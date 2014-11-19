@@ -1,0 +1,25 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'install' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.32
+4 error install Couldn't read dependencies
+5 error Error: Invalid version: "0.1"
+5 error     at Object.module.exports.fixVersionField (/usr/local/lib/node_modules/npm/node_modules/read-package-json/node_modules/normalize-package-data/lib/fixer.js:183:13)
+5 error     at /usr/local/lib/node_modules/npm/node_modules/read-package-json/node_modules/normalize-package-data/lib/normalize.js:30:38
+5 error     at Array.forEach (native)
+5 error     at normalize (/usr/local/lib/node_modules/npm/node_modules/read-package-json/node_modules/normalize-package-data/lib/normalize.js:29:15)
+5 error     at final (/usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:342:33)
+5 error     at then (/usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:126:33)
+5 error     at /usr/local/lib/node_modules/npm/node_modules/read-package-json/read-json.js:240:59
+5 error     at f (/usr/local/lib/node_modules/npm/node_modules/once/once.js:16:25)
+5 error     at Glob.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/glob/glob.js:100:7)
+5 error     at Glob.emit (events.js:95:17)
+6 error If you need help, you may report this *entire* log,
+6 error including the npm and node versions, at:
+6 error     <http://github.com/npm/npm/issues>
+7 error System Linux 3.2.0-4-amd64
+8 error command "/usr/local/bin/node" "/usr/local/bin/npm" "install"
+9 error cwd /media/sf_Work/www/passbolt_ff
+10 error node -v v0.10.32
+11 error npm -v 1.4.28
+12 verbose exit [ 1, true ]

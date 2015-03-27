@@ -754,8 +754,6 @@ textarea {
   margin-bottom: .5em;
   -webkit-appearance: none;
 }
-select.fluid,
-textarea.fluid,
 input[type=password].fluid,
 input[type=text].fluid {
   width: 80%;
@@ -1400,7 +1398,7 @@ h1.workspace-title {
 @media all and (min-width: 768px) {
   .footer {
     bottom: 0;
-    position: fixed;
+    position: absolute;
     padding: 0.833em 1.5% 0 .5%;
     font-size: .75em;
     /* 12px */

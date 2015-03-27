@@ -16,9 +16,6 @@
 	<title>Passbolt config</title>
 	<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"/>
 	<script src="js/lib/modernizr.js"></script>
-	<!--<script src="js/lib/jquery-2.1.1.min.js"></script>-->
-	<!--<script src="js/openpgp.js"></script>-->
-    <!--<script src="js/lib/toggle.js"></script>-->
 	<link rel="stylesheet" media="all" href="css/default/config.css"/>
 </head>
 <body>
@@ -46,6 +43,21 @@
 </div>
 </header>
 
+<div>
+    <h2>Your passbolt visual code</h2>
+    <div id="visualcode">
+        <div class="input text required">
+            <label for="codeColor">Your color</label>
+            <input name="data[VisualCode][color]" class="required fluid" id="js_code_color" required="required" type="text">
+        </div>
+        <div class="input text required">
+            <label for="codeLabel">Your code</label>
+            <input name="data[VisualCode][label]" class="required fluid" id="js_code_label" required="required" type="text">
+        </div>
+        <div class="submit"><input value="save" id="js_save_code" type="submit"/></div>
+    </div>
+</div>
+
 <!-- main -->
 <div class="grid">
 <div class="row">
@@ -53,7 +65,31 @@
 		<h1>Passbolt key settings</h1>
 	
 		<h2>Your current key</h2>
-		<div id="keyinfo">There is no private key available please upload yours or generate a new one.</div>
+		<div id="privkeyinfo">
+            There is no private key available please upload yours or generate a new one.
+            <ul>
+                <li>
+                    <label>user identifiers</label>
+                    <ul class="user-ids"></ul>
+                </li>
+                <li>
+                    <label>Fingerprint</label>
+                    <span class="fingerprint"></span>
+                </li>
+                <li>
+                    <label>Algorithm</label>
+                    <span class="algorithm"></span>
+                </li>
+                <li>
+                    <label>Created</label>
+                    <span class="created"></span>
+                </li>
+                <li>
+                    <label>Expire</label>
+                    <span class="expires"></span>
+                </li>
+            </ul>
+        </div>
 	</div>
 </div>
 <div class="row">

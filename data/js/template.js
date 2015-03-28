@@ -28,15 +28,16 @@
   /**
    * Initialize page with a template.
    */
-  var initPageTpl = function() {
+  var initPageTpl = function(options) {
     getTpl(self.options.templatePath, function(tpl) {
       // Additional data to passe to the template renderer.
-      var data = {
+      var ejsParams = {
         addonDataPath: self.options.addonDataPath
       };
+      $.extend(ejsParams, options);
 
       // Render the page template.
-      var html = new EJS({text: tpl}).render(data);
+      var html = new EJS({text: tpl}).render(ejsParams);
       $('body').html(html);
 
       // When ready trigger the template-ready event.

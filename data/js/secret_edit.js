@@ -7,7 +7,7 @@ $(document).bind('template-ready', function() {
     $viewSecretButton = $('#js_secret_view'),
     $secretStrength = $('#js_secret_strength'),
     $generateSecretButton = $('#js_secret_generate'),
-    currentSecret = 'test est';
+    currentSecret = '';
 
   /**
    * show / hide the secret.
@@ -41,15 +41,23 @@ $(document).bind('template-ready', function() {
   };
 
   /**
-   * Decrypt the secret field.
+   * The secret is still encrypted, decrypt it.
    */
-  var decryptSecretField = function() {
-    return passbolt.cipher.decrypt(passbolt.context['armoredSecret'])
-      .then(function(secret) {
-        isDecrypted = true;
-        $secret.val(secret)
-          .trigger('change');
-      });
+  var decryptSecret = function() {
+    var armored = passbolt.context['armoredSecret'];
+    if (typeof armored != 'undefined' && !armored) {
+      var deferred = $.Deferred();
+      deferred.resolveWith('');
+      return deferred;
+    } else {
+      var deferred = passbolt.cipher.decrypt(armored);
+      deferred.then(function(secret) {
+          isDecrypted = true;
+          $secret.val(secret)
+            .trigger('change');
+        });
+      return deferred;
+    }
   };
 
   // When the user explicitly wants to view the secret.
@@ -59,7 +67,7 @@ $(document).bind('template-ready', function() {
     if (isDecrypted) {
       toggleViewSecret();
     } else {
-      decryptSecretField()
+      decryptSecret()
         .then(function(secret) {
           toggleViewSecret();
         });
@@ -82,7 +90,7 @@ $(document).bind('template-ready', function() {
       $secretClear.val(secret);
       updateSecretStrength(secret);
     } else {
-      decryptSecretField();
+      decryptSecret();
     }
   });
 
@@ -101,7 +109,7 @@ $(document).bind('template-ready', function() {
       $secret.val(secretComplexity.generate())
         .trigger('change');
     } else {
-      decryptSecretField();
+      decryptSecret();
     }
   });
 

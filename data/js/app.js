@@ -1,47 +1,21 @@
 // Close the latest opened dialog message.
-passbolt.message('passbolt.dialog.close_latest')
+passbolt.message('passbolt.keyring.master.request.close')
   .subscribe(function() {
-    passbolt.event.triggerToPage('request_dialog_close_latest');
-  });
-
-// Intercept the return of the request passbolt.keyring.master.request.
-// If the result is an error, display the Master Password Request failure dialog.
-passbolt.message('passbolt.keyring.master.request.complete')
-  .subscribe(function(token, status) {
-    if (status == 'ERROR') {
-      // Drive the app to open an empty dialog.
-      passbolt.event.triggerToPage('request_dialog', {
-        label: 'Request master password failure'
-      });
-
-      // insert the master password form.
-      var $iframe = $('<iframe/>', {
-        id: 'pwdDialog',
-        src: 'about:blank?passbolt=masterFailureInline&id=test&token=' + token,
-        frameBorder: 0
-      });
-      $wrapper = $('.js_dialog_content:last');
-      $iframe.appendTo($wrapper);
-    }
+    $('#passbolt-iframe-master-password').remove();
   });
 
 // Intercept the request passbolt.keyring.master.request.
 // Display a popup to request the user master password.
 passbolt.message('passbolt.keyring.master.request')
   .subscribe(function(token) {
-    // Drive the app to open an empty dialog.
-    passbolt.event.triggerToPage('request_dialog', {
-      label: 'Request master password'
-    });
-
-    // insert the master password form.
+    // Ibject the master password dialog into the web page DOM.
     var $iframe = $('<iframe/>', {
-      id: 'pwdDialog',
+      id: 'passbolt-iframe-master-password',
       src: 'about:blank?passbolt=masterInline',
       frameBorder: 0
     });
-    $wrapper = $('.js_dialog_content:last');
-    $iframe.appendTo($wrapper);
+    $iframe.appendTo('body')
+      .addClass('passbolt-plugin-dialog');
 
     // When the iframe is ready pass it some variables.
     // @todo ATTENTION, is the lib which will intercept the events will be loaded at that point in the iframe ?
@@ -52,7 +26,7 @@ passbolt.message('passbolt.keyring.master.request')
 
 // Decrypt a password when the user is clicking on a pwd cell of the password browser component.
 // Copy it in the clipboard.
-$('body').on('click', '.password',  function() {
+$('body').on('click', '#js_wsp_pwd_browser .password',  function() {
   var armoredSecret = $('pre', this).html();
   // Decrypt the armored secret.
   passbolt.cipher.decrypt(armoredSecret)
@@ -67,7 +41,6 @@ $('body').on('click', '.password',  function() {
     });
 });
 
-
 // When the user wants to save the changes on his resource, he will ask the plugin to encrypt the
 // secret for the users the resource is shared with.
 // Dispatch this event to the secret edition iframe which will take care of the encryption.
@@ -76,18 +49,19 @@ window.addEventListener('passbolt.secret_edition.encrypt', function(event) {
   passbolt.requestOn('Secret', 'passbolt.secret_edition.encrypt', usersIds)
     .then(function(armoreds, usersIds) {
       var armoreds = [armoreds];
-      passbolt.event.triggerToPage('resource_edition_secret_encrypted', armoreds);
+      passbolt.event.triggerToPage('secret_edition_secret_encrypted', armoreds);
     });
 });
 
 // Listen when a resource is edited and inject the passbolt secret field component.
 window.addEventListener("passbolt.plugin.resource_edition", function() {
   var $wrapper = $('.js_form_secret_wrapper'),
+    // @todo Should the plugin trust this variable ????!!!! No way ---> []
     armoredSecret = $('.js_secret_edit_form textarea', $wrapper).val();
 
   // Add an Iframe to allow the user to edit its secret in a safe environment.
   var $iframe = $('<iframe/>', {
-    id: 'pwdDialog',
+    id: 'passbolt-iframe-secret-edition',
     src: 'about:blank?passbolt=decryptInline',
     frameBorder: 0
   });

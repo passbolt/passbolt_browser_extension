@@ -24,10 +24,10 @@ passbolt.message('passbolt.keyring.master.request')
     });
   });
 
-// Decrypt a password when the user is clicking on a pwd cell of the password browser component.
-// Copy it in the clipboard.
-$('body').on('click', '#js_wsp_pwd_browser .password', function() {
-  var armoredSecret = $('pre', this).html();
+// Intercept the request passbolt.secret.decrypt
+// Decrypt the secret, and stores it into the clipboard.
+window.addEventListener('passbolt.secret.decrypt', function(event) {
+  var armoredSecret = event.detail;
   // Decrypt the armored secret.
   passbolt.cipher.decrypt(armoredSecret)
     .then(function(secret) {
@@ -39,6 +39,19 @@ $('body').on('click', '#js_wsp_pwd_browser .password', function() {
         'title': 'The secret has been copied in your clipboard'
       });
     });
+});
+
+// Intercept the request passbolt.login.clipboard
+// Copy the login into the clipboard.
+window.addEventListener('passbolt.login.clipboard', function(event) {
+  var login = event.detail;
+  // Copy the secret into the clipboard.
+  passbolt.clipboard.copy(login);
+  // Notify the user.
+  passbolt.event.triggerToPage('passbolt_notify', {
+    'status': 'success',
+    'title': 'The username has been copied in your clipboard'
+  });
 });
 
 // When the user wants to save the changes on his resource, he will ask the plugin to encrypt the

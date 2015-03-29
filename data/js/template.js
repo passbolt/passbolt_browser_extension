@@ -37,7 +37,7 @@
 
       // Render the page template.
       var html = new EJS({text: tpl}).render(data);
-      $('html').html(html);
+      $('body').html(html);
 
       // When ready trigger the template-ready event.
       $(document).trigger('template-ready');

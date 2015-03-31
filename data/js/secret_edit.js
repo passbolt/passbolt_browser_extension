@@ -121,6 +121,11 @@ $(document).bind('template-ready', function() {
           passbolt.message('passbolt.secret_edition.encrypt.complete')
             .publish(token, 'SUCCESS', armoreds, usersIds);
         })
+        .progress(function(armored, userId, completedGoals) {
+          // Notity about the progression.
+          passbolt.message('passbolt.secret_edition.encrypt.progress')
+            .publish(token, armored, userId, completedGoals);
+        })
         .fail(function() {
           throw 'ENCRYPTION_FAILED';
         });

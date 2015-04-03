@@ -41,16 +41,17 @@ window.addEventListener('passbolt.secret.decrypt', function(event) {
     });
 });
 
-// Intercept the request passbolt.login.clipboard
-// Copy the login into the clipboard.
-window.addEventListener('passbolt.login.clipboard', function(event) {
-  var login = event.detail;
+// Intercept the request passbolt.clipboard
+// Copy data into the clipboard.
+window.addEventListener('passbolt.clipboard', function(event) {
+  var toCopy = event.detail.data;
+  var name = event.detail.name;
   // Copy the secret into the clipboard.
-  passbolt.clipboard.copy(login);
+  passbolt.clipboard.copy(toCopy);
   // Notify the user.
   passbolt.event.triggerToPage('passbolt_notify', {
     'status': 'success',
-    'title': 'The username has been copied in your clipboard'
+    'title': 'The ' + name + 'has been copied in your clipboard'
   });
 });
 

@@ -48,10 +48,11 @@ window.addEventListener('passbolt.clipboard', function(event) {
   var name = event.detail.name;
   // Copy the secret into the clipboard.
   passbolt.clipboard.copy(toCopy);
+  console.log("notify the user");
   // Notify the user.
   passbolt.event.triggerToPage('passbolt_notify', {
     'status': 'success',
-    'title': 'The ' + name + 'has been copied in your clipboard'
+    'title': 'The ' + name + ' has been copied in your clipboard'
   });
 });
 

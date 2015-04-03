@@ -15,6 +15,10 @@ var passbolt = passbolt || {};
     passbolt.context[name] = value;
   });
 
+  self.port.on('passbolt.event.trigger_to_page', function(name, value) {
+    passbolt.event.triggerToPage(name, value);
+  });
+
   /**
    * Set a context on a given worker.
    * @param worker

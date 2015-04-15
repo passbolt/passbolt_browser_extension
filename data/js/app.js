@@ -47,7 +47,6 @@ passbolt.message('passbolt.progress_dialog.init')
     $iframe.appendTo('body')
       .addClass('passbolt-plugin-dialog');
 
-    console.log($iframe);
     // When the iframe is ready pass it some variables.
     // @todo ATTENTION, is the lib which will intercept the events will be loaded at that point in the iframe ?
     $iframe.on('load', function() {
@@ -121,22 +120,48 @@ window.addEventListener('passbolt.secret_edition.encrypt', function(event) {
 window.addEventListener('passbolt.resource_share.encrypt', function(event) {
   var data = event.detail,
     resourceId = data.resourceId,
-    userId = data.userId;
+    usersIds = data.usersIds;
 
-  var url = self.options.config.url + '/resources/' + resourceId + '.json';
-  $.get(url, function(responseRaw) {
-    var response = JSON.parse(responseRaw);
-    if (response) {
-      resource = response.body;
-      passbolt.cipher.decrypt(resource.Secret[0].data)
-        .then(function(secret) {
-          passbolt.cipher.encrypt(secret, [userId])
-            .then(function(armoreds) {
-              passbolt.event.triggerToPage('resource_share_secret_encrypted', armoreds);
+      // Get the resource from the server.
+      // @todo #cheapsecurity why not use the armored from the passbolt.
+      var url = self.options.config.url + '/resources/' + resourceId + '.json';
+      $.get(url, function(responseRaw) {
+        var response = JSON.parse(responseRaw);
+        if (response) {
+          resource = response.body;
+
+          // Decrypt the secret which has to be encrypted for new users.
+          passbolt.cipher.decrypt(resource.Secret[0].data)
+            .then(function(secret) {
+
+              // Open the progression dialog.
+              // @todo #consistency RequestOn, because request doesn't publish the request on the current worker, it has been made to call add-on code mainly, and tranformed to call function on other worker, and now on the current worker.
+              passbolt.requestOn('App', 'passbolt.progress_dialog.init', 'Encrypting ...', usersIds.length)
+                .then(function(token) {
+
+                  // Encrypt the secret.
+                  passbolt.cipher.encrypt(secret, usersIds)
+                    .progress(function(armored, userId, completedGoals) {
+                      // Notify the progress dialog on progression.
+                      passbolt.messageOn('Progress', 'passbolt.progress_dialog.progress', token, 'Encrypted for ' + userId, completedGoals);
+                    })
+                    .then(function(armoreds) {
+
+                      // Close the progress dialog.
+                      passbolt.message('passbolt.progress_dialog.close')
+                        .publish(token);
+                      // Notify the caller with the secret armoreds.
+                      passbolt.event.triggerToPage('resource_share_secret_encrypted', armoreds);
+
+                    });
+
+                });
+
             });
-        });
-    }
-  });
+
+        }
+
+    });
 });
 
 // Listen when a resource is edited and inject the passbolt secret field component.

@@ -2,6 +2,7 @@
 ######################
 /node_modules
 npm-debug.log
+/bower_components
 
 # OS generated files #
 ######################

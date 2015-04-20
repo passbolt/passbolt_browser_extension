@@ -4,6 +4,10 @@
 npm-debug.log
 /bower_components
 
+# Plugin build       #
+######################
+passbolt-firefox-addon.xpi
+
 # OS generated files #
 ######################
 .DS_Store
@@ -17,4 +21,3 @@ Thumbs.db
 /.settings
 /.idea/*
 gi
-*.xpi

@@ -1,8 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="utf-8"/>
+    <style type="text/css">
+        a.js-state-hidden {
+            display:none;
+        }
+        a.js-state-disabled {
+            color: grey;
+        }
+        a.js-state-processing {
+            color: orange;
+        }
+        label{
+            font-weight:bold;
+        }
+        .error label {
+            color: red;
+        }
+        .warning label {
+            color: orange;
+        }
+    </style>
 </head>
 <body>
-<input type="text" value="http://passbolt.dev"/>
+
+<div id="js_menu">
+</div>
+
+
+<div id="js_step_title">
+</div>
+
+<div id="js_step_content">
+</div>
+
+<div id="js_step_actions">
+    <a id="js_setup_submit_step" href="#">Next ></a>
+    <a id="js_setup_cancel_step" href="#">Cancel</a>
+</div>
+
 </body>
 </html>

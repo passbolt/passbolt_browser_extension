@@ -125,7 +125,7 @@ window.addEventListener('passbolt.resource_share.encrypt', function(event) {
 
       // Get the resource from the server.
       // @todo #cheapsecurity why not use the armored from the passbolt.
-      var url = self.options.config.url + '/resources/' + resourceId + '.json';
+      var url = self.options.config.baseUrl + '/resources/' + resourceId + '.json';
       $.get(url, function(responseRaw) {
         var response = JSON.parse(responseRaw);
         if (response) {

@@ -1,0 +1,5 @@
+{
+  "extensionId": "passbolt-firefox-plugin@passbolt.com",
+  "baseUrl": "http://passbolt.dev",
+  "setupBootstrapRegex": "(.*)\/setup\/install\/(.{8}-.{4}-.{4}-.{4}-.{12})\/(.{32})"
+}

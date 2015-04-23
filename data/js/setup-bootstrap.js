@@ -1,15 +1,35 @@
-(function() {
-  // Collect the domain and redirect the user to the second step.
-  var domain = '',
-    location = window.location.href;
+(function($) {
+  // Collect the setup information and redirect the user to the second step.
+  var data = {
+    domain : '',
+    userId : '',
+    token : '',
+    username : '',
+    firstName : '',
+    lastName : ''
+  };
 
   // If this script is loaded, that means the current page is targeting the first step of
   // the wizard installer. The step which is provided by the backend of passbolt.
-  domain = location.substr(0, location.indexOf(self.options.config.setupBootstrapUrl));
+  // Retrieve all the information we need from the url.
+  var regex = new RegExp(self.options.config.setupBootstrapRegex);
+  var matches = regex.exec(window.location.href);
 
-  // Notify the add-on that the user perform a plugin check operation, either by clicking
-  // on the retry button after he installed the plugin, or loading the server setup bootstrap
-  // with the plugin already installed.
-  // What will redirect him to the second step of the wizard.
-  self.port.emit('passbolt.setup.plugin_check', domain);
-})();
+  if (matches != null) {
+    data.domain = matches[1];
+    data.userId = matches[2];
+    data.token = matches[3];
+
+    // Retrieve the user information given on the page.
+    data.username = $('#js_setup_user_username').val();
+    data.lastName = $('#js_setup_user_last_name').val();
+    data.firstName = $('#js_setup_user_first_name').val();
+
+    // Notify the add-on that the user perform a plugin check operation, either by clicking
+    // on the retry button after he installed the plugin, or loading the server setup bootstrap
+    // with the plugin already installed.
+    // What will redirect him onto the second step of the wizard.
+    self.port.emit('passbolt.setup.plugin_check', data);
+  }
+
+})(jQuery);

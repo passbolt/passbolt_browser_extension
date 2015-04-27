@@ -1,0 +1,7 @@
+<ul>
+<% for (var i in menuSteps) { %>
+    <li class="<%= menuSteps[i].state %>-step">
+        <%= steps[menuSteps[i].stepId].label %> (<%= menuSteps[i].state %>)
+    </li>
+<% } %>
+</ul>

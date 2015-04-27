@@ -1,0 +1,43 @@
+<div>
+    <label>Status</label>
+    <span><%= status %></span>
+</div>
+<ul>
+<% for (var fieldName in fieldsDetails) { %>
+    <li>
+        <%= fieldName %> : <%= fieldsDetails[fieldName].rule %> (<%= fieldsDetails[fieldName].status %>)
+    </li>
+<% } %>
+</ul>
+<div class="<%= fieldsDetails['name'] ? fieldsDetails['name'].status : '' %>">
+    <label>Owner Name</label>
+    <span><%= keyInfo.userIds[0].name %></span>
+</div>
+<div class="<%= fieldsDetails['email'] ? fieldsDetails['email'].status : '' %>">
+    <label>Owner Email</label>
+    <span><%= keyInfo.userIds[0].email %></span>
+</div>
+<div>
+    <label>Key ID</label>
+    <span><%= keyInfo.keyId %></span>
+</div>
+<div>
+    <label>Fingerprint</label>
+    <span><%= keyInfo.fingerprint %></span>
+</div>
+<div>
+    <label>Created</label>
+    <span><%= keyInfo.created %></span>
+</div>
+<div>
+    <label>Expires</label>
+    <span><%= keyInfo.expires %></span>
+</div>
+<div>
+    <label>Length</label>
+    <span><%= keyInfo.length %></span>
+</div>
+<div>
+    <label>Algorithm</label>
+    <span><%= keyInfo.algorithm %></span>
+</div>

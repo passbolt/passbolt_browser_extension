@@ -121,11 +121,14 @@ passbolt.setup.data = passbolt.setup.data || {};
     $action.removeClass (function (index, css) {
       return (css.match (/(^|\s)js-state-\S+/g) || []).join(' ');
     });
+    $action.removeClass('disabled')
+      .removeClass('hidden')
+      .removeClass('enabled');
 
     // Go in the new state.
     actionsStates[action] = state;
     // Add the new state class.
-    $action.addClass('js-state-' + state);
+    $action.addClass('js-state-' + state).addClass(state);
   };
 
   /**

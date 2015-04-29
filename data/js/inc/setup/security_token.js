@@ -9,7 +9,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   var step = {
     'id': 'security_token',
-    'label': 'Set a security token',
+    'label': '4. Set a security token',
     'title': 'We need a visual cue to protect us from the bad guys..',
     'parents': ['key_info', 'generate_key'],
     'next': 'password',

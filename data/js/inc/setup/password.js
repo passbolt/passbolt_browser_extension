@@ -9,6 +9,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   var step = {
     'id': 'password',
+    'title' : 'Alright sparky, let\'s create your first password!',
     'label': '5. Login !',
     'parents': ['security_token'],
     'viewData': {}

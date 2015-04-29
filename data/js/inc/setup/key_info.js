@@ -9,7 +9,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   var step = {
     'id': 'key_info',
-    'label': 'Review key info',
+    'label': '2. Review key info',
     'title': 'Let\'s make sure you imported the right key',
     'parents': ['import_key'],
     'next': 'security_token',

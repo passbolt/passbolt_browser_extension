@@ -22,13 +22,43 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   };
 
   step.start = function() {
-    // Check that the pre-filled values unlock the submit button.
-    if ($('#js_setup_security_token_color').val().length != 7 || $('#js_setup_security_token_code').val().length != 3) {
+      /* color picker */
+      var fb = $.farbtastic('#js_colorpicker');
+      var txtvalue = "";
+      var txtpossible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*(){}[]:;!@#$%^&*_-+=|';
+      var colorpossible = 'ABCDEF0123456789';
+
+      /* callback on color picking selection */
+      fb.linkTo(function(color){
+        var txtcolor = fb.hsl[2] > 0.5 ? '#000' : '#fff';
+        $('#js_security_token_text')
+          .css('color',txtcolor)
+          .css('background-color',color);
+        $('#js_security_token_background').val(color);
+        $('#js_security_token_color').val(txtcolor);
+
+      });
+
+      /* set some random letters */
+      var i=0;
+      var randcolor = '';
+      var randtext = '';
+      for( ; i < 3; i++ )
+        randtext += txtpossible.charAt(Math.floor(Math.random() * txtpossible.length));
+      $('#js_security_token_text').val(randtext);
+
+      /* set some random color */
+      for(i=0; i < 6; i++ )
+        randcolor += colorpossible.charAt(Math.floor(Math.random() * colorpossible.length));
+      fb.setColor('#' + randcolor);
+
+    //// Check that the pre-filled values unlock the submit button.
+    if ($('#js_security_token_background').val().length != 7 || $('#js_security_token_text').val().length != 3) {
       passbolt.setup.setActionState('submit', 'disabled');
     }
     // While changing the security token value.
-    $('#js_setup_security_token_color, #js_setup_security_token_code').on('input', function() {
-      if ($('#js_setup_security_token_color').val().length == 7 && $('#js_setup_security_token_code').val().length == 3) {
+    $('#js_security_token_background, #js_security_token_text').on('input', function() {
+      if ($('#js_security_token_background').val().length == 7 && $('#js_security_token_text').val().length == 3) {
         passbolt.setup.setActionState('submit', 'enabled');
       }
       else {
@@ -40,8 +70,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   step.submit = function() {
     passbolt.setup.setActionState('submit', 'processing');
     var def = $.Deferred(),
-      securityTokenColor = $('#js_setup_security_token_color').val(),
-      securityTokenCode = $('#js_setup_security_token_code').val();
+      securityTokenColor = $('#js_security_token_background').val(),
+      securityTokenCode = $('#js_security_token_text').val();
 
     if ($.trim(securityTokenColor).length == 7 && $.trim(securityTokenCode).length == 3) {
       passbolt.setup.data.securityTokenColor = securityTokenColor;

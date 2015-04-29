@@ -9,7 +9,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   var step = {
     'id': 'domain_check',
-    'label': 'Get the plugin',
+    'label': '1. Get the plugin',
     'title': 'Welcome to passbolt! Let\'s take 5 min to setup your system.',
     'parents': null,
     'next': 'define_key',

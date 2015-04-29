@@ -9,7 +9,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   var step = {
     'id': 'secret',
-    'label': 'Set a secret',
+    'label': '3. Set a secret',
     'parents': ['define_key'],
     'next': 'generate_key',
     'viewData': {}
@@ -24,6 +24,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   step.submit = function() {
     passbolt.setup.setActionState('submit', 'processing');
+    passbolt.setup.data.keyInfo.masterKey = $("#js_field_password").val();
+
     var def = $.Deferred();
     def.resolve();
     return def;

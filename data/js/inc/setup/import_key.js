@@ -9,8 +9,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   var step = {
     'id': 'import_key',
-    'label': 'Import your key',
-    'title': 'Import an existing key or <a id="js_setup_goto_define_key" href="#">create</a> a new one!',
+    'label': '2. Import your key',
+    'title': 'Import an existing key or <a id="js_setup_goto_define_key" href="#" class="button primary">create</a> a new one!',
     'parents': ['domain_check'],
     'next': 'key_info',
     'viewData': {}

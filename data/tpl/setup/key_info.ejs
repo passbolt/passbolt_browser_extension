@@ -1,43 +1,59 @@
-<div>
-    <label>Status</label>
-    <span><%= status %></span>
+<!-- left column -->
+<div class="col7">
+    <h3>Information for public and secret key</h3>
+    <table class="table-info">
+        <tr>
+            <td>Owner Name</td>
+            <td  class="<%= fieldsDetails['name'] ? fieldsDetails['name'].status : '' %>"><%= keyInfo.userIds[0].name %> <span class="alt side">original name</span></td>
+        </tr>
+        <tr>
+            <td>Owner Email</td>
+            <td class="<%= fieldsDetails['email'] ? fieldsDetails['email'].status : '' %>"><%= keyInfo.userIds[0].email %></td>
+        </tr>
+        <tr>
+            <td>Key Id</td>
+            <td><%= keyInfo.keyId %></td>
+        </tr>
+        <tr>
+            <td>Fingerprint</td>
+            <td><%= keyInfo.fingerprint %></td>
+        </tr>
+        <tr>
+            <td>Created</td>
+            <td><%= keyInfo.created %></td>
+        </tr>
+        <tr>
+            <td>Expires</td>
+            <td><%= keyInfo.expires %></td>
+        </tr>
+        <tr>
+            <td>Key Length</td>
+            <td><%= keyInfo.length %></td>
+        </tr>
+        <tr>
+            <td>Algorithm</td>
+            <td><%= keyInfo.algorithm %></td>
+        </tr>
+    </table>
 </div>
-<ul>
-<% for (var fieldName in fieldsDetails) { %>
-    <li>
-        <%= fieldName %> : <%= fieldsDetails[fieldName].rule %> (<%= fieldsDetails[fieldName].status %>)
-    </li>
-<% } %>
-</ul>
-<div class="<%= fieldsDetails['name'] ? fieldsDetails['name'].status : '' %>">
-    <label>Owner Name</label>
-    <span><%= keyInfo.userIds[0].name %></span>
-</div>
-<div class="<%= fieldsDetails['email'] ? fieldsDetails['email'].status : '' %>">
-    <label>Owner Email</label>
-    <span><%= keyInfo.userIds[0].email %></span>
-</div>
-<div>
-    <label>Key ID</label>
-    <span><%= keyInfo.keyId %></span>
-</div>
-<div>
-    <label>Fingerprint</label>
-    <span><%= keyInfo.fingerprint %></span>
-</div>
-<div>
-    <label>Created</label>
-    <span><%= keyInfo.created %></span>
-</div>
-<div>
-    <label>Expires</label>
-    <span><%= keyInfo.expires %></span>
-</div>
-<div>
-    <label>Length</label>
-    <span><%= keyInfo.length %></span>
-</div>
-<div>
-    <label>Algorithm</label>
-    <span><%= keyInfo.algorithm %></span>
+
+<!-- right column -->
+<div class="col5 last">
+    <div class="message <%= status %> side-message">
+        <div>
+            <label>Status</label>
+            <span><%= status %></span>
+        </div>
+        <ul>
+            <% for (var fieldName in fieldsDetails) { %>
+            <li>
+                <%= fieldName %> : <%= fieldsDetails[fieldName].rule %> (<%= fieldsDetails[fieldName].status %>)
+            </li>
+            <% } %>
+        </ul>
+        <!--<strong>Success!</strong>
+        Nice one, it looks like a valid key with your key information matching the name and email provided by your passbolt administrator.
+        <br><br>
+        You are good to go!-->
+    </div>
 </div>

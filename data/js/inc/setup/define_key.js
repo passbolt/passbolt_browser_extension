@@ -10,8 +10,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   // The cipher module.
   var step = {
     'id': 'define_key',
-    'label': 'Define your keys',
-    'title': 'Create a new key or <a id="js_setup_goto_import_key" href="#">import</a> an existing one!',
+    'label': '2. Define your keys',
+    'title': 'Create a new key or <a id="js_setup_goto_import_key" href="#" class="button primary">import</a> an existing one!',
     'parents': ['domain_check'],
     'next': 'secret',
     'favorite': true,
@@ -19,10 +19,14 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   };
 
   step.init = function() {
+    step.viewData.firstName = passbolt.setup.data.firstName || null;
+    step.viewData.lastName = passbolt.setup.data.lastName || null;
+    step.viewData.domain = passbolt.setup.data.domain || null;
+    step.viewData.username = passbolt.setup.data.username || null;
   };
 
   step.start = function() {
-    passbolt.setup.setActionState('submit', 'disabled');
+    passbolt.setup.setActionState('submit', 'enabled');
 
     // Bind the go to import an existing key button.
     $('#js_setup_goto_import_key').click(function(ev) {
@@ -32,6 +36,13 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   };
 
   step.submit = function() {
+    // Save value in data.
+    passbolt.setup.data.keyInfo = {};
+    passbolt.setup.data.keyInfo.name = $("#OwnerName").val();
+    passbolt.setup.data.keyInfo.email = passbolt.setup.data.username;
+    passbolt.setup.data.keyInfo.comment = $("#KeyComment").val();
+    passbolt.setup.data.keyInfo.lgth = $("#KeyLength").val();
+    // Process submit.
     passbolt.setup.setActionState('submit', 'processing');
     var def = $.Deferred();
     def.resolve();

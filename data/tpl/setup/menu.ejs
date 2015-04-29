@@ -1,7 +1,22 @@
 <ul>
 <% for (var i in menuSteps) { %>
-    <li class="<%= menuSteps[i].state %>-step">
+    <%
+      var menuClass = 'disabled';
+      switch (menuSteps[i].state) {
+        case 'past':
+          menuClass = 'past';
+          break;
+        case 'current':
+          menuClass = 'selected';
+          break;
+      }
+    %>
+    <li class="<%= menuClass %>">
+        <% if (menuClass == "selected" || menuClass == "past") { %>
+        <a href="#"><%= steps[menuSteps[i].stepId].label %> (<%= menuSteps[i].state %>)</a>
+        <% } else { %>
         <%= steps[menuSteps[i].stepId].label %> (<%= menuSteps[i].state %>)
+        <% } %>
     </li>
 <% } %>
 </ul>

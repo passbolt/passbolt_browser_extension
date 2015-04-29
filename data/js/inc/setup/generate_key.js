@@ -11,7 +11,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     'id': 'generate_key',
     'label': '',
     'parents': ['secret'],
-    'next': 'key_info',
+    'next': 'security_token',
     'subStep': true,
     'viewData': {}
   };

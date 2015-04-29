@@ -72,11 +72,17 @@ module.exports = function(grunt) {
 					dest: '<%= config.webroot %>/img/logo',
 					expand: true
 				},{
+          // Images
+          cwd: '<%= bower.directory %>/<%= config.styleguide %>/src/img',
+          src: ['default/**','logo/**','third_party/**','avatar/**','controls/**'],
+          dest: '<%= config.webroot %>/img',
+          expand: true
+        },{
 					// Less
 					cwd: '<%= bower.directory %>/<%= config.styleguide %>/src/less',
 					src: [
 						'abstractions/**', 'base/**', 'components/**', 'dialogs/**', 'plugin/**',
-						'pages/login.less', 'pages/config.less',
+						'pages/login.less', 'pages/config.less', 'pages/setup.less',
 						'login.less', 'config.less', 'setup.less'
 					],
 					dest: '<%= config.webroot %>/less',

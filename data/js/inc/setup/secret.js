@@ -25,7 +25,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     var $password = $('#js_field_password'),
       $passwordClear = $('#js_field_password_clear'),
       $viewPasswordButton = $('#js_show_pwd_button'),
-      $passwordStrength = $('#js_user_pwd_strength');
+      $passwordStrength = $('#js_user_pwd_strength'),
+      $passwordCriterias = $('#js_password_match_criterias');
 
     // Disable submit button at the beginning.
     passbolt.setup.setActionState('submit', 'disabled');
@@ -61,6 +62,26 @@ passbolt.setup.steps = passbolt.setup.steps || {};
       });
     };
 
+    /**
+     * Update the secret strength component.
+     * @param secret
+     */
+    var updatePasswordCriterias = function(password) {
+      getTpl('./tpl/secret/criterias.ejs', function(tpl) {
+        var criterias = {};
+        if (password.length > 0) {
+          var criterias = secretComplexity.matchMasks(password);
+          criterias['dictionary'] = null;
+          criterias['minLength'] = password.length >= 8;
+        }
+        var data = {
+          criterias: criterias
+        };
+        $passwordCriterias.html(new EJS({text: tpl}).render(data));
+      });
+    };
+    updatePasswordCriterias('');
+
 
     // On input change.
     $password.on('input change', function() {
@@ -69,6 +90,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
       $passwordClear.val(password);
       // Update strength.
       updatePasswordStrength(password);
+      updatePasswordCriterias(password);
 
       // The submit button will be enabled only if the password
       // contains more than 8 characters.

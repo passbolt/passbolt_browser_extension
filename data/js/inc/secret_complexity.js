@@ -121,6 +121,23 @@ var secretComplexity = {};
   exports.strength = strength;
 
   /**
+   * Get an object with a list of criterias and whether the text given matches them.
+   * @param txt
+   * @returns {{}}
+   */
+  var matchMasks = function(txt) {
+    var criterias = {};
+    for (var i in MASKS) {
+      criterias[i] = false;
+      if (txt.match(MASKS[i].pattern)) {
+        criterias[i] = true;
+      }
+    }
+    return criterias;
+  };
+  exports.matchMasks = matchMasks;
+
+  /**
    * Generate a password following the system configuration
    * @return {string}
    */

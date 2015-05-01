@@ -915,6 +915,9 @@ span + .icon {
 .icon.camera:before {
   content: '\1F4F7';
 }
+.icon.paperplane:before {
+  content: '\1F53F';
+}
 /** notification messages **/
 .notification_status .icon.success:before {
   content: '\2713';
@@ -1047,6 +1050,7 @@ a.button {
 }
 a.button.big {
   font-size: 1em;
+  height: 1.5em;
   margin-top: 1em;
   min-width: 3em;
 }
@@ -1072,6 +1076,17 @@ button.primary:focus,
 a.button.primary:focus {
   border: 1px solid #2894df;
   background: #2a9ceb;
+}
+a.button.cancel,
+a.button.cancel:focus,
+a.button.cancel:hover,
+a.button.cancel:active,
+a.button.dim,
+a.button.dim:focus,
+a.button.dim:hover,
+a.button.dim:active {
+  background: #ffffff;
+  font-weight: normal;
 }
 /* hover */
 input[type=submit]:hover,
@@ -1159,6 +1174,24 @@ a.button.disabled:active {
   -moz-border-radius-bottomleft: 0;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+}
+/* processing state */
+html body .button.processing {
+  background: #ffffff;
+  border: 1px solid #ffffff;
+}
+.button.processing:after {
+  line-height: 2.25em;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  content: " ";
+  top: -2px;
+  left: -2px;
+  background: #ffffff url('../img/controls/loading.gif') center center no-repeat;
+  border: 1px solid #CCC;
+  border-radius: 5px;
+  padding: 1px;
 }
 /*
 	Base form components styling

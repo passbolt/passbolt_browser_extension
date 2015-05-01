@@ -2,21 +2,30 @@
 	do not show javascript needed warning if js is enabled
 	this needs modernizer to work
 */
-.js .message.nojs {
-	//display:none;
+.js .message.no-js {
+	display:none;
+}
+.cookies .message.no-cookies {
+	display:none;
 }
 .message {
 	padding:1em;
-}
-.message.error {
-	background:@background-error;
-}
-.message.success {
-	background:@background-success;
-}
-.message.notice {
-	 background:@background-notice;
-}
-.message.warning {
-	background:@background-warning;
+	a {
+		border-bottom:1px solid @grey-darker;
+	}
+	a:hover {
+		border-bottom:1px solid @blue;
+	}
+	&.error {
+		background:@background-error;
+	}
+	&.success {
+		background:@background-success;
+	}
+	&.notice {
+		 background:@background-notice;
+	}
+	&.warning {
+		background:@background-warning;
+	}
 }

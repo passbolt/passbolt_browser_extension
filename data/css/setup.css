@@ -915,6 +915,9 @@ span + .icon {
 .icon.camera:before {
   content: '\1F4F7';
 }
+.icon.paperplane:before {
+  content: '\1F53F';
+}
 /** notification messages **/
 .notification_status .icon.success:before {
   content: '\2713';
@@ -1047,6 +1050,7 @@ a.button {
 }
 a.button.big {
   font-size: 1em;
+  height: 1.5em;
   margin-top: 1em;
   min-width: 3em;
 }
@@ -1072,6 +1076,17 @@ button.primary:focus,
 a.button.primary:focus {
   border: 1px solid #2894df;
   background: #2a9ceb;
+}
+a.button.cancel,
+a.button.cancel:focus,
+a.button.cancel:hover,
+a.button.cancel:active,
+a.button.dim,
+a.button.dim:focus,
+a.button.dim:hover,
+a.button.dim:active {
+  background: #ffffff;
+  font-weight: normal;
 }
 /* hover */
 input[type=submit]:hover,
@@ -1159,6 +1174,24 @@ a.button.disabled:active {
   -moz-border-radius-bottomleft: 0;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+}
+/* processing state */
+html body .button.processing {
+  background: #ffffff;
+  border: 1px solid #ffffff;
+}
+.button.processing:after {
+  line-height: 2.25em;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  content: " ";
+  top: -2px;
+  left: -2px;
+  background: #ffffff url('../img/controls/loading.gif') center center no-repeat;
+  border: 1px solid #CCC;
+  border-radius: 5px;
+  padding: 1px;
 }
 /*
 	Base form components styling
@@ -1509,8 +1542,60 @@ select.fluid {
 }
 .grid-responsive-12 .row,
 .grid .row {
-  clear: both;
+  /*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+  /*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *	`contenteditable` attribute is included anywhere else in the document.
+ *	Otherwise it causes space to appear at the top and bottom of elements
+ *	that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *	`:before` to contain the top-margins of child elements.
+ */
+  /*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+  zoom: 1;
+  /*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *	`contenteditable` attribute is included anywhere else in the document.
+ *	Otherwise it causes space to appear at the top and bottom of elements
+ *	that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *	`:before` to contain the top-margins of child elements.
+ */
   padding: 0 10px;
+}
+.grid-responsive-12 .row:before,
+.grid .row:before,
+.grid-responsive-12 .row:after,
+.grid .row:after {
+  content: "";
+  display: table;
+}
+.grid-responsive-12 .row:after,
+.grid .row:after {
+  clear: both;
+}
+.grid-responsive-12 .row:before,
+.grid .row:before,
+.grid-responsive-12 .row:after,
+.grid .row:after {
+  content: "";
+  display: table;
+}
+.grid-responsive-12 .row:after,
+.grid .row:after {
+  clear: both;
 }
 .grid-responsive-12 .row .col1,
 .grid .row .col1,
@@ -1945,7 +2030,7 @@ select.fluid {
 .header h1 {
   display: none;
 }
-/* Progress bar */
+/* Small Progress bar */
 .progress-bar {
   background: #ffffff;
   width: 100%;
@@ -1957,7 +2042,46 @@ select.fluid {
   height: 2px;
   display: block;
 }
-/* update loading state bar */
+/* larger progress bar */
+.progress-bar-wrapper {
+  border: 1px solid #dddddd;
+  height: 10px;
+  display: block;
+  margin: 2em 0;
+  padding: 2px;
+}
+.progress-bar-wrapper .progress-bar.big {
+  width: 100%;
+  height: 10px;
+  display: block;
+  clear: both;
+  /* indefinite loading */
+}
+.progress-bar-wrapper .progress-bar.big .progress {
+  background: #d40101;
+  width: 5%;
+  height: 5px;
+  display: block;
+  height: 10px;
+}
+.progress-bar-wrapper .progress-bar.big.infinite {
+  background: #d40101;
+}
+.progress-bar-wrapper .progress-bar.big.infinite .progress {
+  width: 100%;
+  overflow: hidden;
+  background: url('../img/controls/infinite-bar.gif') repeat-x;
+  -moz-opacity: 0.5;
+  -khtml-opacity: 0.5;
+  opacity: 0.5;
+  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=5);
+  filter: progid:DXImageTransform.Microsoft.Alpha(opacity=5);
+  filter: alpha(opacity=5);
+}
+/*
+	Contextual loading bar
+	  it is situated at the bottom of the workspace
+*/
 .update-loading-bar {
   position: absolute;
   display: block;
@@ -1965,7 +2089,6 @@ select.fluid {
   bottom: 2em;
   z-index: 991;
 }
-/* initial loading state bar */
 /*
  * Notification
  */
@@ -2098,8 +2221,8 @@ select.fluid {
   padding: 1em;
 }
 .plugin-check.firefox {
-  background: transparent url('../img/third_party/firefox_logo.png') 1em center no-repeat;
-  background-size: 9.375em auto;
+  background: transparent url('../img/third_party/firefox_logo.png') 1.5em center no-repeat;
+  background-size: 150px auto;
   /* 150px */
 }
 .plugin-check.success {
@@ -2110,8 +2233,16 @@ select.fluid {
 }
 .plugin-check .message {
   font-weight: normal;
-  margin-left: 10.375em;
+  margin-left: 180px;
   padding: .5em 1em;
+}
+/* no plugin = display error */
+.no-passboltplugin .plugin-check.success {
+  display: none;
+}
+/* plugin = display success */
+.passboltplugin .plugin-check.error {
+  display: none;
 }
 .video-wrapper {
   padding: 1em;
@@ -2147,8 +2278,20 @@ select.fluid {
 	do not show javascript needed warning if js is enabled
 	this needs modernizer to work
 */
+.js .message.no-js {
+  display: none;
+}
+.cookies .message.no-cookies {
+  display: none;
+}
 .message {
   padding: 1em;
+}
+.message a {
+  border-bottom: 1px solid #888888;
+}
+.message a:hover {
+  border-bottom: 1px solid #2894df;
 }
 .message.error {
   background: #ffe4e4;
@@ -2191,6 +2334,213 @@ table.table-info td + td {
   color: #333333;
   padding-right: .5em;
   padding: .25em .5em;
+}
+/**
+ * Tooltips!
+ * credits: Chris Bracco http://cbracco.me/a-simple-css-tooltip/
+ */
+/* Base styles for the element that has a tooltip */
+[data-tooltip],
+.tooltip {
+  position: relative;
+  cursor: pointer;
+}
+/* Base styles for the entire tooltip */
+[data-tooltip]:before,
+[data-tooltip]:after,
+.tooltip:before,
+.tooltip:after {
+  position: absolute;
+  visibility: hidden;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+  opacity: 0;
+  -webkit-transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out, -webkit-transform 0.2s cubic-bezier(0.71, 1.7, 0.77, 1.24);
+  -moz-transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out, -moz-transform 0.2s cubic-bezier(0.71, 1.7, 0.77, 1.24);
+  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out, transform 0.2s cubic-bezier(0.71, 1.7, 0.77, 1.24);
+  -webkit-transform: translate3d(0, 0, 0);
+  -moz-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  pointer-events: none;
+  text-align: center;
+}
+/* Show the entire tooltip on hover and focus */
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after,
+[data-tooltip]:focus:before,
+[data-tooltip]:focus:after,
+.tooltip:hover:before,
+.tooltip:hover:after,
+.tooltip:focus:before,
+.tooltip:focus:after,
+.always-show:before,
+.always-show:after {
+  visibility: visible;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+  opacity: 1;
+}
+/* Base styles for the tooltip's directional arrow */
+.tooltip:before,
+[data-tooltip]:before {
+  z-index: 1001;
+  border: 6px solid transparent;
+  background: transparent;
+  content: "";
+}
+/* Base styles for the tooltip's content area */
+.tooltip:after,
+[data-tooltip]:after {
+  z-index: 1000;
+  padding: 8px;
+  width: 160px;
+  background-color: #000;
+  background-color: rgba(51, 51, 51, 0.9);
+  color: #fff;
+  content: attr(data-tooltip);
+  font-size: 14px;
+  line-height: 1.2em;
+  font-weight: normal;
+  text-shadow: none;
+}
+/* Directions */
+/* Top (default) */
+[data-tooltip]:before,
+[data-tooltip]:after,
+.tooltip:before,
+.tooltip:after,
+.tooltip-top:before,
+.tooltip-top:after {
+  bottom: 100%;
+  left: 50%;
+}
+[data-tooltip]:before,
+.tooltip:before,
+.tooltip-top:before {
+  margin-left: -6px;
+  margin-bottom: -12px;
+  border-top-color: #000;
+  border-top-color: rgba(51, 51, 51, 0.9);
+}
+/* Horizontally align top/bottom tooltips */
+[data-tooltip]:after,
+.tooltip:after,
+.tooltip-top:after {
+  margin-left: -80px;
+}
+[data-tooltip]:hover:before,
+[data-tooltip]:hover:after,
+[data-tooltip]:focus:before,
+[data-tooltip]:focus:after,
+.tooltip:hover:before,
+.tooltip:hover:after,
+.tooltip:focus:before,
+.tooltip:focus:after,
+.tooltip.always-show:after,
+.tooltip.always-show:before,
+.tooltip-top.always-show:after,
+.tooltip-top.always-show:before,
+.tooltip-top:hover:before,
+.tooltip-top:hover:after,
+.tooltip-top:focus:before,
+.tooltip-top:focus:after {
+  -webkit-transform: translateY(-12px);
+  -moz-transform: translateY(-12px);
+  transform: translateY(-12px);
+}
+/* Left */
+.tooltip-left:before,
+.tooltip-left:after {
+  right: 100%;
+  bottom: 50%;
+  left: auto;
+}
+.tooltip-left:before {
+  margin-left: 0;
+  margin-right: -12px;
+  margin-bottom: 0;
+  border-top-color: transparent;
+  border-left-color: #000;
+  border-left-color: rgba(51, 51, 51, 0.9);
+}
+.tooltip-left:hover:before,
+.tooltip-left:hover:after,
+.tooltip-left.always-show:after,
+.tooltip-left.always-show:before,
+.tooltip-left:focus:before,
+.tooltip-left:focus:after {
+  -webkit-transform: translateX(-12px);
+  -moz-transform: translateX(-12px);
+  transform: translateX(-12px);
+}
+/* Bottom */
+.tooltip-bottom:before,
+.tooltip-bottom:after {
+  top: 100%;
+  bottom: auto;
+  left: 50%;
+}
+.tooltip-bottom:before {
+  margin-top: -12px;
+  margin-bottom: 0;
+  border-top-color: transparent;
+  border-bottom-color: #000;
+  border-bottom-color: rgba(51, 51, 51, 0.9);
+}
+.tooltip-bottom:hover:before,
+.tooltip-bottom:hover:after,
+.tooltip-bottom.always-show:after,
+.tooltip-bottom.always-show:before,
+.tooltip-bottom:focus:before,
+.tooltip-bottom:focus:after {
+  -webkit-transform: translateY(12px);
+  -moz-transform: translateY(12px);
+  transform: translateY(12px);
+}
+/* Right */
+.tooltip-right:before,
+.tooltip-right:after {
+  bottom: 50%;
+  left: 100%;
+}
+.tooltip-right:before {
+  margin-bottom: 0;
+  margin-left: -12px;
+  border-top-color: transparent;
+  border-right-color: #000;
+  border-right-color: rgba(51, 51, 51, 0.9);
+}
+.tooltip-right:hover:before,
+.tooltip-right:hover:after,
+.tooltip-right.always-show:after,
+.tooltip-right.always-show:before,
+.tooltip-right:focus:before,
+.tooltip-right:focus:after {
+  -webkit-transform: translateX(12px);
+  -moz-transform: translateX(12px);
+  transform: translateX(12px);
+}
+/* Move directional arrows down a bit for left/right tooltips */
+.tooltip-left:before,
+.tooltip-right:before {
+  top: 3px;
+}
+/* Vertically center tooltip content for left/right tooltips */
+.tooltip-left:after,
+.tooltip-right:after {
+  margin-left: 0;
+  margin-bottom: -16px;
+}
+/* large width */
+.tooltip.large:after,
+[data-tooltip].large:after {
+  width: 240px;
+}
+.tooltip-right.large:before,
+.tooltip-right.large:after,
+.tooltip-left.large:before,
+.tooltip-left.large:after {
+  margin-top: 6px;
 }
 /**
  * Based on Farbtastic Color Picker 1.2

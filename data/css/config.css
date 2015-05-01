@@ -991,6 +991,7 @@ a.button {
 }
 a.button.big {
   font-size: 1em;
+  height: 1.5em;
   margin-top: 1em;
   min-width: 3em;
 }
@@ -1016,6 +1017,17 @@ button.primary:focus,
 a.button.primary:focus {
   border: 1px solid #2894df;
   background: #2a9ceb;
+}
+a.button.cancel,
+a.button.cancel:focus,
+a.button.cancel:hover,
+a.button.cancel:active,
+a.button.dim,
+a.button.dim:focus,
+a.button.dim:hover,
+a.button.dim:active {
+  background: #ffffff;
+  font-weight: normal;
 }
 /* hover */
 input[type=submit]:hover,
@@ -1104,6 +1116,24 @@ a.button.disabled:active {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
+/* processing state */
+html body .button.processing {
+  background: #ffffff;
+  border: 1px solid #ffffff;
+}
+.button.processing:after {
+  line-height: 2.25em;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  content: " ";
+  top: -2px;
+  left: -2px;
+  background: #ffffff url('../img/controls/loading.gif') center center no-repeat;
+  border: 1px solid #CCC;
+  border-radius: 5px;
+  padding: 1px;
+}
 /*
 	One% CSS Grid - 12 Columns Fluid CSS Grid System
 
@@ -1131,8 +1161,60 @@ a.button.disabled:active {
 }
 .grid-responsive-12 .row,
 .grid .row {
-  clear: both;
+  /*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+  /*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *	`contenteditable` attribute is included anywhere else in the document.
+ *	Otherwise it causes space to appear at the top and bottom of elements
+ *	that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *	`:before` to contain the top-margins of child elements.
+ */
+  /*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+  zoom: 1;
+  /*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *	`contenteditable` attribute is included anywhere else in the document.
+ *	Otherwise it causes space to appear at the top and bottom of elements
+ *	that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *	`:before` to contain the top-margins of child elements.
+ */
   padding: 0 10px;
+}
+.grid-responsive-12 .row:before,
+.grid .row:before,
+.grid-responsive-12 .row:after,
+.grid .row:after {
+  content: "";
+  display: table;
+}
+.grid-responsive-12 .row:after,
+.grid .row:after {
+  clear: both;
+}
+.grid-responsive-12 .row:before,
+.grid .row:before,
+.grid-responsive-12 .row:after,
+.grid .row:after {
+  content: "";
+  display: table;
+}
+.grid-responsive-12 .row:after,
+.grid .row:after {
+  clear: both;
 }
 .grid-responsive-12 .row .col1,
 .grid .row .col1,

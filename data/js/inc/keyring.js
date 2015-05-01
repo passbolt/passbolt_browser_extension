@@ -12,6 +12,10 @@ var passbolt = passbolt || {};
     return passbolt.request("passbolt.keyring.private.import", key);
   };
 
+  keyring.importPublic = function(key, meta) {
+    return passbolt.request("passbolt.keyring.public.import", key, meta);
+  };
+
   passbolt.keyring = keyring;
 
 })( passbolt );

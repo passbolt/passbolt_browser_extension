@@ -9,6 +9,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   var step = {
     'id': 'generate_key',
+    'title': 'Give us a second while we crunch them numbers!',
     'label': '',
     'parents': ['secret'],
     'next': 'security_token',
@@ -21,7 +22,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   };
 
   step.start = function() {
-    passbolt.setup.setActionState('submit', 'disabled');
+    passbolt.setup.setActionState('submit', 'processing');
     setTimeout(function() {
         passbolt.request("passbolt.gpgkey.generate_key_pair", passbolt.setup.data.keyInfo)
           .then(function(key) {
@@ -40,10 +41,9 @@ passbolt.setup.steps = passbolt.setup.steps || {};
                 console.log(error);
                 passbolt.setup.setActionState('submit', 'enabled');
               });
-
           })
           .fail(function(error) {
-            alert('Something went wrong with the key you want to import, see debug for now.');
+            alert('Something went wrong with the key generation. See debug for now.');
             console.log(error);
           });
     },

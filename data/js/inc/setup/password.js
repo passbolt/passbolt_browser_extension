@@ -104,6 +104,20 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     });
   };
 
+  step.autologin = function() {
+    getTpl('./tpl/setup/login_form.ejs', function(tpl) {
+      var data = {
+        login_url : passbolt.setup.data.domain + "/login",
+        username: passbolt.setup.data.username,
+        password: passbolt.setup.data.password
+      };
+      // Renders an invisible form.
+      $('#SetupAutoLogin').html(new EJS({text: tpl}).render(data));
+      // Submit form.
+      $('form', $('#SetupAutoLogin')).submit();
+    });
+  };
+
   // Submit step.
   step.submit = function() {
     passbolt.setup.setActionState('submit', 'processing');
@@ -112,7 +126,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     passbolt.setup.data.password = $('#js_setup_password').val();
     passbolt.request('passbolt.setup.save', passbolt.setup.data)
       .then(function() {
-        console.log('done');
+        // Autologin.
+        step.autologin();
       });
 
     return def;

@@ -121,9 +121,7 @@ passbolt.setup.data = passbolt.setup.data || {};
     $action.removeClass (function (index, css) {
       return (css.match (/(^|\s)js-state-\S+/g) || []).join(' ');
     });
-    $action.removeClass('disabled')
-      .removeClass('hidden')
-      .removeClass('enabled');
+    $action.removeClass('disabled hidden enabled processing');
 
     // Go in the new state.
     actionsStates[action] = state;

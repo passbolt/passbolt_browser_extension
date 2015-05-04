@@ -48,6 +48,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         .then(function(data) {
           passbolt.setup.data.key = data;
           $('#js_setup_import_key_text').val(data).change();
+          $('#KeyErrorMessage').addClass("hidden");
         });
     });
   };
@@ -60,11 +61,12 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
     passbolt.keyring.importPrivate(key)
       .then(function() {
+        $('#KeyErrorMessage').addClass("hidden");
         passbolt.setup.data.key = key;
         def.resolve();
       })
       .fail(function(error) {
-        alert('Something went wrong with the key you want to import, see debug for now.');
+        $('#KeyErrorMessage').removeClass("hidden").html('The key selected has an invalid format.');
         console.log(error);
         passbolt.setup.setActionState('submit', 'enabled');
         def.fail();

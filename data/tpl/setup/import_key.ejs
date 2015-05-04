@@ -1,23 +1,17 @@
 <!-- left column -->
 <div class="col6">
-    <h3>Import public & secret key from a file</h3>
+    <h3>Copy paste your public and private key below, or select it from a file.</h3>
     <div class="input file">
-        <div class="dropzone">
-            Drag and drop your GPG key file here.
-        </div>
         <div class="input-wrapper">
             <div class="input-wrapper-2">
-                <input name="data[Key][file]" value="" id="js_setup_import_key_browse" type="submit">
+                <input name="data[Key][file]" value="Browse..." id="js_setup_import_key_browse" type="submit">
+                <br/><br/>
             </div>
         </div>
     </div>
-</div>
-
-<!-- right column -->
-<div class="col6 last">
-    <h3>or copy paste your key bellow</h3>
     <div class="input textarea gpgkey">
         <textarea name="data[Key][ascii]" class="fluid code" id="js_setup_import_key_text"><%= key %></textarea>
     </div>
+    <div class="message error hidden" id="KeyErrorMessage"></div>
 </div>
 

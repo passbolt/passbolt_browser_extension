@@ -23,15 +23,15 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   };
 
   step.start = function() {
+    // Disable submit button at the beginning.
+    passbolt.setup.setActionState('submit', 'disabled');
+
     // Declare elements and variables.
     var $password = $('#js_setup_password'),
       $passwordClear = $('#js_setup_password_clear'),
       $viewPasswordButton = $('#js_show_pwd_button'),
       $passwordStrength = $('#js_user_pwd_strength'),
       $generatePasswordButton = $('#js_gen_pwd_button');
-
-    // Disable submit button at the beginning.
-    passbolt.setup.setActionState('submit', 'disabled');
 
     /**
      * show / hide the secret.

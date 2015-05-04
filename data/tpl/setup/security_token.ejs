@@ -6,7 +6,7 @@
     <div class="colorpicker">
         <div class="input color">
             <input type="text" id="js_security_token_text" class="token" name="text" value="<%= securityTokenCode %>" maxlength="3"/>
-            <div id="js_field_name_feedback" class="message error">Error message for input text</div>
+            <div id="js_field_name_feedback" class="message error hidden"><!-- Error message --></div>
             <input type="hidden" id="js_security_token_background" name="background" value="<%= securityTokenColor %>" />
             <input type="hidden" id="js_security_token_color" name="color" />
         </div>

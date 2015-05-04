@@ -28,16 +28,18 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         if (passbolt.setup.data.firstName + ' ' + passbolt.setup.data.lastName != keyInfo.userIds[0].name) {
           fieldsDetails['name'] = {
             status: 'warning',
-            rule: 'match'
+            rule: 'match',
+            original: passbolt.setup.data.firstName + ' ' + passbolt.setup.data.lastName
           };
           if (status != 'error' || status != 'warning') status = 'warning';
         }
 
         // Email different from the one defined by the administrator.
-        if (passbolt.setup.data.email != keyInfo.userIds[0].email) {
+        if (passbolt.setup.data.username != keyInfo.userIds[0].email) {
           fieldsDetails['email'] = {
             status: 'warning',
-            rule: 'match'
+            rule: 'match',
+            original: passbolt.setup.data.username
           };
           if (status != 'error' || status != 'warning') status = 'warning';
         }

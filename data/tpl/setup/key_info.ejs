@@ -4,11 +4,11 @@
     <table class="table-info">
         <tr>
             <td>Owner Name</td>
-            <td  class="<%= fieldsDetails['name'] ? fieldsDetails['name'].status : '' %>"><%= keyInfo.userIds[0].name %> <span class="alt side">original name</span></td>
+            <td  class="<%= fieldsDetails['name'] ? fieldsDetails['name'].status : '' %>"><%= keyInfo.userIds[0].name %> <span class="alt side"><%= fieldsDetails['name'].original %></span></td>
         </tr>
         <tr>
             <td>Owner Email</td>
-            <td class="<%= fieldsDetails['email'] ? fieldsDetails['email'].status : '' %>"><%= keyInfo.userIds[0].email %></td>
+            <td class="<%= fieldsDetails['email'] ? fieldsDetails['email'].status : '' %>"><%= keyInfo.userIds[0].email %> <span class="alt side"><%= fieldsDetails['email'].original %></span></td>
         </tr>
         <tr>
             <td>Key Id</td>
@@ -40,20 +40,35 @@
 <!-- right column -->
 <div class="col5 last">
     <div class="message <%= status %> side-message">
-        <div>
-            <label>Status</label>
-            <span><%= status %></span>
-        </div>
-        <ul>
-            <% for (var fieldName in fieldsDetails) { %>
-            <li>
-                <%= fieldName %> : <%= fieldsDetails[fieldName].rule %> (<%= fieldsDetails[fieldName].status %>)
-            </li>
-            <% } %>
-        </ul>
-        <!--<strong>Success!</strong>
-        Nice one, it looks like a valid key with your key information matching the name and email provided by your passbolt administrator.
-        <br><br>
-        You are good to go!-->
+        <%
+        if (status == 'warning') {
+          var fieldsStr = '';
+          for (var fieldName in fieldsDetails) {
+            fieldsStr += ((fieldsStr == '') ? fieldName : ' and ' + fieldName);
+          }
+        %>
+        <p>
+            <strong>Warning:</strong> the <%= fieldsStr %> selected by your administrator do not match
+            the name and email of your key. Passbolt will use the information provided by the administrator to identify yourself.
+        </p>
+        <p>
+            While this is not a deal breaker this may lead to some confusions.
+            <a href="#">Learn more.</a>
+        </p>
+        <p class="small">
+            Note: Passbolt do not support multiple user identities at the moment.
+        </p>
+        <%
+        } else {
+        %>
+          <p>
+              <strong>Success!</strong>
+              Nice one, it looks like a valid key with your key information matching the name and email provided by your passbolt administrator.
+              <br><br>
+              You are good to go!
+          </p>
+        <%
+        }
+        %>
     </div>
 </div>

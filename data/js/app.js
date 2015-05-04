@@ -186,3 +186,8 @@ window.addEventListener("passbolt.plugin.resource_edition", function() {
     passbolt.event.dispatchContext('Secret', 'armoredSecret', armoredSecret);
   });
 }, false);
+
+// Add classes relative to plugin.
+$('html')
+  .removeClass('no-passboltplugin')
+  .addClass('passboltplugin');

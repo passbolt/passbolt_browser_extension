@@ -222,7 +222,6 @@ passbolt.setup.data = passbolt.setup.data || {};
    * @param targetStepId
    */
   passbolt.setup.init = function(data) {
-    console.log(data);
     passbolt.setup.data = data;
 
     // Go to the first step.

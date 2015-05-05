@@ -71,10 +71,12 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     passbolt.setup.setActionState('submit', 'processing');
     var def = $.Deferred(),
       securityTokenColor = $('#js_security_token_background').val(),
+      securityTokenTextColor = $('#js_security_token_color').val(),
       securityTokenCode = $('#js_security_token_text').val();
 
     if ($.trim(securityTokenColor).length == 7 && $.trim(securityTokenCode).length == 3) {
       passbolt.setup.data.securityTokenColor = securityTokenColor;
+      passbolt.setup.data.securityTokenTextColor = securityTokenTextColor;
       passbolt.setup.data.securityTokenCode = securityTokenCode;
       def.resolve();
     }

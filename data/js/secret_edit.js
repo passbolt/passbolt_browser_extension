@@ -9,6 +9,10 @@ $(document).bind('template-ready', function() {
     $generateSecretButton = $('#js_secret_generate'),
     currentSecret = '';
 
+  if ($secret.val() == "") {
+    isDecrypted = true;
+  }
+
   /**
    * show / hide the secret.
    */
@@ -39,6 +43,9 @@ $(document).bind('template-ready', function() {
       $secretStrength.html(new EJS({text: tpl}).render(data));
     });
   };
+  if (isDecrypted) {
+    updateSecretStrength($secret.val());
+  }
 
   /**
    * The secret is still encrypted, decrypt it.
@@ -103,7 +110,6 @@ $(document).bind('template-ready', function() {
   // When the generate a new secret button is clicked.
   $generateSecretButton.on('click', function(ev) {
     ev.preventDefault();
-
     // The operation requires the secret to be decrypted.
     if (isDecrypted) {
       $secret.val(secretComplexity.generate())

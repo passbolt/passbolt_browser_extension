@@ -83,7 +83,7 @@ module.exports = function(grunt) {
 					src: [
 						'abstractions/**', 'base/**', 'components/**', 'dialogs/**', 'plugin/**',
 						'pages/login.less', 'pages/config.less', 'pages/setup.less',
-						'login.less', 'config.less', 'setup.less'
+						'login.less', 'config.less', 'setup.less', 'setup_ff.less', 'main_ff.less', 'external.less'
 					],
 					dest: '<%= config.webroot %>/less',
 					expand: true

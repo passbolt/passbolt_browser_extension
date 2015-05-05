@@ -875,6 +875,9 @@ span + .icon {
 .icon.paperplane:before {
   content: '\1F53F';
 }
+.icon.download:before {
+  content: '\1F4E5';
+}
 /** notification messages **/
 .notification_status .icon.success:before {
   content: '\2713';
@@ -1048,7 +1051,7 @@ textarea {
 }
 /* text and textarea */
 /*
-	Radio
+	Checkboxes and Radio
 */
 .checkboxlist .input.checkbox label,
 .radiolist .input.radio label {
@@ -1058,7 +1061,6 @@ textarea {
 .checkbox label {
   font-weight: normal;
   display: inline;
-  font-size: 1em;
 }
 /* radio and checkboxes */
 /*
@@ -1829,6 +1831,7 @@ html body .button.processing {
 .cookies .message.no-cookies {
   display: none;
 }
+/* message styling per types */
 .message {
   padding: 1em;
 }

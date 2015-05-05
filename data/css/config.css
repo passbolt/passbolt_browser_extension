@@ -822,7 +822,7 @@ textarea {
 }
 /* text and textarea */
 /*
-	Radio
+	Checkboxes and Radio
 */
 .checkboxlist .input.checkbox label,
 .radiolist .input.radio label {
@@ -832,7 +832,6 @@ textarea {
 .checkbox label {
   font-weight: normal;
   display: inline;
-  font-size: 1em;
 }
 /* radio and checkboxes */
 /*

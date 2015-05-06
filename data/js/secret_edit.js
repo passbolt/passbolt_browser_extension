@@ -13,6 +13,23 @@ $(document).bind('template-ready', function() {
     isDecrypted = true;
   }
 
+  // Get config regarding security token, and display it.
+  passbolt.request('passbolt.config.readAll', ['securityTokenColor', 'securityTokenTextColor', 'securityTokenCode'])
+    .then(function(config) {
+      // Load color styles.
+      var styles = "#js_secret:focus," +
+        "#js_secret ~ .security-token {" +
+        "background: " + config.securityTokenColor + ";" +
+        "color:" + config.securityTokenTextColor + ";" +
+        "}" +
+        "#js_secret:focus ~ .security-token {" +
+        "background:" + config.securityTokenTextColor + ";" +
+        "color:" + config.securityTokenColor + ";" +
+        "}";
+      $('head').append('<style>' + styles + '</style>');
+      $('.security-token').text(config.securityTokenCode);
+    });
+
   /**
    * show / hide the secret.
    */

@@ -10,6 +10,23 @@ $(document).bind('template-ready', function() {
       }
     });
 
+  // Get config regarding security token, and display it.
+  passbolt.request('passbolt.config.readAll', ['securityTokenColor', 'securityTokenTextColor', 'securityTokenCode'])
+    .then(function(config) {
+      // Load color styles.
+      var styles = "#js_master_password:focus," +
+        "#js_master_password + .security-token {" +
+          "background: " + config.securityTokenColor + ";" +
+          "color:" + config.securityTokenTextColor + ";" +
+        "}" +
+        "#js_master_password:focus + .security-token {" +
+          "background:" + config.securityTokenTextColor + ";" +
+          "color:" + config.securityTokenColor + ";" +
+        "}";
+      $('head').append('<style>' + styles + '</style>');
+      $('.security-token').text(config.securityTokenCode);
+    });
+
   // The user clicks on OK.
   $('#master-password-submit').on('click', function() {
     var masterPassword = $('#js_master_password').val();

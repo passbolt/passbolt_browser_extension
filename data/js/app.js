@@ -89,6 +89,27 @@ window.addEventListener('passbolt.clipboard', function(event) {
   });
 });
 
+// Intercept the request passbolt.keyring.master.request.
+// Display a popup to request the user master password.
+window.addEventListener('passbolt.keys_preferences.init', function(event) {
+    var userId = event.detail;
+    // Inject the master password dialog into the web page DOM.
+    var $iframe = $('<iframe/>', {
+      id: 'passbolt-iframe-keys-preferences',
+      src: 'about:blank?passbolt=keysPreferences',
+      frameBorder: 0,
+      'data-user-id': userId
+    });
+    $iframe
+      .attr('width', '100%')
+      .attr('height', 500)
+      .appendTo('#js_keys_preferences_iframe_container');
+
+    $iframe.on('load', function() {
+      passbolt.event.dispatchContext('Preferences', 'publicKey', userId);
+    });
+  });
+
 // When the user wants to save the changes on his resource, he will ask the plugin to encrypt the
 // secret for the users the resource is shared with.
 // Dispatch this event to the secret edition iframe which will take care of the encryption.
@@ -187,6 +208,7 @@ window.addEventListener("passbolt.plugin.resource_edition", function() {
   });
 }, false);
 
+// TODO : add this code below in a the corresponding pageMod
 // Add classes relative to plugin.
 $('html')
   .removeClass('no-passboltplugin')

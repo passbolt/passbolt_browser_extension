@@ -21,6 +21,10 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   step.init = function() {
     step.viewData.domain = passbolt.setup.data.domain;
+    passbolt.request('passbolt.setup.init')
+      .then(function() {
+        console.log('setup init');
+      });
   };
 
   step.start = function() {

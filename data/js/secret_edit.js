@@ -1,17 +1,26 @@
 // When the page has been initialized.
 $(document).bind('template-ready', function() {
 
-  var isDecrypted = false,
+  var isDecrypted = true,
     $secret = $('#js_secret'),
     $secretClear = $('#js_secret_clear'),
     $viewSecretButton = $('#js_secret_view'),
     $secretStrength = $('#js_secret_strength'),
     $generateSecretButton = $('#js_secret_generate'),
-    currentSecret = '';
+    currentSecret = '',
+    initialSecretPlaceholder = $secret.attr('placeholder');
 
-  if ($secret.val() == "") {
-    isDecrypted = true;
-  }
+  // Listen to when the context is passed.
+  passbolt.message('passbolt.context.set')
+    .subscribe(function(token, status) {
+      // If armoredSecret is given,
+      if (passbolt.context['armoredSecret'] != undefined && passbolt.context['armoredSecret'] != '') {
+        isDecrypted = false;
+        $secret
+          .attr('placeholder', '********')
+          .parent().addClass('has-encrypted-secret')
+      }
+    });
 
   // Get config regarding security token, and display it.
   passbolt.request('passbolt.config.readAll', ['securityTokenColor', 'securityTokenTextColor', 'securityTokenCode'])
@@ -77,8 +86,12 @@ $(document).bind('template-ready', function() {
       var deferred = passbolt.cipher.decrypt(armored);
       deferred.then(function(secret) {
           isDecrypted = true;
-          $secret.val(secret)
-            .trigger('change');
+          $secret
+            .val(secret)
+            .attr('placeholder', initialSecretPlaceholder)
+            .focus()
+            .trigger('change')
+            .parent().removeClass('has-encrypted-secret');
         });
       return deferred;
     }
@@ -114,6 +127,12 @@ $(document).bind('template-ready', function() {
       $secretClear.val(secret);
       updateSecretStrength(secret);
     } else {
+      decryptSecret();
+    }
+  });
+
+  $secret.on('focus', function(ev) {
+    if (!isDecrypted) {
       decryptSecret();
     }
   });

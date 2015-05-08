@@ -1,4 +1,9 @@
 (function($) {
+  // If the expected username field is not provided, do not launch the setup.
+  if (!$('#js_setup_user_username').length) {
+    return;
+  }
+
   // Collect the setup information and redirect the user to the second step.
   var data = {
     domain : '',

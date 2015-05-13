@@ -63,7 +63,7 @@ passbolt.message('passbolt.progress_dialog.init')
 window.addEventListener('passbolt.secret.decrypt', function(event) {
   var armoredSecret = event.detail;
   // Decrypt the armored secret.
-  passbolt.cipher.decrypt(armoredSecret)
+  passbolt.secret.decrypt(armoredSecret)
     .then(function(secret) {
       // Copy the secret into the clipboard.
       passbolt.clipboard.copy(secret);
@@ -153,7 +153,7 @@ window.addEventListener('passbolt.resource_share.encrypt', function(event) {
           resource = response.body;
 
           // Decrypt the secret which has to be encrypted for new users.
-          passbolt.cipher.decrypt(resource.Secret[0].data)
+          passbolt.secret.decrypt(resource.Secret[0].data)
             .then(function(secret) {
 
               // Open the progression dialog.
@@ -162,7 +162,7 @@ window.addEventListener('passbolt.resource_share.encrypt', function(event) {
                 .then(function(token) {
 
                   // Encrypt the secret.
-                  passbolt.cipher.encrypt(secret, usersIds)
+                  passbolt.secret.encrypt(secret, usersIds)
                     .progress(function(armored, userId, completedGoals) {
                       // Notify the progress dialog on progression.
                       passbolt.messageOn('Progress', 'passbolt.progress_dialog.progress', token, 'Encrypted for ' + userId, completedGoals);

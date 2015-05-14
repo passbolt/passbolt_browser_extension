@@ -7,7 +7,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
 (function (passbolt) {
 
-  // The cipher module.
   var step = {
     'id': 'define_key',
     'label': '2. Define your keys',

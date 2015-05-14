@@ -83,7 +83,7 @@ $(document).bind('template-ready', function() {
       deferred.resolveWith('');
       return deferred;
     } else {
-      var deferred = passbolt.cipher.decrypt(armored);
+      var deferred = passbolt.secret.decrypt(armored);
       deferred.then(function(secret) {
           isDecrypted = true;
           $secret
@@ -158,7 +158,7 @@ $(document).bind('template-ready', function() {
   // Listen when the user wants to encrypt the secret for all the users the resource is shared with.
   passbolt.message('passbolt.secret_edition.encrypt')
     .subscribe(function(token, usersIds) {
-      passbolt.cipher.encrypt(currentSecret, usersIds)
+      passbolt.secret.encrypt(currentSecret, usersIds)
         .then(function(armoreds, usersIds) {
           passbolt.message('passbolt.secret_edition.encrypt.complete')
             .publish(token, 'SUCCESS', armoreds, usersIds);

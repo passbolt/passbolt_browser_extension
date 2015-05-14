@@ -89,6 +89,11 @@ window.addEventListener('passbolt.clipboard', function(event) {
   });
 });
 
+// Intercepts the event passbolt.config.debug
+// To debug the config.
+window.addEventListener('passbolt.config.debug', function(event) {
+  passbolt.request('passbolt.config.debug');
+});
 
 // When the user wants to save the changes on his resource, he will ask the plugin to encrypt the
 // secret for the users the resource is shared with.

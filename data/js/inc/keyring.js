@@ -16,6 +16,14 @@ var passbolt = passbolt || {};
     return passbolt.request("passbolt.keyring.public.import", key, meta);
   };
 
+  keyring.getKeyMeta = function(armoredKey, userId) {
+    var meta = {
+      "user_id" : userId,
+      "key" : armoredKey
+    };
+    return meta;
+  }
+
   passbolt.keyring = keyring;
 
 })( passbolt );

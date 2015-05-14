@@ -1,12 +1,20 @@
 // When the page has been initialized.
 $(document).bind('template-ready', function() {
 
-// Wrong master password.
+  // Wrong master password.
   passbolt.message('passbolt.keyring.master.request.complete')
-    .subscribe(function(token, status) {
+    .subscribe(function(token, status, attempts) {
       if (status == 'ERROR') {
-        $('label[for="js_master_password"]').html('Please enter a valid master password.')
-          .addClass('error');
+        if (attempts < 3) {
+          $('label[for="js_master_password"]').html('Please enter a valid master password.')
+            .addClass('error');
+        } else {
+          getTpl('./tpl/keyring/master-password-failure.ejs', function(tpl) {
+            // Render the page template.
+            var html = new EJS({text: tpl}).render();
+            $('.js_dialog_content').html(html);
+          });
+        }
       }
     });
 
@@ -16,12 +24,12 @@ $(document).bind('template-ready', function() {
       // Load color styles.
       var styles = "#js_master_password:focus," +
         "#js_master_password + .security-token {" +
-          "background: " + config.securityTokenColor + ";" +
-          "color:" + config.securityTokenTextColor + ";" +
+        "background: " + config.securityTokenColor + ";" +
+        "color:" + config.securityTokenTextColor + ";" +
         "}" +
         "#js_master_password:focus + .security-token {" +
-          "background:" + config.securityTokenTextColor + ";" +
-          "color:" + config.securityTokenColor + ";" +
+        "background:" + config.securityTokenTextColor + ";" +
+        "color:" + config.securityTokenColor + ";" +
         "}";
       $('head').append('<style>' + styles + '</style>');
       $('.security-token').text(config.securityTokenCode);
@@ -34,7 +42,7 @@ $(document).bind('template-ready', function() {
   });
 
   // The user wants to close the dialog.
-  $('.js-dialog-close').on('click', function(ev) {
+  $('body').on('click', '.js-dialog-close', function(ev) {
     ev.preventDefault();
     passbolt.messageOn('App', 'passbolt.keyring.master.request.close');
   });

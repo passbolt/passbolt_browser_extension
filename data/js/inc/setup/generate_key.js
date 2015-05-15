@@ -12,7 +12,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     'title': 'Give us a second while we crunch them numbers!',
     'label': '',
     'parents': ['secret'],
-    'next': 'security_token',
+    'next': 'backup_key',
     'subStep': true,
     'viewData': {}
   };
@@ -26,20 +26,19 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     setTimeout(function() {
         passbolt.request("passbolt.gpgkey.generate_key_pair", passbolt.setup.data.keyInfo)
           .then(function(key) {
-            $('#keyGenerationStatus').html("Key has been generated");
-            var privateKey = key.privateKeyArmored;
-            var publicKey = key.publicKeyArmored;
+            var privateKey = key.privateKeyArmored,
+              publicKey = key.publicKeyArmored;
+
             passbolt.setup.data.publicKey = publicKey;
             passbolt.keyring.importPrivate(privateKey)
               .then(function() {
                 passbolt.setup.data.key = privateKey;
-                $('#keyGenerationStatus').html("Congratulations, key has been imported");
                 passbolt.setup.setActionState('submit', 'enabled');
+                passbolt.setup.goForward('backup_key');
               })
               .fail(function(error) {
                 alert('Something went wrong with the key import');
                 console.log(error);
-                passbolt.setup.setActionState('submit', 'enabled');
               });
           })
           .fail(function(error) {
@@ -60,7 +59,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   step.cancel = function() {
     passbolt.setup.setActionState('cancel', 'processing');
     var def = $.Deferred();
-    def.resolve();
+    def.reject();
     return def;
   };
 

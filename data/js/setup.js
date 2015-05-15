@@ -134,7 +134,6 @@ passbolt.setup.data = passbolt.setup.data || {};
    * @param targetStepId
    */
   passbolt.setup.goToStep = function(targetStepId) {
-    //console.log(passbolt.setup.data);
     var menuSteps = passbolt.setup.getMenuSteps(),
       step = passbolt.setup.steps[currentStepId];
 
@@ -211,8 +210,8 @@ passbolt.setup.data = passbolt.setup.data || {};
     if (!pastSteps.length){
       return;
     }
-    // remove the latest step from the step the user has been through.
-    pastSteps.pop();
+    // remove the latest steps from the step the user has been through.
+    pastSteps = pastSteps.slice(0, pastSteps.indexOf(targetStepId));
     currentStepId = targetStepId;
     passbolt.setup.goToStep(currentStepId);
   };
@@ -250,9 +249,14 @@ passbolt.setup.data = passbolt.setup.data || {};
       return;
     }
 
-    var step = passbolt.setup.steps[currentStepId];
+    var step = passbolt.setup.steps[currentStepId],
+      previousStepId = null;
     step.cancel().then(function() {
-      passbolt.setup.goBackward(pastSteps[pastSteps.length - 1]);
+      for(var i in step.parents) {
+        if ((previousStepId = pastSteps.indexOf(step.parents[i])) != -1) {
+          passbolt.setup.goBackward(pastSteps[previousStepId]);
+        }
+      }
     });
 
   });

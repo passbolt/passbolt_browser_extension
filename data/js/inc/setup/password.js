@@ -64,7 +64,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
       });
     };
 
-
     // On input change.
     $password.on('input change', function() {
       var password = $password.val();

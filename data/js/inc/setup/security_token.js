@@ -11,7 +11,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     'id': 'security_token',
     'label': '4. Set a security token',
     'title': 'We need a visual cue to protect us from the bad guys..',
-    'parents': ['key_info', 'generate_key'],
+    'parents': ['key_info', 'backup_key'],
     'next': 'password',
     'viewData': {}
   };

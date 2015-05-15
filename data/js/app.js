@@ -189,6 +189,14 @@ window.addEventListener("passbolt.plugin.resource_edition", function() {
   });
 }, false);
 
+// Listen when the user claim his key.
+window.addEventListener("passbolt.settings.backup_key", function() {
+  passbolt.request('passbolt.settings.backup_key')
+    .then(function () {
+      // The key has been saved.
+    });
+});
+
 // TODO : add this code below in a the corresponding pageMod
 // Add classes relative to plugin.
 $('html')

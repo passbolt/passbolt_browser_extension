@@ -10552,21 +10552,6 @@ module.exports = {
     symEncryptedIntegrityProtected: 18,
     modificationDetectionCode: 19
   },
-
-  /** Data types in the literal packet
-   * @enum {Integer}
-   * @readonly
-   */
-  literal: {
-    /** Binary data 'b' */
-    binary: 'b'.charCodeAt(),
-    /** Text data 't' */
-    text: 't'.charCodeAt(),
-    /** Utf8 data 'u' */
-    utf8: 'u'.charCodeAt()
-  },
-
-
   /** One pass signature packet type
    * @enum {Integer}
    * @readonly
@@ -10676,6 +10661,7 @@ module.exports = {
     third_party: 80
   },
 
+
   /** Signature subpacket type
    * @enum {Integer}
    * @readonly
@@ -10765,14 +10751,28 @@ module.exports = {
       return type[e];
     } else throw new Error('Invalid enum value.');
   },
-  /** Converts from an integer to string. */
+
+	/** Converts from an integer to string. */
   read: function(type, e) {
     for (var i in type)
       if (type[i] == e) return i;
 
     throw new Error('Invalid enum value.');
-  }
+  },
 };
+	/** Data types in the literal packet
+	 * @enum {Integer}
+	 * @readonly
+	 */
+
+	literal: {
+		/** Binary data 'b' */
+		binary: 'b'.charCodeAt(),
+		/** Text data 't' */
+			text: 't'.charCodeAt(),
+		/** Utf8 data 'u' */
+			utf8: 'u'.charCodeAt()
+	}
 
 },{}],31:[function(require,module,exports){
 

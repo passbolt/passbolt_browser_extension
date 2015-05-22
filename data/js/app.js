@@ -91,9 +91,13 @@ window.addEventListener('passbolt.clipboard', function(event) {
 
 // Intercepts the event passbolt.config.debug
 // To debug the config.
-window.addEventListener('passbolt.config.debug', function(event) {
-  passbolt.request('passbolt.config.debug');
-});
+// @TODO move?
+if(self.options.config.debug == true) {
+
+	window.addEventListener('passbolt.config.debug', function (event) {
+		passbolt.request('passbolt.config.debug');
+	});
+}
 
 // When the user wants to save the changes on his resource, he will ask the plugin to encrypt the
 // secret for the users the resource is shared with.
@@ -101,7 +105,8 @@ window.addEventListener('passbolt.config.debug', function(event) {
 window.addEventListener('passbolt.secret_edition.encrypt', function(event) {
   var usersIds = event.detail;
   // Open the progression dialog.
-  // @todo #consistency RequestOn, because request doesn't publish the request on the current worker, it has been made to call add-on code mainly, and tranformed to call function on other worker, and now on the current worker.
+  // @todo #consistency RequestOn, because request doesn't publish the request on the current worker, it has been made to
+  // 			 call add-on code mainly, and tranformed to call function on other worker, and now on the current worker.
   passbolt.requestOn('App', 'passbolt.progress_dialog.init', 'Encrypting ...', usersIds.length)
     .then(function(token) {
       // Request the secret worker to encrypt the new secret.
@@ -142,7 +147,8 @@ window.addEventListener('passbolt.resource_share.encrypt', function(event) {
             .then(function(secret) {
 
               // Open the progression dialog.
-              // @todo #consistency RequestOn, because request doesn't publish the request on the current worker, it has been made to call add-on code mainly, and tranformed to call function on other worker, and now on the current worker.
+              // @todo #consistency RequestOn, because request doesn't publish the request on the current worker,
+              // 	it has been made to call add-on code mainly, and tranformed to call function on other worker, and now on the current worker.
               passbolt.requestOn('App', 'passbolt.progress_dialog.init', 'Encrypting ...', usersIds.length)
                 .then(function(token) {
 
@@ -196,9 +202,3 @@ window.addEventListener("passbolt.settings.backup_key", function() {
       // The key has been saved.
     });
 });
-
-// TODO : add this code below in a the corresponding pageMod
-// Add classes relative to plugin.
-$('html')
-  .removeClass('no-passboltplugin')
-  .addClass('passboltplugin');

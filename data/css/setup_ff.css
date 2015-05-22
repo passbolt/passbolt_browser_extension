@@ -2365,18 +2365,29 @@ select.fluid {
 .plugin-check.error {
   background-color: #ffe4e4;
 }
+.plugin-check.warning {
+  background-color: #ffefc1;
+}
 .plugin-check .message {
   font-weight: normal;
   margin-left: 180px;
   padding: .5em 1em;
 }
-/* no plugin = display error */
-.no-passboltplugin .plugin-check.success {
+/*
+	no plugin = display error
+	no config = display warning
+*/
+.plugin-check {
   display: none;
 }
-/* plugin = display success */
-.passboltplugin .plugin-check.error {
-  display: none;
+.no-passboltplugin .plugin-check.error {
+  display: block;
+}
+.passboltplugin.no-passboltplugin-config .plugin-check.warning {
+  display: block;
+}
+.passboltplugin.passboltplugin-config .plugin-check.success {
+  display: block;
 }
 .video-wrapper {
   padding: 1em;
@@ -3098,6 +3109,14 @@ table.table-info.horizontal tbody tr:nth-child(even) {
   float: left;
   margin-left: 5%;
   width: 60%;
+}
+/*
+	plugin-check behavior is different here
+	there is no warning because the addon is not configured
+	since we're setting it up. So no-passboltplugin-config is still success
+*/
+.passboltplugin .setup .plugin-check.success {
+  display: block;
 }
 /* Scrolling in middle panel in full width */
 @media all and (min-width: 980px) {

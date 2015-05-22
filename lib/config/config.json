@@ -1,6 +1,6 @@
 {
   "extensionId": "passbolt-firefox-plugin@passbolt.com",
-  "baseUrl": "http://passbolt.dev",
+  "baseUrl": "http://192.168.0.108/passbolt",
   "setupBootstrapRegex": "(.*)\/setup\/install\/(.{8}-.{4}-.{4}-.{4}-.{12})\/(.{32})",
   "debug": true
 }

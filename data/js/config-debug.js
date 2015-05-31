@@ -1,6 +1,18 @@
 var passbolt = passbolt || {};
 
 $(function() {
+
+	/**
+	 * Curren user information
+	 */
+	var me = null;
+
+	/**
+	 * Display the key information
+	 * @param keyInfo
+	 * @param keyId
+	 * @param keyType
+	 */
   var displayKeyInfo = function(keyInfo, keyId, keyType) {
     var container = $('#' + keyId);
     var info = {
@@ -10,7 +22,6 @@ $(function() {
       "created" : keyType == 'server' ? keyInfo.key_created : keyInfo.created,
       "expires" : keyInfo.expires
     };
-
     if(keyInfo) {
       if (keyType == 'client') {
         var uids = "";
@@ -31,27 +42,45 @@ $(function() {
     }
   };
 
+	/**
+	 * Helper to build feedback message
+	 * @param message
+	 * @param messageType
+	 * @returns {string}
+	 */
   var feedbackHtml = function(message, messageType) {
     return '<div class="message ' + messageType + '">' + message + '</div>';
   };
 
+	/**
+	 * At startup read configuration and load baseurl
+	 */
   passbolt.request('passbolt.config.read', 'baseUrl')
     .then(function(baseUrl) {
       if(baseUrl) {
         $('#baseUrl').val(baseUrl);
       }
-    });
+    }).fail(function(param){
+			console.log('passbolt.config.read fail: no baseurl in config');
+		});
 
-  // Listen to the keyinfo event, fired when the page is opened or
-  // a new key has been set.
+	/**
+	 * Display key information
+	 * Triggered when the page is opened or when a new key is set
+	 */
   passbolt.request("passbolt.keyring.privateKeyInfo").then(function(info) {
     displayKeyInfo(info, 'privkeyinfo', 'client');
-  });
+  }).fail(function(param){
+		console.log('passbolt.keyring.privateKeyInfo fail: no private key set');
+	});
 
-  var me = null;
+	/**
+	 * Get the information about the current user if any
+	 */
   passbolt.request('passbolt.user.me')
     .then(function(user) {
       me = user;
+			console.log('passbolt.user.me success');
       displayKeyInfo(user.Gpgkey, 'pubkeyinfo-server', 'server');
 
       passbolt.request('passbolt.keyring.findPublicKey', user.id)
@@ -62,15 +91,31 @@ $(function() {
                 displayKeyInfo(info, 'pubkeyinfo-plugin', 'client');
               });
           }
-        });
-    });
+        }).fail(function(param){
+					console.log('passbolt.keyring.publicKeyInfo fail');
+				});
+		}).fail(function(param){
+				console.log('passbolt.user.me fail: no current user');
+		});
 
-
+	/**
+	 * Event: When user press plugin configuration save button
+	 * Save the baseurl, user info, etc.
+	 */
   $('#js_save_conf').click(function() {
     passbolt.request('passbolt.config.write', 'baseUrl', $('#baseUrl').val());
+		passbolt.request('passbolt.config.write', 'username', $('#UserUsername').val());
+		//passbolt.request('passbolt.config.write', 'firstname', $('#ProfileFirstName').val());
+		//passbolt.request('passbolt.config.write', 'lastname', $('#ProfileLastName').val());
+		passbolt.request('passbolt.config.write', 'securityTokenCode', $('#securityTokenCode').val());
+		passbolt.request('passbolt.config.write', 'securityTokenColor', $('#securityTokenColor').val());
+		passbolt.request('passbolt.config.write', 'securityTokenTextColor', $('#securityTokenTextColor').val());
   });
 
-  // The user requests a private key import from file.
+	/**
+	 * Event: When user press browse button
+	 * The user requests a private key import from file.
+ 	 */
   $('#keyFilepicker').click(function(){
     passbolt.file.prompt()
       .then(function(data) {
@@ -78,7 +123,10 @@ $(function() {
       });
   });
 
-  // Save a new key.
+	/**
+	 * Event: When the user pres the key settings save
+	 * Save the private key and deduce public key
+	 */
   $('#saveKey').click(function() {
     var key = $('#keyAscii').val();
     if (key) {

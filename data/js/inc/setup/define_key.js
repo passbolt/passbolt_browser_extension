@@ -36,6 +36,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   step.submit = function() {
     // Save value in data.
+		// @todo validate data
+		// @todo same new name / update on server
     passbolt.setup.data.keyInfo = {};
     passbolt.setup.data.keyInfo.name = $("#OwnerName").val();
     passbolt.setup.data.keyInfo.email = passbolt.setup.data.username;

@@ -93,7 +93,6 @@ window.addEventListener('passbolt.clipboard', function(event) {
 // To debug the config.
 // @TODO move?
 if(self.options.config.debug == true) {
-
 	window.addEventListener('passbolt.config.debug', function (event) {
 		passbolt.request('passbolt.config.debug');
 	});

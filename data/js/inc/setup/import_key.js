@@ -63,6 +63,11 @@ passbolt.setup.steps = passbolt.setup.steps || {};
       .then(function() {
         $('#KeyErrorMessage').addClass("hidden");
         passbolt.setup.data.key = key;
+        // Extract public key.
+        passbolt.request('passbolt.keyring.extractPublicKey', key)
+          .then(function(publicKeyArmored) {
+            passbolt.setup.data.publicKey = publicKeyArmored;
+          });
         def.resolve();
       })
       .fail(function(error) {

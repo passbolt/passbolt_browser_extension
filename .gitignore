@@ -4,9 +4,13 @@
 npm-debug.log
 /bower_components
 
+
 # Plugin build       #
 ######################
 # passbolt-firefox-addon.xpi
+
+# Config
+lib/config/config.json
 
 # OS generated files #
 ######################

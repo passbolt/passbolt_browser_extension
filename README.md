@@ -24,13 +24,26 @@ See https://developer.mozilla.org/en-US/Add-ons/SDK/Tools/jpm#Installation
 Development
 =========
 
-jpm run 		Launch an instance of Firefox with your add-on installed.
-jpm test 		Runs the add-on's unit tests.
-jpm xpi 		Package your add-on as an XPI file, which is the install file format for Firefox add-ons.
-jpm post 		Package your add-on as an XPI file, then post it to some url.
-jpm watchpost 	Package your add-on as an XPI file whenever there is a file changed, and post that to some url.
-
-
+Launch an instance of Firefox with your add-on installed.
+```
+	jpm run
+```
+Runs the add-on's unit tests.
+```
+	jpm test
+```
+Package your add-on as an XPI file, which is the install file format for Firefox add-ons.
+```
+	jpm xpi
+```
+Package your add-on as an XPI file, then post it to some url.
+```
+	jpm post
+```
+Package your add-on as an XPI file whenever there is a file changed, and post that to some url.
+```
+	jpm watchpost
+```
 Productivity
 --------
 

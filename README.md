@@ -11,18 +11,24 @@ Prerequisite
 =========
 
 You will need:
-1. Python v.2.6 or 2.7
-2. the Firefox Addon SDK (jetpack)
+1. Nodejs
+2. JPM the Node base Firefox Addon SDK (jetpack)
 
+```
+	sudo npm install jpm -g
+```
 
-https://developer.mozilla.org/en-US/Add-ons/SDK/Tutorials/Installation
+See https://developer.mozilla.org/en-US/Add-ons/SDK/Tools/jpm#Installation
 
 
 Development
 =========
-- cfx check if cfx is working and options
-- cfx run to run a new instance of Firefox with the add-on installed, to try it out
-- cfx xpi to package the add-on into an XPI file for distribution
+
+jpm run 		Launch an instance of Firefox with your add-on installed.
+jpm test 		Runs the add-on's unit tests.
+jpm xpi 		Package your add-on as an XPI file, which is the install file format for Firefox add-ons.
+jpm post 		Package your add-on as an XPI file, then post it to some url.
+jpm watchpost 	Package your add-on as an XPI file whenever there is a file changed, and post that to some url.
 
 
 Productivity
@@ -35,13 +41,12 @@ lighter if you want to reuse an existing firefox instance and profile.
 
 https://addons.mozilla.org/en-us/firefox/addon/autoinstaller/
 
-
 By default it is disabled, go on the configuration page and activate it.
 
 To udpate your plugin after a change, go on your projet root and execute
 the following:
 
-cfx xpi ; wget --post-file=passbolt-firefox-addon.xpi http://localhost:8888/
+jpm xpi ; wget --post-file=passbolt-firefox-addon.xpi http://localhost:8888/
 
 
 How to edit the LESS/CSS files?

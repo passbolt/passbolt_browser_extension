@@ -19,5 +19,6 @@
     "grunt-contrib-watch": "~0.5.3",
     "grunt-lesslint": "~0.15.0",
     "grunt-shell": "^1.1.1"
-  }
+  },
+  "main" : "lib/main.js"
 }

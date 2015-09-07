@@ -70,7 +70,7 @@ window.addEventListener('passbolt.secret.decrypt', function(event) {
       // Notify the user.
       passbolt.event.triggerToPage('passbolt_notify', {
         'status': 'success',
-        'title': 'The secret has been copied in your clipboard'
+        'title': 'The secret has been copied to clipboard'
       });
     });
 });
@@ -85,7 +85,7 @@ window.addEventListener('passbolt.clipboard', function(event) {
   // Notify the user.
   passbolt.event.triggerToPage('passbolt_notify', {
     'status': 'success',
-    'title': 'The ' + name + ' has been copied in your clipboard'
+    'title': 'The ' + name + ' has been copied to clipboard'
   });
 });
 

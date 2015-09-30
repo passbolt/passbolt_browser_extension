@@ -110,6 +110,33 @@ i.no-text + span {
 .inline {
   display: inline-block;
 }
+/* make something spin */
+@-webkit-keyframes rotate {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(-360deg);
+  }
+}
+@-moz-keyframes rotate {
+  from {
+    -moz-transform: rotate(0deg);
+  }
+  to {
+    -moz-transform: rotate(-360deg);
+  }
+}
+.rotate {
+  -webkit-animation-name: rotate;
+  -webkit-animation-duration: 4s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+  -moz-animation-name: rotate;
+  -moz-animation-duration: 4s;
+  -moz-animation-iteration-count: infinite;
+  -moz-animation-timing-function: linear;
+}
 /* palette */
 /* borders */
 /* font */
@@ -309,7 +336,7 @@ button,
 input,
 select,
 textarea {
-  font-family: sans-serif;
+  font-family: "Open Sans", Verdana, sans-serif;
 }
 /* ==========================================================================
    Links
@@ -782,9 +809,6 @@ p {
   font-weight: normal;
   font-style: normal;
 }
-a.no-text {
-  text-decoration: none;
-}
 .icon:before,
 .icon.social:before {
   font-family: "entypo";
@@ -837,6 +861,9 @@ span + .icon {
   margin-right: 1.357em;
 }
 /* no text */
+a.no-text {
+  text-decoration: none;
+}
 .button .icon.no-text {
   padding-right: .9em;
 }
@@ -935,6 +962,18 @@ span + .icon {
 }
 .icon.warning:before {
   content: '\26A0';
+}
+.icon.rocket:before {
+  content: '\1F680';
+}
+.icon.cycle:before {
+  content: '\1F504';
+}
+.icon.hourglass:before {
+  content: '\23F3';
+}
+.icon.retry:before {
+  content: '\27F3';
 }
 /** notification messages **/
 .notification_status .icon.success:before {
@@ -1317,16 +1356,18 @@ input[type=password],
 input[type=search],
 textarea {
   font-size: 16px;
+  line-height: 24px;
   color: #333333;
   background: #ffffff;
   width: 14em;
   /* 20 char (default input length) x .7em (average char length) */
-  padding: .563em .625em .375em .625em;
+  padding: .375em .625em .375em .625em;
   display: inline-block;
   margin-bottom: .5em;
   -webkit-appearance: none;
   border: 1px solid #cccccc;
   border-top: 1px solid #bbbbbb;
+  vertical-align: middle;
 }
 textarea:hover,
 input[type=password]:hover,
@@ -1413,6 +1454,10 @@ form .input .message.warning {
 form .input .message.notice {
   color: #2894df;
 }
+form .input .message.helptext {
+  color: #888888;
+  font-weight: normal;
+}
 .input.error label {
   color: #d40101;
 }
@@ -1448,7 +1493,7 @@ select:disabled {
 .input.date:after {
   position: absolute;
   content: ' ';
-  z-index: 99999;
+  z-index: 790;
   width: 20px;
   height: 20px;
   background: transparent url('../img/controls/calendar.png') center center no-repeat;
@@ -1464,9 +1509,6 @@ input[type=file] {
 }
 /* file upload input */
 /* layout and shortcuts */
-input.big {
-  font-size: 20px;
-}
 select.fluid,
 textarea.fluid,
 input[type=password].fluid,
@@ -1475,6 +1517,9 @@ input[type=text].fluid {
 }
 select.fluid {
   width: 97.5%;
+}
+.submit-wrapper {
+  margin-top: .5em;
 }
 /* shortcut classes for layout */
 /*
@@ -1613,7 +1658,7 @@ select.fluid {
 	  it is situated at the bottom of the workspace
 */
 .update-loading-bar {
-  position: absolute;
+  position: fixed;
   display: block;
   width: 100%;
   bottom: 2.125em;
@@ -1625,7 +1670,7 @@ select.fluid {
   float: left;
   position: absolute;
   min-width: 13em;
-  z-index: 998;
+  z-index: 898;
   padding-top: .25em;
   width: 100%;
 }
@@ -1637,9 +1682,10 @@ select.fluid {
 .dialog-wrapper {
   position: absolute;
   width: 100%;
-  z-index: 999;
-  background: rgba(255, 255, 255, 0.9);
   height: 100%;
+  z-index: 800;
+  background: rgba(255, 255, 255, 0.9);
+  overflow: auto;
 }
 .dialog {
   position: relative;
@@ -1648,6 +1694,8 @@ select.fluid {
   background: #f3f3f3;
   margin: auto;
   margin-top: 1%;
+  /* some space for the footer / notification area in case it is really tall */
+  margin-bottom: 3em;
   -moz-box-shadow: 0px 0px 10px 0px #dddddd;
   -webkit-box-shadow: 0px 0px 10px 0px #dddddd;
   box-shadow: 0px 0px 10px 0px #dddddd;
@@ -1719,6 +1767,7 @@ select.fluid {
 .dialog textarea {
   width: 92%;
 }
+.dialog textarea + .message.error,
 .dialog input + .message.error {
   display: block;
   clear: both;
@@ -1727,6 +1776,7 @@ select.fluid {
   font-size: .813em;
 }
 .dialog .submit-wrapper {
+  margin: 0;
   border-top: 1px solid #dddddd;
   clear: both;
   width: 100%;
@@ -1815,17 +1865,18 @@ select.fluid {
   padding: 0.1250em;
 }
 .security-token {
-  font-size: 0.813em;
-  padding: .5em 1em;
+  font-size: 1em;
+  padding: .375em 1em;
   text-align: center;
   position: absolute;
   display: inline-block;
-  margin-left: -4em;
+  margin-left: -4.125em;
+  margin-top: .0625em;
   width: 2em;
-  border: 1px solid #dddddd;
-}
-input:focus + .security-token {
-  border: 1px solid #2894df;
+  border: 0;
+  border-left: 1px solid #bbbbbb;
+  line-height: 1.5em;
+  vertical-align: middle;
 }
 /**
  * Based on Farbtastic Color Picker 1.2
@@ -2084,7 +2135,12 @@ input:focus + .security-token {
 .master-password.dialog label {
   margin-bottom: 1em;
 }
+.master-password.dialog input[type=text],
 .master-password.dialog input[type=password] {
+  width: 80%;
+}
+.master-password.login-form input[type=text],
+.master-password.login-form input[type=password] {
   width: 80%;
 }
 /**

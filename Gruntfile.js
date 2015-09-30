@@ -61,6 +61,18 @@ module.exports = function(grunt) {
 					stderr: false
 				},
 				command: '(cd ./app/webroot/js; ./js ./steal/buildjs ./app/passbolt.html)'
+			},
+			bowerupdate: {
+				options: {
+					stderr: false
+				},
+				command: 'bower update'
+			},
+			jpmxpi: {
+				options: {
+					stderr: false
+				},
+				command: 'jpm xpi'
 			}
 		},
 		copy: {
@@ -132,24 +144,17 @@ module.exports = function(grunt) {
 	// ========================================================================
 	// Register Tasks
 
-	// Run 'grunt test' to view lesslint recommendations
-	grunt.registerTask('test', ['lesslint']);
-
-	// Run 'grunt csslint' to check LESS quality, and if no errors then
-	// compile LESS into CSS, combine and minify
-	grunt.registerTask('csslint', ['lesslint', 'clean:css', 'less', 'cssmin']);
-
 	// Run 'grunt css' to compile LESS into CSS, combine and minify
 	grunt.registerTask('css', ['clean:css', 'less', 'cssmin']);
 
 	// Bower deploy
-	grunt.registerTask('styleguide-deploy', ['copy:styleguide']);
+	grunt.registerTask('styleguide-deploy', ['shell:bowerupdate','copy:styleguide','css','shell:jpmxpi']);
 
 	// Run 'grunt production' to prepare the production release
-	grunt.registerTask('production', ['clean:css', 'less', 'cssmin', 'clean:js', 'shell:jsmin']);
+	grunt.registerTask('production', ['css', 'clean:js', 'shell:jsmin']);
 
 	// 'grunt' will check code quality, and if no errors,
 	// compile LESS to CSS, and minify and concatonate all JS and CSS
-	grunt.registerTask('default', [ 'clean', 'less', 'cssmin']);
+	grunt.registerTask('default', ['css','shell:jpmxpi']);
 
 };

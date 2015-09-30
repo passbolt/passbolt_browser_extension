@@ -23,9 +23,6 @@
 	font-weight: normal;
 	font-style: normal;
 }
-a.no-text {
-	text-decoration:none;
-}
 .icon:before,
 .icon.social:before {
 	font-family: "entypo";
@@ -79,11 +76,17 @@ button .icon:before,
 span + .icon	{
 	margin-right:1.357em;
 }
+
 /* no text */
+a.no-text {
+  text-decoration:none;
+}
 .button .icon.no-text {
 	padding-right:.9em;
 }
+.no-text span {
 
+}
 /* actions */
 .icon.add:before,
 .icon.create:before {
@@ -180,6 +183,18 @@ span + .icon	{
 .icon.warning:before {
 	content: '\26A0';
 }
+.icon.rocket:before {
+  content: '\1F680';
+}
+.icon.cycle:before {
+  content: '\1F504';
+}
+.icon.hourglass:before {
+  content: '\23F3';
+}
+.icon.retry:before {
+  content: '\27F3';
+}
 
 /** notification messages **/
 .notification_status .icon.success:before {
@@ -257,4 +272,3 @@ span + .icon	{
 .icon.social.salesforce:before {
 	content: '\f357';
 }
-

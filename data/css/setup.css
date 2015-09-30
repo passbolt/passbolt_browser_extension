@@ -110,6 +110,33 @@ i.no-text + span {
 .inline {
   display: inline-block;
 }
+/* make something spin */
+@-webkit-keyframes rotate {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(-360deg);
+  }
+}
+@-moz-keyframes rotate {
+  from {
+    -moz-transform: rotate(0deg);
+  }
+  to {
+    -moz-transform: rotate(-360deg);
+  }
+}
+.rotate {
+  -webkit-animation-name: rotate;
+  -webkit-animation-duration: 4s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+  -moz-animation-name: rotate;
+  -moz-animation-duration: 4s;
+  -moz-animation-iteration-count: infinite;
+  -moz-animation-timing-function: linear;
+}
 /* palette */
 /* borders */
 /* font */
@@ -309,7 +336,7 @@ button,
 input,
 select,
 textarea {
-  font-family: sans-serif;
+  font-family: "Open Sans", Verdana, sans-serif;
 }
 /* ==========================================================================
    Links
@@ -782,9 +809,6 @@ p {
   font-weight: normal;
   font-style: normal;
 }
-a.no-text {
-  text-decoration: none;
-}
 .icon:before,
 .icon.social:before {
   font-family: "entypo";
@@ -837,6 +861,9 @@ span + .icon {
   margin-right: 1.357em;
 }
 /* no text */
+a.no-text {
+  text-decoration: none;
+}
 .button .icon.no-text {
   padding-right: .9em;
 }
@@ -935,6 +962,18 @@ span + .icon {
 }
 .icon.warning:before {
   content: '\26A0';
+}
+.icon.rocket:before {
+  content: '\1F680';
+}
+.icon.cycle:before {
+  content: '\1F504';
+}
+.icon.hourglass:before {
+  content: '\23F3';
+}
+.icon.retry:before {
+  content: '\27F3';
 }
 /** notification messages **/
 .notification_status .icon.success:before {
@@ -1317,16 +1356,18 @@ input[type=password],
 input[type=search],
 textarea {
   font-size: 16px;
+  line-height: 24px;
   color: #333333;
   background: #ffffff;
   width: 14em;
   /* 20 char (default input length) x .7em (average char length) */
-  padding: .563em .625em .375em .625em;
+  padding: .375em .625em .375em .625em;
   display: inline-block;
   margin-bottom: .5em;
   -webkit-appearance: none;
   border: 1px solid #cccccc;
   border-top: 1px solid #bbbbbb;
+  vertical-align: middle;
 }
 textarea:hover,
 input[type=password]:hover,
@@ -1413,6 +1454,10 @@ form .input .message.warning {
 form .input .message.notice {
   color: #2894df;
 }
+form .input .message.helptext {
+  color: #888888;
+  font-weight: normal;
+}
 .input.error label {
   color: #d40101;
 }
@@ -1448,7 +1493,7 @@ select:disabled {
 .input.date:after {
   position: absolute;
   content: ' ';
-  z-index: 99999;
+  z-index: 790;
   width: 20px;
   height: 20px;
   background: transparent url('../img/controls/calendar.png') center center no-repeat;
@@ -1464,9 +1509,6 @@ input[type=file] {
 }
 /* file upload input */
 /* layout and shortcuts */
-input.big {
-  font-size: 20px;
-}
 select.fluid,
 textarea.fluid,
 input[type=password].fluid,
@@ -1475,6 +1517,9 @@ input[type=text].fluid {
 }
 select.fluid {
   width: 97.5%;
+}
+.submit-wrapper {
+  margin-top: .5em;
 }
 /* shortcut classes for layout */
 /*
@@ -2168,7 +2213,7 @@ select.fluid {
 	  it is situated at the bottom of the workspace
 */
 .update-loading-bar {
-  position: absolute;
+  position: fixed;
   display: block;
   width: 100%;
   bottom: 2.125em;
@@ -2191,7 +2236,7 @@ select.fluid {
   .notification-container {
     bottom: 0;
     position: absolute;
-    z-index: 992;
+    z-index: 991;
     height: 2em;
     margin: 0;
     padding-top: 0.833em;
@@ -2222,9 +2267,10 @@ select.fluid {
 .dialog-wrapper {
   position: absolute;
   width: 100%;
-  z-index: 999;
-  background: rgba(255, 255, 255, 0.9);
   height: 100%;
+  z-index: 800;
+  background: rgba(255, 255, 255, 0.9);
+  overflow: auto;
 }
 .dialog {
   position: relative;
@@ -2233,6 +2279,8 @@ select.fluid {
   background: #f3f3f3;
   margin: auto;
   margin-top: 1%;
+  /* some space for the footer / notification area in case it is really tall */
+  margin-bottom: 3em;
   -moz-box-shadow: 0px 0px 10px 0px #dddddd;
   -webkit-box-shadow: 0px 0px 10px 0px #dddddd;
   box-shadow: 0px 0px 10px 0px #dddddd;
@@ -2304,6 +2352,7 @@ select.fluid {
 .dialog textarea {
   width: 92%;
 }
+.dialog textarea + .message.error,
 .dialog input + .message.error {
   display: block;
   clear: both;
@@ -2312,6 +2361,7 @@ select.fluid {
   font-size: .813em;
 }
 .dialog .submit-wrapper {
+  margin: 0;
   border-top: 1px solid #dddddd;
   clear: both;
   width: 100%;
@@ -2352,7 +2402,7 @@ select.fluid {
   border-top: 1px solid #dddddd;
   bottom: 0;
   position: fixed;
-  z-index: 990;
+  z-index: 890;
 }
 .plugin-check {
   padding: 1em;
@@ -2360,7 +2410,22 @@ select.fluid {
 .plugin-check.firefox {
   background: transparent url('../img/third_party/firefox_logo.png') 1.5em center no-repeat;
   background-size: 150px auto;
-  /* 150px */
+}
+.plugin-check.chrome {
+  background: transparent url('../img/third_party/ChromeWebStore.png') 0.5em center no-repeat;
+  background-size: 180px auto;
+}
+.plugin-check.gpg {
+  background: transparent url('../img/third_party/gnupg_logo_disabled.png') 2em center no-repeat;
+  background-size: 150px auto;
+}
+.plugin-check.gpg.success {
+  background: #edf7eb url('../img/third_party/gnupg_logo.png') 2em center no-repeat;
+  background-size: 150px auto;
+}
+.plugin-check.chrome.error {
+  background: #ffe4e4 url('../img/third_party/ChromeWebStore_disabled.png') 0.5em center no-repeat;
+  background-size: 180px auto;
 }
 .plugin-check.success {
   background-color: #edf7eb;
@@ -2370,6 +2435,9 @@ select.fluid {
 }
 .plugin-check.warning {
   background-color: #ffefc1;
+}
+.plugin-check.notice {
+  background-color: #daecf9;
 }
 .plugin-check .message {
   font-weight: normal;
@@ -2389,6 +2457,7 @@ select.fluid {
 .passboltplugin.no-passboltplugin-config .plugin-check.warning {
   display: block;
 }
+.passboltplugin.passboltplugin-config .plugin-check.gpg.notice,
 .passboltplugin.passboltplugin-config .plugin-check.success {
   display: block;
 }
@@ -2573,7 +2642,7 @@ table.table-info.horizontal tbody tr:nth-child(even) {
 /* Base styles for the tooltip's directional arrow */
 .tooltip:before,
 [data-tooltip]:before {
-  z-index: 1001;
+  z-index: 990;
   border: 6px solid transparent;
   background: transparent;
   content: "";
@@ -2581,7 +2650,7 @@ table.table-info.horizontal tbody tr:nth-child(even) {
 /* Base styles for the tooltip's content area */
 .tooltip:after,
 [data-tooltip]:after {
-  z-index: 1000;
+  z-index: 990;
   padding: 8px;
   width: 160px;
   background-color: #000;

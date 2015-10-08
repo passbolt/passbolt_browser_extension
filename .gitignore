@@ -8,6 +8,8 @@ npm-debug.log
 # Plugin build       #
 ######################
 # passbolt-firefox-addon.xpi
+bootstrap.js
+install.rdf
 
 # Config
 lib/config/config.json

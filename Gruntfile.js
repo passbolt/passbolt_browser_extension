@@ -6,7 +6,7 @@ module.exports = function(grunt) {
 	var config = {
 		webroot : 'data/',
 		styleguide : 'passbolt_styleguide'
-	}
+	};
 
 	// ========================================================================
 	// Configure task options

@@ -1,0 +1,12 @@
+# Ignore .DS_Store files created by mac
+.DS_Store
+
+# Ignore any zip or xpi files
+*.zip
+*.xpi
+
+# Ignore grunt and bower working directory
+/node_modules
+/bower_components
+.git
+/data/less

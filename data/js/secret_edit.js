@@ -18,7 +18,7 @@ $(document).bind('template-ready', function() {
       if (passbolt.context['armoredSecret'] != undefined && passbolt.context['armoredSecret'] != '') {
         isDecrypted = false;
         $secret
-          .attr('placeholder', '********')
+          .attr('placeholder', 'click here to unlock')
           .parent().addClass('has-encrypted-secret')
       }
     });

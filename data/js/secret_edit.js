@@ -8,6 +8,7 @@ $(document).bind('template-ready', function() {
     $secretStrength = $('#js_secret_strength'),
     $generateSecretButton = $('#js_secret_generate'),
     currentSecret = '',
+    originalSecret = '',
     initialSecretPlaceholder = $secret.attr('placeholder');
 
   // Listen to when the context is passed.
@@ -86,6 +87,7 @@ $(document).bind('template-ready', function() {
       var deferred = passbolt.secret.decrypt(armored);
       deferred.then(function(secret) {
           isDecrypted = true;
+          originalSecret = secret;
           $secret
             .val(secret)
             .attr('placeholder', initialSecretPlaceholder)
@@ -154,6 +156,15 @@ $(document).bind('template-ready', function() {
       decryptSecret();
     }
   });
+
+  // Listen when the app wants to know whether the secret has been updated in the secret field.
+  // updated means both decrypted, and changed.
+  passbolt.message('passbolt.secret_edition.is_updated')
+    .subscribe(function(token) {
+      var secretIsUpdated = isDecrypted && (originalSecret != currentSecret);
+      passbolt.message('passbolt.secret_edition.is_updated.complete')
+        .publish(token, 'SUCCESS', secretIsUpdated);
+    });
 
   // Listen when the user wants to encrypt the secret for all the users the resource is shared with.
   passbolt.message('passbolt.secret_edition.encrypt')

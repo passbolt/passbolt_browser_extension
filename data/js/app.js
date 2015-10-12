@@ -103,27 +103,35 @@ if(self.options.config.debug == true) {
 // secret for the users the resource is shared with.
 // Dispatch this event to the secret edition iframe which will take care of the encryption.
 window.addEventListener('passbolt.secret_edition.encrypt', function(event) {
-  var usersIds = event.detail;
-  // Open the progression dialog.
-  // @todo #consistency RequestOn, because request doesn't publish the request on the current worker, it has been made to
-  // 			 call add-on code mainly, and tranformed to call function on other worker, and now on the current worker.
-  passbolt.requestOn('App', 'passbolt.progress_dialog.init', 'Encrypting ...', usersIds.length)
-    .then(function(token) {
-      // Request the secret worker to encrypt the new secret.
-      passbolt.requestOn('Secret', 'passbolt.secret_edition.encrypt', usersIds)
-        .progress(function(armored, userId, completedGoals) {
-          // Notify the progress dialog on progression.
-          passbolt.messageOn('Progress', 'passbolt.progress_dialog.progress', token, 'Encrypted for ' + userId, completedGoals);
-        })
-        .then(function(armoreds, usersIds) {
-          var armoreds = [armoreds];
-          passbolt.event.triggerToPage('secret_edition_secret_encrypted', armoreds);
-          // Close the progress dialog.
-          passbolt.message('passbolt.progress_dialog.close')
-            .publish(token);
+
+  passbolt.requestOn('Secret', 'passbolt.secret_edition.is_updated')
+    .then(function( updated ) {
+      if ( ! updated ) {
+        passbolt.event.triggerToPage('secret_edition_secret_encrypted', []);
+        return;
+      }
+
+      var usersIds = event.detail;
+      // Open the progression dialog.
+      // @todo #consistency RequestOn, because request doesn't publish the request on the current worker, it has been made to
+      // 			 call add-on code mainly, and tranformed to call function on other worker, and now on the current worker.
+      passbolt.requestOn('App', 'passbolt.progress_dialog.init', 'Encrypting ...', usersIds.length)
+        .then(function(token) {
+          // Request the secret worker to encrypt the new secret.
+          passbolt.requestOn('Secret', 'passbolt.secret_edition.encrypt', usersIds)
+            .progress(function(armored, userId, completedGoals) {
+              // Notify the progress dialog on progression.
+              passbolt.messageOn('Progress', 'passbolt.progress_dialog.progress', token, 'Encrypted for ' + userId, completedGoals);
+            })
+            .then(function(armoreds, usersIds) {
+              var armoreds = [armoreds];
+              passbolt.event.triggerToPage('secret_edition_secret_encrypted', armoreds);
+              // Close the progress dialog.
+              passbolt.message('passbolt.progress_dialog.close')
+                .publish(token);
+            });
         });
     });
-
 });
 
 // When the user wants to share a password with other people.

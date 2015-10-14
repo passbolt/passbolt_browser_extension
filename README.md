@@ -15,6 +15,7 @@ You will need:
 2. JPM the Node base Firefox Addon SDK (jetpack)
 
 ```
+	git clone git@bitbucket.org:passbolt/passbolt_ff.git
 	sudo npm install jpm -g
 ```
 

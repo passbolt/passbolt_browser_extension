@@ -140,8 +140,8 @@ $(function() {
           // retrieve public key and import it.
           passbolt.request('passbolt.keyring.extractPublicKey', key)
             .then(function(publicKeyArmored) {
-              var meta = passbolt.keyring.getKeyMeta(publicKeyArmored, me.id);
-              passbolt.keyring.importPublic(publicKeyArmored, meta)
+              //var meta = passbolt.keyring.getKeyMeta(publicKeyArmored, me.id);
+              passbolt.keyring.importPublic(publicKeyArmored, me.id)
                 .then(function() {
                   passbolt.request('passbolt.keyring.publicKeyInfo', publicKeyArmored)
                     .then(function (info) {
@@ -152,7 +152,7 @@ $(function() {
           $('.key-import.feedback').html(feedbackHtml("The key has been imported succesfully.", "success"));
         })
         .fail(function(params) {
-          $('.key-import.feedback').html(feedbackHtml('something went wrong during the import.', 'error'));
+          $('.key-import.feedback').html(feedbackHtml('something went wrong during the import: ' + params, 'error'));
         });
     }
   });

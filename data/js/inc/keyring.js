@@ -8,21 +8,38 @@ var passbolt = passbolt || {};
   // The keyring module.
   var keyring = {};
 
-  keyring.importPrivate = function(key) {
-    return passbolt.request("passbolt.keyring.private.import", key);
+  /**
+   * Request the addon code to import given private key
+   * @param privateKeyArmored
+   * @returns {*}
+   */
+  keyring.importPrivate = function(privateKeyArmored) {
+    return passbolt.request("passbolt.keyring.private.import", privateKeyArmored);
   };
 
-  keyring.importPublic = function(key, meta) {
-    return passbolt.request("passbolt.keyring.public.import", key, meta);
+  /**
+   * Request the addon code to import given public key for a user id
+   * @param publicKeyArmored
+   * @param userid user uuid
+   * @returns {*}
+   */
+  keyring.importPublic = function(publicKeyArmored, userid) {
+    return passbolt.request("passbolt.keyring.public.import", publicKeyArmored, userid);
   };
 
-  keyring.getKeyMeta = function(armoredKey, userId) {
-    var meta = {
-      "user_id" : userId,
-      "key" : armoredKey
-    };
-    return meta;
-  }
+  /**
+   *
+   * @param armoredKey
+   * @param userId
+   * @returns {{user_id: *, key: *}}
+   */
+  //keyring.getKeyMeta = function(armoredKey, userId) {
+  //  var meta = {
+  //    "user_id" : userId,
+  //    "key" : armoredKey
+  //  };
+  //  return meta;
+  //};
 
   passbolt.keyring = keyring;
 

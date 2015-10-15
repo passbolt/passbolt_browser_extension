@@ -94,6 +94,9 @@ $(document).bind('template-ready', function() {
             .focus()
             .trigger('change')
             .parent().removeClass('has-encrypted-secret');
+          $generateSecretButton
+              .removeClass('disabled')
+              .removeAttr('disabled');
         });
       return deferred;
     }
@@ -148,6 +151,10 @@ $(document).bind('template-ready', function() {
   // When the generate a new secret button is clicked.
   $generateSecretButton.on('click', function(ev) {
     ev.preventDefault();
+    // Allow to generate password only if the secret field is unlocked.
+    if ($(this).hasClass('disabled')) {
+      return;
+    }
     // The operation requires the secret to be decrypted.
     if (isDecrypted) {
       $secret.val(secretComplexity.generate())

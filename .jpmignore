@@ -10,3 +10,4 @@
 /bower_components
 .git
 /data/less
+config.json.default

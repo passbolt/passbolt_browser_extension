@@ -20,6 +20,9 @@ $(document).bind('template-ready', function() {
         $secret
           .attr('placeholder', 'click here to unlock')
           .parent().addClass('has-encrypted-secret')
+          $generateSecretButton
+              .addClass('disabled')
+              .prop('disabled', true);
       }
     });
 

@@ -22,7 +22,7 @@ $(document).bind('template-ready', function() {
           .parent().addClass('has-encrypted-secret')
           $generateSecretButton
               .addClass('disabled')
-              .prop('disabled', true);
+              .attr('disabled', 'disabled');
       }
     });
 

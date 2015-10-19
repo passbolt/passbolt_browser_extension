@@ -50,7 +50,6 @@ $(document).bind('template-ready', function() {
 
     /**
      * The secret is still encrypted, decrypt it.
-     * @return promise
      */
     var decryptSecret = function() {
         var armored = passbolt.context['armoredSecret'];
@@ -69,6 +68,9 @@ $(document).bind('template-ready', function() {
                     .focus()
                     .trigger('change')
                     .parent().removeClass('has-encrypted-secret');
+                $generateSecretButton
+                    .removeClass('disabled')
+                    .removeAttr('disabled');
             });
             return deferred;
         }
@@ -105,7 +107,7 @@ $(document).bind('template-ready', function() {
                 });
         });
 
-    // When the password is decrypted / context is passed.
+    // Listen to when the context is passed.
     passbolt.message('passbolt.context.set')
         .subscribe(function(token, status) {
             // If armoredSecret is given,
@@ -114,6 +116,9 @@ $(document).bind('template-ready', function() {
                 $secret
                     .attr('placeholder', 'click here to unlock')
                     .parent().addClass('has-encrypted-secret')
+                $generateSecretButton
+                    .addClass('disabled')
+                    .attr('disabled', 'disabled');
             }
         });
 
@@ -190,18 +195,18 @@ $(document).bind('template-ready', function() {
         // Get config regarding security token, and display it.
         passbolt.request('passbolt.user.settings.getSecurityToken')
             .then(
-                function success(securityToken) {
-                    $securityToken.text(securityToken.code);
-                    securityToken.id = '#js_secret';
-                    getTpl('./tpl/secret/securitytoken-style.ejs', function (tpl) {
-                        var html = new EJS({text: tpl}).render(securityToken);
-                        $('head').append(html);
-                    });
-                },
-                function fail(error) {
-                    throw error;
-                }
-            );
+            function success(securityToken) {
+                $securityToken.text(securityToken.code);
+                securityToken.id = '#js_secret';
+                getTpl('./tpl/secret/securitytoken-style.ejs', function (tpl) {
+                    var html = new EJS({text: tpl}).render(securityToken);
+                    $('head').append(html);
+                });
+            },
+            function fail(error) {
+                throw error;
+            }
+        );
 
         // Update the strength if the secret is already decrypted
         if (isDecrypted) {

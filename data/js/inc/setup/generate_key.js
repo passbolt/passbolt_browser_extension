@@ -24,7 +24,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   step.start = function() {
     passbolt.setup.setActionState('submit', 'processing');
     setTimeout(function() {
-        passbolt.request("passbolt.gpgkey.generate_key_pair", passbolt.setup.data.keyInfo)
+        passbolt.request("passbolt.keyring.generate_key_pair", passbolt.setup.data.keyInfo)
           .then(function(key) {
             var privateKey = key.privateKeyArmored,
               publicKey = key.publicKeyArmored;

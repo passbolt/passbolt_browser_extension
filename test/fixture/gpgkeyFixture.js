@@ -570,7 +570,14 @@ jobTYGzEZb9omwDvejOmnuveJM2ZC2xjMvhddmCNQ1+E/vCUgdnk33EDxvk+LStE
 +6hQdfPTc6FIhB5ygHBcNLQB/1Txgj26reuPFKmjLWN2IVKPj2mia4lQHLub9OTl
 GkkO+pcgU1wQ
 =Zopv
------END PGP PUBLIC KEY BLOCK-----`
+-----END PGP PUBLIC KEY BLOCK-----`,
+        "keyId":"1353b5b15d9b054f",
+        "userIds":[{"name":"Ada Lovelace","email":"ada@passbolt.com"}],
+        "fingerprint":"03f60e958f4cb29723acdf761353b5b15d9b054f",
+        "algorithm":"rsa",
+        "created": new Date("2015-08-09T12:48:31.000Z"),
+        "expires": new Date("2019-08-09T12:48:31.000Z"),
+        "length":4096
     },
     {
         // Betty
@@ -631,14 +638,14 @@ gJf4InpB2dxOL4K2Z7c=
 ];
 
 GpgkeyFixture.ada = {
-    user_id : GpgkeyFixture.public.ok[0].id,
+    user_id : GpgkeyFixture.public.ok[0].user_id,
     phassphrase : 'ada@passbolt.com',
     private : GpgkeyFixture.private.ok[0],
     public : GpgkeyFixture.public.ok[0].key
 };
 
 GpgkeyFixture.betty = {
-    user_id :GpgkeyFixture.public.ok[1].key,
+    user_id :GpgkeyFixture.public.ok[1].user_id,
     phassphrase : 'betty@passbolt.com',
     private : null,
     public : GpgkeyFixture.public.ok[1].key

@@ -36,7 +36,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
           .css('background-color',color);
         $('#js_security_token_background').val(color);
         $('#js_security_token_color').val(txtcolor);
-
       });
 
       /* set some random letters */
@@ -74,6 +73,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
       securityTokenTextColor = $('#js_security_token_color').val(),
       securityTokenCode = $('#js_security_token_text').val();
 
+    // @TODO better validation & error handling
     if ($.trim(securityTokenColor).length == 7 && $.trim(securityTokenCode).length == 3) {
       passbolt.setup.data.securityTokenColor = securityTokenColor;
       passbolt.setup.data.securityTokenTextColor = securityTokenTextColor;

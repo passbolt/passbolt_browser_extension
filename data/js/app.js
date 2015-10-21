@@ -90,15 +90,6 @@ window.addEventListener('passbolt.clipboard', function(event) {
   });
 });
 
-// Intercepts the event passbolt.config.debug
-// To debug the config.
-// @TODO move?
-if(self.options.config.debug == true) {
-	window.addEventListener('passbolt.config.debug', function (event) {
-		passbolt.request('passbolt.config.debug');
-	});
-}
-
 // When the user wants to save the changes on his resource, he will ask the plugin to encrypt the
 // secret for the users the resource is shared with.
 // Dispatch this event to the secret edition iframe which will take care of the encryption.
@@ -144,7 +135,7 @@ window.addEventListener('passbolt.resource_share.encrypt', function(event) {
 
       // Get the resource from the server.
       // @todo #cheapsecurity why not use the armored from the passbolt.
-      var url = self.options.config.baseUrl + '/resources/' + resourceId + '.json';
+      var url = self.options.baseUrl + '/resources/' + resourceId + '.json';
       $.get(url, function(responseRaw) {
         var response = JSON.parse(responseRaw);
         if (response) {

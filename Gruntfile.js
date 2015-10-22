@@ -5,7 +5,8 @@ module.exports = function(grunt) {
 
 	var config = {
 		webroot : 'data/',
-		styleguide : 'passbolt_styleguide'
+		styleguide : 'passbolt_styleguide',
+		modules_path : 'node_modules'
 	};
 
 	// ========================================================================
@@ -62,11 +63,11 @@ module.exports = function(grunt) {
 				},
 				command: '(cd ./app/webroot/js; ./js ./steal/buildjs ./app/passbolt.html)'
 			},
-			bowerupdate: {
+			updatestyleguide: {
 				options: {
 					stderr: false
 				},
-				command: 'bower update'
+				command: 'rm -rf <%= config.modules_path %>/<%= config.styleguide %>; npm install'
 			},
 			jpmxpi: {
 				options: {
@@ -79,19 +80,19 @@ module.exports = function(grunt) {
 			styleguide : {
 				files: [{
 					// Icons
-					cwd: '<%= bower.directory %>/<%= config.styleguide %>/src/img/logo',
+					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img/logo',
 					src: ['icon-16.png','icon-32.png','icon-64.png','icon-20.png','icon-20_white.png'],
 					dest: '<%= config.webroot %>/img/logo',
 					expand: true
 				},{
-          // Images
-          cwd: '<%= bower.directory %>/<%= config.styleguide %>/src/img',
-          src: ['default/**','logo/**','third_party/**','avatar/**','controls/**'],
-          dest: '<%= config.webroot %>/img',
-          expand: true
-        },{
+					// Images
+					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img',
+					src: ['default/**','logo/**','third_party/**','avatar/**','controls/**'],
+					dest: '<%= config.webroot %>/img',
+					expand: true
+				},{
 					// Less
-					cwd: '<%= bower.directory %>/<%= config.styleguide %>/src/less',
+					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/less',
 					src: [
 						'abstractions/**', 'base/**', 'components/**', 'dialogs/**', 'plugin/**',
 						'pages/login.less', 'pages/config_debug_ff.less', 'pages/setup.less', 'pages/external.less', 'pages/settings.less',
@@ -148,7 +149,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('css', ['clean:css', 'less', 'cssmin']);
 
 	// Bower deploy
-	grunt.registerTask('styleguide-deploy', ['shell:bowerupdate','copy:styleguide','css','shell:jpmxpi']);
+	grunt.registerTask('styleguide-deploy', ['shell:updatestyleguide','copy:styleguide','css','shell:jpmxpi']);
 
 	// Run 'grunt production' to prepare the production release
 	grunt.registerTask('production', ['css', 'clean:js', 'shell:jsmin']);

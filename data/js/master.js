@@ -5,7 +5,7 @@ $(document).bind('template-ready', function() {
         $masterPassword = $('#js_master_password');
 
     /* ==================================================================================
-     *        Dialog init
+     *  Dialog init
      * ================================================================================== */
 
     var init = function() {
@@ -30,7 +30,7 @@ $(document).bind('template-ready', function() {
 
 
    /* ==================================================================================
-    *    Add-on Code Events Listeners
+    *  Add-on Code Events Listeners
     * ================================================================================== */
 
     // Wrong master password.
@@ -52,7 +52,7 @@ $(document).bind('template-ready', function() {
 
 
    /* ==================================================================================
-    *        View Events Listeners
+    *  View Events Listeners
     * ================================================================================== */
 
     // The user clicks on OK.

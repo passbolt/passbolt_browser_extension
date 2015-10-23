@@ -7,7 +7,7 @@ $(window).load(function() {
      * Update the login page with a server side rendered template
      * @param step
      */
-    passbolt.login.render = function(step) {
+    passbolt.login.render = function(step, callback) {
         console.log('render' + step);
         var context = $('.login.page .js_main-login-section');
         $.ajax({
@@ -15,6 +15,7 @@ $(window).load(function() {
             context: context
         }).done(function(data) {
             $( this ).html(data);
+            callback();
         }).fail(function() {
             console.log('Server could not be reached...');
         });
@@ -36,10 +37,9 @@ $(window).load(function() {
     passbolt.login.onStep0Start = function() {
         // Display a informations about the state of login
         // e.g. that we're going to check for the server key first
-        passbolt.login.render('stage0');
+        passbolt.login.render('stage0', passbolt.login.onStep0CheckServerKey);
 
     };
-
     passbolt.login.onStep0CheckServerKey = function () {
         console.log('onstep0 check server key');
     };

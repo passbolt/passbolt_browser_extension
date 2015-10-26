@@ -1,3 +1,7 @@
+/* ==================================================================================
+ *  Add-on Code Events Listeners
+ * ================================================================================== */
+
 // Close the latest opened dialog message.
 passbolt.message('passbolt.keyring.master.request.close')
   .subscribe(function() {
@@ -58,12 +62,17 @@ passbolt.message('passbolt.progress_dialog.init')
     });
   });
 
+
+/* ==================================================================================
+ *  JS Application Events Listeners
+ * ================================================================================== */
+
 // Intercept the request passbolt.secret.decrypt
 // Decrypt the secret, and stores it into the clipboard.
 window.addEventListener('passbolt.secret.decrypt', function(event) {
   var armoredSecret = event.detail;
   // Decrypt the armored secret.
-  passbolt.secret.decrypt(armoredSecret)
+  passbolt.request('passbolt.secret.decrypt', armoredSecret)
     .then(function(secret) {
       // Copy the secret into the clipboard.
       passbolt.clipboard.copy(secret);
@@ -142,7 +151,7 @@ window.addEventListener('passbolt.resource_share.encrypt', function(event) {
           resource = response.body;
 
           // Decrypt the secret which has to be encrypted for new users.
-          passbolt.secret.decrypt(resource.Secret[0].data)
+          passbolt.request('passbolt.secret.decrypt', resource.Secret[0].data)
             .then(function(secret) {
 
               // Open the progression dialog.
@@ -152,20 +161,20 @@ window.addEventListener('passbolt.resource_share.encrypt', function(event) {
                 .then(function(token) {
 
                   // Encrypt the secret.
-                  passbolt.secret.encrypt(secret, usersIds)
-                    .progress(function(armored, userId, completedGoals) {
-                      // Notify the progress dialog on progression.
-                      passbolt.messageOn('Progress', 'passbolt.progress_dialog.progress', token, 'Encrypted for ' + userId, completedGoals);
-                    })
-                    .then(function(armoreds) {
+                    passbolt.request('passbolt.secret.encrypt', secret, usersIds)
+                      .progress(function(armored, userId, completedGoals) {
+                        // Notify the progress dialog on progression.
+                        passbolt.messageOn('Progress', 'passbolt.progress_dialog.progress', token, 'Encrypted for ' + userId, completedGoals);
+                      })
+                      .then(function(armoreds) {
 
-                      // Close the progress dialog.
-                      passbolt.message('passbolt.progress_dialog.close')
-                        .publish(token);
-                      // Notify the caller with the secret armoreds.
-                      passbolt.event.triggerToPage('resource_share_secret_encrypted', armoreds);
+                        // Close the progress dialog.
+                        passbolt.message('passbolt.progress_dialog.close')
+                          .publish(token);
+                        // Notify the caller with the secret armoreds.
+                        passbolt.event.triggerToPage('resource_share_secret_encrypted', armoreds);
 
-                    });
+                      });
                 });
             });
         }
@@ -196,7 +205,7 @@ window.addEventListener("passbolt.plugin.resource_edition", function() {
 
 // Listen when the user claim his key.
 window.addEventListener("passbolt.settings.backup_key", function() {
-  passbolt.request('passbolt.settings.backup_key')
+  passbolt.request('passbolt.keyring.private.backup')
     .then(function () {
       // The key has been saved.
     });

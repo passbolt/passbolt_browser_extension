@@ -13,7 +13,7 @@ exports.testIsValid = function(assert) {
 };
 
 exports.testGetCurrent = function(assert) {
-    user.getCurrent().then(
+    user.getRemote().then(
         function() {
             assert.ok(false, 'Get current should not work');
         },
@@ -80,6 +80,35 @@ exports.testValidateUsername = function (assert) {
         }
     }
 
+};
+
+exports.testValidateUserid = function (assert) {
+    var userid;
+    var ok = [
+        'cd49eb9e-73a2-3433-a018-6ed993d421e8'
+    ];
+    var notok = [
+        'ada@passbolt.com', '$w4g', '@', '', '../../', 'cd49eb9e-73a2-3433-Z018-6ed993d421e8',
+        // cd49eb9e-73a2-3433-F018-6ed993d421e8 shouldn't validate too but hey
+    ];
+
+    for (let value of ok) {
+        userid = value;
+        try {
+            assert.ok(user.__validate('id', userid));
+        } catch(e) {
+            assert.ok(false, 'validation of username '+ userid + ' should not throw the exception: ' + e.message);
+        }
+    }
+    for (let value of notok) {
+        userid = value;
+        try {
+            user.__validate('id', userid);
+            assert.ok(false, 'validation of username '+ userid + ' should throw an exception');
+        } catch(e) {
+            assert.ok(true);
+        }
+    }
 };
 
 require('sdk/test').run(exports);

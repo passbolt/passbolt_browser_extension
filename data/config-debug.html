@@ -2,20 +2,9 @@
 <html class="no-js passboltplugin version alpha" lang="en">
 <head>
 	<meta charset="utf-8"/>
-	<!--
-				 ____                  __          ____
-				/ __ \____  _____ ____/ /_  ____  / / /_
-			 / /_/ / __ `/ ___/ ___/ __ \/ __ \/ / __/
-			/ ____/ /_/ (__  |__  ) /_/ / /_/ / / /_
-		 /_/    \__,_/____/____/_.___/\____/_/\__/
-
-		 The password management solution
-		 (c) 2015 passbolt.com
-
-	-->
-	<title>Passbolt config</title>
+	<title>Debug Addon | Passbolt</title>
 	<meta name="viewport" content="width=device-width">
-	<script src="js/lib/modernizr.js"></script>
+	<script src="js/vendors/modernizr.js"></script>
 	<link rel="stylesheet" media="all" href="css/config_debug_ff.css"/>
 </head>
 <body>
@@ -53,7 +42,10 @@
 						<a href="#useranddomainanchor">1. User and domain</a>
 					</li>
 					<li class="selected">
-						<a href="#keysettingsanchor">2. Key settings</a>
+						<a href="#mykeysettingsanchor">2. My key settings</a>
+					</li>
+					<li class="selected">
+						<a href="#serverkeysettingsanchor">3. Server public key</a>
 					</li>
 				</ul>
 			</div>
@@ -74,10 +66,10 @@
 				<div class="row">
 					<div class="col6">
 						<a name="useranddomainanchor"></a>
-						<h3>User and domain</h3>
+						<h3>User</h3>
 						<div class="input text">
-							<label for="baseUrl">Domain</label>
-							<input name="data[Config][BaseUrl]" class="fluid" id="baseUrl" type="text">
+							<label for="UserId">Id</label>
+							<input name="data[User][id]" class="fluid" id="UserId" type="text">
 						</div>
 						<div class="input text">
 							<label for="UserUsername">Username</label>
@@ -93,7 +85,7 @@
 						</div>
 					</div>
 					<div class="col6 last">
-						<h3>Security Token</h3>
+						<h3>Security Token & Domain</h3>
 						<div class="input text">
 							<label for="securityTokenCode">Token Code</label>
 							<input name="data[Config][securityTokenCode]" id="securityTokenCode" required="required" type="text">
@@ -106,6 +98,10 @@
 							<label for="securityTokenTextColor">Token Text Color</label>
 							<input name="data[Config][securityTokenTextColor]" id="securityTokenTextColor" required="required" type="text">
 						</div>
+						<div class="input text">
+							<label for="baseUrl">Domain</label>
+							<input name="data[Config][BaseUrl]" id="baseUrl" type="text">
+						</div>
 					</div>
 				</div>
 				<div class="row">
@@ -116,7 +112,7 @@
 
 				<!-- Key Settings -->
 				<div class="row keysettings">
-					<a name="keysettingsanchor"></a>
+					<a name="mykeysettingsanchor"></a>
 					<h2>Passbolt key settings</h2>
 					<div class="col6">
 						<h3>Add-on private key</h3>
@@ -145,38 +141,13 @@
 								</tr>
 							</table>
 						</div>
-						<h3>Add-on public key</h3>
-						<div id="pubkeyinfo-plugin">
-							<div class="feedback"></div>
-							<table class="table-info">
-								<tr>
-									<td>UID</td>
-									<td class="uid"></td>
-								</tr>
-								<tr>
-									<td>Fingerprint</td>
-									<td class="fingerprint"></td>
-								</tr>
-								<tr>
-									<td>Algorithm</td>
-									<td class="algorithm"></td>
-								</tr>
-								<tr>
-									<td>Created</td>
-									<td class="created"></td>
-								</tr>
-								<tr>
-									<td>Expires</td>
-									<td class="expires"></td>
-								</tr>
-							</table>
-						</div>
 					</div>
 					<div class="col6 last key-save">
 						<h3>Set a new key</h3>
+						<div class="my key-import feedback"></div>
 						<div class="input text required">
-							<label for="KeyAscii">Paste your key here</label>
-							<textarea id="keyAscii" class="code fluid">
+							<label for="myKeyAscii">Paste your key here</label>
+							<textarea id="myKeyAscii" class="code fluid">
 -----BEGIN PGP PRIVATE KEY BLOCK-----
 Comment: GPGTools - https://gpgtools.org
 
@@ -290,11 +261,11 @@ LWN2IVKPj2mia4lQHLub9OTlGkkO+pcgU1wQ
 							<input type="button" value="browse" id="keyFilepicker" class="button">
 							<input value="save" id="saveKey" type="submit"/>
 						</div>
-						<div class="my key-import feedback"></div>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col6 ">
+						<a name="serverkeysettingsanchor"></a>
 						<h3>Server public key</h3>
 						<div id="pubkeyinfo-server">
 							<div class="feedback"></div>
@@ -324,68 +295,67 @@ LWN2IVKPj2mia4lQHLub9OTlGkkO+pcgU1wQ
 					</div>
 					<div class="col6 last key-save">
 						<h3>Set a new key</h3>
+						<div class="server key-import feedback"></div>
 						<div class="input text required">
 							<label for="serverKeyAscii">Paste your key here</label>
-							<textarea id="serverkeyAscii" class="code fluid">
+							<textarea id="serverKeyAscii" class="code fluid">
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 Comment: GPGTools - https://gpgtools.org
 
-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
-1Yc+Xc8=
-=EuCR
+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
+WoyDz96l/88asc2mV7bg82Zp0zo1iZvPeUw=
+=skmC
 -----END PGP PUBLIC KEY BLOCK-----
 							</textarea>
 						</div>
 						<div class="submit">
-							<input type="button" value="browse" id="serverKeyFilepicker" class="button">
 							<input value="save" id="saveServerKey" type="submit"/>
 						</div>
-						<div class="server key-import feedback"></div>
 					</div>
 				</div>
 			</div>

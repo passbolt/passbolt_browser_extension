@@ -193,7 +193,7 @@ $(document).bind('template-ready', function() {
     var init = function() {
 
         // Get config regarding security token, and display it.
-        passbolt.request('passbolt.user.settings.getSecurityToken')
+        passbolt.request('passbolt.user.settings.get.securityToken')
             .then(
             function success(securityToken) {
                 $securityToken.text(securityToken.code);

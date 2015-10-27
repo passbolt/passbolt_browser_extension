@@ -61,6 +61,7 @@
 							It is for development purposes only. It can break the integrity of your password and data.
 							Use at your own risks!
 						</div>
+						<div class="user settings feedback"></div>
 					</div>
 				</div>
 				<div class="row">
@@ -113,9 +114,9 @@
 				<!-- Key Settings -->
 				<div class="row keysettings">
 					<a name="mykeysettingsanchor"></a>
-					<h2>Passbolt key settings</h2>
+					<h2>Browser plugin key settings</h2>
 					<div class="col6">
-						<h3>Add-on private key</h3>
+						<h3>Private key</h3>
 						<div id="privkeyinfo">
 							<div class="feedback"></div>
 							<table class="table-info">
@@ -258,7 +259,7 @@ LWN2IVKPj2mia4lQHLub9OTlGkkO+pcgU1wQ
 							</textarea>
 						</div>
 						<div class="submit">
-							<input type="button" value="browse" id="keyFilepicker" class="button">
+							<input type="button" value="browse" id="myKeyFilepicker" class="button">
 							<input value="save" id="saveKey" type="submit"/>
 						</div>
 					</div>
@@ -266,7 +267,7 @@ LWN2IVKPj2mia4lQHLub9OTlGkkO+pcgU1wQ
 				<div class="row">
 					<div class="col6 ">
 						<a name="serverkeysettingsanchor"></a>
-						<h3>Server public key</h3>
+						<h3>Server key (public)</h3>
 						<div id="pubkeyinfo-server">
 							<div class="feedback"></div>
 							<table class="table-info">
@@ -354,6 +355,7 @@ WoyDz96l/88asc2mV7bg82Zp0zo1iZvPeUw=
 							</textarea>
 						</div>
 						<div class="submit">
+							<input type="button" value="browse" id="serverKeyFilepicker" class="button">
 							<input value="save" id="saveServerKey" type="submit"/>
 						</div>
 					</div>

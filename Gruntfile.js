@@ -4,8 +4,8 @@ module.exports = function(grunt) {
 	// High level variables
 
 	var config = {
-		webroot : 'data/',
-		styleguide : 'passbolt_styleguide',
+		webroot : 'data',
+		styleguide : 'passbolt-styleguide',
 		modules_path : 'node_modules'
 	};
 
@@ -80,18 +80,21 @@ module.exports = function(grunt) {
 			styleguide : {
 				files: [{
 					// Icons
+					nonull: true,
 					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img/logo',
 					src: ['icon-16.png','icon-32.png','icon-64.png','icon-20.png','icon-20_white.png'],
 					dest: '<%= config.webroot %>/img/logo',
 					expand: true
 				},{
 					// Images
+					nonull: true,
 					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img',
 					src: ['default/**','logo/**','third_party/**','avatar/**','controls/**'],
 					dest: '<%= config.webroot %>/img',
 					expand: true
 				},{
 					// Less
+					nonull: true,
 					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/less',
 					src: [
 						'abstractions/**', 'base/**', 'components/**', 'dialogs/**', 'plugin/**',

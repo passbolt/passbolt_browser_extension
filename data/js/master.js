@@ -41,7 +41,7 @@ $(document).bind('template-ready', function() {
                     $('label[for="js_master_password"]').html('Please enter a valid master password.')
                             .addClass('error');
                 } else {
-                    getTpl('./tpl/keyring/master-password-failure.ejs', function(tpl) {
+                    getTpl('./tpl/master/master-password-failure.ejs', function(tpl) {
                         // Render the page template.
                         var html = new EJS({text: tpl}).render();
                         $('.js_dialog_content').html(html);

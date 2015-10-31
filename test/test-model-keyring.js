@@ -46,7 +46,7 @@ exports.testcheckPassphrase = function(assert) {
  */
 exports.testImportPublic = function(assert) {
 
-    //Import with a good key without uuid return false
+    // Import with a good key without uuid return false
     try {
         var result = keyring.importPublic(GpgkeyFixture.public.ok[0].key);
         assert.ok(false, 'import with no user id should throw an exception');
@@ -54,7 +54,7 @@ exports.testImportPublic = function(assert) {
         assert.ok(true);
     }
 
-    //Import with a good key with wrong uuid return false
+    // Import with a good key with wrong uuid return false
     try {
         var result = keyring.importPublic(GpgkeyFixture.public.ok[0].key,'123');
         assert.ok(false, 'import with no user id should throw an exception');

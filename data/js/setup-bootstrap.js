@@ -17,7 +17,8 @@
   // If this script is loaded, that means the current page is targeting the first step of
   // the wizard installer. The step which is provided by the backend of passbolt.
   // Retrieve all the information we need from the url.
-  var regex = new RegExp(self.options.config.setupBootstrapRegex);
+  // @TODO move that up to addon code
+  var regex = new RegExp(self.options.setupBootstrapRegex);
   var matches = regex.exec(window.location.href);
 
   if (matches != null) {
@@ -34,7 +35,9 @@
     // on the retry button after he installed the plugin, or loading the server setup bootstrap
     // with the plugin already installed.
     // What will redirect him onto the second step of the wizard.
+    console.log('setup-bootstrap.js');
     self.port.emit('passbolt.setup.plugin_check', data);
+
   }
 
 })(jQuery);

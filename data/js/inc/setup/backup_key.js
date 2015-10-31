@@ -17,13 +17,11 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     'viewData': {}
   };
 
-  step.init = function() {
-
-  };
+  step.init = function() {};
 
   step.start = function() {
     $('#js_backup_key_download').on('click', function(ev) {
-      passbolt.request('passbolt.setup.backup_key', passbolt.setup.data.key)
+      passbolt.request('passbolt.keyring.private.backup', passbolt.setup.data.key)
         .then(function() {
           // The key has been saved.
         });

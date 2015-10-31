@@ -5,13 +5,13 @@ $(document).bind('template-ready', function() {
         $masterPassword = $('#js_master_password');
 
     /* ==================================================================================
-     *        Dialog init
+     *  Dialog init
      * ================================================================================== */
 
     var init = function() {
 
         // Get config regarding security token, and display it.
-        passbolt.request('passbolt.user.settings.getSecurityToken')
+        passbolt.request('passbolt.user.settings.get.securityToken')
             .then(
                 function success(securityToken) {
                     $securityToken.text(securityToken.code);
@@ -30,7 +30,7 @@ $(document).bind('template-ready', function() {
 
 
    /* ==================================================================================
-    *    Add-on Code Events Listeners
+    *  Add-on Code Events Listeners
     * ================================================================================== */
 
     // Wrong master password.
@@ -41,7 +41,7 @@ $(document).bind('template-ready', function() {
                     $('label[for="js_master_password"]').html('Please enter a valid master password.')
                             .addClass('error');
                 } else {
-                    getTpl('./tpl/keyring/master-password-failure.ejs', function(tpl) {
+                    getTpl('./tpl/master/master-password-failure.ejs', function(tpl) {
                         // Render the page template.
                         var html = new EJS({text: tpl}).render();
                         $('.js_dialog_content').html(html);
@@ -52,7 +52,7 @@ $(document).bind('template-ready', function() {
 
 
    /* ==================================================================================
-    *        View Events Listeners
+    *  View Events Listeners
     * ================================================================================== */
 
     // The user clicks on OK.

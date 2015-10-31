@@ -19,7 +19,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   };
 
   step.init = function() {
-    passbolt.request('passbolt.keyring.privateKeyInfo')
+    passbolt.request('passbolt.keyring.private.get')
       .then(function(keyInfo) {
         var fieldsDetails = {},
           status = 'success';

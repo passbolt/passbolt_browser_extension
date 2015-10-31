@@ -53,13 +53,15 @@ $(document).bind('template-ready', function() {
     };
 
     var onValidPassphrase = function () {
-        $loginMessage.removeClass('error').text('Please wait...');
+        $loginMessage.removeClass('error');
         passbolt.request('passbolt.auth.login', $masterPassword.val()).then(
-            function success(msg) {
-                console.log(msg);
-                // @TODO trigger redirect
+            function success(msg, referrer) {
+                $loginMessage.text(msg);
+                $('html').addClass('loaded');
+                window.top.location.href = referrer;
             },
             function fail(msg) {
+                $('html').addClass('loaded').removeClass('loading');
                 onLoginError(msg);
             }
         );
@@ -67,6 +69,8 @@ $(document).bind('template-ready', function() {
 
     // The user clicks on OK.
     $loginSubmit.on('click', function() {
+        $('html').addClass('loading').removeClass('loaded');
+        $loginMessage.text('Please wait...'); // @TODO l18n
         $loginSubmit.addClass('disabled').addClass('processing');
 
         passbolt.request('passbolt.keyring.private.checkpassphrase', $masterPassword.val()).then(

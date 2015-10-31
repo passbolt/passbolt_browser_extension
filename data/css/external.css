@@ -27,11 +27,6 @@
   margin-top: .5em;
   padding-left: .5em;
 }
-@media all and (max-width: 1200px) {
-  #passbolt-iframe-login-form {
-    height: 16em;
-  }
-}
 #passbolt-iframe-master-password {
   z-index: 992;
 }

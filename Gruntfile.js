@@ -89,7 +89,7 @@ module.exports = function(grunt) {
 					// Images
 					nonull: true,
 					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img',
-					src: ['default/**','logo/**','third_party/**','avatar/**','controls/**'],
+					src: ['logo/**','third_party/**','avatar/**','controls/**'],
 					dest: '<%= config.webroot %>/img',
 					expand: true
 				},{
@@ -99,7 +99,7 @@ module.exports = function(grunt) {
 					src: [
 						'abstractions/**', 'base/**', 'components/**', 'dialogs/**', 'plugin/**',
 						'pages/login.less', 'pages/config_debug_ff.less', 'pages/setup.less', 'pages/external.less', 'pages/settings.less',
-						'login.less', 'config.less', 'setup.less', 'setup_ff.less', 'main_ff.less', 'external.less', 'config_debug_ff.less'
+						'login.less', 'setup.less', 'setup_ff.less', 'main_ff.less', 'external.less', 'config_debug_ff.less'
 					],
 					dest: '<%= config.webroot %>/less',
 					expand: true

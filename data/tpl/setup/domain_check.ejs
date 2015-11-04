@@ -8,15 +8,23 @@
     <div class="why-plugin-wrapper">
         <h3>Url Check</h3>
         <p>
-            You are about to register the plugin to work with the following domain. Please confirm that this is a domain managed by an organisation you trust:
+            You are about to register the plugin to work with the following domain.
+            Please confirm that this is a domain managed by an organisation you trust:
         </p>
         <form>
-            <div class="input text disabled">
+            <div class="input text domain disabled">
+                <label for="js_setup_domain">Domain</label>
                 <input type="text" value="<%= domain %>" id="js_setup_domain" disabled="disabled" />
+            </div>
+            <div class="input text key-fingerprint disabled">
+                <label for="js_setup_key_fingerprint">Server Key</label>
+                <input name="key_fingerprint" id="js_setup_key_fingerprint" value="" placeholder="Retrieving server key. Please wait..." type="text" value="" disabled="disabled"/>
+                <a href="#" class="more" id="js_server_key_info">More</a>
+                <div class="message error"></div>
             </div>
             <div class="input checkbox">
                 <input type="checkbox" id="js_setup_domain_check" value="legit"/>
-                <label for="js_setup_domain_check">I've checked and this domain is legit</label>
+                <label for="js_setup_domain_check">I've checked, this domain name and the server key look legitimate.</label>
             </div>
         </form>
     </div>

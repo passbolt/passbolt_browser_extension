@@ -1,0 +1,82 @@
+<div class="dialog-wrapper">
+    <div class="dialog medium key-info">
+        <div class="dialog-header">
+            <h2>Please verify the server key</h2>
+            <a class="dialog-close js-dialog-close" href="#">
+                <i class="icon close no-text"></i>
+                <span>close</span>
+            </a>
+        </div>
+        <div class="js_dialog_content dialog-content">
+            <div class="form-content">
+                <p>
+                    <strong>
+                        Check that the details of the GPG key below are valid. Do not hesitate to contact your support person in case of doubt!
+                    </strong>
+                </p>
+                <table>
+                    <tbody>
+                    <tr class="owner-name">
+                        <td class="label">Owner Name</td>
+                        <td class="value"><%= userIds[0].name %></td>
+                    </tr>
+                    <tr class="owner-emails">
+                        <td class="label">Owner Email</td>
+                        <td class="value"><%= userIds[0].email %></td>
+                    </tr>
+                    <tr class="keyid">
+                        <td class="label">Key ID</td>
+                        <td class="value">
+                            <% var kid = keyId.toUpperCase(); %>
+                            <%= kid %>
+                        </td>
+                    </tr>
+                    <tr class="fingerprint">
+                        <td class="label">Fingerprint</td>
+                        <td class="value">
+                            <% var fgprt = fingerprint.toUpperCase(); %>
+                            <%= fgprt %>
+                        </td>
+                    </tr>
+                    <tr class="created">
+                        <td class="label">Created</td>
+                        <td class="value">
+                            <%
+                            var dateCreated = new Date(created);
+                            dateCreated = dateCreated.toDateString() + ' ' + dateCreated.toLocaleTimeString();
+                            %>
+                            <%= dateCreated %>
+                        </td>
+                    </tr>
+                    <tr class="expires">
+                        <td class="label">Expires</td>
+                        <td class="value">
+                            <%
+                            var dateExpires = new Date(expires);
+                            dateExpires = dateExpires.toDateString() + ' ' + dateExpires.toLocaleTimeString();
+                            %>
+                            <%= dateExpires %>
+                        </td>
+                    </tr>
+                    <tr class="length">
+                        <td class="label">Length</td>
+                        <td class="value"><%= length %></td>
+                    </tr>
+                    <tr class="algorithm">
+                        <td class="label">Algorithm</td>
+                        <td class="value">
+                            <% var algo = algorithm.toUpperCase(); %>
+                            <%= algo %>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="submit-wrapper clearfix">
+                <input type="submit" value="OK" class="button primary" id="master-password-submit">
+                <!-- <a href="#" class="button" id="js_keyinfo_help">Help!</a> -->
+            </div>
+        </div>
+    </div>
+</div>

@@ -1750,6 +1750,9 @@ select.fluid {
   /* inputs */
   /* submit / cancel */
 }
+.dialog.medium {
+  max-width: 36em;
+}
 .dialog .dialog-header {
   padding: 0.5em 1em 0 1em;
   height: 3em;
@@ -2193,6 +2196,16 @@ select.fluid {
 .master-password.login-form input[type=text],
 .master-password.login-form input[type=password] {
   width: 80%;
+}
+.dialog.key-info table {
+  margin-top: 1em;
+}
+.dialog.key-info table tr td {
+  padding: 0.5em 0 0.5em 0;
+}
+.dialog.key-info table tr td.label {
+  padding-right: 4em;
+  color: #888888;
 }
 /**
  * Needed for Firefox plugin

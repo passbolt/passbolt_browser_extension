@@ -26,7 +26,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   };
 
   step.goToLogin = function() {
-      var loginUrl = passbolt.setup.data.domain + "/login";
+      var loginUrl = passbolt.setup.data.domain + "/auth/login";
       setTimeout(
           function() {
               window.location.href = loginUrl;
@@ -45,7 +45,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
             // Autologin.
             step.goToLogin();
         })
-        .fail(function() {
+        .fail(function(error) {
+            console.log('error while saving information', error);
             alert("could not save information");
         });
 

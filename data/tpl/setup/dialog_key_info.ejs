@@ -1,5 +1,5 @@
 <div class="dialog-wrapper">
-    <div class="dialog medium key-info">
+    <div class="dialog medium key-info" id="dialog-server-key-info">
         <div class="dialog-header">
             <h2>Please verify the server key</h2>
             <a class="dialog-close js-dialog-close" href="#">
@@ -20,7 +20,7 @@
                         <td class="label">Owner Name</td>
                         <td class="value"><%= userIds[0].name %></td>
                     </tr>
-                    <tr class="owner-emails">
+                    <tr class="owner-email">
                         <td class="label">Owner Email</td>
                         <td class="value"><%= userIds[0].email %></td>
                     </tr>
@@ -74,7 +74,7 @@
             </div>
 
             <div class="submit-wrapper clearfix">
-                <input type="submit" value="OK" class="button primary" id="master-password-submit">
+                <input type="submit" value="OK" class="button primary" id="key-info-ok">
                 <!-- <a href="#" class="button" id="js_keyinfo_help">Help!</a> -->
             </div>
         </div>

@@ -124,7 +124,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         step.fetchServerKey(passbolt.setup.data.domain)
             .then(step.getKeyInfo)
             .then(function(info) {
-                $('#js_setup_key_fingerprint').val(info.fingerprint.toUpperCase());
+                $('#js_setup_key_fingerprint').attr('value', info.fingerprint.toUpperCase());
                 $('.input.checkbox').css('visibility', 'visible');
             })
             .fail(function(msg) {

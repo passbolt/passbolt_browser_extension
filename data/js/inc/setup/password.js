@@ -26,9 +26,11 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   };
 
   step.goToLogin = function() {
+      console.log('enter goToLogin');
       var loginUrl = passbolt.setup.data.domain + "/auth/login";
       setTimeout(
           function() {
+              console.log('actually redirect');
               window.location.href = loginUrl;
           },
           1000);
@@ -42,6 +44,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     passbolt.setup.data.password = 'password';
     passbolt.request('passbolt.setup.save', passbolt.setup.data)
         .then(function() {
+            console.log('call goto login');
             // Autologin.
             step.goToLogin();
         })

@@ -69,6 +69,38 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     };
 
     /**
+     * Set the user name in the plugin.
+     *
+     * @param firstName
+     * @param lastName
+     * @returns {*}
+     */
+    step.setName = function (firstName, lastName) {
+        // TODO : validation
+        return passbolt.request('passbolt.user.set.name', firstName, lastName)
+            .then(function () {
+                return {
+                    first_name: firstName,
+                    last_name: lastName
+                };
+            });
+    };
+
+    /**
+     * Set the username in the plugin.
+     *
+     * @param username
+     * @returns {*}
+     */
+    step.setUsername = function (username) {
+        // TODO : validation
+        return passbolt.request('passbolt.user.set.username', username)
+            .then(function () {
+                return username;
+            });
+    };
+
+    /**
      * Import the server key in the keyring.
      * Is called at the page submit.
      *
@@ -120,6 +152,17 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      */
     step.start = function () {
         $('.input.checkbox').css('visibility', 'hidden');
+
+        // Set the name and username on start.
+        // so we can display an error if any.
+        // TODO : display error in case of issue.
+        step.setName(passbolt.setup.data.firstName, passbolt.setup.data.lastName)
+            .then(function () {
+                return step.setUsername(passbolt.setup.data.username);
+            })
+            .fail(function(error) {
+                console.log('error while setting name', error);
+            });
 
         step.fetchServerKey(passbolt.setup.data.domain)
             .then(step.getKeyInfo)

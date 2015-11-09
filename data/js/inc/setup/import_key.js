@@ -16,6 +16,46 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         'viewData': {}
     };
 
+    /**
+     * Browse key and return content of the key selected.
+     * @returns {string}
+     */
+    step.browseKey = function() {
+        return passbolt.request('passbolt.file.prompt')
+            .then(function(data) {
+                passbolt.setup.data.key = data;
+                return data;
+            });
+    };
+
+    /**
+     * Import a private key in the keyring.
+     * @param armoredPrivateKey
+     * @returns {string}
+     *   armored private key
+     */
+    step.importPrivateKey = function(armoredPrivateKey) {
+        return passbolt.request('passbolt.keyring.private.import', armoredPrivateKey)
+            .then(function() {
+                passbolt.setup.data.key = armoredPrivateKey;
+                return armoredPrivateKey;
+            });
+    };
+
+    /**
+     * Extract public key.
+     * @param armoredPrivateKey
+     * @returns {string}
+     *   armored public key
+     */
+    step.extractPublicKey = function(armoredPrivateKey) {
+        return passbolt.request('passbolt.keyring.public.extract', armoredPrivateKey)
+            .then(function(publicKeyArmored) {
+                passbolt.setup.data.publicKey = publicKeyArmored;
+                return publicKeyArmored;
+            });
+    };
+
     step.init = function() {
         passbolt.setup.data.key = passbolt.setup.data.key ? passbolt.setup.data.key : '';
         step.viewData.key = passbolt.setup.data.key;
@@ -44,9 +84,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
         // Bind the browse filepicker button.
         $('#js_setup_import_key_browse').click(function() {
-            passbolt.request('passbolt.file.prompt')
+            step.browseKey()
                 .then(function(data) {
-                    passbolt.setup.data.key = data;
                     $('#js_setup_import_key_text').val(data).change();
                     $('#KeyErrorMessage').addClass('hidden');
                 });
@@ -56,27 +95,19 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     step.submit = function() {
         passbolt.setup.setActionState('submit', 'processing');
 
-        var def = $.Deferred(),
-            key = $('#js_setup_import_key_text').val();
+        var key = $('#js_setup_import_key_text').val();
 
-        passbolt.request('passbolt.keyring.private.import', key)
+        $('#KeyErrorMessage').addClass('hidden');
+        return step.importPrivateKey(key)
+            .then(step.extractPublicKey)
             .then(function() {
-                $('#KeyErrorMessage').addClass('hidden');
-                passbolt.setup.data.key = key;
-                // Extract public key.
-                passbolt.request('passbolt.keyring.public.extract', key)
-                    .then(function(publicKeyArmored) {
-                        passbolt.setup.data.publicKey = publicKeyArmored;
-                    });
-                def.resolve();
+                console.log('key imported succesfully');
             })
             .fail(function(error) {
                 $('#KeyErrorMessage').removeClass('hidden').html('The key selected has an invalid format.');
                 console.log(error);
                 passbolt.setup.setActionState('submit', 'enabled');
-                def.fail();
             });
-        return def;
     };
 
     step.cancel = function() {

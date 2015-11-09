@@ -17,39 +17,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         'viewData': {}
     };
 
-    /**
-     * Set the user name in the plugin.
-     *
-     * @param firstName
-     * @param lastName
-     * @returns {*}
-     */
-    step.setName = function (firstName, lastName) {
-        // TODO : validation
-        return passbolt.request('passbolt.user.set.name', firstName, lastName)
-            .then(function () {
-                return {
-                    first_name: firstName,
-                    last_name: lastName
-                };
-            });
-    };
-
-    /**
-     * Set the username in the plugin.
-     *
-     * @param username
-     * @returns {*}
-     */
-    step.setUsername = function (username) {
-        // TODO : validation
-        return passbolt.request('passbolt.user.set.username', username)
-            .then(function () {
-                return username;
-            });
-    };
-
-
+    // TODO : set name, username and domain from plugin settings.
     step.init = function () {
         step.viewData.firstName = passbolt.setup.data.firstName || null;
         step.viewData.lastName = passbolt.setup.data.lastName || null;
@@ -76,19 +44,13 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
         // Process submit.
         passbolt.setup.setActionState('submit', 'processing');
-
-        step.setName(passbolt.setup.data.firstName, passbolt.setup.data.lastName)
-            .then(function () {
-                step.setUsername(passbolt.setup.data.username).then(function() {
-                    def.resolve();
-                })
-            });
-
         passbolt.setup.data.keyInfo = {};
         passbolt.setup.data.keyInfo.name = $("#OwnerName").val();
         passbolt.setup.data.keyInfo.email = passbolt.setup.data.username;
         passbolt.setup.data.keyInfo.comment = $("#KeyComment").val();
         passbolt.setup.data.keyInfo.lgth = $("#KeyLength").val();
+
+        def.resolve();
         return def;
     };
 

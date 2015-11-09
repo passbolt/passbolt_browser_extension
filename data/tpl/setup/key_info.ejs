@@ -2,37 +2,37 @@
 <div class="col7">
     <h3>Information for public and secret key</h3>
     <table class="table-info">
-        <tr>
+        <tr class="owner_name">
             <td>Owner Name</td>
-            <td  class="<%= fieldsDetails['name'] ? fieldsDetails['name'].status : '' %>"><%= keyInfo.userIds[0].name %> <span class="alt side"><%= fieldsDetails['name'].original %></span></td>
+            <td  class="<%= typeof fieldsDetails['name'] != 'undefined' ? fieldsDetails['name'].status : '' %>"><%= keyInfo.userIds[0].name %> <%= typeof fieldsDetails['name'] != 'undefined' ? '<span class="alt side">' + fieldsDetails['name'].original + '</span>' : '' %></td>
         </tr>
-        <tr>
+        <tr class="owner_email">
             <td>Owner Email</td>
-            <td class="<%= fieldsDetails['email'] ? fieldsDetails['email'].status : '' %>"><%= keyInfo.userIds[0].email %> <span class="alt side"><%= fieldsDetails['email'].original %></span></td>
+            <td class="<%= typeof fieldsDetails['email'] != 'undefined' ? fieldsDetails['email'].status : '' %>"><%= keyInfo.userIds[0].email %> <%= typeof fieldsDetails['email'] != 'undefined' ? '<span class="alt side">' + fieldsDetails['email'].original + '</span>' : '' %></td>
         </tr>
-        <tr>
+        <tr class="keyid">
             <td>Key Id</td>
-            <td><%= keyInfo.keyId %></td>
+            <td><%= keyInfo.keyId.toUpperCase() %></td>
         </tr>
-        <tr>
+        <tr class="fingerprint">
             <td>Fingerprint</td>
-            <td><%= keyInfo.fingerprint %></td>
+            <td><%= keyInfo.fingerprint.toUpperCase() %></td>
         </tr>
-        <tr>
+        <tr class="created">
             <td>Created</td>
             <td><%= keyInfo.created %></td>
         </tr>
-        <tr>
+        <tr class="expires">
             <td>Expires</td>
             <td><%= keyInfo.expires %></td>
         </tr>
-        <tr>
+        <tr class="length">
             <td>Key Length</td>
             <td><%= keyInfo.length %></td>
         </tr>
-        <tr>
+        <tr class="algorithm">
             <td>Algorithm</td>
-            <td><%= keyInfo.algorithm %></td>
+            <td><%= keyInfo.algorithm.toUpperCase() %></td>
         </tr>
     </table>
 </div>

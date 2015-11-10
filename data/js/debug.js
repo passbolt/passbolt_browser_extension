@@ -1,5 +1,6 @@
 var passbolt = passbolt || {};
 
+
 $(function() {
 
     // shortcut for selectors
@@ -20,6 +21,35 @@ $(function() {
         $securityTokenTextColor = $('#securityTokenTextColor'),
         $privateKeyInfo = $('#privkeyinfo'),
         $serverKeyInfo = $('#pubkeyinfo-server');
+
+    /**
+     * Listen to the event passbolt.debug.settings.set
+     * When it is received, then populate fields with the data that we
+     * are supposed to have received in the field js_auto_settings.
+     * The data provided have to be encoded in base64, and in json (once decoded).
+     */
+    window.addEventListener('passbolt.debug.settings.set', function(event) {
+        $('body').removeClass('debug-data-set');
+
+        var json =  $('#js_auto_settings').val();
+        if (json != '') {
+            json = atob(json);
+            var conf = JSON.parse(json);
+
+            $('body').removeClass('debug-data-set');
+            $firstname.val(conf.ProfileFirstName);
+            $lastname.val(conf.ProfileLastName);
+            $username.val(conf.UserUsername);
+            $userid.val(conf.UserId);
+            $domain.val(conf.baseUrl);
+            $securityTokenColor.val(conf.securityTokenColor);
+            $securityTokenTextColor.val(conf.securityTokenTextColor);
+            $securityTokenCode.val(conf.securityTokenCode);
+            $myKeyAscii.val(conf.myKeyAscii);
+            $serverKeyAscii.val(conf.serverKeyAscii);
+            $('body').addClass('debug-data-set');
+        }
+    });
 
     /* ==================================================================================
      *  View Helpers

@@ -10,7 +10,6 @@ data/less
 # Plugin build       #
 ######################
 # passbolt-firefox-addon.xpi
-bootstrap.js
 install.rdf
 
 # Config

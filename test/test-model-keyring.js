@@ -36,8 +36,16 @@ exports.testcheckPassphrase = function(assert) {
     var result = keyring.importPrivate(GpgkeyFixture.ada.private);
     assert.ok(result == true, 'Private key import should work');
 
-    var result = keyring.checkPassphrase(GpgkeyFixture.ada.phassphrase);
-    assert.ok(result, 'Private key decrypt should work');
+    keyring.checkPassphrase(GpgkeyFixture.ada.phassphrase)
+        .then(
+            function() {
+                assert.ok(true, 'Private key decrypt should work');
+            },
+            function(error) {
+               throw "The decrypt should have worked";
+            }
+        );
+
 };
 
 /**

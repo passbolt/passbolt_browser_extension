@@ -1709,20 +1709,6 @@ select.fluid {
   bottom: 2.125em;
   z-index: 991;
 }
-.autocomplete-content {
-  border: 1px solid #dddddd;
-  background: #ffffff;
-  float: left;
-  position: absolute;
-  min-width: 13em;
-  z-index: 898;
-  padding-top: .25em;
-  width: 100%;
-}
-.autocomplete input + .autocomplete-content {
-  margin-top: 1.80em;
-  margin-right: 7px;
-}
 /* Dialog */
 .dialog-wrapper {
   position: absolute;
@@ -2180,6 +2166,126 @@ select.fluid {
   height: 24em;
   width: 95%;
 }
+/*
+	form to add new permissions
+	basically this form is embedded in a dedicated iframe released by the plugin
+*/
+.form-content.permission-add label {
+  padding-bottom: .5em;
+  padding-top: 1em;
+  font-size: 0.938em;
+}
+.form-content.permission-add .autocomplete input {
+  width: 100%;
+  margin-bottom: 0;
+  box-sizing: border-box;
+}
+.form-content.permission-add .message {
+  padding-left: 0;
+}
+/*
+	autocomplete users results
+	basically this list of users is embedded in a dedicated iframe released by the plugin
+*/
+.autocomplete-content {
+  width: 100%;
+  padding: 0;
+  border: 1px solid #dddddd;
+  height: 10em;
+  overflow: auto;
+  box-sizing: border-box;
+}
+.autocomplete-content .row {
+  /*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+  /*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *	`contenteditable` attribute is included anywhere else in the document.
+ *	Otherwise it causes space to appear at the top and bottom of elements
+ *	that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *	`:before` to contain the top-margins of child elements.
+ */
+  /*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+  zoom: 1;
+  /*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *	`contenteditable` attribute is included anywhere else in the document.
+ *	Otherwise it causes space to appear at the top and bottom of elements
+ *	that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *	`:before` to contain the top-margins of child elements.
+ */
+  font-size: .813em;
+  padding: .825em .5em .5em 1em;
+  border-bottom: 1px dotted #dddddd;
+  /* user summary */
+}
+.autocomplete-content .row:before,
+.autocomplete-content .row:after {
+  content: "";
+  display: table;
+}
+.autocomplete-content .row:after {
+  clear: both;
+}
+.autocomplete-content .row:before,
+.autocomplete-content .row:after {
+  content: "";
+  display: table;
+}
+.autocomplete-content .row:after {
+  clear: both;
+}
+.autocomplete-content .row:last-child {
+  border: 0;
+}
+.autocomplete-content .row .avatar img {
+  width: 36px;
+  height: 36px;
+  float: left;
+}
+.autocomplete-content .row .user,
+.autocomplete-content .row .group {
+  width: 75%;
+  float: left;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+.autocomplete-content .row .name {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+}
+.autocomplete-content .row .details {
+  color: #888888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  display: block;
+}
+/* hide icons if there is no space */
+@media all and (max-width: 440px) {
+  .autocomplete-content {
+    height: 100%;
+  }
+}
 .master-password.dialog {
   /* PASSBOLT-1108 */
 }
@@ -2196,6 +2302,210 @@ select.fluid {
 .master-password.login-form input[type=text],
 .master-password.login-form input[type=password] {
   width: 80%;
+}
+/* password share tab */
+.dialog .share-tab {
+  /* list of existing permissions settings */
+  /* new/updated permissions */
+  /* message */
+}
+.dialog .share-tab .form-content {
+  padding: 1em;
+}
+.dialog .share-tab .permission-edit {
+  padding: 0em;
+}
+.dialog .share-tab .permissions.scroll {
+  height: 19em;
+  margin: 0;
+}
+.dialog .share-tab .row {
+  /*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+  /*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *	`contenteditable` attribute is included anywhere else in the document.
+ *	Otherwise it causes space to appear at the top and bottom of elements
+ *	that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *	`:before` to contain the top-margins of child elements.
+ */
+  /*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+  zoom: 1;
+  /*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *	`contenteditable` attribute is included anywhere else in the document.
+ *	Otherwise it causes space to appear at the top and bottom of elements
+ *	that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *	`:before` to contain the top-margins of child elements.
+ */
+  font-size: .813em;
+  padding: .825em .5em .5em 1em;
+  border-bottom: 1px dotted #dddddd;
+  /* user summary */
+  /* row actions */
+}
+.dialog .share-tab .row:before,
+.dialog .share-tab .row:after {
+  content: "";
+  display: table;
+}
+.dialog .share-tab .row:after {
+  clear: both;
+}
+.dialog .share-tab .row:before,
+.dialog .share-tab .row:after {
+  content: "";
+  display: table;
+}
+.dialog .share-tab .row:after {
+  clear: both;
+}
+.dialog .share-tab .row:last-child {
+  border: 0;
+}
+.dialog .share-tab .row .avatar img {
+  width: 36px;
+  height: 36px;
+  float: left;
+}
+.dialog .share-tab .row .user,
+.dialog .share-tab .row .group {
+  width: 55%;
+  float: left;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+.dialog .share-tab .row .name {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+}
+.dialog .share-tab .row .details a {
+  color: #888888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  display: block;
+}
+.dialog .share-tab .row .rights {
+  float: left;
+  margin-top: .5em;
+  width: 25%;
+}
+.dialog .share-tab .row .rights select {
+  width: 95%;
+  font-size: 1em;
+}
+.dialog .share-tab .row .actions {
+  float: right;
+  margin-top: 1em;
+}
+.dialog .share-tab .row .actions a {
+  font-size: 1.125em;
+  padding: .25em .5em .2em .5em;
+  border: 1px solid transparent;
+}
+.dialog .share-tab .row .actions a:hover {
+  border: 1px solid #dddddd;
+}
+.dialog .share-tab .row.inherited-permission .inherited-actions {
+  display: none;
+  float: right;
+}
+.dialog .share-tab .row.inherited-permission:hover .inherited-actions {
+  display: block;
+}
+.dialog .share-tab .row.inherited-permission .inherited-actions a {
+  color: #888888;
+}
+.dialog .share-tab .row.permission-updated .avatar img {
+  border: 1px solid #ff4500;
+}
+.dialog .share-tab .message {
+  font-size: 0.813em;
+  padding-left: 2em;
+}
+.dialog .share-tab .form-content.permission-add {
+  /*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+  /*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *	`contenteditable` attribute is included anywhere else in the document.
+ *	Otherwise it causes space to appear at the top and bottom of elements
+ *	that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *	`:before` to contain the top-margins of child elements.
+ */
+  /*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+  zoom: 1;
+  /*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *	`contenteditable` attribute is included anywhere else in the document.
+ *	Otherwise it causes space to appear at the top and bottom of elements
+ *	that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *	`:before` to contain the top-margins of child elements.
+ */
+}
+.dialog .share-tab .form-content.permission-add:before,
+.dialog .share-tab .form-content.permission-add:after {
+  content: "";
+  display: table;
+}
+.dialog .share-tab .form-content.permission-add:after {
+  clear: both;
+}
+.dialog .share-tab .form-content.permission-add:before,
+.dialog .share-tab .form-content.permission-add:after {
+  content: "";
+  display: table;
+}
+.dialog .share-tab .form-content.permission-add:after {
+  clear: both;
+}
+.dialog .share-tab .form-content.permission-add #passbolt-password-share-autocomplete-wrapper {
+  position: relative;
+  width: 100%;
+}
+/* hide icons if there is no space */
+@media all and (max-width: 480px) {
+  .dialog .share-tab .permissions.scroll {
+    height: auto;
+    margin: 0;
+  }
+  .dialog .share-tab .row .user,
+  .dialog .share-tab .row .group {
+    width: 45%;
+  }
 }
 .dialog.key-info table {
   margin-top: 1em;

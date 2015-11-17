@@ -115,7 +115,7 @@ $(document).bind('template-ready', function() {
                 isDecrypted = false;
                 $secret
                     .attr('placeholder', 'click here to unlock')
-                    .parent().addClass('has-encrypted-secret')
+                    .parent().addClass('has-encrypted-secret');
                 $generateSecretButton
                     .addClass('disabled')
                     .attr('disabled', 'disabled');

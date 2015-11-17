@@ -1,0 +1,17 @@
+<li id="<%= user.User.id %>">
+    <div class="row">
+        <div class="main-cell-wrapper">
+            <div class="main-cell">
+                <a href="#">
+                    <div class="avatar">
+                        <img src="<%= user.Profile.Avatar.url.small %>"/>
+                    </div>
+                    <div class="group">
+                        <span class="name"><%= user.Profile.first_name %> <%= user.Profile.last_name %></span>
+                        <span class="details" title="<%= user.Gpgkey.fingerprint %>"><%= user.Gpgkey.fingerprint %></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</li>

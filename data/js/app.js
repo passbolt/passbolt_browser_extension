@@ -62,6 +62,48 @@ passbolt.message('passbolt.progress_dialog.init')
     });
   });
 
+// A permission has been added through the share iframe.
+passbolt.message('passbolt.share.add_permission')
+	.subscribe(function(permission) {
+		passbolt.event.triggerToPage('resource_share_add_permission', permission);
+	});
+
+// The user is filling the share autocomplete input field.
+passbolt.message('passbolt.share.input_changed')
+	.subscribe(function(resourceId, keywords) {
+		// Forward the event to the ShareAutocomplete Worker.
+		passbolt.messageOn('ShareAutocomplete', 'passbolt.share.input_changed', resourceId, keywords);
+
+		// Listen when a click occurred on an element of the Application DOM.
+		// Hide the iframe in charge of displaying the autocomplete results.
+		// @todo each time the user will change the autocomplete input, a handler will be bound to any window click.
+		// @todo it's not critical, but a small refactoring will help.
+		// @todo the whole function can be moved to another place.
+		$(window).one('click', function() {
+			$('#passbolt-iframe-password-share-autocomplete').addClass('hidden');
+		});
+	});
+
+
+/* ==================================================================================
+ *  HTML HELPER
+ * ================================================================================== */
+
+// Add a class to a HTML Element.
+passbolt.message('passbolt.html_helper.add_class')
+	.subscribe(function(selector, className) {
+		if(!$(selector).hasClass(className)) {
+			$(selector).addClass(className);
+		}
+	});
+
+// Remove a class from a HTML ELement.
+passbolt.message('passbolt.html_helper.remove_class')
+	.subscribe(function(selector, className) {
+		if($(selector).hasClass(className)) {
+			$(selector).removeClass(className);
+		}
+	});
 
 /* ==================================================================================
  *  JS Application Events Listeners
@@ -136,49 +178,29 @@ window.addEventListener('passbolt.secret_edition.encrypt', function(event) {
 
 // When the user wants to share a password with other people.
 // secret for the users the resource is shared with.
-// Dispatch this event to the secret edition iframe which will take care of the encryption.
-window.addEventListener('passbolt.resource_share.encrypt', function(event) {
-  var data = event.detail,
-    resourceId = data.resourceId,
-    usersIds = data.usersIds;
+// Dispatch this event to the share iframe which will take care of the encryption.
+window.addEventListener('passbolt.share.encrypt', function(event) {
+	var data = event.detail,
+		// The new users the secret should be encrypted for. Untrusted information.
+		usersIds = data.usersIds;
 
-      // Get the resource from the server.
-      // @todo #cheapsecurity why not use the armored from the passbolt.
-      var url = self.options.baseUrl + '/resources/' + resourceId + '.json';
-      $.get(url, function(responseRaw) {
-        var response = JSON.parse(responseRaw);
-        if (response) {
-          resource = response.body;
+	// Request the share dialog to encrypt the secret for the new users.
+	passbolt.requestOn('Share', 'passbolt.share.encrypt', usersIds).then(function(armoreds) {
+		// Notify the App with the encrypted secret.
+		passbolt.event.triggerToPage('resource_share_encrypted', armoreds);
+	});
+});
 
-          // Decrypt the secret which has to be encrypted for new users.
-          passbolt.request('passbolt.secret.decrypt', resource.Secret[0].data)
-            .then(function(secret) {
+// When a permission is deleted, the user shouldn't be listed anymore by the autocomplete list.
+window.addEventListener('passbolt.share.remove_permission', function(event) {
+	var data = event.detail,
+		// The user the permission has been deleted for.
+		userId = data.userId,
+		// Is the permission temporary
+		isTemporaryPermission = data.isTemporaryPermission;
 
-              // Open the progression dialog.
-              // @todo #consistency RequestOn, because request doesn't publish the request on the current worker,
-              // 	it has been made to call add-on code mainly, and tranformed to call function on other worker, and now on the current worker.
-              passbolt.requestOn('App', 'passbolt.progress_dialog.init', 'Encrypting ...', usersIds.length)
-                .then(function(token) {
-
-                  // Encrypt the secret.
-                    passbolt.request('passbolt.secret.encrypt', secret, usersIds)
-                      .progress(function(armored, userId, completedGoals) {
-                        // Notify the progress dialog on progression.
-                        passbolt.messageOn('Progress', 'passbolt.progress_dialog.progress', token, 'Encrypted for ' + userId, completedGoals);
-                      })
-                      .then(function(armoreds) {
-
-                        // Close the progress dialog.
-                        passbolt.message('passbolt.progress_dialog.close')
-                          .publish(token);
-                        // Notify the caller with the secret armoreds.
-                        passbolt.event.triggerToPage('resource_share_secret_encrypted', armoreds);
-
-                      });
-                });
-            });
-        }
-    });
+	// Notify the share dialog about this change
+	passbolt.messageOn('Share', 'passbolt.share.remove_permission', userId, isTemporaryPermission);
 });
 
 // Listen when a resource is edited and inject the passbolt secret field component.
@@ -204,9 +226,55 @@ window.addEventListener("passbolt.plugin.resource_edition", function() {
 }, false);
 
 // Listen when the user claim his key.
+// @todo Deprecated code ?
 window.addEventListener("passbolt.settings.backup_key", function() {
   passbolt.request('passbolt.keyring.private.backup')
     .then(function () {
       // The key has been saved.
     });
 });
+
+// Listen when the password share dialog is opened and inject the the plugin share
+// dialog.
+window.addEventListener("passbolt.plugin.resource_share", function(event) {
+	var data = event.detail,
+		$wrapper = $('.js_plugin_share_wrapper'),
+		// The resource id to share.
+		//resourceId = $('#js_perm_create_form_aro', $wrapper).val(),
+		// The secret encrypted for the current user.
+		// @todo find a way to ensure the armored is well the armored associated to the resource id.
+		//armored = $('#js_perm_create_form_armored', $wrapper).val();
+		resourceId = data.resourceId,
+		armored = data.armored;
+
+	// Add an Iframe to allow the user to share its password in a safe environment.
+	var $iframeShare = $('<iframe/>', {
+		id: 'passbolt-iframe-password-share',
+		src: 'about:blank?passbolt=shareInline',
+		frameBorder: 0,
+		marginwidth: 0,
+		marginheight: 0,
+		hspace: 0,
+		vspace: 0,
+		scrolling: 'no'
+	});
+	$iframeShare.prependTo($wrapper);
+
+	// When the iframe is ready pass it some variables.
+	// @todo ATTENTION, is the lib which will intercept the events will be loaded at that point.
+	// @todo Clean this code, make something generic.
+	$iframeShare.on('load', function() {
+		passbolt.event.dispatchContext('Share', 'resourceId', resourceId);
+		passbolt.event.dispatchContext('Share', 'armored', armored);
+	});
+
+	// Add an iframe controlled by the plugin to display the results of the autocomplete research.
+	var $iframeAutocomplete = $('<iframe/>', {
+		id: 'passbolt-iframe-password-share-autocomplete',
+		src: 'about:blank?passbolt=shareAutocompleteInline',
+		class: 'hidden',
+		frameBorder: 0
+	});
+	$iframeAutocomplete.appendTo($('#passbolt-password-share-autocomplete-wrapper', $wrapper));
+
+}, false);

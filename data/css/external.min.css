@@ -1,10 +1,10 @@
 /**!
  * @name		passbolt-firefox-addon
  * @version		v1.0.1
- * @date		2015-11-17
+ * @date		2015-11-19
  * @copyright	
  * @source		
  * @license		magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-v3-or-Later
  */
 
-.passbolt-plugin-dialog{position:absolute;top:0;left:0;width:100%;height:100%;z-index:500}#passbolt-iframe-secret-edition{width:100%;display:block;height:5em}#passbolt-iframe-password-share{width:100%;display:block;height:5.1em}#passbolt-iframe-password-share-autocomplete{position:absolute;top:0;left:0;width:100%;height:10em;z-index:898}@media all and (max-width:440px){#passbolt-iframe-secret-edition{height:8em}#passbolt-iframe-password-share{height:5.1em}#passbolt-iframe-password-share-autocomplete{top:0;position:relative;height:17.5em}}#passbolt-iframe-login-form{width:100%;height:16em;margin-top:.5em;padding-left:.5em}#passbolt-iframe-master-password{z-index:992}#passbolt-iframe-progress-dialog{z-index:993}
+.passbolt-plugin-dialog{position:absolute;top:0;left:0;width:100%;height:100%;z-index:500}#passbolt-iframe-secret-edition{width:100%;display:block;height:5em}#passbolt-iframe-password-share{width:100%;display:block}#passbolt-iframe-password-share-autocomplete{position:absolute;top:0;left:0;width:100%;z-index:898}@media all and (max-width:440px){#passbolt-iframe-secret-edition{height:8em}#passbolt-iframe-password-share-autocomplete{top:0;position:relative}}#passbolt-iframe-login-form{width:100%;height:16em;margin-top:.5em;padding-left:.5em}#passbolt-iframe-master-password{z-index:992}#passbolt-iframe-progress-dialog{z-index:993}

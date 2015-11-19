@@ -140,6 +140,11 @@ $(document).bind('template-ready', function () {
 
 		// Initialize the form.
 		initForm();
+
+		// Resize the iframe container regarding the iframe content.
+		passbolt.helper.html.resizeIframe('#passbolt-iframe-password-share', {
+			width: '100%'
+		});
 	};
 
 	init();

@@ -33,6 +33,16 @@ var passbolt = passbolt || {};
           args = $.merge([id], args);
           self.port.emit.apply(null, args);
         },
+	  	broadcast: function() {
+			var args = Array.slice(arguments);
+			passbolt.request('passbolt.get_workers')
+				.then(function(workersIds) {
+					for (var i in workersIds) {
+						var workerArgs = $.merge(['passbolt.event.dispatch', workersIds[i], id], args);
+						self.port.emit.apply(null, workerArgs);
+					}
+				});
+		},
         subscribe: callbacks.add,
         unsubscribe: callbacks.remove,
         disable: callbacks.disable,

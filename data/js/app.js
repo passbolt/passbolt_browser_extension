@@ -84,30 +84,17 @@ passbolt.message('passbolt.share.input_changed')
 		});
 	});
 
-
-/* ==================================================================================
- *  HTML HELPER
- * ================================================================================== */
-
-// Add a class to a HTML Element.
-passbolt.message('passbolt.html_helper.add_class')
-	.subscribe(function(selector, className) {
-		if(!$(selector).hasClass(className)) {
-			$(selector).addClass(className);
-		}
-	});
-
-// Remove a class from a HTML ELement.
-passbolt.message('passbolt.html_helper.remove_class')
-	.subscribe(function(selector, className) {
-		if($(selector).hasClass(className)) {
-			$(selector).removeClass(className);
-		}
-	});
-
 /* ==================================================================================
  *  JS Application Events Listeners
  * ================================================================================== */
+
+// Intercept the application window resize.
+// Notify all workers regarding the application window resize.
+window.addEventListener('passbolt.html_helper.window_resized', function(event) {
+	var cssClasses = $('body').attr('class').split(' ');
+	passbolt.message('passbolt.html_helper.app_window_resized')
+		.broadcast(cssClasses);
+});
 
 // Intercept the request passbolt.secret.decrypt
 // Decrypt the secret, and stores it into the clipboard.
@@ -240,11 +227,8 @@ window.addEventListener("passbolt.plugin.resource_share", function(event) {
 	var data = event.detail,
 		$wrapper = $('.js_plugin_share_wrapper'),
 		// The resource id to share.
-		//resourceId = $('#js_perm_create_form_aro', $wrapper).val(),
-		// The secret encrypted for the current user.
-		// @todo find a way to ensure the armored is well the armored associated to the resource id.
-		//armored = $('#js_perm_create_form_armored', $wrapper).val();
 		resourceId = data.resourceId,
+		// The secret encrypted for the current user.
 		armored = data.armored;
 
 	// Add an Iframe to allow the user to share its password in a safe environment.
@@ -255,8 +239,7 @@ window.addEventListener("passbolt.plugin.resource_share", function(event) {
 		marginwidth: 0,
 		marginheight: 0,
 		hspace: 0,
-		vspace: 0,
-		scrolling: 'no'
+		vspace: 0
 	});
 	$iframeShare.prependTo($wrapper);
 
@@ -273,8 +256,11 @@ window.addEventListener("passbolt.plugin.resource_share", function(event) {
 		id: 'passbolt-iframe-password-share-autocomplete',
 		src: 'about:blank?passbolt=shareAutocompleteInline',
 		class: 'hidden',
-		frameBorder: 0
+		frameBorder: 0,
+		marginwidth: 0,
+		marginheight: 0,
+		hspace: 0,
+		vspace: 0
 	});
 	$iframeAutocomplete.appendTo($('#passbolt-password-share-autocomplete-wrapper', $wrapper));
-
 }, false);

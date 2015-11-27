@@ -1,7 +1,9 @@
 // When the page has been initialized.
 $(document).bind('template-ready', function () {
 	// The list of users the secret will be encrypted for.
-	var encryptSecretFor = [];
+	var encryptSecretFor = [],
+	// The current search timeout reference.
+		currentSearchTimeout = null;
 
 	// DOM Elements.
 	var $autocomplete = $('#js_perm_create_form_aro_auto_cplt'),
@@ -113,8 +115,15 @@ $(document).bind('template-ready', function () {
 	var initForm = function () {
 		$autocomplete.bind('input', function (ev) {
 			var keywords = $(this).val();
-			// Search user.
-			passbolt.messageOn('App', 'passbolt.share.input_changed', passbolt.context.resourceId, keywords);
+			// If a search has been already scheduled, delete it.
+			if (currentSearchTimeout != null) {
+				clearTimeout(currentSearchTimeout);
+			}
+			// Postpone the search to avoid a request on each very closed input.
+			currentSearchTimeout = setTimeout(function() {
+				// Search user.
+				passbolt.messageOn('App', 'passbolt.share.input_changed', passbolt.context.resourceId, keywords);
+			}, 300);
 		});
 	};
 

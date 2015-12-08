@@ -4175,7 +4175,8 @@ table.table-info.horizontal tbody tr:nth-child(even) {
 .config.page .advanced .target-advanced-settings {
   display: none;
 }
-.config.page .keysettings {
+.config.page .keysettings,
+.config.page .localstoragesettings {
   margin-top: 3em;
 }
 .config.page .submit-input-wrapper {

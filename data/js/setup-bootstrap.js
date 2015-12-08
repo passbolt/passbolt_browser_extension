@@ -35,9 +35,7 @@
     // on the retry button after he installed the plugin, or loading the server setup bootstrap
     // with the plugin already installed.
     // What will redirect him onto the second step of the wizard.
-    console.log('setup-bootstrap.js');
     self.port.emit('passbolt.setup.plugin_check', data);
-
   }
 
 })(jQuery);

@@ -20,7 +20,9 @@ $(function() {
         $securityTokenColor = $('#securityTokenColor'),
         $securityTokenTextColor = $('#securityTokenTextColor'),
         $privateKeyInfo = $('#privkeyinfo'),
-        $serverKeyInfo = $('#pubkeyinfo-server');
+        $serverKeyInfo = $('#pubkeyinfo-server'),
+		$flushLocalStorage = $('#js_flush_conf'),
+		$localStorageInfo = $('#localStorage');
 
     /**
      * Listen to the event passbolt.debug.settings.set
@@ -190,12 +192,24 @@ $(function() {
             });
     };
 
+	/**
+	 * Get local storage info
+	 */
+	var getLocalStorageInfo = function () {
+		//JSON.stringify(data, undefined, 2);
+		passbolt.request('passbolt.debug.config.readAll')
+			.then(function(data) {
+				$localStorageInfo.html(JSON.stringify(data, undefined, 2));
+			});
+	};
+
     /**
      * At startup read configuration and load baseurl
      */
     var init = function () {
         getUser();
         getKeys();
+		getLocalStorageInfo();
     };
     init();
 
@@ -299,4 +313,13 @@ $(function() {
                 $('.server.key-import.feedback').html(feedbackHtml('something went wrong during the import: ' + params, 'error'));
             });
     });
+
+	/**
+	 * Event: When the user press the flush local storage button
+	 * Flush the local storage
+	 */
+	$flushLocalStorage.click(function() {
+		passbolt.message('passbolt.debug.config.flush')
+			.publish();
+	});
 });

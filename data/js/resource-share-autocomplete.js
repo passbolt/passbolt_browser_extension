@@ -74,7 +74,7 @@ $(document).bind('template-ready', function() {
 	 * @param state The state to check
 	 */
 	var stateIs = function(state) {
-		// @todo The DOM has state store ...
+		// @todo The DOM as state store ...
 		return $('.autocomplete-content').hasClass(state);
 	};
 

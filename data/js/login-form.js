@@ -53,8 +53,11 @@ $(document).bind('template-ready', function() {
     };
 
     var onValidPassphrase = function () {
+        console.log('onvalidpassphrase');
         $loginMessage.removeClass('error');
-        passbolt.request('passbolt.auth.login', $masterPassword.val()).then(
+        passbolt.request('passbolt.auth.login', $masterPassword.val());
+            /**
+            .then(
             function success(msg, referrer) {
                 $loginMessage.text(msg);
                 $('html').addClass('loaded');
@@ -64,7 +67,7 @@ $(document).bind('template-ready', function() {
                 $('html').addClass('loaded').removeClass('loading');
                 onLoginError(msg);
             }
-        );
+        );*/
     };
 
     // The user clicks on OK.

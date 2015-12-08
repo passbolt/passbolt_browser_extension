@@ -2,6 +2,7 @@ var passbolt = passbolt || {};
     passbolt.login = passbolt.login || {};
 
 $(function() {
+    var passphraseIframeId = 'passbolt-iframe-login-form';
 
     /**
      * Update the login page with a server side rendered template
@@ -25,6 +26,11 @@ $(function() {
             console.log(self.id + ' Server could not be reached at: ' + url );
         });
     };
+
+
+    /* ==================================================================================
+     *  View Events Listeners
+     * ================================================================================== */
 
     /**
      * When the plugin configuration is missing
@@ -56,7 +62,7 @@ $(function() {
                     .addClass('success')
                     .html('<p class="message">' + msg + '<p>');
 
-                passbolt.login.onStep1MasterKey();
+                passbolt.login.onStep1RequestPassphrase();
             },
             function error(msg) {
                 $('.plugin-check.gpg')
@@ -71,12 +77,15 @@ $(function() {
         $('html').addClass('server-verified');
     };
 
-    passbolt.login.onStep1MasterKey = function () {
+    /**
+     * Insert the passphrase dialog
+     */
+    passbolt.login.onStep1RequestPassphrase = function () {
 
         // Inject the master password dialog iframe into the web page DOM.
         var $iframe = $('<iframe/>', {
-            id: 'passbolt-iframe-login-form',
-            src: 'about:blank?passbolt=passbolt-iframe-login-form',
+            id: passphraseIframeId,
+            src: 'about:blank?passbolt=' + passphraseIframeId,
             frameBorder: 0
         });
         $('.login.form').empty().append($iframe);
@@ -84,6 +93,39 @@ $(function() {
         // See passboltAuthPagemod and login-form for the logic
         // inside the iframe
     };
+
+    /* ==================================================================================
+     *  Add-on Code Events Listeners
+     * ================================================================================== */
+
+    // GPGAuth is complete
+    passbolt.message('passbolt.auth.login.complete')
+        .subscribe(function(token, status, message, referrer) {
+            if(status === 'SUCCESS') {
+                $('html').addClass('loaded').removeClass('loading');
+                window.top.location.href = referrer;
+            } else if(status === 'ERROR') {
+                getTpl('./tpl/login/feedback-login-error.ejs', function (tpl) {
+                    var html = new EJS({text: tpl}).render({'message':message});
+                    $('.login.form').empty().append(html);
+                });
+            }
+        });
+
+    // Passphrase have been captured and verified
+    passbolt.message('passbolt.auth.login.start')
+        .subscribe(function(token, status, message) {
+            $('html').addClass('loading').removeClass('loaded');
+            // remove the iframe and tell the user we're logging in
+            getTpl('./tpl/login/feedback-passphrase-ok.ejs', function (tpl) {
+                var html = new EJS({text: tpl}).render({'message':message});
+                $('.login.form').empty().append(html);
+            });
+        });
+
+    /* ==================================================================================
+     *  Content script init
+     * ================================================================================== */
 
     /**
      * Check if the addon says we are ready for login

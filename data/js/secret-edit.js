@@ -76,6 +76,14 @@ $(document).bind('template-ready', function() {
         }
     };
 
+	/**
+	 * Check if the secret has been updated.
+	 * @returns {boolean}
+	 */
+	var secretIsUpdated = function() {
+		return isDecrypted && (originalSecret != currentSecret);
+	};
+
     /* ==================================================================================
      *  Add-on Code Events Listeners
      * ================================================================================== */
@@ -84,9 +92,8 @@ $(document).bind('template-ready', function() {
     // updated means both decrypted, and changed.
     passbolt.message('passbolt.secret_edition.is_updated')
         .subscribe(function(token) {
-            var secretIsUpdated = isDecrypted && (originalSecret != currentSecret);
             passbolt.message('passbolt.secret_edition.is_updated.complete')
-                .publish(token, 'SUCCESS', secretIsUpdated);
+                .publish(token, 'SUCCESS', secretIsUpdated());
         });
 
     // Listen when the user wants to encrypt the secret for all the users the resource is shared with.
@@ -98,7 +105,7 @@ $(document).bind('template-ready', function() {
                         .publish(token, 'SUCCESS', armoreds, usersIds);
                 })
                 .progress(function(armored, userId, completedGoals) {
-                    // Notity about the progression.
+                    // Notify about the progression.
                     passbolt.message('passbolt.secret_edition.encrypt.progress')
                         .publish(token, armored, userId, completedGoals);
                 })
@@ -156,6 +163,10 @@ $(document).bind('template-ready', function() {
             var secret = $secret.val();
             $secretClear.val(secret);
             updateSecretStrength(secret);
+			// Notify the application regarding the change.
+			if (secretIsUpdated()) {
+				passbolt.messageOn('App', 'passbolt.event.trigger_to_page', 'secret_edition_secret_changed');
+			}
         } else {
             decryptSecret();
         }

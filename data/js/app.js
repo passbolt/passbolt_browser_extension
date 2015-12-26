@@ -212,12 +212,23 @@ window.addEventListener("passbolt.plugin.resource_edition", function() {
   });
 }, false);
 
-// Listen when the user claim his key.
-// @todo Deprecated code ?
-window.addEventListener("passbolt.settings.backup_key", function() {
-  passbolt.request('passbolt.keyring.private.backup')
-    .then(function () {
-      // The key has been saved.
+// Listen when the user requests a backup of his private key.
+window.addEventListener("passbolt.settings.download_private_key", function() {
+    passbolt.request('passbolt.keyring.private.get').then(function(key) {
+        passbolt.request('passbolt.keyring.key.backup', key.key, 'passbolt_private.asc').then(function () {
+                // The key has been saved.
+            });
+        });
+});
+
+// Listen when the user requests a backup of his public key.
+window.addEventListener("passbolt.settings.download_public_key", function() {
+    passbolt.request('passbolt.keyring.private.get').then(function(key) {
+        passbolt.request('passbolt.keyring.public.extract', key.key).then(function(publicKeyArmored){
+            passbolt.request('passbolt.keyring.key.backup', publicKeyArmored, 'passbolt_public.asc').then(function () {
+                // The key has been saved.
+            });
+        })
     });
 });
 

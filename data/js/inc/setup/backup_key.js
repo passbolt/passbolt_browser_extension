@@ -21,7 +21,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   step.start = function() {
     $('#js_backup_key_download').on('click', function(ev) {
-      passbolt.request('passbolt.keyring.private.backup', passbolt.setup.data.key)
+      passbolt.request('passbolt.keyring.key.backup', passbolt.setup.data.key, 'passbolt_private.asc')
         .then(function() {
           // The key has been saved.
         });

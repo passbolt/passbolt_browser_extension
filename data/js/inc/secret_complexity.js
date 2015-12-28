@@ -8,8 +8,12 @@ var secretComplexity = {};
    */
   var STRENGTH = {
     0: {
+      id: 'not_available',
+      label: '--'
+    },
+    1: {
       id: 'very_weak',
-      label: 'very weak'
+      label: 'very weak',
     },
     60: {
       id: 'weak',

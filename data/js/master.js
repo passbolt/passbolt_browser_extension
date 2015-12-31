@@ -2,7 +2,8 @@
 $(document).bind('template-ready', function() {
 
     var $securityToken = $('.security-token'),
-        $masterPassword = $('#js_master_password');
+        $masterPassword = $('#js_master_password'),
+        $masterPasswordSubmit = $('#master-password-submit');
 
     /* ==================================================================================
      *  Dialog init
@@ -26,6 +27,7 @@ $(document).bind('template-ready', function() {
                 }
             );
     };
+
     init();
 
 
@@ -56,9 +58,15 @@ $(document).bind('template-ready', function() {
     * ================================================================================== */
 
     // The user clicks on OK.
-    $('#master-password-submit').on('click', function() {
-        var masterPassword = $masterPassword.val();
-        self.port.emit("passbolt.keyring.master.request.submit", passbolt.context.token, masterPassword);
+    $masterPasswordSubmit.on('click', function() {;
+        self.port.emit("passbolt.keyring.master.request.submit", passbolt.context.token, $masterPassword.val());
+    });
+
+    // The user clicks on enter.
+    $masterPassword.keypress(function(e) {
+        if(e.which == 13) {
+            self.port.emit("passbolt.keyring.master.request.submit", passbolt.context.token, $masterPassword.val());
+        }
     });
 
     // The user wants to close the dialog.
@@ -66,7 +74,6 @@ $(document).bind('template-ready', function() {
         ev.preventDefault();
         passbolt.messageOn('App', 'passbolt.keyring.master.request.close');
     });
-
 });
 
 // Init the page with a template.

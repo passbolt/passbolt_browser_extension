@@ -45,6 +45,12 @@ $(document).bind('template-ready', function() {
                 strengthLabel: secretComplexity.STRENGTH[strength].label
             };
             $secretStrength.html(new EJS({text: tpl}).render(data));
+            // Add class on the top container.
+            var containerClasses = $secretStrength.attr('class').split(' ');
+            if (containerClasses.length > 1) {
+                $secretStrength.removeClass(containerClasses.pop());
+            }
+            $secretStrength.addClass(secretComplexity.STRENGTH[strength].id);
         });
     };
 
@@ -188,6 +194,9 @@ $(document).bind('template-ready', function() {
     // When the generate a new secret button is clicked.
     $generateSecretButton.on('click', function(ev) {
         ev.preventDefault();
+        if ($(this).attr('disabled') == 'disabled') {
+            return false;
+        }
         // The operation requires the secret to be decrypted.
         if (isDecrypted) {
             $secret.val(secretComplexity.generate())

@@ -4054,6 +4054,11 @@ input[type=text].fluid {
 .master-password.dialog input[type=password] {
   width: 80%;
 }
+.master-password.dialog input.focus_first {
+  border-width: 0;
+  font-size: 0;
+  line-height: 0;
+}
 .master-password.dialog .input.checkbox {
   visibility: hidden;
 }

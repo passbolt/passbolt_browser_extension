@@ -163,6 +163,16 @@ window.addEventListener('passbolt.secret_edition.encrypt', function(event) {
     });
 });
 
+// Intercept the request passbolt.secret.focus
+// And transfer the event to the appropriate component.
+window.addEventListener('passbolt.secret.focus', function(event) {
+  // Transfer the event to Secret listener.
+  passbolt.requestOn('Secret', 'passbolt.secret.focus')
+    .then(function( ) {
+      // Nothing.
+    });
+});
+
 // When the user wants to share a password with other people.
 // secret for the users the resource is shared with.
 // Dispatch this event to the share iframe which will take care of the encryption.

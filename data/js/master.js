@@ -3,13 +3,20 @@ $(document).bind('template-ready', function() {
 
     var $securityToken = $('.security-token'),
         $masterPassword = $('#js_master_password'),
-        $masterPasswordSubmit = $('#master-password-submit');
+        $masterPasswordSubmit = $('#master-password-submit'),
+        $focusFirst = $('#js_master_password_focus_first');
 
     /* ==================================================================================
      *  Dialog init
      * ================================================================================== */
 
     var init = function() {
+
+        passbolt.message('passbolt.secret_inactive.key_pressed')
+            .subscribe(function(token) {
+                $('#js_master_password').click();
+                $('#js_master_password').focus();
+            });
 
         // Get config regarding security token, and display it.
         passbolt.request('passbolt.user.settings.get.securityToken')
@@ -20,6 +27,44 @@ $(document).bind('template-ready', function() {
                     getTpl('./tpl/secret/securitytoken-style.ejs', function (tpl) {
                         var html = new EJS({text: tpl}).render(securityToken);
                         $('head').append(html);
+                    });
+
+                    $focusFirst.focus();
+                    $focusFirst.keypress(function(e) {
+                        // Prevent default.
+                        e.preventDefault();
+
+                        // Get keycode.
+                        var keycode = e.keyCode || e.which;
+
+                        // Characters accepted. Should be printable, no control.
+                        var valid =
+                            (keycode > 47 && keycode < 58)   || // number keys
+                            keycode == 32                    || // spacebar
+                            (keycode > 64 && keycode < 91)   || // letter keys
+                            (keycode > 95 && keycode < 112)  || // numpad keys
+                            (keycode > 185 && keycode < 193) || // ;=,-./` (in order)
+                            (keycode > 218 && keycode < 223);   // [\]' (in order)
+
+
+                        // Escape
+                        if (keycode == 27) {
+                            passbolt.messageOn('App', 'passbolt.keyring.master.request.close');
+                        }
+
+                        // If key pressed is not a control, or if tab.
+                        if (valid || keycode == 9) {
+                            // Give focus to field master password.
+                            $masterPassword.focus();
+                        }
+
+                        // If key pressed is not a control.
+                        // We enter the same value in the box.
+                        if (valid) {
+                            $masterPassword.val(String.fromCharCode(keycode));
+                        }
+
+                        return false;
                     });
                 },
                 function fail() {
@@ -62,10 +107,18 @@ $(document).bind('template-ready', function() {
         self.port.emit("passbolt.keyring.master.request.submit", passbolt.context.token, $masterPassword.val());
     });
 
-    // The user clicks on enter.
+    // The user presses a key.
     $masterPassword.keypress(function(e) {
-        if(e.which == 13) {
+        // Get keycode.
+        var keycode = e.keyCode || e.which;
+
+        // The user presses enter.
+        if(keycode == 13) {
             self.port.emit("passbolt.keyring.master.request.submit", passbolt.context.token, $masterPassword.val());
+        }
+        // The user presses escape.
+        else if(keycode == 27) {
+            passbolt.messageOn('App', 'passbolt.keyring.master.request.close');
         }
     });
 

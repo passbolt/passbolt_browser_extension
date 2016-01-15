@@ -135,6 +135,12 @@ $(document).bind('template-ready', function() {
             }
         });
 
+    // Listen to focus event.
+    passbolt.message('passbolt.secret.focus')
+        .subscribe(function(token) {
+            // Set focus on the secret field.
+            $secret.focus();
+        });
 
     /* ==================================================================================
      *    View Events Listeners
@@ -181,6 +187,12 @@ $(document).bind('template-ready', function() {
     // When a user click on the secret/password field
     $secret.on('focus', function(ev) {
         if (!isDecrypted) {
+            // If click is done while on the non decrypted state,
+            // we remove the focus.
+            // We do that because the focus will be needed by the master password dialog.
+            $secret.blur();
+
+            // Launch decryption.
             decryptSecret();
         }
     });
@@ -203,6 +215,25 @@ $(document).bind('template-ready', function() {
                 .trigger('change');
         } else {
             decryptSecret();
+        }
+    });
+
+    // When tab is pressed in secret field, inform app, so it can put the focus on the next field.
+    $secret.keydown(function(ev) {
+        if (!isDecrypted) {
+            ev.preventDefault();
+            return false;
+        }
+        var code = ev.keyCode || ev.which;
+        // Backtab key.
+        if (code == '9' && ev.shiftKey) {
+            $secret.blur();
+            passbolt.messageOn('App', 'passbolt.event.trigger_to_page', 'secret_backtab_pressed');
+        }
+        // Tab key.
+        else if (code == '9') {
+            $secret.blur();
+            passbolt.messageOn('App', 'passbolt.event.trigger_to_page', 'secret_tab_pressed');
         }
     });
 

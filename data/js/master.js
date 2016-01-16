@@ -12,12 +12,6 @@ $(document).bind('template-ready', function() {
 
     var init = function() {
 
-        passbolt.message('passbolt.secret_inactive.key_pressed')
-            .subscribe(function(token) {
-                $('#js_master_password').click();
-                $('#js_master_password').focus();
-            });
-
         // Get config regarding security token, and display it.
         passbolt.request('passbolt.user.settings.get.securityToken')
             .then(
@@ -28,49 +22,54 @@ $(document).bind('template-ready', function() {
                         var html = new EJS({text: tpl}).render(securityToken);
                         $('head').append(html);
                     });
-
-                    $focusFirst.focus();
-                    $focusFirst.keypress(function(e) {
-                        // Prevent default.
-                        e.preventDefault();
-
-                        // Get keycode.
-                        var keycode = e.keyCode || e.which;
-
-                        // Characters accepted. Should be printable, no control.
-                        var valid =
-                            (keycode > 47 && keycode < 58)   || // number keys
-                            keycode == 32                    || // spacebar
-                            (keycode > 64 && keycode < 91)   || // letter keys
-                            (keycode > 95 && keycode < 112)  || // numpad keys
-                            (keycode > 185 && keycode < 193) || // ;=,-./` (in order)
-                            (keycode > 218 && keycode < 223);   // [\]' (in order)
-
-
-                        // Escape
-                        if (keycode == 27) {
-                            passbolt.messageOn('App', 'passbolt.keyring.master.request.close');
-                        }
-
-                        // If key pressed is not a control, or if tab.
-                        if (valid || keycode == 9) {
-                            // Give focus to field master password.
-                            $masterPassword.focus();
-                        }
-
-                        // If key pressed is not a control.
-                        // We enter the same value in the box.
-                        if (valid) {
-                            $masterPassword.val(String.fromCharCode(keycode));
-                        }
-
-                        return false;
-                    });
                 },
                 function fail() {
                     throw 'No security token set';
                 }
             );
+
+        // Remove all focuses from the client app.
+        passbolt.messageOn('App', 'passbolt.event.trigger_to_page', 'remove_all_focuses');
+
+        // We set the focus on the first focus field and wait for events.
+        // TODO improvement : client js should send remove_all_focuses_done, instead of a timeout.
+        setTimeout(function() {
+            // Set focus on the temporary first focus field.
+            $focusFirst.focus();
+
+            // First focus field listen to keypress events.
+            $focusFirst.keypress(function(e) {
+                // Prevent default.
+                e.preventDefault();
+
+                // Get keycode.
+                var keycode = e.keyCode || e.which;
+
+                // Characters accepted. Should be printable, no control.
+                var char = String.fromCharCode(keycode);
+                var regex = /^[\u0020-\u007e\u00a0-\u00ff]*$/;
+                var valid = regex.test(char);
+
+                // Escape
+                if (keycode == 27) {
+                    passbolt.messageOn('App', 'passbolt.keyring.master.request.close');
+                }
+
+                // If key pressed is not a control, or if tab.
+                if (valid || keycode == 9) {
+                    // Give focus to field master password.
+                    $masterPassword.focus();
+                }
+
+                // If key pressed is not a control.
+                // We enter the same value in the box.
+                if (valid) {
+                    $masterPassword.val(char);
+                }
+
+                return false;
+            });
+        }, 200);
     };
 
     init();
@@ -84,6 +83,8 @@ $(document).bind('template-ready', function() {
     passbolt.message('passbolt.keyring.master.request.complete')
         .subscribe(function(token, status, attempts) {
             if (status == 'ERROR') {
+                $masterPasswordSubmit.removeClass('processing');
+                $masterPassword.focus();
                 if (attempts < 3) {
                     $('label[for="js_master_password"]').html('Please enter a valid master password.')
                             .addClass('error');
@@ -103,7 +104,8 @@ $(document).bind('template-ready', function() {
     * ================================================================================== */
 
     // The user clicks on OK.
-    $masterPasswordSubmit.on('click', function() {;
+    $masterPasswordSubmit.on('click', function() {
+        $masterPasswordSubmit.addClass('processing');
         self.port.emit("passbolt.keyring.master.request.submit", passbolt.context.token, $masterPassword.val());
     });
 
@@ -114,6 +116,7 @@ $(document).bind('template-ready', function() {
 
         // The user presses enter.
         if(keycode == 13) {
+            $masterPasswordSubmit.addClass('processing');
             self.port.emit("passbolt.keyring.master.request.submit", passbolt.context.token, $masterPassword.val());
         }
         // The user presses escape.

@@ -58,10 +58,17 @@ $(document).bind('template-ready', function() {
      * The secret is still encrypted, decrypt it.
      */
     var decryptSecret = function() {
+        // If a decryption is already happening, don't trigger it twice.
+        if ($secret.hasClass("decrypting")) {
+            return;
+        }
+        $secret.addClass("decrypting");
+
         var armored = passbolt.context['armoredSecret'];
         if (typeof armored != 'undefined' && !armored) {
             var deferred = $.Deferred();
             deferred.resolveWith('');
+            $secret.removeClass("decrypting");
             return deferred;
         } else {
             var deferred = passbolt.request('passbolt.secret.decrypt', armored);
@@ -77,6 +84,7 @@ $(document).bind('template-ready', function() {
                 $generateSecretButton
                     .removeClass('disabled')
                     .removeAttr('disabled');
+                $secret.removeClass("decrypting");
             });
             return deferred;
         }

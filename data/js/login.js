@@ -2,31 +2,8 @@ var passbolt = passbolt || {};
     passbolt.login = passbolt.login || {};
 
 $(function() {
+
     var passphraseIframeId = 'passbolt-iframe-login-form';
-
-    /**
-     * Update the login page with a server side rendered template
-     * @param step
-     */
-    passbolt.login.render = function(step, callback) {
-        var self = this;
-            self.callback = callback;
-        var $renderSpace = $('.login.page .js_main-login-section');
-
-        url = '/auth/partials/' + step;
-        $.ajax({
-            url: url,
-            context: $renderSpace
-        }).done(function(data) {
-            $( this ).html(data);
-            if(typeof self.callback !== 'undefined') {
-                self.callback();
-            }
-        }).fail(function() {
-            console.log(self.id + ' Server could not be reached at: ' + url );
-        });
-    };
-
 
     /* ==================================================================================
      *  View Events Listeners
@@ -36,18 +13,34 @@ $(function() {
      * When the plugin configuration is missing
      */
     passbolt.login.onConfigurationMissing = function() {
-        // Do not allow login, but explain you need to register
-        // or contact the domain administrator based on server side config
-        passbolt.login.render('noconfig');
+        var $renderSpace = $('.login.page .js_main-login-section'),
+          publicRegistration = $('.login.page.public-registration').length > 0 ? true : false;
+
+          getTpl('./tpl/login/noconfig.ejs', function (tpl) {
+              var html = new EJS({text: tpl}).render({publicRegistration: publicRegistration});
+              $renderSpace.html(html);
+          });
     };
 
     /**
      * Starts with server key check
      */
     passbolt.login.onStep0Start = function() {
-        // Display a informations about the state of login
+        var $renderSpace = $('.login.page .js_main-login-section');
+
+        // Display information about the state of login
         // e.g. that we're going to check for the server key first
-        passbolt.login.render('stage0', passbolt.login.onStep0CheckServerKey);
+        passbolt.request('passbolt.keyring.server.get')
+            .then(function(serverKeyInfo) {
+                getTpl('./tpl/login/stage0.ejs', function (tpl) {
+                    var html = new EJS({text: tpl}).render({serverKeyId: serverKeyInfo.keyId.toUpperCase()});
+                    $renderSpace.html(html);
+                    passbolt.login.onStep0CheckServerKey();
+                });
+            })
+            .fail(function(){
+                console.log('passbolt.keyring.server.get fail: no server key set');
+            });
     };
 
     /**

@@ -32,7 +32,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @returns deferred
      */
     step.fetchServerKey = function(domain) {
-        console.log('domain', domain);
         return passbolt.request('passbolt.auth.getServerKey', domain)
             .then(function(serverKey) {
                 step.serverKey = serverKey.keydata;

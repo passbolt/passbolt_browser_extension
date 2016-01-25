@@ -2,30 +2,8 @@ var passbolt = passbolt || {};
     passbolt.login = passbolt.login || {};
 
 $(function() {
+
     var passphraseIframeId = 'passbolt-iframe-login-form';
-
-    /**
-     * Update the login page with a server side rendered template
-     * @param step
-     */
-    passbolt.login.render = function(step, callback) {
-        var self = this;
-            self.callback = callback;
-        var $renderSpace = $('.login.page .js_main-login-section');
-
-        url = '/auth/partials/' + step;
-        $.ajax({
-            url: url,
-            context: $renderSpace
-        }).done(function(data) {
-            $( this ).html(data);
-            if(typeof self.callback !== 'undefined') {
-                self.callback();
-            }
-        }).fail(function() {
-            console.log(self.id + ' Server could not be reached at: ' + url );
-        });
-    };
 
     /* ==================================================================================
      *  View Events Listeners
@@ -35,17 +13,13 @@ $(function() {
      * When the plugin configuration is missing
      */
     passbolt.login.onConfigurationMissing = function() {
-        var $renderSpace = $('.login.page .js_main-login-section');
+        var $renderSpace = $('.login.page .js_main-login-section'),
+          publicRegistration = $('.login.page.public-registration').length > 0 ? true : false;
 
-        // Do not allow login, but explain you need to register
-        // or contact the domain administrator based on server side config
-        passbolt.request('passbolt.auth.isPublicRegistrationOpen')
-            .then(function(publicRegistration) {
-                getTpl('./tpl/login/noconfig.ejs', function (tpl) {
-                    var html = new EJS({text: tpl}).render({publicRegistration: publicRegistration});
-                    $renderSpace.html(html);
-                });
-            });
+          getTpl('./tpl/login/noconfig.ejs', function (tpl) {
+              var html = new EJS({text: tpl}).render({publicRegistration: publicRegistration});
+              $renderSpace.html(html);
+          });
     };
 
     /**

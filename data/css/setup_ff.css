@@ -4729,6 +4729,9 @@ table.table-info.horizontal tbody tr:nth-child(even) {
   width: 64%;
   float: left;
 }
+.input-password-wrapper .input.password input[type=password].decrypting {
+  background: transparent url(../img/controls/loading.gif) no-repeat 72% center;
+}
 .input-password-wrapper .input.password.has-encrypted-secret input {
   /* fallback placeholder */
   /* webkit placeholder */

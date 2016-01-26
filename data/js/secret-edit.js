@@ -63,6 +63,7 @@ $(document).bind('template-ready', function() {
             return;
         }
         $secret.addClass("decrypting");
+        $secret.attr("placeholder", "decrypting...");
 
         var armored = passbolt.context['armoredSecret'];
         if (typeof armored != 'undefined' && !armored) {

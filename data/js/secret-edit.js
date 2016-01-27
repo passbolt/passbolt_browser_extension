@@ -62,30 +62,35 @@ $(document).bind('template-ready', function() {
         if ($secret.hasClass("decrypting")) {
             return;
         }
-        $secret.addClass("decrypting");
-        $secret.attr("placeholder", "decrypting...");
 
         var armored = passbolt.context['armoredSecret'];
         if (typeof armored != 'undefined' && !armored) {
             var deferred = $.Deferred();
             deferred.resolveWith('');
-            $secret.removeClass("decrypting");
             return deferred;
         } else {
+            // Add class decrypting to show something is happening.
+            $secret.addClass("decrypting");
+
+            // Change placeholder text.
+            $secret.attr("placeholder", "decrypting...");
+
             var deferred = passbolt.request('passbolt.secret.decrypt', armored);
             deferred.then(function(secret) {
                 isDecrypted = true;
                 originalSecret = secret;
+
                 $secret
                     .val(secret)
                     .attr('placeholder', initialSecretPlaceholder)
                     .focus()
                     .trigger('change')
+                    .removeClass("decrypting")
                     .parent().removeClass('has-encrypted-secret');
+
                 $generateSecretButton
                     .removeClass('disabled')
                     .removeAttr('disabled');
-                $secret.removeClass("decrypting");
             });
             return deferred;
         }

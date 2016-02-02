@@ -15,14 +15,34 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         'next': 'define_key',
         'viewData': {},
         'defaultActions': {
-          'submit' : 'disabled',
-          'cancel' : 'hidden'
+            'submit': 'disabled',
+            'cancel': 'hidden'
         },
 
         // Will be used at runtime.
         serverKey: null,
-        serverKeyInfo: {}
+        serverKeyInfo: {},
+
+        /**
+         * Elements available in the dom.
+         * Setup will automatically create corresponding jquery elements
+         * that will be accessible with ${name}.
+         * Example : step.elts.$fingerprintWrapper
+         */
+        elts: {
+            fingerprintWrapper : '.input.key-fingerprint',
+            fingerprintError : '.input.key-fingerprint .message.error',
+            feedbackError : '#js_main_error_feedback',
+            fingerprintInput : '#js_setup_key_fingerprint',
+            domainCheckboxWrapper : '.input.checkbox',
+            domainCheckbox : '#js_setup_domain_check',
+            keyInfoLink :'#js_server_key_info'
+        }
     };
+
+    /* ==================================================================================
+     *  Chainable functions
+     * ================================================================================== */
 
     /**
      * Fetch server key.
@@ -32,9 +52,9 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      *
      * @returns deferred
      */
-    step.fetchServerKey = function(domain) {
+    step._fetchServerKey = function (domain) {
         return passbolt.request('passbolt.auth.getServerKey', domain)
-            .then(function(serverKey) {
+            .then(function (serverKey) {
                 step.serverKey = serverKey.keydata;
                 return serverKey.keydata;
             });
@@ -48,96 +68,122 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      *
      * @returns {*}
      */
-    step.getKeyInfo = function(unarmoredServerKey) {
+    step._getKeyInfo = function (unarmoredServerKey) {
         // Now, request information for the given key, and store them in a variable.
         return passbolt.request('passbolt.keyring.public.info', unarmoredServerKey)
-            .then(function(keyInfo) {
+            .then(function (keyInfo) {
                 step.serverKeyInfo = keyInfo;
                 return keyInfo;
             });
     };
 
     /**
-     * Set domain in the settings.
-     * Is called at the page submit.
-     *
-     * @param domain
-     * @returns {*}
-     */
-    step.setDomain = function(domain) {
-        return passbolt.request('passbolt.user.settings.set.domain', domain);
-    };
-
-    /**
-     * Set the user name in the plugin.
-     *
-     * @param firstName
-     * @param lastName
-     * @returns {*}
-     */
-    step.setName = function (firstName, lastName) {
-        // TODO : validation
-        return passbolt.request('passbolt.user.set.name', firstName, lastName)
-            .then(function () {
-                return {
-                    first_name: firstName,
-                    last_name: lastName
-                };
-            });
-    };
-
-    /**
-     * Set the username in the plugin.
-     *
-     * @param username
-     * @returns {*}
-     */
-    step.setUsername = function (username) {
-        // TODO : validation
-        return passbolt.request('passbolt.user.set.username', username)
-            .then(function () {
-                return username;
-            });
-    };
-
-    /**
-     * Import the server key in the keyring.
-     * Is called at the page submit.
-     *
-     * @param armoredServerKey
-     * @returns {*}
-     */
-    step.importServerKey = function(armoredServerKey) {
-        return passbolt.request('passbolt.keyring.server.import', armoredServerKey);
-    };
-
-    /**
-     * Show key information dialog, and initialize its components.
+     * Display key info.
      *
      * @param keyInfo
-     *   key information, as returned by getKeyInfo().
      */
-    step.showKeyInfoDialog = function(keyInfo) {
-        getTpl('./tpl/setup/dialog_key_info.ejs', function(tpl) {
-            var data = keyInfo;
-            $('body').prepend(new EJS({text: tpl}).render(data));
-            var $dialog = $('.dialog-wrapper');
-            // Init controls close and ok.
-            $('.js-dialog-close, input[type=submit]', $dialog).click(function() {
-                $dialog.remove();
+    step._displayKeyInfo = function (keyInfo) {
+        step.elts.$fingerprintInput.attr('value', keyInfo.fingerprint.toUpperCase());
+        step.elts.$domainCheckboxWrapper.css('visibility', 'visible');
+    };
+
+
+    /* ==================================================================================
+     *  Content code events
+     * ================================================================================== */
+
+    /**
+     * On submit.
+     *
+     * @returns {*}
+     */
+    step.onSubmit = function () {
+        // Deferred.
+        var def = $.Deferred();
+
+        // Set submit form as processing.
+        passbolt.setup.setActionState('submit', 'processing');
+
+        // Set domain in the settings.
+        step.setDomain(passbolt.setup.data.domain)
+
+            // If domain was set succesfully, attempt to import the server key.
+            .then(function () {
+                return step.importServerKey(step.serverKeyInfo.key);
+            })
+
+            // If server key was imported successfully, resolve submit.
+            .then(function () {
+                setTimeout(function () {
+                    def.resolve();
+                }, 1000)
+            })
+
+            // In case of error, we display an error in the console.
+            .fail(function (msg) {
+                console.log(msg);
+                // back to ready state.
+                passbolt.setup.setActionState('submit', 'ready');
             });
-            // TODO : Help page and re-enable help button in dialog view.
-        });
+
+        return def;
     };
 
     /**
      * Display an error message for server key.
      * @param errorMessage
      */
-    step.errorServerKey = function(errorMessage) {
-        $('.input.key-fingerprint').addClass('error');
-        $('.input.key-fingerprint .message.error').text(errorMessage);
+    step.onErrorServerKey = function (errorMessage) {
+        console.log("error retrieving server key : ", errorMessage);
+        step.elts.$fingerprintWrapper.addClass('error');
+        step.elts.$fingerprintError.text("Could not retrieve server key. Please contact administrator.");
     };
+
+    /**
+     * On Domain check.
+     *
+     * Happens when the domain checkbox is checked by the user.
+     */
+    step.onDomainCheck = function () {
+        if (!step.elts.$domainCheckbox.is(':checked')) {
+            passbolt.setup.setActionState('submit', 'disabled');
+        } else {
+            passbolt.setup.setActionState('submit', 'enabled');
+        }
+    };
+
+    /**
+     * On server key info click.
+     *
+     * Happens when the user has clicked on More link next to the server key fingerprint.
+     *
+     * @returns {boolean}
+     */
+    step.onServerKeyInfo = function () {
+        if (step.elts.$fingerprintInput.val() != '') {
+            step.showKeyInfoDialog(step.serverKeyInfo);
+        }
+        return false;
+    };
+
+    /**
+     * On error.
+     *
+     * Is called for general errors that doesn't require specific behavior.
+     *
+     * @param errorMsg
+     */
+    step.onError = function (errorMsg) {
+        console.log('Error : ', errorMsg);
+        step.elts.$feedbackError
+            .removeClass('hidden')
+            .text(errorMsg);
+    }
+
+
+    /* ==================================================================================
+     *  Business functions
+     * ================================================================================== */
 
     /**
      * Implement init().
@@ -151,45 +197,109 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * Implement start().
      */
     step.start = function () {
-        $('.input.checkbox').css('visibility', 'hidden');
+        step.elts.$domainCheckboxWrapper.css('visibility', 'hidden');
 
         // Set the name and username on start.
         // so we can display an error if any.
-        // TODO : display error in case of issue.
         step.setName(passbolt.setup.data.firstName, passbolt.setup.data.lastName)
             .then(function () {
-                return step.setUsername(passbolt.setup.data.username);
-            })
-            .fail(function(error) {
-                console.log('error while setting name', error);
+                step.setUsername(passbolt.setup.data.username).then(function () {
+                    // username and name is set, get the server key.
+                    step.fetchServerKey();
+                });
             });
 
-        step.fetchServerKey(passbolt.setup.data.domain)
-            .then(step.getKeyInfo)
-            .then(function(info) {
-                $('#js_setup_key_fingerprint').attr('value', info.fingerprint.toUpperCase());
-                $('.input.checkbox').css('visibility', 'visible');
-            })
-            .fail(function(msg) {
-                step.errorServerKey(msg);
-                console.log("error server key : " + msg);
-            });
-
-        $('#js_setup_domain_check').change(function () {
-            if (!$(this).is(':checked')) {
-                passbolt.setup.setActionState('submit', 'disabled');
-            } else {
-                passbolt.setup.setActionState('submit', 'enabled');
-            }
-        });
+        // Bind domain check change event.
+        step.elts.$domainCheckbox.change(step.onDomainCheck);
 
         // Init key info dialog.
-        $('#js_server_key_info').click(function() {
-            if ($('#js_setup_key_fingerprint').val() != '') {
-                step.showKeyInfoDialog(step.serverKeyInfo);
-            }
-            return false;
+        step.elts.$keyInfoLink.click(step.onServerKeyInfo);
+    };
+
+    /**
+     * Set domain in the settings.
+     * Is called at the page submit.
+     *
+     * @param domain
+     * @returns {*}
+     */
+    step.setDomain = function (domain) {
+        return passbolt.request('passbolt.user.settings.set.domain', domain)
+            .fail(function (errorMsg) {
+                step.onError(errorMsg);
+            });
+    };
+
+    /**
+     * Validate and set the first name and last name in the plugin.
+     *
+     * @param firstName
+     * @param lastName
+     * @returns {*}
+     */
+    step.setName = function (firstName, lastName) {
+        return passbolt.request('passbolt.user.set.name', firstName, lastName)
+            .fail(function (errorMsg) {
+                step.onError(errorMsg);
+            });
+    };
+
+    /**
+     * Validate and set the username in the plugin.
+     *
+     * @param username
+     * @returns {*}
+     */
+    step.setUsername = function (username) {
+        return passbolt.request('passbolt.user.set.username', username)
+            .fail(function (errorMsg) {
+                step.onError(errorMsg);
+            });
+    };
+
+    /**
+     * Import the server key in the keyring.
+     * Is called at the page submit.
+     *
+     * @param armoredServerKey
+     * @returns {*}
+     */
+    step.importServerKey = function (armoredServerKey) {
+        return passbolt.request('passbolt.keyring.server.import', armoredServerKey)
+            .fail(function (errorMsg) {
+                step.onError(errorMsg);
+            });
+    };
+
+    /**
+     * Show key information dialog, and initialize its components.
+     *
+     * @param keyInfo
+     *   key information, as returned by getKeyInfo().
+     */
+    step.showKeyInfoDialog = function (keyInfo) {
+        getTpl('./tpl/setup/dialog_key_info.ejs', function (tpl) {
+            var data = keyInfo;
+            $('body').prepend(new EJS({text: tpl}).render(data));
+            var $dialog = $('.dialog-wrapper');
+            // Init controls close and ok.
+            $('.js-dialog-close, input[type=submit]', $dialog).click(function () {
+                $dialog.remove();
+            });
+            // TODO : Help page and re-enable help button in dialog view.
         });
+    };
+
+    /**
+     * Fetch and display server key.
+     */
+    step.fetchServerKey = function () {
+        step._fetchServerKey(passbolt.setup.data.domain)
+            .then(step._getKeyInfo)
+            .then(step._displayKeyInfo)
+            .fail(function (msg) {
+                step.onErrorServerKey(msg);
+            });
     };
 
     /**
@@ -197,35 +307,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @returns {*}
      */
     step.submit = function () {
-        // Deferred.
-        var def = $.Deferred();
-
-        // Set submit form as processing.
-        passbolt.setup.setActionState('submit', 'processing');
-
-        // Set domain in the settings.
-        step.setDomain(passbolt.setup.data.domain)
-
-            // If domain was set succesfully, attempt to import the server key.
-            .then(function() {
-                return step.importServerKey(step.serverKeyInfo.key);
-            })
-
-            // If server key was imported successfully, resolve submit.
-            .then(function() {
-                setTimeout(function() {
-                    def.resolve();
-                }, 1000)
-            })
-
-            // In case of error, we display an error in the console.
-            .fail(function(msg) {
-                console.log(msg);
-                // back to ready state.
-                passbolt.setup.setActionState('submit', 'ready');
-            });
-
-        return def;
+        return step.onSubmit();
     };
 
     /**

@@ -180,9 +180,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
             .text(errorMsg);
     }
 
-
     /* ==================================================================================
-     *  Business functions
+     *  Core functions (Implements()).
      * ================================================================================== */
 
     /**
@@ -215,6 +214,27 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         // Init key info dialog.
         step.elts.$keyInfoLink.click(step.onServerKeyInfo);
     };
+
+    /**
+     * Implement submit().
+     * @returns {*}
+     */
+    step.submit = function () {
+        return step.onSubmit();
+    };
+
+    /**
+     * Implement cancel().
+     * @returns {null}
+     */
+    step.cancel = function () {
+        // No cancel action available at this step.
+        return null;
+    };
+
+    /* ==================================================================================
+     *  Business functions
+     * ================================================================================== */
 
     /**
      * Set domain in the settings.
@@ -300,23 +320,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
             .fail(function (msg) {
                 step.onErrorServerKey(msg);
             });
-    };
-
-    /**
-     * Implement submit().
-     * @returns {*}
-     */
-    step.submit = function () {
-        return step.onSubmit();
-    };
-
-    /**
-     * Implement cancel().
-     * @returns {null}
-     */
-    step.cancel = function () {
-        // No cancel action available at this step.
-        return null;
     };
 
     passbolt.setup.steps[step.id] = step;

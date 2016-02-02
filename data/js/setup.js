@@ -13,7 +13,15 @@ passbolt.setup.data = passbolt.setup.data || {};
     actionsStates = {
       'submit': 'enabled',
       'cancel': 'enabled'
-    };
+    },
+    // Actions wrapper element.
+    $actionsWrapper = $('#js_step_actions'),
+    // Menu wrapper element.
+    $menuWrapper = $('#js_menu'),
+    // Content wrapper element.
+    $contentWrapper =  $('#js_step_content'),
+    // Title element.
+    $title = $('#js_step_title');
 
   /**
    * Get the potential next steps of a step.
@@ -22,8 +30,8 @@ passbolt.setup.data = passbolt.setup.data || {};
    * @returns {*|Array}
    */
   passbolt.setup.getNextSteps = function(targetStepId, arr) {
-    var arr = arr || []
-    potentialChildren = [],
+    var arr = arr || [],
+      potentialChildren = [],
       favoriteChild = null;
 
     // Look for future.
@@ -68,9 +76,13 @@ passbolt.setup.data = passbolt.setup.data || {};
    * Get the menu items.
    * @returns {*|Array}
    */
-  passbolt.setup.getMenuSteps = function() {
+  passbolt.setup.getMenuSteps = function(targetStepId) {
+    if (targetStepId == undefined) {
+      targetStepId = currentStepId;
+    }
+
     // Get the current workflow.
-    var workflow = passbolt.setup.getWorkflow(currentStepId),
+    var workflow = passbolt.setup.getWorkflow(targetStepId),
       menuSteps = [],
       state = null;
 
@@ -80,14 +92,14 @@ passbolt.setup.data = passbolt.setup.data || {};
 
       // If the task is a subStep, so it is not visible, and its parent become current
       if (step.subStep) {
-        if (step.id == currentStepId) {
+        if (step.id == targetStepId) {
           menuSteps[menuSteps.length - 1].state = 'current';
         }
         continue;
       }
 
       // If the step is the current step.
-      if (step.id == currentStepId) {
+      if (step.id == targetStepId) {
         state = 'current';
       }
       // If the latest state was current or future, this step is in the future.
@@ -130,53 +142,140 @@ passbolt.setup.data = passbolt.setup.data || {};
   };
 
   /**
-   * Go to the step.
-   * @param targetStepId
+   * Init action buttons for the step according to what is defined
+   * in the step data.
+   *
+   * @param stepId
+   *   step Id.
    */
-  passbolt.setup.goToStep = function(targetStepId) {
-    var menuSteps = passbolt.setup.getMenuSteps(),
-      step = passbolt.setup.steps[currentStepId];
+  passbolt.setup.initActionButtons = function(stepId) {
+    var step = passbolt.setup.steps[stepId];
+
+    // Empty actions container.
+    $actionsWrapper.empty();
+
+    // Get template for actions, and render it.
+    getTpl('./tpl/setup/action_buttons.ejs', function(tpl) {
+
+      // Render.
+      $actionsWrapper.html(new EJS({text: tpl}).render());
+
+      var $nextButton = $('#js_setup_submit_step'),
+        $cancelButton = $('#js_setup_cancel_step');
+
+      // Show hide the default actions.
+      var stepActions = defaultStepActions;
+      if (typeof step.defaultActions != 'undefined') {
+        stepActions = defaultStepActions.filter(function(n) {
+          return step.defaultActions.indexOf(n) > -1;
+        });
+      }
+      for(var i in defaultStepActions) {
+        var action = defaultStepActions[i];
+        // Show the action.
+        if(stepActions.indexOf(action) != -1) {
+          passbolt.setup.setActionState(action, 'enabled');
+        }
+        // Hide the action.
+        else {
+          passbolt.setup.setActionState(action, 'hidden');
+        }
+      }
+
+      // Bind the go to next step button.
+      $nextButton.click(function(ev) {
+        ev.preventDefault();
+        if(actionsStates['submit'] != 'enabled') {
+          return;
+        }
+
+        step.submit().then(function() {
+          passbolt.setup.goForward(step.next);
+        });
+      });
+
+      // Bind the cancel step button.
+      $cancelButton.click(function(ev) {
+        ev.preventDefault();
+        if(actionsStates['cancel'] != 'enabled') {
+          return;
+        }
+
+        var previousStepId = null;
+        step.cancel().then(function() {
+          for(var i in step.parents) {
+            if ((previousStepId = pastSteps.indexOf(step.parents[i])) != -1) {
+              passbolt.setup.goBackward(pastSteps[previousStepId]);
+            }
+          }
+        });
+      });
+    });
+  }
+
+  /**
+   * Init and render menu according to the step provided.
+   *
+   * @param stepId
+   *   step id
+   */
+  passbolt.setup.initMenu = function(stepId) {
+    var menuSteps = passbolt.setup.getMenuSteps();
+
+    // Empty menu container.
+    $menuWrapper.empty();
 
     getTpl('./tpl/setup/menu.ejs', function(tpl) {
       var data = {
         'steps': passbolt.setup.steps,
         'menuSteps': menuSteps,
-        'currentStepId': currentStepId
+        'currentStepId': stepId
       };
-      $('#js_menu').html(new EJS({text: tpl}).render(data));
+      $menuWrapper.html(new EJS({text: tpl}).render(data));
     });
+  }
+
+  /**
+   * Init and render step content according to the step provided in argument.
+   * Also set the title.
+   *
+   * @param stepId
+   *   step id
+   */
+  passbolt.setup.initContent = function(stepId) {
+    var step = passbolt.setup.steps[stepId];
+
+    // Empty content container.
+    $contentWrapper.empty();
 
     // Set the page title.
-    $('#js_step_title').html(step.title);
+    $title.html(step.title);
 
     // Initialize the step.
     step.init();
 
-    // Show hide the default actions.
-    var stepActions = defaultStepActions;
-    if (typeof step.defaultActions != 'undefined') {
-      var stepActions = defaultStepActions.filter(function(n) {
-        return step.defaultActions.indexOf(n) > -1;
-      });
-    }
-    for(var i in defaultStepActions) {
-      var action = defaultStepActions[i];
-      // Show the action.
-      if(stepActions.indexOf(action) != -1) {
-        passbolt.setup.setActionState(action, 'enabled');
-      }
-      // Hide the action.
-      else {
-        passbolt.setup.setActionState(action, 'hidden');
-      }
-    }
-
     // Load the template relative to the step and start the step.
     getTpl('./tpl/setup/' + currentStepId + '.ejs', function(tpl) {
-      $('#js_step_content').html(new EJS({text: tpl}).render(step.viewData));
+      $contentWrapper.html(new EJS({text: tpl}).render(step.viewData));
       // Start the step.
       step.start();
     });
+  }
+
+  /**
+   * Go to the step.
+   * @param targetStepId
+   */
+  passbolt.setup.goToStep = function(targetStepId) {
+
+    // Initialize and render menu.
+    passbolt.setup.initMenu(targetStepId);
+
+    // Init content
+    passbolt.setup.initContent(targetStepId);
+
+    // Init step action buttons.
+    passbolt.setup.initActionButtons(targetStepId);
   };
 
   /**
@@ -227,39 +326,6 @@ passbolt.setup.data = passbolt.setup.data || {};
     passbolt.setup.goForward('domain_check');
   };
 
-  // Bind the go to next step button.
-  $('#js_setup_submit_step').click(function(ev) {
-    ev.preventDefault();
-    if(actionsStates['submit'] != 'enabled') {
-      console.log('cannot go forward if the state is not enabled');
-      return;
-    }
-
-    var step = passbolt.setup.steps[currentStepId];
-    step.submit().then(function() {
-      passbolt.setup.goForward(step.next);
-    });
-  });
-
-  // Bind the cancel step button.
-  $('#js_setup_cancel_step').click(function(ev) {
-    ev.preventDefault();
-    if(actionsStates['cancel'] != 'enabled') {
-      console.log('cannot go backward if the state is not enabled');
-      return;
-    }
-
-    var step = passbolt.setup.steps[currentStepId],
-      previousStepId = null;
-    step.cancel().then(function() {
-      for(var i in step.parents) {
-        if ((previousStepId = pastSteps.indexOf(step.parents[i])) != -1) {
-          passbolt.setup.goBackward(pastSteps[previousStepId]);
-        }
-      }
-    });
-
-  });
 
   // The addon initialise the setup.
   passbolt.message('passbolt.setup.init')

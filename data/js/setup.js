@@ -8,8 +8,8 @@ passbolt.setup.data = passbolt.setup.data || {};
     // The past steps the user went through.
     pastSteps = [],
     // Default actions available at each step.
-    defaultStepActions = ['submit', 'cancel'],
-    // Actions states.
+    defaultStepActions = {'submit': 'enabled', 'cancel': 'enabled'},
+    // Actions and their default states.
     actionsStates = {
       'submit': 'enabled',
       'cancel': 'enabled'
@@ -160,29 +160,24 @@ passbolt.setup.data = passbolt.setup.data || {};
       // Render.
       $actionsWrapper.html(new EJS({text: tpl}).render());
 
+      // Define which actions are available, as well as their states.
+      // This is based on defaultActions, and extended with step actions if defined.
+      var actions = defaultStepActions;
+      if (step.defaultActions != undefined) {
+        actions = $.extend({}, defaultStepActions, step.defaultActions);
+      }
+
+      // Set appropriate state for each action, as per final settings.
+      for(var action in actions) {
+        var state = actions[action];
+        passbolt.setup.setActionState(action, state);
+      }
+
+      // Define action elements in dom.
       var $nextButton = $('#js_setup_submit_step'),
         $cancelButton = $('#js_setup_cancel_step');
 
-      // Show hide the default actions.
-      var stepActions = defaultStepActions;
-      if (typeof step.defaultActions != 'undefined') {
-        stepActions = defaultStepActions.filter(function(n) {
-          return step.defaultActions.indexOf(n) > -1;
-        });
-      }
-      for(var i in defaultStepActions) {
-        var action = defaultStepActions[i];
-        // Show the action.
-        if(stepActions.indexOf(action) != -1) {
-          passbolt.setup.setActionState(action, 'enabled');
-        }
-        // Hide the action.
-        else {
-          passbolt.setup.setActionState(action, 'hidden');
-        }
-      }
-
-      // Bind the go to next step button.
+      // Bind click on the go to next step button.
       $nextButton.click(function(ev) {
         ev.preventDefault();
         if(actionsStates['submit'] != 'enabled') {
@@ -194,7 +189,7 @@ passbolt.setup.data = passbolt.setup.data || {};
         });
       });
 
-      // Bind the cancel step button.
+      // Bind click on the cancel step button.
       $cancelButton.click(function(ev) {
         ev.preventDefault();
         if(actionsStates['cancel'] != 'enabled') {
@@ -271,11 +266,12 @@ passbolt.setup.data = passbolt.setup.data || {};
     // Initialize and render menu.
     passbolt.setup.initMenu(targetStepId);
 
-    // Init content
-    passbolt.setup.initContent(targetStepId);
-
     // Init step action buttons.
     passbolt.setup.initActionButtons(targetStepId);
+
+    // Init content.
+    // Is done at the end because this step will take care of initializing the button states too.
+    passbolt.setup.initContent(targetStepId);
   };
 
   /**

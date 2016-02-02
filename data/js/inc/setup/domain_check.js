@@ -14,9 +14,10 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         'parents': null,
         'next': 'define_key',
         'viewData': {},
-        'defaultActions': [
-            'submit'
-        ],
+        'defaultActions': {
+          'submit' : 'disabled',
+          'cancel' : 'hidden'
+        },
 
         // Will be used at runtime.
         serverKey: null,
@@ -174,7 +175,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
                 console.log("error server key : " + msg);
             });
 
-        passbolt.setup.setActionState('submit', 'disabled');
         $('#js_setup_domain_check').change(function () {
             if (!$(this).is(':checked')) {
                 passbolt.setup.setActionState('submit', 'disabled');

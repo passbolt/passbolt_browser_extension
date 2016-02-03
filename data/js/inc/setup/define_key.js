@@ -14,52 +14,157 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         'parents': ['domain_check'],
         'next': 'secret',
         'favorite': true,
-        'viewData': {}
+        'viewData': {},
+        'elts' : {
+            importButton : '#js_setup_goto_import_key',
+            ownerName : '#OwnerName',
+            ownerEmail : '#OwnerEmail',
+            keyComment : '#KeyComment',
+            keyType : '#KeyType',
+            keyLength : '#KeyLength',
+            keyExpiryDate : '#KeyExpire',
+            feedbackError : '#js_main_error_feedback'
+        },
+        options: {
+            defaultKeyLength : 2048,
+            defaultKeyType : 'RSA-DSA'
+        },
+        data: {
+
+        }
     };
 
-    // TODO : set name, username and domain from plugin settings.
-    step.init = function () {
-        step.viewData.firstName = passbolt.setup.data.firstName || null;
-        step.viewData.lastName = passbolt.setup.data.lastName || null;
-        step.viewData.domain = passbolt.setup.data.domain || null;
-        step.viewData.username = passbolt.setup.data.username || null;
+    /* ==================================================================================
+     *  Content code events
+     * ================================================================================== */
+
+    /**
+     * On click event on the import button.
+     *
+     * @param ev
+     * @param el
+     */
+    step.onImportButtonClick = function(ev, el) {
+        ev.preventDefault();
+        passbolt.setup.switchToStep('import_key');
     };
 
-    step.start = function () {
-        passbolt.setup.setActionState('submit', 'enabled');
+    /**
+     * On error.
+     *
+     * Is called for general errors that doesn't require specific behavior.
+     *
+     * @param errorMsg
+     */
+    step.onError = function (errorMsg) {
+        console.log('Error : ', errorMsg);
+        step.elts.$feedbackError
+            .removeClass('hidden')
+            .text('Error : ' + errorMsg);
+    }
 
-        // Bind the go to import an existing key button.
-        $('#js_setup_goto_import_key').click(function (ev) {
-            ev.preventDefault();
-            passbolt.setup.switchToStep('import_key');
-        });
-    };
 
-    step.submit = function () {
-        // Save value in data.
-        // @todo validate data
-        // @todo same new name / update on server
+    /* ==================================================================================
+     *  Core functions (Implements()).
+     * ================================================================================== */
 
+    /**
+     * Implements init().
+     * @returns {*}
+     */
+     step.init = function () {
         var def = $.Deferred();
 
-        // Process submit.
-        passbolt.setup.setActionState('submit', 'processing');
-        passbolt.setup.data.keyInfo = {};
-        passbolt.setup.data.keyInfo.name = $("#OwnerName").val();
-        passbolt.setup.data.keyInfo.email = passbolt.setup.data.username;
-        passbolt.setup.data.keyInfo.comment = $("#KeyComment").val();
-        passbolt.setup.data.keyInfo.lgth = $("#KeyLength").val();
+        step._getData()
+            .then(function(data) {
+                step.viewData.username = step.data.username = data.username;
+                step.viewData.firstName = step.data.firstname = data.firstname;
+                step.viewData.lastName = step.data.lastname = data.lastname;
+                step.viewData.domain = step.data.domain = data.settings.domain;
 
-        def.resolve();
+                def.resolve();
+            });
+
         return def;
     };
 
+    /**
+     * Implements start().
+     */
+    step.start = function () {
+        // Define default values for key length and type.
+        step.elts.$keyLength.val(step.options.defaultKeyLength);
+        step.elts.$keyType.val(step.options.defaultKeyType);
+
+        // Bind the go to import an existing key button.
+        step.elts.$importButton.click(step.onImportButtonClick);
+    };
+
+    /**
+     * Implements submit().
+     *
+     * @returns {*}
+     */
+    step.submit = function () {
+        // Set submit button into processing state.
+        passbolt.setup.setActionState('submit', 'processing');
+
+        var keyInfo = {};
+        keyInfo.ownerName = step.data.firstname + ' ' + step.data.lastname;
+        keyInfo.ownerEmail = step.data.username;
+        keyInfo.comment = step.elts.$keyComment.val();
+        keyInfo.length = step.elts.$keyLength.val();
+        keyInfo.algorithm = step.elts.$keyType.val();
+
+        return step.validateKeyInfo(keyInfo);
+    };
+
+    /**
+     * Implements cancel().
+     * @returns {*}
+     */
     step.cancel = function () {
         passbolt.setup.setActionState('cancel', 'processing');
         var def = $.Deferred();
         def.resolve();
         return def;
     };
+
+    /* ==================================================================================
+     *  Business functions
+     * ================================================================================== */
+
+    /**
+     * Get the data needed to start this step from plugin, and
+     * Display an error in case it could not be retrieved.
+     *
+     * @returns Deferred
+     *
+     * @private
+     */
+    step._getData = function() {
+        return passbolt.request('passbolt.user.get', {
+            "user" : ["firstname", "lastname", "username"],
+            "settings" : ["domain"]
+        }).fail(function(errorMsg) {
+                step.onError(errorMsg);
+            });
+    }
+
+    /**
+     * Validate key info.
+     *
+     * @param keyInfo
+     * @returns {*}
+     */
+    step.validateKeyInfo = function(keyInfo) {
+        return passbolt.request('passbolt.setup.keyinfo.set', keyInfo)
+            .fail(function(errorMsg) {
+                step.onError(errorMsg);
+                // back to ready state.
+                passbolt.setup.setActionState('submit', 'ready');
+            });
+    }
 
     passbolt.setup.steps[step.id] = step;
 

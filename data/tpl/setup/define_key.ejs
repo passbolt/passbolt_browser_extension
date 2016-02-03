@@ -1,9 +1,12 @@
+<div class="col10 last feedback">
+    <p class="message error hidden" id="js_main_error_feedback"></p>
+</div>
 <!-- left collumn -->
 <div class="col6">
     <h3>Create a new key</h3>
-    <div class="input text required">
+    <div class="input text required disabled">
         <label for="OwnerName">Owner Name</label>
-        <input name="data[Owner][name]" class="required fluid" id="OwnerName" required="required" type="text" value="<%= firstName %> <%= lastName %>">
+        <input name="data[Owner][name]" class="required fluid" id="OwnerName" required="required" type="text" disabled="disabled" value="<%= firstName %> <%= lastName %>">
     </div>
     <div class="input text required disabled">
         <label for="OwnerEmail">Owner Email</label>
@@ -21,7 +24,7 @@
     <div class="input select required">
         <label for="KeyType">Key Type</label>
         <select name="data[Key][type]" id="KeyType" disabled="disabled" class="fluid">
-            <option value="RSA-DSA" selected="selected">RSA and DSA (default)</option>
+            <option value="RSA-DSA" >RSA and DSA (default)</option>
             <option value="DSA-EL" >DSA and Elgamal</option>
         </select>
     </div>
@@ -29,7 +32,7 @@
         <label for="KeyLength">Key Length</label>
         <select name="data[Key][length]" id="KeyLength" disabled="disabled" class="fluid">
             <option value="1024" >1024</option>
-            <option value="2048" selected="selected">2048</option>
+            <option value="2048" >2048</option>
             <option value="3076" >3076</option>
         </select>
     </div>

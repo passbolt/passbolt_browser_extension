@@ -247,21 +247,21 @@ passbolt.setup.data = passbolt.setup.data || {};
         $title.html(step.title);
 
         // Initialize the step.
-        step.init();
+        step.init().then(function() {
+            // Load the template relative to the step and start the step.
+            getTpl('./tpl/setup/' + currentStepId + '.ejs', function (tpl) {
+                $contentWrapper.html(new EJS({text: tpl}).render(step.viewData));
 
-        // Load the template relative to the step and start the step.
-        getTpl('./tpl/setup/' + currentStepId + '.ejs', function (tpl) {
-            $contentWrapper.html(new EJS({text: tpl}).render(step.viewData));
-
-            // Get elements for all selectors.
-            if (step.elts != undefined) {
-                for (name in step.elts) {
-                    step.elts['$' + name] = $(step.elts[name]);
+                // Get elements for all selectors.
+                if (step.elts != undefined) {
+                    for (name in step.elts) {
+                        step.elts['$' + name] = $(step.elts[name]);
+                    }
                 }
-            }
 
-            // Start the step.
-            step.start();
+                // Start the step.
+                step.start();
+            });
         });
     }
 

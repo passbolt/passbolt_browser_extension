@@ -186,10 +186,15 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
     /**
      * Implement init().
+     *
+     * @return deferred
      */
     step.init = function () {
+        var def = $.Deferred();
         step.viewData.domain = passbolt.setup.data.domain;
         passbolt.request('passbolt.setup.init');
+        def.resolve();
+        return def;
     };
 
     /**

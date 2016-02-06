@@ -56,11 +56,22 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      *
      * @param errorMsg
      */
-    step.onError = function (errorMsg) {
-        console.log('Error : ', errorMsg);
+    step.onError = function (errorMsg, validationErrors) {
+        console.log('Error : ', errorMsg, validationErrors);
+
+        var html = '<p>Error : ' + errorMsg + '</p>';
+        if (validationErrors != undefined) {
+            html += '<ul>';
+            for (var i in validationErrors) {
+                var valError = validationErrors[i];
+                html += '<li>' + valError[Object.keys(valError)[0]] + '</li>';
+            }
+            html += '</ul>';
+        }
+
         step.elts.$feedbackError
             .removeClass('hidden')
-            .text('Error : ' + errorMsg);
+            .html(html);
     }
 
 
@@ -73,19 +84,14 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @returns {*}
      */
      step.init = function () {
-        var def = $.Deferred();
 
-        step._getData()
+        return step._getData()
             .then(function(data) {
-                step.viewData.username = step.data.username = data.username;
-                step.viewData.firstName = step.data.firstname = data.firstname;
-                step.viewData.lastName = step.data.lastname = data.lastname;
+                step.viewData.username = step.data.username = data.user.username;
+                step.viewData.firstName = step.data.firstname = data.user.firstname;
+                step.viewData.lastName = step.data.lastname = data.user.lastname;
                 step.viewData.domain = step.data.domain = data.settings.domain;
-
-                def.resolve();
             });
-
-        return def;
     };
 
     /**
@@ -109,14 +115,20 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         // Set submit button into processing state.
         passbolt.setup.setActionState('submit', 'processing');
 
-        var keyInfo = {};
-        keyInfo.ownerName = step.data.firstname + ' ' + step.data.lastname;
-        keyInfo.ownerEmail = step.data.username;
-        keyInfo.comment = step.elts.$keyComment.val();
-        keyInfo.length = step.elts.$keyLength.val();
-        keyInfo.algorithm = step.elts.$keyType.val();
+        var key = {
+            ownerName : step.data.firstname + ' ' + step.data.lastname,
+            ownerEmail : step.data.username,
+            comment : step.elts.$keyComment.val(),
+            length : step.elts.$keyLength.val(),
+            algorithm : step.elts.$keyType.val()
+        };
 
-        return step.validateKeyInfo(keyInfo);
+        var validated = step._validateKeyInfo(key).then(function() {
+            // Store setup data.
+            passbolt.setup.set('key', key);
+        });
+
+        return validated;
     };
 
     /**
@@ -143,10 +155,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @private
      */
     step._getData = function() {
-        return passbolt.request('passbolt.user.get', {
-            "user" : ["firstname", "lastname", "username"],
-            "settings" : ["domain"]
-        }).fail(function(errorMsg) {
+        return passbolt.setup.get()
+            .fail(function(errorMsg) {
                 step.onError(errorMsg);
             });
     }
@@ -157,12 +167,12 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @param keyInfo
      * @returns {*}
      */
-    step.validateKeyInfo = function(keyInfo) {
-        return passbolt.request('passbolt.setup.keyinfo.set', keyInfo)
-            .fail(function(errorMsg) {
-                step.onError(errorMsg);
+    step._validateKeyInfo = function(keyInfo) {
+        return passbolt.request('passbolt.keyring.key.validate', keyInfo, ['ownerName', 'ownerEmail', 'comment', 'length', 'algorithm'])
+            .fail(function(errorMsg, validationErrors) {
+                step.onError(errorMsg, validationErrors);
                 // back to ready state.
-                passbolt.setup.setActionState('submit', 'ready');
+                passbolt.setup.setActionState('submit', 'enabled');
             });
     }
 

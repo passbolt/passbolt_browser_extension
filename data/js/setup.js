@@ -5,8 +5,6 @@ passbolt.setup.data = passbolt.setup.data || {};
 (function ($) {
     // The current step id the user is working on.
     var currentStepId = null,
-    // The past steps the user went through.
-        pastSteps = [],
     // Default actions available at each step.
         defaultStepActions = {'submit': 'enabled', 'cancel': 'enabled'},
     // Actions and their default states.
@@ -14,6 +12,8 @@ passbolt.setup.data = passbolt.setup.data || {};
             'submit': 'enabled',
             'cancel': 'enabled'
         },
+    // First step id.
+        firstStepId = 'domain_check',
     // Actions wrapper element.
         $actionsWrapper = $('#js_step_actions'),
     // Menu wrapper element.
@@ -23,8 +23,101 @@ passbolt.setup.data = passbolt.setup.data || {};
     // Title element.
         $title = $('#js_step_title');
 
+
+    /* ==================================================================================
+     *  Add on code events
+     * ================================================================================== */
+
+    /**
+     * Listens to passbolt.setup.init event
+     *
+     * This event is launched when the pagemod is loaded.
+     */
+    passbolt.message('passbolt.setup.init')
+        .subscribe(function (data) {
+            passbolt.setup.init(data);
+        });
+
+    /* ==================================================================================
+     *  Content code events
+     * ================================================================================== */
+
+    /**
+     * Called when a click on button next is done.
+     *
+     * Takes care of informing the controller that the step is changing,
+     * so the proper setup information will be stored in the setup model.
+     *
+     * @param stepId
+     * @returns {*}
+     */
+     passbolt.setup.onNavigationGoTo = function(stepId) {
+        return passbolt.request('passbolt.setup.navigation.next', stepId)
+            .then(function(stepId) {
+                return stepId;
+            });
+    }
+
+    /**
+     * Called when a click on button previous is done.
+     *
+     * Takes care of informing the controller that the step is changing,
+     * so the proper setup information will be stored in the setup model.
+     *
+     * @param stepId
+     * @returns {*}
+     */
+    passbolt.setup.onNavigationBack = function() {
+        return passbolt.request('passbolt.setup.navigation.back')
+            .then(function(lastStep) {
+                return lastStep;
+            });
+    }
+
+
+    /* ==================================================================================
+     *  Getters and setters
+     * ================================================================================== */
+
+    /**
+     * Get Setup data from controller.
+     *
+     * @returns {*}
+     */
+    passbolt.setup.get = function(key) {
+        return passbolt.request('passbolt.setup.get', key)
+            .then(function(setupData) {
+                return setupData;
+            });
+    }
+
+    /**
+     * Set Setup data in controller.
+     *
+     * @returns {*}
+     */
+    passbolt.setup.set = function(key, value) {
+        return passbolt.request('passbolt.setup.set', key, value)
+            .then(function(setupData) {
+                return setupData;
+            });
+    }
+
+    /**
+     * Ask controller about navigation history.
+     *
+     * @returns {*}
+     */
+    passbolt.setup.getNavigationHistory = function() {
+        return passbolt.request('passbolt.setup.navigation.get.history')
+            .then(function(history) {
+                return history;
+            });
+    }
+
     /**
      * Get the potential next steps of a step.
+     *
      * @param stepId
      * @param arr
      * @returns {*|Array}
@@ -61,20 +154,30 @@ passbolt.setup.data = passbolt.setup.data || {};
 
     /**
      * Get the workflow.
+     *
+     * Workflow is an array of steps.
+     *
      * @param targetStepId
      * @param arr
-     * @returns {*|Array}
+     * @returns {Deferred}
+     *   a deferred object returning the workflow
      */
     passbolt.setup.getWorkflow = function () {
-        var workflow = pastSteps.slice(0);
-        workflow.push(currentStepId);
-        workflow = workflow.concat(passbolt.setup.getNextSteps(currentStepId));
-        return workflow;
+        return passbolt.setup.getNavigationHistory()
+            .then(function(history) {
+                var workflow = history;
+                workflow.push(currentStepId);
+                workflow = workflow.concat(passbolt.setup.getNextSteps(currentStepId));
+                return workflow;
+            });
+
     };
 
     /**
      * Get the menu items.
-     * @returns {*|Array}
+     *
+     * @returns {Deferred}
+     *   Array of menu items
      */
     passbolt.setup.getMenuSteps = function (targetStepId) {
         if (targetStepId == undefined) {
@@ -82,47 +185,56 @@ passbolt.setup.data = passbolt.setup.data || {};
         }
 
         // Get the current workflow.
-        var workflow = passbolt.setup.getWorkflow(targetStepId),
-            menuSteps = [],
-            state = null;
+        return passbolt.setup.getWorkflow(targetStepId)
+            .then(function(workflow) {
+                var menuSteps = [],
+                    state = null;
 
-        for (var i in workflow) {
-            var stepId = workflow[i],
-                step = passbolt.setup.steps[stepId];
 
-            // If the task is a subStep, so it is not visible, and its parent become current
-            if (step.subStep) {
-                if (step.id == targetStepId) {
-                    menuSteps[menuSteps.length - 1].state = 'current';
+                for (var i in workflow) {
+                    var stepId = workflow[i],
+                        step = passbolt.setup.steps[stepId];
+
+                    // If the task is a subStep, so it is not visible, and its parent become current
+                    if (step.subStep) {
+                        if (step.id == targetStepId) {
+                            menuSteps[menuSteps.length - 1].state = 'current';
+                        }
+                        continue;
+                    }
+
+                    // If the step is the current step.
+                    if (step.id == targetStepId) {
+                        state = 'current';
+                    }
+                    // If the latest state was current or future, this step is in the future.
+                    else if (menuSteps.length && (menuSteps[menuSteps.length - 1].state == 'current'
+                        || menuSteps[menuSteps.length - 1].state == 'future')) {
+                        state = 'future';
+                    }
+                    // The step is a past step
+                    else {
+                        state = 'past';
+                    }
+
+                    menuSteps.push({
+                        'stepId': stepId,
+                        'state': state
+                    });
                 }
-                continue;
-            }
 
-            // If the step is the current step.
-            if (step.id == targetStepId) {
-                state = 'current';
-            }
-            // If the latest state was current or future, this step is in the future.
-            else if (menuSteps.length && (menuSteps[menuSteps.length - 1].state == 'current'
-                || menuSteps[menuSteps.length - 1].state == 'future')) {
-                state = 'future';
-            }
-            // The step is a past step
-            else {
-                state = 'past';
-            }
-
-            menuSteps.push({
-                'stepId': stepId,
-                'state': state
+                return menuSteps;
             });
-        }
-
-        return menuSteps;
     };
+
+
+    /* ==================================================================================
+     *  Business logic
+     * ================================================================================== */
 
     /**
      * Set an action state.
+     *
      * @param action
      * @param state
      */
@@ -198,11 +310,7 @@ passbolt.setup.data = passbolt.setup.data || {};
 
                 var previousStepId = null;
                 step.cancel().then(function () {
-                    for (var i in step.parents) {
-                        if ((previousStepId = pastSteps.indexOf(step.parents[i])) != -1) {
-                            passbolt.setup.goBackward(pastSteps[previousStepId]);
-                        }
-                    }
+                    passbolt.setup.goBackward();
                 });
             });
         });
@@ -215,19 +323,20 @@ passbolt.setup.data = passbolt.setup.data || {};
      *   step id
      */
     passbolt.setup.initMenu = function (stepId) {
-        var menuSteps = passbolt.setup.getMenuSteps();
+        passbolt.setup.getMenuSteps()
+            .then(function(menuSteps) {
+                // Empty menu container.
+                $menuWrapper.empty();
 
-        // Empty menu container.
-        $menuWrapper.empty();
-
-        getTpl('./tpl/setup/menu.ejs', function (tpl) {
-            var data = {
-                'steps': passbolt.setup.steps,
-                'menuSteps': menuSteps,
-                'currentStepId': stepId
-            };
-            $menuWrapper.html(new EJS({text: tpl}).render(data));
-        });
+                getTpl('./tpl/setup/menu.ejs', function (tpl) {
+                    var data = {
+                        'steps': passbolt.setup.steps,
+                        'menuSteps': menuSteps,
+                        'currentStepId': stepId
+                    };
+                    $menuWrapper.html(new EJS({text: tpl}).render(data));
+                });
+            });
     }
 
     /**
@@ -267,6 +376,7 @@ passbolt.setup.data = passbolt.setup.data || {};
 
     /**
      * Go to the step.
+     *
      * @param targetStepId
      */
     passbolt.setup.goToStep = function (targetStepId) {
@@ -284,6 +394,7 @@ passbolt.setup.data = passbolt.setup.data || {};
 
     /**
      * Switch to step.
+     *
      * @param targetStepId
      */
     passbolt.setup.switchToStep = function (targetStepId) {
@@ -293,30 +404,209 @@ passbolt.setup.data = passbolt.setup.data || {};
 
     /**
      * Go forward.
+     *
      * @param targetStepId
      */
     passbolt.setup.goForward = function (targetStepId) {
-        // Add the latest current step to the steps history.
-        if (currentStepId != null) {
-            pastSteps.push(currentStepId);
-        }
         currentStepId = targetStepId;
+        // Event onNavigationGoTo.
+        // Will store for us the current step id, and build the history.
+        passbolt.setup.onNavigationGoTo(targetStepId);
+
         passbolt.setup.goToStep(currentStepId);
     };
 
     /**
      * Go backward.
+     *
      * @param targetStepId
      */
     passbolt.setup.goBackward = function (targetStepId) {
-        // If the user is on the first step.
-        if (!pastSteps.length) {
-            return;
+        passbolt.setup.onNavigationBack()
+            .then(function(lastStepId) {
+                if (lastStepId != '') {
+                    currentStepId = lastStepId;
+                    passbolt.setup.goToStep(lastStepId);
+                }
+            });
+    };
+
+
+    /* ==================================================================================
+     *  Init functions
+     * ================================================================================== */
+
+    /**
+     *
+     * @param setupData
+     *
+     * @returns {boolean}
+     * @private
+     */
+    passbolt.setup._initCheckData = function(setupData) {
+        var isCorrect =
+            setupData != undefined && setupData.domain != undefined && setupData.domain != ''
+            && setupData.token != undefined && setupData.token != ''
+            && setupData.userId != undefined && setupData.userId != ''
+            && setupData.firstName != undefined && setupData.firstName != ''
+            && setupData.lastName != undefined && setupData.lastName != '';
+
+        return isCorrect;
+    }
+
+
+    /**
+     * Prepare data to initialize setup.
+     * Try to retrieve setup data from storage in case of a previous unfinished setup,
+     * or get them from the parameters that are provided.
+     *
+     * @param data
+     *   raw setup data (includes domain, token, firstName, lastName, username)
+     *
+     * @returns Deferred {*}
+     *
+     * @private
+     */
+    passbolt.setup._initPrepareData = function(data) {
+
+        var def = $.Deferred();
+
+        // Are data provided by page ?
+        var dataIsProvided = passbolt.setup._initCheckData(data);
+
+        var defaultSetupData = {};
+
+        if (dataIsProvided) {
+            defaultSetupData =  {
+                user : {
+                    id: data.userId,
+                    firstname: data.firstName,
+                    lastname: data.lastName,
+                    username: data.username
+                },
+                settings : {
+                    domain : data.domain,
+                    token : data.token
+                }
+            };
         }
-        // remove the latest steps from the step the user has been through.
-        pastSteps = pastSteps.slice(0, pastSteps.indexOf(targetStepId));
-        currentStepId = targetStepId;
-        passbolt.setup.goToStep(currentStepId);
+
+        // Check if setup was already started from the storage.
+        passbolt.request('passbolt.setup.get')
+            .then(function(storageData) {
+
+                if (passbolt.setup._initCheckData(storageData)) {
+                    def.resolve(storageData);
+                }
+
+                // If data is passed and is populated, then build setup data from there.
+                else if (dataIsProvided) {
+                    def.resolve(defaultSetupData);
+                }
+                else {
+                    def.reject('Unable to retrieve setup data');
+                }
+            })
+            .fail(function() {
+                if (dataIsProvided) {
+                    def.resolve(defaultSetupData);
+                }
+                else {
+                    def.reject('Unable to retrieve setup data');
+                }
+            });
+
+        return def;
+    };
+
+    /**
+     * Validate setup data regarding the user.
+     *
+     * Initialization function to be used at the beginning of the setup.
+     *
+     * @param data
+     * @returns {*}
+     * @private
+     */
+    passbolt.setup._initValidateUser = function(data) {
+        return passbolt.request('passbolt.user.validate', data.user, ['id', 'username', 'firstname', 'lastname'])
+            .then(function(user) {
+                return data;
+            });
+    };
+
+
+    /**
+     * Set user in the setup storage.
+     *
+     * To be used after validation of the user data.
+     *
+     * @param data
+     * @returns {*}
+     * @private
+     */
+    passbolt.setup._initSetUser = function(data) {
+        passbolt.request('passbolt.setup.set', 'test.test1.test2', 'test3');
+
+        return passbolt.request('passbolt.setup.set', 'user', data.user)
+            .then(function(setup) {
+                return data;
+            });
+    };
+
+    /**
+     * Validate setup data regarding the settings.
+     *
+     * @param data
+     * @returns {*}
+     * @private
+     */
+    passbolt.setup._initValidateSettings = function(data) {
+        return passbolt.request('passbolt.user.settings.set.domain', data.settings.domain)
+            .then(function(settings) {
+                return data;
+            });
+    };
+
+    /**
+     * Set settings in the setup storage.
+     *
+     * @param data
+     * @returns {*}
+     * @private
+     */
+    passbolt.setup._initSetSettings = function(data) {
+        return passbolt.request('passbolt.setup.set', 'settings', data.settings)
+            .then(function(setupData) {
+                return data;
+            });
+    };
+
+    /**
+     * Retrieve step id from previous setup if any, and if not
+     * returns the default one.
+     *
+     * @returns {*}
+     * @private
+     */
+    passbolt.setup._initGetStepId = function() {
+        // Get value from setup.
+        return passbolt.request('passbolt.setup.get', 'stepId')
+            .then(function(stepId) {
+                var defaultStepId = 'domain_check';
+                var stepId = stepId != undefined && stepId != '' ? stepId : defaultStepId;
+                return stepId;
+            });
+    };
+
+    /**
+     * Error page when the setup can't start.
+     *
+     * @private
+     */
+    passbolt.setup._initError = function(errorMsg) {
+        console.log('An error happened while initializing the setup : ', errorMsg);
+        // TODO : render error page.
     };
 
     /**
@@ -324,17 +614,22 @@ passbolt.setup.data = passbolt.setup.data || {};
      * @param targetStepId
      */
     passbolt.setup.init = function (data) {
-        passbolt.setup.data = data;
 
-        // Go to the first step.
-        passbolt.setup.goForward('domain_check');
+        //passbolt.setup.set('stepId', "");
+        //passbolt.setup.set('stepsHistory', '');
+
+        passbolt.setup._initPrepareData(data)
+            .then(passbolt.setup._initValidateUser)
+            .then(passbolt.setup._initSetUser)
+            .then(passbolt.setup._initValidateSettings)
+            .then(passbolt.setup._initSetSettings)
+            .then(passbolt.setup._initGetStepId)
+            .then(function(stepId) {
+                passbolt.setup.goForward(stepId);
+            })
+            .fail(function(errorMessage) {
+                passbolt.setup._initError(errorMessage);
+            });
     };
-
-
-    // The addon initialise the setup.
-    passbolt.message('passbolt.setup.init')
-        .subscribe(function (domain, userId, token) {
-            passbolt.setup.init(domain, userId, token);
-        });
 
 })(jQuery);

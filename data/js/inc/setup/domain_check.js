@@ -18,11 +18,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
             'submit': 'disabled',
             'cancel': 'hidden'
         },
-
-        // Will be used at runtime.
-        serverKey: null,
-        serverKeyInfo: {},
-
         /**
          * Elements available in the dom.
          * Setup will automatically create corresponding jquery elements
@@ -37,6 +32,13 @@ passbolt.setup.steps = passbolt.setup.steps || {};
             domainCheckboxWrapper : '.input.checkbox',
             domainCheckbox : '#js_setup_domain_check',
             keyInfoLink :'#js_server_key_info'
+        },
+
+        // Will be used at runtime.
+        _data: {
+            domain : '',
+            serverKey: null,
+            serverKeyInfo: {}
         }
     };
 
@@ -55,7 +57,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     step._fetchServerKey = function (domain) {
         return passbolt.request('passbolt.auth.getServerKey', domain)
             .then(function (serverKey) {
-                step.serverKey = serverKey.keydata;
+                step._data.serverKey = serverKey.keydata;
                 return serverKey.keydata;
             });
     };
@@ -72,7 +74,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         // Now, request information for the given key, and store them in a variable.
         return passbolt.request('passbolt.keyring.public.info', unarmoredServerKey)
             .then(function (keyInfo) {
-                step.serverKeyInfo = keyInfo;
+                step._data.serverKeyInfo = keyInfo;
                 return keyInfo;
             });
     };
@@ -91,43 +93,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     /* ==================================================================================
      *  Content code events
      * ================================================================================== */
-
-    /**
-     * On submit.
-     *
-     * @returns {*}
-     */
-    step.onSubmit = function () {
-        // Deferred.
-        var def = $.Deferred();
-
-        // Set submit form as processing.
-        passbolt.setup.setActionState('submit', 'processing');
-
-        // Set domain in the settings.
-        step.setDomain(passbolt.setup.data.domain)
-
-            // If domain was set succesfully, attempt to import the server key.
-            .then(function () {
-                return step.importServerKey(step.serverKeyInfo.key);
-            })
-
-            // If server key was imported successfully, resolve submit.
-            .then(function () {
-                setTimeout(function () {
-                    def.resolve();
-                }, 1000)
-            })
-
-            // In case of error, we display an error in the console.
-            .fail(function (msg) {
-                console.log(msg);
-                // back to ready state.
-                passbolt.setup.setActionState('submit', 'ready');
-            });
-
-        return def;
-    };
 
     /**
      * Display an error message for server key.
@@ -161,7 +126,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      */
     step.onServerKeyInfo = function () {
         if (step.elts.$fingerprintInput.val() != '') {
-            step.showKeyInfoDialog(step.serverKeyInfo);
+            step.showKeyInfoDialog(step._data.serverKeyInfo);
         }
         return false;
     };
@@ -190,11 +155,10 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @return deferred
      */
     step.init = function () {
-        var def = $.Deferred();
-        step.viewData.domain = passbolt.setup.data.domain;
-        passbolt.request('passbolt.setup.init');
-        def.resolve();
-        return def;
+        return passbolt.setup.get('settings.domain')
+            .then(function(domain) {
+                step.viewData.domain = step._data.domain = domain;
+            });
     };
 
     /**
@@ -203,15 +167,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     step.start = function () {
         step.elts.$domainCheckboxWrapper.css('visibility', 'hidden');
 
-        // Set the name and username on start.
-        // so we can display an error if any.
-        step.setName(passbolt.setup.data.firstName, passbolt.setup.data.lastName)
-            .then(function () {
-                step.setUsername(passbolt.setup.data.username).then(function () {
-                    // username and name is set, get the server key.
-                    step.fetchServerKey();
-                });
-            });
+        // username and name is set, get the server key.
+        step.fetchServerKey();
 
         // Bind domain check change event.
         step.elts.$domainCheckbox.change(step.onDomainCheck);
@@ -225,7 +182,35 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @returns {*}
      */
     step.submit = function () {
-        return step.onSubmit();
+        // Deferred.
+        var def = $.Deferred();
+
+        // Set submit form as processing.
+        passbolt.setup.setActionState('submit', 'processing');
+
+        // Set domain in the settings.
+        step.setDomain(step._data.domain)
+
+            // If domain was set succesfully, attempt to import the server key.
+            .then(function () {
+                return step.importServerKey(step._data.serverKeyInfo.key);
+            })
+
+            // If server key was imported successfully, resolve submit.
+            .then(function () {
+                setTimeout(function () {
+                    def.resolve();
+                }, 1000)
+            })
+
+            // In case of error, we display an error in the console.
+            .fail(function (msg) {
+                console.log(msg);
+                // back to ready state.
+                passbolt.setup.setActionState('submit', 'ready');
+            });
+
+        return def;
     };
 
     /**
@@ -245,42 +230,17 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * Set domain in the settings.
      * Is called at the page submit.
      *
-     * @param domain
+     * @param domain.
+     *
      * @returns {*}
      */
     step.setDomain = function (domain) {
-        return passbolt.request('passbolt.user.settings.set.domain', domain)
+        return passbolt.request('passbolt.setup.set', 'settings.domain', domain)
             .fail(function (errorMsg) {
                 step.onError(errorMsg);
             });
     };
 
-    /**
-     * Validate and set the first name and last name in the plugin.
-     *
-     * @param firstName
-     * @param lastName
-     * @returns {*}
-     */
-    step.setName = function (firstName, lastName) {
-        return passbolt.request('passbolt.user.set.name', firstName, lastName)
-            .fail(function (errorMsg) {
-                step.onError(errorMsg);
-            });
-    };
-
-    /**
-     * Validate and set the username in the plugin.
-     *
-     * @param username
-     * @returns {*}
-     */
-    step.setUsername = function (username) {
-        return passbolt.request('passbolt.user.set.username', username)
-            .fail(function (errorMsg) {
-                step.onError(errorMsg);
-            });
-    };
 
     /**
      * Import the server key in the keyring.
@@ -319,7 +279,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * Fetch and display server key.
      */
     step.fetchServerKey = function () {
-        step._fetchServerKey(passbolt.setup.data.domain)
+        step._fetchServerKey(step._data.domain)
             .then(step._getKeyInfo)
             .then(step._displayKeyInfo)
             .fail(function (msg) {

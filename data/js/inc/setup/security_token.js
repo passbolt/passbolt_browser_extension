@@ -12,7 +12,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         'label': '4. Set a security token',
         'title': 'We need a visual cue to protect us from the bad guys..',
         'parents': ['key_info', 'backup_key'],
-        'next': 'password',
+        'next': 'login_redirection',
         'viewData': {},
         'elts' : {
             securityTokenBgColor : '#js_security_token_background',
@@ -77,6 +77,9 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      */
      step.init = function () {
         return passbolt.setup.get('settings.securityToken').then(function(securityToken) {
+            if (securityToken == undefined || securityToken == '') {
+                securityToken = {};
+            }
             securityToken.color = securityToken.color || step._getRandomColor();
             securityToken.code = securityToken.code || step._getRandomText();
             securityToken.textcolor = securityToken.textcolor || '';

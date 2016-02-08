@@ -6,7 +6,10 @@ passbolt.setup.data = passbolt.setup.data || {};
     // The current step id the user is working on.
     var currentStepId = null,
     // Default actions available at each step.
-        defaultStepActions = {'submit': 'enabled', 'cancel': 'enabled'},
+        defaultStepActions = {
+            'submit': 'enabled',
+            'cancel': 'enabled'
+        },
     // Actions and their default states.
         actionsStates = {
             'submit': 'enabled',
@@ -52,10 +55,16 @@ passbolt.setup.data = passbolt.setup.data || {};
      * @returns {*}
      */
      passbolt.setup.onNavigationGoTo = function(stepId) {
-        return passbolt.request('passbolt.setup.navigation.next', stepId)
-            .then(function(stepId) {
-                return stepId;
-            });
+         // Don't do anything if the step is not supposed to be part of the history.
+         // Example : generation in progress.
+         if (passbolt.setup.steps[stepId]['saveInHistory'] == undefined
+             || passbolt.setup.steps[stepId]['saveInHistory'] == false) {
+
+             return passbolt.request('passbolt.setup.navigation.next', stepId)
+                 .then(function (stepId) {
+                     return stepId;
+                 });
+         }
     }
 
     /**
@@ -409,6 +418,7 @@ passbolt.setup.data = passbolt.setup.data || {};
      */
     passbolt.setup.goForward = function (targetStepId) {
         currentStepId = targetStepId;
+
         // Event onNavigationGoTo.
         // Will store for us the current step id, and build the history.
         passbolt.setup.onNavigationGoTo(targetStepId);
@@ -448,6 +458,7 @@ passbolt.setup.data = passbolt.setup.data || {};
             setupData != undefined && setupData.settings != undefined && setupData.user != undefined
             && setupData.settings.domain != undefined && setupData.settings.domain != ''
             && setupData.settings.token != undefined && setupData.settings.token != ''
+            && setupData.user.username != undefined && setupData.user.username != ''
             && setupData.user.id != undefined && setupData.user.id != ''
             && setupData.user.firstname != undefined && setupData.user.firstname != ''
             && setupData.user.lastname != undefined && setupData.user.lastname != '';
@@ -485,7 +496,18 @@ passbolt.setup.data = passbolt.setup.data || {};
         passbolt.request('passbolt.setup.get')
             .then(function(storageData) {
                 if (passbolt.setup._initCheckData(storageData)) {
-                    def.resolve(storageData);
+                    // If we are in the case where the data provided don't match
+                    // the setup data we already have in storage,
+                    // we flush the storage.
+                    if (dataIsProvided && storageData.settings.token != defaultSetupData.settings.token) {
+                        passbolt.request('passbolt.setup.flush')
+                            .then(function() {
+                                def.resolve(defaultSetupData);
+                            });
+                    }
+                    else {
+                        def.resolve(storageData);
+                    }
                 }
                 // If data is passed and is populated, then build setup data from there.
                 else if (dataIsProvided) {
@@ -601,6 +623,9 @@ passbolt.setup.data = passbolt.setup.data || {};
      */
     passbolt.setup.init = function (data) {
 
+        //passbolt.setup.set('stepId', '');
+        //passbolt.setup.set('stepsHistory', '');
+
         // Build setup data.
         var setupData = {
             settings: {
@@ -608,6 +633,7 @@ passbolt.setup.data = passbolt.setup.data || {};
                 domain: data.domain
             },
             user : {
+                username: data.username,
                 firstname: data.firstName,
                 lastname: data.lastName,
                 id: data.userId

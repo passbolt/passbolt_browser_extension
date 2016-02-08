@@ -13,6 +13,13 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         'label': '',
         'parents': ['secret'],
         'next': 'backup_key',
+        'defaultActions': {
+            'submit': 'hidden',
+            'cancel': 'hidden'
+        },
+        // We do not save this step in history. It should be impossible to come back to this step
+        // without executing the step before first.
+        'saveInHistory': true,
         'subStep': true,
         'viewData': {}
     };
@@ -37,7 +44,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     step._generateKeyPair = function(keyInfo, passphrase) {
        return passbolt.request("passbolt.keyring.generateKeyPair", keyInfo, passphrase)
             .then(function(keyPair) {
-               passbolt.setup.data.publicKey = keyPair.publicKeyArmored;
+               passbolt.setup.set('key.publicKeyArmored', keyPair.publicKeyArmored);
                return keyPair;
             });
     };

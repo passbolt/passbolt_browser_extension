@@ -90,6 +90,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
                 step.viewData.username = step.data.username = data.user.username;
                 step.viewData.firstName = step.data.firstname = data.user.firstname;
                 step.viewData.lastName = step.data.lastname = data.user.lastname;
+                step.viewData.comment = step.data.comment = (data.key.comment != undefined ? data.key.comment : '');
                 step.viewData.domain = step.data.domain = data.settings.domain;
             });
     };

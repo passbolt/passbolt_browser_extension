@@ -17,11 +17,15 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         'elts' : {
             securityTokenBgColor : '#js_security_token_background',
             securityTokenTextColor : '#js_security_token_color',
-            securityTokenText : '#js_security_token_text'
+            securityTokenText : '#js_security_token_text',
+            feedback : '#js_field_name_feedback'
         },
         'options' : {
-            txtpossible : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*(){}[]:;!@#$%^&*_-+=|',
+            txtpossible : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-',
             colorpossible : 'ABCDEF0123456789'
+        },
+        data: {
+            securityToken : {}
         }
     };
 
@@ -35,12 +39,32 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * Triggered when the token has been modified by the user.
      */
     step.onTokenChange = function() {
-        if (step.elts.$securityTokenBgColor.val().length == 7 && step.elts.$securityTokenText.val().length == 3) {
-            passbolt.setup.setActionState('submit', 'enabled');
+        // Validate token, only if fully set.
+        var securityToken = this._getToken();
+        step._validateToken(securityToken)
+            .then(function() {
+                step.elts.$feedback.addClass('hidden');
+                passbolt.setup.setActionState('submit', 'enabled');
+            });
+    }
+
+    /**
+     * On error.
+     */
+    step.onError= function(errorMessage, validationErrors) {
+        var html = '';
+        if (validationErrors != undefined) {
+            html += '<ul>';
+            for (var i in validationErrors) {
+                var valError = validationErrors[i];
+                html += '<li>' + valError[Object.keys(valError)[0]] + '</li>';
+            }
+            html += '</ul>';
         }
-        else {
-            passbolt.setup.setActionState('submit', 'disabled');
-        }
+
+        step.elts.$feedback
+            .removeClass('hidden')
+            .html(html);
     }
 
     /* ==================================================================================
@@ -52,11 +76,13 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @returns {*}
      */
      step.init = function () {
-        var def = $.Deferred();
-        step.viewData.securityTokenColor = passbolt.setup.data.securityTokenColor || null;
-        step.viewData.securityTokenCode = passbolt.setup.data.securityTokenCode || null;
-        def.resolve();
-        return def;
+        return passbolt.setup.get('settings.securityToken').then(function(securityToken) {
+            securityToken.color = securityToken.color || step._getRandomColor();
+            securityToken.code = securityToken.code || step._getRandomText();
+            securityToken.textcolor = securityToken.textcolor || '';
+
+            step.data.securityToken = securityToken;
+        });
     };
 
     /**
@@ -66,13 +92,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         // Color picker.
         step._initColorPicker();
 
-        // Set random text.
-        var randomText = step._getRandomText();
-        step.elts.$securityTokenText.val(randomText);
-
-        // Set random background color.
-        var randomColor = step._getRandomColor();
-        step.fb.setColor('#' + randomColor);
+        // Set security token.
+        step._setToken(step.data.securityToken);
 
         // Check that the pre-filled values unlock the submit button.
         if (step.elts.$securityTokenBgColor.val().length != 7 || step.elts.$securityTokenText.val().length != 3) {
@@ -87,24 +108,21 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
     /**
      * Implements submit().
+     *
+     * Validate token set by user, and save it in setup.
+     *
      * @returns {*}
      */
     step.submit = function () {
+
         passbolt.setup.setActionState('submit', 'processing');
-        var def = $.Deferred(),
-            securityTokenColor = step.elts.$securityTokenBgColor.val(),
-            securityTokenTextColor =  step.elts.$securityTokenTextColor.val(),
-            securityTokenCode =   step.elts.$securityTokenText.val();
 
-        // @TODO better validation & error handling
-        if ($.trim(securityTokenColor).length == 7 && $.trim(securityTokenCode).length == 3) {
-            passbolt.setup.data.securityTokenColor = securityTokenColor;
-            passbolt.setup.data.securityTokenTextColor = securityTokenTextColor;
-            passbolt.setup.data.securityTokenCode = securityTokenCode;
-            def.resolve();
-        }
+        var securityToken = this._getToken();
 
-        return def;
+        return step._validateToken(securityToken)
+            .then(function() {
+                passbolt.setup.set('settings.securityToken', securityToken);
+            });
     };
 
     /**
@@ -121,6 +139,54 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     /* ==================================================================================
      *  Business functions
      * ================================================================================== */
+
+    /**
+     * Validate token.
+     *
+     * @param tokenData
+     * @returns {Deferred}
+     *
+     * @private
+     */
+    step._validateToken = function(tokenData) {
+        return passbolt.request('passbolt.user.settings.validate', {securityToken : tokenData}, ['securityToken'])
+            .fail(function(errorMessage, validationErrors) {
+                step.onError(errorMessage, validationErrors);
+                passbolt.setup.setActionState('submit', 'disabled');
+            });
+    }
+
+
+    /**
+     * Get security token from page, and return corresponding object.
+     *
+     * @returns {{code: *, color: *, textcolor: *}}
+     *
+     * @private
+     */
+    step._getToken = function() {
+        var securityToken = {
+            code : step.elts.$securityTokenText.val(),
+            color : step.elts.$securityTokenBgColor.val(),
+            textcolor : step.elts.$securityTokenTextColor.val()
+        };
+        return securityToken;
+    };
+
+    /**
+     * Set token in page.
+     *
+     * @param object securityToken
+     *   as per model.
+     *
+     * @private
+     */
+    step._setToken = function(securityToken) {
+        step.elts.$securityTokenText.val(securityToken.code);
+        step.elts.$securityTokenTextColor.val(securityToken.textcolor);
+        step.elts.$securityTokenBgColor.val(securityToken.color);
+        step.fb.setColor(securityToken.color);
+    }
 
     /**
      * Init color picker.
@@ -164,7 +230,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         for (var i = 0; i < 6; i++) {
             randomColor += step.options.colorpossible.charAt(Math.floor(Math.random() * step.options.colorpossible.length));
         }
-        return randomColor;
+        return '#' + randomColor;
     };
 
     /**

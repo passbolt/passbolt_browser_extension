@@ -445,11 +445,12 @@ passbolt.setup.data = passbolt.setup.data || {};
      */
     passbolt.setup._initCheckData = function(setupData) {
         var isCorrect =
-            setupData != undefined && setupData.domain != undefined && setupData.domain != ''
-            && setupData.token != undefined && setupData.token != ''
-            && setupData.userId != undefined && setupData.userId != ''
-            && setupData.firstName != undefined && setupData.firstName != ''
-            && setupData.lastName != undefined && setupData.lastName != '';
+            setupData != undefined && setupData.settings != undefined && setupData.user != undefined
+            && setupData.settings.domain != undefined && setupData.settings.domain != ''
+            && setupData.settings.token != undefined && setupData.settings.token != ''
+            && setupData.user.id != undefined && setupData.user.id != ''
+            && setupData.user.firstname != undefined && setupData.user.firstname != ''
+            && setupData.user.lastname != undefined && setupData.user.lastname != '';
 
         return isCorrect;
     }
@@ -477,28 +478,15 @@ passbolt.setup.data = passbolt.setup.data || {};
         var defaultSetupData = {};
 
         if (dataIsProvided) {
-            defaultSetupData =  {
-                user : {
-                    id: data.userId,
-                    firstname: data.firstName,
-                    lastname: data.lastName,
-                    username: data.username
-                },
-                settings : {
-                    domain : data.domain,
-                    token : data.token
-                }
-            };
+            defaultSetupData = data;
         }
 
         // Check if setup was already started from the storage.
         passbolt.request('passbolt.setup.get')
             .then(function(storageData) {
-
                 if (passbolt.setup._initCheckData(storageData)) {
                     def.resolve(storageData);
                 }
-
                 // If data is passed and is populated, then build setup data from there.
                 else if (dataIsProvided) {
                     def.resolve(defaultSetupData);
@@ -546,8 +534,6 @@ passbolt.setup.data = passbolt.setup.data || {};
      * @private
      */
     passbolt.setup._initSetUser = function(data) {
-        passbolt.request('passbolt.setup.set', 'test.test1.test2', 'test3');
-
         return passbolt.request('passbolt.setup.set', 'user', data.user)
             .then(function(setup) {
                 return data;
@@ -615,10 +601,20 @@ passbolt.setup.data = passbolt.setup.data || {};
      */
     passbolt.setup.init = function (data) {
 
-        //passbolt.setup.set('stepId', "");
-        //passbolt.setup.set('stepsHistory', '');
+        // Build setup data.
+        var setupData = {
+            settings: {
+                token : data.token,
+                domain: data.domain
+            },
+            user : {
+                firstname: data.firstName,
+                lastname: data.lastName,
+                id: data.userId
+            }
+        };
 
-        passbolt.setup._initPrepareData(data)
+        passbolt.setup._initPrepareData(setupData)
             .then(passbolt.setup._initValidateUser)
             .then(passbolt.setup._initSetUser)
             .then(passbolt.setup._initValidateSettings)

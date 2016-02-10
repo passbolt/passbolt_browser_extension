@@ -670,6 +670,11 @@ passbolt.setup.data = passbolt.setup.data || {};
                         setupData.key.privateKeyArmored = '';
                     }
 
+                    // Remove passphrase is set.
+                    if (setupData.key.passphrase != undefined) {
+                        setupData.key.passphrase = '';
+                    }
+
                     // Build debug data to render.
                     var data = {
                         error: error,

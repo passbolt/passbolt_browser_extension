@@ -163,12 +163,12 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     /**
      * Save Token.
      *
-     * @param tokenData
+     * @param settings
      * @returns {*}
      * @private
      */
-    step._saveToken = function(tokenData) {
-        return passbolt.setup.set('settings.securityToken', tokenData);
+    step._saveToken = function(settings) {
+        return passbolt.setup.set('settings.securityToken', settings.securityToken);
     }
 
 

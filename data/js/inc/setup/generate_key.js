@@ -87,8 +87,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @param errorMsg
      */
     step.onError = function(errorMsg) {
-        // TODO : display error message.
         console.log('error while generating key', errorMsg);
+        passbolt.setup.fatalError(errorMsg);
     };
 
 

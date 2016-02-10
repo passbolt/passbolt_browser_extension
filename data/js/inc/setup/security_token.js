@@ -40,7 +40,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      */
     step.onTokenChange = function() {
         // Validate token, only if fully set.
-        var securityToken = this._getToken();
+        var securityToken = step._viewGetToken();
         step._validateToken(securityToken)
             .then(function() {
                 step.elts.$feedback.addClass('hidden');
@@ -96,7 +96,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         step._initColorPicker();
 
         // Set security token.
-        step._setToken(step.data.securityToken);
+        step._viewSetToken(step.data.securityToken);
 
         // Check that the pre-filled values unlock the submit button.
         if (step.elts.$securityTokenBgColor.val().length != 7 || step.elts.$securityTokenText.val().length != 3) {
@@ -120,11 +120,12 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
         passbolt.setup.setActionState('submit', 'processing');
 
-        var securityToken = this._getToken();
+        var securityToken = this._viewGetToken();
 
         return step._validateToken(securityToken)
-            .then(function() {
-                passbolt.setup.set('settings.securityToken', securityToken);
+            .then(step._saveToken)
+            .fail(function(error) {
+                passbolt.setup.fatalError(error, securityToken);
             });
     };
 
@@ -159,6 +160,17 @@ passbolt.setup.steps = passbolt.setup.steps || {};
             });
     }
 
+    /**
+     * Save Token.
+     *
+     * @param tokenData
+     * @returns {*}
+     * @private
+     */
+    step._saveToken = function(tokenData) {
+        return passbolt.setup.set('settings.securityToken', tokenData);
+    }
+
 
     /**
      * Get security token from page, and return corresponding object.
@@ -167,7 +179,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      *
      * @private
      */
-    step._getToken = function() {
+    step._viewGetToken = function() {
         var securityToken = {
             code : step.elts.$securityTokenText.val(),
             color : step.elts.$securityTokenBgColor.val(),
@@ -184,7 +196,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      *
      * @private
      */
-    step._setToken = function(securityToken) {
+    step._viewSetToken = function(securityToken) {
         step.elts.$securityTokenText.val(securityToken.code);
         step.elts.$securityTokenTextColor.val(securityToken.textcolor);
         step.elts.$securityTokenBgColor.val(securityToken.color);

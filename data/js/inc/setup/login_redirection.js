@@ -80,7 +80,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @private
      */
     step._flushSetup = function() {
-        passbolt.request('passbolt.setup.flush')
+        return passbolt.request('passbolt.setup.flush')
             .fail(function (error) {
                 console.log('error while flushing setup', error);
             });
@@ -92,7 +92,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      */
     step._goToLogin = function () {
         // Get domain from settings.
-        passbolt.request('passbolt.user.settings.get.domain')
+        return passbolt.request('passbolt.user.settings.get.domain')
             .then(function(domain) {
                 var loginUrl = domain + "/auth/login";
                 // Set timeout so the user has time to read the redirection message before actually being redirected.
@@ -111,10 +111,10 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @private
      */
     step._validateAccount = function(setupData) {
-        passbolt.request('passbolt.setup.save', setupData)
+        return passbolt.request('passbolt.setup.save', setupData)
             .fail(function (error) {
-                console.log('error while saving information', error);
-                alert("could not save information");
+                console.log('error while saving information', error.message, error.data);
+                passbolt.setup.fatalError(error.message, error.data);
             });
     };
 

@@ -612,9 +612,9 @@ passbolt.setup.data = passbolt.setup.data || {};
      *
      * @private
      */
-    passbolt.setup._initError = function(errorMsg) {
-        console.log('An error happened while initializing the setup : ', errorMsg);
-        // TODO : render error page.
+    passbolt.setup._initError = function(errorMsg, extraData) {
+        console.log('An error happened while initializing the setup : ', errorMsg, extraData);
+        passbolt.setup.fatalError(errorMsg, extraData);
     };
 
     /**
@@ -650,8 +650,49 @@ passbolt.setup.data = passbolt.setup.data || {};
                 passbolt.setup.goForward(stepId);
             })
             .fail(function(errorMessage) {
-                passbolt.setup._initError(errorMessage);
+                passbolt.setup._initError(errorMessage, setupData);
             });
     };
+
+    /**
+     * Fatal error.
+     *
+     * @param error
+     * @param additionalData
+     */
+    passbolt.setup.fatalError = function(error, additionalData) {
+        getTpl('./tpl/setup/fatal_error.ejs', function (tpl) {
+            passbolt.setup.get()
+                .then(function(setupData) {
+                    // Remove private key in case it exists.
+                    // Can't keep this information as it is too sensitive.
+                    if (setupData.key.privateKeyArmored != undefined) {
+                        setupData.key.privateKeyArmored = '';
+                    }
+
+                    // Build debug data to render.
+                    var data = {
+                        error: error,
+                        setup : setupData,
+                        additional : additionalData
+                    };
+
+                    // Set title.
+                    $title.text("Damn...");
+
+                    // Render html.
+                    $contentWrapper.html(new EJS({text: tpl}).render({
+                        setupData: data
+                    }));
+
+                    // Show debug info on click.
+                    $('a#show-debug-info').click(function(ev) {
+                        ev.preventDefault();
+                        $('#debug-info').removeClass('hidden');
+                        return false;
+                    });
+                });
+        });
+    }
 
 })(jQuery);

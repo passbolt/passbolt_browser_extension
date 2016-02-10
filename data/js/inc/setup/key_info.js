@@ -56,7 +56,13 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
                         // Pass the status to the view.
                         step.viewData.status = step.data.status = status;
+                    })
+                    .fail(function() {
+                        passbolt.setup.fatalError('could not retrieve user');
                     });
+            })
+            .fail(function() {
+                passbolt.setup.fatalError('could not retrieve private key');
             });
     };
 

@@ -203,11 +203,10 @@ passbolt.setup.steps = passbolt.setup.steps || {};
                 }, 1000)
             })
 
-            // In case of error, we display an error in the console.
+            // In case of error,  display fatal error.
             .fail(function (msg) {
                 console.log(msg);
-                // back to ready state.
-                passbolt.setup.setActionState('submit', 'ready');
+                passbolt.setup.fatalError(msg);
             });
 
         return def;

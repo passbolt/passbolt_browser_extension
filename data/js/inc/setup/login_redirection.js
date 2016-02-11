@@ -100,7 +100,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
                     function () {
                         window.location.href = loginUrl;
                     },
-                    1000);
+                    2000);
             });
     };
 

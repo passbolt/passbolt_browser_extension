@@ -101,6 +101,9 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
         return step.importPrivateKey(key)
             .then(step.extractPublicKey)
+            .then(function(publicKeyArmored) {
+                passbolt.setup.set('key.publicKeyArmored', publicKeyArmored);
+            })
             .fail(function(error) {
                 step.onError(error);
                 passbolt.setup.setActionState('submit', 'enabled');

@@ -4,11 +4,24 @@
 	   / ____/ /_/ (__  |__  ) /_/ / /_/ / / /_
 	  /_/    \__,_/____/____/_.___/\____/_/\__/
 	
-	The password management solution
-	(c) 2012-2015 passbolt.com
+	Open source password manager for teams
+	(c) 2016 Bolt Softwares Pvt Ltd
+
+
+Legal
+===============================
+
+Copyright 2016 Bolt Softwares Private Limited
+
+Terms and conditions: https://www.passbolt.com/terms
+Privacy Policy: https://www.passbolt.com/privacy
+Licence (code): http://www.gnu.org/licenses/agpl-3.0.en.html
+Licence (text & art): http://creativecommons.org/licenses/by-nc-sa/3.0/
+Credits: https://www.passbolt.com/credits
+
 
 Prerequisite
-=========
+===============================
 
 You will need:
 1. Nodejs
@@ -23,7 +36,7 @@ See https://developer.mozilla.org/en-US/Add-ons/SDK/Tools/jpm#Installation
 
 
 Development
-=========
+===============================
 
 Launch an instance of Firefox with your add-on installed.
 ```
@@ -45,8 +58,9 @@ Package your add-on as an XPI file whenever there is a file changed, and post th
 ```
 	jpm watchpost
 ```
+
 Productivity
---------
+------------
 
 While developing you'll frequently need to update your firefox plugin to test
 it. Install the firefox "Extension Auto-Installer" which makes the testing process
@@ -86,8 +100,3 @@ Make sure Grunt watch for less changes and compile them into CSS
 Edit one LESS file to see if it works!
 Make sure that if you need to make change the styleguide to request changes upstream.
 
-
-Licence and copyright
-=====================
-copyright : (c) 2015-present Bolt Softwares Pvt Ltd
-licence : GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html

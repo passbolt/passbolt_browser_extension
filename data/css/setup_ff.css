@@ -85,9 +85,9 @@ html body .hidden {
  * Border radius
  */
 .rounded {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0.214em;
+  -moz-border-radius: 0.214em;
+  border-radius: 0.214em;
 }
 /* position shortcuts */
 .left {
@@ -780,13 +780,25 @@ h3 {
   /* 6px */
   border-bottom: 1px dotted #dddddd;
 }
+/* paragraph */
 p {
-  margin: .25em 0;
+  margin: 0 0 .75em 0;
 }
 .code {
   font-family: "Courier New", Courier, monospace;
   font-size: 0.688em;
   /* 11px base 16 */
+}
+/* lists */
+article ul li {
+  list-style: circle;
+  margin-left: 1em;
+  padding-left: .5em;
+  margin-bottom: .5em;
+}
+article ul.double {
+  width: 48%;
+  float: left;
 }
 /*!
  *  Font Awesome 4.4.0 by @davegandy - http://fontawesome.io - @fontawesome
@@ -2852,9 +2864,9 @@ a.button {
   background-image: -webkit-linear-gradient(top, #f3f3f3, #eeeeee);
   background-image: -o-linear-gradient(top, #f3f3f3, #eeeeee);
   background-image: linear-gradient(top, #f3f3f3, #eeeeee);
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0.214em;
+  -moz-border-radius: 0.214em;
+  border-radius: 0.214em;
 }
 /* size and position adjustments */
 .submit {
@@ -2946,6 +2958,8 @@ a.button.disabled {
   color: #888888;
   background: #ffffff;
   border: 1px solid #dddddd;
+  text-shadow: none;
+  font-weight: normal;
 }
 /* inactive */
 input[type=submit].disabled:hover,
@@ -3527,6 +3541,8 @@ input[type=text].fluid {
 .grid .row .col11 {
   float: none;
   width: 99%;
+  box-sizing: border-box;
+  padding: .5em;
   /*
  * For IE 6/7 only
  * Include this rule to trigger hasLayout and contain floats.
@@ -3732,7 +3748,7 @@ input[type=text].fluid {
 /*
  * large devices
  */
-@media all and (min-width: 768px) {
+@media all and (min-width: 960px) {
   /*
 	 * Common columns definitions
 	 */
@@ -3750,6 +3766,7 @@ input[type=text].fluid {
   .grid .row .col12 {
     float: left;
     margin: 0 3% 0 0;
+    padding: 0;
   }
   .grid .row .last {
     margin-right: 0;
@@ -3796,6 +3813,67 @@ input[type=text].fluid {
   }
   .grid .row .push2 {
     margin-left: 14%;
+  }
+}
+/*
+ * Utilities
+ */
+@media all and (max-width: 768px) {
+  .hidden-xs {
+    display: none;
+  }
+}
+.panel.middle .grid {
+  padding-bottom: 2em;
+}
+/* Scrolling in middle panel in full width */
+@media all and (min-width: 980px) {
+  .panel.middle {
+    overflow-y: scroll;
+  }
+}
+.header h2 {
+  margin: 1em 0 1em .5em;
+}
+.header h2 .button {
+  margin-right: 0.3em;
+  margin-top: -5px;
+}
+/* reset layout styles on smaller screen */
+@media all and (max-width: 980px) {
+  .page,
+  .panel,
+  .header.second + .panel.main,
+  .header.first,
+  .header.second,
+  .col1,
+  .col2,
+  .col3,
+  .col2_3 {
+    position: relative;
+    width: auto;
+    height: auto;
+    display: block;
+    margin: 0;
+    top: auto;
+    overflow: auto;
+  }
+  .header.second {
+    text-align: center;
+    margin-bottom: 2em;
+  }
+  .col1,
+  .panel.left {
+    display: none;
+  }
+  .panel.middle,
+  .col2_3 {
+    width: 98%;
+    left: 1%;
+  }
+  .col2 {
+    width: 55%;
+    left: 1%;
   }
 }
 /*
@@ -3933,7 +4011,7 @@ input[type=text].fluid {
   display: none;
 }
 .header .logo {
-  margin: 1.125em 0 0 1em;
+  margin: 1.25em 0 0 1em;
   max-width: 80%;
 }
 .header .logo img {
@@ -4001,7 +4079,7 @@ input[type=text].fluid {
   position: fixed;
   display: block;
   width: 100%;
-  bottom: 2.125em;
+  bottom: 2.35em;
   z-index: 991;
 }
 /*
@@ -4024,10 +4102,11 @@ input[type=text].fluid {
     z-index: 991;
     height: 2em;
     margin: 0;
-    padding-top: 0.833em;
+    padding-top: 1.167em;
   }
   .notification-container .notification .message {
     margin: 0;
+    margin-top: -0.25em;
     padding: 0;
     width: 60%;
     float: none;
@@ -4113,15 +4192,15 @@ input[type=text].fluid {
   vertical-align: baseline;
   line-height: 0;
   border: 1px solid #eeeeee;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0.214em;
+  -moz-border-radius: 0.214em;
+  border-radius: 0.214em;
 }
 .dialog a.dialog-close:hover .fa-close {
   border: 1px solid #dddddd;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0.214em;
+  -moz-border-radius: 0.214em;
+  border-radius: 0.214em;
 }
 .dialog .dialog-content {
   position: relative;
@@ -4185,7 +4264,7 @@ input[type=text].fluid {
  * Footer
  */
 .footer {
-  padding: 0.833em 1.5% 0 .5%;
+  padding: 1.167em 1.5% 0 .5%;
   text-align: right;
   font-size: .75em;
   /* 12px */
@@ -4197,6 +4276,14 @@ input[type=text].fluid {
   bottom: 0;
   position: fixed;
   z-index: 890;
+}
+.footer .footer-links {
+  width: 100%;
+  margin-top: -0.25em;
+}
+.footer .footer-links li {
+  display: inline;
+  margin-right: 1.5em;
 }
 .plugin-check {
   padding: 1em;
@@ -4236,7 +4323,20 @@ input[type=text].fluid {
 .plugin-check .message {
   font-weight: normal;
   margin-left: 180px;
-  padding: .5em 1em;
+  padding: .5em 1em .25em 1em;
+}
+@media all and (max-width: 980px) {
+  .plugin-check.firefox,
+  .plugin-check.chrome,
+  .plugin-check.gpg,
+  .plugin-check.gpg.success,
+  .plugin-check.chrome.error {
+    background-image: none;
+  }
+  .plugin-check .message {
+    margin-left: 0px;
+    padding: .5em 1em;
+  }
 }
 .video-wrapper {
   padding: 1em;
@@ -4247,6 +4347,9 @@ input[type=text].fluid {
   height: auto;
 }
 /* left panel navigation */
+.panel .navigation {
+  margin-top: 1em;
+}
 .panel .navigation a {
   color: #333333;
   display: block;
@@ -4254,19 +4357,20 @@ input[type=text].fluid {
 .panel .navigation a:hover {
   text-decoration: none;
 }
-.panel .navigation {
-  padding-top: 1em;
-}
 .panel .navigation li {
   color: #dddddd;
   font-size: 0.938em;
   /* 15px from 16px base */
-  padding-left: 1.333em;
-  /* 20px */
-  padding-top: .667em;
+  padding: .469em 0 .469em 1.333em;
+  border-left: 5px solid #ffffff;
+}
+.panel .navigation li:hover {
+  color: #333333;
+  border-left: 5px solid #dddddd;
 }
 .panel .navigation li.selected {
   font-weight: bold;
+  border-left: 5px solid #d40101;
 }
 /*
 	do not show javascript needed warning if js is enabled
@@ -4608,9 +4712,9 @@ table.table-info.horizontal tbody tr:nth-child(even) {
   width: 3em;
   font-size: 24px;
   border: none;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0.214em;
+  -moz-border-radius: 0.214em;
+  border-radius: 0.214em;
   text-align: center;
 }
 .colorpicker .farbtastic {
@@ -4728,6 +4832,9 @@ table.table-info.horizontal tbody tr:nth-child(even) {
   box-sizing: padding-box;
   width: 64%;
   float: left;
+}
+.input-password-wrapper .input.password input[type=password].decrypting {
+  background: transparent url(../img/controls/loading.gif) no-repeat 72% center;
 }
 .input-password-wrapper .input.password.has-encrypted-secret input {
   /* fallback placeholder */
@@ -4862,16 +4969,6 @@ table.table-info.horizontal tbody tr:nth-child(even) {
 }
 .setup .video-wrapper {
   margin-top: 2em;
-}
-.setup .panel.middle .grid {
-  padding-bottom: 2em;
-}
-.setup h2 {
-  margin-top: 1em;
-}
-.setup h2 .button {
-  margin-right: 0.3em;
-  margin-top: -5px;
 }
 .setup .input-password-wrapper {
   margin-top: 1.5em;
@@ -5089,48 +5186,8 @@ table.table-info.horizontal tbody tr:nth-child(even) {
 .passboltplugin .setup .plugin-check.success {
   display: block;
 }
-/* Scrolling in middle panel in full width */
-@media all and (min-width: 980px) {
-  .setup .panel.middle {
-    overflow-y: scroll;
-  }
-}
 /* reset layout styles on smaller screen */
 @media all and (max-width: 980px) {
-  .page,
-  .panel,
-  .header.second + .panel.main,
-  .header.first,
-  .header.second,
-  .col1,
-  .col2,
-  .col3,
-  .col2_3 {
-    position: relative;
-    width: auto;
-    height: auto;
-    display: block;
-    margin: 0;
-    top: auto;
-    overflow: auto;
-  }
-  .header.second {
-    text-align: center;
-    margin-bottom: 2em;
-  }
-  .col1,
-  .panel.left {
-    display: none;
-  }
-  .panel.middle,
-  .col2_3 {
-    width: 98%;
-    left: 1%;
-  }
-  .col2 {
-    width: 55%;
-    left: 1%;
-  }
   .input-password-wrapper .input.password,
   .input-password-wrapper .actions.inline {
     position: relative;

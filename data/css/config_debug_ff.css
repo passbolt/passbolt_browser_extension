@@ -85,9 +85,9 @@ html body .hidden {
  * Border radius
  */
 .rounded {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0.214em;
+  -moz-border-radius: 0.214em;
+  border-radius: 0.214em;
 }
 /* position shortcuts */
 .left {
@@ -752,13 +752,25 @@ h3 {
   /* 6px */
   border-bottom: 1px dotted #dddddd;
 }
+/* paragraph */
 p {
-  margin: .25em 0;
+  margin: 0 0 .75em 0;
 }
 .code {
   font-family: "Courier New", Courier, monospace;
   font-size: 0.688em;
   /* 11px base 16 */
+}
+/* lists */
+article ul li {
+  list-style: circle;
+  margin-left: 1em;
+  padding-left: .5em;
+  margin-bottom: .5em;
+}
+article ul.double {
+  width: 48%;
+  float: left;
 }
 /*!
  *  Font Awesome 4.4.0 by @davegandy - http://fontawesome.io - @fontawesome
@@ -2824,9 +2836,9 @@ a.button {
   background-image: -webkit-linear-gradient(top, #f3f3f3, #eeeeee);
   background-image: -o-linear-gradient(top, #f3f3f3, #eeeeee);
   background-image: linear-gradient(top, #f3f3f3, #eeeeee);
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0.214em;
+  -moz-border-radius: 0.214em;
+  border-radius: 0.214em;
 }
 /* size and position adjustments */
 .submit {
@@ -2918,6 +2930,8 @@ a.button.disabled {
   color: #888888;
   background: #ffffff;
   border: 1px solid #dddddd;
+  text-shadow: none;
+  font-weight: normal;
 }
 /* inactive */
 input[type=submit].disabled:hover,
@@ -3499,6 +3513,8 @@ input[type=text].fluid {
 .grid .row .col11 {
   float: none;
   width: 99%;
+  box-sizing: border-box;
+  padding: .5em;
   /*
  * For IE 6/7 only
  * Include this rule to trigger hasLayout and contain floats.
@@ -3704,7 +3720,7 @@ input[type=text].fluid {
 /*
  * large devices
  */
-@media all and (min-width: 768px) {
+@media all and (min-width: 960px) {
   /*
 	 * Common columns definitions
 	 */
@@ -3722,6 +3738,7 @@ input[type=text].fluid {
   .grid .row .col12 {
     float: left;
     margin: 0 3% 0 0;
+    padding: 0;
   }
   .grid .row .last {
     margin-right: 0;
@@ -3768,6 +3785,14 @@ input[type=text].fluid {
   }
   .grid .row .push2 {
     margin-left: 14%;
+  }
+}
+/*
+ * Utilities
+ */
+@media all and (max-width: 768px) {
+  .hidden-xs {
+    display: none;
   }
 }
 /*
@@ -3905,7 +3930,7 @@ input[type=text].fluid {
   display: none;
 }
 .header .logo {
-  margin: 1.125em 0 0 1em;
+  margin: 1.25em 0 0 1em;
   max-width: 80%;
 }
 .header .logo img {
@@ -3918,7 +3943,7 @@ input[type=text].fluid {
  * Footer
  */
 .footer {
-  padding: 0.833em 1.5% 0 .5%;
+  padding: 1.167em 1.5% 0 .5%;
   text-align: right;
   font-size: .75em;
   /* 12px */
@@ -3930,6 +3955,14 @@ input[type=text].fluid {
   bottom: 0;
   position: fixed;
   z-index: 890;
+}
+.footer .footer-links {
+  width: 100%;
+  margin-top: -0.25em;
+}
+.footer .footer-links li {
+  display: inline;
+  margin-right: 1.5em;
 }
 /* tabs */
 .tabs {
@@ -3956,9 +3989,9 @@ input[type=text].fluid {
   border: 1px solid #dddddd;
   border-bottom: 1px solid #FFF;
   background: #ffffff;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0.214em;
+  -moz-border-radius: 0.214em;
+  border-radius: 0.214em;
   -webkit-border-bottom-left-radius: 0;
   -webkit-border-bottom-right-radius: 0;
   -moz-border-radius-bottomleft: 0;
@@ -4105,6 +4138,9 @@ table.table-info.horizontal tbody tr:nth-child(even) {
   background: #f3f3f3;
 }
 /* left panel navigation */
+.panel .navigation {
+  margin-top: 1em;
+}
 .panel .navigation a {
   color: #333333;
   display: block;
@@ -4112,19 +4148,20 @@ table.table-info.horizontal tbody tr:nth-child(even) {
 .panel .navigation a:hover {
   text-decoration: none;
 }
-.panel .navigation {
-  padding-top: 1em;
-}
 .panel .navigation li {
   color: #dddddd;
   font-size: 0.938em;
   /* 15px from 16px base */
-  padding-left: 1.333em;
-  /* 20px */
-  padding-top: .667em;
+  padding: .469em 0 .469em 1.333em;
+  border-left: 5px solid #ffffff;
+}
+.panel .navigation li:hover {
+  color: #333333;
+  border-left: 5px solid #dddddd;
 }
 .panel .navigation li.selected {
   font-weight: bold;
+  border-left: 5px solid #d40101;
 }
 /**
  * Needed for Firefox plugin

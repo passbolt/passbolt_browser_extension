@@ -85,9 +85,9 @@ html body .hidden {
  * Border radius
  */
 .rounded {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0.214em;
+  -moz-border-radius: 0.214em;
+  border-radius: 0.214em;
 }
 /* position shortcuts */
 .left {
@@ -227,7 +227,7 @@ body {
 /* remember to define focus styles! */
 :focus {
   outline: 0;
-}
+}∂
 /* remember to highlight inserts somehow! */
 ins {
   text-decoration: none;
@@ -780,13 +780,25 @@ h3 {
   /* 6px */
   border-bottom: 1px dotted #dddddd;
 }
+/* paragraph */
 p {
-  margin: .25em 0;
+  margin: 0 0 .75em 0;
 }
 .code {
   font-family: "Courier New", Courier, monospace;
   font-size: 0.688em;
   /* 11px base 16 */
+}
+/* lists */
+article ul li {
+  list-style: circle;
+  margin-left: 1em;
+  padding-left: .5em;
+  margin-bottom: .5em;
+}
+article ul.double {
+  width: 48%;
+  float: left;
 }
 /*!
  *  Font Awesome 4.4.0 by @davegandy - http://fontawesome.io - @fontawesome
@@ -2852,9 +2864,9 @@ a.button {
   background-image: -webkit-linear-gradient(top, #f3f3f3, #eeeeee);
   background-image: -o-linear-gradient(top, #f3f3f3, #eeeeee);
   background-image: linear-gradient(top, #f3f3f3, #eeeeee);
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0.214em;
+  -moz-border-radius: 0.214em;
+  border-radius: 0.214em;
 }
 /* size and position adjustments */
 .submit {
@@ -2946,6 +2958,8 @@ a.button.disabled {
   color: #888888;
   background: #ffffff;
   border: 1px solid #dddddd;
+  text-shadow: none;
+  font-weight: normal;
 }
 /* inactive */
 input[type=submit].disabled:hover,
@@ -3443,7 +3457,7 @@ input[type=text].fluid {
   position: fixed;
   display: block;
   width: 100%;
-  bottom: 2.125em;
+  bottom: 2.35em;
   z-index: 991;
 }
 /* Dialog */
@@ -3511,15 +3525,15 @@ input[type=text].fluid {
   vertical-align: baseline;
   line-height: 0;
   border: 1px solid #eeeeee;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0.214em;
+  -moz-border-radius: 0.214em;
+  border-radius: 0.214em;
 }
 .dialog a.dialog-close:hover .fa-close {
   border: 1px solid #dddddd;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0.214em;
+  -moz-border-radius: 0.214em;
+  border-radius: 0.214em;
 }
 .dialog .dialog-content {
   position: relative;
@@ -3604,9 +3618,9 @@ input[type=text].fluid {
   border: 1px solid #dddddd;
   border-bottom: 1px solid #FFF;
   background: #ffffff;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0.214em;
+  -moz-border-radius: 0.214em;
+  border-radius: 0.214em;
   -webkit-border-bottom-left-radius: 0;
   -webkit-border-bottom-right-radius: 0;
   -moz-border-radius-bottomleft: 0;
@@ -3688,9 +3702,9 @@ input[type=text].fluid {
   width: 3em;
   font-size: 24px;
   border: none;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0.214em;
+  -moz-border-radius: 0.214em;
+  border-radius: 0.214em;
   text-align: center;
 }
 .colorpicker .farbtastic {
@@ -3803,6 +3817,9 @@ input[type=text].fluid {
   box-sizing: padding-box;
   width: 64%;
   float: left;
+}
+.input-password-wrapper .input.password input[type=password].decrypting {
+  background: transparent url(../img/controls/loading.gif) no-repeat 72% center;
 }
 .input-password-wrapper .input.password.has-encrypted-secret input {
   /* fallback placeholder */
@@ -4054,12 +4071,20 @@ input[type=text].fluid {
 .master-password.dialog input[type=password] {
   width: 80%;
 }
+.master-password.dialog input.focus_first {
+  border-width: 0;
+  font-size: 0;
+  line-height: 0;
+}
 .master-password.dialog .input.checkbox {
   visibility: hidden;
 }
 .master-password.login-form input[type=text],
 .master-password.login-form input[type=password] {
   width: 80%;
+}
+.master-password.login-form .submit-wrapper .button {
+  margin-top: .5em;
 }
 /* password share tab */
 .dialog .share-tab {

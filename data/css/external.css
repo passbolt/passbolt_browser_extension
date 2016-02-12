@@ -1,6 +1,6 @@
 /*
- 	These are the styled inserted in the page the plugin is running on
- 	to insert iframes, etc.
+ 	These are the styling rules inserted by the plugin on the pages a pagemod is running on
+ 	it is used mostly to control default iframes height
  */
 /* iframe wrapper */
 .passbolt-plugin-dialog {
@@ -38,9 +38,10 @@
 }
 #passbolt-iframe-login-form {
   width: 100%;
-  height: 16em;
+  height: 16.6em;
   margin-top: .5em;
   padding-left: .5em;
+  margin-bottom: -6%;
 }
 #passbolt-iframe-master-password {
   z-index: 992;

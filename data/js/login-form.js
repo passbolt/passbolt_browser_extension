@@ -70,8 +70,11 @@ $(document).bind('template-ready', function() {
         );*/
     };
 
-    // The user clicks on OK.
-    $loginSubmit.on('click', function() {
+    var onSubmit = function() {
+        if ($loginSubmit.addClass('disabled').hasClass('processing')) {
+            return;
+        }
+
         $('html').addClass('loading').removeClass('loaded');
         $loginMessage.text('Please wait...'); // @TODO l18n
         $loginSubmit.addClass('disabled').addClass('processing');
@@ -84,8 +87,25 @@ $(document).bind('template-ready', function() {
                 onInvalidPassphrase(msg);
             }
         );
+    };
+
+    // The user clicks on OK.
+    $loginSubmit.on('click', function() {
+        onSubmit();
         return false;
     });
+
+    // On keypress inside the master password field.
+    $masterPassword.keypress(function(e) {
+        // Get keycode.
+        var keycode = e.keyCode || e.which;
+
+        // The user presses enter.
+        if (keycode == 13) {
+            onSubmit();
+        }
+    });
+
 
 });
 

@@ -1,5 +1,5 @@
 /**
- * Passbolt setup step.
+ * Passbolt security token setup step.
  */
 var passbolt = passbolt || {};
 passbolt.setup = passbolt.setup || {};

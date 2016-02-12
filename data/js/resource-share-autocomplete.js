@@ -1,3 +1,10 @@
+/**
+ * Autocomplete form in share a resource.
+ *
+ * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ */
+
 // When the page has been initialized.
 $(document).bind('template-ready', function() {
 

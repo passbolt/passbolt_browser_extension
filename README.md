@@ -85,3 +85,9 @@ Make sure Grunt watch for less changes and compile them into CSS
 ```
 Edit one LESS file to see if it works!
 Make sure that if you need to make change the styleguide to request changes upstream.
+
+
+Licence and copyright
+=====================
+copyright : (c) 2015-present Bolt Softwares Pvt Ltd
+licence : GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html

@@ -3804,9 +3804,6 @@ input[type=text].fluid {
   width: 64%;
   float: left;
 }
-.input-password-wrapper .input.password input[type=password].decrypting {
-  background: transparent url(../img/controls/loading.gif) no-repeat 72% center;
-}
 .input-password-wrapper .input.password.has-encrypted-secret input {
   /* fallback placeholder */
   /* webkit placeholder */
@@ -4056,11 +4053,6 @@ input[type=text].fluid {
 .master-password.dialog input[type=text],
 .master-password.dialog input[type=password] {
   width: 80%;
-}
-.master-password.dialog input.focus_first {
-  border-width: 0;
-  font-size: 0;
-  line-height: 0;
 }
 .master-password.dialog .input.checkbox {
   visibility: hidden;

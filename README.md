@@ -62,6 +62,9 @@ Package your add-on as an XPI file whenever there is a file changed, and post th
 Push a new version
 ------------------
 
+To push a new version of the plugin, and before submitting it to mozilla, 
+it is important to tag it :
+
   git commit -am 'X.X.X'
   git tag -a X.X.X -m 'X.X.X'
   git push origin X.X.X

@@ -9,5 +9,12 @@
 /node_modules
 /bower_components
 .git
+.bowerrc
+.gitignore
+.jpmignore
+.idea
+locale/empty
 /data/less
+Gruntfile.js
+npm-debug.log
 config.json.default

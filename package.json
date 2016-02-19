@@ -1,12 +1,21 @@
 {
   "name": "passbolt-firefox",
+  "version": "1.0.3",
   "title": "Passbolt Firefox Addon",
   "id": "passbolt-firefox@passbolt.com",
   "description": "Passbolt Firefox add-on",
-  "license": "GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html",
-  "author": "© 2016 Bolt Softwares Pvt Ltd",
-  "copyright": "Bolt Softwares pvt. ltd.",
-  "version": "1.0.3",
+  "license": "AGPL-3.0",
+  "icon": "resource://@passbolt-firefox/skin/logo-48.png",
+  "homepage": "https://www.passbolt.com",
+  "author": "Bolt Softwares Pvt. Ltd. <info@passbolt.com> (https://www.passbolt.com)",
+  "developers": [
+    "Kevin Muller <kevin@passbolt.com> (https://www.passbolt.com)",
+    "Remy Bertot <remy@passbolt.com> (https://www.passbolt.com)",
+    "Cédric Alfonsi <cedric@passbolt.com> (https://www.passbolt.com)"
+  ],
+  "engines": {
+    "firefox": ">=43 <45"
+  },
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-contrib-clean": "~0.5.0",

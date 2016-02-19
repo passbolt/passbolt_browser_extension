@@ -59,6 +59,14 @@ Package your add-on as an XPI file whenever there is a file changed, and post th
 	jpm watchpost
 ```
 
+Push a new version
+------------------
+
+  git commit -am 'X.X.X'
+  git tag -a X.X.X -m 'X.X.X'
+  git push origin X.X.X
+  git push origin develop
+
 Productivity
 ------------
 

@@ -14,7 +14,7 @@
     "Cédric Alfonsi <cedric@passbolt.com> (https://www.passbolt.com)"
   ],
   "engines": {
-    "firefox": ">=43 <45"
+    "firefox": ">=41 <45"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

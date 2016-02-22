@@ -85,7 +85,7 @@ By default it is disabled, go on the configuration page and activate it.
 To udpate your plugin after a change, go on your projet root and execute
 the following:
 
-jpm xpi ; wget --post-file=passbolt-firefox.xpi http://localhost:8888/
+jpm xpi ; wget --post-file=passbolt.xpi http://localhost:8888/
 
 
 How to edit the LESS/CSS files?

@@ -1,0 +1,32 @@
+<div class="col6 push1 information">
+    <h2>This domain is not known!</h2>
+    <div class="plugin-check-wrapper">
+        <div class="plugin-check firefox warning">
+            <p class="message">
+                Firefox plugin is installed but is already configured for another domain :<br>
+                <a href="<%= trustedDomain %>" class="trusteddomain"><%= trustedDomain %></a>
+                <% if(publicRegistration) { %>
+                    <br>
+                    You can <a href="/register">register again</a> for this domain,
+                    but you will lose your account on the existing domain. Proceed with caution.
+                <% } %>
+            </p>
+        </div>
+    </div>
+</div>
+<div class="col4 push1 last">
+    <div class="logo">
+        <h1><a href="#"><span>Passbolt</span></a></h1>
+    </div>
+    <div class="users login form">
+        <div class="feedback">
+            <i class="fa huge fa-globe" ></i>
+            <p>Firefox plugin is not configured to work with this domain</p>
+        </div>
+        <div class="actions-wrapper center">
+            <% if(publicRegistration) { %>
+                <a class="button primary big" href="/register">Register for this domain</a>
+            <% } %>
+        </div>
+    </div>
+</div>

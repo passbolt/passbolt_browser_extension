@@ -6,8 +6,32 @@
  */
 
 var passbolt = passbolt || {};
+passbolt.bootstrap = passbolt.bootstrap || {};
 
 (function($) {
+
+    /**
+     * When the domain is not the right one, but the plugin is already configured.
+     */
+    passbolt.bootstrap.onWrongDomain = function() {
+        $('html').addClass('domain-unknown');
+
+        var $renderSpace = $('.login.page .js_main-login-section'),
+            publicRegistration = $('.login.page.public-registration').length > 0 ? true : false;
+
+        // Get trusted domain setting.
+        passbolt.request('passbolt.addon.getDomain').then(
+            function success(trustedDomain) {
+                // Get template.
+                getTpl('./tpl/login/wrong-domain.ejs', function (tpl) {
+                    var html = new EJS({text: tpl}).render({
+                        trustedDomain : trustedDomain,
+                        publicRegistration : publicRegistration
+                    });
+                    $renderSpace.html(html);
+                });
+            });
+    };
 
 	// check if the plugin is configured
 	passbolt.request('passbolt.addon.isConfigured')
@@ -30,14 +54,33 @@ var passbolt = passbolt || {};
 
 	// check if it is a passbolt app instance on the login page
 	if($('html.passbolt .login.page').length) {
-		passbolt.request('passbolt.bootstrap.login')
-			.then(
-			function success(refresh) {
-				if (refresh) {
-					location.reload();
-				}
-			}
-		);
+        console.log('login page');
+        // If passbolt is configured.
+        passbolt.request('passbolt.addon.isConfigured')
+            .then(function (response) {
+                if (response === true) {
+                    console.log('login page configured');
+                    // If domain is right.
+                    passbolt.request('passbolt.addon.checkDomain').then(
+                        function success(response) {
+                            // Domain not right, we redirect to wrong domain page.
+                            if (response !== true) {
+                                passbolt.bootstrap.onWrongDomain();
+                                return;
+                            }
+
+                            // Domain is right, we go to login.
+                            passbolt.request('passbolt.bootstrap.login').then(
+                                function success(refresh) {
+                                    if (refresh) {
+                                        location.reload();
+                                    }
+                                }
+                            );
+                        }
+                    );
+                }
+            });
 	}
 
 	// check if it is a passbolt app instance on the debug page

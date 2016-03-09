@@ -227,7 +227,7 @@ body {
 /* remember to define focus styles! */
 :focus {
   outline: 0;
-}∂
+}
 /* remember to highlight inserts somehow! */
 ins {
   text-decoration: none;
@@ -801,15 +801,15 @@ article ul.double {
   float: left;
 }
 /*!
- *  Font Awesome 4.4.0 by @davegandy - http://fontawesome.io - @fontawesome
+ *  Font Awesome 4.5.0 by @davegandy - http://fontawesome.io - @fontawesome
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
  */
 /* FONT PATH
  * -------------------------- */
 @font-face {
   font-family: 'FontAwesome';
-  src: url('../fonts/fontawesome-webfont.eot?v=4.4.0');
-  src: url('../fonts/fontawesome-webfont.eot?#iefix&v=4.4.0') format('embedded-opentype'), url('../fonts/fontawesome-webfont.woff2?v=4.4.0') format('woff2'), url('../fonts/fontawesome-webfont.woff?v=4.4.0') format('woff'), url('../fonts/fontawesome-webfont.ttf?v=4.4.0') format('truetype'), url('../fonts/fontawesome-webfont.svg?v=4.4.0#fontawesomeregular') format('svg');
+  src: url('../fonts/fontawesome-webfont.eot?v=4.5.0');
+  src: url('../fonts/fontawesome-webfont.eot?#iefix&v=4.5.0') format('embedded-opentype'), url('../fonts/fontawesome-webfont.woff2?v=4.5.0') format('woff2'), url('../fonts/fontawesome-webfont.woff?v=4.5.0') format('woff'), url('../fonts/fontawesome-webfont.ttf?v=4.5.0') format('truetype'), url('../fonts/fontawesome-webfont.svg?v=4.5.0#fontawesomeregular') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -2826,6 +2826,66 @@ article ul.double {
 .fa-fonticons:before {
   content: "\f280";
 }
+.fa-reddit-alien:before {
+  content: "\f281";
+}
+.fa-edge:before {
+  content: "\f282";
+}
+.fa-credit-card-alt:before {
+  content: "\f283";
+}
+.fa-codiepie:before {
+  content: "\f284";
+}
+.fa-modx:before {
+  content: "\f285";
+}
+.fa-fort-awesome:before {
+  content: "\f286";
+}
+.fa-usb:before {
+  content: "\f287";
+}
+.fa-product-hunt:before {
+  content: "\f288";
+}
+.fa-mixcloud:before {
+  content: "\f289";
+}
+.fa-scribd:before {
+  content: "\f28a";
+}
+.fa-pause-circle:before {
+  content: "\f28b";
+}
+.fa-pause-circle-o:before {
+  content: "\f28c";
+}
+.fa-stop-circle:before {
+  content: "\f28d";
+}
+.fa-stop-circle-o:before {
+  content: "\f28e";
+}
+.fa-shopping-bag:before {
+  content: "\f290";
+}
+.fa-shopping-basket:before {
+  content: "\f291";
+}
+.fa-hashtag:before {
+  content: "\f292";
+}
+.fa-bluetooth:before {
+  content: "\f293";
+}
+.fa-bluetooth-b:before {
+  content: "\f294";
+}
+.fa-percent:before {
+  content: "\f295";
+}
 /*
 	Generic buttons
 	Description	: We support <input[submit]>, <input.button>, <button> and <a.button>
@@ -3591,6 +3651,7 @@ input[type=text].fluid {
     box-shadow: none;
     width: 100%;
     max-width: 100%;
+    margin-bottom: 2.5em;
   }
 }
 /* tabs */
@@ -3699,8 +3760,10 @@ input[type=text].fluid {
   margin-left: 240px;
 }
 .colorpicker .input input[type=text].token {
-  width: 3em;
-  font-size: 24px;
+  width: 4em;
+  font-size: 1.25em;
+  height: auto;
+  line-height: 2em;
   border: none;
   -webkit-border-radius: 0.214em;
   -moz-border-radius: 0.214em;
@@ -4099,7 +4162,7 @@ input[type=text].fluid {
   padding: 0em;
 }
 .dialog .share-tab .permissions.scroll {
-  height: 19em;
+  max-height: 19em;
   margin: 0;
 }
 .dialog .share-tab .row {
@@ -4226,7 +4289,9 @@ input[type=text].fluid {
   font-size: 0.813em;
   padding-left: 2em;
 }
-.dialog .share-tab .form-content.permission-add {
+.dialog .share-tab .permission-add {
+  background-color: #ffffff;
+  padding: 0 1em 1em 1em;
   /*
  * For IE 6/7 only
  * Include this rule to trigger hasLayout and contain floats.
@@ -4259,23 +4324,23 @@ input[type=text].fluid {
  *	`:before` to contain the top-margins of child elements.
  */
 }
-.dialog .share-tab .form-content.permission-add:before,
-.dialog .share-tab .form-content.permission-add:after {
+.dialog .share-tab .permission-add:before,
+.dialog .share-tab .permission-add:after {
   content: "";
   display: table;
 }
-.dialog .share-tab .form-content.permission-add:after {
+.dialog .share-tab .permission-add:after {
   clear: both;
 }
-.dialog .share-tab .form-content.permission-add:before,
-.dialog .share-tab .form-content.permission-add:after {
+.dialog .share-tab .permission-add:before,
+.dialog .share-tab .permission-add:after {
   content: "";
   display: table;
 }
-.dialog .share-tab .form-content.permission-add:after {
+.dialog .share-tab .permission-add:after {
   clear: both;
 }
-.dialog .share-tab .form-content.permission-add #passbolt-password-share-autocomplete-wrapper {
+.dialog .share-tab .permission-add #passbolt-password-share-autocomplete-wrapper {
   position: relative;
   width: 100%;
 }
@@ -4299,6 +4364,9 @@ input[type=text].fluid {
 .dialog.key-info table tr td.label {
   padding-right: 4em;
   color: #888888;
+}
+#loginSubmit {
+  margin-left: 2px;
 }
 /**
  * Needed for Firefox plugin

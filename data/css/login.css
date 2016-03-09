@@ -758,15 +758,15 @@ article ul.double {
   float: left;
 }
 /*!
- *  Font Awesome 4.4.0 by @davegandy - http://fontawesome.io - @fontawesome
+ *  Font Awesome 4.5.0 by @davegandy - http://fontawesome.io - @fontawesome
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
  */
 /* FONT PATH
  * -------------------------- */
 @font-face {
   font-family: 'FontAwesome';
-  src: url('../fonts/fontawesome-webfont.eot?v=4.4.0');
-  src: url('../fonts/fontawesome-webfont.eot?#iefix&v=4.4.0') format('embedded-opentype'), url('../fonts/fontawesome-webfont.woff2?v=4.4.0') format('woff2'), url('../fonts/fontawesome-webfont.woff?v=4.4.0') format('woff'), url('../fonts/fontawesome-webfont.ttf?v=4.4.0') format('truetype'), url('../fonts/fontawesome-webfont.svg?v=4.4.0#fontawesomeregular') format('svg');
+  src: url('../fonts/fontawesome-webfont.eot?v=4.5.0');
+  src: url('../fonts/fontawesome-webfont.eot?#iefix&v=4.5.0') format('embedded-opentype'), url('../fonts/fontawesome-webfont.woff2?v=4.5.0') format('woff2'), url('../fonts/fontawesome-webfont.woff?v=4.5.0') format('woff'), url('../fonts/fontawesome-webfont.ttf?v=4.5.0') format('truetype'), url('../fonts/fontawesome-webfont.svg?v=4.5.0#fontawesomeregular') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -2783,6 +2783,66 @@ article ul.double {
 .fa-fonticons:before {
   content: "\f280";
 }
+.fa-reddit-alien:before {
+  content: "\f281";
+}
+.fa-edge:before {
+  content: "\f282";
+}
+.fa-credit-card-alt:before {
+  content: "\f283";
+}
+.fa-codiepie:before {
+  content: "\f284";
+}
+.fa-modx:before {
+  content: "\f285";
+}
+.fa-fort-awesome:before {
+  content: "\f286";
+}
+.fa-usb:before {
+  content: "\f287";
+}
+.fa-product-hunt:before {
+  content: "\f288";
+}
+.fa-mixcloud:before {
+  content: "\f289";
+}
+.fa-scribd:before {
+  content: "\f28a";
+}
+.fa-pause-circle:before {
+  content: "\f28b";
+}
+.fa-pause-circle-o:before {
+  content: "\f28c";
+}
+.fa-stop-circle:before {
+  content: "\f28d";
+}
+.fa-stop-circle-o:before {
+  content: "\f28e";
+}
+.fa-shopping-bag:before {
+  content: "\f290";
+}
+.fa-shopping-basket:before {
+  content: "\f291";
+}
+.fa-hashtag:before {
+  content: "\f292";
+}
+.fa-bluetooth:before {
+  content: "\f293";
+}
+.fa-bluetooth-b:before {
+  content: "\f294";
+}
+.fa-percent:before {
+  content: "\f295";
+}
 /*
 	Base form components styling
 	Check components/form for more advanced/fancy input
@@ -3780,6 +3840,18 @@ html body .button.processing {
 .header h1 {
   display: none;
 }
+/* CSS for serving the retina image to devices with a high "device-pixel-ratio": */
+@media only screen and (-moz-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-devicepixel-ratio: 1.5), only screen and (min-resolution: 1.5dppx) {
+  .header .navigation.primary .home a {
+    background: transparent url('../img/logo/icon-48_white.png') 0 0 no-repeat;
+    background-size: 20px 20px;
+  }
+  .header .navigation.primary .home a:focus,
+  .header .navigation.primary .home:hover a {
+    background: transparent url('../img/logo/icon-48.png') 0 0 no-repeat;
+    background-size: 20px 20px;
+  }
+}
 /*
  * Footer
  */
@@ -4138,9 +4210,8 @@ html body .button.processing {
   z-index: 900;
 }
 /*
- * Login page additional styles
+ * Additional styles for login and register
  */
-/* header */
 .page.register h2,
 .page.login h2 {
   font-size: 2em;
@@ -4149,9 +4220,9 @@ html body .button.processing {
 .page.register .logo,
 .page.login .logo {
   background: transparent url('../img/logo/logo.png') 0 10px no-repeat;
-  width: 260px;
-  height: 60px;
-  margin-top: .5em;
+  width: 250px;
+  height: 50px;
+  margin-top: 1em;
 }
 .page.register .logo span,
 .page.login .logo span {
@@ -4241,4 +4312,12 @@ html body .button.processing {
   width: 100%;
   font-size: 1.250em;
   font-weight: bold;
+}
+/* CSS for serving the retina image to devices with a high "device-pixel-ratio": */
+@media only screen and (-moz-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-devicepixel-ratio: 1.5), only screen and (min-resolution: 1.5dppx) {
+  .page.register .logo,
+  .page.login .logo {
+    background: transparent url('../img/logo/logo@2x.png') 0 10px no-repeat;
+    background-size: 187px 36px;
+  }
 }

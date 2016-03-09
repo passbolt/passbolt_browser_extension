@@ -19,50 +19,9 @@ module.exports = function(grunt) {
 		clean: {
 			css: [
 				'<%= config.webroot %>/css/*.css'
-			],
-			'js': [
-				'<%= config.webroot %>/js/app/production.js'
 			]
 		},
-		lesslint: {
-			src: ['<%= config.webroot %>/less/*.less']
-		},
-		less: {
-			files: {
-				expand: true,
-				flatten: true,
-				cwd: "<%= config.webroot %>/less/",
-				src: "*.less",
-				dest: "<%= config.webroot %>/css/",
-				ext: ".css"
-			}
-		},
-		cssmin: {
-			options: {
-				banner: '/**!\n'+
-				' * @name\t\t<%= pkg.name %>\n'+
-				' * @version\t\tv<%= pkg.version %>\n' +
-				' * @date\t\t<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-				' * @copyright\t<%= pkg.copyright %>\n' +
-				' * @source\t\t<%= pkg.repository %>\n'+
-				' * @license\t\t<%= pkg.license %>\n */\n',
-				footer: '/* @license-end */'
-			},
-			minify: {
-				expand: true,
-				cwd: '<%= config.webroot %>/css/',
-				src: ['*.css', '!*.min.css'],
-				dest: '<%= config.webroot %>/css/',
-				ext: '.min.css'
-			}
-		},
 		shell: {
-			jsmin: {
-				options: {
-					stderr: false
-				},
-				command: '(cd ./app/webroot/js; ./js ./steal/buildjs ./app/passbolt.html)'
-			},
 			updatestyleguide: {
 				options: {
 					stderr: false
@@ -93,26 +52,12 @@ module.exports = function(grunt) {
 					dest: '<%= config.webroot %>/img',
 					expand: true
 				},{
-					// Less
-					nonull: true,
-					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/less',
-					src: [
-						'abstractions/**', 'base/**', 'components/**', 'dialogs/**', 'plugin/**',
-						'pages/login.less', 'pages/config_debug_ff.less', 'pages/setup.less', 'pages/external.less', 'pages/settings.less',
-						'login.less', 'setup.less', 'setup_ff.less', 'main_ff.less', 'external.less', 'config_debug_ff.less'
-					],
-					dest: '<%= config.webroot %>/less',
-					expand: true
+						// Less
+						cwd: '<%= config.modules_path %>/<%= config.styleguide %>/build/css',
+						src: ['config_debug_ff.min.css', 'external.min.css', 'login.min.css', 'main_ff.min.css','setup_ff.min.css'],
+						dest: '<%= config.webroot %>/css',
+						expand: true
 				}]
-			}
-		},
-		watch: {
-			less: {
-				files: ['Gruntfile.js', 'package.json', '<%= config.webroot %>/less/*.less','<%= config.webroot %>/less/**/*.less'],
-				tasks: ['css'],
-				options: {
-					spawn: false
-				}
 			}
 		}
 	});
@@ -125,21 +70,7 @@ module.exports = function(grunt) {
 	// ========================================================================
 	// Initialise
 
-	grunt.loadNpmTasks('grunt-contrib-cssmin');
-
 	grunt.loadNpmTasks('grunt-contrib-jshint');
-
-	grunt.loadNpmTasks('grunt-contrib-uglify');
-
-	grunt.loadNpmTasks('grunt-contrib-concat');
-
-	grunt.loadNpmTasks('grunt-contrib-clean');
-
-	grunt.loadNpmTasks('grunt-lesslint');
-
-	grunt.loadNpmTasks('grunt-contrib-less');
-
-	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	grunt.loadNpmTasks('grunt-shell');
 
@@ -148,17 +79,11 @@ module.exports = function(grunt) {
 	// ========================================================================
 	// Register Tasks
 
-	// Run 'grunt css' to compile LESS into CSS, combine and minify
-	grunt.registerTask('css', ['clean:css', 'less', 'cssmin']);
-
 	// Bower deploy
-	grunt.registerTask('styleguide-deploy', ['shell:updatestyleguide','copy:styleguide','css','shell:jpmxpi']);
-
-	// Run 'grunt production' to prepare the production release
-	grunt.registerTask('production', ['css', 'clean:js', 'shell:jsmin']);
+	grunt.registerTask('styleguide-deploy', ['shell:updatestyleguide','copy:styleguide','shell:jpmxpi']);
 
 	// 'grunt' will check code quality, and if no errors,
 	// compile LESS to CSS, and minify and concatonate all JS and CSS
-	grunt.registerTask('default', ['css','shell:jpmxpi']);
+	grunt.registerTask('default', ['shell:jpmxpi']);
 
 };

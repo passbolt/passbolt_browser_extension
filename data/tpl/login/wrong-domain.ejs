@@ -4,15 +4,12 @@
         <div class="plugin-check firefox warning">
             <p class="message">
                 Firefox plugin is installed but is already configured for another domain :<br>
-                <a href="<%= trustedDomain %>" class="trusteddomain"><%= trustedDomain %></a>
-                <% if(publicRegistration) { %>
-                    <br>
-                    You can <a href="/register">register again</a> for this domain,
-                    but you will lose your account on the existing domain. Proceed with caution.
-                <% } %>
+            	<a href="<%= trustedDomain %>" class="trusteddomain"><%= trustedDomain %></a><br>
             </p>
         </div>
     </div>
+    <p>You can <a href="/register">register again</a> for this domain,
+        but you will lose your account on the existing domain. Proceed with caution.</p>
 </div>
 <div class="col4 push1 last">
     <div class="logo">

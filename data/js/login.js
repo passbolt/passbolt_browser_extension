@@ -70,7 +70,10 @@ $(function() {
                     .addClass('error')
                     .html('<p class="message">' + msg + '<p>');
 
-                // @TODO stop spining
+                getTpl('./tpl/login/feedback-login-oops.ejs', function (tpl) {
+                    var html = new EJS({text: tpl}).render();
+                    $('.login.form').empty().append(html);
+                });
             }
         );
 

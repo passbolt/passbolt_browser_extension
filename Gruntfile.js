@@ -32,8 +32,23 @@ module.exports = function(grunt) {
 				options: {
 					stderr: false
 				},
-				command: 'jpm xpi'
-			}
+				command: [
+                    'rm -f passbolt@passbolt.com-*',
+                    'rm -f passbolt-latest@passbolt.com.xpi',
+                    "sed 's/[\"]debug[\"]:.*$/\"debug\": true/' ./lib/config/config.json > ./lib/config/config.json.tmp && mv ./lib/config/config.json.tmp ./lib/config/config.json",
+                    'jpm xpi',
+                    "find . -name '*.xpi' -exec sh -c 'mv \"$0\" \"${0%.xpi}-debug.xpi\"' {} \\;",
+                    "sed 's/[\"]debug[\"]:.*$/\"debug\": false/' ./lib/config/config.json > ./lib/config/config.json.tmp && mv ./lib/config/config.json.tmp ./lib/config/config.json",
+                    'jpm xpi',
+                    'ln -s `find . -name passbolt@passbolt.com-*.xpi` ./passbolt-latest@passbolt.com.xpi'
+                ].join('&&')
+			},
+            xpiinstall: {
+                options: {
+                    stderr: false
+                },
+                command: 'wget --post-file=`find . -name passbolt@passbolt.com-*-debug.xpi` http://localhost:8888/'
+            }
 		},
 		copy: {
 			styleguide : {
@@ -81,6 +96,12 @@ module.exports = function(grunt) {
 
 	// Bower deploy
 	grunt.registerTask('styleguide-deploy', ['shell:updatestyleguide','copy:styleguide','shell:jpmxpi']);
+
+    // Build xpi in debug and non-debug version.
+    grunt.registerTask('build-xpi', ['shell:jpmxpi']);
+
+    // Build xpi in debug and non-debug version.
+    grunt.registerTask('push-xpi', ['shell:xpiinstall']);
 
 	// 'grunt' will check code quality, and if no errors,
 	// compile LESS to CSS, and minify and concatonate all JS and CSS

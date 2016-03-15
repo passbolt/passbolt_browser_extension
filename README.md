@@ -82,10 +82,20 @@ https://addons.mozilla.org/en-us/firefox/addon/autoinstaller/
 
 By default it is disabled, go on the configuration page and activate it.
 
-To udpate your plugin after a change, go on your projet root and execute
+To compile the plugin in both non-debug and debug version, use the following command :
+
+grunt build-xpi
+
+It will create the debug and non debug versions, as well as a symbolic link passbolt-latest@passbolt.com.xpi pointing to the non debug version.
+
+To udpate your plugin in firefox after a change, go on your projet root and execute
 the following:
 
 jpm xpi ; wget --post-file=passbolt.xpi http://localhost:8888/
+
+or
+
+grunt push-xpi (which will install the latest debug version)
 
 
 How to edit the LESS/CSS files?

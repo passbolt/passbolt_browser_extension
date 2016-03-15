@@ -47,7 +47,7 @@ module.exports = function(grunt) {
                 options: {
                     stderr: false
                 },
-                command: 'wget --post-file=`find . -name passbolt@passbolt.com-*-debug.xpi` http://localhost:8888/'
+                command: 'wget --post-file=`find . -name \'passbolt@passbolt.com-*-debug.xpi\'` http://localhost:8888/'
             }
 		},
 		copy: {

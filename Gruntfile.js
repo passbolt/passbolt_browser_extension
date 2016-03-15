@@ -40,7 +40,7 @@ module.exports = function(grunt) {
                     "find . -name '*.xpi' -exec sh -c 'mv \"$0\" \"${0%.xpi}-debug.xpi\"' {} \\;",
                     "sed 's/[\"]debug[\"]:.*$/\"debug\": false/' ./lib/config/config.json > ./lib/config/config.json.tmp && mv ./lib/config/config.json.tmp ./lib/config/config.json",
                     'jpm xpi',
-                    'ln -s `find . -name passbolt@passbolt.com-*.xpi` ./passbolt-latest@passbolt.com.xpi'
+                    'ln -s `find . -name \'passbolt@passbolt.com-*[0-9].xpi\'` ./passbolt-latest@passbolt.com.xpi'
                 ].join('&&')
 			},
             xpiinstall: {

@@ -62,6 +62,7 @@ $(function() {
                     .addClass('success')
                     .html('<p class="message">' + msg + '<p>');
 
+                $('html').addClass('server-verified');
                 passbolt.login.onStep1RequestPassphrase();
             },
             function error(msg) {
@@ -70,14 +71,13 @@ $(function() {
                     .addClass('error')
                     .html('<p class="message">' + msg + '<p>');
 
+                $('html').addClass('server-not-verified');
                 getTpl('./tpl/login/feedback-login-oops.ejs', function (tpl) {
                     var html = new EJS({text: tpl}).render();
                     $('.login.form').empty().append(html);
                 });
             }
         );
-
-        $('html').addClass('server-verified');
     };
 
     /**

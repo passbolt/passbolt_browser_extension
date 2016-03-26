@@ -117,9 +117,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         return passbolt.request('passbolt.setup.save', setupData)
             .fail(function (error) {
                 console.log('error while saving information', error.message, error.data);
-                // In case of fatal error, we flush the setup.
-                // If an error occured, it's useless to let the user start again from the same point as this would give the same fatal error.
-                step._flushSetup();
                 // Throw fatal error.
                 passbolt.setup.fatalError(error.message, error.data);
             });

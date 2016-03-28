@@ -3,7 +3,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-(Add here current version changes)
+
+## [1.0.6] - 2016-03-28
+### Fixed
+- PASSBOLT-1424: Cleanup: in Firefox addon remove URL_PLUBLIC_REGISTRATION.
+- PASSBOLT-1417: At the end of the setup, or in case of setup fatal error, setup data should be cleared.
+- PASSBOLT-1359: Setup should restart where it was left.
+
 
 ## [1.0.5] - 2016-03-21
 ### Added
@@ -21,5 +27,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.5...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.6...HEAD
+[1.0.6]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.5...v1.0.6
 [1.0.5]: https://github.com/passbolt/passbolt_firefox/compare/1.0.4...v1.0.5

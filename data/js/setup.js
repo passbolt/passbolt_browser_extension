@@ -668,6 +668,7 @@ passbolt.setup.data = passbolt.setup.data || {};
      * @param additionalData
      */
     passbolt.setup.fatalError = function(error, additionalData) {
+        // Display fatal error.
         getTpl('./tpl/setup/fatal_error.ejs', function (tpl) {
             passbolt.setup.get()
                 .then(function(setupData) {
@@ -703,6 +704,13 @@ passbolt.setup.data = passbolt.setup.data || {};
                         $('#debug-info').removeClass('hidden');
                         return false;
                     });
+
+                    /////////////////////////////////////////////
+                    //////         Flush Setup           ///////
+                    ///////////////////////////////////////////
+                    // Flush the setup in case of fatal error.
+                    // We don't want to keep the buggy data in the plugin.
+                    passbolt.request('passbolt.setup.flush');
                 });
         });
     }

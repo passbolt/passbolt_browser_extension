@@ -72,10 +72,22 @@ $(function() {
                     .html('<p class="message">' + msg + '<p>');
 
                 $('html').addClass('server-not-verified');
-                getTpl('./tpl/login/feedback-login-oops.ejs', function (tpl) {
-                    var html = new EJS({text: tpl}).render();
-                    $('.login.form').empty().append(html);
-                });
+
+                // Special case to handle if the user doesn't exist on server.
+                if (msg.indexOf('no user associated') != -1) {
+                    $('html').addClass('server-no-user');
+                    getTpl('./tpl/login/feedback-login-no-user.ejs', function (tpl) {
+                        var html = new EJS({text: tpl}).render();
+                        $('.login.form').empty().append(html);
+                    });
+                }
+                // All other cases.
+                else {
+                    getTpl('./tpl/login/feedback-login-oops.ejs', function (tpl) {
+                        var html = new EJS({text: tpl}).render();
+                        $('.login.form').empty().append(html);
+                    });
+                }
             }
         );
     };

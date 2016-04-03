@@ -117,6 +117,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         return passbolt.request('passbolt.setup.save', setupData)
             .fail(function (error) {
                 console.log('error while saving information', error.message, error.data);
+                // Throw fatal error.
                 passbolt.setup.fatalError(error.message, error.data);
             });
     };

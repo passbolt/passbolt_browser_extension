@@ -56,8 +56,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         step.elts.$errorFeedback
             .removeClass('hidden')
             .html(errorMessage);
-
-        console.log(errorMessage);
     };
 
     /* ==================================================================================

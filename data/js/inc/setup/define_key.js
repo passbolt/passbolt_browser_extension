@@ -60,7 +60,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @param errorMsg
      */
     step.onError = function (errorMsg, validationErrors) {
-        console.log('Error : ', errorMsg, validationErrors);
 
         var html = '<p>Error : ' + errorMsg + '</p>';
         if (validationErrors != undefined) {

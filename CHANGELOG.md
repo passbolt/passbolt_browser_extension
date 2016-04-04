@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.7] - 2016-04-04
+### Fixed
+- PASSBOLT-1158: Cleanup: remove useless console.log() from the code.
+- PASSBOLT-1462: Remove spelling mistake on encrypting.
+
 ## [1.0.6] - 2016-03-28
 ### Fixed
 - PASSBOLT-1424: Cleanup: in Firefox addon remove URL_PLUBLIC_REGISTRATION.

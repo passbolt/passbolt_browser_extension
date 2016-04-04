@@ -102,7 +102,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @param errorMessage
      */
     step.onErrorServerKey = function (errorMessage) {
-        console.log("error retrieving server key : ", errorMessage);
         step.elts.$fingerprintWrapper.addClass('error');
         step.elts.$fingerprintError.text("Could not retrieve server key. Please contact administrator.");
     };
@@ -142,7 +141,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @param errorMsg
      */
     step.onError = function (errorMsg) {
-        console.log('Error : ', errorMsg);
         step.elts.$feedbackError
             .removeClass('hidden')
             .text(errorMsg);
@@ -208,7 +206,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
             // In case of error,  display fatal error.
             .fail(function (msg) {
-                console.log(msg);
                 passbolt.setup.fatalError(msg);
             });
 

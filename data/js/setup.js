@@ -620,7 +620,6 @@ passbolt.setup.data = passbolt.setup.data || {};
      * @private
      */
     passbolt.setup._initError = function(errorMsg, extraData) {
-        console.log('An error happened while initializing the setup : ', errorMsg, extraData);
         passbolt.setup.fatalError(errorMsg, extraData);
     };
 

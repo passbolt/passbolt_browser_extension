@@ -60,7 +60,6 @@ $(document).bind('template-ready', function() {
     };
 
     var onValidPassphrase = function () {
-        console.log('onvalidpassphrase');
         $loginMessage.removeClass('error');
         passbolt.request('passbolt.auth.login', $masterPassword.val());
             /**

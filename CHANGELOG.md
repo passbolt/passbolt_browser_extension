@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.8] - 2016-04-05
+- PASSBOLT-1455: As a AP during setup I should not see Learn more broken links
+- PASSBOLT-1158: Cleanup: remove useless console.log() from the code.
+
 ## [1.0.7] - 2016-04-04
 ### Fixed
 - PASSBOLT-1158: Cleanup: remove useless console.log() from the code.

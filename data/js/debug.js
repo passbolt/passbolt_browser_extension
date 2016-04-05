@@ -28,8 +28,8 @@ $(function() {
         $securityTokenTextColor = $('#securityTokenTextColor'),
         $privateKeyInfo = $('#privkeyinfo'),
         $serverKeyInfo = $('#pubkeyinfo-server'),
-		$flushLocalStorage = $('#js_flush_conf'),
-		$localStorageInfo = $('#localStorage');
+		    $flushLocalStorage = $('#js_flush_conf'),
+        $localStorageInfo = $('#localStorage');
 
     /**
      * Listen to the event passbolt.debug.settings.set
@@ -134,34 +134,6 @@ $(function() {
      * ================================================================================== */
 
     /**
-     * Get the information about the current user from the server if any
-     * @TODO Fix this & add back html display
-     */
-    //var updatePublic = function() {
-    //    passbolt.request('passbolt.user.get.remote')
-    //        .then(function(user) {
-    //            console.log('passbolt.user.get.remote success');
-    //            displayKeyInfo(user.Gpgkey, 'pubkeyinfo-plugin', 'server');
-    //
-    //            passbolt.request('passbolt.keyring.public.get', user.id)
-    //                .then(function(publicKeyArmored) {
-    //                    if (publicKeyArmored) {
-    //                        passbolt.request('passbolt.keyring.public.info', publicKeyArmored.key)
-    //                            .then(function (info) {
-    //                                //displayKeyInfo(info, 'pubkeyinfo-plugin', 'client');
-    //                                console.log('passbolt.keyring.public.info :');
-    //                                console.log(info);
-    //                            });
-    //                    }
-    //                }).fail(function(){
-    //                    console.log('passbolt.keyring.public.info fail');
-    //                });
-    //        }).fail(function(){
-    //            console.log('passbolt.user.get.remote fail: no current user');
-    //        });
-    //};
-
-    /**
      * Display key information
      * Triggered when the page is opened or when a new key is set
      */
@@ -172,7 +144,9 @@ $(function() {
                 $myKeyAscii.val(info.key);
             })
             .fail(function(){
-                console.log('passbolt.keyring.private.get fail: no private key set');
+
+                // @todo PASSBOLT-1470
+                // console.log('passbolt.keyring.private.get fail: no private key set');
             });
 
         passbolt.request('passbolt.keyring.server.get')
@@ -181,7 +155,8 @@ $(function() {
                 $serverKeyAscii.val(info.key);
             })
             .fail(function(){
-                console.log('passbolt.keyring.server.get fail: no private key set');
+                // @todo PASSBOLT-1470
+                //console.log('passbolt.keyring.server.get fail: no private key set');
             });
     };
 
@@ -194,8 +169,9 @@ $(function() {
                 displayUserInfo(user);
             })
             .fail(function(e){
-                console.log('passbolt.user.get fail: no user set');
-                console.log(e);
+                // @todo PASSBOLT-1470
+                //console.log('passbolt.user.get fail: no user set');
+                //console.log(e);
             });
     };
 
@@ -216,7 +192,7 @@ $(function() {
     var init = function () {
         getUser();
         getKeys();
-		getLocalStorageInfo();
+		    getLocalStorageInfo();
     };
     init();
 

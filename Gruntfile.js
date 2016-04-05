@@ -95,13 +95,13 @@ module.exports = function(grunt) {
 	// Register Tasks
 
 	// Bower deploy
-	grunt.registerTask('styleguide-deploy', ['shell:updatestyleguide','copy:styleguide','shell:jpmxpi']);
+	grunt.registerTask('styleguide-update', ['shell:updatestyleguide','copy:styleguide','shell:jpmxpi']);
 
-    // Build xpi in debug and non-debug version.
-    grunt.registerTask('build-xpi', ['shell:jpmxpi']);
+  // Build xpi in debug and non-debug version.
+  grunt.registerTask('build-xpi', ['shell:jpmxpi']);
 
-    // Build xpi in debug and non-debug version.
-    grunt.registerTask('push-xpi', ['shell:xpiinstall']);
+  // Build xpi in debug and non-debug version.
+  grunt.registerTask('push-xpi', ['shell:xpiinstall']);
 
 	// 'grunt' will check code quality, and if no errors,
 	// compile LESS to CSS, and minify and concatonate all JS and CSS

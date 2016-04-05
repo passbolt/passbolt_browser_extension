@@ -85,7 +85,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     step._flushSetup = function() {
         return passbolt.request('passbolt.setup.flush')
             .fail(function (error) {
-                console.log('error while flushing setup', error);
+                //@todo PASSBOLT-1471
+                //console.log('error while flushing setup', error);
             });
     };
 

@@ -46,7 +46,8 @@ $(function() {
                 });
             })
             .fail(function(){
-                console.log('passbolt.keyring.server.get fail: no server key set');
+                //@todo PASSBOLT-1471
+                //console.log('passbolt.keyring.server.get fail: no server key set');
             });
     };
 

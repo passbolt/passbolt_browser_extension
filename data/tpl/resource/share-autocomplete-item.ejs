@@ -7,8 +7,8 @@
                         <img src="<%= user.Profile.Avatar.url.small %>"/>
                     </div>
                     <div class="group">
-                        <span class="name"><%= user.Profile.first_name %> <%= user.Profile.last_name %></span>
-                        <span class="details" title="<%= user.Gpgkey.fingerprint %>"><%= user.Gpgkey.fingerprint %></span>
+                        <span class="name"><%= user.Profile.first_name %> <%= user.Profile.last_name %> (<%= user.Gpgkey.key_id %>)</span>
+                        <span class="details" title="<%= user.User.username %>"><%= user.User.username %></span>
                     </div>
                 </a>
             </div>

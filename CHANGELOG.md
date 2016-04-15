@@ -4,8 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.9] - 2016-04-15
+### Fixed
+- PASSBOLT-1408: As a LU I should see the email addresses of the people I'm sharing a password with.
+
 ## [1.0.8] - 2016-04-05
-- PASSBOLT-1455: As a AP during setup I should not see Learn more broken links
+### Fixed
+- PASSBOLT-1455: As a AP during setup I should not see Learn more broken links.
 - PASSBOLT-1158: Cleanup: remove useless console.log() from the code.
 
 ## [1.0.7] - 2016-04-04
@@ -36,6 +41,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.6...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.8...HEAD
+[1.0.8]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.7...v1.0.8
+[1.0.7]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.6...v1.0.7
 [1.0.6]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.5...v1.0.6
 [1.0.5]: https://github.com/passbolt/passbolt_firefox/compare/1.0.4...v1.0.5

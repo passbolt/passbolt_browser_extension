@@ -119,5 +119,7 @@ Legal
 =====
 
 Terms and conditions: https://www.passbolt.com/terms
+
 Privacy Policy: https://www.passbolt.com/privacy
+
 Credits: https://www.passbolt.com/credits

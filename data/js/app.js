@@ -170,6 +170,19 @@ window.addEventListener('passbolt.secret_edition.encrypt', function(event) {
     });
 });
 
+// When the application wants to know if the secret is valid or not.
+// Dispatch this event to the secret edition iframe which is able to know if the secret is valid.
+window.addEventListener('passbolt.secret_edition.validate', function(event) {
+  // Transfer the event to Secret listener.
+  passbolt.requestOn('Secret', 'passbolt.secret_edition.validate')
+    .then(function() {
+      passbolt.event.triggerToPage('secret_edition_secret_validated', [true]);
+    })
+    .fail(function() {
+      passbolt.event.triggerToPage('secret_edition_secret_validated', [false]);
+    });
+});
+
 // Intercept the request passbolt.secret.focus
 // And transfer the event to the appropriate component.
 window.addEventListener('passbolt.secret.focus', function(event) {

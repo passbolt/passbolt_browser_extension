@@ -1,10 +1,10 @@
 /**!
  * @name		passbolt-styleguide
- * @version		v0.3.27
- * @date		2016-03-09
- * @copyright	Copyright 2015, Bolt Softwares Private Ltd
+ * @version		v1.0.17
+ * @date		2016-04-22
+ * @copyright	Copyright 2016, Bolt Softwares Private Ltd
  * @source		https://github.com/passbolt/passbolt_styleguide
- * @license		GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ * @license		AGPL-3.0
  */
 
 .passbolt-plugin-dialog{position:absolute;top:0;left:0;width:100%;height:100%;z-index:500}#passbolt-iframe-secret-edition{width:100%;display:block;height:5em}#passbolt-iframe-password-share{width:100%;display:block}#passbolt-iframe-password-share-autocomplete{position:absolute;top:0;left:0;width:100%;z-index:898}@media all and (max-width:440px){#passbolt-iframe-secret-edition{height:8em}#passbolt-iframe-password-share-autocomplete{top:0;position:relative}}#passbolt-iframe-login-form{width:100%;height:16.6em;margin-top:.5em;padding-left:.5em;margin-bottom:-6%}#passbolt-iframe-master-password{z-index:992}#passbolt-iframe-progress-dialog{z-index:993}

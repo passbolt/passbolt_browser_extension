@@ -15,6 +15,7 @@ $(document).bind('template-ready', function() {
         $secretStrength = $('#js_secret_strength'),
         $securityToken = $('.security-token'),
         $generateSecretButton = $('#js_secret_generate'),
+        $feedback = $('#js_field_password_feedback'),
         currentSecret = '',
         originalSecret = '',
         initialSecretPlaceholder = $secret.attr('placeholder');
@@ -59,6 +60,56 @@ $(document).bind('template-ready', function() {
             }
             $secretStrength.addClass(secretComplexity.STRENGTH[strength].id);
         });
+    };
+
+    /**
+    * Validate the secret.
+    */
+    var validate = function() {
+        var deferred = null;
+
+        // If the secret hasn't been decrypted, we consider it is valid.
+        if (!isDecrypted) {
+            deferred = $.Deferred();
+            deferred.resolveWith(true);
+        } else {
+            deferred = passbolt.request('passbolt.secret.validate', {data: $secret.val()});
+            deferred.then(function(){
+                // If the validation is a success, hide the error feedback.
+                $feedback.hide();
+
+                // Unmark the field.
+                $secret.removeClass('error');
+                $secretClear.removeClass('error');
+
+                // Resize the iframe to fit the content.
+                passbolt.helper.html.resizeIframe('#passbolt-iframe-secret-edition', {
+                    width: '100%'
+                });
+            }).fail(function(message, validationErrors){
+                var error = '';
+
+                // Mark the field.
+                $secret.addClass('error');
+                $secretClear.addClass('error');
+
+                // Display the error feedback.
+                for (var i in validationErrors) {
+                    for (var fieldName in validationErrors[i])
+                    error += validationErrors[i][fieldName] + ' ';
+                }
+                $feedback
+                  .html(error)
+                  .show();
+
+                // Resize the iframe to fit the content.
+                passbolt.helper.html.resizeIframe('#passbolt-iframe-secret-edition', {
+                    width: '100%'
+                });
+            });
+        }
+
+        return deferred;
     };
 
     /**
@@ -122,6 +173,20 @@ $(document).bind('template-ready', function() {
             passbolt.message('passbolt.secret_edition.is_updated.complete')
                 .publish(token, 'SUCCESS', secretIsUpdated());
         });
+
+    // Listen when the app wants to validate the secret.
+    passbolt.message('passbolt.secret_edition.validate')
+      .subscribe(function(token) {
+          validate()
+            .then(function() {
+              passbolt.message('passbolt.secret_edition.validate.complete')
+                .publish(token, 'SUCCESS');
+            })
+            .fail(function(message, validationErrors) {
+                passbolt.message('passbolt.secret_edition.validate.complete')
+                  .publish(token, 'ERROR');
+            });
+      });
 
     // Listen when the user wants to encrypt the secret for all the users the resource is shared with.
     passbolt.message('passbolt.secret_edition.encrypt')

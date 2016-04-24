@@ -19,7 +19,7 @@ var secretComplexity = {};
     },
     1: {
       id: 'very_weak',
-      label: 'very weak',
+      label: 'very weak'
     },
     60: {
       id: 'weak',
@@ -62,7 +62,7 @@ var secretComplexity = {};
     'special': {
       size:32,
         // ASCII Code = 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 58, 59, 60, 61, 62, 63, 64, 91, 92, 93, 94, 95, 96, 123, 124, 125, 126
-        data: '!"#$%&\'()*+,-./:;<=>?@[:]^_`{|}~',
+        data: '!"#$%&\'()*+,-./:;<=>?@[:\\]^_`{|}~',
         pattern: /[!"#$%&\'\(\)*+,\-./:;<=>?@\[\]^_`{|}~]/
     }
   };
@@ -75,7 +75,7 @@ var secretComplexity = {};
    * @returns {*}
    */
   var randomRange = function(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   };
 
   /**
@@ -103,7 +103,7 @@ var secretComplexity = {};
     }
 
     return calculEntropy(pwd.length, maskSize);
-  }
+  };
   exports.entropy = entropy;
 
   /**
@@ -155,8 +155,8 @@ var secretComplexity = {};
     var secret = '',
       mask = [],
       masks = masks || ["alpha", "uppercase", "digit", "special"],
-      length = length || 13,
-      expectedEntropy;
+      length = length || 18,
+      expectedEntropy = null;
 
     // Build the mask to use to generate a secret.
     for (var i in masks) {
@@ -164,11 +164,11 @@ var secretComplexity = {};
     }
 
     // Generate a password which should fit the expected entropy.
-    // Try maximym 10 times.
+    // Try maximum 10 times.
     var j = 0;
     do {
       secret = '';
-      expectedEntropy = calculEntropy(length, mask.length)
+      expectedEntropy = calculEntropy(length, mask.length);
       for (var i=0; i<length; i++) {
         secret += mask[randomRange(0, mask.length-1)];
       }

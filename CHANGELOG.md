@@ -4,7 +4,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [1.0.9] - 2016-04-15
+## [1.0.9-b] - 2016-04-25
+### Fixed
+- PASSBOLT-1457: As LU, I should not be able to create a resource without password.
+- PASSBOLT-1441: Wordsmithing: a parenthesis is missing on set a security token step.
+- PASSBOLT-1158: Remove all errors (plugin/client) from the browser console at passbolt start.
+
+### Changed
+- PASSBOLT-1456: When generating a password automatically it only generates a "fair" level password.
+
+## [1.0.9-a] - 2016-04-15
 ### Fixed
 - PASSBOLT-1408: As a LU I should see the email addresses of the people I'm sharing a password with.
 
@@ -41,9 +50,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.10...HEAD
-[1.0.10]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.9...v1.0.10
-[1.0.9]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.8...v1.0.9
+[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.9-b...HEAD
+[1.0.10]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.9-a...v1.0.9-b
+[1.0.9]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.8...v1.0.9-a
 [1.0.8]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.7...v1.0.8
 [1.0.7]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.6...v1.0.7
 [1.0.6]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.5...v1.0.6

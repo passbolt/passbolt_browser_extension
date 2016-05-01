@@ -49,6 +49,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      *  Chainable functions
      * ================================================================================== */
 
+
     /**
      * Fetch server key.
      *
@@ -90,6 +91,32 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     step._displayKeyInfo = function (keyInfo) {
         step.elts.$fingerprintInput.attr('value', keyInfo.fingerprint.toUpperCase());
         step.elts.$domainCheckboxWrapper.css('visibility', 'visible');
+    };
+
+    /**
+     * Get user domain.
+     *
+     * @returns {*}
+     * @private
+     */
+    step._getUserDomain = function() {
+        return passbolt.request('passbolt.user.settings.get.domain')
+            .then(function(domain) {
+                return domain;
+            });
+    };
+
+    /**
+     * Get user data.
+     * @returns {*}
+     * @private
+     */
+    step._getUserData = function(domain) {
+        return passbolt.request('passbolt.user.get', {user:['firstname', 'lastname', 'username']})
+            .then(function(user) {
+                user.domain = domain;
+                return user;
+            });
     };
 
 
@@ -170,6 +197,25 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
         // username and name is set, get the server key.
         step.fetchServerKey();
+
+        // Check if server is already configured, and display warning.
+        console.log('check is configured');
+        passbolt.request('passbolt.addon.isConfigured')
+            .then(function (isConfigured) {
+                if (isConfigured) {
+                    step._getUserDomain()
+                        .then(step._getUserData)
+                        .then(function(userSettings) {
+                            getTpl('./tpl/setup/already_configured.ejs', function (tpl) {
+                                $('.plugin-check .message')
+                                    .html(new EJS({text: tpl}).render(userSettings))
+                                    .parent()
+                                    .removeClass('success')
+                                    .addClass('warning');
+                            });
+                        });
+                }
+            });
 
         // Bind domain check change event.
         step.elts.$domainCheckbox.change(step.onDomainCheck);

@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- PASSBOLT-1316: As a AP trying to register again, I should see an information message informing me that the plugin is already configured.
 
 ## [1.0.9-b] - 2016-04-25
 ### Fixed
@@ -50,8 +52,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.9-b...HEAD
-[1.0.10]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.9-a...v1.0.9-b
+[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.10...HEAD
+[1.0.10]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.9-b...v1.0.10
+[1.0.9-b]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.9-a...v1.0.9-b
 [1.0.9]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.8...v1.0.9-a
 [1.0.8]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.7...v1.0.8
 [1.0.7]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.6...v1.0.7

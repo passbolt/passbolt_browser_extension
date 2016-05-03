@@ -86,7 +86,9 @@ $(document).bind('template-ready', function() {
     *  Add-on Code Events Listeners
     * ================================================================================== */
 
-    // Wrong master password.
+    /**
+     * Handles wrong master password scenario.
+     */
     passbolt.message('passbolt.keyring.master.request.complete')
         .subscribe(function(token, status, attempts) {
             if (status == 'ERROR') {
@@ -110,21 +112,34 @@ $(document).bind('template-ready', function() {
     *  View Events Listeners
     * ================================================================================== */
 
-    // The user clicks on OK.
-    $masterPasswordSubmit.on('click', function() {
+    /**
+     * Submit handler.
+     */
+    var onSubmit = function() {
         $masterPasswordSubmit.addClass('processing');
-        self.port.emit("passbolt.keyring.master.request.submit", passbolt.context.token, $masterPassword.val());
+        var masterPassword = $masterPassword.val();
+        // TODO : add condition.
+        passbolt.request('passbolt.user.rememberMasterPassword', masterPassword, 1000);
+        self.port.emit("passbolt.keyring.master.request.submit", passbolt.context.token, masterPassword);
+    };
+
+    /**
+     * Event when the user clicks on ok.
+     */
+    $masterPasswordSubmit.on('click', function() {
+        onSubmit();
     });
 
-    // The user presses a key.
+    /**
+     * Event when the user presses a key.
+     */
     $masterPassword.keypress(function(e) {
         // Get keycode.
         var keycode = e.keyCode || e.which;
 
         // The user presses enter.
         if(keycode == 13) {
-            $masterPasswordSubmit.addClass('processing');
-            self.port.emit("passbolt.keyring.master.request.submit", passbolt.context.token, $masterPassword.val());
+            onSubmit();
         }
         // The user presses escape.
         else if(keycode == 27) {
@@ -132,7 +147,9 @@ $(document).bind('template-ready', function() {
         }
     });
 
-    // The user wants to close the dialog.
+    /**
+     * Event when the user clicks on close button.
+     */
     $('body').on('click', '.js-dialog-close', function(ev) {
         ev.preventDefault();
         passbolt.messageOn('App', 'passbolt.keyring.master.request.close');

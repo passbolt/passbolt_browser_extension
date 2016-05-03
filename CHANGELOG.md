@@ -3,8 +3,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.0.10] - 2016-05-03
 ### Changed
 - PASSBOLT-1316: As a AP trying to register again, I should see an information message informing me that the plugin is already configured.
+
 
 ## [1.0.9-b] - 2016-04-25
 ### Fixed

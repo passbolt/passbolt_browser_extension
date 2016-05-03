@@ -118,8 +118,9 @@ $(document).bind('template-ready', function() {
     var onSubmit = function() {
         $masterPasswordSubmit.addClass('processing');
         var masterPassword = $masterPassword.val();
-        // TODO : add condition.
-        passbolt.request('passbolt.user.rememberMasterPassword', masterPassword, 1000);
+        if ($('#js_remember_master_password').is(':checked')) {
+            passbolt.request('passbolt.user.rememberMasterPassword', masterPassword, 1000);
+        }
         self.port.emit("passbolt.keyring.master.request.submit", passbolt.context.token, masterPassword);
     };
 

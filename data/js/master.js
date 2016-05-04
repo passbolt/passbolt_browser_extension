@@ -119,7 +119,7 @@ $(document).bind('template-ready', function() {
         $masterPasswordSubmit.addClass('processing');
         var masterPassword = $masterPassword.val();
         if ($('#js_remember_master_password').is(':checked')) {
-            passbolt.request('passbolt.user.rememberMasterPassword', masterPassword, 1000);
+            passbolt.request('passbolt.user.rememberMasterPassword', masterPassword, 300);
         }
         self.port.emit("passbolt.keyring.master.request.submit", passbolt.context.token, masterPassword);
     };

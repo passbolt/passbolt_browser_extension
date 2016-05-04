@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- PASSBOLT-1108: As LU when entering my master key I can have the plugin remember it for 5 min.
 
 ## [1.0.10] - 2016-05-03
 ### Changed

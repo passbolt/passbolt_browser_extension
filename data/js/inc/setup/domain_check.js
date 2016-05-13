@@ -199,7 +199,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         step.fetchServerKey();
 
         // Check if server is already configured, and display warning.
-        console.log('check is configured');
         passbolt.request('passbolt.addon.isConfigured')
             .then(function (isConfigured) {
                 if (isConfigured) {
@@ -240,7 +239,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
             // If domain was set succesfully, attempt to import the server key.
             .then(function () {
-                return step.importServerKey(step._data.serverKeyInfo.key);
+                return step.setServerKey(step._data.serverKeyInfo.key);
             })
 
             // If server key was imported successfully, resolve submit.
@@ -288,14 +287,14 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
 
     /**
-     * Import the server key in the keyring.
+     * Set the server key in the settings.
      * Is called at the page submit.
      *
      * @param armoredServerKey
      * @returns {*}
      */
-    step.importServerKey = function (armoredServerKey) {
-        return passbolt.request('passbolt.keyring.server.import', armoredServerKey)
+    step.setServerKey = function (armoredServerKey) {
+        return passbolt.request('passbolt.setup.set', 'settings.armoredServerKey', armoredServerKey)
             .fail(function (errorMsg) {
                 step.onError(errorMsg);
             });

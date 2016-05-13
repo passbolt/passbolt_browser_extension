@@ -577,7 +577,7 @@ passbolt.setup.data = passbolt.setup.data || {};
      * @private
      */
     passbolt.setup._initValidateSettings = function(data) {
-        return passbolt.request('passbolt.user.settings.set.domain', data.settings.domain)
+        return passbolt.request('passbolt.user.settings.validate', data.settings, ['domain'])
             .then(function(settings) {
                 return data;
             });

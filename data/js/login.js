@@ -35,20 +35,31 @@ $(function() {
     passbolt.login.onStep0Start = function() {
         var $renderSpace = $('.login.page .js_main-login-section');
 
-        // Display information about the state of login
-        // e.g. that we're going to check for the server key first
-        passbolt.request('passbolt.keyring.server.get')
-            .then(function(serverKeyInfo) {
-                getTpl('./tpl/login/stage0.ejs', function (tpl) {
-                    var html = new EJS({text: tpl}).render({serverKeyId: serverKeyInfo.keyId.toUpperCase()});
-                    $renderSpace.html(html);
+        getTpl('./tpl/login/stage0.ejs', function (tpl) {
+            var html = new EJS({text: tpl}).render({serverKeyId: 'fetching...'});
+            $renderSpace.html(html);
+
+            // Display information about the state of login
+            // e.g. that we're going to check for the server key first
+            passbolt.request('passbolt.keyring.server.get')
+                .then(function(serverKeyInfo) {
+                    // Display server key in the box.
+                    $('#serverkey_id').text(serverKeyInfo.keyId.toUpperCase());
+
+                    // Starts checking server key.
                     passbolt.login.onStep0CheckServerKey();
+                })
+                .fail(function() {
+                    // Display error message.
+                    $('.plugin-check.gpg').removeClass('notice').addClass('error');
+                    $('.plugin-check.gpg .message').text('Error: Could not find server key');
+
+                    getTpl('./tpl/login/feedback-login-oops.ejs', function (tpl) {
+                        var html = new EJS({text: tpl}).render();
+                        $('.login.form').empty().append(html);
+                    });
                 });
-            })
-            .fail(function(){
-                //@todo PASSBOLT-1471
-                //console.log('passbolt.keyring.server.get fail: no server key set');
-            });
+        });
     };
 
     /**
@@ -154,6 +165,7 @@ $(function() {
             passbolt.login.onConfigurationMissing();
         }
     };
+
     passbolt.login.init();
 
 });

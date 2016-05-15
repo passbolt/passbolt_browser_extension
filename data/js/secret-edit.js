@@ -275,7 +275,7 @@ $(document).bind('template-ready', function() {
         if (!isDecrypted) {
             // If click is done while on the non decrypted state,
             // we remove the focus.
-            // We do that because the focus will be needed by the master password dialog.
+            // We do that because the focus will be needed by the passphrase dialog.
             $secret.blur();
 
             // Launch decryption.

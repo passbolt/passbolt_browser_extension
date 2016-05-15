@@ -101,7 +101,7 @@ $(document).bind('template-ready', function() {
         return false;
     });
 
-    // On keypress inside the master password field.
+    // On keypress inside the passphrase field.
     $masterPassword.keypress(function(e) {
         // Get keycode.
         var keycode = e.keyCode || e.which;

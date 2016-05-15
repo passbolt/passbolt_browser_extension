@@ -16,10 +16,10 @@ passbolt.message('passbolt.keyring.master.request.close')
   });
 
 // Intercept the request passbolt.keyring.master.request.
-// Display a popup to request the user master password.
+// Display a popup to request the user passphrase.
 passbolt.message('passbolt.keyring.master.request')
   .subscribe(function(token) {
-    // Inject the master password dialog into the web page DOM.
+    // Inject the passphrase dialog into the web page DOM.
     var $iframe = $('<iframe/>', {
       id: 'passbolt-iframe-master-password',
       src: 'about:blank?passbolt=masterInline',

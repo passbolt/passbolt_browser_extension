@@ -109,7 +109,7 @@ $(function() {
      */
     passbolt.login.onStep1RequestPassphrase = function () {
 
-        // Inject the master password dialog iframe into the web page DOM.
+        // Inject the passphrase dialog iframe into the web page DOM.
         var $iframe = $('<iframe/>', {
             id: passphraseIframeId,
             src: 'about:blank?passbolt=' + passphraseIframeId,

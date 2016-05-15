@@ -64,7 +64,7 @@ $(document).bind('template-ready', function() {
 
                 // If key pressed is not a control, or if tab.
                 if (valid || keycode == 9) {
-                    // Give focus to field master password.
+                    // Give focus to field passphrase.
                     $masterPassword.focus();
                 }
 
@@ -87,7 +87,7 @@ $(document).bind('template-ready', function() {
     * ================================================================================== */
 
     /**
-     * Handles wrong master password scenario.
+     * Handles wrong passphrase scenario.
      */
     passbolt.message('passbolt.keyring.master.request.complete')
         .subscribe(function(token, status, attempts) {
@@ -95,7 +95,7 @@ $(document).bind('template-ready', function() {
                 $masterPasswordSubmit.removeClass('processing');
                 $masterPassword.focus();
                 if (attempts < 3) {
-                    $('label[for="js_master_password"]').html('Please enter a valid master password.')
+                    $('label[for="js_master_password"]').html('Please enter a valid passphrase.')
                             .addClass('error');
                 } else {
                     getTpl('./tpl/master/master-password-failure.ejs', function(tpl) {

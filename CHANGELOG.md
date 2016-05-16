@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.0.11]
 ### Added
 - PASSBOLT-1108: As LU when entering my master key I can have the plugin remember it for 5 min.
 
@@ -60,7 +62,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.10...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.11...HEAD
+[1.0.11]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.10...v1.0.11
 [1.0.10]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.9-b...v1.0.10
 [1.0.9-b]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.9-a...v1.0.9-b
 [1.0.9]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.8...v1.0.9-a

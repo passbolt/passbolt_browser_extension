@@ -33,6 +33,14 @@ passbolt.bootstrap = passbolt.bootstrap || {};
             });
     };
 
+    // Get plugin version and add it in the footer.
+    passbolt.request('passbolt.addon.getVersion')
+        .then(function(version) {
+            var $versionElt = $('#version > a');
+            var appVersion = $versionElt.attr('data-tooltip');
+            $versionElt.attr('data-tooltip', (appVersion + ' / ' + version));
+        });
+
 	// check if the plugin is configured
 	passbolt.request('passbolt.addon.isConfigured')
 		.then(function (response) {

@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - PASSBOLT-959: Added plugin version number in footer.
+- PASSBOLT-1488: As AP, I shouldn't be able to complete the setup if I import a key that already exist on server.
 
 ## [1.0.11]
 ### Added

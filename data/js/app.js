@@ -16,10 +16,10 @@ passbolt.message('passbolt.keyring.master.request.close')
   });
 
 // Intercept the request passbolt.keyring.master.request.
-// Display a popup to request the user master password.
+// Display a popup to request the user passphrase.
 passbolt.message('passbolt.keyring.master.request')
   .subscribe(function(token) {
-    // Inject the master password dialog into the web page DOM.
+    // Inject the passphrase dialog into the web page DOM.
     var $iframe = $('<iframe/>', {
       id: 'passbolt-iframe-master-password',
       src: 'about:blank?passbolt=masterInline',
@@ -167,6 +167,19 @@ window.addEventListener('passbolt.secret_edition.encrypt', function(event) {
                 .publish(token);
             });
         });
+    });
+});
+
+// When the application wants to know if the secret is valid or not.
+// Dispatch this event to the secret edition iframe which is able to know if the secret is valid.
+window.addEventListener('passbolt.secret_edition.validate', function(event) {
+  // Transfer the event to Secret listener.
+  passbolt.requestOn('Secret', 'passbolt.secret_edition.validate')
+    .then(function() {
+      passbolt.event.triggerToPage('secret_edition_secret_validated', [true]);
+    })
+    .fail(function() {
+      passbolt.event.triggerToPage('secret_edition_secret_validated', [false]);
     });
 });
 

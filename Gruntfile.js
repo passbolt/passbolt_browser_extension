@@ -33,22 +33,22 @@ module.exports = function(grunt) {
 					stderr: false
 				},
 				command: [
-                    'rm -f passbolt@passbolt.com-*',
-                    'rm -f passbolt-latest@passbolt.com.xpi',
-                    "sed 's/[\"]debug[\"]:.*$/\"debug\": true/' ./lib/config/config.json > ./lib/config/config.json.tmp && mv ./lib/config/config.json.tmp ./lib/config/config.json",
-                    'jpm xpi',
-                    "find . -name '*.xpi' -exec sh -c 'mv \"$0\" \"${0%.xpi}-debug.xpi\"' {} \\;",
-                    "sed 's/[\"]debug[\"]:.*$/\"debug\": false/' ./lib/config/config.json > ./lib/config/config.json.tmp && mv ./lib/config/config.json.tmp ./lib/config/config.json",
-                    'jpm xpi',
-                    'ln -s `find . -name \'passbolt@passbolt.com-*[0-9].xpi\'` ./passbolt-latest@passbolt.com.xpi'
-                ].join('&&')
+					'rm -f passbolt@passbolt.com-*',
+					'rm -f passbolt-latest@passbolt.com.xpi',
+					"sed 's/[\"]debug[\"]:.*$/\"debug\": true/' ./lib/config/config.json > ./lib/config/config.json.tmp && mv ./lib/config/config.json.tmp ./lib/config/config.json",
+					'jpm xpi',
+					"find . -name '*.xpi' -exec sh -c 'mv \"$0\" \"${0%.xpi}-debug.xpi\"' {} \\;",
+					"sed 's/[\"]debug[\"]:.*$/\"debug\": false/' ./lib/config/config.json > ./lib/config/config.json.tmp && mv ./lib/config/config.json.tmp ./lib/config/config.json",
+					'jpm xpi',
+					'ln -s `find . -name \'passbolt@passbolt.com-*-debug.xpi\'` ./passbolt-latest@passbolt.com.xpi'
+				].join('&&')
 			},
-            xpiinstall: {
-                options: {
-                    stderr: false
-                },
-                command: 'wget --post-file=`find . -name \'passbolt@passbolt.com-*-debug.xpi\'` http://localhost:8888/'
-            }
+			xpiinstall: {
+				options: {
+					stderr: false
+				},
+				command: 'wget --post-file=`find . -name \'passbolt@passbolt.com-*-debug.xpi\'` http://localhost:8888/'
+			}
 		},
 		copy: {
 			styleguide : {
@@ -67,11 +67,11 @@ module.exports = function(grunt) {
 					dest: '<%= config.webroot %>/img',
 					expand: true
 				},{
-						// Less
-						cwd: '<%= config.modules_path %>/<%= config.styleguide %>/build/css',
-						src: ['config_debug_ff.min.css', 'external.min.css', 'login.min.css', 'main_ff.min.css','setup_ff.min.css'],
-						dest: '<%= config.webroot %>/css',
-						expand: true
+					// Less
+					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/build/css',
+					src: ['config_debug_ff.min.css', 'external.min.css', 'login.min.css', 'main_ff.min.css','setup_ff.min.css'],
+					dest: '<%= config.webroot %>/css',
+					expand: true
 				}]
 			}
 		}
@@ -95,13 +95,13 @@ module.exports = function(grunt) {
 	// Register Tasks
 
 	// Bower deploy
-	grunt.registerTask('styleguide-deploy', ['shell:updatestyleguide','copy:styleguide','shell:jpmxpi']);
+	grunt.registerTask('styleguide-update', ['shell:updatestyleguide','copy:styleguide','shell:jpmxpi']);
 
-    // Build xpi in debug and non-debug version.
-    grunt.registerTask('build-xpi', ['shell:jpmxpi']);
+	// Build xpi in debug and non-debug version.
+	grunt.registerTask('build-xpi', ['shell:jpmxpi']);
 
-    // Build xpi in debug and non-debug version.
-    grunt.registerTask('push-xpi', ['shell:xpiinstall']);
+	// Build xpi in debug and non-debug version.
+	grunt.registerTask('push-xpi', ['shell:xpiinstall']);
 
 	// 'grunt' will check code quality, and if no errors,
 	// compile LESS to CSS, and minify and concatonate all JS and CSS

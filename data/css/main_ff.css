@@ -135,6 +135,16 @@ html body .hidden {
   -moz-animation-iteration-count: infinite;
   -moz-animation-timing-function: linear;
 }
+/* list */
+/* seriously? */
+.blink {
+  animation: blinker 1s linear infinite;
+}
+@keyframes blinker {
+  50% {
+    opacity: 0.0;
+  }
+}
 /* palette */
 /* borders */
 /* font */
@@ -782,7 +792,7 @@ h3 {
 }
 /* paragraph */
 p {
-  margin: 0 0 .75em 0;
+  margin: 0 0 1em 0;
 }
 .code {
   font-family: "Courier New", Courier, monospace;
@@ -790,15 +800,41 @@ p {
   /* 11px base 16 */
 }
 /* lists */
+article ul {
+  list-style-type: circle;
+  margin: 0 0 1em 0;
+}
 article ul li {
-  list-style: circle;
-  margin-left: 1em;
+  margin-left: 1.1em;
   padding-left: .5em;
   margin-bottom: .5em;
+  list-style-type: circle;
 }
 article ul.double {
   width: 48%;
   float: left;
+}
+article ul.disc {
+  list-style-type: disc;
+}
+article ul.square {
+  list-style-type: square;
+}
+article ol {
+  margin: 0 0 1em 0;
+  list-style-type: decimal;
+}
+article ol li {
+  /* more margin needed for long numbered lists */
+  margin-left: 2em;
+  padding-left: 1em;
+  margin-bottom: .5em;
+}
+article ol.upper-roman {
+  list-style-type: upper-roman;
+}
+article ol.lower-alpha {
+  list-style-type: lower-alpha;
 }
 /*!
  *  Font Awesome 4.5.0 by @davegandy - http://fontawesome.io - @fontawesome
@@ -3132,12 +3168,15 @@ html body .button.processing {
   height: 100%;
   position: absolute;
   content: " ";
-  top: -2px;
-  left: -2px;
+  top: -1px;
+  left: -1px;
   background: #ffffff url('../img/controls/loading.gif') center center no-repeat;
   border: 1px solid #CCC;
   border-radius: 5px;
   padding: 1px;
+}
+.button-spacer {
+  margin-right: .5em;
 }
 /*
 	Base form components styling
@@ -3458,6 +3497,35 @@ input[type=text].fluid {
 	height: 100%;
 }
 */
+.logo img {
+  max-width: 150px;
+}
+.logo.no-img {
+  background: transparent url('../img/logo/logo.png') 0 0 no-repeat;
+  background-size: 150px auto;
+  width: 150px;
+  height: 30px;
+}
+.logo h1 {
+  display: none;
+}
+.logo.bigger {
+  background: transparent url('../img/logo/logo@2x.png') 0 0 no-repeat;
+  background-size: 200px auto;
+  width: 200px;
+  height: 45px;
+}
+/* CSS for serving the retina image to devices with a high "device-pixel-ratio": */
+@media only screen and (-moz-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-devicepixel-ratio: 1.5), only screen and (min-resolution: 1.5dppx) {
+  .logo.no-img {
+    background: transparent url('../img/logo/logo@2x.png') 0 0 no-repeat;
+    background-size: 150px auto;
+  }
+  .logo.bigger {
+    background: transparent url('../img/logo/logo@2x.png') 0 0 no-repeat;
+    background-size: 200px auto;
+  }
+}
 /* Small Progress bar */
 .progress-bar {
   background: transparent;
@@ -3992,6 +4060,9 @@ input[type=text].fluid {
     font-size: .831em;
     margin-top: .5em;
   }
+  .fa.fa-lg {
+    line-height: 1;
+  }
 }
 /* gpg textarea is large and tall */
 .gpgkey.input.textarea textarea {
@@ -4124,8 +4195,15 @@ input[type=text].fluid {
     max-height: none;
   }
 }
-.master-password.dialog {
-  /* PASSBOLT-1108 */
+.input-password-wrapper {
+  overflow: hidden;
+}
+.input-password-wrapper .message.error {
+  display: block;
+  clear: both;
+  width: 92%;
+  padding-bottom: .5em;
+  font-size: .813em;
 }
 .master-password.dialog label {
   margin-bottom: 1em;
@@ -4138,9 +4216,6 @@ input[type=text].fluid {
   border-width: 0;
   font-size: 0;
   line-height: 0;
-}
-.master-password.dialog .input.checkbox {
-  visibility: hidden;
 }
 .master-password.login-form input[type=text],
 .master-password.login-form input[type=password] {

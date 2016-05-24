@@ -56,8 +56,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         step.elts.$errorFeedback
             .removeClass('hidden')
             .html(errorMessage);
-
-        console.log(errorMessage);
     };
 
     /* ==================================================================================
@@ -102,7 +100,9 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
         step.elts.$errorFeedback.addClass('hidden');
 
-        return step.importPrivateKey(key)
+        return step.extractKeyInfo(key)
+            .then(step.checkKeyDontExistRemotely)
+            .then(step.importPrivateKey)
             .then(step.extractPublicKey)
             .then(function(publicKeyArmored) {
                 passbolt.setup.set('key.publicKeyArmored', publicKeyArmored);
@@ -138,7 +138,36 @@ passbolt.setup.steps = passbolt.setup.steps || {};
                 step.data.privateKeyArmored = data;
                 return data;
             });
-    };
+    },
+
+  /**
+   * Extract key info from private key.
+   */
+    step.extractKeyInfo = function(armoredPrivateKey) {
+        return passbolt.request('passbolt.keyring.public.info', armoredPrivateKey)
+            .then(function(info) {
+                step.data.privateKeyInfo = info;
+                return armoredPrivateKey;
+            });
+    },
+
+    /**
+     * Check that the key doesn't already exist on server.
+     * @param armoredPrivateKey
+     *   armored private key
+     * @return promise
+     */
+    step.checkKeyDontExistRemotely = function (armoredPrivateKey) {
+        var def = $.Deferred();
+        passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
+            .then(function() {
+                def.reject('This key  is already used by another user');
+            })
+            .fail(function() {
+                def.resolve(armoredPrivateKey);
+            });
+        return def;
+    },
 
     /**
      * Import a private key in the keyring.

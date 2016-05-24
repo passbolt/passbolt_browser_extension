@@ -33,6 +33,14 @@ passbolt.bootstrap = passbolt.bootstrap || {};
             });
     };
 
+    // Get plugin version and add it in the footer.
+    passbolt.request('passbolt.addon.getVersion')
+        .then(function(version) {
+            var $versionElt = $('#version > a');
+            var appVersion = $versionElt.attr('data-tooltip');
+            $versionElt.attr('data-tooltip', (appVersion + ' / ' + version));
+        });
+
 	// check if the plugin is configured
 	passbolt.request('passbolt.addon.isConfigured')
 		.then(function (response) {
@@ -54,12 +62,10 @@ passbolt.bootstrap = passbolt.bootstrap || {};
 
 	// check if it is a passbolt app instance on the login page
 	if($('html.passbolt .login.page').length) {
-        console.log('login page');
         // If passbolt is configured.
         passbolt.request('passbolt.addon.isConfigured')
             .then(function (response) {
                 if (response === true) {
-                    console.log('login page configured');
                     // If domain is right.
                     passbolt.request('passbolt.addon.checkDomain').then(
                         function success(response) {

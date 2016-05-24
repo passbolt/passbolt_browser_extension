@@ -577,7 +577,7 @@ passbolt.setup.data = passbolt.setup.data || {};
      * @private
      */
     passbolt.setup._initValidateSettings = function(data) {
-        return passbolt.request('passbolt.user.settings.set.domain', data.settings.domain)
+        return passbolt.request('passbolt.user.settings.validate', data.settings, ['domain'])
             .then(function(settings) {
                 return data;
             });
@@ -620,7 +620,6 @@ passbolt.setup.data = passbolt.setup.data || {};
      * @private
      */
     passbolt.setup._initError = function(errorMsg, extraData) {
-        console.log('An error happened while initializing the setup : ', errorMsg, extraData);
         passbolt.setup.fatalError(errorMsg, extraData);
     };
 

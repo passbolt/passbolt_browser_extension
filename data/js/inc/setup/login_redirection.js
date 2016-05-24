@@ -85,7 +85,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     step._flushSetup = function() {
         return passbolt.request('passbolt.setup.flush')
             .fail(function (error) {
-                console.log('error while flushing setup', error);
+                //@todo PASSBOLT-1471
+                //console.log('error while flushing setup', error);
             });
     };
 
@@ -116,7 +117,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     step._validateAccount = function(setupData) {
         return passbolt.request('passbolt.setup.save', setupData)
             .fail(function (error) {
-                console.log('error while saving information', error.message, error.data);
                 // Throw fatal error.
                 passbolt.setup.fatalError(error.message, error.data);
             });

@@ -1,5 +1,5 @@
 /**
- * Passbolt master password setup step.
+ * Passbolt passphrase setup step.
  *
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
@@ -12,8 +12,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
     var step = {
         'id': 'secret',
-        'title': 'Now let\'s setup your master password!',
-        'label': '3. Set a master password',
+        'title': 'Now let\'s setup your passphrase!',
+        'label': '3. Set a passphrase',
         'parents': ['define_key'],
         'next': 'generate_key',
         'viewData': {},

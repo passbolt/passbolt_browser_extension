@@ -90,7 +90,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @param errorMsg
      */
     step.onError = function(errorMsg) {
-        console.log('error while generating key', errorMsg);
         passbolt.setup.fatalError(errorMsg);
     };
 

@@ -60,7 +60,6 @@ $(document).bind('template-ready', function() {
     };
 
     var onValidPassphrase = function () {
-        console.log('onvalidpassphrase');
         $loginMessage.removeClass('error');
         passbolt.request('passbolt.auth.login', $masterPassword.val());
             /**
@@ -102,7 +101,7 @@ $(document).bind('template-ready', function() {
         return false;
     });
 
-    // On keypress inside the master password field.
+    // On keypress inside the passphrase field.
     $masterPassword.keypress(function(e) {
         // Get keycode.
         var keycode = e.keyCode || e.which;

@@ -49,6 +49,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      *  Chainable functions
      * ================================================================================== */
 
+
     /**
      * Fetch server key.
      *
@@ -92,6 +93,32 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         step.elts.$domainCheckboxWrapper.css('visibility', 'visible');
     };
 
+    /**
+     * Get user domain.
+     *
+     * @returns {*}
+     * @private
+     */
+    step._getUserDomain = function() {
+        return passbolt.request('passbolt.user.settings.get.domain')
+            .then(function(domain) {
+                return domain;
+            });
+    };
+
+    /**
+     * Get user data.
+     * @returns {*}
+     * @private
+     */
+    step._getUserData = function(domain) {
+        return passbolt.request('passbolt.user.get', {user:['firstname', 'lastname', 'username']})
+            .then(function(user) {
+                user.domain = domain;
+                return user;
+            });
+    };
+
 
     /* ==================================================================================
      *  Content code events
@@ -102,7 +129,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @param errorMessage
      */
     step.onErrorServerKey = function (errorMessage) {
-        console.log("error retrieving server key : ", errorMessage);
         step.elts.$fingerprintWrapper.addClass('error');
         step.elts.$fingerprintError.text("Could not retrieve server key. Please contact administrator.");
     };
@@ -142,7 +168,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @param errorMsg
      */
     step.onError = function (errorMsg) {
-        console.log('Error : ', errorMsg);
         step.elts.$feedbackError
             .removeClass('hidden')
             .text(errorMsg);
@@ -173,6 +198,24 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         // username and name is set, get the server key.
         step.fetchServerKey();
 
+        // Check if server is already configured, and display warning.
+        passbolt.request('passbolt.addon.isConfigured')
+            .then(function (isConfigured) {
+                if (isConfigured) {
+                    step._getUserDomain()
+                        .then(step._getUserData)
+                        .then(function(userSettings) {
+                            getTpl('./tpl/setup/already_configured.ejs', function (tpl) {
+                                $('.plugin-check .message')
+                                    .html(new EJS({text: tpl}).render(userSettings))
+                                    .parent()
+                                    .removeClass('success')
+                                    .addClass('warning');
+                            });
+                        });
+                }
+            });
+
         // Bind domain check change event.
         step.elts.$domainCheckbox.change(step.onDomainCheck);
 
@@ -196,7 +239,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
             // If domain was set succesfully, attempt to import the server key.
             .then(function () {
-                return step.importServerKey(step._data.serverKeyInfo.key);
+                return step.setServerKey(step._data.serverKeyInfo.key);
             })
 
             // If server key was imported successfully, resolve submit.
@@ -208,7 +251,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
             // In case of error,  display fatal error.
             .fail(function (msg) {
-                console.log(msg);
                 passbolt.setup.fatalError(msg);
             });
 
@@ -245,14 +287,14 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
 
     /**
-     * Import the server key in the keyring.
+     * Set the server key in the settings.
      * Is called at the page submit.
      *
      * @param armoredServerKey
      * @returns {*}
      */
-    step.importServerKey = function (armoredServerKey) {
-        return passbolt.request('passbolt.keyring.server.import', armoredServerKey)
+    step.setServerKey = function (armoredServerKey) {
+        return passbolt.request('passbolt.setup.set', 'settings.armoredServerKey', armoredServerKey)
             .fail(function (errorMsg) {
                 step.onError(errorMsg);
             });

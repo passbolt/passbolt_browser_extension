@@ -8,16 +8,10 @@
 	(c) 2016 Bolt Softwares Pvt Ltd
 
 
-Legal
-===============================
+Licence
+==============
 
-Copyright 2016 Bolt Softwares Private Limited
-
-Terms and conditions: https://www.passbolt.com/terms
-Privacy Policy: https://www.passbolt.com/privacy
-Licence (code): http://www.gnu.org/licenses/agpl-3.0.en.html
-Licence (text & art): http://creativecommons.org/licenses/by-nc-sa/3.0/
-Credits: https://www.passbolt.com/credits
+Passbolt firefox plugin is distributed under [Affero General Public License v3](http://www.gnu.org/licenses/agpl-3.0.html)
 
 
 Prerequisite
@@ -121,3 +115,7 @@ Make sure Grunt watch for less changes and compile them into CSS
 Edit one LESS file to see if it works!
 Make sure that if you need to make change the styleguide to request changes upstream.
 
+Credits
+=======
+
+https://www.passbolt.com/credits

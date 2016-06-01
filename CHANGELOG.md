@@ -2,10 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.0.12]
 ### Added
 - PASSBOLT-959: Added plugin version number in footer.
 - PASSBOLT-1488: As AP, I shouldn't be able to complete the setup if I import a key that already exist on server.
+
+### Fixed
+- PASSBOLT-1255: Button height issues + missing tooltip on setup
 
 ## [1.0.11]
 ### Added
@@ -65,7 +68,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.11...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.12...HEAD
+[1.0.11]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.11...v1.0.12
 [1.0.11]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.10...v1.0.11
 [1.0.10]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.9-b...v1.0.10
 [1.0.9-b]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.9-a...v1.0.9-b

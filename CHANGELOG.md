@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Fixed
+- PASSBOLT-1366: Worker bug when multiple passbolt instances are open in multiple windows
+
 ## [1.0.12]
 ### Added
 - PASSBOLT-959: Added plugin version number in footer.

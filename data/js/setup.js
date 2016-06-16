@@ -629,8 +629,6 @@ passbolt.setup.data = passbolt.setup.data || {};
      */
     passbolt.setup.init = function (data) {
 
-        //passbolt.setup.set('stepId', '');
-        //passbolt.setup.set('stepsHistory', '');
 
         // Build setup data.
         var setupData = {
@@ -645,6 +643,16 @@ passbolt.setup.data = passbolt.setup.data || {};
                 id: data.userId
             }
         };
+
+        // Init step settings according to config given.
+        for (var stepId in passbolt.setup.steps) {
+            // Get corresponding step.
+            var stepId = passbolt.setup.steps[stepId].id;
+            if (passbolt.setup.workflow[data.workflow][stepId] != undefined) {
+                var workflow = passbolt.setup.workflow[data.workflow][stepId];
+                passbolt.setup.steps[stepId] = $.extend(passbolt.setup.steps[stepId], workflow);
+            }
+        }
 
         passbolt.setup._initPrepareData(setupData)
             .then(passbolt.setup._initValidateUser)

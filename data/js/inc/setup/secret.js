@@ -12,15 +12,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
     var step = {
         'id': 'secret',
-        'title': 'Now let\'s setup your passphrase!',
-        'label': '3. Set a passphrase',
-        'parents': ['define_key'],
-        'next': 'generate_key',
-        'viewData': {},
-        'defaultActions': {
-            'submit': 'disabled',
-            'cancel': 'enabled'
-        },
         'elts' : {
             password : '#js_field_password',
             passwordClear : '#js_field_password_clear',

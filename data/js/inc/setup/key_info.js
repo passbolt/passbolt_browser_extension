@@ -12,14 +12,20 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
     var step = {
         'id': 'key_info',
-        'label': '3. Review key info',
-        'title': 'Let\'s make sure you imported the right key',
-        'parents': ['import_key'],
-        'next': 'security_token',
-        'viewData': {},
         'keyinfo': {},
         'data' : {},
         'status': ''
+    };
+
+    /* ==================================================================================
+     *  Chainable functions.
+     * ================================================================================== */
+
+    step._getKeyInfo = function(privateKeyArmored) {
+        return passbolt.request('passbolt.keyring.public.info', privateKeyArmored)
+            .then(function(keyInfo) {
+                return keyInfo;
+            });
     };
 
     /* ==================================================================================
@@ -32,8 +38,11 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      */
     step.init = function () {
         // Get private key from keyring.
-        return passbolt.request('passbolt.keyring.private.get')
+        return passbolt.setup.get('key.privateKeyArmored')
+            // Retrieve key info from private key.
+            .then(step._getKeyInfo)
             .then(function(keyInfo) {
+
                 // Pass the key info to the view.
                 step.viewData.keyInfo = step.data.keyinfo = keyInfo;
 

@@ -11,20 +11,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 (function (passbolt) {
 
     var step = {
-        'id': 'generate_key',
-        'title': 'Give us a second while we crunch them numbers!',
-        'label': '',
-        'parents': ['secret'],
-        'next': 'backup_key',
-        'defaultActions': {
-            'submit': 'hidden',
-            'cancel': 'hidden'
-        },
-        // We do not save this step in history. It should be impossible to come back to this step
-        // without executing the step before first.
-        'saveInHistory': true,
-        'subStep': true,
-        'viewData': {}
+        'id': 'generate_key'
     };
 
     /* ==================================================================================
@@ -62,8 +49,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      *
      * @private
      */
-    step._importPrivateKey = function(keyPair) {
-        return passbolt.request('passbolt.keyring.private.import', keyPair.privateKeyArmored)
+    step._setPrivateKey = function(keyPair) {
+        return passbolt.setup.set('key.privateKeyArmored', keyPair.privateKeyArmored)
             .then(function() {
                 passbolt.setup.setActionState('submit', 'enabled');
                 passbolt.setup.goForward('backup_key');
@@ -120,7 +107,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
                 // Generate key pair, and import it in keyring.
                 step._generateKeyPair(keyInfo, keyInfo.passphrase)
-                    .then(step._importPrivateKey)
+                    .then(step._setPrivateKey)
                     .then(step.onKeyGenerated)
                     .fail(function(e) {
                         step.onError(e);

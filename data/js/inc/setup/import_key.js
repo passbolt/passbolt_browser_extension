@@ -12,20 +12,19 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
     var step = {
         'id': 'import_key',
-        'label': '2. Import your key',
-        'title': 'Import an existing key or <a id="js_setup_goto_define_key" href="#" class="button primary">create</a> a new one!',
-        'parents': ['domain_check'],
-        'next': 'key_info',
-        'defaultActions': {
-            'submit': 'disabled',
-            'cancel': 'enabled'
-        },
-        'viewData': {},
         'elts' : {
             browseButton : '#js_setup_import_key_browse',
             keyAscii : '#js_setup_import_key_text',
             errorFeedback : '#KeyErrorMessage',
             createButton: '#js_setup_goto_define_key'
+        },
+        'options': {
+            'infoTemplate': null,
+            // The workflow name is useful to know if we should check
+            // whether the key exist on the server, or whether it doesn't exist.
+            // install case: the key fingerprint is not supposed to exist.
+            // recover case: the key fingerprint is supposed to exist.
+            'workflow': 'install'
         },
         data: {
 
@@ -76,6 +75,14 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * Implements start().
      */
     step.start = function() {
+        // If info template is provided, display it.
+        // We use this space to display side information to the user.
+        if (step.options.infoTemplate != undefined && step.options.infoTemplate != null) {
+            getTpl('./tpl/setup/' + step.options.infoTemplate, function (tpl) {
+                $('#js_step_content .sideInfo').html(new EJS({text: tpl}).render());
+            });
+        }
+
         //// Bind the go back to create a new key button.
         step.elts.$createButton.click(function(ev) {
             ev.preventDefault();
@@ -101,8 +108,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         step.elts.$errorFeedback.addClass('hidden');
 
         return step.extractKeyInfo(key)
-            .then(step.checkKeyDontExistRemotely)
-            .then(step.importPrivateKey)
+            .then(step.validateKeyExistance)
+            .then(step.setPrivateKey)
             .then(step.extractPublicKey)
             .then(function(publicKeyArmored) {
                 passbolt.setup.set('key.publicKeyArmored', publicKeyArmored);
@@ -170,13 +177,50 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     },
 
     /**
-     * Import a private key in the keyring.
+     * Check that the key exists on server.
      * @param armoredPrivateKey
-     * @returns {string}
      *   armored private key
+     * @return promise
      */
-    step.importPrivateKey = function(armoredPrivateKey) {
-        return passbolt.request('passbolt.keyring.private.import', armoredPrivateKey)
+    step.checkKeyExistRemotely = function (armoredPrivateKey) {
+        var def = $.Deferred();
+        return passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
+            .then(function() {
+                def.resolve(armoredPrivateKey);
+            })
+            .fail(function() {
+                def.reject('This key doesn\' match any account.');
+            });
+        return def;
+    },
+
+    /**
+     * Check key existance depending on the workflow.
+     * install case: check that the key doesn't exist remotely.
+     * recover case: check that the key exist remotely.
+     */
+    step.validateKeyExistance = function(armoredPrivateKey) {
+        if (step.options.workflow == 'install') {
+            return step.checkKeyDontExistRemotely(armoredPrivateKey)
+                .then(function() {
+                   return armoredPrivateKey;
+                });
+        }
+        else if (step.options.workflow == 'recover') {
+            return step.checkKeyExistRemotely(armoredPrivateKey)
+                .then(function() {
+                    return armoredPrivateKey;
+                });
+        }
+    },
+
+    /**
+     * Set the private key in the setup info.
+     * @param armoredPrivateKey
+     * @returns {*}
+     */
+    step.setPrivateKey = function(armoredPrivateKey) {
+        return passbolt.request('passbolt.setup.set', 'key.privateKeyArmored', armoredPrivateKey)
             .then(function() {
                 step.data.privateKeyArmored = armoredPrivateKey;
                 return armoredPrivateKey;

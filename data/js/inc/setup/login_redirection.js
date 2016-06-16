@@ -12,14 +12,9 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
     var step = {
         'id': 'login_redirection',
-        'title': 'Alright sparky, it\'s time to log in!',
-        'label': '5. Login !',
-        'parents': ['security_token'],
-        'defaultActions': {
-            'submit': 'hidden',
-            'cancel': 'hidden'
-        },
-        'viewData': {}
+        'options': {
+            'workflow': 'install'
+        }
     };
 
 
@@ -115,11 +110,20 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @private
      */
     step._validateAccount = function(setupData) {
-        return passbolt.request('passbolt.setup.save', setupData)
-            .fail(function (error) {
-                // Throw fatal error.
-                passbolt.setup.fatalError(error.message, error.data);
-            });
+        if (step.options.workflow == 'install') {
+            return passbolt.request('passbolt.setup.save', setupData)
+                .fail(function (error) {
+                    // Throw fatal error.
+                    passbolt.setup.fatalError(error.message, error.data);
+                });
+        }
+        else if (step.options.workflow == 'recover') {
+            return passbolt.request('passbolt.setup.completeRecovery', setupData)
+                .fail(function (error) {
+                    // Throw fatal error.
+                    passbolt.setup.fatalError(error.message, error.data);
+                });
+        }
     };
 
     passbolt.setup.steps[step.id] = step;

@@ -9,11 +9,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
     var step = {
         'id': 'security_token',
-        'label': '4. Set a security token',
-        'title': 'We need a visual cue to protect us from the bad guys..',
-        'parents': ['key_info', 'backup_key'],
-        'next': 'login_redirection',
-        'viewData': {},
         'elts' : {
             securityTokenBgColor : '#js_security_token_background',
             securityTokenTextColor : '#js_security_token_color',

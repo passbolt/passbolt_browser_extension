@@ -12,12 +12,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
     var step = {
         'id': 'define_key',
-        'label': '2. Define your keys',
-        'title': 'Create a new key or <a id="js_setup_goto_import_key" href="#" class="button primary">import</a> an existing one!',
-        'parents': ['domain_check'],
-        'next': 'secret',
-        'favorite': true,
-        'viewData': {},
         'elts' : {
             importButton : '#js_setup_goto_import_key',
             ownerName : '#OwnerName',
@@ -27,10 +21,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
             keyLength : '#KeyLength',
             keyExpiryDate : '#KeyExpire',
             feedbackError : '#js_main_error_feedback'
-        },
-        options: {
-            defaultKeyLength : 2048,
-            defaultKeyType : 'RSA-DSA'
         },
         data: {
 

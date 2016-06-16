@@ -13,12 +13,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
     var step = {
         'id': 'backup_key',
-        'title': 'Success! Your secret key is ready.',
-        'label': '',
-        'parents': ['secret'],
-        'next': 'security_token',
-        'subStep': true,
-        'viewData': {},
         'elts' : {
             downloadButton : '#js_backup_key_download'
         }

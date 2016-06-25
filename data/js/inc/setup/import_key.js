@@ -168,7 +168,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         var def = $.Deferred();
         passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
             .then(function() {
-                def.reject('This key  is already used by another user');
+                def.reject('This key is already used by another user');
             })
             .fail(function() {
                 def.resolve(armoredPrivateKey);

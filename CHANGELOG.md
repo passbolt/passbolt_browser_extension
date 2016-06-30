@@ -3,8 +3,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.0.13]
 ### Fixed
 - PASSBOLT-1366: Worker bug when multiple passbolt instances are open in multiple windows
+
+### Added
+- PASSBOLT-1588: As AN it should be possible to recover a passbolt account on a new device.
 
 ## [1.0.12]
 ### Added
@@ -72,8 +77,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.12...HEAD
-[1.0.11]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.11...v1.0.12
+[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.13...HEAD
+[1.0.13]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.12...v1.0.13
+[1.0.12]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.11...v1.0.12
 [1.0.11]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.10...v1.0.11
 [1.0.10]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.9-b...v1.0.10
 [1.0.9-b]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.9-a...v1.0.9-b

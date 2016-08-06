@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- PASSBOLT-1432: Passbolt.app pagemod shouldn't start if user is not logged in
 
 ## [1.0.13]
 ### Fixed

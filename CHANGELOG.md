@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.1.0]
 ### Fixed
 - PASSBOLT-1432: Passbolt.app pagemod shouldn't start if user is not logged in
 
@@ -79,7 +81,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.13...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.13...v1.1.0
 [1.0.13]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.12...v1.0.13
 [1.0.12]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.11...v1.0.12
 [1.0.11]: https://github.com/passbolt/passbolt_firefox/compare/v1.0.10...v1.0.11

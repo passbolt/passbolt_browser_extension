@@ -1,6 +1,6 @@
 {
   "name": "passbolt",
-  "version": "1.0.13",
+  "version": "1.1.0",
   "title": "Passbolt",
   "id": "passbolt@passbolt.com",
   "description": "Passbolt add-on",
@@ -22,7 +22,8 @@
     "grunt-contrib-copy": "~0.5.0",
     "grunt-contrib-jshint": "~0.7.2",
     "grunt-shell": "^1.1.1",
-    "passbolt-styleguide": "~1.0.0"
+    "passbolt-styleguide": "~1.0.0",
+    "jpm": "1.0.6"
   },
   "main" : "lib/main.js"
 }

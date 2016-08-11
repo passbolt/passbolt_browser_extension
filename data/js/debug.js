@@ -28,8 +28,9 @@ $(function() {
         $securityTokenTextColor = $('#securityTokenTextColor'),
         $privateKeyInfo = $('#privkeyinfo'),
         $serverKeyInfo = $('#pubkeyinfo-server'),
-		    $flushLocalStorage = $('#js_flush_conf'),
-        $localStorageInfo = $('#localStorage');
+        $flushLocalStorage = $('#js_flush_conf'),
+        $localStorageInfo = $('#localStorage'),
+        $initAppPagemod = $('#initAppPagemod');
 
     /**
      * Listen to the event passbolt.debug.settings.set
@@ -192,7 +193,7 @@ $(function() {
     var init = function () {
         getUser();
         getKeys();
-		    getLocalStorageInfo();
+        getLocalStorageInfo();
     };
     init();
 
@@ -305,4 +306,14 @@ $(function() {
 		passbolt.message('passbolt.debug.config.flush')
 			.publish();
 	});
+
+    /**
+     * Event: When the user press the init app pagemod button
+     * Request the initialization of the app page mod
+     */
+    $initAppPagemod.click(function() {
+        passbolt.message('passbolt.debug.appPagemod.init')
+            .publish();
+    });
+
 });

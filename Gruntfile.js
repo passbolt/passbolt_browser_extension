@@ -33,21 +33,23 @@ module.exports = function(grunt) {
 					stderr: false
 				},
 				command: [
-					'rm -f passbolt@passbolt.com-*',
-					'rm -f passbolt-latest@passbolt.com.xpi',
-					"sed 's/[\"]debug[\"]:.*$/\"debug\": true/' ./lib/config/config.json > ./lib/config/config.json.tmp && mv ./lib/config/config.json.tmp ./lib/config/config.json",
-					'jpm xpi',
-					"find . -name '*.xpi' -exec sh -c 'mv \"$0\" \"${0%.xpi}-debug.xpi\"' {} \\;",
-					"sed 's/[\"]debug[\"]:.*$/\"debug\": false/' ./lib/config/config.json > ./lib/config/config.json.tmp && mv ./lib/config/config.json.tmp ./lib/config/config.json",
-					'jpm xpi',
-					'ln -s `find . -name \'passbolt@passbolt.com-*-debug.xpi\'` ./passbolt-latest@passbolt.com.xpi'
+					'rm -f passbolt*.xpi',
+					"sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": true/' ./lib/config/config.json",
+					'./node_modules/jpm/bin/jpm xpi',
+					"mv passbolt@passbolt.com-<%= pkg.version %>.xpi passbolt@passbolt.com-<%= pkg.version %>-debug.xpi",
+					"sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' ./lib/config/config.json",
+					'./node_modules/jpm/bin/jpm xpi',
+					'ln -s passbolt@passbolt.com-<%= pkg.version %>-debug.xpi ./passbolt-latest@passbolt.com.xpi'
 				].join('&&')
 			},
 			xpiinstall: {
 				options: {
 					stderr: false
 				},
-				command: 'wget --post-file=`find . -name \'passbolt@passbolt.com-*-debug.xpi\'` http://localhost:8888/'
+				command: [
+					'wget --post-file=passbolt@passbolt.com-<%= pkg.version %>-debug.xpi http://localhost:8888/ > /dev/null 2>&1',
+					'echo "If your browser has the firefox addon \"Extension auto-installer\" installed & enabled, the passbolt plugin is now installed on your browser"'
+				].join(';')
 			}
 		},
 		copy: {

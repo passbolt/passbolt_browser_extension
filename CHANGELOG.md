@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- PASSBOLT-1635: Clean/Document messaging layer
 
 ## [1.1.0]
 ### Fixed

@@ -83,7 +83,10 @@ var passbolt = passbolt || {};
    *
    * 3. Treatment of the response by the content code
    *
-   * Once the content code receives the request response,
+   * Once the content code receives the request response, it execute the
+   * callbacks that have been associated to the request. It is able to
+   * retrieve the references with the token that is exchanged between the
+   * addon-code and the content code.
    *
    * @param message The request name
    * @returns {jQuery.Deferred}
@@ -98,9 +101,9 @@ var passbolt = passbolt || {};
         args = $.merge([message, token], Array.slice(arguments, 1)),
         // The callback to execute when the request is completed, whatever the
         // result.
-        completedCallback = requestCompletedListener,
+        completedCallback = _requestCompletedListener,
         // The callback to execute when the request is in progress.
-        progressCallback = requestProgressListener;
+        progressCallback = _requestProgressListener;
 
     // Observe when the request has been completed.
     self.port.once(message + '.complete', completedCallback);
@@ -142,13 +145,14 @@ var passbolt = passbolt || {};
    * @param args following arguments will be passed to the deferred resolution
    * rejection call.
    */
-  var requestCompletedListener =  function(token, status) {
+  var _requestCompletedListener =  function(token, status) {
     var args = Array.slice(arguments, 2);
     if (status == 'SUCCESS') {
       _stack[token].deferred.resolveWith(this, args);
     } else {
       _stack[token].deferred.rejectWith(this, args);
     }
+    // @TODO Remove the progress listener.
     delete _stack[token];
   };
 
@@ -162,7 +166,7 @@ var passbolt = passbolt || {};
    * @param args following arguments will be passed to the deferred
    * progress call.
    */
-  var requestProgressListener = function(token) {
+  var _requestProgressListener = function(token) {
     var args = Array.slice(arguments, 1);
     _stack[token].deferred.notifyWith(this, args);
   };
@@ -175,7 +179,7 @@ var passbolt = passbolt || {};
    * @param message The request name
    *
    * @returns {jQuery.Deferred}
-     */
+   */
   passbolt.requestOn = function(worker, message) {
     var args = ['passbolt.request.dispatch'].concat(Array.slice(arguments, 0));
     return passbolt.request.apply(null, args);

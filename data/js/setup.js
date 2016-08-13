@@ -43,8 +43,7 @@ passbolt.setup.data = passbolt.setup.data || {};
      *
      * This event is launched when the pagemod is loaded.
      */
-    passbolt.message('passbolt.setup.init')
-        .subscribe(function (data) {
+    passbolt.message.on('passbolt.setup.init', function(data) {
             passbolt.setup.init(data);
         });
 

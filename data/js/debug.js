@@ -303,8 +303,7 @@ $(function() {
 	 * Flush the local storage
 	 */
 	$flushLocalStorage.click(function() {
-		passbolt.message('passbolt.debug.config.flush')
-			.publish();
+		passbolt.message.emit('passbolt.debug.config.flush');
 	});
 
     /**
@@ -312,8 +311,7 @@ $(function() {
      * Request the initialization of the app page mod
      */
     $initAppPagemod.click(function() {
-        passbolt.message('passbolt.debug.appPagemod.init')
-            .publish();
+        passbolt.message.emit('passbolt.debug.appPagemod.init');
     });
 
 });

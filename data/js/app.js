@@ -92,7 +92,7 @@ passbolt.message.on('passbolt.share.input_changed', function(resourceId, keyword
 // Notify all workers regarding the application window resize.
 window.addEventListener('passbolt.html_helper.window_resized', function(event) {
 	var cssClasses = $('body').attr('class').split(' ');
-	passbolt.message.broadCast('passbolt.html_helper.app_window_resized', cssClasses);
+	passbolt.message.emit('passbolt.html_helper.app_window_resized', cssClasses);
 });
 
 // Intercept the request passbolt.secret.decrypt

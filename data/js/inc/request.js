@@ -1,5 +1,6 @@
 /**
- * The passbolt communication module used on content code side.
+ * The passbolt request is a part of the communication layer used on the
+ * content side code to make requests to the addon-code.
  *
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
@@ -16,7 +17,9 @@ var passbolt = passbolt || {};
   var _stack = {};
 
   /**
-   * Perform an asynchronous request on the addon-code.
+   * Perform an asynchronous request to the addon-code.
+   *
+   * By default there is no mechanism to
    *
    * The object returned by the request function is a jQuery.Deferred. The
    * object is chainable, similar to the way a jQuery object is chainable. You
@@ -29,16 +32,16 @@ var passbolt = passbolt || {};
    * How does it work ?
    * ------------------
    *
-   * 1. Request the addon-code
+   * 1. Make a request to the addon-code
    *
-   * To request the addon-code, you can do as following
+   * To make a request to the addon-code, you can do as following
    *
    * ```
    * passbolt.request('request_name')
-   *   .then((response_arg1, response_arg2) => {
+   *   .then(function(response_arg1, response_arg2) {
    *     // Do something in case of success
    *   })
-   *   .fail((response_arg1, response_arg2) => {
+   *   .fail(function(response_arg1, response_arg2) {
    *     // Do something in case of failure
    *   });
    *
@@ -48,10 +51,10 @@ var passbolt = passbolt || {};
    * each request and its associated callbacks and ensure the resolution of the
    * good callbacks once the request is completed.
    *
-   * The token is injected in the request parameters and should be sent back in
-   * the addon code response.
+   * The token is added as parameter and should be sent back in the addon code
+   * response.
    *
-   * The request layer use the Firefox communication mechnism with the port
+   * The request layer use the Firefox communication mechanism with the port
    * object to trigger the request.
    *
    * ```
@@ -60,8 +63,8 @@ var passbolt = passbolt || {};
    *
    * 2. Addon-code response
    *
-   * The addon-code should send a response to all requests whatever the status.
-   * The format of the response is enforced as following.
+   * The addon-code should send a response to all requests disregard of the
+   * status. The format of the response is as follow.
    *
    * 2.1 In case of error
    *
@@ -93,14 +96,14 @@ var passbolt = passbolt || {};
    */
   passbolt.request = function(message) {
 
-    // The deferred object to serve to the caller.
+    // The promise that is return when you call passbolt.request.
     var deferred = $.Deferred(),
         // The generated token used to identify the request.
         token = Math.round(Math.random() * Math.pow(2, 32)),
         // Add the token to the request parameters.
-        args = $.merge([message, token], Array.slice(arguments, 1)),
-        // The callback to execute when the request is completed, whatever the
-        // result.
+        args = [message, token].concat(Array.slice(arguments, 1)),
+        // The callback to execute when the request is completed, disregard
+        // of the result.
         completedCallback = _requestCompletedListener,
         // The callback to execute when the request is in progress.
         progressCallback = _requestProgressListener;
@@ -111,7 +114,7 @@ var passbolt = passbolt || {};
     // request.
     self.port.on(message + '.progress', progressCallback);
 
-    // Add the request references to the stack of pending requests.
+    // Add the request to the stack of pending requests.
     _stack[token] = {
       // The request message.
       message: message,
@@ -134,11 +137,11 @@ var passbolt = passbolt || {};
   /**
    * When a request has been completed by the addon-code, and response sent
    * to the content code, this callback is executed. It resolves/rejects the
-   * deferred associated to the request regarding the addon-code response
+   * promise associated to the request regarding the addon-code response
    * status.
    *
    * @param token The token sent with the request, must be sent back in the
-   * response. It permits to identify the deferred to resolve.
+   * response. It permits to identify which requests to process.
    *
    * @param status The status of the response. It can be SUCCESS or ERROR.
    *

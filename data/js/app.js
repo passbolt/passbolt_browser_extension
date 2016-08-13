@@ -169,7 +169,7 @@ window.addEventListener('passbolt.secret_edition.validate', function(event) {
     .then(function() {
       passbolt.event.triggerToPage('secret_edition_secret_validated', [true]);
     })
-    .fail(function() {
+    .then(null, function() {
       passbolt.event.triggerToPage('secret_edition_secret_validated', [false]);
     });
 });

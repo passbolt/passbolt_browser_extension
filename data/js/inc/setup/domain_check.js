@@ -241,7 +241,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
             })
 
             // In case of error,  display fatal error.
-            .fail(function (msg) {
+            .then(null, function (msg) {
                 passbolt.setup.fatalError(msg);
             });
 
@@ -271,7 +271,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      */
     step.setDomain = function (domain) {
         return passbolt.request('passbolt.setup.set', 'settings.domain', domain)
-            .fail(function (errorMsg) {
+            .then(null, function (errorMsg) {
                 step.onError(errorMsg);
             });
     };
@@ -286,7 +286,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      */
     step.setServerKey = function (armoredServerKey) {
         return passbolt.request('passbolt.setup.set', 'settings.armoredServerKey', armoredServerKey)
-            .fail(function (errorMsg) {
+            .then(null, function (errorMsg) {
                 step.onError(errorMsg);
             });
     };
@@ -317,7 +317,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         step._fetchServerKey(step._data.domain)
             .then(step._getKeyInfo)
             .then(step._displayKeyInfo)
-            .fail(function (msg) {
+            .then(null, function (msg) {
                 step.onErrorServerKey(msg);
             });
     };

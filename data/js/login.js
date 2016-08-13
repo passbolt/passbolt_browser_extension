@@ -49,7 +49,7 @@ $(function() {
                     // Starts checking server key.
                     passbolt.login.onStep0CheckServerKey();
                 })
-                .fail(function() {
+                .then(null, function() {
                     // Display error message.
                     $('.plugin-check.gpg').removeClass('notice').addClass('error');
                     $('.plugin-check.gpg .message').text('Error: Could not find server key');

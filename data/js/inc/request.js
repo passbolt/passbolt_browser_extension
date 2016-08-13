@@ -41,7 +41,7 @@ var passbolt = passbolt || {};
    *   .then(function(response_arg1, response_arg2) {
    *     // Do something in case of success
    *   })
-   *   .fail(function(response_arg1, response_arg2) {
+   *   .then(null, function(response_arg1, response_arg2) {
    *     // Do something in case of failure
    *   });
    *

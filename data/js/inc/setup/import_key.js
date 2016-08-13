@@ -114,7 +114,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
             .then(function(publicKeyArmored) {
                 passbolt.setup.set('key.publicKeyArmored', publicKeyArmored);
             })
-            .fail(function(error) {
+            .then(null, function(error) {
                 step.onError(error);
                 passbolt.setup.setActionState('submit', 'enabled');
             });
@@ -170,7 +170,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
             .then(function() {
                 def.reject('This key is already used by another user');
             })
-            .fail(function() {
+            .then(null, function() {
                 def.resolve(armoredPrivateKey);
             });
         return def;
@@ -188,7 +188,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
             .then(function() {
                 def.resolve(armoredPrivateKey);
             })
-            .fail(function() {
+            .then(null, function() {
                 def.reject('This key doesn\' match any account.');
             });
         return def;

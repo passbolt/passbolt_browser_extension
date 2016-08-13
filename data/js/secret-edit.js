@@ -86,7 +86,7 @@ $(document).bind('template-ready', function() {
                 passbolt.helper.html.resizeIframe('#passbolt-iframe-secret-edition', {
                     width: '100%'
                 });
-            }).fail(function(message, validationErrors){
+            }).then(null, function(message, validationErrors){
                 var error = '';
 
                 // Mark the field.
@@ -178,7 +178,7 @@ $(document).bind('template-ready', function() {
             .then(function() {
               passbolt.message.emit('passbolt.secret_edition.validate.complete', token, 'SUCCESS');
             })
-            .fail(function(message, validationErrors) {
+            .then(null, function(message, validationErrors) {
                 passbolt.message.emit('passbolt.secret_edition.validate.complete', token, 'ERROR');
             });
       });
@@ -193,7 +193,7 @@ $(document).bind('template-ready', function() {
                     // Notify about the progression.
                     passbolt.message.emit('passbolt.secret_edition.encrypt.progress', token, armored, userId, completedGoals);
                 })
-                .fail(function() {
+                .then(null, function() {
                     throw 'ENCRYPTION_FAILED';
                 });
         });

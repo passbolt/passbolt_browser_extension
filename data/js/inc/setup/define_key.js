@@ -149,7 +149,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      */
     step._getData = function() {
         return passbolt.setup.get()
-            .fail(function(errorMsg) {
+            .then(null, function(errorMsg) {
                 step.onError(errorMsg);
             });
     }
@@ -162,7 +162,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      */
     step._validateKeyInfo = function(keyInfo) {
         return passbolt.request('passbolt.keyring.key.validate', keyInfo, ['ownerName', 'ownerEmail', 'comment', 'length', 'algorithm'])
-            .fail(function(errorMsg, validationErrors) {
+            .then(null, function(errorMsg, validationErrors) {
                 step.onError(errorMsg, validationErrors);
                 // back to ready state.
                 passbolt.setup.setActionState('submit', 'enabled');

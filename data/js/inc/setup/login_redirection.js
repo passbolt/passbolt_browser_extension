@@ -79,7 +79,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      */
     step._flushSetup = function() {
         return passbolt.request('passbolt.setup.flush')
-            .fail(function (error) {
+            .then(null, function (error) {
                 //@todo PASSBOLT-1471
                 //console.log('error while flushing setup', error);
             });
@@ -112,14 +112,14 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     step._validateAccount = function(setupData) {
         if (step.options.workflow == 'install') {
             return passbolt.request('passbolt.setup.save', setupData)
-                .fail(function (error) {
+                .then(null, function (error) {
                     // Throw fatal error.
                     passbolt.setup.fatalError(error.message, error.data);
                 });
         }
         else if (step.options.workflow == 'recover') {
             return passbolt.request('passbolt.setup.completeRecovery', setupData)
-                .fail(function (error) {
+                .then(null, function (error) {
                     // Throw fatal error.
                     passbolt.setup.fatalError(error.message, error.data);
                 });

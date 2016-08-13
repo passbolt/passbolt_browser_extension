@@ -115,6 +115,20 @@ Make sure Grunt watch for less changes and compile them into CSS
 Edit one LESS file to see if it works!
 Make sure that if you need to make change the styleguide to request changes upstream.
 
+How to install / update openpgp
+===============================
+By default, openpgpjs as provided in the official repository cannot work 
+in the add-on environment. So we have developed some scripts to patch it.
+
+To install or update openpgp:
+```
+	grunt lib-openpgp-deploy
+```
+
+The command will take care of downloading the version defined in package.json,
+patch it, and deploy it in /lib/vendors.
+Look at Gruntfile.js to see in details what it does.
+
 Credits
 =======
 

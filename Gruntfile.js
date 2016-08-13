@@ -75,8 +75,54 @@ module.exports = function(grunt) {
 					dest: '<%= config.webroot %>/css',
 					expand: true
 				}]
-			}
-		}
+			},
+            openpgp_ff : {
+                files: [
+                    {
+                    // steal
+                    cwd: '<%= config.modules_path %>/openpgp/dist/',
+                    src: ['openpgp_ff.js', 'openpgp.worker.js'],
+                    dest: 'lib/vendors/',
+                    nonull: true,
+                    expand: true,
+                    rename: function(dest, src) {
+                        console.log(dest, src);
+                        if (src == 'openpgp_ff.js') {
+                            return dest + 'openpgp.js';
+                        }
+                        return dest + src;
+                    }
+                }]
+            }
+		},
+        replace: {
+            openpgp_ff: {
+                src: ['<%= config.modules_path %>/openpgp/dist/openpgp.js'],
+                dest: ['<%= config.modules_path %>/openpgp/dist/openpgp_ff.js'],
+                replacements: [
+                    {
+                        // Add necessary dependencies at the beginning of the file.
+                        from: "(function(f)",
+                        to: "if (Worker == undefined) {\nvar Worker = require('./web-worker').Worker;\n}\nif (window == undefined) {\nvar window = require('./window');\nvar atob = window.atob;\n}\n\n(function(f)"
+                    },
+                    {
+                        // Comment promise polyfill. We don't need it. And it breaks.
+                        from: "lib$es6$promise$polyfill$$default();",
+                        to: "//lib$es6$promise$polyfill$$default();"
+                    },
+                    {
+                        // Comment promise polyfill. We don't need it. And it breaks.
+                        from: "_es6Promise2.default.polyfill();",
+                        to: "//_es6Promise2.default.polyfill();"
+                    }//,
+                    //{
+                    //    // Fix path to openpgp worker.
+                    //    from: "'openpgp.worker.js'",
+                    //    to: "'resource://passbolt-at-passbolt-dot-com/lib/vendors/openpgp.worker.js'"
+                    //}
+                ]
+            }
+        }
 	});
 
 	// on watch events configure jshint:all to only run on changed file
@@ -93,11 +139,16 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks('grunt-contrib-copy');
 
+    grunt.loadNpmTasks('grunt-text-replace');
+
 	// ========================================================================
 	// Register Tasks
 
 	// Bower deploy
 	grunt.registerTask('styleguide-update', ['shell:updatestyleguide','copy:styleguide','shell:jpmxpi']);
+
+    // Copy, patch (to make it work with firefox) and deploy openPGP in libraries.
+    grunt.registerTask('lib-openpgp-deploy', ['replace:openpgp_ff', 'copy:openpgp_ff']);
 
 	// Build xpi in debug and non-debug version.
 	grunt.registerTask('build-xpi', ['shell:jpmxpi']);

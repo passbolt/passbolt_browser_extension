@@ -36,7 +36,7 @@ $(document).bind('template-ready', function() {
             );
 
         // Remove all focuses from the client app.
-        passbolt.messageOn('App', 'passbolt.event.trigger_to_page', 'remove_all_focuses');
+        passbolt.message.emitOn('App', 'passbolt.event.trigger_to_page', 'remove_all_focuses');
 
         // We set the focus on the first focus field and wait for events.
         // TODO improvement : client js should send remove_all_focuses_done, instead of a timeout.
@@ -59,7 +59,7 @@ $(document).bind('template-ready', function() {
 
                 // Escape
                 if (keycode == 27) {
-                    passbolt.messageOn('App', 'passbolt.keyring.master.request.close');
+                    passbolt.message.emitOn('App', 'passbolt.keyring.master.request.close');
                 }
 
                 // If key pressed is not a control, or if tab.
@@ -89,8 +89,7 @@ $(document).bind('template-ready', function() {
     /**
      * Handles wrong passphrase scenario.
      */
-    passbolt.message('passbolt.keyring.master.request.complete')
-        .subscribe(function(token, status, attempts) {
+    passbolt.message.on('passbolt.keyring.master.request.complete', function(token, status, attempts) {
             if (status == 'ERROR') {
                 $masterPasswordSubmit.removeClass('processing');
                 $masterPassword.focus();
@@ -144,7 +143,7 @@ $(document).bind('template-ready', function() {
         }
         // The user presses escape.
         else if(keycode == 27) {
-            passbolt.messageOn('App', 'passbolt.keyring.master.request.close');
+            passbolt.message.emitOn('App', 'passbolt.keyring.master.request.close');
         }
     });
 
@@ -153,7 +152,7 @@ $(document).bind('template-ready', function() {
      */
     $('body').on('click', '.js-dialog-close', function(ev) {
         ev.preventDefault();
-        passbolt.messageOn('App', 'passbolt.keyring.master.request.close');
+        passbolt.message.emitOn('App', 'passbolt.keyring.master.request.close');
     });
 });
 

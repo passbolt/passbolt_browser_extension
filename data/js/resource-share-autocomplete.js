@@ -18,14 +18,12 @@ $(document).bind('template-ready', function() {
 		excludedUsers = [];
 
 	// Exclude user from the autocomplete results.
-	passbolt.message('passbolt.share.exclude_user')
-		.subscribe(function(userId) {
+	passbolt.message.on('passbolt.share.exclude_user', function(userId) {
 			excludedUsers.push(userId);
 		});
 
 	// Include user in the autocomplete results.
-	passbolt.message('passbolt.share.include_user')
-		.subscribe(function(userId) {
+	passbolt.message.on('passbolt.share.include_user', function(userId) {
 			var i = excludedUsers.indexOf(userId);
 			if (i != -1) {
 				excludedUsers.splice(i, 1);
@@ -34,13 +32,11 @@ $(document).bind('template-ready', function() {
 
 	// The autocomplete input field has been populated.
 	// Search for users that can be granted.
-	passbolt.message('passbolt.share.input_changed')
-		.subscribe(function(resourceId, keywords) {
-
+	passbolt.message.on('passbolt.share.input_changed', function(resourceId, keywords) {
 			// If the component is already performing a search.
 			if (stateIs('loading')) {
 				setTimeout(function() {
-					passbolt.message('passbolt.share.input_changed', resourceId, keywords);
+					passbolt.message.emit('passbolt.share.input_changed', resourceId, keywords);
 				}, 500);
 				return;
 			}
@@ -62,8 +58,7 @@ $(document).bind('template-ready', function() {
 		});
 
 	// The application window has been resized.
-	passbolt.message('passbolt.html_helper.app_window_resized')
-		.subscribe(function(cssClasses) {
+	passbolt.message.on('passbolt.html_helper.app_window_resized', function(cssClasses) {
 			resize(cssClasses);
 		});
 
@@ -72,7 +67,7 @@ $(document).bind('template-ready', function() {
 		ev.preventDefault();
 		ev.stopPropagation();
 		// Notify the share worker regarding the selected user.
-		passbolt.messageOn('Share', 'passbolt.share.user_selected', currentUsers[this.id]);
+		passbolt.message.emitOn('Share', 'passbolt.share.user_selected', currentUsers[this.id]);
 		setState('hidden');
 	});
 
@@ -144,22 +139,22 @@ $(document).bind('template-ready', function() {
 		switch(state) {
 			case 'loading':
 				$('body').removeClass('hidden loaded').addClass('loading');
-				passbolt.messageOn('App', 'passbolt.html_helper.remove_class', '#passbolt-iframe-password-share-autocomplete', 'hidden');
-				passbolt.messageOn('App', 'passbolt.html_helper.remove_class', '#passbolt-iframe-password-share-autocomplete', 'loaded');
-				passbolt.messageOn('App', 'passbolt.html_helper.add_class', '#passbolt-iframe-password-share-autocomplete', 'loading');
+				passbolt.message.emitOn('App', 'passbolt.html_helper.remove_class', '#passbolt-iframe-password-share-autocomplete', 'hidden');
+				passbolt.message.emitOn('App', 'passbolt.html_helper.remove_class', '#passbolt-iframe-password-share-autocomplete', 'loaded');
+				passbolt.message.emitOn('App', 'passbolt.html_helper.add_class', '#passbolt-iframe-password-share-autocomplete', 'loading');
 				$('.autocomplete-content').removeClass('loaded').addClass('loading');
 				break;
 			case 'loaded':
 				$('body').removeClass('loading').addClass('loaded');
-				passbolt.messageOn('App', 'passbolt.html_helper.remove_class', '#passbolt-iframe-password-share-autocomplete', 'loading');
-				passbolt.messageOn('App', 'passbolt.html_helper.add_class', '#passbolt-iframe-password-share-autocomplete', 'loaded');
+				passbolt.message.emitOn('App', 'passbolt.html_helper.remove_class', '#passbolt-iframe-password-share-autocomplete', 'loading');
+				passbolt.message.emitOn('App', 'passbolt.html_helper.add_class', '#passbolt-iframe-password-share-autocomplete', 'loaded');
 				$('.autocomplete-content').removeClass('loading').addClass('loaded');
 				break;
 			case 'hidden':
 				$('body').removeClass('loading loaded').addClass('hidden');
-				passbolt.messageOn('App', 'passbolt.html_helper.remove_class', '#passbolt-iframe-password-share-autocomplete', 'loaded');
-				passbolt.messageOn('App', 'passbolt.html_helper.remove_class', '#passbolt-iframe-password-share-autocomplete', 'loading');
-				passbolt.messageOn('App', 'passbolt.html_helper.add_class', '#passbolt-iframe-password-share-autocomplete', 'hidden');
+				passbolt.message.emitOn('App', 'passbolt.html_helper.remove_class', '#passbolt-iframe-password-share-autocomplete', 'loaded');
+				passbolt.message.emitOn('App', 'passbolt.html_helper.remove_class', '#passbolt-iframe-password-share-autocomplete', 'loading');
+				passbolt.message.emitOn('App', 'passbolt.html_helper.add_class', '#passbolt-iframe-password-share-autocomplete', 'hidden');
 				$('.autocomplete-content').removeClass('loading loaded');
 				break;
 		}

@@ -119,7 +119,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
         return step._validateToken(securityToken)
             .then(step._saveToken)
-            .fail(function(error) {
+            .then(null, function(error) {
                 passbolt.setup.fatalError(error, securityToken);
             });
     };
@@ -149,7 +149,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      */
     step._validateToken = function(tokenData) {
         return passbolt.request('passbolt.user.settings.validate', {securityToken : tokenData}, ['securityToken'])
-            .fail(function(errorMessage, validationErrors) {
+            .then(null, function(errorMessage, validationErrors) {
                 step.onError(errorMessage, validationErrors);
                 passbolt.setup.setActionState('submit', 'disabled');
             });

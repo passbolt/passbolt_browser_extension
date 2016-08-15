@@ -36,7 +36,7 @@ passbolt.helper.html = passbolt.helper.html || {};
 			}
 		}
 		// Request the application worker to resize the iframe container.
-		passbolt.messageOn('App', 'passbolt.html_helper.resize_iframe', selector, dimension);
+		passbolt.message.emitOn('App', 'passbolt.html_helper.resize_iframe', selector, dimension);
 	};
 	passbolt.helper.html.resizeIframe = resizeIframe;
 
@@ -49,15 +49,14 @@ passbolt.helper.html = passbolt.helper.html || {};
 	 * @param dimension.width
 	 * @param dimension.height
 	 */
-	passbolt.message('passbolt.html_helper.resize_iframe')
-		.subscribe(function (selector, dimension) {
-			if (typeof dimension.height != 'undefined') {
-				$(selector).css('height', dimension.height);
-			}
-			if (typeof dimension.width != 'undefined') {
-				$(selector).css('width', dimension.width);
-			}
-		});
+	passbolt.message.on('passbolt.html_helper.resize_iframe', function(selector, dimension) {
+		if (typeof dimension.height != 'undefined') {
+			$(selector).css('height', dimension.height);
+		}
+		if (typeof dimension.width != 'undefined') {
+			$(selector).css('width', dimension.width);
+		}
+	});
 
 	/**
 	 * Add a class to a HTML Element.
@@ -65,12 +64,11 @@ passbolt.helper.html = passbolt.helper.html || {};
 	 * @param selector The element css selector
 	 * @param className The class to add
 	 */
-	passbolt.message('passbolt.html_helper.add_class')
-		.subscribe(function(selector, className) {
-			if(!$(selector).hasClass(className)) {
-				$(selector).addClass(className);
-			}
-		});
+	passbolt.message.on('passbolt.html_helper.add_class', function(selector, className) {
+		if(!$(selector).hasClass(className)) {
+			$(selector).addClass(className);
+		}
+	});
 
 	/**
 	 * Remove a class from a HTML ELement.
@@ -78,11 +76,10 @@ passbolt.helper.html = passbolt.helper.html || {};
 	 * @param selector The element css selector
 	 * @param className The class to remove
 	 */
-	passbolt.message('passbolt.html_helper.remove_class')
-		.subscribe(function(selector, className) {
-			if($(selector).hasClass(className)) {
-				$(selector).removeClass(className);
-			}
-		});
+	passbolt.message.on('passbolt.html_helper.remove_class', function(selector, className) {
+		if($(selector).hasClass(className)) {
+			$(selector).removeClass(className);
+		}
+	});
 
 })( passbolt );

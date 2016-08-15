@@ -74,7 +74,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
             .then(function() {
                 passbolt.setup.setActionState('submit', 'enabled');
             })
-            .fail(function(errorMessage, validationErrors) {
+            .then(null, function(errorMessage, validationErrors) {
                 passbolt.setup.setActionState('submit', 'disabled');
             })
     }
@@ -133,7 +133,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
             .then(function() {
                 passbolt.setup.set('key.passphrase', step.elts.$password.val());
             })
-            .fail(function(errorMessage, validationErrors) {
+            .then(null, function(errorMessage, validationErrors) {
                 passbolt.setup.setActionState('submit', 'disabled');
             })
     };

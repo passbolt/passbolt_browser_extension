@@ -49,7 +49,7 @@ $(function() {
                     // Starts checking server key.
                     passbolt.login.onStep0CheckServerKey();
                 })
-                .fail(function() {
+                .then(null, function() {
                     // Display error message.
                     $('.plugin-check.gpg').removeClass('notice').addClass('error');
                     $('.plugin-check.gpg .message').text('Error: Could not find server key');
@@ -126,8 +126,7 @@ $(function() {
      * ================================================================================== */
 
     // GPGAuth is complete
-    passbolt.message('passbolt.auth.login.complete')
-        .subscribe(function(token, status, message, referrer) {
+    passbolt.message.on('passbolt.auth.login.complete', function(token, status, message, referrer) {
             if(status === 'SUCCESS') {
                 $('html').addClass('loaded').removeClass('loading');
                 window.top.location.href = referrer;
@@ -140,8 +139,7 @@ $(function() {
         });
 
     // Passphrase have been captured and verified
-    passbolt.message('passbolt.auth.login.start')
-        .subscribe(function(token, status, message) {
+    passbolt.message.on('passbolt.auth.login.start', function(token, status, message) {
             $('html').addClass('loading').removeClass('loaded');
             // remove the iframe and tell the user we're logging in
             getTpl('./tpl/login/feedback-passphrase-ok.ejs', function (tpl) {

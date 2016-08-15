@@ -86,7 +86,7 @@ $(document).bind('template-ready', function() {
                 passbolt.helper.html.resizeIframe('#passbolt-iframe-secret-edition', {
                     width: '100%'
                 });
-            }).fail(function(message, validationErrors){
+            }).then(null, function(message, validationErrors){
                 var error = '';
 
                 // Mark the field.
@@ -168,47 +168,38 @@ $(document).bind('template-ready', function() {
 
     // Listen when the app wants to know whether the secret has been updated in the secret field.
     // updated means both decrypted, and changed.
-    passbolt.message('passbolt.secret_edition.is_updated')
-        .subscribe(function(token) {
-            passbolt.message('passbolt.secret_edition.is_updated.complete')
-                .publish(token, 'SUCCESS', secretIsUpdated());
+    passbolt.message.on('passbolt.secret_edition.is_updated', function(token) {
+            passbolt.message.emit('passbolt.secret_edition.is_updated.complete', token, 'SUCCESS', secretIsUpdated());
         });
 
     // Listen when the app wants to validate the secret.
-    passbolt.message('passbolt.secret_edition.validate')
-      .subscribe(function(token) {
+    passbolt.message.on('passbolt.secret_edition.validate', function(token) {
           validate()
             .then(function() {
-              passbolt.message('passbolt.secret_edition.validate.complete')
-                .publish(token, 'SUCCESS');
+              passbolt.message.emit('passbolt.secret_edition.validate.complete', token, 'SUCCESS');
             })
-            .fail(function(message, validationErrors) {
-                passbolt.message('passbolt.secret_edition.validate.complete')
-                  .publish(token, 'ERROR');
+            .then(null, function(message, validationErrors) {
+                passbolt.message.emit('passbolt.secret_edition.validate.complete', token, 'ERROR');
             });
       });
 
     // Listen when the user wants to encrypt the secret for all the users the resource is shared with.
-    passbolt.message('passbolt.secret_edition.encrypt')
-        .subscribe(function(token, usersIds) {
+    passbolt.message.on('passbolt.secret_edition.encrypt', function(token, usersIds) {
             passbolt.request('passbolt.secret.encrypt', currentSecret, usersIds)
                 .then(function(armoreds, usersIds) {
-                    passbolt.message('passbolt.secret_edition.encrypt.complete')
-                        .publish(token, 'SUCCESS', armoreds, usersIds);
+                    passbolt.message.emit('passbolt.secret_edition.encrypt.complete', token, 'SUCCESS', armoreds, usersIds);
                 })
                 .progress(function(armored, userId, completedGoals) {
                     // Notify about the progression.
-                    passbolt.message('passbolt.secret_edition.encrypt.progress')
-                        .publish(token, armored, userId, completedGoals);
+                    passbolt.message.emit('passbolt.secret_edition.encrypt.progress', token, armored, userId, completedGoals);
                 })
-                .fail(function() {
+                .then(null, function() {
                     throw 'ENCRYPTION_FAILED';
                 });
         });
 
     // Listen to when the context is passed.
-    passbolt.message('passbolt.context.set')
-        .subscribe(function(token, status) {
+    passbolt.message.on('passbolt.context.set', function(token, status) {
             // If armoredSecret is given,
             if (passbolt.context['armoredSecret'] != undefined && passbolt.context['armoredSecret'] != '') {
                 isDecrypted = false;
@@ -222,8 +213,7 @@ $(document).bind('template-ready', function() {
         });
 
     // Listen to focus event.
-    passbolt.message('passbolt.secret.focus')
-        .subscribe(function(token) {
+    passbolt.message.on('passbolt.secret.focus', function(token) {
             // Set focus on the secret field.
             $secret.focus();
         });
@@ -263,7 +253,7 @@ $(document).bind('template-ready', function() {
             updateSecretStrength(secret);
 			// Notify the application regarding the change.
 			if (secretIsUpdated()) {
-				passbolt.messageOn('App', 'passbolt.event.trigger_to_page', 'secret_edition_secret_changed');
+				passbolt.message.emitOn('App', 'passbolt.event.trigger_to_page', 'secret_edition_secret_changed');
 			}
         } else {
             decryptSecret();
@@ -314,12 +304,12 @@ $(document).bind('template-ready', function() {
         // Backtab key.
         if (code == '9' && ev.shiftKey) {
             $secret.blur();
-            passbolt.messageOn('App', 'passbolt.event.trigger_to_page', 'secret_backtab_pressed');
+            passbolt.message.emitOn('App', 'passbolt.event.trigger_to_page', 'secret_backtab_pressed');
         }
         // Tab key.
         else if (code == '9') {
             $secret.blur();
-            passbolt.messageOn('App', 'passbolt.event.trigger_to_page', 'secret_tab_pressed');
+            passbolt.message.emitOn('App', 'passbolt.event.trigger_to_page', 'secret_tab_pressed');
         }
     });
 

@@ -9,8 +9,7 @@
 $(document).bind('template-ready', function() {
 
   // In progress event.
-  passbolt.message('passbolt.progress_dialog.progress')
-    .subscribe(function(token, message, completedGoals) {
+  passbolt.message.on('passbolt.progress_dialog.progress', function(token, message, completedGoals) {
       var percent = Math.round((100 * completedGoals) / passbolt.context.goals);
       if (percent == 100) {
         message = 'completed';
@@ -23,7 +22,7 @@ $(document).bind('template-ready', function() {
   // The user wants to close the dialog.
   $('.js-dialog-close').on('click', function(ev) {
     ev.preventDefault();
-    passbolt.messageOn('App', 'passbolt.progress_dialog.close');
+    passbolt.message.emitOn('App', 'passbolt.progress_dialog.close');
   });
 
 });

@@ -43,8 +43,7 @@ passbolt.setup.data = passbolt.setup.data || {};
      *
      * This event is launched when the pagemod is loaded.
      */
-    passbolt.message('passbolt.setup.init')
-        .subscribe(function (data) {
+    passbolt.message.on('passbolt.setup.init', function(data) {
             passbolt.setup.init(data);
         });
 
@@ -524,7 +523,7 @@ passbolt.setup.data = passbolt.setup.data || {};
                     def.reject('Unable to retrieve setup data');
                 }
             })
-            .fail(function() {
+            .then(null, function() {
                 if (dataIsProvided) {
                     def.resolve(defaultSetupData);
                 }
@@ -663,7 +662,7 @@ passbolt.setup.data = passbolt.setup.data || {};
             .then(function(stepId) {
                 passbolt.setup.goForward(stepId);
             })
-            .fail(function(errorMessage) {
+            .then(null, function(errorMessage) {
                 passbolt.setup._initError(errorMessage, setupData);
             });
     };

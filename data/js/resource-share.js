@@ -18,82 +18,76 @@ $(document).bind('template-ready', function () {
 
 	// Listen when the user deletes a permission.
 	// The user shouldn't be listed anymore by the autocomplete list if the permission is not a temporary permission.
-	passbolt.message('passbolt.share.remove_permission')
-		.subscribe(function(userId, isTemporaryPermission) {
-			// If the permission was a temporary permission, the user can be included in the autocomplete results.
-			if (isTemporaryPermission) {
-				passbolt.messageOn('ShareAutocomplete', 'passbolt.share.include_user', userId);
-			}
-			// Otherwise exclude the user from the autocomplete results.
-			else {
-				passbolt.messageOn('ShareAutocomplete', 'passbolt.share.exclude_user', userId);
-			}
-		});
+	passbolt.message.on('passbolt.share.remove_permission', function(userId, isTemporaryPermission) {
+		// If the permission was a temporary permission, the user can be included in the autocomplete results.
+		if (isTemporaryPermission) {
+			passbolt.message.emitOn('ShareAutocomplete', 'passbolt.share.include_user', userId);
+		}
+		// Otherwise exclude the user from the autocomplete results.
+		else {
+			passbolt.message.emitOn('ShareAutocomplete', 'passbolt.share.exclude_user', userId);
+		}
+	});
 
 	// Listen when the user wants to save its permissions changes.
 	// Encrypt the secret for the new users.
-	passbolt.message('passbolt.share.encrypt')
-		.subscribe(function (tokenShareEncrypt, usersIds) {
-
-			// Update the list of users the secret should be encrypted for regarding the list of users
-			// given by the application.
-			//
-			// The application information cannot be trusted and should be used only to check if a temporary
-			// permission has been removed. The secret shouldn't be encrypted for the temporary permissions
-			// that have been removed.
-			for (var i in encryptSecretFor) {
-				if (usersIds.indexOf(encryptSecretFor[i]) == -1) {
-					encryptSecretFor.splice(i, 1);
-				}
+	passbolt.message.on('passbolt.share.encrypt', function(tokenShareEncrypt, usersIds) {
+		// Update the list of users the secret should be encrypted for regarding the list of users
+		// given by the application.
+		//
+		// The application information cannot be trusted and should be used only to check if a temporary
+		// permission has been removed. The secret shouldn't be encrypted for the temporary permissions
+		// that have been removed.
+		for (var i in encryptSecretFor) {
+			if (usersIds.indexOf(encryptSecretFor[i]) == -1) {
+				encryptSecretFor.splice(i, 1);
 			}
+		}
 
-			// If there is new user to share the secret with.
-			if (encryptSecretFor.length) {
+		// If there is new user to share the secret with.
+		if (encryptSecretFor.length) {
 
-				// Decrypt the secret which has to be encrypted for new users.
-				passbolt.request('passbolt.secret.decrypt', passbolt.context.armored)
-					.then(function (secret) {
+			// Decrypt the secret which has to be encrypted for new users.
+			passbolt.request('passbolt.secret.decrypt', passbolt.context.armored)
+				.then(function (secret) {
 
-						// Open the progression dialog.
-						passbolt.requestOn('App', 'passbolt.progress_dialog.init', 'Encrypting ...', encryptSecretFor.length)
-							.then(function (tokenProgress) {
+					// Open the progression dialog.
+					passbolt.requestOn('App', 'passbolt.progress_dialog.init', 'Encrypting ...', encryptSecretFor.length)
+						.then(function (tokenProgress) {
 
-								// Request the encryption of the secret for the selected users.
-								passbolt.request('passbolt.secret.encrypt', secret, encryptSecretFor)
-									.progress(function (armored, userId, completedGoals) {
+							// Request the encryption of the secret for the selected users.
+							passbolt.request('passbolt.secret.encrypt', secret, encryptSecretFor)
+								.progress(function (armored, userId, completedGoals) {
 
-										// Update the progress dialog.
-										passbolt.messageOn('Progress', 'passbolt.progress_dialog.progress', tokenProgress, 'Encrypted for ' + userId, completedGoals);
-									})
-									.then(function (armoreds) {
+									// Update the progress dialog.
+									passbolt.message.emitOn('Progress', 'passbolt.progress_dialog.progress', tokenProgress, 'Encrypted for ' + userId, completedGoals);
+								})
+								.then(function (armoreds) {
 
-										// Clean list of users the secret has to be encrypted for.
-										encryptSecretFor = [];
-										// Close the progress dialog.
-										passbolt.messageOn('App', 'passbolt.progress_dialog.close');
-										// Resolve the "passbolt.share.encrypt" request promise and return the armoreds secrets.
-										passbolt.message('passbolt.share.encrypt.complete')
-											.publish(tokenShareEncrypt, 'SUCCESS', armoreds);
-									});
-							});
-					});
-			} else {
+									// Clean list of users the secret has to be encrypted for.
+									encryptSecretFor = [];
+									// Close the progress dialog.
+									passbolt.message.emitOn('App', 'passbolt.progress_dialog.close');
+									// Resolve the "passbolt.share.encrypt" request promise and return the armoreds secrets.
+									passbolt.message.emit('passbolt.share.encrypt.complete', tokenShareEncrypt, 'SUCCESS', armoreds);
+								});
+						});
+				});
+		} else {
 
-				passbolt.message('passbolt.share.encrypt.complete')
-					.publish(tokenShareEncrypt, 'SUCCESS', {});
-			}
-		});
+			passbolt.message.emit('passbolt.share.encrypt.complete', tokenShareEncrypt, 'SUCCESS', {});
+		}
+	});
 
 	// A user has been selected in the autocomplete results component.
-	passbolt.message('passbolt.share.user_selected')
-		.subscribe(function (user) {
-			// Add the permission to the list of changes to apply.
-			addTemporaryPermission(user);
-			// Empty the autocomplete input field.
-			$autocomplete.val('');
-			// Exclude the user from the autocomplete results.
-			passbolt.messageOn('ShareAutocomplete', 'passbolt.share.exclude_user', user.User.id);
-		});
+	passbolt.message.on('passbolt.share.user_selected', function(user) {
+		// Add the permission to the list of changes to apply.
+		addTemporaryPermission(user);
+		// Empty the autocomplete input field.
+		$autocomplete.val('');
+		// Exclude the user from the autocomplete results.
+		passbolt.message.emitOn('ShareAutocomplete', 'passbolt.share.exclude_user', user.User.id);
+	});
 
 	/**
 	 * Add a temporary permission to the list of permission.
@@ -113,7 +107,7 @@ $(document).bind('template-ready', function () {
 			type: 1,
 			User: user
 		};
-		passbolt.messageOn('App', 'passbolt.share.add_permission', permission);
+		passbolt.message.emitOn('App', 'passbolt.share.add_permission', permission);
 	};
 
 	/**
@@ -129,7 +123,7 @@ $(document).bind('template-ready', function () {
 			// Postpone the search to avoid a request on each very closed input.
 			currentSearchTimeout = setTimeout(function() {
 				// Search user.
-				passbolt.messageOn('App', 'passbolt.share.input_changed', passbolt.context.resourceId, keywords);
+				passbolt.message.emitOn('App', 'passbolt.share.input_changed', passbolt.context.resourceId, keywords);
 			}, 300);
 		});
 	};

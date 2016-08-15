@@ -109,7 +109,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
                 step._generateKeyPair(keyInfo, keyInfo.passphrase)
                     .then(step._setPrivateKey)
                     .then(step.onKeyGenerated)
-                    .fail(function(e) {
+                    .then(null, function(e) {
                         step.onError(e);
                     });
             });

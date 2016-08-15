@@ -144,8 +144,7 @@ $(function() {
                 displayKeyInfo(info, $privateKeyInfo, 'client');
                 $myKeyAscii.val(info.key);
             })
-            .fail(function(){
-
+            .then(null, function(){
                 // @todo PASSBOLT-1470
                 // console.log('passbolt.keyring.private.get fail: no private key set');
             });
@@ -155,7 +154,7 @@ $(function() {
                 displayKeyInfo(info, $serverKeyInfo, 'client');
                 $serverKeyAscii.val(info.key);
             })
-            .fail(function(){
+            .then(null, function(){
                 // @todo PASSBOLT-1470
                 //console.log('passbolt.keyring.server.get fail: no private key set');
             });
@@ -169,7 +168,7 @@ $(function() {
             .then(function(user) {
                 displayUserInfo(user);
             })
-            .fail(function(e){
+            .then(null, function(e){
                 // @todo PASSBOLT-1470
                 //console.log('passbolt.user.get fail: no user set');
                 //console.log(e);
@@ -271,7 +270,7 @@ $(function() {
 
                 $('.my.key-import.feedback').html(feedbackHtml('The key has been imported succesfully.', 'success'));
             })
-            .fail(function(params) {
+            .then(null, function(params) {
                 $('.my.key-import.feedback').html(feedbackHtml('something went wrong during the import: ' + params, 'error'));
             });
     });
@@ -289,11 +288,11 @@ $(function() {
                         displayKeyInfo(info, $serverKeyInfo, 'client');
                         $('.server.key-import.feedback').html(feedbackHtml('The key has been imported successfully.', 'success'));
                     })
-                    .fail(function(){
+                    .then(null, function(){
                         $('.server.key-import.feedback').html(feedbackHtml('something went south when trying to display the key info','error'));
                     });
             })
-            .fail(function(params) {
+            .then(null, function(params) {
                 $('.server.key-import.feedback').html(feedbackHtml('something went wrong during the import: ' + params, 'error'));
             });
     });
@@ -303,8 +302,7 @@ $(function() {
 	 * Flush the local storage
 	 */
 	$flushLocalStorage.click(function() {
-		passbolt.message('passbolt.debug.config.flush')
-			.publish();
+		passbolt.message.emit('passbolt.debug.config.flush');
 	});
 
     /**
@@ -312,8 +310,7 @@ $(function() {
      * Request the initialization of the app page mod
      */
     $initAppPagemod.click(function() {
-        passbolt.message('passbolt.debug.appPagemod.init')
-            .publish();
+        passbolt.message.emit('passbolt.debug.appPagemod.init');
     });
 
 });

@@ -10,15 +10,13 @@
  * ================================================================================== */
 
 // Close the latest opened dialog message.
-passbolt.message('passbolt.keyring.master.request.close')
-  .subscribe(function() {
+passbolt.message.on('passbolt.keyring.master.request.close', function() {
     $('#passbolt-iframe-master-password').remove();
-  });
+});
 
 // Intercept the request passbolt.keyring.master.request.
 // Display a popup to request the user passphrase.
-passbolt.message('passbolt.keyring.master.request')
-  .subscribe(function(token) {
+passbolt.message.on('passbolt.keyring.master.request', function(token) {
     // Inject the passphrase dialog into the web page DOM.
     var $iframe = $('<iframe/>', {
       id: 'passbolt-iframe-master-password',
@@ -36,9 +34,8 @@ passbolt.message('passbolt.keyring.master.request')
   });
 
 // Close the latest opened dialog message.
-passbolt.message('passbolt.progress_dialog.close')
-  .subscribe(function() {
-    setTimeout(function() {
+passbolt.message.on('passbolt.progress_dialog.close', function() {
+    setTimeout(() => {
       $('#passbolt-iframe-progress-dialog').fadeOut(500, function() {
         $(this).remove();
       });
@@ -47,8 +44,7 @@ passbolt.message('passbolt.progress_dialog.close')
 
 // Intercept the request passbolt.progress_dialog.init.
 // Display a dialog to notify the user about the current step.
-passbolt.message('passbolt.progress_dialog.init')
-  .subscribe(function(token, title, goals) {
+passbolt.message.on('passbolt.progress_dialog.init', function(token, title, goals) {
     // Inject the progress dialog into the web page DOM.
     var $iframe = $('<iframe/>', {
       id: 'passbolt-iframe-progress-dialog',
@@ -64,22 +60,19 @@ passbolt.message('passbolt.progress_dialog.init')
       passbolt.event.dispatchContext('Progress', 'title', title);
       passbolt.event.dispatchContext('Progress', 'goals', goals);
       // Notify the request, if there is one, that the dialog has been initialized.`
-      passbolt.message('passbolt.progress_dialog.init.complete')
-        .publish(token, 'SUCCESS', token);
+      passbolt.message.emit('passbolt.progress_dialog.init.complete', token, 'SUCCESS', token);
     });
   });
 
 // A permission has been added through the share iframe.
-passbolt.message('passbolt.share.add_permission')
-	.subscribe(function(permission) {
+passbolt.message.on('passbolt.share.add_permission', function(permission) {
 		passbolt.event.triggerToPage('resource_share_add_permission', permission);
 	});
 
 // The user is filling the share autocomplete input field.
-passbolt.message('passbolt.share.input_changed')
-	.subscribe(function(resourceId, keywords) {
+passbolt.message.on('passbolt.share.input_changed', function(resourceId, keywords) {
 		// Forward the event to the ShareAutocomplete Worker.
-		passbolt.messageOn('ShareAutocomplete', 'passbolt.share.input_changed', resourceId, keywords);
+		passbolt.message.emitOn('ShareAutocomplete', 'passbolt.share.input_changed', resourceId, keywords);
 
 		// Listen when a click occurred on an element of the Application DOM.
 		// Hide the iframe in charge of displaying the autocomplete results.
@@ -99,8 +92,7 @@ passbolt.message('passbolt.share.input_changed')
 // Notify all workers regarding the application window resize.
 window.addEventListener('passbolt.html_helper.window_resized', function(event) {
 	var cssClasses = $('body').attr('class').split(' ');
-	passbolt.message('passbolt.html_helper.app_window_resized')
-		.broadcast(cssClasses);
+	passbolt.message.emit('passbolt.html_helper.app_window_resized', cssClasses);
 });
 
 // Intercept the request passbolt.secret.decrypt
@@ -157,14 +149,13 @@ window.addEventListener('passbolt.secret_edition.encrypt', function(event) {
           passbolt.requestOn('Secret', 'passbolt.secret_edition.encrypt', usersIds)
             .progress(function(armored, userId, completedGoals) {
               // Notify the progress dialog on progression.
-              passbolt.messageOn('Progress', 'passbolt.progress_dialog.progress', token, 'Encrypted for ' + userId, completedGoals);
+              passbolt.message.emitOn('Progress', 'passbolt.progress_dialog.progress', token, 'Encrypted for ' + userId, completedGoals);
             })
             .then(function(armoreds, usersIds) {
               var armoreds = [armoreds];
               passbolt.event.triggerToPage('secret_edition_secret_encrypted', armoreds);
               // Close the progress dialog.
-              passbolt.message('passbolt.progress_dialog.close')
-                .publish(token);
+              passbolt.message.emit('passbolt.progress_dialog.close', token);
             });
         });
     });
@@ -178,7 +169,7 @@ window.addEventListener('passbolt.secret_edition.validate', function(event) {
     .then(function() {
       passbolt.event.triggerToPage('secret_edition_secret_validated', [true]);
     })
-    .fail(function() {
+    .then(null, function() {
       passbolt.event.triggerToPage('secret_edition_secret_validated', [false]);
     });
 });
@@ -217,7 +208,7 @@ window.addEventListener('passbolt.share.remove_permission', function(event) {
 		isTemporaryPermission = data.isTemporaryPermission;
 
 	// Notify the share dialog about this change
-	passbolt.messageOn('Share', 'passbolt.share.remove_permission', userId, isTemporaryPermission);
+	passbolt.message.emitOn('Share', 'passbolt.share.remove_permission', userId, isTemporaryPermission);
 });
 
 // Listen when a resource is edited and inject the passbolt secret field component.

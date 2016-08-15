@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.1.1]
 ### Fixed
 - PASSBOLT-1655: Visual glitch on password create field, bump to styleguide v1.1.0
+- PASSBOLT-1635: Clean/Document messaging layer
 
 ## [1.1.0]
 ### Fixed

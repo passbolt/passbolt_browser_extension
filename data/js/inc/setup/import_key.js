@@ -55,6 +55,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
         step.elts.$errorFeedback
             .removeClass('hidden')
             .html(errorMessage);
+        passbolt.setup.setActionState('submit', 'enabled');
     };
 
     /* ==================================================================================
@@ -116,7 +117,6 @@ passbolt.setup.steps = passbolt.setup.steps || {};
             })
             .then(null, function(error) {
                 step.onError(error);
-                passbolt.setup.setActionState('submit', 'enabled');
             });
     };
 
@@ -184,7 +184,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      */
     step.checkKeyExistRemotely = function (armoredPrivateKey) {
         var def = $.Deferred();
-        return passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
+        passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
             .then(function() {
                 def.resolve(armoredPrivateKey);
             })

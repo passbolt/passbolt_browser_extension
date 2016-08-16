@@ -1,5 +1,6 @@
 /**
- * Master password field.
+ * The aim of this script is to control the master password dialog content.
+ *
  *
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
@@ -59,7 +60,7 @@ $(document).bind('template-ready', function() {
 
                 // Escape
                 if (keycode == 27) {
-                    passbolt.message.emitOn('App', 'passbolt.keyring.master.request.close');
+                    passbolt.message.emit('passbolt.master-password.close-dialog');
                 }
 
                 // If key pressed is not a control, or if tab.
@@ -143,7 +144,7 @@ $(document).bind('template-ready', function() {
         }
         // The user presses escape.
         else if(keycode == 27) {
-            passbolt.message.emitOn('App', 'passbolt.keyring.master.request.close');
+            passbolt.message.emit('passbolt.master-password.close-dialog');
         }
     });
 
@@ -152,7 +153,7 @@ $(document).bind('template-ready', function() {
      */
     $('body').on('click', '.js-dialog-close', function(ev) {
         ev.preventDefault();
-        passbolt.message.emitOn('App', 'passbolt.keyring.master.request.close');
+        passbolt.message.emit('passbolt.master-password.close-dialog');
     });
 });
 

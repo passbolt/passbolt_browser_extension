@@ -11,25 +11,45 @@ var passbolt = passbolt || {};
 
     passbolt.message = {};
 
-    // Current messages listener
-    var _stack = {};
+    // Messages listeners callbacks.
+    var _listenersCallbacks = {};
 
-    // Execute message callbacks.
+	/**
+     * Execute all the callbacks associated to a message listener.
+     *
+     * @param message
+     * @param args
+     * @private
+     */
     var _executeCallbacks = function (message, args) {
-        for (var i in _stack[message]) {
-            _stack[message][i].apply(null, args);
+        for (var i in _listenersCallbacks[message]) {
+            _listenersCallbacks[message][i].apply(null, args);
         }
     };
 
+	/**
+     * Emit a message to a target worker.
+     *
+     * @param message The message to emit
+     * @param worker The target worker to emit the message to
+     */
     passbolt.message.emitOn = function (message, worker) {
         var args = ['passbolt.event.dispatch'].concat(Array.slice(arguments));
         self.port.emit.apply(null, args);
     };
 
+	/**
+     * Emit a message to the addon code.
+     *
+     * If any listener observe this message, execute all the callbacks attached
+     * to this message.
+     *
+     * @param message
+     */
     passbolt.message.emit = function (message) {
-        // If any callbacks have been attached to the message, execute them.
-        if (_stack[message]) {
-            // Remove the messsage name from the arguments.
+        // If any listener observe this message.
+        if (_listenersCallbacks[message]) {
+            // Execute all the callbacks associated to this listener.
             _executeCallbacks(message, Array.slice(arguments, 1));
         }
 
@@ -38,26 +58,26 @@ var passbolt = passbolt || {};
     };
 
     /**
+     * Listen to a message emitted by the addon code, or emmited in the content
+     * code.
      *
-     * @param message
-     * @param callback
+     * @param message The message to listen for
+     * @param callback The callback to execute once a message is received
      */
     passbolt.message.on = function (message, callback) {
-        // If no listener have been yet attached for this message.
-        // * Instantiate a list of callbacks for this message.
-        // * Listen to the addon-code message.
-        if (!_stack[message]) {
-            _stack[message] = [];
-            // Once the message is received, execute all the callbacks associated to the
-            // message.
+        // If no listener observe yet this message.
+        if (!_listenersCallbacks[message]) {
+            // Instantiate the stack of callbacks for this message.
+            _listenersCallbacks[message] = [];
+            // Listen to the message from the addon-code.
             self.port.on(message, function () {
+                // Execute all the callbacks associated to this listener.
                 _executeCallbacks(message, Array.slice(arguments));
             });
         }
 
-        // Add the callback to the stack of callbacks to execute when a message
-        // is received.
-        _stack[message].push(callback);
+        // Add the callback to the stack of callbacks.
+        _listenersCallbacks[message].push(callback);
     };
 
 })(passbolt);

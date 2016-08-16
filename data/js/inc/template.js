@@ -37,7 +37,7 @@
    */
   var initPageTpl = function(options) {
     getTpl(self.options.templatePath, function(tpl) {
-      // Additional data to passe to the template renderer.
+      // Additional data to pass to the template renderer.
       var ejsParams = {
         addonDataPath: self.options.addonDataPath
       };

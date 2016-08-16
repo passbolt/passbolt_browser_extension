@@ -10,30 +10,6 @@
  * ================================================================================== */
 
 // Close the latest opened dialog message.
-passbolt.message.on('passbolt.keyring.master.request.close', function() {
-    $('#passbolt-iframe-master-password').remove();
-});
-
-// Intercept the request passbolt.keyring.master.request.
-// Display a popup to request the user passphrase.
-passbolt.message.on('passbolt.keyring.master.request', function(token) {
-    // Inject the passphrase dialog into the web page DOM.
-    var $iframe = $('<iframe/>', {
-      id: 'passbolt-iframe-master-password',
-      src: 'about:blank?passbolt=masterInline',
-      frameBorder: 0
-    });
-    $iframe.appendTo('body')
-      .addClass('passbolt-plugin-dialog');
-
-    // When the iframe is ready pass it some variables.
-    // @todo ATTENTION, is the lib which will intercept the events will be loaded at that point in the iframe ?
-    $iframe.on('load', function() {
-      passbolt.event.dispatchContext('MasterPassword', 'token', token);
-    });
-  });
-
-// Close the latest opened dialog message.
 passbolt.message.on('passbolt.progress_dialog.close', function() {
     setTimeout(() => {
       $('#passbolt-iframe-progress-dialog').fadeOut(500, function() {

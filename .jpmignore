@@ -8,6 +8,7 @@
 # Ignore grunt and bower working directory
 /node_modules
 /bower_components
+/test
 .git
 .bowerrc
 .gitignore
@@ -16,5 +17,7 @@
 locale/empty
 /data/less
 Gruntfile.js
+CHANGELOG.MD
+README.MD
 npm-debug.log
 config.json.default

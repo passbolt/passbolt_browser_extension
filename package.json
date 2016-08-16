@@ -27,7 +27,7 @@
     "grunt-contrib-jshint": "~0.7.2",
     "grunt-shell": "^1.1.1",
     "grunt-text-replace": "~0.3.11",
-    "jpm": "1.0.6"
+    "jpm": "1.1.4"
   },
   "main" : "lib/main.js"
 }

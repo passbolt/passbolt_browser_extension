@@ -19,7 +19,10 @@ module.exports = function(grunt) {
 		clean: {
 			css: [
 				'<%= config.webroot %>/css/*.css'
-			]
+			],
+            img: [
+                '<%= config.webroot %>/img'
+            ]
 		},
 		shell: {
 			updatestyleguide: {
@@ -36,9 +39,10 @@ module.exports = function(grunt) {
 					'rm -f passbolt*.xpi',
 					"sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": true/' ./lib/config/config.json",
 					'./node_modules/jpm/bin/jpm xpi',
-					"mv passbolt@passbolt.com-<%= pkg.version %>.xpi passbolt@passbolt.com-<%= pkg.version %>-debug.xpi",
+					"mv passbolt.xpi passbolt@passbolt.com-<%= pkg.version %>-debug.xpi",
 					"sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' ./lib/config/config.json",
 					'./node_modules/jpm/bin/jpm xpi',
+                    "mv passbolt.xpi passbolt@passbolt.com-<%= pkg.version %>.xpi",
 					'ln -s passbolt@passbolt.com-<%= pkg.version %>-debug.xpi ./passbolt-latest@passbolt.com.xpi'
 				].join('&&')
 			},
@@ -55,18 +59,32 @@ module.exports = function(grunt) {
 		copy: {
 			styleguide : {
 				files: [{
-					// Icons
+                    // Avatar
+                    nonull: true,
+                    cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img/avatar',
+                    src: ['user.png'],
+                    dest: '<%= config.webroot %>/img/avatar',
+                    expand: true
+                },{
+                    // Controls
+                    nonull: true,
+                    cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img/controls',
+                    src: ['colorpicker/**', 'calendar.png', 'infinite-bar.gif', 'loading.gif', 'menu.png'],
+                    dest: '<%= config.webroot %>/img/controls',
+                    expand: true
+                },{
+                    // Logo
+                    nonull: true,
+                    cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img/logo',
+                    src: ['icon-16.png', 'icon-20.png','icon-20_white.png', 'icon-32.png','icon-64.png', 'logo.png', 'logo@2x.png'],
+                    dest: '<%= config.webroot %>/img/logo',
+                    expand: true
+                },{
+					// Third party
 					nonull: true,
-					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img/logo',
-					src: ['icon-16.png','icon-32.png','icon-64.png','icon-20.png','icon-20_white.png'],
-					dest: '<%= config.webroot %>/img/logo',
-					expand: true
-				},{
-					// Images
-					nonull: true,
-					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img',
-					src: ['logo/**','third_party/**','avatar/**','controls/**'],
-					dest: '<%= config.webroot %>/img',
+					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img/third_party',
+					src: ['ChromeWebStore.png', 'ChromeWebStore_disabled.png', 'firefox_logo.png', 'firefox_logo_disabled.png', 'gnupg_logo.png', 'gnupg_logo_disabled.png'],
+					dest: '<%= config.webroot %>/img/third_party',
 					expand: true
 				},{
 					// Less
@@ -114,12 +132,7 @@ module.exports = function(grunt) {
                         // Comment promise polyfill. We don't need it. And it breaks.
                         from: "_es6Promise2.default.polyfill();",
                         to: "//_es6Promise2.default.polyfill();"
-                    }//,
-                    //{
-                    //    // Fix path to openpgp worker.
-                    //    from: "'openpgp.worker.js'",
-                    //    to: "'resource://passbolt-at-passbolt-dot-com/lib/vendors/openpgp.worker.js'"
-                    //}
+                    }
                 ]
             }
         }
@@ -131,7 +144,8 @@ module.exports = function(grunt) {
 	//    });
 
 	// ========================================================================
-	// Initialise
+	// Initialize
+    grunt.loadNpmTasks('grunt-contrib-clean');
 
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 
@@ -145,7 +159,7 @@ module.exports = function(grunt) {
 	// Register Tasks
 
 	// Bower deploy
-	grunt.registerTask('styleguide-update', ['shell:updatestyleguide','copy:styleguide','shell:jpmxpi']);
+	grunt.registerTask('styleguide-update', ['shell:updatestyleguide', 'clean:css', 'clean:img', 'copy:styleguide','shell:jpmxpi']);
 
     // Copy, patch (to make it work with firefox) and deploy openPGP in libraries.
     grunt.registerTask('lib-openpgp-deploy', ['replace:openpgp_ff', 'copy:openpgp_ff']);

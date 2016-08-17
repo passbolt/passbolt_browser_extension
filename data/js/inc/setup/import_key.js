@@ -189,7 +189,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
                 def.resolve(armoredPrivateKey);
             })
             .then(null, function() {
-                def.reject('This key doesn\' match any account.');
+                def.reject('This key doesn\'t match any account.');
             });
         return def;
     },

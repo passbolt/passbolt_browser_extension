@@ -123,11 +123,7 @@
         $('label[for="js_master_password"]').html('Please enter a valid passphrase.')
           .addClass('error');
       } else {
-        getTpl('./tpl/master/master-password-failure.ejs', function (tpl) {
-          // Render the page template.
-          var html = new EJS({text: tpl}).render();
-          $('.js_dialog_content').html(html);
-        });
+        passbolt.helper.html.loadTemplate($('.js_dialog_content'), './tpl/master/master-password-failure.ejs');
       }
     }
   };

@@ -158,18 +158,17 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @param secret
      */
     step._updatePasswordCriterias = function (password) {
-        getTpl('./tpl/secret/criterias.ejs', function (tpl) {
-            var criterias = {};
-            if (password.length > 0) {
-                var criterias = secretComplexity.matchMasks(password);
-                criterias['dictionary'] = null;
-                criterias['minLength'] = password.length >= 8;
-            }
-            var data = {
-                criterias: criterias
-            };
-            step.elts.$passwordCriterias.html(new EJS({text: tpl}).render(data));
-        });
+        var criterias = {};
+        if (password.length > 0) {
+            var criterias = secretComplexity.matchMasks(password);
+            criterias['dictionary'] = null;
+            criterias['minLength'] = password.length >= 8;
+        }
+        var data = {
+            criterias: criterias
+        };
+
+        passbolt.helper.html.loadTemplate(step.elts.$passwordCriterias, './tpl/secret/criterias.ejs', 'html', data);
     };
 
     /**
@@ -177,14 +176,13 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * @param secret
      */
     step._updatePasswordStrength = function (password) {
-        getTpl('./tpl/secret/strength.ejs', function (tpl) {
-            var strength = secretComplexity.strength(password);
-            var data = {
-                strengthId: secretComplexity.STRENGTH[strength].id,
-                strengthLabel: secretComplexity.STRENGTH[strength].label
-            };
-            step.elts.$passwordStrength.html(new EJS({text: tpl}).render(data));
-        });
+        var strength = secretComplexity.strength(password);
+        var data = {
+            strengthId: secretComplexity.STRENGTH[strength].id,
+            strengthLabel: secretComplexity.STRENGTH[strength].label
+        };
+
+        passbolt.helper.html.loadTemplate(step.elts.$passwordStrength, './tpl/secret/strength.ejs', 'html', data);
     };
 
     passbolt.setup.steps[step.id] = step;

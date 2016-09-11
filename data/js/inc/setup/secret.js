@@ -11,15 +11,18 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 (function (passbolt) {
 
   var step = {
-    'id': 'secret',
-    'elts': {
-      password: '#js_field_password',
-      passwordClear: '#js_field_password_clear',
-      viewPasswordButton: '#js_show_pwd_button',
-      passwordStrength: '#js_user_pwd_strength',
-      passwordCriterias: '#js_password_match_criterias'
-    }
-  };
+      id: 'secret',
+      elts: {
+        password: '#js_field_password',
+        passwordClear: '#js_field_password_clear',
+        viewPasswordButton: '#js_show_pwd_button',
+        passwordStrength: '#js_user_pwd_strength',
+        passwordCriterias: '#js_password_match_criterias'
+      }
+    },
+
+  // Allow to delay the treament of the master password input.
+    currentOnPasswordInputTimeout = null;
 
   /* ==================================================================================
    *  Content code events
@@ -42,7 +45,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
       step.elts.$passwordClear.val(step.elts.$password.val());
       step.elts.$viewPasswordButton.addClass('selected');
     }
-  }
+  };
 
   /**
    * On input change event on the clear password field.
@@ -51,7 +54,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     // Update password field.
     step.elts.$password.val(step.elts.$passwordClear.val())
       .trigger('change');
-  }
+  };
 
   /**
    * On input change event on the password field.
@@ -64,21 +67,24 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     step.elts.$passwordClear.val(password);
 
     // Update strength.
-    step._updatePasswordStrength(password);
+    return step._updatePasswordStrength(password)
 
-    // Update criterias.
-    step._updatePasswordCriterias(password);
-
-    // Validate key.
-    passbolt.request('passbolt.keyring.key.validate', {passphrase: password}, ['passphrase'])
+      // Update criterias.
       .then(function () {
-        passbolt.setup.setActionState('submit', 'enabled');
+        return step._updatePasswordCriterias(password);
       })
-      .then(null, function (errorMessage, validationErrors) {
-        passbolt.setup.setActionState('submit', 'disabled');
-      })
-  }
 
+      // Validate key.
+      .then(function () {
+        passbolt.request('passbolt.keyring.key.validate', {passphrase: password}, ['passphrase'])
+          .then(function () {
+            passbolt.setup.setActionState('submit', 'enabled');
+          })
+          .then(null, function (errorMessage, validationErrors) {
+            passbolt.setup.setActionState('submit', 'disabled');
+          })
+      });
+  };
 
   /* ==================================================================================
    *  Core functions (Implements()).
@@ -106,7 +112,14 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
     // On input change.
     step.elts.$password.on('input change', function () {
-      step.onPasswordInput();
+      // If the treatment of the input is already schedule.
+      if (currentOnPasswordInputTimeout != null) {
+        clearTimeout(currentOnPasswordInputTimeout);
+      }
+      // Postpone the input treatment
+      currentOnPasswordInputTimeout = setTimeout(function () {
+        step.onPasswordInput();
+      }, 100);
     });
 
     // When the clear password is updated.
@@ -168,7 +181,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
       criterias: criterias
     };
 
-    passbolt.helper.html.loadTemplate(step.elts.$passwordCriterias, './tpl/secret/criterias.ejs', 'html', data);
+    return passbolt.helper.html.loadTemplate(step.elts.$passwordCriterias, './tpl/secret/criterias.ejs', 'html', data);
   };
 
   /**
@@ -182,7 +195,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
       strengthLabel: secretComplexity.STRENGTH[strength].label
     };
 
-    passbolt.helper.html.loadTemplate(step.elts.$passwordStrength, './tpl/secret/strength.ejs', 'html', data);
+    return passbolt.helper.html.loadTemplate(step.elts.$passwordStrength, './tpl/secret/strength.ejs', 'html', data);
   };
 
   passbolt.setup.steps[step.id] = step;

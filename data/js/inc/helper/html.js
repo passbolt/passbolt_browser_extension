@@ -11,6 +11,9 @@ passbolt.helper.html = passbolt.helper.html || {};
 
 (function (passbolt) {
 
+	// Cache the templates.
+	var _templatesCache = {};
+
 	/**
 	 * Resize an iframe container regarding its content size.
 	 * Call this method from the iframe content scope.
@@ -88,7 +91,18 @@ passbolt.helper.html = passbolt.helper.html || {};
 	 * @return {Promise.<T>|*}
 	 */
 	var getTemplate = function(path) {
-		return passbolt.request('passbolt.template.get', path);
+		// If the template exists in cache.
+		if (typeof _templatesCache[path] != 'undefined') {
+			var deferred = $.Deferred();
+			deferred.resolveWith(this, [_templatesCache[path]]);
+			return deferred.promise();
+		}
+
+		return passbolt.request('passbolt.template.get', path)
+			.then(function(tpl) {
+				_templatesCache[path] = tpl;
+				return tpl;
+			});
 	};
 	passbolt.helper.html.getTemplate = getTemplate;
 

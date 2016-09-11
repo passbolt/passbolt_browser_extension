@@ -3,7 +3,7 @@
  *
  * It has for aim to control the master password dialog iframe.
  * 	- Add the iframe to the application page. The masterPasswordDialogPagemod
- * 	  will detect it and will display the iframe content.
+ * 	  will detect it and will control it.
  * 	- Close the iframe.
  *
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd

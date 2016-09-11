@@ -1,7 +1,7 @@
 <div id="js_plugin_progress_dialog" class="dialog-wrapper progress-dialog">
     <div class="dialog">
         <div class="dialog-header">
-            <h2>Encrypting ...</h2>
+            <h2><%= title!=null ? title : '' %></h2>
             <a href="#" class="dialog-close js-dialog-close">
                 <i class="fa fa-close"></i>
                 <span class="visuallyhidden">close</span>
@@ -12,9 +12,9 @@
             <div class="form-content">
                 <label>Take a deep breath and enjoy being in the present moment...</label>
                 <div class="progress-bar-wrapper">
-                    <div id="js_progress_bar_container" class="progress-bar big">
-                        <span id="js_progress_bar" class="progress"></span>
-                    </div>
+                    <span id="js_progress_bar_container" class="progress-bar big infinite">
+                        <span class="progress"></span>
+                    </span>
                 </div>
                 <div class="progress-details">
                     <span id="js_progress_step_label" class="progress-step-label">&nbsp;</span>

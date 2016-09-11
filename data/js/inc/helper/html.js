@@ -82,4 +82,37 @@ passbolt.helper.html = passbolt.helper.html || {};
 		}
 	});
 
+	/**
+	 * Get template
+	 * @param path The template path.
+	 * @return {Promise.<T>|*}
+	 */
+	var getTemplate = function(path) {
+		return passbolt.request('passbolt.template.get', path);
+	};
+	passbolt.helper.html.getTemplate = getTemplate;
+
+	/**
+	 * Render a template and add the result to the selector given in parameter.
+	 *
+	 * @param selector The selector which defines the HTMLElement to add the
+	 *   rendered template in it.
+	 * @param path The template path.
+	 * @param loadStrategy The strategy to use to load the rendered template.
+	 * @param data (optional) Data to pass to the rendering engine.
+	 * @return {Promise.<T>|*}
+	 */
+	var loadTemplate = function(selector, path, loadStrategy, data) {
+		if (!loadStrategy) {
+			loadStrategy = 'html';
+		}
+		return getTemplate(path)
+			.then(function(tpl) {
+				// Render the template.
+				var html = new EJS({text: tpl}).render(data);
+				return $(selector)[loadStrategy](html);
+			});
+	};
+	passbolt.helper.html.loadTemplate = loadTemplate;
+
 })( passbolt );

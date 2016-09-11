@@ -23,12 +23,9 @@ passbolt.bootstrap = passbolt.bootstrap || {};
         passbolt.request('passbolt.addon.getDomain').then(
             function success(trustedDomain) {
                 // Get template.
-                getTpl('./tpl/login/wrong-domain.ejs', function (tpl) {
-                    var html = new EJS({text: tpl}).render({
-                        trustedDomain : trustedDomain,
-                        publicRegistration : publicRegistration
-                    });
-                    $renderSpace.html(html);
+                passbolt.helper.html.loadTemplate($renderSpace, './tpl/login/wrong-domain.ejs','html', {
+                  trustedDomain : trustedDomain,
+                  publicRegistration : publicRegistration
                 });
             });
     };

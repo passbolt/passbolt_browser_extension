@@ -36,20 +36,16 @@
    * Initialize page with a template.
    */
   var initPageTpl = function(options) {
-    getTpl(self.options.templatePath, function(tpl) {
-      // Additional data to pass to the template renderer.
-      var ejsParams = {
-        addonDataPath: self.options.addonDataPath
-      };
-      $.extend(ejsParams, options);
+    // Additional data to pass to the template renderer.
+    var ejsParams = {
+      addonDataPath: self.options.addonDataPath
+    };
+    $.extend(ejsParams, options);
 
-      // Render the page template.
-      var html = new EJS({text: tpl}).render(ejsParams);
-      $('body').html(html);
-
-      // When ready trigger the template-ready event.
-      $(document).trigger('template-ready');
-    });
+    passbolt.helper.html.loadTemplate('body', self.options.templatePath, 'html', ejsParams)
+      .then(function() {
+        $(document).trigger('template-ready');
+      });
   };
   exports.initPageTpl = initPageTpl;
 

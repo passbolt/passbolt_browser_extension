@@ -14,13 +14,13 @@ passbolt.setup.data = passbolt.setup.data || {};
   var currentStepId = null,
   // Default actions available at each step.
     defaultStepActions = {
-      'submit': 'enabled',
-      'cancel': 'enabled'
+      submit: 'enabled',
+      cancel: 'enabled'
     },
   // Actions and their default states.
     actionsStates = {
-      'submit': 'enabled',
-      'cancel': 'enabled'
+      submit: 'enabled',
+      cancel: 'enabled'
     },
   // First step id.
     firstStepId = 'domain_check',
@@ -282,7 +282,7 @@ passbolt.setup.data = passbolt.setup.data || {};
     $actionsWrapper.empty();
 
     // Load the actions template
-    passbolt.helper.html.loadTemplate($actionsWrapper, './tpl/setup/action_buttons.ejs')
+    return passbolt.helper.html.loadTemplate($actionsWrapper, './tpl/setup/action_buttons.ejs')
       .then(function () {
         // Define which actions are available, as well as their states.
         // This is based on defaultActions, and extended with step actions if defined.
@@ -335,7 +335,7 @@ passbolt.setup.data = passbolt.setup.data || {};
    *   step id
    */
   passbolt.setup.initMenu = function (stepId) {
-    passbolt.setup.getMenuSteps()
+    return passbolt.setup.getMenuSteps()
       .then(function (menuSteps) {
         var data = {
           steps: passbolt.setup.steps,
@@ -364,23 +364,25 @@ passbolt.setup.data = passbolt.setup.data || {};
     $title.html(step.title);
 
     // Initialize the step.
-    step.init().then(function () {
-      // Load the template relative to the step and start the step.
-      var tplPath = './tpl/setup/' + currentStepId + '.ejs';
-      return passbolt.helper.html.loadTemplate($contentWrapper, tplPath, 'html', step.viewData)
-        .then(function () {
-          // Get elements for all selectors.
-          if (step.elts != undefined) {
-            for (name in step.elts) {
-              step.elts['$' + name] = $(step.elts[name]);
-            }
-          }
+    return step.init()
 
-          // Start the step.
-          step.start();
-        });
-    });
-  }
+      .then(function () {
+        // Load the template relative to the step and start the step.
+        var tplPath = './tpl/setup/' + currentStepId + '.ejs';
+        return passbolt.helper.html.loadTemplate($contentWrapper, tplPath, 'html', step.viewData)
+          .then(function () {
+            // Get elements for all selectors.
+            if (step.elts != undefined) {
+              for (name in step.elts) {
+                step.elts['$' + name] = $(step.elts[name]);
+              }
+            }
+
+            // Start the step.
+            step.start();
+          });
+      });
+  };
 
   /**
    * Go to the step.
@@ -390,14 +392,18 @@ passbolt.setup.data = passbolt.setup.data || {};
   passbolt.setup.goToStep = function (targetStepId) {
 
     // Initialize and render menu.
-    passbolt.setup.initMenu(targetStepId);
+    return passbolt.setup.initMenu(targetStepId)
 
-    // Init step action buttons.
-    passbolt.setup.initActionButtons(targetStepId);
+      // Init step action buttons.
+      .then(function () {
+        return passbolt.setup.initActionButtons(targetStepId);
+      })
 
-    // Init content.
-    // Is done at the end because this step will take care of initializing the button states too.
-    passbolt.setup.initContent(targetStepId);
+      // Init content.
+      // Is done at the end because this step will take care of initializing the button states too.
+      .then(function () {
+        return passbolt.setup.initContent(targetStepId);
+      });
   };
 
   /**
@@ -713,6 +719,6 @@ passbolt.setup.data = passbolt.setup.data || {};
       .then(function () {
         return passbolt.request('passbolt.setup.flush');
       });
-  }
+  };
 
 })(jQuery);

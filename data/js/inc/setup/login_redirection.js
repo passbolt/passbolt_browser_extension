@@ -10,122 +10,122 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
 (function (passbolt) {
 
-    var step = {
-        'id': 'login_redirection',
-        'options': {
-            'workflow': 'install'
-        }
-    };
+  var step = {
+    'id': 'login_redirection',
+    'options': {
+      'workflow': 'install'
+    }
+  };
 
 
-    /* ==================================================================================
-     *  Core functions (Implements()).
-     * ================================================================================== */
+  /* ==================================================================================
+   *  Core functions (Implements()).
+   * ================================================================================== */
 
-    /**
-     * Implements init().
-     * @returns {*}
-     */
-    step.init = function () {
-        var def = $.Deferred();
-        def.resolve();
-        return def;
-    };
+  /**
+   * Implements init().
+   * @returns {*}
+   */
+  step.init = function () {
+    var def = $.Deferred();
+    def.resolve();
+    return def;
+  };
 
-    /**
-     * Implements start().
-     */
-    step.start = function () {
-        step.submit();
-    };
+  /**
+   * Implements start().
+   */
+  step.start = function () {
+    step.submit();
+  };
 
 
-    /**
-     * Implements submit().
-     * @returns {*}
-     */
-    step.submit = function () {
-        return passbolt.setup.get()
-            .then(step._validateAccount)
-            .then(step._flushSetup)
-            .then(function () {
-                // Autologin.
-                step._goToLogin();
-            });
-    };
+  /**
+   * Implements submit().
+   * @returns {*}
+   */
+  step.submit = function () {
+    return passbolt.setup.get()
+      .then(step._validateAccount)
+      .then(step._flushSetup)
+      .then(function () {
+        // Autologin.
+        step._goToLogin();
+      });
+  };
 
-    /**
-     * Implements cancel().
-     * @returns {*}
-     */
-    step.cancel = function () {
-        passbolt.setup.setActionState('cancel', 'processing');
-        var def = $.Deferred();
-        def.resolve();
-        return def;
-    };
+  /**
+   * Implements cancel().
+   * @returns {*}
+   */
+  step.cancel = function () {
+    passbolt.setup.setActionState('cancel', 'processing');
+    var def = $.Deferred();
+    def.resolve();
+    return def;
+  };
 
-    /* ==================================================================================
-     *  Business functions
-     * ================================================================================== */
+  /* ==================================================================================
+   *  Business functions
+   * ================================================================================== */
 
-    /**
-     * Flush setup.
-     *
-     * If setup went fine, we don't need to keep the data as they are already stored
-     * in user object.
-     *
-     * @private
-     */
-    step._flushSetup = function() {
-        return passbolt.request('passbolt.setup.flush')
-            .then(null, function (error) {
-                //@todo PASSBOLT-1471
-                //console.log('error while flushing setup', error);
-            });
-    };
+  /**
+   * Flush setup.
+   *
+   * If setup went fine, we don't need to keep the data as they are already stored
+   * in user object.
+   *
+   * @private
+   */
+  step._flushSetup = function () {
+    return passbolt.request('passbolt.setup.flush')
+      .then(null, function (error) {
+        //@todo PASSBOLT-1471
+        //console.log('error while flushing setup', error);
+      });
+  };
 
-    /**
-     * Go to login at the end of the setup.
-     * @private
-     */
-    step._goToLogin = function () {
-        // Get domain from settings.
-        return passbolt.request('passbolt.user.settings.get.domain')
-            .then(function(domain) {
-                var loginUrl = domain + "/auth/login";
-                // Set timeout so the user has time to read the redirection message before actually being redirected.
-                setTimeout(
-                    function () {
-                        window.location.href = loginUrl;
-                    },
-                    2000);
-            });
-    };
+  /**
+   * Go to login at the end of the setup.
+   * @private
+   */
+  step._goToLogin = function () {
+    // Get domain from settings.
+    return passbolt.request('passbolt.user.settings.get.domain')
+      .then(function (domain) {
+        var loginUrl = domain + "/auth/login";
+        // Set timeout so the user has time to read the redirection message before actually being redirected.
+        setTimeout(
+          function () {
+            window.location.href = loginUrl;
+          },
+          2000);
+      });
+  };
 
-    /**
-     * Validate account of the user on the server with data collected during the setup.
-     *
-     * @param setupData
-     * @private
-     */
-    step._validateAccount = function(setupData) {
-        if (step.options.workflow == 'install') {
-            return passbolt.request('passbolt.setup.save', setupData)
-                .then(null, function (error) {
-                    // Throw fatal error.
-                    passbolt.setup.fatalError(error.message, error.data);
-                });
-        }
-        else if (step.options.workflow == 'recover') {
-            return passbolt.request('passbolt.setup.completeRecovery', setupData)
-                .then(null, function (error) {
-                    // Throw fatal error.
-                    passbolt.setup.fatalError(error.message, error.data);
-                });
-        }
-    };
+  /**
+   * Validate account of the user on the server with data collected during the setup.
+   *
+   * @param setupData
+   * @private
+   */
+  step._validateAccount = function (setupData) {
+    if (step.options.workflow == 'install') {
+      return passbolt.request('passbolt.setup.save', setupData)
+        .then(null, function (error) {
+          // Throw fatal error.
+          passbolt.setup.fatalError(error.message, error.data);
+        });
+    }
+    else if (step.options.workflow == 'recover') {
+      return passbolt.request('passbolt.setup.completeRecovery', setupData)
+        .then(null, function (error) {
+          // Throw fatal error.
+          passbolt.setup.fatalError(error.message, error.data);
+        });
+    }
+  };
 
-    passbolt.setup.steps[step.id] = step;
+  passbolt.setup.steps[step.id] = step;
 
 })(passbolt);

@@ -196,7 +196,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
           step._getUserDomain()
             .then(step._getUserData)
             .then(function (userSettings) {
-              return passbolt.helper.html.loadTemplate($('.plugin-check .message'), './tpl/master/master-password-failure.ejs', html, userSettings);
+              return passbolt.helper.html.loadTemplate($('.plugin-check .message'), './tpl/setup/already_configured.ejs', 'html', userSettings);
             })
             .then(function () {
               $('.plugin-check .message')

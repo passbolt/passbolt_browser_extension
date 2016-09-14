@@ -106,7 +106,7 @@
    */
   var submitMasterPassword = function (masterPassword) {
     $submitButton.addClass('processing');
-    self.port.emit("passbolt.keyring.master.request.submit", passbolt.context.token, masterPassword);
+    self.port.emit("passbolt.master-password.submit", passbolt.context.token, masterPassword);
   };
 
   /* ==================================================================================

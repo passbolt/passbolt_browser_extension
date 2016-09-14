@@ -105,6 +105,7 @@
    * @param masterPassword {string} The master password to send to the addon code.
    */
   var submitMasterPassword = function (masterPassword) {
+    $submitButton.addClass('processing');
     self.port.emit("passbolt.keyring.master.request.submit", passbolt.context.token, masterPassword);
   };
 
@@ -192,7 +193,6 @@
    * @param ev
    */
   var submitButtonClicked = function () {
-    $submitButton.addClass('processing');
     var masterPassword = $masterPasswordField.val();
 
     // The user wants his master password to be remembered.

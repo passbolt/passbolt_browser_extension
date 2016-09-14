@@ -10,7 +10,6 @@
   // The dialog can be open in create or in edit mode.
   // In edit mode the secret needs to be decrypted to be edited.
   var dialogCase = 'create',
-    originalSecret = '',
     initialSecretPlaceholder = null,
   // The password to edit, it is retrieved by sending a request to the addon-code.
     editedPassword = null,
@@ -33,14 +32,14 @@
 
     // Load the page template.
     loadTemplate()
-    // Init the secret strength with an empty password.
+    // Retrieve the currently edited secret model (even in add case)
+      .then(getEditedPassword)
+      // Init the secret strength with an empty password.
       .then(updateSecretStrength)
       // Init the security token.
       .then(function () {
         return passbolt.security.initSecurityToken('#js_secret', '.security-token');
       })
-      // Retrieve the currently edited secret model (even in add case)
-      .then(getEditedPassword)
       // Lock the secret filed if in edition mode.
       .then(function () {
         if (dialogCase == 'edit') {
@@ -134,10 +133,8 @@
    * Update the secret strength component.
    * @param secret
    */
-  var updateSecretStrength = function (secret) {
-    if (secret === undefined) {
-      secret = '';
-    }
+  var updateSecretStrength = function () {
+    var secret = editedPassword.secret || '';
 
     // Calcul the secret strength.
     var strength = secretComplexity.strength(secret),
@@ -177,9 +174,9 @@
 
       // Store the secret locally, and mark change the component state.
       .then(function (secret) {
-        originalSecret = secret;
         editedPassword.secret = secret;
         secretStateChangeHandler('decrypted');
+        updateSecretStrength();
       }, error)
 
       // Store the decrypted password in the model.
@@ -237,7 +234,7 @@
     // Update the interface.
     editedPassword.secret = $secret.val();
     $secretClear.val(editedPassword.secret);
-    updateSecretStrength(editedPassword.secret);
+    updateSecretStrength();
     passbolt.request('passbolt.edit-password.set-edited-password', editedPassword);
 
     // If the secret has been validated once, validate it again.

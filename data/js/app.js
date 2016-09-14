@@ -118,12 +118,10 @@ window.addEventListener('passbolt.share.encrypt', function () {
 window.addEventListener('passbolt.share.remove_permission', function (event) {
   var data = event.detail,
   // The user the permission has been deleted for.
-    userId = data.userId,
-  // Is the permission temporary
-    isTemporaryPermission = data.isTemporaryPermission;
+    userId = data.userId;
 
   // Notify the share dialog about this change
-  passbolt.message.emitOn('Share', 'passbolt.share.remove_permission', userId, isTemporaryPermission);
+  passbolt.message.emit('passbolt.share.remove-permission', userId);
 });
 
 // Listen when the user requests a backup of his private key.

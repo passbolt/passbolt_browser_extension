@@ -9,6 +9,16 @@
  *  Add-on Code Events Listeners
  * ================================================================================== */
 
+// Add a css class to an html element
+passbolt.message.on('passbolt.passbolt-page.add-class', function (selector, cssClass) {
+  $(selector).addClass(cssClass);
+});
+
+// Remove a css class to an html element
+passbolt.message.on('passbolt.passbolt-page.remove-class', function (selector, cssClass) {
+  $(selector).removeClass(cssClass);
+});
+
 // Ask the passbolt page to release its focus
 passbolt.message.on('passbolt.passbolt-page.remove_all_focuses', function () {
   passbolt.event.triggerToPage('remove_all_focuses');

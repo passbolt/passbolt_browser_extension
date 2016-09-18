@@ -48,7 +48,12 @@
         }
       })
       // Init the event listeners.
-      .then(initEventsListeners, error);
+      .then(initEventsListeners, error)
+      // Mark the iframe container as ready.
+      .then(function () {
+        passbolt.message.emit('passbolt.passbolt-page.remove-class', '#passbolt-iframe-secret-edition', 'loading');
+        passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-secret-edition', 'ready');
+      });
   };
 
   /**

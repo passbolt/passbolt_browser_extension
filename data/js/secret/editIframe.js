@@ -21,6 +21,7 @@
     var $iframe = $('<iframe/>', {
       id: 'passbolt-iframe-secret-edition',
       src: 'about:blank?passbolt=secretEdit&case=' + dialogCase,
+      class: 'loading',
       frameBorder: 0
     });
     $iframe.appendTo('.js_form_secret_wrapper');

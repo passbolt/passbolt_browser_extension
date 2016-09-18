@@ -17,7 +17,7 @@ passbolt.message.on('passbolt.master-password.open-dialog', function (token) {
 	var $iframe = $('<iframe/>', {
 		id: 'passbolt-iframe-master-password',
 		src: 'about:blank?passbolt=masterPasswordDialog',
-		class: 'passbolt-plugin-dialog',
+		class: 'passbolt-plugin-dialog loading',
 		frameBorder: 0
 	});
 	$iframe.appendTo('body');

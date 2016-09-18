@@ -25,7 +25,12 @@
       // Init the security token.
       .then(initSecurityToken)
       // Init the event listeners.
-      .then(initEventsListeners);
+      .then(initEventsListeners)
+      // Mark the iframe container as ready.
+      .then(function () {
+        passbolt.message.emit('passbolt.passbolt-page.remove-class', '#passbolt-iframe-password-share', 'loading');
+        passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-password-share', 'ready');
+      });
   };
 
   /**

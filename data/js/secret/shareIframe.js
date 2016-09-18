@@ -20,6 +20,7 @@
     var $iframeShare = $('<iframe/>', {
       id: 'passbolt-iframe-password-share',
       src: 'about:blank?passbolt=shareInline',
+      class: 'loading',
       frameBorder: 0,
       marginwidth: 0,
       marginheight: 0,

@@ -242,6 +242,9 @@
       return;
     }
 
+    // Notify the application regarding the change.
+    passbolt.message.emit('passbolt.secret-edit.secret-updated');
+
     // Update the interface.
     editedPassword.secret = $secret.val();
     $secretClear.val(editedPassword.secret);

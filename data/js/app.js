@@ -29,6 +29,11 @@ passbolt.message.on('passbolt.share.add-permission', function (permission) {
   passbolt.event.triggerToPage('resource_share_add_permission', permission);
 });
 
+// The secret has been updated, notify the application.
+passbolt.message.on('passbolt.secret-edit.secret-updated', function () {
+  passbolt.event.triggerToPage('secret_edition_secret_changed');
+});
+
 /* ==================================================================================
  *  JS Application Events Listeners
  * ================================================================================== */

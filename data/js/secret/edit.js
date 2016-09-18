@@ -210,10 +210,16 @@
   // When the user explicitly wants to view the secret.
   var viewSecretButtonClickedHandler = function (ev) {
     ev.preventDefault();
+
     // The operation requires the secret to be decrypted.
     if (isDecrypted()) {
       toggleViewSecret();
-    } else {
+    }
+    // If not decrypted, decrypt it before displaying it.
+    else {
+      // If click on the non decrypted state, we remove the  focus. We do that
+      // because the focus will be needed by the passphrase dialog.
+      $(this).blur();
       decryptSecret()
         .then(function () {
           toggleViewSecret();
@@ -252,9 +258,8 @@
   // When a user click on the secret/password field
   var secretFieldFocusedHandler = function (ev) {
     if (!isDecrypted()) {
-      // If click is done while on the non decrypted state,
-      // we remove the focus.
-      // We do that because the focus will be needed by the passphrase dialog.
+      // If click on the non decrypted state, we remove the  focus. We do that
+      // because the focus will be needed by the passphrase dialog.
       $secret.blur();
 
       // Launch decryption.
@@ -289,11 +294,15 @@
     var code = ev.keyCode || ev.which;
     // Backtab key.
     if (code == '9' && ev.shiftKey) {
+      // If click on the non decrypted state, we remove the  focus. We do that
+      // because the focus will be needed by the passphrase dialog.
       $secret.blur();
       passbolt.message.emitOn('App', 'passbolt.event.trigger_to_page', 'secret_backtab_pressed');
     }
     // Tab key.
     else if (code == '9') {
+      // If click on the non decrypted state, we remove the  focus. We do that
+      // because the focus will be needed by the passphrase dialog.
       $secret.blur();
       passbolt.message.emitOn('App', 'passbolt.event.trigger_to_page', 'secret_tab_pressed');
     }

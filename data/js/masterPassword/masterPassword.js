@@ -94,7 +94,7 @@
   /**
    * Request the addon to remember the master password
    */
-  var rememberMasterPassword = function (time) {
+  var rememberMasterPassword = function (masterPassword, time) {
     time = time ? time : 300;
     passbolt.request('passbolt.user.rememberMasterPassword', masterPassword, time);
   };
@@ -197,7 +197,7 @@
 
     // The user wants his master password to be remembered.
     if ($('#js_remember_master_password').is(':checked')) {
-      rememberMasterPassword();
+      rememberMasterPassword(masterPassword);
     }
 
     submitMasterPassword(masterPassword);

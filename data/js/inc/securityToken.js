@@ -23,8 +23,6 @@ passbolt.security = passbolt.security || {};
   var initSecurityToken = function (protectedFieldSelector, securityTokenSelector) {
     return passbolt.request('passbolt.user.settings.get.securityToken')
       .then(function (securityToken) {
-        console.log('initSecurityToken');
-        console.log(securityToken);
         $(securityTokenSelector).text(securityToken.code);
         securityToken.id = protectedFieldSelector;
         return passbolt.helper.html.loadTemplate('head', './tpl/secret/securitytoken-style.ejs', 'append', securityToken);

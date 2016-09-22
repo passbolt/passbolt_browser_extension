@@ -61,7 +61,7 @@
     var deferred = $.Deferred();
 
     // Ask the passbolt application to release the focus.
-    passbolt.message.emit('passbolt.passbolt-page.remove_all_focuses');
+    passbolt.message.emit('passbolt.passbolt-page.remove-all-focuses');
 
     // We set the focus on the first focus field.
     var interval = setInterval(function () {

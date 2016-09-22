@@ -174,14 +174,18 @@
     // Change placeholder text.
     $secret.attr("placeholder", "decrypting...");
 
+    // Notify the application page regarding a running process
+    passbolt.message.emit('passbolt.passbolt-page.loading');
+
     // Request the secret decryption.
-    return passbolt.request('passbolt.secret.decrypt', editedPassword.armored)
+    return passbolt.request('passbolt.secret-edit.decrypt', editedPassword.armored)
 
       // Store the secret locally, and mark change the component state.
       .then(function (secret) {
         editedPassword.secret = secret;
         secretStateChangeHandler('decrypted');
         updateSecretStrength();
+        passbolt.message.emit('passbolt.passbolt-page.loading_complete');
       }, error)
 
       // Store the decrypted password in the model.

@@ -162,7 +162,7 @@
   };
 
   // The application window has been resized.
-  passbolt.message.on('passbolt.html_helper.app_window_resized', function (cssClasses) {
+  passbolt.message.on('passbolt.app.window-resized', function (cssClasses) {
     resize(cssClasses);
   });
 

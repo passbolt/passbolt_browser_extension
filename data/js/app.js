@@ -6,8 +6,20 @@
  */
 
 /* ==================================================================================
- *  Add-on Code Events Listeners
+ *  Common page helpers
  * ================================================================================== */
+
+// Notify the passbolt page that a process is currently running on the plugin.
+// When the process is completed, the event
+// passbolt.passbolt-page.loading should be fired.
+passbolt.message.on('passbolt.passbolt-page.loading', function () {
+  passbolt.event.triggerToPage('passbolt_loading');
+});
+
+// Notify the passbolt page that a process has been completed on the plugin.
+passbolt.message.on('passbolt.passbolt-page.loading_complete', function () {
+  passbolt.event.triggerToPage('passbolt_loading_complete');
+});
 
 // Add a css class to an html element
 passbolt.message.on('passbolt.passbolt-page.add-class', function (selector, cssClass) {
@@ -20,12 +32,12 @@ passbolt.message.on('passbolt.passbolt-page.remove-class', function (selector, c
 });
 
 // Ask the passbolt page to release its focus
-passbolt.message.on('passbolt.passbolt-page.remove_all_focuses', function () {
+passbolt.message.on('passbolt.passbolt-page.remove-all-focuses', function () {
   passbolt.event.triggerToPage('remove_all_focuses');
 });
 
 // Ask the passbolt page to resize an iframe
-passbolt.message.on('passbolt.passbolt-page.resize-iframe', function(selector, dimension) {
+passbolt.message.on('passbolt.passbolt-page.resize-iframe', function (selector, dimension) {
   if (typeof dimension.height != 'undefined') {
     $(selector).css('height', dimension.height);
   }
@@ -34,10 +46,51 @@ passbolt.message.on('passbolt.passbolt-page.resize-iframe', function(selector, d
   }
 });
 
+// The passbolt application has been resized, when it happens the application
+// emit a message to the plugin to notify it.
+// @todo the plugin should check when the window is resized by itself.
+window.addEventListener('passbolt.plugin.app.window-resized', function (event) {
+  var cssClasses = $('body').attr('class').split(' ');
+  passbolt.message.emit('passbolt.app.window-resized', cssClasses);
+});
+
+/* ==================================================================================
+ *  Share & share autocomplete
+ * ================================================================================== */
+
 // A permission has been added through the share iframe.
 passbolt.message.on('passbolt.share.add-permission', function (permission) {
   passbolt.event.triggerToPage('resource_share_add_permission', permission);
 });
+
+// A permission is deleted, the user shouldn't be listed anymore by the autocomplete
+// result list component.
+window.addEventListener('passbolt.share.remove_permission', function (event) {
+  var data = event.detail,
+  // The user the permission has been deleted for.
+    userId = data.userId;
+
+  // Notify the share dialog about this change
+  passbolt.message.emit('passbolt.share.remove-permission', userId);
+});
+
+// When the user wants to share a password with other people.
+// secret for the users the resource is shared with.
+// Dispatch this event to the share iframe which will take care of the encryption.
+window.addEventListener('passbolt.share.encrypt', function () {
+  passbolt.event.triggerToPage('passbolt_loading');
+
+  // Request the share dialog to encrypt the secret for the new users.
+  passbolt.request('passbolt.share.encrypt').then(function (armoreds) {
+    // Notify the App with the encrypted secret.
+    passbolt.event.triggerToPage('resource_share_encrypted', armoreds);
+    passbolt.event.triggerToPage('passbolt_loading_complete');
+  });
+});
+
+/* ==================================================================================
+ *  Secret edit
+ * ================================================================================== */
 
 // The secret has been updated, notify the application.
 passbolt.message.on('passbolt.secret-edit.secret-updated', function () {
@@ -59,51 +112,8 @@ window.addEventListener('passbolt.plugin.secret-edit.focus', function (event) {
   passbolt.message.emit('passbolt.secret-edit.focus');
 });
 
-/* ==================================================================================
- *  JS Application Events Listeners
- * ================================================================================== */
-
-// Intercept the application window resize.
-// Notify all workers regarding the application window resize.
-window.addEventListener('passbolt.html_helper.window_resized', function (event) {
-  var cssClasses = $('body').attr('class').split(' ');
-  passbolt.message.emit('passbolt.html_helper.app_window_resized', cssClasses);
-});
-
-// Intercept the request passbolt.secret.decrypt
-// Decrypt the secret, and stores it into the clipboard.
-window.addEventListener('passbolt.secret.decrypt', function (event) {
-  var armoredSecret = event.detail;
-  // Decrypt the armored secret.
-  passbolt.request('passbolt.secret.decrypt', armoredSecret)
-    .then(function (secret) {
-      // Copy the secret into the clipboard.
-      passbolt.clipboard.copy(secret);
-      // Notify the user.
-      passbolt.event.triggerToPage('passbolt_notify', {
-        status: 'success',
-        title: 'plugin_secret_copy_success'
-      });
-    });
-});
-
-// Intercept the request passbolt.clipboard
-// Copy data into the clipboard.
-window.addEventListener('passbolt.clipboard', function (event) {
-  var toCopy = event.detail.data;
-  var name = event.detail.name;
-  // Copy the secret into the clipboard.
-  passbolt.clipboard.copy(toCopy);
-  // Notify the user.
-  passbolt.event.triggerToPage('passbolt_notify', {
-    status: 'success',
-    title: 'plugin_clipboard_copy_success',
-    data: event.detail
-  });
-});
-
 // When the user wants to save the changes on his resource, the application
-// requests the plugin to encrypt the secret for all the users the resource
+// asks the plugin to encrypt the secret for all the users the resource
 // is shared with.
 window.addEventListener('passbolt.plugin.secret-edit.encrypt', function (event) {
   var usersIds = event.detail;
@@ -133,25 +143,39 @@ window.addEventListener('passbolt.plugin.secret-edit.validate', function (event)
     });
 });
 
-// When the user wants to share a password with other people.
-// secret for the users the resource is shared with.
-// Dispatch this event to the share iframe which will take care of the encryption.
-window.addEventListener('passbolt.share.encrypt', function () {
-  // Request the share dialog to encrypt the secret for the new users.
-  passbolt.request('passbolt.share.encrypt').then(function (armoreds) {
-    // Notify the App with the encrypted secret.
-    passbolt.event.triggerToPage('resource_share_encrypted', armoreds);
-  });
+/* ==================================================================================
+ * Application
+ * ================================================================================== */
+
+// The application asks the plugin to decrypt an armored string and store it
+// in the clipboard.
+window.addEventListener('passbolt.plugin.app.decrypt-copy', function (event) {
+  var armoredSecret = event.detail;
+
+  passbolt.event.triggerToPage('passbolt_loading');
+
+  // Decrypt the armored secret.
+  passbolt.request('passbolt.app.decrypt-copy', armoredSecret)
+    .then(function () {
+      passbolt.event.triggerToPage('passbolt_notify', {
+        status: 'success',
+        title: 'plugin_secret_copy_success'
+      });
+      passbolt.event.triggerToPage('passbolt_loading_complete');
+    });
 });
 
-// When a permission is deleted, the user shouldn't be listed anymore by the autocomplete list.
-window.addEventListener('passbolt.share.remove_permission', function (event) {
-  var data = event.detail,
-  // The user the permission has been deleted for.
-    userId = data.userId;
+// The application asks the plugin to store a string into the clipboard.
+window.addEventListener('passbolt.plugin.app.copy', function (event) {
+  var toCopy = event.detail.data;
+  passbolt.clipboard.copy(toCopy);
 
-  // Notify the share dialog about this change
-  passbolt.message.emit('passbolt.share.remove-permission', userId);
+  // Notify the user.
+  passbolt.event.triggerToPage('passbolt_notify', {
+    status: 'success',
+    title: 'plugin_clipboard_copy_success',
+    data: event.detail
+  });
 });
 
 // Listen when the user requests a backup of his private key.

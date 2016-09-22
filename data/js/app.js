@@ -24,6 +24,16 @@ passbolt.message.on('passbolt.passbolt-page.remove_all_focuses', function () {
   passbolt.event.triggerToPage('remove_all_focuses');
 });
 
+// Ask the passbolt page to resize an iframe
+passbolt.message.on('passbolt.passbolt-page.resize-iframe', function(selector, dimension) {
+  if (typeof dimension.height != 'undefined') {
+    $(selector).css('height', dimension.height);
+  }
+  if (typeof dimension.width != 'undefined') {
+    $(selector).css('width', dimension.width);
+  }
+});
+
 // A permission has been added through the share iframe.
 passbolt.message.on('passbolt.share.add-permission', function (permission) {
   passbolt.event.triggerToPage('resource_share_add_permission', permission);
@@ -32,6 +42,21 @@ passbolt.message.on('passbolt.share.add-permission', function (permission) {
 // The secret has been updated, notify the application.
 passbolt.message.on('passbolt.secret-edit.secret-updated', function () {
   passbolt.event.triggerToPage('secret_edition_secret_changed');
+});
+
+// The secret has the focus and the tab key is pressed, notify the application.
+passbolt.message.on('passbolt.secret-edit.tab-pressed', function () {
+  passbolt.event.triggerToPage('passbolt.plugin.secret-edit.tab-pressed');
+});
+
+// The secret has the focus and the back tab key is pressed, notify the application.
+passbolt.message.on('passbolt.secret-edit.back-tab-pressed', function () {
+  passbolt.event.triggerToPage('passbolt.plugin.secret-edit.back-tab-pressed');
+});
+
+// The application asks the plugin secret-edit iframe to get the focus.
+window.addEventListener('passbolt.plugin.secret-edit.focus', function (event) {
+  passbolt.message.emit('passbolt.secret-edit.focus');
 });
 
 /* ==================================================================================
@@ -105,16 +130,6 @@ window.addEventListener('passbolt.plugin.secret-edit.validate', function (event)
       passbolt.event.triggerToPage('passbolt.plugin.secret-edit.validated', [true]);
     }, function () {
       passbolt.event.triggerToPage('passbolt.plugin.secret-edit.validated', [false]);
-    });
-});
-
-// Intercept the request passbolt.secret.focus
-// And transfer the event to the appropriate component.
-window.addEventListener('passbolt.secret.focus', function (event) {
-  // Transfer the event to Secret listener.
-  passbolt.requestOn('Secret', 'passbolt.secret.focus')
-    .then(function () {
-      // Nothing.
     });
 });
 

@@ -39,51 +39,9 @@ passbolt.helper.html = passbolt.helper.html || {};
 			}
 		}
 		// Request the application worker to resize the iframe container.
-		passbolt.message.emitOn('App', 'passbolt.html_helper.resize_iframe', selector, dimension);
+		passbolt.message.emit('passbolt.passbolt-page.resize-iframe', selector, dimension);
 	};
 	passbolt.helper.html.resizeIframe = resizeIframe;
-
-	/**
-	 * Resize an iframe container regarding its content.
-	 * This function should be embedded at the iframe container level.
-	 *
-	 * @param selector The target iframe container css selector
-	 * @param dimension The dimension to apply
-	 * @param dimension.width
-	 * @param dimension.height
-	 */
-	passbolt.message.on('passbolt.html_helper.resize_iframe', function(selector, dimension) {
-		if (typeof dimension.height != 'undefined') {
-			$(selector).css('height', dimension.height);
-		}
-		if (typeof dimension.width != 'undefined') {
-			$(selector).css('width', dimension.width);
-		}
-	});
-
-	/**
-	 * Add a class to a HTML Element.
-	 *
-	 * @param selector The element css selector
-	 * @param className The class to add
-	 */
-	passbolt.message.on('passbolt.html_helper.add_class', function(selector, className) {
-		if(!$(selector).hasClass(className)) {
-			$(selector).addClass(className);
-		}
-	});
-
-	/**
-	 * Remove a class from a HTML ELement.
-	 *
-	 * @param selector The element css selector
-	 * @param className The class to remove
-	 */
-	passbolt.message.on('passbolt.html_helper.remove_class', function(selector, className) {
-		if($(selector).hasClass(className)) {
-			$(selector).removeClass(className);
-		}
-	});
 
 	/**
 	 * Get template

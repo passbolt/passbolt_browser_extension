@@ -107,7 +107,7 @@
     $viewSecretButton.on('click', viewSecretButtonClickedHandler);
     passbolt.message.on('passbolt.secret-edit.validate-success', validateSuccessHandler);
     passbolt.message.on('passbolt.secret-edit.validate-error', validateErrorHandler);
-    passbolt.message.on('passbolt.secret.focus', onSecretFocusHandler);
+    passbolt.message.on('passbolt.secret-edit.focus', onSecretFocusHandler);
   };
 
   /**
@@ -300,14 +300,14 @@
       // If click on the non decrypted state, we remove the  focus. We do that
       // because the focus will be needed by the passphrase dialog.
       $secret.blur();
-      passbolt.message.emitOn('App', 'passbolt.event.trigger_to_page', 'secret_backtab_pressed');
+      passbolt.message.emit('passbolt.secret-edit.back-tab-pressed');
     }
     // Tab key.
     else if (code == '9') {
       // If click on the non decrypted state, we remove the  focus. We do that
       // because the focus will be needed by the passphrase dialog.
       $secret.blur();
-      passbolt.message.emitOn('App', 'passbolt.event.trigger_to_page', 'secret_tab_pressed');
+      passbolt.message.emit('passbolt.secret-edit.tab-pressed');
     }
   };
 

@@ -171,6 +171,7 @@
   var focusFirstFieldKeypressed = function (ev) {
     // Prevent default.
     ev.preventDefault();
+    ev.stopPropagation();
 
     // Get keycode.
     var keycode = ev.keyCode || ev.which,

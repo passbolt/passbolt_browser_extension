@@ -61,7 +61,7 @@
    * @param error
    */
   var error = function (error) {
-    throw error;
+    // @todo general error handler.
   };
 
   /**
@@ -180,13 +180,24 @@
     // Request the secret decryption.
     return passbolt.request('passbolt.secret-edit.decrypt', editedPassword.armored)
 
-      // Store the secret locally, and mark change the component state.
-      .then(function (secret) {
-        editedPassword.secret = secret;
-        secretStateChangeHandler('decrypted');
-        updateSecretStrength();
-        passbolt.message.emit('passbolt.passbolt-page.loading_complete');
-      }, error)
+      // Once the secret decrypted.
+      .then(
+        // If successfully decrypted.
+        // Store the secret locally, and change the component state, to allow
+        // the user to edit it.
+        function (secret) {
+          editedPassword.secret = secret;
+          secretStateChangeHandler('decrypted');
+          updateSecretStrength();
+          passbolt.message.emit('passbolt.passbolt-page.loading_complete');
+        },
+        // In case of failure.
+        // Reset the decrypting state.
+        function () {
+          $secret.removeClass("decrypting");
+          $secret.attr("placeholder", initialSecretPlaceholder);
+          passbolt.message.emit('passbolt.passbolt-page.loading_complete');
+        })
 
       // Store the decrypted password in the model.
       // It will be useful to other workers (here app when the user will save

@@ -13,12 +13,12 @@
 // When the process is completed, the event
 // passbolt.passbolt-page.loading should be fired.
 passbolt.message.on('passbolt.passbolt-page.loading', function () {
-  passbolt.event.triggerToPage('passbolt_loading');
+  passbolt.message.emitToPage('passbolt_loading');
 });
 
 // Notify the passbolt page that a process has been completed on the plugin.
 passbolt.message.on('passbolt.passbolt-page.loading_complete', function () {
-  passbolt.event.triggerToPage('passbolt_loading_complete');
+  passbolt.message.emitToPage('passbolt_loading_complete');
 });
 
 // Add a css class to an html element
@@ -33,7 +33,7 @@ passbolt.message.on('passbolt.passbolt-page.remove-class', function (selector, c
 
 // Ask the passbolt page to release its focus
 passbolt.message.on('passbolt.passbolt-page.remove-all-focuses', function () {
-  passbolt.event.triggerToPage('remove_all_focuses');
+  passbolt.message.emitToPage('remove_all_focuses');
 });
 
 // Ask the passbolt page to resize an iframe
@@ -60,7 +60,7 @@ window.addEventListener('passbolt.plugin.app.window-resized', function (event) {
 
 // A permission has been added through the share iframe.
 passbolt.message.on('passbolt.share.add-permission', function (permission) {
-  passbolt.event.triggerToPage('resource_share_add_permission', permission);
+  passbolt.message.emitToPage('resource_share_add_permission', permission);
 });
 
 // A permission is deleted, the user shouldn't be listed anymore by the autocomplete
@@ -78,13 +78,13 @@ window.addEventListener('passbolt.share.remove_permission', function (event) {
 // secret for the users the resource is shared with.
 // Dispatch this event to the share iframe which will take care of the encryption.
 window.addEventListener('passbolt.share.encrypt', function () {
-  passbolt.event.triggerToPage('passbolt_loading');
+  passbolt.message.emitToPage('passbolt_loading');
 
   // Request the share dialog to encrypt the secret for the new users.
   passbolt.request('passbolt.share.encrypt').then(function (armoreds) {
     // Notify the App with the encrypted secret.
-    passbolt.event.triggerToPage('resource_share_encrypted', armoreds);
-    passbolt.event.triggerToPage('passbolt_loading_complete');
+    passbolt.message.emitToPage('resource_share_encrypted', armoreds);
+    passbolt.message.emitToPage('passbolt_loading_complete');
   });
 });
 
@@ -94,17 +94,17 @@ window.addEventListener('passbolt.share.encrypt', function () {
 
 // The secret has been updated, notify the application.
 passbolt.message.on('passbolt.secret-edit.secret-updated', function () {
-  passbolt.event.triggerToPage('secret_edition_secret_changed');
+  passbolt.message.emitToPage('secret_edition_secret_changed');
 });
 
 // The secret has the focus and the tab key is pressed, notify the application.
 passbolt.message.on('passbolt.secret-edit.tab-pressed', function () {
-  passbolt.event.triggerToPage('passbolt.plugin.secret-edit.tab-pressed');
+  passbolt.message.emitToPage('passbolt.plugin.secret-edit.tab-pressed');
 });
 
 // The secret has the focus and the back tab key is pressed, notify the application.
 passbolt.message.on('passbolt.secret-edit.back-tab-pressed', function () {
-  passbolt.event.triggerToPage('passbolt.plugin.secret-edit.back-tab-pressed');
+  passbolt.message.emitToPage('passbolt.plugin.secret-edit.back-tab-pressed');
 });
 
 // The application asks the plugin secret-edit iframe to get the focus.
@@ -119,7 +119,7 @@ window.addEventListener('passbolt.plugin.secret-edit.encrypt', function (event) 
   var usersIds = event.detail;
   passbolt.request('passbolt.secret-edit.encrypt', usersIds)
     .then(function (armoreds) {
-      passbolt.event.triggerToPage('passbolt.plugin.secret-edit.encrypted', armoreds);
+      passbolt.message.emitToPage('passbolt.plugin.secret-edit.encrypted', armoreds);
     });
 });
 
@@ -137,9 +137,9 @@ passbolt.message.on('passbolt.secret-edit.validate-error', function () {
 window.addEventListener('passbolt.plugin.secret-edit.validate', function (event) {
   passbolt.request('passbolt.secret-edit.validate')
     .then(function () {
-      passbolt.event.triggerToPage('passbolt.plugin.secret-edit.validated', [true]);
+      passbolt.message.emitToPage('passbolt.plugin.secret-edit.validated', [true]);
     }, function () {
-      passbolt.event.triggerToPage('passbolt.plugin.secret-edit.validated', [false]);
+      passbolt.message.emitToPage('passbolt.plugin.secret-edit.validated', [false]);
     });
 });
 
@@ -152,16 +152,18 @@ window.addEventListener('passbolt.plugin.secret-edit.validate', function (event)
 window.addEventListener('passbolt.plugin.app.decrypt-copy', function (event) {
   var armoredSecret = event.detail;
 
-  passbolt.event.triggerToPage('passbolt_loading');
+  passbolt.message.emitToPage('passbolt_loading');
 
   // Decrypt the armored secret.
   passbolt.request('passbolt.app.decrypt-copy', armoredSecret)
     .then(function () {
-      passbolt.event.triggerToPage('passbolt_notify', {
+      passbolt.message.emitToPage('passbolt_notify', {
         status: 'success',
         title: 'plugin_secret_copy_success'
       });
-      passbolt.event.triggerToPage('passbolt_loading_complete');
+      passbolt.message.emitToPage('passbolt_loading_complete');
+    }, function() {
+      passbolt.message.emitToPage('passbolt_loading_complete');
     });
 });
 
@@ -171,7 +173,7 @@ window.addEventListener('passbolt.plugin.app.copy', function (event) {
   passbolt.clipboard.copy(toCopy);
 
   // Notify the user.
-  passbolt.event.triggerToPage('passbolt_notify', {
+  passbolt.message.emitToPage('passbolt_notify', {
     status: 'success',
     title: 'plugin_clipboard_copy_success',
     data: event.detail

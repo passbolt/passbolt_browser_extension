@@ -69,4 +69,21 @@ var passbolt = passbolt || {};
     _listenersCallbacks[message].push(callback);
   };
 
+  /**
+   * Emit a message to the page.
+   * @param message message name
+   * @param data the data associated to the message
+   */
+  passbolt.message.emitToPage = function (message, data) {
+    // Bundle the event data;
+    var eventData = {
+      event: message,
+      data: data
+    };
+    var cloned = cloneInto(eventData, document.defaultView);
+    var event = document.createEvent('CustomEvent');
+    event.initCustomEvent('addon-message', true, true, cloned);
+    document.documentElement.dispatchEvent(event);
+  };
+
 })(passbolt);

@@ -12,7 +12,7 @@
 
 // Open the master password dialog.
 // Listen to the event : passbolt.master-password.open-dialog
-passbolt.message.on('passbolt.master-password.open-dialog', function (token) {
+passbolt.message.on('passbolt.master-password.open-dialog', function () {
 	// Add the master password iframe to the application page.
 	var $iframe = $('<iframe/>', {
 		id: 'passbolt-iframe-master-password',
@@ -21,12 +21,6 @@ passbolt.message.on('passbolt.master-password.open-dialog', function (token) {
 		frameBorder: 0
 	});
 	$iframe.appendTo('body');
-
-	// When the master password iframe is ready.
-	// Send
-	$iframe.on('load', function () {
-		passbolt.event.dispatchContext('MasterPassword', 'token', token);
-	});
 });
 
 // Close the master password dialog.

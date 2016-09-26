@@ -1,163 +1,163 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
-	// ========================================================================
-	// High level variables
+  // ========================================================================
+  // High level variables
 
-	var config = {
-		webroot : 'data',
-		styleguide : 'passbolt-styleguide',
-		modules_path : 'node_modules'
-	};
+  var config = {
+    webroot: 'data',
+    styleguide: 'passbolt-styleguide',
+    modules_path: 'node_modules'
+  };
 
-	// ========================================================================
-	// Configure task options
+  // ========================================================================
+  // Configure task options
 
-	grunt.initConfig({
-		config : config,
-		pkg: grunt.file.readJSON('package.json'),
-		bower: grunt.file.readJSON('./.bowerrc'),
-		clean: {
-			css: [
-				'<%= config.webroot %>/css/*.css'
-			]
-		},
-		shell: {
-			updatestyleguide: {
-				options: {
-					stderr: false
-				},
-				command: 'rm -rf <%= config.modules_path %>/<%= config.styleguide %>; npm install'
-			},
-			jpmxpi: {
-				options: {
-					stderr: false
-				},
-				command: [
-					'rm -f passbolt*.xpi',
-					"sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": true/' ./lib/config/config.json",
-					'./node_modules/jpm/bin/jpm xpi',
-					"mv passbolt@passbolt.com-<%= pkg.version %>.xpi passbolt@passbolt.com-<%= pkg.version %>-debug.xpi",
-					"sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' ./lib/config/config.json",
-					'./node_modules/jpm/bin/jpm xpi',
-					'ln -s passbolt@passbolt.com-<%= pkg.version %>-debug.xpi ./passbolt-latest@passbolt.com.xpi'
-				].join('&&')
-			},
-			xpiinstall: {
-				options: {
-					stderr: false
-				},
-				command: [
-					'wget --post-file=passbolt@passbolt.com-<%= pkg.version %>-debug.xpi http://localhost:8888/ > /dev/null 2>&1',
-					'echo "If your browser has the firefox addon \"Extension auto-installer\" installed & enabled, the passbolt plugin is now installed on your browser"'
-				].join(';')
-			}
-		},
-		copy: {
-			styleguide : {
-				files: [{
-					// Icons
-					nonull: true,
-					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img/logo',
-					src: ['icon-16.png','icon-32.png','icon-64.png','icon-20.png','icon-20_white.png'],
-					dest: '<%= config.webroot %>/img/logo',
-					expand: true
-				},{
-					// Images
-					nonull: true,
-					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img',
-					src: ['logo/**','third_party/**','avatar/**','controls/**'],
-					dest: '<%= config.webroot %>/img',
-					expand: true
-				},{
-					// Less
-					cwd: '<%= config.modules_path %>/<%= config.styleguide %>/build/css',
-					src: ['config_debug_ff.min.css', 'external.min.css', 'login.min.css', 'main_ff.min.css','setup_ff.min.css'],
-					dest: '<%= config.webroot %>/css',
-					expand: true
-				}]
-			},
-            openpgp_ff : {
-                files: [
-                    {
-                    // steal
-                    cwd: '<%= config.modules_path %>/openpgp/dist/',
-                    src: ['openpgp_ff.js', 'openpgp.worker.js'],
-                    dest: 'lib/vendors/',
-                    nonull: true,
-                    expand: true,
-                    rename: function(dest, src) {
-                        console.log(dest, src);
-                        if (src == 'openpgp_ff.js') {
-                            return dest + 'openpgp.js';
-                        }
-                        return dest + src;
-                    }
-                }]
+  grunt.initConfig({
+    config: config,
+    pkg: grunt.file.readJSON('package.json'),
+    bower: grunt.file.readJSON('./.bowerrc'),
+    clean: {
+      css: [
+        '<%= config.webroot %>/css/*.css'
+      ]
+    },
+    shell: {
+      updatestyleguide: {
+        options: {
+          stderr: false
+        },
+        command: 'rm -rf <%= config.modules_path %>/<%= config.styleguide %>; npm install'
+      },
+      jpmxpi: {
+        options: {
+          stderr: false
+        },
+        command: [
+          'rm -f passbolt*.xpi',
+          "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": true/' ./lib/config/config.json",
+          './node_modules/jpm/bin/jpm xpi',
+          "mv passbolt@passbolt.com-<%= pkg.version %>.xpi passbolt@passbolt.com-<%= pkg.version %>-debug.xpi",
+          "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' ./lib/config/config.json",
+          './node_modules/jpm/bin/jpm xpi',
+          'ln -s passbolt@passbolt.com-<%= pkg.version %>-debug.xpi ./passbolt-latest@passbolt.com.xpi'
+        ].join('&&')
+      },
+      xpiinstall: {
+        options: {
+          stderr: false
+        },
+        command: [
+          'wget --post-file=passbolt@passbolt.com-<%= pkg.version %>-debug.xpi http://localhost:8888/ > /dev/null 2>&1',
+          'echo "If your browser has the firefox addon \"Extension auto-installer\" installed & enabled, the passbolt plugin is now installed on your browser"'
+        ].join(';')
+      }
+    },
+    copy: {
+      styleguide: {
+        files: [{
+          // Icons
+          nonull: true,
+          cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img/logo',
+          src: ['icon-16.png', 'icon-32.png', 'icon-64.png', 'icon-20.png', 'icon-20_white.png'],
+          dest: '<%= config.webroot %>/img/logo',
+          expand: true
+        }, {
+          // Images
+          nonull: true,
+          cwd: '<%= config.modules_path %>/<%= config.styleguide %>/src/img',
+          src: ['logo/**', 'third_party/**', 'avatar/**', 'controls/**'],
+          dest: '<%= config.webroot %>/img',
+          expand: true
+        }, {
+          // Less
+          cwd: '<%= config.modules_path %>/<%= config.styleguide %>/build/css',
+          src: ['config_debug_ff.min.css', 'external.min.css', 'login.min.css', 'main_ff.min.css', 'setup_ff.min.css'],
+          dest: '<%= config.webroot %>/css',
+          expand: true
+        }]
+      },
+      openpgp_ff: {
+        files: [
+          {
+            // steal
+            cwd: '<%= config.modules_path %>/openpgp/dist/',
+            src: ['openpgp_ff.js', 'openpgp.worker.js'],
+            dest: 'lib/vendors/',
+            nonull: true,
+            expand: true,
+            rename: function (dest, src) {
+              console.log(dest, src);
+              if (src == 'openpgp_ff.js') {
+                return dest + 'openpgp.js';
+              }
+              return dest + src;
             }
-		},
-        replace: {
-            openpgp_ff: {
-                src: ['<%= config.modules_path %>/openpgp/dist/openpgp.js'],
-                dest: ['<%= config.modules_path %>/openpgp/dist/openpgp_ff.js'],
-                replacements: [
-                    {
-                        // Add necessary dependencies at the beginning of the file.
-                        from: "(function(f)",
-                        to: "if (Worker == undefined) {\nvar Worker = require('./web-worker').Worker;\n}\nif (window == undefined) {\nvar window = require('./window');\nvar atob = window.atob;\n}\n\n(function(f)"
-                    },
-                    {
-                        // Comment promise polyfill. We don't need it. And it breaks.
-                        from: "lib$es6$promise$polyfill$$default();",
-                        to: "//lib$es6$promise$polyfill$$default();"
-                    },
-                    {
-                        // Comment promise polyfill. We don't need it. And it breaks.
-                        from: "_es6Promise2.default.polyfill();",
-                        to: "//_es6Promise2.default.polyfill();"
-                    }//,
-                    //{
-                    //    // Fix path to openpgp worker.
-                    //    from: "'openpgp.worker.js'",
-                    //    to: "'resource://passbolt-at-passbolt-dot-com/lib/vendors/openpgp.worker.js'"
-                    //}
-                ]
-            }
-        }
-	});
+          }]
+      }
+    },
+    replace: {
+      openpgp_ff: {
+        src: ['<%= config.modules_path %>/openpgp/dist/openpgp.js'],
+        dest: ['<%= config.modules_path %>/openpgp/dist/openpgp_ff.js'],
+        replacements: [
+          {
+            // Add necessary dependencies at the beginning of the file.
+            from: "(function(f)",
+            to: "if (Worker == undefined) {\nvar Worker = require('./web-worker').Worker;\n}\nif (window == undefined) {\nvar window = require('./window');\nvar atob = window.atob;\n}\n\n(function(f)"
+          },
+          {
+            // Comment promise polyfill. We don't need it. And it breaks.
+            from: "lib$es6$promise$polyfill$$default();",
+            to: "//lib$es6$promise$polyfill$$default();"
+          },
+          {
+            // Comment promise polyfill. We don't need it. And it breaks.
+            from: "_es6Promise2.default.polyfill();",
+            to: "//_es6Promise2.default.polyfill();"
+          }//,
+          //{
+          //    // Fix path to openpgp worker.
+          //    from: "'openpgp.worker.js'",
+          //    to: "'resource://passbolt-at-passbolt-dot-com/lib/vendors/openpgp.worker.js'"
+          //}
+        ]
+      }
+    }
+  });
 
-	// on watch events configure jshint:all to only run on changed file
-	//    grunt.event.on('watch', function(action, filepath) {
-	//        grunt.config(['jshint', 'all'], filepath);
-	//    });
+  // on watch events configure jshint:all to only run on changed file
+  //    grunt.event.on('watch', function(action, filepath) {
+  //        grunt.config(['jshint', 'all'], filepath);
+  //    });
 
-	// ========================================================================
-	// Initialise
+  // ========================================================================
+  // Initialise
 
-	grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
 
-	grunt.loadNpmTasks('grunt-shell');
+  grunt.loadNpmTasks('grunt-shell');
 
-	grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
-    grunt.loadNpmTasks('grunt-text-replace');
+  grunt.loadNpmTasks('grunt-text-replace');
 
-	// ========================================================================
-	// Register Tasks
+  // ========================================================================
+  // Register Tasks
 
-	// Bower deploy
-	grunt.registerTask('styleguide-update', ['shell:updatestyleguide','copy:styleguide','shell:jpmxpi']);
+  // Bower deploy
+  grunt.registerTask('styleguide-update', ['shell:updatestyleguide', 'copy:styleguide', 'shell:jpmxpi']);
 
-    // Copy, patch (to make it work with firefox) and deploy openPGP in libraries.
-    grunt.registerTask('lib-openpgp-deploy', ['replace:openpgp_ff', 'copy:openpgp_ff']);
+  // Copy, patch (to make it work with firefox) and deploy openPGP in libraries.
+  grunt.registerTask('lib-openpgp-deploy', ['replace:openpgp_ff', 'copy:openpgp_ff']);
 
-	// Build xpi in debug and non-debug version.
-	grunt.registerTask('build-xpi', ['shell:jpmxpi']);
+  // Build xpi in debug and non-debug version.
+  grunt.registerTask('build-xpi', ['shell:jpmxpi']);
 
-	// Build xpi in debug and non-debug version.
-	grunt.registerTask('push-xpi', ['shell:xpiinstall']);
+  // Build xpi in debug and non-debug version.
+  grunt.registerTask('push-xpi', ['shell:xpiinstall']);
 
-	// 'grunt' will check code quality, and if no errors,
-	// compile LESS to CSS, and minify and concatonate all JS and CSS
-	grunt.registerTask('default', ['shell:jpmxpi']);
+  // 'grunt' will check code quality, and if no errors,
+  // compile LESS to CSS, and minify and concatonate all JS and CSS
+  grunt.registerTask('default', ['shell:jpmxpi']);
 
 };

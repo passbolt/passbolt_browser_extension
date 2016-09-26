@@ -61,7 +61,7 @@
    * @param error
    */
   var error = function (error) {
-    throw error;
+    // @todo general error handler.
   };
 
   /**
@@ -107,7 +107,7 @@
     $viewSecretButton.on('click', viewSecretButtonClickedHandler);
     passbolt.message.on('passbolt.secret-edit.validate-success', validateSuccessHandler);
     passbolt.message.on('passbolt.secret-edit.validate-error', validateErrorHandler);
-    passbolt.message.on('passbolt.secret.focus', onSecretFocusHandler);
+    passbolt.message.on('passbolt.secret-edit.focus', onSecretFocusHandler);
   };
 
   /**
@@ -174,15 +174,30 @@
     // Change placeholder text.
     $secret.attr("placeholder", "decrypting...");
 
-    // Request the secret decryption.
-    return passbolt.request('passbolt.secret.decrypt', editedPassword.armored)
+    // Notify the application page regarding a running process
+    passbolt.message.emit('passbolt.passbolt-page.loading');
 
-      // Store the secret locally, and mark change the component state.
-      .then(function (secret) {
-        editedPassword.secret = secret;
-        secretStateChangeHandler('decrypted');
-        updateSecretStrength();
-      }, error)
+    // Request the secret decryption.
+    return passbolt.request('passbolt.secret-edit.decrypt', editedPassword.armored)
+
+      // Once the secret decrypted.
+      .then(
+        // If successfully decrypted.
+        // Store the secret locally, and change the component state, to allow
+        // the user to edit it.
+        function (secret) {
+          editedPassword.secret = secret;
+          secretStateChangeHandler('decrypted');
+          updateSecretStrength();
+          passbolt.message.emit('passbolt.passbolt-page.loading_complete');
+        },
+        // In case of failure.
+        // Reset the decrypting state.
+        function () {
+          $secret.removeClass("decrypting");
+          $secret.attr("placeholder", initialSecretPlaceholder);
+          passbolt.message.emit('passbolt.passbolt-page.loading_complete');
+        })
 
       // Store the decrypted password in the model.
       // It will be useful to other workers (here app when the user will save
@@ -300,14 +315,14 @@
       // If click on the non decrypted state, we remove the  focus. We do that
       // because the focus will be needed by the passphrase dialog.
       $secret.blur();
-      passbolt.message.emitOn('App', 'passbolt.event.trigger_to_page', 'secret_backtab_pressed');
+      passbolt.message.emit('passbolt.secret-edit.back-tab-pressed');
     }
     // Tab key.
     else if (code == '9') {
       // If click on the non decrypted state, we remove the  focus. We do that
       // because the focus will be needed by the passphrase dialog.
       $secret.blur();
-      passbolt.message.emitOn('App', 'passbolt.event.trigger_to_page', 'secret_tab_pressed');
+      passbolt.message.emit('passbolt.secret-edit.tab-pressed');
     }
   };
 

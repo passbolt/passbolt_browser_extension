@@ -174,18 +174,4 @@ var passbolt = passbolt || {};
     _stack[requestId].deferred.notifyWith(this, args);
   };
 
-  /**
-   * RequestOn allows to request other workers.
-   *
-   * @param worker The name of the worker to request
-   *
-   * @param message The request name
-   *
-   * @returns {jQuery.Deferred}
-   */
-  passbolt.requestOn = function(worker, message) {
-    var args = ['passbolt.request.dispatch'].concat(Array.slice(arguments, 0));
-    return passbolt.request.apply(null, args);
-  };
-
 })( passbolt );

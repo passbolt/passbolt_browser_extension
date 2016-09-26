@@ -9,9 +9,7 @@ var passbolt = passbolt || {};
 (function (passbolt) {
 
   // The clipboard module.
-  var clipboard = {},
-    // The callbacks associated to each request of master done.
-    callbacks = {};
+  var clipboard = {};
 
   /**
    * Copy a string into the clipboard

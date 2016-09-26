@@ -20,7 +20,7 @@
     loadTemplate()
     // Init the security token.
       .then(initSecurityToken)
-      // Steal the focus
+      // Steal the focus.
       .then(stealFocus)
       // Init the event listeners.
       .then(initEventsListeners)
@@ -61,7 +61,7 @@
     var deferred = $.Deferred();
 
     // Ask the passbolt application to release the focus.
-    passbolt.message.emit('passbolt.passbolt-page.remove_all_focuses');
+    passbolt.message.emit('passbolt.passbolt-page.remove-all-focuses');
 
     // We set the focus on the first focus field.
     var interval = setInterval(function () {
@@ -82,18 +82,17 @@
    * The events can come from the following sources : addon, page or DOM.
    */
   var initEventsListeners = function () {
-    $('.js-dialog-close').on('click', closeButtonClicked);
+    $(document).on('click', '.js-dialog-close', closeButtonClicked);
     $submitButton.on('click', submitButtonClicked);
     $focusFirstField.on('keypress', focusFirstFieldKeypressed);
     $masterPasswordField.on('keypress', masterPasswordFieldKeypressed);
-    passbolt.message.on('passbolt.keyring.master.request.complete', masterCompleteHandler);
   };
 
   /**
    * Close the master password dialog
    */
-  var closeDialog = function () {
-    passbolt.message.emit('passbolt.master-password.close-dialog');
+  var cancelMasterPassword = function () {
+    passbolt.message.emit('passbolt.master-password.cancel');
   };
 
   /**
@@ -111,7 +110,8 @@
    */
   var submitMasterPassword = function (masterPassword) {
     $submitButton.addClass('processing');
-    self.port.emit("passbolt.master-password.submit", passbolt.context.token, masterPassword);
+    passbolt.request('passbolt.master-password.submit', masterPassword)
+      .then(validAttemptHandler, wrongAttemptHandler);
   };
 
   /* ==================================================================================
@@ -119,18 +119,27 @@
    * ================================================================================== */
 
   /**
-   * Handles wrong passphrase scenario.
+   * Handles valid attempt.
    */
-  var masterCompleteHandler = function (token, status, attempts) {
-    if (status == 'ERROR') {
+  var validAttemptHandler = function () {
+    passbolt.message.emit('passbolt.master-password.close-dialog');
+  };
+
+  /**
+   * Handles wrong attempt.
+   */
+  var wrongAttemptHandler = function (attempts) {
+    // If less than 3 attempts, notify the user and let him try again.
+    if (attempts < 3) {
+      $('label[for="js_master_password"]')
+        .html('Please enter a valid passphrase.')
+        .addClass('error');
       $submitButton.removeClass('processing');
       $masterPasswordField.focus();
-      if (attempts < 3) {
-        $('label[for="js_master_password"]').html('Please enter a valid passphrase.')
-          .addClass('error');
-      } else {
-        passbolt.helper.html.loadTemplate($('.js_dialog_content'), './tpl/master/master-password-failure.ejs');
-      }
+    }
+    // Otherwise notify the user, and don't allow him to make another attempt.
+    else {
+      passbolt.helper.html.loadTemplate($('.js_dialog_content'), './tpl/master/master-password-failure.ejs');
     }
   };
 
@@ -146,7 +155,7 @@
    */
   var closeButtonClicked = function (ev) {
     ev.preventDefault();
-    closeDialog();
+    cancelMasterPassword();
   };
 
   /**
@@ -162,6 +171,7 @@
   var focusFirstFieldKeypressed = function (ev) {
     // Prevent default.
     ev.preventDefault();
+    ev.stopPropagation();
 
     // Get keycode.
     var keycode = ev.keyCode || ev.which,
@@ -172,7 +182,7 @@
 
     // Escape
     if (keycode == 27) {
-      closeDialog();
+      cancelMasterPassword();
       return;
     }
 
@@ -197,7 +207,7 @@
    *
    * @param ev
    */
-  var submitButtonClicked = function () {
+  var submitButtonClicked = function (ev) {
     var masterPassword = $masterPasswordField.val();
 
     // The user wants his master password to be remembered.
@@ -227,7 +237,7 @@
     }
     // The user presses escape.
     else if (keycode == 27) {
-      closeDialog();
+      cancelMasterPassword();
     }
   };
 

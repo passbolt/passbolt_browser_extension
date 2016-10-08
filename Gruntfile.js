@@ -39,10 +39,9 @@ module.exports = function(grunt) {
 					'rm -f passbolt*.xpi',
 					"sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": true/' ./lib/config/config.json",
 					'./node_modules/jpm/bin/jpm xpi',
-					"mv passbolt.xpi passbolt@passbolt.com-<%= pkg.version %>-debug.xpi",
+					"mv passbolt@passbolt.com-<%= pkg.version %>.xpi passbolt@passbolt.com-<%= pkg.version %>-debug.xpi",
 					"sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' ./lib/config/config.json",
 					'./node_modules/jpm/bin/jpm xpi',
-                    "mv passbolt.xpi passbolt@passbolt.com-<%= pkg.version %>.xpi",
 					'ln -s passbolt@passbolt.com-<%= pkg.version %>-debug.xpi ./passbolt-latest@passbolt.com.xpi'
 				].join('&&')
 			},

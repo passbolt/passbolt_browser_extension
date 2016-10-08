@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- PASSBOLT-1668: Refactor GPGAuth to handle capitalization issue. See github #24 & #16
+- PASSBOLT-1660: Refactoring ground work for Chrome Extension
+
 ## [1.1.1]
 ### Fixed
 - PASSBOLT-1655: Visual glitch on password create field, bump to styleguide v1.1.0

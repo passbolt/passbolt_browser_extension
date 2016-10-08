@@ -33,24 +33,22 @@ Development
 ===============================
 
 Launch an instance of Firefox with your add-on installed.
+Make sure you run an instance that allowed unsigned extension (the developer edition for example)
 ```
-	jpm run
+	jpm run -b /Applications/FirefoxDeveloperEdition.app
 ```
 Runs the add-on's unit tests.
 ```
 	jpm test
 ```
 Package your add-on as an XPI file, which is the install file format for Firefox add-ons.
+The default grunt job will create two XPI, one with a debug mode set and another one to be used in production.
+```
+	grunt
+```
+This is just an elaborated version of the following:
 ```
 	jpm xpi
-```
-Package your add-on as an XPI file, then post it to some url.
-```
-	jpm post
-```
-Package your add-on as an XPI file whenever there is a file changed, and post that to some url.
-```
-	jpm watchpost
 ```
 
 Push a new version

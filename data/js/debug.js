@@ -30,6 +30,7 @@ $(function() {
         $serverKeyInfo = $('#pubkeyinfo-server'),
         $flushLocalStorage = $('#js_flush_conf'),
         $localStorageInfo = $('#localStorage'),
+        $browserPreferencesInfo = $('#browserPreferences'),
         $initAppPagemod = $('#initAppPagemod');
 
     /**
@@ -187,12 +188,34 @@ $(function() {
 	};
 
     /**
+     * Get browser preferences
+     */
+    var getBrowserPreferences = function() {
+        passbolt.request('passbolt.debug.browser.readPreference', 'browser.download.dir')
+            .then(function(downloadDir) {
+                passbolt.request('passbolt.debug.browser.readPreference', "browser.download.lastDir")
+                    .then(function(downloadLastDir) {
+                        passbolt.request('passbolt.file.getPreferredDownloadDirectory')
+                            .then(function(preferredDownloadDir) {
+                                var pref = {
+                                    downloadDir: downloadDir,
+                                    downloadLastDir: downloadLastDir,
+                                    preferredDownloadDirectory: preferredDownloadDir
+                                };
+                                $browserPreferencesInfo.html(JSON.stringify(pref, undefined, 2));
+                            });
+                    });
+            });
+    };
+
+    /**
      * At startup read configuration and load baseurl
      */
     var init = function () {
         getUser();
         getKeys();
         getLocalStorageInfo();
+        getBrowserPreferences();
     };
     init();
 

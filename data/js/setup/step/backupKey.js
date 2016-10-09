@@ -23,10 +23,14 @@ passbolt.setup.steps = passbolt.setup.steps || {};
      * ================================================================================== */
 
     step.onClickDownload = function() {
-        passbolt.request('passbolt.keyring.key.backup', passbolt.setup.data.key, 'passbolt_private.asc')
-            .then(function () {
-                // The key has been saved.
-            });
+        // Get private armored key.
+        passbolt.setup.get('key.privateKeyArmored').then(function(privateKeyArmored) {
+            // Start download.
+            passbolt.request('passbolt.keyring.key.backup', privateKeyArmored, 'passbolt_private.asc')
+                .then(function () {
+                    // The key has been saved.
+                });
+        });
     };
 
     /* ==================================================================================

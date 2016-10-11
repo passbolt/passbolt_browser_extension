@@ -15,7 +15,6 @@ module.exports = function(grunt) {
     grunt.initConfig({
         config : config,
         pkg: grunt.file.readJSON('package.json'),
-        bower: grunt.file.readJSON('./.bowerrc'),
         clean: {
             css: [
                 '<%= config.webroot %>/css/*.css'
@@ -158,7 +157,7 @@ module.exports = function(grunt) {
     // ========================================================================
     // Register Tasks
 
-    // Bower deploy
+    // Update styleguide
     grunt.registerTask('styleguide-update', ['shell:updatestyleguide', 'clean:css', 'clean:img', 'copy:styleguide','shell:jpmxpi']);
 
     // Copy, patch (to make it work with firefox) and deploy openPGP in libraries.

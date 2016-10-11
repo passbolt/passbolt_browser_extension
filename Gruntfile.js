@@ -39,10 +39,11 @@ module.exports = function(grunt) {
                     'rm -f passbolt*.xpi',
                     "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": true/' ./lib/config/config.json",
                     './node_modules/jpm/bin/jpm xpi',
-                    "mv passbolt@passbolt.com-<%= pkg.version %>.xpi passbolt@passbolt.com-<%= pkg.version %>-debug.xpi",
+                    "mv passbolt.xpi passbolt-<%= pkg.version %>-debug.xpi",
                     "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' ./lib/config/config.json",
                     './node_modules/jpm/bin/jpm xpi',
-                    'ln -s passbolt@passbolt.com-<%= pkg.version %>-debug.xpi ./passbolt-latest@passbolt.com.xpi'
+                    "mv passbolt.xpi passbolt-<%= pkg.version %>.xpi",
+                    'ln -s passbolt-<%= pkg.version %>-debug.xpi ./passbolt-latest@passbolt.com.xpi'
                 ].join('&&')
             },
             xpiinstall: {
@@ -50,7 +51,7 @@ module.exports = function(grunt) {
                     stderr: false
                 },
                 command: [
-                    'wget --post-file=passbolt@passbolt.com-<%= pkg.version %>-debug.xpi http://localhost:8888/ > /dev/null 2>&1',
+                    'wget --post-file=passbolt-<%= pkg.version %>-debug.xpi http://localhost:8888/ > /dev/null 2>&1',
                     'echo "If your browser has the firefox addon \"Extension auto-installer\" installed & enabled, the passbolt plugin is now installed on your browser"'
                 ].join(';')
             }

@@ -27,29 +27,28 @@
     $iframe.appendTo('.js_form_secret_wrapper');
   };
 
-  // Open the secret field control component when a password is created.
-  window.addEventListener("passbolt.plugin.resource.create", function () {
-    passbolt.request('passbolt.edit-password.set-edited-password', {
-      resourceId: null,
-      armored: null,
-      secret: ''
-    }).then(function () {
-      _insertIframe('create');
-    });
-  }, false);
+  // Open the secret field control component when a password is created or edited.
+  window.addEventListener("passbolt.plugin.resource_edition", function () {
+    var editData = {
+        armored: null,
+        resourceId: null,
+        secret: ''
+      },
+      dialogCase = 'create',
+      appResourceId = $('#js_field_resource_id').val().trim();
 
-  // Open the secret field control component when a password is edited.
-  window.addEventListener("passbolt.plugin.resource.edit", function () {
-    var armoredSecret = $('#js_field_secret_data_0').val(),
-      resourceId = $('#js_field_resource_id').val();
+    // If a resource id is given, we are in the edit case.
+    if (appResourceId != '') {
+      dialogCase = 'edit';
+      editData.resourceId = appResourceId;
+      editData.armored = $('#js_field_secret_data_0').val();
+      editData.secret = null;
+    }
 
-    passbolt.request('passbolt.edit-password.set-edited-password', {
-      resourceId: resourceId,
-      armored: armoredSecret,
-      secret: null
-    }).then(function () {
-      _insertIframe('edit');
-    });
+    passbolt.request('passbolt.edit-password.set-edited-password', editData)
+      .then(function () {
+        _insertIframe(dialogCase);
+      });
   }, false);
 
 })();

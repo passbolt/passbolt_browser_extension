@@ -34,13 +34,12 @@
         resourceId: null,
         secret: ''
       },
-      dialogCase = 'create',
-      appResourceId = $('#js_field_resource_id').val().trim();
+      dialogCase = 'create';
 
-    // If a resource id is given, we are in the edit case.
-    if (appResourceId != '') {
+    // If a secret id is given that mean we're editing a password.
+    if ($('#js_field_secret_id_0').val() != '') {
       dialogCase = 'edit';
-      editData.resourceId = appResourceId;
+      editData.resourceId = $('#js_field_resource_id').val();
       editData.armored = $('#js_field_secret_data_0').val();
       editData.secret = null;
     }

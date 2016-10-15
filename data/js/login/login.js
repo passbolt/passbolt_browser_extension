@@ -99,7 +99,8 @@ passbolt.login = passbolt.login || {};
     var $iframe = $('<iframe/>', {
       id: passphraseIframeId,
       src: 'about:blank?passbolt=' + passphraseIframeId,
-      frameBorder: 0
+      frameBorder: 0,
+      class: 'loading'
     });
     $('.login.form').empty().append($iframe);
 
@@ -110,6 +111,16 @@ passbolt.login = passbolt.login || {};
   /* ==================================================================================
    *  Add-on Code Events Listeners
    * ================================================================================== */
+
+  // Add a css class to an html element
+  passbolt.message.on('passbolt.auth.add-class', function (selector, cssClass) {
+    $(selector).addClass(cssClass);
+  });
+
+  // Remove a css class to an html element
+  passbolt.message.on('passbolt.auth.remove-class', function (selector, cssClass) {
+    $(selector).removeClass(cssClass);
+  });
 
   // GPGAuth is complete
   passbolt.message.on('passbolt.auth.login.complete', function (token, status, message, referrer) {

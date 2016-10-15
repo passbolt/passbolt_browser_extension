@@ -2,10 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.2.0]
 ### Fixed
 - PASSBOLT-1668: Refactor GPGAuth to handle capitalization issue. See github #24 & #16
 - PASSBOLT-1660: Refactoring ground work for Chrome Extension
+- PASSBOLT-1698: Gpgkey is not downloadable after generation
 
 ## [1.1.1]
 ### Fixed

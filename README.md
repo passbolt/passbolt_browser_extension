@@ -6,128 +6,67 @@
 	
 	Open source password manager for teams
 	(c) 2016 Bolt Softwares Pvt Ltd
+	https://www.passbolt.com
 
 
-Licence
-==============
+## Licence
 
-Passbolt firefox plugin is distributed under [Affero General Public License v3](http://www.gnu.org/licenses/agpl-3.0.html)
+Passbolt is distributed under [Affero General Public License v3](http://www.gnu.org/licenses/agpl-3.0.html)
 
+## About passbolt
 
-Prerequisite
-===============================
+Passbolt is an open source password manager for teams. It allows to securely share and store credentials.
+For instance, the wifi password of your office, or the administrator password of a router, or your organisation social media account password,
+all of them can be secured using Passbolt.
+
+You can try a demo of passbolt at [https://demo.passbolt.com](https://demo.passbolt.com).
+
+You will need to install a plugin, you can find a step by step guide in the website
+[help section](https://www.passbolt.com/help/start/firefox)
+
+Or, of course, you can use the code in this repository to build it yourself and run it!
+
+## About passbolt browser extension
+
+A browser extension is needed to maintain a higher level of security, e.g. to ensure the integrity of the
+cryptographic code and provide a secure random number generator. In the future it will also be used to provide feature such as
+auto filling your passwords when visiting known websites.
+
+### How does it look like?
+
+[![Login](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-login-275.png)](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-login.png)
+[![Browse passwords](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot4-275.png)](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot4.png)
+[![Share passwords](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-share-275.png)](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-share.png)
+
+# Contributing
+Please check CONTRIBUTING.md for more information about how to get involved.
+
+# Quick how-to for developers
+This is just a quick getting started guide, for more information and productivity tips checkout CONTRIBUTING.md
+
+## Prerequisite
 
 You will need:
 1. Nodejs
-2. JPM the Node base Firefox Addon SDK (jetpack)
-
+2. JPM the Node base Firefox Addon SDK (jetpack), see. [Official documentation](https://developer.mozilla.org/en-US/Add-ons/SDK/Tools/jpm#Installation)
+3. This code
 ```
-	git clone git@bitbucket.org:passbolt/passbolt_ff.git
-	sudo npm install jpm -g
-```
-
-See https://developer.mozilla.org/en-US/Add-ons/SDK/Tools/jpm#Installation
-
-
-Development
-===============================
-
-Launch an instance of Firefox with your add-on installed.
-Make sure you run an instance that allowed unsigned extension (the developer edition for example)
-```
-	jpm run -b /Applications/FirefoxDeveloperEdition.app
-```
-Runs the add-on's unit tests.
-```
-	jpm test
-```
-Package your add-on as an XPI file, which is the install file format for Firefox add-ons.
-The default grunt job will create two XPI, one with a debug mode set and another one to be used in production.
-```
-	grunt
-```
-This is just an elaborated version of the following:
-```
-	jpm xpi
+git clone git@github.com:passbolt/passbolt_firefox.git
+sudo npm install jpm -g
 ```
 
-Push a new version
-------------------
+## Test a local version of the plugin
 
-To push a new version of the plugin, and before submitting it to mozilla, 
-it is important to tag it :
-
-  git commit -am 'X.X.X'
-  git tag -a X.X.X -m 'X.X.X'
-  git push origin X.X.X
-  git push origin develop
-
-Productivity
-------------
-
-While developing you'll frequently need to update your firefox plugin to test
-it. Install the firefox "Extension Auto-Installer" which makes the testing process
-lighter if you want to reuse an existing firefox instance and profile.
-
-
-https://addons.mozilla.org/en-us/firefox/addon/autoinstaller/
-
-By default it is disabled, go on the configuration page and activate it.
-
-To compile the plugin in both non-debug and debug version, use the following command :
-
-grunt build-xpi
-
-It will create the debug and non debug versions, as well as a symbolic link passbolt-latest@passbolt.com.xpi pointing to the non debug version.
-
-To udpate your plugin in firefox after a change, go on your projet root and execute
-the following:
-
-jpm xpi ; wget --post-file=passbolt.xpi http://localhost:8888/
-
-or
-
-grunt push-xpi (which will install the latest debug version)
-
-
-How to edit the LESS/CSS files?
-===============================
-
-Install grunt and grunt
+To launch an instance of Firefox with your local version of the add-on installed,
+you will need make sure you run an instance that allowed unsigned extension (the developer edition for example)
 ```
-	npm install -g grunt-cli
+jpm run -b /path/to/FirefoxAllowingUnsignedExtension
 ```
-Install the needed modules defined in the grunt config
+On MacOS that will be something like this:
 ```
-	npm install
-```
-Install the styleguide
-```
-	bower install
-	grunt styleguide-deploy
-```
-Make sure Grunt watch for less changes and compile them into CSS
-```
-	grunt watch
-```
-Edit one LESS file to see if it works!
-Make sure that if you need to make change the styleguide to request changes upstream.
-
-How to install / update openpgp
-===============================
-By default, openpgpjs as provided in the official repository cannot work 
-in the add-on environment. So we have developed some scripts to patch it.
-
-To install or update openpgp:
-```
-	grunt lib-openpgp-deploy
+jpm run -b /Applications/FirefoxDeveloperEdition.app
 ```
 
-The command will take care of downloading the version defined in package.json,
-patch it, and deploy it in /lib/vendors.
-Look at Gruntfile.js to see in details what it does.
-
-Credits
-=======
+# Credits
 
 https://www.passbolt.com/credits

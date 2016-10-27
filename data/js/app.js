@@ -82,7 +82,7 @@ window.addEventListener('passbolt.share.encrypt', function () {
   passbolt.request('passbolt.share.encrypt').then(function (armoreds) {
     // Notify the App with the encrypted secret.
     passbolt.message.emitToPage('resource_share_encrypted', armoreds);
-  }, function() {
+  }, function () {
     // Notify the App that the share encryption process has been canceled.
     passbolt.message.emitToPage('passbolt.plugin.share.canceled');
   });
@@ -108,7 +108,7 @@ passbolt.message.on('passbolt.secret-edit.back-tab-pressed', function () {
 });
 
 // The application asks the plugin secret-edit iframe to get the focus.
-window.addEventListener('passbolt.secret.focus', function (event) {
+window.addEventListener('passbolt.secret.focus', function () {
   passbolt.message.emit('passbolt.secret-edit.focus');
 });
 
@@ -162,7 +162,7 @@ window.addEventListener('passbolt.secret.decrypt', function (event) {
         title: 'plugin_secret_copy_success'
       });
       passbolt.message.emitToPage('passbolt_loading_complete');
-    }, function() {
+    }, function () {
       passbolt.message.emitToPage('passbolt_loading_complete');
     });
 });

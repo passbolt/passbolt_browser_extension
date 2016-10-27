@@ -10,8 +10,10 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-// Open the progress dialog.
-// Listen to the event : passbolt.progress.open-dialog
+/*
+ * Open the progress dialog.
+ * @listens passbolt.progress.open-dialog
+ */
 passbolt.message.on('passbolt.progress.open-dialog', function(title, goals) {
 	var url = 'about:blank?passbolt=progressDialog&title=' + title + '&goals=' + goals;
 
@@ -25,8 +27,10 @@ passbolt.message.on('passbolt.progress.open-dialog', function(title, goals) {
 	$iframe.appendTo('body');
 });
 
-// Close the progress dialog.
-// Listen to the event : passbolt.progress.close-dialog
+/*
+ * Close the progress dialog.
+ * @listens passbolt.progress.close-dialog
+ */
 passbolt.message.on('passbolt.progress.close-dialog', function(wait) {
 	setTimeout(function() {
 		$('#passbolt-iframe-progress-dialog').fadeOut(300, function() {

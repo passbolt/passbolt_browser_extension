@@ -16,9 +16,8 @@ var passbolt = passbolt || {};
 
   /**
    * Execute all the callbacks associated to a message listener.
-   *
-   * @param message
-   * @param args
+   * @param message {string} The message to notify listeners for
+   * @param args {array} Array of arguments to pass to the message handlers
    * @private
    */
   var _executeCallbacks = function (message, args) {
@@ -33,7 +32,7 @@ var passbolt = passbolt || {};
    * If any listeners observe this message, execute all the callbacks attached
    * to this message.
    *
-   * @param message
+   * @param message {string} The message to emit
    */
   passbolt.message.emit = function (message) {
     // If any listener observe this message.
@@ -50,8 +49,8 @@ var passbolt = passbolt || {};
    * Listen to a message emitted by the addon code, or emmited in the content
    * code.
    *
-   * @param message The message to listen for
-   * @param callback The callback to execute once a message is received
+   * @param message {string} The message to listen for
+   * @param callback {function} The callback to execute once a message is received
    */
   passbolt.message.on = function (message, callback) {
     // If no listener observe yet this message.
@@ -71,8 +70,8 @@ var passbolt = passbolt || {};
 
   /**
    * Emit a message to the page.
-   * @param message message name
-   * @param data the data associated to the message
+   * @param message {string} message name
+   * @param data {array} the data associated to the message
    */
   passbolt.message.emitToPage = function (message, data) {
     // Bundle the event data;

@@ -12,13 +12,13 @@ var passbolt = passbolt || {};
   var clipboard = {};
 
   /**
-   * Copy a string into the clipboard
-   * @param txt
+   * Copy a string into the clipboard.
+   * @param txt {string} The text to copy
    */
-  clipboard.copy = function(txt) {
+  clipboard.copy = function (txt) {
     self.port.emit("passbolt.clipboard.copy", txt);
   };
 
   passbolt.clipboard = clipboard;
 
-})( passbolt );
+})(passbolt);

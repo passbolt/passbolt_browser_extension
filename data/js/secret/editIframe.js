@@ -15,7 +15,8 @@
    * Insert the secret edition/creation iframe into the edit password dialog
    * provided by the application page.
    *
-   * @param dialogCase Can be create or edit.
+   * @param dialogCase {string} The case the component will be instantiated for.
+   *  Can be create or edit.
    */
   var _insertIframe = function (dialogCase) {
     var $iframe = $('<iframe/>', {
@@ -27,7 +28,10 @@
     $iframe.appendTo('.js_form_secret_wrapper');
   };
 
-  // Open the secret field control component when a password is created or edited.
+  /*
+   * Open the secret field control component when a password is created or edited.
+   * @listens passbolt.plugin.resource_edition
+   */
   window.addEventListener("passbolt.plugin.resource_edition", function () {
     var editData = {
         armored: null,

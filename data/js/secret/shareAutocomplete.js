@@ -26,7 +26,7 @@
 
   /**
    * Load the page template and initialize the variables relative to it.
-   * @returns {*|Promise.<T>|*}
+   * @returns {promise}
    */
   var loadTemplate = function () {
     return passbolt.helper.html.loadTemplate('body', './tpl/resource/shareAutocomplete.ejs')
@@ -51,16 +51,8 @@
   };
 
   /**
-   * Check if the component is in the given state
-   * @param state The state to check
-   */
-  var stateIs = function (state) {
-    // @todo The DOM as state store ...
-    return $('.autocomplete-content').hasClass(state);
-  };
-
-  /**
    * Resize the iframe.
+   * @param cssClasses {array} The css classes applied to the page.
    */
   var resize = function (cssClasses) {
     // If the resolution is too low, the iframe should not be scrollable.
@@ -99,7 +91,7 @@
 
   /**
    * Load a list of users.
-   * @param users
+   * @param users {array} The list of users
    */
   var load = function (users) {
     // Load the users in the list.
@@ -120,7 +112,7 @@
   /**
    * Change the state of the component.
    * Mark the iframe with the state to allow other external components to work with.
-   * @param state
+   * @param state {string} The state to switch to. Can be : loading, loaded, hidden
    */
   var setState = function (state) {
     switch (state) {
@@ -151,17 +143,27 @@
    *  Addon events handlers
    * ================================================================================== */
 
+  /**
+   * Handle the loading event.
+   */
   var loadingHandler = function () {
     reset();
     setState('loading');
   };
 
+  /**
+   * Handler the load users event.
+   * @param users {array} The list of users to load
+   */
   var loadUsersHandler = function (users) {
     load(users);
     setState('loaded');
   };
 
-  // The application window has been resized.
+  /*
+   * The application window has been resized.
+   * @listens passbolt.master-password.close-dialog
+   */
   passbolt.message.on('passbolt.app.window-resized', function (cssClasses) {
     resize(cssClasses);
   });
@@ -170,7 +172,10 @@
    *  DOM events handlers
    * ================================================================================== */
 
-  // Listen when a user is selected in the list.
+  /**
+   * A user is selected.
+   * @param ev {HTMLEvent} The event which occurred
+   */
   var onSelect = function (ev) {
     ev.preventDefault();
     ev.stopPropagation();

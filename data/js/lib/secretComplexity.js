@@ -45,52 +45,52 @@ var secretComplexity = {};
    */
   var MASKS = {
     'alpha': {
-      size:26,
-        data: 'abcdefghijklmnopqrstuvwxyz',
-        pattern: /[a-z]/
+      size: 26,
+      data: 'abcdefghijklmnopqrstuvwxyz',
+      pattern: /[a-z]/
     },
     'uppercase': {
-      size:26,
-        data: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-        pattern: /[A-Z]/
+      size: 26,
+      data: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      pattern: /[A-Z]/
     },
     'digit': {
-      size:10,
-        data: '0123456789',
-        pattern: /[0-9]/
+      size: 10,
+      data: '0123456789',
+      pattern: /[0-9]/
     },
     'special': {
-      size:32,
-        // ASCII Code = 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 58, 59, 60, 61, 62, 63, 64, 91, 92, 93, 94, 95, 96, 123, 124, 125, 126
-        data: '!"#$%&\'()*+,-./:;<=>?@[:\\]^_`{|}~',
-        pattern: /[!"#$%&\'\(\)*+,\-./:;<=>?@\[\]^_`{|}~]/
+      size: 32,
+      // ASCII Code = 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 58, 59, 60, 61, 62, 63, 64, 91, 92, 93, 94, 95, 96, 123, 124, 125, 126
+      data: '!"#$%&\'()*+,-./:;<=>?@[:\\]^_`{|}~',
+      pattern: /[!"#$%&\'\(\)*+,\-./:;<=>?@\[\]^_`{|}~]/
     }
   };
   exports.MASKS = MASKS;
 
   /**
-   * Geneate a random number in the given range.
-   * @param min
-   * @param max
-   * @returns {*}
+   * Generate a random number in the given range.
+   * @param min {int} The min limit
+   * @param max {int} The mas limit
+   * @returns {int}
    */
-  var randomRange = function(min, max) {
+  var randomRange = function (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   };
 
   /**
    * Calculate the entropy regarding the given primitives.
-   * @param {int} length The number of characters
-   * @param {int} maskSize The number of possibility for each character
+   * @param length {int} The number of characters
+   * @param maskSize {int} The number of possibility for each character
    * @return {int}
    */
-  var calculEntropy = function(length, maskSize) {
+  var calculEntropy = function (length, maskSize) {
     return length * (Math.log(maskSize) / Math.log(2));
   };
 
   /**
-   * Mesure the entropy of a password
-   * @param {srtring} pwd The password to test the entropy
+   * Mesure the entropy of a password.
+   * @param pwd {srtring} The password to test the entropy
    * @return {int}
    */
   var entropy = function (pwd) {
@@ -108,8 +108,14 @@ var secretComplexity = {};
 
   /**
    * Get the entropy level regarding the mesure of the entropy.
-   * @param {string} txt The text to work on.
-   * @return {object} The entropy level {start:(int), id:(string), label:(string)}
+   * @param txt {string} The text to work on
+   * @return {object} The entropy level
+   *  format :
+   *  {
+   *    start {int},
+   *    id {string},
+   *    label {string}
+   *  }
    */
   var strength = function (txt) {
     if (txt == null) {
@@ -131,27 +137,34 @@ var secretComplexity = {};
   exports.strength = strength;
 
   /**
-   * Get an object with a list of criterias and whether the text given matches them.
-   * @param txt
-   * @returns {{}}
+   * Check if a text matches multiple masks.
+   * @param txt {string} The text to
+   * @returns {array} The list of masks as following :
+   *   {
+   *     alpha: true,
+   *     uppercase: false,
+   *     ...
+   *   }
    */
-  var matchMasks = function(txt) {
-    var criterias = {};
+  var matchMasks = function (txt) {
+    var matches = {};
     for (var i in MASKS) {
-      criterias[i] = false;
+      matches[i] = false;
       if (txt.match(MASKS[i].pattern)) {
-        criterias[i] = true;
+        matches[i] = true;
       }
     }
-    return criterias;
+    return matches;
   };
   exports.matchMasks = matchMasks;
 
   /**
-   * Generate a password following the system configuration
+   * Generate a password following the system settings.
+   * @param length {int} (optional) The password length. Default 18.
+   * @param masks {array} (optional) The list of masks to use. Default all.
    * @return {string}
    */
-  var generate = function(length, masks) {
+  var generate = function (length, masks) {
     var secret = '',
       mask = [],
       masks = masks || ["alpha", "uppercase", "digit", "special"],
@@ -169,10 +182,10 @@ var secretComplexity = {};
     do {
       secret = '';
       expectedEntropy = calculEntropy(length, mask.length);
-      for (var i=0; i<length; i++) {
-        secret += mask[randomRange(0, mask.length-1)];
+      for (var i = 0; i < length; i++) {
+        secret += mask[randomRange(0, mask.length - 1)];
       }
-    } while (expectedEntropy != entropy(secret) && j++<10	);
+    } while (expectedEntropy != entropy(secret) && j++ < 10);
 
     return secret;
   };

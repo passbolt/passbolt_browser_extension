@@ -10,6 +10,9 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
 (function (passbolt) {
 
+  /*
+   * Step settings.
+   */
   var step = {
       id: 'secret',
       elts: {
@@ -24,17 +27,86 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   // Allow to delay the treament of the master password input.
     currentOnPasswordInputTimeout = null;
 
+  /**
+   * Implements init().
+   * @returns {promise}
+   */
+  step.init = function () {
+    var def = $.Deferred();
+    def.resolve();
+    return def;
+  };
+
+  /**
+   * Implements start().
+   */
+  step.start = function () {
+    // Disable submit button at the beginning.
+    passbolt.setup.setActionState('submit', 'disabled');
+
+    // Update password criterias for empty password.
+    step._updatePasswordCriterias('');
+
+    // On input change.
+    step.elts.$password.on('input change', function () {
+      // If the treatment of the input is already schedule.
+      if (currentOnPasswordInputTimeout != null) {
+        clearTimeout(currentOnPasswordInputTimeout);
+      }
+      // Postpone the input treatment
+      currentOnPasswordInputTimeout = setTimeout(function () {
+        step.onPasswordInput();
+      }, 100);
+    });
+
+    // When the clear password is updated.
+    step.elts.$passwordClear.on('input', function () {
+      step.onPasswordClearInput();
+    });
+
+    // When the user explicitly wants to view the password.
+    step.elts.$viewPasswordButton.on('click', function (ev) {
+      ev.preventDefault();
+      step.onViewButtonClick(ev);
+    });
+  };
+
+  /**
+   * Implements submit().
+   * @returns {promise}
+   */
+  step.submit = function () {
+    passbolt.setup.setActionState('submit', 'processing');
+
+    // Validate the key and return promise related to validation.
+    return passbolt.request('passbolt.keyring.key.validate', {passphrase: step.elts.$password.val()}, ['passphrase'])
+      .then(function () {
+        passbolt.setup.set('key.passphrase', step.elts.$password.val());
+      })
+      .then(null, function (errorMessage, validationErrors) {
+        passbolt.setup.setActionState('submit', 'disabled');
+      })
+  };
+
+  /**
+   * Implements cancel().
+   * @returns {promise}
+   */
+  step.cancel = function () {
+    passbolt.setup.setActionState('cancel', 'processing');
+    var def = $.Deferred();
+    def.resolve();
+    return def;
+  };
+
   /* ==================================================================================
    *  Content code events
    * ================================================================================== */
 
   /**
    * On click event on the view button.
-   *
-   * @param ev
-   * @param el
    */
-  step.onViewButtonClick = function (ev, el) {
+  step.onViewButtonClick = function () {
     if (step.elts.$password.hasClass('hidden')) {
       step.elts.$password.removeClass('hidden');
       step.elts.$passwordClear.addClass('hidden');
@@ -87,88 +159,13 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   };
 
   /* ==================================================================================
-   *  Core functions (Implements()).
-   * ================================================================================== */
-
-  /**
-   * Implements init().
-   * @returns {*}
-   */
-  step.init = function () {
-    var def = $.Deferred();
-    def.resolve();
-    return def;
-  };
-
-  /**
-   * Implements start().
-   */
-  step.start = function () {
-    // Disable submit button at the beginning.
-    passbolt.setup.setActionState('submit', 'disabled');
-
-    // Update password criterias for empty password.
-    step._updatePasswordCriterias('');
-
-    // On input change.
-    step.elts.$password.on('input change', function () {
-      // If the treatment of the input is already schedule.
-      if (currentOnPasswordInputTimeout != null) {
-        clearTimeout(currentOnPasswordInputTimeout);
-      }
-      // Postpone the input treatment
-      currentOnPasswordInputTimeout = setTimeout(function () {
-        step.onPasswordInput();
-      }, 100);
-    });
-
-    // When the clear password is updated.
-    step.elts.$passwordClear.on('input', function () {
-      step.onPasswordClearInput();
-    });
-
-    // When the user explicitly wants to view the password.
-    step.elts.$viewPasswordButton.on('click', function (ev) {
-      ev.preventDefault();
-      step.onViewButtonClick(ev);
-    });
-  };
-
-  /**
-   * Implements submit().
-   * @returns {*}
-   */
-  step.submit = function () {
-    passbolt.setup.setActionState('submit', 'processing');
-
-    // Validate the key and return promise related to validation.
-    return passbolt.request('passbolt.keyring.key.validate', {passphrase: step.elts.$password.val()}, ['passphrase'])
-      .then(function () {
-        passbolt.setup.set('key.passphrase', step.elts.$password.val());
-      })
-      .then(null, function (errorMessage, validationErrors) {
-        passbolt.setup.setActionState('submit', 'disabled');
-      })
-  };
-
-  /**
-   * Implements cancel().
-   * @returns {*}
-   */
-  step.cancel = function () {
-    passbolt.setup.setActionState('cancel', 'processing');
-    var def = $.Deferred();
-    def.resolve();
-    return def;
-  };
-
-  /* ==================================================================================
    *  Business functions
    * ================================================================================== */
 
   /**
    * Update the secret strength component.
-   * @param secret
+   * @param password {string} The password to evaluate
+   * @returns {promise}
    */
   step._updatePasswordCriterias = function (password) {
     var criterias = {};
@@ -186,7 +183,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   /**
    * Update the secret strength component.
-   * @param secret
+   * @param password {string} The password to measure the strength
+   * @returns {promise}
    */
   step._updatePasswordStrength = function (password) {
     var strength = secretComplexity.strength(password);

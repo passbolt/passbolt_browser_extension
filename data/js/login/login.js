@@ -18,6 +18,7 @@ passbolt.login = passbolt.login || {};
 
   /**
    * When the plugin configuration is missing
+   * @returns {promise}
    */
   passbolt.login.onConfigurationMissing = function () {
     var $renderSpace = $('.login.page .js_main-login-section'),
@@ -27,7 +28,7 @@ passbolt.login = passbolt.login || {};
   };
 
   /**
-   * Starts with server key check
+   * Starts with server key check.
    */
   passbolt.login.onStep0Start = function () {
     var $renderSpace = $('.login.page .js_main-login-section'),
@@ -55,7 +56,7 @@ passbolt.login = passbolt.login || {};
   };
 
   /**
-   * Server key check
+   * Server key check.
    */
   passbolt.login.onStep0CheckServerKey = function () {
 
@@ -91,7 +92,7 @@ passbolt.login = passbolt.login || {};
   };
 
   /**
-   * Insert the passphrase dialog
+   * Insert the passphrase dialog.
    */
   passbolt.login.onStep1RequestPassphrase = function () {
 
@@ -146,7 +147,7 @@ passbolt.login = passbolt.login || {};
    * ================================================================================== */
 
   /**
-   * Check if the addon says we are ready for login
+   * Initialize the login.
    */
   passbolt.login.init = function () {
 

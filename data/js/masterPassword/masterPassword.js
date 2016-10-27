@@ -33,8 +33,7 @@
 
   /**
    * Load the page template and initialize the variables relative to it.
-   *
-   * @returns {*|Promise.<T>|*}
+   * @returns {promise}
    */
   var loadTemplate = function () {
     return passbolt.helper.html.loadTemplate('body', './tpl/master/masterPassword.ejs')
@@ -47,7 +46,7 @@
 
   /**
    * Init the security token.
-   * @returns {Promise.<T>}
+   * @returns {promise}
    */
   var initSecurityToken = function () {
     return passbolt.security.initSecurityToken('#js_master_password', '.security-token');
@@ -55,7 +54,7 @@
 
   /**
    * Steal the focus wherever it is.
-   * @returns {Promise.<T>}
+   * @returns {promise}
    */
   var stealFocus = function () {
     var deferred = $.Deferred();
@@ -105,7 +104,6 @@
 
   /**
    * Submit the master password to the addon code
-   *
    * @param masterPassword {string} The master password to send to the addon code.
    */
   var submitMasterPassword = function (masterPassword) {
@@ -127,6 +125,7 @@
 
   /**
    * Handles wrong attempt.
+   * @param attempts {int} The number of attempts done already
    */
   var wrongAttemptHandler = function (attempts) {
     // If less than 3 attempts, notify the user and let him try again.
@@ -150,8 +149,7 @@
   /**
    * The close button has been clicked.
    * Close the dialog.
-   *
-   * @param ev
+   * @param ev {HTMLEvent} The event which occurred
    */
   var closeButtonClicked = function (ev) {
     ev.preventDefault();
@@ -165,8 +163,7 @@
    *  - Tab pressed : switch the focus to the master password field ;
    *  - Accepted key pressed : switch the focus to the master password and fill
    *    it with the entered character.
-   *
-   * @param ev
+   * @param ev {HTMLEvent} The event which occurred
    */
   var focusFirstFieldKeypressed = function (ev) {
     // Prevent default.
@@ -204,10 +201,8 @@
    *  - Check if the user wants his master password to be remembered and
    *    notify the addon about this preference if yes.
    *  - Submit the master password to the addon.
-   *
-   * @param ev
    */
-  var submitButtonClicked = function (ev) {
+  var submitButtonClicked = function () {
     var masterPassword = $masterPasswordField.val();
 
     // The user wants his master password to be remembered.
@@ -223,8 +218,7 @@
    * Handle the different scenario :
    *  - Escape pressed : close the dialog ;
    *  - Enter pressed : submit the form ;
-   *
-   * @param ev
+   * @param ev {HTMLEvent} The event which occurred
    */
   var masterPasswordFieldKeypressed = function (ev) {
     // Get keycode.

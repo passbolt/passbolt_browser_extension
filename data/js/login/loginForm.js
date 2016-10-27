@@ -33,7 +33,7 @@
 
   /**
    * Load the page template and initialize the variables relative to it.
-   * @returns {*|Promise.<T>|*}
+   * @returns {promise}
    */
   var loadTemplate = function () {
     return passbolt.helper.html.loadTemplate('body', './tpl/login/form.ejs')
@@ -47,7 +47,7 @@
 
   /**
    * Init the security token.
-   * @returns {Promise.<T>}
+   * @returns {promise}
    */
   var initSecurityToken = function () {
     return passbolt.security.initSecurityToken('#js_master_password', '.security-token');
@@ -55,7 +55,7 @@
 
   /**
    * Get the user configured in the addon.
-   * @returns {Promise.<T>}
+   * @returns {promise}
    */
   var getUser = function () {
     return passbolt.request('passbolt.user.get').then(
@@ -77,7 +77,7 @@
 
   /**
    * Passphrase invalid, notify the user.
-   * @param msg
+   * @param msg {string} The error message
    */
   var invalidPassphrase = function (msg) {
     $loginSubmit.removeClass('disabled').removeClass('processing');
@@ -94,6 +94,7 @@
 
   /**
    * Try to login the user.
+   * @param masterPassword {string} The user passphrase
    */
   var loginAttempt = function (masterPassword) {
     if ($loginSubmit.hasClass('processing')) {
@@ -127,7 +128,7 @@
    *
    * @param ev
    */
-  var onLoginSubmit = function (ev) {
+  var onLoginSubmit = function () {
     if ($loginSubmit.hasClass('processing')) {
       return false;
     }
@@ -140,8 +141,8 @@
    * Handle when the user presses a key on the master password field.
    * Handle the scenario :
    *  - Enter pressed : submit the form ;
-   *
-   * @param ev
+
+   * @param ev {HTMLEvent} The event which occurred
    */
   var onMasterPasswordKeypressed = function (ev) {
     if ($loginSubmit.hasClass('processing')) {

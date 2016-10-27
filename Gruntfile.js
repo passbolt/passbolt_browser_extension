@@ -4,9 +4,18 @@ module.exports = function (grunt) {
   // High level variables
 
   var config = {
-    webroot: 'data',
     styleguide: 'passbolt-styleguide',
-    modules_path: 'node_modules'
+    modules_path: 'node_modules',
+    common_path: 'common',
+    webroot: 'common/data',
+    build: {
+      firefox: {
+        path: 'dist/firefox'
+      },
+      chrome: {
+        path: 'dist/chrome'
+      }
+    }
   };
 
   // ========================================================================
@@ -21,41 +30,131 @@ module.exports = function (grunt) {
       ],
       img: [
         '<%= config.webroot %>/img'
+      ],
+      'firefox_build': [
+        '<%= config.build.firefox.path %>/**'
+      ],
+      'chrome_build': [
+        '<%= config.build.chrome.path %>/**'
       ]
     },
     shell: {
-      updatestyleguide: {
+      update_styleguide: {
         options: {
           stderr: false
         },
         command: 'rm -rf <%= config.modules_path %>/<%= config.styleguide %>; npm install'
       },
-      jpmxpi: {
+      build_xpi: {
         options: {
           stderr: false
         },
         command: [
-          'rm -f passbolt*.xpi',
-          "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": true/' ./lib/config/config.json",
-          './node_modules/jpm/bin/jpm xpi',
-          "mv passbolt.xpi passbolt-<%= pkg.version %>-debug.xpi",
-          "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' ./lib/config/config.json",
-          './node_modules/jpm/bin/jpm xpi',
-          "mv passbolt.xpi passbolt-<%= pkg.version %>.xpi",
-          'ln -s passbolt-<%= pkg.version %>-debug.xpi ./passbolt-latest@passbolt.com.xpi'
+          'rm -f <%= config.build.firefox.path %>/passbolt*.xpi',
+          "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": true/' <%= config.build.firefox.path %>/lib/config/config.json",
+          './node_modules/jpm/bin/jpm xpi --addon-dir <%= config.build.firefox.path %>',
+          "mv <%= config.build.firefox.path %>/passbolt.xpi <%= config.build.firefox.path %>/passbolt-<%= pkg.version %>-debug.xpi",
+          "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' <%= config.build.firefox.path %>/lib/config/config.json",
+          './node_modules/jpm/bin/jpm xpi --addon-dir <%= config.build.firefox.path %>',
+          "mv <%= config.build.firefox.path %>/passbolt.xpi <%= config.build.firefox.path %>/passbolt-<%= pkg.version %>.xpi",
+          'ln -s passbolt-<%= pkg.version %>-debug.xpi <%= config.build.firefox.path %>/passbolt-latest@passbolt.com.xpi'
         ].join('&&')
       },
-      xpiinstall: {
+      install_xpi: {
         options: {
           stderr: false
         },
         command: [
-          'wget --post-file=passbolt-<%= pkg.version %>-debug.xpi http://localhost:8888/ > /dev/null 2>&1',
+          'wget --post-file=<%= config.build.firefox.path %>/passbolt-<%= pkg.version %>-debug.xpi http://localhost:8888/ > /dev/null 2>&1',
           'echo "If your browser has the firefox addon \"Extension auto-installer\" installed & enabled, the passbolt plugin is now installed on your browser"'
         ].join(';')
       }
     },
     copy: {
+      firefox_src: {
+        files: [{
+          // Package definition
+          nonull: true,
+          cwd: './',
+          src: ['package.json'],
+          dest: '<%= config.build.firefox.path %>',
+          expand: true
+        }, {
+          // Common
+          nonull: true,
+          cwd: '<%= config.common_path %>',
+          src: ['data/**', 'lib/**', 'locale/**'],
+          dest: '<%= config.build.firefox.path %>',
+          expand: true
+        }, {
+          // Firefox specific
+          nonull: true,
+          cwd: 'firefox',
+          src: ['**'],
+          dest: '<%= config.build.firefox.path %>',
+          expand: true
+        }]
+      },
+      chrome_src: {
+        files: [{
+          // Package definition
+          nonull: true,
+          cwd: './',
+          src: ['package.json'],
+          dest: '<%= config.build.chrome.path %>',
+          expand: true
+        }, {
+          // Common
+          nonull: true,
+          cwd: '<%= config.common_path %>',
+          src: ['data/**', 'lib/**', 'locale/**'],
+          dest: '<%= config.build.chrome.path %>',
+          expand: true
+        }, {
+          // Chrome specific
+          nonull: true,
+          cwd: 'chrome',
+          src: ['**'],
+          dest: '<%= config.build.chrome.path %>',
+          expand: true
+        }]
+      },
+      common_lib: {
+        files: []
+      },
+      firefox_lib: {
+        files: [{
+          // openpgp
+          cwd: '<%= config.modules_path %>/openpgp/dist/',
+          src: ['openpgp.js', 'openpgp.worker.js'],
+          dest: 'firefox/lib/vendors/',
+          nonull: true,
+          expand: true,
+          rename: function (dest, src) {
+            return dest + src;
+          }
+        }]
+      },
+      chrome_lib: {
+        files: [{
+          // steal lib.
+          nonull: true,
+          cwd: '<%= config.modules_path %>/steal',
+          src: ['steal.js', 'ext/dev.js'],
+          dest: 'chrome/lib/vendors/steal',
+          expand: true
+        }, {
+          // openpgp
+          cwd: '<%= config.modules_path %>/openpgp/dist/',
+          src: ['openpgp.js', 'openpgp.worker.js'],
+          dest: 'chrome/lib/vendors/',
+          nonull: true,
+          expand: true,
+          rename: function (dest, src) {
+            return dest + src;
+          }
+        }]
+      },
       styleguide: {
         files: [{
           // Avatar
@@ -92,47 +191,25 @@ module.exports = function (grunt) {
           dest: '<%= config.webroot %>/css',
           expand: true
         }]
-      },
-      openpgp_ff: {
-        files: [
-          {
-            // steal
-            cwd: '<%= config.modules_path %>/openpgp/dist/',
-            src: ['openpgp_ff.js', 'openpgp.worker.js'],
-            dest: 'lib/vendors/',
-            nonull: true,
-            expand: true,
-            rename: function (dest, src) {
-              console.log(dest, src);
-              if (src == 'openpgp_ff.js') {
-                return dest + 'openpgp.js';
-              }
-              return dest + src;
-            }
-          }]
       }
     },
     replace: {
-      openpgp_ff: {
-        src: ['<%= config.modules_path %>/openpgp/dist/openpgp.js'],
-        dest: ['<%= config.modules_path %>/openpgp/dist/openpgp_ff.js'],
-        replacements: [
-          {
-            // Add necessary dependencies at the beginning of the file.
-            from: "(function(f)",
-            to: "if (Worker == undefined) {\nvar Worker = require('./web-worker').Worker;\n}\nif (window == undefined) {\nvar window = require('./window');\nvar atob = window.atob;\n}\n\n(function(f)"
-          },
-          {
-            // Comment promise polyfill. We don't need it. And it breaks.
-            from: "lib$es6$promise$polyfill$$default();",
-            to: "//lib$es6$promise$polyfill$$default();"
-          },
-          {
-            // Comment promise polyfill. We don't need it. And it breaks.
-            from: "_es6Promise2.default.polyfill();",
-            to: "//_es6Promise2.default.polyfill();"
-          }
-        ]
+      patch_firefox_openpgp: {
+        src: ['firefox/lib/vendors/openpgp.js'],
+        dest: ['firefox/lib/vendors/openpgp.js'],
+        replacements: [{
+          // Add necessary dependencies at the beginning of the file.
+          from: "(function(f)",
+          to: "if (Worker == undefined) {\nvar Worker = require('./web-worker').Worker;\n}\nif (window == undefined) {\nvar window = require('./window');\nvar atob = window.atob;\n}\n\n(function(f)"
+        }, {
+          // Comment promise polyfill. We don't need it. And it breaks.
+          from: "lib$es6$promise$polyfill$$default();",
+          to: "//lib$es6$promise$polyfill$$default();"
+        }, {
+          // Comment promise polyfill. We don't need it. And it breaks.
+          from: "_es6Promise2.default.polyfill();",
+          to: "//_es6Promise2.default.polyfill();"
+        }]
       }
     }
   });
@@ -150,22 +227,36 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-text-replace');
 
   // ========================================================================
-  // Register Tasks
+  // Register dependencies deployment tasks.
+
+  // Deploy all libs.
+  grunt.registerTask('deploy-lib', ['deploy-common-lib', 'deploy-chrome-lib', 'deploy-firefox-lib']);
+
+  // Deploy common libs.
+  grunt.registerTask('deploy-common-lib', ['copy:common_lib']);
+
+  // Deploy chrome libs.
+  grunt.registerTask('deploy-chrome-lib', ['copy:chrome_lib']);
+
+  // Deploy firefox lib.
+  grunt.registerTask('deploy-firefox-lib', ['copy:firefox_lib', 'replace:patch_firefox_openpgp']);
 
   // Update styleguide
-  grunt.registerTask('styleguide-update', ['shell:updatestyleguide', 'clean:css', 'clean:img', 'copy:styleguide', 'shell:jpmxpi']);
+  grunt.registerTask('update-styleguide', ['shell:update_styleguide', 'clean:css', 'clean:img', 'copy:styleguide']);
 
-  // Copy, patch (to make it work with firefox) and deploy openPGP in libraries.
-  grunt.registerTask('lib-openpgp-deploy', ['replace:openpgp_ff', 'copy:openpgp_ff']);
-
-  // Build xpi in debug and non-debug version.
-  grunt.registerTask('build-xpi', ['shell:jpmxpi']);
+  // ========================================================================
+  // Register build tasks.
 
   // Build xpi in debug and non-debug version.
-  grunt.registerTask('push-xpi', ['shell:xpiinstall']);
+  grunt.registerTask('install-xpi', ['shell:install_xpi']);
 
-  // 'grunt' will check code quality, and if no errors,
-  // compile LESS to CSS, and minify and concatonate all JS and CSS
-  grunt.registerTask('default', ['shell:jpmxpi']);
+  // Build firefox.
+  grunt.registerTask('build-firefox', ['clean:firefox_build', 'copy:firefox_src', 'shell:build_xpi']);
+
+  // Build chrome.
+  grunt.registerTask('build-chrome', ['clean:chrome_build', 'copy:chrome_src']);
+
+  // By default build plugin for all browsers.
+  grunt.registerTask('default', ['build-firefox', 'build-chrome']);
 
 };

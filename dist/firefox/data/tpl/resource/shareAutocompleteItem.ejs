@@ -1,0 +1,17 @@
+<li id="<%= user.User.id %>">
+    <div class="row">
+        <div class="main-cell-wrapper">
+            <div class="main-cell">
+                <a href="#">
+                    <div class="avatar">
+                        <img src="<%= user.Profile.Avatar.url.small %>"/>
+                    </div>
+                    <div class="group">
+                        <span class="name"><%= user.Profile.first_name %> <%= user.Profile.last_name %> (<%= user.Gpgkey.key_id %>)</span>
+                        <span class="details" title="<%= user.User.username %>"><%= user.User.username %></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</li>

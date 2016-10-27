@@ -1,0 +1,45 @@
+<div class="col10 last feedback">
+    <p class="message error hidden" id="js_main_error_feedback"></p>
+</div>
+<!-- left collumn -->
+<div class="col6">
+    <h3>Create a new key</h3>
+    <div class="input text required disabled">
+        <label for="OwnerName">Owner Name</label>
+        <input name="data[Owner][name]" class="required fluid" id="OwnerName" required="required" type="text" disabled="disabled" value="<%= firstName %> <%= lastName %>">
+    </div>
+    <div class="input text required disabled">
+        <label for="OwnerEmail">Owner Email</label>
+        <input name="data[Owner][email]" class="required fluid" id="OwnerEmail" required="required" type="text" disabled="disabled" value="<%= username %>">
+    </div>
+    <div class="input text">
+        <label for="KeyComment">Comment</label>
+        <input name="data[Key][comment]" class="required fluid" id="KeyComment" required="required" type="text" placeholder="add a comment (optional)" value="<%= comment %>">
+    </div>
+</div>
+
+<!-- right collumn -->
+<div class="col4 last">
+    <h3>Advanced settings</h3>
+    <div class="input select required">
+        <label for="KeyType">Key Type</label>
+        <select name="data[Key][type]" id="KeyType" disabled="disabled" class="fluid">
+            <option value="RSA-DSA" >RSA and DSA (default)</option>
+            <option value="DSA-EL" >DSA and Elgamal</option>
+        </select>
+    </div>
+    <div class="input select required">
+        <label for="KeyLength">Key Length</label>
+        <select name="data[Key][length]" id="KeyLength" disabled="disabled" class="fluid">
+            <option value="1024" >1024</option>
+            <option value="2048" >2048</option>
+            <option value="3076" >3076</option>
+        </select>
+    </div>
+
+    <div class="input date">
+        <label for="KeyExpire">Key Expire</label>
+        <input name="data[Key][expire]" class="required fluid" id="KeyExpire" disabled="disabled" required="required" placeholder="dd/mm/yyyy" type="text">
+        <span class="input-addon"><i class="fa fa-calendar fa-fw"></i></span>
+    </div>
+</div>

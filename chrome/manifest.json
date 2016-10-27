@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+  "name": "Passbolt Extension",
+  "version": "0.0.1",
+
+  "description": "Passbolt extension for the open source password manager for teams.",
+  "icons": {
+    "128": "skin/icon-128.png"
+  },
+  "background": {
+    "page": "index.html"
+  },
+  "browser_action": {
+    "default_icon": "skin/icon-19.png"
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "background",
+    "*://*/*"
+  ],
+  "web_accessible_resources": [
+    "data/*"
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}

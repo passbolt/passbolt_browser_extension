@@ -18,7 +18,7 @@ passbolt.security = passbolt.security || {};
    *  secure
    * @param securityTokenSelector {string} Selector to retrieve the security
    *  token field
-   * @returns {Promise.<T>|*}
+   * @returns {promise}
    */
   var initSecurityToken = function (protectedFieldSelector, securityTokenSelector) {
     return passbolt.request('passbolt.user.settings.get.securityToken')

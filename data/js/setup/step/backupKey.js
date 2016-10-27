@@ -11,59 +11,76 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
 (function (passbolt) {
 
-    var step = {
-        'id': 'backup_key',
-        'elts' : {
-            downloadButton : '#js_backup_key_download'
-        }
-    };
+  /*
+   * Step settings.
+   */
+  var step = {
+    id: 'backup_key',
+    elts: {
+      downloadButton: '#js_backup_key_download'
+    }
+  };
 
-    /* ==================================================================================
-     *  Content code events
-     * ================================================================================== */
+  /**
+   * Implements init().
+   * @returns {promise}
+   */
+  step.init = function () {
+    var def = $.Deferred();
+    def.resolve();
+    return def;
+  };
 
-    step.onClickDownload = function() {
-        // Get private armored key.
-        passbolt.setup.get('key.privateKeyArmored').then(function(privateKeyArmored) {
-            // Start download.
-            passbolt.request('passbolt.keyring.key.backup', privateKeyArmored, 'passbolt_private.asc')
-                .then(function () {
-                    // The key has been saved.
-                });
+  /**
+   * Implements start().
+   */
+  step.start = function () {
+    step.elts.$downloadButton.on('click', function (ev) {
+      step.onClickDownload();
+    });
+  };
+
+  /**
+   * Implements submit().
+   * @returns {promise}
+   */
+  step.submit = function () {
+    passbolt.setup.setActionState('submit', 'processing');
+
+    var def = $.Deferred();
+    def.resolve();
+    return def;
+  };
+
+  /**
+   * Implements cancel().
+   * @returns {promise}
+   */
+  step.cancel = function () {
+    passbolt.setup.setActionState('cancel', 'processing');
+    var def = $.Deferred();
+    def.resolve();
+    return def;
+  };
+
+  /* ==================================================================================
+   *  Content code events
+   * ================================================================================== */
+
+  /**
+   * Handle the onClick event on the download button.
+   */
+  step.onClickDownload = function () {
+    // Get private armored key.
+    passbolt.setup.get('key.privateKeyArmored').then(function (privateKeyArmored) {
+      // Start download.
+      passbolt.request('passbolt.keyring.key.backup', privateKeyArmored, 'passbolt_private.asc')
+        .then(function () {
+          // The key has been saved.
         });
-    };
+    });
+  };
 
-    /* ==================================================================================
-     *  Core functions (Implements()).
-     * ================================================================================== */
-
-    step.init = function () {
-        var def = $.Deferred();
-        def.resolve();
-        return def;
-    };
-
-    step.start = function () {
-        step.elts.$downloadButton.on('click', function (ev) {
-            step.onClickDownload();
-        });
-    };
-
-    step.submit = function () {
-        passbolt.setup.setActionState('submit', 'processing');
-
-        var def = $.Deferred();
-        def.resolve();
-        return def;
-    };
-
-    step.cancel = function () {
-        passbolt.setup.setActionState('cancel', 'processing');
-        var def = $.Deferred();
-        def.resolve();
-        return def;
-    };
-
-    passbolt.setup.steps[step.id] = step;
+  passbolt.setup.steps[step.id] = step;
 
 })(passbolt);

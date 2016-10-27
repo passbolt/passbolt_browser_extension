@@ -10,21 +10,19 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
 (function (passbolt) {
 
+  /*
+   * Step settings.
+   */
   var step = {
-    'id': 'login_redirection',
-    'options': {
-      'workflow': 'install'
+    id: 'login_redirection',
+    options: {
+      workflow: 'install'
     }
   };
 
-
-  /* ==================================================================================
-   *  Core functions (Implements()).
-   * ================================================================================== */
-
   /**
    * Implements init().
-   * @returns {*}
+   * @returns {promise}
    */
   step.init = function () {
     var def = $.Deferred();
@@ -39,10 +37,9 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     step.submit();
   };
 
-
   /**
    * Implements submit().
-   * @returns {*}
+   * @returns {promise}
    */
   step.submit = function () {
     return passbolt.setup.get()
@@ -56,7 +53,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   /**
    * Implements cancel().
-   * @returns {*}
+   * @returns {promise}
    */
   step.cancel = function () {
     passbolt.setup.setActionState('cancel', 'processing');
@@ -75,6 +72,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
    * If setup went fine, we don't need to keep the data as they are already stored
    * in user object.
    *
+   * @returns {promise}
    * @private
    */
   step._flushSetup = function () {
@@ -87,6 +85,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   /**
    * Go to login at the end of the setup.
+   * @returns {promise}
    * @private
    */
   step._goToLogin = function () {
@@ -106,7 +105,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   /**
    * Validate account of the user on the server with data collected during the setup.
    *
-   * @param setupData
+   * @param setupData {array} Setup information
+   * @returns {promise}
    * @private
    */
   step._validateAccount = function (setupData) {

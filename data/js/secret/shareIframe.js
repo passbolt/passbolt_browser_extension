@@ -43,7 +43,10 @@
     $iframeAutocomplete.appendTo($('#passbolt-password-share-autocomplete-wrapper', '.js_plugin_share_wrapper'));
   };
 
-  // Open the secret share control component when a password is shared.
+  /*
+   * Open the secret share control component when a password is shared.
+   * passbolt.plugin.resource_share
+   */
   window.addEventListener("passbolt.plugin.resource_share", function (event) {
     var data = event.detail;
 

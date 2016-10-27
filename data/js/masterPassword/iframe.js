@@ -10,8 +10,10 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-// Open the master password dialog.
-// Listen to the event : passbolt.master-password.open-dialog
+/*
+ * Open the master password dialog.
+ * @listens passbolt.master-password.open-dialog
+ */
 passbolt.message.on('passbolt.master-password.open-dialog', function () {
 	// Add the master password iframe to the application page.
 	var $iframe = $('<iframe/>', {
@@ -23,8 +25,10 @@ passbolt.message.on('passbolt.master-password.open-dialog', function () {
 	$iframe.appendTo('body');
 });
 
-// Close the master password dialog.
-// Listen to the event : passbolt.master-password.close-dialog
+/*
+ * Close the master password dialog.
+ * @listens passbolt.master-password.close-dialog
+ */
 passbolt.message.on('passbolt.master-password.close-dialog', function () {
 	$('#passbolt-iframe-master-password').remove();
 });

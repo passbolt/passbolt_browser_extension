@@ -58,7 +58,7 @@
 
   /**
    * Error handler.
-   * @param error
+   * @param error {string} The error message
    */
   var error = function (error) {
     // @todo general error handler.
@@ -66,7 +66,7 @@
 
   /**
    * Load the page template and initialize the variables relative to it.
-   * @returns {*|Promise.<T>|*}
+   * @returns {promise}
    */
   var loadTemplate = function () {
     return passbolt.helper.html.loadTemplate('body', './tpl/secret/edit.ejs')
@@ -84,7 +84,7 @@
   /**
    * Get the currently edited secret.
    * It must have been stored before launching the secret add/edit dialog.
-   * @returns {Promise.<T>|*}
+   * @returns {promise}
    */
   var getEditedPassword = function () {
     return passbolt.request('passbolt.edit-password.get-edited-password')
@@ -136,7 +136,6 @@
 
   /**
    * Update the secret strength component.
-   * @param secret
    */
   var updateSecretStrength = function () {
     var secret = editedPassword.secret || '';
@@ -222,7 +221,10 @@
    *  DOM events handlers
    * ================================================================================== */
 
-  // When the user explicitly wants to view the secret.
+  /**
+   * When the user explicitly wants to view the secret.
+   * @param ev {HTMLEvent} The event which occurred
+   */
   var viewSecretButtonClickedHandler = function (ev) {
     ev.preventDefault();
 
@@ -242,8 +244,10 @@
     }
   };
 
-  // When the secret is updated.
-  var secretFieldUpdatedHandler = function (ev) {
+  /**
+   * When the secret is updated.
+   */
+  var secretFieldUpdatedHandler = function () {
     // Because change is triggered even if input has been triggered previously
     // (1. user changes the input (input triggered); 2. users moves the focus (change triggered);)
     // Isolate the input binding and trigger change manually to avoid the double change call is useless.
@@ -273,8 +277,10 @@
     }
   };
 
-  // When a user click on the secret/password field
-  var secretFieldFocusedHandler = function (ev) {
+  /**
+   * When a user click on the secret/password field.
+   */
+  var secretFieldFocusedHandler = function () {
     if (!isDecrypted()) {
       // If click on the non decrypted state, we remove the  focus. We do that
       // because the focus will be needed by the passphrase dialog.
@@ -285,13 +291,18 @@
     }
   };
 
-  // When the clear secret is updated.
+  /**
+   * When the clear secret is updated.
+   */
   var secretClearFieldUpdatedHandler = function () {
     $secret.val($secretClear.val())
       .trigger('change');
   };
 
-  // When the generate a new secret button is clicked.
+  /**
+   * When the generate a new secret button is clicked.
+   * @param ev {HTMLEvent} The event which occurred
+   */
   var generateSecretButtonClickedHandler = function (ev) {
     ev.preventDefault();
 
@@ -303,7 +314,10 @@
       .trigger('change');
   };
 
-  // When tab is pressed in secret field, inform app, so it can put the focus on the next field.
+  /**
+   * When tab is pressed in secret field, inform app, so it can put the focus on the next field.
+   * @param ev {HTMLEvent} The event which occurred
+   */
   var secretFieldKeydownHandler = function (ev) {
     if (!isDecrypted()) {
       ev.preventDefault();
@@ -326,6 +340,9 @@
     }
   };
 
+  /**
+   * Handle secret validation success.
+   */
   var validateSuccessHandler = function () {
     $secret.removeClass('error');
     $secretClear.removeClass('error');
@@ -342,6 +359,11 @@
     validationCalled = true;
   };
 
+  /**
+   * Handle secret validation error.
+   * @param message {string} The error message
+   * @param validationErrors {array} The detailed error by fields.
+   */
   var validateErrorHandler = function (message, validationErrors) {
     var error = '';
 
@@ -378,7 +400,7 @@
    *  - The secret field should use the default behavior to display the
    *    secret.
    *
-   * @param state
+   * @param state {string} The state to switch to. Can be : encrypted or decrypted
    */
   var secretStateChangeHandler = function (state) {
     if (state == 'encrypted') {

@@ -12,7 +12,7 @@ var passbolt = passbolt || {};
   /**
    * Stack of pending requests references.
    *
-   * @type {{}}
+   * @type {array}
    */
   var _stack = {};
 
@@ -91,22 +91,22 @@ var passbolt = passbolt || {};
    * retrieve the references with the requestId that is exchanged between the
    * addon-code and the content code.
    *
-   * @param message The request name
+   * @param message {string} The request name
    * @returns {jQuery.Deferred}
    */
-  passbolt.request = function(message) {
+  passbolt.request = function (message) {
 
     // The promise that is return when you call passbolt.request.
     var deferred = $.Deferred(),
-        // Generate the requestId.
+    // Generate the requestId.
       requestId = Math.round(Math.random() * Math.pow(2, 32)),
-        // Add the requestId to the request parameters.
-        args = [message, requestId].concat(Array.slice(arguments, 1)),
-        // The callback to execute when the request is completed, disregard
-        // of the result.
-        completedCallback = _requestCompletedListener,
-        // The callback to execute when the request is in progress.
-        progressCallback = _requestProgressListener;
+    // Add the requestId to the request parameters.
+      args = [message, requestId].concat(Array.slice(arguments, 1)),
+    // The callback to execute when the request is completed, disregard
+    // of the result.
+      completedCallback = _requestCompletedListener,
+    // The callback to execute when the request is in progress.
+      progressCallback = _requestProgressListener;
 
     // Observe when the request has been completed.
     self.port.once(message + '.complete', completedCallback);
@@ -140,15 +140,15 @@ var passbolt = passbolt || {};
    * promise associated to the request regarding the addon-code response
    * status.
    *
-   * @param requestId The identifier sent with the request, must be sent back
+   * @param requestId {int} The identifier sent with the request, must be sent back
    * in the response. It permits to identify which requests to process.
    *
-   * @param status The status of the response. It can be SUCCESS or ERROR.
+   * @param status {string} The status of the response. It can be SUCCESS or ERROR.
    *
-   * @param args following arguments will be passed to the deferred resolution
+   * @param args {...*} following arguments will be passed to the deferred resolution
    * rejection call.
    */
-  var _requestCompletedListener =  function(requestId, status) {
+  var _requestCompletedListener = function (requestId, status) {
     var args = Array.slice(arguments, 2);
     if (status == 'SUCCESS') {
       _stack[requestId].deferred.resolveWith(this, args);
@@ -163,15 +163,15 @@ var passbolt = passbolt || {};
    * When a request send progress events, this callback is executed. It
    * notifies the deferred associated to the request about the progress.
    *
-   * @param requestId The identifier sent with the request, must be sent back
-   * in the progress. It permits to identify the deferred to notify.
+   * @param requestId {int} The identifier sent with the request, must be sent
+   * back in the progress. It permits to identify the deferred to notify.
    *
-   * @param args following arguments will be passed to the deferred
+   * @param args {...*} following arguments will be passed to the deferred
    * progress call.
    */
-  var _requestProgressListener = function(requestId) {
+  var _requestProgressListener = function (requestId) {
     var args = Array.slice(arguments, 1);
     _stack[requestId].deferred.notifyWith(this, args);
   };
 
-})( passbolt );
+})(passbolt);

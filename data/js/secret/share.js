@@ -35,7 +35,7 @@
 
   /**
    * Load the page template and initialize the variables relative to it.
-   * @returns {*|Promise.<T>|*}
+   * @returns {promise}
    */
   var loadTemplate = function () {
     return passbolt.helper.html.loadTemplate('body', './tpl/resource/share.ejs')
@@ -52,7 +52,7 @@
   /**
    * Get the currently edited password.
    * It must have been stored before launching the password share dialog.
-   * @returns {Promise.<T>|*}
+   * @returns {promise}
    */
   var getSharedPassword = function () {
     return passbolt.request('passbolt.share.get-shared-password')
@@ -63,7 +63,7 @@
 
   /**
    * Init the security token.
-   * @returns {Promise.<T>}
+   * @returns {promise}
    */
   var initSecurityToken = function () {
     return passbolt.security.initSecurityToken('#js_perm_create_form_aro_auto_cplt', '.security-token');
@@ -84,7 +84,6 @@
 
   /**
    * Reset the autocomplete search field.
-   * @listens passbolt.share.reset
    */
   var resetHandler = function () {
     $autocomplete.val('');
@@ -96,7 +95,6 @@
 
   /**
    * When the autocomplete search field change.
-   * @listens ~event:($autocomplete input)
    */
   var autocompleteFieldChanged = function () {
     var keywords = $(this).val();

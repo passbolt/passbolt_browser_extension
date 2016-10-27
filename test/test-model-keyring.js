@@ -8,6 +8,7 @@
 'use strict';
 
 var Keyring = require('../lib/model/keyring').Keyring;
+var Settings = require("../lib/model/settings").Settings;
 var keyring = new Keyring();
 var GpgkeyFixture = require('./fixture/gpgkeyFixture').GpgkeyFixture;
 var Validator = require('../lib/vendors/validator.js');
@@ -52,7 +53,6 @@ exports.testcheckPassphrase = function(assert) {
                throw "The decrypt should have worked";
             }
         );
-
 };
 
 /**
@@ -94,19 +94,26 @@ exports.testFlush = function(assert) {
     keyring.importPublic(GpgkeyFixture.ada.public, GpgkeyFixture.ada.user_id);
     keyring.importPublic(GpgkeyFixture.betty.public, GpgkeyFixture.betty.user_id);
     keyring.importPrivate(GpgkeyFixture.ada.private);
-    var l = Object.keys(keyring.publicKeys).length;
+    var publicKeys = Keyring.getPublicKeys();
+    var privateKeys = Keyring.getPrivateKeys();
+
+    var l = Object.keys(publicKeys).length;
     assert.ok( l == 2, 'There should be 2 public keys in the keyring');
-    l = Object.keys(keyring.privateKeys).length;
+    l = Object.keys(privateKeys).length;
     assert.ok( l == 1, 'There should be 1 private key in the keyring');
 
     keyring.flush(Keyring.PUBLIC);
-    l = Object.keys(keyring.publicKeys).length;
+    publicKeys = Keyring.getPublicKeys();
+    privateKeys = Keyring.getPrivateKeys();
+
+    l = Object.keys(publicKeys).length;
     assert.ok( l == 0, 'There should be 0 public key in the keyring');
-    l = Object.keys(keyring.privateKeys).length;
+    l = Object.keys(privateKeys).length;
     assert.ok( l == 1, 'There should be 1 private key in the keyring');
 
     keyring.flush(Keyring.PRIVATE);
-    l = Object.keys(keyring.privateKeys).length;
+    privateKeys = Keyring.getPrivateKeys();
+    l = Object.keys(privateKeys).length;
     assert.ok( l == 0, 'There should be 0 private key in the keyring');
 
 };
@@ -127,6 +134,36 @@ exports.testKeyInfo = function(assert) {
     assert.ok(info.created.toString() == fixture.created.toString());
     assert.ok(info.expires.toString() == fixture.expires.toString());
     assert.ok(info.length == fixture.length);
+};
+
+/**
+ * Check storing a key in the keyring
+ * @param assert
+ */
+exports.testSync = function(assert, done) {
+    var Auth = require('../lib/model/auth').Auth;
+    var auth = new Auth();
+
+    keyring.flush(Keyring.PUBLIC);
+    keyring.importPrivate(GpgkeyFixture.ada.private);
+
+    auth.login('ada@passbolt.com').then(
+      function success(referrer) {
+          keyring.sync()
+            .then(function() {
+                var publicKeys = Keyring.getPublicKeys();
+                var l = Object.keys(publicKeys).length;
+                assert.ok( l > 0, 'There should be at least one public key in the keyring');
+                done();
+            }, function error(error) {
+                assert.ok(false, 'There should not be an error');
+                done();
+            })
+            .catch(function(error) {
+                assert.ok(false, 'There should not be an exception');
+                done();
+            });
+      });
 };
 
 ///**

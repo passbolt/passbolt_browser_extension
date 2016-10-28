@@ -16,6 +16,7 @@ var passbolt = passbolt || {};
 
   /**
    * Execute all the callbacks associated to a message listener.
+   *
    * @param message {string} The message to notify listeners for
    * @param args {array} Array of arguments to pass to the message handlers
    * @private
@@ -38,11 +39,11 @@ var passbolt = passbolt || {};
     // If any listener observe this message.
     if (_listenersCallbacks[message]) {
       // Execute all the callbacks associated to this listener.
-      _executeCallbacks(message, Array.slice(arguments, 1));
+      _executeCallbacks(message, Array.prototype.slice.call(arguments, 1));
     }
 
     // Emit the message to the worker.
-    self.port.emit.apply(null, Array.slice(arguments));
+    self.port.emit.apply(self.port, Array.prototype.slice.call(arguments));
   };
 
   /**
@@ -59,8 +60,9 @@ var passbolt = passbolt || {};
       _listenersCallbacks[message] = [];
       // Listen to the message from the addon-code.
       self.port.on(message, function () {
+        var args = Array.prototype.slice.call(arguments);
         // Execute all the callbacks associated to this listener.
-        _executeCallbacks(message, Array.slice(arguments));
+        _executeCallbacks(message, args);
       });
     }
 
@@ -70,6 +72,7 @@ var passbolt = passbolt || {};
 
   /**
    * Emit a message to the page.
+   *
    * @param message {string} message name
    * @param data {array} the data associated to the message
    */

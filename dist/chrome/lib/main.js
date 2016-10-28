@@ -91,7 +91,7 @@ var pageMods = {};
  * to know about the status of the extension, in a modernizr fashion
  * It also helps the plugin to recognise if a page behave like a passbolt app
  */
-//pageMods.bootstrap = require('./pagemod/bootstrapPagemod').bootstrap;
+pageMods.bootstrap = require('./pagemod/bootstrapPagemod').bootstrap;
 
 /*
  * This pagemod help bootstrap the first step of the setup process from a passbolt server app page

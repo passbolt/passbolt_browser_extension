@@ -50,7 +50,6 @@ module.exports = function (grunt) {
           stderr: false
         },
         command: [
-          'rm -f <%= config.build.firefox.path %>/passbolt*.xpi',
           "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": true/' <%= config.build.firefox.path %>/lib/config/config.json",
           './node_modules/jpm/bin/jpm xpi --addon-dir <%= config.build.firefox.path %>',
           "mv <%= config.build.firefox.path %>/passbolt.xpi <%= config.build.firefox.path %>/passbolt-<%= pkg.version %>-debug.xpi",
@@ -68,6 +67,18 @@ module.exports = function (grunt) {
           'wget --post-file=<%= config.build.firefox.path %>/passbolt-<%= pkg.version %>-debug.xpi http://localhost:8888/ > /dev/null 2>&1',
           'echo "If your browser has the firefox addon \"Extension auto-installer\" installed & enabled, the passbolt plugin is now installed on your browser"'
         ].join(';')
+      },
+      build_crx: {
+        options: {
+          stderr: true
+        },
+        command: [
+          "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": true/' <%= config.build.chrome.path %>/lib/config/config.json",
+          './node_modules/crx/bin/crx.js pack <%= config.build.chrome.path %> --zip-output <%= config.build.chrome.path %>/passbolt-<%= pkg.version %>-debug.zip',
+          "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' <%= config.build.chrome.path %>/lib/config/config.json",
+          './node_modules/crx/bin/crx.js pack <%= config.build.chrome.path %> --zip-output <%= config.build.chrome.path %>/passbolt-<%= pkg.version %>.zip',
+          'ln -s passbolt-<%= pkg.version %>-debug.crx <%= config.build.chrome.path %>/passbolt-latest@passbolt.com.zip'
+        ].join('&&')
       }
     },
     copy: {
@@ -250,13 +261,16 @@ module.exports = function (grunt) {
   // Build xpi in debug and non-debug version.
   grunt.registerTask('install-xpi', ['shell:install_xpi']);
 
+  // Build for all browsers
+  grunt.registerTask('build', ['build-firefox', 'build-chrome']);
+
   // Build firefox.
   grunt.registerTask('build-firefox', ['clean:firefox_build', 'copy:firefox_src', 'shell:build_xpi']);
 
   // Build chrome.
-  grunt.registerTask('build-chrome', ['clean:chrome_build', 'copy:chrome_src']);
+  grunt.registerTask('build-chrome', ['clean:chrome_build', 'copy:chrome_src', 'shell:build_crx']);
 
   // By default build plugin for all browsers.
-  grunt.registerTask('default', ['build-firefox', 'build-chrome']);
+  grunt.registerTask('default', ['build']);
 
 };

@@ -31,6 +31,7 @@
     "grunt-shell": "^1.1.1",
     "grunt-text-replace": "~0.3.11",
     "jpm": "1.1.4",
+    "crx": "3.2.1",
     "jquery": "^3.1.0",
     "passbolt-styleguide": "~1.0.0",
     "steal": "^0.16.26"

@@ -19,9 +19,18 @@
    *  Can be create or edit.
    */
   var _insertIframe = function (dialogCase) {
+    var iframeUrl;
+    var iframeId = 'passbolt-iframe-secret-edition';
+    if(typeof chrome !== 'undefined') {
+      iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html');
+    } else {
+      iframeUrl = 'about:blank';
+    }
+    iframeUrl += '?passbolt=' + iframeId + '&case=' + dialogCase;
+
     var $iframe = $('<iframe/>', {
-      id: 'passbolt-iframe-secret-edition',
-      src: 'about:blank?passbolt=secretEdit&case=' + dialogCase,
+      id: iframeId,
+      src: iframeUrl,
       class: 'loading',
       frameBorder: 0
     });

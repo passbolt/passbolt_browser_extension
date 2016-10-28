@@ -16,10 +16,20 @@
    * by the application page.
    */
   var _insertIframes = function () {
+    var iframeUrl;
+    var iframeId;
+
     // The component managing the autocomplete field.
+    iframeId = 'passbolt-iframe-password-share';
+    if(typeof chrome !== 'undefined') {
+      iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html');
+    } else {
+      iframeUrl = 'about:blank';
+    }
+    iframeUrl += '?passbolt=' + iframeId;
     var $iframeShare = $('<iframe/>', {
-      id: 'passbolt-iframe-password-share',
-      src: 'about:blank?passbolt=shareInline',
+      id: iframeId,
+      src: iframeUrl,
       class: 'loading',
       frameBorder: 0,
       marginwidth: 0,
@@ -29,10 +39,18 @@
     });
     $iframeShare.prependTo('.js_plugin_share_wrapper');
 
+
     // The component managing the autocomplete result list.
+    iframeId = 'passbolt-iframe-password-share-autocomplete';
+    if(typeof chrome !== 'undefined') {
+      iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html');
+    } else {
+      iframeUrl = 'about:blank';
+    }
+    iframeUrl += '?passbolt=' + iframeId;
     var $iframeAutocomplete = $('<iframe/>', {
-      id: 'passbolt-iframe-password-share-autocomplete',
-      src: 'about:blank?passbolt=shareAutocompleteInline',
+      id: iframeId,
+      src: iframeUrl,
       class: 'hidden',
       frameBorder: 0,
       marginwidth: 0,

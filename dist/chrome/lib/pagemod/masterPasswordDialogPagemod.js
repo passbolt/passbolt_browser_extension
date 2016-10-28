@@ -14,7 +14,10 @@ var Worker = require('../model/worker');
 var TabStorage = require('../model/tabStorage').TabStorage;
 
 var masterPasswordDialog = pageMod.PageMod({
-  include: 'about:blank?passbolt=masterPasswordDialog*',
+  include: 'about:blank?passbolt=passbolt-iframe-master-password',
+  // Warning:
+  // If you modify the following script and styles don't forget to also modify then in
+  // src/chrome/data/passbolt-iframe-master-password.html
   contentStyleFile: [
     self.data.url('css/main_ff.min.css')
   ],

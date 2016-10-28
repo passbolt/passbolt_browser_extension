@@ -16,8 +16,8 @@ var Config = require('./config');
 var User = require('./user').User;
 var Keyring = require('./keyring').Keyring;
 var Crypto = require('./crypto').Crypto;
-var GpgAuthToken = require('./gpgAuthToken.js').GpgAuthToken;
-var GpgAuthHeader = require('./gpgAuthHeader.js').GpgAuthHeader;
+var GpgAuthToken = require('./gpgAuthToken').GpgAuthToken;
+var GpgAuthHeader = require('./gpgAuthHeader').GpgAuthHeader;
 
 /**
  * GPGAuth authentication

@@ -13,7 +13,7 @@ var webWorker = require('../vendors/web-worker').Worker;
 var storage = new (require('../vendors/node-localstorage').LocalStorage)();
 var keyring = new openpgp.Keyring();
 var fetch = require('../vendors/window').fetch;
-var Validator = require('../vendors/validator.js');
+var Validator = require('../vendors/validator');
 
 const { defer } = require('sdk/core/promise');
 var __ = require("sdk/l10n").get;

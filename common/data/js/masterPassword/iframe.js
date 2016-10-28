@@ -15,10 +15,19 @@
  * @listens passbolt.master-password.open-dialog
  */
 passbolt.message.on('passbolt.master-password.open-dialog', function () {
+	var iframeUrl;
+	var iframeId = 'passbolt-iframe-master-password';
+	if(typeof chrome !== 'undefined') {
+		iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html');
+	} else {
+		iframeUrl = 'about:blank';
+	}
+	iframeUrl += '?passbolt=' + iframeId;
+
 	// Add the master password iframe to the application page.
 	var $iframe = $('<iframe/>', {
-		id: 'passbolt-iframe-master-password',
-		src: 'about:blank?passbolt=masterPasswordDialog',
+		id: iframeId,
+		src: iframeUrl,
 		class: 'passbolt-plugin-dialog loading',
 		frameBorder: 0
 	});

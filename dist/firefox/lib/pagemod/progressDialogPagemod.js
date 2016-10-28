@@ -13,7 +13,10 @@ var pageMod = require('sdk/page-mod');
 var Worker = require('../model/worker');
 
 progressDialog = pageMod.PageMod({
-  include: 'about:blank?passbolt=progressDialog*',
+  include: 'about:blank?passbolt=passbolt-iframe-progress-dialog*',
+  // Warning:
+  // If you modify the following script and styles don't forget to also modify then in
+  // chrome/data/passbolt-iframe-progress-dialog.html
   contentStyleFile: [
     self.data.url('css/main_ff.min.css')
   ],

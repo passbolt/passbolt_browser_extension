@@ -14,7 +14,10 @@ var Worker = require('../model/worker');
 var TabStorage = require('../model/tabStorage').TabStorage;
 
 var shareDialog = pageMod.PageMod({
-  include: 'about:blank?passbolt=shareInline*',
+  include: 'about:blank?passbolt=passbolt-iframe-password-share',
+  // Warning:
+  // If you modify the following script and styles don't forget to also modify then in
+  // chrome/data/passbolt-iframe-password-share.html
   contentStyleFile: [
     self.data.url('css/main_ff.min.css')
   ],

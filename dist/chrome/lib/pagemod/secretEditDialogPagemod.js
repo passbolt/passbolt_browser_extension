@@ -15,7 +15,10 @@ var Worker = require('../model/worker');
 var TabStorage = require('../model/tabStorage').TabStorage;
 
 var secretEditDialog = pageMod.PageMod({
-  include: 'about:blank?passbolt=secretEdit*',
+  include: 'about:blank?passbolt=passbolt-iframe-secret-edition*',
+  // Warning:
+  // If you modify the following script and styles don't forget to also modify then in
+  // chrome/data/passbolt-iframe-secret-edition.html
   contentStyleFile: [
     self.data.url('css/main_ff.min.css')
   ],

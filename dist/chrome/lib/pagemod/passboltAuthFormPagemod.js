@@ -14,6 +14,9 @@ var Worker = require('../model/worker');
 var passboltAuthForm = pageMod.PageMod({
   include: 'about:blank?passbolt=passbolt-iframe-login-form',
   contentScriptWhen: 'ready',
+  // Warning:
+  // If you modify the following script and styles don't forget to also modify then in
+  // chrome/data/passbolt-iframe-login-form.html
   contentStyleFile: [
     self.data.url('css/main_ff.min.css')
   ],

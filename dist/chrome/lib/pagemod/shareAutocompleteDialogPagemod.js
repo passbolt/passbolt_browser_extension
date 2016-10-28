@@ -16,7 +16,10 @@ var pageMod = require('sdk/page-mod');
 var Worker = require('../model/worker');
 
 var shareAutocompleteDialog = pageMod.PageMod({
-  include: 'about:blank?passbolt=shareAutocompleteInline*',
+  include: 'about:blank?passbolt=passbolt-iframe-password-share-autocomplete',
+  // Warning:
+  // If you modify the following script and styles don't forget to also modify then in
+  // chrome/data/passbolt-iframe-password-share-autocomplete.html
   contentStyleFile: [
     self.data.url('css/main_ff.min.css')
   ],

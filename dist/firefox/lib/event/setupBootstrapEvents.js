@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var { setInterval, clearInterval } = require('sdk/timers');
-var tabs = require('sdk/tabs');
+var tabsController = require('../controller/tabsController');
 var data = require('sdk/self').data;
 var Worker = require('../model/worker');
 
@@ -27,7 +27,7 @@ var listen = function (worker) {
     }, 150);
 
     // Redirect the user to the second step.
-    tabs.activeTab.url = data.url('setup.html');
+    tabsController.setActiveTabUrl(data.url('setup.html'));
   });
 
 };

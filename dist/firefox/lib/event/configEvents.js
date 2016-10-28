@@ -4,7 +4,7 @@
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var tabs = require('sdk/tabs');
+var tabsController = require('../controller/tabsController');
 var Config = require('../model/config');
 var User = require('../model/user').User;
 var self = require("sdk/self");
@@ -57,7 +57,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.addon.checkDomain', function (requestId) {
     var trustedDomain = Config.read('user.settings.trustedDomain');
-    var currentDomain = tabs.activeTab.url;
+    var currentDomain = tabsController.getActiveTabUrl();
     var domainOk = (trustedDomain != '' && currentDomain.indexOf(trustedDomain) != -1);
     worker.port.emit('passbolt.addon.checkDomain.complete', requestId, 'SUCCESS', domainOk);
   });

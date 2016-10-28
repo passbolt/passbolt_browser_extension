@@ -77,7 +77,9 @@ module.exports = function (grunt) {
           './node_modules/crx/bin/crx.js pack <%= config.build.chrome.path %> --zip-output <%= config.build.chrome.path %>/passbolt-<%= pkg.version %>-debug.zip',
           "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' <%= config.build.chrome.path %>/lib/config/config.json",
           './node_modules/crx/bin/crx.js pack <%= config.build.chrome.path %> --zip-output <%= config.build.chrome.path %>/passbolt-<%= pkg.version %>.zip',
-          'ln -s passbolt-<%= pkg.version %>-debug.crx <%= config.build.chrome.path %>/passbolt-latest@passbolt.com.zip'
+          'ln -s passbolt-<%= pkg.version %>-debug.crx <%= config.build.chrome.path %>/passbolt-latest@passbolt.com.zip',
+          'rm -f <%= config.build.chrome.path %>/key.pem',
+          'rm -f passbolt_firefox.crx'
         ].join('&&')
       }
     },

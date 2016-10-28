@@ -6,7 +6,7 @@
  */
 
 var self = require('sdk/self');
-var tabs = require('sdk/tabs');
+var tabsController = require('./tabsController');
 var buttons = require('sdk/ui/button/action');
 var { Hotkey } = require("sdk/hotkeys");
 var Config = require("../model/config");
@@ -38,10 +38,10 @@ var goPassbolt = function () {
 
   // Open a new tab
   try {
-    tabs.open(url);
+    tabsController.open(url);
   } catch (e) {
     // If something wrong happens, redirect the user to the passbolt home page
-    tabs.open('https://www.passbolt.com/start');
+    tabsController.open('https://www.passbolt.com/start');
   }
 };
 

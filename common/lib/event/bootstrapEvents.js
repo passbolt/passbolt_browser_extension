@@ -9,7 +9,7 @@
 var self = require('sdk/self');
 var app = require('../main');
 var Config = require('../model/config');
-var tabs = require("sdk/tabs");
+var tabsController = require('../controller/tabsController');
 var __ = require("sdk/l10n").get;
 
 var listen = function (worker) {
@@ -38,7 +38,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.bootstrap.debug', function (requestId) {
     if (Config.isDebug() == true) {
-      tabs.activeTab.url = self.data.url('config-debug.html');
+      tabsController.setActiveTabUrl(self.data.url('config-debug.html'));
       worker.port.emit('passbolt.config.debug.complete', requestId, 'SUCCESS');
     } else {
       worker.port.emit('passbolt.config.debug.complete', requestId, 'ERROR');

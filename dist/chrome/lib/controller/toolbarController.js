@@ -1,20 +1,43 @@
 /**
- * The class that deals with users.
+ * Toolbar controller.
+ *
+ * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ */
+
+var tabsController = require('./tabsController');
+var user = new (require('../model/user').User)();
+
+/**
+ * Toolbar Controller constructor.
+ * @constructor
  */
 var ToolbarController = function() {
   var _this = this;
-  // React when a browser action's icon is clicked.
-  chrome.browserAction.onClicked.addListener(function (tab) {
-    _this.onButtonClick(tab);
+  chrome.browserAction.onClicked.addListener(function() {
+    _this.onButtonClick();
   });
 };
 
-ToolbarController.prototype.onButtonClick = function(tab) {
-  //var setupUrl = chrome.extension.getURL('data/setup.html');
-  chrome.tabs.update(tab.id, {url: 'http://passbolt.dev'});
+/**
+ * Handle the click on the passbolt toolbar icon.
+ */
+ToolbarController.prototype.onButtonClick = function() {
+  this.openPassboltTab();
 };
 
-var toolbar = new ToolbarController();
+/**
+ * Open a new tab and go to passbolt.
+ */
+ToolbarController.prototype.openPassboltTab = function () {
+  var url = user.getPassboltUrl();
+  try {
+    tabsController.open(url);
+  } catch (e) {
+    // If something wrong happens, redirect the user to the passbolt home page
+    tabsController.open('https://www.passbolt.com/start');
+  }
+};
 
 // Exports the User object.
 exports.ToolbarController = ToolbarController;

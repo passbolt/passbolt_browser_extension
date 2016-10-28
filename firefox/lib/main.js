@@ -57,7 +57,8 @@ exports.events = events;
  *  Where we affect the look and feel of the firefox instance
  * ==================================================================================
  */
-require('./controller/toolbarController');
+var ToolbarController = require('./controller/toolbarController').ToolbarController;
+new ToolbarController();
 
 /* ==================================================================================
  *  Page mods

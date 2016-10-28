@@ -6,37 +6,60 @@
  */
 
 var self = require('sdk/self');
-var tabsController = require('./tabsController');
 var buttons = require('sdk/ui/button/action');
 var { Hotkey } = require("sdk/hotkeys");
-var Config = require("../model/config");
-var Setup = new (require("../model/setup").Setup)();
+var tabsController = require('./tabsController');
 var user = new (require('../model/user').User)();
 
 /**
- * Open passbolt in a new tab.
- * Regarding the current user configuration, different locations can be reached :
- * - Plugin installed but not configured, open the public page getting started;
- * - Plugin installed but partially configured, open the setup;
- * - Plugin installed and configured, open the passbolt application.
+ * Toolbar Controller constructor.
+ * @constructor
  */
-var goPassbolt = function () {
-  var url = '';
+var ToolbarController = function () {
+  var _this = this;
 
-  // CASE The plugin is installed and configured
-  if (user.isValid()) {
-    url = user.settings.getDomain();
-  }
-  // CASE The plugin is installed but the configuration is incomplete
-  else if (Setup.get('stepId') != '') {
-    url = Config.read('extensionBasePath') + '/data/setup.html';
-  }
-  // CASE The plugin is installed but not configured
-  else {
-    url = 'https://www.passbolt.com/start';
-  }
+  // Add a passbolt button on browser toolbar.
+  buttons.ActionButton({
+    id: 'passbolt-link',
+    label: 'Passbolt',
+    icon: {
+      16: './img/logo/icon-16.png',
+      32: './img/logo/icon-32.png',
+      64: './img/logo/icon-64.png'
+    },
+    onClick: function() {
+      _this.onButtonClick()
+    }
+  });
 
-  // Open a new tab
+  // Add a shortcut to reach passbolt (usefull for test).
+  Hotkey({
+    combo: "accel-shift-alt-p",
+    onPress: function() {
+      _this.onShortcutPressed();
+    }
+  });
+};
+
+/**
+ * Handle the click on the passbolt toolbar icon.
+ */
+ToolbarController.prototype.onButtonClick = function () {
+  this.openPassboltTab();
+};
+
+/**
+ * Handle the shortcut pressed event.
+ */
+ToolbarController.prototype.onShortcutPressed = function () {
+  this.openPassboltTab();
+};
+
+/**
+ * Open a new tab and go to passbolt.
+ */
+ToolbarController.prototype.openPassboltTab = function () {
+  var url = user.getPassboltUrl();
   try {
     tabsController.open(url);
   } catch (e) {
@@ -45,24 +68,5 @@ var goPassbolt = function () {
   }
 };
 
-// Define keyboard shortcuts to reach the passbolt vault
-var showHotKey = Hotkey({
-  combo: "accel-shift-alt-p",
-  onPress: function () {
-    goPassbolt();
-  }
-});
-
-// Add a passbolt button on browser toolbar
-var button = buttons.ActionButton({
-  id: 'passbolt-link',
-  label: 'Passbolt',
-  icon: {
-    '16': './img/logo/icon-16.png',
-    '32': './img/logo/icon-32.png',
-    '64': './img/logo/icon-64.png'
-  },
-  onClick: function (state) {
-    goPassbolt();
-  }
-});
+// Exports the User object.
+exports.ToolbarController = ToolbarController;

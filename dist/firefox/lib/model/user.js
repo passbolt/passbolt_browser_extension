@@ -302,7 +302,7 @@ User.prototype._getLocal = function (fields) {
  *
  * @returns {promise}
  */
-User.prototype._getRemote = function() {
+User.prototype._getRemote = function () {
   var deferred = defer(),
     self = this,
     url;
@@ -310,12 +310,12 @@ User.prototype._getRemote = function() {
   //Check if there is a trusted domain
   try {
     url = self.settings.getDomain() + this.URL_GET_REMOTE;
-  } catch(e) {
+  } catch (e) {
     deferred.reject(__('The application domain is not set'));
   }
 
   // Try to get the current user from memory cache
-  if(typeof this._remote_user !== 'undefined') {
+  if (typeof this._remote_user !== 'undefined') {
     return deferred.resolve(this._remote_user);
   }
 
@@ -329,15 +329,15 @@ User.prototype._getRemote = function() {
         'Content-Type': 'application/json'
       }
     })
-    .then(function(response) {
+    .then(function (response) {
       _response = response;
       return response.json();
     })
-    .then(function(json) {
+    .then(function (json) {
       // Check response status
-      if(!_response.ok) {
+      if (!_response.ok) {
         var msg = __('Could not get the current user information. The server responded with an error.');
-        if(json.headers.msg != undefined) {
+        if (json.headers.msg != undefined) {
           msg += ' ' + json.headers.msg;
         }
         msg += ' (' + _response.status + ')';
@@ -347,7 +347,7 @@ User.prototype._getRemote = function() {
       self._remote_user = json.body;
       return deferred.resolve(json.body);
     })
-    .catch(function(error) {
+    .catch(function (error) {
       return deferred.reject(error);
     });
 
@@ -363,7 +363,7 @@ User.prototype.isValid = function () {
   // @TODO check if local and remote matches
   try {
     this.get();
-  } catch(e) {
+  } catch (e) {
     return false;
   }
   return this.settings.isValid();
@@ -386,18 +386,18 @@ User.prototype.isLoggedIn = function () {
         'Content-Type': 'application/json'
       }
     })
-    .then(function(response) {
+    .then(function (response) {
       _response = response;
       return response.json();
     })
-    .then(function(json) {
+    .then(function (json) {
       // Check response status
-      if(!_response.ok) {
+      if (!_response.ok) {
         return deferred.reject(new Error(__('The user is not logged-in')));
       }
       deferred.resolve(__('The user is logged-in'));
     })
-    .catch(function(error) {
+    .catch(function (error) {
       return deferred.reject(error);
     });
 
@@ -453,6 +453,34 @@ User.prototype.getStoredMasterPassword = function () {
   }
 
   return deferred.promise;
+};
+
+/**
+ * Get passbolt instance url.
+ *
+ * Regarding the current user configuration, the results can be :
+ * - Plugin installed but not configured, return the public page getting started url;
+ * - Plugin installed but partially configured, return the setup url;
+ * - Plugin installed and configured, return the passbolt url.
+ * @return {string}
+ */
+User.prototype.getPassboltUrl = function () {
+  var url = '';
+
+  // The plugin is installed and configured
+  if (this.isValid()) {
+    url = this.settings.getDomain();
+  }
+  // The plugin is installed but the configuration is incomplete
+  else if (Setup.get('stepId') != '') {
+    url = Config.read('extensionBasePath') + '/data/setup.html';
+  }
+  // The plugin is installed but not configured
+  else {
+    url = 'https://www.passbolt.com/start';
+  }
+
+  return url;
 };
 
 // Exports the User object.

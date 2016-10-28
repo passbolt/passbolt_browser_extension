@@ -426,5 +426,34 @@ Setup.prototype.checkKeyExistRemotely = function (userFingerprint) {
   return gpgAuth.verify(serverUrl, armoredServerKey, userFingerprint);
 };
 
+/**
+ * Get passbolt instance url.
+ *
+ * Regarding the current user configuration, the results can be :
+ * - Plugin installed but not configured, return the public page getting started url;
+ * - Plugin installed but partially configured, return the setup url;
+ * - Plugin installed and configured, return the passbolt url.
+ * @return {string}
+ */
+Setup.prototype.getPassboltUrl = function () {
+  var url = '',
+    user = new User();
+
+  // The plugin is installed and configured
+  if (user.isValid()) {
+    url = user.settings.getDomain();
+  }
+  // The plugin is installed but the configuration is incomplete
+  else if (this.get('stepId') != '') {
+    url = Config.read('extensionBasePath') + '/data/setup.html';
+  }
+  // The plugin is installed but not configured
+  else {
+    url = 'https://www.passbolt.com/start';
+  }
+
+  return url;
+};
+
 // Exports the Setup object.
 exports.Setup = Setup;

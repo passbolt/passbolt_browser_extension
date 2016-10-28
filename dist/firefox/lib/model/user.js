@@ -455,33 +455,5 @@ User.prototype.getStoredMasterPassword = function () {
   return deferred.promise;
 };
 
-/**
- * Get passbolt instance url.
- *
- * Regarding the current user configuration, the results can be :
- * - Plugin installed but not configured, return the public page getting started url;
- * - Plugin installed but partially configured, return the setup url;
- * - Plugin installed and configured, return the passbolt url.
- * @return {string}
- */
-User.prototype.getPassboltUrl = function () {
-  var url = '';
-
-  // The plugin is installed and configured
-  if (this.isValid()) {
-    url = this.settings.getDomain();
-  }
-  // The plugin is installed but the configuration is incomplete
-  else if (Setup.get('stepId') != '') {
-    url = Config.read('extensionBasePath') + '/data/setup.html';
-  }
-  // The plugin is installed but not configured
-  else {
-    url = 'https://www.passbolt.com/start';
-  }
-
-  return url;
-};
-
 // Exports the User object.
 exports.User = User;

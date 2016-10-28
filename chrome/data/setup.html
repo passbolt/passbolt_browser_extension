@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" class="alpha version passboltplugin">
+<head>
+    <meta charset="utf-8"/>
+    <title>Welcome to Passbolt!</title>
+    <link href="css/setup_ff.min.css" media="all" rel="stylesheet">
+    <script src="js/vendors/jquery.min.js"></script>
+    <script src="js/lib/port.js"></script>
+    <script src="js/lib/request.js"></script>
+    <script src="js/lib/message.js"></script>
+    <script src="js/setup.js"></script>
+    <script src="vendors/modernizr.js"></script>
+</head>
+<body>
+<div id="container" class="page setup">
+    <!-- first header -->
+    <div class="header first">
+        <nav>
+            <div class="primary navigation top">
+                <!-- no top links at setup -->
+            </div>
+        </nav>
+    </div>
+
+    <!-- second header -->
+    <div class="header second">
+        <div class="col1">
+            <div class="logo">
+                <img src="img/logo/logo.png" alt="passbolt">
+
+                <h1><span>Passbolt</span></h1>
+            </div>
+        </div>
+        <div class="col2_3">
+            <h2 id="js_step_title">Welcome to passbolt! Let's take 5 min to setup your system.</h2>
+        </div>
+    </div>
+
+    <div class="panel main ">
+        <!-- wizard steps -->
+        <div class="panel left">
+            <div class="navigation wizard" id="js_menu">
+            </div>
+        </div>
+        <!-- main -->
+        <div class="panel middle">
+            <div class="grid grid-responsive-12">
+                <div class="row" id="js_step_content"></div>
+                <div class="row last" id="js_step_actions"></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

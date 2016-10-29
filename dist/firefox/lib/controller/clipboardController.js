@@ -15,10 +15,10 @@ var {Cc, Ci} = require('chrome');
 /**
  * Copy a text to the clipboard.
  *
- * @param txt The text to copy.
+ * @param text The text to copy.
  */
-var copy = function(txt) {
+var copy = function(text) {
   const gClipboardHelper = Cc['@mozilla.org/widget/clipboardhelper;1'].getService(Ci.nsIClipboardHelper);
-  gClipboardHelper.copyString(txt);
+  gClipboardHelper.copyString(text);
 };
 exports.copy = copy;

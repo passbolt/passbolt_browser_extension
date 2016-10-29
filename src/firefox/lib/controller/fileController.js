@@ -17,6 +17,7 @@ const {TextDecoder, TextEncoder, OS} = Cu.import('resource://gre/modules/osfile.
 var __ = require('sdk/l10n').get;
 var fileIO = require('sdk/io/file');
 const defer = require('sdk/core/promise').defer;
+var preferences = require("sdk/preferences/service");
 
 /**
  * Open a dialog box for selecting a file to open.
@@ -102,7 +103,7 @@ function _saveFilePrompt(filename) {
  * @param content
  */
 function saveFile(filename, content) {
-
+  var deferred = defer();
   let encoder = new TextEncoder();
   let array = encoder.encode(content);
 

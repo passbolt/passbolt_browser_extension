@@ -5,9 +5,7 @@
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var fileIO = require('sdk/io/file');
 var fileController = require('../controller/fileController');
-const {Cu} = require('chrome');
 
 var listen = function (worker) {
 
@@ -18,8 +16,7 @@ var listen = function (worker) {
    * @param requestId {int} The request identifier
    */
   worker.port.on('passbolt.file.getPreferredDownloadDirectory', function (requestId) {
-    Cu.import("resource://gre/modules/Downloads.jsm");
-    Downloads.getPreferredDownloadsDirectory().then(
+    fileController.getPreferredDownloadsDirectory().then(
       function (downloadsDirectory) {
         worker.port.emit('passbolt.file.getPreferredDownloadDirectory.complete', requestId, 'SUCCESS', downloadsDirectory);
       },
@@ -36,12 +33,14 @@ var listen = function (worker) {
    * @param requestId {int} The request identifier
    */
   worker.port.on('passbolt.file.prompt', function (requestId) {
-    var path = fileController.openFilePrompt();
-    if (fileIO.isFile(path)) {
-      var fileContent = fileIO.read(path);
-      worker.port.emit('passbolt.file.prompt.complete', requestId, 'SUCCESS', fileContent);
-    }
+    fileController.openFile().then(
+      function (fileContent) {
+        worker.port.emit('passbolt.file.prompt.complete', requestId, 'SUCCESS', fileContent);
+      },
+      function (error) {
+        worker.port.emit('passbolt.file.prompt.complete', requestId, 'ERROR', error);
+      }
+    );
   });
-
 };
 exports.listen = listen;

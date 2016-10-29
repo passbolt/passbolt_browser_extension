@@ -4,14 +4,18 @@
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+const defer = require('sdk/core/promise').defer;
 
 /**
  * Save file on disk using download
  *
  * @param filename
  * @param content
+ * @return {promise}
  */
 function saveFile(filename, content) {
+  var deferred = defer();
+
   var a = document.createElement('a');
   var blob = new Blob([ content ], {type : "text/plain;charset=UTF-8"});
   a.href = window.URL.createObjectURL(blob);
@@ -20,6 +24,8 @@ function saveFile(filename, content) {
   document.body.appendChild(a);
   a.click();
   delete a;
+
+  return deferred.resolve();
 }
 exports.saveFile = saveFile;
 
@@ -28,10 +34,10 @@ exports.saveFile = saveFile;
  *
  * @return content of a file selected by the user
  */
-function uploadFile() {
+function openFile() {
   var p = new Promise(function(resolve, reject) {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {custom: "passbolt.file.upload"}, function(response) {
+      chrome.tabs.sendMessage(tabs[0].id, {custom: "passbolt.file.open"}, function(response) {
         if(typeof response !== 'undefined' && typeof response.data !== 'undefined') {
           resolve(response.data);
         } else {
@@ -42,4 +48,15 @@ function uploadFile() {
   });
   return p;
 }
-exports.uploadFile = uploadFile;
+exports.openFile = openFile;
+
+/**
+ * Get the prefered download directory path
+ *
+ * @return {string}
+ */
+function getPreferredDownloadsDirectory() {
+  var deferred = defer();
+  return deferred.reject(new Error('chrome/lib/fileController::getPreferredDownloadsDirectory missing'));
+}
+exports.getPreferredDownloadsDirectory = getPreferredDownloadsDirectory;

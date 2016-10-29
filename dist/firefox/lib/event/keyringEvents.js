@@ -5,17 +5,16 @@
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-// Low level files chrome utilities
-const {Cu} = require('chrome');
-const {TextDecoder, TextEncoder, OS} = Cu.import('resource://gre/modules/osfile.jsm', {});
-var fileController = require('../controller/fileController');
-var Keyring = require("../model/keyring").Keyring;
-var keyring = new Keyring();
-var Key = require('../model/key').Key;
-var key = new Key();
 var __ = require("sdk/l10n").get;
 var preferences = require("sdk/preferences/service");
+
+var Keyring = require("../model/keyring").Keyring;
+var Key = require('../model/key').Key;
 var Config = require('../model/config');
+var keyring = new Keyring();
+var key = new Key();
+
+var fileController = require('../controller/fileController');
 
 var listen = function (worker) {
 
@@ -227,44 +226,21 @@ var listen = function (worker) {
    * @param filename {string} The filename to use for the downloadable file
    */
   worker.port.on('passbolt.keyring.key.backup', function (requestId, key, filename) {
+
     if (filename == undefined) {
       filename = 'passbolt.asc';
     }
-
     // If debug mode is enabled, add .txt at the end of filename.
     if (Config.isDebug() == true) {
       filename += '.txt';
     }
 
-    // @todo move to file controller
-    let encoder = new TextEncoder();
-    let array = encoder.encode(key);
-
-
-    Cu.import("resource://gre/modules/Downloads.jsm");
-    Downloads.getPreferredDownloadsDirectory().then(function (preferredDownloadsDir) {
-      // Get path.
-      var path = "";
-      // In case we are running selenium tests, path is taken from preferences,
-      // we don't open file selector.
-      var folderList = preferences.get("browser.download.folderList");
-      var downloadDir = preferences.get("browser.download.dir") || preferredDownloadsDir;
-      var showFolderList = (folderList == undefined || folderList != 2);
-
-      if (showFolderList) {
-        path = fileController.saveFilePrompt(filename);
-      }
-      else {
-        path = downloadDir + '/' + filename;
-      }
-
-      let promise = OS.File.writeAtomic(path, array);
-      promise.then(function () {
+    fileController.saveFile(filename, key)
+      .then(function () {
         worker.port.emit('passbolt.keyring.key.backup.complete', requestId, 'SUCCESS');
       }, function () {
         worker.port.emit('passbolt.keyring.key.backup.complete', requestId, 'ERROR');
       });
-    });
   });
 
   /*

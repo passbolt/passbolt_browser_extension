@@ -11,19 +11,24 @@
  * @see https://developer.mozilla.org/en-US/Add-ons/SDK/Tutorials/Chrome_Authority
  */
 var {Cc, Ci} = require('chrome');
+const {Cu} = require('chrome');
+const {TextDecoder, TextEncoder, OS} = Cu.import('resource://gre/modules/osfile.jsm', {});
+
+var __ = require('sdk/l10n').get;
+var fileIO = require('sdk/io/file');
+const defer = require('sdk/core/promise').defer;
 
 /**
  * Open a dialog box for selecting a file to open.
  *
  * @returns {string} The path of the file to open
  */
-function openFilePrompt() {
+function _openFilePrompt() {
   const nsIFilePicker = Ci.nsIFilePicker;
 
   var window = require('sdk/window/utils').getMostRecentBrowserWindow(),
     path = null,
-    fp = Cc['@mozilla.org/filepicker;1']
-      .createInstance(nsIFilePicker);
+    fp = Cc['@mozilla.org/filepicker;1'].createInstance(nsIFilePicker);
 
   fp.init(window, 'Select a file', nsIFilePicker.modeOpen);
   fp.appendFilters(nsIFilePicker.filterAll | nsIFilePicker.filterText);
@@ -35,7 +40,34 @@ function openFilePrompt() {
 
   return path;
 }
-exports.openFilePrompt = openFilePrompt;
+
+/**
+ * Open a file and return the content
+ *
+ * @return {promise}
+ */
+function openFile() {
+  var deferred = defer();
+  var path = _openFilePrompt();
+  if (fileIO.isFile(path)) {
+    var fileContent = fileIO.read(path);
+    return deferred.resolve(fileContent);
+  } else {
+    return deferred.reject(new Error(__('The selected file does not exist.')));
+  }
+}
+exports.openFile = openFile;
+
+/**
+ * Get the prefered download directory path
+ *
+ * @return {promise}
+ */
+function getPreferredDownloadsDirectory() {
+  Cu.import('resource://gre/modules/Downloads.jsm');
+  return Downloads.getPreferredDownloadsDirectory();
+}
+exports.getPreferredDownloadsDirectory = getPreferredDownloadsDirectory;
 
 /**
  * Open a dialog box for selecting a file to save
@@ -43,7 +75,7 @@ exports.openFilePrompt = openFilePrompt;
  * @param filename Name of the file
  * @returns {string} The path of the file to save
  */
-function saveFilePrompt(filename) {
+function _saveFilePrompt(filename) {
   const nsIFilePicker = Ci.nsIFilePicker;
 
   var window = require('sdk/window/utils').getMostRecentBrowserWindow(),
@@ -62,4 +94,41 @@ function saveFilePrompt(filename) {
 
   return path;
 }
-exports.saveFilePrompt = saveFilePrompt;
+
+/**
+ * Save file on disk using file prompt
+ *
+ * @param filename
+ * @param content
+ */
+function saveFile(filename, content) {
+
+  let encoder = new TextEncoder();
+  let array = encoder.encode(content);
+
+  getPreferredDownloadsDirectory()
+  .then(function (preferredDownloadsDir) {
+    // In case we are running selenium tests, path is taken from preferences,
+    // we don't open file selector.
+    var folderList = preferences.get("browser.download.folderList");
+    var downloadDir = preferences.get("browser.download.dir") || preferredDownloadsDir;
+    var showFolderList = (folderList == undefined || folderList != 2);
+    var path;
+
+    if (showFolderList) {
+      path = _saveFilePrompt(filename);
+    } else {
+      path = downloadDir + '/' + filename;
+    }
+    return OS.File.writeAtomic(path, array);
+  })
+  .then(function (result) {
+    return deferred.resolve();
+  }, function (error) {
+    return deferred.reject(error);
+  });
+
+  return deferred.promise;
+}
+exports.saveFile = saveFile;
+

@@ -8,7 +8,7 @@
 // Low level files chrome utilities
 const {Cu} = require('chrome');
 const {TextDecoder, TextEncoder, OS} = Cu.import('resource://gre/modules/osfile.jsm', {});
-var filepickerController = require('../controller/filepickerController');
+var fileController = require('../controller/fileController');
 var Keyring = require("../model/keyring").Keyring;
 var keyring = new Keyring();
 var Key = require('../model/key').Key;
@@ -252,7 +252,7 @@ var listen = function (worker) {
       var showFolderList = (folderList == undefined || folderList != 2);
 
       if (showFolderList) {
-        path = filepickerController.saveFilePrompt(filename);
+        path = fileController.saveFilePrompt(filename);
       }
       else {
         path = downloadDir + '/' + filename;

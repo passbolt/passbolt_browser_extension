@@ -6,7 +6,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var fileIO = require('sdk/io/file');
-var filepickerController = require('../controller/filepickerController');
+var fileController = require('../controller/fileController');
 const {Cu} = require('chrome');
 
 var listen = function (worker) {
@@ -36,7 +36,7 @@ var listen = function (worker) {
    * @param requestId {int} The request identifier
    */
   worker.port.on('passbolt.file.prompt', function (requestId) {
-    var path = filepickerController.openFilePrompt();
+    var path = fileController.openFilePrompt();
     if (fileIO.isFile(path)) {
       var fileContent = fileIO.read(path);
       worker.port.emit('passbolt.file.prompt.complete', requestId, 'SUCCESS', fileContent);

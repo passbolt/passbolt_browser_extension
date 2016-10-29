@@ -6,7 +6,7 @@ module.exports = function (grunt) {
   var config = {
     styleguide: 'passbolt-styleguide',
     modules_path: 'node_modules',
-    common_path: 'common',
+    common_path: 'src/common',
     webroot: 'common/data',
     build: {
       firefox: {
@@ -102,7 +102,7 @@ module.exports = function (grunt) {
         }, {
           // Firefox specific
           nonull: true,
-          cwd: 'firefox',
+          cwd: 'src/firefox',
           src: ['**'],
           dest: '<%= config.build.firefox.path %>',
           expand: true
@@ -126,7 +126,7 @@ module.exports = function (grunt) {
         }, {
           // Chrome specific
           nonull: true,
-          cwd: 'chrome',
+          cwd: 'src/chrome',
           src: ['**'],
           dest: '<%= config.build.chrome.path %>',
           expand: true
@@ -140,7 +140,7 @@ module.exports = function (grunt) {
           // openpgp
           cwd: '<%= config.modules_path %>/openpgp/dist/',
           src: ['openpgp.js', 'openpgp.worker.js'],
-          dest: 'firefox/lib/vendors/',
+          dest: 'src/firefox/lib/vendors/',
           nonull: true,
           expand: true,
           rename: function (dest, src) {
@@ -154,13 +154,13 @@ module.exports = function (grunt) {
           nonull: true,
           cwd: '<%= config.modules_path %>/steal',
           src: ['steal.js', 'ext/dev.js'],
-          dest: 'chrome/lib/vendors/steal',
+          dest: 'src/chrome/lib/vendors/steal',
           expand: true
         }, {
           // openpgp
           cwd: '<%= config.modules_path %>/openpgp/dist/',
           src: ['openpgp.js', 'openpgp.worker.js'],
-          dest: 'chrome/lib/vendors/',
+          dest: 'src/chrome/lib/vendors/',
           nonull: true,
           expand: true,
           rename: function (dest, src) {
@@ -208,8 +208,8 @@ module.exports = function (grunt) {
     },
     replace: {
       patch_firefox_openpgp: {
-        src: ['firefox/lib/vendors/openpgp.js'],
-        dest: ['firefox/lib/vendors/openpgp.js'],
+        src: ['src/firefox/lib/vendors/openpgp.js'],
+        dest: ['src/firefox/lib/vendors/openpgp.js'],
         replacements: [{
           // Add necessary dependencies at the beginning of the file.
           from: "(function(f)",

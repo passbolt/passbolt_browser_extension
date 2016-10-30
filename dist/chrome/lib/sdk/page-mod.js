@@ -8,8 +8,6 @@
 var ScriptExecution = require('vendors/scriptExecution').ScriptExecution;
 var Crypto = require('model/crypto').Crypto;
 var Worker = require('sdk/worker').Worker;
-var Workers = require('model/workers');
-var i = 0;
 
 /**
  * PageMod Chrome Wrapper

@@ -82,9 +82,14 @@ var passbolt = passbolt || {};
       event: message,
       data: data
     };
-    var cloned = cloneInto(eventData, document.defaultView);
-    var event = document.createEvent('CustomEvent');
-    event.initCustomEvent('addon-message', true, true, cloned);
+    // The method cloneInto is called only for Firefox.
+    // the content script needs to explicitly clone the message payload into
+    // the page script's scope using the global cloneInto().
+    // @see https://developer.mozilla.org/en-US/Add-ons/SDK/Guides/Content_Scripts/Interacting_with_page_scripts#Content_script_to_page_script_2
+    if (typeof cloneInto != 'undefined') {
+      eventData = cloneInto(eventData, document.defaultView);
+    }
+    var event = new CustomEvent('addon-message', { bubbles: true, cancelable: true, detail: eventData });
     document.documentElement.dispatchEvent(event);
   };
 

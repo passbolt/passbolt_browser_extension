@@ -60,3 +60,16 @@ function getPreferredDownloadsDirectory() {
   return deferred.reject(new Error('chrome/lib/fileController::getPreferredDownloadsDirectory missing'));
 }
 exports.getPreferredDownloadsDirectory = getPreferredDownloadsDirectory;
+
+/**
+ * Load file content.
+ * @param path {string} Path of the file to load
+ * @return {promise}
+ */
+function loadFile (path) {
+  var url = chrome.runtime.getURL("data/" + path);
+  return fetch(url).then(function (response) {
+    return response.text();
+  });
+}
+exports.loadFile = loadFile;

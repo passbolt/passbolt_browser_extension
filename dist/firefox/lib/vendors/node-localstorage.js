@@ -18,3 +18,6 @@ LocalStorage.prototype.deleteItem = function(keyStr) {
 };
 
 exports.LocalStorage = LocalStorage;
+
+var localStorage = new LocalStorage();
+exports.localStorage = localStorage;

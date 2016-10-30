@@ -26,7 +26,7 @@
  * ==================================================================================
  */
 var events = {};
-//events.bootstrap = require('./event/bootstrapEvents');
+events.bootstrap = require('./event/bootstrapEvents');
 //events.clipboard = require('./event/clipboardEvents');
 events.config = require('./event/configEvents');
 //events.dispatch = require('./event/dispatchEvents');
@@ -36,7 +36,7 @@ events.file = require('./event/fileEvents');
 //events.secret = require('./event/secretEvents');
 //events.setup = require('./event/setupEvents');
 //events.setupbootstrap = require('./event/setupBootstrapEvents');
-//events.template = require('./event/templateEvents');
+events.template = require('./event/templateEvents');
 //events.user = require('./event/userEvents');
 events.auth = require('./event/authEvents');
 //events.share = require('./event/shareEvents');
@@ -92,7 +92,7 @@ var pageMods = {};
  * to know about the status of the extension, in a modernizr fashion
  * It also helps the plugin to recognise if a page behave like a passbolt app
  */
-pageMods.bootstrap = require('./pagemod/bootstrapPagemod').bootstrap;
+pageMods.appBootstrap = require('./pagemod/bootstrapPagemod').appBootstrap;
 
 /*
  * This pagemod help bootstrap the first step of the setup process from a passbolt server app page

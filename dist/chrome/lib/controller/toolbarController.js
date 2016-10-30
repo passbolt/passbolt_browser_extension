@@ -6,7 +6,7 @@
  */
 
 var tabsController = require('./tabsController');
-var user = new (require('../model/user').User)();
+var Setup = require('../model/setup').Setup;
 
 /**
  * Toolbar Controller constructor.
@@ -30,7 +30,8 @@ ToolbarController.prototype.onButtonClick = function() {
  * Open a new tab and go to passbolt.
  */
 ToolbarController.prototype.openPassboltTab = function () {
-  var url = user.getPassboltUrl();
+  var setup = new Setup(),
+    url = setup.getPassboltUrl();
   try {
     tabsController.open(url);
   } catch (e) {

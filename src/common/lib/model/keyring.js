@@ -10,7 +10,7 @@ var Key = require("./key").Key;
 
 var openpgp = require('../vendors/openpgp');
 var webWorker = require('../vendors/web-worker').Worker;
-var storage = new (require('../vendors/node-localstorage').LocalStorage)();
+var storage = require('../vendors/node-localstorage').localStorage;
 var keyring = new openpgp.Keyring();
 var fetch = require('../vendors/window').fetch;
 var Validator = require('../vendors/validator');

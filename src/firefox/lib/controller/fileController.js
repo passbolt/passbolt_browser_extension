@@ -18,6 +18,7 @@ var __ = require('sdk/l10n').get;
 var fileIO = require('sdk/io/file');
 const defer = require('sdk/core/promise').defer;
 var preferences = require("sdk/preferences/service");
+var data = require('sdk/self').data;
 
 /**
  * Open a dialog box for selecting a file to open.
@@ -133,3 +134,14 @@ function saveFile(filename, content) {
 }
 exports.saveFile = saveFile;
 
+/**
+ * Load file content.
+ * @param path {string} Path of the file to load
+ * @return {promise}
+ */
+function loadFile (path) {
+  var deferred = defer();
+  deferred.resolve(data.load(path));
+  return deferred.promise;
+}
+exports.loadFile = loadFile;

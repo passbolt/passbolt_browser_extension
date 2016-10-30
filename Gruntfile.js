@@ -74,12 +74,10 @@ module.exports = function (grunt) {
         },
         command: [
           "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": true/' <%= config.build.chrome.path %>/lib/config/config.json",
-          './node_modules/crx/bin/crx.js pack <%= config.build.chrome.path %> --zip-output <%= config.build.chrome.path %>/passbolt-<%= pkg.version %>-debug.zip',
+          './node_modules/crx/bin/crx.js pack <%= config.build.chrome.path %> -p key.pem -o <%= config.build.chrome.path %>/passbolt-<%= pkg.version %>-debug.crx',
           "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' <%= config.build.chrome.path %>/lib/config/config.json",
-          './node_modules/crx/bin/crx.js pack <%= config.build.chrome.path %> --zip-output <%= config.build.chrome.path %>/passbolt-<%= pkg.version %>.zip',
-          'ln -s passbolt-<%= pkg.version %>-debug.crx <%= config.build.chrome.path %>/passbolt-latest@passbolt.com.zip',
-          'rm -f <%= config.build.chrome.path %>/key.pem',
-          'rm -f passbolt_firefox.crx'
+          './node_modules/crx/bin/crx.js pack <%= config.build.chrome.path %> -p key.pem -o <%= config.build.chrome.path %>/passbolt-<%= pkg.version %>.crx',
+          'ln -s passbolt-<%= pkg.version %>-debug.crx <%= config.build.chrome.path %>/passbolt-latest@passbolt.com.crx'
         ].join('&&')
       }
     },

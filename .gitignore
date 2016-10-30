@@ -11,7 +11,7 @@ data/less
 ######################
 # passbolt-firefox-addon.xpi
 /bootstrap.js
-/dist/chrome/key.pem
+*.pem
 
 # Config
 lib/config/config.json

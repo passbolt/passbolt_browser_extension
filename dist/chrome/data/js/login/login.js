@@ -159,11 +159,14 @@ passbolt.login = passbolt.login || {};
    */
   passbolt.login.init = function () {
 
-    if (self.options.ready === true) {
-      passbolt.login.onStep0Start();
-    } else {
-      passbolt.login.onConfigurationMissing();
-    }
+    passbolt.request('passbolt.addon.isConfigured')
+      .then(function(isConfigured) {
+        if (isConfigured) {
+          passbolt.login.onStep0Start();
+        } else {
+          passbolt.login.onConfigurationMissing();
+        }
+      });
   };
 
   passbolt.login.init();

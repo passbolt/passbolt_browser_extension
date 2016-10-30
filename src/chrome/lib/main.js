@@ -140,9 +140,9 @@ pageMods.appBootstrap = require('./pagemod/bootstrapPagemod').appBootstrap;
 /*
  * This pagemod drives the login / authentication
  */
-//var PassboltAuth = require('./pagemod/passboltAuthPagemod').PassboltAuth;
-//pageMods.passboltAuth = PassboltAuth;
-//pageMods.passboltAuth.init();
+var PassboltAuth = require('./pagemod/passboltAuthPagemod').PassboltAuth;
+pageMods.passboltAuth = PassboltAuth;
+pageMods.passboltAuth.init();
 
 /*
  * This pagemod drives the login passphrase capture

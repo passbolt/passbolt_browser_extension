@@ -18,7 +18,6 @@ var listen = function (worker) {
    * @param path {string} The template path to retrieve
    */
   worker.port.on('passbolt.template.get', function (requestId, path) {
-    console.log('get ' + path);
     fileController.loadFile(path)
       .then(function(tpl) {
         worker.port.emit('passbolt.template.get.complete', requestId, 'SUCCESS', tpl);

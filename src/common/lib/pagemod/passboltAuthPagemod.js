@@ -59,21 +59,16 @@ PassboltAuth.init = function (forceReset) {
         self.data.url('js/lib/html.js'),
         self.data.url('js/login/login.js')
       ],
-      contentScriptOptions: {
-        id: PassboltAuth.id,
-        addonDataPath: self.data.url(),
-        ready: ready,
-        domain: domain
-      },
       attachTo: ["existing", "top"],
       onAttach: function (worker) {
         Worker.add('Auth', worker);
-        app.events.bootstrap.listen(worker);
-        app.events.template.listen(worker);
-        app.events.keyring.listen(worker);
-        app.events.secret.listen(worker);
-        app.events.user.listen(worker);
-        app.events.auth.listen(worker);
+        app.events.config.listen(worker);
+        //app.events.bootstrap.listen(worker);
+        //app.events.template.listen(worker);
+        //app.events.keyring.listen(worker);
+        //app.events.secret.listen(worker);
+        //app.events.user.listen(worker);
+        //app.events.auth.listen(worker);
       }
     });
     return true;

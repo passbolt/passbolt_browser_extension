@@ -15,7 +15,7 @@ var preferences = require('sdk/preferences/service');
 var get = function(key) {
   return preferences.get(key);
 };
-exports.copy = get;
+exports.get = get;
 
 /**
  * Set the value of given browser setting
@@ -26,4 +26,4 @@ exports.copy = get;
 var set = function(key, value) {
   preferences.set(key, value);
 };
-exports.copy = set;
+exports.set = set;

@@ -53,10 +53,11 @@ function openFile() {
   var path = _openFilePrompt();
   if (fileIO.isFile(path)) {
     var fileContent = fileIO.read(path);
-    return deferred.resolve(fileContent);
+    deferred.resolve(fileContent);
   } else {
-    return deferred.reject(new Error(__('The selected file does not exist.')));
+    deferred.reject(new Error(__('The selected file does not exist.')));
   }
+  return deferred.promise;
 }
 exports.openFile = openFile;
 

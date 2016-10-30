@@ -4,6 +4,7 @@
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+var BrowserSettings = require('../controller/browserSettingsController');
 
 /**
  * Open an url in a new tab.
@@ -28,6 +29,16 @@ exports.getActiveTabUrl = getActiveTabUrl;
  * @param url {string} The url to go to
  */
 var setActiveTabUrl = function (url) {
-  //tabs.activeTab.url = url;
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    var tab = tabs[0],
+      regex = new RegExp('/:\/\//');
+
+    // If the url targets a local resource.
+    if (regex.exec(window.location.href) == null) {
+      url = '/data/' + url;
+    }
+
+    chrome.tabs.update(tab.id, {url: url});
+  });
 };
 exports.setActiveTabUrl = setActiveTabUrl;

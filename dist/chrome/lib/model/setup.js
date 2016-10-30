@@ -18,6 +18,7 @@ var jsonQ = require('../vendors/jsonQ').jsonQ;
 var Validator = require('../vendors/validator');
 var fetch = require('../vendors/window').fetch;
 var FormData = require('../vendors/window').FormData;
+var BrowserSettings = require('../controller/browserSettingsController');
 
 /**
  * The class that deals with keys.
@@ -445,7 +446,7 @@ Setup.prototype.getPassboltUrl = function () {
   }
   // The plugin is installed but the configuration is incomplete
   else if (this.get('stepId') != '') {
-    url = Config.read('extensionBasePath') + '/data/setup.html';
+    url = BrowserSettings.getExtensionUrl() + '/data/setup.html';
   }
   // The plugin is installed but not configured
   else {

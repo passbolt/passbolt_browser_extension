@@ -10,11 +10,11 @@
  * @param {string} key
  * @return {string} value
  */
-var get = function(key) {
-  switch(key) {
+var get = function (key) {
+  switch (key) {
     case 'browser.download.dir':
     case 'browser.download.lastDir':
-      //break;
+    //break;
     default:
       console.error('Chrome browserSettingsController::get for key ' + key + ' not implemented');
       return undefined;
@@ -29,7 +29,17 @@ exports.get = get;
  * @param {string} key
  * @param {string} value
  */
-var set = function(key, value) {
+var set = function (key, value) {
   console.error('Chrome browserSettingsController::set not implemented');
 };
 exports.set = set;
+
+/**
+ * Get the extension url.
+ *
+ * @return {string}
+ */
+var getExtensionUrl = function () {
+  return chrome.runtime.getURL("");
+};
+exports.getExtensionUrl = getExtensionUrl;

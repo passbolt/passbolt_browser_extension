@@ -14,6 +14,7 @@ var storage = require('../vendors/node-localstorage').localStorage;
 var keyring = new openpgp.Keyring();
 var fetch = require('../vendors/window').fetch;
 var Validator = require('../vendors/validator');
+var BrowserSettings = require('../controller/browserSettingsController');
 
 const { defer } = require('sdk/core/promise');
 var __ = require("sdk/l10n").get;
@@ -23,7 +24,7 @@ var __ = require("sdk/l10n").get;
  */
 var Keyring = function () {
   openpgp.initWorker({
-    worker: new webWorker(Config.read('extensionBasePath') + '/lib/vendors/openpgp.worker.js')
+    worker: new webWorker(BrowserSettings.getExtensionUrl() + '/lib/vendors/openpgp.worker.js')
   });
   this.openpgpWorker = openpgp;
 };

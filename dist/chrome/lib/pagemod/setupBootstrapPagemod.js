@@ -43,6 +43,7 @@ SetupBootstrap.init = function () {
     },
     onAttach: function (worker) {
       Worker.add('SetupBootstrap', worker);
+      app.events.config.listen(worker);
       app.events.setupbootstrap.listen(worker);
     }
   });

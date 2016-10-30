@@ -27,3 +27,13 @@ var set = function(key, value) {
   preferences.set(key, value);
 };
 exports.set = set;
+
+/**
+ * Get the extension url.
+ *
+ * @return {string}
+ */
+var getExtensionUrl = function () {
+  return "resource://passbolt-at-passbolt-dot-com";
+};
+exports.getExtensionUrl = getExtensionUrl;

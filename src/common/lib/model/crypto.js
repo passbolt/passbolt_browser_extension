@@ -15,6 +15,7 @@ var Keyring = require('./keyring').Keyring;
 var __ = require("sdk/l10n").get;
 var randomBytes = require('../vendors/crypto').randomBytes;
 var Config = require('./config');
+var BrowserSettings = require('../controller/browserSettingsController');
 
 /**
  * The class that deals with Passbolt encryption and decryption operations.
@@ -29,7 +30,7 @@ var Crypto = function () {
  */
 Crypto.getOpenpgpWorker = function () {
   openpgp.initWorker({
-    worker: new webWorker(Config.read('extensionBasePath') + '/lib/vendors/openpgp.worker.js')
+    worker: new webWorker(BrowserSettings.getExtensionUrl() + '/lib/vendors/openpgp.worker.js')
   });
   return openpgp;
 };

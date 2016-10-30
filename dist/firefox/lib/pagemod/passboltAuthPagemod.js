@@ -63,12 +63,12 @@ PassboltAuth.init = function (forceReset) {
       onAttach: function (worker) {
         Worker.add('Auth', worker);
         app.events.config.listen(worker);
-        app.events.bootstrap.listen(worker);
-        app.events.template.listen(worker);
-        app.events.keyring.listen(worker);
-        app.events.secret.listen(worker);
-        app.events.user.listen(worker);
-        app.events.auth.listen(worker);
+        //app.events.bootstrap.listen(worker);
+        //app.events.template.listen(worker);
+        //app.events.keyring.listen(worker);
+        //app.events.secret.listen(worker);
+        //app.events.user.listen(worker);
+        //app.events.auth.listen(worker);
       }
     });
     return true;

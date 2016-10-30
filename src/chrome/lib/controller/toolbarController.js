@@ -17,12 +17,22 @@ var ToolbarController = function() {
   chrome.browserAction.onClicked.addListener(function() {
     _this.onButtonClick();
   });
+  chrome.commands.onCommand.addListener(function(command) {
+    _this.onShortcutPressed();
+  });
 };
 
 /**
  * Handle the click on the passbolt toolbar icon.
  */
 ToolbarController.prototype.onButtonClick = function() {
+  this.openPassboltTab();
+};
+
+/**
+ * Handle the shortcut pressed event.
+ */
+ToolbarController.prototype.onShortcutPressed = function() {
   this.openPassboltTab();
 };
 

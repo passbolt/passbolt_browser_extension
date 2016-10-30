@@ -26,24 +26,24 @@ if (Config.isDebug() == true) {
  * ==================================================================================
  */
 var events = {};
-events.app = require('./event/appEvents');
+//events.app = require('./event/appEvents');
 events.auth = require('./event/authEvents');
 events.bootstrap = require('./event/bootstrapEvents');
 events.clipboard = require('./event/clipboardEvents');
 events.config = require('./event/configEvents');
-events.editPassword = require('./event/editPasswordEvents');
+//events.editPassword = require('./event/editPasswordEvents');
 events.file = require('./event/fileEvents');
-events.keyring = require('./event/keyringEvents');
-events.masterPasswordIframe = require('./event/masterPasswordIframeEvents');
-events.masterPassword = require('./event/masterPasswordEvents');
-events.passboltPage = require('./event/passboltPageEvents');
-events.secret = require('./event/secretEvents');
-events.setup = require('./event/setupEvents');
-events.setupbootstrap = require('./event/setupBootstrapEvents');
-events.share = require('./event/shareEvents');
-events.shareAutocomplete = require('./event/shareAutocompleteEvents');
+//events.keyring = require('./event/keyringEvents');
+//events.masterPasswordIframe = require('./event/masterPasswordIframeEvents');
+//events.masterPassword = require('./event/masterPasswordEvents');
+//events.passboltPage = require('./event/passboltPageEvents');
+//events.secret = require('./event/secretEvents');
+//events.setup = require('./event/setupEvents');
+//events.setupbootstrap = require('./event/setupBootstrapEvents');
+//events.share = require('./event/shareEvents');
+//events.shareAutocomplete = require('./event/shareAutocompleteEvents');
 events.template = require('./event/templateEvents');
-events.user = require('./event/userEvents');
+//events.user = require('./event/userEvents');
 
 if (Config.isDebug()) {
   events.debug = require('./event/debugEvents');
@@ -57,8 +57,8 @@ exports.events = events;
  *  Where we affect the look and feel of the firefox instance
  * ==================================================================================
  */
-var ToolbarController = require('./controller/toolbarController').ToolbarController;
-new ToolbarController();
+//var ToolbarController = require('./controller/toolbarController').ToolbarController;
+//new ToolbarController();
 
 /* ==================================================================================
  *  Page mods
@@ -102,44 +102,44 @@ pageMods.bootstrap = require('./pagemod/bootstrapPagemod').bootstrap;
  * This pagemod help bootstrap the first step of the setup process from a passbolt server app page
  * The pattern for this url, driving the setup bootstrap, is defined in config.json
  */
-var SetupBootstrap = require('./pagemod/setupBootstrapPagemod').SetupBootstrap;
-pageMods.SetupBootstrap = SetupBootstrap;
-pageMods.SetupBootstrap.init();
+//var SetupBootstrap = require('./pagemod/setupBootstrapPagemod').SetupBootstrap;
+//pageMods.SetupBootstrap = SetupBootstrap;
+//pageMods.SetupBootstrap.init();
 
 /*
  * This page mod drives the reset of setup process
  * The reset of the setup process is driven on the add-on side, see in ../data/ setup.html and js/setup.js
  */
-var Setup = require('./pagemod/setupPagemod').Setup;
-pageMods.Setup = Setup;
-pageMods.Setup.init();
+//var Setup = require('./pagemod/setupPagemod').Setup;
+//pageMods.Setup = Setup;
+//pageMods.Setup.init();
 
 /*
  * This pagemod drives the dialog/iframe where the user enters the secret key password,
  * also called passphrase. It is used when encrypting, decrypting, signing, etc.
  */
-pageMods.masterPasswordDialog = require('./pagemod/masterPasswordDialogPagemod').masterPasswordDialog;
+//pageMods.masterPasswordDialog = require('./pagemod/masterPasswordDialogPagemod').masterPasswordDialog;
 
 /*
  * This pagemod drives the progress bar iframe
  * It is used when the add-on is encrypting something
  */
-pageMods.progressDialog = require('./pagemod/progressDialogPagemod').progressDialog;
+//pageMods.progressDialog = require('./pagemod/progressDialogPagemod').progressDialog;
 
 /*
  * This pagemod drives the iframe used when the user enter a password to be stored by passbolt
  * It is used when creating/editing a new password
  */
-pageMods.secretEditDialog = require('./pagemod/secretEditDialogPagemod').secretEditDialog;
+//pageMods.secretEditDialog = require('./pagemod/secretEditDialogPagemod').secretEditDialog;
 
 /*
  * This pagemod drives the main addon app
  * It is inserted in all the pages of a domain that is trusted.
  * Such trust is defined during the first step of the setup process (or in config-debug)
  */
-var PassboltApp = require('./pagemod/passboltAppPagemod').PassboltApp;
-pageMods.passboltApp = PassboltApp;
-pageMods.passboltApp.init();
+//var PassboltApp = require('./pagemod/passboltAppPagemod').PassboltApp;
+//pageMods.passboltApp = PassboltApp;
+//pageMods.passboltApp.init();
 
 /*
  * This pagemod drives the login / authentication
@@ -151,19 +151,19 @@ pageMods.passboltAuth.init();
 /*
  * This pagemod drives the login passphrase capture
  */
-pageMods.passboltAuthForm = require('./pagemod/passboltAuthFormPagemod').passboltAuthForm;
+//pageMods.passboltAuthForm = require('./pagemod/passboltAuthFormPagemod').passboltAuthForm;
 
 /*
  * This pagemod drives the iframe used when the user share a password
  * It is used when sharing a new password
  */
-pageMods.shareDialog = require('./pagemod/shareDialogPagemod').shareDialog;
+//pageMods.shareDialog = require('./pagemod/shareDialogPagemod').shareDialog;
 
 /*
  * This pagemod drives the iframe used when the user share a password
  * and he is looking for new users to grant
  */
-pageMods.shareAutocompleteDialog = require('./pagemod/shareAutocompleteDialogPagemod').shareAutocompleteDialog;
+//pageMods.shareAutocompleteDialog = require('./pagemod/shareAutocompleteDialogPagemod').shareAutocompleteDialog;
 
 /*
  * This page mod drives a convenience config page for debug
@@ -171,8 +171,8 @@ pageMods.shareAutocompleteDialog = require('./pagemod/shareAutocompleteDialogPag
  * and perform changes useful for testing that would otherwise break things
  * Like for example changing the public key only on the client but not the server
  */
-if (Config.isDebug()) {
-  pageMods.debug = require('./pagemod/debugPagemod').debug;
-}
+//if (Config.isDebug()) {
+//  pageMods.debug = require('./pagemod/debugPagemod').debug;
+//}
 
 exports.pageMods = pageMods;

@@ -34,7 +34,7 @@ var ToolbarController = function () {
 
   // Add a shortcut to reach passbolt (usefull for test).
   Hotkey({
-    combo: "accel-shift-alt-p",
+    combo: "shift-alt-p",
     onPress: function() {
       _this.onShortcutPressed();
     }

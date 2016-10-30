@@ -17,8 +17,9 @@ const {TextDecoder, TextEncoder, OS} = Cu.import('resource://gre/modules/osfile.
 var __ = require('sdk/l10n').get;
 var fileIO = require('sdk/io/file');
 const defer = require('sdk/core/promise').defer;
-var preferences = require("sdk/preferences/service");
 var data = require('sdk/self').data;
+
+var preferences = require('./browserSettingsController');
 
 /**
  * Open a dialog box for selecting a file to open.

@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var Config = require('../model/config');
-var preferences = require("sdk/preferences/service");
+var preferenceController = require('../controller/preferenceController');
 
 var listen = function (worker) {
 
@@ -27,7 +27,7 @@ var listen = function (worker) {
    * @param preferenceKey {string} Preference name to obtain
    */
   worker.port.on('passbolt.debug.browser.readPreference', function (requestId, preferenceKey) {
-    worker.port.emit('passbolt.debug.browser.readPreference.complete', requestId, 'SUCCESS', preferences.get(preferenceKey));
+    worker.port.emit('passbolt.debug.browser.readPreference.complete', requestId, 'SUCCESS', preferenceController.get(preferenceKey));
   });
 
   /*

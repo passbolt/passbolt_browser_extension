@@ -9,7 +9,7 @@ var Config = require('./model/config');
 
 // console and debug utilities
 if (Config.isDebug() == true) {
-  require('sdk/preferences/service').set('extensions.sdk.console.logLevel', 'all');
+  require('./controller/consoleController').setLogLevel('all');
 }
 
 /* ==================================================================================

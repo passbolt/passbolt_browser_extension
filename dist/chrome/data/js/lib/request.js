@@ -148,6 +148,7 @@ var passbolt = passbolt || {};
    * rejection call.
    */
   var _requestCompletedListener =  function(token, status) {
+    console.log(status);
     var args = Array.prototype.slice.call(arguments, 2);
     if (status == 'SUCCESS') {
       _stack[token].deferred.resolveWith(this, args);

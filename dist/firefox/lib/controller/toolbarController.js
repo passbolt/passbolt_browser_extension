@@ -9,7 +9,7 @@ var self = require('sdk/self');
 var buttons = require('sdk/ui/button/action');
 var { Hotkey } = require("sdk/hotkeys");
 var tabsController = require('./tabsController');
-var setup = new (require("../model/setup").Setup)();
+var Toolbar = require('../model/toolbar').Toolbar;
 
 /**
  * Toolbar Controller constructor.
@@ -59,7 +59,7 @@ ToolbarController.prototype.onShortcutPressed = function () {
  * Open a new tab and go to passbolt.
  */
 ToolbarController.prototype.openPassboltTab = function () {
-  var url = setup.getPassboltUrl();
+  var url = Toolbar.getToolbarUrl();
   try {
     tabsController.open(url);
   } catch (e) {

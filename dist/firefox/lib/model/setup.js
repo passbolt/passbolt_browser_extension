@@ -18,7 +18,6 @@ var jsonQ = require('../vendors/jsonQ').jsonQ;
 var Validator = require('../vendors/validator');
 var fetch = require('../vendors/window').fetch;
 var FormData = require('../vendors/window').FormData;
-var BrowserSettings = require('../controller/browserSettingsController');
 
 /**
  * The class that deals with keys.
@@ -425,35 +424,6 @@ Setup.prototype.checkKeyExistRemotely = function (userFingerprint) {
   var serverUrl = this.get('settings.domain');
   var gpgAuth = new Auth();
   return gpgAuth.verify(serverUrl, armoredServerKey, userFingerprint);
-};
-
-/**
- * Get passbolt instance url.
- *
- * Regarding the current user configuration, the results can be :
- * - Plugin installed but not configured, return the public page getting started url;
- * - Plugin installed but partially configured, return the setup url;
- * - Plugin installed and configured, return the passbolt url.
- * @return {string}
- */
-Setup.prototype.getPassboltUrl = function () {
-  var url = '',
-    user = new User();
-
-  // The plugin is installed and configured
-  if (user.isValid()) {
-    url = user.settings.getDomain();
-  }
-  // The plugin is installed but the configuration is incomplete
-  else if (this.get('stepId') != '') {
-    url = BrowserSettings.getExtensionUrl() + '/data/setup.html';
-  }
-  // The plugin is installed but not configured
-  else {
-    url = 'https://www.passbolt.com/start';
-  }
-
-  return url;
 };
 
 // Exports the Setup object.

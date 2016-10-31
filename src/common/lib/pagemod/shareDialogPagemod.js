@@ -31,10 +31,6 @@ var shareDialog = pageMod.PageMod({
     self.data.url('js/secret/share.js')
   ],
   contentScriptWhen: 'ready',
-  contentScriptOptions: {
-    expose_messaging: false,
-    addonDataPath: self.data.url()
-  },
   onAttach: function (worker) {
     Worker.add('Share', worker, {
       // on destroy, clean.

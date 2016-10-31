@@ -29,9 +29,6 @@ var passboltAuthForm = pageMod.PageMod({
     self.data.url('js/lib/securityToken.js'),
     self.data.url('js/login/loginForm.js')
   ],
-  contentScriptOptions: {
-    addonDataPath: self.data.url()
-  },
   onAttach: function (worker) {
     Worker.add('AuthForm', worker);
     app.events.template.listen(worker);

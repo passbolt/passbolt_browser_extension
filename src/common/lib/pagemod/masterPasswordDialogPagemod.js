@@ -31,10 +31,6 @@ var masterPasswordDialog = pageMod.PageMod({
     self.data.url('js/masterPassword/masterPassword.js')
   ],
   contentScriptWhen: 'ready',
-  contentScriptOptions: {
-    expose_messaging: false,
-    addonDataPath: self.data.url()
-  },
   onAttach: function (worker) {
     Worker.add('MasterPassword', worker, {
       // on destroy, clean.

@@ -20,12 +20,8 @@ var Worker = require('../model/worker');
 var Setup = function () {
 };
 Setup._pageMod = undefined;
-Setup.id = 0;
-Setup.current;
 
 Setup.init = function () {
-  Setup.id++;
-
   if (typeof Setup._pageMod !== 'undefined') {
     Setup._pageMod.destroy();
   }

@@ -15,7 +15,6 @@ var user = new (require('../model/user').User)();
 var PassboltAuth = function () {
 };
 PassboltAuth._pageMod = undefined;
-PassboltAuth.id = 0;
 PassboltAuth.current;
 
 PassboltAuth.init = function (forceReset) {
@@ -38,8 +37,6 @@ PassboltAuth.init = function (forceReset) {
   }
 
   if (ready !== PassboltAuth.current) {
-
-    PassboltAuth.id++;
     PassboltAuth.current = ready;
 
     if (typeof PassboltAuth._pageMod !== 'undefined') {

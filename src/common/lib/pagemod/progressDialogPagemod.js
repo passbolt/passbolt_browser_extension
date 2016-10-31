@@ -29,10 +29,6 @@ progressDialog = pageMod.PageMod({
     self.data.url('js/progress/progress.js')
   ],
   contentScriptWhen: 'ready',
-  contentScriptOptions: {
-    expose_messaging: false,
-    addonDataPath: self.data.url()
-  },
   onAttach: function (worker) {
     Worker.add('Progress', worker);
     app.events.template.listen(worker);

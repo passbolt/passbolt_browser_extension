@@ -19,12 +19,8 @@ var Worker = require('../model/worker');
 var SetupBootstrap = function () {
 };
 SetupBootstrap._pageMod = undefined;
-SetupBootstrap.id = 0;
-SetupBootstrap.current;
 
 SetupBootstrap.init = function () {
-  SetupBootstrap.id++;
-
   if (typeof SetupBootstrap._pageMod !== 'undefined') {
     SetupBootstrap._pageMod.destroy();
   }
@@ -39,10 +35,6 @@ SetupBootstrap.init = function () {
       self.data.url('js/lib/request.js'),
       self.data.url('js/setup/bootstrap.js')
     ],
-    contentScriptOptions: {
-      //config: Config.getContentScriptConfig('setup')
-      setupBootstrapRegex: Config.read('setupBootstrapRegex')
-    },
     onAttach: function (worker) {
       Worker.add('SetupBootstrap', worker);
       app.events.config.listen(worker);

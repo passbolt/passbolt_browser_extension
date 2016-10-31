@@ -269,6 +269,8 @@ module.exports = function (grunt) {
 
   // Build chrome.
   grunt.registerTask('build-chrome', ['clean:chrome_build', 'copy:chrome_src', 'shell:build_crx']);
+  // Build chrome directory but not the crx usefull for devel
+  grunt.registerTask('build-chrome-nocrx', ['clean:chrome_build', 'copy:chrome_src']);
 
   // By default build plugin for all browsers.
   grunt.registerTask('default', ['build']);

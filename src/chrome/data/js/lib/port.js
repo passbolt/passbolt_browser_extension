@@ -106,6 +106,32 @@ var self = self || {};
     this._port.postMessage(arguments);
   };
 
+  /**
+   * Generate a port uuid based on tabid
+   * @param tabId
+   * @returns {string}
+   */
+  Port.getUuid = function(seed) {
+    var hashStr;
+
+    // Generate a random hash if no seed is provided
+    if (typeof seed === 'undefined') {
+      throw new Error('portUuid seed should not be null');
+    }
+    // Create SHA hash from seed.
+    var shaObj = new jsSHA('SHA-1', 'TEXT');
+    shaObj.update(seed);
+    hashStr = shaObj.getHash('HEX').substring(0, 32);
+
+    // Build a uuid based on the hash
+    var search = XRegExp('^(?<first>.{8})(?<second>.{4})(?<third>.{1})(?<fourth>.{3})(?<fifth>.{1})(?<sixth>.{3})(?<seventh>.{12}$)');
+    var replace = XRegExp('${first}-${second}-3${fourth}-a${sixth}-${seventh}');
+
+    // Replace regexp by corresponding mask, and remove / character at each side of the result.
+    var uuid = XRegExp.replace(hashStr, search, replace).replace(/\//g, '');
+    return uuid;
+  };
+
   /*****************************************************************************
    * Bootstrap the self.port object to be used by request and message
    *****************************************************************************/
@@ -134,15 +160,25 @@ var self = self || {};
       if(typeof query['passbolt'] !== 'undefined') {
         portname = query['passbolt'];
       } else {
-        var msg = 'Portname undefined for ' + window.location + '. The content code cannot communicate with the addon';
-        throw Error(msg);
+        // get it from tabid
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          tabId = tabs[0].id;
+          portname = this.portname = 'port-' + Port.getUuid(tabId.toString());
+          buildPort();
+        });
+        //var msg = 'Portname undefined for ' + window.location + '. The content code cannot communicate with the addon';
+        //throw Error(msg);
       }
     }
+  }
+  function buildPort() {
     if(typeof self.port === 'undefined') {
+      console.log('connecting to:' + portname);
       self.port = new Port(portname);
     }
-
   }
+
+  // init port with current tabid
   initPort();
 
 })(self);

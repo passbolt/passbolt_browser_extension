@@ -35,6 +35,8 @@ SetupBootstrap.init = function () {
     contentStyleFile: [],
     contentScriptFile: [
       self.data.url('vendors/jquery.min.js'),
+      self.data.url('js/lib/message.js'),
+      self.data.url('js/lib/request.js'),
       self.data.url('js/setup/bootstrap.js')
     ],
     contentScriptOptions: {

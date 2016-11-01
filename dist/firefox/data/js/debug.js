@@ -184,7 +184,7 @@ $(function () {
                   downloadLastDir: downloadLastDir,
                   preferredDownloadDirectory: preferredDownloadDir
                 };
-                $browserPreferencesInfo.html(JSON.stringify(pref, undefined, 2));
+                $('#browserPreferences').html(JSON.stringify(pref, undefined, 2));
               });
           });
       });

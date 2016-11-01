@@ -40,7 +40,7 @@ $(function () {
       // Init the localstorage section.
       .always(initLocalStorageSection)
       // Init the browser preferences section.
-      //.then(getBrowserPreferences);
+      .then(initBrowserPreferencesSection)
       // Init event listeners.
       .always(initEventListeners)
       // Mark the page as ready
@@ -58,7 +58,7 @@ $(function () {
       .then(function (user) {
         return updateUserForm(user);
       })
-      .always(function() {
+      .always(function () {
         def.resolve();
       });
     return def;
@@ -69,19 +69,20 @@ $(function () {
    */
   var initKeysSection = function () {
     // Retrieve the user private key.
-    return passbolt.request('passbolt.keyring.private.get')
+    var p1 = passbolt.request('passbolt.keyring.private.get')
       // Update the client key information.
       .then(function (keyInfo) {
         updateKeyInfo(keyInfo, 'client');
-      })
-      // Retrieve the server public key.
-      .always(function() {
-        return passbolt.request('passbolt.keyring.server.get');
-      })
+      });
+
+    // Retrieve the server public key.
+    var p2 = passbolt.request('passbolt.keyring.server.get')
       // Update the server key information.
       .then(function (keyInfo) {
         updateKeyInfo(keyInfo, 'server');
       });
+
+    return $.when(p1, p2);
   };
 
   /**
@@ -136,11 +137,11 @@ $(function () {
     }
 
     // The HTMLElement container.
-    var $keyInfoContainer = $('#privkeyinfo');
-    if (keyType == 'server')
-      for (var i in keyInfo) {
-        console.log(i + ' : ', keyInfo[i]);
+    var $keyInfoContainer = $('#privkeyinfo'),
+      $keyField = $myKeyAscii;
+    if (keyType == 'server') {
       $keyInfoContainer = $('#pubkeyinfo-server');
+      $keyField = $serverKeyAscii;
     }
 
     // Format and insert the key uid.
@@ -155,6 +156,7 @@ $(function () {
     $('.algorithm', $keyInfoContainer).html(keyInfo.algorithm);
     $('.created', $keyInfoContainer).html(keyInfo.created);
     $('.expires', $keyInfoContainer).html(keyInfo.expires);
+    $keyField.val(keyInfo.key);
   };
 
   /**
@@ -167,26 +169,26 @@ $(function () {
     return '<div class="message ' + messageType + '"><strong>' + messageType.ucfirst() + ':</strong> ' + message + '</div>';
   };
 
-  ///**
-  // * Get browser preferences
-  // */
-  //var getBrowserPreferences = function () {
-  //  passbolt.request('passbolt.debug.browser.readPreference', 'browser.download.dir')
-  //    .then(function (downloadDir) {
-  //      passbolt.request('passbolt.debug.browser.readPreference', "browser.download.lastDir")
-  //        .then(function (downloadLastDir) {
-  //          passbolt.request('passbolt.file.getPreferredDownloadDirectory')
-  //            .then(function (preferredDownloadDir) {
-  //              var pref = {
-  //                downloadDir: downloadDir,
-  //                downloadLastDir: downloadLastDir,
-  //                preferredDownloadDirectory: preferredDownloadDir
-  //              };
-  //              $browserPreferencesInfo.html(JSON.stringify(pref, undefined, 2));
-  //            });
-  //        });
-  //    });
-  //};
+  /**
+   * Init browser preferences section
+   */
+  var initBrowserPreferencesSection = function () {
+    return passbolt.request('passbolt.debug.browser.readPreference', 'browser.download.dir')
+      .then(function (downloadDir) {
+        passbolt.request('passbolt.debug.browser.readPreference', "browser.download.lastDir")
+          .then(function (downloadLastDir) {
+            passbolt.request('passbolt.file.getPreferredDownloadDirectory')
+              .then(function (preferredDownloadDir) {
+                var pref = {
+                  downloadDir: downloadDir,
+                  downloadLastDir: downloadLastDir,
+                  preferredDownloadDirectory: preferredDownloadDir
+                };
+                $('#browserPreferences').html(JSON.stringify(pref, undefined, 2));
+              });
+          });
+      });
+  };
 
   /* ==================================================================================
    *  Business/
@@ -270,8 +272,7 @@ $(function () {
         $('.my.key-import.feedback')
           .html(feedbackHtml('The key has been imported succesfully.', 'success'));
         return initKeysSection();
-      })
-      .then(null, function (error) {
+      }, function (error) {
         $('.my.key-import.feedback')
           .html(feedbackHtml('something went wrong during the import: ' + error, 'error'));
       });
@@ -287,8 +288,7 @@ $(function () {
         $('.server.key-import.feedback')
           .html(feedbackHtml('The key has been imported successfully.', 'success'));
         return initKeysSection();
-      })
-      .then(null, function (error) {
+      }, function (error) {
         $('.server.key-import.feedback')
           .html(feedbackHtml('something went wrong during the import: ' + error, 'error'));
       });
@@ -331,7 +331,7 @@ $(function () {
             securityToken: {
               color: conf.securityTokenColor,
               textcolor: conf.securityTokenTextColor,
-              code: conf.securityTokenCode,
+              code: conf.securityTokenCode
             }
           }
         };

@@ -60,6 +60,9 @@ PageMod.prototype.__init = function() {
         // We wait for the page mod to initiate the connection
         this.__onIframeConnectInit();
         return;
+      } else if (this.args.include.startsWith(self.data.url())) {
+        this.__onContentConnectInit();
+        return;
       } else {
         this.args.include = new RegExp(this.args.include);
       }
@@ -137,6 +140,19 @@ PageMod.prototype.__onIframeConnectInit = function() {
 };
 
 /**
+ * Content code port init
+ * @private
+ */
+PageMod.prototype.__onContentConnectInit = function() {
+  // We use the content file name as portname
+  var portname = this.args.include;
+  var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/data/';
+  portname = portname.replace(replaceStr, '').replace('.html','');
+  this.portname = portname;
+  this.__initConnectListener(this.portname);
+};
+
+/**
  * When a tab is updated
  *
  * @param tabId
@@ -145,6 +161,11 @@ PageMod.prototype.__onIframeConnectInit = function() {
  * @private
  */
 PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
+  // We can't insert scripts if the url is not https or http
+  // as this is not allowed, instead we insert the scripts manually in the background page if needed
+  if(!tab.url.startsWith('http://') || !tab.url.startsWith('https://')){
+    return;
+  }
 
   // Mapping tabs statuses from chrome -> firefox
   // loading = start
@@ -165,15 +186,7 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
       // otherwise reuse the already an active worker in that tab to accept incoming connection
       this.portname = 'port-' + Crypto.uuid(tabId.toString());
       if (this._tabs.indexOf(tabId) === -1) {
-        console.log('init: ' + this.portname);
         this.__initConnectListener(this.portname, tabId);
-      }
-
-      // We can't insert scripts if the url is chrome-extension://
-      // as this is not allowed, instead we insert the scripts manually in the background page
-      // if needed
-      if(tab.url.startsWith(self.data.url())){
-        return true;
       }
 
       // a helper to handle insertion of scripts, variables and css in target page

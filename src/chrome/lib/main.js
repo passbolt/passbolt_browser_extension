@@ -90,93 +90,89 @@ exports.callbacks = callbacks;
  * for example when you change the list of domains that you are running passbolt on
  */
 var pageMods = {};
-//
-///*
-// * This pagemod allow inserting classes to help any page
-// * to know about the status of the extension, in a modernizr fashion
-// * It also helps the plugin to recognise if a page behave like a passbolt app
-// */
-//pageMods.bootstrap = require('./pagemod/bootstrapPagemod').bootstrap;
-//
-///*
-// * This pagemod help bootstrap the first step of the setup process from a passbolt server app page
-// * The pattern for this url, driving the setup bootstrap, is defined in config.json
-// */
-//var SetupBootstrap = require('./pagemod/setupBootstrapPagemod').SetupBootstrap;
-//pageMods.SetupBootstrap = SetupBootstrap;
-//pageMods.SetupBootstrap.init();
-//
-///*
-// * This page mod drives the reset of setup process
-// * The reset of the setup process is driven on the add-on side, see in ../data/ setup.html and js/setup.js
-// */
-//var Setup = require('./pagemod/setupPagemod').Setup;
-//pageMods.Setup = Setup;
-//pageMods.Setup.init();
-//
-///*
-// * This pagemod drives the dialog/iframe where the user enters the secret key password,
-// * also called passphrase. It is used when encrypting, decrypting, signing, etc.
-// */
-//pageMods.masterPasswordDialog = require('./pagemod/masterPasswordDialogPagemod').masterPasswordDialog;
-//
-///*
-// * This pagemod drives the progress bar iframe
-// * It is used when the add-on is encrypting something
-// */
-//pageMods.progressDialog = require('./pagemod/progressDialogPagemod').progressDialog;
-//
-///*
-// * This pagemod drives the iframe used when the user enter a password to be stored by passbolt
-// * It is used when creating/editing a new password
-// */
-//pageMods.secretEditDialog = require('./pagemod/secretEditDialogPagemod').secretEditDialog;
-//
-///*
-// * This pagemod drives the main addon app
-// * It is inserted in all the pages of a domain that is trusted.
-// * Such trust is defined during the first step of the setup process (or in config-debug)
-// */
-//var PassboltApp = require('./pagemod/passboltAppPagemod').PassboltApp;
-//pageMods.passboltApp = PassboltApp;
-//pageMods.passboltApp.init();
-//
-///*
-// * This pagemod drives the login / authentication
-// */
-//var PassboltAuth = require('./pagemod/passboltAuthPagemod').PassboltAuth;
-//pageMods.passboltAuth = PassboltAuth;
-//pageMods.passboltAuth.init();
-//
-///*
-// * This pagemod drives the login passphrase capture
-// */
-//pageMods.passboltAuthForm = require('./pagemod/passboltAuthFormPagemod').passboltAuthForm;
-//
-///*
-// * This pagemod drives the iframe used when the user share a password
-// * It is used when sharing a new password
-// */
-//pageMods.shareDialog = require('./pagemod/shareDialogPagemod').shareDialog;
-//
-///*
-// * This pagemod drives the iframe used when the user share a password
-// * and he is looking for new users to grant
-// */
-//pageMods.shareAutocompleteDialog = require('./pagemod/shareAutocompleteDialogPagemod').shareAutocompleteDialog;
-//
-///*
-// * This page mod drives a convenience config page for debug
-// * This allows to not have to go through the setup process steps
-// * and perform changes useful for testing that would otherwise break things
-// * Like for example changing the public key only on the client but not the server
-// */
-//if (Config.isDebug()) {
-pageMods.debug = require('./pagemod/debugPagemod').debug;
-//}
 
-var self = require('sdk/self');
-chrome.tabs.create({ url: self.data.url('config-debug.html') });
-//chrome.tabs.create({ url: 'http://passbolt.dev' });
+/*
+ * This pagemod allow inserting classes to help any page
+ * to know about the status of the extension, in a modernizr fashion
+ * It also helps the plugin to recognise if a page behave like a passbolt app
+ */
+pageMods.bootstrap = require('./pagemod/bootstrapPagemod').bootstrap;
+
+/*
+ * This pagemod help bootstrap the first step of the setup process from a passbolt server app page
+ * The pattern for this url, driving the setup bootstrap, is defined in config.json
+ */
+var SetupBootstrap = require('./pagemod/setupBootstrapPagemod').SetupBootstrap;
+pageMods.SetupBootstrap = SetupBootstrap;
+pageMods.SetupBootstrap.init();
+
+/*
+ * This page mod drives the reset of setup process
+ * The reset of the setup process is driven on the add-on side, see in ../data/ setup.html and js/setup.js
+ */
+var Setup = require('./pagemod/setupPagemod').Setup;
+pageMods.Setup = Setup;
+pageMods.Setup.init();
+
+/*
+ * This pagemod drives the dialog/iframe where the user enters the secret key password,
+ * also called passphrase. It is used when encrypting, decrypting, signing, etc.
+ */
+pageMods.masterPasswordDialog = require('./pagemod/masterPasswordDialogPagemod').masterPasswordDialog;
+
+/*
+ * This pagemod drives the progress bar iframe
+ * It is used when the add-on is encrypting something
+ */
+pageMods.progressDialog = require('./pagemod/progressDialogPagemod').progressDialog;
+
+/*
+ * This pagemod drives the iframe used when the user enter a password to be stored by passbolt
+ * It is used when creating/editing a new password
+ */
+pageMods.secretEditDialog = require('./pagemod/secretEditDialogPagemod').secretEditDialog;
+
+/*
+ * This pagemod drives the main addon app
+ * It is inserted in all the pages of a domain that is trusted.
+ * Such trust is defined during the first step of the setup process (or in config-debug)
+ */
+var PassboltApp = require('./pagemod/passboltAppPagemod').PassboltApp;
+pageMods.passboltApp = PassboltApp;
+pageMods.passboltApp.init();
+
+/*
+ * This pagemod drives the login / authentication
+ */
+var PassboltAuth = require('./pagemod/passboltAuthPagemod').PassboltAuth;
+pageMods.passboltAuth = PassboltAuth;
+pageMods.passboltAuth.init();
+
+/*
+ * This pagemod drives the login passphrase capture
+ */
+pageMods.passboltAuthForm = require('./pagemod/passboltAuthFormPagemod').passboltAuthForm;
+
+/*
+ * This pagemod drives the iframe used when the user share a password
+ * It is used when sharing a new password
+ */
+pageMods.shareDialog = require('./pagemod/shareDialogPagemod').shareDialog;
+
+/*
+ * This pagemod drives the iframe used when the user share a password
+ * and he is looking for new users to grant
+ */
+pageMods.shareAutocompleteDialog = require('./pagemod/shareAutocompleteDialogPagemod').shareAutocompleteDialog;
+
+/*
+ * This page mod drives a convenience config page for debug
+ * This allows to not have to go through the setup process steps
+ * and perform changes useful for testing that would otherwise break things
+ * Like for example changing the public key only on the client but not the server
+ */
+if (Config.isDebug()) {
+  pageMods.debug = require('./pagemod/debugPagemod').debug;
+}
 
 exports.pageMods = pageMods;

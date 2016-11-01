@@ -28,7 +28,6 @@ SetupBootstrap.init = function () {
   SetupBootstrap._pageMod = pageMod.PageMod({
     include: new RegExp(Config.read('setupBootstrapRegex') + '.*'),
     contentScriptWhen: 'ready',
-    contentStyleFile: [],
     contentScriptFile: [
       self.data.url('vendors/jquery.min.js'),
       self.data.url('js/lib/message.js'),

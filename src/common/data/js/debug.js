@@ -7,17 +7,11 @@
 
 var passbolt = passbolt || {};
 
-
 $(function () {
 
   // shortcut for selectors
-  var $saveMyKey = $('#saveKey'),
-    $saveServerKey = $('#saveServerKey'),
-    $saveSettings = $('#js_save_conf'),
-    $myKeyAscii = $('#myKeyAscii'),
+  var $myKeyAscii = $('#myKeyAscii'),
     $serverKeyAscii = $('#serverKeyAscii'),
-    $myKeyFilepicker = $('#myKeyFilepicker'),
-    $serverKeyFilepicker = $('#serverKeyFilepicker'),
     $domain = $('#baseUrl'),
     $firstname = $('#ProfileFirstName'),
     $lastname = $('#ProfileLastName'),
@@ -25,84 +19,101 @@ $(function () {
     $userid = $('#UserId'),
     $securityTokenCode = $('#securityTokenCode'),
     $securityTokenColor = $('#securityTokenColor'),
-    $securityTokenTextColor = $('#securityTokenTextColor'),
-    $privateKeyInfo = $('#privkeyinfo'),
-    $serverKeyInfo = $('#pubkeyinfo-server'),
-    $flushLocalStorage = $('#js_flush_conf'),
-    $localStorageInfo = $('#localStorage'),
-    $browserPreferencesInfo = $('#browserPreferences'),
-    $initAppPagemod = $('#initAppPagemod');
+    $securityTokenTextColor = $('#securityTokenTextColor');
 
   /**
-   * Listen to the event passbolt.debug.settings.set
-   * When it is received, then populate fields with the data that we
-   * are supposed to have received in the field js_auto_settings.
-   * The data provided have to be encoded in base64, and in json (once decoded).
+   * Uppercase the first letter
+   * @returns {string}
    */
-  window.addEventListener('passbolt.debug.settings.set', function (event) {
-    $('body').removeClass('debug-data-set');
-
-    var json = $('#js_auto_settings').val();
-    if (json != '') {
-      json = atob(json);
-      var conf = JSON.parse(json);
-
-      $('body').removeClass('debug-data-set');
-      $firstname.val(conf.ProfileFirstName);
-      $lastname.val(conf.ProfileLastName);
-      $username.val(conf.UserUsername);
-      $userid.val(conf.UserId);
-      $domain.val(conf.baseUrl);
-      $securityTokenColor.val(conf.securityTokenColor);
-      $securityTokenTextColor.val(conf.securityTokenTextColor);
-      $securityTokenCode.val(conf.securityTokenCode);
-      $myKeyAscii.val(conf.myKeyAscii);
-      $serverKeyAscii.val(conf.serverKeyAscii);
-      $('body').addClass('debug-data-set');
-    }
-  });
-
-  /* ==================================================================================
-   *  View Helpers
-   * ================================================================================== */
-
-  /**
-   * Display the key information
-   * @param keyInfo
-   * @param keyId
-   * @param keyType
-   */
-  var displayKeyInfo = function (keyInfo, container, keyType) {
-
-    var info = {
-      'uid': (keyType == 'server' ? keyInfo.uid.replace('<', '&lt;').replace('>', '&gt;') : keyInfo.userIds[0].name + ' &lt;' + keyInfo.userIds[0].email + '&gt;'),
-      'fingerprint': keyInfo.fingerprint,
-      'algorithm': keyType == 'server' ? keyInfo.type : keyInfo.algorithm,
-      'created': keyType == 'server' ? keyInfo.key_created : keyInfo.created,
-      'expires': keyInfo.expires
-    };
-    if (keyInfo) {
-      if (keyType == 'client') {
-        var uids = '';
-        for (var i in keyInfo.userIds) {
-          var uid = keyInfo.userIds[i].name + ' &lt;' + keyInfo.userIds[i].email + '&gt;';
-          uids += uid;
-        }
-        info.uid = uids;
-      }
-      $('.uid', container).html(info.uid);
-      $('.fingerprint', container).html(info.fingerprint);
-      $('.algorithm', container).html(info.algorithm);
-      $('.created', container).html(info.created);
-      $('.expires', container).html(info.expires);
-
-    }
-    else {
-      $('.feedback', container).html(feedbackHtml('There is no private key available please upload one.', 'error'));
-    }
+  String.prototype.ucfirst = function () {
+    return this.charAt(0).toUpperCase() + this.slice(1);
   };
 
-  var displayUserInfo = function (user) {
+  /**
+   * initialize the debug page.
+   */
+  var init = function () {
+    // Init the user section
+    initUserSection()
+    // Init the keys section.
+      .always(initKeysSection)
+      // Init the localstorage section.
+      .always(initLocalStorageSection)
+      // Init the browser preferences section.
+      //.then(getBrowserPreferences);
+      // Init event listeners.
+      .always(initEventListeners)
+      // Mark the page as ready
+      .always(function () {
+        $('.config.page').addClass('ready');
+      });
+  };
+
+  /**
+   * Initialize the user section
+   */
+  var initUserSection = function () {
+    var def = $.Deferred();
+    passbolt.request('passbolt.user.get')
+      .then(function (user) {
+        return updateUserForm(user);
+      })
+      .always(function () {
+        def.resolve();
+      });
+    return def;
+  };
+
+  /**
+   * Initialize the key section
+   */
+  var initKeysSection = function () {
+    // Retrieve the user private key.
+    var p1 = passbolt.request('passbolt.keyring.private.get')
+      // Update the client key information.
+      .then(function (keyInfo) {
+        updateKeyInfo(keyInfo, 'client');
+      });
+
+    // Retrieve the server public key.
+    var p2 = passbolt.request('passbolt.keyring.server.get')
+      // Update the server key information.
+      .then(function (keyInfo) {
+        updateKeyInfo(keyInfo, 'server');
+      });
+
+    return $.when(p1, p2);
+  };
+
+  /**
+   * Init the local storage section.
+   */
+  var initLocalStorageSection = function () {
+    passbolt.request('passbolt.debug.config.readAll')
+      .then(function (data) {
+        $('#localStorage').html(JSON.stringify(data, undefined, 2));
+      });
+  };
+
+  /**
+   * Init event listeners.
+   */
+  var initEventListeners = function () {
+    $('#js_save_conf').on('click', onSaveUserSettings);
+    $('#myKeyFilepicker').on('click', onBrowsePrivateKeyFile);
+    $('#serverKeyFilepicker').on('click', onBrowseServerPublicKeyFile);
+    $('#saveKey').on('click', onSaveUserKeyClick);
+    $('#saveServerKey').on('click', onSaveServerKeyClick);
+    $('#js_flush_conf').on('click', onFlushConfClick);
+    $('#initAppPagemod').on('click', onInitAppPagemodClick);
+    window.addEventListener('passbolt.debug.settings.set', onSetDebugSettings);
+  };
+
+  /**
+   * Update the user form.
+   * @param user {array} User information
+   */
+  var updateUserForm = function (user) {
     $firstname.val(user.firstname);
     $lastname.val(user.lastname);
     $username.val(user.username);
@@ -114,122 +125,96 @@ $(function () {
   };
 
   /**
-   * Uppercase the first letter
-   * @returns {string}
+   * Update the key information.
+   * @param keyInfo {array} The key info
+   * @param keyType {string} The key type. Can be: client, server.
    */
-  String.prototype.ucfirst = function () {
-    return this.charAt(0).toUpperCase() + this.slice(1);
+  var updateKeyInfo = function (keyInfo, keyType) {
+    // No key provided
+    if (!keyInfo) {
+      feedbackHtml('There is no private key available please upload one.', 'error');
+      return;
+    }
+
+    // The HTMLElement container.
+    var $keyInfoContainer = $('#privkeyinfo'),
+      $keyField = $myKeyAscii;
+    if (keyType == 'server') {
+      $keyInfoContainer = $('#pubkeyinfo-server');
+      $keyField = $serverKeyAscii;
+    }
+
+    // Format and insert the key uid.
+    var uid = '';
+    for (var i in keyInfo.userIds) {
+      uid += keyInfo.userIds[i].name + ' &lt;' + keyInfo.userIds[i].email + '&gt;';
+    }
+    $('.uid', $keyInfoContainer).html(uid);
+
+    // Insert the other information
+    $('.fingerprint', $keyInfoContainer).html(keyInfo.fingerprint);
+    $('.algorithm', $keyInfoContainer).html(keyInfo.algorithm);
+    $('.created', $keyInfoContainer).html(keyInfo.created);
+    $('.expires', $keyInfoContainer).html(keyInfo.expires);
+    $keyField.val(keyInfo.key);
   };
 
   /**
    * Helper to build feedback message
-   * @param message
-   * @param messageType
+   * @param message {string} The message to display.
+   * @param messageType {string} The message type
    * @returns {string}
    */
   var feedbackHtml = function (message, messageType) {
     return '<div class="message ' + messageType + '"><strong>' + messageType.ucfirst() + ':</strong> ' + message + '</div>';
   };
 
+  ///**
+  // * Get browser preferences
+  // */
+  //var getBrowserPreferences = function () {
+  //  passbolt.request('passbolt.debug.browser.readPreference', 'browser.download.dir')
+  //    .then(function (downloadDir) {
+  //      passbolt.request('passbolt.debug.browser.readPreference', "browser.download.lastDir")
+  //        .then(function (downloadLastDir) {
+  //          passbolt.request('passbolt.file.getPreferredDownloadDirectory')
+  //            .then(function (preferredDownloadDir) {
+  //              var pref = {
+  //                downloadDir: downloadDir,
+  //                downloadLastDir: downloadLastDir,
+  //                preferredDownloadDirectory: preferredDownloadDir
+  //              };
+  //              $browserPreferencesInfo.html(JSON.stringify(pref, undefined, 2));
+  //            });
+  //        });
+  //    });
+  //};
+
   /* ==================================================================================
-   *  View init
+   *  Business/
    * ================================================================================== */
 
   /**
-   * Display key information
-   * Triggered when the page is opened or when a new key is set
+   * Save the user settings.
+   * @param user {array} The user info
+   * @returns {promise}
    */
-  var getKeys = function () {
-    passbolt.request('passbolt.keyring.private.get')
-      .then(function (info) {
-        displayKeyInfo(info, $privateKeyInfo, 'client');
-        $myKeyAscii.val(info.key);
-      })
-      .then(null, function () {
-        // @todo PASSBOLT-1470
-        // console.log('passbolt.keyring.private.get fail: no private key set');
-      });
-
-    passbolt.request('passbolt.keyring.server.get')
-      .then(function (info) {
-        displayKeyInfo(info, $serverKeyInfo, 'client');
-        $serverKeyAscii.val(info.key);
-      })
-      .then(null, function () {
-        // @todo PASSBOLT-1470
-        //console.log('passbolt.keyring.server.get fail: no private key set');
-      });
+  var saveUserSettings = function (user) {
+    return passbolt.request('passbolt.user.set', user).then(
+      function () {
+        $('.user.feedback').html(feedbackHtml('User and settings have been saved!', 'success'));
+      },
+      function (msg) {
+        $('.user.feedback').html(feedbackHtml(msg, 'error'));
+      }
+    );
   };
 
   /**
-   * Get the user settings
+   * Extract the user settings form information
+   * @return {array}
    */
-  var getUser = function () {
-    passbolt.request('passbolt.user.get')
-      .then(function (user) {
-        displayUserInfo(user);
-      })
-      .then(null, function (e) {
-        // @todo PASSBOLT-1470
-        //console.log('passbolt.user.get fail: no user set');
-        //console.log(e);
-      });
-  };
-
-  /**
-   * Get local storage info
-   */
-  var getLocalStorageInfo = function () {
-    //JSON.stringify(data, undefined, 2);
-    passbolt.request('passbolt.debug.config.readAll')
-      .then(function (data) {
-        $localStorageInfo.html(JSON.stringify(data, undefined, 2));
-      });
-  };
-
-  /**
-   * Get browser preferences
-   */
-  var getBrowserPreferences = function () {
-    passbolt.request('passbolt.debug.browser.readPreference', 'browser.download.dir')
-      .then(function (downloadDir) {
-        passbolt.request('passbolt.debug.browser.readPreference', "browser.download.lastDir")
-          .then(function (downloadLastDir) {
-            passbolt.request('passbolt.file.getPreferredDownloadDirectory')
-              .then(function (preferredDownloadDir) {
-                var pref = {
-                  downloadDir: downloadDir,
-                  downloadLastDir: downloadLastDir,
-                  preferredDownloadDirectory: preferredDownloadDir
-                };
-                $browserPreferencesInfo.html(JSON.stringify(pref, undefined, 2));
-              });
-          });
-      });
-  };
-
-  /**
-   * At startup read configuration and load baseurl
-   */
-  var init = function () {
-    getUser();
-    getKeys();
-    getLocalStorageInfo();
-    getBrowserPreferences();
-  };
-  init();
-
-
-  /* ==================================================================================
-   *  View Events Listeners
-   * ================================================================================== */
-
-  /**
-   * Event: When user press plugin configuration save button
-   * Save the baseurl, user info, etc.
-   */
-  $saveSettings.click(function () {
-    // Get the data from the input fields
+  var extractFormUserSettings = function () {
     var user = {};
     user.firstname = $firstname.val();
     user.lastname = $lastname.val();
@@ -242,98 +227,124 @@ $(function () {
       textcolor: $securityTokenTextColor.val()
     };
     user.settings.domain = $domain.val();
+    return user;
+  };
 
-    // try to save the username
-    passbolt.request('passbolt.user.set', user).then(
-      function success() {
-        $('.user.feedback').html(feedbackHtml('User and settings have been saved!', 'success'));
-      },
-      function error(msg) {
-        $('.user.feedback').html(feedbackHtml(msg, 'error'));
-      }
-    );
-
-  });
+  /* ==================================================================================
+   *  Events handlers.
+   * ================================================================================== */
 
   /**
-   * Event: When user press browse button for the personal key selection
-   * Place the content of the file in the textarea
+   * Handle save user settings button click.
    */
-  $myKeyFilepicker.click(function () {
+  var onSaveUserSettings = function () {
+    var user = extractFormUserSettings();
+    saveUserSettings(user);
+  };
+
+  /**
+   * Handle browse private key file button click.
+   */
+  var onBrowsePrivateKeyFile = function () {
     passbolt.request('passbolt.file.prompt')
-      .then(function (data) {
-        $myKeyAscii.val(data);
+      .then(function (key) {
+        $myKeyAscii.val(key);
       });
-  });
+  };
 
   /**
-   * Event: When user press browse button for the server key selection
-   * Place the content of the file in the textarea
+   * Handle browse server public key file button click.
    */
-  $serverKeyFilepicker.click(function () {
+  var onBrowseServerPublicKeyFile = function () {
     passbolt.request('passbolt.file.prompt')
-      .then(function (data) {
-        $serverKeyAscii.val(data);
+      .then(function (key) {
+        $serverKeyAscii.val(key);
       });
-  });
+  };
 
   /**
-   * Event: When the user press the save my key settings button
-   * Save the private key and deduce public key from it
+   * Handle save user key button click
    */
-  $saveMyKey.click(function () {
+  var onSaveUserKeyClick = function () {
     var key = $myKeyAscii.val();
-
     passbolt.request('passbolt.keyring.private.import', key)
       .then(function () {
-        // Display info.
-        passbolt.request('passbolt.keyring.private.get').then(function (info) {
-          displayKeyInfo(info, $privateKeyInfo, 'client');
-        });
-
-        $('.my.key-import.feedback').html(feedbackHtml('The key has been imported succesfully.', 'success'));
+        $('.my.key-import.feedback')
+          .html(feedbackHtml('The key has been imported succesfully.', 'success'));
+        return initKeysSection();
       })
-      .then(null, function (params) {
-        $('.my.key-import.feedback').html(feedbackHtml('something went wrong during the import: ' + params, 'error'));
+      .then(null, function (error) {
+        $('.my.key-import.feedback')
+          .html(feedbackHtml('something went wrong during the import: ' + error, 'error'));
       });
-  });
+  };
 
   /**
-   * Event: When the user press the save private key settings button
-   * Save the public server key and update the info on the page
+   * Handle save server key button click
    */
-  $saveServerKey.click(function () {
+  var onSaveServerKeyClick = function () {
     var serverKey = $serverKeyAscii.val();
     passbolt.request('passbolt.keyring.server.import', serverKey)
       .then(function () {
-        passbolt.request('passbolt.keyring.public.info', serverKey)
-          .then(function (info) {
-            displayKeyInfo(info, $serverKeyInfo, 'client');
-            $('.server.key-import.feedback').html(feedbackHtml('The key has been imported successfully.', 'success'));
-          })
-          .then(null, function () {
-            $('.server.key-import.feedback').html(feedbackHtml('something went south when trying to display the key info', 'error'));
-          });
+        $('.server.key-import.feedback')
+          .html(feedbackHtml('The key has been imported successfully.', 'success'));
+        return initKeysSection();
       })
-      .then(null, function (params) {
-        $('.server.key-import.feedback').html(feedbackHtml('something went wrong during the import: ' + params, 'error'));
+      .then(null, function (error) {
+        $('.server.key-import.feedback')
+          .html(feedbackHtml('something went wrong during the import: ' + error, 'error'));
       });
-  });
+  };
 
   /**
-   * Event: When the user press the flush local storage button
-   * Flush the local storage
+   * Handle flush conf button click
    */
-  $flushLocalStorage.click(function () {
+  var onFlushConfClick = function () {
     passbolt.message.emit('passbolt.debug.config.flush');
-  });
+  };
 
   /**
-   * Event: When the user press the init app pagemod button
-   * Request the initialization of the app page mod
+   * Handle init app pagemod button click
    */
-  $initAppPagemod.click(function () {
+  var onInitAppPagemodClick = function () {
     passbolt.message.emit('passbolt.debug.appPagemod.init');
-  });
+  };
 
+  /**
+   * Handle set debug settings event.
+   * Selenium use it to fill the debug page faster.
+   */
+  var onSetDebugSettings = function () {
+    $('body').removeClass('debug-data-set');
+
+    // Retrieve data that have been injected in the js_auto_settings field.
+    var json = $('#js_auto_settings').val();
+    if (json != '') {
+      // Decode the data : base64 & json
+      json = atob(json);
+      var conf = JSON.parse(json),
+        user = {
+          firstname: conf.ProfileFirstName,
+          lastname: conf.ProfileLastName,
+          username: conf.UserUsername,
+          id: conf.UserId,
+          settings: {
+            domain: conf.baseUrl,
+            securityToken: {
+              color: conf.securityTokenColor,
+              textcolor: conf.securityTokenTextColor,
+              code: conf.securityTokenCode
+            }
+          }
+        };
+      updateUserForm(user);
+      $myKeyAscii.val(conf.myKeyAscii);
+      $serverKeyAscii.val(conf.serverKeyAscii);
+    }
+
+    $('body').addClass('debug-data-set');
+  };
+
+  // Init the debug page.
+  init();
 });

@@ -149,7 +149,6 @@ PageMod.prototype.__onContentConnectInit = function() {
   var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/data/';
   portname = portname.replace(replaceStr, '').replace('.html','');
   this.portname = portname;
-  console.log('__onContentConnectInit call' + this.portname);
   this.__initConnectListener(this.portname);
 };
 
@@ -187,7 +186,6 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
       // otherwise reuse the already an active worker in that tab to accept incoming connection
       this.portname = 'port-' + Crypto.uuid(tabId.toString());
       if (this._tabs.indexOf(tabId) === -1) {
-        console.log('init: ' + this.portname);
         this.__initConnectListener(this.portname, tabId);
       }
 

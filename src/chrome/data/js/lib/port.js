@@ -163,7 +163,6 @@ var self = self || {};
    */
   Port.get = function(portname) {
     if(typeof self.port === 'undefined' || !self.port._connected) {
-      console.log('connecting to:' + portname);
       self.port = new Port(portname);
     }
     return self.port;

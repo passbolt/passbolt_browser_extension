@@ -40,7 +40,7 @@ $(function () {
       // Init the localstorage section.
       .always(initLocalStorageSection)
       // Init the browser preferences section.
-      //.then(getBrowserPreferences);
+      .then(initBrowserPreferencesSection)
       // Init event listeners.
       .always(initEventListeners)
       // Mark the page as ready
@@ -169,26 +169,26 @@ $(function () {
     return '<div class="message ' + messageType + '"><strong>' + messageType.ucfirst() + ':</strong> ' + message + '</div>';
   };
 
-  ///**
-  // * Get browser preferences
-  // */
-  //var getBrowserPreferences = function () {
-  //  passbolt.request('passbolt.debug.browser.readPreference', 'browser.download.dir')
-  //    .then(function (downloadDir) {
-  //      passbolt.request('passbolt.debug.browser.readPreference', "browser.download.lastDir")
-  //        .then(function (downloadLastDir) {
-  //          passbolt.request('passbolt.file.getPreferredDownloadDirectory')
-  //            .then(function (preferredDownloadDir) {
-  //              var pref = {
-  //                downloadDir: downloadDir,
-  //                downloadLastDir: downloadLastDir,
-  //                preferredDownloadDirectory: preferredDownloadDir
-  //              };
-  //              $browserPreferencesInfo.html(JSON.stringify(pref, undefined, 2));
-  //            });
-  //        });
-  //    });
-  //};
+  /**
+   * Init browser preferences section
+   */
+  var initBrowserPreferencesSection = function () {
+    return passbolt.request('passbolt.debug.browser.readPreference', 'browser.download.dir')
+      .then(function (downloadDir) {
+        passbolt.request('passbolt.debug.browser.readPreference', "browser.download.lastDir")
+          .then(function (downloadLastDir) {
+            passbolt.request('passbolt.file.getPreferredDownloadDirectory')
+              .then(function (preferredDownloadDir) {
+                var pref = {
+                  downloadDir: downloadDir,
+                  downloadLastDir: downloadLastDir,
+                  preferredDownloadDirectory: preferredDownloadDir
+                };
+                $browserPreferencesInfo.html(JSON.stringify(pref, undefined, 2));
+              });
+          });
+      });
+  };
 
   /* ==================================================================================
    *  Business/
@@ -272,8 +272,7 @@ $(function () {
         $('.my.key-import.feedback')
           .html(feedbackHtml('The key has been imported succesfully.', 'success'));
         return initKeysSection();
-      })
-      .then(null, function (error) {
+      }, function (error) {
         $('.my.key-import.feedback')
           .html(feedbackHtml('something went wrong during the import: ' + error, 'error'));
       });
@@ -289,8 +288,7 @@ $(function () {
         $('.server.key-import.feedback')
           .html(feedbackHtml('The key has been imported successfully.', 'success'));
         return initKeysSection();
-      })
-      .then(null, function (error) {
+      }, function (error) {
         $('.server.key-import.feedback')
           .html(feedbackHtml('something went wrong during the import: ' + error, 'error'));
       });

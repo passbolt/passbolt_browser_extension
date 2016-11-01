@@ -57,7 +57,8 @@ exports.openFile = openFile;
  */
 function getPreferredDownloadsDirectory() {
   var deferred = defer();
-  return deferred.reject(new Error('chrome/lib/fileController::getPreferredDownloadsDirectory missing'));
+  deferred.reject(new Error('chrome/lib/fileController::getPreferredDownloadsDirectory missing'));
+  return deferred.promise;
 }
 exports.getPreferredDownloadsDirectory = getPreferredDownloadsDirectory;
 

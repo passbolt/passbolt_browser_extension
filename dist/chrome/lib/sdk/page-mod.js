@@ -7,7 +7,9 @@
  */
 var ScriptExecution = require('vendors/scriptExecution').ScriptExecution;
 var Crypto = require('model/crypto').Crypto;
+
 var Worker = require('sdk/worker').Worker;
+var self = require('sdk/self');
 
 /**
  * PageMod Chrome Wrapper
@@ -58,6 +60,9 @@ PageMod.prototype.__init = function() {
         // We wait for the page mod to initiate the connection
         this.__onIframeConnectInit();
         return;
+      } else if (this.args.include.startsWith(self.data.url())) {
+        this.__onContentConnectInit();
+        return;
       } else {
         this.args.include = new RegExp(this.args.include);
       }
@@ -76,7 +81,6 @@ PageMod.prototype.__init = function() {
   // fired when a tab is replaced with another tab due to prerendering or instant.
   // see. https://bugs.chromium.org/p/chromium/issues/detail?id=109557
   chrome.tabs.onReplaced.addListener(function (addedTabId, removedTabId) {
-    console.warn('onReplaced' + addedTabId + ":" + removedTabId);
     chrome.tabs.get(addedTabId, function(tab){
       _this.__onTabUpdated(tab.id, {status:'complete'}, tab);
     });
@@ -136,6 +140,19 @@ PageMod.prototype.__onIframeConnectInit = function() {
 };
 
 /**
+ * Content code port init
+ * @private
+ */
+PageMod.prototype.__onContentConnectInit = function() {
+  // We use the content file name as portname
+  var portname = this.args.include;
+  var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/data/';
+  portname = portname.replace(replaceStr, '').replace('.html','');
+  this.portname = portname;
+  this.__initConnectListener(this.portname);
+};
+
+/**
  * When a tab is updated
  *
  * @param tabId
@@ -144,6 +161,11 @@ PageMod.prototype.__onIframeConnectInit = function() {
  * @private
  */
 PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
+  // We can't insert scripts if the url is not https or http
+  // as this is not allowed, instead we insert the scripts manually in the background page if needed
+  if(!tab.url.startsWith('http://') || !tab.url.startsWith('https://')){
+    return;
+  }
 
   // Mapping tabs statuses from chrome -> firefox
   // loading = start
@@ -171,8 +193,6 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
       var scriptExecution = new ScriptExecution(tabId);
 
       // set portname in content code as global variable to be used by data/js/port.js
-      // TODO don't insert portname if already inserted by a different worker
-      // TODO better namespacing
       scriptExecution.setGlobals({portname: this.portname});
 
       // Set JS global variables if needed
@@ -184,7 +204,12 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
       var scripts = [];
       if (typeof this.args.contentScriptFile !== 'undefined' && this.args.contentScriptFile.length) {
         scripts = this.args.contentScriptFile.slice();
+        // remove chrome-extension baseUrl from self.data.url
+        // since when inserted in a page the url are relative to /data already
+        var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/data/';
+        scripts = scripts.map(function(x){return x.replace(replaceStr, '');});
       }
+
       // TODO don't insert if the JS if its already inserted
       scripts.unshift('js/lib/port.js'); // add a firefox-like self.port layer
       scriptExecution.injectScripts(scripts);

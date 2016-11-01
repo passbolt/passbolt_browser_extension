@@ -142,6 +142,7 @@ var listen = function (worker) {
       keyring.importPrivate(privateKeyArmored);
       worker.port.emit('passbolt.keyring.private.import.complete', requestId, 'SUCCESS');
     } catch (e) {
+      console.log(e);
       worker.port.emit('passbolt.keyring.private.import.complete', requestId, 'ERROR', privateKeyArmored)
     }
   });

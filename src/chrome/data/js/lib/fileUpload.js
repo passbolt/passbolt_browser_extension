@@ -9,7 +9,6 @@ $(function () {
   function fileUpload(request, sender, sendResponse) {
 
     if (request.custom == "passbolt.file.open") {
-      alert('test');
       var fileChooser = document.createElement('input');
       fileChooser.type = 'file';
 

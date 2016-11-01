@@ -40,7 +40,7 @@ $(function () {
       // Init the localstorage section.
       .always(initLocalStorageSection)
       // Init the browser preferences section.
-      .then(initBrowserPreferencesSection)
+      //.then(initBrowserPreferencesSection)
       // Init event listeners.
       .always(initEventListeners)
       // Mark the page as ready

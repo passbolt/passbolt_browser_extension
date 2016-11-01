@@ -111,7 +111,7 @@ Keyring.prototype.flush = function (type) {
 
   // Removed latestSync variable.
   // We consider that the keyring has never been synced.
-  storage.deleteItem('latestSync');
+  storage.removeItem('latestSync');
 };
 
 /**

@@ -86,7 +86,7 @@ exports.isDebug = isDebug;
  * Flush the local storage config.
  */
 var flush = function () {
-  storage.deleteItem('config');
+  storage.removeItem('config');
 };
 exports.flush = flush;
 

@@ -12,7 +12,7 @@ var app = require('../main');
 var pageMod = require('sdk/page-mod');
 var Worker = require('../model/worker');
 var user = new (require('../model/user').User)();
-
+alert('bootstrap');
 var appBootstrap = pageMod.PageMod({
   include: '*',
   contentScriptWhen: 'ready',

@@ -157,7 +157,7 @@ Setup.prototype.getNavigationHistory = function () {
  * Flush storage from setup data.
  */
 Setup.prototype.flush = function () {
-  storage.deleteItem(this.storageKeyName);
+  storage.removeItem(this.storageKeyName);
 };
 
 /**

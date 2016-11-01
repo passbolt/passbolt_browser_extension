@@ -9,6 +9,7 @@
  */
 var self = require('sdk/self');
 var pageMod = require('sdk/page-mod');
+
 var app = require('../main');
 var Worker = require('../model/worker');
 
@@ -16,15 +17,10 @@ var Worker = require('../model/worker');
  * This pagemod help bootstrap the first step of the setup process from a passbolt server app page
  * The pattern for this url, driving the setup bootstrap, is defined in config.json
  */
-
-var Setup = function () {
-};
+var Setup = function () {};
 Setup._pageMod = undefined;
-Setup.id = 0;
-Setup.current;
 
 Setup.init = function () {
-  Setup.id++;
 
   if (typeof Setup._pageMod !== 'undefined') {
     Setup._pageMod.destroy();
@@ -32,6 +28,10 @@ Setup.init = function () {
 
   Setup._pageMod = pageMod.PageMod({
     include: self.data.url('setup.html'),
+
+    // Warning:
+    // If you modify the following script and styles don't forget to also modify then in
+    // chrome/data/setup.html and chrome/data/js/load/setup.js
     contentScriptWhen: 'end',
     contentScriptFile: [
       self.data.url('vendors/jquery.min.js'),

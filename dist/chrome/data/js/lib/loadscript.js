@@ -1,31 +1,38 @@
-// loads an individual script
+/**
+ * Load scripts using promises resolved once state is marked as complete
+ * Allow to ensure one script initialization is performed before inserting the next one
+ *
+ * @credit http://stackoverflow.com/users/3761179/matt
+ * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ */
+/**
+ * Loads an individual script
+ * @param {string} path
+ * @return {Promise}
+ */
 var loadScript = function (path) {
-  // generate promise
-  return new Promise(function (fulfill, reject) {
-    // create object
+  return new Promise(function (resolve, reject) {
     var script = document.createElement('script');
-
-    // when it loads or the ready state changes
     script.onload = script.onreadystatechange = function () {
-      // make sure it's finished, then fullfill the promise
-      if (!this.readyState || this.readyState == 'complete') fulfill(this);
+      if (!this.readyState || this.readyState == 'complete') {
+        resolve(this);
+      }
     };
-
-    // begin loading it
     script.src = path;
-
-    // add to head
     document.getElementsByTagName('head')[0].appendChild(script);
   });
 };
 
-// this is the one you want
+/**
+ * Load an array of script path
+ * @param {array} scripts
+ * @return {Promise}
+ */
 var loadScripts = function (scripts) {
   return scripts.reduce(function (queue, path) {
-    // once the current item on the queue has loaded, load the next one
     return queue.then(function () {
-      // individual script
       return loadScript(path);
     });
-  }, Promise.resolve() /* this bit is so queue is always a promise */);
+  }, Promise.resolve());
 };

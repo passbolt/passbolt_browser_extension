@@ -6,23 +6,27 @@ var scripts = [
   'vendors/ejs_production.js',
   'vendors/farbtastic.js',
   'js/lib/port.js',
-  'js/lib/message.js',
-  'js/lib/request.js',
-  'js/lib/html.js',
-  'js/lib/secretComplexity.js',
-  'js/setup/workflow/installSetup.workflow.js',
-  'js/setup/workflow/recoverSetup.workflow.js',
-  'js/setup/step/domainCheck.js',
-  'js/setup/step/defineKey.js',
-  'js/setup/step/importKey.js',
-  'js/setup/step/secret.js',
-  'js/setup/step/generateKey.js',
-  'js/setup/step/backupKey.js',
-  'js/setup/step/keyInfo.js',
-  'js/setup/step/securityToken.js',
-  'js/setup/step/loginRedirection.js',
-  'js/setup/setup.js'
 ];
 loadScripts(scripts).then(function () {
-  // all done!
+  var scripts = [
+    'js/lib/message.js',
+    'js/lib/request.js',
+    'js/lib/html.js',
+    'js/lib/secretComplexity.js',
+    'js/setup/workflow/installSetup.workflow.js',
+    'js/setup/workflow/recoverSetup.workflow.js',
+    'js/setup/step/domainCheck.js',
+    'js/setup/step/defineKey.js',
+    'js/setup/step/importKey.js',
+    'js/setup/step/secret.js',
+    'js/setup/step/generateKey.js',
+    'js/setup/step/backupKey.js',
+    'js/setup/step/keyInfo.js',
+    'js/setup/step/securityToken.js',
+    'js/setup/step/loginRedirection.js',
+    'js/setup/setup.js'
+  ];
+  loadScripts(scripts).then(function () {
+    // all done!
+  });
 });

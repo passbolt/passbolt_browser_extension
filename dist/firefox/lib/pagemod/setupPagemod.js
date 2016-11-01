@@ -21,10 +21,7 @@ var Setup = function () {};
 Setup._pageMod = undefined;
 
 Setup.init = function () {
-<<<<<<< HEAD
-=======
 
->>>>>>> feature/PASSBOLT-1725-r4
   if (typeof Setup._pageMod !== 'undefined') {
     Setup._pageMod.destroy();
   }

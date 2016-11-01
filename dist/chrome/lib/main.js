@@ -172,7 +172,7 @@ pageMods.shareAutocompleteDialog = require('./pagemod/shareAutocompleteDialogPag
  * Like for example changing the public key only on the client but not the server
  */
 if (Config.isDebug()) {
-pageMods.debug = require('./pagemod/debugPagemod').debug;
+  pageMods.debug = require('./pagemod/debugPagemod').debug;
 }
 
 exports.pageMods = pageMods;

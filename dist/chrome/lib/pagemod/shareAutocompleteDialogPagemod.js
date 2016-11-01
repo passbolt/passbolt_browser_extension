@@ -32,10 +32,6 @@ var shareAutocompleteDialog = pageMod.PageMod({
     self.data.url('js/secret/shareAutocomplete.js')
   ],
   contentScriptWhen: 'ready',
-  contentScriptOptions: {
-    expose_messaging: false,
-    addonDataPath: self.data.url()
-  },
   onAttach: function (worker) {
     Worker.add('ShareAutocomplete', worker);
     app.events.config.listen(worker);

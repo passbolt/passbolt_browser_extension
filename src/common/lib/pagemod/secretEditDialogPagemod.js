@@ -33,10 +33,6 @@ var secretEditDialog = pageMod.PageMod({
     self.data.url('js/secret/edit.js')
   ],
   contentScriptWhen: 'ready',
-  contentScriptOptions: {
-    expose_messaging: false,
-    addonDataPath: self.data.url()
-  },
   onAttach: function (worker) {
     Worker.add('Secret', worker, {
       // on destroy, clean.

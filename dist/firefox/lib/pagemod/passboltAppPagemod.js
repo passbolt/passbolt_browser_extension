@@ -18,7 +18,6 @@ var TabStorage = require('../model/tabStorage').TabStorage;
 var PassboltApp = function () {
 };
 PassboltApp._pageMod = null;
-PassboltApp.id = 0;
 
 PassboltApp.exists = function () {
   return PassboltApp._pageMod !== null;
@@ -32,9 +31,6 @@ PassboltApp.destroy = function () {
 };
 
 PassboltApp.initPageMod = function () {
-  // Count the number of initializations.
-  PassboltApp.id++;
-
   // Attach on passbolt application pages.
   // By instance if your application domain is : https://demo.passbolt.com
   // The pagemod will be attached to the following pages :
@@ -62,10 +58,6 @@ PassboltApp.initPageMod = function () {
       self.data.url('js/progress/iframe.js'),
       self.data.url('js/app.js')
     ],
-    contentScriptOptions: {
-      baseUrl: user.settings.getDomain(),
-      id: PassboltApp.id
-    },
     attachTo: ["existing", "top"],
     onAttach: function (worker) {
       TabStorage.initStorage(worker.tab);

@@ -50,13 +50,17 @@ module.exports = function (grunt) {
           stderr: false
         },
         command: [
+          "cp <%= config.build.firefox.path %>/lib/config/config.json <%= config.build.firefox.path %>/lib/config/config.json.original",
           "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": true/' <%= config.build.firefox.path %>/lib/config/config.json",
           './node_modules/jpm/bin/jpm xpi --addon-dir <%= config.build.firefox.path %>',
           "mv <%= config.build.firefox.path %>/passbolt.xpi <%= config.build.firefox.path %>/passbolt-<%= pkg.version %>-debug.xpi",
           "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' <%= config.build.firefox.path %>/lib/config/config.json",
           './node_modules/jpm/bin/jpm xpi --addon-dir <%= config.build.firefox.path %>',
           "mv <%= config.build.firefox.path %>/passbolt.xpi <%= config.build.firefox.path %>/passbolt-<%= pkg.version %>.xpi",
-          'ln -s passbolt-<%= pkg.version %>-debug.xpi <%= config.build.firefox.path %>/passbolt-latest@passbolt.com.xpi'
+          'ln -s passbolt-<%= pkg.version %>-debug.xpi <%= config.build.firefox.path %>/passbolt-latest@passbolt.com.xpi',
+          "rm <%= config.build.firefox.path %>/lib/config/config.json",
+          "cp <%= config.build.firefox.path %>/lib/config/config.json.original <%= config.build.firefox.path %>/lib/config/config.json",
+          "rm <%= config.build.firefox.path %>/lib/config/config.json.original",
         ].join('&&')
       },
       install_xpi: {
@@ -73,11 +77,15 @@ module.exports = function (grunt) {
           stderr: true
         },
         command: [
+          "cp <%= config.build.chrome.path %>/lib/config/config.json <%= config.build.chrome.path %>/lib/config/config.json.original",
           "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": true/' <%= config.build.chrome.path %>/lib/config/config.json",
           './node_modules/crx/bin/crx.js pack <%= config.build.chrome.path %> -p key.pem -o <%= config.build.chrome.path %>/passbolt-<%= pkg.version %>-debug.crx',
           "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' <%= config.build.chrome.path %>/lib/config/config.json",
           './node_modules/crx/bin/crx.js pack <%= config.build.chrome.path %> -p key.pem -o <%= config.build.chrome.path %>/passbolt-<%= pkg.version %>.crx',
-          'ln -s passbolt-<%= pkg.version %>-debug.crx <%= config.build.chrome.path %>/passbolt-latest@passbolt.com.crx'
+          'ln -s passbolt-<%= pkg.version %>-debug.crx <%= config.build.chrome.path %>/passbolt-latest@passbolt.com.crx',
+          "rm <%= config.build.chrome.path %>/lib/config/config.json",
+          "cp <%= config.build.chrome.path %>/lib/config/config.json.original <%= config.build.chrome.path %>/lib/config/config.json",
+          "rm <%= config.build.chrome.path %>/lib/config/config.json.original",
         ].join('&&')
       }
     },

@@ -13,9 +13,6 @@ var pageMod = require('sdk/page-mod');
 var Config = require('../model/config');
 var Worker = require('../model/worker');
 
-// @TODO make sure we load the pagemod only if the plugin is not already configured
-// @TODO delete the pagemod if the config is complete
-
 var SetupBootstrap = function () {
 };
 SetupBootstrap._pageMod = undefined;
@@ -28,6 +25,7 @@ SetupBootstrap.init = function () {
   SetupBootstrap._pageMod = pageMod.PageMod({
     include: new RegExp(Config.read('setupBootstrapRegex') + '.*'),
     contentScriptWhen: 'ready',
+    contentStyleFile: [],
     contentScriptFile: [
       self.data.url('vendors/jquery.min.js'),
       self.data.url('js/lib/message.js'),

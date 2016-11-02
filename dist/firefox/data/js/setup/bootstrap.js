@@ -23,9 +23,8 @@
   };
 
   // If this script is loaded, that means the current page is targeting the first step of
-  // the wizard installer. The step which is provided by the backend of passbolt.
+  // the setup. The step which is provided by the backend of passbolt.
   // Retrieve all the information we need from the url.
-  // @TODO move that up to addon code
 
   // Retrieve the setup bootstrap regex.
   passbolt.request('passbolt.config.read', 'setupBootstrapRegex')

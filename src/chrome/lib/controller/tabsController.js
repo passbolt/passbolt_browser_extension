@@ -29,13 +29,13 @@ exports.getActiveTabUrl = getActiveTabUrl;
  */
 var setActiveTabUrl = function (url) {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    var tab = tabs[0],
-      regex = new RegExp('/:\/\//');
+    var tab = tabs[0];
 
-    // If the url targets a local resource.
-    if (regex.exec(window.location.href) == null) {
-      url = '/data/' + url;
-    }
+    // In case the url given was generated using self.data.url
+    // remove the chrome-extension://<plugin id>/ part of the url
+    // since it's added again by chrome.tabs.update
+    var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/';
+    url = url.replace(replaceStr, '');
 
     chrome.tabs.update(tab.id, {url: url});
   });

@@ -129,12 +129,12 @@ pageMods.passboltAuth.init();
  */
 pageMods.passboltAuthForm = require('./pagemod/passboltAuthFormPagemod').passboltAuthForm;
 
-///*
-// * This pagemod drives the progress bar iframe
-// * It is used when the add-on is encrypting something
-// */
-//pageMods.progressDialog = require('./pagemod/progressDialogPagemod').progressDialog;
-//
+/*
+ * This pagemod drives the progress bar iframe
+ * It is used when the add-on is encrypting something
+ */
+pageMods.progressDialog = require('./pagemod/progressDialogPagemod').progressDialog;
+
 ///*
 // * This pagemod drives the iframe used when the user enter a password to be stored by passbolt
 // * It is used when creating/editing a new password

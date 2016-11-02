@@ -163,7 +163,7 @@ PageMod.prototype.__onContentConnectInit = function() {
 PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
   // We can't insert scripts if the url is not https or http
   // as this is not allowed, instead we insert the scripts manually in the background page if needed
-  if(!tab.url.startsWith('http://') || !tab.url.startsWith('https://')){
+  if (!(tab.url.startsWith('http://') || tab.url.startsWith('https://'))) {
     return;
   }
 
@@ -180,6 +180,7 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
 
     // if the url match the pagemod requested pattern
     if (tab.url.match(this.args.include)) {
+      console.log('url match' + this.args.include);
 
       // if there is not already a worker in that tab
       // generate a portname based on the tab it and listen to connect event
@@ -201,12 +202,12 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
       }
 
       // Inject JS files if needed
+      var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/data/';
       var scripts = [];
       if (typeof this.args.contentScriptFile !== 'undefined' && this.args.contentScriptFile.length) {
         scripts = this.args.contentScriptFile.slice();
         // remove chrome-extension baseUrl from self.data.url
         // since when inserted in a page the url are relative to /data already
-        var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/data/';
         scripts = scripts.map(function(x){return x.replace(replaceStr, '');});
       }
 
@@ -215,9 +216,14 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
       scriptExecution.injectScripts(scripts);
 
       // Inject CSS files if needed
+      var styles = [];
       if (typeof this.args.contentStyleFile !== 'undefined' && this.args.contentStyleFile.length) {
+        styles = this.args.contentStyleFile.slice();
+        // Like for scripts, remove chrome-extension baseUrl from self.data.url
+        styles = styles.map(function(x){return x.replace(replaceStr, '');});
+
         // TODO don't insert if the CSS is already inserted
-        scriptExecution.injectCss(this.args.contentStyleFile);
+        scriptExecution.injectCss(styles);
       }
     }
   }

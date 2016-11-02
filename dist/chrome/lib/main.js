@@ -12,7 +12,7 @@ if (Config.isDebug() == true) {
   require('./controller/consoleController').setLogLevel('all');
 }
 
-/* ==================================================================================
+/* ===================================================Î===============================
  *  Events
  *
  *  Events help the addon code interact with content code via content/workers
@@ -44,10 +44,7 @@ events.share = require('./event/shareEvents');
 events.shareAutocomplete = require('./event/shareAutocompleteEvents');
 events.template = require('./event/templateEvents');
 events.user = require('./event/userEvents');
-
-if (Config.isDebug()) {
-  events.debug = require('./event/debugEvents');
-}
+events.debug = require('./event/debugEvents');
 
 exports.events = events;
 
@@ -121,27 +118,6 @@ pageMods.Setup.init();
 pageMods.masterPasswordDialog = require('./pagemod/masterPasswordDialogPagemod').masterPasswordDialog;
 
 /*
- * This pagemod drives the progress bar iframe
- * It is used when the add-on is encrypting something
- */
-pageMods.progressDialog = require('./pagemod/progressDialogPagemod').progressDialog;
-
-/*
- * This pagemod drives the iframe used when the user enter a password to be stored by passbolt
- * It is used when creating/editing a new password
- */
-pageMods.secretEditDialog = require('./pagemod/secretEditDialogPagemod').secretEditDialog;
-
-/*
- * This pagemod drives the main addon app
- * It is inserted in all the pages of a domain that is trusted.
- * Such trust is defined during the first step of the setup process (or in config-debug)
- */
-var PassboltApp = require('./pagemod/passboltAppPagemod').PassboltApp;
-pageMods.passboltApp = PassboltApp;
-pageMods.passboltApp.init();
-
-/*
  * This pagemod drives the login / authentication
  */
 var PassboltAuth = require('./pagemod/passboltAuthPagemod').PassboltAuth;
@@ -153,17 +129,38 @@ pageMods.passboltAuth.init();
  */
 pageMods.passboltAuthForm = require('./pagemod/passboltAuthFormPagemod').passboltAuthForm;
 
-/*
- * This pagemod drives the iframe used when the user share a password
- * It is used when sharing a new password
- */
-pageMods.shareDialog = require('./pagemod/shareDialogPagemod').shareDialog;
-
-/*
- * This pagemod drives the iframe used when the user share a password
- * and he is looking for new users to grant
- */
-pageMods.shareAutocompleteDialog = require('./pagemod/shareAutocompleteDialogPagemod').shareAutocompleteDialog;
+///*
+// * This pagemod drives the progress bar iframe
+// * It is used when the add-on is encrypting something
+// */
+//pageMods.progressDialog = require('./pagemod/progressDialogPagemod').progressDialog;
+//
+///*
+// * This pagemod drives the iframe used when the user enter a password to be stored by passbolt
+// * It is used when creating/editing a new password
+// */
+//pageMods.secretEditDialog = require('./pagemod/secretEditDialogPagemod').secretEditDialog;
+//
+///*
+// * This pagemod drives the main addon app
+// * It is inserted in all the pages of a domain that is trusted.
+// * Such trust is defined during the first step of the setup process (or in config-debug)
+// */
+//var PassboltApp = require('./pagemod/passboltAppPagemod').PassboltApp;
+//pageMods.passboltApp = PassboltApp;
+//pageMods.passboltApp.init();
+//
+///*
+// * This pagemod drives the iframe used when the user share a password
+// * It is used when sharing a new password
+// */
+//pageMods.shareDialog = require('./pagemod/shareDialogPagemod').shareDialog;
+//
+///*
+// * This pagemod drives the iframe used when the user share a password
+// * and he is looking for new users to grant
+// */
+//pageMods.shareAutocompleteDialog = require('./pagemod/shareAutocompleteDialogPagemod').shareAutocompleteDialog;
 
 /*
  * This page mod drives a convenience config page for debug
@@ -171,8 +168,9 @@ pageMods.shareAutocompleteDialog = require('./pagemod/shareAutocompleteDialogPag
  * and perform changes useful for testing that would otherwise break things
  * Like for example changing the public key only on the client but not the server
  */
+pageMods.Debug = require('./pagemod/debugPagemod').Debug;
 if (Config.isDebug()) {
-  pageMods.debug = require('./pagemod/debugPagemod').debug;
+  console.warn('Warning: plugin debug mode is on!');
+  pageMods.Debug.init();
 }
-
 exports.pageMods = pageMods;

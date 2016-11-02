@@ -1,3 +1,1 @@
-
-
 exports.localStorage = window.localStorage;

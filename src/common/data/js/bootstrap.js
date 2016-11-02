@@ -8,7 +8,7 @@
 var passbolt = passbolt || {};
 
 (function ($) {
-
+  console.log('bootstrap');
   /**
    * Init the passbolt bootstrap.
    */

@@ -36,9 +36,8 @@ pageMods.Bootstrap.init();
 var user = new User();
 if (user.isValid()) {
   pageMods.PassboltAuth.init();
-  pageMods.PassboltAuthForm.init();
 }
-
+pageMods.PassboltAuthForm.init();
 pageMods.SetupBootstrap.init();
 pageMods.Setup.init();
 

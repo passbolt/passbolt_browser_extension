@@ -44,9 +44,9 @@ var listen = function (worker) {
    *
    * @listens passbolt.debug.appPagemod.init
    */
-  worker.port.on('passbolt.debug.appPagemod.init', function () {
-    var app = require('../app');
-    app.pageMods.PassboltApp.init();
-  });
+  //worker.port.on('passbolt.debug.appPagemod.init', function () {
+  //  var app = require('../app');
+  //  app.pageMods.PassboltApp.init();
+  //});
 };
 exports.listen = listen;

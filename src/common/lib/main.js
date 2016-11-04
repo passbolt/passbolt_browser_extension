@@ -41,7 +41,7 @@ pageMods.PassboltAuthForm.init();
 pageMods.SetupBootstrap.init();
 pageMods.Setup.init();
 
-// ...
+// PassboltApp is initialized by login
 // pageMods.PassboltApp.init();
 pageMods.MasterPasswordDialog.init();
 pageMods.ProgressDialog.init();

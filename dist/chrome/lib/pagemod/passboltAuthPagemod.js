@@ -23,7 +23,7 @@ PassboltAuth.init = function () {
   }
 
   // Define which url to run the pagemod on
-  var url = user.settings.getDomain() + '/auth/login';
+  var url = '^' + user.settings.getDomain() + '/auth/login';
   var domain = new RegExp(url);
 
   PassboltAuth._pageMod = pageMod.PageMod({

@@ -38,7 +38,7 @@ PassboltApp.initPageMod = function () {
   // - https://demo.passbolt.com/
   // - https://demo.passbolt.com/#user
   // - https://demo.passbolt.com/#workspace
-  var regex = new RegExp(user.settings.getDomain() + '\/?(#.*)?');
+  var regex = new RegExp('^' + user.settings.getDomain() + '\/?(#.*)?');
   return pageMod.PageMod({
     name: 'PassboltApp',
     include: regex,

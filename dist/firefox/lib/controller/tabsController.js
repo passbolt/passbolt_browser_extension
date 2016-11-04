@@ -6,6 +6,7 @@
  */
 
 var tabs = require('sdk/tabs');
+const defer = require('sdk/core/promise').defer;
 
 /**
  * Open an url in a new tab.
@@ -18,10 +19,12 @@ exports.open = open;
 
 /**
  * Get the active tab url.
- * @return {string}
+ * @return {promise}
  */
 var getActiveTabUrl = function() {
-  return tabs.activeTab.url;
+  var deferred = defer();
+  deferred.resolve(tabs.activeTab.url);
+  return deferred.promise;
 };
 exports.getActiveTabUrl = getActiveTabUrl;
 

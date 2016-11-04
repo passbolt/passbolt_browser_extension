@@ -17,17 +17,6 @@ passbolt.login = passbolt.login || {};
    * ================================================================================== */
 
   /**
-   * When the plugin configuration is missing
-   * @returns {promise}
-   */
-  passbolt.login.onConfigurationMissing = function () {
-    var $renderSpace = $('.login.page .js_main-login-section'),
-      publicRegistration = $('.login.page.public-registration').length > 0 ? true : false;
-
-    return passbolt.helper.html.loadTemplate($renderSpace, './tpl/login/noconfig.ejs', 'html', {publicRegistration: publicRegistration});
-  };
-
-  /**
    * Starts with server key check.
    */
   passbolt.login.onStep0Start = function () {
@@ -158,15 +147,7 @@ passbolt.login = passbolt.login || {};
    * Initialize the login.
    */
   passbolt.login.init = function () {
-
-    passbolt.request('passbolt.addon.isConfigured')
-      .then(function(isConfigured) {
-        if (isConfigured) {
-          passbolt.login.onStep0Start();
-        } else {
-          passbolt.login.onConfigurationMissing();
-        }
-      });
+    passbolt.login.onStep0Start();
   };
 
   passbolt.login.init();

@@ -70,23 +70,23 @@ Auth.prototype.verify = function(serverUrl, serverKey, userFingerprint) {
           });
       },
       function error(error) {
-        return deferred.reject(new Error(__('Unable to encrypt the verify token.') + ' ' + error.message));
+        deferred.reject(new Error(__('Unable to encrypt the verify token.') + ' ' + error.message));
       }
     )
     .then(function(response) {
       // Check response status
-      _this.__statusCheck(response);
       var auth = new GpgAuthHeader(response.headers, 'verify');
 
       // Check that the server was able to decrypt the token with our local copy
       var verify = new GpgAuthToken(auth.headers['x-gpgauth-verify-response']);
       if(verify.token != _this._verifyToken) {
-        return deferred.reject(new Error(__('The server was unable to prove its identity.')));
+        deferred.reject(new Error(__('The server was unable to prove its identity.')));
+      } else {
+        deferred.resolve(__('The server identity is verified!'));
       }
-      return deferred.resolve(__('The server identity is verified!'));
     })
     .catch(function(error) {
-      return deferred.reject(error);
+      deferred.reject(error);
     });
 
   return deferred.promise;
@@ -119,15 +119,15 @@ Auth.prototype.getServerKey = function (domain) {
     })
     .then(
       function success(json) {
-        return deferred.resolve(json.body);
+        deferred.resolve(json.body);
       },
       function error() {
-        return deferred.reject(new Error(
+        deferred.reject(new Error(
           __('There was a problem trying to understand the data provided by the server')));
       }
     )
     .catch(function(error) {
-      return deferred.reject(error);
+      deferred.reject(error);
     });
 
   return deferred.promise;
@@ -152,11 +152,11 @@ Auth.prototype.login = function(passphrase) {
       return _this.__stage2(userAuthToken)
     })
     .then(function(referrer) {
-      return deferred.resolve(referrer);
+      deferred.resolve(referrer);
     })
     .catch(function(error){
       var msg = __('The server was unable to respect the authentication protocol!') + ' ' + error.message;
-      return deferred.reject(new Error(msg));
+      deferred.reject(new Error(msg));
     });
 
   return deferred.promise;
@@ -198,10 +198,10 @@ Auth.prototype.__stage1 = function (passphrase) {
     .then(function(userAuthToken) {
       // Validate the User Auth Token
       var authToken = new GpgAuthToken(userAuthToken);
-      return deferred.resolve(authToken.token);
+      deferred.resolve(authToken.token);
     })
     .catch(function(error){
-      return deferred.reject(error);
+      deferred.reject(error);
     });
 
   return deferred.promise;
@@ -237,10 +237,10 @@ Auth.prototype.__stage2 = function (userAuthToken) {
 
       // Get the redirection url
       var referrer = user.settings.getDomain() + auth.headers['x-gpgauth-refer'];
-      return deferred.resolve(referrer);
+      deferred.resolve(referrer);
     })
     .catch(function(error){
-      return deferred.reject(error);
+      deferred.reject(error);
     });
 
   return deferred.promise;

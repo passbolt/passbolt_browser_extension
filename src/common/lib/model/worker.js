@@ -4,7 +4,7 @@
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var app = require('../main');
+var app = require('../app');
 
 /**
  * Reference a worker.
@@ -13,7 +13,7 @@ var app = require('../main');
  * @param options {array} Optional data
  */
 var add = function (workerId, worker, options) {
-  console.debug('add worker ' + workerId);
+  console.debug('Add worker @ id:' + workerId + ', tab:' + worker.tab.id + ', url:' + worker.tab.url);
   options = options || {};
   var removeOnTabUrlChange = options.removeOnTabUrlChange || true,
     url = worker.tab.url;
@@ -30,9 +30,7 @@ var add = function (workerId, worker, options) {
 
   // Listen to worker detached.
   var onWorkerDetachHandler = function () {
-    if (exists(workerId, worker.tab.id)) {
-      remove(workerId, worker.tab.id, options);
-    }
+    remove(workerId, worker.tab.id, options);
   };
   worker.on('detach', onWorkerDetachHandler);
 
@@ -65,13 +63,13 @@ exports.add = add;
  */
 var remove = function (workerId, tabId, options) {
   if (!exists(workerId, tabId)) {
-    console.warn('[WARNING] Unable to remove the worker ' + workerId + ', it doesn\'t exist on the tab ' + tabId + ' .');
+    console.warn('Warning: unable to remove the worker ' + workerId + ', it doesn\'t exist on the tab ' + tabId + ' .');
   } else {
-    console.debug('remove worker ' + workerId);
-    delete app.workers[tabId][workerId];
+    console.debug('Remove worker @ id:' + workerId + ', tab:' + tabId);
     if (options.onDestroy) {
       options.onDestroy();
     }
+    delete app.workers[tabId][workerId];
   }
 };
 

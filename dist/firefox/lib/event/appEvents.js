@@ -8,7 +8,7 @@
  */
 var masterPasswordController = require('../controller/masterPasswordController');
 var clipboardController = require('../controller/clipboardController');
-var app = require('../main');
+var app = require('../app');
 var __ = require("sdk/l10n").get;
 var Worker = require('../model/worker');
 const { Promise } = require('sdk/core/promise');

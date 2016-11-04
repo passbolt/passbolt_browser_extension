@@ -9,11 +9,10 @@
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-console.log('debug pagemod');
 var pageMod = require('sdk/page-mod');
 var self = require('sdk/self');
 
-var app = require('../main');
+var app = require('../app');
 var Worker = require('../model/worker');
 
 var Debug = function () {};
@@ -21,10 +20,14 @@ Debug._pageMod = undefined;
 
 Debug.init = function () {
 
+  console.warn('Warning: plugin debug mode is on!');
+
   if (typeof Debug._pageMod !== 'undefined') {
     Debug._pageMod.destroy();
+    Debug._pageMod = undefined;
   }
   Debug._pageMod = pageMod.PageMod({
+    name: 'Debug',
     include: self.data.url('config-debug.html'),
 
     // Warning:
@@ -48,5 +51,4 @@ Debug.init = function () {
     }
   });
 };
-
 exports.Debug = Debug;

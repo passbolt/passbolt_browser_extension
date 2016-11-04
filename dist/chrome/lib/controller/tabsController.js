@@ -4,6 +4,7 @@
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+const defer = require('sdk/core/promise').defer;
 
 /**
  * Open an url in a new tab.
@@ -19,7 +20,11 @@ exports.open = open;
  * @return {string}
  */
 var getActiveTabUrl = function () {
-  //return tabs.activeTab.url;
+  var deferred = defer();
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    return deferred.resolve(tabs[0].url);
+  });
+  return deferred.promise;
 };
 exports.getActiveTabUrl = getActiveTabUrl;
 

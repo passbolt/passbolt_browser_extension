@@ -10,7 +10,7 @@
 var self = require('sdk/self');
 var pageMod = require('sdk/page-mod');
 
-var app = require('../main');
+var app = require('../app');
 var Worker = require('../model/worker');
 
 /*
@@ -24,9 +24,11 @@ Setup.init = function () {
 
   if (typeof Setup._pageMod !== 'undefined') {
     Setup._pageMod.destroy();
+    Setup._pageMod = undefined;
   }
 
   Setup._pageMod = pageMod.PageMod({
+    name: 'Setup',
     include: self.data.url('setup.html'),
 
     // Warning:
@@ -67,11 +69,6 @@ Setup.init = function () {
       app.events.config.listen(worker);
     }
   });
-};
-
-Setup.get = function () {
-  Setup.init();
-  return Setup._pageMod;
 };
 
 exports.Setup = Setup;

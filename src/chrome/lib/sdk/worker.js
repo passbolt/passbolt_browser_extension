@@ -47,9 +47,11 @@ Worker.prototype.destroy = function () {
   this.triggerEvent('detach');
 
   // remove the content script from the page
-  // @TODO I cannot do this
+  // Not possible...
 
   // remove all registered listeners
+  this.tab.destroy();
+
   //delete this.callbacks;
   delete this.port;
   delete this.tab;

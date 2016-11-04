@@ -7,7 +7,6 @@
  */
 var ScriptExecution = require('vendors/scriptExecution').ScriptExecution;
 var Crypto = require('model/crypto').Crypto;
-
 var Worker = require('sdk/worker').Worker;
 var self = require('sdk/self');
 
@@ -20,6 +19,7 @@ var self = require('sdk/self');
 var PageMod = function(args) {
   this.args = args;
   this._tabs = []; // list of tab ids in which the pagemod has a worker
+  this._listeners = []; // list of listeners initialized by this pagemod
   this.__init();
 };
 
@@ -37,7 +37,23 @@ PageMod.prototype.args = {};
  * PageMod Destroy
  */
 PageMod.prototype.destroy = function () {
-  console.log('PageMod::destroy not implemented');
+  // Stops the page-mod from making any more modifications.
+  // Once destroyed the page-mod can no longer be used.
+  // Modifications already made to open documents by content scripts will not be undone
+  // Unsuported: stylesheets added by contentStyle or contentStyleFile, will be unregistered immediately.
+  if(typeof this._listeners['chrome.tabs.onRemoved'] !== 'undefined') {
+    chrome.tabs.onRemoved.removeListener(this._listeners['chrome.tabs.onRemoved']);
+    chrome.tabs.onReplaced.removeListener(this._listeners['chrome.tabs.onReplaced']);
+    chrome.tabs.onUpdated.removeListener(this._listeners['chrome.tabs.onUpdated']);
+  }
+
+  if(typeof this._listeners['chrome.runtime.onConnect'] !== 'undefined') {
+    chrome.runtime.onConnect.removeListener(this._listeners['chrome.runtime.onConnect']);
+  }
+  // clear the tab and listeners
+  this._tabs = [];
+  this._listeners = [];
+
 };
 
 /**
@@ -48,6 +64,7 @@ PageMod.prototype.destroy = function () {
  * PageMod Init
  */
 PageMod.prototype.__init = function() {
+
   // The url to use for the pageMod include is not a regex, create one
   if(!(this.args.include instanceof RegExp)) {
     if(this.args.include === '*') {
@@ -72,19 +89,21 @@ PageMod.prototype.__init = function() {
   // When a tab is updated we try to insert content code if it matches
   // the include and contentScriptWhen pageMod parameters
   var _this = this;
-  chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+  this._listeners['chrome.tabs.onUpdated'] = function(tabId, changeInfo, tab) {
     _this.__onTabUpdated(tabId, changeInfo, tab);
-  });
+  };
+  chrome.tabs.onUpdated.addListener(this._listeners['chrome.tabs.onUpdated']);
 
   // Sometimes the page is loaded from the cache and the 'onUpdate' listener is
   // not fired. To make sure we cover that case we listen to 'onReplaced' events
   // fired when a tab is replaced with another tab due to prerendering or instant.
   // see. https://bugs.chromium.org/p/chromium/issues/detail?id=109557
-  chrome.tabs.onReplaced.addListener(function (addedTabId, removedTabId) {
+  this._listeners['chrome.tabs.onReplaced'] = function (addedTabId, removedTabId) {
     chrome.tabs.get(addedTabId, function(tab){
       _this.__onTabUpdated(tab.id, {status:'complete'}, tab);
     });
-  });
+  };
+  chrome.tabs.onReplaced.addListener(this._listeners['chrome.tabs.onReplaced']);
 
   // Using attachto a pagemod can be launched to an already opened tab
   // Useful after an install or a reinstall
@@ -94,16 +113,17 @@ PageMod.prototype.__init = function() {
   if(typeof this.args.attachTo !== 'undefined') {
     chrome.tabs.query({}, function(tabs){
       tabs.forEach(function(tab){
-        _this.__onTabUpdated(tab.id, {status:'complete'}, tab);
+        _this.__onAttachExistingTab(tab);
       });
     });
   }
 
   // When a tab is closed cleanup we cleanup
-  chrome.tabs.onRemoved.addListener(function (tabId) {
+  this._listeners['chrome.tabs.onRemoved'] = function (tabId) {
     var index = _this._tabs.indexOf(tabId);
     _this._tabs.splice(index, 1);
-  });
+  };
+  chrome.tabs.onRemoved.addListener(this._listeners['chrome.tabs.onRemoved']);
 };
 
 /**
@@ -114,7 +134,7 @@ PageMod.prototype.__init = function() {
 PageMod.prototype.__initConnectListener = function(portName, tabId) {
   var _this = this;
 
-  function connected(port) {
+  this._listeners['chrome.runtime.onConnect'] = function (port) {
     // check if the portname match
     if(port.name === portName) {
       // add the sender tab id to the list of active tab for that worker
@@ -123,8 +143,8 @@ PageMod.prototype.__initConnectListener = function(portName, tabId) {
         _this.__onConnect(port);
       }
     }
-  }
-  chrome.runtime.onConnect.addListener(connected);
+  };
+  chrome.runtime.onConnect.addListener(this._listeners['chrome.runtime.onConnect']);
 };
 
 /**
@@ -151,6 +171,30 @@ PageMod.prototype.__onContentConnectInit = function() {
   this.portname = portname;
   this.__initConnectListener(this.portname);
 };
+
+
+/**
+ * When a pagemod is requested on an already opened tab
+ *
+ * Refresh the page so that it can trigger a proper onTabUpdate
+ * so that we have a clean state. Note that we can't just proceed with a onTabUpdate as
+ * here might be some scripts already included in the page and we can't remove them
+ *
+ * @param tab
+ * @private
+ */
+PageMod.prototype.__onAttachExistingTab = function(tab) {
+  // We can't insert scripts if the url is not https or http
+  // as this is not allowed, instead we insert the scripts manually in the background page if needed
+  if (!(tab.url.startsWith('http://') || tab.url.startsWith('https://'))) {
+    return;
+  }
+
+  // if the url match the pagemod requested pattern
+  if (tab.url.match(this.args.include)) {
+    chrome.tabs.reload(tab.id);
+  }
+}
 
 /**
  * When a tab is updated
@@ -180,7 +224,6 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
 
     // if the url match the pagemod requested pattern
     if (tab.url.match(this.args.include)) {
-      console.log('url match' + this.args.include);
 
       // if there is not already a worker in that tab
       // generate a portname based on the tab it and listen to connect event

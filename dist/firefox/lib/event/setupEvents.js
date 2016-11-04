@@ -8,7 +8,7 @@
  */
 var Setup = require('../model/setup').Setup;
 var Key = require('../model/key').Key;
-var app = require('../main');
+var app = require('../app');
 
 var setup = new Setup();
 
@@ -167,7 +167,7 @@ var listen = function (worker) {
     setup.save(data)
       .then(
         function () {
-          app.pageMods.passboltAuth.init(true);
+          app.pageMods.PassboltAuth.init();
           worker.port.emit('passbolt.setup.save.complete', requestId, 'SUCCESS');
         },
         function (error) {
@@ -186,7 +186,7 @@ var listen = function (worker) {
     setup.completeRecovery(data)
       .then(
         function () {
-          app.pageMods.passboltAuth.init(true);
+          app.pageMods.PassboltAuth.init();
           worker.port.emit('passbolt.setup.completeRecovery.complete', requestId, 'SUCCESS');
         },
         function (error) {

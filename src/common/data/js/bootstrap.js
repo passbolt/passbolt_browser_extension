@@ -8,7 +8,6 @@
 var passbolt = passbolt || {};
 
 (function ($) {
-  console.log('bootstrap');
   /**
    * Init the passbolt bootstrap.
    */
@@ -26,31 +25,32 @@ var passbolt = passbolt || {};
     promise = this.checkAddonIsConfigured()
       .then(function (response) {
         isConfigured = response;
-        if (isConfigured !== true) {
-          $('html').addClass('no-passboltplugin-config')
-            .removeClass('passboltplugin-config');
-        } else {
+        if (isConfigured === true) {
           $('html').addClass('passboltplugin-config')
             .removeClass('no-passboltplugin-config');
+        } else {
+          $('html').addClass('no-passboltplugin-config')
+            .removeClass('passboltplugin-config');
+          _this.onConfigurationMissing();
         }
       });
 
     // If on the login page & the plugin is configured
-    if ($('html.passbolt .login.page').length) {
-      // Check that the domain is trusted.
-      promise.then(function () {
-        if (isConfigured) {
-          return _this.initLogin();
-        }
-      });
-    }
+    //if ($('html.passbolt .login.page').length) {
+    //  // Check that the domain is trusted.
+    //  promise.then(function () {
+    //    if (isConfigured) {
+    //      return _this.initLogin();
+    //    }
+    //  });
+    //}
 
     // If on the debug page.
-    if ($('html.passbolt .debug.page').length) {
-      promise.then(function () {
-        return _this.initDebug();
-      })
-    }
+    //if ($('html.passbolt .debug.page').length) {
+    //  promise.then(function () {
+    //    return _this.initDebug();
+    //  })
+    //}
 
     // Init the version
     promise.then(function () {
@@ -86,27 +86,27 @@ var passbolt = passbolt || {};
    * Boostrap the login page.
    * @returns {promise}
    */
-  Bootstrap.prototype.initLogin = function () {
-    var _this = this;
-
-    return _this.checkDomain()
-      .then(function (isTrustedDomain) {
-        // If not on the trusted domain, display a feedback to the user.
-        if (isTrustedDomain !== true) {
-          return _this.onWrongDomain();
-        }
-        // Otherwise intialize the login.
-        else {
-          return passbolt.request('passbolt.bootstrap.login').then(
-            function (refresh) {
-              if (refresh) {
-                location.reload();
-              }
-            }
-          );
-        }
-      });
-  };
+  //Bootstrap.prototype.initLogin = function () {
+  //  var _this = this;
+  //  console.log('init login');
+  //  return _this.checkDomain()
+  //    .then(function (isTrustedDomain) {
+  //      // If not on the trusted domain, display a feedback to the user.
+  //      if (isTrustedDomain !== true) {
+  //        return _this.onWrongDomain();
+  //      }
+  //      // Otherwise intialize the login.
+  //      else {
+  //        return passbolt.request('passbolt.bootstrap.login').then(
+  //          function (refresh) {
+  //            if (refresh) {
+  //              location.reload();
+  //            }
+  //          }
+  //        );
+  //      }
+  //    });
+  //};
 
   /**
    * When the domain is not the right one, but the plugin is already configured.
@@ -126,6 +126,17 @@ var passbolt = passbolt || {};
           publicRegistration: publicRegistration
         });
       });
+  };
+
+  /**
+   * When the plugin configuration is missing
+   * @returns {promise}
+   */
+  Bootstrap.prototype.onConfigurationMissing = function () {
+    var $renderSpace = $('.login.page .js_main-login-section'),
+      publicRegistration = $('.login.page.public-registration').length > 0 ? true : false;
+
+    return passbolt.helper.html.loadTemplate($renderSpace, './tpl/login/noconfig.ejs', 'html', {publicRegistration: publicRegistration});
   };
 
   /**

@@ -61,8 +61,8 @@ var listen = function (worker) {
     auth.login(masterpassword).then(
       function success(referrer) {
         // init the app pagemod
-        var app = require('../main');
-        app.pageMods.passboltApp.init();
+        var app = require('../app');
+        app.pageMods.PassboltApp.init();
 
         // redirect
         var msg = __('You are now logged in!');

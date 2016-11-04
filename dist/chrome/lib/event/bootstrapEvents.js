@@ -7,7 +7,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var self = require('sdk/self');
-var app = require('../main');
+var app = require('../app');
 var Config = require('../model/config');
 var tabsController = require('../controller/tabsController');
 var __ = require("sdk/l10n").get;
@@ -20,15 +20,16 @@ var listen = function (worker) {
    * @listens passbolt.bootstrap.login
    * @param requestId {int} The request identifier
    */
-  worker.port.on('passbolt.bootstrap.login', function (requestId) {
-    // Destroy the passbolt application authentication pageMod.
-    // And trigger a page refresh to restart it to make it work on the current page if changed
-    if (app.pageMods.passboltAuth.init()) {
-      worker.port.emit('passbolt.bootstrap.login.complete', requestId, 'SUCCESS', true);
-    } else {
-      worker.port.emit('passbolt.bootstrap.login.complete', requestId, 'ERROR', true);
-    }
-  });
+  //worker.port.on('passbolt.bootstrap.login', function (requestId) {
+  //  // Destroy the passbolt application authentication pageMod.
+  //  // And trigger a page refresh to restart it to make it work on the current page if changed
+  //  console.log('auth init bootstrap');
+  //  if (app.pageMods.PassboltAuth.init()) {
+  //    worker.port.emit('passbolt.bootstrap.login.complete', requestId, 'SUCCESS', true);
+  //  } else {
+  //    worker.port.emit('passbolt.bootstrap.login.complete', requestId, 'ERROR', true);
+  //  }
+  //});
 
   /*
    * Open the plugin debug page.
@@ -36,14 +37,14 @@ var listen = function (worker) {
    * @listens passbolt.bootstrap.debug
    * @param requestId {int} The request identifier
    */
-  worker.port.on('passbolt.bootstrap.debug', function (requestId) {
-    if (Config.isDebug() == true) {
-      tabsController.setActiveTabUrl(self.data.url('config-debug.html'));
-      worker.port.emit('passbolt.config.debug.complete', requestId, 'SUCCESS');
-    } else {
-      worker.port.emit('passbolt.config.debug.complete', requestId, 'ERROR');
-    }
-  });
+  //worker.port.on('passbolt.bootstrap.debug', function (requestId) {
+  //  if (Config.isDebug() == true) {
+  //    tabsController.setActiveTabUrl(self.data.url('config-debug.html'));
+  //    worker.port.emit('passbolt.config.debug.complete', requestId, 'SUCCESS');
+  //  } else {
+  //    worker.port.emit('passbolt.config.debug.complete', requestId, 'ERROR');
+  //  }
+  //});
 
 };
 exports.listen = listen;

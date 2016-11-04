@@ -57,9 +57,14 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.addon.checkDomain', function (requestId) {
     var trustedDomain = Config.read('user.settings.trustedDomain');
-    var currentDomain = tabsController.getActiveTabUrl();
-    var domainOk = (trustedDomain != '' && currentDomain.indexOf(trustedDomain) != -1);
-    worker.port.emit('passbolt.addon.checkDomain.complete', requestId, 'SUCCESS', domainOk);
+    if(typeof trustedDomain === 'undefined' || trustedDomain == '') {
+      worker.port.emit('passbolt.addon.checkDomain.complete', requestId, 'SUCCESS', false);
+    }
+    tabsController.getActiveTabUrl()
+      .then(function(url) {
+        var domainOk = url.startsWith(trustedDomain);
+        worker.port.emit('passbolt.addon.checkDomain.complete', requestId, 'SUCCESS', domainOk);
+      });
   });
 
   /*

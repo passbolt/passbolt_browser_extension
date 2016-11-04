@@ -9,7 +9,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var self = require('sdk/self');
-var app = require('../main');
+var app = require('../app');
 var pageMod = require('sdk/page-mod');
 var Worker = require('../model/worker');
 var user = new (require('../model/user').User)();
@@ -40,6 +40,7 @@ PassboltApp.initPageMod = function () {
   // - https://demo.passbolt.com/#workspace
   var regex = new RegExp(user.settings.getDomain() + '\/?(#.*)?');
   return pageMod.PageMod({
+    name: 'PassboltApp',
     include: regex,
     contentScriptWhen: 'ready',
     contentStyleFile: [

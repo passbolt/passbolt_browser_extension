@@ -13,24 +13,32 @@ var Tab = function(tab) {
   var _this = this;
 
   // setup on ready event
-  function tabUpdated(tabId, changeInfo, tab) {
+  this._onTabUpdated = function (tabId, changeInfo, tab) {
     // if tab is the same than the current worker tab
     // and is fully loaded
     if(_this.id == tabId && changeInfo.status == 'complete') {
-      chrome.tabs.onUpdated.removeListener(tabUpdated);
       _this.triggerEvent('ready', tab);
     }
-  }
-  chrome.tabs.onUpdated.addListener(tabUpdated);
+  };
+  chrome.tabs.onUpdated.addListener(this._onTabUpdated);
 
   // setup on removed event
-  function onTabRemoved (tabId) {
+  this._onTabRemoved = function (tabId) {
     if(_this.id == tabId) {
-      chrome.tabs.onRemoved.removeListener(onTabRemoved);
+      chrome.tabs.onRemoved.removeListener(_this.onTabRemoved);
       _this.triggerEvent('removed', tab);
     }
-  }
-  chrome.tabs.onRemoved.addListener(onTabRemoved);
+  };
+  chrome.tabs.onRemoved.addListener(this._onTabRemoved);
+};
+
+/**
+ * Destroy the tab listeners
+ * Called when the worker is destroyed
+ */
+Tab.prototype.destroy = function() {
+  chrome.tabs.onUpdated.removeListener(this._tabUpdated);
+  chrome.tabs.onRemoved.removeListener(this._onTabRemoved);
 };
 
 /**

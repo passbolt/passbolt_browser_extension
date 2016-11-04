@@ -8,7 +8,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var self = require('sdk/self');
-var app = require('../main');
+var app = require('../app');
 var pageMod = require('sdk/page-mod');
 var Config = require('../model/config');
 var Worker = require('../model/worker');
@@ -20,9 +20,11 @@ SetupBootstrap._pageMod = undefined;
 SetupBootstrap.init = function () {
   if (typeof SetupBootstrap._pageMod !== 'undefined') {
     SetupBootstrap._pageMod.destroy();
+    SetupBootstrap._pageMod = undefined;
   }
 
   SetupBootstrap._pageMod = pageMod.PageMod({
+    name: 'SetupBootstrap',
     include: new RegExp(Config.read('setupBootstrapRegex') + '.*'),
     contentScriptWhen: 'ready',
     contentStyleFile: [],

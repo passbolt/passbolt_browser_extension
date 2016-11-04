@@ -6,7 +6,7 @@
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var app = require('../main');
+var app = require('../app');
 var User = require('../model/user').User;
 var user = new User();
 var __ = require("sdk/l10n").get;
@@ -139,8 +139,7 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.set', function (requestId, u) {
     try {
       user.set(u);
-      // TODO : wrap this in a separate function.
-      app.pageMods.passboltAuth.init();
+      app.pageMods.PassboltAuth.init();
       worker.port.emit('passbolt.user.set.complete', requestId, 'SUCCESS');
     } catch (e) {
       worker.port.emit('passbolt.user.set.complete', requestId, 'ERROR', e.message);

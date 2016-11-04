@@ -30,7 +30,9 @@ var add = function (workerId, worker, options) {
 
   // Listen to worker detached.
   var onWorkerDetachHandler = function () {
-    remove(workerId, worker.tab.id, options);
+    if (exists(workerId, worker.tab.id)) {
+      remove(workerId, worker.tab.id, options);
+    }
   };
   worker.on('detach', onWorkerDetachHandler);
 
@@ -66,10 +68,10 @@ var remove = function (workerId, tabId, options) {
     console.warn('Warning: unable to remove the worker ' + workerId + ', it doesn\'t exist on the tab ' + tabId + ' .');
   } else {
     console.debug('Remove worker @ id:' + workerId + ', tab:' + tabId);
+    delete app.workers[tabId][workerId];
     if (options.onDestroy) {
       options.onDestroy();
     }
-    delete app.workers[tabId][workerId];
   }
 };
 

@@ -49,7 +49,7 @@ exports.readAll = readAll;
  * @param name {string} Variable name to store
  * @param value {mixed} Variable value
  * @param store {boolean} (optional) Should the configuration variables be
- *  stored in the local storage. By default false.
+ *  stored in the local storage. By default true.
  * @returns {boolean}
  */
 var write = function (name, value, store) {
@@ -57,10 +57,8 @@ var write = function (name, value, store) {
   if (name === 'debug') {
     return false;
   }
-
   _config[name] = value;
-
-  if (typeof store != 'undefined' && store) {
+  if (typeof store === 'undefined' || store) {
     storage.setItem('config', _config);
   }
   return true;

@@ -59,10 +59,10 @@ var listen = function (worker) {
         secret.validate({data: editedPassword.secret});
       }
       Worker.get('Secret', worker.tab.id).port.emit('passbolt.secret-edit.validate-success');
-      worker.port.emit('passbolt.secret-edit.validate.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
       Worker.get('Secret', worker.tab.id).port.emit('passbolt.secret-edit.validate-error', e.message, e.validationErrors);
-      worker.port.emit('passbolt.secret-edit.validate.complete', requestId, 'ERROR', e.message, e.validationErrors);
+      worker.port.emit(requestId, 'ERROR', e.message, e.validationErrors);
     }
   });
 
@@ -83,7 +83,7 @@ var listen = function (worker) {
 
     // If the currently edited secret hasn't been decrypted, leave.
     if (editedPassword.secret == null) {
-      worker.port.emit('passbolt.secret-edit.encrypt.complete', requestId, 'SUCCESS', armoreds);
+      worker.port.emit(requestId, 'SUCCESS', armoreds);
       return;
     }
 
@@ -124,7 +124,7 @@ var listen = function (worker) {
         for (var i in data) {
           armoreds[usersIds[i]] = data[i];
         }
-        worker.port.emit('passbolt.secret-edit.encrypt.complete', requestId, 'SUCCESS', armoreds);
+        worker.port.emit(requestId, 'SUCCESS', armoreds);
         worker.port.emit('passbolt.progress.close-dialog');
       });
   });
@@ -140,7 +140,7 @@ var listen = function (worker) {
     // Store some variables in the tab storage in order to make it accessible by other workers.
     TabStorage.set(worker.tab.id, 'sharedPassword', sharedPassword);
     TabStorage.set(worker.tab.id, 'shareWith', []);
-    worker.port.emit('passbolt.app.share-password-init.complete', requestId, 'SUCCESS');
+    worker.port.emit(requestId, 'SUCCESS');
   });
 
   /*
@@ -157,7 +157,7 @@ var listen = function (worker) {
       armoreds = {};
 
     if (!usersIds.length) {
-      worker.port.emit('passbolt.share.encrypt.complete', requestId, 'SUCCESS', {});
+      worker.port.emit(requestId, 'SUCCESS', {});
       return;
     }
 
@@ -208,13 +208,13 @@ var listen = function (worker) {
         for (var i in data) {
           armoreds[usersIds[i]] = data[i];
         }
-        worker.port.emit('passbolt.share.encrypt.complete', requestId, 'SUCCESS', armoreds);
+        worker.port.emit(requestId, 'SUCCESS', armoreds);
         worker.port.emit('passbolt.progress.close-dialog');
       })
 
       // In case of error, notify the request caller.
       .then(null, function(error) {
-        worker.port.emit('passbolt.share.encrypt.complete', requestId, 'ERROR', error);
+        worker.port.emit(requestId, 'ERROR', error);
       });
 
   });
@@ -258,12 +258,12 @@ var listen = function (worker) {
       // Once the secret is decrypted, answer to the requester.
       .then(function (decrypted) {
         clipboardController.copy(decrypted);
-        worker.port.emit('passbolt.app.decrypt-copy.complete', requestId, 'SUCCESS');
+        worker.port.emit(requestId, 'SUCCESS');
       })
 
       // Catch any error.
       .then(null, function (error) {
-        worker.port.emit('passbolt.app.decrypt-copy.complete', requestId, 'ERROR', error);
+        worker.port.emit(requestId, 'ERROR', error);
       });
   });
 

@@ -120,15 +120,16 @@ passbolt.login = passbolt.login || {};
     $(selector).removeClass(cssClass);
   });
 
-  // GPGAuth is complete
-  passbolt.message.on('passbolt.auth.login.complete', function (token, status, message, referrer) {
-    if (status === 'SUCCESS') {
-      $('html').addClass('loaded').removeClass('loading');
-      window.top.location.href = referrer;
-    } else if (status === 'ERROR') {
-      var tplData = {message: message};
-      passbolt.helper.html.loadTemplate('.login.form', './tpl/login/feedback-login-error.ejs', 'html', tplData);
-    }
+  // GPGAuth is completed with success
+  passbolt.message.on('passbolt.auth.login-success', function (message, referrer) {
+    $('html').addClass('loaded').removeClass('loading');
+    window.top.location.href = referrer;
+  });
+
+  // GPGAuth failed
+  passbolt.message.on('passbolt.auth.login-failed', function (message) {
+    var tplData = {message: message};
+    passbolt.helper.html.loadTemplate('.login.form', './tpl/login/feedback-login-error.ejs', 'html', tplData);
   });
 
   // Passphrase have been captured and verified

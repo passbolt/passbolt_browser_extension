@@ -20,7 +20,7 @@ var listen = function (worker) {
   worker.port.on('passbolt.template.get', function (requestId, path) {
     fileController.loadFile(path)
       .then(function(tpl) {
-        worker.port.emit('passbolt.template.get.complete', requestId, 'SUCCESS', tpl);
+        worker.port.emit(requestId, 'SUCCESS', tpl);
       });
   });
 

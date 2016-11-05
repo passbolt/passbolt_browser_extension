@@ -20,7 +20,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.edit-password.set-edited-password', function (requestId, editedPassword) {
     TabStorage.set(worker.tab.id, 'editedPassword', editedPassword);
-    worker.port.emit('passbolt.edit-password.set-edited-password.complete', requestId, 'SUCCESS');
+    worker.port.emit(requestId, 'SUCCESS');
   });
 
   /*
@@ -31,7 +31,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.edit-password.get-edited-password', function (requestId) {
     var editedPassword = TabStorage.get(worker.tab.id, 'editedPassword');
-    worker.port.emit('passbolt.edit-password.get-edited-password.complete', requestId, 'SUCCESS', editedPassword);
+    worker.port.emit(requestId, 'SUCCESS', editedPassword);
   });
 
 };

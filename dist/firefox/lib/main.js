@@ -33,7 +33,6 @@ pageMods.Bootstrap.init();
 
 // Passbolt Auth pagemod init can also be triggered
 // by debug, setup and user events
-
 var user = new User();
 if (user.isValid()) {
   pageMods.PassboltAuth.init();

@@ -27,9 +27,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.get', function (requestId, data) {
     try {
       var u = user.get(data);
-      worker.port.emit('passbolt.user.get.complete', requestId, 'SUCCESS', u);
+      worker.port.emit(requestId, 'SUCCESS', u);
     } catch (e) {
-      worker.port.emit('passbolt.user.get.complete', requestId, 'ERROR', e.message);
+      worker.port.emit(requestId, 'ERROR', e.message);
     }
   });
 
@@ -42,9 +42,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.get.name', function (requestId) {
     try {
       var name = user.getName();
-      worker.port.emit('passbolt.user.get.name.complete', requestId, 'SUCCESS', name);
+      worker.port.emit(requestId, 'SUCCESS', name);
     } catch (e) {
-      worker.port.emit('passbolt.user.get.name.complete', requestId, 'ERROR', e.message);
+      worker.port.emit(requestId, 'ERROR', e.message);
     }
   });
 
@@ -57,9 +57,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.get.username', function (requestId) {
     try {
       var username = user.getUsername();
-      worker.port.emit('passbolt.user.get.username.complete', requestId, 'SUCCESS', username);
+      worker.port.emit(requestId, 'SUCCESS', username);
     } catch (e) {
-      worker.port.emit('passbolt.user.get.username.complete', requestId, 'ERROR', e.message);
+      worker.port.emit(requestId, 'ERROR', e.message);
     }
   });
 
@@ -72,9 +72,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.settings.get', function (requestId) {
     try {
       var settings = user.settings.get();
-      worker.port.emit('passbolt.user.settings.get.complete', requestId, 'SUCCESS', settings);
+      worker.port.emit(requestId, 'SUCCESS', settings);
     } catch (e) {
-      worker.port.emit('passbolt.user.settings.get.complete', requestId, 'ERROR', e.message);
+      worker.port.emit(requestId, 'ERROR', e.message);
     }
   });
 
@@ -87,9 +87,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.settings.get.securityToken', function (requestId) {
     try {
       var securityToken = user.settings.getSecurityToken();
-      worker.port.emit('passbolt.user.settings.get.securityToken.complete', requestId, 'SUCCESS', securityToken);
+      worker.port.emit(requestId, 'SUCCESS', securityToken);
     } catch (e) {
-      worker.port.emit('passbolt.user.settings.get.securityToken.complete', requestId, 'ERROR', e.message);
+      worker.port.emit(requestId, 'ERROR', e.message);
     }
   });
 
@@ -102,9 +102,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.settings.get.domain', function (requestId) {
     try {
       var domain = user.settings.getDomain();
-      worker.port.emit('passbolt.user.settings.get.domain.complete', requestId, 'SUCCESS', domain);
+      worker.port.emit(requestId, 'SUCCESS', domain);
     } catch (e) {
-      worker.port.emit('passbolt.user.settings.get.domain.complete', requestId, 'ERROR', e.message);
+      worker.port.emit(requestId, 'ERROR', e.message);
     }
   });
 
@@ -119,9 +119,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.validate', function (requestId, u, fields) {
     try {
       var validatedUser = user.validate(u, fields);
-      worker.port.emit('passbolt.user.validate.complete', requestId, 'SUCCESS', validatedUser);
+      worker.port.emit(requestId, 'SUCCESS', validatedUser);
     } catch (e) {
-      worker.port.emit('passbolt.user.validate.complete', requestId, 'ERROR', e.message, e.validationErrors);
+      worker.port.emit(requestId, 'ERROR', e.message, e.validationErrors);
     }
   });
 
@@ -140,9 +140,9 @@ var listen = function (worker) {
     try {
       user.set(u);
       app.pageMods.PassboltAuth.init();
-      worker.port.emit('passbolt.user.set.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
-      worker.port.emit('passbolt.user.set.complete', requestId, 'ERROR', e.message);
+      worker.port.emit(requestId, 'ERROR', e.message);
     }
   });
 
@@ -157,9 +157,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.set.name', function (requestId, firstname, lastname) {
     try {
       user.setName(firstname, lastname);
-      worker.port.emit('passbolt.user.set.name.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
-      worker.port.emit('passbolt.user.set.name.complete', requestId, 'ERROR', e.validationErrors);
+      worker.port.emit(requestId, 'ERROR', e.validationErrors);
     }
   });
 
@@ -173,9 +173,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.set.username', function (requestId, username) {
     try {
       user.setUsername(username);
-      worker.port.emit('passbolt.user.set.username.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
-      worker.port.emit('passbolt.user.set.username.complete', requestId, 'ERROR', e.message);
+      worker.port.emit(requestId, 'ERROR', e.message);
     }
   });
 
@@ -189,9 +189,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.setId', function (requestId, userid) {
     try {
       user.setId(userid);
-      worker.port.emit('passbolt.user.set.id.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
-      worker.port.emit('passbolt.user.set.id.complete', requestId, 'ERROR', e.message);
+      worker.port.emit(requestId, 'ERROR', e.message);
     }
   });
 
@@ -205,9 +205,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.settings.set.securityToken', function (requestId, securityToken) {
     try {
       user.settings.setSecurityToken(securityToken);
-      worker.port.emit('passbolt.user.settings.set.securityToken.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
-      worker.port.emit('passbolt.user.settings.set.securityToken.complete', requestId, 'ERROR', e.message);
+      worker.port.emit(requestId, 'ERROR', e.message);
     }
   });
 
@@ -221,9 +221,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.settings.set.domain', function (requestId, domain) {
     try {
       user.settings.setDomain(domain);
-      worker.port.emit('passbolt.user.settings.set.domain.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
-      worker.port.emit('passbolt.user.settings.set.domain.complete', requestId, 'ERROR', e.message);
+      worker.port.emit(requestId, 'ERROR', e.message);
     }
   });
 
@@ -238,9 +238,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.settings.validate', function (requestId, settingsData, fields) {
     try {
       user.settings.validate(settingsData, fields);
-      worker.port.emit('passbolt.user.settings.validate.complete', requestId, 'SUCCESS', settingsData);
+      worker.port.emit(requestId, 'SUCCESS', settingsData);
     } catch (e) {
-      worker.port.emit('passbolt.user.settings.validate.complete', requestId, 'ERROR', e.message, e.validationErrors);
+      worker.port.emit(requestId, 'ERROR', e.message, e.validationErrors);
     }
   });
 
@@ -255,9 +255,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.user.rememberMasterPassword', function (requestId, masterPassword, seconds) {
     try {
       user.storeMasterPasswordTemporarily(masterPassword, seconds);
-      worker.port.emit('passbolt.user.rememberMasterPassword.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
-      worker.port.emit('passbolt.user.rememberMasterPassword.complete', requestId, 'ERROR', e.message);
+      worker.port.emit(requestId, 'ERROR', e.message);
     }
   });
 

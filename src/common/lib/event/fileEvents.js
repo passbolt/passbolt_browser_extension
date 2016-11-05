@@ -18,10 +18,10 @@ var listen = function (worker) {
   worker.port.on('passbolt.file.getPreferredDownloadDirectory', function (requestId) {
     fileController.getPreferredDownloadsDirectory().then(
       function (downloadsDirectory) {
-        worker.port.emit('passbolt.file.getPreferredDownloadDirectory.complete', requestId, 'SUCCESS', downloadsDirectory);
+        worker.port.emit(requestId, 'SUCCESS', downloadsDirectory);
       },
       function (error) {
-        worker.port.emit('passbolt.file.getPreferredDownloadDirectory.complete', requestId, 'ERROR', error);
+        worker.port.emit(requestId, 'ERROR', error);
       }
     );
   });
@@ -35,10 +35,10 @@ var listen = function (worker) {
   worker.port.on('passbolt.file.prompt', function (requestId) {
     fileController.openFile().then(
       function (fileContent) {
-        worker.port.emit('passbolt.file.prompt.complete', requestId, 'SUCCESS', fileContent);
+        worker.port.emit(requestId, 'SUCCESS', fileContent);
       },
       function (error) {
-        worker.port.emit('passbolt.file.prompt.complete', requestId, 'ERROR', error);
+        worker.port.emit(requestId, 'ERROR', error);
       }
     );
   });

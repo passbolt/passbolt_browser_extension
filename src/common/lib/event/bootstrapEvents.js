@@ -25,9 +25,9 @@ var listen = function (worker) {
   //  // And trigger a page refresh to restart it to make it work on the current page if changed
   //  console.log('auth init bootstrap');
   //  if (app.pageMods.PassboltAuth.init()) {
-  //    worker.port.emit('passbolt.bootstrap.login.complete', requestId, 'SUCCESS', true);
+  //    worker.port.emit(requestId, 'SUCCESS', true);
   //  } else {
-  //    worker.port.emit('passbolt.bootstrap.login.complete', requestId, 'ERROR', true);
+  //    worker.port.emit(requestId, 'ERROR', true);
   //  }
   //});
 
@@ -40,9 +40,9 @@ var listen = function (worker) {
   //worker.port.on('passbolt.bootstrap.debug', function (requestId) {
   //  if (Config.isDebug() == true) {
   //    tabsController.setActiveTabUrl(self.data.url('config-debug.html'));
-  //    worker.port.emit('passbolt.config.debug.complete', requestId, 'SUCCESS');
+  //    worker.port.emit(requestId, 'SUCCESS');
   //  } else {
-  //    worker.port.emit('passbolt.config.debug.complete', requestId, 'ERROR');
+  //    worker.port.emit(requestId, 'ERROR');
   //  }
   //});
 

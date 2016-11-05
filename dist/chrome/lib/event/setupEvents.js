@@ -22,7 +22,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.setup.init', function (requestId) {
     setup.reset();
-    worker.port.emit('passbolt.setup.init.complete', requestId, 'SUCCESS');
+    worker.port.emit(requestId, 'SUCCESS');
   });
 
   /*
@@ -36,9 +36,9 @@ var listen = function (worker) {
     try {
       var keyInfo = new Key();
       keyInfo.set(keyData);
-      worker.port.emit('passbolt.setup.keyinfo.set.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
-      worker.port.emit('passbolt.setup.keyinfo.set.complete', requestId, 'ERROR', error.message);
+      worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
 
@@ -53,9 +53,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.setup.set', function (requestId, key, value) {
     try {
       var setupData = setup.set(key, value);
-      worker.port.emit('passbolt.setup.set.complete', requestId, 'SUCCESS', setupData);
+      worker.port.emit(requestId, 'SUCCESS', setupData);
     } catch (error) {
-      worker.port.emit('passbolt.setup.set.complete', requestId, 'ERROR', error.message);
+      worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
 
@@ -69,9 +69,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.setup.get', function (requestId, key) {
     try {
       var setupData = setup.get(key);
-      worker.port.emit('passbolt.setup.get.complete', requestId, 'SUCCESS', setupData);
+      worker.port.emit(requestId, 'SUCCESS', setupData);
     } catch (error) {
-      worker.port.emit('passbolt.setup.get.complete', requestId, 'ERROR', error.message);
+      worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
 
@@ -85,9 +85,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.setup.navigation.next', function (requestId, stepId) {
     try {
       var myStepId = setup.navigationNext(stepId);
-      worker.port.emit('passbolt.setup.navigation.next.complete', requestId, 'SUCCESS', myStepId);
+      worker.port.emit(requestId, 'SUCCESS', myStepId);
     } catch (error) {
-      worker.port.emit('passbolt.setup.navigation.next.complete', requestId, 'ERROR', error.message);
+      worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
 
@@ -100,9 +100,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.setup.navigation.back', function (requestId) {
     try {
       var lastStep = setup.navigationBack();
-      worker.port.emit('passbolt.setup.navigation.back.complete', requestId, 'SUCCESS', lastStep);
+      worker.port.emit(requestId, 'SUCCESS', lastStep);
     } catch (error) {
-      worker.port.emit('passbolt.setup.navigation.back.complete', requestId, 'ERROR', error.message);
+      worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
 
@@ -114,9 +114,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.setup.navigation.get.history', function (requestId) {
     try {
       var history = setup.getNavigationHistory();
-      worker.port.emit('passbolt.setup.navigation.get.history.complete', requestId, 'SUCCESS', history);
+      worker.port.emit(requestId, 'SUCCESS', history);
     } catch (error) {
-      worker.port.emit('passbolt.setup.navigation.get.history.complete', requestId, 'ERROR', error.message);
+      worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
 
@@ -128,9 +128,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.setup.flush', function (requestId) {
     try {
       setup.flush();
-      worker.port.emit('passbolt.setup.flush.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
-      worker.port.emit('passbolt.setup.flush.complete', requestId, 'ERROR', error.message);
+      worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
 
@@ -145,15 +145,15 @@ var listen = function (worker) {
       setup.checkKeyExistRemotely(fingerprint)
         .then(
           function () {
-            worker.port.emit('passbolt.setup.checkKeyExistRemotely.complete', requestId, 'SUCCESS');
+            worker.port.emit(requestId, 'SUCCESS');
           },
           function (error) {
-            worker.port.emit('passbolt.setup.checkKeyExistRemotely.complete', requestId, 'ERROR', error.message);
+            worker.port.emit(requestId, 'ERROR', error.message);
           }
         );
     }
     catch (error) {
-      worker.port.emit('passbolt.setup.checkKeyExistRemotely.complete', requestId, 'ERROR', error.message);
+      worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
 
@@ -168,10 +168,10 @@ var listen = function (worker) {
       .then(
         function () {
           app.pageMods.PassboltAuth.init();
-          worker.port.emit('passbolt.setup.save.complete', requestId, 'SUCCESS');
+          worker.port.emit(requestId, 'SUCCESS');
         },
         function (error) {
-          worker.port.emit('passbolt.setup.save.complete', requestId, 'ERROR', error);
+          worker.port.emit(requestId, 'ERROR', error);
         }
       );
   });
@@ -187,10 +187,10 @@ var listen = function (worker) {
       .then(
         function () {
           app.pageMods.PassboltAuth.init();
-          worker.port.emit('passbolt.setup.completeRecovery.complete', requestId, 'SUCCESS');
+          worker.port.emit(requestId, 'SUCCESS');
         },
         function (error) {
-          worker.port.emit('passbolt.setup.completeRecovery.complete', requestId, 'ERROR', error);
+          worker.port.emit(requestId, 'ERROR', error);
         }
       );
   });

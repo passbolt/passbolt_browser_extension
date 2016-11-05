@@ -61,9 +61,9 @@ var listen = function (worker) {
 
       // Once the secret is decrypted, respond to the requester.
       .then(function (decrypted) {
-        worker.port.emit('passbolt.secret-edit.decrypt.complete', requestId, 'SUCCESS', decrypted);
+        worker.port.emit(requestId, 'SUCCESS', decrypted);
       }, function (error) {
-        worker.port.emit('passbolt.secret-edit.decrypt.complete', requestId, 'ERROR', error);
+        worker.port.emit(requestId, 'ERROR', error);
       });
   });
 

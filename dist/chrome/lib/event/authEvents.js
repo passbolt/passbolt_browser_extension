@@ -23,10 +23,10 @@ var listen = function (worker) {
   worker.port.on('passbolt.auth.verify', function (requestId) {
     auth.verify().then(
       function success(msg) {
-        worker.port.emit('passbolt.auth.verify.complete', requestId, 'SUCCESS', msg);
+        worker.port.emit(requestId, 'SUCCESS', msg);
       },
       function error(error) {
-        worker.port.emit('passbolt.auth.verify.complete', requestId, 'ERROR', error.message);
+        worker.port.emit(requestId, 'ERROR', error.message);
       }
     );
   });
@@ -41,10 +41,10 @@ var listen = function (worker) {
   worker.port.on('passbolt.auth.getServerKey', function (requestId, domain) {
     auth.getServerKey(domain).then(
       function success(msg) {
-        worker.port.emit('passbolt.auth.getServerKey.complete', requestId, 'SUCCESS', msg);
+        worker.port.emit(requestId, 'SUCCESS', msg);
       },
       function error(error) {
-        worker.port.emit('passbolt.auth.getServerKey.complete', requestId, 'ERROR', error.message);
+        worker.port.emit(requestId, 'ERROR', error.message);
       }
     );
   });
@@ -57,7 +57,7 @@ var listen = function (worker) {
    * @param masterpassword {string} The master password to use for the authentication attempt.
    */
   worker.port.on('passbolt.auth.login', function (requestId, masterpassword) {
-    Worker.get('Auth', worker.tab.id).port.emit('passbolt.auth.login.start', requestId, 'SUCCESS', __('Logging in'));
+    Worker.get('Auth', worker.tab.id).port.emit(requestId, 'SUCCESS', __('Logging in'));
     auth.login(masterpassword).then(
       function success(referrer) {
         // init the app pagemod
@@ -66,10 +66,10 @@ var listen = function (worker) {
 
         // redirect
         var msg = __('You are now logged in!');
-        Worker.get('Auth', worker.tab.id).port.emit('passbolt.auth.login.complete', requestId, 'SUCCESS', msg, referrer);
+        Worker.get('Auth', worker.tab.id).port.emit('passbolt.auth.login-success', msg, referrer);
       },
       function error(error) {
-        Worker.get('Auth', worker.tab.id).port.emit('passbolt.auth.login.complete', requestId, 'ERROR', error.message);
+        Worker.get('Auth', worker.tab.id).port.emit('passbolt.auth.login-failed', error.message);
       }
     );
   });

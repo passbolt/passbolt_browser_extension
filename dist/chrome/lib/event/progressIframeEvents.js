@@ -22,10 +22,10 @@ var listen = function (worker) {
    * @param goals {int} The number of goals to complete
    */
   worker.port.on('passbolt.progress.open-dialog', function (requestId, title, goals) {
-    Worker.get('App', worker.tab.id).port.emit('passbolt.progress.open-dialog', requestId, title, goals);
+    Worker.get('App', worker.tab.id).port.emit(requestId, title, goals);
     // When the dialog is opened, answer to the request caller.
     Worker.get('App', worker.tab.id).port.once('passbolt.progress.open-dialog.complete', function () {
-      worker.port.emit('passbolt.progress.open-dialog.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     });
   });
 

@@ -47,7 +47,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.share.get-shared-password', function (requestId) {
     var sharedPassword = TabStorage.get(worker.tab.id, 'sharedPassword');
-    worker.port.emit('passbolt.share.get-shared-password.complete', requestId, 'SUCCESS', sharedPassword);
+    worker.port.emit(requestId, 'SUCCESS', sharedPassword);
   });
 
 };

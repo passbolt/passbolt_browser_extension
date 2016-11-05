@@ -16,7 +16,7 @@ var listen = function (worker) {
    * @param requestId {int} The request identifier
    */
   worker.port.on('passbolt.debug.config.readAll', function (requestId) {
-    worker.port.emit('passbolt.debug.config.readAll.complete', requestId, 'SUCCESS', Config.readAll());
+    worker.port.emit(requestId, 'SUCCESS', Config.readAll());
   });
 
   /*
@@ -27,7 +27,7 @@ var listen = function (worker) {
    * @param preferenceKey {string} Preference name to obtain
    */
   worker.port.on('passbolt.debug.browser.readPreference', function (requestId, preferenceKey) {
-    worker.port.emit('passbolt.debug.browser.readPreference.complete', requestId, 'SUCCESS', BrowserSettings.get(preferenceKey));
+    worker.port.emit(requestId, 'SUCCESS', BrowserSettings.get(preferenceKey));
   });
 
   /*

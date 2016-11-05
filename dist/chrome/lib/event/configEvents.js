@@ -19,7 +19,7 @@ var listen = function (worker) {
    * @param name {string} Variable name to obtain
    */
   worker.port.on('passbolt.config.read', function (requestId, name) {
-    worker.port.emit('passbolt.config.read.complete', requestId, 'SUCCESS', Config.read(name));
+    worker.port.emit(requestId, 'SUCCESS', Config.read(name));
   });
 
   /*
@@ -34,7 +34,7 @@ var listen = function (worker) {
     for (var i in names) {
       conf[names[i]] = Config.read(names[i]);
     }
-    worker.port.emit('passbolt.config.readAll.complete', requestId, 'SUCCESS', conf);
+    worker.port.emit(requestId, 'SUCCESS', conf);
   });
 
   /*
@@ -45,7 +45,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.addon.isConfigured', function (requestId) {
     var user = new User();
-    worker.port.emit('passbolt.addon.isConfigured.complete', requestId, 'SUCCESS', user.isValid());
+    worker.port.emit(requestId, 'SUCCESS', user.isValid());
   });
 
   /*
@@ -58,12 +58,12 @@ var listen = function (worker) {
   worker.port.on('passbolt.addon.checkDomain', function (requestId) {
     var trustedDomain = Config.read('user.settings.trustedDomain');
     if(typeof trustedDomain === 'undefined' || trustedDomain == '') {
-      worker.port.emit('passbolt.addon.checkDomain.complete', requestId, 'SUCCESS', false);
+      worker.port.emit(requestId, 'SUCCESS', false);
     }
     tabsController.getActiveTabUrl()
       .then(function(url) {
         var domainOk = url.startsWith(trustedDomain);
-        worker.port.emit('passbolt.addon.checkDomain.complete', requestId, 'SUCCESS', domainOk);
+        worker.port.emit(requestId, 'SUCCESS', domainOk);
       });
   });
 
@@ -75,7 +75,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.addon.getDomain', function (requestId) {
     var trustedDomain = Config.read('user.settings.trustedDomain');
-    worker.port.emit('passbolt.addon.getDomain.complete', requestId, 'SUCCESS', trustedDomain);
+    worker.port.emit(requestId, 'SUCCESS', trustedDomain);
   });
 
   /*
@@ -89,7 +89,7 @@ var listen = function (worker) {
   worker.port.on('passbolt.config.write', function (requestId, name, value) {
     var write = Config.write(name, value);
     if (write) {
-      worker.port.emit('passbolt.config.write.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     }
   });
 
@@ -100,7 +100,7 @@ var listen = function (worker) {
    * @param requestId {int} The request identifier
    */
   worker.port.on('passbolt.addon.getVersion', function (requestId) {
-    worker.port.emit('passbolt.addon.getVersion.complete', requestId, 'SUCCESS', self.version);
+    worker.port.emit(requestId, 'SUCCESS', self.version);
   });
 };
 exports.listen = listen;

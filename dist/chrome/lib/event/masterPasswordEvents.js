@@ -36,12 +36,12 @@ var listen = function (worker) {
     keyring.checkPassphrase(masterPassword).then(
       // correct master password.
       function () {
-        worker.port.emit('passbolt.master-password.submit.complete', requestId, 'SUCCESS');
+        worker.port.emit(requestId, 'SUCCESS');
         masterPasswordRequest.deferred.resolve(masterPassword);
       },
       // wrong master password.
       function () {
-        worker.port.emit('passbolt.master-password.submit.complete', requestId, 'ERROR', masterPasswordRequest.attempts);
+        worker.port.emit(requestId, 'ERROR', masterPasswordRequest.attempts);
         if (masterPasswordRequest.attempts == 3) {
           masterPasswordRequest.deferred.reject();
         }

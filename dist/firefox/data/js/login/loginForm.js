@@ -87,9 +87,8 @@
   /**
    * Login the user
    */
-  var login = function () {
-    $loginMessage.removeClass('error');
-    passbolt.request('passbolt.auth.login', $masterPassword.val());
+  var login = function (masterPassword) {
+    passbolt.request('passbolt.auth.login', masterPassword);
   };
 
   /**
@@ -109,6 +108,7 @@
     passbolt.request('passbolt.keyring.private.checkpassphrase', masterPassword).then(
       // If the passphrase is valid, login the user.
       function success() {
+        console.log('successsss,', masterPassword);
         login(masterPassword);
       },
       // If the passphrase is invalid, display an error feedback.

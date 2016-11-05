@@ -32,13 +32,13 @@ var listen = function (worker) {
     try {
       var info = keyring.keyInfo(publicKeyArmored);
     } catch (e) {
-      worker.port.emit('passbolt.keyring.public.info.complete', requestId, 'ERROR', e.message);
+      worker.port.emit(requestId, 'ERROR', e.message);
     }
 
     if (typeof info !== 'undefined') {
-      worker.port.emit('passbolt.keyring.public.info.complete', requestId, 'SUCCESS', info);
+      worker.port.emit(requestId, 'SUCCESS', info);
     } else {
-      worker.port.emit('passbolt.keyring.public.info.complete', requestId, 'ERROR');
+      worker.port.emit(requestId, 'ERROR');
     }
   });
 
@@ -52,9 +52,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.keyring.public.get', function (requestId, userId) {
     var publicKey = keyring.findPublic(userId);
     if (typeof publicKey !== 'undefined') {
-      worker.port.emit('passbolt.keyring.public.get.complete', requestId, 'SUCCESS', publicKey);
+      worker.port.emit(requestId, 'SUCCESS', publicKey);
     } else {
-      worker.port.emit('passbolt.keyring.public.get.complete', requestId, 'ERROR');
+      worker.port.emit(requestId, 'ERROR');
     }
   });
 
@@ -67,9 +67,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.keyring.private.get', function (requestId) {
     var info = keyring.findPrivate();
     if (typeof info !== 'undefined') {
-      worker.port.emit('passbolt.keyring.private.get.complete', requestId, 'SUCCESS', info);
+      worker.port.emit(requestId, 'SUCCESS', info);
     } else {
-      worker.port.emit('passbolt.keyring.private.get.complete', requestId, 'ERROR');
+      worker.port.emit(requestId, 'ERROR');
     }
   });
 
@@ -87,9 +87,9 @@ var listen = function (worker) {
       serverkey = keyring.findPublic(serverkeyid);
 
     if (typeof serverkey !== 'undefined') {
-      worker.port.emit('passbolt.keyring.server.get.complete', requestId, 'SUCCESS', serverkey);
+      worker.port.emit(requestId, 'SUCCESS', serverkey);
     } else {
-      worker.port.emit('passbolt.keyring.server.get.complete', requestId, 'ERROR');
+      worker.port.emit(requestId, 'ERROR');
     }
   });
 
@@ -103,9 +103,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.keyring.public.extract', function (requestId, privateKeyArmored) {
     var publicKeyArmored = keyring.extractPublicKey(privateKeyArmored);
     if (typeof publicKeyArmored !== 'undefined') {
-      worker.port.emit('passbolt.keyring.public.extract.complete', requestId, 'SUCCESS', publicKeyArmored);
+      worker.port.emit(requestId, 'SUCCESS', publicKeyArmored);
     } else {
-      worker.port.emit('passbolt.keyring.public.extract.complete', requestId, 'ERROR');
+      worker.port.emit(requestId, 'ERROR');
     }
   });
 
@@ -120,9 +120,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.keyring.key.validate', function (requestId, keyData, fields) {
     try {
       var validate = key.validate(keyData, fields);
-      worker.port.emit('passbolt.keyring.key.validate.complete', requestId, 'SUCCESS', validate);
+      worker.port.emit(requestId, 'SUCCESS', validate);
     } catch (e) {
-      worker.port.emit('passbolt.keyring.key.validate.complete', requestId, 'ERROR', e.message, e.validationErrors);
+      worker.port.emit(requestId, 'ERROR', e.message, e.validationErrors);
     }
   });
 
@@ -140,9 +140,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.keyring.private.import', function (requestId, privateKeyArmored) {
     try {
       keyring.importPrivate(privateKeyArmored);
-      worker.port.emit('passbolt.keyring.private.import.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
-      worker.port.emit('passbolt.keyring.private.import.complete', requestId, 'ERROR', privateKeyArmored)
+      worker.port.emit(requestId, 'ERROR', privateKeyArmored)
     }
   });
 
@@ -157,9 +157,9 @@ var listen = function (worker) {
   worker.port.on('passbolt.keyring.public.import', function (requestId, publicKeyArmored, userid) {
     try {
       keyring.importPublic(privateKeyArmored, userid);
-      worker.port.emit('passbolt.keyring.public.import.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
-      worker.port.emit('passbolt.keyring.public.import.complete', requestId, 'ERROR', e.message)
+      worker.port.emit(requestId, 'ERROR', e.message)
     }
   });
 
@@ -174,9 +174,9 @@ var listen = function (worker) {
     try {
       var user = new (require("../model/user").User)();
       keyring.importServerPublicKey(publicKeyArmored, user.settings.getDomain());
-      worker.port.emit('passbolt.keyring.server.import.complete', requestId, 'SUCCESS');
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
-      worker.port.emit('passbolt.keyring.server.import.complete', requestId, 'ERROR', e.message)
+      worker.port.emit(requestId, 'ERROR', e.message)
     }
   });
 
@@ -189,7 +189,7 @@ var listen = function (worker) {
   worker.port.on('passbolt.keyring.sync', function (requestId) {
     keyring.sync()
       .then(function (keysCount) {
-        worker.port.emit('passbolt.keyring.sync.complete', requestId, 'SUCCESS', keysCount);
+        worker.port.emit(requestId, 'SUCCESS', keysCount);
       });
   });
 
@@ -203,10 +203,10 @@ var listen = function (worker) {
   worker.port.on('passbolt.keyring.private.checkpassphrase', function (requestId, passphrase) {
     keyring.checkPassphrase(passphrase).then(
       function () {
-        worker.port.emit('passbolt.keyring.private.checkpassphrase.complete', requestId, 'SUCCESS');
+        worker.port.emit(requestId, 'SUCCESS');
       },
       function (error) {
-        worker.port.emit('passbolt.keyring.private.checkpassphrase.complete', requestId, 'ERROR',
+        worker.port.emit(requestId, 'ERROR',
           __('This is not a valid passphrase'));
       }
     );
@@ -236,9 +236,9 @@ var listen = function (worker) {
 
     fileController.saveFile(filename, key)
       .then(function () {
-        worker.port.emit('passbolt.keyring.key.backup.complete', requestId, 'SUCCESS');
+        worker.port.emit(requestId, 'SUCCESS');
       }, function () {
-        worker.port.emit('passbolt.keyring.key.backup.complete', requestId, 'ERROR');
+        worker.port.emit(requestId, 'ERROR');
       });
   });
 
@@ -255,14 +255,14 @@ var listen = function (worker) {
       keyring.generateKeyPair(keyInfo, passphrase)
         .then(
           function (key) {
-            worker.port.emit('passbolt.keyring.generateKeyPair.complete', requestId, 'SUCCESS', key);
+            worker.port.emit(requestId, 'SUCCESS', key);
           },
           function (errorMsg) {
-            worker.port.emit('passbolt.keyring.generateKeyPair.complete', requestId, 'ERROR', errorMsg);
+            worker.port.emit(requestId, 'ERROR', errorMsg);
           });
 
     } catch (e) {
-      worker.port.emit('passbolt.keyring.generateKeyPair.complete', requestId, 'ERROR', e.message);
+      worker.port.emit(requestId, 'ERROR', e.message);
     }
   });
 

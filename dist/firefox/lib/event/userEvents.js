@@ -21,7 +21,7 @@ var listen = function (worker) {
    * Get the current user as stored in the plugin.
    *
    * @listens passbolt.user.get
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param data {array} The user filter
    */
   worker.port.on('passbolt.user.get', function (requestId, data) {
@@ -37,7 +37,7 @@ var listen = function (worker) {
    * Get the current user name (firstname and lastname) as stored in the plugin
    *
    * @listens passbolt.user.get.name
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.user.get.name', function (requestId) {
     try {
@@ -52,7 +52,7 @@ var listen = function (worker) {
    * Get the current username as stored in the plugin
    *
    * @listens passbolt.user.get.username
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.user.get.username', function (requestId) {
     try {
@@ -67,7 +67,7 @@ var listen = function (worker) {
    * Get all the user settings as stored in the plugin
    *
    * @listens passbolt.user.settings.get
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.user.settings.get', function (requestId) {
     try {
@@ -82,7 +82,7 @@ var listen = function (worker) {
    * Get the user security token as stored in the plugin
    *
    * @listens passbolt.user.settings.get.securityToken
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.user.settings.get.securityToken', function (requestId) {
     try {
@@ -97,7 +97,7 @@ var listen = function (worker) {
    * Get the user domain trust as stored in the plugin
    *
    * @listens passbolt.user.settings.get.domain
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.user.settings.get.domain', function (requestId) {
     try {
@@ -112,7 +112,7 @@ var listen = function (worker) {
    * Validate the user object given and return errors if any.
    *
    * @listens passbolt.user.validate
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param u {array} The user object to validate
    * @param fields {array} The fields to validate
    */
@@ -133,7 +133,7 @@ var listen = function (worker) {
    * Set the user in the plugin local storage
    *
    * @listens passbolt.user.set
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param u {array} The user object
    */
   worker.port.on('passbolt.user.set', function (requestId, u) {
@@ -150,7 +150,7 @@ var listen = function (worker) {
    * Set the user name in the plugin local storage
    *
    * @listens passbolt.user.set.name
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param firstname {string} The user firstname
    * @param lastname {string} The user lastname
    */
@@ -167,7 +167,7 @@ var listen = function (worker) {
    * Set the user username in the plugin local storage
    *
    * @listens passbolt.user.set.username
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param username {string} The user username
    */
   worker.port.on('passbolt.user.set.username', function (requestId, username) {
@@ -183,7 +183,7 @@ var listen = function (worker) {
    * Set the user identifier in the plugin local storage
    *
    * @listens passbolt.user.setId
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param userid {string} The user identifier
    */
   worker.port.on('passbolt.user.setId', function (requestId, userid) {
@@ -199,7 +199,7 @@ var listen = function (worker) {
    * Set the user security token in the plugin local storage
    *
    * @listens passbolt.user.settings.set.securityToken
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param securityToken {array} The security token
    */
   worker.port.on('passbolt.user.settings.set.securityToken', function (requestId, securityToken) {
@@ -215,7 +215,7 @@ var listen = function (worker) {
    * Set the user domain trust in the plugin local storage
    *
    * @listens passbolt.user.settings.set.domain
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param domain {string} The domain trust
    */
   worker.port.on('passbolt.user.settings.set.domain', function (requestId, domain) {
@@ -231,7 +231,7 @@ var listen = function (worker) {
    * Validate the user settings object given and return errors if any.
    *
    * @listens passbolt.user.settings.validate
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param settingsData {array} The user settings object to validate
    * @param fields {array} The fields to validate
    */
@@ -248,7 +248,7 @@ var listen = function (worker) {
    * Remember the master password for some time
    *
    * @listens passbolt.user.rememberMasterPassword
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param masterPassword {string} The master password to remember
    * @param seconds {int} The time to remember the secret password
    */

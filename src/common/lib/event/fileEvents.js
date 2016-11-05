@@ -13,7 +13,7 @@ var listen = function (worker) {
    * Get the preferred download directory.
    *
    * @listens passbolt.keyring.generateKeyPair
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.file.getPreferredDownloadDirectory', function (requestId) {
     fileController.getPreferredDownloadsDirectory().then(
@@ -30,7 +30,7 @@ var listen = function (worker) {
    * Prompt a file.
    *
    * @listens passbolt.keyring.generateKeyPair
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.file.prompt', function (requestId) {
     fileController.openFile().then(

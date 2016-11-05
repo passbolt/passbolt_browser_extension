@@ -18,7 +18,7 @@ var listen = function (worker) {
    * Initialize the authentication process.
    *
    * @listens passbolt.bootstrap.login
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   //worker.port.on('passbolt.bootstrap.login', function (requestId) {
   //  // Destroy the passbolt application authentication pageMod.
@@ -35,7 +35,7 @@ var listen = function (worker) {
    * Open the plugin debug page.
    *
    * @listens passbolt.bootstrap.debug
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   //worker.port.on('passbolt.bootstrap.debug', function (requestId) {
   //  if (Config.isDebug() == true) {

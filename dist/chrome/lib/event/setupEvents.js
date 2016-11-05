@@ -18,7 +18,7 @@ var listen = function (worker) {
    * Init / Reset the setup.
    *
    * @listens passbolt.setup.init
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.setup.init', function (requestId) {
     setup.reset();
@@ -29,7 +29,7 @@ var listen = function (worker) {
    * Set key info.
    *
    * @listens passbolt.setup.keyinfo.set
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param keyData {array} The key information
    */
   worker.port.on('passbolt.setup.keyinfo.set', function (requestId, keyData) {
@@ -46,7 +46,7 @@ var listen = function (worker) {
    * Set setup variable.
    *
    * @listens passbolt.setup.set
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param key {string} Variable name to store
    * @param value {string} Variable value
    */
@@ -63,7 +63,7 @@ var listen = function (worker) {
    * Get setup variable.
    *
    * @listens passbolt.setup.get
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param key {string} Variable name to store
    */
   worker.port.on('passbolt.setup.get', function (requestId, key) {
@@ -79,7 +79,7 @@ var listen = function (worker) {
    * Go to next section in the navigation.
    *
    * @listens passbolt.setup.navigation.next
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param stepId {string} The step identifier to go to
    */
   worker.port.on('passbolt.setup.navigation.next', function (requestId, stepId) {
@@ -95,7 +95,7 @@ var listen = function (worker) {
    * Go back to previous section in the navigation.
    *
    * @listens passbolt.setup.navigation.back
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.setup.navigation.back', function (requestId) {
     try {

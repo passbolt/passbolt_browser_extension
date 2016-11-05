@@ -14,7 +14,7 @@ var listen = function (worker) {
    * Retrieve a template with its path.
    *
    * @listens passbolt.template.get
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param path {string} The template path to retrieve
    */
   worker.port.on('passbolt.template.get', function (requestId, path) {

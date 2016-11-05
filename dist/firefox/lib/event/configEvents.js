@@ -15,7 +15,7 @@ var listen = function (worker) {
    * Read configuration variable.
    *
    * @listens passbolt.config.read
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param name {string} Variable name to obtain
    */
   worker.port.on('passbolt.config.read', function (requestId, name) {
@@ -26,7 +26,7 @@ var listen = function (worker) {
    * Read multiple configuration variables.
    *
    * @listens passbolt.config.readAll
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param names {array} Variable names to obtain
    */
   worker.port.on('passbolt.config.readAll', function (requestId, names) {
@@ -41,7 +41,7 @@ var listen = function (worker) {
    * Check if the plugin is well configured
    *
    * @listens passbolt.addon.isConfigured
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.addon.isConfigured', function (requestId) {
     var user = new User();
@@ -53,7 +53,7 @@ var listen = function (worker) {
    * Only works if the plugin is configured.
    *
    * @listens passbolt.addon.checkDomain
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.addon.checkDomain', function (requestId) {
     var trustedDomain = Config.read('user.settings.trustedDomain');
@@ -71,7 +71,7 @@ var listen = function (worker) {
    * Get trusted domain.
    *
    * @listens passbolt.addon.getDomain
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.addon.getDomain', function (requestId) {
     var trustedDomain = Config.read('user.settings.trustedDomain');
@@ -82,7 +82,7 @@ var listen = function (worker) {
    * Set a configuration variable.
    *
    * @listens passbolt.config.write
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param name {string} Variable name to store
    * @param value {mixed} Variable value
    */
@@ -97,7 +97,7 @@ var listen = function (worker) {
    * Get plugin version.
    *
    * @listens passbolt.addon.getDomain
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.addon.getVersion', function (requestId) {
     worker.port.emit(requestId, 'SUCCESS', self.version);

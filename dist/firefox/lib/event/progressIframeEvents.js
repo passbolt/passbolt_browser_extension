@@ -17,7 +17,7 @@ var listen = function (worker) {
    * Open the progress dialog.
    *
    * @listens passbolt.progress.open-dialog
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param title {string} Title of the dialog
    * @param goals {int} The number of goals to complete
    */

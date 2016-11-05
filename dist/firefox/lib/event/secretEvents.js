@@ -45,7 +45,7 @@ var listen = function (worker) {
    * Decrypt a given armored string.
    *
    * @listens passbolt.secret-edit.decrypt
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param armored {string} The armored secret
    */
   worker.port.on('passbolt.secret-edit.decrypt', function (requestId, armored) {

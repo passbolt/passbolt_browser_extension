@@ -22,7 +22,7 @@ var listen = function (worker) {
    *      ** reject the master password request promise
    *
    * @listens passbolt.master-password.submit
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param masterPassword {string} The master password filled by the user
    */
   worker.port.on('passbolt.master-password.submit', function (requestId, masterPassword) {

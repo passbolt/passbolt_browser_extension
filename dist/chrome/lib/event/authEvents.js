@@ -18,7 +18,7 @@ var listen = function (worker) {
    * Verify the server identity.
    *
    * @listens passbolt.auth.verify
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.auth.verify', function (requestId) {
     auth.verify().then(
@@ -35,7 +35,7 @@ var listen = function (worker) {
    * Get the password server key for a given domain.
    *
    * @listens passbolt.auth.getServerKey
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param domain {string} The server's domain
    */
   worker.port.on('passbolt.auth.getServerKey', function (requestId, domain) {
@@ -53,7 +53,7 @@ var listen = function (worker) {
    * Attempt to login the current user.
    *
    * @listens passbolt.auth.login
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param masterpassword {string} The master password to use for the authentication attempt.
    */
   worker.port.on('passbolt.auth.login', function (requestId, masterpassword) {

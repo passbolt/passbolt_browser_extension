@@ -47,7 +47,7 @@ var listen = function (worker) {
   /* Validate the edited secret.
    *
    * @listens passbolt.secret-edit.validate
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.secret-edit.validate', function (requestId) {
     var editedPassword = TabStorage.get(worker.tab.id, 'editedPassword');
@@ -72,7 +72,7 @@ var listen = function (worker) {
    * decrypted send an empty array.
    *
    * @listens passbolt.secret-edit.encrypt
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param usersIds {array} The users to encrypt the edited secret for
    */
   worker.port.on('passbolt.secret-edit.encrypt', function (requestId, usersIds) {
@@ -133,7 +133,7 @@ var listen = function (worker) {
    * Initialize the password sharing process.
    *
    * @listens passbolt.app.share-password-init
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param sharedPassword {array} The password to share
    */
   worker.port.on('passbolt.app.share-password-init', function (requestId, sharedPassword) {
@@ -147,7 +147,7 @@ var listen = function (worker) {
    * Encrypt the shared password for all the new users it has been shared with.
    *
    * @listens passbolt.share.encrypt
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.share.encrypt', function (requestId) {
     var sharedPassword = TabStorage.get(worker.tab.id, 'sharedPassword'),
@@ -241,7 +241,7 @@ var listen = function (worker) {
    * Decrypt a given armored string and store it in the clipboard.
    *
    * @listens passbolt.app.decrypt-copy
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param armored {string} The armored secret
    */
   worker.port.on('passbolt.app.decrypt-copy', function (requestId, armored) {

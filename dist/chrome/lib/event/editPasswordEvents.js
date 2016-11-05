@@ -15,7 +15,7 @@ var listen = function (worker) {
    * Set the edited password.
    *
    * @listens passbolt.edit-password.set-edited-password
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param editedPassword {array} The edited password
    */
   worker.port.on('passbolt.edit-password.set-edited-password', function (requestId, editedPassword) {
@@ -27,7 +27,7 @@ var listen = function (worker) {
    * Get the edited password.
    *
    * @listens passbolt.edit-password.get-edited-password
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.edit-password.get-edited-password', function (requestId) {
     var editedPassword = TabStorage.get(worker.tab.id, 'editedPassword');

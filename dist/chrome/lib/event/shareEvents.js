@@ -43,7 +43,7 @@ var listen = function (worker) {
    * Get the shared password.
    *
    * @listens passbolt.share.get-shared-password
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.share.get-shared-password', function (requestId) {
     var sharedPassword = TabStorage.get(worker.tab.id, 'sharedPassword');

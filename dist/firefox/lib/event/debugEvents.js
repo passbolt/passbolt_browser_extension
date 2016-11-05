@@ -13,7 +13,7 @@ var listen = function (worker) {
    * Retrieve all the plugin configuration variables.
    *
    * @listens passbolt.debug.config.readAll
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.debug.config.readAll', function (requestId) {
     worker.port.emit(requestId, 'SUCCESS', Config.readAll());
@@ -23,7 +23,7 @@ var listen = function (worker) {
    * Read preference variable.
    *
    * @listens passbolt.debug.browser.readPreference
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param preferenceKey {string} Preference name to obtain
    */
   worker.port.on('passbolt.debug.browser.readPreference', function (requestId, preferenceKey) {

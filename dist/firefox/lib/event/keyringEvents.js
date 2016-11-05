@@ -25,7 +25,7 @@ var listen = function (worker) {
    * Get the public key information.
    *
    * @listens passbolt.keyring.public.info
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param publicKeyArmored {string} The public key
    */
   worker.port.on('passbolt.keyring.public.info', function (requestId, publicKeyArmored) {
@@ -46,7 +46,7 @@ var listen = function (worker) {
    * Get a user's public key.
    *
    * @listens passbolt.keyring.public.get
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param userId {string} The user to retrieve the public key
    */
   worker.port.on('passbolt.keyring.public.get', function (requestId, userId) {
@@ -62,7 +62,7 @@ var listen = function (worker) {
    * Get the user private key.
    *
    * @listens passbolt.keyring.private.get
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.keyring.private.get', function (requestId) {
     var info = keyring.findPrivate();
@@ -77,7 +77,7 @@ var listen = function (worker) {
    * Get the server's public key.
    *
    * @listens passbolt.keyring.server.get
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.keyring.server.get', function (requestId) {
 
@@ -97,7 +97,7 @@ var listen = function (worker) {
    * Extract the public key from a private armored key.
    *
    * @listens passbolt.keyring.public.extract
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param privateKeyArmored {string} The private armored key
    */
   worker.port.on('passbolt.keyring.public.extract', function (requestId, privateKeyArmored) {
@@ -113,7 +113,7 @@ var listen = function (worker) {
    * Validate the key information.
    *
    * @listens passbolt.keyring.key.validate
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param keyData {array} The key information
    * @param fields {array} The names of the variable to validate
    */
@@ -134,7 +134,7 @@ var listen = function (worker) {
    * Import the user private armored key.
    *
    * @listens passbolt.keyring.private.import
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param privateKeyArmored {string} The private armored key to import
    */
   worker.port.on('passbolt.keyring.private.import', function (requestId, privateKeyArmored) {
@@ -150,7 +150,7 @@ var listen = function (worker) {
    * Import a user's public armored key.
    *
    * @listens passbolt.keyring.public.import
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param publicKeyArmored {string} The public armored key to import
    * @param userId {string} The user identifier
    */
@@ -167,7 +167,7 @@ var listen = function (worker) {
    * Import the server public armored key.
    *
    * @listens passbolt.keyring.server.import
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param publicKeyArmored {string} The public armored key to import
    */
   worker.port.on('passbolt.keyring.server.import', function (requestId, publicKeyArmored) {
@@ -184,7 +184,7 @@ var listen = function (worker) {
    * Synchronize the keyring with the server.
    *
    * @listens passbolt.keyring.sync
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.keyring.sync', function (requestId) {
     keyring.sync()
@@ -197,7 +197,7 @@ var listen = function (worker) {
    * Check the private key passphrase.
    *
    * @listens passbolt.keyring.private.checkpassphrase
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param passphrase {string} The passphrase to check
    */
   worker.port.on('passbolt.keyring.private.checkpassphrase', function (requestId, passphrase) {
@@ -220,7 +220,7 @@ var listen = function (worker) {
    * Offer to the user to backup his key by downloading it.
    *
    * @listens passbolt.keyring.key.backup
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param key {string} The key to backup
    * @param filename {string} The filename to use for the downloadable file
    */
@@ -246,7 +246,7 @@ var listen = function (worker) {
    * Generate a private armored key.
    *
    * @listens passbolt.keyring.generateKeyPair
-   * @param requestId {int} The request identifier
+   * @param requestId {uuid} The request identifier
    * @param keyInfo {array} The key parameters
    * @param passphrase {string} The key passphrase
    */

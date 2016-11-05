@@ -133,7 +133,7 @@ passbolt.login = passbolt.login || {};
   });
 
   // Passphrase have been captured and verified
-  passbolt.message.on('passbolt.auth.login.start', function (token, status, message) {
+  passbolt.message.on('passbolt.auth.login-processing', function (message) {
     $('html').addClass('loading').removeClass('loaded');
     // remove the iframe and tell the user we're logging in
     var tplData = {message: message};

@@ -57,7 +57,7 @@ var listen = function (worker) {
    * @param masterpassword {string} The master password to use for the authentication attempt.
    */
   worker.port.on('passbolt.auth.login', function (requestId, masterpassword) {
-    Worker.get('Auth', worker.tab.id).port.emit(requestId, 'SUCCESS', __('Logging in'));
+    Worker.get('Auth', worker.tab.id).port.emit('passbolt.auth.login-processing', __('Logging in'));
     auth.login(masterpassword).then(
       function success(referrer) {
         // init the app pagemod

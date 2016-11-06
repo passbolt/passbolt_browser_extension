@@ -44,9 +44,9 @@ passbolt.setup.steps = passbolt.setup.steps || {};
    * @return {promise}
    */
   step.init = function () {
-    return passbolt.setup.get('settings.domain')
-      .then(function (domain) {
-        step.viewData.domain = step._data.domain = domain;
+    return passbolt.setup.get('settings')
+      .then(function (settings) {
+        step.viewData.domain = step._data.domain = settings.domain;
       });
   };
 

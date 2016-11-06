@@ -102,6 +102,7 @@ Auth.prototype.verify = function(serverUrl, serverKey, userFingerprint) {
  */
 Auth.prototype.getServerKey = function (domain) {
   var deferred = defer(),
+    user = new User(),
     _this = this;
 
   if (typeof domain === 'undefined') {

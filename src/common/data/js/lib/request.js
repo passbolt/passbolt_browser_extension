@@ -97,18 +97,19 @@ var passbolt = passbolt || {};
 
     // Observe when the request has been completed.
     // Or if a progress notification is sent.
-    self.port.on(requestId, function handleResponse(status) {
+    self.port.once(requestId, function handleResponse(status) {
       var callbackArgs = Array.prototype.slice.call(arguments, 1);
       if (status == 'SUCCESS') {
         deferred.resolveWith(this, callbackArgs);
-        self.port.removeListener(requestId, handleResponse);
+        //self.port.removeListener(requestId, handleResponse);
       }
       else if (status == 'ERROR') {
         deferred.rejectWith(this, callbackArgs);
-        self.port.removeListener(requestId, handleResponse);
+        //self.port.removeListener(requestId, handleResponse);
       }
       else if (status == 'PROGRESS') {
-        deferred.notifyWith(this, callbackArgs);
+        //deferred.notifyWith(this, callbackArgs);
+        console.warn('progress not supported anymore');
       }
     });
 

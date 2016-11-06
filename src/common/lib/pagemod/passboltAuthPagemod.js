@@ -45,7 +45,6 @@ PassboltAuth.init = function () {
     onAttach: function (worker) {
       Worker.add('Auth', worker);
       app.events.config.listen(worker);
-      app.events.bootstrap.listen(worker);
       app.events.template.listen(worker);
       app.events.keyring.listen(worker);
       app.events.secret.listen(worker);

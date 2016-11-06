@@ -39,7 +39,6 @@ Bootstrap.init = function () {
       Worker.add('appBootstrap', worker);
       app.events.template.listen(worker);
       app.events.config.listen(worker);
-      app.events.bootstrap.listen(worker);
     }
   });
 };

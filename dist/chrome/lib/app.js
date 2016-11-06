@@ -21,7 +21,6 @@
 var events = {};
 events.app = require('./event/appEvents');
 events.auth = require('./event/authEvents');
-events.bootstrap = require('./event/bootstrapEvents');
 events.clipboard = require('./event/clipboardEvents');
 events.config = require('./event/configEvents');
 events.editPassword = require('./event/editPasswordEvents');

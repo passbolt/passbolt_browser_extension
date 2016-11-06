@@ -57,8 +57,6 @@ Setup.init = function () {
       self.data.url('js/setup/setup.js')
     ],
     onAttach: function (worker) {
-      Worker.add('Setup', worker);
-
       app.events.template.listen(worker);
       app.events.clipboard.listen(worker);
       app.events.setup.listen(worker);
@@ -67,6 +65,8 @@ Setup.init = function () {
       app.events.auth.listen(worker);
       app.events.user.listen(worker);
       app.events.config.listen(worker);
+
+      Worker.add('Setup', worker);
     }
   });
 };

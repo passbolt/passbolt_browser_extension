@@ -87,9 +87,11 @@
    * @returns {promise}
    */
   var getEditedPassword = function () {
+    console.log('getEditPassword');
     return passbolt.request('passbolt.edit-password.get-edited-password')
       .then(function (data) {
         // Store the secret to edit.
+        console.log('getEditPassword done');
         editedPassword = data;
       });
   };

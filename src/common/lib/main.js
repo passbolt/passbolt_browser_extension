@@ -31,18 +31,28 @@ var pageMods = require('./app').pageMods;
 
 pageMods.Bootstrap.init();
 
-// Passbolt Auth pagemod init can also be triggered
-// by debug, setup and user events
+// If the user is valid we enable the login pagemod
 var user = new User();
 if (user.isValid()) {
+  // Auth pagemod init can also be triggered
+  // by debug, setup and user events (e.g. when config change)
   pageMods.PassboltAuth.init();
+
+  // App pagemod init is generally triggered after a successful login
+  // We only initialize it here for the cases where the user is already logged in
+  user.isLoggedIn()
+    .then(function() {
+      pageMods.PassboltApp.init();
+    });
 }
-pageMods.PassboltAuthForm.init();
+
+// Setup pagemods
 pageMods.SetupBootstrap.init();
 pageMods.Setup.init();
 
-// PassboltApp is initialized by login
-// pageMods.PassboltApp.init();
+// Other pagemods active all the time
+// but triggered by App or Auth
+pageMods.PassboltAuthForm.init();
 pageMods.MasterPasswordDialog.init();
 pageMods.ProgressDialog.init();
 pageMods.SecretEditDialog.init();

@@ -27,7 +27,6 @@
       iframeUrl = 'about:blank';
     }
     iframeUrl += '?passbolt=' + iframeId + '&case=' + dialogCase;
-
     var $iframe = $('<iframe/>', {
       id: iframeId,
       src: iframeUrl,

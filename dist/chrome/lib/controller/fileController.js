@@ -5,6 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 const defer = require('sdk/core/promise').defer;
+var self = require('sdk/self');
 
 /**
  * Save file on disk using download
@@ -53,7 +54,7 @@ exports.openFile = openFile;
 /**
  * Get the prefered download directory path
  *
- * @return {string}
+ * @return {promise}
  */
 function getPreferredDownloadsDirectory() {
   var deferred = defer();
@@ -68,9 +69,17 @@ exports.getPreferredDownloadsDirectory = getPreferredDownloadsDirectory;
  * @return {promise}
  */
 function loadFile (path) {
-  var url = chrome.runtime.getURL("data/" + path);
-  return fetch(url).then(function (response) {
-    return response.text();
-  });
+  var deferred = defer();
+  var url = self.data.url(path);
+  fetch(url)
+    .then(
+      function (response) {
+         deferred.resolve(response.text());
+      },
+      function (error) {
+        deferred.reject(error);
+      }
+    );
+  return deferred.promise;
 }
 exports.loadFile = loadFile;

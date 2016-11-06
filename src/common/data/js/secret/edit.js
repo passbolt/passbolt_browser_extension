@@ -29,7 +29,6 @@
   var init = function () {
     // Is the dialog opened to edit a password, or to add a new one.
     dialogCase = window.location.href.indexOf('case=edit') != -1 ? 'edit' : 'create';
-
     // Load the page template.
     loadTemplate()
     // Retrieve the currently edited secret model (even in add case)
@@ -87,11 +86,9 @@
    * @returns {promise}
    */
   var getEditedPassword = function () {
-    console.log('getEditPassword');
     return passbolt.request('passbolt.edit-password.get-edited-password')
       .then(function (data) {
         // Store the secret to edit.
-        console.log('getEditPassword done');
         editedPassword = data;
       });
   };

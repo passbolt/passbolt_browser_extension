@@ -21,6 +21,8 @@ var listen = function (worker) {
     fileController.loadFile(path)
       .then(function(tpl) {
         worker.port.emit(requestId, 'SUCCESS', tpl);
+      },function(error) {
+        worker.port.emit(requestId, 'ERROR', error.message);
       });
   });
 

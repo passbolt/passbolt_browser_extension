@@ -155,6 +155,7 @@ PageMod.prototype.__onIframeConnectInit = function() {
   // We use the passbolt part of the location for ifrrame portname
   // e.g. about:blank?passbolt=iframeId
   var iframeId = this.args.include.split('passbolt=')[1];
+  iframeId = iframeId.replace('*', '');
   this.portname = iframeId;
   this.__initConnectListener(this.portname);
 };
@@ -171,7 +172,6 @@ PageMod.prototype.__onContentConnectInit = function() {
   this.portname = portname;
   this.__initConnectListener(this.portname);
 };
-
 
 /**
  * When a pagemod is requested on an already opened tab

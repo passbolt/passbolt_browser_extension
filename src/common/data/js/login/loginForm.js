@@ -108,7 +108,6 @@
     passbolt.request('passbolt.keyring.private.checkpassphrase', masterPassword).then(
       // If the passphrase is valid, login the user.
       function success() {
-        console.log('successsss,', masterPassword);
         login(masterPassword);
       },
       // If the passphrase is invalid, display an error feedback.

@@ -61,5 +61,5 @@ SecretEditDialog.init = function () {
       app.events.user.listen(worker);
     }
   });
-}
+};
 exports.SecretEditDialog = SecretEditDialog;

@@ -57,10 +57,15 @@ passbolt.helper.html = passbolt.helper.html || {};
     }
 
     return passbolt.request('passbolt.template.get', path)
-      .then(function (tpl) {
-        _templatesCache[path] = tpl;
-        return tpl;
-      });
+      .then(
+        function (tpl) {
+          _templatesCache[path] = tpl;
+          return tpl;
+        },
+        function (error) {
+          console.warn(error.message);
+        }
+      );
   };
   passbolt.helper.html.getTemplate = getTemplate;
 

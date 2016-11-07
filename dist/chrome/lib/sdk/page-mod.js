@@ -131,7 +131,7 @@ PageMod.prototype.__init = function() {
  *
  * @private
  */
-PageMod.prototype.__initConnectListener = function(portName, tabId) {
+PageMod.prototype.__initConnectListener = function(portName, tabId, iframe) {
   var _this = this;
 
   this._listeners['chrome.runtime.onConnect'] = function (port) {
@@ -140,7 +140,9 @@ PageMod.prototype.__initConnectListener = function(portName, tabId) {
       // add the sender tab id to the list of active tab for that worker
       if(typeof tabId === 'undefined' || tabId === port.sender.tab.id) {
         _this._tabs.push(port.sender.tab.id);
-        _this.__onConnect(port);
+        var worker = new Worker(port);
+        worker.iframe = iframe;
+        _this.args.onAttach(worker);
       }
     }
   };
@@ -157,7 +159,7 @@ PageMod.prototype.__onIframeConnectInit = function() {
   var iframeId = this.args.include.split('passbolt=')[1];
   iframeId = iframeId.replace('*', '');
   this.portname = iframeId;
-  this.__initConnectListener(this.portname);
+  this.__initConnectListener(this.portname, undefined, true);
 };
 
 /**
@@ -194,7 +196,7 @@ PageMod.prototype.__onAttachExistingTab = function(tab) {
   if (tab.url.match(this.args.include)) {
     chrome.tabs.reload(tab.id);
   }
-}
+};
 
 /**
  * When a tab is updated
@@ -270,18 +272,6 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
       }
     }
   }
-};
-
-/**
- * When a content code connect to the port
- * Triggers onAttach callback so that events from lib/event can be triggered
- * if the pageMod / worker is set to listen to them
- *
- * @param port
- */
-PageMod.prototype.__onConnect = function(port) {
-  var worker = new Worker(port);
-  this.args.onAttach(worker);
 };
 
 /**

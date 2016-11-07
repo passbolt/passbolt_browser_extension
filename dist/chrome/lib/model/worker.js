@@ -19,34 +19,49 @@ var add = function (workerId, worker, options) {
 
   if (exists(workerId, worker.tab.id)) {
     // if a worker with same id is already in the tab
-    // trigger a detach event
+    // destroy it, it will trigger a detach event (see bellow)
+    console.log('destroying worker because it already exist');
     app.workers[worker.tab.id][workerId].destroy();
   }
 
-  // Add the worker to the list of active app workers.
+  // Build the workers list for that tab if needed
   if (typeof app.workers[worker.tab.id] === 'undefined') {
     app.workers[worker.tab.id] = {};
   }
 
+  // Add the worker to the list of active app workers.
   console.debug('Add worker @ id:' + workerId + ', tab:' + worker.tab.id + ', url:' + worker.tab.url);
   app.workers[worker.tab.id][workerId] = worker;
 
-  // Listen to worker detached.
-  var onWorkerDetachHandler = function () {
-    remove(workerId, worker.tab.id, options);
-  };
-  worker.on('detach', onWorkerDetachHandler);
+  // When a port is closed from the content code end
+  // For example when an iframe is unloaded
+  if(typeof worker.iframe !== 'undefined' && worker.iframe === true) {
+    var onPortDisconnect = function() {
+      worker.port._port.onDisconnect.removeListener(onPortDisconnect);
+      console.log('destroying worker because it iframe got unloaded');
+      app.workers[worker.tab.id][workerId].destroy();
+    };
+    worker.port._port.onDisconnect.addListener(onPortDisconnect);
+  }
 
   // Listen to tab url changes.
+  // If callback given in option on url change, call it
   var onTabReadyHandler = function (tab) {
-    // If callback given in option on url change
-    // call it
     if (options.onTabUrlChange) {
       options.onTabUrlChange(worker);
     }
     worker.tab.removeListener('ready', onTabReadyHandler);
   };
   worker.tab.on('ready', onTabReadyHandler);
+
+  // Listen to worker detach event
+  // This event is called as part of the worker destroy
+  // Remove the worker from the list
+  var onWorkerDetachHandler = function () {
+    remove(workerId, worker.tab.id, options);
+  };
+  worker.on('detach', onWorkerDetachHandler);
+
 };
 exports.add = add;
 
@@ -63,7 +78,7 @@ var remove = function (workerId, tabId, options) {
     console.warn('Warning: unable to remove the worker ' + workerId + ', it doesn\'t exist on the tab ' + tabId + ' .');
   } else {
     console.debug('Remove worker @ id:' + workerId + ', tab:' + tabId);
-    if (options.onDestroy) {
+    if (typeof options.onDestroy !== 'undefined') {
       options.onDestroy();
     }
     delete app.workers[tabId][workerId];

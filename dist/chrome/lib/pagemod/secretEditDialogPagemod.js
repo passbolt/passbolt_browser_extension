@@ -46,19 +46,19 @@ SecretEditDialog.init = function () {
     ],
     contentScriptWhen: 'ready',
     onAttach: function (worker) {
-      Worker.add('Secret', worker, {
-        // on destroy, clean.
-        onDestroy: function () {
-          TabStorage.remove(worker.tab.id, 'editedPassword');
-        }
-      });
-
       app.events.config.listen(worker);
       app.events.editPassword.listen(worker);
       app.events.passboltPage.listen(worker);
       app.events.secret.listen(worker);
       app.events.template.listen(worker);
       app.events.user.listen(worker);
+
+      Worker.add('Secret', worker, {
+        // on destroy, clean.
+        onDestroy: function () {
+          TabStorage.remove(worker.tab.id, 'editedPassword');
+        }
+      });
     }
   });
 };

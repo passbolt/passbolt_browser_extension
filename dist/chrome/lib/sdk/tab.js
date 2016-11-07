@@ -37,7 +37,7 @@ var Tab = function(tab) {
  * Called when the worker is destroyed
  */
 Tab.prototype.destroy = function() {
-  chrome.tabs.onUpdated.removeListener(this._tabUpdated);
+  chrome.tabs.onUpdated.removeListener(this._onTabUpdated);
   chrome.tabs.onRemoved.removeListener(this._onTabRemoved);
 };
 

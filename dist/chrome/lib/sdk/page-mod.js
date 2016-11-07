@@ -18,7 +18,7 @@ var self = require('sdk/self');
  */
 var PageMod = function(args) {
   this.args = args;
-  this._tabs = []; // list of tab ids in which the pagemod has a worker
+  this._ports = []; // list of tab ids in which the pagemod has a port open
   this._listeners = []; // list of listeners initialized by this pagemod
   this.__init();
 };
@@ -51,8 +51,9 @@ PageMod.prototype.destroy = function () {
     chrome.runtime.onConnect.removeListener(this._listeners['chrome.runtime.onConnect']);
   }
   // clear the tab and listeners
-  this._tabs = [];
+  this._ports = [];
   this._listeners = [];
+  this._loading = [];
 
 };
 
@@ -120,8 +121,8 @@ PageMod.prototype.__init = function() {
 
   // When a tab is closed cleanup we cleanup
   this._listeners['chrome.tabs.onRemoved'] = function (tabId) {
-    var index = _this._tabs.indexOf(tabId);
-    _this._tabs.splice(index, 1);
+    var index = _this._ports.indexOf(tabId);
+    _this._ports.splice(index, 1);
   };
   chrome.tabs.onRemoved.addListener(this._listeners['chrome.tabs.onRemoved']);
 };
@@ -133,15 +134,16 @@ PageMod.prototype.__init = function() {
  */
 PageMod.prototype.__initConnectListener = function(portName, tabId, iframe) {
   var _this = this;
-
+  if(typeof iframe === 'undefined') {
+    iframe = false;
+  }
   this._listeners['chrome.runtime.onConnect'] = function (port) {
     // check if the portname match
     if(port.name === portName) {
       // add the sender tab id to the list of active tab for that worker
       if(typeof tabId === 'undefined' || tabId === port.sender.tab.id) {
-        _this._tabs.push(port.sender.tab.id);
-        var worker = new Worker(port);
-        worker.iframe = iframe;
+        _this._ports.push(port.sender.tab.id);
+        var worker = new Worker(port, iframe);
         _this.args.onAttach(worker);
       }
     }
@@ -159,6 +161,7 @@ PageMod.prototype.__onIframeConnectInit = function() {
   var iframeId = this.args.include.split('passbolt=')[1];
   iframeId = iframeId.replace('*', '');
   this.portname = iframeId;
+  // console.log(this.args.name + ' iframe page mod openening port on ' + this.portname);
   this.__initConnectListener(this.portname, undefined, true);
 };
 
@@ -172,6 +175,7 @@ PageMod.prototype.__onContentConnectInit = function() {
   var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/data/';
   portname = portname.replace(replaceStr, '').replace('.html','');
   this.portname = portname;
+  // console.log(this.args.name + ' content page mod opening port on ' + this.portname);
   this.__initConnectListener(this.portname);
 };
 
@@ -212,6 +216,11 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
   if (!(tab.url.startsWith('http://') || tab.url.startsWith('https://'))) {
     return;
   }
+  // If the url do not match the arguments in the pagemod
+  // don't initialize anything
+  if (!(tab.url.match(this.args.include))) {
+    return;
+  }
 
   // Mapping tabs statuses from chrome -> firefox
   // loading = start
@@ -221,55 +230,56 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
     status = 'loading';
   }
 
-  // When the tab status match the one requested in the args
+  // When the tab status is marked as complete
   if(changeInfo.status === status) {
 
-    // if the url match the pagemod requested pattern
-    if (tab.url.match(this.args.include)) {
+    // if there is not already a worker in that tab
+    // generate a portname based on the tab it and listen to connect event
+    // otherwise reuse the already an active worker in that tab to accept incoming connection
+    this.portname = 'port-' + Crypto.uuid(tabId.toString());
+    if (this._ports.indexOf(tabId) === -1) {
+      // console.log(this.args.name + ' classic page mod opening port on ' + this.portname);
+      this.__initConnectListener(this.portname, tabId);
+    }
 
-      // if there is not already a worker in that tab
-      // generate a portname based on the tab it and listen to connect event
-      // otherwise reuse the already an active worker in that tab to accept incoming connection
-      this.portname = 'port-' + Crypto.uuid(tabId.toString());
-      if (this._tabs.indexOf(tabId) === -1) {
-        this.__initConnectListener(this.portname, tabId);
-      }
+    // a helper to handle insertion of scripts, variables and css in target page
+    var scriptExecution = new ScriptExecution(tabId);
 
-      // a helper to handle insertion of scripts, variables and css in target page
-      var scriptExecution = new ScriptExecution(tabId);
+    // set portname in content code as global variable to be used by data/js/port.js
+    scriptExecution.setGlobals({portname: this.portname});
 
-      // set portname in content code as global variable to be used by data/js/port.js
-      scriptExecution.setGlobals({portname: this.portname});
+    // Set JS global variables if needed
+    if (typeof this.args.contentScriptOptions !== 'undefined' && Object.keys(this.args.contentScriptOptions).length) {
+      scriptExecution.setGlobals(this.args.contentScriptOptions);
+    }
 
-      // Set JS global variables if needed
-      if (typeof this.args.contentScriptOptions !== 'undefined' && Object.keys(this.args.contentScriptOptions).length) {
-        scriptExecution.setGlobals(this.args.contentScriptOptions);
-      }
+    // Inject JS files if needed
+    var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/data/';
+    var scripts = [];
+    if (typeof this.args.contentScriptFile !== 'undefined' && this.args.contentScriptFile.length) {
+      scripts = this.args.contentScriptFile.slice();
+      // remove chrome-extension baseUrl from self.data.url
+      // since when inserted in a page the url are relative to /data already
+      scripts = scripts.map(function (x) {
+        return x.replace(replaceStr, '');
+      });
+    }
 
-      // Inject JS files if needed
-      var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/data/';
-      var scripts = [];
-      if (typeof this.args.contentScriptFile !== 'undefined' && this.args.contentScriptFile.length) {
-        scripts = this.args.contentScriptFile.slice();
-        // remove chrome-extension baseUrl from self.data.url
-        // since when inserted in a page the url are relative to /data already
-        scripts = scripts.map(function(x){return x.replace(replaceStr, '');});
-      }
+    // TODO don't insert if the JS if its already inserted
+    scripts.unshift('js/lib/port.js'); // add a firefox-like self.port layer
+    scriptExecution.injectScripts(scripts);
 
-      // TODO don't insert if the JS if its already inserted
-      scripts.unshift('js/lib/port.js'); // add a firefox-like self.port layer
-      scriptExecution.injectScripts(scripts);
+    // Inject CSS files if needed
+    var styles = [];
+    if (typeof this.args.contentStyleFile !== 'undefined' && this.args.contentStyleFile.length) {
+      styles = this.args.contentStyleFile.slice();
+      // Like for scripts, remove chrome-extension baseUrl from self.data.url
+      styles = styles.map(function (x) {
+        return x.replace(replaceStr, '');
+      });
 
-      // Inject CSS files if needed
-      var styles = [];
-      if (typeof this.args.contentStyleFile !== 'undefined' && this.args.contentStyleFile.length) {
-        styles = this.args.contentStyleFile.slice();
-        // Like for scripts, remove chrome-extension baseUrl from self.data.url
-        styles = styles.map(function(x){return x.replace(replaceStr, '');});
-
-        // TODO don't insert if the CSS is already inserted
-        scriptExecution.injectCss(styles);
-      }
+      // TODO don't insert if the CSS is already inserted
+      scriptExecution.injectCss(styles);
     }
   }
 };

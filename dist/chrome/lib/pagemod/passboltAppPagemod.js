@@ -64,8 +64,10 @@ PassboltApp.initPageMod = function () {
       TabStorage.initStorage(worker.tab);
 
       Worker.add('App', worker, {
+        // FIREFOX ONLY -
         // If the user is redirected to the login page, that means it is logged out.
         // Destroy the passbolt application pagemod.
+        // Chrome workers are always destroyed on URL change
         onTabUrlChange: function () {
           if (worker.tab.url == user.settings.getDomain() + '/auth/login') {
             PassboltApp.destroy();

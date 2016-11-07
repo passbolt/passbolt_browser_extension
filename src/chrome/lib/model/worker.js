@@ -14,45 +14,34 @@ var app = require('../app');
  */
 var add = function (workerId, worker, options) {
   options = options || {};
-  var removeOnTabUrlChange = options.removeOnTabUrlChange || true,
-    url = worker.tab.url;
+  var url = worker.tab.url;
 
   if (exists(workerId, worker.tab.id)) {
     // if a worker with same id is already in the tab
-    // destroy it, it will trigger a detach event (see bellow)
-    console.log('destroying worker because it already exist');
-    app.workers[worker.tab.id][workerId].destroy();
+    // // destroy it, it will trigger a detach event (see bellow)
+    app.workers[worker.tab.id][workerId].destroy('destroying worker because it already exist');
   }
-
+  
+  // Add the worker to the list of active app workers.
   // Build the workers list for that tab if needed
+  console.debug('Add worker @ id:' + workerId + ', tab:' + worker.tab.id + ', url:' + worker.tab.url);
   if (typeof app.workers[worker.tab.id] === 'undefined') {
     app.workers[worker.tab.id] = {};
   }
-
-  // Add the worker to the list of active app workers.
-  console.debug('Add worker @ id:' + workerId + ', tab:' + worker.tab.id + ', url:' + worker.tab.url);
   app.workers[worker.tab.id][workerId] = worker;
-
-  // When a port is closed from the content code end
-  // For example when an iframe is unloaded
-  if(typeof worker.iframe !== 'undefined' && worker.iframe === true) {
-    var onPortDisconnect = function() {
-      worker.port._port.onDisconnect.removeListener(onPortDisconnect);
-      console.log('destroying worker because it iframe got unloaded');
-      app.workers[worker.tab.id][workerId].destroy();
-    };
-    worker.port._port.onDisconnect.addListener(onPortDisconnect);
-  }
 
   // Listen to tab url changes.
   // If callback given in option on url change, call it
-  var onTabReadyHandler = function (tab) {
-    if (options.onTabUrlChange) {
-      options.onTabUrlChange(worker);
-    }
-    worker.tab.removeListener('ready', onTabReadyHandler);
-  };
-  worker.tab.on('ready', onTabReadyHandler);
+  // var onTabReadyHandler = function (tab) {
+  //   if (url != tab.url.split('#')[0]) {
+  //     // console.log('url changed on tabReadyHandler');
+  //     if (options.onTabUrlChange) {
+  //       options.onTabUrlChange(worker);
+  //     }
+  //     worker.tab.removeListener('ready', onTabReadyHandler);
+  //   }
+  // };
+  // worker.tab.on('ready', onTabReadyHandler);
 
   // Listen to worker detach event
   // This event is called as part of the worker destroy
@@ -116,10 +105,13 @@ exports.getAllKeys = getAllKeys;
  * @return {boolean}
  */
 var exists = function (workerId, tabId) {
-  if (typeof app.workers[tabId] != 'undefined'
-    && typeof app.workers[tabId][workerId] != 'undefined') {
-    return true;
+  // if tab does not exist
+  if (typeof app.workers[tabId] === 'undefined') {
+    return false;
   }
-  return false;
+  if (typeof app.workers[tabId][workerId] === 'undefined') {
+    return false;
+  }
+  return true;
 };
 exports.exists = exists;

@@ -13,7 +13,7 @@
     %>
     <li class="<%= menuClass %>">
         <% if (menuClass == "selected" || menuClass == "past") { %>
-        <a href="#"><%= steps[menuSteps[i].stepId].label %></a>
+        <a><%= steps[menuSteps[i].stepId].label %></a>
         <% } else { %>
         <%= steps[menuSteps[i].stepId].label %>
         <% } %>

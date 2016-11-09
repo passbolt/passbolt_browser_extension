@@ -25,7 +25,7 @@ passbolt.setup.workflow = passbolt.setup.workflow || {};
     },
     'define_key': {
       'label': '2. Define your keys',
-      'title': 'Create a new key or <a id="js_setup_goto_import_key" href="#" class="button primary">import</a> an existing one!',
+      'title': 'Create a new key or <a id="js_setup_goto_import_key" class="button primary">import</a> an existing one!',
       'parents': ['domain_check'],
       'next': 'secret',
       'favorite': true,
@@ -52,7 +52,7 @@ passbolt.setup.workflow = passbolt.setup.workflow || {};
     },
     'import_key': {
       'label': '2. Import your key',
-      'title': 'Import an existing key or <a id="js_setup_goto_define_key" href="#" class="button primary">create</a> a new one!',
+      'title': 'Import an existing key or <a id="js_setup_goto_define_key" class="button primary">create</a> a new one!',
       'parents': ['domain_check'],
       'next': 'key_info',
       'defaultActions': {

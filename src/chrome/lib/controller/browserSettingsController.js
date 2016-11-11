@@ -43,3 +43,13 @@ var getExtensionUrl = function () {
   return chrome.runtime.getURL("");
 };
 exports.getExtensionUrl = getExtensionUrl;
+
+/**
+ * Get the extension version.
+ *
+ * @return {string}
+ */
+var getExtensionVersion = function () {
+  return chrome.runtime.getManifest().version;
+};
+exports.getExtensionVersion = getExtensionVersion;

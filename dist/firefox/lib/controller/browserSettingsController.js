@@ -5,6 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var preferences = require('sdk/preferences/service');
+var self = require("sdk/self");
 
 /**
  * Get the value of given browser setting
@@ -37,3 +38,13 @@ var getExtensionUrl = function () {
   return "resource://passbolt-at-passbolt-dot-com";
 };
 exports.getExtensionUrl = getExtensionUrl;
+
+/**
+ * Get the extension version.
+ *
+ * @return {string}
+ */
+var getExtensionVersion = function () {
+  return self.version;
+};
+exports.getExtensionVersion = getExtensionVersion;

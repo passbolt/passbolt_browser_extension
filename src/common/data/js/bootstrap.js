@@ -37,10 +37,13 @@ var passbolt = passbolt || {};
             .removeClass('passboltplugin-config');
           _this.onConfigurationMissing();
         }
+      })
+
+      // Init the version
+      .then(function(){
+        _this.initVersion();
       });
 
-    // Init the version
-    _this.initVersion();
   };
 
 

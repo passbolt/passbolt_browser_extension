@@ -26,7 +26,7 @@ var listen = function (worker) {
         Worker.get('Setup', tabId).port.emit('passbolt.setup.init', info);
         clearInterval(interval);
       }
-    }, 250);
+    }, 500);
 
     // Redirect the user to the second step.
     tabsController.setActiveTabUrl(data.url('setup.html'));

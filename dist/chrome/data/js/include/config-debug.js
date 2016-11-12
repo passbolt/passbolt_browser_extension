@@ -10,6 +10,7 @@ loadScripts(scripts).then(function () {
     'js/lib/message.js',
     'js/lib/request.js',
     'js/lib/fileUpload.js',
+    'js/debug/profiles.js',
     'js/debug.js'
   ];
   loadScripts(scripts).then(function () {

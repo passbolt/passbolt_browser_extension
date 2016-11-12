@@ -38,6 +38,7 @@ Debug.init = function () {
       self.data.url('vendors/jquery.min.js'),
       self.data.url('js/lib/message.js'),
       self.data.url('js/lib/request.js'),
+      self.data.url('js/debug/profiles.js'),
       self.data.url('js/debug.js')
     ],
     onAttach: function (worker) {

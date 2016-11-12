@@ -43,6 +43,8 @@ $(function () {
       //.then(initBrowserPreferencesSection)
       // Init event listeners.
       .always(initEventListeners)
+      // Init test profiles dropdown.
+      .always(initTestProfilesSection)
       // Mark the page as ready
       .always(function () {
         $('.config.page').addClass('ready');
@@ -106,6 +108,7 @@ $(function () {
     $('#saveServerKey').on('click', onSaveServerKeyClick);
     $('#js_flush_conf').on('click', onFlushConfClick);
     $('#initAppPagemod').on('click', onInitAppPagemodClick);
+    $('#saveTestProfile').on('click', onTestProfileSave);
     window.addEventListener('passbolt.debug.settings.set', onSetDebugSettings);
   };
 
@@ -188,6 +191,17 @@ $(function () {
               });
           });
       });
+  };
+
+  /**
+   *
+   * @returns {*}
+   */
+  var initTestProfilesSection = function () {
+    for (var i in passbolt.debug.profiles) {
+      var profile = passbolt.debug.profiles[i];
+      $('#TestProfile').append('<option value="' + profile['username'] + '">' + profile['username'] + '</option>');
+    }
   };
 
   /* ==================================================================================
@@ -341,6 +355,24 @@ $(function () {
     }
 
     $('body').addClass('debug-data-set');
+  };
+
+  /**
+   * Handle test profile selection.
+   */
+  var onTestProfileSave = function () {
+    var profileName = $('#TestProfile').val();
+    if (profileName == '') {
+      return;
+    }
+
+    var profile = passbolt.debug.profiles[profileName];
+    updateUserForm(profile);
+    $myKeyAscii.val(profile.privateKey);
+    $serverKeyAscii.val(profile.publicKey);
+    $('#js_save_conf').trigger('click');
+    $('#saveKey').trigger('click');
+    $('#saveServerKey').trigger('click');
   };
 
   // Init the debug page.

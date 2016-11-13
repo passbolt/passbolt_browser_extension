@@ -24,6 +24,7 @@ loadScripts(scripts).then(function () {
     'js/setup/step/keyInfo.js',
     'js/setup/step/securityToken.js',
     'js/setup/step/loginRedirection.js',
+    'js/lib/fileUpload.js', // only for chrome
     'js/setup/setup.js'
   ];
   loadScripts(scripts).then(function () {

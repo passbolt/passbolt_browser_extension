@@ -4,8 +4,9 @@
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const defer = require('sdk/core/promise').defer;
 var self = require('sdk/self');
+var __ = require('sdk/l10n').get;
+const defer = require('sdk/core/promise').defer;
 
 /**
  * Save file on disk using download
@@ -26,28 +27,28 @@ function saveFile(filename, content) {
   a.click();
   delete a;
 
-  return deferred.resolve();
+  deferred.resolve();
+  return deferred.promise;
 }
 exports.saveFile = saveFile;
 
 /**
  * Open file content using upload
  *
- * @return content of a file selected by the user
+ * @return {promise} content of a file selected by the user
  */
 function openFile() {
-  var p = new Promise(function(resolve, reject) {
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {custom: "passbolt.file.open"}, function(response) {
-        if(typeof response !== 'undefined' && typeof response.data !== 'undefined') {
-          resolve(response.data);
-        } else {
-          reject();
-        }
-      });
+  var deferred = defer();
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {custom: "passbolt.file.open"}, function(response) {
+      if(typeof response !== 'undefined' && typeof response.data !== 'undefined') {
+        deferred.resolve(response.data);
+      } else {
+        deferred.reject(new Error(__('Something went wrong when trying to open the file. Please retry.')));
+      }
     });
   });
-  return p;
+  return deferred.promise;
 }
 exports.openFile = openFile;
 

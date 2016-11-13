@@ -21,7 +21,7 @@ var listen = function (worker) {
         worker.port.emit(requestId, 'SUCCESS', downloadsDirectory);
       },
       function (error) {
-        worker.port.emit(requestId, 'ERROR', error);
+        worker.port.emit(requestId, 'ERROR', error.message);
       }
     );
   });
@@ -38,7 +38,7 @@ var listen = function (worker) {
         worker.port.emit(requestId, 'SUCCESS', fileContent);
       },
       function (error) {
-        worker.port.emit(requestId, 'ERROR', error);
+        worker.port.emit(requestId, 'ERROR', error.message);
       }
     );
   });

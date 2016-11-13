@@ -139,6 +139,9 @@ passbolt.setup.steps = passbolt.setup.steps || {};
       .then(function (data) {
         step.data.privateKeyArmored = data;
         return data;
+      },
+      function error(error) {
+        step.onError(error);
       });
   };
 

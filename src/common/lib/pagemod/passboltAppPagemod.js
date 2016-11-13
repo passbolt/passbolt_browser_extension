@@ -34,11 +34,12 @@ PassboltApp.initPageMod = function () {
   // Attach on passbolt application pages.
   // By instance if your application domain is : https://demo.passbolt.com
   // The pagemod will be attached to the following pages :
-  // - https://demo.passbolt.com
-  // - https://demo.passbolt.com/
-  // - https://demo.passbolt.com/#user
-  // - https://demo.passbolt.com/#workspace
-  var regex = new RegExp('^' + user.settings.getDomain() + '\/?(#.*)?');
+  // ✓ https://demo.passbolt.com
+  // ✓ https://demo.passbolt.com/
+  // ✓ https://demo.passbolt.com/#user
+  // ✓ https://demo.passbolt.com/#workspace
+  // ✗ https://demo.passbolt.com.attacker.com
+  var regex = new RegExp('^' + user.settings.getDomain() + '\/?(#.*)?$');
   return pageMod.PageMod({
     name: 'PassboltApp',
     include: regex,

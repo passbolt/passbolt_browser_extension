@@ -84,6 +84,7 @@
     $(document).on('click', '.js-dialog-close', closeButtonClicked);
     $submitButton.on('click', submitButtonClicked);
     $focusFirstField.on('keypress', focusFirstFieldKeypressed);
+    $focusFirstField.on('keydown', focusFirstFieldKeydown);
     $masterPasswordField.on('keypress', masterPasswordFieldKeypressed);
   };
 
@@ -157,10 +158,30 @@
   };
 
   /**
+   * The first focus field received a keydown event.
+   * Handle the tab scenario that cannot be treated by the keypress event
+   * handler mainly because of the chrome browser default behavior. The tab
+   * key is not treated by the keypress event.
+   * If tab is pressed, the master password field should get the focus.
+   */
+  var focusFirstFieldKeydown = function(ev) {
+    // Get keycode.
+    var keycode = ev.keyCode || ev.which;
+
+    // Tab.
+    if (keycode == 9) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      // Give focus to field passphrase.
+      $masterPasswordField.focus();
+    }
+  };
+
+  /**
    * The first focus field received a keypress event.
    * Handle the different scenario :
    *  - Escape pressed : close the dialog ;
-   *  - Tab pressed : switch the focus to the master password field ;
+   *  - Tab pressed :  ;
    *  - Accepted key pressed : switch the focus to the master password and fill
    *    it with the entered character.
    * @param ev {HTMLEvent} The event which occurred
@@ -183,8 +204,13 @@
       return;
     }
 
-    // If key pressed is not a control, or if tab.
-    if (valid || keycode == 9) {
+    // Tab
+    if (keycode == 9) {
+      return;
+    }
+
+    // If key pressed is not a control.
+    if (valid) {
       // Give focus to field passphrase.
       $masterPasswordField.focus();
     }

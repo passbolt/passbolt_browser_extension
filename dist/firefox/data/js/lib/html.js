@@ -27,7 +27,7 @@ passbolt.helper.html = passbolt.helper.html || {};
     // Get the dimension of the current document.
     var dimension = {
       width: $('html').outerWidth(),
-      height: $('html').outerHeight()
+      height: $('html').outerHeight() + 6
     };
     // If options given, override the dimensions found before.
     if (typeof options != 'undefined') {
@@ -35,8 +35,11 @@ passbolt.helper.html = passbolt.helper.html || {};
         dimension.width = options.width;
       }
       if (options.height) {
-        dimension.height = options.height;
+        dimension.height = options.height + 6; // account for border;
       }
+    }
+    if(dimension.height < 52) {
+      dimension.height = 52;
     }
     // Request the application worker to resize the iframe container.
     passbolt.message.emit('passbolt.passbolt-page.resize-iframe', selector, dimension);

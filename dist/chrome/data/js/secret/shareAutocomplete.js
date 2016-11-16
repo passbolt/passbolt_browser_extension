@@ -65,19 +65,19 @@
     // In desktop.
     else {
       // If there are less than 3 users to display, the iframe should fit the content.
-      if (currentUsers.length < 3) {
+      // if (currentUsers.length < 3) {
         // Resize the iframe container regarding the iframe content.
         passbolt.helper.html.resizeIframe('#passbolt-iframe-password-share-autocomplete', {
           width: '100%'
         });
-      }
-      else {
-        // Resize the iframe container, reset the height and use the default css.
-        passbolt.helper.html.resizeIframe('#passbolt-iframe-password-share-autocomplete', {
-          width: '100%',
-          height: ''
-        });
-      }
+      // }
+      // else {
+      //   // Resize the iframe container, reset the height and use the default css.
+      //   passbolt.helper.html.resizeIframe('#passbolt-iframe-password-share-autocomplete', {
+      //     width: '100%',
+      //     height: ''
+      //   });
+      // }
     }
   };
 

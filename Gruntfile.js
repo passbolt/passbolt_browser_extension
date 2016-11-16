@@ -7,7 +7,7 @@ module.exports = function (grunt) {
     styleguide: 'passbolt-styleguide',
     modules_path: 'node_modules',
     common_path: 'src/common',
-    webroot: 'common/data',
+    webroot: 'src/common/data',
     build: {
       firefox: {
         path: 'dist/firefox'

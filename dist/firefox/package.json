@@ -1,6 +1,6 @@
 {
   "name": "passbolt",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "title": "Passbolt",
   "id": "passbolt@passbolt.com",
   "description": "Passbolt add-on",
@@ -33,7 +33,7 @@
     "jpm": "1.1.4",
     "crx": "3.2.1",
     "jquery": "^3.1.0",
-    "passbolt-styleguide": "~1.0.0",
+    "passbolt-styleguide": "~1.1.0",
     "steal": "^0.16.26"
   },
   "scripts": {

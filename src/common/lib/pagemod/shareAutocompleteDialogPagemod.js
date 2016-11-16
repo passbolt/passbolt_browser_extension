@@ -26,7 +26,7 @@ ShareAutocompleteDialog.init = function () {
   }
 
   ShareAutocompleteDialog._pageMod = pageMod.PageMod({
-    name: 'ShareAutocompleteDialog',
+    name: 'ShareAutocomplete',
     include: 'about:blank?passbolt=passbolt-iframe-password-share-autocomplete',
     // Warning:
     // If you modify the following script and styles don't forget to also modify then in

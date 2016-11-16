@@ -24,7 +24,7 @@ MasterPasswordDialog.init = function () {
   }
 
   MasterPasswordDialog._pageMod = pageMod.PageMod({
-    name: 'MasterPasswordDialog',
+    name: 'MasterPassword',
     include: 'about:blank?passbolt=passbolt-iframe-master-password',
     // Warning:
     // If you modify the following script and styles don't forget to also modify then in

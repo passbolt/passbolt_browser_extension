@@ -23,7 +23,7 @@ ProgressDialog.init = function () {
   }
 
   ProgressDialog._pageMod = pageMod.PageMod({
-    name: 'ProgressDialog',
+    name: 'Progress',
     include: 'about:blank?passbolt=passbolt-iframe-progress-dialog*',
     // Warning:
     // If you modify the following script and styles don't forget to also modify then in

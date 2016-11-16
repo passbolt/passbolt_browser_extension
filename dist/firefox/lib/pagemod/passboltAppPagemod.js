@@ -39,7 +39,8 @@ PassboltApp.initPageMod = function () {
   // ✓ https://demo.passbolt.com/#user
   // ✓ https://demo.passbolt.com/#workspace
   // ✗ https://demo.passbolt.com.attacker.com
-  var url = '^' + user.settings.getDomain() + '/?(#.*)?';
+  // ✗ https://demo.passbolt.com/auth/login
+  var url = '^' + user.settings.getDomain() + '/?(#.*)?$';
   var regex = new RegExp(url);
   return pageMod.PageMod({
     name: 'PassboltApp',

@@ -21,7 +21,7 @@ PassboltAuthForm.init = function () {
     PassboltAuthForm._pageMod = undefined;
   }
   PassboltAuthForm._pageMod = pageMod.PageMod({
-    name: 'PassboltAuthForm',
+    name: 'AuthForm',
     include: 'about:blank?passbolt=passbolt-iframe-login-form',
     contentScriptWhen: 'ready',
     // Warning:

@@ -27,7 +27,7 @@ Debug.init = function () {
     Debug._pageMod = undefined;
   }
   Debug._pageMod = pageMod.PageMod({
-    name: 'Debug',
+    name: 'debug',
     include: self.data.url('config-debug.html'),
 
     // Warning:

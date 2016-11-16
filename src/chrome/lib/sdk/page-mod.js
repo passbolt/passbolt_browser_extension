@@ -8,6 +8,7 @@
 var ScriptExecution = require('vendors/scriptExecution').ScriptExecution;
 var Crypto = require('model/crypto').Crypto;
 var Worker = require('sdk/worker').Worker;
+var Workers = require('../model/worker');
 var self = require('sdk/self');
 
 /**
@@ -79,6 +80,7 @@ PageMod.prototype.__init = function() {
         this.__onIframeConnectInit();
         return;
       } else if (this.args.include.startsWith(self.data.url())) {
+        // And similarly for any chrome-extension:// urls
         this.__onContentConnectInit();
         return;
       } else {
@@ -140,9 +142,21 @@ PageMod.prototype.__initConnectListener = function(portName, tabId, iframe) {
   this._listeners['chrome.runtime.onConnect'] = function (port) {
     // check if the portname match
     if(port.name === portName) {
+
+      // if there is a connection on the port for a pagemod that
+      // was previously matching on that tab but not anymore
+      if(!iframe && !_this.__checkUrl(port.sender.tab.url)) {
+          // detach any existing worker
+          if(Workers.exists(_this.args.name, port.sender.tab.id)) {
+            Workers.get(_this.args.name, port.sender.tab.id).destroy('destroying worker because url changed');
+          }
+          return;
+      }
+
       // add the sender tab id to the list of active tab for that worker
       if(typeof tabId === 'undefined' || tabId === port.sender.tab.id) {
         _this._ports.push(port.sender.tab.id);
+
         var worker = new Worker(port, iframe);
         _this.args.onAttach(worker);
       }
@@ -211,17 +225,6 @@ PageMod.prototype.__onAttachExistingTab = function(tab) {
  * @private
  */
 PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
-  // We can't insert scripts if the url is not https or http
-  // as this is not allowed, instead we insert the scripts manually in the background page if needed
-  if (!(tab.url.startsWith('http://') || tab.url.startsWith('https://'))) {
-    return;
-  }
-  // If the url do not match the arguments in the pagemod
-  // don't initialize anything
-  if (!(tab.url.match(this.args.include))) {
-    return;
-  }
-
   // Mapping tabs statuses from chrome -> firefox
   // loading = start
   // complete = ready|end // default
@@ -231,57 +234,84 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
   }
 
   // When the tab status is marked as complete
-  if(changeInfo.status === status) {
-
-    // if there is not already a worker in that tab
-    // generate a portname based on the tab it and listen to connect event
-    // otherwise reuse the already an active worker in that tab to accept incoming connection
-    this.portname = 'port-' + Crypto.uuid(tabId.toString());
-    if (this._ports.indexOf(tabId) === -1) {
-      // console.log(this.args.name + ' classic page mod opening port on ' + this.portname);
-      this.__initConnectListener(this.portname, tabId);
-    }
-
-    // a helper to handle insertion of scripts, variables and css in target page
-    var scriptExecution = new ScriptExecution(tabId);
-
-    // set portname in content code as global variable to be used by data/js/port.js
-    scriptExecution.setGlobals({portname: this.portname});
-
-    // Set JS global variables if needed
-    if (typeof this.args.contentScriptOptions !== 'undefined' && Object.keys(this.args.contentScriptOptions).length) {
-      scriptExecution.setGlobals(this.args.contentScriptOptions);
-    }
-
-    // Inject JS files if needed
-    var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/data/';
-    var scripts = [];
-    if (typeof this.args.contentScriptFile !== 'undefined' && this.args.contentScriptFile.length) {
-      scripts = this.args.contentScriptFile.slice();
-      // remove chrome-extension baseUrl from self.data.url
-      // since when inserted in a page the url are relative to /data already
-      scripts = scripts.map(function (x) {
-        return x.replace(replaceStr, '');
-      });
-    }
-
-    // TODO don't insert if the JS if its already inserted
-    scripts.unshift('js/lib/port.js'); // add a firefox-like self.port layer
-    scriptExecution.injectScripts(scripts);
-
-    // Inject CSS files if needed
-    var styles = [];
-    if (typeof this.args.contentStyleFile !== 'undefined' && this.args.contentStyleFile.length) {
-      styles = this.args.contentStyleFile.slice();
-      // Like for scripts, remove chrome-extension baseUrl from self.data.url
-      styles = styles.map(function (x) {
-        return x.replace(replaceStr, '');
-      });
-
-      // TODO don't insert if the CSS is already inserted
-      scriptExecution.injectCss(styles);
-    }
+  if(changeInfo.status != status) {
+    return;
   }
+
+  // We can't insert scripts if the url is not https or http
+  // as this is not allowed, instead we insert the scripts manually in the background page if needed
+  if (!(tab.url.startsWith('http://') || tab.url.startsWith('https://'))) {
+    return false;
+  }
+
+  // Check if pagemod url pattern match tab url
+  if (!this.__checkUrl(tab.url)) {
+    return;
+  }
+
+  // if there is not already a worker in that tab
+  // generate a portname based on the tab it and listen to connect event
+  // otherwise reuse the already an active worker in that tab to accept incoming connection
+  this.portname = 'port-' + Crypto.uuid(tabId.toString());
+  if (this._ports.indexOf(tabId) === -1) {
+    this.__initConnectListener(this.portname, tabId);
+  }
+
+  // a helper to handle insertion of scripts, variables and css in target page
+  var scriptExecution = new ScriptExecution(tabId);
+
+  // set portname in content code as global variable to be used by data/js/port.js
+  scriptExecution.setGlobals({portname: this.portname});
+
+  // Set JS global variables if needed
+  if (typeof this.args.contentScriptOptions !== 'undefined' && Object.keys(this.args.contentScriptOptions).length) {
+    scriptExecution.setGlobals(this.args.contentScriptOptions);
+  }
+
+  // Inject JS files if needed
+  var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/data/';
+  var scripts = [];
+  if (typeof this.args.contentScriptFile !== 'undefined' && this.args.contentScriptFile.length) {
+    scripts = this.args.contentScriptFile.slice();
+    // remove chrome-extension baseUrl from self.data.url
+    // since when inserted in a page the url are relative to /data already
+    scripts = scripts.map(function (x) {
+      return x.replace(replaceStr, '');
+    });
+  }
+
+  // TODO don't insert if the JS if its already inserted
+  scripts.unshift('js/lib/port.js'); // add a firefox-like self.port layer
+  scriptExecution.injectScripts(scripts);
+
+  // Inject CSS files if needed
+  var styles = [];
+  if (typeof this.args.contentStyleFile !== 'undefined' && this.args.contentStyleFile.length) {
+    styles = this.args.contentStyleFile.slice();
+    // Like for scripts, remove chrome-extension baseUrl from self.data.url
+    styles = styles.map(function (x) {
+      return x.replace(replaceStr, '');
+    });
+
+    // TODO don't insert if the CSS is already inserted
+    scriptExecution.injectCss(styles);
+  }
+};
+
+/**
+ * Check if a given URL match the pattern provided in the args
+ *
+ * @param url
+ * @returns {boolean}
+ * @private
+ */
+PageMod.prototype.__checkUrl = function(url) {
+  if (!(url.match(this.args.include))) {
+    // console.debug('Pagemod' + this.args.name + ' URL:' + tab.url + ' do not match ' + this.args.include);
+    return false;
+  }
+  // console.debug('Pagemod' + this.args.name + ' URL:' + tab.url + ' match ' + this.args.include);
+  return true;
 };
 
 /**

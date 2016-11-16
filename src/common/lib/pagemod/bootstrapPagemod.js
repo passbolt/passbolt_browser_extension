@@ -23,7 +23,7 @@ Bootstrap.init = function () {
   }
 
   Bootstrap._pageMod = pageMod.PageMod({
-    name: 'Boostrap',
+    name: 'appBootstrap',
     include: '*',
     contentScriptWhen: 'ready',
     contentStyleFile: [],

@@ -24,7 +24,7 @@ ShareDialog.init = function () {
   }
 
   ShareDialog._pageMod = pageMod.PageMod({
-    name: 'ShareDialog',
+    name: 'Share',
     include: 'about:blank?passbolt=passbolt-iframe-password-share',
     // Warning:
     // If you modify the following script and styles don't forget to also modify then in

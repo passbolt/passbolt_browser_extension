@@ -26,7 +26,7 @@ SecretEditDialog.init = function () {
   }
 
   SecretEditDialog._pageMod = pageMod.PageMod({
-    name: 'SecretEditDialog',
+    name: 'Secret',
     include: 'about:blank?passbolt=passbolt-iframe-secret-edition*',
     // Warning:
     // If you modify the following script and styles don't forget to also modify then in

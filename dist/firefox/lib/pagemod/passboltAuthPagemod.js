@@ -31,7 +31,7 @@ PassboltAuth.init = function () {
   var domain = new RegExp(url);
 
   PassboltAuth._pageMod = pageMod.PageMod({
-    name: 'PassboltAuth',
+    name: 'Auth',
     include: domain,
     contentScriptWhen: 'ready',
     contentStyleFile: [

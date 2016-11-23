@@ -60,11 +60,9 @@ var listen = function (worker) {
     if(typeof trustedDomain === 'undefined' || trustedDomain == '') {
       worker.port.emit(requestId, 'SUCCESS', false);
     }
-    tabsController.getActiveTabUrl()
-      .then(function(url) {
-        var domainOk = url.startsWith(trustedDomain);
-        worker.port.emit(requestId, 'SUCCESS', domainOk);
-      });
+
+    var domainOk = worker.tab.url.startsWith(trustedDomain);
+    worker.port.emit(requestId, 'SUCCESS', domainOk);
   });
 
   /*

@@ -8,84 +8,112 @@
 var passbolt = passbolt || {};
 
 (function ($) {
+
   /**
    * Init the passbolt bootstrap.
    */
   var Bootstrap = function () {
-    var promise,
-      _this = this,
-      isConfigured = false;
-
-    // Add default classes relative to plugin.
-    $('html')
-      .removeClass('no-passboltplugin')
-      .addClass('passboltplugin');
+    var _this = this;
+    this.isPluginIsconfigured = false;
+    this.isTrustedDomain = false;
+    this.trustedDomain = '';
 
     // Check if the addon is configured
-    passbolt.request('passbolt.addon.isConfigured')
-      .then(function (response) {
-        isConfigured = response;
-        if (isConfigured === true) {
-          $('html').addClass('passboltplugin-config')
-            .removeClass('no-passboltplugin-config');
-
-          // If configure but not on the trusted domain
-          // display a feedback to the user.
-          _this.checkDomain();
-        } else {
-          $('html').addClass('no-passboltplugin-config')
-            .removeClass('passboltplugin-config');
-          _this.onConfigurationMissing();
-        }
+    this.loadConfiguration()
+      // Boostrap common.
+      .then(function () {
+        _this.boostrapCommon();
       })
-
-      // Init the version
-      .then(function(){
-        _this.initVersion();
+      // Boostrap login page.
+      .then(function () {
+        _this.boostrapLoginPage();
       });
-
   };
 
-
   /**
-   * Check if on the trusted domain.
-   * @returns {promise}
+   * Load the bootsrap configuration.
+   * @returns {Promise}
    */
-  Bootstrap.prototype.checkDomain = function () {
+  Bootstrap.prototype.loadConfiguration = function () {
     var _this = this;
-    return passbolt.request('passbolt.addon.checkDomain')
-      .then(function (isTrustedDomain) {
-        if (isTrustedDomain !== true) {
-          return _this.onWrongDomain();
-        }
-      });
+
+    return Promise.all([
+      passbolt.request('passbolt.addon.isConfigured'),
+      passbolt.request('passbolt.addon.checkDomain'),
+      passbolt.request('passbolt.addon.getDomain')
+    ]).then(function (data) {
+      _this.isPluginIsconfigured = data[0];
+      _this.isTrustedDomain = data[1];
+      _this.trustedDomain = data[2];
+    });
   };
 
   /**
-   * When the domain is not the right one, but the plugin is already configured.
+   * Bootstrap all pages from all domain.
+   */
+  Bootstrap.prototype.boostrapCommon = function () {
+    $('html').removeClass('no-passboltplugin')
+      .addClass('passboltplugin');
+
+    if (this.isPluginIsconfigured) {
+      $('html').addClass('passboltplugin-config')
+        .removeClass('no-passboltplugin-config');
+    } else {
+      $('html').addClass('no-passboltplugin-config')
+        .removeClass('passboltplugin-config');
+    }
+  };
+
+  /**
+   * Bootstrap the login page.
+   * The login process is mainly managed by the authPageMod, but some cases
+   * are managed by the common boostrap such as :
+   * - Plugin configured but on the wrong domain. When the user tries to access
+   *   another passbolt instance than the one he has configured the plugin for.
+   * - Plugin not configured.
+   */
+  Bootstrap.prototype.boostrapLoginPage = function () {
+    // If not on the login page.
+    if (!$('.passbolt .login.page').length) {
+      return;
+    }
+
+    // If the plugin is not configured.
+    if (this.isPluginIsconfigured) {
+      // If not on a trusted domain.
+      if (!this.isTrustedDomain) {
+        this.loginPageWrongDomain();
+      }
+    }
+    else {
+      this.loginPageConfigurationMissing();
+    }
+
+    // Init the version component.
+    this.initVersion();
+  };
+
+  /**
+   * On the login page, when the domain is not the right one, but the plugin is already configured.
    * @returns {promise}
    */
-  Bootstrap.prototype.onWrongDomain = function () {
+  Bootstrap.prototype.loginPageWrongDomain = function () {
     $('html').addClass('domain-unknown');
     var $renderSpace = $('.login.page .js_main-login-section'),
       publicRegistration = $('.login.page.public-registration').length > 0 ? true : false;
 
-    // Get trusted domain setting.
-    return passbolt.request('passbolt.addon.getDomain').then(
-      function (trustedDomain) {
-        // Get template.
-        passbolt.helper.html.loadTemplate($renderSpace, './tpl/login/wrong-domain.ejs', 'html', {
-          trustedDomain: trustedDomain,
-          publicRegistration: publicRegistration
-        });
-      });
+    // Get template.
+    passbolt.helper.html.loadTemplate($renderSpace, './tpl/login/wrong-domain.ejs', 'html', {
+      trustedDomain: this.trustedDomain,
+      publicRegistration: publicRegistration
+    });
   };
 
   /**
-   * When the plugin configuration is missing
+   * On the login page, when the plugin configuration is missing.
    * @returns {promise}
    */
-  Bootstrap.prototype.onConfigurationMissing = function () {
+  Bootstrap.prototype.loginPageConfigurationMissing = function () {
     var $renderSpace = $('.login.page .js_main-login-section'),
       publicRegistration = $('.login.page.public-registration').length > 0 ? true : false;
 
@@ -93,7 +121,7 @@ var passbolt = passbolt || {};
   };
 
   /**
-   * Initialize the plugin version
+   * Initialize the plugin version section.
    * @returns {promise}
    */
   Bootstrap.prototype.initVersion = function () {

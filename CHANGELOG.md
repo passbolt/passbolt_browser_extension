@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.3.0]
+### Added
+- PASSBOLT-1725 Chrome support
+
+### Fixed
+- PASSBOLT-1708 Refactor Request get and post to use fetch
+
 ## [1.2.0]
 ### Fixed
 - PASSBOLT-1668: Refactor GPGAuth to handle capitalization issue. See github #24 & #16

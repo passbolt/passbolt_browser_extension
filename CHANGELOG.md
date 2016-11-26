@@ -4,7 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fixed
-- PASSBOLT-1606: Wrong message when auto logged out and passbolt not the active tab
+- PASSBOLT-1606: Wrong message when auto logged out and passbolt is not the active tab
+- PASSBOLT-1769: Refactor extension bootstrap, prepare code to welcome future features
 
 ## [1.3.0]
 ### Added

@@ -4,7 +4,7 @@
             <div class="main-cell">
                 <a>
                     <div class="avatar">
-                        <img src="<%= user.Profile.Avatar.url.small %>"/>
+                        <img src="<%= settings['user.settings.trustedDomain'] %>/<%= user.Profile.Avatar.url.small %>"/>
                     </div>
                     <div class="group">
                         <span class="name"><%= user.Profile.first_name %> <%= user.Profile.last_name %> (<%= user.Gpgkey.key_id %>)</span>

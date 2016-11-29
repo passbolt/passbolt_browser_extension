@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-1606: Wrong message when auto logged out and passbolt is not the active tab
 - PASSBOLT-1769: Refactor extension bootstrap, prepare code to welcome future features
 - PASSBOLT-1759: Share: autocomplete list will appear even when there is no text entered in the search
+- PASSBOLT-1760: Share: image is broken in the autcomplete list after user has changed it
 
 ## [1.3.0]
 ### Added

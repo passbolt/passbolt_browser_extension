@@ -18,10 +18,23 @@
    * Initialize the autocomplete result component.
    */
   var init = function () {
+    // Load required settings.
+    loadSettings()
     // Load the page template.
-    loadTemplate()
-    // Init the event listeners.
+      .then(loadTemplate)
+      // Init the event listeners.
       .then(initEventsListeners);
+  };
+
+  /**
+   * Load the settings required by the share autocomplete.
+   * @return {promise}
+   */
+  var loadSettings = function () {
+    return passbolt.request('passbolt.config.readAll', ['user.settings.trustedDomain'])
+      .then(function (response) {
+        settings = response;
+      });
   };
 
   /**
@@ -87,7 +100,7 @@
     // Load the users in the list.
     for (var i in users) {
       currentUsers[users[i].User.id] = users[i];
-      var html = new EJS({text: itemTpl}).render({user: users[i]});
+      var html = new EJS({text: itemTpl}).render({settings: settings, user: users[i]});
       $('ul').append(html);
     }
     // If no user found.

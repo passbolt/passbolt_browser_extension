@@ -48,6 +48,7 @@
     $(document).on('click', 'li', onSelect);
     passbolt.message.on('passbolt.share-autocomplete.loading', loadingHandler);
     passbolt.message.on('passbolt.share-autocomplete.load-users', loadUsersHandler);
+    passbolt.message.on('passbolt.share-autocomplete.reset', resetHandler);
   };
 
   /**
@@ -64,20 +65,9 @@
     }
     // In desktop.
     else {
-      // If there are less than 3 users to display, the iframe should fit the content.
-      // if (currentUsers.length < 3) {
-        // Resize the iframe container regarding the iframe content.
-        passbolt.helper.html.resizeIframe('#passbolt-iframe-password-share-autocomplete', {
-          width: '100%'
-        });
-      // }
-      // else {
-      //   // Resize the iframe container, reset the height and use the default css.
-      //   passbolt.helper.html.resizeIframe('#passbolt-iframe-password-share-autocomplete', {
-      //     width: '100%',
-      //     height: ''
-      //   });
-      // }
+      passbolt.helper.html.resizeIframe('#passbolt-iframe-password-share-autocomplete', {
+        width: '100%'
+      });
     }
   };
 
@@ -142,6 +132,14 @@
   /* ==================================================================================
    *  Addon events handlers
    * ================================================================================== */
+
+  /**
+   * Handle the loading event.
+   */
+  var resetHandler = function () {
+    reset();
+    setState('hidden');
+  };
 
   /**
    * Handle the loading event.

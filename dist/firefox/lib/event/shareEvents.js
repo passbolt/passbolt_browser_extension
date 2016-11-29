@@ -29,14 +29,21 @@ var listen = function (worker) {
     // excluded from the search.
       excludedUsers = TabStorage.get(worker.tab.id, 'shareWith');
 
-    autocompleteWorker.port.emit('passbolt.share-autocomplete.loading');
-
-    permission.searchUsers('resource', sharedPassword.resourceId, keywords, excludedUsers)
-      .then(function (users) {
-        autocompleteWorker.port.emit('passbolt.share-autocomplete.load-users', users);
-      }, function (e) {
-        // @todo ERROR case not managed
-      });
+    // If no keywords provided, hide the autocomplete component.
+    if (!keywords) {
+      autocompleteWorker.port.emit('passbolt.share-autocomplete.reset');
+    }
+    // Otherwise, search the users who match the keywords,
+    // and display them in the autocomplete component.
+    else {
+      autocompleteWorker.port.emit('passbolt.share-autocomplete.loading');
+      permission.searchUsers('resource', sharedPassword.resourceId, keywords, excludedUsers)
+        .then(function (users) {
+          autocompleteWorker.port.emit('passbolt.share-autocomplete.load-users', users);
+        }, function (e) {
+          // @todo ERROR case not managed
+        });
+    }
   });
 
   /*

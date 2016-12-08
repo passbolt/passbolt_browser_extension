@@ -41,12 +41,7 @@ ToolbarController.prototype.onShortcutPressed = function() {
  */
 ToolbarController.prototype.openPassboltTab = function () {
   var url = Toolbar.getToolbarUrl();
-  try {
-    tabsController.open(url);
-  } catch (e) {
-    // If something wrong happens, redirect the user to the passbolt home page
-    tabsController.open('https://www.passbolt.com/start');
-  }
+  tabsController.open(url);
 };
 
 // Exports the User object.

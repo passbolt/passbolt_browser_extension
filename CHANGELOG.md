@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-1760: Share: image is broken in the autcomplete list after user has changed it
 - PASSBOLT-1566: Share autocomplete html is not valid
 - PASSBOLT-1778: Simplify toolbarController openPassboltTab function
+- PASSBOLT-1680: Password is limited to 50 chars, increase the limit to 4096
 
 ## [1.3.0]
 ### Added

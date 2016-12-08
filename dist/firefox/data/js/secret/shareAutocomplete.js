@@ -58,7 +58,7 @@
    * The events can come from the following sources : addon, page or DOM.
    */
   var initEventsListeners = function () {
-    $(document).on('click', 'li', onSelect);
+    $(document).on('click', 'li:has(.user)', onSelectUser);
     passbolt.message.on('passbolt.share-autocomplete.loading', loadingHandler);
     passbolt.message.on('passbolt.share-autocomplete.load-users', loadUsersHandler);
     passbolt.message.on('passbolt.share-autocomplete.reset', resetHandler);
@@ -187,7 +187,7 @@
    * A user is selected.
    * @param ev {HTMLEvent} The event which occurred
    */
-  var onSelect = function (ev) {
+  var onSelectUser = function (ev) {
     ev.preventDefault();
     ev.stopPropagation();
     // Notify the share worker regarding the selected user.

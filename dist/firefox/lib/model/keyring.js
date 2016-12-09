@@ -304,7 +304,8 @@ Keyring.prototype.keyInfo = function (armoredKey) {
     algorithm: key.primaryKey.algorithm.substring(0, 3), // @TODO : proper alghorithm parsing
     created: key.primaryKey.created,
     expires: key.getExpirationTime(),
-    length: key.primaryKey.getBitSize()
+    length: key.primaryKey.getBitSize(),
+    private: key.isPrivate()
   };
 
   return info;

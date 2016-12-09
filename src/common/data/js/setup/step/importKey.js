@@ -73,11 +73,12 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     passbolt.setup.setActionState('submit', 'processing');
 
     var key = $('#js_setup_import_key_text').val();
+    step.data.privateKeyArmored = key;
 
     step.elts.$errorFeedback.addClass('hidden');
 
-    return step.extractKeyInfo(key)
-      .then(step.validateKeyExistance)
+    return step.extractKeyInfo()
+      .then(step.validatePrivateKey)
       .then(step.setPrivateKey)
       .then(step.extractPublicKey)
       .then(function (publicKeyArmored) {
@@ -137,34 +138,47 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   step.browseKey = function () {
     return passbolt.request('passbolt.file.prompt')
       .then(function (data) {
-        step.data.privateKeyArmored = data;
-        return data;
-      },
-      function error(error) {
-        step.onError(error);
-      });
+          step.data.privateKeyArmored = data;
+          return data;
+        },
+        function error(error) {
+          step.onError(error);
+        });
   };
 
   /**
    * Extract key info from private key.
-   * @param armoredPrivateKey {string} The armored private key
    * @returns {promise}
    */
-  step.extractKeyInfo = function (armoredPrivateKey) {
-    return passbolt.request('passbolt.keyring.public.info', armoredPrivateKey)
-      .then(function (info) {
-        step.data.privateKeyInfo = info;
-        return armoredPrivateKey;
+  step.extractKeyInfo = function () {
+    var def = $.Deferred(),
+      armoredPrivateKey = step.data.privateKeyArmored;
+
+    passbolt.request('passbolt.keyring.public.info', armoredPrivateKey)
+      .then(function (keyInfo) {
+        step.data.privateKeyInfo = keyInfo;
+
+        // If the key is not private.
+        if (keyInfo.private === true) {
+          def.resolve();
+        } else {
+          def.reject('This key is not a valid private key');
+        }
+      }, function(error) {
+        def.reject(error);
       });
+
+    return def;
   };
 
   /**
    * Check that the key doesn't already exist on server.
-   * @param armoredPrivateKey {string} The armored private key
    * @return {promise}
    */
-  step.checkKeyDontExistRemotely = function (armoredPrivateKey) {
-    var def = $.Deferred();
+  step.checkKeyDontExistRemotely = function () {
+    var def = $.Deferred(),
+      armoredPrivateKey = step.data.privateKeyArmored;
+
     passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
       .then(function () {
         def.reject('This key is already used by another user');
@@ -172,16 +186,18 @@ passbolt.setup.steps = passbolt.setup.steps || {};
       .then(null, function () {
         def.resolve(armoredPrivateKey);
       });
+
     return def;
   };
 
   /**
    * Check that the key exists on server.
-   * @param armoredPrivateKey {string} The armored private key
    * @return {promise}
    */
-  step.checkKeyExistRemotely = function (armoredPrivateKey) {
-    var def = $.Deferred();
+  step.checkKeyExistRemotely = function () {
+    var def = $.Deferred(),
+      armoredPrivateKey = step.data.privateKeyArmored;
+
     passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
       .then(function () {
         def.resolve(armoredPrivateKey);
@@ -189,6 +205,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
       .then(null, function () {
         def.reject('This key doesn\'t match any account.');
       });
+
     return def;
   };
 
@@ -196,30 +213,24 @@ passbolt.setup.steps = passbolt.setup.steps || {};
    * Check key existence depending on the workflow.
    *  - install case: check that the key doesn't exist remotely.
    *  - recover case: check that the key exist remotely.
-   * @param armoredPrivateKey {string} The armored private key
    * @return {promise}
    */
-  step.validateKeyExistance = function (armoredPrivateKey) {
+  step.validatePrivateKey = function () {
     if (step.options.workflow == 'install') {
-      return step.checkKeyDontExistRemotely(armoredPrivateKey)
-        .then(function () {
-          return armoredPrivateKey;
-        });
+      return step.checkKeyDontExistRemotely()
     }
     else if (step.options.workflow == 'recover') {
-      return step.checkKeyExistRemotely(armoredPrivateKey)
-        .then(function () {
-          return armoredPrivateKey;
-        });
+      return step.checkKeyExistRemotely()
     }
   };
 
   /**
    * Set the private key in the setup info.
-   * @param armoredPrivateKey {string} The armored private key
    * @return {promise}
    */
-  step.setPrivateKey = function (armoredPrivateKey) {
+  step.setPrivateKey = function () {
+    var armoredPrivateKey = step.data.privateKeyArmored;
+
     return passbolt.request('passbolt.setup.set', 'key.privateKeyArmored', armoredPrivateKey)
       .then(function () {
         step.data.privateKeyArmored = armoredPrivateKey;
@@ -229,10 +240,11 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   /**
    * Extract public key.
-   * @param armoredPrivateKey {string} The armored private key
    * @return {promise}
    */
-  step.extractPublicKey = function (armoredPrivateKey) {
+  step.extractPublicKey = function () {
+    var armoredPrivateKey = step.data.privateKeyArmored;
+
     return passbolt.request('passbolt.keyring.public.extract', armoredPrivateKey)
       .then(function (publicKeyArmored) {
         step.data.publicKeyArmored = publicKeyArmored;

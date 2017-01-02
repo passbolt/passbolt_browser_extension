@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.3.1] - 2017-01-03
 ### Fixed
 - PASSBOLT-1606: Wrong message when auto logged out and passbolt is not the active tab
 - PASSBOLT-1769: Refactor extension bootstrap, prepare code to welcome future features
@@ -14,35 +16,35 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-1657: As AP I should not be able to complete the recovery process with my public key
 
 ## [1.3.0]
-### Added
+### Added - 2016-11-25
 - PASSBOLT-1725: Chrome support
 
 ### Fixed
 - PASSBOLT-1708: Refactor Request get and post to use fetch
 
-## [1.2.0]
+## [1.2.0] - 2016-10-16
 ### Fixed
 - PASSBOLT-1668: Refactor GPGAuth to handle capitalization issue. See github #24 & #16
 - PASSBOLT-1660: Refactoring ground work for Chrome Extension
 - PASSBOLT-1698: Gpgkey is not downloadable after generation
 
-## [1.1.1]
+## [1.1.1] - 2016-08-13
 ### Fixed
 - PASSBOLT-1655: Visual glitch on password create field, bump to styleguide v1.1.0
 - PASSBOLT-1635: Clean/Document messaging layer
 
-## [1.1.0]
+## [1.1.0] - 2016-08-09
 ### Fixed
 - PASSBOLT-1432: Passbolt.app pagemod shouldn't start if user is not logged in
 
-## [1.0.13]
+## [1.0.13] - 2016-07-01
 ### Fixed
 - PASSBOLT-1366: Worker bug when multiple passbolt instances are open in multiple windows
 
 ### Added
 - PASSBOLT-1588: As AN it should be possible to recover a passbolt account on a new device.
 
-## [1.0.12]
+## [1.0.12] - 2016-05-31
 ### Added
 - PASSBOLT-959: Added plugin version number in footer.
 - PASSBOLT-1488: As AP, I shouldn't be able to complete the setup if I import a key that already exist on server.
@@ -50,7 +52,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - PASSBOLT-1255: Button height issues + missing tooltip on setup
 
-## [1.0.11]
+## [1.0.11] - 2016-16-16
 ### Added
 - PASSBOLT-1108: As LU when entering my master key I can have the plugin remember it for 5 min.
 
@@ -108,7 +110,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_firefox/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/passbolt/passbolt_firefox/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/passbolt/passbolt_firefox/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/passbolt/passbolt_firefox/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/passbolt/passbolt_firefox/compare/v1.1.0...v1.1.1

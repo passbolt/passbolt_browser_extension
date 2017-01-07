@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- PASSBOLT-1827: As a user I should be able to log in with a passphrase longer than 50 chars in length
 
 ## [1.3.1] - 2017-01-03
 ### Fixed

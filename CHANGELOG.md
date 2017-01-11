@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 - PASSBOLT-1827: As a user I should be able to log in with a passphrase longer than 50 chars in length
+- PASSBOLT-1809: As a developer I should be able to get the chrome zip distrib file as part of the build process
 
 ## [1.3.1] - 2017-01-03
 ### Fixed

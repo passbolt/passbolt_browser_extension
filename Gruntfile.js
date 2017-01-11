@@ -6,8 +6,8 @@ module.exports = function (grunt) {
   var config = {
     styleguide: 'passbolt-styleguide',
     modules_path: 'node_modules',
-    common_path: 'src/common',
-    webroot: 'src/common/data',
+    common_path: 'src/all',
+    webroot: 'src/all/data',
     build: {
       firefox: {
         path: 'dist/firefox'
@@ -78,14 +78,18 @@ module.exports = function (grunt) {
         },
         command: [
           "cp <%= config.build.chrome.path %>/lib/config/config.json <%= config.build.chrome.path %>/lib/config/config.json.original",
+          "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' <%= config.build.chrome.path %>/lib/config/config.json",
+          'zip -q -1 -r dist/passbolt-<%= pkg.version %>.zip <%= config.build.chrome.path %>',
+          "echo '<%= config.build.chrome.path %>/passbolt-<%= pkg.version %>.zip has been generated'",
           "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": true/' <%= config.build.chrome.path %>/lib/config/config.json",
           './node_modules/crx/bin/crx.js pack <%= config.build.chrome.path %> -p key.pem -o <%= config.build.chrome.path %>/passbolt-<%= pkg.version %>-debug.crx',
           "sed -i '' -e 's/[\"]debug[\"]:.*$/\"debug\": false/' <%= config.build.chrome.path %>/lib/config/config.json",
           './node_modules/crx/bin/crx.js pack <%= config.build.chrome.path %> -p key.pem -o <%= config.build.chrome.path %>/passbolt-<%= pkg.version %>.crx',
           'ln -s passbolt-<%= pkg.version %>-debug.crx <%= config.build.chrome.path %>/passbolt-latest@passbolt.com.crx',
+          'mv dist/passbolt-<%= pkg.version %>.zip <%= config.build.chrome.path %>/.',
           "rm <%= config.build.chrome.path %>/lib/config/config.json",
           "cp <%= config.build.chrome.path %>/lib/config/config.json.original <%= config.build.chrome.path %>/lib/config/config.json",
-          "rm <%= config.build.chrome.path %>/lib/config/config.json.original",
+          "rm <%= config.build.chrome.path %>/lib/config/config.json.original"
         ].join('&&')
       }
     },

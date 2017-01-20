@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- PASSBOLT-1850: GITHUB-5 Minor spelling and grammar fixes (@colin-campbell)
 
 ## [1.3.2] - 2017-01-16
 ### Fixed

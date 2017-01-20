@@ -15,7 +15,7 @@ var listen = function (worker) {
    * - If correct, resolve the master password request promise with the master password
    *  as parameter.
    *  - If wrong :
-   *    * And less than 3 attempts done, notify the user his master password is wrong ;
+   *    * And less than 3 attempts done, notify the user their master password is wrong ;
    *    * And 3 attempts done already
    *      ** notify the user;
    *      ** don't allow him to make another attempt with the same dialog;

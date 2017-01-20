@@ -217,7 +217,7 @@ var listen = function (worker) {
    * ================================================================================== */
 
   /*
-   * Offer to the user to backup his key by downloading it.
+   * Offer to the user to backup their key by downloading it.
    *
    * @listens passbolt.keyring.key.backup
    * @param requestId {uuid} The request identifier

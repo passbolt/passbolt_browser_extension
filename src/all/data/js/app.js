@@ -112,7 +112,7 @@ window.addEventListener('passbolt.secret.focus', function () {
   passbolt.message.emit('passbolt.secret-edit.focus');
 });
 
-// When the user wants to save the changes on his resource, the application
+// When the user wants to save the changes on their resource, the application
 // asks the plugin to encrypt the secret for all the users the resource
 // is shared with.
 window.addEventListener('passbolt.secret_edition.encrypt', function (event) {
@@ -180,7 +180,7 @@ window.addEventListener('passbolt.clipboard', function (event) {
   });
 });
 
-// Listen when the user requests a backup of his private key.
+// Listen when the user requests a backup of their private key.
 window.addEventListener("passbolt.settings.download_private_key", function () {
   passbolt.request('passbolt.keyring.private.get').then(function (key) {
     passbolt.request('passbolt.keyring.key.backup', key.key, 'passbolt_private.asc').then(function () {
@@ -189,7 +189,7 @@ window.addEventListener("passbolt.settings.download_private_key", function () {
   });
 });
 
-// Listen when the user requests a backup of his public key.
+// Listen when the user requests a backup of their public key.
 window.addEventListener("passbolt.settings.download_public_key", function () {
   passbolt.request('passbolt.keyring.private.get').then(function (key) {
     passbolt.request('passbolt.keyring.public.extract', key.key).then(function (publicKeyArmored) {

@@ -224,14 +224,14 @@
 
   /**
    * The submit button has been clicked :
-   *  - Check if the user wants his master password to be remembered and
+   *  - Check if the user wants their master password to be remembered and
    *    notify the addon about this preference if yes.
    *  - Submit the master password to the addon.
    */
   var submitButtonClicked = function () {
     var masterPassword = $masterPasswordField.val();
 
-    // The user wants his master password to be remembered.
+    // The user wants their master password to be remembered.
     if ($('#js_remember_master_password').is(':checked')) {
       rememberMasterPassword(masterPassword);
     }

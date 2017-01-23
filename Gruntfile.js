@@ -277,6 +277,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
 
   // Build firefox.
+  grunt.registerTask('build-firefox-src', ['clean:firefox_build', 'copy:firefox_src']);
   grunt.registerTask('build-firefox', ['clean:firefox_build', 'copy:firefox_src', 'shell:build_xpi']);
 
   // Build chrome.

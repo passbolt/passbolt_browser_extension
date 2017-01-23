@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 - PASSBOLT-1850: GITHUB-5 Minor spelling and grammar fixes (@colin-campbell)
+- PASSBOLT-1807: Fix parsing issues with keys that have multiple identities
 
 ## [1.3.2] - 2017-01-16
 ### Fixed

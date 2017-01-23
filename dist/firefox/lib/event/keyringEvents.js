@@ -33,6 +33,7 @@ var listen = function (worker) {
       var info = keyring.keyInfo(publicKeyArmored);
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', e.message);
+      return;
     }
 
     if (typeof info !== 'undefined') {

@@ -70,6 +70,7 @@ $(function () {
    * Initialize the key section
    */
   var initKeysSection = function () {
+
     // Retrieve the user private key.
     var p1 = passbolt.request('passbolt.keyring.private.get')
       // Update the client key information.

@@ -82,6 +82,11 @@ On MacOS that will be something like this:
 jpm run -b /Applications/FirefoxDeveloperEdition.app
 ```
 
+# FAQ
+## How to keep the same extension id at each build
+A key (key.pem) has to be provided by the passbolt team (Cedric) and should be put at the root folder before 
+the grunt build.
+
 # Credits
 
 https://www.passbolt.com/credits

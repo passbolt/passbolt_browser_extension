@@ -313,7 +313,8 @@ Keyring.prototype.keyInfo = function (armoredKey) {
     fingerprint: key.primaryKey.getFingerprint(),
     algorithm: key.primaryKey.algorithm.substring(0, 3), // @TODO : proper alghorithm parsing
     created: key.primaryKey.created,
-    expires: key.getExpirationTime(),
+    //expires: key.getExpirationTime(), // Temporary patch due to bug in chrome (memory leak).
+    expires: '',
     length: key.primaryKey.getBitSize(),
     private: key.isPrivate()
   };
@@ -382,8 +383,10 @@ Keyring.prototype.generateKeyPair = function (keyInfo, passphrase) {
   };
 
   // Launch key pair generation from openpgp worker.
+  this.openpgpWorker.config.use_native = false;
   var def = this.openpgpWorker
     .generateKey(keySettings);
+  this.openpgpWorker.config.use_native = true;
 
   return def;
 };

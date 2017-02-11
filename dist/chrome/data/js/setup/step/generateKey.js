@@ -31,7 +31,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
    * Implements start().
    */
   step.start = function () {
-    passbolt.setup.setActionState('submit', 'processing');
+    // We don't need the submit button here. Removing it.
+    $('#js_setup_submit_step').remove();
 
     // Get key info from setup.
     passbolt.setup.get('key')

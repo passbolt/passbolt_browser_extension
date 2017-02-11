@@ -1,7 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Passbolt Extension",
-  "version": "1.4.0",
+  "short_name": "passbolt",
+  "version": "1.4.2",
   "description": "Passbolt extension for the open source password manager for teams.",
   "icons": {
     "128": "skin/icon-128.png"

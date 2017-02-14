@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "passbolt-styleguide": "~1.1.0",
-    "openpgp": "2.3.2"
+    "openpgp": "~2.3"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

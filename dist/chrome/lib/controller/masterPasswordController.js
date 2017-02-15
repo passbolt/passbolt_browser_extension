@@ -43,7 +43,7 @@ var get = function (worker) {
 exports.get = get;
 
 /**
- * Prompt the user to enter his master password.
+ * Prompt the user to enter their master password.
  *
  * @param worker The worker asking for the master password.
  * @param deferred The promise to resolve/reject when the master password is retrieved.

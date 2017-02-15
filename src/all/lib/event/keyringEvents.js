@@ -33,6 +33,7 @@ var listen = function (worker) {
       var info = keyring.keyInfo(publicKeyArmored);
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', e.message);
+      return;
     }
 
     if (typeof info !== 'undefined') {
@@ -217,7 +218,7 @@ var listen = function (worker) {
    * ================================================================================== */
 
   /*
-   * Offer to the user to backup his key by downloading it.
+   * Offer to the user to backup their key by downloading it.
    *
    * @listens passbolt.keyring.key.backup
    * @param requestId {uuid} The request identifier

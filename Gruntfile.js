@@ -91,7 +91,13 @@ module.exports = function (grunt) {
           "cp <%= config.build.chrome.path %>/lib/config/config.json.original <%= config.build.chrome.path %>/lib/config/config.json",
           "rm <%= config.build.chrome.path %>/lib/config/config.json.original"
         ].join('&&')
-      }
+      },
+      patch_chrome: {
+        options: {
+          stderr: false
+        },
+        command: ' patch -p1 < ./patches/keyring-chrome56-patch.txt'
+      },
     },
     copy: {
       firefox_src: {
@@ -277,10 +283,11 @@ module.exports = function (grunt) {
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
 
   // Build firefox.
+  grunt.registerTask('build-firefox-src', ['clean:firefox_build', 'copy:firefox_src']);
   grunt.registerTask('build-firefox', ['clean:firefox_build', 'copy:firefox_src', 'shell:build_xpi']);
 
   // Build chrome.
-  grunt.registerTask('build-chrome', ['clean:chrome_build', 'copy:chrome_src', 'shell:build_crx']);
+  grunt.registerTask('build-chrome', ['clean:chrome_build', 'copy:chrome_src', 'shell:patch_chrome', 'shell:build_crx']);
   // Build chrome directory but not the crx usefull for devel
   grunt.registerTask('build-chrome-nocrx', ['clean:chrome_build', 'copy:chrome_src']);
 

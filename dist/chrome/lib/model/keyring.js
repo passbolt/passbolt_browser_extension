@@ -4,20 +4,22 @@
  * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+const { defer } = require('sdk/core/promise');
+var __ = require("sdk/l10n").get;
+
 var Config = require('./config');
-var Settings = require("./settings").Settings;
-var Key = require("./key").Key;
 
 var openpgp = require('../vendors/openpgp');
 var webWorker = require('../vendors/web-worker').Worker;
-var storage = require('../vendors/node-localstorage').localStorage;
-var keyring = new openpgp.Keyring();
 var fetch = require('../vendors/window').fetch;
 var Validator = require('../vendors/validator');
-var BrowserSettings = require('../controller/browserSettingsController');
+var XRegExp = require('../vendors/xregexp').XRegExp;
+var storage = require('../vendors/node-localstorage').localStorage;
 
-const { defer } = require('sdk/core/promise');
-var __ = require("sdk/l10n").get;
+var Settings = require("./settings").Settings;
+var Key = require("./key").Key;
+var keyring = new openpgp.Keyring();
+var BrowserSettings = require('../controller/browserSettingsController');
 
 /**
  * The class that deals with Passbolt Keyring.
@@ -279,10 +281,18 @@ Keyring.prototype.keyInfo = function (armoredKey) {
     userIds = key.getUserIds(),
     userIdsSplited = [];
 
+  if(userIds.length === 0) {
+    throw new Error('No key user ID found');
+  }
+
   // Extract name & email from key userIds.
-  var myRegexp = /(.*) <(\S+@\S+)>$/g;
+  var myRegexp = XRegExp(/(.*) <(\S+@\S+)>$/g);
+  var match;
   for (var i in userIds) {
-    var match = myRegexp.exec(userIds[i]);
+    match = XRegExp.exec(userIds[i], myRegexp);
+    if(match === null) {
+      throw new Error('Error when parsing key user id');
+    }
     userIdsSplited.push({
       name: match[1],
       email: match[2]
@@ -303,7 +313,8 @@ Keyring.prototype.keyInfo = function (armoredKey) {
     fingerprint: key.primaryKey.getFingerprint(),
     algorithm: key.primaryKey.algorithm.substring(0, 3), // @TODO : proper alghorithm parsing
     created: key.primaryKey.created,
-    expires: key.getExpirationTime(),
+    //expires: key.getExpirationTime(), // Temporary patch due to bug in chrome (memory leak).
+    expires: '',
     length: key.primaryKey.getBitSize(),
     private: key.isPrivate()
   };
@@ -372,8 +383,10 @@ Keyring.prototype.generateKeyPair = function (keyInfo, passphrase) {
   };
 
   // Launch key pair generation from openpgp worker.
+  this.openpgpWorker.config.use_native = false;
   var def = this.openpgpWorker
     .generateKey(keySettings);
+  this.openpgpWorker.config.use_native = true;
 
   return def;
 };

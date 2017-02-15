@@ -5,6 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Fixed
 
+## [1.4.3] - 2017-02-14
+
+## [1.4.2] - 2017-02-11
+### Fixed
+- Fix for chrome 56 memory leak (https://www.passbolt.com/incidents/20170210_chrome_not_available)
+
 ## [1.4.0] - 2017-02-07
 ### Fixed
 - PASSBOLT-1850: GITHUB-5 Minor spelling and grammar fixes (@colin-campbell)

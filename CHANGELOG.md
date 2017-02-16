@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.4.3]
 ### Updated
-- PASSBOLT-1909: updated openpgpjs. Thanks to @pomarec for the Pull Request. (https://github.com/passbolt/passbolt_browser_extension/pull/11)
+- PASSBOLT-1909: updated openpgpjs to latest version: 1.3.7. Thanks to @pomarec for the pull request. (https://github.com/passbolt/passbolt_browser_extension/pull/11)
 
 ## [1.4.2] - 2017-02-11
 ### Fixed

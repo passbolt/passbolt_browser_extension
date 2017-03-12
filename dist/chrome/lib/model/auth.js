@@ -112,7 +112,7 @@ Auth.prototype.getServerKey = function (domain) {
   fetch(
     domain + this.URL_VERIFY, {
       method: 'GET',
-      credentials: 'include',
+      credentials: 'include'
     })
     .then(function(response) {
       _this.__statusCheck(response);

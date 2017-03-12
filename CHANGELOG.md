@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fixed
+- PASSBOLT-1953: As a user I can share a password with a group
 
 ## [1.4.3]
 ### Updated

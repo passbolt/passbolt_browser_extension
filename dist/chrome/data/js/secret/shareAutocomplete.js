@@ -11,8 +11,8 @@
   var itemTpl = null,
   // Empty result template.
     emptyTpl = null,
-  // The array of users retrieved from the back-end.
-    currentUsers = {};
+  // The array of acos displayed.
+    _aros = {};
 
   /**
    * Initialize the autocomplete result component.
@@ -58,7 +58,7 @@
    * The events can come from the following sources : addon, page or DOM.
    */
   var initEventsListeners = function () {
-    $(document).on('click', 'li:has(.user)', onSelectUser);
+    $(document).on('click', 'li', onSelectAro);
     passbolt.message.on('passbolt.share-autocomplete.loading', loadingHandler);
     passbolt.message.on('passbolt.share-autocomplete.load-users', loadUsersHandler);
     passbolt.message.on('passbolt.share-autocomplete.reset', resetHandler);
@@ -88,26 +88,52 @@
    * Reset the component.
    */
   var reset = function () {
-    currentUsers = {};
+    _aros = {};
     $('ul').empty();
   };
 
   /**
-   * Load a list of users.
-   * @param users {array} The list of users
+   * Load a list of aros (users & groups).
+   * @param aros {array} The list of aros (users & groups) to display
    */
-  var load = function (users) {
-    // Load the users in the list.
-    for (var i in users) {
-      currentUsers[users[i].User.id] = users[i];
-      var html = new EJS({text: itemTpl}).render({settings: settings, user: users[i]});
+  var load = function (aros) {
+    for (var i in aros) {
+      var aro = aros[i],
+        data = {};
+
+      // If the aro is a user.
+      if (aro.User && aro.Profile) {
+        data = {
+          id: aro.User.id,
+          thumbnail_url: settings['user.settings.trustedDomain'] + '/' +  aro.Profile.Avatar.url.small,
+          label: aro.Profile.first_name + ' ' + aro.Profile.last_name +' (' + aro.Gpgkey.key_id + ')',
+          secondaryLabel: aro.User.username,
+          cssClass: 'user'
+        };
+        _aros[aro.User.id] = aro;
+      }
+      // If the aro is a group.
+      else if (aro.Group) {
+        data = {
+          id: aro.Group.id,
+          thumbnail_url: settings['user.settings.trustedDomain'] + '/img/avatar/group_default.png',
+          label: aro.Group.name,
+          secondaryLabel: aro.Group.user_count + ' Member' + (aro.Group.user_count>1?'s':''),
+          cssClass: 'group'
+        };
+        _aros[aro.Group.id] = aro;
+      }
+
+      var html = new EJS({text: itemTpl}).render(data);
       $('ul').append(html);
     }
+
     // If no user found.
-    if (!users.length) {
+    if (!aros.length) {
       var html = new EJS({text: emptyTpl}).render();
       $('ul').append(html);
     }
+
     // Resize the autocomplete iframe.
     resize(['five']);
   };
@@ -187,12 +213,11 @@
    * A user is selected.
    * @param ev {HTMLEvent} The event which occurred
    */
-  var onSelectUser = function (ev) {
+  var onSelectAro = function (ev) {
     ev.preventDefault();
     ev.stopPropagation();
-    // Notify the share worker regarding the selected user.
-    //passbolt.message.emit('passbolt.share-autocomplete.user-selected', currentUsers[this.id]);
-    passbolt.message.emit('passbolt.share-autocomplete.user-selected', currentUsers[this.id]);
+    // Notify the share worker regarding the selected aro.
+    passbolt.message.emit('passbolt.share-autocomplete.aro-selected', _aros[this.id]);
     setState('hidden');
   };
 

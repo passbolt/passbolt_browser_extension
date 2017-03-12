@@ -24,10 +24,7 @@ var listen = function (worker) {
   worker.port.on('passbolt.share.search-users', function (keywords) {
     var sharedPassword = TabStorage.get(worker.tab.id, 'sharedPassword'),
       permission = new Permission(),
-      autocompleteWorker = Worker.get('ShareAutocomplete', worker.tab.id),
-    // The users that have already been added to the share list should be
-    // excluded from the search.
-      excludedUsers = TabStorage.get(worker.tab.id, 'shareWith');
+      autocompleteWorker = Worker.get('ShareAutocomplete', worker.tab.id);
 
     // If no keywords provided, hide the autocomplete component.
     if (!keywords) {
@@ -37,9 +34,20 @@ var listen = function (worker) {
     // and display them in the autocomplete component.
     else {
       autocompleteWorker.port.emit('passbolt.share-autocomplete.loading');
-      permission.searchUsers('resource', sharedPassword.resourceId, keywords, excludedUsers)
-        .then(function (users) {
-          autocompleteWorker.port.emit('passbolt.share-autocomplete.load-users', users);
+      permission.searchUsers('resource', sharedPassword.resourceId, keywords)
+        .then(function (aros) {
+          // The users & groups that have already been added to the share list should not be displayed.
+          var excludedAros = TabStorage.get(worker.tab.id, 'shareWith');
+          for(var i in excludedAros) {
+            var excludedAroId = excludedAros[i].User ? excludedAros[i].User.id : excludedAros[i].Group.id;
+            for(var j in aros) {
+              var aroId = aros[j].User ? aros[j].User.id : aros[j].Group.id;
+              if(aroId == excludedAroId) {
+                aros.splice(j, 1);
+              }
+            }
+          }
+          autocompleteWorker.port.emit('passbolt.share-autocomplete.load-users', aros);
         }, function (e) {
           // @todo ERROR case not managed
         });

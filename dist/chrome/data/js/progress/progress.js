@@ -21,7 +21,11 @@
   /**
    * Update progress bar.
    */
-  var updateProgressBar = function (message, completedGoals) {
+  var updateProgressBar = function (message, completedGoals, totalGoals) {
+    // If the total goals updated.
+    if (totalGoals) {
+      goals = totalGoals;
+    }
     var percent = Math.round((100 * completedGoals) / goals);
     if (percent == 100) {
       message = 'completed';

@@ -63,15 +63,15 @@ passbolt.message.on('passbolt.share.add-permission', function (permission) {
   passbolt.message.emitToPage('resource_share_add_permission', permission);
 });
 
-// A permission is deleted, the user shouldn't be listed anymore by the autocomplete
+// A permission is deleted, the aro shouldn't be listed anymore by the autocomplete
 // result list component.
 window.addEventListener('passbolt.share.remove_permission', function (event) {
   var data = event.detail,
-  // The user the permission has been deleted for.
-    userId = data.userId;
+  // The aro the permission has been deleted for.
+    aroId = data.userId;
 
   // Notify the share dialog about this change
-  passbolt.message.emit('passbolt.share.remove-permission', userId);
+  passbolt.message.emit('passbolt.share.remove-permission', aroId);
 });
 
 // When the user wants to share a password with other people.

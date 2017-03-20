@@ -58,6 +58,8 @@ pageMods.ProgressDialog.init();
 pageMods.SecretEditDialog.init();
 pageMods.ShareDialog.init();
 pageMods.ShareAutocompleteDialog.init();
+pageMods.GroupEditDialog.init();
+pageMods.GroupEditAutocompleteDialog.init();
 
 // Debug pagemod
 if (Config.isDebug()) {

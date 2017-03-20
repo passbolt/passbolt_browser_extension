@@ -88,6 +88,61 @@ window.addEventListener('passbolt.share.encrypt', function () {
   });
 });
 
+
+/* ==================================================================================
+ *  Group edit
+ * ================================================================================== */
+
+// A user has been added through the user edit iframe.
+passbolt.message.on('passbolt.group.edit.add-user', function (groupUser) {
+  passbolt.message.emitToPage('group_edit_add_user', groupUser);
+});
+
+// A group_user is deleted, the group_user should be listed again in the autocomplete.
+window.addEventListener('passbolt.group.edit.remove_group_user', function (event) {
+  var data = event.detail,
+      groupUser = data.groupUser;
+
+  // Notify the share dialog about this change
+  passbolt.message.emit('passbolt.group.edit.remove-group_user', groupUser);
+});
+
+// A group_user is deleted, the group_user should be listed again in the autocomplete.
+window.addEventListener('passbolt.group.edit.edit_group_user', function (event) {
+  var data = event.detail,
+      groupUser = data.groupUser;
+
+  // Notify the share dialog about this change
+  passbolt.message.emit('passbolt.group.edit.edit-group_user', groupUser);
+});
+
+// A group is saved.
+window.addEventListener('passbolt.group.edit.save', function (event) {
+  var data = event.detail,
+      group = data.group;
+
+  // Notify the share dialog about this change
+  passbolt.message.emit('passbolt.group.edit.save', group);
+});
+
+/**
+ * A group has been saved successfully by the plugin.
+ * Inform the client.
+ */
+passbolt.message.on('passbolt.group.edit.save.success', function (group) {
+  passbolt.message.emitToPage('group_edit_save_success', group);
+});
+
+/**
+ * A group has not been saved due to an error.
+ * Inform the client.
+ */
+passbolt.message.on('passbolt.group.edit.save.error', function (errorResponse) {
+  passbolt.message.emitToPage('group_edit_save_error', errorResponse);
+});
+
+
+
 /* ==================================================================================
  *  Secret edit
  * ================================================================================== */

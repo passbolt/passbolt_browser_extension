@@ -59,6 +59,7 @@ PassboltApp.initPageMod = function () {
       self.data.url('js/masterPassword/iframe.js'),
       self.data.url('js/secret/editIframe.js'),
       self.data.url('js/secret/shareIframe.js'),
+      self.data.url('js/group/editIframe.js'),
       self.data.url('js/progress/iframe.js'),
       self.data.url('js/app.js')
     ],
@@ -84,6 +85,7 @@ PassboltApp.initPageMod = function () {
       app.events.keyring.listen(worker);
       app.events.secret.listen(worker);
       app.events.template.listen(worker);
+      app.events.group.listen(worker);
       app.events.masterPasswordIframe.listen(worker);
       app.events.app.listen(worker);
     }

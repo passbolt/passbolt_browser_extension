@@ -293,59 +293,6 @@ var listen = function (worker) {
         worker.port.emit(requestId, 'ERROR', error);
       });
   });
-
-  /*
-   * Initialize the group edit process.
-   *
-   * @listens passbolt.app.group-edit-init
-   * @param groupId {uuid} The group id, null if creation
-   */
-  worker.port.on('passbolt.app.group-edit-init', function (requestId, groupId) {
-    // Store some variables in the tab storage in order to make it accessible by other workers.
-    TabStorage.set(worker.tab.id, 'groupId', groupId);
-    TabStorage.set(worker.tab.id, 'groupUsers', []);
-    worker.port.emit(requestId, 'SUCCESS');
-  });
-
-  /*
-   * A groupUser has been temporary deleted.
-   * Remove it from the list of group users, it added
-   * previously.
-   *
-   * @listens passbolt.group.edit.remove-group_user
-   * @param groupUser {string} The groupUser that has been removed.
-   */
-  worker.port.on('passbolt.group.edit.remove-group_user', function (groupUser) {
-    var groupUsers = TabStorage.get(worker.tab.id, 'groupUsers') || [];
-
-    for (var i in groupUsers) {
-      if (groupUsers[i].user_id == groupUser.user_id) {
-        groupUsers.splice(i, 1);
-        TabStorage.set(worker.tab.id, 'groupUsers', groupUsers);
-        return;
-      }
-    }
-  });
-
-  /*
-   * A groupUser has been temporary deleted.
-   * Remove it from the list of group users, it added
-   * previously.
-   *
-   * @listens passbolt.group.edit.remove-group_user
-   * @param groupUser {string} The groupUser that has been removed.
-   */
-  worker.port.on('passbolt.group.edit.edit-group_user', function (groupUser) {
-    var groupUsers = TabStorage.get(worker.tab.id, 'groupUsers') || [];
-
-    for (var i in groupUsers) {
-      if (groupUsers[i].user_id == groupUser.user_id) {
-        groupUsers[i] = groupUser;
-        TabStorage.set(worker.tab.id, 'groupUsers', groupUsers);
-        return;
-      }
-    }
-  });
 };
 
 

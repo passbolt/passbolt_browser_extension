@@ -149,7 +149,15 @@ module.exports = function (grunt) {
         }]
       },
       common_lib: {
-        files: []
+        // Underscore
+        files: [{
+          // Package definition
+          nonull: true,
+          cwd: '<%= config.modules_path %>/underscore',
+          src: 'underscore-min.js',
+          dest: '<%= config.common_path %>/lib/vendors/',
+          expand: true
+        }]
       },
       firefox_lib: {
         files: [{

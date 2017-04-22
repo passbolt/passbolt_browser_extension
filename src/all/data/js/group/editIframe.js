@@ -5,7 +5,7 @@
  *  - Add the iframe to the application page. The editGroupDialogPagemod
  *    will detect it and will control its DOM.
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2015-present Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
@@ -62,17 +62,21 @@
     };
 
     /*
-     * Open the secret share control component when a password is shared.
-     * passbolt.plugin.resource_share
+     * Open the user field control component when a group is edited.
+     * passbolt.plugin.group_edit
      */
     window.addEventListener("passbolt.plugin.group_edit", function (event) {
-        var data = event.detail;
+        var data = event.detail,
+            groupId = data.groupId,
+            canAddGroupUsers = data.canAddGroupUsers;
 
         // Initialize the process.
-        passbolt.request('passbolt.app.group-edit-init', {
-            //groupId: data.groupId
+        passbolt.request('passbolt.group.edit.init', {
+            groupId: groupId
         }).then(function () {
-            _insertIframes();
+            if (canAddGroupUsers == true) {
+                _insertIframes();
+            }
         });
     }, false);
 

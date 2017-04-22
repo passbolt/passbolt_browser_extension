@@ -9,6 +9,7 @@
 
 var Worker = require('../model/worker');
 var TabStorage = require('../model/tabStorage').TabStorage;
+var GroupForm = require('../model/groupForm').GroupForm;
 
 var listen = function (worker) {
     /*
@@ -18,31 +19,13 @@ var listen = function (worker) {
      * @param user {array} The selected user
      */
     worker.port.on('passbolt.group.edit-autocomplete.user-selected', function (user) {
-        var groupId = TabStorage.get(worker.tab.id, 'groupId');
+        var groupForm = new GroupForm(worker.tab.id);
 
-        // Add the user to the list of user to share the password with.
-        var groupUsers = TabStorage.get(worker.tab.id, 'groupUsers');
-
-        // Check if there is already one admin.
-        var adminExisting = false;
-        for (var i in groupUsers) {
-            if (groupUsers[i].is_admin == 1) {
-                adminExisting = true;
-            }
-        }
-
-        // Build groupUser object.
-        var groupUser= {
-            user_id: user.User.id,
-            is_admin: adminExisting == true ? 0 : 1,
-            User: user
-        };
-
-        // Add object to groupUsers list in tab storage.
-        groupUsers.push(groupUser);
-        TabStorage.set(worker.tab.id, 'groupUsers', groupUsers);
-
-        Worker.get('App', worker.tab.id).port.emit('passbolt.group.edit.add-user', groupUser);
+        groupForm.addGroupUser(user)
+            .then(function(groupUser) {
+                // Add user in the list of group users.
+                Worker.get('App', worker.tab.id).port.emit('passbolt.group.edit.add-user', groupUser);
+            });
 
         // Reset the autocomplete field.
         Worker.get('GroupEdit', worker.tab.id).port.emit('passbolt.group.edit.reset');

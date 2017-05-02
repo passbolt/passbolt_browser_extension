@@ -285,11 +285,6 @@ GroupForm.prototype.getPostJson = function() {
         "GroupUsers": []
     };
 
-    // Set id if exists. (for update).
-    // if(group.Group.id != undefined && group.Group.id != '') {
-    //     groupJson.Group.id = group.Group.id;
-    // }
-
     for (var i in changes) {
         var groupUser = null;
         switch(changes[i].status) {

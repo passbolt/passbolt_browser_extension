@@ -37,16 +37,22 @@ var listen = function (worker) {
       permission.searchUsers('resource', sharedPassword.resourceId, keywords)
         .then(function (aros) {
           // The users & groups that have already been added to the share list should not be displayed.
-          var excludedAros = TabStorage.get(worker.tab.id, 'shareWith');
-          for(var i in excludedAros) {
-            var excludedAroId = excludedAros[i].User ? excludedAros[i].User.id : excludedAros[i].Group.id;
-            for(var j in aros) {
-              var aroId = aros[j].User ? aros[j].User.id : aros[j].Group.id;
-              if(aroId == excludedAroId) {
-                aros.splice(j, 1);
-              }
-            }
+          var excludedAros = TabStorage.get(worker.tab.id, 'shareWith'),
+              excludedArosIds = [];
+          // Extract the excluded aros ids.
+          if (excludedAros) {
+            excludedArosIds = excludedAros.map(function(excludedAro) {
+              return excludedAro.User ? excludedAro.User.id : excludedAro.Group.id;
+            });
           }
+
+          // Filter the data returned by the API.
+          aros = aros.filter(function(aro) {
+            var aroId = aro.User ? aro.User.id : aro.Group.id;
+            return excludedArosIds.indexOf(aroId) === -1;
+          });
+
+          // Load the aros in the autocomplete list.
           autocompleteWorker.port.emit('passbolt.share-autocomplete.load-users', aros);
         }, function (e) {
           // @todo ERROR case not managed

@@ -2,9 +2,22 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+
 ## [Unreleased]
-### Fixed
+
+## [1.5.0]
+### Added
+- PASSBOLT-1955: As an administrator I can create a group
+- PASSBOLT-1969: As a group manager I can see which users are part of a given group from the group edit dialog
+- PASSBOLT-1838: As a group manager I can add a user to a group using the edit group dialog
+- PASSBOLT-1838: As a group manager adding a user to a group, the passwords the group has access should be encrypted for the new user
+- PASSBOLT-1838: As a group manager I can remove a user from a group using the edit group dialog
+- PASSBOLT-1969: As a group manager I can edit the membership roles
 - PASSBOLT-1953: As a user I can share a password with a group
+- PASSBOLT-1940: As a user when editing a password for a group, the secret should be encrypted for all the members
+
+### Fixed
+- PASSBOLT-2031: Share a password with multiple users/groups in a single operation
 
 ## [1.4.3]
 ### Updated

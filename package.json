@@ -7,7 +7,7 @@
   "license": "AGPL-3.0",
   "icon": "resource://@passbolt/skin/logo-48.png",
   "homepage": "https://www.passbolt.com",
-  "author": "Bolt Softwares Pvt. Ltd. <contact@passbolt.com> (https://www.passbolt.com)",
+  "author": "Passbolt <contact@passbolt.com> (https://www.passbolt.com)",
   "repository": "https://github.com/passbolt",
   "developers": [
     "Kévin Muller <kevin@passbolt.com> (https://www.passbolt.com)",

@@ -17,12 +17,18 @@
 passbolt.message.on('passbolt.progress.open-dialog', function(title, goals) {
 	var iframeUrl;
 	var iframeId = 'passbolt-iframe-progress-dialog';
+
 	if(typeof chrome !== 'undefined') {
 		iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html');
 	} else {
 		iframeUrl = 'about:blank';
 	}
-	iframeUrl += '?passbolt=' + iframeId + '&title=' + title + '&goals=' + goals;
+	iframeUrl += '?passbolt=' + iframeId + '&title=' + title;
+
+	// If goals given
+	if(goals) {
+		iframeUrl += '&goals=' + goals;
+	}
 
 	// Add the progress iframe.
 	var $iframe = $('<iframe/>', {

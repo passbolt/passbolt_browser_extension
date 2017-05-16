@@ -149,7 +149,15 @@ module.exports = function (grunt) {
         }]
       },
       common_lib: {
-        files: []
+        // Underscore
+        files: [{
+          // Package definition
+          nonull: true,
+          cwd: '<%= config.modules_path %>/underscore',
+          src: 'underscore-min.js',
+          dest: '<%= config.common_path %>/lib/vendors/',
+          expand: true
+        }]
       },
       firefox_lib: {
         files: [{
@@ -289,7 +297,7 @@ module.exports = function (grunt) {
   // Build chrome.
   grunt.registerTask('build-chrome', ['clean:chrome_build', 'copy:chrome_src', 'shell:patch_chrome', 'shell:build_crx']);
   // Build chrome directory but not the crx usefull for devel
-  grunt.registerTask('build-chrome-nocrx', ['clean:chrome_build', 'copy:chrome_src']);
+  grunt.registerTask('build-chrome-nocrx', ['clean:chrome_build', 'copy:chrome_src', 'shell:patch_chrome']);
 
   // By default build plugin for all browsers.
   grunt.registerTask('default', ['build']);

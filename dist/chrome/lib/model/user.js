@@ -9,6 +9,7 @@ var Settings = require("./settings").Settings;
 
 var Validator = require('../vendors/validator');
 var fetch = require('../vendors/window').fetch;
+const { htmlspecialchars, in_array } = require('../vendors/phpjs');
 
 const { defer } = require('sdk/core/promise');
 var { setTimeout } = require("sdk/timers");
@@ -451,6 +452,50 @@ User.prototype.getStoredMasterPassword = function () {
   else {
     deferred.reject();
   }
+
+  return deferred.promise;
+};
+
+
+User.prototype.searchUsers = function(keywords, excludedUsers) {
+  var deferred = defer();
+
+  fetch(
+      this.settings.getDomain() + '/users.json?filter[keywords]=' + htmlspecialchars(keywords, 'ENT_QUOTES'), {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(function (response) {
+        _response = response;
+        return response.json();
+      })
+      .then(function (json) {
+        // Check response status
+        if(!_response.ok) {
+          var msg = __('Could not get the users. The server responded with an error.');
+          if(json.headers.msg != undefined) {
+            msg += ' ' + json.headers.msg;
+          }
+          msg += ' (' + _response.status + ')';
+          return deferred.reject(new Error(msg));
+        }
+        var users = json.body;
+        var finalUsers = [];
+        for (var i in users) {
+          if (!in_array(users[i].User.id, excludedUsers)) {
+            finalUsers.push(users[i]);
+          }
+        }
+
+        return deferred.resolve(finalUsers);
+      })
+      .catch(function (error) {
+        return deferred.reject(error);
+      });
 
   return deferred.promise;
 };

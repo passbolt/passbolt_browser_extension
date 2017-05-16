@@ -33,6 +33,8 @@ events.secret = require('./event/secretEvents');
 events.setup = require('./event/setupEvents');
 events.setupbootstrap = require('./event/setupBootstrapEvents');
 events.share = require('./event/shareEvents');
+events.group = require('./event/groupEvents');
+events.groupAutocomplete = require('./event/groupAutocompleteEvents');
 events.shareAutocomplete = require('./event/shareAutocompleteEvents');
 events.template = require('./event/templateEvents');
 events.user = require('./event/userEvents');
@@ -136,6 +138,19 @@ pageMods.ShareDialog = require('./pagemod/shareDialogPagemod').ShareDialog;
  * and he is looking for new users to grant
  */
 pageMods.ShareAutocompleteDialog = require('./pagemod/shareAutocompleteDialogPagemod').ShareAutocompleteDialog;
+
+
+/*
+ * This pagemod drives the iframe used when the user creates / edit a group.
+ * It is used when selecting the users who are part of the group.
+ */
+pageMods.GroupEditDialog = require('./pagemod/groupEditDialogPagemod').GroupEditDialog;
+
+/*
+ * This pagemod drives the iframe used when the user creates / edit a group.
+ * It shows the autocomplete list including the users that can be added to the group.
+ */
+pageMods.GroupEditAutocompleteDialog = require('./pagemod/groupEditAutocompleteDialogPagemod').GroupEditAutocompleteDialog;
 
 /*
  * This page mod drives a convenience config page for debug

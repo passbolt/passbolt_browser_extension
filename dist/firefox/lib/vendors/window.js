@@ -32,3 +32,4 @@ exports.localStorage = new LocalStorage();
 
 exports.fetch = addonWindow.window.fetch;
 exports.FormData = addonWindow.window.FormData;
+exports.Headers = addonWindow.window.Headers;

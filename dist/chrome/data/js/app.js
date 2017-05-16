@@ -63,15 +63,15 @@ passbolt.message.on('passbolt.share.add-permission', function (permission) {
   passbolt.message.emitToPage('resource_share_add_permission', permission);
 });
 
-// A permission is deleted, the user shouldn't be listed anymore by the autocomplete
+// A permission is deleted, the aro shouldn't be listed anymore by the autocomplete
 // result list component.
 window.addEventListener('passbolt.share.remove_permission', function (event) {
   var data = event.detail,
-  // The user the permission has been deleted for.
-    userId = data.userId;
+  // The aro the permission has been deleted for.
+    aroId = data.userId;
 
   // Notify the share dialog about this change
-  passbolt.message.emit('passbolt.share.remove-permission', userId);
+  passbolt.message.emit('passbolt.share.remove-permission', aroId);
 });
 
 // When the user wants to share a password with other people.
@@ -86,6 +86,81 @@ window.addEventListener('passbolt.share.encrypt', function () {
     // Notify the App that the share encryption process has been canceled.
     passbolt.message.emitToPage('passbolt.plugin.share.canceled');
   });
+});
+
+
+/* ==================================================================================
+ *  Group edit
+ * ================================================================================== */
+
+// Listen to plugin when a user has been added through the user edit iframe.
+passbolt.message.on('passbolt.group.edit.add-user', function (groupUser) {
+  passbolt.request('passbolt.group.edit.get_group_users_change_list').then(function(changeList) {
+    var change = {
+      type: 'created',
+      groupUser: groupUser,
+      changeList: changeList
+    };
+    passbolt.message.emitToPage('passbolt.plugin.group.edit.group_users_updated', change);
+    passbolt.message.emitToPage('passbolt.group.edit.add_user', groupUser);
+  });
+
+});
+
+// Listen to page when a group_user is deleted, the group_user should be listed again in the autocomplete.
+window.addEventListener('passbolt.group.edit.remove_group_user', function (event) {
+  var data = event.detail,
+      groupUser = data.groupUser;
+
+  passbolt.request('passbolt.group.edit.remove-group_user', groupUser).then(function(groupUser) {
+    passbolt.request('passbolt.group.edit.get_group_users_change_list').then(function(changeList) {
+      var change = {
+        type: 'deleted',
+        groupUser: groupUser,
+        changeList: changeList
+      };
+      passbolt.message.emitToPage('passbolt.plugin.group.edit.group_users_updated', change);
+    });
+  });
+});
+
+// A group_user is deleted, the group_user should be listed again in the autocomplete.
+window.addEventListener('passbolt.group.edit.edit_group_user', function (event) {
+  var data = event.detail,
+      groupUser = data.groupUser;
+
+  passbolt.request('passbolt.group.edit.edit-group_user', groupUser).then(function (groupUser) {
+        passbolt.request('passbolt.group.edit.get_group_users_change_list').then(function(changeList) {
+          var change = {
+            type: 'updated',
+            groupUser: groupUser,
+            changeList: changeList
+          };
+          passbolt.message.emitToPage('passbolt.plugin.group.edit.group_users_updated', change);
+        });
+      });
+});
+
+// When a group is loaded during an edit operation.
+// Typically, this happens during the edit phase. We then need to inform
+// the client that a group has been loaded, so it can refresh the information.
+passbolt.message.on('passbolt.group.edit.group_loaded', function (group) {
+    passbolt.message.emitToPage('passbolt.plugin.group.edit.group_loaded', group);
+});
+
+// A group is saved.
+window.addEventListener('passbolt.group.edit.save', function (event) {
+  var data = event.detail,
+      group = data.group;
+
+  // Notify the share dialog about this change
+  passbolt.request('passbolt.group.edit.save', group).then (
+      function(groupSaved) {
+        passbolt.message.emitToPage('group_edit_save_success', groupSaved);
+      },
+      function(error) {
+        passbolt.message.emitToPage('group_edit_save_error', error);
+      });
 });
 
 /* ==================================================================================

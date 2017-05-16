@@ -39,7 +39,7 @@ Permission.prototype.searchUsers = function(model, instanceId, keywords, exclude
 	// Check if there is a trusted domain.
 	try {
 		url = this.settings.getDomain() + '/share/search-users/' + model + '/' + instanceId + '.json';
-		url += '?keywords=' + keywords + '&excludedUsers=' + encodeURIComponent(JSON.stringify(excludedUsers));
+		url += '?keywords=' + keywords;
 	} catch(e) {
 		return deferred.reject(__('The application domain is not set'));
 	}

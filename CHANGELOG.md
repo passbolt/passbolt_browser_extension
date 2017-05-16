@@ -5,7 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [1.5.0]
+## [1.5.0] - 2017-05-16
 ### Added
 - PASSBOLT-1955: As an administrator I can create a group
 - PASSBOLT-1969: As a group manager I can see which users are part of a given group from the group edit dialog
@@ -19,7 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - PASSBOLT-2031: Share a password with multiple users/groups in a single operation
 
-## [1.4.3]
+## [1.4.3] - 2017-02-16
 ### Updated
 - PASSBOLT-1909: updated openpgpjs to latest version: 1.3.7. Thanks to @pomarec for the pull request. (https://github.com/passbolt/passbolt_browser_extension/pull/11)
 
@@ -143,7 +143,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.3.2...v1.4.0
 [1.3.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.3.0...v1.3.1

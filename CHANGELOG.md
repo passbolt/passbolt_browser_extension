@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.5.1] - 2017-05-16
+### Fixed
+- PASSBOLT-1908: Fix memory leak with openpgp webworker initialization
+
 ## [1.5.0] - 2017-05-16
 ### Added
 - PASSBOLT-1955: As an administrator I can create a group

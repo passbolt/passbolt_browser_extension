@@ -7,32 +7,17 @@
 
 const { defer } = require('sdk/core/promise');
 var openpgp = require('../vendors/openpgp');
-var webWorker = require('../vendors/web-worker').Worker;
 var XRegExp = require('../vendors/xregexp').XRegExp;
 var Validator = require('../vendors/validator');
 var jsSHA = require('../vendors/sha');
 var Keyring = require('./keyring').Keyring;
 var __ = require("sdk/l10n").get;
 var randomBytes = require('../vendors/crypto').randomBytes;
-var Config = require('./config');
-var BrowserSettings = require('../controller/browserSettingsController');
 
 /**
  * The class that deals with Passbolt encryption and decryption operations.
  */
 var Crypto = function () {
-  this.openpgpWorker = Crypto.getOpenpgpWorker();
-};
-
-/**
- * Init and get openpgp worker.
- * @returns {exports.AsyncProxy}
- */
-Crypto.getOpenpgpWorker = function () {
-  openpgp.initWorker({
-    worker: new webWorker(BrowserSettings.getExtensionUrl() + '/lib/vendors/openpgp.worker.js')
-  });
-  return openpgp;
 };
 
 /**
@@ -103,13 +88,13 @@ Crypto.prototype.encrypt = function (message, key) {
 
   // parse the armored key
   try {
-    publicKey = this.openpgpWorker.key.readArmored(key);
+    publicKey = openpgp.key.readArmored(key);
   } catch (error) {
     return deferred.reject(new Error(__('The public key is not in a valid or supported format.')));
   }
 
   // Encrypt message.
-  this.openpgpWorker.encrypt({
+  openpgp.encrypt({
     publicKeys: publicKey.keys,
     data: message
   }).then(
@@ -135,16 +120,16 @@ Crypto.prototype.encrypt = function (message, key) {
 Crypto.prototype.decrypt = function (armored, passphrase) {
   var keyring = new Keyring(),
     keyInfo = keyring.findPrivate(),
-    privateKey = this.openpgpWorker.key.readArmored(keyInfo.key).keys[0],
+    privateKey = openpgp.key.readArmored(keyInfo.key).keys[0],
     deferred = defer(),
     self = this;
 
   if (!privateKey.isDecrypted) {
-    this.openpgpWorker.decryptKey({privateKey: privateKey, passphrase: passphrase})
+    openpgp.decryptKey({privateKey: privateKey, passphrase: passphrase})
       .then(function (privateKey) {
         // Openpgp will throw an exception if the message is badly formatted
-        var pgpMessage = self.openpgpWorker.message.readArmored(armored);
-        return self.openpgpWorker.decrypt({privateKey: privateKey.key, message: pgpMessage});
+        var pgpMessage = openpgp.message.readArmored(armored);
+        return openpgp.decrypt({privateKey: privateKey.key, message: pgpMessage});
       })
       .then(
         function (decrypted) {
@@ -156,7 +141,7 @@ Crypto.prototype.decrypt = function (armored, passphrase) {
       );
   }
   else {
-    self.openpgpWorker.decrypt({privateKey: privateKey, message: pgpMessage})
+    openpgp.decrypt({privateKey: privateKey, message: pgpMessage})
       .then(
         function (decrypted) {
           deferred.resolve(decrypted.data);

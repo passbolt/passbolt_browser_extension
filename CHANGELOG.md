@@ -5,7 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [1.5.1] - 2017-05-16
+## [1.5.1] - 2017-05-23
 ### Fixed
 - PASSBOLT-1908: Fix memory leak with openpgp webworker initialization
 

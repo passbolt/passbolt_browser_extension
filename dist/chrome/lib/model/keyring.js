@@ -7,10 +7,7 @@
 const { defer } = require('sdk/core/promise');
 var __ = require("sdk/l10n").get;
 
-var Config = require('./config');
-
 var openpgp = require('../vendors/openpgp');
-var webWorker = require('../vendors/web-worker').Worker;
 var fetch = require('../vendors/window').fetch;
 var Validator = require('../vendors/validator');
 var XRegExp = require('../vendors/xregexp').XRegExp;
@@ -19,16 +16,11 @@ var storage = require('../vendors/node-localstorage').localStorage;
 var Settings = require("./settings").Settings;
 var Key = require("./key").Key;
 var keyring = new openpgp.Keyring();
-var BrowserSettings = require('../controller/browserSettingsController');
 
 /**
  * The class that deals with Passbolt Keyring.
  */
 var Keyring = function () {
-  openpgp.initWorker({
-    worker: new webWorker(BrowserSettings.getExtensionUrl() + '/lib/vendors/openpgp.worker.js')
-  });
-  this.openpgpWorker = openpgp;
 };
 
 /**
@@ -313,7 +305,7 @@ Keyring.prototype.keyInfo = function (armoredKey) {
     fingerprint: key.primaryKey.getFingerprint(),
     algorithm: key.primaryKey.algorithm.substring(0, 3), // @TODO : proper alghorithm parsing
     created: key.primaryKey.created,
-    //expires: key.getExpirationTime(), // Temporary patch due to bug in chrome (memory leak).
+    //expires: key.getExpirationTime(),
     expires: '',
     length: key.primaryKey.getBitSize(),
     private: key.isPrivate()
@@ -383,10 +375,10 @@ Keyring.prototype.generateKeyPair = function (keyInfo, passphrase) {
   };
 
   // Launch key pair generation from openpgp worker.
-  this.openpgpWorker.config.use_native = false;
-  var def = this.openpgpWorker
+  openpgp.config.use_native = false;
+  var def = openpgp
     .generateKey(keySettings);
-  this.openpgpWorker.config.use_native = true;
+  openpgp.config.use_native = true;
 
   return def;
 };
@@ -403,7 +395,7 @@ Keyring.prototype.checkPassphrase = function (passphrase) {
     privateKey = openpgp.key.readArmored(keyInfo.key).keys[0];
 
   if (!privateKey.isDecrypted) {
-    this.openpgpWorker.decryptKey({privateKey: privateKey, passphrase: passphrase})
+    openpgp.decryptKey({privateKey: privateKey, passphrase: passphrase})
       .then(
         function (decrypted) {
           deferred.resolve(decrypted);

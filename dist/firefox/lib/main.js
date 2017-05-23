@@ -14,6 +14,19 @@ if (Config.isDebug() == true) {
 }
 
 /* ==================================================================================
+ *  Openpgp init
+ *  Init web worker
+ * ==================================================================================
+ */
+var openpgp = require('./vendors/openpgp');
+var webWorker = require('./vendors/web-worker').Worker;
+var BrowserSettings = require('./controller/browserSettingsController');
+
+openpgp.initWorker({
+  worker: new webWorker(BrowserSettings.getExtensionUrl() + '/lib/vendors/openpgp.worker.js')
+});
+
+/* ==================================================================================
  *  Interface changes
  *  Where we affect the look and feel of the firefox instance
  * ==================================================================================

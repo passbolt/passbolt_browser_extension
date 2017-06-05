@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - PASSBOLT-2078: As GM/AD I shouldn't be able to add a user who didn't complete the registration process to a group I edit/create
 
-## [1.5.1] - 2017-05-16
+## [1.5.1] - 2017-05-23
 ### Fixed
 - PASSBOLT-1908: Fix memory leak with openpgp webworker initialization
 

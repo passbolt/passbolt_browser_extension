@@ -8,8 +8,8 @@
             </p>
         </div>
     </div>
-    <p>You can <a href="/register">register again</a> for this domain
-        or <a href="/recover"> recover an existing account</a>,
+    <p>You can <a href="<%= passboltDomain %>/register">register again</a> for this domain
+        or <a href="<%= passboltDomain %>/recover"> recover an existing account</a>,
         but you will lose your account on the existing domain. Proceed with caution.</p>
 </div>
 <div class="col4 push1 last">
@@ -23,9 +23,9 @@
         </div>
         <div class="actions-wrapper center">
             <% if(publicRegistration) { %>
-                <a class="button primary big" href="/register">Register for this domain</a><br><br>
+                <a class="button primary big" href="<%= passboltDomain %>/register">Register for this domain</a><br><br>
             <% } %>
-            <a href="/recover">or recover an existing account</a>
+            <a href="<%= passboltDomain %>/recover">or recover an existing account</a>
         </div>
     </div>
 </div>

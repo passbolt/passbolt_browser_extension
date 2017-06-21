@@ -461,7 +461,7 @@ User.prototype.searchUsers = function(keywords, excludedUsers) {
   var deferred = defer();
 
   fetch(
-      this.settings.getDomain() + '/users.json?filter[keywords]=' + htmlspecialchars(keywords, 'ENT_QUOTES'), {
+      this.settings.getDomain() + '/users.json?filter[keywords]=' + htmlspecialchars(keywords, 'ENT_QUOTES') + '&filter[is-active]=1', {
         method: 'GET',
         credentials: 'include',
         headers: {

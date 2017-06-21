@@ -5,11 +5,11 @@
             <p class="message">
                 Chrome plugin is installed but not configured.
                 <% if(publicRegistration) { %>
-                    <a href="register">Please register</a>,
+                    <a href="<%= passboltDomain %>/register">Please register</a>,
                 <% } else { %>
                     Please contact your domain administrator to request an invitation,
 				<% } %>
-                or <a href="/recover">recover your account if you already have one!</a>
+                or <a href="<%= passboltDomain %>/recover">recover your account if you already have one!</a>
             </p>
         </div>
     </div>
@@ -28,11 +28,11 @@
         </div>
         <div class="actions-wrapper center">
 			<% if(publicRegistration) { %>
-                <a class="button primary" href="/register">Register</a>
-                <a href="/recover">Have an account?</a>
+                <a class="button primary" href="<%= passboltDomain %>/register">Register</a>
+                <a href="<%= passboltDomain %>/recover">Have an account?</a>
 			<% } else { %>
                 Please contact your domain administrator to request an invitation.<br><br>
-                or <a href="/recover">recover your existing account</a>
+                or <a href="<%= passboltDomain %>/recover">recover your existing account</a>
 			<% } %>
         </div>
     </div>

@@ -100,12 +100,14 @@ var passbolt = passbolt || {};
   Bootstrap.prototype.loginPageWrongDomain = function () {
     $('html').addClass('domain-unknown');
     var $renderSpace = $('.login.page .js_main-login-section'),
-      publicRegistration = $('.login.page.public-registration').length > 0 ? true : false;
+      publicRegistration = $('.login.page.public-registration').length > 0 ? true : false,
+      passboltDomain = window.location.href.replace(/(.*)(\/auth\/login(\/)?)$/, '$1');
 
     // Get template.
     passbolt.helper.html.loadTemplate($renderSpace, './tpl/login/wrong-domain.ejs', 'html', {
       trustedDomain: this.trustedDomain,
-      publicRegistration: publicRegistration
+      publicRegistration: publicRegistration,
+      passboltDomain: passboltDomain
     });
   };
 
@@ -115,9 +117,13 @@ var passbolt = passbolt || {};
    */
   Bootstrap.prototype.loginPageConfigurationMissing = function () {
     var $renderSpace = $('.login.page .js_main-login-section'),
-      publicRegistration = $('.login.page.public-registration').length > 0 ? true : false;
+      publicRegistration = $('.login.page.public-registration').length > 0 ? true : false,
+        passboltDomain = window.location.href.replace(/(.*)(\/auth\/login(\/)?)$/, '$1');
 
-    return passbolt.helper.html.loadTemplate($renderSpace, './tpl/login/noconfig.ejs', 'html', {publicRegistration: publicRegistration});
+    return passbolt.helper.html.loadTemplate($renderSpace, './tpl/login/noconfig.ejs', 'html', {
+      publicRegistration: publicRegistration,
+      passboltDomain: passboltDomain
+    });
   };
 
   /**

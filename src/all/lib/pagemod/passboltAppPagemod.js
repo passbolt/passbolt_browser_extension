@@ -5,12 +5,12 @@
  * It is inserted in all the pages of a domain that is trusted.
  * Such trust is defined during the first step of the setup process (or in config-debug)
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var self = require('sdk/self');
+var self = require('../sdk/self');
 var app = require('../app');
-var pageMod = require('sdk/page-mod');
+var pageMod = require('../sdk/page-mod');
 var Worker = require('../model/worker');
 var user = new (require('../model/user').User)();
 var TabStorage = require('../model/tabStorage').TabStorage;

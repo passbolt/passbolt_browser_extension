@@ -1,12 +1,12 @@
 /**
  * Setup bootstrap listener
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var { setInterval, clearInterval } = require('sdk/timers');
+var { setInterval, clearInterval } = require('../sdk/timers');
 var tabsController = require('../controller/tabsController');
-var data = require('sdk/self').data;
+var data = require('../sdk/self').data;
 var Worker = require('../model/worker');
 
 var listen = function (worker) {

@@ -5,11 +5,11 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-var Config = require("./config");
-var Settings = require("./settings").Settings;
+var Config = require('./config');
+var Settings = require('./settings').Settings;
 var fetch = require('../vendors/window').fetch;
-const { defer } = require('sdk/core/promise');
-var __ = require("sdk/l10n").get;
+const { defer } = require('../sdk/core/promise');
+var __ = require('../sdk/l10n').get;
 
 /**
  * The class that deals with groups.

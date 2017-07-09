@@ -1,7 +1,7 @@
 /**
  * Master password controller.
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
@@ -10,7 +10,7 @@
  * Currently it is used only when decrypting content but this system
  * can be reusable for other features in the future like authentication
  */
-const { defer } = require('sdk/core/promise');
+const { defer } = require('../sdk/core/promise');
 var User = require('../model/user').User;
 var Worker = require('../model/worker');
 var TabStorage = require('../model/tabStorage').TabStorage;

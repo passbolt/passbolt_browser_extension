@@ -3,13 +3,13 @@
  *
  * Used to handle the events related to the current user
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var app = require('../app');
 var User = require('../model/user').User;
 var user = new User();
-var __ = require("sdk/l10n").get;
+var __ = require('../sdk/l10n').get;
 
 var listen = function (worker) {
 

@@ -1,11 +1,11 @@
 /**
  * Keyring model.
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const { defer } = require('sdk/core/promise');
-var __ = require("sdk/l10n").get;
+const { defer } = require('../sdk/core/promise');
+var __ = require('../sdk/l10n').get;
 
 var openpgp = require('../vendors/openpgp');
 var fetch = require('../vendors/window').fetch;
@@ -13,8 +13,8 @@ var Validator = require('../vendors/validator');
 var XRegExp = require('../vendors/xregexp').XRegExp;
 var storage = require('../vendors/node-localstorage').localStorage;
 
-var Settings = require("./settings").Settings;
-var Key = require("./key").Key;
+var Settings = require('./settings').Settings;
+var Key = require('./key').Key;
 var keyring = new openpgp.Keyring();
 
 /**

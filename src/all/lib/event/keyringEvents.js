@@ -2,12 +2,12 @@
  * Keyring events
  * @TODO refactor with public and private listeners separate
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var __ = require("sdk/l10n").get;
+var __ = require('../sdk/l10n').get;
 
-var Keyring = require("../model/keyring").Keyring;
+var Keyring = require('../model/keyring').Keyring;
 var Key = require('../model/key').Key;
 var Config = require('../model/config');
 var keyring = new Keyring();
@@ -82,7 +82,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.keyring.server.get', function (requestId) {
 
-    var user = new (require("../model/user").User)(),
+    var user = new (require('../model/user').User)(),
       Crypto = require('../model/crypto').Crypto,
       serverkeyid = Crypto.uuid(user.settings.getDomain()),
       serverkey = keyring.findPublic(serverkeyid);
@@ -173,7 +173,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.keyring.server.import', function (requestId, publicKeyArmored) {
     try {
-      var user = new (require("../model/user").User)();
+      var user = new (require('../model/user').User)();
       keyring.importServerPublicKey(publicKeyArmored, user.settings.getDomain());
       worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {

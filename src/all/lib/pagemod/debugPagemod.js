@@ -6,11 +6,11 @@
  * and perform changes useful for testing that would otherwise break things
  * Like for example changing the public key only on the client but not the server
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var pageMod = require('sdk/page-mod');
-var self = require('sdk/self');
+var pageMod = require('../sdk/page-mod');
+var self = require('../sdk/self');
 
 var app = require('../app');
 var Worker = require('../model/worker');

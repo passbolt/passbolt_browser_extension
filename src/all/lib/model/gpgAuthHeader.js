@@ -6,7 +6,7 @@
  */
 "use strict";
 
-var __ = require("sdk/l10n").get;
+var __ = require('../sdk/l10n').get;
 
 /**
  * The class that deals with secrets.

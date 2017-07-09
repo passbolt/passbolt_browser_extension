@@ -1,0 +1,39 @@
+<div class="col6 push1 information">
+    <h2>Almost there, please register!</h2>
+    <div class="plugin-check-wrapper">
+        <div class="plugin-check <%= browserName %> warning">
+            <p class="message">
+								The plugin is installed but not configured.
+                <% if(publicRegistration) { %>
+                    <a href="<%= passboltDomain %>/register">Please register</a>,
+                <% } else { %>
+                    Please contact your domain administrator to request an invitation,
+				<% } %>
+                or <a href="<%= passboltDomain %>/recover">recover your account if you already have one!</a>
+            </p>
+        </div>
+    </div>
+    <p>
+        If you already registered please check your mail inbox (and your spam folder).
+    </p>
+</div>
+<div class="col4 push1 last">
+	<div class="logo">
+		<h1><span>Passbolt</span></h1>
+	</div>
+    <div class="users login form">
+        <div class="feedback">
+            <i class="fa huge fa-rocket" ></i>
+            <p>You need an account to login.</p>
+        </div>
+        <div class="actions-wrapper center">
+			<% if(publicRegistration) { %>
+                <a class="button primary" href="<%= passboltDomain %>/register">Register</a>
+                <a href="<%= passboltDomain %>/recover">Have an account?</a>
+			<% } else { %>
+                Please contact your domain administrator to request an invitation.<br><br>
+                or <a href="<%= passboltDomain %>/recover">recover your existing account</a>
+			<% } %>
+        </div>
+    </div>
+</div>

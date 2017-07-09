@@ -12,12 +12,12 @@ var User = require('../model/user').User;
 var Group = require('../model/group').Group;
 var GroupForm = require('../model/groupForm').GroupForm;
 var TabStorage = require('../model/tabStorage').TabStorage;
-var _ = require("../vendors/underscore-min");
+var _ = require('../vendors/underscore-min');
 
 var Keyring = require('../model/keyring').Keyring;
 var Crypto = require('../model/crypto').Crypto;
 var masterPasswordController = require('../controller/masterPasswordController');
-const defer = require('sdk/core/promise').defer;
+const defer = require('../sdk/core/promise').defer;
 
 var listen = function (worker) {
     /*

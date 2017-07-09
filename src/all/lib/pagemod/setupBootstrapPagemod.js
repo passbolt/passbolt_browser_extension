@@ -4,12 +4,12 @@
  * This pagemod help bootstrap the first step of the setup process from a passbolt server app page
  * The pattern for this url, driving the setup bootstrap, is defined in config.json
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var self = require('sdk/self');
+var self = require('../sdk/self');
 var app = require('../app');
-var pageMod = require('sdk/page-mod');
+var pageMod = require('../sdk/page-mod');
 var Config = require('../model/config');
 var Worker = require('../model/worker');
 

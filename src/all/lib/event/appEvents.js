@@ -3,16 +3,16 @@
  *
  * Used to handle the events related to main application page.
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var masterPasswordController = require('../controller/masterPasswordController');
 var clipboardController = require('../controller/clipboardController');
 var app = require('../app');
-var __ = require("sdk/l10n").get;
+var __ = require('../sdk/l10n').get;
 var Worker = require('../model/worker');
-const { Promise, defer } = require('sdk/core/promise');
-var { setInterval, clearInterval } = require('sdk/timers');
+const { Promise, defer } = require('../sdk/core/promise');
+var { setInterval, clearInterval } = require('../sdk/timers');
 
 var Keyring = require('../model/keyring').Keyring;
 var Crypto = require('../model/crypto').Crypto;

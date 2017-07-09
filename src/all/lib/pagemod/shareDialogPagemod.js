@@ -4,12 +4,12 @@
  * This pagemod drives the iframe used when the user shares a password.
  * It is used when sharing a new password.
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var self = require('sdk/self');
+var self = require('../sdk/self');
 var app = require('../app');
-var pageMod = require('sdk/page-mod');
+var pageMod = require('../sdk/page-mod');
 var Worker = require('../model/worker');
 var TabStorage = require('../model/tabStorage').TabStorage;
 

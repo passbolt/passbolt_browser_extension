@@ -1,17 +1,17 @@
 /**
  * Crypto model.
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-const { defer } = require('sdk/core/promise');
+const { defer } = require('../sdk/core/promise');
 var openpgp = require('../vendors/openpgp');
 var XRegExp = require('../vendors/xregexp').XRegExp;
 var Validator = require('../vendors/validator');
 var jsSHA = require('../vendors/sha');
 var Keyring = require('./keyring').Keyring;
-var __ = require("sdk/l10n").get;
+var __ = require('../sdk/l10n').get;
 var randomBytes = require('../vendors/crypto').randomBytes;
 
 /**

@@ -8,14 +8,14 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-var Config = require("./config");
-var Settings = require("./settings").Settings;
+var Config = require('./config');
+var Settings = require('./settings').Settings;
 var Group = require('./group').Group;
-const { defer } = require('sdk/core/promise');
+const { defer } = require('../sdk/core/promise');
 var TabStorage = require('../model/tabStorage').TabStorage;
 var jsonQ = require('../vendors/jsonQ').jsonQ;
-var _ = require("../vendors/underscore-min");
-var __ = require("sdk/l10n").get;
+var _ = require('../vendors/underscore-min');
+var __ = require('../sdk/l10n').get;
 
 /**
  * The class that deals with groups.

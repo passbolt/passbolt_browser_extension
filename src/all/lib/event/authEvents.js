@@ -3,13 +3,13 @@
  *
  * Used to handle the events related to authentication.
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var Auth = require('../model/auth').Auth;
 var auth = new Auth();
 
-var __ = require("sdk/l10n").get;
+var __ = require('../sdk/l10n').get;
 var Worker = require('../model/worker');
 
 var listen = function (worker) {

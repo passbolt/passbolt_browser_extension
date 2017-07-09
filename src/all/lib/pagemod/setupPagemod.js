@@ -4,11 +4,11 @@
  * This page mod drives the reset of setup process
  * The reset of the setup process is driven on the add-on side, see in ../data/ setup.html and js/setup.js
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var self = require('sdk/self');
-var pageMod = require('sdk/page-mod');
+var self = require('../sdk/self');
+var pageMod = require('../sdk/page-mod');
 
 var app = require('../app');
 var Worker = require('../model/worker');

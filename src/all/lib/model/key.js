@@ -4,11 +4,11 @@
  * Provides validation methods for a key.
  * Was created initially to validate the key config before its generation.
  *
- * @copyright (c) 2015-present Bolt Softwares Pvt Ltd
+ * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var Validator = require('../vendors/validator');
-var __ = require("sdk/l10n").get;
+var __ = require('../sdk/l10n').get;
 
 /**
  * The class that deals with keys.

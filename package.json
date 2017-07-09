@@ -1,44 +1,21 @@
 {
-  "name": "passbolt",
-  "version": "1.6.1",
-  "title": "Passbolt",
-  "id": "passbolt@passbolt.com",
-  "description": "Passbolt add-on",
+  "name": "passbolt_browser_extension",
+  "version": "1.6.2",
   "license": "AGPL-3.0",
-  "icon": "resource://@passbolt/skin/logo-48.png",
+  "description": "Passbolt web extension for the open source password manager for teams",
   "homepage": "https://www.passbolt.com",
-  "author": "Passbolt SARL <contact@passbolt.com> (https://www.passbolt.com)",
   "repository": "https://github.com/passbolt",
-  "developers": [
-    "Kévin Muller <kevin@passbolt.com> (https://www.passbolt.com)",
-    "Rémy Bertot <remy@passbolt.com> (https://www.passbolt.com)",
-    "Cédric Alfonsi <cedric@passbolt.com> (https://www.passbolt.com)"
-  ],
-  "engines": {
-    "firefox": ">=41.*"
-  },
   "dependencies": {
+    "jquery": "^3.2.1",
     "passbolt-styleguide": "^1.4.1",
     "openpgp": "~2.3",
     "underscore": "^1.8.3"
   },
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-chrome-extensions-reloaded": "^0.1.0",
-    "grunt-contrib-clean": "~0.5.0",
-    "grunt-contrib-copy": "~0.5.0",
-    "grunt-contrib-jshint": "~0.7.2",
+    "grunt": "^1.0.1",
+    "grunt-browserify": "^5.0.0",
+    "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-watch": "^1.0.0",
-    "grunt-shell": "^1.1.1",
-    "grunt-text-replace": "~0.3.11",
-    "jpm": "1.1.4",
-    "crx": "3.2.1",
-    "jquery": "^3.1.0",
-    "passbolt-styleguide": "~1.1.0",
-    "steal": "^0.16.26"
-  },
-  "scripts": {
-    "build": "steal-tools"
-  },
-  "main": "lib/main.js"
+    "grunt-shell": "^2.1.0"
+  }
 }

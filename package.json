@@ -6,10 +6,12 @@
   "homepage": "https://www.passbolt.com",
   "repository": "https://github.com/passbolt",
   "dependencies": {
-    "jquery": "^3.2.1",
-    "passbolt-styleguide": "^1.4.1",
+    "passbolt-styleguide": "^1.5.0",
+    "jquery": "~2.2.4",
     "openpgp": "~2.3",
-    "underscore": "^1.8.3"
+    "underscore": "~1.8.3",
+    "xregexp": "~3.0.0",
+    "jssha": "^2.3.1"
   },
   "devDependencies": {
     "grunt": "^1.0.1",

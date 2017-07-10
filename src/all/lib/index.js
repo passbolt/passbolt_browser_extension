@@ -20,7 +20,6 @@ openpgp.initWorker({
   worker: new Worker(chrome.runtime.getURL('/vendors/openpgp.worker.js'))
 });
 
-
 /* ==================================================================================
  *  Interface changes
  *  Where we affect the look and feel of the firefox instance

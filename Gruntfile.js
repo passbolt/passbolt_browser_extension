@@ -11,11 +11,11 @@ module.exports = function(grunt) {
 	var path = {
 		node_modules: 'node_modules/',
 		dist: 'dist/all/',
-		dist_chrome: 'dist/chrome/',
-		dist_firefox: 'dist/firefox/',
+		dist_vendors: 'dist/all/vendors',
 		src: 'src/all/',
 		src_addon: 'src/all/lib/',
 		src_addon_vendors: 'src/all/lib/vendors/',
+		src_content_vendors: 'src/all/data/vendors/',
 	};
 
 	/**
@@ -84,6 +84,13 @@ module.exports = function(grunt) {
 				]
 			},
 			// copy node_modules where needed in addon or content code vendors folder
+			vendors: {
+				files: [
+					{expand: true, cwd: path.node_modules + 'openpgp/dist', src: '*.js', dest: path.src_addon_vendors},
+					{expand: true, cwd: path.node_modules + 'openpgp/dist', src: '*.js', dest: path.dist_vendors},
+					{expand: true, cwd: path.node_modules + 'jquery/dist', src: '*.min.js', dest: path.src_content_vendors},
+				]
+			},
 			// TODO
 		},
 

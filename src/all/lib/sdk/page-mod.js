@@ -67,26 +67,22 @@ PageMod.prototype.destroy = function () {
  */
 PageMod.prototype.__init = function() {
 
-  // The url to use for the pageMod include is not a regex, create one
+  // The url to use for the pageMod include is not a regex
   if(!(this.args.include instanceof RegExp)) {
-    if(this.args.include === '*') {
-      this.args.include = new RegExp('.*');
-    } else {
-      if (this.args.include.startsWith('about:blank')) {
-        // For URL patterns like 'about:blank?passbolt=passbolt-iframe*'
-        // Contrarily to Firefox we do not inject scripts in the page
-        // They are loaded via chrome-extension://[pluginid]/js/iframe.html templates
-        // We wait for the page mod to initiate the connection
-        this.__onIframeConnectInit();
-        return;
-      } else if (this.args.include.startsWith(self.data.url())) {
-        // And similarly for any chrome-extension:// urls
-        this.__onContentConnectInit();
-        return;
-      } else {
-        this.args.include = new RegExp(this.args.include);
-      }
-    }
+		if (this.args.include.startsWith('about:blank')) {
+			// For URL patterns like 'about:blank?passbolt=passbolt-iframe*'
+			// Contrarily to Firefox we do not inject scripts in the page
+			// They are loaded via chrome-extension://[pluginid]/js/iframe.html templates
+			// We wait for the page mod to initiate the connection
+			this.__onIframeConnectInit();
+			return;
+		} else if (this.args.include.startsWith(chrome.runtime.getURL(''))) {
+			// And similarly for any chrome-extension:// urls
+			this.__onContentConnectInit();
+			return;
+		} else {
+			this.args.include = new RegExp(this.args.include);
+		}
   }
 
   // When a tab is updated we try to insert content code if it matches
@@ -186,7 +182,7 @@ PageMod.prototype.__onIframeConnectInit = function() {
 PageMod.prototype.__onContentConnectInit = function() {
   // We use the content file name as portname
   var portname = this.args.include;
-  var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/data/';
+	var replaceStr = chrome.runtime.getURL('/data/');
   portname = portname.replace(replaceStr, '').replace('.html','');
   this.portname = portname;
   // console.log(this.args.name + ' content page mod opening port on ' + this.portname);
@@ -269,18 +265,8 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
   }
 
   // Inject JS files if needed
-  var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/data/';
-  var scripts = [];
-  if (typeof this.args.contentScriptFile !== 'undefined' && this.args.contentScriptFile.length) {
-    scripts = this.args.contentScriptFile.slice();
-    // remove chrome-extension baseUrl from self.data.url
-    // since when inserted in a page the url are relative to /data already
-    scripts = scripts.map(function (x) {
-      return x.replace(replaceStr, '');
-    });
-  }
-
-  // TODO don't insert if the JS if its already inserted
+	// TODO don't insert if the JS if its already inserted
+  var scripts = this.args.contentScriptFile.slice();
   scripts.unshift('data/js/lib/port.js'); // add a firefox sdk-like self.port layer
   scriptExecution.injectScripts(scripts);
 

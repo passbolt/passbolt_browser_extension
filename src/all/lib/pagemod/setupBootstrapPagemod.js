@@ -7,11 +7,12 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var self = require('../sdk/self');
 var app = require('../app');
 var pageMod = require('../sdk/page-mod');
-var Config = require('../model/config');
 var Worker = require('../model/worker');
+
+var uuidRegex = "([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12})";
+var setupBootstrapRegex = "(.*)\/setup\/(install|recover)\/" + uuidRegex + "\/" + uuidRegex;
 
 var SetupBootstrap = function () {
 };
@@ -25,14 +26,14 @@ SetupBootstrap.init = function () {
 
   SetupBootstrap._pageMod = pageMod.PageMod({
     name: 'SetupBootstrap',
-    include: new RegExp(Config.read('setupBootstrapRegex') + '.*'),
+    include: new RegExp(setupBootstrapRegex),
     contentScriptWhen: 'ready',
     contentStyleFile: [],
     contentScriptFile: [
-      self.data.url('vendors/jquery.min.js'),
-      self.data.url('js/lib/message.js'),
-      self.data.url('js/lib/request.js'),
-      self.data.url('js/setup/bootstrap.js')
+			'data/vendors/jquery.min.js',
+      'data/js/lib/message.js',
+      'data/js/lib/request.js',
+      'data/js/setup/bootstrap.js'
     ],
     onAttach: function (worker) {
       Worker.add('SetupBootstrap', worker);

@@ -4,8 +4,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-
-var BrowserSettings = require('../controller/browserSettingsController');
 var User = require('./user').User;
 var Setup = require('./setup').Setup;
 
@@ -35,8 +33,8 @@ Toolbar.getToolbarUrl = function (tab) {
     url = user.settings.getDomain();
   }
   // The plugin is installed but the configuration is incomplete
-  else if (setup.get('stepId') != '') {
-    url = BrowserSettings.getExtensionUrl() + '/data/setup.html';
+  else if (setup.get('stepId') !== '') {
+    url = chrome.runtime.getURL('/data/setup.html');
   }
   // The plugin is installed but not configured
   else {

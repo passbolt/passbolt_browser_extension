@@ -12,7 +12,7 @@ var User = require('../model/user').User;
 var Group = require('../model/group').Group;
 var GroupForm = require('../model/groupForm').GroupForm;
 var TabStorage = require('../model/tabStorage').TabStorage;
-var _ = require('../vendors/underscore-min');
+// var _ = require('../vendors/underscore-min');
 
 var Keyring = require('../model/keyring').Keyring;
 var Crypto = require('../model/crypto').Crypto;

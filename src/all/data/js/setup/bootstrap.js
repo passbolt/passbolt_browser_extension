@@ -34,7 +34,7 @@
 
       if (matches != null) {
         data.domain = matches[1];
-        data.workflow = matches[2] == 'recover' ? 'recover' : 'install';
+        data.workflow = (matches[2] === 'recover') ? 'recover' : 'install';
         data.userId = matches[3];
         data.token = matches[4];
 

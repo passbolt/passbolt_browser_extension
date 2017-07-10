@@ -8,7 +8,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var self = require('../sdk/self');
 var app = require('../app');
 var pageMod = require('../sdk/page-mod');
 var Worker = require('../model/worker');
@@ -47,37 +46,39 @@ PassboltApp.initPageMod = function () {
     include: regex,
     contentScriptWhen: 'ready',
     contentStyleFile: [
-      self.data.url('css/external.min.css')
+      'data/css/external.min.css'
     ],
     contentScriptFile: [
-      self.data.url('vendors/jquery.min.js'),
-      self.data.url('vendors/ejs_production.js'),
-      self.data.url('js/lib/message.js'),
-      self.data.url('js/lib/request.js'),
-      self.data.url('js/lib/html.js'),
-      self.data.url('js/lib/clipboard.js'),
-      self.data.url('js/masterPassword/iframe.js'),
-      self.data.url('js/secret/editIframe.js'),
-      self.data.url('js/secret/shareIframe.js'),
-      self.data.url('js/group/editIframe.js'),
-      self.data.url('js/progress/iframe.js'),
-      self.data.url('js/app.js')
+      'data/vendors/jquery.min.js',
+      'data/vendors/ejs_production.js',
+      'data/js/lib/message.js',
+      'data/js/lib/request.js',
+      'data/js/lib/html.js',
+      'data/js/lib/clipboard.js',
+      'data/js/masterPassword/iframe.js',
+      'data/js/secret/editIframe.js',
+      'data/js/secret/shareIframe.js',
+      'data/js/group/editIframe.js',
+      'data/js/progress/iframe.js',
+      'data/js/app.js'
     ],
     attachTo: ["existing", "top"],
     onAttach: function (worker) {
       TabStorage.initStorage(worker.tab);
 
-      Worker.add('App', worker, {
-        // FIREFOX ONLY -
-        // If the user is redirected to the login page, that means it is logged out.
-        // Destroy the passbolt application pagemod.
-        // Chrome workers are always destroyed on URL change
-        onTabUrlChange: function () {
-          if (worker.tab.url == user.settings.getDomain() + '/auth/login') {
-            PassboltApp.destroy();
-          }
-        }
-      });
+      Worker.add('App', worker
+      // {
+      //   // FIREFOX ONLY -
+      //   // If the user is redirected to the login page, that means it is logged out.
+      //   // Destroy the passbolt application pagemod.
+      //   // Chrome workers are always destroyed on URL change
+      //   onTabUrlChange: function () {
+      //     if (worker.tab.url === (user.settings.getDomain() + '/auth/login')) {
+      //       PassboltApp.destroy();
+      //     }
+      //   }
+      // }
+      );
 
       app.events.clipboard.listen(worker);
       app.events.config.listen(worker);

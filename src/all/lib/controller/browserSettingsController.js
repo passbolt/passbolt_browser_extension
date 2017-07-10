@@ -35,16 +35,6 @@ var set = function (key, value) {
 exports.set = set;
 
 /**
- * Get the extension url.
- *
- * @return {string}
- */
-var getExtensionUrl = function () {
-  return chrome.runtime.getURL("");
-};
-exports.getExtensionUrl = getExtensionUrl;
-
-/**
  * Get the extension version.
  *
  * @return {string}

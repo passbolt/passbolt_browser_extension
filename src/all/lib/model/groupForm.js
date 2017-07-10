@@ -13,8 +13,8 @@ var Settings = require('./settings').Settings;
 var Group = require('./group').Group;
 const { defer } = require('../sdk/core/promise');
 var TabStorage = require('../model/tabStorage').TabStorage;
-var jsonQ = require('../vendors/jsonQ').jsonQ;
-var _ = require('../vendors/underscore-min');
+// var jsonQ = require('../vendors/jsonQ').jsonQ;
+// var _ = require('../vendors/underscore-min');
 var __ = require('../sdk/l10n').get;
 
 /**

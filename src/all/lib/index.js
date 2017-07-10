@@ -4,6 +4,9 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+console.log('--------------------------------------------');
+console.log('Passbolt Extension: Index.js start ');
+
 // Config and user models
 var Config = require('./model/config');
 var User = require('./model/user').User;
@@ -13,13 +16,9 @@ var User = require('./model/user').User;
  *  Init web worker
  * ==================================================================================
  */
-// var openpgp = require('./vendors/openpgp');
-// var webWorker = require('./vendors/web-worker').Worker;
-// var BrowserSettings = require('./controller/browserSettingsController');
-//
-// openpgp.initWorker({
-//   worker: new webWorker(BrowserSettings.getExtensionUrl() + '/lib/vendors/openpgp.worker.js')
-// });
+openpgp.initWorker({
+  worker: new webWorker(chrome.runtime.getURL('/lib/vendors/openpgp.worker.js'))
+});
 
 /* ==================================================================================
  *  Interface changes
@@ -40,36 +39,36 @@ var pageMods = require('./app').pageMods;
 pageMods.Bootstrap.init();
 
 // // If the user is valid we enable the login pagemod
-// var user = new User();
-// if (user.isValid()) {
-//   // Auth pagemod init can also be triggered
-//   // by debug, setup and user events (e.g. when config change)
-//   pageMods.PassboltAuth.init();
-//
-//   // App pagemod init is generally triggered after a successful login
-//   // We only initialize it here for the cases where the user is already logged in
-//   user.isLoggedIn()
-//     .then(function() {
-//       pageMods.PassboltApp.init();
-//     });
-// }
+var user = new User();
+if (user.isValid()) {
+  // Auth pagemod init can also be triggered
+  // by debug, setup and user events (e.g. when config change)
+  pageMods.PassboltAuth.init();
 
-// Setup pagemods
-// pageMods.SetupBootstrap.init();
-// pageMods.Setup.init();
+  // App pagemod init is generally triggered after a successful login
+  // We only initialize it here for the cases where the user is already logged in
+  user.isLoggedIn()
+    .then(function() {
+      pageMods.PassboltApp.init();
+    });
+}
+
+// Setup pagemodsr
+pageMods.SetupBootstrap.init();
+pageMods.Setup.init();
 
 // Other pagemods active all the time
 // but triggered by App or Auth
-// pageMods.PassboltAuthForm.init();
-// pageMods.MasterPasswordDialog.init();
-// pageMods.ProgressDialog.init();
-// pageMods.SecretEditDialog.init();
-// pageMods.ShareDialog.init();
-// pageMods.ShareAutocompleteDialog.init();
-// pageMods.GroupEditDialog.init();
-// pageMods.GroupEditAutocompleteDialog.init();
+pageMods.PassboltAuthForm.init();
+pageMods.MasterPasswordDialog.init();
+pageMods.ProgressDialog.init();
+pageMods.SecretEditDialog.init();
+pageMods.ShareDialog.init();
+pageMods.ShareAutocompleteDialog.init();
+pageMods.GroupEditDialog.init();
+pageMods.GroupEditAutocompleteDialog.init();
 
 // Debug pagemod
-// if (Config.isDebug()) {
-//   pageMods.Debug.init();
-// }
+if (Config.isDebug()) {
+  pageMods.Debug.init();
+}

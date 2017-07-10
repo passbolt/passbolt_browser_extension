@@ -7,7 +7,7 @@
 
 var Config = require('./config');
 var Settings = require('./settings').Settings;
-var fetch = require('../vendors/window').fetch;
+// var fetch = require('../vendors/window').fetch;
 const { defer } = require('../sdk/core/promise');
 var __ = require('../sdk/l10n').get;
 

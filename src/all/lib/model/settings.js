@@ -7,7 +7,7 @@
 
 var __ = require('../sdk/l10n').get;
 var Config = require('./config');
-var Validator = require('../vendors/validator');
+// var Validator = require('../vendors/validator');
 
 /**
  * The class that deals with users settings

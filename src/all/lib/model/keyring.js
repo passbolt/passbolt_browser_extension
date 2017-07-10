@@ -7,11 +7,11 @@
 const { defer } = require('../sdk/core/promise');
 var __ = require('../sdk/l10n').get;
 
-var openpgp = require('../vendors/openpgp');
-var fetch = require('../vendors/window').fetch;
-var Validator = require('../vendors/validator');
-var XRegExp = require('../vendors/xregexp').XRegExp;
-var storage = require('../vendors/node-localstorage').localStorage;
+// var openpgp = require('../vendors/openpgp');
+// var fetch = require('../vendors/window').fetch;
+// var Validator = require('../vendors/validator');
+// var XRegExp = require('../vendors/xregexp').XRegExp;
+// var storage = require('../vendors/node-localstorage').localStorage;
 
 var Settings = require('./settings').Settings;
 var Key = require('./key').Key;

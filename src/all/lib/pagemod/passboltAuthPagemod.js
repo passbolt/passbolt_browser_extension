@@ -6,7 +6,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var self = require('../sdk/self');
 var app = require('../app');
 var user = new (require('../model/user').User)();
 var pageMod = require('../sdk/page-mod');
@@ -35,15 +34,15 @@ PassboltAuth.init = function () {
     include: domain,
     contentScriptWhen: 'ready',
     contentStyleFile: [
-      self.data.url('css/external.min.css')
+      'data/css/external.min.css'
     ],
     contentScriptFile: [
-      self.data.url('vendors/jquery.min.js'),
-      self.data.url('vendors/ejs_production.js'),
-      self.data.url('js/lib/message.js'),
-      self.data.url('js/lib/request.js'),
-      self.data.url('js/lib/html.js'),
-      self.data.url('js/login/login.js')
+      'data/vendors/jquery.min.js',
+      'data/vendors/ejs_production.js',
+      'data/js/lib/message.js',
+      'data/js/lib/request.js',
+      'data/js/lib/html.js',
+      'data/js/login/login.js'
     ],
     attachTo: ["existing", "top"],
     onAttach: function (worker) {

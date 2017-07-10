@@ -6,7 +6,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var self = require('../sdk/self');
 var pageMod = require('../sdk/page-mod');
 var app = require('../app');
 var Worker = require('../model/worker');
@@ -24,20 +23,9 @@ PassboltAuthForm.init = function () {
     name: 'AuthForm',
     include: 'about:blank?passbolt=passbolt-iframe-login-form',
     contentScriptWhen: 'ready',
-    // Warning:
-    // If you modify the following script and styles don't forget to also modify then in
-    // chrome/data/passbolt-iframe-login-form.html
-    contentStyleFile: [
-      self.data.url('css/main_ff.min.css')
-    ],
     contentScriptFile: [
-      self.data.url('vendors/jquery.min.js'),
-      self.data.url('vendors/ejs_production.js'),
-      self.data.url('js/lib/message.js'),
-      self.data.url('js/lib/request.js'),
-      self.data.url('js/lib/html.js'),
-      self.data.url('js/lib/securityToken.js'),
-      self.data.url('js/login/loginForm.js')
+			// Warning: script and styles need to be modified in
+			// chrome/data/passbolt-iframe-login-form.html
     ],
     onAttach: function (worker) {
       Worker.add('AuthForm', worker);
@@ -47,5 +35,5 @@ PassboltAuthForm.init = function () {
       app.events.auth.listen(worker);
     }
   });
-}
+};
 exports.PassboltAuthForm = PassboltAuthForm;

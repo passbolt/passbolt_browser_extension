@@ -71,8 +71,7 @@ exports.getPreferredDownloadsDirectory = getPreferredDownloadsDirectory;
  */
 function loadFile (path) {
   var deferred = defer();
-	var url = chrome.extension.getURL(path);
-	console.log(url);
+	var url = chrome.runtime.getURL(path);
   fetch(url)
     .then(
       function (response) {

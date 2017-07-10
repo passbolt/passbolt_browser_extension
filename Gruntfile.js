@@ -22,11 +22,12 @@ module.exports = function(grunt) {
 	 * Load and enable Tasks
 	 */
 	grunt.loadNpmTasks('grunt-shell');
+	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-browserify');
 
-	grunt.registerTask('default', ['copy:src', 'browserify:vendor', 'browserify:client']);
+	grunt.registerTask('default', ['clean:data', 'clean:others', 'copy:data', 'copy:others', 'build']);
 	grunt.registerTask('build', ['browserify:vendors', 'browserify:app']);
 
 	/**
@@ -42,13 +43,26 @@ module.exports = function(grunt) {
 		 */
 		browserify: {
 			vendors: {
-				src: [ path.src_addon_vendors + 'jquery.js'],
+				src: [path.src_addon + 'vendors.js'],
 				dest: path.dist + 'vendors.min.js'
 			},
 			app: {
-				src: [ 'src/all/lib/index.js'],
-				dest: 'dist/all/index.min.js'
+				src: [path.src_addon + 'index.js'],
+				dest: path.dist + 'index.min.js'
 			}
+		},
+
+		/**
+		 * Clean operations
+		 */
+		clean: {
+			data: [path.dist + '/data'],
+			css: [path.dist + '/data/css'],
+			img: [path.dist + '/data/img'],
+			others: [
+				path.dist + '/icons',
+				path.dist + '/locale'
+			]
 		},
 
 		/**
@@ -77,9 +91,7 @@ module.exports = function(grunt) {
 		 * Shell commands
 		 */
 		shell: {
-			options: {
-				stderr: false
-			},
+			options: {stderr: false},
 			// TODO. add the shell commands
 		},
 
@@ -91,30 +103,22 @@ module.exports = function(grunt) {
 			data: {
 				files: [path.src + 'data/**/*.*'],
 				tasks: ['copy:data'],
-				options: {
-					spawn: false,
-				}
+				options: {spawn: false}
 			},
 			app: {
-				files: [path.src + 'lib/**/*.js', '!' + path.src + 'lib/vendors/*.js'],
+				files: [path.src + 'lib/**/*.js', '!' + path.src + 'lib/vendors/*.js', '!' + path.src + 'lib/vendors.js'],
 				tasks: ['browserify:app'],
-				options: {
-					spawn: false,
-				}
+				options: {spawn: false}
 			},
 			vendors: {
-				files: [path.src + 'lib/vendors/*.js'],
+				files: [path.src + 'lib/vendors.js', path.src + 'lib/vendors/**/*.js'],
 				tasks: ['browserify:vendors'],
-				options: {
-					spawn: false,
-				}
+				options: {spawn: false}
 			},
 			others: {
 				files: [path.src + 'manifest.json', path.src + 'icons/*', path.src + 'locale/*'],
 				tasks: ['copy:others'],
-				options: {
-					spawn: false,
-				}
+				options: {spawn: false}
 			}
 		}
 	});

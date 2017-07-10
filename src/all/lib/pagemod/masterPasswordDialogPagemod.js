@@ -7,7 +7,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var self = require('../sdk/self');
 var app = require('../app');
 var pageMod = require('../sdk/page-mod');
 var Worker = require('../model/worker');
@@ -26,20 +25,9 @@ MasterPasswordDialog.init = function () {
   MasterPasswordDialog._pageMod = pageMod.PageMod({
     name: 'MasterPassword',
     include: 'about:blank?passbolt=passbolt-iframe-master-password',
-    // Warning:
-    // If you modify the following script and styles don't forget to also modify then in
-    // src/chrome/data/passbolt-iframe-master-password.html
-    contentStyleFile: [
-      self.data.url('css/main_ff.min.css')
-    ],
     contentScriptFile: [
-      self.data.url('vendors/jquery.min.js'),
-      self.data.url('vendors/ejs_production.js'),
-      self.data.url('js/lib/message.js'),
-      self.data.url('js/lib/request.js'),
-      self.data.url('js/lib/html.js'),
-      self.data.url('js/lib/securityToken.js'),
-      self.data.url('js/masterPassword/masterPassword.js')
+			// Warning: script and styles need to be modified in
+			// src/chrome/data/passbolt-iframe-master-password.html
     ],
     contentScriptWhen: 'ready',
     onAttach: function (worker) {

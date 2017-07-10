@@ -39,7 +39,8 @@ auto filling your passwords when visiting known websites.
 [![Share passwords](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-share-275.png)](https://raw.githubusercontent.com/passbolt/passbolt_styleguide/master/src/img/screenshots/teaser-screenshot-share.png)
 
 # Contributing
-Please check CONTRIBUTING.md for more information about how to get involved.
+
+Please check ```CONTRIBUTING.md``` for more information about how to get involved.
 
 ### Reporting a security Issue
 
@@ -57,35 +58,44 @@ The passbolt team will take the following actions:
 - Provide credits in the release announcement to the reporter if they so desire.
 
 # Quick how-to for developers
+
 This is just a quick getting started guide, for more information and productivity tips checkout CONTRIBUTING.md
 
 ## Prerequisite
 
-You will need:
-1. Nodejs
-2. JPM the Node base Firefox Addon SDK (jetpack), see. [Official documentation](https://developer.mozilla.org/en-US/Add-ons/SDK/Tools/jpm#Installation)
-3. This code
+You will need ```node```, ```grunt``` and the dependencies listed in ```packages.json```.
+You will also need ```web-ext``` (for firefox), ```crx``` (for chrome).
 ```
-git clone git@github.com:passbolt/passbolt_firefox.git
-sudo npm install jpm -g
-```
-
-## Test a local version of the plugin
-
-To launch an instance of Firefox with your local version of the add-on installed,
-you will need make sure you run an instance that allowed unsigned extension (the developer edition for example)
-```
-jpm run -b /path/to/FirefoxAllowingUnsignedExtension
-```
-On MacOS that will be something like this:
-```
-jpm run -b /Applications/FirefoxDeveloperEdition.app
+git clone git@github.com:passbolt/passbolt_browser_extension.git
+cd passbolt_browser_extension
+npm install
+sudo npm install web-ext -g
+sudo npm install crx -g
 ```
 
-# FAQ
-## How to keep the same extension id at each build
-A key (key.pem) has to be provided by the passbolt team (Cedric) and should be put at the root folder before 
-the grunt build.
+## Building the source
+
+The non-minified source code is located in ```/src```. It can be built as follow:
+```
+grunt
+```
+
+In order to rebuild the code in this directory automatically while you are editing the src 
+you can use the grunt watch task:
+```
+grunt watch
+```
+
+## Test a local version of the plugin (firefox)
+
+To launch an instance of Firefox with your local version of the add-on installed.
+```
+cd dist/all
+web-ext run
+```
+
+This instance will be reloaded everytime there is a change in the /dist/all code or by pressing the ```r```
+key on the keyboard when web-ext is running.
 
 # Credits
 

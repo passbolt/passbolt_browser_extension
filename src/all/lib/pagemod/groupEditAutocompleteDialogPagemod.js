@@ -10,7 +10,6 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  *
  */
-var self = require('../sdk/self');
 var app = require('../app');
 var pageMod = require('../sdk/page-mod');
 var Worker = require('../model/worker');
@@ -28,19 +27,10 @@ GroupEditAutocompleteDialog.init = function () {
     GroupEditAutocompleteDialog._pageMod = pageMod.PageMod({
         name: 'GroupEditAutocomplete',
         include: 'about:blank?passbolt=passbolt-iframe-group-edit-autocomplete',
-        // Warning:
-        // If you modify the following script and styles don't forget to also modify then in
-        // chrome/data/passbolt-iframe-group-edit-autocomplete.html
-        contentStyleFile: [
-            self.data.url('css/main_ff.min.css')
-        ],
+
         contentScriptFile: [
-            self.data.url('vendors/jquery.min.js'),
-            self.data.url('vendors/ejs_production.js'),
-            self.data.url('js/lib/message.js'),
-            self.data.url('js/lib/request.js'),
-            self.data.url('js/lib/html.js'),
-            self.data.url('js/group/editAutocomplete.js')
+					// Warning: Iframe script and styles need to be modified in
+					// chrome/data/passbolt-iframe-group-edit-autocomplete.html
         ],
         contentScriptWhen: 'ready',
         onAttach: function (worker) {

@@ -7,9 +7,9 @@
 var Config = require('./config');
 var Settings = require('./settings').Settings;
 
-var Validator = require('../vendors/validator');
-var fetch = require('../vendors/window').fetch;
-const { htmlspecialchars, in_array } = require('../vendors/phpjs');
+// var Validator = require('../vendors/validator');
+// var fetch = require('../vendors/window').fetch;
+// const { htmlspecialchars, in_array } = require('../vendors/phpjs');
 
 const { defer } = require('../sdk/core/promise');
 var { setTimeout } = require('../sdk/timers');

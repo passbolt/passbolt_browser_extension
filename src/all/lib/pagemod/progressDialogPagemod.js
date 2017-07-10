@@ -7,7 +7,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var self = require('../sdk/self');
 var app = require('../app');
 var pageMod = require('../sdk/page-mod');
 var Worker = require('../model/worker');
@@ -25,19 +24,10 @@ ProgressDialog.init = function () {
   ProgressDialog._pageMod = pageMod.PageMod({
     name: 'Progress',
     include: 'about:blank?passbolt=passbolt-iframe-progress-dialog*',
-    // Warning:
-    // If you modify the following script and styles don't forget to also modify then in
-    // chrome/data/passbolt-iframe-progress-dialog.html
-    contentStyleFile: [
-      self.data.url('css/main_ff.min.css')
-    ],
+
     contentScriptFile: [
-      self.data.url('vendors/jquery.min.js'),
-      self.data.url('vendors/ejs_production.js'),
-      self.data.url('js/lib/message.js'),
-      self.data.url('js/lib/request.js'),
-      self.data.url('js/lib/html.js'),
-      self.data.url('js/progress/progress.js')
+			// Warning: script and styles need to be modified in
+			// chrome/data/passbolt-iframe-progress-dialog.html
     ],
     contentScriptWhen: 'ready',
     onAttach: function (worker) {
@@ -45,5 +35,5 @@ ProgressDialog.init = function () {
       app.events.template.listen(worker);
     }
   });
-}
+};
 exports.ProgressDialog = ProgressDialog;

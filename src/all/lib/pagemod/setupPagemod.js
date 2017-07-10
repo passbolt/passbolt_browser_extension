@@ -7,7 +7,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var self = require('../sdk/self');
 var pageMod = require('../sdk/page-mod');
 
 var app = require('../app');
@@ -29,33 +28,12 @@ Setup.init = function () {
 
   Setup._pageMod = pageMod.PageMod({
     name: 'Setup',
-    include: self.data.url('setup.html'),
-
-    // Warning:
-    // If you modify the following script and styles don't forget to also modify then in
-    // chrome/data/setup.html and chrome/data/js/load/setup.js
+    include: chrome.runtime.getURL('setup.html'),
     contentScriptWhen: 'end',
     contentScriptFile: [
-      self.data.url('vendors/jquery.min.js'),
-      self.data.url('vendors/ejs_production.js'),
-      self.data.url('vendors/farbtastic.js'),
-      self.data.url('js/lib/message.js'),
-      self.data.url('js/lib/request.js'),
-      self.data.url('js/lib/html.js'),
-      self.data.url('js/lib/secretComplexity.js'),
-      self.data.url('js/setup/workflow/installSetup.workflow.js'),
-      self.data.url('js/setup/workflow/recoverSetup.workflow.js'),
-      self.data.url('js/setup/step/domainCheck.js'),
-      self.data.url('js/setup/step/defineKey.js'),
-      self.data.url('js/setup/step/importKey.js'),
-      self.data.url('js/setup/step/secret.js'),
-      self.data.url('js/setup/step/generateKey.js'),
-      self.data.url('js/setup/step/backupKey.js'),
-      self.data.url('js/setup/step/keyInfo.js'),
-      self.data.url('js/setup/step/securityToken.js'),
-      self.data.url('js/setup/step/loginRedirection.js'),
-      self.data.url('js/setup/setup.js')
-    ],
+			// Warning: script and styles need to be modified in
+			// chrome/data/setup.html and chrome/data/js/load/setup.js
+		],
     onAttach: function (worker) {
       app.events.template.listen(worker);
       app.events.clipboard.listen(worker);

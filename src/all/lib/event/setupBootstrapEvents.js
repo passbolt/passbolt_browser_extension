@@ -23,7 +23,7 @@ var listen = function (worker) {
     // Once the tab is ready, init the setup with the information already gathered.
     var interval = setInterval(function () {
       if (Worker.exists('Setup', tabId)) {
-        Worker.get('Setup', tabId).port.emit('passbolt.setup.init', info);
+      	Worker.get('Setup', tabId).port.emit('passbolt.setup.init', info);
         clearInterval(interval);
       }
     }, 500);

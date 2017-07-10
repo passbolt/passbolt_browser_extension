@@ -8,7 +8,7 @@
     "128": "icons/icon-128.png"
   },
   "background": {
-    "scripts": ["vendors.min.js","index.min.js"]
+    "page": "index.html"
   },
   "browser_action": {
     "default_icon": "icons/icon-19.png",

@@ -41,12 +41,12 @@
      * @returns {promise}
      */
     var loadTemplate = function () {
-        return passbolt.html.loadTemplate('body', './tpl/group/editAutocomplete.ejs')
+        return passbolt.html.loadTemplate('body', 'data/tpl/group/editAutocomplete.ejs')
             .then(function () {
-                return passbolt.html.getTemplate('./tpl/group/editAutocompleteItem.ejs');
+                return passbolt.html.getTemplate('data/tpl/group/editAutocompleteItem.ejs');
             }).then(function (data) {
                 itemTpl = data;
-                return passbolt.html.getTemplate('./tpl/group/editAutocompleteItemEmpty.ejs');
+                return passbolt.html.getTemplate('data/tpl/group/editAutocompleteItemEmpty.ejs');
             }).then(function (data) {
                 emptyTpl = data;
             });

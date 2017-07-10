@@ -666,7 +666,7 @@ passbolt.setup.data = passbolt.setup.data || {};
           additional: additionalData
         };
 
-        return passbolt.html.loadTemplate($actionsWrapper, './tpl/setup/fatal_error.ejs', 'html', {
+        return passbolt.html.loadTemplate($actionsWrapper, 'data/tpl/setup/fatal_error.ejs', 'html', {
           setupData: data
         });
       })

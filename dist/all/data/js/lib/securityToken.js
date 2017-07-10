@@ -25,7 +25,7 @@ passbolt.security = passbolt.security || {};
       .then(function (securityToken) {
         $(securityTokenSelector).text(securityToken.code);
         securityToken.id = protectedFieldSelector;
-        return passbolt.html.loadTemplate('head', './tpl/secret/securitytoken-style.ejs', 'append', securityToken);
+        return passbolt.html.loadTemplate('head', 'data/tpl/secret/securitytoken-style.ejs', 'append', securityToken);
       });
   };
   passbolt.security.initSecurityToken = initSecurityToken;

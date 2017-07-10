@@ -68,7 +68,7 @@
    * @returns {promise}
    */
   var loadTemplate = function () {
-    return passbolt.html.loadTemplate('body', './tpl/secret/edit.ejs')
+    return passbolt.html.loadTemplate('body', 'data/tpl/secret/edit.ejs')
       .then(function () {
         $secret = $('#js_secret');
         $secretClear = $('#js_secret_clear');
@@ -147,7 +147,7 @@
         strengthLabel: secretComplexity.STRENGTH[strength].label
       };
 
-    return passbolt.html.loadTemplate($secretStrength, './tpl/secret/strength.ejs', 'html', tplData)
+    return passbolt.html.loadTemplate($secretStrength, 'data/tpl/secret/strength.ejs', 'html', tplData)
       .then(function () {
         // Add class on the top container.
         var containerClasses = $secretStrength.attr('class').split(' ');

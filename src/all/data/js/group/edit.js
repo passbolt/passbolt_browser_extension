@@ -37,7 +37,7 @@
      * @returns {promise}
      */
     var loadTemplate = function () {
-        return passbolt.html.loadTemplate('body', './tpl/group/edit.ejs')
+        return passbolt.html.loadTemplate('body', 'data/tpl/group/edit.ejs')
             .then(function () {
                 $autocomplete = $(autocompleteFieldSelector);
 
@@ -96,7 +96,6 @@
             passbolt.message.emit('passbolt.group.edit.search-users', keywords);
         }, 300);
     };
-
 
     // Init the autocomplete search field component.
     init();

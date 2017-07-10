@@ -38,7 +38,7 @@
    * @returns {promise}
    */
   var loadTemplate = function () {
-    return passbolt.html.loadTemplate('body', './tpl/resource/share.ejs')
+    return passbolt.html.loadTemplate('body', 'data/tpl/resource/share.ejs')
       .then(function () {
         $autocomplete = $('#js_perm_create_form_aro_auto_cplt');
 

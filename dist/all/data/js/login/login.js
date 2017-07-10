@@ -21,9 +21,12 @@ passbolt.login = passbolt.login || {};
    */
   passbolt.login.onStep0Start = function () {
     var $renderSpace = $('.login.page .js_main-login-section'),
-      tplData = {serverKeyId: 'fetching...'};
+      tplData = {
+      	browserName: passbolt.html.getBrowserName(),
+      	serverKeyId: 'fetching...'
+			};
 
-    passbolt.html.loadTemplate($renderSpace, './tpl/login/stage0.ejs', 'html', tplData)
+    passbolt.html.loadTemplate($renderSpace, 'data/tpl/login/stage0.ejs', 'html', tplData)
       .then(function () {
         // Display information about the state of login
         // e.g. that we're going to check for the server key first
@@ -39,7 +42,7 @@ passbolt.login = passbolt.login || {};
             // Display error message.
             $('.plugin-check.gpg').removeClass('notice').addClass('error');
             $('.plugin-check.gpg .message').text('Error: Could not find server key');
-            passbolt.html.loadTemplate('.login.form', './tpl/login/feedback-login-oops.ejs');
+            passbolt.html.loadTemplate('.login.form', 'data/tpl/login/feedback-login-oops.ejs');
           });
       });
   };
@@ -70,11 +73,11 @@ passbolt.login = passbolt.login || {};
         // Special case to handle if the user doesn't exist on server.
         if (msg.indexOf('no user associated') != -1) {
           $('html').addClass('server-no-user');
-          passbolt.html.loadTemplate('.login.form', './tpl/login/feedback-login-no-user.ejs');
+          passbolt.html.loadTemplate('.login.form', 'data/tpl/login/feedback-login-no-user.ejs');
         }
         // All other cases.
         else {
-          passbolt.html.loadTemplate('.login.form', './tpl/login/feedback-login-oops.ejs');
+          passbolt.html.loadTemplate('.login.form', 'data/tpl/login/feedback-login-oops.ejs');
         }
       }
     );
@@ -129,7 +132,7 @@ passbolt.login = passbolt.login || {};
   // GPGAuth failed
   passbolt.message.on('passbolt.auth.login-failed', function (message) {
     var tplData = {message: message};
-    passbolt.html.loadTemplate('.login.form', './tpl/login/feedback-login-error.ejs', 'html', tplData);
+    passbolt.html.loadTemplate('.login.form', 'data/tpl/login/feedback-login-error.ejs', 'html', tplData);
   });
 
   // Passphrase have been captured and verified
@@ -137,7 +140,7 @@ passbolt.login = passbolt.login || {};
     $('html').addClass('loading').removeClass('loaded');
     // remove the iframe and tell the user we're logging in
     var tplData = {message: message};
-    passbolt.html.loadTemplate('.login.form', './tpl/login/feedback-passphrase-ok.ejs', 'html', tplData);
+    passbolt.html.loadTemplate('.login.form', 'data/tpl/login/feedback-passphrase-ok.ejs', 'html', tplData);
   });
 
   /* ==================================================================================

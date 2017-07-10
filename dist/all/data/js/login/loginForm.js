@@ -36,7 +36,7 @@
    * @returns {promise}
    */
   var loadTemplate = function () {
-    return passbolt.html.loadTemplate('body', './tpl/login/form.ejs')
+    return passbolt.html.loadTemplate('body', 'data/tpl/login/form.ejs')
       .then(function success() {
         $loginSubmit = $('#loginSubmit');
         $username = $('#UserUsername');

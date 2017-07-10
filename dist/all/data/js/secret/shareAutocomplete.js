@@ -42,12 +42,12 @@
    * @returns {promise}
    */
   var loadTemplate = function () {
-    return passbolt.html.loadTemplate('body', './tpl/resource/shareAutocomplete.ejs')
+    return passbolt.html.loadTemplate('body', 'data/tpl/resource/shareAutocomplete.ejs')
       .then(function () {
-        return passbolt.html.getTemplate('./tpl/resource/shareAutocompleteItem.ejs');
+        return passbolt.html.getTemplate('data/tpl/resource/shareAutocompleteItem.ejs');
       }).then(function (data) {
         itemTpl = data;
-        return passbolt.html.getTemplate('./tpl/resource/share-autocomplete-item_empty.ejs');
+        return passbolt.html.getTemplate('data/tpl/resource/share-autocomplete-item_empty.ejs');
       }).then(function (data) {
         emptyTpl = data;
       });

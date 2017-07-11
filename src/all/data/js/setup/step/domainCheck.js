@@ -44,6 +44,9 @@ passbolt.setup.steps = passbolt.setup.steps || {};
    * @return {promise}
    */
   step.init = function () {
+    step.viewData.browserName = passbolt.html.getBrowserName();
+
+    // retrieve the setup settings.
     return passbolt.setup.get('settings')
       .then(function (settings) {
         step.viewData.domain = step._data.domain = settings.domain;

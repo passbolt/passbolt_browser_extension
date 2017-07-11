@@ -28,7 +28,7 @@ Setup.init = function () {
 
   Setup._pageMod = pageMod.PageMod({
     name: 'Setup',
-    include: chrome.runtime.getURL('setup.html'),
+    include: chrome.runtime.getURL('data/setup.html'),
     contentScriptWhen: 'end',
     contentScriptFile: [
 			// Warning: script and styles need to be modified in

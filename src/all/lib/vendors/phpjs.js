@@ -1,4 +1,9 @@
-
+/**
+ * PHPJS functions from http://locutus.io
+ *
+ * @licence MIT License
+ * @copyright 2007-2016 Kevin van Zonneveld (http://kvz.io) and Contributors (http://locutus.io/authors)
+ */
 exports.stripslashes = function stripslashes(str) {
     // @credit: http://phpjs.org/functions/stripslashes/
     return (str + '')

@@ -330,17 +330,14 @@ User.prototype._getRemote = function () {
       }
     })
     .then(function (response) {
-      _response = response;
-      return response.json();
-    })
-    .then(function (json) {
+      var json = response.json();
       // Check response status
-      if (!_response.ok) {
+      if (!response.ok) {
         var msg = __('Could not get the current user information. The server responded with an error.');
         if (json.headers.msg != undefined) {
           msg += ' ' + json.headers.msg;
         }
-        msg += ' (' + _response.status + ')';
+        msg += ' (' + response.status + ')';
         return deferred.reject(new Error(msg));
       }
       // Save temporarily and return remote version of current user
@@ -387,12 +384,8 @@ User.prototype.isLoggedIn = function () {
       }
     })
     .then(function (response) {
-      _response = response;
-      return response.json();
-    })
-    .then(function (json) {
       // Check response status
-      if (!_response.ok) {
+      if (!response.ok) {
         return deferred.reject(new Error(__('The user is not logged-in')));
       }
       deferred.resolve(__('The user is logged-in'));
@@ -469,17 +462,14 @@ User.prototype.searchUsers = function(keywords, excludedUsers) {
         }
       })
       .then(function (response) {
-        _response = response;
-        return response.json();
-      })
-      .then(function (json) {
+        var json = response.json();
         // Check response status
-        if(!_response.ok) {
+        if(!response.ok) {
           var msg = __('Could not get the users. The server responded with an error.');
           if(json.headers.msg != undefined) {
             msg += ' ' + json.headers.msg;
           }
-          msg += ' (' + _response.status + ')';
+          msg += ' (' + response.status + ')';
           return deferred.reject(new Error(msg));
         }
         var users = json.body;

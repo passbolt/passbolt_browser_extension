@@ -50,10 +50,12 @@ if (user.isValid()) {
   user.isLoggedIn()
     .then(function() {
       pageMods.PassboltApp.init();
+    }, function() {
+      // The user is not logged-in, do nothing.
     });
 }
 
-// Setup pagemodsr
+// Setup pagemods
 pageMods.SetupBootstrap.init();
 pageMods.Setup.init();
 

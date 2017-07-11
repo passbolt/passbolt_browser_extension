@@ -50,8 +50,9 @@ Auth.prototype.verify = function(serverUrl, serverKey, userFingerprint) {
     serverUrl = user.settings.getDomain();
   }
   if (typeof userFingerprint === 'undefined') {
-    var keyring = new Keyring();
-    userFingerprint = (keyring.findPrivate()).fingerprint;
+    var keyring = new Keyring(),
+        privateKey = keyring.findPrivate();
+    userFingerprint = privateKey.fingerprint;
   }
 
   var crypto = new Crypto();

@@ -12,7 +12,6 @@ var app = require('../app');
 var __ = require('../sdk/l10n').get;
 var Worker = require('../model/worker');
 const { Promise, defer } = require('../sdk/core/promise');
-var { setInterval, clearInterval } = require('../sdk/timers');
 
 var Keyring = require('../model/keyring').Keyring;
 var Crypto = require('../model/crypto').Crypto;

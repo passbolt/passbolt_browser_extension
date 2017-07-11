@@ -16,7 +16,7 @@ var Port = function(port) {
  * @param callback
  */
 Port.prototype.on = function(msgName, callback) {
-  _this = this;
+  var _this = this;
   this._port.onMessage.addListener(function (msg) {
     var args = Object.keys(msg).map(function (key) {return msg[key]});
     args = Array.prototype.slice.call(args, 1);

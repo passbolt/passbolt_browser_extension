@@ -12,7 +12,6 @@ var Settings = require('./settings').Settings;
 // const { htmlspecialchars, in_array } = require('../vendors/phpjs');
 
 const { defer } = require('../sdk/core/promise');
-var { setTimeout } = require('../sdk/timers');
 var __ = require('../sdk/l10n').get;
 
 // Will store temporarily the user master password if the user wants the

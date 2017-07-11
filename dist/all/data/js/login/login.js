@@ -21,10 +21,7 @@ passbolt.login = passbolt.login || {};
    */
   passbolt.login.onStep0Start = function () {
     var $renderSpace = $('.login.page .js_main-login-section'),
-      tplData = {
-      	browserName: passbolt.html.getBrowserName(),
-      	serverKeyId: 'fetching...'
-			};
+      tplData = {serverKeyId: 'fetching...'};
 
     passbolt.html.loadTemplate($renderSpace, 'data/tpl/login/stage0.ejs', 'html', tplData)
       .then(function () {

@@ -117,7 +117,7 @@ PageMod.prototype.__init = function() {
     });
   }
 
-  // When a tab is closed cleanup we cleanup
+  // When a tab is closed cleanup
   this._listeners['chrome.tabs.onRemoved'] = function (tabId) {
     var index = _this._ports.indexOf(tabId);
     _this._ports.splice(index, 1);

@@ -97,11 +97,14 @@ module.exports = function(grunt) {
 					{expand: true, cwd: path.node_modules + 'jssha/src', src: 'sha.js', dest: path.src_content_vendors},
 					// underscore
 					{expand: true, cwd: path.node_modules + 'underscore', src: 'underscore-min.js', dest: path.src_addon_vendors},
+					// jsonQ
+					{expand: true, cwd: path.node_modules + 'jsonq', src: 'jsonQ.js', dest: path.src_addon_vendors},
 					// Missing Vendors
 					// - Farbtastic color picker in src_content_vendors
 					// - phpjs standard functions in src_addon_vendors
 					// - xregexp-all
-
+					// - ejs
+					// - validator
 				]
 			},
 			// TODO

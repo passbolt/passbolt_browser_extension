@@ -11,7 +11,8 @@
     "openpgp": "~2.3",
     "underscore": "~1.8.3",
     "xregexp": "~3.0.0",
-    "jssha": "~2.3.1"
+    "jssha": "~2.3.1",
+    "jsonq": "~1.1.0"
   },
   "devDependencies": {
     "grunt": "^1.0.1",

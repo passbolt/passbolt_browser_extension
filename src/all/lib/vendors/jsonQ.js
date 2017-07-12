@@ -1,18 +1,31 @@
 /*
- *jsonQ.js v 1.0.4
+ *jsonQ.js v 1.1.0
  *Author: Sudhanshu Yadav
  *s-yadav.github.com
- *Copyright (c) 2013 - 2015 Sudhanshu Yadav.
- *Dual licensed under the MIT and GPL licenses
+ *Copyright (c) 2013 - 2016 Sudhanshu Yadav.
+ *MIT licenses
  */
 //initialize jsonQ
-;(function(undefined) {
+;(function(factory) {
+    /** support UMD ***/
+    var global = Function('return this')() || (42, eval)('this');
+    if (typeof define === "function" && define.amd) {
+        define(["jsonq"], function($) {
+            return (global.jsonQ = factory());
+        });
+    } else if (typeof module === "object" && module.exports) {
+        module.exports = factory();
+
+    } else {
+        global.jsonQ = factory();
+    }
+}(function(undefined) {
 
     var jsonQ = function(json) {
-            //return a jsonQ object
-            return new jsonQ.fn.init(json);
-        },
-    //plugin variable and methods
+        //return a jsonQ object
+        return new jsonQ.fn.init(json);
+    },
+        //plugin variable and methods
         error = function(msg) {
             throw msg;
         },
@@ -33,7 +46,7 @@
 
     /*****private functions for internal use only*******/
 
-        //to check weather path b is subset of path a
+    //to check weather path b is subset of path a
     function matchPath(a, b) {
         var regex = new RegExp('^' + a.join('~~'), 'i');
         return regex.test(b.join('~~'));
@@ -56,10 +69,10 @@
             if (objType(json) == 'object') {
                 if (keyAdded.indexOf(k) == -1) {
                     keyAdded.push(k);
-                    newJson[k] = [];
+                    newJson.jsonQ_path[k] = [];
                 }
 
-                newJson[k].push({
+                newJson.jsonQ_path[k].push({
                     path: lvlpath
                 });
             }
@@ -139,20 +152,22 @@
             var current = this.jsonQ_current,
                 newObj = this.cloneObj(jsonQ()),
                 newCurrent = newObj.jsonQ_current = [],
+                pathObj = this.jsonQ_path,
 
-            //key element (an array of paths with following key)
+                //key element (an array of paths with following key)
                 key = option.key,
-            //dont work with original object clone it and if undefined than make as empty array
-                elm = jsonQ.clone(this[key]) || [],
-            //qualifier
+                //dont work with original object clone it and if undefined than make as empty array
+                elm = jsonQ.clone(pathObj[key]) || [],
+                //qualifier
                 qualifier = option.qualifier,
                 qType = objType(qualifier),
-            //travese method
+                //travese method
                 method = option.method,
                 find = method == "find" ? true : false;
 
             for (var i = 0, ln = current.length; i < ln; i++) {
                 var pathC = current[i].path,
+                    pathCTemp = [],
                     found = false;
 
 
@@ -162,7 +177,7 @@
                         continue;
                     }
 
-                    var pathCTemp = pathC.concat([]);
+                    pathCTemp = pathC.concat([]);
                     pathCTemp.pop();
                 }
 
@@ -284,6 +299,7 @@
 
             //to set initial values
             this.jsonQ_root = json;
+            this.jsonQ_path = {};
             this.jsonQ_current = [{
                 path: []
             }];
@@ -418,7 +434,7 @@
                 newCurrent = newObj.jsonQ_current = [],
                 qType = objType(qualifier);
 
-            if (!qualifier) return;
+            if (!qualifier) return this;
 
             for (var i = 0, ln = current.length; i < ln; i++) {
                 var pathC = current[i].path;
@@ -511,7 +527,7 @@
                 i, ln,
                 sortedPath = [],
                 type = objType(jobj.pathValue(current[0].path)),
-            //function to get value which is an array from pathKey traversing from right.
+                //function to get value which is an array from pathKey traversing from right.
                 getClosestArray = function(key) {
                     while (key.length !== 0) {
                         var lastKey = key.pop();
@@ -536,7 +552,7 @@
             //to run the loop untill all ar sorted
             var alpha = 0,
 
-            // function to remove element if sorting is done for that path
+                // function to remove element if sorting is done for that path
                 spliceElm = function(i) {
                     sortStack.splice(i, 1);
                     return --i;
@@ -546,7 +562,7 @@
                 for (i = 0; i < sortStack.length; i++) {
                     var cur = sortStack[i].current,
                         pH = sortStack[i].pathHolder,
-                    //to get the closest array in the current path. This will also change value of current path variable.
+                        //to get the closest array in the current path. This will also change value of current path variable.
                         ary = getClosestArray(cur),
                         pathStr = cur.join();
 
@@ -727,10 +743,10 @@
             }
 
             var logic = function(val) {
-                    //if a json is an array alike and keys are numbers as string type ("1","2" instad of 1,2) convert them to integer.
-                    if (!isNaN(val)) val = parseInt(val);
-                    return val;
-                },
+                //if a json is an array alike and keys are numbers as string type ("1","2" instad of 1,2) convert them to integer.
+                if (!isNaN(val)) val = parseInt(val);
+                return val;
+            },
 
                 func = function(jsonVal) {
                     var jsonType = objType(jsonVal),
@@ -775,7 +791,7 @@
         index: function(list, elm, isQualifier) {
             var type = objType(elm),
                 ln = list.length,
-            //check that elm is a object or not that is taken by refrence
+                //check that elm is a object or not that is taken by refrence
                 refObj = type == "object" || type == "array" || type == "function" ? true : false;
 
 
@@ -1109,8 +1125,5 @@
     //to assign jsonQ prototypes to init function
     jsonQ.fn.init.prototype = jsonQ.fn;
 
-    //to make jsonQ accessible outside
-    var global = Function('return this')() || (42, eval)('this');
-    global.jsonQ = jsonQ;
-    exports.jsonQ = jsonQ;
-}());
+    return jsonQ;
+}));

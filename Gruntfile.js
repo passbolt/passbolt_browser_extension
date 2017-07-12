@@ -87,9 +87,18 @@ module.exports = function(grunt) {
 			// copy node_modules where needed in addon or content code vendors folder
 			vendors: {
 				files: [
+					// openpgpjs
 					{expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js','openpgp.worker.js'], dest: path.src_addon_vendors},
 					{expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js','openpgp.worker.js'], dest: path.dist_vendors},
+					// jquery
 					{expand: true, cwd: path.node_modules + 'jquery/dist', src: '*.min.js', dest: path.src_content_vendors},
+					// jssha
+					{expand: true, cwd: path.node_modules + 'jssha/src', src: 'sha.js', dest: path.src_addon_vendors},
+					{expand: true, cwd: path.node_modules + 'jssha/src', src: 'sha.js', dest: path.src_content_vendors},
+					// Missing Vendors
+					// - Farbtastic color picker in src_content_vendors
+					// - phpjs standard functions in src_addon_vendors
+
 				]
 			},
 			// TODO

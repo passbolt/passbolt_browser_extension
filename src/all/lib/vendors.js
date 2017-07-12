@@ -38,6 +38,6 @@ window.jsonQ = require('./vendors/jsonQ').jsonQ;
 /**
  * Crypto libraries
  */
-window.storage = require('./vendors/node-localstorage').localStorage;
+window.storage = require('./sdk/node-localstorage').localStorage;
 window.openpgp = require('./vendors/openpgp');
 window.jsSHA = require('./vendors/sha');

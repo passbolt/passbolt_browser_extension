@@ -27,7 +27,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-browserify');
 
-	grunt.registerTask('default', ['clean:data', 'clean:others', 'copy:data', 'copy:others', 'build']);
+	grunt.registerTask('default', ['clean:data', 'clean:others', 'deploy', 'build']);
+	grunt.registerTask('deploy', ['copy']);
 	grunt.registerTask('build', ['browserify:vendors', 'browserify:app']);
 
 	/**
@@ -86,8 +87,8 @@ module.exports = function(grunt) {
 			// copy node_modules where needed in addon or content code vendors folder
 			vendors: {
 				files: [
-					{expand: true, cwd: path.node_modules + 'openpgp/dist', src: '*.js', dest: path.src_addon_vendors},
-					{expand: true, cwd: path.node_modules + 'openpgp/dist', src: '*.js', dest: path.dist_vendors},
+					{expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js','openpgp.worker.js'], dest: path.src_addon_vendors},
+					{expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js','openpgp.worker.js'], dest: path.dist_vendors},
 					{expand: true, cwd: path.node_modules + 'jquery/dist', src: '*.min.js', dest: path.src_content_vendors},
 				]
 			},

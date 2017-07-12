@@ -1,1 +1,0 @@
-keyring-chrome56-patch.txt (11-02-2017) : temporary fix to chrome 56 memory leak. implements use_native=false for key generation, and remove buggy instructions. See incidents page for more details.

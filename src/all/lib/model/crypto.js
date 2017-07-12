@@ -14,7 +14,7 @@ const { defer } = require('../sdk/core/promise');
 
 var Keyring = require('./keyring').Keyring;
 var __ = require('../sdk/l10n').get;
-// var randomBytes = require('../vendors/crypto').randomBytes;
+var randomBytes = require('../sdk/random').randomBytes;
 
 /**
  * The class that deals with Passbolt encryption and decryption operations.

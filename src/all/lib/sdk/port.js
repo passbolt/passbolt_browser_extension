@@ -2,8 +2,8 @@
 /**
  * Port Chrome Wrapper
  *
- * @param port
- * @constructor
+ * @copyright (c) 2017 Passbolt SARL
+ * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var Port = function(port) {
   this._port = port;

@@ -10,9 +10,7 @@
 var app = require('../app');
 var pageMod = require('../sdk/page-mod');
 var Worker = require('../model/worker');
-
-var uuidRegex = "([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12})";
-var setupBootstrapRegex = "(.*)\/setup\/(install|recover)\/" + uuidRegex + "\/" + uuidRegex;
+var Config = require('../model/config');
 
 var SetupBootstrap = function () {
 };
@@ -26,7 +24,7 @@ SetupBootstrap.init = function () {
 
   SetupBootstrap._pageMod = pageMod.PageMod({
     name: 'SetupBootstrap',
-    include: new RegExp(setupBootstrapRegex),
+		include: new RegExp(Config.read('setupBootstrapRegex')),
     contentScriptWhen: 'ready',
     contentStyleFile: [],
     contentScriptFile: [

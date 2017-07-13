@@ -224,7 +224,7 @@ module.exports = function (grunt) {
         }, {
           // Less
           cwd: '<%= config.modules_path %>/<%= config.styleguide %>/build/css',
-          src: ['config_debug_ff.min.css', 'external.min.css', 'login.min.css', 'main_ff.min.css', 'setup_ff.min.css'],
+          src: ['config_debug_webext.min.css', 'external.min.css', 'login.min.css', 'main_webext.min.css', 'setup_webext.min.css'],
           dest: '<%= config.webroot %>/css',
           expand: true
         }]

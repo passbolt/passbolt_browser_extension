@@ -4,8 +4,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-console.log('--------------------------------------------');
-console.log('Passbolt Extension: Index.js start ');
 
 // Config and user models
 var Config = require('./model/config');

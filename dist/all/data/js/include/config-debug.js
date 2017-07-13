@@ -2,7 +2,7 @@ var portname = 'config-debug';
 var scripts = [
   'vendors/jquery.min.js',
   'vendors/sha.js',
-  'vendors/xregexp.js',
+  'vendors/xregexp-all.js',
   'js/lib/port.js'
 ];
 loadScripts(scripts).then(function () {

@@ -30,10 +30,10 @@ window.in_array = require('./vendors/phpjs').in_array;
 /**
  * Other libraries
  */
-window.XRegExp = require('./vendors/xregexp').XRegExp;
+window.XRegExp = require('./vendors/xregexp-all');
 window.Validator = require('./vendors/validator');
 window._ = require('./vendors/underscore-min');
-window.jsonQ = require('./vendors/jsonQ').jsonQ;
+window.jsonQ = require('./vendors/jsonQ');
 
 /**
  * Crypto libraries

@@ -1,7 +1,10 @@
 /**
  * Gruntfile
  * Provides tasks and commands to build and distribute the project
+ *
  * @param grunt
+ * @copyright (c) 2017 Passbolt SARL
+ * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 module.exports = function(grunt) {
 
@@ -11,7 +14,8 @@ module.exports = function(grunt) {
 	var path = {
 		node_modules: 'node_modules/',
 		dist: 'dist/all/',
-		dist_vendors: 'dist/all/vendors',
+		dist_vendors: 'dist/all/vendors/',
+		dist_data: 'dist/all/data/',
 		src: 'src/all/',
 		src_addon: 'src/all/lib/',
 		src_addon_vendors: 'src/all/lib/vendors/',
@@ -27,8 +31,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-browserify');
 
-	grunt.registerTask('default', ['clean:data', 'clean:others', 'deploy', 'build']);
-	grunt.registerTask('deploy', ['copy']);
+	grunt.registerTask('default', ['clean', 'copy', 'build']);
 	grunt.registerTask('build', ['browserify:vendors', 'browserify:app']);
 
 	/**
@@ -57,13 +60,10 @@ module.exports = function(grunt) {
 		 * Clean operations
 		 */
 		clean: {
-			data: [path.dist + '/data'],
-			css: [path.dist + '/data/css'],
-			img: [path.dist + '/data/img'],
-			others: [
-				path.dist + '/icons',
-				path.dist + '/locale'
-			]
+			data: [path.dist_data],
+			vendors: [path.dist_vendors], // TODO PASSBOLT add clean vendors in src data and lib
+			style: [path.dist_data + 'img', path.dist + 'icons', path.dist_data + 'css'],
+			others: [path.dist + 'locale', path.dist + 'manifest.json']
 		},
 
 		/**
@@ -79,7 +79,6 @@ module.exports = function(grunt) {
 			// copy src files to dist, but only those needed
 			others: {
 				files: [
-					{expand: true, cwd: path.src + 'icons', src: '**', dest: path.dist + 'icons'},
 					{expand: true, cwd: path.src + 'locale', src: '**', dest: path.dist + 'locale'},
 					{expand: true, cwd: path.src, src: 'manifest.json', dest: path.dist}
 				]
@@ -99,15 +98,68 @@ module.exports = function(grunt) {
 					{expand: true, cwd: path.node_modules + 'underscore', src: 'underscore-min.js', dest: path.src_addon_vendors},
 					// jsonQ
 					{expand: true, cwd: path.node_modules + 'jsonq', src: 'jsonQ.js', dest: path.src_addon_vendors},
-					// Missing Vendors
-					// - Farbtastic color picker in src_content_vendors
-					// - phpjs standard functions in src_addon_vendors
-					// - xregexp-all
-					// - ejs
-					// - validator
+					// xregexp
+					{expand: true, cwd: path.node_modules + 'xregexp', src: 'xregexp-all.js', dest: path.src_addon_vendors},
+					{expand: true, cwd: path.node_modules + 'xregexp', src: 'xregexp-all.js', dest: path.src_content_vendors},
+
+				 	// TODO PASSBOLT-2219 Fix / Add missing Vendors
+					// In src_content_vendors
+					// Farbtastic color picker is not available as npm package (too old)
+					// ejs too old / was hosted on google code...
+					//
+					// In src_addon_vendors
+					// validator: modified with non-standard alphaNumericSpecial
+					//
+					// Not in scope
+					// phpjs a custom compilation of standard functions from http://locutus.io
+
 				]
 			},
-			// TODO
+			// Copy styleguide elements
+			styleguide: {
+				files: [{
+					// Avatar
+					nonull: true,
+					cwd: path.node_modules + 'passbolt-styleguide/src/img/avatar',
+					src: ['user.png'],
+					dest: path.dist_data + 'img/avatar',
+					expand: true
+				}, {
+					// Controls
+					nonull: true,
+					cwd: path.node_modules + 'passbolt-styleguide/src/img/controls',
+					src: ['colorpicker/**', 'infinite-bar.gif', 'loading.gif'],
+					dest: path.dist_data + 'img/controls',
+					expand: true
+				}, {
+					// Icons
+					nonull: true,
+					cwd: path.node_modules + 'passbolt-styleguide/src/img/logo',
+					src: ['icon-19.png', 'icon-20_white.png', 'icon-48.png', 'icon-48_white.png', 'logo.png', 'logo@2x.png'],
+					dest: path.dist_data + 'img/logo',
+					expand: true
+				}, {
+					// Branding
+					nonull: true,
+					cwd: path.node_modules + 'passbolt-styleguide/src/img/logo',
+					src: ['icon-16.png', 'icon-19.png', 'icon-32.png', 'icon-48.png', 'icon-64.png', 'icon-128.png'],
+					dest: path.dist + 'icons',
+					expand: true
+				}, {
+					// Third party logos
+					nonull: true,
+					cwd: path.node_modules + 'passbolt-styleguide/src/img/third_party',
+					src: ['ChromeWebStore.png', 'firefox_logo.png', 'gnupg_logo.png', 'gnupg_logo_disabled.png'],
+					dest: path.dist_data + 'img/third_party',
+					expand: true
+				}, {
+					// CSS files
+					cwd: path.node_modules + 'passbolt-styleguide/build/css',
+					src: ['config_debug_webext.min.css', 'external.min.css', 'main_webext.min.css', 'setup_webext.min.css'],
+					dest: path.dist_data + 'css',
+					expand: true
+				}]
+			}
 		},
 
 		/**
@@ -139,7 +191,7 @@ module.exports = function(grunt) {
 				options: {spawn: false}
 			},
 			others: {
-				files: [path.src + 'manifest.json', path.src + 'icons/*', path.src + 'locale/*'],
+				files: [path.src + 'manifest.json', path.src + 'locale/*'],
 				tasks: ['copy:others'],
 				options: {spawn: false}
 			}

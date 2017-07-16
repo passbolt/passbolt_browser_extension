@@ -25,7 +25,6 @@ var passbolt = passbolt || {};
 
   // Ask the passbolt page to release its focus
   passbolt.message.on('passbolt.clipboard-iframe.copy', function (secret) {
-    console.log('Content code: passbolt.clipboard-iframe.copy ' + secret);
     clipboard.copy(secret);
   });
 

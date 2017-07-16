@@ -10,21 +10,14 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-/*
+/**
  * Open the master password dialog.
  * @listens passbolt.master-password.open-dialog
  */
 passbolt.message.on('passbolt.master-password.open-dialog', function () {
-	var iframeUrl;
-	var iframeId = 'passbolt-iframe-master-password';
-	if(typeof chrome !== 'undefined') {
-		iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html');
-	} else {
-		iframeUrl = 'about:blank';
-	}
-	iframeUrl += '?passbolt=' + iframeId;
-
 	// Add the master password iframe to the application page.
+	var iframeId = 'passbolt-iframe-master-password';
+	var iframeUrl = chrome.runtime.getURL('data/' + iframeId + '.html') + '?passbolt=' + iframeId;
 	var $iframe = $('<iframe/>', {
 		id: iframeId,
 		src: iframeUrl,
@@ -34,7 +27,7 @@ passbolt.message.on('passbolt.master-password.open-dialog', function () {
 	$iframe.appendTo('body');
 });
 
-/*
+/**
  * Close the master password dialog.
  * @listens passbolt.master-password.close-dialog
  */

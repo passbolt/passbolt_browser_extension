@@ -110,6 +110,11 @@ pageMods.Setup = require('./pagemod/setupPagemod').Setup;
 pageMods.PassboltApp = require('./pagemod/passboltAppPagemod').PassboltApp;
 
 /*
+ * This pagemod drives the clipboard iframe tool
+ */
+pageMods.Clipboard = require('./pagemod/clipboardPagemod').Clipboard;
+
+/*
  * This pagemod drives the dialog/iframe where the user enters the secret key password,
  * also called passphrase. It is used when encrypting, decrypting, signing, etc.
  */

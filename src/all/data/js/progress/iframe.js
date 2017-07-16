@@ -15,17 +15,9 @@
  * @listens passbolt.progress.open-dialog
  */
 passbolt.message.on('passbolt.progress.open-dialog', function(title, goals) {
-	var iframeUrl;
 	var iframeId = 'passbolt-iframe-progress-dialog';
-
-	if(typeof chrome !== 'undefined') {
-		iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html');
-	} else {
-		iframeUrl = 'about:blank';
-	}
-	iframeUrl += '?passbolt=' + iframeId + '&title=' + title;
-
-	// If goals given
+	var iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html') + '?passbolt=' + iframeId;
+	iframeUrl += '&title=' + title;
 	if(goals) {
 		iframeUrl += '&goals=' + goals;
 	}

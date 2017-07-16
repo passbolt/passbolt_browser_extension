@@ -42,5 +42,5 @@ GroupEditAutocompleteDialog.init = function () {
             app.events.template.listen(worker);
         }
     });
-}
+};
 exports.GroupEditAutocompleteDialog = GroupEditAutocompleteDialog;

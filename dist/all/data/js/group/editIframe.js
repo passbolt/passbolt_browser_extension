@@ -16,17 +16,9 @@
      * by the application page.
      */
     var _insertIframes = function () {
-        var iframeUrl;
-        var iframeId;
-
         // The component managing the autocomplete field.
-        iframeId = 'passbolt-iframe-group-edit';
-        if(typeof chrome !== 'undefined') {
-            iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html');
-        } else {
-            iframeUrl = 'about:blank';
-        }
-        iframeUrl += '?passbolt=' + iframeId;
+				var iframeId = 'passbolt-iframe-group-edit';
+        var iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html') + '?passbolt=' + iframeId;
         var $iframeShare = $('<iframe/>', {
             id: iframeId,
             src: iframeUrl,
@@ -39,15 +31,9 @@
         });
         $iframeShare.prependTo('.js_plugin_group_edit_wrapper');
 
-
         // The component managing the autocomplete result list.
         iframeId = 'passbolt-iframe-group-edit-autocomplete';
-        if(typeof chrome !== 'undefined') {
-            iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html');
-        } else {
-            iframeUrl = 'about:blank';
-        }
-        iframeUrl += '?passbolt=' + iframeId;
+			 	iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html') + '?passbolt=' + iframeId;
         var $iframeAutocomplete = $('<iframe/>', {
             id: iframeId,
             src: iframeUrl,

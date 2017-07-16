@@ -23,8 +23,8 @@ openpgp.initWorker({
  *  Where we affect the look and feel of the firefox instance
  * ==================================================================================
  */
-// var ToolbarController = require('./controller/toolbarController').ToolbarController;
-// new ToolbarController();
+var ToolbarController = require('./controller/toolbarController').ToolbarController;
+new ToolbarController();
 
 /* ==================================================================================
  *  Page mods init
@@ -59,6 +59,7 @@ pageMods.Setup.init();
 
 // Other pagemods active all the time
 // but triggered by App or Auth
+pageMods.Clipboard.init();
 pageMods.PassboltAuthForm.init();
 pageMods.MasterPasswordDialog.init();
 pageMods.ProgressDialog.init();

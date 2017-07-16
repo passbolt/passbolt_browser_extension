@@ -54,7 +54,7 @@ PassboltApp.initPageMod = function () {
       'data/js/lib/message.js',
       'data/js/lib/request.js',
       'data/js/lib/html.js',
-      'data/js/lib/clipboard.js',
+      'data/js/clipboard/clipboard.js',
       'data/js/masterPassword/iframe.js',
       'data/js/secret/editIframe.js',
       'data/js/secret/shareIframe.js',
@@ -66,20 +66,6 @@ PassboltApp.initPageMod = function () {
     onAttach: function (worker) {
       TabStorage.initStorage(worker.tab);
 
-      Worker.add('App', worker
-      // {
-      //   // FIREFOX ONLY -
-      //   // If the user is redirected to the login page, that means it is logged out.
-      //   // Destroy the passbolt application pagemod.
-      //   // Chrome workers are always destroyed on URL change
-      //   onTabUrlChange: function () {
-      //     if (worker.tab.url === (user.settings.getDomain() + '/auth/login')) {
-      //       PassboltApp.destroy();
-      //     }
-      //   }
-      // }
-      );
-
       app.events.clipboard.listen(worker);
       app.events.config.listen(worker);
       app.events.editPassword.listen(worker);
@@ -89,6 +75,8 @@ PassboltApp.initPageMod = function () {
       app.events.group.listen(worker);
       app.events.masterPasswordIframe.listen(worker);
       app.events.app.listen(worker);
+
+      Worker.add('App', worker);
     }
   });
 };

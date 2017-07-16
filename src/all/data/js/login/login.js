@@ -85,19 +85,13 @@ passbolt.login = passbolt.login || {};
   };
 
   /**
-   * Insert the passphrase dialog.
+   * Insert the passphrase dialog iframe.
    */
   passbolt.login.onStep1RequestPassphrase = function () {
-    var iframeUrl;
+		// Inject the passphrase dialog iframe into the web page DOM.
+		// See passboltAuthPagemod and login-form for the logic inside the iframe
     var iframeId = passphraseIframeId;
-    if(typeof chrome !== 'undefined') {
-      iframeUrl = chrome.runtime.getURL('data/' + iframeId + '.html');
-    } else {
-      iframeUrl = 'about:blank';
-    }
-    iframeUrl += '?passbolt=' + iframeId;
-
-    // Inject the passphrase dialog iframe into the web page DOM.
+		var iframeUrl = chrome.runtime.getURL('data/' + iframeId + '.html') + '?passbolt=' + iframeId;
     var $iframe = $('<iframe/>', {
       id: iframeId,
       src: iframeUrl,
@@ -105,9 +99,6 @@ passbolt.login = passbolt.login || {};
       class: 'loading'
     });
     $('.login.form').empty().append($iframe);
-
-    // See passboltAuthPagemod and login-form for the logic
-    // inside the iframe
   };
 
   /* ==================================================================================

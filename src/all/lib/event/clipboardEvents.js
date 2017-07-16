@@ -1,11 +1,10 @@
 /**
  * Clipboard events
- * @TODO flush clipboard event (on logout for example)
  *
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var clipboardController = require('../controller/clipboardController');
+var Worker = require('../model/worker');
 
 var listen = function (worker) {
 
@@ -15,8 +14,10 @@ var listen = function (worker) {
    * @listens passbolt.clipboard.copy
    * @param txt {string} The string to copy to clipboard
    */
-  worker.port.on('passbolt.clipboard.copy', function (txt) {
-    clipboardController.copy(txt);
+  worker.port.on('passbolt.clipboard.copy', function (requestId, txt) {
+    var clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
+    clipboardWorker.port.emit('passbolt.clipboard-iframe.copy', txt);
+    worker.port.emit(requestId, 'SUCCESS');
   });
 
 };

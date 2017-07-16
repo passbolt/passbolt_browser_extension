@@ -7,11 +7,10 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var masterPasswordController = require('../controller/masterPasswordController');
-var clipboardController = require('../controller/clipboardController');
 var app = require('../app');
 var __ = require('../sdk/l10n').get;
 var Worker = require('../model/worker');
-const { Promise, defer } = require('../sdk/core/promise');
+const Promise = require('../sdk/core/promise').Promise;
 
 var Keyring = require('../model/keyring').Keyring;
 var Crypto = require('../model/crypto').Crypto;
@@ -221,7 +220,6 @@ var listen = function (worker) {
             }
           });
         }
-
         return Promise.all(promises);
       })
 
@@ -255,7 +253,7 @@ var listen = function (worker) {
 
     for(var i in aros) {
       var aroId = aros[i].User ? aros[i].User.id : aros[i].Group.id;
-      if(aroId == removedAroId) {
+      if(aroId === removedAroId) {
         aros.splice(i, 1);
       }
     }
@@ -264,9 +262,9 @@ var listen = function (worker) {
   });
 
   /*
-   * Decrypt a given armored string and store it in the clipboard.
+   * Decrypt a given armored string
    *
-   * @listens passbolt.app.decrypt-copy
+   * @listens passbolt.app.decrypt
    * @param requestId {uuid} The request identifier
    * @param armored {string} The armored secret
    */
@@ -275,25 +273,21 @@ var listen = function (worker) {
 
     // Master password required to decrypt a secret.
     masterPasswordController.get(worker)
-
-      // Once the master password retrieved, decrypt the secret.
       .then(function (masterPassword) {
+        worker.port.emit('passbolt.progress.open-dialog', 'Decrypting...');
         return crypto.decrypt(armored, masterPassword)
       })
-
-      // Once the secret is decrypted, answer to the requester.
       .then(function (decrypted) {
-        clipboardController.copy(decrypted);
-        worker.port.emit(requestId, 'SUCCESS');
+        var clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
+        clipboardWorker.port.emit('passbolt.clipboard-iframe.copy', decrypted);
+        worker.port.emit('passbolt.progress.close-dialog');
+        worker.port.emit(requestId, 'SUCCESS', decrypted);
       })
-
-      // Catch any error.
-      .then(null, function (error) {
-        worker.port.emit(requestId, 'ERROR', error);
+      .catch(function (error) {
+        worker.port.emit('passbolt.progress.close-dialog');
+        worker.port.emit(requestId, 'ERROR', error.msg);
       });
   });
 };
-
-
 
 exports.listen = listen;

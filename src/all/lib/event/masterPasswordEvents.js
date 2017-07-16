@@ -42,7 +42,7 @@ var listen = function (worker) {
       // wrong master password.
       function () {
         worker.port.emit(requestId, 'ERROR', masterPasswordRequest.attempts);
-        if (masterPasswordRequest.attempts == 3) {
+        if (masterPasswordRequest.attempts === 3) {
           masterPasswordRequest.deferred.reject();
         }
       });

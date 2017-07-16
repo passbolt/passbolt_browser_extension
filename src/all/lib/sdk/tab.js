@@ -25,7 +25,9 @@ var Tab = function(tab) {
   // setup on removed event
   this._onTabRemoved = function (tabId) {
     if(_this.id == tabId) {
-      chrome.tabs.onRemoved.removeListener(_this.onTabRemoved);
+      // if (chrome.tabs.onRemoved.hasListener(_this.onTabRemoved)) {
+      //   chrome.tabs.onRemoved.removeListener(_this.onTabRemoved);
+      // }
       _this.triggerEvent('removed', tab);
     }
   };

@@ -59,6 +59,7 @@ pageMods.Setup.init();
 
 // Other pagemods active all the time
 // but triggered by App or Auth
+pageMods.File.init();
 pageMods.Clipboard.init();
 pageMods.PassboltAuthForm.init();
 pageMods.MasterPasswordDialog.init();

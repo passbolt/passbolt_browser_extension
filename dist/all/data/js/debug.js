@@ -39,8 +39,6 @@ $(function () {
       .always(initKeysSection)
       // Init the localstorage section.
       .always(initLocalStorageSection)
-      // Init the browser preferences section.
-      //.then(initBrowserPreferencesSection)
       // Init event listeners.
       .always(initEventListeners)
       // Init test profiles dropdown.
@@ -174,27 +172,6 @@ $(function () {
   };
 
   /**
-   * Init browser preferences section
-   */
-  var initBrowserPreferencesSection = function () {
-    return passbolt.request('passbolt.debug.browser.readPreference', 'browser.download.dir')
-      .then(function (downloadDir) {
-        passbolt.request('passbolt.debug.browser.readPreference', "browser.download.lastDir")
-          .then(function (downloadLastDir) {
-            passbolt.request('passbolt.file.getPreferredDownloadDirectory')
-              .then(function (preferredDownloadDir) {
-                var pref = {
-                  downloadDir: downloadDir,
-                  downloadLastDir: downloadLastDir,
-                  preferredDownloadDirectory: preferredDownloadDir
-                };
-                $('#browserPreferences').html(JSON.stringify(pref, undefined, 2));
-              });
-          });
-      });
-  };
-
-  /**
    *
    * @returns {*}
    */
@@ -261,7 +238,7 @@ $(function () {
    * Handle browse private key file button click.
    */
   var onBrowsePrivateKeyFile = function () {
-    passbolt.request('passbolt.file.prompt')
+    passbolt.file.get()
       .then(function (key) {
         $myKeyAscii.val(key);
       });
@@ -271,7 +248,8 @@ $(function () {
    * Handle browse server public key file button click.
    */
   var onBrowseServerPublicKeyFile = function () {
-    passbolt.request('passbolt.file.prompt')
+    // passbolt.request('passbolt.file.prompt')
+    passbolt.file.get()
       .then(function (key) {
         $serverKeyAscii.val(key);
       });

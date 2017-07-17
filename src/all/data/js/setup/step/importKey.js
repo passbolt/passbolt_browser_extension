@@ -136,7 +136,8 @@ passbolt.setup.steps = passbolt.setup.steps || {};
    * @returns {promise}
    */
   step.browseKey = function () {
-    return passbolt.request('passbolt.file.prompt')
+    // return passbolt.request('passbolt.file.prompt')
+    return passbolt.file.get()
       .then(function (data) {
           step.data.privateKeyArmored = data;
           return data;

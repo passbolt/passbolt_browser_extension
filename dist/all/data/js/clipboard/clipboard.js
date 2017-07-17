@@ -23,9 +23,9 @@ var passbolt = passbolt || {};
   };
 
   /**
-   * Create secure clipboard iframe
-   * @private
-   */
+  * Create secure clipboard iframe
+  * @private
+  */
   clipboard._createIframe = function () {
     var iframeId = clipboard.iframeId;
     var iframeUrl = chrome.runtime.getURL('data/' + iframeId + '.html') + '?passbolt=' + iframeId;
@@ -41,9 +41,12 @@ var passbolt = passbolt || {};
   /**
    * Delete secure clipboard iframe
    */
-   clipboard._deleteIframe = function () {
+  clipboard._deleteIframe = function () {
     $('#' + clipboard.iframeId).remove();
-   };
+  };
+
+  // init by default
+  clipboard.init();
 
   /* ==================================================================================
    *  Main
@@ -72,7 +75,6 @@ var passbolt = passbolt || {};
     passbolt.clipboard.copy(event.detail.data, event.detail);
   });
 
-  clipboard.init();
   passbolt.clipboard = clipboard;
 
 })(passbolt);

@@ -60,7 +60,7 @@ var listen = function (worker) {
   });
 
   /*
-   * Get the user private key.
+   * Get the user private key object
    *
    * @listens passbolt.keyring.private.get
    * @param requestId {uuid} The request identifier
@@ -72,6 +72,23 @@ var listen = function (worker) {
     } else {
       worker.port.emit(requestId, 'ERROR');
     }
+  });
+
+  /*
+   * Get the user public key in armored format
+   *
+   * @listens passbolt.keyring.public.get
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.keyring.public.get_armored', function (requestId) {
+    var info = keyring.findPrivate();
+    if (typeof info !== 'undefined') {
+      var publicKeyArmored = keyring.extractPublicKey(info.key);
+      if (typeof publicKeyArmored !== 'undefined') {
+        return worker.port.emit(requestId, 'SUCCESS', publicKeyArmored);
+      }
+    }
+    worker.port.emit(requestId, 'ERROR');
   });
 
   /*
@@ -226,7 +243,6 @@ var listen = function (worker) {
    * @param filename {string} The filename to use for the downloadable file
    */
   worker.port.on('passbolt.keyring.key.backup', function (requestId, key, filename) {
-
     if (filename == undefined) {
       filename = 'passbolt.asc';
     }
@@ -235,7 +251,7 @@ var listen = function (worker) {
       filename += '.txt';
     }
 
-    fileController.saveFile(filename, key)
+    fileController.saveFile(filename, key, worker.tab.id)
       .then(function () {
         worker.port.emit(requestId, 'SUCCESS');
       }, function () {

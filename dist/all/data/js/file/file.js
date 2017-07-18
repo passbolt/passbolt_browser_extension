@@ -10,7 +10,7 @@ var passbolt = passbolt || {};
   /* ==================================================================================
    *  Create / Delete iframe
    * ================================================================================== */
-  var file = {
+  passbolt.file = {
     iframeId: 'passbolt-iframe-file'
   };
 
@@ -18,16 +18,16 @@ var passbolt = passbolt || {};
    * Init
    * @private
    */
-  file._init = function () {
-    file._createIframe();
+  passbolt.file.init = function () {
+    passbolt.file._createIframe();
   };
 
   /**
-   * Create secure clipboard iframe
+   * Create iframe
    * @private
    */
-  file._createIframe = function () {
-    var iframeId = file.iframeId;
+  passbolt.file._createIframe = function () {
+    var iframeId = passbolt.file.iframeId;
     var iframeUrl = chrome.runtime.getURL('data/' + iframeId + '.html') + '?passbolt=' + iframeId;
     var $iframe = $('<iframe/>', {
       id: iframeId,
@@ -39,10 +39,10 @@ var passbolt = passbolt || {};
   };
 
   /**
-   * Delete secure clipboard iframe
+   * Delete iframe
    */
-  clipboard._deleteIframe = function () {
-    $('#' + clipboard.iframeId).remove();
+  passbolt.file._deleteIframe = function () {
+    $('#' + passbolt.file.iframeId).remove();
   };
 
   /* ==================================================================================
@@ -82,7 +82,6 @@ var passbolt = passbolt || {};
     return defer;
   };
 
-  file.init();
-  passbolt.file = file;
+  passbolt.file.init();
 
 })(passbolt);

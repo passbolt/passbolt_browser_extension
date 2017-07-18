@@ -4,21 +4,21 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var __ = require('../sdk/l10n').get;
 const defer = require('../sdk/core/promise').defer;
+var Worker = require('../model/worker');
 
 /**
  * Save file on disk using download
  *
  * @param filename
  * @param content
+ * @param tabid
  * @return {promise}
  */
 function saveFile(filename, content, tabid) {
   var deferred = defer();
-
-  var clipboardWorker = Worker.get('FileIframe', tabid);
-  clipboardWorker.port.emit('passbolt.file-iframe.copy', txt);
+  var fileWorker = Worker.get('FileIframe', tabid);
+  fileWorker.port.emit('passbolt.file-iframe.download', filename, content);
   deferred.resolve();
   return deferred.promise;
 }

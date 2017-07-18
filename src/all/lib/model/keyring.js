@@ -349,7 +349,9 @@ Keyring.prototype.findPublic = function (userId) {
  * @returns {OpenPgpKey}
  */
 Keyring.prototype.findPrivate = function (userId) {
-  userId = userId || Keyring.MY_KEY_ID;
+  if (typeof userId === 'undefined') {
+    userId = Keyring.MY_KEY_ID;
+  }
   var privateKeys = Keyring.getPrivateKeys();
   return privateKeys[userId];
 };

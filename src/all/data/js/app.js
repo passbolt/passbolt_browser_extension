@@ -251,30 +251,25 @@ var passbolt = passbolt || {};
   // Listen when the user requests a backup of their private key.
   window.addEventListener('passbolt.settings.download_private_key', function () {
     passbolt.request('passbolt.keyring.private.get')
-      .then(function (key) {
-        return passbolt.request('passbolt.keyring.key.backup', key.key, 'passbolt_private.asc')
+      .then(function(key) {
+        return passbolt.request('passbolt.keyring.key.backup', key.key, 'passbolt_private.asc');
       })
       .then(function () {
         passbolt.message.emitToPage('passbolt_notify', {status: 'success', title: 'download_private_key_success'});
-      })
-      .catch(function() {
+      }, function() {
         passbolt.message.emitToPage('passbolt_notify', {status: 'error', title: 'download_private_key_error'});
       });
   });
 
   // Listen when the user requests a backup of their public key.
   window.addEventListener('passbolt.settings.download_public_key', function () {
-    passbolt.request('passbolt.keyring.private.get')
-      .then(function (key) {
-        return passbolt.request('passbolt.keyring.public.extract', key.key);
-      })
+    passbolt.request('passbolt.keyring.public.get_armored')
       .then(function (publicKeyArmored) {
         return passbolt.request('passbolt.keyring.key.backup', publicKeyArmored, 'passbolt_public.asc')
       })
       .then(function () {
         passbolt.message.emitToPage('passbolt_notify', {status: 'success', title: 'download_public_key_success'});
-      })
-      .catch(function() {
+      },function() {
         passbolt.message.emitToPage('passbolt_notify', {status: 'error', title: 'download_public_key_error'});
       });
   });

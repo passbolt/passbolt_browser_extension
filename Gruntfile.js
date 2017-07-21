@@ -18,7 +18,9 @@ module.exports = function(grunt) {
 		dist_data: 'dist/all/data/',
     firefox: 'dist/firefox/',
     chrome: 'dist/chrome/',
-		src: 'src/all/',
+    src: 'src/all/',
+    src_firefox: 'src/firefox/',
+    src_chrome: 'src/chrome/',
 		src_addon: 'src/all/lib/',
 		src_addon_vendors: 'src/all/lib/vendors/',
 		src_content_vendors: 'src/all/data/vendors/',
@@ -40,16 +42,16 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('default', ['bundle']);
   grunt.registerTask('bundle', ['browserify:vendors', 'browserify:app']);
-	grunt.registerTask('pre-dist', ['copy:data', 'copy:vendors', 'copy:others', 'copy:styleguide']);
+	grunt.registerTask('pre-dist', ['copy:data', 'copy:vendors', 'copy:locale', 'copy:styleguide']);
 
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
   grunt.registerTask('build-firefox', ['clean', 'build-firefox-debug', 'build-firefox-prod']);
-  grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'bundle', 'shell:build_firefox_debug']);
-  grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default', 'bundle', 'shell:build_firefox_prod']);
+  grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox','bundle', 'shell:build_firefox_debug']);
+  grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default','copy:manifest_firefox', 'bundle', 'shell:build_firefox_prod']);
 
   grunt.registerTask('build-chrome', ['clean', 'build-chrome-debug', 'build-chrome-prod']);
-  grunt.registerTask('build-chrome-debug', ['pre-dist', 'copy:config_debug', 'bundle', 'shell:build_chrome_debug']);
-  grunt.registerTask('build-chrome-prod', ['pre-dist', 'copy:config_default', 'bundle', 'shell:build_chrome_prod']);
+  grunt.registerTask('build-chrome-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_chrome', 'bundle', 'shell:build_chrome_debug']);
+  grunt.registerTask('build-chrome-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_chrome', 'bundle', 'shell:build_chrome_prod']);
 
 	/**
 	 * Main grunt tasks configuration
@@ -87,14 +89,13 @@ module.exports = function(grunt) {
 		 * Copy operations
 		 */
 		copy: {
-      // switch config file to debug
+      // switch config files to debug or production
       config_debug: {
         files: [{
 					expand: true, cwd: path.src_addon + 'config', src: 'config.json.debug', dest: path.src_addon + 'config',
 					rename: function(dest, src) { return dest + '/config.json'; }
 				}]
       },
-      // switch config file to production
       config_default: {
         files: [{
 					expand: true, cwd: path.src_addon + 'config', src: 'config.json.default', dest: path.src_addon + 'config',
@@ -107,13 +108,23 @@ module.exports = function(grunt) {
 					{expand: true, cwd: path.src + 'data', src: '**', dest: path.dist + 'data'}
 				]
 			},
-			// copy src files to dist, but only those needed
-			others: {
+			// copy locale files to dist
+			locale: {
 				files: [
 					{expand: true, cwd: path.src + 'locale', src: '**', dest: path.dist + 'locale'},
-					{expand: true, cwd: path.src, src: 'manifest.json', dest: path.dist}
 				]
 			},
+      // switch manifest file to firefox or chrome
+      manifest_firefox: {
+        files: [{
+          expand: true, cwd: path.src_firefox , src: 'manifest.json', dest: path.dist,
+        }]
+      },
+      manifest_chrome: {
+        files: [{
+          expand: true, cwd: path.src_chrome, src: 'manifest.json', dest: path.dist,
+        }]
+      },
 			// copy node_modules where needed in addon or content code vendors folder
 			vendors: {
 				files: [
@@ -121,7 +132,7 @@ module.exports = function(grunt) {
 					{expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js','openpgp.worker.js'], dest: path.src_addon_vendors},
 					{expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js','openpgp.worker.js'], dest: path.dist_vendors},
 					// jquery
-					{expand: true, cwd: path.node_modules + 'jquery/dist', src: '*.min.js', dest: path.src_content_vendors},
+					{expand: true, cwd: path.node_modules + 'jquery/dist', src: 'jquery.min.js', dest: path.src_content_vendors},
 					// jssha
 					{expand: true, cwd: path.node_modules + 'jssha/src', src: 'sha.js', dest: path.src_addon_vendors},
 					{expand: true, cwd: path.node_modules + 'jssha/src', src: 'sha.js', dest: path.src_content_vendors},
@@ -242,8 +253,7 @@ module.exports = function(grunt) {
           stderr: false
         },
         command: [
-          'zip -q -1 -r ' + path.dist + 'passbolt-' + pkg.version + '-debug.zip ' + path.chrome,
-          'mv '+ path.dist + 'passbolt-' + pkg.version + '-debug.zip ' + path.chrome + '.',
+          'zip -q -1 -r ' + path.chrome + 'passbolt-' + pkg.version + '-debug.zip ' + path.dist,
           './node_modules/.bin/crx pack ' + path.dist + ' -p key.pem -o ' + path.chrome + 'passbolt-' + pkg.version + '.crx ',
           "echo '\nZip and Crx files generated in " + path.chrome + "'"
         ].join('&&')

@@ -1,7 +1,7 @@
 {
-"extensionId": "passbolt@passbolt.com",
-"extensionBasePath": "resource://passbolt-at-passbolt-dot-com",
-"baseUrl": "https://demo.passbolt.com",
-"setupBootstrapRegex": "(.*)\/setup\/(install|recover)\/([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12})\/([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12})",
-"debug": true
+    "extensionId": "passbolt@passbolt.com",
+    "extensionBasePath": "resource://passbolt-at-passbolt-dot-com",
+    "baseUrl": "https://demo.passbolt.com",
+    "setupBootstrapRegex": "(.*)\/setup\/(install|recover)\/([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12})\/([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12})",
+    "debug": false
 }

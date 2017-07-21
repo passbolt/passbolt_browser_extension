@@ -1,5 +1,5 @@
 {
-  "name": "passbolt_browser_extension",
+  "name": "passbolt_extension",
   "version": "1.6.2",
   "license": "AGPL-3.0",
   "description": "Passbolt web extension for the open source password manager for teams",
@@ -15,11 +15,13 @@
     "jsonq": "~1.1.0"
   },
   "devDependencies": {
+    "crx": "^3.2.1",
     "grunt": "^1.0.1",
     "grunt-browserify": "^5.0.0",
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-watch": "^1.0.0",
-    "grunt-shell": "^2.1.0"
+    "grunt-shell": "^2.1.0",
+    "web-ext": "^1.10.1"
   }
 }

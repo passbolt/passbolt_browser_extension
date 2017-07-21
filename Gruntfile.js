@@ -16,11 +16,18 @@ module.exports = function(grunt) {
 		dist: 'dist/all/',
 		dist_vendors: 'dist/all/vendors/',
 		dist_data: 'dist/all/data/',
+    firefox: 'dist/firefox/',
+    chrome: 'dist/chrome/',
 		src: 'src/all/',
 		src_addon: 'src/all/lib/',
 		src_addon_vendors: 'src/all/lib/vendors/',
 		src_content_vendors: 'src/all/data/vendors/',
 	};
+
+  /**
+   * Import package.json file content
+   */
+  var pkg = grunt.file.readJSON('package.json');
 
 	/**
 	 * Load and enable Tasks
@@ -31,8 +38,18 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-browserify');
 
-	grunt.registerTask('default', ['clean', 'copy', 'build']);
-	grunt.registerTask('build', ['browserify:vendors', 'browserify:app']);
+	grunt.registerTask('default', ['bundle']);
+  grunt.registerTask('bundle', ['browserify:vendors', 'browserify:app']);
+	grunt.registerTask('pre-dist', ['copy:data', 'copy:vendors', 'copy:others', 'copy:styleguide']);
+
+  grunt.registerTask('build', ['build-firefox', 'build-chrome']);
+  grunt.registerTask('build-firefox', ['clean', 'build-firefox-debug', 'build-firefox-prod']);
+  grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'bundle', 'shell:build_firefox_debug']);
+  grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default', 'bundle', 'shell:build_firefox_prod']);
+
+  grunt.registerTask('build-chrome', ['clean', 'build-chrome-debug', 'build-chrome-prod']);
+  grunt.registerTask('build-chrome-debug', ['pre-dist', 'copy:config_debug', 'bundle', 'shell:build_chrome_debug']);
+  grunt.registerTask('build-chrome-prod', ['pre-dist', 'copy:config_default', 'bundle', 'shell:build_chrome_prod']);
 
 	/**
 	 * Main grunt tasks configuration
@@ -61,7 +78,7 @@ module.exports = function(grunt) {
 		 */
 		clean: {
 			data: [path.dist_data],
-			vendors: [path.dist_vendors], // TODO PASSBOLT add clean vendors in src data and lib
+			vendors: [path.dist_vendors],
 			style: [path.dist_data + 'img', path.dist + 'icons', path.dist_data + 'css'],
 			others: [path.dist + 'locale', path.dist + 'manifest.json']
 		},
@@ -70,6 +87,20 @@ module.exports = function(grunt) {
 		 * Copy operations
 		 */
 		copy: {
+      // switch config file to debug
+      config_debug: {
+        files: [{
+					expand: true, cwd: path.src_addon + 'config', src: 'config.json.debug', dest: path.src_addon + 'config',
+					rename: function(dest, src) { return dest + '/config.json'; }
+				}]
+      },
+      // switch config file to production
+      config_default: {
+        files: [{
+					expand: true, cwd: path.src_addon + 'config', src: 'config.json.default', dest: path.src_addon + 'config',
+					rename: function(dest, src) {return dest + '/config.json';}
+				}]
+      },
 			// copy data
 			data: {
 				files: [
@@ -167,7 +198,56 @@ module.exports = function(grunt) {
 		 */
 		shell: {
 			options: {stderr: false},
-			// TODO. add the shell commands
+
+      /**
+       * Firefox
+       */
+      build_firefox_debug: {
+        options: {
+          stderr: false
+        },
+        command: [
+					'./node_modules/.bin/web-ext build -s='+ path.dist + ' -a='+ path.firefox + '  -o=true',
+					'mv '+ path.firefox + pkg.name + '-' + pkg.version + '.zip ' + path.firefox + 'passbolt-' + pkg.version + '-debug.zip ',
+          'ln -fs ' + 'passbolt-' + pkg.version + '-debug.zip ' + path.firefox + 'passbolt-latest@passbolt.com.zip',
+          "echo '\nMoved to " + path.firefox + "passbolt-" + pkg.version + "-debug.zip'"
+        ].join('&&')
+      },
+      build_firefox_prod: {
+        options: {
+          stderr: false
+        },
+        command: [
+          './node_modules/.bin/web-ext build -s='+ path.dist + ' -a='+ path.firefox + '  -o=true',
+          'mv '+ path.firefox + pkg.name + '-' + pkg.version + '.zip ' + path.firefox + '/passbolt-' + pkg.version + '.zip ',
+          "echo '\nMoved to " + path.firefox + "passbolt-" + pkg.version + ".zip'"
+        ].join('&&')
+      },
+
+      /**
+       * Chrome
+       */
+      build_chrome_debug: {
+        options: {
+          stderr: false
+        },
+        command: [
+          './node_modules/.bin/crx pack ' + path.dist + ' -p key.pem -o ' + path.chrome + '/passbolt-' + pkg.version + '-debug.crx ',
+          'rm '+ path.chrome + 'passbolt-latest@passbolt.com.crx',
+          'ln -fs passbolt-' + pkg.version + '-debug.crx ' + path.chrome + 'passbolt-latest@passbolt.com.crx'
+        ].join('&&')
+      },
+      build_chrome_prod: {
+        options: {
+          stderr: false
+        },
+        command: [
+          'zip -q -1 -r ' + path.dist + 'passbolt-' + pkg.version + '-debug.zip ' + path.chrome,
+          'mv '+ path.dist + 'passbolt-' + pkg.version + '-debug.zip ' + path.chrome + '.',
+          './node_modules/.bin/crx pack ' + path.dist + ' -p key.pem -o ' + path.chrome + 'passbolt-' + pkg.version + '.crx ',
+          "echo '\nZip and Crx files generated in " + path.chrome + "'"
+        ].join('&&')
+      }
 		},
 
 		/**

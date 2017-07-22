@@ -13,11 +13,11 @@ module.exports = function(grunt) {
 	 */
 	var path = {
 		node_modules: 'node_modules/',
-		dist: 'dist/all/',
-		dist_vendors: 'dist/all/vendors/',
-		dist_data: 'dist/all/data/',
-    firefox: 'dist/firefox/',
-    chrome: 'dist/chrome/',
+		build: 'build/',
+		build_vendors: 'build/vendors/',
+		build_data: 'build/data/',
+    dist_firefox: 'dist/firefox/',
+    dist_chrome: 'dist/chrome/',
     src: 'src/all/',
     src_firefox: 'src/firefox/',
     src_chrome: 'src/chrome/',
@@ -42,7 +42,7 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('default', ['bundle']);
   grunt.registerTask('bundle', ['browserify:vendors', 'browserify:app']);
-	grunt.registerTask('pre-dist', ['copy:data', 'copy:vendors', 'copy:locale', 'copy:styleguide']);
+	grunt.registerTask('pre-dist', ['copy:background_page', 'copy:data', 'copy:vendors', 'copy:locale', 'copy:styleguide']);
 
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
   grunt.registerTask('build-firefox', ['clean', 'build-firefox-debug', 'build-firefox-prod']);
@@ -67,11 +67,11 @@ module.exports = function(grunt) {
 		browserify: {
 			vendors: {
 				src: [path.src_addon + 'vendors.js'],
-				dest: path.dist + 'vendors.min.js'
+				dest: path.build + 'vendors.min.js'
 			},
 			app: {
 				src: [path.src_addon + 'index.js'],
-				dest: path.dist + 'index.min.js'
+				dest: path.build + 'index.min.js'
 			}
 		},
 
@@ -79,10 +79,10 @@ module.exports = function(grunt) {
 		 * Clean operations
 		 */
 		clean: {
-			data: [path.dist_data],
-			vendors: [path.dist_vendors],
-			style: [path.dist_data + 'img', path.dist + 'icons', path.dist_data + 'css'],
-			others: [path.dist + 'locale', path.dist + 'manifest.json']
+			data: [path.build_data],
+			vendors: [path.build_vendors],
+			style: [path.build_data + 'img', path.build + 'icons', path.build_data + 'css'],
+			others: [path.build + 'locale', path.build + 'manifest.json']
 		},
 
 		/**
@@ -102,27 +102,33 @@ module.exports = function(grunt) {
 					rename: function(dest, src) {return dest + '/config.json';}
 				}]
       },
+      // copy background page
+      background_page: {
+        files: [
+          {expand: true, cwd: path.src_addon, src: 'index.html', dest: path.build }
+        ]
+      },
 			// copy data
 			data: {
 				files: [
-					{expand: true, cwd: path.src + 'data', src: '**', dest: path.dist + 'data'}
+					{expand: true, cwd: path.src + 'data', src: '**', dest: path.build + 'data'}
 				]
 			},
 			// copy locale files to dist
 			locale: {
 				files: [
-					{expand: true, cwd: path.src + 'locale', src: '**', dest: path.dist + 'locale'},
+					{expand: true, cwd: path.src + 'locale', src: '**', dest: path.build + 'locale'},
 				]
 			},
       // switch manifest file to firefox or chrome
       manifest_firefox: {
         files: [{
-          expand: true, cwd: path.src_firefox , src: 'manifest.json', dest: path.dist,
+          expand: true, cwd: path.src_firefox , src: 'manifest.json', dest: path.build,
         }]
       },
       manifest_chrome: {
         files: [{
-          expand: true, cwd: path.src_chrome, src: 'manifest.json', dest: path.dist,
+          expand: true, cwd: path.src_chrome, src: 'manifest.json', dest: path.build,
         }]
       },
 			// copy node_modules where needed in addon or content code vendors folder
@@ -130,7 +136,7 @@ module.exports = function(grunt) {
 				files: [
 					// openpgpjs
 					{expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js','openpgp.worker.js'], dest: path.src_addon_vendors},
-					{expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js','openpgp.worker.js'], dest: path.dist_vendors},
+					{expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js','openpgp.worker.js'], dest: path.build_vendors},
 					// jquery
 					{expand: true, cwd: path.node_modules + 'jquery/dist', src: 'jquery.min.js', dest: path.src_content_vendors},
 					// jssha
@@ -164,41 +170,41 @@ module.exports = function(grunt) {
 					nonull: true,
 					cwd: path.node_modules + 'passbolt-styleguide/src/img/avatar',
 					src: ['user.png'],
-					dest: path.dist_data + 'img/avatar',
+					dest: path.build_data + 'img/avatar',
 					expand: true
 				}, {
 					// Controls
 					nonull: true,
 					cwd: path.node_modules + 'passbolt-styleguide/src/img/controls',
 					src: ['colorpicker/**', 'infinite-bar.gif', 'loading.gif'],
-					dest: path.dist_data + 'img/controls',
+					dest: path.build_data + 'img/controls',
 					expand: true
 				}, {
 					// Icons
 					nonull: true,
 					cwd: path.node_modules + 'passbolt-styleguide/src/img/logo',
 					src: ['icon-19.png', 'icon-20_white.png', 'icon-48.png', 'icon-48_white.png', 'logo.png', 'logo@2x.png'],
-					dest: path.dist_data + 'img/logo',
+					dest: path.build_data + 'img/logo',
 					expand: true
 				}, {
 					// Branding
 					nonull: true,
 					cwd: path.node_modules + 'passbolt-styleguide/src/img/logo',
 					src: ['icon-16.png', 'icon-19.png', 'icon-32.png', 'icon-48.png', 'icon-64.png', 'icon-128.png'],
-					dest: path.dist + 'icons',
+					dest: path.build + 'icons',
 					expand: true
 				}, {
 					// Third party logos
 					nonull: true,
 					cwd: path.node_modules + 'passbolt-styleguide/src/img/third_party',
 					src: ['ChromeWebStore.png', 'firefox_logo.png', 'gnupg_logo.png', 'gnupg_logo_disabled.png'],
-					dest: path.dist_data + 'img/third_party',
+					dest: path.build_data + 'img/third_party',
 					expand: true
 				}, {
 					// CSS files
 					cwd: path.node_modules + 'passbolt-styleguide/build/css',
 					src: ['config_debug_webext.min.css', 'external.min.css', 'main_webext.min.css', 'setup_webext.min.css'],
-					dest: path.dist_data + 'css',
+					dest: path.build_data + 'css',
 					expand: true
 				}]
 			}
@@ -218,10 +224,11 @@ module.exports = function(grunt) {
           stderr: false
         },
         command: [
-					'./node_modules/.bin/web-ext build -s='+ path.dist + ' -a='+ path.firefox + '  -o=true',
-					'mv '+ path.firefox + pkg.name + '-' + pkg.version + '.zip ' + path.firefox + 'passbolt-' + pkg.version + '-debug.zip ',
-          'ln -fs ' + 'passbolt-' + pkg.version + '-debug.zip ' + path.firefox + 'passbolt-latest@passbolt.com.zip',
-          "echo '\nMoved to " + path.firefox + "passbolt-" + pkg.version + "-debug.zip'"
+					'./node_modules/.bin/web-ext build -s='+ path.build + ' -a='+ path.dist_firefox + '  -o=true',
+					'mv '+ path.dist_firefox + pkg.name + '-' + pkg.version + '.zip ' + path.dist_firefox + 'passbolt-' + pkg.version + '-debug.zip ',
+          'rm -f '+ path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
+          'ln -fs ' + 'passbolt-' + pkg.version + '-debug.zip ' + path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
+          "echo '\nMoved to " + path.dist_firefox + "passbolt-" + pkg.version + "-debug.zip'"
         ].join('&&')
       },
       build_firefox_prod: {
@@ -229,9 +236,9 @@ module.exports = function(grunt) {
           stderr: false
         },
         command: [
-          './node_modules/.bin/web-ext build -s='+ path.dist + ' -a='+ path.firefox + '  -o=true',
-          'mv '+ path.firefox + pkg.name + '-' + pkg.version + '.zip ' + path.firefox + '/passbolt-' + pkg.version + '.zip ',
-          "echo '\nMoved to " + path.firefox + "passbolt-" + pkg.version + ".zip'"
+          './node_modules/.bin/web-ext build -s='+ path.build + ' -a='+ path.dist_firefox + '  -o=true',
+          'mv '+ path.dist_firefox + pkg.name + '-' + pkg.version + '.zip ' + path.dist_firefox + '/passbolt-' + pkg.version + '.zip ',
+          "echo '\nMoved to " + path.dist_firefox + "passbolt-" + pkg.version + ".zip'"
         ].join('&&')
       },
 
@@ -243,9 +250,9 @@ module.exports = function(grunt) {
           stderr: false
         },
         command: [
-          './node_modules/.bin/crx pack ' + path.dist + ' -p key.pem -o ' + path.chrome + '/passbolt-' + pkg.version + '-debug.crx ',
-          'rm '+ path.chrome + 'passbolt-latest@passbolt.com.crx',
-          'ln -fs passbolt-' + pkg.version + '-debug.crx ' + path.chrome + 'passbolt-latest@passbolt.com.crx'
+          './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chrome + 'passbolt-' + pkg.version + '-debug.crx ',
+          'rm -f '+ path.dist_chrome + 'passbolt-latest@passbolt.com.crx',
+          'ln -fs passbolt-' + pkg.version + '-debug.crx ' + path.dist_chrome + 'passbolt-latest@passbolt.com.crx'
         ].join('&&')
       },
       build_chrome_prod: {
@@ -253,9 +260,9 @@ module.exports = function(grunt) {
           stderr: false
         },
         command: [
-          'zip -q -1 -r ' + path.chrome + 'passbolt-' + pkg.version + '-debug.zip ' + path.dist,
-          './node_modules/.bin/crx pack ' + path.dist + ' -p key.pem -o ' + path.chrome + 'passbolt-' + pkg.version + '.crx ',
-          "echo '\nZip and Crx files generated in " + path.chrome + "'"
+          'zip -q -1 -r ' + path.dist_chrome + 'passbolt-' + pkg.version + '-debug.zip ' + path.build,
+          './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chrome + 'passbolt-' + pkg.version + '.crx ',
+          "echo '\nZip and Crx files generated in " + path.dist_chrome + "'"
         ].join('&&')
       }
 		},

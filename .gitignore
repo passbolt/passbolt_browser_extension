@@ -10,6 +10,7 @@ data/less
 # Plugin build       #
 ######################
 # passbolt-firefox-addon.xpi
+/build
 /bootstrap.js
 *.pem
 

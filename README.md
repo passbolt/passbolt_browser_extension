@@ -64,18 +64,22 @@ This is just a quick getting started guide, for more information and productivit
 ## Prerequisite
 
 You will need ```node```, ```grunt``` and the dependencies listed in ```packages.json```.
-You will also need ```web-ext``` (for firefox), ```crx``` (for chrome).
 ```
 git clone git@github.com:passbolt/passbolt_browser_extension.git
 cd passbolt_browser_extension
 npm install
+```
+
+For convenience you can also install ```web-ext``` (for firefox), ```crx``` (for chrome) globally,
+otherwise can can be found in ```node_modules```.
+```
 sudo npm install web-ext -g
 sudo npm install crx -g
 ```
 
-## Building the source
+## Quick bundling the dist/all source
 
-The non-minified source code is located in ```/src```. It can be built as follow:
+The non-minified source code is located in ```/src```. It can be 'bundled' ```to dist/all``` as follow:
 ```
 grunt
 ```
@@ -86,7 +90,8 @@ you can use the grunt watch task:
 grunt watch
 ```
 
-## Test a local version of the plugin (firefox)
+## Test a local version of the plugin
+### Firefox
 
 To launch an instance of Firefox with your local version of the add-on installed.
 ```
@@ -96,6 +101,34 @@ web-ext run
 
 This instance will be reloaded everytime there is a change in the /dist/all code or by pressing the ```r```
 key on the keyboard when web-ext is running.
+You can debug the application script by opening the 
+[browser console](https://developer.mozilla.org/en/docs/Tools/Browser_Console).
+
+### Chrome
+
+Go to the the extension page at [chrome://extensions/](chrome://extensions/) click on the
+'load unpacked extension' button. Point to your dist/all directory and you are good to go.
+You debug the application script by clicking on index.html in "inspect views".
+
+## Packaging the application
+
+You can build the crx or xpi (zip) packages using the following command.
+```
+grunt build
+```
+The build can be found under ```dist/chrome``` or ```dist/firefox```.
+
+## Updating the vendors or the styleguide
+
+You can update the vendors or the styleguide in the ```package.json``` and run the copy task 
+in grunt to deploy them in the appropriate places. Check the ```Gruntfile.js```
+for more information.
+```
+npm update
+grunt copy:vendors
+grunt copy:styleguide
+```
+The build can be found under ```dist/chrome``` or ```dist/firefox```.
 
 # Credits
 

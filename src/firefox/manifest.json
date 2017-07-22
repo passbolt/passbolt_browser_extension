@@ -4,6 +4,11 @@
   "short_name": "passbolt",
   "version": "1.6.2",
   "description": "Passbolt extension for the open source password manager for teams.",
+  "applications": {
+    "gecko": {
+      "id": "passbolt@passbolt.com"
+    }
+  },
   "icons": {
     "16": "icons/icon-16.png",
     "48": "icons/icon-48.png",
@@ -22,9 +27,8 @@
   },
   "permissions": [
     "activeTab",
-    "tabs",
-    "background",
     "clipboardWrite",
+    "tabs",
     "*://*/*"
   ],
   "web_accessible_resources": [

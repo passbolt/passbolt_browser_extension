@@ -107,10 +107,6 @@ var passbolt = passbolt || {};
         deferred.rejectWith(this, callbackArgs);
         //self.port.removeListener(requestId, handleResponse);
       }
-      else if (status == 'PROGRESS') {
-        //deferred.notifyWith(this, callbackArgs);
-        console.warn('progress not supported anymore');
-      }
     });
 
     // Emit the message to the addon-code.

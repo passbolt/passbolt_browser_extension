@@ -24,12 +24,14 @@
       .then(getSharedPassword)
       // Init the security token.
       .then(initSecurityToken)
-      // Init the event listeners.
-      .then(initEventsListeners)
-      // Mark the iframe container as ready.
       .then(function () {
+        // Init the event listeners.
+        initEventsListeners();
+        // Mark the iframe container as ready.
         passbolt.message.emit('passbolt.passbolt-page.remove-class', '#passbolt-iframe-password-share', 'loading');
         passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-password-share', 'ready');
+      }, function() {
+        console.log('Something went wrong when initializing share.js');
       });
   };
 

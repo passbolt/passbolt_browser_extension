@@ -39,10 +39,11 @@
    * Init all the event listeners relative to view events.
    */
   var initEventsListeners = function () {
-    $('.js-dialog-close').on('click', closeDialog);
-
-    // Listen to any progress events.
-    passbolt.message.on('passbolt.progress.update', updateProgressBar);
+    return new Promise(function(resolve, reject) {
+      $('.js-dialog-close').on('click', closeDialog);
+      passbolt.message.on('passbolt.progress.update', updateProgressBar);
+      resolve();
+    });
   };
 
   /**
@@ -81,9 +82,8 @@
       }
     }
 
-    passbolt.html.loadTemplate('body', 'data/tpl/progress/progress.ejs', 'html', {
-      title: title
-    }).then(initEventsListeners, error)
+    passbolt.html.loadTemplate('body', 'data/tpl/progress/progress.ejs', 'html', {title: title})
+      .then(initEventsListeners, error)
       .then(initProgressBar);
   };
 

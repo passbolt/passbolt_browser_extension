@@ -101,7 +101,7 @@ passbolt.html = passbolt.html || {};
 	 */
 	var getBrowserName = function () {
 		var userAgent = window.navigator.userAgent;
-		if(typeof userAgent != 'undefined' ) {
+		if(typeof userAgent !== 'undefined' ) {
 			if (userAgent.substring('Firefox') != -1 || userAgent.substring('Seamonkey') != -1) {
 				return 'firefox';
 			}

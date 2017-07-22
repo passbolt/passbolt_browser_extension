@@ -28,6 +28,8 @@
       .then(function () {
         passbolt.message.emit('passbolt.passbolt-page.remove-class', '#passbolt-iframe-master-password', 'loading');
         passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-master-password', 'ready');
+      }, function () {
+        console.error('Something went wrong when initializing masterPassword.js');
       });
   };
 
@@ -57,23 +59,21 @@
    * @returns {promise}
    */
   var stealFocus = function () {
-    var deferred = $.Deferred();
+    return new Promise(function(resolve, reject) {
+      // Ask the passbolt application to release the focus.
+      passbolt.message.emit('passbolt.passbolt-page.remove-all-focuses');
 
-    // Ask the passbolt application to release the focus.
-    passbolt.message.emit('passbolt.passbolt-page.remove-all-focuses');
-
-    // We set the focus on the first focus field.
-    var interval = setInterval(function () {
-      $focusFirstField.focus();
-      // If the focus has been set to the element, resolve the promise and
-      // continue, otherwise try again.
-      if ($focusFirstField.is(":focus")) {
-        clearInterval(interval);
-        deferred.resolve();
-      }
-    }, 10);
-
-    return deferred;
+      // We set the focus on the first focus field.
+      var interval = setInterval(function () {
+        $focusFirstField.focus();
+        // If the focus has been set to the element, resolve the promise and
+        // continue, otherwise try again.
+        if ($focusFirstField.is(":focus")) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, 10);
+    });
   };
 
   /**

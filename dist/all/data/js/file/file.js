@@ -60,26 +60,25 @@ var passbolt = passbolt || {};
    * @returns string
    */
   passbolt.file.get = function() {
-    var defer = $.Deferred();
-    var fileChooser = document.createElement('input');
-    fileChooser.type = 'file';
+    return new Promise(function(resolve, reject) {
+      var fileChooser = document.createElement('input');
+      fileChooser.type = 'file';
+      fileChooser.addEventListener('change', function () {
+        var file = fileChooser.files[0];
 
-    fileChooser.addEventListener('change', function () {
-      var file = fileChooser.files[0];
+        var reader = new FileReader();
+        reader.onload = function () {
+          var data = reader.result;
+          resolve(data);
+        };
+        reader.readAsText(file);
+        form.reset();
+      });
 
-      var reader = new FileReader();
-      reader.onload = function () {
-        var data = reader.result;
-        defer.resolve(data);
-      };
-      reader.readAsText(file);
-      form.reset();
+      var form = document.createElement('form');
+      form.appendChild(fileChooser);
+      fileChooser.click();
     });
-
-    var form = document.createElement('form');
-    form.appendChild(fileChooser);
-    fileChooser.click();
-    return defer;
   };
 
   passbolt.file.init();

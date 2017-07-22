@@ -458,52 +458,44 @@ passbolt.setup.data = passbolt.setup.data || {};
    */
   passbolt.setup._initPrepareData = function (data) {
 
-    var def = $.Deferred();
+    return new Promise(function(resolve, reject) {
+      // Are data provided by page ?
+      var dataIsProvided = passbolt.setup._initCheckData(data);
+      var defaultSetupData = {};
+      if (dataIsProvided) {
+        defaultSetupData = data;
+      }
 
-    // Are data provided by page ?
-    var dataIsProvided = passbolt.setup._initCheckData(data);
-
-    var defaultSetupData = {};
-
-    if (dataIsProvided) {
-      defaultSetupData = data;
-    }
-
-    // Check if setup was already started from the storage.
-    passbolt.request('passbolt.setup.get')
-      .then(function (storageData) {
-        if (passbolt.setup._initCheckData(storageData)) {
-          // If we are in the case where the data provided don't match
-          // the setup data we already have in storage,
-          // we flush the storage.
-          if (dataIsProvided && storageData.settings.token != defaultSetupData.settings.token) {
-            passbolt.request('passbolt.setup.flush')
-              .then(function () {
-                def.resolve(defaultSetupData);
-              });
+      // Check if setup was already started from the storage.
+      passbolt.request('passbolt.setup.get')
+        .then(function (storageData) {
+          if (passbolt.setup._initCheckData(storageData)) {
+            // If we are in the case where the data provided don't match
+            // the setup data we already have in storage,
+            // we flush the storage.
+            if (dataIsProvided && storageData.settings.token != defaultSetupData.settings.token) {
+              passbolt.request('passbolt.setup.flush')
+                .then(function () {
+                  resolve(defaultSetupData);
+                });
+            } else {
+              resolve(storageData);
+            }
+          } else if (dataIsProvided) {
+            // If data is passed and is populated, then build setup data from there.
+            resolve(defaultSetupData);
+          } else {
+            reject('Unable to retrieve setup data');
           }
-          else {
-            def.resolve(storageData);
-          }
-        }
-        // If data is passed and is populated, then build setup data from there.
-        else if (dataIsProvided) {
-          def.resolve(defaultSetupData);
-        }
-        else {
-          def.reject('Unable to retrieve setup data');
-        }
-      })
-      .then(null, function () {
-        if (dataIsProvided) {
-          def.resolve(defaultSetupData);
-        }
-        else {
-          def.reject('Unable to retrieve setup data');
-        }
-      });
-
-    return def;
+        })
+        // .then(null, function () {
+        //   if (dataIsProvided) {
+        //     resolve(defaultSetupData);
+        //   } else {
+        //     reject('Unable to retrieve setup data');
+        //   }
+        // });
+    });
   };
 
   /**

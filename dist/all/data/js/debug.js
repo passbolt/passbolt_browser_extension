@@ -36,15 +36,15 @@ $(function () {
     // Init the user section
     initUserSection()
     // Init the keys section.
-      .always(initKeysSection)
+      .then(initKeysSection)
       // Init the localstorage section.
-      .always(initLocalStorageSection)
+      .then(initLocalStorageSection)
       // Init event listeners.
-      .always(initEventListeners)
+      .then(initEventListeners)
       // Init test profiles dropdown.
-      .always(initTestProfilesSection)
+      .then(initTestProfilesSection)
       // Mark the page as ready
-      .always(function () {
+      .then(function () {
         $('.config.page').addClass('ready');
       });
   };
@@ -53,15 +53,16 @@ $(function () {
    * Initialize the user section
    */
   var initUserSection = function () {
-    var def = $.Deferred();
-    passbolt.request('passbolt.user.get')
-      .then(function (user) {
-        return updateUserForm(user);
-      })
-      .always(function () {
-        def.resolve();
-      });
-    return def;
+
+    return new Promise(function(resolve, reject) {
+      passbolt.request('passbolt.user.get')
+        .then(function (user) {
+          return updateUserForm(user);
+        })
+        .then(function () {
+          resolve();
+        });
+    });
   };
 
   /**

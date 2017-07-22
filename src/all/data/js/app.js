@@ -117,17 +117,17 @@ var passbolt = passbolt || {};
         groupUser = data.groupUser;
 
     passbolt.request('passbolt.group.edit.remove-group_user', groupUser)
-    .then(function(groupUser) {
-      passbolt.request('passbolt.group.edit.get_group_users_change_list')
-      .then(function(changeList) {
-        var change = {
-          type: 'deleted',
-          groupUser: groupUser,
-          changeList: changeList
-        };
-        passbolt.message.emitToPage('passbolt.plugin.group.edit.group_users_updated', change);
+      .then(function(groupUser) {
+        passbolt.request('passbolt.group.edit.get_group_users_change_list')
+          .then(function(changeList) {
+            var change = {
+              type: 'deleted',
+              groupUser: groupUser,
+              changeList: changeList
+            };
+            passbolt.message.emitToPage('passbolt.plugin.group.edit.group_users_updated', change);
+          });
       });
-    });
   });
 
   // A group_user is deleted, the group_user should be listed again in the autocomplete.
@@ -136,17 +136,17 @@ var passbolt = passbolt || {};
         groupUser = data.groupUser;
 
     passbolt.request('passbolt.group.edit.edit-group_user', groupUser)
-    .then(function (groupUser) {
-      passbolt.request('passbolt.group.edit.get_group_users_change_list')
-      .then(function(changeList) {
-        var change = {
-          type: 'updated',
-          groupUser: groupUser,
-          changeList: changeList
-        };
-        passbolt.message.emitToPage('passbolt.plugin.group.edit.group_users_updated', change);
+      .then(function (groupUser) {
+        passbolt.request('passbolt.group.edit.get_group_users_change_list')
+          .then(function(changeList) {
+            var change = {
+              type: 'updated',
+              groupUser: groupUser,
+              changeList: changeList
+            };
+            passbolt.message.emitToPage('passbolt.plugin.group.edit.group_users_updated', change);
+          });
       });
-    });
   });
 
   // When a group is loaded during an edit operation.

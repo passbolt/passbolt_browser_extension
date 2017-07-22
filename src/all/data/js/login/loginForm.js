@@ -28,6 +28,8 @@
       .then(function () {
         passbolt.message.emit('passbolt.auth.remove-class', '#passbolt-iframe-login-form', 'loading');
         passbolt.message.emit('passbolt.auth.add-class', '#passbolt-iframe-login-form', 'ready');
+      }, function() {
+        console.error('Something went wrong when initializing loginForm.js');
       });
   };
 

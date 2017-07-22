@@ -92,33 +92,28 @@ passbolt.setup.steps = passbolt.setup.steps || {};
    * @returns {promise}
    */
   step.submit = function () {
-    // Deferred.
-    var def = $.Deferred();
+    return new Promise(function(resolve, reject) {
+      // Set submit form as processing.
+      passbolt.setup.setActionState('submit', 'processing');
 
-    // Set submit form as processing.
-    passbolt.setup.setActionState('submit', 'processing');
-
-    // Set domain in the settings.
-    step.setDomain(step._data.domain)
-
-      // If domain was set succesfully, attempt to import the server key.
-      .then(function () {
-        return step.setServerKey(step._data.serverKeyInfo.key);
-      })
-
-      // If server key was imported successfully, resolve submit.
-      .then(function () {
-        setTimeout(function () {
-          def.resolve();
-        }, 1000)
-      })
-
-      // In case of error,  display fatal error.
-      .then(null, function (msg) {
-        passbolt.setup.fatalError(msg);
-      });
-
-    return def;
+      // Set domain in the settings.
+      step.setDomain(step._data.domain)
+        .then(function () {
+          // If domain was set succesfully, attempt to import the server key.
+          return step.setServerKey(step._data.serverKeyInfo.key);
+        })
+        .then(function () {
+          // If server key was imported successfully, resolve submit.
+          setTimeout(function () {
+            resolve();
+          }, 1000)
+        })
+        // In case of error,  display fatal error.
+        .then(null, function (msg) {
+          passbolt.setup.fatalError(msg);
+          reject();
+        });
+    });
   };
 
   /**

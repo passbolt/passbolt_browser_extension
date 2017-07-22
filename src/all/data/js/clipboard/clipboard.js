@@ -57,17 +57,17 @@ var passbolt = passbolt || {};
    * @return promise
    */
   clipboard.copy = function (txt, type) {
-    var deferred = $.Deferred();
-    passbolt.request('passbolt.clipboard.copy', txt)
-      .then(function() {
-        passbolt.message.emitToPage('passbolt_notify', {
-          status: 'success',
-          title: 'plugin_clipboard_copy_success',
-          data: type
+    return new Promise(function(resolve, reject) {
+      passbolt.request('passbolt.clipboard.copy', txt)
+        .then(function () {
+          passbolt.message.emitToPage('passbolt_notify', {
+            status: 'success',
+            title: 'plugin_clipboard_copy_success',
+            data: type
+          });
+          resolve();
         });
-        deferred.resolve();
-      });
-    return deferred;
+    });
   };
 
   // The application asks the plugin to store a string into the clipboard.

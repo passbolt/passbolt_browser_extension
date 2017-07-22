@@ -19,10 +19,11 @@
     var init = function () {
         // Load required settings.
         loadSettings()
-        // Load the page template.
-            .then(loadTemplate)
-            // Init the event listeners.
-            .then(initEventsListeners);
+          .then(loadTemplate)
+          .then(initEventsListeners,
+            function error() {
+                console.error('Something went wrong when intializing EditAutocomplete template.')
+          })
     };
 
     /**
@@ -44,11 +45,15 @@
         return passbolt.html.loadTemplate('body', 'data/tpl/group/editAutocomplete.ejs')
             .then(function () {
                 return passbolt.html.getTemplate('data/tpl/group/editAutocompleteItem.ejs');
-            }).then(function (data) {
+            })
+            .then(function (data) {
                 itemTpl = data;
                 return passbolt.html.getTemplate('data/tpl/group/editAutocompleteItemEmpty.ejs');
-            }).then(function (data) {
+            })
+            .then(function (data) {
                 emptyTpl = data;
+            }, function () {
+                console.error('Something went wrong when loading EditAutocomplete templates');
             });
     };
 

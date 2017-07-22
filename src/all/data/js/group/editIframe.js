@@ -57,13 +57,12 @@
             canAddGroupUsers = data.canAddGroupUsers;
 
         // Initialize the process.
-        passbolt.request('passbolt.group.edit.init', {
-            groupId: groupId
-        }).then(function () {
-            if (canAddGroupUsers == true) {
-                _insertIframes();
-            }
-        });
+        passbolt.request('passbolt.group.edit.init', {groupId: groupId})
+            .then(function () {
+                if (canAddGroupUsers == true) {
+                    _insertIframes();
+                }
+            });
     }, false);
 
 })();

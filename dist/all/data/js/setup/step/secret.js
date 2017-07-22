@@ -29,12 +29,12 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   /**
    * Implements init().
-   * @returns {promise}
+   * @returns Promise
    */
   step.init = function () {
-    var def = $.Deferred();
-    def.resolve();
-    return def;
+    return new Promise(function(resolve, reject) {
+      resolve();
+    });
   };
 
   /**
@@ -90,13 +90,13 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   /**
    * Implements cancel().
-   * @returns {promise}
+   * @returns Promise
    */
   step.cancel = function () {
-    passbolt.setup.setActionState('cancel', 'processing');
-    var def = $.Deferred();
-    def.resolve();
-    return def;
+    return new Promise(function(resolve, reject) {
+      passbolt.setup.setActionState('cancel', 'processing');
+      resolve();
+    });
   };
 
   /* ==================================================================================

@@ -45,14 +45,12 @@
           // Mark it as encrypted here.
           secretStateChangeHandler('encrypted');
         }
-      })
-      // Init the event listeners.
-      .then(initEventsListeners, error)
-      // Mark the iframe container as ready.
-      .then(function () {
+        // Init the event listeners.
+        initEventsListeners();
+        // Mark the iframe container as ready.
         passbolt.message.emit('passbolt.passbolt-page.remove-class', '#passbolt-iframe-secret-edition', 'loading');
         passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-secret-edition', 'ready');
-      });
+      }, error);
   };
 
   /**
@@ -60,7 +58,7 @@
    * @param error {string} The error message
    */
   var error = function (error) {
-    // @todo general error handler.
+    console.error(error);
   };
 
   /**
@@ -96,17 +94,21 @@
   /**
    * Init the events listeners.
    * The events can come from the following sources : addon, page or DOM.
+   * return Promise
    */
   var initEventsListeners = function () {
-    $secret.on('input change', secretFieldUpdatedHandler);
-    $secret.on('keydown', secretFieldKeydownHandler);
-    $secretClear.on('input', secretClearFieldUpdatedHandler);
-    $secret.on('focus', secretFieldFocusedHandler);
-    $generateSecretButton.on('click', generateSecretButtonClickedHandler);
-    $viewSecretButton.on('click', viewSecretButtonClickedHandler);
-    passbolt.message.on('passbolt.secret-edit.validate-success', validateSuccessHandler);
-    passbolt.message.on('passbolt.secret-edit.validate-error', validateErrorHandler);
-    passbolt.message.on('passbolt.secret-edit.focus', onSecretFocusHandler);
+    return new Promise(function(resolve, reject) {
+      $secret.on('input change', secretFieldUpdatedHandler);
+      $secret.on('keydown', secretFieldKeydownHandler);
+      $secretClear.on('input', secretClearFieldUpdatedHandler);
+      $secret.on('focus', secretFieldFocusedHandler);
+      $generateSecretButton.on('click', generateSecretButtonClickedHandler);
+      $viewSecretButton.on('click', viewSecretButtonClickedHandler);
+      passbolt.message.on('passbolt.secret-edit.validate-success', validateSuccessHandler);
+      passbolt.message.on('passbolt.secret-edit.validate-error', validateErrorHandler);
+      passbolt.message.on('passbolt.secret-edit.focus', onSecretFocusHandler);
+      resolve();
+    });
   };
 
   /**

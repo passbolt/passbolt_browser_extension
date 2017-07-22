@@ -85,10 +85,10 @@ passbolt.setup.steps = passbolt.setup.steps || {};
    * @returns {promise}
    */
   step.cancel = function () {
-    passbolt.setup.setActionState('cancel', 'processing');
-    var def = $.Deferred();
-    def.resolve();
-    return def;
+    return new Promise(function(resolve, reject) {
+      passbolt.setup.setActionState('cancel', 'processing');
+      resolve();
+    });
   };
 
   /* ==================================================================================

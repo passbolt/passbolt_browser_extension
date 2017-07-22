@@ -37,9 +37,9 @@ passbolt.setup.steps = passbolt.setup.steps || {};
    * @returns {promise}
    */
   step.init = function () {
-    var def = $.Deferred();
-    def.resolve();
-    return def;
+    return new Promise(function(resolve, reject) {
+      resolve()
+    });
   };
 
   /**
@@ -94,10 +94,10 @@ passbolt.setup.steps = passbolt.setup.steps || {};
    * @returns {promise}
    */
   step.cancel = function () {
-    passbolt.setup.setActionState('cancel', 'processing');
-    var def = $.Deferred();
-    def.resolve();
-    return def;
+    return new Promise(function(resolve, reject) {
+      passbolt.setup.setActionState('cancel', 'processing');
+      resolve()
+    });
   };
 
   /* ==================================================================================
@@ -149,65 +149,59 @@ passbolt.setup.steps = passbolt.setup.steps || {};
 
   /**
    * Extract key info from private key.
-   * @returns {promise}
+   * @returns Promise
    */
   step.extractKeyInfo = function () {
-    var def = $.Deferred(),
-      armoredPrivateKey = step.data.privateKeyArmored;
+    return new Promise(function(resolve, reject) {
+      var armoredPrivateKey = step.data.privateKeyArmored;
 
-    passbolt.request('passbolt.keyring.public.info', armoredPrivateKey)
-      .then(function (keyInfo) {
-        step.data.privateKeyInfo = keyInfo;
+      passbolt.request('passbolt.keyring.public.info', armoredPrivateKey)
+        .then(function (keyInfo) {
+          step.data.privateKeyInfo = keyInfo;
+          if (keyInfo.private === true) {
+            resolve();
+          } else {
+            reject('This key is not a valid private key');
+          }
+        }, function(error) {
+          reject(error);
+        });
 
-        // If the key is not private.
-        if (keyInfo.private === true) {
-          def.resolve();
-        } else {
-          def.reject('This key is not a valid private key');
-        }
-      }, function(error) {
-        def.reject(error);
-      });
-
-    return def;
+    });
   };
 
   /**
    * Check that the key doesn't already exist on server.
-   * @return {promise}
+   * @return Promise
    */
   step.checkKeyDontExistRemotely = function () {
-    var def = $.Deferred(),
-      armoredPrivateKey = step.data.privateKeyArmored;
-
-    passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
-      .then(function () {
-        def.reject('This key is already used by another user');
-      })
-      .then(null, function () {
-        def.resolve(armoredPrivateKey);
-      });
-
-    return def;
+    return new Promise(function(resolve, reject) {
+      var armoredPrivateKey = step.data.privateKeyArmored;
+      passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
+        .then(function () {
+          reject('This key is already used by another user');
+        })
+        .then(null, function () {
+          resolve(armoredPrivateKey);
+        });
+    });
   };
 
   /**
    * Check that the key exists on server.
-   * @return {promise}
+   * @return Promise
    */
   step.checkKeyExistRemotely = function () {
-    var def = $.Deferred(),
-      armoredPrivateKey = step.data.privateKeyArmored;
-
-    passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
-      .then(function () {
-        def.resolve(armoredPrivateKey);
-      })
-      .then(null, function () {
-        def.reject('This key doesn\'t match any account.');
-      });
-
-    return def;
+    return new Promise(function(resolve, reject) {
+      var armoredPrivateKey = step.data.privateKeyArmored;
+      passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
+        .then(function () {
+          resolve(armoredPrivateKey);
+        })
+        .then(null, function () {
+          reject('This key doesn\'t match any account.');
+        });
+    });
   };
 
   /**

@@ -37,7 +37,7 @@ passbolt.html = passbolt.html || {};
         dimension.height = options.height + 6; // account for border;
       }
     }
-    if(dimension.height < 52) {
+    if (dimension.height < 52) {
       dimension.height = 52;
     }
     // Request the application worker to resize the iframe container.
@@ -94,23 +94,23 @@ passbolt.html = passbolt.html || {};
   };
   passbolt.html.loadTemplate = loadTemplate;
 
-	/**
-	 * Return the browser name (best guess)
-	 * This should be used for view enhancement purposes not to change
-	 * functionalities or behaviors
-	 */
-	var getBrowserName = function () {
-		var userAgent = window.navigator.userAgent;
-		if(typeof userAgent != 'undefined' ) {
-			if (userAgent.substring('Firefox') != -1 || userAgent.substring('Seamonkey') != -1) {
-				return 'firefox';
-			}
-			if (userAgent.substring('Chrome') != -1 || userAgent.substring('Chromium') != -1) {
-				return 'chrome'
-			}
-			return 'unsupported';
-		}
-	};
-	passbolt.html.getBrowserName = getBrowserName;
+  /**
+   * Return the browser name (best guess)
+   * This should be used for view enhancement purposes not to change
+   * functionalities or behaviors
+   */
+  var getBrowserName = function () {
+    var userAgent = window.navigator.userAgent;
+    if (typeof userAgent != 'undefined') {
+      if (userAgent.indexOf('Firefox') != -1 || userAgent.indexOf('Seamonkey') != -1) {
+        return 'firefox';
+      }
+      if (userAgent.indexOf('Chrome') != -1 || userAgent.indexOf('Chromium') != -1) {
+        return 'chrome'
+      }
+      return 'unsupported';
+    }
+  };
+  passbolt.html.getBrowserName = getBrowserName;
 
 })(passbolt);

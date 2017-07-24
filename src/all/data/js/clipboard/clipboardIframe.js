@@ -14,18 +14,18 @@ var passbolt = passbolt || {};
 
   /**
    * Copy a string into the clipboard.
-   * @param txt {string} The text to copy
+   * @param text {string} The text to copy
    * @return promise
    */
-  clipboard.copy = function (secret) {
+  clipboard.copy = function (text) {
     // ref. https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Interact_with_the_clipboard
-    $('#ClipboardText').val(secret).select();
+    $('#ClipboardText').val(text).select();
     document.execCommand("Copy");
   };
 
-  // Ask the passbolt page to release its focus
-  passbolt.message.on('passbolt.clipboard-iframe.copy', function (secret) {
-    clipboard.copy(secret);
+  // Ask the passbolt page to copy a string into the clipboard
+  passbolt.message.on('passbolt.clipboard-iframe.copy', function (text) {
+    clipboard.copy(text);
   });
 
 })(passbolt);

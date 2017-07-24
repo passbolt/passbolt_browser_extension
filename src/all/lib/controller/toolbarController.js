@@ -17,9 +17,11 @@ var ToolbarController = function() {
   chrome.browserAction.onClicked.addListener(function() {
     _this.onButtonClick();
   });
-  // chrome.commands.onCommand.addListener(function(command) {
-  //   _this.onShortcutPressed();
-  // });
+  chrome.commands.onCommand.addListener(function(command) {
+    if (command === "passbolt-open") {
+      _this.onButtonClick();
+    }
+  });
 };
 
 /**

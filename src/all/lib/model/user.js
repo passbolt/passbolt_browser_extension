@@ -450,7 +450,8 @@ User.prototype.getStoredMasterPassword = function () {
 
 
 User.prototype.searchUsers = function(keywords, excludedUsers) {
-  var deferred = defer();
+  var deferred = defer(),
+    _response = null;
 
   fetch(
       this.settings.getDomain() + '/users.json?filter[keywords]=' + htmlspecialchars(keywords, 'ENT_QUOTES') + '&filter[is-active]=1', {
@@ -462,16 +463,20 @@ User.prototype.searchUsers = function(keywords, excludedUsers) {
         }
       })
       .then(function (response) {
-        var json = response.json();
+        _response = response;
+        return response.json();
+      })
+      .then(function (json) {
         // Check response status
-        if(!response.ok) {
+        if(!_response.ok) {
           var msg = __('Could not get the users. The server responded with an error.');
           if(json.headers.msg != undefined) {
             msg += ' ' + json.headers.msg;
           }
-          msg += ' (' + response.status + ')';
+          msg += ' (' + _response.status + ')';
           return deferred.reject(new Error(msg));
         }
+
         var users = json.body;
         var finalUsers = [];
         for (var i in users) {

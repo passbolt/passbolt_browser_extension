@@ -39,7 +39,8 @@ var Group = function () {
  * @returns {*}
  */
 Group.prototype.findById = function(groupId) {
-    var deferred = defer();
+    var deferred = defer(),
+      _response = null;
 
     fetch(
         this.settings.getDomain() + '/groups/' + groupId + '.json', {
@@ -85,8 +86,8 @@ Group.prototype.findById = function(groupId) {
  * @returns {*}
  */
 Group.prototype.save = function(group, groupId, dryrun) {
-
     var deferred = defer(),
+        _response = null,
         url =  this.settings.getDomain() + '/groups.json',
         method = 'POST',
         groupParamStr = JSON.stringify(group),

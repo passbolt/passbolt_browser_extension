@@ -107,6 +107,7 @@ $(function () {
     $('#saveServerKey').on('click', onSaveServerKeyClick);
     $('#js_flush_conf').on('click', onFlushConfClick);
     $('#initAppPagemod').on('click', onInitAppPagemodClick);
+    $('#simulateToolbarIcon').on('click', onSimulateToolbarIconClick);
     $('#saveTestProfile').on('click', onTestProfileSave);
     window.addEventListener('passbolt.debug.settings.set', onSetDebugSettings);
   };
@@ -299,6 +300,13 @@ $(function () {
    */
   var onInitAppPagemodClick = function () {
     passbolt.message.emit('passbolt.debug.appPagemod.init');
+  };
+
+  /**
+   * Handle init app pagemod button click
+   */
+  var onSimulateToolbarIconClick = function () {
+    passbolt.message.emit('passbolt.debug.simulateToolbarIconClick');
   };
 
   /**

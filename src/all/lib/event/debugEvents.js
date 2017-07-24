@@ -6,6 +6,7 @@
  */
 var Config = require('../model/config');
 var BrowserSettings = require('../controller/browserSettingsController');
+var ToolbarController = require('../controller/toolbarController').ToolbarController;
 
 var listen = function (worker) {
 
@@ -47,6 +48,16 @@ var listen = function (worker) {
   worker.port.on('passbolt.debug.appPagemod.init', function () {
     var app = require('../app');
     app.pageMods.PassboltApp.init();
+  });
+
+  /*
+   * Simulate toolbar icon click.
+   *
+   * @listens passbolt.debug.simulateToolbarIconClick
+   */
+  worker.port.on('passbolt.debug.simulateToolbarIconClick', function () {
+    var toolbarController = new ToolbarController();
+    toolbarController.openPassboltTab();
   });
 };
 exports.listen = listen;

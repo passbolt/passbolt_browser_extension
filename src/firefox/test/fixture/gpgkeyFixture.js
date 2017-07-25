@@ -1,5 +1,10 @@
 /**
- * Gpgkey fixture.
+ * Gpgkey fixture / Test Data
+ *
+ * Note for Mozilla addon reviewers:
+ * These are test fixtures only available when the application is on
+ * Debug mode. They are used to perform tests on parsing keys and are
+ * not actual keys.
  *
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html

@@ -7,7 +7,7 @@
 
 var passbolt = passbolt || {};
 
-(function ($) {
+$(function () {
 
   /* ==================================================================================
    *  Common page helpers
@@ -274,4 +274,4 @@ var passbolt = passbolt || {};
       });
   });
 
-})(jQuery);
+});

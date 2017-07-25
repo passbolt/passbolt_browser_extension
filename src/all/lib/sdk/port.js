@@ -17,7 +17,8 @@ var Port = function(port) {
  */
 Port.prototype.on = function(msgName, callback) {
   var _this = this;
-  this._port.onMessage.addListener(function (msg) {
+  this._port.onMessage.addListener(function (json) {
+    var msg = JSON.parse(json);
     var args = Object.keys(msg).map(function (key) {return msg[key]});
     args = Array.prototype.slice.call(args, 1);
     if (msg[0] === msgName) {

@@ -13,14 +13,20 @@ module.exports = function(grunt) {
 	 */
 	var path = {
 		node_modules: 'node_modules/',
-		build: 'build/',
-		build_vendors: 'build/vendors/',
-		build_data: 'build/data/',
-    dist_firefox: 'dist/firefox/',
+
+		build: 'build/all/',
+		build_vendors: 'build/all/vendors/',
+		build_data: 'build/all/data/',
+    build_legacy: 'build/firefox_legacy/',
+
     dist_chrome: 'dist/chrome/',
+    dist_firefox: 'dist/firefox/',
+    dist_firefox_legacy: 'dist/firefox_legacy/',
+
     src: 'src/all/',
-    src_firefox: 'src/firefox/',
     src_chrome: 'src/chrome/',
+    src_firefox: 'src/firefox/',
+    src_firefox_legacy: 'src/firefox_legacy/',
 		src_addon: 'src/all/lib/',
 		src_addon_vendors: 'src/all/lib/vendors/',
 		src_content_vendors: 'src/all/data/vendors/',
@@ -46,6 +52,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
   grunt.registerTask('build-firefox', ['clean', 'build-firefox-debug', 'build-firefox-prod']);
+  grunt.registerTask('build-firefox-legacy', ['copy:manifest_firefox', 'copy:config_debug', 'bundle', 'copy:legacy']);
   grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox','bundle', 'shell:build_firefox_debug']);
   grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default','copy:manifest_firefox', 'bundle', 'shell:build_firefox_prod']);
 
@@ -161,7 +168,7 @@ module.exports = function(grunt) {
 					// Not in scope
 					// phpjs a custom compilation of standard functions from http://locutus.io
 
-				]
+				],
 			},
 			// Copy styleguide elements
 			styleguide: {
@@ -207,7 +214,14 @@ module.exports = function(grunt) {
 					dest: path.build_data + 'css',
 					expand: true
 				}]
-			}
+			},
+			// Legacy firefox extension
+      legacy: {
+        files: [
+          {expand: true, cwd: path.build, src: '**/*', dest: path.build_legacy + 'webextension'},
+          {expand: true, cwd: path.src_firefox_legacy, src: '**/*', dest: path.build_legacy},
+        ]
+      }
 		},
 
 		/**
@@ -274,12 +288,12 @@ module.exports = function(grunt) {
 		watch: {
 			data: {
 				files: [path.src + 'data/**/*.*'],
-				tasks: ['copy:data'],
+				tasks: ['copy:data','build-firefox-legacy'],
 				options: {spawn: false}
 			},
 			app: {
 				files: [path.src + 'lib/**/*.js', '!' + path.src + 'lib/vendors/*.js', '!' + path.src + 'lib/vendors.js'],
-				tasks: ['browserify:app'],
+				tasks: ['browserify:app','build-firefox-legacy'],
 				options: {spawn: false}
 			},
 			vendors: {
@@ -287,6 +301,11 @@ module.exports = function(grunt) {
 				tasks: ['browserify:vendors'],
 				options: {spawn: false}
 			},
+      legacy: {
+        files: [path.src_firefox_legacy + '*'],
+        tasks: ['build-firefox-legacy'],
+        options: {spawn: false}
+      },
 			others: {
 				files: [path.src + 'manifest.json', path.src + 'locale/*'],
 				tasks: ['copy:others'],

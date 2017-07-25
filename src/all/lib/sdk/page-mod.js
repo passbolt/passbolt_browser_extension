@@ -267,7 +267,6 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
   // Inject JS files if needed
 	// TODO don't insert if the JS if its already inserted
   var scripts = this.args.contentScriptFile.slice();
-  scripts.unshift('data/js/lib/port.js'); // add a firefox sdk-like self.port layer
   scriptExecution.injectScripts(scripts);
 
   // Inject CSS files if needed

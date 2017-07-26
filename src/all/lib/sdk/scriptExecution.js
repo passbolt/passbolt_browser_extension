@@ -52,13 +52,12 @@ ScriptExecution.prototype.createCssCallback = function(tabId, details, callback)
  * @returns ScriptExecution object
  */
 ScriptExecution.prototype.injectScripts = function (fileArray) {
-  var _this = this;
   var callback = null;
   var info = null;
 
   for (var i = fileArray.length - 1; i >= 0; --i) {
     info = { file: fileArray[i], runAt: 'document_end' };
-    callback = _this.createScriptCallback(_this.tabId, info, callback);
+    callback = this.createScriptCallback(this.tabId, info, callback);
   }
   if (callback !== null) {
     callback();

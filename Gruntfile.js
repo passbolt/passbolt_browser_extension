@@ -288,12 +288,12 @@ module.exports = function(grunt) {
 		watch: {
 			data: {
 				files: [path.src + 'data/**/*.*'],
-				tasks: ['copy:data','build-firefox-legacy'],
+				tasks: ['copy:data'],
 				options: {spawn: false}
 			},
 			app: {
 				files: [path.src + 'lib/**/*.js', '!' + path.src + 'lib/vendors/*.js', '!' + path.src + 'lib/vendors.js'],
-				tasks: ['browserify:app','build-firefox-legacy'],
+				tasks: ['browserify:app'],
 				options: {spawn: false}
 			},
 			vendors: {

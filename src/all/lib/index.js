@@ -13,13 +13,13 @@ var User = require('./model/user').User;
  *  Legacy Firefox Addon-SDK Migration
  * ==================================================================================
  */
-
-console.log('Web Extension started');
-var port = browser.runtime.connect({name: "passbolt-legacy-port"});
-port.onMessage.addListener(function(message) {
-  console.log("Message from legacy add-on: " + message.content);
-});
-
+if (typeof browser !== 'undefined') {
+  console.log('Web Extension started');
+  var port = browser.runtime.connect({name: "passbolt-legacy-port"});
+  port.onMessage.addListener(function(message) {
+    console.log("Message from legacy add-on: " + message.content);
+  });
+}
 
 /* ==================================================================================
  *  Openpgp init

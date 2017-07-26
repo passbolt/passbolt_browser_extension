@@ -3,8 +3,7 @@
  * Make it easier to chrome.tabs.executeScript multiple scripts.
  *
  * @copyright (c) 2017 Passbolt SARL
- * @licence ISC https://opensource.org/licenses/ISC
- * @credit https://github.com/ReeganExE/chrome-script-execution
+ * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 /**
  * ScriptExecution Constructor
@@ -17,56 +16,96 @@ function ScriptExecution(tabId) {
 }
 
 /**
- * Array of js file names with path
+ * Create a callback to injects JavaScript code into a page.
+ * ref. https://developer.chrome.com/extensions/tabs#method-executeScript
+ *
+ * @param tabId
+ * @param details
+ * @param callback
+ * @returns {Function}
+ */
+ScriptExecution.prototype.createScriptCallback = function(tabId, details, callback) {
+  return function () {
+    chrome.tabs.executeScript(tabId, details, callback);
+  };
+};
+
+/**
+ * Create a callback to injects CSS into a page
+ * ref. https://developer.chrome.com/extensions/tabs#method-insertCSS
+ *
+ * @param tabId
+ * @param details
+ * @param callback
+ * @returns {Function}
+ */
+ScriptExecution.prototype.createCssCallback = function(tabId, details, callback) {
+  return function () {
+    chrome.tabs.insertCSS(tabId, details, callback);
+  };
+};
+
+/**
+ * Insert sequentially javascript code in the page
  *
  * @param fileArray array
  * @returns ScriptExecution object
  */
 ScriptExecution.prototype.injectScripts = function (fileArray) {
   var _this = this;
-  return Promise.all(fileArray.map(function (file) {
-    return exeScript(_this.tabId, file);
-  })).then(function () {
-    return _this;
-  });
-};
+  var callback = null;
+  var info = null;
 
-/**
- * Array of css file names with path
- *
- * @param fileArray array
- * @returns ScriptExecution object
- */
-ScriptExecution.prototype.injectCss = function (fileArray) {
-  var _this = this;
-  return Promise.all(fileArray.map(function (file) {
-    return exeCss(_this.tabId, file);
-  })).then(function () {
-    return _this;
-  });
+  for (var i = fileArray.length - 1; i >= 0; --i) {
+    info = { file: fileArray[i], runAt: 'document_end' };
+    callback = _this.createScriptCallback(_this.tabId, info, callback);
+  }
+  if (callback !== null) {
+    callback();
+  }
 };
 
 /**
  * Insert javascript code in the page
  *
+ * @param codeArray array
+ * @returns ScriptExecution object
+ */
+ScriptExecution.prototype.executeScript = function (codeArray) {
+  var callback = null;
+  var info = null;
+
+  for (var i = codeArray.length - 1; i >= 0; --i) {
+    info = { code: codeArray[i], runAt: 'document_end' };
+    callback = this.createScriptCallback(this.tabId, info, callback);
+  }
+  if (callback !== null) {
+    callback();
+  }
+};
+
+/**
+ * Inject sequentially an array of css file in a page
+ *
  * @param fileArray array
  * @returns ScriptExecution object
  */
-ScriptExecution.prototype.executeScript = function (fileArray) {
-  var _this = this;
+ScriptExecution.prototype.injectCss = function (fileArray) {
+  var callback = null;
+  var info = null;
 
-  fileArray = Array.prototype.slice.call(arguments);
-  return Promise.all(fileArray.map(function (code) {
-    return exeCodes(_this.tabId, code);
-  })).then(function () {
-    return _this;
-  });
+  for (var i = fileArray.length - 1; i >= 0; --i) {
+    info = { file: fileArray[i], runAt: 'document_end' };
+    callback = this.createCssCallback(this.tabId, info, callback);
+  }
+  if (callback !== null) {
+    callback();
+  }
 };
 
 /**
  * Set a global variables in the content code environment
- * @param name
- * @param value
+ * @param options as key value
  */
 ScriptExecution.prototype.setGlobals = function (options) {
   var value, code;
@@ -76,63 +115,11 @@ ScriptExecution.prototype.setGlobals = function (options) {
     if (typeof value === 'string') {
       code += options[key];
     } else {
-      throw Error('ScriptExecution.setGlobal unsuported type');
+      throw Error('ScriptExecution.setGlobal unsupported type');
     }
     code += '";';
   }
-  this.executeScript(code);
+  this.executeScript([code]);
 };
-
-/**
- * Call an async function of chrome.tabs and makes it a promise
- *
- * @param fn function to execute
- * @param tabId int
- * @param info info object
- * @returns Promise
- */
-function promiseTo(fn, tabId, info) {
-  return new Promise(function (resolve) {
-    fn.call(chrome.tabs, tabId, info, function () {
-      return resolve();
-    });
-  });
-}
-
-/**
- * Insert a script file in the page
- *
- * @param tabId
- * @param path
- * @returns Promise
- */
-function exeScript(tabId, path) {
-  var info = { file: path, runAt: 'document_end' };
-  return promiseTo(chrome.tabs.executeScript, tabId, info);
-}
-
-/**
- * Insert a stylesheet
- *
- * @param tabId
- * @param path
- * @returns {Promise}
- */
-function exeCss(tabId, path) {
-  var info = { file: path, runAt: 'document_end' };
-  return promiseTo(chrome.tabs.insertCSS, tabId, info);
-}
-
-/**
- * Insert a script code snippet in the page
- *
- * @param tabId
- * @param code
- * @returns {Promise}
- */
-function exeCodes(tabId, code) {
-  var info = { code: code, runAt: 'document_end' };
-  return promiseTo(chrome.tabs.executeScript, tabId, info);
-}
 
 exports.ScriptExecution = ScriptExecution;

@@ -57,22 +57,27 @@ var listen = function (worker) {
    * @param masterpassword {string} The master password to use for the authentication attempt.
    */
   worker.port.on('passbolt.auth.login', function (requestId, masterpassword) {
-    var tabId = worker.tab.id;
+    var tabId = worker.tab.id,
+      _referrer = null;
+
     Worker.get('Auth', worker.tab.id).port.emit('passbolt.auth.login-processing', __('Logging in'));
+
     auth.login(masterpassword).then(
       function success(referrer) {
-        // init the app pagemod
-        var app = require('../app');
-        app.pageMods.PassboltApp.init();
+        _referrer = referrer;
 
-        // redirect
-        var msg = __('You are now logged in!');
-        Worker.get('Auth', tabId).port.emit('passbolt.auth.login-success', msg, referrer);
+        // Init the app pagemod
+        var app = require('../app');
+        return app.pageMods.PassboltApp.init();
       },
       function error(error) {
         Worker.get('Auth', tabId).port.emit('passbolt.auth.login-failed', error.message);
       }
-    );
+    ).then(function() {
+      // Redirect the user.
+      var msg = __('You are now logged in!');
+      Worker.get('Auth', tabId).port.emit('passbolt.auth.login-success', msg, _referrer);
+    });
   });
 
   /*

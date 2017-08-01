@@ -43,6 +43,8 @@ $(function () {
       .always(initEventListeners)
       // Init test profiles dropdown.
       .always(initTestProfilesSection)
+      // Init the logs section.
+      .always(initLogsSection)
       // Mark the page as ready
       .always(function () {
         $('.config.page').addClass('ready');
@@ -93,6 +95,20 @@ $(function () {
     passbolt.request('passbolt.debug.config.readAll')
       .then(function (data) {
         $('#localStorage').html(JSON.stringify(data, undefined, 2));
+      });
+  };
+
+  /**
+   * Init the logs section.
+   */
+  var initLogsSection = function () {
+    return passbolt.request('passbolt.debug.log.readAll')
+      .then(function (data) {
+        var logs = data.reduce(function(sum, log) {
+          sum.push('[' + log.level + '] ' + log.message);
+          return sum;
+        }, []);
+        $('#logsContent').html(JSON.stringify(logs, undefined, 2));
       });
   };
 

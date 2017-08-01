@@ -8,16 +8,23 @@
 // Config and user models
 var Config = require('./model/config');
 var User = require('./model/user').User;
+var Log = require('./model/log').Log;
+
+/* ==================================================================================
+ *  Flush the logs
+ * ==================================================================================
+ */
+Log.flush();
 
 /* ==================================================================================
  *  Legacy Firefox Addon-SDK Migration
  * ==================================================================================
  */
 if (typeof browser !== 'undefined') {
-  console.log('Web Extension started');
+  Log.write({level: 'debug', message: 'Web Extension started'});
   var port = browser.runtime.connect({name: "passbolt-legacy-port"});
   port.onMessage.addListener(function(message) {
-    console.log("Message from legacy add-on: " + message.content);
+    Log.write({level: 'debug', message: 'Message from legacy add-on: ' + message.content});
   });
 }
 

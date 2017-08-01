@@ -8,7 +8,7 @@
   "dependencies": {
     "passbolt-styleguide": "^1.6.0",
     "jquery": "~2.2.4",
-    "openpgp": "~2.3",
+    "openpgp": "~2.5",
     "underscore": "~1.8.3",
     "xregexp": "~3.0.0",
     "jssha": "~2.3.1",

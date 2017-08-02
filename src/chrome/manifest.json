@@ -32,6 +32,8 @@
   "permissions": [
     "activeTab",
     "tabs",
+    "unlimitedStorage",
+    "storage",
     "background",
     "clipboardWrite",
     "*://*/*"

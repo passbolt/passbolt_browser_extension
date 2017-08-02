@@ -297,7 +297,7 @@ module.exports = function(grunt) {
 				options: {spawn: false}
 			},
 			vendors: {
-				files: [path.src + 'lib/vendors.js', path.src + 'lib/vendors/**/*.js'],
+				files: [path.src + 'lib/vendors.js', path.src + 'lib/vendors/**/*.js', path.src + 'lib/sdk/storage.js'],
 				tasks: ['browserify:vendors'],
 				options: {spawn: false}
 			},

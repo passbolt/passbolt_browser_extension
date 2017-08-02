@@ -38,6 +38,7 @@
     "activeTab",
     "clipboardWrite",
     "tabs",
+    "storage",
     "*://*/*"
   ],
   "web_accessible_resources": [

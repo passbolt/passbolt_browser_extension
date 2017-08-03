@@ -16,7 +16,7 @@ LocalStorage.prototype.init = function() {
   // Data are serialized in the local storage.
   return new Promise (function(resolve, reject) {
     _this._storage.get('_passbolt_data', function(items) {
-      if( typeof chrome.runtime.lastError !== 'undefined') {
+      if( typeof chrome.runtime.lastError !== 'undefined' && chrome.runtime.lastError !== null) {
         reject(chrome.runtime.lastError);
       } else {
         if (typeof items._passbolt_data !== 'undefined') {
@@ -34,7 +34,7 @@ LocalStorage.prototype.init = function() {
  */
 LocalStorage.prototype._store = function () {
   this._storage.set({'_passbolt_data': this._data}, function() {
-    if( typeof chrome.runtime.lastError !== 'undefined') {
+    if( typeof chrome.runtime.lastError !== 'undefined' && chrome.runtime.lastError !== null) {
       console.error(chrome.runtime.lastError.message);
     }
   });
@@ -95,6 +95,7 @@ LocalStorage.prototype.migrate = function (data) {
     window.localStorage.removeItem('_passbolt_data');
   }
   this._data = JSON.parse(data);
+  console.log(data);
   this._store();
 };
 

@@ -92,22 +92,19 @@ var migration = function() {
       // Firefox simpleStorage migration
       // get data from legacy addon
       var port = browser.runtime.connect({name: "passbolt-legacy-port"});
-      port.onMessage.addListener(function(data) {
-        if (typeof data !== undefined) {
-          console.log('Migrating firefox simpleStorage.');
+      port.onMessage.addListener(function(message) {
+        var data = message.content;
+        if (data !== '{}') {
+          console.warn('Migrating firefox simpleStorage.');
           storage.migrate(data);
-        } else {
-          console.log('No migration needed (firefox).');
         }
         resolve();
       });
     } else {
       // Chrome localStage migration
       if (storage.migrationNeeded()) {
-        console.log('Migrating chrome localStorage.');
+        console.warn('Migrating chrome localStorage.');
         storage.migrate();
-      } else {
-        console.log('No migration needed (chrome).');
       }
       resolve();
     }

@@ -5,8 +5,8 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-window.storage = require('./sdk/storage').storage;
-var storage = window.storage;
+var storage = require('./sdk/storage').storage;
+window.storage = storage;
 
 var main = function() {
 
@@ -85,37 +85,40 @@ var main = function() {
  *  Data migration
  * ==================================================================================
  */
-var migration = new Promise(function (resolve, reject) {
-  // Browser is a firefox only variable
-  if (typeof browser !== 'undefined') {
-    // Firefox simpleStorage migration
-    // get data from legacy addon
-    var port = browser.runtime.connect({name: "passbolt-legacy-port"});
-    port.onMessage.addListener(function(data) {
-      if (typeof data !== undefined) {
-        console.log('Migrating firefox simpleStorage.');
-        storage.migrate(data);
+var migration = function() {
+  return new Promise(function (resolve, reject) {
+    // Browser is a firefox only variable
+    if (typeof browser !== 'undefined') {
+      // Firefox simpleStorage migration
+      // get data from legacy addon
+      var port = browser.runtime.connect({name: "passbolt-legacy-port"});
+      port.onMessage.addListener(function(data) {
+        if (typeof data !== undefined) {
+          console.log('Migrating firefox simpleStorage.');
+          storage.migrate(data);
+        } else {
+          console.log('No migration needed (firefox).');
+        }
+        resolve();
+      });
+    } else {
+      // Chrome localStage migration
+      if (storage.migrationNeeded()) {
+        console.log('Migrating chrome localStorage.');
+        storage.migrate();
       } else {
-        console.log('No migration needed (firefox).');
+        console.log('No migration needed (chrome).');
       }
       resolve();
-    });
-  } else {
-    // Chrome localStage migration
-    if (storage.migrationNeeded()) {
-      console.log('Migrating chrome localStorage.');
-      storage.migrate();
-    } else {
-      console.log('No migration needed (chrome).');
     }
-    resolve();
-  }
-});
+  });
+};
 
-// Init storage and get going
-migration
-  .then(storage.init())
-  .then(main)
-  .catch(function(error) {
-    console.error(error.message);
+// Migrate date if needed, init storage and get going
+migration()
+  .then(function() {
+    return storage.init();
+  })
+  .then(function() {
+    main();
   });

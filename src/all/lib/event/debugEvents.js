@@ -17,7 +17,8 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.debug.config.readAll', function (requestId) {
-    worker.port.emit(requestId, 'SUCCESS', Config.readAll());
+    var config = Config.readAll();
+    worker.port.emit(requestId, 'SUCCESS', config);
   });
 
   /*

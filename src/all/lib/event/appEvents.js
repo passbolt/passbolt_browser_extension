@@ -285,7 +285,7 @@ var listen = function (worker) {
       })
       .catch(function (error) {
         worker.port.emit('passbolt.progress.close-dialog');
-        worker.port.emit(requestId, 'ERROR', error.msg);
+        worker.port.emit(requestId, 'ERROR', error.message);
       });
   });
 };

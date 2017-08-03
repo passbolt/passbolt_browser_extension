@@ -8,8 +8,6 @@
 function LocalStorage() {
   this._storage = chrome.storage.local;
   this._data = {};
-  this._init = false;
-  var _this = this;
 }
 
 LocalStorage.prototype.init = function() {
@@ -22,7 +20,7 @@ LocalStorage.prototype.init = function() {
         reject(chrome.runtime.lastError);
       } else {
         if (typeof items._passbolt_data !== 'undefined') {
-          _this._data = items._passbolt_data;
+          _this._data = JSON.parse(JSON.stringify(items._passbolt_data));
         }
       }
       resolve();
@@ -96,7 +94,7 @@ LocalStorage.prototype.migrate = function (data) {
     }
     window.localStorage.removeItem('_passbolt_data');
   }
-  this._data = data;
+  this._data = JSON.parse(data);
   this._store();
 };
 

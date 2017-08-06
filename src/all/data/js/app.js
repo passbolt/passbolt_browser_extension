@@ -274,4 +274,6 @@ $(function () {
       });
   });
 
+  $('html').addClass('passboltplugin-ready');
+
 });

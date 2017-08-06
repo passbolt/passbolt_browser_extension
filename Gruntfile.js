@@ -51,7 +51,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('pre-dist', ['copy:background_page', 'copy:data', 'copy:vendors', 'copy:locale', 'copy:styleguide']);
 
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
-  grunt.registerTask('build-firefox', ['clean', 'build-firefox-debug', 'build-firefox-prod']);
+  grunt.registerTask('build-firefox', ['clean', 'build-firefox-debug', 'build-firefox-prod', 'build-firefox-legacy']);
   grunt.registerTask('build-firefox-legacy', ['copy:manifest_firefox', 'copy:config_debug', 'bundle', 'copy:legacy', 'shell:build_firefox_legacy_debug']);
   grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'shell:build_firefox_debug']);
   grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default','copy:manifest_firefox', 'bundle', 'shell:build_firefox_prod']);

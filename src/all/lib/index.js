@@ -92,4 +92,5 @@ pageMods.GroupEditAutocompleteDialog.init();
 // Debug pagemod
 if (Config.isDebug()) {
   pageMods.Debug.init();
+  pageMods.DebugPage.init();
 }

@@ -248,7 +248,7 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
     return;
   }
 
-  Log.write({level: 'debug', message: this.args.name + ' pageMod tabUpdated @ tab:' + tab.id + ', url:' + tab.url + ', status: ' + changeInfo});
+  Log.write({level: 'debug', message: this.args.name + ' pageMod tabUpdated @ tab:' + tab.id + ', url:' + tab.url + ', status: ' + changeInfo.status});
 
   // if there is not already a worker in that tab
   // generate a portname based on the tab it and listen to connect event
@@ -290,12 +290,7 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
  * @private
  */
 PageMod.prototype.__checkUrl = function(url) {
-  if (!(url.match(this.args.include))) {
-    Log.write({level: 'debug', message: 'Pagemod' + this.args.name + ' URL:' + url + ' do not match ' + this.args.include});
-    return false;
-  }
-  Log.write({level: 'debug', message: 'Pagemod' + this.args.name + ' URL:' + url + ' match ' + this.args.include});
-  return true;
+  return (url.match(this.args.include));
 };
 
 /**

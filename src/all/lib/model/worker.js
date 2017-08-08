@@ -5,6 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var app = require('../app');
+var Log = require('./log').Log;
 
 /**
  * Reference a worker.
@@ -21,10 +22,10 @@ var add = function (workerId, worker, options) {
     // // destroy it, it will trigger a detach event (see bellow)
     app.workers[worker.tab.id][workerId].destroy('destroying worker because it already exist');
   }
-  
+
   // Add the worker to the list of active app workers.
   // Build the workers list for that tab if needed
-  console.debug('Add worker @ id:' + workerId + ', tab:' + worker.tab.id + ', url:' + worker.tab.url);
+  Log.write({level: 'debug', message: 'Add worker @ id:' + workerId + ', tab:' + worker.tab.id + ', url:' + worker.tab.url});
   if (typeof app.workers[worker.tab.id] === 'undefined') {
     app.workers[worker.tab.id] = {};
   }
@@ -64,9 +65,9 @@ exports.add = add;
  */
 var remove = function (workerId, tabId, options) {
   if (!exists(workerId, tabId)) {
-    console.warn('Warning: unable to remove the worker ' + workerId + ', it doesn\'t exist on the tab ' + tabId + ' .');
+    Log.write({level: 'warning', 'message': 'Warning: unable to remove the worker ' + workerId + ', it doesn\'t exist on the tab ' + tabId + ' .'});
   } else {
-    console.debug('Remove worker @ id:' + workerId + ', tab:' + tabId);
+    Log.write({level: 'debug', message: 'Remove worker @ id:' + workerId + ', tab:' + tabId});
     if (typeof options.onDestroy !== 'undefined') {
       options.onDestroy();
     }

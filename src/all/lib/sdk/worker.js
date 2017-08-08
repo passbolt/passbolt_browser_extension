@@ -1,5 +1,6 @@
 var Port = require('../sdk/port').Port;
 var Tab = require('../sdk/tab').Tab;
+var Log = require('../model/log').Log;
 
 /**
  * PageMod Worker Chrome Wrapper
@@ -37,6 +38,7 @@ var Worker = function(port, iframe) {
  * @param callback
  */
 Worker.prototype.on = function (eventName, callback) {
+  Log.write({level: 'debug', message: 'Catch event @ tab:' + this.tab.id + ', event: '+ eventName + ', function: Worker.on()'});
   this.callbacks[eventName] = callback;
 };
 
@@ -45,6 +47,7 @@ Worker.prototype.on = function (eventName, callback) {
  * @param eventName
  */
 Worker.prototype.triggerEvent = function (eventName) {
+  Log.write({level: 'debug', message: 'Trigger event @ tab:' + this.tab.id + ', event: '+ eventName + ', function: Worker.triggerEvent()'});
   if (typeof this.callbacks[eventName] !== 'undefined') {
     this.callbacks[eventName].apply();
   }
@@ -54,6 +57,8 @@ Worker.prototype.triggerEvent = function (eventName) {
  * Destroy the worker
  */
 Worker.prototype.destroy = function (reason) {
+  Log.write({level: 'debug', message: 'Destroy worker @ tab:' + this.tab.id + ', function: Worker.destroy()'});
+
   // console.debut('Destroying worker because ' + reason);
   // A detach event is fired just before removal.
   this.triggerEvent('detach');

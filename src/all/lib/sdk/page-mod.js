@@ -10,6 +10,7 @@ var Worker = require('../sdk/worker').Worker;
 var self = require('../sdk/self');
 var Crypto = require('../model/crypto').Crypto;
 var Workers = require('../model/worker');
+var Log = require('../model/log').Log;
 
 /**
  * PageMod Chrome Wrapper
@@ -89,6 +90,7 @@ PageMod.prototype.__init = function() {
   // the include and contentScriptWhen pageMod parameters
   var _this = this;
   this._listeners['chrome.tabs.onUpdated'] = function(tabId, changeInfo, tab) {
+    Log.write({level: 'debug', message: 'Tab onUpdated @ tab:' + tab.id + ', url:' + tab.url + ', function: PageMod.__init()'});
     _this.__onTabUpdated(tabId, changeInfo, tab);
   };
   chrome.tabs.onUpdated.addListener(this._listeners['chrome.tabs.onUpdated']);
@@ -99,6 +101,7 @@ PageMod.prototype.__init = function() {
   // see. https://bugs.chromium.org/p/chromium/issues/detail?id=109557
   this._listeners['chrome.tabs.onReplaced'] = function (addedTabId, removedTabId) {
     chrome.tabs.get(addedTabId, function(tab){
+      Log.write({level: 'debug', message: 'Tab onReplaced @ tab:' + tab.id + ', url:' + tab.url + ', function: PageMod.__init()'});
       _this.__onTabUpdated(tab.id, {status:'complete'}, tab);
     });
   };
@@ -119,6 +122,7 @@ PageMod.prototype.__init = function() {
 
   // When a tab is closed cleanup
   this._listeners['chrome.tabs.onRemoved'] = function (tabId) {
+    Log.write({level: 'debug', message: 'Tab onRemoved @ tab:' + tabId + ', function: PageMod.__init()'});
     var index = _this._ports.indexOf(tabId);
     _this._ports.splice(index, 1);
   };
@@ -171,7 +175,7 @@ PageMod.prototype.__onIframeConnectInit = function() {
   var iframeId = this.args.include.split('passbolt=')[1];
   iframeId = iframeId.replace('*', '');
   this.portname = iframeId;
-  // console.log(this.args.name + ' iframe page mod openening port on ' + this.portname);
+  Log.write({level: 'debug', message: this.args.name + ' iframe page mod openening port on ' + this.portname});
   this.__initConnectListener(this.portname, undefined, true);
 };
 
@@ -185,7 +189,7 @@ PageMod.prototype.__onContentConnectInit = function() {
 	var replaceStr = chrome.runtime.getURL('/data/');
   portname = portname.replace(replaceStr, '').replace('.html','');
   this.portname = portname;
-  // console.log(this.args.name + ' content page mod opening port on ' + this.portname);
+  Log.write({level: 'debug', message: this.args.name + ' content page mod opening port on ' + this.portname});
   this.__initConnectListener(this.portname);
 };
 
@@ -208,6 +212,7 @@ PageMod.prototype.__onAttachExistingTab = function(tab) {
 
   // if the url match the pagemod requested pattern
   if (tab.url.match(this.args.include)) {
+    Log.write({level: 'debug', message: 'Attaching pagemod on an existing tab, reload the tab @ tab:' + tab.id + ', pagemod: ' + this.args.name + ', url:' + tab.url + ', function: PageMod.__onAttachExistingTab()'});
     chrome.tabs.reload(tab.id);
   }
 };
@@ -245,6 +250,8 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
     return;
   }
 
+  Log.write({level: 'debug', message: 'Tab updated, inject scripts in the content page @ tab:' + tab.id + ', pagemod: ' + this.args.name + ', url:' + tab.url + ', function: PageMod.__onTabUpdated()'});
+
   // if there is not already a worker in that tab
   // generate a portname based on the tab it and listen to connect event
   // otherwise reuse the already an active worker in that tab to accept incoming connection
@@ -265,7 +272,7 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
   }
 
   // Inject JS files if needed
-	// TODO don't insert if the JS if its already inserted
+	// TODO don't insert if the JS is already inserted
   var scripts = this.args.contentScriptFile.slice();
   scriptExecution.injectScripts(scripts);
 
@@ -286,10 +293,10 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
  */
 PageMod.prototype.__checkUrl = function(url) {
   if (!(url.match(this.args.include))) {
-    // console.debug('Pagemod' + this.args.name + ' URL:' + tab.url + ' do not match ' + this.args.include);
+    Log.write({level: 'debug', message: 'Pagemod' + this.args.name + ' URL:' + url + ' do not match ' + this.args.include});
     return false;
   }
-  // console.debug('Pagemod' + this.args.name + ' URL:' + tab.url + ' match ' + this.args.include);
+  Log.write({level: 'debug', message: 'Pagemod' + this.args.name + ' URL:' + url + ' match ' + this.args.include});
   return true;
 };
 

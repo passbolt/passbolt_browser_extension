@@ -12,14 +12,15 @@
 var pageMod = require('../sdk/page-mod');
 var app = require('../app');
 var Worker = require('../model/worker');
+var Log = require('../model/log').Log;
 
 var Debug = function () {};
 Debug._pageMod = undefined;
 
 Debug.init = function () {
 
-  console.warn('Warning: plugin debug mode is on!');
-  console.warn(chrome.runtime.getURL('data/config-debug.html'));
+  Log.write({level: 'warning', message: 'Warning: plugin debug mode is on!'});
+  Log.write({level: 'warning', message: chrome.runtime.getURL('data/config-debug.html')});
 
   if (typeof Debug._pageMod !== 'undefined') {
     Debug._pageMod.destroy();

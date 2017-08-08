@@ -5,6 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var Config = require('../model/config');
+var Log = require('../model/log').Log;
 var BrowserSettings = require('../controller/browserSettingsController');
 var ToolbarController = require('../controller/toolbarController').ToolbarController;
 
@@ -59,5 +60,15 @@ var listen = function (worker) {
     var toolbarController = new ToolbarController();
     toolbarController.openPassboltTab();
   });
+
+  /*
+   * Get logs.
+   *
+   * @listens passbolt.debug.getLogs
+   */
+  worker.port.on('passbolt.debug.log.readAll', function (requestId) {
+    worker.port.emit(requestId, 'SUCCESS', Log.readAll());
+  });
+
 };
 exports.listen = listen;

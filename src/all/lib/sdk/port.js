@@ -38,7 +38,7 @@ Port.prototype.on = function(msgName, callback) {
  * @param status SUCCESS | ERROR
  */
 Port.prototype.emit = function () {
-  Log.write({level: 'debug', message: 'Port emit @ message: ' + arguments[0]});
+  Log.write({level: 'debug', message: 'Port emit @ message: ' + arguments[1]});
   this._port.postMessage(Array.prototype.slice.call(arguments));
 };
 exports.Port = Port;

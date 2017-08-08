@@ -90,7 +90,6 @@ PageMod.prototype.__init = function() {
   // the include and contentScriptWhen pageMod parameters
   var _this = this;
   this._listeners['chrome.tabs.onUpdated'] = function(tabId, changeInfo, tab) {
-    Log.write({level: 'debug', message: 'Tab onUpdated @ tab:' + tab.id + ', url:' + tab.url + ', function: PageMod.__init()'});
     _this.__onTabUpdated(tabId, changeInfo, tab);
   };
   chrome.tabs.onUpdated.addListener(this._listeners['chrome.tabs.onUpdated']);
@@ -101,7 +100,6 @@ PageMod.prototype.__init = function() {
   // see. https://bugs.chromium.org/p/chromium/issues/detail?id=109557
   this._listeners['chrome.tabs.onReplaced'] = function (addedTabId, removedTabId) {
     chrome.tabs.get(addedTabId, function(tab){
-      Log.write({level: 'debug', message: 'Tab onReplaced @ tab:' + tab.id + ', url:' + tab.url + ', function: PageMod.__init()'});
       _this.__onTabUpdated(tab.id, {status:'complete'}, tab);
     });
   };
@@ -242,7 +240,7 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
   // We can't insert scripts if the url is not https or http
   // as this is not allowed, instead we insert the scripts manually in the background page if needed
   if (!(tab.url.startsWith('http://') || tab.url.startsWith('https://'))) {
-    return false;
+    return;
   }
 
   // Check if pagemod url pattern match tab url
@@ -250,7 +248,7 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
     return;
   }
 
-  Log.write({level: 'debug', message: 'Tab updated, inject scripts in the content page @ tab:' + tab.id + ', pagemod: ' + this.args.name + ', url:' + tab.url + ', function: PageMod.__onTabUpdated()'});
+  Log.write({level: 'debug', message: this.args.name + ' pageMod tabUpdated @ tab:' + tab.id + ', url:' + tab.url + ', status: ' + changeInfo});
 
   // if there is not already a worker in that tab
   // generate a portname based on the tab it and listen to connect event

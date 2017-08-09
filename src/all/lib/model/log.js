@@ -57,9 +57,20 @@ Log.write = function (log) {
   }
   // Register the log.
   _logs.push(log);
+
+  // Show the time
+  function formatTime(i) {
+    return (i < 10) ? "0" + i : i;
+  }
+  var today = new Date(),
+    h = formatTime(today.getHours()),
+    m = formatTime(today.getMinutes()),
+    s = formatTime(today.getSeconds());
+  var t = h + ':' + m + ':' + s;
+
   // The log could also be displayed on the console.
   if (logSettings.console) {
-    var consoleLog = '[' + log.level + '] ' + log.message;
+    var consoleLog = t + ' [' + log.level + '] ' + log.message;
     console.log(consoleLog);
   }
 };

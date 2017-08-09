@@ -38,7 +38,6 @@ var Worker = function(port, iframe) {
  * @param callback
  */
 Worker.prototype.on = function (eventName, callback) {
-  Log.write({level: 'debug', message: 'Catch event @ tab:' + this.tab.id + ', event: '+ eventName + ', function: Worker.on()'});
   this.callbacks[eventName] = callback;
 };
 
@@ -47,7 +46,7 @@ Worker.prototype.on = function (eventName, callback) {
  * @param eventName
  */
 Worker.prototype.triggerEvent = function (eventName) {
-  Log.write({level: 'debug', message: 'Trigger event @ tab:' + this.tab.id + ', event: '+ eventName + ', function: Worker.triggerEvent()'});
+  Log.write({level: 'debug', message: 'sdk/worker::triggerEvent ' + eventName + ' tab:' + this.tab.id});
   if (typeof this.callbacks[eventName] !== 'undefined') {
     this.callbacks[eventName].apply();
   }
@@ -57,7 +56,7 @@ Worker.prototype.triggerEvent = function (eventName) {
  * Destroy the worker
  */
 Worker.prototype.destroy = function (reason) {
-  Log.write({level: 'debug', message: 'Destroy worker @ tab:' + this.tab.id + ', function: Worker.destroy()'});
+  Log.write({level: 'debug', message: 'sdk/worker::destroy tab:' + this.tab.id + ' ' + reason});
 
   // console.debut('Destroying worker because ' + reason);
   // A detach event is fired just before removal.

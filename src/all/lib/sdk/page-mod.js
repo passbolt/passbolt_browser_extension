@@ -90,7 +90,7 @@ PageMod.prototype.__init = function() {
   // the include and contentScriptWhen pageMod parameters
   var _this = this;
   this._listeners['chrome.tabs.onUpdated'] = function(tabId, changeInfo, tab) {
-    _this.__onTabUpdated(tabId, changeInfo, tab);
+      _this.__onTabUpdated(tabId, changeInfo, tab);
   };
   chrome.tabs.onUpdated.addListener(this._listeners['chrome.tabs.onUpdated']);
 
@@ -120,7 +120,7 @@ PageMod.prototype.__init = function() {
 
   // When a tab is closed cleanup
   this._listeners['chrome.tabs.onRemoved'] = function (tabId) {
-    Log.write({level: 'debug', message: 'Tab onRemoved @ tab:' + tabId + ', function: PageMod.__init()'});
+    Log.write({level: 'debug', message: 'sdk/pagemod::__init::onRemovedListener tab:' + tabId });
     var index = _this._ports.indexOf(tabId);
     _this._ports.splice(index, 1);
   };
@@ -173,7 +173,7 @@ PageMod.prototype.__onIframeConnectInit = function() {
   var iframeId = this.args.include.split('passbolt=')[1];
   iframeId = iframeId.replace('*', '');
   this.portname = iframeId;
-  Log.write({level: 'debug', message: this.args.name + ' iframe page mod openening port on ' + this.portname});
+  Log.write({level: 'debug', message: 'sdk/pageMod::__onIframeConnectInit ' + this.args.name + ' iframe opening port on ' + this.portname});
   this.__initConnectListener(this.portname, undefined, true);
 };
 
@@ -187,7 +187,7 @@ PageMod.prototype.__onContentConnectInit = function() {
 	var replaceStr = chrome.runtime.getURL('/data/');
   portname = portname.replace(replaceStr, '').replace('.html','');
   this.portname = portname;
-  Log.write({level: 'debug', message: this.args.name + ' content page mod opening port on ' + this.portname});
+  Log.write({level: 'debug', message:  'sdk/pageMod::__onContentConnectInit ' + this.args.name + ' content opening port on ' + this.portname});
   this.__initConnectListener(this.portname);
 };
 
@@ -224,31 +224,36 @@ PageMod.prototype.__onAttachExistingTab = function(tab) {
  * @private
  */
 PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
-  // Mapping tabs statuses from chrome -> firefox
-  // loading = start
-  // complete = ready|end // default
-  var status = 'complete';
-  if(typeof this.args.contentScriptWhen !== 'undefined' && this.args.contentScriptWhen === 'start') {
-    status = 'loading';
+  // firefox sometimes fires changes with undefined status
+  // ignore that garbage
+  if(changeInfo.status === undefined) {
+    return;
   }
-
-  // When the tab status is marked as complete
-  if(changeInfo.status != status) {
+  // ignore loading requests
+  if(changeInfo.status !== 'complete') {
     return;
   }
 
+  // ignore requests that have changeInfo.url set && status complete
+  // they are only triggered by firefox in case of tab restore and proved buggy
+  if(changeInfo.url !== undefined) {
+    return;
+  }
+  // ignore about:blank urls they can not be interacted with anyway
+  if(tab.url === 'about:blank') {
+    return;
+  }
   // We can't insert scripts if the url is not https or http
   // as this is not allowed, instead we insert the scripts manually in the background page if needed
   if (!(tab.url.startsWith('http://') || tab.url.startsWith('https://'))) {
     return;
   }
-
   // Check if pagemod url pattern match tab url
   if (!this.__checkUrl(tab.url)) {
     return;
   }
 
-  Log.write({level: 'debug', message: this.args.name + ' pageMod tabUpdated @ tab:' + tab.id + ', url:' + tab.url + ', status: ' + changeInfo.status});
+  Log.write({level: 'debug', message: 'sdk/pageMod::__onTabUpdated ' + this.args.name + ' processing chrome.tabs.onUpdated ' + tabId + ' ' + changeInfo.status + ' ' + changeInfo.url + ' ' + tab.url });
 
   // if there is not already a worker in that tab
   // generate a portname based on the tab it and listen to connect event
@@ -275,10 +280,12 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
   scriptExecution.injectScripts(scripts);
 
   // Inject CSS files if needed
-  var styles = this.args.contentStyleFile.slice();
-  if (styles.length > 0) {
-    // TODO don't insert if the CSS is already inserted
-    scriptExecution.injectCss(styles);
+  if(typeof this.args.contentStyleFile !== 'undefined') {
+    var styles = this.args.contentStyleFile.slice();
+    if (styles.length > 0) {
+      // TODO don't insert if the CSS is already inserted
+      scriptExecution.injectCss(styles);
+    }
   }
 };
 

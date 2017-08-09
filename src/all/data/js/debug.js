@@ -105,7 +105,7 @@ $(function () {
     return passbolt.request('passbolt.debug.log.readAll')
       .then(function (data) {
         var logs = data.reduce(function(sum, log) {
-          sum.push('[' + log.level + '] ' + log.message);
+          sum.push(log.created + ' [' + log.level + '] ' + log.message);
           return sum;
         }, []);
         $('#logsContent').html(JSON.stringify(logs, undefined, 2));

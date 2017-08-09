@@ -55,10 +55,8 @@ Log.write = function (log) {
   if (logSettings.level == 0 || logSettings.level < logLevelMapping[log.level]) {
     return;
   }
-  // Register the log.
-  _logs.push(log);
 
-  // Show the time
+  // add a timestamp
   function formatTime(i) {
     return (i < 10) ? "0" + i : i;
   }
@@ -66,11 +64,14 @@ Log.write = function (log) {
     h = formatTime(today.getHours()),
     m = formatTime(today.getMinutes()),
     s = formatTime(today.getSeconds());
-  var t = h + ':' + m + ':' + s;
+  log.created =  h + ':' + m + ':' + s;
+
+  // Register the log.
+  _logs.push(log);
 
   // The log could also be displayed on the console.
   if (logSettings.console) {
-    var consoleLog = t + ' [' + log.level + '] ' + log.message;
+    var consoleLog = log.created + ' [' + log.level + '] ' + log.message;
     console.log(consoleLog);
   }
 };

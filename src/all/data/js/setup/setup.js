@@ -31,19 +31,6 @@ passbolt.setup.data = passbolt.setup.data || {};
   // Title element.
     $title = $('#js_step_title');
 
-
-  /* ==================================================================================
-   *  Add on code events
-   * ================================================================================== */
-
-  /**
-   * Listens to passbolt.setup.init event
-   * This event is launched when the pagemod is loaded.
-   */
-  passbolt.message.on('passbolt.setup.init', function (data) {
-    passbolt.setup.init(data);
-  });
-
   /* ==================================================================================
    *  Content code events
    * ================================================================================== */
@@ -690,5 +677,14 @@ passbolt.setup.data = passbolt.setup.data || {};
         return passbolt.request('passbolt.setup.flush');
       });
   };
+
+  // initialize the setup
+  var data = {};
+  var parsedUrl = new URL(window.location.href);
+  var rawData = parsedUrl.searchParams.get("data");
+  if (rawData) {
+    data = JSON.parse(decodeURIComponent(rawData));
+  }
+  passbolt.setup.init(data);
 
 })(jQuery);

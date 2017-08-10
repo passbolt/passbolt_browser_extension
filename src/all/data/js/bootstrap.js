@@ -7,7 +7,7 @@
 
 var passbolt = passbolt || {};
 
-(function ($) {
+$(function () {
 
   /**
    * Init the passbolt bootstrap.
@@ -22,11 +22,11 @@ var passbolt = passbolt || {};
     this.loadConfiguration()
       // Boostrap common.
       .then(function () {
-        _this.boostrapCommon();
+        _this.bootstrapCommon();
       })
       // Boostrap login page.
       .then(function () {
-        _this.boostrapLoginPage();
+        _this.bootstrapLoginPage();
       });
   };
 
@@ -51,7 +51,7 @@ var passbolt = passbolt || {};
   /**
    * Bootstrap all pages from all domain.
    */
-  Bootstrap.prototype.boostrapCommon = function () {
+  Bootstrap.prototype.bootstrapCommon = function () {
     $('html').removeClass('no-passboltplugin')
       .addClass('passboltplugin');
 
@@ -67,12 +67,12 @@ var passbolt = passbolt || {};
   /**
    * Bootstrap the login page.
    * The login process is mainly managed by the authPageMod, but some cases
-   * are managed by the common boostrap such as :
+   * are managed by the common bootstrap such as :
    * - Plugin configured but on the wrong domain. When the user tries to access
    *   another passbolt instance than the one he has configured the plugin for.
    * - Plugin not configured.
    */
-  Bootstrap.prototype.boostrapLoginPage = function () {
+  Bootstrap.prototype.bootstrapLoginPage = function () {
     // If not on the login page.
     if (!$('.passbolt .login.page').length) {
       return;
@@ -144,4 +144,5 @@ var passbolt = passbolt || {};
   // Boostrap passbolt.
   new Bootstrap();
 
-})(jQuery);
+});
+undefined;

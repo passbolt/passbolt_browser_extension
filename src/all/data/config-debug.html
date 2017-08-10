@@ -7,6 +7,7 @@
 	<link rel="stylesheet" media="all" href="css/config_debug_webext.min.css"/>
 	<script src="js/lib/loadscript.js"></script>
 	<script src="js/include/config-debug.js"></script>
+	<style>.main.panel { bottom:0; }</style>
 </head>
 <body>
 <div id="container" class="config page debug plugin">
@@ -262,33 +263,45 @@
                     <!--</div>-->
                 <!--</div>-->
 
-				<!-- Advanced -->
-				<div class="row localstoragesettings">
-					<div class="col12">
-						<a name="advanced"></a>
-						<h2>Advanced operations</h2>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col6 last">
-						<h3>Pagemod & workers</h3>
-						<p>(Re)initialize the passbolt application pagemod</p>
-						<input value="execute" id="initAppPagemod" type="submit" class="button"/>
-					</div>
-				</div>
+                <!-- Advanced -->
+                <div class="row localstoragesettings">
+                    <div class="col12">
+                        <a name="advanced"></a>
+                        <h2>Advanced operations</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col6 last">
+                        <h3>Pagemod & workers</h3>
+                        <p>(Re)initialize the passbolt application pagemod</p>
+                        <input value="execute" id="initAppPagemod" type="submit" class="button"/>
+                    </div>
+                    <div class="col6 last">
+                        <h3>Toolbar</h3>
+                        <p>Simulate toolbar icon click</p>
+                        <input value="execute" id="simulateToolbarIcon" type="submit" class="button"/>
+                    </div>
+                </div>
+
+                <!-- Logs -->
+                <div class="row logs">
+                    <div class="col12">
+                        <a name="logs"></a>
+                        <h2>Logs</h2>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col12 last">
+                        <h3>Plugin logs</h3>
+                        <p><pre id="logsContent"></pre></p>
+                    </div>
+                </div>
 
             </div>
 		</div>
 	</div>
 
     <input type="hidden" id="js_auto_settings" name="auto_settings">
-
-	<!-- footer -->
-	<footer>
-		<div class="footer">
-			<span class="copyright">2015 &copy; Passbolt.com <i class="fa-hand-peace-o fa fw"></i></span>
-		</div>
-	</footer>
 
 </div>
 </body>

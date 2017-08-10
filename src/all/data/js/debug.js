@@ -43,6 +43,8 @@ $(function () {
       .then(initEventListeners)
       // Init test profiles dropdown.
       .then(initTestProfilesSection)
+      // Init the logs section.
+      .then(initLogsSection)
       // Mark the page as ready
       .then(function () {
         $('.config.page').addClass('ready');
@@ -55,7 +57,6 @@ $(function () {
    * Initialize the user section
    */
   var initUserSection = function () {
-
     return new Promise(function(resolve, reject) {
       passbolt.request('passbolt.user.get')
         .then(function (user) {
@@ -100,6 +101,20 @@ $(function () {
   };
 
   /**
+   * Init the logs section.
+   */
+  var initLogsSection = function () {
+    return passbolt.request('passbolt.debug.log.readAll')
+      .then(function (data) {
+        var logs = data.reduce(function(sum, log) {
+          sum.push(log.created + ' [' + log.level + '] ' + log.message);
+          return sum;
+        }, []);
+        $('#logsContent').html(JSON.stringify(logs, undefined, 2));
+      });
+  };
+
+  /**
    * Init event listeners.
    */
   var initEventListeners = function () {
@@ -110,6 +125,7 @@ $(function () {
     $('#saveServerKey').on('click', onSaveServerKeyClick);
     $('#js_flush_conf').on('click', onFlushConfClick);
     $('#initAppPagemod').on('click', onInitAppPagemodClick);
+    $('#simulateToolbarIcon').on('click', onSimulateToolbarIconClick);
     $('#saveTestProfile').on('click', onTestProfileSave);
     window.addEventListener('passbolt.debug.settings.set', onSetDebugSettings);
   };
@@ -302,6 +318,13 @@ $(function () {
    */
   var onInitAppPagemodClick = function () {
     passbolt.message.emit('passbolt.debug.appPagemod.init');
+  };
+
+  /**
+   * Handle init app pagemod button click
+   */
+  var onSimulateToolbarIconClick = function () {
+    passbolt.message.emit('passbolt.debug.simulateToolbarIconClick');
   };
 
   /**

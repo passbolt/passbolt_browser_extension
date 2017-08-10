@@ -1,6 +1,13 @@
 /**
  * Debug page.
  *
+ * Note for Mozilla addon reviewers:
+ * These are profile fixtures only available when the application is on
+ * Debug mode. They are used to speed up selenium testsuite execution by
+ * allowing switching quickly between test user profile without having
+ * to perform a recover operation and upload a long secret key string
+ * via the selenium webdriver. These are not "real" secret keys.
+ *
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */

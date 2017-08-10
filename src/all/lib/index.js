@@ -8,6 +8,25 @@
 // Config and user models
 var Config = require('./model/config');
 var User = require('./model/user').User;
+var Log = require('./model/log').Log;
+
+/* ==================================================================================
+ *  Flush the logs
+ * ==================================================================================
+ */
+Log.flush();
+
+/* ==================================================================================
+ *  Legacy Firefox Addon-SDK Migration
+ * ==================================================================================
+ */
+if (typeof browser !== 'undefined') {
+  Log.write({level: 'debug', message: 'Web Extension started'});
+  var port = browser.runtime.connect({name: "passbolt-legacy-port"});
+  port.onMessage.addListener(function(message) {
+    Log.write({level: 'debug', message: 'Message from legacy add-on: ' + message.content});
+  });
+}
 
 /* ==================================================================================
  *  Openpgp init
@@ -73,4 +92,5 @@ pageMods.GroupEditAutocompleteDialog.init();
 // Debug pagemod
 if (Config.isDebug()) {
   pageMods.Debug.init();
+  pageMods.DebugPage.init();
 }

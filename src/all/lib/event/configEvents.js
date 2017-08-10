@@ -94,11 +94,22 @@ var listen = function (worker) {
   /*
    * Get plugin version.
    *
-   * @listens passbolt.addon.getDomain
+   * @listens passbolt.addon.getVersion
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.addon.getVersion', function (requestId) {
     worker.port.emit(requestId, 'SUCCESS', BrowserSettings.getExtensionVersion());
   });
+
+  /*
+   * Get plugin url.
+   *
+   * @listens passbolt.addon.getUrl
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.addon.getUrl', function (requestId) {
+    worker.port.emit(requestId, 'SUCCESS', chrome.runtime.getURL(''));
+  });
+
 };
 exports.listen = listen;

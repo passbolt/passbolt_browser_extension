@@ -23,7 +23,7 @@ events.app = require('./event/appEvents');
 events.auth = require('./event/authEvents');
 events.clipboard = require('./event/clipboardEvents');
 events.config = require('./event/configEvents');
-events.debug = require('./event/debugEvents');
+events.debugPage = require('./event/debugPageEvents');
 events.editPassword = require('./event/editPasswordEvents');
 events.file = require('./event/fileEvents');
 events.group = require('./event/groupEvents');
@@ -74,7 +74,7 @@ exports.callbacks = callbacks;
 var pageMods = {};
 
 /*
- * This pagemod allow inserting classes to help any page
+ * This pagemod allows inserting classes to help any page
  * to know about the status of the extension, in a modernizr fashion
  * It also helps the plugin to recognise if a page behave like a passbolt app
  */
@@ -166,6 +166,12 @@ pageMods.GroupEditAutocompleteDialog = require('./pagemod/groupEditAutocompleteD
  * This allows to not have to go through the setup process steps
  * and perform changes useful for testing that would otherwise break things
  * Like for example changing the public key only on the client but not the server
+ */
+pageMods.DebugPage = require('./pagemod/debugPagePagemod').DebugPage;
+
+/*
+ * This page mod allow inserting the debug tools needed by developers on all
+ * pages.
  */
 pageMods.Debug = require('./pagemod/debugPagemod').Debug;
 

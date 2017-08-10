@@ -1,7 +1,8 @@
 /**
  * Debug pagemod.
  *
- * This page mod drives a convenience config page for debug
+ * This page mod allow inserting the debug tools needed by developers on all
+ * pages. By This page mod drives a convenience config page for debug
  * This allows to not have to go through the setup process steps
  * and perform changes useful for testing that would otherwise break things
  * Like for example changing the public key only on the client but not the server
@@ -18,31 +19,27 @@ Debug._pageMod = undefined;
 
 Debug.init = function () {
 
-  console.warn('Warning: plugin debug mode is on!');
-  console.warn(chrome.runtime.getURL('data/config-debug.html'));
-
   if (typeof Debug._pageMod !== 'undefined') {
     Debug._pageMod.destroy();
     Debug._pageMod = undefined;
   }
-  Debug._pageMod = pageMod.PageMod({
-    name: 'debug',
-    include: chrome.runtime.getURL('data/config-debug.html'),
 
-    contentScriptWhen: 'end',
+  Debug._pageMod = pageMod.PageMod({
+    name: 'Debug',
+    include: new RegExp('.*'),
+
     contentScriptFile: [
-			// Warning: modify the page scripts and styles in
-			// chrome/data/config-debug.html and chrome/data/js/load/config-debug.js
+      'data/vendors/jquery.min.js',
+      'data/js/lib/port.js',
+      'data/js/lib/request.js',
+      'data/js/lib/message.js',
+      'data/js/debug/common.js'
     ],
     onAttach: function (worker) {
-      Worker.add('debug', worker);
+      Worker.add('Debug', worker);
       app.events.config.listen(worker);
-      app.events.file.listen(worker);
-      app.events.keyring.listen(worker);
-      app.events.template.listen(worker);
-      app.events.user.listen(worker);
-      app.events.debug.listen(worker);
     }
   });
+
 };
 exports.Debug = Debug;

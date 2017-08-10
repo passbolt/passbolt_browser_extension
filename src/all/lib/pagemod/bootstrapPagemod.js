@@ -29,6 +29,7 @@ Bootstrap.init = function () {
     contentScriptFile: [
       'data/vendors/jquery.min.js',
       'data/vendors/ejs_production.js',
+      'data/js/lib/port.js',
       'data/js/lib/request.js',
       'data/js/lib/message.js',
       'data/js/lib/html.js',

@@ -116,9 +116,8 @@ passbolt.login = passbolt.login || {};
   });
 
   // GPGAuth is completed with success
-  passbolt.message.on('passbolt.auth.login-success', function (message, referrer) {
+  passbolt.message.on('passbolt.auth.login-success', function () {
     $('html').addClass('loaded').removeClass('loading');
-    window.top.location.href = referrer;
   });
 
   // GPGAuth failed

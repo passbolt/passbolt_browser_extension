@@ -1,0 +1,14 @@
+{
+  "name": "passbolt_extension",
+  "version": "1.6.2",
+  "license": "AGPL-3.0",
+  "title": "Passbolt",
+  "id": "passbolt@passbolt.com",
+  "description": "Passbolt web extension for the open source password manager for teams",
+  "author": "Passbolt SARL <contact@passbolt.com> (https://www.passbolt.com)",
+  "homepage": "https://www.passbolt.com",
+  "repository": "https://github.com/passbolt",
+  "icon": "resource://@passbolt/webextension/icons/icon-48.png",
+  "main": "index.js",
+  "hasEmbeddedWebExtension": true
+}

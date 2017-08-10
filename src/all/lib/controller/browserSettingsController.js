@@ -1,3 +1,5 @@
+var Log = require('../model/log').Log;
+
 /**
  * Browser Settings Controller.
  *
@@ -16,7 +18,7 @@ var get = function (key) {
     case 'browser.download.lastDir':
     //break;
     default:
-      console.error('Chrome browserSettingsController::get for key ' + key + ' not implemented');
+      Log.write({level: 'error', message: 'Chrome browserSettingsController::get for key ' + key + ' not implemented'});
       return undefined;
       break;
   }
@@ -30,7 +32,7 @@ exports.get = get;
  * @param {string} value
  */
 var set = function (key, value) {
-  console.error('Chrome browserSettingsController::set not implemented');
+  Log.write({level: 'error', message: 'Chrome browserSettingsController::set not implemented'});
 };
 exports.set = set;
 

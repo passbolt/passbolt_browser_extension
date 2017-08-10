@@ -33,7 +33,6 @@ var self = self || {};
     this._port.onMessage.addListener(function(msg) {
       _this._onMessage(msg);
     });
-
   };
 
   /**
@@ -105,7 +104,8 @@ var self = self || {};
    * @param args
    */
   Port.prototype.emit = function() {
-    this._port.postMessage(arguments);
+    var message = JSON.stringify(arguments);
+    this._port.postMessage(message);
   };
 
   /*****************************************************************************

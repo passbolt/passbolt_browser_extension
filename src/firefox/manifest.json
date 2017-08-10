@@ -25,6 +25,15 @@
       "64": "icons/icon-64.png"
     }
   },
+  "commands": {
+    "passbolt-open": {
+      "suggested_key": {
+        "default": "Alt+Shift+P",
+        "mac": "Alt+Shift+P"
+      },
+      "description": "Open passbolt in a new tab!"
+    }
+  },
   "permissions": [
     "activeTab",
     "clipboardWrite",

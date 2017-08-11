@@ -35,18 +35,12 @@ $(function () {
   var init = function () {
     // Init the user section
     initUserSection()
-    // Init the keys section.
       .then(initKeysSection)
-      // Init the localstorage section.
       .then(initLocalStorageSection)
-      // Init event listeners.
-      .then(initEventListeners)
-      // Init test profiles dropdown.
-      .then(initTestProfilesSection)
-      // Init the logs section.
       .then(initLogsSection)
-      // Mark the page as ready
       .then(function () {
+        initEventListeners();
+        initTestProfilesSection();
         $('.config.page').addClass('ready');
       },function() {
         console.error('Something went wrong when initializing the the setup page.');
@@ -60,11 +54,12 @@ $(function () {
     return new Promise(function(resolve, reject) {
       passbolt.request('passbolt.user.get')
         .then(function (user) {
-          return updateUserForm(user);
-        })
-        .then(function () {
+          updateUserForm(user);
           resolve();
-        });
+        }, function(error) {
+          // no user, no problem
+          resolve();
+        })
     });
   };
 
@@ -72,29 +67,37 @@ $(function () {
    * Initialize the key section
    */
   var initKeysSection = function () {
-
-    // Retrieve the user private key.
-    var p1 = passbolt.request('passbolt.keyring.private.get')
-      // Update the client key information.
-      .then(function (keyInfo) {
-        updateKeyInfo(keyInfo, 'client');
-      });
-
-    // Retrieve the server public key.
-    var p2 = passbolt.request('passbolt.keyring.server.get')
+    var p1 = new Promise(function(resolve, reject) {
+      // Retrieve the user private key.
+      passbolt.request('passbolt.keyring.private.get')
+        .then(function (keyInfo) {
+          updateKeyInfo(keyInfo, 'client');
+          resolve();
+        }, function(error) {
+          // no private key, no problem
+          resolve();
+        });
+    });
+    var p2 = new Promise(function(resolve, reject) {
+      // Retrieve the server public key.
+      passbolt.request('passbolt.keyring.server.get')
       // Update the server key information.
-      .then(function (keyInfo) {
-        updateKeyInfo(keyInfo, 'server');
-      });
-
-    return $.when(p1, p2);
+        .then(function (keyInfo) {
+          updateKeyInfo(keyInfo, 'server');
+          resolve();
+        }, function(error) {
+          // no private key, no problem
+          resolve();
+        });
+    });
+    return Promise.all([p1, p2]);
   };
 
   /**
    * Init the local storage section.
    */
   var initLocalStorageSection = function () {
-    passbolt.request('passbolt.debug.config.readAll')
+    return passbolt.request('passbolt.debug.config.readAll')
       .then(function (data) {
         $('#localStorage').html(JSON.stringify(data, undefined, 2));
       });

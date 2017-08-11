@@ -51,3 +51,4 @@ $(function () {
   new DebugCommon();
 
 });
+undefined;

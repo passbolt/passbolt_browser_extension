@@ -15,6 +15,12 @@ var _config = require('../config/config.json');
 var init = function () {
   // Retrieve the config from the local storage
   var storedConfig = storage.getItem('config');
+
+  // No config in local storage, do nothing
+  if (storedConfig === null ) {
+    return;
+  }
+
   // Retrieve the config defined by the admin in the config.json.
   for (var name in storedConfig) {
     write(name, storedConfig[name], false);

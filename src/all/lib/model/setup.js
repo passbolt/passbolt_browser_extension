@@ -55,7 +55,7 @@ var Setup = function () {
 Setup.prototype.set = function (key, value) {
   // Get last setup stored.
   var _setup = storage.getItem(this.storageKeyName);
-  if (_setup == undefined || _setup == null) {
+  if (_setup === null) {
     _setup = JSON.parse(JSON.stringify(this._setup));
   }
   key = key.split(".");
@@ -73,15 +73,15 @@ Setup.prototype.set = function (key, value) {
  */
 Setup.prototype.get = function (key) {
   var _setup = storage.getItem(this.storageKeyName);
-  if (_setup == null) {
+  if (_setup === null) {
     _setup = this._setup;
   }
-  if (key == undefined) {
+  if (typeof key === 'undefined') {
     return _setup;
   }
   key = key.split(".");
   var val = jsonQ.pathValue(_setup, key);
-  if (val == undefined) {
+  if (typeof val === 'undefined') {
     return '';
   }
   return val;

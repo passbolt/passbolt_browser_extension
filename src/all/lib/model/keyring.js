@@ -45,10 +45,11 @@ Keyring.STORAGE_KEY_PRIVATE = 'passbolt-private-gpgkeys';
 Keyring.getPrivateKeys = function() {
   // Get the private keys from the local storage.
   var pvtSerialized = storage.getItem(Keyring.STORAGE_KEY_PRIVATE);
-  if (pvtSerialized) {
+  if (pvtSerialized === null) {
+    return {};
+  } else {
     return JSON.parse(pvtSerialized);
   }
-  return {};
 };
 
 /**
@@ -431,7 +432,7 @@ Keyring.prototype.sync = function () {
   var _response = {};
 
   // If a sync has already been performed.
-  if (latestSync) {
+  if (latestSync !== null) {
     url += '?modified_after=' + latestSync;
   }
 

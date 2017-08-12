@@ -261,7 +261,7 @@ module.exports = function(grunt) {
         },
         command: [
           './node_modules/.bin/jpm xpi --addon-dir ' + path.build_legacy,
-          'mv ' + path.build_legacy + 'passbolt_extension.xpi ' + path.dist_firefox + 'passbolt-' + pkg.version + '-legacy-debug.xpi',
+          'mv ' + path.build_legacy + 'passbolt.xpi ' + path.dist_firefox + 'passbolt-' + pkg.version + '-legacy-debug.xpi',
           'rm -f '+ path.dist_firefox + 'passbolt-legacy-latest@passbolt.com.xpi',
           'ln -fs ' + path.dist_firefox + 'passbolt-' + pkg.version + '-legacy-debug.xpi '  + path.dist_firefox + 'passbolt-legacy-latest@passbolt.com.xpi'
         ].join('&&')
@@ -308,7 +308,7 @@ module.exports = function(grunt) {
 				options: {spawn: false}
 			},
 			vendors: {
-				files: [path.src + 'lib/vendors.js', path.src + 'lib/vendors/**/*.js'],
+				files: [path.src + 'lib/vendors.js', path.src + 'lib/vendors/**/*.js', path.src + 'lib/sdk/storage.js'],
 				tasks: ['browserify:vendors'],
 				options: {spawn: false}
 			},

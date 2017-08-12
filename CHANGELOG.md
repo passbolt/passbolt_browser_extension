@@ -4,6 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [Unreleased]
+- PASSBOLT-2198: Migrate from Firefox legacy SDK to embed/native webextensions 
+- PASSBOLT-2254: Add log system to grab selenium tests traces
+- PASSBOLT-2210: Update Grunt build tasks 
+- PASSBOLT-2200: Update to OpenPGP.js version 2.5.8
+- PASSBOLT-2069: Update to JQuery version 3.2.1
+- PASSBOLT-2248: Migrate from window.localStorage to chrome.storage on chrome
+- PASSBOLT-2283: Migrate from simplestorage to chrome.storage on firefox
 
 ## [1.6.0] - 2017-06-21
 ### Fixed

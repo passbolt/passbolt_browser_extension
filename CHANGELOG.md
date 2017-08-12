@@ -2,11 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-
 ## [Unreleased]
-- PASSBOLT-2198: Migrate from Firefox legacy SDK to embed/native webextensions 
+
+## [1.6.2] - 2017-08-12
+### Added
+- PASSBOLT-2198: Migrate from Firefox legacy SDK to embed/native webextensions
 - PASSBOLT-2254: Add log system to grab selenium tests traces
-- PASSBOLT-2210: Update Grunt build tasks 
+- PASSBOLT-2210: Update Grunt build tasks
 - PASSBOLT-2200: Update to OpenPGP.js version 2.5.8
 - PASSBOLT-2069: Update to JQuery version 3.2.1
 - PASSBOLT-2248: Migrate from window.localStorage to chrome.storage on chrome
@@ -159,7 +161,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.2...HEAD
+[1.6.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.1...v1.6.2
+[1.6.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.4.2...v1.5.0

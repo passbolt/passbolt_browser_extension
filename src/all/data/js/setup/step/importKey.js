@@ -86,6 +86,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
       })
       .then(null, function (error) {
         step.onError(error);
+        return Promise.reject();
       });
   };
 
@@ -171,52 +172,31 @@ passbolt.setup.steps = passbolt.setup.steps || {};
   };
 
   /**
-   * Check that the key doesn't already exist on server.
-   * @return Promise
-   */
-  step.checkKeyDontExistRemotely = function () {
-    return new Promise(function(resolve, reject) {
-      var armoredPrivateKey = step.data.privateKeyArmored;
-      passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
-        .then(function () {
-          reject('This key is already used by another user');
-        })
-        .then(null, function () {
-          resolve(armoredPrivateKey);
-        });
-    });
-  };
-
-  /**
-   * Check that the key exists on server.
-   * @return Promise
-   */
-  step.checkKeyExistRemotely = function () {
-    return new Promise(function(resolve, reject) {
-      var armoredPrivateKey = step.data.privateKeyArmored;
-      passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
-        .then(function () {
-          resolve(armoredPrivateKey);
-        })
-        .then(null, function () {
-          reject('This key doesn\'t match any account.');
-        });
-    });
-  };
-
-  /**
    * Check key existence depending on the workflow.
    *  - install case: check that the key doesn't exist remotely.
    *  - recover case: check that the key exist remotely.
    * @return {promise}
    */
   step.validatePrivateKey = function () {
-    if (step.options.workflow == 'install') {
-      return step.checkKeyDontExistRemotely()
-    }
-    else if (step.options.workflow == 'recover') {
-      return step.checkKeyExistRemotely()
-    }
+    return new Promise(function(resolve, reject) {
+      passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
+        .then(function () {
+          if (step.options.workflow == 'install') {
+            reject('This key is already used by another user');
+          }
+          else if (step.options.workflow == 'recover') {
+            resolve();
+          }
+        })
+        .then(null, function () {
+          if (step.options.workflow == 'install') {
+            resolve();
+          }
+          else if (step.options.workflow == 'recover') {
+            reject('This key doesn\'t match any account.');
+          }
+        });
+    });
   };
 
   /**

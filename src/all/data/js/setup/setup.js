@@ -29,7 +29,11 @@ passbolt.setup.data = passbolt.setup.data || {};
   // Content wrapper element.
     $contentWrapper = $('#js_step_content'),
   // Title element.
-    $title = $('#js_step_title');
+    $title = $('#js_step_title'),
+  // The setup data
+    setupData = {},
+  // The setup should start at the step
+    startingStepId = 'domain_check';
 
   /* ==================================================================================
    *  Content code events
@@ -416,12 +420,12 @@ passbolt.setup.data = passbolt.setup.data || {};
    * ================================================================================== */
 
   /**
-   * Check the setup information are valid.
+   * Validate the setup information.
    * @param setupData {array} The setup information
    * @returns {boolean}
    * @private
    */
-  passbolt.setup._initCheckData = function (setupData) {
+  passbolt.setup._initValidateSetupData = function (setupData) {
     var isCorrect =
       setupData != undefined && setupData.settings != undefined && setupData.user != undefined
       && setupData.settings.domain != undefined && setupData.settings.domain != ''
@@ -435,54 +439,87 @@ passbolt.setup.data = passbolt.setup.data || {};
   };
 
   /**
+   * Retrieve setup data from the url if any given.
+   * @private
+   */
+  passbolt.setup._initGetUrlSetupData = function () {
+    var urlSetupData = {};
+    var parsedUrl = new URL(window.location.href);
+    var rawUrlSetupData = parsedUrl.searchParams.get("data");
+    if (rawUrlSetupData) {
+      urlSetupData = JSON.parse(decodeURIComponent(rawUrlSetupData));
+    }
+
+    return new Promise(function(resolve, reject) {
+      // If setup data are provided by the page, map them to the expected format.
+      if (Object.keys(urlSetupData).length) {
+        setupData = {
+          settings: {
+            token: urlSetupData.token,
+            domain: urlSetupData.domain,
+            workflow: urlSetupData.workflow
+          },
+          user: {
+            username: urlSetupData.username,
+            firstname: urlSetupData.firstName,
+            lastname: urlSetupData.lastName,
+            id: urlSetupData.userId
+          }
+        };
+
+        // If the data are not valid.
+        if (!passbolt.setup._initValidateSetupData(setupData)) {
+          return reject('Setup data provided are not valid');
+        }
+      }
+
+      return resolve();
+    });
+  };
+
+  /**
    * Prepare data to initialize setup.
    * Try to retrieve setup data from storage in case of a previous unfinished setup,
    * or get them from the parameters that are provided.
    *
-   * @param data {array} raw setup data (includes domain, token, firstName, lastName, username)
    * @returns {promise}
    * @private
    */
-  passbolt.setup._initPrepareData = function (data) {
+  passbolt.setup._initPrepareData = function () {
+    var flushExistingSetupData = false;
 
-    return new Promise(function(resolve, reject) {
-      // Are data provided by page ?
-      var dataIsProvided = passbolt.setup._initCheckData(data);
-      var defaultSetupData = {};
-      if (dataIsProvided) {
-        defaultSetupData = data;
-      }
-
-      // Check if setup was already started from the storage.
-      passbolt.request('passbolt.setup.get')
-        .then(function (storageData) {
-          if (passbolt.setup._initCheckData(storageData)) {
-            // If we are in the case where the data provided don't match
-            // the setup data we already have in storage,
-            // we flush the storage.
-            if (dataIsProvided && storageData.settings.token != defaultSetupData.settings.token) {
-              passbolt.request('passbolt.setup.flush')
-                .then(function () {
-                  resolve(defaultSetupData);
-                });
-            } else {
-              resolve(storageData);
+    // Retrieve any previous setup data.
+    return passbolt.request('passbolt.setup.get')
+      .then(function(storedSetupData) {
+        // If the user already started a setup process.
+        if (Object.keys(storedSetupData).length && passbolt.setup._initValidateSetupData(storedSetupData)) {
+          // And the setup data are also present in the page.
+          // It can be te case when the user is coming back to the setup page by using navigation button (go back).
+          if (Object.keys(setupData).length) {
+            // If the registration token are different, the user is starting a new setup process.
+            if (setupData.settings.token != storedSetupData.settings.token) {
+              // Later on the process flush the existing setup data.
+              flushExistingSetupData = true;
             }
-          } else if (dataIsProvided) {
-            // If data is passed and is populated, then build setup data from there.
-            resolve(defaultSetupData);
-          } else {
-            reject('Unable to retrieve setup data');
+            // The token are equal, the user is continuing the same setup process.
+            else {
+              setupData = storedSetupData;
+            }
           }
-        })
-        // .then(null, function () {
-        //   if (dataIsProvided) {
-        //     resolve(defaultSetupData);
-        //   } else {
-        //     reject('Unable to retrieve setup data');
-        //   }
-        // });
-    });
+          // No setup data present in the page.
+          // It can be the case when the user closed the setup tab and come back late to setup page
+          // by clicking on the passbolt icon in the toolbar.
+          else {
+            setupData = storedSetupData;
+          }
+        }
+      })
+      // If the stored data need to be flushed.
+      .then(function() {
+        if (flushExistingSetupData) {
+          return passbolt.request('passbolt.setup.flush');
+        }
+      });
   };
 
   /**
@@ -493,11 +530,8 @@ passbolt.setup.data = passbolt.setup.data || {};
    * @returns {promise}
    * @private
    */
-  passbolt.setup._initValidateUser = function (data) {
-    return passbolt.request('passbolt.user.validate', data.user, ['id', 'username', 'firstname', 'lastname'])
-      .then(function (user) {
-        return data;
-      });
+  passbolt.setup._initValidateUser = function () {
+    return passbolt.request('passbolt.user.validate', setupData.user, ['id', 'username', 'firstname', 'lastname']);
   };
 
 
@@ -509,11 +543,8 @@ passbolt.setup.data = passbolt.setup.data || {};
    * @returns {promise}
    * @private
    */
-  passbolt.setup._initSetUser = function (data) {
-    return passbolt.request('passbolt.setup.set', 'user', data.user)
-      .then(function (setup) {
-        return data;
-      });
+  passbolt.setup._initSetUser = function () {
+    return passbolt.request('passbolt.setup.set', 'user', setupData.user);
   };
 
   /**
@@ -523,11 +554,8 @@ passbolt.setup.data = passbolt.setup.data || {};
    * @returns {*}
    * @private
    */
-  passbolt.setup._initValidateSettings = function (data) {
-    return passbolt.request('passbolt.user.settings.validate', data.settings, ['domain'])
-      .then(function (settings) {
-        return data;
-      });
+  passbolt.setup._initValidateSettings = function () {
+    return passbolt.request('passbolt.user.settings.validate', setupData.settings, ['domain']);
   };
 
   /**
@@ -537,11 +565,8 @@ passbolt.setup.data = passbolt.setup.data || {};
    * @returns {promise}
    * @private
    */
-  passbolt.setup._initSetSettings = function (data) {
-    return passbolt.request('passbolt.setup.set', 'settings', data.settings)
-      .then(function (setupData) {
-        return data;
-      });
+  passbolt.setup._initSetSettings = function () {
+    return passbolt.request('passbolt.setup.set', 'settings', setupData.settings);
   };
 
   /**
@@ -551,13 +576,13 @@ passbolt.setup.data = passbolt.setup.data || {};
    * @returns {promise}
    * @private
    */
-  passbolt.setup._initGetStepId = function () {
-    // Get value from setup.
+  passbolt.setup._initStartingStepId = function () {
     return passbolt.request('passbolt.setup.get', 'stepId')
       .then(function (stepId) {
-        var defaultStepId = 'domain_check';
-        var stepId = stepId != undefined && stepId != '' ? stepId : defaultStepId;
-        return stepId;
+        // If the setup has already been started, continue at this step.
+        if (stepId != undefined && stepId != '') {
+          startingStepId = stepId;
+        }
       });
   };
 
@@ -571,43 +596,37 @@ passbolt.setup.data = passbolt.setup.data || {};
   };
 
   /**
+   * Init the setup steps.
+   * @private
+   */
+  passbolt.setup._initSetupSteps = function() {
+    var workflowType = setupData.settings.workflow;
+    // Init step settings according to config given.
+    for (var i in passbolt.setup.steps) {
+      // Get corresponding step.
+      var stepId = passbolt.setup.steps[i].id;
+      var workflow = passbolt.setup.workflow[workflowType][stepId];
+      if (workflow != undefined) {
+        passbolt.setup.steps[stepId] = $.extend(passbolt.setup.steps[stepId], workflow);
+      }
+    }
+  };
+
+  /**
    * init the setup.
    * @param data {array} The setup information
    */
   passbolt.setup.init = function (data) {
-
-    // Build setup data.
-    var setupData = {
-      settings: {
-        token: data.token,
-        domain: data.domain
-      },
-      user: {
-        username: data.username,
-        firstname: data.firstName,
-        lastname: data.lastName,
-        id: data.userId
-      }
-    };
-
-    // Init step settings according to config given.
-    for (var stepId in passbolt.setup.steps) {
-      // Get corresponding step.
-      var stepId = passbolt.setup.steps[stepId].id;
-      if (passbolt.setup.workflow[data.workflow][stepId] != undefined) {
-        var workflow = passbolt.setup.workflow[data.workflow][stepId];
-        passbolt.setup.steps[stepId] = $.extend(passbolt.setup.steps[stepId], workflow);
-      }
-    }
-
-    passbolt.setup._initPrepareData(setupData)
+    passbolt.setup._initGetUrlSetupData(data)
+      .then(passbolt.setup._initPrepareData)
       .then(passbolt.setup._initValidateUser)
       .then(passbolt.setup._initSetUser)
       .then(passbolt.setup._initValidateSettings)
       .then(passbolt.setup._initSetSettings)
-      .then(passbolt.setup._initGetStepId)
-      .then(function (stepId) {
-        passbolt.setup.goForward(stepId);
+      .then(passbolt.setup._initStartingStepId)
+      .then(passbolt.setup._initSetupSteps)
+      .then(function () {
+        passbolt.setup.goForward(startingStepId);
       })
       .then(null, function (errorMessage) {
         passbolt.setup._initError(errorMessage, setupData);
@@ -671,12 +690,6 @@ passbolt.setup.data = passbolt.setup.data || {};
   };
 
   // initialize the setup
-  var data = {};
-  var parsedUrl = new URL(window.location.href);
-  var rawData = parsedUrl.searchParams.get("data");
-  if (rawData) {
-    data = JSON.parse(decodeURIComponent(rawData));
-  }
-  passbolt.setup.init(data);
+  passbolt.setup.init();
 
 })(jQuery);

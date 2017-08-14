@@ -95,7 +95,6 @@ LocalStorage.prototype.migrate = function (data) {
     window.localStorage.removeItem('_passbolt_data');
   }
   this._data = JSON.parse(data);
-  console.log(data);
   this._store();
 };
 

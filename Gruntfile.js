@@ -51,8 +51,9 @@ module.exports = function(grunt) {
 	grunt.registerTask('pre-dist', ['copy:background_page', 'copy:data', 'copy:vendors', 'copy:locale', 'copy:styleguide']);
 
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
-  grunt.registerTask('build-firefox', ['clean', 'build-firefox-debug', 'build-firefox-prod', 'build-firefox-legacy']);
-  grunt.registerTask('build-firefox-legacy', ['copy:manifest_firefox', 'copy:config_debug', 'bundle', 'copy:legacy', 'shell:build_firefox_legacy_debug']);
+  grunt.registerTask('build-firefox', ['clean', 'build-firefox-debug', 'build-firefox-prod', 'build-firefox-legacy-debug', 'build-firefox-legacy-prod']);
+  grunt.registerTask('build-firefox-legacy-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'copy:legacy', 'shell:build_firefox_legacy_debug']);
+  grunt.registerTask('build-firefox-legacy-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_firefox', 'bundle', 'copy:legacy', 'shell:build_firefox_legacy_prod']);
   grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'shell:build_firefox_debug']);
   grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default','copy:manifest_firefox', 'bundle', 'shell:build_firefox_prod']);
 
@@ -264,6 +265,16 @@ module.exports = function(grunt) {
           'mv ' + path.build_legacy + 'passbolt.xpi ' + path.dist_firefox + 'passbolt-' + pkg.version + '-legacy-debug.xpi',
           'rm -f '+ path.dist_firefox + 'passbolt-legacy-latest@passbolt.com.xpi',
           'ln -fs passbolt-' + pkg.version + '-legacy-debug.xpi '  + path.dist_firefox + 'passbolt-legacy-latest@passbolt.com.xpi'
+        ].join(' && ')
+      },
+      build_firefox_legacy_prod: {
+        options: {
+          stderr: false
+        },
+        command: [
+          './node_modules/.bin/jpm xpi --addon-dir ' + path.build_legacy,
+          'mv ' + path.build_legacy + 'passbolt.xpi ' + path.dist_firefox + 'passbolt-' + pkg.version + '-legacy.xpi',
+          "echo '\nMoved to " + path.dist_firefox + "passbolt-' + pkg.version + '-legacy.xpi'"
         ].join(' && ')
       },
 

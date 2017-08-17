@@ -69,7 +69,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
           step._getUserDomain()
             .then(step._getUserData)
             .then(function (userSettings) {
-              return passbolt.html.loadTemplate($('.plugin-check .message'), 'data/tpl/setup/already_configured.ejs', 'html', userSettings);
+              return passbolt.html.loadTemplate($('.plugin-check .message'), 'data/tpl/setup/alreadyConfigured.ejs', 'html', userSettings);
             })
             .then(function () {
               $('.plugin-check .message')

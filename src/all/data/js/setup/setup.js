@@ -256,7 +256,7 @@ passbolt.setup.data = passbolt.setup.data || {};
     $actionsWrapper.empty();
 
     // Load the actions template
-    return passbolt.html.loadTemplate($actionsWrapper, '/data/tpl/setup/action_buttons.ejs')
+    return passbolt.html.loadTemplate($actionsWrapper, '/data/tpl/setup/actionButtons.ejs')
       .then(function () {
         // Define which actions are available, as well as their states.
         // This is based on defaultActions, and extended with step actions if defined.

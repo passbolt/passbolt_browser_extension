@@ -104,12 +104,12 @@
         // Load the users in the list.
         for (var i in users) {
             currentUsers[users[i].User.id] = users[i];
-            var html = new EJS({text: itemTpl}).render({settings: settings, user: users[i]});
+            itemTpl.call({settings: settings, user: users[i]});
             $('ul').append(html);
         }
         // If no user found.
         if (!users.length) {
-            var html = new EJS({text: emptyTpl}).render();
+            emptyTpl.call();
             $('ul').append(html);
         }
         // Resize the autocomplete iframe.

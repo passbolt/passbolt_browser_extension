@@ -34,7 +34,7 @@ passbolt.setup.workflow = passbolt.setup.workflow || {};
       },
       'options': {
         'workflow': 'recover',
-        'infoTemplate': 'elements/import_key_recover_info.ejs'
+        'infoTemplate': 'importKeyRecoverInfo.ejs'
       },
       'viewData': {}
     },

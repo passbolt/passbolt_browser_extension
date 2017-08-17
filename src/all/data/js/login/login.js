@@ -74,11 +74,11 @@ passbolt.login = passbolt.login || {};
         // Special case to handle if the user doesn't exist on server.
         if (msg.indexOf('no user associated') != -1) {
           $('html').addClass('server-no-user');
-          passbolt.html.loadTemplate('.login.form', 'data/tpl/login/feedback-login-no-user.ejs');
+          passbolt.html.loadTemplate('.login.form', 'data/tpl/login/feedbackLoginNoUser.ejs');
         }
         // All other cases.
         else {
-          passbolt.html.loadTemplate('.login.form', 'data/tpl/login/feedback-login-oops.ejs');
+          passbolt.html.loadTemplate('.login.form', 'data/tpl/login/feedbackLoginOops.ejs');
         }
       }
     );
@@ -123,7 +123,7 @@ passbolt.login = passbolt.login || {};
   // GPGAuth failed
   passbolt.message.on('passbolt.auth.login-failed', function (message) {
     var tplData = {message: message};
-    passbolt.html.loadTemplate('.login.form', 'data/tpl/login/feedback-login-error.ejs', 'html', tplData);
+    passbolt.html.loadTemplate('.login.form', 'data/tpl/login/feedbackLoginError.ejs', 'html', tplData);
   });
 
   // Passphrase have been captured and verified
@@ -131,7 +131,7 @@ passbolt.login = passbolt.login || {};
     $('html').addClass('loading').removeClass('loaded');
     // remove the iframe and tell the user we're logging in
     var tplData = {message: message};
-    passbolt.html.loadTemplate('.login.form', 'data/tpl/login/feedback-passphrase-ok.ejs', 'html', tplData);
+    passbolt.html.loadTemplate('.login.form', 'data/tpl/login/feedbackPassphraseOk.ejs', 'html', tplData);
   });
 
   /* ==================================================================================

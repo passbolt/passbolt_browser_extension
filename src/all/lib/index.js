@@ -8,6 +8,7 @@
 var storage = require('./sdk/storage').storage;
 window.storage = storage;
 
+
 var main = function() {
 
   // Config and user models
@@ -108,6 +109,7 @@ var migration = function() {
         }
         resolve();
       });
+      resolve();
     } else {
       // Chrome localStage migration
       if (storage.migrationNeeded()) {

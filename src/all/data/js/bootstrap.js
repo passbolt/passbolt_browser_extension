@@ -102,7 +102,7 @@ $(function () {
       passboltDomain = window.location.href.replace(/(.*)(\/auth\/login(\/)?)$/, '$1'),
       browserName = passbolt.html.getBrowserName();
 
-    passbolt.html.loadTemplate($renderSpace, 'data/tpl/login/wrong-domain.ejs', 'html', {
+    passbolt.html.loadTemplate($renderSpace, 'data/tpl/login/wrongDomain.ejs', 'html', {
       trustedDomain: this.trustedDomain,
       publicRegistration: publicRegistration,
       passboltDomain: passboltDomain,
@@ -143,6 +143,4 @@ $(function () {
 
   // Boostrap passbolt.
   new Bootstrap();
-
 });
-undefined;

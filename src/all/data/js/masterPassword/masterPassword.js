@@ -139,7 +139,7 @@
     }
     // Otherwise notify the user, and don't allow him to make another attempt.
     else {
-      passbolt.html.loadTemplate($('.js_dialog_content'), 'data/tpl/master/master-password-failure.ejs');
+      passbolt.html.loadTemplate($('.js_dialog_content'), 'data/tpl/master/masterPasswordFailure.ejs');
     }
   };
 

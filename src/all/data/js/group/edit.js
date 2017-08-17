@@ -48,7 +48,6 @@
             });
     };
 
-
     /**
      * Init the security token.
      * @returns {promise}

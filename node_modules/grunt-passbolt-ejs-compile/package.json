@@ -1,0 +1,30 @@
+{
+  "name": "grunt-passbolt-ejs-compile",
+  "description": "A grunt task to compile passbolt ejs templates",
+  "version": "0.0.1",
+  "author": "Passbolt SARL",
+  "repository": {
+    "type": "git"
+  },
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ],
+  "engines": {
+    "node": ">= 4.4.0"
+  },
+  "dependencies": {
+    "ejs": "^2.5.7"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1"
+  },
+  "keywords": [
+    "gruntplugin",
+    "ejs"
+  ],
+  "files": [
+    "tasks"
+  ]
+}

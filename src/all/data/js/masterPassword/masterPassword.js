@@ -38,7 +38,7 @@
    * @returns {promise}
    */
   var loadTemplate = function () {
-    return passbolt.html.loadTemplate('body', 'data/tpl/master/masterPassword.ejs')
+    return passbolt.html.loadTemplate('body', 'master/masterPassword.ejs')
       .then(function () {
         $masterPasswordField = $('#js_master_password');
         $submitButton = $('#master-password-submit');
@@ -139,7 +139,7 @@
     }
     // Otherwise notify the user, and don't allow him to make another attempt.
     else {
-      passbolt.html.loadTemplate($('.js_dialog_content'), 'data/tpl/master/masterPasswordFailure.ejs');
+      passbolt.html.loadTemplate($('.js_dialog_content'), 'master/masterPasswordFailure.ejs');
     }
   };
 

@@ -82,7 +82,7 @@
       }
     }
 
-    passbolt.html.loadTemplate('body', 'data/tpl/progress/progress.ejs', 'html', {title: title})
+    passbolt.html.loadTemplate('body', 'progress/progress.ejs', 'html', {title: title})
       .then(initEventsListeners, error)
       .then(initProgressBar);
   };

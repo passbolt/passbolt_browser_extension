@@ -37,7 +37,7 @@
      * @returns {promise}
      */
     var loadTemplate = function () {
-        return passbolt.html.loadTemplate('body', 'data/tpl/group/edit.ejs')
+        return passbolt.html.loadTemplate('body', 'group/edit.ejs')
             .then(function () {
                 $autocomplete = $(autocompleteFieldSelector);
 

@@ -52,8 +52,11 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['bundle']);
   grunt.registerTask('templates', ['ejs_compile', 'browserify:templates']);
+  grunt.registerTask('pre-dist', ['copy:background_page', 'copy:data', 'copy:vendors', 'copy:locale', 'copy:styleguide']);
+
   grunt.registerTask('bundle', ['browserify:vendors', 'browserify:app', 'ejs_compile', 'browserify:templates']);
-	grunt.registerTask('pre-dist', ['copy:background_page', 'copy:data', 'copy:vendors', 'copy:locale', 'copy:styleguide']);
+  grunt.registerTask('bundle-firefox', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle']);
+  grunt.registerTask('bundle-chrome', ['pre-dist', 'copy:config_debug', 'copy:manifest_chrome', 'bundle']);
 
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
   grunt.registerTask('build-firefox', ['clean', 'build-firefox-debug', 'build-firefox-prod', 'build-firefox-legacy-debug', 'build-firefox-legacy-prod']);
@@ -61,7 +64,6 @@ module.exports = function(grunt) {
   grunt.registerTask('build-firefox-legacy-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_firefox', 'bundle', 'copy:legacy', 'shell:build_firefox_legacy_prod']);
   grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'shell:build_firefox_debug']);
   grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default','copy:manifest_firefox', 'bundle', 'shell:build_firefox_prod']);
-
   grunt.registerTask('build-chrome', ['clean', 'build-chrome-debug', 'build-chrome-prod']);
   grunt.registerTask('build-chrome-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_chrome', 'bundle', 'shell:build_chrome_debug']);
   grunt.registerTask('build-chrome-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_chrome', 'bundle', 'shell:build_chrome_prod']);
@@ -164,8 +166,6 @@ module.exports = function(grunt) {
 					{expand: true, cwd: path.node_modules + 'jssha/src', src: 'sha.js', dest: path.src_content_vendors},
 					// underscore
 					{expand: true, cwd: path.node_modules + 'underscore', src: 'underscore-min.js', dest: path.src_addon_vendors},
-					// jsonQ
-					{expand: true, cwd: path.node_modules + 'jsonq', src: 'jsonQ.js', dest: path.src_addon_vendors},
 					// xregexp
 					{expand: true, cwd: path.node_modules + 'xregexp', src: 'xregexp-all.js', dest: path.src_addon_vendors},
 					{expand: true, cwd: path.node_modules + 'xregexp', src: 'xregexp-all.js', dest: path.src_content_vendors},

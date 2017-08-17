@@ -49,7 +49,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
     // If info template is provided, display it.
     // We use this space to display side information to the user.
     if (step.options.infoTemplate != undefined && step.options.infoTemplate != null) {
-      passbolt.html.loadTemplate($('#js_step_content .sideInfo'), 'data/tpl/setup/' + step.options.infoTemplate);
+      passbolt.html.loadTemplate($('#js_step_content .sideInfo'), 'setup/' + step.options.infoTemplate);
     }
 
     // Bind the go back to create a new key button.

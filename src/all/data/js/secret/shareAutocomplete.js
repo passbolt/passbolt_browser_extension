@@ -42,12 +42,12 @@
    * @returns {promise}
    */
   var loadTemplate = function () {
-    return passbolt.html.loadTemplate('body', 'data/tpl/resource/shareAutocomplete.ejs')
+    return passbolt.html.loadTemplate('body', 'resource/shareAutocomplete.ejs')
       .then(function () {
-        return passbolt.html.getTemplate('data/tpl/resource/shareAutocompleteItem.ejs');
+        return passbolt.html.getTemplate('resource/shareAutocompleteItem.ejs');
       }).then(function (data) {
         itemTpl = data;
-        return passbolt.html.getTemplate('data/tpl/resource/shareAutocompleteItemEmpty.ejs');
+        return passbolt.html.getTemplate('resource/shareAutocompleteItemEmpty.ejs');
       }).then(function (data) {
         emptyTpl = data;
       });
@@ -124,13 +124,13 @@
         _aros[aro.Group.id] = aro;
       }
 
-      html = itemTpl.call(data);
+      html = itemTpl.call(this, data);
       $('ul').append(html);
     }
 
     // If no user found.
     if (!aros.length) {
-      var html = emptyTpl.call();
+      var html = emptyTpl.call(this);
       $('ul').append(html);
     }
 

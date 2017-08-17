@@ -256,7 +256,7 @@ passbolt.setup.data = passbolt.setup.data || {};
     $actionsWrapper.empty();
 
     // Load the actions template
-    return passbolt.html.loadTemplate($actionsWrapper, '/data/tpl/setup/actionButtons.ejs')
+    return passbolt.html.loadTemplate($actionsWrapper, 'setup/action_buttons.ejs')
       .then(function () {
         // Define which actions are available, as well as their states.
         // This is based on defaultActions, and extended with step actions if defined.
@@ -316,7 +316,7 @@ passbolt.setup.data = passbolt.setup.data || {};
           currentStepId: stepId
         };
 
-        return passbolt.html.loadTemplate($menuWrapper, '/data/tpl/setup/menu.ejs', 'html', data);
+        return passbolt.html.loadTemplate($menuWrapper, 'setup/menu.ejs', 'html', data);
       });
   };
 
@@ -340,7 +340,7 @@ passbolt.setup.data = passbolt.setup.data || {};
 
       .then(function () {
         // Load the template relative to the step and start the step.
-        var tplPath = '/data/tpl/setup/' + currentStepId + '.ejs';
+        var tplPath = 'setup/' + currentStepId + '.ejs';
         return passbolt.html.loadTemplate($contentWrapper, tplPath, 'html', step.viewData)
           .then(function () {
             // Get elements for all selectors.
@@ -362,10 +362,8 @@ passbolt.setup.data = passbolt.setup.data || {};
    * @returns {promise}
    */
   passbolt.setup.goToStep = function (targetStepId) {
-
     // Initialize and render menu.
     return passbolt.setup.initMenu(targetStepId)
-
       // Init step action buttons.
       .then(function () {
         return passbolt.setup.initActionButtons(targetStepId);
@@ -664,7 +662,7 @@ passbolt.setup.data = passbolt.setup.data || {};
           additional: additionalData
         };
 
-        return passbolt.html.loadTemplate($actionsWrapper, 'data/tpl/setup/fatal_error.ejs', 'html', {
+        return passbolt.html.loadTemplate($actionsWrapper, 'setup/fatal_error.ejs', 'html', {
           setupData: data
         });
       })
@@ -691,5 +689,4 @@ passbolt.setup.data = passbolt.setup.data || {};
 
   // initialize the setup
   passbolt.setup.init();
-
 })(jQuery);

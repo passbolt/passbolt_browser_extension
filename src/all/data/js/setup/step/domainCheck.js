@@ -69,7 +69,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
           step._getUserDomain()
             .then(step._getUserData)
             .then(function (userSettings) {
-              return passbolt.html.loadTemplate($('.plugin-check .message'), 'data/tpl/setup/alreadyConfigured.ejs', 'html', userSettings);
+              return passbolt.html.loadTemplate($('.plugin-check .message'), 'setup/alreadyConfigured.ejs', 'html', userSettings);
             })
             .then(function () {
               $('.plugin-check .message')
@@ -278,7 +278,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
    * @returns {promise}
    */
   step.showKeyInfoDialog = function (keyInfo) {
-    return passbolt.html.loadTemplate($('body'), 'data/tpl/setup/dialog_key_info.ejs', 'prepend', keyInfo)
+    return passbolt.html.loadTemplate($('body'), 'setup/dialog_key_info.ejs', 'prepend', keyInfo)
       .then(function () {
         var $dialog = $('.dialog-wrapper');
         // Init controls close and ok.

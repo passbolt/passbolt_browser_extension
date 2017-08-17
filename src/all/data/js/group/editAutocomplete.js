@@ -42,13 +42,13 @@
      * @returns {promise}
      */
     var loadTemplate = function () {
-        return passbolt.html.loadTemplate('body', 'data/tpl/group/editAutocomplete.ejs')
+        return passbolt.html.loadTemplate('body', 'group/editAutocomplete.ejs')
             .then(function () {
-                return passbolt.html.getTemplate('data/tpl/group/editAutocompleteItem.ejs');
+                return passbolt.html.getTemplate('group/editAutocompleteItem.ejs');
             })
             .then(function (data) {
                 itemTpl = data;
-                return passbolt.html.getTemplate('data/tpl/group/editAutocompleteItemEmpty.ejs');
+                return passbolt.html.getTemplate('group/editAutocompleteItemEmpty.ejs');
             })
             .then(function (data) {
                 emptyTpl = data;
@@ -104,12 +104,12 @@
         // Load the users in the list.
         for (var i in users) {
             currentUsers[users[i].User.id] = users[i];
-            itemTpl.call({settings: settings, user: users[i]});
+            itemTpl.call(this, {settings: settings, user: users[i]});
             $('ul').append(html);
         }
         // If no user found.
         if (!users.length) {
-            emptyTpl.call();
+            emptyTpl.call(this);
             $('ul').append(html);
         }
         // Resize the autocomplete iframe.

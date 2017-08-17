@@ -102,7 +102,7 @@ $(function () {
       passboltDomain = window.location.href.replace(/(.*)(\/auth\/login(\/)?)$/, '$1'),
       browserName = passbolt.html.getBrowserName();
 
-    passbolt.html.loadTemplate($renderSpace, 'data/tpl/login/wrongDomain.ejs', 'html', {
+    passbolt.html.loadTemplate($renderSpace, 'login/wrongDomain.ejs', 'html', {
       trustedDomain: this.trustedDomain,
       publicRegistration: publicRegistration,
       passboltDomain: passboltDomain,
@@ -120,7 +120,7 @@ $(function () {
       passboltDomain = window.location.href.replace(/(.*)(\/auth\/login(\/)?)$/, '$1'),
 	  browserName = passbolt.html.getBrowserName();
 
-    return passbolt.html.loadTemplate($renderSpace, 'data/tpl/login/noconfig.ejs', 'html', {
+    return passbolt.html.loadTemplate($renderSpace, 'login/noconfig.ejs', 'html', {
       publicRegistration: publicRegistration,
       passboltDomain: passboltDomain,
       browserName: browserName

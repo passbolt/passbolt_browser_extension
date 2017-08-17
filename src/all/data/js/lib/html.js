@@ -54,10 +54,10 @@ passbolt.templates = window.templates;
         reject(new Error('Passbolt templates are not defined. Check if one or more js templates are included.'));
       }
       if (typeof window.templates[template[0]] === 'undefined') {
-        reject(new Error('The following passbolt template is missing or not included: ' + template[0]));
+        reject(new Error('The following passbolt template group is missing or not included: ' + path));
       }
       if (typeof window.templates[template[0]][template[1]] === 'undefined') {
-        reject(new Error('The following passbolt template is missing or not included: ' + template[0] + '.' + template[1]));
+        reject(new Error('The following passbolt template is missing or not included: ' + path));
       }
       resolve(window.templates[template[0]][template[1]]);
     });
@@ -83,6 +83,8 @@ passbolt.templates = window.templates;
         // Render the template.
         var html = tpl.call(this, data);
         return $(selector)[loadStrategy](html);
+      }, function(e) {
+        console.error(e.message);
       });
   };
   passbolt.html.loadTemplate = loadTemplate;

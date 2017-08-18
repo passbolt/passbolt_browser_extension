@@ -8,7 +8,7 @@ var passbolt = passbolt || {};
 passbolt.setup = passbolt.setup || {};
 passbolt.setup.steps = passbolt.setup.steps || {};
 
-$(function (passbolt) {
+$(function () {
 
   /*
    * Step settings.

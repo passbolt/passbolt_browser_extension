@@ -69,7 +69,7 @@ $(function () {
           step._getUserDomain()
             .then(step._getUserData)
             .then(function (userSettings) {
-              return passbolt.html.loadTemplate($('.plugin-check .message'), 'setup/alreadyConfigured.ejs', 'html', userSettings);
+              return passbolt.html.loadTemplate($('.plugin-check .message'), 'setup/already_configured.ejs', 'html', userSettings);
             })
             .then(function () {
               $('.plugin-check .message')

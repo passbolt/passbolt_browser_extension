@@ -8,7 +8,7 @@
 var passbolt = passbolt || {};
 passbolt.login = passbolt.login || {};
 
-(function () {
+$(function () {
 
   var passphraseIframeId = 'passbolt-iframe-login-form';
 
@@ -147,4 +147,4 @@ passbolt.login = passbolt.login || {};
 
   passbolt.login.init();
 
-})();
+});

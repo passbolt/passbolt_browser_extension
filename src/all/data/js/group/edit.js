@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function ($) {
+$(function () {
 
     // The current search timeout reference.
     var currentSearchTimeout = null,
@@ -99,4 +99,4 @@
     // Init the autocomplete search field component.
     init();
 
-})(jQuery);
+});

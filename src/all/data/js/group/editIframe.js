@@ -9,7 +9,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function () {
+$(function () {
 
     /**
      * Insert the edit group iframe into the edit group dialog provided
@@ -42,7 +42,8 @@
             marginwidth: 0,
             marginheight: 0,
             hspace: 0,
-            vspace: 0
+            vspace: 0,
+            style: 'margin-top:-12px' // compensate for iframe padding (not present in styleguide)
         });
         $iframeAutocomplete.appendTo($('#passbolt-group-edit-autocomplete-wrapper', '.js_plugin_group_edit_wrapper'));
     };
@@ -65,4 +66,4 @@
             });
     }, false);
 
-})();
+});

@@ -9,7 +9,7 @@ var passbolt = passbolt || {};
 passbolt.setup = passbolt.setup || {};
 passbolt.setup.data = passbolt.setup.data || {};
 
-(function ($) {
+$(function () {
   // The current step id the user is working on.
   var currentStepId = null,
   // Default actions available at each step.
@@ -689,4 +689,4 @@ passbolt.setup.data = passbolt.setup.data || {};
 
   // initialize the setup
   passbolt.setup.init();
-})(jQuery);
+});

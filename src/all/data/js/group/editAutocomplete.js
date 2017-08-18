@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function ($) {
+$(function () {
     // Autocomplete item template.
     var itemTpl = null,
         // Empty result template.
@@ -104,12 +104,12 @@
         // Load the users in the list.
         for (var i in users) {
             currentUsers[users[i].User.id] = users[i];
-            itemTpl.call(this, {settings: settings, user: users[i]});
+            var html = itemTpl.call(this, {settings: settings, user: users[i]});
             $('ul').append(html);
         }
         // If no user found.
         if (!users.length) {
-            emptyTpl.call(this);
+            var html = emptyTpl.call(this);
             $('ul').append(html);
         }
         // Resize the autocomplete iframe.
@@ -202,4 +202,4 @@
     // Init the autocomplete results list component.
     init();
 
-})(jQuery);
+});

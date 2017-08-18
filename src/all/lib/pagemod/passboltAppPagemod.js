@@ -53,11 +53,11 @@ PassboltApp.initPageMod = function () {
       'data/vendors/jquery.min.js',
 
       // Templates
-      'tpl/group.js',
-      'tpl/master.js',
-      'tpl/progress.js',
-      'tpl/resource.js',
-      'tpl/secret.js',
+      'data/tpl/group.js',
+      'data/tpl/master.js',
+      'data/tpl/progress.js',
+      'data/tpl/resource.js',
+      'data/tpl/secret.js',
 
       // Lib
       'data/js/lib/port.js',

@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function () {
+$(function () {
 
   // Autocomplete item template.
   var itemTpl = null,
@@ -124,7 +124,7 @@
         _aros[aro.Group.id] = aro;
       }
 
-      html = itemTpl.call(this, data);
+      var html = itemTpl.call(this, data);
       $('ul').append(html);
     }
 
@@ -224,4 +224,4 @@
   // Init the autocomplete results list component.
   init();
 
-})();
+});

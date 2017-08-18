@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function () {
+$(function () {
 
   // The dialog can be open in create or in edit mode.
   // In edit mode the secret needs to be decrypted to be edited.
@@ -430,4 +430,4 @@
   // Init the secret add/edit dialog.
   init();
 
-})();
+});

@@ -9,7 +9,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function () {
+$(function () {
 
   /**
    * Insert the secret edition/creation iframe into the edit password dialog
@@ -57,4 +57,4 @@
       });
   }, false);
 
-})();
+});

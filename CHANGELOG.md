@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- PASSBOLT-2318: Remove unsafe-eval from CSP
+- PASSBOLT-2318: Precompile EJS templates using grunt-passbolt-ejs-compile task
 
 ## [1.6.2] - 2017-08-12
 ### Added

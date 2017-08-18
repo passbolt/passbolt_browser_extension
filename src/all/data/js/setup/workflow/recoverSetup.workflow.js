@@ -9,7 +9,7 @@ var passbolt = passbolt || {};
 passbolt.setup = passbolt.setup || {};
 passbolt.setup.workflow = passbolt.setup.workflow || {};
 
-(function (passbolt) {
+$(function () {
 
   passbolt.setup.workflow.recover = {
     'domain_check': {
@@ -64,4 +64,4 @@ passbolt.setup.workflow = passbolt.setup.workflow || {};
     }
   };
 
-})(passbolt);
+});

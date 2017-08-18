@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function () {
+$(function () {
 
   // Goals the progress bar has to fullfill.
   var goals = null;
@@ -89,4 +89,4 @@
 
   init();
 
-})();
+});

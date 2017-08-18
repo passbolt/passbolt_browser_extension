@@ -109,7 +109,6 @@ var migration = function() {
         }
         resolve();
       });
-      resolve();
     } else {
       // Chrome localStage migration
       if (storage.migrationNeeded()) {

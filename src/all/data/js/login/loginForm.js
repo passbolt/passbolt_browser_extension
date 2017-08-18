@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function () {
+$(function () {
 
   var $loginSubmit = null,
     $username = null,
@@ -162,4 +162,4 @@
   // Init the login form.
   init();
 
-})();
+});

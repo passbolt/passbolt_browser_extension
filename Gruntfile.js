@@ -296,7 +296,7 @@ module.exports = function(grunt) {
           stderr: false
         },
         command: [
-          'zip -q -1 -r ' + path.dist_chrome + 'passbolt-' + pkg.version + '-debug.zip ' + path.build,
+          'zip -q -1 -r ' + path.dist_chrome + 'passbolt-' + pkg.version + '.zip ' + path.build,
           './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chrome + 'passbolt-' + pkg.version + '.crx ',
           "echo '\nZip and Crx files generated in " + path.dist_chrome + "'"
         ].join(' && ')

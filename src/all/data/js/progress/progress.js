@@ -21,18 +21,23 @@
   /**
    * Update progress bar.
    */
-  var updateProgressBar = function (message, completedGoals, totalGoals) {
-    // If the total goals updated.
-    if (totalGoals) {
-      goals = totalGoals;
-    }
+  var updateProgressBar = function (message, completedGoals) {
     var percent = Math.round((100 * completedGoals) / goals);
     if (percent == 100) {
       message = 'completed';
     }
-    $('#js_progress_step_label', document).text(message);
-    $('#js_progress_percent', document).text(percent);
+    if (message) {
+      $('#js_progress_step_label', document).text(message);
+    }
+    $('#js_progress_percent', document).text(percent + '%');
     $('.progress-bar').css('width', percent + '%');
+  };
+
+  /**
+   * Update goals.
+   */
+  var updateGoals = function (data) {
+    goals = data;
   };
 
   /**
@@ -42,6 +47,7 @@
     return new Promise(function(resolve, reject) {
       $('.js-dialog-close').on('click', closeDialog);
       passbolt.message.on('passbolt.progress.update', updateProgressBar);
+      passbolt.message.on('passbolt.progress.update-goals', updateGoals);
       resolve();
     });
   };

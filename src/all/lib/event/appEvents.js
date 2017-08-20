@@ -7,10 +7,9 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var masterPasswordController = require('../controller/masterPasswordController');
+var progressDialogController = require('../controller/progressDialogController');
 var app = require('../app');
-var __ = require('../sdk/l10n').get;
 var Worker = require('../model/worker');
-const Promise = require('../sdk/core/promise').Promise;
 
 var Keyring = require('../model/keyring').Keyring;
 var Crypto = require('../model/crypto').Crypto;
@@ -89,34 +88,29 @@ var listen = function (worker) {
     }
 
     // Open the progress dialog.
-    worker.port.emit('passbolt.progress.open-dialog', 'Encrypting ...', usersIds.length);
+    progressDialogController.open(worker, 'Encrypting ...', usersIds.length);
 
     // Sync the keyring with the server.
     keyring.sync()
 
       // Once the keyring is synced, encrypt the secret for each user.
       .then(function () {
-        // Store the encryption promise for each user in this array.
-        // Encryptions will be treated in parallel to optimize the treatment.
-        var promises = [],
-          progress = 0,
-          progressWorker = null;
+        var progress = 0;
 
-        usersIds.forEach(function (userId) {
-          var p = crypto.encrypt(editedPassword.secret, userId);
-          promises.push(p);
-
-          // Update the progress dialog.
-          p.then(function () {
-            progress++;
-            progressWorker = Worker.get('Progress', worker.tab.id);
-            if (progressWorker != null) {
-              progressWorker.port.emit('passbolt.progress.update', 'Encrypted for ' + userId, progress);
-            }
-          });
+        // Prepare the data for encryption.
+        var encryptAllData = usersIds.map(function(userId) {
+          return {
+            userId: userId,
+            message: editedPassword.secret
+          }
         });
 
-        return Promise.all(promises);
+        // Encrypt all the messages.
+        return crypto.encryptAll(encryptAllData, function () {
+          progressDialogController.update(worker, progress++);
+        }, function (position) {
+          progressDialogController.update(worker, progress, 'Encrypting ' + position + '/' + usersIds.length);
+        });
       })
 
       // Once the secret is encrypted for all users notify the application and
@@ -126,7 +120,7 @@ var listen = function (worker) {
           armoreds[usersIds[i]] = data[i];
         }
         worker.port.emit(requestId, 'SUCCESS', armoreds);
-        worker.port.emit('passbolt.progress.close-dialog');
+        progressDialogController.close(worker);
       });
   });
 
@@ -167,16 +161,13 @@ var listen = function (worker) {
 
       // Once the master password retrieved, decrypt the secret.
       .then(function (masterPassword) {
+        progressDialogController.open(worker, 'Encrypting ...', 100);
         return crypto.decrypt(sharedPassword.armored, masterPassword)
       })
 
-      // Once the password decrypted :
-      // - notify the user about the process progression.
-      // - Sync the keyring.
+      // Sync the keyring.
       .then(function (secret) {
         sharedPassword.secret = secret;
-        // Notify the user regarding the encryption process starting.
-        worker.port.emit('passbolt.progress.open-dialog', 'Encrypting ...');
         // Sync the keyring.
         return keyring.sync();
       })
@@ -198,29 +189,24 @@ var listen = function (worker) {
 
       // Once the keyring is synced, encrypt the secret for each user.
       .then(function (response) {
-        // Encryptions will be done in parallel.
-        var promises = [],
-          progress = 0;
-
-        // User to encyrpt the secret for.
+        var progress = 0;
         addedUsers = response.changes.added;
+        progressDialogController.updateGoals(worker, addedUsers.length);
 
-        // Encrypt the secret for each new user.
-        for (var i in addedUsers) {
-          var user = addedUsers[i].User,
-            p = crypto.encrypt(sharedPassword.secret, user.id);
+        // Prepare the data for encryption.
+        var encryptAllData = addedUsers.map(function(addedUser) {
+          return {
+            userId: addedUser.User.id,
+            message: sharedPassword.secret
+          }
+        });
 
-          promises.push(p);
-
-          // Update the progress dialog.
-          p.then(function () {
-            var progressWorker = Worker.get('Progress', worker.tab.id);
-            if (progressWorker) {
-              progressWorker.port.emit('passbolt.progress.update', 'Encrypted for ' + userId, progress++, addedUsers.length);
-            }
-          });
-        }
-        return Promise.all(promises);
+        // Encrypt all the messages.
+        return crypto.encryptAll(encryptAllData, function () {
+          progressDialogController.update(worker, progress++);
+        }, function (position) {
+          progressDialogController.update(worker, progress, 'Encrypting ' + position + '/' + addedUsers.length);
+        });
       })
 
       // Once the secret is encrypted for all users notify the application and
@@ -231,7 +217,7 @@ var listen = function (worker) {
           armoreds[addedUsers[i].User.id] = data[i];
         }
         worker.port.emit(requestId, 'SUCCESS', armoreds);
-        worker.port.emit('passbolt.progress.close-dialog');
+        progressDialogController.close(worker);
       })
 
       // In case of error, notify the request caller.

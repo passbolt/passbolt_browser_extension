@@ -40,7 +40,6 @@ MasterPasswordDialog.init = function () {
       app.events.config.listen(worker);
       app.events.masterPasswordIframe.listen(worker);
       app.events.masterPassword.listen(worker);
-      app.events.template.listen(worker);
       app.events.passboltPage.listen(worker);
       app.events.user.listen(worker);
     }

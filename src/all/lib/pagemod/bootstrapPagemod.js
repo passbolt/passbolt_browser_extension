@@ -37,7 +37,6 @@ Bootstrap.init = function () {
     ],
     onAttach: function (worker) {
       Worker.add('Bootstrap', worker);
-      app.events.template.listen(worker);
       app.events.config.listen(worker);
     }
   });

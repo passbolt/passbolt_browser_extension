@@ -84,7 +84,6 @@ PassboltApp.initPageMod = function () {
       app.events.editPassword.listen(worker);
       app.events.keyring.listen(worker);
       app.events.secret.listen(worker);
-      app.events.template.listen(worker);
       app.events.group.listen(worker);
       app.events.masterPasswordIframe.listen(worker);
       app.events.app.listen(worker);

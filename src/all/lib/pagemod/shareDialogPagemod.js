@@ -44,7 +44,6 @@ ShareDialog.init = function () {
       app.events.secret.listen(worker);
       app.events.share.listen(worker);
       app.events.user.listen(worker);
-      app.events.template.listen(worker);
     }
   });
 };

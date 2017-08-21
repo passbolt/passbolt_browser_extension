@@ -32,7 +32,6 @@ ProgressDialog.init = function () {
     contentScriptWhen: 'ready',
     onAttach: function (worker) {
       Worker.add('Progress', worker);
-      app.events.template.listen(worker);
     }
   });
 };

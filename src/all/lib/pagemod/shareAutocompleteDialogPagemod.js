@@ -37,7 +37,6 @@ ShareAutocompleteDialog.init = function () {
       app.events.config.listen(worker);
       app.events.passboltPage.listen(worker);
       app.events.shareAutocomplete.listen(worker);
-      app.events.template.listen(worker);
     }
   });
 };

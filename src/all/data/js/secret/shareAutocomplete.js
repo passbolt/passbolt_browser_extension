@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function () {
+$(function () {
 
   // Autocomplete item template.
   var itemTpl = null,
@@ -42,12 +42,12 @@
    * @returns {promise}
    */
   var loadTemplate = function () {
-    return passbolt.html.loadTemplate('body', 'data/tpl/resource/shareAutocomplete.ejs')
+    return passbolt.html.loadTemplate('body', 'resource/shareAutocomplete.ejs')
       .then(function () {
-        return passbolt.html.getTemplate('data/tpl/resource/shareAutocompleteItem.ejs');
+        return passbolt.html.getTemplate('resource/shareAutocompleteItem.ejs');
       }).then(function (data) {
         itemTpl = data;
-        return passbolt.html.getTemplate('data/tpl/resource/share-autocomplete-item_empty.ejs');
+        return passbolt.html.getTemplate('resource/shareAutocompleteItemEmpty.ejs');
       }).then(function (data) {
         emptyTpl = data;
       });
@@ -124,13 +124,13 @@
         _aros[aro.Group.id] = aro;
       }
 
-      var html = new EJS({text: itemTpl}).render(data);
+      var html = itemTpl.call(this, data);
       $('ul').append(html);
     }
 
     // If no user found.
     if (!aros.length) {
-      var html = new EJS({text: emptyTpl}).render();
+      var html = emptyTpl.call(this);
       $('ul').append(html);
     }
 
@@ -224,4 +224,4 @@
   // Init the autocomplete results list component.
   init();
 
-})();
+});

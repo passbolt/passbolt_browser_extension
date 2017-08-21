@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function () {
+$(function () {
 
   // Goals the progress bar has to fullfill.
   var goals = null;
@@ -88,11 +88,11 @@
       }
     }
 
-    passbolt.html.loadTemplate('body', 'data/tpl/progress/progress.ejs', 'html', {title: title})
+    passbolt.html.loadTemplate('body', 'progress/progress.ejs', 'html', {title: title})
       .then(initEventsListeners, error)
       .then(initProgressBar);
   };
 
   init();
 
-})();
+});

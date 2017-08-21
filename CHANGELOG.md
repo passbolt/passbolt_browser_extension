@@ -3,7 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [1.6.3] - 2017-08-21
 ### Fixed
+- PASSBOLT-2318: Remove unsafe-eval from CSP
+- PASSBOLT-2318: Precompile EJS templates using grunt-passbolt-ejs-compile task
 - PASSBOLT-2269: As LU I can't encrypt a secret for more than 200 people #GITHUB-124
 
 ## [1.6.2] - 2017-08-12

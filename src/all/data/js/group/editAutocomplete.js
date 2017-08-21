@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function ($) {
+$(function () {
     // Autocomplete item template.
     var itemTpl = null,
         // Empty result template.
@@ -42,13 +42,13 @@
      * @returns {promise}
      */
     var loadTemplate = function () {
-        return passbolt.html.loadTemplate('body', 'data/tpl/group/editAutocomplete.ejs')
+        return passbolt.html.loadTemplate('body', 'group/editAutocomplete.ejs')
             .then(function () {
-                return passbolt.html.getTemplate('data/tpl/group/editAutocompleteItem.ejs');
+                return passbolt.html.getTemplate('group/editAutocompleteItem.ejs');
             })
             .then(function (data) {
                 itemTpl = data;
-                return passbolt.html.getTemplate('data/tpl/group/editAutocompleteItemEmpty.ejs');
+                return passbolt.html.getTemplate('group/editAutocompleteItemEmpty.ejs');
             })
             .then(function (data) {
                 emptyTpl = data;
@@ -104,12 +104,12 @@
         // Load the users in the list.
         for (var i in users) {
             currentUsers[users[i].User.id] = users[i];
-            var html = new EJS({text: itemTpl}).render({settings: settings, user: users[i]});
+            var html = itemTpl.call(this, {settings: settings, user: users[i]});
             $('ul').append(html);
         }
         // If no user found.
         if (!users.length) {
-            var html = new EJS({text: emptyTpl}).render();
+            var html = emptyTpl.call(this);
             $('ul').append(html);
         }
         // Resize the autocomplete iframe.
@@ -202,4 +202,4 @@
     // Init the autocomplete results list component.
     init();
 
-})(jQuery);
+});

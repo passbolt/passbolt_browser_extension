@@ -29,7 +29,6 @@ PassboltAuthForm.init = function () {
     ],
     onAttach: function (worker) {
       Worker.add('AuthForm', worker);
-      app.events.template.listen(worker);
       app.events.user.listen(worker);
       app.events.keyring.listen(worker);
       app.events.auth.listen(worker);

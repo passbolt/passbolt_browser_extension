@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function () {
+$(function () {
 
   // The dialog can be open in create or in edit mode.
   // In edit mode the secret needs to be decrypted to be edited.
@@ -66,7 +66,7 @@
    * @returns {promise}
    */
   var loadTemplate = function () {
-    return passbolt.html.loadTemplate('body', 'data/tpl/secret/edit.ejs')
+    return passbolt.html.loadTemplate('body', 'secret/edit.ejs')
       .then(function () {
         $secret = $('#js_secret');
         $secretClear = $('#js_secret_clear');
@@ -149,7 +149,7 @@
         strengthLabel: secretComplexity.STRENGTH[strength].label
       };
 
-    return passbolt.html.loadTemplate($secretStrength, 'data/tpl/secret/strength.ejs', 'html', tplData)
+    return passbolt.html.loadTemplate($secretStrength, 'secret/strength.ejs', 'html', tplData)
       .then(function () {
         // Add class on the top container.
         var containerClasses = $secretStrength.attr('class').split(' ');
@@ -430,4 +430,4 @@
   // Init the secret add/edit dialog.
   init();
 
-})();
+});

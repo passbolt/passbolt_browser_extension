@@ -35,7 +35,6 @@ Setup.init = function () {
 			// chrome/data/setup.html and chrome/data/js/load/setup.js
 		],
     onAttach: function (worker) {
-      app.events.template.listen(worker);
       app.events.clipboard.listen(worker);
       app.events.setup.listen(worker);
       app.events.file.listen(worker);

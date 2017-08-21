@@ -1,0 +1,17 @@
+window.templates = window.templates || {};
+window.templates.setup = window.templates.setup || {};
+window.templates.setup.action_buttons = require('./setup/action_buttons.js');
+window.templates.setup.already_configured = require('./setup/already_configured.js');
+window.templates.setup.backup_key = require('./setup/backup_key.js');
+window.templates.setup.define_key = require('./setup/define_key.js');
+window.templates.setup.dialog_key_info = require('./setup/dialog_key_info.js');
+window.templates.setup.domain_check = require('./setup/domain_check.js');
+window.templates.setup.fatal_error = require('./setup/fatal_error.js');
+window.templates.setup.generate_key = require('./setup/generate_key.js');
+window.templates.setup.import_key_recover_info = require('./setup/import_key_recover_info.js');
+window.templates.setup.import_key = require('./setup/import_key.js');
+window.templates.setup.key_info = require('./setup/key_info.js');
+window.templates.setup.login_redirection = require('./setup/login_redirection.js');
+window.templates.setup.menu = require('./setup/menu.js');
+window.templates.setup.secret = require('./setup/secret.js');
+window.templates.setup.security_token = require('./setup/security_token.js');

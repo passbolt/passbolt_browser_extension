@@ -37,7 +37,6 @@ events.setup = require('./event/setupEvents');
 events.setupbootstrap = require('./event/setupBootstrapEvents');
 events.shareAutocomplete = require('./event/shareAutocompleteEvents');
 events.share = require('./event/shareEvents');
-events.template = require('./event/templateEvents');
 events.user = require('./event/userEvents');
 
 exports.events = events;

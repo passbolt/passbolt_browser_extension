@@ -44,7 +44,6 @@ GroupEditDialog.init = function () {
             app.events.secret.listen(worker);
             app.events.group.listen(worker);
             app.events.user.listen(worker);
-            app.events.template.listen(worker);
         }
     });
 };

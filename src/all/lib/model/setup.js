@@ -12,12 +12,7 @@ var Keyring = require('./keyring').Keyring;
 var Crypto = require('./crypto').Crypto;
 var Auth = require('./auth').Auth;
 var User = require('./user').User;
-
-// var storage = require('../vendors/node-localstorage').localStorage;
-// var jsonQ = require('../vendors/jsonQ').jsonQ;
-// var Validator = require('../vendors/validator');
-// var fetch = require('../vendors/window').fetch;
-// var FormData = require('../vendors/window').FormData;
+var jsonQ = require('../sdk/jsonQ').jsonQ;
 
 /**
  * The class that deals with keys.

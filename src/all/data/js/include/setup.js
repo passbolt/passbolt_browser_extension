@@ -3,9 +3,10 @@ var scripts = [
   'vendors/jquery.min.js',
   'vendors/sha.js',
   'vendors/xregexp-all.js',
-  'vendors/ejs_production.js',
   'vendors/farbtastic.js',
   'js/lib/port.js',
+  'tpl/setup.js',
+  'tpl/secret.js'
 ];
 loadScripts(scripts).then(function () {
   var scripts = [

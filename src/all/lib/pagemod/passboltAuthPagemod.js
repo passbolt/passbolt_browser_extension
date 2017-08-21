@@ -38,7 +38,7 @@ PassboltAuth.init = function () {
     ],
     contentScriptFile: [
       'data/vendors/jquery.min.js',
-      'data/vendors/ejs_production.js',
+      'data/tpl/login.js',
       'data/js/lib/port.js',
       'data/js/lib/message.js',
       'data/js/lib/request.js',
@@ -49,7 +49,6 @@ PassboltAuth.init = function () {
     onAttach: function (worker) {
       Worker.add('Auth', worker);
       app.events.config.listen(worker);
-      app.events.template.listen(worker);
       app.events.keyring.listen(worker);
       app.events.secret.listen(worker);
       app.events.user.listen(worker);

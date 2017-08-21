@@ -39,7 +39,6 @@ GroupEditAutocompleteDialog.init = function () {
             app.events.passboltPage.listen(worker);
             app.events.group.listen(worker);
             app.events.groupAutocomplete.listen(worker);
-            app.events.template.listen(worker);
         }
     });
 };

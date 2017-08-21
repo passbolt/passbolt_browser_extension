@@ -7,12 +7,9 @@
 
 var passbolt = passbolt || {};
 passbolt.html = passbolt.html || {};
+passbolt.templates = window.templates;
 
 (function (passbolt) {
-
-  // Cache the templates.
-  var _templatesCache = {};
-
   /**
    * Resize an iframe container regarding its content size.
    * Call this method from the iframe content scope.
@@ -51,23 +48,19 @@ passbolt.html = passbolt.html || {};
    * @return {Promise.<T>|*}
    */
   var getTemplate = function (path) {
-    // If the template exists in cache.
-    if (typeof _templatesCache[path] != 'undefined') {
-      var deferred = $.Deferred();
-      deferred.resolveWith(this, [_templatesCache[path]]);
-      return deferred.promise();
-    }
-
-    return passbolt.request('passbolt.template.get', path)
-      .then(
-        function (tpl) {
-          _templatesCache[path] = tpl;
-          return tpl;
-        },
-        function (error) {
-          console.warn(error.message);
-        }
-      );
+    return new Promise(function(resolve, reject) {
+      var template = path.replace('data/tpl/','').replace('.ejs', '').split('/');
+      if (typeof window.templates === 'undefined') {
+        reject(new Error('Passbolt templates are not defined. Check if one or more js templates are included.'));
+      }
+      if (typeof window.templates[template[0]] === 'undefined') {
+        reject(new Error('The following passbolt template group is missing or not included: ' + path));
+      }
+      if (typeof window.templates[template[0]][template[1]] === 'undefined') {
+        reject(new Error('The following passbolt template is missing or not included: ' + path));
+      }
+      resolve(window.templates[template[0]][template[1]]);
+    });
   };
   passbolt.html.getTemplate = getTemplate;
 
@@ -88,8 +81,10 @@ passbolt.html = passbolt.html || {};
     return getTemplate(path)
       .then(function (tpl) {
         // Render the template.
-        var html = new EJS({text: tpl}).render(data);
+        var html = tpl.call(this, data);
         return $(selector)[loadStrategy](html);
+      }, function(e) {
+        console.error(e.message);
       });
   };
   passbolt.html.loadTemplate = loadTemplate;

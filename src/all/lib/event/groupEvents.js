@@ -11,7 +11,6 @@ var Worker = require('../model/worker');
 var User = require('../model/user').User;
 var Group = require('../model/group').Group;
 var GroupForm = require('../model/groupForm').GroupForm;
-
 var Keyring = require('../model/keyring').Keyring;
 var Crypto = require('../model/crypto').Crypto;
 var masterPasswordController = require('../controller/masterPasswordController');

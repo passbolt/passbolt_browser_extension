@@ -41,7 +41,6 @@ DebugPage.init = function () {
       app.events.config.listen(worker);
       app.events.file.listen(worker);
       app.events.keyring.listen(worker);
-      app.events.template.listen(worker);
       app.events.user.listen(worker);
       app.events.debugPage.listen(worker);
     }

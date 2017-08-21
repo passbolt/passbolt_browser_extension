@@ -51,13 +51,23 @@ PassboltApp.initPageMod = function () {
     ],
     contentScriptFile: [
       'data/vendors/jquery.min.js',
-      'data/vendors/ejs_production.js',
+
+      // Templates
+      'data/tpl/group.js',
+      'data/tpl/master.js',
+      'data/tpl/progress.js',
+      'data/tpl/resource.js',
+      'data/tpl/secret.js',
+
+      // Lib
       'data/js/lib/port.js',
       'data/js/lib/message.js',
       'data/js/lib/request.js',
       'data/js/lib/html.js',
       'data/js/clipboard/clipboard.js',
       'data/js/file/file.js',
+
+      // App
       'data/js/masterPassword/masterPasswordIframe.js',
       'data/js/secret/editIframe.js',
       'data/js/secret/shareIframe.js',
@@ -74,7 +84,6 @@ PassboltApp.initPageMod = function () {
       app.events.editPassword.listen(worker);
       app.events.keyring.listen(worker);
       app.events.secret.listen(worker);
-      app.events.template.listen(worker);
       app.events.group.listen(worker);
       app.events.masterPasswordIframe.listen(worker);
       app.events.app.listen(worker);

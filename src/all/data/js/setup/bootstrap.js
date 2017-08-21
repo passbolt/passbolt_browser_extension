@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function ($) {
+$(function () {
   // If the expected username field is not provided, do not launch the setup.
   if (!$('#js_setup_user_username').length) {
     return;
@@ -51,4 +51,4 @@
       }
     });
 
-})(jQuery);
+});

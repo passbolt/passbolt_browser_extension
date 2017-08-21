@@ -8,6 +8,7 @@
 var storage = require('./sdk/storage').storage;
 window.storage = storage;
 
+
 var main = function() {
 
   // Config and user models

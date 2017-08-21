@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function () {
+$(function () {
 
   var $loginSubmit = null,
     $username = null,
@@ -38,7 +38,7 @@
    * @returns {promise}
    */
   var loadTemplate = function () {
-    return passbolt.html.loadTemplate('body', 'data/tpl/login/form.ejs')
+    return passbolt.html.loadTemplate('body', 'login/form.ejs')
       .then(function success() {
         $loginSubmit = $('#loginSubmit');
         $username = $('#UserUsername');
@@ -162,4 +162,4 @@
   // Init the login form.
   init();
 
-})();
+});

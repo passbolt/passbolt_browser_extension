@@ -9,28 +9,29 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+$(function () {
+  /**
+   * Open the master password dialog.
+   * @listens passbolt.master-password.open-dialog
+   */
+  passbolt.message.on('passbolt.master-password.open-dialog', function () {
+    // Add the master password iframe to the application page.
+    var iframeId = 'passbolt-iframe-master-password';
+    var iframeUrl = chrome.runtime.getURL('data/' + iframeId + '.html') + '?passbolt=' + iframeId;
+    var $iframe = $('<iframe/>', {
+      id: iframeId,
+      src: iframeUrl,
+      class: 'passbolt-plugin-dialog loading',
+      frameBorder: 0
+    });
+    $iframe.appendTo('body');
+  });
 
-/**
- * Open the master password dialog.
- * @listens passbolt.master-password.open-dialog
- */
-passbolt.message.on('passbolt.master-password.open-dialog', function () {
-	// Add the master password iframe to the application page.
-	var iframeId = 'passbolt-iframe-master-password';
-	var iframeUrl = chrome.runtime.getURL('data/' + iframeId + '.html') + '?passbolt=' + iframeId;
-	var $iframe = $('<iframe/>', {
-		id: iframeId,
-		src: iframeUrl,
-		class: 'passbolt-plugin-dialog loading',
-		frameBorder: 0
-	});
-	$iframe.appendTo('body');
-});
-
-/**
- * Close the master password dialog.
- * @listens passbolt.master-password.close-dialog
- */
-passbolt.message.on('passbolt.master-password.close-dialog', function () {
-	$('#passbolt-iframe-master-password').remove();
+  /**
+   * Close the master password dialog.
+   * @listens passbolt.master-password.close-dialog
+   */
+  passbolt.message.on('passbolt.master-password.close-dialog', function () {
+    $('#passbolt-iframe-master-password').remove();
+  });
 });

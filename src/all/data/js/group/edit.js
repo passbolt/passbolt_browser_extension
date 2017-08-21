@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-(function ($) {
+$(function () {
 
     // The current search timeout reference.
     var currentSearchTimeout = null,
@@ -37,7 +37,7 @@
      * @returns {promise}
      */
     var loadTemplate = function () {
-        return passbolt.html.loadTemplate('body', 'data/tpl/group/edit.ejs')
+        return passbolt.html.loadTemplate('body', 'group/edit.ejs')
             .then(function () {
                 $autocomplete = $(autocompleteFieldSelector);
 
@@ -47,7 +47,6 @@
                 });
             });
     };
-
 
     /**
      * Init the security token.
@@ -100,4 +99,4 @@
     // Init the autocomplete search field component.
     init();
 
-})(jQuery);
+});

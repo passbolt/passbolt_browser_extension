@@ -36,7 +36,6 @@ SecretEditDialog.init = function () {
       app.events.editPassword.listen(worker);
       app.events.passboltPage.listen(worker);
       app.events.secret.listen(worker);
-      app.events.template.listen(worker);
       app.events.user.listen(worker);
 
       Worker.add('Secret', worker, {

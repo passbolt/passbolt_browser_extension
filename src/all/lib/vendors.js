@@ -33,7 +33,6 @@ window.in_array = require('./vendors/phpjs').in_array;
 window.XRegExp = require('./vendors/xregexp-all');
 window.Validator = require('./vendors/validator');
 window._ = require('./vendors/underscore-min');
-window.jsonQ = require('./vendors/jsonQ');
 
 /**
  * Crypto libraries

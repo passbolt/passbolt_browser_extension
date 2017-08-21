@@ -8,7 +8,7 @@ var passbolt = passbolt || {};
 passbolt.setup = passbolt.setup || {};
 passbolt.setup.steps = passbolt.setup.steps || {};
 
-(function (passbolt) {
+$(function () {
 
   /*
    * Step settings.
@@ -178,7 +178,7 @@ passbolt.setup.steps = passbolt.setup.steps || {};
       criterias: criterias
     };
 
-    return passbolt.html.loadTemplate(step.elts.$passwordCriterias, 'data/tpl/secret/criterias.ejs', 'html', data);
+    return passbolt.html.loadTemplate(step.elts.$passwordCriterias, 'secret/criterias.ejs', 'html', data);
   };
 
   /**
@@ -193,9 +193,9 @@ passbolt.setup.steps = passbolt.setup.steps || {};
       strengthLabel: secretComplexity.STRENGTH[strength].label
     };
 
-    return passbolt.html.loadTemplate(step.elts.$passwordStrength, 'data/tpl/secret/strength.ejs', 'html', data);
+    return passbolt.html.loadTemplate(step.elts.$passwordStrength, 'secret/strength.ejs', 'html', data);
   };
 
   passbolt.setup.steps[step.id] = step;
 
-})(passbolt);
+});

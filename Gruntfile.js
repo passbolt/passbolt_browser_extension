@@ -15,21 +15,24 @@ module.exports = function(grunt) {
 		node_modules: 'node_modules/',
 
 		build: 'build/all/',
-		build_vendors: 'build/all/vendors/',
-		build_data: 'build/all/data/',
+    build_data: 'build/all/data/',
     build_legacy: 'build/firefox_legacy/',
+		build_vendors: 'build/all/vendors/',
+    build_templates: 'build/all/data/tpl/',
 
     dist_chrome: 'dist/chrome/',
     dist_firefox: 'dist/firefox/',
     dist_firefox_legacy: 'dist/firefox_legacy/',
 
     src: 'src/all/',
+    src_addon: 'src/all/lib/',
+    src_addon_vendors: 'src/all/lib/vendors/',
     src_chrome: 'src/chrome/',
+    src_content_vendors: 'src/all/data/vendors/',
     src_firefox: 'src/firefox/',
     src_firefox_legacy: 'src/firefox_legacy/',
-		src_addon: 'src/all/lib/',
-		src_addon_vendors: 'src/all/lib/vendors/',
-		src_content_vendors: 'src/all/data/vendors/'
+    src_ejs: 'src/all/data/ejs',
+    src_templates: 'src/all/data/tpl/'
 	};
 
   /**
@@ -45,10 +48,15 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-passbolt-ejs-compile');
 
-	grunt.registerTask('default', ['bundle']);
-  grunt.registerTask('bundle', ['browserify:vendors', 'browserify:app']);
-	grunt.registerTask('pre-dist', ['copy:background_page', 'copy:data', 'copy:vendors', 'copy:locale', 'copy:styleguide']);
+  grunt.registerTask('default', ['bundle']);
+  grunt.registerTask('templates', ['ejs_compile', 'browserify:templates']);
+  grunt.registerTask('pre-dist', ['copy:background_page', 'copy:data', 'copy:vendors', 'copy:locale', 'copy:styleguide']);
+
+  grunt.registerTask('bundle', ['browserify:vendors', 'browserify:app', 'ejs_compile', 'browserify:templates']);
+  grunt.registerTask('bundle-firefox', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle']);
+  grunt.registerTask('bundle-chrome', ['pre-dist', 'copy:config_debug', 'copy:manifest_chrome', 'bundle']);
 
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
   grunt.registerTask('build-firefox', ['clean', 'build-firefox-debug', 'build-firefox-prod', 'build-firefox-legacy-debug', 'build-firefox-legacy-prod']);
@@ -56,7 +64,6 @@ module.exports = function(grunt) {
   grunt.registerTask('build-firefox-legacy-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_firefox', 'bundle', 'copy:legacy', 'shell:build_firefox_legacy_prod']);
   grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'shell:build_firefox_debug']);
   grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default','copy:manifest_firefox', 'bundle', 'shell:build_firefox_prod']);
-
   grunt.registerTask('build-chrome', ['clean', 'build-chrome-debug', 'build-chrome-prod']);
   grunt.registerTask('build-chrome-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_chrome', 'bundle', 'shell:build_chrome_debug']);
   grunt.registerTask('build-chrome-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_chrome', 'bundle', 'shell:build_chrome_prod']);
@@ -77,6 +84,13 @@ module.exports = function(grunt) {
 				src: [path.src_addon + 'vendors.js'],
 				dest: path.build + 'vendors.min.js'
 			},
+      templates: {
+        cwd: path.src_templates,
+        src: ['*.js'],
+        dest: path.build_templates,
+        expand: true,
+        ext: '.js'
+      },
 			app: {
 				src: [path.src_addon + 'index.js'],
 				dest: path.build + 'index.min.js'
@@ -119,7 +133,7 @@ module.exports = function(grunt) {
 			// copy data
 			data: {
 				files: [
-					{expand: true, cwd: path.src + 'data', src: '**', dest: path.build + 'data'}
+					{expand: true, cwd: path.src + 'data', src: ['**', '!tpl/**', '!ejs/**'], dest: path.build + 'data'}
 				]
 			},
 			// copy locale files to dist
@@ -152,8 +166,6 @@ module.exports = function(grunt) {
 					{expand: true, cwd: path.node_modules + 'jssha/src', src: 'sha.js', dest: path.src_content_vendors},
 					// underscore
 					{expand: true, cwd: path.node_modules + 'underscore', src: 'underscore-min.js', dest: path.src_addon_vendors},
-					// jsonQ
-					{expand: true, cwd: path.node_modules + 'jsonq', src: 'jsonQ.js', dest: path.src_addon_vendors},
 					// xregexp
 					{expand: true, cwd: path.node_modules + 'xregexp', src: 'xregexp-all.js', dest: path.src_addon_vendors},
 					{expand: true, cwd: path.node_modules + 'xregexp', src: 'xregexp-all.js', dest: path.src_content_vendors},
@@ -223,6 +235,19 @@ module.exports = function(grunt) {
           {expand: true, cwd: path.src_firefox_legacy, src: '**/*', dest: path.build_legacy},
         ]
       }
+		},
+
+    /**
+     * Compile EJS templates into javascript files
+     */
+		ejs_compile: {
+			all: {
+        cwd: path.src_ejs,
+				src: ['**/*.ejs'],
+				dest: path.src_templates,
+				expand: true,
+				ext: '.js'
+			}
 		},
 
 		/**
@@ -309,9 +334,14 @@ module.exports = function(grunt) {
 		 */
 		watch: {
 			data: {
-				files: [path.src + 'data/**/*.*'],
+				files: [path.src + 'data/**/*.*', '!' + path.src + 'data/tpl/**', '!' + path.src + 'data/ejs/**'],
 				tasks: ['copy:data'],
 				options: {spawn: false}
+			},
+			templates: {
+        files: [path.src + 'data/ejs/**/*.ejs'],
+        tasks: ['ejs_compile', 'browserify:templates'],
+        options: {spawn: false}
 			},
 			app: {
 				files: [path.src + 'lib/**/*.js', '!' + path.src + 'lib/vendors/*.js', '!' + path.src + 'lib/vendors.js'],

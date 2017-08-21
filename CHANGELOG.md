@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-2318: Remove unsafe-eval from CSP
 - PASSBOLT-2318: Precompile EJS templates using grunt-passbolt-ejs-compile task
 - PASSBOLT-2269: As LU I can't encrypt a secret for more than 200 people #GITHUB-124
+- PASSBOLT-2346: Plugin upgrade openpgpjs to 2.5.9
 
 ## [1.6.2] - 2017-08-12
 ### Added

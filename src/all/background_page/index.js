@@ -107,8 +107,8 @@ var migration = function() {
           console.warn('Migrating firefox simpleStorage.');
           storage.migrate(data);
         }
-        resolve();
       });
+      resolve();
     } else {
       // Chrome localStage migration
       if (storage.migrationNeeded()) {

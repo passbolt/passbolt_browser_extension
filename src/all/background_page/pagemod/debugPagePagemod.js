@@ -35,6 +35,7 @@ DebugPage.init = function () {
     contentScriptFile: [
 			// Warning: modify the page scripts and styles in
 			// chrome/data/config-debug.html and chrome/data/js/load/config-debug.js
+      'content_scripts/js/test.js'
     ],
     onAttach: function (worker) {
       Worker.add('DebugPage', worker);

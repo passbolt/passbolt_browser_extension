@@ -6,8 +6,6 @@
  */
 var __ = require('../sdk/l10n').get;
 const defer = require('../sdk/core/promise').defer;
-// var fetch = require('../vendors/window').fetch;
-
 var User = require('./user').User;
 
 /**

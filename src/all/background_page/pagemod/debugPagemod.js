@@ -33,7 +33,7 @@ Debug.init = function () {
       'data/js/lib/port.js',
       'data/js/lib/request.js',
       'data/js/lib/message.js',
-      'data/js/debug/common.js'
+      'content_scripts/js/debug/common.js'
     ],
     onAttach: function (worker) {
       Worker.add('Debug', worker);

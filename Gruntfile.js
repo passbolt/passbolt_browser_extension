@@ -19,20 +19,24 @@ module.exports = function(grunt) {
     build_legacy: 'build/firefox_legacy/',
 		build_vendors: 'build/all/vendors/',
     build_templates: 'build/all/data/tpl/',
+		build_content_scripts: 'build/all/content_scripts',
+    build_web_accessible_resources: 'build/all/web_accessible_resources',
 
     dist_chrome: 'dist/chrome/',
     dist_firefox: 'dist/firefox/',
     dist_firefox_legacy: 'dist/firefox_legacy/',
 
     src: 'src/all/',
-    src_addon: 'src/all/lib/',
-    src_addon_vendors: 'src/all/lib/vendors/',
+    src_addon: 'src/all/background_page/',
+    src_addon_vendors: 'src/all/background_page/vendors/',
     src_chrome: 'src/chrome/',
     src_content_vendors: 'src/all/data/vendors/',
     src_firefox: 'src/firefox/',
     src_firefox_legacy: 'src/firefox_legacy/',
     src_ejs: 'src/all/data/ejs',
-    src_templates: 'src/all/data/tpl/'
+    src_templates: 'src/all/data/tpl/',
+    src_content_scripts: 'src/all/content_scripts/',
+    src_web_accessible_resources: 'src/all/web_accessible_resources/'
 	};
 
   /**
@@ -52,18 +56,20 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['bundle']);
   grunt.registerTask('templates', ['ejs_compile', 'browserify:templates']);
-  grunt.registerTask('pre-dist', ['copy:background_page', 'copy:data', 'copy:vendors', 'copy:locale', 'copy:styleguide']);
+  grunt.registerTask('pre-dist', ['copy:vendors', 'copy:styleguide']);
 
-  grunt.registerTask('bundle', ['browserify:vendors', 'browserify:app', 'ejs_compile', 'browserify:templates']);
+  grunt.registerTask('bundle', ['copy:background_page', 'copy:content_scripts', 'browserify:vendors', 'browserify:app', 'ejs_compile', 'browserify:templates', 'copy:data']);
   grunt.registerTask('bundle-firefox', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle']);
   grunt.registerTask('bundle-chrome', ['pre-dist', 'copy:config_debug', 'copy:manifest_chrome', 'bundle']);
 
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
+
   grunt.registerTask('build-firefox', ['clean', 'build-firefox-debug', 'build-firefox-prod', 'build-firefox-legacy-debug', 'build-firefox-legacy-prod']);
   grunt.registerTask('build-firefox-legacy-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'copy:legacy', 'shell:build_firefox_legacy_debug']);
   grunt.registerTask('build-firefox-legacy-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_firefox', 'bundle', 'copy:legacy', 'shell:build_firefox_legacy_prod']);
   grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'shell:build_firefox_debug']);
   grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default','copy:manifest_firefox', 'bundle', 'shell:build_firefox_prod']);
+
   grunt.registerTask('build-chrome', ['clean', 'build-chrome-debug', 'build-chrome-prod']);
   grunt.registerTask('build-chrome-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_chrome', 'bundle', 'shell:build_chrome_debug']);
   grunt.registerTask('build-chrome-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_chrome', 'bundle', 'shell:build_chrome_prod']);
@@ -77,7 +83,7 @@ module.exports = function(grunt) {
 		/**
 		 * Browserify is a tool to package CommonJS Javascript code for use in the browser.
 		 * We use CommonJS require syntax to manage dependencies in the web extension add-on code
-		 * See also. src/lib/vendor/require_polyfill.js
+		 * See also. src/background_page/vendor/require_polyfill.js
 		 */
 		browserify: {
 			vendors: {
@@ -104,7 +110,7 @@ module.exports = function(grunt) {
 			data: [path.build_data],
 			vendors: [path.build_vendors],
 			style: [path.build_data + 'img', path.build + 'icons', path.build_data + 'css'],
-			others: [path.build + 'locale', path.build + 'manifest.json']
+			manifest: [ path.build + 'manifest.json']
 		},
 
 		/**
@@ -124,22 +130,19 @@ module.exports = function(grunt) {
 					rename: function(dest, src) {return dest + '/config.json';}
 				}]
       },
-      // copy background page
+      content_scripts: {
+        files: [
+          {expand: true, cwd: path.src_content_scripts, src: '**', dest: path.build_content_scripts }
+        ]
+      },
       background_page: {
         files: [
           {expand: true, cwd: path.src_addon, src: 'index.html', dest: path.build }
         ]
       },
-			// copy data
 			data: {
 				files: [
 					{expand: true, cwd: path.src + 'data', src: ['**', '!tpl/**', '!ejs/**'], dest: path.build + 'data'}
-				]
-			},
-			// copy locale files to dist
-			locale: {
-				files: [
-					{expand: true, cwd: path.src + 'locale', src: '**', dest: path.build + 'locale'},
 				]
 			},
       // switch manifest file to firefox or chrome
@@ -333,6 +336,11 @@ module.exports = function(grunt) {
 		 * see. https://github.com/gruntjs/grunt-contrib-watch
 		 */
 		watch: {
+      content_scripts: {
+        files: [path.src_content_scripts + '**/*.*'],
+        tasks: ['copy:content_scripts'],
+        options: {spawn: false}
+      },
 			data: {
 				files: [path.src + 'data/**/*.*', '!' + path.src + 'data/tpl/**', '!' + path.src + 'data/ejs/**'],
 				tasks: ['copy:data'],
@@ -344,12 +352,17 @@ module.exports = function(grunt) {
         options: {spawn: false}
 			},
 			app: {
-				files: [path.src + 'lib/**/*.js', '!' + path.src + 'lib/vendors/*.js', '!' + path.src + 'lib/vendors.js'],
+				files: [path.src + 'background_page/**/*.js', '!' + path.src + 'background_page/vendors/*.js', '!' + path.src + 'background_page/vendors.js'],
 				tasks: ['browserify:app'],
 				options: {spawn: false}
 			},
+      config: {
+        files: [path.src + 'background_page/config/config.json'],
+        tasks: ['browserify:app'],
+        options: {spawn: false}
+      },
 			vendors: {
-				files: [path.src + 'lib/vendors.js', path.src + 'lib/vendors/**/*.js', path.src + 'lib/sdk/storage.js'],
+				files: [path.src + 'background_page/vendors.js', path.src + 'background_page/vendors/**/*.js', path.src + 'background_page/sdk/storage.js'],
 				tasks: ['browserify:vendors'],
 				options: {spawn: false}
 			},
@@ -357,12 +370,7 @@ module.exports = function(grunt) {
         files: [path.src_firefox_legacy + '*'],
         tasks: ['build-firefox-legacy'],
         options: {spawn: false}
-      },
-			others: {
-				files: [path.src + 'manifest.json', path.src + 'locale/*'],
-				tasks: ['copy:others'],
-				options: {spawn: false}
-			}
+      }
 		}
 	});
 };

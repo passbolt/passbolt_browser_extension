@@ -11,9 +11,6 @@ var Settings = require('./settings').Settings;
 const { defer } = require('../sdk/core/promise');
 var __ = require('../sdk/l10n').get;
 
-// var Validator = require('../vendors/validator');
-// var fetch = require('../vendors/window').fetch;
-
 /**
  * The class that deals with permissions.
  */

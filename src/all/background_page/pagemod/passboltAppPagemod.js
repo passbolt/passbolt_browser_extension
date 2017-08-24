@@ -64,16 +64,16 @@ PassboltApp.initPageMod = function () {
       'data/js/lib/message.js',
       'data/js/lib/request.js',
       'data/js/lib/html.js',
-      'data/js/clipboard/clipboard.js',
+      'content_scripts/js/clipboard/clipboardIframe.js',
       'data/js/file/file.js',
 
       // App
-      'data/js/masterPassword/masterPasswordIframe.js',
-      'data/js/secret/editIframe.js',
-      'data/js/secret/shareIframe.js',
-      'data/js/group/editIframe.js',
-      'data/js/progress/progressIframe.js',
-      'data/js/app.js'
+      'content_scripts/js/masterPassword/masterPasswordIframe.js',
+      'content_scripts/js/secret/editIframe.js',
+      'content_scripts/js/secret/shareIframe.js',
+      'content_scripts/js/group/editIframe.js',
+      'content_scripts/js/progress/progressIframe.js',
+      'content_scripts/js/app.js'
     ],
     attachTo: ["existing", "top"],
     onAttach: function (worker) {

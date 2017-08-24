@@ -8,7 +8,6 @@
 
 var __ = require('../sdk/l10n').get;
 var Crypto = require('./crypto').Crypto;
-// var Validator = require('../vendors/validator');
 
 /**
  * Constructor

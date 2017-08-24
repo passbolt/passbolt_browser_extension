@@ -6,12 +6,6 @@
  */
 var __ = require('../sdk/l10n').get;
 const defer = require('../sdk/core/promise').defer;
-//
-// var fetch = require('../vendors/window').fetch;
-// var FormData = require('../vendors/window').FormData;
-// const { urldecode, stripslashes } = require('../vendors/phpjs');
-// var Validator = require('../vendors/validator');
-
 var Config = require('./config');
 var User = require('./user').User;
 var Keyring = require('./keyring').Keyring;

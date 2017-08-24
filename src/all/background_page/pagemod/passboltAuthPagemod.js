@@ -43,7 +43,7 @@ PassboltAuth.init = function () {
       'data/js/lib/message.js',
       'data/js/lib/request.js',
       'data/js/lib/html.js',
-      'data/js/login/login.js'
+      'content_scripts/js/login/login.js'
     ],
     attachTo: ["existing", "top"],
     onAttach: function (worker) {

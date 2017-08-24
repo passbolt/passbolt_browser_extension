@@ -33,7 +33,7 @@ Bootstrap.init = function () {
       'data/js/lib/request.js',
       'data/js/lib/message.js',
       'data/js/lib/html.js',
-      'data/js/bootstrap.js'
+      'content_scripts/js/bootstrap.js'
     ],
     onAttach: function (worker) {
       Worker.add('Bootstrap', worker);

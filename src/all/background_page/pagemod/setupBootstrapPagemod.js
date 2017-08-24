@@ -32,7 +32,7 @@ SetupBootstrap.init = function () {
       'data/js/lib/port.js',
       'data/js/lib/message.js',
       'data/js/lib/request.js',
-      'data/js/setup/bootstrap.js'
+      'content_scripts/js/setup/bootstrap.js'
     ],
     onAttach: function (worker) {
       Worker.add('SetupBootstrap', worker);

@@ -26,6 +26,7 @@ function ScriptExecution(tabId) {
  */
 ScriptExecution.prototype.createScriptCallback = function(tabId, details, callback) {
   return function () {
+      console.log('insert script' + details);
       chrome.tabs.executeScript(tabId, details, callback);
   };
 };

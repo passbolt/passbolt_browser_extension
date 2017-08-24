@@ -11,7 +11,7 @@ loadScripts(scripts).then(function () {
     'js/lib/request.js',
     'js/file/file.js',
     'js/debug/profiles.js',
-    'js/debug.js'
+    'js/debug/debug.js'
   ];
   loadScripts(scripts).then(function () {
     // all done!

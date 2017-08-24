@@ -5,7 +5,6 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-// var storage = require('../vendors/node-localstorage').localStorage;
 var _config = require('../config/config.json');
 
 /**

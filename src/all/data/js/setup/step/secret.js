@@ -73,7 +73,7 @@ $(function () {
 
   /**
    * Implements submit().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.submit = function () {
     passbolt.setup.setActionState('submit', 'processing');
@@ -165,7 +165,7 @@ $(function () {
   /**
    * Update the secret strength component.
    * @param password {string} The password to evaluate
-   * @returns {promise}
+   * @returns {Promise}
    */
   step._updatePasswordCriterias = function (password) {
     var criterias = {};
@@ -184,7 +184,7 @@ $(function () {
   /**
    * Update the secret strength component.
    * @param password {string} The password to measure the strength
-   * @returns {promise}
+   * @returns {Promise}
    */
   step._updatePasswordStrength = function (password) {
     var strength = secretComplexity.strength(password);

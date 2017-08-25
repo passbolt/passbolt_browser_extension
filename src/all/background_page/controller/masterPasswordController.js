@@ -10,7 +10,6 @@
  * Currently it is used only when decrypting content but this system
  * can be reusable for other features in the future like authentication
  */
-const { defer } = require('../sdk/core/promise');
 var User = require('../model/user').User;
 var Worker = require('../model/worker');
 var TabStorage = require('../model/tabStorage').TabStorage;
@@ -23,22 +22,22 @@ var TabStorage = require('../model/tabStorage').TabStorage;
  * @returns {d.promise|*|promise} The promise to resolve/reject when the master password is retrieved.
  */
 var get = function (worker) {
-  var deferred = defer(),
-    user = new User();
+  var p = new Promise(function(resolve, reject) {
+    var user = new User();
 
-  // Try to retrieve a remembered passphrase.
-  user.getStoredMasterPassword().then(
-    // If a passphrase is remembered, use it.
-    function (masterPassword) {
-      deferred.resolve(masterPassword);
-    },
-    // If no passphrase is remembered, prompt the user.
-    function () {
-      _promptUser(worker, deferred);
-    }
-  );
-
-  return deferred.promise;
+    // Try to retrieve a remembered passphrase.
+    user.getStoredMasterPassword().then(
+      // If a passphrase is remembered, use it.
+      function (masterPassword) {
+        resolve(masterPassword);
+      },
+      // If no passphrase is remembered, prompt the user.
+      function () {
+        _promptUser(worker, p);
+      }
+    );
+  });
+  return p;
 };
 exports.get = get;
 

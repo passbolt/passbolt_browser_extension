@@ -5,7 +5,6 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var __ = require('../sdk/l10n').get;
-const defer = require('../sdk/core/promise').defer;
 var User = require('./user').User;
 
 /**
@@ -26,35 +25,33 @@ var Resource = function () {
  * @returns {*}
  */
 Resource.simulateShare = function (resourceId, permissions) {
-  var deferred = defer(),
-    user = new User(),
+  var user = new User(),
     domain = user.settings.getDomain(),
     body = {Permissions: permissions};
 
-  fetch(
-    domain + '/share/simulate/resource/' + resourceId + '.json', {
-      method: 'POST',
-      credentials: 'include',
-      body: JSON.stringify(body),
-      headers: {
-        'Accept': 'application/json',
-        'content-type': 'application/json'
-      }
-    })
-    .then(
-      function success(response) {
-        response.json()
-          .then(function (json) {
-            deferred.resolve(json.body);
-          });
-      },
-      function error() {
-        deferred.reject(new Error(
-          __('There was a problem trying to get the ')));
-      }
-    );
-
-  return deferred.promise;
+  return new Promise(function(resolve, reject) {
+    fetch(
+      domain + '/share/simulate/resource/' + resourceId + '.json', {
+        method: 'POST',
+        credentials: 'include',
+        body: JSON.stringify(body),
+        headers: {
+          'Accept': 'application/json',
+          'content-type': 'application/json'
+        }
+      })
+      .then(
+        function success(response) {
+          response.json()
+            .then(function (json) {
+              resolve(json.body);
+            });
+        },
+        function error() {
+          reject(new Error(__('There was a problem when trying to get simulate the new permissions')));
+        }
+      );
+  });
 };
 
 // Exports the Resource object.

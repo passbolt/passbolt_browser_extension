@@ -211,7 +211,7 @@ $(function () {
   /**
    * Save the user settings.
    * @param user {array} The user info
-   * @returns {promise}
+   * @returns {Promise}
    */
   var saveUserSettings = function (user) {
     return passbolt.request('passbolt.user.set', user).then(

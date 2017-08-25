@@ -15,7 +15,6 @@ var Keyring = require('../model/keyring').Keyring;
 var Crypto = require('../model/crypto').Crypto;
 var masterPasswordController = require('../controller/masterPasswordController');
 var progressDialogController = require('../controller/progressDialogController');
-const defer = require('../sdk/core/promise').defer;
 
 var listen = function (worker) {
   /*
@@ -97,81 +96,79 @@ var listen = function (worker) {
    *   the group response returned from a dry-run call.
    */
   var encryptSecrets = function (group) {
-    var deferred = defer();
+    return new Promise(function(resolve, reject) {
+      // nothing to do, we can return immediately.
+      if (group['dry-run'] == undefined || group['dry-run'] == 0 || group['dry-run']['SecretsNeeded'] == 0) {
+        resolve([]);
+        return;
+      }
 
-    // nothing to do, we can return immediately.
-    if (group['dry-run'] == undefined || group['dry-run'] == 0 || group['dry-run']['SecretsNeeded'] == 0) {
-      deferred.resolve([]);
-      return deferred.promise;
-    }
+      var secretsToEncrypt = group['dry-run']['SecretsNeeded'],
+        mySecrets = group['dry-run']['Secrets'];
 
-    var secretsToEncrypt = group['dry-run']['SecretsNeeded'],
-      mySecrets = group['dry-run']['Secrets'];
+      // Encrypt secrets.
+      var crypto = new Crypto(),
+        keyring = new Keyring(),
+        progress = 0,
+        progressItemsCount = mySecrets.length + secretsToEncrypt.length;
 
-    // Encrypt secrets.
-    var crypto = new Crypto(),
-      keyring = new Keyring(),
-      progress = 0,
-      progressItemsCount = mySecrets.length + secretsToEncrypt.length;
-
-    // Master password required to decrypt secrets before re-encrypting them.
-    masterPasswordController.get(worker)
+      // Master password required to decrypt secrets before re-encrypting them.
+      masterPasswordController.get(worker)
 
       // Decrypt all the secrets.
-      .then(function (masterPassword) {
-        progressDialogController.open(worker, 'Encrypting ...', progressItemsCount);
+        .then(function (masterPassword) {
+          progressDialogController.open(worker, 'Encrypting ...', progressItemsCount);
 
-        // Extract all the secrets to decrypt.
-        var secrets = mySecrets.reduce(function (result, item) {
-          result.push(item.Secret[0].data);
-          return result;
-        }, []);
+          // Extract all the secrets to decrypt.
+          var secrets = mySecrets.reduce(function (result, item) {
+            result.push(item.Secret[0].data);
+            return result;
+          }, []);
 
-        // Decrypt all the secrets.
-        return crypto.decryptAll(secrets, masterPassword, function (secretInClear, position) {
+          // Decrypt all the secrets.
+          return crypto.decryptAll(secrets, masterPassword, function (secretInClear, position) {
             mySecrets[position]['Secret'][0].dataClear = secretInClear;
             progressDialogController.update(worker, progress++);
-          }, function(position) {
+          }, function (position) {
             progressDialogController.update(worker, progress, 'Decrypting ' + position + '/' + secrets.length);
           });
-      })
+        })
 
-      // Synchronize the keyring.
-      .then(function() {
-        return keyring.sync();
-      })
+        // Synchronize the keyring.
+        .then(function () {
+          return keyring.sync();
+        })
 
-      // Encrypt all the secrets.
-      .then(function () {
-        // Prepare the data for encryption.
-        var encryptAllData = secretsToEncrypt.map(function(secretToEncrypt) {
-          // Retrieve the secret in clear.
-          var targetSecret = mySecrets.find(function(mySecret) {
-            return secretToEncrypt.Secret.resource_id == mySecret.Secret[0].resource_id;
+        // Encrypt all the secrets.
+        .then(function () {
+          // Prepare the data for encryption.
+          var encryptAllData = secretsToEncrypt.map(function (secretToEncrypt) {
+            // Retrieve the secret in clear.
+            var targetSecret = mySecrets.find(function (mySecret) {
+              return secretToEncrypt.Secret.resource_id == mySecret.Secret[0].resource_id;
+            });
+            return {
+              userId: secretToEncrypt['Secret'].user_id,
+              message: targetSecret.Secret[0].dataClear
+            }
           });
-          return {
-            userId: secretToEncrypt['Secret'].user_id,
-            message: targetSecret.Secret[0].dataClear
-          }
+
+          // Encrypt all the messages.
+          return crypto.encryptAll(encryptAllData, function (secret, userId, position) {
+            secretsToEncrypt[position].Secret.data = secret;
+            progressDialogController.update(worker, progress++);
+          }, function (position) {
+            progressDialogController.update(worker, progress, 'Encrypting ' + position + '/' + secretsToEncrypt.length);
+          });
+        })
+
+        // Once the secret is encrypted for all users notify the application and
+        // close the progress dialog.
+        .then(function () {
+          resolve(secretsToEncrypt);
+          progressDialogController.close(worker);
         });
-
-        // Encrypt all the messages.
-        return crypto.encryptAll(encryptAllData, function (secret, userId, position) {
-          secretsToEncrypt[position].Secret.data = secret;
-          progressDialogController.update(worker, progress++);
-        }, function (position) {
-          progressDialogController.update(worker, progress, 'Encrypting ' + position + '/' + secretsToEncrypt.length);
-        });
-      })
-
-      // Once the secret is encrypted for all users notify the application and
-      // close the progress dialog.
-      .then(function () {
-        deferred.resolve(secretsToEncrypt);
-        progressDialogController.close(worker);
-      });
-
-    return deferred.promise;
+    });
   };
 
   /*

@@ -4,14 +4,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-
-const { defer } = require('../sdk/core/promise');
-
-// var openpgp = require('../vendors/openpgp');
-// var XRegExp = require('../vendors/xregexp').XRegExp;
-// var Validator = require('../vendors/validator');
-// var jsSHA = require('../vendors/sha');
-
 var Keyring = require('./keyring').Keyring;
 var __ = require('../sdk/l10n').get;
 var randomBytes = require('../sdk/random').randomBytes;
@@ -75,41 +67,40 @@ Crypto.uuid = function (seed) {
  */
 Crypto.prototype.encrypt = function (message, key) {
   var keyring = new Keyring(),
-    publicKey = null,
-    deferred = defer();
+    publicKey = null;
 
-  // if the key is a uuid we get the armored version from the keyring
-  if (Validator.isUUID(key)) {
-    var keyInfo = keyring.findPublic(key);
-    if (!keyInfo) {
-      deferred.reject(new Error(__('The public key could not be found for the user')));
-      return deferred.promise;
+  return new Promise (function(resolve, reject) {
+    // if the key is a uuid we get the armored version from the keyring
+    if (Validator.isUUID(key)) {
+      var keyInfo = keyring.findPublic(key);
+      if (!keyInfo) {
+        reject(new Error(__('The public key could not be found for the user')));
+        return;
+      }
+      key = keyInfo.key;
     }
-    key = keyInfo.key;
-  }
 
-  // parse the armored key
-  try {
-    publicKey = openpgp.key.readArmored(key);
-  } catch (error) {
-    return deferred.reject(new Error(__('The public key is not in a valid or supported format.')));
-  }
-
-  // Encrypt message.
-  openpgp.encrypt({
-    publicKeys: publicKey.keys,
-    data: message
-  }).then(
-    function (encrypted) {
-      return deferred.resolve(encrypted.data);
-    },
-    function (error) {
-      return deferred.reject(error);
+    // parse the armored key
+    try {
+      publicKey = openpgp.key.readArmored(key);
+    } catch (error) {
+      reject(new Error(__('The public key is not in a valid or supported format.')));
+      return;
     }
-  );
 
-  // Encrypt message.
-  return deferred.promise;
+    // Encrypt message.
+    openpgp.encrypt({
+      publicKeys: publicKey.keys,
+      data: message
+    }).then(
+      function (encrypted) {
+        resolve(encrypted.data);
+      },
+      function (error) {
+        reject(error);
+      }
+    );
+  });
 };
 
 /**
@@ -185,38 +176,36 @@ Crypto.prototype.decryptPrivateKey = function (privateKey, passphrase) {
 Crypto.prototype.decrypt = function (armored, passphrase) {
   var keyring = new Keyring(),
     keyInfo = keyring.findPrivate(),
-    privateKey = openpgp.key.readArmored(keyInfo.key).keys[0],
-    deferred = defer();
+    privateKey = openpgp.key.readArmored(keyInfo.key).keys[0];
 
-  if (!privateKey.isDecrypted) {
-    openpgp.decryptKey({privateKey: privateKey, passphrase: passphrase})
-      .then(function (privateKey) {
-        // Openpgp will throw an exception if the message is badly formatted
-        var pgpMessage = openpgp.message.readArmored(armored);
-        return openpgp.decrypt({privateKey: privateKey.key, message: pgpMessage});
-      })
-      .then(
-        function (decrypted) {
-          deferred.resolve(decrypted.data);
-        },
-        function (error) {
-          deferred.reject(error);
-        }
-      );
-  }
-  else {
-    openpgp.decrypt({privateKey: privateKey, message: pgpMessage})
-      .then(
-        function (decrypted) {
-          deferred.resolve(decrypted.data);
-        },
-        function (error) {
-          deferred.reject(error);
-        }
-      );
-  }
-
-  return deferred.promise;
+  return new Promise(function (resolve, reject) {
+    if (!privateKey.isDecrypted) {
+      openpgp.decryptKey({privateKey: privateKey, passphrase: passphrase})
+        .then(function (privateKey) {
+          // Openpgp will throw an exception if the message is badly formatted
+          var pgpMessage = openpgp.message.readArmored(armored);
+          return openpgp.decrypt({privateKey: privateKey.key, message: pgpMessage});
+        })
+        .then(
+          function (decrypted) {
+            resolve(decrypted.data);
+          },
+          function (error) {
+            reject(error);
+          }
+        );
+    } else {
+      openpgp.decrypt({privateKey: privateKey, message: pgpMessage})
+        .then(
+          function (decrypted) {
+            resolve(decrypted.data);
+          },
+          function (error) {
+            reject(error);
+          }
+        );
+    }
+  });
 };
 
 /**
@@ -233,7 +222,7 @@ Crypto.prototype.decryptAll = function (armoreds, passphrase, completeCallback, 
     keyInfo = keyring.findPrivate(),
     privateKey = openpgp.key.readArmored(keyInfo.key).keys[0];
 
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
     // Decrypt the private key.
     this.decryptPrivateKey(privateKey, passphrase)
       // Decrypt the list of armored messages.
@@ -263,7 +252,6 @@ Crypto.prototype.decryptAll = function (armoreds, passphrase, completeCallback, 
       });
   });
 };
-
 
 // Make the object available to other scripts
 exports.Crypto = Crypto;

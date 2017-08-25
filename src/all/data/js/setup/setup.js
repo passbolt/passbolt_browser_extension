@@ -46,7 +46,7 @@ $(function () {
    * so the proper setup information will be stored in the setup model.
    *
    * @param stepId {string} The name of the step
-   * @returns {promise}
+   * @returns {Promise}
    */
   passbolt.setup.onNavigationGoTo = function (stepId) {
     // Don't do anything if the step is not supposed to be part of the history.
@@ -67,7 +67,7 @@ $(function () {
    * Takes care of informing the controller that the step is changing,
    * so the proper setup information will be stored in the setup model.
    *
-   * @returns {promise}
+   * @returns {Promise}
    */
   passbolt.setup.onNavigationBack = function () {
     return passbolt.request('passbolt.setup.navigation.back')
@@ -82,7 +82,7 @@ $(function () {
 
   /**
    * Get Setup data from controller.
-   * @returns {promise}
+   * @returns {Promise}
    */
   passbolt.setup.get = function (key) {
     return passbolt.request('passbolt.setup.get', key)
@@ -93,7 +93,7 @@ $(function () {
 
   /**
    * Set Setup data in controller.
-   * @returns {promise}
+   * @returns {Promise}
    */
   passbolt.setup.set = function (key, value) {
     return passbolt.request('passbolt.setup.set', key, value)
@@ -104,7 +104,7 @@ $(function () {
 
   /**
    * Ask controller about navigation history.
-   * @returns {promise}
+   * @returns {Promise}
    */
   passbolt.setup.getNavigationHistory = function () {
     return passbolt.request('passbolt.setup.navigation.get.history')
@@ -153,7 +153,7 @@ $(function () {
   /**
    * Get the workflow.
    * Workflow is an array of steps.
-   * @returns {promise}
+   * @returns {Promise}
    */
   passbolt.setup.getWorkflow = function () {
     return passbolt.setup.getNavigationHistory()
@@ -168,7 +168,7 @@ $(function () {
 
   /**
    * Get the menu items.
-   * @returns {promise}
+   * @returns {Promise}
    */
   passbolt.setup.getMenuSteps = function (targetStepId) {
     if (typeof targetStepId === 'undefined') {
@@ -247,7 +247,7 @@ $(function () {
    * in the step data.
    *
    * @param stepId {string} The step name
-   * @returns {promise}
+   * @returns {Promise}
    */
   passbolt.setup.initActionButtons = function (stepId) {
     var step = passbolt.setup.steps[stepId];
@@ -305,7 +305,7 @@ $(function () {
   /**
    * Init and render menu according to the step provided.
    * @param stepId {string} The step name
-   * @returns {promise}
+   * @returns {Promise}
    */
   passbolt.setup.initMenu = function (stepId) {
     return passbolt.setup.getMenuSteps()
@@ -324,7 +324,7 @@ $(function () {
    * Init and render step content according to the step provided in argument.
    * Also set the title.
    * @param stepId {string} The step name
-   * @returns {promise}
+   * @returns {Promise}
    */
   passbolt.setup.initContent = function (stepId) {
     var step = passbolt.setup.steps[stepId];
@@ -359,7 +359,7 @@ $(function () {
   /**
    * Go to the step.
    * @param targetStepId {string} The step name
-   * @returns {promise}
+   * @returns {Promise}
    */
   passbolt.setup.goToStep = function (targetStepId) {
     // Initialize and render menu.
@@ -480,7 +480,7 @@ $(function () {
    * Try to retrieve setup data from storage in case of a previous unfinished setup,
    * or get them from the parameters that are provided.
    *
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   passbolt.setup._initPrepareData = function () {
@@ -525,7 +525,7 @@ $(function () {
    * Initialization function to be used at the beginning of the setup.
    *
    * @param data {array} The user information
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   passbolt.setup._initValidateUser = function () {
@@ -538,7 +538,7 @@ $(function () {
    * To be used after validation of the user data.
    *
    * @param data {array} The user information
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   passbolt.setup._initSetUser = function () {
@@ -560,7 +560,7 @@ $(function () {
    * Set settings in the setup storage.
    *
    * @param data {array} The setup information
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   passbolt.setup._initSetSettings = function () {
@@ -571,7 +571,7 @@ $(function () {
    * Retrieve step id from previous setup if any, and if not
    * returns the default one.
    *
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   passbolt.setup._initStartingStepId = function () {
@@ -635,7 +635,7 @@ $(function () {
    * Fatal error.
    * @param error {string} the error message
    * @param additionalData {*} data associated to the error
-   * @returns {promise}
+   * @returns {Promise}
    */
   passbolt.setup.fatalError = function (error, additionalData) {
     // Display fatal error.

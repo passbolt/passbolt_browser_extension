@@ -7,7 +7,6 @@
 
 var Config = require('./config');
 var Settings = require('./settings').Settings;
-const { defer } = require('../sdk/core/promise');
 var __ = require('../sdk/l10n').get;
 
 /**
@@ -38,40 +37,38 @@ var Group = function () {
  * @returns {*}
  */
 Group.prototype.findById = function(groupId) {
-    var deferred = defer(),
-      _response = null;
+  var _response = null;
 
+  return new Promise(function(resolve, reject) {
     fetch(
-        this.settings.getDomain() + '/groups/' + groupId + '.json', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(function (response) {
-            _response = response;
-            return response.json();
-        })
-        .then(function (json) {
-            // Check response status.
-
-            // Response is an error. We return the error.
-            if(!_response.ok) {
-                json.header.status_code = _response.status;
-                return deferred.reject(json);
-            }
-
+      this.settings.getDomain() + '/groups/' + groupId + '.json', {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(function(response) {
+        _response = response;
+        return response.json();
+      })
+      .then(function (json) {
+        // Check response status.
+        // Response is an error. We return the error.
+        if (!_response.ok) {
+          json.header.status_code = _response.status;
+          reject(json);
+        } else {
             // Response is ok.
             var group = json.body;
-            return deferred.resolve(group);
-        })
-        .catch(function (error) {
-            return deferred.reject(error);
-        });
-
-    return deferred.promise;
+            resolve(group);
+        }
+      })
+      .catch(function (error) {
+        reject(error);
+      });
+  });
 };
 
 /**
@@ -85,54 +82,52 @@ Group.prototype.findById = function(groupId) {
  * @returns {*}
  */
 Group.prototype.save = function(group, groupId, dryrun) {
-    var deferred = defer(),
-        _response = null,
+    var _response = null,
         url =  this.settings.getDomain() + '/groups.json',
         method = 'POST',
         groupParamStr = JSON.stringify(group),
         isDryRun = dryrun != undefined && dryrun == true;
 
+  return new Promise(function(resolve, reject) {
     if (groupId != undefined && groupId != '') {
-        url = this.settings.getDomain()
-            + '/groups/'
-            + groupId
-            + (isDryRun ? '/dry-run' : '')
-            + '.json';
-        method = 'PUT';
+      url = this.settings.getDomain()
+        + '/groups/'
+        + groupId
+        + (isDryRun ? '/dry-run' : '')
+        + '.json';
+      method = 'PUT';
     }
 
     fetch(
-        url, {
-            method: method,
-            credentials: 'include',
-            body: groupParamStr,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(function (response) {
-            _response = response;
-            return response.json();
-        })
-        .then(function (json) {
-            // Check response status.
-
-            // Response is an error. We return the error.
-            if(!_response.ok) {
-                json.header.status_code = _response.status;
-                return deferred.reject(json);
-            }
-
+      url, {
+        method: method,
+        credentials: 'include',
+        body: groupParamStr,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(function (response) {
+        _response = response;
+        return response.json();
+      })
+      .then(function (json) {
+        // Check response status.
+        // Response is an error. We return the error.
+        if (!_response.ok) {
+          json.header.status_code = _response.status;
+          reject(json);
+        } else {
             // Response is ok.
             var group = json.body;
-            return deferred.resolve(group);
-        })
-        .catch(function (error) {
-            return deferred.reject(error);
-        });
-
-    return deferred.promise;
+            resolve(group);
+        }
+      })
+      .catch(function (error) {
+        reject(error);
+      });
+  });
 };
 
 /**

@@ -6,7 +6,6 @@
  */
 var Config = require('./config');
 var Settings = require('./settings').Settings;
-const { defer } = require('../sdk/core/promise');
 var __ = require('../sdk/l10n').get;
 
 // Will store temporarily the user master password if the user wants the
@@ -295,55 +294,56 @@ User.prototype._getLocal = function (fields) {
 /**
  * Get the user logged-in on the server
  *
- * @returns {promise}
+ * @returns {Promise}
  */
 User.prototype._getRemote = function () {
-  var deferred = defer(),
-    self = this,
-    url;
+  var self = this, url;
 
-  //Check if there is a trusted domain
-  try {
-    url = self.settings.getDomain() + this.URL_GET_REMOTE;
-  } catch (e) {
-    deferred.reject(__('The application domain is not set'));
-  }
+  return new Promise(function(resolve, reject) {
+    //Check if there is a trusted domain
+    try {
+      url = self.settings.getDomain() + this.URL_GET_REMOTE;
+    } catch (e) {
+      reject(__('The application domain is not set'));
+      return;
+    }
 
-  // Try to get the current user from memory cache
-  if (typeof this._remote_user !== 'undefined') {
-    return deferred.resolve(this._remote_user);
-  }
+    // Try to get the current user from memory cache
+    if (typeof this._remote_user !== 'undefined') {
+      resolve(this._remote_user);
+      return;
+    }
 
-  // If it's not done already, get it from remote server
-  fetch(
-    url, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(function (response) {
-      var json = response.json();
-      // Check response status
-      if (!response.ok) {
-        var msg = __('Could not get the current user information. The server responded with an error.');
-        if (json.headers.msg != undefined) {
-          msg += ' ' + json.headers.msg;
+    // If it's not done already, get it from remote server
+    fetch(
+      url, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         }
-        msg += ' (' + response.status + ')';
-        return deferred.reject(new Error(msg));
-      }
-      // Save temporarily and return remote version of current user
-      self._remote_user = json.body;
-      return deferred.resolve(json.body);
-    })
-    .catch(function (error) {
-      return deferred.reject(error);
-    });
-
-  return deferred.promise;
+      })
+      .then(function (response) {
+        var json = response.json();
+        // Check response status
+        if (!response.ok) {
+          var msg = __('Could not get the current user information. The server responded with an error.');
+          if (json.headers.msg != undefined) {
+            msg += ' ' + json.headers.msg;
+          }
+          msg += ' (' + response.status + ')';
+          return reject(new Error(msg));
+        } else {
+          // Save temporarily and return remote version of current user
+          self._remote_user = json.body;
+          resolve(json.body);
+        }
+      })
+      .catch(function (error) {
+        reject(error);
+      });
+  });
 };
 
 /**
@@ -364,32 +364,31 @@ User.prototype.isValid = function () {
 /**
  * Check if the current user is logged-in
  *
- * @returns {promise}
+ * @returns {Promise}
  */
 User.prototype.isLoggedIn = function () {
-  var deferred = defer();
-
-  fetch(
-    this.settings.getDomain() + '/auth/checkSession.json', {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(function (response) {
-      // Check response status
-      if (!response.ok) {
-        return deferred.reject(new Error(__('The user is not logged-in')));
-      }
-      deferred.resolve(__('The user is logged-in'));
-    })
-    .catch(function (error) {
-      return deferred.reject(error);
-    });
-
-  return deferred.promise;
+  return new Promise(function(resolve, reject) {
+    fetch(
+      this.settings.getDomain() + '/auth/checkSession.json', {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(function (response) {
+        // Check response status
+        if (!response.ok) {
+          reject(new Error(__('The user is not logged-in')));
+        } else {
+          resolve(__('The user is logged-in'));
+        }
+      })
+      .catch(function (error) {
+        reject(error);
+      });
+  });
 };
 
 /**
@@ -429,26 +428,29 @@ User.prototype._loopDeleteMasterPasswordOnTimeout = function (timeout) {
 /**
  * Retrieve master password from memory, in case it was stored temporarily
  * by the user.
- * @returns {promise}
+ * @returns {Promise}
  */
 User.prototype.getStoredMasterPassword = function () {
-  var deferred = defer();
-  if (_masterPassword !== null) {
-    deferred.resolve(_masterPassword.password);
-  }
-  else {
-    deferred.reject();
-  }
-
-  return deferred.promise;
+  return new Promise (function(resolve, reject) {
+    if (_masterPassword !== null) {
+      resolve(_masterPassword.password);
+    } else {
+      reject();
+    }
+  });
 };
 
-
+/**
+ * Search users by keywords
+ *
+ * @param keywords
+ * @param excludedUsers
+ * @return {Promise}
+ */
 User.prototype.searchUsers = function(keywords, excludedUsers) {
-  var deferred = defer(),
-    _response = null;
-
-  fetch(
+  return new Promise (function(resolve, reject) {
+    var _response = null;
+    fetch(
       this.settings.getDomain() + '/users.json?filter[keywords]=' + htmlspecialchars(keywords, 'ENT_QUOTES') + '&filter[is-active]=1', {
         method: 'GET',
         credentials: 'include',
@@ -463,13 +465,14 @@ User.prototype.searchUsers = function(keywords, excludedUsers) {
       })
       .then(function (json) {
         // Check response status
-        if(!_response.ok) {
+        if (!_response.ok) {
           var msg = __('Could not get the users. The server responded with an error.');
-          if(json.headers.msg != undefined) {
+          if (json.headers.msg != undefined) {
             msg += ' ' + json.headers.msg;
           }
           msg += ' (' + _response.status + ')';
-          return deferred.reject(new Error(msg));
+          reject(new Error(msg));
+          return;
         }
 
         var users = json.body;
@@ -479,14 +482,12 @@ User.prototype.searchUsers = function(keywords, excludedUsers) {
             finalUsers.push(users[i]);
           }
         }
-
-        return deferred.resolve(finalUsers);
+        resolve(finalUsers);
       })
       .catch(function (error) {
-        return deferred.reject(error);
+        reject(error);
       });
-
-  return deferred.promise;
+  });
 };
 
 // Exports the User object.

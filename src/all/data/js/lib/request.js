@@ -85,7 +85,7 @@ var passbolt = passbolt || {};
    * between the addon-code and the content code.
    *
    * @param message {string} The request name
-   * @returns {promise}
+   * @returns {Promise}
    */
   passbolt.request = function(message) {
     // The promise that is return when you call passbolt.request.

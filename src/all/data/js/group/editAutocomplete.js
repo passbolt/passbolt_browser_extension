@@ -39,7 +39,7 @@ $(function () {
 
     /**
      * Load the page template and initialize the variables relative to it.
-     * @returns {promise}
+     * @returns {Promise}
      */
     var loadTemplate = function () {
         return passbolt.html.loadTemplate('body', 'group/editAutocomplete.ejs')

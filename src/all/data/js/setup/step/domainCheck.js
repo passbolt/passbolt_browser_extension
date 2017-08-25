@@ -89,7 +89,7 @@ $(function () {
 
   /**
    * Implements submit().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.submit = function () {
     return new Promise(function(resolve, reject) {
@@ -131,7 +131,7 @@ $(function () {
   /**
    * Fetch server key.
    * @param domain domain where to fetch the server key.
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   step._fetchServerKey = function (domain) {
@@ -145,7 +145,7 @@ $(function () {
   /**
    * Get public key information.
    * @param unarmoredServerKey {string} Unarmored server key
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   step._getKeyInfo = function (unarmoredServerKey) {
@@ -169,7 +169,7 @@ $(function () {
 
   /**
    * Get user domain.
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   step._getUserDomain = function () {
@@ -181,7 +181,7 @@ $(function () {
 
   /**
    * Get user data.
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   step._getUserData = function (domain) {
@@ -248,7 +248,7 @@ $(function () {
    * Is called at the page submit.
    *
    * @param domain {string} The domain
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.setDomain = function (domain) {
     return passbolt.request('passbolt.setup.set', 'settings.domain', domain)
@@ -262,7 +262,7 @@ $(function () {
    * Is called at the page submit.
    *
    * @param armoredServerKey {sting} The armored key to set
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.setServerKey = function (armoredServerKey) {
     return passbolt.request('passbolt.setup.set', 'settings.armoredServerKey', armoredServerKey)
@@ -275,7 +275,7 @@ $(function () {
    * Show key information dialog, and initialize its components.
    *
    * @param keyInfo {array} key information, as returned by getKeyInfo().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.showKeyInfoDialog = function (keyInfo) {
     return passbolt.html.loadTemplate($('body'), 'setup/dialog_key_info.ejs', 'prepend', keyInfo)

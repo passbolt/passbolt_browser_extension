@@ -11,7 +11,6 @@
 var Config = require('./config');
 var Settings = require('./settings').Settings;
 var Group = require('./group').Group;
-const { defer } = require('../sdk/core/promise');
 var TabStorage = require('../model/tabStorage').TabStorage;
 var __ = require('../sdk/l10n').get;
 var jsonQ = require('../sdk/jsonQ').jsonQ;
@@ -103,7 +102,6 @@ GroupForm.prototype.set = function (key, value) {
     return groupForm;
 };
 
-
 /**
  * Add a group user in the group.
  *
@@ -111,34 +109,33 @@ GroupForm.prototype.set = function (key, value) {
  * @returns {*}
  */
 GroupForm.prototype.addGroupUser = function(user) {
-    var _groupForm = this.get(),
-        deferred = defer();
+    var _groupForm = this.get();
 
-    var groupId = _groupForm.currentGroup.Group.id;
-    var groupUsers = _groupForm.currentGroup.GroupUser;
-    var initialGroupUsers = _groupForm.initialGroup.GroupUser;
+    return new Promise( function(resolve, reject) {
+      var groupId = _groupForm.currentGroup.Group.id;
+      var groupUsers = _groupForm.currentGroup.GroupUser;
+      var initialGroupUsers = _groupForm.initialGroup.GroupUser;
 
-    // Check if there is already one admin.
-    var adminExisting = false;
-    for (var i in groupUsers) {
+      // Check if there is already one admin.
+      var adminExisting = false;
+      for (var i in groupUsers) {
         if (groupUsers[i].is_admin == 1) {
-            adminExisting = true;
+          adminExisting = true;
         }
-    }
+      }
 
-    // Build groupUser object.
-    var groupUser= {
+      // Build groupUser object.
+      var groupUser = {
         user_id: user.User.id,
         is_admin: adminExisting == true ? 0 : 1,
         User: user
-    };
+      };
 
-    // Add object to groupUsers list in tab storage.
-    groupUsers.push(groupUser);
-    this.set('currentGroup.GroupUser', groupUsers);
-
-    deferred.resolve(groupUser, this.getGroupUsersChangeList());
-    return deferred.promise;
+      // Add object to groupUsers list in tab storage.
+      groupUsers.push(groupUser);
+      this.set('currentGroup.GroupUser', groupUsers);
+      resolve(groupUser, this.getGroupUsersChangeList());
+    });
 };
 
 /**
@@ -149,35 +146,32 @@ GroupForm.prototype.addGroupUser = function(user) {
  */
 GroupForm.prototype.deleteGroupUser = function(groupUserToDelete) {
     var _groupForm = this.get(),
-        groupUsers = _groupForm.currentGroup.GroupUser,
-        deferred = defer();
+        groupUsers = _groupForm.currentGroup.GroupUser;
 
-    // Check if there is already one admin, and getthe index
-    // of the groupUser we are looking for.
-    var adminCount = 0;
-    var index = null;
-    for (var i in groupUsers) {
+    return new Promise( function(resolve, reject) {
+      // Check if there is already one admin, and getthe index
+      // of the groupUser we are looking for.
+      var adminCount = 0;
+      var index = null;
+      for (var i in groupUsers) {
         if (groupUsers[i].is_admin == true) {
-            adminCount++;
+          adminCount++;
         }
         if (groupUsers[i].user_id == groupUserToDelete.user_id) {
-            index = i;
+          index = i;
         }
-    }
+      }
 
-    // If we are trying to delete the last group admin, throw an exception.
-    if (groupUserToDelete.is_admin == true &&  adminCount <= 1) {
-        deferred.reject('Can not delete last group admin');
-        return deferred.promise;
-    }
-
-    // remove groupUser from array.
-    groupUsers.splice(index, 1);
-
-    this.set('currentGroup.GroupUser', groupUsers);
-
-    deferred.resolve(groupUserToDelete);
-    return deferred.promise;
+      // If we are trying to delete the last group admin, throw an exception.
+      if (groupUserToDelete.is_admin == true && adminCount <= 1) {
+        reject('Can not delete last group admin');
+      } else {
+          // remove groupUser from array.
+          groupUsers.splice(index, 1);
+          this.set('currentGroup.GroupUser', groupUsers);
+          resolve(groupUserToDelete);
+      }
+    });
 };
 
 /**
@@ -188,37 +182,35 @@ GroupForm.prototype.deleteGroupUser = function(groupUserToDelete) {
  */
 GroupForm.prototype.updateGroupUser = function(groupUserToUpdate) {
     var _groupForm = this.get(),
-        groupUsers = _groupForm.currentGroup.GroupUser,
-        deferred = defer();
+        groupUsers = _groupForm.currentGroup.GroupUser;
 
-    // Check if there is already one admin, and getthe index
-    // of the groupUser we are looking for.
-    var adminCount = 0;
-    var index = null;
-    for (var i in groupUsers) {
+    return new Promise( function(resolve, reject) {
+      // Check if there is already one admin, and getthe index
+      // of the groupUser we are looking for.
+      var adminCount = 0;
+      var index = null;
+      for (var i in groupUsers) {
         if (groupUsers[i].is_admin == 1 || groupUsers[i].is_admin == true) {
-            adminCount++;
+          adminCount++;
         }
         if (groupUsers[i].user_id == groupUserToUpdate.user_id) {
-            index = i;
+          index = i;
         }
-    }
+      }
 
-    // If we are trying to delete the last group admin, throw an exception.
-    var isRemoveAdmin = groupUserToUpdate.is_admin == false && groupUsers[index].is_admin == true;
-    if (isRemoveAdmin && adminCount <= 1) {
-        deferred.reject('Can not delete last group admin');
-        return deferred.promise;
-    }
+      // If we are trying to delete the last group admin, throw an exception.
+      var isRemoveAdmin = groupUserToUpdate.is_admin == false && groupUsers[index].is_admin == true;
+      if (isRemoveAdmin && adminCount <= 1) {
+        reject('Can not delete last group admin');
+      } else {
+          // remove groupUser from array.
+          groupUsers[index] = _.clone(groupUsers[index]);
+          groupUsers[index].is_admin = groupUserToUpdate.is_admin;
 
-    // remove groupUser from array.
-    groupUsers[index] = _.clone(groupUsers[index]);
-    groupUsers[index].is_admin = groupUserToUpdate.is_admin;
-
-    this.set('currentGroup.GroupUser', groupUsers);
-
-    deferred.resolve(groupUsers[index]);
-    return deferred.promise;
+          this.set('currentGroup.GroupUser', groupUsers);
+          resolve(groupUsers[index]);
+      }
+    });
 }
 
 /**

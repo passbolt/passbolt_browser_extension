@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- PASSBOLT-2344: Remove content scripts from web accessible resources
+- PASSBOLT-2352: Webextension should not use defer(), use native promise instead
+
 ## [1.6.3] - 2017-08-21
 ### Fixed
 - PASSBOLT-2318: Remove unsafe-eval from CSP

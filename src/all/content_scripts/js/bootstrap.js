@@ -96,7 +96,7 @@ $(function () {
 
   /**
    * On the login page, when the domain is not the right one, but the plugin is already configured.
-   * @returns {promise}
+   * @returns {Promise}
    */
   Bootstrap.prototype.loginPageWrongDomain = function () {
     $('html').addClass('domain-unknown');
@@ -115,7 +115,7 @@ $(function () {
 
   /**
    * On the login page, when the plugin configuration is missing.
-   * @returns {promise}
+   * @returns {Promise}
    */
   Bootstrap.prototype.loginPageConfigurationMissing = function () {
     var $renderSpace = $('.login.page .js_main-login-section'),
@@ -132,7 +132,7 @@ $(function () {
 
   /**
    * Initialize the plugin version section.
-   * @returns {promise}
+   * @returns {Promise}
    */
   Bootstrap.prototype.initVersion = function () {
     // Get plugin version and add it in the footer.

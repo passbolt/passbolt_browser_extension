@@ -34,7 +34,7 @@ $(function () {
 
     /**
      * Load the page template and initialize the variables relative to it.
-     * @returns {promise}
+     * @returns {Promise}
      */
     var loadTemplate = function () {
         return passbolt.html.loadTemplate('body', 'group/edit.ejs')
@@ -50,7 +50,7 @@ $(function () {
 
     /**
      * Init the security token.
-     * @returns {promise}
+     * @returns {Promise}
      */
     var initSecurityToken = function () {
         return passbolt.security.initSecurityToken(autocompleteFieldSelector, '.security-token');

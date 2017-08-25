@@ -19,7 +19,7 @@ $(function () {
 
   /**
    * Implements init().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.init = function () {
     return new Promise(function(resolve, reject) {
@@ -51,7 +51,7 @@ $(function () {
 
   /**
    * Implements submit().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.submit = function () {
     return new Promise(function(resolve, reject) {
@@ -62,7 +62,7 @@ $(function () {
 
   /**
    * Implements cancel().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.cancel = function () {
     return new Promise(function(resolve, reject) {
@@ -79,7 +79,7 @@ $(function () {
    * Generate key pair.
    * @param keyInfo {object} The key settings
    * @param passphrase {string} The passphrase for the master key
-   * @returns {promise}
+   * @returns {Promise}
    * @see keyinfo format in Key model
    * @private
    */
@@ -95,7 +95,7 @@ $(function () {
   /**
    * Import private key into the keyring.
    * @param keyInfo {object} key information
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   step._importIntoKeyring = function (keyInfo) {

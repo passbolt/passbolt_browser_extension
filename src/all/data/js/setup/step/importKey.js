@@ -34,7 +34,7 @@ $(function () {
 
   /**
    * Implements init().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.init = function () {
     return new Promise(function(resolve, reject) {
@@ -67,7 +67,7 @@ $(function () {
 
   /**
    * Implements submit().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.submit = function () {
     passbolt.setup.setActionState('submit', 'processing');
@@ -92,7 +92,7 @@ $(function () {
 
   /**
    * Implements cancel().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.cancel = function () {
     return new Promise(function(resolve, reject) {
@@ -134,7 +134,7 @@ $(function () {
 
   /**
    * Browse key and return content of the key selected.
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.browseKey = function () {
     // return passbolt.request('passbolt.file.prompt')

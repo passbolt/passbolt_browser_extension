@@ -23,7 +23,7 @@ $(function () {
 
   /**
    * Implements init().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.init = function () {
     return new Promise(function(resolve, reject) {
@@ -42,7 +42,7 @@ $(function () {
 
   /**
    * Implements submit().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.submit = function () {
     return new Promise(function(resolve, reject) {
@@ -53,7 +53,7 @@ $(function () {
 
   /**
    * Implements cancel().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.cancel = function () {
     return new Promise(function(resolve, reject) {

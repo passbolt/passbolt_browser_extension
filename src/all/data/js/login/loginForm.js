@@ -35,7 +35,7 @@ $(function () {
 
   /**
    * Load the page template and initialize the variables relative to it.
-   * @returns {promise}
+   * @returns {Promise}
    */
   var loadTemplate = function () {
     return passbolt.html.loadTemplate('body', 'login/form.ejs')
@@ -49,7 +49,7 @@ $(function () {
 
   /**
    * Init the security token.
-   * @returns {promise}
+   * @returns {Promise}
    */
   var initSecurityToken = function () {
     return passbolt.security.initSecurityToken('#js_master_password', '.security-token');
@@ -57,7 +57,7 @@ $(function () {
 
   /**
    * Get the user configured in the addon.
-   * @returns {promise}
+   * @returns {Promise}
    */
   var getUser = function () {
     return passbolt.request('passbolt.user.get').then(

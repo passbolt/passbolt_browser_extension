@@ -63,7 +63,7 @@ $(function () {
 
   /**
    * Load the page template and initialize the variables relative to it.
-   * @returns {promise}
+   * @returns {Promise}
    */
   var loadTemplate = function () {
     return passbolt.html.loadTemplate('body', 'secret/edit.ejs')
@@ -81,7 +81,7 @@ $(function () {
   /**
    * Get the currently edited secret.
    * It must have been stored before launching the secret add/edit dialog.
-   * @returns {promise}
+   * @returns {Promise}
    */
   var getEditedPassword = function () {
     return passbolt.request('passbolt.edit-password.get-edited-password')

@@ -4,9 +4,7 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const { defer } = require('../sdk/core/promise');
 var __ = require('../sdk/l10n').get;
-
 var Settings = require('./settings').Settings;
 var Key = require('./key').Key;
 var keyring = new openpgp.Keyring();
@@ -356,7 +354,7 @@ Keyring.prototype.findPrivate = function (userId) {
  *
  * @param keyInfo {array} The key settings
  * @param passphrase {string} The key passphrase
- * @returns {promise}
+ * @returns {Promise}
  */
 Keyring.prototype.generateKeyPair = function (keyInfo, passphrase) {
   // Get user id from key info.
@@ -381,110 +379,105 @@ Keyring.prototype.generateKeyPair = function (keyInfo, passphrase) {
  * Check if the passphrase is valid for the user private key.
  *
  * @param passphrase {string} The key passphrase
- * @returns {promise}
+ * @returns {Promise}
  */
 Keyring.prototype.checkPassphrase = function (passphrase) {
-  var deferred = defer(),
-    keyInfo = this.findPrivate(),
-    privateKey = openpgp.key.readArmored(keyInfo.key).keys[0];
+  return new Promise( function(resolve, reject) {
+    var keyInfo = this.findPrivate(),
+      privateKey = openpgp.key.readArmored(keyInfo.key).keys[0];
 
-  if (!privateKey.isDecrypted) {
-    openpgp.decryptKey({privateKey: privateKey, passphrase: passphrase})
-      .then(
-        function (decrypted) {
-          deferred.resolve(decrypted);
-          return deferred.promise;
-        },
-        function (e) {
-          deferred.reject(e.message);
-          return deferred.promise;
-        }
-      );
-  }
-  else {
-    deferred.resolve();
-  }
-  return deferred.promise;
+    if (!privateKey.isDecrypted) {
+      openpgp.decryptKey({privateKey: privateKey, passphrase: passphrase})
+        .then(
+          function (decrypted) {
+            resolve(decrypted);
+          },
+          function (error) {
+            reject(error);
+          }
+        );
+    } else {
+      resolve();
+    }
+  });
 };
 
 /**
  * Sync the local keyring with the passbolt API.
  * Retrieve the latest updated Public Keys.
  *
- * @returns {promise}
+ * @returns {Promise}
  */
 Keyring.prototype.sync = function () {
-  var _this = this,
-    deferred = defer();
+  var _this = this;
 
-  // Attention : some latencies have been observed while operating on the opengpg keyring.
-  var latestSync = storage.getItem('latestSync');
+  return new Promise( function(resolve, reject) {
+    // Attention : some latencies have been observed while operating on the opengpg keyring.
+    var latestSync = storage.getItem('latestSync');
 
-  // Get the latest keys changes from the backend.
-  var settings = new Settings();
-  var url = settings.getDomain() + '/gpgkeys.json';
-  var _response = {};
+    // Get the latest keys changes from the backend.
+    var settings = new Settings();
+    var url = settings.getDomain() + '/gpgkeys.json';
+    var _response = {};
 
-  // If a sync has already been performed.
-  if (latestSync !== null) {
-    url += '?modified_after=' + latestSync;
-  }
+    // If a sync has already been performed.
+    if (latestSync !== null) {
+      url += '?modified_after=' + latestSync;
+    }
 
-  // Get the updated public keys from passbolt.
-  fetch(
-    url, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(function(response) {
-      _response = response;
-      return response.json();
-    })
-    .then(function(json) {
-      // Check response status
-      if(!_response.ok) {
-        var msg = __('Could not synchronize the keyring. The server responded with an error.');
-        if(json.headers.msg != undefined) {
-          msg += ' ' + json.headers.msg;
+    // Get the updated public keys from passbolt.
+    fetch(
+      url, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         }
-        msg += '(' + _response.status + ')';
-        return deferred.reject(new Error(msg));
-      }
-
-      // Import the keys in keyring
-      if (json.body != undefined) {
-        // Store all the new keys in the keyring.
-        for (var i in json.body) {
-          var meta = json.body[i];
-          _this.importPublic(meta.Gpgkey.key, meta.Gpgkey.user_id);
+      })
+      .then(function (response) {
+        _response = response;
+        return response.json();
+      })
+      .then(function (json) {
+        // Check response status
+        if (!_response.ok) {
+          var msg = __('Could not synchronize the keyring. The server responded with an error.');
+          if (json.headers.msg != undefined) {
+            msg += ' ' + json.headers.msg;
+          }
+          msg += '(' + _response.status + ')';
+          reject(new Error(msg));
+          return;
         }
-      } else {
-        return deferred.reject(new Error(
-          __('Could not synchronize the keyring. The server response body is missing.')
-        ));
-      }
 
-      // Update the latest synced time.
-      if (json.header != undefined) {
-        storage.setItem('latestSync', json.header.servertime);
-      } else {
-        return deferred.reject(new Error(
-          __('Could not synchronize the keyring. The server response header is missing.')
-        ));
-      }
+        // Import the keys in keyring
+        if (json.body != undefined) {
+          // Store all the new keys in the keyring.
+          for (var i in json.body) {
+            var meta = json.body[i];
+            _this.importPublic(meta.Gpgkey.key, meta.Gpgkey.user_id);
+          }
+        } else {
+          reject(new Error(
+            __('Could not synchronize the keyring. The server response body is missing.')
+          ));
+          return;
+        }
 
-      // Resolve the defer with the number of updated keys.
-      return deferred.resolve(json.body.length);
-    })
-    .catch(function(error) {
-      return deferred.reject(error);
-    });
-
-  return deferred.promise;
+        // Update the latest synced time.
+        if (json.header != undefined) {
+          storage.setItem('latestSync', json.header.servertime);
+          // Resolve the defer with the number of updated keys.
+          resolve(json.body.length);
+        } else {
+          reject(new Error(__('Could not synchronize the keyring. The server response header is missing.')));
+        }
+      })
+      .catch(function (error) {
+        reject(error);
+      });
+  });
 };
 
 // Exports the Keyring object.

@@ -22,7 +22,7 @@ $(function () {
 
   /**
    * Implements init().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.init = function () {
     return new Promise(function(resolve, reject) {
@@ -39,7 +39,7 @@ $(function () {
 
   /**
    * Implements submit().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.submit = function () {
     return passbolt.setup.get()
@@ -72,7 +72,7 @@ $(function () {
    * If setup went fine, we don't need to keep the data as they are already stored
    * in user object.
    *
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   step._flushSetup = function () {
@@ -85,7 +85,7 @@ $(function () {
 
   /**
    * Go to login at the end of the setup.
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   step._goToLogin = function () {
@@ -106,7 +106,7 @@ $(function () {
    * Validate account of the user on the server with data collected during the setup.
    *
    * @param setupData {array} Setup information
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   step._validateAccount = function (setupData) {

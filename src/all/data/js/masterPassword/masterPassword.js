@@ -35,7 +35,7 @@ $(function () {
 
   /**
    * Load the page template and initialize the variables relative to it.
-   * @returns {promise}
+   * @returns {Promise}
    */
   var loadTemplate = function () {
     return passbolt.html.loadTemplate('body', 'master/masterPassword.ejs')
@@ -48,7 +48,7 @@ $(function () {
 
   /**
    * Init the security token.
-   * @returns {promise}
+   * @returns {Promise}
    */
   var initSecurityToken = function () {
     return passbolt.security.initSecurityToken('#js_master_password', '.security-token');
@@ -56,7 +56,7 @@ $(function () {
 
   /**
    * Steal the focus wherever it is.
-   * @returns {promise}
+   * @returns {Promise}
    */
   var stealFocus = function () {
     return new Promise(function(resolve, reject) {

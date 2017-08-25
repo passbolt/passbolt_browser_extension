@@ -29,7 +29,7 @@ $(function () {
 
   /**
    * Implements init().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.init = function () {
     return passbolt.setup.get('settings.securityToken').then(function (securityToken) {
@@ -69,7 +69,7 @@ $(function () {
    * Implements submit().
    *
    * Validate token set by user, and save it in setup.
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.submit = function () {
 
@@ -139,7 +139,7 @@ $(function () {
   /**
    * Validate token.
    * @param tokenData
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   step._validateToken = function (tokenData) {
@@ -153,7 +153,7 @@ $(function () {
   /**
    * Save Token.
    * @param settings {array} Token settings
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   step._saveToken = function (settings) {

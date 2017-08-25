@@ -37,7 +37,7 @@ $(function () {
 
   /**
    * Load the page template and initialize the variables relative to it.
-   * @returns {promise}
+   * @returns {Promise}
    */
   var loadTemplate = function () {
     return passbolt.html.loadTemplate('body', 'resource/share.ejs')
@@ -54,7 +54,7 @@ $(function () {
   /**
    * Get the currently edited password.
    * It must have been stored before launching the password share dialog.
-   * @returns {promise}
+   * @returns {Promise}
    */
   var getSharedPassword = function () {
     return passbolt.request('passbolt.share.get-shared-password')
@@ -65,7 +65,7 @@ $(function () {
 
   /**
    * Init the security token.
-   * @returns {promise}
+   * @returns {Promise}
    */
   var initSecurityToken = function () {
     return passbolt.security.initSecurityToken('#js_perm_create_form_aro_auto_cplt', '.security-token');

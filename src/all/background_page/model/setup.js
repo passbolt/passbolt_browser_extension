@@ -4,9 +4,7 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const { defer } = require('../sdk/core/promise');
 var __ = require('../sdk/l10n').get;
-
 var Config = require('./config');
 var Keyring = require('./keyring').Keyring;
 var Crypto = require('./crypto').Crypto;
@@ -182,65 +180,64 @@ Setup.prototype.reset = function () {
  */
 Setup.prototype.save = function(data) {
   var _this = this,
-    _response = {},
-    deferred = defer();
+    _response = {};
 
-  var url = data.settings.domain + '/users/validateAccount/' + data.user.id + '.json';
-  var keyring = new Keyring();
+  return new Promise(function(resolve, reject) {
+    var url = data.settings.domain + '/users/validateAccount/' + data.user.id + '.json';
+    var keyring = new Keyring();
 
-  // Build request data.
-  var requestData = {
-    'AuthenticationToken': {
-      'token': data.settings.token
-    },
-    'Gpgkey': {
-      'key' : data.key.publicKeyArmored
-    }
-  };
-
-  // Save the new password and other information.
-  fetch(
-    url, {
-      method: 'PUT',
-      credentials: 'include',
-      body: JSON.stringify(requestData),
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(function(response) {
-      _response = response;
-      return response.json();
-    })
-    .then(function(json) {
-      // Check response status
-      if (!_response.ok || typeof json.header == 'undefined'
-        || typeof json.header.status == 'undefined' || json.header.status != 'success') {
-        return deferred.reject({
-          message: 'server response error',
-          data: {
-            request: requestData,
-            response: json
-          }
-        });
-      } else {
-        return _this.saveSettings(data);
-      }
-    })
-    .then(
-      function success() {
-        deferred.resolve();
+    // Build request data.
+    var requestData = {
+      'AuthenticationToken': {
+        'token': data.settings.token
       },
-      function error(error){
-        deferred.reject(error);
+      'Gpgkey': {
+        'key': data.key.publicKeyArmored
       }
-    )
-    .catch(function(error){
-      return deferred.reject(error);
-    });
+    };
 
-  return deferred.promise;
+    // Save the new password and other information.
+    fetch(
+      url, {
+        method: 'PUT',
+        credentials: 'include',
+        body: JSON.stringify(requestData),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(function (response) {
+        _response = response;
+        return response.json();
+      })
+      .then(function (json) {
+        // Check response status
+        if (!_response.ok || typeof json.header == 'undefined'
+          || typeof json.header.status == 'undefined' || json.header.status != 'success') {
+          reject({
+            message: 'server response error',
+            data: {
+              request: requestData,
+              response: json
+            }
+          });
+        } else {
+          return _this.saveSettings(data);
+        }
+      })
+      .then(
+        function success() {
+          resolve();
+        },
+        function error(error) {
+          reject(error);
+        }
+      )
+      .catch(function (error) {
+        reject(error);
+      });
+  });
 };
 
 /**
@@ -248,12 +245,13 @@ Setup.prototype.save = function(data) {
  * Inform server that the recovery is complete and save the recovered settings.
  *
  * @param data {array} The recovery data
- * @returns {promise}
+ * @returns {Promise}
  */
 Setup.prototype.completeRecovery = function(data) {
   var _this = this,
-    _response = {},
-    deferred = defer();
+    _response = {};
+
+  return new Promise (function(success, error) {
 
   var url = data.settings.domain + '/setup/completeRecovery/' + data.user.id + '.json';
 
@@ -286,7 +284,7 @@ Setup.prototype.completeRecovery = function(data) {
       // Check response status
       if (!_response.ok || typeof json.header == 'undefined'
         || typeof json.header.status == 'undefined' || json.header.status != 'success') {
-        return deferred.reject({
+        reject({
           message: 'server response error',
           data: {
             request: requestData,
@@ -299,109 +297,108 @@ Setup.prototype.completeRecovery = function(data) {
     })
     .then(
       function success() {
-        deferred.resolve();
+        resolve();
       },
       function error(error){
-        deferred.reject(error);
+        reject(error);
       }
     )
     .catch(function(error){
-      return deferred.reject(error);
+      reject(error);
     });
-
-  return deferred.promise;
+  });
 };
 
 /**
  * Save setup data into settings.
  *
  * @param setupData {setupData}
- * @returns {promise}
+ * @returns {Promise}
  */
 Setup.prototype.saveSettings = function (setupData) {
-  var deferred = defer(),
-    keyring = new Keyring(),
+  var keyring = new Keyring(),
     userInfo = null;
 
-  // Save the user settings, e.g. security token & domain
-  var user = new User();
-  try {
-    user.settings.setSecurityToken(setupData.settings.securityToken);
-    // Save baseUrl.
-    user.settings.setDomain(setupData.settings.domain);
-    // Save user.
-    userInfo = {
-      id: setupData.user.id,
-      username: setupData.user.username,
-      firstname: setupData.user.firstname,
-      lastname: setupData.user.lastname
-    };
-    user.set(userInfo);
+  return new Promise(function(resolve, reject) {
+    // Save the user settings, e.g. security token & domain
+    var user = new User();
+    try {
+      user.settings.setSecurityToken(setupData.settings.securityToken);
+      // Save baseUrl.
+      user.settings.setDomain(setupData.settings.domain);
+      // Save user.
+      userInfo = {
+        id: setupData.user.id,
+        username: setupData.user.username,
+        firstname: setupData.user.firstname,
+        lastname: setupData.user.lastname
+      };
+      user.set(userInfo);
+    }
+    catch (e) {
+      reject({
+        message: e.message,
+        data: {
+          token: setupData.settings.securityToken,
+          domain: setupData.settings.domain,
+          user: userInfo
+        }
+      });
+      return;
+    }
 
-  } catch (e) {
-    deferred.reject({
-      message: e.message,
-      data: {
-        token: setupData.settings.securityToken,
-        domain: setupData.settings.domain,
-        user: userInfo
-      }
-    });
-    return deferred.promise;
-  }
+    // Flush the public keyring.
+    keyring.flush(Keyring.PUBLIC);
+    // Flush the private keyring.
+    keyring.flush(Keyring.PRIVATE);
 
-  // Flush the public keyring.
-  keyring.flush(Keyring.PUBLIC);
-  // Flush the private keyring.
-  keyring.flush(Keyring.PRIVATE);
+    // Import server key into keyring.
+    try {
+      keyring.importServerPublicKey(setupData.settings.armoredServerKey, setupData.settings.domain);
+    }
+    catch (e) {
+      reject({
+        message: 'error importing the server key : ' + e.message,
+        data: {
+          serverKey: setupData.settings.armoredServerKey
+        }
+      });
+      return;
+    }
 
-  // Import server key into keyring.
-  try {
-    keyring.importServerPublicKey(setupData.settings.armoredServerKey, setupData.settings.domain);
-  }
-  catch (e) {
-    deferred.reject({
-      message: 'error importing the server key : ' + e.message,
-      data: {
-        serverKey: setupData.settings.armoredServerKey
-      }
-    });
-    return deferred.promise;
-  }
+    // Import private key into keyring.
+    try {
+      keyring.importPrivate(setupData.key.privateKeyArmored);
+    }
+    catch (e) {
+      reject({
+        message: 'error importing the private key : ' + e.message,
+        data: {
+          key: setupData.key.privateKeyArmored,
+          userId: setupData.user.id
+        }
+      });
+      return;
+    }
 
-  // Import private key into keyring.
-  try {
-    keyring.importPrivate(setupData.key.privateKeyArmored);
-  }
-  catch (e) {
-    deferred.reject({
-      message: 'error importing the private key : ' + e.message,
-      data: {
-        key: setupData.key.privateKeyArmored,
-        userId: setupData.user.id
-      }
-    });
-    return deferred.promise;
-  }
+    // Store the user public key in the keyring.
+    // We store the one generated locally, not the one returned by the server.
+    try {
+      keyring.importPublic(setupData.key.publicKeyArmored, setupData.user.id);
+    } catch (e) {
+      reject({
+        message: 'error importing the public key : ' + e.message,
+        data: {
+          key: setupData.key.publicKeyArmored,
+          userId: setupData.user.id
+        }
+      });
+      return;
+    }
 
-  // Store the user public key in the keyring.
-  // We store the one generated locally, not the one returned by the server.
-  try {
-    keyring.importPublic(setupData.key.publicKeyArmored, setupData.user.id);
-  } catch (e) {
-    deferred.reject({
-      message: 'error importing the public key : ' + e.message,
-      data: {
-        key: setupData.key.publicKeyArmored,
-        userId: setupData.user.id
-      }
-    });
-    return deferred.promise;
-  }
-
-  // Everything alright, we resolve.
-  deferred.resolve();
-  return deferred.promise;
+    // Everything is awesome!
+    resolve();
+  });
 };
 
 /**

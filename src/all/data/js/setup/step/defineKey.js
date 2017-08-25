@@ -30,7 +30,7 @@ $(function () {
 
   /**
    * Implements init().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.init = function () {
 
@@ -58,7 +58,7 @@ $(function () {
 
   /**
    * Implements submit().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.submit = function () {
     // Set submit button into processing state.
@@ -82,7 +82,7 @@ $(function () {
 
   /**
    * Implements cancel().
-   * @returns {promise}
+   * @returns {Promise}
    */
   step.cancel = function () {
     return new Promise(function(resolve, reject) {
@@ -134,7 +134,7 @@ $(function () {
   /**
    * Get the data needed to start this step from plugin, and
    * Display an error in case it could not be retrieved.
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   step._getData = function () {
@@ -147,7 +147,7 @@ $(function () {
   /**
    * Validate key info.
    * @param keyInfo {object} Key settings
-   * @returns {promise}
+   * @returns {Promise}
    * @private
    */
   step._validateKeyInfo = function (keyInfo) {

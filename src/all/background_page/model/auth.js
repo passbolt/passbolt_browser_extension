@@ -5,7 +5,6 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var __ = require('../sdk/l10n').get;
-const defer = require('../sdk/core/promise').defer;
 var Config = require('./config');
 var User = require('./user').User;
 var Keyring = require('./keyring').Keyring;
@@ -29,62 +28,61 @@ var Auth = function () {
  * @param serverUrl {string} The server url
  * @param serverKey {string} The server public armored key or keyid
  * @param userFingerprint {string} The user finger print
- * @returns {promise}
+ * @returns {Promise}
  */
 Auth.prototype.verify = function(serverUrl, serverKey, userFingerprint) {
-  var deferred = defer(),
-    _this = this,
-    user = new User();
+  var _this = this,
+      user = new User();
 
-  // if the server key is not provided get it from the settings
-  if (typeof serverKey === 'undefined') {
-    serverKey = Crypto.uuid(user.settings.getDomain());
-  }
-  if (typeof serverUrl === 'undefined') {
-    serverUrl = user.settings.getDomain();
-  }
-  if (typeof userFingerprint === 'undefined') {
-    var keyring = new Keyring(),
-        privateKey = keyring.findPrivate();
-    userFingerprint = privateKey.fingerprint;
-  }
+  return new Promise (function(resolve, reject) {
+    // if the server key is not provided get it from the settings
+    if (typeof serverKey === 'undefined') {
+      serverKey = Crypto.uuid(user.settings.getDomain());
+    }
+    if (typeof serverUrl === 'undefined') {
+      serverUrl = user.settings.getDomain();
+    }
+    if (typeof userFingerprint === 'undefined') {
+      var keyring = new Keyring(),
+          privateKey = keyring.findPrivate();
+      userFingerprint = privateKey.fingerprint;
+    }
 
-  var crypto = new Crypto();
-  crypto.encrypt(this.__generateVerifyToken(), serverKey)
-    .then(
-      function success(encrypted) {
-        var data = new FormData();
-        data.append('data[gpg_auth][keyid]', userFingerprint);
-        data.append('data[gpg_auth][server_verify_token]', encrypted);
+    var crypto = new Crypto();
+    crypto.encrypt(this.__generateVerifyToken(), serverKey)
+      .then(
+        function success(encrypted) {
+          var data = new FormData();
+          data.append('data[gpg_auth][keyid]', userFingerprint);
+          data.append('data[gpg_auth][server_verify_token]', encrypted);
 
-        return fetch(
-          serverUrl + _this.URL_VERIFY, {
-            method: 'POST',
-            credentials: 'include',
-            body: data
-          });
-      },
-      function error(error) {
-        deferred.reject(new Error(__('Unable to encrypt the verify token.') + ' ' + error.message));
-      }
-    )
-    .then(function(response) {
-      // Check response status
-      var auth = new GpgAuthHeader(response.headers, 'verify');
+          return fetch(
+            serverUrl + _this.URL_VERIFY, {
+              method: 'POST',
+              credentials: 'include',
+              body: data
+            });
+        },
+        function error(error) {
+          reject(new Error(__('Unable to encrypt the verify token.') + ' ' + error.message));
+        }
+      )
+      .then(function(response) {
+        // Check response status
+        var auth = new GpgAuthHeader(response.headers, 'verify');
 
-      // Check that the server was able to decrypt the token with our local copy
-      var verify = new GpgAuthToken(auth.headers['x-gpgauth-verify-response']);
-      if(verify.token != _this._verifyToken) {
-        deferred.reject(new Error(__('The server was unable to prove its identity.')));
-      } else {
-        deferred.resolve(__('The server identity is verified!'));
-      }
-    })
-    .catch(function(error) {
-      deferred.reject(error);
-    });
-
-  return deferred.promise;
+        // Check that the server was able to decrypt the token with our local copy
+        var verify = new GpgAuthToken(auth.headers['x-gpgauth-verify-response']);
+        if(verify.token != _this._verifyToken) {
+          reject(new Error(__('The server was unable to prove its identity.')));
+        } else {
+          resolve(__('The server identity is verified!'));
+        }
+      })
+      .catch(function(error) {
+        reject(error);
+      });
+  });
 };
 
 /**
@@ -93,153 +91,147 @@ Auth.prototype.verify = function(serverUrl, serverKey, userFingerprint) {
  * @param domain {string} domain where to get the key. if domain is not
  *  provided, then look in the settings.
  *
- * @returns {promise}
+ * @returns {Promise}
  */
 Auth.prototype.getServerKey = function (domain) {
-  var deferred = defer(),
-    user = new User(),
+  var user = new User(),
     _this = this;
+  return new Promise (function(resolve, reject) {
 
-  if (typeof domain === 'undefined') {
-    domain = user.settings.getDomain();
-  }
-
-  fetch(
-    domain + this.URL_VERIFY, {
-      method: 'GET',
-      credentials: 'include'
-    })
-    .then(function(response) {
-      _this.__statusCheck(response);
-      return response.json();
-    })
-    .then(
-      function success(json) {
-        deferred.resolve(json.body);
-      },
-      function error() {
-        deferred.reject(new Error(
-          __('There was a problem trying to understand the data provided by the server')));
-      }
-    )
-    .catch(function(error) {
-      deferred.reject(error);
-    });
-
-  return deferred.promise;
+    if (typeof domain === 'undefined') {
+      domain = user.settings.getDomain();
+    }
+    fetch(
+      domain + this.URL_VERIFY, {
+        method: 'GET',
+        credentials: 'include'
+      })
+      .then(function (response) {
+        _this.__statusCheck(response);
+        return response.json();
+      })
+      .then(
+        function success(json) {
+          resolve(json.body);
+        },
+        function error() {
+          reject(new Error(__('There was a problem trying to understand the data provided by the server')));
+        }
+      )
+      .catch(function (error) {
+        reject(error);
+      });
+  });
 };
 
 /**
  * GPGAuth Login - handle stage1, stage2 and complete
  *
  * @param passphrase {string} The user private key passphrase
- * @returns {promise}
+ * @returns {Promise}
  */
 Auth.prototype.login = function(passphrase) {
-  var deferred = defer(),
-    _this = this,
+  var _this = this,
     keyring = new Keyring();
 
-  keyring.checkPassphrase(passphrase)
-    .then(function() {
-      return _this.__stage1(passphrase)
-    })
-    .then(function(userAuthToken) {
-      return _this.__stage2(userAuthToken)
-    })
-    .then(function(referrer) {
-      deferred.resolve(referrer);
-    })
-    .catch(function(error){
-      var msg = __('The server was unable to respect the authentication protocol!') + ' ' + error.message;
-      deferred.reject(new Error(msg));
-    });
-
-  return deferred.promise;
+  return new Promise (function(resolve, reject) {
+    keyring.checkPassphrase(passphrase)
+      .then(function () {
+        return _this.__stage1(passphrase)
+      })
+      .then(function (userAuthToken) {
+        return _this.__stage2(userAuthToken)
+      })
+      .then(function (referrer) {
+        resolve(referrer);
+      })
+      .catch(function (error) {
+        var msg = __('The server was unable to respect the authentication protocol!') + ' ' + error.message;
+        reject(new Error(msg));
+      });
+  });
 };
 
 /**
  * GPGAuth stage1 - get and decrypt a verification given by the server
  *
  * @param passphrase {string} The user private key passphrase
- * @returns {promise}
+ * @returns {Promise}
  * @private
  */
 Auth.prototype.__stage1 = function (passphrase) {
-  var deferred = defer(),
-    _this = this,
+  var _this = this,
     user = new User(),
     keyring = new Keyring();
 
-  var data = new FormData();
-  data.append('data[gpg_auth][keyid]', (keyring.findPrivate()).fingerprint);
+  return new Promise (function(resolve, reject) {
+    var data = new FormData();
+    data.append('data[gpg_auth][keyid]', (keyring.findPrivate()).fingerprint);
 
-  // Stage 1. request a token to the server
-  fetch(
-    user.settings.getDomain() + this.URL_LOGIN, {
-      method: 'POST',
-      credentials: 'include',
-      body : data
-    })
-    .then(function (response) {
-      // Check response status
-      _this.__statusCheck(response);
-      var auth = new GpgAuthHeader(response.headers, 'stage1');
+    // Stage 1. request a token to the server
+    fetch(
+      user.settings.getDomain() + this.URL_LOGIN, {
+        method: 'POST',
+        credentials: 'include',
+        body: data
+      })
+      .then(function (response) {
+        // Check response status
+        _this.__statusCheck(response);
+        var auth = new GpgAuthHeader(response.headers, 'stage1');
 
-      // Try to decrypt the User Auth Token
-      var crypto = new Crypto();
-      var encryptedUserAuthToken = stripslashes(urldecode(auth.headers['x-gpgauth-user-auth-token']));
-      return crypto.decrypt(encryptedUserAuthToken, passphrase);
-    })
-    .then(function(userAuthToken) {
-      // Validate the User Auth Token
-      var authToken = new GpgAuthToken(userAuthToken);
-      deferred.resolve(authToken.token);
-    })
-    .catch(function(error){
-      deferred.reject(error);
-    });
-
-  return deferred.promise;
+        // Try to decrypt the User Auth Token
+        var crypto = new Crypto();
+        var encryptedUserAuthToken = stripslashes(urldecode(auth.headers['x-gpgauth-user-auth-token']));
+        return crypto.decrypt(encryptedUserAuthToken, passphrase);
+      })
+      .then(function (userAuthToken) {
+        // Validate the User Auth Token
+        var authToken = new GpgAuthToken(userAuthToken);
+        resolve(authToken.token);
+      })
+      .catch(function (error) {
+        reject(error);
+      });
+  });
 };
 
 /**
  * Stage 2. send back the token to the server to get auth cookie
  *
  * @param userAuthToken {string} The user authentication token
- * @returns {promise}
+ * @returns {Promise}
  * @private
  */
 Auth.prototype.__stage2 = function (userAuthToken) {
-  var deferred = defer(),
-    _this = this,
+  var _this = this,
     user = new User(),
     keyring = new Keyring();
 
-  var data = new FormData();
-  data.append('data[gpg_auth][keyid]', (keyring.findPrivate()).fingerprint);
-  data.append('data[gpg_auth][user_token_result]', userAuthToken);
+  return new Promise (function(resolve, reject) {
+    var data = new FormData();
+    data.append('data[gpg_auth][keyid]', (keyring.findPrivate()).fingerprint);
+    data.append('data[gpg_auth][user_token_result]', userAuthToken);
 
-  fetch(
-    user.settings.getDomain() + this.URL_LOGIN, {
-      method: 'POST',
-      credentials: 'include',
-      body : data
-    })
-    .then(function(response) {
-      // Check response status
-      _this.__statusCheck(response);
-      var auth = new GpgAuthHeader(response.headers, 'complete');
+    fetch(
+      user.settings.getDomain() + this.URL_LOGIN, {
+        method: 'POST',
+        credentials: 'include',
+        body: data
+      })
+      .then(function (response) {
+        // Check response status
+        _this.__statusCheck(response);
+        var auth = new GpgAuthHeader(response.headers, 'complete');
 
-      // Get the redirection url
-      var referrer = user.settings.getDomain() + auth.headers['x-gpgauth-refer'];
-      deferred.resolve(referrer);
-    })
-    .catch(function(error){
-      deferred.reject(error);
-    });
-
-  return deferred.promise;
+        // Get the redirection url
+        var referrer = user.settings.getDomain() + auth.headers['x-gpgauth-refer'];
+        resolve(referrer);
+      })
+      .catch(function (error) {
+        reject(error);
+      });
+  });
 };
 
 /**

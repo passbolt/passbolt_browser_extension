@@ -10,7 +10,6 @@
  */
 var app = require('../app');
 var pageMod = require('../sdk/page-mod');
-const { defer } = require('../sdk/core/promise');
 var Worker = require('../model/worker');
 var user = new (require('../model/user').User)();
 var TabStorage = require('../model/tabStorage').TabStorage;
@@ -94,29 +93,28 @@ PassboltApp.initPageMod = function () {
 };
 
 PassboltApp.init = function () {
-  var deferred = defer();
-
-  // According to the user status :
-  // * the pagemod should be initialized if the user is valid and logged in;
-  // * the pagemod should be destroyed otherwise;
-  if (user.isValid()) {
-    user.isLoggedIn().then(
-      // If it is already logged-in.
-      function success() {
-        PassboltApp.destroy();
-        PassboltApp._pageMod = PassboltApp.initPageMod();
-        deferred.resolve();
-      },
-      // If it is logged-out.
-      function error() {
-        PassboltApp.destroy();
-      }
-    );
-  } else {
-    deferred.reject();
-  }
-
-  return deferred.promise;
+  return new Promise(function(resolve, reject) {
+    // According to the user status :
+    // * the pagemod should be initialized if the user is valid and logged in;
+    // * the pagemod should be destroyed otherwise;
+    if (user.isValid()) {
+      user.isLoggedIn().then(
+        // If it is already logged-in.
+        function success() {
+          PassboltApp.destroy();
+          PassboltApp._pageMod = PassboltApp.initPageMod();
+          resolve();
+        },
+        // If it is logged-out.
+        function error() {
+          PassboltApp.destroy();
+          resolve();
+        }
+      );
+    } else {
+      resolve();
+    }
+  });
 };
 
 exports.PassboltApp = PassboltApp;

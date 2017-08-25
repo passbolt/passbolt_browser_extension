@@ -18,16 +18,19 @@ $(function () {
     this.isTrustedDomain = false;
     this.trustedDomain = '';
 
-    // Check if the addon is configured
-    this.loadConfiguration()
-      // Boostrap common.
-      .then(function () {
-        _this.bootstrapCommon();
-      })
-      // Boostrap login page.
-      .then(function () {
-        _this.bootstrapLoginPage();
-      });
+    // Do not bootstrap on non passbolt app pages
+    if($('html.passbolt.no-passboltplugin').length === 1) {
+      // Check if the addon is configured
+      this.loadConfiguration()
+        // Boostrap common.
+        .then(function () {
+          _this.bootstrapCommon();
+        })
+        // Boostrap login page.
+        .then(function () {
+          _this.bootstrapLoginPage();
+        });
+    }
   };
 
   /**

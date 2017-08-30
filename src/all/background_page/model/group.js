@@ -37,11 +37,12 @@ var Group = function () {
  * @returns {*}
  */
 Group.prototype.findById = function(groupId) {
-  var _response = null;
+  var _response = null,
+    _this = this;
 
   return new Promise(function(resolve, reject) {
     fetch(
-      this.settings.getDomain() + '/groups/' + groupId + '.json', {
+      _this.settings.getDomain() + '/groups/' + groupId + '.json', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -82,22 +83,23 @@ Group.prototype.findById = function(groupId) {
  * @returns {*}
  */
 Group.prototype.save = function(group, groupId, dryrun) {
-    var _response = null,
-        url =  this.settings.getDomain() + '/groups.json',
-        method = 'POST',
-        groupParamStr = JSON.stringify(group),
-        isDryRun = dryrun != undefined && dryrun == true;
+  var _response = null,
+    url =  this.settings.getDomain() + '/groups.json',
+    method = 'POST',
+    groupParamStr = JSON.stringify(group),
+    isDryRun = dryrun != undefined && dryrun == true;
+
+  // If the group is updated.
+  if (groupId != undefined && groupId != '') {
+    url = this.settings.getDomain()
+      + '/groups/'
+      + groupId
+      + (isDryRun ? '/dry-run' : '')
+      + '.json';
+    method = 'PUT';
+  }
 
   return new Promise(function(resolve, reject) {
-    if (groupId != undefined && groupId != '') {
-      url = this.settings.getDomain()
-        + '/groups/'
-        + groupId
-        + (isDryRun ? '/dry-run' : '')
-        + '.json';
-      method = 'PUT';
-    }
-
     fetch(
       url, {
         method: method,

@@ -27,12 +27,14 @@ var Permission = function () {
  * @returns {Promise}
  */
 Permission.prototype.searchUsers = function(model, instanceId, keywords, excludedUsers) {
-	var _response = {},
-			url = null;
+	var _this = this,
+    _response = {},
+    url = null;
+
 	return new Promise (function (resolve, reject) {
     // Check if there is a trusted domain.
     try {
-      url = this.settings.getDomain() + '/share/search-users/' + model + '/' + instanceId + '.json';
+      url = _this.settings.getDomain() + '/share/search-users/' + model + '/' + instanceId + '.json';
       url += '?keywords=' + keywords;
     } catch (e) {
       reject(__('The application domain is not set'));

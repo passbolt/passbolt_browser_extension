@@ -109,12 +109,11 @@ GroupForm.prototype.set = function (key, value) {
  * @returns {*}
  */
 GroupForm.prototype.addGroupUser = function(user) {
-    var _groupForm = this.get();
+    var _this = this,
+      _groupForm = this.get();
 
-    return new Promise( function(resolve, reject) {
-      var groupId = _groupForm.currentGroup.Group.id;
+    return new Promise( function(resolve) {
       var groupUsers = _groupForm.currentGroup.GroupUser;
-      var initialGroupUsers = _groupForm.initialGroup.GroupUser;
 
       // Check if there is already one admin.
       var adminExisting = false;
@@ -133,8 +132,8 @@ GroupForm.prototype.addGroupUser = function(user) {
 
       // Add object to groupUsers list in tab storage.
       groupUsers.push(groupUser);
-      this.set('currentGroup.GroupUser', groupUsers);
-      resolve(groupUser, this.getGroupUsersChangeList());
+      _this.set('currentGroup.GroupUser', groupUsers);
+      resolve(groupUser, _this.getGroupUsersChangeList());
     });
 };
 
@@ -145,8 +144,9 @@ GroupForm.prototype.addGroupUser = function(user) {
  * @returns {*}
  */
 GroupForm.prototype.deleteGroupUser = function(groupUserToDelete) {
-    var _groupForm = this.get(),
-        groupUsers = _groupForm.currentGroup.GroupUser;
+    var _this = this,
+      _groupForm = this.get(),
+      groupUsers = _groupForm.currentGroup.GroupUser;
 
     return new Promise( function(resolve, reject) {
       // Check if there is already one admin, and getthe index
@@ -168,7 +168,7 @@ GroupForm.prototype.deleteGroupUser = function(groupUserToDelete) {
       } else {
           // remove groupUser from array.
           groupUsers.splice(index, 1);
-          this.set('currentGroup.GroupUser', groupUsers);
+          _this.set('currentGroup.GroupUser', groupUsers);
           resolve(groupUserToDelete);
       }
     });
@@ -181,8 +181,9 @@ GroupForm.prototype.deleteGroupUser = function(groupUserToDelete) {
  * @returns {*}
  */
 GroupForm.prototype.updateGroupUser = function(groupUserToUpdate) {
-    var _groupForm = this.get(),
-        groupUsers = _groupForm.currentGroup.GroupUser;
+    var _this = this,
+      _groupForm = this.get(),
+      groupUsers = _groupForm.currentGroup.GroupUser;
 
     return new Promise( function(resolve, reject) {
       // Check if there is already one admin, and getthe index
@@ -207,7 +208,7 @@ GroupForm.prototype.updateGroupUser = function(groupUserToUpdate) {
           groupUsers[index] = _.clone(groupUsers[index]);
           groupUsers[index].is_admin = groupUserToUpdate.is_admin;
 
-          this.set('currentGroup.GroupUser', groupUsers);
+          _this.set('currentGroup.GroupUser', groupUsers);
           resolve(groupUsers[index]);
       }
     });

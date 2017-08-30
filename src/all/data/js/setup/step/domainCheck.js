@@ -297,7 +297,8 @@ $(function () {
       .then(step._getKeyInfo)
       .then(step._displayKeyInfo)
       .then(null, function (msg) {
-        step.onErrorServerKey(msg);
+        console.error(msg);
+        step.onErrorServerKey();
       });
   };
 

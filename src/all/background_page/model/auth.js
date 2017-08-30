@@ -49,7 +49,7 @@ Auth.prototype.verify = function(serverUrl, serverKey, userFingerprint) {
     }
 
     var crypto = new Crypto();
-    crypto.encrypt(this.__generateVerifyToken(), serverKey)
+    crypto.encrypt(_this.__generateVerifyToken(), serverKey)
       .then(
         function success(encrypted) {
           var data = new FormData();
@@ -73,7 +73,7 @@ Auth.prototype.verify = function(serverUrl, serverKey, userFingerprint) {
 
         // Check that the server was able to decrypt the token with our local copy
         var verify = new GpgAuthToken(auth.headers['x-gpgauth-verify-response']);
-        if(verify.token != _this._verifyToken) {
+        if(verify.token !== _this._verifyToken) {
           reject(new Error(__('The server was unable to prove its identity.')));
         } else {
           resolve(__('The server identity is verified!'));
@@ -102,7 +102,7 @@ Auth.prototype.getServerKey = function (domain) {
       domain = user.settings.getDomain();
     }
     fetch(
-      domain + this.URL_VERIFY, {
+      domain + _this.URL_VERIFY, {
         method: 'GET',
         credentials: 'include'
       })
@@ -170,7 +170,7 @@ Auth.prototype.__stage1 = function (passphrase) {
 
     // Stage 1. request a token to the server
     fetch(
-      user.settings.getDomain() + this.URL_LOGIN, {
+      user.settings.getDomain() + _this.URL_LOGIN, {
         method: 'POST',
         credentials: 'include',
         body: data
@@ -214,7 +214,7 @@ Auth.prototype.__stage2 = function (userAuthToken) {
     data.append('data[gpg_auth][user_token_result]', userAuthToken);
 
     fetch(
-      user.settings.getDomain() + this.URL_LOGIN, {
+      user.settings.getDomain() + _this.URL_LOGIN, {
         method: 'POST',
         credentials: 'include',
         body: data

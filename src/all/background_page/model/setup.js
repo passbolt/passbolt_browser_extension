@@ -247,65 +247,64 @@ Setup.prototype.save = function(data) {
  * @param data {array} The recovery data
  * @returns {Promise}
  */
-Setup.prototype.completeRecovery = function(data) {
+Setup.prototype.completeRecovery = function (data) {
   var _this = this,
     _response = {};
 
-  return new Promise (function(success, error) {
+  return new Promise(function (resolve, reject) {
+    var url = data.settings.domain + '/setup/completeRecovery/' + data.user.id + '.json';
 
-  var url = data.settings.domain + '/setup/completeRecovery/' + data.user.id + '.json';
-
-  // Build request data.
-  var requestData = {
-    'AuthenticationToken': {
-      'token': data.settings.token
-    },
-    'Gpgkey': {
-      'key' : data.key.publicKeyArmored
-    }
-  };
-
-  // Save the new password and other information.
-  fetch(
-    url, {
-      method: 'PUT',
-      credentials: 'include',
-      body: JSON.stringify(requestData),
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(function(response) {
-      _response = response;
-      return response.json();
-    })
-    .then(function(json) {
-      // Check response status
-      if (!_response.ok || typeof json.header == 'undefined'
-        || typeof json.header.status == 'undefined' || json.header.status != 'success') {
-        reject({
-          message: 'server response error',
-          data: {
-            request: requestData,
-            response: json
-          }
-        });
-      } else {
-        return _this.saveSettings(data);
-      }
-    })
-    .then(
-      function success() {
-        resolve();
+    // Build request data.
+    var requestData = {
+      AuthenticationToken: {
+        token: data.settings.token
       },
-      function error(error){
-        reject(error);
+      Gpgkey: {
+        key: data.key.publicKeyArmored
       }
-    )
-    .catch(function(error){
-      reject(error);
-    });
+    };
+
+    // Save the new password and other information.
+    fetch(
+      url, {
+        method: 'PUT',
+        credentials: 'include',
+        body: JSON.stringify(requestData),
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(function (response) {
+        _response = response;
+        return response.json();
+      })
+      .then(function (json) {
+        // Check response status
+        if (!_response.ok || typeof json.header == 'undefined'
+          || typeof json.header.status == 'undefined' || json.header.status != 'success') {
+          reject({
+            message: 'server response error',
+            data: {
+              request: requestData,
+              response: json
+            }
+          });
+        } else {
+          return _this.saveSettings(data);
+        }
+      })
+      .then(
+        function success() {
+          resolve();
+        },
+        function error(error) {
+          reject(error);
+        }
+      )
+      .catch(function (error) {
+        reject(error);
+      });
   });
 };
 

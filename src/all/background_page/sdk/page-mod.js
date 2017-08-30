@@ -100,6 +100,9 @@ PageMod.prototype.__init = function() {
   // see. https://bugs.chromium.org/p/chromium/issues/detail?id=109557
   this._listeners['chrome.tabs.onReplaced'] = function (addedTabId, removedTabId) {
     chrome.tabs.get(addedTabId, function(tab){
+      chrome.tabs.get(removedTabId, function(oldTab) {
+        Log.write({level: 'debug', message: 'sdk/pageMod::__init ' + _this.args.name + ' processing chrome.tabs.onReplaced ' + addedTabId + ' ' + removedTabId + ' ' + tab.url + ' ' + oldTab.url });
+      });
       _this.__onTabUpdated(tab.id, {status:'complete'}, tab);
     });
   };
@@ -234,7 +237,7 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
     return;
   }
 
-  // ignore requests that have changeInfo.url set && status complete
+  // ignore requests that have changeInfo.url set.
   // they are only triggered by firefox in case of tab restore and proved buggy
   if(changeInfo.url !== undefined) {
     return;

@@ -64,15 +64,15 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
 
-  grunt.registerTask('build-firefox', ['clean', 'build-firefox-debug', 'build-firefox-prod', 'build-firefox-legacy-debug', 'build-firefox-legacy-prod']);
+  grunt.registerTask('build-firefox', ['clean:build', 'build-firefox-debug', 'build-firefox-prod', 'build-firefox-legacy-debug', 'build-firefox-legacy-prod']);
   grunt.registerTask('build-firefox-legacy-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'copy:legacy', 'shell:build_firefox_legacy_debug']);
-  grunt.registerTask('build-firefox-legacy-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_firefox', 'bundle', 'copy:legacy', 'shell:build_firefox_legacy_prod']);
+  grunt.registerTask('build-firefox-legacy-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_firefox', 'bundle', 'copy:legacy', 'clean:debug_data', 'shell:build_firefox_legacy_prod']);
   grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'shell:build_firefox_debug']);
-  grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default','copy:manifest_firefox', 'bundle', 'shell:build_firefox_prod']);
+  grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default','copy:manifest_firefox', 'bundle', 'clean:debug_data', 'shell:build_firefox_prod']);
 
-  grunt.registerTask('build-chrome', ['clean', 'build-chrome-debug', 'build-chrome-prod']);
+  grunt.registerTask('build-chrome', ['clean:build', 'build-chrome-debug', 'build-chrome-prod']);
   grunt.registerTask('build-chrome-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_chrome', 'bundle', 'shell:build_chrome_debug']);
-  grunt.registerTask('build-chrome-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_chrome', 'bundle', 'shell:build_chrome_prod']);
+  grunt.registerTask('build-chrome-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_chrome', 'bundle', 'clean:debug_data', 'shell:build_chrome_prod']);
 
 	/**
 	 * Main grunt tasks configuration
@@ -107,10 +107,15 @@ module.exports = function(grunt) {
 		 * Clean operations
 		 */
 		clean: {
-			data: [path.build_data],
-			vendors: [path.build_vendors],
-			style: [path.build_data + 'img', path.build + 'icons', path.build_data + 'css'],
-			manifest: [ path.build + 'manifest.json']
+      build: [
+        path.build_data,
+        path.build_vendors,
+        path.build_data + 'img', path.build + 'icons', path.build_data + 'css',
+        path.build + 'manifest.json'
+      ],
+      debug_data: [
+        path.build_data + 'js/debug/**'
+      ]
 		},
 
 		/**

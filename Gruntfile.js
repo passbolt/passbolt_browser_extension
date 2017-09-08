@@ -249,7 +249,10 @@ module.exports = function(grunt) {
 				src: ['**/*.ejs'],
 				dest: path.src_templates,
 				expand: true,
-				ext: '.js'
+				ext: '.js',
+				options: {
+				  delimiter: '?'
+        }
 			}
 		},
 

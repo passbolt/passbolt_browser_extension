@@ -42,7 +42,7 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<span class=\"progress\"><span class=\"progress-bar <%= strengthId %>\"></span></span>\n<span class=\"complexity-text\">complexity: <strong><%= strengthLabel %></strong></span>\n"
+  , __lines = "<span class=\"progress\"><span class=\"progress-bar <?= strengthId ?>\"></span></span>\n<span class=\"complexity-text\">complexity: <strong><?= strengthLabel ?></strong></span>\n"
   , __filename = "src/all/data/ejs/secret/strength.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);

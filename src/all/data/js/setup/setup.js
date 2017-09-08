@@ -333,7 +333,7 @@ $(function () {
     $contentWrapper.empty();
 
     // Set the page title.
-    $title.html(step.title);
+    $title.text(step.title);
 
     // Initialize the step.
     return step.init()

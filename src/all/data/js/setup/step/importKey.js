@@ -124,7 +124,7 @@ $(function () {
   step.onError = function (errorMessage) {
     step.elts.$errorFeedback
       .removeClass('hidden')
-      .html(errorMessage);
+      .text(errorMessage);
     passbolt.setup.setActionState('submit', 'enabled');
   };
 

@@ -42,7 +42,7 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<!-- left collumn -->\n<div class=\"col7\">\n    <h3>An error occured</h3>\n    <div class=\"message error clearfix\">\n        <p><strong>\n            <i class=\"fa fa-times-circle\"></i> Error!</strong>\n            Something unexpected happened. The setup cannot be completed.</p>\n        <h4>What to do now ?</h4>\n        <p>Please contact us or your system administrator, and provide the debug information below.</p>\n        <p><a id=\"show-debug-info\"><i class=\"fa fa-toggle-down\"></i> See debug info</a></p>\n        <p><textarea class=\"col11 hidden\" id=\"debug-info\"><% var jsonString = JSON.stringify(setupData, null, 2); %><%= jsonString %></textarea></p>\n        </p>\n    </div>\n    <p>\n</div>\n\n<!-- right collumn -->\n<div class=\"col4 last\">\n\n</div>\n"
+  , __lines = "<!-- left collumn -->\n<div class=\"col7\">\n    <h3>An error occured</h3>\n    <div class=\"message error clearfix\">\n        <p><strong>\n            <i class=\"fa fa-times-circle\"></i> Error!</strong>\n            Something unexpected happened. The setup cannot be completed.</p>\n        <h4>What to do now ?</h4>\n        <p>Please contact us or your system administrator, and provide the debug information below.</p>\n        <p><a id=\"show-debug-info\"><i class=\"fa fa-toggle-down\"></i> See debug info</a></p>\n        <p><textarea class=\"col11 hidden\" id=\"debug-info\"><? var jsonString = JSON.stringify(setupData, null, 2); ?><?= jsonString ?></textarea></p>\n        </p>\n    </div>\n    <p>\n</div>\n\n<!-- right collumn -->\n<div class=\"col4 last\">\n\n</div>\n"
   , __filename = "src/all/data/ejs/setup/fatal_error.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);

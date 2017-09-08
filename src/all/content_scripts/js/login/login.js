@@ -57,8 +57,9 @@ $(function () {
       function success(msg) {
         $('.plugin-check.gpg')
           .removeClass('notice')
-          .addClass('success')
-          .html('<p class="message">' + msg + '<p>');
+          .addClass('success');
+
+        passbolt.html.loadTemplate('.plugin-check.gpg', 'login/message.ejs', 'html', {'message': msg});
 
         $('html').addClass('server-verified');
         passbolt.login.onStep1RequestPassphrase();
@@ -66,8 +67,9 @@ $(function () {
       function error(msg) {
         $('.plugin-check.gpg')
           .removeClass('notice')
-          .addClass('error')
-          .html('<p class="message">' + msg + '<p>');
+          .addClass('error');
+
+        passbolt.html.loadTemplate('.plugin-check.gpg', 'login/message.ejs', 'html', {'message': msg});
 
         $('html').addClass('server-not-verified');
 

@@ -42,7 +42,7 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<style>\n    <%= id %>:focus,\n    <%= id %> ~ .security-token {\n        background: <%= color %>;\n        color: <%= textcolor %>;\n    }\n    <%= id %>:focus ~ .security-token {\n        background: <%= textcolor %>;\n        color: <%= color %>;\n    };\n</style>"
+  , __lines = "<style>\n    <?= id ?>:focus,\n    <?= id ?> ~ .security-token {\n        background: <?= color ?>;\n        color: <?= textcolor ?>;\n    }\n    <?= id ?>:focus ~ .security-token {\n        background: <?= textcolor ?>;\n        color: <?= color ?>;\n    };\n</style>"
   , __filename = "src/all/data/ejs/secret/securitytokenStyle.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);

@@ -42,7 +42,7 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<ul>\n<% for (var i in menuSteps) { %>\n    <%\n      var menuClass = 'disabled';\n      switch (menuSteps[i].state) {\n        case 'past':\n          menuClass = 'past';\n          break;\n        case 'current':\n          menuClass = 'selected';\n          break;\n      }\n    %>\n    <li class=\"<%= menuClass %>\">\n        <% if (menuClass == \"selected\" || menuClass == \"past\") { %>\n        <a><%= steps[menuSteps[i].stepId].label %></a>\n        <% } else { %>\n        <%= steps[menuSteps[i].stepId].label %>\n        <% } %>\n    </li>\n<% } %>\n</ul>\n"
+  , __lines = "<ul>\n<? for (var i in menuSteps) { ?>\n    <?\n      var menuClass = 'disabled';\n      switch (menuSteps[i].state) {\n        case 'past':\n          menuClass = 'past';\n          break;\n        case 'current':\n          menuClass = 'selected';\n          break;\n      }\n    ?>\n    <li class=\"<?= menuClass ?>\">\n        <? if (menuClass == \"selected\" || menuClass == \"past\") { ?>\n        <a><?= steps[menuSteps[i].stepId].label ?></a>\n        <? } else { ?>\n        <?= steps[menuSteps[i].stepId].label ?>\n        <? } ?>\n    </li>\n<? } ?>\n</ul>\n"
   , __filename = "src/all/data/ejs/setup/menu.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);

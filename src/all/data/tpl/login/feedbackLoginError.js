@@ -42,7 +42,7 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<div class=\"feedback\">\n    <i class=\"fa fa-cog fa-warning huge\"></i>\n    <p><%= message %></p>\n</div>"
+  , __lines = "<div class=\"feedback\">\n    <i class=\"fa fa-cog fa-warning huge\"></i>\n    <p><?= message ?></p>\n</div>"
   , __filename = "src/all/data/ejs/login/feedbackLoginError.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);

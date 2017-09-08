@@ -42,26 +42,14 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<strong>Warning:</strong> The plugin is already configured for <?= firstname ?> <?= lastname ?> (<?= username ?>), on domain <?= domain ?>.\nCompleting this setup again will prevent <?= firstname ?> <?= lastname ?> from accesssing their passbolt account with this browser.\n"
-  , __filename = "src/all/data/ejs/setup/already_configured.ejs";
+  , __lines = "<div class=\"message\"><?= passboltDomain ?></div>"
+  , __filename = "src/all/data/ejs/login/message.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);
   with (locals || {}) {
-    ; __append("<strong>Warning:</strong> The plugin is already configured for ")
-    ; __append(escapeFn( firstname ))
-    ; __append(" ")
-    ; __append(escapeFn( lastname ))
-    ; __append(" (")
-    ; __append(escapeFn( username ))
-    ; __append("), on domain ")
-    ; __append(escapeFn( domain ))
-    ; __append(".\nCompleting this setup again will prevent ")
-    ; __line = 2
-    ; __append(escapeFn( firstname ))
-    ; __append(" ")
-    ; __append(escapeFn( lastname ))
-    ; __append(" from accesssing their passbolt account with this browser.\n")
-    ; __line = 3
+    ; __append("<div class=\"message\">")
+    ; __append(escapeFn( passboltDomain ))
+    ; __append("</div>")
   }
   return __output.join("");
 } catch (e) {

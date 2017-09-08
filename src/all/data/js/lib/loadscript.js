@@ -15,8 +15,8 @@ var loadScript = function (path) {
   return new Promise(function (resolve, reject) {
     var script = document.createElement('script');
     script.onload = script.onreadystatechange = function () {
-      if (!this.readyState || this.readyState == 'complete') {
-        resolve(this);
+      if (!script.readyState || script.readyState == 'complete') {
+        resolve(script);
       }
     };
     script.src = path;

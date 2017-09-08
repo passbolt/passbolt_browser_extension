@@ -221,10 +221,11 @@ Crypto.prototype.decryptAll = function (armoreds, passphrase, completeCallback, 
   var keyring = new Keyring(),
     keyInfo = keyring.findPrivate(),
     privateKey = openpgp.key.readArmored(keyInfo.key).keys[0];
+    _this = this;
 
   return new Promise(function(resolve, reject) {
     // Decrypt the private key.
-    this.decryptPrivateKey(privateKey, passphrase)
+    _this.decryptPrivateKey(privateKey, passphrase)
       // Decrypt the list of armored messages.
       .then(function(privateKey) {
         // Decrypt the secrets sequentially.

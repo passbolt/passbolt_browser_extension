@@ -33,7 +33,10 @@ var get = function (worker) {
       },
       // If no passphrase is remembered, prompt the user.
       function () {
-        _promptUser(worker, p);
+        _promptUser(worker, {
+          resolve: resolve,
+          reject: reject
+        });
       }
     );
   });
@@ -45,7 +48,7 @@ exports.get = get;
  * Prompt the user to enter their master password.
  *
  * @param worker The worker asking for the master password.
- * @param deferred The promise to resolve/reject when the master password is retrieved.
+ * @param deferred The promise callbacks associated to the master password request.
  * @private
  */
 var _promptUser = function (worker, deferred) {

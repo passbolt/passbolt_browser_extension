@@ -297,20 +297,21 @@ User.prototype._getLocal = function (fields) {
  * @returns {Promise}
  */
 User.prototype._getRemote = function () {
-  var self = this, url;
+  var self = this,
+    url;
 
   return new Promise(function(resolve, reject) {
     //Check if there is a trusted domain
     try {
-      url = self.settings.getDomain() + this.URL_GET_REMOTE;
+      url = self.settings.getDomain() + self.URL_GET_REMOTE;
     } catch (e) {
       reject(__('The application domain is not set'));
       return;
     }
 
     // Try to get the current user from memory cache
-    if (typeof this._remote_user !== 'undefined') {
-      resolve(this._remote_user);
+    if (typeof self._remote_user !== 'undefined') {
+      resolve(self._remote_user);
       return;
     }
 
@@ -367,9 +368,11 @@ User.prototype.isValid = function () {
  * @returns {Promise}
  */
 User.prototype.isLoggedIn = function () {
+  var _this = this;
+
   return new Promise(function(resolve, reject) {
     fetch(
-      this.settings.getDomain() + '/auth/checkSession.json', {
+      _this.settings.getDomain() + '/auth/checkSession.json', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -448,10 +451,12 @@ User.prototype.getStoredMasterPassword = function () {
  * @return {Promise}
  */
 User.prototype.searchUsers = function(keywords, excludedUsers) {
+  var _this = this;
+
   return new Promise (function(resolve, reject) {
     var _response = null;
     fetch(
-      this.settings.getDomain() + '/users.json?filter[keywords]=' + htmlspecialchars(keywords, 'ENT_QUOTES') + '&filter[is-active]=1', {
+      _this.settings.getDomain() + '/users.json?filter[keywords]=' + htmlspecialchars(keywords, 'ENT_QUOTES') + '&filter[is-active]=1', {
         method: 'GET',
         credentials: 'include',
         headers: {

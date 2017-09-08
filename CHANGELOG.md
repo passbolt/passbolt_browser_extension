@@ -3,9 +3,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.6.4] - 2017-08-31
 ### Fixed
 - PASSBOLT-2344: Remove content scripts from web accessible resources
 - PASSBOLT-2352: Webextension should not use defer(), use native promise instead
+- PASSBOLT-2350: Move grunt-passbolt-ejs-template-compile as node module
+- PASSBOLT-2370: Plugin upgrade openpgpjs to 2.5.10
 
 ## [1.6.3] - 2017-08-21
 ### Fixed
@@ -171,7 +175,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.3...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.4...HEAD
+[1.6.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.0...v1.6.1

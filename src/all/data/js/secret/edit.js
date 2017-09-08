@@ -376,7 +376,7 @@ $(function () {
       for (var fieldName in validationErrors[i])
         error += validationErrors[i][fieldName] + ' ';
     }
-    $feedback.html(error).show();
+    $feedback.text(error).show();
 
     // Resize the iframe to fit the content.
     passbolt.html.resizeIframe('#passbolt-iframe-secret-edition', {

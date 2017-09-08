@@ -117,19 +117,10 @@ $(function () {
    * On error.
    */
   step.onError = function (errorMessage, validationErrors) {
-    var html = '';
-    if (validationErrors != undefined) {
-      html += '<ul>';
-      for (var i in validationErrors) {
-        var valError = validationErrors[i];
-        html += '<li>' + valError[Object.keys(valError)[0]] + '</li>';
-      }
-      html += '</ul>';
-    }
-    console.error(errorMessage);
+    console.error(validationErrors);
     step.elts.$feedback
       .removeClass('hidden')
-      .html(html);
+      .text(errorMessage);
   };
 
   /* ==================================================================================

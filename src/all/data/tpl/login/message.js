@@ -42,14 +42,15 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<div class=\"message\"><?= passboltDomain ?></div>"
+  , __lines = "<p class=\"message\"><?= message ?></p>\n"
   , __filename = "src/all/data/ejs/login/message.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);
   with (locals || {}) {
-    ; __append("<div class=\"message\">")
-    ; __append(escapeFn( passboltDomain ))
-    ; __append("</div>")
+    ; __append("<p class=\"message\">")
+    ; __append(escapeFn( message ))
+    ; __append("</p>\n")
+    ; __line = 2
   }
   return __output.join("");
 } catch (e) {

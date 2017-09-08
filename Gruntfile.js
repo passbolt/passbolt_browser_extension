@@ -19,8 +19,8 @@ module.exports = function(grunt) {
     build_legacy: 'build/firefox_legacy/',
 		build_vendors: 'build/all/vendors/',
     build_templates: 'build/all/data/tpl/',
-		build_content_scripts: 'build/all/content_scripts',
-    build_web_accessible_resources: 'build/all/web_accessible_resources',
+		build_content_scripts: 'build/all/content_scripts/',
+    build_web_accessible_resources: 'build/all/web_accessible_resources/',
 
     dist_chrome: 'dist/chrome/',
     dist_firefox: 'dist/firefox/',
@@ -33,7 +33,7 @@ module.exports = function(grunt) {
     src_content_vendors: 'src/all/data/vendors/',
     src_firefox: 'src/firefox/',
     src_firefox_legacy: 'src/firefox_legacy/',
-    src_ejs: 'src/all/data/ejs',
+    src_ejs: 'src/all/data/ejs/',
     src_templates: 'src/all/data/tpl/',
     src_content_scripts: 'src/all/content_scripts/',
     src_web_accessible_resources: 'src/all/web_accessible_resources/'
@@ -108,13 +108,12 @@ module.exports = function(grunt) {
 		 */
 		clean: {
       build: [
-        path.build_data,
-        path.build_vendors,
-        path.build_data + 'img', path.build + 'icons', path.build_data + 'css',
-        path.build + 'manifest.json'
+        path.build + '**',
+        path.build_legacy + '**'
       ],
       debug_data: [
-        path.build_data + 'js/debug/**'
+        path.build_data + 'js/debug/**',
+        path.build_legacy + 'webextension/data/js/debug/**'
       ]
 		},
 

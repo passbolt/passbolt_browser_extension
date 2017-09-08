@@ -1,6 +1,6 @@
 {
   "name": "passbolt",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "license": "AGPL-3.0",
   "title": "Passbolt",
   "id": "passbolt@passbolt.com",
@@ -10,5 +10,8 @@
   "repository": "https://github.com/passbolt",
   "icon": "resource://@passbolt/webextension/icons/icon-48.png",
   "main": "index.js",
-  "hasEmbeddedWebExtension": true
+  "hasEmbeddedWebExtension": true,
+  "permissions": {
+    "multiprocess": true
+  }
 }

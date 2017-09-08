@@ -333,7 +333,10 @@ $(function () {
     $contentWrapper.empty();
 
     // Set the page title.
-    $title.text(step.title);
+    // note for reviewers: values of step.title are safe, all possible values are hardcoded
+    // and can be found in installSetup.workflow.js.
+    // We use html here because some title act as internal anchors
+    $title.html(step.title);
 
     // Initialize the step.
     return step.init()

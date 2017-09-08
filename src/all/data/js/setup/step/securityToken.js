@@ -126,7 +126,7 @@ $(function () {
       }
       html += '</ul>';
     }
-
+    console.error(errorMessage);
     step.elts.$feedback
       .removeClass('hidden')
       .html(html);

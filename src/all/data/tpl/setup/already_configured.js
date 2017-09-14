@@ -42,7 +42,7 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<strong>Warning:</strong> The plugin is already configured for <%= firstname %> <%= lastname %> (<%= username %>), on domain <%= domain %>.\nCompleting this setup again will prevent <%= firstname %> <%= lastname %> from accesssing their passbolt account with this browser.\n"
+  , __lines = "<strong>Warning:</strong> The plugin is already configured for <?= firstname ?> <?= lastname ?> (<?= username ?>), on domain <?= domain ?>.\nCompleting this setup again will prevent <?= firstname ?> <?= lastname ?> from accesssing their passbolt account with this browser.\n"
   , __filename = "src/all/data/ejs/setup/already_configured.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);

@@ -7,12 +7,8 @@
 
 $(function () {
 
-  // Autocomplete item template.
-  var itemTpl = null,
-  // Empty result template.
-    emptyTpl = null,
   // The array of acos displayed.
-    _aros = {};
+  var _aros = {};
 
   /**
    * Initialize the autocomplete result component.
@@ -42,15 +38,7 @@ $(function () {
    * @returns {Promise}
    */
   var loadTemplate = function () {
-    return passbolt.html.loadTemplate('body', 'resource/shareAutocomplete.ejs')
-      .then(function () {
-        return passbolt.html.getTemplate('resource/shareAutocompleteItem.ejs');
-      }).then(function (data) {
-        itemTpl = data;
-        return passbolt.html.getTemplate('resource/shareAutocompleteItemEmpty.ejs');
-      }).then(function (data) {
-        emptyTpl = data;
-      });
+    return passbolt.html.loadTemplate('body', 'resource/shareAutocomplete.ejs');
   };
 
   /**
@@ -93,49 +81,62 @@ $(function () {
   };
 
   /**
+   * Map the data as expected by the view.
+   * @param aro
+   * @returns {*}
+     */
+  var mapViewData = function (aro) {
+    var data = null;
+
+    // If the aro is a user.
+    if (aro.User && aro.Profile) {
+      data = {
+        id: aro.User.id,
+        thumbnail_url: settings['user.settings.trustedDomain'] + '/' +  aro.Profile.Avatar.url.small,
+        label: aro.Profile.first_name + ' ' + aro.Profile.last_name +' (' + aro.Gpgkey.key_id + ')',
+        secondaryLabel: aro.User.username,
+        cssClass: 'user'
+      };
+      _aros[aro.User.id] = aro;
+    }
+    // If the aro is a group.
+    else if (aro.Group) {
+      data = {
+        id: aro.Group.id,
+        thumbnail_url: settings['user.settings.trustedDomain'] + '/img/avatar/group_default.png',
+        label: aro.Group.name,
+        secondaryLabel: aro.Group.user_count + ' Member' + (aro.Group.user_count>1?'s':''),
+        cssClass: 'group'
+      };
+      _aros[aro.Group.id] = aro;
+    }
+
+    return data;
+  };
+
+  /**
    * Load a list of aros (users & groups).
-   * @param aros {array} The list of aros (users & groups) to display
+   * @param {Promise} Once the list of aros is rendered.
    */
   var load = function (aros) {
-    for (var i in aros) {
-      var aro = aros[i],
-        data = {};
+    // Render all the content.
+    return aros.reduce(function(promise, aro) {
+      return promise.then(function() {
+        var data = mapViewData(aro);
+        return passbolt.html.loadTemplate('ul', 'resource/shareAutocompleteItem.ejs', 'append', data);
+      })}, Promise.resolve([]))
 
-      // If the aro is a user.
-      if (aro.User && aro.Profile) {
-        data = {
-          id: aro.User.id,
-          thumbnail_url: settings['user.settings.trustedDomain'] + '/' +  aro.Profile.Avatar.url.small,
-          label: aro.Profile.first_name + ' ' + aro.Profile.last_name +' (' + aro.Gpgkey.key_id + ')',
-          secondaryLabel: aro.User.username,
-          cssClass: 'user'
-        };
-        _aros[aro.User.id] = aro;
-      }
-      // If the aro is a group.
-      else if (aro.Group) {
-        data = {
-          id: aro.Group.id,
-          thumbnail_url: settings['user.settings.trustedDomain'] + '/img/avatar/group_default.png',
-          label: aro.Group.name,
-          secondaryLabel: aro.Group.user_count + ' Member' + (aro.Group.user_count>1?'s':''),
-          cssClass: 'group'
-        };
-        _aros[aro.Group.id] = aro;
-      }
+      // If no content to render.
+      .then(function() {
+        if (!aros.length) {
+          return passbolt.html.loadTemplate('ul', 'resource/shareAutocompleteItemEmpty.ejs', 'append');
+        }
+      })
 
-      var html = itemTpl.call(this, data);
-      $('ul').append(html);
-    }
-
-    // If no user found.
-    if (!aros.length) {
-      var html = emptyTpl.call(this);
-      $('ul').append(html);
-    }
-
-    // Resize the autocomplete iframe.
-    resize(['five']);
+      // Adapt the iframe size to its content.
+      .then(function() {
+        resize(['five']);
+      });
   };
 
   /**

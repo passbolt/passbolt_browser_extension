@@ -42,16 +42,15 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<div class=\"feedback\">\n    <i class=\"fa fa-cog fa-spin huge\"></i>\n    <p><?= message ?><br> please wait...</p>\n</div>"
-  , __filename = "src/all/data/ejs/login/feedbackPassphraseOk.ejs";
+  , __lines = "<p class=\"message\"><?= message ?></p>\n"
+  , __filename = "src/all/data/ejs/login/message.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);
   with (locals || {}) {
-    ; __append("<div class=\"feedback\">\n    <i class=\"fa fa-cog fa-spin huge\"></i>\n    <p>")
-    ; __line = 3
+    ; __append("<p class=\"message\">")
     ; __append(escapeFn( message ))
-    ; __append("<br> please wait...</p>\n</div>")
-    ; __line = 4
+    ; __append("</p>\n")
+    ; __line = 2
   }
   return __output.join("");
 } catch (e) {

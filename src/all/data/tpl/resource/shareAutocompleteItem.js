@@ -42,7 +42,7 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<li id=\"<%= id %>\">\n    <div class=\"row\">\n        <div class=\"main-cell-wrapper\">\n            <div class=\"main-cell\">\n                <a>\n                    <div class=\"avatar\">\n                        <img src=\"<%= thumbnail_url %>\"/>\n                    </div>\n                    <div class=\"<%= cssClass %>\">\n                        <span class=\"name\"><%= label %></span>\n                        <span class=\"details\" title=\"<%= secondaryLabel %>\"><%= secondaryLabel %></span>\n                    </div>\n                </a>\n            </div>\n        </div>\n    </div>\n</li>\n"
+  , __lines = "<li id=\"<?= id ?>\">\n    <div class=\"row\">\n        <div class=\"main-cell-wrapper\">\n            <div class=\"main-cell\">\n                <a>\n                    <div class=\"avatar\">\n                        <img src=\"<?= thumbnail_url ?>\"/>\n                    </div>\n                    <div class=\"<?= cssClass ?>\">\n                        <span class=\"name\"><?= label ?></span>\n                        <span class=\"details\" title=\"<?= secondaryLabel ?>\"><?= secondaryLabel ?></span>\n                    </div>\n                </a>\n            </div>\n        </div>\n    </div>\n</li>\n"
   , __filename = "src/all/data/ejs/resource/shareAutocompleteItem.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);

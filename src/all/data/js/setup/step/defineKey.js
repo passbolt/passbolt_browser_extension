@@ -110,21 +110,11 @@ $(function () {
    * @param errorMsg {strong} The error message
    * @param validationErrors {array} Array of errors by fields
    */
-  step.onError = function (errorMsg, validationErrors) {
-
-    var html = '<p>Error : ' + errorMsg + '</p>';
-    if (validationErrors != undefined) {
-      html += '<ul>';
-      for (var i in validationErrors) {
-        var valError = validationErrors[i];
-        html += '<li>' + valError[Object.keys(valError)[0]] + '</li>';
-      }
-      html += '</ul>';
-    }
-
+  step.onError = function (errorMessage, validationErrors) {
+    console.error(validationErrors);
     step.elts.$feedbackError
       .removeClass('hidden')
-      .html(html);
+      .text(errorMessage);
   };
 
   /* ==================================================================================

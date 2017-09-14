@@ -4,51 +4,51 @@
     <table class="table-info">
         <tr class="owner_name">
             <td>Owner Name</td>
-            <td  class="<%= typeof fieldsDetails['name'] != 'undefined' ? fieldsDetails['name'].status : '' %>"><%= keyInfo.userIds[0].name %> <%= typeof fieldsDetails['name'] != 'undefined' ? '<span class="alt side">' + fieldsDetails['name'].original + '</span>' : '' %></td>
+            <td  class="<?= typeof fieldsDetails['name'] != 'undefined' ? fieldsDetails['name'].status : '' ?>"><?= keyInfo.userIds[0].name ?> <?= typeof fieldsDetails['name'] != 'undefined' ? '<span class="alt side">' + fieldsDetails['name'].original + '</span>' : '' ?></td>
         </tr>
         <tr class="owner_email">
             <td>Owner Email</td>
-            <td class="<%= typeof fieldsDetails['email'] != 'undefined' ? fieldsDetails['email'].status : '' %>"><%= keyInfo.userIds[0].email %> <%= typeof fieldsDetails['email'] != 'undefined' ? '<span class="alt side">' + fieldsDetails['email'].original + '</span>' : '' %></td>
+            <td class="<?= typeof fieldsDetails['email'] != 'undefined' ? fieldsDetails['email'].status : '' ?>"><?= keyInfo.userIds[0].email ?> <?= typeof fieldsDetails['email'] != 'undefined' ? '<span class="alt side">' + fieldsDetails['email'].original + '</span>' : '' ?></td>
         </tr>
         <tr class="keyid">
             <td>Key Id</td>
-            <td><%= keyInfo.keyId.toUpperCase() %></td>
+            <td><?= keyInfo.keyId.toUpperCase() ?></td>
         </tr>
         <tr class="fingerprint">
             <td>Fingerprint</td>
-            <td><%= keyInfo.fingerprint.toUpperCase() %></td>
+            <td><?= keyInfo.fingerprint.toUpperCase() ?></td>
         </tr>
         <tr class="created">
             <td>Created</td>
-            <td><%= keyInfo.created %></td>
+            <td><?= keyInfo.created ?></td>
         </tr>
         <tr class="expires">
             <td>Expires</td>
-            <td><%= keyInfo.expires %></td>
+            <td><?= keyInfo.expires ?></td>
         </tr>
         <tr class="length">
             <td>Key Length</td>
-            <td><%= keyInfo.length %></td>
+            <td><?= keyInfo.length ?></td>
         </tr>
         <tr class="algorithm">
             <td>Algorithm</td>
-            <td><%= keyInfo.algorithm.toUpperCase() %></td>
+            <td><?= keyInfo.algorithm.toUpperCase() ?></td>
         </tr>
     </table>
 </div>
 
 <!-- right column -->
 <div class="col5 last">
-    <div class="message <%= status %> side-message">
-        <%
+    <div class="message <?= status ?> side-message">
+        <?
         if (status == 'warning') {
           var fieldsStr = '';
           for (var fieldName in fieldsDetails) {
             fieldsStr += ((fieldsStr == '') ? fieldName : ' and ' + fieldName);
           }
-        %>
+        ?>
         <p>
-            <strong>Warning:</strong> the <%= fieldsStr %> selected by your administrator does not match
+            <strong>Warning:</strong> the <?= fieldsStr ?> selected by your administrator does not match
             the name and email of your key. Passbolt will use the information provided by the administrator to identify yourself.
         </p>
         <p>
@@ -57,17 +57,17 @@
         <p class="small">
             Note: Passbolt does not support multiple user identities at the moment.
         </p>
-        <%
+        <?
         } else {
-        %>
+        ?>
           <p>
               <strong>Success!</strong>
               Nice one, it looks like a valid key with your key information matching the name and email provided by your passbolt administrator.
               <br><br>
               You are good to go!
           </p>
-        <%
+        <?
         }
-        %>
+        ?>
     </div>
 </div>

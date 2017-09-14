@@ -6,12 +6,10 @@
  */
 
 $(function () {
-    // Autocomplete item template.
-    var itemTpl = null,
-        // Empty result template.
-        emptyTpl = null,
-        // The array of users retrieved from the back-end.
-        currentUsers = {};
+    // The array of users retrieved from the back-end.
+    var currentUsers = {},
+    // The plugin settings.
+      settings = null;
 
     /**
      * Initialize the autocomplete result component.
@@ -42,19 +40,7 @@ $(function () {
      * @returns {Promise}
      */
     var loadTemplate = function () {
-        return passbolt.html.loadTemplate('body', 'group/editAutocomplete.ejs')
-            .then(function () {
-                return passbolt.html.getTemplate('group/editAutocompleteItem.ejs');
-            })
-            .then(function (data) {
-                itemTpl = data;
-                return passbolt.html.getTemplate('group/editAutocompleteItemEmpty.ejs');
-            })
-            .then(function (data) {
-                emptyTpl = data;
-            }, function () {
-                console.error('Something went wrong when loading EditAutocomplete templates');
-            });
+        return passbolt.html.loadTemplate('body', 'group/editAutocomplete.ejs');
     };
 
     /**
@@ -101,19 +87,24 @@ $(function () {
      * @param users {array} The list of users
      */
     var load = function (users) {
-        // Load the users in the list.
-        for (var i in users) {
-            currentUsers[users[i].User.id] = users[i];
-            var html = itemTpl.call(this, {settings: settings, user: users[i]});
-            $('ul').append(html);
-        }
-        // If no user found.
-        if (!users.length) {
-            var html = emptyTpl.call(this);
-            $('ul').append(html);
-        }
-        // Resize the autocomplete iframe.
-        resize(['five']);
+      // Render all the users.
+      return users.reduce(function(promise, user) {
+          return promise.then(function() {
+            currentUsers[user.User.id] = user;
+            return passbolt.html.loadTemplate('ul', 'group/editAutocompleteItem.ejs', 'append', {settings: settings, user: user});
+          })}, Promise.resolve([]))
+
+        // If no content to render.
+        .then(function() {
+          if (!users.length) {
+            return passbolt.html.loadTemplate('ul', 'group/editAutocompleteItemEmpty.ejs', 'append');
+          }
+        })
+
+        // Adapt the iframe size to its content.
+        .then(function() {
+          resize(['five']);
+        });
     };
 
     /**

@@ -1,6 +1,6 @@
 <ul>
-<% for (var i in menuSteps) { %>
-    <%
+<? for (var i in menuSteps) { ?>
+    <?
       var menuClass = 'disabled';
       switch (menuSteps[i].state) {
         case 'past':
@@ -10,13 +10,13 @@
           menuClass = 'selected';
           break;
       }
-    %>
-    <li class="<%= menuClass %>">
-        <% if (menuClass == "selected" || menuClass == "past") { %>
-        <a><%= steps[menuSteps[i].stepId].label %></a>
-        <% } else { %>
-        <%= steps[menuSteps[i].stepId].label %>
-        <% } %>
+    ?>
+    <li class="<?= menuClass ?>">
+        <? if (menuClass == "selected" || menuClass == "past") { ?>
+        <a><?= steps[menuSteps[i].stepId].label ?></a>
+        <? } else { ?>
+        <?= steps[menuSteps[i].stepId].label ?>
+        <? } ?>
     </li>
-<% } %>
+<? } ?>
 </ul>

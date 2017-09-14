@@ -42,7 +42,7 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<li id=\"<%= user.User.id %>\">\n    <div class=\"row\">\n        <div class=\"main-cell-wrapper\">\n            <div class=\"main-cell\">\n                <a>\n                    <div class=\"avatar\">\n                        <img src=\"<%= settings['user.settings.trustedDomain'] %>/<%= user.Profile.Avatar.url.small %>\"/>\n                    </div>\n                    <div class=\"user\">\n                        <span class=\"name\"><%= user.Profile.first_name %> <%= user.Profile.last_name %> (<%= user.Gpgkey.key_id %>)</span>\n                        <span class=\"details\" title=\"<%= user.User.username %>\"><%= user.User.username %></span>\n                    </div>\n                </a>\n            </div>\n        </div>\n    </div>\n</li>\n"
+  , __lines = "<li id=\"<?= user.User.id ?>\">\n    <div class=\"row\">\n        <div class=\"main-cell-wrapper\">\n            <div class=\"main-cell\">\n                <a>\n                    <div class=\"avatar\">\n                        <img src=\"<?= settings['user.settings.trustedDomain'] ?>/<?= user.Profile.Avatar.url.small ?>\"/>\n                    </div>\n                    <div class=\"user\">\n                        <span class=\"name\"><?= user.Profile.first_name ?> <?= user.Profile.last_name ?> (<?= user.Gpgkey.key_id ?>)</span>\n                        <span class=\"details\" title=\"<?= user.User.username ?>\"><?= user.User.username ?></span>\n                    </div>\n                </a>\n            </div>\n        </div>\n    </div>\n</li>\n"
   , __filename = "src/all/data/ejs/group/editAutocompleteItem.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);

@@ -19,8 +19,8 @@ module.exports = function(grunt) {
     build_legacy: 'build/firefox_legacy/',
 		build_vendors: 'build/all/vendors/',
     build_templates: 'build/all/data/tpl/',
-		build_content_scripts: 'build/all/content_scripts',
-    build_web_accessible_resources: 'build/all/web_accessible_resources',
+		build_content_scripts: 'build/all/content_scripts/',
+    build_web_accessible_resources: 'build/all/web_accessible_resources/',
 
     dist_chrome: 'dist/chrome/',
     dist_firefox: 'dist/firefox/',
@@ -33,7 +33,7 @@ module.exports = function(grunt) {
     src_content_vendors: 'src/all/data/vendors/',
     src_firefox: 'src/firefox/',
     src_firefox_legacy: 'src/firefox_legacy/',
-    src_ejs: 'src/all/data/ejs',
+    src_ejs: 'src/all/data/ejs/',
     src_templates: 'src/all/data/tpl/',
     src_content_scripts: 'src/all/content_scripts/',
     src_web_accessible_resources: 'src/all/web_accessible_resources/'
@@ -64,15 +64,15 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
 
-  grunt.registerTask('build-firefox', ['clean', 'build-firefox-debug', 'build-firefox-prod', 'build-firefox-legacy-debug', 'build-firefox-legacy-prod']);
+  grunt.registerTask('build-firefox', ['clean:build', 'build-firefox-debug', 'build-firefox-prod', 'build-firefox-legacy-debug', 'build-firefox-legacy-prod']);
   grunt.registerTask('build-firefox-legacy-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'copy:legacy', 'shell:build_firefox_legacy_debug']);
-  grunt.registerTask('build-firefox-legacy-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_firefox', 'bundle', 'copy:legacy', 'shell:build_firefox_legacy_prod']);
+  grunt.registerTask('build-firefox-legacy-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_firefox', 'bundle', 'copy:legacy', 'clean:debug_data', 'shell:build_firefox_legacy_prod']);
   grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'shell:build_firefox_debug']);
-  grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default','copy:manifest_firefox', 'bundle', 'shell:build_firefox_prod']);
+  grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default','copy:manifest_firefox', 'bundle', 'clean:debug_data', 'shell:build_firefox_prod']);
 
-  grunt.registerTask('build-chrome', ['clean', 'build-chrome-debug', 'build-chrome-prod']);
+  grunt.registerTask('build-chrome', ['clean:build', 'build-chrome-debug', 'build-chrome-prod']);
   grunt.registerTask('build-chrome-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_chrome', 'bundle', 'shell:build_chrome_debug']);
-  grunt.registerTask('build-chrome-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_chrome', 'bundle', 'shell:build_chrome_prod']);
+  grunt.registerTask('build-chrome-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_chrome', 'bundle', 'clean:debug_data', 'shell:build_chrome_prod']);
 
 	/**
 	 * Main grunt tasks configuration
@@ -107,10 +107,14 @@ module.exports = function(grunt) {
 		 * Clean operations
 		 */
 		clean: {
-			data: [path.build_data],
-			vendors: [path.build_vendors],
-			style: [path.build_data + 'img', path.build + 'icons', path.build_data + 'css'],
-			manifest: [ path.build + 'manifest.json']
+      build: [
+        path.build + '**',
+        path.build_legacy + '**'
+      ],
+      debug_data: [
+        path.build_data + 'js/debug/**',
+        path.build_legacy + 'webextension/data/js/debug/**'
+      ]
 		},
 
 		/**
@@ -249,7 +253,10 @@ module.exports = function(grunt) {
 				src: ['**/*.ejs'],
 				dest: path.src_templates,
 				expand: true,
-				ext: '.js'
+				ext: '.js',
+				options: {
+				  delimiter: '?'
+        }
 			}
 		},
 

@@ -132,7 +132,7 @@ $(function () {
     // If less than 3 attempts, notify the user and let him try again.
     if (attempts < 3) {
       $('label[for="js_master_password"]')
-        .html('Please enter a valid passphrase.')
+        .text('Please enter a valid passphrase.')
         .addClass('error');
       $submitButton.removeClass('processing');
       $masterPasswordField.focus();

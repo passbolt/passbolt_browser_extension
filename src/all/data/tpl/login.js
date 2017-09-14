@@ -5,6 +5,7 @@ window.templates.login.feedbackLoginNoUser = require('./login/feedbackLoginNoUse
 window.templates.login.feedbackLoginOops = require('./login/feedbackLoginOops.js');
 window.templates.login.feedbackPassphraseOk = require('./login/feedbackPassphraseOk.js');
 window.templates.login.form = require('./login/form.js');
+window.templates.login.message = require('./login/message.js');
 window.templates.login.noconfig = require('./login/noconfig.js');
 window.templates.login.stage0 = require('./login/stage0.js');
 window.templates.login.wrongDomain = require('./login/wrongDomain.js');

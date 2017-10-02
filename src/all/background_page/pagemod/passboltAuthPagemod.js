@@ -37,7 +37,7 @@ PassboltAuth.init = function () {
       'data/css/external.min.css'
     ],
     contentScriptFile: [
-      'data/vendors/jquery.min.js',
+      'data/vendors/jquery.js',
       'data/tpl/login.js',
       'data/js/lib/port.js',
       'data/js/lib/message.js',

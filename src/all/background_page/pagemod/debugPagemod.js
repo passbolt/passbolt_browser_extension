@@ -29,7 +29,7 @@ Debug.init = function () {
     include: new RegExp('.*'),
 
     contentScriptFile: [
-      'data/vendors/jquery.min.js',
+      'data/vendors/jquery.js',
       'data/js/lib/port.js',
       'data/js/lib/request.js',
       'data/js/lib/message.js',

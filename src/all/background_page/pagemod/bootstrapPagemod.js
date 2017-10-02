@@ -27,7 +27,7 @@ Bootstrap.init = function () {
     contentScriptWhen: 'ready',
     contentStyleFile: [],
     contentScriptFile: [
-      'data/vendors/jquery.min.js',
+      'data/vendors/jquery.js',
       'data/tpl/login.js',
       'data/js/lib/port.js',
       'data/js/lib/request.js',

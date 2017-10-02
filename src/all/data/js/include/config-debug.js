@@ -10,6 +10,7 @@ loadScripts(scripts).then(function () {
     'js/lib/message.js',
     'js/lib/request.js',
     'js/file/file.js',
+    'js/debug/common.js',
     'js/debug/profiles.js',
     'js/debug/debug.js'
   ];

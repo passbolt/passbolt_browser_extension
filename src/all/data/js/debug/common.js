@@ -26,6 +26,7 @@ $(function () {
   var DebugCommon = function () {
     // Initialize the debug meta.
     this.initMeta();
+    this.initEventsListeners();
   };
 
   /**
@@ -44,6 +45,27 @@ $(function () {
           $('head').attr(metaName, meta[name]);
         }
       });
+  };
+
+  /**
+   * Init the debug common event listeners.
+   */
+  DebugCommon.prototype.initEventsListeners = function() {
+    var self = this;
+    window.addEventListener('passbolt.addon.debug.open_tab', function() {
+      self.openTab();
+    });
+  };
+
+  /**
+   * Open a new Tab.
+   * We implemented this function as it to have a unique interface whatever browsers used to test the extension.
+   * Moreover with FF54 & geckodriver 0.19 it's not possible anymore to open a new tab.
+   *
+   * @param url {string} The url to open in the new tab.
+   */
+  DebugCommon.prototype.openTab = function (url) {
+    passbolt.message.emit('passbolt.debug.open-tab', url);
   };
 
   // Init the addon debug.

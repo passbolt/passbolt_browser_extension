@@ -16,7 +16,6 @@ module.exports = function(grunt) {
 
 		build: 'build/all/',
     build_data: 'build/all/data/',
-    build_legacy: 'build/firefox_legacy/',
 		build_vendors: 'build/all/vendors/',
     build_templates: 'build/all/data/tpl/',
 		build_content_scripts: 'build/all/content_scripts/',
@@ -24,7 +23,6 @@ module.exports = function(grunt) {
 
     dist_chrome: 'dist/chrome/',
     dist_firefox: 'dist/firefox/',
-    dist_firefox_legacy: 'dist/firefox_legacy/',
 
     src: 'src/all/',
     src_addon: 'src/all/background_page/',
@@ -32,7 +30,6 @@ module.exports = function(grunt) {
     src_chrome: 'src/chrome/',
     src_content_vendors: 'src/all/data/vendors/',
     src_firefox: 'src/firefox/',
-    src_firefox_legacy: 'src/firefox_legacy/',
     src_ejs: 'src/all/data/ejs/',
     src_templates: 'src/all/data/tpl/',
     src_content_scripts: 'src/all/content_scripts/',
@@ -64,9 +61,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
 
-  grunt.registerTask('build-firefox', ['clean:build', 'build-firefox-debug', 'build-firefox-prod', 'build-firefox-legacy-debug', 'build-firefox-legacy-prod']);
-  grunt.registerTask('build-firefox-legacy-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'copy:legacy', 'shell:build_firefox_legacy_debug']);
-  grunt.registerTask('build-firefox-legacy-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_firefox', 'bundle', 'copy:legacy', 'clean:debug_data', 'shell:build_firefox_legacy_prod']);
+  grunt.registerTask('build-firefox', ['clean:build', 'build-firefox-debug', 'build-firefox-prod']);
   grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'shell:build_firefox_debug']);
   grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default','copy:manifest_firefox', 'bundle', 'clean:debug_data', 'shell:build_firefox_prod']);
 
@@ -109,11 +104,9 @@ module.exports = function(grunt) {
 		clean: {
       build: [
         path.build + '**',
-        path.build_legacy + '**'
       ],
       debug_data: [
         path.build_data + 'js/debug/**',
-        path.build_legacy + 'webextension/data/js/debug/**'
       ]
 		},
 
@@ -234,14 +227,7 @@ module.exports = function(grunt) {
 					dest: path.build_data + 'css',
 					expand: true
 				}]
-			},
-			// Legacy firefox extension
-      legacy: {
-        files: [
-          {expand: true, cwd: path.build, src: '**/*', dest: path.build_legacy + 'webextension'},
-          {expand: true, cwd: path.src_firefox_legacy, src: '**/*', dest: path.build_legacy},
-        ]
-      }
+			}
 		},
 
     /**
@@ -274,7 +260,7 @@ module.exports = function(grunt) {
           stderr: false
         },
         command: [
-					'./node_modules/.bin/web-ext build -s='+ path.build + ' -a='+ path.dist_firefox + '  -o=true',
+					'./node_modules/.bin/web-ext build -s=' + path.build + ' -a=' + path.dist_firefox + '  -o=true',
 					'mv '+ path.dist_firefox + pkg.name + '-' + pkg.version + '.zip ' + path.dist_firefox + 'passbolt-' + pkg.version + '-debug.zip',
           'rm -f '+ path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
           'ln -fs passbolt-' + pkg.version + '-debug.zip ' + path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
@@ -289,27 +275,6 @@ module.exports = function(grunt) {
           './node_modules/.bin/web-ext build -s='+ path.build + ' -a='+ path.dist_firefox + '  -o=true',
           'mv '+ path.dist_firefox + pkg.name + '-' + pkg.version + '.zip ' + path.dist_firefox + '/passbolt-' + pkg.version + '.zip',
           "echo '\nMoved to " + path.dist_firefox + "passbolt-" + pkg.version + ".zip'"
-        ].join(' && ')
-      },
-      build_firefox_legacy_debug: {
-        options: {
-          stderr: false
-        },
-        command: [
-          './node_modules/.bin/jpm xpi --addon-dir ' + path.build_legacy,
-          'mv ' + path.build_legacy + 'passbolt.xpi ' + path.dist_firefox + 'passbolt-' + pkg.version + '-legacy-debug.xpi',
-          'rm -f '+ path.dist_firefox + 'passbolt-legacy-latest@passbolt.com.xpi',
-          'ln -fs passbolt-' + pkg.version + '-legacy-debug.xpi '  + path.dist_firefox + 'passbolt-legacy-latest@passbolt.com.xpi'
-        ].join(' && ')
-      },
-      build_firefox_legacy_prod: {
-        options: {
-          stderr: false
-        },
-        command: [
-          './node_modules/.bin/jpm xpi --addon-dir ' + path.build_legacy,
-          'mv ' + path.build_legacy + 'passbolt.xpi ' + path.dist_firefox + 'passbolt-' + pkg.version + '-legacy.xpi',
-          "echo '\nMoved to " + path.dist_firefox + "passbolt-' + pkg.version + '-legacy.xpi'"
         ].join(' && ')
       },
 
@@ -372,12 +337,7 @@ module.exports = function(grunt) {
 				files: [path.src + 'background_page/vendors.js', path.src + 'background_page/vendors/**/*.js', path.src + 'background_page/sdk/storage.js'],
 				tasks: ['browserify:vendors'],
 				options: {spawn: false}
-			},
-      legacy: {
-        files: [path.src_firefox_legacy + '*'],
-        tasks: ['build-firefox-legacy'],
-        options: {spawn: false}
-      }
+			}
 		}
 	});
 };

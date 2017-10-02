@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.6.5] - 2017-10-02
+### Fixed
+- PASSBOLT-2419: Remove FF legacy extension support
+- PASSBOLT-2423: Template missing when recovering an account: setup/importKeyRecoverInfo.ejs
+
 ## [1.6.5] - 2017-09-14
 ### Fixed
 - PASSBOLT-2386: Enforce the usage of templates instead of manual DOM content insertion

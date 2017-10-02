@@ -23,6 +23,7 @@ events.app = require('./event/appEvents');
 events.auth = require('./event/authEvents');
 events.clipboard = require('./event/clipboardEvents');
 events.config = require('./event/configEvents');
+events.debug = require('./event/debugEvents');
 events.debugPage = require('./event/debugPageEvents');
 events.editPassword = require('./event/editPasswordEvents');
 events.file = require('./event/fileEvents');

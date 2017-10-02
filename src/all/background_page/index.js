@@ -90,41 +90,8 @@ var main = function() {
   }
 };
 
-/* ==================================================================================
- *  Data migration
- * ==================================================================================
- */
-var migration = function() {
-  return new Promise(function (resolve, reject) {
-    // Browser is a firefox only variable
-    if (typeof browser !== 'undefined') {
-      // Firefox simpleStorage migration
-      // get data from legacy addon
-      var port = browser.runtime.connect({name: "passbolt-legacy-port"});
-      port.onMessage.addListener(function(message) {
-        var data = message.content;
-        if (data !== '{}') {
-          console.warn('Migrating firefox simpleStorage.');
-          storage.migrate(data);
-        }
-        resolve();
-      });
-    } else {
-      // Chrome localStage migration
-      if (storage.migrationNeeded()) {
-        console.warn('Migrating chrome localStorage.');
-        storage.migrate();
-      }
-      resolve();
-    }
-  });
-};
-
-// Migrate date if needed, init storage and get going
-migration()
-  .then(function() {
-    return storage.init();
-  })
-  .then(function() {
+// Init storage and get going.
+storage.init()
+  .then(() => {
     main();
   });

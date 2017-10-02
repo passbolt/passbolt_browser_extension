@@ -34,7 +34,7 @@ $(function () {
       },
       'options': {
         'workflow': 'recover',
-        'infoTemplate': 'importKeyRecoverInfo.ejs'
+        'infoTemplate': 'import_key_recover_info.ejs'
       },
       'viewData': {}
     },

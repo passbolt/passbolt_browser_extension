@@ -1,6 +1,6 @@
 var portname = 'setup';
 var scripts = [
-  'vendors/jquery.min.js',
+  'vendors/jquery.js',
   'vendors/sha.js',
   'vendors/xregexp-all.js',
   'vendors/farbtastic.js',

@@ -1,6 +1,6 @@
 var portname = 'config-debug';
 var scripts = [
-  'vendors/jquery.min.js',
+  'vendors/jquery.js',
   'vendors/sha.js',
   'vendors/xregexp-all.js',
   'js/lib/port.js'

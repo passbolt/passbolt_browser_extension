@@ -49,7 +49,7 @@ PassboltApp.initPageMod = function () {
       'data/css/external.min.css'
     ],
     contentScriptFile: [
-      'data/vendors/jquery.min.js',
+      'data/vendors/jquery.js',
 
       // Templates
       'data/tpl/group.js',

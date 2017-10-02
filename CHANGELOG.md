@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - PASSBOLT-2419: Remove FF legacy extension support
 - PASSBOLT-2423: Template missing when recovering an account: setup/importKeyRecoverInfo.ejs
+- PASSBOLT-2425: Chrome 61, issue with minified version of jquery
 
 ## [1.6.5] - 2017-09-14
 ### Fixed
@@ -184,7 +185,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.5...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.6...HEAD
+[1.6.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.5...v1.6.6
 [1.6.5]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.4...v1.6.5
 [1.6.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.2...v1.6.3

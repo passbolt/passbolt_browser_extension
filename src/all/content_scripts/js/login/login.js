@@ -43,7 +43,7 @@ $(function () {
             // Display error message.
             $('.plugin-check.gpg').removeClass('notice').addClass('error');
             $('.plugin-check.gpg .message').text('Error: Could not find server key');
-            passbolt.html.loadTemplate('.login.form', 'login/feedback-login-oops.ejs');
+            passbolt.html.loadTemplate('.login.form', 'login/feedbackLoginOops.ejs');
           });
       });
   };

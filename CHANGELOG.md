@@ -3,8 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- PASSBOLT-2452 Fix broken template on stage0 missing server key
 
-## [1.6.5] - 2017-10-02
+## [1.6.6] - 2017-10-02
 ### Fixed
 - PASSBOLT-2419: Remove FF legacy extension support
 - PASSBOLT-2423: Template missing when recovering an account: setup/importKeyRecoverInfo.ejs

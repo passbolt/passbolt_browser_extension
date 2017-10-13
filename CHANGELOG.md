@@ -3,8 +3,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.6.7] - 2017-10-13
 ### Fixed
 - PASSBOLT-2452 Fix broken template on stage0 missing server key
+- PASSBOLT-2455 Fix setup should not use browser storage to temporarily store private key
 
 ## [1.6.6] - 2017-10-02
 ### Fixed

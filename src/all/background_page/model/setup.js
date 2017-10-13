@@ -35,7 +35,12 @@ var Setup = function () {
     }
   };
 
-  this.storageKeyName = 'setup';
+  /**
+   * We store the setup data in memory and not file storage
+   *
+   * @private
+   */
+  this._storage = null;
 };
 
 /**
@@ -47,13 +52,13 @@ var Setup = function () {
  */
 Setup.prototype.set = function (key, value) {
   // Get last setup stored.
-  var _setup = storage.getItem(this.storageKeyName);
+  var _setup = this._storage;
   if (_setup === null) {
     _setup = JSON.parse(JSON.stringify(this._setup));
   }
   key = key.split(".");
   jsonQ.setPathValue(_setup, key, value);
-  storage.setItem(this.storageKeyName, _setup);
+  this._storage = _setup;
   return _setup;
 };
 
@@ -65,7 +70,7 @@ Setup.prototype.set = function (key, value) {
  * @todo empty should not be associated to not found variable.
  */
 Setup.prototype.get = function (key) {
-  var _setup = storage.getItem(this.storageKeyName);
+  var _setup = this._storage;
   if (_setup === null) {
     _setup = this._setup;
   }
@@ -150,7 +155,7 @@ Setup.prototype.getNavigationHistory = function () {
  * Flush storage from setup data.
  */
 Setup.prototype.flush = function () {
-  storage.removeItem(this.storageKeyName);
+  this._storage = null;
 };
 
 /**

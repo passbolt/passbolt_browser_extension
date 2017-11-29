@@ -458,7 +458,8 @@ Keyring.prototype.sync = function () {
           // Store all the new keys in the keyring.
           for (var i in json.body) {
             var meta = json.body[i];
-            _this.importPublic(meta.Gpgkey.key, meta.Gpgkey.user_id);
+            var armoredKey = meta.Gpgkey.key || meta.Gpgkey.armored_key;
+            _this.importPublic(armoredKey, meta.Gpgkey.user_id);
           }
         } else {
           reject(new Error(

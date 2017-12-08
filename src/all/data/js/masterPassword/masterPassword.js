@@ -252,8 +252,7 @@ $(function () {
 
     // The user presses enter.
     if (keycode == 13) {
-      var masterPassword = $masterPasswordField.val();
-      submitMasterPassword(masterPassword);
+      submitButtonClicked();
     }
     // The user presses escape.
     else if (keycode == 27) {

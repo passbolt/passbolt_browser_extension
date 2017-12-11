@@ -42,12 +42,12 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<div class=\"feedback\">\n    <i class=\"fa fa-meh-o huge\" ></i>\n    <p>The supplied account does not exist</p>\n</div>\n<div class=\"actions-wrapper center\">\n    <a class=\"button primary big\" href=\"register\">register again</a><br><br>\n    <a href=\"/recover\">or recover an existing account</a>\n</div>\n"
+  , __lines = "<div class=\"feedback\">\n    <i class=\"fa fa-meh-o huge\" ></i>\n    <p>The supplied account does not exist</p>\n</div>\n<div class=\"actions-wrapper center\">\n    <a class=\"button primary big\" href=\"/register\">register again</a><br><br>\n    <a href=\"/recover\">or recover an existing account</a>\n</div>\n"
   , __filename = "src/all/data/ejs/login/feedbackLoginNoUser.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);
   with (locals || {}) {
-    ; __append("<div class=\"feedback\">\n    <i class=\"fa fa-meh-o huge\" ></i>\n    <p>The supplied account does not exist</p>\n</div>\n<div class=\"actions-wrapper center\">\n    <a class=\"button primary big\" href=\"register\">register again</a><br><br>\n    <a href=\"/recover\">or recover an existing account</a>\n</div>\n")
+    ; __append("<div class=\"feedback\">\n    <i class=\"fa fa-meh-o huge\" ></i>\n    <p>The supplied account does not exist</p>\n</div>\n<div class=\"actions-wrapper center\">\n    <a class=\"button primary big\" href=\"/register\">register again</a><br><br>\n    <a href=\"/recover\">or recover an existing account</a>\n</div>\n")
     ; __line = 9
   }
   return __output.join("");

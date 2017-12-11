@@ -27,7 +27,8 @@ var listen = function (worker) {
         worker.port.emit(requestId, 'SUCCESS', msg);
       },
       function error(error) {
-        worker.port.emit(requestId, 'ERROR', error.message);
+        var message = __('Could not verify server key. Server code: ') + error.message;
+        worker.port.emit(requestId, 'ERROR', message);
       }
     );
   });

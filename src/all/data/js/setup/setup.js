@@ -617,8 +617,8 @@ $(function () {
    * init the setup.
    * @param data {array} The setup information
    */
-  passbolt.setup.init = function (data) {
-    passbolt.setup._initGetUrlSetupData(data)
+  passbolt.setup.init = function () {
+    passbolt.setup._initGetUrlSetupData()
       .then(passbolt.setup._initPrepareData)
       .then(passbolt.setup._initValidateUser)
       .then(passbolt.setup._initSetUser)

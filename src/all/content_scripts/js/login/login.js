@@ -76,7 +76,10 @@ $(function () {
         // Special case to handle if the user doesn't exist on server.
         if (msg.indexOf('no user associated') != -1) {
           $('html').addClass('server-no-user');
-          passbolt.html.loadTemplate('.login.form', 'login/feedbackLoginNoUser.ejs');
+          var passboltDomain = window.location.href.replace(/(.*)(\/auth\/login(\/)?)$/, '$1');
+          passbolt.html.loadTemplate('.login.form', 'login/feedbackLoginNoUser.ejs', 'html', {
+              passboltDomain: passboltDomain
+          });
         }
         // All other cases.
         else {

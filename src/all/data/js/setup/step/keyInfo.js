@@ -30,39 +30,31 @@ $(function () {
       // Retrieve key info from private key.
       .then(step._getKeyInfo)
       .then(function (keyInfo) {
-
         // Pass the key info to the view.
         step.viewData.keyInfo = step.data.keyinfo = keyInfo;
-
         // Get user from setup data.
-        passbolt.setup.get('user')
-          .then(function (user) {
-            step.data.user = user;
+        return passbolt.setup.get('user');
+      })
+      .then(function (user) {
+          step.data.user = user;
+          var status = 'success';
+          var keyInfo = step._keyInfoFormat(step.data.keyinfo);
 
-            var status = 'success';
-
-            keyInfo = step._keyInfoFormat(keyInfo);
-
-            var fieldsDetails = step._initCheckKeyInfoStatus(keyInfo, user);
-            if (Object.keys(fieldsDetails).length) {
+          var fieldsDetails = step._initCheckKeyInfoStatus(keyInfo, user);
+          if (Object.keys(fieldsDetails).length) {
               status = 'warning';
-            }
+          }
 
-            // Key expired.
-            // @todo key expired in key info page
+          // Key expired.
+          // @todo key expired in key info page
+          // Pass the fields details to the view.
+          step.viewData.fieldsDetails = fieldsDetails;
 
-            // Pass the fields details to the view.
-            step.viewData.fieldsDetails = fieldsDetails;
-
-            // Pass the status to the view.
-            step.viewData.status = step.data.status = status;
-          })
-          .then(null, function () {
-            passbolt.setup.fatalError('could not retrieve user');
-          });
+          // Pass the status to the view.
+          step.viewData.status = step.data.status = status;
       })
       .then(null, function () {
-        passbolt.setup.fatalError('could not retrieve private key');
+          passbolt.setup.fatalError('could not retrieve user');
       });
   };
 
@@ -70,7 +62,7 @@ $(function () {
    * Implements start().
    */
   step.start = function () {
-    if (step.data.status == 'error') {
+    if (step.data.status === 'error') {
       passbolt.setup.setActionState('submit', 'disabled');
     }
   };
@@ -105,6 +97,8 @@ $(function () {
     return passbolt.request('passbolt.keyring.public.info', privateKeyArmored)
       .then(function (keyInfo) {
         return keyInfo;
+      }, function error() {
+        return passbolt.setup.fatalError('Could not retrieve public key info from private key');
       });
   };
 

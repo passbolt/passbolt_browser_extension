@@ -74,9 +74,9 @@ Auth.prototype.verify = function(serverUrl, serverKey, userFingerprint) {
         // Check that the server was able to decrypt the token with our local copy
         var verify = new GpgAuthToken(auth.headers['x-gpgauth-verify-response']);
         if(verify.token !== _this._verifyToken) {
-          reject(new Error(__('The server was unable to prove its identity.')));
+          reject(new Error(__('The server was unable to prove it can use the advertised OpenPGP key.')));
         } else {
-          resolve(__('The server identity is verified!'));
+          resolve(__('The server key is verified! It can be used to sign and decrypt content.'));
         }
       })
       .catch(function(error) {

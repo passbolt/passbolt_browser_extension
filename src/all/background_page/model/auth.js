@@ -76,7 +76,7 @@ Auth.prototype.verify = function(serverUrl, serverKey, userFingerprint) {
         if(verify.token !== _this._verifyToken) {
           reject(new Error(__('The server was unable to prove it can use the advertised OpenPGP key.')));
         } else {
-          resolve(__('The server key is verified! It can be used to sign and decrypt content.'));
+          resolve(__('The server key is verified. The server can use it to sign and decrypt content.'));
         }
       })
       .catch(function(error) {

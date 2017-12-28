@@ -7,6 +7,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.6.8] - 2017-12-28
 ### Fixed
 - PASSBOLT-2558: Security fix content scripts should not be injected on non trusted domain
+- PASSBOLT-2558: Wordsmith verify feature help text 	
+- PASSBOLT-2199: Drop jpm from list of dependencies
+- PASSBOLT-2199: Fix key import key info screen control flow
+- PASSBOLT-2199: Fix register link	
+- PASSBOLT-2199: Add alternative Gpgkey key property armored_key prior to API v2 rollout
+- PASSBOLT-2474: Add new github contribution guidelines and issue templates
 
 ## [1.6.7] - 2017-10-13
 ### Fixed

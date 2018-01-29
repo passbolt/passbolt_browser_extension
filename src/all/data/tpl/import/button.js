@@ -42,12 +42,12 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<a id=\"js_wsp_pwd_import_button\" href=\"#\" class=\"button\">\n    <i class=\"fa fa-fw fa-upload\"></i>\n    <span class=\"visuallyhidden\">upload</span>\n</a>"
+  , __lines = "<a id=\"js_wsp_pwd_import_button\" class=\"button\" role=\"button\">\n    <i class=\"fa fa-fw fa-upload\"></i>\n    <span class=\"visuallyhidden\">upload</span>\n</a>"
   , __filename = "src/all/data/ejs/import/button.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);
   with (locals || {}) {
-    ; __append("<a id=\"js_wsp_pwd_import_button\" href=\"#\" class=\"button\">\n    <i class=\"fa fa-fw fa-upload\"></i>\n    <span class=\"visuallyhidden\">upload</span>\n</a>")
+    ; __append("<a id=\"js_wsp_pwd_import_button\" class=\"button\" role=\"button\">\n    <i class=\"fa fa-fw fa-upload\"></i>\n    <span class=\"visuallyhidden\">upload</span>\n</a>")
     ; __line = 4
   }
   return __output.join("");

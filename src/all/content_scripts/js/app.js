@@ -292,6 +292,7 @@ $(function () {
         importButton.on('click', function(ev) {
           ev.stopPropagation();
           passbolt.request('passbolt.import-passwords.open-dialog');
+          return false;
         });
 
         if (!$('#' + importButton.attr('id')).length) {

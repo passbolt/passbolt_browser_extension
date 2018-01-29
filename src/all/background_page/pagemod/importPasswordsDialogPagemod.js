@@ -27,17 +27,6 @@ ImportPasswordsDialog.init = function () {
     contentScriptFile: [
 			// Warning: script and styles need to be modified in
 			// src/chrome/data/passbolt-iframe-import-passwords.html
-
-      // Vendors
-      'data/vendors/jquery.js',
-      'data/vendors/jquery-filestyle.js',
-
-      // Classes
-      'data/js/import/dialog/importPasswordsDialog.js',
-      'data/js/import/dialog/kdbxCredentialsDialog.js',
-
-      // Templates
-      'data/tpl/import.js'
     ],
     contentScriptWhen: 'ready',
     onAttach: function (worker) {
@@ -48,7 +37,6 @@ ImportPasswordsDialog.init = function () {
         }
       });
       app.events.config.listen(worker);
-      app.events.importPasswordsIframe.listen(worker);
       app.events.importPasswords.listen(worker);
       app.events.passboltPage.listen(worker);
       app.events.user.listen(worker);

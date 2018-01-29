@@ -12,10 +12,13 @@ var User = require('./user').User;
  */
 var Resource = function () {
   this.name = null;
-  this.url = null;
+  this.uri = null;
   this.username = null;
   this.secretClear = null;
   this.description = null;
+  this.secrets = [
+    // Here a list of secrets.
+  ];
 };
 
 /**
@@ -25,7 +28,7 @@ var Resource = function () {
  */
 Resource.prototype.fromKdbxEntry = function(kdbxEntry) {
   this.name = kdbxEntry.fields.Title;
-  this.url = kdbxEntry.fields.URL;
+  this.uri = kdbxEntry.fields.URL;
   this.username = kdbxEntry.fields.UserName;
   if (typeof kdbxEntry.fields.Password == 'object') {
     this.secretClear = kdbxEntry.fields.Password.getText();
@@ -33,6 +36,43 @@ Resource.prototype.fromKdbxEntry = function(kdbxEntry) {
   this.description = kdbxEntry.fields.Notes;
 
   return this;
+};
+
+Resource.save = function(resource) {
+  var user = new User(),
+    domain = user.settings.getDomain(),
+    body = resource;
+
+  body = {
+    "Resource" : resource,
+    "Secret" : resource.secrets
+  };
+
+  console.log('saving...', body);
+  return new Promise(function(resolve, reject) {
+    fetch(
+      domain + '/resources.json?api-version=2', {
+        method: 'POST',
+        credentials: 'include',
+        body: JSON.stringify(body),
+        headers: {
+          'Accept': 'application/json',
+          'content-type': 'application/json'
+        }
+      })
+    .then(
+      function success(response) {
+        response.json()
+        .then(function (json) {
+          console.log('response', json);
+          resolve(json.body);
+        });
+      },
+      function error() {
+        reject(new Error(__('There was a problem while trying to save the resource')));
+      }
+    );
+  });
 };
 
 /**

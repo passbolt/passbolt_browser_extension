@@ -59,6 +59,7 @@ PassboltApp.initPageMod = function () {
       'data/tpl/progress.js',
       'data/tpl/resource.js',
       'data/tpl/secret.js',
+      'data/tpl/import.js',
 
       // Lib
       'data/js/lib/port.js',
@@ -74,6 +75,7 @@ PassboltApp.initPageMod = function () {
       'content_scripts/js/secret/shareIframe.js',
       'content_scripts/js/group/editIframe.js',
       'content_scripts/js/progress/progressIframe.js',
+      'content_scripts/js/import/importPasswordsIframe.js',
       'content_scripts/js/app.js'
     ],
     attachTo: ["existing", "top"],
@@ -87,6 +89,7 @@ PassboltApp.initPageMod = function () {
       app.events.secret.listen(worker);
       app.events.group.listen(worker);
       app.events.masterPasswordIframe.listen(worker);
+      app.events.importPasswordsIframe.listen(worker);
       app.events.app.listen(worker);
 
       Worker.add('App', worker);

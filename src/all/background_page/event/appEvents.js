@@ -124,6 +124,14 @@ var listen = function (worker) {
       });
   });
 
+  worker.port.on('passbolt.resources.import', function (requestId, resources) {
+    console.log('passbolt.resources.import', resources);
+    // Open the progress dialog.
+    progressDialogController.open(worker, 'Importing ...', resources.length);
+    worker.port.emit(requestId, 'SUCCESS');
+    progressDialogController.close(worker);
+  });
+
   /*
    * Initialize the password sharing process.
    *

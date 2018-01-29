@@ -22,6 +22,7 @@ var listen = function (worker) {
    * @param goals {int} The number of goals to complete
    */
   worker.port.on('passbolt.progress.open-dialog', function (requestId, title, goals) {
+    console.log('Progress Iframe Event passbolt.progress.open-dialog received');
     Worker.get('App', worker.tab.id).port.emit(requestId, title, goals);
     // When the dialog is opened, answer to the request caller.
     Worker.get('App', worker.tab.id).port.once('passbolt.progress.open-dialog.complete', function () {

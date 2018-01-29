@@ -276,4 +276,39 @@ $(function () {
 
   $('html').addClass('passboltplugin-ready');
 
+
+  /**
+   * Create the import button in the password workspace,
+   * if it doesn't already exist.
+   */
+  function createImportButton() {
+    // If we are on the import workspace.
+    if($('.page.password').length) {
+      // Create import button
+      passbolt.html.getTemplate('import/button.ejs').then(function(tpl) {
+        let importButton = $(tpl.call(this));
+        let createButton = $('#js_wsp_create_button');
+
+        importButton.on('click', function(ev) {
+          ev.stopPropagation();
+          passbolt.request('passbolt.import-passwords.open-dialog');
+        });
+
+        if (!$('#' + importButton.attr('id')).length) {
+          createButton.after(importButton);
+        }
+      });
+    }
+  }
+
+  // Create import button at the first execution of app.js.
+  // We do this because the event passbolt.workspace.password.enabled has already
+  // been triggered, so it's too late to catch it.
+  createImportButton();
+
+  // Listen to the event passbolt.workspace.password.enabled and create the import button.
+  // The event will be triggered when the user changes workspace.
+  window.addEventListener('passbolt.workspace.password.enabled', function () {
+    createImportButton();
+  });
 });

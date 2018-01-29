@@ -11,6 +11,28 @@ var User = require('./user').User;
  * The class that deals with resources.
  */
 var Resource = function () {
+  this.name = null;
+  this.url = null;
+  this.username = null;
+  this.secretClear = null;
+  this.description = null;
+};
+
+/**
+ * Build a Resource object from a kdbxEntry object.
+ * @param KdbxEntry kdbxEntry
+ * @returns {Resource}
+ */
+Resource.prototype.fromKdbxEntry = function(kdbxEntry) {
+  this.name = kdbxEntry.fields.Title;
+  this.url = kdbxEntry.fields.URL;
+  this.username = kdbxEntry.fields.UserName;
+  if (typeof kdbxEntry.fields.Password == 'object') {
+    this.secretClear = kdbxEntry.fields.Password.getText();
+  }
+  this.description = kdbxEntry.fields.Notes;
+
+  return this;
 };
 
 /**

@@ -29,6 +29,8 @@ events.editPassword = require('./event/editPasswordEvents');
 events.file = require('./event/fileEvents');
 events.group = require('./event/groupEvents');
 events.groupAutocomplete = require('./event/groupAutocompleteEvents');
+events.importPasswordsIframe = require('./event/importPasswordsIframeEvents');
+events.importPasswords = require('./event/importPasswordsEvents');
 events.keyring = require('./event/keyringEvents');
 events.masterPasswordIframe = require('./event/masterPasswordIframeEvents');
 events.masterPassword = require('./event/masterPasswordEvents');
@@ -160,6 +162,11 @@ pageMods.GroupEditDialog = require('./pagemod/groupEditDialogPagemod').GroupEdit
  * It shows the autocomplete list including the users that can be added to the group.
  */
 pageMods.GroupEditAutocompleteDialog = require('./pagemod/groupEditAutocompleteDialogPagemod').GroupEditAutocompleteDialog;
+
+/*
+ * This pagemod drives the dialog/iframe where the user imports passwords,
+ */
+pageMods.MasterPasswordDialog = require('./pagemod/importPasswordsDialogPagemod').ImportPasswordsDialog;
 
 /*
  * This page mod drives a convenience config page for debug

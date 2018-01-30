@@ -11,11 +11,11 @@ var User = require('./user').User;
  * The class that deals with resources.
  */
 var Resource = function () {
-  this.name = null;
-  this.uri = null;
-  this.username = null;
-  this.secretClear = null;
-  this.description = null;
+  this.name = "";
+  this.uri = "";
+  this.username = "";
+  this.secretClear = "";
+  this.description = "";
   this.secrets = [
     // Here a list of secrets.
   ];
@@ -27,7 +27,12 @@ var Resource = function () {
  * @returns {Resource}
  */
 Resource.prototype.fromKdbxEntry = function(kdbxEntry) {
-  this.name = kdbxEntry.fields.Title;
+  if (kdbxEntry.fields.Title == "") {
+    this.name = "(no name)";
+  } else {
+    this.name = kdbxEntry.fields.Title;
+  }
+
   this.uri = kdbxEntry.fields.URL;
   this.username = kdbxEntry.fields.UserName;
   if (typeof kdbxEntry.fields.Password == 'object') {

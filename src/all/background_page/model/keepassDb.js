@@ -106,14 +106,14 @@ KeepassDb.prototype.toResources = function(kdbxDb) {
     try {
       kdbxDb.groups[0].forEach((entry, group) => {
         if (entry != undefined) {
-        var resource = new Resource().fromKdbxEntry(entry);
-        var groups = self.flattenParentGroups(entry);
-        var tag = self.getTagNameFromFlattenedGroups(groups);
-        resource.tags = [];
-        resource.tags.push(tag);
-        entries.push(resource);
-      }
-    });
+          var resource = new Resource().fromKdbxEntry(entry);
+          var groups = self.flattenParentGroups(entry);
+          var tag = self.getTagNameFromFlattenedGroups(groups);
+          resource.tags = [];
+          resource.tags.push(tag);
+          entries.push(resource);
+        }
+      });
     }
     catch(e) {
       reject(e);

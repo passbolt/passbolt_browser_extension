@@ -227,6 +227,15 @@ $(function () {
   });
 
   /* ==================================================================================
+   * Import actions
+   * ================================================================================== */
+
+  // The import is complete, we want to filter the workspace based on the tag used.
+  passbolt.message.on('passbolt.import-passwords.complete', function () {
+    passbolt.message.emitToPage('passbolt.plugin.workspace.filter', {'tag': 'tagName'});
+  });
+
+  /* ==================================================================================
    * Application
    * ================================================================================== */
 

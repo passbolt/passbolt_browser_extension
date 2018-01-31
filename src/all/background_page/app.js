@@ -166,7 +166,7 @@ pageMods.GroupEditAutocompleteDialog = require('./pagemod/groupEditAutocompleteD
 /*
  * This pagemod drives the dialog/iframe where the user imports passwords,
  */
-pageMods.MasterPasswordDialog = require('./pagemod/importPasswordsDialogPagemod').ImportPasswordsDialog;
+pageMods.ImportPasswordsDialog = require('./pagemod/importPasswordsDialogPagemod').ImportPasswordsDialog;
 
 /*
  * This page mod drives a convenience config page for debug

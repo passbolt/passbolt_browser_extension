@@ -28,7 +28,7 @@ $(function () {
   });
 
   /**
-   * Close the master password dialog.
+   * Close the import passwords dialog.
    * @listens passbolt.import-passwords.close-dialog
    */
   passbolt.message.on('passbolt.import-passwords.close-dialog', function () {

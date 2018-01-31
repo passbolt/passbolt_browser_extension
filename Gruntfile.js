@@ -169,8 +169,10 @@ module.exports = function(grunt) {
           // xregexp
           {expand: true, cwd: path.node_modules + 'xregexp', src: 'xregexp-all.js', dest: path.src_addon_vendors},
           {expand: true, cwd: path.node_modules + 'xregexp', src: 'xregexp-all.js', dest: path.src_content_vendors},
-          // kdbxweb
+          // kdbxweb (for import / kdbx).
           {expand: true, cwd: path.node_modules + 'kdbxweb/dist', src: 'kdbxweb.js', dest: path.src_addon_vendors},
+          // papaparse (for import / csv).
+          {expand: true, cwd: path.node_modules + 'papaparse', src: 'papaparse.js', dest: path.src_addon_vendors},
 
            // TODO PASSBOLT-2219 Fix / Add missing Vendors
           // In src_content_vendors

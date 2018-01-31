@@ -30,13 +30,9 @@ ImportPasswordsDialog.init = function () {
     ],
     contentScriptWhen: 'ready',
     onAttach: function (worker) {
-      Worker.add('ImportPasswords', worker, {
-        // on destroy, clean.
-        onDestroy: function() {
-          //TabStorage.remove(worker.tab.id, 'importPasswordsRequest');
-        }
-      });
+      Worker.add('ImportPasswords', worker, {});
       app.events.config.listen(worker);
+      app.events.importPasswordsIframe.listen(worker);
       app.events.importPasswords.listen(worker);
       app.events.passboltPage.listen(worker);
       app.events.user.listen(worker);

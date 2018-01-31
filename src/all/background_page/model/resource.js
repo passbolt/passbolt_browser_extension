@@ -19,6 +19,9 @@ var Resource = function () {
   this.secrets = [
     // Here a list of secrets.
   ];
+
+  // Name to use if the name provided is empty. (validation rules don't permit an empty name).
+  this._defaultName = '(no name)';
 };
 
 /**
@@ -27,8 +30,8 @@ var Resource = function () {
  * @returns {Resource}
  */
 Resource.prototype.fromKdbxEntry = function(kdbxEntry) {
-  if (kdbxEntry.fields.Title == "") {
-    this.name = "(no name)";
+  if (kdbxEntry.fields.Title === "") {
+    this.name = this._defaultName;
   } else {
     this.name = kdbxEntry.fields.Title;
   }
@@ -43,6 +46,28 @@ Resource.prototype.fromKdbxEntry = function(kdbxEntry) {
   return this;
 };
 
+
+/**
+ * Build a Resource object from a csv entry.
+ * @param Array csvEntry
+ * @param Array mapping mapping rules
+ * @returns {Resource}
+ */
+Resource.prototype.fromCsvEntry = function(csvEntry, mapping) {
+  for (var fieldName in mapping) {
+    this[fieldName] = csvEntry[mapping[fieldName]];
+  }
+  if (this.name === "") {
+    this.name = this._defaultName;
+  }
+  return this;
+};
+
+/**
+ * Save a resourc on server.
+ * @param resource
+ */
+
 Resource.save = function(resource) {
   var user = new User(),
     domain = user.settings.getDomain(),
@@ -53,7 +78,6 @@ Resource.save = function(resource) {
     "Secret" : resource.secrets
   };
 
-  console.log('saving...', body);
   return new Promise(function(resolve, reject) {
     fetch(
       domain + '/resources.json?api-version=2', {
@@ -69,7 +93,6 @@ Resource.save = function(resource) {
       function success(response) {
         response.json()
         .then(function (json) {
-          console.log('response', json);
           resolve(json.body);
         });
       },

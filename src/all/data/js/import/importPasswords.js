@@ -7,11 +7,18 @@
 
 $(function () {
 
+  /**
+   * string The selected file as a base 64.
+   */
   var selectedFileBase64 = null;
+
+  /**
+   * ImportPasswordDialog the import password dialog component.
+   */
   var importPasswordsDialog = null;
 
   /**
-   * Initialize the master password dialog.
+   * Initialize the import passwords dialog.
    */
   var init = function () {
     importPasswordsDialog = new ImportPasswordsDialog({
@@ -20,7 +27,10 @@ $(function () {
     importPasswordsDialog.show();
   };
 
-  
+  /**
+   * onSubmit handler.
+   * @param selectedFile
+   */
   var onSubmit = function(selectedFile) {
     getFileAsBase64String(selectedFile)
     .then(function(fileBase64) {
@@ -32,10 +42,10 @@ $(function () {
       return importFile(fileBase64, credentials);
     })
     .then(function(result) {
+      importPasswordsDialog.close();
       displayReport(result);
     })
     .catch(function(e) {
-      console.log('error', e);
       if (e.code == 'InvalidKey') {
         getKdbxCredentials();
       } else if (e.code == 'BadSignature') {
@@ -44,20 +54,38 @@ $(function () {
     });
   };
 
+  /**
+   * Import a file.
+   * Request the add-on code to import a file.
+   *
+   * @param string fileBase64 the file converted into a base64 string
+   * @param object credentials the credentials to decrypt the file, if necessary.
+   */
   var importFile = function(fileBase64, credentials) {
+    // Get file extension.
+    var fileType = ImportPasswordsDialog.getFileExtension(importPasswordsDialog.selectedFile.name);
+
     return new Promise(function(resolve, reject) {
-      passbolt.request('passbolt.import-passwords.import-kdbx', fileBase64, credentials)
+      var options = {
+        "credentials":credentials
+      };
+      passbolt.request('passbolt.import-passwords.import-file', fileBase64, fileType, options)
       .then(
-        function() {
-          resolve();
+        function(result) {
+          resolve(result);
         },
         function(e) {
-          console.log("failure", e);
+          console.error("import file failure", e);
           reject(e);
         });
     });
   };
 
+  /**
+   * Converts a file object into a base 64 string and return it.
+   * @param File file
+   * @return Promise promise
+   */
   var getFileAsBase64String = function(file) {
     return new Promise(function(resolve, reject) {
       var reader = new FileReader();
@@ -74,6 +102,10 @@ $(function () {
     });
   };
 
+  /**
+   * Get Kdbx credentials.
+   * Display a window that will request the credentials to open a kdbx database.
+   */
   var getKdbxCredentials = function() {
     var kdbxCredentials = new KdbxCredentialsDialog({
       onSubmit: function(password, keyFile) {
@@ -99,8 +131,13 @@ $(function () {
     kdbxCredentials.show();
   };
 
+  /**
+   * Display the final import report.
+   * @param result
+   */
   var displayReport = function(result) {
-    console.log("import is done. Display report");
+    var importPasswordsReportDialog = new ImportPasswordsReportDialog(result);
+    importPasswordsReportDialog.show();
   };
 
   init();

@@ -55,7 +55,6 @@ CsvDb.prototype.loadDb = function(csvFile) {
       header: true,
       skipEmptyLines: true,
       complete: function(results, file) {
-        console.error("Parsing complete:", results, file);
         self.db = results;
         resolve(results);
       }

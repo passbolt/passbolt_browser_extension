@@ -4,6 +4,7 @@
  */
 var kdbxweb = require('../vendors/kdbxweb');
 var Resource = require('./resource').Resource;
+var fileController = require('../controller/fileController');
 
 /**
  * Constructor.
@@ -28,37 +29,63 @@ KeepassDb.prototype.createDb = function(password, keyFile) {
 
 /**
  * load a db from file.
- * @param File kdbxFile file object as returned by the file field.
- * @param pass the password of the db
- * @param keyFile (optional) content of the key file if there is one. null otherwise.
+ * @param Blob kdbxFile file object as returned by the file field.
+ * @param string pass the password of the db
+ * @param Blob keyFile (optional) the keyFile if there is one. null otherwise.
  * @returns {Promise}
  */
 KeepassDb.prototype.loadDb = function(kdbxFile, pass, keyFile) {
   var self = this;
-  return new Promise(function(resolve, reject) {
-    var reader;
-    reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        // protectedPass remains null if there is no password.
-        var protectedPass = null;
-        if (pass != null) {
-          protectedPass = kdbxweb.ProtectedValue.fromString(pass);
+
+  return this._prepareKeyFile(keyFile)
+  .then(function(keyFile) {
+    return new Promise(function(resolve, reject) {
+      var reader;
+      reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          // protectedPass remains null if there is no password.
+          var protectedPass = null;
+          if (pass != null) {
+            protectedPass = kdbxweb.ProtectedValue.fromString(pass);
+          }
+          var credentials = new kdbxweb.Credentials(protectedPass, keyFile);
+          kdbxweb.Kdbx.load(e.target.result, credentials)
+          .then(function(db) {
+            self.db = db;
+            resolve(db);
+          })
+          .catch(function(err) {
+            reject(err);
+          });
+        } catch (e) {
+          reject(e);
         }
-        var credentials = new kdbxweb.Credentials(protectedPass, keyFile);
-        kdbxweb.Kdbx.load(e.target.result, credentials)
-        .then(function(db) {
-          self.db = db;
-          resolve(db);
-        })
-        .catch(function(err) {
-          reject(err);
-        });
-      } catch (e) {
+      };
+      reader.readAsArrayBuffer(kdbxFile);
+    });
+  });
+};
+
+/**
+ * Prepare a keyFile in order to be used by loadDb.
+ * If keyFile is not null, transform it into an arrayBuffer.
+ * @param keyFile
+ * @private
+ */
+KeepassDb.prototype._prepareKeyFile = function(keyFile) {
+  return new Promise(function(resolve, reject) {
+    if (keyFile !== null && keyFile !== undefined) {
+      fileController.blobToArrayBuffer(keyFile)
+      .then(function(arrayBuffer) {
+        resolve(arrayBuffer);
+      })
+      .catch(function(e) {
         reject(e);
-      }
-    };
-    reader.readAsArrayBuffer(kdbxFile);
+      });
+      return;
+    }
+    resolve(keyFile);
   });
 };
 
@@ -104,7 +131,7 @@ KeepassDb.prototype.toResources = function(kdbxDb) {
   return new Promise(function(resolve, reject) {
     var entries = [];
     try {
-      kdbxDb.groups[0].forEach((entry, group) => {
+      kdbxDb.groups[0].forEach(function(entry, group) {
         if (entry != undefined) {
           var resource = new Resource().fromKdbxEntry(entry);
           var groups = self.flattenParentGroups(entry);

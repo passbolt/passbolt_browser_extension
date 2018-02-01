@@ -82,7 +82,10 @@ KdbxCredentialsDialog.prototype._initEvents = function() {
   this.$submitButton.on('click', function(ev) {
     ev.stopImmediatePropagation();
     var password = self.$password.val();
-    var keyFile = self.$keyFile.val();
+    if (password === "") {
+      password = null;
+    }
+    var keyFile = self.$keyFile.prop('files')[0];
     self.onSubmit(password, keyFile);
     self.close();
     return false;

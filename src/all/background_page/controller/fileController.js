@@ -40,6 +40,28 @@ function loadFile (path) {
 exports.loadFile = loadFile;
 
 /**
+ * Convert a blob file into an ArrayBuffer.
+ * @param blob
+ * @return {Promise}
+ */
+function blobToArrayBuffer(blob) {
+  return new Promise(function(resolve, reject) {
+    var arrayBuffer;
+    try {
+      var fileReader = new FileReader();
+      fileReader.onload = function() {
+        arrayBuffer = this.result;
+        resolve(arrayBuffer);
+      };
+      fileReader.readAsArrayBuffer(blob);
+    } catch(e) {
+      reject(e);
+    }
+  });
+};
+exports.blobToArrayBuffer = blobToArrayBuffer;
+
+/**
  * Transforms a base 64 encoded file content into a file object.
  * Useful when we need to transmit a file from the content code to the add-on code.
  * @param string b64Data

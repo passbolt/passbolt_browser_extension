@@ -17,6 +17,9 @@ $(function () {
    */
   var importPasswordsDialog = null;
 
+
+  var fileExtension = null;
+
   /**
    * Initialize the import passwords dialog.
    */
@@ -32,6 +35,8 @@ $(function () {
    * @param selectedFile
    */
   var onSubmit = function(selectedFile) {
+    fileExtension = ImportPasswordsDialog.getFileExtension(selectedFile.name);
+
     getFileAsBase64String(selectedFile)
     .then(function(fileBase64) {
       selectedFileBase64 = fileBase64;
@@ -46,10 +51,16 @@ $(function () {
       displayReport(result);
     })
     .catch(function(e) {
-      if (e.code == 'InvalidKey') {
-        getKdbxCredentials();
-      } else if (e.code == 'BadSignature') {
-        importPasswordsDialog.showError("This is not a valid kdbx file");
+      // if file extension is kdbx,
+      if (fileExtension == 'kdbx') {
+        if (e.code == 'InvalidKey') {
+          requestKdbxCredentials();
+        } else if (e.code == 'BadSignature') {
+          importPasswordsDialog.showError("This is not a valid kdbx file");
+        }
+      } else {
+        // CSV case.
+        importPasswordsDialog.showError("This file is invalid and can't be imported.");
       }
     });
   };
@@ -62,14 +73,11 @@ $(function () {
    * @param object credentials the credentials to decrypt the file, if necessary.
    */
   var importFile = function(fileBase64, credentials) {
-    // Get file extension.
-    var fileType = ImportPasswordsDialog.getFileExtension(importPasswordsDialog.selectedFile.name);
-
     return new Promise(function(resolve, reject) {
       var options = {
         "credentials":credentials
       };
-      passbolt.request('passbolt.import-passwords.import-file', fileBase64, fileType, options)
+      passbolt.request('passbolt.import-passwords.import-file', fileBase64, fileExtension, options)
       .then(
         function(result) {
           resolve(result);
@@ -106,29 +114,48 @@ $(function () {
    * Get Kdbx credentials.
    * Display a window that will request the credentials to open a kdbx database.
    */
-  var getKdbxCredentials = function() {
+  var requestKdbxCredentials = function() {
     var kdbxCredentials = new KdbxCredentialsDialog({
       onSubmit: function(password, keyFile) {
-        // TODO: manage key file.
-        var credentials = {
-          password: password,
-          keyFile: null
-        };
-
-        importFile(selectedFileBase64, credentials)
+        getKdbxCredentials(password, keyFile)
+        .then(function(credentials) {
+          return importFile(selectedFileBase64, credentials);
+        })
         .then(function(result) {
           displayReport(result);
         })
         .catch(function(e) {
-          if (e.code == 'InvalidKey') {
+          if (e.code == 'InvalidKey' || e.code == 'InvalidArg') {
             importPasswordsDialog.showError("Invalid password / keyfile provided. Please try again.");
           } else if (e.code == 'BadSignature') {
             importPasswordsDialog.showError("This is not a valid kdbx file");
+          } else {
+            importPasswordsDialog.showError("Could not open the kdbx file");
           }
         });
       }
     });
     kdbxCredentials.show();
+  };
+
+  var getKdbxCredentials = function(password, keyFile) {
+    var credentials = {
+      password: password,
+      keyFile: null
+    };
+
+    return new Promise(function(resolve, reject) {
+      if (keyFile != null) {
+        getFileAsBase64String(keyFile)
+        .then(function(keyFileBase64) {
+          credentials.keyFile = keyFileBase64;
+          resolve(credentials);
+        });
+      }
+      else {
+        resolve(credentials);
+      }
+    });
   };
 
   /**

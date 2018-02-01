@@ -35,14 +35,14 @@ var ImportPasswordsController = function(tabid) {
  * @returns {*}
  */
 ImportPasswordsController.prototype.initFromKdbx = function(b64FileContent, credentials) {
+  // Convert base 64 files into Blob.
   var kdbxFile = fileController.b64ToBlob(b64FileContent);
-  var keyFile = null;
-  if (credentials.keyFile != null) {
-    keyFile = fileController.b64ToBlob(credentials.keyFile);
+  if (credentials.keyFile !== null && credentials.keyFile !== undefined) {
+    credentials.keyFile = fileController.b64ToBlob(credentials.keyFile);
   }
 
   var keepassDb = new KeepassDb();
-  return keepassDb.loadDb(kdbxFile, credentials.password, keyFile)
+  return keepassDb.loadDb(kdbxFile, credentials.password, credentials.keyFile)
   .then(function(db) {
     return keepassDb.toResources(db);
   });

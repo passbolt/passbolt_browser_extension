@@ -274,6 +274,19 @@ var listen = function (worker) {
         worker.port.emit(requestId, 'ERROR', error.message);
       });
   });
+
+  /*
+   * Initialize the export passwords process.
+   *
+   * @listens passbolt.app.export-passwords-init
+   * @param requestId {uuid} The request identifier
+   * @param resources {array} The list of resources to export
+   */
+  worker.port.on('passbolt.app.export-passwords-init', function (requestId, resources) {
+    // Store some variables in the tab storage in order to make it accessible by other workers.
+    TabStorage.set(worker.tab.id, 'exportedResources', resources);
+    worker.port.emit(requestId, 'SUCCESS');
+  });
 };
 
 exports.listen = listen;

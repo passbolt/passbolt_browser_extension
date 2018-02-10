@@ -16,15 +16,24 @@ var KeepassDb = function() {
 
 /**
  * Create a Kdbx database.
- * @param password
- * @param keyFile
- * @returns {credentials|*|null}
+ * @param string password
+ * @param Blob keyFile
+ * @returns {Promise} promise with newly created db
  */
 KeepassDb.prototype.createDb = function(password, keyFile) {
-  let credentials = new kdbxweb.Credentials(kdbxweb.ProtectedValue.fromString(password), keyFile);
-  let newDb = kdbxweb.Kdbx.create(credentials, 'passbolt export');
-  this.db = newDb;
-  return this.db;
+  var self = this;
+  return this._prepareKeyFile(keyFile)
+  .then(function(keyFile) {
+    return new Promise(function(resolve, reject) {
+      // If password is empty, we consider that there is no password.
+      // We don't handle the case where there is a password and it is an empty string. Why? It makes no sense.
+      let protectedPassword = password === '' ? null : kdbxweb.ProtectedValue.fromString(password);
+      let credentials = new kdbxweb.Credentials(protectedPassword, keyFile);
+      let newDb = kdbxweb.Kdbx.create(credentials, 'passbolt export');
+      self.db = newDb;
+      resolve(this.db);
+    });
+  })
 };
 
 /**
@@ -183,13 +192,16 @@ KeepassDb.prototype.fromResources = function(resources, password, keyFile) {
   if (keyFile == undefined) {
     keyFile = null;
   }
-  this.createDb(password, keyFile);
-  for(let i=0; i < resources.length; i++) {
-    resources[i].secretClear = 'this password is a test';
-    this.createEntry(resources[i], null);
-  }
+  var self = this;
 
-  return this.db.save();
+  return this.createDb(password, keyFile)
+  .then(function(db) {
+    for(let i=0; i < resources.length; i++) {
+      resources[i].secretClear = 'this password is a test';
+      self.createEntry(resources[i], null);
+    }
+    return self.db.save();
+  });
 };
 
 exports.KeepassDb = KeepassDb;

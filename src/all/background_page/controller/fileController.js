@@ -93,3 +93,19 @@ function b64ToBlob(b64Data, contentType, sliceSize) {
   return blob;
 }
 exports.b64ToBlob = b64ToBlob;
+
+/**
+ * Blob to Data Url.
+ * @param blob
+ * @return {Promise}
+ */
+function blobToDataURL(blob) {
+  return new Promise(function(resolve, reject) {
+    var a = new FileReader();
+    a.onload = function(e) {
+      resolve(e.target.result);
+    };
+    a.readAsDataURL(blob);
+  });
+}
+exports.blobToDataURL = blobToDataURL;

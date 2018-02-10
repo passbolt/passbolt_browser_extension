@@ -26,6 +26,8 @@ events.config = require('./event/configEvents');
 events.debug = require('./event/debugEvents');
 events.debugPage = require('./event/debugPageEvents');
 events.editPassword = require('./event/editPasswordEvents');
+events.exportPasswordsIframe = require('./event/exportPasswordsIframeEvents');
+events.exportPasswords = require('./event/exportPasswordsEvents');
 events.file = require('./event/fileEvents');
 events.group = require('./event/groupEvents');
 events.groupAutocomplete = require('./event/groupAutocompleteEvents');
@@ -167,6 +169,11 @@ pageMods.GroupEditAutocompleteDialog = require('./pagemod/groupEditAutocompleteD
  * This pagemod drives the dialog/iframe where the user imports passwords,
  */
 pageMods.ImportPasswordsDialog = require('./pagemod/importPasswordsDialogPagemod').ImportPasswordsDialog;
+
+/*
+ * This pagemod drives the dialog/iframe where the user exports passwords,
+ */
+pageMods.ExportPasswordsDialog = require('./pagemod/exportPasswordsDialogPagemod').ExportPasswordsDialog;
 
 /*
  * This page mod drives a convenience config page for debug

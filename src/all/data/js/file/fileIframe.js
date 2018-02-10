@@ -13,20 +13,12 @@ $(function () {
 
   /**
    * Trigger a file download for a given content
-   * @param txt {string} The text to download as a file
-   * @return promise
+   * @param filename {string} filename
+   * @param content {string|blob} The text to download as a file, a base64 url, or a blob.
    */
   file.download = function (filename, content) {
-
-    var a = document.createElement('a');
-    var blob = new Blob([ content ], {type : "text/plain;charset=UTF-8"});
-    a.href = window.URL.createObjectURL(blob);
-    a.download = filename;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    delete a;
-
+      // Use download library to perform the download.
+      download(content, filename, "text/plain");
   };
 
   // Ask the passbolt page to release its focus

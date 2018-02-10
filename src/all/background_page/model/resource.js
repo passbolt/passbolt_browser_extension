@@ -64,6 +64,20 @@ Resource.prototype.fromCsvEntry = function(csvEntry, mapping) {
 };
 
 /**
+ * Build a Csv entry object from a resource.
+ * @param Array resource
+ * @param Array mapping mapping rules
+ * @returns object CSV entry
+ */
+Resource.prototype.toCsvEntry = function(resource, mapping) {
+  var csvEntry = {};
+  for (var fieldName in mapping) {
+    csvEntry[mapping[fieldName]] = resource[fieldName];
+  }
+  return csvEntry;
+}
+
+/**
  * Save a resourc on server.
  * @param resource
  */

@@ -9,7 +9,6 @@
 var app = require('../app');
 var pageMod = require('../sdk/page-mod');
 var Worker = require('../model/worker');
-var TabStorage = require('../model/tabStorage').TabStorage;
 
 var ImportPasswordsDialog = function () {};
 ImportPasswordsDialog._pageMod = undefined;

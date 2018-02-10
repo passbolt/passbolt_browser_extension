@@ -1,5 +1,5 @@
 /**
- * Dialog controller for kdbx credentials.
+ * Dialog controller for kdbx credentials. Can be used for import and export.
  *
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
@@ -9,6 +9,8 @@
  * Constructor.
  * @param object settings
  *   onSubmit (compulsory): on submit handler.
+ *   title: dialog title
+ *   ctaName: label of the submit button
  * @constructor
  */
 var KdbxCredentialsDialog = function(settings) {
@@ -21,6 +23,8 @@ var KdbxCredentialsDialog = function(settings) {
   this.$cancelButton = null;
   this.$submitButton = null;
   this.onSubmit = settings.onSubmit;
+  this.title = settings.title || "Enter the password and/or key file";
+  this.ctaLabel = settings.ctaLabel || "Submit";
 };
 
 /**

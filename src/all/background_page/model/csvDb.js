@@ -88,6 +88,35 @@ CsvDb.prototype.toResources = function(csvDb) {
 };
 
 /**
+ * Transform a list of resources into a CSV file content.
+ * @param array resources
+ * @param string format csv format
+ * @returns {Promise} a promise containing the content of the csv file.
+ */
+CsvDb.prototype.fromResources = function(resources, format) {
+  return new Promise(function(resolve, reject) {
+    var resource = new Resource(),
+      csvEntries = [],
+      csvContent = null;
+
+    if(CsvDb.formats[format] == undefined) {
+      return reject('This csv format is not supported');
+    }
+
+    try {
+      for (var i in resources) {
+        var csvEntry = resource.toCsvEntry(resources[i], CsvDb.formats[format]);
+        csvEntries.push(csvEntry);
+      }
+      csvContent = PapaParse.unparse(csvEntries, {header: true});
+      resolve(csvContent);
+    } catch(e) {
+      reject(e);
+    }
+  });
+};
+
+/**
  * Get CSV format name from a csv entry.
  * @param csvEntry
  * @returns {*}

@@ -227,12 +227,17 @@ $(function () {
   });
 
   /* ==================================================================================
-   * Import actions
+   * Import / export actions
    * ================================================================================== */
 
   // The import is complete, we want to filter the workspace based on the tag used.
   passbolt.message.on('passbolt.import-passwords.complete', function () {
     passbolt.message.emitToPage('passbolt.plugin.workspace.filter', {'tag': 'tagName'});
+  });
+
+  // The export is complete, we want to display a notification
+  passbolt.message.on('passbolt.export-passwords.complete', function () {
+    passbolt.message.emitToPage('passbolt_notify', {status: 'success', title: 'export_passwords_success'});
   });
 
   /* ==================================================================================
@@ -281,6 +286,22 @@ $(function () {
       },function() {
         passbolt.message.emitToPage('passbolt_notify', {status: 'error', title: 'download_public_key_error'});
       });
+  });
+
+  // Listen when the user requests an export of passwords.
+  window.addEventListener('passbolt.export-passwords', function (evt) {
+    var resources = evt.detail.resources;
+    passbolt.request('passbolt.app.export-passwords-init', resources)
+    .then(function() {
+      passbolt.request('passbolt.export-passwords.open-dialog');
+    });
+
+    // passbolt.request('passbolt.export-passwords.export-to-file', format, resources)
+    // .then(function () {
+    //   passbolt.message.emitToPage('passbolt_notify', {status: 'success', title: 'The export was successful'});
+    // }, function() {
+    //   passbolt.message.emitToPage('passbolt_notify', {status: 'error', title: 'There was an error during the export'});
+    // });
   });
 
   $('html').addClass('passboltplugin-ready');

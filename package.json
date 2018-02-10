@@ -14,7 +14,8 @@
     "underscore": "~1.8.3",
     "xregexp": "~3.0.0",
     "kdbxweb":"^1.0.2",
-    "papaparse":"^4.3.6"
+    "papaparse":"^4.3.6",
+    "downloadjs": "^1.4.7"
   },
   "devDependencies": {
     "crx": "^3.2.1",

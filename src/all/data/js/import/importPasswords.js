@@ -116,6 +116,8 @@ $(function () {
    */
   var requestKdbxCredentials = function() {
     var kdbxCredentials = new KdbxCredentialsDialog({
+      title: "Enter the password and/or key file",
+      ctaLabel: "Continue import",
       onSubmit: function(password, keyFile) {
         getKdbxCredentials(password, keyFile)
         .then(function(credentials) {

@@ -17,8 +17,8 @@ var GpgAuthHeader = require('./gpgAuthHeader').GpgAuthHeader;
  * @constructor
  */
 var Auth = function () {
-  this.URL_VERIFY = '/auth/verify.json'; // @TODO get from server http headers
-  this.URL_LOGIN = '/auth/login.json';
+  this.URL_VERIFY = '/auth/verify.json?api-version=v1'; // @TODO get from server http headers
+  this.URL_LOGIN = '/auth/login.json?api-version=v1';
   this._verifyToken = undefined;
 };
 

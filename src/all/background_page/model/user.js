@@ -303,7 +303,7 @@ User.prototype._getRemote = function () {
   return new Promise(function(resolve, reject) {
     //Check if there is a trusted domain
     try {
-      url = self.settings.getDomain() + self.URL_GET_REMOTE;
+      url = self.settings.getDomain() + self.URL_GET_REMOTE + '?api-version=v1';
     } catch (e) {
       reject(__('The application domain is not set'));
       return;
@@ -372,7 +372,7 @@ User.prototype.isLoggedIn = function () {
 
   return new Promise(function(resolve, reject) {
     fetch(
-      _this.settings.getDomain() + '/auth/checkSession.json', {
+      _this.settings.getDomain() + '/auth/checkSession.json' + '?api-version=v1', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -455,8 +455,11 @@ User.prototype.searchUsers = function(keywords, excludedUsers) {
 
   return new Promise (function(resolve, reject) {
     var _response = null;
+    var url = _this.settings.getDomain() + '/users.json'  + '?api-version=v1';
+      url += '&filter[keywords]=' + htmlspecialchars(keywords, 'ENT_QUOTES') + '&filter[is-active]=1';
+
     fetch(
-      _this.settings.getDomain() + '/users.json?filter[keywords]=' + htmlspecialchars(keywords, 'ENT_QUOTES') + '&filter[is-active]=1', {
+      url, {
         method: 'GET',
         credentials: 'include',
         headers: {

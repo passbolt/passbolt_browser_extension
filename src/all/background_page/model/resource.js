@@ -31,7 +31,7 @@ Resource.simulateShare = function (resourceId, permissions) {
 
   return new Promise(function(resolve, reject) {
     fetch(
-      domain + '/share/simulate/resource/' + resourceId + '.json', {
+      domain + '/share/simulate/resource/' + resourceId + '.json' + '?api-version=v1', {
         method: 'POST',
         credentials: 'include',
         body: JSON.stringify(body),

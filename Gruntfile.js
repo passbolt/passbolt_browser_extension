@@ -83,7 +83,7 @@ module.exports = function(grunt) {
     browserify: {
       vendors: {
         src: [path.src_addon + 'vendors.js'],
-        dest: path.build + 'vendors.min.js'
+        dest: path.build + 'vendors.min.js',
       },
       templates: {
         cwd: path.src_templates,

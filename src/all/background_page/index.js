@@ -92,6 +92,6 @@ var main = function() {
 
 // Init storage and get going.
 storage.init()
-  .then(() => {
+  .then(function () {
     main();
   });

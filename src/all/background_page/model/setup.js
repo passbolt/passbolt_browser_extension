@@ -188,7 +188,7 @@ Setup.prototype.save = function(data) {
     _response = {};
 
   return new Promise(function(resolve, reject) {
-    var url = data.settings.domain + '/users/validateAccount/' + data.user.id + '.json';
+    var url = data.settings.domain + '/users/validateAccount/' + data.user.id + '.json' + '?api-version=v1';
     var keyring = new Keyring();
 
     // Build request data.
@@ -257,7 +257,7 @@ Setup.prototype.completeRecovery = function (data) {
     _response = {};
 
   return new Promise(function (resolve, reject) {
-    var url = data.settings.domain + '/setup/completeRecovery/' + data.user.id + '.json';
+    var url = data.settings.domain + '/setup/completeRecovery/' + data.user.id + '.json' + '?api-version=v1';
 
     // Build request data.
     var requestData = {

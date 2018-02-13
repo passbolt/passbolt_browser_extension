@@ -419,7 +419,7 @@ Keyring.prototype.sync = function () {
 
     // Get the latest keys changes from the backend.
     var settings = new Settings();
-    var url = settings.getDomain() + '/gpgkeys.json';
+    var url = settings.getDomain() + '/gpgkeys.json' + '?api-version=v1';
     var _response = {};
 
     // If a sync has already been performed.

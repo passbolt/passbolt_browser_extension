@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.6.9] - 2018-02-13
+### Fixed
+- GITHUB-38: Fix to allow password to be remembered for 5 minutes when Enter is pressed
+- GITHUB-39: Fix Firefox plugin claiming to be Chrome on wrong domain template
+
 ## [1.6.8] - 2017-12-28
 ### Fixed
 - PASSBOLT-2558: Security fix content scripts should not be injected on non trusted domain

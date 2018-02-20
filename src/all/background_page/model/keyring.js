@@ -424,7 +424,7 @@ Keyring.prototype.sync = function () {
 
     // If a sync has already been performed.
     if (latestSync !== null) {
-      url += '?modified_after=' + latestSync;
+      url += '&modified_after=' + latestSync;
     }
 
     // Get the updated public keys from passbolt.

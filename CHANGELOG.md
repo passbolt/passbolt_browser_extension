@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- PASSBOLT-2007: Add remember me for more than 5 minutes
 
 ## [1.6.9] - 2018-02-13
 ### Fixed

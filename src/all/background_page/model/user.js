@@ -8,11 +8,18 @@ var Config = require('./config');
 var Settings = require('./settings').Settings;
 var __ = require('../sdk/l10n').get;
 
-// Will store temporarily the user master password if the user wants the
-// system to remember it.
-// Will be a json object with :
-// - password: value of master password
-// - created: timestamp when it was storeds
+/**
+ * Master password used temporarily by all User instances
+ * We do not want this data in settings since it is not a regular kind
+ * of persisting data
+ *
+ * _masterpassword be a json object with :
+ * - password: value of master password
+ * - created: timestamp when it was stored
+ * - timeout: interval function
+ * @type {null}
+ * @private
+ */
 var _masterPassword = null;
 
 /**
@@ -399,13 +406,12 @@ User.prototype.isLoggedIn = function () {
  *
  * @param masterPassword {string} The master password to store.
  */
-User.prototype.storeMasterPasswordTemporarily = function (masterPassword) {
+User.prototype.storeMasterPasswordTemporarily = function (masterPassword, seconds) {
   _masterPassword = {
     "password": masterPassword,
     "created": Math.round(new Date().getTime() / 1000.0)
   };
-  var timeout = 5 * 60; // 5 minutes.
-  this._loopDeleteMasterPasswordOnTimeout(timeout);
+  this._loopDeleteMasterPasswordOnTimeout(seconds);
 };
 
 /**
@@ -416,16 +422,28 @@ User.prototype.storeMasterPasswordTemporarily = function (masterPassword) {
  * @private
  */
 User.prototype._loopDeleteMasterPasswordOnTimeout = function (timeout) {
+  var interval = 1000 * 60; // check every minutes
   var self = this;
-  var currentTimestamp = Math.round(new Date().getTime() / 1000.0);
-  if (currentTimestamp >= _masterPassword.created + timeout) {
-    _masterPassword = null;
-  }
-  else {
-    setTimeout(function () {
-      self._loopDeleteMasterPasswordOnTimeout(timeout);
-    }, 1000);
-  }
+
+  this.isLoggedIn()
+    .then(function() {
+      var currentTimestamp = Math.round(new Date().getTime() / 1000.0);
+      if (timeout === -1) {
+        _masterPassword.timout = setTimeout(function () {
+          self._loopDeleteMasterPasswordOnTimeout(timeout);
+        }, interval);
+      } else if (currentTimestamp >= _masterPassword.created + timeout) {
+        // The user is logged-in and timeout expired
+        _masterPassword = null;
+      } else {
+        _masterPassword.timout = setTimeout(function () {
+          self._loopDeleteMasterPasswordOnTimeout(timeout);
+        }, interval);
+      }
+    }, function() {
+      // The user is not logged-in, reset
+      _masterPassword = null;
+    });
 };
 
 /**
@@ -434,6 +452,8 @@ User.prototype._loopDeleteMasterPasswordOnTimeout = function (timeout) {
  * @returns {Promise}
  */
 User.prototype.getStoredMasterPassword = function () {
+  var self = this;
+  console.log(self._id);
   return new Promise (function(resolve, reject) {
     if (_masterPassword !== null) {
       resolve(_masterPassword.password);

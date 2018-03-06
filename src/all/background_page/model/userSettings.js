@@ -1,5 +1,5 @@
 /**
- * Settings model.
+ * UserSettings model.
  *
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
@@ -11,14 +11,14 @@ var Config = require('./config');
 /**
  * The class that deals with users settings
  */
-var Settings = function () {
+var UserSettings = function () {
 };
 
 /**
  * Sanity check on user settings.
- * @return {bool}
+ * @return {boolean}
  */
-Settings.prototype.isValid = function () {
+UserSettings.prototype.isValid = function () {
   try {
     this.getSecurityToken();
     this.getDomain();
@@ -36,7 +36,7 @@ Settings.prototype.isValid = function () {
  * @private
  * @throw Error if the field is not valid
  */
-Settings.prototype.__validate = function (field, value) {
+UserSettings.prototype.__validate = function (field, value) {
   switch (field) {
     case 'securityToken':
       this.__validateSecurityToken(value);
@@ -46,7 +46,6 @@ Settings.prototype.__validate = function (field, value) {
       break;
     default :
       throw new Error(__('No validation defined for field: ' + field));
-      break;
   }
 };
 
@@ -57,7 +56,7 @@ Settings.prototype.__validate = function (field, value) {
  * @throw Error on validation failure
  * @private
  */
-Settings.prototype.__validateSecurityToken = function (token) {
+UserSettings.prototype.__validateSecurityToken = function (token) {
   if ((typeof token === 'undefined')) {
     throw Error(__('A token cannot be empty'));
   }
@@ -99,7 +98,7 @@ Settings.prototype.__validateSecurityToken = function (token) {
  * @throw Error on validation failure
  * @private
  */
-Settings.prototype.__validateDomain = function (domain) {
+UserSettings.prototype.__validateDomain = function (domain) {
   if ((typeof domain === 'undefined' || domain === '')) {
     throw new Error(__('A domain cannot be empty'));
   }
@@ -117,8 +116,8 @@ Settings.prototype.__validateDomain = function (domain) {
  * @returns {bool}
  * @throw Error if the secret is not valid
  */
-Settings.prototype.validate = function (settings, fields) {
-  if (fields == undefined) {
+UserSettings.prototype.validate = function (settings, fields) {
+  if (typeof fields === 'undefined') {
     fields = ['securityToken', 'domain'];
   }
 
@@ -150,7 +149,7 @@ Settings.prototype.validate = function (settings, fields) {
  * @returns {string}
  * @throw Error if security token is not set
  */
-Settings.prototype.getSecurityToken = function () {
+UserSettings.prototype.getSecurityToken = function () {
   var token = {};
   token.code = Config.read('user.settings.securityToken.code');
   token.color = Config.read('user.settings.securityToken.color');
@@ -170,7 +169,7 @@ Settings.prototype.getSecurityToken = function () {
  * @return {bool}
  * @throw Error if security token is not valid
  */
-Settings.prototype.setSecurityToken = function (token) {
+UserSettings.prototype.setSecurityToken = function (token) {
   this.__validateSecurityToken(token);
   Config.write('user.settings.securityToken.code', token.code);
   Config.write('user.settings.securityToken.color', token.color);
@@ -183,7 +182,7 @@ Settings.prototype.setSecurityToken = function (token) {
  * @param domain {string} The domain
  * @throw Error if domain is not a valid
  */
-Settings.prototype.setDomain = function (domain) {
+UserSettings.prototype.setDomain = function (domain) {
   this.__validateDomain(domain);
   return Config.write('user.settings.trustedDomain', domain);
 };
@@ -193,7 +192,7 @@ Settings.prototype.setDomain = function (domain) {
  * @returns {string}
  * @throw Error if the trusted domain is not set
  */
-Settings.prototype.getDomain = function () {
+UserSettings.prototype.getDomain = function () {
   var domain = Config.read('user.settings.trustedDomain');
 
   if (typeof domain === 'undefined') {
@@ -213,24 +212,24 @@ Settings.prototype.getDomain = function () {
  * Get the settings.
  * @param fields {array} (optional) An array of settings fields, if not provided
  *  return all the settings
- * @returns {array}
+ * @returns {object}
  */
-Settings.prototype.get = function (fields) {
+UserSettings.prototype.get = function (fields) {
   var settings = {};
 
   var settingsDefaultFields = [
-    "domain",
-    "securityToken"
+    'domain',
+    'securityToken'
   ];
 
-  if (typeof fields == 'undefined') {
+  if (typeof fields === 'undefined') {
     fields = settingsDefaultFields;
   }
 
-  if (fields.indexOf("domain") != -1) {
+  if (fields.indexOf('domain') !== -1) {
     settings.domain = this.getDomain();
   }
-  if (fields.indexOf("securityToken") != -1) {
+  if (fields.indexOf('securityToken') !== -1) {
     settings.securityToken = this.getSecurityToken();
   }
 
@@ -243,9 +242,9 @@ Settings.prototype.get = function (fields) {
  * @returns {boolean}
  * @throw Error if settings is empty or doesn't validate
  */
-Settings.prototype.set = function (settings) {
+UserSettings.prototype.set = function (settings) {
   if (typeof settings === 'undefined') {
-    throw new Error(__('Settings cannot be empty'));
+    throw new Error(__('UserSettings cannot be empty'));
   }
   this.setSecurityToken(settings.securityToken);
   this.setDomain(settings.domain);
@@ -255,8 +254,8 @@ Settings.prototype.set = function (settings) {
 /**
  * Flush the user settings
  */
-Settings.prototype.flush = function () {
+UserSettings.prototype.flush = function () {
   Config.flush();
 };
 
-exports.Settings = Settings;
+exports.UserSettings = UserSettings;

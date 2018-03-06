@@ -22,7 +22,7 @@ var init = function () {
 
   // Retrieve the config defined by the admin in the config.json.
   for (var name in storedConfig) {
-    write(name, storedConfig[name], false);
+    _config[name] = storedConfig[name];
   }
 };
 exports.init = init;
@@ -53,19 +53,15 @@ exports.readAll = readAll;
  *
  * @param name {string} Variable name to store
  * @param value {mixed} Variable value
- * @param store {boolean} (optional) Should the configuration variables be
- *  stored in the local storage. By default true.
  * @returns {boolean}
  */
-var write = function (name, value, store) {
+var write = function (name, value) {
   // do not allow to override the debug mode
   if (name === 'debug') {
     return false;
   }
   _config[name] = value;
-  if (typeof store === 'undefined' || store) {
-    storage.setItem('config', _config);
-  }
+  storage.setItem('config', _config);
   return true;
 };
 exports.write = write;

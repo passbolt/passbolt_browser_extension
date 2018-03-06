@@ -10,6 +10,7 @@ var __ = require('../sdk/l10n').get;
 var Keyring = require('../model/keyring').Keyring;
 var Key = require('../model/key').Key;
 var Config = require('../model/config');
+var User = require('../model/user').User;
 var keyring = new Keyring();
 var key = new Key();
 
@@ -99,7 +100,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.keyring.server.get', function (requestId) {
 
-    var user = new (require('../model/user').User)(),
+    var user = User.getInstance(),
       Crypto = require('../model/crypto').Crypto,
       serverkeyid = Crypto.uuid(user.settings.getDomain()),
       serverkey = keyring.findPublic(serverkeyid);
@@ -190,7 +191,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.keyring.server.import', function (requestId, publicKeyArmored) {
     try {
-      var user = new (require('../model/user').User)();
+      var user = User.getInstance();
       keyring.importServerPublicKey(publicKeyArmored, user.settings.getDomain());
       worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {

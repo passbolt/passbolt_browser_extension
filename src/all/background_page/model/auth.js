@@ -5,7 +5,6 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var __ = require('../sdk/l10n').get;
-var Config = require('./config');
 var User = require('./user').User;
 var Keyring = require('./keyring').Keyring;
 var Crypto = require('./crypto').Crypto;
@@ -32,7 +31,7 @@ var Auth = function () {
  */
 Auth.prototype.verify = function(serverUrl, serverKey, userFingerprint) {
   var _this = this,
-      user = new User();
+      user = User.getInstance();
 
   return new Promise (function(resolve, reject) {
     // if the server key is not provided get it from the settings
@@ -94,7 +93,7 @@ Auth.prototype.verify = function(serverUrl, serverKey, userFingerprint) {
  * @returns {Promise}
  */
 Auth.prototype.getServerKey = function (domain) {
-  var user = new User(),
+  var user = User.getInstance(),
     _this = this;
   return new Promise (function(resolve, reject) {
 
@@ -161,7 +160,7 @@ Auth.prototype.login = function(passphrase) {
  */
 Auth.prototype.__stage1 = function (passphrase) {
   var _this = this,
-    user = new User(),
+    user = User.getInstance(),
     keyring = new Keyring();
 
   return new Promise (function(resolve, reject) {
@@ -205,7 +204,7 @@ Auth.prototype.__stage1 = function (passphrase) {
  */
 Auth.prototype.__stage2 = function (userAuthToken) {
   var _this = this,
-    user = new User(),
+    user = User.getInstance(),
     keyring = new Keyring();
 
   return new Promise (function(resolve, reject) {

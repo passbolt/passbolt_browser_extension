@@ -25,7 +25,7 @@ var Resource = function () {
  * @returns {*}
  */
 Resource.simulateShare = function (resourceId, permissions) {
-  var user = new User(),
+  var user = User.getInstance(),
     domain = user.settings.getDomain(),
     body = {Permissions: permissions};
 

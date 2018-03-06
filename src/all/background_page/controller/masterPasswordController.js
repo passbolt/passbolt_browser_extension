@@ -23,7 +23,7 @@ var TabStorage = require('../model/tabStorage').TabStorage;
  */
 var get = function (worker) {
   var p = new Promise(function(resolve, reject) {
-    var user = new User();
+    var user = User.getInstance();
 
     // Try to retrieve a remembered passphrase.
     user.getStoredMasterPassword().then(
@@ -32,7 +32,7 @@ var get = function (worker) {
         resolve(masterPassword);
       },
       // If no passphrase is remembered, prompt the user.
-      function () {
+      function (error) {
         _promptUser(worker, {
           resolve: resolve,
           reject: reject

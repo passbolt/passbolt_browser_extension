@@ -11,7 +11,7 @@
 var app = require('../app');
 var pageMod = require('../sdk/page-mod');
 var Worker = require('../model/worker');
-var user = new (require('../model/user').User)();
+var User = require('../model/user').User;
 var TabStorage = require('../model/tabStorage').TabStorage;
 
 var PassboltApp = function () {
@@ -40,6 +40,7 @@ PassboltApp.initPageMod = function () {
   // ✗ https://demoxpassbolt.com
   // ✗ https://demo.passbolt.com.attacker.com
   // ✗ https://demo.passbolt.com/auth/login
+  var user = User.getInstance();
   var escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
   var url = '^' + escapedDomain + '/?(#.*)?$';
   var regex = new RegExp(url);
@@ -87,7 +88,9 @@ PassboltApp.initPageMod = function () {
       app.events.secret.listen(worker);
       app.events.group.listen(worker);
       app.events.masterPasswordIframe.listen(worker);
+      app.events.siteSettings.listen(worker);
       app.events.app.listen(worker);
+      app.events.user.listen(worker);
 
       Worker.add('App', worker);
     }
@@ -99,6 +102,7 @@ PassboltApp.init = function () {
     // According to the user status :
     // * the pagemod should be initialized if the user is valid and logged in;
     // * the pagemod should be destroyed otherwise;
+    var user = User.getInstance();
     if (user.isValid()) {
       user.isLoggedIn().then(
         // If it is already logged-in.

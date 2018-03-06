@@ -9,7 +9,7 @@
  */
 
 var Config = require('./config');
-var Settings = require('./settings').Settings;
+var UserSettings = require('./userSettings').UserSettings;
 var Group = require('./group').Group;
 var TabStorage = require('../model/tabStorage').TabStorage;
 var __ = require('../sdk/l10n').get;
@@ -20,7 +20,7 @@ var jsonQ = require('../sdk/jsonQ').jsonQ;
  */
 var GroupForm = function (tabId) {
     // see model/settings
-    this.settings = new Settings();
+    this.settings = new UserSettings();
 
     // Store tabId.
     this.tabId = tabId;
@@ -44,7 +44,7 @@ var GroupForm = function (tabId) {
  * @param group
  */
 GroupForm.prototype.init = function(state, group) {
-    if (group == undefined) {
+    if (typeof group === 'undefined') {
         group = {
             Group: {
                 id: '',
@@ -75,10 +75,10 @@ GroupForm.prototype.init = function(state, group) {
  */
 GroupForm.prototype.get = function(key) {
     var groupForm = TabStorage.get(this.tabId, 'groupForm');
-    if (key != undefined) {
+    if (typeof key !== 'undefined') {
         key = key.split(".");
         var val = jsonQ.pathValue(groupForm, key);
-        if (val == undefined) {
+        if (typeof val === 'undefined') {
             return '';
         }
         return val;

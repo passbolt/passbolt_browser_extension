@@ -7,7 +7,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var app = require('../app');
-var user = new (require('../model/user').User)();
+var User = require('../model/user').User;
 var pageMod = require('../sdk/page-mod');
 var Worker = require('../model/worker');
 
@@ -27,6 +27,7 @@ PassboltAuth.init = function () {
   // ✓ https://demo.passbolt.com/auth/login#checkthis
   // ✗ https://demoxpassbolt.com/auth/login
   // ✗ https://demo.passbolt.com/auth/login/nope
+  var user = User.getInstance();
   var escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
   var url = '^' + escapedDomain + '/auth/login/?(#.*)?$';
   var regex = new RegExp(url);

@@ -8,7 +8,7 @@
  */
 var app = require('../app');
 var User = require('../model/user').User;
-var user = new User();
+var user = User.getInstance();
 var __ = require('../sdk/l10n').get;
 
 var listen = function (worker) {
@@ -261,5 +261,15 @@ var listen = function (worker) {
     }
   });
 
+  /*
+   * User logout is requested
+   *
+   * @listens passbolt.user.logout
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.user.logout', function (requestId) {
+    user.logout();
+    worker.port.emit(requestId, 'SUCCESS');
+  });
 };
 exports.listen = listen;

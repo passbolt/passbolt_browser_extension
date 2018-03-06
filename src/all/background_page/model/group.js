@@ -6,7 +6,7 @@
  */
 
 var Config = require('./config');
-var Settings = require('./settings').Settings;
+var UserSettings = require('./userSettings').UserSettings;
 var __ = require('../sdk/l10n').get;
 
 /**
@@ -14,7 +14,7 @@ var __ = require('../sdk/l10n').get;
  */
 var Group = function () {
     // see model/settings
-    this.settings = new Settings();
+    this.settings = new UserSettings();
 
     /**
      * Definition of group object.

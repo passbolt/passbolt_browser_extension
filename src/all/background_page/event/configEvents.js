@@ -44,7 +44,7 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.addon.isConfigured', function (requestId) {
-    var user = new User();
+    var user = User.getInstance();
     worker.port.emit(requestId, 'SUCCESS', user.isValid());
   });
 

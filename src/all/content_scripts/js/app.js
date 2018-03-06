@@ -274,6 +274,14 @@ $(function () {
       });
   });
 
+  // Listen to logout link click
+  $('.navigation.primary .logout').on('click', function(event) {
+    passbolt.request('passbolt.user.logout')
+      .then(function () {
+      }, function error() {
+        console.error('Unexpected issue during logout.');
+      });
+  });
   $('html').addClass('passboltplugin-ready');
 
 });

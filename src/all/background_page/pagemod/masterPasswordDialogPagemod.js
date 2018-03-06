@@ -42,6 +42,7 @@ MasterPasswordDialog.init = function () {
       app.events.masterPassword.listen(worker);
       app.events.passboltPage.listen(worker);
       app.events.user.listen(worker);
+      app.events.siteSettings.listen(worker);
     }
   });
 };

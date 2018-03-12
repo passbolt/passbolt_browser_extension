@@ -17,8 +17,11 @@ $(function () {
    */
   var init = function () {
     // Load the page template.
-    loadTemplate()
-    // Init the security token.
+    passbolt.request('passbolt.site.settings.plugins.rememberMe')
+      .then(function(options) {
+        return loadTemplate(options);
+      })
+      // Init the security token.
       .then(initSecurityToken)
       // Steal the focus.
       .then(stealFocus)
@@ -28,7 +31,8 @@ $(function () {
       .then(function () {
         passbolt.message.emit('passbolt.passbolt-page.remove-class', '#passbolt-iframe-master-password', 'loading');
         passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-master-password', 'ready');
-      }, function () {
+      })
+      .catch(function () {
         console.error('Something went wrong when initializing masterPassword.js');
       });
   };
@@ -37,8 +41,12 @@ $(function () {
    * Load the page template and initialize the variables relative to it.
    * @returns {Promise}
    */
-  var loadTemplate = function () {
-    return passbolt.html.loadTemplate('body', 'master/masterPassword.ejs')
+  var loadTemplate = function (options) {
+    var tpl = 'master/masterPassword.ejs';
+    if (options === null) {
+      tpl = 'master/masterPasswordSimple.ejs';
+    }
+    return passbolt.html.loadTemplate('body', tpl, 'html', {'options': options})
       .then(function () {
         $masterPasswordField = $('#js_master_password');
         $submitButton = $('#master-password-submit');
@@ -98,9 +106,12 @@ $(function () {
   /**
    * Request the addon to remember the master password
    */
-  var rememberMasterPassword = function (masterPassword, time) {
-    time = time ? time : 300;
-    passbolt.request('passbolt.user.rememberMasterPassword', masterPassword, time);
+  var rememberMasterPassword = function (masterPassword, duration) {
+    duration = duration ? duration : 300;
+    if (isNaN(duration)) {
+      duration = 300;
+    }
+    passbolt.request('passbolt.user.rememberMasterPassword', masterPassword, duration);
   };
 
   /**
@@ -230,10 +241,10 @@ $(function () {
    */
   var submitButtonClicked = function () {
     var masterPassword = $masterPasswordField.val();
-
     // The user wants their master password to be remembered.
     if ($('#js_remember_master_password').is(':checked')) {
-      rememberMasterPassword(masterPassword);
+      var duration = parseInt($('#js_remember_master_password_duration').val());
+      rememberMasterPassword(masterPassword, duration);
     }
 
     submitMasterPassword(masterPassword);
@@ -252,8 +263,7 @@ $(function () {
 
     // The user presses enter.
     if (keycode == 13) {
-      var masterPassword = $masterPasswordField.val();
-      submitMasterPassword(masterPassword);
+      submitButtonClicked();
     }
     // The user presses escape.
     else if (keycode == 27) {

@@ -130,13 +130,13 @@ Resource.import = function(resource) {
  * @returns {*}
  */
 Resource.simulateShare = function (resourceId, permissions) {
-  var user = new User(),
+  var user = User.getInstance(),
     domain = user.settings.getDomain(),
     body = {Permissions: permissions};
 
   return new Promise(function(resolve, reject) {
     fetch(
-      domain + '/share/simulate/resource/' + resourceId + '.json', {
+      domain + '/share/simulate/resource/' + resourceId + '.json' + '?api-version=v1', {
         method: 'POST',
         credentials: 'include',
         body: JSON.stringify(body),

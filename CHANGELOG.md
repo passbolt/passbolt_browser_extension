@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- PASSBOLT-2007: Add remember me for more than 5 minutes
+
+## [1.6.9] - 2018-02-13
+### Fixed
+- GITHUB-38: Fix to allow password to be remembered for 5 minutes when Enter is pressed
+- GITHUB-39: Fix Firefox plugin claiming to be Chrome on wrong domain template
+- PASSBOLT-2677: Add version number to all API calls
+- PASSBOLT-2677: Fix recover link is wrong when optional redirect parameter is set in url
+- PASSBOLT-2677: Bump dependencies to higher versions
 
 ## [1.6.8] - 2017-12-28
 ### Fixed

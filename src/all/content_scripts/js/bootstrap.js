@@ -102,7 +102,7 @@ $(function () {
     $('html').addClass('domain-unknown');
     var $renderSpace = $('.login.page .js_main-login-section'),
       publicRegistration = $('.login.page.public-registration').length > 0 ? true : false,
-      passboltDomain = window.location.href.replace(/(.*)(\/auth\/login(\/)?)$/, '$1'),
+      passboltDomain = window.location.href.replace(/(.*)(\/auth\/login)(.*)$/, '$1'),
       browserName = passbolt.html.getBrowserName();
 
     passbolt.html.loadTemplate($renderSpace, 'login/wrongDomain.ejs', 'html', {
@@ -120,8 +120,8 @@ $(function () {
   Bootstrap.prototype.loginPageConfigurationMissing = function () {
     var $renderSpace = $('.login.page .js_main-login-section'),
       publicRegistration = $('.login.page.public-registration').length > 0 ? true : false,
-      passboltDomain = window.location.href.replace(/(.*)(\/auth\/login(\/)?)$/, '$1'),
-	  browserName = passbolt.html.getBrowserName();
+      passboltDomain = window.location.href.replace(/(.*)(\/auth\/login)(.*)$/, '$1'),
+	    browserName = passbolt.html.getBrowserName();
 
     return passbolt.html.loadTemplate($renderSpace, 'login/noconfig.ejs', 'html', {
       publicRegistration: publicRegistration,

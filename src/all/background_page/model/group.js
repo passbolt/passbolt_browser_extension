@@ -6,7 +6,7 @@
  */
 
 var Config = require('./config');
-var Settings = require('./settings').Settings;
+var UserSettings = require('./userSettings').UserSettings;
 var __ = require('../sdk/l10n').get;
 
 /**
@@ -14,7 +14,7 @@ var __ = require('../sdk/l10n').get;
  */
 var Group = function () {
     // see model/settings
-    this.settings = new Settings();
+    this.settings = new UserSettings();
 
     /**
      * Definition of group object.
@@ -42,7 +42,7 @@ Group.prototype.findById = function(groupId) {
 
   return new Promise(function(resolve, reject) {
     fetch(
-      _this.settings.getDomain() + '/groups/' + groupId + '.json', {
+      _this.settings.getDomain() + '/groups/' + groupId + '.json' + '?api-version=v1', {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -84,7 +84,7 @@ Group.prototype.findById = function(groupId) {
  */
 Group.prototype.save = function(group, groupId, dryrun) {
   var _response = null,
-    url =  this.settings.getDomain() + '/groups.json',
+    url =  this.settings.getDomain() + '/groups.json' + '?api-version=v1',
     method = 'POST',
     groupParamStr = JSON.stringify(group),
     isDryRun = dryrun != undefined && dryrun == true;
@@ -95,7 +95,7 @@ Group.prototype.save = function(group, groupId, dryrun) {
       + '/groups/'
       + groupId
       + (isDryRun ? '/dry-run' : '')
-      + '.json';
+      + '.json' + '?api-version=v1';
     method = 'PUT';
   }
 

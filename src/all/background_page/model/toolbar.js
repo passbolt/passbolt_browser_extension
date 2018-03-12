@@ -25,7 +25,7 @@ var Toolbar = function () {};
  */
 Toolbar.getToolbarUrl = function (tab) {
   var url = '',
-    user = new User(),
+    user = User.getInstance(),
     setup = new Setup();
 
   // The plugin is installed and configured

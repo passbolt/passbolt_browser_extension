@@ -60,7 +60,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.group.edit.search-users', function (keywords) {
     var //sharedPassword = TabStorage.get(worker.tab.id, 'sharedPassword'),
-      user = new User(),
+      user = User.getInstance(),
       autocompleteWorker = Worker.get('GroupEditAutocomplete', worker.tab.id),
     // The users that have already been added to the share list should be
     // excluded from the search.

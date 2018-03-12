@@ -6,7 +6,7 @@
  */
 
 var Config = require('./config');
-var Settings = require('./settings').Settings;
+var UserSettings = require('./userSettings').UserSettings;
 var __ = require('../sdk/l10n').get;
 
 /**
@@ -14,7 +14,7 @@ var __ = require('../sdk/l10n').get;
  */
 var Permission = function () {
 	// see model/settings
-	this.settings = new Settings();
+	this.settings = new UserSettings();
 };
 
 /**
@@ -35,7 +35,8 @@ Permission.prototype.searchUsers = function(model, instanceId, keywords, exclude
     // Check if there is a trusted domain.
     try {
       url = _this.settings.getDomain() + '/share/search-users/' + model + '/' + instanceId + '.json';
-      url += '?keywords=' + keywords;
+      url += '?api-version=v1';
+      url += '&keywords=' + keywords;
     } catch (e) {
       reject(__('The application domain is not set'));
       return;

@@ -43,7 +43,7 @@ var listen = function (worker) {
       function () {
         worker.port.emit(requestId, 'ERROR', masterPasswordRequest.attempts);
         if (masterPasswordRequest.attempts === 3) {
-          masterPasswordRequest.deferred.reject();
+          masterPasswordRequest.deferred.reject(new Error('Too many attempts.'));
         }
       });
   });
@@ -63,7 +63,7 @@ var listen = function (worker) {
     // After reaching 3 attempts the requests is destroyed by the
     // passbolt.master-password.submit message handler.
     if (masterPasswordRequest) {
-      masterPasswordRequest.deferred.reject();
+      masterPasswordRequest.deferred.reject(new Error('The dialog was closed.'));
     }
 
     appWorker.port.emit('passbolt.master-password.close-dialog');

@@ -14,6 +14,7 @@ var main = function() {
   // Config and user models
   var Config = require('./model/config');
   var User = require('./model/user').User;
+  var SiteSettings = require('./model/siteSettings').SiteSettings;
   var Log = require('./model/log').Log;
 
   /* ==================================================================================
@@ -50,7 +51,7 @@ var main = function() {
   pageMods.Bootstrap.init();
 
   // // If the user is valid we enable the login pagemod
-  var user = new User();
+  var user = User.getInstance();
   if (user.isValid()) {
     // Auth pagemod init can also be triggered
     // by debug, setup and user events (e.g. when config change)
@@ -90,10 +91,11 @@ var main = function() {
     pageMods.Debug.init();
     pageMods.DebugPage.init();
   }
+
 };
 
 // Init storage and get going.
 storage.init()
-  .then(() => {
+  .then(function () {
     main();
   });

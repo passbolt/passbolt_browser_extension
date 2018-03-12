@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var __ = require('../sdk/l10n').get;
-var Settings = require('./settings').Settings;
+var UserSettings = require('./userSettings').UserSettings;
 var Key = require('./key').Key;
 var keyring = new openpgp.Keyring();
 
@@ -418,13 +418,13 @@ Keyring.prototype.sync = function () {
     var latestSync = storage.getItem('latestSync');
 
     // Get the latest keys changes from the backend.
-    var settings = new Settings();
-    var url = settings.getDomain() + '/gpgkeys.json';
+    var userSettings = new UserSettings();
+    var url = userSettings.getDomain() + '/gpgkeys.json' + '?api-version=v1';
     var _response = {};
 
     // If a sync has already been performed.
     if (latestSync !== null) {
-      url += '?modified_after=' + latestSync;
+      url += '&modified_after=' + latestSync;
     }
 
     // Get the updated public keys from passbolt.

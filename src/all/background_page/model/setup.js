@@ -163,7 +163,7 @@ Setup.prototype.flush = function () {
  */
 Setup.prototype.reset = function () {
   // Delete user settings
-  var user = new User();
+  var user = User.getInstance();
   user.settings.flush();
 
   // Flush the keyring.
@@ -188,7 +188,7 @@ Setup.prototype.save = function(data) {
     _response = {};
 
   return new Promise(function(resolve, reject) {
-    var url = data.settings.domain + '/users/validateAccount/' + data.user.id + '.json';
+    var url = data.settings.domain + '/users/validateAccount/' + data.user.id + '.json' + '?api-version=v1';
     var keyring = new Keyring();
 
     // Build request data.
@@ -257,7 +257,7 @@ Setup.prototype.completeRecovery = function (data) {
     _response = {};
 
   return new Promise(function (resolve, reject) {
-    var url = data.settings.domain + '/setup/completeRecovery/' + data.user.id + '.json';
+    var url = data.settings.domain + '/setup/completeRecovery/' + data.user.id + '.json' + '?api-version=v1';
 
     // Build request data.
     var requestData = {
@@ -325,7 +325,7 @@ Setup.prototype.saveSettings = function (setupData) {
 
   return new Promise(function(resolve, reject) {
     // Save the user settings, e.g. security token & domain
-    var user = new User();
+    var user = User.getInstance();
     try {
       user.settings.setSecurityToken(setupData.settings.securityToken);
       // Save baseUrl.

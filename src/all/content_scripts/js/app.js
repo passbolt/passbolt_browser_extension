@@ -288,6 +288,15 @@ $(function () {
       });
   });
 
+  // Listen to logout link click
+  $('.navigation.primary .logout').on('click', function(event) {
+    passbolt.request('passbolt.user.logout')
+      .then(function () {
+      }, function error() {
+        console.error('Unexpected issue during logout.');
+      });
+  });
+
   // Listen when the user requests an export of passwords.
   window.addEventListener('passbolt.export-passwords', function (evt) {
     var resources = evt.detail.resources;

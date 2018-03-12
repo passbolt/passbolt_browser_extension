@@ -78,11 +78,12 @@ Resource.prototype.toCsvEntry = function(resource, mapping) {
 }
 
 /**
- * Save a resourc on server.
+ * Import a resource on the server.
+ * Import is different than save here because we will use a different passbolt pro entry point.
  * @param resource
  */
 
-Resource.save = function(resource) {
+Resource.import = function(resource) {
   var user = new User(),
     domain = user.settings.getDomain(),
     body = resource;
@@ -94,7 +95,7 @@ Resource.save = function(resource) {
 
   return new Promise(function(resolve, reject) {
     fetch(
-      domain + '/resources.json?api-version=2', {
+      domain + '/import/resources.json?api-version=2', {
         method: 'POST',
         credentials: 'include',
         body: JSON.stringify(body),

@@ -106,7 +106,7 @@ ImportPasswordsController.prototype.saveResources = function(resources) {
   var i = 0,
     counter = 1;
   for (i in resources) {
-      var p = Resource.save(resources[i]);
+      var p = Resource.import(resources[i]);
       savePromises.push(p);
       p.then(function() {
         progressDialogController.update(appWorker, self.progressStatus++, 'Importing... ' + (counter++) + '/' + self.resources.length);

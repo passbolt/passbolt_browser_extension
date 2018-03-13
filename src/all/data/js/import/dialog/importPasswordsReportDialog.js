@@ -15,6 +15,8 @@ var ImportPasswordsReportDialog = function(results) {
   this.responses = results.responses;
   this.successList = [];
   this.errorsList = [];
+  this.importTag = results.importTag;
+  this.tagsIntegration = results.tagsIntegration;
 
   // elements.
   this.$html = null;

@@ -13,6 +13,7 @@
  */
 var ImportPasswordsDialog = function(settings) {
   this.selectedFile = null;
+  this.tagsIntegration = false;
 
   this.$html = null;
   this.$file = null;
@@ -24,6 +25,10 @@ var ImportPasswordsDialog = function(settings) {
 
   if (settings != undefined && settings.onSubmit != undefined) {
     this.onSubmit = settings.onSubmit;
+  }
+
+  if (settings != undefined && settings.tagsIntegration != undefined) {
+    this.tagsIntegration = settings.tagsIntegration;
   }
 };
 
@@ -67,6 +72,7 @@ ImportPasswordsDialog.prototype._initElements = function() {
   this.$submit = $(':submit', this.$html);
   this.$closeButton = $('.dialog-close', this.$html);
   this.$cancelButton = $('.cancel', this.$html);
+  this.$categoriesAsTagsCheckbox = $('#js_field_category_as_tags');
 
   this._initFileChooser();
 
@@ -88,7 +94,13 @@ ImportPasswordsDialog.prototype._initEvents = function() {
 
   this.$submit.on('click', function(evt) {
     evt.stopImmediatePropagation();
-    self.onSubmit(self.selectedFile);
+    var options = {
+      categoriesAsTags : false
+    };
+    if (self.tagsIntegration === true && self.$categoriesAsTagsCheckbox.prop('checked')) {
+      options.categoriesAsTags = true;
+    }
+    self.onSubmit(self.selectedFile, options);
     return false;
   });
 

@@ -21,21 +21,43 @@ $(function () {
   var fileExtension = null;
 
   /**
+   * Import options
+   * @type {{categoriesAsTags: boolean}}
+   */
+  var importOptions = {
+    tagsIntegration : false,
+    categoriesAsTags : false
+  };
+
+  /**
    * Initialize the import passwords dialog.
    */
   var init = function () {
-    importPasswordsDialog = new ImportPasswordsDialog({
-      "onSubmit":onSubmit
-    });
-    importPasswordsDialog.show();
+    passbolt.request('passbolt.site.settings')
+    .then(
+      function(siteSettings) {
+        if(siteSettings !== null && siteSettings.passbolt !== undefined &&
+          siteSettings.passbolt.plugins !== undefined && siteSettings.passbolt.plugins.tags !== undefined) {
+          importOptions.tagsIntegration = true;
+        }
+
+        importPasswordsDialog = new ImportPasswordsDialog({
+          "onSubmit":onSubmit,
+          "tagsIntegration": importOptions.tagsIntegration
+        });
+        importPasswordsDialog.show();
+      });
   };
 
   /**
    * onSubmit handler.
    * @param selectedFile
+   * @param options
    */
-  var onSubmit = function(selectedFile) {
+  var onSubmit = function(selectedFile, options) {
     fileExtension = ImportPasswordsDialog.getFileExtension(selectedFile.name);
+
+    importOptions = $.extend(importOptions, options);
 
     getFileAsBase64String(selectedFile)
     .then(function(fileBase64) {
@@ -69,15 +91,13 @@ $(function () {
    * Import a file.
    * Request the add-on code to import a file.
    *
-   * @param string fileBase64 the file converted into a base64 string
-   * @param object credentials the credentials to decrypt the file, if necessary.
+   * @param fileBase64 the file converted into a base64 string
+   * @param credentials the credentials to decrypt the file, if necessary.
    */
   var importFile = function(fileBase64, credentials) {
     return new Promise(function(resolve, reject) {
-      var options = {
-        "credentials":credentials
-      };
-      passbolt.request('passbolt.import-passwords.import-file', fileBase64, fileExtension, options)
+      var o = $.extend(importOptions, {credentials: credentials});
+      passbolt.request('passbolt.import-passwords.import-file', fileBase64, fileExtension, o)
       .then(
         function(result) {
           resolve(result);
@@ -165,6 +185,7 @@ $(function () {
    * @param result
    */
   var displayReport = function(result) {
+    result.tagsIntegration = importOptions.tagsIntegration;
     var importPasswordsReportDialog = new ImportPasswordsReportDialog(result);
     importPasswordsReportDialog.show();
   };

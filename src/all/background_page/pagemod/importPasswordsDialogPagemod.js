@@ -35,6 +35,7 @@ ImportPasswordsDialog.init = function () {
       app.events.importPasswords.listen(worker);
       app.events.passboltPage.listen(worker);
       app.events.user.listen(worker);
+      app.events.siteSettings.listen(worker);
     }
   });
 };

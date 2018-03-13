@@ -13,6 +13,7 @@ var Resource = require('../model/resource').Resource;
 var Crypto = require('../model/crypto').Crypto;
 var progressDialogController = require('../controller/progressDialogController');
 var User = require('../model/user').User;
+var Tag = require('../model/tag').Tag;
 
 /**
  * Controller for Import passwords.
@@ -24,6 +25,7 @@ var ImportPasswordsController = function(tabid) {
   this.progressObjective = 0;
   this.progressStatus = 0;
   this.resources = [];
+  this.fileType = null;
 };
 
 /**
@@ -71,8 +73,8 @@ ImportPasswordsController.prototype.initFromCsv = function(b64FileContent, optio
 ImportPasswordsController.prototype.encryptSecrets = function(resources) {
   var keyring = new Keyring(),
     appWorker = Worker.get('App', this.tabid),
-    user = new User(),
-    self=this;
+    user = User.getInstance(),
+    self= this;
 
   this.resources = resources;
   this.progressObjective = this.resources.length * 2;
@@ -94,13 +96,60 @@ ImportPasswordsController.prototype.encryptSecrets = function(resources) {
 };
 
 /**
+ * Get unique import tag.
+ * It's the tag that will be associated to the resources imported.
+ * looks like import-filetype-yyyymmddhhiiss
+ * @param fileType
+ * @return {string}
+ */
+ImportPasswordsController._getUniqueImportTag = function(fileType) {
+  // Today's date in format yyyymmddhhiiss
+  const today = new Date();
+  var importDate = today.getFullYear().toString() +
+    ("0" + (today.getMonth() + 1)).slice(-2).toString() +
+    (("0" + today.getDate()).slice(-2)).toString() +
+    today.getHours().toString() +
+    today.getMinutes().toString() +
+    today.getSeconds().toString();
+
+  var importTag = 'import-' + fileType + '-' + importDate;
+  return importTag;
+};
+
+/**
+ * Save associated tags after a resource is saved.
+ * @param resource
+ * @param tags
+ * @param categoriesAsTags
+ * @private
+ */
+ImportPasswordsController.prototype._saveAssociatedTags = function(resource, tags, categoriesAsTags) {
+  var tag = new Tag();
+
+  if (categoriesAsTags === true) {
+    tags = tags.concat(resource.tags);
+  }
+  tag.add(resource.id, tags).then(
+    function(res) {
+      // Do nothing.
+    },
+    function(e) {
+      console.error('Could not save tag for resource ' + resource.id);
+    }
+  );
+};
+
+/**
  * Save a list of resources on the server.
- * @param resources
+ * @param resources list of resources to save.
+ * @param options
+ *  * bool categoriesAsTags
  * @return Promise
  */
-ImportPasswordsController.prototype.saveResources = function(resources) {
+ImportPasswordsController.prototype.saveResources = function(resources, options) {
   var appWorker = Worker.get('App', this.tabid),
     savePromises = [],
+    tagsIntegration = options.tagsIntegration !== undefined && options.tagsIntegration === true,
     self = this;
 
   var i = 0,
@@ -108,7 +157,15 @@ ImportPasswordsController.prototype.saveResources = function(resources) {
   for (i in resources) {
       var p = Resource.import(resources[i]);
       savePromises.push(p);
-      p.then(function() {
+      p.then(function(resource) {
+        if (tagsIntegration === true) {
+          var tags = new Array();
+          if (options.importTag !== undefined) {
+            tags.push(options.importTag);
+          }
+          resource.tags = resources[i].tags;
+          self._saveAssociatedTags(resource, tags, options.categoriesAsTags);
+        }
         progressDialogController.update(appWorker, self.progressStatus++, 'Importing... ' + (counter++) + '/' + self.resources.length);
       });
   }

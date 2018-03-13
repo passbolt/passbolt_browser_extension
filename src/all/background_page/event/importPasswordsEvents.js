@@ -24,7 +24,8 @@ var listen = function (worker) {
       return importController.encryptSecrets(resources);
     })
     .then(function (resources) {
-      return importController.saveResources(resources);
+      options.importTag = ImportController._getUniqueImportTag(fileType);
+      return importController.saveResources(resources, options);
     })
     .then(function(responses) {
       // Inform the app-js that the import is complete.
@@ -34,7 +35,8 @@ var listen = function (worker) {
       // Send results report to content code, in order to display report.
       const result = {
         "resources": importController.resources,
-        "responses": responses
+        "responses": responses,
+        "importTag": options.importTag
       };
       worker.port.emit(requestId, 'SUCCESS', result);
     })

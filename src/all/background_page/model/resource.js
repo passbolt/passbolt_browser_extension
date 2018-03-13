@@ -84,7 +84,7 @@ Resource.prototype.toCsvEntry = function(resource, mapping) {
  */
 
 Resource.import = function(resource) {
-  var user = new User(),
+  var user = User.getInstance(),
     domain = user.settings.getDomain(),
     body = resource;
 

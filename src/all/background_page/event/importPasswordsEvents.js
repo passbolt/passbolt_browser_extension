@@ -28,16 +28,17 @@ var listen = function (worker) {
       return importController.saveResources(resources, options);
     })
     .then(function(responses) {
-      // Inform the app-js that the import is complete.
-      var appWorker = Worker.get('App', worker.tab.id);
-      appWorker.port.emit('passbolt.import-passwords.complete');
-
       // Send results report to content code, in order to display report.
       const result = {
         "resources": importController.resources,
         "responses": responses,
         "importTag": options.importTag
       };
+
+      // Inform the app-js that the import is complete.
+      var appWorker = Worker.get('App', worker.tab.id);
+      appWorker.port.emit('passbolt.import-passwords.complete', result);
+
       worker.port.emit(requestId, 'SUCCESS', result);
     })
     .catch(function(e) {

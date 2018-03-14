@@ -231,8 +231,8 @@ $(function () {
    * ================================================================================== */
 
   // The import is complete, we want to filter the workspace based on the tag used.
-  passbolt.message.on('passbolt.import-passwords.complete', function () {
-    passbolt.message.emitToPage('passbolt.plugin.workspace.filter', {'tag': 'tagName'});
+  passbolt.message.on('passbolt.import-passwords.complete', function (results) {
+    passbolt.message.emitToPage('passbolt.plugin.import-passwords-complete', {'tag': results.importTag});
   });
 
   // The export is complete, we want to display a notification

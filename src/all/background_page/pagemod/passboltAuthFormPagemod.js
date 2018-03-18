@@ -32,6 +32,7 @@ PassboltAuthForm.init = function () {
       app.events.user.listen(worker);
       app.events.keyring.listen(worker);
       app.events.auth.listen(worker);
+      app.events.siteSettings.listen(worker);
     }
   });
 };

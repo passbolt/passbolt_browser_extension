@@ -41,10 +41,10 @@ SiteSettings.prototype.getRememberMeOptions = function() {
   return new Promise( function(resolve, reject) {
     self.get().then(function (data) {
       if (data === undefined || data.passbolt === undefined || data.passbolt.plugins === undefined
-        || data.passbolt.plugins.remember_me === undefined || data.passbolt.plugins.remember_me.options === undefined) {
+        || data.passbolt.plugins.rememberMe === undefined || data.passbolt.plugins.rememberMe.options === undefined) {
         resolve(null);
       } else {
-        resolve(data.passbolt.plugins.remember_me.options);
+        resolve(data.passbolt.plugins.rememberMe.options);
       }
     })
   });

@@ -8,6 +8,7 @@
  */
 var Auth = require('../model/auth').Auth;
 var auth = new Auth();
+var User = require('../model/user').User;
 
 var __ = require('../sdk/l10n').get;
 var Worker = require('../model/worker');
@@ -57,8 +58,12 @@ var listen = function (worker) {
    * @listens passbolt.auth.login
    * @param requestId {uuid} The request identifier
    * @param masterpassword {string} The master password to use for the authentication attempt.
+   * @param remember {string} whether to remember the master password
+   *   (bool) false|undefined if should not remember
+   *   (integer) -1 if should remember for the session
+   *   (integer) duration in seconds to specify a specific duration
    */
-  worker.port.on('passbolt.auth.login', function (requestId, masterpassword) {
+  worker.port.on('passbolt.auth.login', function (requestId, masterpassword, remember) {
     var tabId = worker.tab.id,
       _referrer = null;
 
@@ -67,6 +72,11 @@ var listen = function (worker) {
     auth.login(masterpassword).then(
       function success(referrer) {
         _referrer = referrer;
+
+        if (remember !== undefined && remember !== false) {
+          var user = User.getInstance();
+          user.storeMasterPasswordTemporarily(masterpassword, remember);
+        }
 
         // Init the app pagemod
         var app = require('../app');

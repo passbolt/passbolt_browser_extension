@@ -10,15 +10,17 @@ $(function () {
   var $loginSubmit = null,
     $username = null,
     $masterPassword = null,
-    $loginMessage = null;
+    $loginMessage = null,
+    rememberMePlugin = false,
+    $rememberMe = null;
 
   /**
    * Initialize the master password dialog.
    */
   var init = function () {
-    // Load the page template.
-    loadTemplate()
-    // Init the security token.
+      // Load the page template.
+      loadTemplate()
+      // Init the security token.
       .then(initSecurityToken)
       // Steal the focus
       .then(getUser)
@@ -34,16 +36,32 @@ $(function () {
   };
 
   /**
+   * Check rememberMe option in site settings.
+   * @returns {Promise}
+   */
+  var addRememberMeOption = function() {
+    passbolt.request('passbolt.site.settings').then(function(settings) {
+        if(settings!== undefined && settings.passbolt !== undefined
+          && settings.passbolt.plugins !== undefined && settings.passbolt.plugins.rememberMe !== undefined) {
+          $rememberMe.parent().removeClass('hidden');
+          passbolt.message.emit('passbolt.auth.add-class', '#passbolt-iframe-login-form', 'with-remember-me-option');
+        }
+      });
+  };
+
+  /**
    * Load the page template and initialize the variables relative to it.
    * @returns {Promise}
    */
   var loadTemplate = function () {
-    return passbolt.html.loadTemplate('body', 'login/form.ejs')
+    return passbolt.html.loadTemplate('body', 'login/form.ejs', 'html', {rememberMeOption: rememberMePlugin})
       .then(function success() {
         $loginSubmit = $('#loginSubmit');
         $username = $('#UserUsername');
         $masterPassword = $('#js_master_password');
         $loginMessage = $('#loginMessage');
+        $rememberMe = $('#rememberMe');
+        addRememberMeOption();
       });
   };
 
@@ -89,8 +107,8 @@ $(function () {
   /**
    * Login the user
    */
-  var login = function (masterPassword) {
-    passbolt.request('passbolt.auth.login', masterPassword);
+  var login = function (masterPassword, remember) {
+    passbolt.request('passbolt.auth.login', masterPassword, remember);
   };
 
   /**
@@ -110,7 +128,11 @@ $(function () {
     passbolt.request('passbolt.keyring.private.checkpassphrase', masterPassword).then(
       // If the passphrase is valid, login the user.
       function success() {
-        login(masterPassword);
+        var remember = false;
+        if ($rememberMe !== null && $rememberMe.prop('checked')) {
+          remember = -1;
+        }
+        login(masterPassword, remember);
       },
       // If the passphrase is invalid, display an error feedback.
       function fail(msg) {

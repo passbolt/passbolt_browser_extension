@@ -42,7 +42,8 @@ $(function () {
   var addRememberMeOption = function() {
     passbolt.request('passbolt.site.settings').then(function(settings) {
         if(settings!== undefined && settings.passbolt !== undefined
-          && settings.passbolt.plugins !== undefined && settings.passbolt.plugins.rememberMe !== undefined) {
+          && settings.passbolt.plugins !== undefined && settings.passbolt.plugins.rememberMe !== undefined
+          && settings.passbolt.plugins.rememberMe.options !== undefined && settings.passbolt.plugins.rememberMe.options['-1'] !== undefined) {
           $rememberMe.parent().removeClass('hidden');
           passbolt.message.emit('passbolt.auth.add-class', '#passbolt-iframe-login-form', 'with-remember-me-option');
         }

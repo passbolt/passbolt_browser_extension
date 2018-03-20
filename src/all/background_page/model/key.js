@@ -68,8 +68,8 @@ Key.prototype.__validate = function (field, value) {
       if (typeof value === 'undefined' || value === '') {
         throw new Error(__('The owner name cannot be empty'));
       }
-      if (!Validator.isAlphanumericSpecial(value)) {
-        throw new Error(__('The full name should contain only alphabetical characters and spaces'));
+      if (!Validator.isUtf8(value)) {
+        throw new Error(__('The full name should contain only UTF8 characters'));
       }
       break;
     case 'ownerEmail' :

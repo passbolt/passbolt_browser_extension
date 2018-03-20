@@ -48,16 +48,22 @@ User.prototype.__validate = function (field, value) {
       if (typeof value === 'undefined' || value === '') {
         throw new Error(__('The first name cannot be empty'));
       }
-      if (!Validator.isAlphanumericSpecial(value)) {
-        throw new Error(__('The first name should only contain alphabetical and numeric characters'))
+      if (!Validator.isUtf8(value)) {
+        throw new Error(__('The first name should be a valid UTF8 string'))
+      }
+      if (!Validator.isLength(value, 0, 255)) {
+        throw new Error(__('The first name length should be maximum 255 characters.'))
       }
       break;
     case 'lastname' :
       if (typeof value === 'undefined' || value === '') {
         throw new Error(__('The last name cannot be empty'));
       }
-      if (!Validator.isAlphanumericSpecial(value)) {
-        throw new Error(__('The last name should only contain alphabetical and numeric characters'))
+      if (!Validator.isUtf8(value)) {
+        throw new Error(__('The last name should be a valid UTF8 string'))
+      }
+      if (!Validator.isLength(value, 0, 255)) {
+        throw new Error(__('The last name length should be maximum 255 characters.'))
       }
       break;
     case 'username' :
@@ -66,6 +72,9 @@ User.prototype.__validate = function (field, value) {
       }
       if (!Validator.isEmail(value)) {
         throw new Error(__('The username should be a valid email address'))
+      }
+      if (!Validator.isLength(value, 0, 255)) {
+        throw new Error(__('The username length should be maximum 255 characters.'))
       }
       break;
     case 'id' :

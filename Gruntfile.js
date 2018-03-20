@@ -55,19 +55,19 @@ module.exports = function(grunt) {
   grunt.registerTask('templates', ['ejs_compile', 'browserify:templates']);
   grunt.registerTask('pre-dist', ['copy:vendors', 'copy:styleguide']);
 
-  grunt.registerTask('bundle', ['copy:background_page', 'copy:content_scripts', 'browserify:vendors', 'browserify:app', 'ejs_compile', 'browserify:templates', 'copy:data']);
-  grunt.registerTask('bundle-firefox', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle']);
-  grunt.registerTask('bundle-chrome', ['pre-dist', 'copy:config_debug', 'copy:manifest_chrome', 'bundle']);
+  grunt.registerTask('bundle', ['copy:background_page', 'copy:content_scripts', 'browserify:app', 'ejs_compile', 'browserify:templates', 'copy:data']);
+  grunt.registerTask('bundle-firefox', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'browserify:vendors']);
+  grunt.registerTask('bundle-chrome', ['pre-dist', 'copy:config_debug', 'copy:manifest_chrome', 'bundle', 'browserify:vendors_chrome']);
 
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
 
   grunt.registerTask('build-firefox', ['clean:build', 'build-firefox-debug', 'build-firefox-prod']);
-  grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle', 'shell:build_firefox_debug']);
-  grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default','copy:manifest_firefox', 'bundle', 'clean:debug_data', 'shell:build_firefox_prod']);
+  grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_firefox', 'bundle-firefox', 'shell:build_firefox_debug']);
+  grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default','copy:manifest_firefox', 'bundle-firefox', 'clean:debug_data', 'shell:build_firefox_prod']);
 
   grunt.registerTask('build-chrome', ['clean:build', 'build-chrome-debug', 'build-chrome-prod']);
-  grunt.registerTask('build-chrome-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_chrome', 'bundle', 'shell:build_chrome_debug']);
-  grunt.registerTask('build-chrome-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_chrome', 'bundle', 'clean:debug_data', 'shell:build_chrome_prod']);
+  grunt.registerTask('build-chrome-debug', ['pre-dist', 'copy:config_debug', 'copy:manifest_chrome', 'bundle-chrome', 'shell:build_chrome_debug']);
+  grunt.registerTask('build-chrome-prod', ['pre-dist', 'copy:config_default', 'copy:manifest_chrome', 'bundle-chrome', 'clean:debug_data', 'shell:build_chrome_prod']);
 
   /**
    * Main grunt tasks configuration
@@ -81,9 +81,13 @@ module.exports = function(grunt) {
      * See also. src/background_page/vendor/require_polyfill.js
      */
     browserify: {
+      vendors_chrome: {
+        src: [path.src_chrome + '/background_page/vendors.js'],
+        dest: path.build + 'vendors.min.js'
+      },
       vendors: {
         src: [path.src_addon + 'vendors.js'],
-        dest: path.build + 'vendors.min.js',
+        dest: path.build + 'vendors.min.js'
       },
       templates: {
         cwd: path.src_templates,
@@ -103,10 +107,10 @@ module.exports = function(grunt) {
      */
     clean: {
       build: [
-        path.build + '**',
+        path.build + '**'
       ],
       debug_data: [
-        path.build_data + 'js/debug/**',
+        path.build_data + 'js/debug/**'
       ]
     },
 
@@ -145,30 +149,25 @@ module.exports = function(grunt) {
       // switch manifest file to firefox or chrome
       manifest_firefox: {
         files: [{
-          expand: true, cwd: path.src_firefox , src: 'manifest.json', dest: path.build,
+          expand: true, cwd: path.src_firefox , src: 'manifest.json', dest: path.build
         }]
       },
       manifest_chrome: {
         files: [{
-          expand: true, cwd: path.src_chrome, src: 'manifest.json', dest: path.build,
+          expand: true, cwd: path.src_chrome, src: 'manifest.json', dest: path.build
         }]
       },
       // copy node_modules where needed in addon or content code vendors folder
       vendors: {
         files: [
           // openpgpjs
-          {expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js','openpgp.worker.js'], dest: path.src_addon_vendors},
           {expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js','openpgp.worker.js'], dest: path.build_vendors},
           // jquery
-                    {expand: true, cwd: path.node_modules + 'jquery/dist', src: 'jquery.js', dest: path.src_content_vendors},
+          {expand: true, cwd: path.node_modules + 'jquery/dist', src: 'jquery.js', dest: path.src_content_vendors},
           // jssha
-          {expand: true, cwd: path.node_modules + 'jssha/src', src: 'sha.js', dest: path.src_addon_vendors},
           {expand: true, cwd: path.node_modules + 'jssha/src', src: 'sha.js', dest: path.src_content_vendors},
-          // underscore
-          {expand: true, cwd: path.node_modules + 'underscore', src: 'underscore-min.js', dest: path.src_addon_vendors},
           // xregexp
-          {expand: true, cwd: path.node_modules + 'xregexp', src: 'xregexp-all.js', dest: path.src_addon_vendors},
-          {expand: true, cwd: path.node_modules + 'xregexp', src: 'xregexp-all.js', dest: path.src_content_vendors},
+          {expand: true, cwd: path.node_modules + 'xregexp', src: 'xregexp-all.js', dest: path.src_content_vendors}
 
            // TODO PASSBOLT-2219 Fix / Add missing Vendors
           // In src_content_vendors
@@ -181,7 +180,7 @@ module.exports = function(grunt) {
           // Not in scope
           // phpjs a custom compilation of standard functions from http://locutus.io
 
-        ],
+        ]
       },
       // Copy styleguide elements
       styleguide: {

@@ -65,8 +65,8 @@ UserSettings.prototype.__validateSecurityToken = function (token) {
     throw Error(__('A token code cannot be empty'));
   }
 
-  if (!Validator.isAlphanumericSpecial(token.code)) {
-    throw new Error(__('The token code should only contain alphabetical and numeric characters'))
+  if (!Validator.isAscii(token.code)) {
+    throw new Error(__('The token code should only contain ASCII characters'))
   }
 
   if (!Validator.isLength(token.code, 3, 3)) {

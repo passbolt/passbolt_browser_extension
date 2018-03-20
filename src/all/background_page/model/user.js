@@ -85,16 +85,22 @@ var User = (function () {
         if (typeof value === 'undefined' || value === '') {
           throw new Error(__('The first name cannot be empty'));
         }
-        if (!Validator.isAlphanumericSpecial(value)) {
-          throw new Error(__('The first name should only contain alphabetical and numeric characters'))
+        if (!Validator.isUtf8(value)) {
+          throw new Error(__('The first name should be a valid UTF8 string'))
+        }
+        if (!Validator.isLength(value, 0, 255)) {
+          throw new Error(__('The first name length should be maximum 255 characters.'))
         }
         break;
       case 'lastname' :
         if (typeof value === 'undefined' || value === '') {
           throw new Error(__('The last name cannot be empty'));
         }
-        if (!Validator.isAlphanumericSpecial(value)) {
-          throw new Error(__('The last name should only contain alphabetical and numeric characters'))
+        if (!Validator.isUtf8(value)) {
+          throw new Error(__('The last name should be a valid UTF8 string'))
+        }
+        if (!Validator.isLength(value, 0, 255)) {
+          throw new Error(__('The last name length should be maximum 255 characters.'))
         }
         break;
       case 'username' :
@@ -103,6 +109,9 @@ var User = (function () {
         }
         if (!Validator.isEmail(value)) {
           throw new Error(__('The username should be a valid email address'))
+        }
+        if (!Validator.isLength(value, 0, 255)) {
+          throw new Error(__('The username length should be maximum 255 characters.'))
         }
         break;
       case 'id' :
@@ -119,9 +128,7 @@ var User = (function () {
     }
     return true;
   };
-  
-  
-  
+
   /**
    * Set a firstname and last name for the plugin user
    *
@@ -138,7 +145,7 @@ var User = (function () {
     return (Config.write('user.firstname', firstname)
     && Config.write('user.lastname', lastname));
   };
-  
+
   /**
    * Set a username for the plugin user
    *
@@ -151,7 +158,7 @@ var User = (function () {
     this._user.username = username;
     return (Config.write('user.username', username));
   };
-  
+
   /**
    * Set the user id
    *
@@ -164,7 +171,7 @@ var User = (function () {
     this._user.id = id;
     return (Config.write('user.id', id));
   };
-  
+
   /**
    * Set the user
    *
@@ -179,14 +186,14 @@ var User = (function () {
     this.setId(user.id);
     this.setUsername(user.username);
     this.setName(user.firstname, user.lastname);
-  
+
     if (typeof user.settings !== 'undefined') {
       this.settings.set(user.settings);
     }
-  
+
     return this._user;
   };
-  
+
   /**
    * Get the user and validate values before returning them
    *
@@ -204,7 +211,7 @@ var User = (function () {
    */
   this.get = function (data) {
     try {
-  
+
       if (typeof data !== 'undefined' && typeof data.user !== 'undefined') {
         this._getLocal(data.user);
       }
@@ -212,7 +219,7 @@ var User = (function () {
         this._getLocal();
       }
       var user = this._user;
-  
+
       // Get settings according to data provided.
       if (typeof data !== 'undefined' && typeof data.user !== 'undefined' && typeof data.settings !== 'undefined') {
         user.settings = this.settings.get(data.settings);
@@ -221,9 +228,9 @@ var User = (function () {
       else if (typeof data === 'undefined') {
         user.settings = this.settings.get();
       }
-  
+
       return user;
-  
+
     } catch (e) {
       throw new Error(__('The user is not set'));
     }

@@ -2,7 +2,6 @@
  * KeepassDb model
  * Provides high level tools to work with a kdbx file and object.
  */
-var kdbxweb = require('../vendors/kdbxweb');
 var Resource = require('./resource').Resource;
 var fileController = require('../controller/fileController');
 

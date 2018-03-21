@@ -2,7 +2,6 @@
  * CsvDb model.
  * Provides high level tools to work with a password csv file.
  */
-var PapaParse = require('../vendors/papaparse');
 var Resource = require('./resource').Resource;
 
 /**

@@ -140,22 +140,13 @@ ExportPasswordsController.prototype.convertResourcesToFile = function() {
 ExportPasswordsController.prototype.downloadFile = function(fileContent) {
   var date = new Date().toISOString().slice(0, 10),
     filename = 'passbolt-export-' + date + '.' + this.format,
+    blobFile = new Blob([fileContent], {type: "text/plain"}),
     self = this;
 
   return new Promise(function(resolve, reject) {
     try {
-      if (self.format == "kdbx") {
-        var blob = new Blob([fileContent]);
-        fileController.blobToDataURL(blob)
-        .then(function(dataUrl) {
-          fileController.saveFile(filename, dataUrl, self.tabid);
-          resolve();
-        });
-      }
-      else if (self.format == "csv") {
-        fileController.saveFile(filename + date + '.csv', fileContent, self.tabid);
-        resolve();
-      }
+      fileController.saveFile(filename, blobFile, self.tabid);
+      resolve();
     } catch(e) {
       reject(e);
     }

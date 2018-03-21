@@ -9,16 +9,31 @@ var Worker = require('../model/worker');
 /**
  * Save file on disk using download
  *
- * @param filename
- * @param content
- * @param tabid
+ * @param {String} filename
+ * @param {Blob|String} content
+ * @param {int} tabid
  * @return {Promise}
  */
 function saveFile(filename, content, tabid) {
+  var content = new Blob([content], {type: "text/plain"});
+
   return new Promise(function(resolve, reject) {
-    var fileWorker = Worker.get('FileIframe', tabid);
-    fileWorker.port.emit('passbolt.file-iframe.download', filename, content);
-    resolve();
+    if (chrome.downloads) {
+      var url = window.URL.createObjectURL(content);
+      chrome.downloads.download(
+        {url: url, filename: filename, saveAs: true},
+        function() {
+          window.URL.revokeObjectURL(url);
+          resolve();
+        });
+    } else {
+      blobToDataURL(content)
+      .then(function(dataUrl) {
+        var fileWorker = Worker.get('FileIframe', tabid);
+        fileWorker.port.emit('passbolt.file-iframe.download', filename, dataUrl);
+        resolve();
+      });
+    }
   });
 }
 exports.saveFile = saveFile;

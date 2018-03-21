@@ -21,7 +21,7 @@ window.Validator = require('validator/validator');
 window.Validator.isUtf8 = require('./utils/validatorRules').isUtf8;
 window.Validator.isUtf8Extended = require('./utils/validatorRules').isUtf8Extended;
 window._ = require('underscore/underscore-min');
-window.kdxweb = require('kdbxweb/dist/kdbxweb');
+window.kdbxweb = require('kdbxweb/dist/kdbxweb');
 window.PapaParse = require('papaparse/papaparse');
 
 

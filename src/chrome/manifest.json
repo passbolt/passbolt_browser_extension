@@ -36,6 +36,7 @@
     "storage",
     "background",
     "clipboardWrite",
+    "downloads",
     "*://*/*"
   ],
   "web_accessible_resources": [

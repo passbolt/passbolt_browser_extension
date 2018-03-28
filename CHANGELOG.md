@@ -3,7 +3,15 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-- PASSBOLT-2007: Add remember me for more than 5 minutes
+
+## [1.6.10] - 2018-03-28
+### Fixed
+- PASSBOLT-2774: Fix download in chrome 65
+- PASSBOLT-2777: Manage third party libraries with npm
+- PASSBOLT-2709: [Pro] As LU I can use the remember me feature on the login form
+- PASSBOLT-2707: [Pro] As LU I can choose the duration passbolt remember my passphrase in a set of options
+- PASSBOLT-2648: [Pro] As LU I can import passwords from kdbx or csv
+- PASSBOLT-2655: [Pro] As LU I can export my passwords in kdbx or csv
 
 ## [1.6.9] - 2018-02-13
 ### Fixed
@@ -16,10 +24,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.6.8] - 2017-12-28
 ### Fixed
 - PASSBOLT-2558: Security fix content scripts should not be injected on non trusted domain
-- PASSBOLT-2558: Wordsmith verify feature help text 	
+- PASSBOLT-2558: Wordsmith verify feature help text
 - PASSBOLT-2199: Drop jpm from list of dependencies
 - PASSBOLT-2199: Fix key import key info screen control flow
-- PASSBOLT-2199: Fix register link	
+- PASSBOLT-2199: Fix register link
 - PASSBOLT-2199: Add alternative Gpgkey key property armored_key prior to API v2 rollout
 - PASSBOLT-2474: Add new github contribution guidelines and issue templates
 
@@ -209,7 +217,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.6...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.10...HEAD
+[1.6.10]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.9...v1.6.10
+[1.6.9]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.6...v1.6.9
 [1.6.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.5...v1.6.6
 [1.6.5]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.4...v1.6.5
 [1.6.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v1.6.3...v1.6.4

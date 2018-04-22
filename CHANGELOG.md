@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- PASSBOLT-2847: Fix import csv file can't create related tags
+- PASSBOLT-2847: Improve visual feedback during import
 
 ## [1.6.10] - 2018-03-28
 ### Fixed

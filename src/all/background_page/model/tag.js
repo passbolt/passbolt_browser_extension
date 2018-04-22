@@ -44,7 +44,12 @@ Tag.prototype.add = function(resourceId, tags) {
       function success(response) {
         response.json()
         .then(function (json) {
-          resolve(json.body);
+          if (json.header !== undefined && json.header.status !== undefined && json.header.status === 'error') {
+            reject(new Error(__('The tag could not be created')));
+          }
+          else {
+            resolve(json.body);
+          }
         });
       },
       function error() {

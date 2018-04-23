@@ -117,69 +117,27 @@ ImportPasswordsController._getUniqueImportTag = function(fileType) {
 };
 
 /**
- * Save associated resource tags after a all resources are saved.
- * @param resources list of resources with their corresponding tags.
- * @param options
+ * Save associated tags after a resource is saved.
+ * @param resource
+ * @param tags
+ * @param categoriesAsTags
  * @private
  */
-ImportPasswordsController.prototype.saveResourcesTags = function(resources, options) {
-  var counter = 1,
-    tagsIntegration = options.tagsIntegration !== undefined && options.tagsIntegration === true,
-    saveTagsPromises = [],
-    appWorker = Worker.get('App', this.tabid),
-    self = this;
+ImportPasswordsController.prototype._saveAssociatedTags = function(resource, tags, categoriesAsTags) {
+  var tag = new Tag();
 
-  return new Promise(function(resolve, reject) {
-    // Handle tags creation if the tag plugin is activated.
-    if (tagsIntegration === true) {
-      // Add n goals to progress bar (n being the number of resources since we will execute that much queries).
-      self.progressObjective += resources.length;
-      progressDialogController.updateGoals(appWorker, self.progressObjective);
-
-
-      for (var i in resources) {
-        var r = resources[i];
-
-        // Resource could not be created, it is still in the list but contains
-        // the error message instead of the resource.
-        // We don't process it and instead show a progress.
-        if (r.id) {
-          // Define list of tags to be saved.
-          var tags = [];
-          // If user selected categories as tags, we add the corresponding tags to the list.
-          if (options.categoriesAsTags === true && r.tags) {
-            tags = tags.concat(r.tags);
-          }
-          // If there is an import tag defined, we also add it.
-          if (options.importTag !== undefined) {
-            tags.push(options.importTag);
-          }
-
-          // Save tags for the current resource.
-          var tag = new Tag();
-          var saveTagsPromise = tag.add(r.id, tags);
-          saveTagsPromises.push(saveTagsPromise);
-          saveTagsPromise.then(
-            function(tag) {
-              progressDialogController.update(appWorker, self.progressStatus++, 'Associating tags... ' + (counter++) + '/' + resources.length);
-            },
-            function(error) {
-              console.error(error);
-            });
-        }
-        else {
-          progressDialogController.update(appWorker, self.progressStatus++, 'Associating tags... ' + (counter++) + '/' + resources.length);
-        }
-      }
-
-      Promise.all(saveTagsPromises).then(function(tagsSaved) {
-        resolve(tagsSaved);
-      });
-    } else {
-      resolve([]);
+  if (categoriesAsTags === true) {
+    tags = tags.concat(resource.tags);
+  }
+  tag.add(resource.id, tags).then(
+    function(res) {
+      // Do nothing.
+    },
+    function(e) {
+      console.error('Could not save tag for resource ' + resource.id);
     }
-  });
-}
+  );
+};
 
 /**
  * Save a list of resources on the server.
@@ -190,35 +148,33 @@ ImportPasswordsController.prototype.saveResourcesTags = function(resources, opti
  */
 ImportPasswordsController.prototype.saveResources = function(resources, options) {
   var appWorker = Worker.get('App', this.tabid),
-    saveResourcesPromises = [],
+    savePromises = [],
+    tagsIntegration = options.tagsIntegration !== undefined && options.tagsIntegration === true,
     self = this;
 
-  var counter = 1;
-  for (var i in resources) {
-    var r = resources[i],
-      saveResourcePromise = Resource.import(r);
-
-    saveResourcesPromises.push(saveResourcePromise);
-    saveResourcePromise.then(function(savedResource) {
-      progressDialogController.update(appWorker, self.progressStatus++, 'Importing... ' + (counter++) + '/' + self.resources.length);
-    });
+  var i = 0,
+    counter = 1;
+  for (i in resources) {
+      var p = Resource.import(resources[i]);
+      savePromises.push(p);
+      p.then(function(resource) {
+        if (tagsIntegration === true) {
+          var tags = new Array();
+          if (options.importTag !== undefined) {
+            tags.push(options.importTag);
+          }
+          resource.tags = resources[i].tags;
+          self._saveAssociatedTags(resource, tags, options.categoriesAsTags);
+        }
+        progressDialogController.update(appWorker, self.progressStatus++, 'Importing... ' + (counter++) + '/' + self.resources.length);
+      });
   }
 
   return new Promise(function(resolve, reject) {
-    var saveResult = [];
-
-    Promise.all(saveResourcesPromises)
-    .then(function(savedResources) {
-      saveResult = savedResources;
-      // Associate initial tags to saved resources.
-      for (var i in savedResources) {
-        savedResources[i].tags = resources[i].tags;
-      }
-      return self.saveResourcesTags(savedResources, options);
-    })
-    .then(function(savedTags) {
+    Promise.all(savePromises)
+    .then(function(values) {
       progressDialogController.close(appWorker);
-      resolve(saveResult);
+      resolve(values);
     })
     .catch(function(e) {
       reject(e);

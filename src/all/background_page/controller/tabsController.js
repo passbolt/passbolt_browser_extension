@@ -32,16 +32,18 @@ exports.getActiveTabUrl = getActiveTabUrl;
  * @param url {string} The url to go to
  */
 var setActiveTabUrl = function (url) {
-  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    var tab = tabs[0];
+  if (url) {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      var tab = tabs[0];
 
-    // In case the url given was generated using self.data.url
-    // remove the chrome-extension://<plugin id>/ part of the url
-    // since it's added again by chrome.tabs.update
-    var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/';
-    url = url.replace(replaceStr, '');
+      // In case the url given was generated using self.data.url
+      // remove the chrome-extension://<plugin id>/ part of the url
+      // since it's added again by chrome.tabs.update
+      var replaceStr = 'chrome-extension://' + chrome.runtime.id + '/';
+      url = url.replace(replaceStr, '');
 
-    chrome.tabs.update(tab.id, {url: url});
-  });
+      chrome.tabs.update(tab.id, {url: url});
+    });
+  }
 };
 exports.setActiveTabUrl = setActiveTabUrl;

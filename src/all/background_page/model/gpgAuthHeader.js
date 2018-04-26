@@ -75,13 +75,17 @@ GpgAuthHeader.prototype.__validateCommonAllStage = function () {
 
   // Check if version is supported
   if (typeof this.headers['x-gpgauth-version'] !== 'string' ||
-    this.headers['x-gpgauth-version'] != '1.3.0') {
+    this.headers['x-gpgauth-version'] !== '1.3.0') {
     return new Error(__('That version of GPGAuth is not supported. (' + this.headers['x-gpgauth-version'] + ')'));
   }
 
   // Check if there is GPGAuth error flagged by the server
-  if (this.headers['x-gpgauth-error'] != undefined) {
-    error_msg = this.headers['x-gpgauth-debug'];
+  if (typeof this.headers['x-gpgauth-error'] !== 'undefined') {
+    if (typeof this.headers['x-gpgauth-debug'] !== 'undefined') {
+      error_msg = this.headers['x-gpgauth-debug'];
+    } else {
+      error_msg = 'There was an error during authentication. Enable debug mode for more information';
+    }
     return new Error(error_msg);
   }
 

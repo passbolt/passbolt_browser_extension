@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Improve
+- PASSBOLT-
 
 ## [1.6.10] - 2018-03-28
 ### Fixed

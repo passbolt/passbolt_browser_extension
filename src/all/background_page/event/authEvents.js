@@ -28,7 +28,7 @@ var listen = function (worker) {
         worker.port.emit(requestId, 'SUCCESS', msg);
       },
       function error(error) {
-        var message = __('Could not verify server key. Server code: ') + error.message;
+        var message = __('Could not verify server key.') + ' ' + error.message;
         worker.port.emit(requestId, 'ERROR', message);
       }
     );
@@ -80,17 +80,18 @@ var listen = function (worker) {
 
         // Init the app pagemod
         var app = require('../app');
-        return app.pageMods.PassboltApp.init();
+        app.pageMods.PassboltApp.init().then(function() {
+          // Redirect the user.
+          var msg = __('You are now logged in!');
+          Worker.get('Auth', tabId).port.emit('passbolt.auth.login-success', msg, _referrer);
+          tabsController.setActiveTabUrl(_referrer);
+        });
       },
       function error(error) {
+        console.error(error.message);
         Worker.get('Auth', tabId).port.emit('passbolt.auth.login-failed', error.message);
       }
-    ).then(function() {
-      // Redirect the user.
-      var msg = __('You are now logged in!');
-      Worker.get('Auth', tabId).port.emit('passbolt.auth.login-success', msg, _referrer);
-      tabsController.setActiveTabUrl(_referrer);
-    });
+    );
   });
 
   /*

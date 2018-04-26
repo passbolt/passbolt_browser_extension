@@ -68,14 +68,25 @@ Auth.prototype.verify = function(serverUrl, serverKey, userFingerprint) {
       )
       .then(function(response) {
         // Check response status
-        var auth = new GpgAuthHeader(response.headers, 'verify');
-
-        // Check that the server was able to decrypt the token with our local copy
-        var verify = new GpgAuthToken(auth.headers['x-gpgauth-verify-response']);
-        if(verify.token !== _this._verifyToken) {
-          reject(new Error(__('The server was unable to prove it can use the advertised OpenPGP key.')));
+        if(!response.ok) {
+          response.json().then(function(json) {
+            if (typeof json.header !== 'undefined') {
+              reject(new Error(json.header.message));
+            } else {
+              var error_msg = __('Server request failed without providing additional information.') + ' (' + response.status + ')';
+              reject(new Error(error_msg))
+            }
+          });
         } else {
-          resolve(__('The server key is verified. The server can use it to sign and decrypt content.'));
+          var auth = new GpgAuthHeader(response.headers, 'verify');
+
+          // Check that the server was able to decrypt the token with our local copy
+          var verify = new GpgAuthToken(auth.headers['x-gpgauth-verify-response']);
+          if(verify.token !== _this._verifyToken) {
+            reject(new Error(__('The server was unable to prove it can use the advertised OpenPGP key.')));
+          } else {
+            resolve(__('The server key is verified. The server can use it to sign and decrypt content.'));
+          }
         }
       })
       .catch(function(error) {
@@ -140,13 +151,16 @@ Auth.prototype.login = function(passphrase) {
       })
       .then(function (userAuthToken) {
         return _this.__stage2(userAuthToken)
+      }, function(error) {
+        reject(error);
       })
       .then(function (referrer) {
         resolve(referrer);
+      }, function(error) {
+        reject(error);
       })
       .catch(function (error) {
-        var msg = __('The server was unable to respect the authentication protocol!') + ' ' + error.message;
-        reject(new Error(msg));
+        reject(error);
       });
   });
 };
@@ -175,10 +189,11 @@ Auth.prototype.__stage1 = function (passphrase) {
         body: data
       })
       .then(function (response) {
-        // Check response status
-        _this.__statusCheck(response);
+        if (!response.ok) {
+          return _this.onResponseError(response);
+        }
+        // Check headers
         var auth = new GpgAuthHeader(response.headers, 'stage1');
-
         // Try to decrypt the User Auth Token
         var crypto = new Crypto();
         var encryptedUserAuthToken = stripslashes(urldecode(auth.headers['x-gpgauth-user-auth-token']));
@@ -220,7 +235,9 @@ Auth.prototype.__stage2 = function (userAuthToken) {
       })
       .then(function (response) {
         // Check response status
-        _this.__statusCheck(response);
+        if (!response.ok) {
+          return _this.onResponseError(response);
+        }
         var auth = new GpgAuthHeader(response.headers, 'complete');
 
         // Get the redirection url
@@ -253,10 +270,29 @@ Auth.prototype.__generateVerifyToken = function() {
  */
 Auth.prototype.__statusCheck = function(response) {
   if(!response.ok) {
-    var msg = __('There was a problem when trying to communicate with the server') + ' (HTTP Code:' + response.status +')'
+    var msg = __('There was a problem when trying to communicate with the server') + ' (HTTP Code:' + response.status +')';
     throw new Error(msg);
   }
   return true;
+};
+
+/**
+ * Handle the creation of an error when response status is no ok
+ *
+ * @param response {object}
+ * @returns Promise that will throw the appropriate exception
+ */
+Auth.prototype.onResponseError = function (response) {
+  var error_msg = __('There was a server error. No additional information provided') + ' (' + response.status + ')';
+  return response.json().then(function (json) {
+    if (typeof json.header !== 'undefined') {
+      throw new Error(json.header.message);
+    } else {
+      throw new Error(error_msg);
+    }
+  }, function error() {
+    throw new Error(error_msg);
+  })
 };
 
 // Exports the Authentication model object.

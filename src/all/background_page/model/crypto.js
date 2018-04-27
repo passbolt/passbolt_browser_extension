@@ -184,7 +184,7 @@ Crypto.prototype.decrypt = function (armored, passphrase) {
         .then(function (privateKey) {
           // Openpgp will throw an exception if the message is badly formatted
           var pgpMessage = openpgp.message.readArmored(armored);
-          return openpgp.decrypt({privateKey: privateKey.key, message: pgpMessage});
+          return openpgp.decrypt({privateKeys: [privateKey.key], message: pgpMessage});
         })
         .then(
           function (decrypted) {
@@ -195,7 +195,7 @@ Crypto.prototype.decrypt = function (armored, passphrase) {
           }
         );
     } else {
-      openpgp.decrypt({privateKey: privateKey, message: pgpMessage})
+      openpgp.decrypt({privateKeys: [privateKey], message: pgpMessage})
         .then(
           function (decrypted) {
             resolve(decrypted.data);
@@ -236,7 +236,7 @@ Crypto.prototype.decryptAll = function (armoreds, passphrase, completeCallback, 
               startCallback(position);
             }
             // Decrypt the secret.
-            return openpgp.decrypt({privateKey: privateKey.key, message: pgpMessage})
+            return openpgp.decrypt({privateKeys: [privateKey.key], message: pgpMessage})
               .then(function(decrypted) {
                 if(completeCallback) {
                   completeCallback(decrypted.data, position);

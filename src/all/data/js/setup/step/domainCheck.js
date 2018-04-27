@@ -153,7 +153,7 @@ $(function () {
     return passbolt.request('passbolt.keyring.public.info', unarmoredServerKey)
       .then(function (keyInfo) {
         step._data.serverKeyInfo = keyInfo;
-        return keyInfo;
+        return step._data.serverKeyInfo;
       });
   };
 
@@ -223,6 +223,7 @@ $(function () {
    */
   step.onServerKeyInfo = function () {
     if (step.elts.$fingerprintInput.val() != '') {
+
       step.showKeyInfoDialog(step._data.serverKeyInfo);
     }
     return false;

@@ -7,27 +7,27 @@
   "repository": "https://github.com/passbolt",
   "dependencies": {
     "downloadjs": "^1.4.7",
-    "ejs": "^2.5.7",
+    "ejs": "^2.5.9",
     "jquery": "~3.3.1",
     "jssha": "~2.3.1",
-    "kdbxweb": "^1.2.2",
+    "kdbxweb": "^1.2.3",
     "locutus": "~2.0.9",
-    "openpgp": "^2.6.2",
-    "papaparse": "^4.3.6",
-    "passbolt-styleguide": "^2.0.9",
-    "underscore": "~1.8.3",
+    "openpgp": "^3.0.8",
+    "papaparse": "^4.4.0",
+    "passbolt-styleguide": "^2.0.10",
+    "underscore": "~1.9.0",
     "validator": "4.1.0",
     "xregexp": "~3.0.0"
   },
   "devDependencies": {
     "crx": "^3.2.1",
     "grunt": "^1.0.2",
-    "grunt-browserify": "^5.2.0",
+    "grunt-browserify": "^5.3.0",
     "grunt-contrib-clean": "^1.1.0",
     "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-watch": "^1.0.0",
+    "grunt-contrib-watch": "^1.0.1",
     "grunt-passbolt-ejs-compile": "0.0.2",
     "grunt-shell": "^2.1.0",
-    "web-ext": "^2.4.0"
+    "web-ext": "^2.6.0"
   }
 }

@@ -30,18 +30,15 @@ var listen = function (worker) {
    * @param publicKeyArmored {string} The public key
    */
   worker.port.on('passbolt.keyring.public.info', function (requestId, publicKeyArmored) {
-    try {
-      var info = keyring.keyInfo(publicKeyArmored);
-    } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message);
-      return;
-    }
-
-    if (typeof info !== 'undefined') {
-      worker.port.emit(requestId, 'SUCCESS', info);
-    } else {
-      worker.port.emit(requestId, 'ERROR');
-    }
+    keyring.keyInfo(publicKeyArmored).then(function (info) {
+      if (typeof info !== 'undefined') {
+        worker.port.emit(requestId, 'SUCCESS', info);
+      } else {
+        worker.port.emit(requestId, 'ERROR', __('No key information provided'));
+      }
+    }, function(error) {
+      worker.port.emit(requestId, 'ERROR', error.message);
+    });
   });
 
   /*

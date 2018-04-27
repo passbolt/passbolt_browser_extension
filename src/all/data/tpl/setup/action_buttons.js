@@ -27,7 +27,7 @@ escapeFn = escapeFn || function (markup) {
   return markup == undefined
     ? ''
     : String(markup)
-        .replace(_MATCH_HTML, encode_char);
+      .replace(_MATCH_HTML, encode_char);
 };
 var _ENCODE_HTML_RULES = {
       "&": "&amp;"

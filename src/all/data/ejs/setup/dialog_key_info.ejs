@@ -41,21 +41,13 @@
                     <tr class="created">
                         <td class="label">Created</td>
                         <td class="value">
-                            <?
-                            var dateCreated = new Date(created);
-                            dateCreated = dateCreated.toDateString() + ' ' + dateCreated.toLocaleTimeString();
-                            ?>
-                            <?= dateCreated ?>
+                            <?= created ?>
                         </td>
                     </tr>
                     <tr class="expires">
                         <td class="label">Expires</td>
                         <td class="value">
-                            <?
-                            var dateExpires = new Date(expires);
-                            dateExpires = dateExpires.toDateString() + ' ' + dateExpires.toLocaleTimeString();
-                            ?>
-                            <?= dateExpires ?>
+                            <?= expires ?>
                         </td>
                     </tr>
                     <tr class="length">

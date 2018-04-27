@@ -28,9 +28,7 @@ var main = function() {
    *  Init web worker
    * ==================================================================================
    */
-  openpgp.initWorker({
-    worker: new Worker(chrome.runtime.getURL('/vendors/openpgp.worker.js'))
-  });
+  openpgp.initWorker({ path:'/vendors/openpgp.worker.js' });
 
   /* ==================================================================================
    *  Interface changes

@@ -149,7 +149,7 @@ var parseArmoredKey = function (armoredKey, type) {
  *  if the key is not public
  *  if the user id is not valid
  */
-Keyring.prototype.importPublic = function (armoredPublicKey, userId) {
+Keyring.prototype.importPublic = async function (armoredPublicKey, userId) {
   // Check user id
   if (typeof userId === 'undefined') {
     throw new Error(__('The user id is undefined'));
@@ -177,7 +177,7 @@ Keyring.prototype.importPublic = function (armoredPublicKey, userId) {
   }
 
   // Get the keyInfo.
-  var keyInfo = this.keyInfo(armoredPublicKey);
+  var keyInfo = await this.keyInfo(armoredPublicKey);
 
   // Add the key in the keyring.
   var publicKeys = Keyring.getPublicKeys();
@@ -197,7 +197,7 @@ Keyring.prototype.importPublic = function (armoredPublicKey, userId) {
  *  if the key cannot be read by openpgp
  *  if the key is not private
  */
-Keyring.prototype.importPrivate = function (armoredKey) {
+Keyring.prototype.importPrivate = async function (armoredKey) {
   // Flush any existing private key.
   this.flush(Keyring.PRIVATE);
 
@@ -220,7 +220,7 @@ Keyring.prototype.importPrivate = function (armoredKey) {
   }
 
   // Get the keyInfo.
-  var keyInfo = this.keyInfo(armoredKey);
+  var keyInfo = await this.keyInfo(armoredKey);
 
   // Add the key in the keyring
   var privateKeys = Keyring.getPrivateKeys();
@@ -253,7 +253,7 @@ Keyring.prototype.importServerPublicKey = function (armoredKey, domain) {
  * @return {array}
  * @throw Error if the key cannot be read by openpgp
  */
-Keyring.prototype.keyInfo = function (armoredKey) {
+Keyring.prototype.keyInfo = async function(armoredKey) {
   // Attempt to read armored key.
   var openpgpRes = openpgp.key.readArmored(armoredKey);
 
@@ -291,15 +291,24 @@ Keyring.prototype.keyInfo = function (armoredKey) {
     keyid = shortid;
   }
 
+  // Format expiration time
+  var expirationTime = await key.getExpirationTime();
+  expirationTime = expirationTime.toString();
+  if (expirationTime === 'Infinity') {
+    expirationTime = __('Never');
+  }
+  var created = key.primaryKey.created.toString();
+
   var info = {
     key: armoredKey,
     keyId: keyid,
     userIds: userIdsSplited,
     fingerprint: key.primaryKey.getFingerprint(),
-    algorithm: key.primaryKey.algorithm.substring(0, 3), // @TODO : proper alghorithm parsing
-    created: key.primaryKey.created,
-    expires: key.getExpirationTime(),
-    length: key.primaryKey.getBitSize(),
+    created: created,
+    expires: expirationTime.toString(),
+    algorithm: key.primaryKey.getAlgorithmInfo().algorithm,
+    length: key.primaryKey.getAlgorithmInfo().bits,
+    curve: key.primaryKey.getAlgorithmInfo().curve,
     private: key.isPrivate()
   };
 

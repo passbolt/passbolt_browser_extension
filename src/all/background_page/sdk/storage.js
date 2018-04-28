@@ -74,39 +74,6 @@ LocalStorage.prototype.removeItem = function (key) {
   this._store();
 };
 
-// ---------------------------------------------------
-//  MIGRATION HELPERS - TO BE DEPRECATED AFTER v1.6.2
-// ---------------------------------------------------
-/**
- * Migrate a data set to the chrome.storage
- * Delete an window.localStorage if any
- * @param data provided by SDK extension for example
- */
-LocalStorage.prototype.migrate = function (data) {
-  // if data is not undefined, it is a firefox sdk migration
-  // where data are provided to the embedded webext
-  // Otheriwse try a chrome migration from window.localStorage
-  if (typeof data === 'undefined') {
-    data = window.localStorage.getItem('_passbolt_data');
-    // already migrated
-    if (data === null) {
-      return;
-    }
-    window.localStorage.removeItem('_passbolt_data');
-  }
-  this._data = JSON.parse(data);
-  this._store();
-};
-
-/**
- * Check if a migration is needed
- * @return boolean
- */
-LocalStorage.prototype.migrationNeeded = function () {
-  var data = window.localStorage.getItem('_passbolt_data');
-  return (data !== null);
-};
-
 exports.LocalStorage = LocalStorage;
 var storage = new LocalStorage();
 exports.storage = storage;

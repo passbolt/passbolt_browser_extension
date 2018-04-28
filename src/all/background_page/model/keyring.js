@@ -112,7 +112,7 @@ Keyring.prototype.flush = function (type) {
 var parseArmoredKey = function (armoredKey, type) {
   // The type of key to parse. By default the PRIVATE.
   var type = type || Keyring.PRIVATE,
-  // The parsed key. If no header found the output will be the input.
+    // The parsed key. If no header found the output will be the input.
     key = armoredKey || '';
 
   if (type == Keyring.PUBLIC) {
@@ -239,10 +239,10 @@ Keyring.prototype.importPrivate = async function (armoredKey) {
  * @returns {bool}
  * @throw Error if the key cannot be imported
  */
-Keyring.prototype.importServerPublicKey = function (armoredKey, domain) {
+Keyring.prototype.importServerPublicKey = async function (armoredKey, domain) {
   var Crypto = require('../model/crypto').Crypto;
   var serverKeyId = Crypto.uuid(domain);
-  this.importPublic(armoredKey, serverKeyId);
+  await this.importPublic(armoredKey, serverKeyId);
   return true;
 };
 
@@ -292,12 +292,16 @@ Keyring.prototype.keyInfo = async function(armoredKey) {
   }
 
   // Format expiration time
-  var expirationTime = await key.getExpirationTime();
-  expirationTime = expirationTime.toString();
-  if (expirationTime === 'Infinity') {
-    expirationTime = __('Never');
+  try {
+    var expirationTime = await key.getExpirationTime();
+    expirationTime = expirationTime.toString();
+    if (expirationTime === 'Infinity') {
+      expirationTime = __('Never');
+    }
+    var created = key.primaryKey.created.toString();
+  } catch(error) {
+    expirationTime = null;
   }
-  var created = key.primaryKey.created.toString();
 
   var info = {
     key: armoredKey,
@@ -305,7 +309,7 @@ Keyring.prototype.keyInfo = async function(armoredKey) {
     userIds: userIdsSplited,
     fingerprint: key.primaryKey.getFingerprint(),
     created: created,
-    expires: expirationTime.toString(),
+    expires: expirationTime,
     algorithm: key.primaryKey.getAlgorithmInfo().algorithm,
     length: key.primaryKey.getAlgorithmInfo().bits,
     curve: key.primaryKey.getAlgorithmInfo().curve,
@@ -417,79 +421,60 @@ Keyring.prototype.checkPassphrase = function (passphrase) {
  * Sync the local keyring with the passbolt API.
  * Retrieve the latest updated Public Keys.
  *
- * @returns {Promise}
+ * @returns {Promise<int>} number of updated keys
  */
-Keyring.prototype.sync = function () {
-  var _this = this;
+Keyring.prototype.sync = async function () {
+  let latestSync = storage.getItem('latestSync');
 
-  return new Promise( function(resolve, reject) {
-    // Attention : some latencies have been observed while operating on the opengpg keyring.
-    var latestSync = storage.getItem('latestSync');
+  // Get the latest keys changes from the backend.
+  let userSettings = new UserSettings();
+  let url = userSettings.getDomain() + '/gpgkeys.json' + '?api-version=v1';
 
-    // Get the latest keys changes from the backend.
-    var userSettings = new UserSettings();
-    var url = userSettings.getDomain() + '/gpgkeys.json' + '?api-version=v1';
-    var _response = {};
+  // If a sync has already been performed.
+  if (latestSync !== null) {
+    url += '&modified_after=' + latestSync;
+  }
 
-    // If a sync has already been performed.
-    if (latestSync !== null) {
-      url += '&modified_after=' + latestSync;
+  // Get the updated public keys from passbolt.
+  let response = await fetch(url, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+  let json = await response.json();
+
+  // Check response status
+  if (!response.ok) {
+    let msg = __('Could not synchronize the keyring. The server responded with an error.');
+    if (json.header.msg) {
+      msg += ' ' + json.header.msg;
     }
+    msg += '(' + response.status + ')';
+    throw new Error(msg);
+  }
+  // Update the latest synced time.
+  if (!json.header) {
+    throw new Error(__('Could not synchronize the keyring. The server response header is missing.'));
+  }
+  if (!json.body) {
+    throw new Error(__('Could not synchronize the keyring. The server response body is missing.'));
+  }
 
-    // Get the updated public keys from passbolt.
-    fetch(
-      url, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(function (response) {
-        _response = response;
-        return response.json();
-      })
-      .then(function (json) {
-        // Check response status
-        if (!_response.ok) {
-          var msg = __('Could not synchronize the keyring. The server responded with an error.');
-          if (json.headers.msg != undefined) {
-            msg += ' ' + json.headers.msg;
-          }
-          msg += '(' + _response.status + ')';
-          reject(new Error(msg));
-          return;
-        }
+  // Store all the new keys in the keyring.
+  let meta, armoredKey, i, imports = [];
+  for (i in json.body) {
+    meta = json.body[i];
+    armoredKey = meta.Gpgkey.key || meta.Gpgkey.armored_key;
+    imports.push(this.importPublic(armoredKey, meta.Gpgkey.user_id));
+  }
+  await Promise.all(imports);
 
-        // Import the keys in keyring
-        if (json.body != undefined) {
-          // Store all the new keys in the keyring.
-          for (var i in json.body) {
-            var meta = json.body[i];
-            var armoredKey = meta.Gpgkey.key || meta.Gpgkey.armored_key;
-            _this.importPublic(armoredKey, meta.Gpgkey.user_id);
-          }
-        } else {
-          reject(new Error(
-            __('Could not synchronize the keyring. The server response body is missing.')
-          ));
-          return;
-        }
+  storage.setItem('latestSync', json.header.servertime);
+  return (json.body.length);
 
-        // Update the latest synced time.
-        if (json.header != undefined) {
-          storage.setItem('latestSync', json.header.servertime);
-          // Resolve the defer with the number of updated keys.
-          resolve(json.body.length);
-        } else {
-          reject(new Error(__('Could not synchronize the keyring. The server response header is missing.')));
-        }
-      })
-      .catch(function (error) {
-        reject(error);
-      });
-  });
 };
 
 // Exports the Keyring object.

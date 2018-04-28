@@ -72,7 +72,6 @@ Log.write = function (log) {
   // The log could also be displayed on the console.
   if (logSettings.console) {
     var consoleLog = log.created + ' [' + log.level + '] ' + log.message;
-    console.log(consoleLog);
   }
 };
 

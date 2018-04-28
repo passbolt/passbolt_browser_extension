@@ -159,19 +159,6 @@ Setup.prototype.flush = function () {
 };
 
 /**
- * Reset the setup process.
- */
-Setup.prototype.reset = function () {
-  // Delete user settings
-  var user = User.getInstance();
-  user.settings.flush();
-
-  // Flush the keyring.
-  var keyring = new Keyring();
-  keyring.flush(Keyring.PUBLIC);
-};
-
-/**
  * Save setup data on the server.
  *
  * If server returns a positive response, then
@@ -317,92 +304,86 @@ Setup.prototype.completeRecovery = function (data) {
  * Save setup data into settings.
  *
  * @param setupData {setupData}
- * @returns {Promise}
+ * @returns {Promise<boolean>}
  */
-Setup.prototype.saveSettings = function (setupData) {
+Setup.prototype.saveSettings = async function (setupData) {
   var keyring = new Keyring(),
     userInfo = null;
 
-  return new Promise(function(resolve, reject) {
-    // Save the user settings, e.g. security token & domain
-    var user = User.getInstance();
-    try {
-      user.settings.setSecurityToken(setupData.settings.securityToken);
-      // Save baseUrl.
-      user.settings.setDomain(setupData.settings.domain);
-      // Save user.
-      userInfo = {
-        id: setupData.user.id,
-        username: setupData.user.username,
-        firstname: setupData.user.firstname,
-        lastname: setupData.user.lastname
-      };
-      user.set(userInfo);
-    }
-    catch (e) {
-      reject({
-        message: e.message,
-        data: {
-          token: setupData.settings.securityToken,
-          domain: setupData.settings.domain,
-          user: userInfo
-        }
-      });
-      return;
-    }
+  // Save the user settings, e.g. security token & domain
+  var user = User.getInstance();
+  try {
+    user.settings.setSecurityToken(setupData.settings.securityToken);
+    // Save baseUrl.
+    user.settings.setDomain(setupData.settings.domain);
+    // Save user.
+    userInfo = {
+      id: setupData.user.id,
+      username: setupData.user.username,
+      firstname: setupData.user.firstname,
+      lastname: setupData.user.lastname
+    };
+    user.set(userInfo);
+  }
+  catch (e) {
+    return Promise.reject({
+      message: e.message,
+      data: {
+        token: setupData.settings.securityToken,
+        domain: setupData.settings.domain,
+        user: userInfo
+      }
+    });
+  }
 
-    // Flush the public keyring.
-    keyring.flush(Keyring.PUBLIC);
-    // Flush the private keyring.
-    keyring.flush(Keyring.PRIVATE);
+  // Flush the public keyring.
+  keyring.flush(Keyring.PUBLIC);
+  // Flush the private keyring.
+  keyring.flush(Keyring.PRIVATE);
 
-    // Import server key into keyring.
-    try {
-      keyring.importServerPublicKey(setupData.settings.armoredServerKey, setupData.settings.domain);
-    }
-    catch (e) {
-      reject({
-        message: 'error importing the server key : ' + e.message,
-        data: {
-          serverKey: setupData.settings.armoredServerKey
-        }
-      });
-      return;
-    }
+  // Import server key into keyring.
+  try {
+    await keyring.importServerPublicKey(setupData.settings.armoredServerKey, setupData.settings.domain);
+  }
+  catch (e) {
+    return Promise.reject({
+      message: 'error importing the server key : ' + e.message,
+      data: {
+        serverKey: setupData.settings.armoredServerKey
+      }
+    });
+  }
 
-    // Import private key into keyring.
-    try {
-      keyring.importPrivate(setupData.key.privateKeyArmored);
-    }
-    catch (e) {
-      reject({
-        message: 'error importing the private key : ' + e.message,
-        data: {
-          key: setupData.key.privateKeyArmored,
-          userId: setupData.user.id
-        }
-      });
-      return;
-    }
+  // Import private key into keyring.
+  try {
+    await keyring.importPrivate(setupData.key.privateKeyArmored);
+  }
+  catch (e) {
+    return Promise.reject({
+      message: 'error importing the private key : ' + e.message,
+      data: {
+        key: setupData.key.privateKeyArmored,
+        userId: setupData.user.id
+      }
+    });
+  }
 
-    // Store the user public key in the keyring.
-    // We store the one generated locally, not the one returned by the server.
-    try {
-      keyring.importPublic(setupData.key.publicKeyArmored, setupData.user.id);
-    } catch (e) {
-      reject({
-        message: 'error importing the public key : ' + e.message,
-        data: {
-          key: setupData.key.publicKeyArmored,
-          userId: setupData.user.id
-        }
-      });
-      return;
-    }
+  // Store the user public key in the keyring.
+  // We store the one generated locally, not the one returned by the server.
+  try {
+    await keyring.importPublic(setupData.key.publicKeyArmored, setupData.user.id);
+  } catch (e) {
+    return Promise.reject({
+      message: 'error importing the public key : ' + e.message,
+      data: {
+        key: setupData.key.publicKeyArmored,
+        userId: setupData.user.id
+      }
+    });
+  }
 
-    // Everything is awesome!
-    resolve();
-  });
+  // Everything is awesome!
+  return Promise.resolve();
 };
 
 /**

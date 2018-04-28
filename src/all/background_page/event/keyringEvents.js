@@ -42,22 +42,6 @@ var listen = function (worker) {
   });
 
   /*
-   * Get a user's public key.
-   *
-   * @listens passbolt.keyring.public.get
-   * @param requestId {uuid} The request identifier
-   * @param userId {string} The user to retrieve the public key
-   */
-  worker.port.on('passbolt.keyring.public.get', function (requestId, userId) {
-    var publicKey = keyring.findPublic(userId);
-    if (typeof publicKey !== 'undefined') {
-      worker.port.emit(requestId, 'SUCCESS', publicKey);
-    } else {
-      worker.port.emit(requestId, 'ERROR');
-    }
-  });
-
-  /*
    * Get the user private key object
    *
    * @listens passbolt.keyring.private.get
@@ -75,7 +59,7 @@ var listen = function (worker) {
   /*
    * Get the user public key in armored format
    *
-   * @listens passbolt.keyring.public.get
+   * @listens passbolt.keyring.public.get_armored
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.keyring.public.get_armored', function (requestId) {
@@ -154,29 +138,11 @@ var listen = function (worker) {
    * @param privateKeyArmored {string} The private armored key to import
    */
   worker.port.on('passbolt.keyring.private.import', function (requestId, privateKeyArmored) {
-    try {
-      keyring.importPrivate(privateKeyArmored);
+    keyring.importPrivate(privateKeyArmored).then(function() {
       worker.port.emit(requestId, 'SUCCESS');
-    } catch (e) {
-      worker.port.emit(requestId, 'ERROR', privateKeyArmored)
-    }
-  });
-
-  /*
-   * Import a user's public armored key.
-   *
-   * @listens passbolt.keyring.public.import
-   * @param requestId {uuid} The request identifier
-   * @param publicKeyArmored {string} The public armored key to import
-   * @param userId {string} The user identifier
-   */
-  worker.port.on('passbolt.keyring.public.import', function (requestId, publicKeyArmored, userid) {
-    try {
-      keyring.importPublic(privateKeyArmored, userid);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message)
-    }
+    }, function(error) {
+      worker.port.emit(requestId, 'ERROR', privateKeyArmored);
+    });
   });
 
   /*
@@ -187,25 +153,11 @@ var listen = function (worker) {
    * @param publicKeyArmored {string} The public armored key to import
    */
   worker.port.on('passbolt.keyring.server.import', function (requestId, publicKeyArmored) {
-    try {
       var user = User.getInstance();
-      keyring.importServerPublicKey(publicKeyArmored, user.settings.getDomain());
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message)
-    }
-  });
-
-  /*
-   * Synchronize the keyring with the server.
-   *
-   * @listens passbolt.keyring.sync
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.keyring.sync', function (requestId) {
-    keyring.sync()
-      .then(function (keysCount) {
-        worker.port.emit(requestId, 'SUCCESS', keysCount);
+      keyring.importServerPublicKey(publicKeyArmored, user.settings.getDomain()).then(function() {
+        worker.port.emit(requestId, 'SUCCESS');
+      }, function (error) {
+        worker.port.emit(requestId, 'ERROR', error.message)
       });
   });
 

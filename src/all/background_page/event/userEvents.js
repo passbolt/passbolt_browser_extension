@@ -34,36 +34,6 @@ var listen = function (worker) {
   });
 
   /*
-   * Get the current user name (firstname and lastname) as stored in the plugin
-   *
-   * @listens passbolt.user.get.name
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.user.get.name', function (requestId) {
-    try {
-      var name = user.getName();
-      worker.port.emit(requestId, 'SUCCESS', name);
-    } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message);
-    }
-  });
-
-  /*
-   * Get the current username as stored in the plugin
-   *
-   * @listens passbolt.user.get.username
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.user.get.username', function (requestId) {
-    try {
-      var username = user.getUsername();
-      worker.port.emit(requestId, 'SUCCESS', username);
-    } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message);
-    }
-  });
-
-  /*
    * Get all the user settings as stored in the plugin
    *
    * @listens passbolt.user.settings.get
@@ -140,87 +110,6 @@ var listen = function (worker) {
     try {
       user.set(u);
       app.pageMods.PassboltAuth.init();
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message);
-    }
-  });
-
-  /*
-   * Set the user name in the plugin local storage
-   *
-   * @listens passbolt.user.set.name
-   * @param requestId {uuid} The request identifier
-   * @param firstname {string} The user firstname
-   * @param lastname {string} The user lastname
-   */
-  worker.port.on('passbolt.user.set.name', function (requestId, firstname, lastname) {
-    try {
-      user.setName(firstname, lastname);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.validationErrors);
-    }
-  });
-
-  /*
-   * Set the user username in the plugin local storage
-   *
-   * @listens passbolt.user.set.username
-   * @param requestId {uuid} The request identifier
-   * @param username {string} The user username
-   */
-  worker.port.on('passbolt.user.set.username', function (requestId, username) {
-    try {
-      user.setUsername(username);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message);
-    }
-  });
-
-  /*
-   * Set the user identifier in the plugin local storage
-   *
-   * @listens passbolt.user.setId
-   * @param requestId {uuid} The request identifier
-   * @param userid {string} The user identifier
-   */
-  worker.port.on('passbolt.user.setId', function (requestId, userid) {
-    try {
-      user.setId(userid);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message);
-    }
-  });
-
-  /*
-   * Set the user security token in the plugin local storage
-   *
-   * @listens passbolt.user.settings.set.securityToken
-   * @param requestId {uuid} The request identifier
-   * @param securityToken {array} The security token
-   */
-  worker.port.on('passbolt.user.settings.set.securityToken', function (requestId, securityToken) {
-    try {
-      user.settings.setSecurityToken(securityToken);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message);
-    }
-  });
-
-  /*
-   * Set the user domain trust in the plugin local storage
-   *
-   * @listens passbolt.user.settings.set.domain
-   * @param requestId {uuid} The request identifier
-   * @param domain {string} The domain trust
-   */
-  worker.port.on('passbolt.user.settings.set.domain', function (requestId, domain) {
-    try {
-      user.settings.setDomain(domain);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', e.message);

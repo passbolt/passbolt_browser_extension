@@ -77,21 +77,6 @@ var listen = function (worker) {
   });
 
   /*
-   * Set a configuration variable.
-   *
-   * @listens passbolt.config.write
-   * @param requestId {uuid} The request identifier
-   * @param name {string} Variable name to store
-   * @param value {mixed} Variable value
-   */
-  worker.port.on('passbolt.config.write', function (requestId, name, value) {
-    var write = Config.write(name, value);
-    if (write) {
-      worker.port.emit(requestId, 'SUCCESS');
-    }
-  });
-
-  /*
    * Get plugin version.
    *
    * @listens passbolt.addon.getVersion

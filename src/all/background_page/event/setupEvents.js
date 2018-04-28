@@ -15,34 +15,6 @@ var setup = new Setup();
 var listen = function (worker) {
 
   /*
-   * Init / Reset the setup.
-   *
-   * @listens passbolt.setup.init
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.setup.init', function (requestId) {
-    setup.reset();
-    worker.port.emit(requestId, 'SUCCESS');
-  });
-
-  /*
-   * Set key info.
-   *
-   * @listens passbolt.setup.keyinfo.set
-   * @param requestId {uuid} The request identifier
-   * @param keyData {array} The key information
-   */
-  worker.port.on('passbolt.setup.keyinfo.set', function (requestId, keyData) {
-    try {
-      var keyInfo = new Key();
-      keyInfo.set(keyData);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error.message);
-    }
-  });
-
-  /*
    * Set setup variable.
    *
    * @listens passbolt.setup.set

@@ -7,6 +7,7 @@
 var Keyring = require('./keyring').Keyring;
 var __ = require('../sdk/l10n').get;
 var randomBytes = require('../sdk/random').randomBytes;
+var Log = require('../model/log').Log;
 
 /**
  * The class that deals with Passbolt encryption and decryption operations.
@@ -41,8 +42,7 @@ Crypto.uuid = function (seed) {
   // Generate a random hash if no seed is provided
   if (typeof seed === 'undefined') {
     hashStr = Crypto.generateRandomHex(32);
-  }
-  else {
+  } else {
     // Create SHA hash from seed.
     var shaObj = new jsSHA('SHA-1', 'TEXT');
     shaObj.update(seed);
@@ -59,157 +59,98 @@ Crypto.uuid = function (seed) {
 
 /**
  * Encrypt a text for a given user id (or an armored key)
+ *
  * @param message {string} The text to encrypt
  * @param key {string} The user id or public armored key
  * @return {promise}
  * @throw Exception
  *   in case of key not found, or problem during encryption.
  */
-Crypto.prototype.encrypt = function (message, key) {
-  var keyring = new Keyring(),
+Crypto.prototype.encrypt = async function (message, key) {
+  let keyring = new Keyring(),
     publicKey = null;
 
-  return new Promise (function(resolve, reject) {
-    // if the key is a uuid we get the armored version from the keyring
-    if (Validator.isUUID(key)) {
-      var keyInfo = keyring.findPublic(key);
-      if (!keyInfo) {
-        reject(new Error(__('The public key could not be found for the user')));
-        return;
-      }
-      key = keyInfo.key;
+  // if the key is a uuid we get the armored version from the keyring
+  if (Validator.isUUID(key)) {
+    let keyInfo = keyring.findPublic(key);
+    if (!keyInfo) {
+      throw new Error(__('The public key could not be found for the user'));
     }
+    key = keyInfo.key;
+  }
 
-    // parse the armored key
-    try {
-      publicKey = openpgp.key.readArmored(key);
-    } catch (error) {
-      reject(new Error(__('The public key is not in a valid or supported format.')));
-      return;
-    }
+  // parse the armored key
+  try {
+    publicKey = await openpgp.key.readArmored(key);
+  } catch (error) {
+    throw new Error(__('The public key is not in a valid or supported format.'));
+  }
 
-    // Encrypt message.
-    openpgp.encrypt({
-      publicKeys: publicKey.keys,
-      data: message
-    }).then(
-      function (encrypted) {
-        resolve(encrypted.data);
-      },
-      function (error) {
-        reject(error);
-      }
-    );
-  });
+  // encrypt the message
+  let encryptedMessage = await openpgp.encrypt({publicKeys: publicKey.keys, data: message});
+  return encryptedMessage.data;
 };
 
 /**
  * Encrypt an array of messages.
- * @param armored The text to decrypt.
+ *
+ * @param toEncrypt The text to encrypt.
  * @param passphrase (optional) The passphrase used to decrypt the private key.
  * @param startCallback The callback to execute each time the function start to encrypt a message
  * @param completeCallback The callback to execute each time the function complete to encrypt a message.
  * @throw Error if something goes wrong in openpgp methods
  * @return promise
  */
-Crypto.prototype.encryptAll = function (data, completeCallback, startCallback) {
-  var keyring = new Keyring();
-
-  return new Promise(function (resolve, reject) {
-    // Encrypt the secrets sequentially.
-    // Chain all the encryption promises.
-    var encryptChainPromise = data.reduce(function (promise, toEncrypt, position) {
-      return promise.then(function (result) {
-
-        var keyInfo = keyring.findPublic(toEncrypt.userId);
-        var publicKey = openpgp.key.readArmored(keyInfo.key);
-        if (startCallback) {
-          startCallback(position);
-        }
-        // Encrypt the message.
-        return openpgp.encrypt({publicKeys: publicKey.keys, data: toEncrypt.message})
-          .then(function (encrypted) {
-            if (completeCallback) {
-              completeCallback(encrypted.data, toEncrypt.userId, position);
-            }
-            return [...result, encrypted.data];
-          });
-      });
-    }, Promise.resolve([])); // Start the promises chain.
-
-    // Once the encryption is done.
-    encryptChainPromise.then(function(result){
-      resolve(result);
-    });
-  });
-};
-
-/**
- * Decrypt a key.
- * @param armored The key to decrypt.
- * @param passphrase (optional) The passphrase used to decrypt the private key.
- * @throw Error if something goes wrong in openpgp methods
- * @return promise
- */
-Crypto.prototype.decryptPrivateKey = function (privateKey, passphrase) {
-  return new Promise(function (resolve, reject) {
-    if (!privateKey.isDecrypted) {
-      return openpgp.decryptKey({privateKey: privateKey, passphrase: passphrase})
-        .then(function(privateKey) {
-          resolve(privateKey);
-        }, function(error) {
-          reject(error);
-        });
-    } else {
-      resolve(privateKey);
+Crypto.prototype.encryptAll = async function (toEncrypt, completeCallback, startCallback) {
+  const keyring = new Keyring();
+  let i, armoredKey, publicKeys, ciphertext, result = [];
+  for (i in toEncrypt) {
+    if (startCallback) {
+      startCallback(i);
     }
-  });
+
+    armoredKey = keyring.findPublic(toEncrypt[i].userId).key;
+    publicKeys = await openpgp.key.readArmored(armoredKey).keys[0];
+    try {
+      ciphertext = await openpgp.encrypt({publicKeys: publicKeys, data: toEncrypt[i].message});
+      result.push(ciphertext.data);
+      if (completeCallback) {
+        completeCallback(ciphertext.data, i);
+      }
+    } catch(error) {
+      let message = `Could not encrypt for user ${toEncrypt[i].userId} with key: ${armoredKey}`;
+      console.error(message);
+      console.error(error);
+    }
+  }
+  return result;
 };
 
 /**
  * Decrypt an armored text.
+ *
  * @param armored The text to decrypt.
  * @param passphrase (optional) The passphrase used to decrypt the private key.
  * @throw Error if something goes wrong in openpgp methods
  * @return promise
  */
-Crypto.prototype.decrypt = function (armored, passphrase) {
-  var keyring = new Keyring(),
-    keyInfo = keyring.findPrivate(),
-    privateKey = openpgp.key.readArmored(keyInfo.key).keys[0];
-
-  return new Promise(function (resolve, reject) {
-    if (!privateKey.isDecrypted) {
-      openpgp.decryptKey({privateKey: privateKey, passphrase: passphrase})
-        .then(function (privateKey) {
-          // Openpgp will throw an exception if the message is badly formatted
-          var pgpMessage = openpgp.message.readArmored(armored);
-          return openpgp.decrypt({privateKeys: [privateKey.key], message: pgpMessage});
-        })
-        .then(
-          function (decrypted) {
-            resolve(decrypted.data);
-          },
-          function (error) {
-            reject(error);
-          }
-        );
-    } else {
-      openpgp.decrypt({privateKeys: [privateKey], message: pgpMessage})
-        .then(
-          function (decrypted) {
-            resolve(decrypted.data);
-          },
-          function (error) {
-            reject(error);
-          }
-        );
-    }
-  });
+Crypto.prototype.decrypt = async function (armoredMessage, passphrase) {
+  const keyring = new Keyring(),
+    armoredKey = keyring.findPrivate().key,
+    pgpMessage = openpgp.message.readArmored(armoredMessage);
+  let privateKey = openpgp.key.readArmored(armoredKey).keys[0];
+  try {
+    await privateKey.decrypt(passphrase);
+  } catch(error) {
+    Log.write({level: 'warning', message: error.message});
+  }
+  let decrypted = await openpgp.decrypt({privateKeys: [privateKey], message: pgpMessage});
+  return decrypted.data;
 };
 
 /**
  * Decrypt an array of armored text.
+ *
  * @param armored The text to decrypt.
  * @param passphrase (optional) The passphrase used to decrypt the private key.
  * @param startCallback The callback to execute each time the function start to decrypt a secret.
@@ -217,41 +158,30 @@ Crypto.prototype.decrypt = function (armored, passphrase) {
  * @throw Error if something goes wrong in openpgp methods
  * @return promise
  */
-Crypto.prototype.decryptAll = function (armoreds, passphrase, completeCallback, startCallback) {
-  var keyring = new Keyring(),
-    keyInfo = keyring.findPrivate(),
-    privateKey = openpgp.key.readArmored(keyInfo.key).keys[0];
-    _this = this;
+Crypto.prototype.decryptAll = async function (armoredMessages, passphrase, completeCallback, startCallback) {
+  const keyring = new Keyring(),
+    armoredKey = keyring.findPrivate().key;
+  let privateKey = openpgp.key.readArmored(armoredKey).keys[0];
+  try {
+    await privateKey.decrypt(passphrase);
+  } catch(error) {
+    Log.write({level: 'warning', message: error.message});
+  }
 
-  return new Promise(function(resolve, reject) {
-    // Decrypt the private key.
-    _this.decryptPrivateKey(privateKey, passphrase)
-      // Decrypt the list of armored messages.
-      .then(function(privateKey) {
-        // Decrypt the secrets sequentially.
-        var decryptChainPromise = armoreds.reduce(function(promise, armored, position) {
-          return promise.then(function(result) {
-            var pgpMessage = openpgp.message.readArmored(armored);
-            if(startCallback) {
-              startCallback(position);
-            }
-            // Decrypt the secret.
-            return openpgp.decrypt({privateKeys: [privateKey.key], message: pgpMessage})
-              .then(function(decrypted) {
-                if(completeCallback) {
-                  completeCallback(decrypted.data, position);
-                }
-                return [...result, decrypted.data];
-              });
-          });
-        }, Promise.resolve([])); // Start the promises chain.
-
-        // Once the decryption is done.
-        decryptChainPromise.then(function(result){
-          resolve(result);
-        });
-      });
-  });
+  // Decrypt the secrets sequentially.
+  let i, pgpMessage, decryptedMessage, result = [];
+  for (i in armoredMessages) {
+    if (startCallback) {
+      startCallback(i);
+    }
+    pgpMessage = openpgp.message.readArmored(armoredMessages[i]);
+    decryptedMessage = await openpgp.decrypt({privateKeys: [privateKey], message: pgpMessage});
+    result.push(decryptedMessage.data);
+    if (completeCallback) {
+      completeCallback(decryptedMessage.data, i);
+    }
+  }
+  return result;
 };
 
 // Make the object available to other scripts

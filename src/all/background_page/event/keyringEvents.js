@@ -174,6 +174,7 @@ var listen = function (worker) {
         worker.port.emit(requestId, 'SUCCESS');
       },
       function (error) {
+        console.error(error);
         worker.port.emit(requestId, 'ERROR', __('This is not a valid passphrase'));
       }
     );

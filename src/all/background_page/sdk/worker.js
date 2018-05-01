@@ -46,7 +46,7 @@ Worker.prototype.on = function (eventName, callback) {
  * @param eventName
  */
 Worker.prototype.triggerEvent = function (eventName) {
-  Log.write({level: 'debug', message: 'sdk/worker::triggerEvent ' + eventName + ' tab:' + this.tab.id});
+  // Log.write({level: 'debug', message: 'sdk/worker::triggerEvent ' + eventName + ' tab:' + this.tab.id});
   if (typeof this.callbacks[eventName] !== 'undefined') {
     this.callbacks[eventName].apply();
   }

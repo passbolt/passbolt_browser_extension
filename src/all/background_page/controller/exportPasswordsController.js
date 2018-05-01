@@ -167,18 +167,17 @@ ExportPasswordsController.prototype._decryptSecrets = function(secrets) {
   // Master password required to decrypt a secret before sharing it.
   return masterPasswordController.get(worker)
   .then(function (masterPassword) {
-    progressDialogController.open(worker, 'Decrypting ...', self.resources.length);
+    progressDialogController.open(worker, 'Decrypting...', self.resources.length);
     var armored = self._prepareArmoredList();
-    return crypto.decryptAll(
-      armored,
-      masterPassword,
+    return crypto.decryptAll(armored, masterPassword,
       // On complete.
       function () {
         progressDialogController.update(worker, self.progressStatus++);
       },
       // On start.
       function (position) {
-        progressDialogController.update(worker, self.progressStatus, 'Decrypting ' + (position + 1) + '/' + self.resources.length);
+        position++;
+        progressDialogController.update(worker, self.progressStatus, `Decrypting ${position}/${self.resources.length}`);
       });
   });
 };

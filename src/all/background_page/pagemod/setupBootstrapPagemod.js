@@ -21,10 +21,11 @@ SetupBootstrap.init = function () {
     SetupBootstrap._pageMod.destroy();
     SetupBootstrap._pageMod = undefined;
   }
-
+  const uuidRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}";
+  const setupBootstrapRegex = `(.*)\/setup\/(install|recover)\/(${uuidRegex})\/(${uuidRegex})`;
   SetupBootstrap._pageMod = pageMod.PageMod({
     name: 'SetupBootstrap',
-		include: new RegExp(Config.read('setupBootstrapRegex')),
+		include: new RegExp(setupBootstrapRegex),
     contentScriptWhen: 'ready',
     contentStyleFile: [],
     contentScriptFile: [

@@ -5,27 +5,47 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-var _config = require('../config/config.json');
+let _config = require('../config/config.json');
 
 /**
  * Init the configuration.
  * Retrieve and load the configuration stored in the local storage.
  */
-var init = function () {
+const init = function () {
+
   // Retrieve the config from the local storage
-  var storedConfig = storage.getItem('config');
+  const storedConfig = storage.getItem('config');
 
   // No config in local storage, do nothing
   if (storedConfig === null ) {
     return;
   }
 
-  // Retrieve the config defined by the admin in the config.json.
-  for (var name in storedConfig) {
-    _config[name] = storedConfig[name];
+  // Merge the config.json and config stored in local storage
+  for (let name in storedConfig) {
+    // only defined items not already defined in config.json
+    if (typeof _config[name] === 'undefined') {
+      _config[name] = storedConfig[name];
+    }
   }
+  migrate();
+
 };
 exports.init = init;
+
+const migrate = function() {
+  let storedConfig = storage.getItem('config');
+  if(typeof storedConfig['debug'] !== 'undefined') {
+    // v2.1.0 Migration - Delete unused config items
+    // TODO - remove after next release
+    storage.removeItem('config','setupBootstrapRegex');
+    storage.removeItem('config','debug');
+    storage.removeItem('config','log');
+    storage.removeItem('config','baseUrl');
+    storage.removeItem('config','extensionId');
+  }
+};
+exports.migrate = migrate;
 
 /**
  * Read a configuration variable.
@@ -33,7 +53,7 @@ exports.init = init;
  * @param name {string} Variable name to obtain
  * @returns {*}
  */
-var read = function (name) {
+const read = function (name) {
   return _config[name];
 };
 exports.read = read;
@@ -43,7 +63,7 @@ exports.read = read;
  *
  * @returns {array}
  */
-var readAll = function () {
+const readAll = function () {
   return _config;
 };
 exports.readAll = readAll;
@@ -55,7 +75,7 @@ exports.readAll = readAll;
  * @param value {mixed} Variable value
  * @returns {boolean}
  */
-var write = function (name, value) {
+const write = function (name, value) {
   // do not allow to override the debug mode
   if (name === 'debug') {
     return false;
@@ -71,8 +91,8 @@ exports.write = write;
  *
  * @returns {bool}
  */
-var isDebug = function () {
-  var debug = read('debug');
+const isDebug = function () {
+  const debug = read('debug');
   if (typeof debug === 'undefined') {
     return false;
   } else {
@@ -84,7 +104,7 @@ exports.isDebug = isDebug;
 /**
  * Flush the local storage config.
  */
-var flush = function () {
+const flush = function () {
   storage.removeItem('config');
 };
 exports.flush = flush;

@@ -69,8 +69,12 @@ LocalStorage.prototype.setItem = function (key, value) {
  * Remove an item
  * @param keyStr
  */
-LocalStorage.prototype.removeItem = function (key) {
-  delete this._data[key];
+LocalStorage.prototype.removeItem = function (key, subkey) {
+  if (typeof subkey === 'undefined') {
+    delete this._data[key];
+  } else {
+    delete this._data[key][subkey];
+  }
   this._store();
 };
 

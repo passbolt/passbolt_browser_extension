@@ -18,7 +18,6 @@ var DebugPage = function () {};
 DebugPage._pageMod = undefined;
 
 DebugPage.init = function () {
-
   Log.write({level: 'warning', message: 'Warning: plugin debug mode is on!'});
   Log.write({level: 'warning', message: chrome.runtime.getURL('data/config-debug.html')});
 

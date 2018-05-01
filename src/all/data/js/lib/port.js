@@ -27,7 +27,6 @@ var self = self || {};
     this._connected = true;
 
     this._port.onDisconnect.addListener(function(){
-      console.warn('port disconnected from addon code: ' + portname);
       _this._connected = false;
     });
     this._port.onMessage.addListener(function(msg) {

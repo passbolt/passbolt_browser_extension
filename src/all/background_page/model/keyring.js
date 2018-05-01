@@ -337,10 +337,9 @@ Keyring.prototype.extractPublicKey = function (privateArmoredKey) {
  * @returns {OpenPgpKey}
  */
 Keyring.prototype.findPublic = function (userId) {
-  var publicKeys = Keyring.getPublicKeys();
-  // TODO no need to iterate, use property/key instead
-  for (var i in publicKeys) {
-    if (publicKeys[i].user_id == userId) {
+  let i, publicKeys = Keyring.getPublicKeys();
+  for (i in publicKeys) {
+    if (publicKeys[i].user_id === userId) {
       return publicKeys[i];
     }
   }
@@ -401,7 +400,7 @@ Keyring.prototype.checkPassphrase = function (passphrase) {
     var keyInfo = _this.findPrivate(),
       privateKey = openpgp.key.readArmored(keyInfo.key).keys[0];
 
-    if (!privateKey.isDecrypted) {
+    if (!privateKey.primaryKey.isDecrypted) {
       openpgp.decryptKey({privateKey: privateKey, passphrase: passphrase})
         .then(
           function (decrypted) {

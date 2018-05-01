@@ -193,17 +193,9 @@ UserSettings.prototype.setDomain = function (domain) {
  * @throw Error if the trusted domain is not set
  */
 UserSettings.prototype.getDomain = function () {
-  var domain = Config.read('user.settings.trustedDomain');
-
+  const domain = Config.read('user.settings.trustedDomain');
   if (typeof domain === 'undefined') {
-    if (!Config.isDebug()) {
-      throw new Error(__('Trusted domain is not set'));
-    } else {
-      domain = Config.read('baseUrl');
-      if (typeof domain === 'undefined') {
-        throw new Error(__('Base url not found in config'));
-      }
-    }
+    throw new Error(__('Trusted domain is not set'));
   }
   return domain;
 };

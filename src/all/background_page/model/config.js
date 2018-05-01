@@ -54,7 +54,10 @@ exports.migrate = migrate;
  * @returns {*}
  */
 const read = function (name) {
-  return _config[name];
+  if(typeof _config[name] !== 'undefined') {
+    return _config[name];
+  }
+  return undefined;
 };
 exports.read = read;
 

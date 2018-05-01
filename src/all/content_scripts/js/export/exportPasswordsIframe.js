@@ -35,3 +35,4 @@ $(function () {
     $('#passbolt-iframe-export-passwords').remove();
   });
 });
+undefined; // result must be structured-clonable data

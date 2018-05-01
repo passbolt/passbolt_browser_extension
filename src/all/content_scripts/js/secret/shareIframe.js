@@ -66,3 +66,4 @@ $(function () {
   }, false);
 
 });
+undefined; // result must be structured-clonable data

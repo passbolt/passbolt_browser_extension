@@ -76,3 +76,4 @@ $(function () {
   passbolt.clipboard = clipboard;
 
 });
+undefined; // result must be structured-clonable data

@@ -27,6 +27,7 @@ var self = self || {};
     this._connected = true;
 
     this._port.onDisconnect.addListener(function(){
+      console.warn('port disconnected from addon code: ' + portname);
       _this._connected = false;
     });
     this._port.onMessage.addListener(function(msg) {
@@ -175,16 +176,19 @@ var self = self || {};
   Port.initPort = function() {
     // Define port name and build singleton
     // if portname is not inserted as variable from addon code (default scenario)
+    var port;
     if(typeof portname === 'undefined') {
       // try to get portname for url (Iframe scenario)
       var query = Port._parseUrlQuery();
       if(typeof query['passbolt'] !== 'undefined') {
-        portname = query['passbolt'];
+        port = query['passbolt'];
       } else {
         throw new Error('Portname is not provided in content code');
       }
+    } else {
+      port = portname;
     }
-    return Port.get(portname);
+    return Port.get(port);
   };
 
   // init port unless told not to

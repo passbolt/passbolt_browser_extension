@@ -151,5 +151,5 @@ $(function () {
   };
 
   passbolt.login.init();
-
 });
+undefined; // result must be structured-clonable data

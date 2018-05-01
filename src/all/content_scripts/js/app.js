@@ -304,13 +304,6 @@ $(function () {
     .then(function() {
       passbolt.request('passbolt.export-passwords.open-dialog');
     });
-
-    // passbolt.request('passbolt.export-passwords.export-to-file', format, resources)
-    // .then(function () {
-    //   passbolt.message.emitToPage('passbolt_notify', {status: 'success', title: 'The export was successful'});
-    // }, function() {
-    //   passbolt.message.emitToPage('passbolt_notify', {status: 'error', title: 'There was an error during the export'});
-    // });
   });
 
   // Listen when the user requests an import of passwords.
@@ -320,3 +313,4 @@ $(function () {
 
   $('html').addClass('passboltplugin-ready');
 });
+undefined; // result must be structured-clonable data

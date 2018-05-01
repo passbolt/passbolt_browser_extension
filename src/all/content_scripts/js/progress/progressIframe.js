@@ -44,3 +44,4 @@ $(function () {
     }, wait ? wait : 0);
   });
 });
+undefined; // result must be structured-clonable data

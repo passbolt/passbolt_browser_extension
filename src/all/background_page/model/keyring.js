@@ -25,7 +25,7 @@ Keyring.PRIVATE_HEADER = '-----BEGIN PGP PRIVATE KEY BLOCK-----';
 Keyring.PRIVATE_FOOTER = '-----END PGP PRIVATE KEY BLOCK-----';
 Keyring.PUBLIC = 'PUBLIC';
 Keyring.PRIVATE = 'PRIVATE';
-Keyring.MY_KEY_ID = 'MY_KEY_ID'; // @TODO use crypto::uuid(user.id) instead
+Keyring.MY_KEY_ID = 'MY_KEY_ID'; // @TODO use user.id instead
 Keyring.STORAGE_KEY_PUBLIC = 'passbolt-public-gpgkeys';
 Keyring.STORAGE_KEY_PRIVATE = 'passbolt-private-gpgkeys';
 

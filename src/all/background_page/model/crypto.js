@@ -81,7 +81,7 @@ Crypto.prototype.encrypt = async function (message, key) {
 
   // parse the armored key
   try {
-    publicKey = await openpgp.key.readArmored(key);
+    publicKey = openpgp.key.readArmored(key);
   } catch (error) {
     throw new Error(__('The public key is not in a valid or supported format.'));
   }
@@ -110,7 +110,7 @@ Crypto.prototype.encryptAll = async function (toEncrypt, completeCallback, start
     }
 
     armoredKey = keyring.findPublic(toEncrypt[i].userId).key;
-    publicKeys = await openpgp.key.readArmored(armoredKey).keys[0];
+    publicKeys = openpgp.key.readArmored(armoredKey).keys[0];
     try {
       ciphertext = await openpgp.encrypt({publicKeys: publicKeys, data: toEncrypt[i].message});
       result.push(ciphertext.data);

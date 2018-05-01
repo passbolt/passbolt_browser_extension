@@ -80,10 +80,18 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.keyring.server.get', function (requestId) {
+    let user, domain;
 
-    var user = User.getInstance(),
-      Crypto = require('../model/crypto').Crypto,
-      serverkeyid = Crypto.uuid(user.settings.getDomain()),
+    try {
+      user = User.getInstance();
+      domain = user.settings.getDomain();
+    } catch (error) {
+      worker.port.emit(requestId, 'ERROR', error.message);
+      return;
+    }
+
+    let Crypto = require('../model/crypto').Crypto,
+      serverkeyid = Crypto.uuid(domain),
       serverkey = keyring.findPublic(serverkeyid);
 
     if (typeof serverkey !== 'undefined') {

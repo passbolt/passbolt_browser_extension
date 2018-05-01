@@ -35,3 +35,4 @@ $(function () {
     $('#passbolt-iframe-master-password').remove();
   });
 });
+undefined; // result must be structured-clonable data

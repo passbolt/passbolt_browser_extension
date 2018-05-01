@@ -115,7 +115,7 @@ Crypto.prototype.encryptAll = async function (toEncrypt, completeCallback, start
       ciphertext = await openpgp.encrypt({publicKeys: publicKeys, data: toEncrypt[i].message});
       result.push(ciphertext.data);
       if (completeCallback) {
-        completeCallback(ciphertext.data, i);
+        completeCallback(ciphertext.data, toEncrypt[i].userId, i);
       }
     } catch(error) {
       let message = `Could not encrypt for user ${toEncrypt[i].userId} with key: ${armoredKey}`;

@@ -4,7 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Improve
+- PASSBOLT-2853: Upgrade to OpenPGP.js 3.x
 - PASSBOLT-2853: Improve error feedback on login
+- PASSBOLT-2853: Cleanup config defaults
 
 ## [1.6.10] - 2018-03-28
 ### Fixed

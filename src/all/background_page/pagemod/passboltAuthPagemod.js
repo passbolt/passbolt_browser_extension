@@ -37,7 +37,7 @@ PassboltAuth.init = function () {
     include: regex,
     contentScriptWhen: 'ready',
     contentStyleFile: [
-      'data/css/external.min.css'
+      'data/css/themes/default/ext_external.min.css'
     ],
     contentScriptFile: [
       'data/vendors/jquery.js',

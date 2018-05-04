@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fix
+- PASSBOLT-2764: Fix share autocomplete search concurrency issue on result display
+
 ### Improve
 - PASSBOLT-2853: Upgrade to OpenPGP.js 3.x
 - PASSBOLT-2853: Improve error feedback on login

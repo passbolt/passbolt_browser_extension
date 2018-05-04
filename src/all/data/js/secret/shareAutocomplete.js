@@ -8,7 +8,9 @@
 $(function () {
 
   // The array of acos displayed.
-  var _aros = {};
+  var _aros = {},
+  // number of user search requests pending
+    requests = 0;
 
   /**
    * Initialize the autocomplete result component.
@@ -186,6 +188,7 @@ $(function () {
    */
   var loadingHandler = function () {
     reset();
+    requests++;
     setState('loading');
   };
 
@@ -194,7 +197,10 @@ $(function () {
    * @param users {array} The list of users to load
    */
   var loadUsersHandler = function (users) {
-    load(users);
+    requests--;
+    if (requests === 0) {
+      load(users);
+    }
     setState('loaded');
   };
 

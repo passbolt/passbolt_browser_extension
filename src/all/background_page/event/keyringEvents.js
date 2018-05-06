@@ -11,6 +11,7 @@ var Keyring = require('../model/keyring').Keyring;
 var Key = require('../model/key').Key;
 var Config = require('../model/config');
 var User = require('../model/user').User;
+var Uuid = require('../utils/uuid');
 var keyring = new Keyring();
 var key = new Key();
 
@@ -90,8 +91,7 @@ var listen = function (worker) {
       return;
     }
 
-    let Crypto = require('../model/crypto').Crypto,
-      serverkeyid = Crypto.uuid(domain),
+    let serverkeyid = Uuid.get(domain),
       serverkey = keyring.findPublic(serverkeyid);
 
     if (typeof serverkey !== 'undefined') {

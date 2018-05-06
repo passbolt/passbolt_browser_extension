@@ -7,8 +7,7 @@
  */
 var ScriptExecution = require('../sdk/scriptExecution').ScriptExecution;
 var Worker = require('../sdk/worker').Worker;
-var self = require('../sdk/self');
-var Crypto = require('../model/crypto').Crypto;
+var Uuid = require('../utils/uuid');
 var Workers = require('../model/worker');
 var Log = require('../model/log').Log;
 
@@ -261,7 +260,7 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
   // if there is not already a worker in that tab
   // generate a portname based on the tab it and listen to connect event
   // otherwise reuse the already an active worker in that tab to accept incoming connection
-  this.portname = 'port-' + Crypto.uuid(tabId.toString());
+  this.portname = 'port-' + Uuid.get(tabId.toString());
   if (this._ports.indexOf(tabId) === -1) {
     this.__initConnectListener(this.portname, tabId);
   }

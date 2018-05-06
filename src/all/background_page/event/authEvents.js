@@ -24,7 +24,8 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.auth.verify', function (requestId) {
     auth.verify().then(
-      function success(msg) {
+      function success() {
+        var msg = __('The server key is verified. The server can use it to sign and decrypt content.');
         worker.port.emit(requestId, 'SUCCESS', msg);
       },
       function error(error) {

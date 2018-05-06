@@ -1,27 +1,25 @@
+"use strict";
 /**
  * Gpg Auth Token Model
  *
  * @copyright (c) 2017 Passbolt SARL
  * @licence AGPL-3.0 http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-"use strict";
-
-var __ = require('../sdk/l10n').get;
-var Crypto = require('./crypto').Crypto;
+const __ = require('../sdk/l10n').get;
+const Uuid = require('../utils/uuid');
 
 /**
  * Constructor
  * @param token {string} The gpg authentication token
  * @throw Exception if the token is not valid
  */
-var GpgAuthToken = function (token) {
-
+const GpgAuthToken = function (token) {
   if (typeof token === 'undefined') {
     this.token = 'gpgauthv1.3.0|36|';
-    this.token += Crypto.uuid();
+    this.token += Uuid.get();
     this.token += '|gpgauthv1.3.0';
   } else {
-    var result = this.validate('token', token);
+    const result = this.validate('token', token);
     if (result === true) {
       this.token = token;
     } else {
@@ -42,7 +40,7 @@ GpgAuthToken.prototype.validate = function (field, value) {
       if (typeof value === 'undefined' || value === '') {
         return new Error(__('The user authentication token cannot be empty'));
       }
-      var sections = value.split('|');
+      const sections = value.split('|');
       if (sections.length !== 4) {
         return new Error(__('The user authentication token is not in the right format'));
       }

@@ -1,60 +1,18 @@
+"use strict";
 /**
  * Crypto model.
  *
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var Keyring = require('./keyring').Keyring;
-var __ = require('../sdk/l10n').get;
-var randomBytes = require('../sdk/random').randomBytes;
-var Log = require('../model/log').Log;
+const Keyring = require('./keyring').Keyring;
+const __ = require('../sdk/l10n').get;
+const Log = require('../model/log').Log;
 
 /**
  * The class that deals with Passbolt encryption and decryption operations.
  */
-var Crypto = function () {
-};
-
-/**
- * Generate a random text.
- * @param size {int} The desired random text size.
- * @returns {string}
- */
-Crypto.generateRandomHex = function (size) {
-  var text = '';
-  var possible = 'ABCDEF0123456789';
-  var random_array = randomBytes(size);
-  for (var i = size; i > 0; i--) {
-    text += possible.charAt(Math.floor(random_array[i] % possible.length));
-  }
-  return text;
-};
-
-/**
- * Generate a random uuid.
- * @param seed {string} (optional) The seed to use to generate a predictable uuid
- *  based on its sha1 hashed
- * @returns {string}
- */
-Crypto.uuid = function (seed) {
-  var hashStr;
-
-  // Generate a random hash if no seed is provided
-  if (typeof seed === 'undefined') {
-    hashStr = Crypto.generateRandomHex(32);
-  } else {
-    // Create SHA hash from seed.
-    var shaObj = new jsSHA('SHA-1', 'TEXT');
-    shaObj.update(seed);
-    hashStr = shaObj.getHash('HEX').substring(0, 32);
-  }
-  // Build a uuid based on the hash
-  var search = XRegExp('^(?<first>.{8})(?<second>.{4})(?<third>.{1})(?<fourth>.{3})(?<fifth>.{1})(?<sixth>.{3})(?<seventh>.{12}$)');
-  var replace = XRegExp('${first}-${second}-3${fourth}-a${sixth}-${seventh}');
-
-  // Replace regexp by corresponding mask, and remove / character at each side of the result.
-  var uuid = XRegExp.replace(hashStr, search, replace).replace(/\//g, '');
-  return uuid;
+const Crypto = function () {
 };
 
 /**
@@ -95,7 +53,6 @@ Crypto.prototype.encrypt = async function (message, key) {
  * Encrypt an array of messages.
  *
  * @param toEncrypt The text to encrypt.
- * @param passphrase (optional) The passphrase used to decrypt the private key.
  * @param startCallback The callback to execute each time the function start to encrypt a message
  * @param completeCallback The callback to execute each time the function complete to encrypt a message.
  * @throw Error if something goes wrong in openpgp methods
@@ -108,7 +65,6 @@ Crypto.prototype.encryptAll = async function (toEncrypt, completeCallback, start
     if (startCallback) {
       startCallback(i);
     }
-
     armoredKey = keyring.findPublic(toEncrypt[i].userId).key;
     publicKeys = openpgp.key.readArmored(armoredKey).keys[0];
     try {
@@ -129,8 +85,8 @@ Crypto.prototype.encryptAll = async function (toEncrypt, completeCallback, start
 /**
  * Decrypt an armored text.
  *
- * @param armored The text to decrypt.
- * @param passphrase (optional) The (validated) passphrase to use to decrypt the private key.
+ * @param armoredMessage {string} The text to decrypt.
+ * @param passphrase {string} The (validated) passphrase to use to decrypt the private key.
  * @throw Error if something goes wrong in openpgp methods
  * @return promise
  */
@@ -151,12 +107,12 @@ Crypto.prototype.decrypt = async function (armoredMessage, passphrase) {
 /**
  * Decrypt an array of armored text.
  *
- * @param armored The text to decrypt.
- * @param passphrase (optional) The passphrase used to decrypt the private key.
- * @param startCallback The callback to execute each time the function start to decrypt a secret.
- * @param completeCallback The callback to execute each time the function complete to decrypt a secret.
+ * @param armoredMessages {string} The text to decrypt.
+ * @param passphrase {string}  The passphrase used to decrypt the private key.
+ * @param startCallback {function} The callback to execute each time the function start to decrypt a secret.
+ * @param completeCallback {function} The callback to execute each time the function complete to decrypt a secret.
  * @throw Error if something goes wrong in openpgp methods
- * @return promise
+ * @return {Promise} the decrypted string
  */
 Crypto.prototype.decryptAll = async function (armoredMessages, passphrase, completeCallback, startCallback) {
   const keyring = new Keyring(),

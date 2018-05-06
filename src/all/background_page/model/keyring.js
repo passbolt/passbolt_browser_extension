@@ -1,18 +1,19 @@
+"use strict";
 /**
  * Keyring model.
  *
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var __ = require('../sdk/l10n').get;
-var UserSettings = require('./userSettings').UserSettings;
-var Key = require('./key').Key;
-var keyring = new openpgp.Keyring();
+const __ = require('../sdk/l10n').get;
+const UserSettings = require('./userSettings').UserSettings;
+const Key = require('./key').Key;
+const Uuid = require('../utils/uuid');
 
 /**
  * The class that deals with Passbolt Keyring.
  */
-var Keyring = function () {
+const Keyring = function () {
 };
 
 /**
@@ -32,26 +33,25 @@ Keyring.STORAGE_KEY_PRIVATE = 'passbolt-private-gpgkeys';
 /**
  * Get private keys.
  *
- * @returns {*}
+ * @returns {object}
  */
 Keyring.getPrivateKeys = function() {
   // Get the private keys from the local storage.
-  var pvtSerialized = storage.getItem(Keyring.STORAGE_KEY_PRIVATE);
-  if (pvtSerialized === null) {
-    return {};
-  } else {
+  const pvtSerialized = storage.getItem(Keyring.STORAGE_KEY_PRIVATE);
+  if (pvtSerialized) {
     return JSON.parse(pvtSerialized);
   }
+  return {};
 };
 
 /**
  * Get stored public keys.
  *
- * @returns {array}
+ * @returns {Object} a collection of key as in {userUuid: Key, ...}
  */
 Keyring.getPublicKeys = function () {
   // Get the public keys from the local storage.
-  var pubSerialized = storage.getItem(Keyring.STORAGE_KEY_PUBLIC);
+  const pubSerialized = storage.getItem(Keyring.STORAGE_KEY_PUBLIC);
   if (pubSerialized) {
     return JSON.parse(pubSerialized);
   }
@@ -65,17 +65,11 @@ Keyring.getPublicKeys = function () {
  * @param keys {array} The list of keys to store
  */
 Keyring.prototype.store = function (type, keys) {
-  if (type != Keyring.PUBLIC && type != Keyring.PRIVATE) {
+  if (type !== Keyring.PUBLIC && type !== Keyring.PRIVATE) {
     throw new Error(__('Key type is incorrect'));
   }
-
-  if (type == Keyring.PRIVATE) {
-    storage_key = Keyring.STORAGE_KEY_PRIVATE;
-  } else {
-    storage_key = Keyring.STORAGE_KEY_PUBLIC;
-  }
-
-  storage.setItem(storage_key, JSON.stringify(keys));
+  let key = (type === Keyring.PRIVATE) ? Keyring.STORAGE_KEY_PRIVATE : Keyring.STORAGE_KEY_PUBLIC;
+  storage.setItem(key, JSON.stringify(keys));
 };
 
 /**
@@ -85,14 +79,13 @@ Keyring.prototype.store = function (type, keys) {
  *  Default Keyring.PUBLIC.
  */
 Keyring.prototype.flush = function (type) {
-  if (typeof type == 'undefined') {
+  if (typeof type === 'undefined') {
     type = Keyring.PUBLIC;
   }
 
-  if (type == Keyring.PUBLIC) {
+  if (type === Keyring.PUBLIC) {
     this.store(Keyring.PUBLIC, {});
-  }
-  else if (type == Keyring.PRIVATE) {
+  } else if (type === Keyring.PRIVATE) {
     this.store(Keyring.PRIVATE, {});
   }
 
@@ -102,40 +95,37 @@ Keyring.prototype.flush = function (type) {
 };
 
 /**
- * Parse an armored key and extract Public or Private sub string.
+ * Parse a text block with one or more keys and extract the Public or Private armoredkey.
  *
  * @param armoredKey {string} The key to parse.
  * @param type {string} The type of keys to parse : Keyring.PRIVATE or Keyring.PUBLIC.
  *  Default Keyring.PRIVATE.
  * @returns {string}
  */
-var parseArmoredKey = function (armoredKey, type) {
-  // The type of key to parse. By default the PRIVATE.
-  var type = type || Keyring.PRIVATE,
-    // The parsed key. If no header found the output will be the input.
-    key = armoredKey || '';
+Keyring.findArmoredKeyInText = function (armoredKey, type) {
+  let headerPos, footerPos;
 
-  if (type == Keyring.PUBLIC) {
+  if (type === Keyring.PUBLIC) {
     // Check if we find the public header & footer.
-    var pubHeaderPos = armoredKey.indexOf(Keyring.PUBLIC_HEADER);
-    if (pubHeaderPos != -1) {
-      var pubFooterPos = armoredKey.indexOf(Keyring.PUBLIC_FOOTER);
-      if (pubFooterPos != -1) {
-        key = armoredKey.substr(pubHeaderPos, pubFooterPos + Keyring.PUBLIC_FOOTER.length);
+    headerPos = armoredKey.indexOf(Keyring.PUBLIC_HEADER);
+    if (headerPos !== -1) {
+      footerPos = armoredKey.indexOf(Keyring.PUBLIC_FOOTER);
+      if (footerPos !== -1) {
+        return armoredKey.substr(headerPos, footerPos + Keyring.PUBLIC_FOOTER.length);
       }
     }
-  } else if (type == Keyring.PRIVATE) {
+  } else if (type === Keyring.PRIVATE) {
     // Check if we find the private header & footer.
-    var privHeaderPos = armoredKey.indexOf(Keyring.PRIVATE_HEADER);
-    if (privHeaderPos != -1) {
-      var privFooterPos = armoredKey.indexOf(Keyring.PRIVATE_FOOTER);
-      if (privFooterPos != -1) {
-        key = armoredKey.substr(privHeaderPos, privFooterPos + Keyring.PRIVATE_HEADER.length);
+    headerPos = armoredKey.indexOf(Keyring.PRIVATE_HEADER);
+    if (headerPos !== -1) {
+      footerPos = armoredKey.indexOf(Keyring.PRIVATE_FOOTER);
+      if (footerPos !== -1) {
+        armoredKey = armoredKey.substr(headerPos, footerPos + Keyring.PRIVATE_HEADER.length);
       }
     }
   }
 
-  return key;
+  return armoredKey;
 };
 
 /**
@@ -160,27 +150,25 @@ Keyring.prototype.importPublic = async function (armoredPublicKey, userId) {
 
   // Parse the keys. If standard format given with a text containing
   // public/private. It will extract only the public.
-  var armoredPublicKey = parseArmoredKey(armoredPublicKey, Keyring.PUBLIC);
+  armoredPublicKey = Keyring.findArmoredKeyInText(armoredPublicKey, Keyring.PUBLIC);
 
   // Is the given key a valid pgp key ?
-  var openpgpRes = openpgp.key.readArmored(armoredPublicKey);
-
-  // Return the error in any case
-  if (openpgpRes.err) {
-    throw new Error(openpgpRes.err[0].message);
+  const publicKey = openpgp.key.readArmored(armoredPublicKey);
+  if (publicKey.err) {
+    throw new Error(publicKey.err[0].message);
   }
 
   // If the key is not public, return an error.
-  var key = openpgpRes.keys[0];
-  if (!key.isPublic()) {
+  const primaryPublicKey = publicKey.keys[0];
+  if (!primaryPublicKey.isPublic()) {
     throw new Error(__('Expected a public key but got a private key instead'));
   }
 
   // Get the keyInfo.
-  var keyInfo = await this.keyInfo(armoredPublicKey);
+  let keyInfo = await this.keyInfo(armoredPublicKey);
 
   // Add the key in the keyring.
-  var publicKeys = Keyring.getPublicKeys();
+  let publicKeys = Keyring.getPublicKeys();
   publicKeys[userId] = keyInfo;
   publicKeys[userId].user_id = userId;
   this.store(Keyring.PUBLIC, publicKeys);
@@ -203,27 +191,25 @@ Keyring.prototype.importPrivate = async function (armoredKey) {
 
   // Parse the keys. If standard format given with a text containing
   // public/private. It will extract only the private.
-  var armoredKey = parseArmoredKey(armoredKey, Keyring.PRIVATE);
+  armoredKey = Keyring.findArmoredKeyInText(armoredKey, Keyring.PRIVATE);
 
   // Is the given key a valid pgp key ?
-  var openpgpRes = openpgp.key.readArmored(armoredKey);
-
-  // Return the error in any case
-  if (openpgpRes.err) {
-    throw new Error(openpgpRes.err[0].message);
+  let privateKey = openpgp.key.readArmored(armoredKey);
+  if (privateKey.err) {
+    throw new Error(privateKey.err[0].message);
   }
 
   // If the key is not private, return an error.
-  var key = openpgpRes.keys[0];
-  if (!key.isPrivate()) {
+  privateKey = privateKey.keys[0];
+  if (!privateKey.isPrivate()) {
     throw new Error(__('Expected a private key but got a public key instead'));
   }
 
   // Get the keyInfo.
-  var keyInfo = await this.keyInfo(armoredKey);
+  let keyInfo = await this.keyInfo(armoredKey);
 
   // Add the key in the keyring
-  var privateKeys = Keyring.getPrivateKeys();
+  let privateKeys = Keyring.getPrivateKeys();
   privateKeys[Keyring.MY_KEY_ID] = keyInfo;
   privateKeys[Keyring.MY_KEY_ID].user_id = Keyring.MY_KEY_ID;
   this.store(Keyring.PRIVATE, privateKeys);
@@ -234,14 +220,13 @@ Keyring.prototype.importPrivate = async function (armoredKey) {
 /**
  * Import the server public armored key.
  *
- * @param armoredPublicKey {string} The key to import
+ * @param armoredKey {string} The key to import
  * @param domain {string} The server domain url
  * @returns {bool}
  * @throw Error if the key cannot be imported
  */
 Keyring.prototype.importServerPublicKey = async function (armoredKey, domain) {
-  var Crypto = require('../model/crypto').Crypto;
-  var serverKeyId = Crypto.uuid(domain);
+  const serverKeyId = Uuid.get(domain);
   await this.importPublic(armoredKey, serverKeyId);
   return true;
 };
@@ -255,25 +240,22 @@ Keyring.prototype.importServerPublicKey = async function (armoredKey, domain) {
  */
 Keyring.prototype.keyInfo = async function(armoredKey) {
   // Attempt to read armored key.
-  var openpgpRes = openpgp.key.readArmored(armoredKey);
-
-  // In case of error, throw exception.
-  if (openpgpRes.err) {
-    throw new Error(openpgpRes.err[0].message);
+  let key = openpgp.key.readArmored(armoredKey);
+  if (key.err) {
+    throw new Error(key.err[0].message);
   }
+  key = key.keys[0];
 
-  var key = openpgpRes.keys[0],
-    userIds = key.getUserIds(),
+  // Check the userIds
+  let userIds = key.getUserIds(),
     userIdsSplited = [];
-
   if(userIds.length === 0) {
     throw new Error('No key user ID found');
   }
 
   // Extract name & email from key userIds.
-  var myRegexp = XRegExp(/(.*) <(\S+@\S+)>$/g);
-  var match;
-  for (var i in userIds) {
+  let i, match, myRegexp = XRegExp(/(.*) <(\S+@\S+)>$/g);
+  for (i in userIds) {
     match = XRegExp.exec(userIds[i], myRegexp);
     if(match === null) {
       throw new Error('Error when parsing key user id');
@@ -285,25 +267,25 @@ Keyring.prototype.keyInfo = async function(armoredKey) {
   }
 
   // seems like opengpg keys id can be longer than 8 bytes (16 default?)
-  var keyid = key.primaryKey.getKeyId().toHex();
+  let keyid = key.primaryKey.getKeyId().toHex();
   if (keyid.length > 8) {
-    var shortid = keyid.substr(keyid.length - 8);
-    keyid = shortid;
+    keyid = keyid.substr(keyid.length - 8);
   }
 
   // Format expiration time
+  let expirationTime, created;
   try {
-    var expirationTime = await key.getExpirationTime();
+    expirationTime = await key.getExpirationTime();
     expirationTime = expirationTime.toString();
     if (expirationTime === 'Infinity') {
       expirationTime = __('Never');
     }
-    var created = key.primaryKey.created.toString();
+    created = key.primaryKey.created.toString();
   } catch(error) {
     expirationTime = null;
   }
 
-  var info = {
+  return {
     key: armoredKey,
     keyId: keyid,
     userIds: userIdsSplited,
@@ -315,26 +297,24 @@ Keyring.prototype.keyInfo = async function(armoredKey) {
     curve: key.primaryKey.getAlgorithmInfo().curve,
     private: key.isPrivate()
   };
-
-  return info;
 };
 
 /**
  * Extract a public armored key from a private armored key.
+ *
  * @param privateArmoredKey {string} The private key armored
  * @returns {string}
  */
 Keyring.prototype.extractPublicKey = function (privateArmoredKey) {
-  var key = openpgp.key.readArmored(privateArmoredKey);
-  var publicKey = key.keys[0].toPublic();
-  return publicKey.armor();
+  const key = openpgp.key.readArmored(privateArmoredKey);
+  return key.keys[0].toPublic().armor();
 };
 
 /**
  * Get a public key by its fingerprint.
  *
- * @param userId {string) The key owner ids
- * @returns {OpenPgpKey}
+ * @param userId {string} uuid
+ * @returns {Key}
  */
 Keyring.prototype.findPublic = function (userId) {
   let i, publicKeys = Keyring.getPublicKeys();
@@ -350,14 +330,11 @@ Keyring.prototype.findPublic = function (userId) {
  * Get a private key by its fingerprint.
  * We currently only support one private key per person
  *
- * @param userId {string} The key owner
- * @returns {OpenPgpKey}
+ * @returns {Key}
  */
-Keyring.prototype.findPrivate = function (userId) {
-  if (typeof userId === 'undefined') {
-    userId = Keyring.MY_KEY_ID;
-  }
-  var privateKeys = Keyring.getPrivateKeys();
+Keyring.prototype.findPrivate = function () {
+  const userId = Keyring.MY_KEY_ID;
+  const privateKeys = Keyring.getPrivateKeys();
   return privateKeys[userId];
 };
 
@@ -366,25 +343,19 @@ Keyring.prototype.findPrivate = function (userId) {
  *
  * @param keyInfo {array} The key settings
  * @param passphrase {string} The key passphrase
- * @returns {Promise}
+ * @returns {Promise.<Object>}
  */
 Keyring.prototype.generateKeyPair = function (keyInfo, passphrase) {
   // Get user id from key info.
-  var key = new Key();
+  const key = new Key();
   key.set(keyInfo);
-  keyInfo.userId = key.getUserId();
-
-  var keySettings = {
-    numBits: keyInfo.length,
-    userIds: keyInfo.userId,
-    passphrase: passphrase
-  };
 
   // Launch key pair generation from openpgp worker.
-  var def = openpgp
-    .generateKey(keySettings);
-
-  return def;
+  return openpgp.generateKey({
+    numBits: keyInfo.length,
+    userIds: key.getUserId(),
+    passphrase: passphrase
+  });
 };
 
 /**

@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fix
+- GITHUB-35 Fix login redirects in wrong tab
 - PASSBOLT-2764: Fix share autocomplete search concurrency issue on result display
 
 ### Improve

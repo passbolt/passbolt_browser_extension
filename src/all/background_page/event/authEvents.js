@@ -84,7 +84,6 @@ var listen = function (worker) {
           // Redirect the user.
           var msg = __('You are now logged in!');
           Worker.get('Auth', tabId).port.emit('passbolt.auth.login-success', msg, _referrer);
-          tabsController.setActiveTabUrl(_referrer);
         });
       },
       function error(error) {

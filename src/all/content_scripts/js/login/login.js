@@ -62,7 +62,6 @@ $(function () {
         passbolt.html.loadTemplate('.plugin-check.gpg', 'login/message.ejs', 'html', {message: msg});
 
         $('html').addClass('server-verified');
-        passbolt.login.onStep1RequestPassphrase();
       },
       function error(msg) {
         $('.plugin-check.gpg')
@@ -87,6 +86,7 @@ $(function () {
         }
       }
     );
+    passbolt.login.onStep1RequestPassphrase();
   };
 
   /**
@@ -121,8 +121,9 @@ $(function () {
   });
 
   // GPGAuth is completed with success
-  passbolt.message.on('passbolt.auth.login-success', function () {
+  passbolt.message.on('passbolt.auth.login-success', function (message, referrer) {
     $('html').addClass('loaded').removeClass('loading');
+    window.location.replace(referrer);
   });
 
   // GPGAuth failed

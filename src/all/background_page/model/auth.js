@@ -19,6 +19,7 @@ var Auth = function () {
   this.URL_VERIFY = '/auth/verify.json?api-version=v1'; // @TODO get from server http headers
   this.URL_LOGIN = '/auth/login.json?api-version=v1';
   this._verifyToken = undefined;
+  this.keyring = new Keyring();
 };
 
 /**
@@ -138,31 +139,12 @@ Auth.prototype.getServerKey = function (domain) {
  * GPGAuth Login - handle stage1, stage2 and complete
  *
  * @param passphrase {string} The user private key passphrase
- * @returns {Promise}
+ * @returns {Promise} referrer url
  */
-Auth.prototype.login = function(passphrase) {
-  var _this = this,
-    keyring = new Keyring();
-
-  return new Promise (function(resolve, reject) {
-    keyring.checkPassphrase(passphrase)
-      .then(function () {
-        return _this.__stage1(passphrase)
-      })
-      .then(function (userAuthToken) {
-        return _this.__stage2(userAuthToken)
-      }, function(error) {
-        reject(error);
-      })
-      .then(function (referrer) {
-        resolve(referrer);
-      }, function(error) {
-        reject(error);
-      })
-      .catch(function (error) {
-        reject(error);
-      });
-  });
+Auth.prototype.login = async function(passphrase) {
+    await this.keyring.checkPassphrase(passphrase);
+    const userAuthToken = await this.stage1(passphrase);
+    return await this.stage2(userAuthToken);
 };
 
 /**
@@ -172,42 +154,35 @@ Auth.prototype.login = function(passphrase) {
  * @returns {Promise}
  * @private
  */
-Auth.prototype.__stage1 = function (passphrase) {
-  var _this = this,
-    user = User.getInstance(),
-    keyring = new Keyring();
+Auth.prototype.stage1 = async function (passphrase) {
 
-  return new Promise (function(resolve, reject) {
-    var data = new FormData();
-    data.append('data[gpg_auth][keyid]', (keyring.findPrivate()).fingerprint);
+  // Prepare request data
+  const body = new FormData();
+  body.append('data[gpg_auth][keyid]', this.keyring.findPrivate().fingerprint);
+  const data = {
+    method: 'POST',
+    credentials: 'include',
+    body: body
+  };
+  const url = User.getInstance().settings.getDomain() + this.URL_LOGIN;
 
-    // Stage 1. request a token to the server
-    fetch(
-      user.settings.getDomain() + _this.URL_LOGIN, {
-        method: 'POST',
-        credentials: 'include',
-        body: data
-      })
-      .then(function (response) {
-        if (!response.ok) {
-          return _this.onResponseError(response);
-        }
-        // Check headers
-        var auth = new GpgAuthHeader(response.headers, 'stage1');
-        // Try to decrypt the User Auth Token
-        var crypto = new Crypto();
-        var encryptedUserAuthToken = stripslashes(urldecode(auth.headers['x-gpgauth-user-auth-token']));
-        return crypto.decrypt(encryptedUserAuthToken, passphrase);
-      })
-      .then(function (userAuthToken) {
-        // Validate the User Auth Token
-        var authToken = new GpgAuthToken(userAuthToken);
-        resolve(authToken.token);
-      })
-      .catch(function (error) {
-        reject(error);
-      });
-  });
+  // Send request token to the server
+  const response = await fetch(url, data);
+  if (!response.ok) {
+    return this.onResponseError(response);
+  }
+
+  // Check headers
+  const auth = new GpgAuthHeader(response.headers, 'stage1');
+
+  // Try to decrypt the User Auth Token
+  const crypto = new Crypto();
+  const encryptedUserAuthToken = stripslashes(urldecode(auth.headers['x-gpgauth-user-auth-token']));
+  let userAuthToken = await crypto.decrypt(encryptedUserAuthToken, passphrase);
+
+  // Validate the User Auth Token
+  let authToken = new GpgAuthToken(userAuthToken);
+  return authToken.token;
 };
 
 /**
@@ -217,7 +192,7 @@ Auth.prototype.__stage1 = function (passphrase) {
  * @returns {Promise}
  * @private
  */
-Auth.prototype.__stage2 = function (userAuthToken) {
+Auth.prototype.stage2 = function (userAuthToken) {
   var _this = this,
     user = User.getInstance(),
     keyring = new Keyring();

@@ -130,7 +130,7 @@ Crypto.prototype.encryptAll = async function (toEncrypt, completeCallback, start
  * Decrypt an armored text.
  *
  * @param armored The text to decrypt.
- * @param passphrase (optional) The passphrase used to decrypt the private key.
+ * @param passphrase (optional) The (validated) passphrase to use to decrypt the private key.
  * @throw Error if something goes wrong in openpgp methods
  * @return promise
  */

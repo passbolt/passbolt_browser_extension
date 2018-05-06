@@ -393,27 +393,14 @@ Keyring.prototype.generateKeyPair = function (keyInfo, passphrase) {
  * @param passphrase {string} The key passphrase
  * @returns {Promise}
  */
-Keyring.prototype.checkPassphrase = function (passphrase) {
-  var _this = this;
+Keyring.prototype.checkPassphrase = async function (passphrase) {
+  const keyInfo = this.findPrivate(),
+    privateKey = openpgp.key.readArmored(keyInfo.key).keys[0];
 
-  return new Promise( function(resolve, reject) {
-    var keyInfo = _this.findPrivate(),
-      privateKey = openpgp.key.readArmored(keyInfo.key).keys[0];
-
-    if (!privateKey.primaryKey.isDecrypted) {
-      openpgp.decryptKey({privateKey: privateKey, passphrase: passphrase})
-        .then(
-          function (decrypted) {
-            resolve(decrypted);
-          },
-          function (error) {
-            reject(error);
-          }
-        );
-    } else {
-      resolve();
-    }
-  });
+  if (!privateKey.primaryKey.isDecrypted) {
+    await openpgp.decryptKey({privateKey, passphrase});
+  }
+  return Promise.resolve();
 };
 
 /**

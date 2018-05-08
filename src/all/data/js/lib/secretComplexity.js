@@ -75,7 +75,10 @@ var secretComplexity = {};
    * @returns {int}
    */
   var randomRange = function (min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    var arr = new Uint32Array(1);
+    window.crypto.getRandomValues(arr);
+    var random = arr[0]/(0xffffffff + 1);
+    return Math.floor(random * (max - min + 1)) + min;
   };
 
   /**

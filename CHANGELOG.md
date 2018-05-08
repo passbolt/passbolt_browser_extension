@@ -2,9 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [2.0.5] - 2018-05-08
 ### Fix
-- GITHUB-35 Fix login redirects in wrong tab
+- PASSBOLT-2857: Fix password generator does not use secure PRNG
+- GITHUB-35: Fix login redirects in wrong tab
 - PASSBOLT-2764: Fix share autocomplete search concurrency issue on result display
 
 ### Improve

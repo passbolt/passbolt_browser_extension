@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.7] - 2018-05-09
+### Fix
+- Fix backward compatibility issue with legacy API.
+
+## [2.0.6] - 2018-05-08
+### Fix
+- Temporarily rollback of v2.0.5 as it break compatibilty with API version < v1.6.10
+
 ## [2.0.5] - 2018-05-08
 ### Fix
 - PASSBOLT-2857: Fix password generator does not use secure PRNG

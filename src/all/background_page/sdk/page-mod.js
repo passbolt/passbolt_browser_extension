@@ -19,7 +19,7 @@ var Log = require('../model/log').Log;
  */
 var PageMod = function(args) {
   this.args = args;
-  this._ports = []; // list of tab ids in which the pagemod has a port open
+  this._ports = {}; // Object{tabid:port, ...} for which the pagemod has a port available
   this._listeners = []; // list of listeners initialized by this pagemod
   this.__init();
 };
@@ -52,9 +52,8 @@ PageMod.prototype.destroy = function () {
     chrome.runtime.onConnect.removeListener(this._listeners['chrome.runtime.onConnect']);
   }
   // clear the tab and listeners
-  this._ports = [];
+  this._ports = {};
   this._listeners = [];
-  this._loading = [];
 
 };
 
@@ -123,8 +122,9 @@ PageMod.prototype.__init = function() {
   // When a tab is closed cleanup
   this._listeners['chrome.tabs.onRemoved'] = function (tabId) {
     Log.write({level: 'debug', message: 'sdk/pagemod::__init::onRemovedListener tab:' + tabId });
-    var index = _this._ports.indexOf(tabId);
-    _this._ports.splice(index, 1);
+    if (tabId in _this._ports) {
+      delete _this._ports[tabId];
+    }
   };
   chrome.tabs.onRemoved.addListener(this._listeners['chrome.tabs.onRemoved']);
 };
@@ -155,8 +155,7 @@ PageMod.prototype.__initConnectListener = function(portName, tabId, iframe) {
 
       // add the sender tab id to the list of active tab for that worker
       if(typeof tabId === 'undefined' || tabId === port.sender.tab.id) {
-        _this._ports.push(port.sender.tab.id);
-
+        _this._ports[port.sender.tab.id] = port;
         var worker = new Worker(port, iframe);
         _this.args.onAttach(worker);
       }
@@ -261,8 +260,20 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
   // generate a portname based on the tab it and listen to connect event
   // otherwise reuse the already an active worker in that tab to accept incoming connection
   this.portname = 'port-' + Uuid.get(tabId.toString());
-  if (this._ports.indexOf(tabId) === -1) {
+  //if (this._ports.indexOf(tabId) === -1) {
+  if (!(tabId in this._ports)) {
     this.__initConnectListener(this.portname, tabId);
+  } else {
+    try {
+      // try to post a message in that port
+      // If the port is disconnected, an error is thrown.
+      this._ports[tabId].postMessage('passbolt.port.check');
+      // If there is not error it means there is already a content script running
+      // and we do not need to include it a second time
+      return;
+    } catch(error) {
+      // If the port is not open / does not exist, we proceed to include scripts
+    }
   }
 
   // a helper to handle insertion of scripts, variables and css in target page
@@ -277,7 +288,6 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
   }
 
   // Inject JS files if needed
-	// TODO don't insert if the JS is already inserted
   var scripts = this.args.contentScriptFile.slice();
   scriptExecution.injectScripts(scripts);
 
@@ -285,7 +295,6 @@ PageMod.prototype.__onTabUpdated = function(tabId, changeInfo, tab) {
   if(typeof this.args.contentStyleFile !== 'undefined') {
     var styles = this.args.contentStyleFile.slice();
     if (styles.length > 0) {
-      // TODO don't insert if the CSS is already inserted
       scriptExecution.injectCss(styles);
     }
   }

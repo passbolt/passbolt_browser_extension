@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased] - 2018-XX-XX
 ### Fix
 - Fix content scripts should not be inserted if they are already present.
+- Fix auth pagemod should insert script when a redirection is set in url
 
 ## [2.0.7] - 2018-05-09
 ### Fix

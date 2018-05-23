@@ -25,11 +25,13 @@ PassboltAuth.init = function () {
   // ✓ https://demo.passbolt.com/auth/login
   // ✓ https://demo.passbolt.com/auth/login/
   // ✓ https://demo.passbolt.com/auth/login#checkthis
+  // ✓ https://demo.passbolt.com/auth/login?redirect=%2somewhere
+  // ✓ https://demo.passbolt.com/auth/login?redirect=%2somewhere#nice
   // ✗ https://demoxpassbolt.com/auth/login
   // ✗ https://demo.passbolt.com/auth/login/nope
   var user = User.getInstance();
   var escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
-  var url = '^' + escapedDomain + '/auth/login/?(#.*)?$';
+  var url = '^' + escapedDomain + '/auth/login/?(#.*)?(\\?.*)?$';
   var regex = new RegExp(url);
 
   PassboltAuth._pageMod = pageMod.PageMod({

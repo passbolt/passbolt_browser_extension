@@ -2,10 +2,15 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased] - 2018-XX-XX
+## [2.0.9] - 2018-05-23
 ### Fix
 - Fix content scripts should not be inserted if they are already present.
 - Fix auth pagemod should insert script when a redirection is set in url
+- Fix json.headers should be json.header
+
+## [2.0.8] - 2018-05-09
+### Fix
+- Fix backward compatibility issue with user search API
 
 ## [2.0.7] - 2018-05-09
 ### Fix

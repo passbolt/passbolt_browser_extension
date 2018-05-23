@@ -461,8 +461,8 @@ var User = (function () {
           // Check response status
           if (!_response.ok) {
             var msg = __('Could not get the users. The server responded with an error.');
-            if (typeof json.headers.msg !== 'undefined') {
-              msg += ' ' + json.headers.msg;
+            if (typeof json.header.msg !== 'undefined') {
+              msg += ' ' + json.header.msg;
             }
             msg += ' (' + _response.status + ')';
             reject(new Error(msg));

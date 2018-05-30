@@ -114,24 +114,22 @@ $(function () {
     passbolt.request('passbolt.user.rememberMasterPassword', masterPassword, duration);
   };
 
-  /**
-   * Submit the master password to the addon code
-   * @param masterPassword {string} The master password to send to the addon code.
-   */
-  var submitMasterPassword = function (masterPassword) {
-    $submitButton.addClass('processing');
-    passbolt.request('passbolt.master-password.submit', masterPassword)
-      .then(validAttemptHandler, wrongAttemptHandler);
-  };
-
   /* ==================================================================================
    *  Addon events handlers
    * ================================================================================== */
 
   /**
    * Handles valid attempt.
+   *  - Check if the user wants their master password to be remembered and
+   *    notify the addon about this preference if yes.
+   *  - Close the dialog
    */
   var validAttemptHandler = function () {
+    // The user wants their master password to be remembered.
+    if ($('#js_remember_master_password').is(':checked')) {
+      var duration = parseInt($('#js_remember_master_password_duration').val());
+      rememberMasterPassword($masterPasswordField.val(), duration);
+    }
     passbolt.message.emit('passbolt.master-password.close-dialog');
   };
 
@@ -235,19 +233,12 @@ $(function () {
 
   /**
    * The submit button has been clicked :
-   *  - Check if the user wants their master password to be remembered and
-   *    notify the addon about this preference if yes.
-   *  - Submit the master password to the addon.
+   *  - Submit the master password to the addon for validation
    */
   var submitButtonClicked = function () {
-    var masterPassword = $masterPasswordField.val();
-    // The user wants their master password to be remembered.
-    if ($('#js_remember_master_password').is(':checked')) {
-      var duration = parseInt($('#js_remember_master_password_duration').val());
-      rememberMasterPassword(masterPassword, duration);
-    }
-
-    submitMasterPassword(masterPassword);
+    $submitButton.addClass('processing');
+    passbolt.request('passbolt.master-password.submit', $masterPasswordField.val())
+      .then(validAttemptHandler, wrongAttemptHandler);
   };
 
   /**

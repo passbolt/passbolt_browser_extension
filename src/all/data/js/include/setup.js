@@ -13,6 +13,7 @@ loadScripts(scripts).then(function () {
     'js/lib/message.js',
     'js/lib/request.js',
     'js/lib/html.js',
+    'js/lib/pwnedpasswords.js',
     'js/lib/secretComplexity.js',
     'js/file/file.js',
     'js/setup/workflow/installSetup.workflow.js',

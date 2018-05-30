@@ -24,9 +24,8 @@ window._ = require('underscore/underscore-min');
 window.kdbxweb = require('kdbxweb/dist/kdbxweb');
 window.PapaParse = require('papaparse/papaparse');
 
-
 /**
- * Crypto libraries
+ * Crypto/sec libraries
  */
 window.openpgp = require('openpgp/dist/openpgp');
 window.jsSHA = require('jssha/src/sha');

@@ -27,6 +27,10 @@ $(function () {
   // Allow to delay the treament of the master password input.
     currentOnPasswordInputTimeout = null;
 
+  // pending checks
+  step.criterias = {};
+  step.strength = undefined;
+
   /**
    * Implements init().
    * @returns Promise
@@ -40,34 +44,34 @@ $(function () {
   /**
    * Implements start().
    */
-  step.start = function () {
+  step.start =  function () {
     // Disable submit button at the beginning.
     passbolt.setup.setActionState('submit', 'disabled');
 
     // Update password criterias for empty password.
-    step._updatePasswordCriterias('');
+    step._updatePasswordCriterias('').then(() => {
+      // On input change.
+      step.elts.$password.on('input change', function () {
+        // If the treatment of the input is already schedule.
+        if (currentOnPasswordInputTimeout != null) {
+          clearTimeout(currentOnPasswordInputTimeout);
+        }
+        // Postpone the input treatment
+        currentOnPasswordInputTimeout = setTimeout(function () {
+          step.onPasswordInput();
+        }, 250);
+      });
 
-    // On input change.
-    step.elts.$password.on('input change', function () {
-      // If the treatment of the input is already schedule.
-      if (currentOnPasswordInputTimeout != null) {
-        clearTimeout(currentOnPasswordInputTimeout);
-      }
-      // Postpone the input treatment
-      currentOnPasswordInputTimeout = setTimeout(function () {
-        step.onPasswordInput();
-      }, 100);
-    });
+      // When the clear password is updated.
+      step.elts.$passwordClear.on('input', function () {
+        step.onPasswordClearInput();
+      });
 
-    // When the clear password is updated.
-    step.elts.$passwordClear.on('input', function () {
-      step.onPasswordClearInput();
-    });
-
-    // When the user explicitly wants to view the password.
-    step.elts.$viewPasswordButton.on('click', function (ev) {
-      ev.preventDefault();
-      step.onViewButtonClick(ev);
+      // When the user explicitly wants to view the password.
+      step.elts.$viewPasswordButton.on('click', function (ev) {
+        ev.preventDefault();
+        step.onViewButtonClick(ev);
+      });
     });
   };
 
@@ -135,27 +139,16 @@ $(function () {
     // Get password from password field.
     var password = step.elts.$password.val();
 
-    // Update password in clear.
+    // Calculate password strength and criterias
     step.elts.$passwordClear.val(password);
-
-    // Update strength.
-    return step._updatePasswordStrength(password)
-
-      // Update criterias.
-      .then(function () {
-        return step._updatePasswordCriterias(password);
-      })
-
-      // Validate key.
-      .then(function () {
-        passbolt.request('passbolt.keyring.key.validate', {passphrase: password}, ['passphrase'])
-          .then(function () {
-            passbolt.setup.setActionState('submit', 'enabled');
-          })
-          .then(null, function (errorMessage, validationErrors) {
-            passbolt.setup.setActionState('submit', 'disabled');
-          })
-      });
+    step.strength = secretComplexity.strength(password);
+    console.log(step.strength);
+    if (password.length > 0) {
+      step.criterias = secretComplexity.matchMasks(password);
+      step.criterias['minLength'] = password.length >= 8;
+    }
+    step._onUpdateAll();
+    step._checkPasswordPwnd(password);
   };
 
   /* ==================================================================================
@@ -163,36 +156,56 @@ $(function () {
    * ================================================================================== */
 
   /**
-   * Update the secret strength component.
-   * @param password {string} The password to evaluate
+   * Update the secret strength and password criteria component.
    * @returns {Promise}
    */
-  step._updatePasswordCriterias = function (password) {
-    var criterias = {};
-    if (password.length > 0) {
-      var criterias = secretComplexity.matchMasks(password);
-      criterias['dictionary'] = null;
-      criterias['minLength'] = password.length >= 8;
-    }
-    var data = {
-      criterias: criterias
-    };
-
-    return passbolt.html.loadTemplate(step.elts.$passwordCriterias, 'secret/criterias.ejs', 'html', data);
+  step._onUpdateAll = function() {
+    // Update strength.
+    return step._updatePasswordStrength(step.strength)
+      .then(() => step._updatePasswordCriterias(step.criterias))
+      .then(() => passbolt.request('passbolt.keyring.key.validate', {passphrase: password}, ['passphrase']))
+      .then(() => passbolt.setup.setActionState('submit', 'enabled'))
+      .then(null, (errorMessage, validationErrors) => {
+        passbolt.setup.setActionState('submit', 'disabled');
+      });
   };
 
   /**
    * Update the secret strength component.
-   * @param password {string} The password to measure the strength
    * @returns {Promise}
    */
-  step._updatePasswordStrength = function (password) {
-    var strength = secretComplexity.strength(password);
-    var data = {
-      strengthId: secretComplexity.STRENGTH[strength].id,
-      strengthLabel: secretComplexity.STRENGTH[strength].label
+  step._updatePasswordCriterias = function () {
+    data = {
+      criterias: step.criterias
     };
+    return passbolt.html.loadTemplate(step.elts.$passwordCriterias, 'secret/criterias.ejs', 'html', data);
+  };
 
+  /**
+   * Update strength and criteria when password is pwnd
+   * @param password
+   * @returns {Promise<Promise<T>|*|*>}
+   * @private
+   */
+  step._checkPasswordPwnd = async function(password) {
+    var isPwnd = await secretComplexity.ispwned(password);
+    step.criterias['dictionary'] = !isPwnd;
+    if (isPwnd) {
+      step.strength = secretComplexity.STRENGTH['pwnd'];
+    }
+    step._onUpdateAll();
+  };
+
+  /**
+   * Update the secret strength component.
+   * @param string {string} strength level to display
+   * @returns {Promise}
+   */
+  step._updatePasswordStrength = function () {
+    var data = {
+      strengthId: secretComplexity.STRENGTH[step.strength].id,
+      strengthLabel: secretComplexity.STRENGTH[step.strength].label
+    };
     return passbolt.html.loadTemplate(step.elts.$passwordStrength, 'secret/strength.ejs', 'html', data);
   };
 

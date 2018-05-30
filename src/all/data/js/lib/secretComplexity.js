@@ -13,6 +13,10 @@ var secretComplexity = {};
    * Secret entropy levels
    */
   var STRENGTH = {
+    'pwnd': {
+      id: 'very_weak',
+      label: 'pwnd'
+    },
     0: {
       id: 'not_available',
       label: 'n/a'
@@ -190,5 +194,19 @@ var secretComplexity = {};
     return secret;
   };
   exports.generate = generate;
+
+  /**
+   * Dictionary check
+   */
+  var ispwned = async function (password) {
+    try {
+      var count = await pwnedpasswords(password);
+      return (count > 0);
+    } catch(error) {
+      console.error(error);
+      return undefined;
+    }
+  };
+  exports.ispwned = ispwned;
 
 })(secretComplexity);

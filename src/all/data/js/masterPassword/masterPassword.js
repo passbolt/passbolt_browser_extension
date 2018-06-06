@@ -94,6 +94,7 @@ $(function () {
     $focusFirstField.on('keypress', focusFirstFieldKeypressed);
     $focusFirstField.on('keydown', focusFirstFieldKeydown);
     $masterPasswordField.on('keypress', masterPasswordFieldKeypressed);
+    $masterPasswordField.on('keydown', masterPasswordFieldKeyDown);
   };
 
   /**
@@ -177,6 +178,14 @@ $(function () {
     // Get keycode.
     var keycode = ev.keyCode || ev.which;
 
+    // Escape
+    if (keycode == 27) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      cancelMasterPassword();
+      return;
+    }
+
     // Tab.
     if (keycode == 9) {
       ev.preventDefault();
@@ -258,6 +267,24 @@ $(function () {
     }
     // The user presses escape.
     else if (keycode == 27) {
+      cancelMasterPassword();
+    }
+  };
+
+  /**
+   * Handle when the user presses a key on the master password field.
+   * Handle the different scenario :
+   *  - Escape pressed : close the dialog ;
+   * @param ev {HTMLEvent} The event which occurred
+   */
+  var masterPasswordFieldKeyDown = function (ev) {
+    // Get keycode.
+    var keycode = ev.keyCode || ev.which;
+
+    // The user presses escape.
+    if (keycode == 27) {
+      ev.preventDefault();
+      ev.stopPropagation();
       cancelMasterPassword();
     }
   };

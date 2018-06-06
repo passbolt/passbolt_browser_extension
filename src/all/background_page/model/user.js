@@ -1,30 +1,24 @@
+"use strict";
 /**
  * User model.
  *
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var Config = require('./config');
-var UserSettings = require('./userSettings').UserSettings;
-var __ = require('../sdk/l10n').get;
-var Log = require('./log').Log;
+const Config = require('./config');
+const UserSettings = require('./userSettings').UserSettings;
+const __ = require('../sdk/l10n').get;
 
 /**
  * The class that deals with users.
  */
-var User = (function () {
+const User = (function () {
 
   // see model/settings
   this.settings = new UserSettings();
 
-  // reference to the user object returned by the server
-  this._remote_user = {};
-
   // the fields
   this._user = {};
-
-  // URLs
-  this.URL_GET_REMOTE = '/users/me.json';
 
  /*
   * _masterpassword be a json object with :
@@ -434,56 +428,44 @@ var User = (function () {
    *
    * @param keywords
    * @param excludedUsers
-   * @return {Promise}
+   * @return {Promise.<array>} array of users
    */
-  this.searchUsers = function(keywords, excludedUsers) {
-    var _this = this;
+  this.searchUsers = async function(keywords, excludedUsers) {
 
-    return new Promise (function(resolve, reject) {
-      var _response = null;
-      var url = _this.settings.getDomain() + '/users.json'  + '?api-version=v1';
-        url += '&filter[keywords]=' + htmlspecialchars(keywords, 'ENT_QUOTES') + '&filter[is-active]=1';
+    // Prepare url and data
+    const url = this.settings.getDomain() + '/users.json'
+      + '?api-version=v1' + '&filter[keywords]=' + htmlspecialchars(keywords, 'ENT_QUOTES') + '&filter[is-active]=1';
+    const data = {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    };
+    const response = await fetch(url, data);
+    const json = await response.json();
 
-      fetch(
-        url, {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        })
-        .then(function (response) {
-          _response = response;
-          return response.json();
-        })
-        .then(function (json) {
-          // Check response status
-          if (!_response.ok) {
-            var msg = __('Could not get the users. The server responded with an error.');
-            if (typeof json.headers.msg !== 'undefined') {
-              msg += ' ' + json.headers.msg;
-            }
-            msg += ' (' + _response.status + ')';
-            reject(new Error(msg));
-            return;
-          }
+    // Check response status
+    if (!response.ok) {
+      let msg = __('Could not get the users. The server responded with an error.');
+      if (typeof json.headers.msg !== 'undefined') {
+        msg += ` ${json.headers.msg}`;
+      }
+      msg += ` (${response.status})`;
+      throw new Error(msg);
+    }
 
-          var users = json.body;
-          var finalUsers = [];
-          for (var i in users) {
-            if (!in_array(users[i].User.id, excludedUsers)) {
-              finalUsers.push(users[i]);
-            }
-          }
-          resolve(finalUsers);
-        })
-        .catch(function (error) {
-          reject(error);
-        });
-    });
+    // Build the user list
+    const users = json.body;
+    let finalUsers = [];
+    for (var i in users) {
+      if (!in_array(users[i].User.id, excludedUsers)) {
+        finalUsers.push(users[i]);
+      }
+    }
+    return finalUsers;
   };
-
 });
 
 var UserSingleton = (function () {

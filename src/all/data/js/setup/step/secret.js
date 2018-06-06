@@ -14,22 +14,17 @@ $(function () {
    * Step settings.
    */
   var step = {
-      id: 'secret',
-      elts: {
-        password: '#js_field_password',
-        passwordClear: '#js_field_password_clear',
-        viewPasswordButton: '#js_show_pwd_button',
-        passwordStrength: '#js_user_pwd_strength',
-        passwordCriterias: '#js_password_match_criterias'
-      }
+    id: 'secret',
+    elts: {
+      password: '#js_field_password',
+      passwordClear: '#js_field_password_clear',
+      viewPasswordButton: '#js_show_pwd_button',
+      passwordStrength: '#js_user_pwd_strength',
+      passwordCriterias: '#js_password_match_criterias'
     },
-
-  // Allow to delay the treament of the master password input.
-    currentOnPasswordInputTimeout = null;
-
-  // pending checks
-  step.criterias = {};
-  step.strength = undefined;
+    criterias: {},
+    strength: undefined
+  };
 
   /**
    * Implements init().
@@ -52,14 +47,7 @@ $(function () {
     step._updatePasswordCriterias('').then(() => {
       // On input change.
       step.elts.$password.on('input change', function () {
-        // If the treatment of the input is already schedule.
-        if (currentOnPasswordInputTimeout != null) {
-          clearTimeout(currentOnPasswordInputTimeout);
-        }
-        // Postpone the input treatment
-        currentOnPasswordInputTimeout = setTimeout(function () {
-          step.onPasswordInput();
-        }, 250);
+        step.onPasswordInput();
       });
 
       // When the clear password is updated.
@@ -142,13 +130,24 @@ $(function () {
     // Calculate password strength and criterias
     step.elts.$passwordClear.val(password);
     step.strength = secretComplexity.strength(password);
-    console.log(step.strength);
+
     if (password.length > 0) {
       step.criterias = secretComplexity.matchMasks(password);
       step.criterias['minLength'] = password.length >= 8;
+      if (step.criterias['minLength']) {
+        step._checkPasswordPwnd(password);
+      } else {
+        step.criterias['dictionary'] = false;
+      }
+    } else {
+      step.criterias['minLength'] = false;
+      step.criterias['alpha'] = false;
+      step.criterias['uppercase'] = false;
+      step.criterias['digit'] = false;
+      step.criterias['special'] = false;
+      step.criterias['dictionary'] = false;
     }
-    step._onUpdateAll();
-    step._checkPasswordPwnd(password);
+    step._onUpdateAll(password);
   };
 
   /* ==================================================================================
@@ -159,13 +158,15 @@ $(function () {
    * Update the secret strength and password criteria component.
    * @returns {Promise}
    */
-  step._onUpdateAll = function() {
+  step._onUpdateAll = function(password) {
     // Update strength.
     return step._updatePasswordStrength(step.strength)
       .then(() => step._updatePasswordCriterias(step.criterias))
       .then(() => passbolt.request('passbolt.keyring.key.validate', {passphrase: password}, ['passphrase']))
-      .then(() => passbolt.setup.setActionState('submit', 'enabled'))
-      .then(null, (errorMessage, validationErrors) => {
+      .then(() => {
+        passbolt.setup.setActionState('submit', 'enabled')
+      }, (errorMessage) => {
+        console.error(errorMessage);
         passbolt.setup.setActionState('submit', 'disabled');
       });
   };
@@ -188,12 +189,25 @@ $(function () {
    * @private
    */
   step._checkPasswordPwnd = async function(password) {
-    var isPwnd = await secretComplexity.ispwned(password);
+    step.criterias['dictionary'] = undefined;
+    var isPwnd;
+    try {
+      isPwnd = await secretComplexity.ispwned(password);
+    } catch (error) {
+      // something went wrong (like a network issue)
+      // leave it undefined
+      console.error(error.message);
+      return;
+    }
+    if (typeof step.criterias['dictionary'] !== 'undefined') {
+      // password was cleared in meantime, ignore this request
+      return;
+    }
     step.criterias['dictionary'] = !isPwnd;
     if (isPwnd) {
-      step.strength = secretComplexity.STRENGTH['pwnd'];
+      step.strength = 1;
     }
-    step._onUpdateAll();
+    step._onUpdateAll(password);
   };
 
   /**

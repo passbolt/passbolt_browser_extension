@@ -42,7 +42,7 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<?\nif (Object.keys(criterias).length == 0) {\n?>\n<li>It is at least 8 char in length </li>\n<li>It contains lower and uppercase character</li>\n<li>It contains letters and numbers</li>\n<li>It contains special characters (like / or * or %)</li>\n<li>It is not part of a dictionary</li>\n<? } else { ?>\n<li class=\"<?= criterias.minLength ? 'success' : 'error' ?>\">It is at least 8 char in length</li>\n<li class=\"<?= criterias.alpha && criterias.uppercase ? 'success' : 'error' ?>\">It contains lower and uppercase character</li>\n<li class=\"<?= (criterias.alpha || criterias.uppercase) && criterias.digit ? 'success' : 'error' ?>\">It contains letters and numbers</li>\n<li class=\"<?= criterias.special ? 'success' : 'error' ?>\">It contains special characters (like / or * or %)</li>\n<li class=\"<?= criterias.dictionary ? 'success' : 'error' ?>\">It is not part of a dictionary</li>\n<? } ?>\n"
+  , __lines = "<?\nif (Object.keys(criterias).length == 0) {\n?>\n<li>It is at least 8 char in length </li>\n<li>It contains lower and uppercase character</li>\n<li>It contains letters and numbers</li>\n<li>It contains special characters (like / or * or %)</li>\n<li>It is not part of a dictionary</li>\n<? } else { ?>\n<li class=\"<?= criterias.minLength ? 'success' : 'error' ?>\">It is at least 8 char in length</li>\n<li class=\"<?= criterias.alpha && criterias.uppercase ? 'success' : 'error' ?>\">It contains lower and uppercase character</li>\n<li class=\"<?= (criterias.alpha || criterias.uppercase) && criterias.digit ? 'success' : 'error' ?>\">It contains letters and numbers</li>\n<li class=\"<?= criterias.special ? 'success' : 'error' ?>\">It contains special characters (like / or * or %)</li>\n<? if (typeof criterias.dictionary !== 'undefined') { ?>\n<li class=\"<?= criterias.dictionary ? 'success' : 'error' ?>\">It is not part of a dictionary</li>\n<? } else { ?>\n<li>It is not part of a dictionary (checking, please wait...)</li>\n<? } ?>\n<? } ?>\n"
   , __filename = "src/all/data/ejs/secret/criterias.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);
@@ -66,14 +66,23 @@ if (Object.keys(criterias).length == 0) {
     ; __append("\">It contains letters and numbers</li>\n<li class=\"")
     ; __line = 13
     ; __append(escapeFn( criterias.special ? 'success' : 'error' ))
-    ; __append("\">It contains special characters (like / or * or %)</li>\n<li class=\"")
+    ; __append("\">It contains special characters (like / or * or %)</li>\n")
     ; __line = 14
+    ;  if (typeof criterias.dictionary !== 'undefined') { 
+    ; __append("\n<li class=\"")
+    ; __line = 15
     ; __append(escapeFn( criterias.dictionary ? 'success' : 'error' ))
     ; __append("\">It is not part of a dictionary</li>\n")
-    ; __line = 15
+    ; __line = 16
+    ;  } else { 
+    ; __append("\n<li>It is not part of a dictionary (checking, please wait...)</li>\n")
+    ; __line = 18
     ;  } 
     ; __append("\n")
-    ; __line = 16
+    ; __line = 19
+    ;  } 
+    ; __append("\n")
+    ; __line = 20
   }
   return __output.join("");
 } catch (e) {

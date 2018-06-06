@@ -233,7 +233,7 @@ module.exports = function(grunt) {
           // CSS files midgar
           cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/midgar',
           src: ['ext_iframe.min.css'],
-          dest: path.build_data + 'css/midgar',
+          dest: path.build_data + 'css/themes/midgar',
           expand: true
         }]
       }

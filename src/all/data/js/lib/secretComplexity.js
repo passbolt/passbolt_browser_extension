@@ -13,10 +13,6 @@ var secretComplexity = {};
    * Secret entropy levels
    */
   var STRENGTH = {
-    'pwnd': {
-      id: 'very_weak',
-      label: 'pwnd'
-    },
     0: {
       id: 'not_available',
       label: 'n/a'

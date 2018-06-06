@@ -27,38 +27,27 @@ $(function () {
    * Initialize the secret add/edit component.
    */
   var init = function () {
-    // Is the dialog opened to edit a password, or to add a new one.
-    dialogCase = window.location.href.indexOf('case=edit') != -1 ? 'edit' : 'create';
-    // Load the page template.
     loadTemplate()
-    // Retrieve the currently edited secret model (even in add case)
+      .then(updateSecurityToken)
       .then(getEditedPassword)
-      // Init the secret strength with an empty password.
       .then(updateSecretStrength)
-      // Init the security token.
-      .then(function () {
-        return passbolt.security.initSecurityToken('#js_secret', '.security-token');
-      })
-      // Lock the secret filed if in edition mode.
-      .then(function () {
-        if (dialogCase == 'edit') {
-          // Mark it as encrypted here.
-          secretStateChangeHandler('encrypted');
-        }
-        // Init the event listeners.
-        initEventsListeners();
-        // Mark the iframe container as ready.
-        passbolt.message.emit('passbolt.passbolt-page.remove-class', '#passbolt-iframe-secret-edition', 'loading');
-        passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-secret-edition', 'ready');
-      }, error);
+      .then(onDialogReady, onError);
   };
 
   /**
    * Error handler.
    * @param error {string} The error message
    */
-  var error = function (error) {
+  var onError = function (error) {
     console.error(error);
+  };
+
+  /**
+   * Update the security token
+   * @returns {Promise|*}
+   */
+  var updateSecurityToken = function () {
+    return passbolt.security.initSecurityToken('#js_secret', '.security-token')
   };
 
   /**
@@ -92,23 +81,31 @@ $(function () {
   };
 
   /**
+   * onDialogReady
    * Init the events listeners.
-   * The events can come from the following sources : addon, page or DOM.
-   * return Promise
    */
-  var initEventsListeners = function () {
-    return new Promise(function(resolve, reject) {
-      $secret.on('input change', secretFieldUpdatedHandler);
-      $secret.on('keydown', secretFieldKeydownHandler);
-      $secretClear.on('input', secretClearFieldUpdatedHandler);
-      $secret.on('focus', secretFieldFocusedHandler);
-      $generateSecretButton.on('click', generateSecretButtonClickedHandler);
-      $viewSecretButton.on('click', viewSecretButtonClickedHandler);
-      passbolt.message.on('passbolt.secret-edit.validate-success', validateSuccessHandler);
-      passbolt.message.on('passbolt.secret-edit.validate-error', validateErrorHandler);
-      passbolt.message.on('passbolt.secret-edit.focus', onSecretFocusHandler);
-      resolve();
-    });
+  var onDialogReady = function () {
+    // Is the dialog opened to edit a password, or to add a new one.
+    dialogCase = window.location.href.indexOf('case=edit') !== -1 ? 'edit' : 'create';
+    if (dialogCase === 'edit') {
+      // Mark it as encrypted here.
+      secretStateChangeHandler('encrypted');
+    }
+
+    // Init the event listeners.
+    $secret.on('input change', secretFieldUpdatedHandler);
+    $secret.on('keydown', secretFieldKeydownHandler);
+    $secretClear.on('input', secretClearFieldUpdatedHandler);
+    $secret.on('focus', secretFieldFocusedHandler);
+    $generateSecretButton.on('click', generateSecretButtonClickedHandler);
+    $viewSecretButton.on('click', viewSecretButtonClickedHandler);
+    passbolt.message.on('passbolt.secret-edit.validate-success', validateSuccessHandler);
+    passbolt.message.on('passbolt.secret-edit.validate-error', validateErrorHandler);
+    passbolt.message.on('passbolt.secret-edit.focus', onSecretFocusHandler);
+
+    // Mark the iframe container as ready.
+    passbolt.message.emit('passbolt.passbolt-page.remove-class', '#passbolt-iframe-secret-edition', 'loading');
+    passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-secret-edition', 'ready');
   };
 
   /**
@@ -138,10 +135,10 @@ $(function () {
   /**
    * Update the secret strength component.
    */
-  var updateSecretStrength = function () {
+  var updateSecretStrength = async function () {
     var secret = editedPassword.secret || '';
 
-    // Calcul the secret strength.
+    // Calculate the secret strength.
     var strength = secretComplexity.strength(secret),
     // Data to pass to the template.
       tplData = {
@@ -157,7 +154,7 @@ $(function () {
           $secretStrength.removeClass(containerClasses.pop());
         }
         $secretStrength.addClass(secretComplexity.STRENGTH[strength].id);
-      }, error);
+      }, onError);
   };
 
   /**
@@ -169,9 +166,8 @@ $(function () {
       return;
     }
 
-    // Add class decrypting to show something is happening.
+    // Add class decrypting and change placeholder text to show something is happening
     $secret.addClass("decrypting");
-    // Change placeholder text.
     $secret.attr("placeholder", "decrypting...");
 
     // Notify the application page regarding a running process
@@ -179,8 +175,6 @@ $(function () {
 
     // Request the secret decryption.
     return passbolt.request('passbolt.secret-edit.decrypt', editedPassword.armored)
-
-      // Once the secret decrypted.
       .then(
         // If successfully decrypted.
         // Store the secret locally, and change the component state, to allow
@@ -204,7 +198,7 @@ $(function () {
       // the password changes).
       .then(function () {
         return passbolt.request('passbolt.edit-password.set-edited-password', editedPassword);
-      }, error);
+      }, onError);
   };
 
   /* ==================================================================================
@@ -404,7 +398,7 @@ $(function () {
    * @param state {string} The state to switch to. Can be : encrypted or decrypted
    */
   var secretStateChangeHandler = function (state) {
-    if (state == 'encrypted') {
+    if (state === 'encrypted') {
       $secret.attr('placeholder', 'click here to unlock')
         .parent().addClass('has-encrypted-secret');
 
@@ -412,7 +406,7 @@ $(function () {
         .addClass('disabled')
         .attr('disabled', 'disabled');
     }
-    else if (state == 'decrypted') {
+    else if (state === 'decrypted') {
       $secret
         .val(editedPassword.secret)
         .attr('placeholder', initialSecretPlaceholder)

@@ -2,9 +2,28 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [2.0.9] - 2018-05-23
 ### Fix
-- GITHUB-35 Fix login redirects in wrong tab
+- Fix content scripts should not be inserted if they are already present.
+- Fix auth pagemod should insert script when a redirection is set in url
+- Fix json.headers should be json.header
+
+## [2.0.8] - 2018-05-09
+### Fix
+- Fix backward compatibility issue with user search API
+
+## [2.0.7] - 2018-05-09
+### Fix
+- Fix backward compatibility issue with legacy API.
+
+## [2.0.6] - 2018-05-08
+### Fix
+- Temporarily rollback of v2.0.5 as it break compatibilty with API version < v1.6.10
+
+## [2.0.5] - 2018-05-08
+### Fix
+- PASSBOLT-2857: Fix password generator does not use secure PRNG
+- GITHUB-35: Fix login redirects in wrong tab
 - PASSBOLT-2764: Fix share autocomplete search concurrency issue on result display
 
 ### Improve

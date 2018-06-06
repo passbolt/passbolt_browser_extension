@@ -54,8 +54,8 @@ var listen = function (worker) {
 
           // Load the aros in the autocomplete list.
           autocompleteWorker.port.emit('passbolt.share-autocomplete.load-users', aros);
-        }, function (e) {
-          // @todo ERROR case not managed
+        }, function (error) {
+          autocompleteWorker.port.emit('passbolt.share-autocomplete.load-users', []);
         });
     }
   });

@@ -25,10 +25,10 @@ $(function () {
       .then(initSecurityToken)
       // Steal the focus.
       .then(stealFocus)
-      // Init the event listeners.
-      .then(initEventsListeners)
-      // Mark the iframe container as ready.
       .then(function () {
+        // Init the event listeners.
+        // Mark the iframe container as ready.
+        initEventsListeners();
         passbolt.message.emit('passbolt.passbolt-page.remove-class', '#passbolt-iframe-master-password', 'loading');
         passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-master-password', 'ready');
       })

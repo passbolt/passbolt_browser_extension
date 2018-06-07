@@ -196,7 +196,6 @@ KeepassDb.prototype.fromResources = function(resources, password, keyFile) {
   return this.createDb(password, keyFile)
   .then(function(db) {
     for(let i=0; i < resources.length; i++) {
-      resources[i].secretClear = 'this password is a test';
       self.createEntry(resources[i], null);
     }
     return self.db.save();

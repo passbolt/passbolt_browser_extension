@@ -19,16 +19,11 @@ $(function () {
    *  Can be create or edit.
    */
   var _insertIframe = function (dialogCase) {
-    var iframeId = 'passbolt-iframe-secret-edition';
-		var iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html') + '?passbolt=' + iframeId;
-    iframeUrl += '&case=' + dialogCase;
-    var $iframe = $('<iframe/>', {
-      id: iframeId,
-      src: iframeUrl,
-      class: 'loading',
-      frameBorder: 0
-    });
-    $iframe.appendTo('.js_form_secret_wrapper');
+    const iframeId = 'passbolt-iframe-secret-edition';
+    const appendTo = '.js_form_secret_wrapper';
+    const urlOptions = {'case' : dialogCase};
+    const className = 'loading';
+    passbolt.html.insertThemedIframe(iframeId, appendTo, className, urlOptions);
   };
 
   /*

@@ -58,6 +58,12 @@ $(function () {
     passbolt.message.emit('passbolt.app.window-resized', cssClasses);
   });
 
+  // The passbolt application updated the settings
+  // Notify the extension to update
+  window.addEventListener('passbolt.plugin.account_settings_updated', function (event) {
+    passbolt.request('passbolt.user.settings.sync');
+  });
+
   /* ==================================================================================
    *  Share & share autocomplete
    * ================================================================================== */

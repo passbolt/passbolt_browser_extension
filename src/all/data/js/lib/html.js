@@ -108,4 +108,64 @@ passbolt.templates = window.templates;
   };
   passbolt.html.getBrowserName = getBrowserName;
 
+  /**
+   *
+   * @param iframeId string
+   * @param iframeUrlOptions Object
+   * @param appendTo string acting as jQuery selector
+   * @param className string (optional)
+   * @returns {*|jQuery|HTMLElement}
+   */
+  var insertIframe = function (iframeId, appendTo, className, iframeUrlOptions, insertMode, style) {
+    // set defaults
+    const mode = insertMode || 'append';
+    const css = style || '';
+    const urlOptions = iframeUrlOptions || {};
+    const cssClass = className || '';
+
+    // build iframe url
+    var iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html') + `?passbolt=${iframeId}&`;
+    let optionUrl = [];
+    for (var options in urlOptions)
+      if (iframeUrlOptions.hasOwnProperty(options)) {
+        optionUrl.push(`${options}=${iframeUrlOptions[options]}`);
+      }
+    iframeUrl += optionUrl.join("&");
+
+    // Build iframe html element
+    var $iframe = $('<iframe/>', {
+      id: iframeId,
+      src: iframeUrl,
+      class: cssClass,
+      frameBorder: 0,
+      style: css
+    });
+
+    // Append or prepend
+    if (mode === 'append') {
+      $iframe.appendTo(appendTo);
+    } else {
+      $iframe.prependTo(appendTo);
+    }
+    return $iframe;
+  };
+  passbolt.html.insertIframe = insertIframe;
+
+  /**
+   *
+   * @param iframeId string
+   * @param appendTo string acting as jQuery selector
+   * @param iframeUrlOptions Object
+   * @param className string (optional)
+   * @param insertMode string append or prepend
+   * @param style string optional
+   * @returns {*|jQuery|HTMLElement}
+   */
+  var insertThemedIframe = async function (iframeId, appendTo, className, iframeUrlOptions, insertMode, style) {
+    const urlOptions = iframeUrlOptions || {};
+    urlOptions['theme'] = await passbolt.request('passbolt.user.settings.get.theme');
+    return insertIframe(iframeId, appendTo, className, urlOptions, insertMode, style);
+  };
+  passbolt.html.insertThemedIframe = insertThemedIframe;
+
 })(passbolt);

@@ -15,21 +15,14 @@ $(function () {
 	 * @listens passbolt.progress.open-dialog
 	 */
   passbolt.message.on('passbolt.progress.open-dialog', function (title, goals) {
-    var iframeId = 'passbolt-iframe-progress-dialog';
-    var iframeUrl = chrome.runtime.getURL('data/' + iframeId + '.html') + '?passbolt=' + iframeId;
-    iframeUrl += '&title=' + title;
+    const iframeId = 'passbolt-iframe-progress-dialog';
+    const appendTo = '#container';
+    const className = 'passbolt-plugin-dialog';
+    const urlOptions = {'title': title};
     if (goals) {
-      iframeUrl += '&goals=' + goals;
+      urlOptions['goals'] = goals;
     }
-
-    // Add the progress iframe.
-    var $iframe = $('<iframe/>', {
-      id: iframeId,
-      src: iframeUrl,
-      class: 'passbolt-plugin-dialog',
-      frameBorder: 0
-    });
-    $iframe.appendTo('body');
+    passbolt.html.insertThemedIframe(iframeId, appendTo, className, urlOptions);
   });
 
 	/*

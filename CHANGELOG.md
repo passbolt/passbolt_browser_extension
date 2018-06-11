@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.10] - 2018-06-07
+### Fix
+- Fix export of kdbx contain test values
+
 ## [2.0.9] - 2018-05-23
 ### Fix
 - Fix content scripts should not be inserted if they are already present.

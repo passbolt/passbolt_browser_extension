@@ -4,11 +4,8 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var __ = require('../sdk/l10n').get;
-var Config = require('./config');
 var Keyring = require('./keyring').Keyring;
-var Crypto = require('./crypto').Crypto;
-var Auth = require('./auth').Auth;
+var Auth = require('./gpgauth').GpgAuth;
 var User = require('./user').User;
 var jsonQ = require('../sdk/jsonQ').jsonQ;
 
@@ -164,7 +161,6 @@ Setup.prototype.flush = function () {
  * If server returns a positive response, then
  * proceed with plugin configuration.
  *  - Set user
- *  - Sync public key in keyring
  *  - Set domain and other settings
  *
  * @param data {array} The setup date to save
@@ -176,7 +172,6 @@ Setup.prototype.save = function(data) {
 
   return new Promise(function(resolve, reject) {
     var url = data.settings.domain + '/users/validateAccount/' + data.user.id + '.json' + '?api-version=v1';
-    var keyring = new Keyring();
 
     // Build request data.
     var requestData = {

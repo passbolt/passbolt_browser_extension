@@ -18,35 +18,16 @@ $(function () {
   var _insertIframes = function () {
     // The component managing the autocomplete field.
     var iframeId = 'passbolt-iframe-password-share';
-		var iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html') + '?passbolt=' + iframeId;
-    var $iframeShare = $('<iframe/>', {
-      id: iframeId,
-      src: iframeUrl,
-      class: 'loading',
-      frameBorder: 0,
-      marginwidth: 0,
-      marginheight: 0,
-      hspace: 0,
-      vspace: 0
-    });
-    $iframeShare.prependTo('.js_plugin_share_wrapper');
-
+    var className = 'loading';
+    var prependTo = '.js_plugin_share_wrapper';
+    passbolt.html.insertThemedIframe(iframeId, prependTo, className, undefined, 'prepend');
 
     // The component managing the autocomplete result list.
     iframeId = 'passbolt-iframe-password-share-autocomplete';
-		iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html') + '?passbolt=' + iframeId;
-    var $iframeAutocomplete = $('<iframe/>', {
-      id: iframeId,
-      src: iframeUrl,
-      class: 'hidden',
-      frameBorder: 0,
-      marginwidth: 0,
-      marginheight: 0,
-      hspace: 0,
-      vspace: 0,
-      style: 'margin-top:-12px' // compensate for iframe padding issue (not present in styleguide
-    });
-    $iframeAutocomplete.appendTo($('#passbolt-password-share-autocomplete-wrapper', '.js_plugin_share_wrapper'));
+		className = 'hidden';
+		var style = 'margin-top:-12px';
+		var appendTo = $('#passbolt-password-share-autocomplete-wrapper', '.js_plugin_share_wrapper');
+    passbolt.html.insertThemedIframe(iframeId, appendTo, className, undefined, 'append', style);
   };
 
   /*

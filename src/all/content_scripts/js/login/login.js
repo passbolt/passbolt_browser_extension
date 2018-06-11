@@ -95,15 +95,11 @@ $(function () {
   passbolt.login.onStep1RequestPassphrase = function () {
 		// Inject the passphrase dialog iframe into the web page DOM.
 		// See passboltAuthPagemod and login-form for the logic inside the iframe
-    var iframeId = passphraseIframeId;
-		var iframeUrl = chrome.runtime.getURL('data/' + iframeId + '.html') + '?passbolt=' + iframeId;
-    var $iframe = $('<iframe/>', {
-      id: iframeId,
-      src: iframeUrl,
-      frameBorder: 0,
-      class: 'loading'
-    });
-    $('.login.form').empty().append($iframe);
+    const iframeId = passphraseIframeId;
+    const className = 'loading';
+    const appendTo = '.login.form';
+    $(appendTo).empty();
+    passbolt.html.insertIframe(iframeId, appendTo, className);
   };
 
   /* ==================================================================================

@@ -16,15 +16,10 @@ $(function () {
    */
   passbolt.message.on('passbolt.master-password.open-dialog', function () {
     // Add the master password iframe to the application page.
-    var iframeId = 'passbolt-iframe-master-password';
-    var iframeUrl = chrome.runtime.getURL('data/' + iframeId + '.html') + '?passbolt=' + iframeId;
-    var $iframe = $('<iframe/>', {
-      id: iframeId,
-      src: iframeUrl,
-      class: 'passbolt-plugin-dialog loading',
-      frameBorder: 0
-    });
-    $iframe.appendTo('body');
+    const iframeId = 'passbolt-iframe-master-password';
+    const className = 'passbolt-plugin-dialog loading';
+    const appendTo = '#container';
+    passbolt.html.insertThemedIframe(iframeId, appendTo, className);
   });
 
   /**

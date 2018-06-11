@@ -8,7 +8,7 @@
  */
 $(function () {
 
-  var clipboard = {
+  let clipboard = {
     iframeId: 'passbolt-iframe-clipboard',
   };
 
@@ -25,22 +25,17 @@ $(function () {
   * @private
   */
   clipboard._createIframe = function () {
-    var iframeId = clipboard.iframeId;
-    var iframeUrl = chrome.runtime.getURL('data/' + iframeId + '.html') + '?passbolt=' + iframeId;
-    var $iframe = $('<iframe/>', {
-      id: iframeId,
-      src: iframeUrl,
-      frameBorder: 0,
-      style: 'position:absolute;bottom:0;right:0;width:1px;height:1px;'
-    });
-    $('body').append($iframe);
+    const iframeId = clipboard.iframeId;
+    const appendTo = 'body';
+    const style = 'position:absolute;bottom:0;right:0;width:1px;height:1px;'; // tu me vois, tu me vois plus
+    passbolt.html.insertIframe(iframeId, appendTo, undefined, undefined, 'append', style);
   };
 
   /**
    * Delete secure clipboard iframe
    */
   clipboard._deleteIframe = function () {
-    $('#' + clipboard.iframeId).remove();
+    $(`#${clipboard.iframeId}`).remove();
   };
 
   // init by default

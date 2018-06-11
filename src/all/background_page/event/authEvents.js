@@ -6,13 +6,9 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var Auth = require('../model/auth').Auth;
-var auth = new Auth();
-var User = require('../model/user').User;
-
-var __ = require('../sdk/l10n').get;
+var GpgAuth = require('../model/gpgauth').GpgAuth;
 var Worker = require('../model/worker');
-var tabsController = require('../controller/tabsController');
+var AuthController = require('../controller/authController').AuthController;
 
 var listen = function (worker) {
 
@@ -23,16 +19,8 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.auth.verify', function (requestId) {
-    auth.verify().then(
-      function success() {
-        var msg = __('The server key is verified. The server can use it to sign and decrypt content.');
-        worker.port.emit(requestId, 'SUCCESS', msg);
-      },
-      function error(error) {
-        var message = __('Could not verify server key.') + ' ' + error.message;
-        worker.port.emit(requestId, 'ERROR', message);
-      }
-    );
+    var auth = new AuthController(worker, requestId);
+    auth.verify();
   });
 
   /*
@@ -43,7 +31,8 @@ var listen = function (worker) {
    * @param domain {string} The server's domain
    */
   worker.port.on('passbolt.auth.getServerKey', function (requestId, domain) {
-    auth.getServerKey(domain).then(
+    var gpgauth = new GpgAuth();
+    gpgauth.getServerKey(domain).then(
       function success(msg) {
         worker.port.emit(requestId, 'SUCCESS', msg);
       },
@@ -58,40 +47,15 @@ var listen = function (worker) {
    *
    * @listens passbolt.auth.login
    * @param requestId {uuid} The request identifier
-   * @param masterpassword {string} The master password to use for the authentication attempt.
-   * @param remember {string} whether to remember the master password
+   * @param passphrase {string} The passphrase to decryt the private key
+   * @param remember {string} whether to remember the passphrase
    *   (bool) false|undefined if should not remember
    *   (integer) -1 if should remember for the session
    *   (integer) duration in seconds to specify a specific duration
    */
-  worker.port.on('passbolt.auth.login', function (requestId, masterpassword, remember) {
-    var tabId = worker.tab.id,
-      _referrer = null;
-
-    Worker.get('Auth', worker.tab.id).port.emit('passbolt.auth.login-processing', __('Logging in'));
-
-    auth.login(masterpassword).then(
-      function success(referrer) {
-        _referrer = referrer;
-
-        if (remember !== undefined && remember !== false) {
-          var user = User.getInstance();
-          user.storeMasterPasswordTemporarily(masterpassword, remember);
-        }
-
-        // Init the app pagemod
-        var app = require('../app');
-        app.pageMods.PassboltApp.init().then(function() {
-          // Redirect the user.
-          var msg = __('You are now logged in!');
-          Worker.get('Auth', tabId).port.emit('passbolt.auth.login-success', msg, _referrer);
-        });
-      },
-      function error(error) {
-        console.error(error.message);
-        Worker.get('Auth', tabId).port.emit('passbolt.auth.login-failed', error.message);
-      }
-    );
+  worker.port.on('passbolt.auth.login', function (requestId, passphrase, remember) {
+    var auth = new AuthController(worker, requestId);
+    auth.login(passphrase, remember);
   });
 
   /*

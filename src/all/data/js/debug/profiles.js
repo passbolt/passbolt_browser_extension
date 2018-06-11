@@ -18,7 +18,7 @@ passbolt.debug = passbolt.debug || {};
 $(function () {
   passbolt.debug.profiles = {};
   passbolt.debug.profiles['ada@passbolt.com'] = {
-    id: 'cd49eb9e-73a2-3433-a018-6ed993d421e8',
+    id: 'f848277c-5398-58f8-a82a-72397af2d450',
     firstname: 'Ada',
     lastname: 'Lovelace',
     username: 'ada@passbolt.com',
@@ -192,7 +192,7 @@ WoyDz96l/88asc2mV7bg82Zp0zo1iZvPeUw=\n\
   };
 
   passbolt.debug.profiles['betty@passbolt.com'] = {
-    id: 'dc8d196f-f7e9-3531-a9de-b15a3b48b11b',
+    id: 'e97b14ba-8957-57c9-a357-f78a6e1e1a46',
     firstname: 'Betty',
     lastname: 'Holberton',
     username: 'betty@passbolt.com',
@@ -366,7 +366,7 @@ WoyDz96l/88asc2mV7bg82Zp0zo1iZvPeUw=\n\
   };
 
   passbolt.debug.profiles['admin@passbolt.com'] = {
-    id: '2e18717e-e2b4-3c55-a6b2-586b0f17dba5',
+    id: 'd57c10f5-639d-5160-9c81-8a0c6c4ec856',
     firstname: 'Admin',
     lastname: 'User',
     username: 'admin@passbolt.com',
@@ -540,7 +540,7 @@ dpjWjDJgJn4x7Nv9VHqJuGQX6WPUYQ94lBm4EH/OahytnF6FIKWS0LmG+GNlbh2o\n\
   };
 
   passbolt.debug.profiles['ping@passbolt.com'] = {
-    id: 'be77c78c-b767-3290-ae92-d5e5c590fcf9',
+    id: 'f7e9754a-2f64-5cdd-8ba2-178b33383505',
     firstname: 'Ping',
     lastname: 'Fu',
     username: 'ping@passbolt.com',
@@ -644,7 +644,7 @@ cOv3QJcgi02rfOMbtFrfHqeEPITCru9nZg==\n\
   };
 
   passbolt.debug.profiles['kathleen@passbolt.com'] = {
-    id: '201b442c-d6ca-3ee6-a443-ce669ca0ec6e',
+    id: '32d29702-85e2-539d-98ac-6abfa7aadf01',
     firstname: 'Kathleen',
     lastname: 'Antonelli',
     username: 'kathleen@passbolt.com',

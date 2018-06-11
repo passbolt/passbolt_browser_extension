@@ -17,14 +17,9 @@ $(function () {
   passbolt.message.on('passbolt.export-passwords.open-dialog', function () {
     // Add the master password iframe to the application page.
     var iframeId = 'passbolt-iframe-export-passwords';
-    var iframeUrl = chrome.runtime.getURL('data/' + iframeId + '.html') + '?passbolt=' + iframeId;
-    var $iframe = $('<iframe/>', {
-      id: iframeId,
-      src: iframeUrl,
-      class: 'passbolt-plugin-dialog loading',
-      frameBorder: 0
-    });
-    $iframe.appendTo('body');
+    var className = 'passbolt-plugin-dialog loading';
+    var appendTo = '#container';
+    passbolt.html.insertThemedIframe(iframeId, appendTo, className);
   });
 
   /**

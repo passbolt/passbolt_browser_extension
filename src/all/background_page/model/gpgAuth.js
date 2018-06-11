@@ -1,6 +1,6 @@
 "use strict";
 /**
- * Auth model.
+ * GpgAuth model.
  *
  * @copyright (c) 2018 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
@@ -20,7 +20,7 @@ const URL_LOGIN = '/auth/login.json?api-version=v1';
  * GPGAuth authentication
  * @constructor
  */
-let Auth = function () {
+let GpgAuth = function () {
   this.keyring = new Keyring();
 };
 
@@ -30,7 +30,7 @@ let Auth = function () {
  * @throws Error if domain is undefined
  * @returns {string}
  */
-Auth.prototype.getDomain = function() {
+GpgAuth.prototype.getDomain = function() {
   return User.getInstance().settings.getDomain();
 };
 
@@ -44,7 +44,7 @@ Auth.prototype.getDomain = function() {
  * @throws Error if verification procedure fails
  * @returns {Promise<void>}
  */
-Auth.prototype.verify = async function(serverUrl, armoredServerKey, userFingerprint) {
+GpgAuth.prototype.verify = async function(serverUrl, armoredServerKey, userFingerprint) {
   let domain = serverUrl || this.getDomain();
   let serverKey = armoredServerKey || Uuid.get(domain);
   let fingerprint = userFingerprint || this.keyring.findPrivate().fingerprint;
@@ -98,7 +98,7 @@ Auth.prototype.verify = async function(serverUrl, armoredServerKey, userFingerpr
  *
  * @returns {Promise.<string>}
  */
-Auth.prototype.getServerKey = async function (serverUrl) {
+GpgAuth.prototype.getServerKey = async function (serverUrl) {
   let domain = serverUrl || this.getDomain();
   const response = await fetch(domain + URL_VERIFY, {
     method: 'GET',
@@ -120,7 +120,7 @@ Auth.prototype.getServerKey = async function (serverUrl) {
  * @param passphrase {string} The user private key passphrase
  * @returns {Promise.<string>} referrer url
  */
-Auth.prototype.login = async function(passphrase) {
+GpgAuth.prototype.login = async function(passphrase) {
     await this.keyring.checkPassphrase(passphrase);
     const userAuthToken = await this.stage1(passphrase);
     return await this.stage2(userAuthToken);
@@ -132,7 +132,7 @@ Auth.prototype.login = async function(passphrase) {
  * @param passphrase {string} The user private key passphrase
  * @returns {Promise.<string>} token
  */
-Auth.prototype.stage1 = async function (passphrase) {
+GpgAuth.prototype.stage1 = async function (passphrase) {
 
   // Prepare request data
   const url = this.getDomain() + URL_LOGIN;
@@ -169,7 +169,7 @@ Auth.prototype.stage1 = async function (passphrase) {
  * @param userAuthToken {string} The user authentication token
  * @returns {Promise.<string>} url to redirect the user to
  */
-Auth.prototype.stage2 = async function (userAuthToken) {
+GpgAuth.prototype.stage2 = async function (userAuthToken) {
 
   // Prepare request data
   const url = this.getDomain() + URL_LOGIN;
@@ -201,7 +201,7 @@ Auth.prototype.stage2 = async function (userAuthToken) {
  * @param response {object}
  * @returns {Promise.<error>} throw a relevant exception
  */
-Auth.prototype.onResponseError = async function (response) {
+GpgAuth.prototype.onResponseError = async function (response) {
   const error_msg = __('There was a server error. No additional information provided') + `(${response.status})`;
   let json;
   try {
@@ -216,4 +216,4 @@ Auth.prototype.onResponseError = async function (response) {
 };
 
 // Exports the Authentication model object.
-exports.Auth = Auth;
+exports.GpgAuth = GpgAuth;

@@ -34,15 +34,15 @@ var listen = function (worker) {
   });
 
   /*
-   * Get all the user settings as stored in the plugin
+   * Get the user security token as stored in the plugin
    *
-   * @listens passbolt.user.settings.get
+   * @listens passbolt.user.settings.get.securityToken
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.user.settings.get', function (requestId) {
+  worker.port.on('passbolt.user.settings.get.securityToken', function (requestId) {
     try {
-      var settings = user.settings.get();
-      worker.port.emit(requestId, 'SUCCESS', settings);
+      var securityToken = user.settings.getSecurityToken();
+      worker.port.emit(requestId, 'SUCCESS', securityToken);
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', e.message);
     }
@@ -54,10 +54,10 @@ var listen = function (worker) {
    * @listens passbolt.user.settings.get.securityToken
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.user.settings.get.securityToken', function (requestId) {
+  worker.port.on('passbolt.user.settings.get.theme', function (requestId) {
     try {
-      var securityToken = user.settings.getSecurityToken();
-      worker.port.emit(requestId, 'SUCCESS', securityToken);
+      var theme = user.settings.getTheme();
+      worker.port.emit(requestId, 'SUCCESS', theme);
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', e.message);
     }
@@ -78,22 +78,6 @@ var listen = function (worker) {
     }
   });
 
-  /*
-   * Validate the user object given and return errors if any.
-   *
-   * @listens passbolt.user.validate
-   * @param requestId {uuid} The request identifier
-   * @param u {array} The user object to validate
-   * @param fields {array} The fields to validate
-   */
-  worker.port.on('passbolt.user.validate', function (requestId, u, fields) {
-    try {
-      var validatedUser = user.validate(u, fields);
-      worker.port.emit(requestId, 'SUCCESS', validatedUser);
-    } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message, e.validationErrors);
-    }
-  });
 
   /* ==================================================================================
    *  Setters for user
@@ -113,6 +97,42 @@ var listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', e.message);
+    }
+  });
+
+  /*
+   * Update the user settings using remote API
+   *
+   * @listens passbolt.user.set
+   * @param requestId {uuid} The request identifier
+   * @param u {array} The user object
+   */
+  worker.port.on('passbolt.user.settings.sync', function (requestId) {
+    user.settings.sync().then(() => {
+      worker.port.emit(requestId, 'SUCCESS');
+    }, (e) => {
+      worker.port.emit(requestId, 'ERROR', e.message);
+    });
+  });
+
+  /* ==================================================================================
+   *  Others
+   * ================================================================================== */
+
+  /*
+   * Validate the user object given and return errors if any.
+   *
+   * @listens passbolt.user.validate
+   * @param requestId {uuid} The request identifier
+   * @param u {array} The user object to validate
+   * @param fields {array} The fields to validate
+   */
+  worker.port.on('passbolt.user.validate', function (requestId, u, fields) {
+    try {
+      var validatedUser = user.validate(u, fields);
+      worker.port.emit(requestId, 'SUCCESS', validatedUser);
+    } catch (e) {
+      worker.port.emit(requestId, 'ERROR', e.message, e.validationErrors);
     }
   });
 

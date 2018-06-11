@@ -22,14 +22,10 @@ $(function () {
     if($('html.passbolt.no-passboltplugin').length === 1) {
       // Check if the addon is configured
       this.loadConfiguration()
-        // Boostrap common.
         .then(function () {
           _this.bootstrapCommon();
-        })
-        // Boostrap login page.
-        .then(function () {
           _this.bootstrapLoginPage();
-        });
+        })
     }
   };
 
@@ -65,6 +61,7 @@ $(function () {
       $('html').addClass('no-passboltplugin-config')
         .removeClass('passboltplugin-config');
     }
+    this.initVersion();
   };
 
   /**
@@ -90,8 +87,6 @@ $(function () {
     } else {
       this.loginPageConfigurationMissing();
     }
-
-    this.initVersion();
   };
 
   /**

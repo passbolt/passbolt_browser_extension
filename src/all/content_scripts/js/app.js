@@ -211,7 +211,7 @@ $(function () {
         passbolt.message.emitToPage('secret_edition_secret_encrypted', armoreds);
       });
   });
-
+``
   // The validation can have been ordered by another worker.
   // Such as the secret that request a validation.
   // In this case the application should display the right feedback to the user.

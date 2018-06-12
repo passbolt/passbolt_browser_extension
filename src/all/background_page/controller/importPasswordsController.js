@@ -149,24 +149,22 @@ ImportPasswordsController.prototype._saveAssociatedTags = function(resource, tag
 ImportPasswordsController.prototype.saveResources = function(resources, options) {
   var appWorker = Worker.get('App', this.tabid),
     savePromises = [],
-    tagsIntegration = options.tagsIntegration !== undefined && options.tagsIntegration === true,
-    self = this;
+    tagsIntegration = options.tagsIntegration !== undefined && options.tagsIntegration === true;
 
-  var i = 0,
-    counter = 1;
-  for (i in resources) {
+  var counter = 1;
+  for (let i in resources) {
       var p = Resource.import(resources[i]);
       savePromises.push(p);
-      p.then(function(resource) {
+      p.then(resource => {
         if (tagsIntegration === true) {
-          var tags = new Array();
+          var tags = [];
           if (options.importTag !== undefined) {
             tags.push(options.importTag);
           }
           resource.tags = resources[i].tags;
-          self._saveAssociatedTags(resource, tags, options.categoriesAsTags);
+          this._saveAssociatedTags(resource, tags, options.categoriesAsTags);
         }
-        progressDialogController.update(appWorker, self.progressStatus++, 'Importing... ' + (counter++) + '/' + self.resources.length);
+        progressDialogController.update(appWorker, this.progressStatus++, 'Importing... ' + (counter++) + '/' + this.resources.length);
       });
   }
 
@@ -205,7 +203,7 @@ ImportPasswordsController.prototype._encryptSecrets = function(userId) {
     },
     // On start.
     function (position) {
-      progressDialogController.update(appWorker, self.progressStatus, 'Encrypting ' + (position + 1) + '/' + self.resources.length);
+      progressDialogController.update(appWorker, self.progressStatus, 'Encrypting ' + (parseInt(position) + 1) + '/' + self.resources.length);
     });
 };
 

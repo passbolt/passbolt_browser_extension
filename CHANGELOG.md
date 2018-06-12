@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Fix press escape to close master password dialog regression
 - GITHUB-268 Fix remember me checkbox label should be clickable
 - GITHUB-46 Fix security token validation regression
+- PASSBOLT-2854 [Pro] Fix bug tags imported are always the same
 
 ## [2.0.10] - 2018-06-07
 ### Fix

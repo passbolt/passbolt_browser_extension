@@ -38,7 +38,7 @@ UserSettings.prototype.isValid = function () {
  * @private
  * @throw Error if the field is not valid
  */
-UserSettings.prototype.validate = function (field, value) {
+UserSettings.prototype.validateField = function (field, value) {
   switch (field) {
     case 'securityToken':
       this.validateSecurityToken(value);
@@ -146,7 +146,7 @@ UserSettings.prototype.validate = function (settings, fields) {
   for (var i in fields) {
     var fieldName = fields[i];
     try {
-      this.validate(fieldName, settings[fieldName]);
+      this.validateField(fieldName, settings[fieldName]);
     } catch (e) {
       var fieldError = {};
       fieldError[fieldName] = e.message;

@@ -107,17 +107,19 @@ $(function () {
     // Validate token, only if fully set.
     var securityToken = step._viewGetToken();
     step._validateToken(securityToken)
-      .then(function () {
+      .then(function success() {
         step.elts.$feedback.addClass('hidden');
         passbolt.setup.setActionState('submit', 'enabled');
+      }, function error (errorMessage, validationErrors) {
+        step.onError(validationErrors[0].securityToken);
+        passbolt.setup.setActionState('submit', 'disabled');
       });
   };
 
   /**
    * On error.
    */
-  step.onError = function (errorMessage, validationErrors) {
-    console.error(validationErrors);
+  step.onError = function (errorMessage) {
     step.elts.$feedback
       .removeClass('hidden')
       .text(errorMessage);
@@ -134,11 +136,7 @@ $(function () {
    * @private
    */
   step._validateToken = function (tokenData) {
-    return passbolt.request('passbolt.user.settings.validate', {securityToken: tokenData}, ['securityToken'])
-      .then(null, function (errorMessage, validationErrors) {
-        step.onError(errorMessage, validationErrors);
-        passbolt.setup.setActionState('submit', 'disabled');
-      });
+    return passbolt.request('passbolt.user.settings.validate', {securityToken: tokenData}, ['securityToken']);
   };
 
   /**

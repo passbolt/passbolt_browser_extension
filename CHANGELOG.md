@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.10] - Unreleased
+### Add
+- Add support for dark theme
+- Add check if passphrase is part of a dictionary
+
+### Fix
+- Fix press escape to close master password dialog regression
+- GITHUB-268 Fix remember me checkbox label should be clickable
+- GITHUB-46 Fix security token validation regression
+
 ## [2.0.10] - 2018-06-07
 ### Fix
 - Fix export of kdbx contain test values

@@ -163,7 +163,11 @@ passbolt.templates = window.templates;
    */
   var insertThemedIframe = async function (iframeId, appendTo, className, iframeUrlOptions, insertMode, style) {
     const urlOptions = iframeUrlOptions || {};
-    urlOptions['theme'] = await passbolt.request('passbolt.user.settings.get.theme');
+    try {
+      urlOptions['theme'] = await passbolt.request('passbolt.user.settings.get.theme');
+    } catch (e) {
+      // no themes, no problem
+    }
     return insertIframe(iframeId, appendTo, className, urlOptions, insertMode, style);
   };
   passbolt.html.insertThemedIframe = insertThemedIframe;

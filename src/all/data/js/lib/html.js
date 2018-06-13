@@ -47,21 +47,19 @@ passbolt.templates = window.templates;
    * @param path The template path.
    * @return {Promise.<T>|*}
    */
-  var getTemplate = function (path) {
-    return new Promise(function(resolve, reject) {
-      var template = path.replace('data/tpl/','').replace('.ejs', '').split('/');
-      if (typeof window.templates === 'undefined') {
-        reject(new Error('Passbolt templates are not defined. Check if one or more js templates are included.'));
-      }
-      if (typeof window.templates[template[0]] === 'undefined') {
-        reject(new Error('The following passbolt template group is missing or not included: ' + path));
-      }
-      if (typeof window.templates[template[0]][template[1]] === 'undefined') {
-        reject(new Error('The following passbolt template is missing or not included: ' + path));
-      }
-      resolve(window.templates[template[0]][template[1]]);
-    });
-  };
+  var getTemplate = async function (path) {
+    var template = path.replace('data/tpl/','').replace('.ejs', '').split('/');
+    if (typeof window.templates === 'undefined') {
+      throw new Error('Passbolt templates are not defined. Check if one or more js templates are included.');
+    }
+    if (typeof window.templates[template[0]] === 'undefined') {
+     throw new Error('The following passbolt template group is missing or not included: ' + path);
+    }
+    if (typeof window.templates[template[0]][template[1]] === 'undefined') {
+      throw new Error('The following passbolt template is missing or not included: ' + path);
+    }
+    return Promise.resolve(window.templates[template[0]][template[1]]);
+};
   passbolt.html.getTemplate = getTemplate;
 
   /**
@@ -74,18 +72,14 @@ passbolt.templates = window.templates;
    * @param data (optional) Data to pass to the rendering engine.
    * @return {Promise.<T>|*}
    */
-  var loadTemplate = function (selector, path, loadStrategy, data) {
+  var loadTemplate = async function (selector, path, loadStrategy, data) {
     if (!loadStrategy) {
       loadStrategy = 'html';
     }
-    return getTemplate(path)
-      .then(function (tpl) {
-        // Render the template.
-        var html = tpl.call(this, data);
-        return $(selector)[loadStrategy](html);
-      }, function(e) {
-        console.error(e.message);
-      });
+    var tpl = await getTemplate(path);
+    var html = tpl.call(this, data);
+
+    return $(selector)[loadStrategy](html);
   };
   passbolt.html.loadTemplate = loadTemplate;
 

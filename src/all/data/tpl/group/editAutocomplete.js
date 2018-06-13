@@ -1,5 +1,5 @@
 module.exports = function(locals, escapeFn, include, rethrow
-) {
+/*``*/) {
 rethrow = rethrow || function rethrow(err, str, flnm, lineno, esc){
   var lines = str.split('\n');
   var start = Math.max(lineno - 3, 0);

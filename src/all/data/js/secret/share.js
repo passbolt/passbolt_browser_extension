@@ -30,6 +30,9 @@ $(function () {
         // Mark the iframe container as ready.
         passbolt.message.emit('passbolt.passbolt-page.remove-class', '#passbolt-iframe-password-share', 'loading');
         passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-password-share', 'ready');
+        passbolt.html.resizeIframe('#passbolt-iframe-password-share', {
+          width: '100%'
+        });
       }, function() {
         console.error('Something went wrong when initializing share.js');
       });
@@ -43,11 +46,6 @@ $(function () {
     return passbolt.html.loadTemplate('body', 'resource/share.ejs')
       .then(function () {
         $autocomplete = $('#js_perm_create_form_aro_auto_cplt');
-
-        // Resize the iframe container regarding the iframe content.
-        passbolt.html.resizeIframe('#passbolt-iframe-password-share', {
-          width: '100%'
-        });
       });
   };
 

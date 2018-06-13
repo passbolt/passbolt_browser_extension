@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.0.10] - Unreleased
+## Unreleased
 ### Add
 - Add support for dark theme
 - Add check if passphrase is part of a dictionary
@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - GITHUB-268 Fix remember me checkbox label should be clickable
 - GITHUB-46 Fix security token validation regression
 - PASSBOLT-2854 [Pro] Fix bug tags imported are always the same
+- PASSBOLT-2887 [Pro] Fix iframe resize issue
 
 ## [2.0.10] - 2018-06-07
 ### Fix

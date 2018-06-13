@@ -29,6 +29,9 @@ $(function () {
             .then(function () {
                 passbolt.message.emit('passbolt.passbolt-page.remove-class', '#passbolt-iframe-group-edit', 'loading');
                 passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-group-edit', 'ready');
+                passbolt.html.resizeIframe('#passbolt-iframe-group-edit', {
+                    width: '100%'
+                });
             });
     };
 
@@ -36,16 +39,9 @@ $(function () {
      * Load the page template and initialize the variables relative to it.
      * @returns {Promise}
      */
-    var loadTemplate = function () {
-        return passbolt.html.loadTemplate('body', 'group/edit.ejs')
-            .then(function () {
-                $autocomplete = $(autocompleteFieldSelector);
-
-                // Resize the iframe container regarding the iframe content.
-                passbolt.html.resizeIframe('#passbolt-iframe-group-edit', {
-                    width: '100%'
-                });
-            });
+    var loadTemplate = async function () {
+        await passbolt.html.loadTemplate('body', 'group/edit.ejs');
+        $autocomplete = $(autocompleteFieldSelector);
     };
 
     /**

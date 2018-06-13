@@ -28,6 +28,7 @@ $(function () {
     iframeId = 'passbolt-iframe-group-edit-autocomplete';
     var appendTo = $('#passbolt-group-edit-autocomplete-wrapper', '.js_plugin_group_edit_wrapper');
     var style = 'margin-top:-12px'; // compensate for iframe padding (not present in styleguide)
+    className = 'hidden';
     insertMode = 'append';
     passbolt.html.insertThemedIframe(iframeId, appendTo, className, urlOptions, insertMode, style);
   };

@@ -14,7 +14,7 @@
     "locutus": "~2.0.9",
     "openpgp": "^3.0.8",
     "papaparse": "^4.4.0",
-    "passbolt-styleguide": "^2.1.8",
+    "passbolt-styleguide": "^2.1.11",
     "underscore": "~1.9.0",
     "validator": "4.1.0",
     "xregexp": "~3.0.0"

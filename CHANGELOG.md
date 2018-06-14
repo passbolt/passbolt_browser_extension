@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - GITHUB-46 Fix security token validation regression
 - PASSBOLT-2854 [Pro] Fix bug tags imported are always the same
 - PASSBOLT-2887 [Pro] Fix iframe resize issue
+- PASSBOLT-2883 Fix logout link and remember me cleanup
 
 ## [2.0.10] - 2018-06-07
 ### Fix

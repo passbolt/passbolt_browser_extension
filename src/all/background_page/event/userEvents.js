@@ -169,16 +169,5 @@ var listen = function (worker) {
       worker.port.emit(requestId, 'ERROR', e.message);
     }
   });
-
-  /*
-   * User logout is requested
-   *
-   * @listens passbolt.user.logout
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.user.logout', function (requestId) {
-    user.logout();
-    worker.port.emit(requestId, 'SUCCESS');
-  });
 };
 exports.listen = listen;

@@ -415,11 +415,9 @@ const User = (function () {
   };
 
   /**
-   * Logout
-   * Delete the master password if any
-   * Let appjs decide what to do
+   * Flush the master password if any stored during a previous session
    */
-  this.logout = function () {
+  this.flushMasterPassword = function () {
     this._masterPassword = null;
   };
 

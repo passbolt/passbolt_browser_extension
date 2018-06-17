@@ -48,6 +48,9 @@ $(function () {
       .then(function () {
         // Autologin.
         step._goToLogin();
+      })
+      .catch(function (error) {
+        passbolt.setup.fatalError(error.message, error.data);
       });
   };
 
@@ -111,18 +114,10 @@ $(function () {
    */
   step._validateAccount = function (setupData) {
     if (step.options.workflow == 'install') {
-      return passbolt.request('passbolt.setup.save', setupData)
-        .then(null, function (error) {
-          // Throw fatal error.
-          passbolt.setup.fatalError(error.message, error.data);
-        });
+      return passbolt.request('passbolt.setup.save', setupData);
     }
     else if (step.options.workflow == 'recover') {
-      return passbolt.request('passbolt.setup.completeRecovery', setupData)
-        .then(null, function (error) {
-          // Throw fatal error.
-          passbolt.setup.fatalError(error.message, error.data);
-        });
+      return passbolt.request('passbolt.setup.completeRecovery', setupData);
     }
   };
 

@@ -42,7 +42,7 @@ PassboltApp.initPageMod = function () {
   // ✗ https://demo.passbolt.com/auth/login
   var user = User.getInstance();
   var escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
-  var url = '^' + escapedDomain + '/?(#.*)?$';
+  var url = '^' + escapedDomain + '/?(/app.*)?(#.*)?$';
   var regex = new RegExp(url);
   return pageMod.PageMod({
     name: 'PassboltApp',

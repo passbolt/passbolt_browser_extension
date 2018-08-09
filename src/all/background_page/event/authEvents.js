@@ -52,10 +52,11 @@ var listen = function (worker) {
    *   (bool) false|undefined if should not remember
    *   (integer) -1 if should remember for the session
    *   (integer) duration in seconds to specify a specific duration
+   * @param redirect {string} The uri to redirect the user after login
    */
-  worker.port.on('passbolt.auth.login', function (requestId, passphrase, remember) {
+  worker.port.on('passbolt.auth.login', function (requestId, passphrase, remember, redirect) {
     var auth = new AuthController(worker, requestId);
-    auth.login(passphrase, remember);
+    auth.login(passphrase, remember, redirect);
   });
 
   /*

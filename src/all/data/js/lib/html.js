@@ -122,7 +122,8 @@ passbolt.templates = window.templates;
     let optionUrl = [];
     for (var options in urlOptions)
       if (iframeUrlOptions.hasOwnProperty(options)) {
-        optionUrl.push(`${options}=${iframeUrlOptions[options]}`);
+        const optionsValue = encodeURIComponent(iframeUrlOptions[options]);
+        optionUrl.push(`${options}=${optionsValue}`);
       }
     iframeUrl += optionUrl.join("&");
 

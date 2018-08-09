@@ -93,13 +93,16 @@ $(function () {
    * Insert the passphrase dialog iframe.
    */
   passbolt.login.onStep1RequestPassphrase = function () {
-		// Inject the passphrase dialog iframe into the web page DOM.
-		// See passboltAuthPagemod and login-form for the logic inside the iframe
+    // Inject the passphrase dialog iframe into the web page DOM.
+    // See passboltAuthPagemod and login-form for the logic inside the iframe
     const iframeId = passphraseIframeId;
     const className = 'loading';
     const appendTo = '.login.form';
+    const params = new URLSearchParams(window.location.search.substring(1));
+    const redirect = params.get('redirect');
+
     $(appendTo).empty();
-    passbolt.html.insertIframe(iframeId, appendTo, className);
+    passbolt.html.insertIframe(iframeId, appendTo, className, {redirect});
   };
 
   /* ==================================================================================
@@ -117,9 +120,10 @@ $(function () {
   });
 
   // GPGAuth is completed with success
-  passbolt.message.on('passbolt.auth.login-success', function (message, referrer) {
+  passbolt.message.on('passbolt.auth.login-success', function (message, redirect) {
     $('html').addClass('loaded').removeClass('loading');
-    window.location.replace(referrer);
+    console.log('redirect to ', redirect);
+    window.location.replace(redirect);
   });
 
   // GPGAuth failed

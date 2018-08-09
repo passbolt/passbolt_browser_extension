@@ -108,8 +108,14 @@ $(function () {
   /**
    * Login the user
    */
-  var login = function (masterPassword, remember) {
-    passbolt.request('passbolt.auth.login', masterPassword, remember);
+  var login = function (masterPassword) {
+    let remember = false;
+    if ($rememberMe !== null && $rememberMe.prop('checked')) {
+      remember = -1;
+    }
+    const params = new URLSearchParams(window.location.search.substring(1));
+    const redirect = params.get('redirect');
+    passbolt.request('passbolt.auth.login', masterPassword, remember, redirect);
   };
 
   /**
@@ -129,11 +135,7 @@ $(function () {
     passbolt.request('passbolt.keyring.private.checkpassphrase', masterPassword).then(
       // If the passphrase is valid, login the user.
       function success() {
-        var remember = false;
-        if ($rememberMe !== null && $rememberMe.prop('checked')) {
-          remember = -1;
-        }
-        login(masterPassword, remember);
+        login(masterPassword);
       },
       // If the passphrase is invalid, display an error feedback.
       function fail(msg) {

@@ -45,13 +45,15 @@ AuthController.prototype.verify = async function() {
  *
  * @returns {Promise<void>}
  */
-AuthController.prototype.login = async function(passphrase, remember) {
-  let referrer;
+AuthController.prototype.login = async function(passphrase, remember, redirect) {
   const tabId = this.worker.tab.id;
+  if (!redirect || redirect[0] != '/') {
+    redirect = '/';
+  }
 
   Worker.get('Auth', tabId).port.emit('passbolt.auth.login-processing', __('Logging in'));
   try {
-    referrer = await this.auth.login(passphrase);
+    await this.auth.login(passphrase);
   } catch(error) {
     Worker.get('Auth', tabId).port.emit('passbolt.auth.login-failed', error.message);
     return;
@@ -75,7 +77,7 @@ AuthController.prototype.login = async function(passphrase, remember) {
   app.pageMods.PassboltApp.init().then(() => {
     // Redirect the user.
     const msg = __('You are now logged in!');
-    Worker.get('Auth', tabId).port.emit('passbolt.auth.login-success', msg, referrer);
+    Worker.get('Auth', tabId).port.emit('passbolt.auth.login-success', msg, redirect);
   });
 };
 

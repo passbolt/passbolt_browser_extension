@@ -133,7 +133,6 @@ GpgAuth.prototype.login = async function(passphrase) {
  * @returns {Promise.<string>} token
  */
 GpgAuth.prototype.stage1 = async function (passphrase) {
-
   // Prepare request data
   const url = this.getDomain() + URL_LOGIN;
   const body = new FormData();
@@ -170,7 +169,6 @@ GpgAuth.prototype.stage1 = async function (passphrase) {
  * @returns {Promise.<string>} url to redirect the user to
  */
 GpgAuth.prototype.stage2 = async function (userAuthToken) {
-
   // Prepare request data
   const url = this.getDomain() + URL_LOGIN;
   const domain = User.getInstance().settings.getDomain();

@@ -6,6 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fix
 - Fix setup fatal error should not trigger a redirect
 
+## [2.2.0] - 2018-08-09
+### Fix
+- Fix setup fatal error should not trigger a redirect
+- PASSBOLT-2940 AppPagemod should start on the routes of the appjs /app/*
+
 ## [2.1.0] - 2018-06-14
 ### Add
 - Add support for dark theme
@@ -265,7 +270,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.0.10...v2.1.0
 [2.0.10]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.0.9...v2.0.10
 [2.0.9]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.0.8...v2.0.9

@@ -28,6 +28,6 @@
     "grunt-contrib-watch": "^1.0.1",
     "grunt-passbolt-ejs-compile": "0.0.2",
     "grunt-shell": "^2.1.0",
-    "web-ext": "^2.6.0"
+    "web-ext": "^2.8.0"
   }
 }

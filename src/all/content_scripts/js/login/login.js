@@ -122,7 +122,6 @@ $(function () {
   // GPGAuth is completed with success
   passbolt.message.on('passbolt.auth.login-success', function (message, redirect) {
     $('html').addClass('loaded').removeClass('loading');
-    console.log('redirect to ', redirect);
     window.location.replace(redirect);
   });
 

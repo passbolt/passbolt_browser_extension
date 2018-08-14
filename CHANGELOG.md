@@ -3,8 +3,14 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
+## [2.2.1] - 2018-08-14
+### Fix
+- Fix login redirect issue, it should not redirect to / if passbolt is installed in a subfolder
+
+## [2.2.0] - 2018-08-13
 ### Fix
 - Fix setup fatal error should not trigger a redirect
+- PASSBOLT-2940 AppPagemod should start on the routes of the appjs /app/*
 
 ## [2.2.0] - 2018-08-09
 ### Fix

@@ -6,8 +6,9 @@
  * @copyright (c) 2018 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const GpgAuth = require('../model/gpgauth').GpgAuth;
 const app = require('../app');
+var Config = require('../model/config');
+const GpgAuth = require('../model/gpgauth').GpgAuth;
 
 const User = require('../model/user').User;
 const __ = require('../sdk/l10n').get;
@@ -48,7 +49,9 @@ AuthController.prototype.verify = async function() {
 AuthController.prototype.login = async function(passphrase, remember, redirect) {
   const tabId = this.worker.tab.id;
   if (!redirect || redirect[0] != '/') {
-    redirect = '/';
+    var trustedDomain = Config.read('user.settings.trustedDomain');
+    const url = new URL(trustedDomain);
+    redirect = url.pathname;
   }
 
   Worker.get('Auth', tabId).port.emit('passbolt.auth.login-processing', __('Logging in'));

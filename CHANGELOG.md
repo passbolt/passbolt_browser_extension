@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fix
 - PASSBOLT-3022: Fix the "import tag" is not associated to passwords imported from a csv where have no category
+- PASSBOLT-3074: As a logged in user selecting a "remember me" duration the  checkbox should be selected automatically
 
 ## [2.2.1] - 2018-08-14
 ### Fix

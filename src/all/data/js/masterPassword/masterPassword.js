@@ -10,7 +10,8 @@ $(function () {
   // DOM Elements.
   var $masterPasswordField = null,
     $submitButton = null,
-    $focusFirstField = null;
+    $focusFirstField = null,
+    $rememberMeDuration = null;
 
   /**
    * Initialize the master password dialog.
@@ -51,6 +52,7 @@ $(function () {
         $masterPasswordField = $('#js_master_password');
         $submitButton = $('#master-password-submit');
         $focusFirstField = $('#js_master_password_focus_first');
+        $rememberMeDuration = $('#js_remember_master_password_duration');
       });
   };
 
@@ -95,6 +97,7 @@ $(function () {
     $focusFirstField.on('keydown', focusFirstFieldKeydown);
     $masterPasswordField.on('keypress', masterPasswordFieldKeypressed);
     $masterPasswordField.on('keydown', masterPasswordFieldKeyDown);
+    $rememberMeDuration.on('change', rememberMeDurationChange);
   };
 
   /**
@@ -128,7 +131,7 @@ $(function () {
   var validAttemptHandler = function () {
     // The user wants their master password to be remembered.
     if ($('#js_remember_master_password').is(':checked')) {
-      var duration = parseInt($('#js_remember_master_password_duration').val());
+      var duration = parseInt($rememberMeDuration.val());
       rememberMasterPassword($masterPasswordField.val(), duration);
     }
     passbolt.message.emit('passbolt.master-password.close-dialog');
@@ -287,6 +290,14 @@ $(function () {
       ev.stopPropagation();
       cancelMasterPassword();
     }
+  };
+
+  /**
+   * Handle when the user is selecting a remember me duration.
+   * @param ev {HTMLEvent} The event which occurred
+   */
+  var rememberMeDurationChange = function () {
+    $('#js_remember_master_password').prop('checked', true);
   };
 
   // Init the master password dialog.

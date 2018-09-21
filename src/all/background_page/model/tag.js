@@ -21,12 +21,12 @@ var Tag = function () {
  * @param resourceId string uuid
  * @param tags array of tag strings
  */
-Tag.prototype.add = function(resourceId, tags) {
+Tag.add = function(resourceId, tags) {
   var user = User.getInstance(),
     domain = user.settings.getDomain();
 
   var body = {
-    "Tags" : tags
+    Tags: tags
   };
 
   return new Promise(function(resolve, reject) {

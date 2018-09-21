@@ -89,8 +89,8 @@ Resource.import = function(resource) {
     body = resource;
 
   body = {
-    "Resource" : resource,
-    "Secret" : resource.secrets
+    Resource: resource,
+    Secret: resource.secrets
   };
 
   return new Promise(function(resolve, reject) {
@@ -108,11 +108,15 @@ Resource.import = function(resource) {
       function success(response) {
         response.json()
         .then(function (json) {
-          resolve(json.body);
+          if (response.ok) {
+            resolve(json.body);
+          } else {
+            reject(json);
+          }
         });
       },
       function error() {
-        reject(new Error(__('There was a problem while trying to save the resource')));
+        reject(new Error(__('There was a problem while trying to connect to the API.')));
       }
     );
   });

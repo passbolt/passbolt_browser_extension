@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
+### Improved
+- PASSBOLT-2981: As Pro LU importing a large set of passwords I should request the API by batch
+
+### Fix
+- PASSBOLT-3022: Fix the "import tag" is not associated to passwords imported from a csv where have no category
+
 ## [2.2.1] - 2018-08-14
 ### Fix
 - Fix login redirect issue, it should not redirect to / if passbolt is installed in a subfolder

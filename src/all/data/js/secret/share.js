@@ -7,110 +7,380 @@
 
 $(function () {
 
-  // The current search timeout reference.
-  var currentSearchTimeout = null,
-  // The password to edit, it is retrieved by sending a request to the addon-code.
-    sharedPassword = null,
-  // DOM Elements.
-    $autocomplete = null;
+  // The user settings.
+  let settings = {};
+
+  // The resources to share.
+  let resources = [];
+
+  // The share changes.
+  let shareChanges = [];
+
+  // Is the current user owner of the resources
+  let isOwner = false;
+
+  // The current search for aros timeout reference.
+  let currentSearchTimeout = null;
+
+  // DOM Elements (jQuery objects).
+  let $permissions,
+    $goToEdit,
+    $goToShare,
+    $searchInput,
+    $autocompleteWrapper,
+    $autocompleteContent,
+    $feedbacks,
+    $save,
+    $cancel,
+    $close;
+
+  // The latest search aros result.
+  let searchArosResult = [];
 
   /**
-   * Initialize the share password component.
+   * Initialize the dialog.
    */
-  var init = function () {
-    // Load the page template.
-    loadTemplate()
-    // Get the shared password.
-      .then(getSharedPassword)
-      // Init the security token.
-      .then(initSecurityToken)
-      .then(function () {
-        // Init the event listeners.
-        initEventsListeners();
-        // Mark the iframe container as ready.
-        passbolt.message.emit('passbolt.passbolt-page.remove-class', '#passbolt-iframe-password-share', 'loading');
-        passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-password-share', 'ready');
-        passbolt.html.resizeIframe('#passbolt-iframe-password-share', {
-          width: '100%'
-        });
-      }, function() {
-        console.error('Something went wrong when initializing share.js');
+  const init = async function () {
+    await loadSettings();
+    await getResources();
+    shareChanges = new ShareChanges(resources);
+    isOwner = shareChanges.isOriginalResourcesOwner();
+    await loadTemplate();
+    await loadPermissions();
+    await initSecurityToken();
+    initEventsListeners();
+    passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-password-share', 'ready');
+  };
+
+  /**
+   * Submit changes.
+   * @return {Promise}
+   */
+  const submitChanges = async function() {
+    return passbolt.request('passbolt.share.submit', shareChanges._changes)
+      .then(null, () => {
+        console.log('error', error);
       });
+  };
+
+  /**
+   * Close the share dialog.
+   */
+  const close = async function() {
+    return passbolt.message.emit('passbolt.share.close');
+  };
+
+  /**
+   * Load the application settings
+   * @return {Promise}
+   */
+  const loadSettings = async function() {
+    settings = await passbolt.request('passbolt.config.readAll', ['user.settings.trustedDomain']);
+  };
+
+  /**
+   * Get the resources to share.
+   * @return {Promise}
+   */
+  const getResources = async function() {
+    const resourcesIds = await passbolt.request('passbolt.share.get-resources-ids');
+    resources = await passbolt.request('passbolt.share.get-resources', resourcesIds);
   };
 
   /**
    * Load the page template and initialize the variables relative to it.
-   * @returns {Promise}
+   * @return {Promise}
    */
-  var loadTemplate = function () {
-    return passbolt.html.loadTemplate('body', 'resource/share.ejs')
-      .then(function () {
-        $autocomplete = $('#js_perm_create_form_aro_auto_cplt');
-      });
+  const loadTemplate = async function () {
+    const bulk = resources.length > 1;
+    await passbolt.html.loadTemplate('body', 'resource/shareDialog.ejs', 'html', {resources, bulk, isOwner});
+    $goToEdit = $('.share-password-dialog #js-share-go-to-edit');
+    $goToShare = $('.share-password-dialog #js-share-go-to-share');
+    $permissions = $('.share-password-dialog #js-share-edit-list ul');
+    $searchInput = $('.share-password-dialog #js-search-aros-input');
+    $autocompleteWrapper = $('.share-password-dialog #js-search-aro-autocomplete');
+    $autocompleteContent = $('.share-password-dialog .autocomplete-content');
+    $feedbacks = $('.share-password-dialog #js-share-feedbacks');
+    $save = $('.share-password-dialog #js-share-save');
+    $cancel = $('.share-password-dialog #js-share-cancel');
+    $close = $('.share-password-dialog .js-dialog-close');
+    if (!isOwner) {
+      showOnlyOwnerCanShareFeedback();
+    }
   };
 
   /**
-   * Get the currently edited password.
-   * It must have been stored before launching the password share dialog.
-   * @returns {Promise}
+   * Load the confirm leave dialog
+   * @return {Promise}
    */
-  var getSharedPassword = function () {
-    return passbolt.request('passbolt.share.get-shared-password')
-      .then(function (data) {
-        sharedPassword = data;
-      });
+  const loadConfirmLeaveTemplate = async function() {
+    let $confirmDialog, $confirmDialogWrapper;
+    await passbolt.html.loadTemplate('body', 'dialog/confirmLeaveDialog.ejs', 'append');
+    $confirmDialog = $('.dialog.confirm');
+    $confirmDialogWrapper = $confirmDialog.parent();
+    $('.js-dialog-close, .js-dialog-cancel', $confirmDialog).on('click', () => $confirmDialogWrapper.remove());
+    $('.js-dialog-confirm', $confirmDialog).on('click', () => passbolt.message.emit('passbolt.share.go-to-edit'));
+  };
+
+  /**
+   * Load the list of permissions
+   */
+  const loadPermissions = async function() {
+    const arosPermissions = shareChanges.aggregatePermissionsByAro();
+    for (var aroId in arosPermissions) {
+      await insertAroPermissions(arosPermissions[aroId]);
+    }
+  };
+
+  /**
+   * Insert an aro permissions in the list
+   * @param {object} aroPermissions The permission to insert
+   * {
+   *  id: {string}, // The aro id
+   *  aro: {object},
+   *  type: int,
+   *  permissions: array<object>
+   * }
+   */
+  const insertAroPermissions = async function(aroPermissions) {
+    const domain = settings['user.settings.trustedDomain'];
+    await passbolt.html.loadTemplate($permissions, 'resource/shareAroPermissionsItem.ejs', 'append', {domain, aroPermissions, isOwner});
   };
 
   /**
    * Init the security token.
-   * @returns {Promise}
+   * @return {Promise}
    */
-  var initSecurityToken = function () {
-    return passbolt.security.initSecurityToken('#js_perm_create_form_aro_auto_cplt', '.security-token');
+  const initSecurityToken = function () {
+    return passbolt.security.initSecurityToken('#js-search-aros-input', '.security-token');
   };
 
   /**
    * Init the events listeners.
    * The events can come from the following sources : addon, page or DOM.
    */
-  var initEventsListeners = function () {
-    $autocomplete.bind('input', autocompleteFieldChanged);
-    passbolt.message.on('passbolt.share.reset', resetHandler);
+  const initEventsListeners = function () {
+    $goToEdit.on('click', event => handleGoToEdit());
+    $goToShare.on('click', event => handleGoToShare());
+    $permissions.on('change', 'select', event => handleAroPermissionChange(event));
+    $permissions.on('click', '.js-share-delete-button', event => handleDeleteAroPermission(event));
+    $searchInput.bind('input', () => handleSearchArosChange());
+    $autocompleteContent.on('click', 'li', event => handleAddAroPermissions(event));
+    $save.on('click', () => submitChanges());
+    $cancel.on('click', () => close());
+    $close.on('click', () => close());
+    $permissions.on('mouseover', '.tooltip-alt', event => handleAroPermissionsTooltipPosition(event));
   };
 
-  /* ==================================================================================
-   *  Addon events handlers
-   * ================================================================================== */
-
   /**
-   * Reset the autocomplete search field.
+   * Go to edit dialog.
    */
-  var resetHandler = function () {
-    $autocomplete.val('');
+  const handleGoToEdit = function() {
+    if (!shareChanges._changes.length) {
+      return passbolt.message.emit('passbolt.share.go-to-edit');
+    } else {
+      loadConfirmLeaveTemplate();
+    }
   };
 
-  /* ==================================================================================
-   *  DOM events handlers
-   * ================================================================================== */
+  /**
+   * Go to share dialog (refresh).
+   */
+  const handleGoToShare = function() {
+    return passbolt.message.emit('passbolt.share.go-to-share');
+  };
 
   /**
-   * When the autocomplete search field change.
+   * Handle aro permission change
+   * @param {DomEvent} event
    */
-  var autocompleteFieldChanged = function () {
-    var keywords = $(this).val();
-    // If a search has been already scheduled, delete it.
+  const handleAroPermissionChange = function (event) {
+    const aroId = $(event.currentTarget).parents('li').attr('id');
+    const type = parseInt($(event.currentTarget).val());
+    shareChanges.updateAroPermissions(aroId, type);
+    markAroPermissionsAsChange(aroId);
+    validateChanges();
+  };
+
+  /**
+   * Handle aro permission delete
+   * @param {DomEvent} event
+   */
+  const handleDeleteAroPermission = function (event) {
+    const aroId = $(event.currentTarget).parents('li').attr('id');
+    shareChanges.deleteAroPermissions(aroId);
+    validateChanges();
+    $(`#${aroId}`, $permissions).remove();
+  };
+
+  /**
+   * Handle search aros change.
+   */
+  const handleSearchArosChange = function () {
+    const keywords = $searchInput.val();
+
+    // Cancel any previous search timeout.
     if (currentSearchTimeout != null) {
       clearTimeout(currentSearchTimeout);
     }
-    // Postpone the search to avoid a request on each very closed input.
-    currentSearchTimeout = setTimeout(function () {
-      // Search user.
-      passbolt.message.emit('passbolt.share.search-users', keywords);
+
+    // Empty search reset the autocomplete component.
+    if (keywords.trim() == '') {
+      resetSearchAros();
+      return;
+    }
+
+    // Throttle the search, so the user has time to enter the complete sentence he wants to search.
+    currentSearchTimeout = setTimeout(() => {
+      $autocompleteContent.empty().addClass('loading');
+      $autocompleteWrapper.removeClass('hidden');
+      passbolt.request('passbolt.share.search-aros', keywords)
+        .then(aros => updateAutocompleteContent(aros));
     }, 300);
   };
 
+  /**
+   * Handle add aro permissions.
+   * @param {DomEvent} event
+   */
+  const handleAddAroPermissions = function(event) {
+    const aroId = $(event.currentTarget).attr('id');
+    const aro = searchArosResult.find(aro => aro.id == aroId);
+    resetSearchAros();
+    const aroPermissions = shareChanges.addAroPermissions(aro);
+    insertAroPermissions(aroPermissions)
+      .then(() => markAroPermissionsAsChange(aroId))
+      .then(() => scrollToLatestAroPermissions())
+      .then(() => validateChanges());
+  };
 
-  // Init the autocomplete search field component.
+  /**
+   * Handle the aro permissions tooltip.
+   * As the tooltip is associated to an element in a overflow div, the tooltip text has to be moved to be aligned.
+   * @param {DomEvent} event
+   */
+  const handleAroPermissionsTooltipPosition = function(event) {
+    const $tooltip = $(event.currentTarget);
+    const position = $tooltip[0].getBoundingClientRect();
+    $('.tooltip-text', $tooltip).css('top', `${position.top}px`);
+  };
+
+  /**
+   * Scroll to the latest aro permissions
+   */
+  const scrollToLatestAroPermissions = function() {
+    $permissions.animate({scrollTop: $permissions[0].scrollHeight}, 500);
+  };
+
+  /**
+   * Mark/Unmark an aro permissions row as updated.
+   * @param {string} aroId The aro permissions row id.
+   */
+  const markAroPermissionsAsChange = function(aroId) {
+    if (shareChanges.hasChanges(aroId)) {
+      $(`#${aroId}`).addClass('permission-updated');
+    } else {
+      $(`#${aroId}`).removeClass('permission-updated');
+    }
+  };
+
+  /**
+   * Reset the search aros.
+   */
+  const resetSearchAros = function () {
+    $searchInput.val('');
+    $autocompleteWrapper.addClass('hidden').removeClass('ready');
+    $autocompleteContent.empty();
+  };
+
+  /**
+   * Update the autocomplete component with the aros returned by the service.
+   * @param {array} aros
+   * @return {Promise}
+   */
+  const updateAutocompleteContent = function (aros) {
+    const excludedArosId = Object.keys(shareChanges._aros);
+    searchArosResult = aros.filter(aro => excludedArosId.indexOf(aro.id) == -1);
+    const data = {
+      domain: settings['user.settings.trustedDomain'],
+      aros: searchArosResult
+    };
+    $autocompleteContent.empty().removeClass('loading');
+    $autocompleteWrapper.removeClass('hidden').addClass('ready');
+    return passbolt.html.loadTemplate($autocompleteContent, 'resource/shareAutocomplete.ejs', 'append', data);
+  };
+
+  /**
+   * Validate the permissions changes.
+   */
+  const validateChanges = function() {
+    const resourcesWithNoOwner = shareChanges.getResourcesWithNoOwner();
+    if (resourcesWithNoOwner.length) {
+      showMissingOwnerFeedback();
+      disableSaveAction();
+      return;
+    }
+    if (!shareChanges._changes.length) {
+      hideFeedback();
+      disableSaveAction();
+      return;
+    }
+    showApplyFeedback();
+    enableSaveAction();
+  };
+
+  /**
+   * Enable the save action
+   */
+  const enableSaveAction = function() {
+    $save
+      .removeClass('disabled')
+      .prop('disabled', null);
+  };
+
+  /**
+   * Disable the save action
+   */
+  const disableSaveAction = function() {
+    $save
+      .addClass('disabled')
+      .prop('disabled', 'disabled');
+  };
+
+  /**
+   * Display the missing owner feedback
+   */
+  const showMissingOwnerFeedback = function() {
+    const plural = resources.length > 1;
+    let text = `The password${plural?'s':''} must have a owner.`;
+    $feedbacks.text(text);
+    $feedbacks.addClass('error').removeClass('warning hidden');
+  };
+
+  /**
+   * Display the only owner can share feedback
+   */
+  const showOnlyOwnerCanShareFeedback = function() {
+    let text = 'Only the owner of a password can share it.';
+    $feedbacks.text(text);
+    $feedbacks.addClass('warning').removeClass('hidden');
+  };
+
+  /**
+   * Display the apply feedback
+   */
+  const showApplyFeedback = function() {
+    const text = 'You need to save to apply the changes.';
+    $feedbacks.text(text);
+    $feedbacks.addClass('warning').removeClass('error hidden');
+  };
+
+  /**
+   * Hide any feedback
+   */
+  const hideFeedback = function() {
+    $feedbacks.addClass('hidden');
+  };
+
   init();
-
 });

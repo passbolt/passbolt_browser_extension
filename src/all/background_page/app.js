@@ -149,12 +149,6 @@ pageMods.SecretEditDialog = require('./pagemod/secretEditDialogPagemod').SecretE
 pageMods.ShareDialog = require('./pagemod/shareDialogPagemod').ShareDialog;
 
 /*
- * This pagemod drives the iframe used when the user share a password
- * and he is looking for new users to grant
- */
-pageMods.ShareAutocompleteDialog = require('./pagemod/shareAutocompleteDialogPagemod').ShareAutocompleteDialog;
-
-/*
  * This pagemod drives the iframe used when the user creates / edit a group.
  * It is used when selecting the users who are part of the group.
  */

@@ -75,14 +75,13 @@ Resource.prototype.toCsvEntry = function(resource, mapping) {
     csvEntry[mapping[fieldName]] = resource[fieldName];
   }
   return csvEntry;
-}
+};
 
 /**
  * Import a resource on the server.
  * Import is different than save here because we will use a different passbolt pro entry point.
  * @param resource
  */
-
 Resource.import = function(resource) {
   var user = User.getInstance(),
     domain = user.settings.getDomain(),
@@ -123,44 +122,75 @@ Resource.import = function(resource) {
 };
 
 /**
- * Simulate share permissions update.
- *
- * It is helpful to :
- *  - Ensure that the changes won't compromise the data integrity;
- *  - Get the lists of added and removed users (Used for later encryption).
- *
+ * Find resource to share
  * @param resourceId
- * @param permissions
- * @returns {*}
+ * @deprecated since v2.4.0 will be removed in v3.0
+ * replaced by the findShareResources function.
  */
-Resource.simulateShare = function (resourceId, permissions) {
-  var user = User.getInstance(),
-    domain = user.settings.getDomain(),
-    body = {Permissions: permissions};
+Resource.findShareResource = async function (resourceId) {
+  const user = User.getInstance();
+  const domain = user.settings.getDomain();
+  const fetchOptions = {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Accept': 'application/json',
+      'content-type': 'application/json'
+    }
+  };
+  let url = new URL(`${domain}/resources/` + resourceId + `.json?api-version=2`);
+  url.searchParams.append('contain[permission]', '1');
+  url.searchParams.append('contain[permissions.user.profile]', '1');
+  url.searchParams.append('contain[permissions.group]', '1');
+  url.searchParams.append('contain[secret]', '1');
+  let response, json;
 
-  return new Promise(function(resolve, reject) {
-    fetch(
-      domain + '/share/simulate/resource/' + resourceId + '.json' + '?api-version=v1', {
-        method: 'POST',
-        credentials: 'include',
-        body: JSON.stringify(body),
-        headers: {
-          'Accept': 'application/json',
-          'content-type': 'application/json'
-        }
-      })
-      .then(
-        function success(response) {
-          response.json()
-            .then(function (json) {
-              resolve(json.body);
-            });
-        },
-        function error() {
-          reject(new Error(__('There was a problem when trying to get simulate the new permissions')));
-        }
-      );
+  try {
+    response = await fetch(url, fetchOptions);
+    json = await response.json();
+  } catch (error) {
+    console.error(error);
+    return new Error(__('There was a problem when trying to retrieve the resource'));
+  }
+
+  return json.body;
+};
+
+/**
+ * Find resources to share
+ * @param {array} resourcesIds
+ * @returns {array|Error}
+ */
+Resource.findShareResources = async function (resourcesIds) {
+  const user = User.getInstance();
+  const domain = user.settings.getDomain();
+  const fetchOptions = {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Accept': 'application/json',
+      'content-type': 'application/json'
+    }
+  };
+  let url = new URL(`${domain}/resources.json?api-version=2`);
+  resourcesIds.forEach(resourceId => {
+    url.searchParams.append(`filter[has-id][]`, resourceId);
   });
+  url.searchParams.append('contain[permission]', '1');
+  url.searchParams.append('contain[permissions.user.profile]', '1');
+  url.searchParams.append('contain[permissions.group]', '1');
+  url.searchParams.append('contain[secret]', '1');
+  let response, json;
+
+  try {
+    response = await fetch(url, fetchOptions);
+    json = await response.json();
+  } catch (error) {
+    console.error(error);
+    return new Error(__('There was a problem when trying to retrieve the resources'));
+  }
+
+  return json.body;
 };
 
 // Exports the Resource object.

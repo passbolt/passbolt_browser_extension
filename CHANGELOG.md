@@ -3,12 +3,15 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
+### Added
+- PASSBOLT-2983: As LU I should be able to share multiple passwords in bulk
+
 ### Improved
 - PASSBOLT-2981: As Pro LU importing a large set of passwords I should request the API by batch
+- PASSBOLT-3074: As a logged in user selecting a "remember me" duration the  checkbox should be selected automatically
 
 ### Fix
 - PASSBOLT-3022: Fix the "import tag" is not associated to passwords imported from a csv where have no category
-- PASSBOLT-3074: As a logged in user selecting a "remember me" duration the  checkbox should be selected automatically
 
 ## [2.2.1] - 2018-08-14
 ### Fix

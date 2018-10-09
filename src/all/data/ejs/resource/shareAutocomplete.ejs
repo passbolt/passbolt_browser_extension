@@ -1,3 +1,46 @@
-<div class="autocomplete-content scroll">
-    <ul></ul>
-</div>
+<ul>
+<? if (!aros.length) { ?>
+    <li>
+        <div class="row">
+            <div class="main-cell-wrapper">
+                <div class="main-cell" style="font-size:16px;">
+                    No user or group found
+                </div>
+            </div>
+        </div>
+    </li>
+<? } ?>
+<? for(let i in aros) {
+    const aro = aros[i];
+    let aroAvatarPath, aroName, aroDetails, cssClass;
+    if (aro.profile) {
+        aroAvatarPath = `${domain}/${aro.profile.avatar.url.small}`;
+        aroName = `${aro.profile.first_name} ${aro.profile.last_name} (${aro.gpgkey.key_id})`;
+        aroDetails = aro.username;
+        cssClass = 'user';
+    } else {
+        aroAvatarPath = `${domain}/img/avatar/group_default.png`;
+        aroName = aro.name;
+        aroDetails = `${aro.user_count} Member(s)`;
+        cssClass = 'group';
+    }
+?>
+    <li id="<?= aro.id ?>">
+        <div class="row">
+            <div class="main-cell-wrapper">
+                <div class="main-cell">
+                    <a>
+                        <div class="avatar">
+                            <img src="<?= aroAvatarPath ?>"/>
+                        </div>
+                        <div class="<?= cssClass ?>">
+                            <span class="name"><?= aroName ?></span>
+                            <span class="details" title="<?= aroDetails ?>"><?= aroDetails ?></span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </li>
+<? } ?>
+</ul>

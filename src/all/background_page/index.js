@@ -78,7 +78,6 @@ var main = function() {
   pageMods.ProgressDialog.init();
   pageMods.SecretEditDialog.init();
   pageMods.ShareDialog.init();
-  pageMods.ShareAutocompleteDialog.init();
   pageMods.GroupEditDialog.init();
   pageMods.GroupEditAutocompleteDialog.init();
   pageMods.ImportPasswordsDialog.init();

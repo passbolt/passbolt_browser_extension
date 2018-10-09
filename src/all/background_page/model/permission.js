@@ -5,74 +5,44 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-var Config = require('./config');
-var UserSettings = require('./userSettings').UserSettings;
+var User = require('./user').User;
 var __ = require('../sdk/l10n').get;
 
 /**
  * The class that deals with permissions.
  */
-var Permission = function () {
-	// see model/settings
-	this.settings = new UserSettings();
-};
+class Permission {}
 
 /**
- * Search users that could be granted to access a given resource.
- *
- * @param model {string} The type of instance
- * @param instanceId {string} The instance to search on
- * @param keywords {string} Filter the search on keywords
- * @param excludedUsers {array} Exclude some users from the search result
- * @returns {Promise}
+ * Find the permissions of a resource.
+ * @param {string} resourceId
+ * @returns {array}
  */
-Permission.prototype.searchUsers = function(model, instanceId, keywords, excludedUsers) {
-	var _this = this,
-    _response = {},
-    url = null;
-
-	return new Promise (function (resolve, reject) {
-    // Check if there is a trusted domain.
-    try {
-      url = _this.settings.getDomain() + '/share/search-users/' + model + '/' + instanceId + '.json';
-      url += '?api-version=v1';
-      url += '&keywords=' + keywords;
-    } catch (e) {
-      reject(__('The application domain is not set'));
-      return;
+Permission.findResourcePermissions = async function(resourceId) {
+  const user = User.getInstance();
+  const domain = user.settings.getDomain();
+  const fetchOptions = {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Accept': 'application/json',
+      'content-type': 'application/json'
     }
+  };
+  let url = new URL(`${domain}/permissions/resource/` + resourceId + `.json?api-version=2`);
+  url.searchParams.append('contain[user.profile]', '1');
+  url.searchParams.append('contain[group]', '1');
+  let response, json;
 
-    // Retrieve the users from the server.
-    fetch(
-      url, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(function (response) {
-        _response = response;
-        return response.json();
-      })
-      .then(function (json) {
-        // Check response status
-        if (!_response.ok) {
-          var msg = __('Could not get the users. The server responded with an error.');
-          if (json.header.msg != undefined) {
-            msg += ' ' + json.header.msg;
-          }
-          msg += ' (' + _response.status + ')';
-          reject(new Error(msg));
-        } else {
-        	resolve(json.body);
-        }
-      })
-      .catch(function (error) {
-        reject(error);
-      });
-  });
+  try {
+    response = await fetch(url, fetchOptions);
+    json = await response.json();
+  } catch (error) {
+    console.error(error);
+    return new Error(__('There was a problem when trying to retrieve the permissions of the resource'));
+  }
+
+  return json.body;
 };
 
 // Exports the Permission object.

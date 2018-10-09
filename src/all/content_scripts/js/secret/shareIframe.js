@@ -11,40 +11,66 @@
 
 $(function () {
 
-  /**
-   * Insert the secret share iframe into the share password dialog provided
-   * by the application page.
-   */
-  var _insertIframes = function () {
-    // The component managing the autocomplete field.
-    var iframeId = 'passbolt-iframe-password-share';
-    var className = 'loading';
-    var prependTo = '.js_plugin_share_wrapper';
-    passbolt.html.insertThemedIframe(iframeId, prependTo, className, undefined, 'prepend');
+  const iframeId = 'passbolt-iframe-password-share';
 
-    // The component managing the autocomplete result list.
-    iframeId = 'passbolt-iframe-password-share-autocomplete';
-		className = 'hidden';
-		var style = 'margin-top:-12px';
-		var appendTo = $('#passbolt-password-share-autocomplete-wrapper', '.js_plugin_share_wrapper');
-    passbolt.html.insertThemedIframe(iframeId, appendTo, className, undefined, 'append', style);
+  /**
+   * Insert the share iframe dialog.
+   * @private
+   */
+  const _insertShareIframe = function() {
+    const className = 'passbolt-plugin-dialog';
+    const appendTo = '#container';
+    return passbolt.html.insertThemedIframe(iframeId, appendTo, className);
   };
 
   /*
-   * Open the secret share control component when a password is shared.
-   * passbolt.plugin.resource_share
+   * Open the password(s) share component.
+   */
+  window.addEventListener("passbolt.plugin.resources_share", function (event) {
+    const data = event.detail;
+    const resourcesIds = Object.values(data.resourcesIds);
+    passbolt.request('passbolt.app.share-init', resourcesIds)
+      .then(() => _insertShareIframe())
+      .then(() => $('.edit-password-dialog').remove());
+  }, false);
+
+  /**
+   * @deprecated since v2.4.0 will be removed in v3.0
+   * replaced by the bulk share event "passbolt.plugin.resources_share"
    */
   window.addEventListener("passbolt.plugin.resource_share", function (event) {
-    var data = event.detail;
-
-    // Initialize the process.
-    passbolt.request('passbolt.app.share-password-init', {
-      resourceId: data.resourceId,
-      armored: data.armored
-    }).then(function () {
-      _insertIframes();
-    });
+    const data = event.detail;
+    const resourceId = data.resourceId;
+    // Remove the dialog inserted by the app-js.
+    // And insert the plugin version
+    $('.share-password-dialog').remove();
+    passbolt.request('passbolt.app.share-init', [resourceId])
+      .then(() => _insertShareIframe())
+      .then(() => $('.edit-password-dialog').remove());
   }, false);
+
+  /*
+   * The share is completed with success.
+   */
+  passbolt.message.on('passbolt.share.complete', function () {
+    $(`#${iframeId}`).remove();
+    passbolt.message.emitToPage('passbolt.share.complete');
+  });
+
+  /*
+   * Close the share iframe
+   */
+  passbolt.message.on('passbolt.share.close', function () {
+    $(`#${iframeId}`).remove();
+  });
+
+  /*
+   * Go to edit dialog
+   */
+  passbolt.message.on('passbolt.share.go-to-edit', function () {
+    $(`#${iframeId}`).remove();
+    passbolt.message.emitToPage('passbolt.share.go-to-edit');
+  });
 
 });
 undefined; // result must be structured-clonable data

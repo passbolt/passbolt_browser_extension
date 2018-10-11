@@ -12,6 +12,7 @@ const Crypto = require('./crypto').Crypto;
 const Uuid = require('../utils/uuid');
 const GpgAuthToken = require('./gpgAuthToken').GpgAuthToken;
 const GpgAuthHeader = require('./gpgAuthHeader').GpgAuthHeader;
+const Request = require('./request').Request;
 
 const URL_VERIFY = '/auth/verify.json?api-version=v1';
 const URL_LOGIN = '/auth/login.json?api-version=v1';
@@ -65,11 +66,13 @@ GpgAuth.prototype.verify = async function(serverUrl, armoredServerKey, userFinge
   data.append('data[gpg_auth][server_verify_token]', encrypted);
 
   // Send the data
-  const response = await fetch(domain + URL_VERIFY, {
+  let fetchOptions = {
     method: 'POST',
     credentials: 'include',
     body: data
-  });
+  };
+  Request.setCsrfHeader(fetchOptions);
+  const response = await fetch(domain + URL_VERIFY, fetchOptions);
 
   // If the server responded with an error build a relevant message
   if(!response.ok) {
@@ -137,14 +140,15 @@ GpgAuth.prototype.stage1 = async function (passphrase) {
   const url = this.getDomain() + URL_LOGIN;
   const body = new FormData();
   body.append('data[gpg_auth][keyid]', this.keyring.findPrivate().fingerprint);
-  const data = {
+  const fetchOptions = {
     method: 'POST',
     credentials: 'include',
     body: body
   };
+  Request.setCsrfHeader(fetchOptions);
 
   // Send request token to the server
-  const response = await fetch(url, data);
+  const response = await fetch(url, fetchOptions);
   if (!response.ok) {
     return this.onResponseError(response);
   }
@@ -177,11 +181,13 @@ GpgAuth.prototype.stage2 = async function (userAuthToken) {
   data.append('data[gpg_auth][user_token_result]', userAuthToken);
 
   // Send it over
-  const response = await fetch(url, {
+  const fetchOptions = {
     method: 'POST',
     credentials: 'include',
     body: data
-  });
+  };
+  Request.setCsrfHeader(fetchOptions);
+  const response = await fetch(url, fetchOptions);
 
   // Check response status
   if (!response.ok) {

@@ -28,6 +28,11 @@ const User = (function () {
   */
   this._masterPassword = null;
 
+  /*
+   * _csrfToken The user current csrf token.
+   */
+  this._csrfToken = null;
+
   /**
    * Validate a user
    *
@@ -352,6 +357,24 @@ const User = (function () {
       "created": Math.round(new Date().getTime() / 1000.0)
     };
     this._loopDeleteMasterPasswordOnTimeout(seconds);
+  };
+
+  /**
+   * Store csrf token.
+   *
+   * @param csrfToken {string} The csrf token.
+   */
+  this.storeCsrfToken = function (csrfToken) {
+    this._csrfToken = csrfToken;
+  };
+
+  /**
+   * Get stored csrf token
+   *
+   * @return {string}
+   */
+  this.getCsrfToken = function() {
+    return this._csrfToken;
   };
 
   /**

@@ -84,12 +84,12 @@ var listen = function (worker) {
         progressDialogController.update(appWorker, progress++, message);
       });
       worker.port.emit(requestId, 'SUCCESS');
+      progressDialogController.close(appWorker);
       appWorker.port.emit('passbolt.share.complete', resources.map(resource => resource.id));
     } catch(error) {
+      progressDialogController.close(appWorker);
       worker.port.emit(requestId, 'ERROR', error);
     }
-
-    progressDialogController.close(appWorker);
   });
 
   /*

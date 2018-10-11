@@ -12,6 +12,7 @@
  * @since         2.4.0
  */
 const User = require('../model/user').User;
+const Request = require('../model/request').Request;
 
 class ShareService {}
 
@@ -99,6 +100,7 @@ ShareService.share = async function(resourceId, data) {
     },
     body: JSON.stringify(data)
   };
+  Request.setCsrfHeader(fetchOptions);
   const url = new URL(`${domain}/share/resource/` + resourceId + `.json?api-version=v1`);
   let response, json;
 
@@ -138,6 +140,7 @@ ShareService.simulateShare = async function (resourceId, permissions) {
       'content-type': 'application/json'
     }
   };
+  Request.setCsrfHeader(fetchOptions);
   let response, json;
 
   try {

@@ -5,6 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var __ = require('../sdk/l10n').get;
+const Request = require('./request').Request;
 var User = require('./user').User;
 
 /**
@@ -83,26 +84,26 @@ Resource.prototype.toCsvEntry = function(resource, mapping) {
  * @param resource
  */
 Resource.import = function(resource) {
-  var user = User.getInstance(),
-    domain = user.settings.getDomain(),
-    body = resource;
-
-  body = {
+  const user = User.getInstance();
+  const domain = user.settings.getDomain();
+  const body = {
     Resource: resource,
     Secret: resource.secrets
   };
+  const url = domain + '/import/resources.json?api-version=2';
+  const fetchOptions = {
+    method: 'POST',
+    credentials: 'include',
+    body: JSON.stringify(body),
+    headers: {
+      'Accept': 'application/json',
+      'content-type': 'application/json'
+    }
+  };
+  Request.setCsrfHeader(fetchOptions);
 
   return new Promise(function(resolve, reject) {
-    fetch(
-      domain + '/import/resources.json?api-version=2', {
-        method: 'POST',
-        credentials: 'include',
-        body: JSON.stringify(body),
-        headers: {
-          'Accept': 'application/json',
-          'content-type': 'application/json'
-        }
-      })
+    fetch(url, fetchOptions)
     .then(
       function success(response) {
         response.json()

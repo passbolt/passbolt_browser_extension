@@ -16,6 +16,8 @@ var Crypto = require('../model/crypto').Crypto;
 var TabStorage = require('../model/tabStorage').TabStorage;
 var Secret = require('../model/secret').Secret;
 var secret = new Secret();
+var User = require('../model/user').User;
+var user = User.getInstance();
 
 var listen = function (worker) {
 

@@ -55,6 +55,10 @@ $(function () {
   passbolt.message.on('passbolt.share.complete', function () {
     $(`#${iframeId}`).remove();
     passbolt.message.emitToPage('passbolt.share.complete');
+    passbolt.message.emitToPage('passbolt_notify', {
+      status: 'success',
+      title: 'app_share_share_success'
+    });
   });
 
   /*

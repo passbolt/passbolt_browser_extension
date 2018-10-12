@@ -7,6 +7,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var __ = require('../sdk/l10n').get;
+const Request = require('./request').Request;
 var User = require('./user').User;
 
 /**
@@ -21,25 +22,28 @@ var Tag = function () {
  * @param resourceId string uuid
  * @param tags array of tag strings
  */
-Tag.prototype.add = function(resourceId, tags) {
+Tag.add = function(resourceId, tags) {
   var user = User.getInstance(),
     domain = user.settings.getDomain();
 
   var body = {
-    "Tags" : tags
+    Tags: tags
   };
 
+  const url = domain + '/tags/' + resourceId + '.json?api-version=2';
+  const fetchOptions = {
+    method: 'POST',
+    credentials: 'include',
+    body: JSON.stringify(body),
+    headers: {
+      'Accept': 'application/json',
+      'content-type': 'application/json'
+    }
+  };
+  Request.setCsrfHeader(fetchOptions);
+
   return new Promise(function(resolve, reject) {
-    fetch(
-      domain + '/tags/' + resourceId + '.json?api-version=2', {
-        method: 'POST',
-        credentials: 'include',
-        body: JSON.stringify(body),
-        headers: {
-          'Accept': 'application/json',
-          'content-type': 'application/json'
-        }
-      })
+    fetch(url, fetchOptions)
     .then(
       function success(response) {
         response.json()

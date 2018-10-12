@@ -117,67 +117,94 @@ ImportPasswordsController._getUniqueImportTag = function(fileType) {
 };
 
 /**
- * Save associated tags after a resource is saved.
- * @param resource
- * @param tags
- * @param categoriesAsTags
+ * Import the tags associated to an imported resource
+ * @param string resourceId the resource identifier
+ * @param array categories the resource categories that will be converted in tags
+ * @param object options
+ *  * bool categoriesAsTags
  * @private
  */
-ImportPasswordsController.prototype._saveAssociatedTags = function(resource, tags, categoriesAsTags) {
-  var tag = new Tag();
-
-  if (categoriesAsTags === true) {
-    tags = tags.concat(resource.tags);
+ImportPasswordsController.prototype._importResourceTags = function(resourceId, categories, options) {
+  const tagsIntegration = options.tagsIntegration || false;
+  const categoriesAsTags = options.categoriesAsTags || null;
+  const importTag = options.importTag || null;
+  if (!tagsIntegration) {
+    return;
   }
-  tag.add(resource.id, tags).then(
-    function(res) {
-      // Do nothing.
-    },
-    function(e) {
-      console.error('Could not save tag for resource ' + resource.id);
-    }
-  );
+
+  let tags = [];
+  if (importTag) {
+    tags.push(importTag);
+  }
+  if (categoriesAsTags === true && categories != '') {
+    tags = tags.concat(categories);
+  }
+
+  return Tag.add(resourceId, tags);
 };
 
 /**
- * Save a list of resources on the server.
- * @param resources list of resources to save.
- * @param options
+ * Import a batch of resources.
+ * @param array resources batch of resources to save.
+ * @param int batchNumber batch number
+ * @param int batchSize maximum number of resources a batch can contain
+ * @param int totalResources total number of resources to import
+ * @param object options
  *  * bool categoriesAsTags
  * @return Promise
  */
-ImportPasswordsController.prototype.saveResources = function(resources, options) {
-  var appWorker = Worker.get('App', this.tabid),
-    savePromises = [],
-    tagsIntegration = options.tagsIntegration !== undefined && options.tagsIntegration === true;
+ImportPasswordsController.prototype._importBatchResources = async function(resources, batchNumber, batchSize, totalResources, options) {
+  const appWorker = Worker.get('App', this.tabid);
+  let counter = batchNumber * batchSize + 1;
+  let importResults = [];
+  const promises = [];
 
-  var counter = 1;
-  for (let i in resources) {
-      var p = Resource.import(resources[i]);
-      savePromises.push(p);
-      p.then(resource => {
-        if (tagsIntegration === true) {
-          var tags = [];
-          if (options.importTag !== undefined) {
-            tags.push(options.importTag);
-          }
-          resource.tags = resources[i].tags;
-          this._saveAssociatedTags(resource, tags, options.categoriesAsTags);
-        }
-        progressDialogController.update(appWorker, this.progressStatus++, 'Importing... ' + (counter++) + '/' + this.resources.length);
-      });
+  for (var i in resources) {
+    const resource = resources[i];
+    const promise = Resource.import(resource)
+      .then(importedResource => {
+        importResults.push(importedResource);
+        return this._importResourceTags(importedResource.id, resource.tags, options);
+      }, error => {
+        importResults.push(error);
+      })
+      .then(() => progressDialogController.update(appWorker, this.progressStatus++, `Importing...  ${counter++}/${totalResources}`));
+    promises.push(promise);
   }
 
-  return new Promise(function(resolve, reject) {
-    Promise.all(savePromises)
-    .then(function(values) {
-      progressDialogController.close(appWorker);
-      resolve(values);
-    })
-    .catch(function(e) {
-      reject(e);
-    });
-  });
+  await Promise.all(promises);
+  return importResults;
+};
+
+/**
+ * Import a list of resources.
+ * @param array resources list of resources to save.
+ * @param object options
+ *  * bool categoriesAsTags
+ * @return Promise
+ */
+ImportPasswordsController.prototype.saveResources = async function(resources, options) {
+  options = options || {};
+  const appWorker = Worker.get('App', this.tabid);
+
+  // Split the resources in batches of equal size.
+  const batchSize = 5;
+  const chunks = resources.length / batchSize;
+  const batches = [];
+  for (var i = 0, j = 0; i < chunks; i++, j += batchSize) {
+    batches.push(resources.slice(j, j + batchSize));
+  }
+
+  let batchNumber = 0;
+  let importResults = [];
+  // Import the batches sequentially
+  for (var i in batches) {
+    const importBatchResult = await this._importBatchResources(batches[i], batchNumber++, batchSize, resources.length, options);
+    importResults = [...importResults, ...importBatchResult];
+  }
+
+  progressDialogController.close(appWorker);
+  return importResults;
 };
 
 /**

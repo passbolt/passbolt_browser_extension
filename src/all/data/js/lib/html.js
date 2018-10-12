@@ -22,8 +22,8 @@ passbolt.templates = window.templates;
   var resizeIframe = function (selector, options) {
     // Get the dimension of the current document.
     var dimension = {
-      width: $('html').outerWidth(),
-      height: $('html').outerHeight() + 6
+      width: $('body').outerWidth(),
+      height: $('body')[0].scrollHeight + 6
     };
     // If options given, override the dimensions found before.
     if (typeof options != 'undefined') {

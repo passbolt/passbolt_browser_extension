@@ -1,0 +1,62 @@
+<?
+let avatarPath = '';
+let aroName = '';
+let aroDetails = '';
+
+if (aroPermissions.aro.profile) {
+    avatarPath = `${domain}/${aroPermissions.aro.profile.avatar.url.small}`;
+    aroName = `${aroPermissions.aro.profile.first_name} ${aroPermissions.aro.profile.last_name}`;
+    aroDetails = aroPermissions.aro.username;
+} else {
+    avatarPath = `${domain}/img/avatar/group_default.png`;
+    aroName = aroPermissions.aro.name;
+    aroDetails = 'Group';
+}
+?>
+<li id="<?= aroPermissions.aro.id ?>" class="row">
+    <div class="avatar">
+        <img src="<?= avatarPath ?>"/>
+    </div>
+
+    <div class="group"><!-- @todo NO BUENO -->
+        <span class="name"><?= aroName ?></span>
+        <span class="details"><a><?= aroDetails ?></a></span>
+    </div>
+
+    <div class="select rights">
+        <select class="permission <?= !isOwner ? 'disabled' : '' ?>" <?= !isOwner ? 'disabled="disabled"' : '' ?>>
+            <option value="1" <?= aroPermissions.type == 1 ? 'selected="selected"' : ''?>>can read</option>
+            <option value="7" <?= aroPermissions.type == 7 ? 'selected="selected"' : ''?>>can update</option>
+            <option value="15" <?= aroPermissions.type == 15 ? 'selected="selected"' : ''?>>is owner</option>
+            <? if (aroPermissions.type == -1) { ?>
+            <option value="-1" selected="selected">varies</option>
+            <? } ?>
+        </select>
+<? if (aroPermissions.type == -1) { ?>
+        <div href="#" class="more_details tooltip-alt">
+            <i class="fa fa-info-circle"></i>
+            <div class="tooltip-text right">
+                <? if(aroPermissions.variesDetails[0].length) { ?>
+                <b>no access</b>: <?= aroPermissions.variesDetails[0].join(', ') ?><br/>
+                <? } ?>
+                <? if(aroPermissions.variesDetails[1].length) { ?>
+                <b>can read</b>: <?= aroPermissions.variesDetails[1].join(', ') ?><br/>
+                <? } ?>
+                <? if(aroPermissions.variesDetails[7].length) { ?>
+                <b>can update</b>: <?= aroPermissions.variesDetails[7].join(', ') ?><br/>
+                <? } ?>
+                <? if(aroPermissions.variesDetails[15].length) { ?>
+                <b>is owner</b>: <?= aroPermissions.variesDetails[15].join(', ') ?><br/>
+                <? } ?>
+            </div>
+        </div>
+<? } ?>
+    </div>
+
+    <div id="js_actions_rs_perm_<?= aroPermissions.aro.id ?>" class="actions">
+        <a class="js-share-delete-button close <?= !isOwner ? 'disabled' : '' ?>" title="remove">
+            <i class="fa fa-times-circle"></i>
+            <span class="visuallyhidden">remove</span>
+        </a>
+    </div>
+</li>

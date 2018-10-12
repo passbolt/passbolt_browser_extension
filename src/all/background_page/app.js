@@ -40,7 +40,6 @@ events.passboltPage = require('./event/passboltPageEvents');
 events.secret = require('./event/secretEvents');
 events.setup = require('./event/setupEvents');
 events.setupbootstrap = require('./event/setupBootstrapEvents');
-events.shareAutocomplete = require('./event/shareAutocompleteEvents');
 events.share = require('./event/shareEvents');
 events.user = require('./event/userEvents');
 events.siteSettings = require('./event/siteSettingsEvents');
@@ -147,12 +146,6 @@ pageMods.SecretEditDialog = require('./pagemod/secretEditDialogPagemod').SecretE
  * It is used when sharing a new password
  */
 pageMods.ShareDialog = require('./pagemod/shareDialogPagemod').ShareDialog;
-
-/*
- * This pagemod drives the iframe used when the user share a password
- * and he is looking for new users to grant
- */
-pageMods.ShareAutocompleteDialog = require('./pagemod/shareAutocompleteDialogPagemod').ShareAutocompleteDialog;
 
 /*
  * This pagemod drives the iframe used when the user creates / edit a group.

@@ -42,13 +42,13 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<div class=\"autocomplete-content scroll\">\n    <ul></ul>\n</div>"
+  , __lines = "<div class=\"autocomplete-wrapper\">\n    <div class=\"autocomplete-content scroll\">\n        <ul></ul>\n    </div>\n</div>\n"
   , __filename = "src/all/data/ejs/group/editAutocomplete.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);
   with (locals || {}) {
-    ; __append("<div class=\"autocomplete-content scroll\">\n    <ul></ul>\n</div>")
-    ; __line = 3
+    ; __append("<div class=\"autocomplete-wrapper\">\n    <div class=\"autocomplete-content scroll\">\n        <ul></ul>\n    </div>\n</div>\n")
+    ; __line = 6
   }
   return __output.join("");
 } catch (e) {

@@ -5,9 +5,8 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-var Config = require('./config');
+const Request = require('./request').Request;
 var UserSettings = require('./userSettings').UserSettings;
-var __ = require('../sdk/l10n').get;
 
 /**
  * The class that deals with groups.
@@ -99,17 +98,19 @@ Group.prototype.save = function(group, groupId, dryrun) {
     method = 'PUT';
   }
 
+  const fetchOptions = {
+    method: method,
+    credentials: 'include',
+    body: groupParamStr,
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  };
+  Request.setCsrfHeader(fetchOptions);
+
   return new Promise(function(resolve, reject) {
-    fetch(
-      url, {
-        method: method,
-        credentials: 'include',
-        body: groupParamStr,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      })
+    fetch(url, fetchOptions)
       .then(function (response) {
         _response = response;
         return response.json();

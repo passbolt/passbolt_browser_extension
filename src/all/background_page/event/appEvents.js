@@ -16,7 +16,8 @@ var Crypto = require('../model/crypto').Crypto;
 var TabStorage = require('../model/tabStorage').TabStorage;
 var Secret = require('../model/secret').Secret;
 var secret = new Secret();
-var Resource = require('../model/resource').Resource;
+var User = require('../model/user').User;
+var user = User.getInstance();
 
 var listen = function (worker) {
 
@@ -131,120 +132,10 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param sharedPassword {array} The password to share
    */
-  worker.port.on('passbolt.app.share-password-init', function (requestId, sharedPassword) {
+  worker.port.on('passbolt.app.share-init', function (requestId, resourcesIds) {
     // Store some variables in the tab storage in order to make it accessible by other workers.
-    TabStorage.set(worker.tab.id, 'sharedPassword', sharedPassword);
-    TabStorage.set(worker.tab.id, 'shareWith', []);
+    TabStorage.set(worker.tab.id, 'shareResourcesIds', resourcesIds);
     worker.port.emit(requestId, 'SUCCESS');
-  });
-
-  /*
-   * Encrypt the shared password for all the new users it has been shared with.
-   *
-   * @listens passbolt.share.encrypt
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.share.encrypt', function (requestId) {
-    var sharedPassword = TabStorage.get(worker.tab.id, 'sharedPassword'),
-      aros = TabStorage.get(worker.tab.id, 'shareWith'),
-      addedUsers = [],
-      keyring = new Keyring(),
-      crypto = new Crypto();
-
-    if (!aros.length) {
-      worker.port.emit(requestId, 'SUCCESS', {});
-      return;
-    }
-
-    // Master password required to decrypt a secret before sharing it.
-    masterPasswordController.get(worker)
-
-      // Once the master password retrieved, decrypt the secret.
-      .then(function (masterPassword) {
-        progressDialogController.open(worker, 'Encrypting ...', 100);
-        return crypto.decrypt(sharedPassword.armored, masterPassword)
-      })
-
-      // Sync the keyring.
-      .then(function (secret) {
-        sharedPassword.secret = secret;
-        // Sync the keyring.
-        return keyring.sync();
-      })
-
-      // Retrieve the new users the secret will be encrypted for.
-      .then(function () {
-        var permissions = [];
-        aros.forEach(function (aro) {
-          var permission = {
-            aco: 'Resource',
-            aro: aro.User ? 'User' : 'Group',
-            aro_foreign_key: aro.User ? aro.User.id : aro.Group.id,
-            type: 1
-          };
-          permissions.push({Permission: permission});
-        });
-        return Resource.simulateShare(sharedPassword.resourceId, permissions);
-      })
-
-      // Once the keyring is synced, encrypt the secret for each user.
-      .then(function (response) {
-        var progress = 0;
-        addedUsers = response.changes.added;
-        progressDialogController.updateGoals(worker, addedUsers.length);
-
-        // Prepare the data for encryption.
-        var encryptAllData = addedUsers.map(function(addedUser) {
-          return {
-            userId: addedUser.User.id,
-            message: sharedPassword.secret
-          }
-        });
-
-        // Encrypt all the messages.
-        return crypto.encryptAll(encryptAllData, function () {
-          progressDialogController.update(worker, progress++);
-        }, function (position) {
-          progressDialogController.update(worker, progress, 'Encrypting ' + position + '/' + addedUsers.length);
-        });
-      })
-
-      // Once the secret is encrypted for all users notify the application and
-      // close the progress dialog.
-      .then(function (data) {
-        var armoreds = {};
-        for (var i in data) {
-          armoreds[addedUsers[i].User.id] = data[i];
-        }
-        worker.port.emit(requestId, 'SUCCESS', armoreds);
-        progressDialogController.close(worker);
-      })
-
-      // In case of error, notify the request caller.
-      .then(null, function (error) {
-        worker.port.emit(requestId, 'ERROR', error);
-      });
-
-  });
-
-  /*
-   * A permission has been temporary deleted.
-   * Remove the aro from the list of aros the password would be shared with.
-   *
-   * @listens passbolt.share.remove-permission
-   * @param removedAroId {string} The aro id to remove.
-   */
-  worker.port.on('passbolt.share.remove-permission', function (removedAroId) {
-    var aros = TabStorage.get(worker.tab.id, 'shareWith') || [];
-
-    for(var i in aros) {
-      var aroId = aros[i].User ? aros[i].User.id : aros[i].Group.id;
-      if(aroId === removedAroId) {
-        aros.splice(i, 1);
-      }
-    }
-
-    TabStorage.set(worker.tab.id, 'shareWith', aros);
   });
 
   /*

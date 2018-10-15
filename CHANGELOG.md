@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
+### Fix
+- Fix application pagemod not starting after mfa verification
 
 ## [2.4.0] - 2018-10-12
 ### Added

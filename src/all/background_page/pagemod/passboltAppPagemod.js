@@ -82,22 +82,31 @@ PassboltApp.initPageMod = function () {
     ],
     attachTo: ["existing", "top"],
     onAttach: function (worker) {
-      TabStorage.initStorage(worker.tab);
+      user.isLoggedIn().then(
+        // If it is already logged-in.
+        function success() {
+          TabStorage.initStorage(worker.tab);
 
-      app.events.clipboard.listen(worker);
-      app.events.config.listen(worker);
-      app.events.editPassword.listen(worker);
-      app.events.exportPasswordsIframe.listen(worker);
-      app.events.keyring.listen(worker);
-      app.events.secret.listen(worker);
-      app.events.group.listen(worker);
-      app.events.importPasswordsIframe.listen(worker);
-      app.events.masterPasswordIframe.listen(worker);
-      app.events.siteSettings.listen(worker);
-      app.events.app.listen(worker);
-      app.events.user.listen(worker);
+          app.events.clipboard.listen(worker);
+          app.events.config.listen(worker);
+          app.events.editPassword.listen(worker);
+          app.events.exportPasswordsIframe.listen(worker);
+          app.events.keyring.listen(worker);
+          app.events.secret.listen(worker);
+          app.events.group.listen(worker);
+          app.events.importPasswordsIframe.listen(worker);
+          app.events.masterPasswordIframe.listen(worker);
+          app.events.siteSettings.listen(worker);
+          app.events.app.listen(worker);
+          app.events.user.listen(worker);
 
-      Worker.add('App', worker);
+          Worker.add('App', worker);
+        },
+        // If it is logged-out.
+        function error() {
+          console.error('Can not attach application if user is not logged in.');
+        }
+      );
     }
   });
 };
@@ -109,20 +118,8 @@ PassboltApp.init = function () {
     // * the pagemod should be destroyed otherwise;
     var user = User.getInstance();
     if (user.isValid()) {
-      user.isLoggedIn().then(
-        // If it is already logged-in.
-        function success() {
-          PassboltApp.destroy();
-          PassboltApp._pageMod = PassboltApp.initPageMod();
-          resolve();
-        },
-        // If it is logged-out.
-        function error() {
-          PassboltApp.destroy();
-          resolve();
-        }
-      );
-    } else {
+      PassboltApp.destroy();
+      PassboltApp._pageMod = PassboltApp.initPageMod();
       resolve();
     }
   });

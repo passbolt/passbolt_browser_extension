@@ -43,6 +43,7 @@ Share.searchResourceAros = function(resourceId, keywords) {
  * @param {object} resources The resources to share
  * @param {object} changes The permissions changes to apply
  * @param {string} privateKeySecret The user private key secret
+ * @param {function} progressCallback Notify the user with this callback
  */
 Share.bulkShare = async function(resources, changes, privateKeySecret, progressCallback) {
   const resourcesChanges = bulkShareAggregateChangesByResource(resources, changes);
@@ -81,7 +82,7 @@ const bulkShareAggregateChangesByResource = function(resources, changes) {
 /**
  * Simulate the changes to apply to the resources
  * @param {object} resourcesChanges The changes aggregated by resource
- * @param {function} progressCallback To call after each simulate
+ * @param {function} progressCallback Notify the user with this callback
  * @returns {object}
  */
 const bulkShareSimulate = async function(resources, resourcesChanges, progressCallback) {
@@ -105,7 +106,7 @@ const bulkShareSimulate = async function(resources, resourcesChanges, progressCa
  * @param {array} resources The resources to share
  * @param {object} resourcesNewUsers The list of new users to share the resources aggregated by resource
  * @param {string} privateKeySecret The current user private key
- * @param {function} progressCallback To call after each major action
+ * @param {function} progressCallback Notify the user with this callback
  * @returns {object} A list of secrets as expected by the passbolt API
  * [
  *  {
@@ -115,7 +116,7 @@ const bulkShareSimulate = async function(resources, resourcesChanges, progressCa
  *  }
  * ]
  */
-const bulkShareEncrypt = async function(resources, resourcesNewUsers, privateKeySecret) {
+const bulkShareEncrypt = async function(resources, resourcesNewUsers, privateKeySecret, progressCallback) {
   const crypto = new Crypto();
   const secrets = {};
 
@@ -123,6 +124,7 @@ const bulkShareEncrypt = async function(resources, resourcesNewUsers, privateKey
     const resource = resources.find(resource => resource.id == resourceId);
     const originalArmored = resource.secrets[0].data;
     const users = resourcesNewUsers[resourceId];
+    progressCallback(`Encrypting for ${resource.name}`);
     if (users && users.length) {
       const message = await crypto.decrypt(originalArmored, privateKeySecret);
       const encryptAllData = users.reduce((carry, userId) => [...carry, {userId, message}], []);

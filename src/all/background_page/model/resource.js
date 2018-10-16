@@ -163,6 +163,18 @@ Resource.findShareResource = async function (resourceId) {
  * @returns {array|Error}
  */
 Resource.findShareResources = async function (resourcesIds) {
+  // Retrieve the resources by batch of 100 to avoid any 414 response.
+  const batchSize = 100;
+  if (resourcesIds.length > batchSize) {
+    let resources = [];
+    for (let i=0; i<resourcesIds.length%batchSize; i++) {
+      const resouresIdsPart = resourcesIds.splice(0, batchSize);
+      const resourcesPart = await Resource.findShareResources(resouresIdsPart);
+      resources = [...resources, ...resourcesPart];
+    }
+    return resources;
+  }
+
   const user = User.getInstance();
   const domain = user.settings.getDomain();
   const fetchOptions = {

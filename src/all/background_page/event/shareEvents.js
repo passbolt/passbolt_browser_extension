@@ -73,7 +73,10 @@ var listen = function (worker) {
     const resources = TabStorage.get(worker.tab.id, 'shareResources');
     const keyring = new Keyring();
     let progress = 0;
-    const progressGoal = resources.length * 2 + 1;
+    // 3+1 :
+    // 3: the simulate call to the API + the encrypting step + the share call to the API
+    // 1: the initialization phase, in other words this function
+    const progressGoal = resources.length * 3 + 1;
 
     try {
       const privateKeySecret = await masterPasswordController.get(worker);

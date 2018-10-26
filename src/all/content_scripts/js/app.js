@@ -254,6 +254,7 @@ $(function () {
   // and store it in the clipboard.
   window.addEventListener('passbolt.secret.decrypt', function (event) {
     var armoredSecret = event.detail;
+    passbolt.message.emit('passbolt.passbolt-page.remove-all-focuses');
     passbolt.request('passbolt.app.decrypt-copy', armoredSecret)
       .then(
         function success() {

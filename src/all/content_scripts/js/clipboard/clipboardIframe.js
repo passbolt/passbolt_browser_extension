@@ -50,6 +50,7 @@ $(function () {
    * @return promise
    */
   clipboard.copy = function (txt, type) {
+    passbolt.message.emitToPage('remove_all_focuses');
     return new Promise(function(resolve, reject) {
       passbolt.request('passbolt.clipboard.copy', txt)
         .then(function () {

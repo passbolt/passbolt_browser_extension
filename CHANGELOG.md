@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.2] - 2018-10-26
+### Fix
+- Fix copy to clipboard does not work on firefox when focus is set on search text input
+
 ## [2.4.1] - 2018-10-15
 ### Fix
 - Fix application pagemod not starting after mfa verification

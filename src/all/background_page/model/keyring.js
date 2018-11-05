@@ -153,7 +153,7 @@ Keyring.prototype.importPublic = async function (armoredPublicKey, userId) {
   armoredPublicKey = Keyring.findArmoredKeyInText(armoredPublicKey, Keyring.PUBLIC);
 
   // Is the given key a valid pgp key ?
-  const publicKey = openpgp.key.readArmored(armoredPublicKey);
+  const publicKey = await openpgp.key.readArmored(armoredPublicKey);
   if (publicKey.err) {
     throw new Error(publicKey.err[0].message);
   }
@@ -194,7 +194,7 @@ Keyring.prototype.importPrivate = async function (armoredKey) {
   armoredKey = Keyring.findArmoredKeyInText(armoredKey, Keyring.PRIVATE);
 
   // Is the given key a valid pgp key ?
-  let privateKey = openpgp.key.readArmored(armoredKey);
+  let privateKey = await openpgp.key.readArmored(armoredKey);
   if (privateKey.err) {
     throw new Error(privateKey.err[0].message);
   }
@@ -240,7 +240,7 @@ Keyring.prototype.importServerPublicKey = async function (armoredKey, domain) {
  */
 Keyring.prototype.keyInfo = async function(armoredKey) {
   // Attempt to read armored key.
-  let key = openpgp.key.readArmored(armoredKey);
+  let key = await openpgp.key.readArmored(armoredKey);
   if (key.err) {
     throw new Error(key.err[0].message);
   }
@@ -305,8 +305,8 @@ Keyring.prototype.keyInfo = async function(armoredKey) {
  * @param privateArmoredKey {string} The private key armored
  * @returns {string}
  */
-Keyring.prototype.extractPublicKey = function (privateArmoredKey) {
-  const key = openpgp.key.readArmored(privateArmoredKey);
+Keyring.prototype.extractPublicKey = async function (privateArmoredKey) {
+  const key = await openpgp.key.readArmored(privateArmoredKey);
   return key.keys[0].toPublic().armor();
 };
 
@@ -365,13 +365,9 @@ Keyring.prototype.generateKeyPair = function (keyInfo, passphrase) {
  * @returns {Promise}
  */
 Keyring.prototype.checkPassphrase = async function (passphrase) {
-  const keyInfo = this.findPrivate(),
-    privateKey = openpgp.key.readArmored(keyInfo.key).keys[0];
-
-  if (!privateKey.primaryKey.isDecrypted) {
-    await openpgp.decryptKey({privateKey, passphrase});
-  }
-  return Promise.resolve();
+  const privateKey = this.findPrivate();
+  const privKeyObj = (await openpgp.key.readArmored(privateKey.key)).keys[0];
+  await privKeyObj.decrypt(passphrase);
 };
 
 /**

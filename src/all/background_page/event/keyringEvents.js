@@ -63,10 +63,10 @@ var listen = function (worker) {
    * @listens passbolt.keyring.public.get_armored
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.keyring.public.get_armored', function (requestId) {
+  worker.port.on('passbolt.keyring.public.get_armored', async function (requestId) {
     var info = keyring.findPrivate();
     if (typeof info !== 'undefined') {
-      var publicKeyArmored = keyring.extractPublicKey(info.key);
+      var publicKeyArmored = await keyring.extractPublicKey(info.key);
       if (typeof publicKeyArmored !== 'undefined') {
         return worker.port.emit(requestId, 'SUCCESS', publicKeyArmored);
       }
@@ -108,8 +108,8 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param privateKeyArmored {string} The private armored key
    */
-  worker.port.on('passbolt.keyring.public.extract', function (requestId, privateKeyArmored) {
-    var publicKeyArmored = keyring.extractPublicKey(privateKeyArmored);
+  worker.port.on('passbolt.keyring.public.extract', async function (requestId, privateKeyArmored) {
+    var publicKeyArmored = await keyring.extractPublicKey(privateKeyArmored);
     if (typeof publicKeyArmored !== 'undefined') {
       worker.port.emit(requestId, 'SUCCESS', publicKeyArmored);
     } else {

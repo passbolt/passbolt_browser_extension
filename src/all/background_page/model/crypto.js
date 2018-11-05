@@ -39,13 +39,17 @@ Crypto.prototype.encrypt = async function (message, key) {
 
   // parse the armored key
   try {
-    publicKey = openpgp.key.readArmored(key);
+    publicKey = (await openpgp.key.readArmored(key)).keys[0];
   } catch (error) {
     throw new Error(__('The public key is not in a valid or supported format.'));
   }
 
   // encrypt the message
-  let encryptedMessage = await openpgp.encrypt({publicKeys: publicKey.keys, data: message});
+  const options = {
+    message: openpgp.message.fromText(message),
+    publicKeys: [publicKey]
+  };
+  let encryptedMessage = await openpgp.encrypt(options);
   return encryptedMessage.data;
 };
 
@@ -60,15 +64,19 @@ Crypto.prototype.encrypt = async function (message, key) {
  */
 Crypto.prototype.encryptAll = async function (toEncrypt, completeCallback, startCallback) {
   const keyring = new Keyring();
-  let i, armoredKey, publicKeys, ciphertext, result = [];
+  let i, armoredKey, publicKey, ciphertext, result = [], options;
   for (i in toEncrypt) {
     if (startCallback) {
       startCallback(i);
     }
     armoredKey = keyring.findPublic(toEncrypt[i].userId).key;
-    publicKeys = openpgp.key.readArmored(armoredKey).keys[0];
+    publicKey = (await openpgp.key.readArmored(armoredKey)).keys[0];
     try {
-      ciphertext = await openpgp.encrypt({publicKeys: publicKeys, data: toEncrypt[i].message});
+      options = {
+        message: openpgp.message.fromText(toEncrypt[i].message),
+        publicKeys: [publicKey]
+      };
+      ciphertext = await openpgp.encrypt(options);
       result.push(ciphertext.data);
       if (completeCallback) {
         completeCallback(ciphertext.data, toEncrypt[i].userId, i);
@@ -93,8 +101,8 @@ Crypto.prototype.encryptAll = async function (toEncrypt, completeCallback, start
 Crypto.prototype.decrypt = async function (armoredMessage, passphrase) {
   const keyring = new Keyring(),
     armoredKey = keyring.findPrivate().key,
-    pgpMessage = openpgp.message.readArmored(armoredMessage);
-  let privateKey = openpgp.key.readArmored(armoredKey).keys[0];
+    pgpMessage = await openpgp.message.readArmored(armoredMessage);
+  let privateKey = (await openpgp.key.readArmored(armoredKey)).keys[0];
   try {
     await privateKey.decrypt(passphrase);
   } catch(error) {
@@ -117,7 +125,7 @@ Crypto.prototype.decrypt = async function (armoredMessage, passphrase) {
 Crypto.prototype.decryptAll = async function (armoredMessages, passphrase, completeCallback, startCallback) {
   const keyring = new Keyring(),
     armoredKey = keyring.findPrivate().key;
-  let privateKey = openpgp.key.readArmored(armoredKey).keys[0];
+  let privateKey = (await openpgp.key.readArmored(armoredKey)).keys[0];
   try {
     await privateKey.decrypt(passphrase);
   } catch(error) {
@@ -130,7 +138,7 @@ Crypto.prototype.decryptAll = async function (armoredMessages, passphrase, compl
     if (startCallback) {
       startCallback(i);
     }
-    pgpMessage = openpgp.message.readArmored(armoredMessages[i]);
+    pgpMessage = await openpgp.message.readArmored(armoredMessages[i]);
     decryptedMessage = await openpgp.decrypt({privateKeys: [privateKey], message: pgpMessage});
     result.push(decryptedMessage.data);
     if (completeCallback) {

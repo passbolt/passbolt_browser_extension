@@ -367,7 +367,9 @@ Keyring.prototype.generateKeyPair = function (keyInfo, passphrase) {
 Keyring.prototype.checkPassphrase = async function (passphrase) {
   const privateKey = this.findPrivate();
   const privKeyObj = (await openpgp.key.readArmored(privateKey.key)).keys[0];
-  await privKeyObj.decrypt(passphrase);
+  if (!privKeyObj.isDecrypted()) {
+    await privKeyObj.decrypt(passphrase);
+  }
 };
 
 /**

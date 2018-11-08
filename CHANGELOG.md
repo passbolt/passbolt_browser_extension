@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.4] - 2018-11-08
+### Fix
+- GITHUB-52 As AP I should be able to generate a gpg key with a comment
+
 ## [2.4.3] - 2018-11-05
 ### Add
 - PASSBOLT-3093: As LU I can select all passwords to perform a bulk operation
@@ -301,7 +305,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.3...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.4...HEAD
+[2.4.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.3...v2.4.4
 [2.4.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.2...v2.4.3
 [2.4.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.1...v2.4.2
 [2.4.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.0...v2.4.1

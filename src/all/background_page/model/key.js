@@ -329,13 +329,8 @@ Key.prototype.buildUserId = function () {
   if (this._key.ownerName == undefined || this._key.ownerEmail == undefined) {
     return false;
   }
-  var userId = '';
-  userId += this._key.ownerName;
-  userId += this._key.comment != undefined && this._key.comment != '' ?
-    (' (' + this._key.comment + ')') : '';
-  userId += (' <' + this._key.ownerEmail + '>');
-
-  return userId;
+  const comment = this._key.comment != undefined && this._key.comment != '' ? ` (${this._key.comment})` : '';
+  return `${this._key.ownerName}${comment} <${this._key.ownerEmail}>`;
 };
 
 // Exports the Key object.

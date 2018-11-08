@@ -9,6 +9,7 @@ const __ = require('../sdk/l10n').get;
 const UserSettings = require('./userSettings').UserSettings;
 const Key = require('./key').Key;
 const Uuid = require('../utils/uuid');
+const goog = require('../utils/format/emailaddress').goog;
 
 /**
  * The class that deals with Passbolt Keyring.
@@ -253,16 +254,11 @@ Keyring.prototype.keyInfo = async function(armoredKey) {
     throw new Error('No key user ID found');
   }
 
-  // Extract name & email from key userIds.
-  let i, match, myRegexp = XRegExp(/(.*) <(\S+@\S+)>$/g);
-  for (i in userIds) {
-    match = XRegExp.exec(userIds[i], myRegexp);
-    if(match === null) {
-      throw new Error('Error when parsing key user id');
-    }
+  for (let i in userIds) {
+    const result = goog.format.EmailAddress.parse(userIds[i]);
     userIdsSplited.push({
-      name: match[1],
-      email: match[2]
+      name: result.name_,
+      email: result.address_
     });
   }
 

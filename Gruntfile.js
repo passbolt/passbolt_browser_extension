@@ -25,6 +25,7 @@ module.exports = function(grunt) {
     dist_firefox: 'dist/firefox/',
 
     src: 'src/all/',
+    test: 'test/',
     src_addon: 'src/all/background_page/',
     src_addon_vendors: 'src/all/background_page/vendors/',
     src_chrome: 'src/chrome/',
@@ -59,15 +60,17 @@ module.exports = function(grunt) {
   grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle', 'browserify:vendors']);
   grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle', 'browserify:vendors_chrome']);
 
+  grunt.registerTask('bundle-test', ['browserify:test', 'copy:test']);
+
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
 
-  grunt.registerTask('build-firefox', ['clean:build', 'build-firefox-debug', 'build-firefox-prod']);
-  grunt.registerTask('build-firefox-debug', ['pre-dist', 'copy:config_debug', 'bundle-firefox', 'shell:build_firefox_debug']);
-  grunt.registerTask('build-firefox-prod', ['pre-dist', 'copy:config_default', 'bundle-firefox', 'clean:debug_data', 'shell:build_firefox_prod']);
+  grunt.registerTask('build-firefox', ['build-firefox-debug', 'build-firefox-prod']);
+  grunt.registerTask('build-firefox-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-firefox', 'bundle-test', 'shell:build_firefox_debug']);
+  grunt.registerTask('build-firefox-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-firefox', 'clean:debug_data', 'shell:build_firefox_prod']);
 
-  grunt.registerTask('build-chrome', ['clean:build', 'build-chrome-debug', 'build-chrome-prod']);
-  grunt.registerTask('build-chrome-debug', ['pre-dist', 'copy:config_debug', 'bundle-chrome', 'shell:build_chrome_debug']);
-  grunt.registerTask('build-chrome-prod', ['pre-dist', 'copy:config_default', 'bundle-chrome', 'clean:debug_data', 'shell:build_chrome_prod']);
+  grunt.registerTask('build-chrome', ['build-chrome-debug', 'build-chrome-prod']);
+  grunt.registerTask('build-chrome-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chrome', 'bundle-test', 'shell:build_chrome_debug']);
+  grunt.registerTask('build-chrome-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome', 'clean:debug_data', 'shell:build_chrome_prod']);
 
   /**
    * Main grunt tasks configuration
@@ -99,6 +102,10 @@ module.exports = function(grunt) {
       app: {
         src: [path.src_addon + 'index.js'],
         dest: path.build + 'index.min.js'
+      },
+      test: {
+        src: [path.test + 'test.js'],
+        dest: path.build + 'test.min.js'
       }
     },
 
@@ -141,6 +148,12 @@ module.exports = function(grunt) {
       background_page: {
         files: [
           {expand: true, cwd: path.src_addon, src: 'index.html', dest: path.build }
+        ]
+      },
+      test: {
+        files: [
+          {expand: true, cwd: path.test, src: 'test.html', dest: path.build},
+          {expand: true, cwd: path.node_modules + 'mocha', src: ['mocha.js', 'mocha.css'], dest: path.build_vendors},
         ]
       },
       data: {
@@ -345,6 +358,11 @@ module.exports = function(grunt) {
       vendors: {
         files: [path.src + 'background_page/vendors.js', path.src + 'background_page/vendors/**/*.js', path.src + 'background_page/sdk/storage.js'],
         tasks: ['browserify:vendors'],
+        options: {spawn: false}
+      },
+      test: {
+        files: [path.test + '**/*.js', path.src + '**/**.js'],
+        tasks: ['browserify:test'],
         options: {spawn: false}
       }
     }

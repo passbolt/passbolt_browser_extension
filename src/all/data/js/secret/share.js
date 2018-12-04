@@ -58,7 +58,7 @@ $(function () {
    */
   const submitChanges = async function() {
     return passbolt.request('passbolt.share.submit', shareChanges._changes)
-      .then(null, () => {
+      .then(null, (error) => {
         console.log('error', error);
       });
   };
@@ -84,7 +84,9 @@ $(function () {
    */
   const getResources = async function() {
     const resourcesIds = await passbolt.request('passbolt.share.get-resources-ids');
+    // console.log('resourcesIds', resourcesIds);
     resources = await passbolt.request('passbolt.share.get-resources', resourcesIds);
+    // console.log('resources', resources);
   };
 
   /**
@@ -93,6 +95,7 @@ $(function () {
    */
   const loadTemplate = async function () {
     const bulk = resources.length > 1;
+    // console.log(resources, bulk);
     await passbolt.html.loadTemplate('body', 'resource/shareDialog.ejs', 'html', {resources, bulk, isOwner});
     $goToEdit = $('.share-password-dialog #js-share-go-to-edit');
     $goToShare = $('.share-password-dialog #js-share-go-to-share');

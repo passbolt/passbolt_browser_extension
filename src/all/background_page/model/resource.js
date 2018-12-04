@@ -167,11 +167,13 @@ Resource.findShareResources = async function (resourcesIds) {
   const batchSize = 100;
   if (resourcesIds.length > batchSize) {
     let resources = [];
-    for (let i=0; i<resourcesIds.length%batchSize; i++) {
+    const totalBatches = Math.ceil(resourcesIds.length / batchSize);
+    for (let i=0; i<totalBatches; i++) {
       const resouresIdsPart = resourcesIds.splice(0, batchSize);
       const resourcesPart = await Resource.findShareResources(resouresIdsPart);
       resources = [...resources, ...resourcesPart];
     }
+
     return resources;
   }
 
@@ -199,7 +201,6 @@ Resource.findShareResources = async function (resourcesIds) {
     response = await fetch(url, fetchOptions);
     json = await response.json();
   } catch (error) {
-    console.error(error);
     return new Error(__('There was a problem when trying to retrieve the resources'));
   }
 

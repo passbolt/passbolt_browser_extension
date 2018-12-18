@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.6] - 2018-12-1*
+### Fix
+- Update to openpgpjs to v4.3.0
+
 ## [2.4.5] - 2018-12-04
 ### Fix
 - PASSBOLT-3256: Fix the bulk share passwords feature which could have forgot passwords when a user is sharing more than 100 passwords

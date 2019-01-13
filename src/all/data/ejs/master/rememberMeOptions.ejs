@@ -1,0 +1,18 @@
+<? if (!options) { ?>
+    <div class="input checkbox">
+        <input type="checkbox" id="js_remember_master_password"/>
+        <label for="js_remember_master_password">Remember it for 5 minutes</label>
+    </div>
+<? } else if (Object.keys(options).length) { ?>
+    <div class="input checkbox">
+        <input type="checkbox" id="js_remember_master_password"/>
+        <label for="js_remember_master_password">Remember it for </label>
+    </div>
+    <div class="input select">
+        <select id="js_remember_master_password_duration">
+        <? for (var time in options) { ?>
+            <option value="<?= time.toString() ?>"><?= options[time].toString() ?></option>
+        <? } ?>
+        </select>
+    </div>
+<? } ?>

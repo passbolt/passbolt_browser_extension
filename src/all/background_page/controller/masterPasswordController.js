@@ -21,26 +21,14 @@ var TabStorage = require('../model/tabStorage').TabStorage;
  * @param worker The worker asking for the master password.
  * @returns {d.promise|*|promise} The promise to resolve/reject when the master password is retrieved.
  */
-var get = function (worker) {
-  var p = new Promise(function(resolve, reject) {
-    var user = User.getInstance();
+var get = async function (worker) {
+  const user = User.getInstance();
 
-    // Try to retrieve a remembered passphrase.
-    user.getStoredMasterPassword().then(
-      // If a passphrase is remembered, use it.
-      function (masterPassword) {
-        resolve(masterPassword);
-      },
-      // If no passphrase is remembered, prompt the user.
-      function (error) {
-        _promptUser(worker, {
-          resolve: resolve,
-          reject: reject
-        });
-      }
-    );
-  });
-  return p;
+  try {
+    return await user.getStoredMasterPassword();
+  } catch (error) {
+    return _promptUser(worker);
+  }
 };
 exports.get = get;
 
@@ -48,18 +36,20 @@ exports.get = get;
  * Prompt the user to enter their master password.
  *
  * @param worker The worker asking for the master password.
- * @param deferred The promise callbacks associated to the master password request.
  * @private
  */
-var _promptUser = function (worker, deferred) {
-  var masterPasswordRequest = {
+var _promptUser = function (worker) {
+  return new Promise(function(resolve, reject) {
+    const masterPasswordRequest = {
       attempts: 0,
-      deferred: deferred
+      deferred: {
+        resolve: resolve,
+        reject: reject
+      }
     };
-
-  // Store the masterPassword request in the tab storage.
-  TabStorage.set(worker.tab.id, 'masterPasswordRequest', masterPasswordRequest);
-
-  // Init the master password dialog.
-  Worker.get('App', worker.tab.id).port.emit('passbolt.master-password.open-dialog');
+    // Store the masterPassword request in the tab storage.
+    TabStorage.set(worker.tab.id, 'masterPasswordRequest', masterPasswordRequest);
+    // Init the master password dialog.
+    Worker.get('App', worker.tab.id).port.emit('passbolt.master-password.open-dialog');
+  });
 };

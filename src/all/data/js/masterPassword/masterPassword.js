@@ -6,55 +6,63 @@
  */
 
 $(function () {
-
   // DOM Elements.
-  var $masterPasswordField = null,
-    $submitButton = null,
-    $focusFirstField = null,
-    $rememberMeDuration = null;
+  let $masterPasswordField = null;
+  let $submitButton = null;
+  let $focusFirstField = null;
+  let $rememberMeDuration = null;
 
   /**
    * Initialize the master password dialog.
    */
-  var init = function () {
-    // Load the page template.
-    passbolt.request('passbolt.site.settings.plugins.rememberMe')
-      .then(function(options) {
-        return loadTemplate(options);
-      })
-      // Init the security token.
-      .then(initSecurityToken)
-      // Steal the focus.
-      .then(stealFocus)
-      .then(function () {
-        // Init the event listeners.
-        // Mark the iframe container as ready.
-        initEventsListeners();
-        passbolt.message.emit('passbolt.passbolt-page.remove-class', '#passbolt-iframe-master-password', 'loading');
-        passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-master-password', 'ready');
-      })
-      .catch(function () {
-        console.error('Something went wrong when initializing masterPassword.js');
-      });
+  var init = async function () {
+    try {
+      await loadTemplate();
+      await initSecurityToken();
+      await stealFocus();
+      initEventsListeners();
+      const rememberMeOptions = await getRememberMeOptions();
+      await loadRememberMeOptionsTemplate(rememberMeOptions);
+      passbolt.message.emit('passbolt.passbolt-page.remove-class', '#passbolt-iframe-master-password', 'loading');
+      passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-master-password', 'ready');
+    } catch (error) {
+      console.error('Something went wrong when initializing masterPassword.js');
+    }
   };
 
   /**
    * Load the page template and initialize the variables relative to it.
    * @returns {Promise}
    */
-  var loadTemplate = function (options) {
-    var tpl = 'master/masterPassword.ejs';
-    if (options === null) {
-      tpl = 'master/masterPasswordSimple.ejs';
-    }
-    return passbolt.html.loadTemplate('body', tpl, 'html', {'options': options})
-      .then(function () {
-        $masterPasswordField = $('#js_master_password');
-        $submitButton = $('#master-password-submit');
-        $focusFirstField = $('#js_master_password_focus_first');
-        $rememberMeDuration = $('#js_remember_master_password_duration');
-      });
+  var loadTemplate = async function () {
+    const tpl = 'master/masterPassword.ejs';
+    await passbolt.html.loadTemplate('body', tpl, 'html')
+    $masterPasswordField = $('#js_master_password');
+    $submitButton = $('#master-password-submit');
+    $focusFirstField = $('#js_master_password_focus_first');
   };
+
+  /**
+   * Get the remember me options.
+   */
+  const getRememberMeOptions = async function () {
+    return await passbolt.request('passbolt.site.settings.plugins.rememberMe');
+  };
+
+  /**
+   * Load the remember options template.
+   * @param options {object} The remember me options
+   * @returns {Promise}
+   */
+  const loadRememberMeOptionsTemplate = async function (options) {
+    if (!options) {
+      return;
+    }
+    const tpl = 'master/rememberMeOptions.ejs';
+    await passbolt.html.loadTemplate('#js_remember_options', tpl, 'html', {'options': options})
+    $rememberMeDuration = $('#js_remember_master_password_duration');
+    $rememberMeDuration.on('change', rememberMeDurationChange);
+  }
 
   /**
    * Init the security token.
@@ -97,7 +105,6 @@ $(function () {
     $focusFirstField.on('keydown', focusFirstFieldKeydown);
     $masterPasswordField.on('keypress', masterPasswordFieldKeypressed);
     $masterPasswordField.on('keydown', masterPasswordFieldKeyDown);
-    $rememberMeDuration.on('change', rememberMeDurationChange);
   };
 
   /**
@@ -247,10 +254,15 @@ $(function () {
    * The submit button has been clicked :
    *  - Submit the master password to the addon for validation
    */
-  var submitButtonClicked = function () {
+  var submitButtonClicked = async function () {
     $submitButton.addClass('processing');
-    passbolt.request('passbolt.master-password.submit', $masterPasswordField.val())
-      .then(validAttemptHandler, wrongAttemptHandler);
+    const attemptValue = $masterPasswordField.val();
+    try {
+      await passbolt.request('passbolt.master-password.submit', attemptValue);
+      validAttemptHandler();
+    } catch (attempts) {
+      wrongAttemptHandler(attempts);
+    }
   };
 
   /**

@@ -2,7 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.4.6] - 2018-12-1*
+## [Unreleased]
+### Improvement
+- PASSBOLT-3347: When the extension requires the users to enter their master password, the popup should be displayed with no delay
+
+## [2.4.6] - 2018-12-18
 ### Fix
 - Update to openpgpjs to v4.3.0
 
@@ -313,7 +317,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.5...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.6...HEAD
+[2.4.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.5...v2.4.6
 [2.4.5]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.4...v2.4.5
 [2.4.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.3...v2.4.4
 [2.4.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.2...v2.4.3

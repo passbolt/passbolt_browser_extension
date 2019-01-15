@@ -3,7 +3,7 @@
  *
  * Used for handling groups / group edits
  *
- * @copyright (c) 2017-present Passbolt SARL
+ * @copyright (c) 2017-2018 Passbolt SARL, 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
@@ -11,10 +11,12 @@ var Worker = require('../model/worker');
 var User = require('../model/user').User;
 var Group = require('../model/group').Group;
 var GroupForm = require('../model/groupForm').GroupForm;
+var InvalidMasterPasswordError = require('../error/invalidMasterPasswordError').InvalidMasterPasswordError;
 var Keyring = require('../model/keyring').Keyring;
 var Crypto = require('../model/crypto').Crypto;
 var masterPasswordController = require('../controller/masterPasswordController');
 var progressDialogController = require('../controller/progressDialogController');
+var UserAbortsOperationError = require('../error/userAbortsOperationError').UserAbortsOperationError;
 
 var listen = function (worker) {
   /*
@@ -90,87 +92,6 @@ var listen = function (worker) {
     }
   });
 
-  /**
-   * Encrypt a list of secrets after a response from a dry-run call.
-   * @param group
-   *   the group response returned from a dry-run call.
-   */
-  var encryptSecrets = function (group) {
-    return new Promise(function(resolve, reject) {
-      // nothing to do, we can return immediately.
-      if (group['dry-run'] == undefined || group['dry-run'] == 0 || group['dry-run']['SecretsNeeded'] == 0) {
-        resolve([]);
-        return;
-      }
-
-      var secretsToEncrypt = group['dry-run']['SecretsNeeded'],
-        mySecrets = group['dry-run']['Secrets'];
-
-      // Encrypt secrets.
-      var crypto = new Crypto(),
-        keyring = new Keyring(),
-        progress = 0,
-        progressItemsCount = mySecrets.length + secretsToEncrypt.length;
-
-      // Master password required to decrypt secrets before re-encrypting them.
-      masterPasswordController.get(worker)
-
-      // Decrypt all the secrets.
-        .then(function (masterPassword) {
-          progressDialogController.open(worker, 'Encrypting ...', progressItemsCount);
-
-          // Extract all the secrets to decrypt.
-          var secrets = mySecrets.reduce(function (result, item) {
-            result.push(item.Secret[0].data);
-            return result;
-          }, []);
-
-          // Decrypt all the secrets.
-          return crypto.decryptAll(secrets, masterPassword, function (secretInClear, position) {
-            mySecrets[position]['Secret'][0].dataClear = secretInClear;
-            progressDialogController.update(worker, progress++);
-          }, function (position) {
-            progressDialogController.update(worker, progress, 'Decrypting ' + position + '/' + secrets.length);
-          });
-        })
-
-        // Synchronize the keyring.
-        .then(function () {
-          return keyring.sync();
-        })
-
-        // Encrypt all the secrets.
-        .then(function () {
-          // Prepare the data for encryption.
-          var encryptAllData = secretsToEncrypt.map(function (secretToEncrypt) {
-            // Retrieve the secret in clear.
-            var targetSecret = mySecrets.find(function (mySecret) {
-              return secretToEncrypt.Secret.resource_id == mySecret.Secret[0].resource_id;
-            });
-            return {
-              userId: secretToEncrypt['Secret'].user_id,
-              message: targetSecret.Secret[0].dataClear
-            }
-          });
-
-          // Encrypt all the messages.
-          return crypto.encryptAll(encryptAllData, function (secret, userId, position) {
-            secretsToEncrypt[position].Secret.data = secret;
-            progressDialogController.update(worker, progress++);
-          }, function (position) {
-            progressDialogController.update(worker, progress, 'Encrypting ' + position + '/' + secretsToEncrypt.length);
-          });
-        })
-
-        // Once the secret is encrypted for all users notify the application and
-        // close the progress dialog.
-        .then(function () {
-          resolve(secretsToEncrypt);
-          progressDialogController.close(worker);
-        });
-    });
-  };
-
   /*
    * Saves / update a group.
    * Receives the instruction from the app that the group is ready to be saved.
@@ -178,75 +99,140 @@ var listen = function (worker) {
    * the local storage by the groupForm model.
    *
    * @listens passbolt.group.edit.save
-   * @param group {object}
-   *   a group object, with name only.
+   * @param group {object} a group object, with name only.
    */
-  worker.port.on('passbolt.group.edit.save', function (requestId, groupToSave) {
-    // Get groupForm object.
-    var groupForm = new GroupForm(worker.tab.id),
-      currentGroup = groupForm.get().currentGroup;
-
-    // Set group name.
+  worker.port.on('passbolt.group.edit.save', async function (requestId, groupToSave) {
+    const groupForm = new GroupForm(worker.tab.id);
     groupForm.set('currentGroup.Group.name', groupToSave.name);
+    const groupJson = groupForm.getPostJson();
+    const groupId = groupForm.get().currentGroup.Group.id;
+    let groupSaved;
 
-    // Get Json for save.
-    var groupJson = groupForm.getPostJson(),
-      group = new Group(),
-      groupUserChangeList = groupForm.getGroupUsersChangeList(),
-      isGroupUserCreated = _.where(groupUserChangeList, {status: "created"}).length > 0 ? true : false, // Check if a groupUser is created in the operation.
-      isEdit = currentGroup.Group.id != undefined && currentGroup.Group.id != ''; // Check if it's an edit operation, or a create one.
-
-    // In case of existing group, update it.
-    if (isEdit) {
-      // If no groupUser has been created, make a direct call to save. We do not need a dry-run, so we save one call.
-      if (!isGroupUserCreated) {
-        group.save(groupJson, currentGroup.Group.id).then(
-          function (groupSaved) {
-            worker.port.emit(requestId, 'SUCCESS', groupSaved);
-          },
-          function error(error) {
-            worker.port.emit(requestId, 'ERROR', error);
-          });
+    try {
+      if (groupForm.isCreating()) {
+        groupSaved = await createGroup(worker, groupJson)
+      } else if (!groupForm.hasNewUsers()) {
+        groupSaved = await updateGroup(worker, groupId, groupJson);
+      } else {
+        groupSaved = await updateGroupWithNewUsers(worker, groupId, groupJson);
       }
-      // Else, if a groupUser has been created, we need to call dry-run first.
-      else {
-        // Save group in dry-run.
-        // The result of this operation will provide us with the list of passwords to encrypt and provide
-        // for the actual save.
-        group.save(groupJson, currentGroup.Group.id, true)
-          .then(
-            function success(groupDryRun) {
-              // Encrypt secrets for all users.
-              encryptSecrets(groupDryRun).then(function (secrets) {
-                groupJson['Secrets'] = secrets;
-                group.save(groupJson, currentGroup.Group.id).then(
-                  function (groupSaved) {
-                    worker.port.emit(requestId, 'SUCCESS', groupSaved);
-                  },
-                  function error(error) {
-                    worker.port.emit(requestId, 'ERROR', error);
-                  });
-              });
-            },
-            function error(errorResponse) {
-              worker.port.emit(requestId, 'ERROR', errorResponse);
-            }
-          );
+      worker.port.emit(requestId, 'SUCCESS', groupSaved);
+    } catch (error) {
+      if (error instanceof InvalidMasterPasswordError || error instanceof UserAbortsOperationError) {
+        // Nothing to do.
+      } else {
+        console.log(error);
+        worker.port.emit(requestId, 'ERROR', error);
       }
-    }
-    // Create case.
-    else {
-      group.save(groupJson)
-        .then(
-          function success(group) {
-            worker.port.emit(requestId, 'SUCCESS', group);
-          },
-          function error(errorResponse) {
-            worker.port.emit(requestId, 'ERROR', errorResponse);
-          }
-        );
+    } finally {
+      progressDialogController.close(worker);
     }
   });
+
+  /**
+   * Create a group.
+   * @param worker {object} The worker associated with the progress dialog.
+   * @param groupJson {object} The form data
+   * @return {object} The API result
+   */
+  const createGroup = async function(worker, groupJson) {
+    const group = new Group();
+
+    await progressDialogController.open(worker, 'Creating group ...', 2);
+    progressDialogController.update(worker, 1);
+    const groupSaved = await group.save(groupJson);
+    progressDialogController.update(worker, 2);
+    progressDialogController.close(worker);
+
+    return groupSaved;
+  };
+
+  /**
+   * Update a group.
+   * @param worker {object} The worker associated with the progress dialog.
+   * @param groupId {string} The group id
+   * @param groupJson {object} The form data
+   * @return {object} The API result
+   */
+  const updateGroup = async function(worker, groupId, groupJson) {
+    const group = new Group();
+
+    const groupSavedPromised = group.save(groupJson, groupId);
+    await progressDialogController.open(worker, 'Updating group ...', 2);
+    progressDialogController.update(worker, 1);
+    const groupSaved = await groupSavedPromised;
+    progressDialogController.update(worker, 2);
+    progressDialogController.close(worker);
+
+    return groupSaved;
+  };
+
+  /**
+   * Update a group with new users.
+   * @param worker {object} The worker associated with the progress dialog.
+   * @param groupId {string} The group id
+   * @param groupJson {object} The form data
+   * @return {object} The API result
+   */
+  const updateGroupWithNewUsers = async function(worker, groupId, groupJson) {
+    const keyring = new Keyring();
+    let progressGoals = 100;
+    let progress = 0;
+    const group = new Group();
+
+    const dryRunPromise = group.save(groupJson, groupId, true);
+    const keyringSyncPromise = keyring.sync();
+    const masterPassword = await masterPasswordController.get(worker);
+    await progressDialogController.open(worker, 'Updating group ...', progressGoals);
+    const dryRunResult = await dryRunPromise;
+    await keyringSyncPromise;
+
+    progress += 2; // Keyring sync + dryrun
+    progressGoals = dryRunResult['dry-run']['SecretsNeeded'].length + dryRunResult['dry-run']['Secrets'].length + progress;
+    progressDialogController.updateGoals(worker, progressGoals);
+    progressDialogController.update(worker, progress++);
+
+    groupJson['Secrets'] = await encryptSaveGroupSecrets(
+      dryRunResult,
+      masterPassword,
+      () => progressDialogController.update(worker, progress++),
+      message => { return index => progressDialogController.update(worker, progress, message.replace('%0', parseInt(index) + 1)) }
+    );
+    const groupSaved = await group.save(groupJson, groupId);
+    progressDialogController.close(worker);
+
+    return groupSaved;
+  };
+
+  /**
+   * Encrypt the secrets needed by a save group operation
+   * @param dryRunResult {object} the group response returned from a dry-run call.
+   * @param masterPassword {string} the private key master password
+   */
+  const encryptSaveGroupSecrets = async function (dryRunResult, masterPassword, completeCallback, startCallback) {
+    if (dryRunResult['dry-run'] == undefined || dryRunResult['dry-run'] == 0 || dryRunResult['dry-run']['SecretsNeeded'] == 0) {
+      return;
+    }
+
+    const crypto = new Crypto();
+    const secretsNeeded = dryRunResult['dry-run']['SecretsNeeded'];
+    const secretsOrigin = dryRunResult['dry-run']['Secrets'];
+
+    // Decrypt all the secrets.
+    const messagesOriginEncrypted = secretsOrigin.reduce((result, item) => [...result, item.Secret[0].data], []);
+    const messagesOriginDecrypted = await crypto.decryptAll(messagesOriginEncrypted, masterPassword, completeCallback, startCallback(`Decrypting %0/${secretsOrigin.length}`));
+    secretsOrigin.forEach((secret, i) => secret['Secret'][0].dataDecrypted = messagesOriginDecrypted[i]);
+
+    // Encrypt all the secrets for the new users.
+    const encryptAllData = secretsNeeded.map(secretNeeded => {
+      const secretOrigin = secretsOrigin.find(secretOrigin => secretNeeded.Secret.resource_id == secretOrigin.Secret[0].resource_id);
+      return {userId: secretNeeded['Secret'].user_id, message: secretOrigin.Secret[0].dataDecrypted}
+    });
+    const messagesNeeededEncrypted = await crypto.encryptAll(encryptAllData, completeCallback, startCallback('Encrypting %0/' + secretsNeeded.length));
+    messagesNeeededEncrypted.forEach((messageEncrypted, i) => secretsNeeded[i].Secret.data = messageEncrypted);
+
+    return secretsNeeded;
+  };
 
   /*
    * A groupUser has been temporary deleted.

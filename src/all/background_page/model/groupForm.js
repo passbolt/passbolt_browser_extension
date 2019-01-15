@@ -65,6 +65,26 @@ GroupForm.prototype.init = function(state, group) {
 };
 
 /**
+ * Check if the form is creating a group.
+ * @return {bool} Tru if creating, false otherwise.
+ */
+GroupForm.prototype.isCreating = function() {
+  const currentGroup = this.get().currentGroup;
+
+  return currentGroup.Group.id == undefined || currentGroup.Group.id == '';
+};
+
+/**
+ * Check if new user have been added to the group.
+ * @return {bool}
+ */
+GroupForm.prototype.hasNewUsers = function() {
+  const groupUserChangeList = this.getGroupUsersChangeList();
+
+  return groupUserChangeList.find(change => change.status == 'created') != undefined;;
+};
+
+/**
  * Retrieve a groupForm.
  *
  * @param key

@@ -12,10 +12,19 @@ var Worker = require('../model/worker');
  *
  * @param worker The worker associated with the progress dialog.
  * @param title The progress dialog title.
- * @param toComplete Number of steps to complete the progression.
+ * @param goals Goals to complete
  */
-var open = function (worker, title, toComplete) {
-  worker.port.emit('passbolt.progress.open-dialog', title, toComplete);
+var open = async function (worker, title, goals) {
+  worker.port.emit('passbolt.progress.open-dialog', title, goals);
+  return new Promise(function(resolve) {
+    let interval = setInterval(function () {
+      let progressWorker = Worker.get('Progress', worker.tab.id);
+      if (progressWorker) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, 50);
+  });
 };
 exports.open = open;
 

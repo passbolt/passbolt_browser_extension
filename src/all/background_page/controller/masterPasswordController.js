@@ -1,7 +1,7 @@
 /**
  * Master password controller.
  *
- * @copyright (c) 2017 Passbolt SARL
+ * @copyright (c) 2017-2018 Passbolt SARL, 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 

@@ -1,12 +1,14 @@
 /**
  * Master password Listeners
  *
- * @copyright (c) 2017 Passbolt SARL
+ * @copyright (c) 2017-2018 Passbolt SARL, 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var Worker = require('../model/worker');
+var InvalidMasterPasswordError = require('../error/invalidMasterPasswordError').InvalidMasterPasswordError;
 var Keyring = require('../model/keyring').Keyring;
 var TabStorage = require('../model/tabStorage').TabStorage;
+var UserAbortsOperationError = require('../error/userAbortsOperationError').UserAbortsOperationError;
+var Worker = require('../model/worker');
 
 var listen = function (worker) {
 
@@ -43,7 +45,7 @@ var listen = function (worker) {
       function () {
         worker.port.emit(requestId, 'ERROR', masterPasswordRequest.attempts);
         if (masterPasswordRequest.attempts === 3) {
-          masterPasswordRequest.deferred.reject(new Error('Too many attempts.'));
+          masterPasswordRequest.deferred.reject(new InvalidMasterPasswordError('Too many attempts.'));
         }
       });
   });
@@ -63,7 +65,7 @@ var listen = function (worker) {
     // After reaching 3 attempts the requests is destroyed by the
     // passbolt.master-password.submit message handler.
     if (masterPasswordRequest) {
-      masterPasswordRequest.deferred.reject(new Error('The dialog was closed.'));
+      masterPasswordRequest.deferred.reject(new UserAbortsOperationError('The dialog was closed.'));
     }
 
     appWorker.port.emit('passbolt.master-password.close-dialog');

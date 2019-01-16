@@ -173,7 +173,8 @@ $(function () {
         passbolt.message.emitToPage('group_edit_save_success', groupSaved);
       },
       function(error) {
-        passbolt.message.emitToPage('group_edit_save_error', error);
+        const data = passbolt.message.formatErrorAsPassboltAPIResponse(error);
+        passbolt.message.emitToPage('group_edit_save_error', data);
       });
   });
 

@@ -93,4 +93,24 @@ var passbolt = passbolt || {};
     document.documentElement.dispatchEvent(event);
   };
 
+  /**
+   * Format javascript errors as Passbolt API response.
+   *
+   * @param {Errror} error The error to format.
+   * @return {Object} The formated error
+   */
+  passbolt.message.formatErrorAsPassboltAPIResponse = function (error) {
+    const code = !error.data || !error.data.code ? undefined : error.data.code;
+    const body = !error.data || !error.data.body ? undefined : error.data.body;
+    return {
+      header: {
+        code: code,
+        status_code: code, // @deprecated from Passsbolt Api v2.7
+        status: 'error',
+        message: error.message
+      },
+      body: body
+    }
+  };
+
 })(passbolt);

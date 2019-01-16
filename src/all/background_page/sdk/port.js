@@ -41,4 +41,24 @@ Port.prototype.emit = function () {
   Log.write({level: 'debug', message: 'Port emit @ message: ' + arguments[1]});
   this._port.postMessage(Array.prototype.slice.call(arguments));
 };
+
+/**
+ * Get an emitable version of a javascript error.
+ * Error cannot be transfered by the Port.postMessage function to the content code.
+ * Some properties are not iterable/enumerable, such as name or message.
+ *
+ * @param error {Error} error The error to work on.
+ * @pararm {Object} The emitable version of the error.
+ */
+Port.prototype.getEmitableError = function (error) {
+  const emitableError = Object.assign({}, error);
+  ["name", "message"].forEach(key => {
+    if (error[key] && !emitableError[key]) {
+      emitableError[key] = error[key];
+    }
+  });
+
+  return emitableError;
+};
+
 exports.Port = Port;

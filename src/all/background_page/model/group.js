@@ -1,10 +1,11 @@
 /**
  * Group model.
  *
- * @copyright (c) 2017-present Passbolt SARL
+ * @copyright (c) 2017-2018 Passbolt SARL, 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
+const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
 const Request = require('./request').Request;
 var UserSettings = require('./userSettings').UserSettings;
 
@@ -81,12 +82,12 @@ Group.prototype.findById = function(groupId) {
  *   whether this call should be a dry-run or an actual call.
  * @returns {*}
  */
-Group.prototype.save = function(group, groupId, dryrun) {
-  var _response = null,
-    url =  this.settings.getDomain() + '/groups.json' + '?api-version=v1',
-    method = 'POST',
-    groupParamStr = JSON.stringify(group),
-    isDryRun = dryrun != undefined && dryrun == true;
+Group.prototype.save = async function(group, groupId, dryrun) {
+    let url =  this.settings.getDomain() + '/groups.json' + '?api-version=v1';
+    let method = 'POST';
+    const groupParamStr = JSON.stringify(group);
+    const isDryRun = dryrun != undefined && dryrun == true;
+    let response, responseJson;
 
   // If the group is updated.
   if (groupId != undefined && groupId != '') {
@@ -109,28 +110,29 @@ Group.prototype.save = function(group, groupId, dryrun) {
   };
   Request.setCsrfHeader(fetchOptions);
 
-  return new Promise(function(resolve, reject) {
-    fetch(url, fetchOptions)
-      .then(function (response) {
-        _response = response;
-        return response.json();
-      })
-      .then(function (json) {
-        // Check response status.
-        // Response is an error. We return the error.
-        if (!_response.ok) {
-          json.header.status_code = _response.status;
-          reject(json);
-        } else {
-            // Response is ok.
-            var group = json.body;
-            resolve(group);
-        }
-      })
-      .catch(function (error) {
-        reject(error);
-      });
-  });
+  try {
+    response = await fetch(url, fetchOptions);
+  } catch (error) {
+    // Catch Network error such as connection lost.
+    throw new PassboltApiFetchError(error.message);
+  }
+
+  try {
+    responseJson = await response.json();
+  } catch (error) {
+    // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
+    throw new PassboltApiFetchError(response.statusText, {code: response.status});
+  }
+
+  if (!response.ok) {
+    const message = responseJson.header.message;
+    throw new PassboltApiFetchError(message, {
+      code: response.status,
+      body: responseJson.body
+    });
+  }
+
+  return responseJson.body;
 };
 
 /**

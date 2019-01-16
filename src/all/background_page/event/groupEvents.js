@@ -119,9 +119,10 @@ var listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS', groupSaved);
     } catch (error) {
       if (error instanceof InvalidMasterPasswordError || error instanceof UserAbortsOperationError) {
-        // Nothing to do.
+        // The save operation has been aborted.
+      } else if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
       } else {
-        console.log(error);
         worker.port.emit(requestId, 'ERROR', error);
       }
     } finally {
@@ -171,7 +172,7 @@ var listen = function (worker) {
    * Update a group with new users.
    * @param worker {object} The worker associated with the progress dialog.
    * @param groupId {string} The group id
-   * @param groupJson {object} The form data
+   * @param groupJson {object } The form data
    * @return {object} The API result
    */
   const updateGroupWithNewUsers = async function(worker, groupId, groupJson) {

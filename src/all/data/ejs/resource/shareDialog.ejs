@@ -1,15 +1,10 @@
 <div class="dialog-wrapper">
     <div class="dialog share-password-dialog">
         <div class="dialog-header">
-<? if (bulk) { ?>
-            <h2>Share <?= resources.length ?> passwords <div class="more_details tooltip-alt">
-                <i class="fa fa-info-circle"></i>
-                <div class="tooltip-text right">
-                    <?= resources.map(resource => resource.name).join(', '); ?>
-                </div>
-            </div></h2>
+<? if (resourcesCount > 1) { ?>
+            <h2><span>Share <?= resourcesCount ?> passwords </span></h2>
 <? } else { ?>
-            <h2>Share<span class="dialog-header-subtitle"><?= resources[0].name ?></span></h2>
+            <h2>Share<span class="dialog-header-subtitle"></span></h2>
 <? } ?>
             <a class="dialog-close js-dialog-close">
                 <i class="fa fa-close"></i>
@@ -18,7 +13,7 @@
         </div>
         <div class="js-dialog-content dialog-content">
 
-<? if (!bulk) { ?>
+<? if (resourcesCount == 1) { ?>
             <ul class="tabs-nav menu">
                 <li id="js-share-go-to-edit">
                     <div class="row">
@@ -44,14 +39,17 @@
                 <div class="tab-content" style="display:block">
 <? } ?>
 
+                    <div class="processing-wrapper">
+                        <span class="processing-text">Retrieving permissions</span>
+                    </div>
+
                     <div id="js-share-edit-list" class="form-content permission-edit">
                         <ul class="permissions scroll"></ul>
                     </div>
 
                     <div id="js-share-feedbacks" class="feedbacks message hidden"></div>
 
-<? if (isOwner) { ?>
-                    <div class="form-content permission-add">
+                    <div id="js-share-form-content-add" class="form-content permission-add hidden">
                         <div class="input text autocomplete">
                             <label for="js-search-aros-input">Share with people or groups</label>
                             <input maxlength="255" id="js-search-aros-input" placeholder="enter one name or email" autocomplete="off" type="text">
@@ -61,7 +59,6 @@
                             <div class="autocomplete-content scroll"></div>
                         </div>
                     </div>
-<? } ?>
 
                     <div class="submit-wrapper clearfix">
                         <input id="js-share-save" type="submit" class="button disabled primary" value="save" disabled="disabled"/>
@@ -69,7 +66,7 @@
                     </div>
                 </div>
 
-<? if (!bulk) { ?>
+<? if (resourcesCount == 1) { ?>
             </div>
         </div>
 <? } ?>

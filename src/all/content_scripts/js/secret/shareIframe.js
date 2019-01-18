@@ -26,12 +26,16 @@ $(function () {
   /*
    * Open the password(s) share component.
    */
-  window.addEventListener("passbolt.plugin.resources_share", function (event) {
+  window.addEventListener("passbolt.plugin.resources_share", async function (event) {
     const data = event.detail;
     const resourcesIds = Object.values(data.resourcesIds);
-    passbolt.request('passbolt.app.share-init', resourcesIds)
-      .then(() => _insertShareIframe())
-      .then(() => $('.edit-password-dialog').remove());
+    try {
+      await passbolt.request('passbolt.app.share-init', resourcesIds);
+      await _insertShareIframe();
+      $('.edit-password-dialog').remove();
+    } catch (error) {
+      // PASSBOLT-3356 Improve the plugin errors management.
+    }
   }, false);
 
   /**

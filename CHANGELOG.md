@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-3347: When the extension requires the users to enter their master password, the popup should be displayed with no delay
 - PASSBOLT-3313: As GM adding a user to a group I should see the loading popup when the extension is processing/requesting the API
 - PASSBOLT-3312: As GM adding a user to a group I should see a relevant feedback in case of network/proxy errors
+- PASSBOLT-3316: As LU Sharing a password I should see a loading feedback when the extension is requesting the API
 
 ## [2.4.6] - 2018-12-18
 ### Fix

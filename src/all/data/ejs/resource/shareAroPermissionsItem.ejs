@@ -24,7 +24,7 @@ if (aroPermissions.aro.profile) {
     </div>
 
     <div class="select rights">
-        <select class="permission <?= !isOwner ? 'disabled' : '' ?>" <?= !isOwner ? 'disabled="disabled"' : '' ?>>
+        <select class="permission <?= !canEdit ? 'disabled' : '' ?>" <?= !canEdit ? 'disabled="disabled"' : '' ?>>
             <option value="1" <?= aroPermissions.type == 1 ? 'selected="selected"' : ''?>>can read</option>
             <option value="7" <?= aroPermissions.type == 7 ? 'selected="selected"' : ''?>>can update</option>
             <option value="15" <?= aroPermissions.type == 15 ? 'selected="selected"' : ''?>>is owner</option>
@@ -54,7 +54,7 @@ if (aroPermissions.aro.profile) {
     </div>
 
     <div id="js_actions_rs_perm_<?= aroPermissions.aro.id ?>" class="actions">
-        <a class="js-share-delete-button close <?= !isOwner ? 'disabled' : '' ?>" title="remove">
+        <a class="js-share-delete-button close <?= !canEdit ? 'disabled' : '' ?>" title="remove">
             <i class="fa fa-times-circle"></i>
             <span class="visuallyhidden">remove</span>
         </a>

@@ -10,29 +10,19 @@ $(function () {
   // The user settings.
   let settings = {};
 
-  // The resources to share.
-  let resources = [];
-
   // The share changes.
   let shareChanges = [];
-
-  // Is the current user owner of the resources
-  let isOwner = false;
 
   // The current search for aros timeout reference.
   let currentSearchTimeout = null;
 
   // DOM Elements (jQuery objects).
   let $permissions,
-    $goToEdit,
-    $goToShare,
     $searchInput,
     $autocompleteWrapper,
     $autocompleteContent,
     $feedbacks,
-    $save,
-    $cancel,
-    $close;
+    $save;
 
   // The latest search aros result.
   let searchArosResult = [];
@@ -42,13 +32,16 @@ $(function () {
    */
   const init = async function () {
     await loadSettings();
-    await getResources();
+    const resourcesIds = await passbolt.request('passbolt.share.get-resources-ids');
+    const resourcesPromise = passbolt.request('passbolt.share.get-resources', resourcesIds);
+    await loadTemplate(resourcesIds);
+    initSecurityToken();
+    const resources = await resourcesPromise;
+    updateTitle(resources);
     shareChanges = new ShareChanges(resources);
-    isOwner = shareChanges.isOriginalResourcesOwner();
-    await loadTemplate();
-    await loadPermissions();
-    await initSecurityToken();
-    initEventsListeners();
+    const canEdit = shareChanges.isOriginalResourcesOwner();
+    loadPermissions(canEdit);
+    showForm(canEdit);
     passbolt.message.emit('passbolt.passbolt-page.add-class', '#passbolt-iframe-password-share', 'ready');
   };
 
@@ -79,37 +72,21 @@ $(function () {
   };
 
   /**
-   * Get the resources to share.
-   * @return {Promise}
-   */
-  const getResources = async function() {
-    const resourcesIds = await passbolt.request('passbolt.share.get-resources-ids');
-    // console.log('resourcesIds', resourcesIds);
-    resources = await passbolt.request('passbolt.share.get-resources', resourcesIds);
-    // console.log('resources', resources);
-  };
-
-  /**
    * Load the page template and initialize the variables relative to it.
+   * @param {array} resourcesIds The list of resources ids to share.
    * @return {Promise}
    */
-  const loadTemplate = async function () {
-    const bulk = resources.length > 1;
-    // console.log(resources, bulk);
-    await passbolt.html.loadTemplate('body', 'resource/shareDialog.ejs', 'html', {resources, bulk, isOwner});
-    $goToEdit = $('.share-password-dialog #js-share-go-to-edit');
-    $goToShare = $('.share-password-dialog #js-share-go-to-share');
+  const loadTemplate = async function (resourcesIds) {
+    const resourcesCount = resourcesIds.length;
+    await passbolt.html.loadTemplate('body', 'resource/shareDialog.ejs', 'html', {resourcesCount});
     $permissions = $('.share-password-dialog #js-share-edit-list ul');
-    $searchInput = $('.share-password-dialog #js-search-aros-input');
-    $autocompleteWrapper = $('.share-password-dialog #js-search-aro-autocomplete');
-    $autocompleteContent = $('.share-password-dialog .autocomplete-content');
     $feedbacks = $('.share-password-dialog #js-share-feedbacks');
     $save = $('.share-password-dialog #js-share-save');
-    $cancel = $('.share-password-dialog #js-share-cancel');
-    $close = $('.share-password-dialog .js-dialog-close');
-    if (!isOwner) {
-      showOnlyOwnerCanShareFeedback();
-    }
+    $('.share-password-dialog #js-share-go-to-edit').on('click', () => handleGoToEdit());
+    $('.share-password-dialog #js-share-go-to-share').on('click', () => handleGoToShare());
+    $('.share-password-dialog #js-share-cancel').on('click', () => close());
+    $('.share-password-dialog .js-dialog-close').on('click', () => close());
+    $save.on('click', () => submitChanges());
   };
 
   /**
@@ -127,11 +104,47 @@ $(function () {
 
   /**
    * Load the list of permissions
+   * @param {boolean} canEdit Does the current user can edit the permissions
    */
-  const loadPermissions = async function() {
+  const loadPermissions = async function(canEdit) {
+    $('.processing-wrapper').hide();
     const arosPermissions = shareChanges.aggregatePermissionsByAro();
     for (var aroId in arosPermissions) {
-      await insertAroPermissions(arosPermissions[aroId]);
+      await insertAroPermissions(arosPermissions[aroId], canEdit);
+    }
+    $permissions.on('change', 'select', event => handleAroPermissionChange(event));
+    $permissions.on('click', '.js-share-delete-button', event => handleDeleteAroPermission(event));
+    $permissions.on('mouseover', '.tooltip-alt', event => handleAroPermissionsTooltipPosition(event));
+  };
+
+  /**
+   * Show form
+   * @param {boolean} canEdit Does the current user can edit the permissions
+   */
+  const showForm = function(canEdit) {
+    if (canEdit) {
+      $('#js-share-form-content-add').show();
+      $searchInput = $('.share-password-dialog #js-search-aros-input');
+      $autocompleteWrapper = $('.share-password-dialog #js-search-aro-autocomplete');
+      $autocompleteContent = $('.share-password-dialog .autocomplete-content');
+      $searchInput.bind('input', () => handleSearchArosChange());
+      $autocompleteContent.on('click', 'li', event => handleAddAroPermissions(event));
+    } else {
+      let text = 'Only the owner of a password can share it.';
+      $feedbacks.text(text);
+      $feedbacks.addClass('warning').removeClass('hidden');
+    }
+  };
+
+  /**
+   * Update title
+   * @param {array} resources List of edited resources
+   */
+  const updateTitle = async function (resources) {
+    if (resources.length > 1) {
+      await passbolt.html.loadTemplate('.share-password-dialog h2', 'resource/shareBulkTitleTooltip.ejs', 'append', {resources});
+    } else {
+      $('.share-password-dialog h2 .dialog-header-subtitle').text(resources[0].name);
     }
   };
 
@@ -145,9 +158,9 @@ $(function () {
    *  permissions: array<object>
    * }
    */
-  const insertAroPermissions = async function(aroPermissions) {
+  const insertAroPermissions = async function(aroPermissions, canEdit) {
     const domain = settings['user.settings.trustedDomain'];
-    await passbolt.html.loadTemplate($permissions, 'resource/shareAroPermissionsItem.ejs', 'append', {domain, aroPermissions, isOwner});
+    await passbolt.html.loadTemplate($permissions, 'resource/shareAroPermissionsItem.ejs', 'append', {domain, aroPermissions, canEdit});
   };
 
   /**
@@ -156,23 +169,6 @@ $(function () {
    */
   const initSecurityToken = function () {
     return passbolt.security.initSecurityToken('#js-search-aros-input', '.security-token');
-  };
-
-  /**
-   * Init the events listeners.
-   * The events can come from the following sources : addon, page or DOM.
-   */
-  const initEventsListeners = function () {
-    $goToEdit.on('click', event => handleGoToEdit());
-    $goToShare.on('click', event => handleGoToShare());
-    $permissions.on('change', 'select', event => handleAroPermissionChange(event));
-    $permissions.on('click', '.js-share-delete-button', event => handleDeleteAroPermission(event));
-    $searchInput.bind('input', () => handleSearchArosChange());
-    $autocompleteContent.on('click', 'li', event => handleAddAroPermissions(event));
-    $save.on('click', () => submitChanges());
-    $cancel.on('click', () => close());
-    $close.on('click', () => close());
-    $permissions.on('mouseover', '.tooltip-alt', event => handleAroPermissionsTooltipPosition(event));
   };
 
   /**
@@ -234,11 +230,11 @@ $(function () {
     }
 
     // Throttle the search, so the user has time to enter the complete sentence he wants to search.
-    currentSearchTimeout = setTimeout(() => {
+    currentSearchTimeout = setTimeout(async () => {
       $autocompleteContent.empty().addClass('loading');
       $autocompleteWrapper.removeClass('hidden');
-      passbolt.request('passbolt.share.search-aros', keywords)
-        .then(aros => updateAutocompleteContent(aros));
+      const aros = await passbolt.request('passbolt.share.search-aros', keywords);
+      updateAutocompleteContent(aros);
     }, 300);
   };
 
@@ -246,15 +242,16 @@ $(function () {
    * Handle add aro permissions.
    * @param {DomEvent} event
    */
-  const handleAddAroPermissions = function(event) {
+  const handleAddAroPermissions = async function(event) {
     const aroId = $(event.currentTarget).attr('id');
     const aro = searchArosResult.find(aro => aro.id == aroId);
     resetSearchAros();
     const aroPermissions = shareChanges.addAroPermissions(aro);
-    insertAroPermissions(aroPermissions)
-      .then(() => markAroPermissionsAsChange(aroId))
-      .then(() => scrollToLatestAroPermissions())
-      .then(() => validateChanges());
+    const canEdit = shareChanges.isOriginalResourcesOwner();
+    await insertAroPermissions(aroPermissions, canEdit);
+    markAroPermissionsAsChange(aroId);
+    scrollToLatestAroPermissions();
+    validateChanges();
   };
 
   /**
@@ -336,8 +333,7 @@ $(function () {
    * Enable the save action
    */
   const enableSaveAction = function() {
-    $save
-      .removeClass('disabled')
+    $save.removeClass('disabled')
       .prop('disabled', null);
   };
 
@@ -345,8 +341,7 @@ $(function () {
    * Disable the save action
    */
   const disableSaveAction = function() {
-    $save
-      .addClass('disabled')
+    $save.addClass('disabled')
       .prop('disabled', 'disabled');
   };
 
@@ -354,19 +349,10 @@ $(function () {
    * Display the missing owner feedback
    */
   const showMissingOwnerFeedback = function() {
-    const plural = resources.length > 1;
+    const plural = shareChanges._resources.length > 1;
     let text = `The password${plural?'s':''} must have a owner.`;
     $feedbacks.text(text);
     $feedbacks.addClass('error').removeClass('warning hidden');
-  };
-
-  /**
-   * Display the only owner can share feedback
-   */
-  const showOnlyOwnerCanShareFeedback = function() {
-    let text = 'Only the owner of a password can share it.';
-    $feedbacks.text(text);
-    $feedbacks.addClass('warning').removeClass('hidden');
   };
 
   /**

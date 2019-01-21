@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-3313: As GM adding a user to a group I should see the loading popup when the extension is processing/requesting the API
 - PASSBOLT-3312: As GM adding a user to a group I should see a relevant feedback in case of network/proxy errors
 - PASSBOLT-3316: As LU Sharing a password I should see a loading feedback when the extension is requesting the API
+- PASSBOLT-3318: As LU I should retrieve a secret when I'm copying it
 
 ## [2.4.6] - 2018-12-18
 ### Fix

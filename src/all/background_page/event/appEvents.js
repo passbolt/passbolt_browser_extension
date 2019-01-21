@@ -3,21 +3,20 @@
  *
  * Used to handle the events related to main application page.
  *
- * @copyright (c) 2017 Passbolt SARL
+ * @copyright (c) 2017 Passbolt SARL, 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+const __ = require('../sdk/l10n').get;
+var Crypto = require('../model/crypto').Crypto;
+const InvalidMasterPasswordError = require('../error/invalidMasterPasswordError').InvalidMasterPasswordError;
+var Keyring = require('../model/keyring').Keyring;
 var masterPasswordController = require('../controller/masterPasswordController');
 var progressDialogController = require('../controller/progressDialogController');
-var app = require('../app');
-var Worker = require('../model/worker');
-
-var Keyring = require('../model/keyring').Keyring;
-var Crypto = require('../model/crypto').Crypto;
-var TabStorage = require('../model/tabStorage').TabStorage;
 var Secret = require('../model/secret').Secret;
 var secret = new Secret();
-var User = require('../model/user').User;
-var user = User.getInstance();
+var TabStorage = require('../model/tabStorage').TabStorage;
+const UserAbortsOperationError = require('../error/userAbortsOperationError').UserAbortsOperationError;
+var Worker = require('../model/worker');
 
 var listen = function (worker) {
 
@@ -144,6 +143,7 @@ var listen = function (worker) {
    * @listens passbolt.app.decrypt
    * @param requestId {uuid} The request identifier
    * @param armored {string} The armored secret
+   * @deprecated since v2.7 will be removed in v3.0
    */
   worker.port.on('passbolt.app.decrypt-copy', function (requestId, armored) {
     var crypto = new Crypto();
@@ -164,6 +164,41 @@ var listen = function (worker) {
         worker.port.emit('passbolt.progress.close-dialog');
         worker.port.emit(requestId, 'ERROR', error.message);
       });
+  });
+
+  /*
+   * Decrypt a given armored string
+   *
+   * @listens passbolt.app.decrypt-and-copy-to-clipboard-resource-secret
+   * @param requestId {uuid} The request identifier
+   * @param resourceId {string} The resource identifier
+   */
+  worker.port.on('passbolt.app.decrypt-secret-and-copy-to-clipboard', async function (requestId, resourceId) {
+    var crypto = new Crypto();
+
+    try {
+      if (!Validator.isUUID(resourceId)) {
+        throw new Error(__('The resource id should be a valid UUID'))
+      }
+      const secretPromise = Secret.findByResourceId(resourceId);
+      const masterPassword = await masterPasswordController.get(worker);
+      await progressDialogController.open(worker, 'Decrypting...');
+      const secret = await secretPromise;
+      const message = await crypto.decrypt(secret.data, masterPassword);
+      const clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
+      clipboardWorker.port.emit('passbolt.clipboard-iframe.copy', message);
+      worker.port.emit(requestId, 'SUCCESS', message);
+    } catch (error) {
+      if (error instanceof InvalidMasterPasswordError || error instanceof UserAbortsOperationError) {
+        // The copy operation has been aborted.
+      } else if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    } finally {
+      progressDialogController.close(worker);
+    }
   });
 
   /*

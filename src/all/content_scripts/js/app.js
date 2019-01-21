@@ -253,6 +253,7 @@ $(function () {
 
   // The application asks the plugin to decrypt an armored string
   // and store it in the clipboard.
+  // @deprecated since v2.7 will be removed in v3.0
   window.addEventListener('passbolt.secret.decrypt', function (event) {
     var armoredSecret = event.detail;
     passbolt.message.emit('passbolt.passbolt-page.remove-all-focuses');
@@ -268,6 +269,26 @@ $(function () {
         function error (msg) {
           passbolt.message.emitToPage('passbolt_notify', {status: 'error', title: 'secret_decrypt_error'});
       });
+  });
+
+  // The application asks the plugin to decrypt and copy a secret
+  // and store it in the clipboard.
+  window.addEventListener('passbolt.plugin.decrypt_secret_and_copy_to_clipboard', async function (event) {
+    var resourceId = event.detail;
+    passbolt.message.emit('passbolt.passbolt-page.remove-all-focuses');
+    try {
+      await passbolt.request('passbolt.app.decrypt-secret-and-copy-to-clipboard', resourceId);
+      passbolt.message.emitToPage('passbolt_notify', {status: 'success', title: 'plugin_clipboard_copy_success', data: 'secret'});
+    } catch (error) {
+      const data = {
+        title: 'secret_decrypt_error',
+        data: {
+          message: error.message
+        },
+        status: 'error'
+      };
+      passbolt.message.emitToPage('passbolt_notify', data);
+    }
   });
 
   // Listen when the user requests a backup of their private key.

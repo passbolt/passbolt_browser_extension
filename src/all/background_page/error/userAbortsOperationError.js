@@ -6,6 +6,10 @@
  */
 
 class UserAbortsOperationError extends Error {
+  constructor(message){
+    super(message);
+    this.name = 'UserAbortsOperationError';
+  }
 }
 
 exports.UserAbortsOperationError = UserAbortsOperationError;

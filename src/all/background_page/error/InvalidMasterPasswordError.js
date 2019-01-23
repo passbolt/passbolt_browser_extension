@@ -6,6 +6,10 @@
  */
 
 class InvalidMasterPasswordError extends Error {
+  constructor(message){
+    super(message);
+    this.name = 'InvalidMasterPasswordError';
+  }
 }
 
 exports.InvalidMasterPasswordError = InvalidMasterPasswordError;

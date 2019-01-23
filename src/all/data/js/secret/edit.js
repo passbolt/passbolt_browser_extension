@@ -1,7 +1,7 @@
 /**
  * Edit a secret.
  *
- * @copyright (c) 2017 Passbolt SARL
+ * @copyright (c) 2017 Passbolt SARL, 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
@@ -26,27 +26,34 @@ $(function () {
   /**
    * Initialize the secret add/edit component.
    */
-  var init = function () {
-    loadTemplate()
-      .then(updateSecurityToken)
-      .then(getEditedPassword)
-      .then(updateSecretStrength)
-      .then(onDialogReady, onError);
+  const init = async function () {
+    try {
+      await loadTemplate();
+      await updateSecurityToken();
+      await getEditedPassword();
+      await updateSecretStrength();
+      await onDialogReady();
+    } catch (error) {
+      onError(error);
+    }
   };
 
   /**
    * Error handler.
    * @param error {string} The error message
    */
-  var onError = function (error) {
-    console.error(error);
+  const onError = function (error) {
+    // @todo Display a feedback to the user.
+    if (error && (error.message != 'UserAbortsOperationError' || error.message != 'InvalidMasterPasswordError')) {
+      console.error(error);
+    }
   };
 
   /**
    * Update the security token
    * @returns {Promise|*}
    */
-  var updateSecurityToken = function () {
+  const updateSecurityToken = function () {
     return passbolt.security.initSecurityToken('#js_secret', '.security-token')
   };
 
@@ -54,17 +61,15 @@ $(function () {
    * Load the page template and initialize the variables relative to it.
    * @returns {Promise}
    */
-  var loadTemplate = function () {
-    return passbolt.html.loadTemplate('body', 'secret/edit.ejs')
-      .then(function () {
-        $secret = $('#js_secret');
-        $secretClear = $('#js_secret_clear');
-        $viewSecretButton = $('#js_secret_view');
-        $secretStrength = $('#js_secret_strength');
-        $generateSecretButton = $('#js_secret_generate');
-        $feedback = $('#js_field_password_feedback');
-        initialSecretPlaceholder = $secret.attr('placeholder');
-      });
+  const loadTemplate = async function () {
+    await passbolt.html.loadTemplate('body', 'secret/edit.ejs');
+    $secret = $('#js_secret');
+    $secretClear = $('#js_secret_clear');
+    $viewSecretButton = $('#js_secret_view');
+    $secretStrength = $('#js_secret_strength');
+    $generateSecretButton = $('#js_secret_generate');
+    $feedback = $('#js_field_password_feedback');
+    initialSecretPlaceholder = $secret.attr('placeholder');
   };
 
   /**
@@ -72,19 +77,15 @@ $(function () {
    * It must have been stored before launching the secret add/edit dialog.
    * @returns {Promise}
    */
-  var getEditedPassword = function () {
-    return passbolt.request('passbolt.edit-password.get-edited-password')
-      .then(function (data) {
-        // Store the secret to edit.
-        editedPassword = data;
-      });
+  const getEditedPassword = async function () {
+    editedPassword = await passbolt.request('passbolt.edit-password.get-edited-password');
   };
 
   /**
    * onDialogReady
    * Init the events listeners.
    */
-  var onDialogReady = function () {
+  const onDialogReady = function () {
     // Is the dialog opened to edit a password, or to add a new one.
     dialogCase = window.location.href.indexOf('case=edit') !== -1 ? 'edit' : 'create';
     if (dialogCase === 'edit') {
@@ -112,14 +113,14 @@ $(function () {
    * Is the secret decrypted?
    * @returns {boolean}
    */
-  var isDecrypted = function () {
+  const isDecrypted = function () {
     return editedPassword.secret != null;
   };
 
   /**
    * Show in clear / obfuscate the secret.
    */
-  var toggleViewSecret = function () {
+  const toggleViewSecret = function () {
     if ($secret.hasClass('hidden')) {
       $secret.removeClass('hidden');
       $secretClear.addClass('hidden');
@@ -135,70 +136,52 @@ $(function () {
   /**
    * Update the secret strength component.
    */
-  var updateSecretStrength = async function () {
-    var secret = editedPassword.secret || '';
+  const updateSecretStrength = async function () {
+    const secret = editedPassword.secret || '';
+    const strength = secretComplexity.strength(secret);
+    const tplData = {
+      strengthId: secretComplexity.STRENGTH[strength].id,
+      strengthLabel: secretComplexity.STRENGTH[strength].label
+    };
 
-    // Calculate the secret strength.
-    var strength = secretComplexity.strength(secret),
-    // Data to pass to the template.
-      tplData = {
-        strengthId: secretComplexity.STRENGTH[strength].id,
-        strengthLabel: secretComplexity.STRENGTH[strength].label
-      };
-
-    return passbolt.html.loadTemplate($secretStrength, 'secret/strength.ejs', 'html', tplData)
-      .then(function () {
-        // Add class on the top container.
-        var containerClasses = $secretStrength.attr('class').split(' ');
-        if (containerClasses.length > 1) {
-          $secretStrength.removeClass(containerClasses.pop());
-        }
-        $secretStrength.addClass(secretComplexity.STRENGTH[strength].id);
-      }, onError);
+    try {
+      await passbolt.html.loadTemplate($secretStrength, 'secret/strength.ejs', 'html', tplData);
+      // Add class on the top container.
+      const containerClasses = $secretStrength.attr('class').split(' ');
+      if (containerClasses.length > 1) {
+        $secretStrength.removeClass(containerClasses.pop());
+      }
+      $secretStrength.addClass(secretComplexity.STRENGTH[strength].id);
+    } catch (error) {
+      onError(error);
+    }
   };
 
   /**
    * The secret is still encrypted, decrypt it.
    */
-  var decryptSecret = function () {
+  const decryptSecret = async function () {
     // If a decryption is already happening, don't trigger it twice.
     if ($secret.hasClass("decrypting")) {
       return;
     }
-
-    // Add class decrypting and change placeholder text to show something is happening
     $secret.addClass("decrypting");
     $secret.attr("placeholder", "decrypting...");
-
-    // Notify the application page regarding a running process
     passbolt.message.emit('passbolt.passbolt-page.loading');
 
-    // Request the secret decryption.
-    return passbolt.request('passbolt.secret-edit.decrypt', editedPassword.armored)
-      .then(
-        // If successfully decrypted.
-        // Store the secret locally, and change the component state, to allow
-        // the user to edit it.
-        function (secret) {
-          editedPassword.secret = secret;
-          secretStateChangeHandler('decrypted');
-          updateSecretStrength();
-          passbolt.message.emit('passbolt.passbolt-page.loading_complete');
-        },
-        // In case of failure.
-        // Reset the decrypting state.
-        function () {
-          $secret.removeClass("decrypting");
-          $secret.attr("placeholder", initialSecretPlaceholder);
-          passbolt.message.emit('passbolt.passbolt-page.loading_complete');
-        })
-
-      // Store the decrypted password in the model.
-      // It will be useful to other workers (here app when the user will save
-      // the password changes).
-      .then(function () {
-        return passbolt.request('passbolt.edit-password.set-edited-password', editedPassword);
-      }, onError);
+    // Retrieve the secret message.
+    try {
+      editedPassword.secret = await passbolt.request('passbolt.secret-edit.decrypt');
+      secretStateChangeHandler('decrypted');
+      updateSecretStrength();
+      await passbolt.request('passbolt.edit-password.set-edited-password', editedPassword);
+    } catch (error) {
+      $secret.attr("placeholder", initialSecretPlaceholder);
+      onError(error);
+    } finally {
+      $secret.removeClass("decrypting");
+      passbolt.message.emit('passbolt.passbolt-page.loading_complete');
+    }
   };
 
   /* ==================================================================================
@@ -208,7 +191,7 @@ $(function () {
   /**
    * When the addon-code orders the secret field to be focused.
    */
-  var onSecretFocusHandler = function () {
+  const onSecretFocusHandler = function () {
     $secret.focus();
   };
 
@@ -220,7 +203,7 @@ $(function () {
    * When the user explicitly wants to view the secret.
    * @param ev {HTMLEvent} The event which occurred
    */
-  var viewSecretButtonClickedHandler = function (ev) {
+  const viewSecretButtonClickedHandler = async function (ev) {
     ev.preventDefault();
 
     // The operation requires the secret to be decrypted.
@@ -232,17 +215,15 @@ $(function () {
       // If click on the non decrypted state, we remove the  focus. We do that
       // because the focus will be needed by the passphrase dialog.
       $(this).blur();
-      decryptSecret()
-        .then(function () {
-          toggleViewSecret();
-        });
+      await decryptSecret();
+      toggleViewSecret();
     }
   };
 
   /**
    * When the secret is updated.
    */
-  var secretFieldUpdatedHandler = function () {
+  const secretFieldUpdatedHandler = function () {
     // Because change is triggered even if input has been triggered previously
     // (1. user changes the input (input triggered); 2. users moves the focus (change triggered);)
     // Isolate the input binding and trigger change manually to avoid the double change call is useless.
@@ -275,7 +256,7 @@ $(function () {
   /**
    * When a user click on the secret/password field.
    */
-  var secretFieldFocusedHandler = function () {
+  const secretFieldFocusedHandler = function () {
     if (!isDecrypted()) {
       // If click on the non decrypted state, we remove the  focus. We do that
       // because the focus will be needed by the passphrase dialog.
@@ -289,7 +270,7 @@ $(function () {
   /**
    * When the clear secret is updated.
    */
-  var secretClearFieldUpdatedHandler = function () {
+  const secretClearFieldUpdatedHandler = function () {
     $secret.val($secretClear.val())
       .trigger('change');
   };
@@ -298,7 +279,7 @@ $(function () {
    * When the generate a new secret button is clicked.
    * @param ev {HTMLEvent} The event which occurred
    */
-  var generateSecretButtonClickedHandler = function (ev) {
+  const generateSecretButtonClickedHandler = function (ev) {
     ev.preventDefault();
 
     if ($(this).attr('disabled') == 'disabled') {
@@ -313,7 +294,7 @@ $(function () {
    * When tab is pressed in secret field, inform app, so it can put the focus on the next field.
    * @param ev {HTMLEvent} The event which occurred
    */
-  var secretFieldKeydownHandler = function (ev) {
+  const secretFieldKeydownHandler = function (ev) {
     if (!isDecrypted()) {
       ev.preventDefault();
       return false;
@@ -338,7 +319,7 @@ $(function () {
   /**
    * Handle secret validation success.
    */
-  var validateSuccessHandler = function () {
+  const validateSuccessHandler = function () {
     $secret.removeClass('error');
     $secretClear.removeClass('error');
 
@@ -359,7 +340,7 @@ $(function () {
    * @param message {string} The error message
    * @param validationErrors {array} The detailed error by fields.
    */
-  var validateErrorHandler = function (message, validationErrors) {
+  const validateErrorHandler = function (message, validationErrors) {
     var error = '';
 
     $secret.addClass('error');
@@ -397,7 +378,7 @@ $(function () {
    *
    * @param state {string} The state to switch to. Can be : encrypted or decrypted
    */
-  var secretStateChangeHandler = function (state) {
+  const secretStateChangeHandler = function (state) {
     if (state === 'encrypted') {
       $secret.attr('placeholder', 'click here to unlock')
         .parent().addClass('has-encrypted-secret');

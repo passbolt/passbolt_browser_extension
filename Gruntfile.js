@@ -184,7 +184,9 @@ module.exports = function(grunt) {
           // xregexp
           {expand: true, cwd: path.node_modules + 'xregexp', src: 'xregexp-all.js', dest: path.src_content_vendors},
           // downloadjs (for download with save as).
-          {expand: true, cwd: path.node_modules + 'downloadjs', src: 'download.js', dest: path.src_content_vendors}
+          {expand: true, cwd: path.node_modules + 'downloadjs', src: 'download.js', dest: path.src_content_vendors},
+          // validator
+          {expand: true, cwd: path.node_modules + 'validator', src: 'validator.js', dest: path.src_content_vendors}
 
            // TODO PASSBOLT-2219 Fix / Add missing Vendors
           // In src_content_vendors

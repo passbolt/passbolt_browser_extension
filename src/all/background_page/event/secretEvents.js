@@ -3,12 +3,13 @@
  *
  * Used for encryption and decryption events
  *
- * @copyright (c) 2017 Passbolt SARL
+ * @copyright (c) 2017 Passbolt SARL, 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-var masterPasswordController = require('../controller/masterPasswordController');
 var Crypto = require('../model/crypto').Crypto;
+var masterPasswordController = require('../controller/masterPasswordController');
+var progressDialogController = require('../controller/progressDialogController');
 var Worker = require('../model/worker');
 var Secret = require('../model/secret').Secret;
 var secret = new Secret();
@@ -46,25 +47,30 @@ var listen = function (worker) {
    *
    * @listens passbolt.secret-edit.decrypt
    * @param requestId {uuid} The request identifier
-   * @param armored {string} The armored secret
    */
-  worker.port.on('passbolt.secret-edit.decrypt', function (requestId, armored) {
-    var crypto = new Crypto();
+  worker.port.on('passbolt.secret-edit.decrypt', async function (requestId) {
+    const editedPassword = TabStorage.get(worker.tab.id, 'editedPassword');
+    const resourceId = editedPassword.resourceId;
+    const crypto = new Crypto();
+    const appWorker = Worker.get('App', worker.tab.id);
 
-    // Master password required to decrypt a secret.
-    masterPasswordController.get(worker)
-
-      // Once the master password retrieved, decrypt the secret.
-      .then(function (masterPassword) {
-        return crypto.decrypt(armored, masterPassword)
-      })
-
-      // Once the secret is decrypted, respond to the requester.
-      .then(function (decrypted) {
-        worker.port.emit(requestId, 'SUCCESS', decrypted);
-      }, function (error) {
+    try {
+      const secretPromise = Secret.findByResourceId(resourceId);
+      const masterPassword = await masterPasswordController.get(worker);
+      await progressDialogController.open(appWorker, 'Decrypting...');
+      const secret = await secretPromise;
+      const message = await crypto.decrypt(secret.data, masterPassword);
+      editedPassword.secret = message;
+      worker.port.emit(requestId, 'SUCCESS', message);
+    } catch (error) {
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
         worker.port.emit(requestId, 'ERROR', error);
-      });
+      }
+    } finally {
+      progressDialogController.close(appWorker);
+    }
   });
 
   /*

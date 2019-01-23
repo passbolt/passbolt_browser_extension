@@ -29,6 +29,7 @@ $(function () {
   /*
    * Open the secret field control component when a password is created or edited.
    * @listens passbolt.plugin.resource_edition
+   * @deprecated since v2.7 will be removed in v3.0
    */
   window.addEventListener("passbolt.plugin.resource_edition", function () {
     var editData = {
@@ -51,6 +52,27 @@ $(function () {
         _insertIframe(dialogCase);
       });
   }, false);
+
+  /*
+   * Open the secret field control component when a password is created or edited.
+   * @listens passbolt.plugin.resource_edition
+   */
+  window.addEventListener("passbolt.plugin.resource_edit", async function (event) {
+    const data = event.detail;
+    let resourceId;
+    if (typeof data == 'string' && validator.isUUID(data)) {
+      resourceId = data;
+    }
+    const editData = {
+        armored: null,
+        resourceId: resourceId,
+        secret: resourceId ? null : ''
+      };
+    const dialogCase = resourceId ? 'edit' : 'create';
+    await passbolt.request('passbolt.edit-password.set-edited-password', editData);
+    _insertIframe(dialogCase);
+  }, false);
+
 
 });
 undefined; // result must be structured-clonable data

@@ -5,7 +5,7 @@
  * It is inserted in all the pages of a domain that is trusted.
  * Such trust is defined during the first step of the setup process (or in config-debug)
  *
- * @copyright (c) 2017 Passbolt SARL
+ * @copyright (c) 2017 Passbolt SARL, 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var app = require('../app');
@@ -53,6 +53,7 @@ PassboltApp.initPageMod = function () {
     ],
     contentScriptFile: [
       'data/vendors/jquery.js',
+      'data/vendors/validator.js',
 
       // Templates
       'data/tpl/group.js',

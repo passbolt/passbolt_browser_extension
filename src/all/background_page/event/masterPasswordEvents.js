@@ -58,8 +58,8 @@ var listen = function (worker) {
    * @listens passbolt.master-password.cancel
    */
   worker.port.on('passbolt.master-password.cancel', function () {
-    var masterPasswordRequest = TabStorage.get(worker.tab.id, 'masterPasswordRequest'),
-      appWorker = Worker.get('App', worker.tab.id);
+    const masterPasswordRequest = TabStorage.get(worker.tab.id, 'masterPasswordRequest');
+    const appWorker = Worker.get('App', worker.tab.id);
 
     // If the request hasn't been destroyed already.
     // After reaching 3 attempts the requests is destroyed by the

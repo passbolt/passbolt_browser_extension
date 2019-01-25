@@ -1,7 +1,7 @@
 /**
  * Main App.
  *
- * @copyright (c) 2017 Passbolt SARL
+ * @copyright (c) 2017-2018 Passbolt SARL, 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
@@ -319,12 +319,19 @@ $(function () {
 
 
   // Listen when the user requests an export of passwords.
-  window.addEventListener('passbolt.export-passwords', function (evt) {
+  // @deprecated with v2.7.0 will be removed with v3.0
+  window.addEventListener('passbolt.export-passwords', async function (evt) {
     var resources = evt.detail.resources;
-    passbolt.request('passbolt.app.export-passwords-init', resources)
-    .then(function() {
-      passbolt.request('passbolt.export-passwords.open-dialog');
-    });
+    if (resources && resources.length) {
+      const resourcesIds = resources.reduce((carry, resource) => [...carry, resource.id], []);
+      await passbolt.request('passbolt.app.export-resources', resourcesIds)
+    }
+  });
+
+  // Listen when the user requests an export of passwords.
+  window.addEventListener('passbolt.plugin.export_resources', async function (evt) {
+    var resourcesIds = evt.detail;
+    await passbolt.request('passbolt.app.export-resources', resourcesIds)
   });
 
   // Listen when the user requests an import of passwords.

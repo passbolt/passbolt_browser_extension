@@ -12,6 +12,7 @@ const InvalidMasterPasswordError = require('../error/invalidMasterPasswordError'
 var Keyring = require('../model/keyring').Keyring;
 var masterPasswordController = require('../controller/masterPasswordController');
 var progressDialogController = require('../controller/progressDialogController');
+const ResourceExportController = require('../controller/resource/resourceExportController').ResourceExportController;
 var Secret = require('../model/secret').Secret;
 var secret = new Secret();
 var TabStorage = require('../model/tabStorage').TabStorage;
@@ -204,14 +205,17 @@ var listen = function (worker) {
   /*
    * Initialize the export passwords process.
    *
-   * @listens passbolt.app.export-passwords-init
+   * @listens passbolt.app.export-resources
    * @param requestId {uuid} The request identifier
-   * @param resources {array} The list of resources to export
+   * @param resourcesIds {array} The list of resources ids to export
    */
-  worker.port.on('passbolt.app.export-passwords-init', function (requestId, resources) {
-    // Store some variables in the tab storage in order to make it accessible by other workers.
-    TabStorage.set(worker.tab.id, 'exportedResources', resources);
-    worker.port.emit(requestId, 'SUCCESS');
+  worker.port.on('passbolt.app.export-resources', async function (requestId, resourcesIds) {
+    try {
+      await ResourceExportController.exec(worker, resourcesIds);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+    }
   });
 };
 

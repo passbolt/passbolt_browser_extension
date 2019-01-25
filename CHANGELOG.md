@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PASSBOLT-3316: As LU Sharing a password I should see a loading feedback when the extension is requesting the API
 - PASSBOLT-3318: As LU I should retrieve a secret when I'm copying it
 - PASSBOLT-3319: As LU I should retrieve a secret when I'm editing it
+- PASSBOLT-3403: As LU I should retrieve secrets when I'm exporting the associated passwords
 
 ## [2.4.6] - 2018-12-18
 ### Fix

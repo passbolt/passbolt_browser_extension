@@ -15,14 +15,35 @@ const __ = require('../sdk/l10n').get;
 const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
 const User = require('../model/user').User;
 
-class SecretService {}
+class ResourceServices {}
 
 /**
- * Find a secret by resource id.
- * @param {string} string The target resource id
- * @returns {object}
+ * Find all the resources with given resources ids
+ * @param {array} resourcesIds The list of resources to find
+ * @returns {array} The list of resources
  */
-SecretService.findByResourceId = async function (resourceId) {
+ResourceServices.findAllByResourcesIds = async function (resourcesIds, options) {
+  // Find by batch of 100 resources to avoid 414 server error.
+  const batchSize = 100;
+  let resources = [];
+  const totalBatches = Math.ceil(resourcesIds.length / batchSize);
+  for (let i = 0; i < totalBatches; i++) {
+    const resourcesIdsPart = resourcesIds.splice(0, batchSize);
+    const optionsPart = Object.assign({filter:{hasId: resourcesIdsPart}}, options);
+    const resourcesPart = await ResourceServices.findAll(optionsPart);
+    resources = [...resources, ...resourcesPart];
+  }
+
+  return resources;
+};
+
+/**
+ * Find all the resources
+ * @param {object} options Optional parameters
+ * @returns {array} The list of resources
+ */
+ResourceServices.findAll = async function (options) {
+  options = options || {};
   const user = User.getInstance();
   const domain = user.settings.getDomain();
   const fetchOptions = {
@@ -33,7 +54,15 @@ SecretService.findByResourceId = async function (resourceId) {
       'content-type': 'application/json'
     }
   };
-  const url = new URL(`${domain}/secrets/resource/${resourceId}.json?api-version=2`);
+  const url = new URL(`${domain}/resources.json?api-version=2`);
+  if (options.contain && options.contain.secret) {
+    url.searchParams.append('contain[secret]', '1');
+  }
+  if (options.filter && options.filter.hasId) {
+    options.filter.hasId.forEach(resourceId => {
+      url.searchParams.append(`filter[has-id][]`, resourceId);
+    });
+  }
   let response, responseJson;
 
   try {
@@ -61,4 +90,4 @@ SecretService.findByResourceId = async function (resourceId) {
   return responseJson.body;
 };
 
-exports.SecretService = SecretService;
+exports.ResourceServices = ResourceServices;

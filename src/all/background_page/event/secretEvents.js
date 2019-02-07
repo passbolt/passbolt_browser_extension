@@ -53,9 +53,15 @@ var listen = function (worker) {
     const resourceId = editedPassword.resourceId;
     const crypto = new Crypto();
     const appWorker = Worker.get('App', worker.tab.id);
+    let secretPromise;
 
     try {
-      const secretPromise = Secret.findByResourceId(resourceId);
+      if (editedPassword.armored == null) {
+        secretPromise = Secret.findByResourceId(resourceId);
+      } else {
+        // @deprecated since v2.7 will be removed in v3.0. The amored secret is found with a request to the API prior to v2.7
+        secretPromise = {data: editedPassword.armored};
+      }
       const masterPassword = await masterPasswordController.get(worker);
       await progressDialogController.open(appWorker, 'Decrypting...');
       const secret = await secretPromise;

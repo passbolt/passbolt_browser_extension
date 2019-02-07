@@ -65,7 +65,7 @@ var listen = function (worker) {
 
   /*
    * Encrypt the shared password for all the new users it has been shared with.
-   * @listens passbolt.share.encrypt
+   * @listens passbolt.share.submit
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.share.submit', async function (requestId, changes) {

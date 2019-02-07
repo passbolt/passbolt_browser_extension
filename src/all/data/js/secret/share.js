@@ -52,7 +52,7 @@ $(function () {
   const submitChanges = async function() {
     return passbolt.request('passbolt.share.submit', shareChanges._changes)
       .then(null, (error) => {
-        console.log('error', error);
+        console.error('error', error);
       });
   };
 

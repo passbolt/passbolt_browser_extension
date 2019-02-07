@@ -65,40 +65,6 @@ $(function () {
   });
 
   /* ==================================================================================
-   *  Share & share autocomplete
-   * ================================================================================== */
-
-  // A permission has been added through the share iframe.
-  passbolt.message.on('passbolt.share.add-permission', function (permission) {
-    passbolt.message.emitToPage('resource_share_add_permission', permission);
-  });
-
-  // A permission is deleted, the aro shouldn't be listed anymore by the autocomplete
-  // result list component.
-  window.addEventListener('passbolt.share.remove_permission', function (event) {
-    var data = event.detail,
-    // The aro the permission has been deleted for.
-      aroId = data.userId;
-
-    // Notify the share dialog about this change
-    passbolt.message.emit('passbolt.share.remove-permission', aroId);
-  });
-
-  // When the user wants to share a password with other people.
-  // secret for the users the resource is shared with.
-  // Dispatch this event to the share iframe which will take care of the encryption.
-  window.addEventListener('passbolt.share.encrypt', function () {
-    // Request the share dialog to encrypt the secret for the new users.
-    passbolt.request('passbolt.share.encrypt').then(function (armoreds) {
-      // Notify the App with the encrypted secret.
-      passbolt.message.emitToPage('resource_share_encrypted', armoreds);
-    }, function () {
-      // Notify the App that the share encryption process has been canceled.
-      passbolt.message.emitToPage('passbolt.plugin.share.canceled');
-    });
-  });
-
-  /* ==================================================================================
    *  Group edit
    * ================================================================================== */
 

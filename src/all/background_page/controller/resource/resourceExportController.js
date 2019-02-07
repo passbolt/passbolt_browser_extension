@@ -35,7 +35,7 @@ class ResourceExportController {
       await progressDialogPromise;
       worker.port.emit('passbolt.export-passwords.open-dialog');
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       progressDialogController.close(appWorker);
     }

@@ -95,7 +95,7 @@ grunt watch
 
 To launch an instance of Firefox with your local version of the add-on installed.
 ```
-cd dist/all
+cd build/all
 web-ext run
 ```
 

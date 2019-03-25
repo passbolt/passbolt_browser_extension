@@ -2,11 +2,10 @@
  * Keyring events
  * @TODO refactor with public and private listeners separate
  *
- * @copyright (c) 2017 Passbolt SARL
+ * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var __ = require('../sdk/l10n').get;
-
+const __ = require('../sdk/l10n').get;
 var Keyring = require('../model/keyring').Keyring;
 var Key = require('../model/key').Key;
 var Config = require('../model/config');
@@ -176,16 +175,13 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param passphrase {string} The passphrase to check
    */
-  worker.port.on('passbolt.keyring.private.checkpassphrase', function (requestId, passphrase) {
-    keyring.checkPassphrase(passphrase).then(
-      function () {
-        worker.port.emit(requestId, 'SUCCESS');
-      },
-      function (error) {
-        console.error(error);
-        worker.port.emit(requestId, 'ERROR', __('This is not a valid passphrase'));
-      }
-    );
+  worker.port.on('passbolt.keyring.private.checkpassphrase', async function (requestId, passphrase) {
+    try {
+      await keyring.checkPassphrase(passphrase);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+    }
   });
 
   /* ==================================================================================

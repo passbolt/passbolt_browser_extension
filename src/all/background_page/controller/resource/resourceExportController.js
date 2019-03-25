@@ -12,7 +12,7 @@
  * @since         2.7.0
  */
 const progressDialogController = require('../../controller/progressDialogController');
-const ResourceServices = require('../../service/resource').ResourceServices;
+const ResourceService = require('../../service/resource').ResourceService;
 const TabStorage = require('../../model/tabStorage').TabStorage;
 const Worker = require('../../model/worker');
 
@@ -29,7 +29,7 @@ class ResourceExportController {
     const appWorker = Worker.get('App', worker.tab.id);
     try {
       const progressDialogPromise = progressDialogController.open(appWorker, 'Retrieving passwords...');
-      const resources = await ResourceServices.findAllByResourcesIds(resourcesIds, {contain:{secret: 1}});
+      const resources = await ResourceService.findAllByResourcesIds(resourcesIds, {contain:{secret: 1}});
       progressDialogController.close(appWorker);
       TabStorage.set(worker.tab.id, 'exportedResources', resources);
       await progressDialogPromise;

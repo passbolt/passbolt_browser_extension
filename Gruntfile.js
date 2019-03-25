@@ -65,12 +65,12 @@ module.exports = function(grunt) {
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
 
   grunt.registerTask('build-firefox', ['build-firefox-debug', 'build-firefox-prod']);
-  grunt.registerTask('build-firefox-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-firefox', 'bundle-test', 'shell:build_firefox_debug']);
-  grunt.registerTask('build-firefox-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-firefox', 'clean:debug_data', 'shell:build_firefox_prod']);
+  grunt.registerTask('build-firefox-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-firefox', 'bundle-test', 'shell:build_quickaccess_debug', 'shell:build_firefox_debug']);
+  grunt.registerTask('build-firefox-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-firefox', 'clean:debug_data', 'shell:build_quickaccess_prod', 'shell:build_firefox_prod']);
 
   grunt.registerTask('build-chrome', ['build-chrome-debug', 'build-chrome-prod']);
-  grunt.registerTask('build-chrome-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chrome', 'bundle-test', 'shell:build_chrome_debug']);
-  grunt.registerTask('build-chrome-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome', 'clean:debug_data', 'shell:build_chrome_prod']);
+  grunt.registerTask('build-chrome-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chrome', 'bundle-test', 'shell:build_quickaccess_debug', 'shell:build_chrome_debug']);
+  grunt.registerTask('build-chrome-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome', 'clean:debug_data', 'shell:build_quickaccess_prod', 'shell:build_chrome_prod']);
 
   /**
    * Main grunt tasks configuration
@@ -158,7 +158,7 @@ module.exports = function(grunt) {
       },
       data: {
         files: [
-          {expand: true, cwd: path.src + 'data', src: ['**', '!tpl/**', '!ejs/**'], dest: path.build + 'data'}
+          {expand: true, cwd: path.src + 'data', src: ['**', '!tpl/**', '!ejs/**', '!js/quickaccess/popup/**'], dest: path.build + 'data'}
         ]
       },
       // switch manifest file to firefox or chrome
@@ -186,7 +186,12 @@ module.exports = function(grunt) {
           // downloadjs (for download with save as).
           {expand: true, cwd: path.node_modules + 'downloadjs', src: 'download.js', dest: path.src_content_vendors},
           // validator
-          {expand: true, cwd: path.node_modules + 'validator', src: 'validator.js', dest: path.src_content_vendors}
+          {expand: true, cwd: path.node_modules + 'validator', src: 'validator.js', dest: path.src_content_vendors},
+          // react / react-dom
+          {expand: true, cwd: path.node_modules + 'react/umd', src: 'react.production.min.js', dest: path.src_content_vendors},
+          {expand: true, cwd: path.node_modules + 'react-dom/umd', src: 'react-dom.production.min.js', dest: path.src_content_vendors},
+          // simplebar
+          {expand: true, cwd: path.node_modules + 'simplebar/dist', src: 'simplebar.js', dest: path.src_content_vendors},
 
            // TODO PASSBOLT-2219 Fix / Add missing Vendors
           // In src_content_vendors
@@ -214,14 +219,20 @@ module.exports = function(grunt) {
           // Controls
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/controls',
-          src: ['colorpicker/**', 'infinite-bar.gif', 'loading_dark.svg', 'loading_light.svg'],
+          src: ['colorpicker/**', 'dot_black.svg', 'dot_red.svg', 'infinite-bar.gif', 'loading_dark.svg', 'loading_light.svg'],
           dest: path.build_data + 'img/controls',
           expand: true
         }, {
-          // Icons
+          nonull: true,
+          cwd: path.node_modules + 'passbolt-styleguide/src/img/fa/fas',
+          src: ['chevron-right.svg', 'check.svg'],
+          dest: path.build_data + 'img/fa/fas',
+          expand: true
+        }, {
+          // Icons / logo
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/logo',
-          src: ['icon-19.png', 'icon-20_white.png', 'icon-48.png', 'icon-48_white.png', 'logo.png', 'logo@2x.png'],
+          src: ['icon-19.png', 'icon-20_white.png', 'icon-48.png', 'icon-48_white.png', 'logo.png', 'logo@2x.png', 'logo.svg'],
           dest: path.build_data + 'img/logo',
           expand: true
         }, {
@@ -241,7 +252,7 @@ module.exports = function(grunt) {
         }, {
           // CSS files default
           cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/default',
-          src: ['ext_config_debug.min.css', 'ext_external.min.css', 'ext_iframe.min.css', 'ext_setup.min.css'],
+          src: ['ext_config_debug.min.css', 'ext_external.min.css', 'ext_iframe.min.css', 'ext_setup.min.css', 'ext_quickaccess.min.css'],
           dest: path.build_data + 'css/themes/default',
           expand: true
         }, {
@@ -249,6 +260,12 @@ module.exports = function(grunt) {
           cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/midgar',
           src: ['ext_iframe.min.css'],
           dest: path.build_data + 'css/themes/midgar',
+          expand: true
+        }, {
+          // Fonts
+          cwd: path.node_modules + 'passbolt-styleguide/src/fonts',
+          src: ['opensans-bold.woff', 'opensans-regular.woff'],
+          dest: path.build_data + 'fonts',
           expand: true
         }]
       }
@@ -275,6 +292,19 @@ module.exports = function(grunt) {
      */
     shell: {
       options: {stderr: false},
+
+      /**
+       * Quickaccess popup
+       */
+      build_quickaccess_prod: {
+        command: "./node_modules/.bin/webpack"
+      },
+      build_quickaccess_debug: {
+        command: "./node_modules/.bin/webpack --config webpack.dev.config.js"
+      },
+      watch_quickaccess_debug: {
+        command: "./node_modules/.bin/webpack --watch --config webpack.dev.config.js"
+      },
 
       /**
        * Firefox
@@ -338,7 +368,7 @@ module.exports = function(grunt) {
         options: {spawn: false}
       },
       data: {
-        files: [path.src + 'data/**/*.*', '!' + path.src + 'data/tpl/**', '!' + path.src + 'data/ejs/**'],
+        files: [path.src + 'data/**/*.*', '!' + path.src + 'data/tpl/**', '!' + path.src + 'data/ejs/**', '!' + path.src + 'js/quickaccess/popup/**'],
         tasks: ['copy:data'],
         options: {spawn: false}
       },

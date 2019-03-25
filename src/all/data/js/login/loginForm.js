@@ -122,7 +122,7 @@ $(function () {
    * Try to login the user.
    * @param masterPassword {string} The user passphrase
    */
-  var loginAttempt = function (masterPassword) {
+  var loginAttempt = async function (masterPassword) {
     if ($loginSubmit.hasClass('processing')) {
       return;
     }
@@ -131,17 +131,13 @@ $(function () {
     $loginMessage.text('Please wait...');
     $loginSubmit.addClass('disabled').addClass('processing');
 
-    // Check the passphrase.
-    passbolt.request('passbolt.keyring.private.checkpassphrase', masterPassword).then(
-      // If the passphrase is valid, login the user.
-      function success() {
-        login(masterPassword);
-      },
-      // If the passphrase is invalid, display an error feedback.
-      function fail(msg) {
-        invalidPassphrase(msg);
-      }
-    );
+    try {
+      // Check the passphrase.
+      await passbolt.request('passbolt.keyring.private.checkpassphrase', masterPassword);
+      login(masterPassword);
+    } catch (error) {
+      invalidPassphrase(error.message);
+    }
   };
 
   /* ==================================================================================

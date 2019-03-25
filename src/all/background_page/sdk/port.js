@@ -61,4 +61,32 @@ Port.prototype.getEmitableError = function (error) {
   return emitableError;
 };
 
+/**
+ * Send a message to the content code
+ *
+ * @param msgName string
+ * @param token uuid
+ * @param status SUCCESS | ERROR
+ */
+Port.prototype.request = function (message) {
+  Log.write({level: 'debug', message: 'Port request @ message: ' + arguments[1]});
+  // The generated requestId used to identify the request.
+  const requestId = (Math.round(Math.random() * Math.pow(2, 32))).toString();
+  // Add the requestId to the request parameters.
+  const requestArgs = [message, requestId].concat(Array.prototype.slice.call(arguments, 1));
+
+  return new Promise((resolve, reject) => {
+    this.on(requestId, function(status) {
+      const responseArgs = Array.prototype.slice.call(arguments, 1);
+      if (status == 'SUCCESS') {
+        resolve.apply(null, responseArgs);
+      }
+      else if (status == 'ERROR') {
+        reject.apply(null, responseArgs);
+      }
+    });
+    this.emit.apply(this, requestArgs);
+  });
+};
+
 exports.Port = Port;

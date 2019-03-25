@@ -156,7 +156,7 @@ PageMod.prototype.__initConnectListener = function(portName, tabId, iframe) {
       // add the sender tab id to the list of active tab for that worker
       if(typeof tabId === 'undefined' || tabId === port.sender.tab.id) {
         _this._ports[port.sender.tab.id] = port;
-        var worker = new Worker(port, iframe);
+        var worker = new Worker(port, port.sender.tab, iframe, _this);
         _this.args.onAttach(worker);
       }
     }

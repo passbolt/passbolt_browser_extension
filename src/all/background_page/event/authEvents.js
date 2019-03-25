@@ -3,14 +3,48 @@
  *
  * Used to handle the events related to authentication.
  *
- * @copyright (c) 2017 Passbolt SARL
+ * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var GpgAuth = require('../model/gpgauth').GpgAuth;
-var Worker = require('../model/worker');
-var AuthController = require('../controller/authController').AuthController;
+const AuthController = require('../controller/authController').AuthController;
+const GpgAuth = require('../model/gpgauth').GpgAuth;
+const User = require('../model/user').User;
+const Worker = require('../model/worker');
 
-var listen = function (worker) {
+const listen = function (worker) {
+  /*
+   * Check if the user is logged in.
+   *
+   * @listens passbolt.auth.is-logged-in
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.auth.is-logged-in', async function (requestId) {
+    const user = User.getInstance();
+
+    try {
+      await user.isLoggedIn();
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      worker.port.emit(requestId, 'ERROR');
+    }
+  });
+
+  /*
+   * Logout.
+   *
+   * @listens passbolt.auth.logout
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.auth.logout', async function (requestId) {
+    const auth = new GpgAuth();
+
+    try {
+      await auth.logout();
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      worker.port.emit(requestId, 'ERROR');
+    }
+  });
 
   /*
    * Verify the server identity.

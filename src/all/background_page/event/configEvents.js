@@ -5,7 +5,6 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var BrowserSettings = require('../controller/browserSettingsController');
-var tabsController = require('../controller/tabsController');
 var Config = require('../model/config');
 var User = require('../model/user').User;
 

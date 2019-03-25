@@ -37,10 +37,13 @@ events.keyring = require('./event/keyringEvents');
 events.masterPasswordIframe = require('./event/masterPasswordIframeEvents');
 events.masterPassword = require('./event/masterPasswordEvents');
 events.passboltPage = require('./event/passboltPageEvents');
+events.quickAccess = require('./event/quickAccessEvents');
+events.resource = require('./event/resourceEvents');
 events.secret = require('./event/secretEvents');
 events.setup = require('./event/setupEvents');
 events.setupbootstrap = require('./event/setupBootstrapEvents');
 events.share = require('./event/shareEvents');
+events.tab = require('./event/tabEvents');
 events.user = require('./event/userEvents');
 events.siteSettings = require('./event/siteSettingsEvents');
 
@@ -105,6 +108,12 @@ pageMods.SetupBootstrap = require('./pagemod/setupBootstrapPagemod').SetupBootst
  * The reset of the setup process is driven on the add-on side, see in ../data/ setup.html and js/setup.js
  */
 pageMods.Setup = require('./pagemod/setupPagemod').Setup;
+
+/*
+ * This page mod drives the reset of setup process
+ * The reset of the setup process is driven on the add-on side, see in ../data/ setup.html and js/setup.js
+ */
+pageMods.QuickAccess = require('./pagemod/quickAccessPagemod').QuickAccess;
 
 /*
  * This pagemod drives the main addon app

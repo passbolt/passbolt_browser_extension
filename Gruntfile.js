@@ -72,6 +72,8 @@ module.exports = function(grunt) {
   grunt.registerTask('build-chrome-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chrome', 'bundle-test', 'shell:build_quickaccess_debug', 'shell:build_chrome_debug']);
   grunt.registerTask('build-chrome-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome', 'clean:debug_data', 'shell:build_quickaccess_prod', 'shell:build_chrome_prod']);
 
+  grunt.registerTask('test', ['shell:test_quickaccess']);
+
   /**
    * Main grunt tasks configuration
     */
@@ -304,6 +306,10 @@ module.exports = function(grunt) {
       },
       watch_quickaccess_debug: {
         command: "./node_modules/.bin/webpack --watch --config webpack.dev.config.js"
+      },
+      test_quickaccess: {
+        stdout: true,
+        command: "jest --config ./src/all/data/js/quickaccess/popup/.jest.config.json --no-cache ./src/all/data/js/quickaccess/popup --maxWorkers=4"
       },
 
       /**

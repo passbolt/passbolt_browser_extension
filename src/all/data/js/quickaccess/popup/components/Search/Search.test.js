@@ -1,7 +1,6 @@
 import React from "react";
 import Search from "./Search";
 import { render, fireEvent, waitForElement, cleanup } from 'react-testing-library';
-import 'jest-dom/extend-expect'
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -12,11 +11,6 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("Search", () => {
-
-  it("should match the snapshot", () => {
-    const component = render(<Search debug />);
-    expect(component.container).toMatchSnapshot();
-  });
 
   it("should render the prop search as default input value", () => {
     const component = render(<Search search="search keywords" debug />);

@@ -13,29 +13,11 @@ afterEach(cleanup);
 
 describe("PassphraseDialog", () => {
 
-  it("should match the snapshot", () => {
-    const appContext = {
-      userSettings: {
-        securityToken: {
-          code: "COD"
-        }
-      }
-    };
-    const component = render(
-      <AppContext.Provider value={appContext}>
-        <PassphraseDialog debug />
-      </AppContext.Provider>
-    );
-    expect(component.container).toMatchSnapshot();
-  });
-
-  it("should execute the onSuccess prop function when the passphrase is correct", async () => {
+  it("should execute the onComplete prop function when the passphrase is correct", async () => {
     const onComplete = jest.fn();
     const appContext = {
-      userSettings: {
-        securityToken: {
-          code: "COD"
-        }
+      user: {
+        "user.settings.securityToken.code": "COD"
       }
     };
     const component = render(

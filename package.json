@@ -52,8 +52,6 @@
     "webpack-cli": "^3.3.0"
   },
   "scripts": {
-    "build": "webpack",
-    "watch": "webpack --watch --config webpack.dev.config.js",
-    "test": "jest --maxWorkers=4"
+    "test": "grunt test"
   }
 }

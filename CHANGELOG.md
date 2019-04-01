@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [2.7.0] - 2019-02-08
 ### Improvement
 - PASSBOLT-3347: When the extension requires the users to enter their master password, the popup should be displayed with no delay
 - PASSBOLT-3313: As GM adding a user to a group I should see the loading popup when the extension is processing/requesting the API
@@ -323,7 +325,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.6...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.7.0...HEAD
+[2.7.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.6...v2.7.0
 [2.4.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.5...v2.4.6
 [2.4.5]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.4...v2.4.5
 [2.4.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.3...v2.4.4

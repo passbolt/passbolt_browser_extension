@@ -5,7 +5,7 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var passbolt = passbolt || {};
+var passbolt = window.passbolt || {};
 
 (function (passbolt) {
 
@@ -88,31 +88,30 @@ var passbolt = passbolt || {};
    * @returns {Promise}
    */
   passbolt.request = function(message) {
-    // The promise that is return when you call passbolt.request.
-    var deferred = $.Deferred(),
     // The generated requestId used to identify the request.
-      requestId = (Math.round(Math.random() * Math.pow(2, 32))).toString(),
+    const requestId = (Math.round(Math.random() * Math.pow(2, 32))).toString();
     // Add the requestId to the request parameters.
-      requestArgs = [message, requestId].concat(Array.prototype.slice.call(arguments, 1));
+    const requestArgs = [message, requestId].concat(Array.prototype.slice.call(arguments, 1));
 
-    // Observe when the request has been completed.
-    // Or if a progress notification is sent.
-    self.port.once(requestId, function handleResponse(status) {
-      var callbackArgs = Array.prototype.slice.call(arguments, 1);
-      if (status == 'SUCCESS') {
-        deferred.resolveWith(this, callbackArgs);
-        //self.port.removeListener(requestId, handleResponse);
-      }
-      else if (status == 'ERROR') {
-        deferred.rejectWith(this, callbackArgs);
-        //self.port.removeListener(requestId, handleResponse);
-      }
+    // The promise that is return when you call passbolt.request.
+    return new Promise((resolve, reject) => {
+      // Observe when the request has been completed.
+      // Or if a progress notification is sent.
+      self.port.once(requestId, function handleResponse(status) {
+        const callbackArgs = Array.prototype.slice.call(arguments, 1);
+        if (status == 'SUCCESS') {
+          resolve.apply(null, callbackArgs);
+        }
+        else if (status == 'ERROR') {
+          reject.apply(null, callbackArgs);
+        }
+      });
+
+      // Emit the message to the addon-code.
+      self.port.emit.apply(self.port, requestArgs);
     });
-
-    // Emit the message to the addon-code.
-    self.port.emit.apply(self.port, requestArgs);
-
-    return deferred;
   };
 
 })( passbolt );
+
+window.passbolt = passbolt;

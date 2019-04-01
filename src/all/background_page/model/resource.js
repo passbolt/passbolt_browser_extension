@@ -4,14 +4,16 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var __ = require('../sdk/l10n').get;
+const __ = require('../sdk/l10n').get;
 const Request = require('./request').Request;
-var User = require('./user').User;
+const User = require('./user').User;
+const browser = require("webextension-polyfill/dist/browser-polyfill");
+const ResourceService = require('../service/resource').ResourceService;
 
 /**
  * The class that deals with resources.
  */
-var Resource = function () {
+const Resource = function () {
   this.name = "";
   this.uri = "";
   this.username = "";
@@ -207,5 +209,36 @@ Resource.findShareResources = async function (resourcesIds) {
   return json.body;
 };
 
-// Exports the Resource object.
+/**
+ * Update the resources local storage with the latest API resources the user has access.
+ * @return {Promise}
+ */
+const FLUSH_RESOURCES_LOCAL_STORAGE_TIME = 20 * 60 * 1000;
+let flushResourcesLocalStorageTimeout = null;
+Resource.updateLocalStorage = async function() {
+  const resources = await ResourceService.findAll();
+  browser.storage.local.set({ resources });
+
+  // Ensure there is no sensitive information stored in the local storage after
+  // a certain period of time defined by the constant FLUSH_RESOURCES_LOCAL_STORAGE_TIME.
+  if (flushResourcesLocalStorageTimeout) {
+    clearTimeout(flushResourcesLocalStorageTimeout);
+  }
+  flushResourcesLocalStorageTimeout = setTimeout(() => {
+    browser.storage.local.remove("resources");
+  }, FLUSH_RESOURCES_LOCAL_STORAGE_TIME);
+}
+
+/**
+ * Observe when the user session is terminated.
+ * Flush the resources local storage.
+ */
+window.addEventListener("passbolt.session.terminated", () => {
+  browser.storage.local.remove("resources");
+  clearTimeout(flushResourcesLocalStorageTimeout);
+});
+
+// Ensure the resources local storage is flushed when the browser start.
+browser.storage.local.remove("resources");
+
 exports.Resource = Resource;

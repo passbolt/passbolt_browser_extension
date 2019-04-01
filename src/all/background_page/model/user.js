@@ -422,15 +422,22 @@ const User = (function () {
   };
 
   /**
+   * Check if the master password is stored.
+   * @return {boolean}
+   */
+  this.isMasterPasswordStored = function() {
+    return this._masterPassword !== null;
+  }
+
+  /**
    * Retrieve master password from memory, in case it was stored temporarily
    * by the user.
    * @returns {Promise}
    */
   this.getStoredMasterPassword = function () {
-    var self = this;
-    return new Promise (function(resolve, reject) {
-      if (self._masterPassword !== null) {
-        resolve(self._masterPassword.password);
+    return new Promise ((resolve, reject) => {
+      if (this.isMasterPasswordStored()) {
+        resolve(this._masterPassword.password);
       } else {
         reject(new Error(__('No master password stored.')));
       }

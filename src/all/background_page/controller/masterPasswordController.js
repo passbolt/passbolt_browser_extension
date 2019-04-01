@@ -1,44 +1,83 @@
 /**
  * Master password controller.
  *
- * @copyright (c) 2017-2018 Passbolt SARL, 2019 Passbolt SA
+ * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-/**
- * This utility function allows to manage several password attempts
- * Currently it is used only when decrypting content but this system
- * can be reusable for other features in the future like authentication
- */
-var User = require('../model/user').User;
-var Worker = require('../model/worker');
-var TabStorage = require('../model/tabStorage').TabStorage;
+const Keyring = require('../model/keyring').Keyring;
+const User = require('../model/user').User;
+const Worker = require('../model/worker');
+const TabStorage = require('../model/tabStorage').TabStorage;
 
 /**
- * Get the user master password. If a remembered master password exists
- * return it, otherwise prompt the user.
+ * Get the user passphrase.
+ * If the passphrase is remembered return it, otherwise request the users to enter their passphrase.
  *
- * @param worker The worker asking for the master password.
- * @returns {d.promise|*|promise} The promise to resolve/reject when the master password is retrieved.
+ * @param worker The worker requesting the passphrase
+ * @returns {Promise<string>}
  */
-var get = async function (worker) {
+const get = async function (worker) {
   const user = User.getInstance();
 
   try {
     return await user.getStoredMasterPassword();
   } catch (error) {
-    return _promptUser(worker);
+    return requestPassphrase(worker);
   }
 };
 exports.get = get;
 
 /**
- * Prompt the user to enter their master password.
+ * Request the users to enter their passphrase.
  *
- * @param worker The worker asking for the master password.
+ * @param worker The worker requesting the passphrase.
+ * @return {Promise}
  * @private
  */
-var _promptUser = function (worker) {
+const requestPassphrase = function (worker) {
+  // @todo the quickaccess worker should have a pagemod too
+  // If the requester is the Quick access worker
+  if (!worker.pageMod) {
+    return requestQuickAccessPassphrase(worker)
+  } else {
+    return requestAppPassphrase(worker);
+  }
+};
+
+/**
+ * Request the passphrase on the quickaccess worker
+ * @param {Worker} worker
+ * @return {Promise}
+ */
+const requestQuickAccessPassphrase = async function(worker) {
+  const requestResult = await worker.port.request('passbolt.passphrase.request');
+  const { passphrase, rememberMe } = requestResult;
+
+  if (!Validator.isUtf8(passphrase)) {
+    throw new Error(__('The passphrase should be a valid UTF8 string.'));
+  }
+  if (!Validator.isBoolean(rememberMe)) {
+    throw new Error(__('The remember me should be a valid boolean.'));
+  }
+
+  const keyring = new Keyring()
+  keyring.checkPassphrase(passphrase)
+
+  if (rememberMe) {
+    const user = User.getInstance();
+    user.storeMasterPasswordTemporarily(passphrase, -1);
+  }
+
+  return passphrase;
+};
+
+/**
+ * Request the passphrase on the app worker
+ * @param {Worker} worker
+ * @return {Promise}
+ */
+const requestAppPassphrase = function(worker) {
   return new Promise(function(resolve, reject) {
     const masterPasswordRequest = {
       attempts: 0,

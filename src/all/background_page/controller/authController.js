@@ -18,7 +18,7 @@ const Worker = require('../model/worker');
  * Auth Controller constructor.
  * @constructor
  */
-const AuthController = function(worker, requestId) {
+const AuthController = function (worker, requestId) {
   this.worker = worker;
   this.requestId = requestId;
   this.auth = new GpgAuth();
@@ -29,7 +29,7 @@ const AuthController = function(worker, requestId) {
  *
  * @returns {Promise<void>}
  */
-AuthController.prototype.verify = async function() {
+AuthController.prototype.verify = async function () {
   let msg;
   try {
     await this.auth.verify();
@@ -46,42 +46,82 @@ AuthController.prototype.verify = async function() {
  *
  * @returns {Promise<void>}
  */
-AuthController.prototype.login = async function(passphrase, remember, redirect) {
-  const tabId = this.worker.tab.id;
-  if (!redirect || redirect[0] != '/') {
-    var trustedDomain = Config.read('user.settings.trustedDomain');
-    const url = new URL(trustedDomain);
-    redirect = url.pathname;
-  }
-
-  Worker.get('Auth', tabId).port.emit('passbolt.auth.login-processing', __('Logging in'));
+AuthController.prototype.login = async function (passphrase, remember, redirect) {
   try {
+    this._beforeLogin();
     await this.auth.login(passphrase);
-  } catch(error) {
-    Worker.get('Auth', tabId).port.emit('passbolt.auth.login-failed', error.message);
-    return;
+    await this._syncUserSettings();
+    if (remember) {
+      const user = User.getInstance();
+      user.storeMasterPasswordTemporarily(passphrase, remember);
+    }
+    this._handleLoginSuccess(redirect);
+  } catch (error) {
+    this._handleLoginError(error);
   }
+};
 
+/**
+ * Before login hook
+ */
+AuthController.prototype._beforeLogin = function () {
+  // If the worker at the origin of the login is the AuthForm.
+  // Keep a reference of the tab id into this._tabId.
+  // Request the Auth worker to display a processing feedback.
+  if (this.worker.pageMod && this.worker.pageMod.args.name == "AuthForm") {
+    this._tabId = this.worker.tab.id;
+    Worker.get('Auth', this._tabId).port.emit('passbolt.auth.login-processing', __('Logging in'));
+  }
+};
+
+/**
+ * Sync the user account settings.
+ * @returns {Promise<void>}
+ */
+AuthController.prototype._syncUserSettings = async function () {
   const user = User.getInstance();
   try {
     await user.settings.sync()
-  } catch(error) {
+  } catch (error) {
     console.error('User settings sync failed');
     console.error(error.message);
     user.settings.setDefaults();
   }
+};
 
-  // set remember master passphrase
-  if (remember !== undefined && remember !== false) {
-    user.storeMasterPasswordTemporarily(passphrase, remember);
-  }
+/**
+ * Handle a login success
+ * @param {string} tabId The tab identifier
+ * @param {Error} redirect The uri to redirect the user to after login.
+ */
+AuthController.prototype._handleLoginSuccess = async function (redirect) {
+  await app.pageMods.PassboltApp.init();
 
-  // Init the app pagemod
-  app.pageMods.PassboltApp.init().then(() => {
-    // Redirect the user.
+  if (this.worker.pageMod && this.worker.pageMod.args.name == "AuthForm") {
+    // The application authenticator requires the success to be sent on another worker (Auth).
+    // It will notify the users and redirect them.
+    if (!redirect || redirect[0] != '/') {
+      const trustedDomain = Config.read('user.settings.trustedDomain');
+      const url = new URL(trustedDomain);
+      redirect = url.pathname;
+    }
     const msg = __('You are now logged in!');
-    Worker.get('Auth', tabId).port.emit('passbolt.auth.login-success', msg, redirect);
-  });
+    Worker.get('Auth', this._tabId).port.emit('passbolt.auth.login-success', msg, redirect);
+  } else {
+    this.worker.port.emit(this.requestId, "SUCCESS");
+  }
+};
+
+/**
+ * Handle a login failure
+ * @param {Error} error The caught error
+ */
+AuthController.prototype._handleLoginError = function (error) {
+  if (this.worker.pageMod && this.worker.pageMod.args.name == "AuthForm") {
+    Worker.get('Auth', this._tabId).port.emit('passbolt.auth.login-failed', error.message);
+  } else {
+    this.worker.port.emit(this.requestId, "ERROR", this.worker.port.getEmitableError(error));
+  }
 };
 
 // Exports the User object.

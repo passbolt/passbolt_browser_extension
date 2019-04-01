@@ -2,9 +2,10 @@
 /**
  * Keyring model.
  *
- * @copyright (c) 2017 Passbolt SARL
+ * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+const InvalidMasterPasswordError = require('../error/invalidMasterPasswordError').InvalidMasterPasswordError;
 const __ = require('../sdk/l10n').get;
 const UserSettings = require('./userSettings').UserSettings;
 const Key = require('./key').Key;
@@ -364,7 +365,11 @@ Keyring.prototype.checkPassphrase = async function (passphrase) {
   const privateKey = this.findPrivate();
   const privKeyObj = (await openpgp.key.readArmored(privateKey.key)).keys[0];
   if (!privKeyObj.isDecrypted()) {
-    await privKeyObj.decrypt(passphrase);
+    try {
+      await privKeyObj.decrypt(passphrase);
+    } catch (error) {
+      throw new InvalidMasterPasswordError();
+    }
   }
 };
 

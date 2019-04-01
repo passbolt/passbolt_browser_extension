@@ -1,6 +1,6 @@
 {
   "name": "passbolt_extension",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "license": "AGPL-3.0",
   "description": "Passbolt web extension for the open source password manager for teams",
   "homepage": "https://www.passbolt.com",
@@ -12,14 +12,27 @@
     "jssha": "~2.3.1",
     "kdbxweb": "^1.2.3",
     "locutus": "~2.0.9",
+    "memoize-one": "^5.0.1",
     "openpgp": "^4.3.0",
     "papaparse": "^4.4.0",
-    "passbolt-styleguide": "^2.4.9",
+    "passbolt-styleguide": "^2.8.0",
+    "prop-types": "^15.6.2",
+    "react": "^16.8.5",
+    "react-dom": "^16.8.5",
+    "react-router-dom": "^4.3.1",
+    "react-transition-group": "^2.7.0",
+    "simplebar": "^3.1.4",
     "underscore": "~1.9.0",
     "validator": "4.1.0",
+    "webextension-polyfill": "^0.4.0",
     "xregexp": "~3.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.4.0",
+    "@babel/plugin-transform-runtime": "^7.4.0",
+    "@babel/preset-env": "^7.4.2",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.4",
     "chai": "^4.2.0",
     "crx": "^3.2.1",
     "grunt": "^1.0.3",
@@ -29,7 +42,16 @@
     "grunt-contrib-watch": "^1.1.0",
     "grunt-passbolt-ejs-compile": "0.0.2",
     "grunt-shell": "^2.1.0",
+    "jest": "^24.5.0",
+    "jest-dom": "^3.1.3",
     "mocha": "^5.2.0",
-    "web-ext": "^2.9.1"
+    "react-testing-library": "^6.0.3",
+    "sinon": "^7.3.1",
+    "web-ext": "^2.9.1",
+    "webpack": "^4.28.3",
+    "webpack-cli": "^3.3.0"
+  },
+  "scripts": {
+    "test": "grunt test"
   }
 }

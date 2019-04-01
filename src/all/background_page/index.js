@@ -82,6 +82,7 @@ var main = function() {
   pageMods.GroupEditAutocompleteDialog.init();
   pageMods.ImportPasswordsDialog.init();
   pageMods.ExportPasswordsDialog.init();
+  pageMods.QuickAccess.init();
 
   // Debug pagemod
   if (Config.isDebug()) {

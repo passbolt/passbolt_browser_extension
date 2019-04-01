@@ -8,18 +8,21 @@ var Log = require('../model/log').Log;
  * @param port
  * @constructor
  */
-var Worker = function(port, iframe) {
+const Worker = function(port, tab, iframe, pageMod) {
   this.port = new Port(port);
-  this.tab = new Tab(port.sender.tab);
   this.callbacks = {};
   this.iframe = iframe;
+  this.pageMod = pageMod;
 
   // make sure the worker self destroy
   // when the tab its running in is closed
   var _this = this;
-  this.tab.on('removed', function () {
-    _this.destroy('tab was closed');
-  });
+  if (tab) {
+    this.tab = new Tab(tab);
+    this.tab.on('removed', function () {
+      _this.destroy('tab was closed');
+    });
+  }
 
   // make sure the worker self destroy
   // when it's an iframe worker and the iframe is unloaded
@@ -56,7 +59,7 @@ Worker.prototype.triggerEvent = function (eventName) {
  * Destroy the worker
  */
 Worker.prototype.destroy = function (reason) {
-  Log.write({level: 'debug', message: 'sdk/worker::destroy tab:' + this.tab.id + ' ' + reason});
+  Log.write({level: 'debug', message: `sdk/worker::destroy ${this.tab && this.tab.id ? `(tab: ${this.tab.id})` : ""} : ${reason}`});
 
   // console.debut('Destroying worker because ' + reason);
   // A detach event is fired just before removal.
@@ -69,7 +72,9 @@ Worker.prototype.destroy = function (reason) {
   if(this.iframe) {
     this.port._port.onDisconnect.removeListener(this.onPortDisconnect);
   }
-  this.tab.destroy();
+  if (this.tab) {
+    this.tab.destroy();
+  }
 
   //delete this.callbacks;
   delete this.port;

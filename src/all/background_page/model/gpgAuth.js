@@ -16,6 +16,7 @@ const Request = require('./request').Request;
 
 const URL_VERIFY = '/auth/verify.json?api-version=v1';
 const URL_LOGIN = '/auth/login.json?api-version=v1';
+const URL_LOGOUT = '/auth/logout.json?api-version=v1';
 
 /**
  * GPGAuth authentication
@@ -115,6 +116,22 @@ GpgAuth.prototype.getServerKey = async function (serverUrl) {
 
   const json = await response.json();
   return json.body;
+};
+
+/**
+ * GPGAuth Logout
+ *
+ * @returns {Promise.<string>} referrer url
+ */
+GpgAuth.prototype.logout = async function() {
+  const url = this.getDomain() + URL_LOGOUT;
+  const fetchOptions = {
+    method: 'GET',
+    credentials: 'include'
+  };
+  const event = new Event('passbolt.session.terminated');
+  window.dispatchEvent(event);
+  return await fetch(url, fetchOptions);
 };
 
 /**

@@ -1,5 +1,5 @@
 /**
- * Port Chrome Wrapper
+ * Browser tab wrapper
  *
  * @param port
  * @constructor

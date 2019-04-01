@@ -27,6 +27,9 @@ $(function () {
           _this.bootstrapLoginPage();
         })
     }
+
+    // Init the quickaccess.
+    passbolt.quickaccess.bootstrap();
   };
 
   /**

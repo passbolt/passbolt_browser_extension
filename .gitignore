@@ -7,9 +7,13 @@ npm-debug.log
 # Less files
 data/less
 
+# Plugin development #
+######################
+__snapshots__
+*.map
+
 # Plugin build       #
 ######################
-# passbolt-firefox-addon.xpi
 /build
 /bootstrap.js
 *.pem

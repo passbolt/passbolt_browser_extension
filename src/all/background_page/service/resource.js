@@ -15,14 +15,14 @@ const __ = require('../sdk/l10n').get;
 const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
 const User = require('../model/user').User;
 
-class ResourceServices {}
+class ResourceService {}
 
 /**
  * Find all the resources with given resources ids
  * @param {array} resourcesIds The list of resources to find
  * @returns {array} The list of resources
  */
-ResourceServices.findAllByResourcesIds = async function (resourcesIds, options) {
+ResourceService.findAllByResourcesIds = async function (resourcesIds, options) {
   // Find by batch of 100 resources to avoid 414 server error.
   const batchSize = 100;
   let resources = [];
@@ -30,7 +30,7 @@ ResourceServices.findAllByResourcesIds = async function (resourcesIds, options) 
   for (let i = 0; i < totalBatches; i++) {
     const resourcesIdsPart = resourcesIds.splice(0, batchSize);
     const optionsPart = Object.assign({filter:{hasId: resourcesIdsPart}}, options);
-    const resourcesPart = await ResourceServices.findAll(optionsPart);
+    const resourcesPart = await ResourceService.findAll(optionsPart);
     resources = [...resources, ...resourcesPart];
   }
 
@@ -38,11 +38,59 @@ ResourceServices.findAllByResourcesIds = async function (resourcesIds, options) 
 };
 
 /**
+ * Find a resource by id
+ * @param {object} options Optional parameters
+ * @returns {object} The found resource
+ */
+ResourceService.findOne = async function (resourceId, options) {
+  options = options || {};
+  const user = User.getInstance();
+  const domain = user.settings.getDomain();
+  const fetchOptions = {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Accept': 'application/json',
+      'content-type': 'application/json'
+    }
+  };
+  const url = new URL(`${domain}/resources/${resourceId}.json?api-version=2`);
+  if (options.contain && options.contain.secret) {
+    url.searchParams.append('contain[secret]', '1');
+  }
+  let response, responseJson;
+
+  try {
+    response = await fetch(url, fetchOptions);
+  } catch (error) {
+    // Catch Network error such as connection lost.
+    throw new PassboltApiFetchError(error.message);
+  }
+
+  try {
+    responseJson = await response.json();
+  } catch (error) {
+    // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
+    throw new PassboltApiFetchError(response.statusText, {code: response.status});
+  }
+
+  if (!response.ok) {
+    const message = responseJson.header.message;
+    throw new PassboltApiFetchError(message, {
+      code: response.status,
+      body: responseJson.body
+    });
+  }
+
+  return responseJson.body;
+};
+
+/**
  * Find all the resources
  * @param {object} options Optional parameters
  * @returns {array} The list of resources
  */
-ResourceServices.findAll = async function (options) {
+ResourceService.findAll = async function (options) {
   options = options || {};
   const user = User.getInstance();
   const domain = user.settings.getDomain();
@@ -90,4 +138,5 @@ ResourceServices.findAll = async function (options) {
   return responseJson.body;
 };
 
-exports.ResourceServices = ResourceServices;
+
+exports.ResourceService = ResourceService;

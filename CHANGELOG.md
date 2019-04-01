@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.8.0] - 2019-04-01
+### Add
+- PB-3: Quickaccess: Simplified app to access passwords from the browser extension
+
 ## [2.7.0] - 2019-02-08
 ### Improvement
 - PASSBOLT-3347: When the extension requires the users to enter their master password, the popup should be displayed with no delay
@@ -325,7 +329,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.7.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.8.0...HEAD
+[2.8.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.7.0...v2.8.0
 [2.7.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.6...v2.7.0
 [2.4.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.5...v2.4.6
 [2.4.5]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.4...v2.4.5

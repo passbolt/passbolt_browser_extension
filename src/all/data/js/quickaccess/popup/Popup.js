@@ -26,19 +26,6 @@ class QuickAccess extends React.Component {
 
   }
 
-  componentDidMount() {
-    this.checkPluginIsConfigured();
-    this.load();
-  }
-
-  async checkPluginIsConfigured() {
-    const isConfigured = await passbolt.request('passbolt.addon.isConfigured');
-    if (!isConfigured) {
-      browser.tabs.create({ url: PASSBOLT_GETTING_STARTED_URL });
-      window.close();
-    }
-  }
-
   initEventHandlers() {
     this.handlekeyDown = this.handleKeyDown.bind(this);
     this.handleSearchChangeCallback = this.handleSearchChangeCallback.bind(this);
@@ -49,46 +36,59 @@ class QuickAccess extends React.Component {
     this.logoutSuccessCallback = this.logoutSuccessCallback.bind(this);
   }
 
+  async componentDidMount() {
+    await this.checkPluginIsConfigured();
+    await this.initAppContext();
+    await this.checkUserIsLoggedIn();
+  }
+
   initState() {
     this.state = {
-      appContext: {},
+      isLoggedIn: null,
+      user: null,
       search: '',
       passphraseRequired: false,
       passphraseRequestId: ''
     };
   }
 
-  async load() {
-    const storageDataPromise = browser.storage.local.get(["_passbolt_data"]);
-    const isLoggedinPromise = this.checkIsLoggedIn();
-    const storageData = await storageDataPromise;
-    const isLoggedIn = await isLoggedinPromise;
-    const appContext = {
-      isLoggedIn: isLoggedIn,
-      user: storageData._passbolt_data.config
-    };
-    this.setState({ appContext });
-  }
-
-  async checkIsLoggedIn() {
-    try {
-      await passbolt.request("passbolt.auth.is-logged-in");
-      return true;
-    } catch (error) {
-      return false;
+  async checkPluginIsConfigured() {
+    const isConfigured = await passbolt.request('passbolt.addon.isConfigured');
+    if (!isConfigured) {
+      browser.tabs.create({ url: PASSBOLT_GETTING_STARTED_URL });
+      window.close();
     }
   }
 
+  async initAppContext() {
+    const storageData = await browser.storage.local.get(["_passbolt_data"]);
+    this.setState({ user: storageData._passbolt_data.config });
+  }
+
+  async checkUserIsLoggedIn() {
+    try {
+      await passbolt.request("passbolt.auth.is-logged-in");
+      this.setState({ isLoggedIn: true });
+    } catch (error) {
+      if (error.name === "MfaAuthenticationRequiredError") {
+        this.redirectToMfaAuthentication();
+      } else {
+        this.setState({ isLoggedIn: false });
+      }
+    }
+  }
+
+  redirectToMfaAuthentication() {
+    browser.tabs.create({ url: this.state.user["user.settings.trustedDomain"] });
+    window.close();
+  }
+
   loginSuccessCallback() {
-    const appContext = this.state.appContext;
-    appContext.isLoggedIn = true;
-    this.setState({ appContext });
+    this.setState({ isLoggedIn: true });
   }
 
   logoutSuccessCallback() {
-    const appContext = this.state.appContext;
-    appContext.isLoggedIn = false;
-    this.setState({ appContext });
+    this.setState({ isLoggedIn: false });
   }
 
   handleKeyDown(event) {
@@ -111,17 +111,16 @@ class QuickAccess extends React.Component {
   }
 
   isReady() {
-    return this.state.appContext.isLoggedIn !== undefined
-      && this.state.appContext.user !== undefined
-      && window.self.port !== undefined
-      && window.self.port._connected;
+    return this.state.isLoggedIn !== null
+      && this.state.user !== null
+      && window.self.port !== undefined && window.self.port._connected;
   }
 
   render() {
     return (
       <Router>
         <Route render={(props) => (
-          <AppContext.Provider value={this.state.appContext}>
+          <AppContext.Provider value={this.state}>
             <div className="container page quickaccess" onKeyDown={this.handleKeyDown}>
               <Header logoutSuccessCallback={this.logoutSuccessCallback} />
               {!this.isReady() &&

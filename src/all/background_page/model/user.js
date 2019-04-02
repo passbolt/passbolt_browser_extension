@@ -6,6 +6,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 const Config = require('./config');
+const MfaAuthenticationRequiredError = require('../error/mfaAuthenticationRequiredError').MfaAuthenticationRequiredError;
 const UserSettings = require('./userSettings').UserSettings;
 const __ = require('../sdk/l10n').get;
 
@@ -335,7 +336,11 @@ const User = (function () {
         .then(function (response) {
           // Check response status
           if (!response.ok) {
-            reject(new Error(__('The user is not logged-in')));
+            if (/mfa\/verify\/error\.json$/.test(response.url)) {
+              reject(new MfaAuthenticationRequiredError());
+            } else {
+              reject(new Error(__('The user is not logged-in')));
+            }
           } else {
             resolve(__('The user is logged-in'));
           }

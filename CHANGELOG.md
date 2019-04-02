@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.8.1] - 2019-04-02
+### Fixed
+- PB-97: Fix - As a user I cannot login using the QuickAccess if i'm using MFA
+
 ## [2.8.0] - 2019-04-01
 ### Add
 - PB-3: Quickaccess: Simplified app to access passwords from the browser extension
@@ -329,7 +333,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.8.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.8.1...HEAD
+[2.8.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.8.0...v2.8.1
 [2.8.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.7.0...v2.8.0
 [2.7.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.6...v2.7.0
 [2.4.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.4.5...v2.4.6

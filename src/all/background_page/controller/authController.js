@@ -50,6 +50,7 @@ AuthController.prototype.login = async function (passphrase, remember, redirect)
   try {
     this._beforeLogin();
     await this.auth.login(passphrase);
+    await this._checkMfaAuthentication();
     await this._syncUserSettings();
     if (remember) {
       const user = User.getInstance();
@@ -71,6 +72,19 @@ AuthController.prototype._beforeLogin = function () {
   if (this.worker.pageMod && this.worker.pageMod.args.name == "AuthForm") {
     this._tabId = this.worker.tab.id;
     Worker.get('Auth', this._tabId).port.emit('passbolt.auth.login-processing', __('Logging in'));
+  }
+};
+
+/**
+ * Check that no MFA Authentication is required.
+ */
+AuthController.prototype._checkMfaAuthentication = async function() {
+  // @todo the quickaccess worker should have a pagemod too
+  // If the requester is the Quick access worker, we need to check if a MFA Authentication is required.
+  // The Auth Form MFA check is made by the API that redirects the user if required.
+  if (!this.worker.pageMod) {
+    const user = User.getInstance();
+    await user.isLoggedIn();
   }
 };
 

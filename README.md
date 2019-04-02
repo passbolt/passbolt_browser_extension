@@ -3,7 +3,7 @@
 	    / /_/ / __ `/ ___/ ___/ __ \/ __ \/ / __/
 	   / ____/ /_/ (__  |__  ) /_/ / /_/ / / /_
 	  /_/    \__,_/____/____/_.___/\____/_/\__/
-	
+
 	Open source password manager for teams
 	(c) 2018 Passbolt SARL
 	https://www.passbolt.com
@@ -77,14 +77,14 @@ sudo npm install web-ext -g
 sudo npm install crx -g
 ```
 
-## Quick bundling the dist/all source
+## Quick bundling the build/all source
 
-The non-minified source code is located in ```/src```. It can be 'bundled' ```to dist/all``` as follow:
+The non-minified source code is located in ```/src```. It can be 'bundled' ```to build/all``` as follow:
 ```
 grunt
 ```
 
-In order to rebuild the code in this directory automatically while you are editing the src 
+In order to rebuild the code in this directory automatically while you are editing the src
 you can use the grunt watch task:
 ```
 grunt watch
@@ -99,15 +99,15 @@ cd build/all
 web-ext run
 ```
 
-This instance will be reloaded everytime there is a change in the /dist/all code or by pressing the ```r```
+This instance will be reloaded everytime there is a change in the /build/all code or by pressing the ```r```
 key on the keyboard when web-ext is running.
-You can debug the application script by opening the 
+You can debug the application script by opening the
 [browser console](https://developer.mozilla.org/en/docs/Tools/Browser_Console).
 
 ### Chrome
 
 Go to the the extension page at [chrome://extensions/](chrome://extensions/) click on the
-'load unpacked extension' button. Point to your dist/all directory and you are good to go.
+'load unpacked extension' button. Point to your build/all directory and you are good to go.
 You debug the application script by clicking on index.html in "inspect views".
 
 ## Packaging the application
@@ -120,7 +120,7 @@ The build can be found under ```dist/chrome``` or ```dist/firefox```.
 
 ## Updating the vendors or the styleguide
 
-You can update the vendors or the styleguide in the ```package.json``` and run the copy task 
+You can update the vendors or the styleguide in the ```package.json``` and run the copy task
 in grunt to deploy them in the appropriate places. Check the ```Gruntfile.js```
 for more information.
 ```

@@ -25,7 +25,7 @@ const listen = function (worker) {
       await user.isLoggedIn();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }
   });
 

@@ -43,7 +43,7 @@ class LoginPage extends React.Component {
         this.redirectToMfaAuthentication();
       } else {
         this.setState({
-          error: "this is not a valid passphrase",
+          error: error.message,
           processing: false
         });
         // Force the focus onto the passphrase input. The autoFocus attribute only works with the first rendering.

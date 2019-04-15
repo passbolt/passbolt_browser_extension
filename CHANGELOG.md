@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- GITHUB-58: Use consistent wording to define a gpg private key passphrase
+
 ## [2.8.2] - 2019-04-02
 ### Fixed
 - Fix broken event. Exception has to be serialized before emiting them from addon to content code

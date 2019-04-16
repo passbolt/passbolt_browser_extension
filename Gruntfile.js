@@ -58,7 +58,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('bundle', ['copy:background_page', 'copy:content_scripts', 'browserify:app', 'ejs_compile', 'browserify:templates', 'copy:data']);
   grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle', 'browserify:vendors']);
-  grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle', 'browserify:vendors_chrome']);
+  grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle', 'browserify:vendors']);
 
   grunt.registerTask('bundle-test', ['browserify:test', 'copy:test']);
 
@@ -86,10 +86,6 @@ module.exports = function(grunt) {
      * See also. src/background_page/vendor/require_polyfill.js
      */
     browserify: {
-      vendors_chrome: {
-        src: [path.src_chrome + '/background_page/vendors.js'],
-        dest: path.build + 'vendors.min.js'
-      },
       vendors: {
         src: [path.src_addon + 'vendors.js'],
         dest: path.build + 'vendors.min.js'

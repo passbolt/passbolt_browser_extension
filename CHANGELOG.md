@@ -8,6 +8,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - GITHUB-58: Use consistent wording to define a gpg private key passphrase
 - GITHUB-64: As AP when I am logging in with the quickaccess I should see a relevant error message in any cases
 - GITHUB-63: Fix password generation mask
+- PB-177: Upgrade Jquery to v3.4
+- PB-178: Drop fetch polyfill for chrome
 
 ## [2.8.2] - 2019-04-02
 ### Fixed

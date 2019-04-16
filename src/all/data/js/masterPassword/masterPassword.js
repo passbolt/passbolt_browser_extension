@@ -60,8 +60,10 @@ $(function () {
     }
     const tpl = 'master/rememberMeOptions.ejs';
     await passbolt.html.loadTemplate('#js_remember_options', tpl, 'html', {'options': options})
+    $rememberMeCheckbox = $('#js_remember_master_password').on('keypress', rememberMeCheckboxKeypressed);
     $rememberMeDuration = $('#js_remember_master_password_duration');
     $rememberMeDuration.on('change', rememberMeDurationChange);
+    $rememberMeDuration.on('keypress', rememberMeDurationKeypressed);
   }
 
   /**
@@ -283,6 +285,38 @@ $(function () {
     // The user presses escape.
     else if (keycode == 27) {
       cancelMasterPassword();
+    }
+  };
+
+  /**
+   * Handle when the user presses a key on the rememember me checkbox.
+   * Handle the different scenario :
+   *  - Enter pressed : submit the form ;
+   * @param ev {HTMLEvent} The event which occurred
+   */
+  var rememberMeCheckboxKeypressed = function (ev) {
+    // Get keycode.
+    var keycode = ev.keyCode || ev.which;
+
+    // The user presses enter.
+    if (keycode == 13) {
+      submitButtonClicked();
+    }
+  };
+
+  /**
+   * Handle when the user presses a key on the rememember me duration field.
+   * Handle the different scenario :
+   *  - Enter pressed : submit the form ;
+   * @param ev {HTMLEvent} The event which occurred
+   */
+  var rememberMeDurationKeypressed = function (ev) {
+    // Get keycode.
+    var keycode = ev.keyCode || ev.which;
+
+    // The user presses enter.
+    if (keycode == 13) {
+      submitButtonClicked();
     }
   };
 

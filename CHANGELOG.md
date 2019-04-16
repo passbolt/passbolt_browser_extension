@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - GITHUB-63: Fix password generation mask
 - PB-177: Upgrade Jquery to v3.4
 - PB-178: Drop fetch polyfill for chrome
+- PB-153: Fix dictionary test result when pwnedpassword is unavailable 
 
 ## [2.8.2] - 2019-04-02
 ### Fixed

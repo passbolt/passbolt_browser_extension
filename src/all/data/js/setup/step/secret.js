@@ -190,14 +190,15 @@ $(function () {
    */
   step._checkPasswordPwnd = async function(password) {
     step.criterias['dictionary'] = undefined;
-    var isPwnd;
+    let isPwnd;
     try {
       isPwnd = await secretComplexity.ispwned(password);
+      step.criterias['dictionary_error'] = undefined;
     } catch (error) {
       // something went wrong (like a network issue)
-      // leave it undefined
+      isPwnd = true;
+      step.criterias['dictionary_error'] = error.message;
       console.error(error.message);
-      return;
     }
     if (typeof step.criterias['dictionary'] !== 'undefined') {
       // password was cleared in meantime, ignore this request

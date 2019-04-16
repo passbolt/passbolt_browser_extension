@@ -21,9 +21,6 @@ async function pwnedpasswords (password) {
   const url = API_URL + hashedPasswordPrefix;
 
   const response = await fetch(url);
-  if (response.status === 404) {
-    return false;
-  }
   if (response.status !== 200) {
     return Promise.reject(new Error(`Failed to load pwnedpasswords API: ${response.status}`));
   }

@@ -199,13 +199,8 @@ var secretComplexity = {};
    * Dictionary check
    */
   var ispwned = async function (password) {
-    try {
-      var count = await pwnedpasswords(password);
-      return (count > 0);
-    } catch(error) {
-      console.error(error);
-      return undefined;
-    }
+    var count = await pwnedpasswords(password);
+    return (count > 0);
   };
   exports.ispwned = ispwned;
 

@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-177: Upgrade Jquery to v3.4
 - PB-178: Drop fetch polyfill for chrome
 - PB-153: Fix dictionary test result when pwnedpassword is unavailable 
+- GITHUB-14: As LU I should be able to navigate into the passphrase popup with the keyboard
 
 ## [2.8.2] - 2019-04-02
 ### Fixed

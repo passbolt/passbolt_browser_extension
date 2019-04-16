@@ -62,8 +62,8 @@ var secretComplexity = {};
     'special': {
       size: 32,
       // ASCII Code = 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 58, 59, 60, 61, 62, 63, 64, 91, 92, 93, 94, 95, 96, 123, 124, 125, 126
-      data: '!"#$%&\'()*+,-./:;<=>?@[:\\]^_`{|}~',
-      pattern: /[!"#$%&\'\(\)*+,\-./:;<=>?@\[\]^_`{|}~]/
+      data: '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~',
+      pattern: /[!"#$%&\'\(\)*+,\-./:;<=>?@\[\\\]^_`{|}~]/
     }
   };
   exports.MASKS = MASKS;
@@ -182,13 +182,14 @@ var secretComplexity = {};
     // Generate a password which should fit the expected entropy.
     // Try maximum 10 times.
     var j = 0;
+    expectedEntropy = calculEntropy(length, mask.length);
+
     do {
       secret = '';
-      expectedEntropy = calculEntropy(length, mask.length);
       for (var i = 0; i < length; i++) {
         secret += mask[randomRange(0, mask.length - 1)];
       }
-    } while (expectedEntropy != entropy(secret) && j++ < 10);
+    } while (entropy(secret) < expectedEntropy && j++ < 10);
 
     return secret;
   };

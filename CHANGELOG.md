@@ -6,7 +6,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - GITHUB-58: Use consistent wording to define a gpg private key passphrase
-- GITHUB-63: As AP when I am logging in with the quickaccess I should see relevant error message in case the error is not relative to my passphrase
+- GITHUB-64: As AP when I am logging in with the quickaccess I should see a relevant error message in any cases
+- GITHUB-63: Fix password generation mask
 
 ## [2.8.2] - 2019-04-02
 ### Fixed

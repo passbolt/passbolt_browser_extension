@@ -4,13 +4,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.8.3] - 2019-04-17
 ### Fixed
 - GITHUB-58: Use consistent wording to define a gpg private key passphrase
 - GITHUB-64: As AP when I am logging in with the quickaccess I should see a relevant error message in any cases
 - GITHUB-63: Fix password generation mask
 - PB-177: Upgrade Jquery to v3.4
 - PB-178: Drop fetch polyfill for chrome
-- PB-153: Fix dictionary test result when pwnedpassword is unavailable 
+- PB-153: Fix dictionary test result when pwnedpassword is unavailable
 - GITHUB-14: As LU I should be able to navigate into the passphrase popup with the keyboard
 
 ## [2.8.2] - 2019-04-02
@@ -347,7 +348,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.8.2...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.8.3...HEAD
+[2.8.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.8.2...v2.8.3
 [2.8.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.8.1...v2.8.2
 [2.8.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.8.0...v2.8.1
 [2.8.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.7.0...v2.8.0

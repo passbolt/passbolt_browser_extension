@@ -5,7 +5,8 @@ var scripts = [
   'vendors/simplebar.js',
   'js/lib/port.js',
   'js/lib/message.js',
-  'js/lib/request.js'
+  'js/lib/request.js',
+  'js/lib/secretComplexity.js'
 ];
 loadScripts(scripts).then(function () {
   var scripts = [

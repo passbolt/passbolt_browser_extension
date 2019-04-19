@@ -76,7 +76,7 @@ var secretComplexity = {};
    */
   var randomRange = function (min, max) {
     var arr = new Uint32Array(1);
-    window.crypto.getRandomValues(arr);
+    window.crypto.getRandomValues(arr); 
     var random = arr[0]/(0xffffffff + 1);
     return Math.floor(random * (max - min + 1)) + min;
   };
@@ -176,7 +176,7 @@ var secretComplexity = {};
 
     // Build the mask to use to generate a secret.
     for (var i in masks) {
-      mask = $.merge(mask, MASKS[masks[i]].data);
+      mask = [...mask, ...MASKS[masks[i]].data]
     }
 
     // Generate a password which should fit the expected entropy.
@@ -205,3 +205,5 @@ var secretComplexity = {};
   exports.ispwned = ispwned;
 
 })(secretComplexity);
+
+window.secretComplexity = secretComplexity;

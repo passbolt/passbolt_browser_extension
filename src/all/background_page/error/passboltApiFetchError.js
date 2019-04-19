@@ -8,8 +8,8 @@
 class PassboltApiFetchError extends Error {
   constructor(message, data) {
     super(message);
-    this.data = data || {};
     this.name = 'PassboltApiFetchError';
+    this.data = data || {};
   }
 }
 

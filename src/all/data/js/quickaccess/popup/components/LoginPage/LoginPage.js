@@ -99,8 +99,8 @@ class LoginPage extends React.Component {
         <div className="login-form">
           <form onSubmit={this.handleFormSubmit}>
             <div className="input text required">
-              <label htmlFor="UserUsername">Username</label>
-              <input className="required" maxLength="50" type="text" id="UserUsername" required="required" value={this.context.user['user.username']} disabled="disabled" />
+              <label htmlFor="username">Username</label>
+              <input className="required" maxLength="50" type="text" id="username" required="required" value={this.context.user['user.username']} disabled="disabled" />
             </div>
             <div className="input text passphrase required">
               <label htmlFor="passphrase">Passphrase</label>

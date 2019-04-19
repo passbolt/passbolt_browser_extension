@@ -29,7 +29,7 @@ Permission.findResourcePermissions = async function(resourceId) {
       'content-type': 'application/json'
     }
   };
-  let url = new URL(`${domain}/permissions/resource/` + resourceId + `.json?api-version=2`);
+  let url = new URL(`${domain}/permissions/resource/${resourceId}.json?api-version=v2`);
   url.searchParams.append('contain[user.profile]', '1');
   url.searchParams.append('contain[group]', '1');
   let response, json;

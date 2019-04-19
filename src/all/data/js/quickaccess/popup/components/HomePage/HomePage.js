@@ -225,9 +225,9 @@ class HomePage extends React.Component {
           </div>
         </div>
         <div className="submit-wrapper">
-          <a href={this.context.user["user.settings.trustedDomain"]} id="popupAction" className="button primary big full-width" role="button" target="_blank" rel="noopener noreferrer">
-            open passbolt
-          </a>
+          <Link to={`/data/quickaccess/resources/create`} id="popupAction" className="button primary big full-width" role="button">
+            create new
+          </Link>
         </div>
       </div>
     );

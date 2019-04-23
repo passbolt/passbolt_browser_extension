@@ -17,5 +17,23 @@ const listen = function (worker) {
     worker.port.emit(requestId, 'SUCCESS', tabs[0].url);
   });
 
+  /*
+   * Get the current tab info.
+   *
+   * @listens passbolt.active-tab.get-info
+   */
+  worker.port.on('passbolt.active-tab.get-info', async function (requestId) {
+    const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+    if (!tabs || !tabs[0]) {
+      worker.port.emit(requestId, 'ERROR', new Error('Unable to retrieve the active tab info.'));
+      return;
+    }
+    const info = {
+      title: tabs[0].title,
+      url: tabs[0].url
+    }
+    worker.port.emit(requestId, 'SUCCESS', info);
+  });
+
 };
 exports.listen = listen;

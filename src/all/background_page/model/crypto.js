@@ -19,11 +19,12 @@ const Crypto = function () {
  *
  * @param message {string} The text to encrypt
  * @param key {string} The user id or public armored key
+ * @param privateKey {Key} (optional) The private key to use to sign the message
  * @throw Exception {Error} The public key is not found
  * @throw Exception {Error} The public key is not in a valid or supported format
  * @return {Promise} The encrypted message
  */
-Crypto.prototype.encrypt = async function (message, key) {
+Crypto.prototype.encrypt = async function (message, key, privateKey) {
   const keyring = new Keyring();
   let publicKey;
 
@@ -46,6 +47,12 @@ Crypto.prototype.encrypt = async function (message, key) {
     message: openpgp.message.fromText(message),
     publicKeys: [publicKey]
   };
+
+  // If a private key is given, sign the message.
+  if (privateKey) {
+    options.privateKeys = [privateKey];
+  }
+
   let encryptedMessage = await openpgp.encrypt(options);
 
   return encryptedMessage.data;

@@ -5,6 +5,7 @@ import AppContext from "./contexts/AppContext";
 import Header from "./components/Header/Header";
 import HomePage from "./components/HomePage/HomePage";
 import LoginPage from "./components/LoginPage/LoginPage";
+import ResourceCreatePage from "./components/ResourceCreatePage/ResourceCreatePage";
 import ResourceViewPage from "./components/ResourceViewPage/ResourceViewPage";
 import Search from "./components/Search/Search";
 import { BrowserRouter as Router, Route } from "react-router-dom";
@@ -23,7 +24,6 @@ class QuickAccess extends React.Component {
     super(props);
     this.initEventHandlers();
     this.initState();
-
   }
 
   initEventHandlers() {
@@ -141,6 +141,7 @@ class QuickAccess extends React.Component {
                       <Route path="/data/quickaccess/login" render={() => (
                         <LoginPage loginSuccessCallback={this.loginSuccessCallback} />
                       )} />
+                      <PrivateRoute path="/data/quickaccess/resources/create" component={ResourceCreatePage} />
                       <PrivateRoute path="/data/quickaccess/resources/view/:id" component={ResourceViewPage} />
                       <PrivateRoute exact path="/data/quickaccess.html" component={HomePage} search={this.state.search} />
                     </AnimatedSwitch>

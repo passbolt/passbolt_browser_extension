@@ -5,17 +5,26 @@ import { CSSTransition, TransitionGroup } from "react-transition-group";
 export default class AnimatedSwitch extends React.Component {
   constructor(props) {
     super(props);
-    this._previousLocationPathname = '';
+    this._previousLocationPathname = "";
   }
 
   getTransition(currentLocationPath, _previousLocationPathname) {
     let transition = "slideNoTransition";
 
-    if (currentLocationPath.indexOf('/data/quickaccess/resources/view') != -1 && this._previousLocationPathname === '/data/quickaccess.html') {
+    if (currentLocationPath.indexOf("/data/quickaccess/resources/view") != -1 && this._previousLocationPathname === "/data/quickaccess.html") {
       transition = "slideLeft";
     }
-    else if (currentLocationPath === '/data/quickaccess.html' && this._previousLocationPathname.indexOf('/data/quickaccess/resources/view') != -1) {
+    else if (currentLocationPath === "/data/quickaccess.html" && this._previousLocationPathname.indexOf("/data/quickaccess/resources/view") != -1) {
       transition = "slideRight";
+    }
+    else if (this._previousLocationPathname == "/data/quickaccess/resources/create" != -1 && this._previousLocationPathname === "/data/quickaccess.html") {
+      transition = "slideLeft";
+    }
+    else if (currentLocationPath === "/data/quickaccess.html" && this._previousLocationPathname.indexOf("/data/quickaccess/resources/create") != -1) {
+      transition = "slideRight";
+    }
+    else if (currentLocationPath.indexOf("/data/quickaccess/resources/view") != -1 && this._previousLocationPathname == "/data/quickaccess/resources/create") {
+      transition = "slideLeft";
     }
 
     return transition;

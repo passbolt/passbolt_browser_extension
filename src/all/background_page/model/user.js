@@ -7,6 +7,7 @@
  */
 const Config = require('./config');
 const MfaAuthenticationRequiredError = require('../error/mfaAuthenticationRequiredError').MfaAuthenticationRequiredError;
+const UserService = require('../service/user').UserService;
 const UserSettings = require('./userSettings').UserSettings;
 const __ = require('../sdk/l10n').get;
 
@@ -365,16 +366,15 @@ const User = (function () {
   };
 
   /**
-   * Store csrf token.
-   *
-   * @param csrfToken {string} The csrf token.
+   * Retrieve and the store the user csrf token.
    */
-  this.storeCsrfToken = function (csrfToken) {
+  this.retrieveAndStoreCsrfToken = async function() {
+    const csrfToken = await UserService.retrieveCsrfToken(this);
     this._csrfToken = csrfToken;
   };
 
   /**
-   * Get stored csrf token
+   * Get the user csrf token
    *
    * @return {string}
    */

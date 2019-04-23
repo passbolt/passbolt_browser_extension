@@ -217,7 +217,7 @@ const FLUSH_RESOURCES_LOCAL_STORAGE_TIME = 20 * 60 * 1000;
 let flushResourcesLocalStorageTimeout = null;
 Resource.updateLocalStorage = async function() {
   const resources = await ResourceService.findAll();
-  browser.storage.local.set({ resources });
+  await browser.storage.local.set({ resources });
 
   // Ensure there is no sensitive information stored in the local storage after
   // a certain period of time defined by the constant FLUSH_RESOURCES_LOCAL_STORAGE_TIME.
@@ -240,5 +240,28 @@ window.addEventListener("passbolt.session.terminated", () => {
 
 // Ensure the resources local storage is flushed when the browser start.
 browser.storage.local.remove("resources");
+
+/**
+ * Add a resource to the local storage.
+ */
+Resource.addToLocalStorage = async function(resource) {
+  const { resources } = await browser.storage.local.get("resources");
+  if (!resources) {
+    await Resource.updateLocalStorage();
+    resources = await browser.storage.local.get("resources");
+  }
+  resources.push(resource);
+  return await browser.storage.local.set({ resources });
+}
+
+/**
+ * Save a resource
+ * @param {object} data The resource data
+ * @return {Promise}
+ */
+Resource.save = async function(data) {
+  return ResourceService.save(data);
+}
+
 
 exports.Resource = Resource;

@@ -65,20 +65,6 @@ $(function () {
         .removeClass('passboltplugin-config');
     }
     this.initVersion();
-    this.getCsrfToken();
-  };
-
-  /**
-   * Init the csrf token.
-   */
-  Bootstrap.prototype.getCsrfToken = function () {
-    if (this.isTrustedDomain) {
-      // Retrieve the CSRF Token from the trusted domain cookie.
-      var match = document.cookie.match(new RegExp('(^| )csrfToken=([^;]+)'));
-      if (match && match[2]) {
-        passbolt.message.emit('passbolt.security.set-csrf-token', match[2]);
-      }
-    }
   };
 
   /**

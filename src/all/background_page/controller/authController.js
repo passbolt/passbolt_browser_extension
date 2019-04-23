@@ -47,13 +47,15 @@ AuthController.prototype.verify = async function () {
  * @returns {Promise<void>}
  */
 AuthController.prototype.login = async function (passphrase, remember, redirect) {
+  const user = User.getInstance();
+
   try {
     this._beforeLogin();
+    await user.retrieveAndStoreCsrfToken();
     await this.auth.login(passphrase);
     await this._checkMfaAuthentication();
     await this._syncUserSettings();
     if (remember) {
-      const user = User.getInstance();
       user.storeMasterPasswordTemporarily(passphrase, remember);
     }
     this._handleLoginSuccess(redirect);

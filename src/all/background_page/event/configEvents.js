@@ -37,17 +37,6 @@ var listen = function (worker) {
   });
 
   /*
-   * Store the csrf token
-   *
-   * @listens passbolt.security.store-csrf-token
-   * @param csrfToken {String} The csrf token
-   */
-  worker.port.on('passbolt.security.set-csrf-token', function(csrfToken) {
-    var user = User.getInstance();
-    user.storeCsrfToken(csrfToken);
-  });
-
-  /*
    * Check if the plugin is well configured
    *
    * @listens passbolt.addon.isConfigured

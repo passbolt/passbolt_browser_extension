@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Add
+- PB-3: Quickaccess: As LU I can add a password via the quickaccess
 
 ## [2.8.3] - 2019-04-17
 ### Fixed

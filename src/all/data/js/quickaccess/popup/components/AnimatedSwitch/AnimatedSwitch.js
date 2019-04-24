@@ -17,7 +17,7 @@ export default class AnimatedSwitch extends React.Component {
     else if (currentLocationPath === "/data/quickaccess.html" && this._previousLocationPathname.indexOf("/data/quickaccess/resources/view") != -1) {
       transition = "slideRight";
     }
-    else if (this._previousLocationPathname == "/data/quickaccess/resources/create" != -1 && this._previousLocationPathname === "/data/quickaccess.html") {
+    else if (currentLocationPath == "/data/quickaccess/resources/create" && this._previousLocationPathname === "/data/quickaccess.html") {
       transition = "slideLeft";
     }
     else if (currentLocationPath === "/data/quickaccess.html" && this._previousLocationPathname.indexOf("/data/quickaccess/resources/create") != -1) {

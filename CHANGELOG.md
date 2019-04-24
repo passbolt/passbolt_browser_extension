@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.9.1] - 2019-04-25
+### Fixed
+- PB-3: Quickaccess: Fix resource create screen styleguide
+
 ## [2.9.0] - 2019-04-24
 ### Add
 - PB-3: Quickaccess: As LU I can add a password via the quickaccess
@@ -352,7 +356,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.9.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.9.1...HEAD
+[2.9.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.9.0...v2.9.1
 [2.9.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.8.3...v2.9.0
 [2.8.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.8.2...v2.8.3
 [2.8.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.8.1...v2.8.2

@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- PB-40: Quickaccess: Don't hide not sanitized uri in the resource view screen
 
 ## [2.9.2] - 2019-04-25
 ### Fixed

@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.9.2] - 2019-04-25
+### Fixed
+- PB-227: Fix browser extension backward compatibility with API < v2.2.0
+
 ## [2.9.1] - 2019-04-25
 ### Fixed
 - PB-3: Quickaccess: Fix resource create screen styleguide
@@ -356,7 +360,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.9.1...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.9.2...HEAD
+[2.9.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.9.1...v2.9.2
 [2.9.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.9.0...v2.9.1
 [2.9.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.8.3...v2.9.0
 [2.8.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.8.2...v2.8.3

@@ -48,7 +48,7 @@ UserService.retrieveCsrfToken = async function (user) {
   const html = await response.text();
   const match = html.match(/_csrfToken.*value=\"(.*)\"/);
 
-  if (!match[1]) {
+  if (!match || !match[1]) {
     console.warn("CSRF token not found. Please upgrade your passbolt API.")
     return "";
   }

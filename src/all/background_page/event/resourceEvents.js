@@ -29,6 +29,26 @@ const listen = function (worker) {
   });
 
   /*
+   * Find all resources
+   *
+   * @listens passbolt.resources.update-local-storage
+   * @param requestId {uuid} The request identifier
+   * @param options {object} The options to apply to the find
+   */
+  worker.port.on('passbolt.resources.find-all', async function (requestId, options) {
+    try {
+      const resources = await Resource.findAll(options);
+      worker.port.emit(requestId, 'SUCCESS', resources);
+    } catch (error) {
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
+
+  /*
    * Create a new resource.
    *
    * @listens passbolt.resources.create

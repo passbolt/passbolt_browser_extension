@@ -1,5 +1,5 @@
 /**
- * SimpleBar.js - v3.1.4
+ * SimpleBar.js - v3.1.5
  * Scrollbars, simpler.
  * https://grsmto.github.io/simplebar/
  *
@@ -109,7 +109,7 @@
     return store[key] || (store[key] = value !== undefined ? value : {});
   })('versions', []).push({
     version: _core.version,
-    mode: 'global',
+    mode: _library ? 'pure' : 'global',
     copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
   });
   });
@@ -3923,11 +3923,6 @@
           var scrollbar = document.createElement('div');
           track.classList.add(this.classNames.track);
           scrollbar.classList.add(this.classNames.scrollbar);
-
-          if (!this.options.autoHide) {
-            scrollbar.classList.add(this.classNames.visible);
-          }
-
           track.appendChild(scrollbar);
           this.axis.x.track.el = track.cloneNode(true);
           this.axis.x.track.el.classList.add(this.classNames.horizontal);
@@ -3939,6 +3934,12 @@
 
         this.axis.x.scrollbar.el = this.axis.x.track.el.querySelector(".".concat(this.classNames.scrollbar));
         this.axis.y.scrollbar.el = this.axis.y.track.el.querySelector(".".concat(this.classNames.scrollbar));
+
+        if (!this.options.autoHide) {
+          this.axis.x.scrollbar.el.classList.add(this.classNames.visible);
+          this.axis.y.scrollbar.el.classList.add(this.classNames.visible);
+        }
+
         this.el.setAttribute('data-simplebar', 'init');
       }
     }, {
@@ -3964,13 +3965,12 @@
           // create an observer instance
           this.mutationObserver = new MutationObserver(function (mutations) {
             mutations.forEach(function (mutation) {
-              if (mutation.target === _this3.el || !_this3.isChildNode(mutation.target) || mutation.addedNodes.length || mutation.removedNodes.length) {
+              if (mutation.target === _this3.contentEl || _this3.isChildNode(mutation.target) || mutation.addedNodes.length || mutation.removedNodes.length) {
                 _this3.recalculate();
               }
             });
-          }); // pass in the target node, as well as the observer options
-
-          this.mutationObserver.observe(this.el, {
+          });
+          this.mutationObserver.observe(this.contentEl, {
             attributes: true,
             childList: true,
             characterData: true,

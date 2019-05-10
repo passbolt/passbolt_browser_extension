@@ -1,13 +1,14 @@
 /**
  * Group model.
  *
- * @copyright (c) 2017-2018 Passbolt SARL, 2019 Passbolt SA
+ * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
+const GroupService = require("../service/group").GroupService;
 const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
 const Request = require('./request').Request;
-var UserSettings = require('./userSettings').UserSettings;
+const UserSettings = require('./userSettings').UserSettings;
 
 /**
  * The class that deals with groups.
@@ -150,6 +151,14 @@ Group.checkGroupUserUserIdExists = function(group, userId) {
     return false;
 };
 
+/**
+ * Find all groups
+ * @param {object} options Options to apply to the find request
+ * @return {Promise}
+ */
+Group.findAll = async function(options) {
+  return await GroupService.findAll(options);
+}
 
 // Exports the Group object.
 exports.Group = Group;

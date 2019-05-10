@@ -1,8 +1,8 @@
 import browser from "webextension-polyfill/dist/browser-polyfill";
-import PropTypes from "prop-types";
 import React from "react";
 import { Link } from "react-router-dom";
 import AppContext from "../../contexts/AppContext";
+import SimpleBar from "../SimpleBar/SimpleBar";
 
 const SUGGESTED_RESOURCES_LIMIT = 3;
 const BROWSED_RESOURCES_LIMIT = 500;
@@ -15,6 +15,10 @@ class HomePage extends React.Component {
   }
 
   componentDidMount() {
+    // Reset the search and any search history.
+    this.context.searchHistory = [];
+    this.context.updateSearch("");
+    this.context.focusSearch();
     this.findResources();
     this.getTabUrl();
   }
@@ -78,10 +82,6 @@ class HomePage extends React.Component {
    */
   getSuggestedResources() {
     const suggestedResources = [];
-    // If the resources have not yet been loaded or the user is searching.
-    if (this.state.resources == null || this.props.search.length > 0) {
-      return suggestedResources;
-    }
 
     for (let i in this.state.resources) {
       const resource = this.state.resources[i];
@@ -108,18 +108,15 @@ class HomePage extends React.Component {
    * @return {array} The list of resources.
    */
   getBrowsedResources() {
-    let resources = this.state.resources;
-    if (resources == null) {
-      return null;
-    }
+    let browsedResources = this.state.resources.slice(0);
 
-    if (this.props.search.length) {
+    if (this.context.search.length) {
       // @todo optimization. Memoize result to avoid filtering each time the component is rendered.
       // @see reactjs doc https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#what-about-memoization
-      resources = this.filterResourcesBySearch(resources, this.props.search);
+      browsedResources = this.filterResourcesBySearch(browsedResources, this.context.search);
     }
 
-    return resources.slice(0, BROWSED_RESOURCES_LIMIT);
+    return browsedResources.slice(0, BROWSED_RESOURCES_LIMIT);
   }
 
   /**
@@ -158,50 +155,44 @@ class HomePage extends React.Component {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
-  isReady() {
-    return this.state.resources !== null
-      && this.state.tabUrl != null;
-  }
-
   render() {
-    const suggestedResources = this.getSuggestedResources();
-    const browsedResources = this.getBrowsedResources();
+    const isReady = this.state.resources !== null;
+    const showSuggestedSection = !this.context.search.length;
+    const showBrowsedResourcesSection = this.context.search.length > 0;
+    const showFiltersSection = !this.context.search.length;
+    const isProEdition = this.context.siteSettings && this.context.siteSettings.passbolt.edition === "pro";
+    let browsedResources, suggestedResources;
+
+    if (isReady) {
+      if (showSuggestedSection) {
+        suggestedResources = this.getSuggestedResources();
+      }
+      if (showBrowsedResourcesSection) {
+        browsedResources = this.getBrowsedResources();
+      }
+    }
 
     return (
       <div className="index-list">
-        <div className="list-container" data-simplebar>
-          {/* This section cannot be shown/hidden with a JSX && condition. Otherwise it generates an unexpected error : Failed to execute 'insertBefore' on 'Node' */}
-          <div className={`list-section ${!suggestedResources.length ? "visually-hidden" : ""}`}>
-            <div className="list-title">
-              <h2>Suggested</h2>
-            </div>
-            <ul className="list-items">
-              {suggestedResources.length > 0 &&
-                suggestedResources.map((resource) => (
-                  <li className="resource-entry" key={resource.id}>
-                    <Link to={`/data/quickaccess/resources/view/${resource.id}`}>
-                      <span className="title">{resource.name}</span>
-                      <span className="username"> {resource.username ? `(${resource.username})` : ""}</span>
-                      <span className="url">{resource.uri}</span>
-                    </Link>
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-          <div className="list-section">
-            <div className="list-title">
-              <h2>Browse</h2>
-            </div>
-            <ul className="list-items">
-              <React.Fragment>
-                {(browsedResources == null) &&
+        <SimpleBar className="list-container">
+          {showSuggestedSection &&
+            <div className={`list-section`}>
+              <div className="list-title">
+                <h2>Suggested</h2>
+              </div>
+              <ul className="list-items">
+                {!isReady &&
                   <li className="empty-entry">
                     <p className="processing-text">Retrieving your passwords</p>
                   </li>
-                  || ""}
-                {(browsedResources && browsedResources.length > 0) &&
-                  browsedResources.map((resource) => (
+                }
+                {(isReady && suggestedResources.length == 0) &&
+                  <li className="empty-entry">
+                    <p>No password match the current page. Try the search.</p>
+                  </li>
+                }
+                {(isReady && suggestedResources.length > 0) &&
+                  suggestedResources.map((resource) => (
                     <li className="resource-entry" key={resource.id}>
                       <Link to={`/data/quickaccess/resources/view/${resource.id}`}>
                         <span className="title">{resource.name}</span>
@@ -210,20 +201,76 @@ class HomePage extends React.Component {
                       </Link>
                     </li>
                   ))}
-                {(browsedResources && browsedResources.length == 0) &&
-                  <li className="empty-entry">
-                    {this.props.search.length &&
+              </ul>
+            </div>
+          }
+          {showBrowsedResourcesSection &&
+            <div className="list-section">
+              <div className="list-title">
+                <h2>Browse</h2>
+              </div>
+              <ul className="list-items">
+                <React.Fragment>
+                  {!isReady &&
+                    <li className="empty-entry">
+                      <p className="processing-text">Retrieving your passwords</p>
+                    </li>
+                  }
+                  {(isReady && browsedResources.length == 0) &&
+                    <li className="empty-entry">
                       <p>No result match your search. Try with another search term.</p>
-                      || ""}
-                    {!this.props.search.length &&
-                      <p>It does feel a bit empty here. Create your first password or wait for a team member to share one with you.</p>
-                      || ""}
+                    </li>
+                  }
+                  {(isReady && browsedResources.length > 0) &&
+                    browsedResources.map((resource) => (
+                      <li className="resource-entry" key={resource.id}>
+                        <Link to={`/data/quickaccess/resources/view/${resource.id}`}>
+                          <span className="title">{resource.name}</span>
+                          <span className="username"> {resource.username ? `(${resource.username})` : ""}</span>
+                          <span className="url">{resource.uri}</span>
+                        </Link>
+                      </li>
+                    ))}
+                </React.Fragment>
+              </ul>
+            </div>
+          }
+          {showFiltersSection &&
+            <div className="list-section">
+              <div className="list-title">
+                <h2>Browse</h2>
+              </div>
+              <ul className="list-items">
+                <li className="filter-entry">
+                  <Link to={"/data/quickaccess/more-filters"}>
+                    <span className="fa icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-label="filter icon"><path d="M487.976 0H24.028C2.71 0-8.047 25.866 7.058 40.971L192 225.941V432c0 7.831 3.821 15.17 10.237 19.662l80 55.98C298.02 518.69 320 507.493 320 487.98V225.941l184.947-184.97C520.021 25.896 509.338 0 487.976 0z" /></svg>
+                    </span>
+                    <span className="filter">Filters</span>
+                  </Link>
+                </li>
+                <li className="filter-entry">
+                  <Link to={"/data/quickaccess/resources/group"}>
+                    <span className="fa icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" aria-label="group icon"><path d="M96 224c35.3 0 64-28.7 64-64s-28.7-64-64-64-64 28.7-64 64 28.7 64 64 64zm448 0c35.3 0 64-28.7 64-64s-28.7-64-64-64-64 28.7-64 64 28.7 64 64 64zm32 32h-64c-17.6 0-33.5 7.1-45.1 18.6 40.3 22.1 68.9 62 75.1 109.4h66c17.7 0 32-14.3 32-32v-32c0-35.3-28.7-64-64-64zm-256 0c61.9 0 112-50.1 112-112S381.9 32 320 32 208 82.1 208 144s50.1 112 112 112zm76.8 32h-8.3c-20.8 10-43.9 16-68.5 16s-47.6-6-68.5-16h-8.3C179.6 288 128 339.6 128 403.2V432c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 48-48v-28.8c0-63.6-51.6-115.2-115.2-115.2zm-223.7-13.4C161.5 263.1 145.6 256 128 256H64c-35.3 0-64 28.7-64 64v32c0 17.7 14.3 32 32 32h65.9c6.3-47.4 34.9-87.3 75.2-109.4z" /></svg>
+                    </span>
+                    <span className="filter">Groups</span>
+                  </Link>
+                </li>
+                {isProEdition &&
+                  <li className="filter-entry">
+                    <Link to={"/data/quickaccess/resources/tag"}>
+                      <span className="fa icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" aria-label="tags icon"><path d="M497.941 225.941L286.059 14.059A48 48 0 0 0 252.118 0H48C21.49 0 0 21.49 0 48v204.118a48 48 0 0 0 14.059 33.941l211.882 211.882c18.744 18.745 49.136 18.746 67.882 0l204.118-204.118c18.745-18.745 18.745-49.137 0-67.882zM112 160c-26.51 0-48-21.49-48-48s21.49-48 48-48 48 21.49 48 48-21.49 48-48 48zm513.941 133.823L421.823 497.941c-18.745 18.745-49.137 18.745-67.882 0l-.36-.36L527.64 323.522c16.999-16.999 26.36-39.6 26.36-63.64s-9.362-46.641-26.36-63.64L331.397 0h48.721a48 48 0 0 1 33.941 14.059l211.882 211.882c18.745 18.745 18.745 49.137 0 67.882z" /></svg>
+                      </span>
+                      <span className="filter">Tags</span>
+                    </Link>
                   </li>
                 }
-              </React.Fragment>
-            </ul>
-          </div>
-        </div>
+              </ul>
+            </div>
+          }
+        </SimpleBar>
         <div className="submit-wrapper">
           <Link to={`/data/quickaccess/resources/create`} id="popupAction" className="button primary big full-width" role="button">
             create new
@@ -235,9 +282,5 @@ class HomePage extends React.Component {
 }
 
 HomePage.contextType = AppContext;
-
-HomePage.propTypes = {
-  search: PropTypes.string
-};
 
 export default HomePage;

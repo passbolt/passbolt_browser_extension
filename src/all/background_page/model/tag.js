@@ -6,9 +6,10 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var __ = require('../sdk/l10n').get;
+const __ = require('../sdk/l10n').get;
 const Request = require('./request').Request;
-var User = require('./user').User;
+const TagService = require("../service/tag").TagService;
+const User = require('./user').User;
 
 /**
  * The class that deals with keys.
@@ -57,6 +58,15 @@ Tag.add = function(resourceId, tags) {
     );
   });
 };
+
+/**
+ * Find all tag
+ * @param {object} options Options to apply to the find request
+ * @return {Promise}
+ */
+Tag.findAll = async function(options) {
+  return await TagService.findAll(options);
+}
 
 // Exports the Keyring object.
 exports.Tag = Tag;

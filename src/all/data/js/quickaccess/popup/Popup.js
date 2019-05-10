@@ -2,9 +2,16 @@ import React from "react";
 import ReactDOM from "react-dom";
 import browser from "webextension-polyfill/dist/browser-polyfill";
 import AppContext from "./contexts/AppContext";
+import FilterResourcesByFavoritePage from "./components/FilterResourcesByFavoritePage/FilterResourcesByFavoritePage";
+import FilterResourcesByItemsIOwnPage from "./components/FilterResourcesByItemsIOwnPage/FilterResourcesByItemsIOwnPage";
+import FilterResourcesByGroupPage from "./components/FilterResourcesByGroupPage/FilterResourcesByGroupPage";
+import FilterResourcesByRecentlyModifiedPage from "./components/FilterResourcesByRecentlyModifiedPage/FilterResourcesByRecentlyModifiedPage";
+import FilterResourcesBySharedWithMePage from "./components/FilterResourcesBySharedWithMePage/FilterResourcesBySharedWithMePage";
+import FilterResourcesByTagPage from "./components/FilterResourcesByTagPage/FilterResourcesByTagPage";
 import Header from "./components/Header/Header";
 import HomePage from "./components/HomePage/HomePage";
 import LoginPage from "./components/LoginPage/LoginPage";
+import MoreFiltersPage from "./components/MoreFiltersPage/MoreFiltersPage";
 import ResourceCreatePage from "./components/ResourceCreatePage/ResourceCreatePage";
 import ResourceViewPage from "./components/ResourceViewPage/ResourceViewPage";
 import Search from "./components/Search/Search";
@@ -14,7 +21,13 @@ import AnimatedSwitch from "./components/AnimatedSwitch/AnimatedSwitch";
 import PassphraseDialog from "./components/PassphraseDialog/PassphraseDialog";
 
 const SEARCH_VISIBLE_ROUTES = [
-  '/data/quickaccess.html'
+  '/data/quickaccess.html',
+  '/data/quickaccess/resources/favorite',
+  '/data/quickaccess/resources/group',
+  '/data/quickaccess/resources/owned-by-me',
+  '/data/quickaccess/resources/recently-modified',
+  '/data/quickaccess/resources/shared-with-me',
+  '/data/quickaccess/resources/tag'
 ];
 
 const PASSBOLT_GETTING_STARTED_URL = "https://www.passbolt.com/start";
@@ -24,11 +37,13 @@ class QuickAccess extends React.Component {
     super(props);
     this.initEventHandlers();
     this.initState();
+    this.searchRef = React.createRef();
   }
 
   initEventHandlers() {
+    this.focusSearch = this.focusSearch.bind(this);
+    this.updateSearch = this.updateSearch.bind(this);
     this.handlekeyDown = this.handleKeyDown.bind(this);
-    this.handleSearchChangeCallback = this.handleSearchChangeCallback.bind(this);
     this.handleBackgroundPageRequiresPassphraseEvent = this.handleBackgroundPageRequiresPassphraseEvent.bind(this);
     passbolt.message.on('passbolt.passphrase.request', this.handleBackgroundPageRequiresPassphraseEvent);
     this.handlePassphraseDialogCompleted = this.handlePassphraseDialogCompleted.bind(this);
@@ -38,18 +53,33 @@ class QuickAccess extends React.Component {
 
   async componentDidMount() {
     await this.checkPluginIsConfigured();
-    await this.initAppContext();
-    await this.checkUserIsLoggedIn();
+    await this.getUser();
+    this.checkUserIsLoggedIn();
+    this.getSiteSettings();
   }
 
   initState() {
     this.state = {
       isLoggedIn: null,
       user: null,
-      search: '',
+      siteSettings: null,
+      // Search
+      search: "",
+      searchHistory: {},
+      updateSearch: this.updateSearch,
+      focusSearch: this.focusSearch,
+      // Passphrase
       passphraseRequired: false,
       passphraseRequestId: ''
     };
+  }
+
+  updateSearch(search) {
+    this.setState({ search });
+  }
+
+  focusSearch() {
+    this.searchRef.current.focus();
   }
 
   async checkPluginIsConfigured() {
@@ -60,9 +90,14 @@ class QuickAccess extends React.Component {
     }
   }
 
-  async initAppContext() {
+  async getUser() {
     const storageData = await browser.storage.local.get(["_passbolt_data"]);
     this.setState({ user: storageData._passbolt_data.config });
+  }
+
+  async getSiteSettings() {
+    const siteSettings = await passbolt.request('passbolt.site.settings');
+    this.setState({ siteSettings });
   }
 
   async checkUserIsLoggedIn() {
@@ -106,10 +141,6 @@ class QuickAccess extends React.Component {
     this.setState({ passphraseRequired: false, passphraseRequestId: null });
   }
 
-  handleSearchChangeCallback(search) {
-    this.setState({ search });
-  }
-
   isReady() {
     return this.state.isLoggedIn !== null
       && this.state.user !== null
@@ -117,33 +148,44 @@ class QuickAccess extends React.Component {
   }
 
   render() {
+    const isReady = this.isReady();
+
     return (
       <Router>
         <Route render={(props) => (
           <AppContext.Provider value={this.state}>
             <div className="container page quickaccess" onKeyDown={this.handleKeyDown}>
               <Header logoutSuccessCallback={this.logoutSuccessCallback} />
-              {!this.isReady() &&
+              {!isReady &&
                 <div className="processing-wrapper">
                   <p className="processing-text">Connecting your account</p>
                 </div>
               }
-              {this.isReady() &&
+              {isReady &&
                 <React.Fragment>
                   {this.state.passphraseRequired &&
                     <PassphraseDialog requestId={this.state.passphraseRequestId} onComplete={this.handlePassphraseDialogCompleted} />
                   }
                   <div className={`${this.state.passphraseRequired ? "visually-hidden" : ""}`}>
-                    <Route exact path={SEARCH_VISIBLE_ROUTES} render={() => (
-                      <Search search={this.state.search} searchChangeCallback={this.handleSearchChangeCallback} />
+                    <Route path={SEARCH_VISIBLE_ROUTES} render={() => (
+                      <Search ref={this.searchRef} />
                     )} />
                     <AnimatedSwitch location={props.location}>
                       <Route path="/data/quickaccess/login" render={() => (
                         <LoginPage loginSuccessCallback={this.loginSuccessCallback} />
                       )} />
+                      <PrivateRoute exact path="/data/quickaccess/resources/group" component={FilterResourcesByGroupPage} />
+                      <PrivateRoute path="/data/quickaccess/resources/group/:id" component={FilterResourcesByGroupPage} />
+                      <PrivateRoute exact path="/data/quickaccess/resources/tag" component={FilterResourcesByTagPage} />
+                      <PrivateRoute path="/data/quickaccess/resources/tag/:id" component={FilterResourcesByTagPage} />
+                      <PrivateRoute exact path="/data/quickaccess/resources/favorite" component={FilterResourcesByFavoritePage} />
+                      <PrivateRoute exact path="/data/quickaccess/resources/owned-by-me" component={FilterResourcesByItemsIOwnPage} />
+                      <PrivateRoute exact path="/data/quickaccess/resources/recently-modified" component={FilterResourcesByRecentlyModifiedPage} />
+                      <PrivateRoute exact path="/data/quickaccess/resources/shared-with-me" component={FilterResourcesBySharedWithMePage} />
                       <PrivateRoute path="/data/quickaccess/resources/create" component={ResourceCreatePage} />
                       <PrivateRoute path="/data/quickaccess/resources/view/:id" component={ResourceViewPage} />
-                      <PrivateRoute exact path="/data/quickaccess.html" component={HomePage} search={this.state.search} />
+                      <PrivateRoute exact path="/data/quickaccess/more-filters" component={MoreFiltersPage} />
+                      <PrivateRoute exact path="/data/quickaccess.html" component={HomePage} />
                     </AnimatedSwitch>
                   </div>
                 </React.Fragment>

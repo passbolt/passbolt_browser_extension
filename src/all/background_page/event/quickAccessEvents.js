@@ -11,7 +11,7 @@ const listen = function (worker) {
   /*
    * Use a resource on the current tab.
    *
-   * @listens passbolt.site.settings.remember
+   * @listens passbolt.quickaccess.use-resource-on-current-tab
    * @param requestId {uuid} The request identifier
    * @param resourceId {uuid} The resource identifier
    */

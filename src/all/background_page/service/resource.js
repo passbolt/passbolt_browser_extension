@@ -114,6 +114,24 @@ ResourceService.findAll = async function (options) {
       url.searchParams.append(`filter[has-id][]`, resourceId);
     });
   }
+  if (options.filter && options.filter.isSharedWithGroup) {
+    url.searchParams.append("filter[is-shared-with-group]", options.filter.isSharedWithGroup);
+  }
+  if (options.filter && options.filter.hasTag) {
+    url.searchParams.append("filter[has-tag]", options.filter.hasTag);
+  }
+  if (options.filter && options.filter.isFavorite) {
+    url.searchParams.append("filter[is-favorite]", true);
+  }
+  if (options.filter && options.filter.isOwnedByMe) {
+    url.searchParams.append("filter[is-owned-by-me]", true);
+  }
+  if (options.filter && options.filter.isSharedWithMe) {
+    url.searchParams.append("filter[is-shared-with-me]", true);
+  }
+  if (options.order && options.order.modifiedDesc) {
+    url.searchParams.append("order[]", "Resource.modified DESC");
+  }
   let response, responseJson;
 
   try {

@@ -1,15 +1,20 @@
-import PropTypes from "prop-types";
 import React from "react";
+import AppContext from "../../contexts/AppContext";
 
 class Search extends React.Component {
 
   constructor(props) {
     super(props);
-    this.handleInputChange = this.handleInputChange.bind(this)
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.searchInputRef = React.createRef();
+  }
+
+  focus() {
+    this.searchInputRef.current.focus();
   }
 
   handleInputChange(event) {
-    this.props.searchChangeCallback(event.target.value);
+    this.context.updateSearch(event.target.value);
   }
 
   render() {
@@ -17,7 +22,8 @@ class Search extends React.Component {
       <div className="search">
         <div className="input text required">
           <label className="visually-hidden">search</label>
-          <input name="search" maxLength="50" type="text" placeholder="search" autoComplete="off" autoFocus onChange={this.handleInputChange} value={this.props.search} />
+          <input name="search" maxLength="50" type="text" placeholder="search" autoComplete="off"
+            ref={this.searchInputRef} onChange={this.handleInputChange} value={this.context.search} />
           <a id="search-submit" className="search-submit button button-icon" role="button">
             <span className="visually-hidden">search</span>
             <span className="fa icon">
@@ -30,9 +36,6 @@ class Search extends React.Component {
   }
 }
 
-Search.propTypes = {
-  search: PropTypes.string,
-  searchChangeCallback: PropTypes.func
-};
+Search.contextType = AppContext;
 
 export default Search;

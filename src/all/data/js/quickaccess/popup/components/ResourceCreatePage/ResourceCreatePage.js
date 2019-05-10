@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import SimpleBar from "../SimpleBar/SimpleBar";
 
 class ResourceCreatePage extends React.Component {
   constructor(props) {
@@ -16,6 +17,7 @@ class ResourceCreatePage extends React.Component {
   }
 
   initEventHandlers() {
+    this.handleGoBackClick = this.handleGoBackClick.bind(this);
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
@@ -55,7 +57,7 @@ class ResourceCreatePage extends React.Component {
     if (tabInfo) {
       const notAllowedTittles = ["newtab"];
       if (notAllowedTittles.indexOf(tabInfo["title"]) === -1) {
-        name = tabInfo["title"];
+        name = tabInfo["title"].substring(0, 64);
       }
       const notAllowedUrls = ["chrome://newtab/", "about:newtab"];
       if (notAllowedUrls.indexOf(tabInfo["url"]) === -1) {
@@ -79,6 +81,11 @@ class ResourceCreatePage extends React.Component {
     this.setState({ name, uri });
   }
 
+  handleGoBackClick(ev) {
+    ev.preventDefault();
+    this.props.history.goBack();
+  }
+
   async handleFormSubmit(event) {
     event.preventDefault();
     this.setState({
@@ -97,7 +104,11 @@ class ResourceCreatePage extends React.Component {
 
     try {
       const resource = await passbolt.request("passbolt.resources.create", resourceMeta, this.state.password);
-      this.props.history.push(`/data/quickaccess/resources/view/${resource.id}`);
+      // The view component should not goback on the create component.
+      const goToComponentState = {
+        goBackEntriesCount: -2
+      };
+      this.props.history.push(`/data/quickaccess/resources/view/${resource.id}`, goToComponentState);
     } catch (error) {
       this.handleSubmitError(error);
     }
@@ -172,13 +183,13 @@ class ResourceCreatePage extends React.Component {
     return (
       <div className="resource-create">
         <div className="back-link">
-          <Link to="/data/quickaccess.html" className="primary-action" title="cancel the operation">
+          <a href="#" className="primary-action" onClick={this.handleGoBackClick} title="Cancel the operation">
             <span className="icon fa">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M34.52 239.03L228.87 44.69c9.37-9.37 24.57-9.37 33.94 0l22.67 22.67c9.36 9.36 9.37 24.52.04 33.9L131.49 256l154.02 154.75c9.34 9.38 9.32 24.54-.04 33.9l-22.67 22.67c-9.37 9.37-24.57 9.37-33.94 0L34.52 272.97c-9.37-9.37-9.37-24.57 0-33.94z" /></svg>
             </span>
             <span className="primary-action-title">Create password</span>
-          </Link>
-          <Link to="/data/quickaccess.html" className="secondary-action button-icon button" title="cancel the operation">
+          </a>
+          <Link to="/data/quickaccess.html" className="secondary-action button-icon button" title="Cancel">
             <span className="fa icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" /></svg>
             </span>
@@ -186,7 +197,7 @@ class ResourceCreatePage extends React.Component {
           </Link>
         </div>
         <form onSubmit={this.handleFormSubmit}>
-          <div className="resource-create-form" data-simplebar>
+          <SimpleBar className="resource-create-form">
             <div className="form-container">
               <div className={`input text required ${this.state.nameError ? "error" : ""}`}>
                 <label htmlFor="name">Name</label>
@@ -229,7 +240,7 @@ class ResourceCreatePage extends React.Component {
                 </span>
               </div>
             </div>
-          </div>
+          </SimpleBar>
           <div className="submit-wrapper input">
             <input type="submit" className={`button primary big full-width ${this.state.processing ? "processing" : ""}`} role="button"
               value="save" disabled={this.state.processing} />

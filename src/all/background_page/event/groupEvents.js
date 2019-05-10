@@ -287,5 +287,25 @@ var listen = function (worker) {
       changeList = groupForm.getGroupUsersChangeList();
     worker.port.emit(requestId, 'SUCCESS', changeList);
   });
+
+  /*
+   * Find all the groups
+   *
+   * @listens passbolt.groups.find-all
+   * @param requestId {uuid} The request identifier
+   * @param options {object} The options to apply to the find
+   */
+  worker.port.on('passbolt.groups.find-all', async function (requestId, options) {
+    try {
+      const groups = await Group.findAll(options);
+      worker.port.emit(requestId, 'SUCCESS', groups);
+    } catch (error) {
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
 };
 exports.listen = listen;

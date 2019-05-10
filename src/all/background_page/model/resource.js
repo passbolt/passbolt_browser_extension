@@ -255,6 +255,15 @@ Resource.addToLocalStorage = async function(resource) {
 }
 
 /**
+ * Find all the resources
+ * @param {object} options Options to apply to the find request
+ * @return {Promise}
+ */
+Resource.findAll = async function(options) {
+  return ResourceService.findAll(options);
+}
+
+/**
  * Save a resource
  * @param {object} data The resource data
  * @return {Promise}

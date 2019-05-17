@@ -4,10 +4,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [2.10.0] - 2019-05-16
+## [2.10.0] - 2019-05-17
+### Added
+- PB-189: Quickaccess: As LU I can browse my passwords with the quickaccess using filters
+
 ### Fixed
 - PB-40: Quickaccess: Don't hide not sanitized uri in the resource view screen
-- PB-189: Quickaccess: As LU I can browse my passwords with the quickaccess using filters
 
 ## [2.9.2] - 2019-04-25
 ### Fixed

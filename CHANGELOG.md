@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [2.10.1] - 2019-05-17
+### Fixed
+- Fix suggested section typo
+
 ## [2.10.0] - 2019-05-17
 ### Added
 - PB-189: Quickaccess: As LU I can browse my passwords with the quickaccess using filters
@@ -367,7 +371,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.10.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.10.1...HEAD
+[2.10.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.10.0...v2.10.1
 [2.10.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.9.2...v2.10.0
 [2.9.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.9.1...v2.9.2
 [2.9.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.9.0...v2.9.1

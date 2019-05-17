@@ -188,7 +188,7 @@ class HomePage extends React.Component {
                 }
                 {(isReady && suggestedResources.length == 0) &&
                   <li className="empty-entry">
-                    <p>No password match the current page. Try the search.</p>
+                    <p>No passwords found for the current page. You can use the search.</p>
                   </li>
                 }
                 {(isReady && suggestedResources.length > 0) &&

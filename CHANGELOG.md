@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+GITHUB-66: The browser extension doesn't build by default on unix system
 
 ## [2.10.1] - 2019-05-17
 ### Fixed

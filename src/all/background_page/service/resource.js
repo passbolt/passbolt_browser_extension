@@ -106,8 +106,17 @@ ResourceService.findAll = async function (options) {
     }
   };
   const url = new URL(`${domain}/resources.json?api-version=2`);
+  if (options.contain && options.contain.permission) {
+    url.searchParams.append('contain[permission]', '1');
+  }
+  if (options.contain && options.contain.favorite) {
+    url.searchParams.append('contain[favorite]', '1');
+  }
   if (options.contain && options.contain.secret) {
     url.searchParams.append('contain[secret]', '1');
+  }
+  if (options.contain && options.contain.tags) {
+    url.searchParams.append('contain[tag]', '1');
   }
   if (options.filter && options.filter.hasId) {
     options.filter.hasId.forEach(resourceId => {
@@ -159,7 +168,6 @@ ResourceService.findAll = async function (options) {
   return responseJson.body;
 };
 
-
 /**
  * Save a new resource
  * @param {object} data The resource data
@@ -179,6 +187,96 @@ ResourceService.save = async function (data) {
   };
   await Request.setCsrfHeader(fetchOptions);
   const url = `${domain}/resources.json?api-version=v2`;
+  let response, responseJson;
+
+  try {
+    response = await fetch(url, fetchOptions);
+  } catch (error) {
+    // Catch Network error such as connection lost.
+    throw new PassboltServiceUnavailableError(error.message);
+  }
+
+  try {
+    responseJson = await response.json();
+  } catch (error) {
+    // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
+    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+  }
+
+  if (!response.ok) {
+    const message = responseJson.header.message;
+    throw new PassboltApiFetchError(message, {
+      code: response.status,
+      body: responseJson.body
+    });
+  }
+
+  return responseJson.body;
+};
+
+/**
+ * Update a new resource
+ * @param {object} data The resource data
+ */
+ResourceService.update = async function (data) {
+  data = data || {};
+  const user = User.getInstance();
+  const domain = user.settings.getDomain();
+  const fetchOptions = {
+    method: 'PUT',
+    credentials: 'include',
+    body: JSON.stringify(data),
+    headers: {
+      'Accept': 'application/json',
+      'content-type': 'application/json'
+    }
+  };
+  await Request.setCsrfHeader(fetchOptions);
+  const url = `${domain}/resources/${data.id}.json?api-version=v2`;
+  let response, responseJson;
+
+  try {
+    response = await fetch(url, fetchOptions);
+  } catch (error) {
+    // Catch Network error such as connection lost.
+    throw new PassboltServiceUnavailableError(error.message);
+  }
+
+  try {
+    responseJson = await response.json();
+  } catch (error) {
+    // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
+    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+  }
+
+  if (!response.ok) {
+    const message = responseJson.header.message;
+    throw new PassboltApiFetchError(message, {
+      code: response.status,
+      body: responseJson.body
+    });
+  }
+
+  return responseJson.body;
+};
+
+/**
+ * Delete a resource.
+ * @param {string} resourceId The resource identifier
+ */
+ResourceService.delete = async function (resourceId) {
+  const user = User.getInstance();
+  const domain = user.settings.getDomain();
+  const fetchOptions = {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: {
+      'Accept': 'application/json',
+      'content-type': 'application/json'
+    }
+  };
+  await Request.setCsrfHeader(fetchOptions);
+  const url = `${domain}/resources/${resourceId}.json?api-version=v2`;
   let response, responseJson;
 
   try {

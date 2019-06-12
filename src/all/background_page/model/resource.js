@@ -7,8 +7,8 @@
 const __ = require('../sdk/l10n').get;
 const Request = require('./request').Request;
 const User = require('./user').User;
-const browser = require("webextension-polyfill/dist/browser-polyfill");
 const ResourceService = require('../service/resource').ResourceService;
+const ResourceLocalStorage = require('../service/local_storage/resource').ResourceLocalStorage;
 
 /**
  * The class that deals with resources.
@@ -32,7 +32,7 @@ const Resource = function () {
  * @param KdbxEntry kdbxEntry
  * @returns {Resource}
  */
-Resource.prototype.fromKdbxEntry = function(kdbxEntry) {
+Resource.prototype.fromKdbxEntry = function (kdbxEntry) {
   if (kdbxEntry.fields.Title === "") {
     this.name = this._defaultName;
   } else {
@@ -56,7 +56,7 @@ Resource.prototype.fromKdbxEntry = function(kdbxEntry) {
  * @param Array mapping mapping rules
  * @returns {Resource}
  */
-Resource.prototype.fromCsvEntry = function(csvEntry, mapping) {
+Resource.prototype.fromCsvEntry = function (csvEntry, mapping) {
   for (var fieldName in mapping) {
     this[fieldName] = csvEntry[mapping[fieldName]];
   }
@@ -72,7 +72,7 @@ Resource.prototype.fromCsvEntry = function(csvEntry, mapping) {
  * @param Array mapping mapping rules
  * @returns object CSV entry
  */
-Resource.prototype.toCsvEntry = function(resource, mapping) {
+Resource.prototype.toCsvEntry = function (resource, mapping) {
   var csvEntry = {};
   for (var fieldName in mapping) {
     csvEntry[mapping[fieldName]] = resource[fieldName];
@@ -85,7 +85,7 @@ Resource.prototype.toCsvEntry = function(resource, mapping) {
  * Import is different than save here because we will use a different passbolt pro entry point.
  * @param resource
  */
-Resource.import = function(resource) {
+Resource.import = function (resource) {
   const user = User.getInstance();
   const domain = user.settings.getDomain();
   const body = {
@@ -104,23 +104,23 @@ Resource.import = function(resource) {
   };
   Request.setCsrfHeader(fetchOptions);
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     fetch(url, fetchOptions)
-    .then(
-      function success(response) {
-        response.json()
-        .then(function (json) {
-          if (response.ok) {
-            resolve(json.body);
-          } else {
-            reject(json);
-          }
-        });
-      },
-      function error() {
-        reject(new Error(__('There was a problem while trying to connect to the API.')));
-      }
-    );
+      .then(
+        function success(response) {
+          response.json()
+            .then(function (json) {
+              if (response.ok) {
+                resolve(json.body);
+              } else {
+                reject(json);
+              }
+            });
+        },
+        function error() {
+          reject(new Error(__('There was a problem while trying to connect to the API.')));
+        }
+      );
   });
 };
 
@@ -170,7 +170,7 @@ Resource.findShareResources = async function (resourcesIds) {
   if (resourcesIds.length > batchSize) {
     let resources = [];
     const totalBatches = Math.ceil(resourcesIds.length / batchSize);
-    for (let i=0; i<totalBatches; i++) {
+    for (let i = 0; i < totalBatches; i++) {
       const resouresIdsPart = resourcesIds.splice(0, batchSize);
       const resourcesPart = await Resource.findShareResources(resouresIdsPart);
       resources = [...resources, ...resourcesPart];
@@ -213,64 +213,66 @@ Resource.findShareResources = async function (resourcesIds) {
  * Update the resources local storage with the latest API resources the user has access.
  * @return {Promise}
  */
-const FLUSH_RESOURCES_LOCAL_STORAGE_TIME = 20 * 60 * 1000;
-let flushResourcesLocalStorageTimeout = null;
-Resource.updateLocalStorage = async function() {
-  const resources = await ResourceService.findAll();
-  await browser.storage.local.set({ resources });
-
-  // Ensure there is no sensitive information stored in the local storage after
-  // a certain period of time defined by the constant FLUSH_RESOURCES_LOCAL_STORAGE_TIME.
-  if (flushResourcesLocalStorageTimeout) {
-    clearTimeout(flushResourcesLocalStorageTimeout);
-  }
-  flushResourcesLocalStorageTimeout = setTimeout(() => {
-    browser.storage.local.remove("resources");
-  }, FLUSH_RESOURCES_LOCAL_STORAGE_TIME);
-};
-
-/**
- * Observe when the user session is terminated.
- * Flush the resources local storage.
- */
-window.addEventListener("passbolt.session.terminated", () => {
-  browser.storage.local.remove("resources");
-  clearTimeout(flushResourcesLocalStorageTimeout);
-});
-
-// Ensure the resources local storage is flushed when the browser start.
-browser.storage.local.remove("resources");
-
-/**
- * Add a resource to the local storage.
- */
-Resource.addToLocalStorage = async function(resource) {
-  let { resources } = await browser.storage.local.get("resources");
-  if (!resources) {
-    await Resource.updateLocalStorage();
-    resources = await browser.storage.local.get("resources");
-  }
-  resources.push(resource);
-  return await browser.storage.local.set({ resources });
-};
+Resource.updateLocalStorage = async function () {
+  const findOptions = {
+    contain: {
+      "permission": true,
+      "favorite": true,
+      "tags": true
+    }
+  };
+  const resources = await ResourceService.findAll(findOptions);
+  await ResourceLocalStorage.set(resources);
+}
 
 /**
  * Find all the resources
  * @param {object} options Options to apply to the find request
  * @return {Promise}
  */
-Resource.findAll = async function(options) {
+Resource.findAll = async function (options) {
   return ResourceService.findAll(options);
-};
+}
 
 /**
  * Save a resource
  * @param {object} data The resource data
  * @return {Promise}
  */
-Resource.save = async function(data) {
-  return ResourceService.save(data);
-};
+Resource.save = async function (data) {
+  const resource = await ResourceService.save(data);
+  await ResourceLocalStorage.addResource(resource);
 
+  return resource;
+}
+
+/**
+ * Save a resource
+ * @param {object} data The resource data
+ * @return {Promise}
+ */
+Resource.update = async function (data) {
+  const resource = await ResourceService.update(data);
+  await ResourceLocalStorage.updateResource(resource);
+
+  return resource;
+}
+
+/**
+ * Delete all the resources
+ * @param {array} resourcesIds The resources ids to delete
+ * @return {Promise}
+ */
+Resource.deleteAll = async function (resourcesIds) {
+  const promise = resourcesIds.reduce((promise, resourceId) => {
+    return promise.then(() => ResourceService.delete(resourceId));
+  }, Promise.resolve([]));
+  // Update local storage.
+  promise.then(async () => {
+    await ResourceLocalStorage.deleteResourcesById(resourcesIds);
+  });
+
+  return promise;
+}
 
 exports.Resource = Resource;

@@ -20,6 +20,7 @@ const listen = function (worker) {
       await Resource.updateLocalStorage();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
+      console.error(error);
       if (error instanceof Error) {
         worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
       } else {
@@ -31,7 +32,7 @@ const listen = function (worker) {
   /*
    * Find all resources
    *
-   * @listens passbolt.resources.update-local-storage
+   * @listens passbolt.resources.find-all
    * @param requestId {uuid} The request identifier
    * @param options {object} The options to apply to the find
    */
@@ -40,6 +41,7 @@ const listen = function (worker) {
       const resources = await Resource.findAll(options);
       worker.port.emit(requestId, 'SUCCESS', resources);
     } catch (error) {
+      console.error(error);
       if (error instanceof Error) {
         worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
       } else {
@@ -62,6 +64,68 @@ const listen = function (worker) {
     try {
       const savedResource = await controller.main(resource, password);
       worker.port.emit(requestId, 'SUCCESS', savedResource);
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
+
+  /*
+   * Delete resources
+   *
+   * @listens passbolt.resources.create
+   * @param requestId {uuid} The request identifier
+   * @param resourcesIds {array} The resources ids to delete
+   */
+  worker.port.on('passbolt.resources.delete-all', async function (requestId, resourcesIds) {
+    try {
+      await Resource.deleteAll(resourcesIds);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error(error);
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
+
+  /*
+   * Save a resource
+   *
+   * @listens passbolt.resources.save
+   * @param requestId {uuid} The request identifier
+   * @param resource {array} The resource
+   */
+  worker.port.on('passbolt.resources.save', async function (requestId, resource) {
+    try {
+      const resourceCreated = await Resource.save(resource);
+      worker.port.emit(requestId, 'SUCCESS', resourceCreated);
+    } catch (error) {
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
+
+  /*
+   * Update resource
+   *
+   * @listens passbolt.resources.update
+   * @param requestId {uuid} The request identifier
+   * @param resource {array} The resource
+   */
+  worker.port.on('passbolt.resources.update', async function (requestId, resource) {
+    try {
+      const resourceUpdated = await Resource.update(resource);
+      worker.port.emit(requestId, 'SUCCESS', resourceUpdated);
     } catch (error) {
       if (error instanceof Error) {
         worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));

@@ -14,15 +14,17 @@ const listen = function (worker) {
    * @listens passbolt.quickaccess.use-resource-on-current-tab
    * @param requestId {uuid} The request identifier
    * @param resourceId {uuid} The resource identifier
+
    */
   worker.port.on('passbolt.quickaccess.use-resource-on-current-tab', async function (requestId, resourceId) {
     if (!Validator.isUUID(resourceId)) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(new Error(__('The resource id should be a valid UUID'))));
       return;
     }
-
+    const tabs = await browser.tabs.query({ active: true, currentWindow: true });  // Code to get browser's current active tab
     const controller = new UseResourceOnCurrentTabController(worker, requestId);
-    controller.main(resourceId);
+    // Passing current active tab to `use-resource-on-current-tab` controller, to check the same origin request
+    controller.main(resourceId, tabs[0]);
   });
 
 };

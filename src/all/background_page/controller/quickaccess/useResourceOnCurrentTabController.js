@@ -31,9 +31,10 @@ class UseResourceOnCurrentTabController {
   /**
    * Execute the controller
    * @param {array} resourceId The resource identifier to decrypt the secret of.
+   * @param {tab} browser's current active tab
    * @return {Promise}
    */
-  async main(resourceId) {
+  async main(resourceId, tab) {
     const crypto = new Crypto();
     const { resources } = await browser.storage.local.get("resources");
     const resource = resources.find(resource => resource.id == resourceId);
@@ -43,9 +44,10 @@ class UseResourceOnCurrentTabController {
       const masterPassword = await masterPasswordController.get(this.worker);
       const secret = await secretPromise;
       const message = await crypto.decrypt(secret.data, masterPassword);
-      const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-      const tabId = tabs[0].id;
-      await Worker.get('Bootstrap', tabId).port.request('passbolt.quickaccess.fill-form', resource.username, message);
+      // Return username as an empty string, when `resource.name` is null
+      const username = resource.username || '';
+      // Current active tab's url is passing to quickaccess to check the same origin request
+      await Worker.get('Bootstrap', tab.id).port.request('passbolt.quickaccess.fill-form', username, message, tab.url);
       this.worker.port.emit(this.requestId, 'SUCCESS');
     } catch (error) {
       this.worker.port.emit(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));

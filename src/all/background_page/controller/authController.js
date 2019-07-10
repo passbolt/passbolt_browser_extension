@@ -124,7 +124,7 @@ AuthController.prototype._handleLoginSuccess = async function (redirect) {
     } else {
       url = new URL(trustedDomain + redirect);
     }
-    redirect = url.pathname;
+    redirect = url.href;
     const msg = __('You are now logged in!');
     Worker.get('Auth', this._tabId).port.emit('passbolt.auth.login-success', msg, redirect);
   } else {

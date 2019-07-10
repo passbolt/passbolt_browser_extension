@@ -42,7 +42,7 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<ul>\n<? if (!aros.length) { ?>\n    <li>\n        <div class=\"row\">\n            <div class=\"main-cell-wrapper\">\n                <div class=\"main-cell\" style=\"font-size:16px;\">\n                    No user or group found\n                </div>\n            </div>\n        </div>\n    </li>\n<? } ?>\n<? for(let i in aros) {\n    const aro = aros[i];\n    let aroAvatarPath, aroName, aroDetails, cssClass;\n    if (aro.profile) {\n        aroAvatarPath = `${domain}/${aro.profile.avatar.url.small}`;\n        aroName = `${aro.profile.first_name} ${aro.profile.last_name} (${aro.gpgkey.key_id})`;\n        aroDetails = aro.username;\n        cssClass = 'user';\n    } else {\n        aroAvatarPath = `${domain}/img/avatar/group_default.png`;\n        aroName = aro.name;\n        aroDetails = `${aro.user_count} Member(s)`;\n        cssClass = 'group';\n    }\n?>\n    <li id=\"<?= aro.id ?>\">\n        <div class=\"row\">\n            <div class=\"main-cell-wrapper\">\n                <div class=\"main-cell\">\n                    <a>\n                        <div class=\"avatar\">\n                            <img src=\"<?= aroAvatarPath ?>\"/>\n                        </div>\n                        <div class=\"<?= cssClass ?>\">\n                            <span class=\"name\"><?= aroName ?></span>\n                            <span class=\"details\" title=\"<?= aroDetails ?>\"><?= aroDetails ?></span>\n                        </div>\n                    </a>\n                </div>\n            </div>\n        </div>\n    </li>\n<? } ?>\n</ul>\n"
+  , __lines = "<ul>\n<? if (!aros.length) { ?>\n    <li>\n        <div class=\"row\">\n            <div class=\"main-cell-wrapper\">\n                <div class=\"main-cell\" style=\"font-size:16px;\">\n                    No user or group found\n                </div>\n            </div>\n        </div>\n    </li>\n<? } ?>\n<? for(let i in aros) {\n    const aro = aros[i];\n    let aroAvatarPath, aroName, aroDetails, cssClass;\n    if (aro.profile) {\n        if (aro.profile.avatar.url.small.startsWith('https://')) {\n            aroAvatarPath = `${aro.profile.avatar.url.small}`;\n        } else {\n            aroAvatarPath = `${domain}/${aro.profile.avatar.url.small}`;\n        }\n        aroName = `${aro.profile.first_name} ${aro.profile.last_name} (${aro.gpgkey.key_id})`;\n        aroDetails = aro.username;\n        cssClass = 'user';\n    } else {\n        aroAvatarPath = `${domain}/img/avatar/group_default.png`;\n        aroName = aro.name;\n        aroDetails = `${aro.user_count} Member(s)`;\n        cssClass = 'group';\n    }\n?>\n    <li id=\"<?= aro.id ?>\">\n        <div class=\"row\">\n            <div class=\"main-cell-wrapper\">\n                <div class=\"main-cell\">\n                    <a>\n                        <div class=\"avatar\">\n                            <img src=\"<?= aroAvatarPath ?>\"/>\n                        </div>\n                        <div class=\"<?= cssClass ?>\">\n                            <span class=\"name\"><?= aroName ?></span>\n                            <span class=\"details\" title=\"<?= aroDetails ?>\"><?= aroDetails ?></span>\n                        </div>\n                    </a>\n                </div>\n            </div>\n        </div>\n    </li>\n<? } ?>\n</ul>\n"
   , __filename = "src/all/data/ejs/resource/shareAutocomplete.ejs";
 try {
   var __output = [], __append = __output.push.bind(__output);
@@ -59,7 +59,11 @@ try {
     const aro = aros[i];
     let aroAvatarPath, aroName, aroDetails, cssClass;
     if (aro.profile) {
-        aroAvatarPath = `${domain}/${aro.profile.avatar.url.small}`;
+        if (aro.profile.avatar.url.small.startsWith('https://')) {
+            aroAvatarPath = `${aro.profile.avatar.url.small}`;
+        } else {
+            aroAvatarPath = `${domain}/${aro.profile.avatar.url.small}`;
+        }
         aroName = `${aro.profile.first_name} ${aro.profile.last_name} (${aro.gpgkey.key_id})`;
         aroDetails = aro.username;
         cssClass = 'user';
@@ -70,29 +74,29 @@ try {
         cssClass = 'group';
     }
 
-    ; __line = 27
+    ; __line = 31
     ; __append("\n    <li id=\"")
-    ; __line = 28
+    ; __line = 32
     ; __append(escapeFn( aro.id ))
     ; __append("\">\n        <div class=\"row\">\n            <div class=\"main-cell-wrapper\">\n                <div class=\"main-cell\">\n                    <a>\n                        <div class=\"avatar\">\n                            <img src=\"")
-    ; __line = 34
+    ; __line = 38
     ; __append(escapeFn( aroAvatarPath ))
     ; __append("\"/>\n                        </div>\n                        <div class=\"")
-    ; __line = 36
+    ; __line = 40
     ; __append(escapeFn( cssClass ))
     ; __append("\">\n                            <span class=\"name\">")
-    ; __line = 37
+    ; __line = 41
     ; __append(escapeFn( aroName ))
     ; __append("</span>\n                            <span class=\"details\" title=\"")
-    ; __line = 38
+    ; __line = 42
     ; __append(escapeFn( aroDetails ))
     ; __append("\">")
     ; __append(escapeFn( aroDetails ))
     ; __append("</span>\n                        </div>\n                    </a>\n                </div>\n            </div>\n        </div>\n    </li>\n")
-    ; __line = 45
+    ; __line = 49
     ;  } 
     ; __append("\n</ul>\n")
-    ; __line = 47
+    ; __line = 51
   }
   return __output.join("");
 } catch (e) {

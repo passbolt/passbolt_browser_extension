@@ -4,7 +4,11 @@ let aroName = '';
 let aroDetails = '';
 
 if (aroPermissions.aro.profile) {
-    avatarPath = `${domain}/${aroPermissions.aro.profile.avatar.url.small}`;
+    if (aroPermissions.aro.profile.avatar.url.small.startsWith('https://')) {
+        avatarPath = `${aroPermissions.aro.profile.avatar.url.small}`;
+    } else {
+        avatarPath = `${domain}/${aroPermissions.aro.profile.avatar.url.small}`;
+    }
     aroName = `${aroPermissions.aro.profile.first_name} ${aroPermissions.aro.profile.last_name}`;
     aroDetails = aroPermissions.aro.username;
 } else {

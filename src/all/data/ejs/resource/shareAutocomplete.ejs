@@ -14,7 +14,11 @@
     const aro = aros[i];
     let aroAvatarPath, aroName, aroDetails, cssClass;
     if (aro.profile) {
-        aroAvatarPath = `${domain}/${aro.profile.avatar.url.small}`;
+        if (aro.profile.avatar.url.small.startsWith('https://')) {
+            aroAvatarPath = `${aro.profile.avatar.url.small}`;
+        } else {
+            aroAvatarPath = `${domain}/${aro.profile.avatar.url.small}`;
+        }
         aroName = `${aro.profile.first_name} ${aro.profile.last_name} (${aro.gpgkey.key_id})`;
         aroDetails = aro.username;
         cssClass = 'user';

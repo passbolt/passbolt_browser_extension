@@ -107,20 +107,24 @@ AuthController.prototype._syncUserSettings = async function () {
 
 /**
  * Handle a login success
- * @param {string} tabId The tab identifier
+ * @param {string} redirect url (optional)
  * @param {Error} redirect The uri to redirect the user to after login.
  */
 AuthController.prototype._handleLoginSuccess = async function (redirect) {
   await app.pageMods.PassboltApp.init();
 
   if (this.worker.pageMod && this.worker.pageMod.args.name == "AuthForm") {
+    let url;
+    const trustedDomain = Config.read('user.settings.trustedDomain');
+
     // The application authenticator requires the success to be sent on another worker (Auth).
     // It will notify the users and redirect them.
-    if (!redirect || redirect[0] != '/') {
-      const trustedDomain = Config.read('user.settings.trustedDomain');
-      const url = new URL(trustedDomain);
-      redirect = url.pathname;
+    if (!redirect || !(typeof redirect === 'string' || redirect instanceof String) || redirect.charAt(0) !== '/') {
+      url = new URL(trustedDomain);
+    } else {
+      url = new URL(trustedDomain + redirect);
     }
+    redirect = url.pathname;
     const msg = __('You are now logged in!');
     Worker.get('Auth', this._tabId).port.emit('passbolt.auth.login-success', msg, redirect);
   } else {

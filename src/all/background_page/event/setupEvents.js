@@ -27,6 +27,7 @@ var listen = function (worker) {
       var setupData = setup.set(key, value);
       worker.port.emit(requestId, 'SUCCESS', setupData);
     } catch (error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
@@ -43,6 +44,7 @@ var listen = function (worker) {
       var setupData = setup.get(key);
       worker.port.emit(requestId, 'SUCCESS', setupData);
     } catch (error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
@@ -59,6 +61,7 @@ var listen = function (worker) {
       var myStepId = setup.navigationNext(stepId);
       worker.port.emit(requestId, 'SUCCESS', myStepId);
     } catch (error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
@@ -74,6 +77,7 @@ var listen = function (worker) {
       var lastStep = setup.navigationBack();
       worker.port.emit(requestId, 'SUCCESS', lastStep);
     } catch (error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
@@ -88,6 +92,7 @@ var listen = function (worker) {
       var history = setup.getNavigationHistory();
       worker.port.emit(requestId, 'SUCCESS', history);
     } catch (error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
@@ -102,6 +107,7 @@ var listen = function (worker) {
       setup.flush();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
@@ -120,11 +126,13 @@ var listen = function (worker) {
             worker.port.emit(requestId, 'SUCCESS');
           },
           function (error) {
+            console.error(error);
             worker.port.emit(requestId, 'ERROR', error.message);
           }
         );
     }
     catch (error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR', error.message);
     }
   });
@@ -143,6 +151,7 @@ var listen = function (worker) {
           worker.port.emit(requestId, 'SUCCESS');
         },
         function (error) {
+          console.error(error);
           worker.port.emit(requestId, 'ERROR', error);
         }
       );
@@ -162,6 +171,7 @@ var listen = function (worker) {
           worker.port.emit(requestId, 'SUCCESS');
         },
         function (error) {
+          console.error(error);
           worker.port.emit(requestId, 'ERROR', error);
         }
       );

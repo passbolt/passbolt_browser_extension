@@ -227,7 +227,7 @@ Resource.updateLocalStorage = async function() {
   flushResourcesLocalStorageTimeout = setTimeout(() => {
     browser.storage.local.remove("resources");
   }, FLUSH_RESOURCES_LOCAL_STORAGE_TIME);
-}
+};
 
 /**
  * Observe when the user session is terminated.
@@ -245,14 +245,14 @@ browser.storage.local.remove("resources");
  * Add a resource to the local storage.
  */
 Resource.addToLocalStorage = async function(resource) {
-  const { resources } = await browser.storage.local.get("resources");
+  let { resources } = await browser.storage.local.get("resources");
   if (!resources) {
     await Resource.updateLocalStorage();
     resources = await browser.storage.local.get("resources");
   }
   resources.push(resource);
   return await browser.storage.local.set({ resources });
-}
+};
 
 /**
  * Find all the resources
@@ -261,7 +261,7 @@ Resource.addToLocalStorage = async function(resource) {
  */
 Resource.findAll = async function(options) {
   return ResourceService.findAll(options);
-}
+};
 
 /**
  * Save a resource
@@ -270,7 +270,7 @@ Resource.findAll = async function(options) {
  */
 Resource.save = async function(data) {
   return ResourceService.save(data);
-}
+};
 
 
 exports.Resource = Resource;

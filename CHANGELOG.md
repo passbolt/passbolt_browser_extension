@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Fixed
+- PB-544: Fix login passphrase remember me and quickaccess
+
 ## [2.10.2] - 2019-07-10
 - GITHUB-66: The browser extension doesn't build by default on unix system
 - GITHUB-70: Fix autofill for self-hosted GitLab instance does not work

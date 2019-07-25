@@ -56,7 +56,7 @@ AuthController.prototype.login = async function (passphrase, remember, redirect)
     await this._checkMfaAuthentication();
     await this._syncUserSettings();
     if (remember) {
-      user.storeMasterPasswordTemporarily(passphrase, remember);
+      user.storeMasterPasswordTemporarily(passphrase, -1);
     }
     this._handleLoginSuccess(redirect);
   } catch (error) {

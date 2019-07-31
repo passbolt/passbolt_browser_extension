@@ -1,6 +1,6 @@
 {
   "name": "passbolt_extension",
-  "version": "2.10.2",
+  "version": "2.10.3",
   "license": "AGPL-3.0",
   "description": "Passbolt web extension for the open source password manager for teams",
   "homepage": "https://www.passbolt.com",
@@ -14,7 +14,7 @@
     "locutus": "~2.0.9",
     "memoize-one": "^5.0.1",
     "openpgp": "^4.3.0",
-    "papaparse": "^4.4.0",
+    "papaparse": "^5.0.1",
     "passbolt-styleguide": "^2.9.0",
     "prop-types": "^15.6.2",
     "react": "^16.8.5",

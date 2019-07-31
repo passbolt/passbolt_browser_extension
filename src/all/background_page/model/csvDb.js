@@ -107,7 +107,7 @@ CsvDb.prototype.fromResources = function(resources, format) {
         var csvEntry = resource.toCsvEntry(resources[i], CsvDb.formats[format]);
         csvEntries.push(csvEntry);
       }
-      csvContent = PapaParse.unparse(csvEntries, {header: true});
+      csvContent = PapaParse.unparse(csvEntries, {header: true, quotes: true});
       resolve(csvContent);
     } catch(e) {
       reject(e);

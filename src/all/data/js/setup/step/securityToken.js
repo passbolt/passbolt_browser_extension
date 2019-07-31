@@ -89,7 +89,7 @@ $(function () {
    * @returns Promise
    */
   step.cancel = function () {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       passbolt.setup.setActionState('cancel', 'processing');
       resolve();
     });
@@ -110,7 +110,7 @@ $(function () {
       .then(function success() {
         step.elts.$feedback.addClass('hidden');
         passbolt.setup.setActionState('submit', 'enabled');
-      }, function error (errorMessage, validationErrors) {
+      }, function error(errorMessage, validationErrors) {
         step.onError(validationErrors[0].securityToken);
         passbolt.setup.setActionState('submit', 'disabled');
       });
@@ -136,7 +136,7 @@ $(function () {
    * @private
    */
   step._validateToken = function (tokenData) {
-    return passbolt.request('passbolt.user.settings.validate', {securityToken: tokenData}, ['securityToken']);
+    return passbolt.request('passbolt.user.settings.validate', { securityToken: tokenData }, ['securityToken']);
   };
 
   /**
@@ -205,14 +205,28 @@ $(function () {
   };
 
   /**
+  * Get Random Bytes
+  * Helps to generate cryptographically secure pseudorandom numbers
+  * @returns {array}
+  * @private
+  */
+
+  step._getRandomBytes = function (byteSize) {
+    var buf = new Uint8Array(byteSize);
+    window.crypto.getRandomValues(buf);
+    return buf;
+  };
+
+  /**
    * Get a generated random color.
    * @returns {string}
    * @private
    */
   step._getRandomColor = function () {
+    var randomArray = step._getRandomBytes(32);
     var randomColor = '';
     for (var i = 0; i < 6; i++) {
-      randomColor += step.options.colorpossible.charAt(Math.floor(Math.random() * step.options.colorpossible.length));
+      randomColor += step.options.colorpossible.charAt(Math.floor(randomArray[i] % (step.options.colorpossible.length + 1)));
     }
     return '#' + randomColor;
   };
@@ -222,14 +236,16 @@ $(function () {
    * @returns {string}
    * @private
    */
+
   step._getRandomText = function () {
+    var randomArray = step._getRandomBytes(32);
     var randomText = '';
     for (var i = 0; i < 3; i++) {
-      randomText += step.options.txtpossible.charAt(Math.floor(Math.random() * step.options.txtpossible.length));
+      randomText += step.options.txtpossible.charAt(Math.floor(randomArray[i] % (step.options.txtpossible.length + 1)));
     }
     return randomText;
   };
-
   passbolt.setup.steps[step.id] = step;
 
 });
+

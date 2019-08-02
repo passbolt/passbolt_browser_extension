@@ -7,26 +7,45 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 const AuthController = require('../controller/authController').AuthController;
+const AuthCheckStatusController = require('../controller/auth/authCheckStatusController').AuthCheckStatusController;
+const AuthIsAuthenticatedController = require('../controller/auth/authIsAuthenticatedController').AuthIsAuthenticatedController;
+const AuthIsMfaRequiredController = require('../controller/auth/authIsMfaRequiredController').AuthIsMfaRequiredController;
 const GpgAuth = require('../model/gpgauth').GpgAuth;
-const User = require('../model/user').User;
 const Worker = require('../model/worker');
 
 const listen = function (worker) {
+
   /*
-   * Check if the user is logged in.
+   * Check if the user is authenticated.
    *
-   * @listens passbolt.auth.is-logged-in
+   * @listens passbolt.auth.is-authenticated
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.is-logged-in', async function (requestId) {
-    const user = User.getInstance();
+  worker.port.on('passbolt.auth.is-authenticated', async function (requestId, options) {
+    const controller = new AuthIsAuthenticatedController(worker, requestId);
+    controller.main(options);
+  });
 
-    try {
-      await user.isLoggedIn();
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-    }
+  /*
+   * Check if the user requires to complete the mfa.
+   *
+   * @listens passbolt.auth.is-mfa-required
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.auth.is-mfa-required', async function (requestId) {
+    const controller = new AuthIsMfaRequiredController(worker, requestId);
+    controller.main();
+  });
+
+  /*
+   * Check the user auth status.
+   *
+   * @listens passbolt.auth.check-status
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.auth.check-status', async function (requestId) {
+    const controller = new AuthCheckStatusController(worker, requestId);
+    controller.main();
   });
 
   /*

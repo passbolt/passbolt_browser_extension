@@ -13,6 +13,7 @@ var main = function() {
 
   // Config and user models
   var Config = require('./model/config');
+  const GpgAuth = require('./model/gpgauth').GpgAuth;
   var User = require('./model/user').User;
   var SiteSettings = require('./model/siteSettings').SiteSettings;
   var Log = require('./model/log').Log;
@@ -48,7 +49,7 @@ var main = function() {
 
   pageMods.Bootstrap.init();
 
-  // // If the user is valid we enable the login pagemod
+  // If the user is valid we enable the login pagemod
   var user = User.getInstance();
   if (user.isValid()) {
     // Auth pagemod init can also be triggered
@@ -57,11 +58,12 @@ var main = function() {
 
     // App pagemod init is generally triggered after a successful login
     // We only initialize it here for the cases where the user is already logged in
-    user.isLoggedIn()
-      .then(function() {
+    // It can happen when the extension is updated
+    const auth = new GpgAuth();
+    auth.isAuthenticated()
+      .then(() => {
         pageMods.PassboltApp.init();
-      }, function() {
-        // The user is not logged-in, do nothing.
+        auth.startCheckAuthStatusLoop();
       });
   }
 

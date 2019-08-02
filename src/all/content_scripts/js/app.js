@@ -143,15 +143,6 @@ window.addEventListener('passbolt.group.edit.save', function (event) {
 });
 
 /* ==================================================================================
- *  Plugin common event
- * ================================================================================== */
-
-window.addEventListener('passbolt.plugin.is-ready', async function (event) {
-  const requestId = event.detail[0];
-  passbolt.message.emitToPage(requestId, { status: 'SUCCESS' });
-});
-
-/* ==================================================================================
  *  Auth event
  * ================================================================================== */
 
@@ -428,10 +419,23 @@ window.addEventListener('passbolt.import-passwords', function (evt) {
   passbolt.request('passbolt.import-passwords.open-dialog');
 });
 
+// Listen when the appjs requests the authenticated status.
+window.addEventListener('passbolt.auth.is-authenticated', async function (event) {
+  const requestId = event.detail[0];
+  const options = event.detail[1];
 
-// Listen when the plugin is ready
-$('html').addClass('passboltplugin-ready');
-window.addEventListener('passbolt.plugin.is-ready', function (requestId) {
-  passbolt.message.emitToPage(requestId, { status: 'SUCCESS' });
+  try {
+    const isAutenticated = await passbolt.request('passbolt.auth.is-authenticated', options);
+    passbolt.message.emitToPage(requestId, { status: 'SUCCESS', body: isAutenticated });
+  } catch (error) {
+    console.error(error);
+    passbolt.message.emitToPage(requestId, { status: 'ERROR', body: error });
+  }
 });
+
+// Listen when the background page is ready and add the status to the DOM.
+passbolt.message.on('passbolt.app.worker.ready', function () {
+  $('html').addClass('passboltplugin-ready');
+});
+
 undefined; // result must be structured-clonable data

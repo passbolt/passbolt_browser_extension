@@ -35,26 +35,28 @@ class LoginPage extends React.Component {
     this.setState({ processing: true, error: "" });
 
     try {
-      await passbolt.request("passbolt.auth.login", this.state.passphrase, this.state.rememberMe);
-      this.props.loginSuccessCallback();
-      this.props.history.push("/data/quickaccess.html");
+      await this.login();
     } catch (error) {
-      if (error.name === "MfaAuthenticationRequiredError") {
-        this.redirectToMfaAuthentication();
-      } else {
-        this.setState({
-          error: error.message,
-          processing: false
-        });
-        // Force the focus onto the passphrase input. The autoFocus attribute only works with the first rendering.
-        this.passphraseInputRef.current.focus();
-      }
+      this.setState({
+        error: error.message,
+        processing: false
+      });
+      // Force the focus onto the passphrase input. The autoFocus attribute only works with the first rendering.
+      this.passphraseInputRef.current.focus();
     }
   }
 
-  redirectToMfaAuthentication() {
-    browser.tabs.create({ url: this.context.user["user.settings.trustedDomain"] });
-    window.close();
+  async login() {
+    await passbolt.request("passbolt.auth.login", this.state.passphrase, this.state.rememberMe);
+    const isMfaRequired = await passbolt.request("passbolt.auth.is-mfa-required");
+
+    if (!isMfaRequired) {
+      this.props.loginSuccessCallback();
+      this.props.history.push("/data/quickaccess.html");
+    } else {
+      browser.tabs.create({ url: this.context.user["user.settings.trustedDomain"] });
+      window.close();
+    }
   }
 
   handleInputChange(event) {

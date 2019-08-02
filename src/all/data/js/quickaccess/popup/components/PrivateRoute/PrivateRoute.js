@@ -14,10 +14,10 @@ class PrivateRoute extends Component {
         path={path}
         render={props => (
           <React.Fragment>
-            {this.context.isLoggedIn &&
+            {this.context.isAuthenticated &&
               <Component {...props} {...componentProps} />
             }
-            {!this.context.isLoggedIn &&
+            {!this.context.isAuthenticated &&
               <Redirect
                 to={{
                   pathname: "/data/quickaccess/login",

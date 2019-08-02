@@ -54,13 +54,13 @@ class QuickAccess extends React.Component {
   async componentDidMount() {
     await this.checkPluginIsConfigured();
     await this.getUser();
-    this.checkUserIsLoggedIn();
+    this.checkAuthStatus();
     this.getSiteSettings();
   }
 
   initState() {
     this.state = {
-      isLoggedIn: null,
+      isAuthenticated: null,
       user: null,
       siteSettings: null,
       // Search
@@ -100,17 +100,13 @@ class QuickAccess extends React.Component {
     this.setState({ siteSettings });
   }
 
-  async checkUserIsLoggedIn() {
-    try {
-      await passbolt.request("passbolt.auth.is-logged-in");
-      this.setState({ isLoggedIn: true });
-    } catch (error) {
-      if (error.name === "MfaAuthenticationRequiredError") {
-        this.redirectToMfaAuthentication();
-      } else {
-        this.setState({ isLoggedIn: false });
-      }
+  async checkAuthStatus() {
+    const { isAuthenticated, isMfaRequired } = await passbolt.request("passbolt.auth.check-status");
+    if (isMfaRequired) {
+      this.redirectToMfaAuthentication();
+      return;
     }
+    this.setState({ isAuthenticated });
   }
 
   redirectToMfaAuthentication() {
@@ -119,11 +115,11 @@ class QuickAccess extends React.Component {
   }
 
   loginSuccessCallback() {
-    this.setState({ isLoggedIn: true });
+    this.setState({ isAuthenticated: true });
   }
 
   logoutSuccessCallback() {
-    this.setState({ isLoggedIn: false });
+    this.setState({ isAuthenticated: false });
   }
 
   handleKeyDown(event) {
@@ -142,7 +138,7 @@ class QuickAccess extends React.Component {
   }
 
   isReady() {
-    return this.state.isLoggedIn !== null
+    return this.state.isAuthenticated !== null
       && this.state.user !== null
       && window.self.port !== undefined && window.self.port._connected;
   }

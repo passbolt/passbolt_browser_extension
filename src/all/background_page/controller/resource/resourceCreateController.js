@@ -41,7 +41,6 @@ class ResourceCreateController {
       secrets: [{ data: secret }]
     }, resource);
     const savedResource = await Resource.save(data);
-    await Resource.addToLocalStorage(savedResource);
 
     return savedResource;
   }

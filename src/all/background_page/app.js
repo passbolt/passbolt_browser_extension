@@ -28,6 +28,7 @@ events.debugPage = require('./event/debugPageEvents');
 events.editPassword = require('./event/editPasswordEvents');
 events.exportPasswordsIframe = require('./event/exportPasswordsIframeEvents');
 events.exportPasswords = require('./event/exportPasswordsEvents');
+events.favorite = require('./event/favoriteEvents');
 events.file = require('./event/fileEvents');
 events.group = require('./event/groupEvents');
 events.groupAutocomplete = require('./event/groupAutocompleteEvents');

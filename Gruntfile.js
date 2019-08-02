@@ -190,6 +190,8 @@ module.exports = function(grunt) {
           {expand: true, cwd: path.node_modules + 'react-dom/umd', src: 'react-dom.production.min.js', dest: path.src_content_vendors},
           // simplebar
           {expand: true, cwd: path.node_modules + 'simplebar/dist', src: 'simplebar.js', dest: path.src_content_vendors},
+          // firefox browser polyfill.
+          {expand: true, cwd: path.node_modules + 'webextension-polyfill/dist', src: 'browser-polyfill.js', dest: path.src_content_vendors}
 
            // TODO PASSBOLT-2219 Fix / Add missing Vendors
           // In src_content_vendors

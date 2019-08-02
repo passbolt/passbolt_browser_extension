@@ -217,6 +217,28 @@ var listen = function (worker) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }
   });
+
+  // Notify the content code about the background page ready.
+  const readyEventSent = false;
+  async function isReady() {
+    // The ready event has already been sent.
+    if (readyEventSent) {
+      return;
+    }
+
+    const requestResult = worker.port.request('passbolt.app.worker.ready');
+
+    // In the case the content code events listener are not yet bound, plan to request the
+    // content again.
+    setTimeout(() => {
+      isReady();
+    }, 50);
+
+    // Once the promise completed then we consider the event has been received by the content code.
+    await requestResult;
+    readyEventSent = true;
+  };
+  isReady();
 };
 
 exports.listen = listen;

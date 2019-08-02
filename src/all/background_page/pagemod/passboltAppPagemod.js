@@ -11,6 +11,7 @@
 var app = require('../app');
 var pageMod = require('../sdk/page-mod');
 var Worker = require('../model/worker');
+var GpgAuth = require('../model/gpgauth').GpgAuth;
 var User = require('../model/user').User;
 var TabStorage = require('../model/tabStorage').TabStorage;
 
@@ -54,6 +55,7 @@ PassboltApp.initPageMod = function () {
     contentScriptFile: [
       'data/vendors/jquery.js',
       'data/vendors/validator.js',
+      'data/vendors/browser-polyfill.js',
 
       // Templates
       'data/tpl/group.js',
@@ -82,38 +84,38 @@ PassboltApp.initPageMod = function () {
       'content_scripts/js/app.js'
     ],
     attachTo: ["existing", "top"],
-    onAttach: function (worker) {
-      user.isLoggedIn().then(
-        // If it is already logged-in.
-        function success() {
-          TabStorage.initStorage(worker.tab);
+    onAttach: async function (worker) {
+      const auth = new GpgAuth();
+      if (!await auth.isAuthenticated()) {
+        console.error('Can not attach application if user is not logged in.');
+        return;
+      }
 
-          app.events.clipboard.listen(worker);
-          app.events.config.listen(worker);
-          app.events.editPassword.listen(worker);
-          app.events.exportPasswordsIframe.listen(worker);
-          app.events.keyring.listen(worker);
-          app.events.secret.listen(worker);
-          app.events.group.listen(worker);
-          app.events.importPasswordsIframe.listen(worker);
-          app.events.masterPasswordIframe.listen(worker);
-          app.events.siteSettings.listen(worker);
-          app.events.app.listen(worker);
-          app.events.user.listen(worker);
+      TabStorage.initStorage(worker.tab);
 
-          Worker.add('App', worker);
-        },
-        // If it is logged-out.
-        function error() {
-          console.error('Can not attach application if user is not logged in.');
-        }
-      );
+      app.events.auth.listen(worker);
+      app.events.clipboard.listen(worker);
+      app.events.config.listen(worker);
+      app.events.editPassword.listen(worker);
+      app.events.exportPasswordsIframe.listen(worker);
+      app.events.favorite.listen(worker);
+      app.events.keyring.listen(worker);
+      app.events.secret.listen(worker);
+      app.events.group.listen(worker);
+      app.events.importPasswordsIframe.listen(worker);
+      app.events.masterPasswordIframe.listen(worker);
+      app.events.siteSettings.listen(worker);
+      app.events.user.listen(worker);
+      app.events.resource.listen(worker);
+      app.events.app.listen(worker);
+
+      Worker.add('App', worker);
     }
   });
 };
 
 PassboltApp.init = function () {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     // According to the user status :
     // * the pagemod should be initialized if the user is valid and logged in;
     // * the pagemod should be destroyed otherwise;

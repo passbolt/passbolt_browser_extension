@@ -26,7 +26,7 @@ class Header extends React.Component {
             <span className="visually-hidden">Passbolt</span>
           </a>
         </h1>
-        {this.context.isLoggedIn &&
+        {this.context.isAuthenticated &&
           <a role="button" className={`option-link button button-icon`} onClick={this.handleLogoutClick} title="logout">
             <span className="visually-hidden">logout</span>
             <span className="fa icon">

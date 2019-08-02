@@ -3,8 +3,12 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Improved
+- PB-242: Add local storage resources capabilities to manipulate the resources (add, delete, update)
+
 ### Fixed
 - PB-544: Fix login passphrase remember me and quickaccess
+- PB-533: Fix session expired management
 
 ## [2.10.2] - 2019-07-10
 - GITHUB-66: The browser extension doesn't build by default on unix system
@@ -12,6 +16,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - GITHUB-71: Fix autofill for openstack horizon does not work
 - PB-449: Fix image url when using non local image storage
 - PB-449: Fix auth redirect when passbolt is installed in directory
+
+### Improved
+- Update the resources local storage when add, delete or update resources
 
 ## [2.10.1] - 2019-05-17
 ### Fixed

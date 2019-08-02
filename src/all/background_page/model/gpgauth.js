@@ -2,21 +2,25 @@
 /**
  * GpgAuth model.
  *
- * @copyright (c) 2018 Passbolt SARL
+ * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 const __ = require('../sdk/l10n').get;
+const AuthService = require('../service/auth').AuthService;
 const User = require('./user').User;
 const Keyring = require('./keyring').Keyring;
 const Crypto = require('./crypto').Crypto;
 const Uuid = require('../utils/uuid');
 const GpgAuthToken = require('./gpgAuthToken').GpgAuthToken;
 const GpgAuthHeader = require('./gpgAuthHeader').GpgAuthHeader;
+const MfaAuthenticationRequiredError = require('../error/mfaAuthenticationRequiredError').MfaAuthenticationRequiredError;
 const Request = require('./request').Request;
+const SiteSettings = require('./siteSettings').SiteSettings;
 
 const URL_VERIFY = '/auth/verify.json?api-version=v1';
 const URL_LOGIN = '/auth/login.json?api-version=v1';
 const URL_LOGOUT = '/auth/logout.json?api-version=v1';
+const CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD = 60000;
 
 /**
  * GPGAuth authentication
@@ -27,12 +31,22 @@ let GpgAuth = function () {
 };
 
 /**
+ * Check the authentication status interval.
+ */
+GpgAuth.checkIsAuthenticatedTimeout = null;
+
+/**
+ * Latest stored auth user status.
+ */
+GpgAuth._authStatus = null;
+
+/**
  * Alias for User settings get domain
  *
  * @throws Error if domain is undefined
  * @returns {string}
  */
-GpgAuth.prototype.getDomain = function() {
+GpgAuth.prototype.getDomain = function () {
   return User.getInstance().settings.getDomain();
 };
 
@@ -46,7 +60,7 @@ GpgAuth.prototype.getDomain = function() {
  * @throws Error if verification procedure fails
  * @returns {Promise<void>}
  */
-GpgAuth.prototype.verify = async function(serverUrl, armoredServerKey, userFingerprint) {
+GpgAuth.prototype.verify = async function (serverUrl, armoredServerKey, userFingerprint) {
   let domain = serverUrl || this.getDomain();
   let serverKey = armoredServerKey || Uuid.get(domain);
   let fingerprint = userFingerprint || this.keyring.findPrivate().fingerprint;
@@ -57,7 +71,7 @@ GpgAuth.prototype.verify = async function(serverUrl, armoredServerKey, userFinge
   try {
     originalToken = new GpgAuthToken();
     encrypted = await crypto.encrypt(originalToken.token, serverKey)
-  } catch(error) {
+  } catch (error) {
     throw new Error(__('Unable to encrypt the verify token.') + ' ' + error.message);
   }
 
@@ -76,7 +90,7 @@ GpgAuth.prototype.verify = async function(serverUrl, armoredServerKey, userFinge
   const response = await fetch(domain + URL_VERIFY, fetchOptions);
 
   // If the server responded with an error build a relevant message
-  if(!response.ok) {
+  if (!response.ok) {
     let json = await response.json();
     if (typeof json.header !== 'undefined') {
       throw new Error(json.header.message);
@@ -89,7 +103,7 @@ GpgAuth.prototype.verify = async function(serverUrl, armoredServerKey, userFinge
   // Check that the server was able to decrypt the token with our local copy
   const auth = new GpgAuthHeader(response.headers, 'verify');
   const verifyToken = new GpgAuthToken(auth.headers['x-gpgauth-verify-response']);
-  if(verifyToken.token !== originalToken.token) {
+  if (verifyToken.token !== originalToken.token) {
     throw new Error(__('The server was unable to prove it can use the advertised OpenPGP key.'));
   }
 };
@@ -109,7 +123,7 @@ GpgAuth.prototype.getServerKey = async function (serverUrl) {
     credentials: 'include'
   });
 
-  if(!response.ok) {
+  if (!response.ok) {
     const msg = __('There was a problem when trying to communicate with the server') + ` (Code: ${response.status})`;
     throw new Error(msg);
   }
@@ -123,15 +137,18 @@ GpgAuth.prototype.getServerKey = async function (serverUrl) {
  *
  * @returns {Promise.<string>} referrer url
  */
-GpgAuth.prototype.logout = async function() {
+GpgAuth.prototype.logout = async function () {
   const url = this.getDomain() + URL_LOGOUT;
   const fetchOptions = {
     method: 'GET',
     credentials: 'include'
   };
-  const event = new Event('passbolt.session.terminated');
+
+  GpgAuth._authStatus = { isAuthenticated: false, isMfaRequired: false };
+  const event = new Event('passbolt.auth.logged-out');
   window.dispatchEvent(event);
-  return await fetch(url, fetchOptions);
+
+  await fetch(url, fetchOptions);
 };
 
 /**
@@ -140,10 +157,10 @@ GpgAuth.prototype.logout = async function() {
  * @param passphrase {string} The user private key passphrase
  * @returns {Promise.<string>} referrer url
  */
-GpgAuth.prototype.login = async function(passphrase) {
-    await this.keyring.checkPassphrase(passphrase);
-    const userAuthToken = await this.stage1(passphrase);
-    return await this.stage2(userAuthToken);
+GpgAuth.prototype.login = async function (passphrase) {
+  await this.keyring.checkPassphrase(passphrase);
+  const userAuthToken = await this.stage1(passphrase);
+  await this.stage2(userAuthToken);
 };
 
 /**
@@ -227,13 +244,134 @@ GpgAuth.prototype.onResponseError = async function (response) {
   let json;
   try {
     json = await response.json();
-  } catch(error) {
+  } catch (error) {
     throw new Error(error_msg);
   }
   if (typeof json.header !== 'undefined') {
     throw new Error(json.header.message);
   }
   throw new Error(error_msg);
+};
+
+/**
+ * Check if the user is authenticated.
+ * @param {object} options Optional parameters
+ * - options.requestApi {bool}, get the status from the API, default true.
+ * @return {bool}
+ */
+GpgAuth.prototype.isAuthenticated = async function (options) {
+  const authStatus = await this.checkAuthStatus(options);
+  return authStatus.isAuthenticated;
+};
+
+/**
+ * Check if the user needs to complete the MFA.
+ *
+ * @return {bool}
+ */
+GpgAuth.prototype.isMfaRequired = async function () {
+  const authStatus = await this.checkAuthStatus();
+  return authStatus.isMfaRequired;
+};
+
+/**
+ * Request the server and retrieve the auth status.
+ * @param {object} options Optional parameters
+ * - options.requestApi {bool}, get the status from the API, default true.
+ * @return {object}
+ *  {
+ *    isAuthenticated: {bool} true if the user is authenticated, false otherwise
+ *    isMfaRequired: {bool} true if the mfa is required, false otherwise.
+ *  }
+ */
+GpgAuth.prototype.checkAuthStatus = async function (options) {
+  let isAuthenticated, isMfaRequired;
+  // Define options.
+  options = Object.assign({
+    requestApi: true
+  }, options);
+
+  // No request to API required, return the latest stored information.
+  if (!options.requestApi && GpgAuth._authStatus !== null) {
+    return GpgAuth._authStatus;
+  }
+
+  try {
+    isAuthenticated = await AuthService.isAuthenticated();
+    isMfaRequired = false;
+  } catch (error) {
+    if (error instanceof MfaAuthenticationRequiredError) {
+      isAuthenticated = true;
+      isMfaRequired = true;
+    } else {
+      throw error;
+    }
+  }
+
+  GpgAuth._authStatus = { isAuthenticated, isMfaRequired };
+
+  return GpgAuth._authStatus;
+};
+
+/**
+ * Start an invertval to check if the user is authenticated.
+ * - In the case the user is logged out, trigger a passbolt.auth.logged-out event.
+ *
+ * @return {void}
+ */
+GpgAuth.prototype.startCheckAuthStatusLoop = async function () {
+  const timeoutPeriod = await this.getCheckAuthStatusTimeoutPeriod();
+
+  if (GpgAuth.checkAuthStatusTimeout) {
+    clearTimeout(GpgAuth.checkAuthStatusTimeout);
+  }
+
+  GpgAuth.checkAuthStatusTimeout = setTimeout(async () => {
+    if (!await this.isAuthenticated()) {
+      const event = new Event('passbolt.auth.logged-out');
+      window.dispatchEvent(event);
+    } else {
+      this.startCheckAuthStatusLoop();
+    }
+  }, timeoutPeriod);
+};
+
+/**
+ * Get the interval period the is authenticated check should be performed.
+ *
+ * The interval varies regarding the version of the API.
+ * - With API >= v2.11.0 the check can be performed every CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD seconds.
+ *   The entry point introduced with v2.11.0 (/auth/is-authenticated) does not extend the user session.
+ * - With API < v2.11.0 the check cannot be performed every CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD seconds.
+ *   The entry point /auth/checksession is extending the session, and therefor the check should be done
+ *   as per the session timeout.
+ *
+ * @return {int}
+ */
+GpgAuth.prototype.getCheckAuthStatusTimeoutPeriod = async function() {
+  let timeoutPeriod = CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD;
+
+  // The entry point available before v2.11.0 extends the session expiry period.
+  // Define the check interval based on the server session timeout.
+  if (AuthService.useLegacyIsAuthenticatedEntryPoint === true) {
+    const domain = User.getInstance().settings.getDomain();
+    const siteSettings = new SiteSettings(domain);
+    const settings = await siteSettings.get();
+    // By default a default php session expires after 24 min.
+    let sessionTimeout = 24;
+    // Check if the session timeout is provided in the settings.
+    // If not provided it means the user is not logged in or the MFA is required.
+    if (settings && settings.app && settings.app.session_timeout) {
+      sessionTimeout = settings.app.session_timeout;
+    }
+    // @debug remove this.
+    sessionTimeout = 0.20;
+    // Convert the timeout in millisecond and add 1 second to ensure the session is well expired
+    // when the request is made.
+    timeoutPeriod = ((sessionTimeout * 60) + 1) * 1000;
+  }
+
+  return timeoutPeriod;
 };
 
 // Exports the Authentication model object.

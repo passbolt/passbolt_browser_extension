@@ -60,11 +60,15 @@ Log.write = function (log) {
   function formatTime(i) {
     return (i < 10) ? "0" + i : i;
   }
-  var today = new Date(),
-    h = formatTime(today.getHours()),
-    m = formatTime(today.getMinutes()),
-    s = formatTime(today.getSeconds());
-  log.created =  h + ':' + m + ':' + s;
+
+  if (!log.date) {
+    log.date = new Date();
+  }
+  const h = formatTime(log.date.getHours());
+  const m = formatTime(log.date.getMinutes());
+  const s = formatTime(log.date.getSeconds());
+  const ms = formatTime(log.date.getMilliseconds());
+  log.created =  h + ':' + m + ':' + s + ':' + ms;
 
   // Register the log.
   _logs.push(log);

@@ -5,8 +5,8 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+const browser = require("webextension-polyfill/dist/browser-polyfill");
 const Config = require('./config');
-const MfaAuthenticationRequiredError = require('../error/mfaAuthenticationRequiredError').MfaAuthenticationRequiredError;
 const UserService = require('../service/user').UserService;
 const UserSettings = require('./userSettings').UserSettings;
 const __ = require('../sdk/l10n').get;
@@ -22,12 +22,12 @@ const User = (function () {
   // the fields
   this._user = {};
 
- /*
-  * _masterpassword be a json object with :
-  * - password: value of master password
-  * - created: timestamp when it was stored
-  * - timeout: interval function
-  */
+  /*
+   * _masterpassword be a json object with :
+   * - password: value of master password
+   * - created: timestamp when it was stored
+   * - timeout: interval function
+   */
   this._masterPassword = null;
 
   /*
@@ -144,7 +144,7 @@ const User = (function () {
     this._user.lastname = lastname;
     this._user.firstname = firstname;
     return (Config.write('user.firstname', firstname)
-    && Config.write('user.lastname', lastname));
+      && Config.write('user.lastname', lastname));
   };
 
   /**
@@ -317,52 +317,38 @@ const User = (function () {
   };
 
   /**
-   * Check if the current user is logged-in
+   * Store the master password temporarily.
    *
-   * @returns {Promise}
+   * @param masterPassword {string} The master password to store.
+   * @param seconds {int} seconds Remember the master password for X seconds. If -1 given,
+   * store the master password until the end of the session.
    */
-  this.isLoggedIn = function () {
-    var _this = this;
+  this.storeMasterPasswordTemporarily = function (masterPassword, seconds) {
+    this.flushMasterPassword();
+    this._masterPassword = {
+      "password": masterPassword,
+      "created": Math.round(new Date().getTime() / 1000.0),
+      "timeout": null
+    };
 
-    return new Promise(function(resolve, reject) {
-      fetch(
-        _this.settings.getDomain() + '/auth/checkSession.json' + '?api-version=v1', {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        })
-        .then(function (response) {
-          // Check response status
-          if (!response.ok) {
-            if (/mfa\/verify\/error\.json$/.test(response.url)) {
-              reject(new MfaAuthenticationRequiredError());
-            } else {
-              reject(new Error(__('The user is not logged-in')));
-            }
-          } else {
-            resolve(__('The user is logged-in'));
-          }
-        })
-        .catch(function (error) {
-          reject(error);
-        });
-    });
+    // If the seconds parameters is not equal to -1, set a timeout to flush the master passphrase at the end
+    // of the defined period. If it is set to -1 it will be flushed based on the passbolt.auth.logged-out
+    // event or when the browser is closed.
+    if (seconds !== -1) {
+      this._masterPassword.timeout = setTimeout(() => {
+        this.flushMasterPassword();
+      }, seconds * 1000);
+    }
   };
 
   /**
-   * Store master password temporarily.
-   *
-   * @param masterPassword {string} The master password to store.
+   * Flush the master password if any stored during a previous session
    */
-  this.storeMasterPasswordTemporarily = function (masterPassword, seconds) {
-    this._masterPassword = {
-      "password": masterPassword,
-      "created": Math.round(new Date().getTime() / 1000.0)
-    };
-    this._loopDeleteMasterPasswordOnTimeout(seconds);
+  this.flushMasterPassword = function () {
+    if (this._masterPassword && this._masterPassword.timeout) {
+      clearTimeout(this._masterPassword.timeout);
+    }
+    this._masterPassword = null;
   };
 
   /**
@@ -373,57 +359,13 @@ const User = (function () {
     this._csrfToken = csrfToken;
   };
 
-  /**
+    /**
    * Get the user csrf token
    *
    * @return {string}
    */
   this.getCsrfToken = function() {
     return this._csrfToken;
-  };
-
-  /**
-   * Loop to be executed every second to check if the master password should be deleted.
-   *
-   * @param timeout {int} timeout in seconds (example, if password should be
-   *  deleted after 5 minutes, 5*60)
-   * @private
-   */
-  this._loopDeleteMasterPasswordOnTimeout = function (timeout) {
-    var interval = 1000 * 10; // check every 10 sec then increase
-    var maxInterval = (1000 * 60 * 60); // check every hour
-    var self = this;
-
-    this.isLoggedIn()
-      .then(function() {
-        if (interval < maxInterval) {
-          // increase check interval to allow autologout
-          // max 1hour, if session timout is set to > 60min remember me is forever
-          // default session length without action is 20min
-          interval = interval + interval;
-          if (interval > maxInterval) {
-            interval = maxInterval;
-          }
-        }
-        var currentTimestamp = Math.round(new Date().getTime() / 1000.0);
-        if (timeout <= 0) {
-          // The user is logged-in and timout is set to until I logout, keep remembering.
-          self._masterPassword.timout = setTimeout(function () {
-            self._loopDeleteMasterPasswordOnTimeout(timeout);
-          }, interval);
-        } else if (currentTimestamp >= self._masterPassword.created + timeout) {
-          // The user is logged-in and timeout expired, reset master password.
-          self._masterPassword = null;
-        } else {
-          // The user is logged-in and timeout did not expire, keep remembering master password.
-          self._masterPassword.timout = setTimeout(function () {
-            self._loopDeleteMasterPasswordOnTimeout(timeout);
-          }, interval);
-        }
-      }, function() {
-        // The user is not logged-in, reset master password.
-        self._masterPassword = null;
-      });
   };
 
   /**
@@ -447,13 +389,6 @@ const User = (function () {
         reject(new Error(__('No master password stored.')));
       }
     });
-  };
-
-  /**
-   * Flush the master password if any stored during a previous session
-   */
-  this.flushMasterPassword = function () {
-    this._masterPassword = null;
   };
 
   /**
@@ -518,6 +453,22 @@ var UserSingleton = (function () {
     }
   };
 })();
+
+// Observe when the user session is terminated.
+// - Flush the temporary stored master password
+window.addEventListener("passbolt.auth.logged-out", () => {
+  const user = UserSingleton.getInstance();
+  user.flushMasterPassword();
+});
+
+// Observe when the window is closed, only strategy found to catch when the browser is closed.
+// - Flush the temporary stored master password
+browser.tabs.onRemoved.addListener((tabId, evInfo) => {
+  if (evInfo.isWindowClosing) {
+    const user = UserSingleton.getInstance();
+    user.flushMasterPassword();
+  }
+});
 
 // Exports the User object.
 exports.User = UserSingleton;

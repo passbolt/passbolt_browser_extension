@@ -14,6 +14,12 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.active-tab.get-url', async function (requestId) {
     const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+    // There's a possiblity when `tabs` will be undefined.
+    // By instance separate `facebook.com` login window serves its usecase (login by facebook/google)
+    if (!tabs || !tabs[0]) {
+      worker.port.emit(requestId, 'ERROR', new Error('Unable to retrieve the active tab info.'));
+      return;
+    }
     worker.port.emit(requestId, 'SUCCESS', tabs[0].url);
   });
 

@@ -5,10 +5,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Improved
 - PB-242: Add local storage resources capabilities to manipulate the resources (add, delete, update)
+- GITHUB-79: Improve autofill compatibility, trigger an input event instead a change event while filling forms
+- PB-278: #GITHUB-61: Improve autofill compatibility, support Docker and AWS forms
+- PB-432: Improve autofill compatibility, support reddit.com
+- PB-433: Improve autofill compatibility, support Zoho CRM
+- GITHUB-78: Improve autofill compatibility, fill only username if no password fill present
+- PB-494: Improve autofill compatibility, ignore hidden fields
+- PB-514: Improve autofill compatibility, fill iframe forms
 
 ### Fixed
 - PB-544: Fix login passphrase remember me and quickaccess
 - PB-533: Fix session expired management
+- PB-515: Autofill should not fill if the url in the tab have changed between the time the user clicked on the button to fill and the data is sent to the page.
 
 ## [2.10.2] - 2019-07-10
 - GITHUB-66: The browser extension doesn't build by default on unix system

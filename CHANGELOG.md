@@ -4,7 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [2.11.0] - 2019-08-06
+## [2.11.0] - 2019-08-07
 ### Improved
 - PB-242: Add local storage resources capabilities to manipulate the resources (add, delete, update)
 - GITHUB-79: Improve autofill compatibility, trigger an input event instead a change event while filling forms

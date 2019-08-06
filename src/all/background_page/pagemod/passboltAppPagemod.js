@@ -86,7 +86,7 @@ PassboltApp.initPageMod = function () {
     attachTo: ["existing", "top"],
     onAttach: async function (worker) {
       const auth = new GpgAuth();
-      if (!await auth.isAuthenticated()) {
+      if (!await auth.isAuthenticated() || await auth.isMfaRequired()) {
         console.error('Can not attach application if user is not logged in.');
         return;
       }

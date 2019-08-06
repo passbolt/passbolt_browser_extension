@@ -223,10 +223,10 @@ $(function () {
    * @private
    */
   step._getRandomColor = function () {
-    var randomArray = step._getRandomBytes(32);
+    var randomArray = step._getRandomBytes(6);
     var randomColor = '';
     for (var i = 0; i < 6; i++) {
-      randomColor += step.options.colorpossible.charAt(Math.floor(randomArray[i] % (step.options.colorpossible.length + 1)));
+      randomColor += step.options.colorpossible.charAt(randomArray[i] % step.options.colorpossible.length);
     }
     return '#' + randomColor;
   };
@@ -238,10 +238,10 @@ $(function () {
    */
 
   step._getRandomText = function () {
-    var randomArray = step._getRandomBytes(32);
+    var randomArray = step._getRandomBytes(3);
     var randomText = '';
     for (var i = 0; i < 3; i++) {
-      randomText += step.options.txtpossible.charAt(Math.floor(randomArray[i] % (step.options.txtpossible.length + 1)));
+      randomText += step.options.txtpossible.charAt(randomArray[i] % step.options.txtpossible.length);
     }
     return randomText;
   };

@@ -364,8 +364,6 @@ GpgAuth.prototype.getCheckAuthStatusTimeoutPeriod = async function() {
     if (settings && settings.app && settings.app.session_timeout) {
       sessionTimeout = settings.app.session_timeout;
     }
-    // @debug remove this.
-    sessionTimeout = 0.20;
     // Convert the timeout in millisecond and add 1 second to ensure the session is well expired
     // when the request is made.
     timeoutPeriod = ((sessionTimeout * 60) + 1) * 1000;

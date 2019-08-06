@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [2.11.0] - 2019-08-06
 ### Improved
 - PB-242: Add local storage resources capabilities to manipulate the resources (add, delete, update)
 - GITHUB-79: Improve autofill compatibility, trigger an input event instead a change event while filling forms
@@ -395,7 +397,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.10.1...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.11.0...HEAD
+[2.11.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.10.1...v2.11.0
 [2.10.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.10.0...v2.10.1
 [2.10.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.9.2...v2.10.0
 [2.9.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.9.1...v2.9.2

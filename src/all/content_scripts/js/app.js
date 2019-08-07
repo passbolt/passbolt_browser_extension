@@ -434,8 +434,10 @@ window.addEventListener('passbolt.auth.is-authenticated', async function (event)
 });
 
 // Listen when the background page is ready and add the status to the DOM.
-passbolt.message.on('passbolt.app.worker.ready', function () {
+passbolt.message.on('passbolt.app.worker.ready', function (requestId) {
   $('html').addClass('passboltplugin-ready');
+  // Answer the request.
+  passbolt.message.emit(requestId, 'SUCCESS');
 });
 
 undefined; // result must be structured-clonable data

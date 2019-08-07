@@ -219,10 +219,10 @@ var listen = function (worker) {
   });
 
   // Notify the content code about the background page ready.
-  const readyEventSent = false;
+  let readyEventSent = false;
   async function isReady() {
     // The ready event has already been sent.
-    if (readyEventSent) {
+    if (!worker || readyEventSent) {
       return;
     }
 

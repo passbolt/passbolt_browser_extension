@@ -26,9 +26,14 @@ const User = (function () {
    * _masterpassword be a json object with :
    * - password: value of master password
    * - created: timestamp when it was stored
-   * - timeout: interval function
+   * - timeout: interval function before passphrase is flushed
    */
   this._masterPassword = null;
+
+  /*
+   * Interval function to keep session alive
+   */
+  this._sessionKeepAliveTimeout = null;
 
   /*
    * _csrfToken The user current csrf token.
@@ -339,16 +344,47 @@ const User = (function () {
         this.flushMasterPassword();
       }, seconds * 1000);
     }
+    if (this._sessionKeepAliveTimeout === null) {
+      this.setKeepAliveTimeout();
+    }
   };
 
   /**
    * Flush the master password if any stored during a previous session
+   * Also stop keeping the session alive if needed
    */
   this.flushMasterPassword = function () {
     if (this._masterPassword && this._masterPassword.timeout) {
       clearTimeout(this._masterPassword.timeout);
     }
+    if (this._sessionKeepAliveTimeout) {
+      clearTimeout(this._sessionKeepAliveTimeout);
+    }
+    this._sessionKeepAliveTimeout = null;
     this._masterPassword = null;
+  };
+
+  /**
+   * @return void
+   */
+  this.setKeepAliveTimeout = function () {
+    this._sessionKeepAliveTimeout = setTimeout( () => {
+      this.keepAlive();
+    }, 15 * 60 * 1000); // check every 15 minutes
+  };
+
+  /**
+   * Keep session alive if user's system is active for last 15 min
+   * @returns void
+   */
+  this.keepAlive = function() {
+    const idleInterval = 15 * 60; // detection interval in sec: 15 minutes
+    browser.idle.queryState(idleInterval).then( async (idleState) => {
+      if (idleState === 'active' && this._masterPassword !== null) {
+        await UserService.keepSessionAlive(this);
+      }
+      this.setKeepAliveTimeout();
+    });
   };
 
   /**
@@ -359,7 +395,7 @@ const User = (function () {
     this._csrfToken = csrfToken;
   };
 
-    /**
+  /**
    * Get the user csrf token
    *
    * @return {string}
@@ -374,7 +410,7 @@ const User = (function () {
    */
   this.isMasterPasswordStored = function() {
     return this._masterPassword !== null;
-  }
+  };
 
   /**
    * Retrieve master password from memory, in case it was stored temporarily

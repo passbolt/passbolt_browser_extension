@@ -61,11 +61,12 @@ const requestQuickAccessPassphrase = async function(worker) {
     throw new Error(__('The remember me should be a valid boolean.'));
   }
 
-  const keyring = new Keyring()
-  keyring.checkPassphrase(passphrase)
+  const keyring = new Keyring();
+  keyring.checkPassphrase(passphrase);
 
+  const user = User.getInstance();
   if (rememberMe) {
-    const user = User.getInstance();
+    // store until I log out
     user.storeMasterPasswordTemporarily(passphrase, -1);
   }
 

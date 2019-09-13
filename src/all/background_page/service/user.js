@@ -61,4 +61,39 @@ UserService.retrieveCsrfToken = async function (user) {
   return match[1];
 };
 
+/**
+ * Keep session alive by calling an endpoint
+ *
+ * @returns {boolean} true if session is active
+ */
+UserService.keepSessionAlive = async function (user) {
+  const domain = user.settings.getDomain();
+  const fetchOptions = {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Accept': 'application/json',
+      'content-type': 'application/json'
+    }
+  };
+  const url = new URL(`${domain}/users/me.json?api-version=2`);
+  let response, responseJson;
+
+  try {
+    response = await fetch(url, fetchOptions);
+  } catch (error) {
+    // Catch Network error such as connection lost.
+    throw new PassboltApiFetchError(error.message);
+  }
+
+  try {
+    await response.json();
+  } catch (error) {
+    // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
+    throw new PassboltApiFetchError(response.statusText, {code: response.status});
+  }
+
+  return response.ok;
+};
+
 exports.UserService = UserService;

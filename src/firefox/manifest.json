@@ -42,6 +42,7 @@
     "clipboardWrite",
     "tabs",
     "storage",
+    "unlimitedStorage",
     "*://*/*"
   ],
   "web_accessible_resources": [

@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [unreleased]
+### Improved
+- PB-649: The quickaccess passphrase field text and background colors should remain as default when the field is not focused.
+
 ## [2.11.1] - 2019-09-16
 - PB-125: Sessions should be extended by default when user ask to remember passphrase.
 

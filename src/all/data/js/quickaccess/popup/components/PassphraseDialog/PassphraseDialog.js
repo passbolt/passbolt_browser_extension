@@ -76,11 +76,11 @@ class PassphraseDialog extends React.Component {
     this.setState({
       passphraseStyle: {
         background: this.context.user["user.settings.securityToken.color"],
-        color: this.context.user["user.settings.securityToken.textColor"],
+        color: this.context.user["user.settings.securityToken.textColor"]
       },
       securityTokenStyle: {
         background: this.context.user["user.settings.securityToken.textColor"],
-        color: this.context.user["user.settings.securityToken.color"],
+        color: this.context.user["user.settings.securityToken.color"]
       }
     });
   }
@@ -88,12 +88,12 @@ class PassphraseDialog extends React.Component {
   handleInputBlur() {
     this.setState({
       passphraseStyle: {
-        background: this.context.user["user.settings.securityToken.textColor"],
-        color: this.context.user["user.settings.securityToken.color"],
+        background: "",
+        color: ""
       },
       securityTokenStyle: {
         background: this.context.user["user.settings.securityToken.color"],
-        color: this.context.user["user.settings.securityToken.textColor"],
+        color: this.context.user["user.settings.securityToken.textColor"]
       }
     });
   }

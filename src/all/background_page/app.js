@@ -39,6 +39,7 @@ events.masterPasswordIframe = require('./event/masterPasswordIframeEvents');
 events.masterPassword = require('./event/masterPasswordEvents');
 events.passboltPage = require('./event/passboltPageEvents');
 events.quickAccess = require('./event/quickAccessEvents');
+events.reactApp = require('./event/reactAppEvents');
 events.resource = require('./event/resourceEvents');
 events.secret = require('./event/secretEvents');
 events.setup = require('./event/setupEvents');
@@ -88,6 +89,11 @@ var pageMods = {};
  * It also helps the plugin to recognise if a page behave like a passbolt app
  */
 pageMods.Bootstrap = require('./pagemod/bootstrapPagemod').Bootstrap;
+
+/*
+ * This pagemod drives the react application.
+ */
+pageMods.ReactApp = require('./pagemod/reactAppPagemod').ReactApp;
 
 /*
  * This pagemod drives the login / authentication

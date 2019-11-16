@@ -31,7 +31,7 @@ class FavoriteService {
         'content-type': 'application/json'
       }
     };
-    Request.setCsrfHeader(fetchOptions);
+    Request.setCsrfHeader(fetchOptions, user);
     const url = new URL(`${domain}/favorites/resource/${resourceId}.json?api-version=2`);
     let response, responseJson;
 
@@ -71,7 +71,7 @@ class FavoriteService {
         'content-type': 'application/json'
       }
     };
-    Request.setCsrfHeader(fetchOptions);
+    Request.setCsrfHeader(fetchOptions, user);
     const url = new URL(`${domain}/favorites/${favoriteId}.json?api-version=2`);
     let response, responseJson;
 

@@ -87,7 +87,7 @@ GpgAuth.prototype.verify = async function (serverUrl, armoredServerKey, userFing
     credentials: 'include',
     body: data
   };
-  Request.setCsrfHeader(fetchOptions);
+  Request.setCsrfHeader(fetchOptions, User.getInstance());
   const response = await fetch(domain + URL_VERIFY, fetchOptions);
 
   // If the server responded with an error build a relevant message
@@ -180,7 +180,7 @@ GpgAuth.prototype.stage1 = async function (passphrase) {
     credentials: 'include',
     body: body
   };
-  Request.setCsrfHeader(fetchOptions);
+  Request.setCsrfHeader(fetchOptions, User.getInstance());
 
   // Send request token to the server
   const response = await fetch(url, fetchOptions);
@@ -221,7 +221,7 @@ GpgAuth.prototype.stage2 = async function (userAuthToken) {
     credentials: 'include',
     body: data
   };
-  Request.setCsrfHeader(fetchOptions);
+  Request.setCsrfHeader(fetchOptions, User.getInstance());
   const response = await fetch(url, fetchOptions);
 
   // Check response status
@@ -349,7 +349,7 @@ GpgAuth.prototype.startCheckAuthStatusLoop = async function () {
  *
  * @return {int}
  */
-GpgAuth.prototype.getCheckAuthStatusTimeoutPeriod = async function() {
+GpgAuth.prototype.getCheckAuthStatusTimeoutPeriod = async function () {
   let timeoutPeriod = CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD;
 
   // The entry point available before v2.11.0 extends the session expiry period.

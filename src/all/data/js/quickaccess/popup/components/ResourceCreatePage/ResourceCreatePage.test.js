@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, wait, cleanup } from 'react-testing-library';
+import { render, fireEvent, wait, cleanup } from '@testing-library/react';
 import { StaticRouter } from 'react-router';
 import ResourceCreatePage from "./ResourceCreatePage";
 import "../../../../../../data/js/lib/secretComplexity";

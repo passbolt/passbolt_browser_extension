@@ -6,6 +6,7 @@
  */
 const Resource = require('../model/resource').Resource;
 const ResourceCreateController = require('../controller/resource/resourceCreateController.js').ResourceCreateController;
+const Worker = require('../model/worker');
 
 const listen = function (worker) {
 
@@ -60,7 +61,6 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.resources.create', async function (requestId, resource, password) {
     const controller = new ResourceCreateController(worker, requestId);
-
     try {
       const savedResource = await controller.main(resource, password);
       worker.port.emit(requestId, 'SUCCESS', savedResource);
@@ -72,6 +72,16 @@ const listen = function (worker) {
         worker.port.emit(requestId, 'ERROR', error);
       }
     }
+  });
+
+  /*
+   * Open the resource create dialog.
+   *
+   * @listens passbolt.resources.open-create-dialog
+   */
+  worker.port.on('passbolt.resources.open-create-dialog', function () {
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.resources.open-create-dialog');
   });
 
   /*

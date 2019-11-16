@@ -131,7 +131,7 @@ ShareService.share = async function(resourceId, data) {
     },
     body: JSON.stringify(data)
   };
-  Request.setCsrfHeader(fetchOptions);
+  Request.setCsrfHeader(fetchOptions, user);
   const url = new URL(`${domain}/share/resource/` + resourceId + `.json?api-version=v1`);
   let response, responseJson;
 
@@ -185,7 +185,7 @@ ShareService.simulateShare = async function (resourceId, permissions) {
       'content-type': 'application/json'
     }
   };
-  Request.setCsrfHeader(fetchOptions);
+  Request.setCsrfHeader(fetchOptions, user);
   let response, responseJson;
 
   try {

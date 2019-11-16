@@ -75,6 +75,7 @@ var listen = function (worker) {
    * @listens passbolt.secret-edit.encrypt
    * @param requestId {uuid} The request identifier
    * @param usersIds {array} The users to encrypt the edited secret for
+   * @deprecated since v2.12.0 will be removed with v2.3.0
    */
   worker.port.on('passbolt.secret-edit.encrypt', function (requestId, usersIds) {
     var editedPassword = TabStorage.get(worker.tab.id, 'editedPassword'),

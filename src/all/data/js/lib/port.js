@@ -108,6 +108,36 @@ var self = window.self || {};
     this._port.postMessage(message);
   };
 
+  /**
+   * Emit a request to the addon code and expect a response.
+   * @param args
+   * @return Promise
+   */
+  Port.prototype.request = function(message) {
+    // Generate a request id that will be used by the addon to answer this request.
+    const requestId = (Math.round(Math.random() * Math.pow(2, 32))).toString();
+    // Add the requestId to the request parameters.
+    const requestArgs = [message, requestId].concat(Array.prototype.slice.call(arguments, 1));
+
+    // The promise that is return when you call passbolt.request.
+    return new Promise((resolve, reject) => {
+      // Observe when the request has been completed.
+      // Or if a progress notification is sent.
+      this.once(requestId, function handleResponse(status) {
+        const callbackArgs = Array.prototype.slice.call(arguments, 1);
+        if (status == 'SUCCESS') {
+          resolve.apply(null, callbackArgs);
+        }
+        else if (status == 'ERROR') {
+          reject.apply(null, callbackArgs);
+        }
+      });
+
+      // Emit the message to the addon-code.
+      this.emit.apply(this, requestArgs);
+    });
+  };
+
   /*****************************************************************************
    * Protected utilities
    *****************************************************************************/

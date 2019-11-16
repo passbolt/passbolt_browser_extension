@@ -1,30 +1,12 @@
-const path = require('path');
+const reactAppConfig = require('./webpack.react_app.config').default;
+const quickaccessConfig = require('./webpack.quickaccess.config').default;
 
-module.exports = {
-  entry: {
-    popup: './src/all/data/js/quickaccess/popup/Popup.js'
-  },
-  mode: 'production',
-  module: {
-    rules: [
-      {
-        test: /\.(js|jsx)$/,
-        exclude: /(node_modules|bower_components)/,
-        loader: "babel-loader",
-        options: {
-          presets: ["@babel/react"],
-        }
-      }
-    ]
-  },
-  externals: {
-    react: 'React',
-    'react-dom': 'ReactDOM'
-  },
-  resolve: { extensions: ["*", ".js", ".jsx"] },
-  output: {
-    path: path.resolve(__dirname, 'build/all/data/js/quickaccess'),
-    pathinfo: true,
-    filename: '[name].js'
-  }
+const configs = [
+  reactAppConfig,
+  quickaccessConfig
+];
+
+module.exports = function (env) {
+  env = env || {};
+  return configs.map(config => config(env));
 };

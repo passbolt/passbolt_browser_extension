@@ -9,6 +9,7 @@ const Keyring = require('../model/keyring').Keyring;
 const User = require('../model/user').User;
 const Worker = require('../model/worker');
 const TabStorage = require('../model/tabStorage').TabStorage;
+const __ = require('../sdk/l10n').get;
 
 /**
  * Get the user passphrase.
@@ -36,12 +37,12 @@ exports.get = get;
  * @private
  */
 const requestPassphrase = function (worker) {
-  // @todo the quickaccess worker should have a pagemod too
-  // If the requester is the Quick access worker
+  // If the requester is the Quickaccess or the ReactApp worker.
+  // @todo the quickaccess and the react app have no pageMod, it smell as it is.
   if (!worker.pageMod) {
-    return requestQuickAccessPassphrase(worker)
+    return requestReactPassphrase(worker)
   } else {
-    return requestAppPassphrase(worker);
+    return requestAppjsPassphrase(worker);
   }
 };
 
@@ -50,27 +51,37 @@ const requestPassphrase = function (worker) {
  * @param {Worker} worker
  * @return {Promise}
  */
-const requestQuickAccessPassphrase = async function(worker) {
+const requestReactPassphrase = async function(worker) {
   const requestResult = await worker.port.request('passbolt.passphrase.request');
   const { passphrase, rememberMe } = requestResult;
 
   if (!Validator.isUtf8(passphrase)) {
     throw new Error(__('The passphrase should be a valid UTF8 string.'));
   }
-  if (!Validator.isBoolean(rememberMe)) {
-    throw new Error(__('The remember me should be a valid boolean.'));
+  if (!Validator.isBoolean(rememberMe) && !Validator.isInt(rememberMe)) {
+    throw new Error(__('The remember me should be a valid integer.'));
   }
 
   const keyring = new Keyring();
   keyring.checkPassphrase(passphrase);
-
-  const user = User.getInstance();
-  if (rememberMe) {
-    // store until I log out
-    user.storeMasterPasswordTemporarily(passphrase, -1);
-  }
+  rememberPassphrase(passphrase, rememberMe);
 
   return passphrase;
+};
+
+/**
+ * Remember the user passphrase for a given duration.
+ * @param {string} passphrase The passphrase
+ * @param {integer|string} duration The duration in second to remember the passphrase for. If -1 given then it will
+ *   remember the passphrase until the user is logged out.
+ * @returns {Promise<void>}
+ */
+const rememberPassphrase = async function(passphrase, duration) {
+  if (!duration || !Validator.isInt(duration)) {
+    return;
+  }
+  const user = User.getInstance();
+  user.storeMasterPasswordTemporarily(passphrase, duration);
 };
 
 /**
@@ -78,7 +89,7 @@ const requestQuickAccessPassphrase = async function(worker) {
  * @param {Worker} worker
  * @return {Promise}
  */
-const requestAppPassphrase = function(worker) {
+const requestAppjsPassphrase = function(worker) {
   return new Promise(function(resolve, reject) {
     const masterPasswordRequest = {
       attempts: 0,

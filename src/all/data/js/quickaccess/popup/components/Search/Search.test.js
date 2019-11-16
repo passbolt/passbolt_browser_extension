@@ -1,6 +1,6 @@
 import React from "react";
 import Search from "./Search";
-import { render, fireEvent, waitForElement, cleanup } from 'react-testing-library';
+import { render, fireEvent, waitForElement, cleanup } from '@testing-library/react';
 import AppContext from "../../contexts/AppContext";
 
 // Reset the modules before each test.

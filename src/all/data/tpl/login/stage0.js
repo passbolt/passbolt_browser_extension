@@ -45,7 +45,8 @@ var __line = 1
   , __lines = "<div class=\"col6 push1 information\">\n    <h2>Welcome back!</h2>\n    <div class=\"plugin-check-wrapper\">\n        <div class=\"plugin-check <?= browserName ?> success\">\n            <p class=\"message\">\n                Nice one! The plugin is installed and configured. You are good to go!\n            </p>\n        </div>\n    </div>\n    <div class=\"plugin-check-wrapper\">\n        <div class=\"plugin-check gpg notice\">\n            <p class=\"message\">\n                Checking if the server can use the following key:\n                <a href=\"auth/verify\" target='_blank' id=\"serverkey_id\">\n                   <?= serverKeyId ?>\n                </a>\n            </p>\n        </div>\n    </div>\n</div>\n<div class=\"col4 push1 last\">\n    <div class=\"logo\">\n        <h1><span>Passbolt</span></h1>\n    </div>\n    <div class=\"users login form\">\n        <div class=\"feedback\">\n            <i class=\"fa fa-cog fa-spin huge\" ></i>\n            <p>Checking server key<br> please wait...</p>\n        </div>\n    </div>\n</div>\n"
   , __filename = "src/all/data/ejs/login/stage0.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<div class=\"col6 push1 information\">\n    <h2>Welcome back!</h2>\n    <div class=\"plugin-check-wrapper\">\n        <div class=\"plugin-check ")
     ; __line = 4
@@ -56,9 +57,11 @@ try {
     ; __append("\n                </a>\n            </p>\n        </div>\n    </div>\n</div>\n<div class=\"col4 push1 last\">\n    <div class=\"logo\">\n        <h1><span>Passbolt</span></h1>\n    </div>\n    <div class=\"users login form\">\n        <div class=\"feedback\">\n            <i class=\"fa fa-cog fa-spin huge\" ></i>\n            <p>Checking server key<br> please wait...</p>\n        </div>\n    </div>\n</div>\n")
     ; __line = 32
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/login/stage0.ejs
 
 }

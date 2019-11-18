@@ -45,14 +45,17 @@ var __line = 1
   , __lines = "<div class=\"submit-input-wrapper\">\n    <a id=\"js_setup_cancel_step\" class=\"button cancel big\">Cancel</a>\n    <a id=\"js_setup_submit_step\" class=\"button primary big\">Next</a>\n</div>\n"
   , __filename = "src/all/data/ejs/setup/action_buttons.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<div class=\"submit-input-wrapper\">\n    <a id=\"js_setup_cancel_step\" class=\"button cancel big\">Cancel</a>\n    <a id=\"js_setup_submit_step\" class=\"button primary big\">Next</a>\n</div>\n")
     ; __line = 5
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/setup/action_buttons.ejs
 
 }

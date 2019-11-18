@@ -45,7 +45,8 @@ var __line = 1
   , __lines = "<span class=\"progress\"><span class=\"progress-bar <?= strengthId ?>\"></span></span>\n<span class=\"complexity-text\">complexity: <strong><?= strengthLabel ?></strong></span>\n"
   , __filename = "src/all/data/ejs/secret/strength.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<span class=\"progress\"><span class=\"progress-bar ")
     ; __append(escapeFn( strengthId ))
@@ -55,9 +56,11 @@ try {
     ; __append("</strong></span>\n")
     ; __line = 3
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/secret/strength.ejs
 
 }

@@ -45,14 +45,17 @@ var __line = 1
   , __lines = "<div class=\"input text autocomplete\">\n    <label for=\"js-search-aros-input\">Share with people or groups</label>\n    <input maxlength=\"255\" id=\"js-search-aros-input\" placeholder=\"enter one name or email\" autocomplete=\"off\" type=\"text\">\n    <div class=\"security-token\"></div>\n</div>\n<div id=\"js-search-aro-autocomplete\" class=\"autocomplete-wrapper hidden\">\n    <div class=\"autocomplete-content scroll\"></div>\n</div>\n"
   , __filename = "src/all/data/ejs/resource/shareFormAdd.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<div class=\"input text autocomplete\">\n    <label for=\"js-search-aros-input\">Share with people or groups</label>\n    <input maxlength=\"255\" id=\"js-search-aros-input\" placeholder=\"enter one name or email\" autocomplete=\"off\" type=\"text\">\n    <div class=\"security-token\"></div>\n</div>\n<div id=\"js-search-aro-autocomplete\" class=\"autocomplete-wrapper hidden\">\n    <div class=\"autocomplete-content scroll\"></div>\n</div>\n")
     ; __line = 9
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/resource/shareFormAdd.ejs
 
 }

@@ -45,14 +45,17 @@ var __line = 1
   , __lines = "<!-- left column -->\n<div class=\"col6 import-key-wrapper\">\n    <h3>Copy paste your private key below</h3>\n    <div class=\"input textarea gpgkey\">\n        <textarea name=\"data[Key][ascii]\" class=\"fluid code\" id=\"js_setup_import_key_text\"></textarea>\n    </div>\n    <div class=\"message error hidden\" id=\"KeyErrorMessage\"></div>\n    <div class=\"input file\">\n        <div class=\"input-wrapper\">\n            <div class=\"input-wrapper-2\">\n                <input name=\"data[Key][file]\" value=\"Browse...\" id=\"js_setup_import_key_browse\" type=\"submit\">\n                <span class=\"help-text\">Or select a file from your computer</span>\n            </div>\n        </div>\n    </div>\n</div>\n<div class=\"col4 last sideInfo\"></div>\n\n"
   , __filename = "src/all/data/ejs/setup/import_key.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<!-- left column -->\n<div class=\"col6 import-key-wrapper\">\n    <h3>Copy paste your private key below</h3>\n    <div class=\"input textarea gpgkey\">\n        <textarea name=\"data[Key][ascii]\" class=\"fluid code\" id=\"js_setup_import_key_text\"></textarea>\n    </div>\n    <div class=\"message error hidden\" id=\"KeyErrorMessage\"></div>\n    <div class=\"input file\">\n        <div class=\"input-wrapper\">\n            <div class=\"input-wrapper-2\">\n                <input name=\"data[Key][file]\" value=\"Browse...\" id=\"js_setup_import_key_browse\" type=\"submit\">\n                <span class=\"help-text\">Or select a file from your computer</span>\n            </div>\n        </div>\n    </div>\n</div>\n<div class=\"col4 last sideInfo\"></div>\n\n")
     ; __line = 19
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/setup/import_key.ejs
 
 }

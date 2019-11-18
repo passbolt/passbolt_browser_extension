@@ -45,14 +45,17 @@ var __line = 1
   , __lines = "<div class=\"feedback\">\n    <i class=\"fa fa-cog fa-warning huge\"></i>\n    <p>Oops, something went wrong</p>\n</div>\n<div class=\"actions-wrapper center\">\n    <a class=\"button primary big\" href=\"/auth/login\">Retry</a>\n</div>\n"
   , __filename = "src/all/data/ejs/login/feedbackLoginOops.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<div class=\"feedback\">\n    <i class=\"fa fa-cog fa-warning huge\"></i>\n    <p>Oops, something went wrong</p>\n</div>\n<div class=\"actions-wrapper center\">\n    <a class=\"button primary big\" href=\"/auth/login\">Retry</a>\n</div>\n")
     ; __line = 8
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/login/feedbackLoginOops.ejs
 
 }

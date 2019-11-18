@@ -45,7 +45,8 @@ var __line = 1
   , __lines = "<ul>\n<? if (!aros.length) { ?>\n    <li>\n        <div class=\"row\">\n            <div class=\"main-cell-wrapper\">\n                <div class=\"main-cell\" style=\"font-size:16px;\">\n                    No user or group found\n                </div>\n            </div>\n        </div>\n    </li>\n<? } ?>\n<? for(let i in aros) {\n    const aro = aros[i];\n    let aroAvatarPath, aroName, aroDetails, cssClass;\n    if (aro.profile) {\n        if (aro.profile.avatar.url.small.startsWith('https://')) {\n            aroAvatarPath = `${aro.profile.avatar.url.small}`;\n        } else {\n            aroAvatarPath = `${domain}/${aro.profile.avatar.url.small}`;\n        }\n        aroName = `${aro.profile.first_name} ${aro.profile.last_name} (${aro.gpgkey.key_id})`;\n        aroDetails = aro.username;\n        cssClass = 'user';\n    } else {\n        aroAvatarPath = `${domain}/img/avatar/group_default.png`;\n        aroName = aro.name;\n        aroDetails = `${aro.user_count} Member(s)`;\n        cssClass = 'group';\n    }\n?>\n    <li id=\"<?= aro.id ?>\">\n        <div class=\"row\">\n            <div class=\"main-cell-wrapper\">\n                <div class=\"main-cell\">\n                    <a>\n                        <div class=\"avatar\">\n                            <img src=\"<?= aroAvatarPath ?>\"/>\n                        </div>\n                        <div class=\"<?= cssClass ?>\">\n                            <span class=\"name\"><?= aroName ?></span>\n                            <span class=\"details\" title=\"<?= aroDetails ?>\"><?= aroDetails ?></span>\n                        </div>\n                    </a>\n                </div>\n            </div>\n        </div>\n    </li>\n<? } ?>\n</ul>\n"
   , __filename = "src/all/data/ejs/resource/shareAutocomplete.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<ul>\n")
     ; __line = 2
@@ -98,9 +99,11 @@ try {
     ; __append("\n</ul>\n")
     ; __line = 51
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/resource/shareAutocomplete.ejs
 
 }

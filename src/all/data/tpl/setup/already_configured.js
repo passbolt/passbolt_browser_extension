@@ -45,7 +45,8 @@ var __line = 1
   , __lines = "<strong>Warning:</strong> The plugin is already configured for <?= firstname ?> <?= lastname ?> (<?= username ?>), on domain <?= domain ?>.\nCompleting this setup again will prevent <?= firstname ?> <?= lastname ?> from accesssing their passbolt account with this browser.\n"
   , __filename = "src/all/data/ejs/setup/already_configured.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<strong>Warning:</strong> The plugin is already configured for ")
     ; __append(escapeFn( firstname ))
@@ -63,9 +64,11 @@ try {
     ; __append(" from accesssing their passbolt account with this browser.\n")
     ; __line = 3
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/setup/already_configured.ejs
 
 }

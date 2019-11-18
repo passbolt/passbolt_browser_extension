@@ -45,14 +45,17 @@ var __line = 1
   , __lines = "\n<div class=\"form-content\">\n    <div class=\"input-password-wrapper\">\n        <input type=\"hidden\" id=\"js_field_secret_id\" />\n        <div class=\"input password required\">\n            <input maxlength=\"4096\" type=\"password\" id=\"js_secret\" placeholder=\"password\" value=\"\"/>\n            <input maxlength=\"4096\" type=\"text\" id=\"js_secret_clear\" placeholder=\"password\" class=\"hidden\"/>\n            <div class=\"security-token\"></div>\n        </div>\n        <ul class=\"actions inline\">\n            <li>\n                <a id=\"js_secret_view\" class=\"button toggle\">\n                    <i class=\"fa fa-eye fa-fw fa-lg\"></i>\n                    <span class=\"visuallyhidden\">view</span>\n                </a>\n            </li>\n            <li>\n                <a id=\"js_secret_generate\" class=\"button\">\n                    <i class=\"fa fa-magic fa-fw fa-lg\"></i>\n                    <span class=\"visuallyhidden\">generate</span>\n                </a>\n            </li>\n        </ul>\n\n        <div id=\"js_secret_strength\" class=\"password-complexity\">\n        </div>\n\n        <div class=\"input text\">\n            <div id=\"js_field_password_feedback\" class=\"message error\">\n            </div>\n        </div>\n    </div>\n</div>\n"
   , __filename = "src/all/data/ejs/secret/edit.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("\n<div class=\"form-content\">\n    <div class=\"input-password-wrapper\">\n        <input type=\"hidden\" id=\"js_field_secret_id\" />\n        <div class=\"input password required\">\n            <input maxlength=\"4096\" type=\"password\" id=\"js_secret\" placeholder=\"password\" value=\"\"/>\n            <input maxlength=\"4096\" type=\"text\" id=\"js_secret_clear\" placeholder=\"password\" class=\"hidden\"/>\n            <div class=\"security-token\"></div>\n        </div>\n        <ul class=\"actions inline\">\n            <li>\n                <a id=\"js_secret_view\" class=\"button toggle\">\n                    <i class=\"fa fa-eye fa-fw fa-lg\"></i>\n                    <span class=\"visuallyhidden\">view</span>\n                </a>\n            </li>\n            <li>\n                <a id=\"js_secret_generate\" class=\"button\">\n                    <i class=\"fa fa-magic fa-fw fa-lg\"></i>\n                    <span class=\"visuallyhidden\">generate</span>\n                </a>\n            </li>\n        </ul>\n\n        <div id=\"js_secret_strength\" class=\"password-complexity\">\n        </div>\n\n        <div class=\"input text\">\n            <div id=\"js_field_password_feedback\" class=\"message error\">\n            </div>\n        </div>\n    </div>\n</div>\n")
     ; __line = 34
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/secret/edit.ejs
 
 }

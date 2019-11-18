@@ -45,16 +45,19 @@ var __line = 1
   , __lines = "<p class=\"message\"><?= message ?></p>\n"
   , __filename = "src/all/data/ejs/login/message.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<p class=\"message\">")
     ; __append(escapeFn( message ))
     ; __append("</p>\n")
     ; __line = 2
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/login/message.ejs
 
 }

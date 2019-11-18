@@ -45,7 +45,8 @@ var __line = 1
   , __lines = "<!-- left column -->\n<div class=\"col7\">\n    <h3>Information for public and secret key</h3>\n    <table class=\"table-info\">\n        <tr class=\"owner_name\">\n            <td>Owner Name</td>\n            <td  class=\"<?= typeof fieldsDetails['name'] != 'undefined' ? fieldsDetails['name'].status : '' ?>\"><?= keyInfo.userIds[0].name ?> <?= typeof fieldsDetails['name'] != 'undefined' ? '<span class=\"alt side\">' + fieldsDetails['name'].original + '</span>' : '' ?></td>\n        </tr>\n        <tr class=\"owner_email\">\n            <td>Owner Email</td>\n            <td class=\"<?= typeof fieldsDetails['email'] != 'undefined' ? fieldsDetails['email'].status : '' ?>\"><?= keyInfo.userIds[0].email ?> <?= typeof fieldsDetails['email'] != 'undefined' ? '<span class=\"alt side\">' + fieldsDetails['email'].original + '</span>' : '' ?></td>\n        </tr>\n        <tr class=\"keyid\">\n            <td>Key Id</td>\n            <td><?= keyInfo.keyId.toUpperCase() ?></td>\n        </tr>\n        <tr class=\"fingerprint\">\n            <td>Fingerprint</td>\n            <td><?= keyInfo.fingerprint.toUpperCase() ?></td>\n        </tr>\n        <tr class=\"created\">\n            <td>Created</td>\n            <td><?= keyInfo.created ?></td>\n        </tr>\n        <tr class=\"expires\">\n            <td>Expires</td>\n            <td><?= keyInfo.expires ?></td>\n        </tr>\n        <tr class=\"length\">\n            <td>Key Length</td>\n            <td><?= keyInfo.length ?></td>\n        </tr>\n        <tr class=\"algorithm\">\n            <td>Algorithm</td>\n            <td><?= keyInfo.algorithm.toUpperCase() ?></td>\n        </tr>\n    </table>\n</div>\n\n<!-- right column -->\n<div class=\"col5 last\">\n    <div class=\"message <?= status ?> side-message\">\n        <?\n        if (status == 'warning') {\n          var fieldsStr = '';\n          for (var fieldName in fieldsDetails) {\n            fieldsStr += ((fieldsStr == '') ? fieldName : ' and ' + fieldName);\n          }\n        ?>\n        <p>\n            <strong>Warning:</strong> the <?= fieldsStr ?> selected by your administrator does not match\n            the name and email of your key. Passbolt will use the information provided by the administrator to identify yourself.\n        </p>\n        <p>\n            While this is not a deal breaker this may lead to some confusion.\n        </p>\n        <p class=\"small\">\n            Note: Passbolt does not support multiple user identities at the moment.\n        </p>\n        <?\n        } else {\n        ?>\n          <p>\n              <strong>Success!</strong>\n              Nice one, it looks like a valid key with your key information matching the name and email provided by your passbolt administrator.\n              <br><br>\n              You are good to go!\n          </p>\n        <?\n        }\n        ?>\n    </div>\n</div>"
   , __filename = "src/all/data/ejs/setup/key_info.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<!-- left column -->\n<div class=\"col7\">\n    <h3>Information for public and secret key</h3>\n    <table class=\"table-info\">\n        <tr class=\"owner_name\">\n            <td>Owner Name</td>\n            <td  class=\"")
     ; __line = 7
@@ -110,9 +111,11 @@ try {
     ; __append("\n    </div>\n</div>")
     ; __line = 73
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/setup/key_info.ejs
 
 }

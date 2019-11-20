@@ -13,7 +13,7 @@
  */
 const Crypto = require('../../model/crypto').Crypto;
 const masterPasswordController = require('../masterPasswordController');
-const progressDialogController = require('../progress/progressDialogController');
+const progressController = require('../progress/progressController');
 const Resource = require('../../model/resource').Resource;
 const User = require('../../model/user').User;
 
@@ -39,22 +39,22 @@ class ResourceCreateController {
     let savedResource;
 
     const masterPassword = await masterPasswordController.get(this.worker);
-    await progressDialogController.open(this.worker, "Creating resource", 3, "Decrypting private key");
+    await progressController.start(this.worker, "Creating resource", 3, "Decrypting private key");
     const privateKey = await crypto.getAndDecryptPrivateKey(masterPassword);
-    progressDialogController.update(this.worker, 1, "Encrypting secret");
+    progressController.update(this.worker, 1, "Encrypting secret");
 
     try {
       const secret = await crypto.encrypt(password, User.getInstance().get().id, privateKey);
       data.secrets = [{data: secret}];
-      progressDialogController.update(this.worker, 2, "Creating password");
+      progressController.update(this.worker, 2, "Creating password");
       savedResource = await Resource.save(data);
-      progressDialogController.update(this.worker, 3);
+      progressController.update(this.worker, 3);
     } catch (error) {
-      progressDialogController.close(this.worker);
+      progressController.complete(this.worker);
       throw error;
     }
 
-    progressDialogController.close(this.worker);
+    progressController.complete(this.worker);
 
     return savedResource;
   }

@@ -10,7 +10,7 @@ var Worker = require('../model/worker');
 var listen = function (worker) {
 
   worker.port.on('passbolt.import-passwords.import-file', function (requestId, b64FileContent, fileType, options) {
-    var importController = new ImportController(worker.tab.id);
+    var importController = new ImportController(worker);
 
     var loader = null;
     if (fileType == 'kdbx') {

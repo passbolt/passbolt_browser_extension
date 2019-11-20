@@ -7,8 +7,6 @@
 var ExportPasswordsController = require('../controller/exportPasswordsController').ExportPasswordsController;
 var Worker = require('../model/worker');
 var TabStorage = require('../model/tabStorage').TabStorage;
-var progressDialogController = require('../controller/progressDialogController');
-var fileController = require('../controller/fileController');
 
 var listen = function (worker) {
 
@@ -33,8 +31,8 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.export-passwords.export-to-file', function (requestId, options) {
     var resources = TabStorage.get(worker.tab.id, 'exportedResources');
-    
-    var exportPasswordsController = new ExportPasswordsController(worker.tab.id);
+
+    var exportPasswordsController = new ExportPasswordsController(worker);
     exportPasswordsController.init(resources, options);
     exportPasswordsController.decryptSecrets()
     .then(function() {

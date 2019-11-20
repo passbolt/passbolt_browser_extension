@@ -15,7 +15,7 @@ var InvalidMasterPasswordError = require('../error/invalidMasterPasswordError').
 var Keyring = require('../model/keyring').Keyring;
 var Crypto = require('../model/crypto').Crypto;
 var masterPasswordController = require('../controller/masterPasswordController');
-var progressDialogController = require('../controller/progressDialogController');
+var progressController = require('../controller/progress/progressController');
 var UserAbortsOperationError = require('../error/userAbortsOperationError').UserAbortsOperationError;
 
 var listen = function (worker) {
@@ -126,7 +126,7 @@ var listen = function (worker) {
         worker.port.emit(requestId, 'ERROR', error);
       }
     } finally {
-      progressDialogController.close(worker);
+      progressController.complete(worker);
     }
   });
 
@@ -139,11 +139,11 @@ var listen = function (worker) {
   const createGroup = async function(worker, groupJson) {
     const group = new Group();
 
-    await progressDialogController.open(worker, 'Creating group ...', 2);
-    progressDialogController.update(worker, 1);
+    await progressController.start(worker, 'Creating group ...', 2);
+    progressController.update(worker, 1);
     const groupSaved = await group.save(groupJson);
-    progressDialogController.update(worker, 2);
-    progressDialogController.close(worker);
+    progressController.update(worker, 2);
+    progressController.complete(worker);
 
     return groupSaved;
   };
@@ -159,11 +159,11 @@ var listen = function (worker) {
     const group = new Group();
 
     const groupSavedPromised = group.save(groupJson, groupId);
-    await progressDialogController.open(worker, 'Updating group ...', 2);
-    progressDialogController.update(worker, 1);
+    await progressController.start(worker, 'Updating group ...', 2);
+    progressController.update(worker, 1);
     const groupSaved = await groupSavedPromised;
-    progressDialogController.update(worker, 2);
-    progressDialogController.close(worker);
+    progressController.update(worker, 2);
+    progressController.complete(worker);
 
     return groupSaved;
   };
@@ -184,23 +184,23 @@ var listen = function (worker) {
     const dryRunPromise = group.save(groupJson, groupId, true);
     const keyringSyncPromise = keyring.sync();
     const masterPassword = await masterPasswordController.get(worker);
-    await progressDialogController.open(worker, 'Updating group ...', progressGoals);
+    await progressController.start(worker, 'Updating group ...', progressGoals);
     const dryRunResult = await dryRunPromise;
     await keyringSyncPromise;
 
     progress += 2; // Keyring sync + dryrun
     progressGoals = dryRunResult['dry-run']['SecretsNeeded'].length + dryRunResult['dry-run']['Secrets'].length + progress;
-    progressDialogController.updateGoals(worker, progressGoals);
-    progressDialogController.update(worker, progress++);
+    progressController.updateGoals(worker, progressGoals);
+    progressController.update(worker, progress++);
 
     groupJson['Secrets'] = await encryptSaveGroupSecrets(
       dryRunResult,
       masterPassword,
-      () => progressDialogController.update(worker, progress++),
-      message => { return index => progressDialogController.update(worker, progress, message.replace('%0', parseInt(index) + 1)) }
+      () => progressController.update(worker, progress++),
+      message => { return index => progressController.update(worker, progress, message.replace('%0', parseInt(index) + 1)) }
     );
     const groupSaved = await group.save(groupJson, groupId);
-    progressDialogController.close(worker);
+    progressController.complete(worker);
 
     return groupSaved;
   };

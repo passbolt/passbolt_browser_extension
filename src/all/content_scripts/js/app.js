@@ -453,6 +453,11 @@ window.addEventListener('passbolt.plugin.resources.open-create-dialog', async fu
   passbolt.message.emit('passbolt.resources.open-create-dialog');
 });
 
+// Show the react app.
+passbolt.message.on('passbolt.app.show', function () {
+  showReactApp();
+});
+
 // Hide the react app.
 passbolt.message.on('passbolt.app.hide', function () {
   hideReactApp();

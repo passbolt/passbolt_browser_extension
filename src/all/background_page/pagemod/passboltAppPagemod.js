@@ -5,7 +5,7 @@
  * It is inserted in all the pages of a domain that is trusted.
  * Such trust is defined during the first step of the setup process (or in config-debug)
  *
- * @copyright (c) 2017 Passbolt SARL, 2019 Passbolt SA
+ * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var app = require('../app');
@@ -60,7 +60,6 @@ PassboltApp.initPageMod = function () {
       // Templates
       'data/tpl/group.js',
       'data/tpl/master.js',
-      'data/tpl/progress.js',
       'data/tpl/resource.js',
       'data/tpl/secret.js',
       'data/tpl/import.js',
@@ -78,7 +77,6 @@ PassboltApp.initPageMod = function () {
       'content_scripts/js/secret/editIframe.js',
       'content_scripts/js/secret/shareIframe.js',
       'content_scripts/js/group/editIframe.js',
-      'content_scripts/js/progress/progressIframe.js',
       'content_scripts/js/import/importPasswordsIframe.js',
       'content_scripts/js/export/exportPasswordsIframe.js',
       'content_scripts/js/app.js'

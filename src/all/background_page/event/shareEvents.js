@@ -8,7 +8,7 @@
  */
 var Keyring = require('../model/keyring').Keyring;
 var masterPasswordController = require('../controller/masterPasswordController');
-var progressDialogController = require('../controller/progressDialogController');
+var progressController = require('../controller/progress/progressController');
 var Permission = require('../model/permission').Permission;
 var Resource = require('../model/resource').Resource;
 var Share = require('../model/share').Share;
@@ -80,17 +80,17 @@ var listen = function (worker) {
 
     try {
       const privateKeySecret = await masterPasswordController.get(worker);
-      progressDialogController.open(appWorker, `Share ${resources.length} passwords`, progressGoal);
-      progressDialogController.update(appWorker, progress++, 'Initialize');
+      progressController.start(appWorker, `Share ${resources.length} passwords`, progressGoal);
+      progressController.update(appWorker, progress++, 'Initialize');
       await keyring.sync();
       await Share.bulkShare(resources, changes, privateKeySecret, message => {
-        progressDialogController.update(appWorker, progress++, message);
+        progressController.update(appWorker, progress++, message);
       });
       worker.port.emit(requestId, 'SUCCESS');
-      progressDialogController.close(appWorker);
+      progressController.complete(appWorker);
       appWorker.port.emit('passbolt.share.complete', resources.map(resource => resource.id));
     } catch(error) {
-      progressDialogController.close(appWorker);
+      progressController.complete(appWorker);
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
       appWorker.port.emit('passbolt.share.error', worker.port.getEmitableError(error));
     }

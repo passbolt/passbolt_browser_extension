@@ -147,12 +147,6 @@ pageMods.File = require('./pagemod/filePagemod').File;
 pageMods.MasterPasswordDialog = require('./pagemod/masterPasswordDialogPagemod').MasterPasswordDialog;
 
 /*
- * This pagemod drives the progress bar iframe
- * It is used when the add-on is encrypting something
- */
-pageMods.ProgressDialog = require('./pagemod/progressDialogPagemod').ProgressDialog;
-
-/*
  * This pagemod drives the iframe used when the user enter a password to be stored by passbolt
  * It is used when creating/editing a new password
  */

@@ -11,7 +11,7 @@ var Crypto = require('../model/crypto').Crypto;
 const InvalidMasterPasswordError = require('../error/invalidMasterPasswordError').InvalidMasterPasswordError;
 var Keyring = require('../model/keyring').Keyring;
 var masterPasswordController = require('../controller/masterPasswordController');
-var progressDialogController = require('../controller/progressDialogController');
+const progressController = require('../controller/progress/progressController');
 const ResourceExportController = require('../controller/resource/resourceExportController').ResourceExportController;
 var Secret = require('../model/secret').Secret;
 var secret = new Secret();
@@ -90,7 +90,7 @@ var listen = function (worker) {
     }
 
     // Open the progress dialog.
-    progressDialogController.open(worker, 'Encrypting ...', usersIds.length);
+    progressController.start(worker, 'Encrypting ...', usersIds.length);
 
     // Sync the keyring with the server.
     keyring.sync()
@@ -109,9 +109,9 @@ var listen = function (worker) {
 
         // Encrypt all the messages.
         return crypto.encryptAll(encryptAllData, function () {
-          progressDialogController.update(worker, progress++);
+          progressController.update(worker, progress++);
         }, function (position) {
-          progressDialogController.update(worker, progress, 'Encrypting ' + position + '/' + usersIds.length);
+          progressController.update(worker, progress, 'Encrypting ' + position + '/' + usersIds.length);
         });
       })
 
@@ -122,7 +122,7 @@ var listen = function (worker) {
           armoreds[usersIds[i]] = data[i];
         }
         worker.port.emit(requestId, 'SUCCESS', armoreds);
-        progressDialogController.close(worker);
+        progressController.complete(worker);
       });
   });
 
@@ -148,22 +148,23 @@ var listen = function (worker) {
    * @deprecated since v2.7 will be removed in v3.0
    */
   worker.port.on('passbolt.app.decrypt-copy', function (requestId, armored) {
+    // @todo try to do something with this shit
     var crypto = new Crypto();
 
     // Master password required to decrypt a secret.
     masterPasswordController.get(worker)
-      .then(function (masterPassword) {
-        worker.port.emit('passbolt.progress.open-dialog', 'Decrypting...');
+      .then(async function (masterPassword) {
+        await progressController.start(worker, 'Decrypting...');
         return crypto.decrypt(armored, masterPassword)
       })
       .then(function (decrypted) {
         var clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
         clipboardWorker.port.emit('passbolt.clipboard-iframe.copy', decrypted);
-        worker.port.emit('passbolt.progress.close-dialog');
+        progressController.complete(worker);
         worker.port.emit(requestId, 'SUCCESS', decrypted);
       })
       .catch(function (error) {
-        worker.port.emit('passbolt.progress.close-dialog');
+        progressController.complete(worker);
         worker.port.emit(requestId, 'ERROR', error.message);
       });
   });
@@ -184,7 +185,7 @@ var listen = function (worker) {
       }
       const secretPromise = Secret.findByResourceId(resourceId);
       const masterPassword = await masterPasswordController.get(worker);
-      await progressDialogController.open(worker, 'Decrypting...');
+      await progressController.start(worker, 'Decrypting...');
       const secret = await secretPromise;
       const message = await crypto.decrypt(secret.data, masterPassword);
       const clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
@@ -199,7 +200,7 @@ var listen = function (worker) {
         worker.port.emit(requestId, 'ERROR', error);
       }
     } finally {
-      progressDialogController.close(worker);
+      progressController.complete(worker);
     }
   });
 

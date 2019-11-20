@@ -4,21 +4,20 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var Worker = require('../model/worker');
 var fileController = require('../controller/fileController');
 var masterPasswordController = require('../controller/masterPasswordController');
 var KeepassDb = require('../model/keepassDb').KeepassDb;
 var CsvDb = require('../model/csvDb').CsvDb;
 var Crypto = require('../model/crypto').Crypto;
-var progressDialogController = require('../controller/progressDialogController');
+var progressController = require('./progress/progressController');
 
 /**
  * Controller for Export passwords.
  * @param tabid
  * @constructor
  */
-var ExportPasswordsController = function(tabid) {
-  this.tabid = tabid;
+var ExportPasswordsController = function(worker) {
+  this.worker = worker;
   this.progressObjective = 0;
   this.progressStatus = 0;
   this.resources = [];
@@ -60,13 +59,12 @@ ExportPasswordsController.prototype.init = function(resources, options) {
  * @return {Promise} a promise containing the list of resources with their decrypted secret.
  */
 ExportPasswordsController.prototype.decryptSecrets = function() {
-  var self = this,
-    worker = Worker.get('App', this.tabid);
+  var self = this;
 
   return this._decryptSecrets(this.resources)
   .then(function(decryptedSecrets) {
     return new Promise(function(resolve, reject) {
-      progressDialogController.close(worker);
+      progressController.complete(self.worker);
       self.resources = self._addDecryptedSecretsToResources(self.resources, decryptedSecrets);
       resolve(self.resources);
     });
@@ -145,7 +143,7 @@ ExportPasswordsController.prototype.downloadFile = function(fileContent) {
 
   return new Promise(function(resolve, reject) {
     try {
-      fileController.saveFile(filename, blobFile, self.tabid);
+      fileController.saveFile(filename, blobFile, self.worker.tab.id);
       resolve();
     } catch(e) {
       reject(e);
@@ -161,23 +159,22 @@ ExportPasswordsController.prototype.downloadFile = function(fileContent) {
  */
 ExportPasswordsController.prototype._decryptSecrets = function(secrets) {
   var self = this,
-    worker = Worker.get('App', this.tabid),
     crypto = new Crypto();
 
   // Master password required to decrypt a secret before sharing it.
-  return masterPasswordController.get(worker)
+  return masterPasswordController.get(this.worker)
   .then(function (masterPassword) {
-    progressDialogController.open(worker, 'Decrypting...', self.resources.length);
+    progressController.start(self.worker, 'Decrypting...', self.resources.length);
     var armored = self._prepareArmoredList();
     return crypto.decryptAll(armored, masterPassword,
       // On complete.
       function () {
-        progressDialogController.update(worker, self.progressStatus++);
+        progressController.update(self.worker, self.progressStatus++);
       },
       // On start.
       function (position) {
         position++;
-        progressDialogController.update(worker, self.progressStatus, `Decrypting ${position}/${self.resources.length}`);
+        progressController.update(self.worker, self.progressStatus, `Decrypting ${position}/${self.resources.length}`);
       });
   });
 };

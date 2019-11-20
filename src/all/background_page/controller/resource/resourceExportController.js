@@ -11,10 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.7.0
  */
-const progressDialogController = require('../../controller/progressDialogController');
+const progressController = require('../progress/progressController');
 const ResourceService = require('../../service/resource').ResourceService;
 const TabStorage = require('../../model/tabStorage').TabStorage;
-const Worker = require('../../model/worker');
 
 /**
  * Resources export controller
@@ -26,18 +25,17 @@ class ResourceExportController {
    * @param {array} resourcesIds The list of resources identifiers to export
    */
   static async exec(worker, resourcesIds) {
-    const appWorker = Worker.get('App', worker.tab.id);
     try {
-      const progressDialogPromise = progressDialogController.open(appWorker, 'Retrieving passwords...');
+      const progressDialogPromise = progressController.start(worker, 'Retrieving passwords...');
       const resources = await ResourceService.findAllByResourcesIds(resourcesIds, {contain:{secret: 1}});
-      progressDialogController.close(appWorker);
+      progressController.complete(worker);
       TabStorage.set(worker.tab.id, 'exportedResources', resources);
       await progressDialogPromise;
       worker.port.emit('passbolt.export-passwords.open-dialog');
     } catch (error) {
       console.error(error);
     } finally {
-      progressDialogController.close(appWorker);
+      progressController.complete(worker);
     }
   }
 }

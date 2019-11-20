@@ -78,8 +78,11 @@ const listen = function (worker) {
    * Open the resource create dialog.
    *
    * @listens passbolt.resources.open-create-dialog
+   * @param requestId {uuid} The request identifier
+   * @param resource {object} The resource meta data
+   * @param password {string} The password to encrypt
    */
-  worker.port.on('passbolt.resources.open-create-dialog', function () {
+  worker.port.on('passbolt.resources.open-create-dialog', async function (requestId, resource, password) {
     const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
     reactAppWorker.port.emit('passbolt.resources.open-create-dialog');
   });

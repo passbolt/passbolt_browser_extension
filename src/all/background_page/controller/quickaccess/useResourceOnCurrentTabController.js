@@ -13,7 +13,7 @@
  */
 const browser = require("webextension-polyfill/dist/browser-polyfill");
 const Crypto = require('../../model/crypto').Crypto;
-const masterPasswordController = require('../masterPasswordController');
+const passphraseController = require('../passphrase/passphraseController');
 const ResourceService = require('../../service/resource').ResourceService;
 const Secret = require('../../model/secret').Secret;
 const Worker = require('../../model/worker');
@@ -41,7 +41,7 @@ class UseResourceOnCurrentTabController {
 
     try {
       const secretPromise = this._getSecret(resourceId);
-      const masterPassword = await masterPasswordController.get(this.worker);
+      const masterPassword = await passphraseController.get(this.worker);
       const secret = await secretPromise;
       const message = await crypto.decrypt(secret.data, masterPassword);
       // Return username as an empty string, when `resource.name` is null

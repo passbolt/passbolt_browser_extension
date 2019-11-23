@@ -10,7 +10,7 @@ const __ = require('../sdk/l10n').get;
 var Crypto = require('../model/crypto').Crypto;
 const InvalidMasterPasswordError = require('../error/invalidMasterPasswordError').InvalidMasterPasswordError;
 var Keyring = require('../model/keyring').Keyring;
-var masterPasswordController = require('../controller/masterPasswordController');
+const passphraseController = require('../controller/passphrase/passphraseController');
 const progressController = require('../controller/progress/progressController');
 const ResourceExportController = require('../controller/resource/resourceExportController').ResourceExportController;
 var Secret = require('../model/secret').Secret;
@@ -152,7 +152,7 @@ var listen = function (worker) {
     var crypto = new Crypto();
 
     // Master password required to decrypt a secret.
-    masterPasswordController.get(worker)
+    passphraseController.get(worker)
       .then(async function (masterPassword) {
         await progressController.start(worker, 'Decrypting...');
         return crypto.decrypt(armored, masterPassword)
@@ -184,7 +184,7 @@ var listen = function (worker) {
         throw new Error(__('The resource id should be a valid UUID'))
       }
       const secretPromise = Secret.findByResourceId(resourceId);
-      const masterPassword = await masterPasswordController.get(worker);
+      const masterPassword = await passphraseController.get(worker);
       await progressController.start(worker, 'Decrypting...');
       const secret = await secretPromise;
       const message = await crypto.decrypt(secret.data, masterPassword);

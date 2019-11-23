@@ -7,7 +7,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var Keyring = require('../model/keyring').Keyring;
-var masterPasswordController = require('../controller/masterPasswordController');
+const passphraseController = require('../controller/passphrase/passphraseController');
 var progressController = require('../controller/progress/progressController');
 var Permission = require('../model/permission').Permission;
 var Resource = require('../model/resource').Resource;
@@ -79,7 +79,7 @@ var listen = function (worker) {
     const progressGoal = resources.length * 3 + 1;
 
     try {
-      const privateKeySecret = await masterPasswordController.get(worker);
+      const privateKeySecret = await passphraseController.get(worker);
       progressController.start(appWorker, `Share ${resources.length} passwords`, progressGoal);
       progressController.update(appWorker, progress++, 'Initialize');
       await keyring.sync();

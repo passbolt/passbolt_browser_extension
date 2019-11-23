@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var fileController = require('../controller/fileController');
-var masterPasswordController = require('../controller/masterPasswordController');
+const passphraseController = require('../controller/passphrase/passphraseController');
 var KeepassDb = require('../model/keepassDb').KeepassDb;
 var CsvDb = require('../model/csvDb').CsvDb;
 var Crypto = require('../model/crypto').Crypto;
@@ -162,7 +162,7 @@ ExportPasswordsController.prototype._decryptSecrets = function(secrets) {
     crypto = new Crypto();
 
   // Master password required to decrypt a secret before sharing it.
-  return masterPasswordController.get(this.worker)
+  return passphraseController.get(this.worker)
   .then(function (masterPassword) {
     progressController.start(self.worker, 'Decrypting...', self.resources.length);
     var armored = self._prepareArmoredList();

@@ -32,7 +32,6 @@ QuickAccess.init = function () {
       app.events.auth.listen(this._worker);
       app.events.config.listen(this._worker);
       app.events.keyring.listen(this._worker);
-      app.events.masterPassword.listen(this._worker);
       app.events.quickAccess.listen(this._worker);
       app.events.group.listen(this._worker);
       app.events.tag.listen(this._worker);

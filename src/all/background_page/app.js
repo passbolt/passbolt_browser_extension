@@ -35,8 +35,6 @@ events.groupAutocomplete = require('./event/groupAutocompleteEvents');
 events.importPasswordsIframe = require('./event/importPasswordsIframeEvents');
 events.importPasswords = require('./event/importPasswordsEvents');
 events.keyring = require('./event/keyringEvents');
-events.masterPasswordIframe = require('./event/masterPasswordIframeEvents');
-events.masterPassword = require('./event/masterPasswordEvents');
 events.passboltPage = require('./event/passboltPageEvents');
 events.quickAccess = require('./event/quickAccessEvents');
 events.reactApp = require('./event/reactAppEvents');
@@ -139,12 +137,6 @@ pageMods.Clipboard = require('./pagemod/clipboardPagemod').Clipboard;
  * This pagemod drives the file iframe tool
  */
 pageMods.File = require('./pagemod/filePagemod').File;
-
-/*
- * This pagemod drives the dialog/iframe where the user enters the secret key password,
- * also called passphrase. It is used when encrypting, decrypting, signing, etc.
- */
-pageMods.MasterPasswordDialog = require('./pagemod/masterPasswordDialogPagemod').MasterPasswordDialog;
 
 /*
  * This pagemod drives the iframe used when the user enter a password to be stored by passbolt

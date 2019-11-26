@@ -45,7 +45,8 @@ var __line = 1
   , __lines = "<div class=\"feedback\">\n    <i class=\"fa fa-meh-o huge\" ></i>\n    <p>The supplied account does not exist</p>\n</div>\n<div class=\"actions-wrapper center\">\n    <a class=\"button primary big\" href=\"<?= passboltDomain ?>/register\">register again</a><br><br>\n    <a href=\"<?= passboltDomain ?>/recover\">or recover an existing account</a>\n</div>\n"
   , __filename = "src/all/data/ejs/login/feedbackLoginNoUser.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<div class=\"feedback\">\n    <i class=\"fa fa-meh-o huge\" ></i>\n    <p>The supplied account does not exist</p>\n</div>\n<div class=\"actions-wrapper center\">\n    <a class=\"button primary big\" href=\"")
     ; __line = 6
@@ -56,9 +57,11 @@ try {
     ; __append("/recover\">or recover an existing account</a>\n</div>\n")
     ; __line = 9
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/login/feedbackLoginNoUser.ejs
 
 }

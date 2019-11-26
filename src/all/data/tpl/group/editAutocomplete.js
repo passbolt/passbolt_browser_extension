@@ -45,14 +45,17 @@ var __line = 1
   , __lines = "<div class=\"autocomplete-wrapper\">\n    <div class=\"autocomplete-content scroll\">\n        <ul></ul>\n    </div>\n</div>\n"
   , __filename = "src/all/data/ejs/group/editAutocomplete.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<div class=\"autocomplete-wrapper\">\n    <div class=\"autocomplete-content scroll\">\n        <ul></ul>\n    </div>\n</div>\n")
     ; __line = 6
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/group/editAutocomplete.ejs
 
 }

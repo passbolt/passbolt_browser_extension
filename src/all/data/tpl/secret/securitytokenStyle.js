@@ -45,7 +45,8 @@ var __line = 1
   , __lines = "<style>\n    <?= id ?>:focus,\n    <?= id ?> ~ .security-token {\n        background: <?= color ?>;\n        color: <?= textcolor ?>;\n    }\n    <?= id ?>:focus ~ .security-token {\n        background: <?= textcolor ?>;\n        color: <?= color ?>;\n    };\n</style>"
   , __filename = "src/all/data/ejs/secret/securitytokenStyle.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<style>\n    ")
     ; __line = 2
@@ -71,9 +72,11 @@ try {
     ; __append(";\n    };\n</style>")
     ; __line = 11
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/secret/securitytokenStyle.ejs
 
 }

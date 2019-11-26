@@ -3,6 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import AppContext from "../../contexts/AppContext";
 import SimpleBar from "../SimpleBar/SimpleBar";
+import canSuggestUrl from "./canSuggestUrl";
 
 const SUGGESTED_RESOURCES_LIMIT = 3;
 const BROWSED_RESOURCES_LIMIT = 500;
@@ -20,7 +21,7 @@ class HomePage extends React.Component {
     this.context.updateSearch("");
     this.context.focusSearch();
     this.findResources();
-    this.getTabUrl();
+    this.getTabHostname();
   }
 
   initEventHandlers() {
@@ -31,7 +32,7 @@ class HomePage extends React.Component {
   initState() {
     this.state = {
       resources: null,
-      tabUrl: null
+      tabHostname: null
     };
   }
 
@@ -71,34 +72,41 @@ class HomePage extends React.Component {
     });
   }
 
-  async getTabUrl() {
-    const tabUrl = await passbolt.request("passbolt.active-tab.get-url");
-    this.setState({ tabUrl })
+  async getTabHostname() {
+    const activeTabUrl = await passbolt.request("passbolt.active-tab.get-url");
+    const parsedUrl = new URL(activeTabUrl);
+    const tabHostname = parsedUrl.hostname;
+    this.setState({ tabHostname })
   }
 
   /**
    * Get the resources for the suggested section.
-   * @return {array} The list of resources.
+   * @param {string} hostname The hostname to filter on.
+   * @param {array} resources The list of resources to filter.
+   * @return {array} The list of filtered resources.
    */
-  getSuggestedResources() {
+  getSuggestedResources(hostname, resources) {
+    if (!hostname) {
+      return [];
+    }
+
     const suggestedResources = [];
 
-    for (let i in this.state.resources) {
-      const resource = this.state.resources[i];
-      if (resource.uri) {
-        // Extract the domain from the resource uri, it ensures a higher matching rate :
-        // - By instance at amazon the same credentials can be used on different subdomains: www.amazon.com; signin.aws.amazon.com; etc ..
-        // - Removing the final part of the urls allows to match DOMAIN/user/login as well as DOMAIN/ap/signin that can vary from a domain service to another.
-        const resourceUriToMatch = resource.uri.replace(/^((http|https):\/\/)?(www\.)?([^\/]*)(\/.*)?/, "$4");
-        const regex = new RegExp(this.escapeRegExp(resourceUriToMatch), 'i');
-        if (regex.test(this.state.tabUrl)) {
-          suggestedResources.push(resource);
-          if (suggestedResources.length == SUGGESTED_RESOURCES_LIMIT) {
-            break;
-          }
+    for (let i in resources) {
+      if (!resources[i].uri) {
+        continue;
+      }
+
+      if (canSuggestUrl(hostname, resources[i].uri)) {
+        suggestedResources.push(resources[i]);
+        if (suggestedResources.length == SUGGESTED_RESOURCES_LIMIT) {
+          break;
         }
       }
     }
+
+    // Sort the resources by uri lengths, the greater on top.
+    suggestedResources.sort((a, b) => b.uri.length - a.uri.length);
 
     return suggestedResources;
   }
@@ -165,7 +173,7 @@ class HomePage extends React.Component {
 
     if (isReady) {
       if (showSuggestedSection) {
-        suggestedResources = this.getSuggestedResources();
+        suggestedResources = this.getSuggestedResources(this.state.tabHostname, this.state.resources);
       }
       if (showBrowsedResourcesSection) {
         browsedResources = this.getBrowsedResources();

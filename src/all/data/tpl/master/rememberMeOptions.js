@@ -45,7 +45,8 @@ var __line = 1
   , __lines = "<? if (!options) { ?>\n    <div class=\"input checkbox\">\n        <input type=\"checkbox\" id=\"js_remember_master_password\"/>\n        <label for=\"js_remember_master_password\">Remember it for 5 minutes</label>\n    </div>\n<? } else if (Object.keys(options).length) { ?>\n    <div class=\"input checkbox\">\n        <input type=\"checkbox\" id=\"js_remember_master_password\"/>\n        <label for=\"js_remember_master_password\">Remember it for </label>\n    </div>\n    <div class=\"input select\">\n        <select id=\"js_remember_master_password_duration\">\n        <? for (var time in options) { ?>\n            <option value=\"<?= time.toString() ?>\"><?= options[time].toString() ?></option>\n        <? } ?>\n        </select>\n    </div>\n<? } ?>\n"
   , __filename = "src/all/data/ejs/master/rememberMeOptions.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ;  if (!options) { 
     ; __append("\n    <div class=\"input checkbox\">\n        <input type=\"checkbox\" id=\"js_remember_master_password\"/>\n        <label for=\"js_remember_master_password\">Remember it for 5 minutes</label>\n    </div>\n")
@@ -68,9 +69,11 @@ try {
     ; __append("\n")
     ; __line = 19
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/master/rememberMeOptions.ejs
 
 }

@@ -45,14 +45,17 @@ var __line = 1
   , __lines = "<div class=\"dialog-wrapper\">\n    <div class=\"dialog confirm\">\n        <div class=\"dialog-header\">\n            <h2>Do you really want to leave ?</h2>\n            <a class=\"js-dialog-close dialog-close\">\n                <i class=\"fa fa-close\"></i>\n                <span class=\"visuallyhidden\">close</span>\n            </a>\n        </div>\n        <div class=\"js_dialog_content dialog-content\">\n            <div class=\"form-content\">\n                <p>\n                    There are unsaved changes, you might want to save them before leaving.\n                </p>\n            </div>\n        </div>\n        <div class=\"submit-wrapper clearfix\">\n            <input type=\"submit\" value=\"Leave anyway\" class=\"js-dialog-confirm button primary warning\">\n            <a class=\"js-dialog-cancel cancel\">cancel</a>\n        </div>\n    </div>\n</div>\n"
   , __filename = "src/all/data/ejs/dialog/confirmLeaveDialog.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<div class=\"dialog-wrapper\">\n    <div class=\"dialog confirm\">\n        <div class=\"dialog-header\">\n            <h2>Do you really want to leave ?</h2>\n            <a class=\"js-dialog-close dialog-close\">\n                <i class=\"fa fa-close\"></i>\n                <span class=\"visuallyhidden\">close</span>\n            </a>\n        </div>\n        <div class=\"js_dialog_content dialog-content\">\n            <div class=\"form-content\">\n                <p>\n                    There are unsaved changes, you might want to save them before leaving.\n                </p>\n            </div>\n        </div>\n        <div class=\"submit-wrapper clearfix\">\n            <input type=\"submit\" value=\"Leave anyway\" class=\"js-dialog-confirm button primary warning\">\n            <a class=\"js-dialog-cancel cancel\">cancel</a>\n        </div>\n    </div>\n</div>\n")
     ; __line = 23
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/dialog/confirmLeaveDialog.ejs
 
 }

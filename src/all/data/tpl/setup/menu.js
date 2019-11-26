@@ -45,7 +45,8 @@ var __line = 1
   , __lines = "<ul>\n<? for (var i in menuSteps) { ?>\n    <?\n      var menuClass = 'disabled';\n      switch (menuSteps[i].state) {\n        case 'past':\n          menuClass = 'past';\n          break;\n        case 'current':\n          menuClass = 'selected';\n          break;\n      }\n    ?>\n    <li class=\"<?= menuClass ?>\">\n        <? if (menuClass == \"selected\" || menuClass == \"past\") { ?>\n        <a><?= steps[menuSteps[i].stepId].label ?></a>\n        <? } else { ?>\n        <?= steps[menuSteps[i].stepId].label ?>\n        <? } ?>\n    </li>\n<? } ?>\n</ul>\n"
   , __filename = "src/all/data/ejs/setup/menu.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<ul>\n")
     ; __line = 2
@@ -88,9 +89,11 @@ try {
     ; __append("\n</ul>\n")
     ; __line = 23
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/setup/menu.ejs
 
 }

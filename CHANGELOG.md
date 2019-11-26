@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Improved
 - PB-649: The quickaccess passphrase field text and background colors should remain as default when the field is not focused.
 
+## [2.11.2] - 2019-11-19
+- PB-847: The quickaccess should suggest resources only if the current tab domain matches or is a subdomain of the resource uri.
+
 ## [2.11.1] - 2019-09-16
 - PB-125: Sessions should be extended by default when user ask to remember passphrase.
 

@@ -45,14 +45,17 @@ var __line = 1
   , __lines = "<!-- left collumn -->\n<div class=\"col7\">\n    <h3>Setup is complete</h3>\n    <div class=\"message success\">\n        <strong>\n            <i class=\"fa fa-check-circle\"></i>\n            Success!\n        </strong>\n        You have successfully completed the setup, thank you!\n        You will soon be redirected to the login page.\n    </div>\n    <div class=\"input-wrapper\">\n        <a id=\"js_spinner\" class=\"button primary next big processing\">login!</a>\n        <a>Click here if you can't wait</a>.\n    </div>\n    <p>\n    </p>\n</div>\n\n<!-- right collumn -->\n<div class=\"col4 last\">\n\n</div>\n"
   , __filename = "src/all/data/ejs/setup/login_redirection.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<!-- left collumn -->\n<div class=\"col7\">\n    <h3>Setup is complete</h3>\n    <div class=\"message success\">\n        <strong>\n            <i class=\"fa fa-check-circle\"></i>\n            Success!\n        </strong>\n        You have successfully completed the setup, thank you!\n        You will soon be redirected to the login page.\n    </div>\n    <div class=\"input-wrapper\">\n        <a id=\"js_spinner\" class=\"button primary next big processing\">login!</a>\n        <a>Click here if you can't wait</a>.\n    </div>\n    <p>\n    </p>\n</div>\n\n<!-- right collumn -->\n<div class=\"col4 last\">\n\n</div>\n")
     ; __line = 24
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/setup/login_redirection.ejs
 
 }

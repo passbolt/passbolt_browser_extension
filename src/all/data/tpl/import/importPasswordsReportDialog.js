@@ -45,7 +45,8 @@ var __line = 1
   , __lines = "<?\nvar success = true;\nif(this.errorsList.length > 0) {\n    success = false;\n}\n?>\n<div class=\"dialog-wrapper\">\n    <div class=\"dialog report\">\n        <div class=\"dialog-header\">\n            <? if (success) { ?>\n            <h2>Success!</h2>\n            <? } else { ?>\n            <h2>Something went wrong!</h2>\n            <? } ?>\n            <a class=\"dialog-close\" role=\"button\">\n                <i class=\"fa fa-close\"></i><span class=\"visuallyhidden\">close</span>\n            </a>\n\n        </div>\n        <div class=\"js_dialog_content dialog-content\">\n\n            <form class=\"tab-content ready selected\" id=\"js_rs_import_report\">\n                <div class=\"form-content\">\n                    <? if (success) { ?>\n                    <p><strong><?= this.successList.length ?> passwords have been imported successfully.</strong></p>\n                    <? } else { ?>\n                    <p class=\"error inline-error\">There was an issue when importing the passwords:</p>\n                    <? } ?>\n                    <? if (!success) { ?>\n                    <p>\n                        <strong><?= this.successList.length ?> out of <?= this.resources.length ?></strong> passwords have been imported.\n                    </p>\n                    <? } ?>\n                    <? if(this.tagsIntegration === true) { ?>\n                    <p>You can find the newly imported passwords under the tag: '<?= this.importTag ?>'.</p>\n                    <? } ?>\n                    <? if (!success) { ?>\n                    <div class=\"accordion error-details closed\">\n                        <div class=\"accordion-header\">\n                            <a role=\"link\">Errors details</a>\n                        </div>\n                        <div class=\"accordion-content hidden\" style=\"display: none;\">\n                            <div class=\"input text\">\n                                <label for=\"js_field_debug\" class=\"visuallyhidden\">Errors details</label>\n                                <textarea id=\"js_field_debug\"><?= JSON.stringify(this.errorsList, null, 4); ?></textarea>\n                            </div>\n                        </div>\n                    </div>\n                    <? } ?>\n                </div>\n                <div class=\"submit-wrapper clearfix\">\n                    <input class=\"button primary\" value=\"Ok\" type=\"submit\">\n                </div>\n            </form>\n        </div>\n    </div>\n</div>"
   , __filename = "src/all/data/ejs/import/importPasswordsReportDialog.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; 
 var success = true;
@@ -107,9 +108,11 @@ if(this.errorsList.length > 0) {
     ; __append("\n                </div>\n                <div class=\"submit-wrapper clearfix\">\n                    <input class=\"button primary\" value=\"Ok\" type=\"submit\">\n                </div>\n            </form>\n        </div>\n    </div>\n</div>")
     ; __line = 57
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/import/importPasswordsReportDialog.ejs
 
 }

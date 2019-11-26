@@ -45,7 +45,8 @@ var __line = 1
   , __lines = "<div class=\"feedback\">\n    <i class=\"fa fa-cog fa-warning huge\"></i>\n    <p><?= message ?></p>\n</div>"
   , __filename = "src/all/data/ejs/login/feedbackLoginError.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<div class=\"feedback\">\n    <i class=\"fa fa-cog fa-warning huge\"></i>\n    <p>")
     ; __line = 3
@@ -53,9 +54,11 @@ try {
     ; __append("</p>\n</div>")
     ; __line = 4
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/login/feedbackLoginError.ejs
 
 }

@@ -45,7 +45,8 @@ var __line = 1
   , __lines = "<div class=\"dialog-wrapper\">\n    <div class=\"dialog share-password-dialog\">\n        <div class=\"dialog-header\">\n<? if (resourcesCount > 1) { ?>\n            <h2><span>Share <?= resourcesCount ?> passwords </span></h2>\n<? } else { ?>\n            <h2>Share<span class=\"dialog-header-subtitle\"></span></h2>\n<? } ?>\n            <a class=\"dialog-close js-dialog-close\">\n                <i class=\"fa fa-close\"></i>\n                <span class=\"visuallyhidden\">close</span>\n            </a>\n        </div>\n        <div class=\"js-dialog-content dialog-content\">\n\n<? if (resourcesCount == 1) { ?>\n            <ul class=\"tabs-nav menu\">\n                <li id=\"js-share-go-to-edit\">\n                    <div class=\"row\">\n                        <div class=\"main-cell-wrapper\">\n                            <div class=\"main-cell\">\n                                <a><span>Edit</span></a>\n                            </div>\n                        </div>\n                    </div>\n                </li>\n                <li id=\"js-share-go-to-share\" class=\"\">\n                    <div class=\"row\">\n                        <div class=\"main-cell-wrapper\">\n                            <div class=\"main-cell\">\n                                <a class=\"selected\"><span>Share</span></a>\n                            </div>\n                        </div>\n                    </div>\n                </li>\n            </ul>\n\n            <div class=\"tab\">\n                <div class=\"tab-content\" style=\"display:block\">\n<? } ?>\n\n                    <div class=\"processing-wrapper\">\n                        <span class=\"processing-text\">Retrieving permissions</span>\n                    </div>\n\n                    <div id=\"js-share-edit-list\" class=\"form-content permission-edit\">\n                        <ul class=\"permissions scroll\"></ul>\n                    </div>\n\n                    <div id=\"js-share-feedbacks\" class=\"feedbacks message hidden\"></div>\n\n                    <div id=\"js-share-form-content-add\" class=\"form-content permission-add hidden\">\n                        <div class=\"input text autocomplete\">\n                            <label for=\"js-search-aros-input\">Share with people or groups</label>\n                            <input maxlength=\"255\" id=\"js-search-aros-input\" placeholder=\"enter one name or email\" autocomplete=\"off\" type=\"text\">\n                            <div class=\"security-token\"></div>\n                        </div>\n                        <div id=\"js-search-aro-autocomplete\" class=\"autocomplete-wrapper hidden\">\n                            <div class=\"autocomplete-content scroll\"></div>\n                        </div>\n                    </div>\n\n                    <div class=\"submit-wrapper clearfix\">\n                        <input id=\"js-share-save\" type=\"submit\" class=\"button disabled primary\" value=\"save\" disabled=\"disabled\"/>\n                        <a id=\"js-share-cancel\" class=\"cancel\">cancel</a>\n                    </div>\n                </div>\n\n<? if (resourcesCount == 1) { ?>\n            </div>\n        </div>\n<? } ?>\n\n    </div>\n</div>\n"
   , __filename = "src/all/data/ejs/resource/shareDialog.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<div class=\"dialog-wrapper\">\n    <div class=\"dialog share-password-dialog\">\n        <div class=\"dialog-header\">\n")
     ; __line = 4
@@ -74,9 +75,11 @@ try {
     ; __append("\n\n    </div>\n</div>\n")
     ; __line = 76
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/resource/shareDialog.ejs
 
 }

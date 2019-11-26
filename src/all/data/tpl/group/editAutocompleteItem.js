@@ -45,7 +45,8 @@ var __line = 1
   , __lines = "<?\n    let avatarPath;\n    if (user.Profile.Avatar.url.small.startsWith('https://')) {\n        avatarPath = user.Profile.Avatar.url.small;\n    } else {\n        avatarPath = settings['user.settings.trustedDomain'] + '/' + user.Profile.Avatar.url.small;\n    }\n?>\n<li id=\"<?= user.User.id ?>\">\n    <div class=\"row\">\n        <div class=\"main-cell-wrapper\">\n            <div class=\"main-cell\">\n                <a>\n                    <div class=\"avatar\">\n                        <img src=\"<?= avatarPath ?>\"/>\n                    </div>\n                    <div class=\"user\">\n                        <span class=\"name\"><?= user.Profile.first_name ?> <?= user.Profile.last_name ?> (<?= user.Gpgkey.key_id ?>)</span>\n                        <span class=\"details\" title=\"<?= user.User.username ?>\"><?= user.User.username ?></span>\n                    </div>\n                </a>\n            </div>\n        </div>\n    </div>\n</li>\n"
   , __filename = "src/all/data/ejs/group/editAutocompleteItem.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; 
     let avatarPath;
@@ -77,9 +78,11 @@ try {
     ; __append("</span>\n                    </div>\n                </a>\n            </div>\n        </div>\n    </div>\n</li>\n")
     ; __line = 26
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/group/editAutocompleteItem.ejs
 
 }

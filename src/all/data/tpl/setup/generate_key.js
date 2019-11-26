@@ -45,14 +45,17 @@ var __line = 1
   , __lines = "<!-- left collumn -->\n<div class=\"col7\">\n    <h3>Generating the secret and public key</h3>\n\n    <div class=\"progress-bar-wrapper\">\n        <span class=\"progress-bar big infinite\"><span class=\"progress \"></span></span>\n    </div>\n\n    <p>We are generating your public and secret keys. This may take a while. Just take a deep breath and enjoy being in the moment. </p>\n\n</div>\n\n<!-- right collumn -->\n<div class=\"col4 last\"></div>"
   , __filename = "src/all/data/ejs/setup/generate_key.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<!-- left collumn -->\n<div class=\"col7\">\n    <h3>Generating the secret and public key</h3>\n\n    <div class=\"progress-bar-wrapper\">\n        <span class=\"progress-bar big infinite\"><span class=\"progress \"></span></span>\n    </div>\n\n    <p>We are generating your public and secret keys. This may take a while. Just take a deep breath and enjoy being in the moment. </p>\n\n</div>\n\n<!-- right collumn -->\n<div class=\"col4 last\"></div>")
     ; __line = 14
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/setup/generate_key.ejs
 
 }

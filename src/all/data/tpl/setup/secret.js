@@ -45,14 +45,17 @@ var __line = 1
   , __lines = "<!-- left collumn -->\n<div class=\"col7\">\n    <h3>Set your passphrase</h3>\n    <p>This is the only passphrase you will need to remember from now on, so make sure you choose it wisely! </p>\n\n    <div class=\"input-password-wrapper\">\n        <div class=\"input password required\">\n            <label for=\"js_field_password\" class=\"hidden\">New passphrase</label>\n            <input name=\"passbolt.model.User.password\" type=\"password\" id=\"js_field_password\" placeholder=\"enter your passphrase here\">\n            <input class=\"required hidden\" type=\"text\" id=\"js_field_password_clear\">\n        </div>\n        <ul class=\"actions inline\">\n            <li>\n                <a id=\"js_show_pwd_button\" class=\"button toggle mad_controller_component_button_controller mad_view_view js_component ready\n                    tooltip-right always-show large\" data-tooltip=\"click here to view in clear text\">\n                    <i class=\"fa fa-eye fa-lg\"></i>\n                    <span class=\"visuallyhidden\">view</span>\n                </a>\n            </li>\n        </ul>\n        <div id=\"js_user_pwd_strength\" class=\"password-complexity\">\n        </div>\n    </div>\n\n    <div class=\"password-hints\">\n        <p>Some tips for choosing a strong passphrase:</p>\n        <ul id=\"js_password_match_criterias\">\n        </ul>\n    </div>\n</div>\n\n<!-- right collumn -->\n<div class=\"col4 last\">\n\n</div>"
   , __filename = "src/all/data/ejs/setup/secret.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; __append("<!-- left collumn -->\n<div class=\"col7\">\n    <h3>Set your passphrase</h3>\n    <p>This is the only passphrase you will need to remember from now on, so make sure you choose it wisely! </p>\n\n    <div class=\"input-password-wrapper\">\n        <div class=\"input password required\">\n            <label for=\"js_field_password\" class=\"hidden\">New passphrase</label>\n            <input name=\"passbolt.model.User.password\" type=\"password\" id=\"js_field_password\" placeholder=\"enter your passphrase here\">\n            <input class=\"required hidden\" type=\"text\" id=\"js_field_password_clear\">\n        </div>\n        <ul class=\"actions inline\">\n            <li>\n                <a id=\"js_show_pwd_button\" class=\"button toggle mad_controller_component_button_controller mad_view_view js_component ready\n                    tooltip-right always-show large\" data-tooltip=\"click here to view in clear text\">\n                    <i class=\"fa fa-eye fa-lg\"></i>\n                    <span class=\"visuallyhidden\">view</span>\n                </a>\n            </li>\n        </ul>\n        <div id=\"js_user_pwd_strength\" class=\"password-complexity\">\n        </div>\n    </div>\n\n    <div class=\"password-hints\">\n        <p>Some tips for choosing a strong passphrase:</p>\n        <ul id=\"js_password_match_criterias\">\n        </ul>\n    </div>\n</div>\n\n<!-- right collumn -->\n<div class=\"col4 last\">\n\n</div>")
     ; __line = 35
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/setup/secret.ejs
 
 }

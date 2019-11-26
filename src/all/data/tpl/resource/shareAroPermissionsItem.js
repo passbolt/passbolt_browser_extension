@@ -45,7 +45,8 @@ var __line = 1
   , __lines = "<?\nlet avatarPath = '';\nlet aroName = '';\nlet aroDetails = '';\n\nif (aroPermissions.aro.profile) {\n    if (aroPermissions.aro.profile.avatar.url.small.startsWith('https://')) {\n        avatarPath = `${aroPermissions.aro.profile.avatar.url.small}`;\n    } else {\n        avatarPath = `${domain}/${aroPermissions.aro.profile.avatar.url.small}`;\n    }\n    aroName = `${aroPermissions.aro.profile.first_name} ${aroPermissions.aro.profile.last_name}`;\n    aroDetails = aroPermissions.aro.username;\n} else {\n    avatarPath = `${domain}/img/avatar/group_default.png`;\n    aroName = aroPermissions.aro.name;\n    aroDetails = 'Group';\n}\n?>\n<li id=\"<?= aroPermissions.aro.id ?>\" class=\"row\">\n    <div class=\"avatar\">\n        <img src=\"<?= avatarPath ?>\"/>\n    </div>\n\n    <div class=\"group\">\n        <span class=\"name\"><?= aroName ?></span>\n        <span class=\"details\"><a><?= aroDetails ?></a></span>\n    </div>\n\n    <div class=\"select rights\">\n        <select class=\"permission <?= !canEdit ? 'disabled' : '' ?>\" <?= !canEdit ? 'disabled=\"disabled\"' : '' ?>>\n            <option value=\"1\" <?= aroPermissions.type == 1 ? 'selected=\"selected\"' : ''?>>can read</option>\n            <option value=\"7\" <?= aroPermissions.type == 7 ? 'selected=\"selected\"' : ''?>>can update</option>\n            <option value=\"15\" <?= aroPermissions.type == 15 ? 'selected=\"selected\"' : ''?>>is owner</option>\n            <? if (aroPermissions.type == -1) { ?>\n            <option value=\"-1\" selected=\"selected\">varies</option>\n            <? } ?>\n        </select>\n<? if (aroPermissions.type == -1) { ?>\n        <div href=\"#\" class=\"more_details tooltip-alt\">\n            <i class=\"fa fa-info-circle\"></i>\n            <div class=\"tooltip-text right\">\n                <? if(aroPermissions.variesDetails[0].length) { ?>\n                <b>no access</b>: <?= aroPermissions.variesDetails[0].join(', ') ?><br/>\n                <? } ?>\n                <? if(aroPermissions.variesDetails[1].length) { ?>\n                <b>can read</b>: <?= aroPermissions.variesDetails[1].join(', ') ?><br/>\n                <? } ?>\n                <? if(aroPermissions.variesDetails[7].length) { ?>\n                <b>can update</b>: <?= aroPermissions.variesDetails[7].join(', ') ?><br/>\n                <? } ?>\n                <? if(aroPermissions.variesDetails[15].length) { ?>\n                <b>is owner</b>: <?= aroPermissions.variesDetails[15].join(', ') ?><br/>\n                <? } ?>\n            </div>\n        </div>\n<? } ?>\n    </div>\n\n    <div id=\"js_actions_rs_perm_<?= aroPermissions.aro.id ?>\" class=\"actions\">\n        <a class=\"js-share-delete-button close <?= !canEdit ? 'disabled' : '' ?>\" title=\"remove\">\n            <i class=\"fa fa-times-circle\"></i>\n            <span class=\"visuallyhidden\">remove</span>\n        </a>\n    </div>\n</li>\n"
   , __filename = "src/all/data/ejs/resource/shareAroPermissionsItem.ejs";
 try {
-  var __output = [], __append = __output.push.bind(__output);
+  var __output = "";
+  function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
     ; 
 let avatarPath = '';
@@ -150,9 +151,11 @@ if (aroPermissions.aro.profile) {
     ; __append("\" title=\"remove\">\n            <i class=\"fa fa-times-circle\"></i>\n            <span class=\"visuallyhidden\">remove</span>\n        </a>\n    </div>\n</li>\n")
     ; __line = 67
   }
-  return __output.join("");
+  return __output;
 } catch (e) {
   rethrow(e, __lines, __filename, __line, escapeFn);
 }
+
+//# sourceURL=src/all/data/ejs/resource/shareAroPermissionsItem.ejs
 
 }

@@ -7,6 +7,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-878: Update OpenPGP.js to v4.7
 - PB-649: The quickaccess passphrase field text and background colors should remain as default when the field is not focused.
 
+### Fixed
+- PB-883: The quickaccess should filter passwords by uri protocol and port if provided.
+
 ## [2.11.2] - 2019-11-19
 - PB-847: The quickaccess should suggest resources only if the current tab domain matches or is a subdomain of the resource uri.
 

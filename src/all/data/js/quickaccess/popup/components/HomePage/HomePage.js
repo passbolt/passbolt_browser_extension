@@ -21,7 +21,7 @@ class HomePage extends React.Component {
     this.context.updateSearch("");
     this.context.focusSearch();
     this.findResources();
-    this.getTabHostname();
+    this.getActiveTabUrl();
   }
 
   initEventHandlers() {
@@ -32,7 +32,7 @@ class HomePage extends React.Component {
   initState() {
     this.state = {
       resources: null,
-      tabHostname: null
+      activeTabUrl: null
     };
   }
 
@@ -72,21 +72,19 @@ class HomePage extends React.Component {
     });
   }
 
-  async getTabHostname() {
+  async getActiveTabUrl() {
     const activeTabUrl = await passbolt.request("passbolt.active-tab.get-url");
-    const parsedUrl = new URL(activeTabUrl);
-    const tabHostname = parsedUrl.hostname;
-    this.setState({ tabHostname })
+    this.setState({ activeTabUrl })
   }
 
   /**
    * Get the resources for the suggested section.
-   * @param {string} hostname The hostname to filter on.
+   * @param {string} activeTabUrl the active tab url
    * @param {array} resources The list of resources to filter.
    * @return {array} The list of filtered resources.
    */
-  getSuggestedResources(hostname, resources) {
-    if (!hostname) {
+  getSuggestedResources(activeTabUrl, resources) {
+    if (!activeTabUrl) {
       return [];
     }
 
@@ -97,7 +95,7 @@ class HomePage extends React.Component {
         continue;
       }
 
-      if (canSuggestUrl(hostname, resources[i].uri)) {
+      if (canSuggestUrl(activeTabUrl, resources[i].uri)) {
         suggestedResources.push(resources[i]);
         if (suggestedResources.length == SUGGESTED_RESOURCES_LIMIT) {
           break;
@@ -173,7 +171,7 @@ class HomePage extends React.Component {
 
     if (isReady) {
       if (showSuggestedSection) {
-        suggestedResources = this.getSuggestedResources(this.state.tabHostname, this.state.resources);
+        suggestedResources = this.getSuggestedResources(this.state.activeTabUrl, this.state.resources);
       }
       if (showBrowsedResourcesSection) {
         browsedResources = this.getBrowsedResources();

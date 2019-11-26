@@ -346,10 +346,11 @@ Keyring.prototype.generateKeyPair = function (keyInfo, passphrase) {
   // Get user id from key info.
   const key = new Key();
   key.set(keyInfo);
+  console.log(keyInfo);
 
   // Launch key pair generation from openpgp worker.
   return openpgp.generateKey({
-    numBits: keyInfo.length,
+    rsaBits: keyInfo.length,
     userIds: key.getUserId(),
     passphrase: passphrase
   });

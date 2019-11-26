@@ -4,6 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Improved
+- PB-878: Update OpenPGP.js to v4.7
 - PB-649: The quickaccess passphrase field text and background colors should remain as default when the field is not focused.
 
 ## [2.11.2] - 2019-11-19

@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - PB-883: The quickaccess should filter passwords by uri protocol and port if provided.
+- PB-766: Fix 414 server issues for features that work with batch of resources. Reduce the size of the batches.
 
 ## [2.11.2] - 2019-11-19
 - PB-847: The quickaccess should suggest resources only if the current tab domain matches or is a subdomain of the resource uri.

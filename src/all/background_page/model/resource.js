@@ -165,7 +165,7 @@ Resource.findShareResource = async function (resourceId) {
  * @returns {array|Error}
  */
 Resource.findShareResources = async function (resourcesIds) {
-  // Retrieve the resources by batch of 100 to avoid any 414 response.
+  // Retrieve by batch to avoid any 414 response.
   const batchSize = 80;
   if (resourcesIds.length > batchSize) {
     let resources = [];

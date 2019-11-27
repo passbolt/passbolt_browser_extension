@@ -27,7 +27,7 @@ class ResourceService {}
  */
 ResourceService.findAllByResourcesIds = async function (resourcesIds, options) {
   // Find by batch of 100 resources to avoid 414 server error.
-  const batchSize = 100;
+  const batchSize = 80;
   let resources = [];
   const totalBatches = Math.ceil(resourcesIds.length / batchSize);
   for (let i = 0; i < totalBatches; i++) {

@@ -132,7 +132,7 @@ var listen = function (worker) {
       var validatedUser = user.validate(u, fields);
       worker.port.emit(requestId, 'SUCCESS', validatedUser);
     } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message, e.validationErrors);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
     }
   });
 
@@ -149,7 +149,7 @@ var listen = function (worker) {
       user.settings.validate(settingsData, fields);
       worker.port.emit(requestId, 'SUCCESS', settingsData);
     } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message, e.validationErrors);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
     }
   });
 

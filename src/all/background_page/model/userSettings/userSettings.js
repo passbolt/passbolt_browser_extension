@@ -5,8 +5,8 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-var __ = require('../sdk/l10n').get;
-var Config = require('./config');
+var __ = require('../../sdk/l10n').get;
+var Config = require('../config');
 
 /**
  * The class that deals with users settings

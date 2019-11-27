@@ -7,7 +7,7 @@
  */
 const InvalidMasterPasswordError = require('../error/invalidMasterPasswordError').InvalidMasterPasswordError;
 const __ = require('../sdk/l10n').get;
-const UserSettings = require('./userSettings').UserSettings;
+const UserSettings = require('./userSettings/userSettings').UserSettings;
 const Key = require('./key').Key;
 const Uuid = require('../utils/uuid');
 const goog = require('../utils/format/emailaddress').goog;

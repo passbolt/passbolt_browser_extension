@@ -129,7 +129,7 @@ var listen = function (worker) {
       var validate = key.validate(keyData, fields);
       worker.port.emit(requestId, 'SUCCESS', validate);
     } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message, e.validationErrors);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
     }
   });
 

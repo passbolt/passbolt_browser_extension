@@ -8,7 +8,7 @@
 const GroupService = require("../service/group").GroupService;
 const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
 const Request = require('./request').Request;
-const UserSettings = require('./userSettings').UserSettings;
+const UserSettings = require('./userSettings/userSettings').UserSettings;
 
 /**
  * The class that deals with groups.

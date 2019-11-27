@@ -63,7 +63,7 @@ var listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
       Worker.get('Secret', worker.tab.id).port.emit('passbolt.secret-edit.validate-error', e.message, e.validationErrors);
-      worker.port.emit(requestId, 'ERROR', e.message, e.validationErrors);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
     }
   });
 

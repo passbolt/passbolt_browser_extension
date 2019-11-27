@@ -9,7 +9,7 @@
  */
 
 var Config = require('./config');
-var UserSettings = require('./userSettings').UserSettings;
+var UserSettings = require('./userSettings/userSettings').UserSettings;
 var Group = require('./group').Group;
 var TabStorage = require('../model/tabStorage').TabStorage;
 var __ = require('../sdk/l10n').get;

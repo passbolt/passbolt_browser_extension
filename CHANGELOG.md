@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
+## [2.11.3] - 2019-11-28
+- GROOVE-1605 Revert to OpenPGP v2.6.2
 
 ## [2.11.2] - 2019-11-19
 - PB-847: The quickaccess should suggest resources only if the current tab domain matches or is a subdomain of the resource uri.

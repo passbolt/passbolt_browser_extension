@@ -83,6 +83,7 @@ describe("canSuggestUrl", () => {
 
   it("should not suggest urls to an attacker url containing a subdomain looking alike a stored password url", () => {
     expect(canSuggestUrl("https://www.passbolt.com.attacker.com", "passbolt.com")).toBe(false);
+    expect(canSuggestUrl("https://www.passbolt.com-attacker.com", "passbolt.com")).toBe(false);
   });
 
   it("should not suggest urls to an attacker url containing a parameter looking alike a stored password url", () => {

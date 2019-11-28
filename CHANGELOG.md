@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-649: The quickaccess passphrase field text and background colors should remain as default when the field is not focused.
 
 ### Fixed
+- PB-879: Fix the setup security token validation bug
 - PB-883: The quickaccess should filter passwords by uri protocol and port if provided.
 - PB-766: Fix 414 server issues for features that work with batch of resources. Reduce the size of the batches.
 

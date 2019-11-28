@@ -110,8 +110,8 @@ $(function () {
       .then(function success() {
         step.elts.$feedback.addClass('hidden');
         passbolt.setup.setActionState('submit', 'enabled');
-      }, function error(errorMessage, validationErrors) {
-        step.onError(validationErrors[0].securityToken);
+      }, function error(error) {
+        step.onError(error.validationErrors[0].securityToken);
         passbolt.setup.setActionState('submit', 'disabled');
       });
   };

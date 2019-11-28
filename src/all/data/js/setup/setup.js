@@ -629,8 +629,14 @@ $(function () {
       .then(function () {
         passbolt.setup.goForward(startingStepId);
       })
-      .then(null, function (errorMessage) {
-        passbolt.setup._initError(errorMessage, setupData);
+      .then(null, function (error) {
+        let message;
+        if (typeof error === "string") {
+          message = error;
+        } else if (error instanceof Error) {
+          message = error.message;
+        }
+        passbolt.setup._initError(message, setupData);
       });
   };
 

@@ -8,7 +8,7 @@
 const browser = require("webextension-polyfill/dist/browser-polyfill");
 const Config = require('./config');
 const UserService = require('../service/user').UserService;
-const UserSettings = require('./userSettings').UserSettings;
+const UserSettings = require('./userSettings/userSettings').UserSettings;
 const __ = require('../sdk/l10n').get;
 
 /**

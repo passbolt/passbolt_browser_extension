@@ -4,12 +4,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Improved
-- PB-878: Update OpenPGP.js to v4.7
 - PB-649: The quickaccess passphrase field text and background colors should remain as default when the field is not focused.
 
 ### Fixed
 - PB-883: The quickaccess should filter passwords by uri protocol and port if provided.
 - PB-766: Fix 414 server issues for features that work with batch of resources. Reduce the size of the batches.
+
+## [2.11.3] - 2019-11-28
+- GROOVE-1605 Revert to OpenPGP v2.6.2
 
 ## [2.11.2] - 2019-11-19
 - PB-847: The quickaccess should suggest resources only if the current tab domain matches or is a subdomain of the resource uri.
@@ -411,6 +413,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - LU: Logged in user
 
 [Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.11.0...HEAD
+[2.11.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.11.2...v2.11.3
+[2.11.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.11.1...v2.11.2
+[2.11.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.11.0...v2.11.1
 [2.11.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.10.1...v2.11.0
 [2.10.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.10.0...v2.10.1
 [2.10.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.9.2...v2.10.0

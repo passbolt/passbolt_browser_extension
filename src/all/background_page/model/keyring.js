@@ -350,7 +350,7 @@ Keyring.prototype.generateKeyPair = function (keyInfo, passphrase) {
 
   // Launch key pair generation from openpgp worker.
   return openpgp.generateKey({
-    rsaBits: keyInfo.length,
+    numBits: keyInfo.length,
     userIds: key.getUserId(),
     passphrase: passphrase
   });

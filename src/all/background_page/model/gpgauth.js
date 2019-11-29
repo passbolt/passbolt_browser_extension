@@ -21,6 +21,7 @@ const URL_VERIFY = '/auth/verify.json?api-version=v1';
 const URL_LOGIN = '/auth/login.json?api-version=v1';
 const URL_LOGOUT = '/auth/logout.json?api-version=v1';
 const CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD = 60000;
+const MAX_IS_AUTHENTICATED_INTERVAL_PERIOD = 2147483647;
 
 /**
  * GPGAuth authentication
@@ -367,6 +368,14 @@ GpgAuth.prototype.getCheckAuthStatusTimeoutPeriod = async function() {
     // Convert the timeout in millisecond and add 1 second to ensure the session is well expired
     // when the request is made.
     timeoutPeriod = ((sessionTimeout * 60) + 1) * 1000;
+
+    // Fix https://github.com/passbolt/passbolt_browser_extension/issues/84
+    if (timeoutPeriod > MAX_IS_AUTHENTICATED_INTERVAL_PERIOD) {
+      timeoutPeriod = MAX_IS_AUTHENTICATED_INTERVAL_PERIOD;
+    }
+    if (timeoutPeriod < CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD) {
+      timeoutPeriod = CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD;
+    }
   }
 
   return timeoutPeriod;

@@ -9,7 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - GITHUB-84: Fix high server session timeout setting can lead to constant sessions check in legacy systems
 - PB-879: Fix the setup security token validation bug
-- PB-883: The quickaccess should filter passwords by uri protocol and port if provided.
+- PB-883: The quickaccess suggestion should filter passwords by uri protocol and port if provided.
 - PB-766: Fix 414 server issues for features that work with batch of resources. Reduce the size of the batches.
 
 ## [2.11.3] - 2019-11-28

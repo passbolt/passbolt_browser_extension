@@ -91,7 +91,8 @@ var listen = function (worker) {
       appWorker.port.emit('passbolt.share.complete', resources.map(resource => resource.id));
     } catch(error) {
       progressDialogController.close(appWorker);
-      worker.port.emit(requestId, 'ERROR', error);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      appWorker.port.emit('passbolt.share.error', worker.port.getEmitableError(error));
     }
   });
 

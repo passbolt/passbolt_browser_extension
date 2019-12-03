@@ -13,6 +13,9 @@
  */
 const User = require('../model/user').User;
 const Request = require('../model/request').Request;
+const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
+const PassboltBadResponseError = require('../error/passboltBadResponseError').PassboltBadResponseError;
+const PassboltServiceUnavailableError = require('../error/passboltServiceUnavailableError').PassboltServiceUnavailableError;
 
 class ShareService {}
 
@@ -35,17 +38,31 @@ ShareService.searchAros = async function (keywords) {
   };
   let url = new URL(`${domain}/share/search-aros?api-version=2`);
   url.searchParams.append('filter[search]', keywords);
-  let response, json;
+  let response, responseJson;
 
   try {
     response = await fetch(url, fetchOptions);
-    json = await response.json();
   } catch (error) {
-    console.error(error);
-    return new Error(__('There was a problem when trying to search the aros'));
+    // Catch Network error such as connection lost.
+    throw new PassboltServiceUnavailableError(error.message);
   }
 
-  return json.body;
+  try {
+    responseJson = await response.json();
+  } catch (error) {
+    // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
+    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+  }
+
+  if (!response.ok) {
+    const message = responseJson.header.message;
+    throw new PassboltApiFetchError(message, {
+      code: response.status,
+      body: responseJson.body
+    });
+  }
+
+  return responseJson.body;
 };
 
 /**
@@ -69,17 +86,31 @@ ShareService.searchResourceAros = async function(resourceId, keywords) {
   };
   let url = new URL(`${domain}/share/search-users/resource/` + resourceId + `?api-version=2`);
   url.searchParams.append('filter[search]', keywords);
-  let response, json;
+  let response, responseJson;
 
   try {
     response = await fetch(url, fetchOptions);
-    json = await response.json();
   } catch (error) {
-    console.error(error);
-    return new Error(__('There was a problem when trying to search the aros'));
+    // Catch Network error such as connection lost.
+    throw new PassboltServiceUnavailableError(error.message);
   }
 
-  return json.body;
+  try {
+    responseJson = await response.json();
+  } catch (error) {
+    // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
+    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+  }
+
+  if (!response.ok) {
+    const message = responseJson.header.message;
+    throw new PassboltApiFetchError(message, {
+      code: response.status,
+      body: responseJson.body
+    });
+  }
+
+  return responseJson.body;
 };
 
 /**
@@ -102,17 +133,31 @@ ShareService.share = async function(resourceId, data) {
   };
   Request.setCsrfHeader(fetchOptions);
   const url = new URL(`${domain}/share/resource/` + resourceId + `.json?api-version=v1`);
-  let response, json;
+  let response, responseJson;
 
   try {
     response = await fetch(url, fetchOptions);
-    json = await response.json();
   } catch (error) {
-    console.error(error);
-    return new Error(__('There was a problem when trying to share'));
+    // Catch Network error such as connection lost.
+    throw new PassboltServiceUnavailableError(error.message);
   }
 
-  return json.body;
+  try {
+    responseJson = await response.json();
+  } catch (error) {
+    // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
+    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+  }
+
+  if (!response.ok) {
+    const message = responseJson.header.message;
+    throw new PassboltApiFetchError(message, {
+      code: response.status,
+      body: responseJson.body
+    });
+  }
+
+  return responseJson.body;
 };
 
 /**
@@ -141,17 +186,31 @@ ShareService.simulateShare = async function (resourceId, permissions) {
     }
   };
   Request.setCsrfHeader(fetchOptions);
-  let response, json;
+  let response, responseJson;
 
   try {
     response = await fetch(url, fetchOptions);
-    json = await response.json();
   } catch (error) {
-    console.error(error);
-    return new Error(__('There was a problem when trying to simulate the share'));
+    // Catch Network error such as connection lost.
+    throw new PassboltServiceUnavailableError(error.message);
   }
 
-  return json.body;
+  try {
+    responseJson = await response.json();
+  } catch (error) {
+    // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
+    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+  }
+
+  if (!response.ok) {
+    const message = responseJson.header.message;
+    throw new PassboltApiFetchError(message, {
+      code: response.status,
+      body: responseJson.body
+    });
+  }
+
+  return responseJson.body;
 };
 
 exports.ShareService = ShareService;

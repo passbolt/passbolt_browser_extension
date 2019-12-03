@@ -53,6 +53,7 @@ $(function () {
     return passbolt.request('passbolt.share.submit', shareChanges._changes)
       .then(null, (error) => {
         console.error('error', error);
+        close();
       });
   };
 

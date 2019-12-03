@@ -65,6 +65,14 @@ $(function () {
     });
   });
 
+  passbolt.message.on('passbolt.share.error', function (error) {
+    passbolt.message.emitToPage('passbolt_notify', {
+      status: 'error',
+      message: error.message,
+      force: true
+    });
+  });
+
   /*
    * Close the share iframe
    */

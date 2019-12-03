@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-649: The quickaccess passphrase field text and background colors should remain as default when the field is not focused.
 
 ### Fixed
+- GROOVE-1610: Fix share operation should not fail silently
 - GITHUB-84: Fix high server session timeout setting can lead to constant sessions check in legacy systems
 - PB-879: Fix the setup security token validation bug
 - PB-883: The quickaccess suggestion should filter passwords by uri protocol and port if provided.

@@ -4,7 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 
-## [2.12.0] - 2019-12-03
+## [2.12.0] - 2019-12-05
 ### Improved
 - PB-649: The quickaccess passphrase field text and background colors should remain as default when the field is not focused.
 

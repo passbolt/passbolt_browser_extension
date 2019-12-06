@@ -380,7 +380,7 @@ class PasswordCreateDialog extends Component {
                 <div className={`input-password-wrapper required ${this.state.passwordError ? "error" : ""}`}>
                   <label htmlFor="create-password-form-password">Password</label>
                   <div className="input text password">
-                    <input id="create-password-form-password" name="password" className="required"
+                    <input id="create-password-form-password" name="password" className="required" maxLength="4096"
                       placeholder="Password" required="required" type={this.state.viewPassword ? "text" : "password"}
                       onKeyUp={this.handlePasswordInputKeyUp} value={this.state.password}
                       onFocus={this.handlePasswordInputFocus} onBlur={this.handlePasswordInputBlur}

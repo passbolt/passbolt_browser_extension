@@ -219,7 +219,7 @@ class ResourceCreatePage extends React.Component {
               </div>
               <div className="input text password required">
                 <label htmlFor="password">Password</label>
-                <input name="password" value={this.state.password} onChange={this.handlePasswordChange} disabled={this.state.processing}
+                <input name="password" maxLength="4096" value={this.state.password} onChange={this.handlePasswordChange} disabled={this.state.processing}
                   type={this.state.viewPassword ? "text" : "password"} className="required" placeholder="Password" id="password" required="required" />
                 <a onClick={this.handleViewPasswordButtonClick} className={`password-view button button-icon button-toggle ${this.state.viewPassword ? "selected" : ""}`}>
                   <span className="fa icon">

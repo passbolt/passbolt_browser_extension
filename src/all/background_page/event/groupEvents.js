@@ -14,7 +14,7 @@ var GroupForm = require('../model/groupForm').GroupForm;
 var InvalidMasterPasswordError = require('../error/invalidMasterPasswordError').InvalidMasterPasswordError;
 var Keyring = require('../model/keyring').Keyring;
 var Crypto = require('../model/crypto').Crypto;
-var masterPasswordController = require('../controller/masterPasswordController');
+const passphraseController = require('../controller/passphrase/passphraseController');
 var progressController = require('../controller/progress/progressController');
 var UserAbortsOperationError = require('../error/userAbortsOperationError').UserAbortsOperationError;
 
@@ -183,7 +183,7 @@ var listen = function (worker) {
 
     const dryRunPromise = group.save(groupJson, groupId, true);
     const keyringSyncPromise = keyring.sync();
-    const masterPassword = await masterPasswordController.get(worker);
+    const masterPassword = await passphraseController.get(worker);
     await progressController.start(worker, 'Updating group ...', progressGoals);
     const dryRunResult = await dryRunPromise;
     await keyringSyncPromise;

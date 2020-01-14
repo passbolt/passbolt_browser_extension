@@ -12,7 +12,7 @@
  * @since         2.8.0
  */
 const Crypto = require('../../model/crypto').Crypto;
-const masterPasswordController = require('../masterPasswordController');
+const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
 const ResourceService = require('../../service/resource').ResourceService;
 const Secret = require('../../model/secret').Secret;
@@ -34,7 +34,7 @@ class SecretDecryptController {
 
     try {
       const secretPromise = this._getSecret(resourceId);
-      const masterPassword = await masterPasswordController.get(this.worker);
+      const masterPassword = await passphraseController.get(this.worker);
       await progressController.start(this.worker, 'Decrypting...', 2, "Decrypting private key");
       const secret = await secretPromise;
       const privateKey = await crypto.getAndDecryptPrivateKey(masterPassword);

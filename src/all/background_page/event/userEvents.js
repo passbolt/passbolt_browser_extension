@@ -152,22 +152,5 @@ var listen = function (worker) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
     }
   });
-
-  /*
-   * Remember the master password for some time
-   *
-   * @listens passbolt.user.rememberMasterPassword
-   * @param requestId {uuid} The request identifier
-   * @param masterPassword {string} The master password to remember
-   * @param seconds {int} The time to remember the secret password
-   */
-  worker.port.on('passbolt.user.rememberMasterPassword', function (requestId, masterPassword, seconds) {
-    try {
-      user.storeMasterPasswordTemporarily(masterPassword, seconds);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message);
-    }
-  });
 };
 exports.listen = listen;

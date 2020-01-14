@@ -11,17 +11,17 @@ var CsvDb = require('../model/csvDb').CsvDb;
 var Keyring = require('../model/keyring').Keyring;
 var Resource = require('../model/resource').Resource;
 var Crypto = require('../model/crypto').Crypto;
-var progressDialogController = require('../controller/progressDialogController');
+var progressController = require('./progress/progressController');
 var User = require('../model/user').User;
 var Tag = require('../model/tag').Tag;
 
 /**
  * Controller for Import passwords.
- * @param tabid
+ * @param {Worker} worker
  * @constructor
  */
-var ImportPasswordsController = function(tabid) {
-  this.tabid = tabid;
+var ImportPasswordsController = function(worker) {
+  this.worker = worker;
   this.progressObjective = 0;
   this.progressStatus = 0;
   this.resources = [];
@@ -72,14 +72,13 @@ ImportPasswordsController.prototype.initFromCsv = function(b64FileContent, optio
  */
 ImportPasswordsController.prototype.encryptSecrets = function(resources) {
   var keyring = new Keyring(),
-    appWorker = Worker.get('App', this.tabid),
     user = User.getInstance(),
     self= this;
 
   this.resources = resources;
   this.progressObjective = this.resources.length * 2;
 
-  progressDialogController.open(appWorker, 'Encrypting ...', this.progressObjective);
+  progressController.start(this.worker, 'Encrypting ...', this.progressObjective);
 
   var currentUser = user.get(),
     userId = currentUser.id;
@@ -154,7 +153,6 @@ ImportPasswordsController.prototype._importResourceTags = function(resourceId, c
  * @return Promise
  */
 ImportPasswordsController.prototype._importBatchResources = async function(resources, batchNumber, batchSize, totalResources, options) {
-  const appWorker = Worker.get('App', this.tabid);
   let counter = batchNumber * batchSize + 1;
   let importResults = [];
   const promises = [];
@@ -168,7 +166,7 @@ ImportPasswordsController.prototype._importBatchResources = async function(resou
       }, error => {
         importResults.push(error);
       })
-      .then(() => progressDialogController.update(appWorker, this.progressStatus++, `Importing...  ${counter++}/${totalResources}`));
+      .then(() => progressController.update(this.worker, this.progressStatus++, `Importing...  ${counter++}/${totalResources}`));
     promises.push(promise);
   }
 
@@ -185,7 +183,6 @@ ImportPasswordsController.prototype._importBatchResources = async function(resou
  */
 ImportPasswordsController.prototype.saveResources = async function(resources, options) {
   options = options || {};
-  const appWorker = Worker.get('App', this.tabid);
 
   // Split the resources in batches of equal size.
   const batchSize = 5;
@@ -203,7 +200,7 @@ ImportPasswordsController.prototype.saveResources = async function(resources, op
     importResults = [...importResults, ...importBatchResult];
   }
 
-  progressDialogController.close(appWorker);
+  progressController.complete(this.worker);
   return importResults;
 };
 
@@ -215,8 +212,7 @@ ImportPasswordsController.prototype.saveResources = async function(resources, op
  */
 ImportPasswordsController.prototype._encryptSecrets = function(userId) {
   var self = this,
-    crypto = new Crypto(),
-    appWorker = Worker.get('App', this.tabid);
+    crypto = new Crypto();
 
   // Format resources for the format expected by encryptAll.
   self.resources = ImportPasswordsController._prepareResources(this.resources, userId);
@@ -226,11 +222,11 @@ ImportPasswordsController.prototype._encryptSecrets = function(userId) {
     this.resources,
     // On complete.
     function () {
-      progressDialogController.update(appWorker, self.progressStatus++);
+      progressController.update(self.worker, self.progressStatus++);
     },
     // On start.
     function (position) {
-      progressDialogController.update(appWorker, self.progressStatus, 'Encrypting ' + (parseInt(position) + 1) + '/' + self.resources.length);
+      progressController.update(self.worker, self.progressStatus, 'Encrypting ' + (parseInt(position) + 1) + '/' + self.resources.length);
     });
 };
 

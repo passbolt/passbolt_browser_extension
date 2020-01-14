@@ -58,10 +58,10 @@ class ReactApp extends Component {
     port.on('passbolt.passphrase.request', this.handlePassphraseEntryRequestEvent);
     this.handlePassphraseDialogClose = this.handlePassphraseDialogClose.bind(this);
 
-    this.handleProgressDialogOpenEvent = this.handleProgressDialogOpenEvent.bind(this);
-    port.on('passbolt.progress.open', this.handleProgressDialogOpenEvent);
-    this.handleProgressDialogCloseEvent = this.handleProgressDialogCloseEvent.bind(this);
-    port.on('passbolt.progress.close', this.handleProgressDialogCloseEvent);
+    this.handleProgressStartEvent = this.handleProgressStartEvent.bind(this);
+    port.on('passbolt.progress.start', this.handleProgressStartEvent);
+    this.handleProgressCompleteEvent = this.handleProgressCompleteEvent.bind(this);
+    port.on('passbolt.progress.complete', this.handleProgressCompleteEvent);
 
     this.handleResourceCreateDialogOpenEvent = this.handleResourceCreateDialogOpenEvent.bind(this);
     port.on('passbolt.resources.open-create-dialog', this.handleResourceCreateDialogOpenEvent);
@@ -86,12 +86,12 @@ class ReactApp extends Component {
     this.setState({showPassphraseEntryDialog: true, passphraseRequestId: requestId});
   }
 
-  handleProgressDialogOpenEvent(title, goals, message) {
+  handleProgressStartEvent(title, goals, message) {
     const progressDialogProps = {title: title, message: message, goals: goals};
     this.setState({showProgressDialog: true, progressDialogProps: progressDialogProps});
   }
 
-  handleProgressDialogCloseEvent() {
+  handleProgressCompleteEvent() {
     this.setState({showProgressDialog: false});
   }
 

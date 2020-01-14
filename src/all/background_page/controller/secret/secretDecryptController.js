@@ -13,15 +13,10 @@
  */
 const Crypto = require('../../model/crypto').Crypto;
 const masterPasswordController = require('../masterPasswordController');
-const progressDialogController = require('../progressDialogController');
-const reactProgressDialogController = require('../progress/progressDialogController');
+const progressController = require('../progress/progressController');
 const ResourceService = require('../../service/resource').ResourceService;
 const Secret = require('../../model/secret').Secret;
-const Worker = require('../../model/worker');
 
-/**
- * Secret decrypt controller
- */
 class SecretDecryptController {
 
   constructor(worker, requestId) {
@@ -40,21 +35,23 @@ class SecretDecryptController {
     try {
       const secretPromise = this._getSecret(resourceId);
       const masterPassword = await masterPasswordController.get(this.worker);
-      await this._showProgress();
+      await progressController.start(this.worker, 'Decrypting...', 2, "Decrypting private key");
       const secret = await secretPromise;
-      const message = await crypto.decrypt(secret.data, masterPassword);
+      const privateKey = await crypto.getAndDecryptPrivateKey(masterPassword);
+      progressController.update(this.worker, 1, "Decrypting secret");
+      const message = await crypto.decryptWithKey(secret.data, privateKey);
+      progressController.update(this.worker, 2, "Complete");
       this.worker.port.emit(this.requestId, 'SUCCESS', message);
     } catch (error) {
       this.worker.port.emit(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
     }
 
-    this._hideProgress();
+    progressController.complete(this.worker);
   }
 
   /**
    * Get the resource secret to decrypt
    * @param {string} resourceId The resource identifier to decrypt the secret of.
-   * @param {object} tabStorageEditedPassword
    * @return {Promise}
    */
   async _getSecret(resourceId) {
@@ -70,32 +67,6 @@ class SecretDecryptController {
     }
 
     return secret;
-  }
-
-  /**
-   * Display progress.
-   */
-  async _showProgress() {
-    // @todo the quickaccess worker should have a pagemod too
-    // Display the progress dialog if the requester is not the quickaccess.
-    if (this.worker.pageMod) {
-      await progressDialogController.open(Worker.get('App', this.worker.tab.id), 'Decrypting...');
-    } else {
-      await reactProgressDialogController.open(this.worker, 'Decrypting...');
-    }
-  }
-
-  /**
-   * Hide progress.
-   */
-  _hideProgress() {
-    // @todo the quickaccess worker should have a pagemod too
-    // Hide the progress dialog if the requester is not the quickaccess.
-    if (this.worker.pageMod) {
-      progressDialogController.close(Worker.get('App', this.worker.tab.id));
-    } else {
-      reactProgressDialogController.close(this.worker);
-    }
   }
 }
 

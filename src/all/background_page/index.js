@@ -78,7 +78,6 @@ var main = function() {
   pageMods.Clipboard.init();
   pageMods.PassboltAuthForm.init();
   pageMods.MasterPasswordDialog.init();
-  pageMods.ProgressDialog.init();
   pageMods.SecretEditDialog.init();
   pageMods.ShareDialog.init();
   pageMods.GroupEditDialog.init();

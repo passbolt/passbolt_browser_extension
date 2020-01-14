@@ -4,11 +4,17 @@
     <table class="table-info">
         <tr class="owner_name">
             <td>Owner Name</td>
-            <td  class="<?= typeof fieldsDetails['name'] != 'undefined' ? fieldsDetails['name'].status : '' ?>"><?= keyInfo.userIds[0].name ?> <?= typeof fieldsDetails['name'] != 'undefined' ? '<span class="alt side">' + fieldsDetails['name'].original + '</span>' : '' ?></td>
+            <td  class="<?= typeof fieldsDetails['name'] != 'undefined' ? fieldsDetails['name'].status : '' ?>">
+                <?= keyInfo.userIds[0].name ?>
+                <?= typeof fieldsDetails['name'] != 'undefined' ? ' (' + fieldsDetails['name'].original + ')' : '' ?>
+            </td>
         </tr>
         <tr class="owner_email">
             <td>Owner Email</td>
-            <td class="<?= typeof fieldsDetails['email'] != 'undefined' ? fieldsDetails['email'].status : '' ?>"><?= keyInfo.userIds[0].email ?> <?= typeof fieldsDetails['email'] != 'undefined' ? '<span class="alt side">' + fieldsDetails['email'].original + '</span>' : '' ?></td>
+            <td class="<?= typeof fieldsDetails['email'] != 'undefined' ? fieldsDetails['email'].status : '' ?>">
+                <?= keyInfo.userIds[0].email ?>
+                <?= typeof fieldsDetails['email'] != 'undefined' ? ' (' + fieldsDetails['email'].original + ')' : '' ?>
+            </td>
         </tr>
         <tr class="keyid">
             <td>Key Id</td>

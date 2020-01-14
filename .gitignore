@@ -7,6 +7,9 @@ npm-debug.log
 # Less files
 data/less
 
+# Lint
+.eslintcache
+
 # Plugin development #
 ######################
 __snapshots__

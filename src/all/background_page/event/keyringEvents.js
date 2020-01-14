@@ -129,7 +129,7 @@ var listen = function (worker) {
       var validate = key.validate(keyData, fields);
       worker.port.emit(requestId, 'SUCCESS', validate);
     } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message, e.validationErrors);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
     }
   });
 
@@ -144,12 +144,17 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param privateKeyArmored {string} The private armored key to import
    */
-  worker.port.on('passbolt.keyring.private.import', function (requestId, privateKeyArmored) {
-    keyring.importPrivate(privateKeyArmored).then(function() {
+  worker.port.on('passbolt.keyring.private.import', async function (requestId, privateKeyArmored) {
+    try {
+      await keyring.importPrivate(privateKeyArmored);
+      const publicKeyArmored = await keyring.extractPublicKey(privateKeyArmored);
+      const user = User.getInstance();
+      await keyring.importPublic(publicKeyArmored, user.get().id);
       worker.port.emit(requestId, 'SUCCESS');
-    }, function(error) {
+    } catch (error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR', privateKeyArmored);
-    });
+    }
   });
 
   /*

@@ -18,7 +18,7 @@ const PassboltServiceUnavailableError = require('../error/passboltServiceUnavail
 const Request = require('../model/request').Request;
 const User = require('../model/user').User;
 
-class ResourceService {}
+class ResourceService { }
 
 /**
  * Find all the resources with given resources ids
@@ -32,7 +32,7 @@ ResourceService.findAllByResourcesIds = async function (resourcesIds, options) {
   const totalBatches = Math.ceil(resourcesIds.length / batchSize);
   for (let i = 0; i < totalBatches; i++) {
     const resourcesIdsPart = resourcesIds.splice(0, batchSize);
-    const optionsPart = Object.assign({filter:{hasId: resourcesIdsPart}}, options);
+    const optionsPart = Object.assign({ filter: { hasId: resourcesIdsPart } }, options);
     const resourcesPart = await ResourceService.findAll(optionsPart);
     resources = [...resources, ...resourcesPart];
   }
@@ -74,7 +74,7 @@ ResourceService.findOne = async function (resourceId, options) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltApiFetchError(response.statusText, {code: response.status});
+    throw new PassboltApiFetchError(response.statusText, { code: response.status });
   }
 
   if (!response.ok) {
@@ -154,7 +154,7 @@ ResourceService.findAll = async function (options) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltApiFetchError(response.statusText, {code: response.status});
+    throw new PassboltApiFetchError(response.statusText, { code: response.status });
   }
 
   if (!response.ok) {
@@ -185,7 +185,7 @@ ResourceService.save = async function (data) {
       'content-type': 'application/json'
     }
   };
-  await Request.setCsrfHeader(fetchOptions);
+  await Request.setCsrfHeader(fetchOptions, user);
   const url = `${domain}/resources.json?api-version=v2`;
   let response, responseJson;
 
@@ -200,7 +200,7 @@ ResourceService.save = async function (data) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+    throw new PassboltBadResponseError(response.statusText, { code: response.status });
   }
 
   if (!response.ok) {
@@ -231,7 +231,7 @@ ResourceService.update = async function (data) {
       'content-type': 'application/json'
     }
   };
-  await Request.setCsrfHeader(fetchOptions);
+  await Request.setCsrfHeader(fetchOptions, user);
   const url = `${domain}/resources/${data.id}.json?api-version=v2`;
   let response, responseJson;
 
@@ -246,7 +246,7 @@ ResourceService.update = async function (data) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+    throw new PassboltBadResponseError(response.statusText, { code: response.status });
   }
 
   if (!response.ok) {
@@ -275,7 +275,7 @@ ResourceService.delete = async function (resourceId) {
       'content-type': 'application/json'
     }
   };
-  await Request.setCsrfHeader(fetchOptions);
+  await Request.setCsrfHeader(fetchOptions, user);
   const url = `${domain}/resources/${resourceId}.json?api-version=v2`;
   let response, responseJson;
 
@@ -290,7 +290,7 @@ ResourceService.delete = async function (resourceId) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+    throw new PassboltBadResponseError(response.statusText, { code: response.status });
   }
 
   if (!response.ok) {

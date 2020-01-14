@@ -14,6 +14,7 @@
 const Crypto = require('../../model/crypto').Crypto;
 const masterPasswordController = require('../masterPasswordController');
 const progressDialogController = require('../progressDialogController');
+const reactProgressDialogController = require('../progress/progressDialogController');
 const ResourceService = require('../../service/resource').ResourceService;
 const Secret = require('../../model/secret').Secret;
 const Worker = require('../../model/worker');
@@ -79,6 +80,8 @@ class SecretDecryptController {
     // Display the progress dialog if the requester is not the quickaccess.
     if (this.worker.pageMod) {
       await progressDialogController.open(Worker.get('App', this.worker.tab.id), 'Decrypting...');
+    } else {
+      await reactProgressDialogController.open(this.worker, 'Decrypting...');
     }
   }
 
@@ -90,6 +93,8 @@ class SecretDecryptController {
     // Hide the progress dialog if the requester is not the quickaccess.
     if (this.worker.pageMod) {
       progressDialogController.close(Worker.get('App', this.worker.tab.id));
+    } else {
+      reactProgressDialogController.close(this.worker);
     }
   }
 }

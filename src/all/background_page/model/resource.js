@@ -102,7 +102,7 @@ Resource.import = function (resource) {
       'content-type': 'application/json'
     }
   };
-  Request.setCsrfHeader(fetchOptions);
+  Request.setCsrfHeader(fetchOptions, user);
 
   return new Promise(function (resolve, reject) {
     fetch(url, fetchOptions)

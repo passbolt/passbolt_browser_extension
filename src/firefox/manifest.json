@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Passbolt Extension",
   "short_name": "passbolt",
-  "version": "2.11.2",
+  "version": "2.12.0",
   "description": "Passbolt extension for the open source password manager for teams.",
   "applications": {
     "gecko": {
@@ -25,7 +25,7 @@
         "size": 32
     }],
     "default_title": "Passbolt Quickaccess",
-    "default_popup": "data/quickaccess.html"
+    "default_popup": "data/quickaccess.html?passbolt=quickaccess"
   },
   "commands": {
     "passbolt-open": {

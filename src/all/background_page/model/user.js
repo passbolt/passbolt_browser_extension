@@ -8,7 +8,7 @@
 const browser = require("webextension-polyfill/dist/browser-polyfill");
 const Config = require('./config');
 const UserService = require('../service/user').UserService;
-const UserSettings = require('./userSettings').UserSettings;
+const UserSettings = require('./userSettings/userSettings').UserSettings;
 const __ = require('../sdk/l10n').get;
 
 /**
@@ -98,7 +98,7 @@ const User = (function () {
           throw new Error(__('The first name length should be maximum 255 characters.'))
         }
         break;
-      case 'lastname' :
+      case 'lastname':
         if (typeof value === 'undefined' || value === '') {
           throw new Error(__('The last name cannot be empty'));
         }
@@ -109,7 +109,7 @@ const User = (function () {
           throw new Error(__('The last name length should be maximum 255 characters.'))
         }
         break;
-      case 'username' :
+      case 'username':
         if (typeof value === 'undefined' || value === '') {
           throw new Error(__('The username cannot be empty'));
         }
@@ -120,7 +120,7 @@ const User = (function () {
           throw new Error(__('The username length should be maximum 255 characters.'))
         }
         break;
-      case 'id' :
+      case 'id':
         if (typeof value === 'undefined' || value === '') {
           throw new Error(__('The user id cannot be empty'));
         }
@@ -128,7 +128,7 @@ const User = (function () {
           throw new Error(__('The user id should be a valid UUID'))
         }
         break;
-      default :
+      default:
         throw new Error(__('No validation defined for field: ' + field));
         break;
     }
@@ -390,9 +390,9 @@ const User = (function () {
   /**
    * Retrieve and the store the user csrf token.
    */
-  this.retrieveAndStoreCsrfToken = async function() {
+  this.retrieveAndStoreCsrfToken = async function () {
     const csrfToken = await UserService.retrieveCsrfToken(this);
-    this._csrfToken = csrfToken;
+    this.setCsrfToken(csrfToken);
   };
 
   /**
@@ -400,15 +400,24 @@ const User = (function () {
    *
    * @return {string}
    */
-  this.getCsrfToken = function() {
+  this.getCsrfToken = function () {
     return this._csrfToken;
+  };
+
+  /**
+   * Set the user csrf token
+   *
+   * @param {string} csrfToken The csrf token to set
+   */
+  this.setCsrfToken = function (csrfToken) {
+    this._csrfToken = csrfToken;
   };
 
   /**
    * Check if the master password is stored.
    * @return {boolean}
    */
-  this.isMasterPasswordStored = function() {
+  this.isMasterPasswordStored = function () {
     return this._masterPassword !== null;
   };
 
@@ -418,7 +427,7 @@ const User = (function () {
    * @returns {Promise}
    */
   this.getStoredMasterPassword = function () {
-    return new Promise ((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       if (this.isMasterPasswordStored()) {
         resolve(this._masterPassword.password);
       } else {
@@ -434,7 +443,7 @@ const User = (function () {
    * @param excludedUsers
    * @return {Promise.<array>} array of users
    */
-  this.searchUsers = async function(keywords, excludedUsers) {
+  this.searchUsers = async function (keywords, excludedUsers) {
 
     // Prepare url and data
     const url = this.settings.getDomain() + '/users.json'
@@ -479,13 +488,24 @@ var UserSingleton = (function () {
     var object = new User();
     return object;
   }
-
   return {
     getInstance: function () {
       if (!instance) {
         instance = createInstance();
       }
       return instance;
+    },
+    findAll: async function (options) {
+      const user = UserSingleton.getInstance();
+      return await UserService.findAll(user, options);
+    },
+    add: async function (options) {
+      const user = UserSingleton.getInstance();
+      return await UserService.add(user, options);
+    },
+    update: async function (options) {
+      const user = UserSingleton.getInstance();
+      return await UserService.update(user, options);
     }
   };
 })();
@@ -508,3 +528,5 @@ browser.tabs.onRemoved.addListener((tabId, evInfo) => {
 
 // Exports the User object.
 exports.User = UserSingleton;
+
+

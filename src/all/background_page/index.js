@@ -62,6 +62,7 @@ var main = function() {
     const auth = new GpgAuth();
     auth.isAuthenticated()
       .then(() => {
+        pageMods.ReactApp.init();
         pageMods.PassboltApp.init();
         auth.startCheckAuthStatusLoop();
       });

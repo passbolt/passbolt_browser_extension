@@ -7,7 +7,7 @@
  */
 const InvalidMasterPasswordError = require('../error/invalidMasterPasswordError').InvalidMasterPasswordError;
 const __ = require('../sdk/l10n').get;
-const UserSettings = require('./userSettings').UserSettings;
+const UserSettings = require('./userSettings/userSettings').UserSettings;
 const Key = require('./key').Key;
 const Uuid = require('../utils/uuid');
 const goog = require('../utils/format/emailaddress').goog;
@@ -346,11 +346,10 @@ Keyring.prototype.generateKeyPair = function (keyInfo, passphrase) {
   // Get user id from key info.
   const key = new Key();
   key.set(keyInfo);
-  console.log(keyInfo);
 
   // Launch key pair generation from openpgp worker.
   return openpgp.generateKey({
-    rsaBits: keyInfo.length,
+    numBits: keyInfo.length,
     userIds: key.getUserId(),
     passphrase: passphrase
   });

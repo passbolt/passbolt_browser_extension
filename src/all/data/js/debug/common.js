@@ -27,6 +27,7 @@ $(function () {
     // Initialize the debug meta.
     this.initMeta();
     this.initEventsListeners();
+    this.initCsrfToken();
   };
 
   /**
@@ -55,6 +56,13 @@ $(function () {
     window.addEventListener('passbolt.addon.debug.open_tab', function() {
       self.openTab();
     });
+  };
+
+  /**
+   * Init the csrf token.
+   */
+  DebugCommon.prototype.initCsrfToken = function() {
+    return passbolt.message.emit('passbolt.debug.init-csrf-token');
   };
 
   /**

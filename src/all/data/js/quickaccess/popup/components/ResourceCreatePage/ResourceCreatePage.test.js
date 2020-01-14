@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, wait, cleanup } from 'react-testing-library';
+import { render, fireEvent, wait, cleanup } from '@testing-library/react';
 import { StaticRouter } from 'react-router';
 import ResourceCreatePage from "./ResourceCreatePage";
 import "../../../../../../data/js/lib/secretComplexity";
@@ -32,6 +32,7 @@ describe("ResourceCreatePage", () => {
         })
       };
 
+      jest.useFakeTimers();
       const context = {};
       const component = render(
         <StaticRouter context={context}>
@@ -41,6 +42,7 @@ describe("ResourceCreatePage", () => {
 
       // Wait the passbolt.request executed in the ComponentDidMount is resolved.
       await wait();
+      jest.runAllTimers();
 
       // Assert the form.
       const nameInput = component.container.querySelector('[name="name"]');
@@ -63,6 +65,8 @@ describe("ResourceCreatePage", () => {
       };
 
       const context = {};
+
+      jest.useFakeTimers();
       const component = render(
         <StaticRouter context={context}>
           <ResourceCreatePage debug />
@@ -71,6 +75,7 @@ describe("ResourceCreatePage", () => {
 
       // Wait the passbolt.request executed in the ComponentDidMount is resolved.
       await wait();
+      jest.runAllTimers();
 
       // Assert the form.
       const nameInput = component.container.querySelector('[name="name"]');
@@ -92,6 +97,7 @@ describe("ResourceCreatePage", () => {
         })
       };
 
+      jest.useFakeTimers();
       const context = {};
       const component = render(
         <StaticRouter context={context}>
@@ -101,6 +107,7 @@ describe("ResourceCreatePage", () => {
 
       // Wait the passbolt.request executed in the ComponentDidMount is resolved.
       await wait();
+      jest.runAllTimers();
 
       // Assert the form.
       const nameInput = component.container.querySelector('[name="name"]');
@@ -139,6 +146,7 @@ describe("ResourceCreatePage", () => {
         }
       };
 
+      jest.useFakeTimers();
       const context = {};
       const component = render(
         <StaticRouter context={context}>
@@ -148,6 +156,7 @@ describe("ResourceCreatePage", () => {
 
       // Wait the passbolt.request executed in the ComponentDidMount is resolved.
       await wait();
+      jest.runAllTimers();
 
       // Fill the form empty fields
       const usernameInput = component.container.querySelector('[name="username"]');

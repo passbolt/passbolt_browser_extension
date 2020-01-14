@@ -49,6 +49,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.debug.appPagemod.init', function () {
     var app = require('../app');
+    app.pageMods.ReactApp.init();
     app.pageMods.PassboltApp.init();
   });
 

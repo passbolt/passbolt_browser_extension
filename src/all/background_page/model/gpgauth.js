@@ -21,6 +21,7 @@ const URL_VERIFY = '/auth/verify.json?api-version=v1';
 const URL_LOGIN = '/auth/login.json?api-version=v1';
 const URL_LOGOUT = '/auth/logout.json?api-version=v1';
 const CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD = 60000;
+const MAX_IS_AUTHENTICATED_INTERVAL_PERIOD = 2147483647;
 
 /**
  * GPGAuth authentication
@@ -86,7 +87,7 @@ GpgAuth.prototype.verify = async function (serverUrl, armoredServerKey, userFing
     credentials: 'include',
     body: data
   };
-  Request.setCsrfHeader(fetchOptions);
+  Request.setCsrfHeader(fetchOptions, User.getInstance());
   const response = await fetch(domain + URL_VERIFY, fetchOptions);
 
   // If the server responded with an error build a relevant message
@@ -179,7 +180,7 @@ GpgAuth.prototype.stage1 = async function (passphrase) {
     credentials: 'include',
     body: body
   };
-  Request.setCsrfHeader(fetchOptions);
+  Request.setCsrfHeader(fetchOptions, User.getInstance());
 
   // Send request token to the server
   const response = await fetch(url, fetchOptions);
@@ -220,7 +221,7 @@ GpgAuth.prototype.stage2 = async function (userAuthToken) {
     credentials: 'include',
     body: data
   };
-  Request.setCsrfHeader(fetchOptions);
+  Request.setCsrfHeader(fetchOptions, User.getInstance());
   const response = await fetch(url, fetchOptions);
 
   // Check response status
@@ -348,7 +349,7 @@ GpgAuth.prototype.startCheckAuthStatusLoop = async function () {
  *
  * @return {int}
  */
-GpgAuth.prototype.getCheckAuthStatusTimeoutPeriod = async function() {
+GpgAuth.prototype.getCheckAuthStatusTimeoutPeriod = async function () {
   let timeoutPeriod = CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD;
 
   // The entry point available before v2.11.0 extends the session expiry period.
@@ -367,6 +368,14 @@ GpgAuth.prototype.getCheckAuthStatusTimeoutPeriod = async function() {
     // Convert the timeout in millisecond and add 1 second to ensure the session is well expired
     // when the request is made.
     timeoutPeriod = ((sessionTimeout * 60) + 1) * 1000;
+
+    // Fix https://github.com/passbolt/passbolt_browser_extension/issues/84
+    if (timeoutPeriod > MAX_IS_AUTHENTICATED_INTERVAL_PERIOD) {
+      timeoutPeriod = MAX_IS_AUTHENTICATED_INTERVAL_PERIOD;
+    }
+    if (timeoutPeriod < CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD) {
+      timeoutPeriod = CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD;
+    }
   }
 
   return timeoutPeriod;

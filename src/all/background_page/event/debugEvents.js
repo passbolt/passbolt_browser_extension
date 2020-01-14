@@ -6,6 +6,7 @@
  */
 var Log = require('../model/log').Log;
 var tabsController = require('../controller/tabsController');
+const User = require('../model/user').User;
 
 var listen = function (worker) {
 
@@ -29,6 +30,25 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.debug.log', function (data) {
     Log.write({level: 'error', message: data});
+  });
+
+  /*
+   * Csrf token.
+   *
+   * @listens passbolt.debug.init-csrf-token
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.debug.init-csrf-token', async function () {
+    let {csrfToken} = await browser.storage.local.get(["csrfToken"]);
+    const user = User.getInstance();
+
+    if (csrfToken) {
+      user.setCsrfToken(csrfToken);
+    } else {
+      await user.retrieveAndStoreCsrfToken();
+      csrfToken = user.getCsrfToken();
+      await browser.storage.local.set({csrfToken});
+    }
   });
 
 };

@@ -1,7 +1,7 @@
 /**
  * Progress dialog controller.
  *
- * @copyright (c) 2017 Passbolt SARL
+ * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
@@ -16,7 +16,7 @@ var Worker = require('../model/worker');
  */
 var open = async function (worker, title, goals) {
   worker.port.emit('passbolt.progress.open-dialog', title, goals);
-  return new Promise(function(resolve) {
+  return new Promise(function (resolve) {
     let interval = setInterval(function () {
       let progressWorker = Worker.get('Progress', worker.tab.id);
       if (progressWorker) {

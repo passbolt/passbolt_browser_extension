@@ -285,6 +285,7 @@ window.addEventListener('passbolt.secret.focus', function () {
 // When the user wants to save the changes on their resource, the application
 // asks the plugin to encrypt the secret for all the users the resource
 // is shared with.
+// @deprecated since v2.12.0 will be removed with v2.3.0
 window.addEventListener('passbolt.secret_edition.encrypt', function (event) {
   var usersIds = event.detail;
   passbolt.request('passbolt.secret-edit.encrypt', usersIds)
@@ -328,7 +329,7 @@ passbolt.message.on('passbolt.export-passwords.complete', function () {
 });
 
 /* ==================================================================================
- * Application
+ * Application (Legacy appjs)
  * ================================================================================== */
 
 // The application asks the plugin to decrypt an armored string
@@ -433,9 +434,82 @@ window.addEventListener('passbolt.auth.is-authenticated', async function (event)
   }
 });
 
+/* ==================================================================================
+ * React Application
+ * ================================================================================== */
+
+// Insert the react application iframe.
+const insertReactAppIframe = function() {
+  const iframeId = 'react-app';
+  const className = '';
+  const appendTo = 'body';
+  const style = "display: none; position: absolute; width: 100%; height:100%; z-index: 999;";
+  return passbolt.html.insertThemedIframe(iframeId, appendTo, className, null, null, style);
+};
+
+// Insert the resource create dialog.
+window.addEventListener('passbolt.plugin.resources.open-create-dialog', async function () {
+  await showReactApp();
+  passbolt.message.emit('passbolt.resources.open-create-dialog');
+});
+
+// Hide the react app.
+passbolt.message.on('passbolt.app.hide', function () {
+  hideReactApp();
+});
+
+// Show the react app.
+const showReactApp = async function() {
+  $('iframe#react-app').css('display', 'block');
+  // Move the focus into the iframe.
+  passbolt.message.emitToPage('passbolt.passbolt-page.remove-all-focuses');
+  let checkCount = 0;
+  return new Promise(function(resolve) {
+    let interval = setInterval(function () {
+      checkCount++;
+      if (checkCount > 200) {
+        clearInterval();
+        resolve();
+      }
+      const appElement = $('iframe#react-app').contents().find('#app');
+      appElement.focus();
+      // If the focus has been set to the element, resolve the promise and
+      // continue, otherwise try again.
+      if (appElement.is(":focus")) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, 10);
+  });
+};
+
+// Hide the react app.
+const hideReactApp = function() {
+  $('iframe#react-app').css('display', 'none');
+};
+
+// Display a notification on the appjs.
+passbolt.message.on('passbolt.notification.display', function (notification) {
+ passbolt.message.emitToPage('passbolt_notify', notification);
+});
+
+// Select and scroll to a resource.
+passbolt.message.on('passbolt.resources.select-and-scroll-to', function (id) {
+  passbolt.message.emitToPage('passbolt.plugin.resources.select-and-scroll-to', id);
+});
+
+/* ==================================================================================
+ * Handle the ready state.
+ * ================================================================================== */
+
 // Listen when the background page is ready and add the status to the DOM.
 passbolt.message.on('passbolt.app.worker.ready', function (requestId) {
+  if ($('html').hasClass('passboltplugin-ready')) {
+    return;
+  }
   $('html').addClass('passboltplugin-ready');
+  // Insert the plugin react application iframe.
+  insertReactAppIframe();
   // Answer the request.
   passbolt.message.emit(requestId, 'SUCCESS');
 });

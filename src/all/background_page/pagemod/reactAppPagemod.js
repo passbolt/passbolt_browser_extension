@@ -28,6 +28,7 @@ class ReactApp {
       });
 
       // Initialize the events listeners.
+      app.events.folder.listen(worker);
       app.events.resource.listen(worker);
       app.events.keyring.listen(worker);
       app.events.reactApp.listen(worker);

@@ -7,8 +7,9 @@
  */
 const browser = require("webextension-polyfill/dist/browser-polyfill");
 const Config = require('./config');
-const UserService = require('../service/user').UserService;
-const UserSettings = require('./userSettings/userSettings').UserSettings;
+const {ApiClientOptions} = require('../service/api/apiClient/apiClientOptions');
+const {UserService} = require('../service/user');
+const {UserSettings} = require('./userSettings/userSettings');
 const __ = require('../sdk/l10n').get;
 
 /**
@@ -405,12 +406,33 @@ const User = (function () {
   };
 
   /**
+   * Get or fetch CSRF token if null
+   *
+   * @returns {Promise<string>}
+   */
+  this.getOrFetchCsrfToken = async function() {
+    if (!this._csrfToken) {
+      await this.retrieveAndStoreCsrfToken();
+    }
+    return this._csrfToken;
+  };
+
+  /**
    * Set the user csrf token
    *
    * @param {string} csrfToken The csrf token to set
    */
   this.setCsrfToken = function (csrfToken) {
     this._csrfToken = csrfToken;
+  };
+
+  /**
+   * Return API Client options such as Domain and CSRF token
+   */
+  this.getApiClientOptions = async function() {
+    return (new ApiClientOptions())
+      .setBaseUrl(this.settings.getDomain())
+      .setCsrfToken(await this.getOrFetchCsrfToken());
   };
 
   /**

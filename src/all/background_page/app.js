@@ -30,6 +30,7 @@ events.exportPasswordsIframe = require('./event/exportPasswordsIframeEvents');
 events.exportPasswords = require('./event/exportPasswordsEvents');
 events.favorite = require('./event/favoriteEvents');
 events.file = require('./event/fileEvents');
+events.folder = require('./event/folderEvents');
 events.group = require('./event/groupEvents');
 events.groupAutocomplete = require('./event/groupAutocompleteEvents');
 events.importPasswordsIframe = require('./event/importPasswordsIframeEvents');

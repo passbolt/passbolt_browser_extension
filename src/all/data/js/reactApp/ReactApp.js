@@ -22,6 +22,7 @@ import Port from "../lib/port";
 import SecretComplexity from "../lib/secretComplexity";
 /* eslint-enable no-unused-vars */
 import PasswordCreateDialog from "./components/PasswordCreateDialog/PasswordCreateDialog";
+import FolderCreateDialog from "./components/FolderCreateDialog/FolderCreateDialog";
 import ProgressDialog from "./components/ProgressDialog/ProgressDialog";
 import PassphraseEntryDialog from "./components/PassphraseEntryDialog/PassphraseEntryDialog";
 import AppContext from './contexts/AppContext';
@@ -44,7 +45,8 @@ class ReactApp extends Component {
       rememberMeOptions: {},
       showPassphraseEntryDialog: false,
       passphraseRequestId: '',
-      showCreateDialog: false,
+      showResourceCreateDialog: false,
+      showFolderCreateDialog: false,
       showProgressDialog: false,
       progressDialogProps: {
         goals: 2,
@@ -66,6 +68,10 @@ class ReactApp extends Component {
     this.handleResourceCreateDialogOpenEvent = this.handleResourceCreateDialogOpenEvent.bind(this);
     port.on('passbolt.resources.open-create-dialog', this.handleResourceCreateDialogOpenEvent);
     this.handleResourceCreateDialogCloseEvent = this.handleResourceCreateDialogCloseEvent.bind(this);
+
+    this.handleFolderCreateDialogOpenEvent = this.handleFolderCreateDialogOpenEvent.bind(this);
+    port.on('passbolt.folders.open-create-dialog', this.handleFolderCreateDialogOpenEvent);
+    this.handleFolderCreateDialogCloseEvent = this.handleFolderCreateDialogCloseEvent.bind(this);
   }
 
   async getUserSettings() {
@@ -100,12 +106,21 @@ class ReactApp extends Component {
   }
 
   handleResourceCreateDialogCloseEvent() {
-    this.setState({showCreateDialog: false});
+    this.setState({showResourceCreateDialog: false});
     port.emit('passbolt.app.hide');
   }
 
   handleResourceCreateDialogOpenEvent() {
-    this.setState({showCreateDialog: true});
+    this.setState({showResourceCreateDialog: true});
+  }
+
+  handleFolderCreateDialogOpenEvent() {
+    this.setState({showFolderCreateDialog: true});
+  }
+
+  handleFolderCreateDialogCloseEvent() {
+    this.setState({showFolderCreateDialog: false});
+    port.emit('passbolt.app.hide');
   }
 
   render() {
@@ -117,17 +132,20 @@ class ReactApp extends Component {
             <AppContext.Provider value={this.state}>
               {isReady &&
               <div id="app" className="app" tabIndex="1000">
-                {this.state.showCreateDialog &&
+                {this.state.showResourceCreateDialog &&
                 <PasswordCreateDialog onClose={this.handleResourceCreateDialogCloseEvent}/>
+                }
+                {this.state.showFolderCreateDialog &&
+                <FolderCreateDialog onClose={this.handleFolderCreateDialogCloseEvent}/>
                 }
                 {this.state.showProgressDialog &&
                 <ProgressDialog title={this.state.progressDialogProps.title}
-                  goals={this.state.progressDialogProps.goals}
-                  message={this.state.progressDialogProps.message}/>
+                                goals={this.state.progressDialogProps.goals}
+                                message={this.state.progressDialogProps.message}/>
                 }
                 {this.state.showPassphraseEntryDialog &&
                 <PassphraseEntryDialog requestId={this.state.passphraseRequestId}
-                  onClose={this.handlePassphraseDialogClose}/>
+                                       onClose={this.handlePassphraseDialogClose}/>
                 }
               </div>
               }

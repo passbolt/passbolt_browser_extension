@@ -453,6 +453,12 @@ window.addEventListener('passbolt.plugin.resources.open-create-dialog', async fu
   passbolt.message.emit('passbolt.resources.open-create-dialog');
 });
 
+// Insert the resource create dialog.
+window.addEventListener('passbolt.plugin.folders.open-create-dialog', async function () {
+  await showReactApp();
+  passbolt.message.emit('passbolt.folders.open-create-dialog');
+});
+
 // Show the react app.
 passbolt.message.on('passbolt.app.show', function () {
   showReactApp();

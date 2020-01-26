@@ -218,7 +218,8 @@ Resource.updateLocalStorage = async function () {
     contain: {
       "permission": true,
       "favorite": true,
-      "tags": true
+      "tags": true,
+      "folder": true
     }
   };
   const resources = await ResourceService.findAll(findOptions);
@@ -242,7 +243,6 @@ Resource.findAll = async function (options) {
 Resource.save = async function (data) {
   const resource = await ResourceService.save(data);
   await ResourceLocalStorage.addResource(resource);
-
   return resource;
 }
 

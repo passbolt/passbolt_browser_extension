@@ -21,16 +21,23 @@ import Simplebar from "simplebar/dist/simplebar";
 import Port from "../lib/port";
 import SecretComplexity from "../lib/secretComplexity";
 /* eslint-enable no-unused-vars */
+
+import ErrorDialog from "./components/Error/ErrorDialog";
 import PasswordCreateDialog from "./components/PasswordCreateDialog/PasswordCreateDialog";
-import FolderCreateDialog from "./components/FolderCreateDialog/FolderCreateDialog";
+import FolderCreateDialog from "./components/Folder/FolderCreateDialog/FolderCreateDialog";
+import FolderRenameDialog from "./components/Folder/FolderRenameDialog/FolderRenameDialog";
+import FolderMoveDialog from "./components/Folder/FolderMoveDialog/FolderMoveDialog";
+import FolderDeleteDialog from "./components/Folder/FolderDeleteDialog/FolderDeleteDialog";
 import ProgressDialog from "./components/ProgressDialog/ProgressDialog";
 import PassphraseEntryDialog from "./components/PassphraseEntryDialog/PassphraseEntryDialog";
+
 import AppContext from './contexts/AppContext';
 
 class ReactApp extends Component {
   constructor(props) {
     super(props);
     this.state = this.getDefaultState();
+    this.bindCallbacks();
     this.initEventHandlers();
   }
 
@@ -46,8 +53,19 @@ class ReactApp extends Component {
       showPassphraseEntryDialog: false,
       passphraseRequestId: '',
       showResourceCreateDialog: false,
+
+      folder: {},
       showFolderCreateDialog: false,
+      showFolderRenameDialog: false,
+      showFolderDeleteDialog: false,
+      showFolderMoveFolderDialog: false,
+
       showProgressDialog: false,
+      showErrorDialog: false,
+      errorDialogProps: {
+        title: null,
+        message: null
+      },
       progressDialogProps: {
         goals: 2,
         message: "test"
@@ -55,23 +73,47 @@ class ReactApp extends Component {
     };
   }
 
-  async initEventHandlers() {
+  bindCallbacks() {
+    this.handleErrorDialogOpenEvent = this.handleErrorDialogOpenEvent.bind(this);
+    this.handleErrorDialogCloseEvent = this.handleErrorDialogCloseEvent.bind(this);
+
     this.handlePassphraseEntryRequestEvent = this.handlePassphraseEntryRequestEvent.bind(this);
-    port.on('passbolt.passphrase.request', this.handlePassphraseEntryRequestEvent);
     this.handlePassphraseDialogClose = this.handlePassphraseDialogClose.bind(this);
 
     this.handleProgressStartEvent = this.handleProgressStartEvent.bind(this);
-    port.on('passbolt.progress.start', this.handleProgressStartEvent);
     this.handleProgressCompleteEvent = this.handleProgressCompleteEvent.bind(this);
-    port.on('passbolt.progress.complete', this.handleProgressCompleteEvent);
 
     this.handleResourceCreateDialogOpenEvent = this.handleResourceCreateDialogOpenEvent.bind(this);
-    port.on('passbolt.resources.open-create-dialog', this.handleResourceCreateDialogOpenEvent);
     this.handleResourceCreateDialogCloseEvent = this.handleResourceCreateDialogCloseEvent.bind(this);
 
     this.handleFolderCreateDialogOpenEvent = this.handleFolderCreateDialogOpenEvent.bind(this);
-    port.on('passbolt.folders.open-create-dialog', this.handleFolderCreateDialogOpenEvent);
     this.handleFolderCreateDialogCloseEvent = this.handleFolderCreateDialogCloseEvent.bind(this);
+
+    this.handleFolderRenameDialogOpenEvent = this.handleFolderRenameDialogOpenEvent.bind(this);
+    this.handleFolderRenameDialogCloseEvent = this.handleFolderRenameDialogCloseEvent.bind(this);
+
+    this.handleFolderDeleteDialogOpenEvent = this.handleFolderDeleteDialogOpenEvent.bind(this);
+    this.handleFolderDeleteDialogCloseEvent = this.handleFolderDeleteDialogCloseEvent.bind(this);
+
+    this.handleFolderMoveDialogOpenEvent = this.handleFolderMoveDialogOpenEvent.bind(this);
+    this.handleFolderMoveDialogCloseEvent = this.handleFolderMoveDialogCloseEvent.bind(this);
+
+  }
+
+  initEventHandlers() {
+    port.on('passbolt.errors.open-error-dialog', this.handleErrorDialogOpenEvent);
+
+    port.on('passbolt.passphrase.request', this.handlePassphraseEntryRequestEvent);
+
+    port.on('passbolt.progress.start', this.handleProgressStartEvent);
+    port.on('passbolt.progress.complete', this.handleProgressCompleteEvent);
+
+    port.on('passbolt.resources.open-create-dialog', this.handleResourceCreateDialogOpenEvent);
+
+    port.on('passbolt.folders.open-create-dialog', this.handleFolderCreateDialogOpenEvent);
+    port.on('passbolt.folders.open-rename-dialog', this.handleFolderRenameDialogOpenEvent);
+    port.on('passbolt.folders.open-delete-dialog', this.handleFolderDeleteDialogOpenEvent);
+    port.on('passbolt.folders.open-move-dialog', this.handleFolderMoveDialogOpenEvent);
   }
 
   async getUserSettings() {
@@ -86,6 +128,16 @@ class ReactApp extends Component {
 
   isReady() {
     return this.state.user !== null;
+  }
+
+  handleErrorDialogOpenEvent(title, message) {
+    const errorDialogProps = {title: title, message: message};
+    this.setState({showErrorDialog: true, errorDialogProps: errorDialogProps});
+  }
+
+  handleErrorDialogCloseEvent() {
+    this.setState({showErrorDialog: false});
+    port.emit('passbolt.app.hide');
   }
 
   handlePassphraseEntryRequestEvent(requestId) {
@@ -123,6 +175,35 @@ class ReactApp extends Component {
     port.emit('passbolt.app.hide');
   }
 
+  handleFolderRenameDialogOpenEvent(folderId) {
+    const folder = {id: folderId};
+    this.setState({showFolderRenameDialog: true, folder});
+  }
+
+  handleFolderRenameDialogCloseEvent() {
+    this.setState({showFolderRenameDialog: false});
+    this.setState({folder: {}});
+    port.emit('passbolt.app.hide');
+  }
+
+  handleFolderDeleteDialogOpenEvent() {
+    this.setState({showFolderDeleteDialog: true});
+  }
+
+  handleFolderDeleteDialogCloseEvent() {
+    this.setState({showFolderDeleteDialog: false});
+    port.emit('passbolt.app.hide');
+  }
+
+  handleFolderMoveDialogOpenEvent() {
+    this.setState({showFolderMoveDialog: true});
+  }
+
+  handleFolderMoveDialogCloseEvent() {
+    this.setState({showFolderMoveDialog: false});
+    port.emit('passbolt.app.hide');
+  }
+
   render() {
     const isReady = this.isReady();
     return (
@@ -132,11 +213,25 @@ class ReactApp extends Component {
             <AppContext.Provider value={this.state}>
               {isReady &&
               <div id="app" className="app" tabIndex="1000">
+                {this.state.showErrorDialog &&
+                <ErrorDialog title={this.state.errorDialogProps.title}
+                             message={this.state.errorDialogProps.message}
+                             onClose={this.handleErrorDialogCloseEvent}/>
+                }
                 {this.state.showResourceCreateDialog &&
                 <PasswordCreateDialog onClose={this.handleResourceCreateDialogCloseEvent}/>
                 }
                 {this.state.showFolderCreateDialog &&
                 <FolderCreateDialog onClose={this.handleFolderCreateDialogCloseEvent}/>
+                }
+                {this.state.showFolderRenameDialog &&
+                <FolderRenameDialog onClose={this.handleFolderRenameDialogCloseEvent} folderId={this.state.folder.id}/>
+                }
+                {this.state.showFolderMoveDialog &&
+                <FolderMoveDialog onClose={this.handleFolderMoveDialogCloseEvent}/>
+                }
+                {this.state.showFolderDeleteDialog &&
+                <FolderDeleteDialog onClose={this.handleFolderDeleteDialogCloseEvent}/>
                 }
                 {this.state.showProgressDialog &&
                 <ProgressDialog title={this.state.progressDialogProps.title}

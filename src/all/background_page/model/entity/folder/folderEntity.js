@@ -33,6 +33,19 @@ class FolderEntity extends Entity {
   }
 
   /**
+   * Get the id
+   *
+   * @throws {Error} if id is not set
+   * @returns {string} id uuid
+   */
+  getId() {
+    if (!this.id) {
+      throw new Error('Folder id is empty.')
+    }
+    return this.id;
+  }
+
+  /**
    * Set id
    * @param {string} id
    * @throws {TypeError} if id is not a valid UUID

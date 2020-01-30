@@ -40,16 +40,6 @@ const listen = function (worker) {
   worker.port.on('passbolt.folders.open-rename-dialog', async function (folderId) {
     const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
     reactAppWorker.port.emit('passbolt.folders.open-rename-dialog', folderId);
-    // try {
-    //   let folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
-    //   const folder = await folderModel.findOne(folderId);
-    // } catch (error) {
-    //   console.error(error);
-    //   const title = 'Folder not found!';
-    //   const message = 'This folder may have been deleted or you do not have the permission to view its content.';
-    //   reactAppWorker.port.emit('passbolt.errors.open-error-dialog', title, message);
-    //   folderModel.updateLocalStorage();
-    // }
   });
 
   /*
@@ -104,6 +94,21 @@ const listen = function (worker) {
   });
 
   /*
+   * Validate a folder
+   *
+   * @listens passbolt.folders.validate
+   * @param requestId {uuid} The request identifier
+   * @param folder {array} The folder
+   */
+  worker.port.on('passbolt.folders.validate', async function (requestId, folderDto) {
+    try {
+      worker.port.emit(requestId, 'SUCCESS', new FolderEntity(folderDto));
+    } catch (error) {
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+    }
+  });
+
+  /*
    * Create a new folder
    *
    * @listens passbolt.folders.create
@@ -144,10 +149,10 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param folder {array} The folder
    */
-  worker.port.on('passbolt.folders.delete', async function (requestId, folderId) {
+  worker.port.on('passbolt.folders.delete', async function (requestId, folderId, cascade) {
     try {
       let folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
-      await folderModel.delete(folderId);
+      await folderModel.delete(folderId, cascade);
       worker.port.emit(requestId, 'SUCCESS', folderId);
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));

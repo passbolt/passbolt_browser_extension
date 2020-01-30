@@ -87,6 +87,7 @@ class ApiClient {
    * Delete a resource by id
    *
    * @param {string} id most likely a uuid
+   * @param {Object} [body] (will be converted to JavaScript Object Notation (JSON) string)
    * @param {Object} [urlOptions] Optional url parameters for example {"contain[something]": "1"}
    * @throws {TypeError} if id is empty or not a string
    * @throws {TypeError} if urlOptions key or values are not a string
@@ -96,10 +97,14 @@ class ApiClient {
    * @returns {Promise<*>}
    * @public
    */
-  async delete (id, urlOptions) {
+  async delete (id, body, urlOptions) {
     this.assertValidId(id);
     const url = this.buildUrl(`${this.baseUrl}/${id}`, urlOptions || {});
-    return this.fetchAndHandleResponse('DELETE', url);
+    let bodyString;
+    if (body) {
+      bodyString = this.buildBody(body);
+    }
+    return this.fetchAndHandleResponse('DELETE', url, bodyString);
   };
 
   /**

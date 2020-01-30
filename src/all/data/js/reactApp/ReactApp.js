@@ -76,25 +76,18 @@ class ReactApp extends Component {
   bindCallbacks() {
     this.handleErrorDialogOpenEvent = this.handleErrorDialogOpenEvent.bind(this);
     this.handleErrorDialogCloseEvent = this.handleErrorDialogCloseEvent.bind(this);
-
     this.handlePassphraseEntryRequestEvent = this.handlePassphraseEntryRequestEvent.bind(this);
     this.handlePassphraseDialogClose = this.handlePassphraseDialogClose.bind(this);
-
     this.handleProgressStartEvent = this.handleProgressStartEvent.bind(this);
     this.handleProgressCompleteEvent = this.handleProgressCompleteEvent.bind(this);
-
     this.handleResourceCreateDialogOpenEvent = this.handleResourceCreateDialogOpenEvent.bind(this);
     this.handleResourceCreateDialogCloseEvent = this.handleResourceCreateDialogCloseEvent.bind(this);
-
     this.handleFolderCreateDialogOpenEvent = this.handleFolderCreateDialogOpenEvent.bind(this);
     this.handleFolderCreateDialogCloseEvent = this.handleFolderCreateDialogCloseEvent.bind(this);
-
     this.handleFolderRenameDialogOpenEvent = this.handleFolderRenameDialogOpenEvent.bind(this);
     this.handleFolderRenameDialogCloseEvent = this.handleFolderRenameDialogCloseEvent.bind(this);
-
     this.handleFolderDeleteDialogOpenEvent = this.handleFolderDeleteDialogOpenEvent.bind(this);
     this.handleFolderDeleteDialogCloseEvent = this.handleFolderDeleteDialogCloseEvent.bind(this);
-
     this.handleFolderMoveDialogOpenEvent = this.handleFolderMoveDialogOpenEvent.bind(this);
     this.handleFolderMoveDialogCloseEvent = this.handleFolderMoveDialogCloseEvent.bind(this);
 
@@ -102,14 +95,10 @@ class ReactApp extends Component {
 
   initEventHandlers() {
     port.on('passbolt.errors.open-error-dialog', this.handleErrorDialogOpenEvent);
-
     port.on('passbolt.passphrase.request', this.handlePassphraseEntryRequestEvent);
-
     port.on('passbolt.progress.start', this.handleProgressStartEvent);
     port.on('passbolt.progress.complete', this.handleProgressCompleteEvent);
-
     port.on('passbolt.resources.open-create-dialog', this.handleResourceCreateDialogOpenEvent);
-
     port.on('passbolt.folders.open-create-dialog', this.handleFolderCreateDialogOpenEvent);
     port.on('passbolt.folders.open-rename-dialog', this.handleFolderRenameDialogOpenEvent);
     port.on('passbolt.folders.open-delete-dialog', this.handleFolderDeleteDialogOpenEvent);
@@ -186,8 +175,9 @@ class ReactApp extends Component {
     port.emit('passbolt.app.hide');
   }
 
-  handleFolderDeleteDialogOpenEvent() {
-    this.setState({showFolderDeleteDialog: true});
+  handleFolderDeleteDialogOpenEvent(folderId) {
+    const folder = {id: folderId};
+    this.setState({showFolderDeleteDialog: true, folder});
   }
 
   handleFolderDeleteDialogCloseEvent() {
@@ -195,8 +185,9 @@ class ReactApp extends Component {
     port.emit('passbolt.app.hide');
   }
 
-  handleFolderMoveDialogOpenEvent() {
-    this.setState({showFolderMoveDialog: true});
+  handleFolderMoveDialogOpenEvent(folderId) {
+    const folder = {id: folderId};
+    this.setState({showFolderMoveDialog: true, folder});
   }
 
   handleFolderMoveDialogCloseEvent() {
@@ -228,10 +219,10 @@ class ReactApp extends Component {
                 <FolderRenameDialog onClose={this.handleFolderRenameDialogCloseEvent} folderId={this.state.folder.id}/>
                 }
                 {this.state.showFolderMoveDialog &&
-                <FolderMoveDialog onClose={this.handleFolderMoveDialogCloseEvent}/>
+                <FolderMoveDialog onClose={this.handleFolderMoveDialogCloseEvent} folderId={this.state.folder.id}/>
                 }
                 {this.state.showFolderDeleteDialog &&
-                <FolderDeleteDialog onClose={this.handleFolderDeleteDialogCloseEvent}/>
+                <FolderDeleteDialog onClose={this.handleFolderDeleteDialogCloseEvent} folderId={this.state.folder.id}/>
                 }
                 {this.state.showProgressDialog &&
                 <ProgressDialog title={this.state.progressDialogProps.title}

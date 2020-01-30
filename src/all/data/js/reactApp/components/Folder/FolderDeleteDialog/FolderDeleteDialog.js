@@ -15,35 +15,90 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import AppContext from "../../../contexts/AppContext";
 import SvgCloseIcon from "../../../img/svg/close";
+import ErrorDialog from "../../Error/ErrorDialog";
+import browser from "webextension-polyfill";
 
 class FolderDeleteDialog extends Component {
+
+  /**
+   * Constructor
+   * Initialize state and bind methods
+   */
   constructor() {
     super();
     this.state = this.getDefaultState();
-    this.initEventHandlers();
-    this.createInputRef();
-  }
-
-  getDefaultState() {
-    return {
-      error: "",
-      name: "",
-      id: "",
-      nameError: ""
-    };
-  }
-
-  initEventHandlers() {
-    this.handleCloseClick = this.handleCloseClick.bind(this);
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-    this.handleFormSubmit = this.handleFormSubmit.bind(this);
+    this.bindCallbacks();
+    this.createRefs();
   }
 
   /**
-   * Delete DOM nodes or React elements references in order to be able to access them programmatically.
+   * Return default state
+   * @returns {Object} default state
    */
-  createInputRef() {
-    this.nameInputRef = React.createRef();
+  getDefaultState() {
+    return {
+      showErrorDialog: false,
+      errorTitle: null,
+      errorMessage: null,
+      name: null,
+      nameError: null,
+      processing: true,
+    };
+  }
+
+  /**
+   * ComponentDidMount
+   * Invoked immediately after component is inserted into the tree
+   */
+  async componentDidMount() {
+    this.loadFolder();
+  }
+
+  /**
+   * Bind callbacks methods
+   */
+  bindCallbacks() {
+    this.handleCloseClick = this.handleCloseClick.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.handleFormSubmit = this.handleFormSubmit.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleNameInputKeyUp = this.handleNameInputKeyUp.bind(this);
+  }
+
+  /**
+   * Create a ref to store the checkbox DOM element
+   */
+  createRefs() {
+    this.cascadeCheckbox = React.createRef();
+  }
+
+  /**
+   * Load current folder info from local storage (name)
+   * @returns {Promise<void>}
+   */
+  async loadFolder() {
+    const storageData = await browser.storage.local.get("folders");
+    if (!storageData) {
+      this.setState({
+        processing: false,
+        showErrorDialog: true,
+        errorMessage: 'The folder could not be found. No folder found.'
+      });
+      return;
+    }
+    const folder = storageData.folders.find(item => item.id === this.props.folderId);
+    if (!folder) {
+      this.setState({
+        processing: false,
+        showErrorDialog: true,
+        errorMessage: 'The folder could not be found. The folder may have been deleted or you may have lost access.'
+      });
+      return;
+    }
+    this.setState({
+      processing: false,
+      name: folder.name
+    });
   }
 
   /**
@@ -61,35 +116,16 @@ class FolderDeleteDialog extends Component {
     this.setState({processing: true});
 
     try {
-      const folder = await this.deleteFolder();
-      this.displayNotification("success", "The folder has been deleted successfully");
+      await port.request("passbolt.folders.delete", this.props.folderId, this.cascadeCheckbox.checked);
+      this.displayNotification("success", "The folder was deleted.");
       this.props.onClose();
     } catch (error) {
-      // It can happen when the user has closed the passphrase entry dialog by instance.
-      if (error.name === "UserAbortsOperationError") {
-        this.setState({processing: false});
-      } else {
-        // Unexpected error occurred.
-        this.setState({
-          error: error.message,
-          processing: false
-        });
-      }
+      this.setState({
+        showErrorDialog: true,
+        errorMessage: error.message,
+        processing: false
+      });
     }
-  }
-
-  /**
-   * Delete the folder
-   * @returns {Promise}
-   */
-  deleteFolder() {
-    const folderDto = {
-      id: this.state.id,
-      name: this.state.name,
-      parentId: this.state.parentId
-    };
-
-    return port.request("passbolt.folders.delete", folderDto);
   }
 
   /**
@@ -106,37 +142,28 @@ class FolderDeleteDialog extends Component {
    * @params {ReactEvent} The react event.
    */
   handleInputChange(event) {
-    const target = event.target;
-    const value = target.value;
-    const name = target.name;
+    const value = event.target.value;
+    const name = event.target.name;
     this.setState({
       [name]: value
     });
   }
 
   /**
-   * Validate the form.
-   * @return {Promise<boolean>}
+   * Handle name input keyUp event.
    */
-  async validate() {
-    // Reset the form errors.
-    this.setState({
-      error: "",
-      nameError: ""
-    });
-
-    // Validate the form inputs.
-    await Promise.all([
-      this.validateNameInput()
-    ]);
-
-    return this.state.nameError === "";
+  async handleNameInputKeyUp() {
+    const state = await this.validateNameInput();
+    this.setState(state);
   }
 
   /**
    * Handle close button click.
    */
   handleCloseClick() {
+    if (this.state.processing) {
+      return;
+    }
     this.props.onClose();
   }
 
@@ -147,18 +174,28 @@ class FolderDeleteDialog extends Component {
   handleKeyDown(event) {
     // Close the dialog when the user presses the "ESC" key.
     if (event.keyCode === 27) {
-      // Stop the event propagation in order to avoid a parent component to react to this ESC event.
       event.stopPropagation();
-      this.props.onClose();
+      this.handleCloseClick();
+    }
+    // Submit the dialog when the user presses the "Enter" key.
+    if (event.keyCode === 13) {
+      event.stopPropagation();
+      this.handleFormSubmit();
     }
   }
 
   render() {
     return (
       <div className="dialog-wrapper" onKeyDown={this.handleKeyDown}>
-        <div className="dialog create-folder-dialog">
+        {this.state.showErrorDialog &&
+        <ErrorDialog title={this.state.errorTitle}
+                     message={this.state.errorMessage}
+                     onClose={this.handleCloseClick}/>
+        }
+        {!this.state.showErrorDialog &&
+        <div className="dialog rename-folder-dialog">
           <div className="dialog-header">
-            <h2>Delete a Folder</h2>
+            <h2>Rename a folder</h2>
             <a className="dialog-close" onClick={this.handleCloseClick}>
               <SvgCloseIcon/>
               <span className="visually-hidden">cancel</span>
@@ -172,20 +209,20 @@ class FolderDeleteDialog extends Component {
                   Other users may loose access. This action cannot be undone.
                 </p>
                 <div className="input checkbox">
-                  <input id="permissions-for-folders" type="checkbox"/>
+                  <input id="permissions-for-folders" type="checkbox" ref={this.cascadeCheckbox}/>
                   <label htmlFor="permissions-for-folders">Also delete items inside this folder</label>
                 </div>
               </div>
-              {this.state.error &&
-              <div className="feedbacks message error">{this.state.error}</div>
-              }
               <div className="submit-wrapper clearfix">
-                <input type="submit" className="button primary" role="button" value="Delete"/>
-                <a className="cancel" role="button" onClick={this.handleCloseClick}>Cancel</a>
+                <a role="button" className={ `button primary ${this.state.processing ? "processing" : ""}` }
+                   onClick={this.handleFormSubmit}>Delete</a>
+                <a role="button" className={ `cancel ${this.state.processing ? "disabled" : ""}` }
+                   onClick={this.handleCloseClick}>Cancel</a>
               </div>
             </form>
           </div>
         </div>
+        }
       </div>
     );
   }
@@ -195,6 +232,7 @@ FolderDeleteDialog.contextType = AppContext;
 
 FolderDeleteDialog.propTypes = {
   className: PropTypes.string,
+  folderId: PropTypes.string,
   onClose: PropTypes.func
 };
 

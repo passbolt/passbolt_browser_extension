@@ -15,14 +15,8 @@ class FolderEntity extends Entity {
    */
   constructor(data) {
     super();
-
-    if (!data) {
-      throw new TypeError('Folder constructor error, no data provided.');
-    }
     if (data.name) {
       this.setName(data.name);
-    } else {
-      this.setName('Untitled Folder');
     }
     if (data.id) {
       this.setId(data.id);
@@ -122,7 +116,7 @@ class FolderEntity extends Entity {
       data.name = this.name;
     }
     if (this.parentId) {
-      data.parent_id = this.name;
+      data.parent_id = this.parentId;
     }
     if (this.id) {
       data.id = this.id;

@@ -26,7 +26,6 @@ class FolderMoveDialog extends Component {
   getDefaultState() {
     return {
       error: "",
-      id: "",
       parent_id: "",
     };
   }
@@ -54,7 +53,7 @@ class FolderMoveDialog extends Component {
     try {
       const folder = await this.moveFolder();
       this.displayNotification("success", "The folder has been moved successfully");
-      this.selectAndScrollToFolder(folder.id);
+      this.selectAndScrollToFolder(this.props.folderId);
       this.props.onClose();
     } catch (error) {
       // It can happen when the user has closed the passphrase entry dialog by instance.
@@ -76,7 +75,7 @@ class FolderMoveDialog extends Component {
    */
   moveFolder() {
     const folderDto = {
-      id: this.state.id,
+      id: this.props.folderId,
       parentId: this.state.parentId
     };
 
@@ -136,6 +135,7 @@ FolderMoveDialog.contextType = AppContext;
 
 FolderMoveDialog.propTypes = {
   className: PropTypes.string,
+  folderId: PropTypes.string,
   onClose: PropTypes.func
 };
 

@@ -89,15 +89,18 @@ class FolderModel {
    * Delete a folder using Passbolt API
    *
    * @param {string} folderId uuid
+   * @param {boolean} [cascade] delete sub folder / resources
    * @throws {TypeError} if entity id is not set
    * @throws {Error} if CSRF token is not set
-   * @returns {Promise<FolderEntity>}
+   * @returns {Promise<void>}
    */
-  async delete(folderId) {
-    const response = await this.client.delete(folderId);
-    const updatedFolderEntity = new FolderEntity(response.body);
-    await FolderLocalStorage.deleteFoldersById(updatedFolderEntity);
-    return updatedFolderEntity;
+  async delete(folderId, cascade) {
+    let body;
+    if (cascade === true) {
+      body = {cascade: 1};
+    }
+    await this.client.delete(folderId, body);
+    await FolderLocalStorage.delete(folderId);
   }
 }
 

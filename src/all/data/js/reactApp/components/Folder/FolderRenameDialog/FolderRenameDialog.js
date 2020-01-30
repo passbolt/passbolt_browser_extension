@@ -19,29 +19,55 @@ import ErrorDialog from "../../Error/ErrorDialog";
 import browser from "webextension-polyfill";
 
 class FolderRenameDialog extends Component {
+
+  /**
+   * Constructor
+   * Initialize state and bind methods
+   */
   constructor() {
     super();
     this.state = this.getDefaultState();
-    this.initEventHandlers();
+    this.bindCallbacks();
+    this.createRefs();
   }
 
+  /**
+   * Return default state
+   * @returns {Object} default state
+   */
   getDefaultState() {
     return {
-      error: null,
-      id: null,
+      showErrorDialog: false,
+      errorTitle: null,
+      errorMessage: null,
       name: null,
       nameError: null,
       processing: true,
     };
   }
 
-  componentDidMount() {
-    this.setState({'id': this.props.folderId});
+  /**
+   * ComponentDidMount
+   * Invoked immediately after component is inserted into the tree
+   */
+  async componentDidMount() {
     this.loadFolder();
+    this.focusOnNameInput();
+    document.addEventListener("keydown", this.handleKeyDown, false);
   }
 
-  initEventHandlers() {
-    this.handleErrorDialogCloseEvent = this.handleErrorDialogCloseEvent.bind(this);
+  /**
+   * componentWillUnmount
+   * Invoked before component is removed from the tree
+   */
+  componentWillUnmount(){
+    document.removeEventListener("keydown", this.handleKeyDown, false);
+  }
+
+  /**
+   * Bind callbacks methods
+   */
+  bindCallbacks() {
     this.handleCloseClick = this.handleCloseClick.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
@@ -49,12 +75,40 @@ class FolderRenameDialog extends Component {
     this.handleNameInputKeyUp = this.handleNameInputKeyUp.bind(this);
   }
 
+  /**
+   * Create a ref to store the input DOM element
+   */
+  createRefs() {
+    this.nameInputRef = React.createRef();
+  }
+
+  /**
+   * Load current folder info from local storage (name)
+   * @returns {Promise<void>}
+   */
   async loadFolder() {
     const storageData = await browser.storage.local.get("folders");
-    // TODO cannot find folder in storage
-    const folder = storageData.folders.find(item => item.id == this.state.id);
-    this.setState({name: folder.name });
-    this.setState({processing: false});
+    if (!storageData) {
+      this.setState({
+        processing: false,
+        showErrorDialog: true,
+        errorMessage: 'The folder could not be found. No folder found.'
+      });
+      return;
+    }
+    const folder = storageData.folders.find(item => item.id === this.props.folderId);
+    if (!folder) {
+      this.setState({
+        processing: false,
+        showErrorDialog: true,
+        errorMessage: 'The folder could not be found. The folder may have been deleted or you may have lost access.'
+      });
+      return;
+    }
+    this.setState({
+      processing: false,
+      name: folder.name
+    });
   }
 
   /**
@@ -73,40 +127,32 @@ class FolderRenameDialog extends Component {
 
     if (!await this.validate()) {
       this.setState({processing: false});
-      this.focusFirstFieldError();
+      this.focusOnNameInput();
       return;
     }
 
     try {
       const folderDto = {
-        id: this.state.id,
+        id: this.props.folderId,
         name: this.state.name
       };
       await port.request("passbolt.folders.update", folderDto);
       this.displayNotification("success", "The folder was renamed successfully");
       this.props.onClose();
     } catch (error) {
-      // It can happen when the user has closed the passphrase entry dialog by instance.
-      if (error.name === "UserAbortsOperationError") {
-        this.setState({processing: false});
-      } else {
-        // Unexpected error occurred.
-        this.setState({
-          showErrorDialog: true,
-          error: error.message,
-          processing: false
-        });
-      }
+      this.setState({
+        showErrorDialog: true,
+        errorMessage: error.message,
+        processing: false
+      });
     }
   }
 
   /**
    * Focus the first field of the form which is in error state.
    */
-  focusFirstFieldError() {
-    if (this.state.nameError) {
-      this.nameInputRef.current.focus();
-    }
+  focusOnNameInput() {
+    this.nameInputRef.current.focus();
   }
 
   /**
@@ -123,9 +169,8 @@ class FolderRenameDialog extends Component {
    * @params {ReactEvent} The react event.
    */
   handleInputChange(event) {
-    const target = event.target;
-    const value = target.value;
-    const name = target.name;
+    const value = event.target.value;
+    const name = event.target.name;
     this.setState({
       [name]: value
     });
@@ -134,25 +179,29 @@ class FolderRenameDialog extends Component {
   /**
    * Handle name input keyUp event.
    */
-  handleNameInputKeyUp() {
-    const state = this.validateNameInput();
+  async handleNameInputKeyUp() {
+    const state = await this.validateNameInput();
     this.setState(state);
   }
 
   /**
    * Validate the name input.
-   * @return {Promise}
+   * @return {Promise<boolean>}
    */
-  validateNameInput() {
+  async validateNameInput() {
     const name = this.state.name.trim();
-    let nameError = "";
     if (!name.length) {
-      nameError = "A name is required.";
+      this.setState({nameError: "A name is required."});
+      return false;
     }
-
-    return new Promise(resolve => {
-      this.setState({nameError: nameError}, resolve);
-    });
+    try {
+      await port.request("passbolt.folders.validate", {name});
+    } catch(error) {
+      this.setState({nameError: error.message});
+      return false;
+    }
+    this.setState({nameError: null});
+    return true;
   }
 
   /**
@@ -160,23 +209,16 @@ class FolderRenameDialog extends Component {
    * @return {Promise<boolean>}
    */
   async validate() {
-    // Reset the form errors.
-    this.setState({
-      nameError: ""
-    });
-
-    // Validate the form inputs.
-    await Promise.all([
-      this.validateNameInput()
-    ]);
-
-    return this.state.nameError === "";
+    return this.validateNameInput();
   }
 
   /**
    * Handle close button click.
    */
   handleCloseClick() {
+    if (this.state.processing) {
+      return;
+    }
     this.props.onClose();
   }
 
@@ -187,24 +229,23 @@ class FolderRenameDialog extends Component {
   handleKeyDown(event) {
     // Close the dialog when the user presses the "ESC" key.
     if (event.keyCode === 27) {
-      // Stop the event propagation in order to avoid a parent component to react to this ESC event.
       event.stopPropagation();
-      this.props.onClose();
+      this.handleCloseClick();
     }
-  }
-
-  handleErrorDialogCloseEvent() {
-    this.setState({showErrorDialog: false});
-    this.handleCloseClick();
+    // Submit the dialog when the user presses the "Enter" key.
+    if (event.keyCode === 13) {
+      event.stopPropagation();
+      this.handleFormSubmit();
+    }
   }
 
   render() {
     return (
       <div className="dialog-wrapper" onKeyDown={this.handleKeyDown}>
         {this.state.showErrorDialog &&
-        <ErrorDialog title=''
-                     message={this.state.error}
-                     onClose={this.handleErrorDialogCloseEvent}/>
+        <ErrorDialog title={this.state.errorTitle}
+                     message={this.state.errorMessage}
+                     onClose={this.handleCloseClick}/>
         }
         {!this.state.showErrorDialog &&
         <div className="dialog rename-folder-dialog">

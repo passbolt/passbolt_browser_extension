@@ -1,7 +1,7 @@
 // var Validator = require('../vendors/validator');
 const {Entity} = require('../entity');
 const FOLDER_NAME_MIN_LENGTH = 1;
-const FOLDER_NAME_MAX_LENGTH = 255;
+const FOLDER_NAME_MAX_LENGTH = 64;
 
 class FolderEntity extends Entity {
 
@@ -15,14 +15,14 @@ class FolderEntity extends Entity {
    */
   constructor(data) {
     super();
-    if (data.name) {
-      this.setName(data.name);
-    }
-    if (data.id) {
+    if (typeof data.id !== "undefined") {
       this.setId(data.id);
     }
-    if (data.parentId) {
-      this.setParentId(data.parentId);
+    if (typeof data.name !== "undefined") {
+      this.setName(data.name);
+    }
+    if (typeof data.folderParentId !== "undefined") {
+      this.setFolderParentId(data.folderParentId);
     }
   }
 
@@ -62,23 +62,26 @@ class FolderEntity extends Entity {
   }
 
   /**
-   * Parent Id
-   * @param {string} parentId
+   * Folder Parent Id
+   * @param {string|null} folderParentId
    * @throws {TypeError} if parent id is not a valid uuid
    * @returns {FolderEntity} self
    * @public
    */
-  setParentId(parentId) {
-    if (!parentId) {
-      throw new TypeError('Folder parent id should not be empty.')
+  setFolderParentId(folderParentId) {
+    if (folderParentId !== null) {
+      if (!folderParentId) {
+        throw new TypeError('Folder parent id should not be empty.')
+      }
+      if (typeof folderParentId !== 'string') {
+        throw new TypeError('Folder parent id should be a valid string.');
+      }
+      if (!Validator.isUUID(folderParentId)) {
+        throw new TypeError('Folder parent id should be a valid uuid.');
+      }
     }
-    if (typeof parentId !== 'string') {
-      throw new TypeError('Folder parent id should be a valid string.');
-    }
-    if (!Validator.isUUID(parentId)) {
-      throw new TypeError('Folder parent id should be a valid uuid.');
-    }
-    this.parentId = parentId;
+
+    this.folderParentId = folderParentId;
 
     return this;
   }
@@ -115,13 +118,33 @@ class FolderEntity extends Entity {
     if (this.name) {
       data.name = this.name;
     }
-    if (this.parentId) {
-      data.parent_id = this.parentId;
+    if (this.folderParentId) {
+      data.folder_parent_id = this.folderParentId;
     }
     if (this.id) {
       data.id = this.id;
     }
     return data;
+  }
+
+  /**
+   * Return entity as data ready to be retrieve grom Passbolt API
+   * @returns {Object}
+   */
+  static fromApiData(data) {
+    const result = {};
+
+    if (typeof data.id !==  "undefined") {
+      result.id = data.id;
+    }
+    if (typeof data.name !==  "undefined") {
+      result.name = data.name;
+    }
+    if (typeof data.folder_parent_id !==  "undefined") {
+      result.folderParentId = data.folder_parent_id;
+    }
+
+    return result;
   }
 }
 

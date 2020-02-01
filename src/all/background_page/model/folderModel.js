@@ -34,19 +34,22 @@ class FolderModel {
    * @return {Promise}
    */
   async updateLocalStorage () {
-    const folders = await this.findAll();
+    const options = {
+      "contain[folder_parent_id]": "1"
+    };
+    const folders = await this.findAll(options);
     await FolderLocalStorage.set(folders);
     return folders;
   }
 
   /**
    */
-  async findAll() {
-    const response = await this.client.findAll();
+  async findAll(options) {
+    const response = await this.client.findAll(options);
     if (!response.body || !response.body.length) {
       return [];
     }
-    return response.body.map(folder => new FolderEntity(folder));
+    return response.body.map(folder => new FolderEntity(FolderEntity.fromApiData(folder)));
   }
 
   /**

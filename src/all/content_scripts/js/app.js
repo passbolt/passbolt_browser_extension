@@ -250,6 +250,37 @@ window.addEventListener('passbolt.plugin.folders.update-local-storage', async fu
   }
 });
 
+// Find all the folders
+window.addEventListener('passbolt.storage.folders.get', async function (event) {
+  const requestId = event.detail[0];
+  const { folders } = await browser.storage.local.get(["folders"]);
+
+  if (folders && Array.isArray(folders)) {
+    passbolt.message.emitToPage(requestId, { status: "SUCCESS", body: folders });
+  } else {
+    passbolt.message.emitToPage(requestId, { status: "ERROR", error: { message: "The folders local storage is not initialized" } });
+  }
+});
+
+// Move a folder.
+window.addEventListener('passbolt.plugin.folders.move', async function (event) {
+  if (!event.detail || !event.detail.folderId || !validator.isUUID(event.detail.folderId)) {
+    throw new TypeError('Invalid Appjs request. Folder delete should contain a valid folder ID.');
+  }
+  if (!event.detail.folderParentId || !validator.isUUID(event.detail.folderParentId)) {
+    throw new TypeError('Invalid Appjs request. Folder delete should contain a valid folder parent ID.');
+  }
+  const folderDto = {
+    id: event.detail.folderId,
+    folderParentId: event.detail.folderParentId
+  };
+  try {
+    await passbolt.request('passbolt.folders.update', folderDto);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
 /* ==================================================================================
  *  Favorite events
  * ================================================================================== */

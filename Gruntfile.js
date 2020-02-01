@@ -59,6 +59,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('bundle', ['copy:background_page', 'copy:content_scripts', 'browserify:background_page', 'ejs_compile', 'browserify:templates', 'copy:data']);
   grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle', 'browserify:vendors']);
+  grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle', 'browserify:vendors']);
 
   grunt.registerTask('build', ['eslint', 'test', 'build-firefox', 'build-chrome']);
 

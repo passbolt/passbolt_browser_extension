@@ -76,7 +76,7 @@ class FolderMoveDialog extends Component {
   moveFolder() {
     const folderDto = {
       id: this.props.folderId,
-      parentId: this.state.parentId
+      folderParentId: this.state.folderParentId
     };
 
     return port.request("passbolt.folders.move", folderDto);

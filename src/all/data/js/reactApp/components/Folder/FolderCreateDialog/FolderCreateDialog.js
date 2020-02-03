@@ -28,7 +28,7 @@ class FolderCreateDialog extends Component {
     return {
       error: "",
       name: "",
-      folderParentId: "",
+      folderParentId: null,
       parentName: "",
       nameError: ""
     };

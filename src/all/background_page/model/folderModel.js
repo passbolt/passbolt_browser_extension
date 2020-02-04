@@ -68,7 +68,7 @@ class FolderModel {
    */
   async create(folderEntity) {
     const response = await this.client.create(folderEntity.toApiData());
-    const updatedFolderEntity = new FolderEntity(response.body);
+    const updatedFolderEntity = new FolderEntity(FolderEntity.fromApiData(response.body));
     await FolderLocalStorage.addFolder(updatedFolderEntity);
     return updatedFolderEntity;
   }
@@ -83,7 +83,7 @@ class FolderModel {
    */
   async update(folderEntity) {
     const response = await this.client.update(folderEntity.getId(), folderEntity.toApiData());
-    const updatedFolderEntity = new FolderEntity(response.body);
+    const updatedFolderEntity = new FolderEntity(FolderEntity.fromApiData(response.body));
     await FolderLocalStorage.updateFolder(updatedFolderEntity);
     return updatedFolderEntity;
   }

@@ -38,6 +38,16 @@ const listen = function (worker) {
   worker.port.on('passbolt.resources.select-and-scroll-to', function (id) {
     Worker.get('App', worker.tab.id).port.emit('passbolt.resources.select-and-scroll-to', id);
   });
+
+  /*
+   * Select and scroll to a folder.
+   *
+   * @listens passbolt.folders.select-and-scroll-to
+   * @param {string} id The folder id.
+   */
+  worker.port.on('passbolt.folders.select-and-scroll-to', function (id) {
+    Worker.get('App', worker.tab.id).port.emit('passbolt.folders.select-and-scroll-to', id);
+  });
 };
 
 exports.listen = listen;

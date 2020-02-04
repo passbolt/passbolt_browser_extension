@@ -265,10 +265,10 @@ window.addEventListener('passbolt.storage.folders.get', async function (event) {
 // Move a folder.
 window.addEventListener('passbolt.plugin.folders.move', async function (event) {
   if (!event.detail || !event.detail.folderId || !validator.isUUID(event.detail.folderId)) {
-    throw new TypeError('Invalid Appjs request. Folder delete should contain a valid folder ID.');
+    throw new TypeError('Invalid Appjs request. Folder move should contain a valid folder ID.');
   }
-  if (!event.detail.folderParentId || !validator.isUUID(event.detail.folderParentId)) {
-    throw new TypeError('Invalid Appjs request. Folder delete should contain a valid folder parent ID.');
+  if (!validator.isUUID(event.detail.folderParentId) && event.detail.folderParentId !== null) {
+    throw new TypeError('Invalid Appjs request. Folder move should contain a valid folder parent ID (null for root).');
   }
   const folderDto = {
     id: event.detail.folderId,
@@ -276,6 +276,25 @@ window.addEventListener('passbolt.plugin.folders.move', async function (event) {
   };
   try {
     await passbolt.request('passbolt.folders.update', folderDto);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+// Move a resource.
+window.addEventListener('passbolt.plugin.resources.move', async function (event) {
+  if (!event.detail || !event.detail.resourceId || !validator.isUUID(event.detail.resourceId)) {
+    throw new TypeError('Invalid Appjs request. Resource move should contain a valid folder ID.');
+  }
+  if (!validator.isUUID(event.detail.folderParentId) && event.detail.folderParentId !== null) {
+    throw new TypeError('Invalid Appjs request. Resource move should contain a valid folder parent ID (null for root).');
+  }
+  const resourceDto = {
+    id: event.detail.resourceId,
+    folderParentId: event.detail.folderParentId
+  };
+  try {
+    await passbolt.request('passbolt.resources.update', resourceDto);
   } catch (error) {
     console.error(error);
   }
@@ -555,7 +574,7 @@ passbolt.message.on('passbolt.resources.select-and-scroll-to', function (id) {
   passbolt.message.emitToPage('passbolt.plugin.resources.select-and-scroll-to', id);
 });
 
-// Select and scroll to a resource.
+// Select and scroll to a folder.
 passbolt.message.on('passbolt.folders.select-and-scroll-to', function (id) {
   passbolt.message.emitToPage('passbolt.plugin.folders.select-and-scroll-to', id);
 });

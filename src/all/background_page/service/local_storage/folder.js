@@ -78,7 +78,7 @@ FolderLocalStorage.updateFolder = async function (folder) {
   try {
     const folders = await FolderLocalStorage.get();
     const folderIndex = folders.findIndex(item => item.id === folder.id);
-    folders[folderIndex] = folder;
+    folders[folderIndex] = Object.assign(folders[folderIndex], folder);
     await browser.storage.local.set({ folders });
     lock.release();
   } catch(error) {

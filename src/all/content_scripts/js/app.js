@@ -515,6 +515,13 @@ window.addEventListener('passbolt.plugin.resources.open-create-dialog', async fu
   passbolt.message.emit('passbolt.resources.open-create-dialog');
 });
 
+// Insert the resource edit dialog.
+window.addEventListener('passbolt.plugin.resources.open-edit-dialog', async function (evt) {
+  const id = evt.detail.id;
+  await showReactApp();
+  passbolt.message.emit('passbolt.resources.open-edit-dialog', id);
+});
+
 //
 // FOLDERS
 //
@@ -622,16 +629,40 @@ const hideReactApp = function() {
  * Handle the ready state.
  * ================================================================================== */
 
-// Listen when the background page is ready and add the status to the DOM.
-passbolt.message.on('passbolt.app.worker.ready', function (requestId) {
-  if ($('html').hasClass('passboltplugin-ready')) {
-    return;
-  }
-  $('html').addClass('passboltplugin-ready');
-  // Insert the plugin react application iframe.
+const isWorkerReady = async function() {
+  let resolver;
+  const promise = new Promise(resolve => {resolver = resolve});
+
+  const checkInterval = setInterval(function() {
+    passbolt.request('passbolt.app.is-ready').then(() => {
+      resolver();
+      clearInterval(checkInterval);
+    });
+  }, 100);
+
+  return promise;
+};
+
+const isReactAppReady = function() {
+  let resolver;
+  const promise = new Promise(resolve => {resolver = resolve});
+
+  const checkInterval = setInterval(function() {
+    passbolt.request('passbolt.react-app.is-ready').then(() => {
+      resolver();
+      clearInterval(checkInterval);
+    });
+  }, 100);
+
+  return promise;
+};
+
+const init = async function() {
+  await isWorkerReady();
   insertReactAppIframe();
-  // Answer the request.
-  passbolt.message.emit(requestId, 'SUCCESS');
-});
+  await isReactAppReady();
+  $('html').addClass('passboltplugin-ready');
+};
+init();
 
 undefined; // result must be structured-clonable data

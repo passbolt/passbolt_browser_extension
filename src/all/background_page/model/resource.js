@@ -233,7 +233,7 @@ Resource.updateLocalStorage = async function () {
  */
 Resource.findAll = async function (options) {
   return ResourceService.findAll(options);
-}
+};
 
 /**
  * Save a resource
@@ -244,7 +244,7 @@ Resource.save = async function (data) {
   const resource = await ResourceService.save(data);
   await ResourceLocalStorage.addResource(resource);
   return resource;
-}
+};
 
 /**
  * Save a resource
@@ -256,7 +256,7 @@ Resource.update = async function (data) {
   await ResourceLocalStorage.updateResource(resource);
 
   return resource;
-}
+};
 
 /**
  * Delete all the resources
@@ -273,6 +273,6 @@ Resource.deleteAll = async function (resourcesIds) {
   });
 
   return promise;
-}
+};
 
 exports.Resource = Resource;

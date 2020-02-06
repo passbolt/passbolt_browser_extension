@@ -20,29 +20,34 @@ import SvgGenerateIcon from "../../img/svg/generate";
 import SvgViewIcon from "../../img/svg/view";
 import SvgWarningÌcon from "../../img/svg/warning";
 
-class PasswordCreateDialog extends Component {
-  constructor() {
-    super();
-    this.state = this.getDefaultState();
+class PasswordEditDialog extends Component {
+  constructor(props, context) {
+    super(props, context);
+    this.state = this.getDefaultState(props, context);
     this.initEventHandlers();
     this.createInputRef();
   }
 
-  getDefaultState() {
+  getDefaultState(props, context) {
+    const resource = context.resources.find(item => item.id === props.id) || {};
+
     return {
+      nameOriginal: resource.name || "",
       error: "",
-      name: "",
+      name: resource.name || "",
       nameError: "",
-      username: "",
+      username: resource.username || "",
       usernameError: "",
-      uri: "",
+      uri: resource.uri || "",
       uriError: "",
       password: "",
       passwordError: "",
-      description: "",
+      description: resource.description || "",
       descriptionError: "",
       viewPassword: false,
-      passwordInputHasFocus: false
+      passwordInputHasFocus: false,
+      isSecretDecrypted: false,
+      isSecretDecrypting: false
     };
   }
 
@@ -79,6 +84,108 @@ class PasswordCreateDialog extends Component {
       return;
     }
 
+    this.save();
+  }
+
+  /**
+   * Handle form input change.
+   * @params {ReactEvent} The react event.
+   */
+  handleInputChange(event) {
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+    this.setState({
+      [name]: value
+    });
+  }
+
+  /**
+   * Handle password input focus.
+   */
+  async handlePasswordInputFocus() {
+    const passwordInputHasFocus = true;
+    this.setState({passwordInputHasFocus: passwordInputHasFocus});
+    if (!this.state.isSecretDecrypted) {
+      await this.decryptSecret();
+      this.passwordInputRef.current.focus();
+    }
+  }
+
+  /**
+   * Handle password input blur.
+   */
+  handlePasswordInputBlur() {
+    const passwordInputHasFocus = false;
+    this.setState({passwordInputHasFocus: passwordInputHasFocus});
+  }
+
+  /**
+   * Handle name input keyUp event.
+   */
+  handleNameInputKeyUp() {
+    const state = this.validateNameInput();
+    this.setState(state);
+  }
+
+  /**
+   * Handle password input keyUp event.
+   */
+  handlePasswordInputKeyUp() {
+    this.validatePasswordInput();
+  }
+
+  /**
+   * Handle view password button click.
+   */
+  async handleViewPasswordButtonClick() {
+    if (this.state.processing) {
+      return;
+    }
+    let isSecretDecrypted = this.state.isSecretDecrypted;
+    if (!isSecretDecrypted) {
+      isSecretDecrypted = await this.decryptSecret();
+    }
+    if (isSecretDecrypted) {
+      this.setState({viewPassword: !this.state.viewPassword});
+    }
+  }
+
+  /**
+   * Handle generate password button click.
+   */
+  handleGeneratePasswordButtonClick() {
+    if (this.state.processing || !this.state.isSecretDecrypted) {
+      return;
+    }
+    const password = secretComplexity.generate();
+    this.setState({password: password});
+  }
+
+  /**
+   * Handle close button click.
+   */
+  handleCloseClick() {
+    this.props.onClose();
+  }
+
+  /**
+   * Handle key down on the component.
+   * @params {ReactEvent} The react event
+   */
+  handleKeyDown(event) {
+    // Close the dialog when the user presses the "ESC" key.
+    if (event.keyCode === 27) {
+      // Stop the event propagation in order to avoid a parent component to react to this ESC event.
+      event.stopPropagation();
+      this.props.onClose();
+    }
+  }
+
+  /**
+   * Save the changes.
+   */
+  async save() {
     this.setState({processing: true});
 
     if (!await this.validate()) {
@@ -88,9 +195,9 @@ class PasswordCreateDialog extends Component {
     }
 
     try {
-      const resource = await this.createResource();
-      this.displayNotification("success", "The password has been added successfully");
-      this.selectAndScrollToResource(resource.id);
+      await this.updateResource();
+      this.displayNotification("success", "The password has been updated successfully");
+      this.selectAndScrollToResource(this.props.id);
       this.props.onClose();
     } catch (error) {
       // It can happen when the user has closed the passphrase entry dialog by instance.
@@ -110,15 +217,20 @@ class PasswordCreateDialog extends Component {
    * Create the resource
    * @returns {Promise}
    */
-  createResource() {
+  updateResource() {
     const resourceMeta = {
+      id: this.props.id,
       name: this.state.name,
       username: this.state.username,
       uri: this.state.uri,
       description: this.state.description
     };
+    let secret = "";
+    if (this.state.isSecretDecrypted) {
+      secret = this.state.password;
+    }
 
-    return port.request("passbolt.resources.create", resourceMeta, this.state.password);
+    return port.request("passbolt.resources.update", resourceMeta, secret);
   }
 
   /**
@@ -150,40 +262,39 @@ class PasswordCreateDialog extends Component {
   }
 
   /**
-   * Handle form input change.
-   * @params {ReactEvent} The react event.
+   * Decrypt the password secret
+   * @return {Promise<boolean>}
    */
-  handleInputChange(event) {
-    const target = event.target;
-    const value = target.value;
-    const name = target.name;
+  async decryptSecret() {
     this.setState({
-      [name]: value
+      isSecretDecrypting: true
     });
+
+    try {
+      const secret = await this.getDecryptedSecret();
+      this.setState({
+        password: secret,
+        isSecretDecrypting: false,
+        isSecretDecrypted: true
+      });
+    } catch (error) {
+      this.setState({
+        isSecretDecrypting: false,
+        isSecretDecrypted: false
+      });
+
+      return false;
+    }
+
+    return true;
   }
 
   /**
-   * Handle password input focus.
+   * Get the decrypted password secret
+   * @return {Promise<string>}
    */
-  handlePasswordInputFocus() {
-    const passwordInputHasFocus = true;
-    this.setState({passwordInputHasFocus: passwordInputHasFocus});
-  }
-
-  /**
-   * Handle password input blur.
-   */
-  handlePasswordInputBlur() {
-    const passwordInputHasFocus = false;
-    this.setState({passwordInputHasFocus: passwordInputHasFocus});
-  }
-
-  /**
-   * Handle name input keyUp event.
-   */
-  handleNameInputKeyUp() {
-    const state = this.validateNameInput();
-    this.setState(state);
+  async getDecryptedSecret() {
+    return port.request("passbolt.secret-edit.decrypt", this.props.id);
   }
 
   /**
@@ -203,17 +314,14 @@ class PasswordCreateDialog extends Component {
   }
 
   /**
-   * Handle password input keyUp event.
-   */
-  handlePasswordInputKeyUp() {
-    this.validatePasswordInput();
-  }
-
-  /**
    * Validate the password input.
    * @return {Promise}
    */
   validatePasswordInput() {
+    if (!this.state.isSecretDecrypted) {
+      return;
+    }
+
     const password = this.state.password;
     let passwordError = "";
     if (!password.length) {
@@ -247,50 +355,6 @@ class PasswordCreateDialog extends Component {
     ]);
 
     return this.state.nameError === "" && this.state.passwordError === "";
-  }
-
-  /**
-   * Handle view password button click.
-   */
-  handleViewPasswordButtonClick() {
-    if (this.state.processing) {
-      return;
-    }
-    this.setState({viewPassword: !this.state.viewPassword});
-  }
-
-  /**
-   * Handle generate password button click.
-   */
-  handleGeneratePasswordButtonClick() {
-    if (this.state.processing) {
-      return;
-    }
-    const password = secretComplexity.generate();
-    this.setState({
-      password: password,
-      passwordError: ""
-    });
-  }
-
-  /**
-   * Handle close button click.
-   */
-  handleCloseClick() {
-    this.props.onClose();
-  }
-
-  /**
-   * Handle key down on the component.
-   * @params {ReactEvent} The react event
-   */
-  handleKeyDown(event) {
-    // Close the dialog when the user presses the "ESC" key.
-    if (event.keyCode === 27) {
-      // Stop the event propagation in order to avoid a parent component to react to this ESC event.
-      event.stopPropagation();
-      this.props.onClose();
-    }
   }
 
   /**
@@ -329,18 +393,37 @@ class PasswordCreateDialog extends Component {
     };
   }
 
+  /**
+   * Get the password input field placeholder.
+   * @returns {string}
+   */
+  getPasswordInputPlaceholder() {
+    let placeholder = "Click here to unlock";
+    if (this.state.isSecretDecrypting) {
+      placeholder = "Decrypting";
+    } else if (this.state.isSecretDecrypted) {
+      placeholder = "Password";
+    }
+
+    return placeholder;
+  }
+
   render() {
     const passwordInputStyle = this.getPasswordInputStyle();
     const securityTokenStyle = this.getSecurityTokenStyle();
     const passwordStrength = secretComplexity.strength(this.state.password);
     const passwordStrengthLabel = secretComplexity.STRENGTH[passwordStrength].label;
     const passwordStrengthLabelClass = secretComplexity.STRENGTH[passwordStrength].id;
+    const passwordPlaceholder = this.getPasswordInputPlaceholder();
 
     return (
       <div className="dialog-wrapper" onKeyDown={this.handleKeyDown}>
-        <div className="dialog create-password-dialog">
+        <div className="dialog edit-password-dialog">
           <div className="dialog-header">
-            <h2>Create a password</h2>
+            <h2>
+              <span className="dialog-header-title">Edit</span>
+              <span className="dialog-header-subtitle">{this.state.nameOriginal}</span>
+            </h2>
             <a className="dialog-close" onClick={this.handleCloseClick}>
               <SvgCloseIcon/>
               <span className="visually-hidden">cancel</span>
@@ -350,8 +433,8 @@ class PasswordCreateDialog extends Component {
             <form onSubmit={this.handleFormSubmit} noValidate>
               <div className="form-content">
                 <div className={`input text required ${this.state.nameError ? "error" : ""}`}>
-                  <label htmlFor="create-password-form-name">Name</label>
-                  <input id="create-password-form-name" name="name" type="text" value={this.state.name}
+                  <label htmlFor="edit-password-form-name">Name</label>
+                  <input id="edit-password-form-name" name="name" type="text" value={this.state.name}
                     onKeyUp={this.handleNameInputKeyUp} onChange={this.handleInputChange}
                     disabled={this.state.processing} ref={this.nameInputRef} className="required fluid" maxLength="64"
                     required="required" autoComplete="off" autoFocus={true}/>
@@ -360,8 +443,8 @@ class PasswordCreateDialog extends Component {
                   }
                 </div>
                 <div className={`input text ${this.state.uriError ? "error" : ""}`}>
-                  <label htmlFor="create-password-form-uri">URL</label>
-                  <input id="create-password-form-uri" name="uri" className="fluid" maxLength="1024" type="text"
+                  <label htmlFor="edit-password-form-uri">URL</label>
+                  <input id="edit-password-form-uri" name="uri" className="fluid" maxLength="1024" type="text"
                     autoComplete="off" value={this.state.uri} onChange={this.handleInputChange}
                     disabled={this.state.processing}/>
                   {this.state.uriError &&
@@ -369,8 +452,8 @@ class PasswordCreateDialog extends Component {
                   }
                 </div>
                 <div className={`input text ${this.state.usernameError ? "error" : ""}`}>
-                  <label htmlFor="create-password-form-username">Username</label>
-                  <input id="create-password-form-username" name="username" type="text" className="fluid" maxLength="64"
+                  <label htmlFor="edit-password-form-username">Username</label>
+                  <input id="edit-password-form-username" name="username" type="text" className="fluid" maxLength="64"
                     autoComplete="off" value={this.state.username} onChange={this.handleInputChange}
                     disabled={this.state.processing}/>
                   {this.state.usernameError &&
@@ -378,14 +461,14 @@ class PasswordCreateDialog extends Component {
                   }
                 </div>
                 <div className={`input-password-wrapper required ${this.state.passwordError ? "error" : ""}`}>
-                  <label htmlFor="create-password-form-password">Password</label>
+                  <label htmlFor="edit-password-form-password">Password</label>
                   <div className="input text password">
-                    <input id="create-password-form-password" name="password" className="required" maxLength="4096"
+                    <input id="edit-password-form-password" name="password" className="required"
                       placeholder="Password" required="required" type={this.state.viewPassword ? "text" : "password"}
                       onKeyUp={this.handlePasswordInputKeyUp} value={this.state.password}
-                      onFocus={this.handlePasswordInputFocus} onBlur={this.handlePasswordInputBlur}
-                      onChange={this.handleInputChange} disabled={this.state.processing}
-                      style={passwordInputStyle} ref={this.passwordInputRef}/>
+                      placeholder={passwordPlaceholder} onFocus={this.handlePasswordInputFocus}
+                      onBlur={this.handlePasswordInputBlur} onChange={this.handleInputChange}
+                      disabled={this.state.processing} style={passwordInputStyle} ref={this.passwordInputRef}/>
                     <div className="security-token"
                       style={securityTokenStyle}>{this.context.user["user.settings.securityToken.code"]}</div>
                   </div>
@@ -399,7 +482,8 @@ class PasswordCreateDialog extends Component {
                     </li>
                     <li>
                       <a onClick={this.handleGeneratePasswordButtonClick}
-                        className="password-generate button-icon button">
+                        disabled={this.state.processing || !this.state.isSecretDecrypted}
+                        className={`password-generate button-icon button ${this.state.processing || !this.state.isSecretDecrypted ? "disabled" : ""}`}>
                         <SvgGenerateIcon/>
                         <span className="visually-hidden">generate</span>
                       </a>
@@ -417,12 +501,12 @@ class PasswordCreateDialog extends Component {
                   }
                 </div>
                 <div className="input textarea">
-                  <label htmlFor="create-password-form-description">Description
+                  <label htmlFor="edit-password-form-description">Description
                     <span className="tooltip tooltip-right" data-tooltip="Do not store sensitive data. This field is not end to end encrypted.">
                       <SvgWarningÌcon/>
                     </span>
                   </label>
-                  <textarea id="create-password-form-description" name="description" maxLength="10000"
+                  <textarea id="edit-password-form-description" name="description" maxLength="10000"
                     className="required" placeholder="add a description" value={this.state.description}
                     disabled={this.state.processing} onChange={this.handleInputChange}>
                   </textarea>
@@ -435,7 +519,7 @@ class PasswordCreateDialog extends Component {
               <div className="feedbacks message error">{this.state.error}</div>
               }
               <div className="submit-wrapper clearfix">
-                <input type="submit" className="button primary" role="button" value="Create"/>
+                <input type="submit" className="button primary" role="button" value="Save"/>
                 <a className="cancel" role="button" onClick={this.handleCloseClick}>Cancel</a>
               </div>
             </form>
@@ -446,11 +530,12 @@ class PasswordCreateDialog extends Component {
   }
 }
 
-PasswordCreateDialog.contextType = AppContext;
+PasswordEditDialog.contextType = AppContext;
 
-PasswordCreateDialog.propTypes = {
+PasswordEditDialog.propTypes = {
   className: PropTypes.string,
-  onClose: PropTypes.func
+  onClose: PropTypes.func,
+  id: PropTypes.string
 };
 
-export default PasswordCreateDialog;
+export default PasswordEditDialog;

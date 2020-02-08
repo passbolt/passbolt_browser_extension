@@ -58,6 +58,9 @@ class ReactApp extends Component {
       passphraseRequestId: '',
 
       showResourceCreateDialog: false,
+      resourceCreateDialogProps: {
+        folderParentId: null
+      },
       showPasswordEditDialog: false,
       passwordEditDialogProps: {
         id: null
@@ -65,6 +68,9 @@ class ReactApp extends Component {
 
       folder: {},
       showFolderCreateDialog: false,
+      folderCreateDialogProps: {
+        folderParentId: null
+      },
       showFolderRenameDialog: false,
       showFolderDeleteDialog: false,
       showFolderMoveFolderDialog: false,
@@ -190,12 +196,14 @@ class ReactApp extends Component {
     port.emit('passbolt.app.hide');
   }
 
-  handleResourceCreateDialogOpenEvent() {
-    this.setState({showResourceCreateDialog: true});
+  handleResourceCreateDialogOpenEvent(folderParentId) {
+    const resourceCreateDialogProps = {folderParentId};
+    this.setState({showResourceCreateDialog: true, resourceCreateDialogProps});
   }
 
-  handleFolderCreateDialogOpenEvent() {
-    this.setState({showFolderCreateDialog: true});
+  handleFolderCreateDialogOpenEvent(folderParentId) {
+    const folderCreateDialogProps = {folderParentId};
+    this.setState({showFolderCreateDialog: true, folderCreateDialogProps});
   }
 
   handleFolderCreateDialogCloseEvent() {
@@ -258,14 +266,16 @@ class ReactApp extends Component {
                              onClose={this.handleErrorDialogCloseEvent}/>
                 }
                 {this.state.showResourceCreateDialog &&
-                <PasswordCreateDialog onClose={this.handleResourceCreateDialogCloseEvent}/>
+                <PasswordCreateDialog onClose={this.handleResourceCreateDialogCloseEvent}
+                  folderParentId={this.state.resourceCreateDialogProps.folderParentId}/>
                 }
                 {this.state.showPasswordEditDialog &&
                 <PasswordEditDialog onClose={this.handleResourceEditDialogCloseEvent}
                   id={this.state.passwordEditDialogProps.id}/>
                 }
                 {this.state.showFolderCreateDialog &&
-                <FolderCreateDialog onClose={this.handleFolderCreateDialogCloseEvent}/>
+                <FolderCreateDialog onClose={this.handleFolderCreateDialogCloseEvent}
+                  folderParentId={this.state.folderCreateDialogProps.folderParentId}/>
                 }
                 {this.state.showFolderRenameDialog &&
                 <FolderRenameDialog onClose={this.handleFolderRenameDialogCloseEvent} folderId={this.state.folder.id}/>

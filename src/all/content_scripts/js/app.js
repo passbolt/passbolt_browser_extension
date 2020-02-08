@@ -510,14 +510,15 @@ window.addEventListener('passbolt.auth.is-authenticated', async function (event)
 // RESOURCES
 //
 // Insert the resource create dialog.
-window.addEventListener('passbolt.plugin.resources.open-create-dialog', async function () {
+window.addEventListener('passbolt.plugin.resources.open-create-dialog', async function (event) {
   await showReactApp();
-  passbolt.message.emit('passbolt.resources.open-create-dialog');
+  const folderParentId = event.detail.folderParentId;
+  passbolt.message.emit('passbolt.resources.open-create-dialog', folderParentId);
 });
 
 // Insert the resource edit dialog.
-window.addEventListener('passbolt.plugin.resources.open-edit-dialog', async function (evt) {
-  const id = evt.detail.id;
+window.addEventListener('passbolt.plugin.resources.open-edit-dialog', async function (event) {
+  const id = event.detail.id;
   await showReactApp();
   passbolt.message.emit('passbolt.resources.open-edit-dialog', id);
 });
@@ -526,9 +527,10 @@ window.addEventListener('passbolt.plugin.resources.open-edit-dialog', async func
 // FOLDERS
 //
 // Insert the folder create dialog.
-window.addEventListener('passbolt.plugin.folders.open-create-dialog', async function () {
+window.addEventListener('passbolt.plugin.folders.open-create-dialog', async function (event) {
   await showReactApp();
-  passbolt.message.emit('passbolt.folders.open-create-dialog');
+  const folderParentId = event.detail.folderParentId;
+  passbolt.message.emit('passbolt.folders.open-create-dialog', folderParentId);
 });
 
 // Insert the folder rename dialog.

@@ -115,7 +115,8 @@ class PasswordCreateDialog extends Component {
       name: this.state.name,
       username: this.state.username,
       uri: this.state.uri,
-      description: this.state.description
+      description: this.state.description,
+      folderParentId: this.props.folderParentId
     };
 
     return port.request("passbolt.resources.create", resourceMeta, this.state.password);
@@ -449,6 +450,7 @@ class PasswordCreateDialog extends Component {
 PasswordCreateDialog.contextType = AppContext;
 
 PasswordCreateDialog.propTypes = {
+  folderParentId: PropTypes.string,
   className: PropTypes.string,
   onClose: PropTypes.func
 };

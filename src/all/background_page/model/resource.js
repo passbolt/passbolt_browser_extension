@@ -224,7 +224,7 @@ Resource.updateLocalStorage = async function () {
   };
   const resources = await ResourceService.findAll(findOptions);
   await ResourceLocalStorage.set(resources);
-}
+};
 
 /**
  * Find all the resources
@@ -241,6 +241,9 @@ Resource.findAll = async function (options) {
  * @return {Promise}
  */
 Resource.save = async function (data) {
+  if (data.folderParentId) {
+    data.folder_parent_id = data.folderParentId;
+  }
   const resource = await ResourceService.save(data);
   await ResourceLocalStorage.addResource(resource);
   return resource;
@@ -252,6 +255,9 @@ Resource.save = async function (data) {
  * @return {Promise}
  */
 Resource.update = async function (data) {
+  if (data.folderParentId) {
+    data.folder_parent_id = data.folderParentId;
+  }
   const resource = await ResourceService.update(data);
   await ResourceLocalStorage.updateResource(resource);
 

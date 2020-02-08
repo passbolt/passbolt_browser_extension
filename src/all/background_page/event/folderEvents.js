@@ -20,13 +20,11 @@ const listen = function (worker) {
    * Open the folder create dialog.
    *
    * @listens passbolt.folders.open-create-dialog
-   * @param requestId {uuid} The request identifier
-   * @param folder {object} The folder meta data
-   * @param password {string} The password to encrypt
+   * @param folderParentId {string} The folder parent id
    */
-  worker.port.on('passbolt.folders.open-create-dialog', async function () {
+  worker.port.on('passbolt.folders.open-create-dialog', async function (folderParentId) {
     const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
-    reactAppWorker.port.emit('passbolt.folders.open-create-dialog');
+    reactAppWorker.port.emit('passbolt.folders.open-create-dialog', folderParentId);
   });
 
   /*
@@ -116,6 +114,7 @@ const listen = function (worker) {
    * @param folder {array} The folder
    */
   worker.port.on('passbolt.folders.create', async function (requestId, folderDto) {
+    console.log('folderDTO', folderDto);
     try {
       let folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
       let folderEntity = await folderModel.create(new FolderEntity(folderDto));

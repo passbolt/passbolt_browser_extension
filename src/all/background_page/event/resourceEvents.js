@@ -81,13 +81,11 @@ const listen = function (worker) {
    * Open the resource create dialog.
    *
    * @listens passbolt.resources.open-create-dialog
-   * @param requestId {uuid} The request identifier
-   * @param resource {object} The resource meta data
-   * @param password {string} The password to encrypt
+   * @param folderParentId {string} The folder parent id
    */
-  worker.port.on('passbolt.resources.open-create-dialog', async function (requestId, resource, password) {
+  worker.port.on('passbolt.resources.open-create-dialog', async function (folderParentId) {
     const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
-    reactAppWorker.port.emit('passbolt.resources.open-create-dialog');
+    reactAppWorker.port.emit('passbolt.resources.open-create-dialog', folderParentId);
   });
 
   /*
@@ -105,7 +103,7 @@ const listen = function (worker) {
   /*
    * Delete resources
    *
-   * @listens passbolt.resources.create
+   * @listens passbolt.resources.delete-all
    * @param requestId {uuid} The request identifier
    * @param resourcesIds {array} The resources ids to delete
    */

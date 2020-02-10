@@ -263,38 +263,44 @@ window.addEventListener('passbolt.storage.folders.get', async function (event) {
 });
 
 // Move a folder.
-window.addEventListener('passbolt.plugin.folders.move', async function (event) {
-  if (!event.detail || !event.detail.folderId || !validator.isUUID(event.detail.folderId)) {
-    throw new TypeError('Invalid Appjs request. Folder move should contain a valid folder ID.');
+window.addEventListener('passbolt.plugin.folders.bulk-move', async function (event) {
+  let resources = [];
+  let folders = [];
+  let folderParentId = null;
+
+  if (!event.detail) {
+    throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
   }
-  if (!validator.isUUID(event.detail.folderParentId) && event.detail.folderParentId !== null) {
+  if (event.detail.folders) {
+    if (!Array.isArray(event.detail.folders)) {
+      throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
+    }
+    event.detail.folders.forEach(folderId => {
+      if (!validator.isUUID(folderId)) {
+        throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
+      }
+    });
+    folders = event.detail.folders;
+  }
+  if (event.detail.resources) {
+    if (!Array.isArray(event.detail.resources)) {
+      throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
+    }
+    event.detail.resources.forEach(resourceId => {
+      if (!validator.isUUID(resourceId)) {
+        throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
+      }
+    });
+    resources = event.detail.resources;
+  }
+  folderParentId = event.detail.folderParentId;
+  if (!validator.isUUID(folderParentId) && folderParentId !== null) {
     throw new TypeError('Invalid Appjs request. Folder move should contain a valid folder parent ID (null for root).');
   }
-  const folderDto = {
-    id: event.detail.folderId,
-    folderParentId: event.detail.folderParentId
-  };
-  try {
-    await passbolt.request('passbolt.folders.update', folderDto);
-  } catch (error) {
-    console.error(error);
-  }
-});
 
-// Move a resource.
-window.addEventListener('passbolt.plugin.resources.move', async function (event) {
-  if (!event.detail || !event.detail.resourceId || !validator.isUUID(event.detail.resourceId)) {
-    throw new TypeError('Invalid Appjs request. Resource move should contain a valid folder ID.');
-  }
-  if (!validator.isUUID(event.detail.folderParentId) && event.detail.folderParentId !== null) {
-    throw new TypeError('Invalid Appjs request. Resource move should contain a valid folder parent ID (null for root).');
-  }
-  const resourceDto = {
-    id: event.detail.resourceId,
-    folderParentId: event.detail.folderParentId
-  };
+  const moveDto = {folders, resources, folderParentId};
   try {
-    await passbolt.request('passbolt.resources.update', resourceDto);
+    await passbolt.request('passbolt.folders.bulk-move', moveDto);
   } catch (error) {
     console.error(error);
   }

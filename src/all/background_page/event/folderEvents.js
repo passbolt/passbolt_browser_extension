@@ -178,6 +178,7 @@ const listen = function (worker) {
     try {
       let folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
       await folderModel.delete(folderId, cascade);
+      folderModel.updateLocalStorage();
       worker.port.emit(requestId, 'SUCCESS', folderId);
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));

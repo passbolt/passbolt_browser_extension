@@ -98,11 +98,11 @@ class FolderModel {
    * @returns {Promise<void>}
    */
   async delete(folderId, cascade) {
-    let body;
-    if (cascade === true) {
-      body = {cascade: 1};
+    const options = {};
+    if (cascade) {
+      options.cascade = "1";
     }
-    await this.client.delete(folderId, body);
+    await this.client.delete(folderId, null, options);
     await FolderLocalStorage.delete(folderId);
   }
 }

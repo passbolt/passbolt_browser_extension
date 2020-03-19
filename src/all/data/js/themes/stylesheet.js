@@ -43,12 +43,18 @@
       }
     };
 
+    async getLocalStorage() {
+      return new Promise((resolve, reject) => {
+        chrome.storage.local.get(["_passbolt_data"], result => resolve(result));
+      });
+    }
+
     async getTheme() {
       let theme = "default";
-      const storageData = await browser.storage.local.get(["_passbolt_data"]);
+      const storageData = await this.getLocalStorage();
       const {_passbolt_data: {config}} = storageData;
       if (config && this.isValidTheme(config["user.settings.theme"])) {
-          theme = config["user.settings.theme"];
+        theme = config["user.settings.theme"];
       }
       return theme;
     }

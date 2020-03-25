@@ -10,40 +10,50 @@ $(function () {
   /**
    * string The selected file as a base 64.
    */
-  var selectedFileBase64 = null;
+  let selectedFileBase64 = null;
 
   /**
    * ImportPasswordDialog the import password dialog component.
    */
-  var importPasswordsDialog = null;
+  let importPasswordsDialog = null;
 
 
-  var fileExtension = null;
+  let fileExtension = null;
 
   /**
    * Import options
-   * @type {{categoriesAsTags: boolean}}
+   * @type {{
+   * foldersIntegration: boolean  // Whether folders plugin is present
+   * tagsIntegration: boolean  // Whether tags plugin is present
+   * importFolders: boolean  // Whether folders should be imported.
+   * importTags: boolean  // Whether tags should be imported (one unique tag for each import)
+   * }}
    */
-  var importOptions = {
+  let importOptions = {
     tagsIntegration : false,
-    categoriesAsTags : false
+    foldersIntegration: false,
+    importTags: false,
+    importFolders: false
   };
 
   /**
    * Initialize the import passwords dialog.
    */
-  var init = function () {
+  const init = function () {
     passbolt.request('passbolt.site.settings')
     .then(
       function(siteSettings) {
         if(siteSettings !== null && siteSettings.passbolt !== undefined &&
-          siteSettings.passbolt.plugins !== undefined && siteSettings.passbolt.plugins.tags !== undefined) {
-          importOptions.tagsIntegration = true;
+          siteSettings.passbolt.plugins !== undefined) {
+          importOptions.foldersIntegration =  siteSettings.passbolt.plugins.folders !== undefined;
+          importOptions.tagsIntegration =  siteSettings.passbolt.plugins.tags !== undefined;
+          importOptions.importFolders = importOptions.foldersIntegration;
+          importOptions.importTags = importOptions.tagsIntegration;
         }
 
         importPasswordsDialog = new ImportPasswordsDialog({
           "onSubmit":onSubmit,
-          "tagsIntegration": importOptions.tagsIntegration
+          "foldersIntegration": importOptions.foldersIntegration
         });
         importPasswordsDialog.show();
       });
@@ -54,7 +64,7 @@ $(function () {
    * @param selectedFile
    * @param options
    */
-  var onSubmit = function(selectedFile, options) {
+  const onSubmit = function(selectedFile, options) {
     fileExtension = ImportPasswordsDialog.getFileExtension(selectedFile.name);
 
     importOptions = $.extend(importOptions, options);
@@ -62,7 +72,7 @@ $(function () {
     getFileAsBase64String(selectedFile)
     .then(function(fileBase64) {
       selectedFileBase64 = fileBase64;
-      var credentials = {
+      const credentials = {
         password: null,
         keyFile: null
       };
@@ -94,9 +104,9 @@ $(function () {
    * @param fileBase64 the file converted into a base64 string
    * @param credentials the credentials to decrypt the file, if necessary.
    */
-  var importFile = function(fileBase64, credentials) {
+  const importFile = function(fileBase64, credentials) {
     return new Promise(function(resolve, reject) {
-      var o = $.extend(importOptions, {credentials: credentials});
+      const o = $.extend(importOptions, {credentials: credentials});
       passbolt.request('passbolt.import-passwords.import-file', fileBase64, fileExtension, o)
       .then(
         function(result) {
@@ -114,13 +124,13 @@ $(function () {
    * @param File file
    * @return Promise promise
    */
-  var getFileAsBase64String = function(file) {
+  const getFileAsBase64String = function(file) {
     return new Promise(function(resolve, reject) {
-      var reader = new FileReader();
+      const reader = new FileReader();
       reader.onload = function(e) {
         try {
-          var base64Url = e.target.result;
-          var fileBase64 = base64Url.split(",")[1];
+          const base64Url = e.target.result;
+          const fileBase64 = base64Url.split(",")[1];
           resolve(fileBase64);
         } catch (e) {
           reject(e);
@@ -134,8 +144,8 @@ $(function () {
    * Get Kdbx credentials.
    * Display a window that will request the credentials to open a kdbx database.
    */
-  var requestKdbxCredentials = function() {
-    var kdbxCredentials = new KdbxCredentialsDialog({
+  const requestKdbxCredentials = function() {
+    const kdbxCredentials = new KdbxCredentialsDialog({
       title: "Enter the password and/or key file",
       ctaLabel: "Continue import",
       onSubmit: function(password, keyFile) {
@@ -160,8 +170,8 @@ $(function () {
     kdbxCredentials.show();
   };
 
-  var getKdbxCredentials = function(password, keyFile) {
-    var credentials = {
+  const getKdbxCredentials = function(password, keyFile) {
+    const credentials = {
       password: password,
       keyFile: null
     };
@@ -184,9 +194,10 @@ $(function () {
    * Display the final import report.
    * @param result
    */
-  var displayReport = function(result) {
+  const displayReport = function(result) {
     result.tagsIntegration = importOptions.tagsIntegration;
-    var importPasswordsReportDialog = new ImportPasswordsReportDialog(result);
+    result.foldersIntegration = importOptions.foldersIntegration;
+    const importPasswordsReportDialog = new ImportPasswordsReportDialog(result);
     importPasswordsReportDialog.show();
   };
 

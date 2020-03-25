@@ -28,7 +28,11 @@ FolderLocalStorage.flush = async function () {
  * Set the folders local storage.
  */
 FolderLocalStorage.get = async function () {
-  const { folders } = await browser.storage.local.get(["folders"]);
+  let { folders } = await browser.storage.local.get(["folders"]);
+  // TODO: remove lines below. It is done temporarily because folders was not initialized by AppJS (added by Kevin).
+  if (!folders) {
+    folders = Array();
+  }
   return folders;
 };
 

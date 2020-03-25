@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) 2019 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.12.0
+ * @since         2.14.0
  */
 import React, {Component} from "react";
 import PropTypes from "prop-types";
@@ -28,7 +28,6 @@ class FolderDeleteDialog extends Component {
     super();
     this.state = this.getDefaultState();
     this.bindCallbacks();
-    this.createRefs();
   }
 
   /**
@@ -40,8 +39,8 @@ class FolderDeleteDialog extends Component {
       showErrorDialog: false,
       errorTitle: null,
       errorMessage: null,
-      name: null,
-      nameError: null,
+      name: "",
+      cascade: false,
       processing: true,
     };
   }
@@ -62,14 +61,6 @@ class FolderDeleteDialog extends Component {
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleNameInputKeyUp = this.handleNameInputKeyUp.bind(this);
-  }
-
-  /**
-   * Create a ref to store the checkbox DOM element
-   */
-  createRefs() {
-    this.cascadeCheckbox = React.createRef();
   }
 
   /**
@@ -116,7 +107,7 @@ class FolderDeleteDialog extends Component {
     this.setState({processing: true});
 
     try {
-      await port.request("passbolt.folders.delete", this.props.folderId, this.cascadeCheckbox.checked);
+      await port.request("passbolt.folders.delete", this.props.folderId, this.state.cascade);
       this.displayNotification("success", "The folder was deleted.");
       this.props.onClose();
     } catch (error) {
@@ -142,19 +133,12 @@ class FolderDeleteDialog extends Component {
    * @params {ReactEvent} The react event.
    */
   handleInputChange(event) {
-    const value = event.target.value;
-    const name = event.target.name;
+    const target = event.target;
+    const value = target.type === "checkbox" ? target.checked : target.value;
+    const name = target.name;
     this.setState({
       [name]: value
     });
-  }
-
-  /**
-   * Handle name input keyUp event.
-   */
-  async handleNameInputKeyUp() {
-    const state = await this.validateNameInput();
-    this.setState(state);
   }
 
   /**
@@ -193,9 +177,9 @@ class FolderDeleteDialog extends Component {
                      onClose={this.handleCloseClick}/>
         }
         {!this.state.showErrorDialog &&
-        <div className="dialog rename-folder-dialog">
+        <div className="dialog delete-folder-dialog">
           <div className="dialog-header">
-            <h2>Rename a folder</h2>
+            <h2>Delete folder</h2>
             <a className="dialog-close" onClick={this.handleCloseClick}>
               <SvgCloseIcon/>
               <span className="visually-hidden">cancel</span>
@@ -209,12 +193,12 @@ class FolderDeleteDialog extends Component {
                   Other users may loose access. This action cannot be undone.
                 </p>
                 <div className="input checkbox">
-                  <input id="permissions-for-folders" type="checkbox" ref={this.cascadeCheckbox}/>
-                  <label htmlFor="permissions-for-folders">Also delete items inside this folder</label>
+                  <input id="delete-cascade" type="checkbox" name="cascade" onChange={this.handleInputChange}/>
+                  <label htmlFor="delete-cascade">Also delete items inside this folder</label>
                 </div>
               </div>
               <div className="submit-wrapper clearfix">
-                <a role="button" className={ `button primary ${this.state.processing ? "processing" : ""}` }
+                <a role="button" className={ `button primary ${this.state.processing ? "processing" : ""} warning` }
                    onClick={this.handleFormSubmit}>Delete</a>
                 <a role="button" className={ `cancel ${this.state.processing ? "disabled" : ""}` }
                    onClick={this.handleCloseClick}>Cancel</a>

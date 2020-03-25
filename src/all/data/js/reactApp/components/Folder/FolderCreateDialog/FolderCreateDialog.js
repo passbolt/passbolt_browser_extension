@@ -28,7 +28,7 @@ class FolderCreateDialog extends Component {
     return {
       error: "",
       name: "",
-      folderParentId: "",
+      folderParentId: null,
       parentName: "",
       nameError: ""
     };
@@ -95,7 +95,7 @@ class FolderCreateDialog extends Component {
   createFolder() {
     const folderDto = {
       name: this.state.name,
-      folderParentId: this.state.folderParentId
+      folderParentId: this.props.folderParentId
     };
 
     return port.request("passbolt.folders.create", folderDto);
@@ -247,6 +247,7 @@ class FolderCreateDialog extends Component {
 FolderCreateDialog.contextType = AppContext;
 
 FolderCreateDialog.propTypes = {
+  folderParentId: PropTypes.string,
   className: PropTypes.string,
   onClose: PropTypes.func
 };

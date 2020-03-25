@@ -6,7 +6,9 @@
  */
 const Resource = require('../model/resource').Resource;
 const ResourceCreateController = require('../controller/resource/resourceCreateController.js').ResourceCreateController;
+const ResourceUpdateController = require('../controller/resource/resourceUpdateController.js').ResourceUpdateController;
 const Worker = require('../model/worker');
+const Log = require('../model/log').Log;
 
 const listen = function (worker) {
 
@@ -17,11 +19,12 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.resources.update-local-storage', async function (requestId) {
+    Log.write({level: 'debug', message: 'ResourceEvent listen passbolt.resources.update-local-storage'});
     try {
       await Resource.updateLocalStorage();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
-      console.error(error);
+      Log.write({level: 'error', message: error.message, data: JSON.stringify(error)});
       if (error instanceof Error) {
         worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
       } else {
@@ -78,19 +81,29 @@ const listen = function (worker) {
    * Open the resource create dialog.
    *
    * @listens passbolt.resources.open-create-dialog
-   * @param requestId {uuid} The request identifier
-   * @param resource {object} The resource meta data
-   * @param password {string} The password to encrypt
+   * @param folderParentId {string} The folder parent id
    */
-  worker.port.on('passbolt.resources.open-create-dialog', async function (requestId, resource, password) {
+  worker.port.on('passbolt.resources.open-create-dialog', async function (folderParentId) {
     const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
-    reactAppWorker.port.emit('passbolt.resources.open-create-dialog');
+    reactAppWorker.port.emit('passbolt.resources.open-create-dialog', folderParentId);
   });
+
+  /*
+   * Open the resource edit dialog.
+   *
+   * @listens passbolt.resources.open-edit-dialog
+   */
+  worker.port.on('passbolt.resources.open-edit-dialog', function (id) {
+    console.log(id);
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.resources.open-edit-dialog', id);
+  });
+
 
   /*
    * Delete resources
    *
-   * @listens passbolt.resources.create
+   * @listens passbolt.resources.delete-all
    * @param requestId {uuid} The request identifier
    * @param resourcesIds {array} The resources ids to delete
    */
@@ -134,12 +147,15 @@ const listen = function (worker) {
    * @listens passbolt.resources.update
    * @param requestId {uuid} The request identifier
    * @param resource {array} The resource
+   * @param editedPassword {} The resource
    */
-  worker.port.on('passbolt.resources.update', async function (requestId, resource) {
+  worker.port.on('passbolt.resources.update', async function (requestId, resource, password) {
+    const controller = new ResourceUpdateController(worker, requestId, password);
     try {
-      const resourceUpdated = await Resource.update(resource);
-      worker.port.emit(requestId, 'SUCCESS', resourceUpdated);
+      const updatedResource = await controller.main(resource, password);
+      worker.port.emit(requestId, 'SUCCESS', updatedResource);
     } catch (error) {
+      console.error(error);
       if (error instanceof Error) {
         worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
       } else {

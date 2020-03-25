@@ -115,15 +115,16 @@ class FolderEntity extends Entity {
    */
   toApiData() {
     let data = {};
-    if (this.name) {
-      data.name = this.name;
-    }
-    if (this.folderParentId) {
-      data.folder_parent_id = this.folderParentId;
-    }
-    if (this.id) {
+    if (typeof this.id !==  "undefined") {
       data.id = this.id;
     }
+    if (typeof this.name !==  "undefined") {
+      data.name = this.name;
+    }
+    if (typeof this.folderParentId !== "undefined") {
+      data.folder_parent_id = this.folderParentId;
+    }
+
     return data;
   }
 

@@ -220,27 +220,30 @@ var listen = function (worker) {
     }
   });
 
-  // Notify the content code about the background page ready.
-  let readyEventSent = false;
-  async function isReady() {
-    // The ready event has already been sent.
-    if (!worker || readyEventSent) {
-      return;
+  /*
+   * Is the background page ready.
+   *
+   * @listens passbolt.app.is-ready
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.app.is-ready', async function (requestId) {
+    worker.port.emit(requestId, 'SUCCESS');
+  });
+
+  /*
+   * Is the react app ready.
+   *
+   * @listens passbolt.app.is-ready
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.react-app.is-ready', async function (requestId) {
+    try {
+      Worker.get('ReactApp', worker.tab.id).port.request('passbolt.app.is-ready');
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch(error) {
+      worker.port.emit(requestId, 'ERROR');
     }
-
-    const requestResult = worker.port.request('passbolt.app.worker.ready');
-
-    // In the case the content code events listener are not yet bound, plan to request the
-    // content again.
-    setTimeout(() => {
-      isReady();
-    }, 50);
-
-    // Once the promise completed then we consider the event has been received by the content code.
-    await requestResult;
-    readyEventSent = true;
-  };
-  isReady();
+  });
 };
 
 exports.listen = listen;

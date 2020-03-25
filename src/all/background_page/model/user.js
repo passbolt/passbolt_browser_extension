@@ -520,14 +520,6 @@ var UserSingleton = (function () {
     findAll: async function (options) {
       const user = UserSingleton.getInstance();
       return await UserService.findAll(user, options);
-    },
-    add: async function (options) {
-      const user = UserSingleton.getInstance();
-      return await UserService.add(user, options);
-    },
-    update: async function (options) {
-      const user = UserSingleton.getInstance();
-      return await UserService.update(user, options);
     }
   };
 })();

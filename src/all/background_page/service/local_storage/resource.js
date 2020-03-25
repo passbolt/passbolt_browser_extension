@@ -14,6 +14,7 @@
 
 const Lock = require('../../utils/lock').Lock;
 const lock = new Lock();
+const Log = require('../../model/log').Log;
 
 class ResourceLocalStorage { }
 
@@ -21,6 +22,7 @@ class ResourceLocalStorage { }
  * Flush the resources local storage
  */
 ResourceLocalStorage.flush = async function () {
+  Log.write({level: 'debug', message: 'ResourceLocalStorage::flush flush resources local storage'});
   return await browser.storage.local.remove("resources");
 };
 

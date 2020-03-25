@@ -263,19 +263,44 @@ window.addEventListener('passbolt.storage.folders.get', async function (event) {
 });
 
 // Move a folder.
-window.addEventListener('passbolt.plugin.folders.move', async function (event) {
-  if (!event.detail || !event.detail.folderId || !validator.isUUID(event.detail.folderId)) {
-    throw new TypeError('Invalid Appjs request. Folder delete should contain a valid folder ID.');
+window.addEventListener('passbolt.plugin.folders.bulk-move', async function (event) {
+  let resources = [];
+  let folders = [];
+  let folderParentId = null;
+
+  if (!event.detail) {
+    throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
   }
-  if (!event.detail.folderParentId || !validator.isUUID(event.detail.folderParentId)) {
-    throw new TypeError('Invalid Appjs request. Folder delete should contain a valid folder parent ID.');
+  if (event.detail.folders) {
+    if (!Array.isArray(event.detail.folders)) {
+      throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
+    }
+    event.detail.folders.forEach(folderId => {
+      if (!validator.isUUID(folderId)) {
+        throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
+      }
+    });
+    folders = event.detail.folders;
   }
-  const folderDto = {
-    id: event.detail.folderId,
-    folderParentId: event.detail.folderParentId
-  };
+  if (event.detail.resources) {
+    if (!Array.isArray(event.detail.resources)) {
+      throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
+    }
+    event.detail.resources.forEach(resourceId => {
+      if (!validator.isUUID(resourceId)) {
+        throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
+      }
+    });
+    resources = event.detail.resources;
+  }
+  folderParentId = event.detail.folderParentId;
+  if (!validator.isUUID(folderParentId) && folderParentId !== null) {
+    throw new TypeError('Invalid Appjs request. Folder move should contain a valid folder parent ID (null for root).');
+  }
+
+  const moveDto = {folders, resources, folderParentId};
   try {
-    await passbolt.request('passbolt.folders.update', folderDto);
+    await passbolt.request('passbolt.folders.bulk-move', moveDto);
   } catch (error) {
     console.error(error);
   }
@@ -491,18 +516,27 @@ window.addEventListener('passbolt.auth.is-authenticated', async function (event)
 // RESOURCES
 //
 // Insert the resource create dialog.
-window.addEventListener('passbolt.plugin.resources.open-create-dialog', async function () {
+window.addEventListener('passbolt.plugin.resources.open-create-dialog', async function (event) {
   await showReactApp();
-  passbolt.message.emit('passbolt.resources.open-create-dialog');
+  const folderParentId = event.detail.folderParentId;
+  passbolt.message.emit('passbolt.resources.open-create-dialog', folderParentId);
+});
+
+// Insert the resource edit dialog.
+window.addEventListener('passbolt.plugin.resources.open-edit-dialog', async function (event) {
+  const id = event.detail.id;
+  await showReactApp();
+  passbolt.message.emit('passbolt.resources.open-edit-dialog', id);
 });
 
 //
 // FOLDERS
 //
 // Insert the folder create dialog.
-window.addEventListener('passbolt.plugin.folders.open-create-dialog', async function () {
+window.addEventListener('passbolt.plugin.folders.open-create-dialog', async function (event) {
   await showReactApp();
-  passbolt.message.emit('passbolt.folders.open-create-dialog');
+  const folderParentId = event.detail.folderParentId;
+  passbolt.message.emit('passbolt.folders.open-create-dialog', folderParentId);
 });
 
 // Insert the folder rename dialog.
@@ -555,7 +589,7 @@ passbolt.message.on('passbolt.resources.select-and-scroll-to', function (id) {
   passbolt.message.emitToPage('passbolt.plugin.resources.select-and-scroll-to', id);
 });
 
-// Select and scroll to a resource.
+// Select and scroll to a folder.
 passbolt.message.on('passbolt.folders.select-and-scroll-to', function (id) {
   passbolt.message.emitToPage('passbolt.plugin.folders.select-and-scroll-to', id);
 });
@@ -603,16 +637,40 @@ const hideReactApp = function() {
  * Handle the ready state.
  * ================================================================================== */
 
-// Listen when the background page is ready and add the status to the DOM.
-passbolt.message.on('passbolt.app.worker.ready', function (requestId) {
-  if ($('html').hasClass('passboltplugin-ready')) {
-    return;
-  }
-  $('html').addClass('passboltplugin-ready');
-  // Insert the plugin react application iframe.
+const isWorkerReady = async function() {
+  let resolver;
+  const promise = new Promise(resolve => {resolver = resolve});
+
+  const checkInterval = setInterval(function() {
+    passbolt.request('passbolt.app.is-ready').then(() => {
+      resolver();
+      clearInterval(checkInterval);
+    });
+  }, 100);
+
+  return promise;
+};
+
+const isReactAppReady = function() {
+  let resolver;
+  const promise = new Promise(resolve => {resolver = resolve});
+
+  const checkInterval = setInterval(function() {
+    passbolt.request('passbolt.react-app.is-ready').then(() => {
+      resolver();
+      clearInterval(checkInterval);
+    });
+  }, 100);
+
+  return promise;
+};
+
+const init = async function() {
+  await isWorkerReady();
   insertReactAppIframe();
-  // Answer the request.
-  passbolt.message.emit(requestId, 'SUCCESS');
-});
+  await isReactAppReady();
+  $('html').addClass('passboltplugin-ready');
+};
+init();
 
 undefined; // result must be structured-clonable data

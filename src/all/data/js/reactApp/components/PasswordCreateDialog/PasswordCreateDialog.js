@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) 2019 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.12.0
+ * @since         2.14.0
  */
 
 import React, {Component} from "react";
@@ -115,7 +115,8 @@ class PasswordCreateDialog extends Component {
       name: this.state.name,
       username: this.state.username,
       uri: this.state.uri,
-      description: this.state.description
+      description: this.state.description,
+      folderParentId: this.props.folderParentId
     };
 
     return port.request("passbolt.resources.create", resourceMeta, this.state.password);
@@ -449,6 +450,7 @@ class PasswordCreateDialog extends Component {
 PasswordCreateDialog.contextType = AppContext;
 
 PasswordCreateDialog.propTypes = {
+  folderParentId: PropTypes.string,
   className: PropTypes.string,
   onClose: PropTypes.func
 };

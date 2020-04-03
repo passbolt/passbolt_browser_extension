@@ -16,7 +16,7 @@
     "locutus": "~2.0.9",
     "memoize-one": "^5.1.1",
     "openpgp": "4.6.2",
-    "papaparse": "^5.1.0",
+    "papaparse": "^5.2.0",
     "passbolt-styleguide": "2.11.1",
     "prop-types": "^15.6.2",
     "react": "^16.12.0",

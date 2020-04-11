@@ -11,9 +11,10 @@
  *   onSubmit (compulsory): the action to execute on a onSubmit.
  * @constructor
  */
-var ImportPasswordsDialog = function(settings) {
+const ImportPasswordsDialog = function(settings) {
   this.selectedFile = null;
   this.tagsIntegration = false;
+  this.foldersIntegration = false;
 
   this.$html = null;
   this.$file = null;
@@ -30,13 +31,17 @@ var ImportPasswordsDialog = function(settings) {
   if (settings != undefined && settings.tagsIntegration != undefined) {
     this.tagsIntegration = settings.tagsIntegration;
   }
+
+  if (settings != undefined && settings.foldersIntegration != undefined) {
+    this.foldersIntegration = settings.foldersIntegration;
+  }
 };
 
 /**
  * Show dialog and initialize elements and events.
  */
 ImportPasswordsDialog.prototype.show = function() {
-  var self = this;
+  const self = this;
 
   passbolt.html.getTemplate('import/importPasswordsMainDialog.ejs').then(function(tpl) {
     self.$html = $(tpl.call(self));
@@ -72,7 +77,7 @@ ImportPasswordsDialog.prototype._initElements = function() {
   this.$submit = $(':submit', this.$html);
   this.$closeButton = $('.dialog-close', this.$html);
   this.$cancelButton = $('.cancel', this.$html);
-  this.$categoriesAsTagsCheckbox = $('#js_field_category_as_tags');
+  this.$importFoldersCheckbox = $('#js_field_import_folders');
 
   this._initFileChooser();
 
@@ -86,7 +91,7 @@ ImportPasswordsDialog.prototype._initElements = function() {
  * @private
  */
 ImportPasswordsDialog.prototype._initEvents = function() {
-  var self = this;
+  const self = this;
 
   this.$file.on('change', function(evt) {
     self.onFileSelect(evt);
@@ -94,11 +99,11 @@ ImportPasswordsDialog.prototype._initEvents = function() {
 
   this.$submit.on('click', function(evt) {
     evt.stopImmediatePropagation();
-    var options = {
-      categoriesAsTags : false
+    const options = {
+      importFolders : false
     };
-    if (self.tagsIntegration === true && self.$categoriesAsTagsCheckbox.prop('checked')) {
-      options.categoriesAsTags = true;
+    if (self.foldersIntegration === true && self.$importFoldersCheckbox.prop('checked')) {
+      options.importFolders = true;
     }
     self.onSubmit(self.selectedFile, options);
     return false;

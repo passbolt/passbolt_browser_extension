@@ -4,18 +4,18 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var ImportController = require('../controller/importPasswordsController').ImportPasswordsController;
-var Worker = require('../model/worker');
+const ImportController = require('../controller/importPasswordsController').ImportPasswordsController;
+const Worker = require('../model/worker');
 
-var listen = function (worker) {
+const listen = function (worker) {
 
   worker.port.on('passbolt.import-passwords.import-file', function (requestId, b64FileContent, fileType, options) {
-    var importController = new ImportController(worker);
+    const importController = new ImportController(worker);
 
-    var loader = null;
-    if (fileType == 'kdbx') {
+    let loader = null;
+    if (fileType === 'kdbx') {
       loader = importController.initFromKdbx(b64FileContent, options.credentials);
-    } else if( fileType == 'csv') {
+    } else if( fileType === 'csv') {
       loader = importController.initFromCsv(b64FileContent, {});
     }
 
@@ -24,19 +24,19 @@ var listen = function (worker) {
       return importController.encryptSecrets(resources);
     })
     .then(function (resources) {
-      options.importTag = ImportController._getUniqueImportTag(fileType);
+      options.importTag = ImportController._generateUniqueImportTag(fileType);
       return importController.saveResources(resources, options);
     })
     .then(function(responses) {
       // Send results report to content code, in order to display report.
       const result = {
-        "resources": importController.resources,
-        "responses": responses,
+        "resources": responses.resources,
+        "folders": responses.folders,
         "importTag": options.importTag
       };
 
       // Inform the app-js that the import is complete.
-      var appWorker = Worker.get('App', worker.tab.id);
+      const appWorker = Worker.get('App', worker.tab.id);
       appWorker.port.emit('passbolt.import-passwords.complete', result);
 
       worker.port.emit(requestId, 'SUCCESS', result);

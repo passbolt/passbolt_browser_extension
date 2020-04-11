@@ -10,40 +10,19 @@
  * @param object results
  * @constructor
  */
-var ImportPasswordsReportDialog = function(results) {
+const ImportPasswordsReportDialog = function(results) {
   this.resources = results.resources;
+  this.folders = results.folders;
   this.responses = results.responses;
-  this.successList = [];
-  this.errorsList = [];
   this.importTag = results.importTag;
   this.tagsIntegration = results.tagsIntegration;
+  this.foldersIntegration = results.foldersIntegration;
 
   // elements.
   this.$html = null;
   this.$closeButton = null;
   this.$okButton = null;
   this.$accordionHeader = null;
-
-  this._processResults();
-};
-
-/**
- * Process results provided.
- * @private
- */
-ImportPasswordsReportDialog.prototype._processResults = function() {
-  for(let i in this.responses) {
-    if (this.responses[i].id != undefined) {
-      this.successList.push(this.responses[i]);
-    }
-    else {
-      const error = {
-        "resource" : this.resources[i],
-        "serverError" : this.responses[i]
-      };
-      this.errorsList.push(error);
-    }
-  }
 };
 
 /**
@@ -61,10 +40,10 @@ ImportPasswordsReportDialog.prototype._initElements = function() {
  * @private
  */
 ImportPasswordsReportDialog.prototype._initEvents = function() {
-  var self = this;
+  const self = this;
 
   this.$accordionHeader.click(function (e) {
-    var $content = $(this).next();
+    const $content = $(this).next();
     if ($content.is(':hidden')) {
       $content.slideDown(50);
     } else {
@@ -91,7 +70,7 @@ ImportPasswordsReportDialog.prototype._initEvents = function() {
  * Show dialog and initialize elements and events.
  */
 ImportPasswordsReportDialog.prototype.show = function() {
-  var self = this;
+  const self = this;
 
   passbolt.html.getTemplate('import/importPasswordsReportDialog.ejs').then(function(tpl) {
     self.$html = $(tpl.call(self));

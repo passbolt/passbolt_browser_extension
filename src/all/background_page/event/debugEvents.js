@@ -32,24 +32,5 @@ var listen = function (worker) {
     Log.write({level: 'error', message: data});
   });
 
-  /*
-   * Csrf token.
-   *
-   * @listens passbolt.debug.init-csrf-token
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.debug.init-csrf-token', async function () {
-    let {csrfToken} = await browser.storage.local.get(["csrfToken"]);
-    const user = User.getInstance();
-
-    if (csrfToken) {
-      user.setCsrfToken(csrfToken);
-    } else {
-      await user.retrieveAndStoreCsrfToken();
-      csrfToken = user.getCsrfToken();
-      await browser.storage.local.set({csrfToken});
-    }
-  });
-
 };
 exports.listen = listen;

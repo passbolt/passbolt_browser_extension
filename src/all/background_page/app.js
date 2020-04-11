@@ -149,7 +149,7 @@ pageMods.SecretEditDialog = require('./pagemod/secretEditDialogPagemod').SecretE
  * This pagemod drives the iframe used when the user share a password
  * It is used when sharing a new password
  */
-pageMods.ShareDialog = require('./pagemod/shareDialogPagemod').ShareDialog;
+//pageMods.ShareDialog = require('./pagemod/shareDialogPagemod').ShareDialog;
 
 /*
  * This pagemod drives the iframe used when the user creates / edit a group.

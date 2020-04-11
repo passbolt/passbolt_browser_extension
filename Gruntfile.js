@@ -214,7 +214,7 @@ module.exports = function (grunt) {
           // Avatar
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/avatar',
-          src: ['user.png'],
+          src: ['user.png', 'group_default.png'],
           dest: path.build_data + 'img/avatar',
           expand: true
         }, {

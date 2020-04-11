@@ -36,18 +36,14 @@ $(function () {
    * Load the bootsrap configuration.
    * @returns {Promise}
    */
-  Bootstrap.prototype.loadConfiguration = function () {
-    var _this = this;
-
-    return Promise.all([
-      passbolt.request('passbolt.addon.isConfigured'),
-      passbolt.request('passbolt.addon.checkDomain'),
-      passbolt.request('passbolt.addon.getDomain')
-    ]).then(function (data) {
-      _this.isPluginIsconfigured = data[0];
-      _this.isTrustedDomain = data[1];
-      _this.trustedDomain = data[2];
-    });
+  Bootstrap.prototype.loadConfiguration = async function () {
+    this.isPluginIsconfigured = await passbolt.request('passbolt.addon.isConfigured');
+    if (this.isPluginIsconfigured) {
+      this.isTrustedDomain = await passbolt.request('passbolt.addon.checkDomain');
+    }
+    if (this.isTrustedDomain) {
+      this.trustedDomain = await passbolt.request('passbolt.addon.getDomain');
+    }
   };
 
   /**

@@ -7,19 +7,20 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 const __ = require('../sdk/l10n').get;
-var Crypto = require('../model/crypto').Crypto;
-const InvalidMasterPasswordError = require('../error/invalidMasterPasswordError').InvalidMasterPasswordError;
-var Keyring = require('../model/keyring').Keyring;
+const {Crypto} = require('../model/crypto');
+const {InvalidMasterPasswordError} = require('../error/invalidMasterPasswordError');
+const {Keyring} = require('../model/keyring');
 const passphraseController = require('../controller/passphrase/passphraseController');
 const progressController = require('../controller/progress/progressController');
-const ResourceExportController = require('../controller/resource/resourceExportController').ResourceExportController;
-var Secret = require('../model/secret').Secret;
-var secret = new Secret();
-var TabStorage = require('../model/tabStorage').TabStorage;
-const UserAbortsOperationError = require('../error/userAbortsOperationError').UserAbortsOperationError;
-var Worker = require('../model/worker');
+const {ResourceExportController} = require('../controller/resource/resourceExportController');
+const {User} = require('../model/user');
+const {Secret} = require('../model/secret');
+const {FolderModel} = require('../model/folderModel');
+const {TabStorage} = require('../model/tabStorage');
+const {UserAbortsOperationError} = require('../error/userAbortsOperationError');
+const Worker = require('../model/worker');
 
-var listen = function (worker) {
+const listen = function (worker) {
 
   /*
    * Broadcast the window resize event to all workers.
@@ -57,6 +58,7 @@ var listen = function (worker) {
       // If the secret is decrypted validate it, otherwise it is
       // considered as valid.
       if (editedPassword.secret != null) {
+        const secret = new Secret();
         secret.validate({data: editedPassword.secret});
       }
       Worker.get('Secret', worker.tab.id).port.emit('passbolt.secret-edit.validate-success');
@@ -127,19 +129,6 @@ var listen = function (worker) {
   });
 
   /*
-   * Initialize the password sharing process.
-   *
-   * @listens passbolt.app.share-password-init
-   * @param requestId {uuid} The request identifier
-   * @param sharedPassword {array} The password to share
-   */
-  worker.port.on('passbolt.app.share-init', function (requestId, resourcesIds) {
-    // Store some variables in the tab storage in order to make it accessible by other workers.
-    TabStorage.set(worker.tab.id, 'shareResourcesIds', resourcesIds);
-    worker.port.emit(requestId, 'SUCCESS');
-  });
-
-  /*
    * Decrypt a given armored string
    *
    * @listens passbolt.app.decrypt
@@ -148,7 +137,6 @@ var listen = function (worker) {
    * @deprecated since v2.7 will be removed in v3.0
    */
   worker.port.on('passbolt.app.decrypt-copy', function (requestId, armored) {
-    // @todo try to do something with this shit
     var crypto = new Crypto();
 
     // Master password required to decrypt a secret.
@@ -233,17 +221,134 @@ var listen = function (worker) {
   /*
    * Is the react app ready.
    *
-   * @listens passbolt.app.is-ready
+   * @listens passbolt.app.react-app.is-ready
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.react-app.is-ready', async function (requestId) {
+  worker.port.on('passbolt.app.react-app.is-ready', async function (requestId) {
     try {
-      Worker.get('ReactApp', worker.tab.id).port.request('passbolt.app.is-ready');
+      Worker.get('ReactApp', worker.tab.id).port.request('passbolt.react-app.is-ready');
       worker.port.emit(requestId, 'SUCCESS');
     } catch(error) {
       worker.port.emit(requestId, 'ERROR');
     }
   });
+
+  //
+  // RESOURCES App Events
+  //
+
+  /*
+   * Open the resource create dialog.
+   *
+   * @listens passbolt.resources.open-create-dialog
+   * @param folderParentId {string} The folder parent id
+   */
+  worker.port.on('passbolt.app.resources.open-create-dialog', async function (folderParentId) {
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.resources.open-create-dialog', folderParentId);
+  });
+
+  /*
+   * Open the resource edit dialog.
+   *
+   * @listens passbolt.resources.open-edit-dialog
+   */
+  worker.port.on('passbolt.app.resources.open-edit-dialog', function (id) {
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.resources.open-edit-dialog', id);
+  });
+
+  // SHARE App Events
+  /*
+  * Initialize the password sharing process.
+  *
+  * @listens passbolt.app.share.open-share-dialog
+  * @param requestId {uuid} The request identifier
+  * @param sharedPassword {array} The password to share
+  */
+  worker.port.on('passbolt.app.share.open-share-dialog', function (requestId, resourcesIds) {
+    // Store some variables in the tab storage in order to make it accessible by other workers.
+    TabStorage.set(worker.tab.id, 'shareResourcesIds', resourcesIds);
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.share.open-share-dialog', resourcesIds);
+    worker.port.emit(requestId, 'SUCCESS');
+  });
+
+  //
+  // FOLDER App Events
+  //
+
+  /*
+   * Pull the resources from the API and update the local storage.
+   *
+   * @listens passbolt.app.folders.update-local-storage
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.app.folders.update-local-storage', async function (requestId) {
+    try {
+      let folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
+      await folderModel.updateLocalStorage();
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
+
+  /*
+   * Open the folder create dialog.
+   *
+   * @listens passbolt.folders.open-create-dialog
+   * @param folderParentId {string} The folder parent id
+   */
+  worker.port.on('passbolt.app.folders.open-create-dialog', async function (folderParentId) {
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.folders.open-create-dialog', folderParentId);
+  });
+
+  /*
+   * Open the folder rename dialog.
+   *
+   * @listens passbolt.folders.open-create-dialog
+   * @param requestId {uuid} The request identifier
+   * @param folder {object} The folder meta data
+   * @param password {string} The password to encrypt
+   */
+  worker.port.on('passbolt.app.folders.open-rename-dialog', async function (folderId) {
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.folders.open-rename-dialog', folderId);
+  });
+
+  /*
+   * Open the folder delete dialog.
+   *
+   * @listens passbolt.folders.open-create-dialog
+   * @param requestId {uuid} The request identifier
+   * @param folder {object} The folder meta data
+   * @param password {string} The password to encrypt
+   */
+  worker.port.on('passbolt.app.folders.open-delete-dialog', async function (folderId) {
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.folders.open-delete-dialog', folderId);
+  });
+
+  /*
+   * Open the folder move dialog.
+   *
+   * @listens passbolt.folders.open-create-dialog
+   * @param requestId {uuid} The request identifier
+   * @param folder {object} The folder meta data
+   * @param password {string} The password to encrypt
+   */
+  worker.port.on('passbolt.app.folders.open-move-dialog', async function (folderId) {
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.folders.open-move-dialog', folderId);
+  });
+
 };
 
 exports.listen = listen;

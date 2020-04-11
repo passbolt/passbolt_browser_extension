@@ -1,25 +1,25 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) 2019 Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) 2020 Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) 2019 Passbolt SA (https://www.passbolt.com)
+ * @copyright     Copyright (c) 2020 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.11.0
+ * @since         2.14.0
  */
 
 import React from "react";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
-import "../../lib/polyfill/cryptoGetRandomvalues";
-import "../../../../../data/js/lib/secretComplexity";
-import AppContext from "../../contexts/AppContext";
-import PasswordCreateDialog from "./PasswordCreateDialog";
+import "../../../lib/polyfill/cryptoGetRandomvalues";
+import "../../../../../../data/js/lib/secretComplexity";
+import AppContext from "../../../contexts/AppContext";
+import PasswordEditDialog from "./PasswordEditDialog";
 
-const PassboltApiFetchError = require("../../../../../background_page/error/passboltApiFetchError").PassboltApiFetchError;
+const PassboltApiFetchError = require("../../../../../../background_page/error/passboltApiFetchError").PassboltApiFetchError;
 
 beforeEach(() => {
   jest.resetModules();
@@ -27,10 +27,10 @@ beforeEach(() => {
   mockPort();
 });
 
-const mockPort = function() {
+const mockPort = function () {
   window.port = {
     _mockedOnCallbacks: {},
-    fireAddonMessage: function(message) {
+    fireAddonMessage: function (message) {
       const callback = window.port._mockedOnCallbacks[message];
       if (callback) {
         const callbackArgs = Array.prototype.slice.call(arguments, 1);
@@ -51,36 +51,70 @@ afterEach(() => {
   delete window.port;
 });
 
-describe("PasswordCreateDialog", () => {
-  const getAppContext = function(appContext) {
+describe("PasswordEditDialog", () => {
+  const getDummyResource = function() {
+      return {
+        "id": "8e3874ae-4b40-590b-968a-418f704b9d9a",
+        "name": "apache",
+        "username": "www-data",
+        "uri": "http://www.apache.org/",
+        "description": "Apache is the world's most used web server software.",
+        "deleted": false,
+        "created": "2019-12-05T13:38:43+00:00",
+        "modified": "2019-12-06T13:38:43+00:00",
+        "created_by": "f848277c-5398-58f8-a82a-72397af2d450",
+        "modified_by": "f848277c-5398-58f8-a82a-72397af2d450"
+      };
+  };
+
+  const getAppContext = function (appContext) {
     const defaultAppContext = {
       user: {
         "user.settings.securityToken.code": "TST",
         "user.settings.securityToken.textColor": "#FFFFFF",
         "user.settings.securityToken.color": "#000000"
-      }
+      },
+      resources: [
+        getDummyResource()
+      ]
     };
 
     return Object.assign(defaultAppContext, appContext || {});
   };
 
-  const renderPasswordCreateDialog = function(appContext, props) {
+  const getComponentProps = function (props) {
+    const defaultAppProps = {
+      id: "8e3874ae-4b40-590b-968a-418f704b9d9a",
+      onClose: jest.fn()
+    };
+
+    return Object.assign(defaultAppProps, props || {});
+  };
+
+  const renderPasswordEditDialog = function (appContext, props) {
     appContext = getAppContext(appContext);
-    props = props || {};
+    props = getComponentProps(props);
+
     return render(
       <AppContext.Provider value={appContext}>
-        <PasswordCreateDialog debug onClose={props.onClose || jest.fn()} />
+        <PasswordEditDialog debug id={props.id} onClose={props.onClose}/>
       </AppContext.Provider>
     );
   };
 
-  it("matches the styleguide.", () => {
-    const {container} = renderPasswordCreateDialog();
+  it.only("matches the styleguide.", () => {
+    const resource = getDummyResource();
+    const {container} = renderPasswordEditDialog();
 
     // Dialog title exists and correct
-    const dialogTitle = container.querySelector(".dialog-header h2");
+    const dialogTitle = container.querySelector(".dialog-header h2 .dialog-header-title");
     expect(dialogTitle).not.toBeNull();
-    expect(dialogTitle.textContent).toBe("Create a password");
+    expect(dialogTitle.textContent).toBe("Edit");
+
+    // Dialog subtitle exists and correct
+    const dialogSubtitle = container.querySelector(".dialog-header h2 .dialog-header-subtitle");
+    expect(dialogSubtitle).not.toBeNull();
+    expect(dialogSubtitle.textContent).toBe(resource.name);
 
     // Close button exists
     const closeButton = container.querySelector(".dialog-close");
@@ -89,17 +123,17 @@ describe("PasswordCreateDialog", () => {
     // Name input field exists.
     const nameInput = container.querySelector("[name=\"name\"]");
     expect(nameInput).not.toBeNull();
-    expect(nameInput.value.trim()).toBe("");
+    expect(nameInput.value.trim()).toBe(resource.name);
 
     // Uri input field exists
     const uriInput = container.querySelector("[name=\"uri\"]");
     expect(uriInput).not.toBeNull();
-    expect(uriInput.value.trim()).toBe("");
+    expect(uriInput.value.trim()).toBe(resource.uri);
 
     // Username input field exists
     const usernameInput = container.querySelector("[name=\"username\"]");
     expect(usernameInput).not.toBeNull();
-    expect(usernameInput.value.trim()).toBe("");
+    expect(usernameInput.value.trim()).toBe(resource.username);
 
     // Password input field exists
     const passwordInput = container.querySelector("[name=\"password\"]");
@@ -132,11 +166,12 @@ describe("PasswordCreateDialog", () => {
     // Password generate button exists.
     const passwordGenerateButton = container.querySelector(".password-generate.button");
     expect(passwordGenerateButton).not.toBeNull();
+    expect(passwordGenerateButton.classList.contains("disabled")).toBe(true);
 
     // Description textarea field exists
     const descriptionTextArea = container.querySelector("[name=\"description\"]");
     expect(descriptionTextArea).not.toBeNull();
-    expect(descriptionTextArea.value.trim()).toBe("");
+    expect(descriptionTextArea.value.trim()).toBe(resource.description);
 
     // Create button exists
     const createButton = container.querySelector(".submit-wrapper [type=\"submit\"]");
@@ -147,11 +182,11 @@ describe("PasswordCreateDialog", () => {
     expect(cancelButton).not.toBeNull();
   });
 
-  it("calls onClose props when clicking on the close button.", () => {
+  it.only("calls onClose props when clicking on the close button.", () => {
     const props = {
       onClose: jest.fn()
     };
-    const {container} = renderPasswordCreateDialog(null, props);
+    const {container} = renderPasswordEditDialog(null, props);
 
     const leftClick = {button: 0};
     const dialogCloseIcon = container.querySelector(".dialog-close");
@@ -159,11 +194,11 @@ describe("PasswordCreateDialog", () => {
     expect(props.onClose).toBeCalled();
   });
 
-  it("calls onClose props when clicking on the cancel button.", () => {
+  it.only("calls onClose props when clicking on the cancel button.", () => {
     const props = {
       onClose: jest.fn()
     };
-    const {container} = renderPasswordCreateDialog(null, props);
+    const {container} = renderPasswordEditDialog(null, props);
 
     const leftClick = {button: 0};
     const cancelButton = container.querySelector(".submit-wrapper .cancel");
@@ -171,9 +206,8 @@ describe("PasswordCreateDialog", () => {
     expect(props.onClose).toBeCalled();
   });
 
-  it("changes the style of its security token when the password input get or lose focus.", () => {
-    const {container} = renderPasswordCreateDialog();
-
+  it("changes the style of its security token when the password input get or lose focus when the password is already decrypted", () => {
+    const {container} = renderPasswordEditDialog();
     const passwordInput = container.querySelector("[name=\"password\"]");
     const securityTokenElement = container.querySelector(".security-token");
 
@@ -203,7 +237,7 @@ describe("PasswordCreateDialog", () => {
   });
 
   it("generates password when clicking on the generate button.", () => {
-    const {container} = renderPasswordCreateDialog();
+    const {container} = renderPasswordEditDialog();
 
     const leftClick = {button: 0};
     const passwordInput = container.querySelector("[name=\"password\"]");
@@ -219,7 +253,7 @@ describe("PasswordCreateDialog", () => {
   });
 
   it("views password when clicking on the view button.", () => {
-    const {container} = renderPasswordCreateDialog();
+    const {container} = renderPasswordEditDialog();
 
     const leftClick = {button: 0};
     const passwordValue = "Lise Meitner";
@@ -242,8 +276,8 @@ describe("PasswordCreateDialog", () => {
     expect(viewButton.classList.contains("selected")).toBe(false);
   });
 
-  it("validates the form when clicking on the submit button.", async() => {
-    const {container} = renderPasswordCreateDialog();
+  it("validates the form when clicking on the submit button.", async () => {
+    const {container} = renderPasswordEditDialog();
 
     const leftClick = {button: 0};
     const submitButton = container.querySelector("input[type=\"submit\"]");
@@ -259,12 +293,12 @@ describe("PasswordCreateDialog", () => {
     expect(passwordErrorMessage.textContent).toBe("A password is required.");
   });
 
-  it("displays an error when the API call fail.", async() => {
+  it("displays an error when the API call fail.", async () => {
     // Mock the request function to make it return an error.
     jest.spyOn(window.port, 'request').mockImplementationOnce(() => {
       throw new PassboltApiFetchError("Jest simulate API error.");
     });
-    const {container} = renderPasswordCreateDialog();
+    const {container} = renderPasswordEditDialog();
 
     const resourceMeta = {
       name: "Password name",
@@ -293,14 +327,14 @@ describe("PasswordCreateDialog", () => {
     expect(generalErrorMessage.textContent).toBe("Jest simulate API error.");
   });
 
-  it("requests the addon to create a resource when clicking on the submit button.", async() => {
+  it("requests the addon to edit a resource when clicking on the submit button.", async () => {
     const createdResourceId = "f2b4047d-ab6d-4430-a1e2-3ab04a2f4fb9";
     // Mock the request function to make it the expected result
     jest.spyOn(window.port, 'request').mockImplementationOnce(jest.fn((message, data) => Object.assign({id: createdResourceId}, data)));
     const props = {
       onClose: jest.fn()
     };
-    const {container} = renderPasswordCreateDialog(null, props);
+    const {container} = renderPasswordEditDialog(null, props);
 
     const resourceMeta = {
       name: "Password name",
@@ -346,7 +380,10 @@ describe("PasswordCreateDialog", () => {
     };
     expect(window.port.request).toHaveBeenCalledWith("passbolt.resources.create", onApiCreateResourceMeta, resourceMeta.password);
     expect(window.port.emit).toHaveBeenCalledTimes(2);
-    expect(window.port.emit).toHaveBeenNthCalledWith(1, "passbolt.notification.display", {"message": "The password has been added successfully", "status": "success"});
+    expect(window.port.emit).toHaveBeenNthCalledWith(1, "passbolt.notification.display", {
+      "message": "The password has been added successfully",
+      "status": "success"
+    });
     expect(window.port.emit).toHaveBeenNthCalledWith(2, "passbolt.resources.select-and-scroll-to", createdResourceId);
     expect(props.onClose).toBeCalled();
   });

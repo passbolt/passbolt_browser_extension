@@ -51,7 +51,7 @@ Share.bulkShare = async function(resources, changes, privateKeySecret, progressC
   const resourcesSecrets = await bulkShareEncrypt(resources, resourcesNewUsers, privateKeySecret, progressCallback);
 
   for (const resourceId in resourcesChanges) {
-    const resource = resources.find(resource => resource.id == resourceId);
+    const resource = resources.find(resource => resource.id === resourceId);
     const permissions = resourcesChanges[resourceId];
     let secrets = resourcesSecrets[resourceId] || [];
     progressCallback(`Sharing password ${resource.name}`);
@@ -70,7 +70,7 @@ const bulkShareAggregateChangesByResource = function(resources, changes) {
 
   for (const i in resources) {
     const resource = resources[i];
-    const resourceChanges = changes.filter(change => change.aco_foreign_key == resource.id);
+    const resourceChanges = changes.filter(change => change.aco_foreign_key === resource.id);
     if (resourceChanges.length) {
       resourcesChanges[resource.id] = resourceChanges
     }
@@ -89,7 +89,7 @@ const bulkShareSimulate = async function(resources, resourcesChanges, progressCa
   const usersToEncryptFor = {};
 
   for (const resourceId in resourcesChanges) {
-    const resource = resources.find(resource => resource.id == resourceId);
+    const resource = resources.find(resource => resource.id === resourceId);
     progressCallback(`Validating share operation for ${resource.name}`);
     const simulateResult = await ShareService.simulateShare(resourceId, resourcesChanges[resourceId]);
     const simulateAddedUsers = simulateResult.changes.added;
@@ -121,7 +121,7 @@ const bulkShareEncrypt = async function(resources, resourcesNewUsers, privateKey
   const secrets = {};
 
   for (const resourceId in resourcesNewUsers) {
-    const resource = resources.find(resource => resource.id == resourceId);
+    const resource = resources.find(resource => resource.id === resourceId);
     const originalArmored = resource.secrets[0].data;
     const users = resourcesNewUsers[resourceId];
     progressCallback(`Encrypting for ${resource.name}`);

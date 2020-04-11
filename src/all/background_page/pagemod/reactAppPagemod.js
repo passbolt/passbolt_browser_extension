@@ -1,32 +1,36 @@
 /**
  * React application pagemod.
  *
- * @copyright (c) 2019 Passbolt SA
+ * @copyright (c) 2020 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-
+const pageMod = require('../sdk/page-mod');
 const app = require('../app');
-const Worker = require('../sdk/worker').Worker;
-const WorkersCollection = require('../model/worker');
+const Worker = require('../model/worker');
 
 /*
- * This page mod drives the react application iframe.
+ * This pagemod help bootstrap the first step of the setup process from a passbolt server app page
+ * The pattern for this url, driving the setup bootstrap, is defined in config.json
  */
-class ReactApp {
+const ReactApp = function () {};
+ReactApp._pageMod = null;
 
-  static init() {
-    chrome.runtime.onConnect.addListener(port => {
-      if (port.name != "react-app") {
-        return;
-      }
+ReactApp.init = function () {
 
-      const worker = new Worker(port, port.sender.tab);
+  if (ReactApp._pageMod) {
+    ReactApp._pageMod.destroy();
+    ReactApp._pageMod = null;
+  }
 
-      // Destroy the worker when the port is destroyed.
-      port.onDisconnect.addListener(() => {
-        worker.destroy('React App pagemod port got disconnected');
-      });
-
+  ReactApp._pageMod = pageMod.PageMod({
+    name: 'ReactApp',
+    include: 'about:blank?passbolt=passbolt-iframe-react-app',
+    contentScriptWhen: 'end',
+    contentScriptFile: [
+      // Warning: script and styles need to be modified in
+      // chrome/data/passbolt-iframe-react-app.html
+    ],
+    onAttach: function (worker) {
       // Initialize the events listeners.
       app.events.folder.listen(worker);
       app.events.resource.listen(worker);
@@ -37,9 +41,9 @@ class ReactApp {
       app.events.share.listen(worker);
       app.events.user.listen(worker);
 
-      WorkersCollection.add('ReactApp', worker);
-    });
-  }
-}
+      Worker.add('ReactApp', worker);
+    }
+  });
+};
 
 exports.ReactApp = ReactApp;

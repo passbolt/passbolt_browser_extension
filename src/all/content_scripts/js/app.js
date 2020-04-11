@@ -1,7 +1,7 @@
 /**
  * Main App.
  *
- * @copyright (c)x 2019 Passbolt SA
+ * @copyright (c) 2020 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
@@ -243,7 +243,7 @@ window.addEventListener('passbolt.plugin.resources.update-local-storage', async 
 window.addEventListener('passbolt.plugin.folders.update-local-storage', async function (event) {
   const requestId = event.detail[0];
   try {
-    await passbolt.request('passbolt.folders.update-local-storage');
+    await passbolt.request('passbolt.app.folders.update-local-storage');
     passbolt.message.emitToPage(requestId, { status: 'SUCCESS' });
   } catch (error) {
     passbolt.message.emitToPage(requestId, { status: 'ERROR', body: error });
@@ -508,169 +508,3 @@ window.addEventListener('passbolt.auth.is-authenticated', async function (event)
     passbolt.message.emitToPage(requestId, { status: 'ERROR', body: error });
   }
 });
-
-/* ==================================================================================
- * React Application
- * ================================================================================== */
-//
-// RESOURCES
-//
-// Insert the resource create dialog.
-window.addEventListener('passbolt.plugin.resources.open-create-dialog', async function (event) {
-  await showReactApp();
-  const folderParentId = event.detail.folderParentId;
-  passbolt.message.emit('passbolt.resources.open-create-dialog', folderParentId);
-});
-
-// Insert the resource edit dialog.
-window.addEventListener('passbolt.plugin.resources.open-edit-dialog', async function (event) {
-  const id = event.detail.id;
-  await showReactApp();
-  passbolt.message.emit('passbolt.resources.open-edit-dialog', id);
-});
-
-//
-// FOLDERS
-//
-// Insert the folder create dialog.
-window.addEventListener('passbolt.plugin.folders.open-create-dialog', async function (event) {
-  await showReactApp();
-  const folderParentId = event.detail.folderParentId;
-  passbolt.message.emit('passbolt.folders.open-create-dialog', folderParentId);
-});
-
-// Insert the folder rename dialog.
-window.addEventListener('passbolt.plugin.folders.open-rename-dialog', async function (event) {
-  if (!event.detail || !event.detail.folderId || !validator.isUUID(event.detail.folderId)) {
-    throw new TypeError('Invalid Appjs request. Folder rename should contain a valid folder ID.');
-  }
-  await showReactApp();
-  passbolt.message.emit('passbolt.folders.open-rename-dialog', event.detail.folderId);
-});
-
-// Insert the folder delete dialog.
-window.addEventListener('passbolt.plugin.folders.open-delete-dialog', async function (event) {
-  if (!event.detail || !event.detail.folderId || !validator.isUUID(event.detail.folderId)) {
-    throw new TypeError('Invalid Appjs request. Folder delete should contain a valid folder ID.');
-  }
-  await showReactApp();
-  passbolt.message.emit('passbolt.folders.open-delete-dialog', event.detail.folderId);
-});
-
-// Insert the folder move dialog.
-window.addEventListener('passbolt.plugin.folders.open-move-dialog', async function (event) {
-  if (!event.detail || !event.detail.folderId || !validator.isUUID(event.detail.folderId)) {
-    throw new TypeError('Invalid Appjs request. Folder delete should contain a valid folder ID.');
-  }
-  await showReactApp();
-  passbolt.message.emit('passbolt.folders.open-move-dialog', event.detail.folderId);
-});
-
-//
-// COMMONS
-//
-// Show the react app.
-passbolt.message.on('passbolt.app.show', function () {
-  showReactApp();
-});
-
-// Hide the react app.
-passbolt.message.on('passbolt.app.hide', function () {
-  hideReactApp();
-});
-
-// Display a notification on the appjs.
-passbolt.message.on('passbolt.notification.display', function (notification) {
-  passbolt.message.emitToPage('passbolt_notify', notification);
-});
-
-// Select and scroll to a resource.
-passbolt.message.on('passbolt.resources.select-and-scroll-to', function (id) {
-  passbolt.message.emitToPage('passbolt.plugin.resources.select-and-scroll-to', id);
-});
-
-// Select and scroll to a folder.
-passbolt.message.on('passbolt.folders.select-and-scroll-to', function (id) {
-  passbolt.message.emitToPage('passbolt.plugin.folders.select-and-scroll-to', id);
-});
-
-// Insert the react application iframe.
-const insertReactAppIframe = function() {
-  const iframeId = 'react-app';
-  const className = '';
-  const appendTo = 'body';
-  const style = "display: none; position: absolute; width: 100%; height:100%; z-index: 999;";
-  return passbolt.html.insertThemedIframe(iframeId, appendTo, className, null, null, style);
-};
-
-// Show the react app.
-const showReactApp = async function() {
-  $('iframe#react-app').css('display', 'block');
-  // Move the focus into the iframe.
-  passbolt.message.emitToPage('passbolt.passbolt-page.remove-all-focuses');
-  let checkCount = 0;
-  return new Promise(function(resolve) {
-    let interval = setInterval(function () {
-      checkCount++;
-      if (checkCount > 200) {
-        clearInterval();
-        resolve();
-      }
-      const appElement = $('iframe#react-app').contents().find('#app');
-      appElement.focus();
-      // If the focus has been set to the element, resolve the promise and
-      // continue, otherwise try again.
-      if (appElement.is(":focus")) {
-        clearInterval(interval);
-        resolve();
-      }
-    }, 10);
-  });
-};
-
-// Hide the react app.
-const hideReactApp = function() {
-  $('iframe#react-app').css('display', 'none');
-};
-
-/* ==================================================================================
- * Handle the ready state.
- * ================================================================================== */
-
-const isWorkerReady = async function() {
-  let resolver;
-  const promise = new Promise(resolve => {resolver = resolve});
-
-  const checkInterval = setInterval(function() {
-    passbolt.request('passbolt.app.is-ready').then(() => {
-      resolver();
-      clearInterval(checkInterval);
-    });
-  }, 100);
-
-  return promise;
-};
-
-const isReactAppReady = function() {
-  let resolver;
-  const promise = new Promise(resolve => {resolver = resolve});
-
-  const checkInterval = setInterval(function() {
-    passbolt.request('passbolt.react-app.is-ready').then(() => {
-      resolver();
-      clearInterval(checkInterval);
-    });
-  }, 100);
-
-  return promise;
-};
-
-const init = async function() {
-  await isWorkerReady();
-  insertReactAppIframe();
-  await isReactAppReady();
-  $('html').addClass('passboltplugin-ready');
-};
-init();
-
-undefined; // result must be structured-clonable data

@@ -1,24 +1,21 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) 2019 Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) 2020 Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) 2019 Passbolt SA (https://www.passbolt.com)
+ * @copyright     Copyright (c) 2020 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.14.0
  */
-
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import AppContext from "../../contexts/AppContext";
-import SvgCloseIcon from "../../img/svg/close";
-import SvgGenerateIcon from "../../img/svg/generate";
-import SvgViewIcon from "../../img/svg/view";
-import SvgWarningÌcon from "../../img/svg/warning";
+import AppContext from "../../../contexts/AppContext";
+import Icon from "../../Common/Icons/Icon";
+import Tooltip from "../../Common/Tooltip/Tooltip";
 
 class PasswordEditDialog extends Component {
   constructor(props, context) {
@@ -205,6 +202,7 @@ class PasswordEditDialog extends Component {
         this.setState({processing: false});
       } else {
         // Unexpected error occurred.
+        console.error(error);
         this.setState({
           error: error.message,
           processing: false
@@ -278,6 +276,7 @@ class PasswordEditDialog extends Component {
         isSecretDecrypted: true
       });
     } catch (error) {
+      console.error(error);
       this.setState({
         isSecretDecrypting: false,
         isSecretDecrypted: false
@@ -425,7 +424,7 @@ class PasswordEditDialog extends Component {
               <span className="dialog-header-subtitle">{this.state.nameOriginal}</span>
             </h2>
             <a className="dialog-close" onClick={this.handleCloseClick}>
-              <SvgCloseIcon/>
+              <Icon name='close' />
               <span className="visually-hidden">cancel</span>
             </a>
           </div>
@@ -464,7 +463,7 @@ class PasswordEditDialog extends Component {
                   <label htmlFor="edit-password-form-password">Password</label>
                   <div className="input text password">
                     <input id="edit-password-form-password" name="password" className="required"
-                      placeholder="Password" required="required" type={this.state.viewPassword ? "text" : "password"}
+                      required="required" type={this.state.viewPassword ? "text" : "password"}
                       onKeyUp={this.handlePasswordInputKeyUp} value={this.state.password}
                       placeholder={passwordPlaceholder} onFocus={this.handlePasswordInputFocus}
                       onBlur={this.handlePasswordInputBlur} onChange={this.handleInputChange}
@@ -475,16 +474,15 @@ class PasswordEditDialog extends Component {
                   <ul className="actions inline">
                     <li>
                       <a onClick={this.handleViewPasswordButtonClick}
-                        className={`password-view button button-icon button-toggle ${this.state.viewPassword ? "selected" : ""}`}>
-                        <SvgViewIcon/>
+                        className={`password-view button button-icon toggle ${this.state.viewPassword ? "selected" : ""}`}>
+                        <Icon name='eye-open' big={true}/>
                         <span className="visually-hidden">view</span>
                       </a>
                     </li>
                     <li>
                       <a onClick={this.handleGeneratePasswordButtonClick}
-                        disabled={this.state.processing || !this.state.isSecretDecrypted}
                         className={`password-generate button-icon button ${this.state.processing || !this.state.isSecretDecrypted ? "disabled" : ""}`}>
-                        <SvgGenerateIcon/>
+                        <Icon name='magic-wand' big={true}/>
                         <span className="visually-hidden">generate</span>
                       </a>
                     </li>
@@ -501,10 +499,8 @@ class PasswordEditDialog extends Component {
                   }
                 </div>
                 <div className="input textarea">
-                  <label htmlFor="edit-password-form-description">Description
-                    <span className="tooltip tooltip-right" data-tooltip="Do not store sensitive data. This field is not end to end encrypted.">
-                      <SvgWarningÌcon/>
-                    </span>
+                  <label htmlFor="edit-password-form-description">Description&nbsp;
+                    <Tooltip message="Do not store sensitive data. Unlike the password, this data is not encrypted." icon="warning" />
                   </label>
                   <textarea id="edit-password-form-description" name="description" maxLength="10000"
                     className="required" placeholder="add a description" value={this.state.description}

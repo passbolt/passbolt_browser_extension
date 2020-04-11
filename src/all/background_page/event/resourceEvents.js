@@ -78,29 +78,6 @@ const listen = function (worker) {
   });
 
   /*
-   * Open the resource create dialog.
-   *
-   * @listens passbolt.resources.open-create-dialog
-   * @param folderParentId {string} The folder parent id
-   */
-  worker.port.on('passbolt.resources.open-create-dialog', async function (folderParentId) {
-    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
-    reactAppWorker.port.emit('passbolt.resources.open-create-dialog', folderParentId);
-  });
-
-  /*
-   * Open the resource edit dialog.
-   *
-   * @listens passbolt.resources.open-edit-dialog
-   */
-  worker.port.on('passbolt.resources.open-edit-dialog', function (id) {
-    console.log(id);
-    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
-    reactAppWorker.port.emit('passbolt.resources.open-edit-dialog', id);
-  });
-
-
-  /*
    * Delete resources
    *
    * @listens passbolt.resources.delete-all

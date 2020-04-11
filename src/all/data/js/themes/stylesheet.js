@@ -77,7 +77,7 @@
     }
 
     getThemePath() {
-      return `css/themes/${this.theme}/ext_iframe.min.css`;
+      return `css/themes/${this.theme}/ext_app.min.css`;
     }
   }
 

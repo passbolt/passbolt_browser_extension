@@ -43,6 +43,7 @@ class SecretDecryptController {
       progressController.update(this.worker, 2, "Complete");
       this.worker.port.emit(this.requestId, 'SUCCESS', message);
     } catch (error) {
+      console.error(error);
       this.worker.port.emit(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
     }
 

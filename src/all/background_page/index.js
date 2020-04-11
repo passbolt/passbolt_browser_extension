@@ -62,7 +62,6 @@ var main = function() {
     const auth = new GpgAuth();
     auth.isAuthenticated()
       .then(() => {
-        pageMods.ReactApp.init();
         pageMods.PassboltApp.init();
         auth.startCheckAuthStatusLoop();
       });
@@ -78,12 +77,13 @@ var main = function() {
   pageMods.Clipboard.init();
   pageMods.PassboltAuthForm.init();
   pageMods.SecretEditDialog.init();
-  pageMods.ShareDialog.init();
+  // pageMods.ShareDialog.init();
   pageMods.GroupEditDialog.init();
   pageMods.GroupEditAutocompleteDialog.init();
   pageMods.ImportPasswordsDialog.init();
   pageMods.ExportPasswordsDialog.init();
   pageMods.QuickAccess.init();
+  pageMods.ReactApp.init();
 
   // Debug pagemod
   if (Config.isDebug()) {

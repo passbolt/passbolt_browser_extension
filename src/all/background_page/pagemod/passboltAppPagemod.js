@@ -73,11 +73,11 @@ PassboltApp.initPageMod = function () {
 
       // App
       'content_scripts/js/secret/editIframe.js',
-      'content_scripts/js/secret/shareIframe.js',
       'content_scripts/js/group/editIframe.js',
       'content_scripts/js/import/importPasswordsIframe.js',
       'content_scripts/js/export/exportPasswordsIframe.js',
-      'content_scripts/js/app.js'
+      'content_scripts/js/app.js',
+      'content_scripts/js/react-app.js'
     ],
     attachTo: ["existing", "top"],
     onAttach: async function (worker) {
@@ -91,11 +91,9 @@ PassboltApp.initPageMod = function () {
 
       app.events.auth.listen(worker);
       app.events.clipboard.listen(worker);
-      app.events.config.listen(worker);
       app.events.editPassword.listen(worker);
       app.events.exportPasswordsIframe.listen(worker);
       app.events.favorite.listen(worker);
-      app.events.folder.listen(worker);
       app.events.keyring.listen(worker);
       app.events.secret.listen(worker);
       app.events.group.listen(worker);
@@ -104,6 +102,7 @@ PassboltApp.initPageMod = function () {
       app.events.user.listen(worker);
       app.events.resource.listen(worker);
       app.events.app.listen(worker);
+      app.events.share.listen(worker);
 
       Worker.add('App', worker);
     }

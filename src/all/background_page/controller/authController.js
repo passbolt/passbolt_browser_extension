@@ -98,7 +98,6 @@ AuthController.prototype._syncUserSettings = async function () {
  * @param {Error} redirect The uri to redirect the user to after login.
  */
 AuthController.prototype._handleLoginSuccess = async function (redirect) {
-  await app.pageMods.ReactApp.init();
   await app.pageMods.PassboltApp.init();
 
   if (this.worker.pageMod && this.worker.pageMod.args.name == "AuthForm") {

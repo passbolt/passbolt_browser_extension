@@ -6,16 +6,15 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var Keyring = require('../model/keyring').Keyring;
-const passphraseController = require('../controller/passphrase/passphraseController');
-var progressController = require('../controller/progress/progressController');
-var Permission = require('../model/permission').Permission;
-var Resource = require('../model/resource').Resource;
-var Share = require('../model/share').Share;
-var TabStorage = require('../model/tabStorage').TabStorage;
-var Worker = require('../model/worker');
+const {ShareController} = require('../controller/share/shareController');
+const {Permission} = require('../model/permission');
+const {Resource} = require('../model/resource');
+const {Share} = require('../model/share');
+const {TabStorage} = require('../model/tabStorage');
+const Worker = require('../model/worker');
 
-var listen = function (worker) {
+const listen = function (worker) {
+
 
   /*
    * Search aros based on keywords.
@@ -34,14 +33,14 @@ var listen = function (worker) {
     worker.port.emit(requestId, 'SUCCESS', aros);
   });
 
-  /*
-   * Retrieve the ids of the resources to share.
-   * @listens passbolt.share.get-resources-ids
-   */
-  worker.port.on('passbolt.share.get-resources-ids', function (requestId) {
-    const resourcesIds = TabStorage.get(worker.tab.id, 'shareResourcesIds');
-    worker.port.emit(requestId, 'SUCCESS', resourcesIds);
-  });
+  // /*
+  //  * Retrieve the ids of the resources to share.
+  //  * @listens passbolt.share.get-resources-ids
+  //  */
+  // worker.port.on('passbolt.share.get-resources-ids', function (requestId) {
+  //   const resourcesIds = TabStorage.get(worker.tab.id, 'shareResourcesIds');
+  //   worker.port.emit(requestId, 'SUCCESS', resourcesIds);
+  // });
 
   /*
    * Retrieve the resources to share.
@@ -68,31 +67,15 @@ var listen = function (worker) {
    * @listens passbolt.share.submit
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.share.submit', async function (requestId, changes) {
-    const appWorker = Worker.get('App', worker.tab.id);
-    const resources = TabStorage.get(worker.tab.id, 'shareResources');
-    const keyring = new Keyring();
-    let progress = 0;
-    // 3+1 :
-    // 3: the simulate call to the API + the encrypting step + the share call to the API
-    // 1: the initialization phase, in other words this function
-    const progressGoal = resources.length * 3 + 1;
-
+  worker.port.on('passbolt.share.save', async function (requestId, resources, changes) {
+    const controller = new ShareController(worker, requestId);
     try {
-      const privateKeySecret = await passphraseController.get(worker);
-      progressController.start(appWorker, `Share ${resources.length} passwords`, progressGoal);
-      progressController.update(appWorker, progress++, 'Initialize');
-      await keyring.sync();
-      await Share.bulkShare(resources, changes, privateKeySecret, message => {
-        progressController.update(appWorker, progress++, message);
-      });
+      await controller.main(resources, changes);
       worker.port.emit(requestId, 'SUCCESS');
-      progressController.complete(appWorker);
-      appWorker.port.emit('passbolt.share.complete', resources.map(resource => resource.id));
-    } catch(error) {
-      progressController.complete(appWorker);
+      //appWorker.port.emit('passbolt.share.complete', results);
+    } catch (error) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      appWorker.port.emit('passbolt.share.error', worker.port.getEmitableError(error));
+      //appWorker.port.emit('passbolt.share.error', worker.port.getEmitableError(error));
     }
   });
 
@@ -102,18 +85,10 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.share.close', function() {
-    const appWorker = Worker.get('App', worker.tab.id);
-    appWorker.port.emit('passbolt.share.close');
-  });
-
-  /*
-   * Go to the edit dialog.
-   * @listens passbolt.share.close
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.share.go-to-edit', function() {
-    const appWorker = Worker.get('App', worker.tab.id);
-    appWorker.port.emit('passbolt.share.go-to-edit');
+    TabStorage.remove(worker.tab.id, 'shareResourcesIds');
+    TabStorage.remove(worker.tab.id, 'shareResources');
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.share.close-share-dialog');
   });
 
 };

@@ -1,12 +1,12 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) 2019 Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) 2020 Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) 2019 Passbolt SA (https://www.passbolt.com)
+ * @copyright     Copyright (c) 2020 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.12.0
@@ -15,11 +15,11 @@
 import React from "react";
 import {render, fireEvent, wait, cleanup} from "@testing-library/react";
 import PassphraseEntryDialog from "./PassphraseEntryDialog";
-import AppContext from "../../contexts/AppContext";
-import "../../../lib/secretComplexity";
-import {UserAbortsOperationError} from "../../../../../background_page/error/userAbortsOperationError";
+import AppContext from "../../../contexts/AppContext";
+import "../../../../lib/secretComplexity";
+import {UserAbortsOperationError} from "../../../../../../background_page/error/userAbortsOperationError";
 
-const PassboltApiFetchError = require("../../../../../background_page/error/passboltApiFetchError").PassboltApiFetchError;
+const PassboltApiFetchError = require("../../../../../../background_page/error/passboltApiFetchError").PassboltApiFetchError;
 
 beforeEach(() => {
   jest.resetModules();
@@ -259,7 +259,7 @@ describe("PassphraseEntryDialog", () => {
   it("Should allow only 3 attempts.", async() => {
     // Mock the request function to make it return an error.
     jest.spyOn(window.port, 'request').mockImplementation(jest.fn(message => {
-      if (message == "passbolt.keyring.private.checkpassphrase") {
+      if (message === "passbolt.keyring.private.checkpassphrase") {
         throw new Error();
       }
     }));

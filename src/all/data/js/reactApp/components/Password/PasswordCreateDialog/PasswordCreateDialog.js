@@ -1,24 +1,22 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) 2019 Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) 2020 Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) 2019 Passbolt SA (https://www.passbolt.com)
+ * @copyright     Copyright (c) 2020 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.14.0
  */
-
 import React, {Component} from "react";
 import PropTypes from "prop-types";
-import AppContext from "../../contexts/AppContext";
-import SvgCloseIcon from "../../img/svg/close";
-import SvgGenerateIcon from "../../img/svg/generate";
-import SvgViewIcon from "../../img/svg/view";
-import SvgWarningÌcon from "../../img/svg/warning";
+
+import AppContext from "../../../contexts/AppContext";
+import Icon from "../../Common/Icons/Icon";
+import Tooltip from "../../Common/Tooltip/Tooltip";
 
 class PasswordCreateDialog extends Component {
   constructor() {
@@ -98,6 +96,7 @@ class PasswordCreateDialog extends Component {
         this.setState({processing: false});
       } else {
         // Unexpected error occurred.
+        console.error(error);
         this.setState({
           error: error.message,
           processing: false
@@ -343,7 +342,7 @@ class PasswordCreateDialog extends Component {
           <div className="dialog-header">
             <h2>Create a password</h2>
             <a className="dialog-close" onClick={this.handleCloseClick}>
-              <SvgCloseIcon/>
+              <Icon name='close'/>
               <span className="visually-hidden">cancel</span>
             </a>
           </div>
@@ -393,15 +392,15 @@ class PasswordCreateDialog extends Component {
                   <ul className="actions inline">
                     <li>
                       <a onClick={this.handleViewPasswordButtonClick}
-                        className={`password-view button button-icon button-toggle ${this.state.viewPassword ? "selected" : ""}`}>
-                        <SvgViewIcon/>
+                        className={`password-view button button-icon toggle ${this.state.viewPassword ? "selected" : ""}`}>
+                        <Icon name='eye-open' big={true}/>
                         <span className="visually-hidden">view</span>
                       </a>
                     </li>
                     <li>
                       <a onClick={this.handleGeneratePasswordButtonClick}
                         className="password-generate button-icon button">
-                        <SvgGenerateIcon/>
+                        <Icon name='magic-wand' big={true}/>
                         <span className="visually-hidden">generate</span>
                       </a>
                     </li>
@@ -418,10 +417,8 @@ class PasswordCreateDialog extends Component {
                   }
                 </div>
                 <div className="input textarea">
-                  <label htmlFor="create-password-form-description">Description
-                    <span className="tooltip tooltip-right" data-tooltip="Do not store sensitive data. This field is not end to end encrypted.">
-                      <SvgWarningÌcon/>
-                    </span>
+                  <label htmlFor="create-password-form-description">Description&nbsp;
+                    <Tooltip message="Do not store sensitive data. Unlike the password, this data is not encrypted." icon="warning" />
                   </label>
                   <textarea id="create-password-form-description" name="description" maxLength="10000"
                     className="required" placeholder="add a description" value={this.state.description}

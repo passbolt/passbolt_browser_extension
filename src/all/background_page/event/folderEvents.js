@@ -8,88 +8,12 @@ const {FolderEntity} = require('../model/entity/folder/folderEntity');
 const {FolderModel} = require('../model/folderModel');
 const {FolderMoveController} = require('../controller/folder/folderMoveController');
 const {User} = require('../model/user');
-const Worker = require('../model/worker');
 
 const listen = function (worker) {
 
   // ================================
-  // DIALOG ACTIONS
-  // ================================
-
-  /*
-   * Open the folder create dialog.
-   *
-   * @listens passbolt.folders.open-create-dialog
-   * @param folderParentId {string} The folder parent id
-   */
-  worker.port.on('passbolt.folders.open-create-dialog', async function (folderParentId) {
-    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
-    reactAppWorker.port.emit('passbolt.folders.open-create-dialog', folderParentId);
-  });
-
-  /*
-   * Open the folder rename dialog.
-   *
-   * @listens passbolt.folders.open-create-dialog
-   * @param requestId {uuid} The request identifier
-   * @param folder {object} The folder meta data
-   * @param password {string} The password to encrypt
-   */
-  worker.port.on('passbolt.folders.open-rename-dialog', async function (folderId) {
-    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
-    reactAppWorker.port.emit('passbolt.folders.open-rename-dialog', folderId);
-  });
-
-  /*
-   * Open the folder delete dialog.
-   *
-   * @listens passbolt.folders.open-create-dialog
-   * @param requestId {uuid} The request identifier
-   * @param folder {object} The folder meta data
-   * @param password {string} The password to encrypt
-   */
-  worker.port.on('passbolt.folders.open-delete-dialog', async function (folderId) {
-    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
-    reactAppWorker.port.emit('passbolt.folders.open-delete-dialog', folderId);
-  });
-
-  /*
-   * Open the folder move dialog.
-   *
-   * @listens passbolt.folders.open-create-dialog
-   * @param requestId {uuid} The request identifier
-   * @param folder {object} The folder meta data
-   * @param password {string} The password to encrypt
-   */
-  worker.port.on('passbolt.folders.open-move-dialog', async function (folderId) {
-    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
-    reactAppWorker.port.emit('passbolt.folders.open-move-dialog', folderId);
-  });
-
-  // ================================
   // SERVICE ACTIONS
   // ================================
-
-  /*
-   * Pull the resources from the API and update the local storage.
-   *
-   * @listens passbolt.folders.update-local-storage
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.folders.update-local-storage', async function (requestId) {
-    try {
-      let folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
-      await folderModel.updateLocalStorage();
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
-    }
-  });
 
   /*
    * Validate a folder

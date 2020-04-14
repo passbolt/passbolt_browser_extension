@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
+## [2.12.2] - 2020-14-04
+### Fixed
+- PB-1209: Bump jQuery to v3.5
 
 ## [2.12.1] - 2020-03-04
 ### Improved

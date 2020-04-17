@@ -47,7 +47,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.secret-edit.decrypt', async function (requestId, resourceId) {
     // Before v2.7.0, resourceId was passed through an object stored in the TabStorage.
-    // @deprecated since v2.7.0 will be removed with v2.3.0
+    // @deprecated since v2.7.0 will be removed with v3.0.0
     if (!resourceId) {
       const tabStorageEditedPassword = TabStorage.get(worker.tab.id, 'editedPassword');
       if (tabStorageEditedPassword) {

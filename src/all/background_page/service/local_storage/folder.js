@@ -117,7 +117,7 @@ FolderLocalStorage.delete = async function (folderId) {
 FolderLocalStorage.flush();
 
 // Flush the local storage when the passbolt user session is terminated
-window.addEventListener("passbolt.auth.logged-out", () => {
+window.addEventListener("passbolt.global.auth.logged-out", () => {
   FolderLocalStorage.flush();
 });
 

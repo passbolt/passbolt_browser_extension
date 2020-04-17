@@ -74,7 +74,7 @@ var passbolt = window.passbolt || {};
    * Emit a message to the page.
    *
    * @param message {string} message name
-   * @param data {array} the data associated to the message
+   * @param data {object} the data associated to the message
    */
   passbolt.message.emitToPage = function (message, data) {
     // Bundle the event data;

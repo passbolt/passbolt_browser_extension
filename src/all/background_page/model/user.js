@@ -338,7 +338,7 @@ const User = (function () {
     };
 
     // If the seconds parameters is not equal to -1, set a timeout to flush the master passphrase at the end
-    // of the defined period. If it is set to -1 it will be flushed based on the passbolt.auth.logged-out
+    // of the defined period. If it is set to -1 it will be flushed based on the passbolt.global.auth.logged-out
     // event or when the browser is closed.
     if (seconds !== -1) {
       this._masterPassword.timeout = setTimeout(() => {
@@ -526,7 +526,7 @@ var UserSingleton = (function () {
 
 // Observe when the user session is terminated.
 // - Flush the temporary stored master password
-window.addEventListener("passbolt.auth.logged-out", () => {
+window.addEventListener("passbolt.global.auth.logged-out", () => {
   const user = UserSingleton.getInstance();
   user.flushMasterPassword();
 });

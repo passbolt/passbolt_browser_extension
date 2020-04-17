@@ -104,8 +104,9 @@ class PasswordEditDialog extends Component {
     const passwordInputHasFocus = true;
     this.setState({passwordInputHasFocus: passwordInputHasFocus});
     if (!this.state.isSecretDecrypted) {
-      await this.decryptSecret();
-      this.passwordInputRef.current.focus();
+      if(await this.decryptSecret()) {
+        this.passwordInputRef.current.focus();
+      }
     }
   }
 
@@ -199,6 +200,7 @@ class PasswordEditDialog extends Component {
     } catch (error) {
       // It can happen when the user has closed the passphrase entry dialog by instance.
       if (error.name === "UserAbortsOperationError") {
+        this.passwordInputRef.current.blur();
         this.setState({processing: false});
       } else {
         // Unexpected error occurred.
@@ -276,7 +278,7 @@ class PasswordEditDialog extends Component {
         isSecretDecrypted: true
       });
     } catch (error) {
-      console.error(error);
+      this.passwordInputRef.current.blur();
       this.setState({
         isSecretDecrypting: false,
         isSecretDecrypted: false

@@ -29,7 +29,7 @@ class Autocomplete extends Component {
     this.bindEventHandlers();
     this.createInputRefs();
     this.state = this.getDefaultState();
-    this.getItemsDebounced = debounce(this.getItems, 150, {leading: true});
+    this.getItemsDebounced = debounce(this.getItems, 250, {leading: true});
     this.cache = [];
     this.cacheExpiry = 10000; // in ms (aka 10s)
   }

@@ -86,10 +86,7 @@ class ReactApp extends Component {
 
       // progress dialog
       showProgressDialog: false,
-      progressDialogProps: {
-        goals: 2,
-        message: "test"
-      },
+      progressDialogProps: {},
 
       // error dialog
       showErrorDialog: false,
@@ -97,7 +94,6 @@ class ReactApp extends Component {
         title: null,
         message: null
       },
-
     };
   }
 
@@ -108,8 +104,10 @@ class ReactApp extends Component {
     this.handleErrorDialogCloseEvent = this.handleErrorDialogCloseEvent.bind(this);
     this.handlePassphraseEntryRequestEvent = this.handlePassphraseEntryRequestEvent.bind(this);
     this.handlePassphraseDialogClose = this.handlePassphraseDialogClose.bind(this);
-    this.handleProgressStartEvent = this.handleProgressStartEvent.bind(this);
-    this.handleProgressCompleteEvent = this.handleProgressCompleteEvent.bind(this);
+    this.handleProgressDialogOpenEvent = this.handleProgressDialogOpenEvent.bind(this);
+    this.handleProgressDialogUpdateEvent = this.handleProgressDialogUpdateEvent.bind(this);
+    this.handleProgressDialogUpdateGoalsEvent = this.handleProgressDialogUpdateGoalsEvent.bind(this);
+    this.handleProgressDialogCloseEvent = this.handleProgressDialogCloseEvent.bind(this);
     this.handleResourceCreateDialogOpenEvent = this.handleResourceCreateDialogOpenEvent.bind(this);
     this.handleResourceCreateDialogCloseEvent = this.handleResourceCreateDialogCloseEvent.bind(this);
     this.handleResourceEditDialogOpenEvent = this.handleResourceEditDialogOpenEvent.bind(this);
@@ -129,8 +127,10 @@ class ReactApp extends Component {
     port.on('passbolt.react-app.is-ready', this.handleIsReadyEvent);
     port.on('passbolt.errors.open-error-dialog', this.handleErrorDialogOpenEvent);
     port.on('passbolt.passphrase.request', this.handlePassphraseEntryRequestEvent);
-    port.on('passbolt.progress.start', this.handleProgressStartEvent);
-    port.on('passbolt.progress.complete', this.handleProgressCompleteEvent);
+    port.on('passbolt.progress.open-progress-dialog', this.handleProgressDialogOpenEvent);
+    port.on("passbolt.progress.update", this.handleProgressDialogUpdateEvent);
+    port.on("passbolt.progress.update-goals", this.handleProgressDialogUpdateGoalsEvent);
+    port.on('passbolt.progress.close-progress-dialog', this.handleProgressDialogCloseEvent);
     port.on('passbolt.resources.open-create-dialog', this.handleResourceCreateDialogOpenEvent);
     port.on('passbolt.resources.open-edit-dialog', this.handleResourceEditDialogOpenEvent);
     port.on('passbolt.folders.open-create-dialog', this.handleFolderCreateDialogOpenEvent);
@@ -139,28 +139,16 @@ class ReactApp extends Component {
     port.on('passbolt.share.open-share-dialog', this.handleShareDialogOpenEvent);
   }
 
-  async getUserSettings() {
-    const storageData = await browser.storage.local.get(["_passbolt_data"]);
-    this.setState({user: storageData._passbolt_data.config});
-  }
-
-  handleStorageChange(changes) {
-    if (changes.resources) {
-      const resources = changes.resources.newValue;
-      this.setState({resources: resources});
-    }
-    if (changes.folders) {
-      const folders = changes.folders.newValue;
-      this.setState({folders: folders});
-    }
-  }
-
   handleIsReadyEvent(requestId) {
     if (this.isReady()) {
       port.emit(requestId, "SUCCESS");
     } else {
       port.emit(requestId, "ERROR");
     }
+  }
+
+  isReady() {
+    return this.state.user !== null;
   }
 
   async getResources() {
@@ -179,13 +167,29 @@ class ReactApp extends Component {
     }
   }
 
+  async getUserSettings() {
+    const storageData = await browser.storage.local.get(["_passbolt_data"]);
+    this.setState({user: storageData._passbolt_data.config});
+  }
+
+  handleStorageChange(changes) {
+    if (changes.resources) {
+      const resources = changes.resources.newValue;
+      this.setState({resources: resources});
+    }
+    if (changes.folders) {
+      const folders = changes.folders.newValue;
+      this.setState({folders: folders});
+    }
+  }
+
+  //=============================================================
+  // Generic error dialog events
+  //=============================================================
+
   async rememberMeInfo() {
     const rememberMeOptions = await port.request('passbolt.site.settings.plugins.rememberMe');
     this.setState({rememberMeOptions: rememberMeOptions});
-  }
-
-  isReady() {
-    return this.state.user !== null;
   }
 
   handleErrorDialogOpenEvent(title, message) {
@@ -198,21 +202,54 @@ class ReactApp extends Component {
     port.emit('passbolt.app.hide');
   }
 
+  //=============================================================
+  // Passphrase  Events
+  //=============================================================
+
   handlePassphraseEntryRequestEvent(requestId) {
     this.setState({showPassphraseEntryDialog: true, passphraseRequestId: requestId});
   }
 
-  handleProgressStartEvent(title, goals, message) {
+  handlePassphraseDialogClose() {
+    this.setState({showPassphraseEntryDialog: false, passphraseRequestId: null});
+  }
+
+  //=============================================================
+  // Progress dialog events
+  //=============================================================
+
+  handleProgressDialogOpenEvent(title, goals, message) {
     const progressDialogProps = {title: title, message: message, goals: goals};
     this.setState({showProgressDialog: true, progressDialogProps: progressDialogProps});
   }
 
-  handleProgressCompleteEvent() {
-    this.setState({showProgressDialog: false});
+  handleProgressDialogUpdateEvent(message, completed) {
+    let progressDialogProps = this.state.progressDialogProps;
+    progressDialogProps.message = message || progressDialogProps.message;
+    progressDialogProps.completed = completed;
+    this.setState({progressDialogProps: progressDialogProps});
   }
 
-  handlePassphraseDialogClose() {
-    this.setState({showPassphraseEntryDialog: false, passphraseRequestId: null});
+  handleProgressDialogUpdateGoalsEvent(goals) {
+    let progressDialogProps = this.state.progressDialogProps;
+    progressDialogProps.goals = goals;
+    this.setState({progressDialogProps: progressDialogProps});
+  }
+
+  handleProgressDialogCloseEvent() {
+    let progressDialogProps = this.state.progressDialogProps;
+    progressDialogProps.completed = progressDialogProps.goals;
+    this.setState({showProgressDialog: true, progressDialogProps: progressDialogProps}, () => {
+      this.setState({showProgressDialog: false, progressDialogProps: null});
+    });
+  }
+
+  //=============================================================
+  // Resource Dialogs Events
+  //=============================================================
+
+  handleResourceEditDialogOpenEvent(id) {
+    this.setState({showPasswordEditDialog: true, passwordEditDialogProps: {id: id}});
   }
 
   handleResourceCreateDialogCloseEvent() {
@@ -224,6 +261,23 @@ class ReactApp extends Component {
     const resourceCreateDialogProps = {folderParentId};
     this.setState({showResourceCreateDialog: true, resourceCreateDialogProps});
   }
+
+  //=============================================================
+  // Share Dialog Events
+  //=============================================================
+
+  handleShareDialogOpenEvent(itemsToShare) {
+    this.setState({showShareDialog: true, shareDialogProps: itemsToShare});
+  }
+
+  handleShareDialogCloseEvent() {
+    this.setState({showShareDialog: false, shareDialogProps: null});
+    port.emit('passbolt.app.hide');
+  }
+
+  //=============================================================
+  // Folder Dialogs Events
+  //=============================================================
 
   handleFolderCreateDialogOpenEvent(folderParentId) {
     const folderCreateDialogProps = {folderParentId};
@@ -261,18 +315,6 @@ class ReactApp extends Component {
     port.emit('passbolt.app.hide');
   }
 
-  handleResourceEditDialogOpenEvent(id) {
-    this.setState({showPasswordEditDialog: true, passwordEditDialogProps: {id: id}});
-  }
-
-  handleShareDialogOpenEvent(resourcesIds, foldersIds) {
-    this.setState({showShareDialog: true, shareDialogProps: {resourcesIds, foldersIds}});
-  }
-
-  handleShareDialogCloseEvent() {
-    this.setState({showShareDialog: false, shareDialogProps: null});
-    port.emit('passbolt.app.hide');
-  }
 
   render() {
     const isReady = this.isReady();
@@ -313,9 +355,9 @@ class ReactApp extends Component {
                 {this.state.showProgressDialog &&
                 <ProgressDialog title={this.state.progressDialogProps.title}
                                 goals={this.state.progressDialogProps.goals}
-                                message={this.state.progressDialogProps.message}/>
+                                message={this.state.progressDialogProps.message}
+                                completed={this.state.progressDialogProps.completed} />
                 }
-
                 {this.state.showPassphraseEntryDialog &&
                 <PassphraseEntryDialog requestId={this.state.passphraseRequestId}
                                        onClose={this.handlePassphraseDialogClose}/>

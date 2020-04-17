@@ -19,7 +19,12 @@ const Crypto = require('../../model/crypto').Crypto;
 const progressController = require('../progress/progressController');
 
 class ResourceUpdateController {
-
+  /**
+   * Constructor
+   *
+   * @param {Worker} worker
+   * @param {string} requestId
+   */
   constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
@@ -30,20 +35,23 @@ class ResourceUpdateController {
    *
    * @param {array} resource The resource meta data.
    * @param {string} password The secret in clear.
+   * @throws
    */
   async main(resource, password) {
     if (password) {
-      const secrets = await this.encryptPassword(resource, password);
-      resource.secrets = secrets;
+      resource.secrets = await this.encryptPassword(resource, password);
       await progressController.update(this.worker, 3, "Updating password");
     } else {
-      progressController.start(this.worker, "Updating password");
+      await progressController.start(this.worker, "Updating password");
     }
-
-    const updatedResource = await Resource.update(resource);
-    progressController.complete(this.worker);
-
-    return updatedResource;
+    try {
+      const updatedResource = await Resource.update(resource);
+      await progressController.complete(this.worker);
+      return updatedResource;
+    } catch(error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   async encryptPassword(resource, password) {

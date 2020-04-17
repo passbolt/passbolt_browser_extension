@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.12.0
  */
-
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import AppContext from "../../contexts/AppContext";
@@ -19,50 +18,19 @@ import AppContext from "../../contexts/AppContext";
 class ProgressDialog extends Component {
   constructor(props) {
     super(props);
-    this.state = this.getDefaultState();
-    this.initEventHandlers();
-  }
-
-  getDefaultState() {
-    return {
-      goals: this.props.goals || 0,
-      message: this.props.message || "",
-      completed: 0,
-    };
-  }
-
-  initEventHandlers() {
-    this.handleBackgroundPageProgressUpdateEvent = this.handleBackgroundPageProgressUpdateEvent.bind(this);
-    port.on("passbolt.progress.update", this.handleBackgroundPageProgressUpdateEvent);
-    this.handleBackgroundPageProgressUpdateGoalsEvent = this.handleBackgroundPageProgressUpdateGoalsEvent.bind(this);
-    port.on("passbolt.progress.update-goals", this.handleBackgroundPageProgressUpdateGoalsEvent);
-  }
-
-  handleBackgroundPageProgressUpdateEvent(message, completed) {
-    this.setState({
-      message: message || this.state.message,
-      completed: completed
-    });
-  }
-
-  handleBackgroundPageProgressUpdateGoalsEvent(goals) {
-    this.setState({goals: goals});
   }
 
   calculateProgress() {
-    let progress = 100;
-    if (this.state.goals) {
-      progress = Math.round((100 * this.state.completed) / this.state.goals);
+    if (!this.props.goals) {
+      return 0;
     }
-
-    return progress;
+    return Math.round((100 * this.props.completed) / this.props.goals);
   }
 
   render() {
-    const displayDetailsSection = this.state.goals || false;
+    const displayDetailsSection = this.props.goals || false;
     const progress = this.calculateProgress();
     const progressBarStyle = {width: `${progress}%`};
-    // @todo Adjust the styleguide.
     const progressLabelStyle = {float: "right"};
 
     return (
@@ -72,7 +40,6 @@ class ProgressDialog extends Component {
             <h2>{this.props.title}</h2>
           </div>
           <div className="dialog-content">
-            {/* Form content class to have the white background */}
             <div className="form-content">
               <label>Take a deep breath and enjoy being in the present moment...</label>
               <div className="progress-bar-wrapper">
@@ -82,7 +49,7 @@ class ProgressDialog extends Component {
               </div>
               {displayDetailsSection &&
               <div className="progress-details">
-                <span className="progress-step-label">&nbsp; {this.state.message}</span>
+                <span className="progress-step-label">&nbsp; {this.props.message}</span>
                 <span style={progressLabelStyle} className="progress-percent">{progress}%</span>
               </div>
               }
@@ -99,11 +66,18 @@ class ProgressDialog extends Component {
 
 ProgressDialog.contextType = AppContext;
 
+ProgressDialog.defaultProps = {
+  title: 'Please wait...',
+  message: 'Please wait...',
+  completed: 0,
+  goal: 0
+};
+
 ProgressDialog.propTypes = {
   title: PropTypes.string,
   goals: PropTypes.number,
+  completed: PropTypes.number,
   message: PropTypes.string
 };
 
 export default ProgressDialog;
-

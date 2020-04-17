@@ -18,12 +18,12 @@ const Worker = require('../../model/worker');
 const start = function (worker, title, goals, message) {
   // If the source of the request is a legacy worker then display the react app that will be in charge of
   // treating the progress events.
-  if (isLegacyWorker(worker)) {
+  if (worker.isLegacyWorker()) {
     const appWorker = Worker.get('App', worker.tab.id);
     appWorker.port.emit('passbolt.app.show');
   }
   const progressWorker = getProgressWorker(worker);
-  progressWorker.port.emit('passbolt.progress.start', title, goals, message)
+  progressWorker.port.emit('passbolt.progress.open-progress-dialog', title, goals, message)
 };
 exports.start = start;
 
@@ -34,9 +34,9 @@ exports.start = start;
  */
 const complete = function (worker) {
   const progressWorker = getProgressWorker(worker);
-  progressWorker.port.emit('passbolt.progress.complete');
+  progressWorker.port.emit('passbolt.progress.close-progress-dialog');
   // If the source of the request is a legacy worker then hide the react app.
-  if (isLegacyWorker(worker)) {
+  if (worker.isLegacyWorker()) {
     const appWorker = Worker.get('App', worker.tab.id);
     appWorker.port.emit('passbolt.app.hide');
   }
@@ -72,25 +72,13 @@ exports.updateGoals = updateGoals;
  * The progress dialog is now managed by the new react application.
  * The treatment of the requests coming from any legacy worker (Import, Export) should be delegated to the new
  * react application.
- * @param {Worker} srcWorker The source worker.
+ * @param {Worker} worker The source worker.
  * @return {Worker}
  */
-const getProgressWorker = function (srcWorker) {
-  if (isLegacyWorker(srcWorker)) {
-    return Worker.get('ReactApp', srcWorker.tab.id);
+const getProgressWorker = function (worker) {
+  if (worker.isLegacyWorker()) {
+    return Worker.get('ReactApp', worker.tab.id);
   }
 
-  return srcWorker;
-};
-
-/**
- * A worker is considered legacy if a pageMod is associated to it.
- * We considered them as legacy because they are going to be migrated soon to the new react application.
- *
- * @param worker
- * @returns {boolean}
- */
-const isLegacyWorker = function (worker) {
-  // If a pageMod is associated to the source worker, then the worker is a legacy worker (App, Import, Export ...).
-  return worker.pageMod !== undefined;
+  return worker;
 };

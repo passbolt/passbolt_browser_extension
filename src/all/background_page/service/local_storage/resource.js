@@ -119,7 +119,7 @@ ResourceLocalStorage.deleteResourcesById = async function (resourcesIds) {
 ResourceLocalStorage.flush();
 
 // Flush the local storage when the passbolt user session is terminated
-window.addEventListener("passbolt.auth.logged-out", () => {
+window.addEventListener("passbolt.global.auth.logged-out", () => {
   ResourceLocalStorage.flush();
 });
 

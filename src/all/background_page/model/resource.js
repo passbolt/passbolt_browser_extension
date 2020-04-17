@@ -83,6 +83,7 @@ Resource.prototype.toCsvEntry = function (resource, mapping) {
 /**
  * Import a resource on the server.
  * Import is different than save here because we will use a different passbolt pro entry point.
+ *
  * @param resource
  */
 Resource.import = function (resource) {
@@ -126,9 +127,10 @@ Resource.import = function (resource) {
 
 /**
  * Find resource to share
- * @param resourceId
+ *
  * @deprecated since v2.4.0 will be removed in v3.0
  * replaced by the findShareResources function.
+ * @param resourceId
  */
 Resource.findShareResource = async function (resourceId) {
   const user = User.getInstance();
@@ -161,6 +163,7 @@ Resource.findShareResource = async function (resourceId) {
 
 /**
  * Find resources to share
+ *
  * @param {array} resourcesIds
  * @returns {array|Error}
  */
@@ -228,6 +231,7 @@ Resource.updateLocalStorage = async function () {
 
 /**
  * Find all the resources
+ *
  * @param {object} options Options to apply to the find request
  * @return {Promise}
  */
@@ -237,6 +241,7 @@ Resource.findAll = async function (options) {
 
 /**
  * Save a resource
+ *
  * @param {object} data The resource data
  * @return {Promise}
  */
@@ -251,6 +256,7 @@ Resource.save = async function (data) {
 
 /**
  * Save a resource
+ *
  * @param {object} data The resource data
  * @return {Promise}
  */
@@ -266,6 +272,7 @@ Resource.update = async function (data) {
 
 /**
  * Delete all the resources
+ *
  * @param {array} resourcesIds The resources ids to delete
  * @return {Promise}
  */

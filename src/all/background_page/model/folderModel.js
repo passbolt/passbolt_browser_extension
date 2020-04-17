@@ -17,7 +17,6 @@ const {FolderLocalStorage} = require('../service/local_storage/folder');
 const FOLDER_API_NAME = 'folders';
 
 class FolderModel {
-
   /**
    * Constructor
    *
@@ -26,11 +25,11 @@ class FolderModel {
    */
   constructor(apiClientOptions) {
     apiClientOptions.setResourceName(FOLDER_API_NAME);
-    this.client = new ApiClient(apiClientOptions);
+    this.apiClient = new ApiClient(apiClientOptions);
   }
 
   /**
-   * Update the resources local storage with the latest API resources the user has access.
+   * Update the folders local storage with the latest API folders the user has access.
    * @return {Promise}
    */
   async updateLocalStorage () {
@@ -45,18 +44,11 @@ class FolderModel {
   /**
    */
   async findAll(options) {
-    const response = await this.client.findAll(options);
+    const response = await this.apiClient.findAll(options);
     if (!response.body || !response.body.length) {
       return [];
     }
     return response.body.map(folder => new FolderEntity(FolderEntity.fromApiData(folder)));
-  }
-
-  /**
-   */
-  async findOne(folderId) {
-    const response = await this.client.get(folderId);
-    return new FolderEntity(response.body);
   }
 
   /**
@@ -67,7 +59,7 @@ class FolderModel {
    * @returns {Promise<FolderEntity>}
    */
   async create(folderEntity) {
-    const response = await this.client.create(folderEntity.toApiData());
+    const response = await this.apiClient.create(folderEntity.toApiData());
     const updatedFolderEntity = new FolderEntity(FolderEntity.fromApiData(response.body));
     await FolderLocalStorage.addFolder(updatedFolderEntity);
     return updatedFolderEntity;
@@ -82,7 +74,7 @@ class FolderModel {
    * @returns {Promise<FolderEntity>}
    */
   async update(folderEntity) {
-    const response = await this.client.update(folderEntity.getId(), folderEntity.toApiData());
+    const response = await this.apiClient.update(folderEntity.getId(), folderEntity.toApiData());
     const updatedFolderEntity = new FolderEntity(FolderEntity.fromApiData(response.body));
     await FolderLocalStorage.updateFolder(updatedFolderEntity);
     return updatedFolderEntity;
@@ -92,7 +84,7 @@ class FolderModel {
    * Delete a folder using Passbolt API
    *
    * @param {string} folderId uuid
-   * @param {boolean} [cascade] delete sub folder / resources
+   * @param {boolean} [cascade] delete sub folder / folders
    * @throws {TypeError} if entity id is not set
    * @throws {Error} if CSRF token is not set
    * @returns {Promise<void>}
@@ -102,9 +94,60 @@ class FolderModel {
     if (cascade) {
       options.cascade = "1";
     }
-    await this.client.delete(folderId, null, options);
+    await this.apiClient.delete(folderId, null, options);
     await FolderLocalStorage.delete(folderId);
   }
+
+  /**
+   * Find folders to share
+   * @param {array} foldersIds
+   * @returns {array|Error}
+   */
+  // TODO use apiClient, return collection of folderEntity
+  async findAllForShare(foldersIds) {
+    // Retrieve by batch to avoid any 414 response.
+    const batchSize = 80;
+    if (foldersIds.length > batchSize) {
+      let folders = [];
+      const totalBatches = Math.ceil(foldersIds.length / batchSize);
+      for (let i = 0; i < totalBatches; i++) {
+        const foldersIdsPart = foldersIds.splice(0, batchSize);
+        const foldersPart = await this.findAllForShare(foldersIdsPart);
+        folders = [...folders, ...foldersPart];
+      }
+
+      return folders;
+    }
+
+    const user = User.getInstance();
+    const domain = user.settings.getDomain();
+    const fetchOptions = {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+        'content-type': 'application/json'
+      }
+    };
+    let url = new URL(`${domain}/folders.json?api-version=2`);
+    foldersIds.forEach(FolderId => {
+      url.searchParams.append(`filter[has-id][]`, FolderId);
+    });
+    url.searchParams.append('contain[permission]', '1');
+    url.searchParams.append('contain[permissions.user.profile]', '1');
+    url.searchParams.append('contain[permissions.group]', '1');
+    let response, json;
+
+    try {
+      response = await fetch(url, fetchOptions);
+      json = await response.json();
+    } catch (error) {
+      return new Error(__('There was a problem when trying to retrieve the folders'));
+    }
+
+    return json.body;
+  };
+
 }
 
 exports.FolderModel = FolderModel;

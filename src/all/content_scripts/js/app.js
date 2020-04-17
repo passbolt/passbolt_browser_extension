@@ -158,7 +158,7 @@ window.addEventListener('passbolt.plugin.auth.logout', async function (event) {
 });
 
 /* ==================================================================================
- *  Resource event
+ *  Storage update events
  * ================================================================================== */
 
 // Listen when the resources local storage is updated and trigger an event on the page.
@@ -176,6 +176,10 @@ browser.storage.onChanged.addListener(changes => {
     passbolt.message.emitToPage("passbolt.storage.folders.updated", folders);
   }
 });
+
+/* ==================================================================================
+ *  Resource event
+ * ================================================================================== */
 
 // Find all the resources
 window.addEventListener('passbolt.storage.resources.get', async function (event) {
@@ -239,72 +243,6 @@ window.addEventListener('passbolt.plugin.resources.update-local-storage', async 
   }
 });
 
-// Update the folders local storage.
-window.addEventListener('passbolt.plugin.folders.update-local-storage', async function (event) {
-  const requestId = event.detail[0];
-  try {
-    await passbolt.request('passbolt.app.folders.update-local-storage');
-    passbolt.message.emitToPage(requestId, { status: 'SUCCESS' });
-  } catch (error) {
-    passbolt.message.emitToPage(requestId, { status: 'ERROR', body: error });
-  }
-});
-
-// Find all the folders
-window.addEventListener('passbolt.storage.folders.get', async function (event) {
-  const requestId = event.detail[0];
-  const { folders } = await browser.storage.local.get(["folders"]);
-
-  if (folders && Array.isArray(folders)) {
-    passbolt.message.emitToPage(requestId, { status: "SUCCESS", body: folders });
-  } else {
-    passbolt.message.emitToPage(requestId, { status: "ERROR", error: { message: "The folders local storage is not initialized" } });
-  }
-});
-
-// Move a folder.
-window.addEventListener('passbolt.plugin.folders.bulk-move', async function (event) {
-  let resources = [];
-  let folders = [];
-  let folderParentId = null;
-
-  if (!event.detail) {
-    throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
-  }
-  if (event.detail.folders) {
-    if (!Array.isArray(event.detail.folders)) {
-      throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
-    }
-    event.detail.folders.forEach(folderId => {
-      if (!validator.isUUID(folderId)) {
-        throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
-      }
-    });
-    folders = event.detail.folders;
-  }
-  if (event.detail.resources) {
-    if (!Array.isArray(event.detail.resources)) {
-      throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
-    }
-    event.detail.resources.forEach(resourceId => {
-      if (!validator.isUUID(resourceId)) {
-        throw new TypeError('Invalid Appjs request. Folder move should contain a valid array of folders ID and/or a valid array of resources ID.');
-      }
-    });
-    resources = event.detail.resources;
-  }
-  folderParentId = event.detail.folderParentId;
-  if (!validator.isUUID(folderParentId) && folderParentId !== null) {
-    throw new TypeError('Invalid Appjs request. Folder move should contain a valid folder parent ID (null for root).');
-  }
-
-  const moveDto = {folders, resources, folderParentId};
-  try {
-    await passbolt.request('passbolt.folders.bulk-move', moveDto);
-  } catch (error) {
-    console.error(error);
-  }
-});
 
 /* ==================================================================================
  *  Favorite events
@@ -363,7 +301,7 @@ window.addEventListener('passbolt.secret.focus', function () {
 // @deprecated since v2.12.0 will be removed with v2.3.0
 window.addEventListener('passbolt.secret_edition.encrypt', function (event) {
   var usersIds = event.detail;
-  passbolt.request('passbolt.secret-edit.encrypt', usersIds)
+  passbolt.request('passbolt.app.deprecated.secret-edit.encrypt', usersIds)
     .then(function (armoreds) {
       passbolt.message.emitToPage('secret_edition_secret_encrypted', armoreds);
     });
@@ -413,7 +351,7 @@ passbolt.message.on('passbolt.export-passwords.complete', function () {
 window.addEventListener('passbolt.secret.decrypt', function (event) {
   var armoredSecret = event.detail;
   passbolt.message.emit('passbolt.passbolt-page.remove-all-focuses');
-  passbolt.request('passbolt.app.decrypt-copy', armoredSecret)
+  passbolt.request('passbolt.app.deprecated.decrypt-copy', armoredSecret)
     .then(
       function success() {
         passbolt.message.emitToPage('passbolt_notify', {

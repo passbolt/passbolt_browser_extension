@@ -72,7 +72,6 @@ PassboltApp.initPageMod = function () {
       'data/js/file/file.js',
 
       // App
-      'content_scripts/js/secret/editIframe.js',
       'content_scripts/js/group/editIframe.js',
       'content_scripts/js/import/importPasswordsIframe.js',
       'content_scripts/js/export/exportPasswordsIframe.js',

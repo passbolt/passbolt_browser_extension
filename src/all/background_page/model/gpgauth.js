@@ -146,7 +146,7 @@ GpgAuth.prototype.logout = async function () {
   };
 
   GpgAuth._authStatus = { isAuthenticated: false, isMfaRequired: false };
-  const event = new Event('passbolt.auth.logged-out');
+  const event = new Event('passbolt.global.auth.logged-out');
   window.dispatchEvent(event);
 
   await fetch(url, fetchOptions);
@@ -316,7 +316,7 @@ GpgAuth.prototype.checkAuthStatus = async function (options) {
 
 /**
  * Start an invertval to check if the user is authenticated.
- * - In the case the user is logged out, trigger a passbolt.auth.logged-out event.
+ * - In the case the user is logged out, trigger a passbolt.global.auth.logged-out event.
  *
  * @return {void}
  */
@@ -329,7 +329,7 @@ GpgAuth.prototype.startCheckAuthStatusLoop = async function () {
 
   GpgAuth.checkAuthStatusTimeout = setTimeout(async () => {
     if (!await this.isAuthenticated()) {
-      const event = new Event('passbolt.auth.logged-out');
+      const event = new Event('passbolt.global.auth.logged-out');
       window.dispatchEvent(event);
     } else {
       this.startCheckAuthStatusLoop();

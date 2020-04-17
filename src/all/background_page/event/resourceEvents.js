@@ -4,14 +4,12 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const Resource = require('../model/resource').Resource;
-const ResourceCreateController = require('../controller/resource/resourceCreateController.js').ResourceCreateController;
-const ResourceUpdateController = require('../controller/resource/resourceUpdateController.js').ResourceUpdateController;
-const Worker = require('../model/worker');
-const Log = require('../model/log').Log;
+const {Log} = require('../model/log');
+const {Resource} = require('../model/resource');
+const {ResourceCreateController} = require('../controller/resource/resourceCreateController.js');
+const {ResourceUpdateController} = require('../controller/resource/resourceUpdateController.js');
 
 const listen = function (worker) {
-
   /*
    * Pull the resources from the API and update the local storage.
    *
@@ -132,7 +130,6 @@ const listen = function (worker) {
       const updatedResource = await controller.main(resource, password);
       worker.port.emit(requestId, 'SUCCESS', updatedResource);
     } catch (error) {
-      console.error(error);
       if (error instanceof Error) {
         worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
       } else {

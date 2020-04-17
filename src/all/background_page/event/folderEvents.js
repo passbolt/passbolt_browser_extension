@@ -6,7 +6,6 @@
  */
 const {FolderEntity} = require('../model/entity/folder/folderEntity');
 const {FolderModel} = require('../model/folderModel');
-const {FolderMoveController} = require('../controller/folder/folderMoveController');
 const {User} = require('../model/user');
 
 const listen = function (worker) {
@@ -61,33 +60,6 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS', folderEntity);
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-    }
-  });
-
-  /*
-   * Move content into folder.
-   *
-   * @listens passbolt.folders.update
-   * @param requestId {uuid} The request identifier
-   * @param moveDto {object} The move data
-   * {
-   *   resources: {array} The resources ids to move
-   *   folders: {array} The folders ids to move
-   *   folderParentId: {string} The destination folder
-   * }
-   */
-  worker.port.on('passbolt.folders.bulk-move', async function (requestId, moveDto) {
-    const controller = new FolderMoveController(worker, requestId);
-    try {
-      await controller.main(moveDto);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
     }
   });
 

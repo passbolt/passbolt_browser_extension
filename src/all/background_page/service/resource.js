@@ -12,18 +12,22 @@
  * @since         2.7.0
  */
 const __ = require('../sdk/l10n').get;
-const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
-const PassboltBadResponseError = require('../error/passboltBadResponseError').PassboltBadResponseError;
-const PassboltServiceUnavailableError = require('../error/passboltServiceUnavailableError').PassboltServiceUnavailableError;
-const Request = require('../model/request').Request;
-const User = require('../model/user').User;
+const {PassboltApiFetchError} = require('../error/passboltApiFetchError');
+const {PassboltBadResponseError} = require('../error/passboltBadResponseError');
+const {PassboltServiceUnavailableError} = require('../error/passboltServiceUnavailableError');
+const {Request} = require('../model/request');
+const {User} = require('../model/user');
 
 class ResourceService { }
 
 /**
  * Find all the resources with given resources ids
+ *
  * @param {array} resourcesIds The list of resources to find
  * @returns {array} The list of resources
+ * @throws PassboltServiceUnavailableError on connection issue
+ * @throws PassboltBadResponseError on response format issue
+ * @throws PassboltApiFetchError on application error
  */
 ResourceService.findAllByResourcesIds = async function (resourcesIds, options) {
   // Retrieve by batch to avoid any 414 response.
@@ -42,8 +46,19 @@ ResourceService.findAllByResourcesIds = async function (resourcesIds, options) {
 
 /**
  * Find a resource by id
- * @param {object} options Optional parameters
- * @returns {object} The found resource
+ *
+ * @param {string} resourceId uuid
+ * @param {Object} options Optional parameters
+ * {
+ *   contain: {
+ *     secret: bool
+ *   }
+ * }
+ * @param {Object} options Optional parameters
+ * @returns {Object} The requested resource
+ * @throws PassboltServiceUnavailableError on connection issue
+ * @throws PassboltBadResponseError on response format issue
+ * @throws PassboltApiFetchError on application error
  */
 ResourceService.findOne = async function (resourceId, options) {
   options = options || {};
@@ -90,8 +105,31 @@ ResourceService.findOne = async function (resourceId, options) {
 
 /**
  * Find all the resources
- * @param {object} options Optional parameters
+ *
+ * @param {Object} options Optional parameters
+ * {
+ *   contain: {
+ *     permission: bool,
+ *     tag: bool,
+ *     favorite: bool,
+ *     secret: bool
+ *   },
+ *   filter: {
+ *     hasId: [string, ...],          // resources uuids
+ *     is-shared-with-group: string,  // group uuid
+ *     has-tag: string,               // tag slug
+ *     is-owned-by-me: bool,
+ *     is-favorite: bool,
+ *     is-shared-with-me: bool
+ *   },
+ *   order: {
+ *     modifiedDesc: bool
+ *   }
+ * }
  * @returns {array} The list of resources
+ * @throws PassboltServiceUnavailableError on connection issue
+ * @throws PassboltBadResponseError on response format issue
+ * @throws PassboltApiFetchError on application error
  */
 ResourceService.findAll = async function (options) {
   options = options || {};
@@ -169,8 +207,13 @@ ResourceService.findAll = async function (options) {
 };
 
 /**
- * Save a new resource
- * @param {object} data The resource data
+ * Save/Create a new resource
+ *
+ * @param {Object} data The resource data
+ * @return {Object} response body, the new resource if successful or validation errors
+ * @throws PassboltServiceUnavailableError on connection issue
+ * @throws PassboltBadResponseError on response format issue
+ * @throws PassboltApiFetchError on application error
  */
 ResourceService.save = async function (data) {
   data = data || {};
@@ -215,8 +258,13 @@ ResourceService.save = async function (data) {
 };
 
 /**
- * Update a new resource
- * @param {object} data The resource data
+ * Update a resource
+ *
+ * @param {Object} data The resource data
+ * @return {Object} response body, the updated resource if successful or validation errors
+ * @throws PassboltServiceUnavailableError on connection issue
+ * @throws PassboltBadResponseError on response format issue
+ * @throws PassboltApiFetchError on application error
  */
 ResourceService.update = async function (data) {
   data = data || {};
@@ -262,7 +310,12 @@ ResourceService.update = async function (data) {
 
 /**
  * Delete a resource.
- * @param {string} resourceId The resource identifier
+ *
+ * @param {string} resourceId The resource uuid
+ * @return {Object} response body (null if successful)
+ * @throws PassboltServiceUnavailableError on connection issue
+ * @throws PassboltBadResponseError on response format issue
+ * @throws PassboltApiFetchError on application error
  */
 ResourceService.delete = async function (resourceId) {
   const user = User.getInstance();

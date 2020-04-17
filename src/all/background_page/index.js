@@ -8,15 +8,13 @@
 var storage = require('./sdk/storage').storage;
 window.storage = storage;
 
-
-var main = function() {
+const main = async function() {
 
   // Config and user models
-  var Config = require('./model/config');
-  const GpgAuth = require('./model/gpgauth').GpgAuth;
-  var User = require('./model/user').User;
-  var SiteSettings = require('./model/siteSettings').SiteSettings;
-  var Log = require('./model/log').Log;
+  const Config = require('./model/config');
+  const {GpgAuth} = require('./model/gpgauth');
+  const {User} = require('./model/user');
+  const {Log} = require('./model/log');
 
   /* ==================================================================================
    *  Flush the logs
@@ -60,11 +58,16 @@ var main = function() {
     // We only initialize it here for the cases where the user is already logged in
     // It can happen when the extension is updated
     const auth = new GpgAuth();
-    auth.isAuthenticated()
-      .then(() => {
-        pageMods.PassboltApp.init();
+    try {
+      const isAuthenticated = await auth.isAuthenticated();
+      if (isAuthenticated) {
+        await pageMods.PassboltApp.init();
         auth.startCheckAuthStatusLoop();
-      });
+      }
+    } catch(error) {
+      // Service unavailable
+      // Do nothing...
+    }
   }
 
   // Setup pagemods

@@ -116,7 +116,6 @@ class PassphraseEntryDialog extends Component {
     try {
       await port.request("passbolt.keyring.private.checkpassphrase", this.state.passphrase);
     } catch (error) {
-      console.error(error);
       return false;
     }
     return true;

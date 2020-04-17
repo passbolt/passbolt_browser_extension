@@ -43,13 +43,18 @@ class ShareDialog extends Component {
    * @return {void}
    */
   async componentDidMount() {
-    this.resources = await port.request('passbolt.share.get-resources', this.props.resourcesIds);
-    this.shareChanges = new ShareChanges(this.resources);
-    let permissions = this.shareChanges.aggregatePermissionsByAro();
-    this.setState({loading: false, name: '', permissions}, () => {
-      // scroll at the top of the permission list
-      this.permissionListRef.current.scrollTop = 0;
-    });
+    if (this.props.resourcesIds) {
+      this.resources = await port.request('passbolt.share.get-resources', this.props.resourcesIds);
+      this.shareChanges = new ShareChanges(this.resources);
+      let permissions = this.shareChanges.aggregatePermissionsByAro();
+      this.setState({loading: false, name: '', permissions}, () => {
+        // scroll at the top of the permission list
+        this.permissionListRef.current.scrollTop = 0;
+      });
+    }
+    // if (this.props.foldersIds) {
+    //   this.folders = await port.request('passbolt.share.get-folders', this.props.foldersIds);
+    // }
   }
 
   /**
@@ -165,7 +170,7 @@ class ShareDialog extends Component {
 
   /**
    * handleServiceError
-   * @param {string} messagef
+   * @param {string} message
    * @return {void}
    */
   handleServiceError (message) {
@@ -232,7 +237,7 @@ class ShareDialog extends Component {
    * @returns {Promise<*>} updated aco(s) data or Error
    */
   async shareSave() {
-    return await port.request("passbolt.share.save", this.resources, this.shareChanges.getChanges());
+    return await port.request("passbolt.share.resources.save", this.resources, this.shareChanges.getChanges());
   }
 
   /**
@@ -241,7 +246,7 @@ class ShareDialog extends Component {
    * @returns {Promise<Object>} aros,
    */
   async fetchAutocompleteItems(keyword) {
-    let items = await port.request('passbolt.share.search-aros', keyword);
+    let items = await port.request('passbolt.share.search-aros', this.props.resourcesIds, keyword);
     return items.filter((item) => {
       let found = this.state.permissions.filter(permission => (permission.aro.id === item.id));
       return found.length === 0;
@@ -467,7 +472,7 @@ ShareDialog.context = AppContext;
 
 ShareDialog.propTypes = {
   resourcesIds: PropTypes.array,
-  foldersIds: PropTypes.object,
+  foldersIds: PropTypes.array,
   onClose: PropTypes.func
 };
 

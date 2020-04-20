@@ -168,48 +168,7 @@ Resource.findShareResource = async function (resourceId) {
  * @returns {array|Error}
  */
 Resource.findShareResources = async function (resourcesIds) {
-  // Retrieve by batch to avoid any 414 response.
-  const batchSize = 80;
-  if (resourcesIds.length > batchSize) {
-    let resources = [];
-    const totalBatches = Math.ceil(resourcesIds.length / batchSize);
-    for (let i = 0; i < totalBatches; i++) {
-      const resouresIdsPart = resourcesIds.splice(0, batchSize);
-      const resourcesPart = await Resource.findShareResources(resouresIdsPart);
-      resources = [...resources, ...resourcesPart];
-    }
-
-    return resources;
-  }
-
-  const user = User.getInstance();
-  const domain = user.settings.getDomain();
-  const fetchOptions = {
-    method: 'GET',
-    credentials: 'include',
-    headers: {
-      'Accept': 'application/json',
-      'content-type': 'application/json'
-    }
-  };
-  let url = new URL(`${domain}/resources.json?api-version=2`);
-  resourcesIds.forEach(resourceId => {
-    url.searchParams.append(`filter[has-id][]`, resourceId);
-  });
-  url.searchParams.append('contain[permission]', '1');
-  url.searchParams.append('contain[permissions.user.profile]', '1');
-  url.searchParams.append('contain[permissions.group]', '1');
-  url.searchParams.append('contain[secret]', '1');
-  let response, json;
-
-  try {
-    response = await fetch(url, fetchOptions);
-    json = await response.json();
-  } catch (error) {
-    return new Error(__('There was a problem when trying to retrieve the resources'));
-  }
-
-  return json.body;
+  return ResourceService.findAllForShare(resourcesIds);
 };
 
 /**

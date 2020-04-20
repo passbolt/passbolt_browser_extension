@@ -31,6 +31,8 @@ class ShareDialog extends Component {
    */
   constructor(props) {
     super(props);
+    this.resources = [];
+    this.folders = [];
     this.state = this.getDefaultState();
     this.shareChanges = null;
     this.permissionListRef = React.createRef();
@@ -45,16 +47,17 @@ class ShareDialog extends Component {
   async componentDidMount() {
     if (this.props.resourcesIds) {
       this.resources = await port.request('passbolt.share.get-resources', this.props.resourcesIds);
-      this.shareChanges = new ShareChanges(this.resources);
-      let permissions = this.shareChanges.aggregatePermissionsByAro();
-      this.setState({loading: false, name: '', permissions}, () => {
-        // scroll at the top of the permission list
-        this.permissionListRef.current.scrollTop = 0;
-      });
     }
-    // if (this.props.foldersIds) {
-    //   this.folders = await port.request('passbolt.share.get-folders', this.props.foldersIds);
-    // }
+    if (this.props.foldersIds) {
+      this.folders = await port.request('passbolt.share.get-folders', this.props.foldersIds);
+    }
+
+    this.shareChanges = new ShareChanges(this.resources, this.folders);
+    let permissions = this.shareChanges.aggregatePermissionsByAro();
+    this.setState({loading: false, name: '', permissions}, () => {
+      // scroll at the top of the permission list
+      this.permissionListRef.current.scrollTop = 0;
+    });
   }
 
   /**
@@ -234,10 +237,19 @@ class ShareDialog extends Component {
 
   /**
    * Save the permissions
-   * @returns {Promise<*>} updated aco(s) data or Error
+   * @returns {Promise<void>}
    */
   async shareSave() {
-    return await port.request("passbolt.share.resources.save", this.resources, this.shareChanges.getChanges());
+    if (this.props.resourcesIds && this.props.foldersIds) {
+      throw new Error('Multi resource and folder share is not implemented.');
+    }
+    if (this.props.resourcesIds) {
+      await port.request("passbolt.share.resources.save", this.resources, this.shareChanges.getResourcesChanges());
+      return;
+    }
+    if (this.props.foldersIds) {
+      await port.request("passbolt.share.folders.save", this.folders, this.shareChanges.getFoldersChanges());
+    }
   }
 
   /**
@@ -348,11 +360,11 @@ class ShareDialog extends Component {
     if (!this.shareChanges) {
       return '';
     }
-    const resources = this.shareChanges.getResources();
-    if (!resources || !resources.length || resources.length === 1) {
+    const acos = this.shareChanges.getAcos();
+    if (!acos || !acos.length || acos.length === 1) {
       return '';
     }
-    return resources.map(resource => resource.name).join(', ');
+    return acos.map(acos => acos.name).join(', ');
   }
 
   /**

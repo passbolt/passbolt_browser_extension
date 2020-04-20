@@ -129,7 +129,7 @@ class FolderEntity extends Entity {
   }
 
   /**
-   * Return entity as data ready to be retrieve grom Passbolt API
+   * Return entity as data ready to be retrieve from Passbolt API
    * @returns {Object}
    */
   static fromApiData(data) {
@@ -145,7 +145,7 @@ class FolderEntity extends Entity {
       result.folderParentId = data.folder_parent_id;
     }
 
-    return result;
+    return new FolderEntity(result);
   }
 }
 

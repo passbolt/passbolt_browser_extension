@@ -357,4 +357,71 @@ ResourceService.delete = async function (resourceId) {
   return responseJson.body;
 };
 
+/**
+ * Find all the resources for a share
+ *
+ * @param resourcesIds
+ * @returns {Promise<[]|*>}
+ */
+// TODO Reuse findAll
+ResourceService.findAllForShare = async function(resourcesIds) {
+  // Retrieve by batch to avoid any 414 response.
+  const batchSize = 80;
+  if (resourcesIds.length > batchSize) {
+    let resources = [];
+    const totalBatches = Math.ceil(resourcesIds.length / batchSize);
+    for (let i = 0; i < totalBatches; i++) {
+      const resouresIdsPart = resourcesIds.splice(0, batchSize);
+      const resourcesPart = await Resource.findShareResources(resouresIdsPart);
+      resources = [...resources, ...resourcesPart];
+    }
+
+    return resources;
+  }
+
+  const user = User.getInstance();
+  const domain = user.settings.getDomain();
+  const fetchOptions = {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Accept': 'application/json',
+      'content-type': 'application/json'
+    }
+  };
+  let url = new URL(`${domain}/resources.json?api-version=2`);
+  resourcesIds.forEach(resourceId => {
+    url.searchParams.append(`filter[has-id][]`, resourceId);
+  });
+  url.searchParams.append('contain[permission]', '1');
+  url.searchParams.append('contain[permissions.user.profile]', '1');
+  url.searchParams.append('contain[permissions.group]', '1');
+  url.searchParams.append('contain[secret]', '1');
+  let response, responseJson;
+
+  try {
+    response = await fetch(url, fetchOptions);
+  } catch (error) {
+    // Catch Network error such as connection lost.
+    throw new PassboltServiceUnavailableError(error.message);
+  }
+
+  try {
+    responseJson = await response.json();
+  } catch (error) {
+    // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
+    throw new PassboltBadResponseError(response.statusText, { code: response.status });
+  }
+
+  if (!response.ok) {
+    const message = responseJson.header.message;
+    throw new PassboltApiFetchError(message, {
+      code: response.status,
+      body: responseJson.body
+    });
+  }
+
+  return responseJson.body;
+};
+
 exports.ResourceService = ResourceService;

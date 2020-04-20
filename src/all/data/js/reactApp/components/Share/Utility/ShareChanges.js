@@ -18,15 +18,30 @@ export default class ShareChanges {
   /**
    * Constructor
    * @param {array} resources
+   * @param {array} folders
    */
-  constructor(resources) {
-    this._resources = resources;
+  constructor(resources, folders) {
+    this._folders = folders || [];
+    this._resources = resources || [];
     this._permissions = [];
     this._aroPermissions = [];
     this._aros = {};
+    this._acos = [];
 
-    resources.forEach(resource => {
-      resource.permissions.forEach(permission => {
+    // Remap the resources and folder into an ACO array
+    // Extend object with "_type" to keep distinction
+    this._resources.forEach(resource => {
+      resource._type = 'Resource';
+      this._acos.push(resource);
+    });
+    this._folders.forEach(folder => {
+      folder._type = 'Folder';
+      this._acos.push(folder);
+    });
+
+    // Build the permission list
+    this._acos.forEach(aco => {
+      aco.permissions.forEach(permission => {
         const aro = permission.user || permission.group;
         if (!this._aros[aro.id]) {
           this._aros[aro.id] = aro;
@@ -41,18 +56,23 @@ export default class ShareChanges {
   getChanges() {
     return this._changes;
   }
+  getResourcesChanges() {
+    return this._changes.filter((element) => element.aco === 'Resource');
+  }
+  getFoldersChanges() {
+    return this._changes.filter((element) => element.aco === 'Folder');
+  }
 
-  getResources() {
-    return this._resources;
+  getAcos() {
+    return this._acos;
   }
 
   /**
    * Check that a user is the original owner of the resources
-   * @param {string} userId
    * @return {boolean}
    */
   isOriginalResourcesOwner() {
-    return this._resources.reduce((carry, resource) => carry && resource.permission.type == ADMIN, true);
+    return this._acos.reduce((carry, aco) => carry && aco.permission.type === ADMIN, true);
   }
 
   /**
@@ -90,17 +110,17 @@ export default class ShareChanges {
     // Calculate varies details
     arosPermissions.forEach(aroPermissions => {
       // permission type varies also in the case there is less permissions than resources shared.
-      if (aroPermissions.permissions.length != this._resources.length) {
+      if (aroPermissions.permissions.length !== this._acos.length) {
         aroPermissions.type = -1;
       }
-      if (aroPermissions.type == -1) {
+      if (aroPermissions.type === -1) {
         // For each permission, aggregate the resources aro has access.
-        aroPermissions.variesDetails = this._resources.reduce((carry, resource) => {
-          const result = aroPermissions.permissions.filter(permission => permission.aco_foreign_key == resource.id);
+        aroPermissions.variesDetails = this._acos.reduce((carry, aco) => {
+          const result = aroPermissions.permissions.filter(permission => permission.aco_foreign_key === aco.id);
           if (!result.length) {
-            carry[0].push(resource.name);
+            carry[0].push(aco.name);
           } else {
-            carry[result[0].type].push(resource.name);
+            carry[result[0].type].push(aco.name);
           }
           return carry;
         }, {0: [], 1: [], 7: [], 15: []});
@@ -129,8 +149,8 @@ export default class ShareChanges {
    * @return {boolean}
    */
   hasChanges(aroId) {
-    const change = this._changes.find(change => change.aro_foreign_key == aroId);
-    return change != undefined;
+    const change = this._changes.find(change => change.aro_foreign_key === aroId);
+    return change !== undefined;
   }
 
   /**
@@ -166,17 +186,17 @@ export default class ShareChanges {
    */
   updateAroPermissions(aroId, type) {
     this._removeAroChanges(aroId);
-    this._resources.forEach(resource => {
-      const permissionOriginal = this.getResourceAroPermission(resource, aroId);
+    this._acos.forEach(aco => {
+      const permissionOriginal = this.getAcoAroPermission(aco, aroId);
       if (permissionOriginal) {
-        if (permissionOriginal.type != type) {
+        if (permissionOriginal.type !== type) {
           const permissionChange = JSON.parse(JSON.stringify(permissionOriginal));
           permissionChange.type = type;
           this._changes.push(permissionChange);
         }
       } else {
         const aro = this._aros[aroId];
-        const permissionChange = this._buildChange(resource, aro, type);
+        const permissionChange = this._buildChange(aco, aro, type);
         this._changes.push(permissionChange);
       }
     });
@@ -188,8 +208,8 @@ export default class ShareChanges {
    */
   deleteAroPermissions(aroId) {
     this._removeAroChanges(aroId);
-    this._resources.forEach(resource => {
-      const permissionOriginal = this.getResourceAroPermission(resource, aroId);
+    this._acos.forEach(aco => {
+      const permissionOriginal = this.getAcoAroPermission(aco, aroId);
       if (permissionOriginal) {
         const permissionChange = JSON.parse(JSON.stringify(permissionOriginal));
         permissionChange.delete = true;
@@ -201,12 +221,12 @@ export default class ShareChanges {
 
   /**
    * Get the permission for a given resource and a given aro
-   * @param {object} resource The resource to get the aro permission for
-   * @param {string} aroId  The aro to get the resource permission for
+   * @param {object} aco The resource or Folder to get the aro permission for
+   * @param {string} aroId The User or Group to get the resource or folder permission for
    * @returns {object}
    */
-  getResourceAroPermission(resource, aroId) {
-    return this._permissions.find(permission => permission.aro_foreign_key == aroId && permission.aco_foreign_key == resource.id);
+  getAcoAroPermission(aco, aroId) {
+    return this._permissions.find(permission => permission.aro_foreign_key === aroId && permission.aco_foreign_key === aco.id);
   }
 
   /**
@@ -214,23 +234,23 @@ export default class ShareChanges {
    * @returns {Resource.List}
    */
   getResourcesWithNoOwner() {
-    return this._resources.filter(resource => {
-      const changes = this._changes.filter(change => change.aco_foreign_key == resource.id);
+    return this._acos.filter(aco => {
+      const changes = this._changes.filter(change => change.aco_foreign_key === aco.id);
       // Check if a new owner is promoted.
-      const grantedOwner = changes.find(change => change.type == ADMIN && !change.delete);
+      const grantedOwner = changes.find(change => change.type === ADMIN && !change.delete);
       if (grantedOwner) {
         return false;
       }
       // Check if there is at least one of the original owners after applying the change.
       const originalOwnersPermissionsIds = this._permissions.reduce((carry, permission) => {
-        if (permission.aco_foreign_key == resource.id && permission.type == ADMIN) {
+        if (permission.aco_foreign_key === aco.id && permission.type === ADMIN) {
           carry = [...carry, permission.id];
         }
         return carry;
       }, []);
-      const revokedOwners = changes.filter(change => (change.delete || change.type != ADMIN) && originalOwnersPermissionsIds.indexOf(change.id) != -1);
+      const revokedOwners = changes.filter(change => (change.delete || change.type !== ADMIN) && originalOwnersPermissionsIds.indexOf(change.id) !== -1);
 
-      return revokedOwners.length == originalOwnersPermissionsIds.length;
+      return revokedOwners.length === originalOwnersPermissionsIds.length;
     });
   }
 
@@ -240,14 +260,14 @@ export default class ShareChanges {
    * @private
    */
   _removeAroChanges(aroId) {
-    this._resources.forEach(resource => {
-      this._changes = this._changes.filter(change => !(change.aco_foreign_key == resource.id && change.aro_foreign_key == aroId));
+    this._acos.forEach(aco => {
+      this._changes = this._changes.filter(change => !(change.aco_foreign_key === aco.id && change.aro_foreign_key === aroId));
     });
   }
 
   /**
    * Build a permission change
-   * @param {object} resource The resource to build a change for
+   * @param {object} aco The resource or folder to build a change for
    * @param {object} aro The aro to build a change for
    * @param {int} type The type of permission
    * @returns {object}
@@ -264,13 +284,13 @@ export default class ShareChanges {
    *
    * @private
    */
-  _buildChange(resource, aro, type) {
+  _buildChange(aco, aro, type) {
     return {
       is_new: true,
       aro: aro.profile ? 'User' : 'Group',
       aro_foreign_key: aro.id,
-      aco: 'Resource',
-      aco_foreign_key: resource.id,
+      aco: aco._type,
+      aco_foreign_key: aco.id,
       type: type
     };
   }

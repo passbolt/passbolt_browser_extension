@@ -9,7 +9,7 @@
 const {ShareResourcesController} = require('../controller/share/shareResourcesController');
 const {Permission} = require('../model/permission');
 const {Resource} = require('../model/resource');
-const {Folder} = require('../model/folderModel');
+const {FolderModel} = require('../model/folderModel');
 const {Share} = require('../model/share');
 const Worker = require('../model/worker');
 
@@ -48,7 +48,7 @@ const listen = function (worker) {
       }
       worker.port.emit(requestId, 'SUCCESS', resources);
     } catch(error) {
-      worker.port.emit(requestId, 'ERROR', this.worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }
   });
 
@@ -59,10 +59,10 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.share.get-folders', async function (requestId, foldersIds) {
     try {
-      const folders = await Folder.findAllForShare(foldersIds);
+      const folders = await FolderModel.findAllForShare(foldersIds);
       worker.port.emit(requestId, 'SUCCESS', folders);
     } catch (error) {
-      worker.port.emit(requestId, 'ERROR', this.worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }
   });
 

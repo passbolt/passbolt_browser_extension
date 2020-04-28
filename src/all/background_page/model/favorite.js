@@ -6,8 +6,8 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const FavoriteService = require("../service/favorite").FavoriteService;
-const ResourceLocalStorage = require('../service/local_storage/resource').ResourceLocalStorage;
+const {FavoriteService} = require("../service/favorite");
+const {ResourceLocalStorage} = require('../service/local_storage/resourceLocalStorage');
 
 class Favorite {
 

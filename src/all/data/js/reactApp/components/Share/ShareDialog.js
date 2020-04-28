@@ -258,7 +258,7 @@ class ShareDialog extends Component {
    * @returns {Promise<Object>} aros,
    */
   async fetchAutocompleteItems(keyword) {
-    let items = await port.request('passbolt.share.search-aros', this.props.resourcesIds, keyword);
+    let items = await port.request('passbolt.share.search-aros', keyword, this.props.resourcesIds);
     return items.filter((item) => {
       let found = this.state.permissions.filter(permission => (permission.aro.id === item.id));
       return found.length === 0;

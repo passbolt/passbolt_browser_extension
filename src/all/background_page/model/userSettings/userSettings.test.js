@@ -1,7 +1,6 @@
 import Validator from 'validator';
 import {UserSettings} from "./userSettings";
 
-
 jest.mock('../config', () => ({
   getItem: (item) => {
     return item;

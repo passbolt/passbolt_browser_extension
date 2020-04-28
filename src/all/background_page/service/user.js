@@ -101,7 +101,6 @@ UserService.keepSessionAlive = async function (user) {
  * @param {object} options Optional parameters
  * @returns {array} The list of users
  */
-
 UserService.findAll = async function (user, options) {
   options = options || {};
   const domain = user.settings.getDomain();
@@ -144,5 +143,64 @@ UserService.findAll = async function (user, options) {
   return responseJson.body;
 };
 
+/**
+ * Search users by keywords
+ *
+ * @param user current user
+ * @param options
+ * - keywords
+ * - excludedUsers
+ * @return {Promise.<array>} array of users
+ */
+UserService.searchUsers = async function (user, options) {
+  let {keywords, excludedUsers} = options;
+  const domain = user.settings.getDomain();
+  const fetchOptions = {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'Accept': 'application/json',
+      'content-type': 'application/json'
+    }
+  };
+  const url = new URL(`${domain}/users.json?api-version=v1`); // TODO use v2
+  url.searchParams.append("filter[has-access]", htmlspecialchars(keywords, 'ENT_QUOTES'));
+  url.searchParams.append("filter[is-active]", "1");
+
+  let response, responseJson;
+
+  try {
+    response = await fetch(url, fetchOptions);
+  } catch (error) {
+    // Catch Network error such as connection lost.
+    throw new PassboltApiFetchError(error.message);
+  }
+
+  try {
+    responseJson = await response.json();
+  } catch (error) {
+    // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
+    throw new PassboltApiFetchError(response.statusText, { code: response.status });
+  }
+
+  if (!response.ok) {
+    let message = __('Could not get the users. The server responded with an error.');
+    message += ` (${responseJson.header.message}`;
+    throw new PassboltApiFetchError(message, {
+      code: response.status,
+      body: responseJson.body
+    });
+  }
+
+  // Build the user list
+  const users = responseJson.body;
+  let finalUsers = [];
+  for (let i in users) {
+    if (!in_array(users[i].User.id, excludedUsers)) {
+      finalUsers.push(users[i]);
+    }
+  }
+  return finalUsers;
+};
 
 exports.UserService = UserService;

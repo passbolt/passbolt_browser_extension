@@ -105,22 +105,5 @@ describe("ProgressDialog", () => {
     const progressDetailsElement = container.querySelector(".progress-details");
     expect(progressDetailsElement).not.toBeNull();
 
-    // Simulate a message from the ADDON updating the progress state.
-    window.port.fireAddonMessage("passbolt.progress.update", "Step 1", 1);
-
-    // Assert
-    expect(progressStepLabel.textContent).toBe("\u00a0 Step 1");
-    expect(progressPercent.textContent).toBe("50%");
-    progressBarStyle = window.getComputedStyle(progressBarElement);
-    expect(progressBarStyle.width).toBe("50%");
-
-    // Simulate a message from the ADDON updating the progress state.
-    window.port.fireAddonMessage("passbolt.progress.update", "Step 2", 2);
-
-    // Assert
-    expect(progressStepLabel.textContent).toBe("\u00a0 Step 2");
-    expect(progressPercent.textContent).toBe("100%");
-    progressBarStyle = window.getComputedStyle(progressBarElement);
-    expect(progressBarStyle.width).toBe("100%");
   });
 });

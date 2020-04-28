@@ -16,7 +16,6 @@ const {PassboltBadResponseError} = require('../../../error/passboltBadResponseEr
 const {PassboltServiceUnavailableError} = require('../../../error/passboltServiceUnavailableError');
 
 class ApiClient {
-
   /**
    * Constructor
    *
@@ -33,7 +32,11 @@ class ApiClient {
       throw new TypeError('ApiClient constructor error: resourceName is required.');
     }
     try {
-      this.baseUrl = this.options.getBaseUrl().toString() + '/' + this.options.getResourceName();
+      let rawBaseUrl = this.options.getBaseUrl().toString();
+      if (rawBaseUrl.endsWith('/')) {
+        rawBaseUrl = rawBaseUrl.slice(0, -1);
+      }
+      this.baseUrl = rawBaseUrl + '/' + this.options.getResourceName();
       this.baseUrl = new URL(this.baseUrl);
     } catch (typeError) {
       throw new TypeError('ApiClient constructor error: b.');
@@ -119,7 +122,7 @@ class ApiClient {
    * @public
    */
   async findAll (urlOptions) {
-    const url = this.buildUrl(this.baseUrl, urlOptions || {});
+    const url = this.buildUrl(this.baseUrl.toString(), urlOptions || {});
     return await this.fetchAndHandleResponse('GET', url);
   };
 
@@ -136,7 +139,7 @@ class ApiClient {
    * @public
    */
   async create(body, urlOptions) {
-    const url = this.buildUrl(this.baseUrl, urlOptions || {});
+    const url = this.buildUrl(this.baseUrl.toString(), urlOptions || {});
     const bodyString = this.buildBody(body);
     return this.fetchAndHandleResponse('POST', url, bodyString);
   }
@@ -237,17 +240,22 @@ class ApiClient {
    * Return a URL object from string url and this.baseUrl and this.apiVersion
    * Optionally append urlOptions to the URL object
    *
-   * @param {string} url
+   * @param {string|URL} url
    * @param {Object} [urlOptions] Optional url parameters for example {"contain[something]": "1"}
    * @throws {TypeError} if urlOptions key or values are not a string
    * @returns {URL}
-   * @private
+   * @public
    */
   buildUrl(url, urlOptions) {
+    if (typeof url !== 'string') {
+      throw new TypeError('ApiClient.buildUrl error: url should be a string.');
+    }
     const urlObj = new URL(`${url}.json?${this.apiVersion}`);
+
+    urlOptions = urlOptions || {};
     for (const [key, value] of Object.entries(urlOptions)) {
       if (typeof key !== 'string' || typeof value !== 'string') {
-        throw new TypeError('ApiClient.buildUrl error: urlOptions values should be a string.')
+        throw new TypeError('ApiClient.buildUrl error: urlOptions values should be a string.');
       }
       urlObj.searchParams.append(key, value);
     }
@@ -266,7 +274,7 @@ class ApiClient {
    * @throws {PassboltBadResponseError} if passbolt API responded with non parsable JSON
    * @throws {PassboltApiFetchError} if passbolt API response is not OK (non 2xx status)
    * @returns {Promise<*>}
-   * @private
+   * @public
    */
   async fetchAndHandleResponse(method, url, body, options) {
     this.assertUrl(url);

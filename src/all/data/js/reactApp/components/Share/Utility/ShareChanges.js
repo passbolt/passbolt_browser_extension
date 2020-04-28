@@ -12,6 +12,7 @@
  * @since         2.0.0
  */
 const READ = 1;
+const UPDATE = 7;
 const ADMIN = 15;
 
 export default class ShareChanges {
@@ -102,7 +103,7 @@ export default class ShareChanges {
         };
         carry.push(aroPermission);
       }
-      aroPermission.type = aroPermission.type == permission.type ? aroPermission.type : -1;
+      aroPermission.type = aroPermission.type === permission.type ? aroPermission.type : -1;
       aroPermission.permissions.push(permission);
       return carry;
     }, []);
@@ -226,7 +227,9 @@ export default class ShareChanges {
    * @returns {object}
    */
   getAcoAroPermission(aco, aroId) {
-    return this._permissions.find(permission => permission.aro_foreign_key === aroId && permission.aco_foreign_key === aco.id);
+    return this._permissions.find(permission => {
+      return (permission.aro_foreign_key === aroId && permission.aco_foreign_key === aco.id);
+    });
   }
 
   /**
@@ -248,7 +251,10 @@ export default class ShareChanges {
         }
         return carry;
       }, []);
-      const revokedOwners = changes.filter(change => (change.delete || change.type !== ADMIN) && originalOwnersPermissionsIds.indexOf(change.id) !== -1);
+      // Check if owner was removed
+      const revokedOwners = changes.filter(change => {
+        return ((change.delete || change.type !== ADMIN) && originalOwnersPermissionsIds.indexOf(change.id) !== -1);
+      });
 
       return revokedOwners.length === originalOwnersPermissionsIds.length;
     });

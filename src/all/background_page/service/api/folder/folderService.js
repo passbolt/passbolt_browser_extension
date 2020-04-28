@@ -10,11 +10,19 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {ApiClient} = require('../service/api/apiClient/apiClient');
-
-const FOLDER_API_NAME = 'folders';
+const {ApiClient} = require('../apiClient/apiClient');
 
 class FolderService {
+  /**
+   * API Resource Name
+   *
+   * @returns {string}
+   * @public
+   */
+  static get RESOURCE_NAME() {
+    return 'folders';
+  }
+
   /**
    * Constructor
    *
@@ -22,14 +30,35 @@ class FolderService {
    * @public
    */
   constructor(apiClientOptions) {
-    apiClientOptions.setResourceName(FOLDER_API_NAME);
+    apiClientOptions.setResourceName(FolderService.RESOURCE_NAME);
     this.apiClient = new ApiClient(apiClientOptions);
   }
 
   /**
    * Find all folders
-   * @param options
+   *
+   * @param {Object} options optional url parameters for example {"contain[something]": "1"}
+   * Supported options:
+   *
+   *   "contain[children_resources]": "1"
+   *   "contain[children_folders]": "1"
+   *   "contain[creator]": "1"
+   *   "contain[modifier]": "1"
+   *   "contain[permission]": "1"
+   *   "contain[permissions]": "1"
+   *   "contain[permissions.user.profile]": "1"
+   *   "contain[permissions.group]": "1"
+   *
+   *   "filter[has-id][]": <uuid>     // filter by ids(s)
+   *   "filter[has-parent][]": <uuid> // filter by parent id(s)
+   *   "filter[search][]": <string>   // filter by name
+   *
    * @returns {Promise<*>} response body
+   * @throws {TypeError} if urlOptions key or values are not a string
+   * @throws {PassboltServiceUnavailableError} if service is not reachable
+   * @throws {PassboltBadResponseError} if passbolt API responded with non parsable JSON
+   * @throws {PassboltApiFetchError} if passbolt API response is not OK (non 2xx status)
+   * @public
    */
   async findAll(options) {
     const response = await this.apiClient.findAll(options);
@@ -43,8 +72,8 @@ class FolderService {
    * Create a folder using Passbolt API
    *
    * @param {Object} data
-   * @throws {Error} if CSRF token is not set
-   * @returns {Promise<FolderEntity>}
+   * @returns {Promise<*>} Response body
+   * @public
    */
   async create(data) {
     const response = await this.apiClient.create(data);
@@ -56,9 +85,8 @@ class FolderService {
    *
    * @param {String} folderId uuid
    * @param {Object} folderData
-   * @throws {Error} if entity id is not set
-   * @throws {Error} if CSRF token is not set
-   * @returns {Promise<FolderEntity>}
+   * @returns {Promise<*>} Response body
+   * @public
    */
   async update(folderId, folderData) {
     const response = await this.apiClient.update(folderId, folderData);
@@ -70,23 +98,23 @@ class FolderService {
    *
    * @param {string} folderId uuid
    * @param {boolean} [cascade] delete sub folder / folders
-   * @throws {TypeError} if entity id is not set
-   * @throws {Error} if CSRF token is not set
-   * @returns {Promise<void>}
+   * @returns {Promise<*>} Response body
+   * @public
    */
   async delete(folderId, cascade) {
     const options = {};
     if (cascade) {
       options.cascade = "1";
     }
-    await this.apiClient.delete(folderId, null, options);
+    const response = await this.apiClient.delete(folderId, null, options);
+    return response.body;
   }
-
 
   /**
    * Find folders to share
    * @param {array} foldersIds
-   * @returns {array|Error}
+   * @returns {Promise<*>} Response body
+   * @public
    */
   async findAllForShare(foldersIds) {
     // Retrieve by batch to avoid any 414 response.
@@ -103,9 +131,9 @@ class FolderService {
       return folders;
     }
 
-    let url = new URL(`${this.apiClient.baseUrl}/folders.json?${this.apiClient.apiVersion}`);
-    foldersIds.forEach(FolderId => {
-      url.searchParams.append(`filter[has-id][]`, FolderId);
+    let url = this.apiClient.buildUrl(this.apiClient.baseUrl.toString());
+    foldersIds.forEach(folderId => {
+      url.searchParams.append(`filter[has-id][]`, folderId);
     });
     url.searchParams.append('contain[permission]', '1');
     url.searchParams.append('contain[permissions.user.profile]', '1');

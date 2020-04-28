@@ -7,16 +7,18 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-var Worker = require('../model/worker');
-var User = require('../model/user').User;
-var Group = require('../model/group').Group;
-var GroupForm = require('../model/groupForm').GroupForm;
-var InvalidMasterPasswordError = require('../error/invalidMasterPasswordError').InvalidMasterPasswordError;
-var Keyring = require('../model/keyring').Keyring;
-var Crypto = require('../model/crypto').Crypto;
+const Worker = require('../model/worker');
+const {User} = require('../model/user');
+const {Group} = require('../model/group');
+const {GroupForm} = require('../model/groupForm');
+const {Keyring} = require('../model/keyring');
+const {Crypto} = require('../model/crypto');
+
 const passphraseController = require('../controller/passphrase/passphraseController');
-var progressController = require('../controller/progress/progressController');
-var UserAbortsOperationError = require('../error/userAbortsOperationError').UserAbortsOperationError;
+const progressController = require('../controller/progress/progressController');
+
+const {InvalidMasterPasswordError} = require('../error/invalidMasterPasswordError');
+const {UserAbortsOperationError} = require('../error/userAbortsOperationError');
 
 var listen = function (worker) {
   /*
@@ -31,7 +33,7 @@ var listen = function (worker) {
     var groupId = data.groupId,
       groupForm = new GroupForm(worker.tab.id);
 
-    if (groupId != '') {
+    if (groupId !== '') {
       var group = new Group();
       group.findById(groupId)
         .then(
@@ -61,13 +63,12 @@ var listen = function (worker) {
    * @param keywords {string} The keywords to search
    */
   worker.port.on('passbolt.group.edit.search-users', function (keywords) {
-    var //sharedPassword = TabStorage.get(worker.tab.id, 'sharedPassword'),
-      user = User.getInstance(),
-      autocompleteWorker = Worker.get('GroupEditAutocomplete', worker.tab.id),
+    const autocompleteWorker = Worker.get('GroupEditAutocomplete', worker.tab.id);
+
     // The users that have already been added to the share list should be
     // excluded from the search.
-      groupForm = new GroupForm(worker.tab.id),
-      excludedUsers = [];
+    const groupForm = new GroupForm(worker.tab.id);
+    let excludedUsers = [];
 
     // If no keywords provided, hide the autocomplete component.
     if (!keywords) {
@@ -79,11 +80,12 @@ var listen = function (worker) {
       autocompleteWorker.port.emit('passbolt.group.edit-autocomplete.loading');
 
       // Get existing users.
-      var groupUsers = groupForm.get('currentGroup.GroupUser');
+      const groupUsers = groupForm.get('currentGroup.GroupUser');
       excludedUsers = _.pluck(groupUsers, 'user_id');
 
       // Search available users.
-      user.searchUsers(keywords, excludedUsers)
+      const currentUser = User.getInstance();
+      UserService.searchUsers(currentUser, {keywords, excludedUsers})
         .then(function (users) {
           autocompleteWorker.port.emit('passbolt.group.edit-autocomplete.load-users', users);
         }, function (e) {

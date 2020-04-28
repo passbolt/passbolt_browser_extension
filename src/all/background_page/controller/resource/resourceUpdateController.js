@@ -12,11 +12,12 @@
  * @since         2.13.0
  */
 const passphraseController = require('../passphrase/passphraseController');
-const Resource = require('../../model/resource').Resource;
-const User = require('../../model/user').User;
-const Keyring = require('../../model/keyring').Keyring;
-const Crypto = require('../../model/crypto').Crypto;
+const {Resource} = require('../../model/resource');
+const {User} = require('../../model/user');
+const {Keyring} = require('../../model/keyring');
+const {Crypto} = require('../../model/crypto');
 const progressController = require('../progress/progressController');
+const {UserService} = require('../../service/user');
 
 class ResourceUpdateController {
   /**
@@ -81,10 +82,9 @@ class ResourceUpdateController {
     const filter = {
       'hasAccess': resource.id
     };
-    const users = await User.findAll({ filter });
-    const usersIds = users.reduce((result, user) => [...result, user.id], []);
-
-    return usersIds;
+    const user = User.getInstance();
+    const users = await UserService.findAll(user, {filter});
+    return users.reduce((result, user) => [...result, user.id], []);
   }
 }
 

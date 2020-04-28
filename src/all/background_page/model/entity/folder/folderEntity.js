@@ -1,151 +1,151 @@
-// var Validator = require('../vendors/validator');
-const {Entity} = require('../entity');
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         2.13.0
+ */
+const {Entity} = require('../abstract/entity');
+const {EntitySchema} = require('../abstract/entitySchema');
+
+const ENTITY_NAME = 'Folder';
 const FOLDER_NAME_MIN_LENGTH = 1;
 const FOLDER_NAME_MAX_LENGTH = 64;
 
 class FolderEntity extends Entity {
-
   /**
    * Folder entity constructor
    *
-   * @throws {TypeError} if name is is not a valid UTF8 Extended string
-   * @throws {TypeError} if id is not a valid UUID
-   * @throws {TypeError} if parent id is not a valid uuid
-   * @param {Object} data folder DTO
+   * @param {Object} folderDto folder DTO
+   * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(data) {
-    super();
-    if (typeof data.id !== "undefined") {
-      this.setId(data.id);
-    }
-    if (typeof data.name !== "undefined") {
-      this.setName(data.name);
-    }
-    if (typeof data.folderParentId !== "undefined") {
-      this.setFolderParentId(data.folderParentId);
-    }
+  constructor(folderDto) {
+    super(EntitySchema.validate(
+      FolderEntity.ENTITY_NAME,
+      folderDto,
+      FolderEntity.getSchema()
+    ));
   }
 
   /**
-   * Get the id
-   *
-   * @throws {Error} if id is not set
-   * @returns {string} id uuid
+   * Get folder entity schema
+   * @returns {Object} schema
    */
-  getId() {
-    if (!this.id) {
-      throw new Error('Folder id is empty.')
+  static getSchema() {
+    return {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "folder_parent_id": {
+          "anyOf": [{
+              "type": "string",
+              "format": "uuid"
+            }, {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": FOLDER_NAME_MIN_LENGTH,
+          "maxLength": FOLDER_NAME_MAX_LENGTH
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time"
+        },
+      }
     }
-    return this.id;
+  }
+
+  // ==================================================
+  // Dynamic properties getters
+  // ==================================================
+  /**
+   * Get folder id
+   * @returns {string} uuid
+   */
+  get id() {
+    return this._props.id || null;
   }
 
   /**
-   * Set id
-   * @param {string} id
-   * @throws {TypeError} if id is not a valid UUID
-   * @returns {FolderEntity} self
-   * @public
+   * Get folder name
+   * @returns {string} admin or user
    */
-  setId(id) {
-    if (!id) {
-      throw new TypeError('Folder id should not be empty.')
-    }
-    if (typeof id !== 'string') {
-      throw new TypeError('Folder id should be a valid string.');
-    }
-    if (!Validator.isUUID(id)) {
-      throw new TypeError('Folder id should be a valid uuid.');
-    }
-    this.id = id;
-
-    return this;
+  get name() {
+    return this._props.name;
   }
 
+  /**
+   * Get folder parent id
+   * @returns {string} uuid parent folder
+   */
+  get folderParentId() {
+    return this._props.folder_parent_id || null;
+  }
+
+  /**
+   * Get created date
+   * @returns {string} date
+   */
+  get created() {
+    return this._props.created || null;
+  }
+
+  /**
+   * Get modified date
+   * @returns {string} date
+   */
+  get modified() {
+    return this._props.modified || null;
+  }
+
+  // ==================================================
+  // Static properties getters
+  // ==================================================
+  /**
+   * FolderEntity.ENTITY_NAME
+   * @returns {string}
+   */
+  static get ENTITY_NAME() {
+    return ENTITY_NAME;
+  }
+
+  // ==================================================
+  // Default properties setters
+  // ==================================================
   /**
    * Folder Parent Id
-   * @param {string|null} folderParentId
-   * @throws {TypeError} if parent id is not a valid uuid
-   * @returns {FolderEntity} self
+   * @param {*} folderParentId
+   * @throws {EntityValidationError} if parent id is not a valid uuid
+   * @returns void
    * @public
    */
-  setFolderParentId(folderParentId) {
-    if (folderParentId !== null) {
-      if (!folderParentId) {
-        throw new TypeError('Folder parent id should not be empty.')
-      }
-      if (typeof folderParentId !== 'string') {
-        throw new TypeError('Folder parent id should be a valid string.');
-      }
-      if (!Validator.isUUID(folderParentId)) {
-        throw new TypeError('Folder parent id should be a valid uuid.');
-      }
+  set folderParentId(folderParentId) {
+    const propName = 'folder_parent_id';
+    if (folderParentId === null) {
+      this._props[propName] = folderParentId;
+      return;
     }
-
-    this.folderParentId = folderParentId;
-
-    return this;
-  }
-
-  /**
-   * Set folder name
-   *
-   * @param {string} name
-   * @throws {TypeError} if name is is not a valid UTF8 Extended string
-   * @returns {FolderEntity}
-   * @public
-   */
-  setName(name) {
-    if (!name) {
-      throw new TypeError('Folder name should not be empty.')
-    }
-    if (typeof name !== 'string') {
-      throw new TypeError('Folder name should be a valid string.');
-    }
-    if (!Validator.isLength(name, FOLDER_NAME_MIN_LENGTH, FOLDER_NAME_MAX_LENGTH)) {
-      throw new TypeError(`Folder name should not be more than ${FOLDER_NAME_MAX_LENGTH} characters in length.`);
-    }
-    this.name = name;
-
-    return this;
-  }
-
-  /**
-   * Return entity as data ready to be sent via Passbolt API
-   * @returns {Object}
-   */
-  toApiData() {
-    let data = {};
-    if (typeof this.id !==  "undefined") {
-      data.id = this.id;
-    }
-    if (typeof this.name !==  "undefined") {
-      data.name = this.name;
-    }
-    if (typeof this.folderParentId !== "undefined") {
-      data.folder_parent_id = this.folderParentId;
-    }
-
-    return data;
-  }
-
-  /**
-   * Return entity as data ready to be retrieve from Passbolt API
-   * @returns {Object}
-   */
-  static fromApiData(data) {
-    const result = {};
-
-    if (typeof data.id !==  "undefined") {
-      result.id = data.id;
-    }
-    if (typeof data.name !==  "undefined") {
-      result.name = data.name;
-    }
-    if (typeof data.folder_parent_id !==  "undefined") {
-      result.folderParentId = data.folder_parent_id;
-    }
-
-    return new FolderEntity(result);
+    const propSchema = FolderEntity.getSchema().properties[propName];
+    this._props[propName]  = EntitySchema.validateProp(propName, folderParentId, propSchema)
   }
 }
 

@@ -7,8 +7,8 @@
 const __ = require('../sdk/l10n').get;
 const Request = require('./request').Request;
 const User = require('./user').User;
-const ResourceService = require('../service/resource').ResourceService;
-const ResourceLocalStorage = require('../service/local_storage/resource').ResourceLocalStorage;
+const {ResourceService} = require('../service/resource');
+const {ResourceLocalStorage} = require('../service/local_storage/resourceLocalStorage');
 
 /**
  * The class that deals with resources.
@@ -129,7 +129,7 @@ Resource.import = function (resource) {
  * Find resource to share
  *
  * @deprecated since v2.4.0 will be removed in v3.0
- * replaced by the findShareResources function.
+ * replaced by the findAllForShare function.
  * @param resourceId
  */
 Resource.findShareResource = async function (resourceId) {
@@ -167,8 +167,8 @@ Resource.findShareResource = async function (resourceId) {
  * @param {array} resourcesIds
  * @returns {array|Error}
  */
-Resource.findShareResources = async function (resourcesIds) {
-  return ResourceService.findAllForShare(resourcesIds);
+Resource.findAllForShare = async function (resourcesIds) {
+  return await ResourceService.findAllForShare(resourcesIds);
 };
 
 /**

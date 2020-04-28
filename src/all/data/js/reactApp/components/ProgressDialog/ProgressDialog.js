@@ -22,7 +22,7 @@ class ProgressDialog extends Component {
 
   calculateProgress() {
     if (!this.props.goals) {
-      return 0;
+      return 100; // displays a spinning 100% progress bar by default.
     }
     return Math.round((100 * this.props.completed) / this.props.goals);
   }

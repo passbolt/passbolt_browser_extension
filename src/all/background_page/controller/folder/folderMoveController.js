@@ -50,7 +50,7 @@ class FolderMoveController {
   async moveFolders(ids, folderParentId) {
     for (let i in ids) {
       const id = ids[i];
-      const folderDto = {id, folderParentId};
+      const folderDto = {id, 'folder_parent_id': folderParentId};
       const folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
       await folderModel.update(new FolderEntity(folderDto));
     }

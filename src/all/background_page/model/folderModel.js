@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {FolderEntity} = require('./entity/folder/folderEntity');
-const {FolderLocalStorage} = require('../service/local_storage/folder');
-const {FolderService} = require('../service/api/folder');
+const {FolderLocalStorage} = require('../service/local_storage/folderLocalStorage');
+const {FolderService} = require('../service/api/folder/folderService');
 
 class FolderModel {
   /**
@@ -27,37 +27,45 @@ class FolderModel {
 
   /**
    * Update the folders local storage with the latest API folders the user has access.
-   * @return {Promise}
+   *
+   * @return {Promise<[FolderEntity]>}
    */
   async updateLocalStorage () {
-    const options = {
-      "contain[folder_parent_id]": "1"
-    };
-    const folders = await this.findAll(options);
+    const folders = await this.findAll();
     await FolderLocalStorage.set(folders);
     return folders;
   }
 
   /**
    * Get all folders from API and map API result to folder Entity
+   *
    * @return {Array<FolderEntity>} folders
    */
-  async findAll(options) {
-    return await this.folderService
-      .findAll(options)
-      .map(folder => FolderEntity.fromApiData(folder));
+  async findAll() {
+    const body = await this.folderService.findAll();
+    return body.map(folder => new FolderEntity(folder));
+  }
+
+  /**
+   * Get all folders from API and map API result to folder Entity
+   *
+   * @return {Array<FolderEntity>} folders
+   */
+  async findAllForShare(foldersIds) {
+    return await this.folderService.findAllForShare(foldersIds);
+    // TODO map to entities
+    //return body.map(folder => FolderEntity.fromApiData(folder));
   }
 
   /**
    * Create a folder using Passbolt API and add result to local storage
    *
    * @param {FolderEntity} folderEntity
-   * @throws {Error} if CSRF token is not set
    * @returns {Promise<FolderEntity>}
    */
   async create(folderEntity) {
-    const response = await this.folderService.create(folderEntity.toApiData());
-    const updatedFolderEntity = FolderEntity.fromApiData(response);
+    const folderDto = await this.folderService.create(folderEntity.toApiData());
+    const updatedFolderEntity = new FolderEntity(folderDto);
     await FolderLocalStorage.addFolder(updatedFolderEntity);
     return updatedFolderEntity;
   }
@@ -66,13 +74,11 @@ class FolderModel {
    * Update a folder using Passbolt API
    *
    * @param {FolderEntity} folderEntity
-   * @throws {Error} if entity id is not set
-   * @throws {Error} if CSRF token is not set
    * @returns {Promise<FolderEntity>}
    */
   async update(folderEntity) {
-    const response = await this.folderService.update(folderEntity.getId(), folderEntity.toApiData());
-    const updatedFolderEntity = FolderEntity.fromApiData(response.body);
+    const folderDto = await this.folderService.update(folderEntity.getId(), folderEntity.toApiData());
+    const updatedFolderEntity = new FolderEntity(folderDto);
     await FolderLocalStorage.updateFolder(updatedFolderEntity);
     return updatedFolderEntity;
   }
@@ -82,8 +88,6 @@ class FolderModel {
    *
    * @param {string} folderId uuid
    * @param {boolean} [cascade] delete sub folder / folders
-   * @throws {TypeError} if entity id is not set
-   * @throws {Error} if CSRF token is not set
    * @returns {Promise<void>}
    */
   async delete(folderId, cascade) {

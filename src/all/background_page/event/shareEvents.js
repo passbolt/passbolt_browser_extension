@@ -6,12 +6,15 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {ShareResourcesController} = require('../controller/share/shareResourcesController');
+const Worker = require('../model/worker');
+const {User} = require('../model/user');
 const {Permission} = require('../model/permission');
 const {Resource} = require('../model/resource');
 const {FolderModel} = require('../model/folderModel');
 const {Share} = require('../model/share');
-const Worker = require('../model/worker');
+
+const {ShareResourcesController} = require('../controller/share/shareResourcesController');
+const {ShareFoldersController} = require('../controller/share/shareFoldersController');
 
 const listen = function (worker) {
   /*
@@ -19,13 +22,17 @@ const listen = function (worker) {
    * @listens passbolt.share.search-aros
    * @param keywords {string} The keywords to search
    */
-  worker.port.on('passbolt.share.search-aros', async function (requestId, itemsToShare, keywords) {
+  worker.port.on('passbolt.share.search-aros', async function (requestId, keywords, resourcesForLegacyApi) {
     let aros;
-    if (itemsToShare.resourcesIds && itemsToShare.resourcesIds.length === 1) {
-      // This code ensure the compatibility with passbolt < v2.4.0.
-      aros = await Share.searchResourceAros(itemsToShare.resourcesIds[0], keywords);
-    } else {
+    try {
       aros = await Share.searchAros(keywords);
+    } catch (error) {
+      if (resourcesForLegacyApi.resourcesIds && resourcesForLegacyApi.resourcesIds.length === 1) {
+        // This code ensure the compatibility with passbolt < v2.4.0.
+        aros = await Share.searchResourceAros(resourcesForLegacyApi.resourcesIds[0], keywords);
+      } else {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      }
     }
     worker.port.emit(requestId, 'SUCCESS', aros);
   });
@@ -44,7 +51,7 @@ const listen = function (worker) {
         resource.permissions = await Permission.findResourcePermissions(resourcesIds[0]);
         resources = [resource];
       } else {
-        resources = await Resource.findShareResources(resourcesIds);
+        resources = await Resource.findAllForShare(resourcesIds);
       }
       worker.port.emit(requestId, 'SUCCESS', resources);
     } catch(error) {
@@ -59,9 +66,12 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.share.get-folders', async function (requestId, foldersIds) {
     try {
-      const folders = await FolderModel.findAllForShare(foldersIds);
-      worker.port.emit(requestId, 'SUCCESS', folders);
+      let apiClientOptions = await User.getInstance().getApiClientOptions();
+      let folderModel = new FolderModel(apiClientOptions);
+      const folderEntities = await folderModel.findAllForShare(foldersIds);
+      worker.port.emit(requestId, 'SUCCESS', folderEntities);
     } catch (error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }
   });
@@ -72,14 +82,28 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.share.resources.save', async function (requestId, resources, changes) {
-    const controller = new ShareResourcesController(worker, requestId);
+    const shareResourcesController = new ShareResourcesController(worker, requestId);
     try {
-      await controller.main(resources, changes);
+      await shareResourcesController.main(resources, changes);
       worker.port.emit(requestId, 'SUCCESS');
-      //appWorker.port.emit('passbolt.share.complete', results);
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      //appWorker.port.emit('passbolt.share.error', worker.port.getEmitableError(error));
+    }
+  });
+
+  /*
+   * Update the folder permissions
+   *
+   * @listens passbolt.share.folders.save
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.share.folders.save', async function (requestId, folders, changes) {
+    const shareFoldersController = new ShareFoldersController(worker, requestId);
+    try {
+      await shareFoldersController.main(folders, changes);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }
   });
 

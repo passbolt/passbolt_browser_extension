@@ -14,8 +14,8 @@
 const browser = require("webextension-polyfill/dist/browser-polyfill");
 const Crypto = require('../../model/crypto').Crypto;
 const passphraseController = require('../passphrase/passphraseController');
-const ResourceService = require('../../service/resource').ResourceService;
-const Secret = require('../../model/secret').Secret;
+const {ResourceService} = require('../../service/resource');
+const {Secret} = require('../../model/secret').Secret;
 const Worker = require('../../model/worker');
 
 /**

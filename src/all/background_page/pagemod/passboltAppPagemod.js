@@ -59,7 +59,6 @@ PassboltApp.initPageMod = function () {
 
       // Templates
       'data/tpl/group.js',
-      'data/tpl/resource.js',
       'data/tpl/secret.js',
       'data/tpl/import.js',
 

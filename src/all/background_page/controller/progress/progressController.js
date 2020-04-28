@@ -12,7 +12,8 @@ const Worker = require('../../model/worker');
  *
  * @param {Worker} worker The worker from which the request comes from.
  * @param {string} title The progress title.
- * @param {integer} goals The number of goals to achieve.
+ * @param {number} goals The number of goals to achieve.
+ * @param {string} message start progress message
  * @return {Promise}
  */
 const start = function (worker, title, goals, message) {

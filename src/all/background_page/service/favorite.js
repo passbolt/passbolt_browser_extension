@@ -12,11 +12,11 @@
  * @since         2.12.0
  */
 const __ = require('../sdk/l10n').get;
-const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
-const PassboltBadResponseError = require('../error/passboltBadResponseError').PassboltBadResponseError;
-const PassboltServiceUnavailableError = require('../error/passboltServiceUnavailableError').PassboltServiceUnavailableError;
-const Request = require('../model/request').Request;
-const User = require('../model/user').User;
+const {PassboltApiFetchError} = require('../error/passboltApiFetchError');
+const {PassboltBadResponseError} = require('../error/passboltBadResponseError');
+const {PassboltServiceUnavailableError} = require('../error/passboltServiceUnavailableError');
+const {Request} = require('../model/request');
+const {User} = require('../model/user');
 
 class FavoriteService {
 

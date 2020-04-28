@@ -15,21 +15,6 @@ const listen = function (worker) {
   // ================================
 
   /*
-   * Validate a folder
-   *
-   * @listens passbolt.folders.validate
-   * @param requestId {uuid} The request identifier
-   * @param folder {array} The folder
-   */
-  worker.port.on('passbolt.folders.validate', async function (requestId, folderDto) {
-    try {
-      worker.port.emit(requestId, 'SUCCESS', new FolderEntity(folderDto));
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-    }
-  });
-
-  /*
    * Create a new folder
    *
    * @listens passbolt.folders.create

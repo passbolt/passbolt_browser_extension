@@ -244,33 +244,6 @@ const User = (function () {
   };
 
   /**
-   * Get the user name
-   *
-   * @return {object}
-   * format :
-   *   {
-   *     firstname : 'FIRST_NAME',
-   *     lastname : 'LAST_NAME'
-   *   }
-   */
-  this.getName = function () {
-    var name = {
-      firstname: Config.read('user.firstname'),
-      lastname: Config.read('user.lastname')
-    };
-    return name;
-  };
-
-  /**
-   * Get the username
-   *
-   * @return {string}
-   */
-  this.getUsername = function () {
-    return Config.read('user.username');
-  };
-
-  /**
    * Get the current user from the local storage.
    * All data returned are validated once again.
    *
@@ -458,49 +431,6 @@ const User = (function () {
     });
   };
 
-  /**
-   * Search users by keywords
-   *
-   * @param keywords
-   * @param excludedUsers
-   * @return {Promise.<array>} array of users
-   */
-  this.searchUsers = async function (keywords, excludedUsers) {
-
-    // Prepare url and data
-    const url = this.settings.getDomain() + '/users.json'
-      + '?api-version=v1' + '&filter[keywords]=' + htmlspecialchars(keywords, 'ENT_QUOTES') + '&filter[is-active]=1';
-    const data = {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    };
-    const response = await fetch(url, data);
-    const json = await response.json();
-
-    // Check response status
-    if (!response.ok) {
-      let msg = __('Could not get the users. The server responded with an error.');
-      if (typeof json.headers.msg !== 'undefined') {
-        msg += ` ${json.headers.msg}`;
-      }
-      msg += ` (${response.status})`;
-      throw new Error(msg);
-    }
-
-    // Build the user list
-    const users = json.body;
-    let finalUsers = [];
-    for (var i in users) {
-      if (!in_array(users[i].User.id, excludedUsers)) {
-        finalUsers.push(users[i]);
-      }
-    }
-    return finalUsers;
-  };
 });
 
 var UserSingleton = (function () {
@@ -516,10 +446,6 @@ var UserSingleton = (function () {
         instance = createInstance();
       }
       return instance;
-    },
-    findAll: async function (options) {
-      const user = UserSingleton.getInstance();
-      return await UserService.findAll(user, options);
     }
   };
 })();

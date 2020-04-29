@@ -34,8 +34,8 @@ passbolt.templates = window.templates;
         dimension.height = options.height + 6; // account for border;
       }
     }
-    if (dimension.height < 52) {
-      dimension.height = 52;
+    if (dimension.height < 92) {
+      dimension.height = 92;
     }
     // Request the application worker to resize the iframe container.
     passbolt.message.emit('passbolt.passbolt-page.resize-iframe', selector, dimension);

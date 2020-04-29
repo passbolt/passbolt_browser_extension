@@ -13,6 +13,7 @@ const {Group} = require('../model/group');
 const {GroupForm} = require('../model/groupForm');
 const {Keyring} = require('../model/keyring');
 const {Crypto} = require('../model/crypto');
+const {UserService} = require('../service/user');
 
 const passphraseController = require('../controller/passphrase/passphraseController');
 const progressController = require('../controller/progress/progressController');

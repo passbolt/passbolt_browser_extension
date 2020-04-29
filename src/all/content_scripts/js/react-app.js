@@ -182,7 +182,7 @@ window.addEventListener("passbolt.plugin.folders.open-share-dialog", async (even
 // DEPRECATED
 //
 // @deprecated since v2.13 to be removed in 3.0
-window.addEventListener("passbolt.plugin.resources.resources_share", shareResources, false);
+window.addEventListener("passbolt.plugin.resources_share", shareResources, false);
 
 // @deprecated since v2.4.0 will be removed in v3.0
 window.addEventListener("passbolt.plugin.resource_share", async function (event) {

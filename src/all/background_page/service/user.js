@@ -164,7 +164,7 @@ UserService.searchUsers = async function (user, options) {
     }
   };
   const url = new URL(`${domain}/users.json?api-version=v1`); // TODO use v2
-  url.searchParams.append("filter[has-access]", htmlspecialchars(keywords, 'ENT_QUOTES'));
+  url.searchParams.append("filter[keywords]", htmlspecialchars(keywords, 'ENT_QUOTES'));
   url.searchParams.append("filter[is-active]", "1");
 
   let response, responseJson;

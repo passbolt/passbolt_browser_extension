@@ -25,7 +25,6 @@ events.clipboard = require('./event/clipboardEvents');
 events.config = require('./event/configEvents');
 events.debug = require('./event/debugEvents');
 events.debugPage = require('./event/debugPageEvents');
-events.editPassword = require('./event/editPasswordEvents');
 events.exportPasswordsIframe = require('./event/exportPasswordsIframeEvents');
 events.exportPasswords = require('./event/exportPasswordsEvents');
 events.favorite = require('./event/favoriteEvents');
@@ -138,12 +137,6 @@ pageMods.Clipboard = require('./pagemod/clipboardPagemod').Clipboard;
  * This pagemod drives the file iframe tool
  */
 pageMods.File = require('./pagemod/filePagemod').File;
-
-/*
- * This pagemod drives the iframe used when the user enter a password to be stored by passbolt
- * It is used when creating/editing a new password
- */
-pageMods.SecretEditDialog = require('./pagemod/secretEditDialogPagemod').SecretEditDialog;
 
 /*
  * This pagemod drives the iframe used when the user creates / edit a group.

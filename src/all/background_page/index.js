@@ -79,7 +79,6 @@ const main = async function() {
   pageMods.File.init();
   pageMods.Clipboard.init();
   pageMods.PassboltAuthForm.init();
-  pageMods.SecretEditDialog.init();
   // pageMods.ShareDialog.init();
   pageMods.GroupEditDialog.init();
   pageMods.GroupEditAutocompleteDialog.init();

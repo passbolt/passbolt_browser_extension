@@ -39,7 +39,6 @@ GroupEditDialog.init = function () {
             });
 
             app.events.config.listen(worker);
-            app.events.editPassword.listen(worker);
             app.events.passboltPage.listen(worker);
             app.events.secret.listen(worker);
             app.events.group.listen(worker);

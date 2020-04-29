@@ -74,6 +74,7 @@ PassboltApp.initPageMod = function () {
       'content_scripts/js/group/editIframe.js',
       'content_scripts/js/import/importPasswordsIframe.js',
       'content_scripts/js/export/exportPasswordsIframe.js',
+      'content_scripts/js/legacy/secret.js',
       'content_scripts/js/app.js',
       'content_scripts/js/react-app.js'
     ],
@@ -89,7 +90,6 @@ PassboltApp.initPageMod = function () {
 
       app.events.auth.listen(worker);
       app.events.clipboard.listen(worker);
-      app.events.editPassword.listen(worker);
       app.events.exportPasswordsIframe.listen(worker);
       app.events.favorite.listen(worker);
       app.events.keyring.listen(worker);

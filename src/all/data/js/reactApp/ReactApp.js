@@ -243,11 +243,7 @@ class ReactApp extends Component {
   }
 
   handleProgressDialogCloseEvent() {
-    const progressDialogProps = this.state.progressDialogProps;
-    progressDialogProps.completed = progressDialogProps.goals;
-    this.setState({showProgressDialog: true, progressDialogProps: progressDialogProps}, () => {
-      this.setState({showProgressDialog: false, progressDialogProps: null});
-    });
+    this.setState({showProgressDialog: false, progressDialogProps: null});
   }
 
   /*

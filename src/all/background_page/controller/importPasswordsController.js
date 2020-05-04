@@ -85,7 +85,7 @@ ImportPasswordsController.prototype.encryptSecrets = async function(resources) {
   this.resources = resources;
   this.progressObjective = this.resources.length * 2;
 
-  await progressController.start(this.worker, 'Encrypting ...', this.progressObjective);
+  await progressController.open(this.worker, 'Encrypting ...', this.progressObjective);
 
   const currentUser = user.get(),
     userId = currentUser.id;
@@ -313,7 +313,7 @@ ImportPasswordsController.prototype.saveResources = async function(resources, op
     importResourcesResults.errors = [...importResourcesResults.errors, ...importBatchResult.errors];
   }
 
-  await progressController.complete(this.worker);
+  await progressController.close(this.worker);
 
   return importResults;
 };

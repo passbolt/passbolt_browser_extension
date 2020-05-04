@@ -51,7 +51,7 @@ ShareService.searchAros = async function (keywords) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+    throw new PassboltBadResponseError();
   }
 
   if (!response.ok) {
@@ -99,7 +99,7 @@ ShareService.searchResourceAros = async function(resourceId, keywords) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+    throw new PassboltBadResponseError();
   }
 
   if (!response.ok) {
@@ -146,7 +146,7 @@ ShareService.shareResource = async function(resourceId, data) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+    throw new PassboltBadResponseError();
   }
 
   if (!response.ok) {
@@ -199,7 +199,7 @@ ShareService.simulateShareResource = async function (resourceId, permissions) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+    throw new PassboltBadResponseError();
   }
 
   if (!response.ok) {

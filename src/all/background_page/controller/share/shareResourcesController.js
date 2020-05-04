@@ -50,18 +50,19 @@ class ShareResourcesController {
       if (resources.length === 1) {
         msg  = `Share one password`;
       }
-      await progressController.start(this.worker, msg, progressGoal);
+      await progressController.open(this.worker, msg, progressGoal);
       await progressController.update(this.worker, progress++, 'Initialize');
       await keyring.sync();
-      await Share.bulkShareResources(resources, changes, privateKeySecret, message => {
-        progressController.update(this.worker, progress++, message);
+      await Share.bulkShareResources(resources, changes, privateKeySecret, async message => {
+        await progressController.update(this.worker, progress++, message);
       });
       const results = resources.map(resource => resource.id);
-      await progressController.complete(this.worker);
+      await progressController.update(this.worker, progressGoal, 'Done!');
+      await progressController.close(this.worker);
       return results;
     } catch(error) {
       console.error(error);
-      await progressController.complete(this.worker);
+      await progressController.close(this.worker);
       throw error;
     }
   }

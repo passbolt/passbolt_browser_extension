@@ -45,14 +45,15 @@ class ShareFoldersController {
       if (folders.length === 1) {
         msg  = `Sharing one folder`;
       }
-      await progressController.start(this.worker, msg, progressGoal, 'Initializing...');
-      await Share.bulkShareFolders(folders, changes, this.folderModel, message => {
+      await progressController.open(this.worker, msg, progressGoal, 'Initializing...');
+      await Share.bulkShareFolders(folders, changes, this.folderModel,  (message) => {
         progressController.update(this.worker, progress++, message);
       });
-      await progressController.complete(this.worker);
+      await progressController.update(this.worker, progressGoal, 'Done!');
+      await progressController.close(this.worker);
     } catch(error) {
       console.error(error);
-      await progressController.complete(this.worker);
+      await progressController.close(this.worker);
       throw error;
     }
   }

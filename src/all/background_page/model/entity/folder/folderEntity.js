@@ -13,6 +13,8 @@
  */
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
+const {PermissionEntity} = require('../permission/permissionEntity');
+const {PermissionsCollection} = require('../permission/permissionsCollection');
 
 const ENTITY_NAME = 'Folder';
 const FOLDER_NAME_MIN_LENGTH = 1;
@@ -31,6 +33,16 @@ class FolderEntity extends Entity {
       folderDto,
       FolderEntity.getSchema()
     ));
+
+    // Associations
+    if (this._props.permission) {
+      this._permission = new PermissionEntity(this._props.permission);
+      delete this._props.permission;
+    }
+    if (this._props.permissions) {
+      this._permissions = new PermissionsCollection(this._props.permissions);
+      delete this._props.permissions;
+    }
   }
 
   /**
@@ -62,6 +74,14 @@ class FolderEntity extends Entity {
           "minLength": FOLDER_NAME_MIN_LENGTH,
           "maxLength": FOLDER_NAME_MAX_LENGTH
         },
+        "created_by": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "modified_by": {
+          "type": "string",
+          "format": "uuid"
+        },
         "created": {
           "type": "string",
           "format": "date-time"
@@ -70,8 +90,40 @@ class FolderEntity extends Entity {
           "type": "string",
           "format": "date-time"
         },
+        "permission": PermissionEntity.getSchema(), // current user permission
+        "permissions": PermissionsCollection.getSchema() // all users permissions
       }
     }
+  }
+
+  /**
+   * Return a DTO ready to be sent to API
+   *
+   * @param {object} [contain] optional
+   * @returns {object}
+   */
+  toDto(contain) {
+    let result = Object.assign({}, this._props);
+
+    if (contain && contain.permission) {
+      if (this._permission) {
+        result.permission = this._permission ? this._permission.toDto() : null;
+      }
+    }
+    if (contain && contain.permissions) {
+      if (this._permissions) {
+        result.permissions = this._permissions ? this._permissions.toDto() : null;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Customizes JSON stringification behavior
+   * @returns {*}
+   */
+  toJSON() {
+    return this.toDto({permission: true, permissions: true});
   }
 
   // ==================================================
@@ -129,23 +181,42 @@ class FolderEntity extends Entity {
   }
 
   // ==================================================
+  // Associated properties getters
+  // ==================================================
+  /**
+   * Get all the current user permissions
+   * @returns {PermissionEntity} permission
+   */
+  get permission() {
+    return this._permission || null;
+  }
+
+  /**
+   * Get all users permissions for the given folder
+   * @returns {PermissionsCollection} permissions
+   */
+  get permissions() {
+    return this._permissions || null;
+  }
+
+  // ==================================================
   // Default properties setters
   // ==================================================
   /**
    * Folder Parent Id
-   * @param {*} folderParentId
+   * @param {string|null} folderParentId optional
    * @throws {EntityValidationError} if parent id is not a valid uuid
    * @returns void
    * @public
    */
   set folderParentId(folderParentId) {
     const propName = 'folder_parent_id';
-    if (folderParentId === null) {
-      this._props[propName] = folderParentId;
+    if (!folderParentId ) {
+      this._props[propName] = null;
       return;
     }
     const propSchema = FolderEntity.getSchema().properties[propName];
-    this._props[propName]  = EntitySchema.validateProp(propName, folderParentId, propSchema)
+    this._props[propName] = EntitySchema.validateProp(propName, folderParentId, propSchema)
   }
 }
 

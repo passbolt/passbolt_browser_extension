@@ -129,7 +129,7 @@ var listen = function (worker) {
         worker.port.emit(requestId, 'ERROR', error);
       }
     } finally {
-      await progressController.complete(worker);
+      await progressController.close(worker);
     }
   });
 
@@ -142,11 +142,11 @@ var listen = function (worker) {
   const createGroup = async function(worker, groupJson) {
     const group = new Group();
 
-    await progressController.start(worker, 'Creating group ...', 2);
+    await progressController.open(worker, 'Creating group ...', 2);
     progressController.update(worker, 1);
     const groupSaved = await group.save(groupJson);
     progressController.update(worker, 2);
-    await progressController.complete(worker);
+    await progressController.close(worker);
 
     return groupSaved;
   };
@@ -162,11 +162,11 @@ var listen = function (worker) {
     const group = new Group();
 
     const groupSavedPromised = group.save(groupJson, groupId);
-    await progressController.start(worker, 'Updating group ...', 2);
+    await progressController.open(worker, 'Updating group ...', 2);
     progressController.update(worker, 1);
     const groupSaved = await groupSavedPromised;
     progressController.update(worker, 2);
-    await progressController.complete(worker);
+    await progressController.close(worker);
 
     return groupSaved;
   };
@@ -187,7 +187,7 @@ var listen = function (worker) {
     const dryRunPromise = group.save(groupJson, groupId, true);
     const keyringSyncPromise = keyring.sync();
     const masterPassword = await passphraseController.get(worker);
-    await progressController.start(worker, 'Updating group ...', progressGoals);
+    await progressController.open(worker, 'Updating group ...', progressGoals);
     const dryRunResult = await dryRunPromise;
     await keyringSyncPromise;
 
@@ -203,7 +203,7 @@ var listen = function (worker) {
       message => { return index => progressController.update(worker, progress, message.replace('%0', parseInt(index) + 1)) }
     );
     const groupSaved = await group.save(groupJson, groupId);
-    await progressController.complete(worker);
+    await progressController.close(worker);
 
     return groupSaved;
   };

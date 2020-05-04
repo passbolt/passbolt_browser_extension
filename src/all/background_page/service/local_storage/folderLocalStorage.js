@@ -41,7 +41,7 @@ class FolderLocalStorage {
 
   /**
    * Set the folders local storage.
-   * @param {array} folderEntities The folders to insert in the local storage.
+   * @param {Array<FolderEntity>} folderEntities The folders to insert in the local storage.
    */
   static async set(folderEntities) {
     await lock.acquire();
@@ -51,10 +51,8 @@ class FolderLocalStorage {
         throw new TypeError('FolderLocalStorage::set expects an array of FolderEntity');
       }
       folderEntities.forEach((folderEntity) => {
-        if (!(folderEntity instanceof FolderEntity)) {
-          throw new TypeError('FolderLocalStorage::set expects an array of FolderEntity');
-        }
-        folders.push(folderEntity.toDto());
+        FolderLocalStorage.assertEntityBeforeSave(folderEntity);
+        folders.push(folderEntity.toDto({permission:true}));
       })
     }
     const result = await browser.storage.local.set({folders});
@@ -79,8 +77,9 @@ class FolderLocalStorage {
   static async addFolder(folderEntity) {
     await lock.acquire();
     try {
+      FolderLocalStorage.assertEntityBeforeSave(folderEntity);
       const folders = await FolderLocalStorage.get();
-      folders.push(folderEntity.toDto());
+      folders.push(folderEntity.toDto({permission: true}));
       await browser.storage.local.set({folders});
       lock.release();
     } catch (error) {
@@ -96,9 +95,10 @@ class FolderLocalStorage {
   static async updateFolder(folderEntity) {
     await lock.acquire();
     try {
+      FolderLocalStorage.assertEntityBeforeSave(folderEntity);
       const folders = await FolderLocalStorage.get();
       const folderIndex = folders.findIndex(item => item.id === folderEntity.id);
-      folders[folderIndex] = Object.assign(folders[folderIndex], folderEntity.toDto());
+      folders[folderIndex] = Object.assign(folders[folderIndex], folderEntity.toDto({permission: true}));
       await browser.storage.local.set({folders});
       lock.release();
     } catch (error) {
@@ -128,6 +128,26 @@ class FolderLocalStorage {
       throw error;
     }
   };
+
+  /**
+   * Make sure the entity meet some minimal requirements before being stored
+   * @param {FolderEntity} folderEntity
+   * @private
+   */
+  static assertEntityBeforeSave(folderEntity) {
+    if (!folderEntity) {
+      throw new TypeError('FolderLocalStorage expects a FolderEntity to be set');
+    }
+    if (!(folderEntity instanceof FolderEntity)) {
+      throw new TypeError('FolderLocalStorage expects an object of type FolderEntity');
+    }
+    if (!folderEntity.id) {
+      throw new TypeError('FolderLocalStorage expects FolderEntity id to be set');
+    }
+    if (!folderEntity.permission) {
+      throw new TypeError('FolderLocalStorage::set expects FolderEntity permission to be set');
+    }
+  }
 }
 
 // Flush the local storage when this library is loaded

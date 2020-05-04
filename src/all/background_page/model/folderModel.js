@@ -44,7 +44,7 @@ class FolderModel {
    * @return {Array<FolderEntity>} folders
    */
   async findAll() {
-    const body = await this.folderService.findAll();
+    const body = await this.folderService.findAll({permission: true});
     return body.map(folder => new FolderEntity(folder));
   }
 
@@ -55,11 +55,11 @@ class FolderModel {
    * @throws {Error} if API call fails, service unreachable, etc.
    * @return {Array<FolderEntity>} folders
    */
-  async findParentWithPermissions(folderEntity) {
+  async findParent(folderEntity) {
     if (!folderEntity.folderParentId) {
-      throw new TypeError('FolderModel::FindParentWithPermissions: folder parent id is missing.');
+      throw new TypeError('FolderModel::findParent folder parent id is missing.');
     }
-    const body = await this.folderService.get(folderEntity.folderParentId, {contain: {'permission': true}});
+    const body = await this.folderService.get(folderEntity.folderParentId, {permission: true});
     return new FolderEntity(body);
   }
 
@@ -81,7 +81,7 @@ class FolderModel {
    * @returns {Promise<FolderEntity>}
    */
   async create(folderEntity) {
-    const folderDto = await this.folderService.create(folderEntity.toDto());
+    const folderDto = await this.folderService.create(folderEntity.toDto(), {permission: true});
     const updatedFolderEntity = new FolderEntity(folderDto);
     await FolderLocalStorage.addFolder(updatedFolderEntity);
     return updatedFolderEntity;
@@ -94,7 +94,7 @@ class FolderModel {
    * @returns {Promise<FolderEntity>}
    */
   async update(folderEntity) {
-    const folderDto = await this.folderService.update(folderEntity.id, folderEntity.toDto());
+    const folderDto = await this.folderService.update(folderEntity.id, folderEntity.toDto(), {permission: true});
     const updatedFolderEntity = new FolderEntity(folderDto);
     await FolderLocalStorage.updateFolder(updatedFolderEntity);
     return updatedFolderEntity;

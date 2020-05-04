@@ -243,7 +243,7 @@ ResourceService.save = async function (data) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, { code: response.status });
+    throw new PassboltBadResponseError();
   }
 
   if (!response.ok) {
@@ -294,7 +294,7 @@ ResourceService.update = async function (data) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, { code: response.status });
+    throw new PassboltBadResponseError();
   }
 
   if (!response.ok) {
@@ -343,7 +343,7 @@ ResourceService.delete = async function (resourceId) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, { code: response.status });
+    throw new PassboltBadResponseError();
   }
 
   if (!response.ok) {
@@ -410,7 +410,7 @@ ResourceService.findAllForShare = async function(resourcesIds) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, { code: response.status });
+    throw new PassboltBadResponseError();
   }
 
   if (!response.ok) {

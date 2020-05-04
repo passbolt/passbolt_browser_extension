@@ -26,16 +26,16 @@ class ResourceExportController {
    */
   static async exec(worker, resourcesIds) {
     try {
-      const progressDialogPromise = progressController.start(worker, 'Retrieving passwords...');
+      const progressDialogPromise = progressController.open(worker, 'Retrieving passwords...');
       const resources = await ResourceService.findAllByResourcesIds(resourcesIds, {contain:{secret: 1}});
-      await progressController.complete(worker);
+      await progressController.close(worker);
       TabStorage.set(worker.tab.id, 'exportedResources', resources);
       await progressDialogPromise;
       worker.port.emit('passbolt.export-passwords.open-dialog');
     } catch (error) {
       console.error(error);
     } finally {
-      await progressController.complete(worker);
+      await progressController.close(worker);
     }
   }
 }

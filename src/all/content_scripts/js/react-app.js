@@ -277,7 +277,7 @@ const isReactAppReady = function() {
       resolver();
       clearInterval(checkInterval);
     }, (error) => {
-      console.warn('Passbolt app is not ready, retrying...');
+      //console.warn('Passbolt app is not ready, retrying...');
     });
   }, 100);
 

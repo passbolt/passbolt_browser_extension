@@ -29,7 +29,7 @@ class UserEntity extends Entity {
   constructor(userDto) {
     super(EntitySchema.validate(
       UserEntity.ENTITY_NAME,
-      userDto,
+      UserEntity._cleanupLastLoginDate(userDto),
       UserEntity.getSchema()
     ));
 
@@ -87,8 +87,12 @@ class UserEntity extends Entity {
           "format": "date-time"
         },
         "last_logged_in": {
-          "type": "string",
-          "format": "date-time"
+          "anyOf": [{
+            "type": "string",
+            "format": "date-time"
+          }, {
+            "type": "null"
+          }]
         },
         "role": RoleEntity.getSchema(),
         "profile": ProfileEntity.getSchema(),
@@ -97,6 +101,19 @@ class UserEntity extends Entity {
         //gpgkey
       }
     }
+  }
+
+  /**
+   * API returns "" for users that never logged in, convert this to null
+   * @param {object} dto
+   * @return {object} dto
+   * @private
+   */
+  static _cleanupLastLoginDate(dto) {
+    if (dto && dto.last_logged_in === '') {
+      dto.last_logged_in = null;
+    }
+    return dto;
   }
 
   /**
@@ -111,7 +128,7 @@ class UserEntity extends Entity {
     }
     if (contain && contain.profile) {
       if (this.profile) {
-        result.profile = this.profile ? this.profile.toDto(contain.profile) : null;
+        result.profile = this.profile ? this.profile.toDto(contain) : null;
       }
     }
     if (contain && contain.gpgkey) {

@@ -114,4 +114,32 @@ describe("Folder entity", () => {
       expect(error.hasError('name', 'maxLength')).toBe(true);
     }
   });
+
+  it("constructor works with associated permissions", () => {
+    const folderDto = {
+      "id": "6e6fd446-92a8-478f-aa9d-746685048836",
+      "name": "folder",
+      "created": "2020-05-04T14:52:28+00:00",
+      "modified": "2020-05-04T14:52:28+00:00",
+      "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+      "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+      "permission": {
+        "id": "37ca07ee-44b6-4ce8-9439-47b4fd5479cc",
+        "aco": "Folder",
+        "aco_foreign_key": "6e6fd446-92a8-478f-aa9d-746685048836",
+        "aro": "User",
+        "aro_foreign_key": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+        "type": 15,
+        "created": "2020-05-04T14:52:28+00:00",
+        "modified": "2020-05-04T14:52:28+00:00"
+      },
+      "folder_parent_id": "63241b96-81d8-4eb9-8cba-82a6f724b310"
+    };
+    const folderEntity = new FolderEntity(folderDto);
+    expect(folderEntity.toDto({permission:true})).toEqual(folderDto);
+    const folderJson = JSON.stringify(folderEntity.toDto({permission:true}));
+    expect(folderJson.includes('37ca07ee-44b6-4ce8-9439-47b4fd5479cc')).toBe(true);
+    const folderJson2 = JSON.stringify(folderEntity.toDto());
+    expect(folderJson2.includes('37ca07ee-44b6-4ce8-9439-47b4fd5479cc')).toBe(false);
+  });
 });

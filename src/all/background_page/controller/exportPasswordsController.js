@@ -60,7 +60,7 @@ ExportPasswordsController.prototype.init = function(resources, options) {
  */
 ExportPasswordsController.prototype.decryptSecrets = async function() {
   const decryptedSecrets = await this._decryptSecrets(this.resources);
-  await progressController.complete(this.worker);
+  await progressController.close(this.worker);
   this.resources = this._addDecryptedSecretsToResources(self.resources, decryptedSecrets);
   return this.resources
 };
@@ -158,7 +158,7 @@ ExportPasswordsController.prototype._decryptSecrets = function(secrets) {
   // Master password required to decrypt a secret before sharing it.
   return passphraseController.get(this.worker)
   .then(function (masterPassword) {
-    progressController.start(self.worker, 'Decrypting...', self.resources.length);
+    progressController.open(self.worker, 'Decrypting...', self.resources.length);
     var armored = self._prepareArmoredList();
     return crypto.decryptAll(armored, masterPassword,
       // On complete.

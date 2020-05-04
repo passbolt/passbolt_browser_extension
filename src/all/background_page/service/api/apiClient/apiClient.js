@@ -312,7 +312,7 @@ class ApiClient {
     } catch (error) {
       // If the response cannot be parsed, it's not a Passbolt API response.
       // It can be a for example a proxy timeout error (504).
-      throw new PassboltBadResponseError(response.statusText, {code: response.status});
+      throw new PassboltBadResponseError();
     }
 
     if (!response.ok) {

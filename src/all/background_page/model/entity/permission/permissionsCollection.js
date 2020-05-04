@@ -19,9 +19,9 @@ const ENTITY_NAME = 'Permissions';
 
 class PermissionsCollection extends EntityCollection {
   /**
-   * Permissions Entity constructor
+   * Permissions Collection constructor
    *
-   * @param {Object} permissionsDto folder DTO
+   * @param {array} permissionsDto
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
   constructor(permissionsDto) {
@@ -35,7 +35,11 @@ class PermissionsCollection extends EntityCollection {
     // Collection validation will fail at the first items that doesn't validate
     this._items = [];
     this._props.forEach(permission => {
-      this._items.push(new PermissionEntity(permission));
+      if(permission instanceof PermissionEntity) {
+        this._items.push(permission);
+      } else {
+        this._items.push(new PermissionEntity(permission));
+      }
     });
 
     // We do not keep original props
@@ -54,9 +58,6 @@ class PermissionsCollection extends EntityCollection {
     }
   }
 
-  // ==================================================
-  // Static getter
-  // ==================================================
   /**
    * PermissionsCollection.ENTITY_NAME
    * @returns {string}

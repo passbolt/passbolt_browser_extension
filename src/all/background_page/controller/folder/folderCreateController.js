@@ -42,20 +42,21 @@ class FolderCreateController {
 
     try {
       let msg = `Creating folder ${folderEntity.name}`;
-      await progressController.start(this.worker, msg, progressGoal, 'Initializing...');
+      await progressController.open(this.worker, msg, progressGoal, 'Initializing...');
       const newFolderEntity = await this.folderModel.create(folderEntity);
       await progressController.update(this.worker, progress++, 'Saving permissions...');
       await progressController.delay();
 
       if (folderEntity.folderParentId) {
-        const parentEntity = await this.folderModel.findParentWithPermissions(folderEntity);
+        const parentEntity = await this.folderModel.findParent(folderEntity);
       }
 
-      await progressController.complete(this.worker);
+      await progressController.update(this.worker, progressGoal, 'Done!');
+      await progressController.close(this.worker);
       return newFolderEntity;
     } catch(error) {
       console.error(error);
-      await progressController.complete(this.worker);
+      await progressController.close(this.worker);
       throw error;
     }
   }

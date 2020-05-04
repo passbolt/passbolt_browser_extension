@@ -86,7 +86,7 @@ class FolderService extends AbstractService {
    *
    * @param {Object} contain optional for example {"user": true}
    *        @see getSupportedContainOptions
-   * @param {Object} filters optional for example {"has-id": [uuid, ...]}
+   * @param {Object} [filters] optional for example {"has-id": [uuid, ...]}
    *        @see getSupportedFiltersOptions
    * @returns {Promise<*>} response body
    * @throws {TypeError} if urlOptions key or values are not a string
@@ -110,11 +110,13 @@ class FolderService extends AbstractService {
    * Create a folder using Passbolt API
    *
    * @param {Object} data
+   * @param {Object} contain optional for example {"permission": true}
    * @returns {Promise<*>} Response body
    * @public
    */
-  async create(data) {
-    const response = await this.apiClient.create(data);
+  async create(data, contain) {
+    let options = contain ? this.formatContainOptions(contain, FolderService.getSupportedContainOptions()) : null;
+    const response = await this.apiClient.create(data, options);
     return response.body;
   }
 
@@ -123,11 +125,13 @@ class FolderService extends AbstractService {
    *
    * @param {String} folderId uuid
    * @param {Object} folderData
+   * @param {Object} contain optional for example {"permission": true}
    * @returns {Promise<*>} Response body
    * @public
    */
-  async update(folderId, folderData) {
-    const response = await this.apiClient.update(folderId, folderData);
+  async update(folderId, folderData, contain) {
+    let options = contain ? this.formatContainOptions(contain, FolderService.getSupportedContainOptions()) : null;
+    const response = await this.apiClient.update(folderId, folderData, options);
     return response.body;
   }
 

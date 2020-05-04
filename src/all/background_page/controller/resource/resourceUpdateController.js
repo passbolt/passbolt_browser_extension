@@ -43,11 +43,11 @@ class ResourceUpdateController {
       resource.secrets = await this.encryptPassword(resource, password);
       await progressController.update(this.worker, 3, "Updating password");
     } else {
-      await progressController.start(this.worker, "Updating password");
+      await progressController.open(this.worker, "Updating password");
     }
     try {
       const updatedResource = await Resource.update(resource);
-      await progressController.complete(this.worker);
+      await progressController.close(this.worker);
       return updatedResource;
     } catch(error) {
       console.error(error);
@@ -63,7 +63,7 @@ class ResourceUpdateController {
     const keyringSyncPromise = keyring.sync();
     const getUsersIdsPromise = this.getUsersIdsToEncryptFor(resource);
     const passphrase = await passphraseController.get(this.worker);
-    await progressController.start(this.worker, "Updating password", 3, "Retrieving users");
+    await progressController.open(this.worker, "Updating password", 3, "Retrieving users");
     await keyringSyncPromise;
     const usersIds = await getUsersIdsPromise;
     await progressController.update(this.worker, 1, "Decrypting private key");

@@ -96,7 +96,7 @@ const listen = function (worker) {
       }
       const secretPromise = Secret.findByResourceId(resourceId);
       const masterPassword = await passphraseController.get(worker);
-      await progressController.start(worker, 'Decrypting...');
+      await progressController.open(worker, 'Decrypting...');
       const secret = await secretPromise;
       const message = await crypto.decrypt(secret.data, masterPassword);
       const clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
@@ -111,7 +111,7 @@ const listen = function (worker) {
         worker.port.emit(requestId, 'ERROR', error);
       }
     } finally {
-      await progressController.complete(worker);
+      await progressController.close(worker);
     }
   });
 
@@ -318,7 +318,7 @@ const listen = function (worker) {
     }
 
     // Open the progress dialog.
-    await progressController.start(worker, 'Encrypting ...', usersIds.length, 'Please wait...');
+    await progressController.open(worker, 'Encrypting ...', usersIds.length, 'Please wait...');
 
     // Sync the keyring with the server.
     await keyring.sync();
@@ -347,7 +347,7 @@ const listen = function (worker) {
       armoreds[usersIds[i]] = data[i];
     }
     worker.port.emit(requestId, 'SUCCESS', armoreds);
-    await progressController.complete(worker);
+    await progressController.close(worker);
   });
 
   /*
@@ -363,14 +363,14 @@ const listen = function (worker) {
 
     try {
       const passphrase = await passphraseController.get(worker);
-      await progressController.start(worker, 'Decrypting...', 1, 'Decrypting...');
+      await progressController.open(worker, 'Decrypting...', 1, 'Decrypting...');
       const decrypted = await crypto.decrypt(armored, passphrase);
       const clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
       clipboardWorker.port.emit('passbolt.clipboard-iframe.copy', decrypted);
-      await progressController.complete(worker);
+      await progressController.close(worker);
       worker.port.emit(requestId, 'SUCCESS', decrypted);
     } catch(error) {
-      await progressController.complete(worker);
+      await progressController.close(worker);
       worker.port.emit(requestId, 'ERROR', error.message);
     }
   });

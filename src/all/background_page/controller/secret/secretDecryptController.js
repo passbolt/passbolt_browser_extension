@@ -43,18 +43,18 @@ class SecretDecryptController {
     }
 
     try {
-      await progressController.start(this.worker, 'Decrypting...', 2, "Decrypting private key");
+      await progressController.open(this.worker, 'Decrypting...', 2, "Decrypting private key");
       const secret = await secretPromise;
       const privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
       progressController.update(this.worker, 1, "Decrypting secret");
       const message = await crypto.decryptWithKey(secret.data, privateKey);
       progressController.update(this.worker, 2, "Complete");
       this.worker.port.emit(this.requestId, 'SUCCESS', message);
-      await progressController.complete(this.worker);
+      await progressController.close(this.worker);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
-      await progressController.complete(this.worker);
+      await progressController.close(this.worker);
     }
   }
 

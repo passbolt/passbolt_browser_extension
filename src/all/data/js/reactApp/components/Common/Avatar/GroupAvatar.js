@@ -20,7 +20,7 @@ class GroupAvatar extends Component {
     if (!url) {
       url = "img/avatar/group_default.png";
     }
-    return `${this.context.user["user.settings.trustedDomain"]}/url`;
+    return `${this.context.user["user.settings.trustedDomain"]}/${url}`;
   }
 
   getAltText() {

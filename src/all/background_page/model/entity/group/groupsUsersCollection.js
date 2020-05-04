@@ -59,8 +59,16 @@ class GroupsUsersCollection extends Entity {
    *
    * @returns {*}
    */
-  toApiData() {
+  toDto() {
     return JSON.parse(JSON.stringify(this._items));
+  }
+
+  /**
+   * Customizes JSON stringification behavior
+   * @returns {*}
+   */
+  toJSON() {
+    return this._items;
   }
 
   // ==================================================
@@ -90,14 +98,11 @@ class GroupsUsersCollection extends Entity {
    * @param {object} groupUser DTO or GroupUserEntity
    */
   push(groupUser) {
-    if (!groupUser) {
-      throw new TypeError(`GroupUsersEntity push parameter cannot be empty.`);
-    }
-    if (typeof groupUser !== 'object') {
+    if (!groupUser || typeof groupUser !== 'object') {
       throw new TypeError(`GroupUsersEntity push parameter should be an object.`);
     }
     if (groupUser instanceof GroupUserEntity) {
-      groupUser = groupUser.toApiData(); // clone
+      groupUser = groupUser.toDto(); // clone
     }
     groupUser = new GroupUserEntity(groupUser); // validate
     this._items.push(groupUser);

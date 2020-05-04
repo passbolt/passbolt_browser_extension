@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {FolderEntity} from "./FolderEntity";
+import {FolderEntity} from "./folderEntity";
 import {EntityValidationError} from "../abstract/entityValidationError";
 import {EntitySchema} from "../abstract/entitySchema";
 import Validator from 'validator';
@@ -32,7 +32,8 @@ describe("Folder entity", () => {
       "name": "folder",
     };
     const entity = new FolderEntity(dto);
-    expect(entity.toApiData()).toEqual(dto);
+    expect(entity.toDto()).toEqual(dto);
+    expect(JSON.stringify(entity)).toEqual(JSON.stringify(dto));
     expect(entity.name).toEqual('folder');
   });
 
@@ -43,7 +44,7 @@ describe("Folder entity", () => {
     };
     expect(dtoNull.hasOwnProperty('folder_parent_id')).toBe(true);
     let entity = new FolderEntity(dtoNull);
-    let apiDto = entity.toApiData();
+    let apiDto = entity.toDto();
     expect(apiDto).toEqual(dtoNull);
     expect(entity.name).toEqual('folder');
     expect(entity.folderParentId).toEqual(null);
@@ -53,7 +54,7 @@ describe("Folder entity", () => {
       "folder_parent_id": "433b1f36-f150-4410-8d78-e28ac78535e9"
     };
     entity = new FolderEntity(dtoUiid);
-    expect(entity.toApiData()).toEqual(dtoUiid);
+    expect(entity.toDto()).toEqual(dtoUiid);
     expect(entity.folderParentId).toEqual('433b1f36-f150-4410-8d78-e28ac78535e9');
   });
 
@@ -72,7 +73,7 @@ describe("Folder entity", () => {
       'modified': '2020-04-25 12:52:01',
     };
     const folderEntity = new FolderEntity(dto);
-    expect(folderEntity.toApiData()).toEqual(filtered);
+    expect(folderEntity.toDto()).toEqual(filtered);
 
     // test getters
     expect(folderEntity.id).toEqual('7f077753-0835-4054-92ee-556660ea04f1');

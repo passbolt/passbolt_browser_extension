@@ -104,22 +104,30 @@ class UserEntity extends Entity {
    * @param {object} contain optional for example {profile: true}
    * @returns {*}
    */
-  toApiData(contain) {
+  toDto(contain) {
     let result = Object.assign({}, this._props);
     if (contain && contain.role) {
-      result.role = this.role ? this.role.toApiData() : null;
+      result.role = this.role ? this.role.toDto() : null;
     }
     if (contain && contain.profile) {
       if (this.profile) {
-        result.profile = this.profile ? this.profile.toApiData(contain.profile) : null;
+        result.profile = this.profile ? this.profile.toDto(contain.profile) : null;
       }
     }
     if (contain && contain.gpgkey) {
       if (this.gpgkey) {
-        result.gpgkey = this.gpgkey ? this.gpgkey.toApiData() : null;
+        result.gpgkey = this.gpgkey ? this.gpgkey.toDto() : null;
       }
     }
     return result;
+  }
+
+  /**
+   * Customizes JSON stringification behavior
+   * @returns {*}
+   */
+  toJSON() {
+    return this.toDto({role: true, profile: true, gpgKey: true});
   }
 
   // ==================================================

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {GpgkeyEntity} from "./GpgkeyEntity";
+import {GpgkeyEntity} from "./gpgkeyEntity";
 import {EntityValidationError} from "../abstract/entityValidationError";
 import {EntitySchema} from "../abstract/entitySchema";
 import Validator from 'validator';

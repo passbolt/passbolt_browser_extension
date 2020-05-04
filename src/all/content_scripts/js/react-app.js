@@ -56,7 +56,6 @@ window.addEventListener('passbolt.plugin.resources.open-edit-dialog', async func
 window.addEventListener('passbolt.storage.folders.get', async function (event) {
   const requestId = event.detail[0];
   const { folders } = await browser.storage.local.get(["folders"]);
-
   if (folders && Array.isArray(folders)) {
     passbolt.message.emitToPage(requestId, { status: "SUCCESS", body: folders });
   } else {

@@ -129,7 +129,7 @@ var listen = function (worker) {
         worker.port.emit(requestId, 'ERROR', error);
       }
     } finally {
-      progressController.complete(worker);
+      await progressController.complete(worker);
     }
   });
 
@@ -146,7 +146,7 @@ var listen = function (worker) {
     progressController.update(worker, 1);
     const groupSaved = await group.save(groupJson);
     progressController.update(worker, 2);
-    progressController.complete(worker);
+    await progressController.complete(worker);
 
     return groupSaved;
   };
@@ -166,7 +166,7 @@ var listen = function (worker) {
     progressController.update(worker, 1);
     const groupSaved = await groupSavedPromised;
     progressController.update(worker, 2);
-    progressController.complete(worker);
+    await progressController.complete(worker);
 
     return groupSaved;
   };
@@ -203,7 +203,7 @@ var listen = function (worker) {
       message => { return index => progressController.update(worker, progress, message.replace('%0', parseInt(index) + 1)) }
     );
     const groupSaved = await group.save(groupJson, groupId);
-    progressController.complete(worker);
+    await progressController.complete(worker);
 
     return groupSaved;
   };
@@ -229,7 +229,7 @@ var listen = function (worker) {
 
     // Encrypt all the secrets for the new users.
     const encryptAllData = secretsNeeded.map(secretNeeded => {
-      const secretOrigin = secretsOrigin.find(secretOrigin => secretNeeded.Secret.resource_id == secretOrigin.Secret[0].resource_id);
+      const secretOrigin = secretsOrigin.find(secretOrigin => secretNeeded.Secret.resource_id === secretOrigin.Secret[0].resource_id);
       return {userId: secretNeeded['Secret'].user_id, message: secretOrigin.Secret[0].dataDecrypted}
     });
     const messagesNeeededEncrypted = await crypto.encryptAll(encryptAllData, completeCallback, startCallback('Encrypting %0/' + secretsNeeded.length));

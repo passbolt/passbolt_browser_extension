@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {RoleEntity} from "./RoleEntity";
+import {RoleEntity} from "./roleEntity";
 import {EntityValidationError} from "../abstract/entityValidationError";
 import {EntitySchema} from "../abstract/entitySchema";
 import Validator from 'validator';
@@ -36,7 +36,7 @@ describe("Role entity", () => {
       "modified": "2012-07-04T13:39:25+00:00"
     };
     const entity = new RoleEntity(dto);
-    expect(entity.toApiData()).toEqual(dto);
+    expect(entity.toDto()).toEqual(dto);
   });
 
   it("constructor works if valid DTO is provided with optional and non supported fields", () => {
@@ -56,7 +56,7 @@ describe("Role entity", () => {
       'modified': '2020-04-25 12:52:01',
     };
     const roleEntity = new RoleEntity(dto);
-    expect(roleEntity.toApiData()).toEqual(filtered);
+    expect(roleEntity.toDto()).toEqual(filtered);
 
     // test getters
     expect(roleEntity.id).toEqual('7f077753-0835-4054-92ee-556660ea04f1');

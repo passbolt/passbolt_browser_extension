@@ -41,19 +41,19 @@ class ResourceCreateController {
     const passphrase = await passphraseController.get(this.worker);
     await progressController.start(this.worker, "Creating password", 2, "Decrypting private key");
     const privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
-    progressController.update(this.worker, 1, "Encrypting secret");
+    await progressController.update(this.worker, 1, "Encrypting secret");
 
     try {
       const secret = await crypto.encrypt(password, User.getInstance().get().id, privateKey);
       data.secrets = [{data: secret}];
-      progressController.update(this.worker, 2, "Creating password");
+      await progressController.update(this.worker, 2, "Creating password");
       savedResource = await Resource.save(data);
     } catch (error) {
-      progressController.complete(this.worker);
+      await progressController.complete(this.worker);
       throw error;
     }
 
-    progressController.complete(this.worker);
+    await progressController.complete(this.worker);
 
     return savedResource;
   }

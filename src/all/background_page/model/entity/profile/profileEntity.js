@@ -88,12 +88,20 @@ class ProfileEntity extends Entity {
    * @param {object} contain optional example {avatar: true}
    * @returns {*}
    */
-  toApiData(contain) {
+  toDto(contain) {
     const result = Object.assign({}, this._props);
     if (contain && contain.avatar) {
-        result.avatar = this.avatar ? this.avatar.toApiData() : null;
+        result.avatar = this.avatar ? this.avatar.toDto() : null;
     }
     return result;
+  }
+
+  /**
+   * Customizes JSON stringification behavior
+   * @returns {*}
+   */
+  toJSON() {
+    return this.toDto({avatar: true});
   }
 
   // ==================================================

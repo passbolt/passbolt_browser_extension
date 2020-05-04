@@ -50,11 +50,11 @@ class SecretDecryptController {
       const message = await crypto.decryptWithKey(secret.data, privateKey);
       progressController.update(this.worker, 2, "Complete");
       this.worker.port.emit(this.requestId, 'SUCCESS', message);
-      progressController.complete(this.worker);
+      await progressController.complete(this.worker);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
-      progressController.complete(this.worker);
+      await progressController.complete(this.worker);
     }
   }
 

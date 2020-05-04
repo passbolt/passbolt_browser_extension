@@ -40,7 +40,7 @@ describe("Entity permission", () => {
 
     // Entity props is equal to original dto
     const entity = new PermissionEntity(dto);
-    expect(entity.toApiData()).toEqual(dto);
+    expect(entity.toDto()).toEqual(dto);
 
     // optional id is not set
     expect(entity.id).toBe(null);
@@ -81,7 +81,7 @@ describe("Entity permission", () => {
 
     // Entity props is filtered
     const entity = new PermissionEntity(dto);
-    expect(entity.toApiData()).toEqual(filtered);
+    expect(entity.toDto()).toEqual(filtered);
 
     expect(entity._hasProp('_custom')).toBe(false);
     expect(entity._hasProp('id')).toBe(true);

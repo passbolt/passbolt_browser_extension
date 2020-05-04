@@ -77,7 +77,7 @@ ImportPasswordsController.prototype.initFromCsv = function(b64FileContent, optio
  * @param resources
  * @returns {*}
  */
-ImportPasswordsController.prototype.encryptSecrets = function(resources) {
+ImportPasswordsController.prototype.encryptSecrets = async function(resources) {
   const keyring = new Keyring(),
     user = User.getInstance(),
     self= this;
@@ -85,20 +85,15 @@ ImportPasswordsController.prototype.encryptSecrets = function(resources) {
   this.resources = resources;
   this.progressObjective = this.resources.length * 2;
 
-  progressController.start(this.worker, 'Encrypting ...', this.progressObjective);
+  await progressController.start(this.worker, 'Encrypting ...', this.progressObjective);
 
   const currentUser = user.get(),
     userId = currentUser.id;
 
   // Sync the keyring with the server.
-  return keyring.sync()
-  // Once the keyring is synced, encrypt the secret for each resource
-  .then(function () {
-    return self._encryptSecrets(userId);
-  })
-  .then(function(armoredSecrets) {
-    return self._addArmoredSecretsToResources(armoredSecrets);
-  });
+  await keyring.sync();
+  const armoredSecrets = await self._encryptSecrets(userId);
+  return self._addArmoredSecretsToResources(armoredSecrets);
 };
 
 /**
@@ -318,7 +313,7 @@ ImportPasswordsController.prototype.saveResources = async function(resources, op
     importResourcesResults.errors = [...importResourcesResults.errors, ...importBatchResult.errors];
   }
 
-  progressController.complete(this.worker);
+  await progressController.complete(this.worker);
 
   return importResults;
 };

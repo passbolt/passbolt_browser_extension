@@ -58,17 +58,11 @@ ExportPasswordsController.prototype.init = function(resources, options) {
  * Request the passphrase if necessary.
  * @return {Promise} a promise containing the list of resources with their decrypted secret.
  */
-ExportPasswordsController.prototype.decryptSecrets = function() {
-  var self = this;
-
-  return this._decryptSecrets(this.resources)
-  .then(function(decryptedSecrets) {
-    return new Promise(function(resolve, reject) {
-      progressController.complete(self.worker);
-      self.resources = self._addDecryptedSecretsToResources(self.resources, decryptedSecrets);
-      resolve(self.resources);
-    });
-  });
+ExportPasswordsController.prototype.decryptSecrets = async function() {
+  const decryptedSecrets = await this._decryptSecrets(this.resources);
+  await progressController.complete(this.worker);
+  this.resources = this._addDecryptedSecretsToResources(self.resources, decryptedSecrets);
+  return this.resources
 };
 
 /**

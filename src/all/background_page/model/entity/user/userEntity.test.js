@@ -33,7 +33,7 @@ describe("Profile entity", () => {
       "username": "dame@passbolt.com",
     };
     const entity = new UserEntity(dto);
-    expect(entity.toApiData()).toEqual(dto);
+    expect(entity.toDto()).toEqual(dto);
     expect(entity.username).toEqual('dame@passbolt.com');
     expect(entity.roleId).toEqual('a58de6d3-f52c-5080-b79b-a601a647ac85');
     expect(entity.created).toBe(null);
@@ -116,7 +116,7 @@ describe("Profile entity", () => {
     };
 
     const entity = new UserEntity(dto);
-    expect(entity.toApiData()).toEqual(filtered);
+    expect(entity.toDto()).toEqual(filtered);
     expect(entity.profile.firstName).toEqual('Admin');
     expect(entity.profile.lastName).toEqual('User');
     expect(entity.role).not.toBe(null);
@@ -125,7 +125,7 @@ describe("Profile entity", () => {
     expect(entity.role.name).toEqual('admin');
     expect(entity.gpgkey.armoredKey.startsWith('-----BEGIN PGP PUBLIC KEY BLOCK-----')).toBe(true);
 
-    const dtoWithContain = entity.toApiData({role: true, profile: true, gpgkey: true});
+    const dtoWithContain = entity.toDto({role: true, profile: true, gpgkey: true});
     expect(dtoWithContain.role.name).toEqual('admin');
     expect(dtoWithContain.profile.first_name).toEqual('Admin');
     expect(dtoWithContain.gpgkey.armored_key.startsWith('-----BEGIN PGP PUBLIC KEY BLOCK-----')).toBe(true);

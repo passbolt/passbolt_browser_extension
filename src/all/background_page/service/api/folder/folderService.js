@@ -11,18 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {ApiClient} = require('../apiClient/apiClient');
+const {AbstractService} = require('../abstract/abstractService');
 
-class FolderService {
-  /**
-   * API Resource Name
-   *
-   * @returns {string}
-   * @public
-   */
-  static get RESOURCE_NAME() {
-    return 'folders';
-  }
+const FOLDER_SERVICE_RESOURCE_NAME = 'folders';
 
+class FolderService extends AbstractService {
   /**
    * Constructor
    *
@@ -30,29 +23,71 @@ class FolderService {
    * @public
    */
   constructor(apiClientOptions) {
-    apiClientOptions.setResourceName(FolderService.RESOURCE_NAME);
-    this.apiClient = new ApiClient(apiClientOptions);
+    super(apiClientOptions, FolderService.RESOURCE_NAME);
+  }
+
+  /**
+   * API Resource Name
+   *
+   * @returns {string}
+   * @public
+   */
+  static get RESOURCE_NAME() {
+    return FOLDER_SERVICE_RESOURCE_NAME;
+  }
+
+  /**
+   * Return the list of supported options for the contain option in API find operations
+   *
+   * @returns {Array<string>} list of supported option
+   */
+  static getSupportedContainOptions() {
+    return [
+      "children_resources",
+      "children_folders",
+      "creator",
+      "modifier",
+      "permission",
+      "permissions",
+      "permissions.user.profile",
+      "permissions.group"
+    ];
+  }
+
+  /**
+   * Return the list of supported filters for in API find operations
+   *
+   * @returns {Array<string>} list of supported option
+   */
+  static getSupportedFiltersOptions() {
+    return [
+      "has-id",
+      "has-parent",
+      "search", // search by name
+    ];
+  }
+
+  /**
+   * Get a folder for a given id
+   *
+   * @param {string} id folder uuid
+   * @param {Object} contain optional example: {permissions: true}
+   * @throws {Error} if API call fails, service unreachable, etc.
+   * @returns {Object} folderDto
+   */
+  async get(id, contain) {
+    let options = contain ? this.formatContainOptions(contain, FolderService.getSupportedContainOptions()) : null;
+    const response = await this.apiClient.get(id, options);
+    return response.body;
   }
 
   /**
    * Find all folders
    *
-   * @param {Object} options optional url parameters for example {"contain[something]": "1"}
-   * Supported options:
-   *
-   *   "contain[children_resources]": "1"
-   *   "contain[children_folders]": "1"
-   *   "contain[creator]": "1"
-   *   "contain[modifier]": "1"
-   *   "contain[permission]": "1"
-   *   "contain[permissions]": "1"
-   *   "contain[permissions.user.profile]": "1"
-   *   "contain[permissions.group]": "1"
-   *
-   *   "filter[has-id][]": <uuid>     // filter by ids(s)
-   *   "filter[has-parent][]": <uuid> // filter by parent id(s)
-   *   "filter[search][]": <string>   // filter by name
-   *
+   * @param {Object} contain optional for example {"user": true}
+   *        @see getSupportedContainOptions
+   * @param {Object} filters optional for example {"has-id": [uuid, ...]}
+   *        @see getSupportedFiltersOptions
    * @returns {Promise<*>} response body
    * @throws {TypeError} if urlOptions key or values are not a string
    * @throws {PassboltServiceUnavailableError} if service is not reachable
@@ -60,7 +95,10 @@ class FolderService {
    * @throws {PassboltApiFetchError} if passbolt API response is not OK (non 2xx status)
    * @public
    */
-  async findAll(options) {
+  async findAll(contain, filters) {
+    contain = contain ? this.formatContainOptions(contain, FolderService.getSupportedContainOptions()) : null;
+    filters = filters ? this.formatFilterOptions(contain, FolderService.getSupportedFiltersOptions()) : null;
+    const options = {...contain, ...filters };
     const response = await this.apiClient.findAll(options);
     if (!response.body || !response.body.length) {
       return [];
@@ -140,6 +178,19 @@ class FolderService {
     url.searchParams.append('contain[permissions.group]', '1');
 
     const response = await this.apiClient.fetchAndHandleResponse('GET', url);
+    return response.body;
+  }
+
+  /**
+   * Update a given folder permission
+   *
+   * @param {string} folderId uuid
+   * @param {object} permissionChangesDto
+   * @returns {Promise<*>}
+   */
+  async updatePermissions(folderId, permissionChangesDto) {
+    let url = `${folderId}/permissions`;
+    const response = await this.apiClient.update(url, permissionChangesDto);
     return response.body;
   }
 }

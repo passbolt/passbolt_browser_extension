@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {ProfileEntity} from "./ProfileEntity";
+import {ProfileEntity} from "./profileEntity";
 import {EntitySchema} from "../abstract/entitySchema";
 import {EntityValidationError} from '../abstract/entityValidationError';
 import Validator from 'validator';
@@ -35,7 +35,7 @@ describe("Profile entity", () => {
       "last_name": "Shirley"
     };
     const entity = new ProfileEntity(dto);
-    expect(entity.toApiData()).toEqual(dto);
+    expect(entity.toDto()).toEqual(dto);
     expect(entity.firstName).toEqual('Dame Steve');
     expect(entity.lastName).toEqual('Shirley');
     expect(entity.created).toBe(null);
@@ -99,14 +99,14 @@ describe("Profile entity", () => {
     };
 
     const entity = new ProfileEntity(dto);
-    expect(entity.toApiData({avatar:true})).toEqual(filtered);
+    expect(entity.toDto({avatar:true})).toEqual(filtered);
     expect(entity.firstName).toEqual('Dame Steve');
     expect(entity.lastName).toEqual('Shirley');
     expect(entity.created).not.toBe(null);
     expect(entity.modified).not.toBe(null);
     expect(entity.avatar).not.toBe(null);
 
-    expect(entity.toApiData()).toEqual(filtered2);
+    expect(entity.toDto()).toEqual(filtered2);
     expect(entity.avatar._hasProp('model')).toBe(false);
     expect(entity.avatar.urlMedium).toBe('img\/public\/Avatar\/d1\/f8\/f4\/421f795574d042d4838f8b30d056bcc7\/421f795574d042d4838f8b30d056bcc7.a99472d5.png');
     expect(entity.avatar.urlSmall).toBe('img\/public\/Avatar\/d1\/f8\/f4\/421f795574d042d4838f8b30d056bcc7\/421f795574d042d4838f8b30d056bcc7.65a0ba70.png');

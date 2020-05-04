@@ -17,6 +17,12 @@ const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
 
 class ShareResourcesController {
+  /**
+   * Controller constructor
+   *
+   * @param {Worker} worker
+   * @param {string} requestId uuid
+   */
   constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
@@ -29,7 +35,7 @@ class ShareResourcesController {
    * @param {array} changes
    * @return {Promise}
    */
-  async main(resources, changes) {
+  async main(resources, changes, ) {
     const keyring = new Keyring();
     let progress = 0;
 
@@ -47,15 +53,15 @@ class ShareResourcesController {
       await progressController.start(this.worker, msg, progressGoal);
       await progressController.update(this.worker, progress++, 'Initialize');
       await keyring.sync();
-      await Share.bulkShare(resources, changes, privateKeySecret, message => {
+      await Share.bulkShareResources(resources, changes, privateKeySecret, message => {
         progressController.update(this.worker, progress++, message);
       });
       const results = resources.map(resource => resource.id);
-      progressController.complete(this.worker);
+      await progressController.complete(this.worker);
       return results;
     } catch(error) {
       console.error(error);
-      progressController.complete(this.worker);
+      await progressController.complete(this.worker);
       throw error;
     }
   }

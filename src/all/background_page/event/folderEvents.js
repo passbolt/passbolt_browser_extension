@@ -4,6 +4,7 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+const {FolderCreateController} = require('../controller/folder/folderCreateController');
 const {FolderEntity} = require('../model/entity/folder/folderEntity');
 const {FolderModel} = require('../model/folderModel');
 const {User} = require('../model/user');
@@ -23,8 +24,9 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.folders.create', async function (requestId, folderDto) {
     try {
-      let folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
-      let folderEntity = await folderModel.create(new FolderEntity(folderDto));
+      const folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
+      const folderCreateController = new FolderCreateController(worker, requestId, folderModel);
+      const folderEntity = await folderCreateController.main(new FolderEntity(folderDto));
       worker.port.emit(requestId, 'SUCCESS', folderEntity);
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
@@ -59,7 +61,6 @@ const listen = function (worker) {
     try {
       let folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
       await folderModel.delete(folderId, cascade);
-      folderModel.updateLocalStorage();
       worker.port.emit(requestId, 'SUCCESS', folderId);
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));

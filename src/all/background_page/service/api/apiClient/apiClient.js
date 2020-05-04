@@ -80,7 +80,7 @@ class ApiClient {
    * @returns {Promise<*>}
    * @public
    */
-  async get (id, urlOptions) {
+  async get(id, urlOptions) {
     this.assertValidId(id);
     const url = this.buildUrl(`${this.baseUrl}/${id}`, urlOptions || {});
     return this.fetchAndHandleResponse('GET', url);
@@ -100,7 +100,7 @@ class ApiClient {
    * @returns {Promise<*>}
    * @public
    */
-  async delete (id, body, urlOptions) {
+  async delete(id, body, urlOptions) {
     this.assertValidId(id);
     const url = this.buildUrl(`${this.baseUrl}/${id}`, urlOptions || {});
     let bodyString;
@@ -254,10 +254,21 @@ class ApiClient {
 
     urlOptions = urlOptions || {};
     for (const [key, value] of Object.entries(urlOptions)) {
-      if (typeof key !== 'string' || typeof value !== 'string') {
-        throw new TypeError('ApiClient.buildUrl error: urlOptions values should be a string.');
+      if (typeof key !== 'string' ) {
+        throw new TypeError('ApiClient.buildUrl error: urlOptions key should be a string.');
       }
-      urlObj.searchParams.append(key, value);
+      if (typeof value === 'string') {
+        urlObj.searchParams.append(key, value);
+      } else {
+        // Example "filter[has-id][]": "<uuid>"
+        if (Array.isArray(value)) {
+          value.forEach((v) => {
+            urlObj.searchParams.append(key, v);
+          });
+        } else {
+          throw new TypeError('ApiClient.buildUrl error: urlOptions value should be a string or array.');
+        }
+      }
     }
     return urlObj;
   }

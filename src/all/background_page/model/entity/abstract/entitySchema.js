@@ -26,27 +26,35 @@ class EntitySchema {
     if (!schema) {
       throw new TypeError(`Could not validate entity ${name}. No schema for entity ${name}.`);
     }
-    if (!schema.type || schema.type !== 'object') {
-      throw new TypeError(`Could not validate entity ${name}. Schema error: only objects are supported.`);
+    if (!schema.type) {
+      throw new TypeError(`Could not validate entity ${name}. Type missing.`);
     }
-    if (!schema.required || !Array.isArray(schema.required) || !schema.required.length) {
-      throw new TypeError(`Could not validate entity ${name}. Schema error: no required properties.`);
-    }
-    if (!schema.properties || !Object.keys(schema).length) {
-      throw new TypeError(`Could not validate entity ${name}. Schema error: no properties.`);
-    }
-    let schemaProps = schema.properties;
-    for (let propName in schemaProps) {
-      // Check type is defined
-      if (!schemaProps.hasOwnProperty(propName) || (!schemaProps[propName].type && !schemaProps[propName].anyOf)) {
-        throw TypeError(`Invalid schema. Type missing for ${propName}...`);
+    if (schema.type === 'array') {
+      if (!schema.items) {
+        throw new TypeError(`Could not validate entity ${name}. Schema error: missing item definition.`);
       }
-      // In case there is multiple types
-      if (schemaProps[propName].anyOf) {
-        if (!Array.isArray(schemaProps[propName].anyOf) || !schemaProps[propName].anyOf.length) {
-          throw new TypeError(`Invalid schema, prop ${propName} anyOf should be an array`);
+      return;
+    }
+    if (schema.type === 'object') {
+      if (!schema.required || !Array.isArray(schema.required) || !schema.required.length) {
+        throw new TypeError(`Could not validate entity ${name}. Schema error: no required properties.`);
+      }
+      if (!schema.properties || !Object.keys(schema).length) {
+        throw new TypeError(`Could not validate entity ${name}. Schema error: no properties.`);
+      }
+      let schemaProps = schema.properties;
+      for (let propName in schemaProps) {
+        // Check type is defined
+        if (!schemaProps.hasOwnProperty(propName) || (!schemaProps[propName].type && !schemaProps[propName].anyOf)) {
+          throw TypeError(`Invalid schema. Type missing for ${propName}...`);
         }
-        // TODO subcheck anyOf items
+        // In case there is multiple types
+        if (schemaProps[propName].anyOf) {
+          if (!Array.isArray(schemaProps[propName].anyOf) || !schemaProps[propName].anyOf.length) {
+            throw new TypeError(`Invalid schema, prop ${propName} anyOf should be an array`);
+          }
+          // TODO subcheck anyOf items
+        }
       }
     }
   }
@@ -66,6 +74,39 @@ class EntitySchema {
       throw new TypeError(`Could not validate entity ${name}. No data provided.`);
     }
 
+    switch (schema.type) {
+      case 'object':
+        return EntitySchema.validateObject(name, dto, schema);
+      case 'array':
+        return EntitySchema.validateArray(name, dto, schema);
+      default:
+        throw new TypeError(`Could not validate entity ${name}. Unsupported type.`);
+    }
+  }
+
+  /**
+   * Validate a given array against a given schema
+   *
+   * @param {string} name of entity
+   * @param {object} dto data transfer object
+   * @param {object} schema json-schema "like" data transfer object definition
+   * @return {object} properties that are listed in the schema
+   * @throws ValidationError
+   */
+  static validateArray(name, dto, schema) {
+    return EntitySchema.validateProp('items', dto, schema);
+  }
+
+  /**
+   * Validate a given object against a given schema
+   *
+   * @param {string} name of entity
+   * @param {object} dto data transfer object
+   * @param {object} schema json-schema "like" data transfer object definition
+   * @return {object} properties that are listed in the schema
+   * @throws ValidationError
+   */
+  static validateObject(name, dto, schema) {
     let requiredProps = schema.required;
     let schemaProps = schema.properties;
 
@@ -142,7 +183,8 @@ class EntitySchema {
       break;
       case 'array':
         // Note - unchecked as not in use beyond array of objects in passbolt
-        // example: users_groups, permissions, etc.
+        // Currently it must be done manually when bootstrapping collections
+        // example: foldersCollection, permissionsCollection, etc.
       case 'object':
         // Note - we do not check if property of type 'object' validate (or array of objects, see above)
         // Currently it must be done manually in the entities when bootstrapping associations
@@ -267,10 +309,10 @@ class EntitySchema {
    */
   static isValidPropType(prop, type) {
     if (Array.isArray(type)) {
-      throw new TypeError('EntitySchema validPropFormat multiple types are not supported.');
+      throw new TypeError('EntitySchema isValidPropType multiple types are not supported.');
     }
     if (typeof type !== 'string') {
-      throw new TypeError('EntitySchema validPropFormat type is invalid.');
+      throw new TypeError('EntitySchema isValidPropType type is invalid.');
     }
     switch (type) {
       case 'null':

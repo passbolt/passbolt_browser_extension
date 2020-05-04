@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {AvatarEntity} from "./AvatarEntity";
+import {AvatarEntity} from "./avatarEntity";
 import {EntitySchema} from "../abstract/entitySchema";
 import Validator from 'validator';
 

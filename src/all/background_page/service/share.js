@@ -119,7 +119,7 @@ ShareService.searchResourceAros = async function(resourceId, keywords) {
  * @param {object} data The request body data
  * @returns {*}
  */
-ShareService.share = async function(resourceId, data) {
+ShareService.shareResource = async function(resourceId, data) {
   const user = User.getInstance();
   const domain = user.settings.getDomain();
   const fetchOptions = {
@@ -171,7 +171,7 @@ ShareService.share = async function(resourceId, data) {
  * @param permissions
  * @returns {*}
  */
-ShareService.simulateShare = async function (resourceId, permissions) {
+ShareService.simulateShareResource = async function (resourceId, permissions) {
   const user = User.getInstance();
   const domain = user.settings.getDomain();
   const url = new URL(`${domain}/share/simulate/resource/${resourceId}.json?api-version=2`);

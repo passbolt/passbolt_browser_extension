@@ -13,6 +13,9 @@ const {Resource} = require('../model/resource');
 const {FolderModel} = require('../model/folderModel');
 const {Share} = require('../model/share');
 
+const {FoldersCollection} = require('../model/entity/folder/foldersCollection');
+const {PermissionChangesCollection} = require('../model/entity/permission/permissionChangesCollection');
+
 const {ShareResourcesController} = require('../controller/share/shareResourcesController');
 const {ShareFoldersController} = require('../controller/share/shareFoldersController');
 
@@ -97,12 +100,18 @@ const listen = function (worker) {
    * @listens passbolt.share.folders.save
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.share.folders.save', async function (requestId, folders, changes) {
-    const shareFoldersController = new ShareFoldersController(worker, requestId);
+  worker.port.on('passbolt.share.folders.save', async function (requestId, foldersDto, changesDto) {
     try {
-      await shareFoldersController.main(folders, changes);
+      const folders = new FoldersCollection(foldersDto);
+      const permissionChanges = new PermissionChangesCollection(changesDto);
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const folderModel = new FolderModel(apiClientOptions);
+
+      const shareFoldersController = new ShareFoldersController(worker, requestId, folderModel);
+      await shareFoldersController.main(folders, permissionChanges);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }
   });

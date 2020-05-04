@@ -11,32 +11,34 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.8.0
  */
+const {Share} = require('../../model/share');
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
 
 class ShareFoldersController {
-  constructor(worker, requestId) {
+  /**
+   * Controller constructor
+   *
+   * @param {Worker} worker
+   * @param {string} requestId uuid
+   * @param {FolderModel} folderModel
+   */
+  constructor(worker, requestId, folderModel) {
     this.worker = worker;
     this.requestId = requestId;
+    this.folderModel = folderModel;
   }
 
   /**
    * Orchestrate dialogs during the share operation
    *
-   * @param {array} folders
-   * @param {array} changes
+   * @param {FoldersCollection} folders
+   * @param {PermissionChangesCollection} changes
    * @return {Promise}
    */
   async main(folders, changes) {
-
-    console.log(folders);
-    console.log(changes);
     let progress = 0;
-
-    // Number of goals is (number of resources * 3) + 1 :
-    // why 3: simulate call to the API + encrypting step + share call to the API
-    // why +1: this function initialization step
-    const progressGoal = folders.length * 3 + 1;
+    const progressGoal = folders.length + 1;
 
     try {
       let msg = `Sharing ${folders.length} folders`;
@@ -44,13 +46,13 @@ class ShareFoldersController {
         msg  = `Sharing one folder`;
       }
       await progressController.start(this.worker, msg, progressGoal, 'Initializing...');
-      await progressController.update(this.worker, progress++, 'Almost done');
-
-      progressController.complete(this.worker);
-      return results;
+      await Share.bulkShareFolders(folders, changes, this.folderModel, message => {
+        progressController.update(this.worker, progress++, message);
+      });
+      await progressController.complete(this.worker);
     } catch(error) {
       console.error(error);
-      progressController.complete(this.worker);
+      await progressController.complete(this.worker);
       throw error;
     }
   }

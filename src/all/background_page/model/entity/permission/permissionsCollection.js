@@ -11,13 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {Entity} = require('../abstract/entity');
+const {EntityCollection} = require('../abstract/entityCollection');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {PermissionEntity} = require('./permissionEntity');
 
 const ENTITY_NAME = 'Permissions';
 
-class PermissionsCollection extends Entity {
+class PermissionsCollection extends EntityCollection {
   /**
    * Permissions Entity constructor
    *
@@ -54,26 +54,9 @@ class PermissionsCollection extends Entity {
     }
   }
 
-  /**
-   * Return a DTO ready to be sent to API
-   *
-   * @returns {*}
-   */
-  toApiData() {
-    return JSON.parse(JSON.stringify(this._items));
-  }
-
   // ==================================================
-  // Static and dynamic properties getters
+  // Static getter
   // ==================================================
-  /**
-   * Get all items references
-   * @returns {Array} items
-   */
-  get items() {
-    return this._items;
-  }
-
   /**
    * PermissionsCollection.ENTITY_NAME
    * @returns {string}
@@ -90,17 +73,14 @@ class PermissionsCollection extends Entity {
    * @param {object} permission DTO or PermissionEntity
    */
   push(permission) {
-    if (!permission) {
-      throw new TypeError(`PermissionsCollection push parameter cannot be empty.`);
-    }
-    if (typeof permission !== 'object') {
+    if (!permission || typeof permission !== 'object') {
       throw new TypeError(`PermissionsCollection push parameter should be an object.`);
     }
     if (permission instanceof PermissionEntity) {
-      permission = permission.toApiData(); // clone
+      permission = permission.toDto(); // clone
     }
     permission = new PermissionEntity(permission); // validate
-    this._items.push(permission);
+    super.push(permission);
   }
 }
 

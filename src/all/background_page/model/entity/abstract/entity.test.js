@@ -32,7 +32,7 @@ describe("Entity", () => {
   it("returns a own copy and not reference", () => {
     const dto = {a:1, b: {c:2}};
     const entity = new Entity(dto);
-    const apiDto = entity.toApiData();
+    const apiDto = entity.toDto();
     apiDto.b.c = 3;
     expect(entity._props).toEqual({a:1, b: {c:2}});
     entity._props.b.c = 4;
@@ -40,10 +40,16 @@ describe("Entity", () => {
     expect(entity._props).toEqual({a:1, b: {c:4}});
   });
 
+  it("stringify as dto", () => {
+    const dto = {a:1, b: {c:2}};
+    const entity = new Entity(dto);
+    expect(JSON.stringify(entity)).toEqual(JSON.stringify(dto));
+  });
+
   it("must retain null values", () => {
     const dto = {a: null};
     const entity = new Entity(dto);
-    const apiDto = entity.toApiData();
+    const apiDto = entity.toDto();
     expect(entity._props).toEqual(dto);
     expect(apiDto).toEqual(dto);
   });

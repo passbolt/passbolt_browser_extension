@@ -24,8 +24,16 @@ class Entity {
    * Return a DTO ready to be sent to API
    * @returns {*}
    */
-  toApiData() {
-    return JSON.parse(JSON.stringify(this._props));
+  toDto() {
+    return JSON.parse(JSON.stringify(this));
+  }
+
+  /**
+   * Customizes JSON stringification behavior
+   * @returns {*}
+   */
+  toJSON() {
+    return this._props;
   }
 
   /**

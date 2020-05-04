@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.4.0
  */
-const Crypto = require('../model/crypto').Crypto;
-const ShareService = require('../service/share').ShareService;
+const {Crypto} = require('../model/crypto');
+const {ShareService} = require('../service/share');
 
 class Share {}
 
@@ -40,13 +40,13 @@ Share.searchResourceAros = function(resourceId, keywords) {
 
 /**
  * Bulk share multiple resources.
- * @param {object} resources The resources to share
- * @param {object} changes The permissions changes to apply
+ * @param {array} resources The resources to share
+ * @param {array} changes The permissions changes to apply
  * @param {string} privateKeySecret The user private key secret
  * @param {function} progressCallback Notify the user with this callback
  */
-Share.bulkShare = async function(resources, changes, privateKeySecret, progressCallback) {
-  const resourcesChanges = bulkShareAggregateChangesByResource(resources, changes);
+Share.bulkShareResources = async function(resources, changes, privateKeySecret, progressCallback) {
+  const resourcesChanges = bulkShareAggregateChanges(resources, changes);
   const resourcesNewUsers = await bulkShareSimulate(resources, resourcesChanges, progressCallback);
   const resourcesSecrets = await bulkShareEncrypt(resources, resourcesNewUsers, privateKeySecret, progressCallback);
 
@@ -55,32 +55,56 @@ Share.bulkShare = async function(resources, changes, privateKeySecret, progressC
     const permissions = resourcesChanges[resourceId];
     let secrets = resourcesSecrets[resourceId] || [];
     progressCallback(`Sharing password ${resource.name}`);
-    await ShareService.share(resourceId, {permissions, secrets});
+    await ShareService.shareResource(resourceId, {permissions, secrets});
   }
 };
 
 /**
- * Aggregate the changes by resource.
- * @param {array} resources The resources to share
+ * Bulk share multiple resources.
+ * @param {FoldersCollection} foldersCollection
+ * @param {PermissionChangesCollection} changesCollection
+ * @param {FolderModel} folderModel
+ * @param {function} progressCallback Notify the user with this callback
+ */
+Share.bulkShareFolders = async function(foldersCollection, changesCollection, folderModel, progressCallback) {
+  for (const folderEntity of foldersCollection) {
+    let permissions = changesCollection.filterByAcoForeignKey(folderEntity.id);
+    if (permissions && permissions.length) {
+      progressCallback(`Updating folder ${folderEntity.name} permissions`);
+      await folderModel.updatePermissions(folderEntity, permissions, false);
+    }
+  }
+  await folderModel.updateLocalStorage();
+};
+
+/**
+ * Aggregate the changes by Acos.
+ * @param {array} acos The resources to share
  * @param {array} changes The changes to apply
  * @return {object}
  */
-const bulkShareAggregateChangesByResource = function(resources, changes) {
-  const resourcesChanges = {};
-
-  for (const i in resources) {
-    const resource = resources[i];
-    const resourceChanges = changes.filter(change => change.aco_foreign_key === resource.id);
-    if (resourceChanges.length) {
-      resourcesChanges[resource.id] = resourceChanges
-    }
+const bulkShareAggregateChanges = function(acos, changes) {
+  if (!acos || !Array.isArray(acos) || !acos.length) {
+    throw new TypeError('bulkShareAggregateChanges expect an array of ACOs');
+  }
+  if (!changes || !Array.isArray(changes) || !changes.length) {
+    throw new TypeError('bulkShareAggregateChanges expect an array of changes');
   }
 
-  return resourcesChanges;
+  const acosChanges = {};
+  acos.forEach(aco => {
+    const acoChanges = changes.filter(change => change.aco_foreign_key === aco.id);
+    if (acoChanges.length) {
+      acosChanges[aco.id] = acoChanges
+    }
+  });
+
+  return acosChanges;
 };
 
 /**
  * Simulate the changes to apply to the resources
+ * @param {array} resources
  * @param {object} resourcesChanges The changes aggregated by resource
  * @param {function} progressCallback Notify the user with this callback
  * @returns {object}
@@ -91,7 +115,7 @@ const bulkShareSimulate = async function(resources, resourcesChanges, progressCa
   for (const resourceId in resourcesChanges) {
     const resource = resources.find(resource => resource.id === resourceId);
     progressCallback(`Validating share operation for ${resource.name}`);
-    const simulateResult = await ShareService.simulateShare(resourceId, resourcesChanges[resourceId]);
+    const simulateResult = await ShareService.simulateShareResource(resourceId, resourcesChanges[resourceId]);
     const simulateAddedUsers = simulateResult.changes.added;
     if (simulateAddedUsers.length) {
       usersToEncryptFor[resourceId] = simulateAddedUsers.reduce((carry, user) => [...carry, user.User.id], []);

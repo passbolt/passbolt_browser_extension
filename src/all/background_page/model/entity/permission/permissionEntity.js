@@ -18,7 +18,7 @@ const {GroupEntity} = require('../group/groupEntity');
 
 const ENTITY_NAME = 'Permission';
 const PERMISSION_ADMIN = 15;
-const PERMISSION_UPDATE = 5;
+const PERMISSION_UPDATE = 7;
 const PERMISSION_READ = 1;
 const ARO_GROUP = 'Group';
 const ARO_USER = 'User';
@@ -120,7 +120,6 @@ class PermissionEntity extends Entity {
   // ==================================================
   /**
    * Get permission id
-   *
    * @returns {string|null} uuid if set
    */
   get id() {
@@ -129,7 +128,6 @@ class PermissionEntity extends Entity {
 
   /**
    * Get ACO - Access Control Object
-   *
    * @returns {string} Group or User
    */
   get aco() {
@@ -138,7 +136,6 @@ class PermissionEntity extends Entity {
 
   /**
    * Get ARO - Access Request Object
-   *
    * @returns {string} Resource or Folder
    */
   get aro() {

@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {FolderEntity} = require('./entity/folder/folderEntity');
+const {PermissionChangeEntity} = require('./entity/permission/permissionChangeEntity');
 const {FolderLocalStorage} = require('../service/local_storage/folderLocalStorage');
 const {FolderService} = require('../service/api/folder/folderService');
 
@@ -39,11 +40,27 @@ class FolderModel {
   /**
    * Get all folders from API and map API result to folder Entity
    *
+   * @throws {Error} if API call fails, service unreachable, etc.
    * @return {Array<FolderEntity>} folders
    */
   async findAll() {
     const body = await this.folderService.findAll();
     return body.map(folder => new FolderEntity(folder));
+  }
+
+  /**
+   * The parent folders from API and map API result to folder Entity
+   *
+   * @param {FolderEntity} folderEntity
+   * @throws {Error} if API call fails, service unreachable, etc.
+   * @return {Array<FolderEntity>} folders
+   */
+  async findParentWithPermissions(folderEntity) {
+    if (!folderEntity.folderParentId) {
+      throw new TypeError('FolderModel::FindParentWithPermissions: folder parent id is missing.');
+    }
+    const body = await this.folderService.get(folderEntity.folderParentId, {contain: {'permission': true}});
+    return new FolderEntity(body);
   }
 
   /**
@@ -64,7 +81,7 @@ class FolderModel {
    * @returns {Promise<FolderEntity>}
    */
   async create(folderEntity) {
-    const folderDto = await this.folderService.create(folderEntity.toApiData());
+    const folderDto = await this.folderService.create(folderEntity.toDto());
     const updatedFolderEntity = new FolderEntity(folderDto);
     await FolderLocalStorage.addFolder(updatedFolderEntity);
     return updatedFolderEntity;
@@ -77,10 +94,31 @@ class FolderModel {
    * @returns {Promise<FolderEntity>}
    */
   async update(folderEntity) {
-    const folderDto = await this.folderService.update(folderEntity.getId(), folderEntity.toApiData());
+    const folderDto = await this.folderService.update(folderEntity.id, folderEntity.toDto());
     const updatedFolderEntity = new FolderEntity(folderDto);
     await FolderLocalStorage.updateFolder(updatedFolderEntity);
     return updatedFolderEntity;
+  }
+
+  /**
+   * Update a folder using Passbolt API
+   *
+   * @param {FolderEntity} folderEntity
+   * @param {PermissionChangesCollection} changesCollection
+   * @param {boolean} updateStorage optional default true, in case you want to update only after bulk update
+   * @returns {Promise<FolderEntity>}
+   */
+  async updatePermissions(folderEntity, changesCollection, updateStorage) {
+    if (typeof updateStorage === 'undefined') {
+      updateStorage = true;
+    }
+    await this.folderService.updatePermissions(folderEntity.id, {permissions: changesCollection.toDto()});
+    if (updateStorage) {
+      // update storage in case the folder becomes non visible to current user
+      // TODO: optimize update only the given folder when user lost access
+      await this.updateLocalStorage();
+    }
+    return folderEntity;
   }
 
   /**
@@ -93,6 +131,11 @@ class FolderModel {
   async delete(folderId, cascade) {
     await this.folderService.delete(folderId, cascade);
     await FolderLocalStorage.delete(folderId);
+    if (cascade) {
+      // update storage and get updated sub folders list in case some are deleted
+      // TODO: optimize update only if folder contains subfolders
+      await this.updateLocalStorage();
+    }
   }
 }
 

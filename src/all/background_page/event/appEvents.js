@@ -111,7 +111,7 @@ const listen = function (worker) {
         worker.port.emit(requestId, 'ERROR', error);
       }
     } finally {
-      progressController.complete(worker);
+      await progressController.complete(worker);
     }
   });
 
@@ -303,13 +303,13 @@ const listen = function (worker) {
    * @listens passbolt.app.deprecated.secret-edit.encrypt
    * @param requestId {uuid} The request identifier
    * @param usersIds {array} The users to encrypt the edited secret for
-   * @deprecated since v2.12.0 will be removed with v2.3.0
+   * @deprecated since v2.12.0 will be removed with v3.0
    */
-  worker.port.on('passbolt.app.deprecated.secret-edit.encrypt', function (requestId, usersIds) {
-    var editedPassword = TabStorage.get(worker.tab.id, 'editedPassword'),
-      keyring = new Keyring(),
-      crypto = new Crypto(),
-      armoreds = {};
+  worker.port.on('passbolt.app.deprecated.secret-edit.encrypt', async function (requestId, usersIds) {
+    const editedPassword = TabStorage.get(worker.tab.id, 'editedPassword');
+    const keyring = new Keyring();
+    const crypto = new Crypto();
+    const armoreds = {};
 
     // If the currently edited secret hasn't been decrypted, leave.
     if (editedPassword.secret == null) {
@@ -318,40 +318,36 @@ const listen = function (worker) {
     }
 
     // Open the progress dialog.
-    progressController.start(worker, 'Encrypting ...', usersIds.length);
+    await progressController.start(worker, 'Encrypting ...', usersIds.length, 'Please wait...');
 
     // Sync the keyring with the server.
-    keyring.sync()
+    await keyring.sync();
 
-      // Once the keyring is synced, encrypt the secret for each user.
-      .then(function () {
-        var progress = 0;
+    // Once the keyring is synced, encrypt the secret for each user.
+    let progress = 0;
 
-        // Prepare the data for encryption.
-        var encryptAllData = usersIds.map(function(userId) {
-          return {
-            userId: userId,
-            message: editedPassword.secret
-          }
-        });
+    // Prepare the data for encryption.
+    let encryptAllData = usersIds.map((userId) => {
+      return {
+        userId: userId,
+        message: editedPassword.secret
+      }
+    });
 
-        // Encrypt all the messages.
-        return crypto.encryptAll(encryptAllData, function () {
-          progressController.update(worker, progress++);
-        }, function (position) {
-          progressController.update(worker, progress, 'Encrypting ' + position + '/' + usersIds.length);
-        });
-      })
+    // Encrypt all the messages.
+    const data = await crypto.encryptAll(encryptAllData, function () {
+      progressController.update(worker, progress++);
+    }, function (position) {
+      progressController.update(worker, progress, 'Encrypting ' + position + '/' + usersIds.length);
+    });
 
-      // Once the secret is encrypted for all users notify the application and
-      // close the progress dialog.
-      .then(function (data) {
-        for (var i in data) {
-          armoreds[usersIds[i]] = data[i];
-        }
-        worker.port.emit(requestId, 'SUCCESS', armoreds);
-        progressController.complete(worker);
-      });
+    // Once the secret is encrypted for all users notify the application and
+    // close the progress dialog.
+    for (let i in data) {
+      armoreds[usersIds[i]] = data[i];
+    }
+    worker.port.emit(requestId, 'SUCCESS', armoreds);
+    await progressController.complete(worker);
   });
 
   /*
@@ -362,27 +358,22 @@ const listen = function (worker) {
    * @param armored {string} The armored secret
    * @deprecated since v2.7 will be removed in v3.0
    */
-  worker.port.on('passbolt.app.deprecated.decrypt-copy', function (requestId, armored) {
+  worker.port.on('passbolt.app.deprecated.decrypt-copy', async function (requestId, armored) {
     var crypto = new Crypto();
 
-    // Master password required to decrypt a secret.
-    passphraseController.get(worker)
-      .then(async function (masterPassword) {
-        await progressController.start(worker, 'Decrypting...');
-        return crypto.decrypt(armored, masterPassword)
-      })
-      .then(function (decrypted) {
-        var clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
-        clipboardWorker.port.emit('passbolt.clipboard-iframe.copy', decrypted);
-        progressController.complete(worker);
-        worker.port.emit(requestId, 'SUCCESS', decrypted);
-      })
-      .catch(function (error) {
-        progressController.complete(worker);
-        worker.port.emit(requestId, 'ERROR', error.message);
-      });
+    try {
+      const passphrase = await passphraseController.get(worker);
+      await progressController.start(worker, 'Decrypting...', 1, 'Decrypting...');
+      const decrypted = await crypto.decrypt(armored, passphrase);
+      const clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
+      clipboardWorker.port.emit('passbolt.clipboard-iframe.copy', decrypted);
+      await progressController.complete(worker);
+      worker.port.emit(requestId, 'SUCCESS', decrypted);
+    } catch(error) {
+      await progressController.complete(worker);
+      worker.port.emit(requestId, 'ERROR', error.message);
+    }
   });
-
 };
 
 exports.listen = listen;

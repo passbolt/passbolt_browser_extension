@@ -186,7 +186,7 @@ class FolderCreateDialog extends Component {
   async createFolder() {
     const folderDto = {
       name: this.state.name,
-      folderParentId: this.props.folderParentId
+      folder_parent_id: this.props.folderParentId
     };
     return await port.request("passbolt.folders.create", folderDto);
   }

@@ -16,7 +16,7 @@ const Worker = require('../../model/worker');
  * @param {string} message start progress message
  * @return {Promise}
  */
-const start = function (worker, title, goals, message) {
+const start = async function (worker, title, goals, message) {
   // If the source of the request is a legacy worker then display the react app that will be in charge of
   // treating the progress events.
   if (worker.isLegacyWorker()) {
@@ -24,18 +24,29 @@ const start = function (worker, title, goals, message) {
     appWorker.port.emit('passbolt.app.show');
   }
   const progressWorker = getProgressWorker(worker);
-  progressWorker.port.emit('passbolt.progress.open-progress-dialog', title, goals, message)
+  progressWorker.port.emit('passbolt.progress.open-progress-dialog', title, goals, message);
+  await delay();
 };
 exports.start = start;
+
+// TODO
+// Replace by response from progress worker
+const delay = async function(ms) {
+  ms = !ms ? 200 : ms;
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+exports.delay = delay;
 
 /**
  * Complete a progression.
  *
  * @param {Worker} worker The worker from which the request comes from.
  */
-const complete = function (worker) {
+const complete = async function (worker) {
   const progressWorker = getProgressWorker(worker);
   progressWorker.port.emit('passbolt.progress.close-progress-dialog');
+  await delay();
+
   // If the source of the request is a legacy worker then hide the react app.
   if (worker.isLegacyWorker()) {
     const appWorker = Worker.get('App', worker.tab.id);
@@ -51,9 +62,10 @@ exports.complete = complete;
  * @param completed Number of steps completed
  * @param message (optional) The message to display
  */
-const update = function (worker, completed, message) {
+const update = async function (worker, completed, message) {
   const progressWorker = getProgressWorker(worker);
   progressWorker.port.emit('passbolt.progress.update', message, completed);
+  await delay();
 };
 exports.update = update;
 

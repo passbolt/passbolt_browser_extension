@@ -15,7 +15,7 @@ import {ApiClient} from "./apiClient";
 import {ApiClientOptions} from "./apiClientOptions";
 import fetch from 'node-fetch';
 import {PassboltServiceUnavailableError} from '../../../error/passboltServiceUnavailableError';
-import {PassboltApiFetchError} from '../../../error/PassboltApiFetchError';
+import {PassboltApiFetchError} from '../../../error/passboltApiFetchError';
 
 // Reset the modules before each test.
 beforeEach(() => {

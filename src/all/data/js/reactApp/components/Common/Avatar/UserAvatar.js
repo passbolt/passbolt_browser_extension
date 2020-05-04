@@ -29,12 +29,12 @@ class UserAvatar extends Component {
    * Return true if the user from props contains a valid profile with avatar url properties
    * @returns {boolean}
    */
-  propsHasUrl () {
+  propsHasUrl() {
     return this.props.user &&
       this.props.user.profile &&
       this.props.user.profile.avatar &&
       this.props.user.profile.avatar.url &&
-      this.props.user.profile.avatar.url.small
+      this.props.user.profile.avatar.url.small;
   }
 
   propsUrlHasProtocol() {
@@ -70,11 +70,11 @@ class UserAvatar extends Component {
   }
 
   render() {
-    return(
+    return (
       <div className="avatar user-avatar">
         <img src={this.getAvatarSrc()} onError={this.handleError.bind(this)} alt={this.getAltText()}/>
       </div>
-    )
+    );
   }
 }
 

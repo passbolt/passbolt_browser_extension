@@ -16,20 +16,12 @@ import PropTypes from "prop-types";
 import Icon from "../Icons/Icon";
 
 class Tooltip extends Component {
-  /**
-   * Constructor
-   * @param {Object} props
-   */
-  constructor(props) {
-    super(props);
-  }
-
   render() {
-    return(
+    return (
       <span className="tooltip tooltip-right" data-tooltip={this.props.message}>
         <Icon name={this.props.icon} />
       </span>
-    )
+    );
   }
 }
 

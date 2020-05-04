@@ -12,7 +12,7 @@
  * @since         2.0.0
  */
 const READ = 1;
-const UPDATE = 7;
+// const UPDATE = 7;
 const ADMIN = 15;
 
 export default class ShareChanges {
@@ -29,8 +29,10 @@ export default class ShareChanges {
     this._aros = {};
     this._acos = [];
 
-    // Remap the resources and folder into an ACO array
-    // Extend object with "_type" to keep distinction
+    /*
+     * Remap the resources and folder into an ACO array
+     * Extend object with "_type" to keep distinction
+     */
     this._resources.forEach(resource => {
       resource._type = 'Resource';
       this._acos.push(resource);
@@ -58,10 +60,10 @@ export default class ShareChanges {
     return this._changes;
   }
   getResourcesChanges() {
-    return this._changes.filter((element) => element.aco === 'Resource');
+    return this._changes.filter(element => element.aco === 'Resource');
   }
   getFoldersChanges() {
-    return this._changes.filter((element) => element.aco === 'Folder');
+    return this._changes.filter(element => element.aco === 'Folder');
   }
 
   getAcos() {
@@ -177,7 +179,7 @@ export default class ShareChanges {
       aro: aro,
       type: type,
       permissions: []
-    }
+    };
   }
 
   /**
@@ -227,9 +229,7 @@ export default class ShareChanges {
    * @returns {object}
    */
   getAcoAroPermission(aco, aroId) {
-    return this._permissions.find(permission => {
-      return (permission.aro_foreign_key === aroId && permission.aco_foreign_key === aco.id);
-    });
+    return this._permissions.find(permission => (permission.aro_foreign_key === aroId && permission.aco_foreign_key === aco.id));
   }
 
   /**
@@ -252,9 +252,7 @@ export default class ShareChanges {
         return carry;
       }, []);
       // Check if owner was removed
-      const revokedOwners = changes.filter(change => {
-        return ((change.delete || change.type !== ADMIN) && originalOwnersPermissionsIds.indexOf(change.id) !== -1);
-      });
+      const revokedOwners = changes.filter(change => ((change.delete || change.type !== ADMIN) && originalOwnersPermissionsIds.indexOf(change.id) !== -1));
 
       return revokedOwners.length === originalOwnersPermissionsIds.length;
     });

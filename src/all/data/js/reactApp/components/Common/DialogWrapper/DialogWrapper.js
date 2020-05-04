@@ -79,6 +79,7 @@ class DialogWrapper extends Component {
 }
 
 DialogWrapper.propTypes = {
+  children: PropTypes.node.isRequired,
   className: PropTypes.string,
   title: PropTypes.string,
   tooltip: PropTypes.string,

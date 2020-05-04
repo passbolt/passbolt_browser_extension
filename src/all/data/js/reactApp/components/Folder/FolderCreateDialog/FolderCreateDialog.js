@@ -61,7 +61,7 @@ class FolderCreateDialog extends Component {
       // Fields and errors
       name: 'loading...',
       nameError: false
-    }
+    };
   }
 
   /**
@@ -88,8 +88,10 @@ class FolderCreateDialog extends Component {
    * @returns {void}
    */
   handleClose() {
-    // ignore closing event of main folder create dialog
-    // if service error is displayed on top
+    /*
+     * ignore closing event of main folder create dialog
+     * if service error is displayed on top
+     */
     if (!this.state.serviceError) {
       this.props.onClose();
     }
@@ -100,8 +102,10 @@ class FolderCreateDialog extends Component {
    * @returns {void}
    */
   handleCloseError() {
-    // Close dialog
-    // TODO do not allow retry if parent id does not exist
+    /*
+     * Close dialog
+     * TODO do not allow retry if parent id does not exist
+     */
     this.setState({serviceError: false, serviceErrorMessage: ''});
   }
 
@@ -168,7 +172,7 @@ class FolderCreateDialog extends Component {
     const prev = this.state.processing;
     return new Promise(resolve => {
       this.setState({processing: !prev}, resolve());
-    })
+    });
   }
 
   /**
@@ -244,7 +248,7 @@ class FolderCreateDialog extends Component {
       nameError = "A name can not be more than 64 char in length.";
     }
     return new Promise(resolve => {
-      this.setState({nameError}, resolve);
+      this.setState({nameError: nameError}, resolve);
     });
   }
 
@@ -253,7 +257,7 @@ class FolderCreateDialog extends Component {
    * @returns {boolean}
    */
   hasValidationError() {
-    return (this.state.nameError !== false)
+    return (this.state.nameError !== false);
   }
 
   /**
@@ -272,18 +276,18 @@ class FolderCreateDialog extends Component {
     return (
       <div>
         <DialogWrapper className='folder-create-dialog' title="Create a new folder"
-                       onClose={this.handleClose} disabled={this.hasAllInputDisabled()}>
+          onClose={this.handleClose} disabled={this.hasAllInputDisabled()}>
           <form className="folder-create-form" onSubmit={this.handleFormSubmit} noValidate>
             <div className="form-content">
               <div className="input text required">
                 <label htmlFor="folder-name-input">Name</label>
                 <input id="folder-name-input" name="name"
-                       ref={this.nameRef}
-                       type="text" value={this.state.name} placeholder="Untitled folder"
-                       maxLength="64" required="required"
-                       disabled={this.hasAllInputDisabled()}
-                       onChange={this.handleInputChange}
-                       autoComplete='off' autoFocus={true}
+                  ref={this.nameRef}
+                  type="text" value={this.state.name} placeholder="Untitled folder"
+                  maxLength="64" required="required"
+                  disabled={this.hasAllInputDisabled()}
+                  onChange={this.handleInputChange}
+                  autoComplete='off' autoFocus={true}
                 />
                 {this.state.nameError &&
                   <div className="error message">{this.state.nameError}</div>
@@ -298,11 +302,11 @@ class FolderCreateDialog extends Component {
         </DialogWrapper>
         {this.state.serviceError &&
           <ErrorDialog message={this.state.serviceErrorMessage}
-                       title={`The folder could not be saved.`}
-                       onClose={this.handleCloseError}/>
+            title={`The folder could not be saved.`}
+            onClose={this.handleCloseError}/>
         }
       </div>
-    )
+    );
   }
 }
 

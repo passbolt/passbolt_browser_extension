@@ -22,14 +22,14 @@ class TooltipHtml extends Component {
    */
   constructor(props) {
     super(props);
-    this.state = {top:null};
+    this.state = {top: null};
     this.tooltipRef = React.createRef();
   }
 
   getInlineCss() {
     if (this.state.top) {
-      const top = (this.tooltipRef.current.getBoundingClientRect().top) + 'px';
-      return {top};
+      const top = `${this.tooltipRef.current.getBoundingClientRect().top}px`;
+      return {top: top};
     }
     return {};
   }
@@ -41,18 +41,19 @@ class TooltipHtml extends Component {
   }
 
   render() {
-    return(
+    return (
       <div className="more-details tooltip-alt" ref={this.tooltipRef} onMouseEnter={this.setTop.bind(this)}>
         <Icon name='info-circle' />
         <div className="tooltip-text right" style={this.getInlineCss()}>
           {this.props.children}
         </div>
       </div>
-    )
+    );
   }
 }
 
 TooltipHtml.propTypes = {
+  children: PropTypes.node.isRequired,
   // force top position (useful if in a scrolling container)
   offset: PropTypes.bool
 };

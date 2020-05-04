@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import React, { Component} from "react";
+import React, {Component} from "react";
 import PropTypes from "prop-types";
 
 class FormSubmitButton extends Component {
@@ -45,11 +45,11 @@ class FormSubmitButton extends Component {
   render() {
     return (
       <input type="submit"
-             className={this.getClassName()}
-             disabled={this.props.disabled}
-             value={this.props.value || 'Save'}
+        className={this.getClassName()}
+        disabled={this.props.disabled}
+        value={this.props.value || 'Save'}
       />
-    )
+    );
   }
 }
 

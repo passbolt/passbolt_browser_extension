@@ -104,7 +104,7 @@ class PasswordEditDialog extends Component {
     const passwordInputHasFocus = true;
     this.setState({passwordInputHasFocus: passwordInputHasFocus});
     if (!this.state.isSecretDecrypted) {
-      if(await this.decryptSecret()) {
+      if (await this.decryptSecret()) {
         this.passwordInputRef.current.focus();
       }
     }

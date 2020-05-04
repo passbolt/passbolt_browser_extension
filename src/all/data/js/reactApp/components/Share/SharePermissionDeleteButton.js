@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import React, { Component} from "react";
+import React, {Component} from "react";
 import PropTypes from "prop-types";
 
 import Icon from "../Common/Icons/Icon";
@@ -31,11 +31,11 @@ class SharePermissionDeleteButton extends Component {
 
   render() {
     return (
-        <a className={this.getClassName()} onClick={this.handleCloseClick.bind(this)} role="button">
-          <Icon name='close-circle' />
-          <span className="visually-hidden">Remove</span>
-        </a>
-    )
+      <a className={this.getClassName()} onClick={this.handleCloseClick.bind(this)} role="button">
+        <Icon name='close-circle' />
+        <span className="visually-hidden">Remove</span>
+      </a>
+    );
   }
 }
 SharePermissionDeleteButton.propTypes = {

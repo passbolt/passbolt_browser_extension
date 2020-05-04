@@ -15,7 +15,7 @@ import React, {Component} from "react";
 
 class AutocompleteItemLoading extends Component {
   render() {
-    return(
+    return (
       <li>
         <div className="row loading">
           <div className="main-cell-wrapper">

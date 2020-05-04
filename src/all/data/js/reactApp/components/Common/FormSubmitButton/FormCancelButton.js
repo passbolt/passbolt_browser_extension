@@ -11,18 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import React, { Component} from "react";
+import React, {Component} from "react";
 import PropTypes from "prop-types";
 
 class FormCancelButton extends Component {
-  /**
-   * Constructor
-   * @param {Object} props
-   */
-  constructor(props) {
-    super(props);
-  }
-
   getClassName() {
     let name = 'cancel';
     if (this.props.disabled) {
@@ -40,7 +32,7 @@ class FormCancelButton extends Component {
   render() {
     return (
       <a className={this.getClassName()} role="button" onClick={this.handleClick.bind(this)}>Cancel</a>
-    )
+    );
   }
 }
 

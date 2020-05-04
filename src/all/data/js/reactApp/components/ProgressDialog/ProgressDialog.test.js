@@ -89,7 +89,7 @@ describe("ProgressDialog", () => {
 
     // Progress bar.
     const progressBarElement = container.querySelector(".progress-bar");
-    let progressBarStyle = window.getComputedStyle(progressBarElement);
+    const progressBarStyle = window.getComputedStyle(progressBarElement);
     expect(progressBarStyle.width).toBe("0%");
 
     // Details message.
@@ -104,6 +104,5 @@ describe("ProgressDialog", () => {
     // Progress details elements to not be displayed.
     const progressDetailsElement = container.querySelector(".progress-details");
     expect(progressDetailsElement).not.toBeNull();
-
   });
 });

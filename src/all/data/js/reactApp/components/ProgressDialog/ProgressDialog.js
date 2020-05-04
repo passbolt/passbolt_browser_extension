@@ -16,10 +16,6 @@ import PropTypes from "prop-types";
 import AppContext from "../../contexts/AppContext";
 
 class ProgressDialog extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   calculateProgress() {
     if (!this.props.goals) {
       return 100; // displays a spinning 100% progress bar by default.

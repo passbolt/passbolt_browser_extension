@@ -15,7 +15,7 @@ import React, {Component} from "react";
 
 class AutocompleteItemEmpty extends Component {
   render() {
-    return(
+    return (
       <li>
         <div className="row">
           <div className="main-cell-wrapper">
@@ -25,7 +25,7 @@ class AutocompleteItemEmpty extends Component {
           </div>
         </div>
       </li>
-    )
+    );
   }
 }
 

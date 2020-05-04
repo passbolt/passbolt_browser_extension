@@ -15,11 +15,10 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 
 class AutocompleteItem extends Component {
-
   getAvatar() {
     if (this.props.user) {
       // return this.props.user.profile.avatar.small;
-      return 'img/avatar/user.png'
+      return 'img/avatar/user.png';
     } else {
       return 'img/avatar/group_default.png';
     }
@@ -35,13 +34,13 @@ class AutocompleteItem extends Component {
 
   getSubtitle() {
     if (this.props.user) {
-      let longId = this.props.user.gpgkey.fingerprint.substr(this.props.user.gpgkey.fingerprint.length - 16);
-      return longId.replace(/(.{4})/g,"$1 ")
+      const longId = this.props.user.gpgkey.fingerprint.substr(this.props.user.gpgkey.fingerprint.length - 16);
+      return longId.replace(/(.{4})/g, "$1 ");
     } else {
       if (this.props.group.user_count > 1) {
         return `${this.props.group.user_count} group members`;
       } else {
-        return `One group member`
+        return `One group member`;
       }
     }
   }
@@ -53,7 +52,7 @@ class AutocompleteItem extends Component {
     return 'row';
   }
 
-  onClick () {
+  onClick() {
     this.props.onClick(this.props.id);
   }
 
@@ -76,7 +75,7 @@ class AutocompleteItem extends Component {
           </div>
         </div>
       </li>
-    )
+    );
   }
 }
 

@@ -12,7 +12,7 @@
  * @since         2.13.0
  */
 class UserAbortsOperationError extends Error {
-  constructor(message){
+  constructor(message) {
     super(message);
     this.name = 'UserAbortsOperationError';
   }

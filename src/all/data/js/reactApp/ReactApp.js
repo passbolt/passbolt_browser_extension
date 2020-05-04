@@ -183,9 +183,11 @@ class ReactApp extends Component {
     }
   }
 
-  //=============================================================
-  // Generic error dialog events
-  //=============================================================
+  /*
+   * =============================================================
+   *  Generic error dialog events
+   * =============================================================
+   */
 
   async rememberMeInfo() {
     const rememberMeOptions = await port.request('passbolt.site.settings.plugins.rememberMe');
@@ -202,9 +204,11 @@ class ReactApp extends Component {
     port.emit('passbolt.app.hide');
   }
 
-  //=============================================================
-  // Passphrase  Events
-  //=============================================================
+  /*
+   * =============================================================
+   *  Passphrase  Events
+   * =============================================================
+   */
 
   handlePassphraseEntryRequestEvent(requestId) {
     this.setState({showPassphraseEntryDialog: true, passphraseRequestId: requestId});
@@ -214,9 +218,11 @@ class ReactApp extends Component {
     this.setState({showPassphraseEntryDialog: false, passphraseRequestId: null});
   }
 
-  //=============================================================
-  // Progress dialog events
-  //=============================================================
+  /*
+   * =============================================================
+   *  Progress dialog events
+   * =============================================================
+   */
 
   handleProgressDialogOpenEvent(title, goals, message) {
     const progressDialogProps = {title: title, message: message, goals: goals};
@@ -224,29 +230,31 @@ class ReactApp extends Component {
   }
 
   handleProgressDialogUpdateEvent(message, completed) {
-    let progressDialogProps = this.state.progressDialogProps;
+    const progressDialogProps = this.state.progressDialogProps;
     progressDialogProps.message = message || progressDialogProps.message;
     progressDialogProps.completed = completed;
     this.setState({progressDialogProps: progressDialogProps});
   }
 
   handleProgressDialogUpdateGoalsEvent(goals) {
-    let progressDialogProps = this.state.progressDialogProps;
+    const progressDialogProps = this.state.progressDialogProps;
     progressDialogProps.goals = goals;
     this.setState({progressDialogProps: progressDialogProps});
   }
 
   handleProgressDialogCloseEvent() {
-    let progressDialogProps = this.state.progressDialogProps;
+    const progressDialogProps = this.state.progressDialogProps;
     progressDialogProps.completed = progressDialogProps.goals;
     this.setState({showProgressDialog: true, progressDialogProps: progressDialogProps}, () => {
       this.setState({showProgressDialog: false, progressDialogProps: null});
     });
   }
 
-  //=============================================================
-  // Resource Dialogs Events
-  //=============================================================
+  /*
+   * =============================================================
+   *  Resource Dialogs Events
+   * =============================================================
+   */
 
   handleResourceEditDialogOpenEvent(id) {
     this.setState({showPasswordEditDialog: true, passwordEditDialogProps: {id: id}});
@@ -258,13 +266,15 @@ class ReactApp extends Component {
   }
 
   handleResourceCreateDialogOpenEvent(folderParentId) {
-    const resourceCreateDialogProps = {folderParentId};
-    this.setState({showResourceCreateDialog: true, resourceCreateDialogProps});
+    const resourceCreateDialogProps = {folderParentId: folderParentId};
+    this.setState({showResourceCreateDialog: true, resourceCreateDialogProps: resourceCreateDialogProps});
   }
 
-  //=============================================================
-  // Share Dialog Events
-  //=============================================================
+  /*
+   * =============================================================
+   *  Share Dialog Events
+   * =============================================================
+   */
 
   handleShareDialogOpenEvent(itemsToShare) {
     this.setState({showShareDialog: true, shareDialogProps: itemsToShare});
@@ -275,13 +285,15 @@ class ReactApp extends Component {
     port.emit('passbolt.app.hide');
   }
 
-  //=============================================================
-  // Folder Dialogs Events
-  //=============================================================
+  /*
+   * =============================================================
+   *  Folder Dialogs Events
+   * =============================================================
+   */
 
   handleFolderCreateDialogOpenEvent(folderParentId) {
-    const folderCreateDialogProps = {folderParentId};
-    this.setState({showFolderCreateDialog: true, folderCreateDialogProps});
+    const folderCreateDialogProps = {folderParentId: folderParentId};
+    this.setState({showFolderCreateDialog: true, folderCreateDialogProps: folderCreateDialogProps});
   }
 
   handleFolderCreateDialogCloseEvent() {
@@ -291,7 +303,7 @@ class ReactApp extends Component {
 
   handleFolderRenameDialogOpenEvent(folderId) {
     const folder = {id: folderId};
-    this.setState({showFolderRenameDialog: true, folder});
+    this.setState({showFolderRenameDialog: true, folder: folder});
   }
 
   handleFolderRenameDialogCloseEvent() {
@@ -302,7 +314,7 @@ class ReactApp extends Component {
 
   handleFolderDeleteDialogOpenEvent(folderId) {
     const folder = {id: folderId};
-    this.setState({showFolderDeleteDialog: true, folder});
+    this.setState({showFolderDeleteDialog: true, folder: folder});
   }
 
   handleFolderDeleteDialogCloseEvent() {
@@ -345,27 +357,29 @@ class ReactApp extends Component {
                 }
                 {this.state.showShareDialog &&
                 <ShareDialog resourcesIds={this.state.shareDialogProps.resourcesIds}
-                             foldersIds={this.state.shareDialogProps.foldersIds}
-                             onClose={this.handleShareDialogCloseEvent} />
+                  foldersIds={this.state.shareDialogProps.foldersIds}
+                  onClose={this.handleShareDialogCloseEvent} />
                 }
                 {
-                  // Hello traveller, leave these dialogs at the end
-                  // so that they are displayed on top of your new dialog
+                  /*
+                   * Hello traveller, leave these dialogs at the end
+                   * so that they are displayed on top of your new dialog
+                   */
                 }
                 {this.state.showProgressDialog &&
                 <ProgressDialog title={this.state.progressDialogProps.title}
-                                goals={this.state.progressDialogProps.goals}
-                                message={this.state.progressDialogProps.message}
-                                completed={this.state.progressDialogProps.completed} />
+                  goals={this.state.progressDialogProps.goals}
+                  message={this.state.progressDialogProps.message}
+                  completed={this.state.progressDialogProps.completed} />
                 }
                 {this.state.showPassphraseEntryDialog &&
                 <PassphraseEntryDialog requestId={this.state.passphraseRequestId}
-                                       onClose={this.handlePassphraseDialogClose}/>
+                  onClose={this.handlePassphraseDialogClose}/>
                 }
                 {this.state.showErrorDialog &&
                 <ErrorDialog title={this.state.errorDialogProps.title}
-                             message={this.state.errorDialogProps.message}
-                             onClose={this.handleErrorDialogCloseEvent}/>
+                  message={this.state.errorDialogProps.message}
+                  onClose={this.handleErrorDialogCloseEvent}/>
                 }
               </div>
               }

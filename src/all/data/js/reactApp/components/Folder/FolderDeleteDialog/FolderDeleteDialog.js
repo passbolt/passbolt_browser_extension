@@ -37,7 +37,7 @@ class FolderDeleteDialog extends Component {
    * @return {void}
    */
   async componentDidMount() {
-    this.setState({loading:false});
+    this.setState({loading: false});
   }
 
   /**
@@ -134,7 +134,7 @@ class FolderDeleteDialog extends Component {
     const prev = this.state.processing;
     return new Promise(resolve => {
       this.setState({processing: !prev}, resolve());
-    })
+    });
   }
 
   /**
@@ -190,25 +190,25 @@ class FolderDeleteDialog extends Component {
     return (
       <div>
         <DialogWrapper className='folder-create-dialog' title="Are you sure?"
-                       onClose={this.handleClose} disabled={this.hasAllInputDisabled()}>
+          onClose={this.handleClose} disabled={this.hasAllInputDisabled()}>
           <form className="folder-create-form" onSubmit={this.handleFormSubmit} noValidate>
             <div className="form-content">
-                <p>
-                  You're about to delete the folder <strong>{this.state.name}</strong>.
+              <p>
+                  You&apos;re about to delete the folder <strong>{this.state.name}</strong>.
                   Other users may loose access. This action cannot be undone.
-                </p>
-                <div className="input checkbox">
-                  <input id="delete-cascade" type="checkbox" name="cascade" onChange={this.handleInputChange}
-                         autoFocus={true} disabled={this.hasAllInputDisabled()} />&nbsp;
-                  <label htmlFor="delete-cascade">Also delete items inside this folder.</label>
-                </div>
+              </p>
+              <div className="input checkbox">
+                <input id="delete-cascade" type="checkbox" name="cascade" onChange={this.handleInputChange}
+                  autoFocus={true} disabled={this.hasAllInputDisabled()} />&nbsp;
+                <label htmlFor="delete-cascade">Also delete items inside this folder.</label>
               </div>
-              <div className="submit-wrapper clearfix">
-                <FormSubmitButton disabled={this.hasAllInputDisabled()} processing={this.state.processing} value="Delete" warning={true}/>
-                <FormCancelButton disabled={this.hasAllInputDisabled()} onClick={this.handleClose} />
-              </div>
-            </form>
-          </DialogWrapper>
+            </div>
+            <div className="submit-wrapper clearfix">
+              <FormSubmitButton disabled={this.hasAllInputDisabled()} processing={this.state.processing} value="Delete" warning={true}/>
+              <FormCancelButton disabled={this.hasAllInputDisabled()} onClick={this.handleClose} />
+            </div>
+          </form>
+        </DialogWrapper>
         {this.state.serviceError &&
           <ErrorDialog message={this.state.errorMessage} onClose={this.handleCloseError}/>
         }

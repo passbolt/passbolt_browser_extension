@@ -14,16 +14,8 @@
 import React, {Component} from "react";
 
 class SharePermissionItemSkeleton extends Component {
-  /**
-   * Constructor
-   * @param {Object} props
-   */
-  constructor(props) {
-    super(props);
-  }
-
   render() {
-    return(
+    return (
       <li className="row skeleton">
         <div className="avatar"></div>
         <div className="aro">

@@ -39,7 +39,7 @@ class FolderRenameDialog extends Component {
    * @return {void}
    */
   async componentDidMount() {
-    this.setState({loading:false}, () => {
+    this.setState({loading: false}, () => {
       this.nameRef.current.focus();
     });
   }
@@ -118,8 +118,10 @@ class FolderRenameDialog extends Component {
    * @returns {void}
    */
   handleClose() {
-    // ignore closing event of main folder create dialog
-    // if service error is displayed on top
+    /*
+     * ignore closing event of main folder create dialog
+     * if service error is displayed on top
+     */
     if (!this.state.serviceError) {
       this.props.onClose();
     }
@@ -201,7 +203,7 @@ class FolderRenameDialog extends Component {
     const prev = this.state.processing;
     return new Promise(resolve => {
       this.setState({processing: !prev}, resolve());
-    })
+    });
   }
 
   /**
@@ -276,7 +278,7 @@ class FolderRenameDialog extends Component {
       nameError = "A name can not be more than 64 char in length.";
     }
     return new Promise(resolve => {
-      this.setState({nameError}, resolve);
+      this.setState({nameError: nameError}, resolve);
     });
   }
 
@@ -285,7 +287,7 @@ class FolderRenameDialog extends Component {
    * @returns {boolean}
    */
   hasValidationError() {
-    return (this.state.nameError !== false)
+    return (this.state.nameError !== false);
   }
 
   /**
@@ -304,18 +306,18 @@ class FolderRenameDialog extends Component {
     return (
       <div>
         <DialogWrapper className='rename-folder-dialog' title="Rename a folder"
-                       onClose={this.handleClose} disabled={this.hasAllInputDisabled()}>
+          onClose={this.handleClose} disabled={this.hasAllInputDisabled()}>
           <form className="folder-rename-form" onSubmit={this.handleFormSubmit} noValidate>
             <div className="form-content">
               <div className={`input text required ${this.state.nameError ? "error" : ""}`}>
                 <label htmlFor="folder-name-input">Folder name</label>
                 <input id="folder-name-input" name="name"
-                       ref={this.nameRef}
-                       type="text" value={this.state.name} placeholder="Untitled folder"
-                       maxLength="64" required="required"
-                       onChange={this.handleInputChange}
-                       disabled={this.hasAllInputDisabled()}
-                       autoComplete="off" autoFocus={true}
+                  ref={this.nameRef}
+                  type="text" value={this.state.name} placeholder="Untitled folder"
+                  maxLength="64" required="required"
+                  onChange={this.handleInputChange}
+                  disabled={this.hasAllInputDisabled()}
+                  autoComplete="off" autoFocus={true}
                 />
                 {this.state.nameError &&
                   <div className="name error message">{this.state.nameError}</div>

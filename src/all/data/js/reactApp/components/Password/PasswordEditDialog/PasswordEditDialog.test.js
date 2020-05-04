@@ -27,10 +27,10 @@ beforeEach(() => {
   mockPort();
 });
 
-const mockPort = function () {
+const mockPort = function() {
   window.port = {
     _mockedOnCallbacks: {},
-    fireAddonMessage: function (message) {
+    fireAddonMessage: function(message) {
       const callback = window.port._mockedOnCallbacks[message];
       if (callback) {
         const callbackArgs = Array.prototype.slice.call(arguments, 1);
@@ -53,21 +53,21 @@ afterEach(() => {
 
 describe("PasswordEditDialog", () => {
   const getDummyResource = function() {
-      return {
-        "id": "8e3874ae-4b40-590b-968a-418f704b9d9a",
-        "name": "apache",
-        "username": "www-data",
-        "uri": "http://www.apache.org/",
-        "description": "Apache is the world's most used web server software.",
-        "deleted": false,
-        "created": "2019-12-05T13:38:43+00:00",
-        "modified": "2019-12-06T13:38:43+00:00",
-        "created_by": "f848277c-5398-58f8-a82a-72397af2d450",
-        "modified_by": "f848277c-5398-58f8-a82a-72397af2d450"
-      };
+    return {
+      "id": "8e3874ae-4b40-590b-968a-418f704b9d9a",
+      "name": "apache",
+      "username": "www-data",
+      "uri": "http://www.apache.org/",
+      "description": "Apache is the world's most used web server software.",
+      "deleted": false,
+      "created": "2019-12-05T13:38:43+00:00",
+      "modified": "2019-12-06T13:38:43+00:00",
+      "created_by": "f848277c-5398-58f8-a82a-72397af2d450",
+      "modified_by": "f848277c-5398-58f8-a82a-72397af2d450"
+    };
   };
 
-  const getAppContext = function (appContext) {
+  const getAppContext = function(appContext) {
     const defaultAppContext = {
       user: {
         "user.settings.securityToken.code": "TST",
@@ -82,7 +82,7 @@ describe("PasswordEditDialog", () => {
     return Object.assign(defaultAppContext, appContext || {});
   };
 
-  const getComponentProps = function (props) {
+  const getComponentProps = function(props) {
     const defaultAppProps = {
       id: "8e3874ae-4b40-590b-968a-418f704b9d9a",
       onClose: jest.fn()
@@ -91,7 +91,7 @@ describe("PasswordEditDialog", () => {
     return Object.assign(defaultAppProps, props || {});
   };
 
-  const renderPasswordEditDialog = function (appContext, props) {
+  const renderPasswordEditDialog = function(appContext, props) {
     appContext = getAppContext(appContext);
     props = getComponentProps(props);
 
@@ -276,7 +276,7 @@ describe("PasswordEditDialog", () => {
     expect(viewButton.classList.contains("selected")).toBe(false);
   });
 
-  it("validates the form when clicking on the submit button.", async () => {
+  it("validates the form when clicking on the submit button.", async() => {
     const {container} = renderPasswordEditDialog();
 
     const leftClick = {button: 0};
@@ -293,7 +293,7 @@ describe("PasswordEditDialog", () => {
     expect(passwordErrorMessage.textContent).toBe("A password is required.");
   });
 
-  it("displays an error when the API call fail.", async () => {
+  it("displays an error when the API call fail.", async() => {
     // Mock the request function to make it return an error.
     jest.spyOn(window.port, 'request').mockImplementationOnce(() => {
       throw new PassboltApiFetchError("Jest simulate API error.");
@@ -327,7 +327,7 @@ describe("PasswordEditDialog", () => {
     expect(generalErrorMessage.textContent).toBe("Jest simulate API error.");
   });
 
-  it("requests the addon to edit a resource when clicking on the submit button.", async () => {
+  it("requests the addon to edit a resource when clicking on the submit button.", async() => {
     const createdResourceId = "f2b4047d-ab6d-4430-a1e2-3ab04a2f4fb9";
     // Mock the request function to make it the expected result
     jest.spyOn(window.port, 'request').mockImplementationOnce(jest.fn((message, data) => Object.assign({id: createdResourceId}, data)));

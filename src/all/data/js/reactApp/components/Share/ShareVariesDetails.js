@@ -15,9 +15,8 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 
 class ShareVariesDetails extends Component {
-
   render() {
-    return(
+    return (
       <span className="share-varies-details">
         {(this.props.variesDetails[0].length > 0) &&
         <span><strong>No access: {this.props.variesDetails[0].join(', ')}</strong><br/></span>
@@ -32,7 +31,7 @@ class ShareVariesDetails extends Component {
         <span><strong>Is owner: {this.props.variesDetails[15].join(', ')}</strong><br/></span>
         }
       </span>
-    )
+    );
   }
 }
 

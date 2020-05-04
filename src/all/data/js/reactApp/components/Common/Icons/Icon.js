@@ -26,7 +26,6 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 
 class Icon extends Component {
-
   getClassName() {
     let className = `svg-icon ${this.props.name}`;
     if (this.props.big) {
@@ -36,7 +35,7 @@ class Icon extends Component {
   }
 
   render() {
-    return(
+    return (
       <span className={this.getClassName()} >
         {this.props.name === 'caret-right' &&
         <svg width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
@@ -169,7 +168,7 @@ class Icon extends Component {
         </svg>
         }
       </span>
-    )
+    );
   }
 }
 

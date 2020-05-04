@@ -50,7 +50,7 @@ class Autocomplete extends Component {
       // Fields and errors
       name: 'loading...',
       nameError: false
-    }
+    };
   }
 
   /**
@@ -113,7 +113,7 @@ class Autocomplete extends Component {
     this.props.onClose();
   }
 
-  handleKeyDown (event) {
+  handleKeyDown(event) {
     if (this.state.disabled || this.state.processing || this.state.autocompleteItems === null) {
       return;
     }
@@ -137,7 +137,7 @@ class Autocomplete extends Component {
   }
 
   handleSelect(selected) {
-    let obj = this.state.autocompleteItems[selected];
+    const obj = this.state.autocompleteItems[selected];
     this.cache = [];
     this.setState({name: ''});
     this.props.onSelect(obj);
@@ -172,20 +172,20 @@ class Autocomplete extends Component {
    * @returns {Promise<void>}
    */
   async handleAutocompleteChange() {
-    let keyword = this.state.name;
+    const keyword = this.state.name;
     if (!keyword) {
       this.closeAutocomplete();
       return;
     }
     try {
-      let autocompleteItems = await this.autocompleteSearch(keyword);
+      const autocompleteItems = await this.autocompleteSearch(keyword);
       let selected = null;
       if (autocompleteItems.length > 0) {
         selected = 0;
       }
       this.props.onOpen();
       return new Promise(resolve => {
-        this.setState({autocompleteItems, processing: false, selected: selected}, resolve());
+        this.setState({autocompleteItems: autocompleteItems, processing: false, selected: selected}, resolve());
       });
     } catch (error) {
       console.error(error);
@@ -196,18 +196,18 @@ class Autocomplete extends Component {
 
   selectPrevious() {
     if (this.state.selected === 0 || this.state.selected === null) {
-      this.setState({selected: (this.state.autocompleteItems.length -1)});
+      this.setState({selected: (this.state.autocompleteItems.length - 1)});
     } else {
-      this.setState({selected: (this.state.selected -1)});
+      this.setState({selected: (this.state.selected - 1)});
     }
     this.scrollToSelectedItem();
   }
 
   selectNext() {
-    if (this.state.selected === null || (this.state.selected === this.state.autocompleteItems.length-1)) {
+    if (this.state.selected === null || (this.state.selected === this.state.autocompleteItems.length - 1)) {
       this.setState({selected: 0});
     } else {
-      this.setState({selected: (this.state.selected +1)});
+      this.setState({selected: (this.state.selected + 1)});
     }
     this.scrollToSelectedItem();
   }
@@ -261,14 +261,14 @@ class Autocomplete extends Component {
           <div className="input text autocomplete">
             <label htmlFor={this.props.id}>{this.props.label}</label>
             <input id={this.props.id}
-                   name={this.props.name}
-                   ref={this.inputRef} maxLength="64"
-                   type="text"
-                   placeholder={this.getPlaceholder()}
-                   autoComplete="off"
-                   value={this.state.name}
-                   disabled={this.isInputDisabled()}
-                   onChange={this.handleInputChange}
+              name={this.props.name}
+              ref={this.inputRef} maxLength="64"
+              type="text"
+              placeholder={this.getPlaceholder()}
+              autoComplete="off"
+              value={this.state.name}
+              disabled={this.isInputDisabled()}
+              onChange={this.handleInputChange}
             />
           </div>
           {(this.state.processing || this.state.autocompleteItems) &&
@@ -284,10 +284,10 @@ class Autocomplete extends Component {
                 {!this.state.processing && this.state.autocompleteItems && (this.state.autocompleteItems).map((item, key) => {
                   if (item.username) {
                     return <AutocompleteItem key={key} id={key} user={item} selected={this.isItemSelected(key)}
-                                             onClick={this.handleSelect}/>
+                      onClick={this.handleSelect}/>;
                   } else {
                     return <AutocompleteItem key={key} id={key} group={item} selected={this.isItemSelected(key)}
-                                             onClick={this.handleSelect}/>
+                      onClick={this.handleSelect}/>;
                   }
                 })}
               </ul>
@@ -296,7 +296,7 @@ class Autocomplete extends Component {
           }
         </div>
       </div>
-    )
+    );
   }
 }
 
@@ -306,7 +306,9 @@ Autocomplete.propTypes = {
   onSelect: PropTypes.func,
   onOpen: PropTypes.func,
   onClose: PropTypes.func,
+  name: PropTypes.string,
   label: PropTypes.string,
+  placeholder: PropTypes.string,
   disabled: PropTypes.bool
 };
 

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import React, { Component} from "react";
+import React, {Component} from "react";
 import PropTypes from "prop-types";
 
 import Icon from "../Icons/Icon";
@@ -35,7 +35,7 @@ class DialogCloseButton extends Component {
         <Icon name='close' />
         <span className="visually-hidden">Close</span>
       </a>
-    )
+    );
   }
 }
 

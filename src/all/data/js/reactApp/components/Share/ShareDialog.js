@@ -53,8 +53,8 @@ class ShareDialog extends Component {
     }
 
     this.shareChanges = new ShareChanges(this.resources, this.folders);
-    let permissions = this.shareChanges.aggregatePermissionsByAro();
-    this.setState({loading: false, name: '', permissions}, () => {
+    const permissions = this.shareChanges.aggregatePermissionsByAro();
+    this.setState({loading: false, name: '', permissions: permissions}, () => {
       // scroll at the top of the permission list
       this.permissionListRef.current.scrollTop = 0;
     });
@@ -79,7 +79,7 @@ class ShareDialog extends Component {
       // Error dialog trigger
       serviceError: false,
       serviceErrorMessage: '',
-    }
+    };
   }
 
   /**
@@ -106,8 +106,10 @@ class ShareDialog extends Component {
    * @returns {void}
    */
   handleClose() {
-    // ignore closing event of main folder create dialog
-    // if service error is displayed on top
+    /*
+     * ignore closing event of main folder create dialog
+     * if service error is displayed on top
+     */
     if (!this.state.serviceError) {
       this.props.onClose();
     }
@@ -118,8 +120,10 @@ class ShareDialog extends Component {
    * @returns {void}
    */
   handleCloseError() {
-    // Close dialog
-    // TODO do not allow retry if parent id does not exist
+    /*
+     * Close dialog
+     * TODO do not allow retry if parent id does not exist
+     */
     this.setState({serviceError: false, serviceErrorMessage: ''});
   }
 
@@ -176,7 +180,7 @@ class ShareDialog extends Component {
    * @param {string} message
    * @return {void}
    */
-  handleServiceError (message) {
+  handleServiceError(message) {
     this.setState({serviceError: true, serviceErrorMessage: message, processing: false});
   }
 
@@ -188,18 +192,18 @@ class ShareDialog extends Component {
    */
   handleAutocompleteSelect(aro) {
     // check if permission is already listed
-    let existing = this.state.permissions.filter(permission => permission.aro.id === aro.id);
+    const existing = this.state.permissions.filter(permission => permission.aro.id === aro.id);
     if (existing.length > 0) {
       // TODO scroll to and highlight
       return;
     }
 
     // TODO restore to original permission if any
-    let permission = this.shareChanges.addAroPermissions(aro);
+    const permission = this.shareChanges.addAroPermissions(aro);
     permission.updated = true;
-    let permissions = this.state.permissions;
+    const permissions = this.state.permissions;
     permissions.push(permission);
-    this.setState({permissions}, () => {
+    this.setState({permissions: permissions}, () => {
       // scroll at the bottom of the permission list
       this.permissionListRef.current.scrollTop = this.permissionListRef.current.scrollHeight;
     });
@@ -214,7 +218,7 @@ class ShareDialog extends Component {
    */
   handlePermissionUpdate(aroId, type) {
     this.shareChanges.updateAroPermissions(aroId, type);
-    let newPermissions = this.state.permissions.map(permission => {
+    const newPermissions = this.state.permissions.map(permission => {
       if (permission.aro.id === aroId) {
         permission.type = type;
         permission.updated = this.shareChanges.hasChanges(aroId);
@@ -230,9 +234,9 @@ class ShareDialog extends Component {
    * @param {string} aroId uuid
    */
   handlePermissionDelete(aroId) {
-      this.shareChanges.deleteAroPermissions(aroId);
-      let newPermissions = this.state.permissions.filter(permission => (permission.aro.id !== aroId));
-      this.setState({permissions: newPermissions});
+    this.shareChanges.deleteAroPermissions(aroId);
+    const newPermissions = this.state.permissions.filter(permission => (permission.aro.id !== aroId));
+    this.setState({permissions: newPermissions});
   }
 
   /**
@@ -258,9 +262,9 @@ class ShareDialog extends Component {
    * @returns {Promise<Object>} aros,
    */
   async fetchAutocompleteItems(keyword) {
-    let items = await port.request('passbolt.share.search-aros', keyword, this.props.resourcesIds);
-    return items.filter((item) => {
-      let found = this.state.permissions.filter(permission => (permission.aro.id === item.id));
+    const items = await port.request('passbolt.share.search-aros', keyword, this.props.resourcesIds);
+    return items.filter(item => {
+      const found = this.state.permissions.filter(permission => (permission.aro.id === item.id));
       return found.length === 0;
     });
   }
@@ -375,7 +379,7 @@ class ShareDialog extends Component {
     const prev = this.state.processing;
     return new Promise(resolve => {
       this.setState({processing: !prev}, resolve());
-    })
+    });
   }
 
   /**
@@ -411,7 +415,7 @@ class ShareDialog extends Component {
     return (
       <div>
         <DialogWrapper className='share-dialog'
-           title={this.getTitle()} tooltip={this.getTooltip()} onClose={this.handleClose} disabled={this.hasAllInputDisabled()}>
+          title={this.getTitle()} tooltip={this.getTooltip()} onClose={this.handleClose} disabled={this.hasAllInputDisabled()}>
           <form className="share-form" onSubmit={this.handleFormSubmit} noValidate>
             <div className="form-content permission-edit">
               {(this.state.loading) &&
@@ -423,19 +427,17 @@ class ShareDialog extends Component {
               }
               {!(this.state.loading) &&
               <ul className="permissions scroll" ref={this.permissionListRef}>
-                {(this.state.permissions && (this.state.permissions).map((permission, key) => {
-                  return <SharePermissionItem
-                    id={permission.aro.id}
-                    key={key}
-                    aro={permission.aro}
-                    permissionType={permission.type}
-                    variesDetails={permission.variesDetails}
-                    updated={permission.updated}
-                    disabled={this.hasAllInputDisabled()}
-                    onUpdate={this.handlePermissionUpdate}
-                    onDelete={this.handlePermissionDelete}
-                  />
-                }))}
+                {(this.state.permissions && (this.state.permissions).map((permission, key) => <SharePermissionItem
+                  id={permission.aro.id}
+                  key={key}
+                  aro={permission.aro}
+                  permissionType={permission.type}
+                  variesDetails={permission.variesDetails}
+                  updated={permission.updated}
+                  disabled={this.hasAllInputDisabled()}
+                  onUpdate={this.handlePermissionUpdate}
+                  onDelete={this.handlePermissionDelete}
+                />))}
               </ul>
               }
             </div>
@@ -450,18 +452,18 @@ class ShareDialog extends Component {
               </div>
             }
             <div className="form-content permission-add">
-                <Autocomplete
-                  id="share-name-input"
-                  name="name"
-                  label="Share with people or groups"
-                  placeholder="Start typing a user or group name"
-                  searchCallback={this.fetchAutocompleteItems}
-                  onSelect={this.handleAutocompleteSelect}
-                  onServiceError={this.handleServiceError}
-                  onOpen={this.handleAutocompleteOpen}
-                  onClose={this.handleAutocompleteClose}
-                  disabled={this.hasAllInputDisabled()}
-                />
+              <Autocomplete
+                id="share-name-input"
+                name="name"
+                label="Share with people or groups"
+                placeholder="Start typing a user or group name"
+                searchCallback={this.fetchAutocompleteItems}
+                onSelect={this.handleAutocompleteSelect}
+                onServiceError={this.handleServiceError}
+                onOpen={this.handleAutocompleteOpen}
+                onClose={this.handleAutocompleteClose}
+                disabled={this.hasAllInputDisabled()}
+              />
             </div>
             <div className="submit-wrapper clearfix">
               <FormSubmitButton disabled={this.hasSubmitDisabled()} processing={this.state.processing} value="Save"/>
@@ -476,7 +478,7 @@ class ShareDialog extends Component {
           onClose={this.handleCloseError}/>
         }
       </div>
-    )
+    );
   }
 }
 

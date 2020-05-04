@@ -16,16 +16,11 @@ import PropTypes from "prop-types";
 import AppContext from "../../../contexts/AppContext";
 
 class GroupAvatar extends Component {
-  /**
-   * Constructor
-   * @param {Object} props
-   */
-  constructor(props) {
-    super(props);
-  }
-
   getAvatarSrc(url) {
-    return `${this.context.user["user.settings.trustedDomain"]}/img/avatar/group_default.png`;
+    if (!url) {
+      url = "img/avatar/group_default.png";
+    }
+    return `${this.context.user["user.settings.trustedDomain"]}/url`;
   }
 
   getAltText() {
@@ -33,11 +28,11 @@ class GroupAvatar extends Component {
   }
 
   render() {
-    return(
+    return (
       <div className="avatar user-avatar">
         <img src={this.getAvatarSrc()} alt={this.getAltText()}/>
       </div>
-    )
+    );
   }
 }
 

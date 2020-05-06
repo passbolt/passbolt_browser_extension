@@ -17,7 +17,7 @@ const {UserEntity} = require('../user/userEntity');
 const {GroupEntity} = require('../group/groupEntity');
 
 const ENTITY_NAME = 'Permission';
-const PERMISSION_ADMIN = 15;
+const PERMISSION_OWNER = 15;
 const PERMISSION_UPDATE = 7;
 const PERMISSION_READ = 1;
 const ARO_GROUP = 'Group';
@@ -96,8 +96,8 @@ class PermissionEntity extends Entity {
           "type": "integer",
           "enum": [
             PermissionEntity.PERMISSION_READ,
-            PermissionEntity.PERMISSION_ADMIN,
-            PermissionEntity.PERMISSION_UPDATE
+            PermissionEntity.PERMISSION_UPDATE,
+            PermissionEntity.PERMISSION_OWNER
           ]
         },
         "created": {
@@ -128,7 +128,7 @@ class PermissionEntity extends Entity {
 
   /**
    * Get ACO - Access Control Object
-   * @returns {string} Group or User
+   * @returns {string} Folder or Resource
    */
   get aco() {
     return this._props.aco;
@@ -136,7 +136,7 @@ class PermissionEntity extends Entity {
 
   /**
    * Get ARO - Access Request Object
-   * @returns {string} Resource or Folder
+   * @returns {string} Groups or User
    */
   get aro() {
     return this._props.aro;
@@ -166,6 +166,14 @@ class PermissionEntity extends Entity {
     return this._props.type;
   }
 
+  /**
+   * Return true if owner permission
+   * @returns {boolean}
+   */
+  isOwner() {
+    return (this.type === PermissionEntity.PERMISSION_OWNER);
+  }
+
   // ==================================================
   // Static properties getters
   // ==================================================
@@ -178,11 +186,11 @@ class PermissionEntity extends Entity {
   }
 
   /**
-   * PermissionEntity.PERMISSION_ADMIN
+   * PermissionEntity.PERMISSION_OWNER
    * @returns {number}
    */
-  static get PERMISSION_ADMIN() {
-    return PERMISSION_ADMIN;
+  static get PERMISSION_OWNER() {
+    return PERMISSION_OWNER;
   }
 
   /**
@@ -250,6 +258,151 @@ class PermissionEntity extends Entity {
    */
   get group() {
     return this._group || null;
+  }
+
+  // ==================================================
+  // Permission comparison operators
+  // ==================================================
+  /**
+   * Basic type assertion helper
+   *
+   * @param {PermissionEntity} permission
+   */
+  static assertIsPermission(permission) {
+    if (!permission || !(permission instanceof PermissionEntity)) {
+      throw new TypeError('Failed to assert the parameter is a valid permission');
+    }
+  }
+
+  /**
+   * Basic type assertion helper
+   *
+   * @param {PermissionEntity} p1
+   * @param {PermissionEntity} p2
+   */
+  static assertArePermissions(p1, p2) {
+    PermissionEntity.assertIsPermission(p1);
+    PermissionEntity.assertIsPermission(p2);
+  }
+
+  /**
+   * Return true if two given permission have the same id
+   *
+   * @param {PermissionEntity} p1
+   * @param {PermissionEntity} p2
+   * @returns {boolean} true if permission ids match
+   */
+  static isIdMatching(p1, p2) {
+    PermissionEntity.assertArePermissions(p1, p2);
+    return (p1.id === p2.id);
+  }
+
+  /**
+   * Return true if two given permission are about the same user or group
+   *
+   * @param {PermissionEntity} p1
+   * @param {PermissionEntity} p2
+   * @returns {boolean} true if permissions match
+   */
+  static isAroMatching(p1, p2) {
+    PermissionEntity.assertArePermissions(p1, p2);
+    return (p1.aro === p2.aro && p1.aroForeignKey === p2.aroForeignKey);
+  }
+
+  /**
+   * Return true if two given permission are about the same folder or resource
+   *
+   * @param {PermissionEntity} p1
+   * @param {PermissionEntity} p2
+   * @returns {boolean} true if permissions match
+   */
+  static isAcoMatching(p1, p2) {
+    PermissionEntity.assertArePermissions(p1, p2);
+    return (p1.aco === p2.aco && p1.acoForeignKey === p2.acoForeignKey);
+  }
+
+  /**
+   * Return true if two given permission are about the same folder/resource and group/user
+   *
+   * @param {PermissionEntity} p1
+   * @param {PermissionEntity} p2
+   * @returns {boolean} true if permissions match
+   */
+  static isAcoAndAroMatching(p1, p2) {
+    PermissionEntity.assertArePermissions(p1, p2);
+    return (PermissionEntity.isAcoMatching(p1, p2) && PermissionEntity.isAroMatching(p1, p2));
+  }
+
+  /**
+   * Return true if two given permission are the same type
+   * Example both permission are about an update right
+   *
+   * @param {PermissionEntity} p1
+   * @param {PermissionEntity} p2
+   * @returns {boolean} true if permissions match
+   */
+  static isTypeMatching(p1, p2) {
+    PermissionEntity.assertArePermissions(p1, p2);
+    return (p1.type === p2.type);
+  }
+
+  /**
+   * Return true if two given permission aco, aro and type matches
+   *
+   * @param {PermissionEntity} p1
+   * @param {PermissionEntity} p2
+   * @returns {boolean} true if permissions match
+   */
+  static isMatchingAroAcoType(p1, p2) {
+    PermissionEntity.assertArePermissions(p1, p2);
+    return PermissionEntity.isAcoAndAroMatching(p1, p2) && PermissionEntity.isTypeMatching(p1, p2);
+  }
+
+  /**
+   * Return the highest permission type
+   *
+   * @param {PermissionEntity} p1
+   * @param {PermissionEntity} p2
+   * @returns {int} highest permission type
+   */
+  static getHighestPermissionType(p1, p2) {
+    PermissionEntity.assertArePermissions(p1, p2);
+    return (p1.type > p2.type) ? p1.type : p2.type;
+  }
+
+  /**
+   * Return true if two given permission are the same type
+   * Example both permission are about an update right
+   *
+   * @param {PermissionEntity} p1
+   * @param {PermissionEntity} p2
+   * @returns {PermissionEntity} the permission with highest type
+   */
+  static getHighestPermission(p1, p2) {
+    PermissionEntity.assertArePermissions(p1, p2);
+    return (p1.type > p2.type) ? p1 : p2;
+  }
+
+  // ==================================================
+  // Permission factories
+  // ==================================================
+  /**
+   * Create a permission copy to be used by another aco
+   * Useful for example when you want to reuse a permission from a folder
+   * and apply it to a resource. For example on a move or a share operation.
+   *
+   * @param aco
+   * @param acoForeignKey
+   * @returns {PermissionEntity}
+   */
+  copyForAnotherAco(aco, acoForeignKey) {
+    return new PermissionEntity({
+      aro: this.aro,
+      aro_foreign_key: this.aroForeignKey,
+      aco: aco,
+      aco_foreign_key: acoForeignKey,
+      type: this.type
+    });
   }
 }
 

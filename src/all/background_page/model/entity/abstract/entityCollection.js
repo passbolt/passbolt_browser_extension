@@ -16,12 +16,13 @@ const {Entity} = require('../abstract/entity');
 class EntityCollection extends Entity {
   /**
    * EntityCollection constructor
-   * @param {*} props
-   * @param {Array} items
+   * @param {array} props
+   * @param {array} [items] optional
    */
   constructor(props, items) {
     super(props);
     if (items) {
+      this._props = null;
       this._items = items;
     } else {
       this._items = [];
@@ -95,7 +96,7 @@ class EntityCollection extends Entity {
     if (typeof propName !== 'string' || typeof search !== 'string') {
       throw new TypeError('EntityCollection find by expect propName and search to be strings');
     }
-    return this._items.filter(item => (item.hasOwnProperty(propName) && item[propName] === search));
+    return this._items.filter(item => (item._props.hasOwnProperty(propName) && item._props[propName] === search));
   }
 
   /**

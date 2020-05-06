@@ -32,10 +32,9 @@ class FoldersCollection extends EntityCollection {
     ));
 
     // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first items that doesn't validate
-    this._items = [];
+    // Collection validation will fail at the first item that doesn't validate
     this._props.forEach(folder => {
-      this._items.push(new FolderEntity(folder));
+      this.push(new FolderEntity(folder));
     });
 
     // We do not keep original props

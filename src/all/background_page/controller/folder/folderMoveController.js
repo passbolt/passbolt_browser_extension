@@ -13,7 +13,7 @@
  */
 const Resource = require('../../model/resource').Resource;
 const {FolderEntity} = require('../../model/entity/folder/folderEntity');
-const {FolderModel} = require('../../model/folderModel');
+const {FolderModel} = require('../../model/folder/folderModel');
 const User = require('../../model/user').User;
 
 class FolderMoveController {

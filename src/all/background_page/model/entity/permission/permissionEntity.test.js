@@ -22,6 +22,20 @@ beforeEach(() => {
   jest.resetModules();
 });
 
+/**
+ * getTestDto
+ * @returns {object}
+ */
+function getTestDto(option) {
+  return {
+    'aro': PermissionEntity.ARO_USER,
+    'aco': PermissionEntity.ACO_RESOURCE,
+    'aro_foreign_key': '7f077753-0835-4054-92ee-556660ea04f1',
+    'aco_foreign_key': '7f077753-0835-4054-92ee-556660ea04f2',
+    'type': PermissionEntity.PERMISSION_OWNER,
+  };
+}
+
 describe("Entity permission", () => {
   it("schema must validate", () => {
     EntitySchema.validateSchema(PermissionEntity.ENTITY_NAME, PermissionEntity.getSchema());
@@ -35,7 +49,7 @@ describe("Entity permission", () => {
       'aco': PermissionEntity.ACO_RESOURCE,
       'aro_foreign_key': aroForeignKey,
       'aco_foreign_key': acoForeignKey,
-      'type': PermissionEntity.PERMISSION_ADMIN,
+      'type': PermissionEntity.PERMISSION_OWNER,
     };
 
     // Entity props is equal to original dto
@@ -49,7 +63,7 @@ describe("Entity permission", () => {
     // Other fields are set properly
     expect(entity.aro).toBe(PermissionEntity.ARO_USER);
     expect(entity.aco).toBe(PermissionEntity.ACO_RESOURCE);
-    expect(entity.type).toBe(PermissionEntity.PERMISSION_ADMIN);
+    expect(entity.type).toBe(PermissionEntity.PERMISSION_OWNER);
     expect(entity.aroForeignKey).toBe(aroForeignKey);
     expect(entity.acoForeignKey).toBe(acoForeignKey);
     expect(entity._hasProp('acoForeignKey')).toBe(true);
@@ -65,7 +79,7 @@ describe("Entity permission", () => {
       'aco': PermissionEntity.ACO_RESOURCE,
       'aro_foreign_key': aroForeignKey,
       'aco_foreign_key': acoForeignKey,
-      'type': PermissionEntity.PERMISSION_ADMIN,
+      'type': PermissionEntity.PERMISSION_OWNER,
       'modified': '2022-04-23 17:34:00',
       '_custom': 'not needed'
     };
@@ -75,7 +89,7 @@ describe("Entity permission", () => {
       'aco': PermissionEntity.ACO_RESOURCE,
       'aro_foreign_key': aroForeignKey,
       'aco_foreign_key': acoForeignKey,
-      'type': PermissionEntity.PERMISSION_ADMIN,
+      'type': PermissionEntity.PERMISSION_OWNER,
       'modified': '2022-04-23 17:34:00',
     };
 
@@ -106,5 +120,89 @@ describe("Entity permission", () => {
       expect(error.hasError('aco_foreign_key')).toBe(true);
       expect(error.hasError('type')).toBe(true);
     }
+  });
+
+  it("assertion checks work", () => {
+    const uuid0 = '7f077753-0835-4054-92ee-556660ea04f0';
+    const uuid1 = '7f077753-0835-4054-92ee-556660ea04f1';
+    const uuid2 = '7f077753-0835-4054-92ee-556660ea04f2';
+    const uuid3 = '7f077753-0835-4054-92ee-556660ea04f3';
+    const uuid4 = '7f077753-0835-4054-92ee-556660ea04f4';
+    const uuid5 = '7f077753-0835-4054-92ee-556660ea04f5';
+
+    const dto1 = {
+      'id': uuid0,
+      'aro': PermissionEntity.ARO_USER,
+      'aco': PermissionEntity.ACO_RESOURCE,
+      'aro_foreign_key': uuid1,
+      'aco_foreign_key': uuid2,
+      'type': PermissionEntity.PERMISSION_OWNER,
+    };
+    const dto2 = {
+      'id': uuid3,
+      'aro': PermissionEntity.ARO_GROUP,
+      'aco': PermissionEntity.ACO_FOLDER,
+      'aro_foreign_key': uuid4,
+      'aco_foreign_key': uuid5,
+      'type': PermissionEntity.PERMISSION_UPDATE,
+    };
+    const same = new PermissionEntity(dto1);
+    const samesame = new PermissionEntity(dto1);
+    const butdifferent = new PermissionEntity(dto2);
+
+    expect(PermissionEntity.isIdMatching(same, samesame)).toBe(true);
+    expect(PermissionEntity.isIdMatching(samesame, butdifferent)).toBe(false);
+
+    expect(PermissionEntity.isAroMatching(same, samesame)).toBe(true);
+    expect(PermissionEntity.isAroMatching(samesame, butdifferent)).toBe(false);
+
+    expect(PermissionEntity.isAcoMatching(same, samesame)).toBe(true);
+    expect(PermissionEntity.isAcoMatching(samesame, butdifferent)).toBe(false);
+
+    expect(PermissionEntity.isAcoAndAroMatching(same, samesame)).toBe(true);
+    expect(PermissionEntity.isAcoAndAroMatching(samesame, butdifferent)).toBe(false);
+
+    expect(PermissionEntity.isTypeMatching(same, samesame)).toBe(true);
+    expect(PermissionEntity.isTypeMatching(samesame, butdifferent)).toBe(false);
+
+    expect(PermissionEntity.isMatchingAroAcoType(same, samesame)).toBe(true);
+    expect(PermissionEntity.isMatchingAroAcoType(samesame, butdifferent)).toBe(false);
+
+    expect(PermissionEntity.getHighestPermissionType(same, samesame)).toBe(PermissionEntity.PERMISSION_OWNER);
+    expect(PermissionEntity.getHighestPermissionType(same, butdifferent)).toBe(PermissionEntity.PERMISSION_OWNER);
+    expect(PermissionEntity.getHighestPermissionType(butdifferent, samesame)).toBe(PermissionEntity.PERMISSION_OWNER);
+
+    expect(PermissionEntity.getHighestPermission(same, samesame)).toEqual(same);
+    expect(PermissionEntity.getHighestPermission(same, butdifferent)).toEqual(same);
+    expect(PermissionEntity.getHighestPermission(butdifferent, samesame)).toEqual(samesame);
+  });
+
+  it("assert permission fails if not an entity", () => {
+    try {
+      PermissionEntity.assertIsPermission(null);
+      expect(false).toBe(true);
+    } catch(error) {
+      expect(error instanceof TypeError).toBe(true);
+    }
+    try {
+      PermissionEntity.assertIsPermission(getTestDto());
+      expect(false).toBe(true);
+    } catch(error) {
+      expect(error instanceof TypeError).toBe(true);
+    }
+    PermissionEntity.assertIsPermission(new PermissionEntity(getTestDto()));
+  });
+
+  it("assert permission fails if not an entity", () => {
+    const p = new PermissionEntity(getTestDto());
+    const uuid0 = '7f077753-0835-4054-92ee-556660ea04f0';
+    const p2 = p.copyForAnotherAco(PermissionEntity.ACO_FOLDER, uuid0);
+    expect(p2.toDto()).toEqual({
+      'aro': PermissionEntity.ARO_USER,
+      'aro_foreign_key': '7f077753-0835-4054-92ee-556660ea04f1',
+      'aco': PermissionEntity.ACO_FOLDER,
+      'aco_foreign_key': '7f077753-0835-4054-92ee-556660ea04f0',
+      'type': PermissionEntity.PERMISSION_OWNER,
+    })
   });
 });

@@ -107,11 +107,11 @@ class EntitySchema {
    * @throws ValidationError
    */
   static validateObject(name, dto, schema) {
-    let requiredProps = schema.required;
-    let schemaProps = schema.properties;
+    const requiredProps = schema.required;
+    const schemaProps = schema.properties;
 
-    let result = {};
-    let validationError = new EntityValidationError(`Could not validate entity ${name}.`);
+    const result = {};
+    const validationError = new EntityValidationError(`Could not validate entity ${name}.`);
 
     for (let propName in schemaProps) {
       if (!schemaProps.hasOwnProperty(propName)) {
@@ -214,7 +214,7 @@ class EntitySchema {
    */
   static validatePropType(propName, prop, propSchema) {
     if (!EntitySchema.isValidPropType(prop, propSchema.type)) {
-      let validationError = new EntityValidationError(`Could not validate property ${propName}.`);
+      const validationError = new EntityValidationError(`Could not validate property ${propName}.`);
       validationError.addError(propName, 'type',  `The ${propName} is not a valid ${propSchema.type}.`);
       throw validationError;
     }
@@ -231,7 +231,7 @@ class EntitySchema {
    * @returns void
    */
   static validatePropTypeString(propName, prop, propSchema) {
-    let validationError = new EntityValidationError(`Could not validate property ${propName}.`);
+    const validationError = new EntityValidationError(`Could not validate property ${propName}.`);
     if (propSchema.format) {
       if (!EntitySchema.isValidStringFormat(prop, propSchema.format)) {
         validationError.addError(propName, 'format', `The ${propName} is not a valid ${propSchema.format}.`);
@@ -270,7 +270,7 @@ class EntitySchema {
    */
   static validatePropEnum(propName, prop, propSchema) {
     if (!EntitySchema.isPropInEnum(prop, propSchema.enum)) {
-      let validationError = new EntityValidationError(`Could not validate property ${propName}.`);
+      const validationError = new EntityValidationError(`Could not validate property ${propName}.`);
       validationError.addError(propName, 'enum', `The ${propName} value is not included in the supported list.`);
       throw validationError;
     }
@@ -294,7 +294,7 @@ class EntitySchema {
         // All must fail...
       }
     }
-    let validationError = new EntityValidationError(`Could not validate property ${propName}.`);
+    const validationError = new EntityValidationError(`Could not validate property ${propName}.`);
     validationError.addError(propName, 'type',  `The ${propName} does not match any of the supported types.`);
     throw validationError;
   }

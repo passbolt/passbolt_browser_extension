@@ -13,6 +13,7 @@
  */
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
+const {EntityValidationError} = require('../abstract/entityValidationError');
 const {PermissionEntity} = require('../permission/permissionEntity');
 const {PermissionsCollection} = require('../permission/permissionsCollection');
 
@@ -25,7 +26,8 @@ class FolderEntity extends Entity {
    * Folder entity constructor
    *
    * @param {Object} folderDto folder DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @throws {EntityValidationError} if permissions are not for folder or not matching foreign key
    */
   constructor(folderDto) {
     super(EntitySchema.validate(
@@ -37,10 +39,12 @@ class FolderEntity extends Entity {
     // Associations
     if (this._props.permission) {
       this._permission = new PermissionEntity(this._props.permission);
+      FolderEntity.assertValidPermission(this._permission, this.id);
       delete this._props.permission;
     }
     if (this._props.permissions) {
       this._permissions = new PermissionsCollection(this._props.permissions);
+      FolderEntity.assertValidPermissions(this._permissions, this.id);
       delete this._props.permissions;
     }
   }
@@ -103,7 +107,7 @@ class FolderEntity extends Entity {
    * @returns {object}
    */
   toDto(contain) {
-    let result = Object.assign({}, this._props);
+    const result = Object.assign({}, this._props);
 
     if (contain && contain.permission) {
       if (this._permission) {
@@ -181,7 +185,7 @@ class FolderEntity extends Entity {
   }
 
   // ==================================================
-  // Associated properties getters
+  // Associated properties methods
   // ==================================================
   /**
    * Get all the current user permissions
@@ -197,6 +201,43 @@ class FolderEntity extends Entity {
    */
   get permissions() {
     return this._permissions || null;
+  }
+
+  /**
+   * Additional permission validation rule
+   * Check that the permission is for a folder
+   * Check that id match foreignKey if any
+   *
+   * @param {PermissionEntity} permission
+   * @param {string} [folderId] optional
+   * @throws {EntityValidationError} if not valid
+   */
+  static assertValidPermission(permission, folderId) {
+    if (!permission) {
+      throw new EntityValidationError('FolderEntity assertValidPermission expect a permission.');
+    }
+    if (permission.aco !== PermissionEntity.ACO_FOLDER) {
+      throw new EntityValidationError('FolderEntity assertValidPermission not a valid folder permission.');
+    }
+    if (folderId && permission.acoForeignKey !== folderId) {
+      throw new EntityValidationError('FolderEntity assertValidPermission folder id doesnt not match foreign key permission.');
+    }
+  }
+
+  /**
+   * Additional permissions validation rule
+   *
+   * @param {PermissionsCollection} permissions
+   * @param {string} [folderId] optional
+   * @throws {EntityValidationError} if not valid
+   */
+  static assertValidPermissions(permissions, folderId) {
+    if (!permissions || !permissions.length) {
+      throw new EntityValidationError('FolderEntity assertValidPermissions expect an array of permissions.');
+    }
+    for (let permission of permissions) {
+      FolderEntity.assertValidPermission(permission, folderId);
+    }
   }
 
   // ==================================================

@@ -10,7 +10,7 @@ const Worker = require('../model/worker');
 const {User} = require('../model/user');
 const {Permission} = require('../model/permission');
 const {Resource} = require('../model/resource');
-const {FolderModel} = require('../model/folderModel');
+const {FolderModel} = require('../model/folder/folderModel');
 const {Share} = require('../model/share');
 
 const {FoldersCollection} = require('../model/entity/folder/foldersCollection');

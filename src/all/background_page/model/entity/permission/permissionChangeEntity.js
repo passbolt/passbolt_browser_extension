@@ -16,6 +16,9 @@ const {EntitySchema} = require('../abstract/entitySchema');
 const {PermissionEntity} = require('./permissionEntity');
 
 const ENTITY_NAME = 'PermissionChange';
+const PERMISSION_CHANGE_CREATE = 'create';
+const PERMISSION_CHANGE_DELETE = 'delete';
+const PERMISSION_CHANGE_UPDATE = 'update';
 
 class PermissionChangeEntity extends Entity {
   /**
@@ -38,9 +41,9 @@ class PermissionChangeEntity extends Entity {
    * With additional deleted fields (boolean flags)
    */
   static getSchema() {
-    let schema = PermissionEntity.getSchema();
-    let whitelistProps = schema.required;
-    let extendedSchema = {
+    const schema = PermissionEntity.getSchema();
+    const whitelistProps = schema.required;
+    const extendedSchema = {
       "type": "object",
       "required": schema.required,
       "properties": {
@@ -59,6 +62,48 @@ class PermissionChangeEntity extends Entity {
     });
 
     return extendedSchema;
+  }
+
+  /**
+   * Build a PermissionChangeEntity from a given permission and build case
+   *
+   * @param {PermissionEntity} permission
+   * @param {string} operation create, update, delete
+   * @throws {TypeError} if parameters are not valid
+   * @return {PermissionChangeEntity}
+   */
+  static createFromPermission(permission, operation) {
+    if (!permission || !(permission instanceof PermissionEntity)) {
+      throw new TypeError('PermissionChangeEntity createFromPermission expect a permission entity.');
+    }
+    let changeDto = {
+      aco: permission.aco,
+      aro: permission.aro,
+      aco_foreign_key: permission.acoForeignKey,
+      aro_foreign_key: permission.aroForeignKey,
+      type: permission.type,
+    };
+    switch(operation) {
+      case PermissionChangeEntity.PERMISSION_CHANGE_CREATE:
+          // nothing to do
+        break;
+      case PermissionChangeEntity.PERMISSION_CHANGE_UPDATE:
+        if (!permission.id) {
+          throw new TypeError('PermissionChangeEntity createFromPermission update expect a permission id.');
+        }
+        changeDto.id = permission.id;
+        break;
+      case PermissionChangeEntity.PERMISSION_CHANGE_DELETE:
+        if (!permission.id) {
+          throw new TypeError('PermissionChangeEntity createFromPermission delete expect a permission id.');
+        }
+        changeDto.id = permission.id;
+        changeDto.delete = true;
+        break;
+      default:
+        throw new TypeError('PermissionChangeEntity createFromPermission unsupported operation');
+    }
+    return new PermissionChangeEntity(changeDto);
   }
 
   // ==================================================
@@ -129,6 +174,30 @@ class PermissionChangeEntity extends Entity {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
+  }
+
+  /**
+   * PermissionEntity.PERMISSION_CHANGE_CREATE
+   * @returns {string}
+   */
+  static get PERMISSION_CHANGE_CREATE() {
+    return PERMISSION_CHANGE_CREATE;
+  }
+
+  /**
+   * PermissionEntity.PERMISSION_CHANGE_UPDATE
+   * @returns {string}
+   */
+  static get PERMISSION_CHANGE_UPDATE() {
+    return PERMISSION_CHANGE_UPDATE;
+  }
+
+  /**
+   * PermissionEntity.PERMISSION_CHANGE_DELETE
+   * @returns {string}
+   */
+  static get PERMISSION_CHANGE_DELETE() {
+    return PERMISSION_CHANGE_DELETE;
   }
 }
 

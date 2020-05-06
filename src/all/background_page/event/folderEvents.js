@@ -6,7 +6,7 @@
  */
 const {FolderCreateController} = require('../controller/folder/folderCreateController');
 const {FolderEntity} = require('../model/entity/folder/folderEntity');
-const {FolderModel} = require('../model/folderModel');
+const {FolderModel} = require('../model/folder/folderModel');
 const {User} = require('../model/user');
 
 const listen = function (worker) {
@@ -27,7 +27,7 @@ const listen = function (worker) {
       const folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
       const folderCreateController = new FolderCreateController(worker, requestId, folderModel);
       const folderEntity = await folderCreateController.main(new FolderEntity(folderDto));
-      worker.port.emit(requestId, 'SUCCESS', folderEntity);
+      worker.port.emit(requestId, 'SUCCESS', folderEntity.toDto());
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }

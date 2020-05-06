@@ -32,10 +32,9 @@ class GroupsUsersCollection extends Entity {
     ));
 
     // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first items that doesn't validate
-    this._items = [];
+    // Collection validation will fail at the first item that doesn't validate
     this._props.forEach(groupUser => {
-      this._items.push(new GroupUserEntity(groupUser));
+      this.push(new GroupUserEntity(groupUser));
     });
 
     // We do not keep original props
@@ -105,7 +104,7 @@ class GroupsUsersCollection extends Entity {
       groupUser = groupUser.toDto(); // clone
     }
     groupUser = new GroupUserEntity(groupUser); // validate
-    this._items.push(groupUser);
+    super.push(groupUser);
   }
 }
 

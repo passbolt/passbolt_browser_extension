@@ -13,6 +13,9 @@
  */
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
+const {EntityValidationError} = require('../abstract/entityValidationError');
+const {PermissionEntity} = require('../permission/permissionEntity');
+const {PermissionsCollection} = require('../permission/permissionsCollection');
 
 const ENTITY_NAME = 'Resource';
 const RESOURCE_NAME_MAX_LENGTH = 255;
@@ -33,6 +36,18 @@ class ResourceEntity extends Entity {
       resourceDto,
       ResourceEntity.getSchema()
     ));
+
+    // Associations
+    if (this._props.permission) {
+      this._permission = new PermissionEntity(this._props.permission);
+      ResourceEntity.assertValidPermission(this._permission, this.id);
+      delete this._props.permission;
+    }
+    if (this._props.permissions) {
+      this._permissions = new PermissionsCollection(this._props.permissions);
+      ResourceEntity.assertValidPermissions(this._permissions, this.id);
+      delete this._props.permissions;
+    }
   }
 
   /**
@@ -86,8 +101,10 @@ class ResourceEntity extends Entity {
           "format": "uuid"
         },
         // Associations
+        "permission": PermissionEntity.getSchema(), // current user permission
+        "permissions": PermissionsCollection.getSchema() // all users permissions
         // secret
-        // permission - current user permission
+        // TODO
       }
     }
   }
@@ -117,15 +134,6 @@ class ResourceEntity extends Entity {
    */
   get description() {
     return this._props.description || null;
-  }
-
-
-  /**
-   * Get group name
-   * @returns {string} admin or user
-   */
-  get name() {
-    return this._props.name;
   }
 
   /**
@@ -169,6 +177,62 @@ class ResourceEntity extends Entity {
   }
 
   // ==================================================
+  // Associated properties methods
+  // ==================================================
+  /**
+   * Get all the current user permissions
+   * @returns {PermissionEntity} permission
+   */
+  get permission() {
+    return this._permission || null;
+  }
+
+  /**
+   * Get all users permissions for the given folder
+   * @returns {PermissionsCollection} permissions
+   */
+  get permissions() {
+    return this._permissions || null;
+  }
+
+  /**
+   * Additional permission validation rule
+   * Check that the permission is for a resource
+   * Check that id match foreignKey if any
+   *
+   * @param {PermissionEntity} permission
+   * @param {string} [resourceId] optional
+   * @throws {EntityValidationError} if not valid
+   */
+  static assertValidPermission(permission, resourceId) {
+    if (!permission) {
+      throw new EntityValidationError('ResourceEntity assertValidPermission expect a permission.');
+    }
+    if (permission.aro !== PermissionEntity.ACO_RESOURCE) {
+      throw new EntityValidationError('ResourceEntity assertValidPermission not a valid folder permission.');
+    }
+    if (resourceId && permission.acoForeignKey !== resourceId) {
+      throw new EntityValidationError('ResourceEntity assertValidPermission folder id doesnt not match foreign key permission.');
+    }
+  }
+
+  /**
+   * Additional permissions validation rule
+   *
+   * @param {PermissionsCollection} permissions
+   * @param {string} [resourceId] optional
+   * @throws {EntityValidationError} if not valid
+   */
+  static assertValidPermissions(permissions, resourceId) {
+    if (!permissions || !permissions.length) {
+      throw new EntityValidationError('ResourceEntity assertValidPermissions expect an array of permissions.');
+    }
+    for (let permission of permissions) {
+      ResourceEntity.assertValidPermission(permission, resourceId);
+    }
+  }
+
+  // ==================================================
   // Static properties getters
   // ==================================================
   /**
@@ -177,22 +241,6 @@ class ResourceEntity extends Entity {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
-  }
-
-  /**
-   * ResourceEntity.ROLE_ADMIN
-   * @returns {string} admin
-   */
-  static get ROLE_ADMIN () {
-    return ROLE_ADMIN;
-  }
-
-  /**
-   * ResourceEntity.ROLE_USER
-   * @returns {string} user
-   */
-  static get ROLE_USER() {
-    return ROLE_USER;
   }
 }
 

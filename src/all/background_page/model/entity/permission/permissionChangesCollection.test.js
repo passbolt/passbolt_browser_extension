@@ -14,6 +14,8 @@
 import {PermissionChangesCollection} from "./permissionChangesCollection";
 import {EntitySchema} from "../abstract/entitySchema";
 import Validator from 'validator';
+import {PermissionEntity} from "./permissionEntity";
+import {PermissionsCollection} from "./permissionsCollection";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -57,5 +59,103 @@ describe("PermissionChangesCollection", () => {
     const changeEntity = new PermissionChangesCollection(changesDto);
     expect(changeEntity.filterByAcoForeignKey("c2c7f658-c7ac-4d73-9020-9d2c296d91ff").length).toBe(3);
     expect(changeEntity.toDto().length).toBe(3);
+  });
+
+  it("buildChangesFromPermissions basics", () => {
+    const originalSet = new PermissionsCollection([{
+      id: "c2c7f658-c7ac-4d73-9020-9d2c296d9100",
+      aco: PermissionEntity.ACO_FOLDER,
+      aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
+      aro: PermissionEntity.ARO_USER,
+      aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d990",
+      type: PermissionEntity.PERMISSION_OWNER
+    }, {
+      id: "c2c7f658-c7ac-4d73-9020-9d2c296d9101",
+      aco: PermissionEntity.ACO_FOLDER,
+      aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
+      aro: PermissionEntity.ARO_USER,
+      aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d991",
+      type: PermissionEntity.PERMISSION_UPDATE
+    }, {
+      id: "c2c7f658-c7ac-4d73-9020-9d2c296d9102",
+      aco: PermissionEntity.ACO_FOLDER,
+      aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
+      aro: PermissionEntity.ARO_USER,
+      aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d992",
+      type: PermissionEntity.PERMISSION_READ
+    },{
+      id: "c2c7f658-c7ac-4d73-9020-9d2c296d9103",
+      aco: PermissionEntity.ACO_FOLDER,
+      aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
+      aro: PermissionEntity.ARO_USER,
+      aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d993",
+      type: PermissionEntity.PERMISSION_READ
+    }]);
+
+    // Delete first one
+    // Downgrade second one
+    // Upgrade third one
+    // Let fourth one
+    // Add five one
+    const expectedSet = new PermissionsCollection([{
+      id: "c2c7f658-c7ac-4d73-9020-9d2c296d9101",
+      aco: PermissionEntity.ACO_FOLDER,
+      aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
+      aro: PermissionEntity.ARO_USER,
+      aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d991",
+      type: PermissionEntity.PERMISSION_READ
+    }, {
+      id: "c2c7f658-c7ac-4d73-9020-9d2c296d9102",
+      aco: PermissionEntity.ACO_FOLDER,
+      aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
+      aro: PermissionEntity.ARO_USER,
+      aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d992",
+      type: PermissionEntity.PERMISSION_UPDATE
+    }, {
+      id: "c2c7f658-c7ac-4d73-9020-9d2c296d9103",
+      aco: PermissionEntity.ACO_FOLDER,
+      aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
+      aro: PermissionEntity.ARO_USER,
+      aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d993",
+      type: PermissionEntity.PERMISSION_READ
+    },{
+      aco: PermissionEntity.ACO_FOLDER,
+      aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
+      aro: PermissionEntity.ARO_USER,
+      aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d994",
+      type: PermissionEntity.PERMISSION_OWNER
+    }]);
+
+    const changes = PermissionChangesCollection.buildChangesFromPermissions(originalSet, expectedSet);
+    expect(changes.toDto()).toEqual([{
+        id: 'c2c7f658-c7ac-4d73-9020-9d2c296d9101',
+        aco: 'Folder',
+        aro: 'User',
+        aco_foreign_key: 'c2c7f658-c7ac-4d73-9020-9d2c296d91ff',
+        aro_foreign_key: '54c6278e-f824-5fda-91ff-3e946b18d991',
+        type: 1
+      }, {
+        id: 'c2c7f658-c7ac-4d73-9020-9d2c296d9102',
+        aco: 'Folder',
+        aro: 'User',
+        aco_foreign_key: 'c2c7f658-c7ac-4d73-9020-9d2c296d91ff',
+        aro_foreign_key: '54c6278e-f824-5fda-91ff-3e946b18d992',
+        type: 7
+      }, {
+        aco: 'Folder',
+        aro: 'User',
+        aco_foreign_key: 'c2c7f658-c7ac-4d73-9020-9d2c296d91ff',
+        aro_foreign_key: '54c6278e-f824-5fda-91ff-3e946b18d994',
+        type: 15
+      }, {
+        id: 'c2c7f658-c7ac-4d73-9020-9d2c296d9100',
+        delete: true,
+        aco: 'Folder',
+        aro: 'User',
+        aco_foreign_key: 'c2c7f658-c7ac-4d73-9020-9d2c296d91ff',
+        aro_foreign_key: '54c6278e-f824-5fda-91ff-3e946b18d990',
+        type: 15
+      }
+    ]);
   });
 });

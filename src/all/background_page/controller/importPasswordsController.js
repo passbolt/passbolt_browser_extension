@@ -13,8 +13,8 @@ const Resource = require('../model/resource').Resource;
 const Crypto = require('../model/crypto').Crypto;
 const progressController = require('./progress/progressController');
 const User = require('../model/user').User;
-const FolderModel = require('../model/folderModel').FolderModel;
-const FolderEntity = require('../model/entity/folder/folderEntity').FolderEntity;
+const {FolderModel} = require('../model/folder/folderModel');
+const {FolderEntity} = require('../model/entity/folder/folderEntity');
 
 /**
  * Controller for Import passwords.

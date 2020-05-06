@@ -44,7 +44,7 @@ describe("Folder entity", () => {
     };
     expect(dtoNull.hasOwnProperty('folder_parent_id')).toBe(true);
     let entity = new FolderEntity(dtoNull);
-    let apiDto = entity.toDto();
+    const apiDto = entity.toDto();
     expect(apiDto).toEqual(dtoNull);
     expect(entity.name).toEqual('folder');
     expect(entity.folderParentId).toEqual(null);

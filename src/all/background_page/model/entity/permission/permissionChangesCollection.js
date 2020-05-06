@@ -14,6 +14,7 @@
 const {EntityCollection} = require('../abstract/entityCollection');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {PermissionChangeEntity} = require('./permissionChangeEntity');
+const {PermissionsCollection} = require('./PermissionsCollection');
 
 const ENTITY_NAME = 'PermissionChanges';
 
@@ -32,14 +33,9 @@ class PermissionChangesCollection extends EntityCollection {
     ));
 
     // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first items that doesn't validate
-    this._items = [];
-    this._props.forEach(permission => {
-      if(permission instanceof PermissionChangeEntity) {
-        this._items.push(permission);
-      } else {
-        this._items.push(new PermissionChangeEntity(permission));
-      }
+    // Collection validation will fail at the first item that doesn't validate
+    this._props.forEach(permissionChange => {
+      this.push(permissionChange);
     });
 
     // We do not keep original props
@@ -71,7 +67,7 @@ class PermissionChangesCollection extends EntityCollection {
   // ==================================================
   /**
    * Push a copy of the permission to the list
-   * @param {object} permission DTO or PermissionChangeEntity
+   * @param {PermissionChangeEntity} permission DTO or PermissionChangeEntity
    */
   push(permission) {
     if (!permission || typeof permission !== 'object') {
@@ -86,12 +82,48 @@ class PermissionChangesCollection extends EntityCollection {
 
   /**
    * Filter By Aco Foreign Key
+   *
    * @param {string} acoForeignKey
    * @returns {PermissionChangesCollection} a new set of permission changes
    */
   filterByAcoForeignKey(acoForeignKey) {
     const permissionChanges = this._items.filter(changeEntity => changeEntity.acoForeignKey === acoForeignKey);
     return new PermissionChangesCollection(permissionChanges);
+  }
+
+  /**
+   * Build changes needed to go from one permission collection to the other
+   *
+   * @param {PermissionsCollection} originalSet
+   * @param {PermissionsCollection} expectedSet
+   */
+  static buildChangesFromPermissions(originalSet, expectedSet) {
+    const result = new PermissionChangesCollection([]);
+
+    // Find new or updated permissions
+    for(let expectedPermission of expectedSet) {
+      const foundPermission = originalSet.findByAro(expectedPermission);
+      if (!foundPermission) {
+        const newChange = PermissionChangeEntity.createFromPermission(expectedPermission, PermissionChangeEntity.PERMISSION_CHANGE_CREATE);
+        result.push(newChange);
+      } else {
+        if (expectedPermission.type !== foundPermission.type) {
+          const newChange = PermissionChangeEntity.createFromPermission(expectedPermission, PermissionChangeEntity.PERMISSION_CHANGE_UPDATE);
+          result.push(newChange);
+        }
+      }
+    }
+
+    // Find deleted permissions
+    for(let originalPermission of originalSet) {
+      if (!expectedSet.findByAro(originalPermission)) {
+        // Aka, permissions that are in the old set and not the new one
+        const newChange = PermissionChangeEntity.createFromPermission(originalPermission, PermissionChangeEntity.PERMISSION_CHANGE_DELETE);
+        result.push(newChange);
+      }
+    }
+
+    return result;
   }
 }
 

@@ -19,7 +19,7 @@ const {Crypto} = require('../model/crypto');
 const {Keyring} = require('../model/keyring');
 const {User} = require('../model/user');
 const {Secret} = require('../model/secret');
-const {FolderModel} = require('../model/folderModel');
+const {FolderModel} = require('../model/folder/folderModel');
 const {TabStorage} = require('../model/tabStorage');
 
 const {InvalidMasterPasswordError} = require('../error/invalidMasterPasswordError');

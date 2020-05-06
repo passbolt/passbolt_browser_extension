@@ -94,7 +94,7 @@ export default class ShareChanges {
   aggregatePermissionsByAro() {
     // Aggregate the data as expected.
     const arosPermissions = this._permissions.reduce((carry, permission) => {
-      let aroPermission = carry.find(_data => _data.id == permission.aro_foreign_key);
+      let aroPermission = carry.find(_data => _data.id === permission.aro_foreign_key);
       if (!aroPermission) {
         const aro = permission.user || permission.group;
         aroPermission = {

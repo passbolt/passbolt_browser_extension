@@ -14,7 +14,7 @@
 const {EntityCollection} = require('../abstract/entityCollection');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {PermissionChangeEntity} = require('./permissionChangeEntity');
-const {PermissionsCollection} = require('./PermissionsCollection');
+const {PermissionsCollection} = require('./permissionsCollection');
 
 const ENTITY_NAME = 'PermissionChanges';
 

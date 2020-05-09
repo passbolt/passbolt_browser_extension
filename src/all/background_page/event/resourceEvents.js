@@ -4,8 +4,11 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+const {User} = require('../model/user');
 const {Log} = require('../model/log');
 const {Resource} = require('../model/resource');
+const {ResourceEntity} = require('../model/entity/resource/resourceEntity');
+
 const {ResourceCreateController} = require('../controller/resource/resourceCreateController.js');
 const {ResourceUpdateController} = require('../controller/resource/resourceUpdateController.js');
 
@@ -57,13 +60,15 @@ const listen = function (worker) {
    *
    * @listens passbolt.resources.create
    * @param requestId {uuid} The request identifier
-   * @param resource {object} The resource meta data
+   * @param resource {resourceDto} The resource meta data
    * @param password {string} The password to encrypt
    */
-  worker.port.on('passbolt.resources.create', async function (requestId, resource, password) {
-    const controller = new ResourceCreateController(worker, requestId);
+  worker.port.on('passbolt.resources.create', async function (requestId, resourceDto, password) {
     try {
-      const savedResource = await controller.main(resource, password);
+      const resourceEntity = new ResourceEntity(resourceDto)
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const controller = new ResourceCreateController(worker, requestId, clientOptions);
+      const savedResource = await controller.main(resourceEntity, password);
       worker.port.emit(requestId, 'SUCCESS', savedResource);
     } catch (error) {
       console.error(error);

@@ -24,8 +24,8 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.folders.create', async function (requestId, folderDto) {
     try {
-      const folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
-      const folderCreateController = new FolderCreateController(worker, requestId, folderModel);
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const folderCreateController = new FolderCreateController(worker, requestId, clientOptions);
       const folderEntity = await folderCreateController.main(new FolderEntity(folderDto));
       worker.port.emit(requestId, 'SUCCESS', folderEntity.toDto());
     } catch (error) {

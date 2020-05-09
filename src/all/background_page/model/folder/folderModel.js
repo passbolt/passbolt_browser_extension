@@ -10,12 +10,14 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+const {FolderEntity} = require('../entity/folder/folderEntity');
+const {FoldersCollection} = require("../entity/folder/foldersCollection");
+const {FolderLocalStorage} = require('../../service/local_storage/folderLocalStorage');
+const {FolderService} = require('../../service/api/folder/folderService');
+
 const {PermissionEntity} = require('../entity/permission/permissionEntity');
 const {PermissionsCollection} = require('../entity/permission/permissionsCollection');
 const {PermissionChangesCollection} = require("../../model/entity/permission/permissionChangesCollection");
-const {FolderEntity} = require('../entity/folder/folderEntity');
-const {FolderLocalStorage} = require('../../service/local_storage/folderLocalStorage');
-const {FolderService} = require('../../service/api/folder/folderService');
 
 class FolderModel {
   /**
@@ -31,50 +33,52 @@ class FolderModel {
   /**
    * Update the folders local storage with the latest API folders the user has access.
    *
-   * @return {Promise<[FolderEntity]>}
+   * @return {FoldersCollection}
    */
   async updateLocalStorage () {
-    const folders = await this.findAll();
-    await FolderLocalStorage.set(folders);
-    return folders;
+    const foldersCollection = await this.findAll();
+    await FolderLocalStorage.set(foldersCollection);
+    return foldersCollection;
   }
 
   /**
    * Get all folders from API and map API result to folder Entity
    *
    * @throws {Error} if API call fails, service unreachable, etc.
-   * @return {Array<FolderEntity>} folders
+   * @return {FoldersCollection}
    */
   async findAll() {
-    const body = await this.folderService.findAll({permission: true});
-    return body.map(folder => new FolderEntity(folder));
+    const foldersDtos = await this.folderService.findAll({permission: true});
+    return new FoldersCollection(foldersDtos);
   }
 
   /**
    * Get all folders from API and map API result to folder Entity
    *
-   * @return {Array<FolderEntity>} folders
+   * @return {FoldersCollection}
    */
   async findAllForShare(foldersIds) {
-    return await this.folderService.findAllForShare(foldersIds);
-    // TODO map to entities
-    //return body.map(folder => FolderEntity.fromApiData(folder));
+    const foldersDtos = await this.folderService.findAllForShare(foldersIds);
+    return new FoldersCollection(foldersDtos);
   }
 
   /**
+   * Clone a parent permission for a given ACO
    *
-   * @param {FolderEntity} folderEntity
+   * @param {string} aco PermissionEntity.ACO_FOLDER or PermissionEntity.ACO_RESOURCE
+   * @param {string} acoId uuid of the resource or folder
+   * @param {string} folderParentId uuid
    * @returns {Promise<PermissionsCollection>}
    */
-  async cloneParentPermissions(folderEntity) {
+  async cloneParentPermissions(aco, acoId, folderParentId) {
     // get parent from api
-    const parentDto = await this.folderService.get(folderEntity.folderParentId, {permissions: true});
+    const parentDto = await this.folderService.get(folderParentId, {permissions: true});
     const parentFolder = new FolderEntity(parentDto);
 
     // clone parent permission for this new folder
     const permissions = new PermissionsCollection([], false);
     for (let parentPermission of parentFolder.permissions) {
-      let clone = parentPermission.copyForAnotherAco(PermissionEntity.ACO_FOLDER, folderEntity.id);
+      let clone = parentPermission.copyForAnotherAco(aco, acoId);
       permissions.addOrReplace(clone);
     }
     return permissions;
@@ -103,7 +107,7 @@ class FolderModel {
   async applyPermissionFromParent(folderEntity, keepOwnership) {
     if (folderEntity.folderParentId) {
       const currentPermissions = new PermissionsCollection([folderEntity.permission]);
-      const targetPermissions = await this.cloneParentPermissions(folderEntity);
+      const targetPermissions = await this.cloneParentPermissions(PermissionEntity.ACO_FOLDER, folderEntity.id, folderEntity.folderParentId);
 
       // Keep ownership / don't transfer folder
       if (typeof keepOwnership === 'undefined' || keepOwnership) {

@@ -56,6 +56,23 @@ class AbstractService {
     }
     return result;
   }
+
+  /**
+   * Format contain orders
+   *
+   * @param {object} orders example: {"orders": ['Resources.name ASC']}
+   * @param {array} supportedOrders example: ['Resources.name ASC', 'Resources.name DESC']
+   * @returns {object} to be used in API request
+   */
+  formatOrderOptions(orders, supportedOrders) {
+    const result = {};
+    for (let order in orders) {
+      if (supportedOrders.includes(order)) {
+        result[`order[]`] = order;
+      }
+    }
+    return result;
+  }
 }
 
 exports.AbstractService = AbstractService;

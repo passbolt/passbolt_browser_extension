@@ -20,6 +20,9 @@ class Entity {
     this._props = JSON.parse(JSON.stringify(props));
   }
 
+  // ==================================================
+  // Serialization
+  // ==================================================
   /**
    * Return a DTO ready to be sent to API
    * @returns {*}
@@ -36,6 +39,9 @@ class Entity {
     return this._props;
   }
 
+  // ==================================================
+  // Private
+  // ==================================================
   /**
    * Return true if object property is set
    *

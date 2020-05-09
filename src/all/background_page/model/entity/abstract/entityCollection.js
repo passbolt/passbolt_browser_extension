@@ -29,6 +29,9 @@ class EntityCollection extends Entity {
     }
   }
 
+  // ==================================================
+  // Serialization
+  // ==================================================
   /**
    * Return a DTO ready to be sent to API
    *

@@ -67,17 +67,17 @@ class PermissionChangesCollection extends EntityCollection {
   // ==================================================
   /**
    * Push a copy of the permission to the list
-   * @param {PermissionChangeEntity} permission DTO or PermissionChangeEntity
+   * @param {PermissionChangeEntity} permissionChange DTO or PermissionChangeEntity
    */
-  push(permission) {
-    if (!permission || typeof permission !== 'object') {
+  push(permissionChange) {
+    if (!permissionChange || typeof permissionChange !== 'object') {
       throw new TypeError(`PermissionChangesCollection push parameter should be an object.`);
     }
-    if (permission instanceof PermissionChangeEntity) {
-      permission = permission.toDto(); // clone
+    if (permissionChange instanceof PermissionChangeEntity) {
+      permissionChange = permissionChange.toDto(); // clone
     }
-    permission = new PermissionChangeEntity(permission); // validate
-    super.push(permission);
+    permissionChange = new PermissionChangeEntity(permissionChange); // validate
+    super.push(permissionChange);
   }
 
   /**

@@ -12,9 +12,11 @@
  * @since         2.13.0
  */
 const {Lock} = require('../../utils/lock');
-const {FolderEntity} = require('../../model/entity/folder/folderEntity');
-
 const lock = new Lock();
+
+const {FolderEntity} = require('../../model/entity/folder/folderEntity');
+const {FoldersCollection} = require("../../model/entity/folder/foldersCollection");
+
 const FOLDER_LOCAL_STORAGE_KEY = 'folders';
 
 class FolderLocalStorage {
@@ -25,35 +27,36 @@ class FolderLocalStorage {
    * @return {Promise<void>}
    */
   static async flush() {
-    return await browser.storage.local.remove(FOLDER_LOCAL_STORAGE_KEY);
+    return await browser.storage.local.remove(FolderLocalStorage.FOLDER_LOCAL_STORAGE_KEY);
   };
 
   /**
    * Set the folders local storage.
+   *
    * @throws {Error} if operation failed
    * @return {Promise} results object, containing every object in keys that was found in the storage area.
    * If storage is not set, undefined will be returned.
    */
   static async get() {
-    let {folders} = await browser.storage.local.get([FOLDER_LOCAL_STORAGE_KEY]);
+    const {folders} = await browser.storage.local.get([FolderLocalStorage.FOLDER_LOCAL_STORAGE_KEY]);
     return folders;
   };
 
   /**
    * Set the folders local storage.
-   * @param {Array<FolderEntity>} folderEntities The folders to insert in the local storage.
+   *
+   * @param {FoldersCollection} foldersCollection The folders to insert in the local storage.
+   * @return {Array<Object>} array of folder dtos
    */
-  static async set(folderEntities) {
+  static async set(foldersCollection) {
     await lock.acquire();
     const folders = [];
-    if (folderEntities) {
-      if (!Array.isArray(folderEntities)) {
-        throw new TypeError('FolderLocalStorage::set expects an array of FolderEntity');
-      }
-      folderEntities.forEach((folderEntity) => {
-        FolderLocalStorage.assertEntityBeforeSave(folderEntity);
-        folders.push(folderEntity.toDto({permission:true}));
-      })
+    if (!(foldersCollection instanceof FoldersCollection)) {
+      throw new TypeError('FolderLocalStorage::set expects a FoldersCollection');
+    }
+    for (let folderEntity of foldersCollection) {
+      FolderLocalStorage.assertEntityBeforeSave(folderEntity);
+      folders.push(folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
     }
     const result = await browser.storage.local.set({folders});
     lock.release();
@@ -62,12 +65,24 @@ class FolderLocalStorage {
 
   /**
    * Get a folder from the local storage by id
+   *
    * @param {string} id The folder id
-   * @return {object} The folder object
+   * @return {object} a folder dto
    */
   static async getFolderById(id) {
     const folders = await FolderLocalStorage.get();
     return folders.find(item => item.id === id);
+  };
+
+  /**
+   * Get a folder from the local storage by id
+   *
+   * @param {(string|null)} id The folder id
+   * @return {object} a folder dto
+   */
+  static async getFolderById(id) {
+    const folders = await FolderLocalStorage.get();
+    return folders.find(item => item.folderParentId === id);
   };
 
   /**
@@ -79,7 +94,7 @@ class FolderLocalStorage {
     try {
       FolderLocalStorage.assertEntityBeforeSave(folderEntity);
       const folders = await FolderLocalStorage.get();
-      folders.push(folderEntity.toDto({permission: true}));
+      folders.push(folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({folders});
       lock.release();
     } catch (error) {
@@ -98,7 +113,7 @@ class FolderLocalStorage {
       FolderLocalStorage.assertEntityBeforeSave(folderEntity);
       const folders = await FolderLocalStorage.get();
       const folderIndex = folders.findIndex(item => item.id === folderEntity.id);
-      folders[folderIndex] = Object.assign(folders[folderIndex], folderEntity.toDto({permission: true}));
+      folders[folderIndex] = Object.assign(folders[folderIndex], folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({folders});
       lock.release();
     } catch (error) {
@@ -130,8 +145,27 @@ class FolderLocalStorage {
   };
 
   /**
+   * FolderLocalStorage.DEFAULT_CONTAIN
+   * @returns {{permission: boolean}}
+   */
+  static get DEFAULT_CONTAIN() {
+    return {permission: true};
+  }
+
+  /**
+   * FolderLocalStorage.FOLDER_LOCAL_STORAGE_KEY
+   * @returns {string}
+   * @constructor
+   */
+  static get FOLDER_LOCAL_STORAGE_KEY() {
+    return FOLDER_LOCAL_STORAGE_KEY;
+  }
+
+  /**
    * Make sure the entity meet some minimal requirements before being stored
+   *
    * @param {FolderEntity} folderEntity
+   * @throw {TypeError} if requirements are not met
    * @private
    */
   static assertEntityBeforeSave(folderEntity) {

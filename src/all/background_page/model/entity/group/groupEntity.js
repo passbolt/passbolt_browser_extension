@@ -82,7 +82,7 @@ class GroupEntity extends Entity {
   // ==================================================
   /**
    * Get group id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get id() {
     return this._props.id || null;
@@ -98,7 +98,7 @@ class GroupEntity extends Entity {
 
   /**
    * Get deleted flag info
-   * @returns {boolean} true if deleted
+   * @returns {(boolean|null)} true if deleted
    */
   get isDeleted() {
     return this._props.deleted || null;
@@ -106,7 +106,7 @@ class GroupEntity extends Entity {
 
   /**
    * Get created date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get created() {
     return this._props.created || null;
@@ -114,7 +114,7 @@ class GroupEntity extends Entity {
 
   /**
    * Get modified date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get modified() {
     return this._props.modified || null;
@@ -122,7 +122,7 @@ class GroupEntity extends Entity {
 
   /**
    * Get created by user id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get createdBy() {
     return this._props.created_by || null;
@@ -130,7 +130,7 @@ class GroupEntity extends Entity {
 
   /**
    * Get modified by user id
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get modifiedBy() {
     return this._props.modified_by || null;

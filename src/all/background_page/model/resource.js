@@ -7,7 +7,7 @@
 const __ = require('../sdk/l10n').get;
 const Request = require('./request').Request;
 const User = require('./user').User;
-const {ResourceService} = require('../service/resource');
+const {LegacyResourceService} = require('../service/resource');
 const {ResourceLocalStorage} = require('../service/local_storage/resourceLocalStorage');
 
 /**
@@ -168,7 +168,7 @@ Resource.findShareResource = async function (resourceId) {
  * @returns {array|Error}
  */
 Resource.findAllForShare = async function (resourcesIds) {
-  return await ResourceService.findAllForShare(resourcesIds);
+  return await LegacyResourceService.findAllForShare(resourcesIds);
 };
 
 /**
@@ -184,8 +184,8 @@ Resource.updateLocalStorage = async function () {
       "folder": true
     }
   };
-  const resources = await ResourceService.findAll(findOptions);
-  await ResourceLocalStorage.set(resources);
+  const resources = await LegacyResourceService.findAll(findOptions);
+  await ResourceLocalStorage.setLegacy(resources);
 };
 
 /**
@@ -195,22 +195,7 @@ Resource.updateLocalStorage = async function () {
  * @return {Promise}
  */
 Resource.findAll = async function (options) {
-  return ResourceService.findAll(options);
-};
-
-/**
- * Save a resource
- *
- * @param {object} data The resource data
- * @return {Promise}
- */
-Resource.save = async function (data) {
-  if (data.folderParentId) {
-    data.folder_parent_id = data.folderParentId;
-  }
-  const resource = await ResourceService.save(data);
-  await ResourceLocalStorage.addResource(resource);
-  return resource;
+  return LegacyResourceService.findAll(options);
 };
 
 /**
@@ -223,7 +208,7 @@ Resource.update = async function (data) {
   if (data.folderParentId) {
     data.folder_parent_id = data.folderParentId;
   }
-  const resource = await ResourceService.update(data);
+  const resource = await LegacyResourceService.update(data);
   await ResourceLocalStorage.updateResource(resource);
 
   return resource;
@@ -237,7 +222,7 @@ Resource.update = async function (data) {
  */
 Resource.deleteAll = async function (resourcesIds) {
   const promise = resourcesIds.reduce((promise, resourceId) => {
-    return promise.then(() => ResourceService.delete(resourceId));
+    return promise.then(() => LegacyResourceService.delete(resourceId));
   }, Promise.resolve([]));
   // Update local storage.
   promise.then(async () => {

@@ -31,9 +31,13 @@ describe("Folder entity", () => {
     const dto = {
       "name": "folder",
     };
+    const result = {
+      "name": "folder",
+      "folder_parent_id": null
+    }
     const entity = new FolderEntity(dto);
-    expect(entity.toDto()).toEqual(dto);
-    expect(JSON.stringify(entity)).toEqual(JSON.stringify(dto));
+    expect(entity.toDto()).toEqual(result);
+    expect(JSON.stringify(entity)).toEqual(JSON.stringify(result));
     expect(entity.name).toEqual('folder');
   });
 
@@ -61,6 +65,7 @@ describe("Folder entity", () => {
   it("constructor works if valid DTO is provided with optional and non supported fields", () => {
     const dto = {
       'id': '7f077753-0835-4054-92ee-556660ea04f1',
+      "folder_parent_id": null,
       'name': "folder",
       'description': 'folder description',
       'created': '2020-04-25 12:52:00',
@@ -68,6 +73,7 @@ describe("Folder entity", () => {
     };
     const filtered = {
       'id': '7f077753-0835-4054-92ee-556660ea04f1',
+      "folder_parent_id": null,
       'name': "folder",
       'created': '2020-04-25 12:52:00',
       'modified': '2020-04-25 12:52:01',

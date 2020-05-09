@@ -116,6 +116,45 @@ class PermissionEntity extends Entity {
   }
 
   // ==================================================
+  // Serialization
+  // ==================================================
+  /**
+   * Return a DTO ready to be sent to API
+   *
+   * @param {object} [contain] optional
+   * @returns {object}
+   */
+  toDto(contain) {
+    const result = Object.assign({}, this._props);
+    if (!contain) {
+      return result;
+    }
+    if (contain.user) {
+      if (this._user) {
+        if (contain.user === true) {
+          result.user = this._user ? this._user.toDto() : null;
+        } else {
+          result.user = this._user ? this._user.toDto(contain.user) : null;
+        }
+      }
+    }
+    if (contain.group) {
+      if (this._group) {
+        result.group = this._group ? this._group.toDto() : null;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Customizes JSON stringification behavior
+   * @returns {*}
+   */
+  toJSON() {
+    return this.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS);
+  }
+
+  // ==================================================
   // Dynamic properties getters
   // ==================================================
   /**
@@ -239,6 +278,14 @@ class PermissionEntity extends Entity {
    */
   static get ACO_FOLDER() {
     return ACO_FOLDER;
+  }
+
+  /**
+   * PermissionEntity.ALL_CONTAIN_OPTIONS
+   * @returns {object} all contain options that can be used in toDto()
+   */
+  static get ALL_CONTAIN_OPTIONS() {
+    return {user: {profile: {avatar: true}}, group:true};
   }
 
   // ==================================================

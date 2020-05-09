@@ -129,7 +129,7 @@ const bulkShareSimulate = async function(resources, resourcesChanges, progressCa
  * Encrypt the resources secrets for all the new users
  * @param {array} resources The resources to share
  * @param {object} resourcesNewUsers The list of new users to share the resources aggregated by resource
- * @param {string} privateKeySecret The current user private key
+ * @param {string} passphrase The current user passphrase
  * @param {function} progressCallback Notify the user with this callback
  * @returns {object} A list of secrets as expected by the passbolt API
  * [
@@ -140,7 +140,7 @@ const bulkShareSimulate = async function(resources, resourcesChanges, progressCa
  *  }
  * ]
  */
-const bulkShareEncrypt = async function(resources, resourcesNewUsers, privateKeySecret, progressCallback) {
+const bulkShareEncrypt = async function(resources, resourcesNewUsers, passphrase, progressCallback) {
   const crypto = new Crypto();
   const secrets = {};
 
@@ -150,7 +150,7 @@ const bulkShareEncrypt = async function(resources, resourcesNewUsers, privateKey
     const users = resourcesNewUsers[resourceId];
     progressCallback(`Encrypting for ${resource.name}`);
     if (users && users.length) {
-      const message = await crypto.decrypt(originalArmored, privateKeySecret);
+      const message = await crypto.decrypt(originalArmored, passphrase);
       const encryptAllData = users.reduce((carry, userId) => [...carry, {userId, message}], []);
       const result = await crypto.encryptAll(encryptAllData);
       secrets[resourceId] = result.map((armored, i) => {

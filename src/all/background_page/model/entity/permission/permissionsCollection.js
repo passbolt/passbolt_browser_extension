@@ -63,6 +63,31 @@ class PermissionsCollection extends EntityCollection {
   }
 
   // ==================================================
+  // Serialization
+  // ==================================================
+  /**
+   * Return a DTO ready to be sent to API
+   *
+   * @param {object} [contain] optional
+   * @returns {object}
+   */
+  toDto(contain) {
+    const result = [];
+    for(let permission of this) {
+      result.push(permission.toDto(contain))
+    }
+    return result;
+  }
+
+  /**
+   * Customizes JSON stringification behavior
+   * @returns {*}
+   */
+  toJSON() {
+    return this.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS);
+  }
+
+  // ==================================================
   // Dynamic getters
   // ==================================================
   /**
@@ -116,11 +141,12 @@ class PermissionsCollection extends EntityCollection {
       throw new TypeError(`PermissionsCollection push expect a permission DTO.`);
     }
     if (permission instanceof PermissionEntity) {
-      permission = permission.toDto(); // clone
+      permission = permission.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS); // deep clone
     }
 
     let newPermission = new PermissionEntity(permission); // validate
 
+    // Build rules
     // Assert there is not already a permission with the same id
     // Assert there is not already a permission with the same ACO/ARO
     // Assert we're dealing with same resource / folder
@@ -163,7 +189,7 @@ class PermissionsCollection extends EntityCollection {
    * Assert there the collection is always about the same ACO (resource/folder)
    *
    * @param {PermissionEntity} permission
-   * @throws {EntityValidationError} if a permission with the same id already exist
+   * @throws {EntityValidationError} if a permission for another ACO already exist
    */
   assertSameAco(permission) {
     if (!this.permissions.length) {

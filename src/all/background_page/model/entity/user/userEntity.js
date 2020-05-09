@@ -116,9 +116,12 @@ class UserEntity extends Entity {
     return dto;
   }
 
+  // ==================================================
+  // Serialization
+  // ==================================================
   /**
    * Return a DTO ready to be sent to API
-   * @param {object} contain optional for example {profile: true}
+   * @param {object} [contain] optional for example {profile: {avatar:true}}
    * @returns {*}
    */
   toDto(contain) {
@@ -127,8 +130,10 @@ class UserEntity extends Entity {
       result.role = this.role ? this.role.toDto() : null;
     }
     if (contain && contain.profile) {
-      if (this.profile) {
-        result.profile = this.profile ? this.profile.toDto(contain) : null;
+      if (contain.profile === true) {
+        result.profile = this.profile.toDto();
+      } else {
+        result.profile = this.profile.toDto(contain.profile);
       }
     }
     if (contain && contain.gpgkey) {
@@ -144,7 +149,7 @@ class UserEntity extends Entity {
    * @returns {*}
    */
   toJSON() {
-    return this.toDto({role: true, profile: true, gpgKey: true});
+    return this.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
   }
 
   // ==================================================
@@ -152,7 +157,7 @@ class UserEntity extends Entity {
   // ==================================================
   /**
    * Get user id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get id() {
     return this._props.id || null;
@@ -176,7 +181,7 @@ class UserEntity extends Entity {
 
   /**
    * Get user activation status
-   * @returns {bool|null} true if user completed the setup
+   * @returns {(boolean|null)} true if user completed the setup
    */
   get isActive() {
     return this._props.active || null;
@@ -184,7 +189,7 @@ class UserEntity extends Entity {
 
   /**
    * Get user deleted status
-   * @returns {bool|null} true if user is deleted
+   * @returns {(boolean|null)} true if user is deleted
    */
   get isDeleted() {
     return this._props.deleted || null;
@@ -192,7 +197,7 @@ class UserEntity extends Entity {
 
   /**
    * Get user creation date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get created() {
     return this._props.created || null;
@@ -200,7 +205,7 @@ class UserEntity extends Entity {
 
   /**
    * Get user modification date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get modified() {
     return this._props.modified || null;
@@ -208,10 +213,18 @@ class UserEntity extends Entity {
 
   /**
    * Get user last login date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get lastLoggedIn() {
     return this._props.last_logged_in || null;
+  }
+
+  /**
+   * FolderEntity.ALL_CONTAIN_OPTIONS
+   * @returns {object} all contain options that can be used in toDto()
+   */
+  static get ALL_CONTAIN_OPTIONS() {
+    return {profile: ProfileEntity.ALL_CONTAIN_OPTIONS, role:true, gpgkey: true};
   }
 
   // ==================================================

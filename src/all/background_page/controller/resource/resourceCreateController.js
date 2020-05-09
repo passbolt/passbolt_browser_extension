@@ -11,51 +11,108 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.9.0
  */
-const Crypto = require('../../model/crypto').Crypto;
+const {Keyring} = require('../../model/keyring');
+const {Share} = require('../../model/share');
+const {Crypto} = require('../../model/crypto');
+const {User} = require('../../model/user');
+
+const {FolderModel} = require('../../model/folder/folderModel');
+const {PermissionChangesCollection}  = require("../../model/entity/permission/permissionChangesCollection");
+const {PermissionsCollection}  = require("../../model/entity/permission/permissionsCollection");
+const {PermissionEntity} = require('../../model/entity/permission/permissionEntity');
+const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
+const {ResourceModel} = require('../../model/resource/resourceModel');
+const {SecretsCollection}  = require("../../model/entity/secret/secretsCollection");
+
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
-const Resource = require('../../model/resource').Resource;
-const User = require('../../model/user').User;
 
-/**
- * Resources save controller
- */
 class ResourceCreateController {
-
-  constructor(worker, requestId) {
+  /**
+   * ResourceCreateController constructor
+   *
+   * @param {Worker}worker
+   * @param {string} requestId
+   * @param {ApiClientOptions} clientOptions
+   */
+  constructor(worker, requestId, clientOptions) {
     this.worker = worker;
     this.requestId = requestId;
+    this.resourceModel = new ResourceModel(clientOptions);
+    this.folderModel = new FolderModel(clientOptions);
   }
 
   /**
    * Create a resource.
    *
-   * @param {array} resource The resource data
+   * @param {ResourceEntity} resourceEntity The resource data
    * @param {string} password The password to encrypt
    */
-  async main(resource, password) {
+  async main(resourceEntity, password) {
     const crypto = new Crypto();
-    const data = Object.assign({}, resource);
-    let savedResource;
+    const keyring = new Keyring();
+    let passphrase;
+    let privateKey;
+    let targetPermissions;
 
-    const passphrase = await passphraseController.get(this.worker);
-    await progressController.open(this.worker, "Creating password", 2, "Decrypting private key");
-    const privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
-    await progressController.update(this.worker, 1, "Encrypting secret");
+    let goals = resourceEntity.folderParentId ? 10 : 2; // arbitrarily "more" if parent permission folder
+    let progress = 0;
+
+    // Get the passphrase if needed and decrypt secret key
+    try {
+      passphrase = await passphraseController.get(this.worker);
+      privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
 
     try {
+      await progressController.open(this.worker, `Creating password`, goals, "Initializing");
+      await progressController.update(this.worker, progress++, "Encrypting secret");
+
+      // Encrypt and sign
       const secret = await crypto.encrypt(password, User.getInstance().get().id, privateKey);
-      data.secrets = [{data: secret}];
-      await progressController.update(this.worker, 2, "Creating password");
-      savedResource = await Resource.save(data);
+      const secrets = new SecretsCollection([{data:secret}]);
+      resourceEntity.secrets = secrets;
+
+      // Save
+      await progressController.update(this.worker, progress++, "Creating password");
+      resourceEntity = await this.resourceModel.create(resourceEntity);
+      resourceEntity.secrets = secrets;
+
+      if (resourceEntity.folderParentId) {
+        // Get parent permissions
+        targetPermissions = await this.folderModel.cloneParentPermissions(PermissionEntity.ACO_RESOURCE, resourceEntity.id, resourceEntity.folderParentId);
+        goals = (targetPermissions.length * 3) +2; // closer to reality...
+        await progressController.updateGoals(this.worker, goals);
+
+        // Sync keyring
+        await progressController.update(this.worker, progress++, "Synchronizing keys");
+        await keyring.sync();
+
+        // Build permissions
+        await progressController.update(this.worker, progress++, "Calculate permissions");
+        const currentPermissions = new PermissionsCollection([resourceEntity.permission]);
+        const changes = PermissionChangesCollection.buildChangesFromPermissions(currentPermissions, targetPermissions);
+
+        // Share
+        await progressController.update(this.worker, progress++, "Start sharing");
+        const resourcesToShare = [resourceEntity.toDto({secrets:true})];
+        await Share.bulkShareResources(resourcesToShare, changes.toDto(), passphrase, async message => {
+          await progressController.update(this.worker, progress++, message);
+        });
+      }
     } catch (error) {
+      console.error(error);
       await progressController.close(this.worker);
       throw error;
     }
 
+    await progressController.update(this.worker, goals, "Done!");
     await progressController.close(this.worker);
 
-    return savedResource;
+    return resourceEntity;
   }
 }
 

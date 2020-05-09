@@ -10,7 +10,6 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {ApiClient} = require('../apiClient/apiClient');
 const {AbstractService} = require('../abstract/abstractService');
 
 const FOLDER_SERVICE_RESOURCE_NAME = 'folders';
@@ -71,20 +70,20 @@ class FolderService extends AbstractService {
    * Get a folder for a given id
    *
    * @param {string} id folder uuid
-   * @param {Object} contain optional example: {permissions: true}
+   * @param {Object} [contains] optional example: {permissions: true}
    * @throws {Error} if API call fails, service unreachable, etc.
    * @returns {Object} folderDto
    */
-  async get(id, contain) {
-    let options = contain ? this.formatContainOptions(contain, FolderService.getSupportedContainOptions()) : null;
+  async get(id, contains) {
+    let options = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.get(id, options);
     return response.body;
   }
 
   /**
    * Find all folders
-   *
-   * @param {Object} contain optional for example {"user": true}
+   *å
+   * @param {Object} [contains] optional for example {"user": true}
    *        @see getSupportedContainOptions
    * @param {Object} [filters] optional for example {"has-id": [uuid, ...]}
    *        @see getSupportedFiltersOptions
@@ -95,10 +94,10 @@ class FolderService extends AbstractService {
    * @throws {PassboltApiFetchError} if passbolt API response is not OK (non 2xx status)
    * @public
    */
-  async findAll(contain, filters) {
-    contain = contain ? this.formatContainOptions(contain, FolderService.getSupportedContainOptions()) : null;
-    filters = filters ? this.formatFilterOptions(contain, FolderService.getSupportedFiltersOptions()) : null;
-    const options = {...contain, ...filters };
+  async findAll(contains, filters) {
+    contains = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
+    filters = filters ? this.formatFilterOptions(contains, FolderService.getSupportedFiltersOptions()) : null;
+    const options = {...contains, ...filters };
     const response = await this.apiClient.findAll(options);
     if (!response.body || !response.body.length) {
       return [];
@@ -110,12 +109,12 @@ class FolderService extends AbstractService {
    * Create a folder using Passbolt API
    *
    * @param {Object} data
-   * @param {Object} contain optional for example {"permission": true}
+   * @param {Object} [contains] optional for example {"permission": true}
    * @returns {Promise<*>} Response body
    * @public
    */
-  async create(data, contain) {
-    let options = contain ? this.formatContainOptions(contain, FolderService.getSupportedContainOptions()) : null;
+  async create(data, contains) {
+    let options = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.create(data, options);
     return response.body;
   }
@@ -125,12 +124,12 @@ class FolderService extends AbstractService {
    *
    * @param {String} folderId uuid
    * @param {Object} folderData
-   * @param {Object} contain optional for example {"permission": true}
+   * @param {Object} [contains] optional for example {"permission": true}
    * @returns {Promise<*>} Response body
    * @public
    */
-  async update(folderId, folderData, contain) {
-    let options = contain ? this.formatContainOptions(contain, FolderService.getSupportedContainOptions()) : null;
+  async update(folderId, folderData, contains) {
+    let options = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.update(folderId, folderData, options);
     return response.body;
   }

@@ -90,7 +90,7 @@ class RoleEntity extends Entity {
 
   /**
    * Get role description
-   * @returns {string} description
+   * @returns {(string|null)} description
    */
   get description() {
     return this._props.description || null;
@@ -98,7 +98,7 @@ class RoleEntity extends Entity {
 
   /**
    * Get created date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get created() {
     return this._props.created || null;

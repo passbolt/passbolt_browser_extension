@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-
 const {FolderEntity} = require('../../model/entity/folder/folderEntity');
 const {FolderModel} = require('../../model/folder/folderModel');
 
@@ -23,12 +22,12 @@ class FolderCreateController {
    *
    * @param {Worker} worker
    * @param {string} requestId
-   * @param {FolderModel} folderModel
+   * @param {ApiClientOptions} clientOptions
    */
-  constructor(worker, requestId, folderModel) {
+  constructor(worker, requestId, clientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.folderModel = folderModel;
+    this.folderModel = new FolderModel(clientOptions);
   }
 
   /**

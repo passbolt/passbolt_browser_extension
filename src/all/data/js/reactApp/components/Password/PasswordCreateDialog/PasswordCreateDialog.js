@@ -88,7 +88,13 @@ class PasswordCreateDialog extends Component {
     try {
       const resource = await this.createResource();
       this.displayNotification("success", "The password has been added successfully");
-      this.selectAndScrollToResource(resource.id);
+      if (resource.folder_parent_id) {
+        // TODO and select resource inside that folder
+        this.selectAndScrollToFolder(resource.folder_parent_id);
+      } else {
+        this.selectAndScrollToResource(resource.id);
+      }
+
       this.props.onClose();
     } catch (error) {
       // It can happen when the user has closed the passphrase entry dialog by instance.
@@ -110,15 +116,15 @@ class PasswordCreateDialog extends Component {
    * @returns {Promise}
    */
   createResource() {
-    const resourceMeta = {
+    const resourceDto = {
       name: this.state.name,
       username: this.state.username,
       uri: this.state.uri,
       description: this.state.description,
-      folderParentId: this.props.folderParentId
+      folder_parent_id: this.props.folderParentId
     };
 
-    return port.request("passbolt.resources.create", resourceMeta, this.state.password);
+    return port.request("passbolt.resources.create", resourceDto, this.state.password);
   }
 
   /**
@@ -147,6 +153,15 @@ class PasswordCreateDialog extends Component {
    */
   selectAndScrollToResource(id) {
     port.emit("passbolt.resources.select-and-scroll-to", id);
+  }
+
+  /**
+   * Select and scroll to a given resource.
+   * @param {string} id The resource id.
+   * @returns {void}
+   */
+  selectAndScrollToFolder(id) {
+    port.emit("passbolt.folders.select-and-scroll-to", id);
   }
 
   /**
@@ -418,7 +433,7 @@ class PasswordCreateDialog extends Component {
                 </div>
                 <div className="input textarea">
                   <label htmlFor="create-password-form-description">Description&nbsp;
-                    <Tooltip message="Do not store sensitive data. Unlike the password, this data is not encrypted." icon="warning" />
+                    <Tooltip message="Do not store sensitive data. Unlike the password, this data is not encrypted." icon="info-circle" />
                   </label>
                   <textarea id="create-password-form-description" name="description" maxLength="10000"
                     className="required" placeholder="add a description" value={this.state.description}

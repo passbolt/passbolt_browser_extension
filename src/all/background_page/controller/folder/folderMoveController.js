@@ -14,13 +14,20 @@
 const Resource = require('../../model/resource').Resource;
 const {FolderEntity} = require('../../model/entity/folder/folderEntity');
 const {FolderModel} = require('../../model/folder/folderModel');
-const User = require('../../model/user').User;
+const {ResourceModel} = require('../../model/resource/resourceModel');
 
 class FolderMoveController {
-
-  constructor(worker, requestId) {
+  /**
+   * FolderMoveController constructor
+   *
+   * @param worker
+   * @param requestId
+   * @param clientOptions
+   */
+  constructor(worker, requestId, clientOptions) {
     this.worker = worker;
     this.requestId = requestId;
+    this.folderModel = new FolderModel(clientOptions)
   }
 
   /**
@@ -44,28 +51,29 @@ class FolderMoveController {
   /**
    * Move folders.
    * @param {array} ids Folders to move
-   * @param {sting} folderParentId The destination folder.
+   * @param {string} folderParentId The destination folder.
    * @returns {Promise<void>}
    */
   async moveFolders(ids, folderParentId) {
     for (let i in ids) {
       const id = ids[i];
       const folderDto = {id, 'folder_parent_id': folderParentId};
-      const folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
-      await folderModel.update(new FolderEntity(folderDto));
+      await this.folderModel.update(new FolderEntity(folderDto));
     }
   }
 
   /**
    * Move resources.
    * @param {array} ids Resources to move
-   * @param {sting} folderParentId The destination folder.
+   * @param {string} folderParentId The destination folder.
    * @returns {Promise<void>}
    */
   async moveResources(ids, folderParentId) {
     for (let i in ids) {
       const id = ids[i];
       const resourceDto = {id, folderParentId};
+
+      // TODO use this.resourceModel.move
       await Resource.update(resourceDto);
     }
   }

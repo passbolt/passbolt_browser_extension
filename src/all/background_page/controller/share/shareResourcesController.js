@@ -35,7 +35,7 @@ class ShareResourcesController {
    * @param {array} changes
    * @return {Promise}
    */
-  async main(resources, changes, ) {
+  async main(resources, changes) {
     const keyring = new Keyring();
     let progress = 0;
 
@@ -43,17 +43,17 @@ class ShareResourcesController {
     // why 3: simulate call to the API + encrypting step + share call to the API
     // why +1: this function initialization step
     const progressGoal = resources.length * 3 + 1;
-    const privateKeySecret = await passphraseController.get(this.worker);
+    const passphrase = await passphraseController.get(this.worker);
 
     try {
       let msg = `Share ${resources.length} passwords`;
       if (resources.length === 1) {
         msg  = `Share one password`;
       }
-      await progressController.open(this.worker, msg, progressGoal);
-      await progressController.update(this.worker, progress++, 'Initialize');
+      await progressController.open(this.worker, msg, progressGoal, 'Initialize');
+      await progressController.update(this.worker, progress++, 'Synchronizing keys');
       await keyring.sync();
-      await Share.bulkShareResources(resources, changes, privateKeySecret, async message => {
+      await Share.bulkShareResources(resources, changes, passphrase, async message => {
         await progressController.update(this.worker, progress++, message);
       });
       const results = resources.map(resource => resource.id);

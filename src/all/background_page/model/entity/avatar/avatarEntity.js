@@ -86,7 +86,7 @@ class AvatarEntity extends Entity {
   // ==================================================
   /**
    * Get avatar id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get id() {
     return this._props.id || null;
@@ -94,7 +94,7 @@ class AvatarEntity extends Entity {
 
   /**
    * Get user id
-   * @returns {*}
+   * @returns {(string|null)}
    */
   get userId() {
     return this._props.user_id || null;
@@ -134,7 +134,7 @@ class AvatarEntity extends Entity {
 
   /**
    * Get avatar creation date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get created() {
     return this._props.created || null;
@@ -142,7 +142,7 @@ class AvatarEntity extends Entity {
 
   /**
    * Get avatar modification date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get modified() {
     return this._props.modified || null;

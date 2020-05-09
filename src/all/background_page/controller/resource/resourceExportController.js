@@ -12,8 +12,8 @@
  * @since         2.7.0
  */
 const progressController = require('../progress/progressController');
-const ResourceService = require('../../service/resource').ResourceService;
-const TabStorage = require('../../model/tabStorage').TabStorage;
+const {LegacyResourceService} = require('../../service/resource');
+const {TabStorage} = require('../../model/tabStorage');
 
 /**
  * Resources export controller
@@ -27,7 +27,7 @@ class ResourceExportController {
   static async exec(worker, resourcesIds) {
     try {
       const progressDialogPromise = progressController.open(worker, 'Retrieving passwords...');
-      const resources = await ResourceService.findAllByResourcesIds(resourcesIds, {contain:{secret: 1}});
+      const resources = await LegacyResourceService.findAllByResourcesIds(resourcesIds, {contain:{secret: 1}});
       await progressController.close(worker);
       TabStorage.set(worker.tab.id, 'exportedResources', resources);
       await progressDialogPromise;

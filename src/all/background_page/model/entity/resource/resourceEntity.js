@@ -14,8 +14,11 @@
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {EntityValidationError} = require('../abstract/entityValidationError');
+const {FavoriteEntity} = require('../favorite/favoriteEntity');
 const {PermissionEntity} = require('../permission/permissionEntity');
 const {PermissionsCollection} = require('../permission/permissionsCollection');
+const {TagsCollection} = require('../tag/tagsCollection');
+const {SecretsCollection} = require('../secret/secretsCollection');
 
 const ENTITY_NAME = 'Resource';
 const RESOURCE_NAME_MAX_LENGTH = 255;
@@ -47,6 +50,20 @@ class ResourceEntity extends Entity {
       this._permissions = new PermissionsCollection(this._props.permissions);
       ResourceEntity.assertValidPermissions(this._permissions, this.id);
       delete this._props.permissions;
+    }
+    if (this._props.secrets) {
+      this._secrets = new SecretsCollection(this._props.secrets);
+      ResourceEntity.assertValidSecrets(this._secrets, this.id);
+      delete this._props.secrets;
+    }
+    if (this._props.favorite) {
+      this._favorite = new FavoriteEntity(this._props.favorite);
+      ResourceEntity.assertValidFavorite(this._favorite, this.id);
+      delete this._props.favorite;
+    }
+    if (this._props.tags) {
+      this._tags = new TagsCollection(this._props.tags);
+      delete this._props.tag;
     }
   }
 
@@ -84,6 +101,9 @@ class ResourceEntity extends Entity {
           "type": "string",
           "maxLength": RESOURCE_DESCRIPTION_MAX_LENGTH
         },
+        "deleted": {
+          "type": "boolean"
+        },
         "created": {
           "type": "string",
           "format": "date-time"
@@ -101,12 +121,76 @@ class ResourceEntity extends Entity {
           "format": "uuid"
         },
         // Associations
+        "folder_parent_id": {
+          "anyOf": [{
+            "type": "string",
+            "format": "uuid"
+          }, {
+            "type": "null"
+          }]
+        },
         "permission": PermissionEntity.getSchema(), // current user permission
-        "permissions": PermissionsCollection.getSchema() // all users permissions
-        // secret
-        // TODO
+        "permissions": PermissionsCollection.getSchema(), // all users permissions
+        "favorite": {
+          "anyOf": [
+            FavoriteEntity.getSchema(),
+            {"type": "null"}
+          ]
+        },
+        "secrets": SecretsCollection.getSchema(),
+        "tags": TagsCollection.getSchema()
       }
     }
+  }
+
+  // ==================================================
+  // Serialization
+  // ==================================================
+  /**
+   * Return a DTO ready to be sent to API
+   *
+   * @param {object} [contain] optional
+   * @returns {object}
+   */
+  toDto(contain) {
+    const result = Object.assign({}, this._props);
+    if (!contain) {
+      return result;
+    }
+    if (contain.permission) {
+      if (this._permission) {
+        result.permission = this._permission ? this._permission.toDto() : null;
+      }
+    }
+    if (contain.permissions) {
+      if (this._permissions) {
+        result.permissions = this._permissions ? this._permissions.toDto() : null;
+      }
+    }
+    if (contain.favorite) {
+      if (this._favorite) {
+        result.favorite = this._favorite ? this._favorite.toDto() : null;
+      }
+    }
+    if (contain.tags) {
+      if (this._tags) {
+        result.tags = this._tags ? this._tags.toDto() : null;
+      }
+    }
+    if (contain.secrets) {
+      if (this._secrets) {
+        result.secrets = this._secrets ? this._secrets.toDto() : null;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Customizes JSON stringification behavior
+   * @returns {*}
+   */
+  toJSON() {
+    return this.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS);
   }
 
   // ==================================================
@@ -130,7 +214,7 @@ class ResourceEntity extends Entity {
 
   /**
    * Get resource description
-   * @returns {string} description
+   * @returns {(string|null)} description
    */
   get description() {
     return this._props.description || null;
@@ -138,7 +222,7 @@ class ResourceEntity extends Entity {
 
   /**
    * Get deleted flag info
-   * @returns {boolean} true if deleted
+   * @returns {(boolean|null)} true if deleted
    */
   get isDeleted() {
     return this._props.deleted || null;
@@ -146,7 +230,7 @@ class ResourceEntity extends Entity {
 
   /**
    * Get created date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get created() {
     return this._props.created || null;
@@ -154,7 +238,7 @@ class ResourceEntity extends Entity {
 
   /**
    * Get modified date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get modified() {
     return this._props.modified || null;
@@ -162,7 +246,7 @@ class ResourceEntity extends Entity {
 
   /**
    * Get created by user id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get createdBy() {
     return this._props.created_by || null;
@@ -170,31 +254,87 @@ class ResourceEntity extends Entity {
 
   /**
    * Get modified by user id
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get modifiedBy() {
     return this._props.modified_by || null;
+  }
+
+  /**
+   * Get the folder parent id if any
+   * @returns {(string|null)} date
+   */
+  get folderParentId() {
+    return this._props.folder_parent_id || null;
   }
 
   // ==================================================
   // Associated properties methods
   // ==================================================
   /**
-   * Get all the current user permissions
-   * @returns {PermissionEntity} permission
+   * Get resource permission for the current user
+   * @returns {(PermissionEntity|null)}
    */
   get permission() {
     return this._permission || null;
   }
 
   /**
-   * Get all users permissions for the given folder
-   * @returns {PermissionsCollection} permissions
+   * Get all resource permissions
+   * @returns {(PermissionsCollection|null)}
    */
   get permissions() {
     return this._permissions || null;
   }
 
+  /**
+   * Get all resource tags for the current user
+   * @returns {(TagsCollection|null)}
+   */
+  get tags() {
+    return this._tags || null;
+  }
+
+  /**
+   * Get resource favorite object for the current user
+   * @returns {(FavoriteEntity|null)}
+   */
+  get favorite() {
+    return this._favorite || null;
+  }
+
+  /**
+   * Get resource favorite status for the current user
+   * @returns {boolean}
+   */
+  isFavorited() {
+    return (this.favorite === true);
+  }
+
+  /**
+   * Get resource secret for the current user
+   * @returns {(SecretsCollection|null)}
+   */
+  get secrets() {
+    return this._secrets || null;
+  }
+
+  // ==================================================
+  // Setters
+  // ==================================================
+  /**
+   * Set the secret
+   * @param {SecretsCollection} secretsCollection
+   * @throws {EntityValidationError} if secretsCollection is not valid
+   */
+  set secrets(secretsCollection) {
+    ResourceEntity.assertValidSecrets(secretsCollection);
+    this._secrets = new SecretsCollection(secretsCollection.toDto());
+  }
+
+  // ==================================================
+  // Build rules
+  // ==================================================
   /**
    * Additional permission validation rule
    * Check that the permission is for a resource
@@ -208,11 +348,11 @@ class ResourceEntity extends Entity {
     if (!permission) {
       throw new EntityValidationError('ResourceEntity assertValidPermission expect a permission.');
     }
-    if (permission.aro !== PermissionEntity.ACO_RESOURCE) {
-      throw new EntityValidationError('ResourceEntity assertValidPermission not a valid folder permission.');
+    if (permission.aco !== PermissionEntity.ACO_RESOURCE) {
+      throw new EntityValidationError('ResourceEntity assertValidPermission not a valid resource permission.');
     }
-    if (resourceId && permission.acoForeignKey !== resourceId) {
-      throw new EntityValidationError('ResourceEntity assertValidPermission folder id doesnt not match foreign key permission.');
+    if (resourceId && (permission.acoForeignKey !== resourceId)) {
+      throw new EntityValidationError('ResourceEntity assertValidPermission resource id doesnt not match foreign key permission.');
     }
   }
 
@@ -232,6 +372,43 @@ class ResourceEntity extends Entity {
     }
   }
 
+  /**
+   * Additional secret validation rule
+   *
+   * @param {SecretsCollection} secrets
+   * @param {string} [resourceId] optional
+   * @throws {EntityValidationError} if not valid
+   */
+  static assertValidSecrets(secrets, resourceId) {
+    if (!secrets || !secrets.length) {
+      throw new EntityValidationError('ResourceEntity assertValidSecrets cannot be empty.');
+    }
+    if (!(secrets instanceof SecretsCollection)) {
+      throw new EntityValidationError('ResourceEntity assertValidSecrets expect a SecretsCollection.');
+    }
+    for (let secret of secrets) {
+      if (secret.resourceId && (secret.resourceId !== resourceId)) {
+        throw new EntityValidationError('ResourceEntity assertValidSecrets secret resourceId should match the resource id.');
+      }
+    }
+  }
+
+  /**
+   * Additional secret validation rule
+   *
+   * @param {FavoriteEntity} favorite
+   * @param {string} [resourceId] optional
+   * @throws {EntityValidationError} if not valid
+   */
+  static assertValidFavorite(favorite, resourceId) {
+    if (favorite.foreignKey !== resourceId) {
+      throw new EntityValidationError('ResourceEntity assertValidFavorite favorite foreign key should match the resource id.');
+    }
+    if (favorite.foreignModel !== FavoriteEntity.FAVORITE_RESOURCE) {
+      throw new EntityValidationError('ResourceEntity assertValidFavorite favorite foreign model should be a resource.');
+    }
+  }
+
   // ==================================================
   // Static properties getters
   // ==================================================
@@ -241,6 +418,14 @@ class ResourceEntity extends Entity {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
+  }
+
+  /**
+   * FolderEntity.ALL_CONTAIN_OPTIONS
+   * @returns {object} all contain options that can be used in toDto()
+   */
+  static get ALL_CONTAIN_OPTIONS() {
+    return {permission:true, permissions:true, secrets:true, favorite:true, tags:true};
   }
 }
 

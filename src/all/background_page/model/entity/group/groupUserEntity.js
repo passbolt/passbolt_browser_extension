@@ -72,7 +72,7 @@ class GroupUserEntity extends Entity {
   // ==================================================
   /**
    * Get groupUser id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get id() {
     return this._props.id || null;
@@ -104,7 +104,7 @@ class GroupUserEntity extends Entity {
 
   /**
    * Get created date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get created() {
     return this._props.created || null;

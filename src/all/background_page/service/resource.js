@@ -18,7 +18,7 @@ const {PassboltServiceUnavailableError} = require('../error/passboltServiceUnava
 const {Request} = require('../model/request');
 const {User} = require('../model/user');
 
-class ResourceService { }
+class LegacyResourceService { }
 
 /**
  * Find all the resources with given resources ids
@@ -29,7 +29,7 @@ class ResourceService { }
  * @throws PassboltBadResponseError on response format issue
  * @throws PassboltApiFetchError on application error
  */
-ResourceService.findAllByResourcesIds = async function (resourcesIds, options) {
+LegacyResourceService.findAllByResourcesIds = async function (resourcesIds, options) {
   // Retrieve by batch to avoid any 414 response.
   const batchSize = 80;
   let resources = [];
@@ -37,7 +37,7 @@ ResourceService.findAllByResourcesIds = async function (resourcesIds, options) {
   for (let i = 0; i < totalBatches; i++) {
     const resourcesIdsPart = resourcesIds.splice(0, batchSize);
     const optionsPart = Object.assign({ filter: { hasId: resourcesIdsPart } }, options);
-    const resourcesPart = await ResourceService.findAll(optionsPart);
+    const resourcesPart = await LegacyResourceService.findAll(optionsPart);
     resources = [...resources, ...resourcesPart];
   }
 
@@ -60,7 +60,7 @@ ResourceService.findAllByResourcesIds = async function (resourcesIds, options) {
  * @throws PassboltBadResponseError on response format issue
  * @throws PassboltApiFetchError on application error
  */
-ResourceService.findOne = async function (resourceId, options) {
+LegacyResourceService.findOne = async function (resourceId, options) {
   options = options || {};
   const user = User.getInstance();
   const domain = user.settings.getDomain();
@@ -131,7 +131,7 @@ ResourceService.findOne = async function (resourceId, options) {
  * @throws PassboltBadResponseError on response format issue
  * @throws PassboltApiFetchError on application error
  */
-ResourceService.findAll = async function (options) {
+LegacyResourceService.findAll = async function (options) {
   options = options || {};
   const user = User.getInstance();
   const domain = user.settings.getDomain();
@@ -215,7 +215,7 @@ ResourceService.findAll = async function (options) {
  * @throws PassboltBadResponseError on response format issue
  * @throws PassboltApiFetchError on application error
  */
-ResourceService.save = async function (data) {
+LegacyResourceService.save = async function (data) {
   data = data || {};
   const user = User.getInstance();
   const domain = user.settings.getDomain();
@@ -266,7 +266,7 @@ ResourceService.save = async function (data) {
  * @throws PassboltBadResponseError on response format issue
  * @throws PassboltApiFetchError on application error
  */
-ResourceService.update = async function (data) {
+LegacyResourceService.update = async function (data) {
   data = data || {};
   const user = User.getInstance();
   const domain = user.settings.getDomain();
@@ -317,7 +317,7 @@ ResourceService.update = async function (data) {
  * @throws PassboltBadResponseError on response format issue
  * @throws PassboltApiFetchError on application error
  */
-ResourceService.delete = async function (resourceId) {
+LegacyResourceService.delete = async function (resourceId) {
   const user = User.getInstance();
   const domain = user.settings.getDomain();
   const fetchOptions = {
@@ -364,7 +364,7 @@ ResourceService.delete = async function (resourceId) {
  * @returns {Promise<[]|*>}
  */
 // TODO Reuse findAll
-ResourceService.findAllForShare = async function(resourcesIds) {
+LegacyResourceService.findAllForShare = async function(resourcesIds) {
   // Retrieve by batch to avoid any 414 response.
   const batchSize = 80;
   if (resourcesIds.length > batchSize) {
@@ -424,4 +424,4 @@ ResourceService.findAllForShare = async function(resourcesIds) {
   return responseJson.body;
 };
 
-exports.ResourceService = ResourceService;
+exports.LegacyResourceService = LegacyResourceService;

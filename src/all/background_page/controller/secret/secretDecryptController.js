@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.8.0
  */
-const Crypto = require('../../model/crypto').Crypto;
+const {Crypto} = require('../../model/crypto');
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
-const ResourceService = require('../../service/resource').ResourceService;
-const Secret = require('../../model/secret').Secret;
+const {LegacyResourceService} = require('../../service/resource');
+const {Secret} = require('../../model/secret');
 
 class SecretDecryptController {
 
@@ -71,7 +71,7 @@ class SecretDecryptController {
       // Before v2.7.0, the secret entry point was not available.
       // Use the resource entry point to retrieve the secret.
       // @deprecated since v2.7.0 will be removed with v2.3.0
-      const resource = await ResourceService.findOne(resourceId, { contain: { secret: 1 } });
+      const resource = await LegacyResourceService.findOne(resourceId, { contain: { secret: 1 } });
       secret = resource.secrets[0];
     }
 

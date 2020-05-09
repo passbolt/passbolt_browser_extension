@@ -53,23 +53,6 @@ class GroupsUsersCollection extends Entity {
     }
   }
 
-  /**
-   * Return a DTO ready to be sent to API
-   *
-   * @returns {*}
-   */
-  toDto() {
-    return JSON.parse(JSON.stringify(this._items));
-  }
-
-  /**
-   * Customizes JSON stringification behavior
-   * @returns {*}
-   */
-  toJSON() {
-    return this._items;
-  }
-
   // ==================================================
   // Static and dynamic properties getters
   // ==================================================

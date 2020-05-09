@@ -77,7 +77,7 @@ class GpgkeyEntity extends Entity {
   // ==================================================
   /**
    * Get gpgkey id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get id() {
     return this._props.id || null;
@@ -109,7 +109,7 @@ class GpgkeyEntity extends Entity {
 
   /**
    * Get created date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get created() {
     return this._props.created || null;
@@ -117,7 +117,7 @@ class GpgkeyEntity extends Entity {
 
   /**
    * Get modified date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get modified() {
     return this._props.modified || null;

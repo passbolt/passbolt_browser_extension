@@ -83,6 +83,9 @@ class ProfileEntity extends Entity {
     }
   }
 
+  // ==================================================
+  // Serialization
+  // ==================================================
   /**
    * Return a DTO ready to be sent to API
    * @param {object} contain optional example {avatar: true}
@@ -101,7 +104,7 @@ class ProfileEntity extends Entity {
    * @returns {*}
    */
   toJSON() {
-    return this.toDto({avatar: true});
+    return this.toDto(ProfileEntity.ALL_CONTAIN_OPTIONS);
   }
 
   // ==================================================
@@ -113,6 +116,14 @@ class ProfileEntity extends Entity {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
+  }
+
+  /**
+   * PermissionEntity.ALL_CONTAIN_OPTIONS
+   * @returns {object} all contain options that can be used in toDto()
+   */
+  static get ALL_CONTAIN_OPTIONS() {
+    return {avatar:true};
   }
 
   // ==================================================
@@ -160,7 +171,7 @@ class ProfileEntity extends Entity {
 
   /**
    * Get profile creation date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get created() {
     return this._props.created || null;

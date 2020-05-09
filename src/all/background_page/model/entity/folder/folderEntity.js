@@ -36,6 +36,11 @@ class FolderEntity extends Entity {
       FolderEntity.getSchema()
     ));
 
+    // if no parent id specified set it to null
+    if(!this._props.hasOwnProperty('folder_parent_id')) {
+      this._props.folder_parent_id = null;
+    }
+
     // Associations
     if (this._props.permission) {
       this._permission = new PermissionEntity(this._props.permission);
@@ -100,6 +105,9 @@ class FolderEntity extends Entity {
     }
   }
 
+  // ==================================================
+  // Serialization
+  // ==================================================
   /**
    * Return a DTO ready to be sent to API
    *
@@ -111,12 +119,14 @@ class FolderEntity extends Entity {
 
     if (contain && contain.permission) {
       if (this._permission) {
-        result.permission = this._permission ? this._permission.toDto() : null;
+        // TODO More granular permission.group permission.user.avatar
+        result.permission = this._permission ? this._permission.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS) : null;
       }
     }
     if (contain && contain.permissions) {
       if (this._permissions) {
-        result.permissions = this._permissions ? this._permissions.toDto() : null;
+        // TODO More granular permissions.group permissions.user
+        result.permissions = this._permissions ? this._permissions.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS) : null;
       }
     }
     return result;
@@ -127,7 +137,7 @@ class FolderEntity extends Entity {
    * @returns {*}
    */
   toJSON() {
-    return this.toDto({permission: true, permissions: true});
+    return this.toDto(FolderEntity.ALL_CONTAIN_OPTIONS);
   }
 
   // ==================================================
@@ -135,7 +145,7 @@ class FolderEntity extends Entity {
   // ==================================================
   /**
    * Get folder id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get id() {
     return this._props.id || null;
@@ -151,7 +161,7 @@ class FolderEntity extends Entity {
 
   /**
    * Get folder parent id
-   * @returns {string} uuid parent folder
+   * @returns {(string|null)} uuid parent folder
    */
   get folderParentId() {
     return this._props.folder_parent_id || null;
@@ -159,7 +169,7 @@ class FolderEntity extends Entity {
 
   /**
    * Get created date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get created() {
     return this._props.created || null;
@@ -167,7 +177,7 @@ class FolderEntity extends Entity {
 
   /**
    * Get modified date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get modified() {
     return this._props.modified || null;
@@ -182,6 +192,14 @@ class FolderEntity extends Entity {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
+  }
+
+  /**
+   * FolderEntity.ALL_CONTAIN_OPTIONS
+   * @returns {object} all contain options that can be used in toDto()
+   */
+  static get ALL_CONTAIN_OPTIONS() {
+    return {permission:true, permissions:true};
   }
 
   // ==================================================

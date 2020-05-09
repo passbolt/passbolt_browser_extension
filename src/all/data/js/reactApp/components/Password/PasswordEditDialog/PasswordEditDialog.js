@@ -502,7 +502,7 @@ class PasswordEditDialog extends Component {
                 </div>
                 <div className="input textarea">
                   <label htmlFor="edit-password-form-description">Description&nbsp;
-                    <Tooltip message="Do not store sensitive data. Unlike the password, this data is not encrypted." icon="warning" />
+                    <Tooltip message="Do not store sensitive data. Unlike the password, this data is not encrypted." icon="info-circle" />
                   </label>
                   <textarea id="edit-password-form-description" name="description" maxLength="10000"
                     className="required" placeholder="add a description" value={this.state.description}

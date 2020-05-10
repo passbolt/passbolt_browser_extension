@@ -15,6 +15,7 @@ const {FoldersCollection} = require("../entity/folder/foldersCollection");
 const {FolderLocalStorage} = require('../../service/local_storage/folderLocalStorage');
 const {FolderService} = require('../../service/api/folder/folderService');
 const {MoveService} = require('../../service/api/move/moveService');
+const {ShareService} = require('../../service/api/share/shareService');
 
 const {PermissionEntity} = require('../entity/permission/permissionEntity');
 const {PermissionsCollection} = require('../entity/permission/permissionsCollection');
@@ -30,6 +31,7 @@ class FolderModel {
   constructor(apiClientOptions) {
     this.folderService = new FolderService(apiClientOptions);
     this.moveService = new MoveService(apiClientOptions);
+    this.shareService = new ShareService(apiClientOptions);
   }
 
   /**
@@ -117,7 +119,7 @@ class FolderModel {
       }
 
       const changes = PermissionChangesCollection.buildChangesFromPermissions(currentPermissions, targetPermissions);
-      folderEntity = await this.updatePermissions(folderEntity, changes);
+      folderEntity = await this.share(folderEntity, changes);
     }
     return folderEntity;
   }
@@ -167,11 +169,11 @@ class FolderModel {
    * @param {boolean} [updateStorage] optional, default true, in case you want to update only after bulk update
    * @returns {Promise<FolderEntity>}
    */
-  async updatePermissions(folderEntity, changesCollection, updateStorage) {
+  async share(folderEntity, changesCollection, updateStorage) {
     if (typeof updateStorage === 'undefined') {
       updateStorage = true;
     }
-    await this.folderService.updatePermissions(folderEntity.id, {permissions: changesCollection.toDto()});
+    await this.shareService.shareFolder(folderEntity.id, {permissions: changesCollection.toDto()});
     if (updateStorage) {
       // update storage in case the folder becomes non visible to current user
       // TODO: optimize update only the given folder when user lost access

@@ -184,18 +184,6 @@ class FolderService extends AbstractService {
     return response.body;
   }
 
-  /**
-   * Update a given folder permission
-   *
-   * @param {string} folderId uuid
-   * @param {object} permissionChangesDto
-   * @returns {Promise<*>}
-   */
-  async updatePermissions(folderId, permissionChangesDto) {
-    let url = `${folderId}/permissions`;
-    const response = await this.apiClient.update(url, permissionChangesDto);
-    return response.body;
-  }
 }
 
 exports.FolderService = FolderService;

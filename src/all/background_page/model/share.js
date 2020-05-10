@@ -71,7 +71,7 @@ Share.bulkShareFolders = async function(foldersCollection, changesCollection, fo
     let permissions = changesCollection.filterByAcoForeignKey(folderEntity.id);
     if (permissions && permissions.length) {
       await progressCallback(`Updating folder ${folderEntity.name} permissions`);
-      await folderModel.updatePermissions(folderEntity, permissions, false);
+      await folderModel.share(folderEntity, permissions, false);
     }
   }
   await folderModel.updateLocalStorage();

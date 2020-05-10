@@ -332,6 +332,21 @@ class ResourceEntity extends Entity {
     this._secrets = new SecretsCollection(secretsCollection.toDto());
   }
 
+  /**
+   * Set folder parent id
+   * @param {string|null} folderParentId
+   * @throws {EntityValidationError} if parent id is not a valid uuid
+   */
+  set folderParentId(folderParentId) {
+    const propName = 'folder_parent_id';
+    if (folderParentId === null) {
+      this._props[propName] = null;
+      return;
+    }
+    const propSchema = ResourceEntity.getSchema().properties[propName];
+    this._props[propName] = EntitySchema.validateProp(propName, folderParentId, propSchema)
+  }
+
   // ==================================================
   // Build rules
   // ==================================================

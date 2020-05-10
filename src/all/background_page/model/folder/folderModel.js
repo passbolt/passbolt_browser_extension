@@ -14,6 +14,7 @@ const {FolderEntity} = require('../entity/folder/folderEntity');
 const {FoldersCollection} = require("../entity/folder/foldersCollection");
 const {FolderLocalStorage} = require('../../service/local_storage/folderLocalStorage');
 const {FolderService} = require('../../service/api/folder/folderService');
+const {MoveService} = require('../../service/api/move/moveService');
 
 const {PermissionEntity} = require('../entity/permission/permissionEntity');
 const {PermissionsCollection} = require('../entity/permission/permissionsCollection');
@@ -28,6 +29,7 @@ class FolderModel {
    */
   constructor(apiClientOptions) {
     this.folderService = new FolderService(apiClientOptions);
+    this.moveService = new MoveService(apiClientOptions);
   }
 
   /**
@@ -117,6 +119,30 @@ class FolderModel {
       const changes = PermissionChangesCollection.buildChangesFromPermissions(currentPermissions, targetPermissions);
       folderEntity = await this.updatePermissions(folderEntity, changes);
     }
+    return folderEntity;
+  }
+
+  /**
+   * Move a folder using Passbolt API
+   *
+   * @param {string} folderId the folder to move
+   * @param {string} folderParentId the destination folder
+   * @returns {FolderEntity}
+   */
+  async move(folderId, folderParentId) {
+    if (!folderId || !Validator.isUUID(folderId)) {
+      throw new TypeError('Folder move expect a valid folder id.');
+    }
+    if (!(folderParentId === null || Validator.isUUID(folderParentId))) {
+      throw new TypeError('Folder move expect a valid folder parent id.');
+    }
+    const folderDto = await FolderLocalStorage.getFolderById(folderId);
+    const folderEntity = new FolderEntity(folderDto);
+    folderEntity.folderParentId = folderParentId;
+    await this.moveService.move(folderEntity);
+    // TODO update modified date
+    await FolderLocalStorage.updateFolder(folderEntity);
+
     return folderEntity;
   }
 

@@ -16,7 +16,7 @@ class Favorite {
     // Update the resources local storage.
     const resource = await ResourceLocalStorage.getResourceById(resourceId);
     resource.favorite = favorite;
-    await ResourceLocalStorage.updateResource(resource);
+    await ResourceLocalStorage.updateResourceLegacy(resource);
 
     return favorite;
   }
@@ -26,7 +26,7 @@ class Favorite {
     await FavoriteService.delete(resource.favorite.id);
     resource.favorite = null;
     // Update the resources local storage.
-    await ResourceLocalStorage.updateResource(resource);
+    await ResourceLocalStorage.updateResourceLegacy(resource);
   }
 };
 

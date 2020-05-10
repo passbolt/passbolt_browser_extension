@@ -10,12 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {PermissionEntity} = require('../entity/permission/permissionEntity');
-const {PermissionsCollection} = require('../entity/permission/permissionsCollection');
-const {PermissionChangesCollection} = require("../../model/entity/permission/permissionChangesCollection");
 const {ResourceEntity} = require('../entity/resource/resourceEntity');
 const {ResourceLocalStorage} = require('../../service/local_storage/resourceLocalStorage');
 const {ResourceService} = require('../../service/api/resource/resourceService');
+const {MoveService} = require('../../service/api/move/moveService');
 
 class ResourceModel {
   /**
@@ -26,6 +24,7 @@ class ResourceModel {
    */
   constructor(apiClientOptions) {
     this.resourceService = new ResourceService(apiClientOptions);
+    this.moveService = new MoveService(apiClientOptions);
   }
 
   /**
@@ -37,7 +36,7 @@ class ResourceModel {
     const resources = await this.resourceService.findAll({
       'permission':true, 'favorite':true, 'tags':true
     });
-    await ResourceLocalStorage.set(resources);
+    await ResourceLocalStorage.setLegacy(resources);
     return resources;
   }
 
@@ -52,6 +51,30 @@ class ResourceModel {
     const updatedResourceEntity = new ResourceEntity(resourceDto);
     await ResourceLocalStorage.addResource(updatedResourceEntity);
     return updatedResourceEntity;
+  }
+
+  /**
+   * Move a folder using Passbolt API
+   *
+   * @param {string} resourceId the resource id
+   * @param {(string|null)} folderParentId the folder parent
+   * @returns {ResourceEntity}
+   */
+  async move(resourceId, folderParentId) {
+    if (!resourceId || !Validator.isUUID(resourceId)) {
+      throw new TypeError('Resource move expect a valid resource id.');
+    }
+    if (!(folderParentId === null || Validator.isUUID(folderParentId))) {
+      throw new TypeError('Resource move expect a valid folder id.');
+    }
+    const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
+    const resourceEntity = new ResourceEntity(resourceDto);
+    resourceEntity.folderParentId = folderParentId;
+    await this.moveService.move(resourceEntity);
+    // TODO update modified date
+    await ResourceLocalStorage.updateResource(resourceEntity);
+
+    return resourceEntity;
   }
 }
 

@@ -209,7 +209,7 @@ Resource.update = async function (data) {
     data.folder_parent_id = data.folderParentId;
   }
   const resource = await LegacyResourceService.update(data);
-  await ResourceLocalStorage.updateResource(resource);
+  await ResourceLocalStorage.updateResourceLegacy(resource);
 
   return resource;
 };

@@ -80,7 +80,7 @@ class FolderLocalStorage {
    * @param {(string|null)} id The folder id
    * @return {object} a folder dto
    */
-  static async getFolderById(id) {
+  static async getFolderByParentId(id) {
     const folders = await FolderLocalStorage.get();
     return folders.find(item => item.folderParentId === id);
   };
@@ -105,7 +105,9 @@ class FolderLocalStorage {
 
   /**
    * Update a folder in the local storage.
+   *
    * @param {FolderEntity} folderEntity The folder to update
+   * @throws {Error} if the folder does not exist in the local storage
    */
   static async updateFolder(folderEntity) {
     await lock.acquire();
@@ -113,6 +115,9 @@ class FolderLocalStorage {
       FolderLocalStorage.assertEntityBeforeSave(folderEntity);
       const folders = await FolderLocalStorage.get();
       const folderIndex = folders.findIndex(item => item.id === folderEntity.id);
+      if (folderIndex === -1) {
+        throw new Error('The folder could not be found in the local storage');
+      }
       folders[folderIndex] = Object.assign(folders[folderIndex], folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({folders});
       lock.release();

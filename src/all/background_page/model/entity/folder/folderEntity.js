@@ -265,8 +265,6 @@ class FolderEntity extends Entity {
    * Folder Parent Id
    * @param {string|null} folderParentId optional
    * @throws {EntityValidationError} if parent id is not a valid uuid
-   * @returns void
-   * @public
    */
   set folderParentId(folderParentId) {
     const propName = 'folder_parent_id';

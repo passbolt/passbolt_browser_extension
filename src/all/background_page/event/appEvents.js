@@ -279,7 +279,7 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.app.folders.open-move-confirmation-dialog', async function (requestId, moveDto) {
     try {
-      const clientOptions = User.getInstance().getApiClientOptions();
+      const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new FolderMoveController(worker, requestId, clientOptions);
       await controller.main(moveDto);
       worker.port.emit(requestId, 'SUCCESS');

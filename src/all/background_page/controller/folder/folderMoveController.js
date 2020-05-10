@@ -11,10 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const Resource = require('../../model/resource').Resource;
 const {FolderEntity} = require('../../model/entity/folder/folderEntity');
+const {FolderLocalStorage} = require('../../service/local_storage/folderLocalStorage');
 const {FolderModel} = require('../../model/folder/folderModel');
+
+const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
 const {ResourceModel} = require('../../model/resource/resourceModel');
+const {ResourceLocalStorage} = require('../../service/local_storage/resourceLocalStorage');
 
 class FolderMoveController {
   /**
@@ -27,7 +30,8 @@ class FolderMoveController {
   constructor(worker, requestId, clientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.folderModel = new FolderModel(clientOptions)
+    this.folderModel = new FolderModel(clientOptions);
+    this.resourceModel = new ResourceModel(clientOptions);
   }
 
   /**
@@ -36,13 +40,24 @@ class FolderMoveController {
    * {
    *   resources: {array} The resources ids to move
    *   folders: {array} The folders ids to move
-   *   folderParentId: {string} The destination folder
+   *   folderParentId: {(string|null)} The destination folder
    * }
    */
   async main(moveDto) {
     const folderParentId = moveDto.folderParentId ? moveDto.folderParentId : null;
     const foldersIds = moveDto.folders ? moveDto.folders : [];
     const resourcesIds = moveDto.resources ? moveDto.resources : null;
+
+    // Sanity checks
+    if (!(folderParentId === null || Validator.isUUID(folderParentId))) {
+      throw new TypeError('Folder move expect a valid folder parent id.');
+    }
+    if (folderParentId !== null) {
+      const folderDto = await FolderLocalStorage.getFolderById(folderParentId);
+      if (!folderDto) {
+        throw new Error('Could not move, the folder parent id does not exist');
+      }
+    }
 
     await this.moveFolders(foldersIds, folderParentId);
     await this.moveResources(resourcesIds, folderParentId);
@@ -51,30 +66,26 @@ class FolderMoveController {
   /**
    * Move folders.
    * @param {array} ids Folders to move
-   * @param {string} folderParentId The destination folder.
+   * @param {(string|null)} folderParentId The destination folder.
    * @returns {Promise<void>}
    */
   async moveFolders(ids, folderParentId) {
     for (let i in ids) {
-      const id = ids[i];
-      const folderDto = {id, 'folder_parent_id': folderParentId};
-      await this.folderModel.update(new FolderEntity(folderDto));
+      const folderId = ids[i];
+      await this.folderModel.move(folderId, folderParentId);
     }
   }
 
   /**
    * Move resources.
    * @param {array} ids Resources to move
-   * @param {string} folderParentId The destination folder.
+   * @param {(string|null)} folderParentId The destination folder.
    * @returns {Promise<void>}
    */
   async moveResources(ids, folderParentId) {
     for (let i in ids) {
-      const id = ids[i];
-      const resourceDto = {id, folderParentId};
-
-      // TODO use this.resourceModel.move
-      await Resource.update(resourceDto);
+      const resourceId = ids[i];
+      await this.resourceModel.move(resourceId, folderParentId);
     }
   }
 }

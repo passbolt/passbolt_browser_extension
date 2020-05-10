@@ -14,6 +14,9 @@
 const Lock = require('../../utils/lock').Lock;
 const lock = new Lock();
 
+const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
+const {ResourcesCollection} = require("../../model/entity/resource/resourcesCollection");
+
 const RESOURCES_LOCAL_STORAGE_KEY = 'resources';
 
 class ResourceLocalStorage {
@@ -41,33 +44,21 @@ class ResourceLocalStorage {
 
   /**
    * Set the resources in local storage.
-   * @param {Array<ResourceEntity>} resourceEntities The folders to insert in the local storage.
+   * @param {ResourcesCollection} resourcesCollection The folders to insert in the local storage.
    */
-  static async set(resourceEntities) {
+  static async set(resourcesCollection) {
     await lock.acquire();
     const resources = [];
-    if (resourceEntities) {
-      if (!Array.isArray(resourceEntities)) {
-        throw new TypeError('FolderLocalStorage::set expects an array of FolderEntity');
+    if (resourcesCollection) {
+      if (!(resourcesCollection instanceof ResourcesCollection)) {
+        throw new TypeError('ResourceLocalStorage::set expects a ResourcesCollection');
       }
-      resourceEntities.forEach((resourceEntity) => {
+      for (let resourceEntity of resourcesCollection) {
         ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
         resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
-      });
+      }
     }
     const result = await browser.storage.local.set({resources});
-    lock.release();
-    return result;
-  };
-
-  /**
-   * Set the resources local storage.
-   * @param {array} resources The resources to insert in the local storage.
-   * @deprecated
-   */
-  static async setLegacy(resources) {
-    await lock.acquire();
-    const result = await browser.storage.local.set({ resources });
     lock.release();
     return result;
   };
@@ -90,6 +81,7 @@ class ResourceLocalStorage {
   static async addResource(resourceEntity) {
     await lock.acquire();
     try {
+      ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
       const resources = await ResourceLocalStorage.get();
       resources.push(resourceEntity);
       await browser.storage.local.set({ resources });
@@ -102,14 +94,19 @@ class ResourceLocalStorage {
 
   /**
    * Update a resource in the local storage.
-   * @param {object} resource The resource to update
+   * @param {ResourceEntity} resourceEntity The resource to update
+   * @throws {Error} if the resource does not exist in the local storage
    */
-  static async updateResource(resource) {
+  static async updateResource(resourceEntity) {
     await lock.acquire();
     try {
+      ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
       const resources = await ResourceLocalStorage.get();
-      const resourceIndex = resources.findIndex(item => item.id === resource.id);
-      resources[resourceIndex] = resource;
+      const resourceIndex = resources.findIndex(item => item.id === resourceEntity.id);
+      if (resourceIndex === -1) {
+        throw new Error('The folder could not be found in the local storage');
+      }
+      resources[resourceIndex] = resourceEntity;
       await browser.storage.local.set({ resources });
       lock.release();
     } catch(error) {
@@ -142,6 +139,9 @@ class ResourceLocalStorage {
     }
   };
 
+  // =================================================
+  // Static methods
+  // =================================================
   /**
    * ResourceLocalStorage.DEFAULT_CONTAIN
    * @returns {{permission: boolean, favorite: boolean, tags: boolean}}
@@ -171,6 +171,41 @@ class ResourceLocalStorage {
       throw new TypeError('ResourceLocalStorage::set expects ResourceEntity permission to be set');
     }
   }
+
+  // =================================================
+  // Deprecated methods
+  // Using DTOs instead of entities
+  // =================================================
+  /**
+   * Set the resources local storage.
+   * @param {array} resources The resources to insert in the local storage.
+   * @deprecated
+   */
+  static async setLegacy(resources) {
+    await lock.acquire();
+    const result = await browser.storage.local.set({ resources });
+    lock.release();
+    return result;
+  };
+
+  /**
+   * Update a resource in the local storage.
+   * @param {object} resource The resource to update
+   * @deprecated
+   */
+  static async updateResourceLegacy(resource) {
+    await lock.acquire();
+    try {
+      const resources = await ResourceLocalStorage.get();
+      const resourceIndex = resources.findIndex(item => item.id === resource.id);
+      resources[resourceIndex] = resource;
+      await browser.storage.local.set({ resources });
+      lock.release();
+    } catch(error) {
+      lock.release();
+      throw error;
+    }
+  };
 }
 
 // Flush the local storage when this library is loaded

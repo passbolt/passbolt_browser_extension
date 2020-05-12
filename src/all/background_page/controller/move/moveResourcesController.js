@@ -122,7 +122,7 @@ class MoveResourcesController {
       // But to change the rights one need to be owner
       if (resource.permission.isOwner()) {
         let parent = !resource.folderParentId ? null : this.resourcesParentFolders.getById(resource.folderParentId);
-        let changes = await this.resourceModel.calculatePermissionsForMove(resource, parent, this.destinationFolder);
+        let changes = await this.resourceModel.calculatePermissionsChangesForMove(resource, parent, this.destinationFolder);
         this.changes.merge(changes);
       }
     }

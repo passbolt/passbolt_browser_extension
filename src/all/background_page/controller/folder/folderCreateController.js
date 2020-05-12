@@ -53,7 +53,7 @@ class FolderCreateController {
         let targetFolder = await this.folderModel.findForShare(folderEntity.folderParentId);
 
         await progressController.update(this.worker, progress++, 'Saving permissions...');
-        let changes = await this.folderModel.getTargetPermissionsAsChanges(folderEntity, targetFolder);
+        let changes = await this.folderModel.calculatePermissionsChangesForCreate(folderEntity, targetFolder);
         if (changes) {
           await this.folderModel.share(folderEntity, changes);
         }

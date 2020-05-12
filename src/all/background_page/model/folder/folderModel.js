@@ -173,25 +173,24 @@ class FolderModel {
     return updatedFolderEntity;
   }
 
-  /***
-   * Returns
+  /**
+   * Calculate permission changes for a create
+   * From current permissions add the destination permissions
+   *
+   * NOTE: This function requires destFolder permissions to be set
    *
    * @param {FolderEntity} folderEntity
-   * @param {FolderEntity} targetFolder
-   * @param {boolean} [keepOwnership] optional, default true
+   * @param {(FolderEntity|null)} destFolder destination
    * @returns {Promise<PermissionChangesCollection>}
    */
-  async getTargetPermissionsAsChanges(folderEntity, targetFolder, keepOwnership) {
+  async calculatePermissionsChangesForCreate(folderEntity, destFolder) {
     let changes = null;
     if (folderEntity.folderParentId) {
-      const currentPermissions = new PermissionsCollection([folderEntity.permission]);
-      const targetPermissions = targetFolder.permissions.cloneForAco(PermissionEntity.ACO_FOLDER, folderEntity.id);
-
-      // Keep ownership / don't transfer folder
-      if (typeof keepOwnership === 'undefined' || keepOwnership) {
-        targetPermissions.addOrReplace(folderEntity.permission);
+      if (!destFolder.permissions) {
+        throw new TypeError('Resource model calculatePermissionsChangesForMove requires destination permissions to be set.');
       }
-
+      const currentPermissions = new PermissionsCollection([folderEntity.permission]);
+      const targetPermissions = destFolder.permissions.cloneForAco(PermissionEntity.ACO_FOLDER, folderEntity.id);
       changes = PermissionChangesCollection.calculateChanges(currentPermissions, targetPermissions);
     }
     return changes;

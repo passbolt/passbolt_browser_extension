@@ -115,13 +115,13 @@ class ResourceModel {
    * @param {(FolderEntity|null)} destFolder
    * @returns {Promise<PermissionChangesCollection>}
    */
-  async calculatePermissionsForMove(resource, parentFolder, destFolder) {
+  async calculatePermissionsChangesForMove(resource, parentFolder, destFolder) {
     let remainingPermissions = new PermissionsCollection([], false);
 
     // Remove permissions from parent if any
     if (resource.folderParentId !== null) {
       if (!resource.permissions || !parentFolder.permissions) {
-        throw new TypeError('Resource model calculatePermissionsForMove requires permissions to be set.');
+        throw new TypeError('Resource model calculatePermissionsChangesForMove requires permissions to be set.');
       }
       remainingPermissions = PermissionsCollection.diff(resource.permissions, parentFolder.permissions, false);
     }
@@ -129,7 +129,7 @@ class ResourceModel {
     let permissionsFromParent = new PermissionsCollection([], false);
     if (destFolder) {
       if (!destFolder.permissions) {
-        throw new TypeError('Resource model calculatePermissionsForMove requires destination permissions to be set.');
+        throw new TypeError('Resource model calculatePermissionsChangesForMove requires destination permissions to be set.');
       }
       permissionsFromParent = destFolder.permissions.cloneForAco(
         PermissionEntity.ACO_RESOURCE, resource.id, false
@@ -153,27 +153,26 @@ class ResourceModel {
   }
 
   /**
-   * Calculate permission changes for a move
+   * Calculate permission changes for a create
    * From current permissions add the destination permissions
-   * From this new set of permission and the original permission calculate the needed changed
    *
-   * NOTE: This function requires permissions to be set for all objects
+   * NOTE: This function requires destFolder permissions to be set
    *
    * @param {ResourceEntity} resource
-   * @param {(FolderEntity|null)} destFolder
+   * @param {(FolderEntity|null)} destFolder destination
    * @returns {Promise<PermissionChangesCollection>}
    */
-  async calculatePermissionsForCreate(resource, destFolder) {
-    let permissionsFromDest = new PermissionsCollection([], false);
+  async calculatePermissionsChangesForCreate(resource, destFolder) {
+    let changes = null
     if (destFolder) {
       if (!destFolder.permissions) {
-        throw new TypeError('Resource model calculatePermissionsForMove requires destination permissions to be set.');
+        throw new TypeError('Resource model calculatePermissionsChangesForMove requires destination permissions to be set.');
       }
-      permissionsFromDest = destFolder.permissions.cloneForAco(
-        PermissionEntity.ACO_RESOURCE, resource.id, false
-      );
+      const currentPermissions = new PermissionsCollection([resource.permission]);
+      const permissionsFromDest = destFolder.permissions.cloneForAco(PermissionEntity.ACO_RESOURCE, resource.id);
+      changes = PermissionChangesCollection.calculateChanges(currentPermissions, permissionsFromDest)
     }
-    return PermissionChangesCollection.calculateChanges(resource.permissions, permissionsFromDest);
+    return changes;
   }
 
   //==============================================================

@@ -81,9 +81,8 @@ class ResourceCreateController {
       if (resource.folderParentId) {
         await progressController.update(this.worker, progress++, "Calculate permissions");
         // Calculate changes if any
-        resource = await this.resourceModel.findForShare(resource.id);
         let destinationFolder = await this.folderModel.findForShare(resource.folderParentId);
-        let changes = await this.resourceModel.calculatePermissionsForCreate(resource, destinationFolder);
+        let changes = await this.resourceModel.calculatePermissionsChangesForCreate(resource, destinationFolder);
 
         // Apply changes
         if (changes) {

@@ -120,7 +120,7 @@ class PermissionsCollection extends EntityCollection {
    * @param {PermissionEntity} permission
    * @returns {PermissionEntity} if a match is found in collection
    */
-  findByAro(permission) {
+  getByAro(permission) {
     const result = this._items.filter(existingPermission => PermissionEntity.isAroMatching(existingPermission, permission));
     if (result.length) {
       return result[0];
@@ -255,30 +255,19 @@ class PermissionsCollection extends EntityCollection {
     throw new EntityCollectionError(0, PermissionsCollection.RULE_ONE_OWNER, msg);
   }
 
-  /**
-   * Assert a given parameter is an instance of a PermissionCollection
-   *
-   * @param {PermissionsCollection} collection
-   * @throw {TypeError} if parameter is not an instance of PermissionCollection
-   */
-  static assertIsPermissionsCollection(collection) {
-    if (!(collection instanceof PermissionsCollection)) {
-      throw new TypeError('Failed to assert the parameter is a valid collection of permissions');
-    }
-  }
-
   // ==================================================
   // Permissions "arithmetics"
   // ==================================================
   /**
-   * Create a new set based on set1 ∪ set2
+   * Create a new set based on set1 + set2
+   * Keep the highest permission if there is an overlap
    *
    * @param {PermissionsCollection} set1
    * @param {PermissionsCollection} set2
    * @param {boolean} [ownerValidation] optional default true
    * @return {PermissionsCollection} set3
    */
-  static unionByAcoAndType(set1, set2, ownerValidation) {
+  static sum(set1, set2, ownerValidation) {
     const set3 = new PermissionsCollection(set1.toDto(), false);
     for (let set2Permission of set2) {
       set3.addOrReplace(set2Permission);
@@ -287,6 +276,65 @@ class PermissionsCollection extends EntityCollection {
       set3.assertAtLeastOneOwner();
     }
     return set3;
+  }
+
+  /**
+   * Create a new set based on set1 - set2
+   * Match is based on ARO and TYPE
+   *
+   * @param {PermissionsCollection} set1
+   * @param {PermissionsCollection} set2
+   * @param {boolean} [ownerValidation] optional default true
+   * @return {PermissionsCollection} set3
+   */
+  static diff(set1, set2, ownerValidation) {
+    const set3 = new PermissionsCollection([], false);
+    for (let permission of set1) {
+      if (!set2.containPermission(permission.aro, permission.aroForeignKey, permission.type)) {
+        set3.push(permission);
+      }
+    }
+    if (typeof ownerValidation === 'undefined' || ownerValidation) {
+      set3.assertAtLeastOneOwner();
+    }
+    return set3;
+  }
+
+  /**
+   * Return true if a set contain a permission for the given aro, aroForeign key and type
+   *
+   * @param {string} aro group or user
+   * @param {string} aroForeignKey uuid
+   * @param {number} type see permission entity types
+   * @returns {boolean}
+   */
+  containPermission( aro, aroForeignKey, type) {
+    for (let permission of this.items) {
+      if (permission.aro === aro && permission.aroForeignKey === aroForeignKey && permission.type === type) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Clone permission set for another ACO
+   *
+   * @param {string} aco resource or folder
+   * @param {string} acoId
+   * @param {boolean} [ownerValidation] optional, default true
+   * @return {PermissionsCollection}
+   */
+  cloneForAco(aco, acoId, ownerValidation) {
+    const permissions = new PermissionsCollection([], false);
+    for (let parentPermission of this.permissions) {
+      let clone = parentPermission.copyForAnotherAco(aco, acoId);
+      permissions.addOrReplace(clone);
+    }
+    if (typeof ownerValidation === 'undefined' || ownerValidation) {
+      this.assertAtLeastOneOwner();
+    }
+    return permissions;
   }
 
   // ==================================================

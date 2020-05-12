@@ -45,17 +45,19 @@ Share.searchResourceAros = function(resourceId, keywords) {
  * @param {string} privateKeySecret The user private key secret
  * @param {function} progressCallback Notify the user with this callback
  */
-Share.bulkShareResources = async function(resources, changes, privateKeySecret, progressCallback) {
+Share.shareResources = async function(resources, changes, privateKeySecret, progressCallback) {
   const resourcesChanges = bulkShareAggregateChanges(resources, changes);
   const resourcesNewUsers = await bulkShareSimulate(resources, resourcesChanges, progressCallback);
   const resourcesSecrets = await bulkShareEncrypt(resources, resourcesNewUsers, privateKeySecret, progressCallback);
 
   for (const resourceId in resourcesChanges) {
-    const resource = resources.find(resource => resource.id === resourceId);
-    const permissions = resourcesChanges[resourceId];
-    let secrets = resourcesSecrets[resourceId] || [];
-    progressCallback(`Sharing password ${resource.name}`);
-    await ShareService.shareResource(resourceId, {permissions, secrets});
+    if (resourcesChanges.hasOwnProperty(resourceId)) {
+      const resource = resources.find(resource => resource.id === resourceId);
+      const permissions = resourcesChanges[resourceId];
+      let secrets = resourcesSecrets[resourceId] || [];
+      progressCallback(`Sharing password ${resource.name}`);
+      await ShareService.shareResource(resourceId, {permissions, secrets});
+    }
   }
 };
 

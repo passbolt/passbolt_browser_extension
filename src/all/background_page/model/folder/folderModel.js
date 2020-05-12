@@ -45,6 +45,9 @@ class FolderModel {
     return foldersCollection;
   }
 
+  // ============================================
+  // Finders
+  // ============================================
   /**
    * Get all folders from API and map API result to folder Entity
    *
@@ -57,7 +60,7 @@ class FolderModel {
   }
 
   /**
-   * Get all folders from API and map API result to folder Entity
+   * Get all folders from API and map API result to folder collection
    *
    * @return {FoldersCollection}
    */
@@ -67,25 +70,94 @@ class FolderModel {
   }
 
   /**
-   * Clone a parent permission for a given ACO
+   * Get folder from API and map API result to folder Entity
    *
-   * @param {string} aco PermissionEntity.ACO_FOLDER or PermissionEntity.ACO_RESOURCE
-   * @param {string} acoId uuid of the resource or folder
-   * @param {string} folderParentId uuid
+   * @return {FolderEntity}
+   */
+  async findForShare(folderId) {
+    const foldersDtos = await this.folderService.findAllForShare([folderId]);
+    if (!foldersDtos.length) {
+      throw new Error(`Folder ${folderId} not found`);
+    }
+    return new FolderEntity(foldersDtos[0]);
+  }
+
+  /**
+   * Get folder permission
+   *
+   * @param {string} folderId folderId
    * @returns {Promise<PermissionsCollection>}
    */
-  async cloneParentPermissions(aco, acoId, folderParentId) {
-    // get parent from api
-    const parentDto = await this.folderService.get(folderParentId, {permissions: true});
-    const parentFolder = new FolderEntity(parentDto);
+  async findFolderPermissions(folderId) {
+    const folderDto = await this.folderService.get(folderId, {permissions: true});
+    const folderEntity = new FolderEntity(folderDto);
+    return folderEntity.permissions;
+  }
 
-    // clone parent permission for this new folder
-    const permissions = new PermissionsCollection([], false);
-    for (let parentPermission of parentFolder.permissions) {
-      let clone = parentPermission.copyForAnotherAco(aco, acoId);
-      permissions.addOrReplace(clone);
+  // ============================================
+  // Local storage getters
+  // ============================================
+  /**
+   * Get a folder collection from the local storage by ids
+   * Also include their children
+   *
+   * @param {array} folderIds The folder ids
+   * @param {boolean} [withChildren] optional default false
+   * @return {FoldersCollection}
+   */
+  async getAllByIds(folderIds, withChildren) {
+    const foldersDto = await FolderLocalStorage.get();
+    const inputCollection = new FoldersCollection(foldersDto);
+    let outputCollection = new FoldersCollection([]);
+    inputCollection.items.forEach((folderDto) => {
+      if (folderIds.includes(folderDto.id)) {
+        outputCollection.push(folderDto);
+      }
+    });
+    if (withChildren) {
+      folderIds.forEach(parentId => {
+        outputCollection = FoldersCollection.getAllChildren(parentId, inputCollection, outputCollection);
+      });
     }
-    return permissions;
+    return outputCollection;
+  };
+
+  // ============================================
+  // Assertions
+  // ============================================
+  /**
+   * Assert for a given folder id that the folder is in the local storage
+   *
+   * @param {(string|null)} folderId folderId
+   * @throws {Error} if the folder does not exist
+   */
+  async assertFolderExists(folderId) {
+    if (folderId === null) {
+      return;
+    }
+    if (!Validator.isUUID(folderId)) {
+      throw new TypeError(`Folder exists check expect a uuid.`);
+    }
+    const folderDto = await FolderLocalStorage.getFolderById(folderId);
+    if (!folderDto) {
+      // TODO check remotely?
+      throw new Error(`Folder with id ${folderId} does not exist.`);
+    }
+  }
+
+  /**
+   * Assert that all the folders are in the local storage
+   *
+   * @param {Array} folderIds array of uuid
+   * @throws {Error} if a folder does not exist
+   */
+  async assertFoldersExist(folderIds) {
+    if (!Array.isArray(folderIds)) {
+      throw new TypeError(`Folders exist check expect an array of uuid.`);
+    }
+    for (let i in folderIds) {
+      await this.assertFolderExists(folderIds[i]);
+    }
   }
 
   /**
@@ -102,26 +174,27 @@ class FolderModel {
   }
 
   /***
-   * Update folder permission by matching the parent permissions
+   * Returns
    *
    * @param {FolderEntity} folderEntity
+   * @param {FolderEntity} targetFolder
    * @param {boolean} [keepOwnership] optional, default true
-   * @returns {Promise<FolderEntity>}
+   * @returns {Promise<PermissionChangesCollection>}
    */
-  async applyPermissionFromParent(folderEntity, keepOwnership) {
+  async getTargetPermissionsAsChanges(folderEntity, targetFolder, keepOwnership) {
+    let changes = null;
     if (folderEntity.folderParentId) {
       const currentPermissions = new PermissionsCollection([folderEntity.permission]);
-      const targetPermissions = await this.cloneParentPermissions(PermissionEntity.ACO_FOLDER, folderEntity.id, folderEntity.folderParentId);
+      const targetPermissions = targetFolder.permissions.cloneForAco(PermissionEntity.ACO_FOLDER, folderEntity.id);
 
       // Keep ownership / don't transfer folder
       if (typeof keepOwnership === 'undefined' || keepOwnership) {
         targetPermissions.addOrReplace(folderEntity.permission);
       }
 
-      const changes = PermissionChangesCollection.buildChangesFromPermissions(currentPermissions, targetPermissions);
-      folderEntity = await this.share(folderEntity, changes);
+      changes = PermissionChangesCollection.calculateChanges(currentPermissions, targetPermissions);
     }
-    return folderEntity;
+    return changes;
   }
 
   /**
@@ -132,12 +205,6 @@ class FolderModel {
    * @returns {FolderEntity}
    */
   async move(folderId, folderParentId) {
-    if (!folderId || !Validator.isUUID(folderId)) {
-      throw new TypeError('Folder move expect a valid folder id.');
-    }
-    if (!(folderParentId === null || Validator.isUUID(folderParentId))) {
-      throw new TypeError('Folder move expect a valid folder parent id.');
-    }
     const folderDto = await FolderLocalStorage.getFolderById(folderId);
     const folderEntity = new FolderEntity(folderDto);
     folderEntity.folderParentId = folderParentId;

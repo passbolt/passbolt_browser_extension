@@ -46,7 +46,6 @@ describe("Permission Collection", () => {
       type: PermissionEntity.PERMISSION_OWNER
     }));
     c.assertAtLeastOneOwner();
-    PermissionsCollection.assertIsPermissionsCollection(c);
     expect(c.permissions.length).toBe(2);
   });
 
@@ -209,7 +208,7 @@ describe("Permission Collection", () => {
   // Union
   //============================================================
 
-  it("unionByAcoAndType returns set1 ∪ set2 - no overlap", () => {
+  it("union returns set1 + set2 - no overlap", () => {
     const dto1 = {
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
@@ -227,14 +226,14 @@ describe("Permission Collection", () => {
     const set1 = new PermissionsCollection([dto1], false);
     const set2 = new PermissionsCollection([dto2], false);
 
-    const set3 = PermissionsCollection.unionByAcoAndType(set1, set2);
+    const set3 = PermissionsCollection.sum(set1, set2);
     expect(set3.toDto()).toEqual([dto1, dto2]);
 
-    const set4 = PermissionsCollection.unionByAcoAndType(set2, set1);
+    const set4 = PermissionsCollection.sum(set2, set1);
     expect(set4.toDto()).toEqual([dto2, dto1]);
   });
 
-  it("unionByAcoAndType returns set1 ∪ set2 - full overlap", () => {
+  it("union returns set1 + set2 - full overlap", () => {
     const dto1 = {
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
@@ -259,13 +258,13 @@ describe("Permission Collection", () => {
     const set1 = new PermissionsCollection([dto3, dto1, dto2], false);
     const set2 = new PermissionsCollection([dto1, dto3, dto2], false);
 
-    const set3 = PermissionsCollection.unionByAcoAndType(set1, set2);
-    const set4 = PermissionsCollection.unionByAcoAndType(set2, set1);
+    const set3 = PermissionsCollection.sum(set1, set2);
+    const set4 = PermissionsCollection.sum(set2, set1);
     expect(set3.toDto()).toEqual([dto3, dto1, dto2]);
     expect(set4.toDto()).toEqual([dto1, dto3, dto2]);
   });
 
-  it("unionByAcoAndType returns set1 ∪ set2 - overlap highest right wins", () => {
+  it("union returns set1 + set2 - overlap highest right wins", () => {
     const set1 = new PermissionsCollection([{
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
@@ -281,8 +280,8 @@ describe("Permission Collection", () => {
       type: PermissionEntity.PERMISSION_READ
     }], false);
 
-    const set3 = PermissionsCollection.unionByAcoAndType(set1, set2);
-    const set4 = PermissionsCollection.unionByAcoAndType(set2, set1);
+    const set3 = PermissionsCollection.sum(set1, set2);
+    const set4 = PermissionsCollection.sum(set2, set1);
     const result = [{
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
@@ -294,7 +293,7 @@ describe("Permission Collection", () => {
     expect(set4.toDto()).toEqual(result);
   });
 
-  it("unionByAcoAndType returns set1 ∪ set2 - empty left or right", () => {
+  it("union returns set1 + set2 - empty left or right", () => {
     const dto1 = {
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
@@ -312,14 +311,14 @@ describe("Permission Collection", () => {
     const set1 = new PermissionsCollection([dto1, dto2], false);
     const set2 = new PermissionsCollection([], false);
 
-    const set3 = PermissionsCollection.unionByAcoAndType(set1, set2);
+    const set3 = PermissionsCollection.sum(set1, set2);
     expect(set3.toDto()).toEqual([dto1, dto2]);
 
-    const set4 = PermissionsCollection.unionByAcoAndType(set2, set1);
+    const set4 = PermissionsCollection.sum(set2, set1);
     expect(set4.toDto()).toEqual([dto1, dto2]);
   });
 
-  it("unionByAcoAndType returns set1 ∪ set2 - now owner set throw error", () => {
+  it("union returns set1 + set2 - now owner set throw error", () => {
     const dto1 = {
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
@@ -338,7 +337,7 @@ describe("Permission Collection", () => {
     const set2 = new PermissionsCollection([dto2], false);
 
     try {
-      PermissionsCollection.unionByAcoAndType(set1, set2);
+      PermissionsCollection.sum(set1, set2);
       expect(false).toBe(true);
     } catch (error) {
       expect(error instanceof EntityCollectionError).toBe(true);
@@ -347,7 +346,7 @@ describe("Permission Collection", () => {
   });
 
 
-  it("unionByAcoAndType returns set1 ∪ set2 - not same aco throw error", () => {
+  it("union returns set1 + set2 - not same aco throw error", () => {
     const dto1 = {
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
@@ -366,7 +365,7 @@ describe("Permission Collection", () => {
     const set2 = new PermissionsCollection([dto2], false);
 
     try {
-      PermissionsCollection.unionByAcoAndType(set1, set2);
+      PermissionsCollection.sum(set1, set2);
       expect(false).toBe(true);
     } catch (error) {
       expect(error instanceof EntityCollectionError).toBe(true);
@@ -450,5 +449,87 @@ describe("Permission Collection", () => {
     expect(permissions[0].user.profile.first_name).toBe('Ada');
     expect(permissions[0].user.profile.avatar.id).toBe('5426cb53-d909-40eb-9202-38f2c1f94084');
     expect(permissions[1].group.name).toBe('Leadership team');
+  });
+
+
+  it("diff set1 - set2", () => {
+    const dto1 = {
+      aco: PermissionEntity.ACO_FOLDER,
+      aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
+      aro: PermissionEntity.ARO_USER,
+      aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d990",
+      type: PermissionEntity.PERMISSION_OWNER
+    };
+    const dto2 = {
+      aco: PermissionEntity.ACO_FOLDER,
+      aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
+      aro: PermissionEntity.ARO_USER,
+      aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d991",
+      type: PermissionEntity.PERMISSION_OWNER
+    };
+    const dto3 = {
+      aco: PermissionEntity.ACO_FOLDER,
+      aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
+      aro: PermissionEntity.ARO_USER,
+      aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d992",
+      type: PermissionEntity.PERMISSION_UPDATE
+    }
+    let set1;
+    let set2;
+    let set3;
+
+    // nothing to remove
+    set1 = new PermissionsCollection([dto3], false);
+    set2 = new PermissionsCollection([dto1, dto2], false);
+    set3 = PermissionsCollection.diff(set1, set2, false);
+    expect(set3.toDto()).toEqual([dto3]);
+
+    // nothing to remove 2
+    set1 = new PermissionsCollection([dto1, dto2], false);
+    set2 = new PermissionsCollection([dto3], false);
+    set3 = PermissionsCollection.diff(set1, set2, false);
+    expect(set3.toDto()).toEqual([dto1, dto2]);
+
+    // nothing to change
+    set1 = new PermissionsCollection([dto1, dto2], false);
+    set2 = new PermissionsCollection([dto1, dto2], false);
+    set3 = PermissionsCollection.diff(set1, set2, false);
+    expect(set3.toDto()).toEqual([]);
+
+    // nothing left
+    set1 = new PermissionsCollection([], false);
+    set2 = new PermissionsCollection([dto1, dto2], false);
+    set3 = PermissionsCollection.diff(set1, set2, false);
+    expect(set3.toDto()).toEqual([]);
+
+    // nothing right
+    set1 = new PermissionsCollection([dto1, dto2], false);
+    set2 = new PermissionsCollection([], false);
+    set3 = PermissionsCollection.diff(set1, set2, false);
+    expect(set3.toDto()).toEqual([dto1, dto2]);
+
+    // nothing at all
+    set1 = new PermissionsCollection([], false);
+    set2 = new PermissionsCollection([], false);
+    set3 = PermissionsCollection.diff(set1, set2, false);
+    expect(set3.toDto()).toEqual([]);
+
+    // nothing left 2
+    set1 = new PermissionsCollection([dto1, dto2], false);
+    set2 = new PermissionsCollection([dto1, dto2, dto3], false);
+    set3 = PermissionsCollection.diff(set1, set2, false);
+    expect(set3.toDto()).toEqual([]);
+
+    // something left
+    set1 = new PermissionsCollection([dto1, dto2], false);
+    set2 = new PermissionsCollection([dto1, dto3], false);
+    set3 = PermissionsCollection.diff(set1, set2, false);
+    expect(set3.toDto()).toEqual([dto2]);
+
+    // something left 2
+    set1 = new PermissionsCollection([dto1, dto2, dto3], false);
+    set2 = new PermissionsCollection([dto3], false);
+    set3 = PermissionsCollection.diff(set1, set2, false);
+    expect(set3.toDto()).toEqual([dto1, dto2]);
   });
 });

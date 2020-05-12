@@ -135,9 +135,89 @@ describe("Folders collection entity", () => {
     ];
     let folderCollection = new FoldersCollection(dto);
     let folders = JSON.parse(JSON.stringify(folderCollection));
-    console.error(folders);
     expect(folders[0].permissions[0].user.profile.first_name).toBe('Ada');
     expect(folders[0].permissions[0].user.profile.avatar.id).toBe('5426cb53-d909-40eb-9202-38f2c1f94084');
     expect(folders[0].permissions[1].group.name).toBe('Leadership team');
-  })
+  });
+
+  it("getAllChildren works", () => {
+    /*
+         folder
+          - folder
+         folder0
+          - folder1
+          - folder2
+             - folder3
+               - folder4
+     */
+    const dto = [{
+      "id": "e2172205-139c-4e4b-a03a-933528123fff",
+      "folder_parent_id": null,
+      "name": "folder"
+    }, {
+      "id": "e2172205-139c-4e4b-a03a-933528123ff1",
+      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff",
+      "name": "folder"
+    }, {
+      "id": "e2172205-139c-4e4b-a03a-933528123f00",
+      "folder_parent_id": null,
+      "name": "folder0"
+    }, {
+      "id": "e2172205-139c-4e4b-a03a-933528123f01",
+      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123f00",
+      "name": "folder1"
+    }, {
+      "id": "e2172205-139c-4e4b-a03a-933528123f02",
+      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123f00",
+      "name": "folder2"
+    }, {
+      "id": "e2172205-139c-4e4b-a03a-933528123f03",
+      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123f02",
+      "name": "folder3"
+    }, {
+      "id": "e2172205-139c-4e4b-a03a-933528123f04",
+      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123f03",
+      "name": "folder4"
+    }];
+    const collection = new FoldersCollection(dto);
+
+    // check picking up last node works
+    let result = collection.getAllChildren("e2172205-139c-4e4b-a03a-933528123f03");
+    expect(result.length).toBe(1);
+    expect(result.items.map(r => r.id)).toEqual([
+      'e2172205-139c-4e4b-a03a-933528123f04'
+    ]);
+
+    // check picking up a branch works
+    result = collection.getAllChildren("e2172205-139c-4e4b-a03a-933528123f00");
+    expect(result.length).toBe(4);
+    expect(result.items.map(r => r.id)).toEqual([
+      'e2172205-139c-4e4b-a03a-933528123f01',
+      'e2172205-139c-4e4b-a03a-933528123f02',
+      'e2172205-139c-4e4b-a03a-933528123f03',
+      'e2172205-139c-4e4b-a03a-933528123f04'
+    ]);
+
+    // check pick everything
+    result = collection.getAllChildren(null);
+    expect(result.length).toBe(7);
+
+    // check pick empty collection
+    result = collection.getAllChildren("e2172205-139c-4e4b-a03a-933528123f99");
+    expect(result.length).toBe(0);
+
+    // Test multi id select via static method call
+    let outputCollection = new FoldersCollection([]);
+    let parentIds = ['e2172205-139c-4e4b-a03a-933528123f03','e2172205-139c-4e4b-a03a-933528123f00'];
+    parentIds.forEach(parentId => {
+      outputCollection = FoldersCollection.getAllChildren(parentId, collection, outputCollection);
+    });
+    expect(outputCollection.length).toBe(4);
+    expect(outputCollection.items.map(r => r.id)).toEqual([
+      'e2172205-139c-4e4b-a03a-933528123f04',
+      'e2172205-139c-4e4b-a03a-933528123f01',
+      'e2172205-139c-4e4b-a03a-933528123f02',
+      'e2172205-139c-4e4b-a03a-933528123f03'
+    ]);
+  });
 });

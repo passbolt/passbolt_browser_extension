@@ -45,17 +45,16 @@ class ResourceCreateController {
   /**
    * Create a resource.
    *
-   * @param {ResourceEntity} resourceEntity The resource data
+   * @param {ResourceEntity} resource The resource data
    * @param {string} password The password to encrypt
    */
-  async main(resourceEntity, password) {
+  async main(resource, password) {
     const crypto = new Crypto();
     const keyring = new Keyring();
     let passphrase;
     let privateKey;
-    let targetPermissions;
 
-    let goals = resourceEntity.folderParentId ? 10 : 2; // arbitrarily "more" if parent permission folder
+    let goals = resource.folderParentId ? 10 : 2; // arbitrarily "more" if parent permission folder
     let progress = 0;
 
     // Get the passphrase if needed and decrypt secret key
@@ -73,35 +72,35 @@ class ResourceCreateController {
 
       // Encrypt and sign
       const secret = await crypto.encrypt(password, User.getInstance().get().id, privateKey);
-      const secrets = new SecretsCollection([{data:secret}]);
-      resourceEntity.secrets = secrets;
+      resource.secrets = new SecretsCollection([{data:secret}]);
 
       // Save
       await progressController.update(this.worker, progress++, "Creating password");
-      resourceEntity = await this.resourceModel.create(resourceEntity);
-      resourceEntity.secrets = secrets;
+      resource = await this.resourceModel.create(resource);
 
-      if (resourceEntity.folderParentId) {
-        // Get parent permissions
-        targetPermissions = await this.folderModel.cloneParentPermissions(PermissionEntity.ACO_RESOURCE, resourceEntity.id, resourceEntity.folderParentId);
-        goals = (targetPermissions.length * 3) +2; // closer to reality...
-        await progressController.updateGoals(this.worker, goals);
-
-        // Sync keyring
-        await progressController.update(this.worker, progress++, "Synchronizing keys");
-        await keyring.sync();
-
-        // Build permissions
+      if (resource.folderParentId) {
         await progressController.update(this.worker, progress++, "Calculate permissions");
-        const currentPermissions = new PermissionsCollection([resourceEntity.permission]);
-        const changes = PermissionChangesCollection.buildChangesFromPermissions(currentPermissions, targetPermissions);
+        // Calculate changes if any
+        resource = await this.resourceModel.findForShare(resource.id);
+        let destinationFolder = await this.folderModel.findForShare(resource.folderParentId);
+        let changes = await this.resourceModel.calculatePermissionsForCreate(resource, destinationFolder);
 
-        // Share
-        await progressController.update(this.worker, progress++, "Start sharing");
-        const resourcesToShare = [resourceEntity.toDto({secrets:true})];
-        await Share.bulkShareResources(resourcesToShare, changes.toDto(), passphrase, async message => {
-          await progressController.update(this.worker, progress++, message);
-        });
+        // Apply changes
+        if (changes) {
+          goals = (changes.length * 3) + 2 + progress; // closer to reality...
+          await progressController.updateGoals(this.worker, goals);
+
+          // Sync keyring
+          await progressController.update(this.worker, progress++, "Synchronizing keys");
+          await keyring.sync();
+
+          // Share
+          await progressController.update(this.worker, progress++, "Start sharing");
+          const resourcesToShare = [resource.toDto({secrets: true})];
+          await Share.shareResources(resourcesToShare, changes.toDto(), passphrase, async message => {
+            await progressController.update(this.worker, progress++, message);
+          });
+        }
       }
     } catch (error) {
       console.error(error);
@@ -112,7 +111,7 @@ class ResourceCreateController {
     await progressController.update(this.worker, goals, "Done!");
     await progressController.close(this.worker);
 
-    return resourceEntity;
+    return resource;
   }
 }
 

@@ -437,36 +437,35 @@ var UserSingleton = (function () {
   var instance;
 
   function createInstance() {
-    var object = new User();
-    return object;
+    return new User();
   }
+
   return {
     getInstance: function () {
       if (!instance) {
         instance = createInstance();
       }
       return instance;
+    },
+
+    init : function () {
+      // Observe when the user session is terminated.
+      // - Flush the temporary stored master password
+      window.addEventListener("passbolt.global.auth.logged-out", () => {
+        const user = UserSingleton.getInstance();
+        user.flushMasterPassword();
+      });
+
+      // Observe when the window is closed, only strategy found to catch when the browser is closed.
+      // - Flush the temporary stored master password
+      browser.tabs.onRemoved.addListener((tabId, evInfo) => {
+        if (evInfo.isWindowClosing) {
+          const user = UserSingleton.getInstance();
+          user.flushMasterPassword();
+        }
+      });
     }
   };
 })();
 
-// Observe when the user session is terminated.
-// - Flush the temporary stored master password
-window.addEventListener("passbolt.global.auth.logged-out", () => {
-  const user = UserSingleton.getInstance();
-  user.flushMasterPassword();
-});
-
-// Observe when the window is closed, only strategy found to catch when the browser is closed.
-// - Flush the temporary stored master password
-browser.tabs.onRemoved.addListener((tabId, evInfo) => {
-  if (evInfo.isWindowClosing) {
-    const user = UserSingleton.getInstance();
-    user.flushMasterPassword();
-  }
-});
-
-// Exports the User object.
 exports.User = UserSingleton;
-
-

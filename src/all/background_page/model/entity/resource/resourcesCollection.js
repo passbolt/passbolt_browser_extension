@@ -64,6 +64,30 @@ class ResourcesCollection extends EntityCollection {
     return this._items;
   }
 
+  /**
+   * Get all the folder parent ids for the resources in the collection
+   * Exclude 'null' aka when parent is the root
+   *
+   * @returns {Array<ResourceEntity>}
+   */
+  get folderParentIds() {
+    return this._items
+      .filter(r => (r.folderParentId !== null))
+      .map(r => r.folderParentId);
+  }
+
+  /**
+   * Get first resource in the collection matching requested id
+   * @returns {Array<ResourceEntity>}
+   */
+  getFirstById(resourceId) {
+    const result = this._items.filter(r => (r.id === resourceId));
+    if (result.length) {
+      return result[0];
+    }
+    return undefined;
+  }
+
   // ==================================================
   // Assertions
   // ==================================================
@@ -107,6 +131,25 @@ class ResourcesCollection extends EntityCollection {
     this.assertUniqueId(resourceEntity);
 
     super.push(resourceEntity);
+  }
+
+  /**
+   * Remove a resource identified by an Id
+   * @param resourceId
+   */
+  remove(resourceId) {
+    const i = this.items.findIndex(item => item.id === resourceId);
+    this.items.splice(i, 1);
+  }
+
+  /**
+   * Remove multiple resources identified by their Ids
+   * @param {Array} resourceIds
+   */
+  removeMany(resourceIds) {
+    for(let i in resourceIds) {
+      this.remove(resourceIds[i]);
+    }
   }
 
   // ==================================================

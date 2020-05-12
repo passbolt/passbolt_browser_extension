@@ -86,13 +86,13 @@ describe("EntityCollection", () => {
     expect(collection.items[4]).toEqual(undefined);
 
     // find all
-    expect(collection.findAll('name', 'first').length).toBe(2);
-    expect(collection.findAll('name', 'second').length).toBe(1);
-    expect(collection.findAll('name', 'third').length).toBe(0);
+    expect(collection.getAll('name', 'first').length).toBe(2);
+    expect(collection.getAll('name', 'second').length).toBe(1);
+    expect(collection.getAll('name', 'third').length).toBe(0);
 
     // find first
-    expect(collection.findFirst('name', 'first').toDto()).toEqual({name: 'first'});
-    expect(collection.findFirst('name', 'third')).toBe(undefined);
+    expect(collection.getFirst('name', 'first').toDto()).toEqual({name: 'first'});
+    expect(collection.getFirst('name', 'third')).toBe(undefined);
   });
 
   it("constructor and getters works with empty collection", () => {

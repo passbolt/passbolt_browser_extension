@@ -81,6 +81,16 @@ class PermissionChangesCollection extends EntityCollection {
   }
 
   /**
+   * Merge another set of permission changes in this one
+   * @param {PermissionChangesCollection} permissionChangesCollection
+   */
+  merge(permissionChangesCollection) {
+    for (let changes of permissionChangesCollection) {
+      this.push(changes);
+    }
+  }
+
+  /**
    * Filter By Aco Foreign Key
    *
    * @param {string} acoForeignKey
@@ -97,12 +107,12 @@ class PermissionChangesCollection extends EntityCollection {
    * @param {PermissionsCollection} originalSet
    * @param {PermissionsCollection} expectedSet
    */
-  static buildChangesFromPermissions(originalSet, expectedSet) {
+  static calculateChanges(originalSet, expectedSet) {
     const result = new PermissionChangesCollection([]);
 
     // Find new or updated permissions
     for(let expectedPermission of expectedSet) {
-      const foundPermission = originalSet.findByAro(expectedPermission);
+      const foundPermission = originalSet.getByAro(expectedPermission);
       if (!foundPermission) {
         const newChange = PermissionChangeEntity.createFromPermission(expectedPermission, PermissionChangeEntity.PERMISSION_CHANGE_CREATE);
         result.push(newChange);
@@ -116,7 +126,7 @@ class PermissionChangesCollection extends EntityCollection {
 
     // Find deleted permissions
     for(let originalPermission of originalSet) {
-      if (!expectedSet.findByAro(originalPermission)) {
+      if (!expectedSet.getByAro(originalPermission)) {
         // Aka, permissions that are in the old set and not the new one
         const newChange = PermissionChangeEntity.createFromPermission(originalPermission, PermissionChangeEntity.PERMISSION_CHANGE_DELETE);
         result.push(newChange);

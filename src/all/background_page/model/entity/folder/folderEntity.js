@@ -99,6 +99,9 @@ class FolderEntity extends Entity {
           "type": "string",
           "format": "date-time"
         },
+        "personal": {
+          "type": "boolean",
+        },
         "permission": PermissionEntity.getSchema(), // current user permission
         "permissions": PermissionsCollection.getSchema() // all users permissions
       }
@@ -183,24 +186,6 @@ class FolderEntity extends Entity {
     return this._props.modified || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
-  /**
-   * FolderEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
-  }
-
-  /**
-   * FolderEntity.ALL_CONTAIN_OPTIONS
-   * @returns {object} all contain options that can be used in toDto()
-   */
-  static get ALL_CONTAIN_OPTIONS() {
-    return {permission:true, permissions:true};
-  }
 
   // ==================================================
   // Associated properties methods
@@ -219,6 +204,52 @@ class FolderEntity extends Entity {
    */
   get permissions() {
     return this._permissions || null;
+  }
+
+  /**
+   * Return true if permission is set to owner
+   * @returns {(boolean|null)}
+   */
+  isOwner() {
+    return this.permission.type === PermissionEntity.PERMISSION_OWNER;
+  }
+
+  /**
+   * Return true if user can update
+   * @returns {(boolean|null)}
+   */
+  canUpdate() {
+    return this.permission.type >= PermissionEntity.PERMISSION_UPDATE;
+  }
+
+  /**
+   * Return true if permission is set to read
+   * @returns {(boolean|null)}
+   */
+  isReadOnly() {
+    return this.permission.type === PermissionEntity.PERMISSION_READ;
+  }
+
+  /**
+   * Get is personal flag
+   * @returns {(boolean|null)}
+   */
+  isPersonal() {
+    if (this._props.hasOwnProperty('personal')) {
+      return this._props.personal;
+    }
+    if (this.permissions) {
+      return this.permissions.length === 1;
+    }
+    return null;
+  }
+
+  /**
+   * Get is shared flag
+   * @returns {(boolean|null)}
+   */
+  isShared() {
+    return !this.isPersonal;
   }
 
   /**
@@ -258,6 +289,21 @@ class FolderEntity extends Entity {
     }
   }
 
+  /**
+   * Assert a given folder can be moved
+   * @param {FolderEntity} folderToMove
+   * @param {FolderEntity} parentFolder
+   * @param {(FolderEntity|null)} destinationFolder
+   * @returns {boolean}
+   */
+  static canFolderMove(folderToMove, parentFolder, destinationFolder) {
+    if (folderToMove.isReadOnly()) {
+       return ((parentFolder === null || parentFolder.isPersonal()) &&
+         (destinationFolder === null || destinationFolder.isPersonal()));
+    }
+    return (destinationFolder === null || !destinationFolder.isReadOnly());
+  }
+
   // ==================================================
   // Default properties setters
   // ==================================================
@@ -274,6 +320,25 @@ class FolderEntity extends Entity {
     }
     const propSchema = FolderEntity.getSchema().properties[propName];
     this._props[propName] = EntitySchema.validateProp(propName, folderParentId, propSchema)
+  }
+
+  // ==================================================
+  // Static properties getters
+  // ==================================================
+  /**
+   * FolderEntity.ENTITY_NAME
+   * @returns {string}
+   */
+  static get ENTITY_NAME() {
+    return ENTITY_NAME;
+  }
+
+  /**
+   * FolderEntity.ALL_CONTAIN_OPTIONS
+   * @returns {object} all contain options that can be used in toDto()
+   */
+  static get ALL_CONTAIN_OPTIONS() {
+    return {permission:true, permissions:true};
   }
 }
 

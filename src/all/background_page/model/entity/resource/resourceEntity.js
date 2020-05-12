@@ -269,7 +269,7 @@ class ResourceEntity extends Entity {
   }
 
   // ==================================================
-  // Associated properties methods
+  // Permissions methods
   // ==================================================
   /**
    * Get resource permission for the current user
@@ -287,6 +287,48 @@ class ResourceEntity extends Entity {
     return this._permissions || null;
   }
 
+  /**
+   * Return true if permission is set to owner
+   * @returns {(boolean|null)}
+   */
+  isOwner() {
+    return this.permission.type === PermissionEntity.PERMISSION_OWNER;
+  }
+
+  /**
+   * Return true if user can update
+   * @returns {(boolean|null)}
+   */
+  canUpdate() {
+    return this.permission.type >= PermissionEntity.PERMISSION_UPDATE;
+  }
+
+  /**
+   * Return true if permission is set to read
+   * @returns {(boolean|null)}
+   */
+  isReadOnly() {
+    return this.permission.type === PermissionEntity.PERMISSION_READ;
+  }
+
+  /**
+   * Assert a given folder can be moved
+   * @param {ResourceEntity} resourceToMove
+   * @param {FolderEntity} parentFolder
+   * @param {(FolderEntity|null)} destinationFolder
+   * @returns {boolean}
+   */
+  static canResourceMove(resourceToMove, parentFolder, destinationFolder) {
+    if (resourceToMove.isReadOnly()) {
+      return ((parentFolder === null || parentFolder.isPersonal()) &&
+        (destinationFolder === null || destinationFolder.isPersonal()));
+    }
+    return (destinationFolder === null || !destinationFolder.isReadOnly());
+  }
+
+  // ==================================================
+  // Other associated properties methods
+  // ==================================================
   /**
    * Get all resource tags for the current user
    * @returns {(TagsCollection|null)}
@@ -345,6 +387,14 @@ class ResourceEntity extends Entity {
     }
     const propSchema = ResourceEntity.getSchema().properties[propName];
     this._props[propName] = EntitySchema.validateProp(propName, folderParentId, propSchema)
+  }
+
+  /**
+   * Set resource permissions
+   * @param {PermissionsCollection} permissions
+   */
+  set permissions(permissions) {
+    this._permissions = permissions;
   }
 
   // ==================================================

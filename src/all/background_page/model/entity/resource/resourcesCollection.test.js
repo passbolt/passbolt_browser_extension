@@ -60,6 +60,7 @@ describe("Resource entity", () => {
     expect(JSON.stringify(entity)).toEqual(JSON.stringify(dto));
     expect(entity.items[0].name).toEqual('resource1');
     expect(entity.items[1].name).toEqual('resource2');
+    expect(entity.folderParentIds).toEqual(['e2172205-139c-4e4b-a03a-933528123fff']);
   });
 
   it("constructor fails if reusing same resource", () => {
@@ -113,5 +114,10 @@ describe("Resource entity", () => {
 
     let t = () => {new ResourcesCollection(dto)};
     expect(t).toThrow(EntityCollectionError);
+  });
+
+  it("constructor works with empty collection", () => {
+    const collection = new ResourcesCollection([]);
+    expect(collection.folderParentIds).toEqual([]);
   });
 });

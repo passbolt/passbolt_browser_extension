@@ -12,7 +12,7 @@ const __ = require('../sdk/l10n').get;
 const passphraseController = require('../controller/passphrase/passphraseController');
 const progressController = require('../controller/progress/progressController');
 const {ResourceExportController} = require('../controller/resource/resourceExportController');
-const {FolderMoveController} = require('../controller/folder/folderMoveController');
+const {MoveController} = require('../controller/move/moveController');
 
 const Worker = require('../model/worker');
 const {Crypto} = require('../model/crypto');
@@ -280,7 +280,7 @@ const listen = function (worker) {
   worker.port.on('passbolt.app.folders.open-move-confirmation-dialog', async function (requestId, moveDto) {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
-      const controller = new FolderMoveController(worker, requestId, clientOptions);
+      const controller = new MoveController(worker, requestId, clientOptions);
       await controller.main(moveDto);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {

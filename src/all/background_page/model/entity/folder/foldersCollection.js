@@ -107,6 +107,68 @@ class FoldersCollection extends EntityCollection {
     return this._items;
   }
 
+  /**
+   * Get all the ids of the folders in the collection
+   * @returns {Array} of ids
+   */
+  get ids() {
+    return this._items.map(folder => folder.id);
+  }
+
+  /**
+   * Get all the folderParentIds of the folders in the collection
+   * @returns {Array} of ids
+   */
+  get folderParentIds() {
+    return this._items.map(folder => folder.folderParentIds);
+  }
+
+  // ==================================================
+  // Finders
+  // ==================================================
+  /**
+   * Get the first item that matches the given id
+   * @param {string} id
+   * @returns {*} FolderEntity or undefined
+   */
+  getById(id) {
+    let found = this._items.filter(folder => folder.id === id);
+    return found.length ? found[0] : undefined;
+  }
+
+  /**
+   * Find all children
+   *
+   * @param {string} parentId
+   * @returns {FoldersCollection}
+   */
+  getAllChildren(parentId) {
+    return FoldersCollection.getAllChildren(parentId, this, new FoldersCollection([]))
+  }
+
+  /**
+   * Recursive find by parent id
+   *
+   * @param {string} parentId
+   * @param {FoldersCollection} inputCollection
+   * @param {FoldersCollection} outputCollection carried forward
+   * @returns {FoldersCollection} outputCollection final
+   */
+  static getAllChildren(parentId, inputCollection, outputCollection) {
+    const children = inputCollection.folders.filter(item => item.folderParentId === parentId);
+    if (children.length) {
+      try {
+        children.forEach(child => outputCollection.push(child));
+      } catch(error) {
+        // children are already in collection
+        // skip...
+      }
+      const childrenIds = children.map(child => child.id);
+      childrenIds.forEach(id => FoldersCollection.getAllChildren(id, inputCollection, outputCollection));
+    }
+    return outputCollection;
+  }
+
   // ==================================================
   // Setters
   // ==================================================

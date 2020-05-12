@@ -11,10 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+import Validator from 'validator';
 import {FolderEntity} from "./folderEntity";
 import {EntityValidationError} from "../abstract/entityValidationError";
 import {EntitySchema} from "../abstract/entitySchema";
-import Validator from 'validator';
+import {PermissionEntity} from "../permission/permissionEntity";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -147,5 +148,82 @@ describe("Folder entity", () => {
     expect(folderJson.includes('37ca07ee-44b6-4ce8-9439-47b4fd5479cc')).toBe(true);
     const folderJson2 = JSON.stringify(folderEntity.toDto());
     expect(folderJson2.includes('37ca07ee-44b6-4ce8-9439-47b4fd5479cc')).toBe(false);
+  });
+
+  it("folder can move test", () => {
+    const personal = new FolderEntity({
+      "name": "0",
+      "personal": true,
+      "permission": {
+        "aco": "Folder",
+        "aco_foreign_key": "6e6fd446-92a8-478f-aa9d-746685048836",
+        "aro": "User",
+        "aro_foreign_key": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+        "type": PermissionEntity.PERMISSION_OWNER
+      }
+    });
+    const sharedOwner = new FolderEntity({
+      "name": "0",
+      "personal": false,
+      "permission": {
+        "aco": "Folder",
+        "aco_foreign_key": "6e6fd446-92a8-478f-aa9d-746685048836",
+        "aro": "User",
+        "aro_foreign_key": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+        "type": PermissionEntity.PERMISSION_OWNER
+      }
+    });
+    const sharedUpdate = new FolderEntity({
+      "name": "0",
+      "personal": false,
+      "permission": {
+        "aco": "Folder",
+        "aco_foreign_key": "6e6fd446-92a8-478f-aa9d-746685048836",
+        "aro": "User",
+        "aro_foreign_key": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+        "type": PermissionEntity.PERMISSION_UPDATE
+      }
+    });
+    const sharedRead = new FolderEntity({
+      "name": "0",
+      "personal": false,
+      "permission": {
+        "aco": "Folder",
+        "aco_foreign_key": "6e6fd446-92a8-478f-aa9d-746685048836",
+        "aro": "User",
+        "aro_foreign_key": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+        "type": PermissionEntity.PERMISSION_READ
+      }
+    });
+    // CANNOT MOVE
+    // Share folder read to folder to the root
+    expect(FolderEntity.canFolderMove(sharedRead, sharedRead, null)).toBe(false);
+    expect(FolderEntity.canFolderMove(sharedRead, sharedUpdate, null)).toBe(false);
+    expect(FolderEntity.canFolderMove(sharedRead, sharedOwner, null)).toBe(false);
+    // Share folder read to folder I own
+    expect(FolderEntity.canFolderMove(sharedRead, sharedRead, sharedOwner)).toBe(false);
+    expect(FolderEntity.canFolderMove(sharedRead, sharedUpdate, sharedOwner)).toBe(false);
+    expect(FolderEntity.canFolderMove(sharedRead, sharedOwner, sharedOwner)).toBe(false);
+    expect(FolderEntity.canFolderMove(sharedRead, personal, sharedOwner)).toBe(false);
+    // Share folder read to folder I own
+    expect(FolderEntity.canFolderMove(sharedRead, sharedRead, sharedUpdate)).toBe(false);
+    expect(FolderEntity.canFolderMove(sharedRead, sharedUpdate, sharedUpdate)).toBe(false);
+    expect(FolderEntity.canFolderMove(sharedRead, sharedOwner, sharedUpdate)).toBe(false);
+    expect(FolderEntity.canFolderMove(sharedRead, personal, sharedUpdate)).toBe(false);
+
+    // CAN MOVE
+    // Read folder in a personal folder
+    expect(FolderEntity.canFolderMove(sharedRead, personal, null)).toBe(true);
+    expect(FolderEntity.canFolderMove(sharedRead, personal, personal)).toBe(true);
+    expect(FolderEntity.canFolderMove(sharedRead, null, personal)).toBe(true);
+    // Moving a personal folder in a personal  folder to the root
+    expect(FolderEntity.canFolderMove(personal, personal, null)).toBe(true);
+    expect(FolderEntity.canFolderMove(sharedOwner, sharedOwner, sharedOwner)).toBe(true);
+    expect(FolderEntity.canFolderMove(sharedOwner, sharedRead, sharedOwner)).toBe(true);
+    expect(FolderEntity.canFolderMove(sharedUpdate, sharedRead, sharedUpdate)).toBe(true);
+    // Moving a personal folder at the root
+    expect(FolderEntity.canFolderMove(personal, null, sharedUpdate)).toBe(true);
+    expect(FolderEntity.canFolderMove(personal, null, null)).toBe(true);
+    expect(FolderEntity.canFolderMove(sharedOwner, null, sharedOwner)).toBe(true);
   });
 });

@@ -38,7 +38,7 @@ class FolderCreateController {
    */
   async main(originalFolder) {
     let progress = 0;
-    let progressGoal = !originalFolder.folderParentId ? 1 : 2;
+    let progressGoal = !originalFolder.folderParentId ? 1 : 3;
 
     try {
       let msg = `Creating folder ${originalFolder.name}`;
@@ -49,8 +49,14 @@ class FolderCreateController {
         // TODO a confirmation dialog that recaps the changes
         // TODO ask if they want to keep the original permission?
         // TODO a remember me option to skip confirmation dialog
+        await progressController.update(this.worker, progress++, 'Fetching parent permissions');
+        let targetFolder = await this.folderModel.findForShare(folderEntity.folderParentId);
+
         await progressController.update(this.worker, progress++, 'Saving permissions...');
-        folderEntity = await this.folderModel.applyPermissionFromParent(folderEntity);
+        let changes = await this.folderModel.getTargetPermissionsAsChanges(folderEntity, targetFolder);
+        if (changes) {
+          await this.folderModel.share(folderEntity, changes);
+        }
       }
 
       await progressController.update(this.worker, progressGoal, 'Done!');

@@ -120,6 +120,7 @@ Crypto.prototype.decryptWithKey = async function (armoredMessage, key) {
  * @param passphrase {string} The passphrase to use to decrypt the private key.
  * @throw Error if something goes wrong in openpgp methods
  * @return {Promise} The decrypted message
+ * @deprecated since 2.13 use decryptWithKey
  */
 Crypto.prototype.decrypt = async function (armoredMessage, passphrase) {
   const key = await this.getAndDecryptPrivateKey(passphrase);

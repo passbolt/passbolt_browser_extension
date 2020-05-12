@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
+const {Log} = require('../../model/log');
 const Lock = require('../../utils/lock').Lock;
 const lock = new Lock();
 
@@ -27,6 +28,7 @@ class ResourceLocalStorage {
    * @return {Promise<void>}
    */
   static async flush() {
+    Log.write({level: 'debug', message: 'ResourceLocalStorage flushed'});
     return await browser.storage.local.remove(RESOURCES_LOCAL_STORAGE_KEY);
   }
 
@@ -206,22 +208,27 @@ class ResourceLocalStorage {
       throw error;
     }
   };
-}
 
-// Flush the local storage when this library is loaded
-ResourceLocalStorage.flush();
+  /**
+   * Init resource local storage
+   */
+  static init() {
+    // Flush the local storage when this library is loaded
+    this.flush();
 
-// Flush the local storage when the passbolt user session is terminated
-window.addEventListener("passbolt.global.auth.logged-out", () => {
-  ResourceLocalStorage.flush();
-});
+    // Flush the local storage when the passbolt user session is terminated
+    window.addEventListener("passbolt.global.auth.logged-out", () => {
+      this.flush();
+    });
 
-// Flush the local storage when a window is closed.
-// Strategy to catch the browser close event.
-browser.tabs.onRemoved.addListener((tabId, evInfo) => {
-  if (evInfo.isWindowClosing) {
-    ResourceLocalStorage.flush();
+    // Flush the local storage when a window is closed.
+    // Strategy to catch the browser close event.
+    browser.tabs.onRemoved.addListener((tabId, evInfo) => {
+      if (evInfo.isWindowClosing) {
+        this.flush();
+      }
+    });
   }
-});
+}
 
 exports.ResourceLocalStorage = ResourceLocalStorage;

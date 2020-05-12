@@ -61,7 +61,7 @@ describe("PermissionChangesCollection", () => {
     expect(changeEntity.toDto().length).toBe(3);
   });
 
-  it("buildChangesFromPermissions basics", () => {
+  it("calculateChanges basics", () => {
     const originalSet = new PermissionsCollection([{
       id: "c2c7f658-c7ac-4d73-9020-9d2c296d9100",
       aco: PermissionEntity.ACO_FOLDER,
@@ -126,7 +126,7 @@ describe("PermissionChangesCollection", () => {
       type: PermissionEntity.PERMISSION_OWNER
     }]);
 
-    const changes = PermissionChangesCollection.buildChangesFromPermissions(originalSet, expectedSet);
+    const changes = PermissionChangesCollection.calculateChanges(originalSet, expectedSet);
     expect(changes.toDto()).toEqual([{
         id: 'c2c7f658-c7ac-4d73-9020-9d2c296d9101',
         aco: 'Folder',

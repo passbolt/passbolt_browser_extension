@@ -93,4 +93,11 @@ Log.flush = function () {
   _logs = [];
 };
 
+/**
+ * Flush a log.
+ */
+Log.init = function () {
+  _logs = [];
+};
+
 exports.Log = Log;

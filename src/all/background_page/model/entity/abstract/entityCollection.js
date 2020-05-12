@@ -95,7 +95,7 @@ class EntityCollection extends Entity {
    * @throws TypeError if parameters are invalid
    * @returns {array} all the items matching search
    */
-  findAll(propName, search) {
+  getAll(propName, search) {
     if (typeof propName !== 'string' || typeof search !== 'string') {
       throw new TypeError('EntityCollection find by expect propName and search to be strings');
     }
@@ -109,11 +109,11 @@ class EntityCollection extends Entity {
    * @param {string} search
    * @returns {Entity} first item matching search
    */
-  findFirst(propName, search) {
+  getFirst(propName, search) {
     if (typeof propName !== 'string' || typeof search !== 'string') {
-      throw new TypeError('EntityCollection findFirst by expect propName and search to be strings');
+      throw new TypeError('EntityCollection getFirst by expect propName and search to be strings');
     }
-    const found = this.findAll(propName, search);
+    const found = this.getAll(propName, search);
     if (!found || !found.length) {
       return undefined;
     }

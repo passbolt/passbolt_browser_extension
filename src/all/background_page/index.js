@@ -4,29 +4,28 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-
 var storage = require('./sdk/storage').storage;
 window.storage = storage;
 
 const main = async function() {
-
-  // Config and user models
   const Config = require('./model/config');
+  const {Log} = require('./model/log');
   const {GpgAuth} = require('./model/gpgauth');
   const {User} = require('./model/user');
-  const {Log} = require('./model/log');
+  const {ResourceLocalStorage} = require('./service/local_storage/resourceLocalStorage');
+  const {FolderLocalStorage} = require('./service/local_storage/folderLocalStorage');
 
   /* ==================================================================================
-   *  Flush the logs
+   *  Initialization of global objects
    * ==================================================================================
    */
-  Log.flush();
+  Log.init();
+  Config.init();
+  User.init();
+  ResourceLocalStorage.init();
+  FolderLocalStorage.init();
 
-  /* ==================================================================================
-   *  Openpgp init
-   *  Init web worker
-   * ==================================================================================
-   */
+  // Web worker
   openpgp.initWorker({ path:'/vendors/openpgp.worker.js' });
 
   /* ==================================================================================

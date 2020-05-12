@@ -11,8 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {ResourceEntity} = require('../entity/resource/resourceEntity');
+const {ResourcesCollection} = require('../entity/resource/resourcesCollection');
 const {ResourceLocalStorage} = require('../../service/local_storage/resourceLocalStorage');
 const {ResourceService} = require('../../service/api/resource/resourceService');
+
+const {PermissionEntity} = require('../entity/permission/permissionEntity');
+const {PermissionsCollection} = require('../entity/permission/permissionsCollection');
+const {PermissionChangesCollection} = require("../../model/entity/permission/permissionChangesCollection");
+
 const {MoveService} = require('../../service/api/move/moveService');
 
 class ResourceModel {
@@ -30,16 +36,174 @@ class ResourceModel {
   /**
    * Update the resources local storage with the latest API resources the user has access.
    *
-   * @return {Promise<[ResourceEntity]>}
+   * @return {ResourcesCollection}
    */
   async updateLocalStorage () {
-    const resources = await this.resourceService.findAll({
-      'permission':true, 'favorite':true, 'tags':true
-    });
-    await ResourceLocalStorage.setLegacy(resources);
-    return resources;
+    const resourceDtos = await this.resourceService.findAll(ResourceLocalStorage.DEFAULT_CONTAIN);
+    const resourcesCollection = new ResourcesCollection(resourceDtos);
+    await ResourceLocalStorage.set(resourcesCollection);
+    return resourcesCollection;
   }
 
+  //==============================================================
+  // Local storage getters
+  //==============================================================
+  /**
+   * Get a folder collection from the local storage by id
+   *
+   * @param {Array} folderIds The folder id
+   * @return {ResourcesCollection}
+   */
+  async getAllByParentIds(folderIds) {
+    const localResources = await ResourceLocalStorage.get();
+    const resourcesCollection = new ResourcesCollection([]);
+    for (let i in folderIds) {
+      let resourceDto = localResources[i].id
+      if (folderIds.includes(resourceDto.folder_parent_id)) {
+        resourcesCollection.push(resourceDto);
+      }
+    }
+    return resourcesCollection;
+  };
+
+  /**
+   * Get a collection of resources from the local storage by id
+   *
+   * @param {Array} resourceIds The resource ids
+   * @return {ResourcesCollection}
+   */
+  async getAllByIds(resourceIds) {
+    const localResources = await ResourceLocalStorage.get();
+    const resourcesCollection = new ResourcesCollection([]);
+    for (let i in resourceIds) {
+      let resourceDto = localResources[i].id
+      if (resourceIds.includes(resourceDto.id)) {
+        resourcesCollection.push(resourceDto);
+      }
+    }
+    return resourcesCollection;
+  };
+
+  /**
+   * Get a collection of resources from the local storage by id
+   * Where the user is the owner
+   *
+   * @param {Array} resourceIds The resource ids
+   * @return {ResourcesCollection}
+   */
+  async getAllByIdsWhereOwner(resourceIds) {
+    const localResources = await ResourceLocalStorage.get();
+    const resourcesCollection = new ResourcesCollection([]);
+    for (let i in resourceIds) {
+      let resourceDto = localResources[i].id
+      if (resourceIds.includes(resourceDto.id) && resourceDto.permission.type === PermissionEntity.PERMISSION_OWNER) {
+        resourcesCollection.push(resourceDto);
+      }
+    }
+    return resourcesCollection;
+  }
+
+  /**
+   * Calculate permission changes for a move
+   * From current permissions, remove the parent folder permissions, add the destination permissions
+   * From this new set of permission and the original permission calculate the needed changed
+   *
+   * NOTE: This function requires permissions to be set for all objects
+   *
+   * @param {ResourceEntity} resource
+   * @param {(FolderEntity|null)} parentFolder
+   * @param {(FolderEntity|null)} destFolder
+   * @returns {Promise<PermissionChangesCollection>}
+   */
+  async calculatePermissionsForMove(resource, parentFolder, destFolder) {
+    let remainingPermissions = new PermissionsCollection([], false);
+
+    // Remove permissions from parent if any
+    if (resource.folderParentId !== null) {
+      if (!resource.permissions || !parentFolder.permissions) {
+        throw new TypeError('Resource model calculatePermissionsForMove requires permissions to be set.');
+      }
+      remainingPermissions = PermissionsCollection.diff(resource.permissions, parentFolder.permissions, false);
+    }
+    // Add parent permissions
+    let permissionsFromParent = new PermissionsCollection([], false);
+    if (destFolder) {
+      if (!destFolder.permissions) {
+        throw new TypeError('Resource model calculatePermissionsForMove requires destination permissions to be set.');
+      }
+      permissionsFromParent = destFolder.permissions.cloneForAco(
+        PermissionEntity.ACO_RESOURCE, resource.id, false
+      );
+    }
+
+    let newPermissions = PermissionsCollection.sum(remainingPermissions, permissionsFromParent, false);
+    if (!destFolder) {
+      // If the move is toward the root
+      // Reuse highest permission
+      newPermissions.addOrReplace(new PermissionEntity({
+        aco: PermissionEntity.ACO_RESOURCE,
+        aro: resource.permission.aro,
+        aco_foreign_key: resource.id,
+        aro_foreign_key: resource.permission.aroForeignKey,
+        type: PermissionEntity.PERMISSION_OWNER,
+      }));
+    }
+    newPermissions.assertAtLeastOneOwner();
+    return PermissionChangesCollection.calculateChanges(resource.permissions, newPermissions);
+  }
+
+  /**
+   * Calculate permission changes for a move
+   * From current permissions add the destination permissions
+   * From this new set of permission and the original permission calculate the needed changed
+   *
+   * NOTE: This function requires permissions to be set for all objects
+   *
+   * @param {ResourceEntity} resource
+   * @param {(FolderEntity|null)} destFolder
+   * @returns {Promise<PermissionChangesCollection>}
+   */
+  async calculatePermissionsForCreate(resource, destFolder) {
+    let permissionsFromDest = new PermissionsCollection([], false);
+    if (destFolder) {
+      if (!destFolder.permissions) {
+        throw new TypeError('Resource model calculatePermissionsForMove requires destination permissions to be set.');
+      }
+      permissionsFromDest = destFolder.permissions.cloneForAco(
+        PermissionEntity.ACO_RESOURCE, resource.id, false
+      );
+    }
+    return PermissionChangesCollection.calculateChanges(resource.permissions, permissionsFromDest);
+  }
+
+  //==============================================================
+  // Finders
+  //==============================================================
+  /**
+   * Find all for share
+   *
+   * @param {array} resourcesIds resource uuids
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAllForShare (resourcesIds) {
+    let resourcesDto = await this.resourceService.findAllForShare(resourcesIds);
+    return new ResourcesCollection(resourcesDto);
+  };
+
+  /**
+   * Find a resource to share
+   *
+   * @param {string} resourcesId resource uuid
+   * @returns {Promise<ResourceEntity>}
+   */
+  async findForShare (resourcesId) {
+    let resourcesDto = await this.resourceService.findAllForShare([resourcesId]);
+    return new ResourceEntity(resourcesDto[0]);
+  };
+
+  //==============================================================
+  // CRUD
+  //==============================================================
   /**
    * Create a resource using Passbolt API and add result to local storage
    *
@@ -47,7 +211,7 @@ class ResourceModel {
    * @returns {Promise<ResourceEntity>}
    */
   async create(resourceEntity) {
-    const resourceDto = await this.resourceService.create(resourceEntity.toDto({secrets:true}), {permission: true});
+    const resourceDto = await this.resourceService.create(resourceEntity.toDto({secrets:true}), {permission:true});
     const updatedResourceEntity = new ResourceEntity(resourceDto);
     await ResourceLocalStorage.addResource(updatedResourceEntity);
     return updatedResourceEntity;
@@ -61,12 +225,6 @@ class ResourceModel {
    * @returns {ResourceEntity}
    */
   async move(resourceId, folderParentId) {
-    if (!resourceId || !Validator.isUUID(resourceId)) {
-      throw new TypeError('Resource move expect a valid resource id.');
-    }
-    if (!(folderParentId === null || Validator.isUUID(folderParentId))) {
-      throw new TypeError('Resource move expect a valid folder id.');
-    }
     const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
     const resourceEntity = new ResourceEntity(resourceDto);
     resourceEntity.folderParentId = folderParentId;
@@ -75,6 +233,28 @@ class ResourceModel {
     await ResourceLocalStorage.updateResource(resourceEntity);
 
     return resourceEntity;
+  }
+
+  //==============================================================
+  // Assertions
+  //==============================================================
+  /**
+   * Assert that all the folders are in the local storage
+   *
+   * @param {Array} resourceIds array of uuid
+   * @throws {Error} if a resource does not exist
+   */
+  async assertResourcesExist(resourceIds) {
+    const resources = await ResourceLocalStorage.get();
+    if (!Array.isArray(resourceIds)) {
+      throw new TypeError(`Resources exist check expect an array of uuid.`);
+    }
+    for (let i in resourceIds) {
+      if (!resources.find(item => item.id === resourceIds[i])) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 

@@ -308,7 +308,7 @@ class PermissionEntity extends Entity {
   }
 
   // ==================================================
-  // Permission comparison operators
+  // Assertions
   // ==================================================
   /**
    * Basic type assertion helper
@@ -332,6 +332,9 @@ class PermissionEntity extends Entity {
     PermissionEntity.assertIsPermission(p2);
   }
 
+  // ==================================================
+  // Permission comparison operators
+  // ==================================================
   /**
    * Return true if two given permission have the same id
    *

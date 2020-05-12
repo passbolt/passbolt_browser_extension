@@ -118,10 +118,13 @@ class MoveResourcesController {
     for (let resource of this.resources) {
       await progressController.update(this.worker, this.progress++, `Calculating changes for ${resource.name}`);
 
-      // Remove old parent permissions if any
-      let parent = !resource.folderParentId ? null : this.resourcesParentFolders.getById(resource.folderParentId);
-      let changes = await this.resourceModel.calculatePermissionsForMove(resource, parent, this.destinationFolder);
-      this.changes.merge(changes);
+      // Somebody who can update can move
+      // But to change the rights one need to be owner
+      if (resource.permission.isOwner()) {
+        let parent = !resource.folderParentId ? null : this.resourcesParentFolders.getById(resource.folderParentId);
+        let changes = await this.resourceModel.calculatePermissionsForMove(resource, parent, this.destinationFolder);
+        this.changes.merge(changes);
+      }
     }
   }
 

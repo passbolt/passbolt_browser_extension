@@ -99,13 +99,19 @@ class MoveResourcesController {
    * @returns {Promise<void>}
    */
   async findAllForShare() {
+    this.resources = await this.resourceModel.findAllForShare(this.resourcesIds);
+    const parentIds = this.resources.folderParentIds;
+
     if (this.destinationFolderId) {
       this.destinationFolder = await this.folderModel.findForShare([this.destinationFolderId]);
     } else {
       this.destinationFolder = null;
     }
-    this.resources = await this.resourceModel.findAllForShare(this.resourcesIds);
-    this.resourcesParentFolders = await this.folderModel.findAllForShare(this.resources.folderParentIds);
+
+    if (parentIds.length) {
+      this.resourcesParentFolders = await this.folderModel.findAllForShare(this.resources.folderParentIds);
+    }
+
     this.filterOutResourcesThatWontMove();
   }
 
@@ -135,7 +141,9 @@ class MoveResourcesController {
   async move() {
     for (let resource of this.resources) {
       await progressController.update(this.worker, this.progress++, `Moving ${resource.name}`);
-      this.resourceModel.move(resource.id, this.destinationFolderId);
+      if (resource.folderParentId !== this.destinationFolderId) {
+        await this.resourceModel.move(resource.id, this.destinationFolderId);
+      }
     }
   }
 

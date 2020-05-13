@@ -42,7 +42,7 @@ class MoveFolderController {
   /**
    * Move content.
    * @param {array} folderId: The resources ids to move
-   * @param {(string|null)} folderId:  The destination folder
+   * @param {(string|null)} destinationFolderId:  The destination folder
    */
   async main(folderId, destinationFolderId) {
     this.folderId = folderId;

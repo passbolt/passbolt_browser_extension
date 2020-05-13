@@ -46,6 +46,34 @@ class FolderModel {
   }
 
   // ============================================
+  // Local storage getters
+  // ============================================
+  /**
+   * Get a folder collection from the local storage by ids
+   * Also include their children
+   *
+   * @param {array} folderIds The folder ids
+   * @param {boolean} [withChildren] optional default false
+   * @return {FoldersCollection}
+   */
+  async getAllByIds(folderIds, withChildren) {
+    const foldersDto = await FolderLocalStorage.get();
+    const inputCollection = new FoldersCollection(foldersDto);
+    let outputCollection = new FoldersCollection([]);
+    inputCollection.items.forEach((folderDto) => {
+      if (folderIds.includes(folderDto.id)) {
+        outputCollection.push(folderDto);
+      }
+    });
+    if (withChildren) {
+      folderIds.forEach(parentId => {
+        outputCollection = FoldersCollection.getAllChildren(parentId, inputCollection, outputCollection);
+      });
+    }
+    return outputCollection;
+  };
+
+  // ============================================
   // Finders
   // ============================================
   /**
@@ -94,83 +122,56 @@ class FolderModel {
     return folderEntity.permissions;
   }
 
-  // ============================================
-  // Local storage getters
-  // ============================================
+  //==============================================================
+  // Permission changes
+  //==============================================================
   /**
-   * Get a folder collection from the local storage by ids
-   * Also include their children
+   * Calculate permission changes for a move
+   * From current permissions, remove the parent folder permissions, add the destination permissions
+   * From this new set of permission and the original permission calculate the needed changed
    *
-   * @param {array} folderIds The folder ids
-   * @param {boolean} [withChildren] optional default false
-   * @return {FoldersCollection}
+   * NOTE: This function requires permissions to be set for all objects
+   *
+   * @param {ResourceEntity} folderEntity
+   * @param {(FolderEntity|null)} parentFolder
+   * @param {(FolderEntity|null)} destFolder
+   * @returns {Promise<PermissionChangesCollection>}
    */
-  async getAllByIds(folderIds, withChildren) {
-    const foldersDto = await FolderLocalStorage.get();
-    const inputCollection = new FoldersCollection(foldersDto);
-    let outputCollection = new FoldersCollection([]);
-    inputCollection.items.forEach((folderDto) => {
-      if (folderIds.includes(folderDto.id)) {
-        outputCollection.push(folderDto);
+  async calculatePermissionsChangesForMove(folderEntity, parentFolder, destFolder) {
+    let remainingPermissions = new PermissionsCollection([], false);
+
+    // Remove permissions from parent if any
+    if (folderEntity.folderParentId !== null) {
+      if (!folderEntity.permissions || !parentFolder.permissions) {
+        throw new TypeError('Resource model calculatePermissionsChangesForMove requires permissions to be set.');
       }
-    });
-    if (withChildren) {
-      folderIds.forEach(parentId => {
-        outputCollection = FoldersCollection.getAllChildren(parentId, inputCollection, outputCollection);
-      });
+      remainingPermissions = PermissionsCollection.diff(folderEntity.permissions, parentFolder.permissions, false);
     }
-    return outputCollection;
-  };
+    // Add parent permissions
+    let permissionsFromParent = new PermissionsCollection([], false);
+    if (destFolder) {
+      if (!destFolder.permissions) {
+        throw new TypeError('Resource model calculatePermissionsChangesForMove requires destination permissions to be set.');
+      }
+      permissionsFromParent = destFolder.permissions.cloneForAco(
+        PermissionEntity.ACO_RESOURCE, folderEntity.id, false
+      );
+    }
 
-  // ============================================
-  // Assertions
-  // ============================================
-  /**
-   * Assert for a given folder id that the folder is in the local storage
-   *
-   * @param {(string|null)} folderId folderId
-   * @throws {Error} if the folder does not exist
-   */
-  async assertFolderExists(folderId) {
-    if (folderId === null) {
-      return;
+    let newPermissions = PermissionsCollection.sum(remainingPermissions, permissionsFromParent, false);
+    if (!destFolder) {
+      // If the move is toward the root
+      // Reuse highest permission
+      newPermissions.addOrReplace(new PermissionEntity({
+        aco: PermissionEntity.ACO_RESOURCE,
+        aro: folderEntity.permission.aro,
+        aco_foreign_key: folderEntity.id,
+        aro_foreign_key: folderEntity.permission.aroForeignKey,
+        type: PermissionEntity.PERMISSION_OWNER,
+      }));
     }
-    if (!Validator.isUUID(folderId)) {
-      throw new TypeError(`Folder exists check expect a uuid.`);
-    }
-    const folderDto = await FolderLocalStorage.getFolderById(folderId);
-    if (!folderDto) {
-      // TODO check remotely?
-      throw new Error(`Folder with id ${folderId} does not exist.`);
-    }
-  }
-
-  /**
-   * Assert that all the folders are in the local storage
-   *
-   * @param {Array} folderIds array of uuid
-   * @throws {Error} if a folder does not exist
-   */
-  async assertFoldersExist(folderIds) {
-    if (!Array.isArray(folderIds)) {
-      throw new TypeError(`Folders exist check expect an array of uuid.`);
-    }
-    for (let i in folderIds) {
-      await this.assertFolderExists(folderIds[i]);
-    }
-  }
-
-  /**
-   * Create a folder using Passbolt API and add result to local storage
-   *
-   * @param {FolderEntity} folderEntity
-   * @returns {Promise<FolderEntity>}
-   */
-  async create(folderEntity) {
-    const folderDto = await this.folderService.create(folderEntity.toDto(), {permission: true});
-    const updatedFolderEntity = new FolderEntity(folderDto);
-    await FolderLocalStorage.addFolder(updatedFolderEntity);
-    return updatedFolderEntity;
+    newPermissions.assertAtLeastOneOwner();
+    return PermissionChangesCollection.calculateChanges(folderEntity.permissions, newPermissions);
   }
 
   /**
@@ -194,6 +195,22 @@ class FolderModel {
       changes = PermissionChangesCollection.calculateChanges(currentPermissions, targetPermissions);
     }
     return changes;
+  }
+
+  //==============================================================
+  // CRUD
+  //==============================================================
+  /**
+   * Create a folder using Passbolt API and add result to local storage
+   *
+   * @param {FolderEntity} folderEntity
+   * @returns {Promise<FolderEntity>}
+   */
+  async create(folderEntity) {
+    const folderDto = await this.folderService.create(folderEntity.toDto(), {permission: true});
+    const updatedFolderEntity = new FolderEntity(folderDto);
+    await FolderLocalStorage.addFolder(updatedFolderEntity);
+    return updatedFolderEntity;
   }
 
   /**
@@ -262,6 +279,44 @@ class FolderModel {
       // update storage and get updated sub folders list in case some are deleted
       // TODO: optimize update only if folder contains subfolders
       await this.updateLocalStorage();
+    }
+  }
+
+  // ============================================
+  // Assertions
+  // ============================================
+  /**
+   * Assert for a given folder id that the folder is in the local storage
+   *
+   * @param {(string|null)} folderId folderId
+   * @throws {Error} if the folder does not exist
+   */
+  async assertFolderExists(folderId) {
+    if (folderId === null) {
+      return;
+    }
+    if (!Validator.isUUID(folderId)) {
+      throw new TypeError(`Folder exists check expect a uuid.`);
+    }
+    const folderDto = await FolderLocalStorage.getFolderById(folderId);
+    if (!folderDto) {
+      // TODO check remotely?
+      throw new Error(`Folder with id ${folderId} does not exist.`);
+    }
+  }
+
+  /**
+   * Assert that all the folders are in the local storage
+   *
+   * @param {Array} folderIds array of uuid
+   * @throws {Error} if a folder does not exist
+   */
+  async assertFoldersExist(folderIds) {
+    if (!Array.isArray(folderIds)) {
+      throw new TypeError(`Folders exist check expect an array of uuid.`);
+    }
+    for (let i in folderIds) {
+      await this.assertFolderExists(folderIds[i]);
     }
   }
 }

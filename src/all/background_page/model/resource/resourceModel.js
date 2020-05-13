@@ -103,6 +103,9 @@ class ResourceModel {
     return resourcesCollection;
   }
 
+  //==============================================================
+  // Permission changes
+  //==============================================================
   /**
    * Calculate permission changes for a move
    * From current permissions, remove the parent folder permissions, add the destination permissions

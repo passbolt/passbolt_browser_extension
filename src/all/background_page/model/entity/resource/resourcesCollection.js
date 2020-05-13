@@ -65,6 +65,15 @@ class ResourcesCollection extends EntityCollection {
   }
 
   /**
+   * Get all the ids of the resources in the collection
+   *
+   * @returns {Array<ResourceEntity>}
+   */
+  get ids() {
+    return this._items.map(r => r.id);
+  }
+
+  /**
    * Get all the folder parent ids for the resources in the collection
    * Exclude 'null' aka when parent is the root
    *
@@ -81,11 +90,16 @@ class ResourcesCollection extends EntityCollection {
    * @returns {Array<ResourceEntity>}
    */
   getFirstById(resourceId) {
-    const result = this._items.filter(r => (r.id === resourceId));
-    if (result.length) {
-      return result[0];
-    }
-    return undefined;
+    return this._items.find(r => (r.id === resourceId));
+  }
+
+  /**
+   * Return a new collection with all resources the current user is owner
+   *
+   * @returns {ResourcesCollection}
+   */
+  getAllWhereOwner() {
+    return new ResourcesCollection(this._items.filter(r => r.isOwner()));
   }
 
   // ==================================================

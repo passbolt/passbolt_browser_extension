@@ -84,7 +84,7 @@ describe("Permission Collection", () => {
         aro: PermissionEntity.ARO_USER,
         aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d991",
         type: PermissionEntity.PERMISSION_READ
-      },{
+      }, {
         aco: PermissionEntity.ACO_FOLDER,
         aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
         aro: PermissionEntity.ARO_USER,
@@ -106,7 +106,7 @@ describe("Permission Collection", () => {
         aro: PermissionEntity.ARO_USER,
         aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d991",
         type: PermissionEntity.PERMISSION_READ
-      },{
+      }, {
         aco: PermissionEntity.ACO_FOLDER,
         aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
         aro: PermissionEntity.ARO_USER,
@@ -129,7 +129,7 @@ describe("Permission Collection", () => {
         aro: PermissionEntity.ARO_USER,
         aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d991",
         type: PermissionEntity.PERMISSION_READ
-      },{
+      }, {
         id: "d2c7f658-c7ac-4d73-9020-9d2c296d91ff",
         aco: PermissionEntity.ACO_FOLDER,
         aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
@@ -151,7 +151,7 @@ describe("Permission Collection", () => {
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d990",
       type: PermissionEntity.PERMISSION_OWNER
-    },{
+    }, {
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
       aro: PermissionEntity.ARO_USER,
@@ -531,5 +531,35 @@ describe("Permission Collection", () => {
     set2 = new PermissionsCollection([dto3], false);
     set3 = PermissionsCollection.diff(set1, set2, false);
     expect(set3.toDto()).toEqual([dto1, dto2]);
+  });
+
+  it("diff set1 - set2, part 2", () => {
+    const owner = {
+      aco: PermissionEntity.ACO_FOLDER,
+      aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
+      aro: PermissionEntity.ARO_USER,
+      aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d990",
+      type: PermissionEntity.PERMISSION_OWNER
+    };
+    const read = {
+      aco: PermissionEntity.ACO_FOLDER,
+      aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
+      aro: PermissionEntity.ARO_USER,
+      aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d990",
+      type: PermissionEntity.PERMISSION_READ
+    };
+    let ownerSet;
+    let readSet;
+    let resultSet;
+
+    // check remove equal or lower
+    ownerSet = new PermissionsCollection([owner], false);
+    readSet = new PermissionsCollection([read], false);
+    resultSet = PermissionsCollection.diff(ownerSet, readSet, false);
+    expect(resultSet.toDto()).toEqual([owner]);
+    resultSet = PermissionsCollection.diff(readSet, ownerSet, false);
+    expect(resultSet.toDto()).toEqual([]);
+    resultSet = PermissionsCollection.diff(ownerSet, ownerSet, false);
+    expect(resultSet.toDto()).toEqual([]);
   });
 });

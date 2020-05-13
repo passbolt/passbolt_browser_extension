@@ -57,6 +57,7 @@ class MoveResourcesController {
     try {
       await progressController.open(this.worker, this.getProgressTitle(), 1, 'Initializing...');
       await this.findAllForShare();
+      this.filterOutResourcesThatWontMove();
       await this.setGoals();
       await this.buildChanges();
       await this.move();
@@ -72,6 +73,23 @@ class MoveResourcesController {
   }
 
   /**
+   * Sanity check
+   * @returns {Promise<void>}
+   */
+  async assertValidMoveParameters(resourcesIds, destinationFolderId) {
+    if (destinationFolderId !== null) {
+      await this.folderModel.assertFolderExists(destinationFolderId);
+    }
+    if (resourcesIds.length) {
+      await this.resourceModel.assertResourcesExist(resourcesIds);
+    } else {
+      throw new Error('Could not move, expecting at least a resource to be provided.');
+    }
+    this.destinationFolderId = destinationFolderId;
+    this.resourcesIds = resourcesIds;
+  }
+
+  /**
    * GetPassphrase
    * @returns {Promise<void>}
    */
@@ -80,18 +98,6 @@ class MoveResourcesController {
     // We do this to confirm the move even if there is nothing to decrypt/re-encrypt
     this.passphrase = await passphraseController.get(this.worker);
     this.privateKey = await this.crypto.getAndDecryptPrivateKey(this.passphrase);
-  }
-
-  /**
-   * Set goals and init progress counter
-   * @returns {Promise<void>}
-   */
-  async setGoals() {
-    // goals = (number of resources to move * get move, secret, decrypt, share) + calculate changes + sync keyring
-    this.goals = (this.resources.length * 5) + 1;
-    this.progress = 0;
-    await progressController.updateGoals(this.worker, this.goals);
-    await progressController.update(this.worker, this.progress++, 'Calculating changes...');
   }
 
   /**
@@ -111,8 +117,36 @@ class MoveResourcesController {
     if (parentIds.length) {
       this.resourcesParentFolders = await this.folderModel.findAllForShare(this.resources.folderParentIds);
     }
+  }
 
-    this.filterOutResourcesThatWontMove();
+  /**
+   * Filter out work needed on resources
+   * @return void
+   */
+  filterOutResourcesThatWontMove() {
+    // Remove resources that are directly selected that can't be moved
+    for (let resource of this.resources) {
+      let parent = null;
+      if (resource.folderParentId !== null) {
+        parent = this.resourcesParentFolders.getById(resource.folderParentId);
+      }
+      if (!ResourceEntity.canResourceMove(resource, parent, this.destinationFolder)) {
+        console.warning(`Resource ${resource.name} can not be moved, skipping.`);
+        this.resources.remove(resource.id);
+      }
+    }
+  }
+
+  /**
+   * Set goals and init progress counter
+   * @returns {Promise<void>}
+   */
+  async setGoals() {
+    // goals = (number of resources to move * get move, secret, decrypt, share) + calculate changes + sync keyring
+    this.goals = (this.resources.length * 5) + 1;
+    this.progress = 0;
+    await progressController.updateGoals(this.worker, this.goals);
+    await progressController.update(this.worker, this.progress++, 'Calculating changes...');
   }
 
   /**
@@ -157,7 +191,7 @@ class MoveResourcesController {
     if (changesDto.length) {
       await progressController.update(this.worker, this.progress++, 'Synchronizing keys');
       await this.keyring.sync();
-      await Share.shareResources(resourcesDto, changesDto, this.passphrase, async message => {
+      await Share.bulkShareResources(resourcesDto, changesDto, this.passphrase, async message => {
         await progressController.update(this.worker, this.progress++, message);
       });
     }
@@ -172,40 +206,6 @@ class MoveResourcesController {
     this.privateKey = null;
   }
 
-  /**
-   * Sanity check
-   * @returns {Promise<void>}
-   */
-  async assertValidMoveParameters(resourcesIds, destinationFolderId) {
-    if (destinationFolderId !== null) {
-      await this.folderModel.assertFolderExists(destinationFolderId);
-    }
-    if (resourcesIds.length) {
-      await this.resourceModel.assertResourcesExist(resourcesIds);
-    } else {
-      throw new Error('Could not move, expecting at least a resource to be provided.');
-    }
-    this.destinationFolderId = destinationFolderId;
-    this.resourcesIds = resourcesIds;
-  }
-
-  /**
-   * Filter out work needed on resources
-   * @return void
-   */
-  filterOutResourcesThatWontMove() {
-    // Remove resources that are directly selected that can't be moved
-    for (let resource of this.resources) {
-      let parent = null;
-      if (resource.folderParentId !== null) {
-        parent = this.resourcesParentFolders.getById(resource.folderParentId);
-      }
-      if (!ResourceEntity.canResourceMove(resource, parent, this.destinationFolder)) {
-        console.warning(`Resource ${resource.name} can not be moved, skipping.`);
-        this.resources.remove(resource.id);
-      }
-    }
-  }
 
   /**
    * Get the title to display on the progress dialog

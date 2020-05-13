@@ -220,4 +220,29 @@ describe("Folders collection entity", () => {
       'e2172205-139c-4e4b-a03a-933528123f03'
     ]);
   });
+
+  it("merge works", () => {
+    const dto1 = [{
+      "id": "e2172205-139c-4e4b-a03a-933528123fff",
+      "folder_parent_id": null,
+      "name": "folder1"
+    }, {
+      "id": "e2172205-139c-4e4b-a03a-933528123ff1",
+      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff",
+      "name": "folder2"
+    }];
+    const dto2 = [{
+      "id": "e2172205-139c-4e4b-a03a-933528123f00",
+      "folder_parent_id": null,
+      "name": "folder3"
+    }, {
+      "id": "e2172205-139c-4e4b-a03a-933528123ff1",
+      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff",
+      "name": "folder2"
+    }];
+    const set1 = new FoldersCollection(dto1);
+    const set2 = new FoldersCollection(dto2);
+    set2.merge(set1);
+    expect(set2.length).toBe(3);
+  });
 });

@@ -115,17 +115,23 @@ class PermissionsCollection extends EntityCollection {
   // ==================================================
   /**
    * Return true if a given permission can be found already in the collection
-   * Look by Aco and Aro
    *
    * @param {PermissionEntity} permission
-   * @returns {PermissionEntity} if a match is found in collection
+   * @returns {(PermissionEntity|undefined)} if a match is found in collection
    */
-  getByAro(permission) {
-    const result = this._items.filter(existingPermission => PermissionEntity.isAroMatching(existingPermission, permission));
-    if (result.length) {
-      return result[0];
-    }
-    return undefined;
+  getByAroMatchingPermission(permission) {
+    return this._items.find(existingPermission => PermissionEntity.isAroMatching(existingPermission, permission));
+  }
+
+  /**
+   * Return true if a given permission can be found already in the collection
+   *
+   * @param {string} aro
+   * @param {string} aroForeignKey
+   * @returns {(PermissionEntity|undefined)} if a match is found in collection
+   */
+  getByAro(aro, aroForeignKey) {
+    return this._items.find(permission => permission.aro === aro && permission.aroForeignKey === aroForeignKey);
   }
 
   // ==================================================
@@ -290,7 +296,7 @@ class PermissionsCollection extends EntityCollection {
   static diff(set1, set2, ownerValidation) {
     const set3 = new PermissionsCollection([], false);
     for (let permission of set1) {
-      if (!set2.containPermission(permission.aro, permission.aroForeignKey, permission.type)) {
+      if (!set2.containAtLeastPermission(permission.aro, permission.aroForeignKey, permission.type)) {
         set3.push(permission);
       }
     }
@@ -301,16 +307,33 @@ class PermissionsCollection extends EntityCollection {
   }
 
   /**
-   * Return true if a set contain a permission for the given aro, aroForeign key and type
+   * Return true if a set contain a permission equal or superior for the given type and aro, aroForeign key
    *
    * @param {string} aro group or user
    * @param {string} aroForeignKey uuid
    * @param {number} type see permission entity types
    * @returns {boolean}
    */
-  containPermission( aro, aroForeignKey, type) {
+  containAtLeastPermission( aro, aroForeignKey, type) {
     for (let permission of this.items) {
-      if (permission.aro === aro && permission.aroForeignKey === aroForeignKey && permission.type === type) {
+      if (permission.aro === aro && permission.aroForeignKey === aroForeignKey && permission.type >= type) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Return true if a set contain a permission equal or inferior for the given type and aro, aroForeign key
+   *
+   * @param {string} aro group or user
+   * @param {string} aroForeignKey uuid
+   * @param {number} type see permission entity types
+   * @returns {boolean}
+   */
+  containAtMostPermission( aro, aroForeignKey, type) {
+    for (let permission of this.items) {
+      if (permission.aro === aro && permission.aroForeignKey === aroForeignKey && permission.type <= type) {
         return true;
       }
     }

@@ -57,8 +57,8 @@ class ResourceModel {
   async getAllByParentIds(folderIds) {
     const localResources = await ResourceLocalStorage.get();
     const resourcesCollection = new ResourcesCollection([]);
-    for (let i in folderIds) {
-      let resourceDto = localResources[i].id
+    for (let i in localResources) {
+      let resourceDto = localResources[i];
       if (folderIds.includes(resourceDto.folder_parent_id)) {
         resourcesCollection.push(resourceDto);
       }
@@ -76,32 +76,13 @@ class ResourceModel {
     const localResources = await ResourceLocalStorage.get();
     const resourcesCollection = new ResourcesCollection([]);
     for (let i in resourceIds) {
-      let resourceDto = localResources[i].id
+      let resourceDto = localResources[i];
       if (resourceIds.includes(resourceDto.id)) {
         resourcesCollection.push(resourceDto);
       }
     }
     return resourcesCollection;
   };
-
-  /**
-   * Get a collection of resources from the local storage by id
-   * Where the user is the owner
-   *
-   * @param {Array} resourceIds The resource ids
-   * @return {ResourcesCollection}
-   */
-  async getAllByIdsWhereOwner(resourceIds) {
-    const localResources = await ResourceLocalStorage.get();
-    const resourcesCollection = new ResourcesCollection([]);
-    for (let i in resourceIds) {
-      let resourceDto = localResources[i].id
-      if (resourceIds.includes(resourceDto.id) && resourceDto.permission.type === PermissionEntity.PERMISSION_OWNER) {
-        resourcesCollection.push(resourceDto);
-      }
-    }
-    return resourcesCollection;
-  }
 
   //==============================================================
   // Permission changes
@@ -122,7 +103,7 @@ class ResourceModel {
     let remainingPermissions = new PermissionsCollection([], false);
 
     // Remove permissions from parent if any
-    if (resource.folderParentId !== null) {
+    if (parentFolder !== null) {
       if (!resource.permissions || !parentFolder.permissions) {
         throw new TypeError('Resource model calculatePermissionsChangesForMove requires permissions to be set.');
       }

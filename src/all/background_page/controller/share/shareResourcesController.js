@@ -53,7 +53,7 @@ class ShareResourcesController {
       await progressController.open(this.worker, msg, progressGoal, 'Initialize');
       await progressController.update(this.worker, progress++, 'Synchronizing keys');
       await keyring.sync();
-      await Share.shareResources(resources, changes, passphrase, async message => {
+      await Share.bulkShareResources(resources, changes, passphrase, async message => {
         await progressController.update(this.worker, progress++, message);
       });
       const results = resources.map(resource => resource.id);

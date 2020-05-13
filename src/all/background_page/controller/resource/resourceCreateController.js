@@ -85,7 +85,7 @@ class ResourceCreateController {
         let changes = await this.resourceModel.calculatePermissionsChangesForCreate(resource, destinationFolder);
 
         // Apply changes
-        if (changes) {
+        if (changes.length) {
           goals = (changes.length * 3) + 2 + progress; // closer to reality...
           await progressController.updateGoals(this.worker, goals);
 
@@ -96,7 +96,7 @@ class ResourceCreateController {
           // Share
           await progressController.update(this.worker, progress++, "Start sharing");
           const resourcesToShare = [resource.toDto({secrets: true})];
-          await Share.shareResources(resourcesToShare, changes.toDto(), passphrase, async message => {
+          await Share.bulkShareResources(resourcesToShare, changes.toDto(), passphrase, async message => {
             await progressController.update(this.worker, progress++, message);
           });
         }

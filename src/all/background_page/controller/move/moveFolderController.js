@@ -47,7 +47,10 @@ class MoveFolderController {
     this.destinationFolderId = null;
     this.destinationFolder = null;
 
-    this.folderChanges = new PermissionChangesCollection([]);
+    this.subFolders = null;
+    this.foldersChanges = new PermissionChangesCollection([]);
+
+    this.resources = null;
     this.resourcesChanges = new PermissionChangesCollection([]);
 
     this.passphrase = null;
@@ -60,7 +63,7 @@ class MoveFolderController {
    * @param {(string|null)} destinationFolderId:  The destination folder
    */
   async main(folderId, destinationFolderId) {
-    await this.assertValidMoveParameters(folderId, destinationFolderId);
+    await this.assertValidParameters(folderId, destinationFolderId);
 
     try {
       await this.getPassphrase();
@@ -72,7 +75,7 @@ class MoveFolderController {
       await progressController.open(this.worker, 'Moving folder', 1, 'Initializing...');
       await this.findAllForShare();
       await this.setGoals();
-      await this.buildChanges();
+      await this.calculateChanges();
       await this.share();
       await this.move();
       await progressController.update(this.worker, this.goals, 'Done');
@@ -89,7 +92,7 @@ class MoveFolderController {
    * Sanity check
    * @returns {Promise<void>}
    */
-  async assertValidMoveParameters(folderId, destinationFolderId) {
+  async assertValidParameters(folderId, destinationFolderId) {
     if (destinationFolderId !== null) {
       await this.folderModel.assertFolderExists(destinationFolderId);
     }
@@ -134,7 +137,7 @@ class MoveFolderController {
     // Get all folders contained in this folder
     // and get all the resources contain in this folder and subfolders
     this.subFolders = await this.folderModel.getAllChildren([this.folder.id]);
-    this.resources = await this.resourceModel.getAllByParentIds([this.folderId, ...this.subFolders.ids]);
+    this.resources = await this.resourceModel.getAllByParentIds([this.folder.id, ...this.subFolders.ids]);
 
     // filter to keep only the resources and folders where the user can change permissions / share
     this.resources = this.resources.getAllWhereOwner();
@@ -179,11 +182,11 @@ class MoveFolderController {
    * Build changes to be used in bulk share
    * @returns {Promise<void>}
    */
-  async buildChanges() {
+  async calculateChanges() {
     // Calculate permission changes for current folder
     await progressController.update(this.worker, this.progress++, `Calculating changes for ${this.folder.name}`);
     if (this.folder.permission.isOwner()) {
-      this.folderChanges.merge(
+      this.foldersChanges.merge(
         await this.folderModel.calculatePermissionsChangesForMove(
           this.folder, this.parentFolder, this.destinationFolder
       ));
@@ -191,7 +194,7 @@ class MoveFolderController {
     // Add the ones for the sub folders
     for (let subfolder of this.subFolders) {
       if (subfolder.permission.isOwner()) {
-        this.folderChanges.merge(
+        this.foldersChanges.merge(
           await this.folderModel.calculatePermissionsChangesForMove(
             subfolder, this.parentFolder, this.destinationFolder
         ));
@@ -213,10 +216,10 @@ class MoveFolderController {
    */
   async share() {
     // Update folders permissions
-    if (this.folderChanges.length) {
+    if (this.foldersChanges.length) {
       let folders = new FoldersCollection([this.folder]);
       folders.merge(this.subFolders);
-      await Share.bulkShareFolders(folders, this.folderChanges, this.folderModel,  async message => {
+      await Share.bulkShareFolders(folders, this.foldersChanges, this.folderModel,  async message => {
         await progressController.update(this.worker, this.progress++, message);
       });
     }

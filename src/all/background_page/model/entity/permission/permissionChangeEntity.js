@@ -184,7 +184,21 @@ class PermissionChangeEntity extends Entity {
    * @returns {boolean} true if deleted
    */
   get isDeleted() {
-    return this._props.deleted || null;
+    return this._props.delete || null;
+  }
+
+  /**
+   * Get the current change scenario
+   * @returns {string}
+   */
+  get scenario() {
+    if (this.isDeleted) {
+      return PermissionChangeEntity.PERMISSION_CHANGE_DELETE;
+    }
+    if (!this.id) {
+      return PermissionChangeEntity.PERMISSION_CHANGE_CREATE;
+    }
+    return PermissionChangeEntity.PERMISSION_CHANGE_UPDATE;
   }
 
   // ==================================================

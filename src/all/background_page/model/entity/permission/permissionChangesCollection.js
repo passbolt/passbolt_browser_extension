@@ -135,33 +135,48 @@ class PermissionChangesCollection extends EntityCollection {
   // ==================================================
   /**
    * Return true if the changes can be applied
+   * @param {string} aco folder or resource to reuse the changes for
+   * @param {string} acoId uuid of the folder or resource to reuse the changes for
    * @param {PermissionsCollection} permissions
    * @param {PermissionChangesCollection} changes
+   * @param {PermissionsCollection} originalPermissions
    */
-  static reuseChanges(permissions, changes) {
+  static reuseChanges(aco, acoId, permissions, changes, originalPermissions) {
+    if (!aco || !acoId || !permissions || !originalPermissions || !changes) {
+      throw new TypeError('PermissionChangesCollection reuseChanges call is missing parameter(s).');
+    }
     const result = new PermissionChangesCollection([]);
-    for(let change of changes) {
+    for (let change of changes) {
       let permission = permissions.getByAro(change.aro, change.aroForeignKey);
-      if (!permission && change.isDeleted) {
-        // Permission is not present and change is a delete
-        // do nothing...
-        continue;
-      }
-      if (!permission && !change.isDeleted) {
-        // if change is not a delete and the
-        // permission doesn't not exist for this user / group
-        // create a new permission
-        result.push(PermissionChangeEntity.createFromPermission(permission, PermissionChangeEntity.PERMISSION_CHANGE_CREATE));
-        continue;
-      }
-      if (permission && !change.isDeleted) {
-        if (change.type === permission.type) {
-          // permission is present and the change is an increase/decrease
-          // of right that is already represented in the current permissions
-          continue;
-        }
-        // Permission is increased / decreased
-        result.push(PermissionChangeEntity.createFromPermission(permission, PermissionChangeEntity.PERMISSION_CHANGE_UPDATE));
+      switch(change.scenario) {
+        case PermissionChangeEntity.PERMISSION_CHANGE_DELETE:
+          if (permission && permission.type === change.type) {
+            result.push(PermissionChangeEntity.createFromPermission(
+              permission, PermissionChangeEntity.PERMISSION_CHANGE_DELETE
+            ));
+          }
+          break;
+        case PermissionChangeEntity.PERMISSION_CHANGE_CREATE:
+          if (!permission) {
+            result.push(new PermissionChangeEntity({
+              aco: aco,
+              aco_foreign_key: acoId,
+              aro: change.aro,
+              aro_foreign_key: change.aroForeignKey,
+              type: change.type
+            }));
+          }
+          break;
+        case PermissionChangeEntity.PERMISSION_CHANGE_UPDATE:
+          if (permission && permission.type !== change.type) {
+            const originalPermission = originalPermissions.items.find(p => p.id === change.id);
+            if (originalPermission.type === permission.type) {
+              result.push(PermissionChangeEntity.createFromPermission(
+                permission, PermissionChangeEntity.PERMISSION_CHANGE_UPDATE
+              ));
+            }
+          }
+          break;
       }
     }
     return result;
@@ -174,6 +189,9 @@ class PermissionChangesCollection extends EntityCollection {
    * @param {PermissionsCollection} expectedSet
    */
   static calculateChanges(originalSet, expectedSet) {
+    if (!originalSet || !(originalSet instanceof PermissionsCollection) || !expectedSet || !(expectedSet instanceof PermissionsCollection)) {
+      throw new TypeError('PermissionChangesCollection calculateChanges invalid parameters');
+    }
     const result = new PermissionChangesCollection([]);
 
     // Find new or updated permissions

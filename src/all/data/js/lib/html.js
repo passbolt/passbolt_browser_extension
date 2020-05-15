@@ -103,14 +103,17 @@ passbolt.templates = window.templates;
   passbolt.html.getBrowserName = getBrowserName;
 
   /**
+   * InsertIframe
    *
    * @param iframeId string
    * @param iframeUrlOptions Object
    * @param appendTo string acting as jQuery selector
    * @param className string (optional)
+   * @param style string (optional)
+   * @param port string (optional)
    * @returns {*|jQuery|HTMLElement}
    */
-  var insertIframe = function (iframeId, appendTo, className, iframeUrlOptions, insertMode, style) {
+  var insertIframe = function (iframeId, appendTo, className, iframeUrlOptions, insertMode, style, port) {
     // set defaults
     const mode = insertMode || 'append';
     const css = style || '';
@@ -118,7 +121,8 @@ passbolt.templates = window.templates;
     const cssClass = className || '';
 
     // build iframe url
-    var iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html') + `?passbolt=${iframeId}&`;
+    var port = port ? port : iframeId;
+    var iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html') + `?passbolt=${port}&`;
     let optionUrl = [];
     for (var options in urlOptions)
       if (iframeUrlOptions.hasOwnProperty(options)) {

@@ -1,5 +1,8 @@
 window.templates = window.templates || {};
 window.templates.login = window.templates.login || {};
+window.templates.login.changeKey = require('./login/changeKey.js');
+window.templates.login.changeKeyOops = require('./login/changeKeyOops.js');
+window.templates.login.changeKeySuccess = require('./login/changeKeySuccess.js');
 window.templates.login.feedbackLoginError = require('./login/feedbackLoginError.js');
 window.templates.login.feedbackLoginNoUser = require('./login/feedbackLoginNoUser.js');
 window.templates.login.feedbackLoginOops = require('./login/feedbackLoginOops.js');

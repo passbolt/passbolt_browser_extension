@@ -6,15 +6,15 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const AuthController = require('../controller/authController').AuthController;
-const AuthCheckStatusController = require('../controller/auth/authCheckStatusController').AuthCheckStatusController;
-const AuthIsAuthenticatedController = require('../controller/auth/authIsAuthenticatedController').AuthIsAuthenticatedController;
-const AuthIsMfaRequiredController = require('../controller/auth/authIsMfaRequiredController').AuthIsMfaRequiredController;
-const GpgAuth = require('../model/gpgauth').GpgAuth;
+const {AuthController} = require('../controller/authController');
+const {AuthCheckStatusController} = require('../controller/auth/authCheckStatusController');
+const {AuthIsAuthenticatedController} = require('../controller/auth/authIsAuthenticatedController');
+const {AuthIsMfaRequiredController} = require('../controller/auth/authIsMfaRequiredController');
+const {AuthUpdateServerKeyController} = require('../controller/auth/authUpdateServerKeyController');
+const {GpgAuth} = require('../model/gpgauth');
 const Worker = require('../model/worker');
 
 const listen = function (worker) {
-
   /*
    * Check if the user is authenticated.
    *
@@ -79,11 +79,11 @@ const listen = function (worker) {
   /*
    * Get the password server key for a given domain.
    *
-   * @listens passbolt.auth.getServerKey
+   * @listens passbolt.auth.get-server-key
    * @param requestId {uuid} The request identifier
    * @param domain {string} The server's domain
    */
-  worker.port.on('passbolt.auth.getServerKey', function (requestId, domain) {
+  worker.port.on('passbolt.auth.get-server-key', function (requestId, domain) {
     var gpgauth = new GpgAuth();
     gpgauth.getServerKey(domain).then(
       function success(msg) {
@@ -93,6 +93,17 @@ const listen = function (worker) {
         worker.port.emit(requestId, 'ERROR', error.message);
       }
     );
+  });
+
+  /*
+   * Get the password server key for a given domain.
+   *
+   * @listens passbolt.auth.replace-server-key
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.auth.replace-server-key', async function (requestId) {
+    const controller = new AuthUpdateServerKeyController(worker, requestId);
+    await controller.main();
   });
 
   /*
@@ -108,7 +119,7 @@ const listen = function (worker) {
    * @param redirect {string} The uri to redirect the user after login
    */
   worker.port.on('passbolt.auth.login', function (requestId, passphrase, remember, redirect) {
-    var auth = new AuthController(worker, requestId);
+    const auth = new AuthController(worker, requestId);
     auth.login(passphrase, remember, redirect);
   });
 

@@ -135,7 +135,7 @@ $(function () {
    * @private
    */
   step._fetchServerKey = function (domain) {
-    return passbolt.request('passbolt.auth.getServerKey', domain)
+    return passbolt.request('passbolt.auth.get-server-key', domain)
       .then(function (serverKey) {
         step._data.serverKey = serverKey.keydata;
         return serverKey.keydata;

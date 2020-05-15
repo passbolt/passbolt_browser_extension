@@ -82,11 +82,27 @@ $(function () {
         }
         // All other cases.
         else {
-          passbolt.html.loadTemplate('.login.form', 'login/feedbackLoginOops.ejs');
+          passbolt.login.onStep0ChangeKey();
+          // passbolt.html.loadTemplate('.login.form', 'login/feedbackLoginOops.ejs');
         }
       }
     );
     passbolt.login.onStep1RequestPassphrase();
+  };
+
+  /**
+   * Insert the passphrase dialog iframe.
+   */
+  passbolt.login.onStep0ChangeKey = function () {
+    // Inject the change key dialog iframe into the web page DOM.
+    // piggy back on login form page mod / port
+    const iframeId = 'passbolt-iframe-login-change-key';
+    const port = passphraseIframeId;
+    const className = 'loading';
+    const appendTo = '.login.form';
+    const style = 'width:330px;height:250px;';
+    $(appendTo).empty();
+    passbolt.html.insertIframe(iframeId, appendTo, className, null, null, style, port);
   };
 
   /**

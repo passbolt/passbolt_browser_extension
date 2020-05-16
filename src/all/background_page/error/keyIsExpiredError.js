@@ -5,11 +5,11 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-class ServerKeyChanged extends Error {
+class KeyIsExpiredError extends Error {
   constructor(message) {
     super(message);
-    this.name = 'ServerKeyChanged';
+    this.name = 'KeyIsExpiredError';
   }
 }
 
-exports.ServerKeyChanged = ServerKeyChanged;
+exports.KeyIsExpiredError = KeyIsExpiredError;

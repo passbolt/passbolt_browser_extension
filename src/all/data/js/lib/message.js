@@ -116,3 +116,5 @@ var passbolt = window.passbolt || {};
 })(passbolt);
 
 window.passbolt = passbolt;
+// result must be structured-clonable data
+undefined;

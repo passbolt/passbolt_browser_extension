@@ -56,7 +56,7 @@ module.exports = function(grunt) {
   grunt.registerTask('pre-dist', ['copy:vendors', 'copy:styleguide']);
 
   grunt.registerTask('bundle', ['copy:background_page', 'copy:content_scripts', 'browserify:app', 'ejs_compile', 'browserify:templates', 'copy:data']);
-  grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle', 'browserify:vendors']);
+  grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle', 'browserify:vendors', 'shell:append']);
   grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle', 'browserify:vendors']);
 
   grunt.registerTask('build', ['build-firefox', 'build-chrome']);
@@ -300,6 +300,15 @@ module.exports = function(grunt) {
       /**
        * Firefox
        */
+      append: {
+        options: {
+          stderr: false
+        },
+        command: [
+          'echo "//result must be structured-clonable data" | tee -a ' + path.build_templates + '*.js',
+          'echo "undefined;" | tee -a ' + path.build_templates + '*.js'
+        ].join(' &&')
+      },
       build_firefox_debug: {
         options: {
           stderr: false

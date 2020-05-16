@@ -339,6 +339,7 @@ $(function () {
       fillForm(quickaccessFormData);
     });
   };
-
-  undefined; // result must be structured-clonable data
 });
+
+// result must be structured-clonable data
+undefined;

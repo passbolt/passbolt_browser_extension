@@ -440,4 +440,5 @@ passbolt.message.on('passbolt.app.worker.ready', function (requestId) {
   passbolt.message.emit(requestId, 'SUCCESS');
 });
 
-undefined; // result must be structured-clonable data
+// result must be structured-clonable data
+undefined;

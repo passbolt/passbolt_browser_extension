@@ -14,6 +14,9 @@ const User = require('../model/user').User;
 const __ = require('../sdk/l10n').get;
 const Worker = require('../model/worker');
 
+const KeyIsExpiredError = require('../error/keyIsExpiredError').KeyIsExpiredError;
+const ServerKeyChangedError = require('../error/serverKeyChangedError').ServerKeyChangedError;
+
 /**
  * Auth Controller constructor.
  * @constructor
@@ -36,6 +39,12 @@ AuthController.prototype.verify = async function () {
     msg = __('The server key is verified. The server can use it to sign and decrypt content.');
     this.worker.port.emit(this.requestId, 'SUCCESS', msg);
   } catch (error) {
+    if (await this.auth.serverKeyChanged()) {
+      error = new ServerKeyChangedError(__('The server key is changed.'));
+    } else if (await this.auth.isServerKeyExpired()) {
+      error = new KeyIsExpiredError(__('The server key is expired.'));
+    }
+
     error.message =  `${__('Could not verify server key.')} ${error.message}`;
     this.worker.port.emit(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
   }

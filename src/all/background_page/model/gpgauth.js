@@ -13,10 +13,8 @@ const Crypto = require('./crypto').Crypto;
 const Uuid = require('../utils/uuid');
 const GpgAuthToken = require('./gpgAuthToken').GpgAuthToken;
 const GpgAuthHeader = require('./gpgAuthHeader').GpgAuthHeader;
-const KeyIsExpired = require('../error/keyIsExpired').KeyIsExpired;
 const MfaAuthenticationRequiredError = require('../error/mfaAuthenticationRequiredError').MfaAuthenticationRequiredError;
 const Request = require('./request').Request;
-const ServerKeyChanged = require('../error/serverKeyChanged').ServerKeyChanged;
 const SiteSettings = require('./siteSettings').SiteSettings;
 
 const URL_VERIFY = '/auth/verify.json?api-version=v1';
@@ -75,12 +73,6 @@ GpgAuth.prototype.verify = async function (serverUrl, armoredServerKey, userFing
     originalToken = new GpgAuthToken();
     encrypted = await crypto.encrypt(originalToken.token, serverKey)
   } catch (error) {
-    if (await this.serverKeyChanged(serverKey)) {
-      throw new ServerKeyChanged(__('The server key is changed.'));
-    }
-    if (await this.keyring.keyIsExpired(serverKey)) {
-      throw new KeyIsExpired(__('The server key is expired.'));
-    }
     throw new Error(__('Unable to encrypt the verify token.') + ' ' + error.message);
   }
 
@@ -119,18 +111,35 @@ GpgAuth.prototype.verify = async function (serverUrl, armoredServerKey, userFing
 
 /**
  * Check if the server key has changed
- * @param {string} The current server key
  */
-GpgAuth.prototype.serverKeyChanged = async function(serverKey) {
-  const updatedServerKeyInfo = await this.getServerKey();
-  return updatedServerKeyInfo.keydata.trim() !== serverKey;
+GpgAuth.prototype.serverKeyChanged = async function() {
+  const remoteKey = await this.getServerKey();
+  const localKey = await this.getServerKeyFromKeyring();
+  return remoteKey.keydata.trim() !== localKey.trim();
 };
+
+/**
+ * Get Server key from keyring
+ * @returns {Promise<*>}
+ */
+GpgAuth.prototype.getServerKeyFromKeyring = async function() {
+  return await this.keyring.findPublic(Uuid.get(this.getDomain())).key;
+}
+
+/**
+ * isServerKeyExpired
+ * @returns {Promise<boolean>}
+ */
+GpgAuth.prototype.isServerKeyExpired = async function() {
+  const key = await this.getServerKeyFromKeyring();
+  return await this.keyring.keyIsExpired(key);
+}
 
 /**
  * Get Server key for GPG auth.
  *
- * @param serverUrl {string} domain where to get the key. if domain is not
- *  provided, then look in the settings.
+ * @param {string} [serverUrl] optional domain where to get the key.
+ * if domain is not provided, then look in the settings.
  *
  * @returns {Promise.<string>}
  */

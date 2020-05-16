@@ -197,3 +197,5 @@ var self = window.self || {};
 })(self);
 
 window.self = self;
+// result must be structured-clonable data
+undefined;

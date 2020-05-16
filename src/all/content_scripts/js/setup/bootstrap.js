@@ -48,4 +48,5 @@ $(function () {
     self.port.emit('passbolt.setup.plugin_check', data);
   }
 });
-undefined; // result must be structured-clonable data
+// result must be structured-clonable data
+undefined;

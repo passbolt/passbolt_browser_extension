@@ -88,11 +88,11 @@ $(function () {
     passbolt.html.loadTemplate('.plugin-check.gpg', 'login/message.ejs', 'html', {message: error.message});
     $('html').addClass('server-not-verified');
 
-    if (error.name === "KeyIsExpired") {
+    if (error.name === "KeyIsExpiredError") {
       // Nothing to do
-    } else if (error.name === "ServerKeyChanged") {
+    } else if (error.name === "ServerKeyChangedError") {
       passbolt.login.onStep0ChangeKey();
-    } else if (error.message.indexOf('no user associated') != -1) {
+    } else if (error.message.indexOf('no user associated') !== -1) {
       // Special case to handle if the user doesn't exist on server.
       $('html').addClass('server-no-user');
       var passboltDomain = window.location.href.replace(/(.*)(\/auth\/login)(.*)$/, '$1');
@@ -184,4 +184,5 @@ $(function () {
 
   passbolt.login.init();
 });
-undefined; // result must be structured-clonable data
+// result must be structured-clonable data
+undefined;

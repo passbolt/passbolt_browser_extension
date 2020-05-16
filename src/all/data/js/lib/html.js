@@ -172,3 +172,6 @@ passbolt.templates = window.templates;
   passbolt.html.insertThemedIframe = insertThemedIframe;
 
 })(passbolt);
+
+// result must be structured-clonable data
+undefined;

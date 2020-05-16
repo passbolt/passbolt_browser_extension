@@ -360,3 +360,4 @@ Object.keys(eventAliasMap).forEach(aliasKey => {
 })
 
 window.fireEvent = fireEvent;
+undefined;

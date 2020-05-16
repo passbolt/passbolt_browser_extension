@@ -78,3 +78,5 @@ $(function () {
   passbolt.file.init();
 
 });
+// result must be structured-clonable data
+undefined;

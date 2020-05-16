@@ -192,7 +192,7 @@ $(function () {
           resolve();
         }
         else if (step.options.workflow == 'recover') {
-          if (error.name === "KeyIsExpired") {
+          if (error.name === "KeyIsExpiredError") {
             resolve();
           } else {
             reject('This key doesn\'t match any account.');

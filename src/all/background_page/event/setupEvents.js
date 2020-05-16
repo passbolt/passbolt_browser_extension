@@ -118,22 +118,14 @@ var listen = function (worker) {
    * @listens passbolt.setup.checkKeyExistRemotely
    * @param fingerprint {string} The key fingerprint to check
    */
-  worker.port.on('passbolt.setup.checkKeyExistRemotely', function (requestId, fingerprint) {
+  worker.port.on('passbolt.setup.checkKeyExistRemotely', async function (requestId, fingerprint) {
     try {
-      setup.checkKeyExistRemotely(fingerprint)
-        .then(
-          function () {
-            worker.port.emit(requestId, 'SUCCESS');
-          },
-          function (error) {
-            console.error(error);
-            worker.port.emit(requestId, 'ERROR', error.message);
-          }
-        );
+      await setup.checkKeyExistRemotely(fingerprint);
+      worker.port.emit(requestId, 'SUCCESS');
     }
     catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', error.message);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }
   });
 

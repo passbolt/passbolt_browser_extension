@@ -234,6 +234,35 @@ Keyring.prototype.importServerPublicKey = async function (armoredKey, domain) {
 };
 
 /**
+ * Check if a key is expired.
+ * @param {string} armoredKey The key to check
+ * @returns {Promise<bool>}
+ */
+Keyring.prototype.keyIsExpired = async function(armoredKey) {
+  let key = await openpgp.key.readArmored(armoredKey);
+  if (key.err) {
+    throw new Error(key.err[0].message);
+  }
+
+  key = key.keys[0];
+  let expirationTime;
+  try {
+    expirationTime = await key.getExpirationTime();
+  } catch(error) {
+    return false;
+  }
+
+  if (expirationTime === Infinity) {
+    return false;
+  }
+
+  const expirationDate = new Date(expirationTime.toString());
+  const now = Date.now();
+
+  return expirationDate < now;
+};
+
+/**
  * Get the key info.
  *
  * @param armoredKey {string} The key to examine

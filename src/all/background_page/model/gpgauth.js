@@ -13,8 +13,10 @@ const Crypto = require('./crypto').Crypto;
 const Uuid = require('../utils/uuid');
 const GpgAuthToken = require('./gpgAuthToken').GpgAuthToken;
 const GpgAuthHeader = require('./gpgAuthHeader').GpgAuthHeader;
+const KeyIsExpired = require('../error/keyIsExpired').KeyIsExpired;
 const MfaAuthenticationRequiredError = require('../error/mfaAuthenticationRequiredError').MfaAuthenticationRequiredError;
 const Request = require('./request').Request;
+const ServerKeyChanged = require('../error/serverKeyChanged').ServerKeyChanged;
 const SiteSettings = require('./siteSettings').SiteSettings;
 
 const URL_VERIFY = '/auth/verify.json?api-version=v1';
@@ -63,7 +65,7 @@ GpgAuth.prototype.getDomain = function () {
  */
 GpgAuth.prototype.verify = async function (serverUrl, armoredServerKey, userFingerprint) {
   let domain = serverUrl || this.getDomain();
-  let serverKey = armoredServerKey || Uuid.get(domain);
+  let serverKey = armoredServerKey || this.keyring.findPublic(Uuid.get(domain)).key;
   let fingerprint = userFingerprint || this.keyring.findPrivate().fingerprint;
 
   // Encrypt a random token
@@ -73,6 +75,12 @@ GpgAuth.prototype.verify = async function (serverUrl, armoredServerKey, userFing
     originalToken = new GpgAuthToken();
     encrypted = await crypto.encrypt(originalToken.token, serverKey)
   } catch (error) {
+    if (await this.serverKeyChanged(serverKey)) {
+      throw new ServerKeyChanged(__('The server key is changed.'));
+    }
+    if (await this.keyring.keyIsExpired(serverKey)) {
+      throw new KeyIsExpired(__('The server key is expired.'));
+    }
     throw new Error(__('Unable to encrypt the verify token.') + ' ' + error.message);
   }
 
@@ -107,6 +115,15 @@ GpgAuth.prototype.verify = async function (serverUrl, armoredServerKey, userFing
   if (verifyToken.token !== originalToken.token) {
     throw new Error(__('The server was unable to prove it can use the advertised OpenPGP key.'));
   }
+};
+
+/**
+ * Check if the server key has changed
+ * @param {string} The current server key
+ */
+GpgAuth.prototype.serverKeyChanged = async function(serverKey) {
+  const updatedServerKeyInfo = await this.getServerKey();
+  return updatedServerKeyInfo.keydata.trim() !== serverKey;
 };
 
 /**

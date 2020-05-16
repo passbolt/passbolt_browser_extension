@@ -392,9 +392,9 @@ Setup.prototype.saveSettings = async function (setupData) {
  * @return {promise}
  */
 Setup.prototype.checkKeyExistRemotely = function (userFingerprint) {
-  var armoredServerKey = this.get('settings.armoredServerKey');
-  var serverUrl = this.get('settings.domain');
-  var gpgAuth = new Auth();
+  const armoredServerKey = this.get('settings.armoredServerKey');
+  const serverUrl = this.get('settings.domain');
+  const gpgAuth = new Auth();
   return gpgAuth.verify(serverUrl, armoredServerKey, userFingerprint);
 };
 

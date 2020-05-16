@@ -51,43 +51,59 @@ $(function () {
   /**
    * Server key check.
    */
-  passbolt.login.onStep0CheckServerKey = function () {
-
-    passbolt.request('passbolt.auth.verify').then(
-      function success(msg) {
-        $('.plugin-check.gpg')
-          .removeClass('notice')
-          .addClass('success');
-
-        passbolt.html.loadTemplate('.plugin-check.gpg', 'login/message.ejs', 'html', {message: msg});
-
-        $('html').addClass('server-verified');
-      },
-      function error(msg) {
-        $('.plugin-check.gpg')
-          .removeClass('notice')
-          .addClass('error');
-
-        passbolt.html.loadTemplate('.plugin-check.gpg', 'login/message.ejs', 'html', {message: msg});
-
-        $('html').addClass('server-not-verified');
-
-        // Special case to handle if the user doesn't exist on server.
-        if (msg.indexOf('no user associated') != -1) {
-          $('html').addClass('server-no-user');
-          var passboltDomain = window.location.href.replace(/(.*)(\/auth\/login)(.*)$/, '$1');
-          passbolt.html.loadTemplate('.login.form', 'login/feedbackLoginNoUser.ejs', 'html', {
-              passboltDomain: passboltDomain
-          });
-        }
-        // All other cases.
-        else {
-          passbolt.login.onStep0ChangeKey();
-          // passbolt.html.loadTemplate('.login.form', 'login/feedbackLoginOops.ejs');
-        }
-      }
-    );
+  passbolt.login.onStep0CheckServerKey = async function () {
     passbolt.login.onStep1RequestPassphrase();
+
+    try {
+      const result = await passbolt.request('passbolt.auth.verify');
+      passbolt.login.handleVerifySuccess(result);
+    } catch (error) {
+      passbolt.login.handleVerifyError(error);
+    }
+  };
+
+  /**
+   * Handle when the verify is a success
+   * @param {string} msg The success message
+   */
+  passbolt.login.handleVerifySuccess = function(msg) {
+    $('.plugin-check.gpg')
+      .removeClass('notice')
+      .addClass('success');
+
+    passbolt.html.loadTemplate('.plugin-check.gpg', 'login/message.ejs', 'html', {message: msg});
+
+    $('html').addClass('server-verified');
+  };
+
+  /**
+   * Handle when the verify fail.
+   * @param {object} error The error message
+   */
+  passbolt.login.handleVerifyError = function(error) {
+    $('.plugin-check.gpg')
+      .removeClass('notice')
+      .addClass('error');
+
+    passbolt.html.loadTemplate('.plugin-check.gpg', 'login/message.ejs', 'html', {message: error.message});
+    $('html').addClass('server-not-verified');
+
+    if (error.name === "KeyIsExpired") {
+      // Nothing to do
+    } else if (error.name === "ServerKeyChanged") {
+      passbolt.login.onStep0ChangeKey();
+    } else if (error.message.indexOf('no user associated') != -1) {
+      // Special case to handle if the user doesn't exist on server.
+      $('html').addClass('server-no-user');
+      var passboltDomain = window.location.href.replace(/(.*)(\/auth\/login)(.*)$/, '$1');
+      passbolt.html.loadTemplate('.login.form', 'login/feedbackLoginNoUser.ejs', 'html', {
+        passboltDomain: passboltDomain
+      });
+    }
+    // All other cases.
+    else {
+      passbolt.html.loadTemplate('.login.form', 'login/feedbackLoginOops.ejs');
+    }
   };
 
   /**

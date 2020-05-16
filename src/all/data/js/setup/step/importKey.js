@@ -178,24 +178,27 @@ $(function () {
    * @return {promise}
    */
   step.validatePrivateKey = function () {
-    return new Promise(function(resolve, reject) {
-      passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint)
-        .then(function () {
-          if (step.options.workflow == 'install') {
-            reject('This key is already used by another user');
-          }
-          else if (step.options.workflow == 'recover') {
+    return new Promise(async (resolve, reject) =>  {
+      try {
+        await passbolt.request('passbolt.setup.checkKeyExistRemotely', step.data.privateKeyInfo.fingerprint);
+        if (step.options.workflow == 'install') {
+          reject('This key is already used by another user');
+        }
+        else if (step.options.workflow == 'recover') {
+          resolve();
+        }
+      } catch (error) {
+        if (step.options.workflow == 'install') {
+          resolve();
+        }
+        else if (step.options.workflow == 'recover') {
+          if (error.name === "KeyIsExpired") {
             resolve();
-          }
-        })
-        .then(null, function () {
-          if (step.options.workflow == 'install') {
-            resolve();
-          }
-          else if (step.options.workflow == 'recover') {
+          } else {
             reject('This key doesn\'t match any account.');
           }
-        });
+        }
+      }
     });
   };
 

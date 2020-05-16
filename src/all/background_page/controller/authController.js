@@ -36,8 +36,8 @@ AuthController.prototype.verify = async function () {
     msg = __('The server key is verified. The server can use it to sign and decrypt content.');
     this.worker.port.emit(this.requestId, 'SUCCESS', msg);
   } catch (error) {
-    msg = __('Could not verify server key.') + ' ' + error.message;
-    this.worker.port.emit(this.requestId, 'ERROR', msg);
+    error.message =  `${__('Could not verify server key.')} ${error.message}`;
+    this.worker.port.emit(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
   }
 };
 

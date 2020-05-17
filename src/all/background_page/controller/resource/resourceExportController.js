@@ -12,8 +12,11 @@
  * @since         2.7.0
  */
 const progressController = require('../progress/progressController');
-const {LegacyResourceService} = require('../../service/resource');
-const {TabStorage} = require('../../model/tabStorage');
+const ResourceService = require('../../service/api/resource/resourceService').ResourceService;
+const TabStorage = require('../../model/tabStorage').TabStorage;
+const User = require('../../model/user').User;
+const ResourceModel = require('../../model/resource/resourceModel').ResourceModel;
+const FolderModel = require('../../model/folder/folderModel').FolderModel;
 
 /**
  * Resources export controller
@@ -22,14 +25,52 @@ class ResourceExportController {
 
   /**
    * Execute the controller
-   * @param {array} resourcesIds The list of resources identifiers to export
+   * @param {array} items The list of items to export. There are 2 formats:
+   *   1) a list of resource ids (will be deprecated)
+   *   2) a list of items categorized under their entity name: example: folders: [folderIds], resources[resourceIds]
    */
-  static async exec(worker, resourcesIds) {
+  static async exec(worker, items) {
+    const requestedToExport = {
+      resources: Array.isArray(items) ? items : items['resources'] || [],
+      folders: items['folders'] || []
+    };
+
+    const itemsToExport = {
+      resources: [],
+      folders: [],
+    }
+
     try {
-      const progressDialogPromise = progressController.open(worker, 'Retrieving passwords...');
-      const resources = await LegacyResourceService.findAllByResourcesIds(resourcesIds, {contain:{secret: 1}});
+      const progressDialogPromise = progressController.open(worker, 'Retrieving items...');
+      const resourceModel = new ResourceModel(await User.getInstance().getApiClientOptions());
+      const folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
+
+      if (requestedToExport.folders.length) {
+        const folders = await folderModel.getAllByIds(requestedToExport.folders, true);
+        itemsToExport.folders = folders.items.map((f) => { return f.toDto() });
+        const folderIdsToExport = folders.items.map((f) => {
+          return f.id;
+        });
+
+        const resourcesInFolders = await resourceModel.getAllByParentIds(folderIdsToExport);
+        const resourceInFoldersIds = resourcesInFolders.items.map((r) => {
+          return r.id;
+        });
+        requestedToExport.resources = [...new Set([...requestedToExport.resources, ...resourceInFoldersIds])];
+      }
+
+      const filter = {
+        'has-id': requestedToExport.resources
+      };
+      const contain = {
+        'secret': 1
+      };
+
+      const resourceService = new ResourceService(await User.getInstance().getApiClientOptions());
+      itemsToExport.resources = await resourceService.findAll(contain, filter);
+
       await progressController.close(worker);
-      TabStorage.set(worker.tab.id, 'exportedResources', resources);
+      TabStorage.set(worker.tab.id, 'itemsToExport', itemsToExport);
       await progressDialogPromise;
       worker.port.emit('passbolt.export-passwords.open-dialog');
     } catch (error) {

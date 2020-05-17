@@ -49,7 +49,7 @@ class ResourceModel {
   // Local storage getters
   //==============================================================
   /**
-   * Get a folder collection from the local storage by id
+   * Get a collection of resources from the local storage by id
    *
    * @param {Array} folderIds The folder id
    * @return {ResourcesCollection}
@@ -57,8 +57,8 @@ class ResourceModel {
   async getAllByParentIds(folderIds) {
     const localResources = await ResourceLocalStorage.get();
     const resourcesCollection = new ResourcesCollection([]);
-    for (let i in folderIds) {
-      let resourceDto = localResources[i].id
+    for (let i in localResources) {
+      let resourceDto = localResources[i];
       if (folderIds.includes(resourceDto.folder_parent_id)) {
         resourcesCollection.push(resourceDto);
       }

@@ -4,23 +4,24 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var fileController = require('../controller/fileController');
+const fileController = require('../controller/fileController');
 const passphraseController = require('../controller/passphrase/passphraseController');
-var KeepassDb = require('../model/keepassDb').KeepassDb;
-var CsvDb = require('../model/csvDb').CsvDb;
-var Crypto = require('../model/crypto').Crypto;
-var progressController = require('./progress/progressController');
+const KeepassDb = require('../model/keepassDb/keepassDb').KeepassDb;
+const CsvDb = require('../model/csvDb').CsvDb;
+const Crypto = require('../model/crypto').Crypto;
+const progressController = require('./progress/progressController');
 
 /**
  * Controller for Export passwords.
  * @param tabid
  * @constructor
  */
-var ExportPasswordsController = function(worker) {
+const ExportPasswordsController = function(worker) {
   this.worker = worker;
   this.progressObjective = 0;
   this.progressStatus = 0;
   this.resources = [];
+  this.folders = [];
   this.format = "";
   this.csvFormat = "";
   this.credentials = null;
@@ -28,7 +29,11 @@ var ExportPasswordsController = function(worker) {
 
 /**
  * Initialize export controller.
- * @param Array resources list of resources
+ * @param object itemsToExport object containing the items to export
+ *    {
+ *      resources: Array,
+ *      folders: Array
+ *    }
  * @param object options options
  *   format: the format of the export (csv-xxx or kdbx)
  *   credentials: credentials if required (mainly for kdbx)
@@ -36,12 +41,15 @@ var ExportPasswordsController = function(worker) {
  *     - keyFile (string) base64 encoded file
  * @return void
  */
-ExportPasswordsController.prototype.init = function(resources, options) {
+ExportPasswordsController.prototype.init = function(itemsToExport, options) {
   var format = options.format || "";
   this.credentials = options.credentials || null;
-  this.resources = resources;
+  this.resources = itemsToExport.resources;
+  this.folders = itemsToExport.folders;
+
+  console.log('exportPasswordsController init', itemsToExport);
   // CSV formats are given in the format "csv-subformat". We need to extract the subformat.
-  var isCsv = format.match(/csv-(.*)/);
+  const isCsv = format.match(/csv-(.*)/);
 
   if(isCsv) {
     this.format = "csv";
@@ -61,7 +69,7 @@ ExportPasswordsController.prototype.init = function(resources, options) {
 ExportPasswordsController.prototype.decryptSecrets = async function() {
   const decryptedSecrets = await this._decryptSecrets(this.resources);
   await progressController.close(this.worker);
-  this.resources = this._addDecryptedSecretsToResources(self.resources, decryptedSecrets);
+  this.resources = this._addDecryptedSecretsToResources(this.resources, decryptedSecrets);
   return this.resources
 };
 
@@ -85,15 +93,20 @@ ExportPasswordsController.prototype.convertResourcesToCsv = function(options) {
  * @return {Promise.<ArrayBuffer>|*}
  */
 ExportPasswordsController.prototype.convertResourcesToKdbx = function(options) {
-  var password = options.credentials.password || "",
-    keyFile = options.credentials.keyFile || null;
+  const password = options.credentials.password || "";
+  let keyFile = options.credentials.keyFile || null;
 
   if (keyFile !== null) {
     keyFile = fileController.b64ToBlob(keyFile);
   }
-  var keepassDb = new KeepassDb();
 
-  return keepassDb.fromResources(this.resources, password, keyFile);
+  const keepassDb = new KeepassDb();
+  const items = {
+    'resources':this.resources,
+    'folders': this.folders
+  };
+
+  return keepassDb.fromItems(items, password, keyFile);
 };
 
 /**
@@ -104,7 +117,7 @@ ExportPasswordsController.prototype.convertResourcesToKdbx = function(options) {
  * @private
  */
 ExportPasswordsController.prototype._addDecryptedSecretsToResources = function(resources, secrets) {
-  for (var i in resources) {
+  for (let i in resources) {
     resources[i].secretClear = secrets[i];
   }
   return resources;
@@ -152,14 +165,14 @@ ExportPasswordsController.prototype.downloadFile = function(fileContent) {
  * @private
  */
 ExportPasswordsController.prototype._decryptSecrets = function(secrets) {
-  var self = this,
+  const self = this,
     crypto = new Crypto();
 
   // Master password required to decrypt a secret before sharing it.
   return passphraseController.get(this.worker)
   .then(function (masterPassword) {
     progressController.open(self.worker, 'Decrypting...', self.resources.length);
-    var armored = self._prepareArmoredList();
+    const armored = self._prepareArmoredList();
     return crypto.decryptAll(armored, masterPassword,
       // On complete.
       function () {
@@ -179,8 +192,8 @@ ExportPasswordsController.prototype._decryptSecrets = function(secrets) {
  * @private
  */
 ExportPasswordsController.prototype._prepareArmoredList = function() {
-  var armored = [];
-  for(var i in this.resources) {
+  const armored = [];
+  for(let i in this.resources) {
     armored.push(this.resources[i].secrets[0].data);
   }
   return armored;

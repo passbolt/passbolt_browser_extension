@@ -26,17 +26,45 @@ beforeEach(() => {
 });
 
 describe("FolderModel",  () => {
+  // Folder 1 5f1da286-37ae-4f1c-aaf1-e0342a5d4dc1
+  // -- Folder 2 870ae6ca-538d-45ff-91ae-1466de7b27ac
+  //     -- Folder 3 130162ae-a4eb-46ac-80b2-2a187601109c
+  //     -- Folder 4 af372e21-b93b-480d-bcda-4a772ae141ba
+  //        -- Folder 5 cccb2dd3-c064-46da-ae03-9b77ac19107e
+  // Folder A 2529edc2-3c04-4d31-bc38-0a28ce4e372a
+  // -- Folder B 34719980-89d3-4791-9c5a-63ff91967fd5
+  let folder1 = "5f1da286-37ae-4f1c-aaf1-e0342a5d4dc1";
+    let folder2 = "870ae6ca-538d-45ff-91ae-1466de7b27ac";
+      let folder3 = "130162ae-a4eb-46ac-80b2-2a187601109c";
+      let folder4 = "af372e21-b93b-480d-bcda-4a772ae141ba";
+        let folder5 = "cccb2dd3-c064-46da-ae03-9b77ac19107e";
+  let folderA = "2529edc2-3c04-4d31-bc38-0a28ce4e372a";
+    let folderB = "34719980-89d3-4791-9c5a-63ff91967fd5";
+
   it("getAllByIds works", async () => {
     FolderLocalStorage.get.mockResolvedValue(getReturnValue());
     const apiClientOptions = (new ApiClientOptions()).setBaseUrl('https://www.passbolt.test');
     const folderModel = new FolderModel(apiClientOptions);
-    let result = await folderModel.getAllByIds(['5f1da286-37ae-4f1c-aaf1-e0342a5d4dc1']);
-    expect(result.length).toBe(1);
-    let search = ['2529edc2-3c04-4d31-bc38-0a28ce4e372a','5f1da286-37ae-4f1c-aaf1-e0342a5d4dc1']
-    result = await folderModel.getAllByIds(search, true);
-    expect(result.length).toBe(3);
-    result = await folderModel.getAllByIds(['5f1da286-37ae-4f1c-aaf1-e0342a5d4d00']);
+
+    // Not found
+    let result = await folderModel.getAllByIds(['5f1da286-37ae-4f1c-aaf1-e0342a5d4d00']);
     expect(result.length).toBe(0);
+
+    // Single
+    result = await folderModel.getAllByIds([folder1]);
+    expect(result.length).toBe(1);
+
+    // Simple with two ids
+    result = await folderModel.getAllByIds([folder1, folderA]);
+    expect(result.length).toBe(2);
+
+    // Full with two ids
+    result = await folderModel.getAllByIds([folder1, folderA], true);
+    expect(result.length).toBe(7);
+
+    // Overlap
+    result = await folderModel.getAllByIds([folder1, folder5], true);
+    expect(result.length).toBe(5);
   });
 
 });
@@ -80,7 +108,7 @@ function getReturnValue() {
           "created": "2020-05-11T15:05:49+00:00",
           "modified": "2020-05-11T15:05:49+00:00"
         },
-        "folder_parent_id": null
+        "folder_parent_id": "5f1da286-37ae-4f1c-aaf1-e0342a5d4dc1"
       },
       {
         "id": "130162ae-a4eb-46ac-80b2-2a187601109c",

@@ -63,6 +63,31 @@ class PermissionChangesCollection extends EntityCollection {
   }
 
   // ==================================================
+  // Filters
+  // ==================================================
+  /**
+   * Filter By Aco Foreign Key
+   *
+   * @param {string} acoForeignKey
+   * @returns {PermissionChangesCollection} a new set of permission changes
+   */
+  filterByAcoForeignKey(acoForeignKey) {
+    const permissionChanges = this._items.filter(changeEntity => changeEntity.acoForeignKey === acoForeignKey);
+    return new PermissionChangesCollection(permissionChanges);
+  }
+
+  /**
+   * Filter By Aco Foreign Key
+   *
+   * @param {string} aroForeignKey
+   * @returns {PermissionChangesCollection} a new set of permission changes
+   */
+  filterByAroForeignKey(aroForeignKey) {
+    const permissionChanges = this._items.filter(changeEntity => changeEntity.aroForeignKey === aroForeignKey);
+    return new PermissionChangesCollection(permissionChanges);
+  }
+
+  // ==================================================
   // Setters
   // ==================================================
   /**
@@ -91,14 +116,70 @@ class PermissionChangesCollection extends EntityCollection {
   }
 
   /**
-   * Filter By Aco Foreign Key
+   * Copy permission changes for another ACO (folder or resource)
+   * Useful to apply a collection of changes to another item
    *
-   * @param {string} acoForeignKey
-   * @returns {PermissionChangesCollection} a new set of permission changes
+   * @param {string} aco type folder or resource
+   * @param {string} acoForeignKey uuid
    */
-  filterByAcoForeignKey(acoForeignKey) {
-    const permissionChanges = this._items.filter(changeEntity => changeEntity.acoForeignKey === acoForeignKey);
-    return new PermissionChangesCollection(permissionChanges);
+  copyForAnotherAco(aco, acoForeignKey) {
+    const results = new PermissionChangesCollection([]);
+    for (let change of this.items) {
+      results.push(change.copyForAnotherAco(aco, acoForeignKey))
+    }
+    return results;
+  }
+
+  // ==================================================
+  // Changes calculation
+  // ==================================================
+  /**
+   * Return true if the changes can be applied
+   * @param {string} aco folder or resource to reuse the changes for
+   * @param {string} acoId uuid of the folder or resource to reuse the changes for
+   * @param {PermissionsCollection} permissions
+   * @param {PermissionChangesCollection} changes
+   * @param {PermissionsCollection} originalPermissions
+   */
+  static reuseChanges(aco, acoId, permissions, changes, originalPermissions) {
+    if (!aco || !acoId || !permissions || !originalPermissions || !changes) {
+      throw new TypeError('PermissionChangesCollection reuseChanges call is missing parameter(s).');
+    }
+    const result = new PermissionChangesCollection([]);
+    for (let change of changes) {
+      let permission = permissions.getByAro(change.aro, change.aroForeignKey);
+      switch(change.scenario) {
+        case PermissionChangeEntity.PERMISSION_CHANGE_DELETE:
+          if (permission && permission.type === change.type) {
+            result.push(PermissionChangeEntity.createFromPermission(
+              permission, PermissionChangeEntity.PERMISSION_CHANGE_DELETE
+            ));
+          }
+          break;
+        case PermissionChangeEntity.PERMISSION_CHANGE_CREATE:
+          if (!permission) {
+            result.push(new PermissionChangeEntity({
+              aco: aco,
+              aco_foreign_key: acoId,
+              aro: change.aro,
+              aro_foreign_key: change.aroForeignKey,
+              type: change.type
+            }));
+          }
+          break;
+        case PermissionChangeEntity.PERMISSION_CHANGE_UPDATE:
+          if (permission && permission.type !== change.type) {
+            const originalPermission = originalPermissions.items.find(p => p.id === change.id);
+            if (originalPermission.type === permission.type) {
+              result.push(PermissionChangeEntity.createFromPermission(
+                permission, PermissionChangeEntity.PERMISSION_CHANGE_UPDATE
+              ));
+            }
+          }
+          break;
+      }
+    }
+    return result;
   }
 
   /**
@@ -108,11 +189,14 @@ class PermissionChangesCollection extends EntityCollection {
    * @param {PermissionsCollection} expectedSet
    */
   static calculateChanges(originalSet, expectedSet) {
+    if (!originalSet || !(originalSet instanceof PermissionsCollection) || !expectedSet || !(expectedSet instanceof PermissionsCollection)) {
+      throw new TypeError('PermissionChangesCollection calculateChanges invalid parameters');
+    }
     const result = new PermissionChangesCollection([]);
 
     // Find new or updated permissions
     for(let expectedPermission of expectedSet) {
-      const foundPermission = originalSet.getByAro(expectedPermission);
+      const foundPermission = originalSet.getByAroMatchingPermission(expectedPermission);
       if (!foundPermission) {
         const newChange = PermissionChangeEntity.createFromPermission(expectedPermission, PermissionChangeEntity.PERMISSION_CHANGE_CREATE);
         result.push(newChange);
@@ -126,7 +210,7 @@ class PermissionChangesCollection extends EntityCollection {
 
     // Find deleted permissions
     for(let originalPermission of originalSet) {
-      if (!expectedSet.getByAro(originalPermission)) {
+      if (!expectedSet.getByAroMatchingPermission(originalPermission)) {
         // Aka, permissions that are in the old set and not the new one
         const newChange = PermissionChangeEntity.createFromPermission(originalPermission, PermissionChangeEntity.PERMISSION_CHANGE_DELETE);
         result.push(newChange);

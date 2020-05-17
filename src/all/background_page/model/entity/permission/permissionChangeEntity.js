@@ -107,6 +107,28 @@ class PermissionChangeEntity extends Entity {
   }
 
   // ==================================================
+  // Copy
+  // ==================================================
+  /**
+   * Create a permission change to be used by another aco
+   * Useful for example when you want to reuse a permission from a folder
+   * and apply it to a resource. For example on a move or a share operation.
+   *
+   * @param aco
+   * @param acoForeignKey
+   * @returns {PermissionEntity}
+   */
+  copyForAnotherAco(aco, acoForeignKey) {
+    return new PermissionEntity({
+      aro: this.aro,
+      aro_foreign_key: this.aroForeignKey,
+      aco: aco,
+      aco_foreign_key: acoForeignKey,
+      type: this.type
+    });
+  }
+
+  // ==================================================
   // Dynamic properties getters
   // ==================================================
   /**
@@ -162,7 +184,21 @@ class PermissionChangeEntity extends Entity {
    * @returns {boolean} true if deleted
    */
   get isDeleted() {
-    return this._props.deleted || null;
+    return this._props.delete || null;
+  }
+
+  /**
+   * Get the current change scenario
+   * @returns {string}
+   */
+  get scenario() {
+    if (this.isDeleted) {
+      return PermissionChangeEntity.PERMISSION_CHANGE_DELETE;
+    }
+    if (!this.id) {
+      return PermissionChangeEntity.PERMISSION_CHANGE_CREATE;
+    }
+    return PermissionChangeEntity.PERMISSION_CHANGE_UPDATE;
   }
 
   // ==================================================

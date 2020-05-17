@@ -13,6 +13,7 @@
  */
 const {Crypto} = require('../model/crypto');
 const {ShareService} = require('../service/share');
+const {Resource} = require('../model/resource');
 
 class Share {}
 
@@ -45,7 +46,7 @@ Share.searchResourceAros = function(resourceId, keywords) {
  * @param {string} privateKeySecret The user private key secret
  * @param {function} progressCallback Notify the user with this callback
  */
-Share.shareResources = async function(resources, changes, privateKeySecret, progressCallback) {
+Share.bulkShareResources = async function(resources, changes, privateKeySecret, progressCallback) {
   const resourcesChanges = bulkShareAggregateChanges(resources, changes);
   const resourcesNewUsers = await bulkShareSimulate(resources, resourcesChanges, progressCallback);
   const resourcesSecrets = await bulkShareEncrypt(resources, resourcesNewUsers, privateKeySecret, progressCallback);
@@ -59,6 +60,7 @@ Share.shareResources = async function(resources, changes, privateKeySecret, prog
       await ShareService.shareResource(resourceId, {permissions, secrets});
     }
   }
+  await Resource.updateLocalStorage();
 };
 
 /**

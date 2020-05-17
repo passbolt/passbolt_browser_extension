@@ -123,6 +123,15 @@ class FoldersCollection extends EntityCollection {
     return this._items.map(folder => folder.folderParentIds);
   }
 
+  /**
+   * Return a new collection with all resources the current user is owner
+   *
+   * @returns {FoldersCollection}
+   */
+  getAllWhereOwner() {
+    return new FoldersCollection(this._items.filter(f => f.isOwner()));
+  }
+
   // ==================================================
   // Finders
   // ==================================================
@@ -175,6 +184,7 @@ class FoldersCollection extends EntityCollection {
   /**
    * Push a copy of the folder to the list
    * @param {object} folder DTO or FolderEntity
+   * @returns {FoldersCollection}
    */
   push(folder) {
     if (!folder || typeof folder !== 'object') {
@@ -190,8 +200,26 @@ class FoldersCollection extends EntityCollection {
     this.assertUniqueId(folderEntity);
 
     super.push(folderEntity);
+    return this;
   }
 
+  /**
+   * Merge another set of folders in this collection
+   * @param {FoldersCollection} foldersCollection
+   * @returns {FoldersCollection}
+   */
+  merge(foldersCollection) {
+    for (let folder of foldersCollection) {
+      try {
+        this.push(folder);
+      } catch(error) {}
+    }
+    return this;
+  }
+
+  // ==================================================
+  // Asserts
+  // ==================================================
   /**
    * Assert there is no other permission with the same id in the collection
    *

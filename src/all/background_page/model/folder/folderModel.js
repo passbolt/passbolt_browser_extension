@@ -59,16 +59,36 @@ class FolderModel {
   async getAllByIds(folderIds, withChildren) {
     const foldersDto = await FolderLocalStorage.get();
     const inputCollection = new FoldersCollection(foldersDto);
-    let outputCollection = new FoldersCollection([]);
+    const outputCollection = new FoldersCollection([]);
     inputCollection.items.forEach((folderDto) => {
       if (folderIds.includes(folderDto.id)) {
         outputCollection.push(folderDto);
       }
     });
     if (withChildren) {
-      folderIds.forEach(parentId => {
-        outputCollection = FoldersCollection.getAllChildren(parentId, inputCollection, outputCollection);
-      });
+      for (let i in folderIds) {
+        let folderId = folderIds[i];
+        let children = FoldersCollection.getAllChildren(folderId, inputCollection, outputCollection);
+        outputCollection.merge(children);
+      }
+    }
+    return outputCollection;
+  };
+
+  /**
+   * Get all the children for the folder provided as input
+   *
+   * @param {array} folderIds The folder ids
+   * @return {FoldersCollection}
+   */
+  async getAllChildren(folderIds) {
+    const foldersDto = await FolderLocalStorage.get();
+    const inputCollection = new FoldersCollection(foldersDto);
+    const outputCollection = new FoldersCollection([]);
+    for (let i in folderIds) {
+      let folderId = folderIds[i];
+      let children = FoldersCollection.getAllChildren(folderId, inputCollection, outputCollection);
+      outputCollection.merge(children);
     }
     return outputCollection;
   };
@@ -141,7 +161,7 @@ class FolderModel {
     let remainingPermissions = new PermissionsCollection([], false);
 
     // Remove permissions from parent if any
-    if (folderEntity.folderParentId !== null) {
+    if (parentFolder) {
       if (!folderEntity.permissions || !parentFolder.permissions) {
         throw new TypeError('Resource model calculatePermissionsChangesForMove requires permissions to be set.');
       }
@@ -154,7 +174,7 @@ class FolderModel {
         throw new TypeError('Resource model calculatePermissionsChangesForMove requires destination permissions to be set.');
       }
       permissionsFromParent = destFolder.permissions.cloneForAco(
-        PermissionEntity.ACO_RESOURCE, folderEntity.id, false
+        PermissionEntity.ACO_FOLDER, folderEntity.id, false
       );
     }
 
@@ -163,9 +183,9 @@ class FolderModel {
       // If the move is toward the root
       // Reuse highest permission
       newPermissions.addOrReplace(new PermissionEntity({
-        aco: PermissionEntity.ACO_RESOURCE,
-        aro: folderEntity.permission.aro,
+        aco: PermissionEntity.ACO_FOLDER,
         aco_foreign_key: folderEntity.id,
+        aro: folderEntity.permission.aro,
         aro_foreign_key: folderEntity.permission.aroForeignKey,
         type: PermissionEntity.PERMISSION_OWNER,
       }));
@@ -253,11 +273,8 @@ class FolderModel {
    * @returns {Promise<FolderEntity>}
    */
   async share(folderEntity, changesCollection, updateStorage) {
-    if (typeof updateStorage === 'undefined') {
-      updateStorage = true;
-    }
     await this.shareService.shareFolder(folderEntity.id, {permissions: changesCollection.toDto()});
-    if (updateStorage) {
+    if (typeof updateStorage === 'undefined' || updateStorage) {
       // update storage in case the folder becomes non visible to current user
       // TODO: optimize update only the given folder when user lost access
       await this.updateLocalStorage();

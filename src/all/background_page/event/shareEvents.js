@@ -105,9 +105,7 @@ const listen = function (worker) {
       const folders = new FoldersCollection(foldersDto);
       const permissionChanges = new PermissionChangesCollection(changesDto);
       const apiClientOptions = await User.getInstance().getApiClientOptions();
-      const folderModel = new FolderModel(apiClientOptions);
-
-      const shareFoldersController = new ShareFoldersController(worker, requestId, folderModel);
+      const shareFoldersController = new ShareFoldersController(worker, requestId, apiClientOptions);
       await shareFoldersController.main(folders, permissionChanges);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {

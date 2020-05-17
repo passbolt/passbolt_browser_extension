@@ -41,9 +41,10 @@ class ResourceExportController {
     }
 
     try {
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const progressDialogPromise = progressController.open(worker, 'Retrieving items...');
-      const resourceModel = new ResourceModel(await User.getInstance().getApiClientOptions());
-      const folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
+      const resourceModel = new ResourceModel(apiClientOptions);
+      const folderModel = new FolderModel(apiClientOptions);
 
       if (requestedToExport.folders.length) {
         const folders = await folderModel.getAllByIds(requestedToExport.folders, true);
@@ -66,7 +67,7 @@ class ResourceExportController {
         'secret': 1
       };
 
-      const resourceService = new ResourceService(await User.getInstance().getApiClientOptions());
+      const resourceService = new ResourceService(apiClientOptions);
       itemsToExport.resources = await resourceService.findAll(contain, filter);
 
       await progressController.close(worker);

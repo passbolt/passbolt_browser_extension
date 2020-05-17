@@ -127,7 +127,6 @@ class ImportController {
     return await csvDb.loadDb(csvFile)
     .then(async db => {
       this.items.resources = await csvDb.toResources(db);
-      console.log('csv resources', this.items.resources);
     });
   };
 

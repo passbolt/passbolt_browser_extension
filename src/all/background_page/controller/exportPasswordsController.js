@@ -47,7 +47,6 @@ ExportPasswordsController.prototype.init = function(itemsToExport, options) {
   this.resources = itemsToExport.resources;
   this.folders = itemsToExport.folders;
 
-  console.log('exportPasswordsController init', itemsToExport);
   // CSV formats are given in the format "csv-subformat". We need to extract the subformat.
   const isCsv = format.match(/csv-(.*)/);
 

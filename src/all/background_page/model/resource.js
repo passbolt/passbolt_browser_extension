@@ -19,6 +19,7 @@ const Resource = function () {
   this.username = "";
   this.secretClear = "";
   this.description = "";
+  this.folderParentPath = "";
   this.secrets = [
     // Here a list of secrets.
   ];

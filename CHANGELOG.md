@@ -3,7 +3,12 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
-## [2.12.2] - 2020-14-04
+## [2.12.3] - 2020-05-18
+### Fixed
+- Add support to replace server OpenPGP public key when expired or replaced
+- Fix error message on Firefox (insert script return value must be structured-clonable)
+
+## [2.12.2] - 2020-04-14
 ### Fixed
 - PB-1209: Bump jQuery to v3.5
 

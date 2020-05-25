@@ -1,8 +1,15 @@
 /**
- * Import passwords controller.
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
- * @copyright (c) 2017 Passbolt SARL
- * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         2.13.0
  */
 const Worker = require('../../model/worker');
 const fileController = require('../../controller/fileController');
@@ -42,15 +49,39 @@ class ImportController {
     this.fileType = fileType;
     this.fileB64Content = fileB64Content;
 
-    this.progressStatus = 0;
     this.resources = [];
     this.uniqueImportTag = ImportController._generateUniqueImportTag(this.fileType);
+
+    // Batch size for the import, in order to throttle the calls to server.
+    this.batchSize = 5;
+
+    // Count of batches. Will be populated by prepareBatches.
+    this.batchCount = 0;
+
+    // Count of number of items to be imported.
+    this.itemsCount = 0;
+
+    // Count of operations to be executed during import.
+    this.operationsCount = 0;
+
+    // Keep count of the current operation number.
+    this.currentOperationNumber = 0;
+
+    // Current batch. To be used at runtime by the progress bar.
+    this.currentBatchNumber = 0;
+
+    // current item number.
+    this.currentItemNumber = 0;
 
     // Will contain the list of folders that have been created, organized by path.
     // example:
     // /root/category1 : { folder entity }
     this.folders = {};
 
+    // Contains items to import.
+    // It is composed of:
+    // - resources Array of resoures
+    // - foldersPaths: Array of string folders paths (example of path:'/path1/path2')
     this.items = {
       'resources': [],
       'foldersPaths': []
@@ -69,20 +100,19 @@ class ImportController {
     }
 
     this._prepareFolders();
+    this.prepareProgressCounter();
 
-    this.progressObjective = this.items.resources.length;
-    if (this.options.importFolders) {
-      this.progressObjective +=  this.items.foldersPaths.length;
-    }
-
-    await progressController.open(this.worker, 'Importing ...', this.progressObjective, "Preparing import");
+    await progressController.open(this.worker, 'Importing ...', this.operationsCount, "Preparing import");
     try {
       await this.encryptSecretsAndAddToResources();
-      let folders = [];
+      let folders;
       if (this.options.importFolders) {
-        folders = await this.saveFolders();
+        const folderBatches = this.prepareBatches(this.items.foldersPaths);
+        folders = await this.processBatches(folderBatches, this.saveFolder.bind(this));
       }
-      const resources = await this.saveResources();
+
+      const resourceBatches = this.prepareBatches(this.items.resources);
+      const resources = await this.processBatches(resourceBatches, this.saveResource.bind(this));
 
       await progressController.close(this.worker);
 
@@ -99,6 +129,20 @@ class ImportController {
     }
   }
 
+  prepareProgressCounter() {
+    // The default objective is the number of resources multiplied by 2 because:
+    // - we will first encrypt each resource secret. Each encryption succeeded is one step.
+    // - then we will save each secret. Each save is one step.
+    this.operationsCount += this.items.resources.length * 2;
+    this.itemsCount = this.items.resources.length;
+
+    // Each folder also counts as a step.
+    if (this.options.importFolders) {
+      this.operationsCount +=  this.items.foldersPaths.length;
+      this.itemsCount += this.items.foldersPaths.length;
+    }
+  }
+
   /**
    * Initialize passwords controller from a kdbx file.
    * @returns {*}
@@ -110,11 +154,10 @@ class ImportController {
     }
 
     const keepassDb = new KeepassDb();
-    return await keepassDb.loadDb(kdbxFile, this.options.credentials.password, this.options.credentials.keyFile)
-    .then(db => {
-      this.items = keepassDb.toItems(db);
-      return this.items;
-    });
+    const db = await keepassDb.loadDb(kdbxFile, this.options.credentials.password, this.options.credentials.keyFile);
+    this.items = keepassDb.toItems(db);
+
+    return this.items;
   };
 
   /**
@@ -139,7 +182,7 @@ class ImportController {
       user = User.getInstance();
 
     this.resources = this.items.resources;
-    this.progressObjective = this.resources.length * 2;
+    this.operationsCount = this.resources.length * 2;
 
     const currentUser = user.get(),
       userId = currentUser.id;
@@ -204,55 +247,42 @@ class ImportController {
   }
 
   /**
-   * Import all folders for resource.
-   * @param resources
-   * @return Array
-   * @private
+   * Save a folder from its path.
+   * Store the result in this.folders[path] for reference.
+   * @param folderPath
+   * @return {Promise<void>}
    */
-  async saveFolders () {
+  async saveFolder(folderPath) {
     const folderModel = new FolderModel(this.clientOptions);
-    const importFoldersResults = {
-      "created" : [],
-      "errors" : []
-    };
+    const  folderSplit = folderPath.replace(/^\//, '').split('/'),
+      folderName = folderSplit.pop(),
+      folderParent = folderSplit.length ? "/" + folderSplit.join("/") : "";
 
-
-   const allPaths = this.items.foldersPaths;
-
-    const totalFolders = allPaths.length;
-    // Create folders.
-    for(let i in allPaths) {
-      const currentFolderPath = allPaths[i],
-        currentFolderSplit = currentFolderPath.replace(/^\//, '').split('/'),
-        currentFolderName = currentFolderSplit.pop(),
-        currentFolderParent = currentFolderSplit.length ? "/" + currentFolderSplit.join("/") : "";
-
-      try {
-        let folderE = new FolderEntity({ "name": currentFolderName });
-        if (currentFolderParent !== "") {
-          const parentFolder = this.getFolderFromPath(currentFolderParent);
-          if (!parentFolder) {
-            return;
-          }
-          folderE.folderParentId = parentFolder.id;
-        }
-
-        await progressController.update(this.worker, ++this.progressStatus, `Importing folder...  ${i}/${totalFolders}`);
-        this.folders[currentFolderPath] = await folderModel.create(folderE);
-        importFoldersResults.created.push({
-          "path": currentFolderPath,
-          "folder": this.folders[currentFolderPath]
-        });
-      } catch(e) {
-        importFoldersResults.errors.push({
-          "path": currentFolderPath,
-          "error": e.message
-        });
+    let folderE = new FolderEntity({ "name": folderName });
+    if (folderParent !== "") {
+      const parentFolder = this.getFolderFromPath(folderParent);
+      if (!parentFolder) {
+        return;
       }
+
+      folderE.folderParentId = parentFolder.id;
     }
 
-    return importFoldersResults;
-  };
+    this.folders[folderPath] = await folderModel.create(folderE);
+
+    return this.folders[folderPath];
+  }
+
+  async saveResource(resource) {
+    // Manage parent folder if exists (has been created).
+    let folderPath = this._getConsolidatedPath(resource.folderParentPath);
+    let folderExist = this.getFolderFromPath(folderPath);
+    if (this.options.importFolders && folderExist) {
+      resource["folder_parent_id"] = folderExist.id;
+    }
+
+    return Resource.import(resource);
+  }
 
   /**
    * Import a batch of resources.
@@ -261,37 +291,31 @@ class ImportController {
    * @param int batchSize maximum number of resources a batch can contain
    * @return Promise
    */
-  async _importBatchResources (resourcesBatch, batchNumber, batchSize) {
-    let counter = batchNumber * batchSize + 1;
-    let importResults = {
+  async importBatch (resourcesBatch, batchNumber, importFn) {
+    this.currentBatchNumber ++;
+    const importResults = {
       "created" : [],
       "errors" : []
     };
-    const promises = [];
 
-    for (let i in resourcesBatch) {
-      const resource = resourcesBatch[i];
-
-      // Manage parent folder if exists (has been created).
-      let folderPath = this._getConsolidatedPath(resource.folderParentPath);
-      let folderExist = this.getFolderFromPath(folderPath);
-      if (this.options.importFolders && folderExist) {
-        resource["folder_parent_id"] = folderExist.id;
-      }
-
-      const promise = Resource.import(resource)
-      .then(importedResource => {
-        importResults.created.push({"resource": importedResource});
-        const totalResources = this.items.resources.length;
-        progressController.update(this.worker, this.progressStatus++, `Importing...  ${counter++}/${totalResources}`)
-      }, error => {
+    const promises = resourcesBatch.map(resource => {
+      return importFn(resource)
+      .then(resource => {
+        this.currentItemNumber ++;
+        this.currentOperationNumber++;
+        progressController.update(this.worker, this.currentOperationNumber, `Importing...  ${this.currentItemNumber}/${this.itemsCount}`);
+        importResults.created.push(resource);
+      })
+      .catch(e => {
+        this.currentItemNumber ++;
+        this.currentOperationNumber++;
+        progressController.update(this.worker, this.currentOperationNumber, `Importing...  ${this.currentItemNumber}/${this.itemsCount}`);
         importResults.errors.push({
-          "error": error.header.message,
+          "error": e.header.message,
           "resource": resource,
         });
       });
-      promises.push(promise);
-    }
+    });
 
     await Promise.all(promises);
 
@@ -299,41 +323,49 @@ class ImportController {
   };
 
   /**
-   * Import a list of resources.
-   * @param array resources list of resources to save.
-   * @param object options
-   *  * bool foldersIntegration
-   *  * bool tagsIntegration
-   *  * bool importFolders
-   *  * bool importTags
-   * @return Promise
+   * Split a list of items into batches.
+   * For example: 15 items with a batchSize of 5 will return 3 arrays of 5 items.
+   * @param items
+   * @return {Array}
    */
-  async saveResources () {
-    let importResourcesResults = {
+  prepareBatches(items) {
+    const batches = [];
+    const chunks = items.length / this.batchSize;
+    for (let i = 0, j = 0; i < chunks; i++, j += this.batchSize) {
+      batches.push(items.slice(j, j + this.batchSize));
+    }
+
+    this.batchCount += batches.length;
+
+    return batches;
+  }
+
+  /**
+   * Process batches of an import.
+   * Batches is an array of batch
+   * A batch is an array of items.
+   * importFn is the callback to a function that knows how to import an item.
+   * @param batches Array
+   * @param importFn function
+   * @return {Promise<{created: Array, errors: Array}>}
+   */
+  async processBatches(batches, importFn) {
+    let batchResults = {
       "created": [],
       "errors": []
     };
 
-    const importResults =  importResourcesResults;
-
-    // Split the resources in batches of equal size.
-    const batchSize = 5;
-    const chunks = this.items.resources.length / batchSize;
-    const batches = [];
-    for (let i = 0, j = 0; i < chunks; i++, j += batchSize) {
-      batches.push(this.items.resources.slice(j, j + batchSize));
-    }
-
     let batchNumber = 0;
     // Import the batches sequentially
     for (let i in batches) {
-      const importBatchResult = await this._importBatchResources(batches[i], batchNumber++, batchSize);
-      importResourcesResults.created = [...importResourcesResults.created, ...importBatchResult.created];
-      importResourcesResults.errors = [...importResourcesResults.errors, ...importBatchResult.errors];
+      const batch = batches[i];
+      const importBatchResult = await this.importBatch(batch, batchNumber++, importFn);
+      batchResults.created = [...batchResults.created, ...importBatchResult.created];
+      batchResults.errors = [...batchResults.errors, ...importBatchResult.errors];
     }
 
-    return importResults;
-  };
+    return batchResults;
+  }
 
   /**
    * Encrypt a list of secrets for a given user id.
@@ -352,11 +384,11 @@ class ImportController {
       this.items.resources,
       // On complete.
        () => {
-        progressController.update(this.worker, this.progressStatus++);
+        progressController.update(this.worker, this.currentOperationNumber++);
       },
       // On start.
       (position) => {
-        progressController.update(this.worker, this.progressStatus, 'Encrypting ' + (parseInt(position) + 1) + '/' + this.items.resources.length);
+        progressController.update(this.worker, this.currentOperationNumber, 'Encrypting ' + (parseInt(position) + 1) + '/' + this.items.resources.length);
       });
   };
 

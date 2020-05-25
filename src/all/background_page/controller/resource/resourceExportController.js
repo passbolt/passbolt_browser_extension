@@ -60,15 +60,19 @@ class ResourceExportController {
         requestedToExport.resources = [...new Set([...requestedToExport.resources, ...resourceInFoldersIds])];
       }
 
-      const filter = {
-        'has-id': requestedToExport.resources
-      };
-      const contain = {
-        'secret': 1
-      };
+      // If there are resources to export.
+      if (requestedToExport.resources.length) {
+        const filter = {
+          'has-id': requestedToExport.resources
+        };
+        const contain = {
+          'secret': 1
+        };
 
-      const resourceService = new ResourceService(apiClientOptions);
-      itemsToExport.resources = await resourceService.findAll(contain, filter);
+        const resourceService = new ResourceService(apiClientOptions);
+        itemsToExport.resources = await resourceService.findAll(contain, filter);
+      }
+
 
       await progressController.close(worker);
       TabStorage.set(worker.tab.id, 'itemsToExport', itemsToExport);

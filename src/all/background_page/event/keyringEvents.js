@@ -210,7 +210,7 @@ var listen = function (worker) {
       filename += '.txt';
     }
 
-    fileController.saveFile(filename, key, worker.tab.id)
+    fileController.saveFile(filename, key, "text/plain", worker.tab.id)
       .then(function () {
         worker.port.emit(requestId, 'SUCCESS');
       }, function () {

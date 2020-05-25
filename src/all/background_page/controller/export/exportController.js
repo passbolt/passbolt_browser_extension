@@ -135,6 +135,25 @@ class ExportController {
   };
 
   /**
+   * Get mime type from file extension.
+   * @param extension
+   * @return {string}
+   */
+  static getMimeType(extension) {
+    let mimeType = "text/plain";
+    switch (extension) {
+      case 'kdbx':
+        mimeType = "application/x-keepass";
+        break;
+      case 'csv':
+        mimeType = "text/csv";
+        break;
+    }
+
+    return mimeType;
+  }
+
+  /**
    * Download the file content.
    * The name of the file will be "passbolt-export-date.format".
    * @param fileContent
@@ -143,11 +162,12 @@ class ExportController {
   downloadFile(fileContent) {
     const date = new Date().toISOString().slice(0, 10),
       filename = 'passbolt-export-' + date + '.' + this.format,
-      blobFile = new Blob([fileContent], {type: "text/plain"});
+      mimeType = ExportController.getMimeType(this.format),
+      blobFile = new Blob([fileContent], {type: mimeType});
 
     return new Promise((resolve, reject)  => {
       try {
-        fileController.saveFile(filename, blobFile, this.worker.tab.id);
+        fileController.saveFile(filename, blobFile, mimeType, this.worker.tab.id);
         resolve();
       } catch(e) {
         reject(e);

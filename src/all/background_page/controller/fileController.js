@@ -11,11 +11,15 @@ var Worker = require('../model/worker');
  *
  * @param {String} filename
  * @param {Blob|String} content
+ * @param {String} mimeType mime type
  * @param {int} tabid
  * @return {Promise}
  */
-function saveFile(filename, content, tabid) {
-  var content = new Blob([content], {type: "text/plain"});
+function saveFile(filename, content, mimeType, tabid) {
+  if (!mimeType) {
+    mimeType = "text/plain";
+  }
+  content = new Blob([content], {type: mimeType});
 
   return new Promise(function(resolve, reject) {
     if (chrome.downloads) {

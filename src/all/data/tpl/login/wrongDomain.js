@@ -42,7 +42,7 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<div class=\"col6 push1 information\">\n    <h2>This domain is not known!</h2>\n    <div class=\"plugin-check-wrapper\">\n        <div class=\"plugin-check <?= browserName ?> warning\">\n            <p class=\"message\">\n                The plugin is installed but is already configured for another domain :<br>\n            \t<a href=\"<?= trustedDomain ?>\" class=\"trusteddomain\"><?= trustedDomain ?></a><br>\n            </p>\n        </div>\n    </div>\n    <p>You can <a href=\"<?= passboltDomain ?>/register\">register again</a> for this domain\n        or <a href=\"<?= passboltDomain ?>/recover\"> recover an existing account</a>,\n        but you will lose your account on the existing domain. Proceed with caution.</p>\n</div>\n<div class=\"col4 push1 last\">\n    <div class=\"logo\">\n        <h1><a href=\"#\"><span>Passbolt</span></a></h1>\n    </div>\n    <div class=\"users login form\">\n        <div class=\"feedback\">\n            <i class=\"fa huge fa-globe\" ></i>\n            <p>The browser extension is not configured to work with this domain</p>\n        </div>\n        <div class=\"actions-wrapper center\">\n            <? if(publicRegistration) { ?>\n                <a class=\"button primary big\" href=\"<?= passboltDomain ?>/register\">Register for this domain</a><br><br>\n            <? } ?>\n            <a href=\"<?= passboltDomain ?>/recover\">or recover an existing account</a>\n        </div>\n    </div>\n</div>"
+  , __lines = "<div class=\"col6 push1 information\">\n    <h2>This domain is not known!</h2>\n    <div class=\"plugin-check-wrapper\">\n        <div class=\"plugin-check <?= browserName ?> warning\">\n            <p class=\"message\">\n                The plugin is installed but is already configured for another domain.<br>\n            </p>\n        </div>\n    </div>\n    <p>You can <a href=\"<?= passboltDomain ?>/register\">register again</a> for this domain\n        or <a href=\"<?= passboltDomain ?>/recover\"> recover an existing account</a>,\n        but you will lose your account on the existing domain. Proceed with caution.</p>\n</div>\n<div class=\"col4 push1 last\">\n    <div class=\"logo\">\n        <h1><a href=\"#\"><span>Passbolt</span></a></h1>\n    </div>\n    <div class=\"users login form\">\n        <div class=\"feedback\">\n            <i class=\"fa huge fa-globe\" ></i>\n            <p>The browser extension is not configured to work with this domain</p>\n        </div>\n        <div class=\"actions-wrapper center\">\n            <? if(publicRegistration) { ?>\n                <a class=\"button primary big\" href=\"<?= passboltDomain ?>/register\">Register for this domain</a><br><br>\n            <? } ?>\n            <a href=\"<?= passboltDomain ?>/recover\">or recover an existing account</a>\n        </div>\n    </div>\n</div>\n"
   , __filename = "src/all/data/ejs/login/wrongDomain.ejs";
 try {
   var __output = "";
@@ -51,30 +51,25 @@ try {
     ; __append("<div class=\"col6 push1 information\">\n    <h2>This domain is not known!</h2>\n    <div class=\"plugin-check-wrapper\">\n        <div class=\"plugin-check ")
     ; __line = 4
     ; __append(escapeFn( browserName ))
-    ; __append(" warning\">\n            <p class=\"message\">\n                The plugin is installed but is already configured for another domain :<br>\n            	<a href=\"")
-    ; __line = 7
-    ; __append(escapeFn( trustedDomain ))
-    ; __append("\" class=\"trusteddomain\">")
-    ; __append(escapeFn( trustedDomain ))
-    ; __append("</a><br>\n            </p>\n        </div>\n    </div>\n    <p>You can <a href=\"")
-    ; __line = 11
+    ; __append(" warning\">\n            <p class=\"message\">\n                The plugin is installed but is already configured for another domain.<br>\n            </p>\n        </div>\n    </div>\n    <p>You can <a href=\"")
+    ; __line = 10
     ; __append(escapeFn( passboltDomain ))
     ; __append("/register\">register again</a> for this domain\n        or <a href=\"")
-    ; __line = 12
+    ; __line = 11
     ; __append(escapeFn( passboltDomain ))
     ; __append("/recover\"> recover an existing account</a>,\n        but you will lose your account on the existing domain. Proceed with caution.</p>\n</div>\n<div class=\"col4 push1 last\">\n    <div class=\"logo\">\n        <h1><a href=\"#\"><span>Passbolt</span></a></h1>\n    </div>\n    <div class=\"users login form\">\n        <div class=\"feedback\">\n            <i class=\"fa huge fa-globe\" ></i>\n            <p>The browser extension is not configured to work with this domain</p>\n        </div>\n        <div class=\"actions-wrapper center\">\n            ")
-    ; __line = 25
+    ; __line = 24
     ;  if(publicRegistration) { 
     ; __append("\n                <a class=\"button primary big\" href=\"")
-    ; __line = 26
+    ; __line = 25
     ; __append(escapeFn( passboltDomain ))
     ; __append("/register\">Register for this domain</a><br><br>\n            ")
-    ; __line = 27
+    ; __line = 26
     ;  } 
     ; __append("\n            <a href=\"")
-    ; __line = 28
+    ; __line = 27
     ; __append(escapeFn( passboltDomain ))
-    ; __append("/recover\">or recover an existing account</a>\n        </div>\n    </div>\n</div>")
+    ; __append("/recover\">or recover an existing account</a>\n        </div>\n    </div>\n</div>\n")
     ; __line = 31
   }
   return __output;

@@ -4,6 +4,7 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+var Config = require('../model/config');
 var Worker = require('../model/worker');
 
 /**
@@ -24,8 +25,11 @@ function saveFile(filename, content, mimeType, tabid) {
   return new Promise(function(resolve, reject) {
     if (chrome.downloads) {
       var url = window.URL.createObjectURL(content);
+      // Don't propose the "save as dialog" if running the test, the tests need the file to be automatically saved
+      // in the default downloads directory.
+      const saveAs = !Config.isDebug();
       chrome.downloads.download(
-        {url: url, filename: filename, saveAs: true},
+        {url: url, filename: filename, saveAs},
         function() {
           window.URL.revokeObjectURL(url);
           resolve();

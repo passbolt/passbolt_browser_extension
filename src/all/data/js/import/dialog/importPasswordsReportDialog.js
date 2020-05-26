@@ -15,8 +15,7 @@ const ImportPasswordsReportDialog = function(results) {
   this.folders = results.folders;
   this.responses = results.responses;
   this.importTag = results.importTag;
-  this.tagsIntegration = results.tagsIntegration;
-  this.foldersIntegration = results.foldersIntegration;
+  this.options = results.options;
 
   // elements.
   this.$html = null;

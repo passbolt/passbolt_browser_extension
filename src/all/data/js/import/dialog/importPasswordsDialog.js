@@ -13,8 +13,8 @@
  */
 const ImportPasswordsDialog = function(settings) {
   this.selectedFile = null;
-  this.tagsIntegration = false;
-  this.foldersIntegration = false;
+  this.hasTagsPlugin = false;
+  this.hasFoldersPlugin = false;
 
   this.$html = null;
   this.$file = null;
@@ -24,16 +24,16 @@ const ImportPasswordsDialog = function(settings) {
   this.$closeButton = null;
   this.$cancelButton = null;
 
-  if (settings != undefined && settings.onSubmit != undefined) {
+  if (settings && settings.onSubmit) {
     this.onSubmit = settings.onSubmit;
   }
 
-  if (settings != undefined && settings.tagsIntegration != undefined) {
-    this.tagsIntegration = settings.tagsIntegration;
+  if (settings && settings.hasTagsPlugin) {
+    this.hasTagsPlugin = settings.hasTagsPlugin;
   }
 
-  if (settings != undefined && settings.foldersIntegration != undefined) {
-    this.foldersIntegration = settings.foldersIntegration;
+  if (settings && settings.hasFoldersPlugin) {
+    this.hasFoldersPlugin = settings.hasFoldersPlugin;
   }
 };
 
@@ -78,6 +78,7 @@ ImportPasswordsDialog.prototype._initElements = function() {
   this.$closeButton = $('.dialog-close', this.$html);
   this.$cancelButton = $('.cancel', this.$html);
   this.$importFoldersCheckbox = $('#js_field_import_folders');
+  this.$importTagsCheckbox = $('#js_field_import_tags');
 
   this._initFileChooser();
 
@@ -100,10 +101,14 @@ ImportPasswordsDialog.prototype._initEvents = function() {
   this.$submit.on('click', function(evt) {
     evt.stopImmediatePropagation();
     const options = {
-      importFolders : false
+      importFolders : false,
+      importTags:false
     };
-    if (self.foldersIntegration === true && self.$importFoldersCheckbox.prop('checked')) {
+    if (self.hasFoldersPlugin === true && self.$importFoldersCheckbox.prop('checked')) {
       options.importFolders = true;
+    }
+    if (self.hasTagsPlugin === true && self.$importTagsCheckbox.prop('checked')) {
+      options.importTags = true;
     }
     self.onSubmit(self.selectedFile, options);
     return false;

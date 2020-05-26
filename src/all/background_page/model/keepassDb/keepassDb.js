@@ -105,7 +105,7 @@ KeepassDb.prototype._prepareKeyFile = function(keyFile) {
  * @returns {String} path. Example: "/parent1/group"
  */
 KeepassDb.prototype.getGroupPath = function(group) {
-  function getParent(group, groups) {
+  function getParentGroups(group, groups) {
     if (group.parentGroup) {
       groups = getParent(group.parentGroup, groups);
     }
@@ -114,7 +114,7 @@ KeepassDb.prototype.getGroupPath = function(group) {
   }
 
   let groups = [];
-  groups = getParent(group, groups);
+  groups = getParentGroups(group, groups);
 
   const groupNames = groups.map(group => {
     return group.name;
@@ -186,12 +186,9 @@ KeepassDb.prototype.toFoldersPaths = function(kdbxDb) {
  */
 KeepassDb.prototype.toItems = function(kdbxDb) {
   const items = {
-    'resources': [],
-    'foldersPaths': [],
+    'resources': this.toResources(kdbxDb),
+    'foldersPaths': this.toFoldersPaths(kdbxDb),
   };
-
-  items.resources = this.toResources(kdbxDb);
-  items.foldersPaths = this.toFoldersPaths(kdbxDb);
 
   return items;
 };
@@ -216,6 +213,7 @@ KeepassDb.prototype.createEntry = function(resource, group, db) {
   entry.fields.Password = kdbxweb.ProtectedValue.fromString(resource.secretClear);
   entry.fields.URL = resource.uri;
   entry.fields.Notes = resource.description;
+
   return entry;
 };
 

@@ -22,6 +22,7 @@ const progressController = require('../progress/progressController');
 const User = require('../../model/user').User;
 const {FolderModel} = require('../../model/folder/folderModel');
 const {FolderEntity} = require('../../model/entity/folder/folderEntity');
+const Tag = require('../../model/tag').Tag;
 
 class ImportController {
   /**
@@ -30,8 +31,8 @@ class ImportController {
    * @param {Worker} worker
    * @param {ApiClientOptions} clientOptions
    * @param options object
-   *  * bool foldersIntegration
-   *  * bool tagsIntegration
+   *  * bool hasFoldersPlugin
+   *  * bool hasTagsPlugin
    *  * bool importFolders
    *  * bool importTags
    *  * object credentials
@@ -44,7 +45,6 @@ class ImportController {
     this.worker = worker;
     this.clientOptions = clientOptions;
 
-    // this.requestId = requestId;
     this.options = options;
     this.fileType = fileType;
     this.fileB64Content = fileB64Content;
@@ -111,15 +111,29 @@ class ImportController {
         folders = await this.processBatches(folderBatches, this.saveFolder.bind(this));
       }
 
+      // Save resources.
       const resourceBatches = this.prepareBatches(this.items.resources);
       const resources = await this.processBatches(resourceBatches, this.saveResource.bind(this));
+
+      // Save tags for resources.
+      let tags;
+      if (this.options.importTags && resources.created.length > 0) {
+        // Add the number of extra goals for tags import.
+        this.operationsCount += resources.created.length;
+        this.itemsCount += resources.created.length;
+        progressController.updateGoals(this.worker, this.operationsCount);
+        const tagsBatches = this.prepareBatches(resources.created);
+        tags = await this.processBatches(tagsBatches, this.saveTags.bind(this));
+      }
 
       await progressController.close(this.worker);
 
       const result = {
         "resources": resources,
         "folders": folders,
+        "tags": tags,
         "importTag": this.uniqueImportTag,
+        "options": this.options
       };
 
       return result;
@@ -128,6 +142,19 @@ class ImportController {
       throw Error(e);
     }
   }
+
+  /**
+   * Import the tags associated to an imported resource
+   * @param string resourceId the resource identifier
+   * @param array categories the resource categories that will be converted in tags
+   * @param object options
+   *  * bool categoriesAsTags
+   * @private
+   */
+  saveTags(resource) {
+    let tags = [this.uniqueImportTag];
+    return Tag.add(resource.id, tags);
+  };
 
   prepareProgressCounter() {
     // The default objective is the number of resources multiplied by 2 because:
@@ -140,6 +167,11 @@ class ImportController {
     if (this.options.importFolders) {
       this.operationsCount +=  this.items.foldersPaths.length;
       this.itemsCount += this.items.foldersPaths.length;
+    }
+
+    // If tags are imported, then one more operation per tag.
+    if (this.options.importTags) {
+      this.operationsCount +=  this.items.resources.length;
     }
   }
 
@@ -194,7 +226,7 @@ class ImportController {
   };
 
   /**
-   * Initialize the list of folders. Add root and make sure they are in their final form.
+   * Initialize the list of folders. Add root and make sure their paths is in their final form.
    * @private
    */
   _prepareFolders() {
@@ -231,13 +263,13 @@ class ImportController {
    * @private
    */
   _getConsolidatedPath(path) {
-    let res = '/' + path;
+    let res = '';
 
     if (!path || path === '/') {
       res = '/' + this.uniqueImportTag;
-    } else if (path.includes('/Root/')) {
+    } else if (path.match(/^Root/)) {
       // If there is a root folder, we replace it with the unique tag name.
-      res = path.replace("/Root/", "/" + this.uniqueImportTag + "/", );
+      res = path.replace(/^Root/, "/" + this.uniqueImportTag);
     } else {
       // Else, we add the unique tag name at the beginning of
       res = "/" + this.uniqueImportTag + '/' + path;

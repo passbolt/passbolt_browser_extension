@@ -85,7 +85,7 @@ class ResourceLocalStorage {
     try {
       ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
       const resources = await ResourceLocalStorage.get();
-      resources.push(resourceEntity);
+      resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({ resources });
       lock.release();
     } catch (error) {
@@ -108,7 +108,7 @@ class ResourceLocalStorage {
       if (resourceIndex === -1) {
         throw new Error('The folder could not be found in the local storage');
       }
-      resources[resourceIndex] = resourceEntity;
+      resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
       await browser.storage.local.set({ resources });
       lock.release();
     } catch(error) {

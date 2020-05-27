@@ -183,8 +183,15 @@ class MoveFolderController {
    * @returns {Promise<void>}
    */
   async calculateChanges() {
-    // Calculate permission changes for current folder
     await progressController.update(this.worker, this.progress++, `Calculating changes for ${this.folder.name}`);
+
+    // When a shared folder at the root is moved in a personal folder
+    // we do not change permissions
+    if (this.folder.isShared() && this.folder.folderParentId === null && this.destinationFolder.isPersonal()) {
+      return;
+    }
+
+    // Calculate permission changes for current folder
     if (this.folder.permission.isOwner()) {
       this.foldersChanges.merge(
         await this.folderModel.calculatePermissionsChangesForMove(

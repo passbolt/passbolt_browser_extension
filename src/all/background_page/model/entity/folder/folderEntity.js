@@ -249,7 +249,7 @@ class FolderEntity extends Entity {
    * @returns {(boolean|null)}
    */
   isShared() {
-    return !this.isPersonal;
+    return !this.isPersonal();
   }
 
   /**

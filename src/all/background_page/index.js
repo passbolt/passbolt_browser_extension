@@ -4,31 +4,28 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-
 var storage = require('./sdk/storage').storage;
 window.storage = storage;
 
-
-var main = function() {
-
-  // Config and user models
-  var Config = require('./model/config');
-  const GpgAuth = require('./model/gpgauth').GpgAuth;
-  var User = require('./model/user').User;
-  var SiteSettings = require('./model/siteSettings').SiteSettings;
-  var Log = require('./model/log').Log;
+const main = async function() {
+  const Config = require('./model/config');
+  const {Log} = require('./model/log');
+  const {GpgAuth} = require('./model/gpgauth');
+  const {User} = require('./model/user');
+  const {ResourceLocalStorage} = require('./service/local_storage/resourceLocalStorage');
+  const {FolderLocalStorage} = require('./service/local_storage/folderLocalStorage');
 
   /* ==================================================================================
-   *  Flush the logs
+   *  Initialization of global objects
    * ==================================================================================
    */
-  Log.flush();
+  Log.init();
+  Config.init();
+  User.init();
+  ResourceLocalStorage.init();
+  FolderLocalStorage.init();
 
-  /* ==================================================================================
-   *  Openpgp init
-   *  Init web worker
-   * ==================================================================================
-   */
+  // Web worker
   openpgp.initWorker({ path:'/vendors/openpgp.worker.js' });
 
   /* ==================================================================================
@@ -60,11 +57,16 @@ var main = function() {
     // We only initialize it here for the cases where the user is already logged in
     // It can happen when the extension is updated
     const auth = new GpgAuth();
-    auth.isAuthenticated()
-      .then(() => {
-        pageMods.PassboltApp.init();
+    try {
+      const isAuthenticated = await auth.isAuthenticated();
+      if (isAuthenticated) {
+        await pageMods.PassboltApp.init();
         auth.startCheckAuthStatusLoop();
-      });
+      }
+    } catch(error) {
+      // Service unavailable
+      // Do nothing...
+    }
   }
 
   // Setup pagemods
@@ -76,15 +78,13 @@ var main = function() {
   pageMods.File.init();
   pageMods.Clipboard.init();
   pageMods.PassboltAuthForm.init();
-  pageMods.MasterPasswordDialog.init();
-  pageMods.ProgressDialog.init();
-  pageMods.SecretEditDialog.init();
-  pageMods.ShareDialog.init();
+  // pageMods.ShareDialog.init();
   pageMods.GroupEditDialog.init();
   pageMods.GroupEditAutocompleteDialog.init();
   pageMods.ImportPasswordsDialog.init();
   pageMods.ExportPasswordsDialog.init();
   pageMods.QuickAccess.init();
+  pageMods.ReactApp.init();
 
   // Debug pagemod
   if (Config.isDebug()) {

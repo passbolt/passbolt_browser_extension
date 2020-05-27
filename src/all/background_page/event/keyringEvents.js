@@ -144,12 +144,17 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param privateKeyArmored {string} The private armored key to import
    */
-  worker.port.on('passbolt.keyring.private.import', function (requestId, privateKeyArmored) {
-    keyring.importPrivate(privateKeyArmored).then(function() {
+  worker.port.on('passbolt.keyring.private.import', async function (requestId, privateKeyArmored) {
+    try {
+      await keyring.importPrivate(privateKeyArmored);
+      const publicKeyArmored = await keyring.extractPublicKey(privateKeyArmored);
+      const user = User.getInstance();
+      await keyring.importPublic(publicKeyArmored, user.get().id);
       worker.port.emit(requestId, 'SUCCESS');
-    }, function(error) {
+    } catch (error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR', privateKeyArmored);
-    });
+    }
   });
 
   /*
@@ -205,7 +210,7 @@ var listen = function (worker) {
       filename += '.txt';
     }
 
-    fileController.saveFile(filename, key, worker.tab.id)
+    fileController.saveFile(filename, key, "text/plain", worker.tab.id)
       .then(function () {
         worker.port.emit(requestId, 'SUCCESS');
       }, function () {

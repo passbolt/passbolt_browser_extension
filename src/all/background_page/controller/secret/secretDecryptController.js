@@ -11,16 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.8.0
  */
-const Crypto = require('../../model/crypto').Crypto;
-const masterPasswordController = require('../masterPasswordController');
-const progressDialogController = require('../progressDialogController');
-const ResourceService = require('../../service/resource').ResourceService;
-const Secret = require('../../model/secret').Secret;
-const Worker = require('../../model/worker');
+const {Crypto} = require('../../model/crypto');
+const passphraseController = require('../passphrase/passphraseController');
+const progressController = require('../progress/progressController');
+const {LegacyResourceService} = require('../../service/resource');
+const {Secret} = require('../../model/secret');
 
-/**
- * Secret decrypt controller
- */
 class SecretDecryptController {
 
   constructor(worker, requestId) {
@@ -35,25 +31,36 @@ class SecretDecryptController {
    */
   async decrypt(resourceId) {
     const crypto = new Crypto();
+    let passphrase;
+    const secretPromise = this._getSecret(resourceId);
 
+    // Capture the passphrase if needed
     try {
-      const secretPromise = this._getSecret(resourceId);
-      const masterPassword = await masterPasswordController.get(this.worker);
-      await this._showProgress();
-      const secret = await secretPromise;
-      const message = await crypto.decrypt(secret.data, masterPassword);
-      this.worker.port.emit(this.requestId, 'SUCCESS', message);
-    } catch (error) {
+      passphrase = await passphraseController.get(this.worker);
+    } catch(error) {
       this.worker.port.emit(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
+      return;
     }
 
-    this._hideProgress();
+    try {
+      await progressController.open(this.worker, 'Decrypting...', 2, "Decrypting private key");
+      const secret = await secretPromise;
+      const privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
+      progressController.update(this.worker, 1, "Decrypting secret");
+      const message = await crypto.decryptWithKey(secret.data, privateKey);
+      progressController.update(this.worker, 2, "Complete");
+      this.worker.port.emit(this.requestId, 'SUCCESS', message);
+      await progressController.close(this.worker);
+    } catch (error) {
+      console.error(error);
+      this.worker.port.emit(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
+      await progressController.close(this.worker);
+    }
   }
 
   /**
    * Get the resource secret to decrypt
    * @param {string} resourceId The resource identifier to decrypt the secret of.
-   * @param {object} tabStorageEditedPassword
    * @return {Promise}
    */
   async _getSecret(resourceId) {
@@ -64,33 +71,11 @@ class SecretDecryptController {
       // Before v2.7.0, the secret entry point was not available.
       // Use the resource entry point to retrieve the secret.
       // @deprecated since v2.7.0 will be removed with v2.3.0
-      const resource = await ResourceService.findOne(resourceId, { contain: { secret: 1 } });
+      const resource = await LegacyResourceService.findOne(resourceId, { contain: { secret: 1 } });
       secret = resource.secrets[0];
     }
 
     return secret;
-  }
-
-  /**
-   * Display progress.
-   */
-  async _showProgress() {
-    // @todo the quickaccess worker should have a pagemod too
-    // Display the progress dialog if the requester is not the quickaccess.
-    if (this.worker.pageMod) {
-      await progressDialogController.open(Worker.get('App', this.worker.tab.id), 'Decrypting...');
-    }
-  }
-
-  /**
-   * Hide progress.
-   */
-  _hideProgress() {
-    // @todo the quickaccess worker should have a pagemod too
-    // Hide the progress dialog if the requester is not the quickaccess.
-    if (this.worker.pageMod) {
-      progressDialogController.close(Worker.get('App', this.worker.tab.id));
-    }
   }
 }
 

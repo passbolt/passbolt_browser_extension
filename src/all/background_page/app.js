@@ -25,20 +25,19 @@ events.clipboard = require('./event/clipboardEvents');
 events.config = require('./event/configEvents');
 events.debug = require('./event/debugEvents');
 events.debugPage = require('./event/debugPageEvents');
-events.editPassword = require('./event/editPasswordEvents');
 events.exportPasswordsIframe = require('./event/exportPasswordsIframeEvents');
 events.exportPasswords = require('./event/exportPasswordsEvents');
 events.favorite = require('./event/favoriteEvents');
 events.file = require('./event/fileEvents');
+events.folder = require('./event/folderEvents');
 events.group = require('./event/groupEvents');
 events.groupAutocomplete = require('./event/groupAutocompleteEvents');
 events.importPasswordsIframe = require('./event/importPasswordsIframeEvents');
 events.importPasswords = require('./event/importPasswordsEvents');
 events.keyring = require('./event/keyringEvents');
-events.masterPasswordIframe = require('./event/masterPasswordIframeEvents');
-events.masterPassword = require('./event/masterPasswordEvents');
 events.passboltPage = require('./event/passboltPageEvents');
 events.quickAccess = require('./event/quickAccessEvents');
+events.reactApp = require('./event/reactAppEvents');
 events.resource = require('./event/resourceEvents');
 events.secret = require('./event/secretEvents');
 events.setup = require('./event/setupEvents');
@@ -90,6 +89,11 @@ var pageMods = {};
 pageMods.Bootstrap = require('./pagemod/bootstrapPagemod').Bootstrap;
 
 /*
+ * This pagemod drives the react application.
+ */
+pageMods.ReactApp = require('./pagemod/reactAppPagemod').ReactApp;
+
+/*
  * This pagemod drives the login / authentication
  */
 pageMods.PassboltAuth = require('./pagemod/passboltAuthPagemod').PassboltAuth;
@@ -133,30 +137,6 @@ pageMods.Clipboard = require('./pagemod/clipboardPagemod').Clipboard;
  * This pagemod drives the file iframe tool
  */
 pageMods.File = require('./pagemod/filePagemod').File;
-
-/*
- * This pagemod drives the dialog/iframe where the user enters the secret key password,
- * also called passphrase. It is used when encrypting, decrypting, signing, etc.
- */
-pageMods.MasterPasswordDialog = require('./pagemod/masterPasswordDialogPagemod').MasterPasswordDialog;
-
-/*
- * This pagemod drives the progress bar iframe
- * It is used when the add-on is encrypting something
- */
-pageMods.ProgressDialog = require('./pagemod/progressDialogPagemod').ProgressDialog;
-
-/*
- * This pagemod drives the iframe used when the user enter a password to be stored by passbolt
- * It is used when creating/editing a new password
- */
-pageMods.SecretEditDialog = require('./pagemod/secretEditDialogPagemod').SecretEditDialog;
-
-/*
- * This pagemod drives the iframe used when the user share a password
- * It is used when sharing a new password
- */
-pageMods.ShareDialog = require('./pagemod/shareDialogPagemod').ShareDialog;
 
 /*
  * This pagemod drives the iframe used when the user creates / edit a group.

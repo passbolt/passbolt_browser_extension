@@ -1,0 +1,52 @@
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ */
+const {AbstractService} = require('../abstract/abstractService');
+
+const SHARE_SERVICE_RESOURCE_NAME = 'share';
+
+class ShareService extends AbstractService {
+  /**
+   * Constructor
+   *
+   * @param {ApiClientOptions} apiClientOptions
+   * @public
+   */
+  constructor(apiClientOptions) {
+    super(apiClientOptions, ShareService.RESOURCE_NAME);
+  }
+
+  /**
+   * API Resource Name
+   *
+   * @returns {string}
+   * @public
+   */
+  static get RESOURCE_NAME() {
+    return SHARE_SERVICE_RESOURCE_NAME;
+  }
+
+  /**
+   * Update a given folder permission
+   *
+   * @param {string} folderId uuid
+   * @param {object} permissionChangesDto
+   * @returns {Promise<*>}
+   */
+  async shareFolder(folderId, permissionChangesDto) {
+    let url = `folder/${folderId}`;
+    const response = await this.apiClient.update(url, permissionChangesDto);
+    return response.body;
+  }
+}
+
+exports.ShareService = ShareService;

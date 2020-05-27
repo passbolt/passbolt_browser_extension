@@ -8,10 +8,19 @@
 	(c) 2019 Passbolt SA
 	https://www.passbolt.com
 
+## License
 
-## Licence
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-Passbolt is distributed under [Affero General Public License v3](http://www.gnu.org/licenses/agpl-3.0.html)
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose. See the
+GNU Affero General Public License for more details.
+
+[Affero General Public License v3](http://www.gnu.org/licenses/agpl-3.0.html)
 
 ## About passbolt
 

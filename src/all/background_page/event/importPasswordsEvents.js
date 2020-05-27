@@ -1,50 +1,23 @@
 /**
  * Import passwords Listeners
  *
- * @copyright (c) 2017 Passbolt SARL
+ * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var ImportController = require('../controller/importPasswordsController').ImportPasswordsController;
-var Worker = require('../model/worker');
+const ImportController = require('../controller/import/importController').ImportController;
+const User = require('../model/user').User;
 
-var listen = function (worker) {
-
-  worker.port.on('passbolt.import-passwords.import-file', function (requestId, b64FileContent, fileType, options) {
-    var importController = new ImportController(worker.tab.id);
-
-    var loader = null;
-    if (fileType == 'kdbx') {
-      loader = importController.initFromKdbx(b64FileContent, options.credentials);
-    } else if( fileType == 'csv') {
-      loader = importController.initFromCsv(b64FileContent, {});
-    }
-
-    loader
-    .then(function(resources) {
-      return importController.encryptSecrets(resources);
-    })
-    .then(function (resources) {
-      options.importTag = ImportController._getUniqueImportTag(fileType);
-      return importController.saveResources(resources, options);
-    })
-    .then(function(responses) {
-      // Send results report to content code, in order to display report.
-      const result = {
-        "resources": importController.resources,
-        "responses": responses,
-        "importTag": options.importTag
-      };
-
-      // Inform the app-js that the import is complete.
-      var appWorker = Worker.get('App', worker.tab.id);
-      appWorker.port.emit('passbolt.import-passwords.complete', result);
-
+const listen = function (worker) {
+  worker.port.on('passbolt.import-passwords.import-file', async function (requestId, b64FileContent, fileType, options) {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const importController = new ImportController(worker, apiClientOptions, options, fileType, b64FileContent);
+    try {
+      const result = await importController.exec();
       worker.port.emit(requestId, 'SUCCESS', result);
-    })
-    .catch(function(e) {
+    } catch (e) {
       console.error(e);
       worker.port.emit(requestId, 'ERROR', e);
-    });
+    }
   });
 };
 

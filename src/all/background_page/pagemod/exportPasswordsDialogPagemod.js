@@ -32,7 +32,7 @@ ExportPasswordsDialog.init = function () {
     onAttach: function (worker) {
       Worker.add('ExportPasswords', worker, {
         onDestroy: function () {
-          TabStorage.remove(worker.tab.id, 'exportedResources');
+          TabStorage.remove(worker.tab.id, 'itemsToExport');
         }
       });
       app.events.config.listen(worker);

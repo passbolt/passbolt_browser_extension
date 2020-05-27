@@ -13,9 +13,9 @@
  */
 const browser = require("webextension-polyfill/dist/browser-polyfill");
 const Crypto = require('../../model/crypto').Crypto;
-const masterPasswordController = require('../masterPasswordController');
-const ResourceService = require('../../service/resource').ResourceService;
-const Secret = require('../../model/secret').Secret;
+const passphraseController = require('../passphrase/passphraseController');
+const {LegacyResourceService} = require('../../service/resource');
+const {Secret} = require('../../model/secret').Secret;
 const Worker = require('../../model/worker');
 
 /**
@@ -41,7 +41,7 @@ class UseResourceOnCurrentTabController {
 
     try {
       const secretPromise = this._getSecret(resourceId);
-      const masterPassword = await masterPasswordController.get(this.worker);
+      const masterPassword = await passphraseController.get(this.worker);
       const secret = await secretPromise;
       const message = await crypto.decrypt(secret.data, masterPassword);
       // Return username as an empty string, when `resource.name` is null
@@ -69,7 +69,7 @@ class UseResourceOnCurrentTabController {
       // Before v2.7.0, the secret entry point was not available.
       // Use the resource entry point to retrieve the secret.
       // @deprecated since v2.7.0 will be removed with v2.3.0
-      const resource = await ResourceService.findOne(resourceId, { contain: { secret: 1 } });
+      const resource = await LegacyResourceService.findOne(resourceId, { contain: { secret: 1 } });
       secret = resource.secrets[0];
     }
 

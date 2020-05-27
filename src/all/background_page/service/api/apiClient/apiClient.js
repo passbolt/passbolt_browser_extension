@@ -1,0 +1,330 @@
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         2.13.0
+ */
+const {PassboltApiFetchError} = require('../../../error/passboltApiFetchError');
+const {PassboltBadResponseError} = require('../../../error/passboltBadResponseError');
+const {PassboltServiceUnavailableError} = require('../../../error/passboltServiceUnavailableError');
+
+class ApiClient {
+  /**
+   * Constructor
+   *
+   * @param {ApiClientOptions} options
+   * @throws {TypeError} if baseUrl is empty or not a string
+   * @public
+   */
+  constructor(options) {
+    this.options = options;
+    if (!this.options.getBaseUrl()) {
+      throw new TypeError('ApiClient constructor error: baseUrl is required.');
+    }
+    if (!this.options.getResourceName()) {
+      throw new TypeError('ApiClient constructor error: resourceName is required.');
+    }
+    try {
+      let rawBaseUrl = this.options.getBaseUrl().toString();
+      if (rawBaseUrl.endsWith('/')) {
+        rawBaseUrl = rawBaseUrl.slice(0, -1);
+      }
+      this.baseUrl = rawBaseUrl + '/' + this.options.getResourceName();
+      this.baseUrl = new URL(this.baseUrl);
+    } catch (typeError) {
+      throw new TypeError('ApiClient constructor error: b.');
+    }
+
+    this.apiVersion = 'api-version=v2';
+  }
+
+  /**
+   * @returns {Object} fetchOptions.headers
+   * @private
+   */
+  getDefaultHeaders() {
+    return {
+      'Accept': 'application/json',
+      'content-type': 'application/json'
+    }
+  }
+
+  /**
+   * @returns {Object} fetchOptions
+   * @private
+   */
+  buildFetchOptions() {
+    return {
+      credentials: 'include',
+      headers: {...this.getDefaultHeaders(), ...this.options.getHeaders()}
+    };
+  }
+
+  /**
+   * Find a resource by id
+   *
+   * @param {string} id most likely a uuid
+   * @param {Object} [urlOptions] Optional url parameters for example {"contain[something]": "1"}
+   * @throws {TypeError} if id is empty or not a string
+   * @throws {TypeError} if urlOptions key or values are not a string
+   * @throws {PassboltServiceUnavailableError} if service is not reachable
+   * @throws {PassboltBadResponseError} if passbolt API responded with non parsable JSON
+   * @throws {PassboltApiFetchError} if passbolt API response is not OK (non 2xx status)
+   * @returns {Promise<*>}
+   * @public
+   */
+  async get(id, urlOptions) {
+    this.assertValidId(id);
+    const url = this.buildUrl(`${this.baseUrl}/${id}`, urlOptions || {});
+    return this.fetchAndHandleResponse('GET', url);
+  };
+
+  /**
+   * Delete a resource by id
+   *
+   * @param {string} id most likely a uuid
+   * @param {Object} [body] (will be converted to JavaScript Object Notation (JSON) string)
+   * @param {Object} [urlOptions] Optional url parameters for example {"contain[something]": "1"}
+   * @throws {TypeError} if id is empty or not a string
+   * @throws {TypeError} if urlOptions key or values are not a string
+   * @throws {PassboltServiceUnavailableError} if service is not reachable
+   * @throws {PassboltBadResponseError} if passbolt API responded with non parsable JSON
+   * @throws {PassboltApiFetchError} if passbolt API response is not OK (non 2xx status)
+   * @returns {Promise<*>}
+   * @public
+   */
+  async delete(id, body, urlOptions) {
+    this.assertValidId(id);
+    const url = this.buildUrl(`${this.baseUrl}/${id}`, urlOptions || {});
+    let bodyString;
+    if (body) {
+      bodyString = this.buildBody(body);
+    }
+    return this.fetchAndHandleResponse('DELETE', url, bodyString);
+  };
+
+  /**
+   * Find all the resources
+   *
+   * @param {Object} [urlOptions] Optional url parameters for example {"contain[something]": "1"}
+   * @throws {TypeError} if urlOptions key or values are not a string
+   * @throws {PassboltServiceUnavailableError} if service is not reachable
+   * @throws {PassboltBadResponseError} if passbolt API responded with non parsable JSON
+   * @throws {PassboltApiFetchError} if passbolt API response is not OK (non 2xx status)
+   * @returns {Promise<*>}
+   * @public
+   */
+  async findAll (urlOptions) {
+    const url = this.buildUrl(this.baseUrl.toString(), urlOptions || {});
+    return await this.fetchAndHandleResponse('GET', url);
+  };
+
+  /**
+   * Create a resource
+   *
+   * @param {Object} body (will be converted to JavaScript Object Notation (JSON) string)
+   * @param {Object} [urlOptions] Optional url parameters for example {"contain[something]": "1"}
+   * @throws {TypeError} if body is empty or cannot converted to valid JSON string
+   * @throws {PassboltServiceUnavailableError} if service is not reachable
+   * @throws {PassboltBadResponseError} if passbolt API responded with non parsable JSON
+   * @throws {PassboltApiFetchError} if passbolt API response is not OK (non 2xx status)
+   * @returns {Promise<*>}
+   * @public
+   */
+  async create(body, urlOptions) {
+    const url = this.buildUrl(this.baseUrl.toString(), urlOptions || {});
+    const bodyString = this.buildBody(body);
+    return this.fetchAndHandleResponse('POST', url, bodyString);
+  }
+
+  /**
+   * Update a resource
+   *
+   * @param {string} id most likely a uuid
+   * @param {Object} body (will be converted to JavaScript Object Notation (JSON) string)
+   * @param {Object} [urlOptions] Optional url parameters for example {"contain[something]": "1"}
+   * @throws {TypeError} if id is empty or not a string
+   * @throws {TypeError} if body is empty or cannot converted to valid JSON string
+   * @throws {PassboltServiceUnavailableError} if service is not reachable
+   * @throws {PassboltBadResponseError} if passbolt API responded with non parsable JSON
+   * @throws {PassboltApiFetchError} if passbolt API response is not OK (non 2xx status)
+   * @returns {Promise<*>}
+   * @public
+   */
+  async update(id, body, urlOptions) {
+    this.assertValidId(id);
+    const url = this.buildUrl(`${this.baseUrl}/${id}`, urlOptions || {});
+    const bodyString = this.buildBody(body);
+    return this.fetchAndHandleResponse('PUT', url, bodyString);
+  }
+
+  /**
+   * Assert that an id is a valid non empty string
+   *
+   * @throws {TypeError} if id is empty or not a string
+   * @param {string} id
+   * @return {void}
+   * @private
+   */
+  assertValidId(id) {
+    if (!id) {
+      throw new TypeError('ApiClient.assertValidId error: id cannot be empty');
+    }
+    if (typeof id !== 'string') {
+      throw new TypeError('ApiClient.assertValidId error: id should be a string');
+    }
+  }
+
+  /**
+   * @throw TypeError
+   * @param method
+   * @private
+   */
+  assertMethod(method) {
+    if (typeof method !== 'string') {
+      new TypeError('ApiClient.assertValidMethod method should be a string.');
+    }
+    const supportedMethods = ['GET', 'POST', 'PUT', 'DELETE'];
+    if (supportedMethods.indexOf(method) < 0) {
+      new TypeError(`ApiClient.assertValidMethod error: method ${method} is not supported.`);
+    }
+  }
+
+  /**
+   * Url paramter assertion
+   * @param {*} url
+   * @throw TypeError
+   * @private
+   */
+  assertUrl(url) {
+    if (!url) {
+      throw new TypeError('ApliClient.assertUrl error: url is required.');
+    }
+    if (!(url instanceof URL)) {
+      throw new TypeError('ApliClient.assertUrl error: url should be a valid URL object.');
+    }
+  }
+
+  /**
+   * Body parameter assertion
+   * @param body
+   * @throws {TypeError} if body is not a string
+   * @private
+   */
+  assertBody(body) {
+    if (typeof body !== 'string') {
+      new TypeError(`ApiClient.assertBody error: body should be a string.`);
+    }
+  }
+
+  /**
+   * Build body object
+   *
+   * @param {Object} body
+   * @throws {TypeError} if body is empty or cannot converted to valid JSON string
+   * @return {string} JavaScript Object Notation (JSON) string
+   * @private
+   */
+  buildBody(body) {
+    return JSON.stringify(body);
+  }
+
+  /**
+   * Return a URL object from string url and this.baseUrl and this.apiVersion
+   * Optionally append urlOptions to the URL object
+   *
+   * @param {string|URL} url
+   * @param {Object} [urlOptions] Optional url parameters for example {"contain[something]": "1"}
+   * @throws {TypeError} if urlOptions key or values are not a string
+   * @returns {URL}
+   * @public
+   */
+  buildUrl(url, urlOptions) {
+    if (typeof url !== 'string') {
+      throw new TypeError('ApiClient.buildUrl error: url should be a string.');
+    }
+    const urlObj = new URL(`${url}.json?${this.apiVersion}`);
+
+    urlOptions = urlOptions || {};
+    for (const [key, value] of Object.entries(urlOptions)) {
+      if (typeof key !== 'string' ) {
+        throw new TypeError('ApiClient.buildUrl error: urlOptions key should be a string.');
+      }
+      if (typeof value === 'string') {
+        urlObj.searchParams.append(key, value);
+      } else {
+        // Example "filter[has-id][]": "<uuid>"
+        if (Array.isArray(value)) {
+          value.forEach((v) => {
+            urlObj.searchParams.append(key, v);
+          });
+        } else {
+          throw new TypeError('ApiClient.buildUrl error: urlOptions value should be a string or array.');
+        }
+      }
+    }
+    return urlObj;
+  }
+
+  /**
+   * fetchAndHandleResponse
+   *
+   * @param {string} method example 'GET', 'POST'
+   * @param {URL} url object
+   * @param {string} [body] (optional)
+   * @param {Object} [options] (optional) more fetch options
+   * @throws {TypeError} if method, url are not defined or of the wrong type
+   * @throws {PassboltServiceUnavailableError} if service is not reachable
+   * @throws {PassboltBadResponseError} if passbolt API responded with non parsable JSON
+   * @throws {PassboltApiFetchError} if passbolt API response is not OK (non 2xx status)
+   * @returns {Promise<*>}
+   * @public
+   */
+  async fetchAndHandleResponse(method, url, body, options) {
+    this.assertUrl(url);
+    this.assertMethod(method);
+    if (body) {
+      this.assertBody(body);
+    }
+
+    let response, responseJson;
+    let fetchOptions = { ...this.buildFetchOptions(), ...options };
+    fetchOptions.method = method;
+    if (body) {
+      fetchOptions.body = body;
+    }
+    try {
+      response = await fetch(url.toString(), fetchOptions);
+    } catch (error) {
+      // Catch Network error such as connection lost.
+      throw new PassboltServiceUnavailableError(error.message);
+    }
+
+    try {
+      responseJson = await response.json();
+    } catch (error) {
+      // If the response cannot be parsed, it's not a Passbolt API response.
+      // It can be a for example a proxy timeout error (504).
+      throw new PassboltBadResponseError();
+    }
+
+    if (!response.ok) {
+      const message = responseJson.header.message;
+      throw new PassboltApiFetchError(message, {
+        code: response.status,
+        body: responseJson.body
+      });
+    }
+
+    return responseJson;
+  }
+}
+
+exports.ApiClient = ApiClient;

@@ -6,6 +6,7 @@
  */
 var Log = require('../model/log').Log;
 var tabsController = require('../controller/tabsController');
+const User = require('../model/user').User;
 
 var listen = function (worker) {
 

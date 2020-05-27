@@ -24,7 +24,10 @@ Port.prototype.on = function(msgName, callback) {
     var args = Object.keys(msg).map(function (key) {return msg[key]});
     args = Array.prototype.slice.call(args, 1);
     if (msg[0] === msgName) {
-      Log.write({level: 'debug', message: 'Port on @ message: ' + msgName});
+      // TODO create list of blacklisted events
+      if(msgName !== 'passbolt.auth.is-authenticated') {
+        Log.write({level: 'debug', message: 'Port on @ message: ' + msgName});
+      }
       callback.apply(_this, args);
     }
   });
@@ -39,6 +42,17 @@ Port.prototype.on = function(msgName, callback) {
  */
 Port.prototype.emit = function () {
   Log.write({level: 'debug', message: 'Port emit @ message: ' + arguments[1]});
+  this._port.postMessage(Array.prototype.slice.call(arguments));
+};
+
+/**
+ * Send a message to the content code
+ *
+ * @param msgName string
+ * @param token uuid
+ * @param status SUCCESS | ERROR
+ */
+Port.prototype.emitQuiet = function () {
   this._port.postMessage(Array.prototype.slice.call(arguments));
 };
 

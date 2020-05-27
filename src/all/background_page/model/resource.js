@@ -7,8 +7,8 @@
 const __ = require('../sdk/l10n').get;
 const Request = require('./request').Request;
 const User = require('./user').User;
-const ResourceService = require('../service/resource').ResourceService;
-const ResourceLocalStorage = require('../service/local_storage/resource').ResourceLocalStorage;
+const {LegacyResourceService} = require('../service/resource');
+const {ResourceLocalStorage} = require('../service/local_storage/resourceLocalStorage');
 
 /**
  * The class that deals with resources.
@@ -19,6 +19,7 @@ const Resource = function () {
   this.username = "";
   this.secretClear = "";
   this.description = "";
+  this.folderParentPath = "";
   this.secrets = [
     // Here a list of secrets.
   ];
@@ -83,6 +84,7 @@ Resource.prototype.toCsvEntry = function (resource, mapping) {
 /**
  * Import a resource on the server.
  * Import is different than save here because we will use a different passbolt pro entry point.
+ *
  * @param resource
  */
 Resource.import = function (resource) {
@@ -102,7 +104,7 @@ Resource.import = function (resource) {
       'content-type': 'application/json'
     }
   };
-  Request.setCsrfHeader(fetchOptions);
+  Request.setCsrfHeader(fetchOptions, user);
 
   return new Promise(function (resolve, reject) {
     fetch(url, fetchOptions)
@@ -126,9 +128,10 @@ Resource.import = function (resource) {
 
 /**
  * Find resource to share
- * @param resourceId
+ *
  * @deprecated since v2.4.0 will be removed in v3.0
- * replaced by the findShareResources function.
+ * replaced by the findAllForShare function.
+ * @param resourceId
  */
 Resource.findShareResource = async function (resourceId) {
   const user = User.getInstance();
@@ -161,52 +164,12 @@ Resource.findShareResource = async function (resourceId) {
 
 /**
  * Find resources to share
+ *
  * @param {array} resourcesIds
  * @returns {array|Error}
  */
-Resource.findShareResources = async function (resourcesIds) {
-  // Retrieve by batch to avoid any 414 response.
-  const batchSize = 80;
-  if (resourcesIds.length > batchSize) {
-    let resources = [];
-    const totalBatches = Math.ceil(resourcesIds.length / batchSize);
-    for (let i = 0; i < totalBatches; i++) {
-      const resouresIdsPart = resourcesIds.splice(0, batchSize);
-      const resourcesPart = await Resource.findShareResources(resouresIdsPart);
-      resources = [...resources, ...resourcesPart];
-    }
-
-    return resources;
-  }
-
-  const user = User.getInstance();
-  const domain = user.settings.getDomain();
-  const fetchOptions = {
-    method: 'GET',
-    credentials: 'include',
-    headers: {
-      'Accept': 'application/json',
-      'content-type': 'application/json'
-    }
-  };
-  let url = new URL(`${domain}/resources.json?api-version=2`);
-  resourcesIds.forEach(resourceId => {
-    url.searchParams.append(`filter[has-id][]`, resourceId);
-  });
-  url.searchParams.append('contain[permission]', '1');
-  url.searchParams.append('contain[permissions.user.profile]', '1');
-  url.searchParams.append('contain[permissions.group]', '1');
-  url.searchParams.append('contain[secret]', '1');
-  let response, json;
-
-  try {
-    response = await fetch(url, fetchOptions);
-    json = await response.json();
-  } catch (error) {
-    return new Error(__('There was a problem when trying to retrieve the resources'));
-  }
-
-  return json.body;
+Resource.findAllForShare = async function (resourcesIds) {
+  return await LegacyResourceService.findAllForShare(resourcesIds);
 };
 
 /**
@@ -218,54 +181,49 @@ Resource.updateLocalStorage = async function () {
     contain: {
       "permission": true,
       "favorite": true,
-      "tags": true
+      "tags": true,
+      "folder": true
     }
   };
-  const resources = await ResourceService.findAll(findOptions);
-  await ResourceLocalStorage.set(resources);
-}
+  const resources = await LegacyResourceService.findAll(findOptions);
+  await ResourceLocalStorage.setLegacy(resources);
+};
 
 /**
  * Find all the resources
+ *
  * @param {object} options Options to apply to the find request
  * @return {Promise}
  */
 Resource.findAll = async function (options) {
-  return ResourceService.findAll(options);
-}
+  return LegacyResourceService.findAll(options);
+};
 
 /**
  * Save a resource
- * @param {object} data The resource data
- * @return {Promise}
- */
-Resource.save = async function (data) {
-  const resource = await ResourceService.save(data);
-  await ResourceLocalStorage.addResource(resource);
-
-  return resource;
-}
-
-/**
- * Save a resource
+ *
  * @param {object} data The resource data
  * @return {Promise}
  */
 Resource.update = async function (data) {
-  const resource = await ResourceService.update(data);
-  await ResourceLocalStorage.updateResource(resource);
+  if (data.folderParentId) {
+    data.folder_parent_id = data.folderParentId;
+  }
+  const resource = await LegacyResourceService.update(data);
+  await ResourceLocalStorage.updateResourceLegacy(resource);
 
   return resource;
-}
+};
 
 /**
  * Delete all the resources
+ *
  * @param {array} resourcesIds The resources ids to delete
  * @return {Promise}
  */
 Resource.deleteAll = async function (resourcesIds) {
   const promise = resourcesIds.reduce((promise, resourceId) => {
-    return promise.then(() => ResourceService.delete(resourceId));
+    return promise.then(() => LegacyResourceService.delete(resourceId));
   }, Promise.resolve([]));
   // Update local storage.
   promise.then(async () => {
@@ -273,6 +231,6 @@ Resource.deleteAll = async function (resourcesIds) {
   });
 
   return promise;
-}
+};
 
 exports.Resource = Resource;

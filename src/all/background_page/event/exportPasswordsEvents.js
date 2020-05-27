@@ -4,22 +4,23 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var ExportPasswordsController = require('../controller/exportPasswordsController').ExportPasswordsController;
-var Worker = require('../model/worker');
-var TabStorage = require('../model/tabStorage').TabStorage;
-var progressDialogController = require('../controller/progressDialogController');
-var fileController = require('../controller/fileController');
+const ExportController = require('../controller/export/exportController').ExportController;
+const Worker = require('../model/worker');
+const TabStorage = require('../model/tabStorage').TabStorage;
 
-var listen = function (worker) {
+const listen = function (worker) {
 
   /**
    * Get details of an export, like the number of passwords that will be exported.
    * This event is used by content code to display the number of passwords that will be exported.
    */
   worker.port.on('passbolt.export-passwords.get-details', function (requestId) {
-    var exportedResources = TabStorage.get(worker.tab.id, 'exportedResources');
-    var details = {
-      count: exportedResources.length
+    const itemsToExport = TabStorage.get(worker.tab.id, 'itemsToExport');
+    const details = {
+      count: {
+        resources:itemsToExport.resources.length,
+        folders:itemsToExport.folders.length
+      },
     };
     worker.port.emit(requestId, 'SUCCESS', details);
   });
@@ -31,29 +32,23 @@ var listen = function (worker) {
    *   format
    *   credentials
    */
-  worker.port.on('passbolt.export-passwords.export-to-file', function (requestId, options) {
-    var resources = TabStorage.get(worker.tab.id, 'exportedResources');
-    
-    var exportPasswordsController = new ExportPasswordsController(worker.tab.id);
-    exportPasswordsController.init(resources, options);
-    exportPasswordsController.decryptSecrets()
-    .then(function() {
-      return exportPasswordsController.convertResourcesToFile();
-    })
-    .then(function(fileContent) {
-      exportPasswordsController.downloadFile(fileContent);
-    })
-    .then(function() {
-      // Display notification.
-      var appWorker = Worker.get('App', worker.tab.id);
-      appWorker.port.emit('passbolt.export-passwords.complete');
+  worker.port.on('passbolt.export-passwords.export-to-file', async function (requestId, options) {
+    const itemsToExport = TabStorage.get(worker.tab.id, 'itemsToExport');
 
-      worker.port.emit(requestId, 'SUCCESS');
-    })
-    .catch(function(e) {
+    const exportController = new ExportController(worker, itemsToExport, options);
+    try {
+      await exportController.exec();
+    } catch (e) {
       console.error("Export error:", e);
       worker.port.emit(requestId, 'ERROR', e);
-    });
+      return;
+    }
+
+    // Display notification.
+    const appWorker = Worker.get('App', worker.tab.id);
+    appWorker.port.emit('passbolt.export-passwords.complete');
+
+    worker.port.emit(requestId, 'SUCCESS');
   });
 };
 

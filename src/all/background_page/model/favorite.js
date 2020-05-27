@@ -6,8 +6,8 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const FavoriteService = require("../service/favorite").FavoriteService;
-const ResourceLocalStorage = require('../service/local_storage/resource').ResourceLocalStorage;
+const {FavoriteService} = require("../service/favorite");
+const {ResourceLocalStorage} = require('../service/local_storage/resourceLocalStorage');
 
 class Favorite {
 
@@ -16,7 +16,7 @@ class Favorite {
     // Update the resources local storage.
     const resource = await ResourceLocalStorage.getResourceById(resourceId);
     resource.favorite = favorite;
-    await ResourceLocalStorage.updateResource(resource);
+    await ResourceLocalStorage.updateResourceLegacy(resource);
 
     return favorite;
   }
@@ -26,7 +26,7 @@ class Favorite {
     await FavoriteService.delete(resource.favorite.id);
     resource.favorite = null;
     // Update the resources local storage.
-    await ResourceLocalStorage.updateResource(resource);
+    await ResourceLocalStorage.updateResourceLegacy(resource);
   }
 };
 

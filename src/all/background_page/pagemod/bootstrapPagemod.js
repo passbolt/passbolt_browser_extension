@@ -15,7 +15,6 @@ var Bootstrap = function () {};
 Bootstrap._pageMod = undefined;
 
 Bootstrap.init = function () {
-
   if (typeof Bootstrap._pageMod !== 'undefined') {
     Bootstrap._pageMod.destroy();
     Bootstrap._pageMod = undefined;

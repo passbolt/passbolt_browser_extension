@@ -1,15 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import SimpleBar from "../SimpleBar/SimpleBar";
+import AppContext from "../../contexts/AppContext";
 
 class ResourceCreatePage extends React.Component {
   constructor(props) {
     super(props);
     this.initEventHandlers();
-    this.initState();
-    this.nameInputRef = React.createRef();
-    this.uriInputRef = React.createRef();
-    this.usernameInputRef = React.createRef();
+    this.state = this.getDefaultState();
+    this.createInputRef();
   }
 
   componentDidMount() {
@@ -25,8 +24,9 @@ class ResourceCreatePage extends React.Component {
     this.handleGeneratePasswordButtonClick = this.handleGeneratePasswordButtonClick.bind(this);
   }
 
-  initState() {
-    this.state = {
+  getDefaultState() {
+    return {
+      loaded: false,
       error: "",
       name: "",
       nameError: "",
@@ -42,43 +42,57 @@ class ResourceCreatePage extends React.Component {
     };
   }
 
+  createInputRef() {
+    this.nameInputRef = React.createRef();
+    this.uriInputRef = React.createRef();
+    this.usernameInputRef = React.createRef();
+  }
+
   async loadPasswordMetaFromTabInfo() {
-    let tabInfo;
+    const {name, uri} = await this.getPasswordMetaFromTabInfo();
+    this.setState({ name, uri });
+    await this.focusFirstEmptyField(name, uri);
+    this.setState({loaded: true});
+  }
+
+  async getPasswordMetaFromTabInfo() {
     let name = "";
     let uri = "";
+    const ignoreNames = ["newtab"];
+    const ignoreUris = ["chrome://newtab/", "about:newtab"];
 
     try {
-      tabInfo = await passbolt.request("passbolt.active-tab.get-info");
+      const tabInfo = await passbolt.request("passbolt.active-tab.get-info");
+      if (!ignoreNames.includes(tabInfo["title"])) {
+        name = tabInfo["title"].substring(0, 64);
+      }
+      if (!ignoreUris.includes(tabInfo["url"])) {
+        uri = tabInfo["url"];
+      }
     } catch (error) {
       console.error(error);
     }
 
-    // Extract the password meta from the tab info.
-    if (tabInfo) {
-      const notAllowedTittles = ["newtab"];
-      if (notAllowedTittles.indexOf(tabInfo["title"]) === -1) {
-        name = tabInfo["title"].substring(0, 64);
-      }
-      const notAllowedUrls = ["chrome://newtab/", "about:newtab"];
-      if (notAllowedUrls.indexOf(tabInfo["url"]) === -1) {
-        uri = tabInfo["url"];
-      }
-    }
+    return {name, uri};
+  }
 
-    // Focus the first empty input field in the form.
-    // Wait 210ms, the time for the slide to be displayed.
-    // If we don't wait the animation is screwed up, the parent DOM element is animated (the one containing the header).
-    setTimeout(() => {
-      if (name === "") {
-        this.nameInputRef.current.focus();
-      } else if (uri === "") {
-        this.uriInputRef.current.focus();
-      } else {
-        this.usernameInputRef.current.focus();
-      }
-    }, 210);
-
-    this.setState({ name, uri });
+  focusFirstEmptyField(name, uri) {
+    return new Promise(resolve => {
+      // Wait 210ms, the time for the animation to be completed.
+      // If we don't wait the animation to be completed, then the focus will screw the animation. Some browsers need
+      // elements to be visible to give them focus, therefor the browser makes it visible while the animation is
+      // running, making the element blinking.
+      setTimeout(() => {
+        if (name === "") {
+          this.nameInputRef.current.focus();
+        } else if (uri === "") {
+          this.uriInputRef.current.focus();
+        } else {
+          this.usernameInputRef.current.focus();
+        }
+        resolve();
+      }, 210);
+    });
   }
 
   handleGoBackClick(ev) {
@@ -100,11 +114,13 @@ class ResourceCreatePage extends React.Component {
       name: this.state.name,
       username: this.state.username,
       uri: this.state.uri
-    }
+    };
 
     try {
       const resource = await passbolt.request("passbolt.resources.create", resourceMeta, this.state.password);
-      // The view component should not goback on the create component.
+      // Remove the create step from the history.
+      // The user needs to be redirected to the home page and not the create page while clicking on go back
+      // password details page.
       const goToComponentState = {
         goBackEntriesCount: -2
       };
@@ -201,7 +217,7 @@ class ResourceCreatePage extends React.Component {
             <div className="form-container">
               <div className={`input text required ${this.state.nameError ? "error" : ""}`}>
                 <label htmlFor="name">Name</label>
-                <input name="name" value={this.state.name} onChange={this.handleInputChange} disabled={this.state.processing} autoFocus={true}
+                <input name="name" value={this.state.name} onChange={this.handleInputChange} disabled={this.state.processing}
                   ref={this.nameInputRef} className="required fluid" maxLength="64" type="text" id="name" required="required" autoComplete="off" />
                 <div className="error-message">{this.state.nameError}</div>
               </div>
@@ -251,5 +267,7 @@ class ResourceCreatePage extends React.Component {
     );
   }
 }
+
+ResourceCreatePage.contextType = AppContext;
 
 export default ResourceCreatePage;

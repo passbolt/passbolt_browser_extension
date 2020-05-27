@@ -95,8 +95,7 @@ AuthController.prototype._syncUserSettings = async function () {
   try {
     await user.settings.sync()
   } catch (error) {
-    console.error('User settings sync failed');
-    console.error(error.message);
+    // fail silently for CE users
     user.settings.setDefaults();
   }
 };

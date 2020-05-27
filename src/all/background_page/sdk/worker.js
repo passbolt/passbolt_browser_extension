@@ -36,6 +36,20 @@ const Worker = function(port, tab, iframe, pageMod) {
 };
 
 /**
+ * A worker is considered legacy if it's not the react app
+ * We considered them as legacy because they are going to be migrated soon to the new react application.
+ *
+ * @returns {boolean}
+ */
+Worker.prototype.isLegacyWorker = function () {
+  if (!this.pageMod) {
+    return false; // quick access
+  }
+  // Every worker from anything else than the react app pagemod is legacy
+  return this.pageMod.args.name !== 'ReactApp';
+};
+
+/**
  * Add event listener
  * @param eventName
  * @param callback

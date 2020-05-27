@@ -112,6 +112,37 @@ var passbolt = window.passbolt || {};
     });
   };
 
+  /**
+   * Respond to a request.
+   * @param {string} requestId The request id.
+   * @param {string} status Can be SUCCESS or ERROR.
+   * @param {*} data The response payload.
+   */
+  passbolt.requestResponse = function(requestId, status, data) {
+    if (data && data instanceof Error) {
+      data = getEmitableError(data);
+    }
+    passbolt.message.emit(requestId, status, data);
+  };
+
+  /**
+   * Get an emitable version of a javascript error.
+   * Some error properties are not  iterable/enumerable and are not sent by port message.
+   *
+   * @param error {Error} error The error to work on.
+   * @pararm {Object} The emitable version of the error.
+   */
+  const getEmitableError = function (error) {
+    const emitableError = Object.assign({}, error);
+    ["name", "message"].forEach(key => {
+      if (error[key] && !emitableError[key]) {
+        emitableError[key] = error[key];
+      }
+    });
+
+    return emitableError;
+  };
+
 })( passbolt );
 
 window.passbolt = passbolt;

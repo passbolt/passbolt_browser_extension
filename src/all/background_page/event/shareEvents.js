@@ -6,41 +6,38 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var Keyring = require('../model/keyring').Keyring;
-var masterPasswordController = require('../controller/masterPasswordController');
-var progressDialogController = require('../controller/progressDialogController');
-var Permission = require('../model/permission').Permission;
-var Resource = require('../model/resource').Resource;
-var Share = require('../model/share').Share;
-var TabStorage = require('../model/tabStorage').TabStorage;
-var Worker = require('../model/worker');
+const Worker = require('../model/worker');
+const {User} = require('../model/user');
+const {Permission} = require('../model/permission');
+const {Resource} = require('../model/resource');
+const {FolderModel} = require('../model/folder/folderModel');
+const {Share} = require('../model/share');
 
-var listen = function (worker) {
+const {FoldersCollection} = require('../model/entity/folder/foldersCollection');
+const {PermissionChangesCollection} = require('../model/entity/permission/permissionChangesCollection');
 
+const {ShareResourcesController} = require('../controller/share/shareResourcesController');
+const {ShareFoldersController} = require('../controller/share/shareFoldersController');
+
+const listen = function (worker) {
   /*
    * Search aros based on keywords.
    * @listens passbolt.share.search-aros
    * @param keywords {string} The keywords to search
    */
-  worker.port.on('passbolt.share.search-aros', async function (requestId, keywords) {
-    const resourcesIds = TabStorage.get(worker.tab.id, 'shareResourcesIds');
+  worker.port.on('passbolt.share.search-aros', async function (requestId, keywords, resourcesForLegacyApi) {
     let aros;
-    if (resourcesIds.length == 1) {
-      // This code ensure the compatibility with passbolt < v2.4.0.
-      aros = await Share.searchResourceAros(resourcesIds[0], keywords);
-    } else {
+    try {
       aros = await Share.searchAros(keywords);
+    } catch (error) {
+      if (resourcesForLegacyApi.resourcesIds && resourcesForLegacyApi.resourcesIds.length === 1) {
+        // This code ensure the compatibility with passbolt < v2.4.0.
+        aros = await Share.searchResourceAros(resourcesForLegacyApi.resourcesIds[0], keywords);
+      } else {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      }
     }
     worker.port.emit(requestId, 'SUCCESS', aros);
-  });
-
-  /*
-   * Retrieve the ids of the resources to share.
-   * @listens passbolt.share.get-resources-ids
-   */
-  worker.port.on('passbolt.share.get-resources-ids', function (requestId) {
-    const resourcesIds = TabStorage.get(worker.tab.id, 'shareResourcesIds');
-    worker.port.emit(requestId, 'SUCCESS', resourcesIds);
   });
 
   /*
@@ -50,17 +47,36 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.share.get-resources', async function (requestId, resourcesIds) {
     let resources = [];
-    if (resourcesIds.length == 1) {
-      // This code ensure the compatibility with passbolt < v2.4.0.
-      const resource = await Resource.findShareResource(resourcesIds[0]);
-      const resourcePermissions = await Permission.findResourcePermissions(resourcesIds[0]);
-      resource.permissions = resourcePermissions;
-      resources = [resource];
-    } else {
-      resources = await Resource.findShareResources(resourcesIds);
+    try {
+      if (resourcesIds.length === 1) {
+        // This code ensure the compatibility with passbolt < v2.4.0.
+        const resource = await Resource.findShareResource(resourcesIds[0]);
+        resource.permissions = await Permission.findResourcePermissions(resourcesIds[0]);
+        resources = [resource];
+      } else {
+        resources = await Resource.findAllForShare(resourcesIds);
+      }
+      worker.port.emit(requestId, 'SUCCESS', resources);
+    } catch(error) {
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }
-    TabStorage.set(worker.tab.id, 'shareResources', resources);
-    worker.port.emit(requestId, 'SUCCESS', resources);
+  });
+
+  /*
+   * Retrieve the folders to share.
+   * @listens passbolt.share.get-folders
+   * @param {array} foldersIds The ids of the folders to retrieve.
+   */
+  worker.port.on('passbolt.share.get-folders', async function (requestId, foldersIds) {
+    try {
+      let apiClientOptions = await User.getInstance().getApiClientOptions();
+      let folderModel = new FolderModel(apiClientOptions);
+      const folderDtos = await folderModel.findAllForShare(foldersIds);
+      worker.port.emit(requestId, 'SUCCESS', folderDtos);
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+    }
   });
 
   /*
@@ -68,31 +84,33 @@ var listen = function (worker) {
    * @listens passbolt.share.submit
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.share.submit', async function (requestId, changes) {
-    const appWorker = Worker.get('App', worker.tab.id);
-    const resources = TabStorage.get(worker.tab.id, 'shareResources');
-    const keyring = new Keyring();
-    let progress = 0;
-    // 3+1 :
-    // 3: the simulate call to the API + the encrypting step + the share call to the API
-    // 1: the initialization phase, in other words this function
-    const progressGoal = resources.length * 3 + 1;
-
+  worker.port.on('passbolt.share.resources.save', async function (requestId, resources, changes) {
+    const shareResourcesController = new ShareResourcesController(worker, requestId);
     try {
-      const privateKeySecret = await masterPasswordController.get(worker);
-      progressDialogController.open(appWorker, `Share ${resources.length} passwords`, progressGoal);
-      progressDialogController.update(appWorker, progress++, 'Initialize');
-      await keyring.sync();
-      await Share.bulkShare(resources, changes, privateKeySecret, message => {
-        progressDialogController.update(appWorker, progress++, message);
-      });
+      await shareResourcesController.main(resources, changes);
       worker.port.emit(requestId, 'SUCCESS');
-      progressDialogController.close(appWorker);
-      appWorker.port.emit('passbolt.share.complete', resources.map(resource => resource.id));
-    } catch(error) {
-      progressDialogController.close(appWorker);
+    } catch (error) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      appWorker.port.emit('passbolt.share.error', worker.port.getEmitableError(error));
+    }
+  });
+
+  /*
+   * Update the folder permissions
+   *
+   * @listens passbolt.share.folders.save
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.share.folders.save', async function (requestId, foldersDto, changesDto) {
+    try {
+      const folders = new FoldersCollection(foldersDto);
+      const permissionChanges = new PermissionChangesCollection(changesDto);
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const shareFoldersController = new ShareFoldersController(worker, requestId, apiClientOptions);
+      await shareFoldersController.main(folders, permissionChanges);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }
   });
 
@@ -102,18 +120,8 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.share.close', function() {
-    const appWorker = Worker.get('App', worker.tab.id);
-    appWorker.port.emit('passbolt.share.close');
-  });
-
-  /*
-   * Go to the edit dialog.
-   * @listens passbolt.share.close
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.share.go-to-edit', function() {
-    const appWorker = Worker.get('App', worker.tab.id);
-    appWorker.port.emit('passbolt.share.go-to-edit');
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.share.close-share-dialog');
   });
 
 };

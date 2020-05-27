@@ -7,16 +7,19 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-var Worker = require('../model/worker');
-var User = require('../model/user').User;
-var Group = require('../model/group').Group;
-var GroupForm = require('../model/groupForm').GroupForm;
-var InvalidMasterPasswordError = require('../error/invalidMasterPasswordError').InvalidMasterPasswordError;
-var Keyring = require('../model/keyring').Keyring;
-var Crypto = require('../model/crypto').Crypto;
-var masterPasswordController = require('../controller/masterPasswordController');
-var progressDialogController = require('../controller/progressDialogController');
-var UserAbortsOperationError = require('../error/userAbortsOperationError').UserAbortsOperationError;
+const Worker = require('../model/worker');
+const {User} = require('../model/user');
+const {Group} = require('../model/group');
+const {GroupForm} = require('../model/groupForm');
+const {Keyring} = require('../model/keyring');
+const {Crypto} = require('../model/crypto');
+const {UserService} = require('../service/user');
+
+const passphraseController = require('../controller/passphrase/passphraseController');
+const progressController = require('../controller/progress/progressController');
+
+const {InvalidMasterPasswordError} = require('../error/invalidMasterPasswordError');
+const {UserAbortsOperationError} = require('../error/userAbortsOperationError');
 
 var listen = function (worker) {
   /*
@@ -31,7 +34,7 @@ var listen = function (worker) {
     var groupId = data.groupId,
       groupForm = new GroupForm(worker.tab.id);
 
-    if (groupId != '') {
+    if (groupId !== '') {
       var group = new Group();
       group.findById(groupId)
         .then(
@@ -61,13 +64,12 @@ var listen = function (worker) {
    * @param keywords {string} The keywords to search
    */
   worker.port.on('passbolt.group.edit.search-users', function (keywords) {
-    var //sharedPassword = TabStorage.get(worker.tab.id, 'sharedPassword'),
-      user = User.getInstance(),
-      autocompleteWorker = Worker.get('GroupEditAutocomplete', worker.tab.id),
+    const autocompleteWorker = Worker.get('GroupEditAutocomplete', worker.tab.id);
+
     // The users that have already been added to the share list should be
     // excluded from the search.
-      groupForm = new GroupForm(worker.tab.id),
-      excludedUsers = [];
+    const groupForm = new GroupForm(worker.tab.id);
+    let excludedUsers = [];
 
     // If no keywords provided, hide the autocomplete component.
     if (!keywords) {
@@ -79,11 +81,12 @@ var listen = function (worker) {
       autocompleteWorker.port.emit('passbolt.group.edit-autocomplete.loading');
 
       // Get existing users.
-      var groupUsers = groupForm.get('currentGroup.GroupUser');
+      const groupUsers = groupForm.get('currentGroup.GroupUser');
       excludedUsers = _.pluck(groupUsers, 'user_id');
 
       // Search available users.
-      user.searchUsers(keywords, excludedUsers)
+      const currentUser = User.getInstance();
+      UserService.searchUsers(currentUser, {keywords, excludedUsers})
         .then(function (users) {
           autocompleteWorker.port.emit('passbolt.group.edit-autocomplete.load-users', users);
         }, function (e) {
@@ -126,7 +129,7 @@ var listen = function (worker) {
         worker.port.emit(requestId, 'ERROR', error);
       }
     } finally {
-      progressDialogController.close(worker);
+      await progressController.close(worker);
     }
   });
 
@@ -139,11 +142,11 @@ var listen = function (worker) {
   const createGroup = async function(worker, groupJson) {
     const group = new Group();
 
-    await progressDialogController.open(worker, 'Creating group ...', 2);
-    progressDialogController.update(worker, 1);
+    await progressController.open(worker, 'Creating group ...', 2);
+    progressController.update(worker, 1);
     const groupSaved = await group.save(groupJson);
-    progressDialogController.update(worker, 2);
-    progressDialogController.close(worker);
+    progressController.update(worker, 2);
+    await progressController.close(worker);
 
     return groupSaved;
   };
@@ -159,11 +162,11 @@ var listen = function (worker) {
     const group = new Group();
 
     const groupSavedPromised = group.save(groupJson, groupId);
-    await progressDialogController.open(worker, 'Updating group ...', 2);
-    progressDialogController.update(worker, 1);
+    await progressController.open(worker, 'Updating group ...', 2);
+    progressController.update(worker, 1);
     const groupSaved = await groupSavedPromised;
-    progressDialogController.update(worker, 2);
-    progressDialogController.close(worker);
+    progressController.update(worker, 2);
+    await progressController.close(worker);
 
     return groupSaved;
   };
@@ -183,24 +186,24 @@ var listen = function (worker) {
 
     const dryRunPromise = group.save(groupJson, groupId, true);
     const keyringSyncPromise = keyring.sync();
-    const masterPassword = await masterPasswordController.get(worker);
-    await progressDialogController.open(worker, 'Updating group ...', progressGoals);
+    const masterPassword = await passphraseController.get(worker);
+    await progressController.open(worker, 'Updating group ...', progressGoals);
     const dryRunResult = await dryRunPromise;
     await keyringSyncPromise;
 
     progress += 2; // Keyring sync + dryrun
     progressGoals = dryRunResult['dry-run']['SecretsNeeded'].length + dryRunResult['dry-run']['Secrets'].length + progress;
-    progressDialogController.updateGoals(worker, progressGoals);
-    progressDialogController.update(worker, progress++);
+    progressController.updateGoals(worker, progressGoals);
+    progressController.update(worker, progress++);
 
     groupJson['Secrets'] = await encryptSaveGroupSecrets(
       dryRunResult,
       masterPassword,
-      () => progressDialogController.update(worker, progress++),
-      message => { return index => progressDialogController.update(worker, progress, message.replace('%0', parseInt(index) + 1)) }
+      () => progressController.update(worker, progress++),
+      message => { return index => progressController.update(worker, progress, message.replace('%0', parseInt(index) + 1)) }
     );
     const groupSaved = await group.save(groupJson, groupId);
-    progressDialogController.close(worker);
+    await progressController.close(worker);
 
     return groupSaved;
   };
@@ -226,7 +229,7 @@ var listen = function (worker) {
 
     // Encrypt all the secrets for the new users.
     const encryptAllData = secretsNeeded.map(secretNeeded => {
-      const secretOrigin = secretsOrigin.find(secretOrigin => secretNeeded.Secret.resource_id == secretOrigin.Secret[0].resource_id);
+      const secretOrigin = secretsOrigin.find(secretOrigin => secretNeeded.Secret.resource_id === secretOrigin.Secret[0].resource_id);
       return {userId: secretNeeded['Secret'].user_id, message: secretOrigin.Secret[0].dataDecrypted}
     });
     const messagesNeeededEncrypted = await crypto.encryptAll(encryptAllData, completeCallback, startCallback('Encrypting %0/' + secretsNeeded.length));

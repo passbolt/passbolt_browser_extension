@@ -3,6 +3,48 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
+## [2.13.0] - 2020-03-04
+### Added
+- PB-658 Add folder create dialog and service
+- PB-658 Add rename folder dialog
+- PB-658 Add select and scroll to a folder after creation
+- PB-658 Add store folder in local storage when logged in
+- PB-658 Add create a resource or folder into a folder
+- PB-658 Add support for creating resource with parent permissions
+- PB-658 Add support for creating folder with parent permission
+- PB-658 Add loading state to share dialog
+- PB-658 Add folder share recursive
+- PB-658 Add folders move in bulk (resources and folders)
+- PB-658 Add support for multi resource move with permissions changes
+- PB-658 Add folder delete dialog
+- PB-658 Add cascading folders delete
+- PB-1059 As a user I can import folders from a kdbx file
+- PB-1059 As a user I can export resources and folders to a kdbx file
+
+### Fixes
+- Fix package-lock.json and rebuild extensions
+- Fix share dialog autocomplete search, only the last API query result should be shown.
+- Fix file format for export and file download by adding mime type.
+- Fix linting
+- Fix react app pagemod
+- Fix React app to supports theme changes
+
+### Improvements
+- PB-799 Migrate share to react
+- PB-799 Migrate resource edit dialog to react
+- Add support for structured model entities
+- Add npm version in package.json
+- Do not display the domain the extension is configured for when triggering reconfig on another.
+- Fix backward compatibility with v2.12
+- PB-1089: Bump dependencies to higher versions
+- Styleguide update
+
+## [2.12.3] - 2020-05-18
+### Fixed
+- Add support to replace server OpenPGP public key when expired or replaced
+- Fix error message on Firefox (insert script return value must be structured-clonable)
+- Fix quickaccess create password field should be max 4096 characters in length
+
 ## [2.12.2] - 2020-14-04
 ### Fixed
 - PB-1209: Bump jQuery to v3.5

@@ -23,15 +23,15 @@ $(function () {
   /**
    * Import options
    * @type {{
-   * foldersIntegration: boolean  // Whether folders plugin is present
-   * tagsIntegration: boolean  // Whether tags plugin is present
+   * hasFoldersPlugin: boolean  // Whether folders plugin is present
+   * hasTagsPlugin: boolean  // Whether tags plugin is present
    * importFolders: boolean  // Whether folders should be imported.
    * importTags: boolean  // Whether tags should be imported (one unique tag for each import)
    * }}
    */
   let importOptions = {
-    tagsIntegration : false,
-    foldersIntegration: false,
+    hasTagsPlugin : false,
+    hasFoldersPlugin: false,
     importTags: false,
     importFolders: false
   };
@@ -45,15 +45,16 @@ $(function () {
       function(siteSettings) {
         if(siteSettings !== null && siteSettings.passbolt !== undefined &&
           siteSettings.passbolt.plugins !== undefined) {
-          importOptions.foldersIntegration =  siteSettings.passbolt.plugins.folders !== undefined;
-          importOptions.tagsIntegration =  siteSettings.passbolt.plugins.tags !== undefined;
-          importOptions.importFolders = importOptions.foldersIntegration;
-          importOptions.importTags = importOptions.tagsIntegration;
+          importOptions.hasFoldersPlugin =  siteSettings.passbolt.plugins.folders !== undefined;
+          importOptions.hasTagsPlugin =  siteSettings.passbolt.plugins.tags !== undefined;
+          importOptions.importFolders = importOptions.hasFoldersPlugin;
+          importOptions.importTags = importOptions.hasTagsPlugin;
         }
 
         importPasswordsDialog = new ImportPasswordsDialog({
           "onSubmit":onSubmit,
-          "foldersIntegration": importOptions.foldersIntegration
+          "hasFoldersPlugin": importOptions.hasFoldersPlugin,
+          "hasTagsPlugin": importOptions.hasTagsPlugin
         });
         importPasswordsDialog.show();
       });
@@ -195,8 +196,6 @@ $(function () {
    * @param result
    */
   const displayReport = function(result) {
-    result.tagsIntegration = importOptions.tagsIntegration;
-    result.foldersIntegration = importOptions.foldersIntegration;
     const importPasswordsReportDialog = new ImportPasswordsReportDialog(result);
     importPasswordsReportDialog.show();
   };

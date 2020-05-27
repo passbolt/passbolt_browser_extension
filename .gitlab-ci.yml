@@ -15,14 +15,14 @@ stages:
 
 tester:
   stage: test
-  image: node:10
+  image: node:12
   script:
     - npm install
     - npm run test
 
 linter:
   stage: test
-  image: node:10
+  image: node:12
   script:
     - npm install
     - npm run eslint

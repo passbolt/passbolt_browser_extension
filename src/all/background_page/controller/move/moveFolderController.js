@@ -187,7 +187,7 @@ class MoveFolderController {
 
     // When a shared folder at the root is moved in a personal folder
     // we do not change permissions
-    if (this.folder.isShared() && this.folder.folderParentId === null && this.destinationFolder.isPersonal()) {
+    if (this.folder.isShared() && this.destinationFolder.isPersonal() && (this.folder.folderParentId === null || this.parentFolder.isPersonal())) {
       return;
     }
 

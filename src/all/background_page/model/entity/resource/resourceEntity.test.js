@@ -92,9 +92,6 @@ describe("Resource entity", () => {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
         name: { required: 'The name is required.' },
-        username: { required: 'The username is required.' },
-        uri: { required: 'The uri is required.' },
-        description: { required: 'The description is required.' }
       });
     }
   });

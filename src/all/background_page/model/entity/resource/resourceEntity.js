@@ -75,10 +75,7 @@ class ResourceEntity extends Entity {
     return {
       "type": "object",
       "required": [
-        "name",
-        "username",
-        "uri",
-        "description"
+        "name"
       ],
       "properties": {
         "id": {
@@ -98,8 +95,12 @@ class ResourceEntity extends Entity {
           "maxLength": RESOURCE_URI_MAX_LENGTH
         },
         "description": {
-          "type": "string",
-          "maxLength": RESOURCE_DESCRIPTION_MAX_LENGTH
+          "anyOf": [{
+            "type": "string",
+            "maxLength": RESOURCE_DESCRIPTION_MAX_LENGTH
+          }, {
+            "type": "null"
+          }]
         },
         "deleted": {
           "type": "boolean"

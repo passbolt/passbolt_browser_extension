@@ -32,6 +32,7 @@ class Autocomplete extends Component {
     this.getItemsDebounced = debounce(this.getItems, 250, {leading: true});
     this.cache = [];
     this.cacheExpiry = 10000; // in ms (aka 10s)
+    this.autocompleteSearchRequestTime = null;
   }
 
   /**
@@ -101,8 +102,14 @@ class Autocomplete extends Component {
 
   async autocompleteSearch(keyword) {
     if (!this.cache[keyword] || this.cache[keyword].cacheExpiry < (new Date()).getTime()) {
-      this.cache[keyword] = await this.getItemsDebounced(keyword);
+      const autocompleteSearchRequestTime = Date.now();
+      this.autocompleteSearchRequestTime = autocompleteSearchRequestTime;
+      const items = await this.getItemsDebounced(keyword);
+      this.cache[keyword] = items;
       this.cache[keyword].cacheExpiry = (new Date()).getTime() + this.cacheExpiry;
+      if (autocompleteSearchRequestTime !== this.autocompleteSearchRequestTime) {
+        return false;
+      }
     }
     return this.cache[keyword];
   }
@@ -179,6 +186,9 @@ class Autocomplete extends Component {
     }
     try {
       const autocompleteItems = await this.autocompleteSearch(keyword);
+      if (autocompleteItems === false) {
+        return;
+      }
       let selected = null;
       if (autocompleteItems.length > 0) {
         selected = 0;

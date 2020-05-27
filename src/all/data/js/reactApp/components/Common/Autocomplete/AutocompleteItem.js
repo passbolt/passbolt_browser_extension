@@ -58,7 +58,7 @@ class AutocompleteItem extends Component {
 
   render() {
     return (
-      <li id="autocomplete-item">
+      <li>
         <div className={this.getClassName()}>
           <div className="main-cell-wrapper">
             <div className="main-cell ">

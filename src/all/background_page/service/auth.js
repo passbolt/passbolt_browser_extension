@@ -93,7 +93,7 @@ const _isAuthenticated = async function () {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+    throw new PassboltBadResponseError();
   }
 
   if (response.ok) {
@@ -142,7 +142,7 @@ const _isAuthenticatedLegacy = async function () {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+    throw new PassboltBadResponseError();
   }
 
   if (response.ok) {

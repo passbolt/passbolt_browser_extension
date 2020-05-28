@@ -7,8 +7,9 @@
  */
 const browser = require("webextension-polyfill/dist/browser-polyfill");
 const Config = require('./config');
-const UserService = require('../service/user').UserService;
-const UserSettings = require('./userSettings/userSettings').UserSettings;
+const {ApiClientOptions} = require('../service/api/apiClient/apiClientOptions');
+const {UserService} = require('../service/user');
+const {UserSettings} = require('./userSettings/userSettings');
 const __ = require('../sdk/l10n').get;
 
 /**
@@ -98,7 +99,7 @@ const User = (function () {
           throw new Error(__('The first name length should be maximum 255 characters.'))
         }
         break;
-      case 'lastname' :
+      case 'lastname':
         if (typeof value === 'undefined' || value === '') {
           throw new Error(__('The last name cannot be empty'));
         }
@@ -109,7 +110,7 @@ const User = (function () {
           throw new Error(__('The last name length should be maximum 255 characters.'))
         }
         break;
-      case 'username' :
+      case 'username':
         if (typeof value === 'undefined' || value === '') {
           throw new Error(__('The username cannot be empty'));
         }
@@ -120,7 +121,7 @@ const User = (function () {
           throw new Error(__('The username length should be maximum 255 characters.'))
         }
         break;
-      case 'id' :
+      case 'id':
         if (typeof value === 'undefined' || value === '') {
           throw new Error(__('The user id cannot be empty'));
         }
@@ -128,7 +129,7 @@ const User = (function () {
           throw new Error(__('The user id should be a valid UUID'))
         }
         break;
-      default :
+      default:
         throw new Error(__('No validation defined for field: ' + field));
         break;
     }
@@ -243,33 +244,6 @@ const User = (function () {
   };
 
   /**
-   * Get the user name
-   *
-   * @return {object}
-   * format :
-   *   {
-   *     firstname : 'FIRST_NAME',
-   *     lastname : 'LAST_NAME'
-   *   }
-   */
-  this.getName = function () {
-    var name = {
-      firstname: Config.read('user.firstname'),
-      lastname: Config.read('user.lastname')
-    };
-    return name;
-  };
-
-  /**
-   * Get the username
-   *
-   * @return {string}
-   */
-  this.getUsername = function () {
-    return Config.read('user.username');
-  };
-
-  /**
    * Get the current user from the local storage.
    * All data returned are validated once again.
    *
@@ -337,7 +311,7 @@ const User = (function () {
     };
 
     // If the seconds parameters is not equal to -1, set a timeout to flush the master passphrase at the end
-    // of the defined period. If it is set to -1 it will be flushed based on the passbolt.auth.logged-out
+    // of the defined period. If it is set to -1 it will be flushed based on the passbolt.global.auth.logged-out
     // event or when the browser is closed.
     if (seconds !== -1) {
       this._masterPassword.timeout = setTimeout(() => {
@@ -390,9 +364,9 @@ const User = (function () {
   /**
    * Retrieve and the store the user csrf token.
    */
-  this.retrieveAndStoreCsrfToken = async function() {
+  this.retrieveAndStoreCsrfToken = async function () {
     const csrfToken = await UserService.retrieveCsrfToken(this);
-    this._csrfToken = csrfToken;
+    this.setCsrfToken(csrfToken);
   };
 
   /**
@@ -400,15 +374,45 @@ const User = (function () {
    *
    * @return {string}
    */
-  this.getCsrfToken = function() {
+  this.getCsrfToken = function () {
     return this._csrfToken;
+  };
+
+  /**
+   * Get or fetch CSRF token if null
+   *
+   * @returns {Promise<string>}
+   */
+  this.getOrFetchCsrfToken = async function() {
+    if (!this._csrfToken) {
+      await this.retrieveAndStoreCsrfToken();
+    }
+    return this._csrfToken;
+  };
+
+  /**
+   * Set the user csrf token
+   *
+   * @param {string} csrfToken The csrf token to set
+   */
+  this.setCsrfToken = function (csrfToken) {
+    this._csrfToken = csrfToken;
+  };
+
+  /**
+   * Return API Client options such as Domain and CSRF token
+   */
+  this.getApiClientOptions = async function() {
+    return (new ApiClientOptions())
+      .setBaseUrl(this.settings.getDomain())
+      .setCsrfToken(await this.getOrFetchCsrfToken());
   };
 
   /**
    * Check if the master password is stored.
    * @return {boolean}
    */
-  this.isMasterPasswordStored = function() {
+  this.isMasterPasswordStored = function () {
     return this._masterPassword !== null;
   };
 
@@ -418,7 +422,7 @@ const User = (function () {
    * @returns {Promise}
    */
   this.getStoredMasterPassword = function () {
-    return new Promise ((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       if (this.isMasterPasswordStored()) {
         resolve(this._masterPassword.password);
       } else {
@@ -427,57 +431,13 @@ const User = (function () {
     });
   };
 
-  /**
-   * Search users by keywords
-   *
-   * @param keywords
-   * @param excludedUsers
-   * @return {Promise.<array>} array of users
-   */
-  this.searchUsers = async function(keywords, excludedUsers) {
-
-    // Prepare url and data
-    const url = this.settings.getDomain() + '/users.json'
-      + '?api-version=v1' + '&filter[keywords]=' + htmlspecialchars(keywords, 'ENT_QUOTES') + '&filter[is-active]=1';
-    const data = {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    };
-    const response = await fetch(url, data);
-    const json = await response.json();
-
-    // Check response status
-    if (!response.ok) {
-      let msg = __('Could not get the users. The server responded with an error.');
-      if (typeof json.headers.msg !== 'undefined') {
-        msg += ` ${json.headers.msg}`;
-      }
-      msg += ` (${response.status})`;
-      throw new Error(msg);
-    }
-
-    // Build the user list
-    const users = json.body;
-    let finalUsers = [];
-    for (var i in users) {
-      if (!in_array(users[i].User.id, excludedUsers)) {
-        finalUsers.push(users[i]);
-      }
-    }
-    return finalUsers;
-  };
 });
 
 var UserSingleton = (function () {
   var instance;
 
   function createInstance() {
-    var object = new User();
-    return object;
+    return new User();
   }
 
   return {
@@ -486,25 +446,26 @@ var UserSingleton = (function () {
         instance = createInstance();
       }
       return instance;
+    },
+
+    init : function () {
+      // Observe when the user session is terminated.
+      // - Flush the temporary stored master password
+      window.addEventListener("passbolt.global.auth.logged-out", () => {
+        const user = UserSingleton.getInstance();
+        user.flushMasterPassword();
+      });
+
+      // Observe when the window is closed, only strategy found to catch when the browser is closed.
+      // - Flush the temporary stored master password
+      browser.tabs.onRemoved.addListener((tabId, evInfo) => {
+        if (evInfo.isWindowClosing) {
+          const user = UserSingleton.getInstance();
+          user.flushMasterPassword();
+        }
+      });
     }
   };
 })();
 
-// Observe when the user session is terminated.
-// - Flush the temporary stored master password
-window.addEventListener("passbolt.auth.logged-out", () => {
-  const user = UserSingleton.getInstance();
-  user.flushMasterPassword();
-});
-
-// Observe when the window is closed, only strategy found to catch when the browser is closed.
-// - Flush the temporary stored master password
-browser.tabs.onRemoved.addListener((tabId, evInfo) => {
-  if (evInfo.isWindowClosing) {
-    const user = UserSingleton.getInstance();
-    user.flushMasterPassword();
-  }
-});
-
-// Exports the User object.
 exports.User = UserSingleton;

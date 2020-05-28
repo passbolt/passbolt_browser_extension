@@ -111,6 +111,3 @@ const flush = function () {
   storage.removeItem('config');
 };
 exports.flush = flush;
-
-// Init the config.
-init();

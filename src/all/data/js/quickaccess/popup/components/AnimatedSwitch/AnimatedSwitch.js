@@ -173,7 +173,7 @@ export default class AnimatedSwitch extends React.Component {
     const { children } = this.props;
     const currentLocationPathname = this.props.location.pathname;
     const transition = this.getTransition(currentLocationPathname, this._previousLocationPathname);
-    // If no transition, the previous component should disapear instantly.
+    // If no transition, the previous component should be hidden immediately.
     const transitionTimeout = transition !== "noTransition" ? 210 : 0;
     console.debug(`AnimatedSwitch render from ${this._previousLocationPathname} to ${currentLocationPathname} with transition ${transition}`);
     this._previousLocationPathname = currentLocationPathname;

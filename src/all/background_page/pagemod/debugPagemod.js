@@ -37,7 +37,6 @@ Debug.init = function () {
     ],
     onAttach: function (worker) {
       Worker.add('Debug', worker);
-      app.events.config.listen(worker);
       app.events.debug.listen(worker);
     }
   });

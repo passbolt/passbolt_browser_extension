@@ -3,10 +3,10 @@
  * Provides tasks and commands to build and distribute the project
  *
  * @param grunt
- * @copyright (c) 2017 Passbolt SARL
+ * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
   /**
    * Path shortcuts
@@ -25,8 +25,9 @@ module.exports = function(grunt) {
     dist_firefox: 'dist/firefox/',
 
     src: 'src/all/',
-    src_addon: 'src/all/background_page/',
-    src_addon_vendors: 'src/all/background_page/vendors/',
+    test: 'test/',
+    src_background_page: 'src/all/background_page/',
+    src_background_page_vendors: 'src/all/background_page/vendors/',
     src_chrome: 'src/chrome/',
     src_content_vendors: 'src/all/data/vendors/',
     src_firefox: 'src/firefox/',
@@ -49,27 +50,30 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('grunt-passbolt-ejs-compile');
 
   grunt.registerTask('default', ['bundle']);
   grunt.registerTask('templates', ['ejs_compile', 'browserify:templates']);
   grunt.registerTask('pre-dist', ['copy:vendors', 'copy:styleguide']);
 
-  grunt.registerTask('bundle', ['copy:background_page', 'copy:content_scripts', 'browserify:app', 'ejs_compile', 'browserify:templates', 'copy:data']);
+  grunt.registerTask('bundle', ['copy:background_page', 'copy:content_scripts', 'browserify:background_page', 'ejs_compile', 'browserify:templates', 'copy:data']);
   grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle', 'browserify:vendors', 'shell:append']);
   grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle', 'browserify:vendors']);
 
-  grunt.registerTask('build', ['build-firefox', 'build-chrome']);
+  grunt.registerTask('build', ['eslint', 'test', 'build-firefox', 'build-chrome']);
 
   grunt.registerTask('build-firefox', ['build-firefox-debug', 'build-firefox-prod']);
-  grunt.registerTask('build-firefox-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-firefox', 'shell:build_quickaccess_debug', 'shell:build_firefox_debug']);
-  grunt.registerTask('build-firefox-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-firefox', 'clean:debug_data', 'shell:build_quickaccess_prod', 'shell:build_firefox_prod']);
+  grunt.registerTask('build-firefox-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-firefox', 'shell:build_webpack_apps_debug', 'shell:build_firefox_debug']);
+  grunt.registerTask('build-firefox-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-firefox', 'clean:debug_data', 'shell:build_webpack_apps_prod', 'shell:build_firefox_prod']);
 
   grunt.registerTask('build-chrome', ['build-chrome-debug', 'build-chrome-prod']);
-  grunt.registerTask('build-chrome-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chrome', 'shell:build_quickaccess_debug', 'shell:build_chrome_debug']);
-  grunt.registerTask('build-chrome-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome', 'clean:debug_data', 'shell:build_quickaccess_prod', 'shell:build_chrome_prod']);
+  grunt.registerTask('build-chrome-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chrome', 'shell:build_webpack_apps_debug', 'shell:build_chrome_debug']);
+  grunt.registerTask('build-chrome-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome', 'shell:build_webpack_apps_prod', 'clean:debug_data', 'shell:build_chrome_prod']);
 
   grunt.registerTask('test', ['shell:test']);
+
+  grunt.registerTask('custom-chrome-debug', ['copy:background_page', 'copy:content_scripts', 'browserify:background_page', 'copy:data', 'shell:build_webpack_apps_debug']);
 
   /**
    * Main grunt tasks configuration
@@ -78,13 +82,29 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     /**
+     * Eslint.
+     */
+    eslint: {
+      options: {
+        maxWarnings: 1,
+        configFile: '.eslintrc.json',
+        cache: true,
+        fix: grunt.option('fix'),
+        reportUnusedDisableDirectives: true
+      },
+      target: [
+        'src/all/data/js/reactApp/**/*.js',
+      ]
+    },
+
+    /**
      * Browserify is a tool to package CommonJS Javascript code for use in the browser.
      * We use CommonJS require syntax to manage dependencies in the web extension add-on code
      * See also. src/background_page/vendor/require_polyfill.js
      */
     browserify: {
       vendors: {
-        src: [path.src_addon + 'vendors.js'],
+        src: [path.src_background_page + 'vendors.js'],
         dest: path.build + 'vendors.min.js'
       },
       templates: {
@@ -94,8 +114,8 @@ module.exports = function(grunt) {
         expand: true,
         ext: '.js'
       },
-      app: {
-        src: [path.src_addon + 'index.js'],
+      background_page: {
+        src: [path.src_background_page + 'index.js'],
         dest: path.build + 'index.min.js'
       }
     },
@@ -119,37 +139,37 @@ module.exports = function(grunt) {
       // switch config files to debug or production
       config_debug: {
         files: [{
-          expand: true, cwd: path.src_addon + 'config', src: 'config.json.debug', dest: path.src_addon + 'config',
-          rename: function(dest, src) { return dest + '/config.json'; }
+          expand: true, cwd: path.src_background_page + 'config', src: 'config.json.debug', dest: path.src_background_page + 'config',
+          rename: function (dest, src) { return dest + '/config.json'; }
         }]
       },
       config_default: {
         files: [{
-          expand: true, cwd: path.src_addon + 'config',
+          expand: true, cwd: path.src_background_page + 'config',
           src: 'config.json.default',
-          dest: path.src_addon + 'config',
-          rename: function(dest, src) {console.log( dest + '/config.json'); return dest + '/config.json';}
+          dest: path.src_background_page + 'config',
+          rename: function (dest, src) { console.log(dest + '/config.json'); return dest + '/config.json'; }
         }]
       },
       content_scripts: {
         files: [
-          {expand: true, cwd: path.src_content_scripts, src: '**', dest: path.build_content_scripts }
+          { expand: true, cwd: path.src_content_scripts, src: '**', dest: path.build_content_scripts }
         ]
       },
       background_page: {
         files: [
-          {expand: true, cwd: path.src_addon, src: 'index.html', dest: path.build }
+          { expand: true, cwd: path.src_background_page, src: 'index.html', dest: path.build }
         ]
       },
       data: {
         files: [
-          {expand: true, cwd: path.src + 'data', src: ['**', '!tpl/**', '!ejs/**', '!js/quickaccess/popup/**'], dest: path.build + 'data'}
+          { expand: true, cwd: path.src + 'data', src: ['**', '!tpl/**', '!ejs/**', '!js/quickaccess/popup/**', '!js/app/**'], dest: path.build + 'data' }
         ]
       },
       // switch manifest file to firefox or chrome
       manifest_firefox: {
         files: [{
-          expand: true, cwd: path.src_firefox , src: 'manifest.json', dest: path.build
+          expand: true, cwd: path.src_firefox, src: 'manifest.json', dest: path.build
         }]
       },
       manifest_chrome: {
@@ -161,31 +181,26 @@ module.exports = function(grunt) {
       vendors: {
         files: [
           // openpgpjs
-          {expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js','openpgp.worker.js'], dest: path.build_vendors},
+          { expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js', 'openpgp.worker.js'], dest: path.build_vendors },
           // jquery
-          {expand: true, cwd: path.node_modules + 'jquery/dist', src: 'jquery.js', dest: path.src_content_vendors},
+          { expand: true, cwd: path.node_modules + 'jquery/dist', src: 'jquery.js', dest: path.src_content_vendors },
           // jssha
-          {expand: true, cwd: path.node_modules + 'jssha/src', src: 'sha.js', dest: path.src_content_vendors},
+          { expand: true, cwd: path.node_modules + 'jssha/src', src: 'sha.js', dest: path.src_content_vendors },
           // xregexp
-          {expand: true, cwd: path.node_modules + 'xregexp', src: 'xregexp-all.js', dest: path.src_content_vendors},
+          { expand: true, cwd: path.node_modules + 'xregexp', src: 'xregexp-all.js', dest: path.src_content_vendors },
           // downloadjs (for download with save as).
-          {expand: true, cwd: path.node_modules + 'downloadjs', src: 'download.js', dest: path.src_content_vendors},
+          { expand: true, cwd: path.node_modules + 'downloadjs', src: 'download.js', dest: path.src_content_vendors },
           // validator
-          {expand: true, cwd: path.node_modules + 'validator', src: 'validator.js', dest: path.src_content_vendors},
-          // react / react-dom
-          {expand: true, cwd: path.node_modules + 'react/umd', src: 'react.production.min.js', dest: path.src_content_vendors},
-          {expand: true, cwd: path.node_modules + 'react-dom/umd', src: 'react-dom.production.min.js', dest: path.src_content_vendors},
-          // simplebar
-          {expand: true, cwd: path.node_modules + 'simplebar/dist', src: 'simplebar.js', dest: path.src_content_vendors},
+          { expand: true, cwd: path.node_modules + 'validator', src: 'validator.js', dest: path.src_content_vendors },
           // firefox browser polyfill.
-          {expand: true, cwd: path.node_modules + 'webextension-polyfill/dist', src: 'browser-polyfill.js', dest: path.src_content_vendors}
+          { expand: true, cwd: path.node_modules + 'webextension-polyfill/dist', src: 'browser-polyfill.js', dest: path.src_content_vendors }
 
-           // TODO PASSBOLT-2219 Fix / Add missing Vendors
+          // TODO PASSBOLT-2219 Fix / Add missing Vendors
           // In src_content_vendors
           // Farbtastic color picker is not available as npm package (too old)
           // ejs too old / was hosted on google code...
           //
-          // In src_addon_vendors
+          // In src_background_page_vendors
           // validator: modified with non-standard alphaNumericSpecial
           //
           // Not in scope
@@ -199,7 +214,7 @@ module.exports = function(grunt) {
           // Avatar
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/avatar',
-          src: ['user.png'],
+          src: ['user.png', 'group_default.png'],
           dest: path.build_data + 'img/avatar',
           expand: true
         }, {
@@ -239,13 +254,13 @@ module.exports = function(grunt) {
         }, {
           // CSS files default
           cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/default',
-          src: ['ext_config_debug.min.css', 'ext_external.min.css', 'ext_iframe.min.css', 'ext_setup.min.css', 'ext_quickaccess.min.css'],
+          src: ['ext_config_debug.min.css', 'ext_external.min.css', 'ext_login.min.css', 'ext_legacy.min.css', 'ext_setup.min.css', 'ext_quickaccess.min.css', 'ext_app.min.css'],
           dest: path.build_data + 'css/themes/default',
           expand: true
         }, {
           // CSS files midgar
           cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/midgar',
-          src: ['ext_iframe.min.css'],
+          src: ['ext_legacy.min.css', 'ext_app.min.css'],
           dest: path.build_data + 'css/themes/midgar',
           expand: true
         }, {
@@ -278,20 +293,21 @@ module.exports = function(grunt) {
      * Shell commands
      */
     shell: {
-      options: {stderr: false},
+      options: { stderr: false },
 
       /**
-       * Quickaccess popup
+       * Build content code apps.
        */
-      build_quickaccess_prod: {
+      build_webpack_apps_prod: {
         command: "./node_modules/.bin/webpack"
       },
-      build_quickaccess_debug: {
-        command: "./node_modules/.bin/webpack --config webpack.dev.config.js"
+      build_webpack_apps_debug: {
+        command: "./node_modules/.bin/webpack --env.debug=true"
       },
-      watch_quickaccess_debug: {
-        command: "./node_modules/.bin/webpack --watch --config webpack.dev.config.js"
-      },
+
+      /**
+       * Unit tests.
+       */
       test: {
         stdout: true,
         command: "jest --config .jest.config.json --no-cache ./src/all/ --maxWorkers=4"
@@ -315,8 +331,8 @@ module.exports = function(grunt) {
         },
         command: [
           './node_modules/.bin/web-ext build -s=' + path.build + ' -a=' + path.dist_firefox + '  -o=true',
-          'mv '+ path.dist_firefox + pkg.name + '-' + pkg.version + '.zip ' + path.dist_firefox + 'passbolt-' + pkg.version + '-debug.zip',
-          'rm -f '+ path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
+          'mv ' + path.dist_firefox + pkg.name + '-' + pkg.version + '.zip ' + path.dist_firefox + 'passbolt-' + pkg.version + '-debug.zip',
+          'rm -f ' + path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
           'ln -fs passbolt-' + pkg.version + '-debug.zip ' + path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
           "echo '\nMoved to " + path.dist_firefox + "passbolt-" + pkg.version + "-debug.zip'"
         ].join(' && ')
@@ -326,8 +342,8 @@ module.exports = function(grunt) {
           stderr: false
         },
         command: [
-          './node_modules/.bin/web-ext build -s='+ path.build + ' -a='+ path.dist_firefox + '  -o=true',
-          'mv '+ path.dist_firefox + pkg.name + '-' + pkg.version + '.zip ' + path.dist_firefox + '/passbolt-' + pkg.version + '.zip',
+          './node_modules/.bin/web-ext build -s=' + path.build + ' -a=' + path.dist_firefox + '  -o=true',
+          'mv ' + path.dist_firefox + pkg.name + '-' + pkg.version + '.zip ' + path.dist_firefox + '/passbolt-' + pkg.version + '.zip',
           "echo '\nMoved to " + path.dist_firefox + "passbolt-" + pkg.version + ".zip'"
         ].join(' && ')
       },
@@ -341,7 +357,7 @@ module.exports = function(grunt) {
         },
         command: [
           './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chrome + 'passbolt-' + pkg.version + '-debug.crx',
-          'rm -f '+ path.dist_chrome + 'passbolt-latest@passbolt.com.crx',
+          'rm -f ' + path.dist_chrome + 'passbolt-latest@passbolt.com.crx',
           'ln -fs passbolt-' + pkg.version + '-debug.crx ' + path.dist_chrome + 'passbolt-latest@passbolt.com.crx'
         ].join(' && ')
       },
@@ -365,32 +381,32 @@ module.exports = function(grunt) {
       content_scripts: {
         files: [path.src_content_scripts + '**/*.*'],
         tasks: ['copy:content_scripts'],
-        options: {spawn: false}
+        options: { spawn: false }
       },
       data: {
         files: [path.src + 'data/**/*.*', '!' + path.src + 'data/tpl/**', '!' + path.src + 'data/ejs/**', '!' + path.src + 'js/quickaccess/popup/**'],
-        tasks: ['copy:data'],
-        options: {spawn: false}
+        tasks: ['copy:data', 'shell:build_webpack_apps_debug'],
+        options: { spawn: false }
       },
       templates: {
         files: [path.src + 'data/ejs/**/*.ejs'],
         tasks: ['ejs_compile', 'browserify:templates'],
-        options: {spawn: false}
+        options: { spawn: false }
       },
-      app: {
+      background_page: {
         files: [path.src + 'background_page/**/*.js', '!' + path.src + 'background_page/vendors/*.js', '!' + path.src + 'background_page/vendors.js'],
-        tasks: ['browserify:app'],
-        options: {spawn: false}
+        tasks: ['browserify:background_page'],
+        options: { spawn: false }
       },
       config: {
         files: [path.src + 'background_page/config/config.json'],
-        tasks: ['browserify:app'],
-        options: {spawn: false}
+        tasks: ['browserify:background_page'],
+        options: { spawn: false }
       },
       vendors: {
         files: [path.src + 'background_page/vendors.js', path.src + 'background_page/vendors/**/*.js', path.src + 'background_page/sdk/storage.js'],
         tasks: ['browserify:vendors'],
-        options: {spawn: false}
+        options: { spawn: false }
       }
     }
   });

@@ -45,7 +45,11 @@ class PassphraseDialog extends React.Component {
   }
 
   handlePassphraseSuccess() {
-    passbolt.message.emit(this.props.requestId, "SUCCESS", { passphrase: this.state.passphrase, rememberMe: this.state.rememberMe });
+    const rememberMeDuration = this.state.rememberMe ? -1 : false;
+    passbolt.message.emit(this.props.requestId, "SUCCESS", {
+      passphrase: this.state.passphrase,
+      rememberMe: rememberMeDuration
+    });
     this.props.onComplete();
   }
 

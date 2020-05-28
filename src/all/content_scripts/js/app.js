@@ -1,7 +1,7 @@
 /**
  * Main App.
  *
- * @copyright (c)x 2019 Passbolt SA
+ * @copyright (c) 2020 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
@@ -158,7 +158,7 @@ window.addEventListener('passbolt.plugin.auth.logout', async function (event) {
 });
 
 /* ==================================================================================
- *  Resource event
+ *  Storage update events
  * ================================================================================== */
 
 // Listen when the resources local storage is updated and trigger an event on the page.
@@ -168,6 +168,18 @@ browser.storage.onChanged.addListener(changes => {
     passbolt.message.emitToPage("passbolt.storage.resources.updated", resources);
   }
 });
+
+// Listen when the folder local storage is updated and trigger an event on the page.
+browser.storage.onChanged.addListener(changes => {
+  if (changes.folders) {
+    const folders = changes.folders.newValue;
+    passbolt.message.emitToPage("passbolt.storage.folders.updated", folders);
+  }
+});
+
+/* ==================================================================================
+ *  Resource event
+ * ================================================================================== */
 
 // Find all the resources
 window.addEventListener('passbolt.storage.resources.get', async function (event) {
@@ -231,6 +243,7 @@ window.addEventListener('passbolt.plugin.resources.update-local-storage', async 
   }
 });
 
+
 /* ==================================================================================
  *  Favorite events
  * ================================================================================== */
@@ -285,9 +298,10 @@ window.addEventListener('passbolt.secret.focus', function () {
 // When the user wants to save the changes on their resource, the application
 // asks the plugin to encrypt the secret for all the users the resource
 // is shared with.
+// @deprecated since v2.12.0 will be removed with v2.3.0
 window.addEventListener('passbolt.secret_edition.encrypt', function (event) {
   var usersIds = event.detail;
-  passbolt.request('passbolt.secret-edit.encrypt', usersIds)
+  passbolt.request('passbolt.app.deprecated.secret-edit.encrypt', usersIds)
     .then(function (armoreds) {
       passbolt.message.emitToPage('secret_edition_secret_encrypted', armoreds);
     });
@@ -328,7 +342,7 @@ passbolt.message.on('passbolt.export-passwords.complete', function () {
 });
 
 /* ==================================================================================
- * Application
+ * Application (Legacy appjs)
  * ================================================================================== */
 
 // The application asks the plugin to decrypt an armored string
@@ -337,7 +351,7 @@ passbolt.message.on('passbolt.export-passwords.complete', function () {
 window.addEventListener('passbolt.secret.decrypt', function (event) {
   var armoredSecret = event.detail;
   passbolt.message.emit('passbolt.passbolt-page.remove-all-focuses');
-  passbolt.request('passbolt.app.decrypt-copy', armoredSecret)
+  passbolt.request('passbolt.app.deprecated.decrypt-copy', armoredSecret)
     .then(
       function success() {
         passbolt.message.emitToPage('passbolt_notify', {
@@ -431,13 +445,6 @@ window.addEventListener('passbolt.auth.is-authenticated', async function (event)
     console.error(error);
     passbolt.message.emitToPage(requestId, { status: 'ERROR', body: error });
   }
-});
-
-// Listen when the background page is ready and add the status to the DOM.
-passbolt.message.on('passbolt.app.worker.ready', function (requestId) {
-  $('html').addClass('passboltplugin-ready');
-  // Answer the request.
-  passbolt.message.emit(requestId, 'SUCCESS');
 });
 
 // result must be structured-clonable data

@@ -12,11 +12,11 @@
  * @since         2.12.0
  */
 const __ = require('../sdk/l10n').get;
-const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
-const PassboltBadResponseError = require('../error/passboltBadResponseError').PassboltBadResponseError;
-const PassboltServiceUnavailableError = require('../error/passboltServiceUnavailableError').PassboltServiceUnavailableError;
-const Request = require('../model/request').Request;
-const User = require('../model/user').User;
+const {PassboltApiFetchError} = require('../error/passboltApiFetchError');
+const {PassboltBadResponseError} = require('../error/passboltBadResponseError');
+const {PassboltServiceUnavailableError} = require('../error/passboltServiceUnavailableError');
+const {Request} = require('../model/request');
+const {User} = require('../model/user');
 
 class FavoriteService {
 
@@ -31,7 +31,7 @@ class FavoriteService {
         'content-type': 'application/json'
       }
     };
-    Request.setCsrfHeader(fetchOptions);
+    Request.setCsrfHeader(fetchOptions, user);
     const url = new URL(`${domain}/favorites/resource/${resourceId}.json?api-version=2`);
     let response, responseJson;
 
@@ -46,7 +46,7 @@ class FavoriteService {
       responseJson = await response.json();
     } catch (error) {
       // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-      throw new PassboltBadResponseError(response.statusText, { code: response.status });
+      throw new PassboltBadResponseError();
     }
 
     if (!response.ok) {
@@ -71,7 +71,7 @@ class FavoriteService {
         'content-type': 'application/json'
       }
     };
-    Request.setCsrfHeader(fetchOptions);
+    Request.setCsrfHeader(fetchOptions, user);
     const url = new URL(`${domain}/favorites/${favoriteId}.json?api-version=2`);
     let response, responseJson;
 
@@ -86,7 +86,7 @@ class FavoriteService {
       responseJson = await response.json();
     } catch (error) {
       // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-      throw new PassboltBadResponseError(response.statusText, { code: response.status });
+      throw new PassboltBadResponseError();
     }
 
     if (!response.ok) {

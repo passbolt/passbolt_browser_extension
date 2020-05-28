@@ -32,15 +32,14 @@ class AuthIsAuthenticatedController {
     try {
       const isAuthenticated = await this.auth.isAuthenticated(options);
       if (isAuthenticated) {
-        this.worker.port.emit(this.requestId, 'SUCCESS', true);
+        this.worker.port.emitQuiet(this.requestId, 'SUCCESS', true);
       } else {
-        this.worker.port.emit(this.requestId, 'SUCCESS', false);
+        this.worker.port.emitQuiet(this.requestId, 'SUCCESS', false);
       }
     } catch (error) {
-      this.worker.port.emit(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
+      this.worker.port.emitQuiet(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
     }
   }
-
 }
 
 exports.AuthIsAuthenticatedController = AuthIsAuthenticatedController;

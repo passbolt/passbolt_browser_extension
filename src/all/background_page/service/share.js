@@ -51,7 +51,7 @@ ShareService.searchAros = async function (keywords) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+    throw new PassboltBadResponseError();
   }
 
   if (!response.ok) {
@@ -99,7 +99,7 @@ ShareService.searchResourceAros = async function(resourceId, keywords) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+    throw new PassboltBadResponseError();
   }
 
   if (!response.ok) {
@@ -119,7 +119,7 @@ ShareService.searchResourceAros = async function(resourceId, keywords) {
  * @param {object} data The request body data
  * @returns {*}
  */
-ShareService.share = async function(resourceId, data) {
+ShareService.shareResource = async function(resourceId, data) {
   const user = User.getInstance();
   const domain = user.settings.getDomain();
   const fetchOptions = {
@@ -131,7 +131,7 @@ ShareService.share = async function(resourceId, data) {
     },
     body: JSON.stringify(data)
   };
-  Request.setCsrfHeader(fetchOptions);
+  Request.setCsrfHeader(fetchOptions, user);
   const url = new URL(`${domain}/share/resource/` + resourceId + `.json?api-version=v1`);
   let response, responseJson;
 
@@ -146,7 +146,7 @@ ShareService.share = async function(resourceId, data) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+    throw new PassboltBadResponseError();
   }
 
   if (!response.ok) {
@@ -171,7 +171,7 @@ ShareService.share = async function(resourceId, data) {
  * @param permissions
  * @returns {*}
  */
-ShareService.simulateShare = async function (resourceId, permissions) {
+ShareService.simulateShareResource = async function (resourceId, permissions) {
   const user = User.getInstance();
   const domain = user.settings.getDomain();
   const url = new URL(`${domain}/share/simulate/resource/${resourceId}.json?api-version=2`);
@@ -185,7 +185,7 @@ ShareService.simulateShare = async function (resourceId, permissions) {
       'content-type': 'application/json'
     }
   };
-  Request.setCsrfHeader(fetchOptions);
+  Request.setCsrfHeader(fetchOptions, user);
   let response, responseJson;
 
   try {
@@ -199,7 +199,7 @@ ShareService.simulateShare = async function (resourceId, permissions) {
     responseJson = await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltBadResponseError(response.statusText, {code: response.status});
+    throw new PassboltBadResponseError();
   }
 
   if (!response.ok) {

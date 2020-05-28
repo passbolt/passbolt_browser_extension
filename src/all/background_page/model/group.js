@@ -8,6 +8,7 @@
 const GroupService = require("../service/group").GroupService;
 const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
 const Request = require('./request').Request;
+const User = require('./user').User;
 const UserSettings = require('./userSettings/userSettings').UserSettings;
 
 /**
@@ -109,7 +110,7 @@ Group.prototype.save = async function(group, groupId, dryrun) {
       'Content-Type': 'application/json'
     }
   };
-  Request.setCsrfHeader(fetchOptions);
+  Request.setCsrfHeader(fetchOptions, User.getInstance());
 
   try {
     response = await fetch(url, fetchOptions);

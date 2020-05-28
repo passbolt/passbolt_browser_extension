@@ -27,7 +27,7 @@ GroupEditDialog.init = function () {
         include: 'about:blank?passbolt=passbolt-iframe-group-edit',
         contentScriptFile: [
 					// Warning: script and styles need to be modified in
-					// chrome/data/passbolt-iframe-password-share.html
+					// chrome/data/passbolt-iframe-group-edit.html
         ],
         contentScriptWhen: 'ready',
         onAttach: function (worker) {
@@ -39,7 +39,6 @@ GroupEditDialog.init = function () {
             });
 
             app.events.config.listen(worker);
-            app.events.editPassword.listen(worker);
             app.events.passboltPage.listen(worker);
             app.events.secret.listen(worker);
             app.events.group.listen(worker);

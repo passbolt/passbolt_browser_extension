@@ -10,14 +10,14 @@ passbolt.quickaccess = passbolt.quickaccess || {};
 
 $(function () {
   /**
-     * Fill the login form.
-     *
-     * @param {string} loginReqId The request id, to use in the response to complete the addon promise.
-     * @param {string} loginUsername The username to use
-     * @param {string} secret The password to use
-     * @param {string} url to get domain
-     */
-
+   * Fill the login form.
+   *
+   * @param {Object} formData
+   * - {string} loginReqId The request id, to use in the response to complete the addon promise.
+   * - {string} loginUsername The username to use
+   * - {string} secret The password to use
+   * - {string} url to get domain
+   */
   const fillForm = function (formData) {
     try {
       // Validate the fillForm parameters
@@ -67,11 +67,11 @@ $(function () {
 
   /**
    * Check the requested document, top document and an iframe form is initiated from same domain.
+   *
    * @param {string} requestedUrl The requested document url
    * @param {string} documentUrl The current active document url
    * @return {Boolean} true
    */
-
   const isRequestInitiatedFromSameOrigin = function (requestedUrl, documentUrl) {
     // requestedUrl - from quickaccess
     const parsedRequestedUrl = new URL(requestedUrl);
@@ -84,7 +84,7 @@ $(function () {
 
     // Requested document and top/iframe document origin is same
     return requestedOrigin === documentOrigin;
-  }
+  };
 
   /**
    * Validate the fillForm parameters
@@ -93,7 +93,6 @@ $(function () {
    * @param {string} secret The autofill request secret paramater
    * @param {url} url The autofill request url paramater
    */
-
   const validateData = function (formData) {
     const { requestId, username, secret, url } = formData;
     if (typeof requestId !== 'string') {
@@ -108,14 +107,13 @@ $(function () {
     if (typeof url !== 'string') {
       throw new Error('The parameter url is not valid');
     }
-  }
+  };
 
   /**
    * Fill form field.
    * @param {DomElement} element The element to fill
    * @param {string} value The value to use
    */
-
   const fillInputField = function (element, value) {
     // In order to ensure a high level of compatibility with most forms (even ones
     // controlled by javascript), the process needs to simulate how a user will
@@ -137,7 +135,6 @@ $(function () {
    * @param {string} type - either `password` or `username` to find elements
    * @param {Object} formData - to check same origin request
    */
-
   const getInputElementFromIframe = function (type, formData) {
     const iframes = document.querySelectorAll("iframe");
     let inputElement = null;
@@ -160,14 +157,13 @@ $(function () {
       }
     }
     return inputElement;
-  }
+  };
 
   /**
    * Returns an accessible iframe document in the page
    * @param {DomElement} ifram found on the page
    * @return {DomElement} iframe document
    */
-
   const getAccessedIframeContentDocument = function (iframe) {
     let iframeContentDocument = null;
     try {
@@ -176,7 +172,7 @@ $(function () {
       console.error(error);
     }
     return iframeContentDocument;
-  }
+  };
 
   /**
   * Returns an input element in the iframe
@@ -184,7 +180,6 @@ $(function () {
   * @param {DomElement} iframe document to start the search.
   * @return {DomElement} iframe document
   */
-
   const findInputElementInIframe = function (type, iframeDocument) {
     let inputElement = null;
     if (type === 'password') {
@@ -205,13 +200,12 @@ $(function () {
       }
     }
     return null;
-  }
+  };
 
   /**
    * Find the password element on the page.
    * @return {DomElement/null}
    */
-
   const getPasswordElement = function (formData) {
     const passwordElements = $(document).find("input[type='password']:visible:enabled");
     let passwordElement = null;
@@ -226,14 +220,13 @@ $(function () {
       passwordElement = getInputElementFromIframe('password', formData);
     }
     return passwordElement;
-  }
+  };
 
   /**
-  * Find the username element on the page based on password's parent as reference element.
-  * @param {DomElement} referenceElement The element reference to start the search.
-  * @return {DomElement/null}
-  */
-
+   * Find the username element on the page based on password's parent as reference element.
+   * @param {DomElement} referenceElement The element reference to start the search.
+   * @return {DomElement/null}
+   */
   const getUsernameElementBasedOnPasswordElement = function (formData, referenceElement) {
     // No parent element found.
     if (referenceElement || '') {
@@ -266,14 +259,13 @@ $(function () {
 
     // A username element has been found.
     return usernameElement;
-  }
+  };
 
   /**
    * Find the username element on the page.
    * @param {DomElement} fallbackUsernameElement The element reference to start the search.
    * @return {DomElement/null}
    */
-
   const getUsernameElement = function (formData, fallbackUsernameElement) {
 
     let usernameElement = null;
@@ -293,14 +285,13 @@ $(function () {
 
     // A username element has been found.
     return usernameElement;
-  }
+  };
 
   /**
    * Extract the username element from an array of dom elements.
    * @param {array} elements An array of dom elements
    * @return {DomElement/null}
    */
-
   const extractUsernameElementWithFallback = function (elements) {
     let usernameElement = null;
     // Filter elements to find the field that has the highest odd to be the username field.
@@ -322,7 +313,7 @@ $(function () {
           }
         }
       }
-    };
+    }
 
     // When filters fail to find matched elements on the page, use first element from an array of dom elements as username element
     if (!usernameElement) {
@@ -331,7 +322,7 @@ $(function () {
 
     // Return either matched username element based on filters or fallback element
     return usernameElement;
-  }
+  };
 
   passbolt.quickaccess.bootstrap = function () {
     passbolt.message.on('passbolt.quickaccess.fill-form', function (requestId, username, secret, url) {
@@ -339,6 +330,7 @@ $(function () {
       fillForm(quickaccessFormData);
     });
   };
+
 });
 
 // result must be structured-clonable data

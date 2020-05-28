@@ -4,8 +4,6 @@
  * @copyright (c) 2018 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var __ = require('../sdk/l10n').get;
-var Config = require('../model/config');
 
 /**
  * The class that deals with users settings
@@ -19,17 +17,11 @@ var SiteSettings = function (domain) {
  * Try to get the site settings from object cache, config or remotely
  * @returns {Promise}
  */
-SiteSettings.prototype.get = function() {
-  var self = this;
+SiteSettings.prototype.get = async function() {
   if (this._settings === null) {
-    // get from remote
-    return this.getRemote();
-  } else {
-    // already there in object
-    return new Promise( function(resolve, reject) {
-      resolve(self._settings);
-    });
+    this._settings = await this.getRemote();
   }
+  return this._settings
 };
 
 /**
@@ -37,9 +29,8 @@ SiteSettings.prototype.get = function() {
  * @returns {Promise}
  */
 SiteSettings.prototype.getRememberMeOptions = function() {
-  var self = this;
-  return new Promise( function(resolve, reject) {
-    self.get().then(function (data) {
+  return new Promise( (resolve, reject) => {
+    this.get().then(function (data) {
       if (data === undefined || data.passbolt === undefined || data.passbolt.plugins === undefined
         || data.passbolt.plugins.rememberMe === undefined || data.passbolt.plugins.rememberMe.options === undefined) {
         resolve(null);
@@ -54,9 +45,8 @@ SiteSettings.prototype.getRememberMeOptions = function() {
  * Get remote settings
  * @return {Promise}
  */
-SiteSettings.prototype.getRemote = function () {
-  var url = this.domain + '/settings.json?api-version=v2';
-  var self = this;
+SiteSettings.prototype.getRemote = async function () {
+  const url = this.domain + '/settings.json?api-version=v2';
   return new Promise( function(resolve, reject) {
     fetch(
       url, {
@@ -75,19 +65,16 @@ SiteSettings.prototype.getRemote = function () {
         }
       })
       .then(function (json) {
-          var response = { 'body' : {} };
+          let response = { 'body' : {} };
           if (json !== null) {
             response = json.body;
           }
-          // Save temporarily and return remote version of current user
-          self._settings = response;
-          resolve(self._settings);
+          resolve(response);
       })
       .catch(function (error) {
         reject(error);
       })
   });
-
 };
 
 exports.SiteSettings = SiteSettings;

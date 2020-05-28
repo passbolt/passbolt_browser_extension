@@ -1,26 +1,34 @@
 /**
  * App events.
+ * Used to handle the events coming and going to the APPJS
+ * e.g. the JS application served by the server
  *
- * Used to handle the events related to main application page.
- *
- * @copyright (c) 2017 Passbolt SARL, 2019 Passbolt SA
+ * @copyright (c) 2020 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 const __ = require('../sdk/l10n').get;
-var Crypto = require('../model/crypto').Crypto;
-const InvalidMasterPasswordError = require('../error/invalidMasterPasswordError').InvalidMasterPasswordError;
-var Keyring = require('../model/keyring').Keyring;
-var masterPasswordController = require('../controller/masterPasswordController');
-var progressDialogController = require('../controller/progressDialogController');
-const ResourceExportController = require('../controller/resource/resourceExportController').ResourceExportController;
-var Secret = require('../model/secret').Secret;
-var secret = new Secret();
-var TabStorage = require('../model/tabStorage').TabStorage;
-const UserAbortsOperationError = require('../error/userAbortsOperationError').UserAbortsOperationError;
-var Worker = require('../model/worker');
 
-var listen = function (worker) {
+// Controllers
+const passphraseController = require('../controller/passphrase/passphraseController');
+const progressController = require('../controller/progress/progressController');
+const {ResourceExportController} = require('../controller/resource/resourceExportController');
+const {MoveController} = require('../controller/move/moveController');
 
+const Worker = require('../model/worker');
+const {Crypto} = require('../model/crypto');
+const {Keyring} = require('../model/keyring');
+const {User} = require('../model/user');
+const {Secret} = require('../model/secret');
+const {FolderModel} = require('../model/folder/folderModel');
+const {TabStorage} = require('../model/tabStorage');
+
+const {InvalidMasterPasswordError} = require('../error/invalidMasterPasswordError');
+const {UserAbortsOperationError} = require('../error/userAbortsOperationError');
+
+const listen = function (worker) {
+  /* ==================================================================================
+   * Window App Events
+   * ================================================================================== */
   /*
    * Broadcast the window resize event to all workers.
    *
@@ -35,6 +43,10 @@ var listen = function (worker) {
       Worker.get(workersIds[i], worker.tab.id).port.emit('passbolt.app.window-resized', cssClasses);
     }
   });
+
+  /* ==================================================================================
+   * Secret App Events
+   * ================================================================================== */
 
   /*
    * Give the focus to the secret-edit iframe.
@@ -57,6 +69,7 @@ var listen = function (worker) {
       // If the secret is decrypted validate it, otherwise it is
       // considered as valid.
       if (editedPassword.secret != null) {
+        const secret = new Secret();
         secret.validate({data: editedPassword.secret});
       }
       Worker.get('Secret', worker.tab.id).port.emit('passbolt.secret-edit.validate-success');
@@ -68,111 +81,11 @@ var listen = function (worker) {
   });
 
   /*
-   * Encrypt the currently edited secret for all given users. Send the armored
-   * secrets in the response to the requester. If the secret hasn't been
-   * decrypted send an empty array.
-   *
-   * @listens passbolt.secret-edit.encrypt
-   * @param requestId {uuid} The request identifier
-   * @param usersIds {array} The users to encrypt the edited secret for
-   */
-  worker.port.on('passbolt.secret-edit.encrypt', function (requestId, usersIds) {
-    var editedPassword = TabStorage.get(worker.tab.id, 'editedPassword'),
-      keyring = new Keyring(),
-      crypto = new Crypto(),
-      armoreds = {};
-
-    // If the currently edited secret hasn't been decrypted, leave.
-    if (editedPassword.secret == null) {
-      worker.port.emit(requestId, 'SUCCESS', armoreds);
-      return;
-    }
-
-    // Open the progress dialog.
-    progressDialogController.open(worker, 'Encrypting ...', usersIds.length);
-
-    // Sync the keyring with the server.
-    keyring.sync()
-
-      // Once the keyring is synced, encrypt the secret for each user.
-      .then(function () {
-        var progress = 0;
-
-        // Prepare the data for encryption.
-        var encryptAllData = usersIds.map(function(userId) {
-          return {
-            userId: userId,
-            message: editedPassword.secret
-          }
-        });
-
-        // Encrypt all the messages.
-        return crypto.encryptAll(encryptAllData, function () {
-          progressDialogController.update(worker, progress++);
-        }, function (position) {
-          progressDialogController.update(worker, progress, 'Encrypting ' + position + '/' + usersIds.length);
-        });
-      })
-
-      // Once the secret is encrypted for all users notify the application and
-      // close the progress dialog.
-      .then(function (data) {
-        for (var i in data) {
-          armoreds[usersIds[i]] = data[i];
-        }
-        worker.port.emit(requestId, 'SUCCESS', armoreds);
-        progressDialogController.close(worker);
-      });
-  });
-
-  /*
-   * Initialize the password sharing process.
-   *
-   * @listens passbolt.app.share-password-init
-   * @param requestId {uuid} The request identifier
-   * @param sharedPassword {array} The password to share
-   */
-  worker.port.on('passbolt.app.share-init', function (requestId, resourcesIds) {
-    // Store some variables in the tab storage in order to make it accessible by other workers.
-    TabStorage.set(worker.tab.id, 'shareResourcesIds', resourcesIds);
-    worker.port.emit(requestId, 'SUCCESS');
-  });
-
-  /*
-   * Decrypt a given armored string
-   *
-   * @listens passbolt.app.decrypt
-   * @param requestId {uuid} The request identifier
-   * @param armored {string} The armored secret
-   * @deprecated since v2.7 will be removed in v3.0
-   */
-  worker.port.on('passbolt.app.decrypt-copy', function (requestId, armored) {
-    var crypto = new Crypto();
-
-    // Master password required to decrypt a secret.
-    masterPasswordController.get(worker)
-      .then(function (masterPassword) {
-        worker.port.emit('passbolt.progress.open-dialog', 'Decrypting...');
-        return crypto.decrypt(armored, masterPassword)
-      })
-      .then(function (decrypted) {
-        var clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
-        clipboardWorker.port.emit('passbolt.clipboard-iframe.copy', decrypted);
-        worker.port.emit('passbolt.progress.close-dialog');
-        worker.port.emit(requestId, 'SUCCESS', decrypted);
-      })
-      .catch(function (error) {
-        worker.port.emit('passbolt.progress.close-dialog');
-        worker.port.emit(requestId, 'ERROR', error.message);
-      });
-  });
-
-  /*
    * Decrypt a given armored string
    *
    * @listens passbolt.app.decrypt-and-copy-to-clipboard-resource-secret
-   * @param requestId {uuid} The request identifier
-   * @param resourceId {string} The resource identifier
+   * @param {uuid} requestId The request identifier
+   * @param {string} resourceId The resource identifier
    */
   worker.port.on('passbolt.app.decrypt-secret-and-copy-to-clipboard', async function (requestId, resourceId) {
     var crypto = new Crypto();
@@ -182,8 +95,8 @@ var listen = function (worker) {
         throw new Error(__('The resource id should be a valid UUID'))
       }
       const secretPromise = Secret.findByResourceId(resourceId);
-      const masterPassword = await masterPasswordController.get(worker);
-      await progressDialogController.open(worker, 'Decrypting...');
+      const masterPassword = await passphraseController.get(worker);
+      await progressController.open(worker, 'Decrypting...');
       const secret = await secretPromise;
       const message = await crypto.decrypt(secret.data, masterPassword);
       const clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
@@ -198,8 +111,61 @@ var listen = function (worker) {
         worker.port.emit(requestId, 'ERROR', error);
       }
     } finally {
-      progressDialogController.close(worker);
+      await progressController.close(worker);
     }
+  });
+
+  /* ==================================================================================
+   * Bootstrap App Events
+   * ================================================================================== */
+  /*
+   * Is the background page ready.
+   *
+   * @listens passbolt.app.is-ready
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.app.is-ready', async function (requestId) {
+    worker.port.emit(requestId, 'SUCCESS');
+  });
+
+  /*
+   * Is the react app ready.
+   *
+   * @listens passbolt.app.react-app.is-ready
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.app.react-app.is-ready', async function (requestId) {
+    try {
+      Worker.get('ReactApp', worker.tab.id).port.request('passbolt.react-app.is-ready');
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch(error) {
+      worker.port.emit(requestId, 'ERROR');
+    }
+  });
+
+  /* ==================================================================================
+   * RESOURCES App Events
+   * ================================================================================== */
+  /*
+   * Open the resource create dialog.
+   *
+   * @listens passbolt.resources.open-create-dialog
+   * @param {string|null} folderParentId The folder parent id (optional)
+   */
+  worker.port.on('passbolt.app.resources.open-create-dialog', async function (folderParentId) {
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.resources.open-create-dialog', folderParentId);
+  });
+
+  /*
+   * Open the resource edit dialog.
+   *
+   * @listens passbolt.resources.open-edit-dialog
+   * @param {string} resourceId the resource to edit
+   */
+  worker.port.on('passbolt.app.resources.open-edit-dialog', function (resourceId) {
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.resources.open-edit-dialog', resourceId);
   });
 
   /*
@@ -218,27 +184,197 @@ var listen = function (worker) {
     }
   });
 
-  // Notify the content code about the background page ready.
-  let readyEventSent = false;
-  async function isReady() {
-    // The ready event has already been sent.
-    if (!worker || readyEventSent) {
+  /* ==================================================================================
+   * SHARE App Events
+   * ================================================================================== */
+  /*
+   * Initialize the password sharing process.
+   *
+   * @listens passbolt.app.share.open-share-dialog
+   * @param {string} requestId The request identifier
+   * @param {object} itemsToShare
+   * - {array} resourcesIds The uuids of the resources to share
+   * - {array} foldersIds The uuids of the folders to share
+   */
+  worker.port.on('passbolt.app.share.open-share-dialog', function (requestId, itemsToShare) {
+    // Store some variables in the tab storage in order to make it accessible by other workers.
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.share.open-share-dialog', itemsToShare);
+    worker.port.emit(requestId, 'SUCCESS');
+  });
+
+  /* ==================================================================================
+   * FOLDER App Events
+   * ================================================================================== */
+  /*
+   * Pull the resources from the API and update the local storage.
+   *
+   * @listens passbolt.app.folders.update-local-storage
+   * @param {uuid} requestId The request identifier
+   */
+  worker.port.on('passbolt.app.folders.update-local-storage', async function (requestId) {
+    try {
+      let folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
+      await folderModel.updateLocalStorage();
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
+
+  /*
+   * Open the folder create dialog.
+   *
+   * @listens passbolt.folders.open-create-dialog
+   * @param {string|null} folderParentId The folder parent id (optional)
+   */
+  worker.port.on('passbolt.app.folders.open-create-dialog', async function (folderParentId) {
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.folders.open-create-dialog', folderParentId);
+  });
+
+  /*
+   * Open the folder rename dialog.
+   *
+   * @listens passbolt.folders.open-rename-dialog
+   * @param {string} folderId The folder id
+   */
+  worker.port.on('passbolt.app.folders.open-rename-dialog', async function (folderId) {
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.folders.open-rename-dialog', folderId);
+  });
+
+  /*
+   * Open the folder delete dialog.
+   *
+   * @listens passbolt.folders.open-delete-dialog
+   * @param {string} folderId The folder id
+   */
+  worker.port.on('passbolt.app.folders.open-delete-dialog', async function (folderId) {
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.folders.open-delete-dialog', folderId);
+  });
+
+  /*
+   * Open the folder share dialog.
+   *
+   * @listens passbolt.folders.open-share-dialog
+   * @param {string} folderId The folder id
+   */
+  worker.port.on('passbolt.app.folders.open-share-dialog', async function (folderId) {
+    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
+    reactAppWorker.port.emit('passbolt.folders.open-share-dialog', folderId);
+  });
+
+  /*
+   * Open the folder move confirmation dialog.
+   *
+   * @listens passbolt.folders.open-move-confirmation-dialog
+   * @param {object} moveDto {resources: array of uuids, folders: array of uuids, folderParentId: uuid}
+   */
+  worker.port.on('passbolt.app.folders.open-move-confirmation-dialog', async function (requestId, moveDto) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const controller = new MoveController(worker, requestId, clientOptions);
+      await controller.main(moveDto);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
+
+  /* ==================================================================================
+   * DEPRECATED App Events
+   * ================================================================================== */
+  /*
+   * Encrypt the currently edited secret for all given users. Send the armored
+   * secrets in the response to the requester. If the secret hasn't been
+   * decrypted send an empty array.
+   *
+   * @listens passbolt.app.deprecated.secret-edit.encrypt
+   * @param requestId {uuid} The request identifier
+   * @param usersIds {array} The users to encrypt the edited secret for
+   * @deprecated since v2.12.0 will be removed with v3.0
+   */
+  worker.port.on('passbolt.app.deprecated.secret-edit.encrypt', async function (requestId, usersIds) {
+    const editedPassword = TabStorage.get(worker.tab.id, 'editedPassword');
+    const keyring = new Keyring();
+    const crypto = new Crypto();
+    const armoreds = {};
+
+    // If the currently edited secret hasn't been decrypted, leave.
+    if (editedPassword.secret == null) {
+      worker.port.emit(requestId, 'SUCCESS', armoreds);
       return;
     }
 
-    const requestResult = worker.port.request('passbolt.app.worker.ready');
+    // Open the progress dialog.
+    await progressController.open(worker, 'Encrypting ...', usersIds.length, 'Please wait...');
 
-    // In the case the content code events listener are not yet bound, plan to request the
-    // content again.
-    setTimeout(() => {
-      isReady();
-    }, 50);
+    // Sync the keyring with the server.
+    await keyring.sync();
 
-    // Once the promise completed then we consider the event has been received by the content code.
-    await requestResult;
-    readyEventSent = true;
-  };
-  isReady();
+    // Once the keyring is synced, encrypt the secret for each user.
+    let progress = 0;
+
+    // Prepare the data for encryption.
+    let encryptAllData = usersIds.map((userId) => {
+      return {
+        userId: userId,
+        message: editedPassword.secret
+      }
+    });
+
+    // Encrypt all the messages.
+    const data = await crypto.encryptAll(encryptAllData, function () {
+      progressController.update(worker, progress++);
+    }, function (position) {
+      progressController.update(worker, progress, 'Encrypting ' + position + '/' + usersIds.length);
+    });
+
+    // Once the secret is encrypted for all users notify the application and
+    // close the progress dialog.
+    for (let i in data) {
+      armoreds[usersIds[i]] = data[i];
+    }
+    worker.port.emit(requestId, 'SUCCESS', armoreds);
+    await progressController.close(worker);
+  });
+
+  /*
+   * Decrypt a given armored string
+   *
+   * @listens passbolt.app.decrypt
+   * @param requestId {uuid} The request identifier
+   * @param armored {string} The armored secret
+   * @deprecated since v2.7 will be removed in v3.0
+   */
+  worker.port.on('passbolt.app.deprecated.decrypt-copy', async function (requestId, armored) {
+    var crypto = new Crypto();
+
+    try {
+      const passphrase = await passphraseController.get(worker);
+      await progressController.open(worker, 'Decrypting...', 1, 'Decrypting...');
+      const decrypted = await crypto.decrypt(armored, passphrase);
+      const clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
+      clipboardWorker.port.emit('passbolt.clipboard-iframe.copy', decrypted);
+      await progressController.close(worker);
+      worker.port.emit(requestId, 'SUCCESS', decrypted);
+    } catch(error) {
+      await progressController.close(worker);
+      worker.port.emit(requestId, 'ERROR', error.message);
+    }
+  });
 };
 
 exports.listen = listen;

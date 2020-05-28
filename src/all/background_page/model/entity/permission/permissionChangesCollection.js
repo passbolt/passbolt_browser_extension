@@ -202,6 +202,7 @@ class PermissionChangesCollection extends EntityCollection {
         result.push(newChange);
       } else {
         if (expectedPermission.type !== foundPermission.type) {
+          expectedPermission.id = foundPermission.id;
           const newChange = PermissionChangeEntity.createFromPermission(expectedPermission, PermissionChangeEntity.PERMISSION_CHANGE_UPDATE);
           result.push(newChange);
         }

@@ -308,6 +308,22 @@ class PermissionEntity extends Entity {
   }
 
   // ==================================================
+  // Dynamic properties setters
+  // ==================================================
+  /**
+   * Set the permission id
+   *
+   * @param {string} id
+   * @throws {TypeError} if permissions id is not UUID
+   */
+  set id(id) {
+    if (!Validator.isUUID(id)) {
+      throw new TypeError('The permission id should be a valid UUID.');
+    }
+    this._props.id = id;
+  }
+
+  // ==================================================
   // Assertions
   // ==================================================
   /**

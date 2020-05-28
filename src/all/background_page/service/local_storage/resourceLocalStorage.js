@@ -106,7 +106,7 @@ class ResourceLocalStorage {
       const resources = await ResourceLocalStorage.get();
       const resourceIndex = resources.findIndex(item => item.id === resourceEntity.id);
       if (resourceIndex === -1) {
-        throw new Error('The folder could not be found in the local storage');
+        throw new Error('The resource could not be found in the local storage');
       }
       resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
       await browser.storage.local.set({ resources });

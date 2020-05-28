@@ -15,7 +15,19 @@ $(function () {
     document.documentElement.dispatchEvent(event);
   };
 
-  const openDialog = (resourceId) => {
+  const openDialog = async (resourceId) => {
+    // Initialize/Update manually the resources local storage prior to version v2.11.0. The storage is required
+    // by the new implementation of the add/update resources operations.
+    // There are issues with some scenarios prior to v2.11.0, by instance:
+    // 1. storage has been updated;
+    // 2. another user share a resource with the current user;
+    // 3. the current user reload the grid by click on all items (appjs API request);
+    // 4. the user try to edit a resource that is not in the local storage.
+    const { resources } = await browser.storage.local.get(["resources"]);
+    if (!resources || !Array.isArray(resources)) {
+      passbolt.request('passbolt.resources.update-local-storage');
+    }
+
     if (!resourceId) {
       legacyEventToNewEvent('passbolt.plugin.resources.open-create-dialog');
       $('.create-password-dialog').remove();

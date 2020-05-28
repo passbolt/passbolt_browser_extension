@@ -16,6 +16,14 @@ $(function () {
   };
 
   const openDialog = async (resourceId) => {
+    if (!resourceId) {
+      legacyEventToNewEvent('passbolt.plugin.resources.open-create-dialog');
+      $('.create-password-dialog').remove();
+    } else {
+      legacyEventToNewEvent('passbolt.plugin.resources.open-edit-dialog', {id: resourceId});
+      $('.edit-password-dialog').remove();
+    }
+
     // Initialize/Update manually the resources local storage prior to version v2.11.0. The storage is required
     // by the new implementation of the add/update resources operations.
     // There are issues with some scenarios prior to v2.11.0, by instance:
@@ -26,14 +34,6 @@ $(function () {
     const { resources } = await browser.storage.local.get(["resources"]);
     if (!resources || !Array.isArray(resources)) {
       passbolt.request('passbolt.resources.update-local-storage');
-    }
-
-    if (!resourceId) {
-      legacyEventToNewEvent('passbolt.plugin.resources.open-create-dialog');
-      $('.create-password-dialog').remove();
-    } else {
-      legacyEventToNewEvent('passbolt.plugin.resources.open-edit-dialog', {id: resourceId});
-      $('.edit-password-dialog').remove();
     }
   };
 

@@ -42,14 +42,14 @@ function encode_char(c) {
 };
 ;
 var __line = 1
-  , __lines = "<h3>The server key has changed!</h3>\n<p>\n    For\n    <a href=\"https://help.passbolt.com/start/key-change\" target=\"_blank\" target=\"_blank\" rel=\"noopener noreferrer\">\n    security reasons</a>, please confirm with your IT administrator that this is\n    a change they initiated.\n</p>\n<div class=\"input checkbox required\">\n    <input type=\"checkbox\" id=\"js_server_key_change_confirm\" value=\"legit\"/>\n    <label for=\"js_server_key_change_confirm\">I have checked, all is fine.</label>\n</div><br>\n<div class=\"actions-wrapper center\">\n    <a id=\"js_server_key_change_submit\" class=\"button primary big disabled\" href=\"#\" role=\"button\">Accept new key</a>\n</div>\n"
+  , __lines = "<h3>The server key has changed!</h3>\n<p>\n    For security reasons, please confirm with your IT administrator that this is\n    a change they initiated.\n</p>\n<div class=\"input checkbox required\">\n    <input type=\"checkbox\" id=\"js_server_key_change_confirm\" value=\"legit\"/>\n    <label for=\"js_server_key_change_confirm\">I have checked, all is fine.</label>\n</div><br>\n<div class=\"actions-wrapper center\">\n    <a id=\"js_server_key_change_submit\" class=\"button primary big disabled\" href=\"#\" role=\"button\">Accept new key</a>\n</div>\n"
   , __filename = "src/all/data/ejs/login/changeKey.ejs";
 try {
   var __output = "";
   function __append(s) { if (s !== undefined && s !== null) __output += s }
   with (locals || {}) {
-    ; __append("<h3>The server key has changed!</h3>\n<p>\n    For\n    <a href=\"https://help.passbolt.com/start/key-change\" target=\"_blank\" target=\"_blank\" rel=\"noopener noreferrer\">\n    security reasons</a>, please confirm with your IT administrator that this is\n    a change they initiated.\n</p>\n<div class=\"input checkbox required\">\n    <input type=\"checkbox\" id=\"js_server_key_change_confirm\" value=\"legit\"/>\n    <label for=\"js_server_key_change_confirm\">I have checked, all is fine.</label>\n</div><br>\n<div class=\"actions-wrapper center\">\n    <a id=\"js_server_key_change_submit\" class=\"button primary big disabled\" href=\"#\" role=\"button\">Accept new key</a>\n</div>\n")
-    ; __line = 15
+    ; __append("<h3>The server key has changed!</h3>\n<p>\n    For security reasons, please confirm with your IT administrator that this is\n    a change they initiated.\n</p>\n<div class=\"input checkbox required\">\n    <input type=\"checkbox\" id=\"js_server_key_change_confirm\" value=\"legit\"/>\n    <label for=\"js_server_key_change_confirm\">I have checked, all is fine.</label>\n</div><br>\n<div class=\"actions-wrapper center\">\n    <a id=\"js_server_key_change_submit\" class=\"button primary big disabled\" href=\"#\" role=\"button\">Accept new key</a>\n</div>\n")
+    ; __line = 13
   }
   return __output;
 } catch (e) {

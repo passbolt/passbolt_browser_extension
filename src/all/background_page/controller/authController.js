@@ -40,7 +40,7 @@ AuthController.prototype.verify = async function () {
     this.worker.port.emit(this.requestId, 'SUCCESS', msg);
   } catch (error) {
     if (await this.auth.serverKeyChanged()) {
-      error = new ServerKeyChangedError(__('The server key is changed.'));
+      error = new ServerKeyChangedError(__('The server key has changed.'));
     } else if (await this.auth.isServerKeyExpired()) {
       error = new KeyIsExpiredError(__('The server key is expired.'));
     }

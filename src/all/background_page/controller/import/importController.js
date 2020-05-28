@@ -124,6 +124,10 @@ class ImportController {
         progressController.updateGoals(this.worker, this.operationsCount);
         const tagsBatches = this.prepareBatches(resources.created);
         tags = await this.processBatches(tagsBatches, this.saveTags.bind(this));
+        // crassette
+        if (!folders || !folders.length) {
+          Worker.get('App', this.worker.tab.id).port.emit('passbolt.import-passwords.complete', {tag: this.uniqueImportTag});
+        }
       }
 
       await progressController.close(this.worker);

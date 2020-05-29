@@ -480,7 +480,7 @@ class ImportController {
    * @returns {*|Array}
    * @private
    */
-  static _prepareResources = function(resources, userId) {
+  static _prepareResources (resources, userId) {
     const resourcesToEncrypt = resources.map(function(resource) {
       resource.userId = userId;
       resource.message = resource.secretClear;

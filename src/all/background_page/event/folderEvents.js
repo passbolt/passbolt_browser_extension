@@ -42,9 +42,10 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.folders.update', async function (requestId, folderDto) {
     try {
-      let folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
-      let folderEntity = await folderModel.update(new FolderEntity(folderDto));
-      worker.port.emit(requestId, 'SUCCESS', folderEntity);
+      const folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
+      const folderEntity = await folderModel.update(new FolderEntity(folderDto));
+      const folderDto = folderEntity.toJSON();
+      worker.port.emit(requestId, 'SUCCESS', folderDto);
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }

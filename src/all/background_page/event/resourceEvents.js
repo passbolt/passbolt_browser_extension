@@ -69,7 +69,8 @@ const listen = function (worker) {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new ResourceCreateController(worker, requestId, clientOptions);
       const savedResource = await controller.main(resourceEntity, password);
-      worker.port.emit(requestId, 'SUCCESS', savedResource);
+      const savedResourceDto = savedResource.toJSON();
+      worker.port.emit(requestId, 'SUCCESS', savedResourceDto);
     } catch (error) {
       console.error(error);
       if (error instanceof Error) {

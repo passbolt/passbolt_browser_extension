@@ -163,7 +163,7 @@ module.exports = function (grunt) {
       },
       data: {
         files: [
-          { expand: true, cwd: path.src + 'data', src: ['**', '!tpl/**', '!ejs/**', '!js/quickaccess/popup/**', '!js/app/**'], dest: path.build + 'data' }
+          { expand: true, cwd: path.src + 'data', src: ['**', '!tpl/**', '!ejs/**', '!js/quickaccess/popup/**', '!js/reactApp/**'], dest: path.build + 'data' }
         ]
       },
       // switch manifest file to firefox or chrome

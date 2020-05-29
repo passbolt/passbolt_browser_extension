@@ -71,7 +71,8 @@ const listen = function (worker) {
     try {
       let apiClientOptions = await User.getInstance().getApiClientOptions();
       let folderModel = new FolderModel(apiClientOptions);
-      const folderDtos = await folderModel.findAllForShare(foldersIds);
+      const foldersCollection = await folderModel.findAllForShare(foldersIds);
+      const folderDtos = foldersCollection.toJSON();
       worker.port.emit(requestId, 'SUCCESS', folderDtos);
     } catch (error) {
       console.error(error);

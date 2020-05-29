@@ -342,13 +342,13 @@ class ShareDialog extends Component {
       return `Share ${this.props.resourcesIds.length + this.props.foldersIds.length} items`;
     }
     if (this.isAboutAResource()) {
-      return `Share a resource`;//todo name
+      return `Share resource ${this.resources[0].name}`;
     }
     if (this.isAboutResources()) {
       return `Share ${this.props.resourcesIds.length} resources`;
     }
     if (this.isAboutAFolder()) {
-      return `Share a folder`;// todo name
+      return `Share folder ${this.folders[0].name}`;
     }
     if (this.isAboutFolders()) {
       return `Share ${this.props.foldersIds.length} folders`;

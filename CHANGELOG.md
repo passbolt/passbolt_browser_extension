@@ -3,7 +3,17 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
-## [2.13.0] - 2020-03-04
+## [2.13.1] - 2020-05-29
+### Fixed
+- Fix direct export of resources/folders with a parent not included in export group
+- Fix share folder/resource dialog should display item name
+- Fix move shared folder cases where the permissions should not change
+- Fix move shared resources cases where the permissions should not change
+- Fix the response to the event 'passbolt.share.get-folders' should return an array
+- Fix transform entity to dto before port.emit
+- Fix linting
+
+## [2.13.0] - 2020-05-28
 ### Added
 - PB-658 Add folder create dialog and service
 - PB-658 Add rename folder dialog
@@ -466,7 +476,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.12.1...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.0...HEAD
+[2.12.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.12.1...v2.13.0
 [2.12.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.12.0...v2.12.1
 [2.12.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.11.3...v2.12.0
 [2.11.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.11.2...v2.11.3

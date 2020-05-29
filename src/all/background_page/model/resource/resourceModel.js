@@ -147,7 +147,7 @@ class ResourceModel {
    * @returns {Promise<PermissionChangesCollection>}
    */
   async calculatePermissionsChangesForCreate(resource, destFolder) {
-    let changes = null
+    let changes = null;
     if (destFolder) {
       if (!destFolder.permissions) {
         throw new TypeError('Resource model calculatePermissionsChangesForMove requires destination permissions to be set.');

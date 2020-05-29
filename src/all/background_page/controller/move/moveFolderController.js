@@ -185,9 +185,10 @@ class MoveFolderController {
   async calculateChanges() {
     await progressController.update(this.worker, this.progress++, `Calculating changes for ${this.folder.name}`);
 
-    // When a shared folder at the root is moved in a personal folder
-    // we do not change permissions
-    if (this.folder.isShared() && this.destinationFolder.isPersonal() && (this.folder.folderParentId === null || this.parentFolder.isPersonal())) {
+    // When a shared folder is moved: from the root to a personal folder; or from a personal folder to a personal
+    // folder; or from a personal folder to the root.
+    // We do not change permissions
+    if (this.folder.isShared() && (this.destinationFolderId === null || this.destinationFolder.isPersonal()) && (this.folder.folderParentId === null || this.parentFolder.isPersonal())) {
       return;
     }
 

@@ -205,7 +205,7 @@ KeepassDb.prototype.createEntry = function(resource, group, db) {
     db = this.db;
   }
   if (group == undefined || group == null) {
-    group = db.getDefaultGroup();
+    group = db.getDefaultGroup() || null;
   }
   const entry = db.createEntry(group);
   entry.fields.Title = resource.name;
@@ -230,16 +230,17 @@ KeepassDb.prototype.findOrCreateGroupRecursive = function(folder, folders) {
   if(folder.folder_parent_id) {
     if(!this._groups[folder.folder_parent_id]) {
       const parentFolder = folders.filter(f => f.id === folder.folder_parent_id);
-      this.findOrCreateGroupRecursive(parentFolder, folders);
+      if (parentFolder.length) {
+        this.findOrCreateGroupRecursive(parentFolder, folders);
+      }
     }
-
     parentGroup = this._groups[folder.folder_parent_id];
-  } else {
-    parentGroup = this.db.getDefaultGroup();
   }
 
   if (!this._groups[folder.id]) {
-    // Create it.
+    if (!parentGroup) {
+      parentGroup = this.db.getDefaultGroup()
+    }
     this._groups[folder.id] = this.db.createGroup(parentGroup, folder.name);
   }
 
@@ -278,7 +279,9 @@ KeepassDb.prototype.fromItems = function(items, password, keyFile) {
       let parentGroup = null;
       if (items.resources[i].folder_parent_id) {
         const parentFolder = items.folders.find(f => f.id === items.resources[i].folder_parent_id);
-        parentGroup = self.findOrCreateGroupRecursive(parentFolder, items.folders);
+        if (parentFolder) {
+          parentGroup = self.findOrCreateGroupRecursive(parentFolder, items.folders);
+        }
       }
 
       self.createEntry(items.resources[i], parentGroup);

@@ -18,7 +18,6 @@ const {FolderModel} = require('../../model/folder/folderModel');
 const {ResourceModel} = require('../../model/resource/resourceModel');
 const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
 const {PermissionChangesCollection} = require('../../model/entity/permission/permissionChangesCollection');
-const {PermissionsCollection}  = require("../../model/entity/permission/permissionsCollection");
 
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
@@ -59,7 +58,7 @@ class MoveResourcesController {
       await this.findAllForShare();
       this.filterOutResourcesThatWontMove();
       await this.setGoals();
-      await this.buildChanges();
+      await this.calculateChanges();
       await this.move();
       await this.share();
       await progressController.update(this.worker, this.goals, 'Done');
@@ -153,18 +152,30 @@ class MoveResourcesController {
    * Build changes to be used in bulk share
    * @returns {Promise<void>}
    */
-  async buildChanges() {
+  async calculateChanges() {
     this.changes = new PermissionChangesCollection([]);
     for (let resource of this.resources) {
       await progressController.update(this.worker, this.progress++, `Calculating changes for ${resource.name}`);
 
-      // Somebody who can update can move
-      // But to change the rights one need to be owner
-      if (resource.permission.isOwner()) {
-        let parent = !resource.folderParentId ? null : this.resourcesParentFolders.getById(resource.folderParentId);
-        let changes = await this.resourceModel.calculatePermissionsChangesForMove(resource, parent, this.destinationFolder);
-        this.changes.merge(changes);
+      // A user who can update a resource can move it
+      // But to change the rights they need to be owner
+      if (!resource.permission.isOwner()) {
+        break;
       }
+
+      // When a shared folder is moved, we do not change permissions when:
+      // - move is from the root to a personal folder
+      // - move is from a personal folder to a personal folder;
+      // - move is from a personal folder to the root.
+      if (resource.isShared()
+        && (this.destinationFolderId === null || this.destinationFolder.isPersonal())
+        && (resource.folderParentId === null || resource.isPersonal())) {
+        break;
+      }
+
+      let parent = !resource.folderParentId ? null : this.resourcesParentFolders.getById(resource.folderParentId);
+      let changes = await this.resourceModel.calculatePermissionsChangesForMove(resource, parent, this.destinationFolder);
+      this.changes.merge(changes);
     }
   }
 

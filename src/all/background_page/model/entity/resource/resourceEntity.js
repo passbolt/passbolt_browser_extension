@@ -121,7 +121,6 @@ class ResourceEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
-        // Associations
         "folder_parent_id": {
           "anyOf": [{
             "type": "string",
@@ -130,8 +129,13 @@ class ResourceEntity extends Entity {
             "type": "null"
           }]
         },
+        // Permissions
         "permission": PermissionEntity.getSchema(), // current user permission
         "permissions": PermissionsCollection.getSchema(), // all users permissions
+        "personal": {
+          "type": "boolean"
+        },
+        // other Associations
         "favorite": {
           "anyOf": [
             FavoriteEntity.getSchema(),
@@ -272,6 +276,28 @@ class ResourceEntity extends Entity {
   // ==================================================
   // Permissions methods
   // ==================================================
+  /**
+   * Get is personal flag
+   * @returns {(boolean|null)}
+   */
+  isPersonal() {
+    if (this._props.hasOwnProperty('personal')) {
+      return this._props.personal;
+    }
+    if (this.permissions) {
+      return this.permissions.length === 1;
+    }
+    return null;
+  }
+
+  /**
+   * Get is shared flag
+   * @returns {(boolean|null)}
+   */
+  isShared() {
+    return !this.isPersonal();
+  }
+
   /**
    * Get resource permission for the current user
    * @returns {(PermissionEntity|null)}

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
+## [2.13.2] - 2020-06-01
+### Fixed
+- Fix resource URI can be null or a string
+
 ## [2.13.1] - 2020-05-29
 ### Fixed
 - Fix direct export of resources/folders with a parent not included in export group

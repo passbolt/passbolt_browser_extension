@@ -87,12 +87,20 @@ class ResourceEntity extends Entity {
           "maxLength": RESOURCE_NAME_MAX_LENGTH
         },
         "username": {
-          "type": "string",
-          "maxLength": RESOURCE_USERNAME_MAX_LENGTH
+          "anyOf": [{
+            "type": "string",
+            "maxLength": RESOURCE_USERNAME_MAX_LENGTH
+          }, {
+            "type": "null"
+          }]
         },
         "uri": {
-          "type": "string",
-          "maxLength": RESOURCE_URI_MAX_LENGTH
+          "anyOf": [{
+            "type": "string",
+            "maxLength": RESOURCE_URI_MAX_LENGTH
+          }, {
+            "type": "null"
+          }]
         },
         "description": {
           "anyOf": [{

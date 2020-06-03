@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Fix resource URI can be null or a string
 - Fix folder rename issue
 - Fix export with large amount of resources issue
+- Fix bulk move large amount of resources with the same folder parent issue
 
 ## [2.13.1] - 2020-05-29
 ### Fixed

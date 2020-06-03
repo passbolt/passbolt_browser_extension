@@ -105,7 +105,7 @@ class MoveResourcesController {
    */
   async findAllForShare() {
     this.resources = await this.resourceModel.findAllForShare(this.resourcesIds);
-    const parentIds = this.resources.folderParentIds;
+    const parentIds = [...new Set(this.resources.folderParentIds)];
 
     if (this.destinationFolderId) {
       this.destinationFolder = await this.folderModel.findForShare([this.destinationFolderId]);
@@ -114,7 +114,7 @@ class MoveResourcesController {
     }
 
     if (parentIds.length) {
-      this.resourcesParentFolders = await this.folderModel.findAllForShare(this.resources.folderParentIds);
+      this.resourcesParentFolders = await this.folderModel.findAllForShare(parentIds);
     }
   }
 

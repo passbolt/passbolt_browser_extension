@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [2.13.2] - 2020-06-01
 ### Fixed
 - Fix resource URI can be null or a string
+- Fix folder rename issue
 
 ## [2.13.1] - 2020-05-29
 ### Fixed

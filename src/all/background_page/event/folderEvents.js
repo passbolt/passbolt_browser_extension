@@ -27,7 +27,7 @@ const listen = function (worker) {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const folderCreateController = new FolderCreateController(worker, requestId, clientOptions);
       const folderEntity = await folderCreateController.main(new FolderEntity(folderDto));
-      worker.port.emit(requestId, 'SUCCESS', folderEntity.toDto());
+      worker.port.emit(requestId, 'SUCCESS', folderEntity.toJSON());
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }
@@ -44,8 +44,7 @@ const listen = function (worker) {
     try {
       const folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
       const folderEntity = await folderModel.update(new FolderEntity(folderDto));
-      const folderDto = folderEntity.toJSON();
-      worker.port.emit(requestId, 'SUCCESS', folderDto);
+      worker.port.emit(requestId, 'SUCCESS', folderEntity.toJSON());
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }

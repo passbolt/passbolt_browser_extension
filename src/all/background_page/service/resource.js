@@ -372,7 +372,7 @@ LegacyResourceService.findAllForShare = async function(resourcesIds) {
     const totalBatches = Math.ceil(resourcesIds.length / batchSize);
     for (let i = 0; i < totalBatches; i++) {
       const resouresIdsPart = resourcesIds.splice(0, batchSize);
-      const resourcesPart = await Resource.findAllForShare(resouresIdsPart);
+      const resourcesPart = await LegacyResourceService.findAllForShare(resouresIdsPart);
       resources = [...resources, ...resourcesPart];
     }
 

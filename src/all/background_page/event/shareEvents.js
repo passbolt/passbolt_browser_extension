@@ -58,6 +58,7 @@ const listen = function (worker) {
       }
       worker.port.emit(requestId, 'SUCCESS', resources);
     } catch(error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
     }
   });

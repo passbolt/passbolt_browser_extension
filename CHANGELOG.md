@@ -3,10 +3,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
-## [2.13.2] - 2020-06-01
+## [2.13.2] - 2020-06-03
 ### Fixed
 - Fix resource URI can be null or a string
 - Fix folder rename issue
+- Fix export with large amount of resources issue
 
 ## [2.13.1] - 2020-05-29
 ### Fixed
@@ -481,8 +482,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.0...HEAD
-[2.12.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.12.1...v2.13.0
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.2...HEAD
+[2.13.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.1...v2.13.2
+[2.13.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.0...v2.13.1
+[2.13.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.12.1...v2.13.0
 [2.12.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.12.0...v2.12.1
 [2.12.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.11.3...v2.12.0
 [2.11.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.11.2...v2.11.3

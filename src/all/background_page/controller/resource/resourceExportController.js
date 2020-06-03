@@ -38,7 +38,7 @@ class ResourceExportController {
     const itemsToExport = {
       resources: [],
       folders: [],
-    }
+    };
 
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
@@ -62,15 +62,8 @@ class ResourceExportController {
 
       // If there are resources to export.
       if (requestedToExport.resources.length) {
-        const filter = {
-          'has-id': requestedToExport.resources
-        };
-        const contain = {
-          'secret': 1
-        };
-
         const resourceService = new ResourceService(apiClientOptions);
-        itemsToExport.resources = await resourceService.findAll(contain, filter);
+        itemsToExport.resources = await resourceService.findAllForExport(requestedToExport.resources);
       }
 
 

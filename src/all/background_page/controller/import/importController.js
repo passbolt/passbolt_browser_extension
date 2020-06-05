@@ -55,9 +55,6 @@ class ImportController {
     // Batch size for the import, in order to throttle the calls to server.
     this.batchSize = 5;
 
-    // Count of batches. Will be populated by prepareBatches.
-    this.batchCount = 0;
-
     // Count of number of items to be imported.
     this.itemsCount = 0;
 
@@ -107,7 +104,7 @@ class ImportController {
       await this.encryptSecretsAndAddToResources();
       let folders;
       if (this.options.importFolders) {
-        const folderBatches = this.prepareBatches(this.items.foldersPaths);
+        const folderBatches = this.prepareFoldersBatches(this.items.foldersPaths);
         folders = await this.processBatches(folderBatches, this.saveFolder.bind(this));
       }
 
@@ -290,7 +287,7 @@ class ImportController {
    */
   async saveFolder(folderPath) {
     const folderModel = new FolderModel(this.clientOptions);
-    const  folderSplit = folderPath.replace(/^\//, '').split('/'),
+    const folderSplit = folderPath.replace(/^\//, '').split('/'),
       folderName = folderSplit.pop(),
       folderParent = folderSplit.length ? "/" + folderSplit.join("/") : "";
 
@@ -359,6 +356,55 @@ class ImportController {
   };
 
   /**
+   * Split a list of folders into batches.
+   * Batches are organized by level and for given size.
+   * By instance :
+   * [
+   *   /import-kdbx-2020060518538
+   *   /import-kdbx-2020060518538/folderA
+   *   /import-kdbx-2020060518538/folderA/subFolderA
+   *   /import-kdbx-2020060518538/folderB
+   * ]
+   * will return:
+   * [
+   *   [
+   *     /import-kdbx-2020060518538
+   *   ], [
+   *     /import-kdbx-2020060518538/folderA
+   *     /import-kdbx-2020060518538/folderB
+   *   ], [
+   *     /import-kdbx-2020060518538/folderA/subFolderA
+   *   ]
+   * ]
+   * @param {array} folderPaths The list of folders paths
+   * @return {Array}
+   */
+  prepareFoldersBatches(folderPaths) {
+    const folderPathsByLevels = [];
+    const batches = [];
+
+    folderPaths.forEach(folderPath => {
+      const level = folderPath.split('/').length;
+      if (!folderPathsByLevels[level]) {
+        folderPathsByLevels[level] = [];
+      }
+      folderPathsByLevels[level].push(folderPath);
+    });
+
+    folderPathsByLevels.forEach(folderPathsByLevel => {
+      batches.push([]);
+      folderPathsByLevel.forEach(folderPath => {
+        if(batches[batches.length - 1].length === this.batchSize) {
+          batches.push([]);
+        }
+        batches[batches.length - 1].push(folderPath);
+      });
+    });
+
+    return batches;
+  }
+
+  /**
    * Split a list of items into batches.
    * For example: 15 items with a batchSize of 5 will return 3 arrays of 5 items.
    * @param items
@@ -370,8 +416,6 @@ class ImportController {
     for (let i = 0, j = 0; i < chunks; i++, j += this.batchSize) {
       batches.push(items.slice(j, j + this.batchSize));
     }
-
-    this.batchCount += batches.length;
 
     return batches;
   }

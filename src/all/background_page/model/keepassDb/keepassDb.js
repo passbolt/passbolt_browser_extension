@@ -107,7 +107,7 @@ KeepassDb.prototype._prepareKeyFile = function(keyFile) {
 KeepassDb.prototype.getGroupPath = function(group) {
   function getParentGroups(group, groups) {
     if (group.parentGroup) {
-      groups = getParent(group.parentGroup, groups);
+      groups = getParentGroups(group.parentGroup, groups);
     }
     groups.push(group);
     return groups;

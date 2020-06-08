@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
+### Added
+- PB-1290 As a user I can choose which permission changes strategy to apply on a move
 
 ## [2.13.3] - 2020-06-05
 ### Fixed

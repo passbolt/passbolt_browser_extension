@@ -33,6 +33,7 @@ import PassphraseEntryDialog from "./components/Passphrase/PassphraseEntryDialog
 
 import AppContext from './contexts/AppContext';
 import ShareDialog from "./components/Share/ShareDialog";
+import FolderMoveStrategyDialog from "./components/Folder/FolderMoveStrategyDialog/FolderMoveStrategyDialog";
 
 class ReactApp extends Component {
   constructor(props) {
@@ -77,6 +78,13 @@ class ReactApp extends Component {
       },
       showFolderRenameDialog: false,
       showFolderDeleteDialog: false,
+      showFolderMoveStrategyDialog: false,
+      folderMoveStrategyProps: {
+        requestId: null,
+        folderId: null,
+        foldersIds: [],
+        resourcesIds: []
+      },
 
       // share dialog
       showShareDialog: false,
@@ -118,6 +126,8 @@ class ReactApp extends Component {
     this.handleFolderRenameDialogCloseEvent = this.handleFolderRenameDialogCloseEvent.bind(this);
     this.handleFolderDeleteDialogOpenEvent = this.handleFolderDeleteDialogOpenEvent.bind(this);
     this.handleFolderDeleteDialogCloseEvent = this.handleFolderDeleteDialogCloseEvent.bind(this);
+    this.handleFolderMoveStrategyRequestEvent = this.handleFolderMoveStrategyRequestEvent.bind(this);
+    this.handleFolderMoveStrategyDialogCloseEvent = this.handleFolderMoveStrategyDialogCloseEvent.bind(this);
     this.handleShareDialogOpenEvent = this.handleShareDialogOpenEvent.bind(this);
     this.handleShareDialogCloseEvent = this.handleShareDialogCloseEvent.bind(this);
   }
@@ -126,7 +136,6 @@ class ReactApp extends Component {
     browser.storage.onChanged.addListener(this.handleStorageChange);
     port.on('passbolt.react-app.is-ready', this.handleIsReadyEvent);
     port.on('passbolt.errors.open-error-dialog', this.handleErrorDialogOpenEvent);
-    port.on('passbolt.passphrase.request', this.handlePassphraseEntryRequestEvent);
     port.on('passbolt.progress.open-progress-dialog', this.handleProgressDialogOpenEvent);
     port.on("passbolt.progress.update", this.handleProgressDialogUpdateEvent);
     port.on("passbolt.progress.update-goals", this.handleProgressDialogUpdateGoalsEvent);
@@ -137,6 +146,10 @@ class ReactApp extends Component {
     port.on('passbolt.folders.open-rename-dialog', this.handleFolderRenameDialogOpenEvent);
     port.on('passbolt.folders.open-delete-dialog', this.handleFolderDeleteDialogOpenEvent);
     port.on('passbolt.share.open-share-dialog', this.handleShareDialogOpenEvent);
+
+    // requests: dialogs that return responses to controllers
+    port.on('passbolt.passphrase.request', this.handlePassphraseEntryRequestEvent);
+    port.on('passbolt.folders.move-strategy.request', this.handleFolderMoveStrategyRequestEvent);
   }
 
   handleIsReadyEvent(requestId) {
@@ -200,7 +213,8 @@ class ReactApp extends Component {
   }
 
   handleErrorDialogCloseEvent() {
-    this.setState({showErrorDialog: false});
+    const defaultState = this.getDefaultState();
+    this.setState({showErrorDialog: false, errorDialogProps: defaultState.errorDialogProps});
     port.emit('passbolt.app.hide');
   }
 
@@ -215,7 +229,8 @@ class ReactApp extends Component {
   }
 
   handlePassphraseDialogClose() {
-    this.setState({showPassphraseEntryDialog: false, passphraseRequestId: null});
+    const defaultState = this.getDefaultState();
+    this.setState({showPassphraseEntryDialog: false, passphraseRequestId: defaultState.passphraseRequestId});
   }
 
   /*
@@ -243,7 +258,8 @@ class ReactApp extends Component {
   }
 
   handleProgressDialogCloseEvent() {
-    this.setState({showProgressDialog: false, progressDialogProps: null});
+    const defaultState = this.getDefaultState();
+    this.setState({showProgressDialog: false, progressDialogProps: defaultState.progressDialogProps});
   }
 
   /*
@@ -252,18 +268,25 @@ class ReactApp extends Component {
    * =============================================================
    */
 
+  handleResourceCreateDialogOpenEvent(folderParentId) {
+    const resourceCreateDialogProps = {folderParentId: folderParentId};
+    this.setState({showResourceCreateDialog: true, resourceCreateDialogProps: resourceCreateDialogProps});
+  }
+
+  handleResourceCreateDialogCloseEvent() {
+    const defaultState = this.getDefaultState();
+    this.setState({showResourceCreateDialog: false, resourceCreateDialogProps: defaultState.resourceCreateDialogProps});
+    port.emit('passbolt.app.hide');
+  }
+
   handleResourceEditDialogOpenEvent(id) {
     this.setState({showPasswordEditDialog: true, passwordEditDialogProps: {id: id}});
   }
 
-  handleResourceCreateDialogCloseEvent() {
-    this.setState({showResourceCreateDialog: false});
+  handleResourceEditDialogCloseEvent() {
+    const defaultState = this.getDefaultState();
+    this.setState({showPasswordEditDialog: false, passwordEditDialogProps: defaultState.passwordEditDialogProps});
     port.emit('passbolt.app.hide');
-  }
-
-  handleResourceCreateDialogOpenEvent(folderParentId) {
-    const resourceCreateDialogProps = {folderParentId: folderParentId};
-    this.setState({showResourceCreateDialog: true, resourceCreateDialogProps: resourceCreateDialogProps});
   }
 
   /*
@@ -277,7 +300,8 @@ class ReactApp extends Component {
   }
 
   handleShareDialogCloseEvent() {
-    this.setState({showShareDialog: false, shareDialogProps: null});
+    const defaultState = this.getDefaultState();
+    this.setState({showShareDialog: false, shareDialogProps: defaultState.shareDialogProps});
     port.emit('passbolt.app.hide');
   }
 
@@ -293,7 +317,8 @@ class ReactApp extends Component {
   }
 
   handleFolderCreateDialogCloseEvent() {
-    this.setState({showFolderCreateDialog: false});
+    const defaultState = this.getDefaultState();
+    this.setState({showFolderCreateDialog: false, folderCreateDialogProps: defaultState.folderCreateDialogProps});
     port.emit('passbolt.app.hide');
   }
 
@@ -303,8 +328,8 @@ class ReactApp extends Component {
   }
 
   handleFolderRenameDialogCloseEvent() {
-    this.setState({showFolderRenameDialog: false});
-    this.setState({folder: {}});
+    const defaultState = this.getDefaultState();
+    this.setState({showFolderRenameDialog: false, folder: defaultState.folder});
     port.emit('passbolt.app.hide');
   }
 
@@ -314,16 +339,33 @@ class ReactApp extends Component {
   }
 
   handleFolderDeleteDialogCloseEvent() {
-    this.setState({showFolderDeleteDialog: false});
+    const defaultState = this.getDefaultState();
+    this.setState({showFolderDeleteDialog: false, folder: defaultState.folder});
     port.emit('passbolt.app.hide');
   }
 
-  handleResourceEditDialogCloseEvent() {
-    this.setState({showPasswordEditDialog: false});
-    port.emit('passbolt.app.hide');
+  handleFolderMoveStrategyRequestEvent(requestId, folderId, foldersIds, resourcesIds) {
+    this.setState({
+      showProgressDialog: false,
+      showFolderMoveStrategyDialog: true,
+      folderMoveStrategyProps: {requestId, folderId, foldersIds, resourcesIds}
+    });
   }
 
+  handleFolderMoveStrategyDialogCloseEvent() {
+    const defaultState = this.getDefaultState();
+    this.setState({
+      showProgressDialog: true,
+      showFolderMoveStrategyDialog: false,
+      folderMoveStrategyProps: defaultState.folderMoveStrategyProps
+    });
+  }
 
+  /*
+   * =============================================================
+   *  View
+   * =============================================================
+   */
   render() {
     const isReady = this.isReady();
     return (
@@ -344,6 +386,14 @@ class ReactApp extends Component {
                 {this.state.showFolderCreateDialog &&
                 <FolderCreateDialog onClose={this.handleFolderCreateDialogCloseEvent}
                   folderParentId={this.state.folderCreateDialogProps.folderParentId}/>
+                }
+                {this.state.showFolderMoveStrategyDialog &&
+                <FolderMoveStrategyDialog onClose={this.handleFolderMoveStrategyDialogCloseEvent}
+                  folderId={this.state.folderMoveStrategyProps.folderId}
+                  foldersIds={this.state.folderMoveStrategyProps.foldersIds}
+                  resourcesIds={this.state.folderMoveStrategyProps.resourcesIds}
+                  requestId={this.state.folderMoveStrategyProps.requestId}
+                />
                 }
                 {this.state.showFolderRenameDialog &&
                 <FolderRenameDialog onClose={this.handleFolderRenameDialogCloseEvent} folderId={this.state.folder.id}/>

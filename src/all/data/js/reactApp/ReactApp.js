@@ -348,7 +348,7 @@ class ReactApp extends Component {
     this.setState({
       showProgressDialog: false,
       showFolderMoveStrategyDialog: true,
-      folderMoveStrategyProps: {requestId, folderId, foldersIds, resourcesIds}
+      folderMoveStrategyProps: {requestId: requestId, folderId: folderId, foldersIds: foldersIds, resourcesIds: resourcesIds}
     });
   }
 

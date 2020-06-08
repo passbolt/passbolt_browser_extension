@@ -39,7 +39,7 @@ class FolderMoveStrategyDialog extends Component {
    * @return {void}
    */
   async componentDidMount() {
-    this.setState({loading:false, moveOption: 'change'});
+    this.setState({loading: false, moveOption: 'change'});
     this.moveOptionChangeRef.current.focus();
   }
 
@@ -136,7 +136,7 @@ class FolderMoveStrategyDialog extends Component {
     const prev = this.state.processing;
     return new Promise(resolve => {
       this.setState({processing: !prev}, resolve());
-    })
+    });
   }
 
   /**
@@ -240,14 +240,14 @@ class FolderMoveStrategyDialog extends Component {
     return (
       <div>
         <DialogWrapper className='move-folder-strategy-dialog' title="How do you want to proceed?"
-                       onClose={this.handleClose} disabled={this.hasAllInputDisabled()}>
+          onClose={this.handleClose} disabled={this.hasAllInputDisabled()}>
           <form className="folder-create-form" onSubmit={this.handleFormSubmit} noValidate>
             <div className="form-content">
               <p>{this.getIntroMessage()}</p>
               <div className="radiolist-alt">
                 <div className="input radio">
                   <input name="moveOption" value="change" id="moveOptionChange" type="radio"
-                         onChange={this.handleInputChange} ref={this.moveOptionChangeRef} checked={this.state.moveOption === 'change'} />
+                    onChange={this.handleInputChange} ref={this.moveOptionChangeRef} checked={this.state.moveOption === 'change'} />
                   <label htmlFor="moveOptionChange">
                     <span className="strategy-name">Change permissions</span>
                     <span className="strategy-info">Remove old inherited permissions and apply the new destination folder permissions recursively.</span>
@@ -255,7 +255,7 @@ class FolderMoveStrategyDialog extends Component {
                 </div>
                 <div className="input radio last">
                   <input name="moveOption" value="keep" id="moveOptionKeep" type="radio"
-                         onChange={this.handleInputChange} ref={this.moveOptionKeepRef}  checked={this.state.moveOption === 'keep'}/>
+                    onChange={this.handleInputChange} ref={this.moveOptionKeepRef}  checked={this.state.moveOption === 'keep'}/>
                   <label htmlFor="moveOptionKeep">
                     <span className="strategy-name">Keep existing permissions</span>
                     <span className="strategy-info">Keep the original permissions, do not apply the destination folder permissions.</span>

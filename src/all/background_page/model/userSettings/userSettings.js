@@ -109,7 +109,7 @@ UserSettings.prototype.validateDomain = function (domain) {
   if ((typeof domain === 'undefined' || domain === '')) {
     throw new Error(__('A domain cannot be empty'));
   }
-  if (!Validator.isURL(domain)) {
+  if (!Validator.isURL(domain, {require_tld:false})) {
     throw new Error(__('The trusted domain url is not valid.'));
   }
   return true;

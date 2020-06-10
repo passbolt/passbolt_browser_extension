@@ -3,8 +3,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
+## [2.13.4] - 2020-06-11
 ### Added
 - PB-1290 As a user I can choose which permission changes strategy to apply on a move
+
+### Fixed
+- GITHUB-238: As an administrator I should be able to install passbolt on a domain without a TLD.
+- BUGZILLA-1372288: Hide extension URL from page when inserting iframe in a content script
 
 ## [2.13.3] - 2020-06-05
 ### Fixed

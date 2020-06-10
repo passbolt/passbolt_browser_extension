@@ -109,6 +109,7 @@ passbolt.templates = window.templates;
    * @param iframeUrlOptions Object
    * @param appendTo string acting as jQuery selector
    * @param className string (optional)
+   * @param insertMode append or prepend
    * @param style string (optional)
    * @param port string (optional)
    * @returns {*|jQuery|HTMLElement}
@@ -121,11 +122,11 @@ passbolt.templates = window.templates;
     const cssClass = className || '';
 
     // build iframe url
-    var port = port ? port : iframeId;
-    var iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html') + `?passbolt=${port}&`;
+    port = port ? port : iframeId;
+    let iframeUrl = chrome.runtime.getURL('data/' + iframeId +'.html') + `?passbolt=${port}&`;
     let optionUrl = [];
-    for (var options in urlOptions)
-      if (iframeUrlOptions.hasOwnProperty(options)) {
+    for (let options in urlOptions)
+      if (urlOptions.hasOwnProperty(options) && iframeUrlOptions.hasOwnProperty(options)) {
         const optionsValue = encodeURIComponent(iframeUrlOptions[options]);
         optionUrl.push(`${options}=${optionsValue}`);
       }
@@ -134,7 +135,7 @@ passbolt.templates = window.templates;
     // Build iframe html element
     var $iframe = $('<iframe/>', {
       id: iframeId,
-      src: iframeUrl,
+      src: '',
       class: cssClass,
       frameBorder: 0,
       style: css
@@ -146,6 +147,9 @@ passbolt.templates = window.templates;
     } else {
       $iframe.prependTo(appendTo);
     }
+    const iframe = document.getElementById(iframeId);
+    iframe.contentWindow.location = iframeUrl;
+
     return $iframe;
   };
   passbolt.html.insertIframe = insertIframe;

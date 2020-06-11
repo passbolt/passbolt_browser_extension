@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+const __ = require('../../sdk/l10n').get;
 const {Keyring} = require('../../model/keyring');
 const {Crypto} = require('../../model/crypto');
 const {Share} = require('../../model/share');
@@ -54,7 +55,7 @@ class MoveResourcesController {
       throw error;
     }
     try {
-      await progressController.open(this.worker, this.getProgressTitle(), 1, 'Initializing...');
+      await progressController.open(this.worker, this.getProgressTitle(), 1, __('Initializing...'));
       await this.findAllForShare();
       this.filterOutResourcesThatWontMove();
       await this.setGoals();
@@ -82,7 +83,7 @@ class MoveResourcesController {
     if (resourcesIds.length) {
       await this.resourceModel.assertResourcesExist(resourcesIds);
     } else {
-      throw new Error('Could not move, expecting at least a resource to be provided.');
+      throw new Error(__('Could not move, expecting at least a resource to be provided.'));
     }
     this.destinationFolderId = destinationFolderId;
     this.resourcesIds = resourcesIds;
@@ -95,8 +96,8 @@ class MoveResourcesController {
   async getPassphrase() {
     // Get the passphrase if needed and decrypt secret key
     // We do this to confirm the move even if there is nothing to decrypt/re-encrypt
-    this.passphrase = await passphraseController.get(this.worker);
-    this.privateKey = await this.crypto.getAndDecryptPrivateKey(this.passphrase);
+    const passphrase = await passphraseController.get(this.worker);
+    this.privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
   }
 
   /**
@@ -145,7 +146,7 @@ class MoveResourcesController {
     this.goals = (this.resources.length * 5) + 1;
     this.progress = 0;
     await progressController.updateGoals(this.worker, this.goals);
-    await progressController.update(this.worker, this.progress++, 'Calculating changes...');
+    await progressController.update(this.worker, this.progress++, __('Calculating changes...'));
   }
 
   /**
@@ -200,9 +201,9 @@ class MoveResourcesController {
     let resourcesDto = this.resources.toDto({secrets:true});
     let changesDto = this.changes.toDto();
     if (changesDto.length) {
-      await progressController.update(this.worker, this.progress++, 'Synchronizing keys');
+      await progressController.update(this.worker, this.progress++, __('Synchronizing keys'));
       await this.keyring.sync();
-      await Share.bulkShareResources(resourcesDto, changesDto, this.passphrase, async message => {
+      await Share.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await progressController.update(this.worker, this.progress++, message);
       });
     }
@@ -213,7 +214,6 @@ class MoveResourcesController {
    * @returns {void}
    */
   cleanup() {
-    this.passphrase = null;
     this.privateKey = null;
   }
 
@@ -224,7 +224,7 @@ class MoveResourcesController {
    */
   getProgressTitle() {
     if (this.resourcesIds.length === 1) {
-      return 'Moving one resource';
+      return __('Moving one resource');
     } else {
       return `Moving ${this.resourcesIds.length} resources`;
     }

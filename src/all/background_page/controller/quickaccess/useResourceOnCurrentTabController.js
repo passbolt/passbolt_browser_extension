@@ -30,23 +30,32 @@ class UseResourceOnCurrentTabController {
 
   /**
    * Execute the controller
-   * @param {array} resourceId The resource identifier to decrypt the secret of.
-   * @param {tab} browser's current active tab
+   * @param {string} resourceId The resource identifier to decrypt the secret of.
+   * @param {tab} tab browser's current active tab
    * @return {Promise}
    */
   async main(resourceId, tab) {
     const crypto = new Crypto();
     const { resources } = await browser.storage.local.get("resources");
-    const resource = resources.find(resource => resource.id == resourceId);
+    const resource = resources.find(resource => resource.id === resourceId);
+    let privateKey;
+
+    // Get the passphrase if needed and decrypt secret key
+    try {
+      let passphrase = await passphraseController.get(this.worker);
+      privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
+    } catch (error) {
+      console.error(error);
+      this.worker.port.emit(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
+    }
 
     try {
       const secretPromise = this._getSecret(resourceId);
-      const masterPassword = await passphraseController.get(this.worker);
       const secret = await secretPromise;
-      const message = await crypto.decrypt(secret.data, masterPassword);
+      const message = await crypto.decryptWithKey(secret.data, privateKey);
       // Return username as an empty string, when `resource.name` is null
       const username = resource.username || '';
-      // Current active tab's url is passing to quickaccess to check the same origin request
+      // Current active tab's url is passing to quick access to check the same origin request
       await Worker.get('Bootstrap', tab.id).port.request('passbolt.quickaccess.fill-form', username, message, tab.url);
       this.worker.port.emit(this.requestId, 'SUCCESS');
     } catch (error) {
@@ -56,8 +65,7 @@ class UseResourceOnCurrentTabController {
 
   /**
    * Get the resource secret to decrypt
-   * @param {string} resourceId The resource identifier to decrypt the secret of.
-   * @param {object} tabStorageEditedPassword
+   * @param {string} resourceId The resource identifier to decrypt the secret of
    * @return {Promise}
    */
   async _getSecret(resourceId) {

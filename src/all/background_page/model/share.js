@@ -43,13 +43,13 @@ Share.searchResourceAros = function(resourceId, keywords) {
  * Bulk share multiple resources.
  * @param {array} resources The resources to share
  * @param {array} changes The permissions changes to apply
- * @param {string} privateKeySecret The user private key secret
+ * @param privateKey {openpgp.key.Key} The decrypted private key to use to decrypt the message.
  * @param {function} progressCallback Notify the user with this callback
  */
-Share.bulkShareResources = async function(resources, changes, privateKeySecret, progressCallback) {
+Share.bulkShareResources = async function(resources, changes, privateKey, progressCallback) {
   const resourcesChanges = bulkShareAggregateChanges(resources, changes);
   const resourcesNewUsers = await bulkShareSimulate(resources, resourcesChanges, progressCallback);
-  const resourcesSecrets = await bulkShareEncrypt(resources, resourcesNewUsers, privateKeySecret, progressCallback);
+  const resourcesSecrets = await bulkShareEncrypt(resources, resourcesNewUsers, privateKey, progressCallback);
 
   for (const resourceId in resourcesChanges) {
     if (resourcesChanges.hasOwnProperty(resourceId)) {
@@ -133,7 +133,7 @@ const bulkShareSimulate = async function(resources, resourcesChanges, progressCa
  * Encrypt the resources secrets for all the new users
  * @param {array} resources The resources to share
  * @param {object} resourcesNewUsers The list of new users to share the resources aggregated by resource
- * @param {string} passphrase The current user passphrase
+ * @param privateKey {openpgp.key.Key} The decrypted private key to use to decrypt the message.
  * @param {function} progressCallback Notify the user with this callback
  * @returns {object} A list of secrets as expected by the passbolt API
  * [
@@ -144,7 +144,7 @@ const bulkShareSimulate = async function(resources, resourcesChanges, progressCa
  *  }
  * ]
  */
-const bulkShareEncrypt = async function(resources, resourcesNewUsers, passphrase, progressCallback) {
+const bulkShareEncrypt = async function(resources, resourcesNewUsers, privateKey, progressCallback) {
   const crypto = new Crypto();
   const secrets = {};
 
@@ -154,9 +154,9 @@ const bulkShareEncrypt = async function(resources, resourcesNewUsers, passphrase
     const users = resourcesNewUsers[resourceId];
     progressCallback(`Encrypting for ${resource.name}`);
     if (users && users.length) {
-      const message = await crypto.decrypt(originalArmored, passphrase);
+      const message = await crypto.decryptWithKey(originalArmored, privateKey);
       const encryptAllData = users.reduce((carry, userId) => [...carry, {userId, message}], []);
-      const result = await crypto.encryptAll(encryptAllData);
+      const result = await crypto.encryptAll(encryptAllData, privateKey);
       secrets[resourceId] = result.map((armored, i) => {
         return {
           resource_id: resourceId,

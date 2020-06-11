@@ -88,23 +88,34 @@ const listen = function (worker) {
    * @param {string} resourceId The resource identifier
    */
   worker.port.on('passbolt.app.decrypt-secret-and-copy-to-clipboard', async function (requestId, resourceId) {
-    var crypto = new Crypto();
+    const crypto = new Crypto();
+    let privateKey;
 
     try {
       if (!Validator.isUUID(resourceId)) {
         throw new Error(__('The resource id should be a valid UUID'))
       }
+      // Start fetching secret
       const secretPromise = Secret.findByResourceId(resourceId);
-      const masterPassword = await passphraseController.get(worker);
+
+      // Ask for passphrase if needed
+      let passphrase = await passphraseController.get(this.worker);
+      privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
+
+      // Finish fetching if needed and decrypt
       await progressController.open(worker, 'Decrypting...');
       const secret = await secretPromise;
-      const message = await crypto.decrypt(secret.data, masterPassword);
+      const message = await crypto.decryptWithKey(secret.data, privateKey);
+
+      // Copy and success
       const clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
       clipboardWorker.port.emit('passbolt.clipboard-iframe.copy', message);
       worker.port.emit(requestId, 'SUCCESS', message);
+
     } catch (error) {
       if (error instanceof InvalidMasterPasswordError || error instanceof UserAbortsOperationError) {
         // The copy operation has been aborted.
+        // Do nothing
       } else if (error instanceof Error) {
         worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
       } else {
@@ -136,7 +147,8 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.app.react-app.is-ready', async function (requestId) {
     try {
-      Worker.get('ReactApp', worker.tab.id).port.request('passbolt.react-app.is-ready');
+      const reactWorker = Worker.get('ReactApp', worker.tab.id);
+      reactWorker.port.request('passbolt.react-app.is-ready');
       worker.port.emit(requestId, 'SUCCESS');
     } catch(error) {
       worker.port.emit(requestId, 'ERROR');
@@ -311,11 +323,21 @@ const listen = function (worker) {
     const keyring = new Keyring();
     const crypto = new Crypto();
     const armoreds = {};
+    let privateKey;
 
     // If the currently edited secret hasn't been decrypted, leave.
     if (editedPassword.secret == null) {
       worker.port.emit(requestId, 'SUCCESS', armoreds);
       return;
+    }
+
+    // Get the passphrase if needed and decrypt secret key
+    try {
+      let passphrase = await passphraseController.get(this.worker);
+      privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', this.worker.port.getEmitableError(error));
     }
 
     // Open the progress dialog.
@@ -336,7 +358,7 @@ const listen = function (worker) {
     });
 
     // Encrypt all the messages.
-    const data = await crypto.encryptAll(encryptAllData, function () {
+    const data = await crypto.encryptAll(encryptAllData, privateKey, function () {
       progressController.update(worker, progress++);
     }, function (position) {
       progressController.update(worker, progress, 'Encrypting ' + position + '/' + usersIds.length);
@@ -345,7 +367,9 @@ const listen = function (worker) {
     // Once the secret is encrypted for all users notify the application and
     // close the progress dialog.
     for (let i in data) {
-      armoreds[usersIds[i]] = data[i];
+      if (data.hasOwnProperty(i)) {
+        armoreds[usersIds[i]] = data[i];
+      }
     }
     worker.port.emit(requestId, 'SUCCESS', armoreds);
     await progressController.close(worker);
@@ -360,12 +384,21 @@ const listen = function (worker) {
    * @deprecated since v2.7 will be removed in v3.0
    */
   worker.port.on('passbolt.app.deprecated.decrypt-copy', async function (requestId, armored) {
-    var crypto = new Crypto();
+    const crypto = new Crypto();
+    let privateKey;
+
+    // Get the passphrase if needed and decrypt secret key
+    try {
+      let passphrase = await passphraseController.get(this.worker);
+      privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', this.worker.port.getEmitableError(error));
+    }
 
     try {
-      const passphrase = await passphraseController.get(worker);
       await progressController.open(worker, 'Decrypting...', 1, 'Decrypting...');
-      const decrypted = await crypto.decrypt(armored, passphrase);
+      const decrypted = await crypto.decryptWithKey(armored, privateKey);
       const clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
       clipboardWorker.port.emit('passbolt.clipboard-iframe.copy', decrypted);
       await progressController.close(worker);

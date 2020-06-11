@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+const __ = require('../../sdk/l10n').get;
 const Worker = require('../../model/worker');
 
 const {Crypto} = require('../../model/crypto');
@@ -74,13 +75,13 @@ class MoveFolderController {
       throw error;
     }
     try {
-      await progressController.open(this.worker, 'Moving folder', 1, 'Initializing...');
+      await progressController.open(this.worker, __('Moving folder'), 1, __('Initializing...'));
       await this.findAllForShare();
       await this.setGoals();
       await this.calculateChanges();
       await this.share();
       await this.move();
-      await progressController.update(this.worker, this.goals, 'Done');
+      await progressController.update(this.worker, this.goals, __('Done'));
       await progressController.close(this.worker);
       this.cleanup()
     } catch(error) {
@@ -101,10 +102,10 @@ class MoveFolderController {
     if (folderId) {
       await this.folderModel.assertFolderExists(folderId);
     } else {
-      throw new Error('Could not move, expecting a folder to be provided.');
+      throw new Error(__('Could not move, expecting a folder to be provided.'));
     }
     if (folderId === destinationFolderId) {
-      throw new Error('The folder cannot be moved inside itself.');
+      throw new Error(__('The folder cannot be moved inside itself.'));
     }
     this.destinationFolderId = destinationFolderId;
     this.folderId = folderId;
@@ -117,8 +118,8 @@ class MoveFolderController {
   async getPassphrase() {
     // Get the passphrase if needed and decrypt secret key
     // We do this to confirm the move even if there is nothing to decrypt/re-encrypt
-    this.passphrase = await passphraseController.get(this.worker);
-    this.privateKey = await this.crypto.getAndDecryptPrivateKey(this.passphrase);
+    const passphrase = await passphraseController.get(this.worker);
+    this.privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
   }
 
   /**
@@ -177,7 +178,7 @@ class MoveFolderController {
     this.goals = 3 + (this.subFolders.length * 2) + (this.resources.length * 4);
     this.progress = 0;
     await progressController.updateGoals(this.worker, this.goals);
-    await progressController.update(this.worker, this.progress++, 'Calculating changes...');
+    await progressController.update(this.worker, this.progress++, __('Calculating changes...'));
   }
 
   /**
@@ -251,9 +252,9 @@ class MoveFolderController {
     if (this.resourcesChanges.length) {
       let resourcesDto = this.resources.toDto({secrets:true});
       let changesDto = this.resourcesChanges.toDto();
-      await progressController.update(this.worker, this.progress++, 'Synchronizing keys');
+      await progressController.update(this.worker, this.progress++, __('Synchronizing keys'));
       await this.keyring.sync();
-      await Share.bulkShareResources(resourcesDto, changesDto, this.passphrase, async message => {
+      await Share.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await progressController.update(this.worker, this.progress++, message);
       });
     }
@@ -273,7 +274,6 @@ class MoveFolderController {
    * @returns {void}
    */
   cleanup() {
-    this.passphrase = null;
     this.privateKey = null;
   }
 

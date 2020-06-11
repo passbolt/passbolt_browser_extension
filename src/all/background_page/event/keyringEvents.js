@@ -6,17 +6,17 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 const __ = require('../sdk/l10n').get;
-var Keyring = require('../model/keyring').Keyring;
-var Key = require('../model/key').Key;
-var Config = require('../model/config');
-var User = require('../model/user').User;
-var Uuid = require('../utils/uuid');
-var keyring = new Keyring();
-var key = new Key();
+const {Keyring} = require('../model/keyring');
+const {Key} = require('../model/key');
+const Config = require('../model/config');
+const {User} = require('../model/user');
+const Uuid = require('../utils/uuid');
+const keyring = new Keyring();
+const key = new Key();
 
-var fileController = require('../controller/fileController');
+const fileController = require('../controller/fileController');
 
-var listen = function (worker) {
+const listen = function (worker) {
 
   /* ==================================================================================
    *  Get Key info events
@@ -48,7 +48,7 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.keyring.private.get', function (requestId) {
-    var info = keyring.findPrivate();
+    const info = keyring.findPrivate();
     if (typeof info !== 'undefined') {
       worker.port.emit(requestId, 'SUCCESS', info);
     } else {
@@ -63,9 +63,9 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.keyring.public.get_armored', async function (requestId) {
-    var info = keyring.findPrivate();
+    const info = keyring.findPrivate();
     if (typeof info !== 'undefined') {
-      var publicKeyArmored = await keyring.extractPublicKey(info.key);
+      const publicKeyArmored = await keyring.extractPublicKey(info.key);
       if (typeof publicKeyArmored !== 'undefined') {
         return worker.port.emit(requestId, 'SUCCESS', publicKeyArmored);
       }
@@ -108,7 +108,7 @@ var listen = function (worker) {
    * @param privateKeyArmored {string} The private armored key
    */
   worker.port.on('passbolt.keyring.public.extract', async function (requestId, privateKeyArmored) {
-    var publicKeyArmored = await keyring.extractPublicKey(privateKeyArmored);
+    const publicKeyArmored = await keyring.extractPublicKey(privateKeyArmored);
     if (typeof publicKeyArmored !== 'undefined') {
       worker.port.emit(requestId, 'SUCCESS', publicKeyArmored);
     } else {
@@ -126,7 +126,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.keyring.key.validate', function (requestId, keyData, fields) {
     try {
-      var validate = key.validate(keyData, fields);
+      const validate = key.validate(keyData, fields);
       worker.port.emit(requestId, 'SUCCESS', validate);
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
@@ -165,7 +165,7 @@ var listen = function (worker) {
    * @param publicKeyArmored {string} The public armored key to import
    */
   worker.port.on('passbolt.keyring.server.import', function (requestId, publicKeyArmored) {
-      var user = User.getInstance();
+      const user = User.getInstance();
       keyring.importServerPublicKey(publicKeyArmored, user.settings.getDomain()).then(function() {
         worker.port.emit(requestId, 'SUCCESS');
       }, function (error) {
@@ -202,11 +202,11 @@ var listen = function (worker) {
    * @param filename {string} The filename to use for the downloadable file
    */
   worker.port.on('passbolt.keyring.key.backup', function (requestId, key, filename) {
-    if (filename == undefined) {
+    if (filename === undefined) {
       filename = 'passbolt.asc';
     }
     // If debug mode is enabled, add .txt at the end of filename.
-    if (Config.isDebug() == true) {
+    if (Config.isDebug() === true) {
       filename += '.txt';
     }
 

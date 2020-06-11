@@ -116,8 +116,8 @@ class ShareFoldersController {
   async getPassphrase() {
     // Get the passphrase if needed and decrypt secret key
     // We do this to confirm the move even if there is nothing to decrypt/re-encrypt
-    this.passphrase = await passphraseController.get(this.worker);
-    this.privateKey = await this.crypto.getAndDecryptPrivateKey(this.passphrase);
+    const passphrase = await passphraseController.get(this.worker);
+    this.privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
   }
 
   /**
@@ -199,7 +199,7 @@ class ShareFoldersController {
       let changesDto = this.resourcesChanges.toDto();
       await progressController.update(this.worker, this.progress++, 'Synchronizing keys');
       await this.keyring.sync();
-      await Share.bulkShareResources(resourcesDto, changesDto, this.passphrase, async message => {
+      await Share.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await progressController.update(this.worker, this.progress++, message);
       });
     }
@@ -210,7 +210,6 @@ class ShareFoldersController {
    * @returns {void}
    */
   cleanup() {
-    this.passphrase = null;
     this.privateKey = null;
   }
 }

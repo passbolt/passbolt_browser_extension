@@ -12,8 +12,8 @@ const Worker = require('../../model/worker');
  *
  * @param {Worker} worker The worker from which the request comes from.
  * @param {string} title The progress title.
- * @param {number} goals The number of goals to achieve.
- * @param {string} message start progress message
+ * @param {number} [goals] optional The number of goals to achieve.
+ * @param {string} [message] optional start progress message
  * @return {Promise}
  */
 const open = async function (worker, title, goals, message) {

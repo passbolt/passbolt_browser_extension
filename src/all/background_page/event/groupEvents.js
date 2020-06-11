@@ -1,12 +1,16 @@
 /**
- * Group Listeners
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SARL (https://www.passbolt.com)
  *
- * Used for handling groups / group edits
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
  *
- * @copyright (c) 2017-2018 Passbolt SARL, 2019 Passbolt SA
- * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         2.0.0
  */
-
 const Worker = require('../model/worker');
 const {User} = require('../model/user');
 const {Group} = require('../model/group');
@@ -180,13 +184,24 @@ var listen = function (worker) {
    */
   const updateGroupWithNewUsers = async function(worker, groupId, groupJson) {
     const keyring = new Keyring();
+    const crypto = new Crypto(keyring);
     let progressGoals = 100;
     let progress = 0;
+    let privateKey;
     const group = new Group();
-
     const dryRunPromise = group.save(groupJson, groupId, true);
     const keyringSyncPromise = keyring.sync();
-    const masterPassword = await passphraseController.get(worker);
+
+    // Passphrase required to decrypt a secret before sharing it.
+    // Get the passphrase if needed and decrypt secret key
+    try {
+      const passphrase = await passphraseController.get(worker);
+      privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+
     await progressController.open(worker, 'Updating group ...', progressGoals);
     const dryRunResult = await dryRunPromise;
     await keyringSyncPromise;
@@ -198,7 +213,7 @@ var listen = function (worker) {
 
     groupJson['Secrets'] = await encryptSaveGroupSecrets(
       dryRunResult,
-      masterPassword,
+      privateKey,
       () => progressController.update(worker, progress++),
       message => { return index => progressController.update(worker, progress, message.replace('%0', parseInt(index) + 1)) }
     );
@@ -210,11 +225,14 @@ var listen = function (worker) {
 
   /**
    * Encrypt the secrets needed by a save group operation
-   * @param dryRunResult {object} the group response returned from a dry-run call.
-   * @param masterPassword {string} the private key master password
+   *
+   * @param {object} dryRunResult the group response returned from a dry-run call.
+   * @param {openpgp.key.Key} privateKey the decrypted private key
+   * @param {function} completeCallback
+   * @param {function} startCallback
    */
-  const encryptSaveGroupSecrets = async function (dryRunResult, masterPassword, completeCallback, startCallback) {
-    if (dryRunResult['dry-run'] == undefined || dryRunResult['dry-run'] == 0 || dryRunResult['dry-run']['SecretsNeeded'] == 0) {
+  const encryptSaveGroupSecrets = async function (dryRunResult, privateKey, completeCallback, startCallback) {
+    if (dryRunResult['dry-run'] === undefined || dryRunResult['dry-run'] === 0 || dryRunResult['dry-run']['SecretsNeeded'] === 0) {
       return;
     }
 
@@ -224,7 +242,7 @@ var listen = function (worker) {
 
     // Decrypt all the secrets.
     const messagesOriginEncrypted = secretsOrigin.reduce((result, item) => [...result, item.Secret[0].data], []);
-    const messagesOriginDecrypted = await crypto.decryptAll(messagesOriginEncrypted, masterPassword, completeCallback, startCallback(`Decrypting %0/${secretsOrigin.length}`));
+    const messagesOriginDecrypted = await crypto.decryptAll(messagesOriginEncrypted, privateKey, completeCallback, startCallback(`Decrypting %0/${secretsOrigin.length}`));
     secretsOrigin.forEach((secret, i) => secret['Secret'][0].dataDecrypted = messagesOriginDecrypted[i]);
 
     // Encrypt all the secrets for the new users.
@@ -232,7 +250,7 @@ var listen = function (worker) {
       const secretOrigin = secretsOrigin.find(secretOrigin => secretNeeded.Secret.resource_id === secretOrigin.Secret[0].resource_id);
       return {userId: secretNeeded['Secret'].user_id, message: secretOrigin.Secret[0].dataDecrypted}
     });
-    const messagesNeeededEncrypted = await crypto.encryptAll(encryptAllData, completeCallback, startCallback('Encrypting %0/' + secretsNeeded.length));
+    const messagesNeeededEncrypted = await crypto.encryptAll(encryptAllData, privateKey, completeCallback, startCallback('Encrypting %0/' + secretsNeeded.length));
     messagesNeeededEncrypted.forEach((messageEncrypted, i) => secretsNeeded[i].Secret.data = messageEncrypted);
 
     return secretsNeeded;

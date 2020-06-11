@@ -11,13 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+const __ = require('../../sdk/l10n').get;
 const fileController = require('../fileController');
 const passphraseController = require('../passphrase/passphraseController');
-const KeepassDb = require('../../model/keepassDb/keepassDb').KeepassDb;
-const CsvDb = require('../../model/csvDb').CsvDb;
-const Crypto = require('../../model/crypto').Crypto;
+const {KeepassDb} = require('../../model/keepassDb/keepassDb');
+const {CsvDb} = require('../../model/csvDb');
+const {Crypto} = require('../../model/crypto');
 const progressController = require('../progress/progressController');
-
 
 class ExportController {
 
@@ -57,7 +57,7 @@ class ExportController {
     } else if (format === 'kdbx') {
       this.format = "kdbx"
     } else {
-      throw error('Export format is not supported');
+      throw error(__('Export format is not supported'));
     }
   }
 
@@ -136,7 +136,7 @@ class ExportController {
 
   /**
    * Get mime type from file extension.
-   * @param extension
+   * @param {string} extension kdbx or csv or text/plain
    * @return {string}
    */
   static getMimeType(extension) {
@@ -183,12 +183,22 @@ class ExportController {
    */
   async _decryptSecrets(secrets) {
     const crypto = new Crypto();
+    let privateKey;
 
     // Master password required to decrypt a secret before sharing it.
-    const masterPassword = await passphraseController.get(this.worker);
-    progressController.open(this.worker, 'Decrypting...', this.resources.length);
+    // Get the passphrase if needed and decrypt secret key
+    try {
+      const passphrase = await passphraseController.get(this.worker);
+      privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+
+    await progressController.open(this.worker, __('Decrypting...'), this.resources.length);
     const armored = this._prepareArmoredList();
-    return crypto.decryptAll(armored, masterPassword,
+
+    return crypto.decryptAll(armored, privateKey,
       // On complete.
        () => {
         progressController.update(this.worker, this.progressStatus++);
@@ -208,7 +218,9 @@ class ExportController {
   _prepareArmoredList() {
     const armored = [];
     for(let i in this.resources) {
-      armored.push(this.resources[i].secrets[0].data);
+      if (this.resources.hasOwnProperty(i)) {
+        armored.push(this.resources[i].secrets[0].data);
+      }
     }
     return armored;
   };
@@ -222,7 +234,9 @@ class ExportController {
    */
   static _addDecryptedSecretsToResources(resources, secrets) {
     for (let i in resources) {
-      resources[i].secretClear = secrets[i];
+      if (resources.hasOwnProperty(i)) {
+        resources[i].secretClear = secrets[i];
+      }
     }
     return resources;
   };

@@ -11,18 +11,22 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+const __ = require('../../sdk/l10n').get;
 const Worker = require('../../model/worker');
-const fileController = require('../../controller/fileController');
-const KeepassDb = require('../../model/keepassDb/keepassDb').KeepassDb;
-const CsvDb = require('../../model/csvDb').CsvDb;
-const Keyring = require('../../model/keyring').Keyring;
-const Resource = require('../../model/resource').Resource;
-const Crypto = require('../../model/crypto').Crypto;
-const progressController = require('../progress/progressController');
-const User = require('../../model/user').User;
-const {FolderModel} = require('../../model/folder/folderModel');
+
+const {Crypto} = require('../../model/crypto');
+const {CsvDb} = require('../../model/csvDb');
 const {FolderEntity} = require('../../model/entity/folder/folderEntity');
-const Tag = require('../../model/tag').Tag;
+const {FolderModel} = require('../../model/folder/folderModel');
+const {KeepassDb} = require('../../model/keepassDb/keepassDb');
+const {Keyring} = require('../../model/keyring');
+const {Resource} = require('../../model/resource');
+const {Tag} = require('../../model/tag');
+const {User} = require('../../model/user');
+
+const progressController = require('../progress/progressController');
+const passphraseController = require('../passphrase/passphraseController');
+const fileController = require('../../controller/fileController');
 
 class ImportController {
   /**
@@ -83,6 +87,9 @@ class ImportController {
       'resources': [],
       'foldersPaths': []
     }
+
+    this.keyring = new Keyring();
+    this.crypto = new Crypto(this.keyring);
   }
 
   /**
@@ -90,18 +97,30 @@ class ImportController {
    * @return {Promise<{folders, importTag: *, resources}>}
    */
   async exec() {
+    let passphrase;
+    let privateKey;
+
     if (this.fileType === 'kdbx') {
       await this.initFromKdbx();
     } else if(this.fileType === 'csv') {
       await this.initFromCsv();
     }
 
+    // Get the passphrase if needed and decrypt secret key
+    try {
+      passphrase = await passphraseController.get(this.worker);
+      privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+
     this._prepareFolders();
     this.prepareProgressCounter();
 
-    await progressController.open(this.worker, 'Importing ...', this.operationsCount, "Preparing import");
+    await progressController.open(this.worker, __('Importing ...'), this.operationsCount, __("Preparing import"));
     try {
-      await this.encryptSecretsAndAddToResources();
+      await this.encryptSecretsAndAddToResources(privateKey);
       let folders;
       if (this.options.importFolders) {
         const folderBatches = this.prepareFoldersBatches(this.items.foldersPaths);
@@ -129,15 +148,13 @@ class ImportController {
 
       await progressController.close(this.worker);
 
-      const result = {
+      return {
         "resources": resources,
         "folders": folders,
         "tags": tags,
         "importTag": this.uniqueImportTag,
         "options": this.options
       };
-
-      return result;
     } catch(e) {
       await progressController.close(this.worker);
       throw Error(e);
@@ -146,10 +163,8 @@ class ImportController {
 
   /**
    * Import the tags associated to an imported resource
-   * @param string resourceId the resource identifier
-   * @param array categories the resource categories that will be converted in tags
-   * @param object options
-   *  * bool categoriesAsTags
+   *
+   * @param {object} resource
    * @private
    */
   saveTags(resource) {
@@ -157,6 +172,9 @@ class ImportController {
     return Tag.add(resource.id, tags);
   };
 
+  /**
+   * Progress counter helper
+   */
   prepareProgressCounter() {
     // The default objective is the number of resources multiplied by 2 because:
     // - we will first encrypt each resource secret. Each encryption succeeded is one step.
@@ -180,7 +198,7 @@ class ImportController {
    * Initialize passwords controller from a kdbx file.
    * @returns {*}
    */
-  async initFromKdbx () {
+  async initFromKdbx() {
     const kdbxFile = fileController.b64ToBlob(this.fileB64Content);
     if (this.options.credentials.keyFile !== null && this.options.credentials.keyFile !== undefined) {
       credentials.keyFile = fileController.b64ToBlob(this.options.credentials.keyFile);
@@ -197,7 +215,7 @@ class ImportController {
    * Initialize controller from a csv file.
    * @returns {*}
    */
-  async initFromCsv () {
+  async initFromCsv() {
     const csvFile = fileController.b64ToBlob(this.fileB64Content);
     const csvDb = new CsvDb();
     return await csvDb.loadDb(csvFile)
@@ -208,11 +226,11 @@ class ImportController {
 
   /**
    * Encrypt a resource clear password into an armored message.
+   * @param {openpgp.key.Key} privateKey decrypted private key
    * @returns {*}
    */
-  async encryptSecretsAndAddToResources() {
-    const keyring = new Keyring(),
-      user = User.getInstance();
+  async encryptSecretsAndAddToResources(privateKey) {
+    const user = User.getInstance();
 
     this.resources = this.items.resources;
     this.operationsCount = this.resources.length * 2;
@@ -221,8 +239,8 @@ class ImportController {
       userId = currentUser.id;
 
     // Sync the keyring with the server.
-    await keyring.sync();
-    const armoredSecrets = await this._encryptSecretsForUser(userId);
+    await this.keyring.sync();
+    const armoredSecrets = await this._encryptSecretsForUser(userId, privateKey);
     return this._enrichResourcesWithArmoredSecret(armoredSecrets);
   };
 
@@ -246,10 +264,10 @@ class ImportController {
   /**
    * Retrieve a folder from its path (during the import process).
    * Will return either a folder object, or undefined if the folder has not been created yet.
-   * @param path
+   * @param {string} path
    * @return {*}
    */
-  getFolderFromPath (path) {
+  getFolderFromPath(path) {
     if (this.folders[path]) {
       return this.folders[path];
     }
@@ -259,7 +277,7 @@ class ImportController {
 
   /**
    * Get consolidated path.
-   * @param path
+   * @param {string} path
    * @return {string|*}
    * @private
    */
@@ -306,6 +324,11 @@ class ImportController {
     return this.folders[folderPath];
   }
 
+  /**
+   * Save resource
+   * @param {object} resource
+   * @returns {Promise<unknown>}
+   */
   async saveResource(resource) {
     // Manage parent folder if exists (has been created).
     let folderPath = this._getConsolidatedPath(resource.folderParentPath);
@@ -319,13 +342,14 @@ class ImportController {
 
   /**
    * Import a batch of resources.
-   * @param array resourcesBatch batch of resources to save.
-   * @param int batchNumber batch number
-   * @param int batchSize maximum number of resources a batch can contain
+   *
+   * @param {array} resourcesBatch batch of resources to save.
+   * @param {int} batchNumber batch number
+   * @param {function} importFn import function callback
    * @return Promise
    */
-  async importBatch (resourcesBatch, batchNumber, importFn) {
-    this.currentBatchNumber ++;
+  async importBatch(resourcesBatch, batchNumber, importFn) {
+    this.currentBatchNumber++;
     const importResults = {
       "created" : [],
       "errors" : []
@@ -334,13 +358,13 @@ class ImportController {
     const promises = resourcesBatch.map(resource => {
       return importFn(resource)
       .then(resource => {
-        this.currentItemNumber ++;
+        this.currentItemNumber++;
         this.currentOperationNumber++;
         progressController.update(this.worker, this.currentOperationNumber, `Importing...  ${this.currentItemNumber}/${this.itemsCount}`);
         importResults.created.push(resource);
       })
       .catch(e => {
-        this.currentItemNumber ++;
+        this.currentItemNumber++;
         this.currentOperationNumber++;
         progressController.update(this.worker, this.currentOperationNumber, `Importing...  ${this.currentItemNumber}/${this.itemsCount}`);
         importResults.errors.push({
@@ -438,10 +462,12 @@ class ImportController {
     let batchNumber = 0;
     // Import the batches sequentially
     for (let i in batches) {
-      const batch = batches[i];
-      const importBatchResult = await this.importBatch(batch, batchNumber++, importFn);
-      batchResults.created = [...batchResults.created, ...importBatchResult.created];
-      batchResults.errors = [...batchResults.errors, ...importBatchResult.errors];
+      if (batches.hasOwnProperty(i)) {
+        const batch = batches[i];
+        const importBatchResult = await this.importBatch(batch, batchNumber++, importFn);
+        batchResults.created = [...batchResults.created, ...importBatchResult.created];
+        batchResults.errors = [...batchResults.errors, ...importBatchResult.errors];
+      }
     }
 
     return batchResults;
@@ -449,26 +475,27 @@ class ImportController {
 
   /**
    * Encrypt a list of secrets for a given user id.
-   * @param userId
+   * @param {string} userId
+   * @param {openpgp.key.Key} privateKey decrypted private key
    * @returns {promise}
    * @private
    */
-  async _encryptSecretsForUser (userId) {
-    const crypto = new Crypto();
-
+  async _encryptSecretsForUser (userId, privateKey) {
     // Format resources for the format expected by encryptAll.
     this.items.resources = ImportController._prepareResources(this.items.resources, userId);
 
     // Encrypt all the messages.
-    return crypto.encryptAll(
+    return this.crypto.encryptAll(
       this.items.resources,
+      privateKey,
       // On complete.
        () => {
         progressController.update(this.worker, this.currentOperationNumber++);
       },
       // On start.
       (position) => {
-        progressController.update(this.worker, this.currentOperationNumber, 'Encrypting ' + (parseInt(position) + 1) + '/' + this.items.resources.length);
+        const message = 'Encrypting ' + (parseInt(position) + 1) + '/' + this.items.resources.length;
+        progressController.update(this.worker, this.currentOperationNumber, message);
       });
   };
 
@@ -482,16 +509,18 @@ class ImportController {
       throw Error('There was a problem while encrypting the secrets');
     }
     for (let i in armoredSecrets) {
-      if (this.items.resources[i].message !== '') {
-        this.items.resources[i].secrets = [
-          {
-            data : armoredSecrets[i],
-          }
-        ];
+      if (armoredSecrets.hasOwnProperty(i)) {
+        if (this.items.resources[i].message !== '') {
+          this.items.resources[i].secrets = [
+            {
+              data : armoredSecrets[i],
+            }
+          ];
+        }
+        // Remove data that were added by _prepareResources().
+        delete this.items.resources[i].message;
+        delete this.items.resources[i].userId;
       }
-      // Remove data that were added by _prepareResources().
-      delete this.items.resources[i].message;
-      delete this.items.resources[i].userId;
     }
   };
 
@@ -525,13 +554,12 @@ class ImportController {
    * @private
    */
   static _prepareResources (resources, userId) {
-    const resourcesToEncrypt = resources.map(function(resource) {
+    return resources.map(function(resource) {
       resource.userId = userId;
       resource.message = resource.secretClear;
       delete resource.secretClear;
       return resource;
     });
-    return resourcesToEncrypt;
   };
 }
 

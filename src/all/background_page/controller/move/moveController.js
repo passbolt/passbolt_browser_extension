@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+const __ = require('../../sdk/l10n').get;
 const {MoveResourcesController} = require('./moveResourcesController');
 const {MoveFolderController} = require('./moveFolderController');
 
@@ -38,7 +39,7 @@ class MoveController {
    */
   async main(moveDto) {
     if (!moveDto) {
-      throw new TypeError('Move controller parameters cannot be empty');
+      throw new TypeError(__('Move controller parameters cannot be empty'));
     }
 
     let folderParentId = moveDto.folderParentId ? moveDto.folderParentId : null;
@@ -47,10 +48,10 @@ class MoveController {
 
     // TODO
     if (resourcesIds.length && foldersIds.length) {
-      throw new TypeError('Multi resource and folder move is not supported.');
+      throw new TypeError(__('Multi resource and folder move is not supported.'));
     }
     if (foldersIds.length > 1) {
-      throw new TypeError('Multi folder move is not supported.');
+      throw new TypeError(__('Multi folder move is not supported.'));
     }
 
     // Move multiple resources at once

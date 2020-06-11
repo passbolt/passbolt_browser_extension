@@ -11,6 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.8.0
  */
+const __ = require('../../sdk/l10n').get;
+const {Crypto} = require('../../model/crypto');
 const {Keyring} = require('../../model/keyring');
 const {Share} = require('../../model/share');
 const passphraseController = require('../passphrase/passphraseController');
@@ -37,27 +39,37 @@ class ShareResourcesController {
    */
   async main(resources, changes) {
     const keyring = new Keyring();
+    const crypto = new Crypto(keyring);
+
     let progress = 0;
+    let privateKey;
 
     // Number of goals is (number of resources * 3) + 1 :
     // why 3: simulate call to the API + encrypting step + share call to the API
     // why +1: this function initialization step
     const progressGoal = resources.length * 3 + 1;
-    const passphrase = await passphraseController.get(this.worker);
+
+    try {
+      let passphrase = await passphraseController.get(this.worker);
+      privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
 
     try {
       let msg = `Share ${resources.length} passwords`;
       if (resources.length === 1) {
         msg  = `Share one password`;
       }
-      await progressController.open(this.worker, msg, progressGoal, 'Initialize');
-      await progressController.update(this.worker, progress++, 'Synchronizing keys');
+      await progressController.open(this.worker, msg, progressGoal, __('Initialize'));
+      await progressController.update(this.worker, progress++, __('Synchronizing keys'));
       await keyring.sync();
-      await Share.bulkShareResources(resources, changes, passphrase, async message => {
+      await Share.bulkShareResources(resources, changes, privateKey, async message => {
         await progressController.update(this.worker, progress++, message);
       });
       const results = resources.map(resource => resource.id);
-      await progressController.update(this.worker, progressGoal, 'Done!');
+      await progressController.update(this.worker, progressGoal, __('Done!'));
       await progressController.close(this.worker);
       return results;
     } catch(error) {

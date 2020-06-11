@@ -11,15 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.9.0
  */
+const __ = require('../../sdk/l10n').get;
 const {Keyring} = require('../../model/keyring');
 const {Share} = require('../../model/share');
 const {Crypto} = require('../../model/crypto');
 const {User} = require('../../model/user');
 
 const {FolderModel} = require('../../model/folder/folderModel');
-const {PermissionChangesCollection}  = require("../../model/entity/permission/permissionChangesCollection");
-const {PermissionsCollection}  = require("../../model/entity/permission/permissionsCollection");
-const {PermissionEntity} = require('../../model/entity/permission/permissionEntity');
 const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
 const {ResourceModel} = require('../../model/resource/resourceModel');
 const {SecretsCollection}  = require("../../model/entity/secret/secretsCollection");
@@ -51,7 +49,6 @@ class ResourceCreateController {
   async main(resource, password) {
     const crypto = new Crypto();
     const keyring = new Keyring();
-    let passphrase;
     let privateKey;
 
     let goals = resource.folderParentId ? 10 : 2; // arbitrarily "more" if parent permission folder
@@ -59,7 +56,7 @@ class ResourceCreateController {
 
     // Get the passphrase if needed and decrypt secret key
     try {
-      passphrase = await passphraseController.get(this.worker);
+      let passphrase = await passphraseController.get(this.worker);
       privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
     } catch (error) {
       console.error(error);
@@ -67,19 +64,19 @@ class ResourceCreateController {
     }
 
     try {
-      await progressController.open(this.worker, `Creating password`, goals, "Initializing");
-      await progressController.update(this.worker, progress++, "Encrypting secret");
+      await progressController.open(this.worker, __('Creating password'), goals, __('Initializing'));
+      await progressController.update(this.worker, progress++, __('Encrypting secret'));
 
       // Encrypt and sign
       const secret = await crypto.encrypt(password, User.getInstance().get().id, privateKey);
       resource.secrets = new SecretsCollection([{data:secret}]);
 
       // Save
-      await progressController.update(this.worker, progress++, "Creating password");
+      await progressController.update(this.worker, progress++, __('Creating password'));
       resource = await this.resourceModel.create(resource);
 
       if (resource.folderParentId) {
-        await progressController.update(this.worker, progress++, "Calculate permissions");
+        await progressController.update(this.worker, progress++, __('Calculate permissions'));
         // Calculate changes if any
         let destinationFolder = await this.folderModel.findForShare(resource.folderParentId);
         let changes = await this.resourceModel.calculatePermissionsChangesForCreate(resource, destinationFolder);
@@ -90,13 +87,13 @@ class ResourceCreateController {
           await progressController.updateGoals(this.worker, goals);
 
           // Sync keyring
-          await progressController.update(this.worker, progress++, "Synchronizing keys");
+          await progressController.update(this.worker, progress++, __('Synchronizing keys'));
           await keyring.sync();
 
           // Share
-          await progressController.update(this.worker, progress++, "Start sharing");
+          await progressController.update(this.worker, progress++, __('Start sharing'));
           const resourcesToShare = [resource.toDto({secrets: true})];
-          await Share.bulkShareResources(resourcesToShare, changes.toDto(), passphrase, async message => {
+          await Share.bulkShareResources(resourcesToShare, changes.toDto(), privateKey, async message => {
             await progressController.update(this.worker, progress++, message);
           });
         }
@@ -107,7 +104,7 @@ class ResourceCreateController {
       throw error;
     }
 
-    await progressController.update(this.worker, goals, "Done!");
+    await progressController.update(this.worker, goals, __('Done!'));
     await progressController.close(this.worker);
 
     return resource;

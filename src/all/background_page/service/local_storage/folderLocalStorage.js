@@ -48,7 +48,7 @@ class FolderLocalStorage {
    * Set the folders local storage.
    *
    * @param {FoldersCollection} foldersCollection The folders to insert in the local storage.
-   * @return {Array<Object>} array of folder dtos
+   * @return {void}
    */
   static async set(foldersCollection) {
     await lock.acquire();
@@ -60,9 +60,8 @@ class FolderLocalStorage {
       FolderLocalStorage.assertEntityBeforeSave(folderEntity);
       folders.push(folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
     }
-    const result = await browser.storage.local.set({folders});
+    await browser.storage.local.set({folders});
     lock.release();
-    return result;
   };
 
   /**

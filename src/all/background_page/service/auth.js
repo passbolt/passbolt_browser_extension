@@ -90,7 +90,7 @@ const _isAuthenticated = async function () {
   }
 
   try {
-    responseJson = await response.json();
+    await response.json();
   } catch (error) {
     // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
     throw new PassboltBadResponseError();
@@ -105,7 +105,7 @@ const _isAuthenticated = async function () {
     throw new MfaAuthenticationRequiredError();
   }
   // Entry point not found.
-  else if (response.status == 404) {
+  else if (response.status === 404) {
     throw new NotFoundError();
   }
 

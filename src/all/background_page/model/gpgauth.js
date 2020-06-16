@@ -23,6 +23,7 @@ const {GpgAuthHeader} = require('./gpgAuthHeader');
 const {MfaAuthenticationRequiredError} = require('../error/mfaAuthenticationRequiredError');
 const {Request} = require('./request');
 const {SiteSettings} = require('./siteSettings');
+const {AuthStatusLocalStorage} = require('../service/local_storage/authStatusLocalStorage');
 
 const URL_VERIFY = '/auth/verify.json?api-version=v1';
 const URL_LOGIN = '/auth/login.json?api-version=v1';
@@ -45,7 +46,7 @@ class GpgAuth {
     // Check the authentication status interval.
     this.checkIsAuthenticatedTimeout = null;
     // Latest stored auth user status.
-    this._authStatus = null;
+    this.authStatus = null;
   }
 
   /**
@@ -178,7 +179,7 @@ class GpgAuth {
       credentials: 'include'
     };
 
-    this._authStatus = {isAuthenticated: false, isMfaRequired: false};
+    this.authStatus = {isAuthenticated: false, isMfaRequired: false};
     const event = new Event('passbolt.global.auth.logged-out');
     window.dispatchEvent(event);
 
@@ -325,8 +326,18 @@ class GpgAuth {
     }, options);
 
     // No request to API required, return the latest stored information.
-    if (!options.requestApi && this._authStatus !== null) {
-      return this._authStatus;
+    // Check in the local storage if any
+    if (!options.requestApi) {
+      try {
+        const storedStatus = await AuthStatusLocalStorage.get();
+        if (storedStatus) {
+          this.authStatus = storedStatus;
+          return this.authStatus;
+        }
+      } catch(error) {
+        // Nothing found, check with the API
+        // continue...
+      }
     }
 
     try {
@@ -341,9 +352,9 @@ class GpgAuth {
       }
     }
 
-    this._authStatus = {isAuthenticated, isMfaRequired};
-
-    return this._authStatus;
+    this.authStatus = {isAuthenticated, isMfaRequired};
+    await AuthStatusLocalStorage.set(isAuthenticated, isMfaRequired);
+    return this.authStatus;
   };
 
   /**

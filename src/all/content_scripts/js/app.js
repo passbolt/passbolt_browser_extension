@@ -439,8 +439,8 @@ window.addEventListener('passbolt.auth.is-authenticated', async function (event)
   const options = event.detail[1];
 
   try {
-    const isAutenticated = await passbolt.request('passbolt.auth.is-authenticated', options);
-    passbolt.message.emitToPage(requestId, { status: 'SUCCESS', body: isAutenticated });
+    const isAuthenticated = await passbolt.request('passbolt.auth.is-authenticated', options);
+    passbolt.message.emitToPage(requestId, { status: 'SUCCESS', body: isAuthenticated });
   } catch (error) {
     console.error(error);
     passbolt.message.emitToPage(requestId, { status: 'ERROR', body: error });

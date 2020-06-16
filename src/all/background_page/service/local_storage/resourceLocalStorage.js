@@ -47,6 +47,7 @@ class ResourceLocalStorage {
   /**
    * Set the resources in local storage.
    * @param {ResourcesCollection} resourcesCollection The folders to insert in the local storage.
+   * @return {void}
    */
   static async set(resourcesCollection) {
     await lock.acquire();
@@ -60,9 +61,8 @@ class ResourceLocalStorage {
         resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
       }
     }
-    const result = await browser.storage.local.set({resources});
+    await browser.storage.local.set({resources});
     lock.release();
-    return result;
   };
 
   /**
@@ -181,13 +181,13 @@ class ResourceLocalStorage {
   /**
    * Set the resources local storage.
    * @param {array} resources The resources to insert in the local storage.
+   * @return {void}
    * @deprecated
    */
   static async setLegacy(resources) {
     await lock.acquire();
-    const result = await browser.storage.local.set({ resources });
+    await browser.storage.local.set({ resources });
     lock.release();
-    return result;
   };
 
   /**

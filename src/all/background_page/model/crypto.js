@@ -62,7 +62,12 @@ class Crypto {
       options.privateKeys = [privateKey];
     }
 
-    let encryptedMessage = await openpgp.encrypt(options);
+    let encryptedMessage;
+    try {
+      encryptedMessage = await openpgp.encrypt(options);
+    } finally {
+      await openpgp.getWorker().clearKeyCache();
+    }
 
     return encryptedMessage.data;
   };
@@ -118,7 +123,13 @@ class Crypto {
    */
   async decryptWithKey(armoredMessage, privateKey) {
     const pgpMessage = await openpgp.message.readArmored(armoredMessage);
-    const decrypted = await openpgp.decrypt({privateKeys: [privateKey], message: pgpMessage});
+    let decrypted;
+
+    try {
+      decrypted = await openpgp.decrypt({privateKeys: [privateKey], message: pgpMessage});
+    } finally {
+      await openpgp.getWorker().clearKeyCache();
+    }
 
     return decrypted.data;
   };

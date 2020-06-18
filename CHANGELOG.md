@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-1326 Add support for signatures on share and import encryption operations
 
 ### Fixed
+- Fix import CSV file should create associated folders
 - Fix progress bar should never be more than 100%
 - GITHUB-238: As an administrator I should be able to install passbolt on a domain without a TLD.
 - BUGZILLA-1372288: Hide extension URL from page when inserting iframe in a content script

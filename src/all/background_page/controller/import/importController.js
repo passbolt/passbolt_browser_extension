@@ -220,7 +220,7 @@ class ImportController {
     const csvDb = new CsvDb();
     return await csvDb.loadDb(csvFile)
     .then(async db => {
-      this.items.resources = await csvDb.toResources(db);
+      this.items = await csvDb.toItems(db);
     });
   };
 

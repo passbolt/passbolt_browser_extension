@@ -2,13 +2,13 @@
  * CsvDb model.
  * Provides high level tools to work with a password csv file.
  */
-var Resource = require('./resource').Resource;
+const Resource = require('./resource').Resource;
 
 /**
  * Constructor.
  * @constructor
  */
-var CsvDb = function() {
+const CsvDb = function() {
   this.db = null;
 };
 
@@ -22,7 +22,8 @@ CsvDb.formats = {
     "uri": "URL",
     "secretClear": "Password",
     "description": "Notes",
-    "tags": "Group"
+    "tags": "Group",
+    "folderParentPath":"Group"
   },
   "lastpass": {
     "name": "name",
@@ -30,7 +31,8 @@ CsvDb.formats = {
     "uri": "url",
     "secretClear": "password",
     "description": "extra",
-    "tags": "grouping"
+    "tags": "grouping",
+    "folderParentPath":"grouping"
   },
   "1password": {
     "name": "Title",
@@ -38,23 +40,23 @@ CsvDb.formats = {
     "uri": "URL",
     "secretClear": "Password",
     "description": "Notes",
-    "tags": "Type"
+    "tags": "Type",
+    "folderParentPath":"Type"
   }
 };
 
 /**
  * load a db from file.
- * @param File kdbxFile file object as returned by the file field.
+ * @param {File} csvFile file object as returned by the file field.
  * @returns {Promise}
  */
 CsvDb.prototype.loadDb = function(csvFile) {
-  var self = this;
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve) => {
     PapaParse.parse(csvFile, {
       header: true,
       skipEmptyLines: true,
-      complete: function(results, file) {
-        self.db = results;
+      complete: function(results) {
+        this.db = results;
         resolve(results);
       }
     });
@@ -62,25 +64,76 @@ CsvDb.prototype.loadDb = function(csvFile) {
 };
 
 /**
+ * Transform a csv file into a list of Resources and folders
+ * @param {Array} csvDb
+ * @returns {Promise<object>} with resources and foldersPaths
+ */
+CsvDb.prototype.toItems = async function(csvDb) {
+  const resources = await this.toResources(csvDb);
+  return {
+    'resources': resources,
+    'foldersPaths': this.toFoldersPaths(resources),
+  };
+};
+
+/**
+ * Transform a csv file into a list of folders paths (that will later become folders).
+ * @param {Array} resources
+ * @returns {Array}
+ */
+CsvDb.prototype.toFoldersPaths = function(resources) {
+  let foldersPaths = [];
+
+  resources.forEach((resource) => {
+    if (resource.folderParentPath) {
+      let paths = this.getGroupPath(resource.folderParentPath);
+      foldersPaths = [...foldersPaths, ...paths];
+    }
+  });
+
+  // Remove duplicates and order.
+  foldersPaths = [...new Set(foldersPaths)].sort();
+  return foldersPaths;
+};
+
+/**
+ * Transform a group into a flat path by traversing the parents.
+ * @param {string} path
+ * @returns {array} path. Example: "/parent1/group"
+ */
+CsvDb.prototype.getGroupPath = function(path) {
+  const results = [];
+  const pathFragment = path.split('/');
+  let previous = '';
+  for (let i in pathFragment) {
+    let insert = previous + pathFragment[i];
+    results.push(insert);
+    previous = insert + '/';
+  }
+  return results;
+};
+
+/**
  * Transform a csv database into a list of Resources.
- * @param Array csvDb
+ * @param {Array} csvDb
  * @returns {Promise}
  */
-CsvDb.prototype.toResources = function(csvDb) {
-  var self = this;
-  return new Promise(function(resolve, reject) {
-    var resources = [];
-    for (var i in csvDb['data']) {
-      var csvEntry = csvDb['data'][i];
-      var formatName = self.getCsvFormat(csvEntry);
-      if (formatName == false) {
-        reject('CSV format is not recognized');
-      }
+CsvDb.prototype.toResources = async function(csvDb) {
+  return new Promise((resolve, reject) => {
+    const resources = [];
+    for (let i in csvDb['data']) {
+      if (csvDb['data'].hasOwnProperty(i)) {
+        const csvEntry = csvDb['data'][i];
+        const formatName = this.getCsvFormat(csvEntry);
+        if (formatName === false) {
+          reject('CSV format is not recognized');
+        }
 
-      var resource = new Resource();
-      var mapping = CsvDb.formats[formatName];
-      resource.fromCsvEntry(csvEntry, mapping);
-      resources.push(resource);
+        const resource = new Resource();
+        const mapping = CsvDb.formats[formatName];
+        resource.fromCsvEntry(csvEntry, mapping);
+        resources.push(resource);
+      }
     }
     resolve(resources);
   });
@@ -88,30 +141,30 @@ CsvDb.prototype.toResources = function(csvDb) {
 
 /**
  * Transform a list of resources into a CSV file content.
- * @param array resources
- * @param string format csv format
+ * @param {array} resources
+ * @param {string} format csv format
  * @returns {Promise} a promise containing the content of the csv file.
  */
 CsvDb.prototype.fromResources = function(resources, format) {
-  return new Promise(function(resolve, reject) {
-    var resource = new Resource(),
-      csvEntries = [],
-      csvContent = null;
+  return new Promise((resolve, reject) => {
+    const resource = new Resource();
+    const csvEntries = [];
+    let csvContent = null;
 
-    if(CsvDb.formats[format] == undefined) {
+    if (CsvDb.formats[format] === undefined) {
       return reject('This csv format is not supported');
     }
 
     try {
-      for (var i in resources) {
-        var csvEntry = resource.toCsvEntry(resources[i], CsvDb.formats[format]);
+      for (let i in resources) {
+        const csvEntry = resource.toCsvEntry(resources[i], CsvDb.formats[format]);
         csvEntries.push(csvEntry);
       }
       csvContent = PapaParse.unparse(csvEntries, {header: true, quotes: true});
       resolve(csvContent);
     } catch(e) {
       reject(e);
-    }
+    }s
   });
 };
 
@@ -121,8 +174,8 @@ CsvDb.prototype.fromResources = function(resources, format) {
  * @returns {*}
  */
 CsvDb.prototype.getCsvFormat = function(csvEntry) {
-  var formats = CsvDb.formats;
-  for (var formatName in formats) {
+  const formats = CsvDb.formats;
+  for (let formatName in formats) {
     if (CsvDb._checkFormat(csvEntry, formats[formatName])) {
       return formatName;
     }
@@ -138,9 +191,9 @@ CsvDb.prototype.getCsvFormat = function(csvEntry) {
  * @private
  */
 CsvDb._checkFormat = function(csvEntry, format) {
-  var match = true;
-  for (var i in format) {
-    if (csvEntry[format[i]] == undefined) {
+  let match = true;
+  for (let i in format) {
+    if (format.hasOwnProperty(i) && csvEntry[format[i]] === undefined) {
       match = false;
       break;
     }

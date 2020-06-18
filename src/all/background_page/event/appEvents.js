@@ -99,7 +99,7 @@ const listen = function (worker) {
       const secretPromise = Secret.findByResourceId(resourceId);
 
       // Ask for passphrase if needed
-      let passphrase = await passphraseController.get(this.worker);
+      let passphrase = await passphraseController.get(worker);
       privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
 
       // Finish fetching if needed and decrypt

@@ -164,7 +164,7 @@ class FolderEntity extends Entity {
 
   /**
    * Get folder parent id
-   * @returns {(string|null)} uuid parent folder
+   * @returns {string|null} uuid parent folder
    */
   get folderParentId() {
     return this._props.folder_parent_id || null;

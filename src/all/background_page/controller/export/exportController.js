@@ -18,6 +18,7 @@ const {KeepassDb} = require('../../model/keepassDb/keepassDb');
 const {CsvDb} = require('../../model/csvDb');
 const {Crypto} = require('../../model/crypto');
 const progressController = require('../progress/progressController');
+const {FoldersCollection} = require('../../model/entity/folder/foldersCollection');
 
 class ExportController {
 
@@ -91,6 +92,12 @@ class ExportController {
    */
   convertResourcesToCsv(options) {
     const csvDb = new CsvDb();
+    const foldersCollection = new FoldersCollection(this.folders);
+
+    for (let i=0; i < this.resources.length; i++) {
+      this.resources[i].folderParentPath = foldersCollection.getFolderPath(this.resources[i].folder_parent_id);
+    }
+
     return csvDb.fromResources(this.resources, options.format);
   };
 

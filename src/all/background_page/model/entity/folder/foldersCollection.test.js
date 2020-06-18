@@ -245,4 +245,47 @@ describe("Folders collection entity", () => {
     set2.merge(set1);
     expect(set2.length).toBe(3);
   });
+
+  it("getFolderPath works", () => {
+    // folder001
+    //    folder011
+    //       folder 111
+    //    folder012
+    // folder002
+    const dto1 = [{
+      "id": "e2172205-139c-4e4b-a03a-933528123001",
+      "folder_parent_id": null,
+      "name": "folder001"
+    }, {
+      "id": "e2172205-139c-4e4b-a03a-933528123011",
+      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123001",
+      "name": "folder011"
+    }, {
+      "id": "e2172205-139c-4e4b-a03a-933528123111",
+      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123011",
+      "name": "folder111"
+    }, {
+      "id": "e2172205-139c-4e4b-a03a-933528123012",
+      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123001",
+      "name": "folder012"
+    }, {
+      "id": "e2172205-139c-4e4b-a03a-933528123002",
+      "folder_parent_id": null,
+      "name": "folder002"
+    }];
+    const collection = new FoldersCollection(dto1);
+    let path;
+
+    path = collection.getFolderPath(null);
+    expect(path).toEqual('/')
+
+    path = collection.getFolderPath('e2172205-139c-4e4b-a03a-933528123001');
+    expect(path).toEqual('/folder001');
+
+    path = collection.getFolderPath('e2172205-139c-4e4b-a03a-933528123011');
+    expect(path).toEqual('/folder001/folder011');
+
+    path = collection.getFolderPath('e2172205-139c-4e4b-a03a-933528123111');
+    expect(path).toEqual('/folder001/folder011/folder111')
+  });
 });

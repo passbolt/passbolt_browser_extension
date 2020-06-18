@@ -123,9 +123,21 @@ class EntityCollection extends Entity {
   /**
    * Push an item in the list
    * @param {*} item
+   * @returns {int} new length of collection
    */
   push(item) {
     this._items.push(item);
+    return this._items.length;
+  }
+
+  /**
+   * Add an item at the beggining of the list
+   * @param {*} item
+   * @returns {int} new length of collection
+   */
+  unshift(item) {
+    this._items.unshift(item);
+    return this._items.length;
   }
 }
 

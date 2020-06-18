@@ -178,6 +178,59 @@ class FoldersCollection extends EntityCollection {
     return outputCollection;
   }
 
+  /**
+   *
+   * @param folderId
+   * @returns {string}
+   */
+  getFolderPath(folderId) {
+    if (folderId === null) {
+      return '/';
+    }
+    const folder = this.folders.find(item => item.id === folderId);
+    if (!folder) {
+      let msg = `FoldersCollection::getAllParentsAsPath the folder is missing in the inputCollection.`;
+      msg += `(id: ${folderId})`;
+      throw new Error(msg);
+    }
+    const parents = this.getAllParents(folder);
+    parents.unshift(folder);
+    return '/' + (parents.folders.map(folder => folder.name)).reverse().join('/');
+  }
+
+  /**
+   * Find all parent
+   *
+   * @param {FolderEntity} folder
+   * @returns {FoldersCollection}
+   */
+  getAllParents(folder) {
+    return FoldersCollection.getAllParents(folder, this, new FoldersCollection([]))
+  }
+
+  /**
+   * Recursive parent find for a given folder and a collection of folders
+   *
+   * @param {FolderEntity} folder
+   * @param {FoldersCollection} inputCollection
+   * @param {FoldersCollection} outputCollection carried forward
+   * @returns {FoldersCollection} outputCollection final
+   */
+  static getAllParents(folder, inputCollection, outputCollection) {
+    if (folder.folderParentId !== null) {
+      const parent = inputCollection.folders.find(item => item.id === folder.folderParentId);
+      if (parent !== undefined) {
+        outputCollection.push(parent);
+        FoldersCollection.getAllParents(parent, inputCollection, outputCollection);
+      } else {
+        let msg = `FoldersCollection::getAllParents the parent folder is missing in the inputCollection.`;
+        msg += `(id: ${current.folderParentId})`;
+        throw new Error(msg);
+      }
+    }
+    return outputCollection;
+  }
+
   // ==================================================
   // Setters
   // ==================================================

@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
+### Added
+- Increase the number of passwords the quickaccess suggests
+
 ## [2.13.4] - 2020-06-11
 ### Added
 - PB-1290 As a user I can choose which permission changes strategy to apply on a move

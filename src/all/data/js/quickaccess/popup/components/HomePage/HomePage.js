@@ -5,7 +5,7 @@ import AppContext from "../../contexts/AppContext";
 import SimpleBar from "../SimpleBar/SimpleBar";
 import canSuggestUrl from "./canSuggestUrl";
 
-const SUGGESTED_RESOURCES_LIMIT = 3;
+const SUGGESTED_RESOURCES_LIMIT = 20;
 const BROWSED_RESOURCES_LIMIT = 500;
 
 class HomePage extends React.Component {

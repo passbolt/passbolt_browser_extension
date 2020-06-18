@@ -353,7 +353,7 @@ class Keyring {
 
     // Launch key pair generation from openpgp worker.
     return openpgp.generateKey({
-      numBits: keyInfo.length,
+      rsaBits: keyInfo.length,
       userIds: key.getUserId(),
       passphrase: passphrase
     });

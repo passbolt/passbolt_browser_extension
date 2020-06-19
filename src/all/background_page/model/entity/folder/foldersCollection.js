@@ -222,10 +222,6 @@ class FoldersCollection extends EntityCollection {
       if (parent !== undefined) {
         outputCollection.push(parent);
         FoldersCollection.getAllParents(parent, inputCollection, outputCollection);
-      } else {
-        let msg = `FoldersCollection::getAllParents the parent folder is missing in the inputCollection.`;
-        msg += `(id: ${current.folderParentId})`;
-        throw new Error(msg);
       }
     }
     return outputCollection;

@@ -95,7 +95,9 @@ class ExportController {
     const foldersCollection = new FoldersCollection(this.folders);
 
     for (let i=0; i < this.resources.length; i++) {
-      this.resources[i].folderParentPath = foldersCollection.getFolderPath(this.resources[i].folder_parent_id);
+      if (this.resources[i].hasOwnProperty('folder_parent_id')) {
+        this.resources[i].folderParentPath = foldersCollection.getFolderPath(this.resources[i].folder_parent_id);
+      }
     }
 
     return csvDb.fromResources(this.resources, options.format);

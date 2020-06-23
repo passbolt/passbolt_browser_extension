@@ -2,11 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.13.4] - 2020-06-19
+## [2.13.4] - 2020-06-23
 ### Added
 - Increase the number of passwords the quickaccess suggests
 - PB-1290 As a user I can choose which permission changes strategy to apply on a move
 - PB-1326 Add support for signatures on share and import encryption operations
+
+### Improvements
+- PB-1348 Performance. Openpgpjs version bump v4.10.4
 
 ### Fixed
 - Fix CSV import and export should support folders
@@ -499,7 +502,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.3...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.4...HEAD
+[2.13.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.3...v2.13.4
 [2.13.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.2...v2.13.3
 [2.13.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.1...v2.13.2
 [2.13.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.0...v2.13.1

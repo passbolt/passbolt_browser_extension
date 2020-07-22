@@ -96,7 +96,11 @@ class ExportController {
 
     for (let i=0; i < this.resources.length; i++) {
       if (this.resources[i].hasOwnProperty('folder_parent_id')) {
-        this.resources[i].folderParentPath = foldersCollection.getFolderPath(this.resources[i].folder_parent_id);
+        let folderParentPath = "";
+        try {
+          folderParentPath = foldersCollection.getFolderPath(this.resources[i].folder_parent_id);
+        } catch(error) {}
+        this.resources[i].folderParentPath = folderParentPath;
       }
     }
 

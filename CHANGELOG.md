@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.13.5] - 2020-07-22
+### Fixed
+- Fix autofill should work when input type is not lowercase
+- Fix export to CSV should work if export does not include the resource associated folder
+
 ## [2.13.4] - 2020-06-23
 ### Added
 - Increase the number of passwords the quickaccess suggests

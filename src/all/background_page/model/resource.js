@@ -9,6 +9,7 @@ const Request = require('./request').Request;
 const User = require('./user').User;
 const {LegacyResourceService} = require('../service/resource');
 const {ResourceLocalStorage} = require('../service/local_storage/resourceLocalStorage');
+const {ResourceEntity} = require('./entity/resource/resourceEntity');
 
 /**
  * The class that deals with resources.
@@ -111,8 +112,10 @@ Resource.import = function (resource) {
       .then(
         function success(response) {
           response.json()
-            .then(function (json) {
+            .then(async function (json) {
               if (response.ok) {
+                const updatedResourceEntity = new ResourceEntity(json.body);
+                await ResourceLocalStorage.addResource(updatedResourceEntity);
                 resolve(json.body);
               } else {
                 reject(json);
@@ -175,6 +178,7 @@ Resource.findAllForShare = async function (resourcesIds) {
 /**
  * Update the resources local storage with the latest API resources the user has access.
  * @return {Promise}
+ * @deprecated see ResourceModel.updateLocalStorage
  */
 Resource.updateLocalStorage = async function () {
   const findOptions = {

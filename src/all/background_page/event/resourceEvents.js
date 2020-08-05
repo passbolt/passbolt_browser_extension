@@ -7,6 +7,7 @@
 const {User} = require('../model/user');
 const {Log} = require('../model/log');
 const {Resource} = require('../model/resource');
+const {ResourceModel} = require('../model/resource/resourceModel');
 const {ResourceEntity} = require('../model/entity/resource/resourceEntity');
 
 const {ResourceCreateController} = require('../controller/resource/resourceCreateController.js');
@@ -65,7 +66,7 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.resources.create', async function (requestId, resourceDto, password) {
     try {
-      const resourceEntity = new ResourceEntity(resourceDto)
+      const resourceEntity = new ResourceEntity(resourceDto);
       const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new ResourceCreateController(worker, requestId, clientOptions);
       const savedResource = await controller.main(resourceEntity, password);
@@ -90,7 +91,9 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.resources.delete-all', async function (requestId, resourcesIds) {
     try {
-      await Resource.deleteAll(resourcesIds);
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const resourceModel = new ResourceModel(clientOptions);
+      await resourceModel.deleteAll(resourcesIds);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       if (error instanceof Error) {

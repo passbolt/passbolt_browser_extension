@@ -3,7 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-- PB-1416 As LU deleting a folder, the resources local storage should be updated with the latest changes
+### Fixed
+- PB-1416 As LU deleting a folder it should update the resources local storage
+- PB-1417 As LU importing resources it should update the resources local storage
+- PB-1418 As LU deleting resources it should update the resources local storage after each delete to improve the feedback
 
 ## [2.13.5] - 2020-07-22
 ### Fixed

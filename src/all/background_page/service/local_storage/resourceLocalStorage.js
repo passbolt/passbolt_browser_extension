@@ -118,20 +118,18 @@ class ResourceLocalStorage {
   };
 
   /**
-   * Delete resources in the local storage by resources ids.
-   * @param {array} resourcesIds The list of resource ids
+   * Delete a resource in the local storage by id.
+   * @param {string} resourceId The resource id
    */
-  static async deleteResourcesById(resourcesIds) {
+  static async deleteResourceById(resourceId) {
     await lock.acquire();
     try {
       const resources = await ResourceLocalStorage.get();
       if (resources) {
-        resourcesIds.forEach(resourceId => {
-          const resourceIndex = resources.findIndex(item => item.id === resourceId);
-          if (resourceIndex !== -1) {
-            resources.splice(resourceIndex, 1);
-          }
-        });
+        const resourceIndex = resources.findIndex(item => item.id === resourceId);
+        if (resourceIndex !== -1) {
+          resources.splice(resourceIndex, 1);
+        }
         await browser.storage.local.set({ resources });
         lock.release();
       }

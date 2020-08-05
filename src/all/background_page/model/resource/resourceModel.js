@@ -201,6 +201,29 @@ class ResourceModel {
   }
 
   /**
+   * Delete a resource using Passbolt API and remove the resource from the local storage
+   *
+   * @param {string} resourceId The resource id
+   * @returns {Promise<void>}
+   */
+  async delete(resourceId) {
+    await this.resourceService.delete(resourceId);
+    await ResourceLocalStorage.deleteResourceById(resourceId);
+  }
+
+  /**
+   * Delete multiple resources
+   *
+   * @param {array} resourcesIds List of resources ids to delete
+   * @returns {Promise<void>}
+   */
+  async deleteAll(resourcesIds) {
+    return resourcesIds.reduce((promise, resourceId) => {
+      return promise.then(async () => this.delete(resourceId));
+    }, Promise.resolve([]));
+  }
+
+  /**
    * Move a folder using Passbolt API
    *
    * @param {string} resourceId the resource id

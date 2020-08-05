@@ -219,22 +219,4 @@ Resource.update = async function (data) {
   return resource;
 };
 
-/**
- * Delete all the resources
- *
- * @param {array} resourcesIds The resources ids to delete
- * @return {Promise}
- */
-Resource.deleteAll = async function (resourcesIds) {
-  const promise = resourcesIds.reduce((promise, resourceId) => {
-    return promise.then(() => LegacyResourceService.delete(resourceId));
-  }, Promise.resolve([]));
-  // Update local storage.
-  promise.then(async () => {
-    await ResourceLocalStorage.deleteResourcesById(resourcesIds);
-  });
-
-  return promise;
-};
-
 exports.Resource = Resource;

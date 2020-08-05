@@ -7,6 +7,7 @@
 const {FolderCreateController} = require('../controller/folder/folderCreateController');
 const {FolderEntity} = require('../model/entity/folder/folderEntity');
 const {FolderModel} = require('../model/folder/folderModel');
+const {ResourceModel} = require('../model/resource/resourceModel');
 const {User} = require('../model/user');
 
 const listen = function (worker) {
@@ -59,8 +60,13 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.folders.delete', async function (requestId, folderId, cascade) {
     try {
-      let folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const folderModel = new FolderModel(apiClientOptions);
+      const resourceModel = new ResourceModel(apiClientOptions);
+
       await folderModel.delete(folderId, cascade);
+      await resourceModel.updateLocalStorage();
+
       worker.port.emit(requestId, 'SUCCESS', folderId);
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));

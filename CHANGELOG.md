@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+- PB-1416 As LU deleting a folder, the resources local storage should be updated with the latest changes
+
 ## [2.13.5] - 2020-07-22
 ### Fixed
 - Fix autofill should work when input type is not lowercase

@@ -3,10 +3,14 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+### [2.13.5] - 2020-07-22
 ### Fixed
 - PB-1416 As LU deleting a folder it should update the resources local storage
 - PB-1417 As LU importing resources it should update the resources local storage
-- PB-1418 As LU deleting resources it should update the resources local storage after each delete to improve the feedback
+
+### Improved
+- PB-1418 As LU deleting resources it should update the resources local storage after each delete (improve the feedback)
 
 ## [2.13.5] - 2020-07-22
 ### Fixed
@@ -513,7 +517,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.4...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.6...HEAD
+[2.13.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.5...v2.13.6
+[2.13.5]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.4...v2.13.5
 [2.13.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.3...v2.13.4
 [2.13.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.2...v2.13.3
 [2.13.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.1...v2.13.2

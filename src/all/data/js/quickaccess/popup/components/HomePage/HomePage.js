@@ -73,8 +73,12 @@ class HomePage extends React.Component {
   }
 
   async getActiveTabUrl() {
-    const activeTabUrl = await passbolt.request("passbolt.active-tab.get-url");
-    this.setState({ activeTabUrl })
+    try {
+      const activeTabUrl = await passbolt.request("passbolt.active-tab.get-url");
+      this.setState({ activeTabUrl });
+    } catch(error) {
+      console.error(error);
+    }
   }
 
   /**

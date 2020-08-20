@@ -78,11 +78,9 @@ Port.prototype.getEmitableError = function (error) {
 /**
  * Send a message to the content code
  *
- * @param msgName string
- * @param token uuid
- * @param status SUCCESS | ERROR
+ * @param {string} message
  */
-Port.prototype.request = function (message) {
+Port.prototype.request = async function (message) {
   Log.write({level: 'debug', message: 'Port request @ message: ' + arguments[1]});
   // The generated requestId used to identify the request.
   const requestId = (Math.round(Math.random() * Math.pow(2, 32))).toString();
@@ -92,10 +90,10 @@ Port.prototype.request = function (message) {
   return new Promise((resolve, reject) => {
     this.on(requestId, function(status) {
       const responseArgs = Array.prototype.slice.call(arguments, 1);
-      if (status == 'SUCCESS') {
+      if (status === 'SUCCESS') {
         resolve.apply(null, responseArgs);
       }
-      else if (status == 'ERROR') {
+      else if (status === 'ERROR') {
         reject.apply(null, responseArgs);
       }
     });

@@ -110,14 +110,15 @@ class ResourceCreatePage extends React.Component {
       uriError: "",
     });
 
-    const resourceMeta = {
+    const resourceDto = {
       name: this.state.name,
       username: this.state.username,
       uri: this.state.uri
     };
+    const secretDto = this.state.password;
 
     try {
-      const resource = await passbolt.request("passbolt.resources.create", resourceMeta, this.state.password);
+      const resource = await passbolt.request("passbolt.resources.create", resourceDto, secretDto);
       // Remove the create step from the history.
       // The user needs to be redirected to the home page and not the create page while clicking on go back
       // password details page.

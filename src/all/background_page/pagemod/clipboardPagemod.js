@@ -7,7 +7,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var app = require('../app');
-var pageMod = require('../sdk/page-mod');
+const {PageMod} = require('../sdk/page-mod');
 var Worker = require('../model/worker');
 
 var Clipboard = function () {};
@@ -20,7 +20,7 @@ Clipboard.init = function () {
 			Clipboard._pageMod = undefined;
     }
 
-	  Clipboard._pageMod = pageMod.PageMod({
+	  Clipboard._pageMod = new PageMod({
         name: 'Clipboard',
         include: 'about:blank?passbolt=passbolt-iframe-clipboard',
 

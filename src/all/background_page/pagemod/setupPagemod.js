@@ -7,7 +7,7 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var pageMod = require('../sdk/page-mod');
+const {PageMod} = require('../sdk/page-mod');
 
 var app = require('../app');
 var Worker = require('../model/worker');
@@ -26,7 +26,7 @@ Setup.init = function () {
     Setup._pageMod = undefined;
   }
 
-  Setup._pageMod = pageMod.PageMod({
+  Setup._pageMod = new PageMod({
     name: 'Setup',
     include: chrome.runtime.getURL('data/setup.html'),
     contentScriptWhen: 'end',

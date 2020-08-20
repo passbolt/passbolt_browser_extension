@@ -16,7 +16,6 @@ $(function () {
    * Fill the login form.
    *
    * @param {Object} formData
-   * - {string} loginReqId The request id, to use in the response to complete the addon promise.
    * - {string} loginUsername The username to use
    * - {string} secret The password to use
    * - {string} url to get domain
@@ -91,16 +90,13 @@ $(function () {
 
   /**
    * Validate the fillForm parameters
-   * @param {string} requestId The autofill request id parameter
-   * @param {string} username The autofill request username paramater
-   * @param {string} secret The autofill request secret paramater
-   * @param {url} url The autofill request url paramater
+   * @param {object} formData
+   * - {string} username The autofill request username parameter
+   * - {string} secret The autofill request secret parameter
+   *  - {url} url The autofill request url parameter
    */
   const validateData = function (formData) {
-    const { requestId, username, secret, url } = formData;
-    if (typeof requestId !== 'string') {
-      throw new Error('The parameter requestId is not valid');
-    }
+    const { username, secret, url } = formData;
     if (typeof username !== 'string') {
       throw new Error('The parameter username is not valid');
     }
@@ -327,8 +323,8 @@ $(function () {
   };
 
   passbolt.quickaccess.bootstrap = function () {
-    passbolt.message.on('passbolt.quickaccess.fill-form', function (requestId, username, secret, url) {
-      const quickaccessFormData = { requestId, username, secret, url };
+    passbolt.message.on('passbolt.quickaccess.fill-form', function (username, secret, url) {
+      const quickaccessFormData = { username, secret, url };
       fillForm(quickaccessFormData);
     });
   };

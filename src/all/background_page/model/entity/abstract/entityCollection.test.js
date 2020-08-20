@@ -78,12 +78,16 @@ describe("EntityCollection", () => {
     // Push
     collection.push(new TestEntity({name: 'fourth'}));
     expect(collection.items.length).toBe(4);
-
-    // Iterator tests
     expect(collection.items[0].name).toEqual('first');
     expect(collection.items[1].name).toEqual('second');
     expect(collection.items[2].name).toEqual('first');
     expect(collection.items[4]).toEqual(undefined);
+
+    // Iterator tests
+    for (let item of collection) {
+      expect(item.name).toEqual('first');
+      break;
+    }
 
     // find all
     expect(collection.getAll('name', 'first').length).toBe(2);

@@ -11,7 +11,7 @@
  *
  */
 var app = require('../app');
-var pageMod = require('../sdk/page-mod');
+const {PageMod} = require('../sdk/page-mod');
 var Worker = require('../model/worker');
 
 var GroupEditAutocompleteDialog = function () {};
@@ -24,7 +24,7 @@ GroupEditAutocompleteDialog.init = function () {
         GroupEditAutocompleteDialog._pageMod = undefined;
     }
 
-    GroupEditAutocompleteDialog._pageMod = pageMod.PageMod({
+    GroupEditAutocompleteDialog._pageMod = new PageMod({
         name: 'GroupEditAutocomplete',
         include: 'about:blank?passbolt=passbolt-iframe-group-edit-autocomplete',
 

@@ -47,6 +47,7 @@ class ReactApp extends Component {
     this.getUserSettings();
     this.rememberMeInfo();
     this.getResources();
+    this.getResourceTypes();
     this.getFolders();
   }
 
@@ -169,6 +170,14 @@ class ReactApp extends Component {
     if (storageData.resources && storageData.resources.length) {
       const resources = storageData.resources;
       this.setState({resources: resources});
+    }
+  }
+
+  async getResourceTypes() {
+    const storageData = await browser.storage.local.get(["resourceTypes"]);
+    if (storageData.resourceTypes && storageData.resourceTypes.length) {
+      const resourceTypes = storageData.resourceTypes;
+      this.setState({resourceTypes: resourceTypes});
     }
   }
 
@@ -377,11 +386,14 @@ class ReactApp extends Component {
               <div id="app" className={`app ${isReady ? "ready" : ""}`} tabIndex="1000">
                 {this.state.showResourceCreateDialog &&
                 <PasswordCreateDialog onClose={this.handleResourceCreateDialogCloseEvent}
-                  folderParentId={this.state.resourceCreateDialogProps.folderParentId}/>
+                  folderParentId={this.state.resourceCreateDialogProps.folderParentId}
+                  resourceTypes={this.state.resourceTypes}
+                />
                 }
                 {this.state.showPasswordEditDialog &&
                 <PasswordEditDialog onClose={this.handleResourceEditDialogCloseEvent}
-                  id={this.state.passwordEditDialogProps.id}/>
+                  id={this.state.passwordEditDialogProps.id}
+                  resourceTypes={this.state.resourceTypes}/>
                 }
                 {this.state.showFolderCreateDialog &&
                 <FolderCreateDialog onClose={this.handleFolderCreateDialogCloseEvent}

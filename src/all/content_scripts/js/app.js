@@ -272,62 +272,6 @@ window.addEventListener('passbolt.plugin.favorite.delete', async function (event
 });
 
 /* ==================================================================================
- *  Secret edit
- * ================================================================================== */
-
-// The secret has been updated, notify the application.
-passbolt.message.on('passbolt.secret-edit.secret-updated', function () {
-  passbolt.message.emitToPage('secret_edition_secret_changed');
-});
-
-// The secret has the focus and the tab key is pressed, notify the application.
-passbolt.message.on('passbolt.secret-edit.tab-pressed', function () {
-  passbolt.message.emitToPage('secret_tab_pressed');
-});
-
-// The secret has the focus and the back tab key is pressed, notify the application.
-passbolt.message.on('passbolt.secret-edit.back-tab-pressed', function () {
-  passbolt.message.emitToPage('secret_backtab_pressed');
-});
-
-// The application asks the plugin secret-edit iframe to get the focus.
-window.addEventListener('passbolt.secret.focus', function () {
-  passbolt.message.emit('passbolt.secret-edit.focus');
-});
-
-// When the user wants to save the changes on their resource, the application
-// asks the plugin to encrypt the secret for all the users the resource
-// is shared with.
-// @deprecated since v2.12.0 will be removed with v2.3.0
-window.addEventListener('passbolt.secret_edition.encrypt', function (event) {
-  var usersIds = event.detail;
-  passbolt.request('passbolt.app.deprecated.secret-edit.encrypt', usersIds)
-    .then(function (armoreds) {
-      passbolt.message.emitToPage('secret_edition_secret_encrypted', armoreds);
-    });
-});
-
-// The validation can have been ordered by another worker.
-// Such as the secret that request a validation.
-// In this case the application should display the right feedback to the user.
-passbolt.message.on('passbolt.secret-edit.validate-success', function () {
-  $('.js_form_element_wrapper.js_form_secret_wrapper').removeClass('error');
-});
-passbolt.message.on('passbolt.secret-edit.validate-error', function () {
-  $('.js_form_element_wrapper.js_form_secret_wrapper').addClass('error');
-});
-
-// Before encrypting the edited secret, ensure the secret is valid.
-window.addEventListener('passbolt.secret_edition.validate', function (event) {
-  passbolt.request('passbolt.secret-edit.validate')
-    .then(function () {
-      passbolt.message.emitToPage('secret_edition_secret_validated', [true]);
-    }, function () {
-      passbolt.message.emitToPage('secret_edition_secret_validated', [false]);
-    });
-});
-
-/* ==================================================================================
  * Import / export actions
  * ================================================================================== */
 
@@ -347,7 +291,7 @@ passbolt.message.on('passbolt.export-passwords.complete', function () {
 
 // The application asks the plugin to decrypt an armored string
 // and store it in the clipboard.
-// @deprecated since v2.7 will be removed in v3.0
+// @deprecated since v2.7 will be removed in v3.x
 window.addEventListener('passbolt.secret.decrypt', function (event) {
   var armoredSecret = event.detail;
   passbolt.message.emit('passbolt.passbolt-page.remove-all-focuses');
@@ -413,7 +357,7 @@ window.addEventListener('passbolt.settings.download_public_key', function () {
 
 
 // Listen when the user requests an export of passwords.
-// @deprecated with v2.7.0 will be removed with v3.0
+// @deprecated with v2.7.0 will be removed with v3.x
 window.addEventListener('passbolt.export-passwords', async function (evt) {
   var resources = evt.detail.resources;
   if (resources && resources.length) {

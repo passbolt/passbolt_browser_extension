@@ -7,7 +7,7 @@
 const {User} = require('../model/user');
 const {Log} = require('../model/log');
 const {Resource} = require('../model/resource');
-const {ResourceEntity} = require('../model/entity/resource/resourceEntity');
+const {ResourceTypeModel} = require('../model/resourceType/resourceTypeModel');
 
 const {ResourceCreateController} = require('../controller/resource/resourceCreateController.js');
 const {ResourceUpdateController} = require('../controller/resource/resourceUpdateController.js');
@@ -22,7 +22,13 @@ const listen = function (worker) {
   worker.port.on('passbolt.resources.update-local-storage', async function (requestId) {
     Log.write({level: 'debug', message: 'ResourceEvent listen passbolt.resources.update-local-storage'});
     try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const resourceTypeModel = new ResourceTypeModel(clientOptions);
+      await resourceTypeModel.updateLocalStorage();
+
+      // @todo legacy replace by ResourceModel
       await Resource.updateLocalStorage();
+
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       Log.write({level: 'error', message: error.message, data: JSON.stringify(error)});
@@ -60,15 +66,14 @@ const listen = function (worker) {
    *
    * @listens passbolt.resources.create
    * @param requestId {uuid} The request identifier
-   * @param resource {resourceDto} The resource meta data
-   * @param password {string} The password to encrypt
+   * @param resourceDto {object} The resource meta data
+   * @param plaintextDto {string|object} The plaintext data to encrypt
    */
-  worker.port.on('passbolt.resources.create', async function (requestId, resourceDto, password) {
+  worker.port.on('passbolt.resources.create', async function (requestId, resourceDto, plaintextDto) {
     try {
-      const resourceEntity = new ResourceEntity(resourceDto)
       const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new ResourceCreateController(worker, requestId, clientOptions);
-      const savedResource = await controller.main(resourceEntity, password);
+      const savedResource = await controller.main(resourceDto, plaintextDto);
       const savedResourceDto = savedResource.toJSON();
       worker.port.emit(requestId, 'SUCCESS', savedResourceDto);
     } catch (error) {
@@ -130,10 +135,11 @@ const listen = function (worker) {
    * @param resource {array} The resource
    * @param editedPassword {} The resource
    */
-  worker.port.on('passbolt.resources.update', async function (requestId, resource, password) {
-    const controller = new ResourceUpdateController(worker, requestId, password);
+  worker.port.on('passbolt.resources.update', async function (requestId, resourceDto, plaintextDto) {
+    const clientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new ResourceUpdateController(worker, requestId, clientOptions);
     try {
-      const updatedResource = await controller.main(resource, password);
+      const updatedResource = await controller.main(resourceDto, plaintextDto);
       worker.port.emit(requestId, 'SUCCESS', updatedResource);
     } catch (error) {
       if (error instanceof Error) {

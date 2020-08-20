@@ -4,7 +4,7 @@
  * @copyright (c) 2020 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const pageMod = require('../sdk/page-mod');
+const {PageMod} = require('../sdk/page-mod');
 const app = require('../app');
 const Worker = require('../model/worker');
 
@@ -22,7 +22,7 @@ ReactApp.init = function () {
     ReactApp._pageMod = null;
   }
 
-  ReactApp._pageMod = pageMod.PageMod({
+  ReactApp._pageMod = new PageMod({
     name: 'ReactApp',
     include: 'about:blank?passbolt=passbolt-iframe-react-app',
     contentScriptWhen: 'end',

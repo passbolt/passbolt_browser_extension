@@ -11,80 +11,154 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+const __ = require('../../sdk/l10n').get;
 const passphraseController = require('../passphrase/passphraseController');
+const progressController = require('../progress/progressController');
+
 const {Resource} = require('../../model/resource');
 const {User} = require('../../model/user');
 const {Keyring} = require('../../model/keyring');
 const {Crypto} = require('../../model/crypto');
-const progressController = require('../progress/progressController');
+const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
+const {ResourceModel} = require('../../model/resource/resourceModel');
 const {UserService} = require('../../service/user');
 
 class ResourceUpdateController {
   /**
-   * Constructor
+   * ResourceUpdateController constructor
    *
    * @param {Worker} worker
    * @param {string} requestId
+   * @param {ApiClientOptions} clientOptions
    */
-  constructor(worker, requestId) {
+  constructor(worker, requestId, clientOptions) {
     this.worker = worker;
     this.requestId = requestId;
+    this.resourceModel = new ResourceModel(clientOptions);
+    this.crypto = new Crypto();
   }
 
   /**
    * Update a resource.
    *
-   * @param {array} resource The resource meta data.
-   * @param {string} password The secret in clear.
-   * @throws
+   * @param {object} resourceDto The resource data
+   * @param {null|string|object} plaintextDto The secret to encrypt
+   * @returns {Promise<Object>} updated resource
    */
-  async main(resource, password) {
-    if (password) {
-      resource.secrets = await this.encryptPassword(resource, password);
-      await progressController.update(this.worker, 3, "Updating password");
+  async main(resourceDto, plaintextDto) {
+    // Most simple scenario, there is no secret to update
+    if (plaintextDto === null) {
+      return await this.updateResourceMetaOnly(resourceDto);
     } else {
-      await progressController.open(this.worker, "Updating password");
+      return await this.updateResourceAndSecret(resourceDto, plaintextDto);
     }
+  }
+
+  /**
+   * Update a resource metadata
+   *
+   * @param {object} resourceDto
+   * @returns {Promise<Object>} updated resource
+   */
+  async updateResourceMetaOnly(resourceDto) {
+    await progressController.open(this.worker, __("Updating password"), 1);
+    const updatedResource = await Resource.update(resourceDto);
+    await progressController.update(this.worker, 1, __("Done!"));
+    await progressController.close(this.worker);
+    return updatedResource;
+  }
+
+  /**
+   * Update a resource and associated secret
+   *
+   * @param {object} resourceDto
+   * @param {string|object} plaintextDto
+   * @returns {Promise<Object>} updated resource
+   */
+  async updateResourceAndSecret(resourceDto, plaintextDto) {
+    let resource = new ResourceEntity(resourceDto);
+
+    // Get the number of users the password is shared with to set the goal
+    // And sync the keyring while we are at it
+    const usersIds = await this.getUsersIdsToEncryptFor(resource.id);
+    const keyring = new Keyring();
+    const keyringSync = keyring.sync();
+
+    // Get the passphrase if needed and decrypt secret key
+    let privateKey = await this.getPrivateKey()
+
+    // Set the goals
+    await progressController.open(this.worker, __("Updating password"), 1);
+    await usersIds;
+    await keyringSync;
+    const goals = usersIds.length + 2;
+    await progressController.updateGoals(this.worker, goals);
+
+    // Encrypt
+    await progressController.update(this.worker, goals-1, __("Saving resource"));
+    const plaintext = await this.resourceModel.serializePlaintextDto(resource.resourceTypeId, plaintextDto);
+    resourceDto.secrets = await this.encryptSecrets(plaintext, usersIds, privateKey);
+
+    // Post data & wrap up
+    const updatedResource = await Resource.update(resourceDto);
+    await progressController.update(this.worker, goals, __("Done!"));
+    await progressController.close(this.worker);
+    return updatedResource;
+  }
+
+  /**
+   * getPrivateKey
+   * @returns {Promise<openpgp.key.Key>}
+   */
+  async getPrivateKey() {
     try {
-      const updatedResource = await Resource.update(resource);
-      await progressController.close(this.worker);
-      return updatedResource;
-    } catch(error) {
+      let passphrase = await passphraseController.get(this.worker);
+      return await this.crypto.getAndDecryptPrivateKey(passphrase);
+    } catch (error) {
       console.error(error);
       throw error;
     }
   }
 
-  async encryptPassword(resource, password) {
-    const keyring = new Keyring();
-    const crypto = new Crypto();
-    const secrets = [];
-
-    const keyringSyncPromise = keyring.sync();
-    const getUsersIdsPromise = this.getUsersIdsToEncryptFor(resource);
-    const passphrase = await passphraseController.get(this.worker);
-    await progressController.open(this.worker, "Updating password", 3, "Retrieving users");
-    await keyringSyncPromise;
-    const usersIds = await getUsersIdsPromise;
-    await progressController.update(this.worker, 1, "Decrypting private key");
-    const privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
-    await progressController.update(this.worker, 2, "Encrypting");
-    for (let i in usersIds) {
-      const userId =  usersIds[i];
-      const data = await crypto.encrypt(password, userId, privateKey);
-      secrets.push({user_id: userId, data});
+  /**
+   * Get all user ids a given resource should be encrypted for
+   * TODO Move to service
+   *
+   * @param {string} resourceId
+   * @returns {Promise<*>}
+   */
+  async getUsersIdsToEncryptFor(resourceId) {
+    if (!resourceId || !Validator.isUUID(resourceId)) {
+      throw new TypeError(__('Can not update resource. Resource id should be a valid UUID.'));
     }
-
-    return secrets;
-  }
-
-  async getUsersIdsToEncryptFor(resource) {
     const filter = {
-      'hasAccess': resource.id
+      'hasAccess': resourceId
     };
     const user = User.getInstance();
     const users = await UserService.findAll(user, {filter});
     return users.reduce((result, user) => [...result, user.id], []);
+  }
+
+  /**
+   * Encrypt and sign plaintext data for the given users
+   * TODO Move to service
+   *
+   * @param {string|Object} plaintextDto
+   * @param {array} usersIds
+   * @param {openpgp.key.Key} privateKey
+   * @returns {Promise<array>}
+   */
+  async encryptSecrets(plaintextDto, usersIds, privateKey) {
+    const secrets = [];
+    for (let i in usersIds) {
+      if (usersIds.hasOwnProperty(i)) {
+        const userId =  usersIds[i];
+        const data = await this.crypto.encrypt(plaintextDto, userId, privateKey);
+        secrets.push({user_id: userId, data});
+        await progressController.update(this.worker, i+1, __("Encrypting"));
+      }
+    }
+    return secrets;
   }
 }
 

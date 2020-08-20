@@ -13,7 +13,7 @@
  */
 const __ = require('../sdk/l10n').get;
 const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
-const User = require('../model/user').User;
+const {User} = require('../model/user');
 
 class SecretService {}
 

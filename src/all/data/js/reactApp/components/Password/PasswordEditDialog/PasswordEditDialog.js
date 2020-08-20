@@ -27,7 +27,6 @@ class PasswordEditDialog extends Component {
 
   getDefaultState(props, context) {
     const resource = context.resources.find(item => item.id === props.id) || {};
-
     return {
       nameOriginal: resource.name || "",
       error: "",
@@ -44,7 +43,9 @@ class PasswordEditDialog extends Component {
       viewPassword: false,
       passwordInputHasFocus: false,
       isSecretDecrypted: false,
-      isSecretDecrypting: false
+      isSecretDecrypting: false,
+      encryptDescription: null,
+      resourceTypeId: resource.resource_type_id || ""
     };
   }
 
@@ -59,6 +60,9 @@ class PasswordEditDialog extends Component {
     this.handlePasswordInputKeyUp = this.handlePasswordInputKeyUp.bind(this);
     this.handleViewPasswordButtonClick = this.handleViewPasswordButtonClick.bind(this);
     this.handleGeneratePasswordButtonClick = this.handleGeneratePasswordButtonClick.bind(this);
+    this.handleDescriptionInputFocus = this.handleDescriptionInputFocus.bind(this);
+    this.handleDescriptionInputBlur = this.handleDescriptionInputBlur.bind(this);
+    this.handleDescriptionToggle = this.handleDescriptionToggle.bind(this);
   }
 
   /**
@@ -67,6 +71,13 @@ class PasswordEditDialog extends Component {
   createInputRef() {
     this.nameInputRef = React.createRef();
     this.passwordInputRef = React.createRef();
+    this.descriptionInputRef = React.createRef();
+  }
+
+  componentDidMount() {
+    if (this.mustDescriptionBeEncrypted()) {
+      this.setState({encryptDescription: true, description: ''});
+    }
   }
 
   /**
@@ -81,7 +92,7 @@ class PasswordEditDialog extends Component {
       return;
     }
 
-    this.save();
+    await this.save();
   }
 
   /**
@@ -111,11 +122,30 @@ class PasswordEditDialog extends Component {
   }
 
   /**
+   * Handle description input focus.
+   */
+  async handleDescriptionInputFocus() {
+    const descriptionHasFocus = true;
+    this.setState({passwordInputHasFocus: descriptionHasFocus});
+    if (this.mustDescriptionBeEncrypted() && !this.state.isSecretDecrypted) {
+      if (await this.decryptSecret()) {
+        this.descriptionInputRef.current.focus();
+      }
+    }
+  }
+
+  /**
    * Handle password input blur.
    */
   handlePasswordInputBlur() {
-    const passwordInputHasFocus = false;
-    this.setState({passwordInputHasFocus: passwordInputHasFocus});
+    this.setState({passwordInputHasFocus: false});
+  }
+
+  /**
+   * Handle description input blur.
+   */
+  handleDescriptionInputBlur() {
+    this.setState({descriptionInputHasFocus: false});
   }
 
   /**
@@ -214,23 +244,76 @@ class PasswordEditDialog extends Component {
   }
 
   /**
-   * Create the resource
-   * @returns {Promise}
+   * Update the resource (LEGACY)
+   * @returns {Promise<Object>} updated resource
    */
-  updateResource() {
-    const resourceMeta = {
+  updateResourceLegacy() {
+    const resourceDto = {
       id: this.props.id,
       name: this.state.name,
       username: this.state.username,
       uri: this.state.uri,
       description: this.state.description
     };
-    let secret = "";
+    let plaintextDto = null;
     if (this.state.isSecretDecrypted) {
-      secret = this.state.password;
+      plaintextDto = this.state.password;
+    }
+    return port.request("passbolt.resources.update", resourceDto, plaintextDto);
+  }
+
+  /**
+   * Update the resource
+   * @returns {Promise<Object>} updated resource
+   */
+  updateResource() {
+    if (!this.isResourceTypesEnabled()) {
+      return this.updateResourceLegacy();
     }
 
-    return port.request("passbolt.resources.update", resourceMeta, secret);
+    const resourceDto = {
+      id: this.props.id,
+      name: this.state.name,
+      username: this.state.username,
+      uri: this.state.uri
+    };
+    let plaintextDto = null;
+    let resourceTypeCase;
+    if (this.state.isSecretDecrypted) {
+      if (!this.state.encryptDescription) {
+        resourceTypeCase = 'password-string';
+        resourceDto.description = this.state.description;
+        plaintextDto = this.state.password;
+      } else {
+        resourceTypeCase = 'password-and-description';
+        resourceDto.description = '';
+        plaintextDto = {
+          description: this.state.description,
+          password: this.state.password
+        };
+      }
+      const resourceTypeId = this.findResourceTypeIdBySlug(resourceTypeCase);
+      if (resourceTypeId) {
+        resourceDto.resource_type_id = resourceTypeId;
+      }
+    }
+    return port.request("passbolt.resources.update", resourceDto, plaintextDto);
+  }
+
+  /**
+   * Find a resource type for a give slug
+   * @param {string} slug
+   * @returns {undefined|object}
+   */
+  findResourceTypeIdBySlug(slug) {
+    if (!this.isResourceTypesEnabled()) {
+      return undefined;
+    }
+    const type = this.props.resourceTypes.find(type => type.slug === slug);
+    if (type && type.id) {
+      return type.id;
+    }
+    return undefined;
   }
 
   /**
@@ -271,9 +354,10 @@ class PasswordEditDialog extends Component {
     });
 
     try {
-      const secret = await this.getDecryptedSecret();
+      const secretDto = await this.getDecryptedSecret();
       this.setState({
-        password: secret,
+        password: secretDto.password,
+        description: secretDto.description,
         isSecretDecrypting: false,
         isSecretDecrypted: true
       });
@@ -292,10 +376,17 @@ class PasswordEditDialog extends Component {
 
   /**
    * Get the decrypted password secret
-   * @return {Promise<string>}
+   * @return {Promise<Object>}
    */
   async getDecryptedSecret() {
-    return port.request("passbolt.secret-edit.decrypt", this.props.id);
+    const plaintext = await port.request("passbolt.secret.decrypt", this.props.id);
+    if (typeof plaintext === 'string') {
+      return {
+        password: plaintext,
+        description: this.state.description
+      };
+    }
+    return plaintext;
   }
 
   /**
@@ -320,7 +411,7 @@ class PasswordEditDialog extends Component {
    */
   validatePasswordInput() {
     if (!this.state.isSecretDecrypted) {
-      return;
+      return Promise.resolve();
     }
 
     const password = this.state.password;
@@ -409,13 +500,64 @@ class PasswordEditDialog extends Component {
     return placeholder;
   }
 
+  /**
+   * Are resource types supported?
+   * @returns {boolean}
+   */
+  isResourceTypesEnabled() {
+    return !(!this.props.resourceTypes || !this.props.resourceTypes.length);
+  }
+
+  /**
+   * Must the description be kept encrypted?
+   * E.g. prevent downgrading from an encrypted description to a cleartext one
+   * @returns {boolean}
+   */
+  mustDescriptionBeEncrypted() {
+    if (this.isResourceTypesEnabled()) {
+      return false;
+    }
+    const type = this.props.resourceTypes.find(type => type.id === this.state.resourceTypeId);
+    if (!type || !type.slug) {
+      return false;
+    }
+    return (type.slug === 'password-and-description');
+  }
+
+  /**
+   * Get the description placeholder text depending on state
+   * @returns {string}
+   */
+  getDescriptionPlaceholder() {
+    if (this.state.encryptDescription) {
+      let placeholder = "Click here to unlock";
+      if (this.state.isSecretDecrypting) {
+        placeholder = "Decrypting";
+      } else if (this.state.isSecretDecrypted) {
+        placeholder = "Description (encrypted)";
+      }
+      return placeholder;
+    }
+    return "Description";
+  }
+
+  /**
+   * Switch to toggle description field encryption
+   */
+  async handleDescriptionToggle() {
+    if (!this.mustDescriptionBeEncrypted()) {
+      const encrypt = !this.state.encryptDescription;
+      this.setState({encryptDescription: encrypt});
+      if (encrypt) {
+        await this.decryptSecret();
+      }
+    }
+  }
+
   render() {
-    const passwordInputStyle = this.getPasswordInputStyle();
-    const securityTokenStyle = this.getSecurityTokenStyle();
     const passwordStrength = secretComplexity.strength(this.state.password);
     const passwordStrengthLabel = secretComplexity.STRENGTH[passwordStrength].label;
     const passwordStrengthLabelClass = secretComplexity.STRENGTH[passwordStrength].id;
-    const passwordPlaceholder = this.getPasswordInputPlaceholder();
 
     return (
       <div className="dialog-wrapper" onKeyDown={this.handleKeyDown}>
@@ -438,7 +580,7 @@ class PasswordEditDialog extends Component {
                   <input id="edit-password-form-name" name="name" type="text" value={this.state.name}
                     onKeyUp={this.handleNameInputKeyUp} onChange={this.handleInputChange}
                     disabled={this.state.processing} ref={this.nameInputRef} className="required fluid" maxLength="64"
-                    required="required" autoComplete="off" autoFocus={true}/>
+                    required="required" autoComplete="off" autoFocus={true} placeholder="Name" />
                   {this.state.nameError &&
                   <div className="name error message">{this.state.nameError}</div>
                   }
@@ -446,7 +588,7 @@ class PasswordEditDialog extends Component {
                 <div className={`input text ${this.state.uriError ? "error" : ""}`}>
                   <label htmlFor="edit-password-form-uri">URL</label>
                   <input id="edit-password-form-uri" name="uri" className="fluid" maxLength="1024" type="text"
-                    autoComplete="off" value={this.state.uri} onChange={this.handleInputChange}
+                    autoComplete="off" value={this.state.uri} onChange={this.handleInputChange} placeholder="URL"
                     disabled={this.state.processing}/>
                   {this.state.uriError &&
                   <div className="error message">{this.state.uriError}</div>
@@ -455,7 +597,7 @@ class PasswordEditDialog extends Component {
                 <div className={`input text ${this.state.usernameError ? "error" : ""}`}>
                   <label htmlFor="edit-password-form-username">Username</label>
                   <input id="edit-password-form-username" name="username" type="text" className="fluid" maxLength="64"
-                    autoComplete="off" value={this.state.username} onChange={this.handleInputChange}
+                    autoComplete="off" value={this.state.username} onChange={this.handleInputChange} placeholder="Username"
                     disabled={this.state.processing}/>
                   {this.state.usernameError &&
                   <div className="error message">{this.state.usernameError}</div>
@@ -467,16 +609,16 @@ class PasswordEditDialog extends Component {
                     <input id="edit-password-form-password" name="password" className="required"
                       required="required" type={this.state.viewPassword ? "text" : "password"}
                       onKeyUp={this.handlePasswordInputKeyUp} value={this.state.password}
-                      placeholder={passwordPlaceholder} onFocus={this.handlePasswordInputFocus}
+                      placeholder={this.getPasswordInputPlaceholder()} onFocus={this.handlePasswordInputFocus}
                       onBlur={this.handlePasswordInputBlur} onChange={this.handleInputChange}
-                      disabled={this.state.processing} style={passwordInputStyle} ref={this.passwordInputRef}/>
+                      disabled={this.state.processing} style={this.getPasswordInputStyle()} ref={this.passwordInputRef}/>
                     <div className="security-token"
-                      style={securityTokenStyle}>{this.context.user["user.settings.securityToken.code"]}</div>
+                      style={this.getSecurityTokenStyle()}>{this.context.user["user.settings.securityToken.code"]}</div>
                   </div>
                   <ul className="actions inline">
                     <li>
                       <a onClick={this.handleViewPasswordButtonClick}
-                        className={`password-view button button-icon toggle ${this.state.viewPassword ? "selected" : ""}`}>
+                        className={`password-view button button-icon toggle ${this.state.viewPassword ? "selected" : ""} ${this.state.processing ? "disabled" : ""}`}>
                         <Icon name='eye-open' big={true}/>
                         <span className="visually-hidden">view</span>
                       </a>
@@ -490,8 +632,9 @@ class PasswordEditDialog extends Component {
                     </li>
                   </ul>
                   <div className={`password-complexity ${passwordStrengthLabelClass}`}>
-                    <span className="progress"><span
-                      className={`progress-bar ${passwordStrengthLabelClass}`}></span></span>
+                    <span className="progress">
+                      <span className={`progress-bar ${passwordStrengthLabelClass}`}/>
+                    </span>
                     <span className="complexity-text">complexity: <strong>{passwordStrengthLabel}</strong></span>
                   </div>
                   {this.state.passwordError &&
@@ -501,12 +644,26 @@ class PasswordEditDialog extends Component {
                   }
                 </div>
                 <div className="input textarea">
-                  <label htmlFor="edit-password-form-description">Description&nbsp;
-                    <Tooltip message="Do not store sensitive data. Unlike the password, this data is not encrypted." icon="info-circle" />
+                  <label htmlFor="create-password-form-description">Description&nbsp;
+                    {!this.isResourceTypesEnabled() &&
+                    <Tooltip message="Do not store sensitive data. Unlike the password, this data is not encrypted. Upgrade to version 3 to encrypt this information."
+                      icon="info-circle"/>
+                    }
+                    {this.isResourceTypesEnabled() && !this.state.encryptDescription &&
+                    <a role="button" onClick={this.handleDescriptionToggle}>
+                      <Tooltip message="Do not store sensitive data or click here to enable encryption for the description field." icon="lock-open" />
+                    </a>
+                    }
+                    {this.isResourceTypesEnabled() && this.state.encryptDescription &&
+                    <a role="button" onClick={this.handleDescriptionToggle}>
+                      <Tooltip message="The description content will be encrypted." icon="lock" />
+                    </a>
+                    }
                   </label>
                   <textarea id="edit-password-form-description" name="description" maxLength="10000"
-                    className="required" placeholder="add a description" value={this.state.description}
-                    disabled={this.state.processing} onChange={this.handleInputChange}>
+                    className="required" placeholder={this.getDescriptionPlaceholder()} value={this.state.description}
+                    disabled={this.state.processing} onChange={this.handleInputChange} ref={this.descriptionInputRef}
+                    onFocus={this.handleDescriptionInputFocus} onBlur={this.handleDescriptionInputBlur}>
                   </textarea>
                   {this.state.descriptionError &&
                   <div className="error message">{this.state.descriptionError}</div>
@@ -529,11 +686,14 @@ class PasswordEditDialog extends Component {
 }
 
 PasswordEditDialog.contextType = AppContext;
-
+PasswordEditDialog.defaultProps = {
+  resourceTypes: []
+};
 PasswordEditDialog.propTypes = {
   className: PropTypes.string,
   onClose: PropTypes.func,
-  id: PropTypes.string
+  id: PropTypes.string,
+  resourceTypes: PropTypes.array
 };
 
 export default PasswordEditDialog;

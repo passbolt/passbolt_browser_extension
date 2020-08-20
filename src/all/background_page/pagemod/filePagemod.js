@@ -6,7 +6,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var app = require('../app');
-var pageMod = require('../sdk/page-mod');
+const {PageMod} = require('../sdk/page-mod');
 var Worker = require('../model/worker');
 
 var File = function () {};
@@ -19,7 +19,7 @@ File.init = function () {
       File._pageMod = undefined;
     }
 
-    File._pageMod = pageMod.PageMod({
+    File._pageMod = new PageMod({
         name: 'File',
         include: 'about:blank?passbolt=passbolt-iframe-file',
 

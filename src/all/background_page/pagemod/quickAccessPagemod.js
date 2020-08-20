@@ -6,14 +6,13 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-
 const app = require('../app');
-const Worker = require('../sdk/worker').Worker;
+const {Worker} = require('../sdk/worker');
 
 /*
  * This page mod drives the quick access default popup
  */
-var QuickAccess = function () {
+const QuickAccess = function () {
   // The current active worker.
   this._worker = null;
 };
@@ -21,7 +20,7 @@ var QuickAccess = function () {
 QuickAccess.init = function () {
 
   chrome.runtime.onConnect.addListener(function (port) {
-    if (port.name == "quickaccess") {
+    if (port.name === "quickaccess") {
       this._worker = new Worker(port);
 
       // Destroy the worker when the quickacess poppup is destroyed.

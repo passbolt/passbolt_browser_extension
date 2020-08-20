@@ -40,7 +40,8 @@ class PasswordCreateDialog extends Component {
       description: "",
       descriptionError: "",
       viewPassword: false,
-      passwordInputHasFocus: false
+      passwordInputHasFocus: false,
+      encryptDescription: false
     };
   }
 
@@ -55,6 +56,7 @@ class PasswordCreateDialog extends Component {
     this.handlePasswordInputKeyUp = this.handlePasswordInputKeyUp.bind(this);
     this.handleViewPasswordButtonClick = this.handleViewPasswordButtonClick.bind(this);
     this.handleGeneratePasswordButtonClick = this.handleGeneratePasswordButtonClick.bind(this);
+    this.handleDescriptionToggle = this.handleDescriptionToggle.bind(this);
   }
 
   /**
@@ -116,15 +118,46 @@ class PasswordCreateDialog extends Component {
    * @returns {Promise}
    */
   createResource() {
+    let resourceTypeCase, secretDto;
     const resourceDto = {
       name: this.state.name,
       username: this.state.username,
       uri: this.state.uri,
-      description: this.state.description,
       folder_parent_id: this.props.folderParentId
     };
 
-    return port.request("passbolt.resources.create", resourceDto, this.state.password);
+    if (!this.isResourceTypesEnabled()) {
+      resourceDto.description = this.state.description;
+      return port.request("passbolt.resources.create", resourceDto, this.state.password);
+    }
+    if (!this.state.encryptDescription) {
+      resourceTypeCase = 'password-string';
+      resourceDto.description = this.state.description;
+      secretDto = this.state.password;
+    } else {
+      resourceTypeCase = 'password-and-description';
+      secretDto = {
+        description: this.state.description,
+        password: this.state.password
+      };
+    }
+    const resourceTypeId = this.findResourceTypeIdBySlug(resourceTypeCase);
+    if (resourceTypeId) {
+      resourceDto.resource_type_id = resourceTypeId;
+    }
+    return port.request("passbolt.resources.create", resourceDto, secretDto);
+  }
+
+  findResourceTypeIdBySlug(slug) {
+    if (!this.isResourceTypesEnabled()) {
+      return undefined;
+    }
+    const type = this.props.resourceTypes.find(type => type.slug === slug);
+    return type.id;
+  }
+
+  isResourceTypesEnabled() {
+    return !(!this.props.resourceTypes || !this.props.resourceTypes.length);
   }
 
   /**
@@ -344,9 +377,14 @@ class PasswordCreateDialog extends Component {
     };
   }
 
+  /**
+   * Switch to toggle description field encryption
+   */
+  handleDescriptionToggle() {
+    this.setState({encryptDescription: !this.state.encryptDescription});
+  }
+
   render() {
-    const passwordInputStyle = this.getPasswordInputStyle();
-    const securityTokenStyle = this.getSecurityTokenStyle();
     const passwordStrength = secretComplexity.strength(this.state.password);
     const passwordStrengthLabel = secretComplexity.STRENGTH[passwordStrength].label;
     const passwordStrengthLabelClass = secretComplexity.STRENGTH[passwordStrength].id;
@@ -369,7 +407,7 @@ class PasswordCreateDialog extends Component {
                   <input id="create-password-form-name" name="name" type="text" value={this.state.name}
                     onKeyUp={this.handleNameInputKeyUp} onChange={this.handleInputChange}
                     disabled={this.state.processing} ref={this.nameInputRef} className="required fluid" maxLength="64"
-                    required="required" autoComplete="off" autoFocus={true}/>
+                    required="required" autoComplete="off" autoFocus={true} placeholder="Name"/>
                   {this.state.nameError &&
                   <div className="name error message">{this.state.nameError}</div>
                   }
@@ -377,7 +415,7 @@ class PasswordCreateDialog extends Component {
                 <div className={`input text ${this.state.uriError ? "error" : ""}`}>
                   <label htmlFor="create-password-form-uri">URL</label>
                   <input id="create-password-form-uri" name="uri" className="fluid" maxLength="1024" type="text"
-                    autoComplete="off" value={this.state.uri} onChange={this.handleInputChange}
+                    autoComplete="off" value={this.state.uri} onChange={this.handleInputChange} placeholder="URI"
                     disabled={this.state.processing}/>
                   {this.state.uriError &&
                   <div className="error message">{this.state.uriError}</div>
@@ -386,7 +424,7 @@ class PasswordCreateDialog extends Component {
                 <div className={`input text ${this.state.usernameError ? "error" : ""}`}>
                   <label htmlFor="create-password-form-username">Username</label>
                   <input id="create-password-form-username" name="username" type="text" className="fluid" maxLength="64"
-                    autoComplete="off" value={this.state.username} onChange={this.handleInputChange}
+                    autoComplete="off" value={this.state.username} onChange={this.handleInputChange} placeholder="Username"
                     disabled={this.state.processing}/>
                   {this.state.usernameError &&
                   <div className="error message">{this.state.usernameError}</div>
@@ -400,9 +438,9 @@ class PasswordCreateDialog extends Component {
                       onKeyUp={this.handlePasswordInputKeyUp} value={this.state.password}
                       onFocus={this.handlePasswordInputFocus} onBlur={this.handlePasswordInputBlur}
                       onChange={this.handleInputChange} disabled={this.state.processing}
-                      style={passwordInputStyle} ref={this.passwordInputRef}/>
+                      style={this.getPasswordInputStyle()} ref={this.passwordInputRef}/>
                     <div className="security-token"
-                      style={securityTokenStyle}>{this.context.user["user.settings.securityToken.code"]}</div>
+                      style={this.getSecurityTokenStyle()}>{this.context.user["user.settings.securityToken.code"]}</div>
                   </div>
                   <ul className="actions inline">
                     <li>
@@ -421,8 +459,9 @@ class PasswordCreateDialog extends Component {
                     </li>
                   </ul>
                   <div className={`password-complexity ${passwordStrengthLabelClass}`}>
-                    <span className="progress"><span
-                      className={`progress-bar ${passwordStrengthLabelClass}`}></span></span>
+                    <span className="progress">
+                      <span className={`progress-bar ${passwordStrengthLabelClass}`}/>
+                    </span>
                     <span className="complexity-text">complexity: <strong>{passwordStrengthLabel}</strong></span>
                   </div>
                   {this.state.passwordError &&
@@ -433,10 +472,23 @@ class PasswordCreateDialog extends Component {
                 </div>
                 <div className="input textarea">
                   <label htmlFor="create-password-form-description">Description&nbsp;
-                    <Tooltip message="Do not store sensitive data. Unlike the password, this data is not encrypted." icon="info-circle" />
+                    {!this.isResourceTypesEnabled() &&
+                    <Tooltip message="Do not store sensitive data. Unlike the password, this data is not encrypted. Upgrade to version 3 to encrypt this information."
+                      icon="info-circle"/>
+                    }
+                    {this.isResourceTypesEnabled() && !this.state.encryptDescription &&
+                    <a role="button" onClick={this.handleDescriptionToggle}>
+                      <Tooltip message="Do not store sensitive data or click here to enable encryption for the description field." icon="lock-open" />
+                    </a>
+                    }
+                    {this.isResourceTypesEnabled() && this.state.encryptDescription &&
+                    <a role="button" onClick={this.handleDescriptionToggle}>
+                      <Tooltip message="The description content will be encrypted." icon="lock" />
+                    </a>
+                    }
                   </label>
                   <textarea id="create-password-form-description" name="description" maxLength="10000"
-                    className="required" placeholder="add a description" value={this.state.description}
+                    className="required" placeholder="Add a description" value={this.state.description}
                     disabled={this.state.processing} onChange={this.handleInputChange}>
                   </textarea>
                   {this.state.descriptionError &&
@@ -463,6 +515,7 @@ PasswordCreateDialog.contextType = AppContext;
 
 PasswordCreateDialog.propTypes = {
   folderParentId: PropTypes.string,
+  resourceTypes: PropTypes.array,
   className: PropTypes.string,
   onClose: PropTypes.func
 };

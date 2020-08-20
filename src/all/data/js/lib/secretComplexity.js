@@ -76,7 +76,7 @@ var secretComplexity = {};
    */
   var randomRange = function (min, max) {
     var arr = new Uint32Array(1);
-    window.crypto.getRandomValues(arr); 
+    window.crypto.getRandomValues(arr);
     var random = arr[0]/(0xffffffff + 1);
     return Math.floor(random * (max - min + 1)) + min;
   };
@@ -163,8 +163,8 @@ var secretComplexity = {};
 
   /**
    * Generate a password following the system settings.
-   * @param length {int} (optional) The password length. Default 18.
-   * @param masks {array} (optional) The list of masks to use. Default all.
+   * @param {int} [length] (optional) The password length. Default 18.
+   * @param {array} [masks] (optional) The list of masks to use. Default all.
    * @return {string}
    */
   var generate = function (length, masks) {

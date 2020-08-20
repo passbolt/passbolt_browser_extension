@@ -7,7 +7,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var app = require('../app');
-var pageMod = require('../sdk/page-mod');
+const {PageMod} = require('../sdk/page-mod');
 var Worker = require('../model/worker');
 var TabStorage = require('../model/tabStorage').TabStorage;
 
@@ -21,7 +21,7 @@ ExportPasswordsDialog.init = function () {
     ExportPasswordsDialog._pageMod = undefined;
   }
 
-  ExportPasswordsDialog._pageMod = pageMod.PageMod({
+  ExportPasswordsDialog._pageMod = new PageMod({
     name: 'ExportPasswords',
     include: 'about:blank?passbolt=passbolt-iframe-export-passwords',
     contentScriptFile: [

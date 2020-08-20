@@ -6,7 +6,7 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var pageMod = require('../sdk/page-mod');
+const {PageMod} = require('../sdk/page-mod');
 var app = require('../app');
 var Worker = require('../model/worker');
 
@@ -19,7 +19,7 @@ PassboltAuthForm.init = function () {
     PassboltAuthForm._pageMod.destroy();
     PassboltAuthForm._pageMod = undefined;
   }
-  PassboltAuthForm._pageMod = pageMod.PageMod({
+  PassboltAuthForm._pageMod = new PageMod({
     name: 'AuthForm',
     include: 'about:blank?passbolt=passbolt-iframe-login-form',
     contentScriptWhen: 'ready',

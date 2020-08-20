@@ -7,7 +7,7 @@
 
 // var Validator = require('../vendors/validator');
 const __ = require('../sdk/l10n').get;
-const SecretService = require('../service/secret').SecretService;
+const {SecretService} = require('../service/secret');
 
 /**
  * The class that deals with secrets.
@@ -74,9 +74,13 @@ class Secret {
   /**
    * Retrieve a resource secret
    * @param {string} resourceId The target resource to retrieve the secret for.
+   * @throws {TypeError} if resource ID is not a valid uuid
    * @return {object}
    */
   static findByResourceId (resourceId) {
+    if (!Validator.isUUID(resourceId)) {
+      throw new TypeError(__('The resource id should be a valid UUID'))
+    }
     return SecretService.findByResourceId(resourceId);
   };
 }

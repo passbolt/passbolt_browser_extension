@@ -17,6 +17,7 @@ const {EntitySchema} = require('../abstract/entitySchema');
 const ENTITY_NAME = 'Role';
 const ROLE_ADMIN = 'admin';
 const ROLE_USER = 'user';
+const ROLE_NAME_MAX_LENGTH = 255;
 
 class RoleEntity extends Entity {
   /**
@@ -55,7 +56,7 @@ class RoleEntity extends Entity {
         },
         "description": {
           "type": "string",
-          "maxLength": 255
+          "maxLength": ROLE_NAME_MAX_LENGTH
         },
         "created": {
           "type": "string",

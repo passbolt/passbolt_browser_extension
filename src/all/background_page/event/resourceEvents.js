@@ -22,10 +22,6 @@ const listen = function (worker) {
   worker.port.on('passbolt.resources.update-local-storage', async function (requestId) {
     Log.write({level: 'debug', message: 'ResourceEvent listen passbolt.resources.update-local-storage'});
     try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const resourceTypeModel = new ResourceTypeModel(clientOptions);
-      await resourceTypeModel.updateLocalStorage();
-
       // @todo legacy replace by ResourceModel
       await Resource.updateLocalStorage();
 

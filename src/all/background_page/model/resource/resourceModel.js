@@ -268,8 +268,15 @@ class ResourceModel {
     if (schema.type === 'string') {
       return plaintext;
     }
-    const plaintextDto = JSON.parse(plaintext);
-    return new PlaintextEntity(plaintextDto, schema);
+    try {
+      const plaintextDto = JSON.parse(plaintext);
+      return new PlaintextEntity(plaintextDto, schema);
+    } catch(error) {
+      console.error(error);
+      // SyntaxError, json is not valid
+      // TypeError schema does not match
+      return plaintext; // return 'broken' string
+    }
   }
 
   //==============================================================

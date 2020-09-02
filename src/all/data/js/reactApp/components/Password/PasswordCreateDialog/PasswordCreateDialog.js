@@ -67,6 +67,12 @@ class PasswordCreateDialog extends Component {
     this.passwordInputRef = React.createRef();
   }
 
+  componentDidMount() {
+    if (this.isResourceTypesEnabled()) {
+      this.setState({encryptDescription: true});
+    }
+  }
+
   /**
    * Handle form submit event.
    * @params {ReactEvent} The react event

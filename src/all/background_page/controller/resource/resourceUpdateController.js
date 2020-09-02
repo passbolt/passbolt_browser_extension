@@ -78,28 +78,26 @@ class ResourceUpdateController {
   async updateResourceAndSecret(resourceDto, plaintextDto) {
     let resource = new ResourceEntity(resourceDto);
 
-    // Get the number of users the password is shared with to set the goal
-    // And sync the keyring while we are at it
-    const usersIds = await this.getUsersIdsToEncryptFor(resource.id);
-    const keyring = new Keyring();
-    const keyringSync = keyring.sync();
-
     // Get the passphrase if needed and decrypt secret key
     let privateKey = await this.getPrivateKey()
 
     // Set the goals
-    await progressController.open(this.worker, __("Updating password"), 1);
-    await usersIds;
-    await keyringSync;
-    const goals = usersIds.length + 2;
+    await progressController.open(this.worker, __("Updating password"), 4);
+    const usersIds = await this.getUsersIdsToEncryptFor(resource.id);
+    const goals = usersIds.length + 3; // encrypt * users + keyring sync + save + done
     await progressController.updateGoals(this.worker, goals);
 
+    // Sync keyring
+    await progressController.update(this.worker, 1, __("Synchronizing keyring"));
+    const keyring = new Keyring();
+    await keyring.sync();
+
     // Encrypt
-    await progressController.update(this.worker, goals-1, __("Saving resource"));
     const plaintext = await this.resourceModel.serializePlaintextDto(resource.resourceTypeId, plaintextDto);
     resourceDto.secrets = await this.encryptSecrets(plaintext, usersIds, privateKey);
 
     // Post data & wrap up
+    await progressController.update(this.worker, goals-1, __("Saving resource"));
     const updatedResource = await Resource.update(resourceDto);
     await progressController.update(this.worker, goals, __("Done!"));
     await progressController.close(this.worker);
@@ -150,12 +148,12 @@ class ResourceUpdateController {
    */
   async encryptSecrets(plaintextDto, usersIds, privateKey) {
     const secrets = [];
-    for (let i in usersIds) {
+    for (let i=0; i < usersIds.length; i++) {
       if (usersIds.hasOwnProperty(i)) {
         const userId =  usersIds[i];
         const data = await this.crypto.encrypt(plaintextDto, userId, privateKey);
         secrets.push({user_id: userId, data});
-        await progressController.update(this.worker, i+1, __("Encrypting"));
+        await progressController.update(this.worker, i+2, __("Encrypting"));
       }
     }
     return secrets;

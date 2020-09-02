@@ -514,7 +514,7 @@ class PasswordEditDialog extends Component {
    * @returns {boolean}
    */
   mustDescriptionBeEncrypted() {
-    if (this.isResourceTypesEnabled()) {
+    if (!this.isResourceTypesEnabled()) {
       return false;
     }
     const type = this.props.resourceTypes.find(type => type.id === this.state.resourceTypeId);

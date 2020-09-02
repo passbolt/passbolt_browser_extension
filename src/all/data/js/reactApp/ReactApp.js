@@ -199,6 +199,10 @@ class ReactApp extends Component {
       const resources = changes.resources.newValue;
       this.setState({resources: resources});
     }
+    if (changes.resourceTypes) {
+      const resourceTypes = changes.resourceTypes.newValue;
+      this.setState({resourceTypes: resourceTypes});
+    }
     if (changes.folders) {
       const folders = changes.folders.newValue;
       this.setState({folders: folders});

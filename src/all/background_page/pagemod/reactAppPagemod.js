@@ -40,6 +40,7 @@ ReactApp.init = function () {
       app.events.siteSettings.listen(worker);
       app.events.share.listen(worker);
       app.events.user.listen(worker);
+      app.events.comment.listen(worker);
 
       Worker.add('ReactApp', worker);
     }

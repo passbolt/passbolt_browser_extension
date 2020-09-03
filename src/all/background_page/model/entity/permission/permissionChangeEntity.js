@@ -133,7 +133,7 @@ class PermissionChangeEntity extends Entity {
   // ==================================================
   /**
    * Get permission id
-   * @returns {string|null} uuid if set
+   * @returns {(string|null)} uuid if set
    */
   get id() {
     return this._props.id || null;
@@ -181,7 +181,7 @@ class PermissionChangeEntity extends Entity {
 
   /**
    * Get deleted status flag
-   * @returns {boolean} true if deleted
+   * @returns {(boolean|null)} true if deleted
    */
   get isDeleted() {
     return this._props.delete || null;

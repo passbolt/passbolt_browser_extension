@@ -125,7 +125,7 @@ class GpgkeyEntity extends Entity {
 
   /**
    * Get deleted flag info
-   * @returns {boolean} true if deleted
+   * @returns {{boolean|null}} true if deleted
    */
   get isDeleted() {
     return this._props.deleted || null;

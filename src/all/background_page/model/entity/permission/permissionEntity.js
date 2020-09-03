@@ -159,7 +159,7 @@ class PermissionEntity extends Entity {
   // ==================================================
   /**
    * Get permission id
-   * @returns {string|null} uuid if set
+   * @returns {(string|null)} uuid if set
    */
   get id() {
     return this._props.id || null;
@@ -293,7 +293,7 @@ class PermissionEntity extends Entity {
   // ==================================================
   /**
    * Get associated user data
-   * @returns {UserEntity} user
+   * @returns {(UserEntity|null)} user
    */
   get user() {
     return this._user || null;
@@ -301,7 +301,7 @@ class PermissionEntity extends Entity {
 
   /**
    * Get associated group data
-   * @returns {GroupEntity} group
+   * @returns {(GroupEntity|null)} group
    */
   get group() {
     return this._group || null;

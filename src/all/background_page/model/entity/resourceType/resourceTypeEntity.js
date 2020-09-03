@@ -137,7 +137,7 @@ class ResourceTypeEntity extends Entity {
 
   /**
    * Get modified date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get modified() {
     return this._props.modified || null;

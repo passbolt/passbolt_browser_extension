@@ -22,6 +22,7 @@ var events = {};
 events.app = require('./event/appEvents');
 events.auth = require('./event/authEvents');
 events.clipboard = require('./event/clipboardEvents');
+events.comment = require('./event/commentEvents');
 events.config = require('./event/configEvents');
 events.debug = require('./event/debugEvents');
 events.debugPage = require('./event/debugPageEvents');

@@ -164,7 +164,7 @@ class FolderEntity extends Entity {
 
   /**
    * Get folder parent id
-   * @returns {string|null} uuid parent folder
+   * @returns {(string|null)} uuid parent folder
    */
   get folderParentId() {
     return this._props.folder_parent_id || null;
@@ -192,7 +192,7 @@ class FolderEntity extends Entity {
   // ==================================================
   /**
    * Get all the current user permissions
-   * @returns {PermissionEntity} permission
+   * @returns {{PermissionEntity|null}} permission
    */
   get permission() {
     return this._permission || null;
@@ -200,7 +200,7 @@ class FolderEntity extends Entity {
 
   /**
    * Get all users permissions for the given folder
-   * @returns {PermissionsCollection} permissions
+   * @returns {{PermissionsCollection|null}} permissions
    */
   get permissions() {
     return this._permissions || null;

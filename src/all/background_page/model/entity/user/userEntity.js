@@ -220,7 +220,7 @@ class UserEntity extends Entity {
   }
 
   /**
-   * FolderEntity.ALL_CONTAIN_OPTIONS
+   * UserEntity.ALL_CONTAIN_OPTIONS
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
@@ -243,7 +243,7 @@ class UserEntity extends Entity {
   // ==================================================
   /**
    * Get user profile
-   * @returns {ProfileEntity} profile
+   * @returns {(ProfileEntity|null)} profile
    */
   get profile() {
     return this._profile || null;
@@ -251,7 +251,7 @@ class UserEntity extends Entity {
 
   /**
    * Get user role
-   * @returns {RoleEntity} role
+   * @returns {(RoleEntity|null)} role
    */
   get role() {
     return this._role || null;
@@ -259,7 +259,7 @@ class UserEntity extends Entity {
 
   /**
    * Get user gpgkey
-   * @returns {GpgkeyEntity} key
+   * @returns {(GpgkeyEntity|null)} key
    */
   get gpgkey() {
     return this._gpgkey || null;

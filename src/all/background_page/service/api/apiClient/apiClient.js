@@ -171,7 +171,7 @@ class ApiClient {
    * @throws {TypeError} if id is empty or not a string
    * @param {string} id
    * @return {void}
-   * @private
+   * @public
    */
   assertValidId(id) {
     if (!id) {
@@ -230,7 +230,7 @@ class ApiClient {
    * @param {Object} body
    * @throws {TypeError} if body is empty or cannot converted to valid JSON string
    * @return {string} JavaScript Object Notation (JSON) string
-   * @private
+   * @public
    */
   buildBody(body) {
     return JSON.stringify(body);

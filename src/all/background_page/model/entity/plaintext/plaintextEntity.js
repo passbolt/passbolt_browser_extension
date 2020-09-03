@@ -54,7 +54,7 @@ class PlaintextEntity extends Entity {
   /**
    * Return password prop if any
    *
-   * @returns {string|null}
+   * @returns {(string|null)} password
    */
   get password() {
     return this._props.password || null;

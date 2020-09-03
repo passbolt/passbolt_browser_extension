@@ -67,7 +67,7 @@ class ResourcesCollection extends EntityCollection {
   /**
    * Get all the ids of the resources in the collection
    *
-   * @returns {Array<ResourceEntity>}
+   * @returns {Array<string>}
    */
   get ids() {
     return this._items.map(r => r.id);
@@ -77,7 +77,7 @@ class ResourcesCollection extends EntityCollection {
    * Get all the folder parent ids for the resources in the collection
    * Exclude 'null' aka when parent is the root
    *
-   * @returns {Array<ResourceEntity>}
+   * @returns {Array<string>}
    */
   get folderParentIds() {
     return this._items
@@ -87,7 +87,7 @@ class ResourcesCollection extends EntityCollection {
 
   /**
    * Get first resource in the collection matching requested id
-   * @returns {Array<ResourceEntity>}
+   * @returns {(ResourceEntity|undefined)}
    */
   getFirstById(resourceId) {
     return this._items.find(r => (r.id === resourceId));

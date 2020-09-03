@@ -179,7 +179,7 @@ class ProfileEntity extends Entity {
 
   /**
    * Get profile modification date
-   * @returns {string} date
+   * @returns {(string|null)} date
    */
   get modified() {
     return this._props.modified || null;

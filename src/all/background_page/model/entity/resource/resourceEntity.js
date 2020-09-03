@@ -17,6 +17,7 @@ const {EntityValidationError} = require('../abstract/entityValidationError');
 const {FavoriteEntity} = require('../favorite/favoriteEntity');
 const {PermissionEntity} = require('../permission/permissionEntity');
 const {PermissionsCollection} = require('../permission/permissionsCollection');
+const {ResourceTypeEntity} = require('../resourceType/resourceTypeEntity');
 const {TagsCollection} = require('../tag/tagsCollection');
 const {SecretsCollection} = require('../secret/secretsCollection');
 
@@ -143,6 +144,12 @@ class ResourceEntity extends Entity {
         "personal": {
           "type": "boolean"
         },
+        // Resource types
+        "resource_type_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "resource_type": ResourceTypeEntity.getSchema(),
         // other Associations
         "favorite": {
           "anyOf": [
@@ -211,10 +218,10 @@ class ResourceEntity extends Entity {
   // ==================================================
   /**
    * Get resource id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get id() {
-    return this._props.id;
+    return this._props.id || null;
   }
 
   /**
@@ -223,6 +230,14 @@ class ResourceEntity extends Entity {
    */
   get name() {
     return this._props.name;
+  }
+
+  /**
+   * Get resource username
+   * @returns {string} username
+   */
+  get username() {
+    return this._props.username;
   }
 
   /**
@@ -275,10 +290,18 @@ class ResourceEntity extends Entity {
 
   /**
    * Get the folder parent id if any
-   * @returns {(string|null)} date
+   * @returns {(string|null)} uuid
    */
   get folderParentId() {
     return this._props.folder_parent_id || null;
+  }
+
+  /**
+   * Get the resource type if any
+   * @returns {(string|null)} uuid
+   */
+  get resourceTypeId() {
+    return this._props.resource_type_id || null;
   }
 
   // ==================================================
@@ -389,11 +412,22 @@ class ResourceEntity extends Entity {
   }
 
   /**
-   * Get resource secret for the current user
+   * Get resource secrets
    * @returns {(SecretsCollection|null)}
    */
   get secrets() {
     return this._secrets || null;
+  }
+
+  /**
+   * Get resource secret for the current user
+   * @returns {(SecretEntity|null)}
+   */
+  get secret() {
+    for (let secret of this._secrets) {
+      return secret;
+    }
+    return null;
   }
 
   // ==================================================

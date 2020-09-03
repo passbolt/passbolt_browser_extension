@@ -7,7 +7,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var app = require('../app');
-var pageMod = require('../sdk/page-mod');
+const {PageMod} = require('../sdk/page-mod');
 var Worker = require('../model/worker');
 
 var ImportPasswordsDialog = function () {};
@@ -20,7 +20,7 @@ ImportPasswordsDialog.init = function () {
     ImportPasswordsDialog._pageMod = undefined;
   }
 
-  ImportPasswordsDialog._pageMod = pageMod.PageMod({
+  ImportPasswordsDialog._pageMod = new PageMod({
     name: 'ImportPasswords',
     include: 'about:blank?passbolt=passbolt-iframe-import-passwords',
     contentScriptFile: [

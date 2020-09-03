@@ -9,7 +9,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var app = require('../app');
-var pageMod = require('../sdk/page-mod');
+const {PageMod} = require('../sdk/page-mod');
 var Worker = require('../model/worker');
 var GpgAuth = require('../model/gpgauth').GpgAuth;
 var User = require('../model/user').User;
@@ -45,7 +45,7 @@ PassboltApp.initPageMod = function () {
   var escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
   var url = '^' + escapedDomain + '/?(/app.*)?(#.*)?$';
   var regex = new RegExp(url);
-  return pageMod.PageMod({
+  return new PageMod({
     name: 'PassboltApp',
     include: regex,
     contentScriptWhen: 'ready',
@@ -78,7 +78,7 @@ PassboltApp.initPageMod = function () {
       'content_scripts/js/app.js',
       'content_scripts/js/react-app.js'
     ],
-    attachTo: ["existing", "top"],
+    attachTo: {existing: true, reload: true},
     onAttach: async function (worker) {
       const auth = new GpgAuth();
       if (!await auth.isAuthenticated() || await auth.isMfaRequired()) {

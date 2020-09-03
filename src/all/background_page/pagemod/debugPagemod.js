@@ -10,7 +10,7 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var pageMod = require('../sdk/page-mod');
+const {PageMod} = require('../sdk/page-mod');
 var app = require('../app');
 var Worker = require('../model/worker');
 
@@ -24,7 +24,7 @@ Debug.init = function () {
     Debug._pageMod = undefined;
   }
 
-  Debug._pageMod = pageMod.PageMod({
+  Debug._pageMod = new PageMod({
     name: 'Debug',
     include: new RegExp('.*'),
 

@@ -78,14 +78,20 @@ var remove = function (workerId, tabId, options) {
 /**
  * Get a worker.
  * @param workerId {string} The worker identifier
- * @param tabId {string} The tab identifier on which the worker runs
+ * @param {string} tabId The tab identifier on which the worker runs
+ * @param {boolean} [log] error optional, default true
  * @return {Worker} null if the worker doesn't exist.
  */
-var get = function (workerId, tabId) {
-  if (app.workers[tabId][workerId]) {
-    return app.workers[tabId][workerId];
+var get = function (workerId, tabId, log) {
+  if (!exists(workerId, tabId)) {
+    const error = new Error(`Could not find worker ID ${workerId} for tab ${tabId}.`);
+    if (log !== false) {
+      console.error(error);
+      console.error(app.workers);
+    }
+    throw Error;
   }
-  return null;
+  return app.workers[tabId][workerId];
 };
 exports.get = get;
 

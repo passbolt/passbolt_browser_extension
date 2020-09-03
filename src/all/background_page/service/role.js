@@ -15,7 +15,7 @@ const __ = require('../sdk/l10n').get;
 const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
 const PassboltBadResponseError = require('../error/passboltBadResponseError').PassboltBadResponseError;
 const PassboltServiceUnavailableError = require('../error/passboltServiceUnavailableError').PassboltServiceUnavailableError;
-const User = require('../model/user').User;
+const {User} = require('../model/user');
 
 class RoleService { }
 

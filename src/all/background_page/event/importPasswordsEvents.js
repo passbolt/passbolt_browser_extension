@@ -5,7 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 const ImportController = require('../controller/import/importController').ImportController;
-const User = require('../model/user').User;
+const {User} = require('../model/user');
 
 const listen = function (worker) {
   worker.port.on('passbolt.import-passwords.import-file', async function (requestId, b64FileContent, fileType, options) {

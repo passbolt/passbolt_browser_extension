@@ -19,7 +19,8 @@ const ENTITY_NAME = 'Secret';
 
 class SecretEntity extends Entity {
   /**
-   * Role entity constructor
+   * Secret entity constructor
+   * Used to store encrypted secrets
    *
    * @param {Object} secretDto secret DTO
    * @throws EntityValidationError if the dto cannot be converted into an entity
@@ -77,10 +78,10 @@ class SecretEntity extends Entity {
   // ==================================================
   /**
    * Get secret id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get id() {
-    return this._props.id;
+    return this._props.id || null;
   }
 
   /**

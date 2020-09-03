@@ -342,7 +342,8 @@ describe("PasswordCreateDialog", () => {
       name: resourceMeta.name,
       uri: resourceMeta.uri,
       username: resourceMeta.username,
-      description: resourceMeta.description
+      description: resourceMeta.description,
+      folder_parent_id: undefined,
     };
     expect(window.port.request).toHaveBeenCalledWith("passbolt.resources.create", onApiCreateResourceMeta, resourceMeta.password);
     expect(window.port.emit).toHaveBeenCalledTimes(2);

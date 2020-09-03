@@ -47,6 +47,7 @@ class ReactApp extends Component {
     this.getUserSettings();
     this.rememberMeInfo();
     this.getResources();
+    this.getResourceTypes();
     this.getFolders();
   }
 
@@ -172,6 +173,14 @@ class ReactApp extends Component {
     }
   }
 
+  async getResourceTypes() {
+    const storageData = await browser.storage.local.get(["resourceTypes"]);
+    if (storageData.resourceTypes && storageData.resourceTypes.length) {
+      const resourceTypes = storageData.resourceTypes;
+      this.setState({resourceTypes: resourceTypes});
+    }
+  }
+
   async getFolders() {
     const storageData = await browser.storage.local.get(["folders"]);
     if (storageData.folders && storageData.folders.length) {
@@ -189,6 +198,10 @@ class ReactApp extends Component {
     if (changes.resources) {
       const resources = changes.resources.newValue;
       this.setState({resources: resources});
+    }
+    if (changes.resourceTypes) {
+      const resourceTypes = changes.resourceTypes.newValue;
+      this.setState({resourceTypes: resourceTypes});
     }
     if (changes.folders) {
       const folders = changes.folders.newValue;
@@ -377,11 +390,14 @@ class ReactApp extends Component {
               <div id="app" className={`app ${isReady ? "ready" : ""}`} tabIndex="1000">
                 {this.state.showResourceCreateDialog &&
                 <PasswordCreateDialog onClose={this.handleResourceCreateDialogCloseEvent}
-                  folderParentId={this.state.resourceCreateDialogProps.folderParentId}/>
+                  folderParentId={this.state.resourceCreateDialogProps.folderParentId}
+                  resourceTypes={this.state.resourceTypes}
+                />
                 }
                 {this.state.showPasswordEditDialog &&
                 <PasswordEditDialog onClose={this.handleResourceEditDialogCloseEvent}
-                  id={this.state.passwordEditDialogProps.id}/>
+                  id={this.state.passwordEditDialogProps.id}
+                  resourceTypes={this.state.resourceTypes}/>
                 }
                 {this.state.showFolderCreateDialog &&
                 <FolderCreateDialog onClose={this.handleFolderCreateDialogCloseEvent}

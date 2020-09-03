@@ -74,11 +74,16 @@ class AuthController {
       await user.retrieveAndStoreCsrfToken();
       const privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
       await this.auth.login(privateKey);
+
+      // Post login operations
+      // MFA may not be complete yet, so no need to preload things here
       if (remember) {
         user.storeMasterPasswordTemporarily(passphrase, -1);
       }
       await this.auth.startCheckAuthStatusLoop();
-      await this.syncUserSettings();
+      await app.pageMods.PassboltApp.init();
+
+      // Move on to MFA or main screen
       this.handleLoginSuccess(redirect);
     } catch (error) {
       this.handleLoginError(error);
@@ -101,21 +106,6 @@ class AuthController {
   }
 
   /**
-   * Sync the user account settings.
-   *
-   * @returns {Promise<void>}
-   */
-  async syncUserSettings() {
-    const user = User.getInstance();
-    try {
-      await user.settings.sync()
-    } catch (error) {
-      // fail silently for CE users
-      user.settings.setDefaults();
-    }
-  }
-
-  /**
    * Handle a login success
    *
    * @param {string} redirect url (optional)
@@ -123,8 +113,6 @@ class AuthController {
    * @return {void}
    */
   async handleLoginSuccess(redirect) {
-    await app.pageMods.PassboltApp.init();
-
     if (this.worker.pageMod && this.worker.pageMod.args.name === "AuthForm") {
       let url;
       const trustedDomain = Config.read('user.settings.trustedDomain');

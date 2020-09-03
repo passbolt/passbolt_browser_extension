@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.4.0
  */
-const User = require('../model/user').User;
+const {User} = require('../model/user');
 const Request = require('../model/request').Request;
 const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
 const PassboltBadResponseError = require('../error/passboltBadResponseError').PassboltBadResponseError;

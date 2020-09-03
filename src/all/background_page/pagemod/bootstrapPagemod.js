@@ -7,11 +7,11 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var app = require('../app');
-var pageMod = require('../sdk/page-mod');
-var Worker = require('../model/worker');
+const app = require('../app');
+const {PageMod} = require('../sdk/page-mod');
+const Worker = require('../model/worker');
 
-var Bootstrap = function () {};
+const Bootstrap = function () {};
 Bootstrap._pageMod = undefined;
 
 Bootstrap.init = function () {
@@ -20,7 +20,7 @@ Bootstrap.init = function () {
     Bootstrap._pageMod = undefined;
   }
 
-  Bootstrap._pageMod = pageMod.PageMod({
+  Bootstrap._pageMod = new PageMod({
     name: 'Bootstrap',
     include: new RegExp('.*'),
     contentScriptWhen: 'ready',
@@ -36,6 +36,7 @@ Bootstrap.init = function () {
       'data/js/quickaccess/quickaccess.js',
       'content_scripts/js/bootstrap.js'
     ],
+    attachTo: {existing: true, reload: false},
     onAttach: function (worker) {
       Worker.add('Bootstrap', worker);
       app.events.config.listen(worker);

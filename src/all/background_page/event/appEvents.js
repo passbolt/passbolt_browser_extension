@@ -11,16 +11,16 @@ const __ = require('../sdk/l10n').get;
 // Controllers
 const passphraseController = require('../controller/passphrase/passphraseController');
 const progressController = require('../controller/progress/progressController');
+
+const {SecretDecryptController} = require('../controller/secret/secretDecryptController');
 const {ResourceExportController} = require('../controller/resource/resourceExportController');
 const {MoveController} = require('../controller/move/moveController');
 
 const Worker = require('../model/worker');
 const {Crypto} = require('../model/crypto');
-const {Keyring} = require('../model/keyring');
 const {User} = require('../model/user');
-const {Secret} = require('../model/secret');
+const {ResourceTypeModel} = require('../model/resourceType/resourceTypeModel');
 const {FolderModel} = require('../model/folder/folderModel');
-const {TabStorage} = require('../model/tabStorage');
 
 const {InvalidMasterPasswordError} = require('../error/invalidMasterPasswordError');
 const {UserAbortsOperationError} = require('../error/userAbortsOperationError');
@@ -47,82 +47,46 @@ const listen = function (worker) {
   /* ==================================================================================
    * Secret App Events
    * ================================================================================== */
-
-  /*
-   * Give the focus to the secret-edit iframe.
-   *
-   * @listens passbolt.secret-edit.focus
-   */
-  worker.port.on('passbolt.secret-edit.focus', function () {
-    Worker.get('Secret', worker.tab.id).port.emit('passbolt.secret-edit.focus');
-  });
-
-  /* Validate the edited secret.
-   *
-   * @listens passbolt.secret-edit.validate
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.secret-edit.validate', function (requestId) {
-    var editedPassword = TabStorage.get(worker.tab.id, 'editedPassword');
-
-    try {
-      // If the secret is decrypted validate it, otherwise it is
-      // considered as valid.
-      if (editedPassword.secret != null) {
-        const secret = new Secret();
-        secret.validate({data: editedPassword.secret});
-      }
-      Worker.get('Secret', worker.tab.id).port.emit('passbolt.secret-edit.validate-success');
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (e) {
-      Worker.get('Secret', worker.tab.id).port.emit('passbolt.secret-edit.validate-error', e.message, e.validationErrors);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
-    }
-  });
-
   /*
    * Decrypt a given armored string
    *
    * @listens passbolt.app.decrypt-and-copy-to-clipboard-resource-secret
    * @param {uuid} requestId The request identifier
    * @param {string} resourceId The resource identifier
+   * @param {string} fieldToCopy The secret field to copy
    */
-  worker.port.on('passbolt.app.decrypt-secret-and-copy-to-clipboard', async function (requestId, resourceId) {
-    const crypto = new Crypto();
-    let privateKey;
-
+  worker.port.on('passbolt.app.decrypt-secret-and-copy-to-clipboard', async function (requestId, resourceId, fieldToCopy) {
     try {
-      if (!Validator.isUUID(resourceId)) {
-        throw new Error(__('The resource id should be a valid UUID'))
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const controller = new SecretDecryptController(worker, requestId, apiClientOptions);
+      const {plaintext} = await controller.main(resourceId);
+      let textToCopy;
+
+      // Define what to copy
+      fieldToCopy = fieldToCopy || 'password';
+      if (typeof plaintext === 'string') {
+        textToCopy = plaintext;
+      } else {
+        if (plaintext.props.hasOwnProperty(fieldToCopy)) {
+          textToCopy = plaintext.props[fieldToCopy];
+        } else {
+          throw new Error(__('Missing property '));
+        }
       }
-      // Start fetching secret
-      const secretPromise = Secret.findByResourceId(resourceId);
-
-      // Ask for passphrase if needed
-      let passphrase = await passphraseController.get(worker);
-      privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
-
-      // Finish fetching if needed and decrypt
-      await progressController.open(worker, 'Decrypting...');
-      const secret = await secretPromise;
-      const message = await crypto.decryptWithKey(secret.data, privateKey);
 
       // Copy and success
       const clipboardWorker = Worker.get('ClipboardIframe', worker.tab.id);
-      clipboardWorker.port.emit('passbolt.clipboard-iframe.copy', message);
-      worker.port.emit(requestId, 'SUCCESS', message);
+      clipboardWorker.port.emit('passbolt.clipboard-iframe.copy', textToCopy);
+      worker.port.emit(requestId, 'SUCCESS', true);
 
     } catch (error) {
       if (error instanceof InvalidMasterPasswordError || error instanceof UserAbortsOperationError) {
-        // The copy operation has been aborted.
-        // Do nothing
+        // The copy operation has been aborted, do nothing
       } else if (error instanceof Error) {
         worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
       } else {
         worker.port.emit(requestId, 'ERROR', error);
       }
-    } finally {
-      await progressController.close(worker);
     }
   });
 
@@ -147,12 +111,39 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.app.react-app.is-ready', async function (requestId) {
     try {
-      const reactWorker = Worker.get('ReactApp', worker.tab.id);
-      reactWorker.port.request('passbolt.react-app.is-ready');
+      const reactWorker = Worker.get('ReactApp', worker.tab.id, false);
+      await reactWorker.port.request('passbolt.react-app.is-ready');
       worker.port.emit(requestId, 'SUCCESS');
     } catch(error) {
       worker.port.emit(requestId, 'ERROR');
     }
+  });
+
+  /*
+   * Whe the appjs is ready
+   *
+   * @listens assbolt.app.after-appjs-ready
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.app.after-appjs-ready', async function (requestId) {
+    // Sync user settings
+    const user = User.getInstance();
+    try {
+      await user.settings.sync()
+    } catch (error) {
+      // fail silently for CE users
+      user.settings.setDefaults();
+    }
+
+    // Sync
+    try {
+      const resourceTypeModel = new ResourceTypeModel(await user.getApiClientOptions());
+      await resourceTypeModel.updateLocalStorage();
+    } catch (error) {
+      // fail silently for prior version users
+    }
+
+    worker.port.emit(requestId, 'SUCCESS');
   });
 
   /* ==================================================================================
@@ -309,73 +300,6 @@ const listen = function (worker) {
    * DEPRECATED App Events
    * ================================================================================== */
   /*
-   * Encrypt the currently edited secret for all given users. Send the armored
-   * secrets in the response to the requester. If the secret hasn't been
-   * decrypted send an empty array.
-   *
-   * @listens passbolt.app.deprecated.secret-edit.encrypt
-   * @param requestId {uuid} The request identifier
-   * @param usersIds {array} The users to encrypt the edited secret for
-   * @deprecated since v2.12.0 will be removed with v3.0
-   */
-  worker.port.on('passbolt.app.deprecated.secret-edit.encrypt', async function (requestId, usersIds) {
-    const editedPassword = TabStorage.get(worker.tab.id, 'editedPassword');
-    const keyring = new Keyring();
-    const crypto = new Crypto();
-    const armoreds = {};
-    let privateKey;
-
-    // If the currently edited secret hasn't been decrypted, leave.
-    if (editedPassword.secret == null) {
-      worker.port.emit(requestId, 'SUCCESS', armoreds);
-      return;
-    }
-
-    // Get the passphrase if needed and decrypt secret key
-    try {
-      let passphrase = await passphraseController.get(this.worker);
-      privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', this.worker.port.getEmitableError(error));
-    }
-
-    // Open the progress dialog.
-    await progressController.open(worker, 'Encrypting ...', usersIds.length, 'Please wait...');
-
-    // Sync the keyring with the server.
-    await keyring.sync();
-
-    // Once the keyring is synced, encrypt the secret for each user.
-    let progress = 0;
-
-    // Prepare the data for encryption.
-    let encryptAllData = usersIds.map((userId) => {
-      return {
-        userId: userId,
-        message: editedPassword.secret
-      }
-    });
-
-    // Encrypt all the messages.
-    const data = await crypto.encryptAll(encryptAllData, privateKey, function () {
-      progressController.update(worker, progress++);
-    }, function (position) {
-      progressController.update(worker, progress, 'Encrypting ' + position + '/' + usersIds.length);
-    });
-
-    // Once the secret is encrypted for all users notify the application and
-    // close the progress dialog.
-    for (let i in data) {
-      if (data.hasOwnProperty(i)) {
-        armoreds[usersIds[i]] = data[i];
-      }
-    }
-    worker.port.emit(requestId, 'SUCCESS', armoreds);
-    await progressController.close(worker);
-  });
-
-  /*
    * Decrypt a given armored string
    *
    * @listens passbolt.app.decrypt
@@ -387,7 +311,6 @@ const listen = function (worker) {
     const crypto = new Crypto();
     let privateKey;
 
-    // Get the passphrase if needed and decrypt secret key
     try {
       let passphrase = await passphraseController.get(this.worker);
       privateKey = await crypto.getAndDecryptPrivateKey(passphrase);

@@ -15,9 +15,11 @@ const {ResourcesCollection} = require('../entity/resource/resourcesCollection');
 const {ResourceLocalStorage} = require('../../service/local_storage/resourceLocalStorage');
 const {ResourceService} = require('../../service/api/resource/resourceService');
 
+const {PlaintextEntity} = require('../entity/plaintext/plaintextEntity');
 const {PermissionEntity} = require('../entity/permission/permissionEntity');
 const {PermissionsCollection} = require('../entity/permission/permissionsCollection');
 const {PermissionChangesCollection} = require("../../model/entity/permission/permissionChangesCollection");
+const {ResourceTypeModel} = require("../../model/resourceType/resourceTypeModel");
 
 const {MoveService} = require('../../service/api/move/moveService');
 
@@ -31,6 +33,7 @@ class ResourceModel {
   constructor(apiClientOptions) {
     this.resourceService = new ResourceService(apiClientOptions);
     this.moveService = new MoveService(apiClientOptions);
+    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
   }
 
   /**
@@ -179,9 +182,9 @@ class ResourceModel {
    * @param {string} resourcesId resource uuid
    * @returns {Promise<ResourceEntity>}
    */
-  async findForShare (resourcesId) {
-    let resourcesDto = await this.resourceService.findAllForShare([resourcesId]);
-    return new ResourceEntity(resourcesDto[0]);
+  async findForDecrypt (resourcesId) {
+    let resourcesDto = await this.resourceService.get(resourcesId, {'secret': true, 'resource-type': true});
+    return new ResourceEntity(resourcesDto);
   };
 
   //==============================================================
@@ -239,6 +242,64 @@ class ResourceModel {
     await ResourceLocalStorage.updateResource(resourceEntity);
 
     return resourceEntity;
+  }
+
+  //==============================================================
+  // Secret plaintext serialization
+  //==============================================================
+  /**
+   * Return plaintext ready to be encrypted
+   * Based on resource type and plaintext
+   *
+   * @param {string|undefined} resourceTypeId The resource type uuid
+   * @param {string|object} plaintextDto The secret to encrypt
+   * @throws {TypeError} if resourceTypeId is invalid or the type definition is not found
+   * @returns {Promise<string>}
+   */
+  async serializePlaintextDto(resourceTypeId, plaintextDto) {
+    if (!resourceTypeId || typeof plaintextDto === 'string') {
+      return plaintextDto;
+    }
+    const schema = await this.resourceTypeModel.getSecretSchemaById(resourceTypeId);
+    if (!schema) {
+      throw new TypeError(__('Could not find the schema definition for the requested resource type.'))
+    }
+    const plaintextEntity = new PlaintextEntity(plaintextDto, schema);
+    return JSON.stringify(plaintextEntity);
+  }
+
+  /**
+   * Return the secret as per the resource type schema definition
+   *
+   * @param {string|undefined} resourceTypeId The resource type uuid
+   * @param {string} plaintext the secret data in plaintext
+   * @throws {TypeError} if plaintext is not a string or resource id is not a valid uuid
+   * @throws {SyntaxError} if plaintext is not a parsable JSON object (depends on secret schema definition)
+   * @returns {Promise<string|PlaintextEntity>}
+   */
+  async deserializePlaintext(resourceTypeId, plaintext) {
+    if (typeof plaintext !== 'string') {
+      throw new TypeError(__('Could not deserialize secret, plaintext is not a string.'))
+    }
+    if (!resourceTypeId) {
+      return plaintext;
+    }
+    const schema = await this.resourceTypeModel.getSecretSchemaById(resourceTypeId);
+    if (!schema) {
+      throw new TypeError(__('Could not find the schema definition for the requested resource type.'))
+    }
+    if (schema.type === 'string') {
+      return plaintext;
+    }
+    try {
+      const plaintextDto = JSON.parse(plaintext);
+      return new PlaintextEntity(plaintextDto, schema);
+    } catch(error) {
+      console.error(error);
+      // SyntaxError, json is not valid
+      // TypeError schema does not match
+      return plaintext; // return 'broken' string
+    }
   }
 
   //==============================================================

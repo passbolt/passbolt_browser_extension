@@ -8,7 +8,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var app = require('../app');
-var pageMod = require('../sdk/page-mod');
+const {PageMod} = require('../sdk/page-mod');
 var Worker = require('../model/worker');
 var Config = require('../model/config');
 
@@ -23,7 +23,7 @@ SetupBootstrap.init = function () {
   }
   const uuidRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}";
   const setupBootstrapRegex = `(.*)\/setup\/(install|recover)\/(${uuidRegex})\/(${uuidRegex})`;
-  SetupBootstrap._pageMod = pageMod.PageMod({
+  SetupBootstrap._pageMod = new PageMod({
     name: 'SetupBootstrap',
 		include: new RegExp(setupBootstrapRegex),
     contentScriptWhen: 'ready',

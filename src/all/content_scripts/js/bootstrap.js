@@ -13,7 +13,6 @@ $(function () {
    * Init the passbolt bootstrap.
    */
   var Bootstrap = function () {
-    var _this = this;
     this.isPluginIsconfigured = false;
     this.isTrustedDomain = false;
     this.trustedDomain = '';
@@ -22,9 +21,9 @@ $(function () {
     if($('html.passbolt.no-passboltplugin').length === 1) {
       // Check if the addon is configured
       this.loadConfiguration()
-        .then(function () {
-          _this.bootstrapCommon();
-          _this.bootstrapLoginPage();
+        .then(() => {
+          this.bootstrapCommon();
+          this.bootstrapLoginPage();
         })
     }
 

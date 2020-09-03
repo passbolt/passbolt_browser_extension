@@ -14,7 +14,7 @@
 const __ = require('../sdk/l10n').get;
 const MfaAuthenticationRequiredError = require('../error/mfaAuthenticationRequiredError').MfaAuthenticationRequiredError;
 const NotFoundError = require('../error/notFoundError').NotFoundError;
-const User = require('../model/user').User;
+const {User} = require('../model/user');
 const PassboltBadResponseError = require('../error/passboltBadResponseError').PassboltBadResponseError;
 const PassboltServiceUnavailableError = require('../error/passboltServiceUnavailableError').PassboltServiceUnavailableError;
 

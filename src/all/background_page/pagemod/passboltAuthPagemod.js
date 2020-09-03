@@ -8,7 +8,7 @@
  */
 var app = require('../app');
 var User = require('../model/user').User;
-var pageMod = require('../sdk/page-mod');
+const {PageMod} = require('../sdk/page-mod');
 var Worker = require('../model/worker');
 
 var PassboltAuth = function () {};
@@ -34,7 +34,7 @@ PassboltAuth.init = function () {
   var url = '^' + escapedDomain + '/auth/login/?(#.*)?(\\?.*)?$';
   var regex = new RegExp(url);
 
-  PassboltAuth._pageMod = pageMod.PageMod({
+  PassboltAuth._pageMod = new PageMod({
     name: 'Auth',
     include: regex,
     contentScriptWhen: 'ready',
@@ -50,12 +50,11 @@ PassboltAuth.init = function () {
       'data/js/lib/html.js',
       'content_scripts/js/login/login.js'
     ],
-    attachTo: ["existing", "top"],
+    attachTo: {existing: true, reload: true},
     onAttach: function (worker) {
       user.flushMasterPassword();
       Worker.add('Auth', worker);
       app.events.keyring.listen(worker);
-      app.events.secret.listen(worker);
       app.events.user.listen(worker);
       app.events.auth.listen(worker);
     }

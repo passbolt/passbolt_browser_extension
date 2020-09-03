@@ -401,6 +401,7 @@ const User = (function () {
 
   /**
    * Return API Client options such as Domain and CSRF token
+   * @return {ApiClientOptions} apiClientOptions
    */
   this.getApiClientOptions = async function() {
     return (new ApiClientOptions())

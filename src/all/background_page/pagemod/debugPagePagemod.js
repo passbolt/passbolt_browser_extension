@@ -9,7 +9,7 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var pageMod = require('../sdk/page-mod');
+const {PageMod} = require('../sdk/page-mod');
 var app = require('../app');
 var Worker = require('../model/worker');
 var Log = require('../model/log').Log;
@@ -26,7 +26,7 @@ DebugPage.init = function () {
     DebugPage._pageMod = undefined;
   }
 
-  DebugPage._pageMod = pageMod.PageMod({
+  DebugPage._pageMod = new PageMod({
     name: 'DebugPage',
     include: chrome.runtime.getURL('data/config-debug.html'),
 

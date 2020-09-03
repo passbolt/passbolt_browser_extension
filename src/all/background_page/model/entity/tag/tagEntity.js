@@ -71,10 +71,10 @@ class TagEntity extends Entity {
   // ==================================================
   /**
    * Get tag id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get id() {
-    return this._props.id;
+    return this._props.id || null;
   }
 
   /**

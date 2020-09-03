@@ -52,7 +52,9 @@ class ResourceService extends AbstractService {
       'permissions.user.profile',
       'permissions.group',
       // if tag plugin
-      'tag'
+      'tag',
+      // resource types - since v3
+      'resource-type'
     ];
   }
 

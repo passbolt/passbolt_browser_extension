@@ -186,7 +186,10 @@ window.addEventListener("passbolt.plugin.resources_share", shareResources, false
 // @deprecated since v2.4.0 will be removed in v3.0
 window.addEventListener("passbolt.plugin.resource_share", async function (event) {
   const data = event.detail;
-  const resourceId = Object.values(data.resourceId);
+  let resourceId = Object.values(data.resourceId);
+  if (Array.isArray(resourceId)){
+    resourceId = resourceId.join('');
+  }
   if (!event.detail || !validator.isUUID(resourceId)) {
     throw new TypeError('Invalid Appjs request. Resource share request should contain a valid resource UUID.');
   }

@@ -455,15 +455,6 @@ var UserSingleton = (function () {
         const user = UserSingleton.getInstance();
         user.flushMasterPassword();
       });
-
-      // Observe when the window is closed, only strategy found to catch when the browser is closed.
-      // - Flush the temporary stored master password
-      browser.tabs.onRemoved.addListener((tabId, evInfo) => {
-        if (evInfo.isWindowClosing) {
-          const user = UserSingleton.getInstance();
-          user.flushMasterPassword();
-        }
-      });
     }
   };
 })();

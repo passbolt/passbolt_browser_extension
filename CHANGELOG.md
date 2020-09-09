@@ -4,6 +4,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### [2.13.7] - 2020-09-09
+### Fixed
+- Fix terminate any active session if user starts another account recovery / setup.
+- Fix local storage / session should not be flushed when window is closed.
+
+### Added
+- Add codeql-analysis.yml for Github code analysis
+
 ### [2.13.6] - 2020-08-06
 ### Fixed
 - PB-1416 As LU deleting a folder it should update the resources local storage

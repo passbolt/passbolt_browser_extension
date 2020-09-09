@@ -618,6 +618,7 @@ $(function () {
    * @param data {array} The setup information
    */
   passbolt.setup.init = function () {
+    passbolt.request("passbolt.auth.logout");
     passbolt.setup._initGetUrlSetupData()
       .then(passbolt.setup._initPrepareData)
       .then(passbolt.setup._initValidateUser)

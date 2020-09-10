@@ -198,14 +198,25 @@ class ResourceModel {
    * @returns {Promise<ResourceEntity>}
    */
   async create(resourceEntity) {
-    const resourceDto = await this.resourceService.create(resourceEntity.toDto({secrets:true}), {permission:true});
-    const updatedResourceEntity = new ResourceEntity(resourceDto);
-    await ResourceLocalStorage.addResource(updatedResourceEntity);
-    return updatedResourceEntity;
+    const data = resourceEntity.toDto({secrets:true});
+    const resourceDto = await this.resourceService.create(data, ResourceLocalStorage.DEFAULT_CONTAIN);
+    const newResourceEntity = new ResourceEntity(resourceDto);
+    await ResourceLocalStorage.addResource(newResourceEntity);
+    return newResourceEntity;
   }
 
+  /**
+   * Update a resource using Passbolt API and add result to local storage
+   *
+   * @param {ResourceEntity} resourceEntity
+   * @returns {Promise<ResourceEntity>}
+   */
   async update(resourceEntity) {
-    const resourceDto = await this.resourceService.update(resourceEntity.toDto({secrets:true}), {permission:true});
+    const data = resourceEntity.toDto({secrets:true});
+    const resourceDto = await this.resourceService.update(resourceEntity.id, data, ResourceLocalStorage.DEFAULT_CONTAIN);
+    const updatedResourceEntity = new ResourceEntity(resourceDto);
+    await ResourceLocalStorage.updateResource(updatedResourceEntity);
+    return updatedResourceEntity;
   }
 
   /**

@@ -8,7 +8,6 @@
  */
 const Worker = require('../model/worker');
 const {User} = require('../model/user');
-const {Permission} = require('../model/permission');
 const {Resource} = require('../model/resource');
 const {FolderModel} = require('../model/folder/folderModel');
 const {Share} = require('../model/share');
@@ -48,14 +47,7 @@ const listen = function (worker) {
   worker.port.on('passbolt.share.get-resources', async function (requestId, resourcesIds) {
     let resources = [];
     try {
-      if (resourcesIds.length === 1) {
-        // This code ensure the compatibility with passbolt < v2.4.0.
-        const resource = await Resource.findShareResource(resourcesIds[0]);
-        resource.permissions = await Permission.findResourcePermissions(resourcesIds[0]);
-        resources = [resource];
-      } else {
-        resources = await Resource.findAllForShare(resourcesIds);
-      }
+      resources = await Resource.findAllForShare(resourcesIds);
       worker.port.emit(requestId, 'SUCCESS', resources);
     } catch(error) {
       console.error(error);

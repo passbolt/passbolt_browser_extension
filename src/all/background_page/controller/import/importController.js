@@ -21,7 +21,9 @@ const {FolderModel} = require('../../model/folder/folderModel');
 const {KeepassDb} = require('../../model/keepassDb/keepassDb');
 const {Keyring} = require('../../model/keyring');
 const {Resource} = require('../../model/resource');
-const {Tag} = require('../../model/tag');
+const {TagModel} = require('../../model/tag/tagModel');
+const {TagEntity} = require('../../model/entity/tag/tagEntity');
+const {TagsCollection} = require('../../model/entity/tag/tagsCollection');
 const {User} = require('../../model/user');
 
 const progressController = require('../progress/progressController');
@@ -142,7 +144,7 @@ class ImportController {
         tags = await this.processBatches(tagsBatches, this.saveTags.bind(this));
         // crassette
         if (!folders || !folders.length) {
-          Worker.get('App', this.worker.tab.id).port.emit('passbolt.import-passwords.complete', {tag: this.uniqueImportTag});
+          Worker.get('App', this.worker.tab.id).port.emit('passbolt.import-passwords.complete', {tag: this.uniqueImportTag.slug});
         }
       }
 
@@ -152,7 +154,7 @@ class ImportController {
         "resources": resources,
         "folders": folders,
         "tags": tags,
-        "importTag": this.uniqueImportTag,
+        "importTag": this.uniqueImportTag.slug,
         "options": this.options
       };
     } catch(e) {
@@ -165,11 +167,13 @@ class ImportController {
    * Import the tags associated to an imported resource
    *
    * @param {object} resource
+   * @return {Promise}
    * @private
    */
   saveTags(resource) {
-    let tags = [this.uniqueImportTag];
-    return Tag.add(resource.id, tags);
+    let tagsCollection = new TagsCollection([this.uniqueImportTag.toDto()]);
+    let tagModel = new TagModel(this.clientOptions);
+    return tagModel.updateResourceTags(resource.id, tagsCollection);
   };
 
   /**
@@ -285,13 +289,13 @@ class ImportController {
     let res = '';
 
     if (!path || path === '/') {
-      res = '/' + this.uniqueImportTag;
+      res = '/' + this.uniqueImportTag.slug;
     } else if (path.match(/^Root/)) {
       // If there is a root folder, we replace it with the unique tag name.
-      res = path.replace(/^Root/, "/" + this.uniqueImportTag);
+      res = path.replace(/^Root/, "/" + this.uniqueImportTag.slug);
     } else {
       // Else, we add the unique tag name at the beginning of
-      res = "/" + this.uniqueImportTag + '/' + path;
+      res = "/" + this.uniqueImportTag.slug + '/' + path;
     }
 
     return res;
@@ -346,7 +350,7 @@ class ImportController {
    * @param {array} resourcesBatch batch of resources to save.
    * @param {int} batchNumber batch number
    * @param {function} importFn import function callback
-   * @return Promise
+   * @return {Promise}
    */
   async importBatch(resourcesBatch, batchNumber, importFn) {
     this.currentBatchNumber++;
@@ -531,7 +535,7 @@ class ImportController {
    * It's the tag / folder name that will be associated to the resources imported.
    * looks like import-filetype-yyyymmddhhiiss
    * @param fileType
-   * @return {string}
+   * @return {TagEntity}
    */
   static _generateUniqueImportTag (fileType) {
     // Today's date in format yyyymmddhhiiss
@@ -543,7 +547,7 @@ class ImportController {
       today.getMinutes().toString() +
       today.getSeconds().toString();
 
-    return 'import-' + fileType + '-' + importDate;
+    return new TagEntity({slug: 'import-' + fileType + '-' + importDate, is_shared: false});
   };
 
   /**

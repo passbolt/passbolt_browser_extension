@@ -466,6 +466,14 @@ class ResourceEntity extends Entity {
     this._permissions = permissions;
   }
 
+  /**
+   * Set resource tags
+   * @param {TagsCollection} tags
+   */
+  set tags(tags) {
+    this._tags = tags;
+  }
+
   // ==================================================
   // Build rules
   // ==================================================

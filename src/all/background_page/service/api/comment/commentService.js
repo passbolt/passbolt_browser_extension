@@ -47,43 +47,21 @@ class CommentService extends AbstractService {
   }
 
   /**
-   * Return the list of supported filters for in API find operations
-   *
-   * @returns {Array<string>} list of supported option
-   */
-  static getSupportedFiltersOptions() {
-    return [];
-  }
-
-  /**
-   * Return the list of supported orders for in API find operations
-   *
-   * @returns {Array<string>} list of supported option
-   */
-  static getSupportedOrdersOptions() {
-    return [];
-  }
-
-  /**
    * Find all resources
    *
    * @param {string} foreignId foreign model name
    * @param {string} foreignModel foreign key uuid
    * @param {Object} [contains] optional example: {creator: true}
-   * @param {Object} [filters] optional
-   * @param {Object} [orders] optional
    * @returns {Promise<*>} response body
    * @throws {Error} if options are invalid or API error
    * @public
    */
-  async findAll(foreignModel, foreignId,  contains, filters, orders) {
+  async findAll(foreignModel, foreignId,  contains) {
     this.apiClient.assertValidId(foreignId);
     this.assertValidForeignModel(foreignModel);
 
     contains = contains ? this.formatContainOptions(contains, CommentService.getSupportedContainOptions()) : null;
-    filters = filters ? this.formatFilterOptions(filters, CommentService.getSupportedFiltersOptions()) : null;
-    orders = orders ? this.formatOrderOptions(orders, CommentService.getSupportedFiltersOptions()) : null;
-    const urlOptions = {...contains, ...filters, ...orders};
+    const urlOptions = {...contains};
 
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${foreignModel.toLowerCase()}/${foreignId}`, urlOptions || {});
     const response = await this.apiClient.fetchAndHandleResponse('GET', url);
@@ -97,16 +75,13 @@ class CommentService extends AbstractService {
    * Create a resource using Passbolt API
    *
    * @param {Object} commentDto
-   * @param {Object} [contains] optional example: {creator: true}
    * @returns {Promise<*>} Response body
    * @public
    */
-  async create(commentDto, contains) {
-    let urlOptions = contains ? this.formatContainOptions(contains, CommentService.getSupportedContainOptions()) : null;
-
+  async create(commentDto) {
     const foreignModel = commentDto.foreign_model;
     const foreignId = commentDto.foreign_key;
-    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${foreignModel.toLowerCase()}/${foreignId}`, urlOptions || {});
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${foreignModel.toLowerCase()}/${foreignId}`, {});
     const data = {content: commentDto.content};
     if (commentDto.parent_id) {
       data.parent_id = commentDto.parent_id;

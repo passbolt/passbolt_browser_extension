@@ -200,14 +200,6 @@ class FolderLocalStorage {
     window.addEventListener("passbolt.global.auth.logged-out", () => {
       this.flush();
     });
-
-    // Flush the local storage when a window is closed.
-    // Strategy to catch the browser close event.
-    browser.tabs.onRemoved.addListener((tabId, evInfo) => {
-      if (evInfo.isWindowClosing) {
-        this.flush();
-      }
-    });
   }
 }
 

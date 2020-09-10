@@ -15,13 +15,13 @@ const __ = require('../../sdk/l10n').get;
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
 
-const {Resource} = require('../../model/resource');
 const {User} = require('../../model/user');
 const {Keyring} = require('../../model/keyring');
 const {Crypto} = require('../../model/crypto');
 const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
 const {ResourceModel} = require('../../model/resource/resourceModel');
 const {UserService} = require('../../service/user');
+const {SecretsCollection} = require('../../model/entity/secret/secretsCollection');
 
 class ResourceUpdateController {
   /**
@@ -46,23 +46,24 @@ class ResourceUpdateController {
    * @returns {Promise<Object>} updated resource
    */
   async main(resourceDto, plaintextDto) {
-    // Most simple scenario, there is no secret to update
+    const resourceEntity = new ResourceEntity(resourceDto);
     if (plaintextDto === null) {
-      return await this.updateResourceMetaOnly(resourceDto);
+      // Most simple scenario, there is no secret to update
+      return await this.updateResourceMetaOnly(resourceEntity);
     } else {
-      return await this.updateResourceAndSecret(resourceDto, plaintextDto);
+      return await this.updateResourceAndSecret(resourceEntity, plaintextDto);
     }
   }
 
   /**
    * Update a resource metadata
    *
-   * @param {object} resourceDto
+   * @param {ResourceEntity} resourceEntity
    * @returns {Promise<Object>} updated resource
    */
-  async updateResourceMetaOnly(resourceDto) {
+  async updateResourceMetaOnly(resourceEntity) {
     await progressController.open(this.worker, __("Updating password"), 1);
-    const updatedResource = await Resource.update(resourceDto);
+    const updatedResource = await this.resourceModel.update(resourceEntity);
     await progressController.update(this.worker, 1, __("Done!"));
     await progressController.close(this.worker);
     return updatedResource;
@@ -71,19 +72,17 @@ class ResourceUpdateController {
   /**
    * Update a resource and associated secret
    *
-   * @param {object} resourceDto
+   * @param {object} resourceEntity
    * @param {string|object} plaintextDto
    * @returns {Promise<Object>} updated resource
    */
-  async updateResourceAndSecret(resourceDto, plaintextDto) {
-    let resource = new ResourceEntity(resourceDto);
-
+  async updateResourceAndSecret(resourceEntity, plaintextDto) {
     // Get the passphrase if needed and decrypt secret key
     let privateKey = await this.getPrivateKey()
 
     // Set the goals
     await progressController.open(this.worker, __("Updating password"), 4);
-    const usersIds = await this.getUsersIdsToEncryptFor(resource.id);
+    const usersIds = await this.getUsersIdsToEncryptFor(resourceEntity.id);
     const goals = usersIds.length + 3; // encrypt * users + keyring sync + save + done
     await progressController.updateGoals(this.worker, goals);
 
@@ -93,12 +92,12 @@ class ResourceUpdateController {
     await keyring.sync();
 
     // Encrypt
-    const plaintext = await this.resourceModel.serializePlaintextDto(resource.resourceTypeId, plaintextDto);
-    resourceDto.secrets = await this.encryptSecrets(plaintext, usersIds, privateKey);
+    const plaintext = await this.resourceModel.serializePlaintextDto(resourceEntity.resourceTypeId, plaintextDto);
+    resourceEntity.secrets = await this.encryptSecrets(plaintext, usersIds, privateKey);
 
     // Post data & wrap up
     await progressController.update(this.worker, goals-1, __("Saving resource"));
-    const updatedResource = await Resource.update(resourceDto);
+    const updatedResource = await this.resourceModel.update(resourceEntity);
     await progressController.update(this.worker, goals, __("Done!"));
     await progressController.close(this.worker);
     return updatedResource;
@@ -144,7 +143,7 @@ class ResourceUpdateController {
    * @param {string|Object} plaintextDto
    * @param {array} usersIds
    * @param {openpgp.key.Key} privateKey
-   * @returns {Promise<array>}
+   * @returns {Promise<SecretsCollection>}
    */
   async encryptSecrets(plaintextDto, usersIds, privateKey) {
     const secrets = [];
@@ -156,7 +155,7 @@ class ResourceUpdateController {
         await progressController.update(this.worker, i+2, __("Encrypting"));
       }
     }
-    return secrets;
+    return new SecretsCollection(secrets);
   }
 }
 

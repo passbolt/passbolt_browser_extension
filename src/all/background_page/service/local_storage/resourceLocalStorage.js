@@ -174,7 +174,7 @@ class ResourceLocalStorage {
 
   // =================================================
   // Deprecated methods
-  // Using DTOs instead of entities
+  // Stop using DTOs instead one should use entities
   // =================================================
   /**
    * Set the resources local storage.
@@ -217,14 +217,6 @@ class ResourceLocalStorage {
     // Flush the local storage when the passbolt user session is terminated
     window.addEventListener("passbolt.global.auth.logged-out", () => {
       this.flush();
-    });
-
-    // Flush the local storage when a window is closed.
-    // Strategy to catch the browser close event.
-    browser.tabs.onRemoved.addListener((tabId, evInfo) => {
-      if (evInfo.isWindowClosing) {
-        this.flush();
-      }
     });
   }
 }

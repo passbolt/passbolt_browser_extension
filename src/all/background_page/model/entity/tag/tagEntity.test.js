@@ -43,8 +43,7 @@ describe("Tag entity", () => {
     } catch(error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual( {
-        slug: { required: 'The slug is required.' },
-        is_shared: { required: 'The is_shared is required.' }
+        slug: { required: 'The slug is required.' }
       });
     }
   });

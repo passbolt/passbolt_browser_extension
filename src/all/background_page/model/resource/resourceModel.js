@@ -18,9 +18,10 @@ const {ResourceService} = require('../../service/api/resource/resourceService');
 const {PlaintextEntity} = require('../entity/plaintext/plaintextEntity');
 const {PermissionEntity} = require('../entity/permission/permissionEntity');
 const {PermissionsCollection} = require('../entity/permission/permissionsCollection');
-const {PermissionChangesCollection} = require("../../model/entity/permission/permissionChangesCollection");
-const {ResourceTypeModel} = require("../../model/resourceType/resourceTypeModel");
+const {PermissionChangesCollection} = require('../../model/entity/permission/permissionChangesCollection');
+const {ResourceTypeModel} = require('../../model/resourceType/resourceTypeModel');
 
+const {TagsCollection} = require('../../model/entity/tag/tagsCollection');
 const {MoveService} = require('../../service/api/move/moveService');
 
 class ResourceModel {
@@ -203,6 +204,10 @@ class ResourceModel {
     return updatedResourceEntity;
   }
 
+  async update(resourceEntity) {
+    const resourceDto = await this.resourceService.update(resourceEntity.toDto({secrets:true}), {permission:true});
+  }
+
   /**
    * Delete a resource using Passbolt API and remove the resource from the local storage
    *
@@ -300,6 +305,22 @@ class ResourceModel {
       // TypeError schema does not match
       return plaintext; // return 'broken' string
     }
+  }
+
+  /**
+   * Update tags in resource local storage
+   * Doesn't udpate the tags remotely, use tagModel for this instead
+   *
+   * @param {string} resourceId
+   * @param {TagsCollection} tagsCollection
+   * @returns {Promise<ResourceEntity>}
+   */
+  async updateTagsLocally(resourceId, tagsCollection) {
+    const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
+    const resourceEntity = new ResourceEntity(resourceDto);
+    resourceEntity.tags = tagsCollection;
+    await ResourceLocalStorage.updateResource(resourceEntity);
+    return resourceEntity;
   }
 
   //==============================================================

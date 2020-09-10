@@ -32,6 +32,9 @@ class TagEntity extends Entity {
     ));
 
     // Additional build rules
+    if (typeof this._props.is_shared === 'undefined') {
+      this._props.is_shared = this.slug.startsWith('#');
+    }
     if (this.slug.startsWith('#') && !this.isShared) {
       const error = new EntityValidationError('Invalid tag');
       error.addError('is_shared', 'hashtag', 'A shared tag should start with a hashtag.');
@@ -46,8 +49,7 @@ class TagEntity extends Entity {
     return {
       "type": "object",
       "required": [
-        "slug",
-        "is_shared"
+        "slug"
       ],
       "properties": {
         "id": {
@@ -93,22 +95,6 @@ class TagEntity extends Entity {
     return this._props.is_shared;
   }
 
-  /**
-   * Get created date
-   * @returns {(string|null)} date
-   */
-  get created() {
-    return this._props.created || null;
-  }
-
-  /**
-   * Get modified date
-   * @returns {(string|null)} date
-   */
-  get modified() {
-    return this._props.modified || null;
-  }
-
   // ==================================================
   // Static properties getters
   // ==================================================
@@ -119,7 +105,6 @@ class TagEntity extends Entity {
   static get ENTITY_NAME() {
     return ENTITY_NAME;
   }
-
 }
 
 exports.TagEntity = TagEntity;

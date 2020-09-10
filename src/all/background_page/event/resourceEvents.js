@@ -91,6 +91,7 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.resources.delete-all', async function (requestId, resourcesIds) {
     try {
+      // TODO DeleteResourcesController with progress dialog if resourceIds > 1
       const clientOptions = await User.getInstance().getApiClientOptions();
       const resourceModel = new ResourceModel(clientOptions);
       await resourceModel.deleteAll(resourcesIds);

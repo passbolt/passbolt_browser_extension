@@ -203,20 +203,4 @@ Resource.findAll = async function (options) {
   return LegacyResourceService.findAll(options);
 };
 
-/**
- * Save a resource
- *
- * @param {object} data The resource data
- * @return {Promise}
- */
-Resource.update = async function (data) {
-  if (data.folderParentId) {
-    data.folder_parent_id = data.folderParentId;
-  }
-  const resource = await LegacyResourceService.update(data);
-  await ResourceLocalStorage.updateResourceLegacy(resource);
-
-  return resource;
-};
-
 exports.Resource = Resource;

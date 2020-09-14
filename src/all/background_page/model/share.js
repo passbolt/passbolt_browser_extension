@@ -60,7 +60,6 @@ Share.bulkShareResources = async function(resources, changes, privateKey, progre
       await ShareService.shareResource(resourceId, {permissions, secrets});
     }
   }
-  await Resource.updateLocalStorage();
 };
 
 /**

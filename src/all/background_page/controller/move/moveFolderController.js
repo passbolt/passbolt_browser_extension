@@ -257,6 +257,7 @@ class MoveFolderController {
       await Share.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await progressController.update(this.worker, this.progress++, message);
       });
+      await this.resourceModel.updateLocalStorage();
     }
   }
 

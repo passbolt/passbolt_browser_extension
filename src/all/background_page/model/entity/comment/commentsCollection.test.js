@@ -44,10 +44,8 @@ describe("Comment entity", () => {
     };
     const dto = [comment1, comment2];
     const entity = new CommentsCollection(dto);
-    comment1.creator = comment2.creator = null;
-    comment1.modifier = comment2.modifier = null;
     const expected = [comment1, comment2];
-    expect(entity.toDto()).toEqual(expected);
+    expect(expected).toEqual(entity.toDto());
     expect(JSON.stringify(entity)).toEqual(JSON.stringify(expected));
     expect(entity.items[0].content).toEqual('comment1');
     expect(entity.items[1].content).toEqual('comment2');

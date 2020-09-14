@@ -258,6 +258,7 @@ class ApiClient {
         throw new TypeError('ApiClient.buildUrl error: urlOptions key should be a string.');
       }
       if (typeof value === 'string') {
+        // Example "filter[has-tag]": "<string>"
         urlObj.searchParams.append(key, value);
       } else {
         // Example "filter[has-id][]": "<uuid>"

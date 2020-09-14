@@ -177,30 +177,20 @@ class ResourceEntity extends Entity {
     if (!contain) {
       return result;
     }
-    if (contain.permission) {
-      if (this._permission) {
-        result.permission = this._permission ? this._permission.toDto() : null;
-      }
+    if (this._permission && contain.permission) {
+      result.permission = this._permission.toDto();
     }
-    if (contain.permissions) {
-      if (this._permissions) {
-        result.permissions = this._permissions ? this._permissions.toDto() : null;
-      }
+    if (this._permissions && contain.permissions) {
+        result.permissions = this._permissions.toDto();
     }
-    if (contain.favorite) {
-      if (this._favorite) {
-        result.favorite = this._favorite ? this._favorite.toDto() : null;
-      }
+    if (this._favorite && contain.favorite) {
+        result.favorite = this._favorite.toDto();
     }
-    if (contain.tags) {
-      if (this._tags) {
-        result.tags = this._tags ? this._tags.toDto() : null;
-      }
+    if (this._tags && contain.tags) {
+        result.tags = this._tags.toDto();
     }
-    if (contain.secrets) {
-      if (this._secrets) {
-        result.secrets = this._secrets ? this._secrets.toDto() : null;
-      }
+    if (this._secrets && contain.secrets) {
+        result.secrets = this._secrets.toDto();
     }
     return result;
   }

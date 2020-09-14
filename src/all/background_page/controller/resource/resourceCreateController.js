@@ -126,6 +126,7 @@ class ResourceCreateController {
       await Share.bulkShareResources(resourcesToShare, changes.toDto(), privateKey, async message => {
         await progressController.update(this.worker, this.progress++, message);
       });
+      await this.resourceModel.updateLocalStorage();
     }
   }
 }

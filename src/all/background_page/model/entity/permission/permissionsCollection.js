@@ -73,6 +73,9 @@ class PermissionsCollection extends EntityCollection {
    */
   toDto(contain) {
     const result = [];
+    if (!contain) {
+      contain = PermissionEntity.ALL_CONTAIN_OPTIONS;
+    }
     for(let permission of this) {
       result.push(permission.toDto(contain))
     }

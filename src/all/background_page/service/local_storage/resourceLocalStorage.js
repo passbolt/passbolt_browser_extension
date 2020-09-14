@@ -147,7 +147,7 @@ class ResourceLocalStorage {
    * @returns {{permission: boolean, favorite: boolean, tags: boolean}}
    */
   static get DEFAULT_CONTAIN() {
-    return {permission: true, favorite: true, tags: true};
+    return {permission: true, favorite: true, tags: true, folder: true};
   }
 
   /**
@@ -176,18 +176,6 @@ class ResourceLocalStorage {
   // Deprecated methods
   // Stop using DTOs instead one should use entities
   // =================================================
-  /**
-   * Set the resources local storage.
-   * @param {array} resources The resources to insert in the local storage.
-   * @return {void}
-   * @deprecated
-   */
-  static async setLegacy(resources) {
-    await lock.acquire();
-    await browser.storage.local.set({ resources });
-    lock.release();
-  };
-
   /**
    * Update a resource in the local storage.
    * @param {object} resource The resource to update

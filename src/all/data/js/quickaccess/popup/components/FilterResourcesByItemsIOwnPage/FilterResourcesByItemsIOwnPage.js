@@ -52,8 +52,8 @@ class FilterResourcesByItemsIOwnPage extends React.Component {
   }
 
   async findAndLoadResources() {
-    const filter = { isOwnedByMe: true };
-    const resources = await passbolt.request("passbolt.resources.find-all", { filter });
+    const filters = { 'is-owned-by-me': true };
+    const resources = await passbolt.request('passbolt.resources.find-all', { filters });
     this.sortResourcesAlphabetically(resources);
     this.setState({ resources });
   }

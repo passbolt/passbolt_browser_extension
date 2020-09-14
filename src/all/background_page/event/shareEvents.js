@@ -8,9 +8,9 @@
  */
 const Worker = require('../model/worker');
 const {User} = require('../model/user');
-const {Resource} = require('../model/resource');
-const {FolderModel} = require('../model/folder/folderModel');
 const {Share} = require('../model/share');
+const {ResourceModel} = require('../model/resource/resourceModel');
+const {FolderModel} = require('../model/folder/folderModel');
 
 const {FoldersCollection} = require('../model/entity/folder/foldersCollection');
 const {PermissionChangesCollection} = require('../model/entity/permission/permissionChangesCollection');
@@ -45,10 +45,11 @@ const listen = function (worker) {
    * @param {array} resourcesIds The ids of the resources to retrieve.
    */
   worker.port.on('passbolt.share.get-resources', async function (requestId, resourcesIds) {
-    let resources = [];
     try {
-      resources = await Resource.findAllForShare(resourcesIds);
-      worker.port.emit(requestId, 'SUCCESS', resources);
+      let apiClientOptions = await User.getInstance().getApiClientOptions();
+      let resourceModel = new ResourceModel(apiClientOptions);
+      const resourcesCollection = await resourceModel.findAllForShare(resourcesIds);
+      worker.port.emit(requestId, 'SUCCESS', resourcesCollection.toJSON());
     } catch(error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
@@ -79,8 +80,9 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.share.resources.save', async function (requestId, resources, changes) {
-    const shareResourcesController = new ShareResourcesController(worker, requestId);
     try {
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const shareResourcesController = new ShareResourcesController(worker, requestId, apiClientOptions);
       await shareResourcesController.main(resources, changes);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {

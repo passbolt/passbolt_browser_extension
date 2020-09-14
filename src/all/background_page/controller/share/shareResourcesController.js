@@ -15,19 +15,23 @@ const __ = require('../../sdk/l10n').get;
 const {Crypto} = require('../../model/crypto');
 const {Keyring} = require('../../model/keyring');
 const {Share} = require('../../model/share');
+const {ResourceModel} = require('../../model/resource/resourceModel');
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
 
 class ShareResourcesController {
   /**
-   * Controller constructor
+   * MoveController constructor
    *
    * @param {Worker} worker
-   * @param {string} requestId uuid
+   * @param {string} requestId
+   * @param {ApiClientOptions} clientOptions
    */
-  constructor(worker, requestId) {
+  constructor(worker, requestId, clientOptions) {
     this.worker = worker;
     this.requestId = requestId;
+    this.clientOptions = clientOptions;
+    this.resourceModel = new ResourceModel(clientOptions);
   }
 
   /**
@@ -68,6 +72,7 @@ class ShareResourcesController {
       await Share.bulkShareResources(resources, changes, privateKey, async message => {
         await progressController.update(this.worker, progress++, message);
       });
+      await this.resourceModel.updateLocalStorage();
       const results = resources.map(resource => resource.id);
       await progressController.update(this.worker, progressGoal, __('Done!'));
       await progressController.close(this.worker);

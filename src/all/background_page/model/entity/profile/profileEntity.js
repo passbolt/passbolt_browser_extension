@@ -88,13 +88,13 @@ class ProfileEntity extends Entity {
   // ==================================================
   /**
    * Return a DTO ready to be sent to API
-   * @param {object} contain optional example {avatar: true}
+   * @param {object} [contain] optional example {avatar: true}
    * @returns {*}
    */
   toDto(contain) {
     const result = Object.assign({}, this._props);
-    if (contain && contain.avatar) {
-        result.avatar = this.avatar ? this.avatar.toDto() : null;
+    if (this.avatar && contain && contain.avatar) {
+        result.avatar = this.avatar.toDto();
     }
     return result;
   }

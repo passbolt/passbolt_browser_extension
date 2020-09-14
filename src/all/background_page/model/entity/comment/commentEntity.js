@@ -128,11 +128,14 @@ class CommentEntity extends Entity {
    */
   toDto(contain) {
     let result = Object.assign({}, this._props);
-    if (contain && contain.creator) {
-      result.creator = this.creator ? this.creator.toDto() : null;
+    if (!contain) {
+      return result;
     }
-    if (contain && contain.modifier) {
-      result.modifier = this.modifier ? this.modifier.toDto() : null;
+    if (this.creator && contain.creator) {
+      result.creator = this.creator.toDto();
+    }
+    if (this.modifier && contain.modifier) {
+      result.modifier = this.modifier.toDto();
     }
     return result;
   }

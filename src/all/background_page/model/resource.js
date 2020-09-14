@@ -7,7 +7,6 @@
 const __ = require('../sdk/l10n').get;
 const Request = require('./request').Request;
 const User = require('./user').User;
-const {LegacyResourceService} = require('../service/resource');
 const {ResourceLocalStorage} = require('../service/local_storage/resourceLocalStorage');
 const {ResourceEntity} = require('./entity/resource/resourceEntity');
 
@@ -31,7 +30,7 @@ const Resource = function () {
 
 /**
  * Build a Resource object from a kdbxEntry object.
- * @param KdbxEntry kdbxEntry
+ * @param {KdbxEntry} kdbxEntry
  * @returns {Resource}
  */
 Resource.prototype.fromKdbxEntry = function (kdbxEntry) {
@@ -54,8 +53,8 @@ Resource.prototype.fromKdbxEntry = function (kdbxEntry) {
 
 /**
  * Build a Resource object from a csv entry.
- * @param Array csvEntry
- * @param Array mapping mapping rules
+ * @param {Array} csvEntry
+ * @param {Array} mapping mapping rules
  * @returns {Resource}
  */
 Resource.prototype.fromCsvEntry = function (csvEntry, mapping) {
@@ -70,13 +69,13 @@ Resource.prototype.fromCsvEntry = function (csvEntry, mapping) {
 
 /**
  * Build a Csv entry object from a resource.
- * @param Array resource
- * @param Array mapping mapping rules
+ * @param {Array} resource
+ * @param {Array} mapping mapping rules
  * @returns object CSV entry
  */
 Resource.prototype.toCsvEntry = function (resource, mapping) {
-  var csvEntry = {};
-  for (var fieldName in mapping) {
+  const csvEntry = {};
+  for (let fieldName in mapping) {
     csvEntry[mapping[fieldName]] = resource[fieldName];
   }
   return csvEntry;
@@ -87,6 +86,7 @@ Resource.prototype.toCsvEntry = function (resource, mapping) {
  * Import is different than save here because we will use a different passbolt pro entry point.
  *
  * @param resource
+ * @TODO user resourceAdd from model
  */
 Resource.import = function (resource) {
   const user = User.getInstance();
@@ -127,80 +127,6 @@ Resource.import = function (resource) {
         }
       );
   });
-};
-
-/**
- * Find resource to share
- *
- * @deprecated since v2.4.0 will be removed in v3.0
- * replaced by the findAllForShare function.
- * @param resourceId
- */
-Resource.findShareResource = async function (resourceId) {
-  const user = User.getInstance();
-  const domain = user.settings.getDomain();
-  const fetchOptions = {
-    method: 'GET',
-    credentials: 'include',
-    headers: {
-      'Accept': 'application/json',
-      'content-type': 'application/json'
-    }
-  };
-  let url = new URL(`${domain}/resources/` + resourceId + `.json?api-version=2`);
-  url.searchParams.append('contain[permission]', '1');
-  url.searchParams.append('contain[permissions.user.profile]', '1');
-  url.searchParams.append('contain[permissions.group]', '1');
-  url.searchParams.append('contain[secret]', '1');
-  let response, json;
-
-  try {
-    response = await fetch(url, fetchOptions);
-    json = await response.json();
-  } catch (error) {
-    console.error(error);
-    return new Error(__('There was a problem when trying to retrieve the resource'));
-  }
-
-  return json.body;
-};
-
-/**
- * Find resources to share
- *
- * @param {array} resourcesIds
- * @returns {array|Error}
- */
-Resource.findAllForShare = async function (resourcesIds) {
-  return await LegacyResourceService.findAllForShare(resourcesIds);
-};
-
-/**
- * Update the resources local storage with the latest API resources the user has access.
- * @return {Promise}
- * @deprecated see ResourceModel.updateLocalStorage
- */
-Resource.updateLocalStorage = async function () {
-  const findOptions = {
-    contain: {
-      "permission": true,
-      "favorite": true,
-      "tags": true,
-      "folder": true
-    }
-  };
-  const resources = await LegacyResourceService.findAll(findOptions);
-  await ResourceLocalStorage.setLegacy(resources);
-};
-
-/**
- * Find all the resources
- *
- * @param {object} options Options to apply to the find request
- * @return {Promise}
- */
-Resource.findAll = async function (options) {
-  return LegacyResourceService.findAll(options);
 };
 
 exports.Resource = Resource;

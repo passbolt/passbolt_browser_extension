@@ -167,6 +167,19 @@ class ResourceModel {
   // Finders
   //==============================================================
   /**
+   * Find all
+   *
+   * @param {Object} [contains] optional example: {permissions: true}
+   * @param {Object} [filters] optional
+   * @param {Object} [orders] optional
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAll(contains, filters, orders) {
+    let resourcesDto = await this.resourceService.findAll(contains, filters, orders);
+    return new ResourcesCollection(resourcesDto);
+  }
+
+  /**
    * Find all for share
    *
    * @param {array} resourcesIds resource uuids

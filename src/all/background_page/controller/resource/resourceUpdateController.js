@@ -15,12 +15,11 @@ const __ = require('../../sdk/l10n').get;
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
 
-const {User} = require('../../model/user');
 const {Keyring} = require('../../model/keyring');
 const {Crypto} = require('../../model/crypto');
 const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
 const {ResourceModel} = require('../../model/resource/resourceModel');
-const {UserService} = require('../../service/user');
+const {UserModel} = require('../../model/user/userModel');
 const {SecretsCollection} = require('../../model/entity/secret/secretsCollection');
 
 class ResourceUpdateController {
@@ -35,6 +34,7 @@ class ResourceUpdateController {
     this.worker = worker;
     this.requestId = requestId;
     this.resourceModel = new ResourceModel(clientOptions);
+    this.userModel = new UserModel(clientOptions);
     this.crypto = new Crypto();
   }
 
@@ -72,7 +72,7 @@ class ResourceUpdateController {
   /**
    * Update a resource and associated secret
    *
-   * @param {object} resourceEntity
+   * @param {ResourceEntity} resourceEntity
    * @param {string|object} plaintextDto
    * @returns {Promise<Object>} updated resource
    */
@@ -81,26 +81,31 @@ class ResourceUpdateController {
     let privateKey = await this.getPrivateKey()
 
     // Set the goals
-    await progressController.open(this.worker, __("Updating password"), 4);
-    const usersIds = await this.getUsersIdsToEncryptFor(resourceEntity.id);
-    const goals = usersIds.length + 3; // encrypt * users + keyring sync + save + done
-    await progressController.updateGoals(this.worker, goals);
+    try {
+      await progressController.open(this.worker, __("Updating password"), 4);
+      const usersIds = await this.userModel.findAllIdsForResourceUpdate(resourceEntity.id);
+      const goals = usersIds.length + 3; // encrypt * users + keyring sync + save + done
+      await progressController.updateGoals(this.worker, goals);
 
-    // Sync keyring
-    await progressController.update(this.worker, 1, __("Synchronizing keyring"));
-    const keyring = new Keyring();
-    await keyring.sync();
+      // Sync keyring
+      await progressController.update(this.worker, 1, __("Synchronizing keyring"));
+      const keyring = new Keyring();
+      await keyring.sync();
 
-    // Encrypt
-    const plaintext = await this.resourceModel.serializePlaintextDto(resourceEntity.resourceTypeId, plaintextDto);
-    resourceEntity.secrets = await this.encryptSecrets(plaintext, usersIds, privateKey);
+      // Encrypt
+      const plaintext = await this.resourceModel.serializePlaintextDto(resourceEntity.resourceTypeId, plaintextDto);
+      resourceEntity.secrets = await this.encryptSecrets(plaintext, usersIds, privateKey);
 
-    // Post data & wrap up
-    await progressController.update(this.worker, goals-1, __("Saving resource"));
-    const updatedResource = await this.resourceModel.update(resourceEntity);
-    await progressController.update(this.worker, goals, __("Done!"));
-    await progressController.close(this.worker);
-    return updatedResource;
+      // Post data & wrap up
+      await progressController.update(this.worker, goals-1, __("Saving resource"));
+      const updatedResource = await this.resourceModel.update(resourceEntity);
+      await progressController.update(this.worker, goals, __("Done!"));
+      await progressController.close(this.worker);
+      return updatedResource;
+    } catch(error) {
+      await progressController.close(this.worker);
+      throw error;
+    }
   }
 
   /**
@@ -115,25 +120,6 @@ class ResourceUpdateController {
       console.error(error);
       throw error;
     }
-  }
-
-  /**
-   * Get all user ids a given resource should be encrypted for
-   * TODO Move to service
-   *
-   * @param {string} resourceId
-   * @returns {Promise<*>}
-   */
-  async getUsersIdsToEncryptFor(resourceId) {
-    if (!resourceId || !Validator.isUUID(resourceId)) {
-      throw new TypeError(__('Can not update resource. Resource id should be a valid UUID.'));
-    }
-    const filter = {
-      'hasAccess': resourceId
-    };
-    const user = User.getInstance();
-    const users = await UserService.findAll(user, {filter});
-    return users.reduce((result, user) => [...result, user.id], []);
   }
 
   /**

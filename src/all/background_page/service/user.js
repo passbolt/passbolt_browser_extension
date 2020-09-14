@@ -97,53 +97,6 @@ UserService.keepSessionAlive = async function (user) {
 };
 
 /**
- * Find all the users
- * @param {object} options Optional parameters
- * @returns {array} The list of users
- */
-UserService.findAll = async function (user, options) {
-  options = options || {};
-  const domain = user.settings.getDomain();
-  const fetchOptions = {
-    method: 'GET',
-    credentials: 'include',
-    headers: {
-      'Accept': 'application/json',
-      'content-type': 'application/json'
-    }
-  };
-  const url = new URL(`${domain}/users.json?api-version=2`);
-  if (options.filter && options.filter.hasAccess) {
-    url.searchParams.append("filter[has-access]", options.filter.hasAccess);
-  }
-  let response, responseJson;
-
-  try {
-    response = await fetch(url, fetchOptions);
-  } catch (error) {
-    // Catch Network error such as connection lost.
-    throw new PassboltApiFetchError(error.message);
-  }
-
-  try {
-    responseJson = await response.json();
-  } catch (error) {
-    // If the response cannot be parsed, it's not a Passbolt API response. It can be a nginx error (504).
-    throw new PassboltApiFetchError(response.statusText, { code: response.status });
-  }
-
-  if (!response.ok) {
-    const message = responseJson.header.message;
-    throw new PassboltApiFetchError(message, {
-      code: response.status,
-      body: responseJson.body
-    });
-  }
-
-  return responseJson.body;
-};
-
-/**
  * Search users by keywords
  *
  * @param user current user

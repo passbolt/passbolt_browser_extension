@@ -451,7 +451,6 @@ describe("Permission Collection", () => {
     expect(permissions[1].group.name).toBe('Leadership team');
   });
 
-
   it("diff set1 - set2", () => {
     const dto1 = {
       aco: PermissionEntity.ACO_FOLDER,

@@ -34,7 +34,7 @@ class AbstractService {
     const result = {};
     for (let item in contain) {
       if (contain[item] && supportedOptions.includes(item)) {
-        result[`contain[${item}]`] = "1";
+        result[`contain[${item}]`] = '1';
       }
     }
     return result;
@@ -43,15 +43,24 @@ class AbstractService {
   /**
    * Format contain filters
    *
-   * @param {object} contain example: {"has-id": ['uuid', 'uuid2'], "search": 'name'}
+   * @param {object} filter example: {"has-id": ['uuid', 'uuid2'], "search": 'name'}
    * @param {array} supportedOptions example: ['has-id', 'search']
+   * @throws {TypeError} if filter value is not an array or a string
    * @returns {object} to be used in API request
    */
-  formatFilterOptions(contain, supportedOptions) {
+  formatFilterOptions(filter, supportedOptions) {
     const result = {};
-    for (let item in contain) {
-      if (contain.hasOwnProperty(item) && supportedOptions.includes(item)) {
-        result[`filter[${item}][]`] = contain[item];
+    for (let item in filter) {
+      if (filter.hasOwnProperty(item) && supportedOptions.includes(item)) {
+        if (typeof filter[item] === 'boolean') {
+          result[`filter[${item}]`] = (filter[item] ? '1' : '0');
+        } else if (typeof filter[item] === 'string') {
+          result[`filter[${item}]`] = filter[item];
+        } else if (Array.isArray(filter[item])) {
+          result[`filter[${item}][]`] = filter[item];
+        } else {
+          throw new TypeError(`Filter option should be an array or a string.`);
+        }
       }
     }
     return result;

@@ -52,8 +52,8 @@ class FilterResourcesByFavoritePage extends React.Component {
   }
 
   async findAndLoadResources() {
-    const filter = { isFavorite: true };
-    const resources = await passbolt.request("passbolt.resources.find-all", { filter });
+    const filters = { 'is-favorite': true };
+    const resources = await passbolt.request('passbolt.resources.find-all', { filters });
     this.sortResourcesAlphabetically(resources);
     this.setState({ resources });
   }

@@ -22,9 +22,9 @@ const listen = function (worker) {
   worker.port.on('passbolt.resources.update-local-storage', async function (requestId) {
     Log.write({level: 'debug', message: 'ResourceEvent listen passbolt.resources.update-local-storage'});
     try {
-      // @todo legacy replace by ResourceModel
-      await Resource.updateLocalStorage();
-
+      let apiClientOptions = await User.getInstance().getApiClientOptions();
+      let resourceModel = new ResourceModel(apiClientOptions);
+      resourceModel.updateLocalStorage();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       Log.write({level: 'error', message: error.message, data: JSON.stringify(error)});
@@ -45,8 +45,11 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.resources.find-all', async function (requestId, options) {
     try {
-      const resources = await Resource.findAll(options);
-      worker.port.emit(requestId, 'SUCCESS', resources);
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const resourceModel = new ResourceModel(clientOptions);
+      const {contains, filters, orders} = options;
+      const resources = await resourceModel.findAll(contains, filters, orders);
+      worker.port.emit(requestId, 'SUCCESS', resources.toJSON());
     } catch (error) {
       console.error(error);
       if (error instanceof Error) {
@@ -135,12 +138,13 @@ const listen = function (worker) {
    * @param editedPassword {} The resource
    */
   worker.port.on('passbolt.resources.update', async function (requestId, resourceDto, plaintextDto) {
-    const clientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new ResourceUpdateController(worker, requestId, clientOptions);
     try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const controller = new ResourceUpdateController(worker, requestId, clientOptions);
       const updatedResource = await controller.main(resourceDto, plaintextDto);
       worker.port.emit(requestId, 'SUCCESS', updatedResource);
     } catch (error) {
+      console.error(error);
       if (error instanceof Error) {
         worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
       } else {

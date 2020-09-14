@@ -126,20 +126,21 @@ class UserEntity extends Entity {
    */
   toDto(contain) {
     let result = Object.assign({}, this._props);
-    if (contain && contain.role) {
-      result.role = this.role ? this.role.toDto() : null;
+    if (!contain) {
+      return result;
     }
-    if (contain && contain.profile) {
+    if (this.role && contain.role) {
+      result.role = this.role.toDto();
+    }
+    if (this.profile && contain.profile) {
       if (contain.profile === true) {
         result.profile = this.profile.toDto();
       } else {
         result.profile = this.profile.toDto(contain.profile);
       }
     }
-    if (contain && contain.gpgkey) {
-      if (this.gpgkey) {
-        result.gpgkey = this.gpgkey ? this.gpgkey.toDto() : null;
-      }
+    if (this.gpgkey && contain.gpgkey) {
+      result.gpgkey = this.gpgkey.toDto();
     }
     return result;
   }

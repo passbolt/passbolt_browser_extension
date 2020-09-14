@@ -119,18 +119,16 @@ class FolderEntity extends Entity {
    */
   toDto(contain) {
     const result = Object.assign({}, this._props);
-
-    if (contain && contain.permission) {
-      if (this._permission) {
-        // TODO More granular permission.group permission.user.avatar
-        result.permission = this._permission ? this._permission.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS) : null;
-      }
+    if (!contain) {
+      return result;
     }
-    if (contain && contain.permissions) {
-      if (this._permissions) {
-        // TODO More granular permissions.group permissions.user
-        result.permissions = this._permissions ? this._permissions.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS) : null;
-      }
+    if (this._permission && contain.permission) {
+      // TODO More granular permission.group permission.user.avatar
+      result.permission = this._permission.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS);
+    }
+    if (this._permissions && contain.permissions) {
+      // TODO More granular permissions.group permissions.user
+      result.permissions = this._permissions.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS);
     }
     return result;
   }

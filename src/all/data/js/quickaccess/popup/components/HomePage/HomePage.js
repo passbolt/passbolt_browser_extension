@@ -51,7 +51,7 @@ class HomePage extends React.Component {
       this.sortResourcesAlphabetically(resources);
       this.setState({ resources });
     }
-    passbolt.request("passbolt.resources.update-local-storage");
+    passbolt.request('passbolt.resources.update-local-storage');
   }
 
   sortResourcesAlphabetically(resources) {

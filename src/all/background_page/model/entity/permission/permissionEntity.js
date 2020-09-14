@@ -129,19 +129,15 @@ class PermissionEntity extends Entity {
     if (!contain) {
       return result;
     }
-    if (contain.user) {
-      if (this._user) {
-        if (contain.user === true) {
-          result.user = this._user ? this._user.toDto() : null;
-        } else {
-          result.user = this._user ? this._user.toDto(contain.user) : null;
-        }
+    if (this._user && contain.user) {
+      if (contain.user === true) {
+        result.user = this._user.toDto();
+      } else {
+        result.user = this._user.toDto(contain.user);
       }
     }
-    if (contain.group) {
-      if (this._group) {
-        result.group = this._group ? this._group.toDto() : null;
-      }
+    if (this._group && contain.group) {
+      result.group = this._group.toDto();
     }
     return result;
   }

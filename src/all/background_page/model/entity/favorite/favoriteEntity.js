@@ -61,7 +61,7 @@ class FavoriteEntity extends Entity {
         },
         "foreign_model": {
           "type": "string",
-          "enum": [FavoriteEntity.FAVORITE_RESOURCE]
+          "enum": FavoriteEntity.ALLOWED_FOREIGN_MODELS
         },
         "created": {
           "type": "string",
@@ -143,6 +143,14 @@ class FavoriteEntity extends Entity {
    */
   static get FAVORITE_RESOURCE () {
     return FAVORITE_RESOURCE;
+  }
+
+  /**
+   * FavoriteEntity.ALLOWED_FOREIGN_MODELS
+   * @returns {[string]} array of supported resource names
+   */
+  static get ALLOWED_FOREIGN_MODELS() {
+    return [FAVORITE_RESOURCE];
   }
 }
 

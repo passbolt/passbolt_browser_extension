@@ -137,7 +137,8 @@ class FolderModel {
    * @returns {Promise<PermissionsCollection>}
    */
   async findFolderPermissions(folderId) {
-    const folderDto = await this.folderService.get(folderId, {permissions: true});
+    const contain = {'permissions.user.profile': true, 'permissions.group': true};
+    const folderDto = await this.folderService.get(folderId, contain);
     const folderEntity = new FolderEntity(folderDto);
     return folderEntity.permissions;
   }

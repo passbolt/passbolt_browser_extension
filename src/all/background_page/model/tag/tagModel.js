@@ -25,8 +25,8 @@ class TagModel {
    * @public
    */
   constructor(apiClientOptions) {
-    this.resourceModel = new ResourceModel(apiClientOptions);
     this.tagService = new TagService(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions);
   }
 
   /**
@@ -50,7 +50,7 @@ class TagModel {
   async updateResourceTags(resourceId, tagsCollection) {
     const tagsDto = await this.tagService.updateResourceTags(resourceId, tagsCollection.toDto());
     const updatedTagsCollection = new TagsCollection(tagsDto);
-    return await this.resourceModel.updateTagsLocally(resourceId, updatedTagsCollection);
+    return await this.resourceModel.updateResourceTagsLocally(resourceId, updatedTagsCollection);
   }
 
   /**
@@ -61,7 +61,9 @@ class TagModel {
    */
   async update(tagEntity) {
     const tagDto = await this.tagService.update(tagEntity.id, tagEntity.toDto());
-    return new TagEntity(tagDto);
+    const updatedTagEntity = new TagEntity(tagDto);
+    await this.resourceModel.updateTagLocally(updatedTagEntity);
+    return updatedTagEntity;
   }
 
   /**
@@ -72,6 +74,7 @@ class TagModel {
    */
   async delete(tagId) {
     await this.tagService.delete(tagId);
+    await this.resourceModel.deleteTagsLocally(tagId);
   }
 }
 

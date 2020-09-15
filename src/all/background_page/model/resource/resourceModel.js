@@ -164,7 +164,21 @@ class ResourceModel {
   }
 
   //==============================================================
-  // Finders
+  // Getters / local calls
+  //==============================================================
+  /**
+   * Return a resource for a given id from the local storage
+   *
+   * @param {string} resourceId uuid
+   * @returns {Promise<ResourceEntity>}
+   */
+  async getById(resourceId) {
+    const resourceDto = ResourceLocalStorage.getResourceById(resourceId);
+    return new ResourceEntity(resourceDto);
+  }
+
+  //==============================================================
+  // Finders / remote calls
   //==============================================================
   /**
    * Find all
@@ -197,9 +211,31 @@ class ResourceModel {
    * @returns {Promise<ResourceEntity>}
    */
   async findForDecrypt (resourcesId) {
-    let resourcesDto = await this.resourceService.get(resourcesId, {'secret': true, 'resource-type': true});
+    const resourcesDto = await this.resourceService.get(resourcesId, {'secret': true, 'resource-type': true});
     return new ResourceEntity(resourcesDto);
   };
+
+  /**
+   * Find permissions for a resource
+   *
+   * @param {string} resourcesId resource uuid
+   * @returns {Promise<ResourceEntity>}
+   */
+  async findResourcePermissions (resourcesId) {
+    const contain = {'permissions.user.profile':true, 'permissions.group':true};
+
+    // TODO deprecate findAll with has-id filter and use what's in comment
+    // TODO not possible for backward compatibility issues, because permissions filter not present < v3
+    //const resourcesDto = await this.resourceService.get(resourcesId, contain);
+    //const resourceEntity = new ResourceEntity(resourcesDto);
+    //return resourceEntity.permissions;
+
+    // @deprecated
+    const filter = {'has-id': [resourcesId]};
+    const resourceDtos = await this.resourceService.findAll(contain, filter);
+    const resourceEntity = new ResourceEntity(resourceDtos[0]); // will fail if not found but not clean 404
+    return resourceEntity.permissions;
+  }
 
   //==============================================================
   // CRUD
@@ -331,6 +367,25 @@ class ResourceModel {
     }
   }
 
+  //==============================================================
+  // Associated data management
+  //==============================================================
+  /**
+   * Update tag in associated resource local storage
+   *
+   * @param {TagEntity} tagEntity
+   * @returns {Promise<boolean>} if tag was present and updated
+   */
+  async updateTagLocally(tagEntity) {
+    const localResources = await ResourceLocalStorage.get();
+    let resourceCollection = new ResourcesCollection(localResources);
+    if (resourceCollection.updateTag(tagEntity)) {
+      await ResourceLocalStorage.set(resourceCollection);
+      return true;
+    }
+    return false;
+  }
+
   /**
    * Update tags in resource local storage
    * Doesn't udpate the tags remotely, use tagModel for this instead
@@ -339,12 +394,43 @@ class ResourceModel {
    * @param {TagsCollection} tagsCollection
    * @returns {Promise<ResourceEntity>}
    */
-  async updateTagsLocally(resourceId, tagsCollection) {
+  async updateResourceTagsLocally(resourceId, tagsCollection) {
     const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
     const resourceEntity = new ResourceEntity(resourceDto);
     resourceEntity.tags = tagsCollection;
     await ResourceLocalStorage.updateResource(resourceEntity);
     return resourceEntity;
+  }
+
+  /**
+   * Remove a tag from resource local storage
+   *
+   * @param tagId
+   * @returns {Promise<boolean>} true if deleted false if not present
+   */
+  async deleteTagsLocally(tagId) {
+    const localResources = await ResourceLocalStorage.get();
+    let resourceCollection = new ResourcesCollection(localResources);
+    if (resourceCollection.removeTagById(tagId)) {
+      await ResourceLocalStorage.set(resourceCollection);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Update a favorite association of a resource in local storage
+   * Doesn't udpate the favorite remotely, use favoriteModel for this instead
+   *
+   * @param {string} resourceId
+   * @param {FavoriteEntity|null} favoriteEntity or null
+   * @return {Promise<void>}
+   */
+  async updateFavoriteLocally(resourceId, favoriteEntity) {
+    const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
+    const resourceEntity = new ResourceEntity(resourceDto);
+    resourceEntity.favorite = favoriteEntity;
+    await ResourceLocalStorage.updateResource(resourceEntity);
   }
 
   //==============================================================

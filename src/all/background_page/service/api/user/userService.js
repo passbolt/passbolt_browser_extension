@@ -85,9 +85,11 @@ class UserService extends AbstractService {
    *
    * @param {string} id user uuid
    * @throws {Error} if API call fails, service unreachable, etc.
+   * @throws {TypeError} if user id is not a valid uuid
    * @returns {Object} userDto
    */
   async get(id) {
+    this.assertValidId(id);
     const response = await this.apiClient.get(id);
     return response.body;
   }
@@ -122,6 +124,7 @@ class UserService extends AbstractService {
    * @public
    */
   async create(data) {
+    this.assertNonEmptyData(data);
     const response = await this.apiClient.create(data);
     return response.body;
   }
@@ -132,9 +135,12 @@ class UserService extends AbstractService {
    * @param {String} userId uuid
    * @param {Object} userData
    * @returns {Promise<*>} Response body
+   * @throw {TypeError} if user id is not a valid uuid
    * @public
    */
   async update(userId, userData) {
+    this.assertValidId(userId);
+    this.assertNonEmptyData(userData);
     const response = await this.apiClient.update(userId, userData);
     return response.body;
   }
@@ -144,9 +150,11 @@ class UserService extends AbstractService {
    *
    * @param {string} userId uuid
    * @returns {Promise<*>} Response body
+   * @throw {TypeError} if user id is not a valid uuid
    * @public
    */
   async delete(userId) {
+    this.assertValidId(userId);
     const response = await this.apiClient.delete(userId);
     return response.body;
   }

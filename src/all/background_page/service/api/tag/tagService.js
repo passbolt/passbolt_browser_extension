@@ -62,7 +62,7 @@ class TagService extends AbstractService {
    * @public
    */
   async updateResourceTags(resourceId, tagsDto) {
-    this.apiClient.assertValidId(resourceId);
+    this.assertValidId(resourceId);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${resourceId}`);
     const data = {
       'Tags': tagsDto.map(tag => tag.slug)
@@ -78,9 +78,11 @@ class TagService extends AbstractService {
    * @param {String} tagId uuid
    * @param {Object} tagData
    * @returns {Promise<*>} Response body
+   * @throw {TypeError} if tagId is not a valid uuid
    * @public
    */
   async update(tagId, tagData) {
+    this.assertValidId(tagId);
     const response = await this.apiClient.update(tagId, tagData);
     return response.body;
   }
@@ -90,9 +92,11 @@ class TagService extends AbstractService {
    *
    * @param {string} tagId uuid
    * @returns {Promise<*>} Response body
+   * @throw {TypeError} if tagId is not a valid uuid
    * @public
    */
   async delete(tagId) {
+    this.assertValidId(tagId);
     const response = await this.apiClient.delete(tagId);
     return response.body;
   }

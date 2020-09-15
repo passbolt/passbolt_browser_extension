@@ -12,9 +12,28 @@ const {User} = require('../model/user');
 
 const listen = function (worker) {
 
-  // ================================
-  // SERVICE ACTIONS
-  // ================================
+  /*
+   * Find a folder with complete permissions
+   *
+   * @listens passbolt.resources.find-for-permissions
+   * @param requestId {uuid} The request identifier
+   * @param folderId {uuid} the folder uuid
+   */
+  worker.port.on('passbolt.folders.find-permissions', async function (requestId, folderId) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const folderModel = new FolderModel(clientOptions);
+      const permissions = await folderModel.findFolderPermissions(folderId);
+      worker.port.emit(requestId, 'SUCCESS', permissions.toJSON());
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
 
   /*
    * Create a new folder

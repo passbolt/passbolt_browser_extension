@@ -64,7 +64,7 @@ class ResourceEntity extends Entity {
     }
     if (this._props.tags) {
       this._tags = new TagsCollection(this._props.tags);
-      delete this._props.tag;
+      delete this._props.tags;
     }
   }
 
@@ -458,10 +458,32 @@ class ResourceEntity extends Entity {
 
   /**
    * Set resource tags
+   *
    * @param {TagsCollection} tags
    */
   set tags(tags) {
     this._tags = tags;
+  }
+
+  /**
+   * Update a tag if present
+   *
+   * @param tagEntity
+   * @return {boolean} true if tag was updated in resource tag collection
+   */
+  updateTag(tagEntity) {
+    if (this.tags) {
+      return this.tags.update(tagEntity);
+    }
+    return false;
+  }
+
+  /**
+   * Set favorite
+   * @param {FavoriteEntity} favorite
+   */
+  set favorite(favorite) {
+    this._favorite = favorite;
   }
 
   // ==================================================

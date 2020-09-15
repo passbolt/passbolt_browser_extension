@@ -71,10 +71,13 @@ class FolderService extends AbstractService {
    *
    * @param {string} id folder uuid
    * @param {Object} [contains] optional example: {permissions: true}
-   * @throws {Error} if API call fails, service unreachable, etc.
+   * @throws {Error} if API call fails, service unreachable, etc
+   * @throws {TypeError} if folder id is not a uuid
    * @returns {Object} folderDto
+   * @public
    */
   async get(id, contains) {
+    this.assertValidId(id);
     let options = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.get(id, options);
     return response.body;
@@ -111,9 +114,11 @@ class FolderService extends AbstractService {
    * @param {Object} data
    * @param {Object} [contains] optional for example {"permission": true}
    * @returns {Promise<*>} Response body
+   * @throws {TypeError} if data is empty
    * @public
    */
   async create(data, contains) {
+    this.assertNonEmptyData(data);
     let options = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.create(data, options);
     return response.body;
@@ -126,9 +131,12 @@ class FolderService extends AbstractService {
    * @param {Object} folderData
    * @param {Object} [contains] optional for example {"permission": true}
    * @returns {Promise<*>} Response body
+   * @throws {TypeError} if folder id is not a uuid or data is empty
    * @public
    */
   async update(folderId, folderData, contains) {
+    this.assertValidId(folderId);
+    this.assertNonEmptyData(folderData);
     let options = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.update(folderId, folderData, options);
     return response.body;
@@ -140,9 +148,11 @@ class FolderService extends AbstractService {
    * @param {string} folderId uuid
    * @param {boolean} [cascade] delete sub folder / folders
    * @returns {Promise<*>} Response body
+   * @throws {TypeError} if folder id is not a uuid
    * @public
    */
   async delete(folderId, cascade) {
+    this.assertValidId(folderId);
     const options = {};
     if (cascade) {
       options.cascade = "1";

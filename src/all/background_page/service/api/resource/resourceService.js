@@ -93,9 +93,11 @@ class ResourceService extends AbstractService {
    * @param {string} id resource uuid
    * @param {Object} [contains] optional example: {permissions: true}
    * @throws {Error} if API call fails, service unreachable, etc.
+   * @throws {TypeError} if resource id is not a uuid
    * @returns {Object} resourceDto
    */
   async get(id, contains) {
+    this.assertValidId(id);
     let options = contains ? this.formatContainOptions(contains, ResourceService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.get(id, options);
     return response.body;
@@ -129,9 +131,11 @@ class ResourceService extends AbstractService {
    * @param {Object} data
    * @param {Object} [contains] optional example: {permissions: true}
    * @returns {Promise<*>} Response body
+   * @throws {TypeError} if resource id is not a uuid
    * @public
    */
   async create(data, contains) {
+    this.assertNonEmptyData(data);
     let options = contains ? this.formatContainOptions(contains, ResourceService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.create(data, options);
     return response.body;
@@ -144,9 +148,12 @@ class ResourceService extends AbstractService {
    * @param {Object} resourceData
    * @param {Object} [contains] optional example: {permissions: true}
    * @returns {Promise<*>} Response body
+   * @throws {TypeError} if resource id is not a uuid or data is empty
    * @public
    */
   async update(resourceId, resourceData, contains) {
+    this.assertValidId(resourceId);
+    this.assertNonEmptyData(resourceData);
     let options = contains ? this.formatContainOptions(contains, ResourceService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.update(resourceId, resourceData, options);
     return response.body;
@@ -160,6 +167,7 @@ class ResourceService extends AbstractService {
    * @public
    */
   async delete(resourceId) {
+    this.assertValidId(resourceId);
     const response = await this.apiClient.delete(resourceId);
     return response.body;
   }

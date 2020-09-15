@@ -42,8 +42,10 @@ class MoveService extends AbstractService {
   /**
    * Move an entity in a user tree.
    *
-   * @param {Entity} entity The entity to move
+   * @param {ResourceEntity|FolderEntity} entity The entity to move
+   * @throws {TypeError} if entity is not a ResourceEntity or FolderEntity
    * @returns {Promise<*>}
+   * @public
    */
   async move(entity) {
     let foreignModel;

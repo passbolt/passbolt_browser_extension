@@ -59,7 +59,7 @@ class AbstractService {
         } else if (Array.isArray(filter[item])) {
           result[`filter[${item}][]`] = filter[item];
         } else {
-          throw new TypeError(`Filter option should be an array or a string.`);
+          throw new TypeError(`Service error. Filter option should be an array or a string.`);
         }
       }
     }
@@ -81,6 +81,33 @@ class AbstractService {
       }
     }
     return result;
+  }
+
+  /**
+   * Assert that an id is a valid uuid or throw a TypeError
+   *
+   * @param {string} id
+   * @throws {TypeError} if id is not a valid uuid
+   * @return {void}
+   * @public
+   */
+  assertValidId(id) {
+    if (!id || typeof id !== 'string' || !Validator.isUUID(id)) {
+      throw new TypeError(`Service error. The id '${id}' is not a valid uuid.`);
+    }
+  }
+
+  /**
+   * Assert the provided data is not empty
+   *
+   * @param {object} data
+   * @return {void}
+   * @public
+   */
+  assertNonEmptyData(data) {
+    if (!data) {
+      throw new TypeError(`Service error. Data cannot be empty.`)
+    }
   }
 }
 

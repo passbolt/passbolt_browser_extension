@@ -47,7 +47,7 @@ class CommentService extends AbstractService {
   }
 
   /**
-   * Find all resources
+   * Find all comments
    *
    * @param {string} foreignId foreign model name
    * @param {string} foreignModel foreign key uuid
@@ -57,7 +57,7 @@ class CommentService extends AbstractService {
    * @public
    */
   async findAll(foreignModel, foreignId,  contains) {
-    this.apiClient.assertValidId(foreignId);
+    this.assertValidId(foreignId);
     this.assertValidForeignModel(foreignModel);
 
     contains = contains ? this.formatContainOptions(contains, CommentService.getSupportedContainOptions()) : null;
@@ -72,15 +72,22 @@ class CommentService extends AbstractService {
   }
 
   /**
-   * Create a resource using Passbolt API
+   * Create a comment using Passbolt API
    *
    * @param {Object} commentDto
    * @returns {Promise<*>} Response body
+   * @throw {TypeError} if comment dto is invalid or incomplete
    * @public
    */
   async create(commentDto) {
+    if (!commentDto || !commentDto.foreign_key || !commentDto.foreign_model) {
+      throw new TypeError(`Comment creation failed, invalid comment data.`);
+    }
     const foreignModel = commentDto.foreign_model;
+    this.assertValidForeignModel(foreignModel);
     const foreignId = commentDto.foreign_key;
+    this.assertValidId(foreignId);
+
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${foreignModel.toLowerCase()}/${foreignId}`, {});
     const data = {content: commentDto.content};
     if (commentDto.parent_id) {
@@ -93,14 +100,16 @@ class CommentService extends AbstractService {
   }
 
   /**
-   * Delete a resource using Passbolt API
+   * Delete a comment using Passbolt API
    *
-   * @param {string} resourceId uuid
+   * @param {string} commentId uuid
    * @returns {Promise<*>} Response body
+   * @throws {TypeError} if commenId is not a valid uuid
    * @public
    */
-  async delete(resourceId) {
-    const response = await this.apiClient.delete(resourceId);
+  async delete(commentId) {
+    this.assertValidId(commentId);
+    const response = await this.apiClient.delete(commentId);
     return response.body;
   }
 

@@ -128,6 +128,45 @@ class TagsCollection extends EntityCollection {
     super.push(tagEntity);
   }
 
+  /**
+   * Remove by Id
+   * @param {string} tagId uuid
+   * @returns {boolean} true if tag was found and removed from the collection
+   */
+  removeById(tagId) {
+    const length = this.tags.length;
+    let i = 0;
+    for(; i < length; i++) {
+      let existingTag = this.tags[i];
+      if (existingTag.id === tagId) {
+        this._items.splice(i, 1);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Remove by Id
+   * @param {TagEntity} tagEntity
+   * @returns {boolean} true if tag was found and removed from the collection
+   */
+  update(tagEntity) {
+    if (!tagEntity.id) {
+      return false;
+    }
+    const length = this.tags.length;
+    let i = 0;
+    for(; i < length; i++) {
+      let existingTag = this.tags[i];
+      if (existingTag.id === tagEntity.id) {
+        this._items[i] = tagEntity;
+        return true;
+      }
+    }
+    return false;
+  }
+
   // ==================================================
   // Static getters
   // ==================================================

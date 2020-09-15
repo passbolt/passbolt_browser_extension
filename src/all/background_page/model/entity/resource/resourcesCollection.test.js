@@ -12,6 +12,7 @@
  * @since         2.13.0
  */
 import {ResourcesCollection} from "./resourcesCollection";
+import {TagEntity} from "../tag/tagEntity";
 import {EntityCollectionError} from "../abstract/entityCollectionError";
 import {EntitySchema} from "../abstract/entitySchema";
 import Validator from 'validator';
@@ -120,4 +121,95 @@ describe("Resource entity", () => {
     const collection = new ResourcesCollection([]);
     expect(collection.folderParentIds).toEqual([]);
   });
+
+  it("removeTagById works", () => {
+    const tag1 = {
+      "id": "45ce85c9-e301-4de2-8b41-298507002861",
+      "is_shared": false,
+      "slug": 'tag1'
+    };
+    const tag2 = {
+      "id": "45ce85c9-e301-4de2-8b41-298507002862",
+      "is_shared": false,
+      "slug": 'tag2'
+    }
+    const dto = [{
+      "name": "resource1",
+      "tags": [tag1, tag2]
+    },{
+      "name": "resource2",
+      "tags": [tag1]
+    },{
+      "name": "resource3",
+      "tags": [tag2]
+    },{
+      "name": "resource4"
+    }];
+    const resourcesCollection = new ResourcesCollection(dto);
+
+    // remove existing tag
+    expect(resourcesCollection.removeTagById('45ce85c9-e301-4de2-8b41-298507002861')).toBe(true);
+    expect(resourcesCollection.resources[0].tags.toDto()).toEqual([tag2]);
+    expect(resourcesCollection.resources[1].tags.toDto()).toEqual([]);
+    expect(resourcesCollection.resources[2].tags.toDto()).toEqual([tag2]);
+    expect(resourcesCollection.resources[3].tags).toBeNull();
+
+    // try to remove non existing tag
+    expect(resourcesCollection.removeTagById('45ce85c9-e301-4de2-8b41-298507002863')).toBe(false);
+    expect(resourcesCollection.resources[0].tags.toDto()).toEqual([tag2]);
+    expect(resourcesCollection.resources[1].tags.toDto()).toEqual([]);
+    expect(resourcesCollection.resources[2].tags.toDto()).toEqual([tag2]);
+    expect(resourcesCollection.resources[3].tags).toBeNull();
+  });
+
+  it("update tag works", () => {
+    const tag1 = {
+      "id": "45ce85c9-e301-4de2-8b41-298507002861",
+      "is_shared": false,
+      "slug": 'tag1'
+    };
+    const updatedTag1 = {
+      "id": "45ce85c9-e301-4de2-8b41-298507002861",
+      "is_shared": false,
+      "slug": 'updated_tag1'
+    };
+    const tag2 = {
+      "id": "45ce85c9-e301-4de2-8b41-298507002862",
+      "is_shared": false,
+      "slug": 'tag2'
+    }
+    const tag3 = {
+      "id": "45ce85c9-e301-4de2-8b41-298507002863",
+      "is_shared": false,
+      "slug": 'tag3'
+    };
+    const dto = [{
+      "name": "resource1",
+      "tags": [tag1, tag2]
+    },{
+      "name": "resource2",
+      "tags": [tag1]
+    },{
+      "name": "resource3",
+      "tags": [tag2]
+    },{
+      "name": "resource4"
+    }];
+    const resourcesCollection = new ResourcesCollection(dto);
+
+    // Try to update existing tag
+    expect(resourcesCollection.updateTag(new TagEntity(updatedTag1))).toBe(true);
+    expect(resourcesCollection.resources[0].tags.toDto()).toEqual([updatedTag1, tag2]);
+    expect(resourcesCollection.resources[1].tags.toDto()).toEqual([updatedTag1]);
+    expect(resourcesCollection.resources[2].tags.toDto()).toEqual([tag2]);
+    expect(resourcesCollection.resources[3].tags).toBeNull();
+
+    // Try to update non existing tag
+    expect(resourcesCollection.updateTag(new TagEntity(tag3))).toBe(false);
+    expect(resourcesCollection.resources[0].tags.toDto()).toEqual([updatedTag1, tag2]);
+    expect(resourcesCollection.resources[1].tags.toDto()).toEqual([updatedTag1]);
+    expect(resourcesCollection.resources[2].tags.toDto()).toEqual([tag2]);
+    expect(resourcesCollection.resources[3].tags).toBeNull();
+  });
+
 });

@@ -167,6 +167,41 @@ class ResourcesCollection extends EntityCollection {
   }
 
   // ==================================================
+  // Association management
+  // ==================================================
+  /**
+   * Remove a tag association for the resource in the collection if present
+   *
+   * @param {string} tagId uuid
+   * @return {boolean} true if removed
+   */
+  removeTagById(tagId) {
+    let removed = false;
+    for (let resource of this.resources) {
+      if (resource.tags) {
+        removed = resource.tags.removeById(tagId) || removed;
+      }
+    }
+    return removed;
+  }
+
+  /**
+   * Update tag if present in resource collection
+   *
+   * @param {TagEntity} tagEntity
+   * @return {boolean} true if updated
+   */
+  updateTag(tagEntity) {
+    let updated = false;
+    for (let resource of this.resources) {
+      if (resource.tags) {
+        updated = resource.tags.update(tagEntity) || updated;
+      }
+    }
+    return updated;
+  }
+
+  // ==================================================
   // Static getters
   // ==================================================
   /**

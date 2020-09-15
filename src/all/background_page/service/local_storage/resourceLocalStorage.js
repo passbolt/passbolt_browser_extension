@@ -69,7 +69,7 @@ class ResourceLocalStorage {
    * Get a resource from the local storage by id
    *
    * @param {string} id The resource id
-   * @return {object} resource object
+   * @return {object} resource dto object
    */
   static async getResourceById(id) {
     const resources = await ResourceLocalStorage.get();

@@ -41,8 +41,10 @@ class ResourceTypeService extends AbstractService {
    * @param {string} id resource type uuid
    * @throws {Error} if API call fails, service unreachable, etc.
    * @returns {Object} resourceTypeDto
+   * @throws {TypeError} if resource type id is not a uuid
    */
   async get(id) {
+    this.assertValidId(id);
     const response = await this.apiClient.get(id);
     return response.body;
   }

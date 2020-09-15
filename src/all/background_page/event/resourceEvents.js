@@ -61,6 +61,29 @@ const listen = function (worker) {
   });
 
   /*
+   * Find a resource with complete permissions
+   *
+   * @listens passbolt.resources.find-for-permissions
+   * @param requestId {uuid} The request identifier
+   * @param options {object} The options to apply to the find
+   */
+  worker.port.on('passbolt.resources.find-permissions', async function (requestId, resourceId) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const resourceModel = new ResourceModel(clientOptions);
+      const permissions = await resourceModel.findResourcePermissions(resourceId);
+      worker.port.emit(requestId, 'SUCCESS', permissions.toJSON());
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
+
+  /*
    * Create a new resource.
    *
    * @listens passbolt.resources.create

@@ -40,7 +40,7 @@ class CommentModel {
   }
 
   /**
-   * Create a comment using Passbolt API and add result to local storage
+   * Create a comment using Passbolt API
    *
    * @param {CommentEntity} commentEntity
    * @returns {Promise<CommentEntity>}

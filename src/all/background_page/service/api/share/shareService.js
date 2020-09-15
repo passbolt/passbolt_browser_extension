@@ -41,8 +41,12 @@ class ShareService extends AbstractService {
    * @param {string} folderId uuid
    * @param {object} permissionChangesDto
    * @returns {Promise<*>}
+   * @throws {TypeError} if folder id is not a uuid or permission changes is empty
+   * @public
    */
   async shareFolder(folderId, permissionChangesDto) {
+    this.assertValidId(folderId);
+    this.assertNonEmptyData(permissionChangesDto);
     let url = `folder/${folderId}`;
     const response = await this.apiClient.update(url, permissionChangesDto);
     return response.body;

@@ -49,6 +49,9 @@ class FavoriteModel {
    */
   async removeResourceFromFavorite(resourceId) {
     const resourceEntity = await this.resourceModel.getById(resourceId);
+    if (!resourceEntity.favorite) {
+      return; // already deleted or not finished added...
+    }
     await this.favoriteService.delete(resourceEntity.favorite.id);
     await this.resourceModel.updateFavoriteLocally(resourceId, null);
   }

@@ -49,10 +49,6 @@ class ReactApp extends Component {
     this.getResources();
     this.getResourceTypes();
     this.getFolders();
-
-    try {
-      passbolt.port.request('passbolt.resources.find-permissions', "b5df7213-c13d-46cb-822f-d7f1672e53b2")
-    }
   }
 
   getDefaultState() {

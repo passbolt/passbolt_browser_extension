@@ -173,7 +173,7 @@ class ResourceModel {
    * @returns {Promise<ResourceEntity>}
    */
   async getById(resourceId) {
-    const resourceDto = ResourceLocalStorage.getResourceById(resourceId);
+    const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
     return new ResourceEntity(resourceDto);
   }
 

@@ -183,14 +183,16 @@ class ResourceEntity extends Entity {
     if (this._permissions && contain.permissions) {
         result.permissions = this._permissions.toDto();
     }
-    if (this._favorite && contain.favorite) {
-        result.favorite = this._favorite.toDto();
-    }
     if (this._tags && contain.tags) {
         result.tags = this._tags.toDto();
     }
     if (this._secrets && contain.secrets) {
         result.secrets = this._secrets.toDto();
+    }
+
+    // preserve null state
+    if (typeof this._favorite !== 'undefined' && contain.favorite) {
+      result.favorite = this._favorite === null ? null : this._favorite.toDto();
     }
     return result;
   }

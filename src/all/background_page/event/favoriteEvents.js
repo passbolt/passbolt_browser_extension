@@ -20,8 +20,8 @@ const listen = function (worker) {
     try {
       const apiClientOption = await User.getInstance().getApiClientOptions();
       const favoriteModel = new FavoriteModel(apiClientOption);
-      await favoriteModel.addResourceToFavorite(resourceId);
-      worker.port.emit(requestId, 'SUCCESS');
+      const favoriteEntity = await favoriteModel.addResourceToFavorite(resourceId);
+      worker.port.emit(requestId, 'SUCCESS', favoriteEntity);
     } catch (error) {
       console.error(error);
       if (error instanceof Error) {

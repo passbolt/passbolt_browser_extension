@@ -12,6 +12,7 @@
  */
 const {User} = require('../model/user');
 const {TagModel} = require('../model/tag/tagModel');
+const {TagEntity} = require('../model/entity/tag/tagEntity');
 const {TagsCollection} = require('../model/entity/tag/tagsCollection');
 
 const listen = function (worker) {
@@ -39,7 +40,7 @@ const listen = function (worker) {
   /*
    * Update resource tags
    *
-   * @listens passbolt.tags.delete
+   * @listens passbolt.tags.update-resource-tags
    * @param requestId {uuid} The request identifier
    * @param resourceId {uuid} The resource identifier
    * @param tagsDto {Object} tags dto
@@ -51,6 +52,29 @@ const listen = function (worker) {
       const tagsCollection = new TagsCollection(tagsDto);
       const tags = await tagModel.updateResourceTags(resourceId, tagsCollection);
       worker.port.emit(requestId, 'SUCCESS', tags);
+    } catch (error) {
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
+
+  /*
+   * Update a tag
+   *
+   * @listens passbolt.tags.update
+   * @param requestId {uuid} The request identifier
+   * @param tagDto {object} The tag object
+   */
+  worker.port.on('passbolt.tags.update', async function (requestId, tagDto) {
+    try {
+      const apiOption = await User.getInstance().getApiClientOptions();
+      const tagModel = new TagModel(apiOption);
+      const tagEntity = new TagEntity(tagDto);
+      const updatedTag = await tagModel.update(tagEntity);
+      worker.port.emit(requestId, 'SUCCESS', updatedTag);
     } catch (error) {
       if (error instanceof Error) {
         worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));

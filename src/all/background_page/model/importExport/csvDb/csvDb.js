@@ -2,7 +2,7 @@
  * CsvDb model.
  * Provides high level tools to work with a password csv file.
  */
-const Resource = require('./resource').Resource;
+const {ResourceDto} = require('../resourceDto');
 
 /**
  * Constructor.
@@ -22,7 +22,7 @@ CsvDb.formats = {
     "uri": "URL",
     "secretClear": "Password",
     "description": "Notes",
-    "tags": "Group",
+    // "tags": "Group",
     "folderParentPath":"Group"
   },
   "lastpass": {
@@ -31,7 +31,7 @@ CsvDb.formats = {
     "uri": "url",
     "secretClear": "password",
     "description": "extra",
-    "tags": "grouping",
+    // "tags": "grouping",
     "folderParentPath":"grouping"
   },
   "1password": {
@@ -40,7 +40,7 @@ CsvDb.formats = {
     "uri": "URL",
     "secretClear": "Password",
     "description": "Notes",
-    "tags": "Type",
+    // "tags": "Type",
     "folderParentPath":"Type"
   }
 };
@@ -69,24 +69,27 @@ CsvDb.prototype.loadDb = function(csvFile) {
  * @returns {Promise<object>} with resources and foldersPaths
  */
 CsvDb.prototype.toItems = async function(csvDb) {
-  const resources = await this.toResources(csvDb);
+  const resourceDtos = await this.toResourceDtos(csvDb);
   return {
-    'resources': resources,
-    'foldersPaths': this.toFoldersPaths(resources),
+    'resources': resourceDtos,
+    'foldersPaths': this.toFoldersPaths(resourceDtos),
   };
 };
 
 /**
  * Transform a csv file into a list of folders paths (that will later become folders).
- * @param {Array} resources
+ * @param {Array} resourceDtos
  * @returns {Array}
  */
-CsvDb.prototype.toFoldersPaths = function(resources) {
+CsvDb.prototype.toFoldersPaths = function(resourceDtos) {
   let foldersPaths = [];
 
-  resources.forEach((resource) => {
-    if (resource.folderParentPath) {
-      let paths = this.getGroupPath(resource.folderParentPath);
+  resourceDtos.forEach((resourceDto) => {
+    if (resourceDto.folderParentPath) {
+      let cleanPath = resourceDto.folderParentPath.replace(/^\/+/, ""); // remove leading slashes if any
+      cleanPath = cleanPath.replace(/\/\/+/g, "/"); // replace double slashes with single slash if any
+      resourceDto.folderParentPath = cleanPath;
+      let paths = this.getGroupPath(resourceDto.folderParentPath);
       foldersPaths = [...foldersPaths, ...paths];
     }
   });
@@ -118,9 +121,9 @@ CsvDb.prototype.getGroupPath = function(path) {
  * @param {Array} csvDb
  * @returns {Promise}
  */
-CsvDb.prototype.toResources = async function(csvDb) {
+CsvDb.prototype.toResourceDtos = async function(csvDb) {
   return new Promise((resolve, reject) => {
-    const resources = [];
+    const resourceDtos = [];
     for (let i in csvDb['data']) {
       if (csvDb['data'].hasOwnProperty(i)) {
         const csvEntry = csvDb['data'][i];
@@ -129,25 +132,25 @@ CsvDb.prototype.toResources = async function(csvDb) {
           reject('CSV format is not recognized');
         }
 
-        const resource = new Resource();
+        const resourceDto = new ResourceDto();
         const mapping = CsvDb.formats[formatName];
-        resource.fromCsvEntry(csvEntry, mapping);
-        resources.push(resource);
+        resourceDto.fromCsvEntry(csvEntry, mapping);
+        resourceDtos.push(resourceDto);
       }
     }
-    resolve(resources);
+    resolve(resourceDtos);
   });
 };
 
 /**
  * Transform a list of resources into a CSV file content.
- * @param {array} resources
+ * @param {array} resourcesDto
  * @param {string} format csv format
  * @returns {Promise} a promise containing the content of the csv file.
  */
-CsvDb.prototype.fromResources = function(resources, format) {
+CsvDb.prototype.fromResourceDtos = function(resourcesDto, format) {
   return new Promise((resolve, reject) => {
-    const resource = new Resource();
+    const resourceDto = new ResourceDto();
     const csvEntries = [];
     let csvContent = null;
 
@@ -156,15 +159,15 @@ CsvDb.prototype.fromResources = function(resources, format) {
     }
 
     try {
-      for (let i in resources) {
-        const csvEntry = resource.toCsvEntry(resources[i], CsvDb.formats[format]);
+      for (let i in resourcesDto) {
+        const csvEntry = resourceDto.toCsvEntry(resourcesDto[i], CsvDb.formats[format]);
         csvEntries.push(csvEntry);
       }
       csvContent = PapaParse.unparse(csvEntries, {header: true, quotes: true});
       resolve(csvContent);
     } catch(e) {
       reject(e);
-    }s
+    }
   });
 };
 

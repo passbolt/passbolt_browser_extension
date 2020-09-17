@@ -13,7 +13,6 @@
  */
 const {Crypto} = require('../model/crypto');
 const {ShareService} = require('../service/share');
-const {Resource} = require('../model/resource');
 
 class Share {}
 

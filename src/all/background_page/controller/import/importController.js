@@ -14,17 +14,19 @@
 const __ = require('../../sdk/l10n').get;
 const Worker = require('../../model/worker');
 
+const {Keyring} = require('../../model/keyring');
 const {Crypto} = require('../../model/crypto');
-const {CsvDb} = require('../../model/csvDb');
+const {User} = require('../../model/user');
+const {CsvDb} = require('../../model/importExport/csvDb/csvDb');
+const {KeepassDb} = require('../../model/importExport/keepassDb/keepassDb');
+
 const {FolderEntity} = require('../../model/entity/folder/folderEntity');
 const {FolderModel} = require('../../model/folder/folderModel');
-const {KeepassDb} = require('../../model/keepassDb/keepassDb');
-const {Keyring} = require('../../model/keyring');
-const {Resource} = require('../../model/resource');
+const {ResourceModel} = require('../../model/resource/resourceModel');
+const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
 const {TagModel} = require('../../model/tag/tagModel');
 const {TagEntity} = require('../../model/entity/tag/tagEntity');
 const {TagsCollection} = require('../../model/entity/tag/tagsCollection');
-const {User} = require('../../model/user');
 
 const progressController = require('../progress/progressController');
 const passphraseController = require('../passphrase/passphraseController');
@@ -50,6 +52,7 @@ class ImportController {
   constructor(worker, clientOptions, options, fileType, fileB64Content) {
     this.worker = worker;
     this.clientOptions = clientOptions;
+    this.resourceModel = new ResourceModel(clientOptions);
 
     this.options = options;
     this.fileType = fileType;
@@ -170,7 +173,7 @@ class ImportController {
    * @return {Promise}
    * @private
    */
-  saveTags(resource) {
+  async saveTags(resource) {
     let tagsCollection = new TagsCollection([this.uniqueImportTag.toDto()]);
     let tagModel = new TagModel(this.clientOptions);
     return tagModel.updateResourceTags(resource.id, tagsCollection);
@@ -330,18 +333,25 @@ class ImportController {
 
   /**
    * Save resource
-   * @param {object} resource
+   * @param {object} resourceDto
    * @returns {Promise<unknown>}
    */
-  async saveResource(resource) {
+  async saveResource(resourceDto) {
     // Manage parent folder if exists (has been created).
-    let folderPath = this._getConsolidatedPath(resource.folderParentPath);
+    let folderPath = this._getConsolidatedPath(resourceDto.folderParentPath);
     let folderExist = this.getFolderFromPath(folderPath);
     if (this.options.importFolders && folderExist) {
-      resource["folder_parent_id"] = folderExist.id;
+      resourceDto["folder_parent_id"] = folderExist.id;
     }
 
-    return Resource.import(resource);
+    try {
+      let resourceEntity = new ResourceEntity(resourceDto);
+      resourceEntity = await this.resourceModel.create(resourceEntity);
+      return resourceEntity.toDto();
+    } catch(error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   /**
@@ -515,11 +525,7 @@ class ImportController {
     for (let i in armoredSecrets) {
       if (armoredSecrets.hasOwnProperty(i)) {
         if (this.items.resources[i].message !== '') {
-          this.items.resources[i].secrets = [
-            {
-              data : armoredSecrets[i],
-            }
-          ];
+          this.items.resources[i].secrets = [{data : armoredSecrets[i]}];
         }
         // Remove data that were added by _prepareResources().
         delete this.items.resources[i].message;

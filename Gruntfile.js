@@ -73,7 +73,9 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test', ['shell:test']);
 
-  grunt.registerTask('custom-chrome-debug', ['copy:background_page', 'copy:content_scripts', 'browserify:background_page', 'copy:data', 'shell:build_webpack_apps_debug']);
+  grunt.registerTask('custom-chrome-debug', ['bg-chrome-debug', 'react-chrome-debug']);
+  grunt.registerTask('bg-chrome-debug', ['copy:background_page', 'browserify:background_page']);
+  grunt.registerTask('react-chrome-debug', ['copy:content_scripts', 'copy:data', 'shell:build_webpack_apps_debug']);
 
   /**
    * Main grunt tasks configuration

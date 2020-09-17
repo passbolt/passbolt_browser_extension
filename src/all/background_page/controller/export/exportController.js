@@ -14,8 +14,8 @@
 const __ = require('../../sdk/l10n').get;
 const fileController = require('../fileController');
 const passphraseController = require('../passphrase/passphraseController');
-const {KeepassDb} = require('../../model/keepassDb/keepassDb');
-const {CsvDb} = require('../../model/csvDb');
+const {KeepassDb} = require('../../model/importExport/keepassDb/keepassDb');
+const {CsvDb} = require('../../model/importExport/csvDb/csvDb');
 const {Crypto} = require('../../model/crypto');
 const progressController = require('../progress/progressController');
 const {FoldersCollection} = require('../../model/entity/folder/foldersCollection');
@@ -25,12 +25,12 @@ class ExportController {
   /**
    * Constructor
    * @param worker
-   * @param object items object containing the items to export
+   * @param {object} items object containing the items to export
    *    {
    *      resources: Array,
    *      folders: Array
    *    }
-   * @param object options options
+   * @param {object} options options
    *   format: the format of the export (csv-xxx or kdbx)
    *   credentials: credentials if required (mainly for kdbx)
    *     - password (string)
@@ -86,7 +86,7 @@ class ExportController {
 
   /**
    * Convert a list of resources into a csv file content.
-   * @param options
+   * @param {object} options
    *  format: format of the csv file. See CsvDB.formats.
    * @return {Promise} a promise containing the csv file content (string).
    */
@@ -104,12 +104,12 @@ class ExportController {
       }
     }
 
-    return csvDb.fromResources(this.resources, options.format);
+    return csvDb.fromResourceDtos(this.resources, options.format);
   };
 
   /**
    * Convert a list of resources into a kdbx file.
-   * @param options
+   * @param {object} options
    *   credentials: the credentials to encrypt the file.
    *     - password: string. empty password will create a db without a password.
    *     - keyFile: string, base64 encoded. provide null if no keyFile.
@@ -169,7 +169,7 @@ class ExportController {
   /**
    * Download the file content.
    * The name of the file will be "passbolt-export-date.format".
-   * @param fileContent
+   * @param {object} fileContent
    * @return {Promise}
    */
   downloadFile(fileContent) {

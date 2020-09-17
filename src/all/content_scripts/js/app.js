@@ -205,19 +205,6 @@ window.addEventListener('passbolt.plugin.resources.delete-all', async function (
   }
 });
 
-// Save a resource
-window.addEventListener('passbolt.plugin.resources.save', async function (event) {
-  const requestId = event.detail[0];
-  const resource = event.detail[1];
-
-  try {
-    const resourceCreated = await passbolt.request('passbolt.resources.save', resource);
-    passbolt.message.emitToPage(requestId, { status: 'SUCCESS', body: resourceCreated });
-  } catch (error) {
-    passbolt.message.emitToPage(requestId, { status: 'ERROR', body: error });
-  }
-});
-
 // Update a resource
 window.addEventListener('passbolt.plugin.resources.update', async function (event) {
   const requestId = event.detail[0];
@@ -288,6 +275,11 @@ passbolt.message.on('passbolt.export-passwords.complete', function () {
 /* ==================================================================================
  * Application (Legacy appjs)
  * ================================================================================== */
+// Save a resource
+// @deprecated with v2.7.0 will be removed with v3.x
+window.addEventListener('passbolt.plugin.resources.save', async function (event) {
+  console.error('@deprecated passbolt.plugin.resources.save - please upgrade.')
+});
 
 // The application asks the plugin to decrypt an armored string
 // and store it in the clipboard.

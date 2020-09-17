@@ -6,7 +6,6 @@
  */
 const {User} = require('../model/user');
 const {Log} = require('../model/log');
-const {Resource} = require('../model/resource');
 const {ResourceModel} = require('../model/resource/resourceModel');
 
 const {ResourceCreateController} = require('../controller/resource/resourceCreateController.js');
@@ -125,26 +124,6 @@ const listen = function (worker) {
     } catch (error) {
       if (error instanceof Error) {
         console.error(error);
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
-    }
-  });
-
-  /*
-   * Save a resource
-   *
-   * @listens passbolt.resources.save
-   * @param requestId {uuid} The request identifier
-   * @param resource {array} The resource
-   */
-  worker.port.on('passbolt.resources.save', async function (requestId, resource) {
-    try {
-      const resourceCreated = await Resource.save(resource);
-      worker.port.emit(requestId, 'SUCCESS', resourceCreated);
-    } catch (error) {
-      if (error instanceof Error) {
         worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
       } else {
         worker.port.emit(requestId, 'ERROR', error);

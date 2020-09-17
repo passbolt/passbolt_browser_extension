@@ -2,14 +2,14 @@
  * KeepassDb model
  * Provides high level tools to work with a kdbx file and object.
  */
-var Resource = require('../resource').Resource;
-var fileController = require('../../controller/fileController');
+const {ResourceDto} = require('../resourceDto');
+const fileController = require('../../../controller/fileController');
 
 /**
  * Constructor.
  * @constructor
  */
-var KeepassDb = function() {
+const KeepassDb = function() {
   this.db = null;
   // Contains folders organized by folder uuid : kdbx group
   this._groups = {};
@@ -17,8 +17,8 @@ var KeepassDb = function() {
 
 /**
  * Create a Kdbx database.
- * @param string password
- * @param Blob keyFile
+ * @param {string} password
+ * @param {Blob} keyFile
  * @returns {Promise} promise with newly created db
  */
 KeepassDb.prototype.createDb = function(password, keyFile) {
@@ -39,9 +39,9 @@ KeepassDb.prototype.createDb = function(password, keyFile) {
 
 /**
  * load a db from file.
- * @param Blob kdbxFile file object as returned by the file field.
- * @param string pass the password of the db
- * @param Blob keyFile (optional) the keyFile if there is one. null otherwise.
+ * @param {Blob} kdbxFile file object as returned by the file field.
+ * @param {string} pass the password of the db
+ * @param {Blob} keyFile (optional) the keyFile if there is one. null otherwise.
  * @returns {Promise}
  */
 KeepassDb.prototype.loadDb = function(kdbxFile, pass, keyFile) {
@@ -101,7 +101,7 @@ KeepassDb.prototype._prepareKeyFile = function(keyFile) {
 
 /**
  * Transform a group into a flat path by traversing the parents.
- * @param KdbxGroup group
+ * @param {KdbxGroup} group
  * @returns {String} path. Example: "/parent1/group"
  */
 KeepassDb.prototype.getGroupPath = function(group) {
@@ -120,23 +120,21 @@ KeepassDb.prototype.getGroupPath = function(group) {
     return group.name;
   });
 
-  const path = groupNames.join('/');
-
-  return path;
+  return groupNames.join('/');
 };
 
 /**
- * Transform a kdbx database into a list of Resources.
- * @param Kdbx kdbxDb
+ * Transform a kdbx database into a list of ResourceDtos.
+ * @param {Kdbx} kdbxDb
  * @returns {Array}
  */
-KeepassDb.prototype.toResources = function(kdbxDb) {
+KeepassDb.prototype.toResourceDtos = function(kdbxDb) {
   const entries = [];
     kdbxDb.groups[0].forEach((entry, group) => {
       if (entry) {
-        const resource = new Resource().fromKdbxEntry(entry);
-        resource.folderParentPath = this.getGroupPath(entry.parentGroup);
-        entries.push(resource);
+        const resourceDto = new ResourceDto().fromKdbxEntry(entry);
+        resourceDto.folderParentPath = this.getGroupPath(entry.parentGroup);
+        entries.push(resourceDto);
       }
     });
 
@@ -163,7 +161,7 @@ KeepassDb.prototype._handleGroupRecursively = function(group, paths) {
 
 /**
  * Transform a kdbx database into a list of folders paths (that will later become folders).
- * @param Kdbx kdbxDb
+ * @param {Kdbx} kdbxDb
  * @returns {Array}
  */
 KeepassDb.prototype.toFoldersPaths = function(kdbxDb) {
@@ -181,38 +179,36 @@ KeepassDb.prototype.toFoldersPaths = function(kdbxDb) {
 
 /**
  * Transform a kdbx database into a list of Resources.
- * @param Kdbx kdbxDb
- * @returns {Promise}
+ * @param {Kdbx} kdbxDb
+ * @returns {Object} resources, foldersPaths
  */
 KeepassDb.prototype.toItems = function(kdbxDb) {
-  const items = {
-    'resources': this.toResources(kdbxDb),
+  return {
+    'resources': this.toResourceDtos(kdbxDb),
     'foldersPaths': this.toFoldersPaths(kdbxDb),
   };
-
-  return items;
 };
 
 /**
  * Create an entry in the db from a Resource.
- * @param Resouce resource
- * @param KdbxGroup group
- * @param Kdbx db
+ * @param {ResourceDto} resourceDto
+ * @param {KdbxGroup} [group] optional
+ * @param {Kdbx} [db] optional
  * @returns {KdbxEntry}
  */
-KeepassDb.prototype.createEntry = function(resource, group, db) {
-  if (db == undefined || db == null) {
+KeepassDb.prototype.createEntry = function(resourceDto, group, db) {
+  if (!db) {
     db = this.db;
   }
-  if (group == undefined || group == null) {
+  if (!group) {
     group = db.getDefaultGroup() || null;
   }
   const entry = db.createEntry(group);
-  entry.fields.Title = resource.name;
-  entry.fields.UserName = resource.username;
-  entry.fields.Password = kdbxweb.ProtectedValue.fromString(resource.secretClear);
-  entry.fields.URL = resource.uri;
-  entry.fields.Notes = resource.description;
+  entry.fields.Title = resourceDto.name;
+  entry.fields.UserName = resourceDto.username;
+  entry.fields.Password = kdbxweb.ProtectedValue.fromString(resourceDto.secretClear);
+  entry.fields.URL = resourceDto.uri;
+  entry.fields.Notes = resourceDto.description;
 
   return entry;
 };
@@ -249,17 +245,17 @@ KeepassDb.prototype.findOrCreateGroupRecursive = function(folder, folders) {
 
 /**
  * Build a Kdbx database from a list of Items.
- * @param object items items to export
+ * @param {object} items items to export
  *   format: {
- *     resources: array or resources,
+ *     resources: array or resourceDtos,
  *     folders: array of folders
  *   }
- * @param string password the password to encrypt the db
- * @param keyFile the keyfile to encrypt the db
+ * @param {string} password the password to encrypt the db
+ * @param {Blob} keyFile the keyfile to encrypt the db
  * @returns {Promise.<ArrayBuffer>|*}
  */
 KeepassDb.prototype.fromItems = function(items, password, keyFile) {
-  if (keyFile == undefined) {
+  if (!keyFile) {
     keyFile = null;
   }
   const self = this;

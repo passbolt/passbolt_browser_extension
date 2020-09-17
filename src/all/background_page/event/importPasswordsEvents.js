@@ -4,7 +4,7 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const ImportController = require('../controller/import/importController').ImportController;
+const {ImportController} = require('../controller/import/importController');
 const {User} = require('../model/user');
 
 const listen = function (worker) {

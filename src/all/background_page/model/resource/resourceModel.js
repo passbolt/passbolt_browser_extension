@@ -18,7 +18,7 @@ const {ResourceService} = require('../../service/api/resource/resourceService');
 const {PlaintextEntity} = require('../entity/plaintext/plaintextEntity');
 const {PermissionEntity} = require('../entity/permission/permissionEntity');
 const {PermissionsCollection} = require('../entity/permission/permissionsCollection');
-const {PermissionChangesCollection} = require('../../model/entity/permission/permissionChangesCollection');
+const {PermissionChangesCollection} = require('../entity/permission/change/permissionChangesCollection');
 const {ResourceTypeModel} = require('../../model/resourceType/resourceTypeModel');
 
 const {TagsCollection} = require('../../model/entity/tag/tagsCollection');
@@ -276,7 +276,7 @@ class ResourceModel {
    */
   async delete(resourceId) {
     await this.resourceService.delete(resourceId);
-    await ResourceLocalStorage.deleteResourceById(resourceId);
+    await ResourceLocalStorage.delete(resourceId);
   }
 
   /**

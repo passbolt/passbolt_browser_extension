@@ -149,13 +149,17 @@ class UserService extends AbstractService {
    * Delete a user using Passbolt API
    *
    * @param {string} userId uuid
+   * @param {object} transfer for example instructions for permissions transfer
+   * @param {boolean} [dryRun] optional (default false)
    * @returns {Promise<*>} Response body
    * @throw {TypeError} if user id is not a valid uuid
+   * @throw {ApiFetchError} if user cannot be deleted
    * @public
    */
-  async delete(userId) {
+  async delete(userId, transfer, dryRun) {
     this.assertValidId(userId);
-    const response = await this.apiClient.delete(userId);
+    const data = transfer ? {transfer: transfer} : {};
+    const response = await this.apiClient.delete(userId, data, {},  dryRun);
     return response.body;
   }
 }

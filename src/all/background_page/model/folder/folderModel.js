@@ -19,7 +19,7 @@ const {ShareService} = require('../../service/api/share/shareService');
 
 const {PermissionEntity} = require('../entity/permission/permissionEntity');
 const {PermissionsCollection} = require('../entity/permission/permissionsCollection');
-const {PermissionChangesCollection} = require("../../model/entity/permission/permissionChangesCollection");
+const {PermissionChangesCollection} = require("../entity/permission/change/permissionChangesCollection");
 
 class FolderModel {
   /**

@@ -13,6 +13,7 @@
  */
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
+const {GroupsUsersCollection} = require('./groupsUsersCollection');
 
 const ENTITY_NAME = 'Group';
 const GROUP_NAME_MIN_LENGTH = 1;
@@ -41,8 +42,7 @@ class GroupEntity extends Entity {
     return {
       "type": "object",
       "required": [
-        "id",
-        "name",
+        "name"
       ],
       "properties": {
         "id": {
@@ -72,7 +72,9 @@ class GroupEntity extends Entity {
         "modified_by": {
           "type": "string",
           "format": "uuid"
-        }
+        },
+        // Associations
+        "groups_users": GroupsUsersCollection.getSchema()
       }
     }
   }

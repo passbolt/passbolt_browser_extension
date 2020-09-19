@@ -21,6 +21,7 @@ const {Crypto} = require('../model/crypto');
 const {User} = require('../model/user');
 const {ResourceTypeModel} = require('../model/resourceType/resourceTypeModel');
 const {FolderModel} = require('../model/folder/folderModel');
+const {UserModel} = require('../model/user/userModel');
 
 const {InvalidMasterPasswordError} = require('../error/invalidMasterPasswordError');
 const {UserAbortsOperationError} = require('../error/userAbortsOperationError');
@@ -130,6 +131,8 @@ const listen = function (worker) {
     const user = User.getInstance();
     try {
       await user.settings.sync()
+      const userModel = new UserModel(await user.getApiClientOptions());
+      await userModel.updateLocalStorage();
     } catch (error) {
       // fail silently for CE users
       user.settings.setDefaults();

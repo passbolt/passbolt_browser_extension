@@ -13,6 +13,7 @@
  */
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
+const {UserEntity} = require('../user/userEntity');
 
 const ENTITY_NAME = 'GroupUser';
 
@@ -29,6 +30,12 @@ class GroupUserEntity extends Entity {
       groupUserDto,
       GroupUserEntity.getSchema()
     ));
+
+    // Associations
+    if (this._props.user) {
+      this._user = new UserEntity(this._props.user);
+      delete this._props.user;
+    }
   }
 
   /**
@@ -39,7 +46,6 @@ class GroupUserEntity extends Entity {
     return {
       "type": "object",
       "required": [
-        "group_id",
         "user_id",
         "is_admin",
       ],
@@ -63,6 +69,8 @@ class GroupUserEntity extends Entity {
           "type": "string",
           "format": "date-time"
         },
+        // Relations
+        "user": UserEntity.getSchema()
       }
     }
   }
@@ -91,7 +99,7 @@ class GroupUserEntity extends Entity {
    * @returns {string} uuid
    */
   get groupId() {
-    return this._props.group_id;
+    return this._props.group_id || null;
   }
 
   /**
@@ -108,6 +116,14 @@ class GroupUserEntity extends Entity {
    */
   get created() {
     return this._props.created || null;
+  }
+
+  /**
+   * Get associated user
+   * @returns {UserEntity|null}
+   */
+  get user() {
+    return this._user || null;
   }
 
   // ==================================================

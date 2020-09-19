@@ -6,12 +6,14 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var app = require('../app');
-var User = require('../model/user').User;
-var user = User.getInstance();
-var __ = require('../sdk/l10n').get;
+const app = require('../app');
+const {User} = require('../model/user');
 
-var listen = function (worker) {
+const {UserModel} = require('../model/user/userModel');
+const {UserEntity} = require('../model/entity/user/userEntity');
+const {UserDeleteTransferEntity} = require('../model/entity/user/transfer/userDeleteTransfer');
+
+const listen = function (worker) {
 
   /* ==================================================================================
    *  Getters for user
@@ -26,8 +28,8 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.user.get', function (requestId, data) {
     try {
-      var u = user.get(data);
-      worker.port.emit(requestId, 'SUCCESS', u);
+      const user = User.getInstance().get(data);
+      worker.port.emit(requestId, 'SUCCESS', user);
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', e.message);
     }
@@ -41,7 +43,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.user.settings.get.securityToken', function (requestId) {
     try {
-      var securityToken = user.settings.getSecurityToken();
+      const securityToken = User.getInstance().settings.getSecurityToken();
       worker.port.emit(requestId, 'SUCCESS', securityToken);
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', e.message);
@@ -56,7 +58,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.user.settings.get.theme', function (requestId) {
     try {
-      var theme = user.settings.getTheme();
+      const theme = User.getInstance().settings.getTheme();
       worker.port.emit(requestId, 'SUCCESS', theme);
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', e.message);
@@ -71,7 +73,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.user.settings.get.domain', function (requestId) {
     try {
-      var domain = user.settings.getDomain();
+      const domain = User.getInstance().settings.getDomain();
       worker.port.emit(requestId, 'SUCCESS', domain);
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', e.message);
@@ -92,7 +94,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.user.set', function (requestId, u) {
     try {
-      user.set(u);
+      User.getInstance().set(u);
       app.pageMods.PassboltAuth.init();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
@@ -108,7 +110,7 @@ var listen = function (worker) {
    * @param u {array} The user object
    */
   worker.port.on('passbolt.user.settings.sync', function (requestId) {
-    user.settings.sync().then(() => {
+    User.getInstance().settings.sync().then(() => {
       worker.port.emit(requestId, 'SUCCESS');
     }, (e) => {
       worker.port.emit(requestId, 'ERROR', e.message);
@@ -116,9 +118,93 @@ var listen = function (worker) {
   });
 
   /* ==================================================================================
+   *  CRUD
+   * ================================================================================== */
+  /*
+   * Create a user user
+   *
+   * @listens passbolt.user.create
+   * @param requestId {uuid} The request identifier
+   * @param userDato {Object} The user object, example:
+   *  {username: 'ada@passbolt.com', profile: {first_name: 'ada', last_name: 'lovelace'}, role_id: <UUID>}
+   */
+  worker.port.on('passbolt.users.create', async function (requestId, userDto) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const userModel = new UserModel(clientOptions);
+      const userEntity = new UserEntity(userDto);
+      const updatedUser = await userModel.create(userEntity);
+      worker.port.emit(requestId, 'SUCCESS', updatedUser.toDto());
+    } catch(error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+    }
+  });
+
+  /*
+   * Update a user
+   * Can be used to change the role or firstname/lastname but nothing else
+   *
+   * @listens passbolt.user.update
+   * @param requestId {uuid} The request identifier
+   * @param userDato {Object} The user object, example:
+   *  {id: <UUID>, profile: {first_name: 'ada', last_name: 'lovelace'}, role_id: <UUID>}
+   */
+  worker.port.on('passbolt.users.update', async function (requestId, userDto) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const userModel = new UserModel(clientOptions);
+      const userEntity = new UserEntity(userDto);
+      const updatedUser = await userModel.update(userEntity);
+      worker.port.emit(requestId, 'SUCCESS', updatedUser.toDto());
+    } catch(error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+    }
+  });
+
+  /*
+   * Delete a user - dry run
+   *
+   * @param {string} requestId The request identifier uuid
+   * @param {string} userId The user uuid
+   */
+  worker.port.on('passbolt.users.delete-dry-run', async function (requestId, userId, transferDto) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const userModel = new UserModel(clientOptions);
+      const transferEntity = transferDto ? new UserDeleteTransferEntity(transferDto) : null;
+      await userModel.deleteDryRun(userId, transferEntity);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch(error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+    }
+  });
+
+  /*
+   * Delete a user
+   *
+   * @param {string} requestId The request identifier uuid
+   * @param {string} userId The user uuid
+   * @param {object} [transferDto] optional data ownership transfer
+   */
+  worker.port.on('passbolt.users.delete', async function (requestId, userId, transferDto) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const userModel = new UserModel(clientOptions);
+      const transferEntity = transferDto ? new UserDeleteTransferEntity(transferDto) : null;
+      await userModel.delete(userId, transferEntity);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch(error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+    }
+  });
+
+  /* ==================================================================================
    *  Others
    * ================================================================================== */
-
   /*
    * Validate the user object given and return errors if any.
    *
@@ -129,7 +215,7 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.user.validate', function (requestId, u, fields) {
     try {
-      var validatedUser = user.validate(u, fields);
+      const validatedUser = User.getInstance().validate(u, fields);
       worker.port.emit(requestId, 'SUCCESS', validatedUser);
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
@@ -146,11 +232,12 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.user.settings.validate', function (requestId, settingsData, fields) {
     try {
-      user.settings.validate(settingsData, fields);
+      User.getInstance().settings.validate(settingsData, fields);
       worker.port.emit(requestId, 'SUCCESS', settingsData);
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
     }
   });
 };
+
 exports.listen = listen;

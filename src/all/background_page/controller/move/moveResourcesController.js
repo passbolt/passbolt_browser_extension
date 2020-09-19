@@ -18,7 +18,7 @@ const {Share} = require('../../model/share');
 const {FolderModel} = require('../../model/folder/folderModel');
 const {ResourceModel} = require('../../model/resource/resourceModel');
 const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
-const {PermissionChangesCollection} = require('../../model/entity/permission/permissionChangesCollection');
+const {PermissionChangesCollection} = require('../../model/entity/permission/change/permissionChangesCollection');
 
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');

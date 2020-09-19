@@ -121,7 +121,7 @@ class ResourceLocalStorage {
    * Delete a resource in the local storage by id.
    * @param {string} resourceId The resource id
    */
-  static async deleteResourceById(resourceId) {
+  static async delete(resourceId) {
     await lock.acquire();
     try {
       const resources = await ResourceLocalStorage.get();

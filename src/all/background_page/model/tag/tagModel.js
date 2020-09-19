@@ -34,6 +34,7 @@ class TagModel {
    *
    * @throws {Error} if API call fails, service unreachable, etc.
    * @return {TagsCollection}
+   * @public
    */
   async findAll() {
     const tagsDto = await this.tagService.findAll();
@@ -46,6 +47,7 @@ class TagModel {
    * @param {string} resourceId uuid
    * @param {TagsCollection} tagsCollection
    * @returns {ResourceEntity}
+   * @public
    */
   async updateResourceTags(resourceId, tagsCollection) {
     const tagsDto = await this.tagService.updateResourceTags(resourceId, tagsCollection.toDto());
@@ -58,6 +60,7 @@ class TagModel {
    *
    * @param {TagEntity} tagEntity
    * @returns {Promise<TagEntity>}
+   * @public
    */
   async update(tagEntity) {
     const tagDto = await this.tagService.update(tagEntity.id, tagEntity.toDto());
@@ -71,6 +74,7 @@ class TagModel {
    *
    * @param {string} tagId uuid
    * @returns {Promise<void>}
+   * @public
    */
   async delete(tagId) {
     await this.tagService.delete(tagId);

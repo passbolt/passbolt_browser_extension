@@ -11,8 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
+const {UserEntity} = require('../entity/user/userEntity');
 const {UsersCollection} = require('../entity/user/usersCollection');
+const {UserDeleteTransferEntity} = require('../entity/user/transfer/userDeleteTransfer');
+
 const {UserService} = require('../../service/api/user/userService');
+const {UserLocalStorage} = require('../../service/local_storage/userLocalStorage');
+
+const {PassboltApiFetchError} = require('../../error/passboltApiFetchError');
+const {DeleteDryRunError} = require('../../error/deleteDryRunError');
 
 class UserModel {
   /**
@@ -26,17 +33,118 @@ class UserModel {
   }
 
   /**
+   * Update the users local storage with the latest API
    *
-   * @param {string} resourceId uuid
-   * @returns {Promise<Array<string>>} Array of user uuids
+   * @return {UsersCollection}
+   * @public
    */
-  async findAllIdsForResourceUpdate(resourceId) {
-    if (!Validator.isUUID(resourceId)) {
-      throw new TypeError('Error in find all users for resources updates. The resource id is not a valid uuid.');
+  async updateLocalStorage () {
+    const userDtos = await this.userService.findAll(UserLocalStorage.DEFAULT_CONTAIN);
+    const usersCollection = new UsersCollection(userDtos);
+    await UserLocalStorage.set(usersCollection);
+    return usersCollection;
+  }
+
+  /**
+   * Find all user ids who have access to a user
+   *
+   * @param {string} userId uuid
+   * @returns {Promise<Array<string>>} Array of user uuids
+   * @public
+   */
+  async findAllIdsForResourceUpdate(userId) {
+    if (!Validator.isUUID(userId)) {
+      throw new TypeError('Error in find all users for users updates. The user id is not a valid uuid.');
     }
-    const usersDto = await this.userService.findAll(null, {'has-access': resourceId});
+    const usersDto = await this.userService.findAll(null, {'has-access': userId});
     const usersCollection = new UsersCollection(usersDto);
     return usersCollection.ids;
+  }
+
+  //==============================================================
+  // CRUD
+  //==============================================================
+  /**
+   * Create a user using Passbolt API and add result to local storage
+   *
+   * @param {UserEntity} userEntity
+   * @returns {Promise<UserEntity>}
+   * @public
+   */
+  async create(userEntity) {
+    const data = userEntity.toDto({profile: {avatar: false}});
+    const userDto = await this.userService.create(data);
+    const newUserEntity = new UserEntity(userDto);
+    await UserLocalStorage.addUser(newUserEntity);
+    return newUserEntity;
+  }
+
+  /**
+   * Update a user using Passbolt API and add result to local storage
+   *
+   * @param {UserEntity} userEntity
+   * @returns {Promise<UserEntity>}
+   * @public
+   */
+  async update(userEntity) {
+    const data = userEntity.toDto({profile: {avatar: false}});
+    const userDto = await this.userService.update(userEntity.id, data);
+    const updatedUserEntity = new UserEntity(userDto);
+    await UserLocalStorage.updateUser(updatedUserEntity);
+    return updatedUserEntity;
+  }
+
+  /**
+   * Check if a user can be deleted
+   *
+   * A user can not be deleted if:
+   * - they are the only owner of a shared resource
+   * - they are the only group manager of a group that owns a shared resource
+   * In such case ownership transfer is required.
+   *
+   * @param {string} userId The user id
+   * @param {UserDeleteTransferEntity} [transfer] optional ownership transfer information if needed
+   * @returns {Promise<void>}
+   * @throws {DeleteDryRunError} if some permissions must be transferred
+   * @public
+   */
+  async deleteDryRun(userId, transfer) {
+    try {
+      let deleteData = (transfer && transfer instanceof UserDeleteTransferEntity) ? transfer.toDto() : {};
+      await this.userService.delete(userId, deleteData, true);
+    } catch(error) {
+      if (error instanceof PassboltApiFetchError && error.data.code === 400 && error.data.body.errors) {
+        // recast generic 400 error into a delete dry run error
+        // allowing validation of the returned entities and reuse down the line to transfer permissions
+        throw new DeleteDryRunError(error.message, error.data.body.errors);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a user and transfer ownership if needed
+   *
+   * @param {string} userId The user id
+   * @param {UserDeleteTransferEntity} [transfer] optional ownership transfer information if needed
+   * @returns {Promise<void>}
+   * @public
+   */
+  async delete(userId, transfer) {
+    try {
+      let deleteData = (transfer && transfer instanceof UserDeleteTransferEntity) ? transfer.toDto() : {};
+      await this.userService.delete(userId, deleteData);
+    } catch(error) {
+      if (error instanceof PassboltApiFetchError && error.data.code === 400 && error.data.body.errors) {
+        // recast generic 400 error into a delete dry run error
+        // allowing validation of the returned entities and reuse down the line to transfer permissions
+        throw new DeleteDryRunError(error.message, error.data.body.errors);
+      }
+      throw error;
+    }
+
+    // Update local storage
+    await UserLocalStorage.delete(userId);
   }
 }
 

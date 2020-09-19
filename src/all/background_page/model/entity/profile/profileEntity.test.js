@@ -29,8 +29,6 @@ describe("Profile entity", () => {
 
   it("constructor works if valid minimal DTO is provided", () => {
     const dto = {
-      "id": "2766ff6b-87f1-53a9-98fd-72cd32a3df69",
-      "user_id": "54c6278e-f824-5fda-91ff-3e946b18d994",
       "first_name": "Dame Steve",
       "last_name": "Shirley"
     };
@@ -118,8 +116,6 @@ describe("Profile entity", () => {
       expect(false).toBe(true);
     } catch(error) {
       expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('id', 'required')).toBe(true);
-      expect(error.hasError('user_id', 'required')).toBe(true);
       expect(error.hasError('first_name', 'required')).toBe(true);
       expect(error.hasError('last_name', 'required')).toBe(true);
     }

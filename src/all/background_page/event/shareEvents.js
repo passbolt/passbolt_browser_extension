@@ -13,7 +13,7 @@ const {ResourceModel} = require('../model/resource/resourceModel');
 const {FolderModel} = require('../model/folder/folderModel');
 
 const {FoldersCollection} = require('../model/entity/folder/foldersCollection');
-const {PermissionChangesCollection} = require('../model/entity/permission/permissionChangesCollection');
+const {PermissionChangesCollection} = require('../model/entity/permission/change/permissionChangesCollection');
 
 const {ShareResourcesController} = require('../controller/share/shareResourcesController');
 const {ShareFoldersController} = require('../controller/share/shareFoldersController');

@@ -46,8 +46,6 @@ class ProfileEntity extends Entity {
     return {
       "type": "object",
       "required": [
-        "id",
-        "user_id",
         "first_name",
         "last_name"
       ],

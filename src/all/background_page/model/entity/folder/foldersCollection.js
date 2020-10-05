@@ -23,7 +23,7 @@ class FoldersCollection extends EntityCollection {
   /**
    * Folders Entity constructor
    *
-   * @param {Object} foldersCollectionDto folder DTO
+   * @param {Object} foldersCollectionDto folders
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
   constructor(foldersCollectionDto) {

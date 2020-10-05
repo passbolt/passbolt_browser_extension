@@ -13,7 +13,7 @@
  */
 const {Entity} = require('../../abstract/entity');
 const {EntityValidationError} = require('../../abstract/entityValidationError');
-const {GroupUserTransfersCollection} = require('../../group/transfer/groupUserTransfersCollection');
+const {GroupUserTransfersCollection} = require('../../groupUser/transfer/groupUserTransfersCollection');
 const {PermissionTransfersCollection} = require('../../permission/transfer/permissionTransfersCollection');
 
 const ENTITY_NAME = 'UserDeleteTransfer';

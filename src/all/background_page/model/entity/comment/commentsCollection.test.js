@@ -46,6 +46,7 @@ describe("Comment entity", () => {
     const entity = new CommentsCollection(dto);
     const expected = [comment1, comment2];
     expect(expected).toEqual(entity.toDto());
+    expect(expected).toEqual(entity.toJSON());
     expect(JSON.stringify(entity)).toEqual(JSON.stringify(expected));
     expect(entity.items[0].content).toEqual('comment1');
     expect(entity.items[1].content).toEqual('comment2');

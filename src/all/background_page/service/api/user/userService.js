@@ -43,8 +43,13 @@ class UserService extends AbstractService {
    */
   static getSupportedContainOptions() {
     return [
-      'LastLoggedIn',
-      'is_mfa_enabled'
+      'LastLoggedIn', // @deprecated v2.13 should use last_logged_in
+      'is_mfa_enabled',
+      // since v3
+      'last_logged_in', // only use when v2.13 support is dropped
+      'gpgkey',
+      'groups_users',
+      'profile'
     ];
   }
 

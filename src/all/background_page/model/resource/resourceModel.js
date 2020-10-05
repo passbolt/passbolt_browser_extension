@@ -43,7 +43,8 @@ class ResourceModel {
    * @return {ResourcesCollection}
    */
   async updateLocalStorage () {
-    const resourceDtos = await this.resourceService.findAll(ResourceLocalStorage.DEFAULT_CONTAIN);
+    const contain = {permission: true, favorite: true, tags: true, folder: true};
+    const resourceDtos = await this.resourceService.findAll(contain);
     const resourcesCollection = new ResourcesCollection(resourceDtos);
     await ResourceLocalStorage.set(resourcesCollection);
     return resourcesCollection;
@@ -219,7 +220,7 @@ class ResourceModel {
    * Find permissions for a resource
    *
    * @param {string} resourcesId resource uuid
-   * @returns {Promise<ResourceEntity>}
+   * @returns {Promise<PermissionsCollection>}
    */
   async findResourcePermissions (resourcesId) {
     const contain = {'permissions.user.profile':true, 'permissions.group':true};
@@ -248,7 +249,8 @@ class ResourceModel {
    */
   async create(resourceEntity) {
     const data = resourceEntity.toDto({secrets:true});
-    const resourceDto = await this.resourceService.create(data, ResourceLocalStorage.DEFAULT_CONTAIN);
+    const contain = {permission: true, favorite: true, tags: true, folder: true};
+    const resourceDto = await this.resourceService.create(data, contain);
     const newResourceEntity = new ResourceEntity(resourceDto);
     await ResourceLocalStorage.addResource(newResourceEntity);
     return newResourceEntity;

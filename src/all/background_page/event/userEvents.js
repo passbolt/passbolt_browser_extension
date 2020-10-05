@@ -134,7 +134,7 @@ const listen = function (worker) {
       const userModel = new UserModel(clientOptions);
       const userEntity = new UserEntity(userDto);
       const updatedUser = await userModel.create(userEntity);
-      worker.port.emit(requestId, 'SUCCESS', updatedUser.toDto());
+      worker.port.emit(requestId, 'SUCCESS', updatedUser);
     } catch(error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
@@ -156,7 +156,7 @@ const listen = function (worker) {
       const userModel = new UserModel(clientOptions);
       const userEntity = new UserEntity(userDto);
       const updatedUser = await userModel.update(userEntity);
-      worker.port.emit(requestId, 'SUCCESS', updatedUser.toDto());
+      worker.port.emit(requestId, 'SUCCESS', updatedUser);
     } catch(error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));

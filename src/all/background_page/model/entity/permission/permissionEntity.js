@@ -29,7 +29,7 @@ class PermissionEntity extends Entity {
   /**
    * Permission Entity constructor
    *
-   * @param {Object} permissionDto folder DTO
+   * @param {Object} permissionDto permission
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
   constructor(permissionDto) {

@@ -152,7 +152,10 @@ class FolderLocalStorage {
 
   /**
    * FolderLocalStorage.DEFAULT_CONTAIN
-   * @returns {{permission: boolean}}
+   * Warning: To be used for entity serialization not service API contain!
+   *
+   * @returns {Object}
+   * @private
    */
   static get DEFAULT_CONTAIN() {
     return {permission: true};

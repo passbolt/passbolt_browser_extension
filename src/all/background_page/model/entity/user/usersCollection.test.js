@@ -13,6 +13,7 @@
  */
 import {UsersCollection} from "./usersCollection";
 import {EntityCollectionError} from "../abstract/entityCollectionError";
+import {UsersCollectionTestFixtures} from "./usersCollection.test.fixtures";
 import {EntitySchema} from "../abstract/entitySchema";
 import Validator from 'validator';
 
@@ -96,5 +97,11 @@ describe("User entity", () => {
   it("constructor works with empty collection", () => {
     const collection = new UsersCollection([]);
     expect(collection.ids).toEqual([]);
+  });
+
+  it("serialization works with full object inside collection", () => {
+    const dto = UsersCollectionTestFixtures.default;
+    const collection = new UsersCollection(dto);
+    expect(collection.toDto()).toEqual(dto);
   });
 });

@@ -16,6 +16,11 @@ const {EntitySchema} = require('../abstract/entitySchema');
 
 const ENTITY_NAME = 'gpgkey';
 
+const FINGERPRINT_MIN_LENGTH = 40;
+const FINGERPRINT_MAX_LENGTH = 40;
+const KEY_ID_MIN_LENGTH = 8;
+const KEY_ID_MAX_LENGTH = 8;
+
 class GpgkeyEntity extends Entity {
   /**
    * Gpgkey entity constructor
@@ -52,13 +57,41 @@ class GpgkeyEntity extends Entity {
           "format": "uuid"
         },
         "fingerprint": {
-          "type": "string"
+          "type": "string",
+          "minLength": FINGERPRINT_MIN_LENGTH,
+          "maxLength": FINGERPRINT_MAX_LENGTH
         },
         "armored_key": {
           "type": "string"
         },
         "deleted": {
           "type": "boolean"
+        },
+        "type": {
+          "type": "string"
+        },
+        "uid": {
+          "type": "string"
+        },
+        "bits": {
+          "type": "integer"
+        },
+        "key_id": {
+          "type": "string",
+          "minLength": KEY_ID_MIN_LENGTH,
+          "maxLength": KEY_ID_MAX_LENGTH
+        },
+        "key_created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expires": {
+          "anyOf": [{
+            "type": "string",
+            "format": "date-time"
+          }, {
+            "type": "null"
+          }]
         },
         "created": {
           "type": "string",
@@ -67,7 +100,7 @@ class GpgkeyEntity extends Entity {
         "modified": {
           "type": "string",
           "format": "date-time"
-        },
+        }
       }
     }
   }

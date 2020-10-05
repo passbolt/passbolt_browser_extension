@@ -39,10 +39,10 @@ var listen = function (worker) {
   /*
    * Check if the plugin is well configured
    *
-   * @listens passbolt.addon.isConfigured
+   * @listens passbolt.addon.is-configured
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.isConfigured', function (requestId) {
+  worker.port.on('passbolt.addon.is-configured', function (requestId) {
     var user = User.getInstance();
     worker.port.emit(requestId, 'SUCCESS', user.isValid());
   });
@@ -51,10 +51,10 @@ var listen = function (worker) {
    * Check if the current domain matches the trusted domain defined in configuration.
    * Only works if the plugin is configured.
    *
-   * @listens passbolt.addon.checkDomain
+   * @listens passbolt.addon.check-domain
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.checkDomain', function (requestId) {
+  worker.port.on('passbolt.addon.check-domain', function (requestId) {
     var trustedDomain = Config.read('user.settings.trustedDomain');
     if(typeof trustedDomain === 'undefined' || trustedDomain == '') {
       worker.port.emit(requestId, 'SUCCESS', false);
@@ -67,10 +67,10 @@ var listen = function (worker) {
   /*
    * Get trusted domain.
    *
-   * @listens passbolt.addon.getDomain
+   * @listens passbolt.addon.get-domain
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.getDomain', function (requestId) {
+  worker.port.on('passbolt.addon.get-domain', function (requestId) {
     var trustedDomain = Config.read('user.settings.trustedDomain');
     worker.port.emit(requestId, 'SUCCESS', trustedDomain);
   });
@@ -78,20 +78,20 @@ var listen = function (worker) {
   /*
    * Get plugin version.
    *
-   * @listens passbolt.addon.getVersion
+   * @listens passbolt.addon.get-version
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.getVersion', function (requestId) {
+  worker.port.on('passbolt.addon.get-version', function (requestId) {
     worker.port.emit(requestId, 'SUCCESS', BrowserSettings.getExtensionVersion());
   });
 
   /*
    * Get plugin url.
    *
-   * @listens passbolt.addon.getUrl
+   * @listens passbolt.addon.get-url
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.getUrl', function (requestId) {
+  worker.port.on('passbolt.addon.get-url', function (requestId) {
     worker.port.emit(requestId, 'SUCCESS', chrome.runtime.getURL(''));
   });
 

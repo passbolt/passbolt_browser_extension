@@ -46,7 +46,7 @@ class EntityCollection extends Entity {
    * @returns {*}
    */
   toJSON() {
-    return this._items;
+    return this.toDto();
   }
 
   // ==================================================

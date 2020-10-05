@@ -35,7 +35,7 @@ $(function () {
    */
   DebugCommon.prototype.initMeta = function() {
     var meta = {};
-    return passbolt.request('passbolt.addon.getUrl')
+    return passbolt.request('passbolt.addon.get-url')
       .then(function(addonUrl) {
         meta['addon-url'] = addonUrl;
       })

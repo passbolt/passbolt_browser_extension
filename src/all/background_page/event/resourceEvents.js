@@ -48,7 +48,7 @@ const listen = function (worker) {
       const resourceModel = new ResourceModel(clientOptions);
       const {contains, filters, orders} = options;
       const resources = await resourceModel.findAll(contains, filters, orders);
-      worker.port.emit(requestId, 'SUCCESS', resources.toJSON());
+      worker.port.emit(requestId, 'SUCCESS', resources);
     } catch (error) {
       console.error(error);
       if (error instanceof Error) {
@@ -71,7 +71,7 @@ const listen = function (worker) {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const resourceModel = new ResourceModel(clientOptions);
       const permissions = await resourceModel.findResourcePermissions(resourceId);
-      worker.port.emit(requestId, 'SUCCESS', permissions.toJSON());
+      worker.port.emit(requestId, 'SUCCESS', permissions);
     } catch (error) {
       console.error(error);
       if (error instanceof Error) {

@@ -25,7 +25,7 @@ class FolderEntity extends Entity {
   /**
    * Folder entity constructor
    *
-   * @param {Object} folderDto folder DTO
+   * @param {Object} folderDto folder
    * @throws {EntityValidationError} if the dto cannot be converted into an entity
    * @throws {EntityValidationError} if permissions are not for folder or not matching foreign key
    */

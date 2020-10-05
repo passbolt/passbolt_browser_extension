@@ -13,7 +13,9 @@
  */
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
-const {GroupsUsersCollection} = require('./groupsUsersCollection');
+const {UserEntity} = require('../user/userEntity');
+const {GroupUserEntity} = require('../groupUser/groupUserEntity');
+const {GroupsUsersCollection} = require('../groupUser/groupsUsersCollection');
 
 const ENTITY_NAME = 'Group';
 const GROUP_NAME_MIN_LENGTH = 1;
@@ -32,6 +34,24 @@ class GroupEntity extends Entity {
       groupDto,
       GroupEntity.getSchema()
     ));
+
+    // Association
+    if (this._props.groups_users) {
+      this._groups_users = new GroupsUsersCollection(this._props.groups_users);
+      delete this._props.groups_users;
+    }
+    if (this._props.my_group_user) {
+      this._my_group_user = new GroupUserEntity(this._props.my_group_user);
+      delete this._props.my_group_user;
+    }
+    if (this._props.creator) {
+      this._creator = new UserEntity(this._props.creator);
+      delete this._props.creator;
+    }
+    if (this._props.modifier) {
+      this._modifier = new UserEntity(this._props.modifier);
+      delete this._props.modifier;
+    }
   }
 
   /**
@@ -74,9 +94,73 @@ class GroupEntity extends Entity {
           "format": "uuid"
         },
         // Associations
-        "groups_users": GroupsUsersCollection.getSchema()
+        "groups_users": GroupsUsersCollection.getSchema(),
+        "my_group_user": GroupUserEntity.getSchema(),
+        "creator": UserEntity.getSchema(),
+        "modifier": UserEntity.getSchema()
       }
     }
+  }
+
+  // ==================================================
+  // Serialization
+  // ==================================================
+  /**
+   * Return a DTO ready to be sent to API
+   * @param {object} [contain] optional for example {profile: {avatar:true}}
+   * @returns {*}
+   */
+  toDto(contain) {
+    let result = Object.assign({}, this._props);
+    if (!contain) {
+      return result;
+    }
+    if (this._groups_users && contain.groups_users) {
+      if (contain.groups_users === true) {
+        result.groups_users = this._groups_users.toDto();
+      } else {
+        result.groups_users = this._groups_users.toDto(contain.groups_users);
+      }
+    }
+    if (this._my_group_user && contain.my_group_user) {
+      result.my_group_user = this._my_group_user.toDto();
+    }
+    if (this._creator && contain.creator) {
+      if (contain.creator === true) {
+        result.creator = this._creator.toDto();
+      } else {
+        result.creator = this._creator.toDto(contain.user);
+      }
+    }
+    if (this._modifier && contain.modifier) {
+      if (contain.modifier === true) {
+        result.modifier = this._modifier.toDto();
+      } else {
+        result.modifier = this._modifier.toDto(contain.modifier);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Customizes JSON stringification behavior
+   * @returns {*}
+   */
+  toJSON() {
+    return this.toDto(GroupEntity.ALL_CONTAIN_OPTIONS);
+  }
+
+  /**
+   * GroupEntity.ALL_CONTAIN_OPTIONS
+   * @returns {object} all contain options that can be used in toDto()
+   */
+  static get ALL_CONTAIN_OPTIONS() {
+    return {
+      'creator': UserEntity.ALL_CONTAIN_OPTIONS,
+      'modifier': UserEntity.ALL_CONTAIN_OPTIONS,
+      'groups_users': GroupUserEntity.ALL_CONTAIN_OPTIONS,
+      'my_group_user': GroupUserEntity.ALL_CONTAIN_OPTIONS,
+    };
   }
 
   // ==================================================
@@ -136,6 +220,22 @@ class GroupEntity extends Entity {
    */
   get modifiedBy() {
     return this._props.modified_by || null;
+  }
+
+  /**
+   * Return groups users
+   * @returns {(GroupsUsersCollection|null)}
+   */
+  get groupsUsers() {
+    return this._groups_users || null;
+  }
+
+  /**
+   * Return current user group user
+   * @returns {(GroupUserEntity|null)}
+   */
+  get myGroupUser() {
+    return this._my_group_user || null;
   }
 
   // ==================================================

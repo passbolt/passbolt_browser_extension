@@ -36,12 +36,12 @@ $(function () {
    * @returns {Promise}
    */
   Bootstrap.prototype.loadConfiguration = async function () {
-    this.isPluginIsconfigured = await passbolt.request('passbolt.addon.isConfigured');
+    this.isPluginIsconfigured = await passbolt.request('passbolt.addon.is-configured');
     if (this.isPluginIsconfigured) {
-      this.isTrustedDomain = await passbolt.request('passbolt.addon.checkDomain');
+      this.isTrustedDomain = await passbolt.request('passbolt.addon.check-domain');
     }
     if (this.isTrustedDomain) {
-      this.trustedDomain = await passbolt.request('passbolt.addon.getDomain');
+      this.trustedDomain = await passbolt.request('passbolt.addon.get-domain');
     }
   };
 
@@ -129,7 +129,7 @@ $(function () {
    */
   Bootstrap.prototype.initVersion = function () {
     // Get plugin version and add it in the footer.
-    return passbolt.request('passbolt.addon.getVersion')
+    return passbolt.request('passbolt.addon.get-version')
       .then(function (version) {
         var $versionElt = $('#version > a'),
           appVersion = $versionElt.attr('data-tooltip');

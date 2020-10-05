@@ -16,6 +16,7 @@ const {EntitySchema} = require('../abstract/entitySchema');
 const {RoleEntity} = require('../role/roleEntity');
 const {ProfileEntity} = require('../profile/profileEntity');
 const {GpgkeyEntity} = require('../gpgkey/gpgkeyEntity');
+const {GroupsUsersCollection} = require('../groupUser/groupsUsersCollection');
 
 const ENTITY_NAME = 'User';
 
@@ -24,13 +25,14 @@ class UserEntity extends Entity {
    * User entity constructor
    *
    * @param {Object} userDto user DTO
+   * @param {Object} [associations] optional {groups_users: <boolean>}
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(userDto) {
+  constructor(userDto, associations) {
     super(EntitySchema.validate(
       UserEntity.ENTITY_NAME,
       UserEntity._cleanupLastLoginDate(userDto),
-      UserEntity.getSchema()
+      UserEntity.getSchema(associations)
     ));
 
     // Associations
@@ -45,6 +47,10 @@ class UserEntity extends Entity {
     if (this._props.gpgkey) {
       this._gpgkey = new GpgkeyEntity(this._props.gpgkey);
       delete this._props.gpgkey;
+    }
+    if (this._props.groups_users) {
+      this._groups_users = new GroupsUsersCollection(this._props.groups_users);
+      delete this._props.groups_users;
     }
   }
 
@@ -97,8 +103,7 @@ class UserEntity extends Entity {
         "role": RoleEntity.getSchema(),
         "profile": ProfileEntity.getSchema(),
         "gpgkey": GpgkeyEntity.getSchema(),
-        //groups_users
-        //gpgkey
+        "groups_users": GroupsUsersCollection.getSchema()
       }
     }
   }
@@ -141,6 +146,9 @@ class UserEntity extends Entity {
     }
     if (this.gpgkey && contain.gpgkey) {
       result.gpgkey = this.gpgkey.toDto();
+    }
+    if (this.groupsUsers && contain.groups_users) {
+      result.groups_users = this.groupsUsers.toDto();
     }
     return result;
   }
@@ -225,7 +233,7 @@ class UserEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {profile: ProfileEntity.ALL_CONTAIN_OPTIONS, role:true, gpgkey: true};
+    return {profile: ProfileEntity.ALL_CONTAIN_OPTIONS, role: true, gpgkey: true, groups_users: true};
   }
 
   // ==================================================
@@ -265,6 +273,15 @@ class UserEntity extends Entity {
   get gpgkey() {
     return this._gpgkey || null;
   }
+
+  /**
+   * Get user groups
+   * @returns {(GroupsUsersCollection|null)} users groups
+   */
+  get groupsUsers() {
+    return this._groups_users || null;
+  }
+
 }
 
 exports.UserEntity = UserEntity;

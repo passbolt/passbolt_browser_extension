@@ -12,12 +12,10 @@
  * @since         2.13.0
  */
 import {PermissionEntity} from "./permissionEntity";
-import {EntityValidationError} from "../abstract/entityValidationError";
 import {EntitySchema} from "../abstract/entitySchema";
 import Validator from 'validator';
 import {PermissionsCollection} from "./permissionsCollection";
 import {EntityCollectionError} from "../abstract/entityCollectionError";
-import {FoldersCollection} from "../folder/foldersCollection";
 
 beforeEach(() => {
   window.Validator = Validator;

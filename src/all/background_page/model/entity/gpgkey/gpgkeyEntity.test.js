@@ -12,9 +12,10 @@
  * @since         2.13.0
  */
 import {GpgkeyEntity} from "./gpgkeyEntity";
-import {EntityValidationError} from "../abstract/entityValidationError";
+import {GpgkeyEntityFixtures} from "./gpgkeyEntity.test.fixtures";
 import {EntitySchema} from "../abstract/entitySchema";
 import Validator from 'validator';
+import {UsersCollection} from "../user/usersCollection";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -22,13 +23,19 @@ beforeEach(() => {
   jest.resetModules();
 });
 
-describe("Folder entity", () => {
+describe("Gpgkey entity", () => {
   it("schema must validate", () => {
     EntitySchema.validateSchema(GpgkeyEntity.ENTITY_NAME, GpgkeyEntity.getSchema());
   });
 
-  it.skip("constructor works if valid minimal DTO is provided", () => {
-    // TODO
+  it("constructor works if valid minimal DTO is provided", () => {
+    const dto = GpgkeyEntityFixtures.default;
+    try {
+      const key = new GpgkeyEntity(dto);
+      expect(key.toDto()).toEqual(dto);
+    } catch(error) {
+      console.error(error);
+    }
   });
 
   it.skip("constructor works if valid DTO is provided with optional and non supported fields", () => {

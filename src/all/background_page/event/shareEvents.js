@@ -49,7 +49,7 @@ const listen = function (worker) {
       let apiClientOptions = await User.getInstance().getApiClientOptions();
       let resourceModel = new ResourceModel(apiClientOptions);
       const resourcesCollection = await resourceModel.findAllForShare(resourcesIds);
-      worker.port.emit(requestId, 'SUCCESS', resourcesCollection.toJSON());
+      worker.port.emit(requestId, 'SUCCESS', resourcesCollection);
     } catch(error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));

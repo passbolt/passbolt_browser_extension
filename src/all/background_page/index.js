@@ -17,6 +17,7 @@ const main = async function() {
   const {FolderLocalStorage} = require('./service/local_storage/folderLocalStorage');
   const {AuthStatusLocalStorage} = require('./service/local_storage/authStatusLocalStorage');
   const {UserLocalStorage} = require('./service/local_storage/userLocalStorage');
+  const {GroupLocalStorage} = require('./service/local_storage/groupLocalStorage');
 
   /* ==================================================================================
    *  Initialization of global objects
@@ -30,6 +31,7 @@ const main = async function() {
   FolderLocalStorage.init();
   AuthStatusLocalStorage.init();
   UserLocalStorage.init();
+  GroupLocalStorage.init();
 
   // Web worker
   openpgp.initWorker({ path:'/vendors/openpgp.worker.js' });

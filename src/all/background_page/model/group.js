@@ -5,16 +5,17 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-const GroupService = require("../service/group").GroupService;
-const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
-const Request = require('./request').Request;
-const User = require('./user').User;
-const UserSettings = require('./userSettings/userSettings').UserSettings;
+const {GroupService} = require("../service/group");
+const {PassboltApiFetchError} = require('../error/passboltApiFetchError');
+const {Request} = require('./request');
+const {User} = require('./user');
+const {UserSettings} = require('./userSettings/userSettings');
 
 /**
  * The class that deals with groups.
+ * @deprecated
  */
-var Group = function () {
+const Group = function () {
     // see model/settings
     this.settings = new UserSettings();
 
@@ -30,7 +31,6 @@ var Group = function () {
         GroupUser: [],
     };
 };
-
 
 /**
  * Find a group by id on the server.

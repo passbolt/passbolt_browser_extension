@@ -22,6 +22,7 @@ const {User} = require('../model/user');
 const {ResourceTypeModel} = require('../model/resourceType/resourceTypeModel');
 const {FolderModel} = require('../model/folder/folderModel');
 const {UserModel} = require('../model/user/userModel');
+const {GroupModel} = require('../model/group/groupModel');
 
 const {InvalidMasterPasswordError} = require('../error/invalidMasterPasswordError');
 const {UserAbortsOperationError} = require('../error/userAbortsOperationError');
@@ -131,11 +132,20 @@ const listen = function (worker) {
     const user = User.getInstance();
     try {
       await user.settings.sync()
-      const userModel = new UserModel(await user.getApiClientOptions());
-      await userModel.updateLocalStorage();
     } catch (error) {
       // fail silently for CE users
       user.settings.setDefaults();
+    }
+
+    try {
+      const apiOptions = await user.getApiClientOptions();
+      const userModel = new UserModel(apiOptions);
+      await userModel.updateLocalStorage();
+      const groupModel = new GroupModel(apiOptions);
+      await groupModel.updateLocalStorage();
+    } catch(error) {
+      console.error(error);
+      throw error;
     }
 
     // Sync

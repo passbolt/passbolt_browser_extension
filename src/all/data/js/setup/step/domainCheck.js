@@ -63,7 +63,7 @@ $(function () {
     step.fetchServerKey();
 
     // Check if server is already configured, and display warning.
-    passbolt.request('passbolt.addon.isConfigured')
+    passbolt.request('passbolt.addon.is-configured')
       .then(function (isConfigured) {
         if (isConfigured) {
           step._getUserDomain()

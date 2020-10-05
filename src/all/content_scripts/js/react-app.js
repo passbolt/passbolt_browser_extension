@@ -287,7 +287,12 @@ const isReactAppReady = function() {
 // Content script initialization
 const init = async function() {
   await isAppWorkerReady();
-  await passbolt.request('passbolt.app.after-appjs-ready');
+  try {
+    await passbolt.request('passbolt.app.after-appjs-ready');
+  } catch(error) {
+    // TODO application failed to load,
+    // display error message, restart?
+  }
   insertReactAppIframe();
   await isReactAppReady();
   $('html').addClass('passboltplugin-ready');

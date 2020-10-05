@@ -19,6 +19,10 @@ const {Keyring} = require('../model/keyring');
 const {Crypto} = require('../model/crypto');
 const {UserService} = require('../service/user');
 
+const {GroupModel} = require('../model/group/groupModel');
+const {GroupEntity} = require('../model/entity/group/groupEntity');
+const {GroupDeleteTransferEntity} = require('../model/entity/group/transfer/groupDeleteTransfer');
+
 const passphraseController = require('../controller/passphrase/passphraseController');
 const progressController = require('../controller/progress/progressController');
 
@@ -26,6 +30,99 @@ const {InvalidMasterPasswordError} = require('../error/invalidMasterPasswordErro
 const {UserAbortsOperationError} = require('../error/userAbortsOperationError');
 
 var listen = function (worker) {
+
+  /*
+   * Find all the groups
+   *
+   * @listens passbolt.groups.find-all
+   * @param requestId {uuid} The request identifier
+   * @param options {object} The options to apply to the find
+   */
+  worker.port.on('passbolt.groups.find-all', async function (requestId, options) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const groupModel = new GroupModel(clientOptions);
+      const {contains, filters, orders} = options;
+      const groupsCollection = await groupModel.findAll(contains, filters, orders);
+      worker.port.emit(requestId, 'SUCCESS', groupsCollection);
+    } catch (error) {
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
+
+  /* ==================================================================================
+   *  CRUD
+   * ================================================================================== */
+  /*
+   * Create a groups
+   *
+   * @listens passbolt.groups.create
+   * @param requestId {uuid} The request identifier
+   * @param groupDto {Object} The group object, example:
+   *  {name: 'group name', groups_users: [{user_id: <UUID>, is_admin: <boolean>}]}
+   */
+  worker.port.on('passbolt.groups.create', async function (requestId, groupDto) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const groupModel = new GroupModel(clientOptions);
+      const groupEntity = new GroupEntity(groupDto);
+      const newGroup = await groupModel.create(groupEntity);
+      worker.port.emit(requestId, 'SUCCESS', newGroup);
+    } catch(error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+    }
+  });
+
+  /*
+   * Delete a Group - dry run
+   *
+   * @param {string} requestId The request identifier uuid
+   * @param {string} groupId The user uuid
+   * @param {object} [transferDto] optional data ownership transfer
+   * example: {owners: [{aco_foreign_key: <UUID>, id: <UUID>}]}
+   */
+  worker.port.on('passbolt.groups.delete-dry-run', async function (requestId, groupId, transferDto) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const groupModel = new GroupModel(clientOptions);
+      const transferEntity = transferDto ? new GroupDeleteTransferEntity(transferDto) : null;
+      await groupModel.deleteDryRun(groupId, transferEntity);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch(error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+    }
+  });
+
+  /*
+   * Delete a Group
+   *
+   * @param {string} requestId The request identifier uuid
+   * @param {string} groupId The group uuid
+   * @param {object} [transferDto] optional data ownership transfer
+   * example: {owners: [{aco_foreign_key: <UUID>, id: <UUID>}]}
+   */
+  worker.port.on('passbolt.groups.delete', async function (requestId, groupId, transferDto) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const groupModel = new GroupModel(clientOptions);
+      const transferEntity = transferDto ? new GroupDeleteTransferEntity(transferDto) : null;
+      await groupModel.delete(groupId, transferEntity);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch(error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+    }
+  });
+
+  // =====================================================================
+  // DEPRECATED - older group edition screens
+  // =====================================================================
   /*
    * Initialize the group edit process.
    *
@@ -285,9 +382,7 @@ var listen = function (worker) {
    * @param groupUser {string} The groupUser that has been removed.
    */
   worker.port.on('passbolt.group.edit.edit-group_user', function (requestId, groupUser) {
-    var groupForm = new GroupForm(worker.tab.id),
-      appWorker = Worker.get('App', worker.tab.id);
-
+    const groupForm = new GroupForm(worker.tab.id);
     groupForm.updateGroupUser(groupUser).then(
       function (groupUser) {
         worker.port.emit(requestId, 'SUCCESS', groupUser);
@@ -309,24 +404,5 @@ var listen = function (worker) {
     worker.port.emit(requestId, 'SUCCESS', changeList);
   });
 
-  /*
-   * Find all the groups
-   *
-   * @listens passbolt.groups.find-all
-   * @param requestId {uuid} The request identifier
-   * @param options {object} The options to apply to the find
-   */
-  worker.port.on('passbolt.groups.find-all', async function (requestId, options) {
-    try {
-      const groups = await Group.findAll(options);
-      worker.port.emit(requestId, 'SUCCESS', groups);
-    } catch (error) {
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
-    }
-  });
 };
 exports.listen = listen;

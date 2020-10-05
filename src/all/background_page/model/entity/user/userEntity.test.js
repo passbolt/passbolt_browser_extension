@@ -16,6 +16,8 @@ import {UserEntityTestFixtures} from "./userEntity.test.fixtures";
 import {EntitySchema} from "../abstract/entitySchema";
 import {EntityValidationError} from '../abstract/entityValidationError';
 import Validator from 'validator';
+import {UsersCollectionTestFixtures} from "./usersCollection.test.fixtures";
+import {UsersCollection} from "./usersCollection";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -98,4 +100,11 @@ describe("User entity", () => {
     }
   });
 
+  it("serialization works with full object inside collection", () => {
+    const dto = UserEntityTestFixtures.default;
+    const entity = new UserEntity(dto);
+    expect(entity.groupsUsers).not.toBeNull();
+    expect(entity.groupsUsers.items[0].id).toEqual('03e26ff8-81d2-5b7f-87e4-99bbc40e1f95');
+    expect(entity.toDto(UserEntity.ALL_CONTAIN_OPTIONS)).toEqual(dto);
+  });
 });

@@ -20,7 +20,7 @@ class PermissionTransferEntity extends Entity {
   /**
    * PermissionTransfer Entity constructor
    *
-   * @param {Object} permissionTransferDto folder DTO
+   * @param {Object} permissionTransferDto permission transfer
    * @throws EntityValidationError if the dto cannot be converted into an entity
    * @public
    */

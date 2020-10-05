@@ -59,5 +59,30 @@ exports.GroupEntityTestFixtures = {
         }
       }
     ]
+  },
+  "without_groups_users_user": {
+    "id": "47787831-f9c2-4edc-a27f-06978ac18406",
+    "name": "test group",
+    "deleted": false,
+    "created": "2020-09-18T04:33:01+00:00",
+    "modified": "2020-09-18T04:33:01+00:00",
+    "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+    "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+    "groups_users": [
+      {
+        "id": "49a7cdf0-9786-4f26-a98a-e3f935d50d04",
+        "group_id": "47787831-f9c2-4edc-a27f-06978ac18406",
+        "user_id": "f848277c-5398-58f8-a82a-72397af2d450",
+        "is_admin": true,
+        "created": "2020-09-18T04:33:01+00:00"
+      },
+      {
+        "id": "0c17f5e3-2f28-4697-9e7b-4e4943ec546a",
+        "group_id": "47787831-f9c2-4edc-a27f-06978ac18406",
+        "user_id": "e97b14ba-8957-57c9-a357-f78a6e1e1a46",
+        "is_admin": false,
+        "created": "2020-09-18T04:39:41+00:00"
+      }
+    ]
   }
 }

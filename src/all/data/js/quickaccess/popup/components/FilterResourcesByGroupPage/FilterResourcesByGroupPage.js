@@ -80,8 +80,8 @@ class FilterResourcesByGroupPage extends React.Component {
   }
 
   async findAndLoadGroups() {
-    const filter = { hasUsers: [this.context.user["user.id"]] };
-    const groups = await passbolt.request("passbolt.groups.find-all", { filter });
+    const filters = { 'has-users': [this.context.user["user.id"]] };
+    const groups = await passbolt.request("passbolt.groups.find-all", { filters });
     this.sortGroupsAlphabetically(groups);
     this.setState({ groups });
   }

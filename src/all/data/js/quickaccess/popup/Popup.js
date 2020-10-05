@@ -88,7 +88,7 @@ class QuickAccess extends React.Component {
   }
 
   async checkPluginIsConfigured() {
-    const isConfigured = await passbolt.request('passbolt.addon.isConfigured');
+    const isConfigured = await passbolt.request('passbolt.addon.is-configured');
     if (!isConfigured) {
       browser.tabs.create({ url: PASSBOLT_GETTING_STARTED_URL });
       window.close();

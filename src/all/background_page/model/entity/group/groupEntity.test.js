@@ -30,7 +30,7 @@ describe("Group entity", () => {
   it("constructor works if valid minimal DTO is provided", () => {
     const dto = GroupEntityTestFixtures.default;
     const entity = new GroupEntity(dto);
-    expect(entity.toDto()).toEqual(dto);
+    expect(entity.toDto(GroupEntity.ALL_CONTAIN_OPTIONS)).toEqual(GroupEntityTestFixtures.without_groups_users_user);
     expect(entity.name).toEqual('test group');
   });
 });

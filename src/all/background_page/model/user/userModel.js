@@ -39,7 +39,7 @@ class UserModel {
    * @public
    */
   async updateLocalStorage () {
-    const contain =  {profile: true, gpgkey: false, groups_users: false, my_groups_users: true};
+    const contain =  {profile: true, gpgkey: false, groups_users: false};
     const userDtos = await this.userService.findAll(contain);
     const usersCollection = new UsersCollection(userDtos);
     await UserLocalStorage.set(usersCollection);

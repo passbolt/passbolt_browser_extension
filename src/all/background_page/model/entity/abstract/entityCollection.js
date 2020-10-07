@@ -131,7 +131,7 @@ class EntityCollection extends Entity {
   }
 
   /**
-   * Add an item at the beginning of the list
+   * Add an item at the beggining of the list
    * @param {*} item
    * @returns {int} new length of collection
    */

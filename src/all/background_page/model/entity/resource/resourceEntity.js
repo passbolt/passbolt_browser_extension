@@ -183,7 +183,7 @@ class ResourceEntity extends Entity {
     if (this._permissions && contain.permissions) {
         result.permissions = this._permissions.toDto();
     }
-    if (this._tags && contain.tags) {
+    if (this._tags && contain.tag) {
         result.tags = this._tags.toDto();
     }
     if (this._secrets && contain.secrets) {
@@ -472,32 +472,10 @@ class ResourceEntity extends Entity {
 
   /**
    * Set resource tags
-   *
    * @param {TagsCollection} tags
    */
   set tags(tags) {
     this._tags = tags;
-  }
-
-  /**
-   * Update a tag if present
-   *
-   * @param tagEntity
-   * @return {boolean} true if tag was updated in resource tag collection
-   */
-  updateTag(tagEntity) {
-    if (this.tags) {
-      return this.tags.update(tagEntity);
-    }
-    return false;
-  }
-
-  /**
-   * Set favorite
-   * @param {FavoriteEntity} favorite
-   */
-  set favorite(favorite) {
-    this._favorite = favorite;
   }
 
   // ==================================================
@@ -593,7 +571,7 @@ class ResourceEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {permission:true, permissions:true, secrets:true, favorite:true, tags:true};
+    return {permission:true, permissions:true, secrets:true, favorite:true, tag:true};
   }
 }
 

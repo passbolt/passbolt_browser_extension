@@ -1,5 +1,0 @@
-{
-  "transform": {
-    "^.+\\.js$": "./.jest.transform.js"
-  }
-}

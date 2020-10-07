@@ -32,6 +32,7 @@ ReactApp.init = function () {
     ],
     onAttach: function (worker) {
       // Initialize the events listeners.
+      app.events.clipboard.listen(worker);
       app.events.folder.listen(worker);
       app.events.resource.listen(worker);
       app.events.keyring.listen(worker);
@@ -43,6 +44,7 @@ ReactApp.init = function () {
       app.events.group.listen(worker);
       app.events.comment.listen(worker);
       app.events.tag.listen(worker);
+      app.events.favorite.listen(worker);
 
       Worker.add('ReactApp', worker);
     }

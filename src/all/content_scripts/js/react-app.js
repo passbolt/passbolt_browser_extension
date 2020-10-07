@@ -267,35 +267,10 @@ const isAppWorkerReady = async function() {
   return promise;
 };
 
-// Check if react iframe app is ready via the background page app worker
-const isReactAppReady = function() {
-  let resolver;
-  const promise = new Promise(resolve => {resolver = resolve});
-
-  const checkInterval = setInterval(function() {
-    passbolt.request('passbolt.app.react-app.is-ready').then(() => {
-      resolver();
-      clearInterval(checkInterval);
-    }, (error) => {
-      //console.warn('Passbolt app is not ready, retrying...');
-    });
-  }, 100);
-
-  return promise;
-};
-
 // Content script initialization
 const init = async function() {
   await isAppWorkerReady();
-  try {
-    await passbolt.request('passbolt.app.after-appjs-ready');
-  } catch(error) {
-    // TODO application failed to load,
-    // display error message, restart?
-  }
-  insertReactAppIframe();
-  await isReactAppReady();
-  $('html').addClass('passboltplugin-ready');
+  await passbolt.request('passbolt.app.after-appjs-ready');
 };
 init();
 

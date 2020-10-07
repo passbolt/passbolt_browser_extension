@@ -132,10 +132,10 @@ class CommentEntity extends Entity {
       return result;
     }
     if (this.creator && contain.creator) {
-      result.creator = this.creator.toDto();
+      result.creator = this.creator.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
     }
     if (this.modifier && contain.modifier) {
-      result.modifier = this.modifier.toDto();
+      result.modifier = this.modifier.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
     }
     return result;
   }

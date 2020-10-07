@@ -9,6 +9,7 @@ const {FolderEntity} = require('../model/entity/folder/folderEntity');
 const {FolderModel} = require('../model/folder/folderModel');
 const {ResourceModel} = require('../model/resource/resourceModel');
 const {User} = require('../model/user');
+const {MoveController} = require('../controller/move/moveController');
 
 const listen = function (worker) {
 
@@ -92,6 +93,47 @@ const listen = function (worker) {
     }
   });
 
+  /*
+   * Pull the resources from the API and update the local storage.
+   *
+   * @listens passbolt.app.folders.update-local-storage
+   * @param {uuid} requestId The request identifier
+   */
+  worker.port.on('passbolt.folders.update-local-storage', async function (requestId) {
+    try {
+      let folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
+      await folderModel.updateLocalStorage();
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
+
+  /*
+   * Open the folder move confirmation dialog.
+   *
+   * @listens passbolt.folders.open-move-confirmation-dialog
+   * @param {object} moveDto {resources: array of uuids, folders: array of uuids, folderParentId: uuid}
+   */
+  worker.port.on('passbolt.folders.open-move-confirmation-dialog', async function (requestId, moveDto) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const controller = new MoveController(worker, requestId, clientOptions);
+      await controller.main(moveDto);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
 };
 
 exports.listen = listen;

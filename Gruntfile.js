@@ -155,7 +155,7 @@ module.exports = function (grunt) {
       },
       content_scripts: {
         files: [
-          { expand: true, cwd: path.src_content_scripts, src: '**', dest: path.build_content_scripts }
+          { expand: true, cwd: path.src_content_scripts, src: ['**', '!js/manageReactAppIframe/**'], dest: path.build_content_scripts }
         ]
       },
       background_page: {

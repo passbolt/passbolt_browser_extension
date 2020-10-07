@@ -43,7 +43,7 @@ class ResourceModel {
    * @return {ResourcesCollection}
    */
   async updateLocalStorage () {
-    const contain = {permission: true, favorite: true, tags: true, folder: true};
+    const contain = {permission: true, favorite: true, tag: true};
     const resourceDtos = await this.resourceService.findAll(contain);
     const resourcesCollection = new ResourcesCollection(resourceDtos);
     await ResourceLocalStorage.set(resourcesCollection);

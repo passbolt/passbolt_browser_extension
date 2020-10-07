@@ -32,7 +32,7 @@ const listen = function (worker) {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const commentModel = new CommentModel(clientOptions);
       const commentsCollection = await commentModel.findAllByResourceId(resourceId);
-      worker.port.emit(requestId, 'SUCCESS', commentsCollection);
+      worker.port.emit(requestId, 'SUCCESS', commentsCollection.toJSON());
     } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));

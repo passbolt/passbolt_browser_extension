@@ -26,8 +26,8 @@ const listen = function (worker) {
     try {
       const apiOption = await User.getInstance().getApiClientOptions();
       const tagModel = new TagModel(apiOption);
-      const tags = await tagModel.findAll();
-      worker.port.emit(requestId, 'SUCCESS', tags);
+      const tagsCollection = await tagModel.findAll();
+      worker.port.emit(requestId, 'SUCCESS', tagsCollection.toJSON());
     } catch (error) {
       if (error instanceof Error) {
         worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));

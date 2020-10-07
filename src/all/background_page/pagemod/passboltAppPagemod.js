@@ -76,7 +76,9 @@ PassboltApp.initPageMod = function () {
       'content_scripts/js/export/exportPasswordsIframe.js',
       'content_scripts/js/legacy/secret.js',
       'content_scripts/js/app.js',
-      'content_scripts/js/react-app.js'
+      'content_scripts/js/react-app.js',
+      'content_scripts/js/dist/vendors/vendors-manage-react-app-iframe.js',
+      'content_scripts/js/dist/manage-react-app-iframe.js',
     ],
     attachTo: {existing: true, reload: true},
     onAttach: async function (worker) {

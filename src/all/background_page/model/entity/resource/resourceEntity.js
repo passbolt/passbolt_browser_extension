@@ -245,7 +245,10 @@ class ResourceEntity extends Entity {
    * @returns {(boolean|null)} true if deleted
    */
   get isDeleted() {
-    return this._props.deleted || null;
+    if (typeof this._props.deleted === 'undefined') {
+      return null;
+    }
+    return this._props.deleted;
   }
 
   /**
@@ -318,6 +321,9 @@ class ResourceEntity extends Entity {
    * @returns {(boolean|null)}
    */
   isShared() {
+    if (this.isPersonal() === null)  {
+      return null;
+    }
     return !this.isPersonal();
   }
 
@@ -342,12 +348,15 @@ class ResourceEntity extends Entity {
    * @returns {(boolean|null)}
    */
   isOwner() {
+    if (this.permission === null) {
+      return null;
+    }
     return this.permission.type === PermissionEntity.PERMISSION_OWNER;
   }
 
   /**
    * Return true if user can update
-   * @returns {(boolean|null)}
+   * @returns {boolean}
    */
   canUpdate() {
     return this.permission.type >= PermissionEntity.PERMISSION_UPDATE;
@@ -358,6 +367,9 @@ class ResourceEntity extends Entity {
    * @returns {(boolean|null)}
    */
   isReadOnly() {
+    if (this.permission === null) {
+      return null;
+    }
     return this.permission.type === PermissionEntity.PERMISSION_READ;
   }
 

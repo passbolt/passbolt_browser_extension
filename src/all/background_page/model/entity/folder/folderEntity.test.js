@@ -40,6 +40,11 @@ describe("Folder entity", () => {
     expect(entity.toDto()).toEqual(result);
     expect(JSON.stringify(entity)).toEqual(JSON.stringify(result));
     expect(entity.name).toEqual('folder');
+    expect(entity.isReadOnly()).toBe(false);
+    expect(entity.canUpdate()).toBe(false);
+    expect(entity.isOwner()).toBe(false);
+    expect(entity.isPersonal()).toBe(null);
+    expect(entity.isShared()).toBe(null);
   });
 
   it("constructor works with parent id as null or uuid", () => {

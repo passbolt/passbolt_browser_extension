@@ -100,6 +100,13 @@ class UserEntity extends Entity {
             "type": "null"
           }]
         },
+        "is_mfa_enabled": {
+          "anyOf": [{
+            "type": "boolean"
+          }, {
+            "type": "null"
+          }]
+        },
         "role": RoleEntity.getSchema(),
         "profile": ProfileEntity.getSchema(),
         "gpgkey": GpgkeyEntity.getSchema(),
@@ -193,7 +200,10 @@ class UserEntity extends Entity {
    * @returns {(boolean|null)} true if user completed the setup
    */
   get isActive() {
-    return this._props.active || null;
+    if (typeof this._props.active === 'undefined') {
+      return null;
+    }
+    return this._props.active;
   }
 
   /**
@@ -201,7 +211,10 @@ class UserEntity extends Entity {
    * @returns {(boolean|null)} true if user is deleted
    */
   get isDeleted() {
-    return this._props.deleted || null;
+    if (typeof this._props.deleted === 'undefined') {
+      return null;
+    }
+    return this._props.deleted;
   }
 
   /**
@@ -226,6 +239,17 @@ class UserEntity extends Entity {
    */
   get lastLoggedIn() {
     return this._props.last_logged_in || null;
+  }
+
+  /**
+   * Get mfa enabled flag
+   * @returns {(boolean|null)} true if mfa is enabled
+   */
+  get isMfaEnabled() {
+    if (typeof this._props.is_mfa_enabled === 'undefined') {
+      return null;
+    }
+    return this._props.is_mfa_enabled;
   }
 
   /**

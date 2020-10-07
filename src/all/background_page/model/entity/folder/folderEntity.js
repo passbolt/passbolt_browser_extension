@@ -206,25 +206,34 @@ class FolderEntity extends Entity {
 
   /**
    * Return true if permission is set to owner
-   * @returns {(boolean|null)}
+   * @returns {boolean}
    */
   isOwner() {
+    if (this.permission === null) {
+      return false;
+    }
     return this.permission.type === PermissionEntity.PERMISSION_OWNER;
   }
 
   /**
    * Return true if user can update
-   * @returns {(boolean|null)}
+   * @returns {boolean}
    */
   canUpdate() {
+    if (!this.permission || !this.permission.type) {
+      return false;
+    }
     return this.permission.type >= PermissionEntity.PERMISSION_UPDATE;
   }
 
   /**
    * Return true if permission is set to read
-   * @returns {(boolean|null)}
+   * @returns {boolean}
    */
   isReadOnly() {
+    if (this.permission === null) {
+      return false;
+    }
     return this.permission.type === PermissionEntity.PERMISSION_READ;
   }
 
@@ -247,6 +256,9 @@ class FolderEntity extends Entity {
    * @returns {(boolean|null)}
    */
   isShared() {
+    if (this.isPersonal() === null) {
+      return null;
+    }
     return !this.isPersonal();
   }
 

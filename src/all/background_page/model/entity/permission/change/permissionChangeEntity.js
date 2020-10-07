@@ -184,7 +184,10 @@ class PermissionChangeEntity extends Entity {
    * @returns {(boolean|null)} true if deleted
    */
   get isDeleted() {
-    return this._props.delete || null;
+    if (typeof this._props.delete === 'undefined') {
+      return null;
+    }
+    return this._props.delete;
   }
 
   /**

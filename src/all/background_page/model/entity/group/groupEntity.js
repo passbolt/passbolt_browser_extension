@@ -187,7 +187,10 @@ class GroupEntity extends Entity {
    * @returns {(boolean|null)} true if deleted
    */
   get isDeleted() {
-    return this._props.deleted || null;
+    if (typeof this._props.deleted === 'undefined') {
+      return null;
+    }
+    return this._props.deleted;
   }
 
   /**

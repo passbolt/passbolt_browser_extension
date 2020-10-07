@@ -8,6 +8,7 @@ exports.UserEntityTestFixtures = {
     "created": "2020-04-20T11:32:16+00:00",
     "modified": "2020-04-20T11:32:16+00:00",
     "last_logged_in": "2012-07-04T13:39:25+00:00",
+    "is_mfa_enabled": false,
     "profile": {
       "id": "92ccfd1b-6eb8-5e1c-a022-cf22463e8361",
       "user_id": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",

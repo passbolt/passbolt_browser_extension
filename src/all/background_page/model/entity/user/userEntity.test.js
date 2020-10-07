@@ -54,7 +54,8 @@ describe("User entity", () => {
       "deleted": false,
       "created": "2020-04-20T11:32:16+00:00",
       "modified": "2020-04-20T11:32:16+00:00",
-      "last_logged_in": "2012-07-04T13:39:25+00:00"
+      "last_logged_in": "2012-07-04T13:39:25+00:00",
+      "is_mfa_enabled": false
     };
 
     const entity = new UserEntity(dto);
@@ -65,12 +66,14 @@ describe("User entity", () => {
     expect(entity.profile).not.toBe(null);
     expect(entity.gpgkey).not.toBe(null);
     expect(entity.role.name).toEqual('admin');
+    expect(entity.isMfaEnabled).toBe(false);
     expect(entity.gpgkey.armoredKey.startsWith('-----BEGIN PGP PUBLIC KEY BLOCK-----')).toBe(true);
 
     const dtoWithContain = entity.toDto({role: true, profile: true, gpgkey: true});
     expect(dtoWithContain.role.name).toEqual('admin');
     expect(dtoWithContain.profile.first_name).toEqual('Admin');
     expect(dtoWithContain.gpgkey.armored_key.startsWith('-----BEGIN PGP PUBLIC KEY BLOCK-----')).toBe(true);
+    expect(dtoWithContain.is_mfa_enabled).toBe(false);
   });
 
   it("constructor throws an exception if DTO is missing required field", () => {
@@ -106,5 +109,23 @@ describe("User entity", () => {
     expect(entity.groupsUsers).not.toBeNull();
     expect(entity.groupsUsers.items[0].id).toEqual('03e26ff8-81d2-5b7f-87e4-99bbc40e1f95');
     expect(entity.toDto(UserEntity.ALL_CONTAIN_OPTIONS)).toEqual(dto);
+  });
+
+  it("mfa enabled can be null or ommited", () => {
+    const dto = {
+      "role_id": "a58de6d3-f52c-5080-b79b-a601a647ac85",
+      "username": "dame@passbolt.com",
+      "is_mfa_enabled": null
+    };
+    const entity = new UserEntity(dto);
+    expect(entity.isMfaEnabled).toBe(null);
+
+
+    const dto2 = {
+      "role_id": "a58de6d3-f52c-5080-b79b-a601a647ac85",
+      "username": "dame@passbolt.com",
+    };
+    const entity2 = new UserEntity(dto2);
+    expect(entity2.isMfaEnabled).toBe(null);
   });
 });

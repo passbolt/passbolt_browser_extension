@@ -65,7 +65,7 @@ class TagModel {
   async update(tagEntity) {
     const tagDto = await this.tagService.update(tagEntity.id, tagEntity.toDto());
     const updatedTagEntity = new TagEntity(tagDto);
-    await this.resourceModel.updateTagLocally(updatedTagEntity);
+    await this.resourceModel.replaceTagLocally(tagEntity.id, updatedTagEntity);
     return updatedTagEntity;
   }
 

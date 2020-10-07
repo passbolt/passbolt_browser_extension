@@ -186,16 +186,17 @@ class ResourcesCollection extends EntityCollection {
   }
 
   /**
-   * Update tag if present in resource collection
+   * Replace tag with a new tag if present in resource collection
    *
-   * @param {TagEntity} tagEntity
+   * @param {string} tagId The tag to replace
+   * @param {TagEntity} tagEntity The replacement tag
    * @return {boolean} true if updated
    */
-  updateTag(tagEntity) {
+  replaceTag(tagId, tagEntity) {
     let updated = false;
     for (let resource of this.resources) {
       if (resource.tags) {
-        updated = resource.tags.update(tagEntity) || updated;
+        updated = resource.tags.replaceTag(tagId, tagEntity) || updated;
       }
     }
     return updated;

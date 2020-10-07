@@ -74,7 +74,7 @@ const listen = function (worker) {
       const tagModel = new TagModel(apiOption);
       const tagEntity = new TagEntity(tagDto);
       const updatedTag = await tagModel.update(tagEntity);
-      worker.port.emit(requestId, 'SUCCESS', updatedTag);
+      worker.port.emit(requestId, 'SUCCESS', updatedTag.toDto());
     } catch (error) {
       if (error instanceof Error) {
         worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));

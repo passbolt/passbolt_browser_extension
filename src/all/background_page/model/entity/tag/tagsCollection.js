@@ -147,19 +147,20 @@ class TagsCollection extends EntityCollection {
   }
 
   /**
-   * Remove by Id
+   * Replace tag
+   * @param {string} tagId
    * @param {TagEntity} tagEntity
    * @returns {boolean} true if tag was found and removed from the collection
    */
-  update(tagEntity) {
-    if (!tagEntity.id) {
+  replaceTag(tagId, tagEntity) {
+    if (!tagId) {
       return false;
     }
     const length = this.tags.length;
     let i = 0;
     for(; i < length; i++) {
       let existingTag = this.tags[i];
-      if (existingTag.id === tagEntity.id) {
+      if (existingTag.id === tagId) {
         this._items[i] = tagEntity;
         return true;
       }

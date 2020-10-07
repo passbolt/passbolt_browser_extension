@@ -198,14 +198,14 @@ describe("Resource entity", () => {
     const resourcesCollection = new ResourcesCollection(dto);
 
     // Try to update existing tag
-    expect(resourcesCollection.updateTag(new TagEntity(updatedTag1))).toBe(true);
+    expect(resourcesCollection.replaceTag(updatedTag1.id, new TagEntity(updatedTag1))).toBe(true);
     expect(resourcesCollection.resources[0].tags.toDto()).toEqual([updatedTag1, tag2]);
     expect(resourcesCollection.resources[1].tags.toDto()).toEqual([updatedTag1]);
     expect(resourcesCollection.resources[2].tags.toDto()).toEqual([tag2]);
     expect(resourcesCollection.resources[3].tags).toBeNull();
 
     // Try to update non existing tag
-    expect(resourcesCollection.updateTag(new TagEntity(tag3))).toBe(false);
+    expect(resourcesCollection.replaceTag(tag3.id, new TagEntity(tag3))).toBe(false);
     expect(resourcesCollection.resources[0].tags.toDto()).toEqual([updatedTag1, tag2]);
     expect(resourcesCollection.resources[1].tags.toDto()).toEqual([updatedTag1]);
     expect(resourcesCollection.resources[2].tags.toDto()).toEqual([tag2]);

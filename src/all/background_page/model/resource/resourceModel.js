@@ -375,13 +375,14 @@ class ResourceModel {
   /**
    * Update tag in associated resource local storage
    *
-   * @param {TagEntity} tagEntity
+   * @param {string} tagId The previous tag id
+   * @param {TagEntity} tagEntity The tag entity which replace the previous tag
    * @returns {Promise<boolean>} if tag was present and updated
    */
-  async updateTagLocally(tagEntity) {
+  async replaceTagLocally(tagId, tagEntity) {
     const localResources = await ResourceLocalStorage.get();
     let resourceCollection = new ResourcesCollection(localResources);
-    if (resourceCollection.updateTag(tagEntity)) {
+    if (resourceCollection.replaceTag(tagId, tagEntity)) {
       await ResourceLocalStorage.set(resourceCollection);
       return true;
     }

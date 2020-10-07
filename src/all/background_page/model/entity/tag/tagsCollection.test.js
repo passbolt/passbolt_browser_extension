@@ -142,14 +142,14 @@ describe("Tag entity", () => {
     };
     const dto = [tag1, tag2];
     const collection = new TagsCollection(dto);
-    expect(collection.update(new TagEntity({
+    expect(collection.replaceTag("45ce85c9-e301-4de2-8b41-298507002861", new TagEntity({
       "id": "45ce85c9-e301-4de2-8b41-298507002861",
       "slug": 'updated',
       "is_shared": false}))).toBe(true);
     expect(collection.items[0].slug).toBe('updated');
     expect(collection.items[1].slug).toBe('tag2')
     expect(collection.length).toBe(2);
-    expect(collection.update(new TagEntity({
+    expect(collection.replaceTag("45ce85c9-e301-4de2-8b41-298507002860", new TagEntity({
       "id": "45ce85c9-e301-4de2-8b41-298507002860",
       "slug": 'nope',
       "is_shared": false}))).toBe(false);

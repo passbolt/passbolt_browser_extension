@@ -28,6 +28,7 @@ class ManageReactAppIframe extends Component {
             "/app/folders/view/:filterByFolderId",
             "/app/passwords/view/:selectedResourceId",
             "/app/passwords",
+            "/app/users",
             "/",
           ]}>
             <ReactAppIframe/>

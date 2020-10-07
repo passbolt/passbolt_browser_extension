@@ -12,8 +12,9 @@
  * @since        3.0.0
  */
 import React, {Component} from "react";
+import {withRouter} from "react-router-dom";
 
-class ReactAppIframe extends Component{
+class ReactAppIframe extends Component {
 
   constructor(props) {
     super(props);
@@ -29,34 +30,80 @@ class ReactAppIframe extends Component{
     this.iframeRef = React.createRef();
   }
 
-  loadReactAppIframe() {
-    const iframeUrl = chrome.runtime.getURL("data/passbolt-iframe-react-app.html?passbolt=passbolt-iframe-react-app");
-    this.iframeRef.current.contentWindow.location = iframeUrl;
-  }
-
+  /**
+   * Remove the legacy canjs application.
+   * Empty the body and remove all javascripts.
+   */
   removeLegacyCanJs() {
-    // Remove canjs container.
-    const canJsContainer = document.querySelector('#container');
-    if (canJsContainer) {
-      canJsContainer.remove();
-    }
-    // Remove canjs scripts.
+    // Remove all javascript.
     const scripts = document.querySelectorAll('script');
     scripts.forEach(script => script.remove());
+
+    // Remove all canjs content
+    const legacyContainerElement = document.querySelector('#container');
+    if (legacyContainerElement) {
+      legacyContainerElement.remove();
+    }
+    const legacyBusElement = document.querySelector('#bus');
+    if (legacyBusElement) {
+      legacyBusElement.remove();
+    }
+    const legacyFooterElement = document.querySelector('footer');
+    if (legacyFooterElement) {
+      legacyFooterElement.remove();
+    }
   }
 
+  /**
+   * Load the react app iframe
+   * @returns {void}
+   */
+  loadReactAppIframe() {
+    const contentScriptPathname = this.getPagePathname();
+    const iframeUrl = `data/passbolt-iframe-react-app.html?passbolt=passbolt-iframe-react-app&pathname=${contentScriptPathname}`;
+    this.iframeRef.current.contentWindow.location = chrome.runtime.getURL(iframeUrl);
+  }
+
+  /**
+   * Get the pathname from url.
+   * By instance ?pathname=/app/users
+   *
+   * @returns {string}
+   */
+  getPagePathname() {
+    if (!this.validatePagePathname()) {
+      return "";
+    }
+
+    return this.props.location.pathname;
+  }
+
+  /**
+   * Validate a pathname.
+   * A valid pathname contains only alphabetical, numerical, / and - characters
+   * @param {string} pathname
+   * @returns {boolean}
+   */
+  validatePagePathname() {
+    return /^[A-Za-z0-9\-\/]*$/.test(this.props.location.pathname);
+  }
+
+  /**
+   * Render the component
+   * @return {JSX}
+   */
   render() {
     const style = {
       position: "absolute",
       width: "100%",
-      height:"100%",
+      height: "100%",
       zIndex: 999,
     };
 
     return (
-      <iframe id="passbolt-iframe-react-app" ref={this.iframeRef} style={style} />
+      <iframe id="passbolt-iframe-react-app" ref={this.iframeRef} style={style}/>
     );
   }
 }
 
-export default ReactAppIframe;
+export default withRouter(ReactAppIframe);

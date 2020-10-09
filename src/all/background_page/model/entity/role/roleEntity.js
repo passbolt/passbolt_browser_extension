@@ -17,6 +17,8 @@ const {EntitySchema} = require('../abstract/entitySchema');
 const ENTITY_NAME = 'Role';
 const ROLE_ADMIN = 'admin';
 const ROLE_USER = 'user';
+const ROLE_GUEST = 'guest';
+const ROLE_ROOT = 'root';
 const ROLE_NAME_MAX_LENGTH = 255;
 
 class RoleEntity extends Entity {
@@ -52,7 +54,7 @@ class RoleEntity extends Entity {
         },
         "name": {
           "type": "string",
-          "enum": [RoleEntity.ROLE_ADMIN, RoleEntity.ROLE_USER]
+          "enum": [RoleEntity.ROLE_ADMIN, RoleEntity.ROLE_USER, RoleEntity.ROLE_GUEST, RoleEntity.ROLE_ROOT]
         },
         "description": {
           "type": "string",
@@ -138,6 +140,22 @@ class RoleEntity extends Entity {
    */
   static get ROLE_USER() {
     return ROLE_USER;
+  }
+
+  /**
+   * RoleEntity.ROLE_GUEST
+   * @returns {string} user
+   */
+  static get ROLE_GUEST() {
+    return ROLE_GUEST;
+  }
+
+  /**
+   * RoleEntity.ROLE_ROOT
+   * @returns {string} user
+   */
+  static get ROLE_ROOT() {
+    return ROLE_ROOT;
   }
 }
 

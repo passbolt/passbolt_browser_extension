@@ -17,6 +17,7 @@ const ResourceModel = require("../../model/resource/resourceModel").ResourceMode
 const FolderModel = require("../../model/folder/folderModel").FolderModel;
 const GroupModel = require("../../model/group/groupModel").GroupModel;
 const UserModel = require("../../model/user/userModel").UserModel;
+const RoleModel = require("../../model/role/roleModel").RoleModel;
 
 class AppInitController {
 
@@ -33,6 +34,7 @@ class AppInitController {
     this.syncGroupsLocalStorage(apiOptions);
     this.syncResourcesLocalStorage(apiOptions);
     this.syncFoldersLocalStorage(apiOptions);
+    this.syncRolesLocalStorage(apiOptions);
   }
 
   async syncUserSettings(user) {
@@ -84,6 +86,15 @@ class AppInitController {
     try {
       const folderModel = new FolderModel(apiOptions);
       folderModel.updateLocalStorage();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async syncRolesLocalStorage(apiOptions) {
+    try {
+      const roleModel = new RoleModel(apiOptions);
+      roleModel.updateLocalStorage();
     } catch (error) {
       console.error(error);
     }

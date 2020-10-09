@@ -28,9 +28,9 @@ const storage = browser.storage;
  */
 async function waitPagemodIsReady() {
   let resolver;
-  const promise = new Promise(resolve => {resolver = resolve});
+  const promise = new Promise(resolve => { resolver = resolve; });
 
-  const checkInterval = setInterval(function() {
+  const checkInterval = setInterval(() => {
     port.request("passbolt.pagemod.is-ready").then(() => {
       resolver();
       clearInterval(checkInterval);

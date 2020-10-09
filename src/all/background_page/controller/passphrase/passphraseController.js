@@ -35,13 +35,6 @@ exports.get = get;
  * @return {Promise<string>}
  */
 const requestPassphrase = async function(worker) {
-  // If the source of the request is a legacy worker then display the react app that will be in charge of
-  // treating the progress events.
-  if (worker.isLegacyWorker()) {
-    const appWorker = Worker.get('App', worker.tab.id);
-    appWorker.port.emit('passbolt.app.show');
-  }
-
   const passphraseWorker = getPassphraseWorker(worker);
 
   try {
@@ -52,11 +45,6 @@ const requestPassphrase = async function(worker) {
 
     return passphrase;
   } catch (error) {
-    // If the source of the request is a legacy worker then hide the react app.
-    if (worker.isLegacyWorker()) {
-      const appWorker = Worker.get('App', worker.tab.id);
-      appWorker.port.emit('passbolt.app.hide');
-    }
     throw error;
   }
 };

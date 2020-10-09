@@ -8,14 +8,15 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var app = require('../app');
-const {PageMod} = require('../sdk/page-mod');
-var Worker = require('../model/worker');
-var GpgAuth = require('../model/gpgauth').GpgAuth;
-var User = require('../model/user').User;
-var TabStorage = require('../model/tabStorage').TabStorage;
 
-var PassboltApp = function () {
+const app = require('../app');
+const {PageMod} = require('../sdk/page-mod');
+const Worker = require('../model/worker');
+const GpgAuth = require('../model/gpgauth').GpgAuth;
+const User = require('../model/user').User;
+const AppInitController = require("../controller/app/appInitController").AppInitController;
+
+const PassboltApp = function () {
 };
 PassboltApp._pageMod = null;
 
@@ -41,10 +42,11 @@ PassboltApp.initPageMod = function () {
   // ✗ https://demoxpassbolt.com
   // ✗ https://demo.passbolt.com.attacker.com
   // ✗ https://demo.passbolt.com/auth/login
-  var user = User.getInstance();
-  var escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
-  var url = '^' + escapedDomain + '/?(/app.*)?(#.*)?$';
-  var regex = new RegExp(url);
+  const user = User.getInstance();
+  const escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
+  const url = '^' + escapedDomain + '/?(/app.*)?(#.*)?$';
+  const regex = new RegExp(url);
+
   return new PageMod({
     name: 'PassboltApp',
     include: regex,
@@ -53,32 +55,8 @@ PassboltApp.initPageMod = function () {
       'data/css/themes/default/ext_external.min.css'
     ],
     contentScriptFile: [
-      'data/vendors/jquery.js',
-      'data/vendors/validator.js',
-      'data/vendors/browser-polyfill.js',
-
-      // Templates
-      'data/tpl/group.js',
-      'data/tpl/secret.js',
-      'data/tpl/import.js',
-
-      // Lib
-      'data/js/lib/port.js',
-      'data/js/lib/message.js',
-      'data/js/lib/request.js',
-      'data/js/lib/html.js',
-      'content_scripts/js/clipboard/clipboardIframe.js',
-      'data/js/file/file.js',
-
-      // App
-      'content_scripts/js/group/editIframe.js',
-      'content_scripts/js/import/importPasswordsIframe.js',
-      'content_scripts/js/export/exportPasswordsIframe.js',
-      'content_scripts/js/legacy/secret.js',
-      'content_scripts/js/app.js',
-      'content_scripts/js/react-app.js',
-      'content_scripts/js/dist/vendors/vendors-manage-react-app-iframe.js',
-      'content_scripts/js/dist/manage-react-app-iframe.js',
+      'content_scripts/js/dist/vendors/vendors-app.js',
+      'content_scripts/js/dist/app.js',
     ],
     attachTo: {existing: true, reload: true},
     onAttach: async function (worker) {
@@ -88,21 +66,8 @@ PassboltApp.initPageMod = function () {
         return;
       }
 
-      TabStorage.initStorage(worker.tab);
-
-      app.events.auth.listen(worker);
-      app.events.clipboard.listen(worker);
-      app.events.exportPasswordsIframe.listen(worker);
-      app.events.favorite.listen(worker);
-      app.events.keyring.listen(worker);
-      app.events.secret.listen(worker);
-      app.events.group.listen(worker);
-      app.events.importPasswordsIframe.listen(worker);
-      app.events.siteSettings.listen(worker);
-      app.events.user.listen(worker);
-      app.events.resource.listen(worker);
-      app.events.app.listen(worker);
-      app.events.share.listen(worker);
+      const appInitController = new AppInitController(worker);
+      await appInitController.main();
 
       Worker.add('App', worker);
     }
@@ -114,7 +79,7 @@ PassboltApp.init = function () {
     // According to the user status :
     // * the pagemod should be initialized if the user is valid and logged in;
     // * the pagemod should be destroyed otherwise;
-    var user = User.getInstance();
+    const user = User.getInstance();
     if (user.isValid()) {
       PassboltApp.destroy();
       PassboltApp._pageMod = PassboltApp.initPageMod();

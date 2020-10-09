@@ -7,6 +7,7 @@
 const {PageMod} = require('../sdk/page-mod');
 const app = require('../app');
 const Worker = require('../model/worker');
+const GpgAuth = require('../model/gpgauth').GpgAuth;
 
 /*
  * This pagemod help bootstrap the first step of the setup process from a passbolt server app page
@@ -24,19 +25,24 @@ ReactApp.init = function () {
 
   ReactApp._pageMod = new PageMod({
     name: 'ReactApp',
-    include: 'about:blank?passbolt=passbolt-iframe-react-app',
+    include: 'about:blank?passbolt=passbolt-iframe-app',
     contentScriptWhen: 'end',
     contentScriptFile: [
       // Warning: script and styles need to be modified in
-      // chrome/data/passbolt-iframe-react-app.html
+      // chrome/data/passbolt-iframe-app.html
     ],
-    onAttach: function (worker) {
+    onAttach: async function (worker) {
+      const auth = new GpgAuth();
+      if (!await auth.isAuthenticated() || await auth.isMfaRequired()) {
+        console.error('Can not attach application if user is not logged in.');
+        return;
+      }
+
       // Initialize the events listeners.
       app.events.clipboard.listen(worker);
       app.events.folder.listen(worker);
       app.events.resource.listen(worker);
       app.events.keyring.listen(worker);
-      app.events.reactApp.listen(worker);
       app.events.secret.listen(worker);
       app.events.siteSettings.listen(worker);
       app.events.share.listen(worker);
@@ -45,6 +51,7 @@ ReactApp.init = function () {
       app.events.comment.listen(worker);
       app.events.tag.listen(worker);
       app.events.favorite.listen(worker);
+      app.events.pagemod.listen(worker);
 
       Worker.add('ReactApp', worker);
     }

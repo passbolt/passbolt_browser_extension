@@ -95,7 +95,7 @@ module.exports = function (grunt) {
         reportUnusedDisableDirectives: true
       },
       target: [
-        'src/all/data/js/reactApp/**/*.js',
+        'src/all/data/js/app/**/*.js',
       ]
     },
 
@@ -155,7 +155,7 @@ module.exports = function (grunt) {
       },
       content_scripts: {
         files: [
-          { expand: true, cwd: path.src_content_scripts, src: ['**', '!js/manageReactAppIframe/**'], dest: path.build_content_scripts }
+          { expand: true, cwd: path.src_content_scripts, src: ['**', '!js/app/**'], dest: path.build_content_scripts }
         ]
       },
       background_page: {
@@ -165,7 +165,7 @@ module.exports = function (grunt) {
       },
       data: {
         files: [
-          { expand: true, cwd: path.src + 'data', src: ['**', '!tpl/**', '!ejs/**', '!js/quickaccess/popup/**', '!js/reactApp/**'], dest: path.build + 'data' }
+          { expand: true, cwd: path.src + 'data', src: ['**', '!tpl/**', '!ejs/**', '!js/quickaccess/popup/**', '!js/app/**'], dest: path.build + 'data' }
         ]
       },
       // switch manifest file to firefox or chrome

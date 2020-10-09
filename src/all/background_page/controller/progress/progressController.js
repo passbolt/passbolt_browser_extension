@@ -17,12 +17,6 @@ const Worker = require('../../model/worker');
  * @return {Promise}
  */
 const open = async function (worker, title, goals, message) {
-  // If the source of the request is a legacy worker then display the react app that will be in charge of
-  // treating the progress events.
-  if (worker.isLegacyWorker()) {
-    const appWorker = Worker.get('App', worker.tab.id);
-    appWorker.port.emit('passbolt.app.show');
-  }
   const progressWorker = getProgressWorker(worker);
   progressWorker.port.emit('passbolt.progress.open-progress-dialog', title, goals, message);
   await delay();
@@ -45,12 +39,6 @@ exports.delay = delay;
 const close = async function (worker) {
   const progressWorker = getProgressWorker(worker);
   progressWorker.port.emit('passbolt.progress.close-progress-dialog');
-
-  // If the source of the request is a legacy worker then hide the react app.
-  if (worker.isLegacyWorker()) {
-    const appWorker = Worker.get('App', worker.tab.id);
-    appWorker.port.emit('passbolt.app.hide');
-  }
 };
 exports.close = close;
 

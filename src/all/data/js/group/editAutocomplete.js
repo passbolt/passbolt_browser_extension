@@ -166,14 +166,6 @@ $(function () {
         setState('loaded');
     };
 
-    /*
-     * The application window has been resized.
-     * @listens passbolt.master-password.close-dialog
-     */
-    passbolt.message.on('passbolt.app.window-resized', function (cssClasses) {
-        resize(cssClasses);
-    });
-
     /* ==================================================================================
      *  DOM events handlers
      * ================================================================================== */

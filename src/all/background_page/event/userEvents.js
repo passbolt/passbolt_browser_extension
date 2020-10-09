@@ -125,7 +125,7 @@ const listen = function (worker) {
    *
    * @listens passbolt.user.create
    * @param requestId {uuid} The request identifier
-   * @param userDato {Object} The user object, example:
+   * @param userDto {Object} The user object, example:
    *  {username: 'ada@passbolt.com', profile: {first_name: 'ada', last_name: 'lovelace'}, role_id: <UUID>}
    */
   worker.port.on('passbolt.users.create', async function (requestId, userDto) {
@@ -236,6 +236,27 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS', settingsData);
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
+    }
+  });
+
+  /*
+   * Pull the users from the API and update the local storage.
+   *
+   * @listens passbolt.users.update-local-storage
+   * @param {uuid} requestId The request identifier
+   */
+  worker.port.on('passbolt.users.update-local-storage', async function (requestId) {
+    try {
+      let userModel = new UserModel(await User.getInstance().getApiClientOptions());
+      await userModel.updateLocalStorage();
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
     }
   });
 };

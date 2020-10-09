@@ -52,7 +52,7 @@ const main = async function() {
    */
   var pageMods = require('./app').pageMods;
 
-  pageMods.Bootstrap.init();
+  pageMods.WebIntegration.init();
 
   // If the user is valid we enable the login pagemod
   var user = User.getInstance();
@@ -86,11 +86,6 @@ const main = async function() {
   pageMods.File.init();
   pageMods.Clipboard.init();
   pageMods.PassboltAuthForm.init();
-  // pageMods.ShareDialog.init();
-  pageMods.GroupEditDialog.init();
-  pageMods.GroupEditAutocompleteDialog.init();
-  pageMods.ImportPasswordsDialog.init();
-  pageMods.ExportPasswordsDialog.init();
   pageMods.QuickAccess.init();
   pageMods.ReactApp.init();
 

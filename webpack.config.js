@@ -1,11 +1,11 @@
-const reactAppConfig = require('./webpack.react_app.config').default;
-const quickaccessConfig = require('./webpack.quickaccess.config').default;
-const manageReactAppIframeConfig = require('./webpack.manage_react_app_iframe.config').default;
+const contentScriptsAppConfig = require('./webpack.content_scripts.app.config').default;
+const dataAppConfig = require('./webpack.data.app.config').default;
+const dataQuickaccessConfig = require('./webpack.data.quickaccess.config').default;
 
 const configs = [
-  reactAppConfig,
-  quickaccessConfig,
-  manageReactAppIframeConfig
+  contentScriptsAppConfig,
+  dataQuickaccessConfig,
+  dataAppConfig,
 ];
 
 module.exports = function (env) {

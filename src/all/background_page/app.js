@@ -19,26 +19,20 @@
  * ==================================================================================
  */
 var events = {};
-events.app = require('./event/appEvents');
 events.auth = require('./event/authEvents');
 events.clipboard = require('./event/clipboardEvents');
 events.comment = require('./event/commentEvents');
 events.config = require('./event/configEvents');
 events.debug = require('./event/debugEvents');
 events.debugPage = require('./event/debugPageEvents');
-events.exportPasswordsIframe = require('./event/exportPasswordsIframeEvents');
 events.exportPasswords = require('./event/exportPasswordsEvents');
 events.favorite = require('./event/favoriteEvents');
 events.file = require('./event/fileEvents');
 events.folder = require('./event/folderEvents');
 events.group = require('./event/groupEvents');
-events.groupAutocomplete = require('./event/groupAutocompleteEvents');
-events.importPasswordsIframe = require('./event/importPasswordsIframeEvents');
 events.importPasswords = require('./event/importPasswordsEvents');
 events.keyring = require('./event/keyringEvents');
-events.passboltPage = require('./event/passboltPageEvents');
 events.quickAccess = require('./event/quickAccessEvents');
-events.reactApp = require('./event/reactAppEvents');
 events.resource = require('./event/resourceEvents');
 events.secret = require('./event/secretEvents');
 events.setup = require('./event/setupEvents');
@@ -48,6 +42,7 @@ events.tab = require('./event/tabEvents');
 events.tag = require('./event/tagEvents');
 events.user = require('./event/userEvents');
 events.siteSettings = require('./event/siteSettingsEvents');
+events.pagemod = require('./event/pagmodEvents');
 
 exports.events = events;
 
@@ -87,7 +82,7 @@ var pageMods = {};
  * to know about the status of the extension, in a modernizr fashion
  * It also helps the plugin to recognise if a page behave like a passbolt app
  */
-pageMods.Bootstrap = require('./pagemod/bootstrapPagemod').Bootstrap;
+pageMods.WebIntegration = require('./pagemod/webIntegrationPagemod').WebIntegration;
 
 /*
  * This pagemod drives the react application.
@@ -138,28 +133,6 @@ pageMods.Clipboard = require('./pagemod/clipboardPagemod').Clipboard;
  * This pagemod drives the file iframe tool
  */
 pageMods.File = require('./pagemod/filePagemod').File;
-
-/*
- * This pagemod drives the iframe used when the user creates / edit a group.
- * It is used when selecting the users who are part of the group.
- */
-pageMods.GroupEditDialog = require('./pagemod/groupEditDialogPagemod').GroupEditDialog;
-
-/*
- * This pagemod drives the iframe used when the user creates / edit a group.
- * It shows the autocomplete list including the users that can be added to the group.
- */
-pageMods.GroupEditAutocompleteDialog = require('./pagemod/groupEditAutocompleteDialogPagemod').GroupEditAutocompleteDialog;
-
-/*
- * This pagemod drives the dialog/iframe where the user imports passwords,
- */
-pageMods.ImportPasswordsDialog = require('./pagemod/importPasswordsDialogPagemod').ImportPasswordsDialog;
-
-/*
- * This pagemod drives the dialog/iframe where the user exports passwords,
- */
-pageMods.ExportPasswordsDialog = require('./pagemod/exportPasswordsDialogPagemod').ExportPasswordsDialog;
 
 /*
  * This page mod drives a convenience config page for debug

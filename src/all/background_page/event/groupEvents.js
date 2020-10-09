@@ -404,5 +404,25 @@ var listen = function (worker) {
     worker.port.emit(requestId, 'SUCCESS', changeList);
   });
 
+  /*
+   * Pull the groups from the API and update the local storage.
+   *
+   * @listens passbolt.groups.update-local-storage
+   * @param {uuid} requestId The request identifier
+   */
+  worker.port.on('passbolt.groups.update-local-storage', async function (requestId) {
+    try {
+      let groupModel = new GroupModel(await User.getInstance().getApiClientOptions());
+      await groupModel.updateLocalStorage();
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      if (error instanceof Error) {
+        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      } else {
+        worker.port.emit(requestId, 'ERROR', error);
+      }
+    }
+  });
 };
 exports.listen = listen;

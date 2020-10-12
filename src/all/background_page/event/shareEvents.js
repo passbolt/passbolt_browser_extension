@@ -49,7 +49,7 @@ const listen = function (worker) {
       let apiClientOptions = await User.getInstance().getApiClientOptions();
       let resourceModel = new ResourceModel(apiClientOptions);
       const resourcesCollection = await resourceModel.findAllForShare(resourcesIds);
-      worker.port.emit(requestId, 'SUCCESS', resourcesCollection);
+      worker.port.emit(requestId, 'SUCCESS', resourcesCollection.toDto());
     } catch(error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
@@ -66,8 +66,7 @@ const listen = function (worker) {
       let apiClientOptions = await User.getInstance().getApiClientOptions();
       let folderModel = new FolderModel(apiClientOptions);
       const foldersCollection = await folderModel.findAllForShare(foldersIds);
-      const folderDtos = foldersCollection.toJSON();
-      worker.port.emit(requestId, 'SUCCESS', folderDtos);
+      worker.port.emit(requestId, 'SUCCESS', foldersCollection.toDto());
     } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));

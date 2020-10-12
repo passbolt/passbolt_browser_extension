@@ -48,7 +48,7 @@ const listen = function (worker) {
       const resourceModel = new ResourceModel(clientOptions);
       const {contains, filters, orders} = options;
       const resources = await resourceModel.findAll(contains, filters, orders);
-      worker.port.emit(requestId, 'SUCCESS', resources);
+      worker.port.emit(requestId, 'SUCCESS', resources.toDto());
     } catch (error) {
       console.error(error);
       if (error instanceof Error) {

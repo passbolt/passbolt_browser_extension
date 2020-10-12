@@ -39,7 +39,7 @@ class GroupModel {
    * @public
    */
   async updateLocalStorage () {
-    const contain = {groups_users: false, my_group_user: true, modifier: false};
+    const contain = {groups_users: true, my_group_user: true, modifier: false};
     const groupDtos = await this.groupService.findAll(contain);
     const groupsCollection = new GroupsCollection(groupDtos);
     await GroupLocalStorage.set(groupsCollection);

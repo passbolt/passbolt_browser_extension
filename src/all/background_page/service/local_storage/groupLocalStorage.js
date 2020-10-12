@@ -147,7 +147,7 @@ class GroupLocalStorage {
    * @private
    */
   static get DEFAULT_CONTAIN() {
-    return {my_group_user: true}; // no group users, etc.
+    return {my_group_user: true, groups_users: true};
   }
 
   /**

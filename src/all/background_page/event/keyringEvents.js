@@ -23,6 +23,29 @@ const listen = function (worker) {
    * ================================================================================== */
 
   /*
+   * Get the public key information for a user.
+   *
+   * @listens passbolt.keyring.get-public-key-info-by-user
+   * @param requestId {uuid} The request identifier
+   * @param userId {string} The user identifier
+   */
+  worker.port.on('passbolt.keyring.get-public-key-info-by-user', async function (requestId, userId) {
+    let key = keyring.findPublic(userId);
+    // If the key is not in the keyring, try to sync the keyring and try again
+    if (!key) {
+      await keyring.sync();
+      key = keyring.findPublic(userId);
+    }
+
+    if (key) {
+      const keyInfo = await keyring.keyInfo(key.key);
+      worker.port.emit(requestId, 'SUCCESS', keyInfo);
+    } else {
+      worker.port.emit(requestId, 'ERROR', __('Key not found'));
+    }
+  });
+
+  /*
    * Get the public key information.
    *
    * @listens passbolt.keyring.public.info

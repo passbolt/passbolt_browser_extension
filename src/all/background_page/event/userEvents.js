@@ -168,7 +168,7 @@ const listen = function (worker) {
    * @listens passbolt.user.update
    * @param requestId {uuid} The request identifier
    * @param userDato {Object} The user object, example:
-   *  {id: <UUID>, profile: {first_name: 'ada', last_name: 'lovelace'}, role_id: <UUID>}
+   *  {id: <UUID>, username: 'ada@passbolt.com', profile: {first_name: 'ada', last_name: 'lovelace'}, role_id: <UUID>}
    */
   worker.port.on('passbolt.users.update', async function (requestId, userDto) {
     try {

@@ -65,7 +65,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param comment {array} The comment
    */
-  worker.port.on('passbolt.comments.delete', async function (requestId, commentId, cascade) {
+  worker.port.on('passbolt.comments.delete', async function (requestId, commentId) {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const commentModel = new CommentModel(apiClientOptions);

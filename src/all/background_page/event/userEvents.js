@@ -142,6 +142,26 @@ const listen = function (worker) {
   });
 
   /*
+   * Create a user user
+   *
+   * @listens passbolt.users.find-logged-in-user
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.users.find-logged-in-user', async function (requestId) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const userModel = new UserModel(clientOptions);
+      const loggedInUserId = User.getInstance().get().id;
+      const contains = {profile: true, role: true};
+      const userEntity = await userModel.findOne(loggedInUserId, contains);
+      worker.port.emit(requestId, 'SUCCESS', userEntity.toDto(contains));
+    } catch(error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+    }
+  });
+
+  /*
    * Update a user
    * Can be used to change the role or firstname/lastname but nothing else
    *

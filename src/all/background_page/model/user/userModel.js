@@ -46,6 +46,23 @@ class UserModel {
     return usersCollection;
   }
 
+  //==============================================================
+  // Finders / remote calls
+  //==============================================================
+
+  /**
+   * Find all
+   *
+   * @param {Object} [contains] optional example: {permissions: true}
+   * @param {Object} [filters] optional
+   * @param {Object} [orders] optional
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findOne(userId, contains) {
+    const userDto = await this.userService.get(userId, contains);
+    return new UserEntity(userDto);
+  }
+
   /**
    * Find all user ids who have access to a user
    *

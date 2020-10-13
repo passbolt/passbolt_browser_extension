@@ -89,13 +89,16 @@ class UserService extends AbstractService {
    * Get a user for a given id
    *
    * @param {string} id user uuid
+   * @param {Object} [contains] optional example: {permissions: true}
    * @throws {Error} if API call fails, service unreachable, etc.
    * @throws {TypeError} if user id is not a valid uuid
    * @returns {Object} userDto
    */
-  async get(id) {
+  async get(id, contains) {
     this.assertValidId(id);
-    const response = await this.apiClient.get(id);
+    contains = contains ? this.formatContainOptions(contains, UserService.getSupportedContainOptions()) : null;
+    const options = {...contains};
+    const response = await this.apiClient.get(id, options);
     return response.body;
   }
 

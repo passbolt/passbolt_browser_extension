@@ -56,31 +56,6 @@ class FoldersCollection extends EntityCollection {
   }
 
   // ==================================================
-  // Serialization
-  // ==================================================
-  /**
-   * Return a DTO ready to be sent to API
-   *
-   * @param {object} [contain] optional
-   * @returns {object}
-   */
-  toDto(contain) {
-    const result = [];
-    for(let folder of this) {
-      result.push(folder.toDto(contain))
-    }
-    return result;
-  }
-
-  /**
-   * Customizes JSON stringification behavior
-   * @returns {*}
-   */
-  toJSON() {
-    return this.toDto(FolderEntity.ALL_CONTAIN_OPTIONS);
-  }
-
-  // ==================================================
   // Getter
   // ==================================================
   /**

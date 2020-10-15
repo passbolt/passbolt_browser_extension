@@ -38,7 +38,7 @@ class DeleteDryRunError extends Error {
         sole_owner: new ResourcesCollection(errors.resources.sole_owner)
       };
     }
-    if (errors.folders && errors.folders.sole_manager) {
+    if (errors.folders && errors.folders.sole_owner) {
       this.errors.folders = {
         sole_owner: new FoldersCollection(errors.folders.sole_owner)
       };

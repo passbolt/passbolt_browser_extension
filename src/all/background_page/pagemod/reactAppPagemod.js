@@ -51,6 +51,7 @@ ReactApp.init = function () {
       app.events.comment.listen(worker);
       app.events.tag.listen(worker);
       app.events.favorite.listen(worker);
+      app.events.importPasswords.listen(worker);
       app.events.pagemod.listen(worker);
 
       Worker.add('ReactApp', worker);

@@ -2,6 +2,7 @@
  * CsvDb model.
  * Provides high level tools to work with a password csv file.
  */
+const {ImportCsvError} = require("../../../error/importCsvError");
 const {ResourceDto} = require('../resourceDto');
 
 /**
@@ -129,7 +130,7 @@ CsvDb.prototype.toResourceDtos = async function(csvDb) {
         const csvEntry = csvDb['data'][i];
         const formatName = this.getCsvFormat(csvEntry);
         if (formatName === false) {
-          reject('CSV format is not recognized');
+          reject(new ImportCsvError('CSV format is not recognized'));
         }
 
         const resourceDto = new ResourceDto();
@@ -155,7 +156,7 @@ CsvDb.prototype.fromResourceDtos = function(resourcesDto, format) {
     let csvContent = null;
 
     if (CsvDb.formats[format] === undefined) {
-      return reject('This csv format is not supported');
+      return reject(new ImportCsvError('This csv format is not supported'));
     }
 
     try {

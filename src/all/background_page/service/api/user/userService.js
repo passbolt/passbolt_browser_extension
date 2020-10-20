@@ -113,7 +113,8 @@ class UserService extends AbstractService {
    * @public
    */
   async findAll(contains, filters, orders) {
-    contains = contains ? this.formatContainOptions(contains, UserService.getSupportedContainOptions()) : null;
+    const legacyContain = UserService.remapToLegacyContain(contains) ;// crassette
+    contains = contains ? this.formatContainOptions(legacyContain, UserService.getSupportedContainOptions()) : null;
     filters = filters ? this.formatFilterOptions(filters, UserService.getSupportedFiltersOptions()) : null;
     orders = orders ? this.formatOrderOptions(orders, UserService.getSupportedFiltersOptions()) : null;
     const options = {...contains, ...filters, ...orders};
@@ -122,6 +123,28 @@ class UserService extends AbstractService {
       return [];
     }
     return response.body;
+  }
+
+  /**
+   * Helper to remap to legacy contain options to improve backward compatibility
+   * @deprecated  remove when support for v2.14 is dropped
+   *
+   * @param {Object} contains
+   * ex. {last_logged_in: true}
+   * @returns {Object} update contains
+   * ex. {LastLoggedIn: true}
+   * @public
+   */
+  static remapToLegacyContain(contains) {
+    if (!contains) {
+      return undefined;
+    }
+    if (contains.hasOwnProperty('last_logged_in')) {
+      contains.LastLoggedIn = contains.last_logged_in;
+      delete contains.last_logged_in;
+    }
+
+    return contains;
   }
 
   /**

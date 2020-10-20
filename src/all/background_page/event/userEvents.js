@@ -137,7 +137,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS', updatedUser);
     } catch(error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -154,10 +154,10 @@ const listen = function (worker) {
       const loggedInUserId = User.getInstance().get().id;
       const contains = {profile: true, role: true};
       const userEntity = await userModel.findOne(loggedInUserId, contains);
-      worker.port.emit(requestId, 'SUCCESS', userEntity.toDto(contains));
+      worker.port.emit(requestId, 'SUCCESS', userEntity);
     } catch(error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -179,7 +179,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS', updatedUser);
     } catch(error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -198,7 +198,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS');
     } catch(error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -218,7 +218,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS');
     } catch(error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -238,7 +238,7 @@ const listen = function (worker) {
       const validatedUser = User.getInstance().validate(u, fields);
       worker.port.emit(requestId, 'SUCCESS', validatedUser);
     } catch (e) {
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
+      worker.port.emit(requestId, 'ERROR', e);
     }
   });
 
@@ -255,7 +255,7 @@ const listen = function (worker) {
       User.getInstance().settings.validate(settingsData, fields);
       worker.port.emit(requestId, 'SUCCESS', settingsData);
     } catch (e) {
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
+      worker.port.emit(requestId, 'ERROR', e);
     }
   });
 
@@ -272,11 +272,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 };

@@ -21,7 +21,7 @@ const listen = function (worker) {
     let tab;
     if (!worker.port) {
       const err = new Error('Inactive worker on the page.');
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(err));
+      worker.port.emit(requestId, 'ERROR', err);
     }
     try {
       const tabs = await browser.tabs.query({active: true, currentWindow: true});  // Code to get browser's current active tab
@@ -30,11 +30,11 @@ const listen = function (worker) {
         const tabsForDebug = await browser.tabs.query({});
         console.error(err);
         console.error(tabsForDebug);
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(err));
+        worker.port.emit(requestId, 'ERROR', err);
       }
       tab = tabs[0];
     } catch(error) {
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
 
     try {
@@ -57,7 +57,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 };

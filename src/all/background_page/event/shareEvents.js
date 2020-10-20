@@ -33,7 +33,7 @@ const listen = function (worker) {
         // This code ensure the compatibility with passbolt < v2.4.0.
         aros = await Share.searchResourceAros(resourcesForLegacyApi.resourcesIds[0], keywords);
       } else {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+        worker.port.emit(requestId, 'ERROR', error);
       }
     }
     worker.port.emit(requestId, 'SUCCESS', aros);
@@ -49,10 +49,10 @@ const listen = function (worker) {
       let apiClientOptions = await User.getInstance().getApiClientOptions();
       let resourceModel = new ResourceModel(apiClientOptions);
       const resourcesCollection = await resourceModel.findAllForShare(resourcesIds);
-      worker.port.emit(requestId, 'SUCCESS', resourcesCollection.toDto());
+      worker.port.emit(requestId, 'SUCCESS', resourcesCollection);
     } catch(error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -66,10 +66,10 @@ const listen = function (worker) {
       let apiClientOptions = await User.getInstance().getApiClientOptions();
       let folderModel = new FolderModel(apiClientOptions);
       const foldersCollection = await folderModel.findAllForShare(foldersIds);
-      worker.port.emit(requestId, 'SUCCESS', foldersCollection.toDto());
+      worker.port.emit(requestId, 'SUCCESS', foldersCollection);
     } catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -85,7 +85,7 @@ const listen = function (worker) {
       await shareResourcesController.main(resources, changes);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -105,7 +105,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 

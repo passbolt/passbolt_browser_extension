@@ -27,13 +27,9 @@ const listen = function (worker) {
       const apiOption = await User.getInstance().getApiClientOptions();
       const tagModel = new TagModel(apiOption);
       const tagsCollection = await tagModel.findAll();
-      worker.port.emit(requestId, 'SUCCESS', tagsCollection.toJSON());
+      worker.port.emit(requestId, 'SUCCESS', tagsCollection);
     } catch (error) {
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -53,11 +49,7 @@ const listen = function (worker) {
       const tags = await tagModel.updateResourceTags(resourceId, tagsCollection);
       worker.port.emit(requestId, 'SUCCESS', tags);
     } catch (error) {
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -74,13 +66,9 @@ const listen = function (worker) {
       const tagModel = new TagModel(apiOption);
       const tagEntity = new TagEntity(tagDto);
       const updatedTag = await tagModel.update(tagEntity);
-      worker.port.emit(requestId, 'SUCCESS', updatedTag.toDto());
+      worker.port.emit(requestId, 'SUCCESS', updatedTag);
     } catch (error) {
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -98,11 +86,7 @@ const listen = function (worker) {
       await tagModel.delete(tagId);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 };

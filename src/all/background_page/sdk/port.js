@@ -5,6 +5,7 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+require('../error/error.js');
 var Log = require('../model/log').Log;
 
 var Port = function(port) {
@@ -42,7 +43,9 @@ Port.prototype.on = function(msgName, callback) {
  */
 Port.prototype.emit = function () {
   Log.write({level: 'debug', message: 'Port emit @ message: ' + arguments[1]});
-  this._port.postMessage(Array.prototype.slice.call(arguments));
+  const args = Array.prototype.slice.call(arguments)
+    .map(arg => typeof arg.toJSON === "function" ? arg.toJSON() : arg);
+  this._port.postMessage(args);
 };
 
 /**
@@ -53,26 +56,9 @@ Port.prototype.emit = function () {
  * @param status SUCCESS | ERROR
  */
 Port.prototype.emitQuiet = function () {
-  this._port.postMessage(Array.prototype.slice.call(arguments));
-};
-
-/**
- * Get an emitable version of a javascript error.
- * Error cannot be transfered by the Port.postMessage function to the content code.
- * Some properties are not iterable/enumerable, such as name or message.
- *
- * @param error {Error} error The error to work on.
- * @pararm {Object} The emitable version of the error.
- */
-Port.prototype.getEmitableError = function (error) {
-  const emitableError = Object.assign({}, error);
-  ["name", "message"].forEach(key => {
-    if (error[key] && !emitableError[key]) {
-      emitableError[key] = error[key];
-    }
-  });
-
-  return emitableError;
+  const args = Array.prototype.slice.call(arguments)
+    .map(arg => typeof arg.toJSON === "function" ? arg.toJSON() : arg);
+  this._port.postMessage(args);
 };
 
 /**

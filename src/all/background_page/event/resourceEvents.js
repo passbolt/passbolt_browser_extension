@@ -26,12 +26,7 @@ const listen = function (worker) {
       resourceModel.updateLocalStorage();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
-      Log.write({level: 'error', message: error.message, data: JSON.stringify(error)});
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -48,14 +43,10 @@ const listen = function (worker) {
       const resourceModel = new ResourceModel(clientOptions);
       const {contains, filters, orders} = options;
       const resources = await resourceModel.findAll(contains, filters, orders);
-      worker.port.emit(requestId, 'SUCCESS', resources.toDto());
+      worker.port.emit(requestId, 'SUCCESS', resources);
     } catch (error) {
       console.error(error);
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -74,11 +65,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS', permissions);
     } catch (error) {
       console.error(error);
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -95,15 +82,10 @@ const listen = function (worker) {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new ResourceCreateController(worker, requestId, clientOptions);
       const savedResource = await controller.main(resourceDto, plaintextDto);
-      const savedResourceDto = savedResource.toJSON();
-      worker.port.emit(requestId, 'SUCCESS', savedResourceDto);
+      worker.port.emit(requestId, 'SUCCESS', savedResource);
     } catch (error) {
       console.error(error);
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -122,12 +104,8 @@ const listen = function (worker) {
       await resourceModel.deleteAll(resourcesIds);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
-      if (error instanceof Error) {
-        console.error(error);
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -147,11 +125,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS', updatedResource);
     } catch (error) {
       console.error(error);
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 }

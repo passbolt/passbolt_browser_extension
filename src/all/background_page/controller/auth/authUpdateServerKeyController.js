@@ -31,7 +31,7 @@ class AuthUpdateServerKeyController {
       await this.keyring.importServerPublicKey(serverKey.keydata, domain);
       this.worker.port.emit(this.requestId, 'SUCCESS', domain);
     } catch (error) {
-      this.worker.port.emit(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
+      this.worker.port.emit(this.requestId, 'ERROR', error);
     }
   }
 }

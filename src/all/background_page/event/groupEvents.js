@@ -46,11 +46,7 @@ var listen = function (worker) {
       const groupsCollection = await groupModel.findAll(contains, filters, orders);
       worker.port.emit(requestId, 'SUCCESS', groupsCollection);
     } catch (error) {
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -74,7 +70,7 @@ var listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS', newGroup);
     } catch(error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -95,7 +91,7 @@ var listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS');
     } catch(error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -116,7 +112,7 @@ var listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS');
     } catch(error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -224,8 +220,6 @@ var listen = function (worker) {
     } catch (error) {
       if (error instanceof InvalidMasterPasswordError || error instanceof UserAbortsOperationError) {
         // The save operation has been aborted.
-      } else if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
       } else {
         worker.port.emit(requestId, 'ERROR', error);
       }
@@ -417,11 +411,7 @@ var listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);
-      if (error instanceof Error) {
-        worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 };

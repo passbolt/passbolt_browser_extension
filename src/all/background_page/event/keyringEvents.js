@@ -152,7 +152,7 @@ const listen = function (worker) {
       const validate = key.validate(keyData, fields);
       worker.port.emit(requestId, 'SUCCESS', validate);
     } catch (e) {
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
+      worker.port.emit(requestId, 'ERROR', e);
     }
   });
 
@@ -208,7 +208,7 @@ const listen = function (worker) {
       await keyring.checkPassphrase(passphrase);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 

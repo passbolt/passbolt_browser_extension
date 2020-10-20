@@ -22,7 +22,7 @@ const listen = function (worker) {
       const {plaintext} = await controller.main(resourceId);
       worker.port.emit(requestId, 'SUCCESS', plaintext);
     } catch (error) {
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 };

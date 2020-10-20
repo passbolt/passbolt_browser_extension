@@ -57,7 +57,7 @@ class AuthController {
       }
 
       error.message = `${__('Could not verify server key.')} ${error.message}`;
-      this.worker.port.emit(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
+      this.worker.port.emit(this.requestId, 'ERROR', error);
     }
   }
 
@@ -141,7 +141,7 @@ class AuthController {
     if (this.worker.pageMod && this.worker.pageMod.args.name === "AuthForm") {
       Worker.get('Auth', this._tabId).port.emit('passbolt.auth.login-failed', error.message);
     } else {
-      this.worker.port.emit(this.requestId, "ERROR", this.worker.port.getEmitableError(error));
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 }

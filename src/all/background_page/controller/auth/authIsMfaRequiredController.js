@@ -30,7 +30,7 @@ class AuthIsMfaRequiredController {
         this.worker.port.emit(this.requestId, 'SUCCESS', false);
       }
     } catch (error) {
-      this.worker.port.emit(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
+      this.worker.port.emit(this.requestId, 'ERROR', error);
     }
   }
 

@@ -32,10 +32,10 @@ const listen = function (worker) {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const commentModel = new CommentModel(clientOptions);
       const commentsCollection = await commentModel.findAllByResourceId(resourceId);
-      worker.port.emit(requestId, 'SUCCESS', commentsCollection.toJSON());
+      worker.port.emit(requestId, 'SUCCESS', commentsCollection);
     } catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -54,7 +54,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS', commentEntity);
     } catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
@@ -73,7 +73,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS', commentId);
     } catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 };

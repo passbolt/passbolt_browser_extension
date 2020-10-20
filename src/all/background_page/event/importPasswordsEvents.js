@@ -16,7 +16,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS', result);
     } catch (e) {
       console.error(e);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(e));
+      worker.port.emit(requestId, 'ERROR', e);
     }
   });
 };

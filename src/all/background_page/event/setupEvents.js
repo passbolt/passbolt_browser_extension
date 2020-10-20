@@ -125,7 +125,7 @@ var listen = function (worker) {
     }
     catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR', worker.port.getEmitableError(error));
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 

@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
+require('./error.js');
 const {GroupsCollection} = require('../model/entity/group/groupsCollection');
 const {ResourcesCollection} = require('../model/entity/resource/resourcesCollection');
 const {FoldersCollection} = require('../model/entity/folder/foldersCollection');
@@ -49,6 +50,29 @@ class DeleteDryRunError extends Error {
       console.error(this);
       throw new TypeError(`Invalid user deletion error. There should be at least some error details.`);
     }
+  }
+
+  toJSON() {
+    const result = super.toJSON();
+    result.errors = {};
+
+    if (this.errors.groups && this.errors.groups.sole_manager) {
+      result.errors.groups = {
+        sole_manager: this.errors.groups.sole_manager.toJSON()
+      };
+    }
+    if (this.errors.resources && this.errors.resources.sole_owner) {
+      result.errors.resources = {
+        sole_owner: this.errors.resources.sole_owner.toJSON()
+      };
+    }
+    if (this.errors.folders && this.errors.folders.sole_owner) {
+      result.errors.folders = {
+        sole_owner: this.errors.folders.sole_owner.toJSON()
+      };
+    }
+
+    return result;
   }
 }
 

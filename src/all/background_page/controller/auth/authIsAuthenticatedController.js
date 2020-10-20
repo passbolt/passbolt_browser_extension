@@ -37,7 +37,7 @@ class AuthIsAuthenticatedController {
         this.worker.port.emitQuiet(this.requestId, 'SUCCESS', false);
       }
     } catch (error) {
-      this.worker.port.emitQuiet(this.requestId, 'ERROR', this.worker.port.getEmitableError(error));
+      this.worker.port.emitQuiet(this.requestId, 'ERROR', error);
     }
   }
 }

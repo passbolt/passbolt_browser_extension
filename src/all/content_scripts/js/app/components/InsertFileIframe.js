@@ -14,7 +14,7 @@
 import React, {Component} from "react";
 import {withRouter} from "react-router-dom";
 
-class InsertClipboardIframe extends Component {
+class InsertFileIframe extends Component {
 
   constructor(props) {
     super(props);
@@ -22,7 +22,7 @@ class InsertClipboardIframe extends Component {
   }
 
   componentDidMount() {
-    this.loadClipboardIframe();
+    this.loadFileIframe();
   }
 
   createRefs() {
@@ -33,8 +33,8 @@ class InsertClipboardIframe extends Component {
    * Load the react app iframe
    * @returns {void}
    */
-  loadClipboardIframe() {
-    const iframeUrl = `data/passbolt-iframe-clipboard.html?passbolt=passbolt-iframe-clipboard`;
+  loadFileIframe() {
+    const iframeUrl = `data/passbolt-iframe-file.html?passbolt=passbolt-iframe-file`;
     this.iframeRef.current.contentWindow.location = chrome.runtime.getURL(iframeUrl);
   }
 
@@ -52,9 +52,9 @@ class InsertClipboardIframe extends Component {
     };
 
     return (
-      <iframe id="passbolt-iframe-clipboard" ref={this.iframeRef} style={style}/>
+      <iframe id="passbolt-iframe-file" ref={this.iframeRef} style={style}/>
     );
   }
 }
 
-export default withRouter(InsertClipboardIframe);
+export default withRouter(InsertFileIframe);

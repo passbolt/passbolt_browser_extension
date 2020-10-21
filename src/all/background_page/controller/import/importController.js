@@ -207,12 +207,14 @@ class ImportController {
    */
   async initFromKdbx() {
     const kdbxFile = fileController.b64ToBlob(this.fileB64Content);
+    const password = this.options.credentials.password;
+    let keyFile = null;
     if (this.options.credentials.keyFile !== null && this.options.credentials.keyFile !== undefined) {
-      credentials.keyFile = fileController.b64ToBlob(this.options.credentials.keyFile);
+      keyFile = fileController.b64ToBlob(this.options.credentials.keyFile);
     }
 
     const keepassDb = new KeepassDb();
-    const db = await keepassDb.loadDb(kdbxFile, this.options.credentials.password, this.options.credentials.keyFile);
+    const db = await keepassDb.loadDb(kdbxFile, password, keyFile);
     this.items = keepassDb.toItems(db);
 
     return this.items;

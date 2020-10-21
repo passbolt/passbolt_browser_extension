@@ -20,6 +20,7 @@ import Port from "../../../data/js/lib/port";
 import InsertAppIframe from "./components/InsertAppIframe";
 import CleanupLegacyAppJs from "./components/CleanupLegacyAppJs";
 import InsertClipboardIframe from "./components/InsertClipboardIframe";
+import InsertFileIframe from "./components/InsertFileIframe";
 
 class App extends Component {
   render() {
@@ -37,6 +38,7 @@ class App extends Component {
             <CleanupLegacyAppJs/>
             <InsertAppIframe/>
             <InsertClipboardIframe/>
+            <InsertFileIframe/>
           </Route>
         </Switch>
       </Router>

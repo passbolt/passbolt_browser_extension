@@ -52,6 +52,9 @@ ReactApp.init = function () {
       app.events.tag.listen(worker);
       app.events.favorite.listen(worker);
       app.events.importPasswords.listen(worker);
+      app.events.exportPasswords.listen(worker);
+
+      // Keep the pagemod event listeners at the end of the list.
       app.events.pagemod.listen(worker);
 
       Worker.add('ReactApp', worker);

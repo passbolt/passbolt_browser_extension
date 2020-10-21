@@ -18,7 +18,10 @@ const {KeepassDb} = require('../../model/importExport/keepassDb/keepassDb');
 const {CsvDb} = require('../../model/importExport/csvDb/csvDb');
 const {Crypto} = require('../../model/crypto');
 const progressController = require('../progress/progressController');
+const {ResourceService} = require("../../service/api/resource/resourceService");
+const {FolderModel} = require("../../model/folder/folderModel");
 const {FoldersCollection} = require('../../model/entity/folder/foldersCollection');
+const User = require('../../model/user').User;
 
 class ExportController {
 
@@ -46,8 +49,8 @@ class ExportController {
 
     const format = options.format || "";
     this.credentials = options.credentials || null;
-    this.resources = items.resources;
-    this.folders = items.folders;
+    this.resourcesIds = items.resourcesIds;
+    this.foldersIds = items.foldersIds;
 
     // CSV formats are given in the format "csv-subformat". We need to extract the subformat.
     const isCsv = format.match(/csv-(.*)/);
@@ -58,7 +61,7 @@ class ExportController {
     } else if (format === 'kdbx') {
       this.format = "kdbx"
     } else {
-      throw error(__('Export format is not supported'));
+      throw new Error(__('Export format is not supported'));
     }
   }
 
@@ -67,9 +70,41 @@ class ExportController {
    * @return {Promise}
    */
   async exec() {
+    this.folders = await this.findFolders();
+    this.resources = await this.findResources();
     await this.decryptSecrets();
     const fileContent = await this.convertResourcesToFile();
     return this.downloadFile(fileContent);
+  }
+
+  /**
+   * Retrieve all the folders to export
+   * @returns {Promise<[]>}
+   */
+  async findFolders() {
+    if (!this.foldersIds || !this.foldersIds.length) {
+      return [];
+    }
+
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const folderModel = new FolderModel(apiClientOptions);
+
+    const folders = await folderModel.getAllByIds(this.foldersIds);
+    return folders.toDto();
+  }
+
+  /**
+   * Retrieve all the resources
+   * @returns {Promise<[]>}
+   */
+  async findResources() {
+    if (!this.resourcesIds || !this.resourcesIds.length) {
+      return [];
+    }
+
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const resourceService = new ResourceService(apiClientOptions);
+    return await resourceService.findAllForExport(this.resourcesIds);
   }
 
   /**

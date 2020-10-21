@@ -44,7 +44,7 @@ Port.prototype.on = function(msgName, callback) {
 Port.prototype.emit = function () {
   Log.write({level: 'debug', message: 'Port emit @ message: ' + arguments[1]});
   const args = Array.prototype.slice.call(arguments)
-    .map(arg => typeof arg.toJSON === "function" ? arg.toJSON() : arg);
+    .map(arg => (arg && typeof arg.toJSON === "function") ? arg.toJSON() : arg);
   this._port.postMessage(args);
 };
 
@@ -57,7 +57,7 @@ Port.prototype.emit = function () {
  */
 Port.prototype.emitQuiet = function () {
   const args = Array.prototype.slice.call(arguments)
-    .map(arg => typeof arg.toJSON === "function" ? arg.toJSON() : arg);
+    .map(arg => (arg && typeof arg.toJSON === "function") ? arg.toJSON() : arg);
   this._port.postMessage(args);
 };
 

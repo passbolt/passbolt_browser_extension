@@ -19,6 +19,7 @@
  * ==================================================================================
  */
 var events = {};
+events.actionLogs = require('./event/actionLogEvents');
 events.auth = require('./event/authEvents');
 events.clipboard = require('./event/clipboardEvents');
 events.comment = require('./event/commentEvents');
@@ -33,6 +34,7 @@ events.group = require('./event/groupEvents');
 events.importPasswords = require('./event/importPasswordsEvents');
 events.keyring = require('./event/keyringEvents');
 events.quickAccess = require('./event/quickAccessEvents');
+events.pagemod = require('./event/pagmodEvents');
 events.resource = require('./event/resourceEvents');
 events.secret = require('./event/secretEvents');
 events.setup = require('./event/setupEvents');
@@ -42,7 +44,6 @@ events.tab = require('./event/tabEvents');
 events.tag = require('./event/tagEvents');
 events.user = require('./event/userEvents');
 events.siteSettings = require('./event/siteSettingsEvents');
-events.pagemod = require('./event/pagmodEvents');
 
 exports.events = events;
 

@@ -76,6 +76,7 @@ class ActionLogService extends AbstractService {
    */
   async findAllFor(foreignModel, foreignId, page, limit) {
     this.assertValidForeignModel(foreignModel);
+    this.assertValidId(foreignId);
     if (!page || typeof page !== 'number') {
       throw new TypeError(`ActionLog page should be a valid integer.`);
     }

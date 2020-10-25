@@ -34,6 +34,7 @@ events.group = require('./event/groupEvents');
 events.importPasswords = require('./event/importPasswordsEvents');
 events.keyring = require('./event/keyringEvents');
 events.quickAccess = require('./event/quickAccessEvents');
+events.multiFactorAuthentication = require('./event/multiFactorAuthenticationEvents');
 events.pagemod = require('./event/pagmodEvents');
 events.resource = require('./event/resourceEvents');
 events.secret = require('./event/secretEvents');

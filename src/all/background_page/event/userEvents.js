@@ -275,6 +275,24 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
+
+  /*
+   * Resend an invite to a user.
+   *
+   * @listens passbolt.users.resend-invite
+   * @param {uuid} requestId The request identifier
+   * @param {string} username The user username
+   */
+  worker.port.on('passbolt.users.resend-invite', async function(requestId, username) {
+    try {
+      let userModel = new UserModel(await User.getInstance().getApiClientOptions());
+      await userModel.resendInvite(username);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
 };
 
 exports.listen = listen;

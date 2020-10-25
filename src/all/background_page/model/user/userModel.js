@@ -46,6 +46,17 @@ class UserModel {
     return usersCollection;
   }
 
+  /**
+   * Resend an invite to a user
+   *
+   * @param {string} username The user username
+   * @return {Promise<*>}
+   * @public
+   */
+  async resendInvite (username) {
+    return this.userService.resendInvite(username);
+  }
+
   //==============================================================
   // Finders / remote calls
   //==============================================================

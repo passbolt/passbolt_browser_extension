@@ -193,6 +193,21 @@ class UserService extends AbstractService {
     const response = await this.apiClient.delete(userId, data, {},  dryRun);
     return response.body;
   }
+
+  /**
+   * Resend invite
+   *
+   * @param {string} username The user username
+   * @returns {Promise<*>} Response body
+   * @throw {ApiFetchError} if the invite cannot be resent
+   * @public
+   */
+  async resendInvite(username) {
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/recover`);
+    const data = {username};
+    const bodyString = this.apiClient.buildBody(data);
+    return this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+  }
 }
 
 exports.UserService = UserService;

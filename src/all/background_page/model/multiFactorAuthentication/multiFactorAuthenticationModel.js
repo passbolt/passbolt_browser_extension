@@ -33,9 +33,8 @@ class MultiFactorAuthenticationModel {
    * @public
    */
   async disableForUser(userId) {
-    // await this.multiFactorAuthenticationService.disableMfaForUser(userId);
+    await this.multiFactorAuthenticationService.disableMfaForUser(userId);
     const userDto = await UserLocalStorage.getUserById(userId);
-    console.log(userDto);
     if (userDto) {
       userDto.is_mfa_enabled = false;
       const userEntity = new UserEntity(userDto);

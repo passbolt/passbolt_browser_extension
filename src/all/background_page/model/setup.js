@@ -171,15 +171,15 @@ Setup.prototype.save = function(data) {
     _response = {};
 
   return new Promise(function(resolve, reject) {
-    var url = data.settings.domain + '/users/validateAccount/' + data.user.id + '.json' + '?api-version=v1';
+    var url = data.settings.domain + '/users/validateAccount/' + data.user.id + '.json' + '?api-version=v2';
 
     // Build request data.
     var requestData = {
-      'AuthenticationToken': {
+      'authenticationToken': {
         'token': data.settings.token
       },
-      'Gpgkey': {
-        'key': data.key.publicKeyArmored
+      'gpgkey': {
+        'armored_key': data.key.publicKeyArmored
       }
     };
 
@@ -239,15 +239,15 @@ Setup.prototype.completeRecovery = function (data) {
     _response = {};
 
   return new Promise(function (resolve, reject) {
-    var url = data.settings.domain + '/setup/completeRecovery/' + data.user.id + '.json' + '?api-version=v1';
+    var url = data.settings.domain + '/setup/completeRecovery/' + data.user.id + '.json' + '?api-version=v2';
 
     // Build request data.
     var requestData = {
-      AuthenticationToken: {
+      authenticationtoken: {
         token: data.settings.token
       },
-      Gpgkey: {
-        key: data.key.publicKeyArmored
+      gpgkey: {
+        armored_key: data.key.publicKeyArmored
       }
     };
 

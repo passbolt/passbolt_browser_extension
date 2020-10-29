@@ -132,7 +132,7 @@ ShareService.shareResource = async function(resourceId, data) {
     body: JSON.stringify(data)
   };
   Request.setCsrfHeader(fetchOptions, user);
-  const url = new URL(`${domain}/share/resource/` + resourceId + `.json?api-version=v1`);
+  const url = new URL(`${domain}/share/resource/` + resourceId + `.json?api-version=v2`);
   let response, responseJson;
 
   try {

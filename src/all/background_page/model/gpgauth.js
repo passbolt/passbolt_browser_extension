@@ -25,9 +25,9 @@ const {Request} = require('./request');
 const {SiteSettings} = require('./siteSettings');
 const {AuthStatusLocalStorage} = require('../service/local_storage/authStatusLocalStorage');
 
-const URL_VERIFY = '/auth/verify.json?api-version=v1';
-const URL_LOGIN = '/auth/login.json?api-version=v1';
-const URL_LOGOUT = '/auth/logout.json?api-version=v1';
+const URL_VERIFY = '/auth/verify.json?api-version=v2';
+const URL_LOGIN = '/auth/login.json?api-version=v2';
+const URL_LOGOUT = '/auth/logout.json?api-version=v2';
 const CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD = 60000;
 const MAX_IS_AUTHENTICATED_INTERVAL_PERIOD = 2147483647;
 

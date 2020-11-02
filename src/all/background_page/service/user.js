@@ -116,7 +116,7 @@ UserService.searchUsers = async function (user, options) {
       'content-type': 'application/json'
     }
   };
-  const url = new URL(`${domain}/users.json?api-version=v1`); // TODO use v2
+  const url = new URL(`${domain}/users.json?api-version=v2`); // TODO use v2
   url.searchParams.append("filter[keywords]", htmlspecialchars(keywords, 'ENT_QUOTES'));
   url.searchParams.append("filter[is-active]", "1");
 
@@ -149,7 +149,7 @@ UserService.searchUsers = async function (user, options) {
   const users = responseJson.body;
   let finalUsers = [];
   for (let i in users) {
-    if (!in_array(users[i].User.id, excludedUsers)) {
+    if (!in_array(users[i].id, excludedUsers)) {
       finalUsers.push(users[i]);
     }
   }

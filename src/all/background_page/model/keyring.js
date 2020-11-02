@@ -374,7 +374,7 @@ class Keyring {
 
     // Get the latest keys changes from the backend.
     let userSettings = new UserSettings();
-    let url = userSettings.getDomain() + '/gpgkeys.json' + '?api-version=v1';
+    let url = userSettings.getDomain() + '/gpgkeys.json' + '?api-version=v2';
 
     // If a sync has already been performed.
     if (latestSync !== null) {
@@ -414,8 +414,7 @@ class Keyring {
     for (i in json.body) {
       if (json.body.hasOwnProperty(i)) {
         meta = json.body[i];
-        armoredKey = meta.Gpgkey.key || meta.Gpgkey.armored_key;
-        imports.push(this.importPublic(armoredKey, meta.Gpgkey.user_id));
+        imports.push(this.importPublic(meta.armored_key, meta.user_id));
       }
     }
     await Promise.all(imports);

@@ -151,6 +151,30 @@ class GroupService extends AbstractService {
   }
 
   /**
+   * Simulate a group update using Passbolt API
+   *
+   * @param {String} groupId uuid
+   * @param {Object} groupData
+   * @returns {Promise<*>} Response body
+   * @throw {TypeError} if group id is not a valid uuid
+   * @public
+   */
+  async updateDryRun(groupId, groupData) {
+    this.assertValidId(groupId);
+    this.assertNonEmptyData(groupData);
+    const {body} = await this.apiClient.update(groupId, groupData, {}, true);
+
+    if (body) {
+      // @deprecated prior to API v2.14, the update dry run returns only v1 format result.
+      if (body['dry-run']) {
+        return this.remapUpdateDryRunDataV1tov2(body['dry-run']);
+      } else {
+        return body;
+      }
+    }
+  }
+
+  /**
    * Delete a group using Passbolt API
    *
    * @param {string} groupId uuid
@@ -217,6 +241,27 @@ class GroupService extends AbstractService {
       delete contain.groups_users;
     }
     return contain;
+  }
+
+  /**
+   * @deprecated should be removed when v2.14 support is dropped
+   * Remap update dry run result from V1 format to v2 format.
+   * @returns {{secrets_needed: (*|*[]), secrets: (*|*[])}}
+   */
+  remapUpdateDryRunDataV1tov2(data) {
+    let secrets = [];
+    let needed_secrets = [];
+
+    if (data.Secrets && Array.isArray(data.Secrets)) {
+      const mapLegacySecret = legacySecret => legacySecret.Secret && Array.isArray(legacySecret.Secret) ? legacySecret.Secret[0] : null;
+      secrets = data.Secrets.map(mapLegacySecret);
+    }
+    if (data.SecretsNeeded && Array.isArray(data.SecretsNeeded)) {
+      const mapLegacyNeededSecret = legacyNeededSecret => legacyNeededSecret.Secret;
+      needed_secrets = data.SecretsNeeded.map(mapLegacyNeededSecret);
+    }
+
+    return {secrets, needed_secrets};
   }
 }
 

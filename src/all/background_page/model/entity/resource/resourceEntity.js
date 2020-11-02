@@ -19,7 +19,7 @@ const {PermissionEntity} = require('../permission/permissionEntity');
 const {PermissionsCollection} = require('../permission/permissionsCollection');
 const {ResourceTypeEntity} = require('../resourceType/resourceTypeEntity');
 const {TagsCollection} = require('../tag/tagsCollection');
-const {SecretsCollection} = require('../secret/secretsCollection');
+const {UserResourceSecretsCollection} = require('../secret/userResource/userResourceSecretsCollection');
 
 const ENTITY_NAME = 'Resource';
 const RESOURCE_NAME_MAX_LENGTH = 255;
@@ -53,7 +53,7 @@ class ResourceEntity extends Entity {
       delete this._props.permissions;
     }
     if (this._props.secrets) {
-      this._secrets = new SecretsCollection(this._props.secrets);
+      this._secrets = new UserResourceSecretsCollection(this._props.secrets);
       ResourceEntity.assertValidSecrets(this._secrets, this.id);
       delete this._props.secrets;
     }
@@ -157,7 +157,7 @@ class ResourceEntity extends Entity {
             {"type": "null"}
           ]
         },
-        "secrets": SecretsCollection.getSchema(),
+        "secrets": UserResourceSecretsCollection.getSchema(),
         "tags": TagsCollection.getSchema()
       }
     }
@@ -417,7 +417,7 @@ class ResourceEntity extends Entity {
 
   /**
    * Get resource secrets
-   * @returns {(SecretsCollection|null)}
+   * @returns {(UserResourceSecretsCollection|null)}
    */
   get secrets() {
     return this._secrets || null;
@@ -439,12 +439,12 @@ class ResourceEntity extends Entity {
   // ==================================================
   /**
    * Set the secret
-   * @param {SecretsCollection} secretsCollection
+   * @param {UserResourceSecretsCollection} secretsCollection
    * @throws {EntityValidationError} if secretsCollection is not valid
    */
   set secrets(secretsCollection) {
     ResourceEntity.assertValidSecrets(secretsCollection);
-    this._secrets = new SecretsCollection(secretsCollection.toDto());
+    this._secrets = new UserResourceSecretsCollection(secretsCollection.toDto());
   }
 
   /**
@@ -521,7 +521,7 @@ class ResourceEntity extends Entity {
   /**
    * Additional secret validation rule
    *
-   * @param {SecretsCollection} secrets
+   * @param {UserResourceSecretsCollection} secrets
    * @param {string} [resourceId] optional
    * @throws {EntityValidationError} if not valid
    */
@@ -529,8 +529,8 @@ class ResourceEntity extends Entity {
     if (!secrets || !secrets.length) {
       throw new EntityValidationError('ResourceEntity assertValidSecrets cannot be empty.');
     }
-    if (!(secrets instanceof SecretsCollection)) {
-      throw new EntityValidationError('ResourceEntity assertValidSecrets expect a SecretsCollection.');
+    if (!(secrets instanceof UserResourceSecretsCollection)) {
+      throw new EntityValidationError('ResourceEntity assertValidSecrets expect a UserResourceSecretsCollection.');
     }
     for (let secret of secrets) {
       if (secret.resourceId && (secret.resourceId !== resourceId)) {

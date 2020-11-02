@@ -121,6 +121,23 @@ class GroupUserEntity extends Entity {
   }
 
   // ==================================================
+  // Dynamic properties setters
+  // ==================================================
+
+  /**
+   * Set the group user id
+   *
+   * @param {string} id
+   * @throws {TypeError} if id is not UUID
+   */
+  set id(id) {
+    if (!Validator.isUUID(id)) {
+      throw new TypeError('The group user id should be a valid UUID.');
+    }
+    this._props.id = id;
+  }
+
+  // ==================================================
   // Static properties getters
   // ==================================================
   /**

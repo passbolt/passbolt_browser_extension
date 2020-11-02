@@ -56,11 +56,12 @@ class GroupsUsersCollection extends EntityCollection {
   // ==================================================
   // Static and dynamic properties getters
   // ==================================================
+
   /**
    * Get all items references
    * @returns {Array} items
    */
-  get items() {
+  get groupsUsers() {
     return this._items;
   }
 
@@ -88,6 +89,28 @@ class GroupsUsersCollection extends EntityCollection {
     }
     groupUser = new GroupUserEntity(groupUser); // validate
     super.push(groupUser);
+  }
+
+  // ==================================================
+  // Finders
+  // ==================================================
+
+  /**
+   * Get groupUser by user id
+   * @param {string} userId The user to look for
+   * @return {object}
+   */
+  getGroupUserByUserId(userId) {
+    return this.groupsUsers.find(groupUser => groupUser.userId === userId);
+  }
+
+  /**
+   * Get groupUser by id
+   * @param {string} id The group user id
+   * @return {object}
+   */
+  getById(id) {
+    return this.items.find(groupUser => groupUser.id === id);
   }
 }
 

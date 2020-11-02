@@ -159,6 +159,7 @@ class ApiClient {
    * @param {string} id most likely a uuid
    * @param {Object} body (will be converted to JavaScript Object Notation (JSON) string)
    * @param {Object} [urlOptions] Optional url parameters for example {"contain[something]": "1"}
+   * @param {Boolean?} [dryRun] optional, default false, checks if the validity of the operation prior real update
    * @throws {TypeError} if id is empty or not a string
    * @throws {TypeError} if body is empty or cannot converted to valid JSON string
    * @throws {PassboltServiceUnavailableError} if service is not reachable
@@ -167,10 +168,21 @@ class ApiClient {
    * @returns {Promise<*>}
    * @public
    */
-  async update(id, body, urlOptions) {
+  async update(id, body, urlOptions, dryRun) {
     this.assertValidId(id);
-    const url = this.buildUrl(`${this.baseUrl}/${id}`, urlOptions || {});
-    const bodyString = this.buildBody(body);
+    let url;
+    if (typeof dryRun === 'undefined') {
+      dryRun = false;
+    }
+    if (!dryRun) {
+      url = this.buildUrl(`${this.baseUrl}/${id}`, urlOptions || {});
+    } else {
+      url = this.buildUrl(`${this.baseUrl}/${id}/dry-run`, urlOptions || {});
+    }
+    let bodyString;
+    if (body) {
+      bodyString = this.buildBody(body);
+    }
     return this.fetchAndHandleResponse('PUT', url, bodyString);
   }
 

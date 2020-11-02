@@ -14,6 +14,7 @@
 const {GroupEntity} = require('../entity/group/groupEntity');
 const {GroupsCollection} = require('../entity/group/groupsCollection');
 const {GroupDeleteTransferEntity} = require('../entity/group/transfer/groupDeleteTransfer');
+const {GroupUpdateDryRunResultEntity} = require("../entity/group/update/groupUpdateDryRunResultEntity");
 
 const {GroupService} = require('../../service/api/group/groupService');
 const {GroupLocalStorage} = require('../../service/local_storage/groupLocalStorage');
@@ -46,6 +47,28 @@ class GroupModel {
     return groupsCollection;
   }
 
+  //==============================================================
+  // Local storage getters
+  //==============================================================
+
+  /**
+   * Get a group by id
+   *
+   * @param {string} groupId The group id
+   * @return {GroupEntity}
+   */
+  async
+  getById(groupId) {
+    const localGroup = await GroupLocalStorage.getGroupById(groupId);
+    if (localGroup) {
+      return new GroupEntity(localGroup);
+    }
+  };
+
+  //==============================================================
+  // CRUD
+  //==============================================================
+
   /**
    * Find all groups
    *
@@ -59,9 +82,6 @@ class GroupModel {
     return new GroupsCollection(groupsDto);
   }
 
-  //==============================================================
-  // CRUD
-  //==============================================================
   /**
    * Create a group using Passbolt API and add result to local storage
    *
@@ -78,15 +98,28 @@ class GroupModel {
   }
 
   /**
+   * Simulate update a group using Passbolt API
+   *
+   * @param {GroupUpdateEntity} groupUpdateEntity
+   * @returns {Promise<GroupUpdateDryRunResultEntity>}
+   * @public
+   */
+  async updateDryRun(groupUpdateEntity) {
+    const data = groupUpdateEntity.toDto();
+    const groupUpdateDryRunResultDto = await this.groupService.updateDryRun(groupUpdateEntity.id, data);
+    return new GroupUpdateDryRunResultEntity(groupUpdateDryRunResultDto);
+  }
+
+  /**
    * Update a group using Passbolt API and add result to local storage
    *
-   * @param {GroupEntity} groupEntity
+   * @param {GroupUpdateEntity} groupUpdateEntity
    * @returns {Promise<GroupEntity>}
    * @public
    */
-  async update(groupEntity) {
-    const data = groupEntity.toDto({groups_users: true});
-    const groupDto = await this.groupService.update(groupEntity.id, data);
+  async update(groupUpdateEntity) {
+    const data = groupUpdateEntity.toDto();
+    const groupDto = await this.groupService.update(groupUpdateEntity.id, data);
     const updatedGroupEntity = new GroupEntity(groupDto);
     await GroupLocalStorage.updateGroup(updatedGroupEntity);
     return updatedGroupEntity;

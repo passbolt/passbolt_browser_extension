@@ -192,11 +192,12 @@ class EntitySchema {
       case 'integer':
         // Note - Min / max supported, not needed in passbolt
       case 'boolean':
+      case 'blob':
       case 'null':
         // No additional checks
         break;
       default:
-        throw new TypeError(`Could not validate property ${propName}. Unsuported prop type ${propSchema.type}`);
+        throw new TypeError(`Could not validate property ${propName}. Unsupported prop type ${propSchema.type}`);
     }
 
     return prop;
@@ -329,6 +330,8 @@ class EntitySchema {
         return typeof prop === 'object';
       case 'array':
         return Array.isArray(prop);
+      case 'blob':
+        return prop instanceof Blob;
       default:
         throw new TypeError('EntitySchema validation type not supported.');
     }

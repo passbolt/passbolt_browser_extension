@@ -58,7 +58,6 @@ class ApiClient {
 
   /**
    * @returns {Object} fetchOptions
-   * @private
    */
   buildFetchOptions() {
     return {
@@ -240,8 +239,8 @@ class ApiClient {
    * @private
    */
   assertBody(body) {
-    if (typeof body !== 'string') {
-      new TypeError(`ApiClient.assertBody error: body should be a string.`);
+    if (typeof body !== 'string' && !(body instanceof FormData)) {
+      new TypeError(`ApiClient.assertBody error: body should be a string or an instance of FormData.`);
     }
   }
 
@@ -300,7 +299,7 @@ class ApiClient {
    *
    * @param {string} method example 'GET', 'POST'
    * @param {URL} url object
-   * @param {string} [body] (optional)
+   * @param {*} [body] (optional)
    * @param {Object} [options] (optional) more fetch options
    * @throws {TypeError} if method, url are not defined or of the wrong type
    * @throws {PassboltServiceUnavailableError} if service is not reachable

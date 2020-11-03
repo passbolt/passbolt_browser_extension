@@ -177,6 +177,30 @@ class UserService extends AbstractService {
   }
 
   /**
+   * Update a user avatar using Passbolt API
+   *
+   * @param {String} userId uuid
+   * @param {Blob} file the file to upload
+   * @param {string} filename the filename
+   * @returns {Promise<*>} Response body
+   * @throw {TypeError} if user id is not a valid uuid
+   * @public
+   */
+  async updateAvatar(userId, file, filename) {
+    this.assertValidId(userId);
+    this.assertNonEmptyData(file);
+    this.assertNonEmptyData(filename);
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${userId}`);
+    const body = new FormData();
+    body.append("profile[avatar][file]", file, filename);
+    const fetchOptions = this.apiClient.buildFetchOptions();
+    // It is required to let this property unset in order to let the browser determine it by itself and set the additional variable boundary required by the API to parse the payload.
+    delete fetchOptions.headers['content-type'];
+    const response = await this.apiClient.fetchAndHandleResponse("POST", url, body, fetchOptions);
+    return response.body;
+  }
+
+  /**
    * Delete a user using Passbolt API
    *
    * @param {string} userId uuid

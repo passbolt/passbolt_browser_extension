@@ -31,6 +31,8 @@ class App extends Component {
             "/app/folders/view/:filterByFolderId",
             "/app/passwords/view/:selectedResourceId",
             "/app/passwords",
+            "/app/settings",
+            "/app/settings/profile",
             "/app/users/view/:selectedUserId",
             "/app/users",
             "/",

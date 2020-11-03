@@ -12,6 +12,7 @@ const {User} = require('../model/user');
 const {UserModel} = require('../model/user/userModel');
 const {UserEntity} = require('../model/entity/user/userEntity');
 const {UserDeleteTransferEntity} = require('../model/entity/user/transfer/userDeleteTransfer');
+const {AvatarUpdateEntity} = require("../model/entity/avatar/update/avatarUpdateEntity");
 
 const listen = function (worker) {
 
@@ -176,6 +177,27 @@ const listen = function (worker) {
       const userModel = new UserModel(clientOptions);
       const userEntity = new UserEntity(userDto);
       const updatedUser = await userModel.update(userEntity);
+      worker.port.emit(requestId, 'SUCCESS', updatedUser);
+    } catch(error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Update a user avatar
+   *
+   * @listens passbolt.users.update-avatar
+   * @param requestId {uuid} The request identifier
+   * @param avatarBase64UpdateDto {object} The avatar dto
+   *  {fileBase64: <string>, mimeType: <string>, filename: <string>}
+   */
+  worker.port.on('passbolt.users.update-avatar', async function (requestId, userId, avatarBase64UpdateDto) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const userModel = new UserModel(clientOptions);
+      const avatarUpdateEntity = AvatarUpdateEntity.createFromFileBase64(avatarBase64UpdateDto);
+      const updatedUser = await userModel.updateAvatar(userId, avatarUpdateEntity);
       worker.port.emit(requestId, 'SUCCESS', updatedUser);
     } catch(error) {
       console.error(error);

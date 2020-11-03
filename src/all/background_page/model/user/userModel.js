@@ -124,6 +124,19 @@ class UserModel {
   }
 
   /**
+   * Update a user using Passbolt API and add result to local storage
+   *
+   * @param {string} userId The user id to update the avatar for
+   * @param {AvatarUpdateEntity} avatarUpdateEntity The avatar update entity
+   * @returns {Promise<UserEntity>}
+   * @public
+   */
+  async updateAvatar(userId, avatarUpdateEntity) {
+    const userDto = await this.userService.updateAvatar(userId, avatarUpdateEntity.file, avatarUpdateEntity.filename);
+    return new UserEntity(userDto);
+  }
+
+  /**
    * Check if a user can be deleted
    *
    * A user can not be deleted if:

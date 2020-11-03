@@ -16,24 +16,24 @@ const {EntitySchema} = require('../../abstract/entitySchema');
 const {EntityCollectionError} = require('../../abstract/entityCollectionError');
 const {SecretEntity} = require('../secretEntity');
 
-const ENTITY_NAME = 'UserResourceSecrets';
+const ENTITY_NAME = 'ResourceSecrets';
 
 const RULE_UNIQUE_ID = 'unique_id';
 const RULE_UNIQUE_USER_ID = 'unique_user_id';
 const RULE_SAME_RESOURCE = 'same_resource';
 
-class UserResourceSecretsCollection extends EntityCollection {
+class ResourceSecretsCollection extends EntityCollection {
   /**
-   * UserResourceSecrets Collection constructor
+   * ResourceSecrets Collection constructor
    *
-   * @param {Object} userResourceSecretsCollectionDto secrets DTO
+   * @param {Object} resourceSecretsCollectionDto secrets DTO
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(userResourceSecretsCollectionDto) {
+  constructor(resourceSecretsCollectionDto) {
     super(EntitySchema.validate(
-      UserResourceSecretsCollection.ENTITY_NAME,
-      userResourceSecretsCollectionDto,
-      UserResourceSecretsCollection.getSchema()
+      ResourceSecretsCollection.ENTITY_NAME,
+      resourceSecretsCollectionDto,
+      ResourceSecretsCollection.getSchema()
     ));
 
     // Note: there is no "multi-item" validation
@@ -84,7 +84,7 @@ class UserResourceSecretsCollection extends EntityCollection {
     for(; i < length; i++) {
       let existingSecret = this.secrets[i];
       if (existingSecret.id && existingSecret.id === secret.id) {
-        throw new EntityCollectionError(i, UserResourceSecretsCollection.RULE_UNIQUE_ID, `Secret id ${secret.id} already exists.`);
+        throw new EntityCollectionError(i, ResourceSecretsCollection.RULE_UNIQUE_ID, `Secret id ${secret.id} already exists.`);
       }
     }
   }
@@ -104,7 +104,7 @@ class UserResourceSecretsCollection extends EntityCollection {
     for(; i < length; i++) {
       let existingSecret = this.secrets[i];
       if (existingSecret.userId && existingSecret.userId === secret.userId) {
-        throw new EntityCollectionError(i, UserResourceSecretsCollection.RULE_UNIQUE_USER_ID, `Secret for user id ${secret.userId} already exists.`);
+        throw new EntityCollectionError(i, ResourceSecretsCollection.RULE_UNIQUE_USER_ID, `Secret for user id ${secret.userId} already exists.`);
       }
     }
   }
@@ -124,7 +124,7 @@ class UserResourceSecretsCollection extends EntityCollection {
     }
     if (secretEntity.resourceId !== this.secrets[0].resourceId) {
       const msg = `The collection is already used for another resource with id ${this.secrets[0].resourceId}.`;
-      throw new EntityCollectionError(0, UserResourceSecretsCollection.RULE_SAME_RESOURCE, msg);
+      throw new EntityCollectionError(0, ResourceSecretsCollection.RULE_SAME_RESOURCE, msg);
     }
   }
 
@@ -137,7 +137,7 @@ class UserResourceSecretsCollection extends EntityCollection {
    */
   push(secret) {
     if (!secret || typeof secret !== 'object') {
-      throw new TypeError(`UserResourceSecretsCollection push parameter should be an object.`);
+      throw new TypeError(`ResourceSecretsCollection push parameter should be an object.`);
     }
     if (secret instanceof SecretEntity) {
       secret = secret.toDto(); // clone
@@ -156,7 +156,7 @@ class UserResourceSecretsCollection extends EntityCollection {
   // Static getters
   // ==================================================
   /**
-   * UserResourceSecretsCollection.ENTITY_NAME
+   * ResourceSecretsCollection.ENTITY_NAME
    * @returns {string}
    */
   static get ENTITY_NAME() {
@@ -164,7 +164,7 @@ class UserResourceSecretsCollection extends EntityCollection {
   }
 
   /**
-   * UserResourceSecretsCollection.RULE_UNIQUE_ID
+   * ResourceSecretsCollection.RULE_UNIQUE_ID
    * @returns {string}
    */
   static get RULE_UNIQUE_ID() {
@@ -172,7 +172,7 @@ class UserResourceSecretsCollection extends EntityCollection {
   }
 
   /**
-   * UserResourceSecretsCollection.RULE_UNIQUE_USER_ID
+   * ResourceSecretsCollection.RULE_UNIQUE_USER_ID
    * @returns {string}
    */
   static get RULE_UNIQUE_USER_ID() {
@@ -180,7 +180,7 @@ class UserResourceSecretsCollection extends EntityCollection {
   }
 
   /**
-   * UserResourceSecretsCollection.RULE_SAME_RESOURCE
+   * ResourceSecretsCollection.RULE_SAME_RESOURCE
    * @returns {string}
    */
   static get RULE_SAME_RESOURCE() {
@@ -188,4 +188,4 @@ class UserResourceSecretsCollection extends EntityCollection {
   }
 }
 
-exports.UserResourceSecretsCollection = UserResourceSecretsCollection;
+exports.ResourceSecretsCollection = ResourceSecretsCollection;

@@ -14,13 +14,13 @@
 const __ = require('../../sdk/l10n').get;
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
+const {ResourceSecretsCollection} = require("../../model/entity/secret/resource/resourceSecretsCollection");
 
 const {Keyring} = require('../../model/keyring');
 const {Crypto} = require('../../model/crypto');
 const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
 const {ResourceModel} = require('../../model/resource/resourceModel');
 const {UserModel} = require('../../model/user/userModel');
-const {SecretsCollection} = require('../../model/entity/secret/secretsCollection');
 
 class ResourceUpdateController {
   /**
@@ -129,7 +129,7 @@ class ResourceUpdateController {
    * @param {string|Object} plaintextDto
    * @param {array} usersIds
    * @param {openpgp.key.Key} privateKey
-   * @returns {Promise<SecretsCollection>}
+   * @returns {Promise<ResourceSecretsCollection>}
    */
   async encryptSecrets(plaintextDto, usersIds, privateKey) {
     const secrets = [];
@@ -141,7 +141,7 @@ class ResourceUpdateController {
         await progressController.update(this.worker, i+2, __("Encrypting"));
       }
     }
-    return new SecretsCollection(secrets);
+    return new ResourceSecretsCollection(secrets);
   }
 }
 

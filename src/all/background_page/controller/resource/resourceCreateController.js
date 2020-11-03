@@ -20,7 +20,7 @@ const {User} = require('../../model/user');
 const {FolderModel} = require('../../model/folder/folderModel');
 const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
 const {ResourceModel} = require('../../model/resource/resourceModel');
-const {SecretsCollection}  = require('../../model/entity/secret/secretsCollection');
+const {ResourceSecretsCollection} = require("../../model/entity/secret/resource/resourceSecretsCollection");
 
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
@@ -74,7 +74,7 @@ class ResourceCreateController {
       // Encrypt and sign
       await progressController.update(this.worker, this.progress++, __('Encrypting secret'));
       const secret = await this.crypto.encrypt(plaintext, User.getInstance().get().id, privateKey);
-      resource.secrets = new SecretsCollection([{data:secret}]);
+      resource.secrets = new ResourceSecretsCollection([{data:secret}]);
 
       // Save
       await progressController.update(this.worker, this.progress++, __('Creating password'));

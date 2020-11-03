@@ -39,7 +39,7 @@ class GroupModel {
    * @return {GroupsCollection}
    * @public
    */
-  async updateLocalStorage () {
+  async updateLocalStorage() {
     const contain = {groups_users: true, my_group_user: true, modifier: false};
     const groupDtos = await this.groupService.findAll(contain);
     const groupsCollection = new GroupsCollection(groupDtos);
@@ -47,9 +47,11 @@ class GroupModel {
     return groupsCollection;
   }
 
-  //==============================================================
-  // Local storage getters
-  //==============================================================
+  /*
+   * ==============================================================
+   *  Local storage getters
+   * ==============================================================
+   */
 
   /**
    * Get a group by id
@@ -57,17 +59,18 @@ class GroupModel {
    * @param {string} groupId The group id
    * @return {GroupEntity}
    */
-  async
-  getById(groupId) {
+  async getById(groupId) {
     const localGroup = await GroupLocalStorage.getGroupById(groupId);
     if (localGroup) {
       return new GroupEntity(localGroup);
     }
-  };
+  }
 
-  //==============================================================
-  // CRUD
-  //==============================================================
+  /*
+   * ==============================================================
+   *  CRUD
+   * ==============================================================
+   */
 
   /**
    * Find all groups
@@ -78,7 +81,7 @@ class GroupModel {
    * @returns {Promise<GroupsCollection>}
    */
   async findAll(contains, filters, orders) {
-    let groupsDto = await this.groupService.findAll(contains, filters, orders);
+    const groupsDto = await this.groupService.findAll(contains, filters, orders);
     return new GroupsCollection(groupsDto);
   }
 
@@ -141,12 +144,14 @@ class GroupModel {
    */
   async deleteDryRun(groupId, transfer) {
     try {
-      let deleteData = (transfer && transfer instanceof GroupDeleteTransferEntity) ? transfer.toDto() : {};
+      const deleteData = (transfer && transfer instanceof GroupDeleteTransferEntity) ? transfer.toDto() : {};
       await this.groupService.delete(groupId, deleteData, true);
-    } catch(error) {
+    } catch (error) {
       if (error instanceof PassboltApiFetchError && error.data.code === 400 && error.data.body.errors) {
-        // recast generic 400 error into a delete dry run error
-        // allowing validation of the returned entities and reuse down the line to transfer permissions
+        /*
+         * recast generic 400 error into a delete dry run error
+         * allowing validation of the returned entities and reuse down the line to transfer permissions
+         */
         throw new DeleteDryRunError(error.message, error.data.body.errors);
       }
       throw error;
@@ -163,12 +168,14 @@ class GroupModel {
    */
   async delete(groupId, transfer) {
     try {
-      let deleteData = (transfer && transfer instanceof GroupDeleteTransferEntity) ? transfer.toDto() : {};
+      const deleteData = (transfer && transfer instanceof GroupDeleteTransferEntity) ? transfer.toDto() : {};
       await this.groupService.delete(groupId, deleteData);
-    } catch(error) {
+    } catch (error) {
       if (error instanceof PassboltApiFetchError && error.data.code === 400 && error.data.body.errors) {
-        // recast generic 400 error into a delete dry run error
-        // allowing validation of the returned entities and reuse down the line to transfer permissions
+        /*
+         * recast generic 400 error into a delete dry run error
+         * allowing validation of the returned entities and reuse down the line to transfer permissions
+         */
         throw new DeleteDryRunError(error.message, error.data.body.errors);
       }
       throw error;

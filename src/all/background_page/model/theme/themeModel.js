@@ -12,6 +12,7 @@
  */
 const {ThemesCollection} = require("../entity/theme/themesCollection");
 const {AccountSettingsService} = require("../../service/api/accountSettings/accountSettingsService");
+const Config = require('../config');
 
 class ThemeModel {
   /**
@@ -31,13 +32,30 @@ class ThemeModel {
   /**
    * Find all themes
    *
-   * @returns {Promise<*>} response body
+   * @returns {Promise<ThemesCollection>} The collection of available themes
    * @throws {Error} if options are invalid or API error
    * @public
    */
   async findAll() {
     const themesDto = await this.accountSettingsService.findAllThemes();
     return new ThemesCollection(themesDto);
+  }
+
+  //==============================================================
+  // CRUDs
+  //==============================================================
+
+  /**
+   * Change the current user theme
+   *
+   * @param {ChangeThemeEntity} changeThemeEntity The theme change entity
+   * @returns {Promise<void>} response body
+   * @throws {Error} if options are invalid or API error
+   * @public
+   */
+  async change(changeThemeEntity) {
+    await this.accountSettingsService.change(changeThemeEntity.name);
+    Config.write('user.settings.theme', changeThemeEntity.name);
   }
 }
 

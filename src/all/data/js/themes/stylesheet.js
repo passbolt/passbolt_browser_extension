@@ -77,7 +77,8 @@
     }
 
     getThemePath() {
-      return `css/themes/${this.theme}/ext_app.min.css`;
+      const addonUrl = document.location.origin;
+      return `${addonUrl}/data/css/themes/${this.theme}/ext_app.min.css`;
     }
   }
 

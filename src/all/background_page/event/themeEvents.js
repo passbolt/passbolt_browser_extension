@@ -12,6 +12,7 @@
  */
 const {User} = require('../model/user');
 const {ThemeModel} = require("../model/theme/themeModel");
+const {ChangeThemeEntity} = require("../model/entity/theme/change/ChangeThemeEntity");
 
 const listen = async function (worker) {
   /*
@@ -26,6 +27,25 @@ const listen = async function (worker) {
       const themeModel = new ThemeModel(clientOptions);
       const themes = await themeModel.findAll();
       worker.port.emit(requestId, 'SUCCESS', themes);
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Change the current user theme
+   *
+   * @listens passbolt.themes.change
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.themes.change', async function (requestId, name) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const themeModel = new ThemeModel(clientOptions);
+      const changeThemeEntity = new ChangeThemeEntity({name});
+      await themeModel.change(changeThemeEntity);
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);

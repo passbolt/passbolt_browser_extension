@@ -43,6 +43,7 @@ events.setupbootstrap = require('./event/setupBootstrapEvents');
 events.share = require('./event/shareEvents');
 events.tab = require('./event/tabEvents');
 events.tag = require('./event/tagEvents');
+events.theme = require('./event/themeEvents');
 events.user = require('./event/userEvents');
 events.siteSettings = require('./event/siteSettingsEvents');
 

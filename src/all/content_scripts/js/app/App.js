@@ -33,6 +33,7 @@ class App extends Component {
             "/app/passwords",
             "/app/settings",
             "/app/settings/profile",
+            "/app/settings/theme",
             "/app/users/view/:selectedUserId",
             "/app/users",
             "/",

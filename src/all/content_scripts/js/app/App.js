@@ -32,6 +32,7 @@ class App extends Component {
             "/app/passwords/view/:selectedResourceId",
             "/app/passwords",
             "/app/settings",
+            "/app/settings/keys",
             "/app/settings/profile",
             "/app/settings/theme",
             "/app/users/view/:selectedUserId",

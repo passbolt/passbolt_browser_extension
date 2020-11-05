@@ -6,7 +6,8 @@
  */
 var Log = require('../model/log').Log;
 var tabsController = require('../controller/tabsController');
-const {User} = require('../model/user');
+const {Keyring} = require('../model/keyring');
+const keyring = new Keyring();
 
 var listen = function (worker) {
 
@@ -30,6 +31,21 @@ var listen = function (worker) {
    */
   worker.port.on('passbolt.debug.log', function (data) {
     Log.write({level: 'error', message: data});
+  });
+
+  /*
+   * Get the user private key object
+   *
+   * @listens passbolt.keyring.private.get
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.keyring.private.get', function (requestId) {
+    const info = keyring.findPrivate();
+    if (typeof info !== 'undefined') {
+      worker.port.emit(requestId, 'SUCCESS', info);
+    } else {
+      worker.port.emit(requestId, 'ERROR');
+    }
   });
 
 };

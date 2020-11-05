@@ -65,38 +65,6 @@ const listen = function (worker) {
   });
 
   /*
-   * Get the user private key object
-   *
-   * @listens passbolt.keyring.private.get
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.keyring.private.get', function (requestId) {
-    const info = keyring.findPrivate();
-    if (typeof info !== 'undefined') {
-      worker.port.emit(requestId, 'SUCCESS', info);
-    } else {
-      worker.port.emit(requestId, 'ERROR');
-    }
-  });
-
-  /*
-   * Get the user public key in armored format
-   *
-   * @listens passbolt.keyring.public.get_armored
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.keyring.public.get_armored', async function (requestId) {
-    const info = keyring.findPrivate();
-    if (typeof info !== 'undefined') {
-      const publicKeyArmored = await keyring.extractPublicKey(info.key);
-      if (typeof publicKeyArmored !== 'undefined') {
-        return worker.port.emit(requestId, 'SUCCESS', publicKeyArmored);
-      }
-    }
-    worker.port.emit(requestId, 'ERROR');
-  });
-
-  /*
    * Get the server's public key.
    *
    * @listens passbolt.keyring.server.get
@@ -262,6 +230,50 @@ const listen = function (worker) {
 
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', e.message);
+    }
+  });
+
+  /*
+   * Offer to users to download their public key
+   *
+   * @listens passbolt.keyring.download-my-public-key
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.keyring.download-my-public-key', async function (requestId) {
+    let publicKeyArmored;
+    let filename = "passbolt_public.asc";
+    try {
+      const privateKeyInfo = await keyring.findPrivate();
+      if (privateKeyInfo) {
+        publicKeyArmored = await keyring.extractPublicKey(privateKeyInfo.key);
+      }
+      if (!publicKeyArmored) {
+        throw new Error('Public key not found.');
+      }
+      await fileController.saveFile(filename, publicKeyArmored, "text/plain", worker.tab.id);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch(error) {
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+ * Offer to users to download their private key
+ *
+ * @listens passbolt.keyring.download-my-private-key
+ * @param requestId {uuid} The request identifier
+ */
+  worker.port.on('passbolt.keyring.download-my-private-key', async function (requestId) {
+    let filename = "passbolt_private.asc";
+    try {
+      const privateKeyInfo = await keyring.findPrivate();
+      if (!privateKeyInfo) {
+        throw new Error('Private key not found.');
+      }
+      await fileController.saveFile(filename, privateKeyInfo.key, "text/plain", worker.tab.id);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch(error) {
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 

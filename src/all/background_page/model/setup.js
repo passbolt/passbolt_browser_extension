@@ -175,7 +175,7 @@ Setup.prototype.save = function(data) {
 
     // Build request data.
     var requestData = {
-      'authenticationToken': {
+      'authenticationtoken': {
         'token': data.settings.token
       },
       'gpgkey': {

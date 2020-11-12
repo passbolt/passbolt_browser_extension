@@ -19,7 +19,7 @@ const ENTITY_NAME = 'gpgkey';
 const FINGERPRINT_MIN_LENGTH = 40;
 const FINGERPRINT_MAX_LENGTH = 40;
 const KEY_ID_MIN_LENGTH = 8;
-const KEY_ID_MAX_LENGTH = 8;
+const KEY_ID_MAX_LENGTH = 16;
 
 class GpgkeyEntity extends Entity {
   /**

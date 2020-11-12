@@ -33,8 +33,6 @@ class GroupsUpdateController {
    */
   constructor(worker, requestId, clientOptions) {
     this.worker = worker;
-    this.requestId = requestId;
-    this.clientOptions = clientOptions;
     this.groupModel = new GroupModel(clientOptions);
     this.keyring = new Keyring();
     this.crypto = new Crypto(this.keyring);

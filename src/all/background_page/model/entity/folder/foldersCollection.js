@@ -107,6 +107,18 @@ class FoldersCollection extends EntityCollection {
     return new FoldersCollection(this._items.filter(f => f.isOwner()));
   }
 
+  /**
+   * Get an entity folder parent path.
+   * @param {FolderEntity|ResourceEntity} entity
+   * @returns {string}
+   */
+  getFolderParentPath(entity) {
+    return this.getAllParents(entity).items
+      .reverse()
+      .map(folderParentEntity => folderParentEntity.name)
+      .join("/");
+  }
+
   // ==================================================
   // Finders
   // ==================================================

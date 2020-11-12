@@ -245,7 +245,7 @@ class EntitySchema {
     }
     if (propSchema.maxLength) {
       if (!EntitySchema.isValidStringLength(prop, 0, propSchema.maxLength)) {
-        validationError.addError(propName, 'maxLength', `The ${propName} should be ${propSchema.minLength} character in length maximum.`);
+        validationError.addError(propName, 'maxLength', `The ${propName} should be ${propSchema.maxLength} character in length maximum.`);
       }
     }
     if (propSchema.pattern) {
@@ -368,6 +368,8 @@ class EntitySchema {
         return Validator.isURL(prop);
       case 'x-hex-color':
         return Validator.isHexColor(prop);
+      case 'x-base64':
+        return Validator.isBase64(prop);
 
       // Not supported - Not needed
       default:

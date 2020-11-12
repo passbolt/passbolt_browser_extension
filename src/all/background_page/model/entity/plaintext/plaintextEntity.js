@@ -60,6 +60,15 @@ class PlaintextEntity extends Entity {
     return this._props.password || null;
   }
 
+  /**
+   * Return description prop if any
+   *
+   * @returns {(string|null)} description
+   */
+  get description() {
+    return this._props.description || null;
+  }
+
   // ==================================================
   // Static properties getters
   // ==================================================

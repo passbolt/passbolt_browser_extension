@@ -12,9 +12,7 @@
  * @since         2.13.0
  */
 import {FoldersCollection} from "./foldersCollection";
-import {EntityValidationError} from "../abstract/entityValidationError";
 import {EntitySchema} from "../abstract/entitySchema";
-import {EntityCollection} from "../abstract/entityCollection";
 import Validator from 'validator';
 
 // Reset the modules before each test.

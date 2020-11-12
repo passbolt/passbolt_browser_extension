@@ -10,6 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+const {splitBySize} = require("../../utils/array/splitBySize");
 const {ResourceEntity} = require('../entity/resource/resourceEntity');
 const {ResourcesCollection} = require('../entity/resource/resourcesCollection');
 const {ResourceLocalStorage} = require('../../service/local_storage/resourceLocalStorage');
@@ -23,6 +24,8 @@ const {ResourceTypeModel} = require('../../model/resourceType/resourceTypeModel'
 
 const {TagsCollection} = require('../../model/entity/tag/tagsCollection');
 const {MoveService} = require('../../service/api/move/moveService');
+
+const BULK_OPERATION_SIZE = 5;
 
 class ResourceModel {
   /**
@@ -79,14 +82,8 @@ class ResourceModel {
    */
   async getAllByIds(resourceIds) {
     const localResources = await ResourceLocalStorage.get();
-    const resourcesCollection = new ResourcesCollection([]);
-    for (let i in resourceIds) {
-      let resourceDto = localResources[i];
-      if (resourceIds.includes(resourceDto.id)) {
-        resourcesCollection.push(resourceDto);
-      }
-    }
-    return resourcesCollection;
+    const filteredResources = localResources.filter(localResource => resourceIds.includes(localResource.id));
+    return new ResourcesCollection(filteredResources);
   };
 
   //==============================================================
@@ -206,6 +203,23 @@ class ResourceModel {
   };
 
   /**
+   * Find all resources for decrypt
+   *
+   * @param {array} resourcesIds resources uuids
+   * @returns {Promise<ResourcesCollection>}
+   */
+  async findAllForDecrypt (resourcesIds) {
+    let resourcesDto = [];
+    // We split the requests in chunks in order to avoid any too long url error.
+    const resourcesIdsChunks = splitBySize(resourcesIds, 80);
+    for (let resourcesIdsChunk of resourcesIdsChunks) {
+      const partialResourcesDto = await this.resourceService.findAll({'secret': true, 'resource-type': true}, {'has-id': resourcesIdsChunk});
+      resourcesDto = [...resourcesDto, ...partialResourcesDto];
+    }
+    return new ResourcesCollection(resourcesDto);
+  };
+
+  /**
    * Find a resource to share
    *
    * @param {string} resourcesId resource uuid
@@ -294,6 +308,55 @@ class ResourceModel {
   }
 
   /**
+   * Delete a bulk of resources
+   * @param {ResourcesCollection} collection The collection of resources to delete
+   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
+   * @returns {Promise<array<ResourceEntity>>}
+   */
+  async bulkDelete(resourcesIds, callbacks) {
+    let result = [];
+
+    // Parallelize the operations by chunk of BULK_OPERATION_SIZE operations.
+    const chunks = splitBySize(resourcesIds, BULK_OPERATION_SIZE);
+    for (let chunkIndex in chunks) {
+      const chunk = chunks[chunkIndex];
+      const promises = chunk.map(async (resourceId, mapIndex) => {
+        const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
+        return this._bulkDelete_deleteResource(resourceId, collectionIndex, callbacks);
+      });
+
+      const bulkPromises = await Promise.allSettled(promises);
+      const intermediateResult = bulkPromises.map(promiseResult => promiseResult.value);
+      result = [...result, ...intermediateResult];
+    }
+
+    return result;
+  }
+
+  /**
+   * Delete a resource for the bulkDelete function.
+   * @param {string} resourceId The resource to delete
+   * @param {int} collectionIndex The index of the resource in the initial collection
+   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
+   * @returns {Promise<ResourceEntity|Error>}
+   * @private
+   */
+  async _bulkDelete_deleteResource(resourceId, collectionIndex, callbacks) {
+    callbacks = callbacks || {};
+    const successCallback = callbacks.successCallback || (() => {});
+    const errorCallback = callbacks.errorCallback || (() => {});
+
+    try {
+      await this.delete(resourceId);
+      successCallback(collectionIndex);
+    } catch(error) {
+      console.error(error);
+      errorCallback(error, collectionIndex);
+      return error;
+    }
+  }
+
+  /**
    * Move a folder using Passbolt API
    *
    * @param {string} resourceId the resource id
@@ -309,6 +372,56 @@ class ResourceModel {
     await ResourceLocalStorage.updateResource(resourceEntity);
 
     return resourceEntity;
+  }
+
+  /**
+   * Create a bulk of resources
+   * @param {ResourcesCollection} collection The collection of resources to import
+   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
+   * @returns {Promise<array<ResourceEntity>>}
+   */
+  async bulkCreate(collection, callbacks) {
+    let result = [];
+
+    // Parallelize the operations by chunk of BULK_OPERATION_SIZE operations.
+    const chunks = splitBySize(collection.resources, BULK_OPERATION_SIZE);
+    for (let chunkIndex in chunks) {
+      const chunk = chunks[chunkIndex];
+      const promises = chunk.map(async (resourceId, mapIndex) => {
+        const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
+        return this._bulkCreate_createResource(resourceId, collectionIndex, callbacks);
+      });
+
+      const bulkPromises = await Promise.allSettled(promises);
+      const intermediateResult = bulkPromises.map(promiseResult => promiseResult.value);
+      result = [...result, ...intermediateResult];
+    }
+
+    return result;
+  }
+
+  /**
+   * Create a resource for the bulkCreate function.
+   * @param {ResourceEntity} resourceEntity The resource to create
+   * @param {int} collectionIndex The index of the resource in the initial collection
+   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
+   * @returns {Promise<ResourceEntity|Error>}
+   * @private
+   */
+  async _bulkCreate_createResource(resourceEntity, collectionIndex, callbacks) {
+    callbacks = callbacks || {};
+    const successCallback = callbacks.successCallback || (() => {});
+    const errorCallback = callbacks.errorCallback || (() => {});
+
+    try {
+      const createdResourceEntity = await this.create(resourceEntity);
+      successCallback(createdResourceEntity, collectionIndex);
+      return createdResourceEntity;
+    } catch(error) {
+      console.error(error);
+      errorCallback(error, collectionIndex);
+      return error;
+    }
   }
 
   //==============================================================

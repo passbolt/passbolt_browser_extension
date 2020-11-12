@@ -10,6 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+const {splitBySize} = require("../../utils/array/splitBySize");
 const {FolderEntity} = require('../entity/folder/folderEntity');
 const {FoldersCollection} = require("../entity/folder/foldersCollection");
 const {FolderLocalStorage} = require('../../service/local_storage/folderLocalStorage');
@@ -20,6 +21,8 @@ const {ShareService} = require('../../service/api/share/shareService');
 const {PermissionEntity} = require('../entity/permission/permissionEntity');
 const {PermissionsCollection} = require('../entity/permission/permissionsCollection');
 const {PermissionChangesCollection} = require("../entity/permission/change/permissionChangesCollection");
+
+const BULK_OPERATION_SIZE = 5;
 
 class FolderModel {
   /**
@@ -39,7 +42,7 @@ class FolderModel {
    *
    * @return {FoldersCollection}
    */
-  async updateLocalStorage () {
+  async updateLocalStorage() {
     const foldersCollection = await this.findAll();
     await FolderLocalStorage.set(foldersCollection);
     return foldersCollection;
@@ -49,6 +52,17 @@ class FolderModel {
   // Local storage getters
   // ============================================
   /**
+   * Return a folder for a given id from the local storage
+   *
+   * @param {string} folderId uuid
+   * @returns {Promise<FolderEntity|null>}
+   */
+  async getById(folderId) {
+    const folderDto = await FolderLocalStorage.getFolderById(folderId);
+    return folderDto ? new FolderEntity(folderDto) : null;
+  }
+
+  /**
    * Get a folder collection from the local storage by ids
    * Also include their children
    *
@@ -57,19 +71,21 @@ class FolderModel {
    * @return {FoldersCollection}
    */
   async getAllByIds(folderIds, withChildren) {
-    const foldersDto = await FolderLocalStorage.get();
-    const inputCollection = new FoldersCollection(foldersDto);
     const outputCollection = new FoldersCollection([]);
-    inputCollection.items.forEach((folderDto) => {
-      if (folderIds.includes(folderDto.id)) {
-        outputCollection.push(folderDto);
-      }
-    });
-    if (withChildren) {
-      for (let i in folderIds) {
-        let folderId = folderIds[i];
-        let children = FoldersCollection.getAllChildren(folderId, inputCollection, outputCollection);
-        outputCollection.merge(children);
+    const foldersDto = await FolderLocalStorage.get();
+    if (foldersDto) {
+      const inputCollection = new FoldersCollection(foldersDto);
+      inputCollection.items.forEach((folderDto) => {
+        if (folderIds.includes(folderDto.id)) {
+          outputCollection.push(folderDto);
+        }
+      });
+      if (withChildren) {
+        for (let i in folderIds) {
+          let folderId = folderIds[i];
+          let children = FoldersCollection.getAllChildren(folderId, inputCollection, outputCollection);
+          outputCollection.merge(children);
+        }
       }
     }
     return outputCollection;
@@ -297,6 +313,56 @@ class FolderModel {
       // update storage and get updated sub folders list in case some are deleted
       // TODO: optimize update only if folder contains subfolders
       await this.updateLocalStorage();
+    }
+  }
+
+  /**
+   * Create a bulk of folders
+   * @param {FoldersCollection} collection The collection of folders
+   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
+   * @returns {Promise<array<FolderEntity>>}
+   */
+  async bulkCreate(collection, callbacks) {
+    let result = [];
+
+    // Parallelize the operations by chunk of BULK_OPERATION_SIZE operations.
+    const chunks = splitBySize(collection.folders, BULK_OPERATION_SIZE);
+    for (let chunkIndex in chunks) {
+      const chunk = chunks[chunkIndex];
+      const promises = chunk.map(async (folderEntity, mapIndex) => {
+        const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
+        return this._bulkCreate_createFolder(folderEntity, collectionIndex, callbacks);
+      });
+
+      const bulkPromises = await Promise.allSettled(promises);
+      const intermediateResult = bulkPromises.map(promiseResult => promiseResult.value);
+      result = [...result, ...intermediateResult];
+    }
+
+    return result;
+  }
+
+  /**
+   * Create a folder for the bulkCreate function.
+   * @param {FolderEntity} folderEntity The folder to create
+   * @param {int} collectionIndex The index of the folder in the initial collection
+   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
+   * @returns {Promise<FolderEntity|Error>}
+   * @private
+   */
+  async _bulkCreate_createFolder(folderEntity, collectionIndex, callbacks) {
+    callbacks = callbacks || {};
+    const successCallback = callbacks.successCallback || (() => {});
+    const errorCallback = callbacks.errorCallback || (() => {});
+
+    try {
+      const createdFolderEntity = await this.create(folderEntity);
+      successCallback(createdFolderEntity, collectionIndex);
+      return createdFolderEntity;
+    } catch(error) {
+      console.error(error);
+      errorCallback(error, collectionIndex);
+      return error;
     }
   }
 

@@ -45,7 +45,7 @@ class ResourceTypeModel {
    * @return {ResourceTypesCollection}
    */
   async getAll() {
-    const resourceTypeDtos = await ResourceTypeLocalStorage.get();
+    const resourceTypeDtos = await ResourceTypeLocalStorage.get() || [];
     return new ResourceTypesCollection(resourceTypeDtos);
   };
 

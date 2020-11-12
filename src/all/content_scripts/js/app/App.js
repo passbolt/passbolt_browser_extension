@@ -29,6 +29,7 @@ class App extends Component {
         <Switch>
           <Route exact path={[
             "/app/folders/view/:filterByFolderId",
+            "/app/groups/view/:selectedGroupId",
             "/app/passwords/view/:selectedResourceId",
             "/app/passwords",
             "/app/settings",

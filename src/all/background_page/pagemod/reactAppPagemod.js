@@ -51,8 +51,8 @@ ReactApp.init = function () {
       app.events.comment.listen(worker);
       app.events.tag.listen(worker);
       app.events.favorite.listen(worker);
-      app.events.importPasswords.listen(worker);
-      app.events.exportPasswords.listen(worker);
+      app.events.importResources.listen(worker);
+      app.events.exportResources.listen(worker);
       app.events.actionLogs.listen(worker);
       app.events.multiFactorAuthentication.listen(worker);
       app.events.theme.listen(worker);

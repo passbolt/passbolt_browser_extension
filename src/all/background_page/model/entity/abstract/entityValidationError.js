@@ -20,6 +20,7 @@ class EntityValidationError extends Error {
   constructor(message) {
     message = message || 'Entity validation error.';
     super(message);
+    this.name = 'EntityValidationError';
     this.details = {};
   }
 

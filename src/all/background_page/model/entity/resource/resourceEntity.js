@@ -567,7 +567,7 @@ class ResourceEntity extends Entity {
   }
 
   /**
-   * FolderEntity.ALL_CONTAIN_OPTIONS
+   * ResourceEntity.ALL_CONTAIN_OPTIONS
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {

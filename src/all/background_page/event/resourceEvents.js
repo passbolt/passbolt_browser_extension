@@ -101,7 +101,7 @@ const listen = function (worker) {
       // TODO DeleteResourcesController with progress dialog if resourceIds > 1
       const clientOptions = await User.getInstance().getApiClientOptions();
       const resourceModel = new ResourceModel(clientOptions);
-      await resourceModel.deleteAll(resourcesIds);
+      await resourceModel.bulkDelete(resourcesIds);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);

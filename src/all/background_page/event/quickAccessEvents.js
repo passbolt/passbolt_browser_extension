@@ -40,7 +40,7 @@ const listen = function (worker) {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const controller = new SecretDecryptController(worker, requestId, apiClientOptions);
-      const {plaintext, resource} = await controller.main(resourceId);
+      const {plaintext, resource} = await controller.main(resourceId, false);
 
       // Define what to do autofill
       let username = resource.username || '';

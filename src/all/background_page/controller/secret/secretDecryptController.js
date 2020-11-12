@@ -36,7 +36,7 @@ class SecretDecryptController {
    * @param {string} resourceId the resource uuid
    * @return {Promise<Object>} e.g. {resource: <ResourceEntity>, plaintext:<PlaintextEntity|string>}
    */
-  async main(resourceId) {
+  async main(resourceId, showProgress) {
     const crypto = new Crypto();
     let passphrase;
 
@@ -48,22 +48,30 @@ class SecretDecryptController {
 
     try {
       // Decrypt the private key
-      await progressController.open(this.worker, 'Decrypting...', 2, "Decrypting private key");
+      if (showProgress) {
+        await progressController.open(this.worker, 'Decrypting...', 2, "Decrypting private key");
+      }
       const privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
 
       // Decrypt and deserialize the secret if needed
-      await progressController.update(this.worker, 1, "Decrypting secret");
+      if (showProgress) {
+        await progressController.update(this.worker, 1, "Decrypting secret");
+      }
       const resource = await resourcePromise;
       let plaintext = await crypto.decryptWithKey(resource.secret.data, privateKey);
       plaintext = await this.resourceModel.deserializePlaintext(resource.resourceTypeId, plaintext);
 
       // Wrap up
-      await progressController.update(this.worker, 2, "Complete");
-      await progressController.close(this.worker);
+      if (showProgress) {
+        await progressController.update(this.worker, 2, "Complete");
+        await progressController.close(this.worker);
+      }
       return {plaintext, resource};
     } catch (error) {
       console.error(error);
-      await progressController.close(this.worker);
+      if (showProgress) {
+        await progressController.close(this.worker);
+      }
       throw error;
     }
   }

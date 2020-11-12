@@ -15,11 +15,15 @@ const listen = function (worker) {
    * @listens passbolt.secret.decrypt
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.secret.decrypt', async function (requestId, resourceId) {
+  worker.port.on('passbolt.secret.decrypt', async function (requestId, resourceId, options) {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
+      let showProgress = true;
+      if (options && Object.prototype.hasOwnProperty.call(options, 'showProgress')) {
+        showProgress = options.showProgress;
+      }
       const controller = new SecretDecryptController(worker, requestId, apiClientOptions);
-      const {plaintext} = await controller.main(resourceId);
+      const {plaintext} = await controller.main(resourceId, showProgress);
       worker.port.emit(requestId, 'SUCCESS', plaintext);
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);

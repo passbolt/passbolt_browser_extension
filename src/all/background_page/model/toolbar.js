@@ -5,7 +5,6 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 var User = require('./user').User;
-var Setup = require('./setup').Setup;
 
 /**
  * Toolbar constructor.
@@ -19,22 +18,16 @@ var Toolbar = function () {};
  *
  * Regarding the current user configuration, the results can be :
  * - Plugin installed but not configured, return the public page getting started url;
- * - Plugin installed but partially configured, return the setup url;
  * - Plugin installed and configured, return the passbolt url.
  * @return {string}
  */
-Toolbar.getToolbarUrl = function (tab) {
+Toolbar.getToolbarUrl = function () {
   var url = '',
-    user = User.getInstance(),
-    setup = new Setup();
+    user = User.getInstance();
 
   // The plugin is installed and configured
   if (user.isValid()) {
     url = user.settings.getDomain();
-  }
-  // The plugin is installed but the configuration is incomplete
-  else if (setup.get('stepId') !== '') {
-    url = chrome.runtime.getURL('/data/setup.html');
   }
   // The plugin is installed but not configured
   else {

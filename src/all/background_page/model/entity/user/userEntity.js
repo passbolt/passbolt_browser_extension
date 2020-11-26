@@ -63,7 +63,7 @@ class UserEntity extends Entity {
       "type": "object",
       "required": [
         "username",
-        "role_id",
+        // "role_id",
       ],
       "properties": {
         "id": {

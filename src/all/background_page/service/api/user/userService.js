@@ -232,6 +232,21 @@ class UserService extends AbstractService {
     const bodyString = this.apiClient.buildBody(data);
     return this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
   }
+
+
+  /**
+   * Validate an account
+   * @param {string} userId the user id
+   * @param {object} validateAccountDto The validate account dto
+   * @returns {Promise<*>} response body
+   * @throws {Error} if options are invalid or API error
+   */
+  async validateAccount(userId, validateAccountDto) {
+    this.assertValidId(userId);
+    const url = new URL(`${this.apiClient.baseUrl}/validateAccount/${userId}`);
+    const bodyString = this.apiClient.buildBody(validateAccountDto);
+    return this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+  }
 }
 
 exports.UserService = UserService;

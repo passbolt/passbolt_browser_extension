@@ -1,173 +1,140 @@
 /**
- * Setup Events
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
- * Listen to events related to the setup
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
  *
- * @copyright (c) 2017 Passbolt SARL
- * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
  */
-var Setup = require('../model/setup').Setup;
-var Key = require('../model/key').Key;
-var app = require('../app');
+const {SetupController} = require("../controller/setup/setupController");
 
-var setup = new Setup();
-
-var listen = function (worker) {
-
-  /*
-   * Set setup variable.
-   *
-   * @listens passbolt.setup.set
-   * @param requestId {uuid} The request identifier
-   * @param key {string} Variable name to store
-   * @param value {string} Variable value
+const listen = function (worker) {
+  /**
+   * The setup controller.
+   * @type {SetupController}
+   * @private
    */
-  worker.port.on('passbolt.setup.set', function (requestId, key, value) {
-    try {
-      var setupData = setup.set(key, value);
-      worker.port.emit(requestId, 'SUCCESS', setupData);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error.message);
-    }
-  });
+  const setupController = new SetupController(worker, worker.tab.url);
 
   /*
-   * Get setup variable.
+   * Retrieve the setup info
    *
-   * @listens passbolt.setup.get
-   * @param requestId {uuid} The request identifier
-   * @param key {string} Variable name to store
-   */
-  worker.port.on('passbolt.setup.get', function (requestId, key) {
-    try {
-      var setupData = setup.get(key);
-      worker.port.emit(requestId, 'SUCCESS', setupData);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error.message);
-    }
-  });
-
-  /*
-   * Go to next section in the navigation.
-   *
-   * @listens passbolt.setup.navigation.next
-   * @param requestId {uuid} The request identifier
-   * @param stepId {string} The step identifier to go to
-   */
-  worker.port.on('passbolt.setup.navigation.next', function (requestId, stepId) {
-    try {
-      var myStepId = setup.navigationNext(stepId);
-      worker.port.emit(requestId, 'SUCCESS', myStepId);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error.message);
-    }
-  });
-
-  /*
-   * Go back to previous section in the navigation.
-   *
-   * @listens passbolt.setup.navigation.back
+   * @listens passbolt.setup.info
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.setup.navigation.back', function (requestId) {
+  worker.port.on('passbolt.setup.info', async function (requestId) {
     try {
-      var lastStep = setup.navigationBack();
-      worker.port.emit(requestId, 'SUCCESS', lastStep);
+      const setupEntity = await setupController.retrieveSetupInfo();
+      worker.port.emit(requestId, 'SUCCESS', setupEntity);
     } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error.message);
-    }
-  });
-
-  /*
-   * Get the navigation history.
-   *
-   * @listens passbolt.setup.navigation.get.history
-   */
-  worker.port.on('passbolt.setup.navigation.get.history', function (requestId) {
-    try {
-      var history = setup.getNavigationHistory();
-      worker.port.emit(requestId, 'SUCCESS', history);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error.message);
-    }
-  });
-
-  /*
-   * Flush setup data.
-   *
-   * @listens passbolt.setup.flush
-   */
-  worker.port.on('passbolt.setup.flush', function (requestId) {
-    try {
-      setup.flush();
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error.message);
-    }
-  });
-
-  /*
-   * Check if key exists on server.
-   *
-   * @listens passbolt.setup.checkKeyExistRemotely
-   * @param fingerprint {string} The key fingerprint to check
-   */
-  worker.port.on('passbolt.setup.checkKeyExistRemotely', async function (requestId, fingerprint) {
-    try {
-      await setup.checkKeyExistRemotely(fingerprint);
-      worker.port.emit(requestId, 'SUCCESS');
-    }
-    catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
   /*
-   * Save the setup gathered information.
+   * Generate the user secret key.
    *
-   * @listens passbolt.setup.save
-   * @param data {arary} The setup information
+   * @listens passbolt.setup.generate-key
+   * @param requestId {uuid} The request identifier
+   * @param passphrase {string} The passphrase used to generate the key
    */
-  worker.port.on('passbolt.setup.save', function (requestId, data) {
-    setup.save(data)
-      .then(
-        function () {
-          app.pageMods.PassboltAuth.init();
-          worker.port.emit(requestId, 'SUCCESS');
-        },
-        function (error) {
-          console.error(error);
-          worker.port.emit(requestId, 'ERROR', error);
-        }
-      );
+  worker.port.on('passbolt.setup.generate-key', async function (requestId, passphrase) {
+    try {
+      await setupController.generateKey(passphrase);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
   });
 
   /*
-   * Complete the recovery and the save the gathered information.
+   * Download the recovery kit.
    *
-   * @listens passbolt.setup.completeRecovery
-   * @param data {arary} The recovery information
+   * @listens passbolt.setup.download-recovery-kit
+   * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.setup.completeRecovery', function (requestId, data) {
-    setup.completeRecovery(data)
-      .then(
-        function () {
-          app.pageMods.PassboltAuth.init();
-          worker.port.emit(requestId, 'SUCCESS');
-        },
-        function (error) {
-          console.error(error);
-          worker.port.emit(requestId, 'ERROR', error);
-        }
-      );
+  worker.port.on('passbolt.setup.download-recovery-kit', async function (requestId) {
+    try {
+      await setupController.downloadRecoveryKit();
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
   });
 
+  /*
+   * Import secret key.
+   *
+   * @listens passbolt.setup.import-key
+   * @param requestId {uuid} The request identifier
+   * @param armoredKey {string} The armored key to import
+   */
+  worker.port.on('passbolt.setup.import-key', async function (requestId, armoredKey) {
+    try {
+      await setupController.importKey(armoredKey);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Verify secret key passphrase
+   *
+   * @listens passbolt.setup.verify-passphrase
+   * @param requestId {uuid} The request identifier
+   * @param passphrase {string} The passphrase used to verify the secret key
+   * @param rememberMe {boolean} The passphrase should be remembered and used to login the user at the end of the setup process
+   */
+  worker.port.on('passbolt.setup.verify-passphrase', async function (requestId, passphrase) {
+    try {
+      await setupController.verifyPassphrase(passphrase);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Set the user security token
+   *
+   * @listens passbolt.setup.set-security-token
+   * @param requestId {uuid} The request identifier
+   * @param securityTokenDto {object} The security token dto. ie: {color: hex-string, text-color: hex-string, code: string}
+   */
+  worker.port.on('passbolt.setup.set-security-token', async function (requestId, securityTokenDto) {
+    try {
+      setupController.setSecurityToken(securityTokenDto);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Complete the setup
+   *
+   * @listens passbolt.setup.complete
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.setup.complete', async function (requestId) {
+    try {
+      await setupController.complete();
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
 };
 exports.listen = listen;

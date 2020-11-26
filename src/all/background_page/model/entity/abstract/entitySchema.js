@@ -249,9 +249,13 @@ class EntitySchema {
       }
     }
     if (propSchema.pattern) {
-      const reg = new RegExp(propSchema.pattern);
-      if (!reg.test(prop)) {
+      if (!Validator.matches(prop, propSchema.pattern)) {
         validationError.addError(propName, 'pattern', `The ${propName} is not valid.`);
+      }
+    }
+    if (propSchema.custom) {
+      if (!propSchema.custom(prop)) {
+        validationError.addError(propName, 'custom', `The ${propName} is not valid.`);
       }
     }
     if (validationError.hasErrors()) {

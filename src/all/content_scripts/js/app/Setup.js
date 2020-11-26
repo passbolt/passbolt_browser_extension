@@ -9,10 +9,11 @@
  * @copyright     Copyright (c) 2020 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
+ * @since        3.0.0
  */
-import React from "react";
+import React, {Component} from "react";
 import ReactDOM from "react-dom";
-import ExtBootstrapApp from "passbolt-styleguide/src/react-extension/ExtBootstrapApp";
+import ExtBootstrapSetup from "passbolt-styleguide/src/react-extension/ExtBootstrapSetup";
 /* eslint-disable no-unused-vars */
 import Port from "../../../data/js/lib/port";
 /* eslint-enable no-unused-vars */
@@ -20,4 +21,4 @@ import Port from "../../../data/js/lib/port";
 const browserExtensionUrl = chrome.runtime.getURL("/");
 const domContainer = document.createElement("div");
 document.body.appendChild(domContainer);
-ReactDOM.render(<ExtBootstrapApp port={port} browserExtensionUrl={browserExtensionUrl}/>, domContainer);
+ReactDOM.render(<ExtBootstrapSetup port={port} browserExtensionUrl={browserExtensionUrl}/>, domContainer);

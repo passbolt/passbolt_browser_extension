@@ -1,7 +1,7 @@
 {
     "debug": true,
     "log": {
-       "level": 4,
+       "level": 1,
        "console": true
     }
 }

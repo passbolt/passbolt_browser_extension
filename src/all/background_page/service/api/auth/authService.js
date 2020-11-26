@@ -52,6 +52,29 @@ class AuthService extends AbstractService {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/logout`, {});
     return this.apiClient.fetchAndHandleResponse('GET', url);
   }
+
+  /**
+   * Retrieve the server key
+   * @returns {Promise<{armored_key: string, fingerprint: string}>}
+   */
+  async getServerKey() {
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/verify`, {});
+    const response = await this.apiClient.fetchAndHandleResponse('GET', url);
+    return this.mapGetServerKey(response.body);
+  }
+
+  /**
+   * Map the get server key result of the API.
+   * @param data
+   * @returns {{armored_key: string, fingerprint: string}}
+   */
+  mapGetServerKey(data) {
+    const {keydata, fingerprint} = data;
+    return {
+      armored_key: keydata,
+      fingerprint
+    }
+  }
 }
 
 exports.AuthService = AuthService;

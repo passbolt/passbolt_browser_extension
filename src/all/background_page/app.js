@@ -36,10 +36,10 @@ events.keyring = require('./event/keyringEvents');
 events.quickAccess = require('./event/quickAccessEvents');
 events.multiFactorAuthentication = require('./event/multiFactorAuthenticationEvents');
 events.pagemod = require('./event/pagmodEvents');
+events.recover = require('./event/recoverEvents');
 events.resource = require('./event/resourceEvents');
 events.secret = require('./event/secretEvents');
 events.setup = require('./event/setupEvents');
-events.setupbootstrap = require('./event/setupBootstrapEvents');
 events.share = require('./event/shareEvents');
 events.tab = require('./event/tabEvents');
 events.tag = require('./event/tagEvents');
@@ -110,13 +110,25 @@ pageMods.SetupBootstrap = require('./pagemod/setupBootstrapPagemod').SetupBootst
 
 /*
  * This page mod drives the reset of setup process
- * The reset of the setup process is driven on the add-on side, see in ../data/ setup.html and js/setup.js
+ * The reset of the setup process is driven on the add-on side, see in ../data/passbolt-iframe-setup.html
  */
 pageMods.Setup = require('./pagemod/setupPagemod').Setup;
 
 /*
+ * This pagemod help bootstrap the first step of the recover process from a passbolt server app page
+ * The pattern for this url, driving the recover bootstrap, is defined in config.json
+ */
+pageMods.RecoverBootstrap = require('./pagemod/recoverBootstrapPagemod').RecoverBootstrap;
+
+/*
+ * This page mod drives the reset of recover process
+ * The reset of the setup process is driven on the add-on side, see in ../data/passbolt-iframe-recover.html
+ */
+pageMods.Recover = require('./pagemod/recoverPagemod').Setup;
+
+/*
  * This page mod drives the reset of setup process
- * The reset of the setup process is driven on the add-on side, see in ../data/ setup.html and js/setup.js
+ * The reset of the setup process is driven on the add-on side, see in ../data/quickaccess.html
  */
 pageMods.QuickAccess = require('./pagemod/quickAccessPagemod').QuickAccess;
 

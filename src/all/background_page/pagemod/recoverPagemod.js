@@ -13,25 +13,30 @@
 const {PageMod} = require('../sdk/page-mod');
 const app = require('../app');
 
-const SetupBootstrap = function () {};
-SetupBootstrap._pageMod = undefined;
+/*
+ * This pagemod help bootstrap the first step of the recover process from a passbolt server app page
+ * The pattern for this url, driving the recover bootstrap, is defined in config.json
+ */
+const Recover = function () {};
+Recover._pageMod = undefined;
 
-SetupBootstrap.init = function () {
-  if (typeof SetupBootstrap._pageMod !== 'undefined') {
-    SetupBootstrap._pageMod.destroy();
-    SetupBootstrap._pageMod = undefined;
+Recover.init = function () {
+  if (typeof Recover._pageMod !== 'undefined') {
+    Recover._pageMod.destroy();
+    Recover._pageMod = undefined;
   }
-  const uuidRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}";
-  const setupBootstrapRegex = `(.*)\/setup\/install\/(${uuidRegex})\/(${uuidRegex})`;
-  SetupBootstrap._pageMod = new PageMod({
-    name: 'SetupBootstrap',
-		include: new RegExp(setupBootstrapRegex),
+
+  Recover._pageMod = new PageMod({
+    name: 'Setup',
+    include: 'about:blank?passbolt=passbolt-iframe-recover',
     contentScriptWhen: 'ready',
     contentScriptFile: [
-      'content_scripts/js/dist/vendors.js',
-      'content_scripts/js/dist/setup.js',
-    ],
+			// Warning: script and styles need to be modified in
+			// chrome/data/passbolt-iframe-recover.html
+		],
     onAttach: function (worker) {
+      app.events.recover.listen(worker);
+
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows
        * the content code to know when the background page is ready.
@@ -41,4 +46,4 @@ SetupBootstrap.init = function () {
   });
 };
 
-exports.SetupBootstrap = SetupBootstrap;
+exports.Setup = Recover;

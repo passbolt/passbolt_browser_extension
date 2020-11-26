@@ -8,6 +8,7 @@ var Log = require('../model/log').Log;
 var tabsController = require('../controller/tabsController');
 const {Keyring} = require('../model/keyring');
 const keyring = new Keyring();
+const {User} = require('../model/user');
 
 var listen = function (worker) {
 
@@ -46,6 +47,43 @@ var listen = function (worker) {
     } else {
       worker.port.emit(requestId, 'ERROR');
     }
+  });
+
+
+  /*
+   * Import the user private armored key.
+   *
+   * @listens passbolt.keyring.private.import
+   * @param requestId {uuid} The request identifier
+   * @param privateKeyArmored {string} The private armored key to import
+   */
+  worker.port.on('passbolt.keyring.private.import', async function (requestId, privateKeyArmored) {
+    try {
+      await keyring.importPrivate(privateKeyArmored);
+      const publicKeyArmored = await keyring.extractPublicKey(privateKeyArmored);
+      const user = User.getInstance();
+      await keyring.importPublic(publicKeyArmored, user.get().id);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', privateKeyArmored);
+    }
+  });
+
+  /*
+   * Import the server public armored key.
+   *
+   * @listens passbolt.keyring.server.import
+   * @param requestId {uuid} The request identifier
+   * @param publicKeyArmored {string} The public armored key to import
+   */
+  worker.port.on('passbolt.keyring.server.import', function (requestId, publicKeyArmored) {
+    const user = User.getInstance();
+    keyring.importServerPublicKey(publicKeyArmored, user.settings.getDomain()).then(function() {
+      worker.port.emit(requestId, 'SUCCESS');
+    }, function (error) {
+      worker.port.emit(requestId, 'ERROR', error.message)
+    });
   });
 
 };

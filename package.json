@@ -67,7 +67,11 @@
     "webpack-cli": "^3.3.12"
   },
   "scripts": {
+    "build": "npm run build-content-script; npm run build-data;",
+    "build-content-scripts": "webpack --config webpack-content-scripts.config.js",
+    "build-data": "webpack --config webpack-data.config.js",
     "test": "grunt test",
-    "eslint": "grunt eslint"
+    "eslint": "grunt eslint",
+    "eslint-fix": "grunt eslint --fix"
   }
 }

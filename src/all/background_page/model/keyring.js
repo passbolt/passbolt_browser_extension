@@ -264,7 +264,7 @@ class Keyring {
     }
 
     return {
-      key: armoredKey,
+      key: key.armor(),
       keyId: keyid,
       userIds: userIdsSplited,
       fingerprint: key.primaryKey.getFingerprint(),
@@ -334,29 +334,6 @@ class Keyring {
         throw new InvalidMasterPasswordError();
       }
     }
-  }
-
-  // ==================================================
-  // GENERATION
-  // ==================================================
-  /**
-   * Generate a key pair based on given key settings.
-   *
-   * @param {array} keyInfo The key settings
-   * @param {string} passphrase The key passphrase
-   * @returns {Promise.<Object>}
-   */
-  generateKeyPair(keyInfo, passphrase) {
-    // Get user id from key info.
-    const key = new Key();
-    key.set(keyInfo);
-
-    // Launch key pair generation from openpgp worker.
-    return openpgp.generateKey({
-      rsaBits: keyInfo.length,
-      userIds: key.getUserId(),
-      passphrase: passphrase
-    });
   }
 
   // ==================================================

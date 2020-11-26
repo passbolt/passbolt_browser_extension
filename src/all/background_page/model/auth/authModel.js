@@ -10,8 +10,13 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+const app = require("../../app");
 const {AuthStatusLocalStorage} = require("../../service/local_storage/authStatusLocalStorage");
+const {GpgAuth} = require("../gpgauth");
 const {AuthService} = require("../../service/api/auth/authService");
+const {User} = require("../user");
+const {Keyring} = require("../keyring");
+const {Crypto} = require("../crypto");
 
 class AuthModel {
   /**
@@ -22,6 +27,9 @@ class AuthModel {
    */
   constructor(apiClientOptions) {
     this.authService = new AuthService(apiClientOptions);
+    const keyring = new Keyring();
+    this.crypto = new Crypto(keyring);
+    this.legacyAuthModel = new GpgAuth(keyring);
   }
 
   /**
@@ -44,6 +52,36 @@ class AuthModel {
     const event = new Event('passbolt.auth.after-logout');
     window.dispatchEvent(event);
   };
+
+  /**
+   * Get server key
+   * @returns {Promise<object>} The server key dto {fingerprint: string, armored_key: string}
+   */
+  async getServerKey() {
+    return this.authService.getServerKey();
+  };
+
+  /**
+   * Login
+   * @param {string} passphrase The passphrase to use to decrypt the user private key
+   * @param {boolean?} remember Should the passphrase remember until the user is logged out
+   * @returns {Promise<void>}
+   */
+  async login(passphrase, remember) {
+    remember = remember || false;
+    const user = User.getInstance();
+    const privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
+    await user.retrieveAndStoreCsrfToken();
+    await this.legacyAuthModel.login(privateKey);
+
+    // Post login operations
+    // MFA may not be complete yet, so no need to preload things here
+    if (remember) {
+      user.storeMasterPasswordTemporarily(passphrase, -1);
+    }
+    await this.legacyAuthModel.startCheckAuthStatusLoop();
+    await app.pageMods.PassboltApp.init();
+  }
 }
 
 exports.AuthModel = AuthModel;

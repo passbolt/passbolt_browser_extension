@@ -83,7 +83,7 @@ describe("User entity", () => {
     } catch(error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('username', 'required')).toBe(true);
-      expect(error.hasError('role_id', 'required')).toBe(true);
+      // expect(error.hasError('role_id', 'required')).toBe(true);
     }
   });
 

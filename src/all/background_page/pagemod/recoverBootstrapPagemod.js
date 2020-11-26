@@ -13,23 +13,23 @@
 const {PageMod} = require('../sdk/page-mod');
 const app = require('../app');
 
-const SetupBootstrap = function () {};
-SetupBootstrap._pageMod = undefined;
+const RecoverBootstrap = function () {};
+RecoverBootstrap._pageMod = undefined;
 
-SetupBootstrap.init = function () {
-  if (typeof SetupBootstrap._pageMod !== 'undefined') {
-    SetupBootstrap._pageMod.destroy();
-    SetupBootstrap._pageMod = undefined;
+RecoverBootstrap.init = function () {
+  if (typeof RecoverBootstrap._pageMod !== 'undefined') {
+    RecoverBootstrap._pageMod.destroy();
+    RecoverBootstrap._pageMod = undefined;
   }
   const uuidRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}";
-  const setupBootstrapRegex = `(.*)\/setup\/install\/(${uuidRegex})\/(${uuidRegex})`;
-  SetupBootstrap._pageMod = new PageMod({
-    name: 'SetupBootstrap',
-		include: new RegExp(setupBootstrapRegex),
+  const recoverBootstrapRegex = `(.*)\/setup\/recover\/(${uuidRegex})\/(${uuidRegex})`;
+  RecoverBootstrap._pageMod = new PageMod({
+    name: 'RecoverBootstrap',
+		include: new RegExp(recoverBootstrapRegex),
     contentScriptWhen: 'ready',
     contentScriptFile: [
       'content_scripts/js/dist/vendors.js',
-      'content_scripts/js/dist/setup.js',
+      'content_scripts/js/dist/recover.js',
     ],
     onAttach: function (worker) {
       /*
@@ -41,4 +41,4 @@ SetupBootstrap.init = function () {
   });
 };
 
-exports.SetupBootstrap = SetupBootstrap;
+exports.RecoverBootstrap = RecoverBootstrap;

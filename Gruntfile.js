@@ -227,12 +227,6 @@ module.exports = function (grunt) {
           dest: path.build_data + 'img/controls',
           expand: true
         }, {
-          nonull: true,
-          cwd: path.node_modules + 'passbolt-styleguide/src/img/fa/fas',
-          src: ['chevron-right.svg', 'check.svg'],
-          dest: path.build_data + 'img/fa/fas',
-          expand: true
-        }, {
           // Icons / logo
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/logo',
@@ -256,7 +250,8 @@ module.exports = function (grunt) {
         }, {
           // CSS files default
           cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/default',
-          src: ['ext_config_debug.min.css', 'ext_external.min.css', 'ext_login.min.css', 'ext_legacy.min.css', 'ext_setup.min.css', 'ext_quickaccess.min.css', 'ext_app.min.css'],
+          src: ['ext_config_debug.min.css', 'ext_external.min.css', 'ext_login.min.css', 'ext_legacy.min.css',
+            'ext_setup.min.css', 'ext_quickaccess.min.css', 'ext_app.min.css', 'ext_authentication.min.css'],
           dest: path.build_data + 'css/themes/default',
           expand: true
         }, {
@@ -301,10 +296,10 @@ module.exports = function (grunt) {
        * Build content code apps.
        */
       build_webpack_apps_prod: {
-        command: "./node_modules/.bin/webpack"
+        command: "webpack --config webpack-content-scripts.config.js; webpack --config webpack-data.config.js"
       },
       build_webpack_apps_debug: {
-        command: "./node_modules/.bin/webpack --env.debug=true"
+        command: "webpack --env.debug=true --config webpack-content-scripts.config.js; webpack --env.debug=true --config webpack-data.config.js"
       },
 
       /**

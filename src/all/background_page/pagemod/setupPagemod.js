@@ -1,26 +1,26 @@
 /**
- * Setup pagemod.
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
- * This page mod drives the reset of setup process
- * The reset of the setup process is driven on the add-on side, see in ../data/ setup.html and js/setup.js
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
  *
- * @copyright (c) 2017 Passbolt SARL
- * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {PageMod} = require('../sdk/page-mod');
-
-var app = require('../app');
-var Worker = require('../model/worker');
+const app = require('../app');
 
 /*
  * This pagemod help bootstrap the first step of the setup process from a passbolt server app page
  * The pattern for this url, driving the setup bootstrap, is defined in config.json
  */
-var Setup = function () {};
+const Setup = function () {};
 Setup._pageMod = undefined;
 
 Setup.init = function () {
-
   if (typeof Setup._pageMod !== 'undefined') {
     Setup._pageMod.destroy();
     Setup._pageMod = undefined;
@@ -28,22 +28,20 @@ Setup.init = function () {
 
   Setup._pageMod = new PageMod({
     name: 'Setup',
-    include: chrome.runtime.getURL('data/setup.html'),
-    contentScriptWhen: 'end',
+    include: 'about:blank?passbolt=passbolt-iframe-setup',
+    contentScriptWhen: 'ready',
     contentScriptFile: [
 			// Warning: script and styles need to be modified in
-			// chrome/data/setup.html and chrome/data/js/load/setup.js
+			// chrome/data/passbolt-iframe-setup.html
 		],
     onAttach: function (worker) {
-      app.events.clipboard.listen(worker);
       app.events.setup.listen(worker);
-      app.events.file.listen(worker);
-      app.events.keyring.listen(worker);
-      app.events.auth.listen(worker);
-      app.events.user.listen(worker);
-      app.events.config.listen(worker);
 
-      Worker.add('Setup', worker);
+      /*
+       * Keep the pagemod event listeners at the end of the list, it answers to an event that allows
+       * the content code to know when the background page is ready.
+       */
+      app.events.pagemod.listen(worker);
     }
   });
 };

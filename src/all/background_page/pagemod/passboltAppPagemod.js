@@ -8,8 +8,6 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-
-const app = require('../app');
 const {PageMod} = require('../sdk/page-mod');
 const Worker = require('../model/worker');
 const GpgAuth = require('../model/gpgauth').GpgAuth;
@@ -55,7 +53,7 @@ PassboltApp.initPageMod = function () {
       'data/css/themes/default/ext_external.min.css'
     ],
     contentScriptFile: [
-      'content_scripts/js/dist/vendors/vendors-app.js',
+      'content_scripts/js/dist/vendors.js',
       'content_scripts/js/dist/app.js',
     ],
     attachTo: {existing: true, reload: true},

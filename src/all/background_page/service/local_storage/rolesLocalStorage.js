@@ -124,7 +124,7 @@ class RolesLocalStorage {
     this.flush();
 
     // Flush the local storage when the passbolt user session is terminated
-    window.addEventListener("passbolt.global.auth.logged-out", () => {
+    window.addEventListener("passbolt.auth.after-logout", () => {
       this.flush();
     });
   }

@@ -12,7 +12,9 @@ const {AuthIsAuthenticatedController} = require('../controller/auth/authIsAuthen
 const {AuthIsMfaRequiredController} = require('../controller/auth/authIsMfaRequiredController');
 const {AuthUpdateServerKeyController} = require('../controller/auth/authUpdateServerKeyController');
 const {GpgAuth} = require('../model/gpgauth');
+const {AuthModel} = require("../model/auth/authModel");
 const Worker = require('../model/worker');
+const {User} = require('../model/user');
 
 const listen = function (worker) {
   /*
@@ -55,13 +57,34 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.auth.logout', async function (requestId) {
-    const auth = new GpgAuth();
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const auth = new AuthModel(apiClientOptions);
 
     try {
       await auth.logout();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       worker.port.emit(requestId, 'ERROR');
+    }
+  });
+
+  /*
+   * Navigate to logout
+   *
+   * @listens passbolt.auth.navigate-to-logout
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.auth.navigate-to-logout', async function () {
+    const user = User.getInstance();
+    const apiClientOptions = await user.getApiClientOptions();
+    const auth = new AuthModel(apiClientOptions);
+    const url = `${user.settings.getDomain()}/auth/logout`;
+
+    try {
+      await chrome.tabs.update(worker.tab.id, {url});
+      await auth.postLogout();
+    } catch (error) {
+      console.error(error);
     }
   });
 

@@ -19,8 +19,13 @@ const config = {
   },
   optimization: {
     splitChunks: {
-      chunks: 'all',
-      filename: 'vendors/[name].js'
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]((?!(passbolt\-styleguide)).*)[\\/]/,
+          name: 'vendors',
+          chunks: 'all'
+        },
+      }
     },
   },
   resolve: {extensions: ["*", ".js", ".jsx"]},
@@ -33,7 +38,7 @@ const config = {
 
 exports.default = function (env) {
   // Enable debug mode.
-  if (env.debug) {
+  if (env && env.debug) {
     config.mode = "development";
     config.devtool = "inline-source-map";
   }

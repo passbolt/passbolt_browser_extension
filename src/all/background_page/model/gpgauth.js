@@ -168,25 +168,6 @@ class GpgAuth {
   }
 
   /**
-   * GPGAuth Logout
-   *
-   * @returns {Promise.<string>} referrer url
-   */
-  async logout() {
-    const url = this.getDomain() + URL_LOGOUT;
-    const fetchOptions = {
-      method: 'GET',
-      credentials: 'include'
-    };
-
-    this.authStatus = {isAuthenticated: false, isMfaRequired: false};
-    const event = new Event('passbolt.global.auth.logged-out');
-    window.dispatchEvent(event);
-
-    await fetch(url, fetchOptions);
-  };
-
-  /**
    * GPGAuth Login - handle stage1, stage2 and complete
    *
    * @param privateKey {openpgp.key.Key} The decrypted private key to use to decrypt the message.
@@ -359,7 +340,7 @@ class GpgAuth {
 
   /**
    * Start an invertval to check if the user is authenticated.
-   * - In the case the user is logged out, trigger a passbolt.global.auth.logged-out event.
+   * - In the case the user is logged out, trigger a passbolt.auth.after-logout event.
    *
    * @return {void}
    */
@@ -372,8 +353,7 @@ class GpgAuth {
 
     this.checkAuthStatusTimeout = setTimeout(async () => {
       if (!await this.isAuthenticated()) {
-        const event = new Event('passbolt.global.auth.logged-out');
-        window.dispatchEvent(event);
+        window.dispatchEvent(new Event('passbolt.auth.after-logout'));
       } else {
         this.startCheckAuthStatusLoop();
       }

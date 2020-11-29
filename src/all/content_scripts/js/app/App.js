@@ -34,6 +34,7 @@ class App extends Component {
             "/app/passwords",
             "/app/settings",
             "/app/settings/keys",
+            "/app/settings/mfa",
             "/app/settings/profile",
             "/app/settings/theme",
             "/app/users/view/:selectedUserId",

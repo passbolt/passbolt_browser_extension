@@ -113,7 +113,7 @@ class UserService extends AbstractService {
    * @public
    */
   async findAll(contains, filters, orders) {
-    const legacyContain = UserService.remapToLegacyContain(contains) ;// crassette
+    const legacyContain = UserService.remapToLegacyContain(contains);// crassette
     contains = contains ? this.formatContainOptions(legacyContain, UserService.getSupportedContainOptions()) : null;
     filters = filters ? this.formatFilterOptions(filters, UserService.getSupportedFiltersOptions()) : null;
     orders = orders ? this.formatOrderOptions(orders, UserService.getSupportedFiltersOptions()) : null;
@@ -214,7 +214,7 @@ class UserService extends AbstractService {
   async delete(userId, transfer, dryRun) {
     this.assertValidId(userId);
     const data = transfer ? {transfer: transfer} : {};
-    const response = await this.apiClient.delete(userId, data, {},  dryRun);
+    const response = await this.apiClient.delete(userId, data, {}, dryRun);
     return response.body;
   }
 
@@ -230,21 +230,6 @@ class UserService extends AbstractService {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/recover`);
     const data = {username};
     const bodyString = this.apiClient.buildBody(data);
-    return this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
-  }
-
-
-  /**
-   * Validate an account
-   * @param {string} userId the user id
-   * @param {object} validateAccountDto The validate account dto
-   * @returns {Promise<*>} response body
-   * @throws {Error} if options are invalid or API error
-   */
-  async validateAccount(userId, validateAccountDto) {
-    this.assertValidId(userId);
-    const url = new URL(`${this.apiClient.baseUrl}/validateAccount/${userId}`);
-    const bodyString = this.apiClient.buildBody(validateAccountDto);
     return this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
   }
 }

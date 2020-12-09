@@ -13,6 +13,7 @@
 const app = require("../../app");
 const {ApiClientOptions} = require("../../service/api/apiClient/apiClientOptions");
 const fileController = require('../../controller/fileController');
+const {InvalidMasterPasswordError} = require("../../error/invalidMasterPasswordError");
 const {AccountModel} = require("../../model/account/accountModel");
 const {SetupModel} = require("../../model/setup/setupModel");
 const {AuthModel} = require("../../model/auth/authModel");
@@ -53,7 +54,7 @@ class SetupController {
     const serverKeyDto = await this.authModel.getServerKey();
     await this.keyring.keyInfo(serverKeyDto.armored_key);
     this.setupEntity.serverPublicArmoredKey = serverKeyDto.armored_key;
-    const userEntity = await this.setupModel.findUser(this.setupEntity.userId, this.setupEntity.token);
+    const userEntity = await this.setupModel.findSetupInfo(this.setupEntity.userId, this.setupEntity.token);
     this.setupEntity.user = userEntity;
     return this.setupEntity;
   }
@@ -90,15 +91,15 @@ class SetupController {
   async importKey(armoredKey) {
     const keyInfo = await this.keyring.keyInfo(armoredKey);
     if (!keyInfo.private) {
-      throw new Error("The key must be a private key.");
+      throw new TypeError('The key must be a private key.');
     }
     try {
       // Verify that the key is not already in use by another user.
       await this.legacyAuthModel.verify(this.setupEntity.domain, this.setupEntity.serverPublicArmoredKey, keyInfo.fingerprint);
-      throw new Error("This key is already used by another user.");
+      throw new TypeError('This key is already used by another user.');
     } catch (error) {
       // An error is expected.
-      // @todo Ensure the error is related the one expected: There is no user associated with this key. User not found.
+      // @todo Ensure the error is related the one expected: No user associated with this key. It could be a different error ApiFetchError ...
     }
 
     this.setupEntity.userPrivateArmoredKey = keyInfo.key;
@@ -112,7 +113,11 @@ class SetupController {
    */
   async verifyPassphrase(passphrase) {
     let privateKey = (await openpgp.key.readArmored(this.setupEntity.userPrivateArmoredKey)).keys[0];
-    await privateKey.decrypt(passphrase);
+    try {
+      await privateKey.decrypt(passphrase);
+    } catch(error) {
+      throw new InvalidMasterPasswordError();
+    }
     // Store the user passphrase to login in after the setup operation.
     this.setupEntity.passphrase = passphrase;
   }
@@ -133,7 +138,7 @@ class SetupController {
   async complete() {
     const accountDto = this.setupEntity.toAccountDto();
     const accountEntity = new AccountEntity(accountDto);
-    await this.setupModel.validateAccount(this.setupEntity);
+    await this.setupModel.complete(this.setupEntity);
     await this.accountModel.add(accountEntity);
     app.pageMods.PassboltAuth.init(); // This is required, the pagemod is not initialized prior to the completion of the setup.
     await this.authModel.login(this.setupEntity.passphrase);

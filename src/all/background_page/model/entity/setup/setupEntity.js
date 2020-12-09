@@ -148,10 +148,10 @@ class SetupEntity extends Entity {
   }
 
   /**
-   * Return a DTO ready to be sent the API to validate the account.
+   * Return a DTO ready to be sent the API to complete the registration or the recovery process.
    * @returns {object}
    */
-  toValidateAccountDto() {
+  toCompleteDto() {
     return {
       authenticationtoken: {
         token: this.token

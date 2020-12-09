@@ -13,7 +13,7 @@
  */
 import React from "react";
 import ReactDOM from "react-dom";
-import ExtAuthenticationSetup from "passbolt-styleguide/src/react-extension/ExtAuthenticationSetup";
+import ExtAuthenticationRecover from "passbolt-styleguide/src/react-extension/ExtAuthenticationRecover";
 /* eslint-disable no-unused-vars */
 import Port from "../lib/port";
 /* eslint-enable no-unused-vars */
@@ -40,7 +40,7 @@ async function main() {
   await waitPagemodIsReady();
   const domContainer = document.createElement("div");
   document.body.appendChild(domContainer);
-  ReactDOM.render(React.createElement(ExtAuthenticationSetup, {port: port}), domContainer);
+  ReactDOM.render(React.createElement(ExtAuthenticationRecover, {port: port}), domContainer);
 }
 
 main();

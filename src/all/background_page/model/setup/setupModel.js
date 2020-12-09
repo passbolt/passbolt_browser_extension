@@ -35,20 +35,44 @@ class SetupModel {
    * @returns {Promise<UserEntity>}
    * @throws {Error} if options are invalid or API error
    */
-  async findUser(userId, token) {
-    const userDto = await this.setupService.findUserLegacy(userId, token);
+  async findSetupInfo(userId, token) {
+    const userDto = await this.setupService.findLegacySetupInfo(userId, token);
     return new UserEntity(userDto);
   }
 
   /**
-   * Validate the account
+   * Find setup info. Retrieve the user profile and server public key and return a setup entity
+   * @param {string} userId The user id
+   * @param {string} token The setup token
+   * populated with these information.
+   * @returns {Promise<UserEntity>}
+   * @throws {Error} if options are invalid or API error
+   */
+  async findRecoverInfo(userId, token) {
+    const userDto = await this.setupService.findLegacyRecoverInfo(userId, token);
+    return new UserEntity(userDto);
+  }
+
+  /**
+   * Complete the setup.
    * @param {SetupEntity} setupEntity The setup entity
    * @returns {Promise<void>}
    * @throws {Error} if options are invalid or API error
    */
-  async validateAccount(setupEntity) {
-    const validateAccountDto = setupEntity.toValidateAccountDto();
-    await this.userService.validateAccount(setupEntity.userId, validateAccountDto);
+  async complete(setupEntity) {
+    const completeDto = setupEntity.toCompleteDto();
+    await this.setupService.complete(setupEntity.userId, completeDto);
+  }
+
+  /**
+   * Complete the recovery
+   * @param {SetupEntity} setupEntity The setup entity
+   * @returns {Promise<void>}
+   * @throws {Error} if options are invalid or API error
+   */
+  async completeRecovery(setupEntity) {
+    const completeDto = setupEntity.toCompleteDto();
+    await this.setupService.completeRecovery(setupEntity.userId, completeDto);
   }
 }
 

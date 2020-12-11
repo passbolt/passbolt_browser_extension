@@ -66,11 +66,42 @@ class SetupService extends AbstractService {
   }
 
   /**
-   * Find legacy setup info
+   * Find the setup info
    * @param {string} userId the user id
    * @param {string} token the token
    * @returns {Promise<*>} response body
    * @throws {Error} if options are invalid or API error
+   */
+  async findSetupInfo(userId, token) {
+    this.assertValidId(userId);
+    this.assertValidId(token);
+    const url = new URL(`${this.apiClient.baseUrl}/info/${userId}/${token}`);
+    const response = await this.apiClient.fetchAndHandleResponse('GET', url);
+    return response.body;
+  }
+
+  /**
+   * Find the recover info
+   * @param {string} userId the user id
+   * @param {string} token the token
+   * @returns {Promise<*>} response body
+   * @throws {Error} if options are invalid or API error
+   */
+  async findRecoverInfo(userId, token) {
+    this.assertValidId(userId);
+    this.assertValidId(token);
+    const url = new URL(`${this.apiClient.baseUrl}/recover/info/${userId}/${token}`);
+    const response = await this.apiClient.fetchAndHandleResponse('GET', url);
+    return response.body;
+  }
+
+  /**
+   * Find legacy setup info.
+   * @param {string} userId the user id
+   * @param {string} token the token
+   * @returns {Promise<*>} response body
+   * @throws {Error} if options are invalid or API error
+   * @deprecated will be removed with v4
    */
   async findLegacySetupInfo(userId, token) {
     this.assertValidId(userId);

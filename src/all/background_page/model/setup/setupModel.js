@@ -36,7 +36,7 @@ class SetupModel {
    * @throws {Error} if options are invalid or API error
    */
   async findSetupInfo(userId, token) {
-    const userDto = await this.setupService.findLegacySetupInfo(userId, token);
+    const userDto = await this.setupService.findSetupInfo(userId, token);
     return new UserEntity(userDto);
   }
 
@@ -49,7 +49,7 @@ class SetupModel {
    * @throws {Error} if options are invalid or API error
    */
   async findRecoverInfo(userId, token) {
-    const userDto = await this.setupService.findLegacyRecoverInfo(userId, token);
+    const userDto = await this.setupService.findRecoverInfo(userId, token);
     return new UserEntity(userDto);
   }
 

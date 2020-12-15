@@ -13,6 +13,7 @@
 const app = require("../../app");
 const {ApiClientOptions} = require("../../service/api/apiClient/apiClientOptions");
 const fileController = require('../../controller/fileController');
+const {GpgKeyError} = require("../../error/GpgKeyError");
 const {InvalidMasterPasswordError} = require("../../error/invalidMasterPasswordError");
 const {AccountModel} = require("../../model/account/accountModel");
 const {SetupModel} = require("../../model/setup/setupModel");
@@ -89,14 +90,19 @@ class SetupController {
    * @returns {Promise<void>}
    */
   async importKey(armoredKey) {
-    const keyInfo = await this.keyring.keyInfo(armoredKey);
+    let keyInfo = null;
+    try {
+    keyInfo = await this.keyring.keyInfo(armoredKey);
+    } catch(error) {
+      throw new GpgKeyError('The key must be a valid private key.');
+    }
     if (!keyInfo.private) {
-      throw new TypeError('The key must be a private key.');
+      throw new GpgKeyError('The key must be a private key.');
     }
     try {
       // Verify that the key is not already in use by another user.
       await this.legacyAuthModel.verify(this.setupEntity.domain, this.setupEntity.serverPublicArmoredKey, keyInfo.fingerprint);
-      throw new TypeError('This key is already used by another user.');
+      throw new GpgKeyError('This key is already used by another user.');
     } catch (error) {
       // An error is expected.
       // @todo Ensure the error is related the one expected: No user associated with this key. It could be a different error ApiFetchError ...

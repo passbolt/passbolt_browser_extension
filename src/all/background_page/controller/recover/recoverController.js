@@ -12,6 +12,7 @@
  */
 const app = require("../../app");
 const {ApiClientOptions} = require("../../service/api/apiClient/apiClientOptions");
+const {GpgKeyError} = require("../../error/GpgKeyError");
 const {InvalidMasterPasswordError} = require("../../error/invalidMasterPasswordError");
 const {AccountModel} = require("../../model/account/accountModel");
 const {SetupModel} = require("../../model/setup/setupModel");
@@ -61,16 +62,21 @@ class RecoverController {
    * @returns {Promise<void>}
    */
   async importKey(armoredKey) {
-    const keyInfo = await this.keyring.keyInfo(armoredKey);
+    let keyInfo = null;
+    try {
+      keyInfo = await this.keyring.keyInfo(armoredKey);
+    } catch(error) {
+      throw new GpgKeyError('The key must be a valid private key.');
+    }
     if (!keyInfo.private) {
-      throw new TypeError('The key must be a private key.');
+      throw new GpgKeyError('The key must be a private key.');
     }
     try {
       // Verify that the key is not already in use by another user.
       await this.legacyAuthModel.verify(this.setupEntity.domain, this.setupEntity.serverPublicArmoredKey, keyInfo.fingerprint);
     } catch (error) {
       // @todo Ensure the error is related the one expected, could be a different error ApiFetchError ...
-      throw new TypeError('This key does not match any account.');
+      throw new GpgKeyError('This key does not match any account.');
     }
 
     this.setupEntity.userPrivateArmoredKey = keyInfo.key;

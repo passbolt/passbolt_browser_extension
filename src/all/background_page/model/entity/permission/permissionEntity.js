@@ -94,11 +94,7 @@ class PermissionEntity extends Entity {
         },
         "type": {
           "type": "integer",
-          "enum": [
-            PermissionEntity.PERMISSION_READ,
-            PermissionEntity.PERMISSION_UPDATE,
-            PermissionEntity.PERMISSION_OWNER
-          ]
+          "enum": PermissionEntity.PERMISSION_TYPES
         },
         "created": {
           "type": "string",
@@ -288,6 +284,18 @@ class PermissionEntity extends Entity {
     return {user: {profile: {avatar: true}}, group:true};
   }
 
+  /**
+   * PermissionEntity.PERMISSION_TYPES
+   * @returns {number[]}
+   */
+  static get PERMISSION_TYPES() {
+    return [
+      PermissionEntity.PERMISSION_READ,
+      PermissionEntity.PERMISSION_UPDATE,
+      PermissionEntity.PERMISSION_OWNER
+    ];
+  }
+
   // ==================================================
   // Associated properties getters
   // ==================================================
@@ -321,6 +329,19 @@ class PermissionEntity extends Entity {
       throw new TypeError('The permission id should be a valid UUID.');
     }
     this._props.id = id;
+  }
+
+  /**
+   * Set the permission type
+   *
+   * @param {int} type
+   * @param type
+   */
+  set type(type) {
+    if (!type || !PermissionEntity.PERMISSION_TYPES.includes(type)) {
+      throw new TypeError('The type should be a valid integer.');
+    }
+    this._props.type = type;
   }
 
   // ==================================================

@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### [2.13.8] - 2020-09-09
+### Fixed
+- PB-3519 Fix inherited permissions are not updated on share with nested folder and resources
+
 ### [2.13.7] - 2020-09-09
 ### Fixed
 - Fix terminate any active session if user starts another account recovery / setup.

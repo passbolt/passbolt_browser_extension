@@ -262,7 +262,7 @@ describe("PermissionChangesCollection", () => {
     expect(result.items[0].aroForeignKey).toBe(user2);
   });
 
-  it("reuse changes works - part3 update", () => {
+  it("reuse changes works - part3 update - upgrade matching permission", () => {
     let permissions;
     let changes;
     let original;
@@ -365,7 +365,47 @@ describe("PermissionChangesCollection", () => {
     result = PermissionChangesCollection.reuseChanges(
       PermissionEntity.ACO_RESOURCE, resource1, permissions, changes, original
     );
+
     expect(result.length).toBe(1);
+    const permissionChange = result.items[0];
+    expect(permissionChange.aco).toBe(PermissionEntity.ACO_RESOURCE);
+    expect(permissionChange.acoForeignKey).toBe(resource1);
+    expect(permissionChange.aro).toBe("User");
+    expect(permissionChange.aroForeignKey).toBe(user2);
+    expect(permissionChange.id).toBe(permission2);
+    expect(permissionChange.type).toBe(PermissionEntity.PERMISSION_OWNER);
   });
 
+  it("reuse changes works - part3 update - downgrade permission", () => {
+    // subfolder.permission.aco
+    const aco = '192eb961-414c-43d4-9196-36dad47eed0e';
+
+    // subfolder.permissions
+    const permissions = new PermissionsCollection([
+      {aco: PermissionEntity.ACO_FOLDER, aco_foreign_key: "192eb961-414c-43d4-9196-36dad47eed0e", aro: PermissionEntity.ARO_USER, aro_foreign_key: "e97b14ba-8957-57c9-a357-f78a6e1e1a46", created: "2020-12-16T04:34:16+00:00", group: null, id: "b5fcee7b-588f-4453-8230-e646aa38dac2", modified: "2020-12-16T04:34:16+00:00", type: PermissionEntity.PERMISSION_UPDATE},
+      {aco: PermissionEntity.ACO_FOLDER, aco_foreign_key: "192eb961-414c-43d4-9196-36dad47eed0e", aro: PermissionEntity.ARO_USER, aro_foreign_key: "f848277c-5398-58f8-a82a-72397af2d450", created: "2020-12-16T04:33:39+00:00", group: null, id: "7a9ce7a7-45a2-47c1-ac7c-167a48a4792a", modified: "2020-12-16T04:33:39+00:00", type: PermissionEntity.PERMISSION_OWNER}
+    ]);
+
+    // this.originalChanges
+    const changes = new PermissionChangesCollection([
+      {aco: PermissionEntity.ACO_FOLDER, aco_foreign_key: "4074c78f-3988-4f54-beb9-afabcdbbdcde", aro: PermissionEntity.ARO_USER, aro_foreign_key: "e97b14ba-8957-57c9-a357-f78a6e1e1a46", id: "7e69e863-f69c-4185-ad38-af3c9adfbbab", type: PermissionEntity.PERMISSION_READ}
+    ]);
+
+    // this.folder.permissions
+    const original = new PermissionsCollection([
+      {aco: PermissionEntity.ACO_FOLDER, aco_foreign_key: "4074c78f-3988-4f54-beb9-afabcdbbdcde", aro: PermissionEntity.ARO_USER, aro_foreign_key: "e97b14ba-8957-57c9-a357-f78a6e1e1a46", created: "2020-12-16T04:34:16+00:00", group: null, id: "7e69e863-f69c-4185-ad38-af3c9adfbbab", modified: "2020-12-16T04:42:17+00:00", type: PermissionEntity.PERMISSION_UPDATE},
+      {aco: PermissionEntity.ACO_FOLDER, aco_foreign_key: "4074c78f-3988-4f54-beb9-afabcdbbdcde", aro: PermissionEntity.ARO_USER, aro_foreign_key: "f848277c-5398-58f8-a82a-72397af2d450", created: "2020-12-16T04:33:33+00:00", group: null, id: "b741be47-48ef-436f-a5c7-02330ed99954", modified: "2020-12-16T04:33:33+00:00", type: PermissionEntity.PERMISSION_OWNER}
+    ]);
+
+    const result = PermissionChangesCollection.reuseChanges(
+      PermissionEntity.ACO_FOLDER, aco, permissions, changes, original
+    );
+    const permissionChange = result.items[0];
+    expect(permissionChange.aco).toBe("Folder");
+    expect(permissionChange.acoForeignKey).toBe("192eb961-414c-43d4-9196-36dad47eed0e");
+    expect(permissionChange.aro).toBe("User");
+    expect(permissionChange.aroForeignKey).toBe("e97b14ba-8957-57c9-a357-f78a6e1e1a46");
+    expect(permissionChange.id).toBe("b5fcee7b-588f-4453-8230-e646aa38dac2");
+    expect(permissionChange.type).toBe(PermissionEntity.PERMISSION_READ);
+  });
 });

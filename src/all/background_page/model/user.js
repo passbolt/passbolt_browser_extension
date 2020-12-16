@@ -365,8 +365,7 @@ const User = (function () {
    * Retrieve and the store the user csrf token.
    */
   this.retrieveAndStoreCsrfToken = async function () {
-    // const csrfToken = await UserService.retrieveCsrfToken(this);
-    const csrfToken = "TEST"// @debug
+    const csrfToken = await UserService.retrieveCsrfToken(this);
     this.setCsrfToken(csrfToken);
   };
 

@@ -15,6 +15,7 @@ const __ = require('../sdk/l10n').get;
 const app = require('../app');
 const Config = require('../model/config');
 const Worker = require('../model/worker');
+const {UserNotFoundError} = require("../error/UserNotFoundError");
 
 const {GpgAuth} = require('../model/gpgauth');
 const {User} = require('../model/user');
@@ -50,7 +51,9 @@ class AuthController {
       msg = __('The server key is verified. The server can use it to sign and decrypt content.');
       this.worker.port.emit(this.requestId, 'SUCCESS', msg);
     } catch (error) {
-      if (await this.auth.serverKeyChanged()) {
+      if (error.message.indexOf('no user associated') !== -1) {
+        error = new UserNotFoundError(__('There is no user associated with this key.'));
+      } else if (await this.auth.serverKeyChanged()) {
         error = new ServerKeyChangedError(__('The server key has changed.'));
       } else if (await this.auth.isServerKeyExpired()) {
         error = new KeyIsExpiredError(__('The server key is expired.'));
@@ -65,6 +68,7 @@ class AuthController {
    * Handle the click on the passbolt toolbar icon.
    *
    * @returns {Promise<void>}
+   * @deprecated
    */
   async login(passphrase, remember, redirect) {
     const user = User.getInstance();
@@ -94,6 +98,7 @@ class AuthController {
    * Before login hook
    *
    * @return {void}
+   * @deprecated
    */
   beforeLogin() {
     // If the worker at the origin of the login is the AuthForm.
@@ -111,6 +116,7 @@ class AuthController {
    * @param {string} redirect url (optional)
    * @param {Error} redirect The uri to redirect the user to after login.
    * @return {void}
+   * @deprecated
    */
   async handleLoginSuccess(redirect) {
     if (this.worker.pageMod && this.worker.pageMod.args.name === "AuthForm") {
@@ -136,6 +142,7 @@ class AuthController {
    * Handle a login failure
    * @param {Error} error The caught error
    * @return {void}
+   * @deprecated
    */
   handleLoginError(error) {
     if (this.worker.pageMod && this.worker.pageMod.args.name === "AuthForm") {

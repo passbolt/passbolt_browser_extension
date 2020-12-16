@@ -90,17 +90,17 @@ pageMods.WebIntegration = require('./pagemod/webIntegrationPagemod').WebIntegrat
 /*
  * This pagemod drives the react application.
  */
-pageMods.ReactApp = require('./pagemod/reactAppPagemod').ReactApp;
+pageMods.App = require('./pagemod/AppPagemod').App;
 
 /*
  * This pagemod drives the login / authentication
  */
-pageMods.PassboltAuth = require('./pagemod/passboltAuthPagemod').PassboltAuth;
+pageMods.AuthBootstrap = require('./pagemod/authBootstrapPagemod').AuthBootstrap;
 
 /*
  * This pagemod drives the login passphrase capture
  */
-pageMods.PassboltAuthForm = require('./pagemod/passboltAuthFormPagemod').PassboltAuthForm;
+pageMods.Auth = require('./pagemod/authPagemod').Auth;
 
 /*
  * This pagemod help bootstrap the first step of the setup process from a passbolt server app page
@@ -137,7 +137,7 @@ pageMods.QuickAccess = require('./pagemod/quickAccessPagemod').QuickAccess;
  * It is inserted in all the pages of a domain that is trusted.
  * Such trust is defined during the first step of the setup process (or in config-debug)
  */
-pageMods.PassboltApp = require('./pagemod/passboltAppPagemod').PassboltApp;
+pageMods.AppBoostrap = require('./pagemod/appBoostrap').AppBoostrap;
 
 /*
  * This pagemod drives the clipboard iframe tool

@@ -96,7 +96,7 @@ const listen = function (worker) {
   worker.port.on('passbolt.user.set', function (requestId, u) {
     try {
       User.getInstance().set(u);
-      app.pageMods.PassboltAuth.init();
+      app.pageMods.AuthBootstrap.init();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', e.message);

@@ -80,7 +80,7 @@ class AuthModel {
       user.storeMasterPasswordTemporarily(passphrase, -1);
     }
     await this.legacyAuthModel.startCheckAuthStatusLoop();
-    await app.pageMods.PassboltApp.init();
+    await app.pageMods.AppBoostrap.init();
   }
 }
 

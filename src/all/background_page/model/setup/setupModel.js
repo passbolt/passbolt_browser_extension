@@ -36,7 +36,17 @@ class SetupModel {
    * @throws {Error} if options are invalid or API error
    */
   async findSetupInfo(userId, token) {
-    const userDto = await this.setupService.findSetupInfo(userId, token);
+    let userDto = null;
+    try {
+      userDto = await this.setupService.findSetupInfo(userId, token);
+    } catch (error) {
+      // If the entry point doesn't exist we are in a version < v3.
+      if (error.code = "404") {
+        userDto = await this.setupService.findLegacySetupInfo(userId, token);
+      } else {
+        throw error
+      }
+    }
     return new UserEntity(userDto);
   }
 
@@ -49,7 +59,17 @@ class SetupModel {
    * @throws {Error} if options are invalid or API error
    */
   async findRecoverInfo(userId, token) {
-    const userDto = await this.setupService.findRecoverInfo(userId, token);
+    let userDto = null;
+    try {
+      userDto = await this.setupService.findRecoverInfo(userId, token);
+    } catch (error) {
+      // If the entry point doesn't exist we are in a version < v3.
+      if (error.code = "404") {
+        userDto = await this.setupService.findLegacyRecoverInfo(userId, token);
+      } else {
+        throw error
+      }
+    }
     return new UserEntity(userDto);
   }
 

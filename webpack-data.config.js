@@ -5,6 +5,7 @@ const config = {
     'app': path.resolve(__dirname, './src/all/data/js/app/App.js'),
     'setup': path.resolve(__dirname, './src/all/data/js/app/Setup.js'),
     'recover': path.resolve(__dirname, './src/all/data/js/app/Recover.js'),
+    'login': path.resolve(__dirname, './src/all/data/js/app/Login.js'),
     'quickaccess': path.resolve(__dirname, './src/all/data/js/quickaccess/popup/Popup.js')
   },
   mode: 'production',

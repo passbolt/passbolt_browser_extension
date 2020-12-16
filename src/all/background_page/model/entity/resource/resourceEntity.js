@@ -478,6 +478,14 @@ class ResourceEntity extends Entity {
     this._tags = tags;
   }
 
+  /**
+   * Set resource favorite
+   * @param {FavoriteEntity} favorite
+   */
+  set favorite(favorite) {
+    this._favorite = favorite;
+  }
+
   // ==================================================
   // Build rules
   // ==================================================

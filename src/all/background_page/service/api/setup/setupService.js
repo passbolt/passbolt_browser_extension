@@ -144,6 +144,7 @@ class SetupService extends AbstractService {
    * @param {string} token the token
    * @returns {Promise<*>} response body
    * @throws {Error} if options are invalid or API error
+   * @deprecated will be removed with v4
    */
   async findLegacyRecoverInfo(userId, token) {
     this.assertValidId(userId);

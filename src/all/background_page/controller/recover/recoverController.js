@@ -117,7 +117,7 @@ class RecoverController {
     const accountEntity = new AccountEntity(accountDto);
     await this.setupModel.completeRecovery(this.setupEntity);
     await this.accountModel.add(accountEntity);
-    app.pageMods.PassboltAuth.init(); // This is required, the pagemod is not initialized prior to the completion of the setup.
+    app.pageMods.AuthBootstrap.init(); // This is required, the pagemod is not initialized prior to the completion of the setup.
     await this.authModel.login(this.setupEntity.passphrase);
     await this.redirectToApp();
   }

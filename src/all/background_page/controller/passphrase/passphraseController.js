@@ -35,10 +35,8 @@ exports.get = get;
  * @return {Promise<string>}
  */
 const requestPassphrase = async function(worker) {
-  const passphraseWorker = getPassphraseWorker(worker);
-
   try {
-    const requestResult = await passphraseWorker.port.request('passbolt.passphrase.request');
+    const requestResult = await worker.port.request('passbolt.passphrase.request');
     const { passphrase, rememberMe } = requestResult;
     validatePassphrase(passphrase, rememberMe);
     rememberPassphrase(passphrase, rememberMe);
@@ -79,20 +77,5 @@ const validatePassphrase = function(passphrase, rememberMe) {
 
   const keyring = new Keyring();
   keyring.checkPassphrase(passphrase);
-};
-
-/**
- * The passphrase entry dialog is now managed by the new react application.
- * The treatment of the requests coming from any legacy worker (Import, Export) should be delegated to the new
- * react application.
- * @param {Worker} worker The source worker.
- * @return {Worker}
- */
-const getPassphraseWorker = function (worker) {
-  if (worker.isLegacyWorker()) {
-    return Worker.get('ReactApp', worker.tab.id);
-  }
-
-  return worker;
 };
 

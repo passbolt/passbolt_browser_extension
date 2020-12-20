@@ -17,8 +17,7 @@ const Worker = require('../../model/worker');
  * @return {Promise}
  */
 const open = async function (worker, title, goals, message) {
-  const progressWorker = getProgressWorker(worker);
-  progressWorker.port.emit('passbolt.progress.open-progress-dialog', title, goals, message);
+  worker.port.emit('passbolt.progress.open-progress-dialog', title, goals, message);
   await delay();
 };
 exports.open = open;
@@ -37,8 +36,7 @@ exports.delay = delay;
  * @param {Worker} worker The worker from which the request comes from.
  */
 const close = async function (worker) {
-  const progressWorker = getProgressWorker(worker);
-  progressWorker.port.emit('passbolt.progress.close-progress-dialog');
+  worker.port.emit('passbolt.progress.close-progress-dialog');
 };
 exports.close = close;
 
@@ -50,8 +48,7 @@ exports.close = close;
  * @param message (optional) The message to display
  */
 const update = async function (worker, completed, message) {
-  const progressWorker = getProgressWorker(worker);
-  progressWorker.port.emit('passbolt.progress.update', message, completed);
+  worker.port.emit('passbolt.progress.update', message, completed);
   await delay();
 };
 exports.update = update;
@@ -63,22 +60,6 @@ exports.update = update;
  * @param goals The new goals
  */
 const updateGoals = function (worker, goals) {
-  const progressWorker = getProgressWorker(worker);
-  progressWorker.port.emit('passbolt.progress.update-goals', goals);
+  worker.port.emit('passbolt.progress.update-goals', goals);
 };
 exports.updateGoals = updateGoals;
-
-/**
- * The progress dialog is now managed by the new react application.
- * The treatment of the requests coming from any legacy worker (Import, Export) should be delegated to the new
- * react application.
- * @param {Worker} worker The source worker.
- * @return {Worker}
- */
-const getProgressWorker = function (worker) {
-  if (worker.isLegacyWorker()) {
-    return Worker.get('ReactApp', worker.tab.id);
-  }
-
-  return worker;
-};

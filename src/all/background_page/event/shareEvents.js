@@ -108,16 +108,5 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
-
-  /*
-   * Close the share passwords dialog
-   * @listens passbolt.share.close
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.share.close', function() {
-    const reactAppWorker = Worker.get('ReactApp', worker.tab.id);
-    reactAppWorker.port.emit('passbolt.share.close-share-dialog');
-  });
-
 };
 exports.listen = listen;

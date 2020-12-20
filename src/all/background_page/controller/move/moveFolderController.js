@@ -232,8 +232,7 @@ class MoveFolderController {
     if (this.foldersChanges.length || this.resourcesChanges.length) {
       // Some permission changes are possible, ask user what strategy to adopt
       // This also serves as a confirmation prior to a typically sensitive operation
-      const reactWorker = this.getReactWorker();
-      const strategy = await reactWorker.port.request('passbolt.folders.move-strategy.request', this.destinationFolderId, [this.folderId], []);
+      const strategy = await this.worker.port.request('passbolt.folders.move-strategy.request', this.destinationFolderId, [this.folderId], []);
       if (strategy.moveOption === 'keep') {
         return;
       }
@@ -277,19 +276,6 @@ class MoveFolderController {
   cleanup() {
     this.privateKey = null;
   }
-
-  /**
-   * The treatment of the requests coming from any legacy worker should be delegated to the new
-   * react application.
-   * @return {Worker}
-   */
-  getReactWorker() {
-    if (this.worker.isLegacyWorker()) {
-      return Worker.get('ReactApp', this.worker.tab.id);
-    }
-    return this.worker;
-  };
-
 }
 
 exports.MoveFolderController = MoveFolderController;

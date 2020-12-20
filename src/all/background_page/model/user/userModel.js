@@ -67,7 +67,7 @@ class UserModel {
    * @param {Object} [contains] optional example: {permissions: true}
    * @param {Object} [filters] optional
    * @param {Object} [orders] optional
-   * @returns {Promise<ResourcesCollection>}
+   * @returns {Promise<UserEntity>}
    */
   async findOne(userId, contains) {
     const userDto = await this.userService.get(userId, contains);

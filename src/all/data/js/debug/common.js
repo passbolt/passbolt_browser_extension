@@ -64,7 +64,7 @@ $(function () {
    *
    * @param url {string} The url to open in the new tab.
    */
-  DebugCommon.prototype.openTab = function (url) {
+  DebugCommon.prototype.openTab = function (url){
     passbolt.message.emit('passbolt.debug.open-tab', url);
   };
 

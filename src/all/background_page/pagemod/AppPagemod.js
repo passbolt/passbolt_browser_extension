@@ -60,7 +60,7 @@ App.init = function () {
       // Keep the pagemod event listeners at the end of the list.
       app.events.pagemod.listen(worker);
 
-      Worker.add('ReactApp', worker);
+      Worker.add('App', worker);
     }
   });
 };

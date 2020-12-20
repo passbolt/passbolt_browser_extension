@@ -28,11 +28,9 @@ WebIntegration.init = function () {
     contentScriptFile: [
       'data/vendors/jquery.js',
       'data/vendors/dom-testing-library-event.js',
-      'data/tpl/login.js',
       'data/js/lib/port.js',
       'data/js/lib/request.js',
       'data/js/lib/message.js',
-      'data/js/lib/html.js',
       'data/js/quickaccess/quickaccess.js',
       'content_scripts/js/bootstrap.js'
     ],

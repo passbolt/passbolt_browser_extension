@@ -19,13 +19,13 @@
  * ==================================================================================
  */
 var events = {};
+events.appBootstrap = require('./event/appBootstrapEvents');
 events.actionLogs = require('./event/actionLogEvents');
 events.auth = require('./event/authEvents');
 events.clipboard = require('./event/clipboardEvents');
 events.comment = require('./event/commentEvents');
 events.config = require('./event/configEvents');
 events.debug = require('./event/debugEvents');
-events.debugPage = require('./event/debugPageEvents');
 events.exportResources = require('./event/exportResourcesEvents');
 events.favorite = require('./event/favoriteEvents');
 events.file = require('./event/fileEvents');
@@ -88,9 +88,16 @@ var pageMods = {};
 pageMods.WebIntegration = require('./pagemod/webIntegrationPagemod').WebIntegration;
 
 /*
+ * This pagemod drives the main addon app
+ * It is inserted in all the pages of a domain that is trusted.
+ * Such trust is defined during the first step of the setup process (or in config-debug)
+ */
+pageMods.AppBoostrap = require('./pagemod/appBoostrapPagemod').AppBoostrap;
+
+/*
  * This pagemod drives the react application.
  */
-pageMods.App = require('./pagemod/AppPagemod').App;
+pageMods.App = require('./pagemod/appPagemod').App;
 
 /*
  * This pagemod drives the login / authentication
@@ -133,13 +140,6 @@ pageMods.Recover = require('./pagemod/recoverPagemod').Setup;
 pageMods.QuickAccess = require('./pagemod/quickAccessPagemod').QuickAccess;
 
 /*
- * This pagemod drives the main addon app
- * It is inserted in all the pages of a domain that is trusted.
- * Such trust is defined during the first step of the setup process (or in config-debug)
- */
-pageMods.AppBoostrap = require('./pagemod/appBoostrap').AppBoostrap;
-
-/*
  * This pagemod drives the clipboard iframe tool
  */
 pageMods.Clipboard = require('./pagemod/clipboardPagemod').Clipboard;
@@ -154,12 +154,6 @@ pageMods.File = require('./pagemod/filePagemod').File;
  * This allows to not have to go through the setup process steps
  * and perform changes useful for testing that would otherwise break things
  * Like for example changing the public key only on the client but not the server
- */
-pageMods.DebugPage = require('./pagemod/debugPagePagemod').DebugPage;
-
-/*
- * This page mod allow inserting the debug tools needed by developers on all
- * pages.
  */
 pageMods.Debug = require('./pagemod/debugPagemod').Debug;
 

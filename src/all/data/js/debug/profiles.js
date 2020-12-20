@@ -23,7 +23,7 @@ $(function () {
     lastname: 'Lovelace',
     username: 'ada@passbolt.com',
     settings: {
-      domain: 'http://passbolt.dev',
+      domain: 'http://passbolt.local',
       securityToken: {
         color: '#ff3a3a',
         textcolor: '#ffffff',
@@ -197,7 +197,7 @@ WoyDz96l/88asc2mV7bg82Zp0zo1iZvPeUw=\n\
     lastname: 'Holberton',
     username: 'betty@passbolt.com',
     settings: {
-      domain: 'http://passbolt.dev',
+      domain: 'http://passbolt.local',
       securityToken: {
         color: '#ff3a3a',
         textcolor: '#ffffff',
@@ -371,7 +371,7 @@ WoyDz96l/88asc2mV7bg82Zp0zo1iZvPeUw=\n\
     lastname: 'User',
     username: 'admin@passbolt.com',
     settings: {
-      domain: 'http://passbolt.dev',
+      domain: 'http://passbolt.local',
       securityToken: {
         color: '#ff3a3a',
         textcolor: '#ffffff',
@@ -545,7 +545,7 @@ dpjWjDJgJn4x7Nv9VHqJuGQX6WPUYQ94lBm4EH/OahytnF6FIKWS0LmG+GNlbh2o\n\
     lastname: 'Fu',
     username: 'ping@passbolt.com',
     settings: {
-      domain: 'http://passbolt.dev',
+      domain: 'http://passbolt.local',
       securityToken: {
         color: '#ff3a3a',
         textcolor: '#ffffff',
@@ -649,7 +649,7 @@ cOv3QJcgi02rfOMbtFrfHqeEPITCru9nZg==\n\
     lastname: 'Antonelli',
     username: 'kathleen@passbolt.com',
     settings: {
-      domain: 'http://passbolt.dev',
+      domain: 'http://passbolt.local',
       securityToken: {
         color: '#ff3a3a',
         textcolor: '#ffffff',

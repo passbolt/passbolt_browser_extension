@@ -4,13 +4,76 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var Log = require('../model/log').Log;
-var tabsController = require('../controller/tabsController');
+const app = require('../app');
+const Config = require('../model/config');
+const Log = require('../model/log').Log;
+const BrowserSettings = require('../controller/browserSettingsController');
+const ToolbarController = require('../controller/toolbarController').ToolbarController;
 const {Keyring} = require('../model/keyring');
 const keyring = new Keyring();
 const {User} = require('../model/user');
 
-var listen = function (worker) {
+const listen = function (worker) {
+
+  /*
+   * Retrieve all the plugin configuration variables.
+   *
+   * @listens passbolt.debug.config.readAll
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.debug.config.readAll', function (requestId) {
+    var config = Config.readAll();
+    worker.port.emit(requestId, 'SUCCESS', config);
+  });
+
+  /*
+   * Read preference variable.
+   *
+   * @listens passbolt.debug.browser.readPreference
+   * @param requestId {uuid} The request identifier
+   * @param preferenceKey {string} Preference name to obtain
+   */
+  worker.port.on('passbolt.debug.browser.readPreference', function (requestId, preferenceKey) {
+    worker.port.emit(requestId, 'SUCCESS', BrowserSettings.get(preferenceKey));
+  });
+
+  /*
+   * Flush plugin configuration.
+   *
+   * @listens passbolt.debug.config.flush
+   */
+  worker.port.on('passbolt.debug.config.flush', function () {
+    Config.flush();
+  });
+
+  /*
+   * Initialize the application pagemod.
+   *
+   * @listens passbolt.debug.appPagemod.init
+   */
+  worker.port.on('passbolt.debug.appPagemod.init', function () {
+    var app = require('../app');
+    app.pageMods.AppBoostrap.init();
+  });
+
+  /*
+   * Simulate toolbar icon click.
+   *
+   * @listens passbolt.debug.simulateToolbarIconClick
+   */
+  worker.port.on('passbolt.debug.simulateToolbarIconClick', function () {
+    var toolbarController = new ToolbarController();
+    toolbarController.openPassboltTab();
+  });
+
+  /*
+   * Get logs.
+   *
+   * @listens passbolt.debug.getLogs
+   */
+  worker.port.on('passbolt.debug.log.readAll', function (requestId) {
+    worker.port.emit(requestId, 'SUCCESS', Log.readAll());
+  });
 
   /*
    * Open a new tab.
@@ -86,5 +149,21 @@ var listen = function (worker) {
     });
   });
 
+  /*
+   * Set the user in the plugin local storage
+   *
+   * @listens passbolt.user.set
+   * @param requestId {uuid} The request identifier
+   * @param u {array} The user object
+   */
+  worker.port.on('passbolt.user.set', function (requestId, u) {
+    try {
+      User.getInstance().set(u);
+      app.pageMods.AuthBootstrap.init();
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (e) {
+      worker.port.emit(requestId, 'ERROR', e.message);
+    }
+  });
 };
 exports.listen = listen;

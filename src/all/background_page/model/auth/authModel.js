@@ -71,7 +71,6 @@ class AuthModel {
     remember = remember || false;
     const user = User.getInstance();
     const privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
-    await user.retrieveAndStoreCsrfToken();
     await this.legacyAuthModel.login(privateKey);
 
     // Post login operations

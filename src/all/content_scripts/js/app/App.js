@@ -15,9 +15,11 @@ import ReactDOM from "react-dom";
 import ExtBootstrapApp from "passbolt-styleguide/src/react-extension/ExtBootstrapApp";
 /* eslint-disable no-unused-vars */
 import Port from "../../../data/js/lib/port";
+import browser from "webextension-polyfill";
 /* eslint-enable no-unused-vars */
 
+const storage = browser.storage;
 const browserExtensionUrl = chrome.runtime.getURL("/");
 const domContainer = document.createElement("div");
 document.body.appendChild(domContainer);
-ReactDOM.render(<ExtBootstrapApp port={port} browserExtensionUrl={browserExtensionUrl}/>, domContainer);
+ReactDOM.render(<ExtBootstrapApp port={port} storage={storage} browserExtensionUrl={browserExtensionUrl}/>, domContainer);

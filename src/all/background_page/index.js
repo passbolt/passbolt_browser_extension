@@ -94,7 +94,6 @@ const main = async function() {
   // Debug pagemod
   if (Config.isDebug()) {
     pageMods.Debug.init();
-    pageMods.DebugPage.init();
   }
 
 };

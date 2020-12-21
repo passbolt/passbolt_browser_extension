@@ -9,6 +9,7 @@
 var app = require('../app');
 var User = require('../model/user').User;
 const {PageMod} = require('../sdk/page-mod');
+const Worker = require('../model/worker');
 
 var AuthBootstrap = function () {};
 AuthBootstrap._pageMod = undefined;
@@ -53,6 +54,8 @@ AuthBootstrap.init = function () {
        * the content code to know when the background page is ready.
        */
       app.events.pagemod.listen(worker);
+
+      Worker.add('AuthBootstrap', worker);
     }
   });
 };

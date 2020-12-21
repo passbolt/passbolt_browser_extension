@@ -13,8 +13,6 @@
  */
 const __ = require('../sdk/l10n').get;
 const Worker = require('../model/worker');
-const {UserNotFoundError} = require("../error/UserNotFoundError");
-
 const {GpgAuth} = require('../model/gpgauth');
 const {Crypto} = require('../model/crypto');
 const {Keyring} = require('../model/keyring');
@@ -49,7 +47,7 @@ class AuthController {
       this.worker.port.emit(this.requestId, 'SUCCESS', msg);
     } catch (error) {
       if (error.message.indexOf('no user associated') !== -1) {
-        error = new UserNotFoundError(__('There is no user associated with this key.'));
+        Worker.get('AuthBootstrap', this.worker.tab.id).port.emit('passbolt.auth-bootstrap.remove-iframe');
       } else if (await this.auth.serverKeyChanged()) {
         error = new ServerKeyChangedError(__('The server key has changed.'));
       } else if (await this.auth.isServerKeyExpired()) {

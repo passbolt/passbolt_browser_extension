@@ -24,5 +24,13 @@ const listen = function (worker) {
       appBoostrapWorker.port.emit('passbolt.app-bootstrap.change-route', path);
     }
   });
+
+  /*
+   * Whenever the (React) app wants to reload the page
+   * @listens passbolt.app.reload-page
+   */
+  worker.port.on('passbolt.app.reload', function () {
+    browser.tabs.reload(worker.tab.id);
+  });
 };
 exports.listen = listen;

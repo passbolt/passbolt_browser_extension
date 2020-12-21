@@ -38,6 +38,7 @@ App.init = function () {
       }
 
       // Initialize the events listeners.
+      app.events.app.listen(worker);
       app.events.auth.listen(worker);
       app.events.clipboard.listen(worker);
       app.events.config.listen(worker);

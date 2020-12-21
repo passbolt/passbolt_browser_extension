@@ -19,6 +19,7 @@
  * ==================================================================================
  */
 var events = {};
+events.app = require('./event/appEvents');
 events.appBootstrap = require('./event/appBootstrapEvents');
 events.actionLogs = require('./event/actionLogEvents');
 events.auth = require('./event/authEvents');

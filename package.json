@@ -62,7 +62,7 @@
     "jest-environment-node": "^26.6.2",
     "mocha": "^5.2.0",
     "sinon": "^7.5.0",
-    "web-ext": "^4.1.0",
+    "web-ext": "^5.4.1",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.12"
   },

@@ -10,6 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+const {SiteSettings} = require("../model/siteSettings");
 const {SetupController} = require("../controller/setup/setupController");
 
 const listen = function (worker) {
@@ -19,6 +20,23 @@ const listen = function (worker) {
    * @private
    */
   const setupController = new SetupController(worker, worker.tab.url);
+
+  /*
+   * Initialize the recovery process.
+   *
+   * @listens passbolt.setup.site-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.setup.site-settings', async function (requestId) {
+    try {
+      const siteSettings = new SiteSettings(setupController.setupEntity.domain);
+      const siteSettingsDto = await siteSettings.get();
+      worker.port.emit(requestId, 'SUCCESS', siteSettingsDto);
+    } catch(error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
 
   /*
    * Retrieve the setup info

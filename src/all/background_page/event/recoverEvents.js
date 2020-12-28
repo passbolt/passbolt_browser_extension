@@ -59,11 +59,11 @@ const listen = function (worker) {
    * @listens passbolt.recover.verify-passphrase
    * @param requestId {uuid} The request identifier
    * @param passphrase {string} The passphrase used to verify the secret key
-   * @param rememberMe {boolean} The passphrase should be remembered and used to login the user at the end of the setup process
+   * @param rememberUntilLogout {boolean} The passphrase should be remembered until the user is logged out
    */
-  worker.port.on('passbolt.recover.verify-passphrase', async function (requestId, passphrase) {
+  worker.port.on('passbolt.recover.verify-passphrase', async function (requestId, passphrase, rememberUntilLogout) {
     try {
-      await recoverController.verifyPassphrase(passphrase);
+      await recoverController.verifyPassphrase(passphrase, rememberUntilLogout);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);

@@ -35,10 +35,25 @@ class UsersCollection extends EntityCollection {
       UsersCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+
+    // Check if user usernames and ids are unique
+    // Why not this.push? It is faster than adding items one by one
+    const ids = this._props.map(user => user.id);
+    ids.sort().sort((a, b) => {
+      if (a === b) {
+        throw new EntityCollectionError(0, UsersCollection.RULE_UNIQUE_ID, `User id ${a} already exists.`);
+      }
+    });
+    const usernames = this._props.map(user => user.username);
+    usernames.sort().sort((a, b) => {
+      if (a === b) {
+        throw new EntityCollectionError(0, UsersCollection.RULE_UNIQUE_USERNAME, `User username ${a} already exists.`);
+      }
+    });
+
+    // Directly push into the private property _items[]
     this._props.forEach(user => {
-      this.push(new UserEntity(user));
+      this._items.push(new UserEntity(user));
     });
 
     // We do not keep original props

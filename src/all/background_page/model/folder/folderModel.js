@@ -339,6 +339,7 @@ class FolderModel {
       result = [...result, ...intermediateResult];
     }
 
+    await FolderLocalStorage.addFolders(result);
     return result;
   }
 
@@ -356,7 +357,11 @@ class FolderModel {
     const errorCallback = callbacks.errorCallback || (() => {});
 
     try {
-      const createdFolderEntity = await this.create(folderEntity);
+      // Here we create entity just like in this.create
+      // but we don't add the resource entity in the local storage just yet,
+      // we wait until all resources are created in order to speed things up
+      const folderDto = await this.folderService.create(folderEntity.toDto(), {permission: true});
+      const createdFolderEntity = new FolderEntity(folderDto);
       successCallback(createdFolderEntity, collectionIndex);
       return createdFolderEntity;
     } catch(error) {

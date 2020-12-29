@@ -149,6 +149,8 @@ class ImportResourcesFileController {
   /**
    * Encrypt the secrets.
    * @param {ImportResourcesFileEntity} importEntity The import object
+   * @param {string} userId uuid
+   * @param {openpgp.key.Key} privateKey
    * @returns {Promise<void>}
    */
   async encryptSecrets(importEntity, userId, privateKey) {
@@ -291,7 +293,7 @@ class ImportResourcesFileController {
     /**
      * Tag the first resource to ensure the API is not creating 2 tags with the same name.
      * It happens with version <= v2.13 that 2 tags were created when tagging multiple resource in bulk and that leads to
-     * unecpected behavior.
+     * unexpected behavior.
      * @todo investigate the API resource tag entry point and remove this hack.
      */
     await this.tagModel.updateResourceTags(resourcesIds[0], tagsCollection);

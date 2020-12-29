@@ -296,20 +296,86 @@ class ResourceModel {
   }
 
   /**
-   * Delete multiple resources
+   * Move a folder using Passbolt API
    *
-   * @param {array} resourcesIds List of resources ids to delete
-   * @returns {Promise<void>}
+   * @param {string} resourceId the resource id
+   * @param {(string|null)} folderParentId the folder parent
+   * @returns {ResourceEntity}
    */
-  async deleteAll(resourcesIds) {
-    return resourcesIds.reduce((promise, resourceId) => {
-      return promise.then(async () => this.delete(resourceId));
-    }, Promise.resolve([]));
+  async move(resourceId, folderParentId) {
+    const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
+    const resourceEntity = new ResourceEntity(resourceDto);
+    resourceEntity.folderParentId = folderParentId;
+    await this.moveService.move(resourceEntity);
+    // TODO update modified date
+    await ResourceLocalStorage.updateResource(resourceEntity);
+
+    return resourceEntity;
+  }
+
+  //==============================================================
+  // Bulk operations
+  //==============================================================
+  /**
+   * Create a bulk of resources
+   * @param {ResourcesCollection} collection The collection of resources to import
+   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
+   * @returns {Promise<array<ResourceEntity>>}
+   */
+  async bulkCreate(collection, callbacks) {
+    let result = [];
+
+    // Parallelize the operations by chunk of BULK_OPERATION_SIZE operations.
+    const chunks = splitBySize(collection.resources, BULK_OPERATION_SIZE);
+    for (let chunkIndex in chunks) {
+      const chunk = chunks[chunkIndex];
+      const promises = chunk.map(async (resourceId, mapIndex) => {
+        const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
+        return this._bulkCreate_createResource(resourceId, collectionIndex, callbacks);
+      });
+
+      const bulkPromises = await Promise.allSettled(promises);
+      const intermediateResult = bulkPromises.map(promiseResult => promiseResult.value);
+      result = [...result, ...intermediateResult];
+    }
+
+    await ResourceLocalStorage.addResources(result);
+    return result;
+  }
+
+  /**
+   * Create a resource for the bulkCreate function.
+   * @param {ResourceEntity} resourceEntity The resource to create
+   * @param {int} collectionIndex The index of the resource in the initial collection
+   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
+   * @returns {Promise<ResourceEntity|Error>}
+   * @private
+   */
+  async _bulkCreate_createResource(resourceEntity, collectionIndex, callbacks) {
+    callbacks = callbacks || {};
+    const successCallback = callbacks.successCallback || (() => {});
+    const errorCallback = callbacks.errorCallback || (() => {});
+
+    try {
+      // Here we create entity just like in this.create
+      // but we don't add the resource entity in the local storage just yet,
+      // we wait until all resources are created in order to speed things up
+      const data = resourceEntity.toDto({secrets:true});
+      const contain = {permission: true, favorite: true, tags: true, folder: true};
+      const resourceDto = await this.resourceService.create(data, contain);
+      const createdResourceEntity = new ResourceEntity(resourceDto);
+      successCallback(createdResourceEntity, collectionIndex);
+      return createdResourceEntity;
+    } catch(error) {
+      console.error(error);
+      errorCallback(error, collectionIndex);
+      return error;
+    }
   }
 
   /**
    * Delete a bulk of resources
-   * @param {ResourcesCollection} collection The collection of resources to delete
+   * @param {Array<string>} resourcesIds collection The list of uuids to delete
    * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
    * @returns {Promise<array<ResourceEntity>>}
    */
@@ -349,74 +415,6 @@ class ResourceModel {
     try {
       await this.delete(resourceId);
       successCallback(collectionIndex);
-    } catch(error) {
-      console.error(error);
-      errorCallback(error, collectionIndex);
-      return error;
-    }
-  }
-
-  /**
-   * Move a folder using Passbolt API
-   *
-   * @param {string} resourceId the resource id
-   * @param {(string|null)} folderParentId the folder parent
-   * @returns {ResourceEntity}
-   */
-  async move(resourceId, folderParentId) {
-    const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
-    const resourceEntity = new ResourceEntity(resourceDto);
-    resourceEntity.folderParentId = folderParentId;
-    await this.moveService.move(resourceEntity);
-    // TODO update modified date
-    await ResourceLocalStorage.updateResource(resourceEntity);
-
-    return resourceEntity;
-  }
-
-  /**
-   * Create a bulk of resources
-   * @param {ResourcesCollection} collection The collection of resources to import
-   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
-   * @returns {Promise<array<ResourceEntity>>}
-   */
-  async bulkCreate(collection, callbacks) {
-    let result = [];
-
-    // Parallelize the operations by chunk of BULK_OPERATION_SIZE operations.
-    const chunks = splitBySize(collection.resources, BULK_OPERATION_SIZE);
-    for (let chunkIndex in chunks) {
-      const chunk = chunks[chunkIndex];
-      const promises = chunk.map(async (resourceId, mapIndex) => {
-        const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
-        return this._bulkCreate_createResource(resourceId, collectionIndex, callbacks);
-      });
-
-      const bulkPromises = await Promise.allSettled(promises);
-      const intermediateResult = bulkPromises.map(promiseResult => promiseResult.value);
-      result = [...result, ...intermediateResult];
-    }
-
-    return result;
-  }
-
-  /**
-   * Create a resource for the bulkCreate function.
-   * @param {ResourceEntity} resourceEntity The resource to create
-   * @param {int} collectionIndex The index of the resource in the initial collection
-   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
-   * @returns {Promise<ResourceEntity|Error>}
-   * @private
-   */
-  async _bulkCreate_createResource(resourceEntity, collectionIndex, callbacks) {
-    callbacks = callbacks || {};
-    const successCallback = callbacks.successCallback || (() => {});
-    const errorCallback = callbacks.errorCallback || (() => {});
-
-    try {
-      const createdResourceEntity = await this.create(resourceEntity);
-      successCallback(createdResourceEntity, collectionIndex);
-      return createdResourceEntity;
     } catch(error) {
       console.error(error);
       errorCallback(error, collectionIndex);
@@ -503,20 +501,51 @@ class ResourceModel {
   }
 
   /**
-   * Update tags in resource local storage
+   * Replace tags for a given resource in local storage
    * Doesn't udpate the tags remotely, use tagModel for this instead
    *
    * @param {string} resourceId
    * @param {TagsCollection} tagsCollection
    * @returns {Promise<ResourceEntity>}
    */
-  async updateResourceTagsLocally(resourceId, tagsCollection) {
+  async replaceResourceTagsLocally(resourceId, tagsCollection) {
     const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
     const resourceEntity = new ResourceEntity(resourceDto);
     resourceEntity.tags = tagsCollection;
     await ResourceLocalStorage.updateResource(resourceEntity);
     return resourceEntity;
   }
+
+  /**
+   * Update multiple resources tags in local storage
+   * Doesn't update the tags remotely, use tagModel for this instead
+   *
+   * @param {Array<string>} resourceIds
+   * @param {Array<TagsCollection>} tagsCollections
+   * @returns {Promise<Array<ResourceEntity>>}
+   */
+  async bulkReplaceResourceTagsLocally(resourceIds, tagsCollections) {
+    const resourcesDto = await ResourceLocalStorage.get();
+    let resourceCollection = new ResourcesCollection(resourcesDto);
+    await resourceCollection.bulkReplaceTagsCollection(resourceIds, tagsCollections);
+    await ResourceLocalStorage.set(resourceCollection);
+  }
+
+  /**
+   * Get a resource from the local storage by id
+   *
+   * @param {Array<string>} ids The resource uuids
+   * @return {Array<Object>} list of resources matching id list
+   */
+  static async getResourcesByIds(ids) {
+    if (!ids || !Array.isArray(ids) || !ids.length) {
+      return undefined;
+    }
+    let found = [];
+    const resources = await ResourceLocalStorage.get();
+
+    return found;
+  };
 
   /**
    * Remove a tag from resource local storage

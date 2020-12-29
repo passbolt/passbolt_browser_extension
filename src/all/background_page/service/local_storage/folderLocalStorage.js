@@ -105,6 +105,26 @@ class FolderLocalStorage {
   };
 
   /**
+   * Add multiple folders to the local storage
+   * @param {Array<FolderEntity>} folderEntities
+   */
+  static async addFolders(folderEntities) {
+    await lock.acquire();
+    try {
+      const folders = await FolderLocalStorage.get();
+      folderEntities.forEach(folderEntity => {
+        FolderLocalStorage.assertEntityBeforeSave(folderEntity);
+        folders.push(folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
+      });
+      await browser.storage.local.set({folders});
+      lock.release();
+    } catch (error) {
+      lock.release();
+      throw error;
+    }
+  };
+
+  /**
    * Update a folder in the local storage.
    *
    * @param {FolderEntity} folderEntity The folder to update

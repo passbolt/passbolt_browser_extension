@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {PageMod} = require('../sdk/page-mod');
+const Worker = require('../model/worker');
 const app = require('../app');
 
 const RecoverBootstrap = function () {};
@@ -32,6 +33,7 @@ RecoverBootstrap.init = function () {
       'content_scripts/js/dist/recover.js',
     ],
     onAttach: function (worker) {
+      Worker.add('RecoverBootstrap', worker);
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows
        * the content code to know when the background page is ready.

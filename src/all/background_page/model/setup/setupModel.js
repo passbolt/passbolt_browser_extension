@@ -41,8 +41,9 @@ class SetupModel {
       const {user} = await this.setupService.findSetupInfo(userId, token);
       userDto = user;
     } catch (error) {
-      // If the entry point doesn't exist, the API version is <v3.
-      if (error.code = "404") {
+      // If the entry point doesn't exist or return a 500, the API version is <v3.
+      const code = error.data && error.data.code;
+      if (code === 404 || code === 500) {
         userDto = await this.setupService.findLegacySetupInfo(userId, token);
       } else {
         throw error
@@ -65,8 +66,9 @@ class SetupModel {
       const {user} = await this.setupService.findRecoverInfo(userId, token);
       userDto = user;
     } catch (error) {
-      // If the entry point doesn't exist, the API version is <v3.
-      if (error.code = "404") {
+      // If the entry point doesn't exist or return a 500, the API version is <v3.
+      const code = error.data && error.data.code
+      if (code === 404 || code === 500) {
         userDto = await this.setupService.findLegacyRecoverInfo(userId, token);
       } else {
         throw error

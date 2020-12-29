@@ -12,6 +12,7 @@
  */
 const {SiteSettings} = require("../model/siteSettings");
 const {RecoverController} = require("../controller/recover/recoverController");
+const Worker = require('../model/worker');
 
 const listen = function (worker) {
   /**
@@ -51,6 +52,8 @@ const listen = function (worker) {
     } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
+      // In case of unexpected error at this step, let the API treat the case.
+      Worker.get('RecoverBootstrap', worker.tab.id).port.emit('passbolt.recover-bootstrap.remove-iframe');
     }
   });
 

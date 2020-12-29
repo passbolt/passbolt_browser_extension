@@ -75,7 +75,7 @@ class SetupService extends AbstractService {
   async findSetupInfo(userId, token) {
     this.assertValidId(userId);
     this.assertValidId(token);
-    const url = new URL(`${this.apiClient.baseUrl}/install/${userId}/${token}`);
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/install/${userId}/${token}`, {});
     const response = await this.apiClient.fetchAndHandleResponse('GET', url);
     return response.body;
   }
@@ -90,7 +90,7 @@ class SetupService extends AbstractService {
   async findRecoverInfo(userId, token) {
     this.assertValidId(userId);
     this.assertValidId(token);
-    const url = new URL(`${this.apiClient.baseUrl}/recover/start/${userId}/${token}`);
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/recover/start/${userId}/${token}`, {});
     const response = await this.apiClient.fetchAndHandleResponse('GET', url);
     return response.body;
   }

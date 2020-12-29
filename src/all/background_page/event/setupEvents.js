@@ -12,6 +12,7 @@
  */
 const {SiteSettings} = require("../model/siteSettings");
 const {SetupController} = require("../controller/setup/setupController");
+const Worker = require('../model/worker');
 
 const listen = function (worker) {
   /**
@@ -51,6 +52,8 @@ const listen = function (worker) {
     } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
+      // In case of unexpected error at this step, let the API treat the case.
+      Worker.get('SetupBootstrap', worker.tab.id).port.emit('passbolt.setup-bootstrap.remove-iframe');
     }
   });
 

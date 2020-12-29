@@ -115,9 +115,10 @@ class SetupController {
   /**
    * Verify the imported key passphrase
    * @param {string} passphrase The passphrase
+   * @param {boolean?} rememberUntilLogout (Optional) The passphrase should be remembered until the user is logged out
    * @returns {Promise<void>}
    */
-  async verifyPassphrase(passphrase) {
+  async verifyPassphrase(passphrase, rememberUntilLogout) {
     let privateKey = (await openpgp.key.readArmored(this.setupEntity.userPrivateArmoredKey)).keys[0];
     try {
       await privateKey.decrypt(passphrase);
@@ -126,6 +127,9 @@ class SetupController {
     }
     // Store the user passphrase to login in after the setup operation.
     this.setupEntity.passphrase = passphrase;
+    if (rememberUntilLogout){
+      this.setupEntity.rememberUntilLogout = rememberUntilLogout
+    }
   }
 
   /**
@@ -147,7 +151,7 @@ class SetupController {
     await this.setupModel.complete(this.setupEntity);
     await this.accountModel.add(accountEntity);
     app.pageMods.AuthBootstrap.init(); // This is required, the pagemod is not initialized prior to the completion of the setup.
-    await this.authModel.login(this.setupEntity.passphrase);
+    await this.authModel.login(this.setupEntity.passphrase, this.setupEntity.rememberUntilLogout);
     await this.redirectToApp();
   }
 

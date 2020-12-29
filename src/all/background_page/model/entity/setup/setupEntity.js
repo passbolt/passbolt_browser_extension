@@ -75,6 +75,9 @@ class SetupEntity extends Entity {
         "passphrase": {
           "type": "string"
         },
+        "remember_until_logout": {
+          "type": "boolean"
+        },
         "user_public_armored_key": {
           "type": "string"
         },
@@ -233,6 +236,24 @@ class SetupEntity extends Entity {
   set passphrase(passphrase) {
     EntitySchema.validateProp("passphrase", passphrase, SetupEntity.getSchema().properties.passphrase);
     this._props.passphrase = passphrase;
+  }
+
+  /**
+   * Get the passphrase remember until logout flag
+   * @returns {boolean}
+   */
+  get rememberUntilLogout() {
+    return this._props.remember_until_logout;
+  }
+
+  /**
+   * Set the passphrase remember until logout flag
+   * @param {boolean} rememberUntilLogout The passphrase
+   * @throws EntityValidationError The parameter doesn't match the constraint of the property
+   */
+  set rememberUntilLogout(rememberUntilLogout) {
+    EntitySchema.validateProp("remember_until_logout", rememberUntilLogout, SetupEntity.getSchema().properties.remember_until_logout);
+    this._props.remember_until_logout = rememberUntilLogout;
   }
 
   /**

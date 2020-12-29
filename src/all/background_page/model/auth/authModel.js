@@ -64,18 +64,18 @@ class AuthModel {
   /**
    * Login
    * @param {string} passphrase The passphrase to use to decrypt the user private key
-   * @param {boolean?} remember Should the passphrase remember until the user is logged out
+   * @param {boolean?} rememberUntilLogout Should the passphrase remember until the user is logged out
    * @returns {Promise<void>}
    */
-  async login(passphrase, remember) {
-    remember = remember || false;
+  async login(passphrase, rememberUntilLogout) {
+    rememberUntilLogout = rememberUntilLogout || false;
     const user = User.getInstance();
     const privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
     await this.legacyAuthModel.login(privateKey);
 
     // Post login operations
     // MFA may not be complete yet, so no need to preload things here
-    if (remember) {
+    if (rememberUntilLogout) {
       user.storeMasterPasswordTemporarily(passphrase, -1);
     }
     await this.legacyAuthModel.startCheckAuthStatusLoop();

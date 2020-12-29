@@ -532,22 +532,6 @@ class ResourceModel {
   }
 
   /**
-   * Get a resource from the local storage by id
-   *
-   * @param {Array<string>} ids The resource uuids
-   * @return {Array<Object>} list of resources matching id list
-   */
-  static async getResourcesByIds(ids) {
-    if (!ids || !Array.isArray(ids) || !ids.length) {
-      return undefined;
-    }
-    let found = [];
-    const resources = await ResourceLocalStorage.get();
-
-    return found;
-  };
-
-  /**
    * Remove a tag from resource local storage
    *
    * @param tagId

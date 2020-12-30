@@ -71,6 +71,8 @@ class AuthModel {
     rememberUntilLogout = rememberUntilLogout || false;
     const user = User.getInstance();
     const privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
+    // @deprecated to be removed with v4. Prior to API v3, retrieving the CSRF token log the user out, so we need to fetch it before the login.
+    await user.retrieveAndStoreCsrfToken();
     await this.legacyAuthModel.login(privateKey);
 
     // Post login operations

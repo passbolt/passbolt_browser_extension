@@ -13,7 +13,6 @@ const app = require('../app');
 const Worker = require('../model/worker');
 const GpgAuth = require('../model/gpgauth').GpgAuth;
 const User = require('../model/user').User;
-const AppInitController = require("../controller/app/appInitController").AppInitController;
 
 const AppBoostrapPagemod = function () {
 };
@@ -64,9 +63,6 @@ AppBoostrapPagemod.initPageMod = function () {
         console.error('Can not attach application if user is not logged in.');
         return;
       }
-
-      const appInitController = new AppInitController(worker);
-      await appInitController.main();
 
       app.events.appBootstrap.listen(worker);
 

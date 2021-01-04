@@ -172,11 +172,15 @@ class ImportResourcesFileController {
    * @returns {string|{password: string, description: *}}
    */
   buildSecretDto(importResourceEntity) {
+    // @todo sloppy. If the resources types are present, we consider that by default the description should be encrypted.
     if (importResourceEntity.resourceTypeId) {
-      return {
-        password: importResourceEntity.secretClear,
-        description: importResourceEntity.description
+      const dto = {
+        password: importResourceEntity.secretClear || "",
+        description: importResourceEntity.description || ""
       }
+      // @todo sloppy. We remove the clear description here, but it should be done at a parsing level.
+      importResourceEntity.description = "";
+      return dto;
     }
     return importResourceEntity.secretClear;
   }

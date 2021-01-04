@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import Transition from 'react-transition-group/Transition';
 import browser from "webextension-polyfill/dist/browser-polyfill";
 import AppContext from "../../contexts/AppContext";
@@ -18,6 +17,7 @@ class ResourceViewPage extends React.Component {
     this.handleCopyPasswordClick = this.handleCopyPasswordClick.bind(this);
     this.handleGoToUrlClick = this.handleGoToUrlClick.bind(this);
     this.handleUseOnThisTabClick = this.handleUseOnThisTabClick.bind(this);
+    this.handleViewPasswordButtonClick = this.handleViewPasswordButtonClick.bind(this);
   }
 
   initState() {
@@ -27,7 +27,9 @@ class ResourceViewPage extends React.Component {
       usingOnThisTab: false,
       copySecretState: "default",
       copyLoginState: "default",
-      useOnThisTabError: ""
+      useOnThisTabError: "",
+      passwordDecrypted: null, // The current resource password decrypted
+      isSecretDecrypting: false // if the secret is decrypting
     };
   }
 
@@ -103,7 +105,13 @@ class ResourceViewPage extends React.Component {
     this.resetError();
     try {
       this.setState({ copySecretState: 'processing' });
-      const plaintextDto = await passbolt.request('passbolt.secret.decrypt', this.state.resource.id);
+      let plaintextDto;
+      if (this.hasPasswordDecrypted()) {
+        // password already decrypted
+        plaintextDto = this.state.passwordDecrypted;
+      } else {
+        plaintextDto = await passbolt.request("passbolt.secret.decrypt", this.state.resource.id, {showProgress: true});
+      }
       await this.copyPasswordToClipboard(plaintextDto);
       this.setState({ copySecretState: 'done' });
       setTimeout(() => {
@@ -115,6 +123,23 @@ class ResourceViewPage extends React.Component {
       } else {
         console.error('An unexpected error occurred', error);
       }
+    }
+  }
+
+  /**
+   * Handle view password button click.
+   */
+  async handleViewPasswordButtonClick() {
+    if (this.hasPasswordDecrypted()) {
+      this.setState({passwordDecrypted: null});
+    } else {
+      await this.setState({isSecretDecrypting: true});
+      let plaintextDto = await passbolt.request("passbolt.secret.decrypt", this.state.resource.id, {showProgress: true});
+      if (plaintextDto.password) {
+        // If the secret decrypted is in object and not a string
+        plaintextDto = plaintextDto.password;
+      }
+      this.setState({passwordDecrypted: plaintextDto, isSecretDecrypting: false});
     }
   }
 
@@ -175,8 +200,25 @@ class ResourceViewPage extends React.Component {
     return url.href;
   }
 
+  /**
+   * Has password decrypted for a resource
+   * @returns {boolean}
+   */
+  hasPasswordDecrypted() {
+    return this.state.passwordDecrypted !== null;
+  }
+
+  /**
+   * Has property preview password
+   * @returns {*}
+   */
+  get hasPreviewPasswordEnabled() {
+    return this.context.siteSettings && this.context.siteSettings.passbolt.plugins.previewPassword;
+  }
+
   render() {
     const sanitizeResourceUrl = this.sanitizeResourceUrl();
+    const hasPasswordDecrypted = this.hasPasswordDecrypted();
 
     return (
       <div className="resource item-browse">
@@ -250,9 +292,34 @@ class ResourceViewPage extends React.Component {
               <span className="visually-hidden">Copy to clipboard</span>
             </a>
             <span className="property-name">Password</span>
-            <a href="#" role="button" className="secret-copy property-value" onClick={this.handleCopyPasswordClick}>
+            <a href="#" role="button" className={`property-value secret ${hasPasswordDecrypted ? "decrypted" : "secret-copy"}`} onClick={this.handleCopyPasswordClick}>
+              {hasPasswordDecrypted &&
+              <span>{this.state.passwordDecrypted}</span>
+              }
+              {!hasPasswordDecrypted &&
               <span className="visually-hidden">Copy to clipboard</span>
+              }
             </a>
+            {this.hasPreviewPasswordEnabled &&
+            <a onClick={this.handleViewPasswordButtonClick}
+              className={`password-view button button-icon button-toggle ${hasPasswordDecrypted ? "selected" : ""} ${this.state.isSecretDecrypting ? "disabled" : ""}`}>
+              <span className="fa icon">
+                <Transition in={!this.state.isSecretDecrypting} appear={false} timeout={500}>
+                  {(status) => (
+                    <svg className={`transition fade-${status} ${this.state.isSecretDecrypting ? "visually-hidden" : ""}`} viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1664 960q-152-236-381-353 61 104 61 225 0 185-131.5 316.5t-316.5 131.5-316.5-131.5-131.5-316.5q0-121 61-225-229 117-381 353 133 205 333.5 326.5t434.5 121.5 434.5-121.5 333.5-326.5zm-720-384q0-20-14-34t-34-14q-125 0-214.5 89.5t-89.5 214.5q0 20 14 34t34 14 34-14 14-34q0-86 61-147t147-61q20 0 34-14t14-34zm848 384q0 34-20 69-140 230-376.5 368.5t-499.5 138.5-499.5-139-376.5-368q-20-35-20-69t20-69q140-229 376.5-368t499.5-139 499.5 139 376.5 368q20 35 20 69z"/>
+                    </svg>
+                  )}
+                </Transition>
+                <Transition in={this.state.isSecretDecrypting} appear={true} timeout={500}>
+                  {(status) => (
+                    <svg className={`fade-${status} ${!this.state.isSecretDecrypting ? "visually-hidden" : ""}`} width="22px" height="22px" viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg"><g stroke="none" fill="none" ><g id="loading_white" transform="translate(2, 2)" strokeWidth="4"><circle id="Oval" stroke="#CCC" cx="9" cy="9" r="9" /></g><g id="loading_white" transform="translate(2, 2)" strokeWidth="2"><path d="M18,9 C18,4.03 13.97,0 9,0" id="Shape" stroke="#000"><animateTransform attributeName="transform" type="rotate" from="0 9 9" to="360 9 9" dur="0.35s" repeatCount="indefinite" /></path></g></g></svg>
+                  )}
+                </Transition>
+              </span>
+              <span className="visually-hidden">view</span>
+            </a>
+            }
           </li>
           <li className="property">
             <a href={`${sanitizeResourceUrl ? sanitizeResourceUrl : "#"}`} role="button" className={`button button-icon property-action ${!sanitizeResourceUrl ? "disabled" : ""}`}

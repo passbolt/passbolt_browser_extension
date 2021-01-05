@@ -105,6 +105,16 @@ class QuickAccess extends React.Component {
     this.setState({ siteSettings });
   }
 
+  /**
+   * Can the user use the remember until I logout option
+   * @return {boolean}
+   */
+  get canRememberMe() {
+    const options = this.state.siteSettings && this.state.siteSettings.passbolt.plugins.rememberMe.options;
+    const hasRememberMe =  options && typeof options[-1] !== "undefined";
+    return hasRememberMe;
+  }
+
   async checkAuthStatus() {
     const { isAuthenticated, isMfaRequired } = await passbolt.request("passbolt.auth.check-status");
     if (isMfaRequired) {
@@ -173,7 +183,7 @@ class QuickAccess extends React.Component {
                     )} />
                     <AnimatedSwitch location={props.location}>
                       <Route path="/data/quickaccess/login" render={() => (
-                        <LoginPage loginSuccessCallback={this.loginSuccessCallback} />
+                        <LoginPage loginSuccessCallback={this.loginSuccessCallback} canRememberMe={this.canRememberMe}/>
                       )} />
                       <PrivateRoute exact path="/data/quickaccess/resources/group" component={FilterResourcesByGroupPage} />
                       <PrivateRoute path="/data/quickaccess/resources/group/:id" component={FilterResourcesByGroupPage} />

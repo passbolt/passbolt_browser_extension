@@ -89,58 +89,8 @@ class AuthModel {
    * @returns {Promise<void>}
    */
   async postLogin() {
-    this._syncUserSettings();
-    this._syncResourcesTypesLocalStorage();
-    this._syncRolesLocalStorage();
     await this.legacyAuthModel.startCheckAuthStatusLoop();
     await app.pageMods.AppBoostrap.init();
-  }
-
-  /**
-   * Sync the user settings
-   * @returns {Promise<void>}
-   * @private
-   */
-  async _syncUserSettings() {
-    const user = User.getInstance();
-    try {
-      await user.settings.sync()
-    } catch (error) {
-      // fail silently for CE users
-      user.settings.setDefaults();
-    }
-  }
-
-  /**
-   * Sync the API resources types
-   * @returns {Promise<void>}
-   * @private
-   */
-  async _syncResourcesTypesLocalStorage() {
-    const user = User.getInstance();
-    const apiClientOptions = await user.getApiClientOptions();
-    try {
-      const resourceTypeModel = new ResourceTypeModel(apiClientOptions);
-      await resourceTypeModel.updateLocalStorage();
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  /**
-   * Sync the API roles
-   * @returns {Promise<void>}
-   * @private
-   */
-  async _syncRolesLocalStorage() {
-    const user = User.getInstance();
-    const apiClientOptions = await user.getApiClientOptions();
-    try {
-      const roleModel = new RoleModel(apiClientOptions);
-      await roleModel.updateLocalStorage();
-    } catch (error) {
-      console.error(error);
-    }
   }
 }
 

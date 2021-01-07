@@ -176,7 +176,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);
-      worker.port.emit(requestId, 'ERROR');
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 

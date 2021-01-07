@@ -303,6 +303,11 @@ class ImportResourcesFileController {
     await this.tagModel.updateResourceTags(resourcesIds[0], tagsCollection);
     resourcesIds.splice(0, 1);
 
+    // If there was only one resource, exit.
+    if (!resourcesIds.length) {
+      return;
+    }
+
     // Bulk tag the resources.
     let taggedCount = 0;
     const successCallback = () => this.handleTagResourceSuccess(importEntity, ++taggedCount);

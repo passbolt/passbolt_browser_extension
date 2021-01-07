@@ -210,7 +210,7 @@ module.exports = function (grunt) {
           // Controls
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/controls',
-          src: ['check_black.svg', 'check_white.svg', 'colorpicker/**', 'dot_black.svg', 'dot_red.svg', 'infinite-bar.gif', 'loading_dark.svg', 'loading_light.svg'],
+          src: ['check_black.svg', 'check_white.svg', 'colorpicker/**', 'dot_black.svg', 'dot_white.svg', 'dot_red.svg', 'infinite-bar.gif', 'loading_dark.svg', 'loading_light.svg'],
           dest: path.build_data + 'img/controls',
           expand: true
         }, {

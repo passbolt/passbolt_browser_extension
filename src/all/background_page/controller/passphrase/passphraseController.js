@@ -46,6 +46,7 @@ const requestPassphrase = async function(worker) {
     throw error;
   }
 };
+exports.request = requestPassphrase;
 
 /**
  * Remember the user passphrase for a given duration.

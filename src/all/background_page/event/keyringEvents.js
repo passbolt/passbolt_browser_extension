@@ -127,7 +127,7 @@ const listen = function (worker) {
   worker.port.on('passbolt.keyring.download-my-private-key', async function (requestId) {
     let filename = "passbolt_private.asc";
     try {
-      await passphraseController.get(worker);
+      await passphraseController.request(worker);
       const privateKeyInfo = await keyring.findPrivate();
       if (!privateKeyInfo) {
         throw new Error('Private key not found.');

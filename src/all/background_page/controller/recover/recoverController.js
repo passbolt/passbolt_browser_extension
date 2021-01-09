@@ -62,7 +62,23 @@ class RecoverController {
    * @returns {Promise<void>}
    */
   async importKey(armoredKey) {
+    const keyInfo = await this._assertImportKeyFormat(armoredKey);
+    await this._assertImportKeyOwnedByUser(keyInfo.fingerprint);
+    this.setupEntity.userPrivateArmoredKey = keyInfo.key;
+    this.setupEntity.userPublicArmoredKey = await this.keyring.extractPublicKey(this.setupEntity.userPrivateArmoredKey);
+  }
+
+  /**
+   * Assert import key.
+   * @param {string} armoredKey The user armored private key
+   * @returns {Promise<object>} The keyinfo
+   * @throws {GpgKeyError} If the key is not a valid key
+   * @throws {GpgKeyError} If the key is not a private key
+   * @private
+   */
+  async _assertImportKeyFormat(armoredKey) {
     let keyInfo = null;
+
     try {
       keyInfo = await this.keyring.keyInfo(armoredKey);
     } catch(error) {
@@ -71,16 +87,28 @@ class RecoverController {
     if (!keyInfo.private) {
       throw new GpgKeyError('The key must be a private key.');
     }
+
+    return keyInfo;
+  }
+
+  /**
+   * Assert import key is owned by the user doing the recover.
+   * @todo for now the function only check that the key is recognized by the server. The API does offer yet a way to verify that a key is associated to a user id.
+   * @param {string} fingerprint The import key fingerprint
+   * @returns {Promise<void>}
+   * @throws {GpgKeyError} If the key is already used
+   * @private
+   */
+  async _assertImportKeyOwnedByUser(fingerprint) {
+    const domain = this.setupEntity.domain;
+    const serverPublicArmoredKey = this.setupEntity.serverPublicArmoredKey;
+
     try {
-      // Verify that the key is not already in use by another user.
-      await this.legacyAuthModel.verify(this.setupEntity.domain, this.setupEntity.serverPublicArmoredKey, keyInfo.fingerprint);
+      await this.legacyAuthModel.verify(domain, serverPublicArmoredKey, fingerprint);
     } catch (error) {
-      // @todo Ensure the error is related the one expected, could be a different error ApiFetchError ...
+      // @todo Handle not controlled errors, such as timeout error...
       throw new GpgKeyError('This key does not match any account.');
     }
-
-    this.setupEntity.userPrivateArmoredKey = keyInfo.key;
-    this.setupEntity.userPublicArmoredKey = await this.keyring.extractPublicKey(this.setupEntity.userPrivateArmoredKey);
   }
 
   /**

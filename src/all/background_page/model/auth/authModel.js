@@ -10,9 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+const __ = require('../../sdk/l10n').get;
 const app = require("../../app");
-const {RoleModel} = require("../role/roleModel");
-const {ResourceTypeModel} = require("../resourceType/resourceTypeModel");
+const {GpgAuthHeader} = require("../gpgAuthHeader");
+const {GpgAuthToken} = require("../gpgAuthToken");
 const {AuthStatusLocalStorage} = require("../../service/local_storage/authStatusLocalStorage");
 const {GpgAuth} = require("../gpgauth");
 const {AuthService} = require("../../service/api/auth/authService");
@@ -91,6 +92,34 @@ class AuthModel {
   async postLogin() {
     await this.legacyAuthModel.startCheckAuthStatusLoop();
     await app.pageMods.AppBoostrap.init();
+  }
+
+  /**
+   * Verify the server identify
+   *
+   * @param {string} serverKey The public key to use to encrypt the serverToken
+   * @param {string} fingerprint The fingerprint to verify
+   * @throws {Error} If the token cannot be encrypted
+   * @throws {Error} if verification procedure fails
+   * @returns {Promise<void>}
+   */
+  async verify(serverKey, fingerprint) {
+    let encryptedToken, originalToken;
+    try {
+      originalToken = new GpgAuthToken();
+      encryptedToken = await this.crypto.encrypt(originalToken.token, serverKey)
+    } catch (error) {
+      throw new Error(__('Unable to encrypt the verify token.') + ' ' + error.message);
+    }
+
+    const response = await this.authService.verify(fingerprint, encryptedToken);
+
+    // Check that the server was able to decrypt the token with our local copy
+    const auth = new GpgAuthHeader(response.headers, 'verify');
+    const verifyToken = new GpgAuthToken(auth.headers['x-gpgauth-verify-response']);
+    if (verifyToken.token !== originalToken.token) {
+      throw new Error(__('The server was unable to prove it can use the advertised OpenPGP key.'));
+    }
   }
 }
 

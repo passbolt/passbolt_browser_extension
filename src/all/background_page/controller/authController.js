@@ -12,12 +12,15 @@
  * @since         2.0.0
  */
 const __ = require('../sdk/l10n').get;
+const Uuid = require('../utils/uuid');
 const Worker = require('../model/worker');
-const {GpgAuth} = require('../model/gpgauth');
+const {User} = require('../model/user');
+const {AuthModel} = require("../model/auth/authModel");
 const {Crypto} = require('../model/crypto');
 const {Keyring} = require('../model/keyring');
 const {KeyIsExpiredError} = require('../error/keyIsExpiredError');
 const {ServerKeyChangedError} = require('../error/serverKeyChangedError');
+const {PassboltApiFetchError} = require('../error/passboltApiFetchError');
 
 class AuthController {
    /**
@@ -31,7 +34,6 @@ class AuthController {
     this.requestId = requestId;
     this.keyring = new Keyring();
     this.crypto = new Crypto(this.keyring);
-    this.auth = new GpgAuth(this.keyring);
   }
 
   /**
@@ -40,23 +42,42 @@ class AuthController {
    * @returns {Promise<void>}
    */
   async verify() {
-    let msg;
+    const user = User.getInstance();
+    const clientOptions = await user.getApiClientOptions({requireCsrfToken: false});
+    const authModel = new AuthModel(clientOptions);
+    const serverKey = this.keyring.findPublic(Uuid.get(user.settings.getDomain())).key;
+    const userFingerprint = this.keyring.findPrivate().fingerprint;
+
     try {
-      await this.auth.verify();
-      msg = __('The server key is verified. The server can use it to sign and decrypt content.');
-      this.worker.port.emit(this.requestId, 'SUCCESS', msg);
+      await authModel.verify(serverKey, userFingerprint);
+      this.worker.port.emit(this.requestId, 'SUCCESS');
     } catch (error) {
+      await this.onVerifyError(error)
+    }
+  }
+
+  /**
+   * Whenever the verify fail
+   * @param {Error} error The error
+   * @returns {Promise<void>}
+   */
+  async onVerifyError(error) {
+    if (error instanceof PassboltApiFetchError) {
       if (error.message.indexOf('no user associated') !== -1) {
+        /*
+         * If the user has been deleted from the API, remove the authentication iframe served by the
+         * browser extension, and let the user continue its journey through the triage app served by the API.
+         */
         Worker.get('AuthBootstrap', this.worker.tab.id).port.emit('passbolt.auth-bootstrap.remove-iframe');
-      } else if (await this.auth.serverKeyChanged()) {
+      } else if (await this.authLegacy.serverKeyChanged()) {
         error = new ServerKeyChangedError(__('The server key has changed.'));
-      } else if (await this.auth.isServerKeyExpired()) {
+      } else if (await this.authLegacy.isServerKeyExpired()) {
         error = new KeyIsExpiredError(__('The server key is expired.'));
       }
-
-      error.message = `${__('Could not verify server key.')} ${error.message}`;
-      this.worker.port.emit(this.requestId, 'ERROR', error);
     }
+
+    error.message = `${__('Could not verify server key.')} ${error.message}`;
+    this.worker.port.emit(this.requestId, 'ERROR', error);
   }
 }
 

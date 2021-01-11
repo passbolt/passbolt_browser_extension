@@ -408,12 +408,23 @@ const User = (function () {
 
   /**
    * Return API Client options such as Domain and CSRF token
+   * @param {object?} options (optional)
+   * - requireCsrfToken {bool}: Should the csrf token should be set, default true
    * @return {ApiClientOptions} apiClientOptions
    */
-  this.getApiClientOptions = async function() {
-    return (new ApiClientOptions())
-      .setBaseUrl(this.settings.getDomain())
-      .setCsrfToken(await this.getOrFetchCsrfToken());
+  this.getApiClientOptions = async function(options) {
+    options = Object.assign({
+      requireCsrfToken: true,
+    }, options);
+
+    const apiClientOptions = (new ApiClientOptions())
+      .setBaseUrl(this.settings.getDomain());
+
+    if (options.requireCsrfToken) {
+      apiClientOptions.setCsrfToken(await this.getOrFetchCsrfToken());
+    }
+
+    return apiClientOptions;
   };
 
   /**

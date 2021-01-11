@@ -117,6 +117,13 @@ class ExportResourcesFileController {
     for (let exportResourceEntity of exportEntity.exportResources) {
       progressController.update(this.worker, ++this.progress, __(`Decrypting ${++i}/${exportEntity.exportResources.items.length}`));
       let secretClear = await this.crypto.decryptWithKey(exportResourceEntity.secrets.items[0].data, privateKey);
+
+      // @deprecated Prior to v3, resources have no resource type. Remove this condition with v4.
+      if (!exportResourceEntity.resourceTypeId) {
+        exportResourceEntity.secretClear = secretClear;
+        return;
+      }
+
       const resourceType = resourcesTypesCollection.getFirst('id', exportResourceEntity.resourceTypeId);
       if (resourceType && resourceType.slug === 'password-and-description') {
         secretClear = await this.resourceModel.deserializePlaintext(exportResourceEntity.resourceTypeId, secretClear);

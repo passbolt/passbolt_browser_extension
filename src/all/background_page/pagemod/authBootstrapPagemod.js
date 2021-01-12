@@ -39,6 +39,8 @@ AuthBootstrap.init = function () {
     include: regex,
     contentScriptWhen: 'ready',
     contentStyleFile: [
+      // @deprecated when support for v2 is dropped
+      // used to control iframe styling without inline style in v3
       'data/css/themes/default/ext_external.min.css'
     ],
     contentScriptFile: [

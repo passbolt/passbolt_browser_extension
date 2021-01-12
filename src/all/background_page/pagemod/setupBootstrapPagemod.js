@@ -28,6 +28,11 @@ SetupBootstrap.init = function () {
     name: 'SetupBootstrap',
 		include: new RegExp(setupBootstrapRegex),
     contentScriptWhen: 'ready',
+    contentStyleFile: [
+      // @deprecated when support for v2 is dropped
+      // used to control iframe styling without inline style in v3
+      'data/css/themes/default/ext_external.min.css'
+    ],
     contentScriptFile: [
       'content_scripts/js/dist/vendors.js',
       'content_scripts/js/dist/setup.js',

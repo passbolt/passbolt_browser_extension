@@ -21,6 +21,7 @@ const {Keyring} = require('../model/keyring');
 const {KeyIsExpiredError} = require('../error/keyIsExpiredError');
 const {ServerKeyChangedError} = require('../error/serverKeyChangedError');
 const {PassboltApiFetchError} = require('../error/passboltApiFetchError');
+const {GpgAuth} = require('../model/gpgauth');
 
 class AuthController {
    /**
@@ -34,6 +35,7 @@ class AuthController {
     this.requestId = requestId;
     this.keyring = new Keyring();
     this.crypto = new Crypto(this.keyring);
+    this.authLegacy = new GpgAuth(this.keyring);
   }
 
   /**
@@ -69,14 +71,22 @@ class AuthController {
          * browser extension, and let the user continue its journey through the triage app served by the API.
          */
         Worker.get('AuthBootstrap', this.worker.tab.id).port.emit('passbolt.auth-bootstrap.remove-iframe');
-      } else if (await this.authLegacy.serverKeyChanged()) {
-        error = new ServerKeyChangedError(__('The server key has changed.'));
-      } else if (await this.authLegacy.isServerKeyExpired()) {
-        error = new KeyIsExpiredError(__('The server key is expired.'));
+      } else {
+        try {
+          if (await this.authLegacy.serverKeyChanged()) {
+            error = new ServerKeyChangedError(__('The server key has changed.'));
+          } else if (await this.authLegacy.isServerKeyExpired()) {
+            error = new KeyIsExpiredError(__('The server key is expired.'));
+          }
+        } catch (e) {
+          // Cannot ask for old server key, maybe server is misconfigured
+          console.error(e);
+          error = new Error(__('Server internal error. Check with your administrator.'));
+        }
       }
     }
 
-    error.message = `${__('Could not verify server key.')} ${error.message}`;
+    error.message = `${__('Could not verify the server key.')} ${error.message}`;
     this.worker.port.emit(this.requestId, 'ERROR', error);
   }
 }

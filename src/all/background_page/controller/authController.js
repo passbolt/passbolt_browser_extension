@@ -64,25 +64,23 @@ class AuthController {
    * @returns {Promise<void>}
    */
   async onVerifyError(error) {
-    if (error instanceof PassboltApiFetchError) {
-      if (error.message.indexOf('no user associated') !== -1) {
-        /*
-         * If the user has been deleted from the API, remove the authentication iframe served by the
-         * browser extension, and let the user continue its journey through the triage app served by the API.
-         */
-        Worker.get('AuthBootstrap', this.worker.tab.id).port.emit('passbolt.auth-bootstrap.remove-iframe');
-      } else {
-        try {
-          if (await this.authLegacy.serverKeyChanged()) {
-            error = new ServerKeyChangedError(__('The server key has changed.'));
-          } else if (await this.authLegacy.isServerKeyExpired()) {
-            error = new KeyIsExpiredError(__('The server key is expired.'));
-          }
-        } catch (e) {
-          // Cannot ask for old server key, maybe server is misconfigured
-          console.error(e);
-          error = new Error(__('Server internal error. Check with your administrator.'));
+    if (error.message && error.message.indexOf('no user associated') !== -1) {
+      /*
+       * If the user has been deleted from the API, remove the authentication iframe served by the
+       * browser extension, and let the user continue its journey through the triage app served by the API.
+       */
+      Worker.get('AuthBootstrap', this.worker.tab.id).port.emit('passbolt.auth-bootstrap.remove-iframe');
+    } else {
+      try {
+        if (await this.authLegacy.serverKeyChanged()) {
+          error = new ServerKeyChangedError(__('The server key has changed.'));
+        } else if (await this.authLegacy.isServerKeyExpired()) {
+          error = new KeyIsExpiredError(__('The server key is expired.'));
         }
+      } catch (e) {
+        // Cannot ask for old server key, maybe server is misconfigured
+        console.error(e);
+        error = new Error(__('Server internal error. Check with your administrator.'));
       }
     }
 

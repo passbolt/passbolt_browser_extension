@@ -11,7 +11,8 @@
     "plugin:react/recommended"
   ],
   "plugins": [
-    "jest"
+    "jest",
+    "no-unsanitized"
   ],
   "env": {
     "browser": true,
@@ -205,7 +206,10 @@
         "MemberExpression": 1,
         "SwitchCase": 1
       }
-    ]
+    ],
     // enforce consistent indentation
+    // Mozilla unsanitized rules
+    "no-unsanitized/method": "error",
+    "no-unsanitized/property": "error"
   }
 }

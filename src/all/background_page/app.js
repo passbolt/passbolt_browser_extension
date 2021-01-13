@@ -29,7 +29,6 @@ events.config = require('./event/configEvents');
 events.debug = require('./event/debugEvents');
 events.exportResources = require('./event/exportResourcesEvents');
 events.favorite = require('./event/favoriteEvents');
-events.file = require('./event/fileEvents');
 events.folder = require('./event/folderEvents');
 events.group = require('./event/groupEvents');
 events.importResources = require('./event/importResourcesEvents');

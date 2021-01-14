@@ -23,7 +23,7 @@
     "moment-timezone": "^0.5.32",
     "openpgp": "4.10.9",
     "papaparse": "^5.2.0",
-    "passbolt-styleguide": "^3.0.0-alpha.9",
+    "passbolt-styleguide": "^3.0.0-beta.1",
     "prop-types": "^15.6.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",

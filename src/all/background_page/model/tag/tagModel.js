@@ -55,59 +55,7 @@ class TagModel {
   async updateResourceTags(resourceId, tagsCollection) {
     const tagsDto = await this.tagService.updateResourceTags(resourceId, tagsCollection.toDto());
     const updatedTagsCollection = new TagsCollection(tagsDto);
-    return await this.resourceModel.updateResourceTagsLocally(resourceId, updatedTagsCollection);
-  }
-
-  /**
-   * Bulk tag resources
-   * @param {array} resourcesIds the resources ids
-   * @param {TagsCollection} tagsCollection the tags to apply
-   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
-   * @returns {Promise<array<ResourceEntity>>}
-   */
-  async bulkTagResources(resourcesIds, tagsCollection, callbacks) {
-    let result = [];
-
-    // Parallelize the operations by chunk of BULK_OPERATION_SIZE operations.
-    const chunks = splitBySize(resourcesIds, BULK_OPERATION_SIZE);
-    for (let chunkIndex in chunks) {
-      const chunk = chunks[chunkIndex];
-      const promises = chunk.map(async (resourceId, mapIndex) => {
-        const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
-        return this._bulkTagResources_tagResource(resourceId, tagsCollection, collectionIndex, callbacks);
-      });
-
-      const bulkPromises = await Promise.allSettled(promises);
-      const intermediateResult = bulkPromises.map(promiseResult => promiseResult.value);
-      result = [...result, ...intermediateResult];
-    }
-
-    return result;
-  }
-
-  /**
-   * Tag a resource for the bulkTagResources function.
-   * @param {string} resourceId The resource id to tag
-   * @param {TagsCollection} tagsCollection the tags to apply
-   * @param {int} collectionIndex The index of the folder in the initial collection
-   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
-   * @returns {Promise<FolderEntity|Error>}
-   * @private
-   */
-  async _bulkTagResources_tagResource(resourceId, tagsCollection, collectionIndex, callbacks) {
-    callbacks = callbacks || {};
-    const successCallback = callbacks.successCallback || (() => {});
-    const errorCallback = callbacks.errorCallback || (() => {});
-
-    try {
-      const createdFolderEntity = await this.updateResourceTags(resourceId, tagsCollection);
-      successCallback(createdFolderEntity, collectionIndex);
-      return createdFolderEntity;
-    } catch(error) {
-      console.error(error);
-      errorCallback(error, collectionIndex);
-      return error;
-    }
+    return await this.resourceModel.replaceResourceTagsLocally(resourceId, updatedTagsCollection);
   }
 
   /**
@@ -134,6 +82,62 @@ class TagModel {
   async delete(tagId) {
     await this.tagService.delete(tagId);
     await this.resourceModel.deleteTagsLocally(tagId);
+  }
+
+  // ==================================================
+  // Bulk tag operation
+  // ==================================================
+  /**
+   * Bulk tag resources
+   * @param {array} resourcesIds the resources ids
+   * @param {TagsCollection} tagsCollection the tags to apply
+   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
+   * @returns {Promise<array<ResourceEntity>>}
+   */
+  async bulkTagResources(resourcesIds, tagsCollection, callbacks) {
+    let tagCollections = []
+
+    // Parallelize the operations by chunk of BULK_OPERATION_SIZE operations.
+    const chunks = splitBySize(resourcesIds, BULK_OPERATION_SIZE);
+    for (let chunkIndex in chunks) {
+      const chunk = chunks[chunkIndex];
+      const promises = chunk.map(async (resourceId, mapIndex) => {
+        const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
+        return this._bulkTagResources_tagResource(resourceId, tagsCollection, collectionIndex, callbacks);
+      });
+
+      const bulkPromises = await Promise.allSettled(promises);
+      const intermediateResult = bulkPromises.map(promiseResult => promiseResult.value);
+      tagCollections = [...tagCollections, ...intermediateResult];
+    }
+
+    return await this.resourceModel.bulkReplaceResourceTagsLocally(resourcesIds, tagCollections);
+  }
+
+  /**
+   * Tag a resource for the bulkTagResources function.
+   * @param {string} resourceId The resource id to tag
+   * @param {TagsCollection} tagsCollection the tags to apply
+   * @param {int} collectionIndex The index of the folder in the initial collection
+   * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
+   * @returns {Promise<TagsCollection|Error>}
+   * @private
+   */
+  async _bulkTagResources_tagResource(resourceId, tagsCollection, collectionIndex, callbacks) {
+    callbacks = callbacks || {};
+    const successCallback = callbacks.successCallback || (() => {});
+    const errorCallback = callbacks.errorCallback || (() => {});
+
+    try {
+      const tagsDto = await this.tagService.updateResourceTags(resourceId, tagsCollection.toDto());
+      const updatedTagsCollection = new TagsCollection(tagsDto);
+      successCallback(updatedTagsCollection, collectionIndex);
+      return updatedTagsCollection;
+    } catch(error) {
+      console.error(error);
+      errorCallback(error, collectionIndex);
+      return error;
+    }
   }
 }
 

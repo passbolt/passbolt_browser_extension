@@ -10,11 +10,10 @@ const {AuthController} = require('../controller/authController');
 const {AuthCheckStatusController} = require('../controller/auth/authCheckStatusController');
 const {AuthIsAuthenticatedController} = require('../controller/auth/authIsAuthenticatedController');
 const {AuthIsMfaRequiredController} = require('../controller/auth/authIsMfaRequiredController');
-const {AuthUpdateServerKeyController} = require('../controller/auth/authUpdateServerKeyController');
-const {GpgAuth} = require('../model/gpgauth');
 const {AuthModel} = require("../model/auth/authModel");
-const Worker = require('../model/worker');
 const {User} = require('../model/user');
+const {Keyring} = require('../model/keyring');
+const Config = require('../model/config');
 
 const listen = function (worker) {
   /*
@@ -94,7 +93,7 @@ const listen = function (worker) {
    * @listens passbolt.auth.verify
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.verify', function (requestId) {
+  worker.port.on('passbolt.auth.verify-server-key', function (requestId) {
     var auth = new AuthController(worker, requestId);
     auth.verify();
   });
@@ -106,16 +105,16 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param domain {string} The server's domain
    */
-  worker.port.on('passbolt.auth.get-server-key', function (requestId, domain) {
-    var gpgauth = new GpgAuth();
-    gpgauth.getServerKey(domain).then(
-      function success(msg) {
-        worker.port.emit(requestId, 'SUCCESS', msg);
-      },
-      function error(error) {
-        worker.port.emit(requestId, 'ERROR', error.message);
-      }
-    );
+  worker.port.on('passbolt.auth.get-server-key', async function (requestId, domain) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const authModel = new AuthModel(clientOptions);
+      const serverKeyDto = await authModel.getServerKey();
+      worker.port.emit(requestId, 'SUCCESS', serverKeyDto);
+    } catch {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
   });
 
   /*
@@ -125,8 +124,37 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.auth.replace-server-key', async function (requestId) {
-    const controller = new AuthUpdateServerKeyController(worker, requestId);
-    await controller.main();
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const authModel = new AuthModel(apiClientOptions);
+    const keyring = new Keyring();
+    const domain = Config.read('user.settings.trustedDomain');
+
+    try {
+      const serverKeyDto = await authModel.getServerKey();
+      await keyring.importServerPublicKey(serverKeyDto.armored_key, domain);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Verify the passphrase
+   *
+   * @listens passbolt.auth.verify-passphrase
+   * @param requestId {uuid} The request identifier
+   * @param passphrase {string} The passphrase to verify
+   */
+  worker.port.on('passbolt.auth.verify-passphrase', async function (requestId, passphrase) {
+    const keyring = new Keyring();
+    try {
+      await keyring.checkPassphrase(passphrase);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
   });
 
   /*
@@ -139,35 +167,34 @@ const listen = function (worker) {
    *   (bool) false|undefined if should not remember
    *   (integer) -1 if should remember for the session
    *   (integer) duration in seconds to specify a specific duration
-   * @param redirect {string} The uri to redirect the user after login
    */
-  worker.port.on('passbolt.auth.login', function (requestId, passphrase, remember, redirect) {
-    const auth = new AuthController(worker, requestId);
-    auth.login(passphrase, remember, redirect);
+  worker.port.on('passbolt.auth.login', async function (requestId, passphrase, remember) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const authModel = new AuthModel(clientOptions);
+      await authModel.login(passphrase, remember);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
   });
 
   /*
-   * Ask the login page to add a css class to an HTML Element.
+   * Redirect the user post login.
    *
-   * @listens passbolt.auth.add-class
-   * @param selector {string} The HTML Element selector
-   * @param cssClass {string} The class(es) to add to the html element
+   * @listens passbolt.auth.post-login-redirect
+   * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.add-class', function (selector, cssClass) {
-    Worker.get('Auth', worker.tab.id).port.emit('passbolt.auth.add-class', selector, cssClass);
+  worker.port.on('passbolt.auth.post-login-redirect', function(requestId) {
+    let url = Config.read('user.settings.trustedDomain');
+    const redirectTo = (new URL(worker.tab.url)).searchParams.get('redirect');
+    if (/^\/[A-Za-z0-9\-\/]*$/.test(redirectTo)) {
+      url = `${url}${redirectTo}`;
+    }
+    chrome.tabs.update(worker.tab.id, {url});
+    worker.port.emit(requestId, 'SUCCESS');
   });
-
-  /*
-   * Ask the login page to remove a css class from an HTML Element.
-   *
-   * @listens passbolt.auth.remove-class
-   * @param selector {string} The HTML Element selector
-   * @param cssClass {string} The class(es) to remove from the html element
-   */
-  worker.port.on('passbolt.auth.remove-class', function (selector, cssClass) {
-    Worker.get('Auth', worker.tab.id).port.emit('passbolt.auth.remove-class', selector, cssClass);
-  });
-
 };
 
 exports.listen = listen;

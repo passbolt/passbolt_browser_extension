@@ -13,6 +13,7 @@
 const app = require("../../app");
 const {ApiClientOptions} = require("../../service/api/apiClient/apiClientOptions");
 const fileController = require('../../controller/fileController');
+const {GpgKeyError} = require("../../error/GpgKeyError");
 const {InvalidMasterPasswordError} = require("../../error/invalidMasterPasswordError");
 const {AccountModel} = require("../../model/account/accountModel");
 const {SetupModel} = require("../../model/setup/setupModel");
@@ -89,29 +90,66 @@ class SetupController {
    * @returns {Promise<void>}
    */
   async importKey(armoredKey) {
-    const keyInfo = await this.keyring.keyInfo(armoredKey);
-    if (!keyInfo.private) {
-      throw new TypeError('The key must be a private key.');
-    }
-    try {
-      // Verify that the key is not already in use by another user.
-      await this.legacyAuthModel.verify(this.setupEntity.domain, this.setupEntity.serverPublicArmoredKey, keyInfo.fingerprint);
-      throw new TypeError('This key is already used by another user.');
-    } catch (error) {
-      // An error is expected.
-      // @todo Ensure the error is related the one expected: No user associated with this key. It could be a different error ApiFetchError ...
-    }
-
+    const keyInfo = await this._assertImportKeyFormat(armoredKey);
+    await this._assertImportKeyNotUsed(keyInfo.fingerprint);
     this.setupEntity.userPrivateArmoredKey = keyInfo.key;
     this.setupEntity.userPublicArmoredKey = await this.keyring.extractPublicKey(this.setupEntity.userPrivateArmoredKey);
   }
 
   /**
+   * Assert import key.
+   * @param {string} armoredKey The user armored private key
+   * @returns {Promise<object>} The keyinfo
+   * @throws {GpgKeyError} If the key is not a valid key
+   * @throws {GpgKeyError} If the key is not a private key
+   * @private
+   */
+  async _assertImportKeyFormat(armoredKey) {
+    let keyInfo = null;
+
+    try {
+      keyInfo = await this.keyring.keyInfo(armoredKey);
+    } catch(error) {
+      throw new GpgKeyError('The key must be a valid private key.');
+    }
+    if (!keyInfo.private) {
+      throw new GpgKeyError('The key must be a private key.');
+    }
+
+    return keyInfo;
+  }
+
+  /**
+   * Assert import key is not already used
+   * @param {string} fingerprint The import key fingerprint
+   * @returns {Promise<void>}
+   * @throws {GpgKeyError} If the key is already used
+   * @private
+   */
+  async _assertImportKeyNotUsed(fingerprint) {
+    const domain = this.setupEntity.domain;
+    const serverPublicArmoredKey = this.setupEntity.serverPublicArmoredKey;
+    let keyAlreadyUsed = false;
+
+    try {
+      await this.legacyAuthModel.verify(domain, serverPublicArmoredKey, fingerprint);
+      keyAlreadyUsed = true;
+    } catch (error) {
+      // @todo Handle not controlled errors, such as timeout error...
+    }
+
+    if (keyAlreadyUsed) {
+      throw new GpgKeyError('This key is already used by another user.');
+    }
+  }
+
+  /**
    * Verify the imported key passphrase
    * @param {string} passphrase The passphrase
+   * @param {boolean?} rememberUntilLogout (Optional) The passphrase should be remembered until the user is logged out
    * @returns {Promise<void>}
    */
-  async verifyPassphrase(passphrase) {
+  async verifyPassphrase(passphrase, rememberUntilLogout) {
     let privateKey = (await openpgp.key.readArmored(this.setupEntity.userPrivateArmoredKey)).keys[0];
     try {
       await privateKey.decrypt(passphrase);
@@ -120,6 +158,9 @@ class SetupController {
     }
     // Store the user passphrase to login in after the setup operation.
     this.setupEntity.passphrase = passphrase;
+    if (rememberUntilLogout){
+      this.setupEntity.rememberUntilLogout = rememberUntilLogout
+    }
   }
 
   /**
@@ -140,8 +181,8 @@ class SetupController {
     const accountEntity = new AccountEntity(accountDto);
     await this.setupModel.complete(this.setupEntity);
     await this.accountModel.add(accountEntity);
-    app.pageMods.PassboltAuth.init(); // This is required, the pagemod is not initialized prior to the completion of the setup.
-    await this.authModel.login(this.setupEntity.passphrase);
+    app.pageMods.AuthBootstrap.init(); // This is required, the pagemod is not initialized prior to the completion of the setup.
+    await this.authModel.login(this.setupEntity.passphrase, this.setupEntity.rememberUntilLogout);
     await this.redirectToApp();
   }
 

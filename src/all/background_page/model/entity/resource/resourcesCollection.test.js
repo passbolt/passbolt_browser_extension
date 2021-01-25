@@ -16,6 +16,7 @@ import {TagEntity} from "../tag/tagEntity";
 import {EntityCollectionError} from "../abstract/entityCollectionError";
 import {EntitySchema} from "../abstract/entitySchema";
 import Validator from 'validator';
+import {TagsCollection} from "../tag/tagsCollection";
 
 // Reset the modules before each resource1.
 beforeEach(() => {
@@ -27,8 +28,22 @@ describe("Resource entity", () => {
   it("schema must validate", () => {
     EntitySchema.validateSchema(ResourcesCollection.ENTITY_NAME, ResourcesCollection.getSchema());
   });
-
   it("constructor works if valid minimal DTO is provided", () => {
+    const resource1 = {
+      "name": "resource1",
+    };
+    const resource2 = {
+      "name": "resource2",
+    };
+    const dto = [resource1, resource2];
+    const entity = new ResourcesCollection(dto);
+    expect(entity.toDto()).toEqual(dto);
+    expect(JSON.stringify(entity)).toEqual(JSON.stringify(dto));
+    expect(entity.items[0].name).toEqual('resource1');
+    expect(entity.items[1].name).toEqual('resource2');
+  });
+
+  it("constructor works if valid DTO is provided", () => {
     const resource1 = {
       "id": "10801423-4151-42a4-99d1-86e66145a08c",
       "name": "resource1",
@@ -67,16 +82,7 @@ describe("Resource entity", () => {
   it("constructor fails if reusing same resource", () => {
     const resource1 = {
       "id": "692af28a-58eb-4306-aab7-ab284b6141b3",
-      "name": "resource1",
-      "username": "",
-      "uri": "",
-      "description": "",
-      "deleted": false,
-      "created": "2020-05-08T10:03:11+00:00",
-      "modified": "2020-05-08T10:03:11+00:00",
-      "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "folder_parent_id": null
+      "name": "resource1"
     };
     const dto = [resource1, resource1];
 
@@ -88,30 +94,15 @@ describe("Resource entity", () => {
     const resource1 = {
       "id": "10801423-4151-42a4-99d1-86e66145a08c",
       "name": "resource1",
-      "username": "",
-      "uri": "",
-      "description": "",
-      "deleted": false,
-      "created": "2020-05-04T20:31:45+00:00",
-      "modified": "2020-05-04T20:31:45+00:00",
-      "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff"
     };
     const resource2 = {
-      "id": "10801423-4151-42a4-99d1-86e66145a08c",
-      "name": "resource2",
-      "username": "",
-      "uri": "",
-      "description": "",
-      "deleted": false,
-      "created": "2020-05-04T20:31:45+00:00",
-      "modified": "2020-05-04T20:31:45+00:00",
-      "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff"
+      "name": "resource2"
     };
-    const dto = [resource1, resource2];
+    const resource3 = {
+      "id": "10801423-4151-42a4-99d1-86e66145a08c",
+      "name": "resource3",
+    };
+    const dto = [resource1, resource2, resource3];
 
     let t = () => {new ResourcesCollection(dto)};
     expect(t).toThrow(EntityCollectionError);
@@ -212,4 +203,57 @@ describe("Resource entity", () => {
     expect(resourcesCollection.resources[3].tags).toBeNull();
   });
 
+  it("bulk replace tag works", () => {
+    const tag1 = {"id": "45ce85c9-e301-4de2-8b41-298507002861", "is_shared": false, "slug": 'tag1'};
+    const tag2 = {"id": "45ce85c9-e301-4de2-8b41-298507002862", "is_shared": false, "slug": 'tag2'}
+    const tag3 = {"id": "45ce85c9-e301-4de2-8b41-298507002863", "is_shared": false, "slug": 'tag3'};
+    const dto = [{
+      "id": "45ce85c9-e301-4de2-8b41-298507002851",
+      "name": "resource1",
+      "tags": [tag1, tag2]
+    },{
+      "id": "45ce85c9-e301-4de2-8b41-298507002852",
+      "name": "resource2",
+      "tags": [tag1]
+    },{
+      "id": "45ce85c9-e301-4de2-8b41-298507002853",
+      "name": "resource3",
+      "tags": [tag2]
+    },{
+      "id": "45ce85c9-e301-4de2-8b41-298507002854",
+      "name": "resource4"
+    }];
+    const resourcesCollection = new ResourcesCollection(dto);
+
+    const tagsCollections = [];
+    const resourceIds = [];
+
+    // resource not in collection
+    resourceIds.push("45ce85c9-e301-4de2-8b41-298507002850");
+    tagsCollections.push(new TagsCollection([tag1, tag3]));
+
+    // resource tag not edited
+    resourceIds.push("45ce85c9-e301-4de2-8b41-298507002851");
+    tagsCollections.push(new TagsCollection([tag1, tag2]));
+
+    // resource tags edited
+    resourceIds.push("45ce85c9-e301-4de2-8b41-298507002852");
+    tagsCollections.push(new TagsCollection([tag2, tag3]));
+
+    // resource tags removed
+    resourceIds.push("45ce85c9-e301-4de2-8b41-298507002853");
+    tagsCollections.push(new TagsCollection([]));
+
+    // resource tags added
+    resourceIds.push("45ce85c9-e301-4de2-8b41-298507002854");
+    tagsCollections.push(new TagsCollection([tag1]));
+
+    const result = resourcesCollection.bulkReplaceTagsCollection(resourceIds, tagsCollections);
+
+    expect(resourcesCollection.resources[0].tags.toDto()).toEqual([tag1, tag2]);
+    expect(resourcesCollection.resources[1].tags.toDto()).toEqual([tag2, tag3]);
+    expect(resourcesCollection.resources[2].tags.toDto()).toEqual([]);
+    expect(resourcesCollection.resources[3].tags.toDto()).toEqual([tag1]);
+    expect(result).toEqual(4);
+  });
 });

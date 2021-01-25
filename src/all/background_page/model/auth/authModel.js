@@ -10,7 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+const __ = require('../../sdk/l10n').get;
 const app = require("../../app");
+const {GpgAuthHeader} = require("../gpgAuthHeader");
+const {GpgAuthToken} = require("../gpgAuthToken");
 const {AuthStatusLocalStorage} = require("../../service/local_storage/authStatusLocalStorage");
 const {GpgAuth} = require("../gpgauth");
 const {AuthService} = require("../../service/api/auth/authService");
@@ -64,23 +67,59 @@ class AuthModel {
   /**
    * Login
    * @param {string} passphrase The passphrase to use to decrypt the user private key
-   * @param {boolean?} remember Should the passphrase remember until the user is logged out
+   * @param {boolean?} rememberUntilLogout Should the passphrase remember until the user is logged out
    * @returns {Promise<void>}
    */
-  async login(passphrase, remember) {
-    remember = remember || false;
+  async login(passphrase, rememberUntilLogout) {
+    rememberUntilLogout = rememberUntilLogout || false;
     const user = User.getInstance();
     const privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
+    // @deprecated to be removed with v4. Prior to API v3, retrieving the CSRF token log the user out, so we need to fetch it before the login.
     await user.retrieveAndStoreCsrfToken();
     await this.legacyAuthModel.login(privateKey);
-
     // Post login operations
     // MFA may not be complete yet, so no need to preload things here
-    if (remember) {
+    if (rememberUntilLogout) {
       user.storeMasterPasswordTemporarily(passphrase, -1);
     }
+    await this.postLogin();
+  }
+
+  /**
+   * Post login
+   * @returns {Promise<void>}
+   */
+  async postLogin() {
     await this.legacyAuthModel.startCheckAuthStatusLoop();
-    await app.pageMods.PassboltApp.init();
+    await app.pageMods.AppBoostrap.init();
+  }
+
+  /**
+   * Verify the server identify
+   *
+   * @param {string} serverKey The public key to use to encrypt the serverToken
+   * @param {string} fingerprint The fingerprint to verify
+   * @throws {Error} If the token cannot be encrypted
+   * @throws {Error} if verification procedure fails
+   * @returns {Promise<void>}
+   */
+  async verify(serverKey, fingerprint) {
+    let encryptedToken, originalToken;
+    try {
+      originalToken = new GpgAuthToken();
+      encryptedToken = await this.crypto.encrypt(originalToken.token, serverKey)
+    } catch (error) {
+      throw new Error(__('Unable to encrypt the verify token.') + ' ' + error.message);
+    }
+
+    const response = await this.authService.verify(fingerprint, encryptedToken);
+
+    // Check that the server was able to decrypt the token with our local copy
+    const auth = new GpgAuthHeader(response.headers, 'verify');
+    const verifyToken = new GpgAuthToken(auth.headers['x-gpgauth-verify-response']);
+    if (verifyToken.token !== originalToken.token) {
+      throw new Error(__('The server was unable to prove it can use the advertised OpenPGP key.'));
+    }
   }
 }
 

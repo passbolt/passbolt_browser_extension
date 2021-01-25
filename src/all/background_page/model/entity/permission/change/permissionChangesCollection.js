@@ -15,6 +15,7 @@ const {EntityCollection} = require('../../abstract/entityCollection');
 const {EntitySchema} = require('../../abstract/entitySchema');
 const {PermissionChangeEntity} = require('./permissionChangeEntity');
 const {PermissionsCollection} = require('../permissionsCollection');
+const {PermissionEntity} = require('../permissionEntity');
 
 const ENTITY_NAME = 'PermissionChanges';
 
@@ -171,8 +172,10 @@ class PermissionChangesCollection extends EntityCollection {
           if (permission && permission.type !== change.type) {
             const originalPermission = originalPermissions.items.find(p => p.id === change.id);
             if (originalPermission.type === permission.type) {
+              const expectedPermission = new PermissionEntity(permission.toDto());
+              expectedPermission.type = change.type;
               result.push(PermissionChangeEntity.createFromPermission(
-                permission, PermissionChangeEntity.PERMISSION_CHANGE_UPDATE
+                expectedPermission, PermissionChangeEntity.PERMISSION_CHANGE_UPDATE
               ));
             }
           }

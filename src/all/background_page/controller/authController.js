@@ -12,16 +12,16 @@
  * @since         2.0.0
  */
 const __ = require('../sdk/l10n').get;
-const app = require('../app');
-const Config = require('../model/config');
+const Uuid = require('../utils/uuid');
 const Worker = require('../model/worker');
-
-const {GpgAuth} = require('../model/gpgauth');
 const {User} = require('../model/user');
+const {AuthModel} = require("../model/auth/authModel");
 const {Crypto} = require('../model/crypto');
 const {Keyring} = require('../model/keyring');
 const {KeyIsExpiredError} = require('../error/keyIsExpiredError');
 const {ServerKeyChangedError} = require('../error/serverKeyChangedError');
+const {PassboltApiFetchError} = require('../error/passboltApiFetchError');
+const {GpgAuth} = require('../model/gpgauth');
 
 class AuthController {
    /**
@@ -35,7 +35,7 @@ class AuthController {
     this.requestId = requestId;
     this.keyring = new Keyring();
     this.crypto = new Crypto(this.keyring);
-    this.auth = new GpgAuth(this.keyring);
+    this.authLegacy = new GpgAuth(this.keyring);
   }
 
   /**
@@ -44,105 +44,48 @@ class AuthController {
    * @returns {Promise<void>}
    */
   async verify() {
-    let msg;
-    try {
-      await this.auth.verify();
-      msg = __('The server key is verified. The server can use it to sign and decrypt content.');
-      this.worker.port.emit(this.requestId, 'SUCCESS', msg);
-    } catch (error) {
-      if (await this.auth.serverKeyChanged()) {
-        error = new ServerKeyChangedError(__('The server key has changed.'));
-      } else if (await this.auth.isServerKeyExpired()) {
-        error = new KeyIsExpiredError(__('The server key is expired.'));
-      }
+    const user = User.getInstance();
+    const clientOptions = await user.getApiClientOptions({requireCsrfToken: false});
+    const authModel = new AuthModel(clientOptions);
+    const serverKey = this.keyring.findPublic(Uuid.get(user.settings.getDomain())).key;
+    const userFingerprint = this.keyring.findPrivate().fingerprint;
 
-      error.message = `${__('Could not verify server key.')} ${error.message}`;
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+    try {
+      await authModel.verify(serverKey, userFingerprint);
+      this.worker.port.emit(this.requestId, 'SUCCESS');
+    } catch (error) {
+      await this.onVerifyError(error)
     }
   }
 
   /**
-   * Handle the click on the passbolt toolbar icon.
-   *
+   * Whenever the verify fail
+   * @param {Error} error The error
    * @returns {Promise<void>}
    */
-  async login(passphrase, remember, redirect) {
-    const user = User.getInstance();
-
-    this.beforeLogin();
-    try {
-      await user.retrieveAndStoreCsrfToken();
-      const privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
-      await this.auth.login(privateKey);
-
-      // Post login operations
-      // MFA may not be complete yet, so no need to preload things here
-      if (remember) {
-        user.storeMasterPasswordTemporarily(passphrase, -1);
-      }
-      await this.auth.startCheckAuthStatusLoop();
-      await app.pageMods.PassboltApp.init();
-
-      // Move on to MFA or main screen
-      this.handleLoginSuccess(redirect);
-    } catch (error) {
-      this.handleLoginError(error);
-    }
-  };
-
-  /**
-   * Before login hook
-   *
-   * @return {void}
-   */
-  beforeLogin() {
-    // If the worker at the origin of the login is the AuthForm.
-    // Keep a reference of the tab id into this._tabId.
-    // Request the Auth worker to display a processing feedback.
-    if (this.worker.pageMod && this.worker.pageMod.args.name === "AuthForm") {
-      this._tabId = this.worker.tab.id;
-      Worker.get('Auth', this._tabId).port.emit('passbolt.auth.login-processing', __('Logging in'));
-    }
-  }
-
-  /**
-   * Handle a login success
-   *
-   * @param {string} redirect url (optional)
-   * @param {Error} redirect The uri to redirect the user to after login.
-   * @return {void}
-   */
-  async handleLoginSuccess(redirect) {
-    if (this.worker.pageMod && this.worker.pageMod.args.name === "AuthForm") {
-      let url;
-      const trustedDomain = Config.read('user.settings.trustedDomain');
-
-      // The application authenticator requires the success to be sent on another worker (Auth).
-      // It will notify the users and redirect them.
-      if (!redirect || !(typeof redirect === 'string' || redirect instanceof String) || redirect.charAt(0) !== '/') {
-        url = new URL(trustedDomain);
-      } else {
-        url = new URL(trustedDomain + redirect);
-      }
-      redirect = url.href;
-      const msg = __('You are now logged in!');
-      Worker.get('Auth', this._tabId).port.emit('passbolt.auth.login-success', msg, redirect);
+  async onVerifyError(error) {
+    if (error.message && error.message.indexOf('no user associated') !== -1) {
+      /*
+       * If the user has been deleted from the API, remove the authentication iframe served by the
+       * browser extension, and let the user continue its journey through the triage app served by the API.
+       */
+      Worker.get('AuthBootstrap', this.worker.tab.id).port.emit('passbolt.auth-bootstrap.remove-iframe');
     } else {
-      this.worker.port.emit(this.requestId, "SUCCESS");
+      try {
+        if (await this.authLegacy.serverKeyChanged()) {
+          error = new ServerKeyChangedError(__('The server key has changed.'));
+        } else if (await this.authLegacy.isServerKeyExpired()) {
+          error = new KeyIsExpiredError(__('The server key is expired.'));
+        }
+      } catch (e) {
+        // Cannot ask for old server key, maybe server is misconfigured
+        console.error(e);
+        error = new Error(__('Server internal error. Check with your administrator.'));
+      }
     }
-  }
 
-  /**
-   * Handle a login failure
-   * @param {Error} error The caught error
-   * @return {void}
-   */
-  handleLoginError(error) {
-    if (this.worker.pageMod && this.worker.pageMod.args.name === "AuthForm") {
-      Worker.get('Auth', this._tabId).port.emit('passbolt.auth.login-failed', error.message);
-    } else {
-      this.worker.port.emit(this.requestId, "ERROR", error);
-    }
+    error.message = `${__('Could not verify the server key.')} ${error.message}`;
+    this.worker.port.emit(this.requestId, 'ERROR', error);
   }
 }
 

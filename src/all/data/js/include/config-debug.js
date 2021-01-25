@@ -9,8 +9,7 @@ loadScripts(scripts).then(function () {
   var scripts = [
     'js/lib/message.js',
     'js/lib/request.js',
-    'js/lib/html.js',
-    'js/file/file.js',
+    'js/debug/file.js',
     'js/debug/common.js',
     'js/debug/profiles.js',
     'js/debug/debug.js'

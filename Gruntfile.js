@@ -17,7 +17,6 @@ module.exports = function (grunt) {
     build: 'build/all/',
     build_data: 'build/all/data/',
     build_vendors: 'build/all/vendors/',
-    build_templates: 'build/all/data/tpl/',
     build_content_scripts: 'build/all/content_scripts/',
     build_web_accessible_resources: 'build/all/web_accessible_resources/',
 
@@ -31,8 +30,6 @@ module.exports = function (grunt) {
     src_chrome: 'src/chrome/',
     src_content_vendors: 'src/all/data/vendors/',
     src_firefox: 'src/firefox/',
-    src_ejs: 'src/all/data/ejs/',
-    src_templates: 'src/all/data/tpl/',
     src_content_scripts: 'src/all/content_scripts/',
     src_web_accessible_resources: 'src/all/web_accessible_resources/'
   };
@@ -51,14 +48,12 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-eslint');
-  grunt.loadNpmTasks('grunt-passbolt-ejs-compile');
 
   grunt.registerTask('default', ['bundle']);
-  grunt.registerTask('templates', ['ejs_compile', 'browserify:templates']);
   grunt.registerTask('pre-dist', ['copy:vendors', 'copy:styleguide']);
 
-  grunt.registerTask('bundle', ['copy:background_page', 'copy:content_scripts', 'browserify:background_page', 'ejs_compile', 'browserify:templates', 'copy:data']);
-  grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle', 'browserify:vendors', 'shell:append']);
+  grunt.registerTask('bundle', ['copy:background_page', 'copy:content_scripts', 'browserify:background_page', 'copy:data']);
+  grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle', 'browserify:vendors']);
   grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle', 'browserify:vendors']);
 
   grunt.registerTask('build', ['eslint', 'test', 'build-firefox', 'build-chrome']);
@@ -109,13 +104,6 @@ module.exports = function (grunt) {
         src: [path.src_background_page + 'vendors.js'],
         dest: path.build + 'vendors.min.js'
       },
-      templates: {
-        cwd: path.src_templates,
-        src: ['*.js'],
-        dest: path.build_templates,
-        expand: true,
-        ext: '.js'
-      },
       background_page: {
         src: [path.src_background_page + 'index.js'],
         dest: path.build + 'index.min.js'
@@ -165,7 +153,7 @@ module.exports = function (grunt) {
       },
       data: {
         files: [
-          { expand: true, cwd: path.src + 'data', src: ['**', '!tpl/**', '!ejs/**', '!js/quickaccess/popup/**', '!js/app/**'], dest: path.build + 'data' }
+          { expand: true, cwd: path.src + 'data', src: ['**', '!js/quickaccess/popup/**', '!js/app/**'], dest: path.build + 'data' }
         ]
       },
       // switch manifest file to firefox or chrome
@@ -200,7 +188,6 @@ module.exports = function (grunt) {
           // TODO PASSBOLT-2219 Fix / Add missing Vendors
           // In src_content_vendors
           // Farbtastic color picker is not available as npm package (too old)
-          // ejs too old / was hosted on google code...
           //
           // In src_background_page_vendors
           // validator: modified with non-standard alphaNumericSpecial
@@ -223,14 +210,14 @@ module.exports = function (grunt) {
           // Controls
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/controls',
-          src: ['colorpicker/**', 'dot_black.svg', 'dot_red.svg', 'infinite-bar.gif', 'loading_dark.svg', 'loading_light.svg'],
+          src: ['check_black.svg', 'check_white.svg', 'colorpicker/**', 'dot_black.svg', 'dot_white.svg', 'dot_red.svg', 'infinite-bar.gif', 'loading_dark.svg', 'loading_light.svg'],
           dest: path.build_data + 'img/controls',
           expand: true
         }, {
           // Icons / logo
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/logo',
-          src: ['icon-19.png', 'icon-20_white.png', 'icon-48.png', 'icon-48_white.png', 'logo.png', 'logo@2x.png', 'logo.svg'],
+          src: ['icon-19.png', 'icon-20_white.png', 'icon-48.png', 'icon-48_white.png', 'logo.png', 'logo@2x.png', 'logo.svg', 'logo_white.png', 'logo_white@2x.png', 'logo_white.svg'],
           dest: path.build_data + 'img/logo',
           expand: true
         }, {
@@ -271,22 +258,6 @@ module.exports = function (grunt) {
     },
 
     /**
-     * Compile EJS templates into javascript files
-     */
-    ejs_compile: {
-      all: {
-        cwd: path.src_ejs,
-        src: ['**/*.ejs'],
-        dest: path.src_templates,
-        expand: true,
-        ext: '.js',
-        options: {
-          delimiter: '?'
-        }
-      }
-    },
-
-    /**
      * Shell commands
      */
     shell: {
@@ -313,15 +284,6 @@ module.exports = function (grunt) {
       /**
        * Firefox
        */
-      append: {
-        options: {
-          stderr: false
-        },
-        command: [
-          'echo "//result must be structured-clonable data" | tee -a ' + path.build_templates + '*.js',
-          'echo "undefined;" | tee -a ' + path.build_templates + '*.js'
-        ].join(' &&')
-      },
       build_firefox_debug: {
         options: {
           stderr: false
@@ -381,13 +343,8 @@ module.exports = function (grunt) {
         options: { spawn: false }
       },
       data: {
-        files: [path.src + 'data/**/*.*', '!' + path.src + 'data/tpl/**', '!' + path.src + 'data/ejs/**', '!' + path.src + 'js/quickaccess/popup/**'],
+        files: [path.src + 'data/**/*.*', '!' + path.src + 'js/quickaccess/popup/**'],
         tasks: ['copy:data', 'shell:build_webpack_apps_debug'],
-        options: { spawn: false }
-      },
-      templates: {
-        files: [path.src + 'data/ejs/**/*.ejs'],
-        tasks: ['ejs_compile', 'browserify:templates'],
         options: { spawn: false }
       },
       background_page: {

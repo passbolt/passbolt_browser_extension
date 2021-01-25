@@ -149,6 +149,8 @@ class ImportResourcesFileController {
   /**
    * Encrypt the secrets.
    * @param {ImportResourcesFileEntity} importEntity The import object
+   * @param {string} userId uuid
+   * @param {openpgp.key.Key} privateKey
    * @returns {Promise<void>}
    */
   async encryptSecrets(importEntity, userId, privateKey) {
@@ -170,11 +172,15 @@ class ImportResourcesFileController {
    * @returns {string|{password: string, description: *}}
    */
   buildSecretDto(importResourceEntity) {
+    // @todo sloppy. If the resources types are present, we consider that by default the description should be encrypted.
     if (importResourceEntity.resourceTypeId) {
-      return {
-        password: importResourceEntity.secretClear,
-        description: importResourceEntity.description
+      const dto = {
+        password: importResourceEntity.secretClear || "",
+        description: importResourceEntity.description || ""
       }
+      // @todo sloppy. We remove the clear description here, but it should be done at a parsing level.
+      importResourceEntity.description = "";
+      return dto;
     }
     return importResourceEntity.secretClear;
   }
@@ -291,11 +297,16 @@ class ImportResourcesFileController {
     /**
      * Tag the first resource to ensure the API is not creating 2 tags with the same name.
      * It happens with version <= v2.13 that 2 tags were created when tagging multiple resource in bulk and that leads to
-     * unecpected behavior.
+     * unexpected behavior.
      * @todo investigate the API resource tag entry point and remove this hack.
      */
     await this.tagModel.updateResourceTags(resourcesIds[0], tagsCollection);
     resourcesIds.splice(0, 1);
+
+    // If there was only one resource, exit.
+    if (!resourcesIds.length) {
+      return;
+    }
 
     // Bulk tag the resources.
     let taggedCount = 0;

@@ -12,6 +12,8 @@
  * @since         3.0.0
  */
 const {AbstractService} = require('../abstract/abstractService');
+const {PassboltServiceUnavailableError} = require('../../../error/passboltServiceUnavailableError');
+const {PassboltBadResponseError} = require('../../../error/passboltBadResponseError');
 
 const USER_SERVICE_RESOURCE_NAME = 'users';
 
@@ -231,6 +233,66 @@ class UserService extends AbstractService {
     const data = {username};
     const bodyString = this.apiClient.buildBody(data);
     return this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+  }
+
+  /**
+   * Retrieve the user csrf token
+   * @returns {Promise<string>}
+   */
+  async findCsrfToken() {
+    try {
+      const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/csrf-token`, {});
+      const response = await this.apiClient.fetchAndHandleResponse('GET', url);
+      return response.body;
+    } catch(error) {
+      // If the entry point doesn't exist we are in a version < v3.
+      if (error.code = "404") {
+        return this.findLegacyCsrfToken();
+      } else {
+        throw error
+      }
+    }
+  }
+
+  /**
+   * Retrieve the user csrf token on a legacy api
+   * @return {Promise<string>}
+   * @deprecated will be removed with v4
+   */
+  async findLegacyCsrfToken() {
+    const url = new URL(`${this.apiClient.baseUrl}/recover`);
+    let response, responseHtml;
+    try {
+      response = await fetch(url.toString());
+    } catch (error) {
+      // Catch Network error such as connection lost.
+      throw new PassboltServiceUnavailableError();
+    }
+
+    try {
+      responseHtml = await response.text();
+      let parser = new DOMParser();
+      let parsedHtml = parser.parseFromString(responseHtml, 'text/html');
+      const csrfTokenInput = parsedHtml.getElementsByName('_csrfToken');
+      if (!csrfTokenInput[0] || !/^[a-z0-9]{128}$/.test(csrfTokenInput[0].value)) {
+        throw new Error('No valid CSRF token found using legacy strategy.');
+      }
+      return csrfTokenInput[0].value;
+    } catch (error) {
+      // If the response cannot be parsed, it's not a Passbolt API response.
+      // It can be a for example a proxy timeout error (504).
+      throw new PassboltBadResponseError();
+    }
+  };
+
+  /**
+   * Keep the session alive
+   * @returns {Promise<bool>}
+   */
+  async keepSessionAlive() {
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/me`, {});
+    await this.apiClient.fetchAndHandleResponse('GET', url);
+    return true;
   }
 }
 

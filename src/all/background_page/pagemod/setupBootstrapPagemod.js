@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {PageMod} = require('../sdk/page-mod');
+const Worker = require('../model/worker');
 const app = require('../app');
 
 const SetupBootstrap = function () {};
@@ -27,11 +28,17 @@ SetupBootstrap.init = function () {
     name: 'SetupBootstrap',
 		include: new RegExp(setupBootstrapRegex),
     contentScriptWhen: 'ready',
+    contentStyleFile: [
+      // @deprecated when support for v2 is dropped
+      // used to control iframe styling without inline style in v3
+      'data/css/themes/default/ext_external.min.css'
+    ],
     contentScriptFile: [
       'content_scripts/js/dist/vendors.js',
       'content_scripts/js/dist/setup.js',
     ],
     onAttach: function (worker) {
+      Worker.add('SetupBootstrap', worker);
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows
        * the content code to know when the background page is ready.

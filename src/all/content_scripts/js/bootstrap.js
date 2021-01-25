@@ -9,136 +9,73 @@ var passbolt = passbolt || {};
 
 $(function () {
 
-  /**
-   * Init the passbolt bootstrap.
-   */
-  var Bootstrap = function () {
-    this.isPluginIsconfigured = false;
-    this.isTrustedDomain = false;
-    this.trustedDomain = '';
+  function init() {
+    bootstrapQuickAccess();
+    bootstrapLegacyAuthLogin();
+  }
 
-    // Do not bootstrap on non passbolt app pages
-    if($('html.passbolt.no-passboltplugin').length === 1) {
-      // Check if the addon is configured
-      this.loadConfiguration()
-        .then(() => {
-          this.bootstrapCommon();
-          this.bootstrapLoginPage();
-        })
-    }
-
-    // Init the quickaccess.
+  function bootstrapQuickAccess() {
     passbolt.quickaccess.bootstrap();
-  };
+  }
 
   /**
-   * Load the bootsrap configuration.
-   * @returns {Promise}
+   * Bootstrap the legacy auth login page.
+   * The workflows have changed and a user visiting the legacy api login page with an unconfigured browser extension
+   * should not be requested to download the extension.
+   * @deprecated to be removed with v4
    */
-  Bootstrap.prototype.loadConfiguration = async function () {
-    this.isPluginIsconfigured = await passbolt.request('passbolt.addon.is-configured');
-    if (this.isPluginIsconfigured) {
-      this.isTrustedDomain = await passbolt.request('passbolt.addon.check-domain');
-    }
-    if (this.isTrustedDomain) {
-      this.trustedDomain = await passbolt.request('passbolt.addon.get-domain');
-    }
-  };
+  function bootstrapLegacyAuthLogin() {
+    if (!isLegacyApi()) return;
 
-  /**
-   * Bootstrap all pages from all domain.
-   */
-  Bootstrap.prototype.bootstrapCommon = function () {
-    $('html').removeClass('no-passboltplugin')
-      .addClass('passboltplugin');
+    const baseElements = document.getElementsByTagName('base')
+    if (!baseElements || !baseElements.length) return;
+    const baseUrl = baseElements[0].attributes.href.value.replace(/\/*$/g, ''); // Remove last slash
 
-    if (this.isPluginIsconfigured) {
-      $('html').addClass('passboltplugin-config')
-        .removeClass('no-passboltplugin-config');
-    } else {
-      $('html').addClass('no-passboltplugin-config')
-        .removeClass('passboltplugin-config');
-    }
-    this.initVersion();
-  };
+    // Plugin check warning instead of error
+    const pluginCheckElements = document.getElementsByClassName("plugin-check");
+    if (!pluginCheckElements || !pluginCheckElements.length) return;
+    pluginCheckElements[0].classList.remove("error");
+    pluginCheckElements[0].classList.add("warning");
 
-  /**
-   * Bootstrap the login page.
-   * The login process is mainly managed by the authPageMod, but some cases
-   * are managed by the common bootstrap such as :
-   * - Plugin configured but on the wrong domain. When the user tries to access
-   *   another passbolt instance than the one he has configured the plugin for.
-   * - Plugin not configured.
-   */
-  Bootstrap.prototype.bootstrapLoginPage = function () {
-    // If not on the login page.
-    if (!$('.passbolt .login.page').length) {
-      return;
-    }
+    // Plugin check feedback
+    const pluginCheckMessageElements = document.querySelectorAll(".plugin-check .message");
+    if (!pluginCheckMessageElements || !pluginCheckMessageElements.length) return;
+    pluginCheckMessageElements[0].textContent = "The plugin is installed but not configured. Please contact your domain administrator to request an invitation, or ";
 
-    // If the plugin is not configured.
-    if (this.isPluginIsconfigured) {
-      // If not on a trusted domain.
-      if (!this.isTrustedDomain) {
-        this.loginPageWrongDomain();
-      }
-    } else {
-      this.loginPageConfigurationMissing();
-    }
-  };
+    // Plugin check recover feedback link
+    const pluginCheckRecoverLinkElement = document.createElement('a');
+    const pluginCheckRecoverLinkTextElement = document.createTextNode("recover your account if you already have one!");
+    pluginCheckRecoverLinkElement.appendChild(pluginCheckRecoverLinkTextElement);
+    pluginCheckRecoverLinkElement.href = `${baseUrl}/users/recover`;
+    pluginCheckRecoverLinkElement.rel = "noopener,noreferrer";
+    pluginCheckMessageElements[0].appendChild(pluginCheckRecoverLinkElement);
 
-  /**
-   * On the login page, when the domain is not the right one, but the plugin is already configured.
-   * @returns {Promise}
-   */
-  Bootstrap.prototype.loginPageWrongDomain = function () {
-    $('html').addClass('domain-unknown');
-    var $renderSpace = $('.login.page .js_main-login-section'),
-      publicRegistration = $('.login.page.public-registration').length > 0 ? true : false,
-      passboltDomain = window.location.href.replace(/(.*)(\/auth\/login)(.*)$/, '$1'),
-      browserName = passbolt.html.getBrowserName();
+    // Download plugin big icon to it's fine rocket icon!
+    const downloadPluginElements = document.querySelectorAll(".fa-download.huge");
+    if (!downloadPluginElements || !downloadPluginElements.length) return;
+    downloadPluginElements[0].classList.remove("fa-download");
+    downloadPluginElements[0].classList.add("fa-rocket");
 
-    passbolt.html.loadTemplate($renderSpace, 'login/wrongDomain.ejs', 'html', {
-      trustedDomain: this.trustedDomain,
-      publicRegistration: publicRegistration,
-      passboltDomain: passboltDomain,
-      browserName: browserName
-    });
-  };
+    // Remove download CTA plugin
+    const downloadPluginButtonElements = document.querySelectorAll(".button.primary");
+    if (!downloadPluginButtonElements || !downloadPluginButtonElements.length) return;
+    downloadPluginButtonElements[0].remove();
 
-  /**
-   * On the login page, when the plugin configuration is missing.
-   * @returns {Promise}
-   */
-  Bootstrap.prototype.loginPageConfigurationMissing = function () {
-    var $renderSpace = $('.login.page .js_main-login-section'),
-      publicRegistration = $('.login.page.public-registration').length > 0 ? true : false,
-      passboltDomain = window.location.href.replace(/(.*)(\/auth\/login)(.*)$/, '$1'),
-	    browserName = passbolt.html.getBrowserName();
+    // It's fine feedback!
+    const usersLoginFormFeedbackElements = document.querySelectorAll(".users.login.form .feedback");
+    if (!usersLoginFormFeedbackElements || !usersLoginFormFeedbackElements.length) return;
+    const usersLoginFormFeedbackElement = document.createElement('p');
+    const usersLoginFormFeedbackTextElement = document.createTextNode("You need an account to login.");
+    usersLoginFormFeedbackElement.appendChild(usersLoginFormFeedbackTextElement);
+    usersLoginFormFeedbackElements[0].appendChild(usersLoginFormFeedbackElement);
+  }
 
-    return passbolt.html.loadTemplate($renderSpace, 'login/noconfig.ejs', 'html', {
-      publicRegistration: publicRegistration,
-      passboltDomain: passboltDomain,
-      browserName: browserName
-    });
-  };
+  function isLegacyApi() {
+    const legacyElements = document.querySelectorAll("html.passbolt .js_main-login-section");
+    return legacyElements && legacyElements.length !== 0;
+  }
 
-  /**
-   * Initialize the plugin version section.
-   * @returns {Promise}
-   */
-  Bootstrap.prototype.initVersion = function () {
-    // Get plugin version and add it in the footer.
-    return passbolt.request('passbolt.addon.get-version')
-      .then(function (version) {
-        var $versionElt = $('#version > a'),
-          appVersion = $versionElt.attr('data-tooltip');
-        $versionElt.attr('data-tooltip', (appVersion + ' / ' + version));
-      });
-  };
-
-  // Boostrap passbolt.
-  new Bootstrap();
+  init();
 });
 // result must be structured-clonable data
 undefined;

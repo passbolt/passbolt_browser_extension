@@ -76,6 +76,7 @@ class ResourceLocalStorage {
     return resources.find(item => item.id === id);
   };
 
+
   /**
    * Add a resource in the local storage
    * @param {ResourceEntity} resourceEntity
@@ -86,6 +87,26 @@ class ResourceLocalStorage {
       ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
       const resources = await ResourceLocalStorage.get();
       resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
+      await browser.storage.local.set({ resources });
+      lock.release();
+    } catch (error) {
+      lock.release();
+      throw error;
+    }
+  };
+
+  /**
+   * Add multiple resources to the local storage
+   * @param {Array<ResourceEntity>} resourceEntities
+   */
+  static async addResources(resourceEntities) {
+    await lock.acquire();
+    try {
+      const resources = await ResourceLocalStorage.get();
+      resourceEntities.forEach(resourceEntity => {
+        ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
+        resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
+      });
       await browser.storage.local.set({ resources });
       lock.release();
     } catch (error) {

@@ -7,12 +7,10 @@
  */
 const __ = require('../sdk/l10n').get;
 const {Keyring} = require('../model/keyring');
-const {Key} = require('../model/key');
-const Config = require('../model/config');
 const {User} = require('../model/user');
 const Uuid = require('../utils/uuid');
 const keyring = new Keyring();
-const key = new Key();
+const passphraseController = require('../controller/passphrase/passphraseController');
 
 const fileController = require('../controller/fileController');
 
@@ -129,6 +127,7 @@ const listen = function (worker) {
   worker.port.on('passbolt.keyring.download-my-private-key', async function (requestId) {
     let filename = "passbolt_private.asc";
     try {
+      await passphraseController.request(worker);
       const privateKeyInfo = await keyring.findPrivate();
       if (!privateKeyInfo) {
         throw new Error('Private key not found.');

@@ -6,7 +6,6 @@
  */
 
 var passbolt = passbolt || {};
-
 $(function () {
 
   // shortcut for selectors

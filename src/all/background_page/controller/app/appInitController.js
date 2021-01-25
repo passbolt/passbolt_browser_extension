@@ -13,31 +13,27 @@
  */
 const User = require('../../model/user').User;
 const ResourceTypeModel = require("../../model/resourceType/resourceTypeModel").ResourceTypeModel;
-const ResourceModel = require("../../model/resource/resourceModel").ResourceModel;
-const FolderModel = require("../../model/folder/folderModel").FolderModel;
-const GroupModel = require("../../model/group/groupModel").GroupModel;
-const UserModel = require("../../model/user/userModel").UserModel;
 const RoleModel = require("../../model/role/roleModel").RoleModel;
 
 class AppInitController {
-
-  constructor(worker) {
-    this.worker = worker;
-  }
-
+  /**
+   *
+   * @returns {Promise<>}
+   */
   async main() {
-    const user = User.getInstance();
-    this.syncUserSettings(user);
-    const apiOptions = await user.getApiClientOptions();
-    this.syncResouresTypesLocalStorage(apiOptions);
-    this.syncUsersLocalStorage(apiOptions);
-    this.syncGroupsLocalStorage(apiOptions);
-    this.syncResourcesLocalStorage(apiOptions);
-    this.syncFoldersLocalStorage(apiOptions);
-    this.syncRolesLocalStorage(apiOptions);
+    const syncUserSettingsPromise = this._syncUserSettings();
+    const syncResourcesTypesPromise = this._syncResourcesTypesLocalStorage();
+    const syncRolesPromise = this._syncRolesLocalStorage();
+    return Promise.allSettled([syncUserSettingsPromise, syncResourcesTypesPromise, syncRolesPromise])
   }
 
-  async syncUserSettings(user) {
+  /**
+   * Sync the user settings
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _syncUserSettings() {
+    const user = User.getInstance();
     try {
       await user.settings.sync()
     } catch (error) {
@@ -46,55 +42,34 @@ class AppInitController {
     }
   }
 
-  async syncUsersLocalStorage(apiOptions) {
+  /**
+   * Sync the API resources types
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _syncResourcesTypesLocalStorage() {
+    const user = User.getInstance();
+    const apiClientOptions = await user.getApiClientOptions();
     try {
-      const userModel = new UserModel(apiOptions);
-      await userModel.updateLocalStorage();
+      const resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+      await resourceTypeModel.updateLocalStorage();
     } catch (error) {
+      // If API < v3, we expect an error here.
       console.error(error);
     }
   }
 
-  async syncGroupsLocalStorage(apiOptions) {
+  /**
+   * Sync the API roles
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _syncRolesLocalStorage() {
+    const user = User.getInstance();
+    const apiClientOptions = await user.getApiClientOptions();
     try {
-      const groupModel = new GroupModel(apiOptions);
-      groupModel.updateLocalStorage();
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async syncResouresTypesLocalStorage(apiOptions) {
-    try {
-      const resourceTypeModel = new ResourceTypeModel(apiOptions);
-      resourceTypeModel.updateLocalStorage();
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async syncResourcesLocalStorage(apiOptions) {
-    try {
-      const resourceModel = new ResourceModel(apiOptions);
-      resourceModel.updateLocalStorage();
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async syncFoldersLocalStorage(apiOptions) {
-    try {
-      const folderModel = new FolderModel(apiOptions);
-      folderModel.updateLocalStorage();
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async syncRolesLocalStorage(apiOptions) {
-    try {
-      const roleModel = new RoleModel(apiOptions);
-      roleModel.updateLocalStorage();
+      const roleModel = new RoleModel(apiClientOptions);
+      await roleModel.updateLocalStorage();
     } catch (error) {
       console.error(error);
     }

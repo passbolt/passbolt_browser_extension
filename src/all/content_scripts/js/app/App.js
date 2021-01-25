@@ -15,9 +15,34 @@ import ReactDOM from "react-dom";
 import ExtBootstrapApp from "passbolt-styleguide/src/react-extension/ExtBootstrapApp";
 /* eslint-disable no-unused-vars */
 import Port from "../../../data/js/lib/port";
+import browser from "webextension-polyfill";
 /* eslint-enable no-unused-vars */
 
-const browserExtensionUrl = chrome.runtime.getURL("/");
-const domContainer = document.createElement("div");
-document.body.appendChild(domContainer);
-ReactDOM.render(<ExtBootstrapApp port={port} browserExtensionUrl={browserExtensionUrl}/>, domContainer);
+/**
+ * Wait until the background pagemod is ready.
+ * @returns {Promise}
+ */
+async function waitPagemodIsReady() {
+  let resolver;
+  const promise = new Promise(resolve => { resolver = resolve; });
+
+  const checkInterval = setInterval(() => {
+    port.request("passbolt.pagemod.is-ready").then(() => {
+      resolver();
+      clearInterval(checkInterval);
+    });
+  }, 50);
+
+  return promise;
+}
+
+async function main() {
+  await waitPagemodIsReady();
+  const storage = browser.storage;
+  const browserExtensionUrl = chrome.runtime.getURL("/");
+  const domContainer = document.createElement("div");
+  document.body.appendChild(domContainer);
+  ReactDOM.render(<ExtBootstrapApp port={port} storage={storage} browserExtensionUrl={browserExtensionUrl}/>, domContainer);
+}
+
+main();

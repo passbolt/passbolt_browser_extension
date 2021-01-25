@@ -8,7 +8,7 @@
 const browser = require("webextension-polyfill/dist/browser-polyfill");
 const Config = require('./config');
 const {ApiClientOptions} = require('../service/api/apiClient/apiClientOptions');
-const {UserService} = require('../service/user');
+const {UserService} = require('../service/api/user/userService');
 const {UserSettings} = require('./userSettings/userSettings');
 const __ = require('../sdk/l10n').get;
 
@@ -355,7 +355,9 @@ const User = (function () {
     const idleInterval = 15 * 60; // detection interval in sec: 15 minutes
     browser.idle.queryState(idleInterval).then( async (idleState) => {
       if (idleState === 'active' && this._masterPassword !== null) {
-        await UserService.keepSessionAlive(this);
+        const apiClientOptions = this.getApiClientOptions();
+        const userService = new UserService(apiClientOptions)
+        await userService.keepSessionAlive();
       }
       this.setKeepAliveTimeout();
     });
@@ -363,9 +365,14 @@ const User = (function () {
 
   /**
    * Retrieve and the store the user csrf token.
+   * @return {void}
    */
   this.retrieveAndStoreCsrfToken = async function () {
-    const csrfToken = await UserService.retrieveCsrfToken(this);
+    // Don't use the getApiClientOptions. It will create a loop as it calls this method to retrieve the csrf token.
+    const apiClientOptions = (new ApiClientOptions())
+      .setBaseUrl(this.settings.getDomain());
+    const userService = new UserService(apiClientOptions)
+    const csrfToken = await userService.findCsrfToken();
     this.setCsrfToken(csrfToken);
   };
 
@@ -401,12 +408,23 @@ const User = (function () {
 
   /**
    * Return API Client options such as Domain and CSRF token
+   * @param {object?} options (optional)
+   * - requireCsrfToken {bool}: Should the csrf token should be set, default true
    * @return {ApiClientOptions} apiClientOptions
    */
-  this.getApiClientOptions = async function() {
-    return (new ApiClientOptions())
-      .setBaseUrl(this.settings.getDomain())
-      .setCsrfToken(await this.getOrFetchCsrfToken());
+  this.getApiClientOptions = async function(options) {
+    options = Object.assign({
+      requireCsrfToken: true,
+    }, options);
+
+    const apiClientOptions = (new ApiClientOptions())
+      .setBaseUrl(this.settings.getDomain());
+
+    if (options.requireCsrfToken) {
+      apiClientOptions.setCsrfToken(await this.getOrFetchCsrfToken());
+    }
+
+    return apiClientOptions;
   };
 
   /**

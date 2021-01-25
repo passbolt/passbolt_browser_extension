@@ -35,6 +35,8 @@ Recover.init = function () {
 			// chrome/data/passbolt-iframe-recover.html
 		],
     onAttach: function (worker) {
+      app.events.config.listen(worker);
+      app.events.siteSettings.listen(worker);
       app.events.recover.listen(worker);
 
       /*

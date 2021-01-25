@@ -18,6 +18,7 @@ const main = async function() {
   const {AuthStatusLocalStorage} = require('./service/local_storage/authStatusLocalStorage');
   const {UserLocalStorage} = require('./service/local_storage/userLocalStorage');
   const {GroupLocalStorage} = require('./service/local_storage/groupLocalStorage');
+  const {RolesLocalStorage} = require("./service/local_storage/rolesLocalStorage");
 
   /* ==================================================================================
    *  Initialization of global objects
@@ -32,6 +33,7 @@ const main = async function() {
   AuthStatusLocalStorage.init();
   UserLocalStorage.init();
   GroupLocalStorage.init();
+  RolesLocalStorage.init();
 
   // Web worker
   openpgp.initWorker({ path:'/vendors/openpgp.worker.js' });
@@ -59,7 +61,7 @@ const main = async function() {
   if (user.isValid()) {
     // Auth pagemod init can also be triggered
     // by debug, setup and user events (e.g. when config change)
-    pageMods.PassboltAuth.init();
+    pageMods.AuthBootstrap.init();
 
     // App pagemod init is generally triggered after a successful login
     // We only initialize it here for the cases where the user is already logged in
@@ -68,7 +70,7 @@ const main = async function() {
     try {
       const isAuthenticated = await auth.isAuthenticated();
       if (isAuthenticated) {
-        await pageMods.PassboltApp.init();
+        await pageMods.AppBoostrap.init();
         auth.startCheckAuthStatusLoop();
       }
     } catch(error) {
@@ -87,14 +89,13 @@ const main = async function() {
   // but triggered by App or Auth
   pageMods.File.init();
   pageMods.Clipboard.init();
-  pageMods.PassboltAuthForm.init();
+  pageMods.Auth.init();
   pageMods.QuickAccess.init();
-  pageMods.ReactApp.init();
+  pageMods.App.init();
 
   // Debug pagemod
   if (Config.isDebug()) {
     pageMods.Debug.init();
-    pageMods.DebugPage.init();
   }
 
 };

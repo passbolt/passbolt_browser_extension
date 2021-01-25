@@ -10,7 +10,9 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+const {SiteSettings} = require("../model/siteSettings");
 const {RecoverController} = require("../controller/recover/recoverController");
+const Worker = require('../model/worker');
 
 const listen = function (worker) {
   /**
@@ -19,6 +21,23 @@ const listen = function (worker) {
    * @private
    */
   const recoverController = new RecoverController(worker, worker.tab.url);
+
+  /*
+   * Initialize the recovery process.
+   *
+   * @listens passbolt.recover.site-settings
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.recover.site-settings', async function (requestId) {
+    try {
+      const siteSettings = new SiteSettings(recoverController.setupEntity.domain);
+      const siteSettingsDto = await siteSettings.get();
+      worker.port.emit(requestId, 'SUCCESS', siteSettingsDto);
+    } catch(error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
 
   /*
    * Retrieve the recover info
@@ -33,6 +52,8 @@ const listen = function (worker) {
     } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
+      // In case of unexpected error at this step, let the API treat the case.
+      Worker.get('RecoverBootstrap', worker.tab.id).port.emit('passbolt.recover-bootstrap.remove-iframe');
     }
   });
 
@@ -59,11 +80,11 @@ const listen = function (worker) {
    * @listens passbolt.recover.verify-passphrase
    * @param requestId {uuid} The request identifier
    * @param passphrase {string} The passphrase used to verify the secret key
-   * @param rememberMe {boolean} The passphrase should be remembered and used to login the user at the end of the setup process
+   * @param rememberUntilLogout {boolean} The passphrase should be remembered until the user is logged out
    */
-  worker.port.on('passbolt.recover.verify-passphrase', async function (requestId, passphrase) {
+  worker.port.on('passbolt.recover.verify-passphrase', async function (requestId, passphrase, rememberUntilLogout) {
     try {
-      await recoverController.verifyPassphrase(passphrase);
+      await recoverController.verifyPassphrase(passphrase, rememberUntilLogout);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);

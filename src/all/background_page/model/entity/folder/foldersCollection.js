@@ -33,10 +33,17 @@ class FoldersCollection extends EntityCollection {
       FoldersCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    // Check if folder ids are unique
+    // Why not this.push? It is faster than adding items one by one
+    const ids = this._props.map(folder => folder.id);
+    ids.sort().sort((a, b) => {
+      if (a === b) {
+        throw new EntityCollectionError(0, FoldersCollection.RULE_UNIQUE_ID, `Folder id ${a} already exists.`);
+      }
+    });
+    // Directly push into the private property _items[]
     this._props.forEach(folder => {
-      this.push(new FolderEntity(folder));
+      this._items.push(new FolderEntity(folder));
     });
 
     // We do not keep original props

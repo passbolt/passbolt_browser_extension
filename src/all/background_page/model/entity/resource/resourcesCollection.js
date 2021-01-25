@@ -15,6 +15,7 @@ const {EntityCollection} = require('../abstract/entityCollection');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {EntityCollectionError} = require('../abstract/entityCollectionError');
 const {ResourceEntity} = require('./resourceEntity');
+const {Log} = require('../../../model/log');
 
 const ENTITY_NAME = 'Resources';
 
@@ -34,10 +35,17 @@ class ResourcesCollection extends EntityCollection {
       ResourcesCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    // Check if resource ids are unique
+    // Why not this.push? It is faster than adding items one by one
+    const ids = this._props.map(resource => resource.id);
+    ids.sort().sort((a, b) => {
+      if (a === b) {
+        throw new EntityCollectionError(0, ResourcesCollection.RULE_UNIQUE_ID, `Resource id ${a} already exists.`);
+      }
+    });
+    // Directly push into the private property _items[]
     this._props.forEach(resource => {
-      this.push(new ResourceEntity(resource));
+      this._items.push(new ResourceEntity(resource));
     });
 
     // We do not keep original props
@@ -91,6 +99,14 @@ class ResourcesCollection extends EntityCollection {
    */
   getFirstById(resourceId) {
     return this._items.find(r => (r.id === resourceId));
+  }
+
+  /**
+   * Get first resource position in the collection matching requested id
+   * @returns {(int|-1)} index of the first element in the array that matches the id. Otherwise -1.
+   */
+  getFirstIndexById(resourceId) {
+    return this._items.findIndex(r => (r.id === resourceId));
   }
 
   /**
@@ -200,6 +216,47 @@ class ResourcesCollection extends EntityCollection {
       }
     }
     return updated;
+  }
+
+  /**
+   * bulkReplaceTagsCollection
+   * For a given list of resource ids update the associated tagsCollection
+   * For example resourceIds[0] tags will be replaced with tagsCollections[0]
+   *
+   * @param {Array<string>} resourceIds
+   * @param {Array<TagsCollection>} tagsCollections
+   * @returns {int} the number of resources affected
+   */
+  bulkReplaceTagsCollection(resourceIds, tagsCollections) {
+    if (!resourceIds || !Array.isArray(resourceIds) || !resourceIds.length) {
+      throw new Error('Resource ids should be provided to bulk update tags in resource collection.');
+    }
+    if (!tagsCollections || !Array.isArray(tagsCollections) || !tagsCollections.length) {
+      throw new Error('Tag collections should be provided to bulk update tags in resource collection.');
+    }
+    if (resourceIds.length !== tagsCollections.length) {
+      throw new Error('Bulk update requires matching tags collections and list of resource ids.');
+    }
+
+    let result = 0;
+    let i = 0;
+    let j;
+    for (; i < resourceIds.length; i++) {
+      if (i in tagsCollections) {
+        const resourceId = resourceIds[i];
+        const tagCollection = tagsCollections[i];
+        j = this.getFirstIndexById(resourceId);
+        if (j >= 0) {
+          this.items[j].tags = tagCollection;
+          result++;
+        } else {
+          // resource not found in collection
+          // let the caller decides if it's important based on results
+        }
+      }
+    }
+
+    return result;
   }
 
   // ==================================================

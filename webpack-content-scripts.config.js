@@ -4,14 +4,15 @@ const config = {
   entry: {
     'app': path.resolve(__dirname, './src/all/content_scripts/js/app/App.js'),
     'setup': path.resolve(__dirname, './src/all/content_scripts/js/app/Setup.js'),
-    'recover': path.resolve(__dirname, './src/all/content_scripts/js/app/Recover.js')
+    'recover': path.resolve(__dirname, './src/all/content_scripts/js/app/Recover.js'),
+    'login': path.resolve(__dirname, './src/all/content_scripts/js/app/Login.js')
   },
   mode: 'production',
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
-        exclude: /(node_modules|bower_components)/,
+        exclude: /(node_modules[\\/]((?!(passbolt\-styleguide))))/,
         loader: "babel-loader",
         options: {
           presets: ["@babel/react"],

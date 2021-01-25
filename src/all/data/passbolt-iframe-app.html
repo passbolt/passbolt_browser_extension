@@ -1,17 +1,49 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <script src="js/themes/stylesheet.js"></script>
     <script src="js/dist/vendors.js"></script>
 </head>
-
 <body>
-<div id="container" class="page">
-    <div class="contain-item">
-        <div id="app-container" class="container-wrapper">
+<div id="temporary-skeleton" class="temporary skeleton">
+    <div class="page password">
+        <div id="app" class="app ready" tabindex="1000">
+            <div class="header first">
+                <nav><div class="primary navigation top"></div></nav>
+            </div>
+            <div class="header second">
+                <div class="col1">
+                    <div class="logo no-img">
+                        <h1><span>Passbolt</span></h1>
+                    </div>
+                </div>
+                <div class="col2 search-wrapper"><form class="search">
+                    <div class="input search required">
+                        <label>Search</label>
+                        <input class="required disabled" disabled type="search" placeholder="Search" value="">
+                    </div>
+                    <button value="search" disabled type="submit">
+                        <span class="svg-icon search">
+                            <svg width="1792" height="1792" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1216 832q0-185-131.5-316.5t-316.5-131.5-316.5 131.5-131.5 316.5 131.5 316.5 316.5 131.5 316.5-131.5 131.5-316.5zm512 832q0 52-38 90t-90 38q-54 0-90-38l-343-342q-179 124-399 124-143 0-273.5-55.5t-225-150-150-225-55.5-273.5 55.5-273.5 150-225 225-150 273.5-55.5 273.5 55.5 225 150 150 225 55.5 273.5q0 220-124 399l343 343q37 37 37 90z"></path>
+                            </svg>
+                        </span>
+                        <span class="visuallyhidden">Search</span></button>
+                </form></div>
+                <div class="col3 profile-wrapper"></div>
+            </div>
+            <div class="header third "></div>
+            <div class="panel main">
+                <div class="panel left"></div>
+                <div class="panel middle">
+                    <div class="breadcrumbs"></div>
+                </div>
+            </div>
         </div>
+        <footer>
+            <div class="footer"></div>
+        </footer>
     </div>
 </div>
 <script src="js/dist/app.js"></script>

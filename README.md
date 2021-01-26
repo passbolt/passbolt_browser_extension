@@ -5,28 +5,33 @@
 	  /_/    \__,_/____/____/_.___/\____/_/\__/
 
 	Open source password manager for teams
-	(c) 2019 Passbolt SA
+	(c) 2021 Passbolt SA
 	https://www.passbolt.com
 
 ## License
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
+Passbolt - Open source password manager for teams
 
-This program is distributed in the hope that it will be useful,
-but without any warranty; without even the implied warranty of
-merchantability or fitness for a particular purpose. See the
-GNU Affero General Public License for more details.
+(c) 2021 Passbolt SA
 
-[Affero General Public License v3](http://www.gnu.org/licenses/agpl-3.0.html)
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General
+Public License (AGPL) as published by the Free Software Foundation version 3.
+
+The name "Passbolt" is a registered trademark of Passbolt SA, and Passbolt SA hereby declines to grant a trademark
+license to "Passbolt" pursuant to the GNU Affero General Public License version 3 Section 7(e), without a separate
+agreement with Passbolt SA.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License along with this program. If not,
+see [GNU Affero General Public License v3](http://www.gnu.org/licenses/agpl-3.0.html).
 
 ## About passbolt
 
 Passbolt is an open source password manager for teams. It allows to securely share and store credentials.
-For instance, the wifi password of your office, or the administrator password of a router, or your organisation social media account password,
-all of them can be secured using Passbolt.
+For instance, the wifi password of your office, or the administrator password of a router, or your organisation social
+media account password, all of them can be secured using Passbolt.
 
 You can try a demo of passbolt at [https://demo.passbolt.com](https://demo.passbolt.com).
 
@@ -38,8 +43,8 @@ Or, of course, you can use the code in this repository to build it yourself and 
 ## About passbolt browser extension
 
 A browser extension is needed to maintain a higher level of security, e.g. to ensure the integrity of the
-cryptographic code and provide a secure random number generator. In the future it will also be used to provide feature such as
-auto filling your passwords when visiting known websites.
+cryptographic code and provide a secure random number generator. In the future it will also be used to provide feature
+such as auto filling your passwords when visiting known websites.
 
 ### How does it look like?
 

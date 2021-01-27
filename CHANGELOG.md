@@ -4,7 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-### [3.0.0] - 2021-01-27
+## [3.0.0] - 2021-01-27
 ### Added
 - Add a new login page and process redesign
 - Add a new setup pages and process redesign
@@ -22,6 +22,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Improve import export speed and misc compatibility improvements
 - Improve server data validation in background page
 - Misc update of dependencies
+- Misc fixes of small styling issues in user and password workspace
 
 ### [2.13.8] - 2020-09-09
 ### Fixed

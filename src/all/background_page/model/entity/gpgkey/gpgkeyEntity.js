@@ -68,7 +68,11 @@ class GpgkeyEntity extends Entity {
           "type": "boolean"
         },
         "type": {
-          "type": "string"
+          "anyOf": [{
+            "type": "string"
+          }, {
+            "type": "null"
+          }]
         },
         "uid": {
           "type": "string"

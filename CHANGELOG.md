@@ -4,6 +4,25 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### [3.0.0] - 2021-01-27
+### Added
+- Add a new login page and process redesign
+- Add a new setup pages and process redesign
+- Add a new recovery page and process redesign
+- Add request passphrase prior to downloading the private key in user workspace
+- Add the ability to sort by favorites
+- Add the ability to encrypt description
+- Add baseline support for other resource types
+
+### Improved
+- Migrate user workspace code previously served by server in the extension
+- Migrate password workspace code previously served by server in the extension
+- Migrate user profile code previously served by server in the extension
+- Migrate the front-end code from CanJS to React
+- Improve import export speed and misc compatibility improvements
+- Improve server data validation in background page
+- Misc update of dependencies
+
 ### [2.13.8] - 2020-09-09
 ### Fixed
 - PB-3519 Fix inherited permissions are not updated on share with nested folder and resources

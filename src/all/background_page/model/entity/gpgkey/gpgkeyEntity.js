@@ -74,7 +74,11 @@ class GpgkeyEntity extends Entity {
           "type": "string"
         },
         "bits": {
-          "type": "integer"
+          "anyOf": [{
+            "type": "integer",
+          }, {
+            "type": "null"
+          }]
         },
         "key_id": {
           "type": "string",

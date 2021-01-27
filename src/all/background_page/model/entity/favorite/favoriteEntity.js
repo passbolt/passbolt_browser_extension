@@ -43,7 +43,7 @@ class FavoriteEntity extends Entity {
         "id",
         "user_id",
         "foreign_key",
-        "foreign_model",
+        //"foreign_model",
         "created"
       ],
       "properties": {
@@ -59,18 +59,18 @@ class FavoriteEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
-        "foreign_model": {
-          "type": "string",
-          "enum": FavoriteEntity.ALLOWED_FOREIGN_MODELS
-        },
+        // "foreign_model": {
+        //   "type": "string",
+        //   "enum": FavoriteEntity.ALLOWED_FOREIGN_MODELS
+        // },
         "created": {
           "type": "string",
           "format": "date-time"
         },
-        "modified": {
-          "type": "string",
-          "format": "date-time"
-        }
+        // "modified": {
+        //   "type": "string",
+        //   "format": "date-time"
+        // }
       }
     }
   }

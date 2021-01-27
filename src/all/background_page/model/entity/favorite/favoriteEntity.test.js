@@ -32,9 +32,9 @@ describe("Favorite entity", () => {
       "id": "45ce85c9-e301-4de2-8b41-298507002861",
       "user_id": "d57c10f5-633d-5160-9c81-8a0c6c4ec856",
       "foreign_key": "10801423-4121-42a4-99d1-86e66145a08c",
-      "foreign_model": "Resource",
+      //"foreign_model": "Resource",
       "created": "2020-05-06T21:59:24+00:00",
-      "modified": "2020-05-06T21:59:24+00:00"
+      // "modified": "2020-05-06T21:59:24+00:00"
     };
     const entity = new FavoriteEntity(dto);
     expect(entity.toDto()).toEqual(dto);
@@ -52,7 +52,7 @@ describe("Favorite entity", () => {
         id: { required: 'The id is required.' },
         user_id: { required: 'The user_id is required.' },
         foreign_key: { required: 'The foreign_key is required.' },
-        foreign_model: { required: 'The foreign_model is required.' }
+        //foreign_model: { required: 'The foreign_model is required.' }
       });
     }
   });
@@ -73,9 +73,9 @@ describe("Favorite entity", () => {
         id: { format: 'The id is not a valid uuid.' },
         user_id: { format: 'The user_id is not a valid uuid.' },
         foreign_key: { format: 'The foreign_key is not a valid uuid.' },
-        foreign_model: { enum: 'The foreign_model value is not included in the supported list.'},
+        //foreign_model: { enum: 'The foreign_model value is not included in the supported list.'},
         created: { format: 'The created is not a valid date-time.' },
-        modified: { format: 'The modified is not a valid date-time.' }
+        //modified: { format: 'The modified is not a valid date-time.' }
       });
     }
   });

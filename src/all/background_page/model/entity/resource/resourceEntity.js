@@ -558,9 +558,9 @@ class ResourceEntity extends Entity {
     if (favorite.foreignKey !== resourceId) {
       throw new EntityValidationError('ResourceEntity assertValidFavorite favorite foreign key should match the resource id.');
     }
-    if (favorite.foreignModel !== FavoriteEntity.FAVORITE_RESOURCE) {
-      throw new EntityValidationError('ResourceEntity assertValidFavorite favorite foreign model should be a resource.');
-    }
+    // if (favorite.foreignModel !== FavoriteEntity.FAVORITE_RESOURCE) {
+    //   throw new EntityValidationError('ResourceEntity assertValidFavorite favorite foreign model should be a resource.');
+    // }
   }
 
   // ==================================================

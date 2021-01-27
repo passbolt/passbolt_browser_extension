@@ -1,6 +1,6 @@
 {
   "name": "passbolt_extension",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "license": "AGPL-3.0",
   "description": "Passbolt web extension for the open source password manager for teams",
   "homepage": "https://www.passbolt.com",

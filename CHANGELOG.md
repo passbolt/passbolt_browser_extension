@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [3.0.3] - 2021-01-27
+### Fixed
+- Fix do not enforce validation for gpgkey with type property set to null
+- Fix do not enforce validation for gpgkey with bits property set to null
+
 ## [3.0.2] - 2021-01-27
 ### Fixed
 - Fix do not enforce validation error for tags with slug duplicates

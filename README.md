@@ -81,7 +81,7 @@ You will need ```node```, ```grunt``` and the dependencies listed in ```packages
 ```
 git clone git@github.com:passbolt/passbolt_browser_extension.git
 cd passbolt_browser_extension
-npm install
+npm ci
 ```
 
 For convenience you can also install ```web-ext``` (for firefox), ```crx``` (for chrome) globally,

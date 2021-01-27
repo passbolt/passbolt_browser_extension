@@ -78,7 +78,6 @@ describe("Profile entity", () => {
       "modified": "2020-04-20T11:32:17+00:00",
       "avatar": {
         "id": "421f7955-74d0-42d4-838f-8b30d056bcc7",
-        "user_id": "54c6278e-f824-5fda-91ff-3e946b18d994",
         "created": "2020-04-20T11:32:17+00:00",
         "modified": "2020-04-20T11:32:17+00:00",
         "url": {

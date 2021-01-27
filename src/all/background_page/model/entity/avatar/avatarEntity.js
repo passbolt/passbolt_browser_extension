@@ -48,10 +48,10 @@ class AvatarEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
-        "user_id": {
-          "type": "string",
-          "format": "uuid"
-        },
+        // "user_id": {
+        //   "type": "string",
+        //   "format": "uuid"
+        // },
         "url": {
           "type": "object",
           "required": [

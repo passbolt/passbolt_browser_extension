@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ## [3.0.0] - 2021-01-27
+### Fixed
+- Fix do not enforce validation error for tags with slug duplicates
+- Fix do not enforce validation for avatar with empty user_id
+
+## [3.0.0] - 2021-01-27
 ### Added
 - Add a new login page and process redesign
 - Add a new setup pages and process redesign

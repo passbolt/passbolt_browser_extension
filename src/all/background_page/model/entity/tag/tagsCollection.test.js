@@ -59,22 +59,22 @@ describe("Tag entity", () => {
     expect(t).toThrow(EntityCollectionError);
   });
 
-  it("constructor fails if reusing same slug", () => {
-    const tag1 = {
-      "id": "45ce85c9-e301-4de2-8b41-298507002861",
-      "slug": 'tag1',
-      "is_shared": false,
-    };
-    const tag2 = {
-      "id": "45ce85c9-e301-4de2-8b41-298507002862",
-      "slug": 'tag1',
-      "is_shared": false,
-    };
-    const dto = [tag1, tag2];
-
-    let t = () => {new TagsCollection(dto)};
-    expect(t).toThrow(EntityCollectionError);
-  });
+  // it("constructor fails if reusing same slug", () => {
+  //   const tag1 = {
+  //     "id": "45ce85c9-e301-4de2-8b41-298507002861",
+  //     "slug": 'tag1',
+  //     "is_shared": false,
+  //   };
+  //   const tag2 = {
+  //     "id": "45ce85c9-e301-4de2-8b41-298507002862",
+  //     "slug": 'tag1',
+  //     "is_shared": false,
+  //   };
+  //   const dto = [tag1, tag2];
+  //
+  //   let t = () => {new TagsCollection(dto)};
+  //   expect(t).toThrow(EntityCollectionError);
+  // });
 
   it("constructor fails if reusing same id", () => {
     const tag1 = {

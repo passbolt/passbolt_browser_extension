@@ -123,7 +123,7 @@ class TagsCollection extends EntityCollection {
 
     // Build rules
     this.assertUniqueId(tagEntity);
-    this.assertUniqueSlug(tagEntity);
+    //this.assertUniqueSlug(tagEntity);
 
     super.push(tagEntity);
   }

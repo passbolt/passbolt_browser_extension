@@ -35,7 +35,12 @@ const main = async function() {
   GroupLocalStorage.init();
   RolesLocalStorage.init();
 
-  // Web worker
+  // Openpgpjs worker initialization
+  /**
+   * This option is needed because some secrets were encrypted using non-encryption RSA keys,
+   * due to an openpgpjs bug: https://github.com/openpgpjs/openpgpjs/pull/1148
+   */
+  openpgp.config.allow_insecure_decryption_with_signing_keys = true;
   openpgp.initWorker({ path:'/vendors/openpgp.worker.js' });
 
   /* ==================================================================================

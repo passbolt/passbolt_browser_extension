@@ -24,7 +24,7 @@ beforeEach(() => {
   jest.resetModules();
 });
 
-describe("Resource entity", () => {
+describe("Resources Collection", () => {
   it("schema must validate", () => {
     EntitySchema.validateSchema(ResourcesCollection.ENTITY_NAME, ResourcesCollection.getSchema());
   });
@@ -36,11 +36,11 @@ describe("Resource entity", () => {
       "name": "resource2",
     };
     const dto = [resource1, resource2];
-    const entity = new ResourcesCollection(dto);
-    expect(entity.toDto()).toEqual(dto);
-    expect(JSON.stringify(entity)).toEqual(JSON.stringify(dto));
-    expect(entity.items[0].name).toEqual('resource1');
-    expect(entity.items[1].name).toEqual('resource2');
+    const collection = new ResourcesCollection(dto);
+    expect(collection.toDto()).toEqual(dto);
+    expect(JSON.stringify(collection)).toEqual(JSON.stringify(dto));
+    expect(collection.items[0].name).toEqual('resource1');
+    expect(collection.items[1].name).toEqual('resource2');
   });
 
   it("constructor works if valid DTO is provided", () => {
@@ -255,5 +255,33 @@ describe("Resource entity", () => {
     expect(resourcesCollection.resources[2].tags.toDto()).toEqual([]);
     expect(resourcesCollection.resources[3].tags.toDto()).toEqual([tag1]);
     expect(result).toEqual(4);
+  });
+
+  describe("sanitizeDto", () => {
+    it("sanitizeDto should remove duplicated resource ids", () => {
+      const resource1 = {
+        "id": "10801423-4151-42a4-99d1-86e66145a08c",
+        "name": "resource1",
+      };
+      const resource2 = {
+        "id": "10801423-4151-42a4-99d1-86e66145a08c",
+        "name": "resource1",
+      };
+
+      const santitizedDto = ResourcesCollection.sanitizeDto([resource1, resource2]);
+      expect(santitizedDto).toHaveLength(1);
+      expect(santitizedDto).toEqual(expect.arrayContaining([resource1]));
+
+      const collection = new ResourcesCollection(santitizedDto);
+      expect(collection).toHaveLength(1);
+    });
+
+    it("sanitizeDto should return an empty array if an unsupported type of data is given in parameter", () => {
+      const santitizedDtos = ResourcesCollection.sanitizeDto("not-an-array");
+      expect(santitizedDtos).toHaveLength(0);
+
+      const collection = new ResourcesCollection(santitizedDtos);
+      expect(collection).toHaveLength(0);
+    });
   });
 });

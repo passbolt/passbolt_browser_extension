@@ -177,6 +177,7 @@ class ResourceService extends AbstractService {
    * @param {array} resourcesIds
    * @returns {Promise<*>} Response body
    * @public
+   * @todo should be replaced by a findAll, see how the find all for resources export works.
    */
   async findAllForShare(resourcesIds) {
     // Retrieve by batch to avoid any 414 response.
@@ -200,37 +201,6 @@ class ResourceService extends AbstractService {
     url.searchParams.append('contain[permission]', '1');
     url.searchParams.append('contain[permissions.user.profile]', '1');
     url.searchParams.append('contain[permissions.group]', '1');
-    url.searchParams.append('contain[secret]', '1');
-
-    const response = await this.apiClient.fetchAndHandleResponse('GET', url);
-    return response.body;
-  }
-
-  /**
-   * Find resources to export
-   * @param {array} resourcesIds
-   * @returns {Promise<*>} Response body
-   * @public
-   */
-  async findAllForExport(resourcesIds) {
-    // Retrieve by batch to avoid any 414 response.
-    const batchSize = 80;
-    if (resourcesIds.length > batchSize) {
-      let resources = [];
-      const totalBatches = Math.ceil(resourcesIds.length / batchSize);
-      for (let i = 0; i < totalBatches; i++) {
-        const resourcesIdsPart = resourcesIds.splice(0, batchSize);
-        const resourcesPart = await this.findAllForExport(resourcesIdsPart);
-        resources = [...resources, ...resourcesPart];
-      }
-
-      return resources;
-    }
-
-    let url = this.apiClient.buildUrl(this.apiClient.baseUrl.toString());
-    resourcesIds.forEach(resourceId => {
-      url.searchParams.append(`filter[has-id][]`, resourceId);
-    });
     url.searchParams.append('contain[secret]', '1');
 
     const response = await this.apiClient.fetchAndHandleResponse('GET', url);

@@ -15,7 +15,7 @@ const {EntityCollection} = require('../abstract/entityCollection');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {EntityCollectionError} = require('../abstract/entityCollectionError');
 const {ResourceEntity} = require('./resourceEntity');
-const {Log} = require('../../../model/log');
+const {deduplicateObjects} = require("../../../utils/array/deduplicateObjects");
 
 const ENTITY_NAME = 'Resources';
 
@@ -116,6 +116,24 @@ class ResourcesCollection extends EntityCollection {
    */
   getAllWhereOwner() {
     return new ResourcesCollection(this._items.filter(r => r.isOwner()));
+  }
+
+  // ==================================================
+  // Sanitization
+  // ==================================================
+  /**
+   * Sanitize resources dto:
+   * - Deduplicate the resources by id.
+   *
+   * @param {Array} dto The resources dto
+   * @returns {Array}
+   */
+  static sanitizeDto(dto) {
+    if (!Array.isArray(dto)) {
+      return [];
+    }
+
+    return deduplicateObjects(dto, 'id');
   }
 
   // ==================================================

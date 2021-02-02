@@ -32,4 +32,36 @@ describe("Groups users collection", () => {
     const entity = new GroupsUsersCollection(dto);
     expect(entity.toDto()).toEqual(GroupsUsersCollectionTestFixtures.without_user);
   });
+
+  describe("sanitizeDto", () => {
+    it("sanitizeDto should remove groups users that don't validate ", () => {
+      const groupUser1 = {
+        "id": "10801423-4151-42a4-99d1-86e66145a01a",
+        "group_id": "10801423-4151-42a4-99d1-86e66145a08c",
+        "user_id": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+        "is_admin": true
+      };
+      const groupUser2 = {
+        "id": "10801423-4151-42a4-99d1-86e66145a01b",
+        "group_id": null,
+        "user_id": "d57c10f5-639d-5160-9c81-8a0c6c4ec857",
+        "is_admin": true
+      };
+
+      const santitizedDtos = GroupsUsersCollection.sanitizeDto([groupUser1, groupUser2]);
+      expect(santitizedDtos).toHaveLength(1);
+      expect(santitizedDtos).toEqual(expect.arrayContaining([groupUser1]));
+
+      const collection = new GroupsUsersCollection(santitizedDtos);
+      expect(collection).toHaveLength(1);
+    });
+
+    it("sanitizeDto should return an empty array if an unsupported type of data is given in parameter", () => {
+      const santitizedDtos = GroupsUsersCollection.sanitizeDto("not-an-array");
+      expect(santitizedDtos).toHaveLength(0);
+
+      const collection = new GroupsUsersCollection(santitizedDtos);
+      expect(collection).toHaveLength(0);
+    });
+  });
 });

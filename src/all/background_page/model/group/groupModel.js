@@ -40,9 +40,8 @@ class GroupModel {
    * @public
    */
   async updateLocalStorage() {
-    const contain = {groups_users: true, my_group_user: true, modifier: false};
-    const groupDtos = await this.groupService.findAll(contain);
-    const groupsCollection = new GroupsCollection(groupDtos);
+    const contains = {groups_users: true, my_group_user: true, modifier: false};
+    const groupsCollection = await this.findAll(contains, null, null, true);
     await GroupLocalStorage.set(groupsCollection);
     return groupsCollection;
   }
@@ -78,10 +77,14 @@ class GroupModel {
    * @param {Object} [contains] optional
    * @param {Object} [filters] optional
    * @param {Object} [orders] optional
+   * @param {boolean?} preSanitize (optional) should the service result be sanitized prior to the entity creation
    * @returns {Promise<GroupsCollection>}
    */
-  async findAll(contains, filters, orders) {
-    const groupsDto = await this.groupService.findAll(contains, filters, orders);
+  async findAll(contains, filters, orders, preSanitize) {
+    let groupsDto = await this.groupService.findAll(contains, filters, orders);
+    if (preSanitize) {
+      groupsDto = GroupsCollection.sanitizeDto(groupsDto);
+    }
     return new GroupsCollection(groupsDto);
   }
 
@@ -117,12 +120,16 @@ class GroupModel {
    * Update a group using Passbolt API and add result to local storage
    *
    * @param {GroupUpdateEntity} groupUpdateEntity
+   * @param {boolean?} preSanitize (optional) should the service result be sanitized prior to the entity creation
    * @returns {Promise<GroupEntity>}
    * @public
    */
-  async update(groupUpdateEntity) {
+  async update(groupUpdateEntity, preSanitize) {
     const data = groupUpdateEntity.toDto();
-    const groupDto = await this.groupService.update(groupUpdateEntity.id, data);
+    let groupDto = await this.groupService.update(groupUpdateEntity.id, data);
+    if (preSanitize) {
+      groupDto = GroupEntity.sanitizeDto(groupDto)
+    }
     const updatedGroupEntity = new GroupEntity(groupDto);
     await GroupLocalStorage.updateGroup(updatedGroupEntity);
     return updatedGroupEntity;

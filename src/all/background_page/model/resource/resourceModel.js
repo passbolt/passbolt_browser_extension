@@ -47,8 +47,7 @@ class ResourceModel {
    */
   async updateLocalStorage () {
     const contain = {permission: true, favorite: true, tag: true};
-    const resourceDtos = await this.resourceService.findAll(contain);
-    const resourcesCollection = new ResourcesCollection(resourceDtos);
+    const resourcesCollection = await this.findAll(contain, null, null, true);
     await ResourceLocalStorage.set(resourcesCollection);
     return resourcesCollection;
   }
@@ -184,10 +183,14 @@ class ResourceModel {
    * @param {Object} [contains] optional example: {permissions: true}
    * @param {Object} [filters] optional
    * @param {Object} [orders] optional
+   * @param {boolean?} preSanitize (optional) should the service result be sanitized prior to the entity creation
    * @returns {Promise<ResourcesCollection>}
    */
-  async findAll(contains, filters, orders) {
+  async findAll(contains, filters, orders, preSanitize) {
     let resourcesDto = await this.resourceService.findAll(contains, filters, orders);
+    if (preSanitize) {
+      resourcesDto = ResourcesCollection.sanitizeDto(resourcesDto);
+    }
     return new ResourcesCollection(resourcesDto);
   }
 

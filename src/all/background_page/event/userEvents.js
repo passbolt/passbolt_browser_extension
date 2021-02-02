@@ -70,7 +70,7 @@ const listen = function (worker) {
       const userModel = new UserModel(clientOptions);
       const loggedInUserId = User.getInstance().get().id;
       const contains = {profile: true, role: true};
-      const userEntity = await userModel.findOne(loggedInUserId, contains);
+      const userEntity = await userModel.findOne(loggedInUserId, contains, true);
       worker.port.emit(requestId, 'SUCCESS', userEntity);
     } catch(error) {
       console.error(error);
@@ -92,7 +92,7 @@ const listen = function (worker) {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const userModel = new UserModel(clientOptions);
       const userEntity = new UserEntity(userDto);
-      const updatedUser = await userModel.update(userEntity);
+      const updatedUser = await userModel.update(userEntity, true);
       worker.port.emit(requestId, 'SUCCESS', updatedUser);
     } catch(error) {
       console.error(error);
@@ -113,7 +113,7 @@ const listen = function (worker) {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const userModel = new UserModel(clientOptions);
       const avatarUpdateEntity = AvatarUpdateEntity.createFromFileBase64(avatarBase64UpdateDto);
-      const updatedUser = await userModel.updateAvatar(userId, avatarUpdateEntity);
+      const updatedUser = await userModel.updateAvatar(userId, avatarUpdateEntity, true);
       worker.port.emit(requestId, 'SUCCESS', updatedUser);
     } catch(error) {
       console.error(error);

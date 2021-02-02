@@ -15,6 +15,7 @@ const {EntityCollection} = require('../abstract/entityCollection');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {EntityCollectionError} = require('../abstract/entityCollectionError');
 const {UserEntity} = require('./userEntity');
+const {GroupsUsersCollection} = require("../groupUser/groupsUsersCollection");
 
 const ENTITY_NAME = 'Users';
 
@@ -95,6 +96,26 @@ class UsersCollection extends EntityCollection {
    */
   getFirstById(userId) {
     return this._items.find(r => (r.id === userId));
+  }
+
+  // ==================================================
+  // Sanitization
+  // ==================================================
+  /**
+   * Sanitize user dto:
+   * - Remove group users which don't validate if any.
+   *
+   * @param {Array} dto The users dto
+   * @returns {Array}
+   */
+  static sanitizeDto(dto) {
+    if (!Array.isArray(dto)) {
+      return [];
+    }
+
+    const sanitizedDto = dto.map(rowDto => UserEntity.sanitizeDto(rowDto));
+
+    return sanitizedDto;
   }
 
   // ==================================================

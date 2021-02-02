@@ -15,6 +15,8 @@ const {EntityCollection} = require('../abstract/entityCollection');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {EntityCollectionError} = require('../abstract/entityCollectionError');
 const {GroupEntity} = require('./groupEntity');
+const {GroupsUsersCollection} = require("../groupUser/groupsUsersCollection");
+const {deduplicateObjects} = require("../../../utils/array/deduplicateObjects");
 
 const ENTITY_NAME = 'Groups';
 
@@ -94,6 +96,30 @@ class GroupsCollection extends EntityCollection {
    */
   getFirstById(groupId) {
     return this._items.find(r => (r.id === groupId));
+  }
+
+  // ==================================================
+  // Sanitization
+  // ==================================================
+  /**
+   * Sanitize groups dto:
+   * - Deduplicate the groups by name.
+   * - Deduplicate the groups by id.
+   * - For each group remove group users which don't validate if any.
+   *
+   * @param {Array} dto The groups dto
+   * @returns {Array}
+   */
+  static sanitizeDto(dto) {
+    if (!Array.isArray(dto)) {
+      return [];
+    }
+
+    let sanitizedDto = deduplicateObjects(dto, 'name');
+    sanitizedDto = deduplicateObjects(sanitizedDto, 'id');
+    sanitizedDto = sanitizedDto.map(rowDto => GroupEntity.sanitizeDto(rowDto));
+
+    return sanitizedDto;
   }
 
   // ==================================================

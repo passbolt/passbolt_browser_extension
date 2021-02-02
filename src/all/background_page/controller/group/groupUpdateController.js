@@ -164,7 +164,7 @@ class GroupsUpdateController {
    */
   async updateGroup(groupUpdateEntity) {
     await progressController.update(this.worker, this.progress++, __("Updating group"));
-    await this.groupModel.update(groupUpdateEntity);
+    await this.groupModel.update(groupUpdateEntity, true);
   }
 }
 

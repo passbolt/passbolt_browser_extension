@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [3.0.4] - 2021-02-03
+### Fixed
+- Allow decryption with rsa signing key to work around old openpgpjs bug
+- Pre sanitize data prior to collections/entity creation for the following operations: local storage update (resources, groups, users), user and avatar update, group update
+
 ## [3.0.3] - 2021-01-28
 ### Fixed
 - Fix do not enforce validation for gpgkey with type property set to null

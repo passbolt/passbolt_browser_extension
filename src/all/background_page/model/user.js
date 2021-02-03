@@ -355,7 +355,7 @@ const User = (function () {
     const idleInterval = 15 * 60; // detection interval in sec: 15 minutes
     browser.idle.queryState(idleInterval).then( async (idleState) => {
       if (idleState === 'active' && this._masterPassword !== null) {
-        const apiClientOptions = this.getApiClientOptions();
+        const apiClientOptions = await this.getApiClientOptions();
         const userService = new UserService(apiClientOptions)
         await userService.keepSessionAlive();
       }

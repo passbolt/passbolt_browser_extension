@@ -29,7 +29,6 @@ class AccountModel {
   /**
    * Add an account to the browser extension.
    * @param {AccountEntity} accountEntity The account to add
-   * @returns {Promise<UserEntity>}
    * @throws {Error} if options are invalid or API error
    */
   async add(accountEntity) {
@@ -52,6 +51,29 @@ class AccountModel {
    */
   async changeSecurityToken(securityTokenEntity) {
     await User.getInstance().updateSecurityToken(securityTokenEntity.toDto());
+  }
+
+  /**
+   * Decrypt and encrypt the private key with new passphrase of an account to the browser extension.
+   * @param {string} oldPassphrase The old passphrase
+   * @param {string} newPassphrase The new passphrase
+   * @returns {Promise<string>}
+   * @throws {Error} if options are invalid or API error
+   */
+  async updatePrivateKey(oldPassphrase, newPassphrase) {
+    const privateKey = this.keyring.findPrivate();
+    const userPrivateKeyObj = (await openpgp.key.readArmored(privateKey.key)).keys[0];
+    const userNewPrivateKey = await openpgp.decryptKey({privateKey: userPrivateKeyObj, passphrase: oldPassphrase});
+    await userNewPrivateKey.key.encrypt(newPassphrase);
+    const userPrivateArmoredKey = userNewPrivateKey.key.armor();
+    try {
+      await this.keyring.importPrivate(userPrivateArmoredKey);
+    } catch (error) {
+      // Rollback to the old passphrase
+      await this.keyring.importPrivate(privateKey.key);
+      throw error;
+    }
+    return userPrivateArmoredKey;
   }
 }
 

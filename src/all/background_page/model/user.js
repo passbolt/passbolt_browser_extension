@@ -316,6 +316,7 @@ const User = (function () {
     if (seconds !== -1) {
       this._masterPassword.timeout = setTimeout(() => {
         this.flushMasterPassword();
+        this.stopSessionKeepAlive();
       }, seconds * 1000);
     }
     if (this._sessionKeepAliveTimeout === null) {
@@ -325,17 +326,22 @@ const User = (function () {
 
   /**
    * Flush the master password if any stored during a previous session
-   * Also stop keeping the session alive if needed
    */
   this.flushMasterPassword = function () {
     if (this._masterPassword && this._masterPassword.timeout) {
       clearTimeout(this._masterPassword.timeout);
     }
+    this._masterPassword = null;
+  };
+
+  /**
+   * Stop keeping the session alive
+   */
+  this.stopSessionKeepAlive = function () {
     if (this._sessionKeepAliveTimeout) {
       clearTimeout(this._sessionKeepAliveTimeout);
     }
     this._sessionKeepAliveTimeout = null;
-    this._masterPassword = null;
   };
 
   /**
@@ -481,6 +487,7 @@ var UserSingleton = (function () {
       window.addEventListener("passbolt.auth.after-logout", () => {
         const user = UserSingleton.getInstance();
         user.flushMasterPassword();
+        user.stopSessionKeepAlive();
       });
     }
   };

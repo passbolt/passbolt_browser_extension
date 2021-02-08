@@ -6,11 +6,13 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+const {AccountModel} = require("../model/account/accountModel");
 const {User} = require('../model/user');
 const {UserModel} = require('../model/user/userModel');
 const {UserEntity} = require('../model/entity/user/userEntity');
 const {UserDeleteTransferEntity} = require('../model/entity/user/transfer/userDeleteTransfer');
 const {AvatarUpdateEntity} = require("../model/entity/avatar/update/avatarUpdateEntity");
+const {SecurityTokenEntity} = require("../../securityToken/securityTokenEntity");
 
 const listen = function (worker) {
 
@@ -115,6 +117,27 @@ const listen = function (worker) {
       const avatarUpdateEntity = AvatarUpdateEntity.createFromFileBase64(avatarBase64UpdateDto);
       const updatedUser = await userModel.updateAvatar(userId, avatarUpdateEntity, true);
       worker.port.emit(requestId, 'SUCCESS', updatedUser);
+    } catch(error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Update a user avatar
+   *
+   * @listens passbolt.users.update-security-token
+   * @param requestId {uuid} The request identifier
+   * @param {{code: string, color: string, textColor: string}} securityTokenDto
+   *
+   */
+  worker.port.on('passbolt.users.update-security-token', async function (requestId, securityTokenDto) {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const accountModel = new AccountModel(clientOptions);
+      const securityTokenEntity = new SecurityTokenEntity(securityTokenDto);
+      await accountModel.changeSecurityToken(securityTokenEntity);
+      worker.port.emit(requestId, 'SUCCESS');
     } catch(error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);

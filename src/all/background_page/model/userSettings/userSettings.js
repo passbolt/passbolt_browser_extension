@@ -60,7 +60,7 @@ class UserSettings {
   /**
    * Validate a security token.
    *
-   * @param token {string} The token to validate
+   * @param token {{code: string, color: string, textColor: string}} The token to validate
    * @returns {boolean}
    * @throw Error on validation failure
    * @private
@@ -189,7 +189,7 @@ class UserSettings {
   /**
    * Set the user security token.
    *
-   * @param token {string} The security token
+   * @param token {{code: string, color: string, textColor: string}} The security token
    * @return {bool}
    * @throw Error if security token is not valid
    */

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Fixed
+- Fix missing chevron image in quickaccess
+- Remove EJS from dependencies
+
 ## [3.0.5] - 2021-02-03
 ### Fixed
 - Fix keep session alive

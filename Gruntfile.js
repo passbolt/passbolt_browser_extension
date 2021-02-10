@@ -210,14 +210,21 @@ module.exports = function (grunt) {
           // Controls
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/controls',
-          src: ['check_black.svg', 'check_white.svg', 'colorpicker/**', 'dot_black.svg', 'dot_white.svg', 'dot_red.svg', 'infinite-bar.gif', 'loading_dark.svg', 'loading_light.svg'],
+          src: [
+            'check_black.svg', 'check_white.svg', 'dot_black.svg', 'dot_white.svg', 'dot_red.svg',
+            'infinite-bar.gif', 'loading_dark.svg', 'loading_light.svg', 'chevron-right_black.svg',
+            'chevron-right_white.svg'
+          ],
           dest: path.build_data + 'img/controls',
           expand: true
         }, {
           // Icons / logo
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/logo',
-          src: ['icon-19.png', 'icon-20_white.png', 'icon-48.png', 'icon-48_white.png', 'logo.png', 'logo@2x.png', 'logo.svg', 'logo_white.png', 'logo_white@2x.png', 'logo_white.svg'],
+          src: [
+            'icon-19.png', 'icon-20_white.png', 'icon-48.png', 'icon-48_white.png', 'logo.png', 'logo@2x.png',
+            'logo.svg', 'logo_white.png', 'logo_white@2x.png', 'logo_white.svg'
+          ],
           dest: path.build_data + 'img/logo',
           expand: true
         }, {
@@ -237,8 +244,10 @@ module.exports = function (grunt) {
         }, {
           // CSS files default
           cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/default',
-          src: ['ext_config_debug.min.css', 'ext_external.min.css', 'ext_login.min.css', 'ext_legacy.min.css',
-            'ext_setup.min.css', 'ext_quickaccess.min.css', 'ext_app.min.css', 'ext_authentication.min.css'],
+          src: [
+            'ext_config_debug.min.css', 'ext_external.min.css', 'ext_login.min.css', 'ext_legacy.min.css',
+            'ext_setup.min.css', 'ext_quickaccess.min.css', 'ext_app.min.css', 'ext_authentication.min.css'
+          ],
           dest: path.build_data + 'css/themes/default',
           expand: true
         }, {

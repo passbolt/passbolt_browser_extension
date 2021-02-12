@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Fix missing chevron image in quickaccess
 - Remove EJS from dependencies
+- Fix import of keepass file containing entries with undefined field
 
 ## [3.0.5] - 2021-02-03
 ### Fixed

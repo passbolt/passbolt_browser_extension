@@ -122,10 +122,10 @@ class ResourcesKdbxImportParser {
    */
   parseResource(kdbxEntry) {
     const externalResourceDto = {
-      name: kdbxEntry.fields.Title.trim(),
-      uri: kdbxEntry.fields.URL.trim(),
-      username: kdbxEntry.fields.UserName.trim(),
-      description: kdbxEntry.fields.Notes.trim(),
+      name: kdbxEntry.fields.Title ? kdbxEntry.fields.Title.trim() : "",
+      uri: kdbxEntry.fields.URL ? kdbxEntry.fields.URL.trim() : "",
+      username: kdbxEntry.fields.UserName ? kdbxEntry.fields.UserName.trim() : "",
+      description: kdbxEntry.fields.Notes ? kdbxEntry.fields.Notes.trim() : "",
       folder_parent_path: this.getKdbxEntryPath(kdbxEntry),
       secret_clear: '' // By default a secret can be null
     };

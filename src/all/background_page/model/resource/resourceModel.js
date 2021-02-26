@@ -323,7 +323,7 @@ class ResourceModel {
    * Create a bulk of resources
    * @param {ResourcesCollection} collection The collection of resources to import
    * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
-   * @returns {Promise<array<ResourceEntity>>}
+   * @returns {Promise<array<ResourceEntity|Error>>}
    */
   async bulkCreate(collection, callbacks) {
     let result = [];
@@ -342,7 +342,10 @@ class ResourceModel {
       result = [...result, ...intermediateResult];
     }
 
-    await ResourceLocalStorage.addResources(result);
+    // Insert the created resources in the local storage
+    const createdResources = result.filter(row => row instanceof ResourceEntity);
+    await ResourceLocalStorage.addResources(createdResources);
+
     return result;
   }
 
@@ -351,7 +354,8 @@ class ResourceModel {
    * @param {ResourceEntity} resourceEntity The resource to create
    * @param {int} collectionIndex The index of the resource in the initial collection
    * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
-   * @returns {Promise<ResourceEntity|Error>}
+   * @returns {Promise<ResourceEntity>}
+   * @throws Exception if the resource cannot be created
    * @private
    */
   async _bulkCreate_createResource(resourceEntity, collectionIndex, callbacks) {
@@ -372,7 +376,7 @@ class ResourceModel {
     } catch(error) {
       console.error(error);
       errorCallback(error, collectionIndex);
-      return error;
+      throw error;
     }
   }
 
@@ -380,7 +384,7 @@ class ResourceModel {
    * Delete a bulk of resources
    * @param {Array<string>} resourcesIds collection The list of uuids to delete
    * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
-   * @returns {Promise<array<ResourceEntity>>}
+   * @returns {Promise<array<*>>}
    */
   async bulkDelete(resourcesIds, callbacks) {
     let result = [];
@@ -408,6 +412,7 @@ class ResourceModel {
    * @param {int} collectionIndex The index of the resource in the initial collection
    * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
    * @returns {Promise<ResourceEntity|Error>}
+   * @throws Exception if the resource cannot be deleted
    * @private
    */
   async _bulkDelete_deleteResource(resourceId, collectionIndex, callbacks) {
@@ -421,7 +426,7 @@ class ResourceModel {
     } catch(error) {
       console.error(error);
       errorCallback(error, collectionIndex);
-      return error;
+      throw error;
     }
   }
 

@@ -320,7 +320,7 @@ class FolderModel {
    * Create a bulk of folders
    * @param {FoldersCollection} collection The collection of folders
    * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
-   * @returns {Promise<array<FolderEntity>>}
+   * @returns {Promise<array<FolderEntity|Error>>}
    */
   async bulkCreate(collection, callbacks) {
     let result = [];
@@ -339,7 +339,10 @@ class FolderModel {
       result = [...result, ...intermediateResult];
     }
 
-    await FolderLocalStorage.addFolders(result);
+    // Insert the created folders into the local storage
+    const createdFolders = result.filter(row => row instanceof FolderEntity);
+    await FolderLocalStorage.addFolders(createdFolders);
+
     return result;
   }
 
@@ -348,7 +351,8 @@ class FolderModel {
    * @param {FolderEntity} folderEntity The folder to create
    * @param {int} collectionIndex The index of the folder in the initial collection
    * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
-   * @returns {Promise<FolderEntity|Error>}
+   * @returns {Promise<FolderEntity>}
+   * @throws Exception if the folder cannot be created
    * @private
    */
   async _bulkCreate_createFolder(folderEntity, collectionIndex, callbacks) {
@@ -358,8 +362,8 @@ class FolderModel {
 
     try {
       // Here we create entity just like in this.create
-      // but we don't add the resource entity in the local storage just yet,
-      // we wait until all resources are created in order to speed things up
+      // but we don't add the folder entity in the local storage just yet,
+      // we wait until all folders are created in order to speed things up
       const folderDto = await this.folderService.create(folderEntity.toDto(), {permission: true});
       const createdFolderEntity = new FolderEntity(folderDto);
       successCallback(createdFolderEntity, collectionIndex);
@@ -367,7 +371,7 @@ class FolderModel {
     } catch(error) {
       console.error(error);
       errorCallback(error, collectionIndex);
-      return error;
+      throw error;
     }
   }
 

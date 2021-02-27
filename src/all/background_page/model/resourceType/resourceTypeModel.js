@@ -40,13 +40,17 @@ class ResourceTypeModel {
   }
 
   /**
-   * Get a collection of resourceTypes from the local storage by id
+   * Get a collection of all resourceTypes from the local storage.
+   * If the local storage is unset, initialize it.
    *
    * @return {ResourceTypesCollection}
    */
-  async getAll() {
-    const resourceTypeDtos = await ResourceTypeLocalStorage.get() || [];
-    return new ResourceTypesCollection(resourceTypeDtos);
+  async getOrFindAll() {
+    const resourceTypeDtos = await ResourceTypeLocalStorage.get();
+    if (typeof resourceTypeDtos !== 'undefined') {
+      return new ResourceTypesCollection(resourceTypeDtos);
+    }
+    return this.updateLocalStorage();
   };
 
   /**
@@ -59,7 +63,7 @@ class ResourceTypeModel {
     if (!Validator.isUUID(resourceTypeId)) {
       throw new TypeError(__('The resource type id should be a valid UUID'))
     }
-    const types = await this.getAll();
+    const types = await this.getOrFindAll();
     const type = types.getFirst('id', resourceTypeId);
     if (!type || !type.definition || !type.definition.secret) {
       return undefined;

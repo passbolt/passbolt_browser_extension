@@ -10,6 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+const __ = require('../../sdk/l10n').get;
 const {splitBySize} = require("../../utils/array/splitBySize");
 const {ResourceEntity} = require('../entity/resource/resourceEntity');
 const {ResourcesCollection} = require('../entity/resource/resourcesCollection');
@@ -85,6 +86,17 @@ class ResourceModel {
     return new ResourcesCollection(filteredResources);
   };
 
+  /**
+   * Return a resource for a given id from the local storage
+   *
+   * @param {string} resourceId uuid
+   * @returns {Promise<ResourceEntity>}
+   */
+  async getById(resourceId) {
+    const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
+    return new ResourceEntity(resourceDto);
+  }
+
   //==============================================================
   // Permission changes
   //==============================================================
@@ -158,20 +170,6 @@ class ResourceModel {
       changes = PermissionChangesCollection.calculateChanges(currentPermissions, permissionsFromDest)
     }
     return changes;
-  }
-
-  //==============================================================
-  // Getters / local calls
-  //==============================================================
-  /**
-   * Return a resource for a given id from the local storage
-   *
-   * @param {string} resourceId uuid
-   * @returns {Promise<ResourceEntity>}
-   */
-  async getById(resourceId) {
-    const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
-    return new ResourceEntity(resourceDto);
   }
 
   //==============================================================

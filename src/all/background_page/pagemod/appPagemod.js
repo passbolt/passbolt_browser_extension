@@ -44,6 +44,8 @@ App.init = function () {
       app.events.config.listen(worker);
       app.events.folder.listen(worker);
       app.events.resource.listen(worker);
+      app.events.resourceType.listen(worker);
+      app.events.role.listen(worker);
       app.events.keyring.listen(worker);
       app.events.secret.listen(worker);
       app.events.siteSettings.listen(worker);

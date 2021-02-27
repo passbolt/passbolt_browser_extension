@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Remove EJS from dependencies
 - Fix import of keepass file containing entries with undefined field
 - Fix import should not throw an error if a resource or a folder cannot be created
+- GITHUB-381 Fix quickaccess and custom fields. Lazy load resource types local storage on demand.
 
 ## [3.0.5] - 2021-02-03
 ### Fixed

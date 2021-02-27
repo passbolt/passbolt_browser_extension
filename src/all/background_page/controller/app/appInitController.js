@@ -12,9 +12,13 @@
  * @since         3.0.0
  */
 const User = require('../../model/user').User;
-const ResourceTypeModel = require("../../model/resourceType/resourceTypeModel").ResourceTypeModel;
-const RoleModel = require("../../model/role/roleModel").RoleModel;
 
+/**
+ * React application bootstrap.
+ *
+ * @deprecated The application should load what required. The background page shouldn't bootstrap
+ *   what the application needs.
+ */
 class AppInitController {
   /**
    *
@@ -22,9 +26,7 @@ class AppInitController {
    */
   async main() {
     const syncUserSettingsPromise = this._syncUserSettings();
-    const syncResourcesTypesPromise = this._syncResourcesTypesLocalStorage();
-    const syncRolesPromise = this._syncRolesLocalStorage();
-    return Promise.allSettled([syncUserSettingsPromise, syncResourcesTypesPromise, syncRolesPromise])
+    return Promise.allSettled([syncUserSettingsPromise]);
   }
 
   /**
@@ -39,39 +41,6 @@ class AppInitController {
     } catch (error) {
       // fail silently for CE users
       user.settings.setDefaults();
-    }
-  }
-
-  /**
-   * Sync the API resources types
-   * @returns {Promise<void>}
-   * @private
-   */
-  async _syncResourcesTypesLocalStorage() {
-    const user = User.getInstance();
-    const apiClientOptions = await user.getApiClientOptions();
-    try {
-      const resourceTypeModel = new ResourceTypeModel(apiClientOptions);
-      await resourceTypeModel.updateLocalStorage();
-    } catch (error) {
-      // If API < v3, we expect an error here.
-      console.error(error);
-    }
-  }
-
-  /**
-   * Sync the API roles
-   * @returns {Promise<void>}
-   * @private
-   */
-  async _syncRolesLocalStorage() {
-    const user = User.getInstance();
-    const apiClientOptions = await user.getApiClientOptions();
-    try {
-      const roleModel = new RoleModel(apiClientOptions);
-      await roleModel.updateLocalStorage();
-    } catch (error) {
-      console.error(error);
     }
   }
 }

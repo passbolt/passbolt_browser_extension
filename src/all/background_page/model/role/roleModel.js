@@ -37,6 +37,20 @@ class RoleModel {
     await RolesLocalStorage.set(rolesCollection);
     return rolesCollection;
   }
+
+  /**
+   * Get a collection of all roles from the local storage.
+   * If the local storage is unset, initialize it.
+   *
+   * @return {ResourceTypesCollection}
+   */
+  async getOrFindAll() {
+    const rolesDto = await RolesLocalStorage.get();
+    if (typeof rolesDto !== 'undefined') {
+      return new RolesCollection(rolesDto);
+    }
+    return this.updateLocalStorage();
+  };
 }
 
 exports.RoleModel = RoleModel;

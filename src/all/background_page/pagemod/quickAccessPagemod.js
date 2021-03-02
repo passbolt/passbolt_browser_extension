@@ -19,7 +19,7 @@ const QuickAccess = function () {
 
 QuickAccess.init = function () {
 
-  chrome.runtime.onConnect.addListener(function (port) {
+  chrome.runtime.onConnect.addListener(async function (port) {
     if (port.name === "quickaccess") {
       this._worker = new Worker(port);
 
@@ -38,6 +38,9 @@ QuickAccess.init = function () {
       app.events.secret.listen(this._worker);
       app.events.siteSettings.listen(this._worker);
       app.events.tab.listen(this._worker);
+
+      // Keep the pagemod event listeners at the end of the list.
+      app.events.pagemod.listen(this._worker);
     }
   });
 };

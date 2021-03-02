@@ -124,7 +124,7 @@ class ImportResourcesFileController {
    */
   async parseFile(importEntity) {
     const importParser = new ResourcesImportParser();
-    const resourceTypesCollection = await this.resourceTypeModel.getAll();
+    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
     await importParser.parseImport(importEntity, resourceTypesCollection);
 
     // Now that we know about the content of the import, update the progress bar goals.

@@ -113,7 +113,7 @@ class ExportResourcesFileController {
    */
   async decryptSecrets(exportEntity, userId, privateKey) {
     let i = 0;
-    const resourcesTypesCollection = await this.resourceTypeModel.getAll();
+    const resourcesTypesCollection = await this.resourceTypeModel.getOrFindAll();
     for (let exportResourceEntity of exportEntity.exportResources.items) {
       progressController.update(this.worker, ++this.progress, __(`Decrypting ${++i}/${exportEntity.exportResources.items.length}`));
       let secretClear = await this.crypto.decryptWithKey(exportResourceEntity.secrets.items[0].data, privateKey);

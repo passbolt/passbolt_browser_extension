@@ -69,6 +69,7 @@ AppBoostrapPagemod.initPageMod = function () {
 
       // The application init controller aims to load content required by the applications such
       // as roles, resources types and user settings.
+      // Could be done in post sign in, but mfa might not be completed at that moment.
       const appInitController = new AppInitController();
       await appInitController.main();
 

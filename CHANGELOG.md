@@ -578,7 +578,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.6...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.6...HEAD
+[3.0.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.0...v3.0.6
+[3.0.5]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.0...v3.0.5
+[3.0.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.0...v3.0.4
+[3.0.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.0...v3.0.3
+[3.0.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.0...v3.0.2
+[3.0.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.0...v3.0.1
+[3.0.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.8...v3.0.0
+[2.13.8]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.7...v2.13.8
+[2.13.7]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.6...v2.13.7
 [2.13.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.5...v2.13.6
 [2.13.5]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.4...v2.13.5
 [2.13.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.3...v2.13.4

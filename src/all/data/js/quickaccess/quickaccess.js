@@ -10,7 +10,7 @@ passbolt.quickaccess = passbolt.quickaccess || {};
 
 $(function () {
   const PASSWORD_INPUT_SELECTOR = "input[type='password']:visible:enabled, input[type='Password']:visible:enabled, input[type='PASSWORD']:visible:enabled";
-  const USERNAME_INPUT_SELECTOR = "input[type='text']:visible:enabled, input[type='Text']:visible:enabled, input[type='TEXT']:visible:enabled, input[type='email']:visible:enabled, input[type='Email']:visible:enabled, input[type='EMAIL']:visible:enabled";
+  const USERNAME_INPUT_SELECTOR = "input[type='text']:visible:enabled, input[type='Text']:visible:enabled, input[type='TEXT']:visible:enabled, input[type='email']:visible:enabled, input[type='Email']:visible:enabled, input[type='EMAIL']:visible:enabled, input:not([type]):visible:enabled";
 
   /**
    * Fill the login form.

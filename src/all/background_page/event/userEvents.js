@@ -12,7 +12,7 @@ const {UserModel} = require('../model/user/userModel');
 const {UserEntity} = require('../model/entity/user/userEntity');
 const {UserDeleteTransferEntity} = require('../model/entity/user/transfer/userDeleteTransfer');
 const {AvatarUpdateEntity} = require("../model/entity/avatar/update/avatarUpdateEntity");
-const {SecurityTokenEntity} = require("../../securityToken/securityTokenEntity");
+const {SecurityTokenEntity} = require("../model/entity/securityToken/securityTokenEntity");
 
 const listen = function (worker) {
 

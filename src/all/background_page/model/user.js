@@ -428,6 +428,14 @@ const User = (function () {
   };
 
   /**
+   * Update the security token
+   * @param token {{code: string, color: string, textColor: string}} The security token
+   */
+  this.updateSecurityToken = async function(token) {
+    this.settings.setSecurityToken(token);
+  };
+
+  /**
    * Check if the master password is stored.
    * @return {boolean}
    */

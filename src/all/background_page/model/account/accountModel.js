@@ -10,7 +10,6 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {UserEntity} = require("../entity/user/userEntity");
 const {User} = require('../user');
 const {Keyring} = require('../keyring');
 const {UserService} = require("../../service/api/user/userService");
@@ -44,6 +43,15 @@ class AccountModel {
     await this.keyring.importServerPublicKey(accountEntity.serverPublicArmoredKey, accountEntity.domain);
     await this.keyring.importPublic(accountEntity.userPublicArmoredKey, accountEntity.userId);
     await this.keyring.importPrivate(accountEntity.userPrivateArmoredKey);
+  }
+
+  /**
+   * Change the security token
+   * @param securityTokenEntity the security token
+   * @returns {Promise<void>}
+   */
+  async changeSecurityToken(securityTokenEntity) {
+    await User.getInstance().updateSecurityToken(securityTokenEntity.toDto());
   }
 }
 

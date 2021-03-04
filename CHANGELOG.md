@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.0.7] - 2021-03-04
+### Fixed
+- GITHUB-156 Fix import/export and legacy API v2
+
 ## [3.0.6] - 2021-03-02
 ### Fixed
 - Fix missing chevron image in quickaccess
@@ -581,12 +585,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.6...HEAD
-[3.0.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.0...v3.0.6
-[3.0.5]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.0...v3.0.5
-[3.0.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.0...v3.0.4
-[3.0.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.0...v3.0.3
-[3.0.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.0...v3.0.2
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.7...HEAD
+[3.0.7]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.6...v3.0.7
+[3.0.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.5...v3.0.6
+[3.0.5]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.4...v3.0.5
+[3.0.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.3...v3.0.4
+[3.0.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.2...v3.0.3
+[3.0.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.1...v3.0.2
 [3.0.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.8...v3.0.0
 [2.13.8]: https://github.com/passbolt/passbolt_browser_extension/compare/v2.13.7...v2.13.8

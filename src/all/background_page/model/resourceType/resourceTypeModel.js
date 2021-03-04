@@ -12,6 +12,7 @@
  * @since         v3.0.0
  */
 const __ = require('../../sdk/l10n').get;
+const {PassboltApiFetchError} = require('../../error/passboltApiFetchError');
 const {ResourceTypesCollection} = require('../entity/resourceType/resourceTypesCollection');
 const {ResourceTypeLocalStorage} = require('../../service/local_storage/resourceTypeLocalStorage');
 const {ResourceTypeService} = require('../../service/api/resourceType/resourceTypeService');
@@ -33,7 +34,17 @@ class ResourceTypeModel {
    * @return {ResourceTypesCollection}
    */
   async updateLocalStorage () {
-    const resourceTypeDtos = await this.resourceTypeService.findAll();
+    let resourceTypeDtos = [];
+    try {
+      resourceTypeDtos = await this.resourceTypeService.findAll();
+    } catch (error) {
+      // @deprecated to remove with v4. Expect 404 if API < V3, ResourcesTypes has been introduced with v3.
+      if (error instanceof PassboltApiFetchError && error.data && error.data.code === 404) {
+        console.error(error);
+      } else {
+        throw error;
+      }
+    }
     const resourceTypesCollection = new ResourceTypesCollection(resourceTypeDtos);
     await ResourceTypeLocalStorage.set(resourceTypesCollection);
     return resourceTypesCollection;

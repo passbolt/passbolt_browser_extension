@@ -85,7 +85,7 @@ class ResourceViewPage extends React.Component {
    */
   async copyPasswordToClipboard(plaintextDto) {
     if (!plaintextDto) {
-      throw new TypeError(__('The password is empty.'));
+      throw new TypeError('The password is empty.');
     }
     if (typeof plaintextDto === 'string') {
       await navigator.clipboard.writeText(plaintextDto);
@@ -93,7 +93,7 @@ class ResourceViewPage extends React.Component {
       if (plaintextDto.hasOwnProperty('password')) {
         await navigator.clipboard.writeText(plaintextDto.password);
       } else {
-        throw new TypeError(__('The password field is not defined.'));
+        throw new TypeError('The password field is not defined.');
       }
     }
   }

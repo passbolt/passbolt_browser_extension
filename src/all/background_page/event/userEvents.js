@@ -158,16 +158,15 @@ const listen = function (worker) {
    */
   worker.port.on('passbolt.user.update-private-key', async function (requestId, oldPassphrase, newPassphrase) {
     try {
-      if(typeof oldPassphrase === 'string' && typeof newPassphrase === 'string') {
-        const clientOptions = await User.getInstance().getApiClientOptions();
-        const accountModel = new AccountModel(clientOptions);
-        const userPrivateArmoredKey = await accountModel.updatePrivateKey(oldPassphrase, newPassphrase);
-        await User.getInstance().flushMasterPassword();
-        await fileController.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", worker.tab.id);
-        worker.port.emit(requestId, 'SUCCESS');
-      } else {
+      if (typeof oldPassphrase !== 'string' || typeof newPassphrase !== 'string') {
         throw new Error('The old and new passphrase have to be string');
       }
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const accountModel = new AccountModel(clientOptions);
+      const userPrivateArmoredKey = await accountModel.updatePrivateKey(oldPassphrase, newPassphrase);
+      await User.getInstance().flushMasterPassword();
+      await fileController.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", worker.tab.id);
+      worker.port.emit(requestId, 'SUCCESS');
     } catch(error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);

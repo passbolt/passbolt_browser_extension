@@ -9,10 +9,14 @@
 const {AccountModel} = require("../model/account/accountModel");
 const {User} = require('../model/user');
 const {UserModel} = require('../model/user/userModel');
+const {AccountModel} = require('../model/account/accountModel');
 const {UserEntity} = require('../model/entity/user/userEntity');
 const {UserDeleteTransferEntity} = require('../model/entity/user/transfer/userDeleteTransfer');
 const {AvatarUpdateEntity} = require("../model/entity/avatar/update/avatarUpdateEntity");
 const {SecurityTokenEntity} = require("../model/entity/securityToken/securityTokenEntity");
+const fileController = require('../controller/fileController');
+
+const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
 
 const listen = function (worker) {
 
@@ -137,6 +141,31 @@ const listen = function (worker) {
       const accountModel = new AccountModel(clientOptions);
       const securityTokenEntity = new SecurityTokenEntity(securityTokenDto);
       await accountModel.changeSecurityToken(securityTokenEntity);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch(error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Update the private key of the user and send the new recovery kit
+   *
+   * @listens passbolt.user.update-private-key
+   * @param requestId {uuid} The request identifier
+   * @param oldPassphrase {string} The old passphrase
+   * @param newPassphrase {string} The new passphrase
+   */
+  worker.port.on('passbolt.user.update-private-key', async function (requestId, oldPassphrase, newPassphrase) {
+    try {
+      if (typeof oldPassphrase !== 'string' || typeof newPassphrase !== 'string') {
+        throw new Error('The old and new passphrase have to be string');
+      }
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const accountModel = new AccountModel(clientOptions);
+      const userPrivateArmoredKey = await accountModel.updatePrivateKey(oldPassphrase, newPassphrase);
+      await User.getInstance().flushMasterPassword();
+      await fileController.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", worker.tab.id);
       worker.port.emit(requestId, 'SUCCESS');
     } catch(error) {
       console.error(error);

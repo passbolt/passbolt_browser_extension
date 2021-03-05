@@ -235,6 +235,13 @@ module.exports = function (grunt) {
           dest: path.build + 'icons',
           expand: true
         }, {
+          // Illustrations
+          nonull: true,
+          cwd: path.node_modules + 'passbolt-styleguide/src/img/illustrations',
+          src: ['passphrase_intro.png'],
+          dest: path.build_data + 'img/illustrations',
+          expand: true
+        }, {
           // Third party logos
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/third_party',

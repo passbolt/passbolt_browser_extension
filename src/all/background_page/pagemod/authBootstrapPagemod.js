@@ -50,6 +50,7 @@ AuthBootstrap.init = function () {
     attachTo: {existing: true, reload: true},
     onAttach: function (worker) {
       user.flushMasterPassword();
+      user.stopSessionKeepAlive();
 
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows

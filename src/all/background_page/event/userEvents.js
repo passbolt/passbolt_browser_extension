@@ -6,7 +6,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {AccountModel} = require("../model/account/accountModel");
 const {User} = require('../model/user');
 const {UserModel} = require('../model/user/userModel');
 const {AccountModel} = require('../model/account/accountModel');

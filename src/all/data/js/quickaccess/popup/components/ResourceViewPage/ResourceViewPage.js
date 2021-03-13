@@ -28,7 +28,7 @@ class ResourceViewPage extends React.Component {
       copySecretState: "default",
       copyLoginState: "default",
       useOnThisTabError: "",
-      passwordDecrypted: null, // The current resource password decrypted
+      previewedPassword: null,
       isSecretDecrypting: false // if the secret is decrypting
     };
   }
@@ -79,68 +79,122 @@ class ResourceViewPage extends React.Component {
   }
 
   /**
-   * Copy password from dto to clipboard
-   * Support original password (a simple string) and composed objects)
-   *
-   * @param {string|object} plaintextDto
-   * @returns {Promise<void>}
+   * Handle copy password click.
    */
-  async copyPasswordToClipboard(plaintextDto) {
-    if (!plaintextDto) {
-      throw new TypeError('The password is empty.');
-    }
-    if (typeof plaintextDto === 'string') {
-      await navigator.clipboard.writeText(plaintextDto);
-    } else {
-      if (plaintextDto.hasOwnProperty('password')) {
-        await navigator.clipboard.writeText(plaintextDto.password);
-      } else {
-        throw new TypeError('The password field is not defined.');
-      }
-    }
+  async handleCopyPasswordClick() {
+    await this.copyPasswordToClipboard();
   }
 
-  async handleCopyPasswordClick(event) {
-    event.preventDefault();
+  /**
+   * Handle preview password button click.
+   */
+  async handleViewPasswordButtonClick() {
+    await this.togglePreviewPassword();
+  }
+
+  /**
+   * Copy the resource password to clipboard.
+   * @returns {Promise<void>}
+   */
+  async copyPasswordToClipboard() {
+    const isPasswordPreviewed = this.isPasswordPreviewed();
+    let password;
+
     this.resetError();
-    try {
-      this.setState({ copySecretState: 'processing' });
-      let plaintextDto;
-      if (this.hasPasswordDecrypted()) {
-        // password already decrypted
-        plaintextDto = this.state.passwordDecrypted;
-      } else {
-        plaintextDto = await passbolt.request("passbolt.secret.decrypt", this.state.resource.id, {showProgress: true});
+    this.setState({ copySecretState: 'processing' });
+
+    if (isPasswordPreviewed) {
+      password = this.state.previewedPassword;
+    } else {
+      try {
+        const plaintext = await this.decryptResourceSecret(this.state.resource.id);
+        password = this.extractPlaintextPassword(plaintext);
+      } catch (error) {
+        if (error.name !== "UserAbortsOperationError") {
+          this.setState({ copySecretState: 'default' });
+          return;
+        }
       }
-      await this.copyPasswordToClipboard(plaintextDto);
-      this.setState({ copySecretState: 'done' });
-      setTimeout(() => {
-        this.setState({ copySecretState: 'default' });
-      }, 15000);
-    } catch (error) {
-      if (error.name === "UserAbortsOperationError") {
-        this.setState({ copySecretState: 'default' });
-      } else {
-        console.error('An unexpected error occurred', error);
-      }
+    }
+
+    await navigator.clipboard.writeText(password);
+    this.setState({ copySecretState: 'done' });
+    setTimeout(() => {
+      this.setState({ copySecretState: 'default' });
+    }, 15000);
+  }
+
+  /**
+   * Toggle preview password
+   * @returns {Promise<void>}
+   */
+  async togglePreviewPassword() {
+    const isPasswordPreviewed = this.isPasswordPreviewed();
+    if (isPasswordPreviewed) {
+      this.hidePreviewedPassword();
+    } else {
+      await this.previewPassword();
     }
   }
 
   /**
-   * Handle view password button click.
+   * Hide the previewed resource password.
    */
-  async handleViewPasswordButtonClick() {
-    if (this.hasPasswordDecrypted()) {
-      this.setState({passwordDecrypted: null});
-    } else {
-      await this.setState({isSecretDecrypting: true});
-      let plaintextDto = await passbolt.request("passbolt.secret.decrypt", this.state.resource.id, {showProgress: true});
-      if (plaintextDto.password) {
-        // If the secret decrypted is in object and not a string
-        plaintextDto = plaintextDto.password;
+  hidePreviewedPassword() {
+    this.setState({previewedPassword: null});
+  }
+
+  /**
+   * Preview password
+   * @returns {Promise<void>}
+   */
+  async previewPassword() {
+    const resourceId = this.state.resource.id;
+    let previewedPassword;
+
+    await this.setState({isSecretDecrypting: true});
+
+    try {
+      const plaintext = await this.decryptResourceSecret(resourceId);
+      previewedPassword = this.extractPlaintextPassword(plaintext);
+    } catch (error) {
+      if (error.name !== "UserAbortsOperationError") {
+        throw error;
       }
-      this.setState({passwordDecrypted: plaintextDto, isSecretDecrypting: false});
     }
+
+    this.setState({previewedPassword, isSecretDecrypting: false});
+  }
+
+  /**
+   * Get the password property from a secret plaintext object.
+   * @param {string|object} plaintextDto The secret plaintext
+   * @returns {string}
+   */
+  extractPlaintextPassword(plaintextDto) {
+    if (!plaintextDto) {
+      throw new TypeError('The secret plaintext is empty.');
+    }
+    if (typeof plaintextDto === 'string') {
+      return plaintextDto;
+    }
+    if (typeof plaintextDto !== 'object') {
+      throw new TypeError('The secret plaintext must be a string or an object.');
+    }
+    if (!Object.prototype.hasOwnProperty.call(plaintextDto, 'password')) {
+      throw new TypeError('The secret plaintext must have a password property.');
+    }
+    return plaintextDto.password;
+  }
+
+  /**
+   * Decrypt the resource secret
+   * @param {string} resourceId The target resource id
+   * @returns {Promise<object>} The secret in plaintext format
+   * @throw UserAbortsOperationError If the user cancel the operation
+   */
+  decryptResourceSecret(resourceId) {
+    return passbolt.request("passbolt.secret.decrypt", resourceId, {showProgress: true});
   }
 
   handleGoToUrlClick(event) {
@@ -201,24 +255,24 @@ class ResourceViewPage extends React.Component {
   }
 
   /**
-   * Has password decrypted for a resource
+   * Check if the password is previewed
    * @returns {boolean}
    */
-  hasPasswordDecrypted() {
-    return this.state.passwordDecrypted !== null;
+  isPasswordPreviewed() {
+    return this.state.previewedPassword !== null;
   }
 
   /**
-   * Has property preview password
-   * @returns {*}
+   * Returns true if the logged in user can use the preview password capability.
+   * @returns {boolean}
    */
-  get hasPreviewPasswordEnabled() {
+  get canUsePreviewPassword() {
     return this.context.siteSettings && this.context.siteSettings.passbolt.plugins.previewPassword;
   }
 
   render() {
     const sanitizeResourceUrl = this.sanitizeResourceUrl();
-    const hasPasswordDecrypted = this.hasPasswordDecrypted();
+    const isPasswordPreviewed = this.isPasswordPreviewed();
 
     return (
       <div className="resource item-browse">
@@ -292,17 +346,20 @@ class ResourceViewPage extends React.Component {
               <span className="visually-hidden">Copy to clipboard</span>
             </a>
             <span className="property-name">Password</span>
-            <a href="#" role="button" className={`property-value secret ${hasPasswordDecrypted ? "decrypted" : "secret-copy"}`} onClick={this.handleCopyPasswordClick}>
-              {hasPasswordDecrypted &&
-              <span>{this.state.passwordDecrypted}</span>
+            <a href="#" role="button"
+              className={`property-value secret ${isPasswordPreviewed ? "decrypted" : "secret-copy"}`}
+              title={isPasswordPreviewed ? this.state.previewedPassword : "secret"}
+              onClick={this.handleCopyPasswordClick}>
+              {isPasswordPreviewed &&
+              <span>{this.state.previewedPassword}</span>
               }
-              {!hasPasswordDecrypted &&
+              {!isPasswordPreviewed &&
               <span className="visually-hidden">Copy to clipboard</span>
               }
             </a>
-            {this.hasPreviewPasswordEnabled &&
+            {this.canUsePreviewPassword &&
             <a onClick={this.handleViewPasswordButtonClick}
-              className={`password-view button button-icon button-toggle ${hasPasswordDecrypted ? "selected" : ""} ${this.state.isSecretDecrypting ? "disabled" : ""}`}>
+              className={`password-view button button-icon button-toggle ${isPasswordPreviewed ? "selected" : ""} ${this.state.isSecretDecrypting ? "disabled" : ""}`}>
               <span className="fa icon">
                 <Transition in={!this.state.isSecretDecrypting} appear={false} timeout={500}>
                   {(status) => (

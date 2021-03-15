@@ -4,6 +4,18 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.1.0] - 2021-03-17
+### Added
+- PB-4924 As LU, I should be able to edit my security token
+- PB-4917 As LU I should be able to change my passphrase
+- PB-3550 As LU I can preview a password in the passwords grid
+- PB-3575 As LU I can preview a password in the quick access
+- PB-3570 As LU I can preview a password in the password details sidebar
+
+### Fixed
+- PB-5437 As LU I should see the group edit dialog when I follow a group edit permalink
+- Allow resizing of textarea
+
 ## [3.0.7] - 2021-03-04
 ### Fixed
 - GITHUB-156 Fix import/export and legacy API v2
@@ -585,7 +597,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.7...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.7...v3.1.0
 [3.0.7]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.6...v3.0.7
 [3.0.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.5...v3.0.6
 [3.0.5]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.4...v3.0.5

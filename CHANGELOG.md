@@ -6,7 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [3.1.0] - 2021-03-17
 ### Added
-- PB-4924 As LU, I should be able to edit my security token
+- PB-4924 As LU I should be able to edit my security token
 - PB-4917 As LU I should be able to change my passphrase
 - PB-3550 As LU I can preview a password in the passwords grid
 - PB-3575 As LU I can preview a password in the quick access

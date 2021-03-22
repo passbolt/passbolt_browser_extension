@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.9.0
  */
-const __ = require('../../sdk/l10n').get;
+const {i18n} = require('../../sdk/i18n');
+
 const {Keyring} = require('../../model/keyring');
 const {Share} = require('../../model/share');
 const {Crypto} = require('../../model/crypto');
@@ -68,16 +69,16 @@ class ResourceCreateController {
     }
 
     try {
-      await progressController.open(this.worker, __('Creating password'), this.goals, __('Initializing'));
+      await progressController.open(this.worker, i18n.t('Creating password'), this.goals, i18n.t('Initializing'));
       const plaintext = await this.resourceModel.serializePlaintextDto(resource.resourceTypeId, plaintextDto);
 
       // Encrypt and sign
-      await progressController.update(this.worker, this.progress++, __('Encrypting secret'));
+      await progressController.update(this.worker, this.progress++, i18n.t('Encrypting secret'));
       const secret = await this.crypto.encrypt(plaintext, User.getInstance().get().id, privateKey);
       resource.secrets = new ResourceSecretsCollection([{data:secret}]);
 
       // Save
-      await progressController.update(this.worker, this.progress++, __('Creating password'));
+      await progressController.update(this.worker, this.progress++, i18n.t('Creating password'));
       resource = await this.resourceModel.create(resource);
 
       // Share if needed
@@ -90,7 +91,7 @@ class ResourceCreateController {
       throw error;
     }
 
-    await progressController.update(this.worker, this.goals, __('Done!'));
+    await progressController.update(this.worker, this.goals, i18n.t('Done!'));
     await progressController.close(this.worker);
 
     return resource;
@@ -106,7 +107,7 @@ class ResourceCreateController {
    */
   async handleCreateInFolder(resourceEntity, privateKey) {
     // Calculate changes if any
-    await progressController.update(this.worker, this.progress++, __('Calculate permissions'));
+    await progressController.update(this.worker, this.progress++, i18n.t('Calculate permissions'));
     let destinationFolder = await this.folderModel.findForShare(resourceEntity.folderParentId);
     let changes = await this.resourceModel.calculatePermissionsChangesForCreate(resourceEntity, destinationFolder);
 
@@ -116,12 +117,12 @@ class ResourceCreateController {
       await progressController.updateGoals(this.worker, this.goals);
 
       // Sync keyring
-      await progressController.update(this.worker, this.progress++, __('Synchronizing keys'));
+      await progressController.update(this.worker, this.progress++, i18n.t('Synchronizing keys'));
       const keyring = new Keyring();
       await keyring.sync();
 
       // Share
-      await progressController.update(this.worker, this.progress++, __('Start sharing'));
+      await progressController.update(this.worker, this.progress++, i18n.t('Start sharing'));
       const resourcesToShare = [resourceEntity.toDto({secrets: true})];
       await Share.bulkShareResources(resourcesToShare, changes.toDto(), privateKey, async message => {
         await progressController.update(this.worker, this.progress++, message);

@@ -1,9 +1,10 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { withRouter } from "react-router";
-import { Link } from "react-router-dom";
+import {withRouter} from "react-router";
+import {Link} from "react-router-dom";
 import AppContext from "../../contexts/AppContext";
 import SimpleBar from "../SimpleBar/SimpleBar";
+import {Trans, withTranslation} from "react-i18next";
 
 const BROWSED_RESOURCES_LIMIT = 500;
 const BROWSED_TAGS_LIMIT = 500;
@@ -50,6 +51,14 @@ class FilterResourcesByTagPage extends React.Component {
       tags: null,
       resources: null
     };
+  }
+
+  /**
+   * Get the translate function
+   * @returns {function(...[*]=)}
+   */
+  get translate() {
+    return this.props.t;
   }
 
   handleGoBackClick(ev) {
@@ -232,19 +241,19 @@ class FilterResourcesByTagPage extends React.Component {
     return (
       <div className="index-list">
         <div className="back-link">
-          <a href="#" className="primary-action" onClick={this.handleGoBackClick} title="Go back">
+          <a href="#" className="primary-action" onClick={this.handleGoBackClick} title={this.translate("Go back")}>
             <span className="icon fa">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path d="M34.52 239.03L228.87 44.69c9.37-9.37 24.57-9.37 33.94 0l22.67 22.67c9.36 9.36 9.37 24.52.04 33.9L131.49 256l154.02 154.75c9.34 9.38 9.32 24.54-.04 33.9l-22.67 22.67c-9.37 9.37-24.57 9.37-33.94 0L34.52 272.97c-9.37-9.37-9.37-24.57 0-33.94z" /></svg>
             </span>
             <span className="primary-action-title">
-              {this.state.selectedTag && this.state.selectedTag.slug || "Tags"}
+              {this.state.selectedTag && this.state.selectedTag.slug || <Trans>Tags</Trans>}
             </span>
           </a>
-          <Link to="/data/quickaccess.html" className="secondary-action button-icon button" title="Cancel">
+          <Link to="/data/quickaccess.html" className="secondary-action button-icon button" title={this.translate("Cancel")}>
             <span className="fa icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" /></svg>
             </span>
-            <span className="visually-hidden">cancel</span>
+            <span className="visually-hidden"><Trans>cancel</Trans></span>
           </Link>
         </div>
         <SimpleBar className="list-container">
@@ -252,7 +261,7 @@ class FilterResourcesByTagPage extends React.Component {
             {!isReady &&
               <li className="empty-entry">
                 <p className="processing-text">
-                  {listTagsOnly ? "Retrieving your tags" : "Retrieving your passwords"}
+                  {listTagsOnly ? <Trans>Retrieving your tags</Trans> : <Trans>Retrieving your passwords</Trans>}
                 </p>
               </li>
             }
@@ -263,8 +272,8 @@ class FilterResourcesByTagPage extends React.Component {
                     {(!browsedTags.length) &&
                       <li className="empty-entry">
                         <p>
-                          {isSearching && "No result match your search. Try with another search term."}
-                          {!isSearching && "No passwords are yet tagged. It does feel a bit empty here, tag your first password."}
+                          {isSearching && <Trans>No result match your search. Try with another search term.</Trans>}
+                          {!isSearching && <Trans>No passwords are yet tagged. It does feel a bit empty here, tag your first password.</Trans>}
                         </p>
                       </li>
                     }
@@ -284,10 +293,10 @@ class FilterResourcesByTagPage extends React.Component {
                     {!browsedResources.length &&
                       <li className="empty-entry">
                         <p>
-                          {isSearching && "No result match your search. Try with another search term."}
+                          {isSearching && <Trans>No result match your search. Try with another search term.</Trans>}
                           {/* The below scenario should not happen */}
-                          {!isSearching && "No passwords are marked with this tag yet. Mark a password with this tag or wait for a team \
-                            member to mark a password with this tag."}
+                          {!isSearching && <Trans>No passwords are marked with this tag yet. Mark a password with this
+                            tag or wait for a team member to mark a password with this tag.</Trans>}
                         </p>
                       </li>
                     }
@@ -309,7 +318,7 @@ class FilterResourcesByTagPage extends React.Component {
         </SimpleBar>
         <div className="submit-wrapper">
           <Link to="/data/quickaccess/resources/create" id="popupAction" className="button primary big full-width" role="button">
-            create new
+            <Trans>Create new</Trans>
           </Link>
         </div>
       </div>
@@ -323,7 +332,8 @@ FilterResourcesByTagPage.propTypes = {
   // Match, location and history props are injected by the withRouter decoration call.
   match: PropTypes.object,
   location: PropTypes.object,
-  history: PropTypes.object
+  history: PropTypes.object,
+  t: PropTypes.func, // The translation function
 };
 
-export default withRouter(FilterResourcesByTagPage);
+export default withTranslation('common')(withRouter(FilterResourcesByTagPage));

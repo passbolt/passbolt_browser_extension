@@ -10,7 +10,6 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const __ = require('../../sdk/l10n').get;
 const {GroupUpdateEntity} = require("../../model/entity/group/update/groupUpdateEntity");
 const {GroupModel} = require("../../model/group/groupModel");
 const passphraseController = require('../passphrase/passphraseController');
@@ -20,8 +19,7 @@ const {SecretEntity} = require("../../model/entity/secret/secretEntity");
 const {SecretsCollection} = require("../../model/entity/secret/secretsCollection");
 const {Keyring} = require('../../model/keyring');
 const {Crypto} = require('../../model/crypto');
-
-const PROGRESS_DIALOG_TITLE = "Updating group ...";
+const {i18n} = require('../../sdk/i18n');
 
 class GroupsUpdateController {
   /**
@@ -51,7 +49,7 @@ class GroupsUpdateController {
     const originalGroupEntity = await this.groupModel.getById(updatedGroupEntity.id);
     const groupUpdateEntity = GroupUpdateEntity.createFromGroupsDiff(originalGroupEntity, updatedGroupEntity);
 
-    await progressController.open(this.worker, PROGRESS_DIALOG_TITLE, this.progressGoal, __('Initialize'));
+    await progressController.open(this.worker, i18n.t("Updating group ..."), this.progressGoal, i18n.t('Initialize'));
     await progressController.update(this.worker, this.progress++);
 
     try {
@@ -99,7 +97,7 @@ class GroupsUpdateController {
    * @returns {Promise<int>}
    */
   async synchronizeKeys() {
-    await progressController.update(this.worker, this.progress++, __('Synchronizing keys'));
+    await progressController.update(this.worker, this.progress++, i18n.t('Synchronizing keys'));
     return this.keyring.sync();
   }
 
@@ -128,7 +126,7 @@ class GroupsUpdateController {
       const neededSecret = items[i];
       const resourceId = neededSecret.resourceId;
       const userId = neededSecret.userId;
-      progressController.update(this.worker, this.progress++, __(`Encrypting ${i}/${items.length}`));
+      progressController.update(this.worker, this.progress++, i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
       const secretDto = {
         resource_id: resourceId,
         user_id: userId,
@@ -151,7 +149,7 @@ class GroupsUpdateController {
     const items = secretsCollection.items;
     for (let i in items) {
       const secret = items[i];
-      progressController.update(this.worker, this.progress++, __(`Decrypting ${i}/${items.length}`));
+      progressController.update(this.worker, this.progress++, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
       result[secret.resourceId] = await this.crypto.decryptWithKey(secret.data, privateKey);
     }
     return result;
@@ -163,7 +161,7 @@ class GroupsUpdateController {
    * @returns {Promise<void>}
    */
   async updateGroup(groupUpdateEntity) {
-    await progressController.update(this.worker, this.progress++, __("Updating group"));
+    await progressController.update(this.worker, this.progress++, i18n.t("Updating group"));
     await this.groupModel.update(groupUpdateEntity, true);
   }
 }

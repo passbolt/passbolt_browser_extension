@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const __ = require('../../sdk/l10n').get;
 const {FolderEntity} = require('../../model/entity/folder/folderEntity');
 const {FolderModel} = require('../../model/folder/folderModel');
+const {i18n} = require('../../sdk/i18n');
 
 const progressController = require('../progress/progressController');
 
@@ -43,24 +43,24 @@ class FolderCreateController {
 
     try {
       let msg = `Creating folder ${originalFolder.name}`;
-      await progressController.open(this.worker, msg, progressGoal, __('Creating folder...'));
+      await progressController.open(this.worker, msg, progressGoal, i18n.t('Creating folder...'));
       let folderEntity = await this.folderModel.create(originalFolder);
 
       if (folderEntity.folderParentId) {
         // TODO a confirmation dialog that recaps the changes
         // TODO ask if they want to keep the original permission?
         // TODO a remember me option to skip confirmation dialog
-        await progressController.update(this.worker, progress++, __('Fetching parent permissions'));
+        await progressController.update(this.worker, progress++, i18n.t('Fetching parent permissions'));
         let targetFolder = await this.folderModel.findForShare(folderEntity.folderParentId);
 
-        await progressController.update(this.worker, progress++, __('Saving permissions...'));
+        await progressController.update(this.worker, progress++, i18n.t('Saving permissions...'));
         let changes = await this.folderModel.calculatePermissionsChangesForCreate(folderEntity, targetFolder);
         if (changes) {
           await this.folderModel.share(folderEntity, changes);
         }
       }
 
-      await progressController.update(this.worker, progressGoal,  __('Done!'));
+      await progressController.update(this.worker, progressGoal,  i18n.t('Done!'));
       await progressController.close(this.worker);
       return folderEntity;
     } catch(error) {

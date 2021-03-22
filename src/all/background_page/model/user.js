@@ -10,7 +10,6 @@ const Config = require('./config');
 const {ApiClientOptions} = require('../service/api/apiClient/apiClientOptions');
 const {UserService} = require('../service/api/user/userService');
 const {UserSettings} = require('./userSettings/userSettings');
-const __ = require('../sdk/l10n').get;
 
 /**
  * The class that deals with users.
@@ -68,7 +67,7 @@ const User = (function () {
 
     if (errors.length > 0) {
       // Return exception with details in validationErrors.
-      var e = new Error(__('user could not be validated'));
+      var e = new Error('user could not be validated');
       // Add validation errors to the error object.
       e.validationErrors = errors;
       throw e;
@@ -90,47 +89,47 @@ const User = (function () {
     switch (field) {
       case 'firstname':
         if (typeof value === 'undefined' || value === '') {
-          throw new Error(__('The first name cannot be empty'));
+          throw new Error('The first name cannot be empty');
         }
         if (!Validator.isUtf8(value)) {
-          throw new Error(__('The first name should be a valid UTF8 string'))
+          throw new Error('The first name should be a valid UTF8 string')
         }
         if (!Validator.isLength(value, 0, 255)) {
-          throw new Error(__('The first name length should be maximum 255 characters.'))
+          throw new Error('The first name length should be maximum 255 characters.')
         }
         break;
       case 'lastname':
         if (typeof value === 'undefined' || value === '') {
-          throw new Error(__('The last name cannot be empty'));
+          throw new Error('The last name cannot be empty');
         }
         if (!Validator.isUtf8(value)) {
-          throw new Error(__('The last name should be a valid UTF8 string'))
+          throw new Error('The last name should be a valid UTF8 string')
         }
         if (!Validator.isLength(value, 0, 255)) {
-          throw new Error(__('The last name length should be maximum 255 characters.'))
+          throw new Error('The last name length should be maximum 255 characters.')
         }
         break;
       case 'username':
         if (typeof value === 'undefined' || value === '') {
-          throw new Error(__('The username cannot be empty'));
+          throw new Error('The username cannot be empty');
         }
         if (!Validator.isEmail(value)) {
-          throw new Error(__('The username should be a valid email address'))
+          throw new Error('The username should be a valid email address')
         }
         if (!Validator.isLength(value, 0, 255)) {
-          throw new Error(__('The username length should be maximum 255 characters.'))
+          throw new Error('The username length should be maximum 255 characters.')
         }
         break;
       case 'id':
         if (typeof value === 'undefined' || value === '') {
-          throw new Error(__('The user id cannot be empty'));
+          throw new Error('The user id cannot be empty');
         }
         if (!Validator.isUUID(value)) {
-          throw new Error(__('The user id should be a valid UUID'))
+          throw new Error('The user id should be a valid UUID')
         }
         break;
       default:
-        throw new Error(__('No validation defined for field: ' + field));
+        throw new Error('No validation defined for field: ' + field);
         break;
     }
     return true;
@@ -188,7 +187,7 @@ const User = (function () {
    */
   this.set = function (user) {
     if (typeof user === 'undefined') {
-      throw new Error(__('The user cannot be empty'));
+      throw new Error('The user cannot be empty');
     }
     this.setId(user.id);
     this.setUsername(user.username);
@@ -239,7 +238,7 @@ const User = (function () {
       return user;
 
     } catch (e) {
-      throw new Error(__('The user is not set'));
+      throw new Error('The user is not set');
     }
   };
 
@@ -274,7 +273,7 @@ const User = (function () {
         this.__validate(varName, this._user[varName]);
       } catch (e) {
         this._user[varName] = {};
-        throw new Error(__('The user is not set'));
+        throw new Error('The user is not set');
       }
     }
 
@@ -459,7 +458,7 @@ const User = (function () {
       if (this.isMasterPasswordStored()) {
         resolve(this._masterPassword.password);
       } else {
-        reject(new Error(__('No master password stored.')));
+        reject(new Error('No master password stored.'));
       }
     });
   };

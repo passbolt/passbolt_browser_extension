@@ -11,8 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         v3.0.0
  */
-const __ = require('../../sdk/l10n').get;
-const {PassboltApiFetchError} = require('../../error/passboltApiFetchError');
 const {ResourceTypesCollection} = require('../entity/resourceType/resourceTypesCollection');
 const {ResourceTypeLocalStorage} = require('../../service/local_storage/resourceTypeLocalStorage');
 const {ResourceTypeService} = require('../../service/api/resourceType/resourceTypeService');
@@ -72,7 +70,7 @@ class ResourceTypeModel {
    */
   async getSecretSchemaById(resourceTypeId) {
     if (!Validator.isUUID(resourceTypeId)) {
-      throw new TypeError(__('The resource type id should be a valid UUID'))
+      throw new TypeError('The resource type id should be a valid UUID')
     }
     const types = await this.getOrFindAll();
     const type = types.getFirst('id', resourceTypeId);

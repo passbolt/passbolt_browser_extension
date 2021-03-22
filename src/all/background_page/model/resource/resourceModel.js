@@ -10,7 +10,6 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const __ = require('../../sdk/l10n').get;
 const {splitBySize} = require("../../utils/array/splitBySize");
 const {ResourceEntity} = require('../entity/resource/resourceEntity');
 const {ResourcesCollection} = require('../entity/resource/resourcesCollection');
@@ -446,7 +445,7 @@ class ResourceModel {
     }
     const schema = await this.resourceTypeModel.getSecretSchemaById(resourceTypeId);
     if (!schema) {
-      throw new TypeError(__('Could not find the schema definition for the requested resource type.'))
+      throw new TypeError('Could not find the schema definition for the requested resource type.')
     }
     const plaintextEntity = new PlaintextEntity(plaintextDto, schema);
     return JSON.stringify(plaintextEntity);
@@ -463,14 +462,14 @@ class ResourceModel {
    */
   async deserializePlaintext(resourceTypeId, plaintext) {
     if (typeof plaintext !== 'string') {
-      throw new TypeError(__('Could not deserialize secret, plaintext is not a string.'))
+      throw new TypeError('Could not deserialize secret, plaintext is not a string.')
     }
     if (!resourceTypeId) {
       return plaintext;
     }
     const schema = await this.resourceTypeModel.getSecretSchemaById(resourceTypeId);
     if (!schema) {
-      throw new TypeError(__('Could not find the schema definition for the requested resource type.'))
+      throw new TypeError('Could not find the schema definition for the requested resource type.')
     }
     if (schema.type === 'string') {
       return plaintext;

@@ -48,11 +48,12 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-eslint');
+  grunt.loadNpmTasks('i18next-scanner');
 
   grunt.registerTask('default', ['bundle']);
   grunt.registerTask('pre-dist', ['copy:vendors', 'copy:styleguide']);
 
-  grunt.registerTask('bundle', ['copy:background_page', 'copy:content_scripts', 'browserify:background_page', 'copy:data']);
+  grunt.registerTask('bundle', ['copy:background_page', 'copy:content_scripts', 'browserify:background_page', 'copy:data', 'copy:locales']);
   grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle', 'browserify:vendors']);
   grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle', 'browserify:vendors']);
 
@@ -70,7 +71,9 @@ module.exports = function (grunt) {
 
   grunt.registerTask('custom-chrome-debug', ['bg-chrome-debug', 'react-chrome-debug']);
   grunt.registerTask('bg-chrome-debug', ['copy:background_page', 'browserify:background_page']);
-  grunt.registerTask('react-chrome-debug', ['copy:content_scripts', 'copy:data', 'shell:build_webpack_apps_debug']);
+  grunt.registerTask('react-chrome-debug', ['copy:content_scripts', 'copy:data', 'copy:locales', 'shell:build_webpack_apps_debug']);
+
+  grunt.registerTask('translate', ['i18next']);
 
   /**
    * Main grunt tasks configuration
@@ -154,6 +157,11 @@ module.exports = function (grunt) {
       data: {
         files: [
           { expand: true, cwd: path.src + 'data', src: ['**', '!js/quickaccess/popup/**', '!js/app/**'], dest: path.build + 'data' }
+        ]
+      },
+      locales: {
+        files: [
+          { expand: true, cwd: path.src + 'locales', src: ['**'], dest: path.build + 'locales' }
         ]
       },
       // switch manifest file to firefox or chrome
@@ -269,6 +277,12 @@ module.exports = function (grunt) {
           src: ['opensans-bold.woff', 'opensans-regular.woff'],
           dest: path.build_data + 'fonts',
           expand: true
+        }, {
+          // Locales
+          cwd: path.node_modules + 'passbolt-styleguide/src/locales',
+          src: ['**'],
+          dest: path.build_data + 'locales',
+          expand: true
         }]
       }
     },
@@ -345,6 +359,39 @@ module.exports = function (grunt) {
           './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chrome + 'passbolt-' + pkg.version + '.crx ',
           "echo '\nZip and Crx files generated in " + path.dist_chrome + "'"
         ].join(' && ')
+      }
+    },
+    /**
+     * Extract translations through the JS files
+     */
+    i18next: {
+      translate: {
+        src: 'src/**/*.{js,html}',
+        dest: 'src',
+        options: {
+          lngs: ['en-US'],
+          func: {
+            list: ['this.translate', 'i18n.t'], // function us  e to parse and find new translation
+            extensions: ['.js', '.jsx']
+          },
+          trans: {
+            component: 'Trans',
+            i18nKey: 'i18nKey',
+            defaultsKey: 'defaults',
+            extensions: ['.js', '.jsx'],
+            fallbackKey: true
+          },
+          nsSeparator: false,
+          keySeparator: false,
+          defaultNs: 'common',
+          resource: {
+            loadPath: 'src/all/locales/{{lng}}/{{ns}}.json',
+            savePath: 'all/locales/{{lng}}/{{ns}}.json'
+          },
+          removeUnusedKeys: true,
+          sort: true,
+          debug: true,
+        }
       }
     },
 

@@ -39,7 +39,7 @@ class PlaintextEntity extends Entity {
    * @throws TypeError unsupported
    */
   static getSchema() {
-    throw new TypeError(__('Plaintext only support dynamic schemas, defined from resource type.'))
+    throw new TypeError('Plaintext only support dynamic schemas, defined from resource type.')
   }
 
   /**

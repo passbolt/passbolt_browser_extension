@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.8.0
  */
+const {i18n} = require('../../sdk/i18n');
 const {Crypto} = require('../../model/crypto');
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
@@ -49,13 +50,13 @@ class SecretDecryptController {
     try {
       // Decrypt the private key
       if (showProgress) {
-        await progressController.open(this.worker, 'Decrypting...', 2, "Decrypting private key");
+        await progressController.open(this.worker, i18n.t('Decrypting ...'), 2, i18n.t("Decrypting private key"));
       }
       const privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
 
       // Decrypt and deserialize the secret if needed
       if (showProgress) {
-        await progressController.update(this.worker, 1, "Decrypting secret");
+        await progressController.update(this.worker, 1, i18n.t("Decrypting secret"));
       }
       const resource = await resourcePromise;
       let plaintext = await crypto.decryptWithKey(resource.secret.data, privateKey);
@@ -63,7 +64,7 @@ class SecretDecryptController {
 
       // Wrap up
       if (showProgress) {
-        await progressController.update(this.worker, 2, "Complete");
+        await progressController.update(this.worker, 2, i18n.t("Complete"));
         await progressController.close(this.worker);
       }
       return {plaintext, resource};

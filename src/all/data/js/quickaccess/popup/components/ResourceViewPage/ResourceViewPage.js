@@ -2,6 +2,9 @@ import React from "react";
 import Transition from 'react-transition-group/Transition';
 import browser from "webextension-polyfill/dist/browser-polyfill";
 import AppContext from "../../contexts/AppContext";
+import PropTypes from "prop-types";
+import ResourceCreatePage from "../ResourceCreatePage/ResourceCreatePage";
+import {Trans, withTranslation} from "react-i18next";
 
 class ResourceViewPage extends React.Component {
   constructor(props) {
@@ -31,6 +34,14 @@ class ResourceViewPage extends React.Component {
       previewedPassword: null,
       isSecretDecrypting: false // if the secret is decrypting
     };
+  }
+
+  /**
+   * Get the translate function
+   * @returns {function(...[*]=)}
+   */
+  get translate() {
+    return this.props.t;
   }
 
   handleGoBackClick(ev) {
@@ -283,16 +294,16 @@ class ResourceViewPage extends React.Component {
             </span>
             <span className="primary-action-title">{this.state.resource.name}</span>
           </a>
-          <a href={`${this.context.user["user.settings.trustedDomain"]}/app/passwords/view/${this.props.match.params.id}`} className="secondary-action button-icon button" target="_blank" rel="noopener noreferrer" title="View it in passbolt">
+          <a href={`${this.context.user["user.settings.trustedDomain"]}/app/passwords/view/${this.props.match.params.id}`} className="secondary-action button-icon button" target="_blank" rel="noopener noreferrer" title={this.translate("View it in passbolt")}>
             <span className="fa icon">
               <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="external-link-alt" className="svg-inline--fa fa-external-link-alt fa-w-18" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M576 24v127.984c0 21.461-25.96 31.98-40.971 16.971l-35.707-35.709-243.523 243.523c-9.373 9.373-24.568 9.373-33.941 0l-22.627-22.627c-9.373-9.373-9.373-24.569 0-33.941L442.756 76.676l-35.703-35.705C391.982 25.9 402.656 0 424.024 0H552c13.255 0 24 10.745 24 24zM407.029 270.794l-16 16A23.999 23.999 0 0 0 384 303.765V448H64V128h264a24.003 24.003 0 0 0 16.97-7.029l16-16C376.089 89.851 365.381 64 344 64H48C21.49 64 0 85.49 0 112v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V287.764c0-21.382-25.852-32.09-40.971-16.97z"/></svg>
             </span>
-            <span className="visually-hidden">Edit in passbolt</span>
+            <span className="visually-hidden"><Trans>Edit in passbolt</Trans></span>
           </a>
         </div>
         <ul className="properties">
           <li className="property">
-            <a role="button" className={`button button-icon property-action ${!this.state.resource.username ? "disabled" : ""}`} onClick={this.handleCopyLoginClick} title="copy to clipboard">
+            <a role="button" className={`button button-icon property-action ${!this.state.resource.username ? "disabled" : ""}`} onClick={this.handleCopyLoginClick} title={this.translate("copy to clipboard")}>
               <span className="fa icon login-copy-icon">
                 <Transition in={this.state.copyLoginState === "default"} appear={false} timeout={500}>
                   {(status) => (
@@ -310,9 +321,9 @@ class ResourceViewPage extends React.Component {
                   )}
                 </Transition>
               </span>
-              <span className="visually-hidden">Copy to clipboard</span>
+              <span className="visually-hidden"><Trans>Copy to clipboard</Trans></span>
             </a>
-            <span className="property-name">Username</span>
+            <span className="property-name"><Trans>Username</Trans></span>
             {this.state.resource.username &&
               <a href="#" role="button" className="property-value" onClick={this.handleCopyLoginClick}>
                 {this.state.resource.username}
@@ -320,12 +331,12 @@ class ResourceViewPage extends React.Component {
             }
             {!this.state.resource.username &&
               <span className="property-value empty">
-                no username provided
+                <Trans>no username provided</Trans>
               </span>
             }
           </li>
           <li className="property">
-            <a role="button" className="button button-icon property-action" onClick={this.handleCopyPasswordClick} title="copy to clipboard">
+            <a role="button" className="button button-icon property-action" onClick={this.handleCopyPasswordClick} title={this.translate("copy to clipboard")}>
               <span className="fa icon">
                 <Transition in={this.state.copySecretState === "default"} appear={false} timeout={500}>
                   {(status) => (
@@ -343,7 +354,7 @@ class ResourceViewPage extends React.Component {
                   )}
                 </Transition>
               </span>
-              <span className="visually-hidden">Copy to clipboard</span>
+              <span className="visually-hidden"><Trans>Copy to clipboard</Trans></span>
             </a>
             <span className="property-name">Password</span>
             <a href="#" role="button"
@@ -354,7 +365,7 @@ class ResourceViewPage extends React.Component {
               <span>{this.state.previewedPassword}</span>
               }
               {!isPasswordPreviewed &&
-              <span className="visually-hidden">Copy to clipboard</span>
+              <span className="visually-hidden"><Trans>Copy to clipboard</Trans></span>
               }
             </a>
             {this.canUsePreviewPassword &&
@@ -380,11 +391,11 @@ class ResourceViewPage extends React.Component {
           </li>
           <li className="property">
             <a href={`${sanitizeResourceUrl ? sanitizeResourceUrl : "#"}`} role="button" className={`button button-icon property-action ${!sanitizeResourceUrl ? "disabled" : ""}`}
-              onClick={this.handleGoToUrlClick} target="_blank" rel="noopener noreferrer" title="open in a new tab">
+              onClick={this.handleGoToUrlClick} target="_blank" rel="noopener noreferrer" title={this.translate("open in a new tab")}>
               <span className="fa icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M448 80v352c0 26.51-21.49 48-48 48H48c-26.51 0-48-21.49-48-48V80c0-26.51 21.49-48 48-48h352c26.51 0 48 21.49 48 48zm-88 16H248.029c-21.313 0-32.08 25.861-16.971 40.971l31.984 31.987L67.515 364.485c-4.686 4.686-4.686 12.284 0 16.971l31.029 31.029c4.687 4.686 12.285 4.686 16.971 0l195.526-195.526 31.988 31.991C358.058 263.977 384 253.425 384 231.979V120c0-13.255-10.745-24-24-24z" /></svg>
               </span>
-              <span className="visually-hidden">Open in new window</span>
+              <span className="visually-hidden"><Trans>Open in new window</Trans></span>
             </a>
             <span className="property-name">Url</span>
             {this.state.resource.uri && sanitizeResourceUrl &&
@@ -399,14 +410,14 @@ class ResourceViewPage extends React.Component {
             }
             {!this.state.resource.uri &&
               <span className="property-value empty">
-                no url provided
+                <Trans>no url provided</Trans>
               </span>
             }
           </li>
         </ul>
         <div className="submit-wrapper input">
           <a href="#" id="popupAction" className={`button primary big full-width ${this.state.usingOnThisTab ? "processing" : ""}`} role="button" onClick={this.handleUseOnThisTabClick}>
-            use on this page
+            <Trans>use on this page</Trans>
           </a>
           <div className="error-message">{this.state.useOnThisTabError}</div>
         </div>
@@ -416,5 +427,8 @@ class ResourceViewPage extends React.Component {
 }
 
 ResourceViewPage.contextType = AppContext;
+ResourceCreatePage.propTypes = {
+  t: PropTypes.func, // The translation function
+};
 
-export default ResourceViewPage;
+export default withTranslation('common')(ResourceViewPage);

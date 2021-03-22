@@ -5,9 +5,9 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
+const {i18n} = require('../../sdk/i18n');
 const Keyring = require('../../model/keyring').Keyring;
 const User = require('../../model/user').User;
-const Worker = require('../../model/worker');
 
 /**
  * Get the user master password.
@@ -70,10 +70,10 @@ const rememberPassphrase = function(passphrase, duration) {
  */
 const validatePassphrase = function(passphrase, rememberMe) {
   if (!Validator.isUtf8(passphrase)) {
-    throw new Error(__('The passphrase should be a valid UTF8 string.'));
+    throw new Error(i18n.t('The passphrase should be a valid UTF8 string.'));
   }
   if (!Validator.isBoolean(rememberMe) && !Validator.isInt(rememberMe)) {
-    throw new Error(__('The remember me should be a valid integer.'));
+    throw new Error(i18n.t('The remember me should be a valid integer.'));
   }
 
   const keyring = new Keyring();

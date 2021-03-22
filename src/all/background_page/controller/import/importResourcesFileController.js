@@ -10,9 +10,6 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const __ = require('../../sdk/l10n').get;
-const Worker = require('../../model/worker');
-
 const {Keyring} = require('../../model/keyring');
 const {Crypto} = require('../../model/crypto');
 const {User} = require('../../model/user');
@@ -36,7 +33,7 @@ const {ResourceSecretsCollection} = require("../../model/entity/secret/resource/
 const {ImportResourcesFileEntity} = require("../../model/entity/import/importResourcesFileEntity");
 const {SecretEntity} = require("../../model/entity/secret/secretEntity");
 
-const PROGRESS_DIALOG_TITLE = "Importing ...";
+const {i18n} = require('../../sdk/i18n');
 
 class ImportResourcesFileController {
   /**
@@ -72,7 +69,7 @@ class ImportResourcesFileController {
   async exec(fileType, file, options) {
     const userId = User.getInstance().get().id;
 
-    await progressController.open(this.worker, PROGRESS_DIALOG_TITLE, this.progressGoal, __('Initialize'));
+    await progressController.open(this.worker, i18n.t("Importing ..."), this.progressGoal, i18n.t('Initialize'));
     await progressController.update(this.worker, ++this.progress);
 
     try {
@@ -156,7 +153,8 @@ class ImportResourcesFileController {
   async encryptSecrets(importEntity, userId, privateKey) {
     let i = 0;
     for (let importResourceEntity of importEntity.importResources) {
-      progressController.update(this.worker, this.progress++, __(`Encrypting ${++i}/${importEntity.importResources.items.length}`));
+      i++;
+      progressController.update(this.worker, this.progress++, i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: importEntity.importResources.items.length}));
       // @todo The secret DTO could be carried by the external resource entity. It can be done when we arrange the external resource entity schema validation.
       const secretDto = this.buildSecretDto(importResourceEntity);
       const serializedPlaintextDto = await this.resourceModel.serializePlaintextDto(importResourceEntity.resourceTypeId, secretDto);
@@ -225,7 +223,7 @@ class ImportResourcesFileController {
     externalFolderEntity.id = folderEntity.id;
     importEntity.importFolders.setFolderParentIdsByPath(externalFolderEntity.path, externalFolderEntity.id);
     importEntity.importResources.setFolderParentIdsByPath(externalFolderEntity.path, externalFolderEntity.id);
-    progressController.update(this.worker, this.progress++, __(`Importing folders ${importedCount}/${importEntity.importFolders.items.length}`));
+    progressController.update(this.worker, this.progress++, i18n.t('Importing folders {{importedCount}}/{{total}}', {importedCount, total: importEntity.importFolders.items.length}));
   }
 
   /**
@@ -236,7 +234,7 @@ class ImportResourcesFileController {
    * @param {ExternalFolderEntity} externalFolderEntity The external folder entity at the source of the create
    */
   handleImportFolderError(importEntity, importedCount, error, externalFolderEntity) {
-    progressController.update(this.worker, this.progress++, __(`Importing folders ${importedCount}/${importEntity.importFolders.items.length}`));
+    progressController.update(this.worker, this.progress++, i18n.t('Importing folders {{importedCount}}/{{total}}', {importedCount, total: importEntity.importFolders.items.length}));
     importEntity.importFoldersErrors.push(new ImportError("Cannot import folder", externalFolderEntity, error));
     importEntity.importFolders.removeByPath(externalFolderEntity.path);
     importEntity.importResources.removeByPath(externalFolderEntity.path);
@@ -264,7 +262,7 @@ class ImportResourcesFileController {
    */
   handleImportResourceSuccess(importEntity, importedCount, resourceEntity, externalResourceEntity) {
     externalResourceEntity.id = resourceEntity.id;
-    progressController.update(this.worker, this.progress++, __(`Importing passwords ${importedCount}/${importEntity.importResources.items.length}`));
+    progressController.update(this.worker, this.progress++, i18n.t('Importing passwords {{importedCount}}/{{total}}', {importedCount, total: importEntity.importResources.items.length}));
   }
 
   /**
@@ -275,7 +273,7 @@ class ImportResourcesFileController {
    * @param {ExternalResourceEntity} externalResourceEntity The external resource entity at the source of the create
    */
   handleImportResourceError(importEntity, importedCount, error, externalResourceEntity) {
-    progressController.update(this.worker, this.progress++, __(`Importing passwords ${importedCount}/${importEntity.importResources.items.length}`));
+    progressController.update(this.worker, this.progress++, i18n.t('Importing passwords {{importedCount}}/{{total}}', {importedCount, total: importEntity.importResources.items.length}));
     importEntity.importResourcesErrors.push(new ImportError("Cannot import resource", externalResourceEntity, error));
   }
 
@@ -326,7 +324,7 @@ class ImportResourcesFileController {
    * @param {int} taggedCount The number of resource tagged (with success or no)
    */
   handleTagResourceSuccess(importEntity, taggedCount) {
-    progressController.update(this.worker, this.progress++, __(`Tagging passwords ${taggedCount}/${importEntity.importResources.items.length}`));
+    progressController.update(this.worker, this.progress++, i18n.t('Tagging passwords {{taggedCount}}/{{total}}', {taggedCount, total: importEntity.importResources.items.length}));
   }
 
   /**
@@ -335,7 +333,7 @@ class ImportResourcesFileController {
    * @param {int} taggedCount The number of resource tagged (with success or no)
    */
   handleTagResourceError(importEntity, taggedCount) {
-    progressController.update(this.worker, this.progress++, __(`Tagging passwords ${taggedCount}/${importEntity.importResources.items.length}`));
+    progressController.update(this.worker, this.progress++, i18n.t('Tagging passwords {{taggedCount}}/{{total}}', {taggedCount, total: importEntity.importResources.items.length}));
   }
 }
 

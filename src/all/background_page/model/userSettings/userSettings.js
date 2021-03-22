@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-const __ = require('../../sdk/l10n').get;
 const Config = require('../config');
 
 /**
@@ -53,7 +52,7 @@ class UserSettings {
         this.validateTheme(value);
         break;
       default :
-        throw new Error(__(`No validation defined for field: ${field}.`));
+        throw new Error(`No validation defined for field: ${field}.`);
     }
   }
 
@@ -67,35 +66,35 @@ class UserSettings {
    */
   validateSecurityToken(token) {
     if ((typeof token === 'undefined')) {
-      throw Error(__('A token cannot be empty.'));
+      throw Error('A token cannot be empty.');
     }
 
     if (typeof token.code === 'undefined' || token.code === '') {
-      throw Error(__('A token code cannot be empty.'));
+      throw Error('A token code cannot be empty.');
     }
 
     if (!Validator.isAscii(token.code)) {
-      throw new Error(__('The token code should only contain ASCII characters.'))
+      throw new Error('The token code should only contain ASCII characters.')
     }
 
     if (!Validator.isLength(token.code, 3, 3)) {
-      throw Error(__('The token code should only contain 3 characters.'))
+      throw Error('The token code should only contain 3 characters.')
     }
 
     if (typeof token.color === 'undefined' || token.color === '') {
-      throw Error(__('The token color cannot be empty.'));
+      throw Error('The token color cannot be empty.');
     }
 
     if (!Validator.isHexColor(token.color)) {
-      throw Error(__(`This is not a valid token color: ${token.color}.`));
+      throw Error(`This is not a valid token color: ${token.color}.`);
     }
 
     if (typeof token.textcolor === 'undefined' || token.textcolor === '') {
-      throw Error(__('The token text color cannot be empty.'));
+      throw Error('The token text color cannot be empty.');
     }
 
     if (!Validator.isHexColor(token.textcolor)) {
-      throw Error(__(`This is not a valid token text color: ${token.textcolor}.`));
+      throw Error(`This is not a valid token text color: ${token.textcolor}.`);
     }
     return true;
   }
@@ -109,10 +108,10 @@ class UserSettings {
    */
   validateDomain(domain) {
     if ((typeof domain === 'undefined' || domain === '')) {
-      throw new Error(__('A domain cannot be empty'));
+      throw new Error('A domain cannot be empty');
     }
     if (!Validator.isURL(domain, {require_tld: false})) {
-      throw new Error(__('The trusted domain url is not valid.'));
+      throw new Error('The trusted domain url is not valid.');
     }
   }
 
@@ -126,7 +125,7 @@ class UserSettings {
   validateTheme(theme) {
     const whitelist = ['default', 'midgar'];
     if (whitelist.indexOf(theme) === -1) {
-      throw new Error(__('The theme is not valid.'));
+      throw new Error('The theme is not valid.');
     }
   }
 
@@ -157,7 +156,7 @@ class UserSettings {
 
     if (errors.length > 0) {
       // Return exception with details in validationErrors.
-      const e = new Error(__('settings could not be validated'));
+      const e = new Error('settings could not be validated');
       // Add validation errors to the error object.
       e.validationErrors = errors;
       throw e;
@@ -181,7 +180,7 @@ class UserSettings {
     if ((typeof token.code === 'undefined') ||
       (typeof token.color === 'undefined') ||
       (typeof token.textcolor === 'undefined')) {
-      throw new Error(__('Security token is not set'));
+      throw new Error('Security token is not set');
     }
     return token;
   }
@@ -222,7 +221,7 @@ class UserSettings {
   getDomain() {
     const domain = Config.read('user.settings.trustedDomain');
     if (typeof domain === 'undefined') {
-      throw new Error(__('Trusted domain is not set'));
+      throw new Error('Trusted domain is not set');
     }
     return domain;
   }
@@ -247,7 +246,7 @@ class UserSettings {
   getTheme() {
     const theme = Config.read('user.settings.theme');
     if (typeof theme === 'undefined') {
-      throw new Error(__('The user has no selected themes.'));
+      throw new Error('The user has no selected themes.');
     }
     return theme;
   }
@@ -286,7 +285,7 @@ class UserSettings {
    */
   set(settings) {
     if (typeof settings === 'undefined') {
-      throw new Error(__('UserSettings cannot be empty'));
+      throw new Error('UserSettings cannot be empty');
     }
     this.setSecurityToken(settings.securityToken);
     this.setDomain(settings.domain);
@@ -332,7 +331,7 @@ class UserSettings {
 
     // Check response status
     if (!response.ok) {
-      let msg = __('Could not synchronize the account settings. The server responded with an error.');
+      let msg = 'Could not synchronize the account settings. The server responded with an error.';
       if (json.header.msg) {
         msg += ' ' + json.header.msg;
       }
@@ -340,10 +339,10 @@ class UserSettings {
       throw new Error(msg);
     }
     if (!json.header) {
-      throw new Error(__('Could not synchronize account settings. The server response header is missing.'));
+      throw new Error('Could not synchronize account settings. The server response header is missing.');
     }
     if (!json.body) {
-      throw new Error(__('Could not synchronize account settings. The server response body is missing.'));
+      throw new Error('Could not synchronize account settings. The server response body is missing.');
     }
 
     // Store all the new properties and associated values.

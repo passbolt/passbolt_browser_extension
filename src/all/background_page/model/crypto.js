@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         1.0.0
  */
-const __ = require('../sdk/l10n').get;
 const {Keyring} = require('./keyring');
 
 /**
@@ -41,7 +40,7 @@ class Crypto {
     if (Validator.isUUID(publicKey)) {
       let keyInfo = this.keyring.findPublic(publicKey);
       if (!keyInfo) {
-        throw new Error(__('The public key could not be found for the user'));
+        throw new Error('The public key could not be found for the user');
       }
       publicKey = keyInfo.key;
     }
@@ -49,7 +48,7 @@ class Crypto {
     try {
       publicKey = (await openpgp.key.readArmored(publicKey)).keys[0];
     } catch (error) {
-      throw new Error(__('The public key is not in a valid or supported format.'));
+      throw new Error('The public key is not in a valid or supported format.');
     }
 
     const options = {

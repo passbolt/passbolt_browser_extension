@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import AppContext from "../../contexts/AppContext";
+import {Trans, withTranslation} from "react-i18next";
 
 class PassphraseDialog extends React.Component {
 
@@ -30,6 +31,14 @@ class PassphraseDialog extends React.Component {
       passphraseStyle: {},
       securityTokenStyle: {}
     };
+  }
+
+  /**
+   * Get the translate function
+   * @returns {function(...[*]=)}
+   */
+  get translate() {
+    return this.props.t;
   }
 
   async handleFormSubmit(event) {
@@ -122,21 +131,21 @@ class PassphraseDialog extends React.Component {
       <div className="passphrase shake" onKeyDown={this.handleKeyDown}>
         <div className="back-link">
           <a className="primary-action">
-            <span className="primary-action-title">Passphrase required</span>
+            <span className="primary-action-title"><Trans>Passphrase required</Trans></span>
           </a>
-          <a onClick={this.handleCloseButtonClick} className="secondary-action button-icon button" title="cancel the operation">
+          <a onClick={this.handleCloseButtonClick} className="secondary-action button-icon button" title={this.translate("cancel the operation")}>
             <span className="fa icon">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" /></svg>
             </span>
-            <span className="visually-hidden">cancel</span>
+            <span className="visually-hidden"><Trans>cancel</Trans></span>
           </a>
         </div>
         {this.state.attempt < 3 &&
           <form onSubmit={this.handleFormSubmit}>
             <div className="form-container">
               <div className={`input text passphrase required ${this.state.passphraseError ? 'error' : ''}`} >
-                <label htmlFor="passphrase">Please enter your passphrase</label>
-                <input type="password" name="passphrase" placeholder="passphrase" id="passphrase" autoFocus ref={this.passphraseInputRef}
+                <label htmlFor="passphrase"><Trans>Please enter your passphrase</Trans></label>
+                <input type="password" name="passphrase" placeholder={this.translate('passphrase')} id="passphrase" autoFocus ref={this.passphraseInputRef}
                   value={this.state.passphrase} onChange={this.handleInputChange} onFocus={this.handleInputFocus} onBlur={this.handleInputBlur}
                   disabled={this.state.processing} style={this.state.passphraseStyle} />
                 <span className="security-token" style={this.state.securityTokenStyle}>{this.context.user["user.settings.securityToken.code"]}</span>
@@ -144,7 +153,7 @@ class PassphraseDialog extends React.Component {
               </div>
               <div className="input checkbox small">
                 <input type="checkbox" name="rememberMe" id="remember-me" checked={this.state.rememberMe} onChange={this.handleInputChange} />
-                <label htmlFor="remember-me">Remember until I log out.</label>
+                <label htmlFor="remember-me"><Trans>Remember until I log out.</Trans></label>
               </div>
             </div>
             <div className="submit-wrapper">
@@ -156,11 +165,11 @@ class PassphraseDialog extends React.Component {
         {this.state.attempt == 3 &&
           <div className="passphrase-wrong">
             <div className="too-many-attempts-error">
-              Your passphrase is wrong ! The operation has been aborted.
+              <Trans>Your passphrase is wrong ! The operation has been aborted.</Trans>
             </div>
             <div className="submit-wrapper">
               <a className="button primary big full-width" role="button" autoFocus onClick={this.handleCloseButtonClick}>
-                close
+                <Trans>close</Trans>
               </a>
             </div>
           </div>
@@ -175,7 +184,8 @@ PassphraseDialog.contextType = AppContext;
 PassphraseDialog.propTypes = {
   className: PropTypes.string,
   requestId: PropTypes.string,
-  onComplete: PropTypes.func
+  onComplete: PropTypes.func,
+  t: PropTypes.func, // The translation function
 };
 
-export default PassphraseDialog;
+export default withTranslation('common')(PassphraseDialog);

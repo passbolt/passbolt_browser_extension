@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-const __ = require('../sdk/l10n').get;
 const Uuid = require('../utils/uuid');
 const Worker = require('../model/worker');
 const {User} = require('../model/user');
@@ -22,6 +21,7 @@ const {KeyIsExpiredError} = require('../error/keyIsExpiredError');
 const {ServerKeyChangedError} = require('../error/serverKeyChangedError');
 const {PassboltApiFetchError} = require('../error/passboltApiFetchError');
 const {GpgAuth} = require('../model/gpgauth');
+const {i18n} = require('../sdk/i18n');
 
 class AuthController {
    /**
@@ -73,18 +73,18 @@ class AuthController {
     } else {
       try {
         if (await this.authLegacy.serverKeyChanged()) {
-          error = new ServerKeyChangedError(__('The server key has changed.'));
+          error = new ServerKeyChangedError(i18n.t('The server key has changed.'));
         } else if (await this.authLegacy.isServerKeyExpired()) {
-          error = new KeyIsExpiredError(__('The server key is expired.'));
+          error = new KeyIsExpiredError(i18n.t('The server key is expired.'));
         }
       } catch (e) {
         // Cannot ask for old server key, maybe server is misconfigured
         console.error(e);
-        error = new Error(__('Server internal error. Check with your administrator.'));
+        error = new Error(i18n.t('Server internal error. Check with your administrator.'));
       }
     }
 
-    error.message = `${__('Could not verify the server key.')} ${error.message}`;
+    error.message = `${i18n.t('Could not verify the server key.')} ${error.message}`;
     this.worker.port.emit(this.requestId, 'ERROR', error);
   }
 }

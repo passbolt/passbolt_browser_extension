@@ -5,7 +5,7 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const __ = require('../sdk/l10n').get;
+const {i18n} = require('../sdk/i18n');
 const {Keyring} = require('../model/keyring');
 const {User} = require('../model/user');
 const Uuid = require('../utils/uuid');
@@ -39,7 +39,7 @@ const listen = function (worker) {
       const keyInfo = await keyring.keyInfo(key.key);
       worker.port.emit(requestId, 'SUCCESS', keyInfo);
     } else {
-      worker.port.emit(requestId, 'ERROR', __('Key not found'));
+      worker.port.emit(requestId, 'ERROR', i18n.t('Key not found'));
     }
   });
 
@@ -109,7 +109,7 @@ const listen = function (worker) {
         publicKeyArmored = await keyring.extractPublicKey(privateKeyInfo.key);
       }
       if (!publicKeyArmored) {
-        throw new Error('Public key not found.');
+        throw new Error(i18n.t('Public key not found.'));
       }
       await fileController.saveFile(filename, publicKeyArmored, "text/plain", worker.tab.id);
       worker.port.emit(requestId, 'SUCCESS');
@@ -130,7 +130,7 @@ const listen = function (worker) {
       await passphraseController.request(worker);
       const privateKeyInfo = await keyring.findPrivate();
       if (!privateKeyInfo) {
-        throw new Error('Private key not found.');
+        throw new Error(i18n.t('Private key not found.'));
       }
       await fileController.saveFile(filename, privateKeyInfo.key, "text/plain", worker.tab.id);
       worker.port.emit(requestId, 'SUCCESS');

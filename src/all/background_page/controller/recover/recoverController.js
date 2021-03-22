@@ -10,6 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+const {i18n} = require('../../sdk/i18n');
 const app = require("../../app");
 const {ApiClientOptions} = require("../../service/api/apiClient/apiClientOptions");
 const {GpgKeyError} = require("../../error/GpgKeyError");
@@ -82,10 +83,10 @@ class RecoverController {
     try {
       keyInfo = await this.keyring.keyInfo(armoredKey);
     } catch(error) {
-      throw new GpgKeyError('The key must be a valid private key.');
+      throw new GpgKeyError(i18n.t('The key must be a valid private key.'));
     }
     if (!keyInfo.private) {
-      throw new GpgKeyError('The key must be a private key.');
+      throw new GpgKeyError(i18n.t('The key must be a private key.'));
     }
 
     return keyInfo;
@@ -107,7 +108,7 @@ class RecoverController {
       await this.legacyAuthModel.verify(domain, serverPublicArmoredKey, fingerprint);
     } catch (error) {
       // @todo Handle not controlled errors, such as timeout error...
-      throw new GpgKeyError('This key does not match any account.');
+      throw new GpgKeyError(i18n.t('This key does not match any account.'));
     }
   }
 

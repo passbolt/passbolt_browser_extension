@@ -12,7 +12,6 @@
  * @since         2.9.0
  */
 const Uuid = require('../utils/uuid');
-const __ = require('../sdk/l10n').get;
 
 const {AuthService} = require('../service/auth');
 const {User} = require('./user');
@@ -80,7 +79,7 @@ class GpgAuth {
       originalToken = new GpgAuthToken();
       encrypted = await this.crypto.encrypt(originalToken.token, serverKey)
     } catch (error) {
-      throw new Error(__('Unable to encrypt the verify token.') + ' ' + error.message);
+      throw new Error('Unable to encrypt the verify token.' + ' ' + error.message);
     }
 
     // Prepare the request data
@@ -103,7 +102,7 @@ class GpgAuth {
       if (typeof json.header !== 'undefined') {
         throw new Error(json.header.message);
       } else {
-        const msg = __('Server request failed without providing additional information.') + ' (' + response.status + ')';
+        const msg = 'Server request failed without providing additional information.' + ' (' + response.status + '';
         throw new Error(msg);
       }
     }
@@ -112,7 +111,7 @@ class GpgAuth {
     const auth = new GpgAuthHeader(response.headers, 'verify');
     const verifyToken = new GpgAuthToken(auth.headers['x-gpgauth-verify-response']);
     if (verifyToken.token !== originalToken.token) {
-      throw new Error(__('The server was unable to prove it can use the advertised OpenPGP key.'));
+      throw new Error('The server was unable to prove it can use the advertised OpenPGP key.');
     }
   }
 
@@ -159,7 +158,7 @@ class GpgAuth {
     });
 
     if (!response.ok) {
-      const msg = __('There was a problem when trying to communicate with the server') + ` (Code: ${response.status})`;
+      const msg = 'There was a problem when trying to communicate with the server' + ` (Code: ${response.status})`;
       throw new Error(msg);
     }
 
@@ -255,7 +254,7 @@ class GpgAuth {
    * @returns {Promise.<error>} throw a relevant exception
    */
   async onResponseError(response) {
-    const error_msg = __('There was a server error. No additional information provided') + `(${response.status})`;
+    const error_msg = 'There was a server error. No additional information provided' + `(${response.status}`;
     let json;
     try {
       json = await response.json();

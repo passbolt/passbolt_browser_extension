@@ -6,8 +6,6 @@
  */
 "use strict";
 
-var __ = require('../sdk/l10n').get;
-
 /**
  * The class that deals with secrets.
  */
@@ -70,13 +68,13 @@ GpgAuthHeader.prototype.__validateCommonAllStage = function () {
 
   // Check if headers are present
   if (typeof this.headers === 'undefined') {
-    return new Error(__('No GPGAuth headers set.'))
+    return new Error('No GPGAuth headers set.')
   }
 
   // Check if version is supported
   if (typeof this.headers['x-gpgauth-version'] !== 'string' ||
     this.headers['x-gpgauth-version'] !== '1.3.0') {
-    return new Error(__('That version of GPGAuth is not supported. (' + this.headers['x-gpgauth-version'] + ')'));
+    return new Error('That version of GPGAuth is not supported. (' + this.headers['x-gpgauth-version'] + ')');
   }
 
   // Check if there is GPGAuth error flagged by the server
@@ -104,72 +102,72 @@ GpgAuthHeader.prototype.__validateByStage = function (stage) {
     case 'logout' :
       if (typeof this.headers['x-gpgauth-authenticated'] !== 'string' ||
         this.headers['x-gpgauth-authenticated'] != 'false') {
-        return new Error(__('x-gpgauth-authenticated should be set to false during the logout stage'));
+        return new Error('x-gpgauth-authenticated should be set to false during the logout stage');
       }
       break;
     case 'verify' :
     case 'stage0' :
       if (typeof this.headers['x-gpgauth-authenticated'] !== 'string' ||
         this.headers['x-gpgauth-authenticated'] != 'false') {
-        return new Error(__('x-gpgauth-authenticated should be set to false during the verify stage'));
+        return new Error('x-gpgauth-authenticated should be set to false during the verify stage');
       }
       if (typeof this.headers['x-gpgauth-progress'] !== 'string' ||
         this.headers['x-gpgauth-progress'] != 'stage0') {
-        return new Error(__('x-gpgauth-progress should be set to stage0 during the verify stage'));
+        return new Error('x-gpgauth-progress should be set to stage0 during the verify stage');
       }
       if (typeof this.headers['x-gpgauth-user-auth-token'] !== 'undefined') {
-        return new Error(__('x-gpgauth-user-auth-token should not be set during the verify stage' + typeof this.headers['x-gpgauth-user-auth-token']));
+        return new Error('x-gpgauth-user-auth-token should not be set during the verify stage' + typeof this.headers['x-gpgauth-user-auth-token']);
       }
       if (typeof this.headers['x-gpgauth-verify-response'] !== 'string') {
-        return new Error(__('x-gpgauth-verify-response should be set during the verify stage'));
+        return new Error('x-gpgauth-verify-response should be set during the verify stage');
       }
       if (typeof this.headers['x-gpgauth-refer'] !== 'undefined') {
-        return new Error(__('x-gpgauth-refer should not be set during verify stage'));
+        return new Error('x-gpgauth-refer should not be set during verify stage');
       }
       break;
 
     case 'stage1' :
       if (typeof this.headers['x-gpgauth-authenticated'] !== 'string' ||
         this.headers['x-gpgauth-authenticated'] != 'false') {
-        return new Error(__('x-gpgauth-authenticated should be set to false during stage1'));
+        return new Error('x-gpgauth-authenticated should be set to false during stage1');
       }
       if (typeof this.headers['x-gpgauth-progress'] !== 'string' ||
         this.headers['x-gpgauth-progress'] != 'stage1') {
-        return new Error(__('x-gpgauth-progress should be set to stage1'));
+        return new Error('x-gpgauth-progress should be set to stage1');
       }
       if (typeof this.headers['x-gpgauth-user-auth-token'] === 'undefined') {
-        return new Error(__('x-gpgauth-user-auth-token should be set during stage1'));
+        return new Error('x-gpgauth-user-auth-token should be set during stage1');
       }
       if (typeof this.headers['x-gpgauth-verify-response'] !== 'undefined') {
-        return new Error(__('x-gpgauth-verify-response should not be set during stage1'));
+        return new Error('x-gpgauth-verify-response should not be set during stage1');
       }
       if (typeof this.headers['x-gpgauth-refer'] !== 'undefined') {
-        return new Error(__('x-gpgauth-refer should not be set during stage1'));
+        return new Error('x-gpgauth-refer should not be set during stage1');
       }
       return true;
 
     case 'complete':
       if (typeof this.headers['x-gpgauth-authenticated'] !== 'string' ||
         this.headers['x-gpgauth-authenticated'] != 'true') {
-        return new Error(__('x-gpgauth-authenticated should be set to true when GPGAuth is complete'));
+        return new Error('x-gpgauth-authenticated should be set to true when GPGAuth is complete');
       }
       if (typeof this.headers['x-gpgauth-progress'] !== 'string' ||
         this.headers['x-gpgauth-progress'] != 'complete') {
-        return new Error(__('x-gpgauth-progress should be set to complete during final stage'));
+        return new Error('x-gpgauth-progress should be set to complete during final stage');
       }
       if (typeof this.headers['x-gpgauth-user-auth-token'] !== 'undefined') {
-        return new Error(__('x-gpgauth-user-auth-token should not be set during final stage'));
+        return new Error('x-gpgauth-user-auth-token should not be set during final stage');
       }
       if (typeof this.headers['x-gpgauth-verify-response'] !== 'undefined') {
-        return new Error(__('x-gpgauth-verify-response should not be set during final stage'));
+        return new Error('x-gpgauth-verify-response should not be set during final stage');
       }
       if (typeof this.headers['x-gpgauth-refer'] !== 'string') {
-        return new Error(__('x-gpgauth-refer should be set during final stage'));
+        return new Error('x-gpgauth-refer should be set during final stage');
       }
       return true;
 
     default:
-      return new Error(__('Unknown GPGAuth stage'));
+      return new Error('Unknown GPGAuth stage');
   }
 };
 

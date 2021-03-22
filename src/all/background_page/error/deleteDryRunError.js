@@ -48,7 +48,7 @@ class DeleteDryRunError extends Error {
     // There should be at least some errors
     if (!this.errors.folders && !this.errors.resources && !this.errors.groups) {
       console.error(this);
-      throw new TypeError(`Invalid user deletion error. There should be at least some error details.`);
+      throw new TypeError('Invalid user deletion error. There should be at least some error details.');
     }
   }
 

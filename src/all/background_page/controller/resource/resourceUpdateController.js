@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const __ = require('../../sdk/l10n').get;
+const {i18n} = require('../../sdk/i18n');
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
 const {ResourceSecretsCollection} = require("../../model/entity/secret/resource/resourceSecretsCollection");
@@ -62,9 +62,9 @@ class ResourceUpdateController {
    * @returns {Promise<Object>} updated resource
    */
   async updateResourceMetaOnly(resourceEntity) {
-    await progressController.open(this.worker, __("Updating password"), 1);
+    await progressController.open(this.worker, i18n.t("Updating password"), 1);
     const updatedResource = await this.resourceModel.update(resourceEntity);
-    await progressController.update(this.worker, 1, __("Done!"));
+    await progressController.update(this.worker, 1, i18n.t("Done!"));
     await progressController.close(this.worker);
     return updatedResource;
   }
@@ -82,13 +82,13 @@ class ResourceUpdateController {
 
     // Set the goals
     try {
-      await progressController.open(this.worker, __("Updating password"), 4);
+      await progressController.open(this.worker, i18n.t("Updating password"), 4);
       const usersIds = await this.userModel.findAllIdsForResourceUpdate(resourceEntity.id);
       const goals = usersIds.length + 3; // encrypt * users + keyring sync + save + done
       await progressController.updateGoals(this.worker, goals);
 
       // Sync keyring
-      await progressController.update(this.worker, 1, __("Synchronizing keyring"));
+      await progressController.update(this.worker, 1, i18n.t("Synchronizing keyring"));
       const keyring = new Keyring();
       await keyring.sync();
 
@@ -97,9 +97,9 @@ class ResourceUpdateController {
       resourceEntity.secrets = await this.encryptSecrets(plaintext, usersIds, privateKey);
 
       // Post data & wrap up
-      await progressController.update(this.worker, goals-1, __("Saving resource"));
+      await progressController.update(this.worker, goals-1, i18n.t("Saving resource"));
       const updatedResource = await this.resourceModel.update(resourceEntity);
-      await progressController.update(this.worker, goals, __("Done!"));
+      await progressController.update(this.worker, goals, i18n.t("Done!"));
       await progressController.close(this.worker);
       return updatedResource;
     } catch(error) {
@@ -138,7 +138,7 @@ class ResourceUpdateController {
         const userId =  usersIds[i];
         const data = await this.crypto.encrypt(plaintextDto, userId, privateKey);
         secrets.push({user_id: userId, data});
-        await progressController.update(this.worker, i+2, __("Encrypting"));
+        await progressController.update(this.worker, i+2, i18n.t("Encrypting"));
       }
     }
     return new ResourceSecretsCollection(secrets);

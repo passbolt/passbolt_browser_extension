@@ -11,13 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.8.0
  */
-const __ = require('../../sdk/l10n').get;
 const {Crypto} = require('../../model/crypto');
 const {Keyring} = require('../../model/keyring');
 const {Share} = require('../../model/share');
 const {ResourceModel} = require('../../model/resource/resourceModel');
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
+const {i18n} = require('../../sdk/i18n');
 
 class ShareResourcesController {
   /**
@@ -66,15 +66,15 @@ class ShareResourcesController {
       if (resources.length === 1) {
         msg  = `Share one password`;
       }
-      await progressController.open(this.worker, msg, progressGoal, __('Initialize'));
-      await progressController.update(this.worker, progress++, __('Synchronizing keys'));
+      await progressController.open(this.worker, msg, progressGoal, i18n.t('Initialize'));
+      await progressController.update(this.worker, progress++, i18n.t('Synchronizing keys'));
       await keyring.sync();
       await Share.bulkShareResources(resources, changes, privateKey, async message => {
         await progressController.update(this.worker, progress++, message);
       });
       await this.resourceModel.updateLocalStorage();
       const results = resources.map(resource => resource.id);
-      await progressController.update(this.worker, progressGoal, __('Done!'));
+      await progressController.update(this.worker, progressGoal, i18n.t('Done!'));
       await progressController.close(this.worker);
       return results;
     } catch(error) {

@@ -142,7 +142,7 @@ class CommentsCollection extends EntityCollection {
    */
   push(comment) {
     if (!comment || typeof comment !== 'object') {
-      throw new TypeError(`CommentsCollection push parameter should be an object.`);
+      throw new TypeError('CommentsCollection push parameter should be an object.');
     }
     if (comment instanceof CommentEntity) {
       comment = comment.toDto(CommentEntity.ALL_CONTAIN_OPTIONS); // deep clone

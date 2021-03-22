@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-const __ = require('../sdk/l10n').get;
 const Uuid = require('../utils/uuid');
 
 class GpgAuthToken {
@@ -48,24 +47,24 @@ class GpgAuthToken {
     switch (field) {
       case 'token' :
         if (typeof value === 'undefined' || value === '') {
-          return new Error(__('The user authentication token cannot be empty'));
+          return new Error('The user authentication token cannot be empty');
         }
         const sections = value.split('|');
         if (sections.length !== 4) {
-          return new Error(__('The user authentication token is not in the right format'));
+          return new Error('The user authentication token is not in the right format');
         }
         if (sections[0] !== sections[3] && sections[0] !== 'gpgauthv1.3.0') {
-          return new Error(__('Passbolt does not support this GPGAuth version'));
+          return new Error('Passbolt does not support this GPGAuth version');
         }
         if (sections[1] !== '36') {
-          return new Error(__('Passbolt does not support GPGAuth token nonce longer than 36 characters: ' + sections[2]));
+          return new Error('Passbolt does not support GPGAuth token nonce longer than 36 characters: ' + sections[2]);
         }
         if (!Validator.isUUID(sections[2])) {
-          return new Error(__('Passbolt does not support GPGAuth token nonce that are not UUIDs'));
+          return new Error('Passbolt does not support GPGAuth token nonce that are not UUIDs');
         }
         return true;
       default :
-        return new Error(__('No validation defined for field: ' + field));
+        return new Error('No validation defined for field: ' + field);
     }
   }
 }

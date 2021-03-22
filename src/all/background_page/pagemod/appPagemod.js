@@ -31,6 +31,9 @@ App.init = function () {
       // chrome/data/passbolt-iframe-app.html
     ],
     onAttach: async function (worker) {
+      const locale = await browser.tabs.detectLanguage();
+      console.log(locale);
+
       const auth = new GpgAuth();
       if (!await auth.isAuthenticated() || await auth.isMfaRequired()) {
         console.error('Can not attach application if user is not logged in.');

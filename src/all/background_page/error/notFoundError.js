@@ -11,10 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
-
 class NotFoundError extends Error {
   constructor(message) {
-    message = message || "NotFoundError";
+    message = message || 'NotFoundError';
     super(message)
     this.name = 'NotFoundError';
   }

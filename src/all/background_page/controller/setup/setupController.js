@@ -25,6 +25,7 @@ const {SetupEntity} = require("../../model/entity/setup/setupEntity");
 const {GenerateGpgKeyEntity} = require("../../model/entity/gpgkey/generate/generateGpgkeyEntity");
 const {SecurityTokenEntity} = require("../../model/entity/securityToken/securityTokenEntity");
 const {AccountEntity} = require("../../model/entity/account/accountEntity");
+const {i18n} = require('../../sdk/i18n');
 
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
 
@@ -110,10 +111,10 @@ class SetupController {
     try {
       keyInfo = await this.keyring.keyInfo(armoredKey);
     } catch(error) {
-      throw new GpgKeyError('The key must be a valid private key.');
+      throw new GpgKeyError(i18n.t('The key must be a valid private key.'));
     }
     if (!keyInfo.private) {
-      throw new GpgKeyError('The key must be a private key.');
+      throw new GpgKeyError(i18n.t('The key must be a private key.'));
     }
 
     return keyInfo;
@@ -139,7 +140,7 @@ class SetupController {
     }
 
     if (keyAlreadyUsed) {
-      throw new GpgKeyError('This key is already used by another user.');
+      throw new GpgKeyError(i18n.t('This key is already used by another user.'));
     }
   }
 

@@ -11,9 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const __ = require('../../sdk/l10n').get;
-const Worker = require('../../model/worker');
-
+const {i18n} = require('../../sdk/i18n');
 const {Crypto} = require('../../model/crypto');
 const {Keyring} = require('../../model/keyring');
 const {Share} = require('../../model/share');
@@ -75,13 +73,13 @@ class MoveFolderController {
       throw error;
     }
     try {
-      await progressController.open(this.worker, __('Moving folder'), 1, __('Initializing...'));
+      await progressController.open(this.worker, i18n.t('Moving folder'), 1, i18n.t('Initializing ...'));
       await this.findAllForShare();
       await this.setGoals();
       await this.calculateChanges();
       await this.share();
       await this.move();
-      await progressController.update(this.worker, this.goals, __('Done'));
+      await progressController.update(this.worker, this.goals, i18n.t('Done'));
       await progressController.close(this.worker);
       this.cleanup()
     } catch(error) {
@@ -102,10 +100,10 @@ class MoveFolderController {
     if (folderId) {
       await this.folderModel.assertFolderExists(folderId);
     } else {
-      throw new Error(__('Could not move, expecting a folder to be provided.'));
+      throw new Error(i18n.t('Could not move, expecting a folder to be provided.'));
     }
     if (folderId === destinationFolderId) {
-      throw new Error(__('The folder cannot be moved inside itself.'));
+      throw new Error(i18n.t('The folder cannot be moved inside itself.'));
     }
     this.destinationFolderId = destinationFolderId;
     this.folderId = folderId;
@@ -161,10 +159,12 @@ class MoveFolderController {
    */
   assertFolderCanBeMoved() {
     if (this.folder.folderParentId === this.destinationFolderId) {
-      throw new Error(`Folder ${this.folder.name} is already in folder ${this.destinationFolder.name}.`);
+      const message = i18n.t('Folder {{name}} is already in folder {{destination}}.', {name: this.folder.name, destination: this.destinationFolder.name});
+      throw new Error(message);
     }
     if (!FolderEntity.canFolderMove(this.folder, this.parentFolder, this.destinationFolder)) {
-      throw new Error(`Folder ${this.folder.name} can not be moved.`);
+      const message = i18n.t('Folder {{name}} can not be moved.', {name: this.folder.name});
+      throw new Error(message);
     }
   }
 
@@ -178,7 +178,7 @@ class MoveFolderController {
     this.goals = 3 + (this.subFolders.length * 2) + (this.resources.length * 4);
     this.progress = 0;
     await progressController.updateGoals(this.worker, this.goals);
-    await progressController.update(this.worker, this.progress++, __('Calculating changes...'));
+    await progressController.update(this.worker, this.progress++, i18n.t('Calculating changes...'));
   }
 
   /**
@@ -186,7 +186,7 @@ class MoveFolderController {
    * @returns {Promise<void>}
    */
   async calculateChanges() {
-    await progressController.update(this.worker, this.progress++, `Calculating changes for ${this.folder.name}`);
+    await progressController.update(this.worker, this.progress++, i18n.t('Calculating changes for {{name}}', {name: this.folder.name}));
 
     // When a shared folder is moved, we do not change permissions when:
     // - move is from the root to a personal folder
@@ -251,7 +251,7 @@ class MoveFolderController {
     if (this.resourcesChanges.length) {
       let resourcesDto = this.resources.toDto({secrets:true});
       let changesDto = this.resourcesChanges.toDto();
-      await progressController.update(this.worker, this.progress++, __('Synchronizing keys'));
+      await progressController.update(this.worker, this.progress++, i18n.t('Synchronizing keys'));
       await this.keyring.sync();
       await Share.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await progressController.update(this.worker, this.progress++, message);
@@ -265,7 +265,7 @@ class MoveFolderController {
    * @returns {Promise<void>}
    */
   async move() {
-    await progressController.update(this.worker, this.progress++, `Moving ${this.folder.name}`);
+    await progressController.update(this.worker, this.progress++, i18n.t('Moving {{name}}', {name: this.folder.name}));
     await this.folderModel.move(this.folder.id, this.destinationFolderId);
   }
 

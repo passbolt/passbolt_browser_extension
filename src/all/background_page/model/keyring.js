@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-const __ = require('../sdk/l10n').get;
 const Uuid = require('../utils/uuid');
 
 const {InvalidMasterPasswordError} = require('../error/invalidMasterPasswordError');
@@ -86,10 +85,10 @@ class Keyring {
   async importPublic(armoredPublicKey, userId) {
     // Check user id
     if (typeof userId === 'undefined') {
-      throw new Error(__('The user id is undefined'));
+      throw new Error('The user id is undefined');
     }
     if (!Validator.isUUID(userId)) {
-      throw new Error(__('The user id is not valid'));
+      throw new Error('The user id is not valid');
     }
 
     // Parse the keys. If standard format given with a text containing
@@ -105,7 +104,7 @@ class Keyring {
     // If the key is not public, return an error.
     const primaryPublicKey = publicKey.keys[0];
     if (!primaryPublicKey.isPublic()) {
-      throw new Error(__('Expected a public key but got a private key instead'));
+      throw new Error('Expected a public key but got a private key instead');
     }
 
     // Get the keyInfo.
@@ -146,7 +145,7 @@ class Keyring {
     // If the key is not private, return an error.
     privateKey = privateKey.keys[0];
     if (!privateKey.isPrivate()) {
-      throw new Error(__('Expected a private key but got a public key instead'));
+      throw new Error('Expected a private key but got a public key instead');
     }
 
     // Get the keyInfo.
@@ -256,7 +255,7 @@ class Keyring {
       expirationTime = await key.getExpirationTime();
       expirationTime = expirationTime.toString();
       if (expirationTime === 'Infinity') {
-        expirationTime = __('Never');
+        expirationTime = 'Never';
       }
       created = key.primaryKey.created.toString();
     } catch(error) {
@@ -371,7 +370,7 @@ class Keyring {
 
     // Check response status
     if (!response.ok) {
-      let msg = __('Could not synchronize the keyring. The server responded with an error.');
+      let msg = 'Could not synchronize the keyring. The server responded with an error.';
       if (json.header.msg) {
         msg += ' ' + json.header.msg;
       }
@@ -380,10 +379,10 @@ class Keyring {
     }
     // Update the latest synced time.
     if (!json.header) {
-      throw new Error(__('Could not synchronize the keyring. The server response header is missing.'));
+      throw new Error('Could not synchronize the keyring. The server response header is missing.');
     }
     if (!json.body) {
-      throw new Error(__('Could not synchronize the keyring. The server response body is missing.'));
+      throw new Error('Could not synchronize the keyring. The server response body is missing.');
     }
 
     // Store all the new keys in the keyring.
@@ -414,7 +413,7 @@ class Keyring {
    */
   store(type, keys) {
     if (type !== Keyring.PUBLIC && type !== Keyring.PRIVATE) {
-      throw new Error(__('Key type is incorrect'));
+      throw new Error('Key type is incorrect');
     }
     let key = (type === Keyring.PRIVATE) ? Keyring.STORAGE_KEY_PRIVATE : Keyring.STORAGE_KEY_PUBLIC;
     storage.setItem(key, JSON.stringify(keys));

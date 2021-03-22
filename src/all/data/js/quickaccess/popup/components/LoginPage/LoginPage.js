@@ -1,8 +1,9 @@
 import browser from "webextension-polyfill/dist/browser-polyfill";
 import React from "react";
 import PropTypes from "prop-types";
-import { withRouter } from "react-router";
+import {withRouter} from "react-router";
 import AppContext from "../../contexts/AppContext";
+import {Trans, withTranslation} from "react-i18next";
 
 class LoginPage extends React.Component {
   constructor(props) {
@@ -28,6 +29,14 @@ class LoginPage extends React.Component {
       passphraseStyle: {},
       securityTokenStyle: {}
     };
+  }
+
+  /**
+   * Get the translate function
+   * @returns {function(...[*]=)}
+   */
+  get translate() {
+    return this.props.t;
   }
 
   async handleFormSubmit(event) {
@@ -101,12 +110,12 @@ class LoginPage extends React.Component {
         <div className="login-form">
           <form onSubmit={this.handleFormSubmit}>
             <div className="input text required">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username"><Trans>Username</Trans></label>
               <input className="required" maxLength="50" type="text" id="username" required="required" value={this.context.user['user.username']} disabled="disabled" />
             </div>
             <div className="input text passphrase required">
-              <label htmlFor="passphrase">Passphrase</label>
-              <input type="password" name="passphrase" placeholder="passphrase" id="passphrase" autoFocus ref={this.passphraseInputRef}
+              <label htmlFor="passphrase"><Trans>Passphrase</Trans></label>
+              <input type="password" name="passphrase" placeholder={this.translate('passphrase')} id="passphrase" autoFocus ref={this.passphraseInputRef}
                 value={this.state.passphrase} onChange={this.handleInputChange} onFocus={this.handleInputFocus} onBlur={this.handleInputBlur}
                 disabled={this.state.processing} style={this.state.passphraseStyle} />
               <span className="security-token" style={this.state.securityTokenStyle}>{this.context.user["user.settings.securityToken.code"]}</span>
@@ -115,11 +124,11 @@ class LoginPage extends React.Component {
             {this.props.canRememberMe &&
               <div className="input checkbox small">
                 <input type="checkbox" name="rememberMe" id="remember-me" checked={this.state.rememberMe} onChange={this.handleInputChange} disabled={this.state.processing} />
-                <label htmlFor="remember-me">Remember until I log out.</label>
+                <label htmlFor="remember-me"><Trans>Remember until I log out.</Trans></label>
               </div>
             }
             <div className="submit-wrapper">
-              <input type="submit" className={`button primary big full-width ${this.state.processing ? "processing" : ""}`} role="button" value="login" disabled={this.state.processing} />
+              <input type="submit" className={`button primary big full-width ${this.state.processing ? "processing" : ""}`} role="button" value={this.translate('login')} disabled={this.state.processing} />
             </div>
           </form>
         </div>
@@ -128,15 +137,18 @@ class LoginPage extends React.Component {
   }
 }
 
+LoginPage.contextType = AppContext;
+
 LoginPage.propTypes = {
   canRememberMe: PropTypes.bool, // True if the remember me flag must be displayed
   loginSuccessCallback: PropTypes.func,
   // Match, location and history props are injected by the withRouter decoration call.
   match: PropTypes.object,
   location: PropTypes.object,
-  history: PropTypes.object
+  history: PropTypes.object,
+  t: PropTypes.func, // The translation function
 };
 
-export default withRouter(LoginPage);
+export default withTranslation('common')(withRouter(LoginPage));
 
-LoginPage.contextType = AppContext;
+

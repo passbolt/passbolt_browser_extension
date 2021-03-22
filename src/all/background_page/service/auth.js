@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
-const __ = require('../sdk/l10n').get;
 const MfaAuthenticationRequiredError = require('../error/mfaAuthenticationRequiredError').MfaAuthenticationRequiredError;
 const NotFoundError = require('../error/notFoundError').NotFoundError;
 const {User} = require('../model/user');

@@ -21,6 +21,7 @@ const {FoldersCollection} = require('../../model/entity/folder/foldersCollection
 
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
+const {i18n} = require('../../sdk/i18n');
 
 class ShareFoldersController {
   /**
@@ -70,12 +71,12 @@ class ShareFoldersController {
     }
 
     try {
-      await progressController.open(this.worker, `Sharing folder ${this.folder.name}`, 1, 'Initializing...');
+      await progressController.open(this.worker, i18n.t('Sharing folder {{name}}', {name: this.folder.name}), 1, i18n.t('Initializing ...'));
       await this.findAllForShare();
       await this.setGoals();
       await this.calculateChanges();
       await this.share();
-      await progressController.update(this.worker, this.goals, 'Done');
+      await progressController.update(this.worker, this.goals, i18n.t('Done'));
       await progressController.close(this.worker);
       this.cleanup()
     } catch(error) {
@@ -105,7 +106,7 @@ class ShareFoldersController {
     this.originalChanges = changes;
 
     if (!this.folder.isOwner()) {
-      throw new Error('The folder cannot be shared. Insufficient rights.');
+      throw new Error(i18n.t('The folder cannot be shared. Insufficient rights.'));
     }
   }
 
@@ -153,7 +154,7 @@ class ShareFoldersController {
     this.goals = 3 + (this.subFolders.length * 2) + (this.resources.length * 4);
     this.progress = 0;
     await progressController.updateGoals(this.worker, this.goals);
-    await progressController.update(this.worker, this.progress++, 'Calculating changes...');
+    await progressController.update(this.worker, this.progress++, i18n.t('Calculating changes...'));
   }
 
   /**
@@ -197,7 +198,7 @@ class ShareFoldersController {
     if (this.resourcesChanges.length) {
       let resourcesDto = this.resources.toDto({secrets:true});
       let changesDto = this.resourcesChanges.toDto();
-      await progressController.update(this.worker, this.progress++, 'Synchronizing keys');
+      await progressController.update(this.worker, this.progress++, i18n.t('Synchronizing keys'));
       await this.keyring.sync();
       await Share.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await progressController.update(this.worker, this.progress++, message);

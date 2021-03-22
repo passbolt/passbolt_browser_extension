@@ -8,7 +8,6 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 // var Validator = require('../vendors/validator');
-var __ = require('../sdk/l10n').get;
 
 /**
  * The class that deals with keys.
@@ -38,57 +37,57 @@ Key.prototype.__validate = function (field, value) {
   switch (field) {
     case 'algorithm':
       if (typeof value === 'undefined' || value === '') {
-        throw new Error(__('The key algorithm cannot be empty'));
+        throw new Error('The key algorithm cannot be empty');
       }
       var supportedAlgorithms = [
         "RSA-DSA"
       ];
       if (supportedAlgorithms.indexOf(value) == -1) {
-        throw new Error(__('The key algorithm selected is not supported'));
+        throw new Error('The key algorithm selected is not supported');
       }
       break;
     case 'length' :
       if (typeof value === 'undefined' || value === '') {
-        throw new Error(__('The length cannot be empty'));
+        throw new Error('The length cannot be empty');
       }
       var supportedLength = [
         "2048"
       ];
       if (supportedLength.indexOf(value) == -1) {
-        throw new Error(__('The key length selected is not supported'));
+        throw new Error('The key length selected is not supported');
       }
       break;
     case 'comment' :
       // We accept everything except ().
       if (Validator.matches(value, /[()]/)) {
-        throw new Error(__('The comment contains invalid characters : ()'));
+        throw new Error('The comment contains invalid characters : ()');
       }
       break;
     case 'ownerName' :
       if (typeof value === 'undefined' || value === '') {
-        throw new Error(__('The owner name cannot be empty'));
+        throw new Error('The owner name cannot be empty');
       }
       if (!Validator.isUtf8(value)) {
-        throw new Error(__('The full name should contain only UTF8 characters'));
+        throw new Error('The full name should contain only UTF8 characters');
       }
       break;
     case 'ownerEmail' :
       if (!Validator.isEmail(value)) {
-        throw new Error(__('The owner email should be a valid email'));
+        throw new Error('The owner email should be a valid email');
       }
       break;
     case 'userId' :
       if (!Validator.matches(value, /^[0-9A-Za-z\u00C0-\u017F\-' ]+ (\(\[0-9A-Za-z\u00C0-\u017F\-' ]+\)? (<[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}>){1})$/i)) {
-        throw new Error(__('The userId should follow a correct format ' + value));
+        throw new Error('The userId should follow a correct format ' + value);
       }
       break;
     case 'passphrase' :
       if (!Validator.isLength(value, 8)) {
-        throw new Error(__('The passphrase should be at least 8 characters'));
+        throw new Error('The passphrase should be at least 8 characters');
       }
       break;
     default :
-      throw new Error(__('No validation defined for field: ' + field));
+      throw new Error('No validation defined for field: ' + field);
       break;
   }
   return true;
@@ -120,7 +119,7 @@ Key.prototype.validate = function (key, fields) {
 
   if (errors.length > 0) {
     // Return exception with details in validationErrors.
-    var e = new Error(__('key could not be validated'));
+    var e = new Error('key could not be validated');
     // Add validation errors to the error object.
     e.validationErrors = errors;
     throw e;
@@ -137,7 +136,7 @@ Key.prototype.validate = function (key, fields) {
 Key.prototype.set = function (key) {
 
   if (typeof key === 'undefined') {
-    throw new Error(__('The key cannot be empty'));
+    throw new Error('The key cannot be empty');
   }
 
   this.setOwnerName(key.ownerName);

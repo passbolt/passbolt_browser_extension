@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const __ = require('../../sdk/l10n').get;
+const {i18n} = require('../../sdk/i18n');
 const {Keyring} = require('../../model/keyring');
 const {Crypto} = require('../../model/crypto');
 const {Share} = require('../../model/share');
@@ -55,14 +55,14 @@ class MoveResourcesController {
       throw error;
     }
     try {
-      await progressController.open(this.worker, this.getProgressTitle(), 1, __('Initializing...'));
+      await progressController.open(this.worker, this.getProgressTitle(), 1, i18n.t('Initializing ...'));
       await this.findAllForShare();
       this.filterOutResourcesThatWontMove();
       await this.setGoals();
       await this.calculateChanges();
       await this.move();
       await this.share();
-      await progressController.update(this.worker, this.goals, 'Done');
+      await progressController.update(this.worker, this.goals, i18n.t('Done'));
       await progressController.close(this.worker);
       this.cleanup()
     } catch(error) {
@@ -83,7 +83,7 @@ class MoveResourcesController {
     if (resourcesIds.length) {
       await this.resourceModel.assertResourcesExist(resourcesIds);
     } else {
-      throw new Error(__('Could not move, expecting at least a resource to be provided.'));
+      throw new Error(i18n.t('Could not move, expecting at least a resource to be provided.'));
     }
     this.destinationFolderId = destinationFolderId;
     this.resourcesIds = resourcesIds;
@@ -146,7 +146,7 @@ class MoveResourcesController {
     this.goals = (this.resources.length * 5) + 1;
     this.progress = 0;
     await progressController.updateGoals(this.worker, this.goals);
-    await progressController.update(this.worker, this.progress++, __('Calculating changes...'));
+    await progressController.update(this.worker, this.progress++, i18n.t('Calculating changes ...'));
   }
 
   /**
@@ -156,7 +156,7 @@ class MoveResourcesController {
   async calculateChanges() {
     this.changes = new PermissionChangesCollection([]);
     for (let resource of this.resources) {
-      await progressController.update(this.worker, this.progress++, `Calculating changes for ${resource.name}`);
+      await progressController.update(this.worker, this.progress++, i18n.t('Calculating changes for {{name}}', {name: resource.name}));
 
       // A user who can update a resource can move it
       // But to change the rights they need to be owner
@@ -186,7 +186,7 @@ class MoveResourcesController {
    */
   async move() {
     for (let resource of this.resources) {
-      await progressController.update(this.worker, this.progress++, `Moving ${resource.name}`);
+      await progressController.update(this.worker, this.progress++, i18n.t('Moving {{name}}', {name: resource.name}));
       if (resource.folderParentId !== this.destinationFolderId) {
         await this.resourceModel.move(resource.id, this.destinationFolderId);
       }
@@ -201,7 +201,7 @@ class MoveResourcesController {
     let resourcesDto = this.resources.toDto({secrets:true});
     let changesDto = this.changes.toDto();
     if (changesDto.length) {
-      await progressController.update(this.worker, this.progress++, __('Synchronizing keys'));
+      await progressController.update(this.worker, this.progress++, i18n.t('Synchronizing keys'));
       await this.keyring.sync();
       await Share.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await progressController.update(this.worker, this.progress++, message);
@@ -225,9 +225,9 @@ class MoveResourcesController {
    */
   getProgressTitle() {
     if (this.resourcesIds.length === 1) {
-      return __('Moving one resource');
+      return i18n.t('Moving one resource');
     } else {
-      return `Moving ${this.resourcesIds.length} resources`;
+      return i18n.t('Moving {{total}} resources', {total: this.resourcesIds.length});
     }
   }
 }

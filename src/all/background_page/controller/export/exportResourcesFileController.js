@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const __ = require('../../sdk/l10n').get;
 const Worker = require('../../model/worker');
 
 const {Keyring} = require('../../model/keyring');
@@ -31,7 +30,7 @@ const {ExternalResourcesCollection} = require("../../model/entity/resource/exter
 const {ExternalFoldersCollection} = require("../../model/entity/folder/external/externalFoldersCollection");
 const {ExportResourcesFileEntity} = require("../../model/entity/export/exportResourcesFileEntity");
 
-const PROGRESS_DIALOG_TITLE = "Exporting ...";
+const {i18n} = require('../../sdk/i18n');
 
 class ExportResourcesFileController {
   /**
@@ -70,7 +69,7 @@ class ExportResourcesFileController {
       await this.decryptSecrets(exportEntity, userId, privateKey);
       await this.export(exportEntity);
       await this.download(exportEntity);
-      await progressController.update(this.worker, this.progressGoal, __('Generate file'));
+      await progressController.update(this.worker, this.progressGoal, i18n.t('Generate file'));
       await progressController.close(this.worker);
       return exportEntity;
     } catch (error) {
@@ -86,7 +85,7 @@ class ExportResourcesFileController {
    */
   async prepareExportContent(exportEntity) {
     const progressGoals = exportEntity.resourcesIds.length + 2; // 1 (initialize & find secrets) + #secrets (to encrypt) + 1 (Complete operation)
-    await progressController.open(this.worker, PROGRESS_DIALOG_TITLE, progressGoals, __('Initialize'));
+    await progressController.open(this.worker, i18n.t("Exporting ..."), progressGoals, i18n.t('Initialize'));
     await progressController.update(this.worker, ++this.progress);
 
     const foldersCollection = await this.folderModel.getAllByIds(exportEntity.foldersIds);
@@ -115,7 +114,8 @@ class ExportResourcesFileController {
     let i = 0;
     const resourcesTypesCollection = await this.resourceTypeModel.getOrFindAll();
     for (let exportResourceEntity of exportEntity.exportResources.items) {
-      progressController.update(this.worker, ++this.progress, __(`Decrypting ${++i}/${exportEntity.exportResources.items.length}`));
+      i++;
+      progressController.update(this.worker, ++this.progress, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: exportEntity.exportResources.items.length}));
       let secretClear = await this.crypto.decryptWithKey(exportResourceEntity.secrets.items[0].data, privateKey);
 
       // @deprecated Prior to v3, resources have no resource type. Remove this condition with v4.

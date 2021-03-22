@@ -10,7 +10,6 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const __ = require('../../sdk/l10n').get;
 const app = require("../../app");
 const {GpgAuthHeader} = require("../gpgAuthHeader");
 const {GpgAuthToken} = require("../gpgAuthToken");
@@ -109,7 +108,7 @@ class AuthModel {
       originalToken = new GpgAuthToken();
       encryptedToken = await this.crypto.encrypt(originalToken.token, serverKey)
     } catch (error) {
-      throw new Error(__('Unable to encrypt the verify token.') + ' ' + error.message);
+      throw new Error('Unable to encrypt the verify token.' + ' ' + error.message);
     }
 
     const response = await this.authService.verify(fingerprint, encryptedToken);
@@ -118,7 +117,7 @@ class AuthModel {
     const auth = new GpgAuthHeader(response.headers, 'verify');
     const verifyToken = new GpgAuthToken(auth.headers['x-gpgauth-verify-response']);
     if (verifyToken.token !== originalToken.token) {
-      throw new Error(__('The server was unable to prove it can use the advertised OpenPGP key.'));
+      throw new Error('The server was unable to prove it can use the advertised OpenPGP key.');
     }
   }
 }

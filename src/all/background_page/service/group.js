@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.10.0
  */
-const __ = require('../sdk/l10n').get;
 const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
 const PassboltBadResponseError = require('../error/passboltBadResponseError').PassboltBadResponseError;
 const PassboltServiceUnavailableError = require('../error/passboltServiceUnavailableError').PassboltServiceUnavailableError;

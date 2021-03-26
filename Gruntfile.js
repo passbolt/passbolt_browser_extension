@@ -53,7 +53,7 @@ module.exports = function (grunt) {
   grunt.registerTask('default', ['bundle']);
   grunt.registerTask('pre-dist', ['copy:vendors', 'copy:styleguide']);
 
-  grunt.registerTask('bundle', ['copy:background_page', 'copy:content_scripts', 'browserify:background_page', 'copy:data', 'copy:locales']);
+  grunt.registerTask('bundle', ['externalize-locale-strings', 'copy:background_page', 'copy:content_scripts', 'browserify:background_page', 'copy:data', 'copy:locales']);
   grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle', 'browserify:vendors']);
   grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle', 'browserify:vendors']);
 
@@ -73,7 +73,7 @@ module.exports = function (grunt) {
   grunt.registerTask('bg-chrome-debug', ['copy:background_page', 'browserify:background_page']);
   grunt.registerTask('react-chrome-debug', ['copy:content_scripts', 'copy:data', 'copy:locales', 'shell:build_webpack_apps_debug']);
 
-  grunt.registerTask('translate', ['i18next']);
+  grunt.registerTask('externalize-locale-strings', ['i18next']);
 
   /**
    * Main grunt tasks configuration
@@ -365,7 +365,7 @@ module.exports = function (grunt) {
      * Extract translations through the JS files
      */
     i18next: {
-      translate: {
+      externalize: {
         src: 'src/**/*.{js,html}',
         dest: 'src',
         options: {
@@ -390,7 +390,7 @@ module.exports = function (grunt) {
           },
           removeUnusedKeys: true,
           sort: true,
-          debug: true,
+          debug: false,
         }
       }
     },

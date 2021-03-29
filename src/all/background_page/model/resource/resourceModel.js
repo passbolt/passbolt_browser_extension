@@ -26,6 +26,7 @@ const {TagsCollection} = require('../../model/entity/tag/tagsCollection');
 const {MoveService} = require('../../service/api/move/moveService');
 
 const BULK_OPERATION_SIZE = 5;
+const MAX_LENGTH_PLAINTEXT = 4096;
 
 class ResourceModel {
   /**
@@ -440,12 +441,16 @@ class ResourceModel {
    * @returns {Promise<string>}
    */
   async serializePlaintextDto(resourceTypeId, plaintextDto) {
-    if (!resourceTypeId || typeof plaintextDto === 'string') {
-      return plaintextDto;
+    if (!resourceTypeId) {
+      if (typeof plaintextDto === 'string' && plaintextDto.length < MAX_LENGTH_PLAINTEXT) {
+        return plaintextDto;
+      } else {
+        throw new TypeError(`The secret should be maximum ${MAX_LENGTH_PLAINTEXT} characters in length.`);
+      }
     }
     const schema = await this.resourceTypeModel.getSecretSchemaById(resourceTypeId);
     if (!schema) {
-      throw new TypeError('Could not find the schema definition for the requested resource type.')
+      throw new TypeError('Could not find the schema definition for the requested resource type.');
     }
     const plaintextEntity = new PlaintextEntity(plaintextDto, schema);
     return JSON.stringify(plaintextEntity);

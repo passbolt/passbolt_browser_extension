@@ -64,6 +64,21 @@ class AccountSettingsService extends AbstractService {
     return response.body;
   }
 
+  /**
+   * Update the current user locale language
+   *
+   * @param {string} locale The locale language to switch on
+   * @returns {Promise<*>} response body
+   * @throws {Error} if options are invalid or API error
+   * @public
+   */
+  async updateLocale(locale) {
+    const data = {value: locale};
+    const bodyString = this.apiClient.buildBody(data);
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/locale`);
+    const response = await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+    return response.body;
+  }
 }
 
 exports.AccountSettingsService = AccountSettingsService;

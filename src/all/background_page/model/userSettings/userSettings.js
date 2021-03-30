@@ -51,6 +51,9 @@ class UserSettings {
       case 'theme':
         this.validateTheme(value);
         break;
+      case 'locale':
+        this.validateLocale(value);
+        break;
       default :
         throw new Error(`No validation defined for field: ${field}.`);
     }
@@ -126,6 +129,20 @@ class UserSettings {
     const whitelist = ['default', 'midgar'];
     if (whitelist.indexOf(theme) === -1) {
       throw new Error('The theme is not valid.');
+    }
+  }
+
+  /**
+   * Validate locale language.
+   *
+   * @param locale {string} The locale to validate
+   * @throw {Error} on validation failure
+   * @returns {void}
+   */
+  validateLocale(locale) {
+    const regex = new RegExp("^[a-z]{2}-[A-Z]{2}$");
+    if (locale.match(regex)) {
+      throw new Error('The locale is not valid.');
     }
   }
 
@@ -252,6 +269,31 @@ class UserSettings {
   }
 
   /**
+   * Set a locale for the user
+   *
+   * @param locale {string} The locale language
+   * @throw Error if locale is not a valid
+   */
+  setLocale(locale) {
+    this.validateLocale(locale);
+    return Config.write('user.settings.locale', locale);
+  }
+
+  /**
+   * Get the currently selected locale for the user
+   *
+   * @returns {string}
+   * @throw Error if the locale is not set
+   */
+  getLocale() {
+    const locale = Config.read('user.settings.locale');
+    if (typeof locale === 'undefined') {
+      throw new Error('The user has no locale language.');
+    }
+    return locale;
+  }
+
+  /**
    * Get the settings.
    *
    * @param{array} [fields] (optional) An array of settings fields, if not provided return all the settings
@@ -353,6 +395,9 @@ class UserSettings {
         switch (props.property) {
           case 'theme':
             this.setTheme(props.value);
+            break;
+          case 'locale':
+            this.setLocale(props.value);
             break;
           default:
             console.error(`Unknown property ${props.property}`);

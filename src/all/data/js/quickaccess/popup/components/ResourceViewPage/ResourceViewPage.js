@@ -168,13 +168,12 @@ class ResourceViewPage extends React.Component {
     try {
       const plaintext = await this.decryptResourceSecret(resourceId);
       previewedPassword = this.extractPlaintextPassword(plaintext);
+      this.setState({previewedPassword, isSecretDecrypting: false});
     } catch (error) {
       if (error.name !== "UserAbortsOperationError") {
         throw error;
       }
     }
-
-    this.setState({previewedPassword, isSecretDecrypting: false});
   }
 
   /**

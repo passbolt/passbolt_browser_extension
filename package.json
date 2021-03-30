@@ -30,7 +30,7 @@
     "react-router-dom": "^5.2.0",
     "react-transition-group": "^2.7.0",
     "simplebar": "^3.1.4",
-    "underscore": "~1.9.0",
+    "underscore": "~1.12.1",
     "validator": "4.1.0",
     "webextension-polyfill": "^0.4.0",
     "xregexp": "~3.0.0"

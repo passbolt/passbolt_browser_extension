@@ -5,7 +5,7 @@ const config = {
     'app': path.resolve(__dirname, './src/all/content_scripts/js/app/App.js'),
     'setup': path.resolve(__dirname, './src/all/content_scripts/js/app/Setup.js'),
     'recover': path.resolve(__dirname, './src/all/content_scripts/js/app/Recover.js'),
-    'login': path.resolve(__dirname, './src/all/content_scripts/js/app/Login.js')
+    'login': path.resolve(__dirname, './src/all/content_scripts/js/app/Login.js'),
   },
   mode: 'production',
   module: {

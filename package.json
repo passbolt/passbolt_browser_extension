@@ -28,10 +28,7 @@
     "prop-types": "^15.6.2",
     "react": "16.12.0",
     "react-dom": "16.12.0",
-    "react-i18next": "^11.8.8",
-    "react-list": "^0.8.16",
     "react-router-dom": "5.2.0",
-    "react-transition-group": "^2.7.0",
     "simplebar": "^3.1.4",
     "underscore": "~1.9.0",
     "validator": "4.1.0",
@@ -60,13 +57,13 @@
     "grunt-contrib-watch": "^1.1.0",
     "grunt-eslint": "^22.0.0",
     "grunt-shell": "^2.1.0",
+    "i18next-scanner": "github:Benj1er/i18next-scanner#master",
     "jest": "^26.6.3",
     "jest-environment-node": "^26.6.2",
     "sinon": "^7.5.0",
     "web-ext": "^5.4.1",
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.12",
-    "i18next-scanner": "github:Benj1er/i18next-scanner#master"
+    "webpack-cli": "^3.3.12"
   },
   "scripts": {
     "build": "npm run build-content-script; npm run build-data;",

@@ -156,7 +156,7 @@ module.exports = function (grunt) {
       },
       data: {
         files: [
-          { expand: true, cwd: path.src + 'data', src: ['**', '!js/quickaccess/popup/**', '!js/app/**'], dest: path.build + 'data' }
+          { expand: true, cwd: path.src + 'data', src: ['**', '!js/app/**'], dest: path.build + 'data' }
         ]
       },
       locales: {
@@ -403,11 +403,6 @@ module.exports = function (grunt) {
       content_scripts: {
         files: [path.src_content_scripts + '**/*.*'],
         tasks: ['copy:content_scripts'],
-        options: { spawn: false }
-      },
-      data: {
-        files: [path.src + 'data/**/*.*', '!' + path.src + 'js/quickaccess/popup/**'],
-        tasks: ['copy:data', 'shell:build_webpack_apps_debug'],
         options: { spawn: false }
       },
       background_page: {

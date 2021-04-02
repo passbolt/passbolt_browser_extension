@@ -165,7 +165,7 @@ class PassphraseDialog extends React.Component {
         {this.state.attempt == 3 &&
           <div className="passphrase-wrong">
             <div className="too-many-attempts-error">
-              <Trans>Your passphrase is wrong ! The operation has been aborted.</Trans>
+              <Trans>Your passphrase is wrong!</Trans> <Trans>The operation has been aborted.</Trans>
             </div>
             <div className="submit-wrapper">
               <a className="button primary big full-width" role="button" autoFocus onClick={this.handleCloseButtonClick}>

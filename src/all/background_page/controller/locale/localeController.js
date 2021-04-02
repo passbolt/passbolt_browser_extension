@@ -16,7 +16,7 @@
  */
 const {LocaleEntity} = require("../../model/entity/locale/localeEntity");
 const {LocaleModel} = require("../../model/locale/localeModel");
-const {User} = require('../model/user');
+const {User} = require('../../model/user');
 const {i18n} = require('../../sdk/i18n');
 
 class LocaleController {

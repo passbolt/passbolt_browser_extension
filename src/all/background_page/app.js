@@ -43,6 +43,7 @@ events.role = require('./event/roleEvents');
 events.secret = require('./event/secretEvents');
 events.setup = require('./event/setupEvents');
 events.share = require('./event/shareEvents');
+events.subscription = require('./event/subscriptionEvents');
 events.tab = require('./event/tabEvents');
 events.tag = require('./event/tagEvents');
 events.theme = require('./event/themeEvents');

@@ -56,6 +56,20 @@ class UserModel {
     return this.userService.resendInvite(username);
   }
 
+  /**
+   * Get a collection of all users from the local storage.
+   * If the local storage is unset, initialize it.
+   *
+   * @return {UsersCollection}
+   */
+  async getOrFindAll() {
+    const usersDto = await UserLocalStorage.get();
+    if (typeof usersDto !== 'undefined') {
+      return new UsersCollection(usersDto);
+    }
+    return this.updateLocalStorage();
+  }
+
   //==============================================================
   // Finders / remote calls
   //==============================================================

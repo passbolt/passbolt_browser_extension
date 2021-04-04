@@ -8,7 +8,6 @@
  */
 const {User} = require('../model/user');
 const {UserModel} = require('../model/user/userModel');
-const {AccountModel} = require('../model/account/accountModel');
 const {UserEntity} = require('../model/entity/user/userEntity');
 const {UserDeleteTransferEntity} = require('../model/entity/user/transfer/userDeleteTransfer');
 const {AvatarUpdateEntity} = require("../model/entity/avatar/update/avatarUpdateEntity");
@@ -36,6 +35,23 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS', user);
     } catch (e) {
       worker.port.emit(requestId, 'ERROR', e.message);
+    }
+  });
+
+  /*
+   * Get the users from the local storage.
+   *
+   * @listens passbolt.users.get-all
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.users.get-all', async function (requestId) {
+    try {
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const userModel = new UserModel(apiClientOptions);
+      const users = await userModel.getOrFindAll();
+      worker.port.emit(requestId, 'SUCCESS', users);
+    } catch (error) {
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 

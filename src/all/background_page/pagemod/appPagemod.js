@@ -53,6 +53,7 @@ App.init = function () {
       app.events.secret.listen(worker);
       app.events.siteSettings.listen(worker);
       app.events.share.listen(worker);
+      app.events.subscription.listen(worker);
       app.events.user.listen(worker);
       app.events.group.listen(worker);
       app.events.comment.listen(worker);

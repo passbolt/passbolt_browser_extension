@@ -25,6 +25,7 @@ import {ExternalResourceEntity} from "../../entity/resource/external/externalRes
 import {ImportResourcesFileEntity} from "../../entity/import/importResourcesFileEntity";
 import {EntityValidationError} from "../../entity/abstract/entityValidationError";
 import {ImportError} from "../../../error/importError";
+import {BinaryConvert} from "../../../utils/format/binaryConvert";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -50,7 +51,7 @@ describe("ResourcesCsvImportParser", () => {
     const importDto = {
       "ref": "import-ref",
       "file_type": "csv",
-      "file": btoa(csv)
+      "file": btoa(BinaryConvert.toBinary(csv))
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
     const importer = new ResourcesCsvImportParser(importEntity);
@@ -74,7 +75,7 @@ describe("ResourcesCsvImportParser", () => {
     const importDto = {
       "ref": "import-ref",
       "file_type": "csv",
-      "file": btoa(csv)
+      "file": btoa(BinaryConvert.toBinary(csv))
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
     const importer = new ResourcesCsvImportParser(importEntity);
@@ -127,7 +128,7 @@ describe("ResourcesCsvImportParser", () => {
     const importDto = {
       "ref": "import-ref",
       "file_type": "csv",
-      "file": btoa(csv)
+      "file": btoa(BinaryConvert.toBinary(csv))
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
     const importer = new ResourcesCsvImportParser(importEntity);
@@ -153,7 +154,7 @@ describe("ResourcesCsvImportParser", () => {
     const importDto = {
       "ref": "import-ref",
       "file_type": "csv",
-      "file": btoa(csv)
+      "file": btoa(BinaryConvert.toBinary(csv))
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
     const importer = new ResourcesCsvImportParser(importEntity);
@@ -194,7 +195,7 @@ describe("ResourcesCsvImportParser", () => {
     const importDto = {
       "ref": "import-ref",
       "file_type": "csv",
-      "file": btoa(csv)
+      "file": btoa(BinaryConvert.toBinary(csv))
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
     const importer = new ResourcesCsvImportParser(importEntity);
@@ -216,7 +217,7 @@ describe("ResourcesCsvImportParser", () => {
     const importDto = {
       "ref": "import-ref",
       "file_type": "csv",
-      "file": btoa(csv)
+      "file": btoa(BinaryConvert.toBinary(csv))
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
     const importer = new ResourcesCsvImportParser(importEntity);
@@ -239,7 +240,7 @@ describe("ResourcesCsvImportParser", () => {
     const importDto = {
       "ref": "import-ref",
       "file_type": "csv",
-      "file": btoa(csv)
+      "file": btoa(BinaryConvert.toBinary(csv))
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
     const importer = new ResourcesCsvImportParser(importEntity);

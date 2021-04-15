@@ -300,7 +300,7 @@ module.exports = function (grunt) {
         command: "webpack--config webpack-content-scripts.config.js; webpack --config webpack-data.config.js"
       },
       build_webpack_apps_debug: {
-        command: "webpack --env development --config webpack-content-scripts.config.js; webpack --env development --config webpack-data.config.js"
+        command: "webpack --env debug=true --config webpack-content-scripts.config.js; webpack --env debug=true --config webpack-data.config.js"
       },
 
       /**

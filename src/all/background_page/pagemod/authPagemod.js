@@ -29,11 +29,13 @@ Auth.init = function () {
     ],
     onAttach: function (worker) {
       Worker.add('Auth', worker);
+
       app.events.user.listen(worker);
       app.events.keyring.listen(worker);
       app.events.auth.listen(worker);
       app.events.config.listen(worker);
-      app.events.siteSettings.listen(worker);
+      app.events.organizationSettings.listen(worker);
+      app.events.locale.listen(worker);
 
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows

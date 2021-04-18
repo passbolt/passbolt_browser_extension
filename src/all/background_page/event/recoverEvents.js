@@ -10,9 +10,11 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {SiteSettings} = require("../model/siteSettings");
+const {OrganizationSettingsModel} = require("../model/organizationSettings/organizationSettingsModel");
 const {RecoverController} = require("../controller/recover/recoverController");
 const Worker = require('../model/worker');
+const {GetRecoverLocaleController} = require("../controller/locale/getRecoverLocaleController");
+const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
 
 const listen = function (worker) {
   /**
@@ -23,17 +25,41 @@ const listen = function (worker) {
   const recoverController = new RecoverController(worker, worker.tab.url);
 
   /*
-   * Initialize the recovery process.
+   * Retrieve the organization settings.
    *
-   * @listens passbolt.recover.site-settings
+   * @listens passbolt.organization-settings.get
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.recover.site-settings', async function (requestId) {
+  worker.port.on('passbolt.organization-settings.get', async function (requestId) {
     try {
-      const siteSettings = new SiteSettings(recoverController.setupEntity.domain);
-      const siteSettingsDto = await siteSettings.get();
-      worker.port.emit(requestId, 'SUCCESS', siteSettingsDto);
+      const apiClientOptions = (new ApiClientOptions()).setBaseUrl(recoverController.setupEntity.domain);
+      const organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+      const organizationSettings = await organizationSettingsModel.getOrFind(true);
+      worker.port.emit(requestId, 'SUCCESS', organizationSettings);
     } catch(error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Get the runtime locale.
+   *
+   * The recover PageMod cannot use the common locale event listeners as these one need a browser extension already
+   * configured with user settings in the local storage in order to perform API request.
+   * @deprecated with multi-accounts support
+   *
+   * @listens passbolt.locale.get
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.locale.get', async function(requestId) {
+    const apiClientOptions = (new ApiClientOptions()).setBaseUrl(recoverController.setupEntity.domain);
+    const getRecoverLocaleController = new GetRecoverLocaleController(this.worker, apiClientOptions, recoverController.setupEntity);
+
+    try {
+      const localeEntity = await getRecoverLocaleController.getLocale();
+      worker.port.emit(requestId, 'SUCCESS', localeEntity);
+    } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }

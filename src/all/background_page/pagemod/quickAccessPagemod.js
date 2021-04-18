@@ -23,7 +23,7 @@ QuickAccess.init = function () {
     if (port.name === "quickaccess") {
       this._worker = new Worker(port);
 
-      // Destroy the worker when the quickacess poppup is destroyed.
+      // Destroy the worker when the quickacess popup is destroyed.
       port.onDisconnect.addListener(() => {
         this._worker.destroy('Quickaccess popup got destroyed');
       });
@@ -36,8 +36,9 @@ QuickAccess.init = function () {
       app.events.tag.listen(this._worker);
       app.events.resource.listen(this._worker);
       app.events.secret.listen(this._worker);
-      app.events.siteSettings.listen(this._worker);
+      app.events.organizationSettings.listen(this._worker);
       app.events.tab.listen(this._worker);
+      app.events.locale.listen(this._worker);
 
       // Keep the pagemod event listeners at the end of the list.
       app.events.pagemod.listen(this._worker);

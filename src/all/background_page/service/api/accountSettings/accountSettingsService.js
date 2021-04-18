@@ -36,6 +36,18 @@ class AccountSettingsService extends AbstractService {
   }
 
   /**
+   * Find all account settings
+   *
+   * @returns {Promise<*>} response body
+   * @throws {Error} if options are invalid or API error
+   * @public
+   */
+  async findAll() {
+    const response = this.apiClient.findAll();
+    return response.body;
+  }
+
+  /**
    * Find all themes
    *
    * @returns {Promise<*>} response body
@@ -49,14 +61,14 @@ class AccountSettingsService extends AbstractService {
   }
 
   /**
-   * Change the current user theme
+   * Update the current user theme
    *
    * @param {string} name The theme name to switch on
    * @returns {Promise<*>} response body
    * @throws {Error} if options are invalid or API error
    * @public
    */
-  async change(name) {
+  async updateTheme(name) {
     const data = {value: name};
     const bodyString = this.apiClient.buildBody(data);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/themes`);
@@ -75,7 +87,7 @@ class AccountSettingsService extends AbstractService {
   async updateLocale(locale) {
     const data = {value: locale};
     const bodyString = this.apiClient.buildBody(data);
-    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/locale`);
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/locales`);
     const response = await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
     return response.body;
   }

@@ -36,7 +36,6 @@ Recover.init = function () {
 		],
     onAttach: function (worker) {
       app.events.config.listen(worker);
-      app.events.siteSettings.listen(worker);
       app.events.recover.listen(worker);
 
       /*

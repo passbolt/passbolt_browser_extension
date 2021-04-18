@@ -104,12 +104,15 @@ class UserLocalStorage {
     try {
       UserLocalStorage.assertEntityBeforeSave(userEntity);
       const users = await UserLocalStorage.get();
-      const userIndex = users.findIndex(item => item.id === userEntity.id);
-      if (userIndex === -1) {
-        throw new Error('The user could not be found in the local storage');
+      // If the local storage has been already initialized.
+      if (users) {
+        const userIndex = users.findIndex(item => item.id === userEntity.id);
+        if (userIndex === -1) {
+          throw new Error('The user could not be found in the local storage');
+        }
+        users[userIndex] = Object.assign(users[userIndex], userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
+        await browser.storage.local.set({users});
       }
-      users[userIndex] = Object.assign(users[userIndex], userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
-      await browser.storage.local.set({users});
       lock.release();
     } catch (error) {
       lock.release();

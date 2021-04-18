@@ -12,18 +12,14 @@
  */
 const {User} = require('../user');
 const {Keyring} = require('../keyring');
-const {UserService} = require("../../service/api/user/userService");
 
 class AccountModel {
   /**
    * Constructor
-   *
-   * @param {ApiClientOptions} apiClientOptions
    * @public
    */
-  constructor(apiClientOptions) {
+  constructor() {
     this.keyring = new Keyring();
-    this.userService = new UserService(apiClientOptions);
   }
 
   /**

@@ -15,7 +15,7 @@ const {EntitySchema} = require('../abstract/entitySchema');
 const {UserEntity} = require("../user/userEntity");
 const {SecurityTokenEntity} = require("../securityToken/securityTokenEntity");
 
-const ENTITY_NAME = "account";
+const ENTITY_NAME = "Account";
 
 class AccountEntity extends Entity {
   /**
@@ -52,7 +52,6 @@ class AccountEntity extends Entity {
       "required": [
         "domain",
         "user_id",
-        "token",
         "user_public_armored_key",
         "user_private_armored_key",
         "server_public_armored_key",
@@ -67,6 +66,10 @@ class AccountEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
+        "token" : {
+          "type": "string",
+          "format": "uuid"
+        },
         "user_public_armored_key": {
           "type": "string"
         },
@@ -75,6 +78,14 @@ class AccountEntity extends Entity {
         },
         "server_public_armored_key": {
           "type": "string"
+        },
+        "locale": {
+          "anyOf": [{
+            "type": "string",
+            "pattern": /^[a-z]{2}-[A-Z]{2}$/,
+          }, {
+            "type": "null"
+          }]
         },
         // Associated models
         "user": UserEntity.getSchema(),
@@ -111,7 +122,8 @@ class AccountEntity extends Entity {
       id: this.userId,
       username: this.user.username,
       firstname: this.user.profile.firstName,
-      lastname: this.user.profile.lastName
+      lastname: this.user.profile.lastName,
+      locale: this.user.locale
     };
   }
 

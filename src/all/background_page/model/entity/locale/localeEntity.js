@@ -42,12 +42,15 @@ class LocaleEntity extends Entity {
     return {
       "type": "object",
       "required": [
-        "language"
+        "locale",
       ],
       "properties": {
-        "language": {
+        "locale": {
           "type": "string",
           "pattern": /^[a-z]{2}-[A-Z]{2}$/,
+        },
+        "label": {
+          "type": "string"
         }
       }
     };
@@ -57,11 +60,19 @@ class LocaleEntity extends Entity {
   // Dynamic properties getters
   // ==================================================
   /**
-   * Get locale name
-   * @returns {string} admin or user
+   * Get the locale identifier
+   * @returns {string}
    */
-  get language() {
-    return this._props.language;
+  get locale() {
+    return this._props.locale;
+  }
+
+  /**
+   * Get locale label
+   * @returns {string}
+   */
+  get label() {
+    return this._props.label;
   }
 
   // ==================================================

@@ -141,7 +141,7 @@ class UserSettings {
    */
   validateLocale(locale) {
     const regex = new RegExp("^[a-z]{2}-[A-Z]{2}$");
-    if (locale.match(regex)) {
+    if (!locale.match(regex)) {
       throw new Error('The locale is not valid.');
     }
   }
@@ -272,9 +272,10 @@ class UserSettings {
    * Set a locale for the user
    *
    * @param locale {string} The locale language
+   * @return {Promise<void>}
    * @throw Error if locale is not a valid
    */
-  setLocale(locale) {
+  async setLocale(locale) {
     this.validateLocale(locale);
     return Config.write('user.settings.locale', locale);
   }

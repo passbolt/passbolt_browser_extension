@@ -9,8 +9,11 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         3.2.0
  */
-const {LocaleController} = require("../controller/locale/localeController");
+const {GetLocaleController} = require("../controller/locale/getLocaleController");
+const {LocaleEntity} = require("../model/entity/locale/localeEntity");
+const {LocaleModel} = require("../model/locale/localeModel");
 const {User} = require('../model/user');
 
 const listen = async function (worker) {
@@ -20,13 +23,15 @@ const listen = async function (worker) {
    * @listens passbolt.locale.get
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.locale.language.get', async function(requestId) {
+  worker.port.on('passbolt.locale.get', async function(requestId) {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const localeController = new LocaleController(worker, apiClientOptions);
+    const getLocaleController = new GetLocaleController(worker, apiClientOptions);
+
     try {
-      const localeEntity = await localeController.getLocale();
+      const localeEntity = await getLocaleController.getLocale();
       worker.port.emit(requestId, 'SUCCESS', localeEntity);
     } catch (error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
@@ -37,13 +42,15 @@ const listen = async function (worker) {
    * @listens passbolt.locale.language.update
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.locale.language.update', async function(requestId, localDto) {
+  worker.port.on('passbolt.locale.update-user-locale', async function(requestId, localeDto) {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const localeController = new LocaleController(worker, apiClientOptions);
+    const localeModel = new LocaleModel(apiClientOptions);
     try {
-      await localeController.updateLocale(localDto);
+      const localeToUpdateEntity = new LocaleEntity(localeDto);
+      await localeModel.updateUserLocale(localeToUpdateEntity);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
   });

@@ -1,79 +1,69 @@
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         3.2.0
+ */
 const i18next = require('i18next');
 const HttpApi = require('i18next-http-backend');
 
 /**
- * The supported languages
- * @type {string[]}
+ * The instance of the I18next library.
  */
-const supportedLanguages = [
-  'en-US',
-];
+let _i18next;
 
-/**
- * The fallback language.
- * @type {string}
- */
-const fallbackLanguage = 'en-US';
+class I18n {
 
-/**
- * Get the language to use to translate the application
- * @returns {string|string}
- */
-function getLanguage() {
-  let language = navigator.language;
-
-  if (isSupportedLanguage(language)) {
-    return language;
+  /**
+   * Initialize I18n
+   * @param {string} locale The locale. i.e. en-UK
+   * @param {array<string>} supportedLocales The supported locales. i.e. ['en-UK', 'fr-FR']
+   */
+  static init(locale, supportedLocales) {
+    _i18next = i18next.createInstance();
+    _i18next.use(HttpApi)
+      .init({
+        lng: locale,
+        load: 'currentOnly',
+        backend: {
+          loadPath: '/locales/{{lng}}/{{ns}}.json'
+        },
+        supportedLngs: supportedLocales,
+        fallbackLng: false,
+        ns: ['common'],
+        defaultNS: 'common',
+        keySeparator: false, // don't use the dot for separator of nested json object
+        nsSeparator: false, // allowed ':' in key to avoid namespace separator
+        debug: true,
+      });
   }
 
-  const similarLanguage = findSimilarLanguage(language);
-  if (similarLanguage) {
-    return similarLanguage;
+  /**
+   * Initialize the library with the default locale.
+   */
+  static initWithDefaultLocale() {
+    const defaultLocale = "en-US";
+    const defaultSupportedLocales = [defaultLocale];
+    I18n.init(defaultLocale, defaultSupportedLocales);
   }
 
-  return fallbackLanguage;
+  /**
+   * Interface to the i18next translation function t().
+   * @returns {string}
+   */
+  static t() {
+    if (!_i18next) {
+      I18n.initWithDefaultLocale();
+    }
+    return _i18next.t.apply(_i18next, arguments);
+  }
 }
 
-/**
- * Check if the given langauge is supported
- * @param {string} language The language to test
- * @returns {boolean}
- */
-function isSupportedLanguage(language) {
-  return supportedLanguages.includes(language);
-}
-
-/**
- * Find the first similar language
- * By instance if en-US is supported but not en-UK, then en-US will be a similar language of en-UK
- * @param {string} language The language to find a similar one
- * @returns {string}
- */
-function findSimilarLanguage(language) {
-  const nonExplicitLanguage = language.split('-')[0];
-  return supportedLanguages.find(supportedLanguage => nonExplicitLanguage === supportedLanguage.split('-')[0]);
-}
-
-// Initialize i18n with the browser default language.
-const language = getLanguage();
-i18next
-  .use(HttpApi)
-  .init({
-    lng: language,
-    load: 'currentOnly',
-    react: {
-      useSuspense: false,
-    },
-    backend: {
-      loadPath: '/locales/{{lng}}/{{ns}}.json'
-    },
-    supportedLngs: supportedLanguages,
-    fallbackLng: false,
-    ns: ['common'],
-    defaultNS: 'common',
-    keySeparator: false, // don't use the dot for separator of nested json object
-    nsSeparator: false, // allowed ':' in key to avoid namespace separator
-    debug: true,
-  });
-
-exports.i18n = i18next;
+exports.i18n = I18n;

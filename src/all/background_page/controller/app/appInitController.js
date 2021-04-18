@@ -30,7 +30,7 @@ class AppInitController {
   }
 
   /**
-   * Sync the user settings
+   * Synchronize the user settings
    * @returns {Promise<void>}
    * @private
    */
@@ -39,7 +39,7 @@ class AppInitController {
     try {
       await user.settings.sync()
     } catch (error) {
-      // fail silently for CE users
+      // @deprecated with v4. The /account/settings entry point exist since v3.0 in CE.
       user.settings.setDefaults();
     }
   }

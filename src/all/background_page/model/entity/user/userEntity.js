@@ -107,6 +107,15 @@ class UserEntity extends Entity {
             "type": "null"
           }]
         },
+        "locale": {
+          "anyOf": [{
+            "type": "string",
+            "pattern": /^[a-z]{2}-[A-Z]{2}$/,
+          }, {
+            "type": "null"
+          }]
+        },
+        // Associated models
         "role": RoleEntity.getSchema(),
         "profile": ProfileEntity.getSchema(),
         "gpgkey": GpgkeyEntity.getSchema(),
@@ -272,6 +281,22 @@ class UserEntity extends Entity {
       return null;
     }
     return this._props.is_mfa_enabled;
+  }
+
+  /**
+   * Get the user locale.
+   * @returns {(string|null)}
+   */
+  get locale() {
+    return this._props.locale || null;
+  }
+
+  /**
+   * Set the user locale
+   * @params {string} locale The locale to set
+   */
+  set locale(locale) {
+    this._props.locale = locale;
   }
 
   /**

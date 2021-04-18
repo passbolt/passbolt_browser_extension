@@ -12,6 +12,7 @@
  * @since         2.9.0
  */
 const Uuid = require('../utils/uuid');
+const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
 
 const {AuthService} = require('../service/auth');
 const {User} = require('./user');
@@ -21,7 +22,7 @@ const {GpgAuthToken} = require('./gpgAuthToken');
 const {GpgAuthHeader} = require('./gpgAuthHeader');
 const {MfaAuthenticationRequiredError} = require('../error/mfaAuthenticationRequiredError');
 const {Request} = require('./request');
-const {SiteSettings} = require('./siteSettings');
+const {OrganizationSettingsModel} = require('./organizationSettings/organizationSettingsModel');
 const {AuthStatusLocalStorage} = require('../service/local_storage/authStatusLocalStorage');
 
 const URL_VERIFY = '/auth/verify.json?api-version=v2';
@@ -378,8 +379,9 @@ class GpgAuth {
     // Define the check interval based on the server session timeout.
     if (AuthService.useLegacyIsAuthenticatedEntryPoint === true) {
       const domain = User.getInstance().settings.getDomain();
-      const siteSettings = new SiteSettings(domain);
-      const settings = await siteSettings.get();
+      const apiClientOptions = (new ApiClientOptions()).setBaseUrl(domain);
+      const organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+      const settings = await organizationSettingsModel.getOrFind();
       // By default a default php session expires after 24 min.
       let sessionTimeout = 24;
       // Check if the session timeout is provided in the settings.

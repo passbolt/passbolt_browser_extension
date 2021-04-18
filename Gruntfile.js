@@ -279,7 +279,7 @@ module.exports = function (grunt) {
           expand: true
         }, {
           // Locales
-          cwd: path.node_modules + 'passbolt-styleguide/src/locales',
+          cwd: path.node_modules + 'passbolt-styleguide/build/locales',
           src: ['**'],
           dest: path.build_data + 'locales',
           expand: true

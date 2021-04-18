@@ -54,7 +54,7 @@ class ThemeModel {
    * @public
    */
   async change(changeThemeEntity) {
-    await this.accountSettingsService.change(changeThemeEntity.name);
+    await this.accountSettingsService.updateTheme(changeThemeEntity.name);
     Config.write('user.settings.theme', changeThemeEntity.name);
   }
 }

@@ -7,6 +7,7 @@ import Request from "../../lib/request";
 import Message from "../../lib/message";
 import SecretComplexity from "../../lib/secretComplexity";
 import AppContext from "./contexts/AppContext";
+import TranslationProvider from "./components/Internationalisation/TranslationProvider";
 import FilterResourcesByFavoritePage from "./components/FilterResourcesByFavoritePage/FilterResourcesByFavoritePage";
 import FilterResourcesByItemsIOwnPage from "./components/FilterResourcesByItemsIOwnPage/FilterResourcesByItemsIOwnPage";
 import FilterResourcesByGroupPage from "./components/FilterResourcesByGroupPage/FilterResourcesByGroupPage";
@@ -26,8 +27,6 @@ import {BrowserRouter as Router, Route} from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import AnimatedSwitch from "./components/AnimatedSwitch/AnimatedSwitch";
 import PassphraseDialog from "./components/PassphraseDialog/PassphraseDialog";
-import {Trans, withTranslation} from "react-i18next";
-import TranslationProvider from "./components/Internationalisation/TranslationProvider";
 
 const SEARCH_VISIBLE_ROUTES = [
   '/data/quickaccess.html',
@@ -75,6 +74,7 @@ class QuickAccess extends React.Component {
     await this.getUser();
     this.checkAuthStatus();
     this.getSiteSettings();
+    this.getLocale();
   }
 
   initState() {
@@ -82,6 +82,7 @@ class QuickAccess extends React.Component {
       isAuthenticated: null,
       user: null,
       siteSettings: null,
+      locale: "en-US", // To avoid any weird blink, launch the quickaccess with a default english locale
       // Search
       search: "",
       searchHistory: {},
@@ -115,8 +116,13 @@ class QuickAccess extends React.Component {
   }
 
   async getSiteSettings() {
-    const siteSettings = await passbolt.request('passbolt.site.settings');
+    const siteSettings = await passbolt.request('passbolt.organization-settings.get');
     this.setState({siteSettings});
+  }
+
+  async getLocale() {
+    const {locale} = await passbolt.request("passbolt.locale.get");
+    this.setState({locale});
   }
 
   async checkAuthStatus() {
@@ -159,22 +165,23 @@ class QuickAccess extends React.Component {
   isReady() {
     return this.state.isAuthenticated !== null
       && this.state.user !== null
-      && window.self.port !== undefined && window.self.port._connected;
+      && this.state.locale !== null
+      && this.state.siteSettings !== null;
   }
 
   render() {
     const isReady = this.isReady();
 
     return (
-      <TranslationProvider>
-        <Router>
-          <Route render={(props) => (
-            <AppContext.Provider value={this.state}>
+      <AppContext.Provider value={this.state}>
+        <TranslationProvider loadingPath="/data/locales/{{lng}}/{{ns}}.json">
+          <Router>
+            <Route render={(props) => (
               <div className="container page quickaccess" onKeyDown={this.handleKeyDown}>
                 <Header logoutSuccessCallback={this.logoutSuccessCallback}/>
                 {!isReady &&
                 <div className="processing-wrapper">
-                  <p className="processing-text"><Trans>Connecting your account</Trans></p>
+                  <p className="processing-text">Connecting your account</p>
                 </div>
                 }
                 {isReady &&
@@ -207,13 +214,38 @@ class QuickAccess extends React.Component {
                 </React.Fragment>
                 }
               </div>
-            </AppContext.Provider>
-          )}/>
-        </Router>
-      </TranslationProvider>
+            )}/>
+          </Router>
+        </TranslationProvider>
+      </AppContext.Provider>
     );
   }
 }
 
-const domContainer = document.querySelector('#quickaccess-container');
-ReactDOM.render(React.createElement(withTranslation('common')(QuickAccess)), domContainer);
+/**
+ * Wait until the background pagemod is ready.
+ * @returns {Promise}
+ */
+async function waitPagemodIsReady() {
+  let resolver;
+  const promise = new Promise(resolve => {
+    resolver = resolve;
+  });
+
+  const checkInterval = setInterval(() => {
+    passbolt.request("passbolt.pagemod.is-ready").then(() => {
+      resolver();
+      clearInterval(checkInterval);
+    });
+  }, 50);
+
+  return promise;
+}
+
+async function main() {
+  await waitPagemodIsReady();
+  const domContainer = document.querySelector('#quickaccess-container');
+  ReactDOM.render(React.createElement(QuickAccess), domContainer);
+}
+
+main();

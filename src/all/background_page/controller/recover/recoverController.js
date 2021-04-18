@@ -52,8 +52,7 @@ class RecoverController {
     const serverKeyDto = await this.authModel.getServerKey();
     await this.keyring.keyInfo(serverKeyDto.armored_key);
     this.setupEntity.serverPublicArmoredKey = serverKeyDto.armored_key;
-    const userEntity = await this.setupModel.findRecoverInfo(this.setupEntity.userId, this.setupEntity.token);
-    this.setupEntity.user = userEntity;
+    this.setupEntity.user = await this.setupModel.findRecoverInfo(this.setupEntity.userId, this.setupEntity.token);
     return this.setupEntity;
   }
 

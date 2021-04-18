@@ -9,52 +9,78 @@
  * @copyright     Copyright (c) 2020 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since        3.0.3
+ * @since        3.2.0
  */
 import i18n from 'i18next';
-import {initReactI18next} from 'react-i18next';
+import {I18nextProvider} from 'react-i18next';
 import HttpApi from 'i18next-http-backend';
-import {Component} from "react";
+import React, {Component} from "react";
 import PropTypes from "prop-types";
-
-/**
- * The supported languages
- * @type {string[]}
- */
-const supportedLanguages = [
-  'en-US',
-];
-
-/**
- * The fallback language.
- * @type {string}
- */
-const fallbackLanguage = 'en-US';
+import AppContext from "../../contexts/AppContext";
 
 /**
  * The locales default path.
  * @type {string}
  */
-const defaultLocalesPath = '/data/locales/{{lng}}/{{ns}}.json';
+const defaultLocalesPath = '/locales/{{lng}}/{{ns}}.json';
 
 /**
  * This component set up the translation process
  */
 class TranslationProvider extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = this.defaultState;
+  }
+
   /**
-   *
-   * @returns {Promise<void>}
-   * @constructor
+   * Returns the default component state
    */
-  async UNSAFE_componentWillMount() {
-    const language = this.getLanguage();
-    await i18n
+  get defaultState() {
+    return {
+      i18next: null // The i18next instance
+    };
+  }
+
+  /**
+   * ComponentDidMount
+   * Invoked immediately after component is inserted into the tree
+   * @return {void}
+   */
+  componentDidMount() {
+    this.initI18next();
+  }
+
+  /**
+   * Whenever the component has updated in terms of props
+   */
+  async componentDidUpdate() {
+    await this.handleLocaleChange();
+  }
+
+  /**
+   * Check if the locale has changed and update
+   */
+  async handleLocaleChange() {
+    const hasLocaleChanged = this.state.i18next && this.locale !== this.state.i18next.language;
+    if (hasLocaleChanged) {
+      this.initI18next();
+    }
+  }
+
+  /**
+   * Initialize i18next
+   * @returns {Promise<void>}
+   */
+  async initI18next() {
+    const i18next = i18n.createInstance();
+    await i18next
       // pass the i18n instance to react-i18next.
-      .use(initReactI18next)
       .use(HttpApi)
       // init i18next, for all options read: https://www.i18next.com/overview/configuration-options
       .init({
-        lng: language,
+        lng: this.locale,
         load: 'currentOnly',
         react: {
           useSuspense: false,
@@ -62,53 +88,41 @@ class TranslationProvider extends Component {
         backend: {
           loadPath: this.props.loadingPath || defaultLocalesPath
         },
-        supportedLngs: supportedLanguages,
+        supportedLngs: this.supportedLocales,
         fallbackLng: false,
         ns: ['common'],
         defaultNS: 'common',
-        keySeparator: false, // don't use the dot for separator of nested/ShareVariesDetails.js json object
+        keySeparator: false, // don't use the dot for separator of nested json object
         nsSeparator: false, // allowed ':' in key to avoid namespace separator
         debug: true,
-      });
+      }, () => this.setState({i18next}));
   }
 
   /**
-   * Get the language to use to translate the application
-   * @returns {string|string}
+   * Get the locale
+   * @type {string}
    */
-  getLanguage() {
-    let language = navigator.language;
+  get locale() {
+    return this.context.locale;
+  }
 
-    if (this.isSupportedLanguage(language)) {
-      return language;
+  /**
+   * Get supported locales.
+   * @returns {string[]}
+   */
+  get supportedLocales() {
+    if (!this.context.siteSettings || !this.context.siteSettings.supportedLocales) {
+      return [this.locale];
     }
-
-    const similarLanguage = this.findSimilarLanguage(language);
-    if (similarLanguage) {
-      return similarLanguage;
-    }
-
-    return fallbackLanguage;
+    return this.context.siteSettings.supportedLocales.map(supportedLocale => supportedLocale.locale);
   }
 
   /**
-   * Check if the given langauge is supported
-   * @param {string} language The language to test
-   * @returns {boolean}
+   * Returns true when the component can be rendered
    */
-  isSupportedLanguage(language) {
-    return supportedLanguages.includes(language);
-  }
-
-  /**
-   * Find the first similar language
-   * By instance if en-US is supported but not en-UK, then en-US will be a similar language of en-UK
-   * @param {string} language The language to find a similar one
-   * @returns {string}
-   */
-  findSimilarLanguage(language) {
-    const nonExplicitLanguage = language.split('-')[0];
-    return supportedLanguages.find(supportedLanguage => nonExplicitLanguage === supportedLanguage.split('-')[0]);
+  get isReady() {
+    // Waiting for the i18n initialization to be completed
+    return this.state.i18next !== null;
   }
 
   /**
@@ -116,12 +130,20 @@ class TranslationProvider extends Component {
    * @returns {JSX}
    */
   render() {
-    return ({...this.props.children});
+    return (
+      <>
+        {this.isReady &&
+        <I18nextProvider i18n={this.state.i18next}>
+          {this.props.children}
+        </I18nextProvider>
+        }
+      </>
+    );
   }
 }
 
+TranslationProvider.contextType = AppContext;
 TranslationProvider.propTypes = {
-  defaultLanguage: PropTypes.string, // The default language
   loadingPath: PropTypes.any, // The way to load translations files
   children: PropTypes.any, // The children components
 };

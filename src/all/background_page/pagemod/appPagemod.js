@@ -7,6 +7,7 @@
 const {PageMod} = require('../sdk/page-mod');
 const app = require('../app');
 const Worker = require('../model/worker');
+const {AppInitController} = require("../controller/app/appInitController");
 const GpgAuth = require('../model/gpgauth').GpgAuth;
 
 /*
@@ -31,14 +32,17 @@ App.init = function () {
       // chrome/data/passbolt-iframe-app.html
     ],
     onAttach: async function (worker) {
-      const locale = await browser.tabs.detectLanguage();
-      console.log(locale);
-
       const auth = new GpgAuth();
       if (!await auth.isAuthenticated() || await auth.isMfaRequired()) {
         console.error('Can not attach application if user is not logged in.');
         return;
       }
+
+      // Init the application.
+      const appInitController = new AppInitController();
+      await appInitController.main();
+
+      app.events.appBootstrap.listen(worker);
 
       // Initialize the events listeners.
       app.events.app.listen(worker);
@@ -51,7 +55,7 @@ App.init = function () {
       app.events.role.listen(worker);
       app.events.keyring.listen(worker);
       app.events.secret.listen(worker);
-      app.events.siteSettings.listen(worker);
+      app.events.organizationSettings.listen(worker);
       app.events.share.listen(worker);
       app.events.subscription.listen(worker);
       app.events.user.listen(worker);

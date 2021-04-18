@@ -87,6 +87,14 @@ class SetupEntity extends Entity {
         "server_public_armored_key": {
           "type": "string"
         },
+        "locale": {
+          "anyOf": [{
+            "type": "string",
+            "pattern": /^[a-z]{2}-[A-Z]{2}$/,
+          }, {
+            "type": "null"
+          }]
+        },
         // Associated models
         "user": UserEntity.getSchema(),
         "security_token": SecurityTokenEntity.getSchema(),
@@ -161,6 +169,9 @@ class SetupEntity extends Entity {
       },
       gpgkey: {
         armored_key: this.userPublicArmoredKey
+      },
+      user: {
+        locale: this.locale
       }
     }
   }
@@ -174,15 +185,17 @@ class SetupEntity extends Entity {
   }
 
   toAccountDto() {
-    return {
+    const accountDto = {
       domain: this.domain,
       user_id: this.userId,
       user: this.user.toDto(UserEntity.ALL_CONTAIN_OPTIONS),
       user_public_armored_key: this.userPublicArmoredKey,
       user_private_armored_key: this.userPrivateArmoredKey,
       server_public_armored_key: this.serverPublicArmoredKey,
-      security_token: this.securityToken.toDto()
+      security_token: this.securityToken.toDto(),
     };
+    accountDto.user.locale = this.locale;
+    return accountDto;
   }
 
   /**
@@ -308,6 +321,23 @@ class SetupEntity extends Entity {
   set serverPublicArmoredKey(armoredKey) {
     EntitySchema.validateProp("server_public_armored_key", armoredKey, SetupEntity.getSchema().properties.server_public_armored_key);
     this._props.server_public_armored_key = armoredKey;
+  }
+
+  /**
+   * Get the setup locale
+   * @returns {(string|null)}
+   */
+  get locale() {
+    return this._props.locale || null;
+  }
+
+  /**
+   * Set the setup locale
+   * @params {string} locale The locale
+   */
+  set locale(locale) {
+    EntitySchema.validateProp("locale", locale, SetupEntity.getSchema().properties.locale);
+    this._props.locale = locale;
   }
 
   // ==================================================

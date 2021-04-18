@@ -1,11 +1,11 @@
 import browser from "webextension-polyfill/dist/browser-polyfill";
 import React from "react";
+import PropTypes from "prop-types";
+import {Trans, withTranslation} from "react-i18next";
 import {Link} from "react-router-dom";
 import AppContext from "../../contexts/AppContext";
 import SimpleBar from "../SimpleBar/SimpleBar";
 import canSuggestUrl from "./canSuggestUrl";
-import PropTypes from "prop-types";
-import {Trans, withTranslation} from "react-i18next";
 
 const SUGGESTED_RESOURCES_LIMIT = 20;
 const BROWSED_RESOURCES_LIMIT = 500;

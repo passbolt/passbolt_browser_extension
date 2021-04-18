@@ -28,7 +28,7 @@ describe("Locale entity", () => {
 
   it("constructor works if valid minimal DTO is provided", () => {
     const dto = {
-      "language": "en-US",
+      "locale": "en-US",
     };
 
     const entity = new LocaleEntity(dto);
@@ -41,20 +41,20 @@ describe("Locale entity", () => {
     } catch(error) {
       expect(error).toBeInstanceOf(EntityValidationError);
       expect(typeof error.details).toEqual("object");
-      expect(error.details.language).not.toBeUndefined();
+      expect(error.details.locale).not.toBeUndefined();
     }
   });
 
   it("constructor returns validation error if dto required fields are invalid", () => {
     try {
       new LocaleEntity({
-        "language": "🏆‍️"
+        "locale": "🏆‍️"
       });
       expect(false).toBe(true);
     } catch(error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        language: { pattern: 'The language is not valid.' },
+        locale: { pattern: 'The locale is not valid.' },
       });
     }
   });

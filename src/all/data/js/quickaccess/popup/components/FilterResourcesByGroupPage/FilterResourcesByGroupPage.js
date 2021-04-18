@@ -318,7 +318,7 @@ class FilterResourcesByGroupPage extends React.Component {
         </SimpleBar>
         <div className="submit-wrapper">
           <Link to="/data/quickaccess/resources/create" id="popupAction" className="button primary big full-width" role="button">
-            <Trans>create new</Trans>
+            <Trans>Create new</Trans>
           </Link>
         </div>
       </div>

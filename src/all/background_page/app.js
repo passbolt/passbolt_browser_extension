@@ -48,7 +48,7 @@ events.tab = require('./event/tabEvents');
 events.tag = require('./event/tagEvents');
 events.theme = require('./event/themeEvents');
 events.user = require('./event/userEvents');
-events.siteSettings = require('./event/siteSettingsEvents');
+events.organizationSettings = require('./event/organizationSettingsEvents');
 events.locale = require('./event/localeEvents');
 
 exports.events = events;

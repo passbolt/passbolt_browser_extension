@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) 2020 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.3.0
+ * @since         3.2.0
  */
 import React from "react";
 import ReactDOM from "react-dom";
@@ -42,7 +42,7 @@ async function waitPagemodIsReady() {
 async function main() {
   await waitPagemodIsReady();
   const domContainer = document.querySelector('#quickaccess-container');
-  ReactDOM.render(React.createElement(ExtQuickAccess,{port: port, storage: storage}), domContainer);
+  ReactDOM.render(React.createElement(ExtQuickAccess, {port: port, storage: storage}), domContainer);
 }
 
 main();

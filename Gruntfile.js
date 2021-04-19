@@ -156,7 +156,7 @@ module.exports = function (grunt) {
       },
       data: {
         files: [
-          { expand: true, cwd: path.src + 'data', src: ['**', '!js/app/**'], dest: path.build + 'data' }
+          { expand: true, cwd: path.src + 'data', src: ['**', '!js/app/**'], dest: path.build_data }
         ]
       },
       locales: {

@@ -38,7 +38,7 @@ class SetupController {
    */
   constructor(worker, url) {
     this.worker = worker;
-    this.setupEntity = SetupEntity.createFromUrl(url);
+    this.setupEntity = SetupEntity.createFromUrl(url, true);
     const apiClientOptions = (new ApiClientOptions()).setBaseUrl(this.setupEntity.domain);
     this.setupModel = new SetupModel(apiClientOptions);
     this.authModel = new AuthModel(apiClientOptions);

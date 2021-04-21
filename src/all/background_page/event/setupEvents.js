@@ -13,6 +13,7 @@
 const {OrganizationSettingsModel} = require("../model/organizationSettings/organizationSettingsModel");
 const {SetupController} = require("../controller/setup/setupController");
 const Worker = require('../model/worker');
+const {SetSetupLocaleController} = require("../controller/locale/setSetupLocaleController");
 const {GetSetupLocaleController} = require("../controller/locale/getSetupLocaleController");
 const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
 
@@ -45,7 +46,7 @@ const listen = function (worker) {
   /*
    * Get runtime locale.
    *
-   * The recover PageMod cannot use the common locale event listeners as these one need a browser extension already
+   * The setup PageMod cannot use the common locale event listeners as these one need a browser extension already
    * configured with user settings in the local storage in order to perform API request.
    * @deprecated with multi-accounts support
    *
@@ -59,6 +60,23 @@ const listen = function (worker) {
     try {
       const localeEntity = await getSetupLocaleController.getLocale();
       worker.port.emit(requestId, 'SUCCESS', localeEntity);
+    } catch (error) {
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Set the user locale.
+   *
+   * @listens passbolt.locale.update-user-locale
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.locale.update-user-locale', async function(requestId, localeDto) {
+    try {
+      const apiClientOptions = (new ApiClientOptions()).setBaseUrl(setupController.setupEntity.domain);
+      const setSetupLocaleController = new SetSetupLocaleController(this.worker, apiClientOptions, setupController.setupEntity);
+      await setSetupLocaleController.setLocale(localeDto);
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }

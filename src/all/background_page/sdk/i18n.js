@@ -49,7 +49,7 @@ class I18n {
    * Initialize the library with the default locale.
    */
   static initWithDefaultLocale() {
-    const defaultLocale = "en-US";
+    const defaultLocale = "en-UK";
     const defaultSupportedLocales = [defaultLocale];
     I18n.init(defaultLocale, defaultSupportedLocales);
   }

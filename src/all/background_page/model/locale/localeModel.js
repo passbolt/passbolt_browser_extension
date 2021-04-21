@@ -25,7 +25,7 @@ class LocaleModel {
    */
   static get DEFAULT_LOCALE() {
     return new LocaleEntity({
-      locale: 'en-US',
+      locale: 'en-UK',
       label: 'English'
     });
   }

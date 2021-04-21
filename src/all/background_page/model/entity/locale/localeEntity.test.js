@@ -28,7 +28,7 @@ describe("Locale entity", () => {
 
   it("constructor works if valid minimal DTO is provided", () => {
     const dto = {
-      "locale": "en-US",
+      "locale": "en-UK",
     };
 
     const entity = new LocaleEntity(dto);

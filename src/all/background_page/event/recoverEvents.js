@@ -13,6 +13,7 @@
 const {OrganizationSettingsModel} = require("../model/organizationSettings/organizationSettingsModel");
 const {RecoverController} = require("../controller/recover/recoverController");
 const Worker = require('../model/worker');
+const {SetRecoverLocaleController} = require("../controller/locale/setRecoverLocaleController");
 const {GetRecoverLocaleController} = require("../controller/locale/getRecoverLocaleController");
 const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
 
@@ -61,6 +62,23 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'SUCCESS', localeEntity);
     } catch (error) {
       console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Set the user locale.
+   *
+   * @listens passbolt.locale.update-user-locale
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.locale.update-user-locale', async function(requestId, localeDto) {
+    try {
+      const apiClientOptions = (new ApiClientOptions()).setBaseUrl(recoverController.setupEntity.domain);
+      const setRecoverLocaleController = new SetRecoverLocaleController(this.worker, apiClientOptions, recoverController.setupEntity);
+      await setRecoverLocaleController.setLocale(localeDto);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });

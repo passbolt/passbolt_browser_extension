@@ -1,5 +1,5 @@
 /**
- * Get locale controller has for aim to retrieve the locale for the recover application.
+ * Get locale controller has for aim to retrieve the locale for the setup application.
  *
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)

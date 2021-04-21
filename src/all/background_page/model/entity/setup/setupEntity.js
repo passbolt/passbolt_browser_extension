@@ -104,18 +104,27 @@ class SetupEntity extends Entity {
 
   /**
    * Create a setup entity from an url.
-   * @param {string} url The url to parse
+   * @param {string} setupUrl The url to parse
+   * @param {boolean} detectLocale (optional) Detect the locale from the url. Default false. It's useful for the setup
+   * to capture the locale on the page where the user has to download the extension and continue with it.
    * @return {SetupEntity}
    */
-  static createFromUrl(url) {
+  static createFromUrl(setupUrl, detectLocale = false) {
     const uuidRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}";
     const regex = new RegExp(`(.*)\/setup\/(install|recover)\/(${uuidRegex})\/(${uuidRegex})`);
-    if (regex.test(url)) {
-      const [, domain, , user_id, token] = url.match(regex);
+    if (regex.test(setupUrl)) {
+      const [, domain, , user_id, token] = setupUrl.match(regex);
       const setupDto = {
         domain,
         user_id,
         token,
+      }
+      if (detectLocale) {
+        const url = new URL(setupUrl);
+        const locale = url.searchParams.get('locale');
+        if (locale) {
+          setupDto.locale = locale;
+        }
       }
       return new SetupEntity(setupDto);
     }

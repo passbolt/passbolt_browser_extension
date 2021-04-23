@@ -37,9 +37,9 @@ class GetRecoverLocaleController {
   async getLocale() {
     let recoverLocale, userLocale;
     if (this.recoverEntity.locale) {
-      recoverLocale = this.localeModel.getSupportedLocale(this.recoverEntity.locale);
+      recoverLocale = await this.localeModel.getSupportedLocale(this.recoverEntity.locale);
     } else if (this.recoverEntity.user && this.recoverEntity.user.locale) {
-      userLocale = this.localeModel.getSupportedLocale(this.recoverEntity.user.locale);
+      userLocale = await this.localeModel.getSupportedLocale(this.recoverEntity.user.locale);
     }
 
     const locale = recoverLocale

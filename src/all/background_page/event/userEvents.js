@@ -13,6 +13,7 @@ const {UserDeleteTransferEntity} = require('../model/entity/user/transfer/userDe
 const {AvatarUpdateEntity} = require("../model/entity/avatar/update/avatarUpdateEntity");
 const {SecurityTokenEntity} = require("../model/entity/securityToken/securityTokenEntity");
 const fileController = require('../controller/fileController');
+const {AccountModel} = require("../model/account/accountModel");
 
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
 

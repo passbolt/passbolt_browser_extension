@@ -21,7 +21,7 @@ beforeEach(() => {
   jest.resetModules();
 });
 
-describe("Role entity", () => {
+describe("Avatar entity", () => {
   it("schema must validate", () => {
     EntitySchema.validateSchema(AvatarEntity.ENTITY_NAME, AvatarEntity.getSchema());
   });

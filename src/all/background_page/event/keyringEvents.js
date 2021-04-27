@@ -119,11 +119,11 @@ const listen = function (worker) {
   });
 
   /*
- * Offer to users to download their private key
- *
- * @listens passbolt.keyring.download-my-private-key
- * @param requestId {uuid} The request identifier
- */
+   * Offer to users to download their private key
+   *
+   * @listens passbolt.keyring.download-my-private-key
+   * @param requestId {uuid} The request identifier
+   */
   worker.port.on('passbolt.keyring.download-my-private-key', async function (requestId) {
     let filename = "passbolt_private.asc";
     try {
@@ -139,5 +139,24 @@ const listen = function (worker) {
     }
   });
 
+  /*
+   * Get private key
+   *
+   * @listens passbolt.keyring.get-private-key
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.keyring.get-private-key', async function (requestId) {
+    try {
+      await passphraseController.request(worker);
+      const privateKeyInfo = await keyring.findPrivate();
+      if (!privateKeyInfo) {
+        throw new Error('Private key not found.');
+      }
+      worker.port.emit(requestId, 'SUCCESS', privateKeyInfo);
+    } catch(error) {
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
 };
 exports.listen = listen;
+

@@ -32,7 +32,13 @@ const config = {
       }
     },
   },
-  resolve: {extensions: ["*", ".js", ".jsx"]},
+  resolve: {
+    alias: {
+      'react': path.resolve('./node_modules/react'),
+      'react-dom': path.resolve('./node_modules/react-dom')
+    },
+    extensions: ["*", ".js", ".jsx"]
+  },
   output: {
     path: path.resolve(__dirname, './build/all/data/js/dist'),
     pathinfo: true,

@@ -49,7 +49,7 @@ const config = {
 exports.default = function (env) {
   env = env || {};
   // Enable debug mode.
-  if (env && env.debug) {
+  if (env == "development") {
     config.mode = "development";
     config.devtool = "inline-source-map";
   }

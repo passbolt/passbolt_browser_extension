@@ -10,6 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+const {BinaryConvert} = require("../../../utils/format/binaryConvert");
 const {ImportError} = require("../../../error/importError");
 const {FileFormatError} = require("../../../error/fileFormatError");
 const {ExternalFoldersCollection} = require("../../entity/folder/external/externalFoldersCollection");
@@ -71,7 +72,8 @@ class ResourcesCsvImportParser {
    * @returns {{data: <array<object>>, fields: <array<string>>}}
    */
   readCsv() {
-    const csv = atob(this.importEntity.file);
+    const decoded = atob(this.importEntity.file);
+    const csv = BinaryConvert.fromBinary(decoded);
     const {data, errors, meta: {fields}} = PapaParse.parse(csv, {header: true, skipEmptyLines: true});
     // For now, no papaparse controlled errors are a blocking the import process
     return {data, fields};

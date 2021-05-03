@@ -50,7 +50,7 @@ class FavoriteService extends AbstractService {
     this.assertValidForeignModel(foreignModel);
     this.assertValidId(foreignId);
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${foreignModel.toLowerCase()}/${foreignId}`, {});
-    const response = await this.apiClient.fetchAndHandleResponse('POST', url, {});
+    const response = await this.apiClient.fetchAndHandleResponse('POST', url);
     return response.body;
   }
 

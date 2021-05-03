@@ -53,7 +53,7 @@ const listen = function (worker) {
 
       // Current active tab's url is passing to quick access to check the same origin request
       const webIntegrationWorker = await Worker.get('WebIntegration', tab.id);
-      await webIntegrationWorker.port.emit('passbolt.quickaccess.fill-form', username, password, tab.url);
+      await webIntegrationWorker.port.request('passbolt.quickaccess.fill-form', username, password, tab.url);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);

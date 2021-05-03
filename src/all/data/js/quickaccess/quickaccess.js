@@ -323,8 +323,8 @@ $(function () {
   };
 
   passbolt.quickaccess.bootstrap = function () {
-    passbolt.message.on('passbolt.quickaccess.fill-form', function (username, secret, url) {
-      const quickaccessFormData = { username, secret, url };
+    passbolt.message.on('passbolt.quickaccess.fill-form', function (requestId, username, secret, url) {
+      const quickaccessFormData = { requestId, username, secret, url };
       fillForm(quickaccessFormData);
     });
   };

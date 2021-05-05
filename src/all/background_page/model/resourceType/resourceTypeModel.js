@@ -14,6 +14,7 @@
 const {ResourceTypesCollection} = require('../entity/resourceType/resourceTypesCollection');
 const {ResourceTypeLocalStorage} = require('../../service/local_storage/resourceTypeLocalStorage');
 const {ResourceTypeService} = require('../../service/api/resourceType/resourceTypeService');
+const PassboltApiFetchError = require('../../error/passboltApiFetchError').PassboltApiFetchError;
 
 class ResourceTypeModel {
   /**
@@ -60,7 +61,7 @@ class ResourceTypeModel {
       return new ResourceTypesCollection(resourceTypeDtos);
     }
     return this.updateLocalStorage();
-  };
+  }
 
   /**
    * Return the secret section of the schema definition for a given resource type id

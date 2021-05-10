@@ -41,7 +41,7 @@ class I18n {
         defaultNS: 'common',
         keySeparator: false, // don't use the dot for separator of nested json object
         nsSeparator: false, // allowed ':' in key to avoid namespace separator
-        debug: true,
+        debug: false,
       });
   }
 

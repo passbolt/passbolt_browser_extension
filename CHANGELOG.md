@@ -3,6 +3,33 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- PB-5054 French internationalization
+- PB-5526 As AD I can manage the subscription key from the administration panel
+
+### Fixed
+- PB-5366 Fix share autocomplete search results can be invalid
+- PB-5498 Fix image version displayed after avatar upload
+- PB-5861 Fix serializePlaintextDto should validate secret maxlength if resourceTypeId is set to legacy type, or not set
+- PB-5909 Fix as LU aborting a preview operation I should not see an empty preview
+- PB-5983 Fix as LU I can import passwords with non latin characters
+- PB-6008 Fix as LU I should get a feedback in the quickaccess when I try to autofill credentials on a page, but an error occurred
+- PB-6080 Fix add favorites fetch payload error
+
+### Improvement
+- PB-5443 As LU I should get a visual feedback when the maximum length of the secret fields is reached so that I do not loose data
+- PB-5455 As LU selecting a description order to copy it should not enter the description edit mode
+- PB-5496 As LU updating my avatar I should see the error message if an error occurred
+- PB-5857 As LU I should be able to change the user role in the create/edit user dialog by clicking on the checkbox label
+
+### Security
+- PB-6012 Fix the quickaccess suggestion component should not suggest TLD entries (PB-01-002)
+
+### Maintenance
+- PB-5069 Migrate moment to Luxon
+- PB-5884 Move quickaccess front end code to the styleguide repository
+- PB-5887 Fix semantic gap in naming conventions in styleguide
+- PB-5959 Bump webpack to v5
 
 ## [3.1.0] - 2021-03-17
 ### Added

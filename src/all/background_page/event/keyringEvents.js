@@ -152,7 +152,7 @@ const listen = function (worker) {
       if (!privateKeyInfo) {
         throw new Error('Private key not found.');
       }
-      worker.port.emit(requestId, 'SUCCESS', privateKeyInfo);
+      worker.port.emit(requestId, 'SUCCESS', privateKeyInfo.key);
     } catch(error) {
       worker.port.emit(requestId, 'ERROR', error);
     }

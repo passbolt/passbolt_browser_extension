@@ -14,13 +14,13 @@
 const {OrganizationSettingsEntity} = require("../entity/organizationSettings/organizationSettingsEntity");
 const {OrganizationSettingsService} = require("../../service/api/organizationSettings/organizationSettingsService");
 
+// Settings local cache.
+let _settings;
+
 /**
  * Organization settings model.
  */
 class OrganizationSettingsModel {
-
-  // Local organization settings entity cached
-  static _settings;
 
   /**
    * Constructor
@@ -38,11 +38,11 @@ class OrganizationSettingsModel {
    * @returns {Promise<OrganizationSettingsEntity>}
    */
   async getOrFind(refreshCache) {
-    if (refreshCache || !OrganizationSettingsService._settings) {
-      OrganizationSettingsService._settings = await this.find();
+    if (refreshCache || !_settings) {
+      _settings = await this.find();
 
     }
-    return OrganizationSettingsService._settings;
+    return _settings;
   }
 
   /**

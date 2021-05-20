@@ -71,7 +71,7 @@ class ResourceTypeModel {
    */
   async getSecretSchemaById(resourceTypeId) {
     if (!Validator.isUUID(resourceTypeId)) {
-      throw new TypeError('The resource type id should be a valid UUID')
+      throw new TypeError('The resource type id should be a valid UUID');
     }
     const types = await this.getOrFindAll();
     const type = types.getFirst('id', resourceTypeId);

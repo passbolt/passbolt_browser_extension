@@ -441,13 +441,14 @@ class ResourceModel {
    * @returns {Promise<string>}
    */
   async serializePlaintextDto(resourceTypeId, plaintextDto) {
-    if (!resourceTypeId) {
-      if (typeof plaintextDto === 'string' && plaintextDto.length < MAX_LENGTH_PLAINTEXT) {
-        return plaintextDto;
-      } else {
+    // If legacy resource (no resource type available or the plaintextDto is a string)
+    if (!resourceTypeId || typeof plaintextDto === 'string') {
+      if (plaintextDto.length > MAX_LENGTH_PLAINTEXT) {
         throw new TypeError(`The secret should be maximum ${MAX_LENGTH_PLAINTEXT} characters in length.`);
       }
+      return plaintextDto;
     }
+
     const schema = await this.resourceTypeModel.getSecretSchemaById(resourceTypeId);
     if (!schema) {
       throw new TypeError('Could not find the schema definition for the requested resource type.');

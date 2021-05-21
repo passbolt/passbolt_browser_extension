@@ -297,7 +297,7 @@ module.exports = function (grunt) {
        * Build content code apps.
        */
       build_webpack_apps_prod: {
-        command: "webpack--config webpack-content-scripts.config.js; webpack --config webpack-data.config.js"
+        command: "webpack --config webpack-content-scripts.config.js; webpack --config webpack-data.config.js"
       },
       build_webpack_apps_debug: {
         command: "webpack --env debug=true --config webpack-content-scripts.config.js; webpack --env debug=true --config webpack-data.config.js"

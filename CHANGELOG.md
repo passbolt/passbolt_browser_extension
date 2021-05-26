@@ -4,7 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [3.2.0] - 2021-05-20
+## [3.2.1] - 2021-05-26
 ### Added
 - PB-5054 French internationalization
 - PB-5526 As AD I can manage the subscription key from the administration panel
@@ -626,8 +626,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.0...HEAD
-[3.2.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.1.0...v3.2.0
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.1...HEAD
+[3.2.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.1.0...v3.2.1
 [3.1.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.7...v3.1.0
 [3.0.7]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.6...v3.0.7
 [3.0.6]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.5...v3.0.6

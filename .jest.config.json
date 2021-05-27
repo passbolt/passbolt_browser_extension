@@ -1,6 +1,5 @@
 {
   "transform": {
     "^.+\\.js$": "./.jest.transform.js"
-  },
-  "setupFilesAfterEnv": ["<rootDir>/.jest.setup.js"]
+  }
 }

@@ -27,7 +27,8 @@ class BinaryConvert {
     for (let i = 0; i < bytes.length; i++) {
       bytes[i] = binary.charCodeAt(i);
     }
-    return new TextDecoder("utf-16").decode(new Uint16Array(bytes.buffer));
+    const concatenateStringFromByte = (data, byte) => data + String.fromCharCode(byte);
+    return new Uint16Array(bytes.buffer).reduce(concatenateStringFromByte, '');
   }
 
   /**
@@ -39,7 +40,8 @@ class BinaryConvert {
     for (let i = 0; i < codeUnits.length; i++) {
       codeUnits[i] = string.charCodeAt(i);
     }
-    return new TextDecoder("utf-8").decode(new Uint8Array(codeUnits.buffer));
+    const concatenateStringFromByte = (data, byte) => data + String.fromCharCode(byte);
+    return new Uint8Array(codeUnits.buffer).reduce(concatenateStringFromByte, '');
   }
 }
 

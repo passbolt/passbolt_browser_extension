@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.2.2] - 2021-05-31
+### Fixed
+- PB-7569 As AN with an unconfigured extension on chrome I should not get an error clicking on the toolbar passbolt icon
+
 ## [3.2.1] - 2021-05-26
 ### Added
 - PB-5054 French internationalization
@@ -626,7 +630,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.1...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.2...HEAD
+[3.2.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.1...v3.2.2
 [3.2.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.1.0...v3.2.1
 [3.1.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.7...v3.1.0
 [3.0.7]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.6...v3.0.7

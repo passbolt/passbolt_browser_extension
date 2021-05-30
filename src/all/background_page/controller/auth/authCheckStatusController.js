@@ -26,6 +26,7 @@ class AuthCheckStatusController {
       const status = await this.auth.checkAuthStatus();
       this.worker.port.emit(this.requestId, 'SUCCESS', status);
     } catch (error) {
+      console.error(error);
       this.worker.port.emit(this.requestId, 'ERROR', error);
     }
   }

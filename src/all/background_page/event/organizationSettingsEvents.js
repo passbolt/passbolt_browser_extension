@@ -27,8 +27,9 @@ const listen = function (worker) {
       const organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
       const organizationSettings = await organizationSettingsModel.getOrFind(true);
       worker.port.emit(requestId, 'SUCCESS', organizationSettings);
-    } catch (e) {
-      worker.port.emit(requestId, 'ERROR', e.message);
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
     }
   });
 };

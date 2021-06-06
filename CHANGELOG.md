@@ -3,8 +3,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [3.2.3] - 2021-06-07
 ### Fixed
-- PB-7561 - Fix as LU I should import CSV containing non latin1 characters
+- PB-7561 Fix as LU I should import CSV containing non latin1 characters
+- PB-7563 Update passbolt styleguide dependencies
 
 ## [3.2.2] - 2021-05-31
 ### Fixed
@@ -632,7 +635,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.2...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.3...HEAD
+[3.2.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.2...v3.2.3
 [3.2.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.1...v3.2.2
 [3.2.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.1.0...v3.2.1
 [3.1.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.0.7...v3.1.0

@@ -19,7 +19,7 @@
     "jquery": "^3.5.0",
     "jssha": "~2.3.1",
     "kdbxweb": "1.9.0",
-    "locutus": "~2.0.9",
+    "locutus": "~2.0.15",
     "memoize-one": "^5.1.1",
     "moment-timezone": "^0.5.32",
     "openpgp": "4.10.9",

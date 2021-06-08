@@ -64,8 +64,7 @@ const main = async function() {
   // If the user is valid we enable the login pagemod
   var user = User.getInstance();
   if (user.isValid()) {
-    // Auth pagemod init can also be triggered
-    // by debug, setup and user events (e.g. when config change)
+    // Auth pagemod init can also be triggered by setup and user events (e.g. when config change)
     pageMods.AuthBootstrap.init();
 
     // App pagemod init is generally triggered after a successful login
@@ -97,12 +96,6 @@ const main = async function() {
   pageMods.Auth.init();
   pageMods.QuickAccess.init();
   pageMods.App.init();
-
-  // Debug pagemod
-  if (Config.isDebug()) {
-    pageMods.Debug.init();
-  }
-
 };
 
 // Init storage and get going.

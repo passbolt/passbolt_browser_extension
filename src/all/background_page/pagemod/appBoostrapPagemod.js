@@ -3,7 +3,7 @@
  *
  * This pagemod drives the main addon app
  * It is inserted in all the pages of a domain that is trusted.
- * Such trust is defined during the first step of the setup process (or in config-debug)
+ * Such trust is defined during the first step of the setup process.
  *
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html

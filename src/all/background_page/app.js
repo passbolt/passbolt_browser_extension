@@ -26,7 +26,6 @@ events.auth = require('./event/authEvents');
 events.clipboard = require('./event/clipboardEvents');
 events.comment = require('./event/commentEvents');
 events.config = require('./event/configEvents');
-events.debug = require('./event/debugEvents');
 events.exportResources = require('./event/exportResourcesEvents');
 events.favorite = require('./event/favoriteEvents');
 events.folder = require('./event/folderEvents');
@@ -94,7 +93,7 @@ pageMods.WebIntegration = require('./pagemod/webIntegrationPagemod').WebIntegrat
 /*
  * This pagemod drives the main addon app
  * It is inserted in all the pages of a domain that is trusted.
- * Such trust is defined during the first step of the setup process (or in config-debug)
+ * Such trust is defined during the first step of the setup process.
  */
 pageMods.AppBoostrap = require('./pagemod/appBoostrapPagemod').AppBoostrap;
 
@@ -152,13 +151,5 @@ pageMods.Clipboard = require('./pagemod/clipboardPagemod').Clipboard;
  * This pagemod drives the file iframe tool
  */
 pageMods.File = require('./pagemod/filePagemod').File;
-
-/*
- * This page mod drives a convenience config page for debug
- * This allows to not have to go through the setup process steps
- * and perform changes useful for testing that would otherwise break things
- * Like for example changing the public key only on the client but not the server
- */
-pageMods.Debug = require('./pagemod/debugPagemod').Debug;
 
 exports.pageMods = pageMods;

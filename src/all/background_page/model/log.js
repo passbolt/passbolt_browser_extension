@@ -39,14 +39,6 @@ exports._logs = _logs;
 var Log = function () {};
 
 /**
- * Get all the logs.
- * @returns {*}
- */
-Log.readAll = function () {
-  return _logs;
-};
-
-/**
  * Write a log.
  * @param log {object} The log to write.
  */
@@ -84,13 +76,6 @@ Log.write = function (log) {
       console.log(consoleLog);
     }
   }
-};
-
-/**
- * Flush a log.
- */
-Log.flush = function () {
-  _logs = [];
 };
 
 /**

@@ -15,27 +15,13 @@ var Toolbar = require('../model/toolbar').Toolbar;
 var ToolbarController = function() {
   var _this = this;
   chrome.browserAction.onClicked.addListener(function() {
-    _this.onButtonClick();
+    _this.openPassboltTab();
   });
   chrome.commands.onCommand.addListener(function(command) {
     if (command === "passbolt-open") {
-      _this.onButtonClick();
+      _this.openPassboltTab();
     }
   });
-};
-
-/**
- * Handle the click on the passbolt toolbar icon.
- */
-ToolbarController.prototype.onButtonClick = function() {
-  this.openPassboltTab();
-};
-
-/**
- * Handle the shortcut pressed event.
- */
-ToolbarController.prototype.onShortcutPressed = function() {
-  this.openPassboltTab();
 };
 
 /**

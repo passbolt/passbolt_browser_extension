@@ -61,11 +61,11 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build-firefox', ['build-firefox-debug', 'build-firefox-prod']);
   grunt.registerTask('build-firefox-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-firefox', 'shell:build_webpack_apps_debug', 'shell:build_firefox_debug']);
-  grunt.registerTask('build-firefox-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-firefox', 'clean:debug_data', 'shell:build_webpack_apps_prod', 'shell:build_firefox_prod']);
+  grunt.registerTask('build-firefox-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-firefox', 'shell:build_webpack_apps_prod', 'shell:build_firefox_prod']);
 
   grunt.registerTask('build-chrome', ['build-chrome-debug', 'build-chrome-prod']);
   grunt.registerTask('build-chrome-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chrome', 'shell:build_webpack_apps_debug', 'shell:build_chrome_debug']);
-  grunt.registerTask('build-chrome-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome', 'shell:build_webpack_apps_prod', 'clean:debug_data', 'shell:build_chrome_prod']);
+  grunt.registerTask('build-chrome-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome', 'shell:build_webpack_apps_prod', 'shell:build_chrome_prod']);
 
   grunt.registerTask('test', ['shell:test']);
 
@@ -119,9 +119,6 @@ module.exports = function (grunt) {
     clean: {
       build: [
         path.build + '**'
-      ],
-      debug_data: [
-        path.build_data + 'js/debug/**'
       ]
     },
 
@@ -260,7 +257,7 @@ module.exports = function (grunt) {
           // CSS files default
           cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/default',
           src: [
-            'ext_config_debug.min.css', 'ext_external.min.css', 'ext_login.min.css', 'ext_legacy.min.css',
+            'ext_external.min.css', 'ext_login.min.css', 'ext_legacy.min.css',
             'ext_setup.min.css', 'ext_quickaccess.min.css', 'ext_app.min.css', 'ext_authentication.min.css'
           ],
           dest: path.build_data + 'css/themes/default',

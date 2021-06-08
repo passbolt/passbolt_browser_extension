@@ -61,7 +61,6 @@ Worker.prototype.triggerEvent = function (eventName) {
 Worker.prototype.destroy = function (reason) {
   Log.write({level: 'debug', message: `sdk/worker::destroy ${this.tab && this.tab.id ? `(tab: ${this.tab.id})` : ""} : ${reason}`});
 
-  // console.debut('Destroying worker because ' + reason);
   // A detach event is fired just before removal.
   this.triggerEvent('detach');
 

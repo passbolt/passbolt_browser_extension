@@ -141,34 +141,6 @@ var self = window.self || {};
   /*****************************************************************************
    * Protected utilities
    *****************************************************************************/
-  /**
-   * Generate a port uuid based on tabid
-   * @param tabId
-   * @returns {string}
-   */
-  Port._getUuid = function(seed) {
-    // healthchecks
-    if (typeof seed === 'undefined') {
-      throw new Error('portUuid seed should not be null');
-    }
-    if (typeof jsSHA === 'undefined') {
-      throw new Error('jsSHA library is needed in content code to generate portname');
-    }
-
-    // Create SHA hash from seed.
-    var hashStr;
-    var shaObj = new jsSHA('SHA-1', 'TEXT');
-    shaObj.update(seed);
-    hashStr = shaObj.getHash('HEX').substring(0, 32);
-
-    // Build a uuid based on the hash
-    var search = XRegExp('^(?<first>.{8})(?<second>.{4})(?<third>.{1})(?<fourth>.{3})(?<fifth>.{1})(?<sixth>.{3})(?<seventh>.{12}$)');
-    var replace = XRegExp('${first}-${second}-3${fourth}-a${sixth}-${seventh}');
-
-    // Replace regexp by corresponding mask, and remove / character at each side of the result.
-    var uuid = XRegExp.replace(hashStr, search, replace).replace(/\//g, '');
-    return uuid;
-  };
 
   /**
    * Parse url query variables to allow finding the portname in it

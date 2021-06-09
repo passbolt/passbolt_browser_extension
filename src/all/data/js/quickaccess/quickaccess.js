@@ -8,9 +8,18 @@
 var passbolt = passbolt || {};
 passbolt.quickaccess = passbolt.quickaccess || {};
 
-$(function () {
-  const PASSWORD_INPUT_SELECTOR = "input[type='password']:visible:enabled, input[type='Password']:visible:enabled, input[type='PASSWORD']:visible:enabled";
-  const USERNAME_INPUT_SELECTOR = "input[type='text']:visible:enabled, input[type='Text']:visible:enabled, input[type='TEXT']:visible:enabled, input[type='email']:visible:enabled, input[type='Email']:visible:enabled, input[type='EMAIL']:visible:enabled, input:not([type]):visible:enabled";
+// Without jQuery. Define a convenience method and use it
+const autofillReady = (callback) => {
+  if (document.readyState != "loading") {
+    callback();
+  } else {
+    document.addEventListener("DOMContentLoaded", callback);
+  }
+};
+
+autofillReady(() => {
+  const PASSWORD_INPUT_SELECTOR = "input[type='password']:not([hidden]):not([disabled]), input[type='Password']:not([hidden]):not([disabled]), input[type='PASSWORD']:not([hidden]):not([disabled])";
+  const USERNAME_INPUT_SELECTOR = "input[type='text']:not([hidden]):not([disabled]), input[type='Text']:not([hidden]):not([disabled]), input[type='TEXT']:not([hidden]):not([disabled]), input[type='email']:not([hidden]):not([disabled]), input[type='Email']:not([hidden]):not([disabled]), input[type='EMAIL']:not([hidden]):not([disabled]), input:not([type]):not([hidden]):not([disabled])";
 
   /**
    * Fill the login form.
@@ -182,13 +191,13 @@ $(function () {
   const findInputElementInIframe = function (type, iframeDocument) {
     let inputElement = null;
     if (type === 'password') {
-      inputElement = $(iframeDocument).find(PASSWORD_INPUT_SELECTOR);
+      inputElement = iframeDocument.querySelectorAll(PASSWORD_INPUT_SELECTOR);
       //  Password element has been found.
       if (inputElement.length) {
         return inputElement[0];
       }
     } else if (type === 'username') {
-      inputElement = $(iframeDocument).find(USERNAME_INPUT_SELECTOR);
+      inputElement = iframeDocument.querySelectorAll(USERNAME_INPUT_SELECTOR);
       if (inputElement.length) {
         // When username element found, extract it from an array of dom elements.
         inputElement = extractUsernameElementWithFallback(inputElement);
@@ -206,7 +215,8 @@ $(function () {
    * @return {DomElement/null}
    */
   const getPasswordElement = function (formData) {
-    let passwordElements = $(document).find(PASSWORD_INPUT_SELECTOR);
+    let passwordElements = document.querySelectorAll(PASSWORD_INPUT_SELECTOR);
+
     let passwordElement = null;
 
     // A password element has been found.
@@ -238,7 +248,7 @@ $(function () {
     let usernameElement = null;
 
     // The username field can be an input field of type email or text.
-    const elements = $(referenceElement).find(USERNAME_INPUT_SELECTOR);
+    const elements = referenceElement.querySelectorAll(USERNAME_INPUT_SELECTOR);
 
     // No input fields found in the reference element.
     // Search in the parent.
@@ -269,7 +279,7 @@ $(function () {
     let usernameElement = null;
 
     // The username field can be an input field of type email or text.
-    const elements = $(fallbackUsernameElement).find(USERNAME_INPUT_SELECTOR);
+    const elements = fallbackUsernameElement.querySelectorAll(USERNAME_INPUT_SELECTOR);
 
     // When username element found, extract it from an array of dom elements.
     if (elements.length) {
@@ -303,7 +313,7 @@ $(function () {
         const element = elements[i];
         for (let j = 0; j < inputAttributes.length; j++) {
           for (let k = 0; k < inputAttrValues.length; k++) {
-            const matchedInput = $(element).filter(`input[${inputAttributes[j]}*='${inputAttrValues[k]}' i]`);
+            const matchedInput = element.querySelectorAll(`input[${inputAttributes[j]}*='${inputAttrValues[k]}' i]`);
             if (matchedInput.length) {
               usernameElement = matchedInput[0];
               break foundBreakPoint;

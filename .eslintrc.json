@@ -18,7 +18,6 @@
     "browser": true,
     "es6": true,
     "amd": true,
-    "jquery": true,
     "webextensions": true,
     "jest": true
   },

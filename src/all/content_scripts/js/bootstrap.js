@@ -7,7 +7,16 @@
 
 var passbolt = passbolt || {};
 
-$(function () {
+// Without jQuery. Define a convenience method and use it
+const bootstrapReady = (callback) => {
+  if (document.readyState != "loading") {
+    callback();
+  } else {
+    document.addEventListener("DOMContentLoaded", callback);
+  }
+};
+
+bootstrapReady(() => {
 
   function init() {
     bootstrapQuickAccess();

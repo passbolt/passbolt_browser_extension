@@ -177,8 +177,6 @@ module.exports = function (grunt) {
         files: [
           // openpgpjs
           { expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js', 'openpgp.worker.js'], dest: path.build_vendors },
-          // jquery
-          { expand: true, cwd: path.node_modules + 'jquery/dist', src: 'jquery.js', dest: path.src_content_vendors },
           // downloadjs (for download with save as).
           { expand: true, cwd: path.node_modules + 'downloadjs', src: 'download.js', dest: path.src_content_vendors }
           // TODO PASSBOLT-2219 Fix / Add missing Vendors

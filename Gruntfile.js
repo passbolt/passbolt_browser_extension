@@ -108,7 +108,7 @@ module.exports = function (grunt) {
         dest: path.build + 'vendors.min.js'
       },
       background_page: {
-        src: [path.src_background_page + 'index.js'],
+        src: [path.src_background_page + 'index.js', path.src_background_page + 'browserEvent.js'],
         dest: path.build + 'index.min.js'
       }
     },
@@ -229,7 +229,7 @@ module.exports = function (grunt) {
           // Illustrations
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/illustrations',
-          src: ['passphrase_intro.png'],
+          src: ['passphrase_intro.png', 'pin_passbolt.gif', 'arrow.png'],
           dest: path.build_data + 'img/illustrations',
           expand: true
         }, {

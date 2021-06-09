@@ -26,7 +26,6 @@ WebIntegration.init = function () {
     contentScriptWhen: 'ready',
     contentStyleFile: [],
     contentScriptFile: [
-      'data/vendors/jquery.js',
       'data/vendors/dom-testing-library-event.js',
       'data/js/lib/port.js',
       'data/js/lib/request.js',

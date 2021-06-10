@@ -69,6 +69,7 @@ App.init = function () {
       app.events.multiFactorAuthentication.listen(worker);
       app.events.theme.listen(worker);
       app.events.locale.listen(worker);
+      app.events.passwordGenerator.listen(worker);
 
       // Keep the pagemod event listeners at the end of the list.
       app.events.pagemod.listen(worker);

@@ -49,6 +49,7 @@ events.theme = require('./event/themeEvents');
 events.user = require('./event/userEvents');
 events.organizationSettings = require('./event/organizationSettingsEvents');
 events.locale = require('./event/localeEvents');
+events.passwordGenerator = require('./event/passwordGeneratorEvents');
 
 exports.events = events;
 

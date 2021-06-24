@@ -4,9 +4,12 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {PasswordGeneratorLocalStorage} = require("./service/local_storage/passwordGeneratorLocalStorage");
 var storage = require('./sdk/storage').storage;
 window.storage = storage;
+
+/* Listen to browser events such as browser extension installation. As per the documentation
+ * the listeners must be registered synchronously from the start of the page. */
+require('./event/browser/browserEvents.js');
 
 const main = async function() {
   const Config = require('./model/config');
@@ -20,6 +23,7 @@ const main = async function() {
   const {UserLocalStorage} = require('./service/local_storage/userLocalStorage');
   const {GroupLocalStorage} = require('./service/local_storage/groupLocalStorage');
   const {RolesLocalStorage} = require("./service/local_storage/rolesLocalStorage");
+  const {PasswordGeneratorLocalStorage} = require("./service/local_storage/passwordGeneratorLocalStorage");
 
   /* ==================================================================================
    *  Initialization of global objects

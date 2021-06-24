@@ -26,12 +26,12 @@ const listen = function (worker) {
   const setupController = new SetupController(worker, worker.tab.url);
 
   /*
-   * Is the first install.
+   * Is the browser extension just installed.
    *
-   * @listens passbolt.setup.first-install
+   * @listens passbolt.setup.is-first-install
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.setup.first-install', async function (requestId) {
+  worker.port.on('passbolt.setup.is-first-install', async function (requestId) {
     try {
       const isFirstInstall = worker.tab.url.indexOf('first-install') !== -1;
       worker.port.emit(requestId, 'SUCCESS', isFirstInstall);

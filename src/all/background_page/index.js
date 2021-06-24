@@ -7,8 +7,9 @@
 var storage = require('./sdk/storage').storage;
 window.storage = storage;
 
-// Browser event on installed extension
-require('./event/browserEvent.js');
+/* Listen to browser events such as browser extension installation. As per the documentation
+ * the listeners must be registered synchronously from the start of the page. */
+require('./event/browser/browserEvents.js');
 
 const main = async function() {
   const Config = require('./model/config');

@@ -14,7 +14,7 @@
  * Background script for browser listener
  */
 
-const {OnExtensionInstalledController} = require("../controller/extension/OnExtensionInstalledController");
+const {OnExtensionInstalledController} = require("../../controller/extension/OnExtensionInstalledController");
 /**
  * On installed the extension, add first install in the url tab of setup or recover
  */

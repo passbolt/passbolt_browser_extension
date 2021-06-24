@@ -108,7 +108,7 @@ module.exports = function (grunt) {
         dest: path.build + 'vendors.min.js'
       },
       background_page: {
-        src: [path.src_background_page + 'index.js', path.src_background_page + 'browserEvent.js'],
+        src: [path.src_background_page + 'index.js'],
         dest: path.build + 'index.min.js'
       }
     },

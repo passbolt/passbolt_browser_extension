@@ -26,17 +26,19 @@ WebIntegration.init = function () {
     contentScriptWhen: 'ready',
     contentStyleFile: [],
     contentScriptFile: [
-      'data/vendors/dom-testing-library-event.js',
-      'data/js/lib/port.js',
-      'data/js/lib/request.js',
-      'data/js/lib/message.js',
-      'data/js/quickaccess/quickaccess.js',
-      'content_scripts/js/bootstrap.js'
+      'content_scripts/js/dist/browser-integration/vendors.js',
+      'content_scripts/js/dist/browser-integration/browser-integration.js'
     ],
     attachTo: {existing: true, reload: false},
     onAttach: function (worker) {
       Worker.add('WebIntegration', worker);
       app.events.config.listen(worker);
+
+      /*
+       * Keep the pagemod event listeners at the end of the list, it answers to an event that allows
+       * the content code to know when the background page is ready.
+       */
+      app.events.pagemod.listen(worker);
     }
   });
 };

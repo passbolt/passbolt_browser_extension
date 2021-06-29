@@ -91,6 +91,8 @@ class AuthModel {
   async postLogin() {
     await this.legacyAuthModel.startCheckAuthStatusLoop();
     await app.pageMods.AppBoostrap.init();
+    const event = new Event('passbolt.auth.after-login');
+    window.dispatchEvent(event);
   }
 
   /**

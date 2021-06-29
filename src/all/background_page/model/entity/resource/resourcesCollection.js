@@ -11,15 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+
 const {EntityCollection} = require('../abstract/entityCollection');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {EntityCollectionError} = require('../abstract/entityCollectionError');
 const {ResourceEntity} = require('./resourceEntity');
 const {deduplicateObjects} = require("../../../utils/array/deduplicateObjects");
+const {canSuggestUrl} = require("../../../utils/url/canSuggestUrl");
 
 const ENTITY_NAME = 'Resources';
-
 const RULE_UNIQUE_ID = 'unique_id';
+const SUGGESTED_RESOURCES_LIMIT = 6;
 
 class ResourcesCollection extends EntityCollection {
   /**
@@ -116,6 +118,25 @@ class ResourcesCollection extends EntityCollection {
    */
   getAllWhereOwner() {
     return new ResourcesCollection(this._items.filter(r => r.isOwner()));
+  }
+
+  /**
+   * Returns the count of possible resources to suggest given an url
+   * @param currentUrl An url
+   * @return {*[]|number}
+   */
+  countSuggestedResources(url) {
+    let count = 0;
+    for (let index = 0; index < this._items.length; index++) {
+      if (this._items[index].uri) {
+        const canBeSuggested = canSuggestUrl(url, this._items[index].uri);
+        count = canBeSuggested ? count + 1 : count;
+        if (count === SUGGESTED_RESOURCES_LIMIT) {
+          break;
+        }
+      }
+    }
+    return count;
   }
 
   // ==================================================

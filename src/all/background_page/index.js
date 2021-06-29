@@ -82,6 +82,8 @@ const main = async function() {
       if (isAuthenticated) {
         await pageMods.AppBoostrap.init();
         auth.startCheckAuthStatusLoop();
+        const event = new Event('passbolt.auth.after-login');
+        window.dispatchEvent(event);
       }
     } catch(error) {
       // Service unavailable

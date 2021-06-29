@@ -222,7 +222,20 @@ module.exports = function (grunt) {
           // Branding
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/logo',
-          src: ['icon-16.png', 'icon-19.png', 'icon-32.png', 'icon-48.png', 'icon-64.png', 'icon-128.png'],
+          src: [
+            'icon-16.png',
+            'icon-19.png',
+            'icon-32.png',
+            'icon-32-signout.png',
+            'icon-32-badge-1.png',
+            'icon-32-badge-2.png',
+            'icon-32-badge-3.png',
+            'icon-32-badge-4.png',
+            'icon-32-badge-5.png',
+            'icon-32-badge-5+.png',
+            'icon-48.png',
+            'icon-64.png',
+            'icon-128.png'],
           dest: path.build + 'icons',
           expand: true
         }, {

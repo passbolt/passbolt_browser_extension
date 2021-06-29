@@ -97,6 +97,15 @@ class ResourceModel {
     return new ResourceEntity(resourceDto);
   }
 
+  /**
+   * Returns the cached collection of resoures or fetch them otherwise
+   * @return {Promise<void>}
+   */
+  async getOrFindAll() {
+    const localResources = await ResourceLocalStorage.get();
+    return localResources ? new ResourcesCollection(localResources) : this.findAll();
+  }
+
   //==============================================================
   // Permission changes
   //==============================================================
@@ -251,6 +260,18 @@ class ResourceModel {
     const resourceDtos = await this.resourceService.findAll(contain, filter);
     const resourceEntity = new ResourceEntity(resourceDtos[0]); // will fail if not found but not clean 404
     return resourceEntity.permissions;
+  }
+
+  /**
+   * Returns the count of possible resources to suggest given an url
+   * @param currentUrl An url
+   * @return {*[]|number}
+   */
+  async countSuggestedResources(url) {
+    if (!url) {
+      return 0;
+    }
+    return (await this.getOrFindAll()).countSuggestedResources(url);
   }
 
   //==============================================================

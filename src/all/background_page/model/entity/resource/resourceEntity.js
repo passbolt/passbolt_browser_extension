@@ -299,6 +299,13 @@ class ResourceEntity extends Entity {
     return this._props.resource_type_id || null;
   }
 
+  /**
+   * Returns the resource uri
+   */
+  get uri() {
+    return this._props.uri || null;
+  }
+
   // ==================================================
   // Permissions methods
   // ==================================================

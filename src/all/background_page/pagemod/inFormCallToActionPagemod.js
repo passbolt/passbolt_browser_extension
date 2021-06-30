@@ -13,10 +13,6 @@
 const {PageMod} = require('../sdk/page-mod');
 const app = require('../app');
 
-/*
- * This pagemod help bootstrap the first step of the setup process from a passbolt server app page
- * The pattern for this url, driving the setup bootstrap, is defined in config.json
- */
 const InFormCallToAction = function () {};
 InFormCallToAction._pageMod = undefined;
 
@@ -35,7 +31,8 @@ InFormCallToAction.init = function () {
 			// chrome/data/passbolt-iframe-in-form-call-to-action.html
 		],
     onAttach: function (worker) {
-      // TODO add events
+      app.events.auth.listen(worker);
+      app.events.informCallToAction.listen(worker);
 
 
       /*
@@ -47,4 +44,4 @@ InFormCallToAction.init = function () {
   });
 };
 
-exports.InFormMenuCTA = InFormCallToAction;
+exports.InFormCallToAction = InFormCallToAction;

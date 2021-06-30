@@ -1,13 +1,11 @@
 /**
- * User events
+ * Pagemod events
  *
- * Used to handle the events related to the current user
+ * Used to handle the events related to the current pagemod
  *
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const app = require('../app');
-
 const listen = function (worker) {
   /*
    * Check that the pagemod page is ready.

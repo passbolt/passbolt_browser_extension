@@ -214,7 +214,15 @@ module.exports = function (grunt) {
           cwd: path.node_modules + 'passbolt-styleguide/src/img/logo',
           src: [
             'icon-19.png', 'icon-20_white.png', 'icon-48.png', 'icon-48_white.png', 'logo.png', 'logo@2x.png',
-            'logo.svg', 'logo_white.png', 'logo_white@2x.png', 'logo_white.svg'
+            'logo.svg', 'logo_white.png', 'logo_white@2x.png', 'logo_white.svg',
+            'icon-16.png',
+            'icon-16-signout.png',
+            'icon-16-badge-1.png',
+            'icon-16-badge-2.png',
+            'icon-16-badge-3.png',
+            'icon-16-badge-4.png',
+            'icon-16-badge-5.png',
+            'icon-16-badge-5+.png',
           ],
           dest: path.build_data + 'img/logo',
           expand: true
@@ -256,7 +264,7 @@ module.exports = function (grunt) {
           // CSS files default
           cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/default',
           src: [
-            'ext_external.min.css', 'ext_login.min.css', 'ext_legacy.min.css',
+            'ext_external.min.css', 'ext_login.min.css', 'ext_legacy.min.css', 'ext_in_form_cta.min.css',
             'ext_setup.min.css', 'ext_quickaccess.min.css', 'ext_app.min.css', 'ext_authentication.min.css'
           ],
           dest: path.build_data + 'css/themes/default',
@@ -264,7 +272,7 @@ module.exports = function (grunt) {
         }, {
           // CSS files midgar
           cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/midgar',
-          src: ['ext_legacy.min.css', 'ext_app.min.css'],
+          src: ['ext_legacy.min.css', 'ext_app.min.css', 'ext_in_form_cta.min.css'],
           dest: path.build_data + 'css/themes/midgar',
           expand: true
         }, {
@@ -296,14 +304,18 @@ module.exports = function (grunt) {
         command: [
           'webpack --config webpack-content-scripts.config.js',
           'webpack --config webpack-data.config.js',
-          'webpack --config webpack-content-scripts.browser-integration.config.js'
+          'webpack --config webpack-content-scripts.browser-integration.config.js',
+          'webpack --config webpack-data.in-form-call-to-action.config.js',
+          'webpack --config webpack-data.in-form-menu.config.js'
         ].join(' && ')
       },
       build_webpack_apps_debug: {
         command: [
           'webpack --env debug=true --config webpack-content-scripts.config.js',
           'webpack --env debug=true --config webpack-data.config.js',
-          'webpack --env debug=true --config webpack-content-scripts.browser-integration.config.js'
+          'webpack --env debug=true --config webpack-content-scripts.browser-integration.config.js',
+          'webpack --env debug=true --config webpack-data.in-form-call-to-action.config.js',
+          'webpack --env debug=true --config webpack-data.in-form-menu.config.js'
         ].join(' && ')
       },
 

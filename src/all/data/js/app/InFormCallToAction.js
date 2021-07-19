@@ -9,12 +9,14 @@
  * @copyright     Copyright (c) 2020 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since        3.4.0
+ * @since         3.4.0
  */
+import React from "react";
+import ReactDOM from "react-dom";
+import ExtInFormCallToAction from "passbolt-styleguide/src/react-web-integration/ExtInFormCallToAction";
 /* eslint-disable no-unused-vars */
-import Port from "../../../data/js/lib/port";
+import Port from "../lib/port";
 /* eslint-enable no-unused-vars */
-import {BrowserIntegrationBootstrap} from "passbolt-styleguide/src/react-web-integration/BrowserIntegrationBootstrap.js";
 
 /**
  * Wait until the background pagemod is ready.
@@ -23,7 +25,6 @@ import {BrowserIntegrationBootstrap} from "passbolt-styleguide/src/react-web-int
 async function waitPagemodIsReady() {
   let resolver;
   const promise = new Promise(resolve => { resolver = resolve; });
-
   const checkInterval = setInterval(() => {
     port.request("passbolt.pagemod.is-ready").then(() => {
       resolver();
@@ -36,7 +37,9 @@ async function waitPagemodIsReady() {
 
 async function main() {
   await waitPagemodIsReady();
-  BrowserIntegrationBootstrap.init();
+  const domContainer = document.createElement("div");
+  document.body.appendChild(domContainer);
+  ReactDOM.render(React.createElement(ExtInFormCallToAction, {port: port}), domContainer);
 }
 
 main();

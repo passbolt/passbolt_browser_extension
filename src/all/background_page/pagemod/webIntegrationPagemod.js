@@ -33,6 +33,7 @@ WebIntegration.init = function () {
     onAttach: function (worker) {
       Worker.add('WebIntegration', worker);
       app.events.config.listen(worker);
+      app.events.webIntegration.listen(worker);
 
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows

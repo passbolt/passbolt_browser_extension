@@ -12,11 +12,17 @@
  * @since         3.4.0
  */
 const Worker = require('../../model/worker');
+const {QuickAccessService} = require("../../service/ui/QuickAccess.service");
 const {ResourceModel} = require('../../model/resource/resourceModel');
+const GpgAuth = require('../../model/gpgauth').GpgAuth;
+const {User} = require('../../model/user');
 
+/**
+ * Controller related to the in-form call-to-action
+ */
 class InformCallToActionController {
   /**
-   * ExportResourcesFileController constructor
+   * InformCallToActionController constructor
    * @param {Worker} worker
    * @param {ApiClientOptions} clientOptions
    */
@@ -28,31 +34,62 @@ class InformCallToActionController {
   }
 
   /**
-   * Open the quick access popup
+   * Whenever one intends to check the status of the call-to-action (authenticated / unauthenticated mode)
+   * @param requestId
    */
-  openQuickAccessPopup() {
-    chrome.browserAction.getPopup({}, (popup) => {
-      const detachedQuickAccess = window.open(popup, "extension_popup", `width=380,height=400,scrollbars=0,toolbar=0,location=0,resizable=0,status=0`);
-      detachedQuickAccess.document.title = "Passbolt";
-    });
+  async checkStatus(requestId) {
+    try {
+      const auth = new GpgAuth();
+      const status = await auth.checkAuthStatus({requestApi: false});
+      this.worker.port.emit(requestId, "SUCCESS", status);
+    }
+    catch(error) {
+      /*
+       * When we are in a logged out mode and there's some cleaning of the local storage
+       * the check status request the api. In case of unauthenticated user, it throws a 401
+       * that we catch right here
+       */
+      this.worker.port.emit(requestId, "SUCCESS", {isAuthenticated: false});
+    }
   }
 
   /**
-   * Open the mfa page
-   * @param {String} url
+   * Whenever one intends to know the count of suggested resources
+   * @param requestId The identifier of the request
    */
-  openMfa(url) {
-    chrome.tabs.create({url, active: true});
+  async countSuggestedResourcesCount(requestId) {
+    try {
+      const suggestedResourcesCount = await this.resourceModel.countSuggestedResources(this.worker.tab.url);
+      this.worker.port.emit(requestId, "SUCCESS", {suggestedResourcesCount: suggestedResourcesCount});
+    } catch (error) {
+      console.error(error);
+      this.worker.port.emit(requestId, 'ERROR', error);
+    }
   }
+
 
   /**
-   * Returns the count of suggested resources
-   * @return {*[]|number}
+   * Whenever the user executes the inform call-to-action
+   * @param requestId The identifier of the request
    */
-  countSuggestedResources() {
-    return this.resourceModel.countSuggestedResources(this.worker.tab.url);
+  async execute(requestId) {
+    try {
+      const auth = new GpgAuth();
+      const status = await auth.checkAuthStatus({requestApi: false});
+      if (!status.isAuthenticated) {
+        await QuickAccessService.openInDetachedMode();
+        this.worker.port.emit(requestId, "SUCCESS");
+      } else if (status.isMfaRequired) {
+        browser.tabs.create({url: User.getInstance().settings.getDomain(), active: true});
+        this.worker.port.emit(requestId, "SUCCESS");
+      } else {
+        Worker.get('WebIntegration', this.worker.tab.id).port.emit('passbolt.in-form-menu.open');
+      }
+    } catch (error) {
+      console.error(error);
+      this.worker.port.emit(requestId, 'ERROR', error);
+    }
   }
-
 }
 
 

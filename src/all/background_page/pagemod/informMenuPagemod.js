@@ -31,6 +31,8 @@ InFormMenu.init = function () {
 			// chrome/data/passbolt-iframe-in-form-menu.html
 		],
     onAttach: function (worker) {
+      app.events.informMenu.listen(worker);
+
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows
        * the content code to know when the background page is ready.

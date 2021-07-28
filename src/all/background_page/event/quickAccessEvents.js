@@ -6,6 +6,8 @@
  */
 const {i18n} = require('../sdk/i18n');
 const Worker = require('../model/worker');
+const {BrowserTabService} = require("../service/ui/browserTab.service");
+const {ResourceInProgressCacheService} = require("../service/cache/resourceInProgressCache.service");
 const {User} = require('../model/user');
 const {SecretDecryptController} = require('../controller/secret/secretDecryptController');
 
@@ -55,6 +57,26 @@ const listen = function (worker) {
       const webIntegrationWorker = await Worker.get('WebIntegration', tab.id);
       await webIntegrationWorker.port.request('passbolt.quickaccess.fill-form', username, password, tab.url);
       worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Prepare to create a new resource.
+   *
+   * @listens passbolt.resources.prepare-create
+   * @param requestId {uuid} The request identifier
+   * @param tabId {string} The tab id
+   */
+  worker.port.on('passbolt.quickaccess.prepare-create', async function (requestId, tabId) {
+    try {
+      const resourceInProgress = ResourceInProgressCacheService.getAndConsume() || {};
+      const tab = tabId ? await BrowserTabService.getById(tabId) : await BrowserTabService.getCurrent();
+      resourceInProgress.name = tab.title;
+      resourceInProgress.uri = tab.url;
+      worker.port.emit(requestId, 'SUCCESS', resourceInProgress);
     } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);

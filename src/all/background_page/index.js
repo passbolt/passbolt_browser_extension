@@ -81,7 +81,6 @@ const main = async function() {
       const isAuthenticated = await auth.isAuthenticated();
       if (isAuthenticated) {
         await pageMods.AppBoostrap.init();
-        await pageMods.InFormMenu.init();
         auth.startCheckAuthStatusLoop();
         const event = new Event('passbolt.auth.after-login');
         window.dispatchEvent(event);
@@ -105,6 +104,7 @@ const main = async function() {
   pageMods.Auth.init();
   pageMods.QuickAccess.init();
   pageMods.InFormMenuCTA.init();
+  pageMods.InFormMenu.init();
   pageMods.App.init();
 };
 

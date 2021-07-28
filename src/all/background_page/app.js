@@ -51,6 +51,7 @@ events.organizationSettings = require('./event/organizationSettingsEvents');
 events.locale = require('./event/localeEvents');
 events.passwordGenerator = require('./event/passwordGeneratorEvents');
 events.informCallToAction = require('./event/informCallToActionEvents');
+events.informMenu = require('./event/informMenuEvents');
 
 exports.events = events;
 
@@ -155,7 +156,7 @@ pageMods.Clipboard = require('./pagemod/clipboardPagemod').Clipboard;
 pageMods.File = require('./pagemod/filePagemod').File;
 
 /*
- * This pagemod drives the inform menu iframe tool
+ * This pagemod drives the inform menu cta iframe tool
  */
 pageMods.InFormMenuCTA = require('./pagemod/inFormCallToActionPagemod').InFormCallToAction;
 

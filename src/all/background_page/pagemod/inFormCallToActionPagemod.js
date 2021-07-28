@@ -31,7 +31,6 @@ InFormCallToAction.init = function () {
 			// chrome/data/passbolt-iframe-in-form-call-to-action.html
 		],
     onAttach: function (worker) {
-      app.events.auth.listen(worker);
       app.events.informCallToAction.listen(worker);
 
 

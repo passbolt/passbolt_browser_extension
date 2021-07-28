@@ -70,6 +70,7 @@ App.init = function () {
       app.events.theme.listen(worker);
       app.events.locale.listen(worker);
       app.events.passwordGenerator.listen(worker);
+      app.events.mobile.listen(worker);
 
       // Keep the pagemod event listeners at the end of the list.
       app.events.pagemod.listen(worker);

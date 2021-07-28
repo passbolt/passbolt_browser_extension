@@ -50,6 +50,7 @@ events.user = require('./event/userEvents');
 events.organizationSettings = require('./event/organizationSettingsEvents');
 events.locale = require('./event/localeEvents');
 events.passwordGenerator = require('./event/passwordGeneratorEvents');
+events.mobile = require('./event/mobileEvents');
 
 exports.events = events;
 

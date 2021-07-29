@@ -14,7 +14,11 @@
 
 const {ResourceInProgressCacheService} = require("../../service/cache/resourceInProgressCache.service");
 const Worker = require('../../model/worker');
+const {ResourceModel} = require("../../model/resource/resourceModel");
+const {Crypto} = require('../../model/crypto');
 const {QuickAccessService} = require("../../service/ui/quickAccess.service");
+const User = require('../../model/user').User;
+const passphraseController = require('../passphrase/passphraseController');
 
 
 /**
@@ -26,8 +30,10 @@ class InformMenuController {
    * @param {Worker} worker
    * @param {ApiClientOptions} clientOptions
    */
-  constructor(worker) {
+  constructor(worker, clientOptions) {
     this.worker = worker;
+    this.resourceModel = new ResourceModel(clientOptions);
+    this.crypto = new Crypto();
   }
 
   /**
@@ -37,10 +43,11 @@ class InformMenuController {
   async getInitialConfiguration(requestId) {
     try {
       const callToActionInput = await Worker.get('WebIntegration', this.worker.tab.id).port.request('passbolt.web-integration.last-performed-call-to-action-input');
+      const suggestedResources = await this.resourceModel.findSuggestedResources(this.worker.tab.url);
       const configuration = {
         inputType: callToActionInput.type,
         inputValue: callToActionInput.value,
-        suggestedResources: []
+        suggestedResources: suggestedResources
       }
       this.worker.port.emit(requestId, "SUCCESS", configuration);
     } catch (error) {
@@ -81,6 +88,33 @@ class InformMenuController {
     await QuickAccessService.openInDetachedMode(queryParameters);
     Worker.get('WebIntegration', this.worker.tab.id).port.emit('passbolt.in-form-menu.close');
     this.worker.port.emit(requestId, "SUCCESS");
+  }
+
+  /**
+   * Whenever the user intends to use a suggested resource as credentials for the current page
+   * @param requestId A request identifier
+   * @param resourceId A resource identifier
+   * @return {Promise<void>}
+   */
+  async useSuggestedResource(requestId, resourceId) {
+    try {
+      // WebIntegration Worker
+      const webIntegrationWorker = Worker.get('WebIntegration', this.worker.tab.id);
+      webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
+      // Get the resource, decrypt the resources password and requests to fill the credentials
+      const passphrase = await passphraseController.requestFromQuickAccess();
+      const resource = await this.resourceModel.findForDecrypt(resourceId);
+      const privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
+      let plaintext = await this.crypto.decryptWithKey(resource.secret.data, privateKey);
+      plaintext = await this.resourceModel.deserializePlaintext(resource.resourceTypeId, plaintext);
+      const {username} = resource;
+      const password = plaintext?.password || plaintext;
+      webIntegrationWorker.port.emit('passbolt.web-integration.fill-credentials', {username, password});
+      this.worker.port.emit(requestId, "SUCCESS");
+    } catch(error) {
+      console.log(error);
+      this.worker.port.emit(requestId, "ERROR", error);
+    }
   }
 
   /**

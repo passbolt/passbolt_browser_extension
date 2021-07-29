@@ -26,7 +26,7 @@ async function openInDetachedMode(queryParameters = []) {
   const popupUrl = await browser.browserAction.getPopup({});
   const popupUrlWithQueryParameters = new URL(popupUrl);
   queryParameters.forEach(queryParameter => popupUrlWithQueryParameters.searchParams.append(queryParameter.name, queryParameter.value));
-  const windowFeatures = `width=${QUICKACCESS_WINDOW_WIDTH},height=${QUICKACCESS_WINDOW_HEIGHT},scrollbars=0,toolbar=0,location=0,resizable=0,status=0, noopener`;
+  const windowFeatures = `width=${QUICKACCESS_WINDOW_WIDTH},height=${QUICKACCESS_WINDOW_HEIGHT},scrollbars=0,toolbar=0,location=0,resizable=0,status=0,noopener`;
   const detachedQuickAccess = window.open(popupUrlWithQueryParameters.href, "extension_popup", windowFeatures);
   detachedQuickAccess.document.title = "Passbolt";
 }

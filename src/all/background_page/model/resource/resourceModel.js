@@ -274,6 +274,19 @@ class ResourceModel {
     return (await this.getOrFindAll()).countSuggestedResources(url);
   }
 
+  /**
+   * Returns the possible resources to suggest given an url
+   * @param currentUrl An url
+   * @return {*[]|number}
+   */
+  async findSuggestedResources(url) {
+    if (!url) {
+      return 0;
+    }
+    const toDto = resourceEntity => resourceEntity.toDto();
+    return (await this.getOrFindAll()).findSuggestedResources(url).map(toDto);
+  }
+
   //==============================================================
   // CRUD
   //==============================================================

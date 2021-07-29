@@ -8,6 +8,7 @@
  */
 const app = require('../app');
 const {Worker} = require('../sdk/worker');
+const WorkerModel = require('../model/worker');
 
 /*
  * This page mod drives the quick access default popup
@@ -21,12 +22,7 @@ QuickAccess.init = function () {
 
   chrome.runtime.onConnect.addListener(async function (port) {
     if (port.name === "quickaccess") {
-      this._worker = new Worker(port);
-
-      // Destroy the worker when the quickacess popup is destroyed.
-      port.onDisconnect.addListener(() => {
-        this._worker.destroy('Quickaccess popup got destroyed');
-      });
+      this._worker = new Worker(port, port.sender.tab);
 
       app.events.auth.listen(this._worker);
       app.events.config.listen(this._worker);
@@ -39,6 +35,7 @@ QuickAccess.init = function () {
       app.events.organizationSettings.listen(this._worker);
       app.events.tab.listen(this._worker);
       app.events.locale.listen(this._worker);
+      WorkerModel.add('QuickAccess', this._worker);
 
       // Keep the pagemod event listeners at the end of the list.
       app.events.pagemod.listen(this._worker);

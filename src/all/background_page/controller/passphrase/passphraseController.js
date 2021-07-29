@@ -5,9 +5,12 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
+const {QuickAccessService} = require("../../service/ui/quickAccess.service");
 const {i18n} = require('../../sdk/i18n');
 const Keyring = require('../../model/keyring').Keyring;
 const User = require('../../model/user').User;
+const Worker = require('../../model/worker');
+const {BrowserTabService} = require("../../service/ui/browserTab.service");
 
 /**
  * Get the user master password.
@@ -47,6 +50,43 @@ const requestPassphrase = async function(worker) {
   }
 };
 exports.request = requestPassphrase;
+
+/**
+ * Request the user passphrase from the Quick Access
+ */
+const requestPassphraseFromQuickAccess = async function() {
+  const requestId = 'passbolt.quickaccess.request-passphrase';
+  // Open the quick access to ask for the master passphrase
+  const queryParameters = [
+    {name: "uiMode", value: "detached"},
+    {name: "feature", value: "request-passphrase"},
+    {name: "requestId", value: requestId}
+  ];
+  QuickAccessService.openInDetachedMode(queryParameters);
+  return  new Promise((resolve, reject) => {
+    const quickAccessWorkerInterval = setInterval(async() => {
+      const currentTab = await BrowserTabService.getCurrent();
+      const quickAccessWorker = Worker.get('QuickAccess', currentTab.id);
+      if (quickAccessWorker) {
+        clearInterval(quickAccessWorkerInterval);
+        try {
+          quickAccessWorker.port.on(requestId, (status, requestResult)  => {
+            if (status === 'SUCCESS') {
+              const {passphrase, rememberMe} = requestResult;
+              validatePassphrase(passphrase, rememberMe);
+              rememberPassphrase(passphrase, rememberMe);
+              resolve(passphrase);
+            }
+          });
+        } catch (error) {
+          reject(error);
+        }
+      }
+    }, 100);
+  });
+};
+
+exports.requestFromQuickAccess = requestPassphraseFromQuickAccess;
 
 /**
  * Remember the user passphrase for a given duration.

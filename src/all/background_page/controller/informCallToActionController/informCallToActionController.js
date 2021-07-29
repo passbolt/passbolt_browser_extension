@@ -28,8 +28,6 @@ class InformCallToActionController {
    */
   constructor(worker, clientOptions) {
     this.worker = worker;
-
-    // Models
     this.resourceModel = new ResourceModel(clientOptions);
   }
 
@@ -60,7 +58,7 @@ class InformCallToActionController {
   async countSuggestedResourcesCount(requestId) {
     try {
       const suggestedResourcesCount = await this.resourceModel.countSuggestedResources(this.worker.tab.url);
-      this.worker.port.emit(requestId, "SUCCESS", {suggestedResourcesCount: suggestedResourcesCount});
+      this.worker.port.emit(requestId, "SUCCESS", suggestedResourcesCount);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(requestId, 'ERROR', error);

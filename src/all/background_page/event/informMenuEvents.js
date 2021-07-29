@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {InformMenuController} = require("../controller/InformMenuController/InformMenuController");
+const {User} = require('../model/user');
 
 /**
  * Listens the inform menu events
@@ -22,25 +23,45 @@ const listen = function (worker) {
 
   /** Whenever the in-form menu need initialization */
   worker.port.on('passbolt.in-form-menu.init', async function(requestId) {
-    const informMenuController = new InformMenuController(worker);
+    const apiClientOptions =  await User.getInstance().getApiClientOptions();
+    const informMenuController = new InformMenuController(worker, apiClientOptions);
     await informMenuController.getInitialConfiguration(requestId);
   });
 
   /** Whenever the user clicks on create new credentials of the in-form-menu */
   worker.port.on('passbolt.in-form-menu.create-new-credentials', async function(requestId) {
-    const informMenuController = new InformMenuController(worker);
+    const apiClientOptions =  await User.getInstance().getApiClientOptions();
+    const informMenuController = new InformMenuController(worker, apiClientOptions);
     await informMenuController.createNewCredentials(requestId);
   });
 
   /** Whenever the user clicks on create new credentials of the in-form-menu */
   worker.port.on('passbolt.in-form-menu.save-credentials', async function(requestId) {
-    const informMenuController = new InformMenuController(worker);
+    const apiClientOptions =  await User.getInstance().getApiClientOptions();
+    const informMenuController = new InformMenuController(worker, apiClientOptions);
     await informMenuController.saveCredentials(requestId);
   });
 
   /** Whenever the user clicks on browse credentials of the in-form-menu */
   worker.port.on('passbolt.in-form-menu.browse-credentials', async function(requestId) {
-    const informMenuController = new InformMenuController(worker);
+    const apiClientOptions =  await User.getInstance().getApiClientOptions();
+    const informMenuController = new InformMenuController(worker, apiClientOptions);
+    informMenuController.browseCredentials(requestId);
+  });
+
+  /**
+   * Whenever the user intends to use a suggested resource as credentials for the current page
+   */
+  worker.port.on('passbolt.in-form-menu.use-suggested-resource', async function(requestId, resourceId) {
+    const apiClientOptions =  await User.getInstance().getApiClientOptions();
+    const informMenuController = new InformMenuController(worker, apiClientOptions);
+    await informMenuController.useSuggestedResource(requestId, resourceId);
+  });
+
+  /** Whenever the user clicks on browse credentials of the in-form-menu */
+  worker.port.on('passbolt.in-form-menu.browse-credentials', async function(requestId) {
+    const apiClientOptions =  await User.getInstance().getApiClientOptions();
+    const informMenuController = new InformMenuController(worker, apiClientOptions);
     informMenuController.browseCredentials(requestId);
   });
 };

@@ -29,9 +29,6 @@ const listen = function (worker) {
       const tabs = await browser.tabs.query({active: true, currentWindow: true});  // Code to get browser's current active tab
       if (!tabs || !tabs.length) {
         const err = new Error(i18n.t('Autofill failed. Could not find the active tab.'));
-        const tabsForDebug = await browser.tabs.query({});
-        console.error(err);
-        console.error(tabsForDebug);
         worker.port.emit(requestId, 'ERROR', err);
       }
       tab = tabs[0];
@@ -45,7 +42,7 @@ const listen = function (worker) {
       const {plaintext, resource} = await controller.main(resourceId, false);
 
       // Define what to do autofill
-      let username = resource.username || '';
+      const username = resource.username || '';
       let password;
       if (typeof plaintext === 'string') {
         password = plaintext;
@@ -70,7 +67,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param tabId {string} The tab id
    */
-  worker.port.on('passbolt.quickaccess.prepare-create', async function (requestId, tabId) {
+  worker.port.on('passbolt.quickaccess.prepare-resource', async function (requestId, tabId) {
     try {
       const resourceInProgress = ResourceInProgressCacheService.getAndConsume() || {};
       const tab = tabId ? await BrowserTabService.getById(tabId) : await BrowserTabService.getCurrent();
@@ -82,6 +79,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
+
 };
 
 exports.listen = listen;

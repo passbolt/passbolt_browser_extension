@@ -121,6 +121,27 @@ class ResourcesCollection extends EntityCollection {
   }
 
   /**
+   * Find the possible resources to suggest given an url
+   * @param url An url
+   * @return {*[]} A list of resource
+   */
+  findSuggestedResources(url) {
+    const suggestedResources = [];
+    for (let index = 0; index < this._items.length; index++) {
+      if (this._items[index].uri) {
+        const canBeSuggested = canSuggestUrl(url, this._items[index].uri);
+        if (canBeSuggested) {
+          suggestedResources.push(this._items[index]);
+        }
+        if (suggestedResources.length === SUGGESTED_RESOURCES_LIMIT) {
+          break;
+        }
+      }
+    }
+    return suggestedResources;
+  }
+
+  /**
    * Returns the count of possible resources to suggest given an url
    * @param currentUrl An url
    * @return {*[]|number}

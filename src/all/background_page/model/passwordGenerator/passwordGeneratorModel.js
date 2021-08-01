@@ -124,7 +124,6 @@ class PasswordGeneratorModel {
     try {
       passwordGeneratorDto = await this.passwordGeneratorService.find();
       passwordGeneratorDto = Object.assign({}, passwordGeneratorDto, {generators: GENERATORS});
-      Log.write({level: 'debug', message: JSON.stringify(passwordGeneratorDto)});
     } catch (error) {
       if (error instanceof PassboltApiFetchError && error.data && error.data.code === 404) {
         const default_generator = "passphrase";

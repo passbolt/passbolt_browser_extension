@@ -75,7 +75,11 @@ class InformCallToActionController {
       const auth = new GpgAuth();
       const status = await auth.checkAuthStatus({requestApi: false});
       if (!status.isAuthenticated) {
-        await QuickAccessService.openInDetachedMode();
+        const queryParameters = [
+          {name: "uiMode", value: "detached"},
+          {name: "feature", value: "login"}
+        ];
+        await QuickAccessService.openInDetachedMode(queryParameters);
         this.worker.port.emit(requestId, "SUCCESS");
       } else if (status.isMfaRequired) {
         browser.tabs.create({url: User.getInstance().settings.getDomain(), active: true});

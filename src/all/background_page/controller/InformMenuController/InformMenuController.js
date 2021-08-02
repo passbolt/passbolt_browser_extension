@@ -20,6 +20,8 @@ const {Crypto} = require('../../model/crypto');
 const {QuickAccessService} = require("../../service/ui/quickAccess.service");
 const User = require('../../model/user').User;
 const passphraseController = require('../passphrase/passphraseController');
+const {BrowserTabService} = require("../../service/ui/browserTab.service");
+const {ExternalResourceEntity} = require("../../model/entity/resource/external/externalResourceEntity");
 
 
 /**
@@ -84,16 +86,27 @@ class InformMenuController {
    * @param requestId The identifier of the request
    */
   async saveCredentials(requestId) {
-    const queryParameters = [
+    // Request resource username and password to the page on which the save credentials has been initiated.
+    const {username, password: secret_clear} = await Worker.get('WebIntegration', this.worker.tab.id).port.request('passbolt.web-integration.get-credentials');
+
+    // Retrieve resource name and uri from tab.
+    const tab = await BrowserTabService.getCurrent();
+    const name = tab.title;
+    const uri = tab.url;
+
+    // Store the resource to save in cache.
+    const resourceDto = {name, username, uri, secret_clear};
+    const resource = new ExternalResourceEntity(resourceDto);
+    ResourceInProgressCacheService.set(resource);
+
+    // Open the quickaccess on the save credentials page.
+    const quickaccessDetachModeQueryParameters = [
       {name: "uiMode", value: "detached"},
       {name: "feature", value: "save-credentials"},
       {name: "tabId", value: this.worker.tab.id}
     ];
-    // Request username and password
-    const {username, password: secret_clear} = await Worker.get('WebIntegration', this.worker.tab.id).port.request('passbolt.web-integration.get-credentials');
-    const resourceInProgress = {username, secret_clear};
-    ResourceInProgressCacheService.set(resourceInProgress);
-    await QuickAccessService.openInDetachedMode(queryParameters);
+    await QuickAccessService.openInDetachedMode(quickaccessDetachModeQueryParameters);
+
     Worker.get('WebIntegration', this.worker.tab.id).port.emit('passbolt.in-form-menu.close');
     this.worker.port.emit(requestId, "SUCCESS");
   }

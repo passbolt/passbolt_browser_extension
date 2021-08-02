@@ -6,7 +6,6 @@
  */
 const {i18n} = require('../sdk/i18n');
 const Worker = require('../model/worker');
-const {BrowserTabService} = require("../service/ui/browserTab.service");
 const {ResourceInProgressCacheService} = require("../service/cache/resourceInProgressCache.service");
 const {User} = require('../model/user');
 const {SecretDecryptController} = require('../controller/secret/secretDecryptController');
@@ -47,7 +46,7 @@ const listen = function (worker) {
       if (typeof plaintext === 'string') {
         password = plaintext;
       } else {
-        password = plaintext.password || ''
+        password = plaintext.password || '';
       }
 
       // Current active tab's url is passing to quick access to check the same origin request
@@ -67,12 +66,9 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param tabId {string} The tab id
    */
-  worker.port.on('passbolt.quickaccess.prepare-resource', async function (requestId, tabId) {
+  worker.port.on('passbolt.quickaccess.prepare-resource', async function (requestId) {
     try {
-      const resourceInProgress = ResourceInProgressCacheService.getAndConsume() || {};
-      const tab = tabId ? await BrowserTabService.getById(tabId) : await BrowserTabService.getCurrent();
-      resourceInProgress.name = tab.title;
-      resourceInProgress.uri = tab.url;
+      const resourceInProgress = ResourceInProgressCacheService.consume() || {};
       worker.port.emit(requestId, 'SUCCESS', resourceInProgress);
     } catch (error) {
       console.error(error);
@@ -80,6 +76,21 @@ const listen = function (worker) {
     }
   });
 
+  /*
+   * Prepare to auto-save a new resource.
+   *
+   * @listens passbolt.resources.prepare-autosave
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.quickaccess.prepare-autosave', async function (requestId) {
+    try {
+      const resourceInProgress = ResourceInProgressCacheService.consume() || {};
+      worker.port.emit(requestId, 'SUCCESS', resourceInProgress);
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
 };
 
 exports.listen = listen;

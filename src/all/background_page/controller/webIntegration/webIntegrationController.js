@@ -14,7 +14,7 @@
 
 const {ResourceInProgressCacheService} = require("../../service/cache/resourceInProgressCache.service");
 const {QuickAccessService} = require("../../service/ui/quickAccess.service");
-
+const {ExternalResourceEntity} = require("../../model/entity/resource/external/externalResourceEntity");
 
 /**
  * Controller related to the in-form call-to-action
@@ -37,13 +37,15 @@ class WebIntegrationController {
       {name: "feature", value: "autosave-credentials"}
     ];
     // Request username and password
-    const resourceInProgress = {
+    const url = new URL(resourceToSave.url);
+    const resourceDto = {
       name: resourceToSave.name,
-      uri: new URL(resourceToSave.url).hostname,
+      uri: `${url.protocol}//${url.host}${url.pathname}`,
       username: resourceToSave.username,
       secret_clear: resourceToSave.password
     };
-    ResourceInProgressCacheService.set(resourceInProgress);
+    const resource = new ExternalResourceEntity(resourceDto);
+    ResourceInProgressCacheService.set(resource);
     QuickAccessService.openInDetachedMode(queryParameters);
   }
 }

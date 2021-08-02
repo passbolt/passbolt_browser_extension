@@ -90,22 +90,6 @@ const listen = function (worker) {
   });
 
   /*
-   * Prepare to auto-save a new resource.
-   *
-   * @listens passbolt.resources.prepare-autosave
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.resource.prepare-autosave', async function (requestId) {
-    try {
-      const resourceInProgress = ResourceInProgressCacheService.get() || {};
-      worker.port.emit(requestId, 'SUCCESS', resourceInProgress);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
-  });
-
-  /*
    * Delete resources
    *
    * @listens passbolt.resources.delete-all

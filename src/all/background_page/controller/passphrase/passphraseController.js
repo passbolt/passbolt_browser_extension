@@ -55,14 +55,23 @@ exports.request = requestPassphrase;
  * Request the user passphrase from the Quick Access
  */
 const requestPassphraseFromQuickAccess = async function() {
-  const requestId = 'passbolt.quickaccess.request-passphrase';
-  // Open the quick access to ask for the master passphrase
-  const queryParameters = [
-    {name: "uiMode", value: "detached"},
-    {name: "feature", value: "request-passphrase"},
-    {name: "requestId", value: requestId}
-  ];
-  QuickAccessService.openInDetachedMode(queryParameters);
+  const user = User.getInstance();
+  try {
+    return await user.getStoredMasterPassword();
+  } catch (error) {
+    const requestId = 'passbolt.quickaccess.request-passphrase';
+    // Open the quick access to ask for the master passphrase
+    const queryParameters = [
+      {name: "uiMode", value: "detached"},
+      {name: "feature", value: "request-passphrase"},
+      {name: "requestId", value: requestId}
+    ];
+    await QuickAccessService.openInDetachedMode(queryParameters);
+    return await getPassphraseFromQuickAccess(requestId);
+  }
+};
+
+const getPassphraseFromQuickAccess = async function(requestId) {
   return  new Promise((resolve, reject) => {
     const quickAccessWorkerInterval = setInterval(async() => {
       const currentTab = await BrowserTabService.getCurrent();

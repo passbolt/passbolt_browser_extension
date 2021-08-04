@@ -12,28 +12,51 @@
  * @since         3.4
  */
 
-/** The default quickaccesss window heigth */
-const QUICKACCESS_WINDOW_HEIGHT = 380;
+/** The default quickaccesss window height */
+const QUICKACCESS_WINDOW_HEIGHT = 400;
 
-/** The default quickaccesss window heigth */
-const QUICKACCESS_WINDOW_WIDTH = 400;
+/** The default quickaccesss window width */
+const QUICKACCESS_WINDOW_WIDTH = 380;
 
 /**
  * Open the quick access in a detached mode
- * @param {array<{name: string, value: string}>} queryParameters The query paramenters to attach to the quick access detached popup url
+ * @param {array<{name: string, value: string}>} queryParameters The query parameters to attach to the quick access detached popup url
  */
 async function openInDetachedMode(queryParameters = []) {
-  const popupUrl = await browser.browserAction.getPopup({});
-  const popupUrlWithQueryParameters = new URL(popupUrl);
-  queryParameters.forEach(queryParameter => popupUrlWithQueryParameters.searchParams.append(queryParameter.name, queryParameter.value));
-  const windowFeatures = `width=${QUICKACCESS_WINDOW_WIDTH},height=${QUICKACCESS_WINDOW_HEIGHT},scrollbars=0,toolbar=0,location=0,resizable=0,status=0`;
-  const detachedQuickAccessWindow = window.open("", "extension_popup", windowFeatures);
-  // The noopener feature cannot be passed as open parameters, otherwise it set all the other feature to null.
-  detachedQuickAccessWindow.opener = null;
-  detachedQuickAccessWindow.location = popupUrlWithQueryParameters.href;
-  detachedQuickAccessWindow.document.title = "Passbolt";
+  const url = await buildDetachedQuickacessUrl(queryParameters);
+  const {top, left} = await buildDetachedQuickaccessPosition();
+
+  const type = "panel";
+  const width = QUICKACCESS_WINDOW_WIDTH;
+  const height = QUICKACCESS_WINDOW_HEIGHT;
+  const windowCreateData = {url, type, left, top, width, height};
+
+  browser.windows.create(windowCreateData);
+}
+
+/**
+ * Build the detached quickaccess url.
+ * @param {array<{name: string, value: string}>} queryParameters The query parameters to attach to the quick access detached popup url
+ * @returns {Promise<string>}
+ */
+async function buildDetachedQuickacessUrl(queryParameters) {
+  const browserExtensionUrl = await browser.browserAction.getPopup({});
+  const quickaccessUrl = new URL(browserExtensionUrl);
+  queryParameters.forEach(queryParameter => quickaccessUrl.searchParams.append(queryParameter.name, queryParameter.value));
+  return quickaccessUrl.href;
+}
+
+/**
+ * Build the detached quickaccess position.
+ * @returns {Promise<{top: number, left: number}>}
+ */
+async function buildDetachedQuickaccessPosition() {
+  const currentWindow = await browser.windows.getCurrent();
+  const left = currentWindow.left + currentWindow.width - QUICKACCESS_WINDOW_WIDTH;
+  const top = currentWindow.top;
+  return {top, left};
 }
 
 exports.QuickAccessService = {
   openInDetachedMode: openInDetachedMode
-}
+};

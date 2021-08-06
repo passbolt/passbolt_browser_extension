@@ -41,7 +41,7 @@ class AuthModel {
   async logout() {
     await this.authService.logout();
     await this.postLogout();
-  };
+  }
 
   /**
    * Post logout
@@ -53,7 +53,7 @@ class AuthModel {
     await AuthStatusLocalStorage.set(isAuthenticated, isMfaRequired);
     const event = new Event('passbolt.auth.after-logout');
     window.dispatchEvent(event);
-  };
+  }
 
   /**
    * Get server key
@@ -61,7 +61,7 @@ class AuthModel {
    */
   async getServerKey() {
     return this.authService.getServerKey();
-  };
+  }
 
   /**
    * Login

@@ -9,6 +9,7 @@ const Worker = require('../model/worker');
 const {ResourceInProgressCacheService} = require("../service/cache/resourceInProgressCache.service");
 const {User} = require('../model/user');
 const {SecretDecryptController} = require('../controller/secret/secretDecryptController');
+const {BrowserTabService} = require("../service/ui/browserTab.service");
 
 const listen = function (worker) {
   /*
@@ -18,19 +19,18 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param resourceId {uuid} The resource identifier
    */
-  worker.port.on('passbolt.quickaccess.use-resource-on-current-tab', async function (requestId, resourceId) {
+  worker.port.on('passbolt.quickaccess.use-resource-on-current-tab', async function (requestId, resourceId, tabId) {
     let tab;
     if (!worker.port) {
       const err = new Error(i18n.t('Inactive worker on the page.'));
       worker.port.emit(requestId, 'ERROR', err);
     }
     try {
-      const tabs = await browser.tabs.query({active: true, currentWindow: true});  // Code to get browser's current active tab
-      if (!tabs || !tabs.length) {
+      tab = tabId ? await BrowserTabService.getById(tabId) : await BrowserTabService.getCurrent();  // Code to get browser's tab
+      if (!tab) {
         const err = new Error(i18n.t('Autofill failed. Could not find the active tab.'));
         worker.port.emit(requestId, 'ERROR', err);
       }
-      tab = tabs[0];
     } catch(error) {
       worker.port.emit(requestId, 'ERROR', error);
     }

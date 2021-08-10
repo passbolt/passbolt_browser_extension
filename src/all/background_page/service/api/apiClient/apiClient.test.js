@@ -74,7 +74,7 @@ describe("Integration test with real fetch", () => {
     }
   });
 
-  it("should respond 403 to unauthorized url", async () => {
+  it("should respond 401 to unauthorized url", async () => {
     const options = (new ApiClientOptions())
       .setBaseUrl('https://cloud.passbolt.com/passbolt-monitor/')
       .setResourceName('users');
@@ -83,7 +83,7 @@ describe("Integration test with real fetch", () => {
       await testClient.findAll();
       done.fail();
     } catch (error) {
-      expect(error.data.code).toBe(403);
+      expect(error.data.code).toBe(401);
       // TODO find out why we can't use:
       //   expect(error).toBeInstanceOf(PassboltApiFetchError)
       expect(error.name).toBe('PassboltApiFetchError');

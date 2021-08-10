@@ -1,77 +1,72 @@
 /**
- * The aim of the worker model is to manage instantiated workers.
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) 2021 Passbolt SA (https://www.passbolt.com)
  *
- * @copyright (c) 2017 Passbolt SARL
- * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) 2021 Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         1.3.0
  */
-var app = require('../app');
-var Log = require('./log').Log;
+const Log = require('./log').Log;
+const workers = {};
 
 /**
  * Reference a worker.
  * @param workerId {string} The worker identifier
  * @param worker {Worker} The worker to reference
- * @param options {array} Optional data
  */
-var add = function (workerId, worker, options) {
-  options = options || {};
-  var url = worker.tab.url;
-
-  if (exists(workerId, worker.tab.id)) {
-    // if a worker with same id is already in the tab
-    // // destroy it, it will trigger a detach event (see bellow)
-    app.workers[worker.tab.id][workerId].destroy('from model/worker::add because ' + workerId + ' already exist at tab ' + worker.tab.id);
+const add = function (workerId, worker) {
+  const tabId = worker?.tab?.id || -1;
+  if (exists(workerId, tabId)) {
+    /*
+     * if a worker with same id is already in the tab
+     * destroy it, it will trigger a detach event (see bellow)
+     * @todo Overall this workers catalog management should be brought at a lower level, and constraint of uniqueness
+     *   of a worker should be expressed by a pagemod property.
+     */
+    workers[tabId][workerId].destroy(`from model/worker::add because ${workerId} already exist at tab ${tabId}`);
   }
 
-  // Add the worker to the list of active app workers.
-  // Build the workers list for that tab if needed
-  Log.write({level: 'debug', message: 'model/worker:: Add worker ' + workerId + ', tab:' + worker.tab.id + ', url:' + worker.tab.url});
-  if (typeof app.workers[worker.tab.id] === 'undefined') {
-    app.workers[worker.tab.id] = {};
-  }
-  app.workers[worker.tab.id][workerId] = worker;
+  /*
+   * Add the worker to the list of active app workers.
+   * Build the workers list for that tab if needed
+   */
+  Log.write({
+    level: 'debug',
+    message: `model/worker:: Add worker ${workerId}, tab:${tabId}, url:${worker?.tab?.url}`
+  });
 
-  // Listen to tab url changes.
-  // If callback given in option on url change, call it
-  // var onTabReadyHandler = function (tab) {
-  //   if (url != tab.url.split('#')[0]) {
-  //     // console.log('url changed on tabReadyHandler');
-  //     if (options.onTabUrlChange) {
-  //       options.onTabUrlChange(worker);
-  //     }
-  //     worker.tab.removeListener('ready', onTabReadyHandler);
-  //   }
-  // };
-  // worker.tab.on('ready', onTabReadyHandler);
+  workers[tabId] = workers[tabId] || {};
+  workers[tabId][workerId] = worker;
 
-  // Listen to worker detach event
-  // This event is called as part of the worker destroy
-  // Remove the worker from the list
-  var onWorkerDetachHandler = function () {
-    remove(workerId, worker.tab.id, options);
-  };
+  /*
+   * Listen to worker detach event
+   * This event is called as part of the worker destroy
+   * Remove the worker from the list
+   */
+  const onWorkerDetachHandler = () => remove(workerId, tabId);
   worker.on('detach', onWorkerDetachHandler);
-
 };
 exports.add = add;
 
 /**
- * Unreference a worker.
- * @param tabId {string} The tab identifier on which the worker runs
- * @param workerId {string} The worker identifier
- * @param options {array} Optional parameters
- *  - options.onDestroy {function} Callback to execute when the worker is
- *    destroyed.
+ * Remove a worker from the list of referenced workers.
+ * @param workerId {string} The worker identifier.
+ * @param tabId {string} The tab identifier on which the worker runs.
  */
-var remove = function (workerId, tabId, options) {
+const remove = function (workerId, tabId) {
   if (!exists(workerId, tabId)) {
-    Log.write({level: 'warning', 'message': 'model/worker::remove unable to remove ' + workerId + ', it does not exist for tab ' + tabId });
+    Log.write({
+      level: 'warning',
+      'message': `model/worker::remove unable to remove ${workerId}, it does not exist for tab ${tabId}`
+    });
   } else {
-    Log.write({level: 'debug', message: 'model/worker::remove ' + workerId + ', tab:' + tabId});
-    if (typeof options.onDestroy !== 'undefined') {
-      options.onDestroy();
-    }
-    delete app.workers[tabId][workerId];
+    Log.write({level: 'debug', message: `model/worker::remove ${workerId}, tab:${tabId}`});
+    delete workers[tabId][workerId];
   }
 };
 
@@ -79,46 +74,28 @@ var remove = function (workerId, tabId, options) {
  * Get a worker.
  * @param workerId {string} The worker identifier
  * @param {string} tabId The tab identifier on which the worker runs
- * @param {boolean} [log] error optional, default true
+ * @param {?boolean} log error optional, default true
  * @return {Worker} null if the worker doesn't exist.
  */
-var get = function (workerId, tabId, log) {
+const get = function (workerId, tabId, log = true) {
   if (!exists(workerId, tabId)) {
     const error = new Error(`Could not find worker ID ${workerId} for tab ${tabId}.`);
-    if (log !== false) {
-      console.error(error);
-      console.error(app.workers);
+    if (log) {
+      console.error(error, workers);
     }
     throw Error;
   }
-  return app.workers[tabId][workerId];
+  return workers[tabId][workerId];
 };
 exports.get = get;
 
 /**
- * Get all workers identifiers instantiated on a tab.
- * @param tabId {string} The tab identifier
- * @return {array}
- */
-var getAllKeys = function (tabId) {
-  return Object.keys(app.workers[tabId]);
-};
-exports.getAllKeys = getAllKeys;
-
-/**
  * Checks that a worker exists.
- * @param workerId {string} The worker identifier
- * @param tabId {string} The tab identifier on which the worker runs
+ * @param {string} workerId The worker identifier
+ * @param {string} tabId The tab identifier on which the worker runs
  * @return {boolean}
  */
-var exists = function (workerId, tabId) {
-  // if tab does not exist
-  if (typeof app.workers[tabId] === 'undefined') {
-    return false;
-  }
-  if (typeof app.workers[tabId][workerId] === 'undefined') {
-    return false;
-  }
-  return true;
+const exists = function (workerId, tabId) {
+  return !(!workers[tabId] || !workers[tabId][workerId]);
 };
 exports.exists = exists;

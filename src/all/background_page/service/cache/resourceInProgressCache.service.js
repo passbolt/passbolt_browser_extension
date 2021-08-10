@@ -25,7 +25,7 @@ class ResourceInProgressCacheService {
   static #VALIDITY_TIMEOUT_IN_MS = 6000;
 
   /** The cached resource*/
-  #resource;
+  #resourceDto;
 
   /** The invalidity timeout */
   #invalidTimeout;
@@ -34,7 +34,7 @@ class ResourceInProgressCacheService {
    * Default constructor
    */
   constructor() {
-    this.#resource = null;
+    this.#resourceDto = null;
     this.bindCallbacks();
   }
 
@@ -46,25 +46,28 @@ class ResourceInProgressCacheService {
   }
 
   /**
-   * Returns the resource information in progress
-   * @return A resource
+   * Consume the cached resource.
+   * @return {Object} A resource DTO
    */
-  getAndConsume() {
-    const resource =  this.#resource;
+  consume() {
+    const resourceDto = this.#resourceDto;
     this.reset();
-    return resource?.toDto();
+    return resourceDto;
   }
 
   /**
-   * Set resource information in progress
-   * @param value
-   * @param timeoutInMs
+   * Store a resource in cache.
+   * @param {ExternalResourceEntity|object} resource The resource to store in cache.
+   * @param {?int} timeoutInMs Period of time in millsecond after which the cache will be cleaned.
    */
   set(resource, timeoutInMs = ResourceInProgressCacheService.#VALIDITY_TIMEOUT_IN_MS) {
+    if (!(resource instanceof ExternalResourceEntity)) {
+      throw new TypeError('ResourceInProgressCacheService::set expects a ExternalResourceEntity');
+    }
     // Clean everything before set the value
     this.reset();
 
-    this.#resource = new ExternalResourceEntity(resource);
+    this.#resourceDto = resource.toDto();
 
     // Invalid the cache after a given time
     this.#invalidTimeout = setTimeout(this.reset, timeoutInMs);
@@ -77,7 +80,7 @@ class ResourceInProgressCacheService {
    * Resets the cache
    */
   reset() {
-    this.#resource = null;
+    this.#resourceDto = null;
     clearTimeout(this.#invalidTimeout);
     window.removeEventListener("passbolt.auth.after-logout", this.reset);
   }

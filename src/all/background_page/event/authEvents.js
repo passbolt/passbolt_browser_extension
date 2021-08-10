@@ -63,6 +63,7 @@ const listen = function (worker) {
       await auth.logout();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
+      console.error(error);
       worker.port.emit(requestId, 'ERROR');
     }
   });

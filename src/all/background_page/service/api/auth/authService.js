@@ -53,7 +53,17 @@ class AuthService extends AbstractService {
    */
   async logout() {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/logout`, {});
-    return this.apiClient.fetchAndHandleResponse('GET', url);
+    try {
+      // @deprecated with passbolt API > 4. Logout redirect automatically to login.json which generates an error.
+      await this.apiClient.fetchAndHandleResponse('GET', url, null, {redirect: "manual"});
+    } catch (error) {
+      if (error instanceof PassboltBadResponseError && error?.srcResponse?.type === "opaqueredirect") {
+        // @deprecated with passbolt API > 4. Logout redirect automatically to login.json which generates an error.
+      } else {
+        throw error;
+      }
+    }
+
   }
 
   /**

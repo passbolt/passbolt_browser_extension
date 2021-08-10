@@ -7,9 +7,11 @@
 const {i18n} = require('../sdk/i18n');
 
 class PassboltBadResponseError extends Error {
-  constructor() {
+  constructor(error, response) {
     super(i18n.t('An internal error occurred. The server response could not be parsed. Please contact your administrator.'));
     this.name = 'PassboltBadResponseError';
+    this.srcError = error;
+    this.srcResponse = response;
   }
 }
 

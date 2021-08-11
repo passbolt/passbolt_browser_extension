@@ -99,3 +99,32 @@ const exists = function (workerId, tabId) {
   return !(!workers[tabId] || !workers[tabId][workerId]);
 };
 exports.exists = exists;
+
+/**
+ * Wait until a worker exists
+ * @param {string} workerId The worker identifier
+ * @param {string} tabId The tab identifier on which the worker runs
+ * @param {int} timeout The timeout after which the promise fails if the worker is not found
+ * @return {Promise<void>}
+ */
+const waitExists = function (workerId, tabId, timeout = 10000) {
+  const intervalPeriod = 100;
+  let attempt = 0;
+
+  return new Promise((resolve, reject) => {
+    const interval = setInterval(() => {
+      attempt++;
+      try {
+        get(workerId, tabId, false);
+        clearInterval(interval);
+        resolve();
+      } catch (error) {
+        if (attempt * intervalPeriod >= timeout) {
+          clearInterval(interval);
+          reject(error);
+        }
+      }
+    }, intervalPeriod);
+  });
+};
+exports.waitExists = waitExists;

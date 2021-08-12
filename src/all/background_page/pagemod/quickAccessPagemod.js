@@ -35,10 +35,12 @@ QuickAccess.init = function () {
       app.events.organizationSettings.listen(this._worker);
       app.events.tab.listen(this._worker);
       app.events.locale.listen(this._worker);
-      WorkerModel.add('QuickAccess', this._worker);
+      app.events.passwordGenerator.listen(this._worker);
 
       // Keep the pagemod event listeners at the end of the list.
       app.events.pagemod.listen(this._worker);
+
+      WorkerModel.add('QuickAccess', this._worker);
     }
   });
 };

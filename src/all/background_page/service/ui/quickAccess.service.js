@@ -21,6 +21,7 @@ const QUICKACCESS_WINDOW_WIDTH = 380;
 /**
  * Open the quick access in a detached mode
  * @param {array<{name: string, value: string}>} queryParameters The query parameters to attach to the quick access detached popup url
+ * @return {Promise<windows.Window>}
  */
 async function openInDetachedMode(queryParameters = []) {
   const url = await buildDetachedQuickacessUrl(queryParameters);
@@ -31,7 +32,7 @@ async function openInDetachedMode(queryParameters = []) {
   const height = QUICKACCESS_WINDOW_HEIGHT;
   const windowCreateData = {url, type, left, top, width, height};
 
-  browser.windows.create(windowCreateData);
+  return browser.windows.create(windowCreateData);
 }
 
 /**

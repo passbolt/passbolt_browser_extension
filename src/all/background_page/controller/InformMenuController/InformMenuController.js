@@ -107,8 +107,8 @@ class InformMenuController {
     ];
     await QuickAccessService.openInDetachedMode(quickaccessDetachModeQueryParameters);
 
-    Worker.get('WebIntegration', this.worker.tab.id).port.emit('passbolt.in-form-menu.close');
     this.worker.port.emit(requestId, "SUCCESS");
+    Worker.get('WebIntegration', this.worker.tab.id).port.emit('passbolt.in-form-menu.close');
   }
 
   /**
@@ -131,10 +131,9 @@ class InformMenuController {
       const {username} = resource;
       const password = plaintext?.password || plaintext;
       webIntegrationWorker.port.emit('passbolt.web-integration.fill-credentials', {username, password});
-      this.worker.port.emit(requestId, "SUCCESS");
     } catch(error) {
-      console.log(error);
-      this.worker.port.emit(requestId, "ERROR", error);
+      // The original worker has been destroyed when requesting to close the in-form menu, there is no worker to notify.
+      console.error(error);
     }
   }
 

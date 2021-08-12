@@ -55,38 +55,53 @@ exports.request = requestPassphrase;
  * Request the user passphrase from the Quick Access
  */
 const requestPassphraseFromQuickAccess = async function() {
-  const requestId = 'passbolt.quickaccess.request-passphrase';
-  // Open the quick access to ask for the master passphrase
-  const queryParameters = [
-    {name: "uiMode", value: "detached"},
-    {name: "feature", value: "request-passphrase"},
-    {name: "requestId", value: requestId}
-  ];
-  QuickAccessService.openInDetachedMode(queryParameters);
-  return  new Promise((resolve, reject) => {
-    const quickAccessWorkerInterval = setInterval(async() => {
-      const currentTab = await BrowserTabService.getCurrent();
-      const quickAccessWorker = Worker.get('QuickAccess', currentTab.id);
-      if (quickAccessWorker) {
-        clearInterval(quickAccessWorkerInterval);
-        try {
-          quickAccessWorker.port.on(requestId, (status, requestResult)  => {
-            if (status === 'SUCCESS') {
-              const {passphrase, rememberMe} = requestResult;
-              validatePassphrase(passphrase, rememberMe);
-              rememberPassphrase(passphrase, rememberMe);
-              resolve(passphrase);
-            }
-          });
-        } catch (error) {
-          reject(error);
-        }
-      }
-    }, 100);
-  });
-};
+  const user = User.getInstance();
+  try {
+    return await user.getStoredMasterPassword();
+  } catch (error) {
+    /*
+     Open the quick access to request the master passphrase to the user.
+     Then once the quick access will have captured the passphrase, it will communicate it to its worker using requestId
+     as message name. Basically, without changing the way the passphrase will be returned if the quick access was already
+     open and it will have to reply to the request "passbolt.passphrase.request".
+    */
+    const requestId = (Math.round(Math.random() * Math.pow(2, 32))).toString();
+    const queryParameters = [
+      {name: "uiMode", value: "detached"},
+      {name: "feature", value: "request-passphrase"},
+      {name: "requestId", value: requestId}
+    ];
+    const quickAccessWindow = await QuickAccessService.openInDetachedMode(queryParameters);
+    const {passphrase, rememberMe} = await listenToDetachedQuickaccessPassphraseRequestResponse(requestId, quickAccessWindow);
+    validatePassphrase(passphrase, rememberMe);
+    rememberPassphrase(passphrase, rememberMe);
 
+    return passphrase;
+  }
+};
 exports.requestFromQuickAccess = requestPassphraseFromQuickAccess;
+
+/**
+ * Listen to the quick access passphrase request response.
+ * @param {string} requestId The requestId used by the quick access to return the user passphrase
+ * @param {window.Window} quickAccessWindow The window the quick access runs on.
+ * @returns {Promise<{passphrase: string, rememberMe: string}>}
+ */
+const listenToDetachedQuickaccessPassphraseRequestResponse = async function(requestId, quickAccessWindow) {
+  const tabId = quickAccessWindow?.tabs?.[0]?.id;
+  await Worker.waitExists('QuickAccess', tabId);
+  const quickAccessWorker = Worker.get('QuickAccess', tabId);
+
+  return new Promise((resolve, reject) => {
+    quickAccessWorker.port.on(requestId, (status, requestResult)  => {
+      if (status === 'SUCCESS') {
+        resolve(requestResult)
+      } else {
+        reject(requestResult);
+      }
+    });
+  })
+};
 
 /**
  * Remember the user passphrase for a given duration.

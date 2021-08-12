@@ -31,8 +31,10 @@ async function openInDetachedMode(queryParameters = []) {
   const width = QUICKACCESS_WINDOW_WIDTH;
   const height = QUICKACCESS_WINDOW_HEIGHT;
   const windowCreateData = {url, type, left, top, width, height};
-
-  return browser.windows.create(windowCreateData);
+  const quickAccessWindow = await browser.windows.create(windowCreateData);
+  // On firefox 90, with dual screen, the window is not positioned properly and it requires to be moved manually.
+  browser.windows.update(quickAccessWindow.id, {left, top});
+  return quickAccessWindow;
 }
 
 /**

@@ -91,6 +91,7 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
+
 };
 
 exports.listen = listen;

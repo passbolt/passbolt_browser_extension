@@ -6,6 +6,7 @@
  */
 const {i18n} = require('../sdk/i18n');
 const Worker = require('../model/worker');
+const {BrowserTabService} = require("../service/ui/browserTab.service");
 const {ResourceInProgressCacheService} = require("../service/cache/resourceInProgressCache.service");
 const {User} = require('../model/user');
 const {SecretDecryptController} = require('../controller/secret/secretDecryptController');
@@ -89,6 +90,21 @@ const listen = function (worker) {
     } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Update the quickacess window height
+   *
+   * @listens passbolt.quickaccess.update-window-height
+   * @param height {int} the height to apply
+   */
+  worker.port.on('passbolt.quickaccess.update-window-height', async function (height) {
+    try {
+      const quickAccessTab = await BrowserTabService.getById(worker.tab.id);
+      browser.windows.update(quickAccessTab.windowId, {height: height + 30});
+    } catch (error) {
+      console.error(error);
     }
   });
 

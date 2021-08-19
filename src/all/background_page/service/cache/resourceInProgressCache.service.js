@@ -14,6 +14,14 @@
 
 const {ExternalResourceEntity} = require("../../model/entity/resource/external/externalResourceEntity");
 
+/** Default validity timeout of the cache */
+const VALIDITY_TIMEOUT_IN_MS = 6000;
+
+/** The cached resource*/
+let resourceDto,
+/** The invalidity timeout */
+invalidTimeout;
+
 /**
  * A cache service used whenever one wants to store information about a resource creation in progress.
  * This cache is a one-shot getter i.e. after one call the get, the cache is reset. Moreover, the cache information
@@ -21,20 +29,11 @@ const {ExternalResourceEntity} = require("../../model/entity/resource/external/e
  */
 class ResourceInProgressCacheService {
 
-  /** Default validity timeout of the cache */
-  static #VALIDITY_TIMEOUT_IN_MS = 6000;
-
-  /** The cached resource*/
-  #resourceDto;
-
-  /** The invalidity timeout */
-  #invalidTimeout;
-
   /**
    * Default constructor
    */
   constructor() {
-    this.#resourceDto = null;
+    resourceDto = null;
     this.bindCallbacks();
   }
 
@@ -50,9 +49,9 @@ class ResourceInProgressCacheService {
    * @return {Object} A resource DTO
    */
   consume() {
-    const resourceDto = this.#resourceDto;
+    const resource = resourceDto;
     this.reset();
-    return resourceDto;
+    return resource;
   }
 
   /**
@@ -60,17 +59,17 @@ class ResourceInProgressCacheService {
    * @param {ExternalResourceEntity|object} resource The resource to store in cache.
    * @param {?int} timeoutInMs Period of time in millsecond after which the cache will be cleaned.
    */
-  set(resource, timeoutInMs = ResourceInProgressCacheService.#VALIDITY_TIMEOUT_IN_MS) {
+  set(resource, timeoutInMs = VALIDITY_TIMEOUT_IN_MS) {
     if (!(resource instanceof ExternalResourceEntity)) {
       throw new TypeError('ResourceInProgressCacheService::set expects a ExternalResourceEntity');
     }
     // Clean everything before set the value
     this.reset();
 
-    this.#resourceDto = resource.toDto();
+    resourceDto = resource.toDto();
 
     // Invalid the cache after a given time
-    this.#invalidTimeout = setTimeout(this.reset, timeoutInMs);
+    invalidTimeout = setTimeout(this.reset, timeoutInMs);
 
     // Invalid the cache if the user is logged out
     window.addEventListener("passbolt.auth.after-logout", this.reset);
@@ -80,8 +79,8 @@ class ResourceInProgressCacheService {
    * Resets the cache
    */
   reset() {
-    this.#resourceDto = null;
-    clearTimeout(this.#invalidTimeout);
+    resourceDto = null;
+    clearTimeout(invalidTimeout);
     window.removeEventListener("passbolt.auth.after-logout", this.reset);
   }
 }

@@ -50,6 +50,7 @@ events.user = require('./event/userEvents');
 events.organizationSettings = require('./event/organizationSettingsEvents');
 events.locale = require('./event/localeEvents');
 events.passwordGenerator = require('./event/passwordGeneratorEvents');
+events.mobile = require('./event/mobileEvents');
 events.informCallToAction = require('./event/informCallToActionEvents');
 events.informMenu = require('./event/informMenuEvents');
 events.webIntegration = require('./event/webIntegrationEvents');

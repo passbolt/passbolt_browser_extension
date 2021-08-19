@@ -249,6 +249,13 @@ module.exports = function (grunt) {
         }, {
           // Illustrations
           nonull: true,
+          cwd: path.node_modules + 'passbolt-styleguide/src/img/diagrams',
+          src: ['mobile-transfer.svg'],
+          dest: path.build_data + 'img/diagrams',
+          expand: true
+        }, {
+          // Illustrations
+          nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/illustrations',
           src: ['passphrase_intro.png', 'pin_passbolt.gif', 'arrow.png'],
           dest: path.build_data + 'img/illustrations',

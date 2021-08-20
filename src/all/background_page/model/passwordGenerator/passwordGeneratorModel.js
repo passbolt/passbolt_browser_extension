@@ -20,17 +20,6 @@ const {Log} = require('../../model/log');
 /** List of possible generator types */
 const GENERATORS =  [
   {
-    "name": "Passphrase",
-    "type": "passphrase",
-    "default_options":{
-      "word_count": 8,
-      "word_case": "lowercase",
-      "min_word": 4,
-      "max_word": 40,
-      "separator": " "
-    },
-  },
-  {
     "name": "Password",
     "type": "password",
     "default_options":{
@@ -100,6 +89,17 @@ const GENERATORS =  [
         "characters": "😀😃😄😁😆😅😂🤣🥲☺️😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥸🤩🥳😏😒😞😔😟😕🙁☹️😣😖😫😩🥺😢😭😤😠😡🤬🤯😳🥵🥶😱😨😰😥😓🤗🤔🤭🤫🤥😶😐😑😬🙄😯😦😧😮😲🥱😴🤤😪😵🤐🥴🤢🤮🤧😷🤒🤕🤑🤠😈👿👹👺🤡💩👻💀☠️👽👾🤖🎃😺😸😹😻😼😽🙀😿😾"
       }
     ],
+  },
+  {
+    "name": "Passphrase",
+    "type": "passphrase",
+    "default_options":{
+      "word_count": 8,
+      "word_case": "lowercase",
+      "min_word": 4,
+      "max_word": 40,
+      "separator": " "
+    },
   }
 ];
 
@@ -126,7 +126,7 @@ class PasswordGeneratorModel {
       passwordGeneratorDto = Object.assign({}, passwordGeneratorDto, {generators: GENERATORS});
     } catch (error) {
       if (error instanceof PassboltApiFetchError && error.data && error.data.code === 404) {
-        const default_generator = "passphrase";
+        const default_generator = "password";
         passwordGeneratorDto = Object.assign({}, {default_generator}, {generators: GENERATORS});
       } else {
         throw error;

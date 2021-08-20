@@ -10,7 +10,6 @@ const {BrowserTabService} = require("../service/ui/browserTab.service");
 const {ResourceInProgressCacheService} = require("../service/cache/resourceInProgressCache.service");
 const {User} = require('../model/user');
 const {SecretDecryptController} = require('../controller/secret/secretDecryptController');
-const {BrowserTabService} = require("../service/ui/browserTab.service");
 
 const listen = function (worker) {
   /*

@@ -19,6 +19,7 @@ const config = {
   },
   optimization: {
     splitChunks: {
+      minSize: 0,
       cacheGroups: {
         commons: {
           test: /[\\/]node_modules[\\/]((?!(passbolt\-styleguide)).*)[\\/]/,

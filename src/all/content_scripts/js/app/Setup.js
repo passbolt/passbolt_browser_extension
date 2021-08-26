@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since        3.0.0
  */
-import React, {Component} from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 import ExtBootstrapSetup from "passbolt-styleguide/src/react-extension/ExtBootstrapSetup";
 /* eslint-disable no-unused-vars */

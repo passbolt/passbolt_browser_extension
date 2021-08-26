@@ -12,8 +12,7 @@
  * @since         2.12.0
  */
 
-(function () {
-
+(function() {
   class Stylesheet {
     constructor() {
       this.stylesheetElementId = "ext-iframe-stylesheet-link";
@@ -41,10 +40,10 @@
           document.getElementById(this.stylesheetElementId).setAttribute('href', themePath);
         }
       }
-    };
+    }
 
     async getLocalStorage() {
-      return new Promise((resolve, reject) => {
+      return new Promise(resolve => {
         chrome.storage.local.get(["_passbolt_data"], result => resolve(result));
       });
     }
@@ -83,5 +82,4 @@
   }
 
   new Stylesheet();
-
 })();

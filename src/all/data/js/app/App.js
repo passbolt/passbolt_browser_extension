@@ -41,7 +41,6 @@ async function waitPagemodIsReady() {
 
 async function main() {
   await waitPagemodIsReady();
-  port.request('passbolt.app.init');
   const domContainer = document.createElement("div");
   document.body.appendChild(domContainer);
   ReactDOM.render(React.createElement(ExtApp, {port: port, storage: storage}), domContainer);

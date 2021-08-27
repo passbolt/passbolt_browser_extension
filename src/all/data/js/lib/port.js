@@ -4,34 +4,33 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var self = window.self || {};
+const self = window.self || {};
 
-(function (self) {
+(function(self) {
   /**
    * Port Class Constructor
    * @param port
    * @constructor
    */
-  var Port = function (portname) {
-    var _this = this;
+  const Port = function(portname) {
     this._i = 0;
     this._listeners = {};
 
-    if(typeof portname !== 'undefined') {
+    if (typeof portname !== 'undefined') {
       this._portname = portname;
     } else {
-      var msg = 'Port requires a portname to communicate to the addon code.';
+      const msg = 'Port requires a portname to communicate to the addon code.';
       throw Error(msg);
     }
     this._port = chrome.runtime.connect({name: this._portname});
     this._connected = true;
 
-    this._port.onDisconnect.addListener(function(){
-      console.warn('port disconnected from addon code: ' + portname);
-      _this._connected = false;
+    this._port.onDisconnect.addListener(() => {
+      console.warn(`port disconnected from addon code: ${portname}`);
+      this._connected = false;
     });
-    this._port.onMessage.addListener(function(msg) {
-      _this._onMessage(msg);
+    this._port.onMessage.addListener(msg => {
+      this._onMessage(msg);
     });
   };
 
@@ -43,15 +42,15 @@ var self = window.self || {};
    * @private
    */
   Port.prototype._onMessage = function(msg) {
-    var eventName = msg[0];
-    if(typeof this._listeners[eventName] !== 'undefined' && this._listeners[eventName].length > 0) {
-      var listeners = this._listeners[eventName];
-      for(var i = 0; i < listeners.length; i++) {
-        var listener = listeners[i];
-        var args = Array.prototype.slice.call(msg, 1);
+    const eventName = msg[0];
+    if (typeof this._listeners[eventName] !== 'undefined' && this._listeners[eventName].length > 0) {
+      const listeners = this._listeners[eventName];
+      for (let i = 0; i < listeners.length; i++) {
+        const listener = listeners[i];
+        const args = Array.prototype.slice.call(msg, 1);
         listener.callback.apply(this, args);
 
-        if(listener.once) {
+        if (listener.once) {
           this._listeners[eventName].splice(i, 1);
           i--; // jump back since i++ is the new i
         }
@@ -68,13 +67,13 @@ var self = window.self || {};
    * @private
    */
   Port.prototype._addListener = function(name, callback, once) {
-    if(typeof this._listeners[name] === 'undefined') {
+    if (typeof this._listeners[name] === 'undefined') {
       this._listeners[name] = [];
     }
     this._listeners[name].push({
-      name : name,
-      callback : callback,
-      once : once
+      name: name,
+      callback: callback,
+      once: once
     });
   };
 
@@ -104,7 +103,7 @@ var self = window.self || {};
    * @param args
    */
   Port.prototype.emit = function() {
-    var message = JSON.stringify(arguments);
+    const message = JSON.stringify(arguments);
     this._port.postMessage(message);
   };
 
@@ -121,14 +120,15 @@ var self = window.self || {};
 
     // The promise that is return when you call passbolt.request.
     return new Promise((resolve, reject) => {
-      // Observe when the request has been completed.
-      // Or if a progress notification is sent.
-      this.once(requestId, function handleResponse(status) {
+      /*
+       * Observe when the request has been completed.
+       * Or if a progress notification is sent.
+       */
+      this.once(requestId, function(status) {
         const callbackArgs = Array.prototype.slice.call(arguments, 1);
         if (status == 'SUCCESS') {
           resolve.apply(null, callbackArgs);
-        }
-        else if (status == 'ERROR') {
+        } else if (status == 'ERROR') {
           reject.apply(null, callbackArgs);
         }
       });
@@ -138,33 +138,37 @@ var self = window.self || {};
     });
   };
 
-  /*****************************************************************************
+  /**
+   ****************************************************************************
    * Protected utilities
-   *****************************************************************************/
+   ****************************************************************************
+   */
 
   /**
    * Parse url query variables to allow finding the portname in it
    */
   Port._parseUrlQuery = function() {
-    var query = window.location.search.substring(1);
-    var vars = query.split('&');
-    var result = [];
-    for (var i = 0; i < vars.length; i++) {
-      var pair = vars[i].split('=');
+    const query = window.location.search.substring(1);
+    const vars = query.split('&');
+    const result = [];
+    for (let i = 0; i < vars.length; i++) {
+      const pair = vars[i].split('=');
       result[pair[0]] = pair[1];
     }
     return result;
   };
 
-  /*****************************************************************************
+  /**
+   ****************************************************************************
    * Bootstrap the self.port object to be used by request and message
-   *****************************************************************************/
+   ****************************************************************************
+   */
   /**
    * Port get singleton
    * @returns {Port}
    */
   Port.get = function(portname) {
-    if(typeof self.port === 'undefined' || !self.port._connected) {
+    if (typeof self.port === 'undefined' || !self.port._connected) {
       self.port = new Port(portname);
     }
     return self.port;
@@ -176,18 +180,21 @@ var self = window.self || {};
    * and subsequently any content code needing to communicate with the addon code
    */
   Port.initPort = function() {
-    // Define port name and build singleton
-    // if portname is not inserted as variable from addon code (default scenario)
-    var port;
-    if(typeof portname === 'undefined') {
+    /*
+     * Define port name and build singleton
+     * if portname is not inserted as variable from addon code (default scenario)
+     */
+    let port;
+    if (typeof portname === 'undefined') {
       // try to get portname for url (Iframe scenario)
-      var query = Port._parseUrlQuery();
-      if(typeof query['passbolt'] !== 'undefined') {
+      const query = Port._parseUrlQuery();
+      if (typeof query['passbolt'] !== 'undefined') {
         port = query['passbolt'];
       } else {
         throw new Error('Portname is not provided in content code');
       }
     } else {
+      // eslint-disable-next-line no-undef
       port = portname;
     }
     return Port.get(port);
@@ -195,7 +202,6 @@ var self = window.self || {};
 
   // init port unless told not to
   Port.initPort();
-
 })(self);
 
 window.self = self;

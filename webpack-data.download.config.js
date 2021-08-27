@@ -2,7 +2,7 @@ const path = require('path');
 
 const config = {
   entry: {
-    'app': path.resolve(__dirname, './src/all/data/js/app/InFormMenu.js')
+    'app': path.resolve(__dirname, './src/all/data/js/app/Download.js')
   },
   mode: 'production',
   module: {
@@ -21,7 +21,7 @@ const config = {
     splitChunks: {
       minSize: 0,
       cacheGroups: {
-        commons: {
+        defaultVendors: {
           test: /[\\/]node_modules[\\/]((?!(passbolt\-styleguide)).*)[\\/]/,
           name: 'vendors',
           chunks: 'all'
@@ -30,14 +30,10 @@ const config = {
     },
   },
   resolve: {
-    alias: {
-      'react': path.resolve('./node_modules/react'),
-      'react-dom': path.resolve('./node_modules/react-dom')
-    },
     extensions: ["*", ".js", ".jsx"]
   },
   output: {
-    path: path.resolve(__dirname, './build/all/data/js/dist/in-form-menu'),
+    path: path.resolve(__dirname, './build/all/data/js/dist/download'),
     pathinfo: true,
     filename: '[name].js'
   }

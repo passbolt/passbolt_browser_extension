@@ -93,7 +93,8 @@ module.exports = function (grunt) {
         reportUnusedDisableDirectives: true
       },
       target: [
-        'src/all/data/js/app/**/*.js',
+        'src/all/data/js/**/*.js',
+        'src/all/content_scripts/js/**/*.js',
       ]
     },
 
@@ -153,7 +154,7 @@ module.exports = function (grunt) {
       },
       data: {
         files: [
-          { expand: true, cwd: path.src + 'data', src: ['**', '!js/app/**'], dest: path.build_data }
+          { expand: true, cwd: path.src + 'data', src: ['js/themes/**', '*.html'], dest: path.build_data }
         ]
       },
       locales: {
@@ -177,15 +178,6 @@ module.exports = function (grunt) {
         files: [
           // openpgpjs
           { expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js', 'openpgp.worker.js'], dest: path.build_vendors },
-          // downloadjs (for download with save as).
-          { expand: true, cwd: path.node_modules + 'downloadjs', src: 'download.js', dest: path.src_content_vendors }
-          // TODO PASSBOLT-2219 Fix / Add missing Vendors
-          // In src_background_page_vendors
-          // validator: modified with non-standard alphaNumericSpecial
-          //
-          // Not in scope
-          // phpjs a custom compilation of standard functions from http://locutus.io
-
         ]
       },
       // Copy styleguide elements
@@ -314,7 +306,9 @@ module.exports = function (grunt) {
           'webpack --config webpack-data.config.js',
           'webpack --config webpack-content-scripts.browser-integration.config.js',
           'webpack --config webpack-data.in-form-call-to-action.config.js',
-          'webpack --config webpack-data.in-form-menu.config.js'
+          'webpack --config webpack-data.in-form-menu.config.js',
+          'webpack --config webpack-data.clipboard.config.js',
+          'webpack --config webpack-data.download.config.js'
         ].join(' && ')
       },
       build_webpack_apps_debug: {
@@ -323,7 +317,9 @@ module.exports = function (grunt) {
           'webpack --env debug=true --config webpack-data.config.js',
           'webpack --env debug=true --config webpack-content-scripts.browser-integration.config.js',
           'webpack --env debug=true --config webpack-data.in-form-call-to-action.config.js',
-          'webpack --env debug=true --config webpack-data.in-form-menu.config.js'
+          'webpack --env debug=true --config webpack-data.in-form-menu.config.js',
+          'webpack --env debug=true --config webpack-data.clipboard.config.js',
+          'webpack --env debug=true --config webpack-data.download.config.js'
         ].join(' && ')
       },
 

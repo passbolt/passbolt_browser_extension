@@ -110,7 +110,7 @@ const listenToDetachedQuickaccessPassphraseRequestResponse = async function(requ
  *   remember the passphrase until the user is logged out.
  */
 const rememberPassphrase = function(passphrase, duration) {
-  if (!duration || !Validator.isInt(duration)) {
+  if (!duration || !Number.isInteger(duration)) {
     return;
   }
   const user = User.getInstance();
@@ -127,7 +127,7 @@ const validatePassphrase = function(passphrase, rememberMe) {
   if (!Validator.isUtf8(passphrase)) {
     throw new Error(i18n.t('The passphrase should be a valid UTF8 string.'));
   }
-  if (!Validator.isBoolean(rememberMe) && !Validator.isInt(rememberMe)) {
+  if (!(typeof rememberMe === 'boolean') && !Number.isInteger(rememberMe)) {
     throw new Error(i18n.t('The remember me should be a valid integer.'));
   }
 

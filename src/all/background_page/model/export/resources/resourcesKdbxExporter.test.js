@@ -14,8 +14,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import Validator from "validator";
-import kdbxweb from "kdbxweb/dist/kdbxweb";
-import argon2 from "kdbxweb/test/test-support/argon2";
+import * as kdbxweb from "passbolt-kdbxweb";
+import argon2 from "./argon2.test-lib";
 
 import {ResourcesKdbxExporter} from "./resourcesKdbxExporter";
 import {ExportResourcesFileEntity} from "../../entity/export/exportResourcesFileEntity";
@@ -91,10 +91,12 @@ describe("ResourcesKdbxExporter", () => {
     expect(kdbxDb.groups[0].name).toEqual("passbolt export");
     expect(kdbxDb.groups[0].groups[0].name).toEqual("Recycle Bin");
     expect(kdbxDb.groups[0].groups[1].name).toEqual("Folder 1");
-    expect(kdbxDb.groups[0].entries[0].fields.Title).toEqual("Password 1");
+    expect(kdbxDb.groups[0].entries[0].fields.get('Title')).toEqual("Password 1");
+    const password1 = kdbxDb.groups[0].entries[0].fields.get('Password').getText();
+    expect(password1).toEqual("Secret 1");
     expect(kdbxDb.groups[0].groups[1].groups[0].name).toEqual("Folder 2");
-    expect(kdbxDb.groups[0].groups[1].entries[0].fields.Title).toEqual("Password 2");
-    expect(kdbxDb.groups[0].groups[1].groups[0].entries[0].fields.Title).toEqual("Password 3");
+    expect(kdbxDb.groups[0].groups[1].entries[0].fields.get('Title')).toEqual("Password 2");
+    expect(kdbxDb.groups[0].groups[1].groups[0].entries[0].fields.get('Title')).toEqual("Password 3");
   });
 
   it("should protect an export with a password", async () => {

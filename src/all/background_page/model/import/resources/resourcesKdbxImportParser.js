@@ -10,7 +10,6 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const ByteUtils = require("kdbxweb/lib/utils/byte-utils");
 const {ImportError} = require("../../../error/importError");
 const {ExternalFoldersCollection} = require("../../entity/folder/external/externalFoldersCollection");
 const {ExternalResourcesCollection} = require("../../entity/resource/external/externalResourcesCollection");
@@ -43,7 +42,7 @@ class ResourcesKdbxImportParser {
    * @returns {Promise<kdbxweb.Kdbx>}
    */
   async readKdbxDb() {
-    const arrayBytes = ByteUtils.base64ToBytes(this.importEntity.file)
+    const arrayBytes = kdbxweb.ByteUtils.base64ToBytes(this.importEntity.file)
     const kdbxCredentials = this.readKdbxCredentials();
     return kdbxweb.Kdbx.load(arrayBytes.buffer, kdbxCredentials);
   }
@@ -122,15 +121,15 @@ class ResourcesKdbxImportParser {
    */
   parseResource(kdbxEntry) {
     const externalResourceDto = {
-      name: kdbxEntry.fields.Title ? kdbxEntry.fields.Title.trim() : "",
-      uri: kdbxEntry.fields.URL ? kdbxEntry.fields.URL.trim() : "",
-      username: kdbxEntry.fields.UserName ? kdbxEntry.fields.UserName.trim() : "",
-      description: kdbxEntry.fields.Notes ? kdbxEntry.fields.Notes.trim() : "",
+      name: kdbxEntry.fields.get('Title') ? kdbxEntry.fields.get('Title').trim() : "",
+      uri: kdbxEntry.fields.get('URL') ? kdbxEntry.fields.get('URL').trim() : "",
+      username: kdbxEntry.fields.get('UserName') ? kdbxEntry.fields.get('UserName').trim() : "",
+      description: kdbxEntry.fields.get('Notes') ? kdbxEntry.fields.get('Notes').trim() : "",
       folder_parent_path: this.getKdbxEntryPath(kdbxEntry),
       secret_clear: '' // By default a secret can be null
     };
-    if (typeof kdbxEntry.fields.Password == 'object') {
-      externalResourceDto.secret_clear = kdbxEntry.fields.Password.getText();
+    if (typeof kdbxEntry.fields.get('Password') == 'object') {
+      externalResourceDto.secret_clear = kdbxEntry.fields.get('Password').getText();
     }
 
     // @todo pebble

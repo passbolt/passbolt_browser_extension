@@ -323,13 +323,13 @@ class EntitySchema {
       case 'null':
         return prop === null;
       case 'boolean':
-        return (prop === true || prop === false);
+        return typeof prop === 'boolean';
       case 'string':
         return typeof prop === 'string';
       case 'integer':
-        return Validator.isInt(prop);
+        return Number.isInteger(prop);
       case 'number':
-        return Validator.isFloat(prop);
+        return typeof prop === 'number';
       case 'object':
         return typeof prop === 'object';
       case 'array':
@@ -360,7 +360,7 @@ class EntitySchema {
       case 'idn-email':
         return Validator.isEmail(prop);
       case 'date-time':
-        return Validator.isDate(prop);
+        return Validator.isISO8601(prop);
       // case 'ipv4':
       //   return Validator.isIP(prop, '4');
       // case 'ipv6':

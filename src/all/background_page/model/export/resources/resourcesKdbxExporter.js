@@ -81,13 +81,13 @@ class ResourcesKdbxExporter {
    */
   createKdbxEntry(kdbxDb, externalResourceEntity, parentKdbxGroup) {
     const kdbxEntry = kdbxDb.createEntry(parentKdbxGroup);
-    kdbxEntry.fields.Title = externalResourceEntity.name;
-    kdbxEntry.fields.UserName = externalResourceEntity.username;
+    kdbxEntry.fields.set('Title', externalResourceEntity.name);
+    kdbxEntry.fields.set('UserName', externalResourceEntity.username);
     if (externalResourceEntity.secretClear) {
-      kdbxEntry.fields.Password = kdbxweb.ProtectedValue.fromString(externalResourceEntity.secretClear);
+      kdbxEntry.fields.set('Password', kdbxweb.ProtectedValue.fromString(externalResourceEntity.secretClear));
     }
-    kdbxEntry.fields.URL = externalResourceEntity.uri;
-    kdbxEntry.fields.Notes = externalResourceEntity.description;
+    kdbxEntry.fields.set('URL', externalResourceEntity.uri);
+    kdbxEntry.fields.set('Notes', externalResourceEntity.description);
   }
 }
 

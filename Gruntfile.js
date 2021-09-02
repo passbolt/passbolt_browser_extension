@@ -249,7 +249,7 @@ module.exports = function (grunt) {
           // Illustrations
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/illustrations',
-          src: ['passphrase_intro.png', 'pin_passbolt.gif', 'arrow.png'],
+          src: ['passphrase_intro.png', 'pin_passbolt.gif', 'wave-pin_my_extension.svg'],
           dest: path.build_data + 'img/illustrations',
           expand: true
         }, {

@@ -34,7 +34,7 @@ class OnExtensionInstalledController {
 const updateTabMatchUrl = tabs => {
   const uuidRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}";
   const urlExtensionRegex = `(.*)\/setup\/(install|recover)\/(${uuidRegex})\/(${uuidRegex})`;
-  return Promise.all(tabs.forEach(tab => {
+  return Promise.all(tabs.map(tab => {
     if (tab && tab.url.match(urlExtensionRegex)) {
       const url = new URL(tab.url);
       url.searchParams.set('first-install', 1);
@@ -43,6 +43,7 @@ const updateTabMatchUrl = tabs => {
         active: true
       });
     }
+    return tab;
   }));
 };
 

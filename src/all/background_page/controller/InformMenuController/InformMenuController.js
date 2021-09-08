@@ -118,10 +118,9 @@ class InformMenuController {
    * @return {Promise<void>}
    */
   async useSuggestedResource(requestId, resourceId) {
+    // WebIntegration Worker
+    const webIntegrationWorker = Worker.get('WebIntegration', this.worker.tab.id);
     try {
-      // WebIntegration Worker
-      const webIntegrationWorker = Worker.get('WebIntegration', this.worker.tab.id);
-      webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
       // Get the resource, decrypt the resources password and requests to fill the credentials
       const passphrase = await passphraseController.requestFromQuickAccess();
       const resource = await this.resourceModel.findForDecrypt(resourceId);
@@ -131,9 +130,13 @@ class InformMenuController {
       const {username} = resource;
       const password = plaintext?.password || plaintext;
       webIntegrationWorker.port.emit('passbolt.web-integration.fill-credentials', {username, password});
+      this.worker.port.emit(requestId, "SUCCESS");
+      webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
     } catch(error) {
       // The original worker has been destroyed when requesting to close the in-form menu, there is no worker to notify.
       console.error(error);
+      this.worker.port.emit(requestId, "ERROR", error);
+      webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
     }
   }
 

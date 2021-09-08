@@ -87,4 +87,15 @@ Port.prototype.request = async function (message) {
   });
 };
 
+/**
+ * onDestroyed() called when the port is destroyed
+ *
+ * @param callback
+ */
+Port.prototype.onDisconnect = function(callback) {
+  this._port.onDisconnect.addListener(() => {
+    callback()
+  });
+};
+
 exports.Port = Port;

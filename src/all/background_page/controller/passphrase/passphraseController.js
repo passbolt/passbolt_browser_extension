@@ -10,6 +10,7 @@ const {i18n} = require('../../sdk/i18n');
 const Keyring = require('../../model/keyring').Keyring;
 const User = require('../../model/user').User;
 const Worker = require('../../model/worker');
+const {UserAbortsOperationError} = require("../../error/userAbortsOperationError");
 const {BrowserTabService} = require("../../service/ui/browserTab.service");
 
 /**
@@ -91,16 +92,29 @@ const listenToDetachedQuickaccessPassphraseRequestResponse = async function(requ
   const tabId = quickAccessWindow?.tabs?.[0]?.id;
   await Worker.waitExists('QuickAccess', tabId);
   const quickAccessWorker = Worker.get('QuickAccess', tabId);
+  let isResolved = false;
 
-  return new Promise((resolve, reject) => {
+  const promise = new Promise((resolve, reject) => {
+    // When the passphrase is entered and valid, the quickaccess responds on the port with the requestId that has been given to it when opening it.
     quickAccessWorker.port.on(requestId, (status, requestResult)  => {
+      isResolved = true;
       if (status === 'SUCCESS') {
         resolve(requestResult)
       } else {
         reject(requestResult);
       }
     });
-  })
+    // If the users closes the window manually before entering their passphrase, the operation is aborted.
+    quickAccessWorker.port.onDisconnect(() => {
+      if (!isResolved) {
+        isResolved = true;
+        const error = new UserAbortsOperationError("The dialog has been closed.");
+        reject(error);
+      }
+    })
+  });
+
+  return promise;
 };
 
 /**

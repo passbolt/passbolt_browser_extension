@@ -21,7 +21,7 @@ window.XRegExp = require('xregexp/xregexp-all');
 window.Validator = require('validator/validator');
 window.Validator.isUtf8 = require('./utils/validatorRules').isUtf8;
 window.Validator.isUtf8Extended = require('./utils/validatorRules').isUtf8Extended;
-window.kdbxweb = require('passbolt-kdbxweb');
+window.kdbxweb = require('kdbxweb');
 window.PapaParse = require('papaparse/papaparse');
 
 /**

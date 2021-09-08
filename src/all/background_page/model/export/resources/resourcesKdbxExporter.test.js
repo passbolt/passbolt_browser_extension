@@ -14,7 +14,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import Validator from "validator";
-import * as kdbxweb from "passbolt-kdbxweb";
+import * as kdbxweb from "kdbxweb";
 import argon2 from "./argon2.test-lib";
 
 import {ResourcesKdbxExporter} from "./resourcesKdbxExporter";

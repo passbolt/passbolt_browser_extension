@@ -15,7 +15,7 @@
  */
 import fs from "fs";
 import Validator from "validator";
-import * as kdbxweb from "passbolt-kdbxweb";
+import * as kdbxweb from "kdbxweb";
 
 import {ResourcesKdbxImportParser} from "./resourcesKdbxImportParser";
 import {ImportResourcesFileEntity} from "../../entity/import/importResourcesFileEntity";

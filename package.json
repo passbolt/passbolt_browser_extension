@@ -18,7 +18,7 @@
     "i18next-http-backend": "^1.1.1",
     "ip-regex": "^4.3.0",
     "jssha": "~2.3.1",
-    "passbolt-kdbxweb": "2.1.1",
+    "kdbxweb": "2.1.1",
     "locutus": "~2.0.9",
     "memoize-one": "^5.1.1",
     "moment-timezone": "^0.5.32",

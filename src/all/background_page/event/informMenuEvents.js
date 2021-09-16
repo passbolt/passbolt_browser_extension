@@ -10,6 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+const {GetLocaleController} = require("../controller/locale/getLocaleController");
 const {InformMenuController} = require("../controller/InformMenuController/InformMenuController");
 const {User} = require('../model/user');
 
@@ -61,6 +62,25 @@ const listen = function (worker) {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const informMenuController = new InformMenuController(worker, apiClientOptions);
     informMenuController.fillPassword(requestId, password);
+  });
+
+  /*
+   * Get locale language
+   *
+   * @listens passbolt.locale.get
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.locale.get', async function(requestId) {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const getLocaleController = new GetLocaleController(worker, apiClientOptions);
+
+    try {
+      const localeEntity = await getLocaleController.getLocale();
+      worker.port.emit(requestId, 'SUCCESS', localeEntity);
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
   });
 };
 

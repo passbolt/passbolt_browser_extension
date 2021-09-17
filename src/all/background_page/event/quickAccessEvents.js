@@ -66,10 +66,18 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param tabId {string} The tab id
    */
-  worker.port.on('passbolt.quickaccess.prepare-resource', async function (requestId) {
+  worker.port.on('passbolt.quickaccess.prepare-resource', async function (requestId, tabId) {
     try {
-      const resourceInProgress = ResourceInProgressCacheService.consume() || {};
-      worker.port.emit(requestId, 'SUCCESS', resourceInProgress);
+      const resourceInProgress = ResourceInProgressCacheService.consume();
+      if (resourceInProgress === null) {
+        // Retrieve resource name and uri from tab.
+        const tab = tabId ? await BrowserTabService.getById(tabId) : await BrowserTabService.getCurrent();
+        const name = tab.title;
+        const uri = tab.url;
+        worker.port.emit(requestId, 'SUCCESS', {name, uri});
+      } else {
+        worker.port.emit(requestId, 'SUCCESS', resourceInProgress);
+      }
     } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);

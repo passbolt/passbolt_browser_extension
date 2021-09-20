@@ -64,6 +64,13 @@ const listen = function (worker) {
     informMenuController.fillPassword(requestId, password);
   });
 
+  /** Whenever the user wants to close the in-form-menu */
+  worker.port.on('passbolt.in-form-menu.close', async function(requestId) {
+    const apiClientOptions =  await User.getInstance().getApiClientOptions();
+    const informMenuController = new InformMenuController(worker, apiClientOptions);
+    informMenuController.close(requestId);
+  });
+
   /*
    * Get locale language
    *

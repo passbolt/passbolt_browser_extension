@@ -34,6 +34,8 @@ const config = {
   },
   resolve: {extensions: ["*", ".js", ".jsx"]},
   output: {
+    // Set a unique name to ensure the cohabitation of multiple webpack loader on the same page.
+    chunkLoadingGlobal: 'contentScriptChunkLoadingGlobal',
     path: path.resolve(__dirname, './build/all/content_scripts/js/dist'),
     pathinfo: true,
     filename: '[name].js'

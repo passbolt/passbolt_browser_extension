@@ -37,6 +37,8 @@ const config = {
     extensions: ["*", ".js", ".jsx"]
   },
   output: {
+    // Set a unique name to ensure the cohabitation of multiple webpack loader on the same page.
+    chunkLoadingGlobal: 'dataInFormCallToActionChunkLoadingGlobal',
     path: path.resolve(__dirname, './build/all/data/js/dist/in-form-call-to-action'),
     pathinfo: true,
     filename: '[name].js'

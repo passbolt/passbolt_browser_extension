@@ -89,7 +89,15 @@ class OrganizationSettingsEntity extends Entity {
    * @returns {boolean}
    */
   isPluginEnabled(name) {
-    return this._props.passbolt && this._props.passbolt.plugins && typeof this._props.passbolt.plugins[name] !== "undefined";
+    const pluginSetting = typeof this._props?.passbolt?.plugins[name];
+
+    // If the plugin is not present in the site settings, then we consider it disabled.
+    if (!pluginSetting) {
+      return false;
+    }
+
+    // If the plugin is not marked as disabled, it's considered enabled. i.e. enabled propery not present => enabled
+    return pluginSetting?.enabled !== false;
   }
 
   /**

@@ -12,6 +12,7 @@
  */
 const {InformCallToActionController} = require("../controller/informCallToActionController/informCallToActionController");
 const {User} = require('../model/user');
+const {AuthenticationEventController} = require("../controller/auth/authenticationEventController");
 
 
 
@@ -20,6 +21,9 @@ const {User} = require('../model/user');
  * @param worker
  */
 const listen = function(worker) {
+
+  const authenticationEventController = new AuthenticationEventController(worker);
+  authenticationEventController.startListen();
 
  /*
   * Whenever the the in-form call-to-action status is required

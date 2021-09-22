@@ -42,7 +42,8 @@ Port.prototype.on = function(msgName, callback) {
  * @param status SUCCESS | ERROR
  */
 Port.prototype.emit = function () {
-  Log.write({level: 'debug', message: 'Port emit @ message: ' + arguments[1]});
+  const message = arguments[1] || arguments[0];
+  Log.write({level: 'debug', message: 'Port emit @ message: ' + message});
   const args = Array.prototype.slice.call(arguments)
     .map(arg => (arg && typeof arg.toJSON === "function") ? arg.toJSON() : arg);
   this._port.postMessage(args);

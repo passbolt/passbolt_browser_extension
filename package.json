@@ -66,7 +66,7 @@
   },
   "scripts": {
     "preinstall": "npx npm-force-resolutions || echo 1",
-    "build": "npm run build-content-script; npm run build-data;",
+    "build": "npm run build-content-scripts; npm run build-data;",
     "build-content-scripts": "webpack --config webpack-content-scripts.config.js",
     "build-data": "webpack --config webpack-data.config.js",
     "test": "grunt test",

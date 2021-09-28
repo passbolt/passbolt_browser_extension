@@ -162,6 +162,14 @@ class InformMenuController {
     Worker.get('WebIntegration', this.worker.tab.id).port.emit('passbolt.web-integration.fill-password', password);
     this.worker.port.emit(requestId, "SUCCESS");
   }
+
+  /**
+   * Whenever the user intends to close the in-form-menu in the current page
+   */
+  close(requestId) {
+    Worker.get('WebIntegration', this.worker.tab.id).port.emit('passbolt.in-form-menu.close');
+    this.worker.port.emit(requestId, "SUCCESS");
+  }
 }
 
 

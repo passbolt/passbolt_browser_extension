@@ -15,7 +15,6 @@ const {PasswordGeneratorEntity} = require('../entity/passordGenerator/passwordGe
 const {PasswordGeneratorLocalStorage} = require('../../service/local_storage/passwordGeneratorLocalStorage');
 const {PasswordGeneratorService} = require('../../service/api/passwordGenerator/passwordGeneratorService');
 const PassboltApiFetchError = require('../../error/passboltApiFetchError').PassboltApiFetchError;
-const {Log} = require('../../model/log');
 
 /** List of possible generator types */
 const GENERATORS =  [
@@ -32,61 +31,71 @@ const GENERATORS =  [
       {
         "name": "upper",
         "label": "A-Z",
-        "characters": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "characters": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"],
         "active": true
       },
       {
         "name": "lower",
         "label": "a-z",
-        "characters": "abcdefghijklmnopqrstuvwxyz",
+        "characters": ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
         "active": true
       },
       {
         "name": "digit",
         "label": "0-9",
-        "characters": "0123456789",
+        "characters": ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
         "active": true
       },
       {
         "name": "special_char1",
         "label": "# $ % & @ ^ ~",
-        "characters": "#$%&@^~",
+        "characters": ["#", "$", "%", "&", "@", "^", "~"],
         "active": true
       },
       {
         "name": "parenthesis",
         "label": "{ [ ( | ) ] ] }",
-        "characters": "([|])",
+        "characters": ["{", "(", "[", "|", "]", ")", "}"],
         "active": true
       },
       {
         "name": "special_char2",
         "label": ". , : ;",
-        "characters": ".,:;",
+        "characters": [".", ",", ":", ";"],
         "active": true
       },
       {
         "name": "special_char3",
         "label": "' \" `",
-        "characters": "'\"`",
+        "characters": ["'", "\"", "`"],
         "active": true
       },
       {
         "name": "special_char4",
         "label": "/ \\ _ -",
-        "characters": "/\\_-",
+        "characters": ["/", "\\", "_", "-"],
         "active": true
       },
       {
         "name": "special_char5",
         "label": "< * + ! ? =",
-        "characters": "<*+!?=",
+        "characters": ["<", "*", "+", "!", "?", "="],
         "active": true
       },
       {
         "name": "emoji",
         "label": "😘",
-        "characters": "😀😃😄😁😆😅😂🤣🥲☺️😊😇🙂🙃😉😌😍🥰😘😗😙😚😋😛😝😜🤪🤨🧐🤓😎🥸🤩🥳😏😒😞😔😟😕🙁☹️😣😖😫😩🥺😢😭😤😠😡🤬🤯😳🥵🥶😱😨😰😥😓🤗🤔🤭🤫🤥😶😐😑😬🙄😯😦😧😮😲🥱😴🤤😪😵🤐🥴🤢🤮🤧😷🤒🤕🤑🤠😈👿👹👺🤡💩👻💀☠️👽👾🤖🎃😺😸😹😻😼😽🙀😿😾"
+        // Based on the initial emoticons block (introduce in unicode v6), not updated since 2015 (unicode v8), see https://en.wikipedia.org/wiki/Emoticons_(Unicode_block)
+        "characters": [
+          "😀", "😁", "😂", "😃", "😄", "😅", "😆", "😇", "😈", "😉",
+          "😊", "😋", "😌", "😍", "😎", "😏", "😐", "😑", "😒", "😓",
+          "😔", "😕", "😖", "😗", "😘", "😙", "😚", "😛", "😜", "😝",
+          "😞", "😟", "😠", "😡", "😢", "😣", "😤", "😥", "😦", "😧",
+          "😨", "😩", "😪", "😫", "😬", "😭", "😮", "😯", "😰", "😱",
+          "😲", "😳", "😴", "😵", "😶", "😷", "😸", "😹", "😺", "😻",
+          "😼", "😽", "😾", "😿", "🙀", "🙁", "🙂", "🙃", "🙄", "🙅",
+          "🙆", "🙇", "🙈", "🙉", "🙊", "🙋", "🙌", "🙍", "🙎", "🙏",
+        ],
       }
     ],
   },

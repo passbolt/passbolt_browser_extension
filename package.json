@@ -33,6 +33,7 @@
     "@babel/plugin-transform-runtime": "^7.7.4",
     "@babel/preset-env": "^7.10.2",
     "@babel/preset-react": "^7.7.4",
+    "babel-jest": "^27.2.4",
     "babel-loader": "^8.0.4",
     "crx": "^5.0.1",
     "eslint": "^6.6.0",
@@ -48,8 +49,8 @@
     "grunt-eslint": "^22.0.0",
     "grunt-shell": "^2.1.0",
     "i18next-scanner": "github:passbolt/i18next-scanner#master",
-    "jest": "^26.6.3",
-    "jest-environment-node": "^26.6.2",
+    "jest": "^27.2.4",
+    "jest-environment-jsdom": "^27.2.4",
     "web-ext": "^6.3.0",
     "webpack": "^5.53.0",
     "webpack-cli": "^4.8.0"

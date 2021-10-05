@@ -21,7 +21,7 @@
     "npm-force-resolutions": "0.0.10",
     "openpgp": "4.10.9",
     "papaparse": "^5.2.0",
-    "passbolt-styleguide": "3.3.0-alpha.2",
+    "passbolt-styleguide": "3.3.0-alpha.4",
     "react": "16.12.0",
     "react-dom": "16.12.0",
     "validator": "^13.6.0",
@@ -51,6 +51,7 @@
     "i18next-scanner": "github:passbolt/i18next-scanner#master",
     "jest": "^27.2.4",
     "jest-environment-jsdom": "^27.2.4",
+    "jest-environment-node": "^27.2.4",
     "web-ext": "^6.3.0",
     "webpack": "^5.53.0",
     "webpack-cli": "^4.8.0"

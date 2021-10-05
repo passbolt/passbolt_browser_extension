@@ -69,7 +69,7 @@ class ResourcesKdbxImportParser {
    */
   parseFolder(kdbxGroup) {
     const externalFolderDto = {
-      name: kdbxGroup.name.trim(),
+      name: ExternalFolderEntity.escapeName(kdbxGroup.name),
       folder_parent_path: this.getKdbxEntryPath(kdbxGroup)
     };
 
@@ -108,7 +108,7 @@ class ResourcesKdbxImportParser {
   getKdbxEntryPath(kdbxEntry) {
     let ancestors = [];
     if (kdbxEntry.parentGroup) {
-      const getAncestors = group => group.parentGroup ? [...getAncestors(group.parentGroup), group.name] : [group.name];
+      const getAncestors = group => group.parentGroup ? [...getAncestors(group.parentGroup), ExternalFolderEntity.escapeName(group.name)] : [ExternalFolderEntity.escapeName(group.name)];
       ancestors = getAncestors(kdbxEntry.parentGroup);
     }
     return ancestors.join('/');

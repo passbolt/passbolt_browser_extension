@@ -244,7 +244,7 @@ class ExternalResourceEntity extends Entity {
    * @returns {int} the depth
    */
   get depth() {
-    return this.folderParentPath ? this.folderParentPath.split('/').length : 0;
+    return this.folderParentPath ? ExternalFolderEntity.splitFolderPath(this.folderParentPath).length : 0;
   }
 
   // ==================================================

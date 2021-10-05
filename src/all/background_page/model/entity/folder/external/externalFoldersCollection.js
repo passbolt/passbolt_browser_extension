@@ -53,9 +53,12 @@ class ExternalFoldersCollection extends EntityCollection {
       throw new TypeError(`ExternalFoldersCollection constructFromFoldersCollection parameter should be an instance of FoldersCollection.`);
     }
     const externalFoldersDto = foldersCollection.folders.map(folderEntity => {
-      const folderParentPath = foldersCollection.getFolderParentPath(folderEntity);
+      const folderParentPath = ExternalFoldersCollection.getEscapedFolderParentPath(foldersCollection, folderEntity);
       const folderParentId = folderParentPath.length ? folderEntity.folderParentId : null;
-      return Object.assign(folderEntity.toDto(), {folder_parent_id: folderParentId, folder_parent_path: folderParentPath});
+      return Object.assign(folderEntity.toDto(), {
+        name: ExternalFolderEntity.escapeName(folderEntity.name),
+        folder_parent_id: folderParentId,
+        folder_parent_path: folderParentPath});
     });
     return new ExternalFoldersCollection(externalFoldersDto);
   }
@@ -70,6 +73,39 @@ class ExternalFoldersCollection extends EntityCollection {
       "type": "array",
       "items": ExternalFolderEntity.getSchema(),
     }
+  }
+
+  /**
+   * Get the escaped folder parent path for a given FolderEntity.
+   *
+   * @param {FoldersCollection} foldersCollection
+   * @param {FolderEntity} folderEntity
+   * @returns {string}
+   */
+  static getEscapedFolderParentPath(foldersCollection, folderEntity) {
+    return foldersCollection.getAllParents(folderEntity).items
+      .reverse()
+      .map(folderParentEntity => ExternalFolderEntity.escapeName(folderParentEntity.name))
+      .join("/");
+  }
+
+  /**
+   * Builds a folderCollection based on an array of ExternalFolderEntity.
+   * ExternalFolderEntity has name escaped while FolderEntity doesn't have.
+   * So, this method ensure that FolderEntity have its name resolved from the ExternalFolderEntity.
+   *
+   * @param {array<ExternalFolderEntity>} externalFoldersCollection
+   * @returns {FoldersCollection}
+   */
+  static toFoldersCollection(externalFoldersCollection) {
+    const foldersCollection = [];
+    externalFoldersCollection.forEach(externalFolder => {
+      const folderDto = Object.assign(externalFolder.toDto(), {
+        name: ExternalFolderEntity.resolveEscapedName(externalFolder.name),
+      });
+      foldersCollection.push(folderDto);
+    });
+    return new FoldersCollection(foldersCollection);
   }
 
   /**
@@ -173,7 +209,7 @@ class ExternalFoldersCollection extends EntityCollection {
     if (!path.length) {
       return;
     }
-    const split = path.split('/');
+    const split = ExternalFolderEntity.splitFolderPath(path);
     let pathCursor = "";
     for (let folderName of split) {
       pathCursor = pathCursor.length ? `${pathCursor}/${folderName}` : folderName;

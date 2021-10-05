@@ -28,6 +28,8 @@ const {TagModel} = require('../../model/tag/tagModel');
 
 const {ResourcesCollection} = require("../../model/entity/resource/resourcesCollection");
 const {FoldersCollection} = require("../../model/entity/folder/foldersCollection");
+const {ExternalFolderEntity} = require('../../model/entity/folder/external/externalFolderEntity')
+const {ExternalFoldersCollection} = require('../../model/entity/folder/external/externalFoldersCollection');
 const {TagsCollection} = require('../../model/entity/tag/tagsCollection');
 const {ResourceSecretsCollection} = require("../../model/entity/secret/resource/resourceSecretsCollection");
 const {ImportResourcesFileEntity} = require("../../model/entity/import/importResourcesFileEntity");
@@ -198,7 +200,7 @@ class ImportResourcesFileController {
       if (!externalFolderChunk.length) {
         break;
       }
-      const foldersCollection = new FoldersCollection(externalFolderChunk);
+      const foldersCollection = ExternalFoldersCollection.toFoldersCollection(externalFolderChunk);
       const successCallback = (folderEntity, index) => this.handleImportFolderSuccess.bind(this)(importEntity, ++importedCount, folderEntity, externalFolderChunk[index]);
       const errorCallback = (error, index) => this.handleImportFolderError.bind(this)(importEntity, ++importedCount, error, externalFolderChunk[index]);
       await this.folderModel.bulkCreate(foldersCollection, {successCallback, errorCallback});

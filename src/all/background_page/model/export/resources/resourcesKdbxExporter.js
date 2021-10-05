@@ -1,3 +1,5 @@
+const {ExternalFolderEntity} = require("../../entity/folder/external/externalFolderEntity");
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -66,7 +68,7 @@ class ResourcesKdbxExporter {
    * @param {kdbxweb.Group} parentKdbxGroup The parent kdbx group
    */
   createKdbxGroup(kdbxDb, externalFolderEntity, parentKdbxGroup) {
-    const kdbxGroup = kdbxDb.createGroup(parentKdbxGroup, externalFolderEntity.name);
+    const kdbxGroup = kdbxDb.createGroup(parentKdbxGroup, ExternalFolderEntity.resolveEscapedName(externalFolderEntity.name));
     const childrenExportFolders = this.exportEntity.exportFolders.getByFolderParentId(externalFolderEntity.id);
     childrenExportFolders.forEach(childExportFolder => this.createKdbxGroup(kdbxDb, childExportFolder, kdbxGroup));
     const childrenExportResources = this.exportEntity.exportResources.getByFolderParentId(externalFolderEntity.id);

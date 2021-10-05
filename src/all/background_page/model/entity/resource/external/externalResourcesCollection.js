@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {ExternalFoldersCollection} = require("../../folder/external/externalFoldersCollection");
+const {ExternalFolderEntity} = require("../../folder/external/externalFolderEntity");
 const {ResourcesCollection} = require("../resourcesCollection");
 const {EntityCollection} = require('../../abstract/entityCollection');
 const {EntitySchema} = require('../../abstract/entitySchema');

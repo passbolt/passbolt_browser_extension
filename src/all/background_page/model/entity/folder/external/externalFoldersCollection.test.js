@@ -58,14 +58,14 @@ describe("ExternalFoldersCollection", () => {
 
   it("createAndPushMissingPathFolders creates and pushes missing path folders into the collection", () => {
     const collection = new ExternalFoldersCollection([]);
-    const rootFolder = new ExternalFolderEntity({"name": "Root"});
+    const rootFolder = new ExternalFolderEntity({"name": "Root /"});
     collection.push(rootFolder);
-    collection.pushFromPath("///Root /  Folder 1 //// Folder 2////");
+    collection.pushFromPath("///Root //Folder 1////Folder 2 // ");
 
     expect(collection.items).toHaveLength(3);
-    const folder1 = buildExternalFolderDto(1, {folder_parent_path: "Root"});
+    const folder1 = buildExternalFolderDto(1, {folder_parent_path: "Root /"});
     expect(collection.toJSON()).toEqual(expect.arrayContaining([folder1]));
-    const folder2 = buildExternalFolderDto(2, {folder_parent_path: "Root/Folder 1"});
+    const folder2 = buildExternalFolderDto('2 // ', {folder_parent_path: "Root //Folder 1"});
     expect(collection.toJSON()).toEqual(expect.arrayContaining([folder2]));
   });
 
@@ -90,5 +90,13 @@ describe("ExternalFoldersCollection", () => {
     for (let externalFolderEntity of collection) {
       expect(externalFolderEntity.folderParentPath).toEqual("New/Root");
     }
+  });
+
+  it("should build a FoldersCollection while resolving escaped folder name", () => {
+    const externalFolderEntityList = [new ExternalFolderEntity({name: "/ Ro / ot /"})];
+    const foldersCollection = ExternalFoldersCollection.toFoldersCollection(externalFolderEntityList);
+
+    const folderEntity = foldersCollection.items[0];
+    expect(folderEntity.name).toBe("/Ro/ot/");
   });
 });

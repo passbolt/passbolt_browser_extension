@@ -63,7 +63,7 @@ describe("ExternalResourceEntity", () => {
       "folder_parent_path": "// at/ the///root /"
     };
     const entity = new ExternalResourceEntity(dto);
-    expect(entity.folderParentPath).toEqual("at/the/root");
+    expect(entity.folderParentPath).toEqual("/ at/ the/root /");
   });
 
   it("constructor returns validation error if dto fields are invalid", () => {

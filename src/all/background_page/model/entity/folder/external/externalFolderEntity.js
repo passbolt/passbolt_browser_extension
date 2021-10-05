@@ -64,10 +64,7 @@ class ExternalFolderEntity extends Entity {
       ],
       "properties": {
         "id": folderEntitySchema.properties.id,
-        "name": {
-          ...folderEntitySchema.properties.name,
-          "pattern": /^[^\/]*$/
-        },
+        "name": folderEntitySchema.properties.name,
         "folder_parent_id": folderEntitySchema.properties.folder_parent_id,
         "folder_parent_path": {
           "type": "string"
@@ -83,7 +80,7 @@ class ExternalFolderEntity extends Entity {
    */
   static createFromPath(path) {
     path = ExternalFolderEntity.sanitizePath(path);
-    const chunks = path.split('/');
+    const chunks = ExternalFolderEntity.splitFolderPath(path);
     const externalFolderDto = {
       name: chunks.pop(),
       folder_parent_path: chunks.join('/')
@@ -103,10 +100,48 @@ class ExternalFolderEntity extends Entity {
    */
   static sanitizePath(path) {
     path = path || "";
-    path = path.replace(/[ \/]*\/[ \/]*/g, '/') // Replace any combinations of space and / by one unique /
-      .replace(/^\/*|\/*$/g, '') // Remove first and last /
-      .trim() // Remove first and last spaces;
-    return path;
+    return path
+      .replace(/^(\/{2,})|(\/{2,})$/g, '/') //replace any group of starting or ending slash by a single slash
+      .replace(/^(\/(?! ))|((?<! )\/)$/g, '') //remove starting '/' not followed by a space or an ending '/' not preceded by a space
+      .replace(/(?<! )(\/{2,})(?! )/g, '/') //replace any group of multiple / that are not prefixed or suffixed by a space
+  }
+
+  /**
+   * Split folder path while considering a non separator regex.
+   * The non separator is ' / ' expecting that this is the one used while importing or exporting resources.
+   * ie: root/path/un / splittedPath => ['root', 'path', 'un/splittedPath']
+   * @param {string} path The path to split
+   * @return {array<string>}
+   */
+  static splitFolderPath(path) {
+    return path.split(/(?<! )\/(?! )/g);
+  }
+
+  /**
+   * Escape a folder name by adding spaces around slashes to escape them and not confuse them with a directory separator.
+   * A trim is applied to avoid issues with folder export/import when they by ' /'.
+   * @param {string} name
+   */
+  static escapeName(name) {
+    name = name || "";
+    return name
+      .trim()
+      .replace(/^\//, '/ ') // replace a starting '/' by '/ '
+      .replace(/\/$/, ' /') // replace an ending '/' by ' /'
+      .replace(/(.)\/(.)/g, '$1 / $2'); //replace all "middle" '/' by ' / '
+  }
+
+  /**
+   * Removes the extra spaces in a folder name that are added to differentiate slashes between directory seperator from the ones part of the name.
+   * ie: '/ folder' => '/folder'
+   * ie: 'folder /' => 'folder/'
+   * ie: 'fol / der' => 'fol/der'
+   * @param {string} name The name from where to remove extra spaces
+   * @return {string}
+   */
+  static resolveEscapedName(name) {
+    name = name || "";
+    return name.replace(/ \/ | \/|\/ /g,'/'); //replace any ' / ', ' /', '/ ' (slash with spaces) by a single '/'
   }
 
   // ==================================================
@@ -207,7 +242,7 @@ class ExternalFolderEntity extends Entity {
    * @returns {int} the depth
    */
   get depth() {
-    return this.folderParentPath ? this.folderParentPath.split('/').length : 0;
+    return this.folderParentPath ? ExternalFolderEntity.splitFolderPath(this.folderParentPath).length : 0;
   }
 
   // ==================================================

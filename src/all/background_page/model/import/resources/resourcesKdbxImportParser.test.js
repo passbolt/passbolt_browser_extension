@@ -188,12 +188,12 @@ describe("ResourcesKdbxImportParser", () => {
     await parser.parseImport();
 
     // Assert resources
-    expect(importEntity.importResources.items).toHaveLength(1);
+    expect(importEntity.importResources.items).toHaveLength(2);
     const resource1Dto = buildExternalResourceDto(1, {folder_parent_path: "import-ref/Root/Folder 1"});
     expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource1Dto]));
 
     // Assert folders
-    expect(importEntity.importFolders.items).toHaveLength(3);
+    expect(importEntity.importFolders.items).toHaveLength(4);
     const folderRefDto = {name: "import-ref", folder_parent_path: ""};
     expect(importEntity.importFolders.toJSON()).toEqual(expect.arrayContaining([folderRefDto]));
     const folderKdbxRootDto = {name: "Root", folder_parent_path: "import-ref"};
@@ -202,19 +202,13 @@ describe("ResourcesKdbxImportParser", () => {
     expect(importEntity.importFolders.toJSON()).toEqual(expect.arrayContaining([folder1RootDto]));
 
     // Assert folders errors
-    expect(importEntity.importFoldersErrors).toHaveLength(2);
+    expect(importEntity.importFoldersErrors).toHaveLength(1);
     // Folder name exceeding max length
     let error = importEntity.importFoldersErrors[0];
     expect(error).toBeInstanceOf(ImportError);
     expect(error.sourceError).toBeInstanceOf(EntityValidationError);
     expect(error.sourceError.details).toHaveProperty("name");
     expect(error.data.name).toEqual("too-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-name");
-    // Folder name containing /
-    error = importEntity.importFoldersErrors[1];
-    expect(error).toBeInstanceOf(ImportError);
-    expect(error.sourceError).toBeInstanceOf(EntityValidationError);
-    expect(error.sourceError.details).toHaveProperty("name");
-    expect(error.data.name).toEqual("/folder-name-with-/");
 
     // Assert resources errors
     expect(importEntity.importResourcesErrors).toHaveLength(1);

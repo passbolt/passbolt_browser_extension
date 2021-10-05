@@ -56,10 +56,10 @@ describe("ExternalFolderEntity", () => {
   it("constructor sanitize folder_parent_path", () => {
     const dto = {
       "name": "folder",
-      "folder_parent_path": "// at/ the///root /"
+      "folder_parent_path": "// at/ the///root //"
     };
     const entity = new ExternalFolderEntity(dto);
-    expect(entity.folderParentPath).toEqual("at/the/root");
+    expect(entity.folderParentPath).toEqual("/ at/ the/root /");
   });
 
   it("constructor returns validation error if dto fields are invalid", () => {
@@ -79,8 +79,8 @@ describe("ExternalFolderEntity", () => {
   it("createFromPath constructs a folder from a path", () => {
     const path = "// at/ the///root /";
     const entity = ExternalFolderEntity.createFromPath(path);
-    expect(entity.name).toEqual("root");
-    expect(entity.folderParentPath).toEqual("at/the");
+    expect(entity.name).toEqual("root /");
+    expect(entity.folderParentPath).toEqual("/ at/ the");
   });
 
   it("sanitize sanitizes a path", () => {
@@ -88,8 +88,8 @@ describe("ExternalFolderEntity", () => {
     expect(ExternalFolderEntity.sanitizePath(path)).toEqual("");
     path = "/root/";
     expect(ExternalFolderEntity.sanitizePath(path)).toEqual("root");
-    path = "/  root  / / ////  folder1 /folder2   /// /";
-    expect(ExternalFolderEntity.sanitizePath(path)).toEqual("root/folder1/folder2");
+    path = "///  root  / / ////  folder1 /folder2   /// ///";
+    expect(ExternalFolderEntity.sanitizePath(path)).toEqual("/  root  / / ///  folder1 /folder2   /// /");
   });
 
   it("changeRootPath change the folder root path", () => {
@@ -99,5 +99,78 @@ describe("ExternalFolderEntity", () => {
     expect(folder.folderParentPath).toEqual("root");
     folder.changeRootPath(rootFolder)
     expect(folder.folderParentPath).toEqual("root/root");
+  });
+
+  it("should split folder path considering '/' in folder name", () => {
+    const pathToTestAndResult = {
+      "Root/DatabaseCC/Domaine / Windows": ["Root", "DatabaseCC", "Domaine / Windows"],
+      "Root/DatabaseCC/Réseau avocat / Vidéo": ["Root", "DatabaseCC", "Réseau avocat / Vidéo"],
+
+      "/ Root/DatabaseCC/Réseau avocat /": ["/ Root", "DatabaseCC", "Réseau avocat /"],
+      " // Root //DatabaseCC/ / //Réseau avocat / Vidéo // /": [" // Root /", "DatabaseCC/ / /", "Réseau avocat / Vidéo // /"],
+      "/  / Root / /// / DatabaseCC / /": ["/  / Root / /", "/ / DatabaseCC / /"],
+    };
+
+    for (let rawPath in pathToTestAndResult) {
+      const sanitizedPath = ExternalFolderEntity.splitFolderPath(rawPath);
+      const expectedResult = pathToTestAndResult[rawPath];
+      expect(sanitizedPath).toEqual(expectedResult);
+    }
+  });
+
+  it("should escape folder name by adding spaces around '/'", () => {
+    const nameToTestAndResult = {
+      "Root":"Root",
+      " Root ":"Root",
+      "Réseau avocat/Vidéo": "Réseau avocat / Vidéo",
+      "Réseau avocat / Vidéo": "Réseau avocat  /  Vidéo",
+      "///": "/  /  /",
+      "/test/test/": "/ test / test /",
+    };
+
+    for (let rawName in nameToTestAndResult) {
+      const sanitizedPath = ExternalFolderEntity.escapeName(rawName);
+      const expectedResult = nameToTestAndResult[rawName];
+      expect(sanitizedPath).toEqual(expectedResult);
+    }
+  });
+
+  it("should resolve escaped name by removing the extra 'spaces' around '/'", () => {
+    const nameToTestAndResult = {
+      "Root": "Root",
+      " Root ": " Root ",
+      "Réseau avocat/Vidéo": "Réseau avocat/Vidéo",
+      "Réseau avocat / Vidéo": "Réseau avocat/Vidéo",
+      "/  /  /": "///",
+      "/ test / test /": "/test/test/",
+      "  / te / st /  ": " /te/st/ ",
+    };
+
+    for (let rawName in nameToTestAndResult) {
+      const sanitizedPath = ExternalFolderEntity.resolveEscapedName(rawName);
+      const expectedResult = nameToTestAndResult[rawName];
+      expect(sanitizedPath).toEqual(expectedResult);
+    }
+  });
+
+  it("should give the right depth when paths have '/' in folder name", () => {
+
+    const pathToTestAndResult = {
+      "Root": 1,
+      "Root /": 1,
+      "Root //DatabaseCC": 2,
+      "Root/DatabaseCC/Domaine / Windows": 3,
+      "Root/DatabaseCC/Réseau avocat / Vidéo": 3,
+
+      "/ Root/DatabaseCC/Réseau avocat /": 3,
+      " // Root //DatabaseCC/ / //Réseau avocat / Vidéo // /": 3,
+      "/  / Root / /// / DatabaseCC / /": 2,
+    };
+
+    for (let rawPath in pathToTestAndResult) {
+      const externalFolder = new ExternalFolderEntity({name:"test", folder_parent_path: rawPath})
+      const expectedResult = pathToTestAndResult[rawPath];
+      expect(externalFolder.depth).toEqual(expectedResult);
+    }
   });
 });

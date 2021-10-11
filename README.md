@@ -144,6 +144,23 @@ grunt copy:styleguide
 ```
 The build can be found under ```dist/chrome``` or ```dist/firefox```.
 
+## Unit testing
+
+Unit testing is handle by Jest. It provides ways to run them and also build code coverage reports.
+
+To run unit tests:
+```
+grunt test
+```
+
+To run unit tests with coverage:
+```
+grunt test-coverage
+```
+
+Once the code coverage report is generated you can find the result in the folder `coverage`.
+Jest also provides an HTML version of the reports avaiable at `coverage/lcov-report/index.html`.
+
 # Credits
 
 https://www.passbolt.com/credits

@@ -13,6 +13,7 @@
 .bowerrc
 .gitignore
 .jpmignore
+.npmignore
 .idea
 locale/empty
 /data/less
@@ -21,3 +22,6 @@ CHANGELOG.MD
 README.MD
 npm-debug.log
 config.json.default
+
+#jest test coverage
+/coverage

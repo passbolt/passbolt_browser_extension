@@ -68,6 +68,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build-chrome-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome', 'shell:build_webpack_apps_prod', 'shell:build_chrome_prod']);
 
   grunt.registerTask('test', ['shell:test']);
+  grunt.registerTask('test-coverage', ['shell:test_coverage']);
 
   grunt.registerTask('custom-chrome-debug', ['bg-chrome-debug', 'react-chrome-debug']);
   grunt.registerTask('bg-chrome-debug', ['copy:background_page', 'browserify:background_page']);
@@ -329,6 +330,10 @@ module.exports = function (grunt) {
       test: {
         stdout: true,
         command: "jest --config .jest.config.json --no-cache ./src/all/ --maxWorkers=4"
+      },
+      test_coverage: {
+        stdout: true,
+        command: "jest --config .jest.config.json --no-cache ./src/all/ --maxWorkers=4 --coverage --collectCoverageFrom=src/**/*.{js,jsx}"
       },
 
       /**

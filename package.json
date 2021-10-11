@@ -65,6 +65,7 @@
     "build-content-scripts": "webpack --config webpack-content-scripts.config.js",
     "build-data": "webpack --config webpack-data.config.js",
     "test": "grunt test",
+    "test-coverage": "grunt test-coverage",
     "eslint": "grunt eslint",
     "eslint-fix": "grunt eslint --fix"
   }

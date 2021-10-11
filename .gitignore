@@ -10,6 +10,9 @@ data/less
 #eslint cache
 .eslintcache
 
+#jest test coverage
+/coverage
+
 # Plugin development #
 ######################
 __snapshots__

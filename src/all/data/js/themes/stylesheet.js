@@ -15,20 +15,42 @@
 (function() {
   class Stylesheet {
     constructor() {
-      this.stylesheetElementId = "ext-iframe-stylesheet-link";
       this.init();
     }
 
     async init() {
-      await this.insert();
+      await this.updateStylesWithUserPreferences();
       this.handleStorageChange = this.handleStorageChange.bind(this);
       chrome.storage.onChanged.addListener(this.handleStorageChange);
     }
 
-    async insert() {
+    async updateStylesWithUserPreferences() {
+      const cssInfoTag = document.querySelector('#stylesheet-manager');
+      if (!cssInfoTag) {
+        return;
+      }
+
       this.theme = await this.getTheme();
-      const stylesheetElement = this.createStylesheetElement(this.theme);
-      document.getElementsByTagName("head")[0].appendChild(stylesheetElement);
+      const cssFile = cssInfoTag.dataset.file;
+      const baseUrl = window.location.origin;
+
+      this.getLinkTag().setAttribute("href", `${baseUrl}/data/css/themes/${this.theme}/${cssFile}`);
+    }
+
+    getLinkTag() {
+      let link = document.querySelector("#stylesheet");
+      if (link) {
+        return link;
+      }
+
+      link = document.createElement("link");
+      link.setAttribute("id", "stylesheet");
+      link.setAttribute("media", "all");
+      link.setAttribute("rel", "stylesheet");
+
+      document.querySelector("head").appendChild(link);
+
+      return link;
     }
 
     handleStorageChange(changes) {
@@ -36,8 +58,7 @@
         const config = changes._passbolt_data.newValue.config;
         if (config && this.theme !== config["user.settings.theme"] && this.isValidTheme(config["user.settings.theme"])) {
           this.theme = config["user.settings.theme"];
-          const themePath = this.getThemePath(this.theme);
-          document.getElementById(this.stylesheetElementId).setAttribute('href', themePath);
+          this.updateStylesWithUserPreferences();
         }
       }
     }
@@ -49,35 +70,30 @@
     }
 
     async getTheme() {
-      let theme = "default";
-      const storageData = await this.getLocalStorage();
-      const {_passbolt_data: {config}} = storageData;
-      if (config && this.isValidTheme(config["user.settings.theme"])) {
-        theme = config["user.settings.theme"];
+      if (await this.isThemeDefined()) {
+        const storageData = await this.getLocalStorage();
+        const {_passbolt_data: {config}} = storageData;
+        return config["user.settings.theme"];
       }
-      return theme;
+
+      return window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? "midgar"
+        : "default";
+    }
+
+    async isThemeDefined() {
+      const storageData = await this.getLocalStorage();
+      if (!storageData || !storageData._passbolt_data) {
+        return false;
+      }
+
+      const {_passbolt_data: {config}} = storageData;
+      return this.isValidTheme(config["user.settings.theme"]);
     }
 
     isValidTheme(theme) {
       const whitelist = ['default', 'midgar'];
       return whitelist.includes(theme);
-    }
-
-    createStylesheetElement() {
-      const themePath = this.getThemePath(this.theme);
-      const link = document.createElement('link');
-      link.id = this.stylesheetElementId;
-      link.href = themePath;
-      link.type = 'text/css';
-      link.rel = 'stylesheet';
-      link.media = 'all';
-
-      return link;
-    }
-
-    getThemePath() {
-      const addonUrl = document.location.origin;
-      return `${addonUrl}/data/css/themes/${this.theme}/ext_app.min.css`;
     }
   }
 

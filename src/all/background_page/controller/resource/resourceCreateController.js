@@ -54,14 +54,16 @@ class ResourceCreateController {
   async main(resourceDto, plaintextDto) {
     let privateKey;
 
-    // set default goals, we give arbitrarily "more" goals if a parent permission folder is set
-    // as we don't know how many 'share' operations are needed yet
+    /*
+     * set default goals, we give arbitrarily "more" goals if a parent permission folder is set
+     * as we don't know how many 'share' operations are needed yet
+     */
     let resource = new ResourceEntity(resourceDto);
     this.goals = resource.folderParentId ? 10 : 2;
 
     // Get the passphrase if needed and decrypt secret key
     try {
-      let passphrase = await passphraseController.get(this.worker);
+      const passphrase = await passphraseController.get(this.worker);
       privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
     } catch (error) {
       console.error(error);
@@ -75,7 +77,7 @@ class ResourceCreateController {
       // Encrypt and sign
       await progressController.update(this.worker, this.progress++, i18n.t('Encrypting secret'));
       const secret = await this.crypto.encrypt(plaintext, User.getInstance().get().id, privateKey);
-      resource.secrets = new ResourceSecretsCollection([{data:secret}]);
+      resource.secrets = new ResourceSecretsCollection([{data: secret}]);
 
       // Save
       await progressController.update(this.worker, this.progress++, i18n.t('Creating password'));
@@ -108,8 +110,8 @@ class ResourceCreateController {
   async handleCreateInFolder(resourceEntity, privateKey) {
     // Calculate changes if any
     await progressController.update(this.worker, this.progress++, i18n.t('Calculate permissions'));
-    let destinationFolder = await this.folderModel.findForShare(resourceEntity.folderParentId);
-    let changes = await this.resourceModel.calculatePermissionsChangesForCreate(resourceEntity, destinationFolder);
+    const destinationFolder = await this.folderModel.findForShare(resourceEntity.folderParentId);
+    const changes = await this.resourceModel.calculatePermissionsChangesForCreate(resourceEntity, destinationFolder);
 
     // Apply changes
     if (changes.length) {

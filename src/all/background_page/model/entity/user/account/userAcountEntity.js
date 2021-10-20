@@ -70,18 +70,20 @@ class UserAccountEntity extends Entity {
         // Associated models
         "security_token": SecurityTokenEntity.getSchema(),
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API
    * @returns {*}
    */
   toDto() {
-    let result = Object.assign({}, this._props);
+    const result = Object.assign({}, this._props);
 
     return result;
   }
@@ -94,9 +96,11 @@ class UserAccountEntity extends Entity {
     return this.toDto();
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get user username
    * @returns {string} email
@@ -105,9 +109,11 @@ class UserAccountEntity extends Entity {
     return this._props.username;
   }
 
-  // ==================================================
-  // Associated properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Associated properties getters
+   * ==================================================
+   */
   /**
    * Get security token
    * @returns {SecurityTokenEntity|null}
@@ -116,9 +122,11 @@ class UserAccountEntity extends Entity {
     return this._security_token || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * UserAccountEntity.ENTITY_NAME
    * @returns {string}

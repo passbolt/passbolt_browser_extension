@@ -98,7 +98,7 @@ class ResourceService extends AbstractService {
    */
   async get(id, contains) {
     this.assertValidId(id);
-    let options = contains ? this.formatContainOptions(contains, ResourceService.getSupportedContainOptions()) : null;
+    const options = contains ? this.formatContainOptions(contains, ResourceService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.get(id, options);
     return response.body;
   }
@@ -136,7 +136,7 @@ class ResourceService extends AbstractService {
    */
   async create(data, contains) {
     this.assertNonEmptyData(data);
-    let options = contains ? this.formatContainOptions(contains, ResourceService.getSupportedContainOptions()) : null;
+    const options = contains ? this.formatContainOptions(contains, ResourceService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.create(data, options);
     return response.body;
   }
@@ -154,7 +154,7 @@ class ResourceService extends AbstractService {
   async update(resourceId, resourceData, contains) {
     this.assertValidId(resourceId);
     this.assertNonEmptyData(resourceData);
-    let options = contains ? this.formatContainOptions(contains, ResourceService.getSupportedContainOptions()) : null;
+    const options = contains ? this.formatContainOptions(contains, ResourceService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.update(resourceId, resourceData, options);
     return response.body;
   }
@@ -194,7 +194,7 @@ class ResourceService extends AbstractService {
       return resources;
     }
 
-    let url = this.apiClient.buildUrl(this.apiClient.baseUrl.toString());
+    const url = this.apiClient.buildUrl(this.apiClient.baseUrl.toString());
     resourcesIds.forEach(resourceId => {
       url.searchParams.append(`filter[has-id][]`, resourceId);
     });

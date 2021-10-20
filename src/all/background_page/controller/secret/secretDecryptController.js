@@ -39,13 +39,12 @@ class SecretDecryptController {
    */
   async main(resourceId, showProgress) {
     const crypto = new Crypto();
-    let passphrase;
 
     // Start downloading secret
     const resourcePromise = this.resourceModel.findForDecrypt(resourceId);
 
     // Capture the passphrase if needed
-    passphrase = await passphraseController.get(this.worker);
+    const passphrase = await passphraseController.get(this.worker);
 
     try {
       // Decrypt the private key
@@ -67,7 +66,7 @@ class SecretDecryptController {
         await progressController.update(this.worker, 2, i18n.t("Complete"));
         await progressController.close(this.worker);
       }
-      return {plaintext, resource};
+      return {plaintext: plaintext, resource: resource};
     } catch (error) {
       console.error(error);
       if (showProgress) {

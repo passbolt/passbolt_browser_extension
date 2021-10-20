@@ -49,7 +49,7 @@ class LocalesCollection extends EntityCollection {
     return {
       "type": "array",
       "items": LocaleEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -60,9 +60,11 @@ class LocalesCollection extends EntityCollection {
     return this._items;
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the resource to the list
    * @param {object} locale DTO or LocaleEntity
@@ -79,9 +81,11 @@ class LocalesCollection extends EntityCollection {
     super.push(localeEntity);
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
   /**
    * LocalesCollection.ENTITY_NAME
    * @returns {string}

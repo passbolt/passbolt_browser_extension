@@ -14,7 +14,6 @@
 const GpgAuth = require('../../model/gpgauth').GpgAuth;
 
 class AuthCheckStatusController {
-
   constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
@@ -30,7 +29,6 @@ class AuthCheckStatusController {
       this.worker.port.emit(this.requestId, 'ERROR', error);
     }
   }
-
 }
 
 exports.AuthCheckStatusController = AuthCheckStatusController;

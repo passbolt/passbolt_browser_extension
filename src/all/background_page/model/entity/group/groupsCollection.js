@@ -15,7 +15,6 @@ const {EntityCollection} = require('../abstract/entityCollection');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {EntityCollectionError} = require('../abstract/entityCollectionError');
 const {GroupEntity} = require('./groupEntity');
-const {GroupsUsersCollection} = require("../groupUser/groupsUsersCollection");
 const {deduplicateObjects} = require("../../../utils/array/deduplicateObjects");
 
 const ENTITY_NAME = 'Groups';
@@ -37,8 +36,10 @@ class GroupsCollection extends EntityCollection {
       GroupsCollection.getSchema()
     ));
 
-    // Check if group names and ids are unique
-    // Why not this.push? It is faster than adding items one by one
+    /*
+     * Check if group names and ids are unique
+     * Why not this.push? It is faster than adding items one by one
+     */
     const ids = this._props.map(group => group.id);
     ids.sort().sort((a, b) => {
       if (a === b) {
@@ -70,7 +71,7 @@ class GroupsCollection extends EntityCollection {
     return {
       "type": "array",
       "items": GroupEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -98,9 +99,11 @@ class GroupsCollection extends EntityCollection {
     return this._items.find(r => (r.id === groupId));
   }
 
-  // ==================================================
-  // Sanitization
-  // ==================================================
+  /*
+   * ==================================================
+   * Sanitization
+   * ==================================================
+   */
   /**
    * Sanitize groups dto:
    * - Deduplicate the groups by name.
@@ -122,9 +125,11 @@ class GroupsCollection extends EntityCollection {
     return sanitizedDto;
   }
 
-  // ==================================================
-  // Assertions
-  // ==================================================
+  /*
+   * ==================================================
+   * Assertions
+   * ==================================================
+   */
   /**
    * Assert there is no other group with the same id in the collection
    *
@@ -137,8 +142,8 @@ class GroupsCollection extends EntityCollection {
     }
     const length = this.groups.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingGroup = this.groups[i];
+    for (; i < length; i++) {
+      const existingGroup = this.groups[i];
       if (existingGroup.id && existingGroup.id === group.id) {
         throw new EntityCollectionError(i, GroupsCollection.RULE_UNIQUE_ID, `Group id ${group.id} already exists.`);
       }
@@ -154,17 +159,19 @@ class GroupsCollection extends EntityCollection {
   assertUniqueGroupName(group) {
     const length = this.groups.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingGroup = this.groups[i];
+    for (; i < length; i++) {
+      const existingGroup = this.groups[i];
       if (existingGroup.name === group.name) {
         throw new EntityCollectionError(i, GroupsCollection.RULE_UNIQUE_GROUP_NAME, `The group name ${group.name} already exists.`);
       }
     }
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the group to the list
    * @param {object} group DTO or GroupEntity
@@ -199,14 +206,16 @@ class GroupsCollection extends EntityCollection {
    * @param {Array} groupIds
    */
   removeMany(groupIds) {
-    for (let i in groupIds) {
+    for (const i in groupIds) {
       this.remove(groupIds[i]);
     }
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
   /**
    * GroupsCollection.ENTITY_NAME
    * @returns {string}

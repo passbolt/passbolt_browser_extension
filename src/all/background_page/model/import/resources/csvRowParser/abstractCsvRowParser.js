@@ -26,9 +26,11 @@ class AbstractCsvRowParser {
    * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
    * @returns {ExternalResourceEntity}
    */
+  /* eslint-disable no-unused-vars */
   static parse(data, resourceTypesCollection) {
     throw new Error("parse should be overridden by the inherited csv row parser.");
   }
+  /* eslint-enable no-unused-vars */
 
   /**
    * Check that the parser can parse the format represented by the given fields.
@@ -36,7 +38,7 @@ class AbstractCsvRowParser {
    * @return {int} The matching score. the number of fields the parser match. the greater the better.
    */
   static canParse(csvFields) {
-    let score = 0;
+    const score = 0;
     const requiredFields = ["name", "secret_clear"];
     const csvHasField = fieldName => csvFields.some(csvFieldName => this.mapping[fieldName] === csvFieldName);
 

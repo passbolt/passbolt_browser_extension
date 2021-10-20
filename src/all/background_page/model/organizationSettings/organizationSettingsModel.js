@@ -21,7 +21,6 @@ let _settings;
  * Organization settings model.
  */
 class OrganizationSettingsModel {
-
   /**
    * Constructor
    *
@@ -40,7 +39,6 @@ class OrganizationSettingsModel {
   async getOrFind(refreshCache) {
     if (refreshCache || !_settings) {
       _settings = await this.find();
-
     }
     return _settings;
   }

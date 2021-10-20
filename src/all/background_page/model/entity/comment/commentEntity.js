@@ -115,19 +115,21 @@ class CommentEntity extends Entity {
         "creator": UserEntity.getSchema(),
         "modifier": UserEntity.getSchema(),
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API
    * @param {object} [contain] optional for example {creator: false, modifier: false}
    * @returns {*}
    */
   toDto(contain) {
-    let result = Object.assign({}, this._props);
+    const result = Object.assign({}, this._props);
     if (!contain) {
       return result;
     }
@@ -148,9 +150,11 @@ class CommentEntity extends Entity {
     return this.toDto(CommentEntity.ALL_CONTAIN_OPTIONS);
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get comment id
    * @returns {(string|null)} uuid
@@ -231,9 +235,11 @@ class CommentEntity extends Entity {
     return this._props.modified_by || null;
   }
 
-  // ==================================================
-  // Associated properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Associated properties getters
+   * ==================================================
+   */
   /**
    * Get user profile of person who created the comment
    * @returns {(UserEntity|null)} user
@@ -250,9 +256,11 @@ class CommentEntity extends Entity {
     return this._modifier || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * CommentEntity.ENTITY_NAME
    * @returns {string}

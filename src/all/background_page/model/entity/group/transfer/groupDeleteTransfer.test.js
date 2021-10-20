@@ -37,19 +37,17 @@ describe("Group delete transfer entity", () => {
     expect(groupDeleteTransfer.owners.length).toBe(1);
     expect(groupDeleteTransfer.owners.items[0].id).toBe('898ce1d0-601f-5194-976b-147a680dd472');
     expect(groupDeleteTransfer.owners.items[0].acoForeignKey).toBe('8e3874ae-4b40-590b-968a-418f704b9d9a');
-
   });
 
   it("constructor works fails if not enough data is provided", () => {
     let t;
-    t = () => {new GroupDeleteTransferEntity({})};
+    t = () => { new GroupDeleteTransferEntity({}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new GroupDeleteTransferEntity({owners: []})};
+    t = () => { new GroupDeleteTransferEntity({owners: []}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new GroupDeleteTransferEntity({owners: [{}]})};
+    t = () => { new GroupDeleteTransferEntity({owners: [{}]}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new GroupDeleteTransferEntity({owners: [{id: '898ce1d0-601f-5194-976b-147a680dd472'}]})};
+    t = () => { new GroupDeleteTransferEntity({owners: [{id: '898ce1d0-601f-5194-976b-147a680dd472'}]}); };
     expect(t).toThrow(EntityValidationError);
   });
-
 });

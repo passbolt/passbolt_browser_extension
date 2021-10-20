@@ -27,7 +27,7 @@ class AuthStatusLocalStorage {
   static async flush() {
     Log.write({level: 'debug', message: 'AuthStatusLocalStorage flushed'});
     return await browser.storage.local.remove(AuthStatusLocalStorage.AUTH_STATUS_STORAGE_KEY);
-  };
+  }
 
   /**
    * Set the folders local storage.
@@ -42,7 +42,7 @@ class AuthStatusLocalStorage {
       return result[AuthStatusLocalStorage.AUTH_STATUS_STORAGE_KEY];
     }
     return undefined;
-  };
+  }
 
   /**
    * Set the folders local storage.
@@ -56,10 +56,10 @@ class AuthStatusLocalStorage {
     isAuthenticated = isAuthenticated === true ? true : false;
     isMfaRequired = isMfaRequired === false ? false : true;
     const status = {};
-    status[AuthStatusLocalStorage.AUTH_STATUS_STORAGE_KEY] = {isAuthenticated, isMfaRequired};
+    status[AuthStatusLocalStorage.AUTH_STATUS_STORAGE_KEY] = {isAuthenticated: isAuthenticated, isMfaRequired: isMfaRequired};
     await browser.storage.local.set(status);
     lock.release();
-  };
+  }
 
   /**
    * AuthStatusLocalStorage.AUTH_STATUS_STORAGE_KEY

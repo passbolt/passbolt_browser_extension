@@ -63,34 +63,44 @@ describe("AuthenticationToken entity", () => {
 
   it("constructor returns validation error if dto fields are invalid", () => {
     let t;
-    t = () => {new AuthenticationTokenEntity({
-      'id':'nope',
-      'token': '7f077753-0835-4054-92ee-556660ea04f4'
-    });};
+    t = () => {
+      new AuthenticationTokenEntity({
+        'id': 'nope',
+        'token': '7f077753-0835-4054-92ee-556660ea04f4'
+      });
+    };
     expect(t).toThrow(EntityValidationError);
 
-    t = () => {new AuthenticationTokenEntity({
-      'active':'nope',
-      'token': '7f077753-0835-4054-92ee-556660ea04f4'
-    });};
+    t = () => {
+      new AuthenticationTokenEntity({
+        'active': 'nope',
+        'token': '7f077753-0835-4054-92ee-556660ea04f4'
+      });
+    };
     expect(t).toThrow(EntityValidationError);
 
-    t = () => {new AuthenticationTokenEntity({
-      'type':'nope',
-      'token': '7f077753-0835-4054-92ee-556660ea04f4'
-    });};
+    t = () => {
+      new AuthenticationTokenEntity({
+        'type': 'nope',
+        'token': '7f077753-0835-4054-92ee-556660ea04f4'
+      });
+    };
     expect(t).toThrow(EntityValidationError);
 
-    t = () => {new AuthenticationTokenEntity({
-      'created':'nope',
-      'token': '7f077753-0835-4054-92ee-556660ea04f4'
-    });};
+    t = () => {
+      new AuthenticationTokenEntity({
+        'created': 'nope',
+        'token': '7f077753-0835-4054-92ee-556660ea04f4'
+      });
+    };
     expect(t).toThrow(EntityValidationError);
 
-    t = () => {new AuthenticationTokenEntity({
-      'created':'modified',
-      'token': '7f077753-0835-4054-92ee-556660ea04f4'
-    });};
+    t = () => {
+      new AuthenticationTokenEntity({
+        'created': 'modified',
+        'token': '7f077753-0835-4054-92ee-556660ea04f4'
+      });
+    };
     expect(t).toThrow(EntityValidationError);
   });
 });

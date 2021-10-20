@@ -39,11 +39,11 @@ describe("GroupUser transfer entity", () => {
   });
 
   it("constructor fails if dto is empty", () => {
-    const dto = {}
+    const dto = {};
     try {
       new GroupUserTransferEntity(dto);
       expect(true).toBe(false);
-    } catch(error) {
+    } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('group_id')).toBe(true);
       expect(error.hasError('id')).toBe(true);
@@ -54,11 +54,11 @@ describe("GroupUser transfer entity", () => {
     const dto = {
       id: 'not uuid',
       group_id: 'not uuid',
-    }
+    };
     try {
       new GroupUserTransferEntity(dto);
       expect(true).toBe(false);
-    } catch(error) {
+    } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('group_id')).toBe(true);
       expect(error.hasError('id')).toBe(true);
@@ -72,7 +72,7 @@ describe("GroupUser transfer entity", () => {
     try {
       new GroupUserTransferEntity(dto);
       expect(true).toBe(false);
-    } catch(error) {
+    } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('id')).toBe(true);
     }
@@ -85,7 +85,7 @@ describe("GroupUser transfer entity", () => {
     try {
       new GroupUserTransferEntity(dto);
       expect(true).toBe(false);
-    } catch(error) {
+    } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('group_id')).toBe(true);
     }

@@ -13,7 +13,7 @@
 const {User} = require('../model/user');
 const {MultiFactorAuthenticationModel} = require("../model/multiFactorAuthentication/multiFactorAuthenticationModel");
 
-const listen = function (worker) {
+const listen = function(worker) {
   /*
    * Disable mfa for a user
    *
@@ -21,13 +21,13 @@ const listen = function (worker) {
    * @param {string} requestId The request identifier uuid
    * @param {string} userId The user uuid
    */
-  worker.port.on('passbolt.mfa.disable-for-user', async function (requestId, userId) {
+  worker.port.on('passbolt.mfa.disable-for-user', async(requestId, userId) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const mfaModel = new MultiFactorAuthenticationModel(clientOptions);
       await mfaModel.disableForUser(userId);
       worker.port.emit(requestId, 'SUCCESS');
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }

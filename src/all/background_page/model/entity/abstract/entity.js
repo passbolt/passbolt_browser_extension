@@ -20,9 +20,11 @@ class Entity {
     this._props = JSON.parse(JSON.stringify(props));
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API
    * @returns {*}
@@ -39,9 +41,11 @@ class Entity {
     return this._props;
   }
 
-  // ==================================================
-  // Private
-  // ==================================================
+  /*
+   * ==================================================
+   * Private
+   * ==================================================
+   */
   /**
    * Return true if object property is set
    *
@@ -52,11 +56,11 @@ class Entity {
   _hasProp(propName) {
     if (!propName.includes('.')) {
       const normalizedPropName = Entity._normalizePropName(propName);
-      return this._props.hasOwnProperty(normalizedPropName);
+      return Object.prototype.hasOwnProperty.call(this._props, normalizedPropName);
     }
     try {
-       this._getPropByPath(propName);
-       return true;
+      this._getPropByPath(propName);
+      return true;
     } catch (error) {
       return false;
     }
@@ -73,11 +77,11 @@ class Entity {
   _getPropByPath(path) {
     const normalizedPath = Entity._normalizePropName(path);
     return normalizedPath.split('.').reduce((obj, i) => {
-        if (obj.hasOwnProperty(i)) {
-          return obj[i];
-        }
-        throw new Error();
-      }, this._props);
+      if (Object.prototype.hasOwnProperty.call(obj, i)) {
+        return obj[i];
+      }
+      throw new Error();
+    }, this._props);
   }
 
   /**
@@ -89,7 +93,7 @@ class Entity {
    */
   static _normalizePropName(name) {
     return name
-      .replace(/([A-Z])/g,  (x,y) => "_" + y.toLowerCase()) // add underscore where is a cap
+      .replace(/([A-Z])/g,  (x, y) => `_${y.toLowerCase()}`) // add underscore where is a cap
       .replace(/\._/, ".") // remove leading underscore in front of dots
       .replace(/^_/, "") // remove leading underscore
       .replace(/^\./, ""); // remove leading dots

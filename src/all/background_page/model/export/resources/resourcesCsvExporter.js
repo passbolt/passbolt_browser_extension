@@ -75,7 +75,7 @@ class ResourcesCsvExporter {
    */
   exportResources(RowComposer) {
     const result = [];
-    for (let exportResourceEntity of this.exportEntity.exportResources) {
+    for (const exportResourceEntity of this.exportEntity.exportResources) {
       const row = RowComposer.compose(exportResourceEntity);
       result.push(row);
     }

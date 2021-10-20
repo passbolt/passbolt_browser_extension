@@ -128,7 +128,7 @@ class GroupModel {
     const data = groupUpdateEntity.toDto();
     let groupDto = await this.groupService.update(groupUpdateEntity.id, data);
     if (preSanitize) {
-      groupDto = GroupEntity.sanitizeDto(groupDto)
+      groupDto = GroupEntity.sanitizeDto(groupDto);
     }
     const updatedGroupEntity = new GroupEntity(groupDto);
     await GroupLocalStorage.updateGroup(updatedGroupEntity);

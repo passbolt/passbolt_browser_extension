@@ -8,14 +8,14 @@
 const {SecretDecryptController} = require('../controller/secret/secretDecryptController');
 const {User} = require('../model/user');
 
-const listen = function (worker) {
+const listen = function(worker) {
   /*
    * Decrypt a given armored string.
    *
    * @listens passbolt.secret.decrypt
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.secret.decrypt', async function (requestId, resourceId, options) {
+  worker.port.on('passbolt.secret.decrypt', async(requestId, resourceId, options) => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       let showProgress = true;

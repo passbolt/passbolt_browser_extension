@@ -93,19 +93,21 @@ class TransferEntity extends Entity {
         // Associated models
         "authentication_token": AuthenticationTokenEntity.getSchema(),
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API
    * @param {object} [contain] optional for example {profile: {avatar:true}}
    * @returns {*}
    */
   toDto(contain) {
-    let result = Object.assign({}, this._props);
+    const result = Object.assign({}, this._props);
     if (!contain) {
       return result;
     }
@@ -133,9 +135,11 @@ class TransferEntity extends Entity {
     };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get transfer id
    * @returns {string} uuid
@@ -160,9 +164,11 @@ class TransferEntity extends Entity {
     return this._props.modified || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * TransferEntity.ENTITY_NAME
    * @returns {string}

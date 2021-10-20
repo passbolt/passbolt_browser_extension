@@ -94,8 +94,7 @@ module.exports = function (grunt) {
         reportUnusedDisableDirectives: true
       },
       target: [
-        'src/all/data/js/**/*.js',
-        'src/all/content_scripts/js/**/*.js',
+        'src/all/**/*.js'
       ]
     },
 

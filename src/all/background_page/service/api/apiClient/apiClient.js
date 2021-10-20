@@ -36,7 +36,7 @@ class ApiClient {
       if (rawBaseUrl.endsWith('/')) {
         rawBaseUrl = rawBaseUrl.slice(0, -1);
       }
-      this.baseUrl = rawBaseUrl + '/' + this.options.getResourceName();
+      this.baseUrl = `${rawBaseUrl}/${this.options.getResourceName()}`;
       this.baseUrl = new URL(this.baseUrl);
     } catch (typeError) {
       throw new TypeError('ApiClient constructor error: b.');
@@ -53,7 +53,7 @@ class ApiClient {
     return {
       'Accept': 'application/json',
       'content-type': 'application/json'
-    }
+    };
   }
 
   /**
@@ -83,7 +83,7 @@ class ApiClient {
     this.assertValidId(id);
     const url = this.buildUrl(`${this.baseUrl}/${id}`, urlOptions || {});
     return this.fetchAndHandleResponse('GET', url);
-  };
+  }
 
   /**
    * Delete a resource by id
@@ -111,12 +111,9 @@ class ApiClient {
     } else {
       url = this.buildUrl(`${this.baseUrl}/${id}/dry-run`, urlOptions || {});
     }
-    let bodyString;
-    if (body) {
-      bodyString = this.buildBody(body);
-    }
+    const bodyString = body ? this.buildBody(body) : undefined;
     return this.fetchAndHandleResponse('DELETE', url, bodyString);
-  };
+  }
 
   /**
    * Find all the resources
@@ -129,10 +126,10 @@ class ApiClient {
    * @returns {Promise<*>}
    * @public
    */
-  async findAll (urlOptions) {
+  async findAll(urlOptions) {
     const url = this.buildUrl(this.baseUrl.toString(), urlOptions || {});
     return await this.fetchAndHandleResponse('GET', url);
-  };
+  }
 
   /**
    * Create a resource
@@ -178,10 +175,7 @@ class ApiClient {
     } else {
       url = this.buildUrl(`${this.baseUrl}/${id}/dry-run`, urlOptions || {});
     }
-    let bodyString;
-    if (body) {
-      bodyString = this.buildBody(body);
-    }
+    const bodyString = body ? this.buildBody(body) : undefined;
     return this.fetchAndHandleResponse('PUT', url, bodyString);
   }
 
@@ -274,7 +268,7 @@ class ApiClient {
 
     urlOptions = urlOptions || {};
     for (const [key, value] of Object.entries(urlOptions)) {
-      if (typeof key !== 'string' ) {
+      if (typeof key !== 'string') {
         throw new TypeError('ApiClient.buildUrl error: urlOptions key should be a string.');
       }
       if (typeof value === 'string') {
@@ -283,7 +277,7 @@ class ApiClient {
       } else {
         // Example "filter[has-id][]": "<uuid>"
         if (Array.isArray(value)) {
-          value.forEach((v) => {
+          value.forEach(v => {
             urlObj.searchParams.append(key, v);
           });
         } else {
@@ -316,7 +310,7 @@ class ApiClient {
     }
 
     let response, responseJson;
-    let fetchOptions = { ...this.buildFetchOptions(), ...options };
+    const fetchOptions = {...this.buildFetchOptions(), ...options};
     fetchOptions.method = method;
     if (body) {
       fetchOptions.body = body;
@@ -332,8 +326,10 @@ class ApiClient {
       responseJson = await response.json();
     } catch (error) {
       console.error(error);
-      // If the response cannot be parsed, it's not a Passbolt API response.
-      // It can be a for example a proxy timeout error (504).
+      /*
+       * If the response cannot be parsed, it's not a Passbolt API response.
+       * It can be a for example a proxy timeout error (504).
+       */
       throw new PassboltBadResponseError(error, response);
     }
 

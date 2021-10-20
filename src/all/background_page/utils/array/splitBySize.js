@@ -24,6 +24,6 @@ const splitBySize = (arr, size) => arr.reduce((chunks, el, i) => {
     chunks.push([el]);
   }
   return chunks;
-}, [])
+}, []);
 
 exports.splitBySize = splitBySize;

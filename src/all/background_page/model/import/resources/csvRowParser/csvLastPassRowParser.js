@@ -26,7 +26,7 @@ class CsvLastPassRowParser extends AbstractCsvRowParser {
       "secret_clear": "password",
       "description": "extra",
       "folder_parent_path": "grouping"
-    }
+    };
   }
 
   /**
@@ -41,7 +41,7 @@ class CsvLastPassRowParser extends AbstractCsvRowParser {
     if (resourceType) {
       externalResourceDto.resource_type_id = resourceType.id;
     }
-    for (let propertyName in this.mapping) {
+    for (const propertyName in this.mapping) {
       if (data[this.mapping[propertyName]]) {
         externalResourceDto[propertyName] = data[this.mapping[propertyName]];
       }

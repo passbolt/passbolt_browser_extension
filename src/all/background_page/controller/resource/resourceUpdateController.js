@@ -78,7 +78,7 @@ class ResourceUpdateController {
    */
   async updateResourceAndSecret(resourceEntity, plaintextDto) {
     // Get the passphrase if needed and decrypt secret key
-    let privateKey = await this.getPrivateKey()
+    const privateKey = await this.getPrivateKey();
 
     // Set the goals
     try {
@@ -97,12 +97,12 @@ class ResourceUpdateController {
       resourceEntity.secrets = await this.encryptSecrets(plaintext, usersIds, privateKey);
 
       // Post data & wrap up
-      await progressController.update(this.worker, goals-1, i18n.t("Saving resource"));
+      await progressController.update(this.worker, goals - 1, i18n.t("Saving resource"));
       const updatedResource = await this.resourceModel.update(resourceEntity);
       await progressController.update(this.worker, goals, i18n.t("Done!"));
       await progressController.close(this.worker);
       return updatedResource;
-    } catch(error) {
+    } catch (error) {
       await progressController.close(this.worker);
       throw error;
     }
@@ -114,7 +114,7 @@ class ResourceUpdateController {
    */
   async getPrivateKey() {
     try {
-      let passphrase = await passphraseController.get(this.worker);
+      const passphrase = await passphraseController.get(this.worker);
       return await this.crypto.getAndDecryptPrivateKey(passphrase);
     } catch (error) {
       console.error(error);
@@ -133,12 +133,12 @@ class ResourceUpdateController {
    */
   async encryptSecrets(plaintextDto, usersIds, privateKey) {
     const secrets = [];
-    for (let i=0; i < usersIds.length; i++) {
-      if (usersIds.hasOwnProperty(i)) {
+    for (let i = 0; i < usersIds.length; i++) {
+      if (Object.prototype.hasOwnProperty.call(usersIds, i)) {
         const userId =  usersIds[i];
         const data = await this.crypto.encrypt(plaintextDto, userId, privateKey);
-        secrets.push({user_id: userId, data});
-        await progressController.update(this.worker, i+2, i18n.t("Encrypting"));
+        secrets.push({user_id: userId, data: data});
+        await progressController.update(this.worker, i + 2, i18n.t("Encrypting"));
       }
     }
     return new ResourceSecretsCollection(secrets);

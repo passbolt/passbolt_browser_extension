@@ -14,7 +14,6 @@
 const GpgAuth = require('../../model/gpgauth').GpgAuth;
 
 class AuthIsAuthenticatedController {
-
   constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;

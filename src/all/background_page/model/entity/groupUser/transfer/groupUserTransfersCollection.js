@@ -32,8 +32,10 @@ class GroupUserTransfersCollection extends EntityCollection {
       GroupUserTransfersCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(groupUserTransfer => {
       this.push(groupUserTransfer);
     });
@@ -56,7 +58,7 @@ class GroupUserTransfersCollection extends EntityCollection {
     return {
       "type": "array",
       "items": GroupUserTransferEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -67,9 +69,11 @@ class GroupUserTransfersCollection extends EntityCollection {
     return ENTITY_NAME;
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the groupUser to the list
    * @param {GroupUserTransferEntity} groupUserTransfer DTO or GroupUserTransferEntity

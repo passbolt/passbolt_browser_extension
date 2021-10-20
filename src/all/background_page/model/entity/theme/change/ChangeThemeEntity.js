@@ -13,7 +13,6 @@
  */
 const {Entity} = require('../../abstract/entity');
 const {EntitySchema} = require('../../abstract/entitySchema');
-const {EntityValidationError} = require('../../abstract/entityValidationError');
 const {ThemeEntity} = require("../themeEntity");
 
 const ENTITY_NAME = 'ChangeTheme';
@@ -47,12 +46,14 @@ class ChangeThemeEntity extends Entity {
       "properties": {
         "name": themeEntitySchema.properties.name
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
 
   /**
    * Get theme name
@@ -63,9 +64,11 @@ class ChangeThemeEntity extends Entity {
   }
 
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * ThemeEntity.ENTITY_NAME
    * @returns {string}

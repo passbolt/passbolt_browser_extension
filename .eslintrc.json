@@ -6,6 +6,7 @@
       "jsx": true
     }
   },
+  "parser": "babel-eslint",
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended"
@@ -19,13 +20,24 @@
     "es6": true,
     "amd": true,
     "webextensions": true,
-    "jest": true
+    "jest": true,
+    "node": true
   },
   "globals": {
     "global": true,
     "__": true,
     "secretComplexity": true,
-    "port": true
+    "port": true,
+    "Validator": true,
+    "openpgp": true,
+    "PapaParse": true,
+    "kdbxweb": true,
+    "storage": true,
+    "jsSHA": true,
+    "XRegExp": true,
+    "stripslashes": true,
+    "urldecode": true,
+    "OpenpgpkeyEntity": true
   },
   "rules": {
     "strict": [
@@ -46,7 +58,12 @@
     // enforce consistent brace style for all control statements
     "no-eval": 2,
     // disallow the use of eval()
-    "no-extend-native": 2,
+    "no-extend-native": [
+      "error",
+      {
+        "exceptions": ["Error"]
+      }
+    ],
     // disallow extending native types
     "no-global-assign": 2,
     // disallow assignments to native objects or read-only global variables
@@ -80,15 +97,6 @@
     "eol-last": 1,
     // enforce at least one newline at the end of files
     "func-call-spacing": 1,
-    // require or disallow spacing between function identifiers and their invocations
-    "indent": [
-      "warn",
-      2,
-      {
-        "MemberExpression": 0,
-        "SwitchCase": 1
-      }
-    ],
     // enforce consistent indentation
     "key-spacing": [
       "warn",
@@ -197,7 +205,10 @@
         "uninitialized": "always"
       }
     ],
-    // enforce variables to be declared either together or separately in functions
+    /*
+     * require or disallow spacing between function identifiers and their invocations
+     * enforce variables to be declared either together or separately in functions
+     */
     "indent": [
       "warn",
       2,

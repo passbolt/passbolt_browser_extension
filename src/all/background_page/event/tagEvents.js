@@ -15,14 +15,14 @@ const {TagModel} = require('../model/tag/tagModel');
 const {TagEntity} = require('../model/entity/tag/tagEntity');
 const {TagsCollection} = require('../model/entity/tag/tagsCollection');
 
-const listen = function (worker) {
+const listen = function(worker) {
   /*
    * Find all the tags
    *
    * @listens passbolt.tags.find-all
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.tags.find-all', async function (requestId) {
+  worker.port.on('passbolt.tags.find-all', async requestId => {
     try {
       const apiOption = await User.getInstance().getApiClientOptions();
       const tagModel = new TagModel(apiOption);
@@ -41,7 +41,7 @@ const listen = function (worker) {
    * @param resourceId {uuid} The resource identifier
    * @param tagsDto {Object} tags dto
    */
-  worker.port.on('passbolt.tags.update-resource-tags', async function (requestId, resourceId, tagsDto) {
+  worker.port.on('passbolt.tags.update-resource-tags', async(requestId, resourceId, tagsDto) => {
     try {
       const apiOption = await User.getInstance().getApiClientOptions();
       const tagModel = new TagModel(apiOption);
@@ -60,7 +60,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param tagDto {object} The tag object
    */
-  worker.port.on('passbolt.tags.update', async function (requestId, tagDto) {
+  worker.port.on('passbolt.tags.update', async(requestId, tagDto) => {
     try {
       const apiOption = await User.getInstance().getApiClientOptions();
       const tagModel = new TagModel(apiOption);
@@ -79,7 +79,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param tagId {uuid} The tag identifier
    */
-  worker.port.on('passbolt.tags.delete', async function (requestId, tagId) {
+  worker.port.on('passbolt.tags.delete', async(requestId, tagId) => {
     try {
       const apiOption = await User.getInstance().getApiClientOptions();
       const tagModel = new TagModel(apiOption);

@@ -57,12 +57,12 @@ describe("SecurityToken entity", () => {
         "textcolor": "true"
       });
       expect(false).toBe(true);
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        code: { pattern: 'The code is not valid.' },
-        color: { format: 'The color is not a valid x-hex-color.' },
-        textcolor: { format: 'The textcolor is not a valid x-hex-color.' }
+        code: {pattern: 'The code is not valid.'},
+        color: {format: 'The color is not a valid x-hex-color.'},
+        textcolor: {format: 'The textcolor is not a valid x-hex-color.'}
       });
     }
   });

@@ -110,12 +110,14 @@ class GpgkeyEntity extends Entity {
           "format": "date-time"
         }
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get gpgkey id
    * @returns {(string|null)} uuid
@@ -175,9 +177,11 @@ class GpgkeyEntity extends Entity {
     return this._props.deleted;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * GpgkeyEntity.ENTITY_NAME
    * @returns {string}

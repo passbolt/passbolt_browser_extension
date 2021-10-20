@@ -68,7 +68,7 @@ class MoveFolderController {
 
     try {
       await this.getPassphrase();
-    } catch(error) {
+    } catch (error) {
       this.cleanup();
       throw error;
     }
@@ -81,10 +81,10 @@ class MoveFolderController {
       await this.move();
       await progressController.update(this.worker, this.goals, i18n.t('Done'));
       await progressController.close(this.worker);
-      this.cleanup()
-    } catch(error) {
+      this.cleanup();
+    } catch (error) {
       await progressController.close(this.worker);
-      this.cleanup()
+      this.cleanup();
       throw error;
     }
   }
@@ -114,8 +114,10 @@ class MoveFolderController {
    * @returns {Promise<void>}
    */
   async getPassphrase() {
-    // Get the passphrase if needed and decrypt secret key
-    // We do this to confirm the move even if there is nothing to decrypt/re-encrypt
+    /*
+     * Get the passphrase if needed and decrypt secret key
+     * We do this to confirm the move even if there is nothing to decrypt/re-encrypt
+     */
     const passphrase = await passphraseController.get(this.worker);
     this.privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
   }
@@ -135,8 +137,10 @@ class MoveFolderController {
     }
     this.assertFolderCanBeMoved();
 
-    // Get all folders contained in this folder
-    // and get all the resources contain in this folder and subfolders
+    /*
+     * Get all folders contained in this folder
+     * and get all the resources contain in this folder and subfolders
+     */
     this.subFolders = await this.folderModel.getAllChildren([this.folder.id]);
     this.resources = await this.resourceModel.getAllByParentIds([this.folder.id, ...this.subFolders.ids]);
 
@@ -173,8 +177,10 @@ class MoveFolderController {
    * @returns {Promise<void>}
    */
   async setGoals() {
-    // calculate changes for folder + subfolders + resources
-    // init + move + (folders to update * 2) + (resources to update * get secret, decrypt, encrypt, share) + sync keyring
+    /*
+     * calculate changes for folder + subfolders + resources
+     * init + move + (folders to update * 2) + (resources to update * get secret, decrypt, encrypt, share) + sync keyring
+     */
     this.goals = 3 + (this.subFolders.length * 2) + (this.resources.length * 4);
     this.progress = 0;
     await progressController.updateGoals(this.worker, this.goals);
@@ -188,10 +194,12 @@ class MoveFolderController {
   async calculateChanges() {
     await progressController.update(this.worker, this.progress++, i18n.t('Calculating changes for {{name}}', {name: this.folder.name}));
 
-    // When a shared folder is moved, we do not change permissions when:
-    // - move is from the root to a personal folder
-    // - move is from a personal folder to a personal folder;
-    // - move is from a personal folder to the root.
+    /*
+     * When a shared folder is moved, we do not change permissions when:
+     * - move is from the root to a personal folder
+     * - move is from a personal folder to a personal folder;
+     * - move is from a personal folder to the root.
+     */
     if (this.folder.isShared()
       && (this.destinationFolderId === null || this.destinationFolder.isPersonal())
       && (this.folder.folderParentId === null || this.parentFolder.isPersonal())) {
@@ -203,19 +211,19 @@ class MoveFolderController {
       this.foldersChanges.merge(
         await this.folderModel.calculatePermissionsChangesForMove(
           this.folder, this.parentFolder, this.destinationFolder
-      ));
+        ));
     }
     // Add the ones for the sub folders
-    for (let subfolder of this.subFolders) {
+    for (const subfolder of this.subFolders) {
       if (subfolder.permission.isOwner()) {
         this.foldersChanges.merge(
           await this.folderModel.calculatePermissionsChangesForMove(
             subfolder, this.parentFolder, this.destinationFolder
-        ));
+          ));
       }
     }
     // And for the resources
-    for (let resource of this.resources) {
+    for (const resource of this.resources) {
       if (resource.permission.isOwner()) {
         this.resourcesChanges.merge(await this.resourceModel.calculatePermissionsChangesForMove(
           resource, this.parentFolder, this.destinationFolder
@@ -230,8 +238,10 @@ class MoveFolderController {
    */
   async share() {
     if (this.foldersChanges.length || this.resourcesChanges.length) {
-      // Some permission changes are possible, ask user what strategy to adopt
-      // This also serves as a confirmation prior to a typically sensitive operation
+      /*
+       * Some permission changes are possible, ask user what strategy to adopt
+       * This also serves as a confirmation prior to a typically sensitive operation
+       */
       const strategy = await this.worker.port.request('passbolt.folders.move-strategy.request', this.destinationFolderId, [this.folderId], []);
       if (strategy.moveOption === 'keep') {
         return;
@@ -240,7 +250,7 @@ class MoveFolderController {
 
     // Update folders permissions
     if (this.foldersChanges.length) {
-      let folders = new FoldersCollection([this.folder]);
+      const folders = new FoldersCollection([this.folder]);
       folders.merge(this.subFolders);
       await Share.bulkShareFolders(folders, this.foldersChanges, this.folderModel,  async message => {
         await progressController.update(this.worker, this.progress++, message);
@@ -249,8 +259,8 @@ class MoveFolderController {
 
     // Share resources
     if (this.resourcesChanges.length) {
-      let resourcesDto = this.resources.toDto({secrets:true});
-      let changesDto = this.resourcesChanges.toDto();
+      const resourcesDto = this.resources.toDto({secrets: true});
+      const changesDto = this.resourcesChanges.toDto();
       await progressController.update(this.worker, this.progress++, i18n.t('Synchronizing keys'));
       await this.keyring.sync();
       await Share.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {

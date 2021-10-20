@@ -14,10 +14,10 @@ const {PageMod} = require('../sdk/page-mod');
 const Worker = require('../model/worker');
 const app = require('../app');
 
-const RecoverBootstrap = function () {};
+const RecoverBootstrap = function() {};
 RecoverBootstrap._pageMod = undefined;
 
-RecoverBootstrap.init = function () {
+RecoverBootstrap.init = function() {
   if (typeof RecoverBootstrap._pageMod !== 'undefined') {
     RecoverBootstrap._pageMod.destroy();
     RecoverBootstrap._pageMod = undefined;
@@ -26,18 +26,20 @@ RecoverBootstrap.init = function () {
   const recoverBootstrapRegex = `(.*)\/setup\/recover\/(${uuidRegex})\/(${uuidRegex})`;
   RecoverBootstrap._pageMod = new PageMod({
     name: 'RecoverBootstrap',
-		include: new RegExp(recoverBootstrapRegex),
+    include: new RegExp(recoverBootstrapRegex),
     contentScriptWhen: 'ready',
     contentStyleFile: [
-      // @deprecated when support for v2 is dropped
-      // used to control iframe styling without inline style in v3
+      /*
+       * @deprecated when support for v2 is dropped
+       * used to control iframe styling without inline style in v3
+       */
       'data/css/themes/default/ext_external.min.css'
     ],
     contentScriptFile: [
       'content_scripts/js/dist/vendors.js',
       'content_scripts/js/dist/recover.js',
     ],
-    onAttach: function (worker) {
+    onAttach: function(worker) {
       Worker.add('RecoverBootstrap', worker);
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows

@@ -40,10 +40,10 @@ describe("Tag entity", () => {
   it("constructor returns validation error if dto required fields are missing", () => {
     try {
       new TagEntity({});
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.details).toEqual( {
-        slug: { required: 'The slug is required.' }
+      expect(error.details).toEqual({
+        slug: {required: 'The slug is required.'}
       });
     }
   });
@@ -55,12 +55,12 @@ describe("Tag entity", () => {
         "slug": [],
         "is_shared": "🧟‍",
       });
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        id: { format: 'The id is not a valid uuid.' },
-        slug: { type: 'The slug is not a valid string.' },
-        is_shared: { type: 'The is_shared is not a valid boolean.' }
+        id: {format: 'The id is not a valid uuid.'},
+        slug: {type: 'The slug is not a valid string.'},
+        is_shared: {type: 'The is_shared is not a valid boolean.'}
       });
     }
   });
@@ -72,10 +72,10 @@ describe("Tag entity", () => {
         "slug": "",
         "is_shared": false,
       });
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        slug: { minLength: 'The slug should be 1 character in length minimum.' },
+        slug: {minLength: 'The slug should be 1 character in length minimum.'},
       });
     }
     try {
@@ -84,10 +84,10 @@ describe("Tag entity", () => {
         "slug": Array(129).join("a"),
         "is_shared": false,
       });
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        slug: { minLength: 'The slug should be 128 characters in length maximum.' },
+        slug: {minLength: 'The slug should be 128 characters in length maximum.'},
       });
     }
   });
@@ -99,10 +99,10 @@ describe("Tag entity", () => {
         "slug": 'test',
         "is_shared": true,
       });
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        is_shared: { hashtag: 'A shared tag should start with a hashtag.'},
+        is_shared: {hashtag: 'A shared tag should start with a hashtag.'},
       });
     }
   });

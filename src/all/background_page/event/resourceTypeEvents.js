@@ -14,14 +14,14 @@
 const {ResourceTypeModel} = require("../model/resourceType/resourceTypeModel");
 const {User} = require('../model/user');
 
-const listen = function (worker) {
+const listen = function(worker) {
   /*
    * Get the resource types from the local storage.
    *
    * @listens passbolt.resource-type.get-all
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.resource-type.get-all', async function (requestId) {
+  worker.port.on('passbolt.resource-type.get-all', async requestId => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const resourceTypeModel = new ResourceTypeModel(apiClientOptions);
@@ -31,6 +31,6 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
-}
+};
 
 exports.listen = listen;

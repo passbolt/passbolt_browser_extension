@@ -78,12 +78,14 @@ class ProfileEntity extends Entity {
         },
         "avatar": AvatarEntity.getSchema()
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API
    * @param {object} [contain] optional example {avatar: true}
@@ -92,7 +94,7 @@ class ProfileEntity extends Entity {
   toDto(contain) {
     const result = Object.assign({}, this._props);
     if (this.avatar && contain && contain.avatar) {
-        result.avatar = this.avatar.toDto();
+      result.avatar = this.avatar.toDto();
     }
     return result;
   }
@@ -105,9 +107,11 @@ class ProfileEntity extends Entity {
     return this.toDto(ProfileEntity.ALL_CONTAIN_OPTIONS);
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * ProfileEntity.ENTITY_NAME
    * @returns {string}
@@ -121,12 +125,14 @@ class ProfileEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {avatar:true};
+    return {avatar: true};
   }
 
-  // ==================================================
-  // Default properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Default properties getters
+   * ==================================================
+   */
   /**
    * Get profile id
    * @returns {string} uuid
@@ -183,9 +189,11 @@ class ProfileEntity extends Entity {
     return this._props.modified || null;
   }
 
-  // ==================================================
-  // Associated properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Associated properties getters
+   * ==================================================
+   */
   /**
    * Get the associated avatar entity if any
    * @returns {AvatarEntity|null}

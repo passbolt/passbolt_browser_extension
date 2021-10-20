@@ -40,8 +40,8 @@ describe("Group update entity", () => {
 
   it("constructor works fails if not enough data is provided", () => {
     try {
-      new GroupUpdateEntity({})
-    } catch(error) {
+      new GroupUpdateEntity({});
+    } catch (error) {
       expect(error).toBeInstanceOf(EntityValidationError);
       expect(typeof error.details).toEqual("object");
       expect(error.details.id).not.toBeUndefined();

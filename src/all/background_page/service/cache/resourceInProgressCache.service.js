@@ -19,8 +19,8 @@ const VALIDITY_TIMEOUT_IN_MS = 6000;
 
 /** The cached resource*/
 let resourceDto,
-/** The invalidity timeout */
-invalidTimeout;
+  /** The invalidity timeout */
+  invalidTimeout;
 
 /**
  * A cache service used whenever one wants to store information about a resource creation in progress.
@@ -28,7 +28,6 @@ invalidTimeout;
  * is stored for a certain time given when one set a value and whenever the user is logged out
  */
 class ResourceInProgressCacheService {
-
   /**
    * Default constructor
    */

@@ -1,7 +1,6 @@
 const {canSuggestUrl} = require("./canSuggestUrl");
 
 describe("canSuggestUrl", () => {
-
   it("should suggest matching domain urls", () => {
     expect(canSuggestUrl("ssh://www.passbolt.com", "ssh://www.passbolt.com")).toBe(true);
     expect(canSuggestUrl("http://www.passbolt.com", "http://www.passbolt.com")).toBe(true);
@@ -134,8 +133,10 @@ describe("canSuggestUrl", () => {
     expect(canSuggestUrl("https://127.0.0.1:444", "127.0.0.1:443")).toBe(false);
     expect(canSuggestUrl("https://www.passbolt.com:444", "www.passbolt.com:443")).toBe(false);
 
-    // Ports are not deducted from urls schemes, that's why we expect http scheme to not match an url with a defined
-    // port, even if it is the correct one.
+    /*
+     * Ports are not deducted from urls schemes, that's why we expect http scheme to not match an url with a defined
+     * port, even if it is the correct one.
+     */
     expect(canSuggestUrl("http://127.0.0.1", "127.0.0.1:80")).toBe(false);
     expect(canSuggestUrl("https://www.passbolt.com", "www.passbolt.com:443")).toBe(false);
   });

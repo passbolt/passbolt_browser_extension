@@ -24,7 +24,7 @@ class ResourcesImportParser {
    */
   parseImport(importResourcesEntity, resourceTypesCollection) {
     const Parser = this.getParser(importResourcesEntity);
-    const parser = new Parser(importResourcesEntity, resourceTypesCollection)
+    const parser = new Parser(importResourcesEntity, resourceTypesCollection);
     return parser.parseImport();
   }
 

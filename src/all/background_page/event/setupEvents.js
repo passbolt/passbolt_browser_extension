@@ -17,7 +17,7 @@ const {SetSetupLocaleController} = require("../controller/locale/setSetupLocaleC
 const {GetSetupLocaleController} = require("../controller/locale/getSetupLocaleController");
 const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
 
-const listen = function (worker) {
+const listen = function(worker) {
   /**
    * The setup controller.
    * @type {SetupController}
@@ -31,7 +31,7 @@ const listen = function (worker) {
    * @listens passbolt.setup.is-first-install
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.setup.is-first-install', async function (requestId) {
+  worker.port.on('passbolt.setup.is-first-install', async requestId => {
     try {
       const isFirstInstall = worker.tab.url.indexOf('first-install') !== -1;
       worker.port.emit(requestId, 'SUCCESS', isFirstInstall);
@@ -47,13 +47,13 @@ const listen = function (worker) {
    * @listens passbolt.organization-settings.get
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.organization-settings.get', async function (requestId) {
+  worker.port.on('passbolt.organization-settings.get', async requestId => {
     try {
       const apiClientOptions = (new ApiClientOptions()).setBaseUrl(setupController.setupEntity.domain);
       const organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
       const organizationSettings = await organizationSettingsModel.getOrFind(true);
       worker.port.emit(requestId, 'SUCCESS', organizationSettings);
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
@@ -104,7 +104,7 @@ const listen = function (worker) {
    * @listens passbolt.setup.info
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.setup.info', async function (requestId) {
+  worker.port.on('passbolt.setup.info', async requestId => {
     try {
       const setupEntity = await setupController.retrieveSetupInfo();
       worker.port.emit(requestId, 'SUCCESS', setupEntity);
@@ -123,7 +123,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param passphrase {string} The passphrase used to generate the key
    */
-  worker.port.on('passbolt.setup.generate-key', async function (requestId, passphrase) {
+  worker.port.on('passbolt.setup.generate-key', async(requestId, passphrase) => {
     try {
       await setupController.generateKey(passphrase);
       worker.port.emit(requestId, 'SUCCESS');
@@ -139,7 +139,7 @@ const listen = function (worker) {
    * @listens passbolt.setup.download-recovery-kit
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.setup.download-recovery-kit', async function (requestId) {
+  worker.port.on('passbolt.setup.download-recovery-kit', async requestId => {
     try {
       await setupController.downloadRecoveryKit();
       worker.port.emit(requestId, 'SUCCESS');
@@ -156,7 +156,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param armoredKey {string} The armored key to import
    */
-  worker.port.on('passbolt.setup.import-key', async function (requestId, armoredKey) {
+  worker.port.on('passbolt.setup.import-key', async(requestId, armoredKey) => {
     try {
       await setupController.importKey(armoredKey);
       worker.port.emit(requestId, 'SUCCESS');
@@ -174,7 +174,7 @@ const listen = function (worker) {
    * @param passphrase {string} The passphrase used to verify the secret key
    * @param rememberUntilLogout {boolean} The passphrase should be remembered until the user is logged out
    */
-  worker.port.on('passbolt.setup.verify-passphrase', async function (requestId, passphrase, rememberUntilLogout) {
+  worker.port.on('passbolt.setup.verify-passphrase', async(requestId, passphrase, rememberUntilLogout) => {
     try {
       await setupController.verifyPassphrase(passphrase, rememberUntilLogout);
       worker.port.emit(requestId, 'SUCCESS');
@@ -191,7 +191,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param securityTokenDto {object} The security token dto. ie: {color: hex-string, text-color: hex-string, code: string}
    */
-  worker.port.on('passbolt.setup.set-security-token', async function (requestId, securityTokenDto) {
+  worker.port.on('passbolt.setup.set-security-token', async(requestId, securityTokenDto) => {
     try {
       setupController.setSecurityToken(securityTokenDto);
       worker.port.emit(requestId, 'SUCCESS');
@@ -207,7 +207,7 @@ const listen = function (worker) {
    * @listens passbolt.setup.complete
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.setup.complete', async function (requestId) {
+  worker.port.on('passbolt.setup.complete', async requestId => {
     try {
       await setupController.complete();
       worker.port.emit(requestId, 'SUCCESS');

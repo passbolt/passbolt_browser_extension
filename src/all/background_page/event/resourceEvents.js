@@ -11,18 +11,18 @@ const {ResourceModel} = require('../model/resource/resourceModel');
 const {ResourceCreateController} = require('../controller/resource/resourceCreateController.js');
 const {ResourceUpdateController} = require('../controller/resource/resourceUpdateController.js');
 
-const listen = function (worker) {
+const listen = function(worker) {
   /*
    * Pull the resources from the API and update the local storage.
    *
    * @listens passbolt.resources.update-local-storage
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.resources.update-local-storage', async function (requestId) {
+  worker.port.on('passbolt.resources.update-local-storage', async requestId => {
     Log.write({level: 'debug', message: 'ResourceEvent listen passbolt.resources.update-local-storage'});
     try {
-      let apiClientOptions = await User.getInstance().getApiClientOptions();
-      let resourceModel = new ResourceModel(apiClientOptions);
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const resourceModel = new ResourceModel(apiClientOptions);
       resourceModel.updateLocalStorage();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
@@ -37,7 +37,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param options {object} The options to apply to the find
    */
-  worker.port.on('passbolt.resources.find-all', async function (requestId, options) {
+  worker.port.on('passbolt.resources.find-all', async(requestId, options) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const resourceModel = new ResourceModel(clientOptions);
@@ -57,7 +57,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param options {object} The options to apply to the find
    */
-  worker.port.on('passbolt.resources.find-permissions', async function (requestId, resourceId) {
+  worker.port.on('passbolt.resources.find-permissions', async(requestId, resourceId) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const resourceModel = new ResourceModel(clientOptions);
@@ -77,7 +77,7 @@ const listen = function (worker) {
    * @param resourceDto {object} The resource meta data
    * @param plaintextDto {string|object} The plaintext data to encrypt
    */
-  worker.port.on('passbolt.resources.create', async function (requestId, resourceDto, plaintextDto) {
+  worker.port.on('passbolt.resources.create', async(requestId, resourceDto, plaintextDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new ResourceCreateController(worker, requestId, clientOptions);
@@ -96,7 +96,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param resourcesIds {array} The resources ids to delete
    */
-  worker.port.on('passbolt.resources.delete-all', async function (requestId, resourcesIds) {
+  worker.port.on('passbolt.resources.delete-all', async(requestId, resourcesIds) => {
     try {
       // TODO DeleteResourcesController with progress dialog if resourceIds > 1
       const clientOptions = await User.getInstance().getApiClientOptions();
@@ -117,7 +117,7 @@ const listen = function (worker) {
    * @param resource {array} The resource
    * @param editedPassword {} The resource
    */
-  worker.port.on('passbolt.resources.update', async function (requestId, resourceDto, plaintextDto) {
+  worker.port.on('passbolt.resources.update', async(requestId, resourceDto, plaintextDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new ResourceUpdateController(worker, requestId, clientOptions);
@@ -128,6 +128,6 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
-}
+};
 
 exports.listen = listen;

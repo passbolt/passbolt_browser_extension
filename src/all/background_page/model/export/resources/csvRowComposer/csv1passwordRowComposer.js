@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {AbstractRowComposer} = require("./abstractRowComposer");
-const {ExternalResourceEntity} = require("../../../entity/resource/external/externalResourceEntity");
 const {Csv1PasswordRowParser} = require("../../../import/resources/csvRowParser/csv1PasswordRowParser");
 
 const FORMAT = "csv-1password";
@@ -43,7 +42,7 @@ class Csv1PasswordRowComposer extends AbstractRowComposer {
   static compose(externalResourceEntity) {
     const row = {};
     const externalResourceDto = externalResourceEntity.toDto();
-    for (let propertyName in this.mapping) {
+    for (const propertyName in this.mapping) {
       row[this.mapping[propertyName]] = externalResourceDto[propertyName] || "";
     }
     return row;

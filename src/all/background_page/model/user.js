@@ -1,4 +1,4 @@
-"use strict";
+
 /**
  * User model.
  *
@@ -14,8 +14,7 @@ const {UserSettings} = require('./userSettings/userSettings');
 /**
  * The class that deals with users.
  */
-const User = (function () {
-
+const User = (function() {
   // see model/settings
   this.settings = new UserSettings();
 
@@ -48,18 +47,18 @@ const User = (function () {
    * @returns {object} The user in case of success
    * @throw Error if the user is not valid
    */
-  this.validate = function (user, fields) {
+  this.validate = function(user, fields) {
     if (typeof fields === 'undefined') {
       fields = ['id', 'username', 'firstname', 'lastname'];
     }
 
-    var errors = [];
-    for (var i in fields) {
-      var fieldName = fields[i];
+    const errors = [];
+    for (const i in fields) {
+      const fieldName = fields[i];
       try {
         this.__validate(fieldName, user[fieldName]);
       } catch (e) {
-        var fieldError = {};
+        const fieldError = {};
         fieldError[fieldName] = e.message;
         errors.push(fieldError);
       }
@@ -67,7 +66,7 @@ const User = (function () {
 
     if (errors.length > 0) {
       // Return exception with details in validationErrors.
-      var e = new Error('user could not be validated');
+      const e = new Error('user could not be validated');
       // Add validation errors to the error object.
       e.validationErrors = errors;
       throw e;
@@ -85,17 +84,17 @@ const User = (function () {
    * @throw Error if the field is not valid
    * @private
    */
-  this.__validate = function (field, value) {
+  this.__validate = function(field, value) {
     switch (field) {
       case 'firstname':
         if (typeof value === 'undefined' || value === '') {
           throw new Error('The first name cannot be empty');
         }
         if (!Validator.isUtf8(value)) {
-          throw new Error('The first name should be a valid UTF8 string')
+          throw new Error('The first name should be a valid UTF8 string');
         }
         if (!Validator.isLength(value, 0, 255)) {
-          throw new Error('The first name length should be maximum 255 characters.')
+          throw new Error('The first name length should be maximum 255 characters.');
         }
         break;
       case 'lastname':
@@ -103,10 +102,10 @@ const User = (function () {
           throw new Error('The last name cannot be empty');
         }
         if (!Validator.isUtf8(value)) {
-          throw new Error('The last name should be a valid UTF8 string')
+          throw new Error('The last name should be a valid UTF8 string');
         }
         if (!Validator.isLength(value, 0, 255)) {
-          throw new Error('The last name length should be maximum 255 characters.')
+          throw new Error('The last name length should be maximum 255 characters.');
         }
         break;
       case 'username':
@@ -114,10 +113,10 @@ const User = (function () {
           throw new Error('The username cannot be empty');
         }
         if (!Validator.isEmail(value)) {
-          throw new Error('The username should be a valid email address')
+          throw new Error('The username should be a valid email address');
         }
         if (!Validator.isLength(value, 0, 255)) {
-          throw new Error('The username length should be maximum 255 characters.')
+          throw new Error('The username length should be maximum 255 characters.');
         }
         break;
       case 'id':
@@ -125,12 +124,11 @@ const User = (function () {
           throw new Error('The user id cannot be empty');
         }
         if (!Validator.isUUID(value)) {
-          throw new Error('The user id should be a valid UUID')
+          throw new Error('The user id should be a valid UUID');
         }
         break;
       default:
-        throw new Error('No validation defined for field: ' + field);
-        break;
+        throw new Error(`No validation defined for field: ${field}`);
     }
     return true;
   };
@@ -143,7 +141,7 @@ const User = (function () {
    * @return {bool}
    * @throw Error if the firsname or the lastname are not valid
    */
-  this.setName = function (firstname, lastname) {
+  this.setName = function(firstname, lastname) {
     this.__validate('firstname', firstname);
     this.__validate('lastname', lastname);
     this._user.lastname = lastname;
@@ -159,7 +157,7 @@ const User = (function () {
    * @return {bool}
    * @throw Error if the username is not valid
    */
-  this.setUsername = function (username) {
+  this.setUsername = function(username) {
     this.__validate('username', username);
     this._user.username = username;
     return (Config.write('user.username', username));
@@ -172,7 +170,7 @@ const User = (function () {
    * @return {bool}
    * @throw Error if the user id is not valid
    */
-  this.setId = function (id) {
+  this.setId = function(id) {
     this.__validate('id', id);
     this._user.id = id;
     return (Config.write('user.id', id));
@@ -185,7 +183,7 @@ const User = (function () {
    * @return {object} The user
    * @throw Error if the user information are not valid
    */
-  this.set = function (user) {
+  this.set = function(user) {
     if (typeof user === 'undefined') {
       throw new Error('The user cannot be empty');
     }
@@ -215,28 +213,24 @@ const User = (function () {
    * @return {object}
    * @throw Error if the user or the setting are not valid
    */
-  this.get = function (data) {
+  this.get = function(data) {
     try {
-
       if (typeof data !== 'undefined' && typeof data.user !== 'undefined') {
         this._getLocal(data.user);
-      }
-      else {
+      } else {
         this._getLocal();
       }
-      var user = this._user;
+      const user = this._user;
 
       // Get settings according to data provided.
       if (typeof data !== 'undefined' && typeof data.user !== 'undefined' && typeof data.settings !== 'undefined') {
         user.settings = this.settings.get(data.settings);
-      }
-      // If no data is provided, get everything.
-      else if (typeof data === 'undefined') {
+      } else if (typeof data === 'undefined') {
+        // If no data is provided, get everything.
         user.settings = this.settings.get();
       }
 
       return user;
-
     } catch (e) {
       throw new Error('The user is not set');
     }
@@ -250,9 +244,9 @@ const User = (function () {
    * @return {object}
    * @throw Exception in case a data doesn't validate before being returned
    */
-  this._getLocal = function (fields) {
+  this._getLocal = function(fields) {
     // Default data to return for user.
-    var userDefaultFields = [
+    const userDefaultFields = [
       "id",
       "username",
       "firstname",
@@ -265,9 +259,9 @@ const User = (function () {
     }
 
     // For each user data requested, try to retrieve it and validate it.
-    for (var i in fields) {
-      var varName = fields[i];
-      this._user[varName] = Config.read('user.' + varName);
+    for (const i in fields) {
+      const varName = fields[i];
+      this._user[varName] = Config.read(`user.${varName}`);
 
       try {
         this.__validate(varName, this._user[varName]);
@@ -285,7 +279,7 @@ const User = (function () {
    *
    * @returns {boolean}
    */
-  this.isValid = function () {
+  this.isValid = function() {
     try {
       this.get();
     } catch (e) {
@@ -301,7 +295,7 @@ const User = (function () {
    * @param seconds {int} seconds Remember the master password for X seconds. If -1 given,
    * store the master password until the end of the session.
    */
-  this.storeMasterPasswordTemporarily = function (masterPassword, seconds) {
+  this.storeMasterPasswordTemporarily = function(masterPassword, seconds) {
     this.flushMasterPassword();
     this._masterPassword = {
       "password": masterPassword,
@@ -309,9 +303,11 @@ const User = (function () {
       "timeout": null
     };
 
-    // If the seconds parameters is not equal to -1, set a timeout to flush the master passphrase at the end
-    // of the defined period. If it is set to -1 it will be flushed based on the passbolt.auth.after-logout
-    // event or when the browser is closed.
+    /*
+     * If the seconds parameters is not equal to -1, set a timeout to flush the master passphrase at the end
+     * of the defined period. If it is set to -1 it will be flushed based on the passbolt.auth.after-logout
+     * event or when the browser is closed.
+     */
     if (seconds !== -1) {
       this._masterPassword.timeout = setTimeout(() => {
         this.flushMasterPassword();
@@ -326,7 +322,7 @@ const User = (function () {
   /**
    * Flush the master password if any stored during a previous session
    */
-  this.flushMasterPassword = function () {
+  this.flushMasterPassword = function() {
     if (this._masterPassword && this._masterPassword.timeout) {
       clearTimeout(this._masterPassword.timeout);
     }
@@ -336,7 +332,7 @@ const User = (function () {
   /**
    * Stop keeping the session alive
    */
-  this.stopSessionKeepAlive = function () {
+  this.stopSessionKeepAlive = function() {
     if (this._sessionKeepAliveTimeout) {
       clearTimeout(this._sessionKeepAliveTimeout);
     }
@@ -346,8 +342,8 @@ const User = (function () {
   /**
    * @return void
    */
-  this.setKeepAliveTimeout = function () {
-    this._sessionKeepAliveTimeout = setTimeout( () => {
+  this.setKeepAliveTimeout = function() {
+    this._sessionKeepAliveTimeout = setTimeout(() => {
       this.keepAlive();
     }, 15 * 60 * 1000); // check every 15 minutes
   };
@@ -358,10 +354,10 @@ const User = (function () {
    */
   this.keepAlive = function() {
     const idleInterval = 15 * 60; // detection interval in sec: 15 minutes
-    browser.idle.queryState(idleInterval).then( async (idleState) => {
+    browser.idle.queryState(idleInterval).then(async idleState => {
       if (idleState === 'active' && this._masterPassword !== null) {
         const apiClientOptions = await this.getApiClientOptions();
-        const userService = new UserService(apiClientOptions)
+        const userService = new UserService(apiClientOptions);
         await userService.keepSessionAlive();
       }
       this.setKeepAliveTimeout();
@@ -372,11 +368,11 @@ const User = (function () {
    * Retrieve and the store the user csrf token.
    * @return {void}
    */
-  this.retrieveAndStoreCsrfToken = async function () {
+  this.retrieveAndStoreCsrfToken = async function() {
     // Don't use the getApiClientOptions. It will create a loop as it calls this method to retrieve the csrf token.
     const apiClientOptions = (new ApiClientOptions())
       .setBaseUrl(this.settings.getDomain());
-    const userService = new UserService(apiClientOptions)
+    const userService = new UserService(apiClientOptions);
     const csrfToken = await userService.findCsrfToken();
     this.setCsrfToken(csrfToken);
   };
@@ -386,7 +382,7 @@ const User = (function () {
    *
    * @return {string}
    */
-  this.getCsrfToken = function () {
+  this.getCsrfToken = function() {
     return this._csrfToken;
   };
 
@@ -407,7 +403,7 @@ const User = (function () {
    *
    * @param {string} csrfToken The csrf token to set
    */
-  this.setCsrfToken = function (csrfToken) {
+  this.setCsrfToken = function(csrfToken) {
     this._csrfToken = csrfToken;
   };
 
@@ -444,7 +440,7 @@ const User = (function () {
    * Check if the master password is stored.
    * @return {boolean}
    */
-  this.isMasterPasswordStored = function () {
+  this.isMasterPasswordStored = function() {
     return this._masterPassword !== null;
   };
 
@@ -453,7 +449,7 @@ const User = (function () {
    * by the user.
    * @returns {Promise}
    */
-  this.getStoredMasterPassword = function () {
+  this.getStoredMasterPassword = function() {
     return new Promise((resolve, reject) => {
       if (this.isMasterPasswordStored()) {
         resolve(this._masterPassword.password);
@@ -462,27 +458,28 @@ const User = (function () {
       }
     });
   };
-
 });
 
-var UserSingleton = (function () {
-  var instance;
+const UserSingleton = (function() {
+  let instance;
 
   function createInstance() {
     return new User();
   }
 
   return {
-    getInstance: function () {
+    getInstance: function() {
       if (!instance) {
         instance = createInstance();
       }
       return instance;
     },
 
-    init : function () {
-      // Observe when the user session is terminated.
-      // - Flush the temporary stored master password
+    init: function() {
+      /*
+       * Observe when the user session is terminated.
+       * - Flush the temporary stored master password
+       */
       window.addEventListener("passbolt.auth.after-logout", () => {
         const user = UserSingleton.getInstance();
         user.flushMasterPassword();

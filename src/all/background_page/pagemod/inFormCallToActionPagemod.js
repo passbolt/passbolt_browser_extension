@@ -13,10 +13,10 @@
 const {PageMod} = require('../sdk/page-mod');
 const app = require('../app');
 
-const InFormCallToAction = function () {};
+const InFormCallToAction = function() {};
 InFormCallToAction._pageMod = undefined;
 
-InFormCallToAction.init = function () {
+InFormCallToAction.init = function() {
   if (typeof InFormCallToAction._pageMod !== 'undefined') {
     InFormCallToAction._pageMod.destroy();
     InFormCallToAction._pageMod = undefined;
@@ -27,10 +27,12 @@ InFormCallToAction.init = function () {
     include: 'about:blank?passbolt=passbolt-iframe-in-form-call-to-action',
     contentScriptWhen: 'ready',
     contentScriptFile: [
-			// Warning: script and styles need to be modified in
-			// chrome/data/passbolt-iframe-in-form-call-to-action.html
-		],
-    onAttach: function (worker) {
+      /*
+       * Warning: script and styles need to be modified in
+       * chrome/data/passbolt-iframe-in-form-call-to-action.html
+       */
+    ],
+    onAttach: function(worker) {
       app.events.informCallToAction.listen(worker);
 
 

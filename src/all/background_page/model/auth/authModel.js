@@ -76,8 +76,10 @@ class AuthModel {
     // @deprecated to be removed with v4. Prior to API v3, retrieving the CSRF token log the user out, so we need to fetch it before the login.
     await user.retrieveAndStoreCsrfToken();
     await this.legacyAuthModel.login(privateKey);
-    // Post login operations
-    // MFA may not be complete yet, so no need to preload things here
+    /*
+     * Post login operations
+     * MFA may not be complete yet, so no need to preload things here
+     */
     if (rememberUntilLogout) {
       user.storeMasterPasswordTemporarily(passphrase, -1);
     }
@@ -108,9 +110,9 @@ class AuthModel {
     let encryptedToken, originalToken;
     try {
       originalToken = new GpgAuthToken();
-      encryptedToken = await this.crypto.encrypt(originalToken.token, serverKey)
+      encryptedToken = await this.crypto.encrypt(originalToken.token, serverKey);
     } catch (error) {
-      throw new Error('Unable to encrypt the verify token.' + ' ' + error.message);
+      throw new Error(`Unable to encrypt the verify token. ${error.message}`);
     }
 
     const response = await this.authService.verify(fingerprint, encryptedToken);

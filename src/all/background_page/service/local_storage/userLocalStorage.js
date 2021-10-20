@@ -30,7 +30,7 @@ class UserLocalStorage {
   static async flush() {
     Log.write({level: 'debug', message: 'UserLocalStorage flushed'});
     return await browser.storage.local.remove(UserLocalStorage.USER_LOCAL_STORAGE_KEY);
-  };
+  }
 
   /**
    * Set the users local storage.
@@ -42,7 +42,7 @@ class UserLocalStorage {
   static async get() {
     const {users} = await browser.storage.local.get([UserLocalStorage.USER_LOCAL_STORAGE_KEY]);
     return users;
-  };
+  }
 
   /**
    * Set the users local storage.
@@ -56,13 +56,13 @@ class UserLocalStorage {
     if (!(usersCollection instanceof UsersCollection)) {
       throw new TypeError('UserLocalStorage::set expects a UsersCollection');
     }
-    for (let userEntity of usersCollection) {
+    for (const userEntity of usersCollection) {
       UserLocalStorage.assertEntityBeforeSave(userEntity);
       users.push(userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
     }
-    await browser.storage.local.set({users});
+    await browser.storage.local.set({users: users});
     lock.release();
-  };
+  }
 
   /**
    * Get a user from the local storage by id
@@ -73,7 +73,7 @@ class UserLocalStorage {
   static async getUserById(id) {
     const users = await UserLocalStorage.get();
     return users.find(item => item.id === id);
-  };
+  }
 
   /**
    * Add a user in the local storage
@@ -85,13 +85,13 @@ class UserLocalStorage {
       UserLocalStorage.assertEntityBeforeSave(userEntity);
       const users = await UserLocalStorage.get();
       users.push(userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
-      await browser.storage.local.set({users});
+      await browser.storage.local.set({users: users});
       lock.release();
     } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
   /**
    * Update a user in the local storage.
@@ -111,14 +111,14 @@ class UserLocalStorage {
           throw new Error('The user could not be found in the local storage');
         }
         users[userIndex] = Object.assign(users[userIndex], userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
-        await browser.storage.local.set({users});
+        await browser.storage.local.set({users: users});
       }
       lock.release();
     } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
   /**
    * Delete users in the local storage by users ids.
@@ -133,14 +133,14 @@ class UserLocalStorage {
         if (userIndex !== -1) {
           users.splice(userIndex, 1);
         }
-        await browser.storage.local.set({users});
+        await browser.storage.local.set({users: users});
         lock.release();
       }
     } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
   /**
    * UserLocalStorage.DEFAULT_CONTAIN

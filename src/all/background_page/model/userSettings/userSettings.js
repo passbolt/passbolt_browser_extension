@@ -77,11 +77,11 @@ class UserSettings {
     }
 
     if (!Validator.isAscii(token.code)) {
-      throw new Error('The token code should only contain ASCII characters.')
+      throw new Error('The token code should only contain ASCII characters.');
     }
 
     if (!Validator.isLength(token.code, 3, 3)) {
-      throw Error('The token code should only contain 3 characters.')
+      throw Error('The token code should only contain 3 characters.');
     }
 
     if (typeof token.color === 'undefined' || token.color === '') {
@@ -160,8 +160,8 @@ class UserSettings {
     }
 
     const errors = [];
-    for (let i in fields) {
-      let fieldName = fields[i];
+    for (const i in fields) {
+      const fieldName = fields[i];
       try {
         this.validateField(fieldName, settings[fieldName]);
       } catch (e) {
@@ -189,7 +189,7 @@ class UserSettings {
    * @throw Error if security token is not set
    */
   getSecurityToken() {
-    var token = {};
+    const token = {};
     token.code = Config.read('user.settings.securityToken.code');
     token.color = Config.read('user.settings.securityToken.color');
     token.textcolor = Config.read('user.settings.securityToken.textColor');
@@ -361,8 +361,8 @@ class UserSettings {
    */
   async sync() {
     // Get remote account settings (all)
-    let url = this.getDomain() + '/account/settings.json' + '?api-version=v2';
-    let response = await fetch(url, {
+    const url = `${this.getDomain()}/account/settings.json` + `?api-version=v2`;
+    const response = await fetch(url, {
       method: 'GET',
       credentials: 'include',
       headers: {
@@ -370,15 +370,15 @@ class UserSettings {
         'Content-Type': 'application/json'
       }
     });
-    let json = await response.json();
+    const json = await response.json();
 
     // Check response status
     if (!response.ok) {
       let msg = 'Could not synchronize the account settings. The server responded with an error.';
       if (json.header.msg) {
-        msg += ' ' + json.header.msg;
+        msg += ` ${json.header.msg}`;
       }
-      msg += '(' + response.status + ')';
+      msg += `(${response.status})`;
       throw new Error(msg);
     }
     if (!json.header) {

@@ -14,14 +14,14 @@
 const User = require('../model/user').User;
 const {OrganizationSettingsModel} = require('../model/organizationSettings/organizationSettingsModel');
 
-const listen = function (worker) {
+const listen = function(worker) {
   /*
    * Get the organization settings.
    *
    * @listens passbolt.organization-settings.get
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.organization-settings.get', async function (requestId) {
+  worker.port.on('passbolt.organization-settings.get', async requestId => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);

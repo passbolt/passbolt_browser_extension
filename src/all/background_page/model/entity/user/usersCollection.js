@@ -15,7 +15,6 @@ const {EntityCollection} = require('../abstract/entityCollection');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {EntityCollectionError} = require('../abstract/entityCollectionError');
 const {UserEntity} = require('./userEntity');
-const {GroupsUsersCollection} = require("../groupUser/groupsUsersCollection");
 
 const ENTITY_NAME = 'Users';
 
@@ -37,8 +36,10 @@ class UsersCollection extends EntityCollection {
     ));
 
 
-    // Check if user usernames and ids are unique
-    // Why not this.push? It is faster than adding items one by one
+    /*
+     * Check if user usernames and ids are unique
+     * Why not this.push? It is faster than adding items one by one
+     */
     const ids = this._props.map(user => user.id);
     ids.sort().sort((a, b) => {
       if (a === b) {
@@ -70,7 +71,7 @@ class UsersCollection extends EntityCollection {
     return {
       "type": "array",
       "items": UserEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -98,9 +99,11 @@ class UsersCollection extends EntityCollection {
     return this._items.find(r => (r.id === userId));
   }
 
-  // ==================================================
-  // Sanitization
-  // ==================================================
+  /*
+   * ==================================================
+   * Sanitization
+   * ==================================================
+   */
   /**
    * Sanitize user dto:
    * - Remove group users which don't validate if any.
@@ -118,9 +121,11 @@ class UsersCollection extends EntityCollection {
     return sanitizedDto;
   }
 
-  // ==================================================
-  // Assertions
-  // ==================================================
+  /*
+   * ==================================================
+   * Assertions
+   * ==================================================
+   */
   /**
    * Assert there is no other user with the same id in the collection
    *
@@ -133,8 +138,8 @@ class UsersCollection extends EntityCollection {
     }
     const length = this.users.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingUser = this.users[i];
+    for (; i < length; i++) {
+      const existingUser = this.users[i];
       if (existingUser.id && existingUser.id === user.id) {
         throw new EntityCollectionError(i, UsersCollection.RULE_UNIQUE_ID, `User id ${user.id} already exists.`);
       }
@@ -150,17 +155,19 @@ class UsersCollection extends EntityCollection {
   assertUniqueUsername(user) {
     const length = this.users.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingUser = this.users[i];
+    for (; i < length; i++) {
+      const existingUser = this.users[i];
       if (existingUser.username === user.username) {
         throw new EntityCollectionError(i, UsersCollection.RULE_UNIQUE_USERNAME, `The username ${user.username} already exists.`);
       }
     }
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the user to the list
    * @param {object} user DTO or UserEntity
@@ -195,14 +202,16 @@ class UsersCollection extends EntityCollection {
    * @param {Array} userIds
    */
   removeMany(userIds) {
-    for(let i in userIds) {
+    for (const i in userIds) {
       this.remove(userIds[i]);
     }
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
   /**
    * UsersCollection.ENTITY_NAME
    * @returns {string}

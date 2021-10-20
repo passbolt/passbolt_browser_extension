@@ -53,10 +53,10 @@ class ResourcesKdbxExporter {
     let keepassPassword = null;
     let keepassKeyFile = null;
     if (this.exportEntity.password) {
-      keepassPassword = kdbxweb.ProtectedValue.fromString(this.exportEntity.password)
+      keepassPassword = kdbxweb.ProtectedValue.fromString(this.exportEntity.password);
     }
     if (this.exportEntity.keyfile) {
-      keepassKeyFile = kdbxweb.ByteUtils.base64ToBytes(this.exportEntity.keyfile)
+      keepassKeyFile = kdbxweb.ByteUtils.base64ToBytes(this.exportEntity.keyfile);
     }
     return new kdbxweb.Credentials(keepassPassword, keepassKeyFile);
   }

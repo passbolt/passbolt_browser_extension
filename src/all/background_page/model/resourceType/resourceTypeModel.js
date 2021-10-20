@@ -32,7 +32,7 @@ class ResourceTypeModel {
    *
    * @return {ResourceTypesCollection}
    */
-  async updateLocalStorage () {
+  async updateLocalStorage() {
     let resourceTypeDtos = [];
     try {
       resourceTypeDtos = await this.resourceTypeService.findAll();

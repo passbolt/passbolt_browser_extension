@@ -81,7 +81,7 @@ describe("Resource entity", () => {
       "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
       "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff"
     });
-    const contain = {secrets:true, permissions:true, permission:true, tags:true, favorite:true};
+    const contain = {secrets: true, permissions: true, permission: true, tags: true, favorite: true};
     expect(entity.toDto(contain)).toEqual({
       "id": "10801423-4151-42a4-99d1-86e66145a08c",
       "name": "test",
@@ -126,10 +126,10 @@ describe("Resource entity", () => {
   it("constructor returns validation error if dto required fields are missing", () => {
     try {
       new ResourceEntity({});
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        name: { required: 'The name is required.' },
+        name: {required: 'The name is required.'},
       });
     }
   });

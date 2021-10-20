@@ -31,8 +31,10 @@ class ExternalFoldersCollection extends EntityCollection {
       ExternalFoldersCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(externalFolderDto => {
       this.push(new ExternalFolderEntity(externalFolderDto));
     });
@@ -72,7 +74,7 @@ class ExternalFoldersCollection extends EntityCollection {
     return {
       "type": "array",
       "items": ExternalFolderEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -124,9 +126,11 @@ class ExternalFoldersCollection extends EntityCollection {
     return this._items.map(r => r.id);
   }
 
-  // ==================================================
-  // Finders / Filters
-  // ==================================================
+  /*
+   * ==================================================
+   * Finders / Filters
+   * ==================================================
+   */
 
   /**
    * Check if a folder external of the list has the given path.
@@ -177,9 +181,11 @@ class ExternalFoldersCollection extends EntityCollection {
     return this.externalFolders.filter(externalFolderEntity => externalFolderEntity.folderParentId === folderParentId);
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the external folder to the list
    * @param {object} externalFolder DTO or ExternalFolderEntity
@@ -211,7 +217,7 @@ class ExternalFoldersCollection extends EntityCollection {
     }
     const split = ExternalFolderEntity.splitFolderPath(path);
     let pathCursor = "";
-    for (let folderName of split) {
+    for (const folderName of split) {
       pathCursor = pathCursor.length ? `${pathCursor}/${folderName}` : folderName;
       if (this.hasPath(pathCursor)) {
         continue;
@@ -221,7 +227,7 @@ class ExternalFoldersCollection extends EntityCollection {
     }
 
     // If no error, persist the folders in the collection.
-    externalFoldersEntities.forEach(externalFolderEntity => this.push(externalFolderEntity))
+    externalFoldersEntities.forEach(externalFolderEntity => this.push(externalFolderEntity));
   }
 
   /**
@@ -230,7 +236,7 @@ class ExternalFoldersCollection extends EntityCollection {
    * @param {string} folderParentId The corresponding folder parent id
    */
   setFolderParentIdsByPath(folderParentPath, folderParentId) {
-    for (let externalFolderEntity of this.externalFolders) {
+    for (const externalFolderEntity of this.externalFolders) {
       if (externalFolderEntity.folderParentPath === folderParentPath) {
         externalFolderEntity.folderParentId = folderParentId;
       }
@@ -250,7 +256,7 @@ class ExternalFoldersCollection extends EntityCollection {
    * @param {string} path the path to remove
    */
   removeByPath(path) {
-    for (let i = this.externalFolders.length - 1; i>=0; i--) {
+    for (let i = this.externalFolders.length - 1; i >= 0; i--) {
       const externalFolderEntity = this.externalFolders[i];
       const escapedPath = path.replace(/[.*+\-?^${}()|[\]\\\/]/g, '\\$&');
       const regex = new RegExp(`^${escapedPath}($|\/)`);
@@ -260,9 +266,11 @@ class ExternalFoldersCollection extends EntityCollection {
     }
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
   /**
    * ExternalFoldersCollection.ENTITY_NAME
    * @returns {string}

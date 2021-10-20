@@ -17,11 +17,12 @@ const {AccountModel} = require("../model/account/accountModel");
 
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
 
-const listen = function (worker) {
-
-  /* ==================================================================================
+const listen = function(worker) {
+  /*
+   * ==================================================================================
    *  Getters for user
-   * ================================================================================== */
+   * ==================================================================================
+   */
 
   /*
    * Get the current user as stored in the plugin.
@@ -30,7 +31,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param data {array} The user filter
    */
-  worker.port.on('passbolt.user.get', function (requestId, data) {
+  worker.port.on('passbolt.user.get', (requestId, data) => {
     try {
       const user = User.getInstance().get(data);
       worker.port.emit(requestId, 'SUCCESS', user);
@@ -45,7 +46,7 @@ const listen = function (worker) {
    * @listens passbolt.users.get-all
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.users.get-all', async function (requestId) {
+  worker.port.on('passbolt.users.get-all', async requestId => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const userModel = new UserModel(apiClientOptions);
@@ -56,9 +57,11 @@ const listen = function (worker) {
     }
   });
 
-  /* ==================================================================================
+  /*
+   * ==================================================================================
    *  CRUD
-   * ================================================================================== */
+   * ==================================================================================
+   */
   /*
    * Create a user user
    *
@@ -67,14 +70,14 @@ const listen = function (worker) {
    * @param userDto {Object} The user object, example:
    *  {username: 'ada@passbolt.com', profile: {first_name: 'ada', last_name: 'lovelace'}, role_id: <UUID>}
    */
-  worker.port.on('passbolt.users.create', async function (requestId, userDto) {
+  worker.port.on('passbolt.users.create', async(requestId, userDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const userModel = new UserModel(clientOptions);
       const userEntity = new UserEntity(userDto);
       const updatedUser = await userModel.create(userEntity);
       worker.port.emit(requestId, 'SUCCESS', updatedUser);
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
@@ -86,7 +89,7 @@ const listen = function (worker) {
    * @listens passbolt.users.find-logged-in-user
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.users.find-logged-in-user', async function (requestId) {
+  worker.port.on('passbolt.users.find-logged-in-user', async requestId => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const userModel = new UserModel(clientOptions);
@@ -94,7 +97,7 @@ const listen = function (worker) {
       const contains = {profile: true, role: true};
       const userEntity = await userModel.findOne(loggedInUserId, contains, true);
       worker.port.emit(requestId, 'SUCCESS', userEntity);
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
@@ -109,14 +112,14 @@ const listen = function (worker) {
    * @param userDato {Object} The user object, example:
    *  {id: <UUID>, username: 'ada@passbolt.com', profile: {first_name: 'ada', last_name: 'lovelace'}, role_id: <UUID>}
    */
-  worker.port.on('passbolt.users.update', async function (requestId, userDto) {
+  worker.port.on('passbolt.users.update', async(requestId, userDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const userModel = new UserModel(clientOptions);
       const userEntity = new UserEntity(userDto);
       const updatedUser = await userModel.update(userEntity, true);
       worker.port.emit(requestId, 'SUCCESS', updatedUser);
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
@@ -130,14 +133,14 @@ const listen = function (worker) {
    * @param avatarBase64UpdateDto {object} The avatar dto
    *  {fileBase64: <string>, mimeType: <string>, filename: <string>}
    */
-  worker.port.on('passbolt.users.update-avatar', async function (requestId, userId, avatarBase64UpdateDto) {
+  worker.port.on('passbolt.users.update-avatar', async(requestId, userId, avatarBase64UpdateDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const userModel = new UserModel(clientOptions);
       const avatarUpdateEntity = AvatarUpdateEntity.createFromFileBase64(avatarBase64UpdateDto);
       const updatedUser = await userModel.updateAvatar(userId, avatarUpdateEntity, true);
       worker.port.emit(requestId, 'SUCCESS', updatedUser);
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
@@ -151,14 +154,14 @@ const listen = function (worker) {
    * @param {{code: string, color: string, textColor: string}} securityTokenDto
    *
    */
-  worker.port.on('passbolt.users.update-security-token', async function (requestId, securityTokenDto) {
+  worker.port.on('passbolt.users.update-security-token', async(requestId, securityTokenDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const accountModel = new AccountModel(clientOptions);
       const securityTokenEntity = new SecurityTokenEntity(securityTokenDto);
       await accountModel.changeSecurityToken(securityTokenEntity);
       worker.port.emit(requestId, 'SUCCESS');
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
@@ -172,7 +175,7 @@ const listen = function (worker) {
    * @param oldPassphrase {string} The old passphrase
    * @param newPassphrase {string} The new passphrase
    */
-  worker.port.on('passbolt.user.update-private-key', async function (requestId, oldPassphrase, newPassphrase) {
+  worker.port.on('passbolt.user.update-private-key', async(requestId, oldPassphrase, newPassphrase) => {
     try {
       if (typeof oldPassphrase !== 'string' || typeof newPassphrase !== 'string') {
         throw new Error('The old and new passphrase have to be string');
@@ -183,7 +186,7 @@ const listen = function (worker) {
       await User.getInstance().flushMasterPassword();
       await fileController.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", worker.tab.id);
       worker.port.emit(requestId, 'SUCCESS');
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
@@ -195,14 +198,14 @@ const listen = function (worker) {
    * @param {string} requestId The request identifier uuid
    * @param {string} userId The user uuid
    */
-  worker.port.on('passbolt.users.delete-dry-run', async function (requestId, userId, transferDto) {
+  worker.port.on('passbolt.users.delete-dry-run', async(requestId, userId, transferDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const userModel = new UserModel(clientOptions);
       const transferEntity = transferDto ? new UserDeleteTransferEntity(transferDto) : null;
       await userModel.deleteDryRun(userId, transferEntity);
       worker.port.emit(requestId, 'SUCCESS');
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
@@ -215,22 +218,24 @@ const listen = function (worker) {
    * @param {string} userId The user uuid
    * @param {object} [transferDto] optional data ownership transfer
    */
-  worker.port.on('passbolt.users.delete', async function (requestId, userId, transferDto) {
+  worker.port.on('passbolt.users.delete', async(requestId, userId, transferDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const userModel = new UserModel(clientOptions);
       const transferEntity = transferDto ? new UserDeleteTransferEntity(transferDto) : null;
       await userModel.delete(userId, transferEntity);
       worker.port.emit(requestId, 'SUCCESS');
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
-  /* ==================================================================================
+  /*
+   * ==================================================================================
    *  Others
-   * ================================================================================== */
+   * ==================================================================================
+   */
 
   /*
    * Pull the users from the API and update the local storage.
@@ -238,9 +243,9 @@ const listen = function (worker) {
    * @listens passbolt.users.update-local-storage
    * @param {uuid} requestId The request identifier
    */
-  worker.port.on('passbolt.users.update-local-storage', async function (requestId) {
+  worker.port.on('passbolt.users.update-local-storage', async requestId => {
     try {
-      let userModel = new UserModel(await User.getInstance().getApiClientOptions());
+      const userModel = new UserModel(await User.getInstance().getApiClientOptions());
       await userModel.updateLocalStorage();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
@@ -256,9 +261,9 @@ const listen = function (worker) {
    * @param {uuid} requestId The request identifier
    * @param {string} username The user username
    */
-  worker.port.on('passbolt.users.resend-invite', async function(requestId, username) {
+  worker.port.on('passbolt.users.resend-invite', async(requestId, username) => {
     try {
-      let userModel = new UserModel(await User.getInstance().getApiClientOptions());
+      const userModel = new UserModel(await User.getInstance().getApiClientOptions());
       await userModel.resendInvite(username);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {

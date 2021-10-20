@@ -16,14 +16,14 @@ const {LocaleEntity} = require("../model/entity/locale/localeEntity");
 const {LocaleModel} = require("../model/locale/localeModel");
 const {User} = require('../model/user');
 
-const listen = async function (worker) {
+const listen = async function(worker) {
   /*
    * Get locale language
    *
    * @listens passbolt.locale.get
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.locale.get', async function(requestId) {
+  worker.port.on('passbolt.locale.get', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const getLocaleController = new GetLocaleController(worker, apiClientOptions);
 
@@ -42,7 +42,7 @@ const listen = async function (worker) {
    * @listens passbolt.locale.language.update
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.locale.update-user-locale', async function(requestId, localeDto) {
+  worker.port.on('passbolt.locale.update-user-locale', async(requestId, localeDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const localeModel = new LocaleModel(apiClientOptions);
     try {
@@ -54,6 +54,6 @@ const listen = async function (worker) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
-}
+};
 
 exports.listen = listen;

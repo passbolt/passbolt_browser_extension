@@ -25,8 +25,8 @@ function ScriptExecution(tabId) {
  * @returns {Function}
  */
 ScriptExecution.prototype.createScriptCallback = function(tabId, details, callback) {
-  return function () {
-      chrome.tabs.executeScript(tabId, details, callback);
+  return function() {
+    chrome.tabs.executeScript(tabId, details, callback);
   };
 };
 
@@ -40,7 +40,7 @@ ScriptExecution.prototype.createScriptCallback = function(tabId, details, callba
  * @returns {Function}
  */
 ScriptExecution.prototype.createCssCallback = function(tabId, details, callback) {
-  return function () {
+  return function() {
     chrome.tabs.insertCSS(tabId, details, callback);
   };
 };
@@ -51,12 +51,12 @@ ScriptExecution.prototype.createCssCallback = function(tabId, details, callback)
  * @param fileArray array
  * @returns ScriptExecution object
  */
-ScriptExecution.prototype.injectScripts = function (fileArray) {
-  var callback = null;
-  var info = null;
+ScriptExecution.prototype.injectScripts = function(fileArray) {
+  let callback = null;
+  let info = null;
 
-  for (var i = fileArray.length - 1; i >= 0; --i) {
-    info = { file: fileArray[i], runAt: 'document_end' };
+  for (let i = fileArray.length - 1; i >= 0; --i) {
+    info = {file: fileArray[i], runAt: 'document_end'};
     callback = this.createScriptCallback(this.tabId, info, callback);
   }
   if (callback !== null) {
@@ -70,12 +70,12 @@ ScriptExecution.prototype.injectScripts = function (fileArray) {
  * @param codeArray array
  * @returns ScriptExecution object
  */
-ScriptExecution.prototype.executeScript = function (codeArray) {
-  var callback = null;
-  var info = null;
+ScriptExecution.prototype.executeScript = function(codeArray) {
+  let callback = null;
+  let info = null;
 
-  for (var i = codeArray.length - 1; i >= 0; --i) {
-    info = { code: codeArray[i], runAt: 'document_end' };
+  for (let i = codeArray.length - 1; i >= 0; --i) {
+    info = {code: codeArray[i], runAt: 'document_end'};
     callback = this.createScriptCallback(this.tabId, info, callback);
   }
   if (callback !== null) {
@@ -89,12 +89,12 @@ ScriptExecution.prototype.executeScript = function (codeArray) {
  * @param fileArray array
  * @returns ScriptExecution object
  */
-ScriptExecution.prototype.injectCss = function (fileArray) {
-  var callback = null;
-  var info = null;
+ScriptExecution.prototype.injectCss = function(fileArray) {
+  let callback = null;
+  let info = null;
 
-  for (var i = fileArray.length - 1; i >= 0; --i) {
-    info = { file: fileArray[i], runAt: 'document_end' };
+  for (let i = fileArray.length - 1; i >= 0; --i) {
+    info = {file: fileArray[i], runAt: 'document_end'};
     callback = this.createCssCallback(this.tabId, info, callback);
   }
   if (callback !== null) {
@@ -106,11 +106,11 @@ ScriptExecution.prototype.injectCss = function (fileArray) {
  * Set a global variables in the content code environment
  * @param options as key value
  */
-ScriptExecution.prototype.setGlobals = function (options) {
-  var value, code;
-  for (var key in options) {
+ScriptExecution.prototype.setGlobals = function(options) {
+  let value, code;
+  for (const key in options) {
     value = options[key];
-    code = 'var ' + key + '="';
+    code = `var ${key}="`;
     if (typeof value === 'string') {
       code += options[key];
     } else {

@@ -9,7 +9,7 @@ const {i18n} = require('../sdk/i18n');
 class PassboltServiceUnavailableError extends Error {
   constructor(message) {
     message = message || i18n.t('The service is unavailable');
-    super(message)
+    super(message);
     this.name = 'PassboltServiceUnavailableError';
   }
 }

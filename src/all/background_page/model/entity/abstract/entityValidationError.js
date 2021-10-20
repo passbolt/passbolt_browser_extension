@@ -41,7 +41,7 @@ class EntityValidationError extends Error {
     if (typeof message !== 'string') {
       throw new TypeError('EntityValidationError addError message should be a string.');
     }
-    if (!this.details.hasOwnProperty(property)) {
+    if (!Object.prototype.hasOwnProperty.call(this.details, property)) {
       this.details[property] = {};
     }
     this.details[property][rule] = message;
@@ -58,14 +58,14 @@ class EntityValidationError extends Error {
     if (typeof property !== 'string') {
       throw new TypeError('EntityValidationError hasError property should be a string.');
     }
-    const hasError = (this.details && this.details.hasOwnProperty(property));
+    const hasError = (this.details && Object.prototype.hasOwnProperty.call(this.details, property));
     if (!rule) {
       return hasError;
     }
     if (typeof rule !== 'string') {
       throw new TypeError('EntityValidationError hasError rule should be a string.');
     }
-    return this.details[property].hasOwnProperty(rule);
+    return Object.prototype.hasOwnProperty.call(this.details[property], rule);
   }
 
   /**

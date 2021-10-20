@@ -17,10 +17,10 @@ const app = require('../app');
  * This pagemod help bootstrap the first step of the setup process from a passbolt server app page
  * The pattern for this url, driving the setup bootstrap, is defined in config.json
  */
-const Setup = function () {};
+const Setup = function() {};
 Setup._pageMod = undefined;
 
-Setup.init = function () {
+Setup.init = function() {
   if (typeof Setup._pageMod !== 'undefined') {
     Setup._pageMod.destroy();
     Setup._pageMod = undefined;
@@ -31,10 +31,12 @@ Setup.init = function () {
     include: 'about:blank?passbolt=passbolt-iframe-setup',
     contentScriptWhen: 'ready',
     contentScriptFile: [
-			// Warning: script and styles need to be modified in
-			// chrome/data/passbolt-iframe-setup.html
-		],
-    onAttach: function (worker) {
+      /*
+       * Warning: script and styles need to be modified in
+       * chrome/data/passbolt-iframe-setup.html
+       */
+    ],
+    onAttach: function(worker) {
       app.events.config.listen(worker);
       app.events.setup.listen(worker);
 

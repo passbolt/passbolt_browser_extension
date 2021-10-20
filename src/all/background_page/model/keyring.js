@@ -15,7 +15,6 @@ const Uuid = require('../utils/uuid');
 
 const {InvalidMasterPasswordError} = require('../error/invalidMasterPasswordError');
 const {UserSettings} = require('./userSettings/userSettings');
-const {Key} = require('./key');
 
 const {goog} = require('../utils/format/emailaddress');
 
@@ -37,9 +36,11 @@ const STORAGE_KEY_PRIVATE = 'passbolt-private-gpgkeys';
  * The class that deals with Passbolt Keyring.
  */
 class Keyring {
-  // ==================================================
-  // FINDERS
-  // ==================================================
+  /*
+   * ==================================================
+   * FINDERS
+   * ==================================================
+   */
   /**
    * Get a public key by its fingerprint.
    *
@@ -47,14 +48,15 @@ class Keyring {
    * @returns {Key|undefined}
    */
   findPublic(userId) {
-    let i, publicKeys = this.getPublicKeysFromStorage();
+    let i;
+    const publicKeys = this.getPublicKeysFromStorage();
     for (i in publicKeys) {
-      if (publicKeys.hasOwnProperty(i) && publicKeys[i].user_id === userId) {
+      if (Object.prototype.hasOwnProperty.call(publicKeys, i) && publicKeys[i].user_id === userId) {
         return publicKeys[i];
       }
     }
     return undefined;
-  };
+  }
 
   /**
    * Get a private key by its fingerprint.
@@ -66,11 +68,13 @@ class Keyring {
     const userId = Keyring.MY_KEY_ID;
     const privateKeys = this.getPrivateKeysFromStorage();
     return privateKeys[userId];
-  };
+  }
 
-  // ==================================================
-  // IMPORT
-  // ==================================================
+  /*
+   * ==================================================
+   * IMPORT
+   * ==================================================
+   */
   /**
    * Import a public armored key.
    *
@@ -91,8 +95,10 @@ class Keyring {
       throw new Error('The user id is not valid');
     }
 
-    // Parse the keys. If standard format given with a text containing
-    // public/private. It will extract only the public.
+    /*
+     * Parse the keys. If standard format given with a text containing
+     * public/private. It will extract only the public.
+     */
     armoredPublicKey = this.findArmoredKeyInText(armoredPublicKey, Keyring.PUBLIC);
 
     // Is the given key a valid pgp key ?
@@ -108,10 +114,10 @@ class Keyring {
     }
 
     // Get the keyInfo.
-    let keyInfo = await this.keyInfo(armoredPublicKey);
+    const keyInfo = await this.keyInfo(armoredPublicKey);
 
     // Add the key in the keyring.
-    let publicKeys = this.getPublicKeysFromStorage();
+    const publicKeys = this.getPublicKeysFromStorage();
     publicKeys[userId] = keyInfo;
     publicKeys[userId].user_id = userId;
     this.store(Keyring.PUBLIC, publicKeys);
@@ -132,8 +138,10 @@ class Keyring {
     // Flush any existing private key.
     this.flush(Keyring.PRIVATE);
 
-    // Parse the keys. If standard format given with a text containing
-    // public/private. It will extract only the private.
+    /*
+     * Parse the keys. If standard format given with a text containing
+     * public/private. It will extract only the private.
+     */
     armoredKey = this.findArmoredKeyInText(armoredKey, Keyring.PRIVATE);
 
     // Is the given key a valid pgp key ?
@@ -149,16 +157,16 @@ class Keyring {
     }
 
     // Get the keyInfo.
-    let keyInfo = await this.keyInfo(armoredKey);
+    const keyInfo = await this.keyInfo(armoredKey);
 
     // Add the key in the keyring
-    let privateKeys = this.getPrivateKeysFromStorage();
+    const privateKeys = this.getPrivateKeysFromStorage();
     privateKeys[Keyring.MY_KEY_ID] = keyInfo;
     privateKeys[Keyring.MY_KEY_ID].user_id = Keyring.MY_KEY_ID;
     this.store(Keyring.PRIVATE, privateKeys);
 
     return true;
-  };
+  }
 
   /**
    * Import the server public armored key.
@@ -174,9 +182,11 @@ class Keyring {
     return true;
   }
 
-  // ==================================================
-  // PARSING AND KEY INFO
-  // ==================================================
+  /*
+   * ==================================================
+   * PARSING AND KEY INFO
+   * ==================================================
+   */
   /**
    * Parse a text block with one or more keys and extract the Public or Private armoredkey.
    *
@@ -209,7 +219,7 @@ class Keyring {
     }
 
     return armoredKey;
-  };
+  }
 
   /**
    * Get the key info.
@@ -218,7 +228,7 @@ class Keyring {
    * @return {array}
    * @throw Error if the key cannot be read by openpgp
    */
-  async keyInfo (armoredKey) {
+  async keyInfo(armoredKey) {
     // Attempt to read armored key.
     let key = await openpgp.key.readArmored(armoredKey);
     if (key.err) {
@@ -227,14 +237,14 @@ class Keyring {
     key = key.keys[0];
 
     // Check the userIds
-    let userIds = key.getUserIds(),
-      userIdsSplited = [];
-    if(userIds.length === 0) {
+    const userIds = key.getUserIds();
+    const userIdsSplited = [];
+    if (userIds.length === 0) {
       throw new Error('No key user ID found');
     }
 
-    for (let i in userIds) {
-      if (userIds.hasOwnProperty(i)) {
+    for (const i in userIds) {
+      if (Object.prototype.hasOwnProperty.call(userIds, i)) {
         const result = goog.format.EmailAddress.parse(userIds[i]);
         userIdsSplited.push({
           name: result.name_,
@@ -258,7 +268,7 @@ class Keyring {
         expirationTime = 'Never';
       }
       created = key.primaryKey.created.toString();
-    } catch(error) {
+    } catch (error) {
       expirationTime = null;
     }
 
@@ -285,7 +295,7 @@ class Keyring {
   async extractPublicKey(privateArmoredKey) {
     const key = await openpgp.key.readArmored(privateArmoredKey);
     return key.keys[0].toPublic().armor();
-  };
+  }
 
   /**
    * Check if a key is expired.
@@ -302,7 +312,7 @@ class Keyring {
     let expirationTime;
     try {
       expirationTime = await key.getExpirationTime();
-    } catch(error) {
+    } catch (error) {
       return false;
     }
 
@@ -323,7 +333,7 @@ class Keyring {
    * @returns {Promise}
    * @todo move to Crypto
    */
-  async checkPassphrase (passphrase) {
+  async checkPassphrase(passphrase) {
     const privateKey = this.findPrivate();
     const privKeyObj = (await openpgp.key.readArmored(privateKey.key)).keys[0];
     if (!privKeyObj.isDecrypted()) {
@@ -335,30 +345,32 @@ class Keyring {
     }
   }
 
-  // ==================================================
-  // SERVER SYNC
-  // @TODO move to a dedicated service
-  // ==================================================
+  /*
+   * ==================================================
+   * SERVER SYNC
+   * @TODO move to a dedicated service
+   * ==================================================
+   */
   /**
    * Sync the local keyring with the passbolt API.
    * Retrieve the latest updated Public Keys.
    *
    * @returns {Promise<int>} number of updated keys
    */
-  async sync () {
-    let latestSync = storage.getItem('latestSync');
+  async sync() {
+    const latestSync = storage.getItem('latestSync');
 
     // Get the latest keys changes from the backend.
-    let userSettings = new UserSettings();
-    let url = userSettings.getDomain() + '/gpgkeys.json' + '?api-version=v2';
+    const userSettings = new UserSettings();
+    let url = `${userSettings.getDomain()}/gpgkeys.json` + `?api-version=v2`;
 
     // If a sync has already been performed.
     if (latestSync !== null) {
-      url += '&modified_after=' + latestSync;
+      url += `&modified_after=${latestSync}`;
     }
 
     // Get the updated public keys from passbolt.
-    let response = await fetch(url, {
+    const response = await fetch(url, {
       method: 'GET',
       credentials: 'include',
       headers: {
@@ -366,15 +378,15 @@ class Keyring {
         'Content-Type': 'application/json'
       }
     });
-    let json = await response.json();
+    const json = await response.json();
 
     // Check response status
     if (!response.ok) {
       let msg = 'Could not synchronize the keyring. The server responded with an error.';
       if (json.header.msg) {
-        msg += ' ' + json.header.msg;
+        msg += ` ${json.header.msg}`;
       }
-      msg += '(' + response.status + ')';
+      msg += `(${response.status})`;
       throw new Error(msg);
     }
     // Update the latest synced time.
@@ -386,9 +398,10 @@ class Keyring {
     }
 
     // Store all the new keys in the keyring.
-    let meta, armoredKey, i, imports = [];
+    let meta, i;
+    const imports = [];
     for (i in json.body) {
-      if (json.body.hasOwnProperty(i)) {
+      if (Object.prototype.hasOwnProperty.call(json.body, i)) {
         meta = json.body[i];
         imports.push(this.importPublic(meta.armored_key, meta.user_id));
       }
@@ -400,10 +413,12 @@ class Keyring {
     return (json.body.length);
   }
 
-  // ==================================================
-  // STORAGE
-  // @TODO move to a dedicated service
-  // ==================================================
+  /*
+   * ==================================================
+   * STORAGE
+   * @TODO move to a dedicated service
+   * ==================================================
+   */
   /**
    * Store keys in the local storage.
    *
@@ -415,7 +430,7 @@ class Keyring {
     if (type !== Keyring.PUBLIC && type !== Keyring.PRIVATE) {
       throw new Error('Key type is incorrect');
     }
-    let key = (type === Keyring.PRIVATE) ? Keyring.STORAGE_KEY_PRIVATE : Keyring.STORAGE_KEY_PUBLIC;
+    const key = (type === Keyring.PRIVATE) ? Keyring.STORAGE_KEY_PRIVATE : Keyring.STORAGE_KEY_PUBLIC;
     storage.setItem(key, JSON.stringify(keys));
   }
 
@@ -438,7 +453,7 @@ class Keyring {
    *
    * @returns {Object} a collection of key as in {userUuid: Key, ...}
    */
-  getPublicKeysFromStorage () {
+  getPublicKeysFromStorage() {
     // Get the public keys from the local storage.
     const pubSerialized = storage.getItem(Keyring.STORAGE_KEY_PUBLIC);
     if (pubSerialized) {
@@ -453,7 +468,7 @@ class Keyring {
    * @param type {string} The type of keys to flush : Keyring.PRIVATE or Keyring.PUBLIC.
    *  Default Keyring.PUBLIC.
    */
-  flush (type) {
+  flush(type) {
     if (typeof type === 'undefined') {
       type = Keyring.PUBLIC;
     }
@@ -464,14 +479,18 @@ class Keyring {
       this.store(Keyring.PRIVATE, {});
     }
 
-    // Removed latestSync variable.
-    // We consider that the keyring has never been synced.
+    /*
+     * Removed latestSync variable.
+     * We consider that the keyring has never been synced.
+     */
     storage.removeItem('latestSync');
   }
 
-  // ==================================================
-  // CONSTANT GETTERS
-  // ==================================================
+  /*
+   * ==================================================
+   * CONSTANT GETTERS
+   * ==================================================
+   */
   /**
    * Keyring.MY_KEY_ID
    * @returns {string}

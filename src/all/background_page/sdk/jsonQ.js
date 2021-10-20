@@ -3,8 +3,8 @@
  * Copyright (c) 2013 - 2016 Sudhanshu Yadav.
  * MIT licenses
  */
-var objType = (function() {
-  var map = {
+const objType = (function() {
+  const map = {
     '[object Array]': 'array',
     '[object Object]': 'object',
     '[object String]': 'string',
@@ -15,17 +15,16 @@ var objType = (function() {
   };
 
   return function(obj) {
-    var type = Object.prototype.toString.call(obj);
+    const type = Object.prototype.toString.call(obj);
     return map[type];
   };
 }());
 
-var jsonQ = {
+const jsonQ = {
   // get value at specific path in a json
   pathValue: function(json, path) {
-    var i = 0,
-
-      ln = path.length;
+    let i = 0;
+    const ln = path.length;
 
     if (json === null) {
       return null;
@@ -43,9 +42,9 @@ var jsonQ = {
   },
   // set path value
   setPathValue: function(json, path, value) {
-    var i = 0,
-      tempJson = json,
-      ln = path.length;
+    let i = 0;
+    let tempJson = json;
+    const ln = path.length;
     if (json === null) {
       return null;
     }

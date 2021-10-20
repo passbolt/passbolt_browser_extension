@@ -7,8 +7,7 @@
 const {User} = require('../model/user');
 const {FavoriteModel} = require('../model/favorite/favoriteModel');
 
-const listen = function (worker) {
-
+const listen = function(worker) {
   /*
    * Mark a resource as favorite
    *
@@ -16,7 +15,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param resourceId {uuid} The resource id
    */
-  worker.port.on('passbolt.favorite.add', async function (requestId, resourceId) {
+  worker.port.on('passbolt.favorite.add', async(requestId, resourceId) => {
     try {
       const apiClientOption = await User.getInstance().getApiClientOptions();
       const favoriteModel = new FavoriteModel(apiClientOption);
@@ -35,7 +34,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param resourceId {uuid} The resource id
    */
-  worker.port.on('passbolt.favorite.delete', async function (requestId, resourceId) {
+  worker.port.on('passbolt.favorite.delete', async(requestId, resourceId) => {
     try {
       const apiClientOption = await User.getInstance().getApiClientOptions();
       const favoriteModel = new FavoriteModel(apiClientOption);
@@ -46,6 +45,6 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
-}
+};
 
 exports.listen = listen;

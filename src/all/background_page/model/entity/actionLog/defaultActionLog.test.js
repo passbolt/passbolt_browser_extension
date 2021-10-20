@@ -51,11 +51,11 @@ describe("Default action log entity", () => {
 
   it("constructor works fails if not enough data is provided", () => {
     let t;
-    t = () => {new UpdatedPermissionEntity({})};
+    t = () => { new UpdatedPermissionEntity({}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new UpdatedPermissionEntity({id: "5b998a97-29fb-5b1d-86d7-a026867addec"})};
+    t = () => { new UpdatedPermissionEntity({id: "5b998a97-29fb-5b1d-86d7-a026867addec"}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new UpdatedPermissionEntity({id: "5b998a97-29fb-5b1d-86d7-a026867addec", "action_log_id": "eebf0a92-18a4-440e-8aa8-799287fc2c26"})};
+    t = () => { new UpdatedPermissionEntity({id: "5b998a97-29fb-5b1d-86d7-a026867addec", "action_log_id": "eebf0a92-18a4-440e-8aa8-799287fc2c26"}); };
     expect(t).toThrow(EntityValidationError);
   });
 
@@ -67,7 +67,7 @@ describe("Default action log entity", () => {
         "type": 42
       });
       expect(false).toBe(true);
-    } catch(error) {
+    } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('id', 'format')).toBe(true);
       expect(error.hasError('action_log_id', 'format')).toBe(true);

@@ -30,7 +30,7 @@ class GroupLocalStorage {
   static async flush() {
     Log.write({level: 'debug', message: 'GroupLocalStorage flushed'});
     return await browser.storage.local.remove(GroupLocalStorage.GROUP_LOCAL_STORAGE_KEY);
-  };
+  }
 
   /**
    * Set the groups local storage.
@@ -42,7 +42,7 @@ class GroupLocalStorage {
   static async get() {
     const {groups} = await browser.storage.local.get([GroupLocalStorage.GROUP_LOCAL_STORAGE_KEY]);
     return groups;
-  };
+  }
 
   /**
    * Set the groups local storage.
@@ -56,13 +56,13 @@ class GroupLocalStorage {
     if (!(groupsCollection instanceof GroupsCollection)) {
       throw new TypeError('GroupLocalStorage::set expects a GroupsCollection');
     }
-    for (let groupEntity of groupsCollection) {
+    for (const groupEntity of groupsCollection) {
       GroupLocalStorage.assertEntityBeforeSave(groupEntity);
       groups.push(groupEntity.toDto(GroupLocalStorage.DEFAULT_CONTAIN));
     }
-    await browser.storage.local.set({groups});
+    await browser.storage.local.set({groups: groups});
     lock.release();
-  };
+  }
 
   /**
    * Get a group from the local storage by id
@@ -73,7 +73,7 @@ class GroupLocalStorage {
   static async getGroupById(id) {
     const groups = await GroupLocalStorage.get();
     return groups.find(item => item.id === id);
-  };
+  }
 
   /**
    * Add a group in the local storage
@@ -85,13 +85,13 @@ class GroupLocalStorage {
       GroupLocalStorage.assertEntityBeforeSave(groupEntity);
       const groups = await GroupLocalStorage.get();
       groups.push(groupEntity.toDto(GroupLocalStorage.DEFAULT_CONTAIN));
-      await browser.storage.local.set({groups});
+      await browser.storage.local.set({groups: groups});
       lock.release();
     } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
   /**
    * Update a group in the local storage.
@@ -109,13 +109,13 @@ class GroupLocalStorage {
         throw new Error('The group could not be found in the local storage');
       }
       groups[groupIndex] = Object.assign(groups[groupIndex], groupEntity.toDto(GroupLocalStorage.DEFAULT_CONTAIN));
-      await browser.storage.local.set({groups});
+      await browser.storage.local.set({groups: groups});
       lock.release();
     } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
   /**
    * Delete groups in the local storage by groups ids.
@@ -130,14 +130,14 @@ class GroupLocalStorage {
         if (groupIndex !== -1) {
           groups.splice(groupIndex, 1);
         }
-        await browser.storage.local.set({groups});
+        await browser.storage.local.set({groups: groups});
         lock.release();
       }
     } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
   /**
    * GroupLocalStorage.DEFAULT_CONTAIN

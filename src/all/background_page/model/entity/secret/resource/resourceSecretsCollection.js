@@ -36,8 +36,10 @@ class ResourceSecretsCollection extends EntityCollection {
       ResourceSecretsCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(secret => {
       this.push(new SecretEntity(secret));
     });
@@ -55,7 +57,7 @@ class ResourceSecretsCollection extends EntityCollection {
     return {
       "type": "array",
       "items": SecretEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -66,9 +68,11 @@ class ResourceSecretsCollection extends EntityCollection {
     return this._items;
   }
 
-  // ==================================================
-  // Assertions
-  // ==================================================
+  /*
+   * ==================================================
+   * Assertions
+   * ==================================================
+   */
   /**
    * Assert there is no other secret with the same id in the collection
    *
@@ -81,8 +85,8 @@ class ResourceSecretsCollection extends EntityCollection {
     }
     const length = this.secrets.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingSecret = this.secrets[i];
+    for (; i < length; i++) {
+      const existingSecret = this.secrets[i];
       if (existingSecret.id && existingSecret.id === secret.id) {
         throw new EntityCollectionError(i, ResourceSecretsCollection.RULE_UNIQUE_ID, `Secret id ${secret.id} already exists.`);
       }
@@ -101,8 +105,8 @@ class ResourceSecretsCollection extends EntityCollection {
     }
     const length = this.secrets.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingSecret = this.secrets[i];
+    for (; i < length; i++) {
+      const existingSecret = this.secrets[i];
       if (existingSecret.userId && existingSecret.userId === secret.userId) {
         throw new EntityCollectionError(i, ResourceSecretsCollection.RULE_UNIQUE_USER_ID, `Secret for user id ${secret.userId} already exists.`);
       }
@@ -128,9 +132,11 @@ class ResourceSecretsCollection extends EntityCollection {
     }
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the secret to the list
    * @param {object} secret DTO or SecretEntity
@@ -152,9 +158,11 @@ class ResourceSecretsCollection extends EntityCollection {
     super.push(secretEntity);
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
   /**
    * ResourceSecretsCollection.ENTITY_NAME
    * @returns {string}

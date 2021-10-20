@@ -57,12 +57,12 @@ describe("Setup entity", () => {
         "domain": true
       });
       expect(false).toBe(true);
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        user_id: { format: 'The user_id is not a valid uuid.' },
-        token: { format: 'The token is not a valid uuid.' },
-        domain: { type: 'The domain is not a valid string.' }
+        user_id: {format: 'The user_id is not a valid uuid.'},
+        token: {format: 'The token is not a valid uuid.'},
+        domain: {type: 'The domain is not a valid string.'}
       });
     }
   });
@@ -78,9 +78,9 @@ describe("Setup entity", () => {
   it("createFromUrl throws an error if it cannot parse the url", () => {
     const url = "https://cloud.passbolt.local/acme/d57c10f5-639d-5160-9c81-8a0c6c4ec856/10801423-4151-42a4-99d1-86e66145a08c";
     try {
-      const setupEntity = SetupEntity.createFromUrl(url);
+      SetupEntity.createFromUrl(url);
       expect(true).toBeFalsy();
-    } catch(error) {
+    } catch (error) {
       expect(false).toBeFalsy();
     }
   });

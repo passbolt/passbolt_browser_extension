@@ -14,11 +14,12 @@ const passphraseController = require('../controller/passphrase/passphraseControl
 
 const fileController = require('../controller/fileController');
 
-const listen = function (worker) {
-
-  /* ==================================================================================
+const listen = function(worker) {
+  /*
+   * ==================================================================================
    *  Get Key info events
-   * ================================================================================== */
+   * ==================================================================================
+   */
 
   /*
    * Get the public key information for a user.
@@ -27,7 +28,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param userId {string} The user identifier
    */
-  worker.port.on('passbolt.keyring.get-public-key-info-by-user', async function (requestId, userId) {
+  worker.port.on('passbolt.keyring.get-public-key-info-by-user', async(requestId, userId) => {
     let key = keyring.findPublic(userId);
     // If the key is not in the keyring, try to sync the keyring and try again
     if (!key) {
@@ -49,7 +50,7 @@ const listen = function (worker) {
    * @listens passbolt.keyring.server.get
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.keyring.server.get', function (requestId) {
+  worker.port.on('passbolt.keyring.server.get', requestId => {
     let user, domain;
 
     try {
@@ -60,8 +61,8 @@ const listen = function (worker) {
       return;
     }
 
-    let serverkeyid = Uuid.get(domain),
-      serverkey = keyring.findPublic(serverkeyid);
+    const serverkeyid = Uuid.get(domain);
+    const serverkey = keyring.findPublic(serverkeyid);
 
     if (typeof serverkey !== 'undefined') {
       worker.port.emit(requestId, 'SUCCESS', serverkey);
@@ -70,9 +71,11 @@ const listen = function (worker) {
     }
   });
 
-  /* ==================================================================================
+  /*
+   * ==================================================================================
    *  Import Key & Sync' events
-   * ================================================================================== */
+   * ==================================================================================
+   */
 
   /*
    * Check the private key passphrase.
@@ -81,7 +84,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param passphrase {string} The passphrase to check
    */
-  worker.port.on('passbolt.keyring.private.checkpassphrase', async function (requestId, passphrase) {
+  worker.port.on('passbolt.keyring.private.checkpassphrase', async(requestId, passphrase) => {
     try {
       await keyring.checkPassphrase(passphrase);
       worker.port.emit(requestId, 'SUCCESS');
@@ -90,9 +93,11 @@ const listen = function (worker) {
     }
   });
 
-  /* ==================================================================================
+  /*
+   * ==================================================================================
    *  Backups key events
-   * ================================================================================== */
+   * ==================================================================================
+   */
 
   /*
    * Offer to users to download their public key
@@ -100,9 +105,9 @@ const listen = function (worker) {
    * @listens passbolt.keyring.download-my-public-key
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.keyring.download-my-public-key', async function (requestId) {
+  worker.port.on('passbolt.keyring.download-my-public-key', async requestId => {
     let publicKeyArmored;
-    let filename = "passbolt_public.asc";
+    const filename = "passbolt_public.asc";
     try {
       const privateKeyInfo = await keyring.findPrivate();
       if (privateKeyInfo) {
@@ -113,7 +118,7 @@ const listen = function (worker) {
       }
       await fileController.saveFile(filename, publicKeyArmored, "text/plain", worker.tab.id);
       worker.port.emit(requestId, 'SUCCESS');
-    } catch(error) {
+    } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
@@ -124,8 +129,8 @@ const listen = function (worker) {
    * @listens passbolt.keyring.download-my-private-key
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.keyring.download-my-private-key', async function (requestId) {
-    let filename = "passbolt_private.asc";
+  worker.port.on('passbolt.keyring.download-my-private-key', async requestId => {
+    const filename = "passbolt_private.asc";
     try {
       await passphraseController.request(worker);
       const privateKeyInfo = await keyring.findPrivate();
@@ -134,7 +139,7 @@ const listen = function (worker) {
       }
       await fileController.saveFile(filename, privateKeyInfo.key, "text/plain", worker.tab.id);
       worker.port.emit(requestId, 'SUCCESS');
-    } catch(error) {
+    } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
@@ -145,7 +150,7 @@ const listen = function (worker) {
    * @listens passbolt.keyring.get-private-key
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.keyring.get-private-key', async function (requestId) {
+  worker.port.on('passbolt.keyring.get-private-key', async requestId => {
     try {
       await passphraseController.request(worker);
       const privateKeyInfo = await keyring.findPrivate();
@@ -153,7 +158,7 @@ const listen = function (worker) {
         throw new Error('Private key not found.');
       }
       worker.port.emit(requestId, 'SUCCESS', privateKeyInfo.key);
-    } catch(error) {
+    } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });

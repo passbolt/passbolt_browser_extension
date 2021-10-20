@@ -83,7 +83,7 @@ describe("PermissionChangesCollection", () => {
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d992",
       type: PermissionEntity.PERMISSION_READ
-    },{
+    }, {
       id: "c2c7f658-c7ac-4d73-9020-9d2c296d9103",
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
@@ -92,11 +92,13 @@ describe("PermissionChangesCollection", () => {
       type: PermissionEntity.PERMISSION_READ
     }]);
 
-    // Delete first one
-    // Downgrade second one
-    // Upgrade third one
-    // Let fourth one
-    // Add five one
+    /*
+     * Delete first one
+     * Downgrade second one
+     * Upgrade third one
+     * Let fourth one
+     * Add five one
+     */
     const expectedSet = new PermissionsCollection([{
       id: "c2c7f658-c7ac-4d73-9020-9d2c296d9101",
       aco: PermissionEntity.ACO_FOLDER,
@@ -118,7 +120,7 @@ describe("PermissionChangesCollection", () => {
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d993",
       type: PermissionEntity.PERMISSION_READ
-    },{
+    }, {
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
       aro: PermissionEntity.ARO_USER,
@@ -128,52 +130,48 @@ describe("PermissionChangesCollection", () => {
 
     const changes = PermissionChangesCollection.calculateChanges(originalSet, expectedSet);
     expect(changes.toDto()).toEqual([{
-        id: 'c2c7f658-c7ac-4d73-9020-9d2c296d9101',
-        aco: 'Folder',
-        aro: 'User',
-        aco_foreign_key: 'c2c7f658-c7ac-4d73-9020-9d2c296d91ff',
-        aro_foreign_key: '54c6278e-f824-5fda-91ff-3e946b18d991',
-        type: 1
-      }, {
-        id: 'c2c7f658-c7ac-4d73-9020-9d2c296d9102',
-        aco: 'Folder',
-        aro: 'User',
-        aco_foreign_key: 'c2c7f658-c7ac-4d73-9020-9d2c296d91ff',
-        aro_foreign_key: '54c6278e-f824-5fda-91ff-3e946b18d992',
-        type: 7
-      }, {
-        aco: 'Folder',
-        aro: 'User',
-        aco_foreign_key: 'c2c7f658-c7ac-4d73-9020-9d2c296d91ff',
-        aro_foreign_key: '54c6278e-f824-5fda-91ff-3e946b18d994',
-        type: 15
-      }, {
-        id: 'c2c7f658-c7ac-4d73-9020-9d2c296d9100',
-        delete: true,
-        aco: 'Folder',
-        aro: 'User',
-        aco_foreign_key: 'c2c7f658-c7ac-4d73-9020-9d2c296d91ff',
-        aro_foreign_key: '54c6278e-f824-5fda-91ff-3e946b18d990',
-        type: 15
-      }
+      id: 'c2c7f658-c7ac-4d73-9020-9d2c296d9101',
+      aco: 'Folder',
+      aro: 'User',
+      aco_foreign_key: 'c2c7f658-c7ac-4d73-9020-9d2c296d91ff',
+      aro_foreign_key: '54c6278e-f824-5fda-91ff-3e946b18d991',
+      type: 1
+    }, {
+      id: 'c2c7f658-c7ac-4d73-9020-9d2c296d9102',
+      aco: 'Folder',
+      aro: 'User',
+      aco_foreign_key: 'c2c7f658-c7ac-4d73-9020-9d2c296d91ff',
+      aro_foreign_key: '54c6278e-f824-5fda-91ff-3e946b18d992',
+      type: 7
+    }, {
+      aco: 'Folder',
+      aro: 'User',
+      aco_foreign_key: 'c2c7f658-c7ac-4d73-9020-9d2c296d91ff',
+      aro_foreign_key: '54c6278e-f824-5fda-91ff-3e946b18d994',
+      type: 15
+    }, {
+      id: 'c2c7f658-c7ac-4d73-9020-9d2c296d9100',
+      delete: true,
+      aco: 'Folder',
+      aro: 'User',
+      aco_foreign_key: 'c2c7f658-c7ac-4d73-9020-9d2c296d91ff',
+      aro_foreign_key: '54c6278e-f824-5fda-91ff-3e946b18d990',
+      type: 15
+    }
     ]);
   });
 
   it("reuse changes works - part1 deletion", () => {
-    let permissions;
-    let changes;
-    let original;
-    let result;
-    let resource1 = "c2c7f658-c7ac-4d73-9020-9d2c296d91ff";
-    let user1 = "54c6278e-f824-5fda-91ff-3e946b18d990";
-    let user2 = "54c6278e-f824-5fda-91ff-3e946b18d991";
-    let folder1 = "640ebc06-5ec1-5322-a1ae-6120ed2f3a74";
-    let permission1 = "c2c7f658-c7ac-4d73-9020-9d2c296d9100";
-    let permission2 = "c2c7f658-c7ac-4d73-9020-9d2c296d9101";
-    let permission3 = "c2c7f658-c7ac-4d73-9020-9d2c296d9102";
+    const resource1 = "c2c7f658-c7ac-4d73-9020-9d2c296d91ff";
+    const user1 = "54c6278e-f824-5fda-91ff-3e946b18d990";
+    const user2 = "54c6278e-f824-5fda-91ff-3e946b18d991";
+    const folder1 = "640ebc06-5ec1-5322-a1ae-6120ed2f3a74";
+    const permission1 = "c2c7f658-c7ac-4d73-9020-9d2c296d9100";
+    const permission2 = "c2c7f658-c7ac-4d73-9020-9d2c296d9101";
+    const permission3 = "c2c7f658-c7ac-4d73-9020-9d2c296d9102";
 
     // permission is not present and change is a delete
-    permissions = new PermissionsCollection([{
+    const permissions = new PermissionsCollection([{
       id: permission1,
       aco: PermissionEntity.ACO_RESOURCE,
       aco_foreign_key: resource1,
@@ -181,7 +179,7 @@ describe("PermissionChangesCollection", () => {
       aro_foreign_key: user1,
       type: PermissionEntity.PERMISSION_OWNER
     }]);
-    changes = new PermissionChangesCollection([{
+    let changes = new PermissionChangesCollection([{
       id: permission2,
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: folder1,
@@ -189,7 +187,7 @@ describe("PermissionChangesCollection", () => {
       aro_foreign_key: user1,
       delete: true,
       type: PermissionEntity.PERMISSION_READ
-    },{
+    }, {
       id: permission3,
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: folder1,
@@ -198,8 +196,8 @@ describe("PermissionChangesCollection", () => {
       delete: true,
       type: PermissionEntity.PERMISSION_OWNER
     }]);
-    original = new PermissionsCollection([], false);
-    result = PermissionChangesCollection.reuseChanges(
+    const original = new PermissionsCollection([], false);
+    let result = PermissionChangesCollection.reuseChanges(
       PermissionEntity.ACO_RESOURCE, resource1, permissions, changes, original
     );
     expect(result.length).toBe(0);
@@ -222,17 +220,13 @@ describe("PermissionChangesCollection", () => {
   });
 
   it("reuse changes works - part2 create", () => {
-    let permissions;
-    let changes;
-    let original;
-    let result;
-    let resource1 = "c2c7f658-c7ac-4d73-9020-9d2c296d91ff";
-    let user1 = "54c6278e-f824-5fda-91ff-3e946b18d990";
-    let user2 = "54c6278e-f824-5fda-91ff-3e946b18d991";
-    let folder1 = "640ebc06-5ec1-5322-a1ae-6120ed2f3a74";
-    let permission1 = "c2c7f658-c7ac-4d73-9020-9d2c296d9100";
+    const resource1 = "c2c7f658-c7ac-4d73-9020-9d2c296d91ff";
+    const user1 = "54c6278e-f824-5fda-91ff-3e946b18d990";
+    const user2 = "54c6278e-f824-5fda-91ff-3e946b18d991";
+    const folder1 = "640ebc06-5ec1-5322-a1ae-6120ed2f3a74";
+    const permission1 = "c2c7f658-c7ac-4d73-9020-9d2c296d9100";
 
-    permissions = new PermissionsCollection([{
+    const permissions = new PermissionsCollection([{
       id: permission1,
       aco: PermissionEntity.ACO_RESOURCE,
       aco_foreign_key: resource1,
@@ -240,21 +234,21 @@ describe("PermissionChangesCollection", () => {
       aro_foreign_key: user1,
       type: PermissionEntity.PERMISSION_OWNER
     }]);
-    changes = new PermissionChangesCollection([{
+    const changes = new PermissionChangesCollection([{
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: folder1,
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: user1,
       type: PermissionEntity.PERMISSION_UPDATE
-    },{
+    }, {
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: folder1,
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: user2,
       type: PermissionEntity.PERMISSION_OWNER
     }]);
-    original = new PermissionsCollection([], false);
-    result = PermissionChangesCollection.reuseChanges(
+    const original = new PermissionsCollection([], false);
+    const result = PermissionChangesCollection.reuseChanges(
       PermissionEntity.ACO_RESOURCE, resource1, permissions, changes, original
     );
     expect(result.length).toBe(1);
@@ -263,26 +257,22 @@ describe("PermissionChangesCollection", () => {
   });
 
   it("reuse changes works - part3 update - upgrade matching permission", () => {
-    let permissions;
-    let changes;
-    let original;
-    let result;
-    let resource1 = "c2c7f658-c7ac-4d73-9020-9d2c296d91ff";
-    let user1 = "54c6278e-f824-5fda-91ff-3e946b18d990";
-    let user2 = "54c6278e-f824-5fda-91ff-3e946b18d991";
-    let user3 = "54c6278e-f824-5fda-91ff-3e946b18d992";
-    let user4 = "54c6278e-f824-5fda-91ff-3e946b18d993";
+    const resource1 = "c2c7f658-c7ac-4d73-9020-9d2c296d91ff";
+    const user1 = "54c6278e-f824-5fda-91ff-3e946b18d990";
+    const user2 = "54c6278e-f824-5fda-91ff-3e946b18d991";
+    const user3 = "54c6278e-f824-5fda-91ff-3e946b18d992";
+    const user4 = "54c6278e-f824-5fda-91ff-3e946b18d993";
 
-    let folder1 = "640ebc06-5ec1-5322-a1ae-6120ed2f3a74";
-    let permission1 = "c2c7f658-c7ac-4d73-9020-9d2c296d9100";
-    let permission2 = "c2c7f658-c7ac-4d73-9020-9d2c296d9101";
-    let permission3 = "c2c7f658-c7ac-4d73-9020-9d2c296d9102";
-    let permission4 = "c2c7f658-c7ac-4d73-9020-9d2c296d9103";
-    let permission5 = "c2c7f658-c7ac-4d73-9020-9d2c296d9104";
-    let permission6 = "c2c7f658-c7ac-4d73-9020-9d2c296d9105";
-    let permission7 = "c2c7f658-c7ac-4d73-9020-9d2c296d9106";
+    const folder1 = "640ebc06-5ec1-5322-a1ae-6120ed2f3a74";
+    const permission1 = "c2c7f658-c7ac-4d73-9020-9d2c296d9100";
+    const permission2 = "c2c7f658-c7ac-4d73-9020-9d2c296d9101";
+    const permission3 = "c2c7f658-c7ac-4d73-9020-9d2c296d9102";
+    const permission4 = "c2c7f658-c7ac-4d73-9020-9d2c296d9103";
+    const permission5 = "c2c7f658-c7ac-4d73-9020-9d2c296d9104";
+    const permission6 = "c2c7f658-c7ac-4d73-9020-9d2c296d9105";
+    const permission7 = "c2c7f658-c7ac-4d73-9020-9d2c296d9106";
 
-    permissions = new PermissionsCollection([{
+    const permissions = new PermissionsCollection([{
       // permission is not in the original
       id: permission1,
       aco: PermissionEntity.ACO_RESOURCE,
@@ -290,7 +280,7 @@ describe("PermissionChangesCollection", () => {
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: user1,
       type: PermissionEntity.PERMISSION_OWNER
-    },{
+    }, {
       // permission is same than original
       id: permission2,
       aco: PermissionEntity.ACO_RESOURCE,
@@ -298,7 +288,7 @@ describe("PermissionChangesCollection", () => {
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: user2,
       type: PermissionEntity.PERMISSION_READ
-    },{
+    }, {
       // permission is more than original
       id: permission3,
       aco: PermissionEntity.ACO_RESOURCE,
@@ -306,7 +296,7 @@ describe("PermissionChangesCollection", () => {
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: user3,
       type: PermissionEntity.PERMISSION_OWNER
-    },{
+    }, {
       // permission is less than original
       id: permission4,
       aco: PermissionEntity.ACO_RESOURCE,
@@ -316,21 +306,21 @@ describe("PermissionChangesCollection", () => {
       type: PermissionEntity.PERMISSION_READ
     }]);
 
-    changes = new PermissionChangesCollection([{
+    const changes = new PermissionChangesCollection([{
       id: permission5,
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: folder1,
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: user2,
       type: PermissionEntity.PERMISSION_OWNER
-    },{
+    }, {
       id: permission6,
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: folder1,
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: user3,
       type: PermissionEntity.PERMISSION_UPDATE
-    },{
+    }, {
       id: permission7,
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: folder1,
@@ -339,21 +329,21 @@ describe("PermissionChangesCollection", () => {
       type: PermissionEntity.PERMISSION_UPDATE
     }]);
 
-    original = new PermissionsCollection([{
+    const original = new PermissionsCollection([{
       id: permission5,
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: folder1,
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: user2,
       type: PermissionEntity.PERMISSION_READ
-    },{
+    }, {
       id: permission6,
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: folder1,
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: user3,
       type: PermissionEntity.PERMISSION_READ
-    },{
+    }, {
       id: permission7,
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: folder1,
@@ -362,7 +352,7 @@ describe("PermissionChangesCollection", () => {
       type: PermissionEntity.PERMISSION_OWNER
     }], false);
 
-    result = PermissionChangesCollection.reuseChanges(
+    const result = PermissionChangesCollection.reuseChanges(
       PermissionEntity.ACO_RESOURCE, resource1, permissions, changes, original
     );
 

@@ -19,12 +19,11 @@ const {Crypto} = require('../model/crypto');
 const {Keyring} = require('../model/keyring');
 const {KeyIsExpiredError} = require('../error/keyIsExpiredError');
 const {ServerKeyChangedError} = require('../error/serverKeyChangedError');
-const {PassboltApiFetchError} = require('../error/passboltApiFetchError');
 const {GpgAuth} = require('../model/gpgauth');
 const {i18n} = require('../sdk/i18n');
 
 class AuthController {
-   /**
+  /**
    * AuthController Constructor
    *
    * @param {Worker} worker
@@ -54,7 +53,7 @@ class AuthController {
       await authModel.verify(serverKey, userFingerprint);
       this.worker.port.emit(this.requestId, 'SUCCESS');
     } catch (error) {
-      await this.onVerifyError(error)
+      await this.onVerifyError(error);
     }
   }
 

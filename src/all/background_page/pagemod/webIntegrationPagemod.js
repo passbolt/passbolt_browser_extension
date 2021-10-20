@@ -11,10 +11,10 @@ const app = require('../app');
 const {PageMod} = require('../sdk/page-mod');
 const Worker = require('../model/worker');
 
-const WebIntegration = function () {};
+const WebIntegration = function() {};
 WebIntegration._pageMod = undefined;
 
-WebIntegration.init = function () {
+WebIntegration.init = function() {
   if (typeof WebIntegration._pageMod !== 'undefined') {
     WebIntegration._pageMod.destroy();
     WebIntegration._pageMod = undefined;
@@ -30,7 +30,7 @@ WebIntegration.init = function () {
       'content_scripts/js/dist/browser-integration/browser-integration.js'
     ],
     attachTo: {existing: true, reload: false},
-    onAttach: function (worker) {
+    onAttach: function(worker) {
       Worker.add('WebIntegration', worker);
       app.events.config.listen(worker);
       app.events.webIntegration.listen(worker);

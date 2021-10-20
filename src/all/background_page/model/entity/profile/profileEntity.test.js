@@ -96,7 +96,7 @@ describe("Profile entity", () => {
     };
 
     const entity = new ProfileEntity(dto);
-    expect(entity.toDto({avatar:true})).toEqual(filtered);
+    expect(entity.toDto({avatar: true})).toEqual(filtered);
     expect(entity.firstName).toEqual('Dame Steve');
     expect(entity.lastName).toEqual('Shirley');
     expect(entity.created).not.toBe(null);
@@ -113,7 +113,7 @@ describe("Profile entity", () => {
     try {
       new ProfileEntity({"created": "2020-04-20T11:32:17+00:00"});
       expect(false).toBe(true);
-    } catch(error) {
+    } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('first_name', 'required')).toBe(true);
       expect(error.hasError('last_name', 'required')).toBe(true);
@@ -129,7 +129,7 @@ describe("Profile entity", () => {
         "last_name": Array(257).join("¯\_(ツ)_/¯")
       });
       expect(false).toBe(true);
-    } catch(error) {
+    } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('id', 'format')).toBe(true);
       expect(error.hasError('user_id', 'type')).toBe(true);
@@ -137,5 +137,4 @@ describe("Profile entity", () => {
       expect(error.hasError('last_name', 'maxLength')).toBe(true);
     }
   });
-
 });

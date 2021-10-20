@@ -56,9 +56,11 @@ class LocaleEntity extends Entity {
     };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get the locale identifier
    * @returns {string}
@@ -75,9 +77,11 @@ class LocaleEntity extends Entity {
     return this._props.label;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * LocaleEntity.ENTITY_NAME
    * @returns {string}

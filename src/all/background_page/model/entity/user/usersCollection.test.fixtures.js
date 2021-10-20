@@ -61,4 +61,4 @@ exports.UsersCollectionTestFixtures = {
       "modified": "2020-04-20T11:32:18+00:00"
     }
   }]
-}
+};

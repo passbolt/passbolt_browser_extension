@@ -12,7 +12,7 @@
  * @param {mixed} value The value to validate
  * @return {boolean}
  */
-var isUtf8Extended = function (value) {
+const isUtf8Extended = function(value) {
   return typeof value === 'string';
 };
 exports.isUtf8Extended = isUtf8Extended;
@@ -28,7 +28,7 @@ exports.isUtf8Extended = isUtf8Extended;
  * @param {mixed} value The value to validate
  * @return {boolean}
  */
-var isUtf8 = function (value) {
+const isUtf8 = function(value) {
   if (typeof value !== 'string') {
     return false;
   }

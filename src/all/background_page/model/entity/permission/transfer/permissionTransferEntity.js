@@ -55,12 +55,14 @@ class PermissionTransferEntity extends Entity {
           "format": "uuid"
         },
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get permission id
    *
@@ -81,9 +83,11 @@ class PermissionTransferEntity extends Entity {
     return this._props.aco_foreign_key;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * PermissionTransferEntity.ENTITY_NAME
    *

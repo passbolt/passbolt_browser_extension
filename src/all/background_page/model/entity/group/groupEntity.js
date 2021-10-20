@@ -99,12 +99,14 @@ class GroupEntity extends Entity {
         "creator": UserEntity.getSchema(),
         "modifier": UserEntity.getSchema()
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Sanitization
-  // ==================================================
+  /*
+   * ==================================================
+   * Sanitization
+   * ==================================================
+   */
   /**
    * Sanitize group dto:
    * - Remove group users which don't validate if any.
@@ -117,23 +119,25 @@ class GroupEntity extends Entity {
       return dto;
     }
 
-    if (dto.hasOwnProperty('groups_users')) {
+    if (Object.prototype.hasOwnProperty.call(dto, 'groups_users')) {
       dto.groups_users = GroupsUsersCollection.sanitizeDto(dto.groups_users);
     }
 
     return dto;
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API
    * @param {object} [contain] optional for example {profile: {avatar:true}}
    * @returns {*}
    */
   toDto(contain) {
-    let result = Object.assign({}, this._props);
+    const result = Object.assign({}, this._props);
     if (!contain) {
       return result;
     }
@@ -185,9 +189,11 @@ class GroupEntity extends Entity {
     };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get group id
    * @returns {(string|null)} uuid
@@ -263,9 +269,11 @@ class GroupEntity extends Entity {
     return this._my_group_user || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * GroupEntity.ENTITY_NAME
    * @returns {string}

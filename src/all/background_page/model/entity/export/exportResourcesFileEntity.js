@@ -34,21 +34,24 @@ class ExportResourcesFileEntity extends Entity {
       exportResourcesFileDto,
       ExportResourcesFileEntity.getSchema()
     ));
-    // // @todo Refactor when a schema deep testing strategy is implemented.
-    // if (exportResourcesFileDto.options) {
-    //   EntitySchema.validate(
-    //     ExportResourcesFileEntity.ENTITY_NAME,
-    //     exportResourcesFileDto.options,
-    //     ExportResourcesFileEntity.getSchema().properties.options
-    //   );
-    //   if (exportResourcesFileDto.options.credentials) {
-    //     EntitySchema.validate(
-    //       ExportResourcesFileEntity.ENTITY_NAME,
-    //       exportResourcesFileDto.options.credentials,
-    //       ExportResourcesFileEntity.getSchema().properties.options.properties.credentials
-    //     );
-    //   }
-    // }
+
+    /*
+     * // @todo Refactor when a schema deep testing strategy is implemented.
+     * $ if (exportResourcesFileDto.options) {
+     *   EntitySchema.validate(
+     *     ExportResourcesFileEntity.ENTITY_NAME,
+     *     exportResourcesFileDto.options,
+     *     ExportResourcesFileEntity.getSchema().properties.options
+     *   );
+     *   if (exportResourcesFileDto.options.credentials) {
+     *     EntitySchema.validate(
+     *       ExportResourcesFileEntity.ENTITY_NAME,
+     *       exportResourcesFileDto.options.credentials,
+     *       ExportResourcesFileEntity.getSchema().properties.options.properties.credentials
+     *     );
+     *   }
+     * }
+     */
 
     // Associations
     if (this._props.export_resources) {
@@ -120,12 +123,14 @@ class ExportResourcesFileEntity extends Entity {
           }
         }
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
 
   /**
    * Get export format
@@ -183,9 +188,11 @@ class ExportResourcesFileEntity extends Entity {
     return this.credentials.keyfile;
   }
 
-  // ==================================================
-  // Calculated properties
-  // ==================================================
+  /*
+   * ==================================================
+   * Calculated properties
+   * ==================================================
+   */
 
   /**
    * Get export file type
@@ -195,9 +202,11 @@ class ExportResourcesFileEntity extends Entity {
     return this.format.split('-')[0];
   }
 
-  // ==================================================
-  // Associated properties getters / setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Associated properties getters / setters
+   * ==================================================
+   */
 
   /**
    * Get the collection of resources to export
@@ -237,9 +246,11 @@ class ExportResourcesFileEntity extends Entity {
     this._export_folders = collection;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
 
   /**
    * ExportResourcesFileEntity.ENTITY_NAME
@@ -259,7 +270,7 @@ class ExportResourcesFileEntity extends Entity {
       ExportResourcesFileEntity.FORMAT_CSV_KDBX,
       ExportResourcesFileEntity.FORMAT_CSV_LASTPASS,
       ExportResourcesFileEntity.FORMAT_CSV_1PASSWORD,
-    ]
+    ];
   }
 
   /**

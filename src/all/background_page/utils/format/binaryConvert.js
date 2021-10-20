@@ -16,7 +16,6 @@
  * The class that deals with Passbolt to convert binary.
  */
 class BinaryConvert {
-
   /**
    * Get string from binary
    * @param binary

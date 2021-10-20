@@ -60,9 +60,11 @@ class LocaleModel {
     i18n.init(localeEntity.locale, supportedLocalesId);
   }
 
-  //==============================================================
-  // Finders / remote calls
-  //==============================================================
+  /*
+   * ==============================================================
+   *  Finders / remote calls
+   * ==============================================================
+   */
 
   /**
    * Get the organization locale.
@@ -83,7 +85,7 @@ class LocaleModel {
 
     if (localePluginEnabled) {
       const localePluginSettings = organizationSettings.getPluginSettings("locale");
-      return new LocalesCollection(localePluginSettings.options || [])
+      return new LocalesCollection(localePluginSettings.options || []);
     }
 
     return LocaleModel.DEFAULT_SUPPORTED_LOCALES;
@@ -111,9 +113,11 @@ class LocaleModel {
     return supportedLocales.locales.find(supportedLocale => localeNonExplicitLanguage === supportedLocale.locale.split('-')[0]);
   }
 
-  //==============================================================
-  // CRUDs
-  //==============================================================
+  /*
+   * ==============================================================
+   *  CRUDs
+   * ==============================================================
+   */
 
   /**
    * Update the current user locale language

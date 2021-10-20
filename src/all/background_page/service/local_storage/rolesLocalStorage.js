@@ -42,7 +42,7 @@ class RolesLocalStorage {
   static async get() {
     const {roles} = await browser.storage.local.get([ROLES_LOCAL_STORAGE_KEY]);
     return roles;
-  };
+  }
 
   /**
    * Set the roles in local storage.
@@ -56,14 +56,14 @@ class RolesLocalStorage {
       if (!(rolesCollection instanceof RolesCollection)) {
         throw new TypeError('RolesLocalStorage::set expects a RolesCollection');
       }
-      for (let roleEntity of rolesCollection) {
+      for (const roleEntity of rolesCollection) {
         RolesLocalStorage.assertEntityBeforeSave(roleEntity);
         roles.push(roleEntity.toDto());
       }
     }
-    await browser.storage.local.set({roles});
+    await browser.storage.local.set({roles: roles});
     lock.release();
-  };
+  }
 
   /**
    * Get a resource from the local storage by id
@@ -74,7 +74,7 @@ class RolesLocalStorage {
   static async getResourceById(id) {
     const roles = await RolesLocalStorage.get();
     return roles.find(item => item.id === id);
-  };
+  }
 
   /**
    * Add a role in the local storage
@@ -86,17 +86,19 @@ class RolesLocalStorage {
       RolesLocalStorage.assertEntityBeforeSave(roleEntity);
       const roles = await RolesLocalStorage.get();
       roles.push(roleEntity.toDto());
-      await browser.storage.local.set({ roles });
+      await browser.storage.local.set({roles: roles});
       lock.release();
     } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
-  // =================================================
-  // Static methods
-  // =================================================
+  /*
+   * =================================================
+   * Static methods
+   * =================================================
+   */
   /**
    * Make sure the entity meet some minimal requirements before being stored
    *

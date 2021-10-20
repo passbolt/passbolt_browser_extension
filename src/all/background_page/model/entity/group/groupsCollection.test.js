@@ -54,7 +54,7 @@ describe("Groups collection", () => {
       };
       const dtos = [group1, group2];
 
-      let t = () => {new GroupsCollection(dtos)};
+      const t = () => { new GroupsCollection(dtos); };
       expect(t).toThrow(EntityCollectionError);
     });
 
@@ -69,7 +69,7 @@ describe("Groups collection", () => {
       };
       const dtos = [group1, group2];
 
-      let t = () => {new GroupsCollection(dtos)};
+      const t = () => { new GroupsCollection(dtos); };
       expect(t).toThrow(EntityCollectionError);
     });
 

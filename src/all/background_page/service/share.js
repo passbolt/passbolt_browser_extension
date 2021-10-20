@@ -25,7 +25,7 @@ class ShareService {}
  * @returns {array}
  * Return users or groups objects.
  */
-ShareService.searchAros = async function (keywords) {
+ShareService.searchAros = async function(keywords) {
   const user = User.getInstance();
   const domain = user.settings.getDomain();
   const fetchOptions = {
@@ -36,7 +36,7 @@ ShareService.searchAros = async function (keywords) {
       'content-type': 'application/json'
     }
   };
-  let url = new URL(`${domain}/share/search-aros?api-version=2`);
+  const url = new URL(`${domain}/share/search-aros?api-version=2`);
   url.searchParams.append('filter[search]', keywords);
   let response, responseJson;
 
@@ -84,7 +84,7 @@ ShareService.searchResourceAros = async function(resourceId, keywords) {
       'content-type': 'application/json'
     }
   };
-  let url = new URL(`${domain}/share/search-users/resource/` + resourceId + `?api-version=2`);
+  const url = new URL(`${domain}/share/search-users/resource/${resourceId}?api-version=2`);
   url.searchParams.append('filter[search]', keywords);
   let response, responseJson;
 
@@ -132,7 +132,7 @@ ShareService.shareResource = async function(resourceId, data) {
     body: JSON.stringify(data)
   };
   Request.setCsrfHeader(fetchOptions, user);
-  const url = new URL(`${domain}/share/resource/` + resourceId + `.json?api-version=v2`);
+  const url = new URL(`${domain}/share/resource/${resourceId}.json?api-version=v2`);
   let response, responseJson;
 
   try {
@@ -171,7 +171,7 @@ ShareService.shareResource = async function(resourceId, data) {
  * @param permissions
  * @returns {*}
  */
-ShareService.simulateShareResource = async function (resourceId, permissions) {
+ShareService.simulateShareResource = async function(resourceId, permissions) {
   const user = User.getInstance();
   const domain = user.settings.getDomain();
   const url = new URL(`${domain}/share/simulate/resource/${resourceId}.json?api-version=2`);

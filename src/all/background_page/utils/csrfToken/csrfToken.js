@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 class CsrfToken {
-
   /**
    * CsrfToken constructor
    * @param {string} token
@@ -41,7 +40,7 @@ class CsrfToken {
    */
   validate(token) {
     if (!token) {
-      throw new TypeError('CSRF token cannot be empty.')
+      throw new TypeError('CSRF token cannot be empty.');
     }
     if (typeof token !== 'string') {
       throw new TypeError('CSRF token should be a string.');
@@ -54,7 +53,7 @@ class CsrfToken {
    * @returns {{"X-CSRF-Token": string}}
    */
   toFetchHeaders() {
-    return {'X-CSRF-Token' : this.token};
+    return {'X-CSRF-Token': this.token};
   }
 }
 

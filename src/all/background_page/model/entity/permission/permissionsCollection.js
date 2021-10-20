@@ -12,7 +12,6 @@
  * @since         2.13.0
  */
 const {EntitySchema} = require('../abstract/entitySchema');
-const {EntityValidationError} = require('../abstract/entityValidationError');
 const {EntityCollection} = require('../abstract/entityCollection');
 const {EntityCollectionError} = require('../abstract/entityCollectionError');
 const {PermissionEntity} = require('./permissionEntity');
@@ -46,14 +45,18 @@ class PermissionsCollection extends EntityCollection {
       PermissionsCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(permission => {
       this.push(permission);
     });
 
-    // Logical validation rules
-    // A permission list must contain at least one owner
+    /*
+     * Logical validation rules
+     * A permission list must contain at least one owner
+     */
     if (typeof ownerValidation === 'undefined' || ownerValidation) {
       this.assertAtLeastOneOwner();
     }
@@ -62,9 +65,11 @@ class PermissionsCollection extends EntityCollection {
     this._props = null;
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API
    *
@@ -76,8 +81,8 @@ class PermissionsCollection extends EntityCollection {
     if (!contain) {
       contain = PermissionEntity.ALL_CONTAIN_OPTIONS;
     }
-    for(let permission of this) {
-      result.push(permission.toDto(contain))
+    for (const permission of this) {
+      result.push(permission.toDto(contain));
     }
     return result;
   }
@@ -90,9 +95,11 @@ class PermissionsCollection extends EntityCollection {
     return this.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS);
   }
 
-  // ==================================================
-  // Dynamic getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic getters
+   * ==================================================
+   */
   /**
    * Get permissions entity schema
    *
@@ -102,7 +109,7 @@ class PermissionsCollection extends EntityCollection {
     return {
       "type": "array",
       "items": PermissionEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -113,9 +120,11 @@ class PermissionsCollection extends EntityCollection {
     return this._items;
   }
 
-  // ==================================================
-  // Finders
-  // ==================================================
+  /*
+   * ==================================================
+   * Finders
+   * ==================================================
+   */
   /**
    * Return true if a given permission can be found already in the collection
    *
@@ -137,9 +146,11 @@ class PermissionsCollection extends EntityCollection {
     return this._items.find(permission => permission.aro === aro && permission.aroForeignKey === aroForeignKey);
   }
 
-  // ==================================================
-  // Push items in the collection
-  // ==================================================
+  /*
+   * ==================================================
+   * Push items in the collection
+   * ==================================================
+   */
   /**
    * Push a copy of the permission to the list
    * @param {PermissionEntity} permission DTO or PermissionEntity
@@ -153,12 +164,14 @@ class PermissionsCollection extends EntityCollection {
       permission = permission.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS); // deep clone
     }
 
-    let newPermission = new PermissionEntity(permission); // validate
+    const newPermission = new PermissionEntity(permission); // validate
 
-    // Build rules
-    // Assert there is not already a permission with the same id
-    // Assert there is not already a permission with the same ACO/ARO
-    // Assert we're dealing with same resource / folder
+    /*
+     * Build rules
+     * Assert there is not already a permission with the same id
+     * Assert there is not already a permission with the same ACO/ARO
+     * Assert we're dealing with same resource / folder
+     */
     this.assertSameAco(newPermission);
     this.assertUniqueId(newPermission);
     this.assertUniqueAro(newPermission);
@@ -175,12 +188,12 @@ class PermissionsCollection extends EntityCollection {
   addOrReplace(permission) {
     try {
       this.push(permission);
-    } catch(error) {
-      const recover = [PermissionsCollection.RULE_UNIQUE_ID, PermissionsCollection.RULE_UNIQUE_ARO]
+    } catch (error) {
+      const recover = [PermissionsCollection.RULE_UNIQUE_ID, PermissionsCollection.RULE_UNIQUE_ARO];
       if (!recover.includes(error.rule)) {
         throw error;
       }
-      let existingPermission = this.permissions[error.position];
+      const existingPermission = this.permissions[error.position];
       if (PermissionEntity.isAcoAndAroMatching(existingPermission, permission)) {
         // if the match, keep the one with highest permission
         this.permissions[error.position] = PermissionEntity.getHighestPermission(existingPermission, permission);
@@ -191,9 +204,11 @@ class PermissionsCollection extends EntityCollection {
     }
   }
 
-  // ==================================================
-  // Permissions assertions
-  // ==================================================
+  /*
+   * ==================================================
+   * Permissions assertions
+   * ==================================================
+   */
   /**
    * Assert there the collection is always about the same ACO (resource/folder)
    *
@@ -222,8 +237,8 @@ class PermissionsCollection extends EntityCollection {
     }
     const length = this.permissions.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingPermission = this.permissions[i];
+    for (; i < length; i++) {
+      const existingPermission = this.permissions[i];
       if (existingPermission.id && existingPermission.id === permission.id) {
         throw new EntityCollectionError(i, PermissionsCollection.RULE_UNIQUE_ID, `Permission id ${permission.id} already exists.`);
       }
@@ -239,8 +254,8 @@ class PermissionsCollection extends EntityCollection {
   assertUniqueAro(permission) {
     const length = this.permissions.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingPermission = this.permissions[i];
+    for (; i < length; i++) {
+      const existingPermission = this.permissions[i];
       if (PermissionEntity.isAroMatching(permission, existingPermission)) {
         const msg = `${permission.aro} id ${permission.aroForeignKey} already exists in the permission list.`;
         throw new EntityCollectionError(i, PermissionsCollection.RULE_UNIQUE_ARO, msg);
@@ -255,18 +270,20 @@ class PermissionsCollection extends EntityCollection {
    * @throws {EntityValidationError} if not owner is found in the collection
    */
   assertAtLeastOneOwner() {
-    for (let permission of this) {
+    for (const permission of this) {
       if (permission.isOwner()) {
         return;
       }
     }
-    const msg = 'Permission collection should contain at least one owner.'
+    const msg = 'Permission collection should contain at least one owner.';
     throw new EntityCollectionError(0, PermissionsCollection.RULE_ONE_OWNER, msg);
   }
 
-  // ==================================================
-  // Permissions "arithmetics"
-  // ==================================================
+  /*
+   * ==================================================
+   * Permissions "arithmetics"
+   * ==================================================
+   */
   /**
    * Create a new set based on set1 + set2
    * Keep the highest permission if there is an overlap
@@ -278,7 +295,7 @@ class PermissionsCollection extends EntityCollection {
    */
   static sum(set1, set2, ownerValidation) {
     const set3 = new PermissionsCollection(set1.toDto(), false);
-    for (let set2Permission of set2) {
+    for (const set2Permission of set2) {
       set3.addOrReplace(set2Permission);
     }
     if (typeof ownerValidation === 'undefined' || ownerValidation) {
@@ -298,7 +315,7 @@ class PermissionsCollection extends EntityCollection {
    */
   static diff(set1, set2, ownerValidation) {
     const set3 = new PermissionsCollection([], false);
-    for (let permission of set1) {
+    for (const permission of set1) {
       if (!set2.containAtLeastPermission(permission.aro, permission.aroForeignKey, permission.type)) {
         set3.push(permission);
       }
@@ -317,8 +334,8 @@ class PermissionsCollection extends EntityCollection {
    * @param {number} type see permission entity types
    * @returns {boolean}
    */
-  containAtLeastPermission( aro, aroForeignKey, type) {
-    for (let permission of this.items) {
+  containAtLeastPermission(aro, aroForeignKey, type) {
+    for (const permission of this.items) {
       if (permission.aro === aro && permission.aroForeignKey === aroForeignKey && permission.type >= type) {
         return true;
       }
@@ -334,8 +351,8 @@ class PermissionsCollection extends EntityCollection {
    * @param {number} type see permission entity types
    * @returns {boolean}
    */
-  containAtMostPermission( aro, aroForeignKey, type) {
-    for (let permission of this.items) {
+  containAtMostPermission(aro, aroForeignKey, type) {
+    for (const permission of this.items) {
       if (permission.aro === aro && permission.aroForeignKey === aroForeignKey && permission.type <= type) {
         return true;
       }
@@ -353,8 +370,8 @@ class PermissionsCollection extends EntityCollection {
    */
   cloneForAco(aco, acoId, ownerValidation) {
     const permissions = new PermissionsCollection([], false);
-    for (let parentPermission of this.permissions) {
-      let clone = parentPermission.copyForAnotherAco(aco, acoId);
+    for (const parentPermission of this.permissions) {
+      const clone = parentPermission.copyForAnotherAco(aco, acoId);
       permissions.addOrReplace(clone);
     }
     if (typeof ownerValidation === 'undefined' || ownerValidation) {
@@ -363,9 +380,11 @@ class PermissionsCollection extends EntityCollection {
     return permissions;
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
   /**
    * PermissionsCollection.ENTITY_NAME
    * @returns {string}

@@ -14,8 +14,6 @@ const {Keyring} = require('../../model/keyring');
 const {Crypto} = require('../../model/crypto');
 const {User} = require('../../model/user');
 
-const {FileTypeError} = require("../../error/fileTypeError");
-
 const progressController = require('../progress/progressController');
 const passphraseController = require('../passphrase/passphraseController');
 const {ImportError} = require("../../error/importError");
@@ -27,8 +25,6 @@ const {ResourceModel} = require('../../model/resource/resourceModel');
 const {TagModel} = require('../../model/tag/tagModel');
 
 const {ResourcesCollection} = require("../../model/entity/resource/resourcesCollection");
-const {FoldersCollection} = require("../../model/entity/folder/foldersCollection");
-const {ExternalFolderEntity} = require('../../model/entity/folder/external/externalFolderEntity')
 const {ExternalFoldersCollection} = require('../../model/entity/folder/external/externalFoldersCollection');
 const {TagsCollection} = require('../../model/entity/tag/tagsCollection');
 const {ResourceSecretsCollection} = require("../../model/entity/secret/resource/resourceSecretsCollection");
@@ -101,7 +97,7 @@ class ImportResourcesFileController {
    */
   buildImportEntity(fileType, file, options) {
     const ref = this.generateImportReference();
-    const importResourcesDto = {file_type: fileType, file, options, ref};
+    const importResourcesDto = {file_type: fileType, file: file, options: options, ref: ref};
     return new ImportResourcesFileEntity(importResourcesDto);
   }
 
@@ -154,14 +150,14 @@ class ImportResourcesFileController {
    */
   async encryptSecrets(importEntity, userId, privateKey) {
     let i = 0;
-    for (let importResourceEntity of importEntity.importResources) {
+    for (const importResourceEntity of importEntity.importResources) {
       i++;
       progressController.update(this.worker, this.progress++, i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: importEntity.importResources.items.length}));
       // @todo The secret DTO could be carried by the external resource entity. It can be done when we arrange the external resource entity schema validation.
       const secretDto = this.buildSecretDto(importResourceEntity);
       const serializedPlaintextDto = await this.resourceModel.serializePlaintextDto(importResourceEntity.resourceTypeId, secretDto);
       const data = await this.crypto.encrypt(serializedPlaintextDto, userId, privateKey);
-      const secret = new SecretEntity({data});
+      const secret = new SecretEntity({data: data});
       importResourceEntity.secrets = new ResourceSecretsCollection([secret]);
     }
   }
@@ -177,7 +173,7 @@ class ImportResourcesFileController {
       const dto = {
         password: importResourceEntity.secretClear || "",
         description: importResourceEntity.description || ""
-      }
+      };
       // @todo sloppy. We remove the clear description here, but it should be done at a parsing level.
       importResourceEntity.description = "";
       return dto;
@@ -203,8 +199,8 @@ class ImportResourcesFileController {
       const foldersCollection = ExternalFoldersCollection.toFoldersCollection(externalFolderChunk);
       const successCallback = (folderEntity, index) => this.handleImportFolderSuccess.bind(this)(importEntity, ++importedCount, folderEntity, externalFolderChunk[index]);
       const errorCallback = (error, index) => this.handleImportFolderError.bind(this)(importEntity, ++importedCount, error, externalFolderChunk[index]);
-      await this.folderModel.bulkCreate(foldersCollection, {successCallback, errorCallback});
-    } while(++depth);
+      await this.folderModel.bulkCreate(foldersCollection, {successCallback: successCallback, errorCallback: errorCallback});
+    } while (++depth);
 
     // Set import folder reference
     const importFolderReferenceEntity = importEntity.importFolders.getByPath(importEntity.ref);
@@ -225,7 +221,7 @@ class ImportResourcesFileController {
     externalFolderEntity.id = folderEntity.id;
     importEntity.importFolders.setFolderParentIdsByPath(externalFolderEntity.path, externalFolderEntity.id);
     importEntity.importResources.setFolderParentIdsByPath(externalFolderEntity.path, externalFolderEntity.id);
-    progressController.update(this.worker, this.progress++, i18n.t('Importing folders {{importedCount}}/{{total}}', {importedCount, total: importEntity.importFolders.items.length}));
+    progressController.update(this.worker, this.progress++, i18n.t('Importing folders {{importedCount}}/{{total}}', {importedCount: importedCount, total: importEntity.importFolders.items.length}));
   }
 
   /**
@@ -236,7 +232,7 @@ class ImportResourcesFileController {
    * @param {ExternalFolderEntity} externalFolderEntity The external folder entity at the source of the create
    */
   handleImportFolderError(importEntity, importedCount, error, externalFolderEntity) {
-    progressController.update(this.worker, this.progress++, i18n.t('Importing folders {{importedCount}}/{{total}}', {importedCount, total: importEntity.importFolders.items.length}));
+    progressController.update(this.worker, this.progress++, i18n.t('Importing folders {{importedCount}}/{{total}}', {importedCount: importedCount, total: importEntity.importFolders.items.length}));
     importEntity.importFoldersErrors.push(new ImportError("Cannot import folder", externalFolderEntity, error));
     importEntity.importFolders.removeByPath(externalFolderEntity.path);
     importEntity.importResources.removeByPath(externalFolderEntity.path);
@@ -252,7 +248,7 @@ class ImportResourcesFileController {
     const resourcesCollection = new ResourcesCollection(importEntity.importResources.toJSON());
     const successCallback = (resourceEntity, index) => this.handleImportResourceSuccess(importEntity, ++importedCount, resourceEntity, importEntity.importResources.items[index]);
     const errorCallback = (error, index) => this.handleImportResourceError(importEntity, ++importedCount, error, importEntity.importResources.items[index]);
-    await this.resourceModel.bulkCreate(resourcesCollection, {successCallback, errorCallback});
+    await this.resourceModel.bulkCreate(resourcesCollection, {successCallback: successCallback, errorCallback: errorCallback});
   }
 
   /**
@@ -264,7 +260,7 @@ class ImportResourcesFileController {
    */
   handleImportResourceSuccess(importEntity, importedCount, resourceEntity, externalResourceEntity) {
     externalResourceEntity.id = resourceEntity.id;
-    progressController.update(this.worker, this.progress++, i18n.t('Importing passwords {{importedCount}}/{{total}}', {importedCount, total: importEntity.importResources.items.length}));
+    progressController.update(this.worker, this.progress++, i18n.t('Importing passwords {{importedCount}}/{{total}}', {importedCount: importedCount, total: importEntity.importResources.items.length}));
   }
 
   /**
@@ -275,7 +271,7 @@ class ImportResourcesFileController {
    * @param {ExternalResourceEntity} externalResourceEntity The external resource entity at the source of the create
    */
   handleImportResourceError(importEntity, importedCount, error, externalResourceEntity) {
-    progressController.update(this.worker, this.progress++, i18n.t('Importing passwords {{importedCount}}/{{total}}', {importedCount, total: importEntity.importResources.items.length}));
+    progressController.update(this.worker, this.progress++, i18n.t('Importing passwords {{importedCount}}/{{total}}', {importedCount: importedCount, total: importEntity.importResources.items.length}));
     importEntity.importResourcesErrors.push(new ImportError("Cannot import resource", externalResourceEntity, error));
   }
 
@@ -287,7 +283,7 @@ class ImportResourcesFileController {
   async bulkTagResources(importEntity) {
     const tagsCollection = new TagsCollection([{slug: importEntity.ref}]);
     const resourcesIds = importEntity.importResources.items.filter(importResourceEntity => importResourceEntity.id)
-      // Do not tag resource which failed.
+    // Do not tag resource which failed.
       .map(importResourceEntity => importResourceEntity.id);
 
     if (!resourcesIds.length) {
@@ -312,7 +308,7 @@ class ImportResourcesFileController {
     let taggedCount = 0;
     const successCallback = () => this.handleTagResourceSuccess(importEntity, ++taggedCount);
     const errorCallback = () => this.handleTagResourceError(importEntity, ++taggedCount);
-    const resourcesEntities = await this.tagModel.bulkTagResources(resourcesIds, tagsCollection, {successCallback, errorCallback});
+    const resourcesEntities = await this.tagModel.bulkTagResources(resourcesIds, tagsCollection, {successCallback: successCallback, errorCallback: errorCallback});
 
     // Retrieve the reference tag and update the import entity.
     if (resourcesEntities && resourcesEntities.length) {
@@ -326,7 +322,7 @@ class ImportResourcesFileController {
    * @param {int} taggedCount The number of resource tagged (with success or no)
    */
   handleTagResourceSuccess(importEntity, taggedCount) {
-    progressController.update(this.worker, this.progress++, i18n.t('Tagging passwords {{taggedCount}}/{{total}}', {taggedCount, total: importEntity.importResources.items.length}));
+    progressController.update(this.worker, this.progress++, i18n.t('Tagging passwords {{taggedCount}}/{{total}}', {taggedCount: taggedCount, total: importEntity.importResources.items.length}));
   }
 
   /**
@@ -335,7 +331,7 @@ class ImportResourcesFileController {
    * @param {int} taggedCount The number of resource tagged (with success or no)
    */
   handleTagResourceError(importEntity, taggedCount) {
-    progressController.update(this.worker, this.progress++, i18n.t('Tagging passwords {{taggedCount}}/{{total}}', {taggedCount, total: importEntity.importResources.items.length}));
+    progressController.update(this.worker, this.progress++, i18n.t('Tagging passwords {{taggedCount}}/{{total}}', {taggedCount: taggedCount, total: importEntity.importResources.items.length}));
   }
 }
 

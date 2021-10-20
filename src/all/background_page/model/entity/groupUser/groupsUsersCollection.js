@@ -31,8 +31,10 @@ class GroupsUsersCollection extends EntityCollection {
       GroupsUsersCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(groupUser => {
       this.push(new GroupUserEntity(groupUser));
     });
@@ -50,12 +52,14 @@ class GroupsUsersCollection extends EntityCollection {
     return {
       "type": "array",
       "items": GroupUserEntity.getSchema(),
-    }
+    };
   }
 
-  // ==================================================
-  // Sanitization
-  // ==================================================
+  /*
+   * ==================================================
+   * Sanitization
+   * ==================================================
+   */
   /**
    * Sanitize groups users dto:
    * - Remove group user which do not validate
@@ -72,16 +76,18 @@ class GroupsUsersCollection extends EntityCollection {
       try {
         new GroupUserEntity(dto);
         return true;
-      } catch(error) {
+      } catch (error) {
         return false;
       }
-    }
+    };
     return dto.filter(filterValidGroupUser);
   }
 
-  // ==================================================
-  // Static and dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static and dynamic properties getters
+   * ==================================================
+   */
 
   /**
    * Get all items references
@@ -99,9 +105,11 @@ class GroupsUsersCollection extends EntityCollection {
     return ENTITY_NAME;
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the groupUser to the list
    * @param {object} groupUser DTO or GroupUserEntity
@@ -117,9 +125,11 @@ class GroupsUsersCollection extends EntityCollection {
     super.push(groupUser);
   }
 
-  // ==================================================
-  // Finders
-  // ==================================================
+  /*
+   * ==================================================
+   * Finders
+   * ==================================================
+   */
 
   /**
    * Get groupUser by user id

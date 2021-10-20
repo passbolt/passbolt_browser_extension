@@ -15,39 +15,39 @@ import {EntityCollectionError} from "./entityCollectionError";
 
 describe("EntityCollectionError", () => {
   it("constructor throw exception if position is empty", () => {
-    let t = () => { new EntityCollectionError(null, null, null) };
+    const t = () => { new EntityCollectionError(null, null, null); };
     expect(t).toThrow(TypeError);
   });
 
   it("constructor throw exception if position is not a number", () => {
-    let t = () => { new EntityCollectionError('test', 'test', 'test') };
+    const t = () => { new EntityCollectionError('test', 'test', 'test'); };
     expect(t).toThrow(TypeError);
   });
 
   it("constructor throw exception if rule is empty", () => {
-    let t = () => { new EntityCollectionError(0, null, null) };
+    const t = () => { new EntityCollectionError(0, null, null); };
     expect(t).toThrow(TypeError);
   });
 
   it("constructor throw exception if rule is not a string", () => {
-    let t = () => { new EntityCollectionError(0, [], 'test') };
+    const t = () => { new EntityCollectionError(0, [], 'test'); };
     expect(t).toThrow(TypeError);
   });
 
   it("constructor use default mesage if empty", () => {
-    let e = new EntityCollectionError(0, 'test');
+    const e = new EntityCollectionError(0, 'test');
     expect(e.position).toBe(0);
     expect(e.rule).toBe('test');
-    expect(e.message).toBe( 'Entity collection error.');
+    expect(e.message).toBe('Entity collection error.');
   });
 
   it("constructor throw exception if mesage is not a string", () => {
-    let t = () => { new EntityCollectionError(0, 'test', []) };
+    const t = () => { new EntityCollectionError(0, 'test', []); };
     expect(t).toThrow(TypeError);
   });
 
   it("constructor throw exception if mesage is not a string", () => {
-    let e = new EntityCollectionError(0, 'test', 'test');
+    const e = new EntityCollectionError(0, 'test', 'test');
     expect(e.position).toBe(0);
     expect(e.rule).toBe('test');
     expect(e.message).toBe('test');

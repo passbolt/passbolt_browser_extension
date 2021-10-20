@@ -5,7 +5,8 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-/* ===================================================================================
+/*
+ * ===================================================================================
  *  Events
  *
  *  Events help the addon code interact with content code via content/workers
@@ -18,7 +19,7 @@
  *  encryption and decryption events.
  * ==================================================================================
  */
-var events = {};
+const events = {};
 events.app = require('./event/appEvents');
 events.appBootstrap = require('./event/appBootstrapEvents');
 events.actionLogs = require('./event/actionLogEvents');
@@ -57,7 +58,8 @@ events.webIntegration = require('./event/webIntegrationEvents');
 
 exports.events = events;
 
-/* ==================================================================================
+/*
+ * ==================================================================================
  *  Page mods
  *  Run scripts in the context of web pages whose URL matches a given pattern.
  *  see. https://developer.mozilla.org/en-US/Add-ons/SDK/High-Level_APIs/page-mod
@@ -71,7 +73,7 @@ exports.events = events;
  * We cannot give directly the function reference since the add-on and content code can only
  * communicate via text.
  */
-var callbacks = {};
+const callbacks = {};
 exports.callbacks = callbacks;
 
 /*
@@ -79,7 +81,7 @@ exports.callbacks = callbacks;
  * It is usefull for example to re-initialize pagemods after a configuration changes
  * for example when you change the list of domains that you are running passbolt on
  */
-var pageMods = {};
+const pageMods = {};
 
 /*
  * This pagemod allows inserting classes to help any page

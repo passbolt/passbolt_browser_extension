@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const Worker = require('../../model/worker');
 
 const {Keyring} = require('../../model/keyring');
 const {Crypto} = require('../../model/crypto');
@@ -91,7 +90,7 @@ class ExportResourcesFileController {
     const foldersCollection = await this.folderModel.getAllByIds(exportEntity.foldersIds);
     const exportFoldersCollection = ExternalFoldersCollection.constructFromFoldersCollection(foldersCollection);
     const resourcesCollection = await this.resourceModel.findAllForDecrypt(exportEntity.resourcesIds);
-    const exportResourcesCollection = ExternalResourcesCollection.constructFromResourcesCollection(resourcesCollection, exportFoldersCollection)
+    const exportResourcesCollection = ExternalResourcesCollection.constructFromResourcesCollection(resourcesCollection, exportFoldersCollection);
     exportEntity.exportFolders = exportFoldersCollection;
     exportEntity.exportResources = exportResourcesCollection;
   }
@@ -113,7 +112,7 @@ class ExportResourcesFileController {
   async decryptSecrets(exportEntity, userId, privateKey) {
     let i = 0;
     const resourcesTypesCollection = await this.resourceTypeModel.getOrFindAll();
-    for (let exportResourceEntity of exportEntity.exportResources.items) {
+    for (const exportResourceEntity of exportEntity.exportResources.items) {
       i++;
       progressController.update(this.worker, ++this.progress, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: exportEntity.exportResources.items.length}));
       let secretClear = await this.crypto.decryptWithKey(exportResourceEntity.secrets.items[0].data, privateKey);
@@ -169,13 +168,13 @@ class ExportResourcesFileController {
    * @param {ExportResourcesFileEntity} exportEntity The export entity
    * @returns {Promise<void>}
    */
-  async download (exportEntity) {
+  async download(exportEntity) {
     const date = new Date().toISOString().slice(0, 10);
     const filename = `passbolt-export-${date}.${exportEntity.fileType}`;
     const mimeType = this.getMimeType(exportEntity.fileType);
     const blobFile = new Blob([exportEntity.file], {type: mimeType});
     await fileController.saveFile(filename, blobFile, mimeType, this.worker.tab.id);
-  };
+  }
 }
 
 

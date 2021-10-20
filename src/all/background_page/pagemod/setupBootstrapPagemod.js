@@ -14,10 +14,10 @@ const {PageMod} = require('../sdk/page-mod');
 const Worker = require('../model/worker');
 const app = require('../app');
 
-const SetupBootstrap = function () {};
+const SetupBootstrap = function() {};
 SetupBootstrap._pageMod = undefined;
 
-SetupBootstrap.init = function () {
+SetupBootstrap.init = function() {
   if (typeof SetupBootstrap._pageMod !== 'undefined') {
     SetupBootstrap._pageMod.destroy();
     SetupBootstrap._pageMod = undefined;
@@ -26,18 +26,20 @@ SetupBootstrap.init = function () {
   const setupBootstrapRegex = `(.*)\/setup\/install\/(${uuidRegex})\/(${uuidRegex})`;
   SetupBootstrap._pageMod = new PageMod({
     name: 'SetupBootstrap',
-		include: new RegExp(setupBootstrapRegex),
+    include: new RegExp(setupBootstrapRegex),
     contentScriptWhen: 'ready',
     contentStyleFile: [
-      // @deprecated when support for v2 is dropped
-      // used to control iframe styling without inline style in v3
+      /*
+       * @deprecated when support for v2 is dropped
+       * used to control iframe styling without inline style in v3
+       */
       'data/css/themes/default/ext_external.min.css'
     ],
     contentScriptFile: [
       'content_scripts/js/dist/vendors.js',
       'content_scripts/js/dist/setup.js',
     ],
-    onAttach: function (worker) {
+    onAttach: function(worker) {
       Worker.add('SetupBootstrap', worker);
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows

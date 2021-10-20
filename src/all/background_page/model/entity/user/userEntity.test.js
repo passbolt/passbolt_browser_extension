@@ -78,7 +78,7 @@ describe("User entity", () => {
     try {
       new UserEntity({"created": "2020-04-20T11:32:17+00:00"});
       expect(false).toBe(true);
-    } catch(error) {
+    } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('username', 'required')).toBe(true);
       // expect(error.hasError('role_id', 'required')).toBe(true);
@@ -93,7 +93,7 @@ describe("User entity", () => {
         "username": "(ノಠ益ಠ)ノ",
       });
       expect(false).toBe(true);
-    } catch(error) {
+    } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('id', 'format')).toBe(true);
       expect(error.hasError('role_id', 'type')).toBe(true);

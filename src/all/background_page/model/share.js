@@ -21,7 +21,7 @@ class Share {}
  * @param {string} keywords The string to search
  * @return {array}
  */
-Share.searchAros = async function (keywords) {
+Share.searchAros = async function(keywords) {
   return ShareService.searchAros(keywords);
 };
 
@@ -51,12 +51,12 @@ Share.bulkShareResources = async function(resources, changes, privateKey, progre
   const resourcesSecrets = await bulkShareEncrypt(resources, resourcesNewUsers, privateKey, progressCallback);
 
   for (const resourceId in resourcesChanges) {
-    if (resourcesChanges.hasOwnProperty(resourceId)) {
+    if (Object.prototype.hasOwnProperty.call(resourcesChanges, resourceId)) {
       const resource = resources.find(resource => resource.id === resourceId);
       const permissions = resourcesChanges[resourceId];
-      let secrets = resourcesSecrets[resourceId] || [];
+      const secrets = resourcesSecrets[resourceId] || [];
       progressCallback(`Sharing password ${resource.name}`);
-      await ShareService.shareResource(resourceId, {permissions, secrets});
+      await ShareService.shareResource(resourceId, {permissions: permissions, secrets: secrets});
     }
   }
 };
@@ -70,7 +70,7 @@ Share.bulkShareResources = async function(resources, changes, privateKey, progre
  */
 Share.bulkShareFolders = async function(foldersCollection, changesCollection, folderModel, progressCallback) {
   for (const folderEntity of foldersCollection) {
-    let permissions = changesCollection.filterByAcoForeignKey(folderEntity.id);
+    const permissions = changesCollection.filterByAcoForeignKey(folderEntity.id);
     if (permissions && permissions.length) {
       await progressCallback(`Updating folder ${folderEntity.name} permissions`);
       await folderModel.share(folderEntity, permissions, false);
@@ -97,7 +97,7 @@ const bulkShareAggregateChanges = function(acos, changes) {
   acos.forEach(aco => {
     const acoChanges = changes.filter(change => change.aco_foreign_key === aco.id);
     if (acoChanges.length) {
-      acosChanges[aco.id] = acoChanges
+      acosChanges[aco.id] = acoChanges;
     }
   });
 
@@ -153,15 +153,13 @@ const bulkShareEncrypt = async function(resources, resourcesNewUsers, privateKey
     progressCallback(`Encrypting for ${resource.name}`);
     if (users && users.length) {
       const message = await crypto.decryptWithKey(originalArmored, privateKey);
-      const encryptAllData = users.reduce((carry, userId) => [...carry, {userId, message}], []);
+      const encryptAllData = users.reduce((carry, userId) => [...carry, {userId: userId, message: message}], []);
       const result = await crypto.encryptAll(encryptAllData, privateKey);
-      secrets[resourceId] = result.map((armored, i) => {
-        return {
-          resource_id: resourceId,
-          user_id: users[i],
-          data: armored
-        }
-      });
+      secrets[resourceId] = result.map((armored, i) => ({
+        resource_id: resourceId,
+        user_id: users[i],
+        data: armored
+      }));
     }
   }
 

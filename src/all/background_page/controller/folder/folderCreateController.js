@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {FolderEntity} = require('../../model/entity/folder/folderEntity');
 const {FolderModel} = require('../../model/folder/folderModel');
 const {i18n} = require('../../sdk/i18n');
 
@@ -39,22 +38,24 @@ class FolderCreateController {
    */
   async main(originalFolder) {
     let progress = 0;
-    let progressGoal = !originalFolder.folderParentId ? 1 : 3;
+    const progressGoal = !originalFolder.folderParentId ? 1 : 3;
 
     try {
-      let msg = `Creating folder ${originalFolder.name}`;
+      const msg = `Creating folder ${originalFolder.name}`;
       await progressController.open(this.worker, msg, progressGoal, i18n.t('Creating folder...'));
-      let folderEntity = await this.folderModel.create(originalFolder);
+      const folderEntity = await this.folderModel.create(originalFolder);
 
       if (folderEntity.folderParentId) {
-        // TODO a confirmation dialog that recaps the changes
-        // TODO ask if they want to keep the original permission?
-        // TODO a remember me option to skip confirmation dialog
+        /*
+         * TODO a confirmation dialog that recaps the changes
+         * TODO ask if they want to keep the original permission?
+         * TODO a remember me option to skip confirmation dialog
+         */
         await progressController.update(this.worker, progress++, i18n.t('Fetching parent permissions'));
-        let targetFolder = await this.folderModel.findForShare(folderEntity.folderParentId);
+        const targetFolder = await this.folderModel.findForShare(folderEntity.folderParentId);
 
         await progressController.update(this.worker, progress++, i18n.t('Saving permissions...'));
-        let changes = await this.folderModel.calculatePermissionsChangesForCreate(folderEntity, targetFolder);
+        const changes = await this.folderModel.calculatePermissionsChangesForCreate(folderEntity, targetFolder);
         if (changes) {
           await this.folderModel.share(folderEntity, changes);
         }
@@ -63,7 +64,7 @@ class FolderCreateController {
       await progressController.update(this.worker, progressGoal,  i18n.t('Done!'));
       await progressController.close(this.worker);
       return folderEntity;
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       await progressController.close(this.worker);
       throw error;

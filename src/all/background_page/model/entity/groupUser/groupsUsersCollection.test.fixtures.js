@@ -67,4 +67,4 @@ exports.GroupsUsersCollectionTestFixtures = {
       "created": "2020-09-18T04:39:41+00:00"
     }
   ]
-}
+};

@@ -67,18 +67,18 @@ describe("Role entity", () => {
   });
 
   it("constructor returns validation error if dto required fields are missing", () => {
-    let t = () => {new RoleEntity({'name':'test'});};
+    let t = () => { new RoleEntity({'name': 'test'}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new RoleEntity({'id':'7f077753-0835-4054-92ee-556660ea04f1'});};
+    t = () => { new RoleEntity({'id': '7f077753-0835-4054-92ee-556660ea04f1'}); };
     expect(t).toThrow(EntityValidationError);
   });
 
   it("constructor returns validation error if dto fields are invalid", () => {
-    let t = () => {new RoleEntity({'id':'nope', 'name': 'test'});};
+    let t = () => { new RoleEntity({'id': 'nope', 'name': 'test'}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new RoleEntity({'id':'nope', 'name':  Array(51).join("a")});};
+    t = () => { new RoleEntity({'id': 'nope', 'name': Array(51).join("a")}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new RoleEntity({'id':'7f077753-0835-4054-92ee-556660ea04f1', 'name': 'user', 'description': Array(257).join("a") });};
+    t = () => { new RoleEntity({'id': '7f077753-0835-4054-92ee-556660ea04f1', 'name': 'user', 'description': Array(257).join("a")}); };
     expect(t).toThrow(EntityValidationError);
   });
 });

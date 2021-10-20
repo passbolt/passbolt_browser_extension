@@ -114,12 +114,14 @@ class ImportResourcesFileEntity extends Entity {
           }
         }
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
 
   /**
    * Return a DTO ready to be sent to API
@@ -154,9 +156,11 @@ class ImportResourcesFileEntity extends Entity {
     return this.toDto();
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
 
   /**
    * Get the import reference
@@ -230,9 +234,11 @@ class ImportResourcesFileEntity extends Entity {
     return this.credentials.keyfile;
   }
 
-  // ==================================================
-  // Calculated properties
-  // ==================================================
+  /*
+   * ==================================================
+   * Calculated properties
+   * ==================================================
+   */
 
   /**
    * Get the reference folder
@@ -272,9 +278,11 @@ class ImportResourcesFileEntity extends Entity {
     this._referenceTag = tag;
   }
 
-  // ==================================================
-  // Associated properties getters / setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Associated properties getters / setters
+   * ==================================================
+   */
 
   /**
    * Get the collection of resources to import
@@ -327,7 +335,7 @@ class ImportResourcesFileEntity extends Entity {
    * @param {array} collection The collection of errors
    */
   set importResourcesErrors(errors) {
-    if (typeof errors !== "array") {
+    if (Array.isArray(errors)) {
       throw new TypeError("importResourcesErrors must be a valid array");
     }
     this._import_resources_errors = errors;
@@ -346,15 +354,17 @@ class ImportResourcesFileEntity extends Entity {
    * @param {array} collection The list of errors
    */
   set importFoldersErrors(errors) {
-    if (typeof errors !== "array") {
+    if (Array.isArray(errors)) {
       throw new TypeError("importFoldersErrors must be a valid array");
     }
     this._import_folders_errors = errors;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
 
   /**
    * ImportResourcesFileEntity.ENTITY_NAME
@@ -372,7 +382,7 @@ class ImportResourcesFileEntity extends Entity {
     return [
       ImportResourcesFileEntity.FILE_TYPE_CSV,
       ImportResourcesFileEntity.FILE_TYPE_KDBX,
-    ]
+    ];
   }
 
   /**

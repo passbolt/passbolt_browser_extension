@@ -32,4 +32,4 @@ async function getById(id) {
 exports.BrowserTabService = {
   getCurrent: getCurrent,
   getById: getById,
-}
+};

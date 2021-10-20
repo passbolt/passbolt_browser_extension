@@ -11,7 +11,7 @@ const {ResourceInProgressCacheService} = require("../service/cache/resourceInPro
 const {User} = require('../model/user');
 const {SecretDecryptController} = require('../controller/secret/secretDecryptController');
 
-const listen = function (worker) {
+const listen = function(worker) {
   /*
    * Use a resource on the current tab.
    *
@@ -19,7 +19,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param resourceId {uuid} The resource identifier
    */
-  worker.port.on('passbolt.quickaccess.use-resource-on-current-tab', async function (requestId, resourceId, tabId) {
+  worker.port.on('passbolt.quickaccess.use-resource-on-current-tab', async(requestId, resourceId, tabId) => {
     let tab;
     if (!worker.port) {
       const err = new Error(i18n.t('Inactive worker on the page.'));
@@ -31,7 +31,7 @@ const listen = function (worker) {
         const err = new Error(i18n.t('Autofill failed. Could not find the active tab.'));
         worker.port.emit(requestId, 'ERROR', err);
       }
-    } catch(error) {
+    } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }
 
@@ -66,7 +66,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param tabId {string} The tab id
    */
-  worker.port.on('passbolt.quickaccess.prepare-resource', async function (requestId, tabId) {
+  worker.port.on('passbolt.quickaccess.prepare-resource', async(requestId, tabId) => {
     try {
       const resourceInProgress = ResourceInProgressCacheService.consume();
       if (resourceInProgress === null) {
@@ -74,7 +74,7 @@ const listen = function (worker) {
         const tab = tabId ? await BrowserTabService.getById(tabId) : await BrowserTabService.getCurrent();
         const name = tab.title;
         const uri = tab.url;
-        worker.port.emit(requestId, 'SUCCESS', {name, uri});
+        worker.port.emit(requestId, 'SUCCESS', {name: name, uri: uri});
       } else {
         worker.port.emit(requestId, 'SUCCESS', resourceInProgress);
       }
@@ -90,7 +90,7 @@ const listen = function (worker) {
    * @listens passbolt.resources.prepare-autosave
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.quickaccess.prepare-autosave', async function (requestId) {
+  worker.port.on('passbolt.quickaccess.prepare-autosave', async requestId => {
     try {
       const resourceInProgress = ResourceInProgressCacheService.consume() || {};
       worker.port.emit(requestId, 'SUCCESS', resourceInProgress);
@@ -106,7 +106,7 @@ const listen = function (worker) {
    * @listens passbolt.quickaccess.update-window-height
    * @param height {int} the height to apply
    */
-  worker.port.on('passbolt.quickaccess.update-window-height', async function (height) {
+  worker.port.on('passbolt.quickaccess.update-window-height', async height => {
     try {
       const quickAccessTab = await BrowserTabService.getById(worker.tab.id);
       browser.windows.update(quickAccessTab.windowId, {height: height + 30});
@@ -114,7 +114,6 @@ const listen = function (worker) {
       console.error(error);
     }
   });
-
 };
 
 exports.listen = listen;

@@ -41,10 +41,10 @@ describe("Secret entity", () => {
   it("constructor returns validation error if dto required fields are missing", () => {
     try {
       new SecretEntity({});
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.details).toEqual( {
-        data: { required: 'The data is required.' }
+      expect(error.details).toEqual({
+        data: {required: 'The data is required.'}
       });
     }
   });
@@ -58,13 +58,13 @@ describe("Secret entity", () => {
         "resource_id": "💥‍",
       });
       expect(false).toBe(true);
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        id: { format: 'The id is not a valid uuid.' },
-        user_id: { format: 'The user_id is not a valid uuid.' },
-        resource_id: { format: 'The resource_id is not a valid uuid.' },
-        data: { type: 'The data is not a valid string.' }
+        id: {format: 'The id is not a valid uuid.'},
+        user_id: {format: 'The user_id is not a valid uuid.'},
+        resource_id: {format: 'The resource_id is not a valid uuid.'},
+        data: {type: 'The data is not a valid string.'}
       });
     }
   });

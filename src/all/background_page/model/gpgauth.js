@@ -27,7 +27,6 @@ const {AuthStatusLocalStorage} = require('../service/local_storage/authStatusLoc
 
 const URL_VERIFY = '/auth/verify.json?api-version=v2';
 const URL_LOGIN = '/auth/login.json?api-version=v2';
-const URL_LOGOUT = '/auth/logout.json?api-version=v2';
 const CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD = 60000;
 const MAX_IS_AUTHENTICATED_INTERVAL_PERIOD = 2147483647;
 
@@ -70,17 +69,17 @@ class GpgAuth {
    * @returns {Promise<void>}
    */
   async verify(serverUrl, armoredServerKey, userFingerprint) {
-    let domain = serverUrl || this.getDomain();
-    let serverKey = armoredServerKey || this.keyring.findPublic(Uuid.get(domain)).key;
-    let fingerprint = userFingerprint || this.keyring.findPrivate().fingerprint;
+    const domain = serverUrl || this.getDomain();
+    const serverKey = armoredServerKey || this.keyring.findPublic(Uuid.get(domain)).key;
+    const fingerprint = userFingerprint || this.keyring.findPrivate().fingerprint;
 
     // Encrypt a random token
     let encrypted, originalToken;
     try {
       originalToken = new GpgAuthToken();
-      encrypted = await this.crypto.encrypt(originalToken.token, serverKey)
+      encrypted = await this.crypto.encrypt(originalToken.token, serverKey);
     } catch (error) {
-      throw new Error('Unable to encrypt the verify token.' + ' ' + error.message);
+      throw new Error(`Unable to encrypt the verify token. ${error.message}`);
     }
 
     // Prepare the request data
@@ -89,7 +88,7 @@ class GpgAuth {
     data.append('data[gpg_auth][server_verify_token]', encrypted);
 
     // Send the data
-    let fetchOptions = {
+    const fetchOptions = {
       method: 'POST',
       credentials: 'include',
       body: data
@@ -99,11 +98,11 @@ class GpgAuth {
 
     // If the server responded with an error build a relevant message
     if (!response.ok) {
-      let json = await response.json();
+      const json = await response.json();
       if (typeof json.header !== 'undefined') {
         throw new Error(json.header.message);
       } else {
-        const msg = 'Server request failed without providing additional information.' + ' (' + response.status + '';
+        const msg = `Server request failed (${response.status}) without providing additional information.`;
         throw new Error(msg);
       }
     }
@@ -124,7 +123,7 @@ class GpgAuth {
     const remoteKey = await this.getServerKey();
     const localKey = await this.getServerKeyFromKeyring();
     return remoteKey.keydata.trim() !== localKey.trim();
-  };
+  }
 
   /**
    * Get Server key from keyring
@@ -152,7 +151,7 @@ class GpgAuth {
    * @returns {Promise.<string>}
    */
   async getServerKey(serverUrl) {
-    let domain = serverUrl || this.getDomain();
+    const domain = serverUrl || this.getDomain();
     const response = await fetch(domain + URL_VERIFY, {
       method: 'GET',
       credentials: 'include'
@@ -207,10 +206,10 @@ class GpgAuth {
 
     // Try to decrypt the User Auth Token
     const encryptedUserAuthToken = stripslashes(urldecode(auth.headers['x-gpgauth-user-auth-token']));
-    let userAuthToken = await this.crypto.decryptWithKey(encryptedUserAuthToken, privateKey);
+    const userAuthToken = await this.crypto.decryptWithKey(encryptedUserAuthToken, privateKey);
 
     // Validate the User Auth Token
-    let authToken = new GpgAuthToken(userAuthToken);
+    const authToken = new GpgAuthToken(userAuthToken);
     return authToken.token;
   }
 
@@ -306,8 +305,10 @@ class GpgAuth {
       requestApi: true
     }, options);
 
-    // No request to API required, return the latest stored information.
-    // Check in the local storage if any
+    /*
+     * No request to API required, return the latest stored information.
+     * Check in the local storage if any
+     */
     if (!options.requestApi) {
       try {
         const storedStatus = await AuthStatusLocalStorage.get();
@@ -315,9 +316,11 @@ class GpgAuth {
           this.authStatus = storedStatus;
           return this.authStatus;
         }
-      } catch(error) {
-        // Nothing found, check with the API
-        // continue...
+      } catch (error) {
+        /*
+         * Nothing found, check with the API
+         * continue...
+         */
       }
     }
 
@@ -333,10 +336,10 @@ class GpgAuth {
       }
     }
 
-    this.authStatus = {isAuthenticated, isMfaRequired};
+    this.authStatus = {isAuthenticated: isAuthenticated, isMfaRequired: isMfaRequired};
     await AuthStatusLocalStorage.set(isAuthenticated, isMfaRequired);
     return this.authStatus;
-  };
+  }
 
   /**
    * Start an invertval to check if the user is authenticated.
@@ -351,7 +354,7 @@ class GpgAuth {
       clearTimeout(this.checkAuthStatusTimeout);
     }
 
-    this.checkAuthStatusTimeout = setTimeout(async () => {
+    this.checkAuthStatusTimeout = setTimeout(async() => {
       if (!await this.isAuthenticated()) {
         window.dispatchEvent(new Event('passbolt.auth.after-logout'));
       } else {
@@ -375,8 +378,10 @@ class GpgAuth {
   async getCheckAuthStatusTimeoutPeriod() {
     let timeoutPeriod = CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD;
 
-    // The entry point available before v2.11.0 extends the session expiry period.
-    // Define the check interval based on the server session timeout.
+    /*
+     * The entry point available before v2.11.0 extends the session expiry period.
+     * Define the check interval based on the server session timeout.
+     */
     if (AuthService.useLegacyIsAuthenticatedEntryPoint === true) {
       const domain = User.getInstance().settings.getDomain();
       const apiClientOptions = (new ApiClientOptions()).setBaseUrl(domain);
@@ -384,13 +389,17 @@ class GpgAuth {
       const settings = await organizationSettingsModel.getOrFind();
       // By default a default php session expires after 24 min.
       let sessionTimeout = 24;
-      // Check if the session timeout is provided in the settings.
-      // If not provided it means the user is not logged in or the MFA is required.
+      /*
+       * Check if the session timeout is provided in the settings.
+       * If not provided it means the user is not logged in or the MFA is required.
+       */
       if (settings && settings.app && settings.app.session_timeout) {
         sessionTimeout = settings.app.session_timeout;
       }
-      // Convert the timeout in millisecond and add 1 second to ensure the session is well expired
-      // when the request is made.
+      /*
+       * Convert the timeout in millisecond and add 1 second to ensure the session is well expired
+       * when the request is made.
+       */
       timeoutPeriod = ((sessionTimeout * 60) + 1) * 1000;
 
       // Fix https://github.com/passbolt/passbolt_browser_extension/issues/84
@@ -403,7 +412,7 @@ class GpgAuth {
     }
 
     return timeoutPeriod;
-  };
+  }
 }
 // Exports the Authentication model object.
 exports.GpgAuth = GpgAuth;

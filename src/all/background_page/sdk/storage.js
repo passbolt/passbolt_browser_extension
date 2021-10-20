@@ -11,12 +11,14 @@ function LocalStorage() {
 }
 
 LocalStorage.prototype.init = function() {
-  var _this = this;
-  // Load the passbolt local storage.
-  // Data are serialized in the local storage.
-  return new Promise (function(resolve, reject) {
-    _this._storage.get('_passbolt_data', function(items) {
-      if( typeof chrome.runtime.lastError !== 'undefined' && chrome.runtime.lastError !== null) {
+  const _this = this;
+  /*
+   * Load the passbolt local storage.
+   * Data are serialized in the local storage.
+   */
+  return new Promise((resolve, reject) => {
+    _this._storage.get('_passbolt_data', items => {
+      if (typeof chrome.runtime.lastError !== 'undefined' && chrome.runtime.lastError !== null) {
         reject(chrome.runtime.lastError);
       } else {
         if (typeof items._passbolt_data !== 'undefined') {
@@ -32,9 +34,9 @@ LocalStorage.prototype.init = function() {
  * Save cached _data into chrome.storage
  * @private
  */
-LocalStorage.prototype._store = function () {
-  this._storage.set({'_passbolt_data': this._data}, function() {
-    if( typeof chrome.runtime.lastError !== 'undefined' && chrome.runtime.lastError !== null) {
+LocalStorage.prototype._store = function() {
+  this._storage.set({'_passbolt_data': this._data}, () => {
+    if (typeof chrome.runtime.lastError !== 'undefined' && chrome.runtime.lastError !== null) {
       console.error(chrome.runtime.lastError.message);
     }
   });
@@ -47,8 +49,8 @@ LocalStorage.prototype._store = function () {
  * @param key string
  * @returns {*} or null
  */
-LocalStorage.prototype.getItem = function (key) {
-  var item = this._data[key];
+LocalStorage.prototype.getItem = function(key) {
+  const item = this._data[key];
   if (typeof item === 'undefined') {
     return null;
   }
@@ -60,7 +62,7 @@ LocalStorage.prototype.getItem = function (key) {
  * @param key
  * @param value
  */
-LocalStorage.prototype.setItem = function (key, value) {
+LocalStorage.prototype.setItem = function(key, value) {
   this._data[key] = value;
   this._store();
 };
@@ -69,7 +71,7 @@ LocalStorage.prototype.setItem = function (key, value) {
  * Remove an item
  * @param keyStr
  */
-LocalStorage.prototype.removeItem = function (key, subkey) {
+LocalStorage.prototype.removeItem = function(key, subkey) {
   if (typeof subkey === 'undefined') {
     delete this._data[key];
   } else {
@@ -79,5 +81,5 @@ LocalStorage.prototype.removeItem = function (key, subkey) {
 };
 
 exports.LocalStorage = LocalStorage;
-var storage = new LocalStorage();
+const storage = new LocalStorage();
 exports.storage = storage;

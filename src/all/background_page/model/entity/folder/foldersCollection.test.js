@@ -131,8 +131,8 @@ describe("Folders collection entity", () => {
         "folder_parent_id": "e2172205-139c-4e4b-a03a-933528123fff"
       }
     ];
-    let folderCollection = new FoldersCollection(dto);
-    let folders = JSON.parse(JSON.stringify(folderCollection));
+    const folderCollection = new FoldersCollection(dto);
+    const folders = JSON.parse(JSON.stringify(folderCollection));
     expect(folders[0].permissions[0].user.profile.first_name).toBe('Ada');
     expect(folders[0].permissions[0].user.profile.avatar.id).toBe('5426cb53-d909-40eb-9202-38f2c1f94084');
     expect(folders[0].permissions[1].group.name).toBe('Leadership team');
@@ -140,13 +140,13 @@ describe("Folders collection entity", () => {
 
   it("getAllChildren works", () => {
     /*
-         folder
-          - folder
-         folder0
-          - folder1
-          - folder2
-             - folder3
-               - folder4
+     *folder
+     * - folder
+     *folder0
+     * - folder1
+     * - folder2
+     *    - folder3
+     *      - folder4
      */
     const dto = [{
       "id": "e2172205-139c-4e4b-a03a-933528123fff",
@@ -206,7 +206,7 @@ describe("Folders collection entity", () => {
 
     // Test multi id select via static method call
     let outputCollection = new FoldersCollection([]);
-    let parentIds = ['e2172205-139c-4e4b-a03a-933528123f03','e2172205-139c-4e4b-a03a-933528123f00'];
+    const parentIds = ['e2172205-139c-4e4b-a03a-933528123f03', 'e2172205-139c-4e4b-a03a-933528123f00'];
     parentIds.forEach(parentId => {
       outputCollection = FoldersCollection.getAllChildren(parentId, collection, outputCollection);
     });
@@ -245,11 +245,13 @@ describe("Folders collection entity", () => {
   });
 
   it("getFolderPath works", () => {
-    // folder001
-    //    folder011
-    //       folder 111
-    //    folder012
-    // folder002
+    /*
+     * folder001
+     *    folder011
+     *       folder 111
+     *    folder012
+     * folder002
+     */
     const dto1 = [{
       "id": "e2172205-139c-4e4b-a03a-933528123001",
       "folder_parent_id": null,
@@ -275,7 +277,7 @@ describe("Folders collection entity", () => {
     let path;
 
     path = collection.getFolderPath(null);
-    expect(path).toEqual('/')
+    expect(path).toEqual('/');
 
     path = collection.getFolderPath('e2172205-139c-4e4b-a03a-933528123001');
     expect(path).toEqual('/folder001');
@@ -284,6 +286,6 @@ describe("Folders collection entity", () => {
     expect(path).toEqual('/folder001/folder011');
 
     path = collection.getFolderPath('e2172205-139c-4e4b-a03a-933528123111');
-    expect(path).toEqual('/folder001/folder011/folder111')
+    expect(path).toEqual('/folder001/folder011/folder111');
   });
 });

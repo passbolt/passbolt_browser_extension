@@ -35,8 +35,10 @@ class SecretsCollection extends EntityCollection {
       SecretsCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(secret => {
       this.push(new SecretEntity(secret));
     });
@@ -54,7 +56,7 @@ class SecretsCollection extends EntityCollection {
     return {
       "type": "array",
       "items": SecretEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -65,9 +67,11 @@ class SecretsCollection extends EntityCollection {
     return this._items;
   }
 
-  // ==================================================
-  // Assertions
-  // ==================================================
+  /*
+   * ==================================================
+   * Assertions
+   * ==================================================
+   */
   /**
    * Assert there is no other secret with the same id in the collection
    *
@@ -78,8 +82,9 @@ class SecretsCollection extends EntityCollection {
     if (!secret.id) {
       return;
     }
-    if (this.items.some((item, index) => item.id === secret.id)) {
-      throw new EntityCollectionError(index, SecretsCollection.RULE_UNIQUE_ID, `Secret id ${secret.id} already exists.`);
+    const collectionErrorIndex = this.items.findIndex(item => item.id === secret.id);
+    if (collectionErrorIndex !== -1) {
+      throw new EntityCollectionError(collectionErrorIndex, SecretsCollection.RULE_UNIQUE_ID, `Secret id ${secret.id} already exists.`);
     }
   }
 
@@ -94,14 +99,17 @@ class SecretsCollection extends EntityCollection {
       return;
     }
 
-    if (this.items.some((item, index) => item.resourceId === secret.resourceId && item.userId === secret.userId)) {
-      throw new EntityCollectionError(index, SecretsCollection.RULE_UNIQUE_USER_ID, `Secret for user id ${secret.userId} and resource id ${secret.resourceId} already exists.`);
+    const collectionErrorIndex = this.items.findIndex(item => item.resourceId === secret.resourceId && item.userId === secret.userId);
+    if (collectionErrorIndex !== -1) {
+      throw new EntityCollectionError(collectionErrorIndex, SecretsCollection.RULE_UNIQUE_USER_ID, `Secret for user id ${secret.userId} and resource id ${secret.resourceId} already exists.`);
     }
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the secret to the list
    * @param {object} secret DTO or SecretEntity
@@ -122,9 +130,11 @@ class SecretsCollection extends EntityCollection {
     super.push(secretEntity);
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
   /**
    * SecretsCollection.ENTITY_NAME
    * @returns {string}

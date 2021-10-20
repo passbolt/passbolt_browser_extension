@@ -31,7 +31,7 @@ describe("User delete transfer entity", () => {
       managers: [{
         group_id: '47787831-f9c2-4edc-a27f-06978ac18406',
         id: '0c17f5e3-2f28-4697-9e7b-4e4943ec546a'
-      },{
+      }, {
         group_id: '47787831-f9c2-4edc-a27f-06978ac18405',
         id: '0c17f5e3-2f28-4697-9e7b-4e4943ec5465'
       }]
@@ -66,23 +66,21 @@ describe("User delete transfer entity", () => {
     expect(userDeleteTransfer.owners.length).toBe(1);
     expect(userDeleteTransfer.owners.items[0].id).toBe('898ce1d0-601f-5194-976b-147a680dd472');
     expect(userDeleteTransfer.owners.items[0].acoForeignKey).toBe('8e3874ae-4b40-590b-968a-418f704b9d9a');
-
   });
 
   it("constructor works fails if not enough data is provided", () => {
     let t;
-    t = () => {new UserDeleteTransferEntity({})};
+    t = () => { new UserDeleteTransferEntity({}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new UserDeleteTransferEntity({owners: []})};
+    t = () => { new UserDeleteTransferEntity({owners: []}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new UserDeleteTransferEntity({owners: [{}]})};
+    t = () => { new UserDeleteTransferEntity({owners: [{}]}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new UserDeleteTransferEntity({owners: [{id: '898ce1d0-601f-5194-976b-147a680dd472'}]})};
+    t = () => { new UserDeleteTransferEntity({owners: [{id: '898ce1d0-601f-5194-976b-147a680dd472'}]}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new UserDeleteTransferEntity({managers: []})};
+    t = () => { new UserDeleteTransferEntity({managers: []}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new UserDeleteTransferEntity({managers: [{id: '898ce1d0-601f-5194-976b-147a680dd472'}]})};
+    t = () => { new UserDeleteTransferEntity({managers: [{id: '898ce1d0-601f-5194-976b-147a680dd472'}]}); };
     expect(t).toThrow(EntityValidationError);
   });
-
 });

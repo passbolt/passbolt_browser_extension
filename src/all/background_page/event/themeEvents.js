@@ -14,14 +14,14 @@ const {User} = require('../model/user');
 const {ThemeModel} = require("../model/theme/themeModel");
 const {ChangeThemeEntity} = require("../model/entity/theme/change/ChangeThemeEntity");
 
-const listen = async function (worker) {
+const listen = async function(worker) {
   /*
    * Find all themes
    *
    * @listens passbolt.themes.find-all
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.themes.find-all', async function (requestId) {
+  worker.port.on('passbolt.themes.find-all', async requestId => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const themeModel = new ThemeModel(clientOptions);
@@ -39,11 +39,11 @@ const listen = async function (worker) {
    * @listens passbolt.themes.change
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.themes.change', async function (requestId, name) {
+  worker.port.on('passbolt.themes.change', async(requestId, name) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const themeModel = new ThemeModel(clientOptions);
-      const changeThemeEntity = new ChangeThemeEntity({name});
+      const changeThemeEntity = new ChangeThemeEntity({name: name});
       await themeModel.change(changeThemeEntity);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
@@ -51,6 +51,6 @@ const listen = async function (worker) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
-}
+};
 
 exports.listen = listen;

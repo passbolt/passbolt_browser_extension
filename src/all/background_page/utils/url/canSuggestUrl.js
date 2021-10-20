@@ -99,7 +99,7 @@ function canSuggestUrl(url, suggestedUrl) {
  *   port: {integer}
  * }
  */
-const parseSuggestedUrl = function (suggestedUrl) {
+const parseSuggestedUrl = function(suggestedUrl) {
   let suggestedUrlObject;
   let protocol = "";
   let hostname = "";
@@ -132,7 +132,7 @@ const parseSuggestedUrl = function (suggestedUrl) {
     hostname = suggestedUrlObject.hostname;
   }
 
-  return {protocol, hostname, port};
+  return {protocol: protocol, hostname: hostname, port: port};
 };
 
 // Hostname allowed characters regex
@@ -155,7 +155,7 @@ const regexHostnameAllowedChars = XRegExp('^[\\p{L}\\p{N}.-]*$');
  * @param {string} hostname The hostname to check if it is a child.
  * @return {boolean}
  */
-const isParentHostname = function (parent, child) {
+const isParentHostname = function(parent, child) {
   if (!child || !parent || !regexHostnameAllowedChars.test(child) || !regexHostnameAllowedChars.test(parent)
   ) {
     return false;
@@ -177,7 +177,7 @@ const isParentHostname = function (parent, child) {
        * recognize it as passbolt.com.
        */
       if (child[lastIndexOf - 1] === undefined || child[lastIndexOf - 1] === '.') {
-        return true
+        return true;
       }
     }
   }

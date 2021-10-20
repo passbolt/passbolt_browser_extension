@@ -60,20 +60,20 @@ describe("Resource Type entity", () => {
   });
 
   it("constructor returns validation error if dto required fields are missing", () => {
-    let t = () => {new ResourceTypeEntity({'id':'7f077753-0835-4054-92ee-556660ea04f1', 'slug':'test'});};
+    let t = () => { new ResourceTypeEntity({'id': '7f077753-0835-4054-92ee-556660ea04f1', 'slug': 'test'}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new ResourceTypeEntity({'id':'7f077753-0835-4054-92ee-556660ea04f1', 'name':'test'});};
+    t = () => { new ResourceTypeEntity({'id': '7f077753-0835-4054-92ee-556660ea04f1', 'name': 'test'}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new ResourceTypeEntity({'name':'test', 'slug':'test'});};
+    t = () => { new ResourceTypeEntity({'name': 'test', 'slug': 'test'}); };
     expect(t).toThrow(EntityValidationError);
   });
 
   it("constructor returns validation error if dto fields are invalid", () => {
-    let t = () => {new ResourceTypeEntity({'id':'nope', 'name': 'test', 'slug': 'test'});};
+    let t = () => { new ResourceTypeEntity({'id': 'nope', 'name': 'test', 'slug': 'test'}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new ResourceTypeEntity({'id':'nope', 'name':  Array(255).join("a"), 'slug': 'test'});};
+    t = () => { new ResourceTypeEntity({'id': 'nope', 'name': Array(255).join("a"), 'slug': 'test'}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new ResourceTypeEntity({'id':'7f077753-0835-4054-92ee-556660ea04f1', 'name': 'test', 'slug': 'test', 'description': Array(257).join("a") });};
+    t = () => { new ResourceTypeEntity({'id': '7f077753-0835-4054-92ee-556660ea04f1', 'name': 'test', 'slug': 'test', 'description': Array(257).join("a")}); };
     expect(t).toThrow(EntityValidationError);
   });
 });

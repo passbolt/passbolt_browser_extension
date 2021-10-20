@@ -63,7 +63,6 @@ class AuthService extends AbstractService {
         throw error;
       }
     }
-
   }
 
   /**
@@ -85,8 +84,8 @@ class AuthService extends AbstractService {
     const {keydata, fingerprint} = data;
     return {
       armored_key: keydata,
-      fingerprint
-    }
+      fingerprint: fingerprint
+    };
   }
 
   /**
@@ -117,8 +116,10 @@ class AuthService extends AbstractService {
     try {
       responseJson = await response.json();
     } catch (error) {
-      // If the response cannot be parsed, it's not a Passbolt API response.
-      // It can be a for example a proxy timeout error (504).
+      /*
+       * If the response cannot be parsed, it's not a Passbolt API response.
+       * It can be a for example a proxy timeout error (504).
+       */
       throw new PassboltBadResponseError();
     }
 

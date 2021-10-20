@@ -55,19 +55,21 @@ class GroupUpdateDryRunResultEntity extends Entity {
         "secrets": SecretsCollection.getSchema(),
         "needed_secrets": NeededSecretsCollection.getSchema()
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
 
   /**
    * Return a DTO ready to be sent to API
    * @returns {*}
    */
   toDto() {
-    let result = Object.assign({}, this._props);
+    const result = Object.assign({}, this._props);
     if (this._secrets) {
       result.secrets = this._secrets.toDto();
     }
@@ -85,9 +87,11 @@ class GroupUpdateDryRunResultEntity extends Entity {
     return this.toDto();
   }
 
-  // ==================================================
-  // Other associated properties methods
-  // ==================================================
+  /*
+   * ==================================================
+   * Other associated properties methods
+   * ==================================================
+   */
 
   /**
    * Return secrets
@@ -105,9 +109,11 @@ class GroupUpdateDryRunResultEntity extends Entity {
     return this._needed_secrets || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
 
   /**
    * GroupEntity.ENTITY_NAME

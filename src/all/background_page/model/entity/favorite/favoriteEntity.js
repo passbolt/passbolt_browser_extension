@@ -59,25 +59,31 @@ class FavoriteEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
-        // "foreign_model": {
-        //   "type": "string",
-        //   "enum": FavoriteEntity.ALLOWED_FOREIGN_MODELS
-        // },
+        /*
+         * "foreign_model": {
+         *   "type": "string",
+         *   "enum": FavoriteEntity.ALLOWED_FOREIGN_MODELS
+         * },
+         */
         "created": {
           "type": "string",
           "format": "date-time"
         },
-        // "modified": {
-        //   "type": "string",
-        //   "format": "date-time"
-        // }
+        /*
+         * "modified": {
+         *   "type": "string",
+         *   "format": "date-time"
+         * }
+         */
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get favorite id
    * @returns {string} uuid
@@ -126,9 +132,11 @@ class FavoriteEntity extends Entity {
     return this._props.modified || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * FavoriteEntity.ENTITY_NAME
    * @returns {string}
@@ -141,7 +149,7 @@ class FavoriteEntity extends Entity {
    * FavoriteEntity.FAVORITE_RESOURCE
    * @returns {string} resource
    */
-  static get FAVORITE_RESOURCE () {
+  static get FAVORITE_RESOURCE() {
     return FAVORITE_RESOURCE;
   }
 

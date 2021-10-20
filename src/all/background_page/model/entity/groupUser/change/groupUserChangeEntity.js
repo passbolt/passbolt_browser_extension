@@ -71,8 +71,8 @@ class GroupUserChangeEntity extends Entity {
     if (!groupUser || !(groupUser instanceof GroupUserEntity)) {
       throw new TypeError('GroupUserChangeEntity createFromGroupUser expect a GroupUser entity.');
     }
-    let changeDto = {};
-    switch(operation) {
+    const changeDto = {};
+    switch (operation) {
       case GroupUserChangeEntity.GROUP_USER_CHANGE_CREATE:
         if (!groupUser.userId) {
           throw new TypeError('GroupUserChangeEntity createFromGroupUser update expect a group user user_id.');
@@ -102,9 +102,11 @@ class GroupUserChangeEntity extends Entity {
     return new GroupUserChangeEntity(changeDto);
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
 
   /**
    * Get group user id
@@ -155,9 +157,11 @@ class GroupUserChangeEntity extends Entity {
     return GroupUserChangeEntity.GROUP_USER_CHANGE_UPDATE;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
 
   /**
    * GroupUserChangeEntity.ENTITY_NAME

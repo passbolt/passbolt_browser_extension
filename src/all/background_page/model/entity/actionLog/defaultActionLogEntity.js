@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {EntitySchema} = require('../abstract/entitySchema');
-const {EntityValidationError} = require('../abstract/entityValidationError');
 const {AbstractActionLogEntity} = require("./abstractActionLogEntity");
 
 const ENTITY_NAME = 'DefaultActionLog';
@@ -31,9 +30,11 @@ class DefaultActionLogEntity extends AbstractActionLogEntity {
     ));
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
 
   /**
    * ActionLog.ENTITY_NAME

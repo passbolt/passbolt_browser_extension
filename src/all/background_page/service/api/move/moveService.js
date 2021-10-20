@@ -52,7 +52,7 @@ class MoveService extends AbstractService {
 
     if (entity instanceof FolderEntity) {
       foreignModel = MOVE_SERVICE_FOREIGN_MODEL_FOLDER;
-    } else if(entity instanceof ResourceEntity) {
+    } else if (entity instanceof ResourceEntity) {
       foreignModel = MOVE_SERVICE_FOREIGN_MODEL_RESOURCE;
     } else {
       throw new TypeError("The entity must be a FolderEntity or a ResourceEntity");

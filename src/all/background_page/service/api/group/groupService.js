@@ -192,9 +192,11 @@ class GroupService extends AbstractService {
     return response.body;
   }
 
-  // ========================================================================
-  // CRASSETTES
-  // ========================================================================
+  /*
+   * ========================================================================
+   * CRASSETTES
+   * ========================================================================
+   */
   /**
    * @deprecated should be removed when v2.14 support is dropped
    * @param {undefined|Object} data
@@ -205,12 +207,12 @@ class GroupService extends AbstractService {
       return undefined;
     }
     const groups_users = [];
-    for (let g of data.groups_users) {
+    for (const g of data.groups_users) {
       const group_user =  {};
-      if (g.hasOwnProperty('user_id')) {
+      if (Object.prototype.hasOwnProperty.call(g, 'user_id')) {
         group_user.user_id = g.user_id;
       }
-      if (g.hasOwnProperty('is_admin')) {
+      if (Object.prototype.hasOwnProperty.call(g, 'is_admin')) {
         group_user.is_admin = g.is_admin ? 1 : 0;
       }
       groups_users.push({'GroupUser': group_user});
@@ -230,9 +232,11 @@ class GroupService extends AbstractService {
     if (!contain) {
       return undefined;
     }
-    // Remap for compatibility reason
-    // groups_users => group_user
-    if (contain.hasOwnProperty('groups_users')) {
+    /*
+     * Remap for compatibility reason
+     * groups_users => group_user
+     */
+    if (Object.prototype.hasOwnProperty.call(contain, 'groups_users')) {
       if (typeof contain.groups_users === 'boolean') {
         contain.group_user = contain.groups_users;
       } else {
@@ -261,7 +265,7 @@ class GroupService extends AbstractService {
       needed_secrets = data.SecretsNeeded.map(mapLegacyNeededSecret);
     }
 
-    return {secrets, needed_secrets};
+    return {secrets: secrets, needed_secrets: needed_secrets};
   }
 }
 

@@ -31,14 +31,14 @@ function setIcon(path) {
  * Set the browser extension icon in an active mode
  */
 function activate() {
-  setIcon( '/icons/icon-32.png');
+  setIcon('/icons/icon-32.png');
 }
 
 /**
  * Set the browser extension icon in an inactive mode
  */
 function deactivate() {
-  setIcon( '/icons/icon-32-signout.png');
+  setIcon('/icons/icon-32-signout.png');
 }
 
 /**
@@ -63,4 +63,4 @@ exports.BrowserExtensionIconService = {
   activate: activate,
   deactivate: deactivate,
   setSuggestedResourcesCount: setSuggestedResourcesCount
-}
+};

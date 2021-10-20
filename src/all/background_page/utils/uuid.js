@@ -1,4 +1,4 @@
-"use strict";
+
 /**
  * UUID Generator
  *
@@ -12,10 +12,10 @@ const randomBytes = require('../sdk/random').randomBytes;
  * @param size {int} The desired random text size.
  * @returns {string}
  */
-function generateRandomHex (size) {
-  let i, text = '';
-  let possible = 'ABCDEF0123456789';
-  let random_array = randomBytes(size);
+function generateRandomHex(size) {
+  let i; let text = '';
+  const possible = 'ABCDEF0123456789';
+  const random_array = randomBytes(size);
   for (i = size; i > 0; i--) {
     text += possible.charAt(Math.floor(random_array[i] % possible.length));
   }
@@ -28,7 +28,7 @@ function generateRandomHex (size) {
  *  based on its sha1 hashed
  * @returns {string}
  */
-const get = function (seed) {
+const get = function(seed) {
   let hashStr;
 
   // Generate a random hash if no seed is provided
@@ -36,13 +36,13 @@ const get = function (seed) {
     hashStr = generateRandomHex(32);
   } else {
     // Create SHA hash from seed.
-    let shaObj = new jsSHA('SHA-1', 'TEXT');
+    const shaObj = new jsSHA('SHA-1', 'TEXT');
     shaObj.update(seed);
     hashStr = shaObj.getHash('HEX').substring(0, 32);
   }
   // Build a uuid based on the hash
-  let search = XRegExp('^(?<first>.{8})(?<second>.{4})(?<third>.{1})(?<fourth>.{3})(?<fifth>.{1})(?<sixth>.{3})(?<seventh>.{12}$)');
-  let replace = XRegExp('${first}-${second}-3${fourth}-a${sixth}-${seventh}');
+  const search = XRegExp('^(?<first>.{8})(?<second>.{4})(?<third>.{1})(?<fourth>.{3})(?<fifth>.{1})(?<sixth>.{3})(?<seventh>.{12}$)');
+  const replace = XRegExp('${first}-${second}-3${fourth}-a${sixth}-${seventh}');
 
   // Replace regexp by corresponding mask, and remove / character at each side of the result.
   return XRegExp.replace(hashStr, search, replace).replace(/\//g, '');

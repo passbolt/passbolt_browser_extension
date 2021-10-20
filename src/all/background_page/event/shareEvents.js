@@ -6,7 +6,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const Worker = require('../model/worker');
 const {User} = require('../model/user');
 const {Share} = require('../model/share');
 const {ResourceModel} = require('../model/resource/resourceModel');
@@ -18,13 +17,13 @@ const {PermissionChangesCollection} = require('../model/entity/permission/change
 const {ShareResourcesController} = require('../controller/share/shareResourcesController');
 const {ShareFoldersController} = require('../controller/share/shareFoldersController');
 
-const listen = function (worker) {
+const listen = function(worker) {
   /*
    * Search aros based on keywords.
    * @listens passbolt.share.search-aros
    * @param keywords {string} The keywords to search
    */
-  worker.port.on('passbolt.share.search-aros', async function (requestId, keywords, resourcesForLegacyApi) {
+  worker.port.on('passbolt.share.search-aros', async(requestId, keywords, resourcesForLegacyApi) => {
     let aros;
     try {
       aros = await Share.searchAros(keywords);
@@ -44,13 +43,13 @@ const listen = function (worker) {
    * @listens passbolt.share.get-resources
    * @param {array} resourcesIds The ids of the resources to retrieve.
    */
-  worker.port.on('passbolt.share.get-resources', async function (requestId, resourcesIds) {
+  worker.port.on('passbolt.share.get-resources', async(requestId, resourcesIds) => {
     try {
-      let apiClientOptions = await User.getInstance().getApiClientOptions();
-      let resourceModel = new ResourceModel(apiClientOptions);
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const resourceModel = new ResourceModel(apiClientOptions);
       const resourcesCollection = await resourceModel.findAllForShare(resourcesIds);
       worker.port.emit(requestId, 'SUCCESS', resourcesCollection);
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
@@ -61,10 +60,10 @@ const listen = function (worker) {
    * @listens passbolt.share.get-folders
    * @param {array} foldersIds The ids of the folders to retrieve.
    */
-  worker.port.on('passbolt.share.get-folders', async function (requestId, foldersIds) {
+  worker.port.on('passbolt.share.get-folders', async(requestId, foldersIds) => {
     try {
-      let apiClientOptions = await User.getInstance().getApiClientOptions();
-      let folderModel = new FolderModel(apiClientOptions);
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const folderModel = new FolderModel(apiClientOptions);
       const foldersCollection = await folderModel.findAllForShare(foldersIds);
       worker.port.emit(requestId, 'SUCCESS', foldersCollection);
     } catch (error) {
@@ -78,7 +77,7 @@ const listen = function (worker) {
    * @listens passbolt.share.submit
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.share.resources.save', async function (requestId, resources, changes) {
+  worker.port.on('passbolt.share.resources.save', async(requestId, resources, changes) => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const shareResourcesController = new ShareResourcesController(worker, requestId, apiClientOptions);
@@ -95,7 +94,7 @@ const listen = function (worker) {
    * @listens passbolt.share.folders.save
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.share.folders.save', async function (requestId, foldersDto, changesDto) {
+  worker.port.on('passbolt.share.folders.save', async(requestId, foldersDto, changesDto) => {
     try {
       const folders = new FoldersCollection(foldersDto);
       const permissionChanges = new PermissionChangesCollection(changesDto);

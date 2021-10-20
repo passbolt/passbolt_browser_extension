@@ -53,11 +53,11 @@ describe("Logged user entity", () => {
 
   it("constructor works fails if not enough data is provided", () => {
     let t;
-    t = () => {new LoggedUserEntity({})};
+    t = () => { new LoggedUserEntity({}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new LoggedUserEntity({id: "f848277c-5398-58f8-a82a-72397af2d450"})};
+    t = () => { new LoggedUserEntity({id: "f848277c-5398-58f8-a82a-72397af2d450"}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new LoggedUserEntity({id: "f848277c-5398-58f8-a82a-72397af2d450", "username": "ada@passbolt.com"})};
+    t = () => { new LoggedUserEntity({id: "f848277c-5398-58f8-a82a-72397af2d450", "username": "ada@passbolt.com"}); };
     expect(t).toThrow(EntityValidationError);
   });
 });

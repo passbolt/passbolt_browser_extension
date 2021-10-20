@@ -13,7 +13,6 @@
  */
 const {Entity} = require('../../abstract/entity');
 const {EntitySchema} = require('../../abstract/entitySchema');
-const {EntityValidationError} = require('../../abstract/entityValidationError');
 
 const ENTITY_NAME = 'NeededSecret';
 
@@ -54,12 +53,14 @@ class NeededSecretEntity extends Entity {
           "format": "uuid"
         }
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
 
   /**
    * Get needed secret user id
@@ -77,9 +78,11 @@ class NeededSecretEntity extends Entity {
     return this._props.resource_id;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
 
   /**
    * NeededSecretEntity.ENTITY_NAME

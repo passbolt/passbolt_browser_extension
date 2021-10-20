@@ -38,9 +38,9 @@ describe("Update subscription entity", () => {
   it("constructor returns validation error if dto required fields are missing", () => {
     try {
       new UpdateSubscriptionEntity({});
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.details).toEqual( {
+      expect(error.details).toEqual({
         data: {required: 'The data is required.'}
       });
     }
@@ -51,10 +51,10 @@ describe("Update subscription entity", () => {
       new UpdateSubscriptionEntity({
         "data": []
       });
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        data: { type: 'The data is not a valid string.' },
+        data: {type: 'The data is not a valid string.'},
       });
     }
   });

@@ -21,16 +21,15 @@ const {AuthenticationEventController} = require("../controller/auth/authenticati
  * @param worker
  */
 const listen = function(worker) {
-
   const authenticationEventController = new AuthenticationEventController(worker);
   authenticationEventController.startListen();
 
- /*
-  * Whenever the the in-form call-to-action status is required
-  * @listens passbolt.in-form-cta.check-status
-  * @param requestId {uuid} The request identifier
-  * @returns {*{isAuthenticated,isMfaRequired}
-  */
+  /*
+   * Whenever the the in-form call-to-action status is required
+   * @listens passbolt.in-form-cta.check-status
+   * @param requestId {uuid} The request identifier
+   * @returns {*{isAuthenticated,isMfaRequired}
+   */
   worker.port.on('passbolt.in-form-cta.check-status', async requestId => {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const informCallToActionController = new InformCallToActionController(worker, apiClientOptions);

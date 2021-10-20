@@ -76,16 +76,16 @@ class PermissionChangeEntity extends Entity {
     if (!permission || !(permission instanceof PermissionEntity)) {
       throw new TypeError('PermissionChangeEntity createFromPermission expect a permission entity.');
     }
-    let changeDto = {
+    const changeDto = {
       aco: permission.aco,
       aro: permission.aro,
       aco_foreign_key: permission.acoForeignKey,
       aro_foreign_key: permission.aroForeignKey,
       type: permission.type,
     };
-    switch(operation) {
+    switch (operation) {
       case PermissionChangeEntity.PERMISSION_CHANGE_CREATE:
-          // nothing to do
+        // nothing to do
         break;
       case PermissionChangeEntity.PERMISSION_CHANGE_UPDATE:
         if (!permission.id) {
@@ -106,9 +106,11 @@ class PermissionChangeEntity extends Entity {
     return new PermissionChangeEntity(changeDto);
   }
 
-  // ==================================================
-  // Copy
-  // ==================================================
+  /*
+   * ==================================================
+   * Copy
+   * ==================================================
+   */
   /**
    * Create a permission change to be used by another aco
    * Useful for example when you want to reuse a permission from a folder
@@ -128,9 +130,11 @@ class PermissionChangeEntity extends Entity {
     });
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get permission id
    * @returns {(string|null)} uuid if set
@@ -204,9 +208,11 @@ class PermissionChangeEntity extends Entity {
     return PermissionChangeEntity.PERMISSION_CHANGE_UPDATE;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * PermissionEntity.ENTITY_NAME
    * @returns {string}

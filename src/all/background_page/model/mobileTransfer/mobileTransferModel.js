@@ -58,7 +58,6 @@ class MobileTransferModel {
     const transferDto = await this.mobileTransferService.update(transferEntity.id, transferEntity.toDto());
     return new TransferEntity(transferDto);
   }
-
 }
 
 exports.MobileTransferModel = MobileTransferModel;

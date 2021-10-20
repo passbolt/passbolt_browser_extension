@@ -110,7 +110,7 @@ class SetupController {
 
     try {
       keyInfo = await this.keyring.keyInfo(armoredKey);
-    } catch(error) {
+    } catch (error) {
       throw new GpgKeyError(i18n.t('The key must be a valid private key.'));
     }
     if (!keyInfo.private) {
@@ -151,16 +151,16 @@ class SetupController {
    * @returns {Promise<void>}
    */
   async verifyPassphrase(passphrase, rememberUntilLogout) {
-    let privateKey = (await openpgp.key.readArmored(this.setupEntity.userPrivateArmoredKey)).keys[0];
+    const privateKey = (await openpgp.key.readArmored(this.setupEntity.userPrivateArmoredKey)).keys[0];
     try {
       await privateKey.decrypt(passphrase);
-    } catch(error) {
+    } catch (error) {
       throw new InvalidMasterPasswordError();
     }
     // Store the user passphrase to login in after the setup operation.
     this.setupEntity.passphrase = passphrase;
-    if (rememberUntilLogout){
-      this.setupEntity.rememberUntilLogout = rememberUntilLogout
+    if (rememberUntilLogout) {
+      this.setupEntity.rememberUntilLogout = rememberUntilLogout;
     }
   }
 
@@ -193,7 +193,7 @@ class SetupController {
    */
   async redirectToApp() {
     const url = this.setupEntity.domain;
-    chrome.tabs.update(this.worker.tab.id, {url});
+    chrome.tabs.update(this.worker.tab.id, {url: url});
   }
 }
 

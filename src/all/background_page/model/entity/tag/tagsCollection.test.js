@@ -55,26 +55,28 @@ describe("Tag entity", () => {
     };
     const dto = [tag1, tag1];
 
-    let t = () => {new TagsCollection(dto)};
+    const t = () => { new TagsCollection(dto); };
     expect(t).toThrow(EntityCollectionError);
   });
 
-  // it("constructor fails if reusing same slug", () => {
-  //   const tag1 = {
-  //     "id": "45ce85c9-e301-4de2-8b41-298507002861",
-  //     "slug": 'tag1',
-  //     "is_shared": false,
-  //   };
-  //   const tag2 = {
-  //     "id": "45ce85c9-e301-4de2-8b41-298507002862",
-  //     "slug": 'tag1',
-  //     "is_shared": false,
-  //   };
-  //   const dto = [tag1, tag2];
-  //
-  //   let t = () => {new TagsCollection(dto)};
-  //   expect(t).toThrow(EntityCollectionError);
-  // });
+  /*
+   * it("constructor fails if reusing same slug", () => {
+   *   const tag1 = {
+   *     "id": "45ce85c9-e301-4de2-8b41-298507002861",
+   *     "slug": 'tag1',
+   *     "is_shared": false,
+   *   };
+   *   const tag2 = {
+   *     "id": "45ce85c9-e301-4de2-8b41-298507002862",
+   *     "slug": 'tag1',
+   *     "is_shared": false,
+   *   };
+   *   const dto = [tag1, tag2];
+   *
+   *   let t = () => {new TagsCollection(dto)};
+   *   expect(t).toThrow(EntityCollectionError);
+   * });
+   */
 
   it("constructor fails if reusing same id", () => {
     const tag1 = {
@@ -89,7 +91,7 @@ describe("Tag entity", () => {
     };
     const dto = [tag1, tag2];
 
-    let t = () => {new TagsCollection(dto)};
+    const t = () => { new TagsCollection(dto); };
     expect(t).toThrow(EntityCollectionError);
   });
 
@@ -108,7 +110,7 @@ describe("Tag entity", () => {
       "id": "45ce85c9-e301-4de2-8b41-298507002863",
       "slug": 'tag3',
       "is_shared": false,
-    }
+    };
     const dto = [tag1, tag2, tag3];
     const collection = new TagsCollection(dto);
     expect(collection.length).toBe(3);
@@ -147,7 +149,7 @@ describe("Tag entity", () => {
       "slug": 'updated',
       "is_shared": false}))).toBe(true);
     expect(collection.items[0].slug).toBe('updated');
-    expect(collection.items[1].slug).toBe('tag2')
+    expect(collection.items[1].slug).toBe('tag2');
     expect(collection.length).toBe(2);
     expect(collection.replaceTag("45ce85c9-e301-4de2-8b41-298507002860", new TagEntity({
       "id": "45ce85c9-e301-4de2-8b41-298507002860",

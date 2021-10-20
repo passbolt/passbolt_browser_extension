@@ -13,7 +13,7 @@
 const {ActionLogModel} = require("../model/actionLog/actionLogModel");
 const {User} = require('../model/user');
 
-const listen = async function (worker) {
+const listen = async function(worker) {
   /*
    * Find all action logs for a given instance
    *
@@ -21,7 +21,7 @@ const listen = async function (worker) {
    * @param requestId {uuid} The request identifier
    * @param options {object} The options to apply to the find
    */
-  worker.port.on('passbolt.actionlogs.find-all-for', async function (requestId, foreignModel, foreignId, options) {
+  worker.port.on('passbolt.actionlogs.find-all-for', async(requestId, foreignModel, foreignId, options) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const actionLogModel = new ActionLogModel(clientOptions);
@@ -33,6 +33,6 @@ const listen = async function (worker) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
-}
+};
 
 exports.listen = listen;

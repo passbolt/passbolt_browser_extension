@@ -12,7 +12,6 @@
  */
 const {Entity} = require('../../abstract/entity');
 const {EntitySchema} = require('../../abstract/entitySchema');
-const {EntityValidationError} = require('../../abstract/entityValidationError');
 const {PermissionEntity} = require("../permissionEntity");
 const {LoggedUserEntity} = require("../../user/actionLog/loggedUserEntity");
 const {GroupEntity} = require("../../group/groupEntity");
@@ -72,7 +71,7 @@ class UpdatedPermissionEntity extends Entity {
         "user": LoggedUserEntity.getSchema(),
         "group": GroupEntity.getSchema()
       }
-    }
+    };
   }
 
   /**
@@ -81,7 +80,7 @@ class UpdatedPermissionEntity extends Entity {
    * @returns {*}
    */
   toDto(contain) {
-    let result = Object.assign({}, this._props);
+    const result = Object.assign({}, this._props);
     if (!contain) {
       return result;
     }
@@ -113,9 +112,11 @@ class UpdatedPermissionEntity extends Entity {
     return this.toDto(UpdatedPermissionEntity.ALL_CONTAIN_OPTIONS);
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get id
    * @returns {(string|null)} uuid
@@ -132,9 +133,11 @@ class UpdatedPermissionEntity extends Entity {
     return this._props.type;
   }
 
-  // ==================================================
-  // Other associated properties methods
-  // ==================================================
+  /*
+   * ==================================================
+   * Other associated properties methods
+   * ==================================================
+   */
 
   /**
    * Get the user.
@@ -152,9 +155,11 @@ class UpdatedPermissionEntity extends Entity {
     return this._group || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
 
   /**
    * UpdatedPermissionEntity.ENTITY_NAME

@@ -15,31 +15,31 @@ import {EntityValidationError} from "./entityValidationError";
 
 describe("EntityValidationError", () => {
   it("addErrors throw exception if property is not a string", () => {
-    let t = () => {
-      let e = new EntityValidationError('placeholder message');
+    const t = () => {
+      const e = new EntityValidationError('placeholder message');
       e.addError(null, null, null);
     };
     expect(t).toThrow(TypeError);
   });
 
   it("addErrors throw exception if rule is not a string", () => {
-    let t = () => {
-      let e = new EntityValidationError('placeholder message');
+    const t = () => {
+      const e = new EntityValidationError('placeholder message');
       e.addError('prop', null, null);
     };
     expect(t).toThrow(TypeError);
   });
 
   it("addErrors throw exception if message is not a string", () => {
-    let t = () => {
-      let e = new EntityValidationError('placeholder message');
+    const t = () => {
+      const e = new EntityValidationError('placeholder message');
       e.addError('prop', 'rule', null);
     };
     expect(t).toThrow(TypeError);
   });
 
   it("addErrors add exception details", () => {
-    let e = new EntityValidationError('placeholder message');
+    const e = new EntityValidationError('placeholder message');
     e.addError('prop1', 'rule1', 'message1');
     e.addError('prop2', 'rule1', 'message1');
     e.addError('prop1', 'rule2', 'message2');

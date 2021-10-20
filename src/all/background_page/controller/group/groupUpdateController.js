@@ -122,7 +122,7 @@ class GroupsUpdateController {
   async encryptSecrets(privateKey, neededSecretsCollection, decryptedSecrets) {
     const secrets = new SecretsCollection([]);
     const items = neededSecretsCollection.items;
-    for (let i in items) {
+    for (const i in items) {
       const neededSecret = items[i];
       const resourceId = neededSecret.resourceId;
       const userId = neededSecret.userId;
@@ -147,7 +147,7 @@ class GroupsUpdateController {
   async decryptSecrets(privateKey, secretsCollection) {
     const result = [];
     const items = secretsCollection.items;
-    for (let i in items) {
+    for (const i in items) {
       const secret = items[i];
       progressController.update(this.worker, this.progress++, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
       result[secret.resourceId] = await this.crypto.decryptWithKey(secret.data, privateKey);

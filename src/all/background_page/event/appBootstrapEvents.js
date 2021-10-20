@@ -13,21 +13,21 @@
 const {User} = require('../model/user');
 const {AuthModel} = require("../model/auth/authModel");
 
-const listen = function (worker) {
+const listen = function(worker) {
   /*
    * Navigate to logout
    *
    * @listens passbolt.app-boostrap.navigate-to-logout
    * @deprecated will be removed with v4. Helps to support legacy appjs logout.
    */
-  worker.port.on('passbolt.app-boostrap.navigate-to-logout', async function () {
+  worker.port.on('passbolt.app-boostrap.navigate-to-logout', async() => {
     const user = User.getInstance();
     const apiClientOptions = await user.getApiClientOptions();
     const auth = new AuthModel(apiClientOptions);
     const url = `${user.settings.getDomain()}/auth/logout`;
 
     try {
-      await chrome.tabs.update(worker.tab.id, {url});
+      await chrome.tabs.update(worker.tab.id, {url: url});
       await auth.postLogout();
     } catch (error) {
       console.error(error);

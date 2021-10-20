@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-const {PassboltApiFetchError} = require("../../error/passboltApiFetchError");
 const {PassboltSubscriptionError} = require("../../error/passboltSubscriptionError");
 const {SubscriptionEntity} = require("../entity/subscription/subscriptionEntity");
 const {SubscriptionService} = require("../../service/api/subscription/subscriptionService");
@@ -27,9 +26,11 @@ class SubscriptionModel {
     this.subscriptionService = new SubscriptionService(apiClientOptions);
   }
 
-  //==============================================================
-  // Finders / remote calls
-  //==============================================================
+  /*
+   * ==============================================================
+   *  Finders / remote calls
+   * ==============================================================
+   */
 
   /**
    * Find the subscription
@@ -44,15 +45,17 @@ class SubscriptionModel {
       const isPaymentRequired = error.data && error.data.code === 402;
       if (isPaymentRequired) {
         const subscription = new SubscriptionEntity(error.data.body);
-        throw new PassboltSubscriptionError(error.message, subscription)
+        throw new PassboltSubscriptionError(error.message, subscription);
       }
       throw error;
     }
   }
 
-  //==============================================================
-  // CRUD
-  //==============================================================
+  /*
+   * ==============================================================
+   *  CRUD
+   * ==============================================================
+   */
 
   /**
    * Update the subscription
@@ -68,7 +71,7 @@ class SubscriptionModel {
       const isPaymentRequired = error.data && error.data.code === 402;
       if (isPaymentRequired) {
         const subscription = new SubscriptionEntity(error.data.body);
-        throw new PassboltSubscriptionError(error.message, subscription)
+        throw new PassboltSubscriptionError(error.message, subscription);
       }
       throw error;
     }

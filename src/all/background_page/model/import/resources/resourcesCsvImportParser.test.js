@@ -47,7 +47,7 @@ describe("ResourcesCsvImportParser", () => {
 
   it("should read import file encoded in base64", () => {
     const csv = "Title,Username,URL,Password,Notes,Group\n" +
-      "Password 1,Username 1,https://url1.com,Password 1,Description 1,\n"
+      "Password 1,Username 1,https://url1.com,Password 1,Description 1,\n";
     const importDto = {
       "ref": "import-ref",
       "file_type": "csv",
@@ -66,12 +66,12 @@ describe("ResourcesCsvImportParser", () => {
     };
     expect(data).toEqual(expect.arrayContaining([csvRow]));
     const csvFields = ['Title', 'Username', 'URL', 'Password', 'Notes', 'Group'];
-    expect(fields).toEqual(expect.arrayContaining(csvFields))
+    expect(fields).toEqual(expect.arrayContaining(csvFields));
   });
 
   it("should determine row parser to use", () => {
     const csv = "Title,Username,URL,Password,Notes,Group\n" +
-      "Password 1,Username 1,https://url1.com,Password 1,Description 1,\n"
+      "Password 1,Username 1,https://url1.com,Password 1,Description 1,\n";
     const importDto = {
       "ref": "import-ref",
       "file_type": "csv",
@@ -79,12 +79,12 @@ describe("ResourcesCsvImportParser", () => {
     };
     const importEntity = new ImportResourcesFileEntity(importDto);
     const importer = new ResourcesCsvImportParser(importEntity);
-    const {data, fields} = importer.readCsv();
+    const {fields} = importer.readCsv();
     const RowParser = importer.getRowParser(fields);
     expect(RowParser).toEqual(CsvKdbxRowParser);
   });
 
-  it("should throw an error if no row parser is identified", async () => {
+  it("should throw an error if no row parser is identified", async() => {
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-not-protected.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
@@ -121,7 +121,7 @@ describe("ResourcesCsvImportParser", () => {
     }, data);
   }
 
-  it("should parse resources", async () => {
+  it("should parse resources", async() => {
     const csv = "Title,Username,URL,Password,Notes,Group\n" +
       "Password 1,username1,https://url1.com,Secret 1,Description 1,\n" +
       "Password 2,username2,https://url2.com,Secret 2,Description 2,\n";
@@ -141,7 +141,7 @@ describe("ResourcesCsvImportParser", () => {
     expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource2Dto]));
   });
 
-  it("should parse resources and folders", async () => {
+  it("should parse resources and folders", async() => {
     const csv = "Title,Username,URL,Password,Notes,Group\n" +
       // The algorithm should create the missing folders in the path if they have not been created yet, Folder 1 here
       "Password 1,username1,https://url1.com,Secret 1,Description 1,Folder 1/Folder 2\n" +
@@ -189,7 +189,7 @@ describe("ResourcesCsvImportParser", () => {
     expect(importEntity.importFolders.toJSON()).toEqual(expect.arrayContaining([folder1Dto]));
   });
 
-  it("should be able to parse an empty row", async () => {
+  it("should be able to parse an empty row", async() => {
     const csv = "Title,Username,URL,Password,Notes,Group\n" +
       ",,,,,\n";
     const importDto = {
@@ -210,7 +210,7 @@ describe("ResourcesCsvImportParser", () => {
     expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([expectedResourceDto]));
   });
 
-  it("should catch and keep a reference of import resource entity validation error", async () => {
+  it("should catch and keep a reference of import resource entity validation error", async() => {
     const name = "too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name";
     const csv = "Title,Username,URL,Password,Notes,Group\n" +
       `${name},,,,,\n`;
@@ -225,7 +225,7 @@ describe("ResourcesCsvImportParser", () => {
 
     expect(importEntity.importResources.items).toHaveLength(0);
     expect(importEntity.importResourcesErrors).toHaveLength(1);
-    let error = importEntity.importResourcesErrors[0];
+    const error = importEntity.importResourcesErrors[0];
     expect(error).toBeInstanceOf(ImportError);
     expect(error.sourceError).toBeInstanceOf(EntityValidationError);
     expect(error.sourceError.details).toHaveProperty("name");
@@ -233,7 +233,7 @@ describe("ResourcesCsvImportParser", () => {
     expect(error.data.Title).toEqual(resourceName);
   });
 
-  it("should catch and keep a reference of import folder entity validation error", async () => {
+  it("should catch and keep a reference of import folder entity validation error", async() => {
     const path = "too-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-name";
     const csv = "Title,Username,URL,Password,Notes,Group\n" +
       `,,,,,${path}\n`;
@@ -252,7 +252,7 @@ describe("ResourcesCsvImportParser", () => {
 
     expect(importEntity.importFolders.items).toHaveLength(1); // The folder relative to the import reference
     expect(importEntity.importFoldersErrors).toHaveLength(1);
-    let error = importEntity.importFoldersErrors[0];
+    const error = importEntity.importFoldersErrors[0];
     expect(error).toBeInstanceOf(ImportError);
     expect(error.sourceError).toBeInstanceOf(EntityValidationError);
     expect(error.sourceError.details).toHaveProperty("name");

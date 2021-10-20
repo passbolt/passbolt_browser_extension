@@ -17,10 +17,10 @@ const app = require('../app');
  * This pagemod help bootstrap the first step of the recover process from a passbolt server app page
  * The pattern for this url, driving the recover bootstrap, is defined in config.json
  */
-const Recover = function () {};
+const Recover = function() {};
 Recover._pageMod = undefined;
 
-Recover.init = function () {
+Recover.init = function() {
   if (typeof Recover._pageMod !== 'undefined') {
     Recover._pageMod.destroy();
     Recover._pageMod = undefined;
@@ -31,10 +31,12 @@ Recover.init = function () {
     include: 'about:blank?passbolt=passbolt-iframe-recover',
     contentScriptWhen: 'ready',
     contentScriptFile: [
-			// Warning: script and styles need to be modified in
-			// chrome/data/passbolt-iframe-recover.html
-		],
-    onAttach: function (worker) {
+      /*
+       * Warning: script and styles need to be modified in
+       * chrome/data/passbolt-iframe-recover.html
+       */
+    ],
+    onAttach: function(worker) {
       app.events.config.listen(worker);
       app.events.recover.listen(worker);
 

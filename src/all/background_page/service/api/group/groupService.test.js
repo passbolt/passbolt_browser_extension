@@ -46,14 +46,14 @@ describe("Group entity", () => {
     let v2 = {
       'modifier': true,
       'groups_users': true
-    }
+    };
     let v1 = {
       'modifier': true,
       'group_user': true
-    }
+    };
     expect(GroupService.remapLegacyContain(v2)).toEqual(v1);
-    v2 = {groups_users: { user: {profile: true}}}
-    v1 = {group_user: { user: {profile: true}}}
+    v2 = {groups_users: {user: {profile: true}}};
+    v1 = {group_user: {user: {profile: true}}};
     expect(GroupService.remapLegacyContain(v2)).toEqual(v1);
   });
 });

@@ -62,11 +62,13 @@ class GroupUserEntity extends Entity {
           "type": "string",
           "format": "date-time"
         }
-        // NO ASSOCIATIONS
-        // users or groups are omitted
-        // to avoid circular dependencies
+        /*
+         * NO ASSOCIATIONS
+         * users or groups are omitted
+         * to avoid circular dependencies
+         */
       }
-    }
+    };
   }
 
   /**
@@ -77,9 +79,11 @@ class GroupUserEntity extends Entity {
     return Object.assign({}, this._props);
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get groupUser id
    * @returns {(string|null)} uuid
@@ -120,9 +124,11 @@ class GroupUserEntity extends Entity {
     return this._props.created || null;
   }
 
-  // ==================================================
-  // Dynamic properties setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties setters
+   * ==================================================
+   */
 
   /**
    * Set the group user id
@@ -137,9 +143,11 @@ class GroupUserEntity extends Entity {
     this._props.id = id;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * GroupUserEntity.ENTITY_NAME
    * @returns {string}

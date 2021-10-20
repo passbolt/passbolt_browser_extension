@@ -4,12 +4,11 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var BrowserSettings = require('../controller/browserSettingsController');
-var Config = require('../model/config');
-var User = require('../model/user').User;
+const BrowserSettings = require('../controller/browserSettingsController');
+const Config = require('../model/config');
+const User = require('../model/user').User;
 
-var listen = function (worker) {
-
+const listen = function(worker) {
   /*
    * Read configuration variable.
    *
@@ -17,7 +16,7 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param name {string} Variable name to obtain
    */
-  worker.port.on('passbolt.config.read', function (requestId, name) {
+  worker.port.on('passbolt.config.read', (requestId, name) => {
     worker.port.emit(requestId, 'SUCCESS', Config.read(name));
   });
 
@@ -28,9 +27,9 @@ var listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param names {array} Variable names to obtain
    */
-  worker.port.on('passbolt.config.readAll', function (requestId, names) {
-    var conf = {};
-    for (var i in names) {
+  worker.port.on('passbolt.config.readAll', (requestId, names) => {
+    const conf = {};
+    for (const i in names) {
       conf[names[i]] = Config.read(names[i]);
     }
     worker.port.emit(requestId, 'SUCCESS', conf);
@@ -42,8 +41,8 @@ var listen = function (worker) {
    * @listens passbolt.addon.is-configured
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.is-configured', function (requestId) {
-    var user = User.getInstance();
+  worker.port.on('passbolt.addon.is-configured', requestId => {
+    const user = User.getInstance();
     worker.port.emit(requestId, 'SUCCESS', user.isValid());
   });
 
@@ -54,13 +53,13 @@ var listen = function (worker) {
    * @listens passbolt.addon.check-domain
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.check-domain', function (requestId) {
-    var trustedDomain = Config.read('user.settings.trustedDomain');
-    if(typeof trustedDomain === 'undefined' || trustedDomain == '') {
+  worker.port.on('passbolt.addon.check-domain', requestId => {
+    const trustedDomain = Config.read('user.settings.trustedDomain');
+    if (typeof trustedDomain === 'undefined' || trustedDomain == '') {
       worker.port.emit(requestId, 'SUCCESS', false);
     }
 
-    var domainOk = worker.tab.url.startsWith(trustedDomain);
+    const domainOk = worker.tab.url.startsWith(trustedDomain);
     worker.port.emit(requestId, 'SUCCESS', domainOk);
   });
 
@@ -70,8 +69,8 @@ var listen = function (worker) {
    * @listens passbolt.addon.get-domain
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.get-domain', function (requestId) {
-    var trustedDomain = Config.read('user.settings.trustedDomain');
+  worker.port.on('passbolt.addon.get-domain', requestId => {
+    const trustedDomain = Config.read('user.settings.trustedDomain');
     worker.port.emit(requestId, 'SUCCESS', trustedDomain);
   });
 
@@ -81,7 +80,7 @@ var listen = function (worker) {
    * @listens passbolt.addon.get-version
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.get-version', function (requestId) {
+  worker.port.on('passbolt.addon.get-version', requestId => {
     worker.port.emit(requestId, 'SUCCESS', BrowserSettings.getExtensionVersion());
   });
 
@@ -91,9 +90,8 @@ var listen = function (worker) {
    * @listens passbolt.addon.get-url
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.get-url', function (requestId) {
+  worker.port.on('passbolt.addon.get-url', requestId => {
     worker.port.emit(requestId, 'SUCCESS', chrome.runtime.getURL(''));
   });
-
 };
 exports.listen = listen;

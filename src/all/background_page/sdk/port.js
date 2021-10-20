@@ -6,9 +6,9 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 require('../error/error.js');
-var Log = require('../model/log').Log;
+const Log = require('../model/log').Log;
 
-var Port = function(port) {
+const Port = function(port) {
   this._port = port;
 };
 
@@ -19,15 +19,15 @@ var Port = function(port) {
  * @param callback
  */
 Port.prototype.on = function(msgName, callback) {
-  var _this = this;
-  this._port.onMessage.addListener(function (json) {
-    var msg = JSON.parse(json);
-    var args = Object.keys(msg).map(function (key) {return msg[key]});
+  const _this = this;
+  this._port.onMessage.addListener(json => {
+    const msg = JSON.parse(json);
+    let args = Object.keys(msg).map(key => msg[key]);
     args = Array.prototype.slice.call(args, 1);
     if (msg[0] === msgName) {
       // TODO create list of blacklisted events
-      if(msgName !== 'passbolt.auth.is-authenticated') {
-        Log.write({level: 'debug', message: 'Port on @ message: ' + msgName});
+      if (msgName !== 'passbolt.auth.is-authenticated') {
+        Log.write({level: 'debug', message: `Port on @ message: ${msgName}`});
       }
       callback.apply(_this, args);
     }
@@ -41,9 +41,9 @@ Port.prototype.on = function(msgName, callback) {
  * @param token uuid
  * @param status SUCCESS | ERROR
  */
-Port.prototype.emit = function () {
+Port.prototype.emit = function() {
   const message = arguments[1] || arguments[0];
-  Log.write({level: 'debug', message: 'Port emit @ message: ' + message});
+  Log.write({level: 'debug', message: `Port emit @ message: ${message}`});
   const args = Array.prototype.slice.call(arguments)
     .map(arg => (arg && typeof arg.toJSON === "function") ? arg.toJSON() : arg);
   this._port.postMessage(args);
@@ -56,7 +56,7 @@ Port.prototype.emit = function () {
  * @param token uuid
  * @param status SUCCESS | ERROR
  */
-Port.prototype.emitQuiet = function () {
+Port.prototype.emitQuiet = function() {
   const args = Array.prototype.slice.call(arguments)
     .map(arg => (arg && typeof arg.toJSON === "function") ? arg.toJSON() : arg);
   this._port.postMessage(args);
@@ -67,8 +67,8 @@ Port.prototype.emitQuiet = function () {
  *
  * @param {string} message
  */
-Port.prototype.request = async function (message) {
-  Log.write({level: 'debug', message: 'Port request @ message: ' + arguments[1]});
+Port.prototype.request = async function(message) {
+  Log.write({level: 'debug', message: `Port request @ message: ${arguments[1]}`});
   // The generated requestId used to identify the request.
   const requestId = (Math.round(Math.random() * Math.pow(2, 32))).toString();
   // Add the requestId to the request parameters.
@@ -79,8 +79,7 @@ Port.prototype.request = async function (message) {
       const responseArgs = Array.prototype.slice.call(arguments, 1);
       if (status === 'SUCCESS') {
         resolve.apply(null, responseArgs);
-      }
-      else if (status === 'ERROR') {
+      } else if (status === 'ERROR') {
         reject.apply(null, responseArgs);
       }
     });
@@ -95,7 +94,7 @@ Port.prototype.request = async function (message) {
  */
 Port.prototype.onDisconnect = function(callback) {
   this._port.onDisconnect.addListener(() => {
-    callback()
+    callback();
   });
 };
 

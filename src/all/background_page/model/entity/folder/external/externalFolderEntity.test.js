@@ -33,7 +33,7 @@ describe("ExternalFolderEntity", () => {
     const result = {
       "name": "folder",
       "folder_parent_path": ""
-    }
+    };
     const entity = new ExternalFolderEntity(dto);
     expect(entity.toDto()).toEqual(result);
     expect(entity.name).toEqual("folder");
@@ -93,11 +93,11 @@ describe("ExternalFolderEntity", () => {
   });
 
   it("changeRootPath change the folder root path", () => {
-    const rootFolder = new ExternalFolderEntity({"name": "root"})
+    const rootFolder = new ExternalFolderEntity({"name": "root"});
     const folder = new ExternalFolderEntity({"name": "Folder 1"});
-    folder.changeRootPath(rootFolder)
+    folder.changeRootPath(rootFolder);
     expect(folder.folderParentPath).toEqual("root");
-    folder.changeRootPath(rootFolder)
+    folder.changeRootPath(rootFolder);
     expect(folder.folderParentPath).toEqual("root/root");
   });
 
@@ -111,7 +111,7 @@ describe("ExternalFolderEntity", () => {
       "/  / Root / /// / DatabaseCC / /": ["/  / Root / /", "/ / DatabaseCC / /"],
     };
 
-    for (let rawPath in pathToTestAndResult) {
+    for (const rawPath in pathToTestAndResult) {
       const sanitizedPath = ExternalFolderEntity.splitFolderPath(rawPath);
       const expectedResult = pathToTestAndResult[rawPath];
       expect(sanitizedPath).toEqual(expectedResult);
@@ -120,15 +120,15 @@ describe("ExternalFolderEntity", () => {
 
   it("should escape folder name by adding spaces around '/'", () => {
     const nameToTestAndResult = {
-      "Root":"Root",
-      " Root ":"Root",
+      "Root": "Root",
+      " Root ": "Root",
       "Réseau avocat/Vidéo": "Réseau avocat / Vidéo",
       "Réseau avocat / Vidéo": "Réseau avocat  /  Vidéo",
       "///": "/  /  /",
       "/test/test/": "/ test / test /",
     };
 
-    for (let rawName in nameToTestAndResult) {
+    for (const rawName in nameToTestAndResult) {
       const sanitizedPath = ExternalFolderEntity.escapeName(rawName);
       const expectedResult = nameToTestAndResult[rawName];
       expect(sanitizedPath).toEqual(expectedResult);
@@ -146,7 +146,7 @@ describe("ExternalFolderEntity", () => {
       "  / te / st /  ": " /te/st/ ",
     };
 
-    for (let rawName in nameToTestAndResult) {
+    for (const rawName in nameToTestAndResult) {
       const sanitizedPath = ExternalFolderEntity.resolveEscapedName(rawName);
       const expectedResult = nameToTestAndResult[rawName];
       expect(sanitizedPath).toEqual(expectedResult);
@@ -154,7 +154,6 @@ describe("ExternalFolderEntity", () => {
   });
 
   it("should give the right depth when paths have '/' in folder name", () => {
-
     const pathToTestAndResult = {
       "Root": 1,
       "Root /": 1,
@@ -167,8 +166,8 @@ describe("ExternalFolderEntity", () => {
       "/  / Root / /// / DatabaseCC / /": 2,
     };
 
-    for (let rawPath in pathToTestAndResult) {
-      const externalFolder = new ExternalFolderEntity({name:"test", folder_parent_path: rawPath})
+    for (const rawPath in pathToTestAndResult) {
+      const externalFolder = new ExternalFolderEntity({name: "test", folder_parent_path: rawPath});
       const expectedResult = pathToTestAndResult[rawPath];
       expect(externalFolder.depth).toEqual(expectedResult);
     }

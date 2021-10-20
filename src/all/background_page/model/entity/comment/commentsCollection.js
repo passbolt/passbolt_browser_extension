@@ -35,8 +35,10 @@ class CommentsCollection extends EntityCollection {
       CommentsCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(comment => {
       this.push(new CommentEntity(comment));
     });
@@ -54,7 +56,7 @@ class CommentsCollection extends EntityCollection {
     return {
       "type": "array",
       "items": CommentEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -92,9 +94,11 @@ class CommentsCollection extends EntityCollection {
     return this._items.map(r => r.foreignKey);
   }
 
-  // ==================================================
-  // Assertions
-  // ==================================================
+  /*
+   * ==================================================
+   * Assertions
+   * ==================================================
+   */
   /**
    * Assert there is no other comment with the same id in the collection
    *
@@ -107,8 +111,8 @@ class CommentsCollection extends EntityCollection {
     }
     const length = this.comments.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingComment = this.comments[i];
+    for (; i < length; i++) {
+      const existingComment = this.comments[i];
       if (existingComment.id && existingComment.id === commentEntity.id) {
         throw new EntityCollectionError(i, CommentsCollection.RULE_UNIQUE_ID, `Comment id ${commentEntity.id} already exists.`);
       }
@@ -133,9 +137,11 @@ class CommentsCollection extends EntityCollection {
     }
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the comment to the list
    * @param {object} comment DTO or CommentEntity
@@ -165,9 +171,11 @@ class CommentsCollection extends EntityCollection {
     this.items.splice(i, 1);
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
   /**
    * CommentsCollection.ENTITY_NAME
    * @returns {string}

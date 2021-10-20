@@ -12,7 +12,7 @@
 /**
  * The class that deals with keys.
  */
-var Key = function () {
+const Key = function() {
   // Key data.
   this._key = {
     algorithm: '',
@@ -33,15 +33,18 @@ var Key = function () {
  * @throw Error if the field is not valid
  * @private
  */
-Key.prototype.__validate = function (field, value) {
+Key.prototype.__validate = function(field, value) {
+  const supportedAlgorithms = [
+    "RSA-DSA"
+  ];
+  const supportedLength = [
+    "2048"
+  ];
   switch (field) {
     case 'algorithm':
       if (typeof value === 'undefined' || value === '') {
         throw new Error('The key algorithm cannot be empty');
       }
-      var supportedAlgorithms = [
-        "RSA-DSA"
-      ];
       if (supportedAlgorithms.indexOf(value) == -1) {
         throw new Error('The key algorithm selected is not supported');
       }
@@ -50,9 +53,6 @@ Key.prototype.__validate = function (field, value) {
       if (typeof value === 'undefined' || value === '') {
         throw new Error('The length cannot be empty');
       }
-      var supportedLength = [
-        "2048"
-      ];
       if (supportedLength.indexOf(value) == -1) {
         throw new Error('The key length selected is not supported');
       }
@@ -78,7 +78,7 @@ Key.prototype.__validate = function (field, value) {
       break;
     case 'userId' :
       if (!Validator.matches(value, /^[0-9A-Za-z\u00C0-\u017F\-' ]+ (\(\[0-9A-Za-z\u00C0-\u017F\-' ]+\)? (<[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}>){1})$/i)) {
-        throw new Error('The userId should follow a correct format ' + value);
+        throw new Error(`The userId should follow a correct format ${value}`);
       }
       break;
     case 'passphrase' :
@@ -87,8 +87,7 @@ Key.prototype.__validate = function (field, value) {
       }
       break;
     default :
-      throw new Error('No validation defined for field: ' + field);
-      break;
+      throw new Error(`No validation defined for field: ${field}`);
   }
   return true;
 };
@@ -100,18 +99,18 @@ Key.prototype.__validate = function (field, value) {
  * @returns {array} The key in case of success
  * @throw Error if the key is not valid
  */
-Key.prototype.validate = function (key, fields) {
+Key.prototype.validate = function(key, fields) {
   if (fields == undefined) {
     fields = ['ownerName', 'ownerEmail', 'userId', 'passphrase', 'comment'];
   }
 
-  var errors = [];
-  for (var i in fields) {
-    var fieldName = fields[i];
+  const errors = [];
+  for (const i in fields) {
+    const fieldName = fields[i];
     try {
       this.__validate(fieldName, key[fieldName]);
     } catch (e) {
-      var fieldError = {};
+      const fieldError = {};
       fieldError[fieldName] = e.message;
       errors.push(fieldError);
     }
@@ -119,7 +118,7 @@ Key.prototype.validate = function (key, fields) {
 
   if (errors.length > 0) {
     // Return exception with details in validationErrors.
-    var e = new Error('key could not be validated');
+    const e = new Error('key could not be validated');
     // Add validation errors to the error object.
     e.validationErrors = errors;
     throw e;
@@ -133,8 +132,7 @@ Key.prototype.validate = function (key, fields) {
  * @param key {array} The key to set
  * @return {bool} true if successful
  */
-Key.prototype.set = function (key) {
-
+Key.prototype.set = function(key) {
   if (typeof key === 'undefined') {
     throw new Error('The key cannot be empty');
   }
@@ -158,7 +156,7 @@ Key.prototype.set = function (key) {
  * @param length {string} The key length
  * @throw Error when length is not a supported one
  */
-Key.prototype.setLength = function (length) {
+Key.prototype.setLength = function(length) {
   this.__validate('length', length);
   this._key.length = length;
   return this._key;
@@ -169,7 +167,7 @@ Key.prototype.setLength = function (length) {
  * @param algorithm {string} The key algorithm
  * @throw Error when algorithm is not a supported one
  */
-Key.prototype.setAlgorithm = function (algorithm) {
+Key.prototype.setAlgorithm = function(algorithm) {
   this.__validate('algorithm', algorithm);
   this._key.algorithm = algorithm;
   return this._key;
@@ -180,7 +178,7 @@ Key.prototype.setAlgorithm = function (algorithm) {
  * @param comment {string} The key comment
  * @throw Error when comment is not a supported one
  */
-Key.prototype.setComment = function (comment) {
+Key.prototype.setComment = function(comment) {
   this.__validate('comment', comment);
   this._key.comment = comment;
   return this._key;
@@ -192,7 +190,7 @@ Key.prototype.setComment = function (comment) {
  * @param userId {string} The key user id
  * @throw Error when the user id is not valid
  */
-Key.prototype.setUserId = function (userId) {
+Key.prototype.setUserId = function(userId) {
   this.__validate('userId', userId);
   this._key.userId = userId;
   return this._key;
@@ -203,7 +201,7 @@ Key.prototype.setUserId = function (userId) {
  * @param ownerName {string} The key owner name
  * @throw Error when owner name is not valid
  */
-Key.prototype.setOwnerName = function (ownerName) {
+Key.prototype.setOwnerName = function(ownerName) {
   this.__validate('ownerName', ownerName);
   this._key.ownerName = ownerName;
   return this._key;
@@ -214,7 +212,7 @@ Key.prototype.setOwnerName = function (ownerName) {
  * @param ownerEmail {string} The key owner email
  * @throw Error when the owner email is not valid
  */
-Key.prototype.setOwnerEmail = function (ownerEmail) {
+Key.prototype.setOwnerEmail = function(ownerEmail) {
   this.__validate('ownerEmail', ownerEmail);
   this._key.ownerEmail = ownerEmail;
   return this._key;
@@ -225,7 +223,7 @@ Key.prototype.setOwnerEmail = function (ownerEmail) {
  * @param passphrase {string} The key passphrase
  * @throw Error when passphrase is not valid
  */
-Key.prototype.setPassphrase = function (passphrase) {
+Key.prototype.setPassphrase = function(passphrase) {
   this.__validate('passphrase', passphrase);
   this._key.passphrase = passphrase;
   return this._key;
@@ -237,10 +235,10 @@ Key.prototype.setPassphrase = function (passphrase) {
  *  return all the key settings
  * @returns {array}
  */
-Key.prototype.get = function (fields) {
-  var key = {};
+Key.prototype.get = function(fields) {
+  const key = {};
 
-  var keyDefaultFields = [
+  const keyDefaultFields = [
     "userId",
     "length",
     "algorithm",
@@ -252,8 +250,8 @@ Key.prototype.get = function (fields) {
     fields = keyDefaultFields;
   }
 
-  for (var i in fields) {
-    var varName = fields[i];
+  for (const i in fields) {
+    const varName = fields[i];
     key[varName] = this._key[varName];
   }
 
@@ -264,7 +262,7 @@ Key.prototype.get = function (fields) {
  * Get the key length.
  * @return {string}
  */
-Key.prototype.getLength = function () {
+Key.prototype.getLength = function() {
   return this._key.length;
 };
 
@@ -272,7 +270,7 @@ Key.prototype.getLength = function () {
  * Get the key algorithm.
  * @return {string}
  */
-Key.prototype.getAlgorithm = function () {
+Key.prototype.getAlgorithm = function() {
   return this._key.algorithm;
 };
 
@@ -280,7 +278,7 @@ Key.prototype.getAlgorithm = function () {
  * Get the key comment.
  * @return {string}
  */
-Key.prototype.getComment = function () {
+Key.prototype.getComment = function() {
   return this._key.comment;
 };
 
@@ -288,7 +286,7 @@ Key.prototype.getComment = function () {
  * Get the key user id.
  * @return {string}
  */
-Key.prototype.getUserId = function () {
+Key.prototype.getUserId = function() {
   if (this._key.userId == undefined || this._key.userId == '') {
     this._key.userId = this.buildUserId();
   }
@@ -299,7 +297,7 @@ Key.prototype.getUserId = function () {
  * Get the key owner name.
  * @return {string}
  */
-Key.prototype.getOwnerName = function () {
+Key.prototype.getOwnerName = function() {
   return this._key.ownerName;
 };
 
@@ -307,7 +305,7 @@ Key.prototype.getOwnerName = function () {
  * Get the key owner email.
  * @return {string}
  */
-Key.prototype.getOwnerEmail = function () {
+Key.prototype.getOwnerEmail = function() {
   return this._key.ownerEmail;
 };
 
@@ -315,7 +313,7 @@ Key.prototype.getOwnerEmail = function () {
  * Get the key passphrase.
  * @return {string}
  */
-Key.prototype.getPassphrase = function () {
+Key.prototype.getPassphrase = function() {
   return this._key.passphrase;
 };
 
@@ -324,7 +322,7 @@ Key.prototype.getPassphrase = function () {
  * @returns {*} False if owner name or owner email missing else the user id
  *  as following : OwnerName (Comment) <OwnerEmail>
  */
-Key.prototype.buildUserId = function () {
+Key.prototype.buildUserId = function() {
   if (this._key.ownerName == undefined || this._key.ownerEmail == undefined) {
     return false;
   }

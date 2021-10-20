@@ -1,4 +1,4 @@
-var Log = require('../model/log').Log;
+const Log = require('../model/log').Log;
 
 /**
  * Browser Settings Controller.
@@ -12,26 +12,16 @@ var Log = require('../model/log').Log;
  * @param {string} key
  * @return {string} value
  */
-var get = function (key) {
-  switch (key) {
-    case 'browser.download.dir':
-    case 'browser.download.lastDir':
-    //break;
-    default:
-      Log.write({level: 'error', message: 'Chrome browserSettingsController::get for key ' + key + ' not implemented'});
-      return undefined;
-      break;
-  }
+const get = function(key) {
+  Log.write({level: 'error', message: `Chrome browserSettingsController::get for key ${key} not implemented`});
+  return undefined;
 };
 exports.get = get;
 
 /**
  * Set the value of given browser setting
- *
- * @param {string} key
- * @param {string} value
  */
-var set = function (key, value) {
+const set = function() {
   Log.write({level: 'error', message: 'Chrome browserSettingsController::set not implemented'});
 };
 exports.set = set;
@@ -41,7 +31,7 @@ exports.set = set;
  *
  * @return {string}
  */
-var getExtensionVersion = function () {
+const getExtensionVersion = function() {
   return chrome.runtime.getManifest().version;
 };
 exports.getExtensionVersion = getExtensionVersion;

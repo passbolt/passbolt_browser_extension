@@ -37,7 +37,7 @@ class FolderEntity extends Entity {
     ));
 
     // if no parent id specified set it to null
-    if(!this._props.hasOwnProperty('folder_parent_id')) {
+    if (!Object.prototype.hasOwnProperty.call(this._props, 'folder_parent_id')) {
       this._props.folder_parent_id = null;
     }
 
@@ -71,11 +71,11 @@ class FolderEntity extends Entity {
         },
         "folder_parent_id": {
           "anyOf": [{
-              "type": "string",
-              "format": "uuid"
-            }, {
-              "type": "null"
-            }
+            "type": "string",
+            "format": "uuid"
+          }, {
+            "type": "null"
+          }
           ]
         },
         "name": {
@@ -105,12 +105,14 @@ class FolderEntity extends Entity {
         "permission": PermissionEntity.getSchema(), // current user permission
         "permissions": PermissionsCollection.getSchema() // all users permissions
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API
    *
@@ -141,9 +143,11 @@ class FolderEntity extends Entity {
     return this.toDto(FolderEntity.ALL_CONTAIN_OPTIONS);
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get folder id
    * @returns {(string|null)} uuid
@@ -185,9 +189,11 @@ class FolderEntity extends Entity {
   }
 
 
-  // ==================================================
-  // Associated properties methods
-  // ==================================================
+  /*
+   * ==================================================
+   * Associated properties methods
+   * ==================================================
+   */
   /**
    * Get all the current user permissions
    * @returns {{PermissionEntity|null}} permission
@@ -242,7 +248,7 @@ class FolderEntity extends Entity {
    * @returns {(boolean|null)}
    */
   isPersonal() {
-    if (this._props.hasOwnProperty('personal')) {
+    if (Object.prototype.hasOwnProperty.call(this._props, 'personal')) {
       return this._props.personal;
     }
     if (this.permissions) {
@@ -294,7 +300,7 @@ class FolderEntity extends Entity {
     if (!permissions || !permissions.length) {
       throw new EntityValidationError('FolderEntity assertValidPermissions expect an array of permissions.');
     }
-    for (let permission of permissions) {
+    for (const permission of permissions) {
       FolderEntity.assertValidPermission(permission, folderId);
     }
   }
@@ -308,15 +314,17 @@ class FolderEntity extends Entity {
    */
   static canFolderMove(folderToMove, parentFolder, destinationFolder) {
     if (folderToMove.isReadOnly()) {
-       return ((parentFolder === null || parentFolder.isPersonal()) &&
+      return ((parentFolder === null || parentFolder.isPersonal()) &&
          (destinationFolder === null || destinationFolder.isPersonal()));
     }
     return (destinationFolder === null || !destinationFolder.isReadOnly());
   }
 
-  // ==================================================
-  // Default properties setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Default properties setters
+   * ==================================================
+   */
   /**
    * Folder Parent Id
    * @param {string|null} folderParentId optional
@@ -324,17 +332,19 @@ class FolderEntity extends Entity {
    */
   set folderParentId(folderParentId) {
     const propName = 'folder_parent_id';
-    if (!folderParentId ) {
+    if (!folderParentId) {
       this._props[propName] = null;
       return;
     }
     const propSchema = FolderEntity.getSchema().properties[propName];
-    this._props[propName] = EntitySchema.validateProp(propName, folderParentId, propSchema)
+    this._props[propName] = EntitySchema.validateProp(propName, folderParentId, propSchema);
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * FolderEntity.ENTITY_NAME
    * @returns {string}
@@ -348,7 +358,7 @@ class FolderEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {permission:true, permissions:true};
+    return {permission: true, permissions: true};
   }
 }
 

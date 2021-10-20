@@ -32,12 +32,14 @@ class AbstractService {
    */
   formatContainOptions(contain, supportedOptions) {
     const result = {};
-    for (let item in contain) {
-      // Trigger error if other formats are used
-      // for example {user: {profile: true}} instead of {'user':true, 'user.profile': true}
+    for (const item in contain) {
+      /*
+       * Trigger error if other formats are used
+       * for example {user: {profile: true}} instead of {'user':true, 'user.profile': true}
+       */
       if (typeof item !== 'string') {
         const details = JSON.stringify(contain);
-        throw new TypeError(`Invalid contain ${details}, items should be a string.`)
+        throw new TypeError(`Invalid contain ${details}, items should be a string.`);
       }
       if (supportedOptions.includes(item)) {
         result[`contain[${item}]`] = contain[item] ? '1' : '0';
@@ -56,8 +58,8 @@ class AbstractService {
    */
   formatFilterOptions(filter, supportedOptions) {
     const result = {};
-    for (let item in filter) {
-      if (filter.hasOwnProperty(item) && supportedOptions.includes(item)) {
+    for (const item in filter) {
+      if (Object.prototype.hasOwnProperty.call(filter, item) && supportedOptions.includes(item)) {
         if (typeof filter[item] === 'boolean') {
           result[`filter[${item}]`] = (filter[item] ? '1' : '0');
         } else if (typeof filter[item] === 'string') {
@@ -81,7 +83,7 @@ class AbstractService {
    */
   formatOrderOptions(orders, supportedOrders) {
     const result = {};
-    for (let order in orders) {
+    for (const order in orders) {
       if (supportedOrders.includes(order)) {
         result[`order[]`] = order;
       }
@@ -112,7 +114,7 @@ class AbstractService {
    */
   assertNonEmptyData(data) {
     if (!data) {
-      throw new TypeError(`Service error. Data cannot be empty.`)
+      throw new TypeError(`Service error. Data cannot be empty.`);
     }
   }
 }

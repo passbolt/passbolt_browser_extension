@@ -26,8 +26,10 @@ class UserDeleteTransferEntity extends Entity {
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
   constructor(transferDto) {
-    // cannot use default entity schema validation as there are no required field
-    // e.g. owners or managers should be set or both
+    /*
+     * cannot use default entity schema validation as there are no required field
+     * e.g. owners or managers should be set or both
+     */
     super(UserDeleteTransferEntity.validate(transferDto));
 
     // Association
@@ -69,12 +71,14 @@ class UserDeleteTransferEntity extends Entity {
         "owners": PermissionTransfersCollection.getSchema(),
         "managers": GroupUserTransfersCollection.getSchema()
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API
    * @returns {Object} with owners and/or managers key set
@@ -90,9 +94,11 @@ class UserDeleteTransferEntity extends Entity {
     return result;
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get the collection of resource/folder permission transfers if any
    * @returns {PermissionTransfersCollection}
@@ -111,9 +117,11 @@ class UserDeleteTransferEntity extends Entity {
     return this._managers || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * UserDeleteTransferEntity.ENTITY_NAME
    * @returns {string}

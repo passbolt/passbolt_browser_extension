@@ -15,14 +15,14 @@ const {User} = require('../model/user');
 const {Keyring} = require('../model/keyring');
 const Config = require('../model/config');
 
-const listen = function (worker) {
+const listen = function(worker) {
   /*
    * Check if the user is authenticated.
    *
    * @listens passbolt.auth.is-authenticated
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.is-authenticated', async function (requestId, options) {
+  worker.port.on('passbolt.auth.is-authenticated', async(requestId, options) => {
     const controller = new AuthIsAuthenticatedController(worker, requestId);
     controller.main(options);
   });
@@ -33,7 +33,7 @@ const listen = function (worker) {
    * @listens passbolt.auth.is-mfa-required
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.is-mfa-required', async function (requestId) {
+  worker.port.on('passbolt.auth.is-mfa-required', async requestId => {
     const controller = new AuthIsMfaRequiredController(worker, requestId);
     controller.main();
   });
@@ -44,7 +44,7 @@ const listen = function (worker) {
    * @listens passbolt.auth.check-status
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.check-status', async function (requestId) {
+  worker.port.on('passbolt.auth.check-status', async requestId => {
     const controller = new AuthCheckStatusController(worker, requestId);
     controller.main();
   });
@@ -55,7 +55,7 @@ const listen = function (worker) {
    * @listens passbolt.auth.logout
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.logout', async function (requestId) {
+  worker.port.on('passbolt.auth.logout', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const auth = new AuthModel(apiClientOptions);
 
@@ -74,14 +74,14 @@ const listen = function (worker) {
    * @listens passbolt.auth.navigate-to-logout
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.navigate-to-logout', async function () {
+  worker.port.on('passbolt.auth.navigate-to-logout', async() => {
     const user = User.getInstance();
     const apiClientOptions = await user.getApiClientOptions();
     const auth = new AuthModel(apiClientOptions);
     const url = `${user.settings.getDomain()}/auth/logout`;
 
     try {
-      await chrome.tabs.update(worker.tab.id, {url});
+      await chrome.tabs.update(worker.tab.id, {url: url});
       await auth.postLogout();
     } catch (error) {
       console.error(error);
@@ -94,8 +94,8 @@ const listen = function (worker) {
    * @listens passbolt.auth.verify
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.verify-server-key', function (requestId) {
-    var auth = new AuthController(worker, requestId);
+  worker.port.on('passbolt.auth.verify-server-key', requestId => {
+    const auth = new AuthController(worker, requestId);
     auth.verify();
   });
 
@@ -106,13 +106,13 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param domain {string} The server's domain
    */
-  worker.port.on('passbolt.auth.get-server-key', async function (requestId, domain) {
+  worker.port.on('passbolt.auth.get-server-key', async requestId => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const authModel = new AuthModel(clientOptions);
       const serverKeyDto = await authModel.getServerKey();
       worker.port.emit(requestId, 'SUCCESS', serverKeyDto);
-    } catch {
+    } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
@@ -124,7 +124,7 @@ const listen = function (worker) {
    * @listens passbolt.auth.replace-server-key
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.replace-server-key', async function (requestId) {
+  worker.port.on('passbolt.auth.replace-server-key', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const authModel = new AuthModel(apiClientOptions);
     const keyring = new Keyring();
@@ -147,7 +147,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param passphrase {string} The passphrase to verify
    */
-  worker.port.on('passbolt.auth.verify-passphrase', async function (requestId, passphrase) {
+  worker.port.on('passbolt.auth.verify-passphrase', async(requestId, passphrase) => {
     const keyring = new Keyring();
     try {
       await keyring.checkPassphrase(passphrase);
@@ -169,7 +169,7 @@ const listen = function (worker) {
    *   (integer) -1 if should remember for the session
    *   (integer) duration in seconds to specify a specific duration
    */
-  worker.port.on('passbolt.auth.login', async function (requestId, passphrase, remember) {
+  worker.port.on('passbolt.auth.login', async(requestId, passphrase, remember) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const authModel = new AuthModel(clientOptions);
@@ -187,13 +187,13 @@ const listen = function (worker) {
    * @listens passbolt.auth.post-login-redirect
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.post-login-redirect', function(requestId) {
+  worker.port.on('passbolt.auth.post-login-redirect', requestId => {
     let url = Config.read('user.settings.trustedDomain');
     const redirectTo = (new URL(worker.tab.url)).searchParams.get('redirect');
     if (/^\/[A-Za-z0-9\-\/]*$/.test(redirectTo)) {
       url = `${url}${redirectTo}`;
     }
-    chrome.tabs.update(worker.tab.id, {url});
+    chrome.tabs.update(worker.tab.id, {url: url});
     worker.port.emit(requestId, 'SUCCESS');
   });
 };

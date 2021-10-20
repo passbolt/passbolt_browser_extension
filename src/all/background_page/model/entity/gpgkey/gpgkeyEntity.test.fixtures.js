@@ -14,4 +14,4 @@ exports.GpgkeyEntityFixtures = {
     "created": "2020-04-20T11:32:18+00:00",
     "modified": "2020-04-20T11:32:18+00:00"
   }
-}
+};

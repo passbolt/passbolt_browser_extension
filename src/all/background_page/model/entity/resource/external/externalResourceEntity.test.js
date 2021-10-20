@@ -36,7 +36,7 @@ describe("ExternalResourceEntity", () => {
       "name": "Password 1",
       "secret_clear": "",
       "folder_parent_path": "",
-    }
+    };
     const entity = new ExternalResourceEntity(dto);
     expect(entity.toDto()).toEqual(result);
     expect(entity.id).toEqual(null);
@@ -83,11 +83,11 @@ describe("ExternalResourceEntity", () => {
   });
 
   it("changeRootPath change the resource root path", () => {
-    const rootFolder = new ExternalFolderEntity({"name": "root"})
+    const rootFolder = new ExternalFolderEntity({"name": "root"});
     const resource = new ExternalResourceEntity({"name": "Resource 1", "secret_clear": ""});
-    resource.changeRootPath(rootFolder)
+    resource.changeRootPath(rootFolder);
     expect(resource.folderParentPath).toEqual("root");
-    resource.changeRootPath(rootFolder)
+    resource.changeRootPath(rootFolder);
     expect(resource.folderParentPath).toEqual("root/root");
   });
 });

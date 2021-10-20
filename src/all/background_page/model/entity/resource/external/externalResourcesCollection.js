@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {ExternalFoldersCollection} = require("../../folder/external/externalFoldersCollection");
-const {ExternalFolderEntity} = require("../../folder/external/externalFolderEntity");
 const {ResourcesCollection} = require("../resourcesCollection");
 const {EntityCollection} = require('../../abstract/entityCollection');
 const {EntitySchema} = require('../../abstract/entitySchema');
@@ -33,8 +32,10 @@ class ExternalResourcesCollection extends EntityCollection {
       ExternalResourcesCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(externalResourceDto => {
       this.push(new ExternalResourceEntity(externalResourceDto));
     });
@@ -52,7 +53,7 @@ class ExternalResourcesCollection extends EntityCollection {
     return {
       "type": "array",
       "items": ExternalResourceEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -97,9 +98,11 @@ class ExternalResourcesCollection extends EntityCollection {
     return new ExternalResourcesCollection(externalResourcesDto);
   }
 
-  // ==================================================
-  // Finders / Filters
-  // ==================================================
+  /*
+   * ==================================================
+   * Finders / Filters
+   * ==================================================
+   */
 
   /**
    * Get external resources by depth
@@ -122,9 +125,11 @@ class ExternalResourcesCollection extends EntityCollection {
     return this.externalResources.filter(externalResource => externalResource.folderParentId === folderParentId);
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the external resource to the list
    * @param {object|ExternalResourceEntity} externalResource DTO or ExternalResourceEntity
@@ -147,7 +152,7 @@ class ExternalResourcesCollection extends EntityCollection {
    * @param {string} folderParentId The corresponding folder parent id
    */
   setFolderParentIdsByPath(folderParentPath, folderParentId) {
-    for (let externalResource of this.externalResources) {
+    for (const externalResource of this.externalResources) {
       if (externalResource.folderParentPath === folderParentPath) {
         externalResource.folderParentId = folderParentId;
       }
@@ -167,7 +172,7 @@ class ExternalResourcesCollection extends EntityCollection {
    * @param {string} path the path to remove
    */
   removeByPath(path) {
-    for (let i = this.externalResources.length - 1; i>=0; i--) {
+    for (let i = this.externalResources.length - 1; i >= 0; i--) {
       const externalResourceEntity = this.externalResources[i];
       const escapedPath = path.replace(/[.*+\-?^${}()|[\]\\\/]/g, '\\$&');
       const regex = new RegExp(`^${escapedPath}\/`);
@@ -177,9 +182,11 @@ class ExternalResourcesCollection extends EntityCollection {
     }
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
   /**
    * ExternalResourcesCollection.ENTITY_NAME
    * @returns {string}
@@ -187,7 +194,6 @@ class ExternalResourcesCollection extends EntityCollection {
   static get ENTITY_NAME() {
     return ENTITY_NAME;
   }
-
 }
 
 exports.ExternalResourcesCollection = ExternalResourcesCollection;

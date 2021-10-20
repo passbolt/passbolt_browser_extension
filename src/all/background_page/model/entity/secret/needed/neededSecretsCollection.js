@@ -31,8 +31,10 @@ class NeededSecretsCollection extends EntityCollection {
       NeededSecretsCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(neededSecret => {
       this.push(new NeededSecretEntity(neededSecret));
     });
@@ -50,7 +52,7 @@ class NeededSecretsCollection extends EntityCollection {
     return {
       "type": "array",
       "items": NeededSecretEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -61,9 +63,11 @@ class NeededSecretsCollection extends EntityCollection {
     return this._items;
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
 
   /**
    * Push a copy of the needed secret to the list
@@ -81,9 +85,11 @@ class NeededSecretsCollection extends EntityCollection {
     super.push(neededSecretEntity);
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
 
   /**
    * NeededSecretsCollection.ENTITY_NAME

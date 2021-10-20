@@ -60,7 +60,7 @@ class ExternalResourceEntity extends Entity {
       "name": ExternalResourceEntity.DEFAULT_RESOURCE_NAME,
       "secret_clear": "",
       "folder_parent_path": ""
-    }
+    };
   }
 
   /**
@@ -91,12 +91,14 @@ class ExternalResourceEntity extends Entity {
           "type": "string"
         }
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
 
   /**
    * Return a DTO ready to be sent to API
@@ -119,9 +121,11 @@ class ExternalResourceEntity extends Entity {
     return this.toDto();
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
 
   /**
    * Get resource id
@@ -227,9 +231,11 @@ class ExternalResourceEntity extends Entity {
     return this._props.resource_type_id || null;
   }
 
-  // ==================================================
-  // Calculated properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Calculated properties getters
+   * ==================================================
+   */
 
   /**
    * Get resource path
@@ -247,9 +253,11 @@ class ExternalResourceEntity extends Entity {
     return this.folderParentPath ? ExternalFolderEntity.splitFolderPath(this.folderParentPath).length : 0;
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
 
   /**
    * Set folder parent path
@@ -271,9 +279,11 @@ class ExternalResourceEntity extends Entity {
     }
   }
 
-  // ==================================================
-  // Other associated properties methods
-  // ==================================================
+  /*
+   * ==================================================
+   * Other associated properties methods
+   * ==================================================
+   */
 
   /**
    * Get secrets
@@ -294,9 +304,11 @@ class ExternalResourceEntity extends Entity {
     this._secrets = secrets;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * ExternalResourceEntity.ENTITY_NAME
    * @returns {string}

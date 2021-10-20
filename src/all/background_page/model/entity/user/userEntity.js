@@ -121,7 +121,7 @@ class UserEntity extends Entity {
         "gpgkey": GpgkeyEntity.getSchema(),
         "groups_users": GroupsUsersCollection.getSchema()
       }
-    }
+    };
   }
 
   /**
@@ -137,9 +137,11 @@ class UserEntity extends Entity {
     return dto;
   }
 
-  // ==================================================
-  // Sanitization
-  // ==================================================
+  /*
+   * ==================================================
+   * Sanitization
+   * ==================================================
+   */
   /**
    * Sanitize user dto:
    * - Remove group users which don't validate if any.
@@ -152,23 +154,25 @@ class UserEntity extends Entity {
       return dto;
     }
 
-    if (dto.hasOwnProperty('groups_users')) {
+    if (Object.prototype.hasOwnProperty.call(dto, 'groups_users')) {
       dto.groups_users = GroupsUsersCollection.sanitizeDto(dto.groups_users);
     }
 
     return dto;
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API
    * @param {object} [contain] optional for example {profile: {avatar:true}}
    * @returns {*}
    */
   toDto(contain) {
-    let result = Object.assign({}, this._props);
+    const result = Object.assign({}, this._props);
     if (!contain) {
       return result;
     }
@@ -199,9 +203,11 @@ class UserEntity extends Entity {
     return this.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get user id
    * @returns {(string|null)} uuid
@@ -307,9 +313,11 @@ class UserEntity extends Entity {
     return {profile: ProfileEntity.ALL_CONTAIN_OPTIONS, role: true, gpgkey: true, groups_users: true};
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * ProfileEntity.ENTITY_NAME
    * @returns {string}
@@ -318,9 +326,11 @@ class UserEntity extends Entity {
     return ENTITY_NAME;
   }
 
-  // ==================================================
-  // Associated properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Associated properties getters
+   * ==================================================
+   */
   /**
    * Get user profile
    * @returns {(ProfileEntity|null)} profile
@@ -352,7 +362,6 @@ class UserEntity extends Entity {
   get groupsUsers() {
     return this._groups_users || null;
   }
-
 }
 
 exports.UserEntity = UserEntity;

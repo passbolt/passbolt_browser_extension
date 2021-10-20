@@ -39,11 +39,11 @@ describe("Permission transfer entity", () => {
   });
 
   it("constructor fails if dto is empty", () => {
-    const dto = {}
+    const dto = {};
     try {
       new PermissionTransferEntity(dto);
       expect(true).toBe(false);
-    } catch(error) {
+    } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('aco_foreign_key')).toBe(true);
       expect(error.hasError('id')).toBe(true);
@@ -54,11 +54,11 @@ describe("Permission transfer entity", () => {
     const dto = {
       id: 'not uuid',
       aco_foreign_key: 'not uuid',
-    }
+    };
     try {
       new PermissionTransferEntity(dto);
       expect(true).toBe(false);
-    } catch(error) {
+    } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('aco_foreign_key')).toBe(true);
       expect(error.hasError('id')).toBe(true);
@@ -72,7 +72,7 @@ describe("Permission transfer entity", () => {
     try {
       new PermissionTransferEntity(dto);
       expect(true).toBe(false);
-    } catch(error) {
+    } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('id')).toBe(true);
     }
@@ -85,7 +85,7 @@ describe("Permission transfer entity", () => {
     try {
       new PermissionTransferEntity(dto);
       expect(true).toBe(false);
-    } catch(error) {
+    } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('aco_foreign_key')).toBe(true);
     }

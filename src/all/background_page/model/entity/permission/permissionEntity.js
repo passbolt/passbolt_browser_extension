@@ -108,12 +108,14 @@ class PermissionEntity extends Entity {
         "user": UserEntity.getSchema(),
         "group": GroupEntity.getSchema()
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API
    *
@@ -146,9 +148,11 @@ class PermissionEntity extends Entity {
     return this.toDto(PermissionEntity.ALL_CONTAIN_OPTIONS);
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get permission id
    * @returns {(string|null)} uuid if set
@@ -205,9 +209,11 @@ class PermissionEntity extends Entity {
     return (this.type === PermissionEntity.PERMISSION_OWNER);
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * PermissionEntity.ENTITY_NAME
    * @returns {string}
@@ -277,7 +283,7 @@ class PermissionEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {user: {profile: {avatar: true}}, group:true};
+    return {user: {profile: {avatar: true}}, group: true};
   }
 
   /**
@@ -292,9 +298,11 @@ class PermissionEntity extends Entity {
     ];
   }
 
-  // ==================================================
-  // Associated properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Associated properties getters
+   * ==================================================
+   */
   /**
    * Get associated user data
    * @returns {(UserEntity|null)} user
@@ -311,9 +319,11 @@ class PermissionEntity extends Entity {
     return this._group || null;
   }
 
-  // ==================================================
-  // Dynamic properties setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties setters
+   * ==================================================
+   */
   /**
    * Set the permission id
    *
@@ -340,9 +350,11 @@ class PermissionEntity extends Entity {
     this._props.type = type;
   }
 
-  // ==================================================
-  // Assertions
-  // ==================================================
+  /*
+   * ==================================================
+   * Assertions
+   * ==================================================
+   */
   /**
    * Basic type assertion helper
    *
@@ -365,9 +377,11 @@ class PermissionEntity extends Entity {
     PermissionEntity.assertIsPermission(p2);
   }
 
-  // ==================================================
-  // Permission comparison operators
-  // ==================================================
+  /*
+   * ==================================================
+   * Permission comparison operators
+   * ==================================================
+   */
   /**
    * Return true if two given permission have the same id
    *
@@ -466,9 +480,11 @@ class PermissionEntity extends Entity {
     return (p1.type > p2.type) ? p1 : p2;
   }
 
-  // ==================================================
-  // Permission factories
-  // ==================================================
+  /*
+   * ==================================================
+   * Permission factories
+   * ==================================================
+   */
   /**
    * Create a permission copy to be used by another aco
    * Useful for example when you want to reuse a permission from a folder

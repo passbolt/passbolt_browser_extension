@@ -14,13 +14,13 @@
 const {PasswordGeneratorModel} = require("../model/passwordGenerator/passwordGeneratorModel");
 const {User} = require('../model/user');
 
-const listen = function (worker) {
+const listen = function(worker) {
   /*
    * Get the password generator settings from the local storage.
    *
    * @listens passbolt.password-generator.settings
    */
-  worker.port.on('passbolt.password-generator.settings', async function (requestId) {
+  worker.port.on('passbolt.password-generator.settings', async requestId => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const passwordGeneratorModel = new PasswordGeneratorModel(apiClientOptions);
@@ -30,6 +30,6 @@ const listen = function (worker) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
-}
+};
 
 exports.listen = listen;

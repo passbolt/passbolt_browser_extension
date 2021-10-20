@@ -30,7 +30,7 @@ class FolderLocalStorage {
   static async flush() {
     Log.write({level: 'debug', message: 'FolderLocalStorage flushed'});
     return await browser.storage.local.remove(FolderLocalStorage.FOLDER_LOCAL_STORAGE_KEY);
-  };
+  }
 
   /**
    * Set the folders local storage.
@@ -42,7 +42,7 @@ class FolderLocalStorage {
   static async get() {
     const {folders} = await browser.storage.local.get([FolderLocalStorage.FOLDER_LOCAL_STORAGE_KEY]);
     return folders;
-  };
+  }
 
   /**
    * Set the folders local storage.
@@ -56,13 +56,13 @@ class FolderLocalStorage {
     if (!(foldersCollection instanceof FoldersCollection)) {
       throw new TypeError('FolderLocalStorage::set expects a FoldersCollection');
     }
-    for (let folderEntity of foldersCollection) {
+    for (const folderEntity of foldersCollection) {
       FolderLocalStorage.assertEntityBeforeSave(folderEntity);
       folders.push(folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
     }
-    await browser.storage.local.set({folders});
+    await browser.storage.local.set({folders: folders});
     lock.release();
-  };
+  }
 
   /**
    * Get a folder from the local storage by id
@@ -73,7 +73,7 @@ class FolderLocalStorage {
   static async getFolderById(id) {
     const folders = await FolderLocalStorage.get();
     return folders.find(item => item.id === id);
-  };
+  }
 
   /**
    * Get a folder from the local storage by id
@@ -84,7 +84,7 @@ class FolderLocalStorage {
   static async getFolderByParentId(id) {
     const folders = await FolderLocalStorage.get();
     return folders.find(item => item.folderParentId === id);
-  };
+  }
 
   /**
    * Add a folder in the local storage
@@ -96,13 +96,13 @@ class FolderLocalStorage {
       FolderLocalStorage.assertEntityBeforeSave(folderEntity);
       const folders = await FolderLocalStorage.get();
       folders.push(folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
-      await browser.storage.local.set({folders});
+      await browser.storage.local.set({folders: folders});
       lock.release();
     } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
   /**
    * Add multiple folders to the local storage
@@ -116,13 +116,13 @@ class FolderLocalStorage {
         FolderLocalStorage.assertEntityBeforeSave(folderEntity);
         folders.push(folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
       });
-      await browser.storage.local.set({folders});
+      await browser.storage.local.set({folders: folders});
       lock.release();
     } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
   /**
    * Update a folder in the local storage.
@@ -140,13 +140,13 @@ class FolderLocalStorage {
         throw new Error('The folder could not be found in the local storage');
       }
       folders[folderIndex] = Object.assign(folders[folderIndex], folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
-      await browser.storage.local.set({folders});
+      await browser.storage.local.set({folders: folders});
       lock.release();
     } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
   /**
    * Delete folders in the local storage by folders ids.
@@ -161,14 +161,14 @@ class FolderLocalStorage {
         if (folderIndex !== -1) {
           folders.splice(folderIndex, 1);
         }
-        await browser.storage.local.set({folders});
+        await browser.storage.local.set({folders: folders});
         lock.release();
       }
     } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
   /**
    * FolderLocalStorage.DEFAULT_CONTAIN

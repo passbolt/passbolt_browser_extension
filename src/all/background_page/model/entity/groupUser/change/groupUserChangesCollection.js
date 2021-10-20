@@ -31,8 +31,10 @@ class GroupUserChangesCollection extends EntityCollection {
       GroupUserChangesCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(groupUserChange => {
       this.push(groupUserChange);
     });
@@ -50,7 +52,7 @@ class GroupUserChangesCollection extends EntityCollection {
     return {
       "type": "array",
       "items": GroupUserChangeEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -66,7 +68,7 @@ class GroupUserChangesCollection extends EntityCollection {
     const result = new GroupUserChangesCollection([]);
 
     // Find new or updated group user
-    for (let updatedGroupUser of expectedSet) {
+    for (const updatedGroupUser of expectedSet) {
       const groupUser = originalSet.getGroupUserByUserId(updatedGroupUser.userId);
       if (!groupUser) {
         const newChange = GroupUserChangeEntity.createFromGroupUser(updatedGroupUser, GroupUserChangeEntity.GROUP_USER_CHANGE_CREATE);
@@ -81,7 +83,7 @@ class GroupUserChangesCollection extends EntityCollection {
     }
 
     // Find deleted groups users
-    for (let originalGroupUser of originalSet) {
+    for (const originalGroupUser of originalSet) {
       if (!expectedSet.getById(originalGroupUser.id)) {
         const newChange = GroupUserChangeEntity.createFromGroupUser(originalGroupUser, GroupUserChangeEntity.GROUP_USER_CHANGE_DELETE);
         result.push(newChange);
@@ -91,9 +93,11 @@ class GroupUserChangesCollection extends EntityCollection {
     return result;
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
 
   /**
    * Push a copy of the group user change to the list
@@ -110,9 +114,11 @@ class GroupUserChangesCollection extends EntityCollection {
     super.push(groupUserChange);
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
 
   /**
    * ActionLogsCollection.ENTITY_NAME

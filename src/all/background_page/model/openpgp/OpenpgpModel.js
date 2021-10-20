@@ -13,15 +13,6 @@
 // const {OpenpgpkeyEntity} = require("../entity/gpgkey/local/localGpgkeyEntity");
 
 class OpenpgpModel {
-  /**
-   * Constructor
-   *
-   * @param {ApiClientOptions} apiClientOptions
-   * @public
-   */
-  constructor(apiClientOptions) {
-
-  }
   //
   // /**
   //  * Generate a key
@@ -45,7 +36,7 @@ class OpenpgpModel {
 
   // @todo maybe useful for retrieving the server key and test the imported gpg key
   async parseArmoredKey(armoredKey) {
-    let openpgpKey = await openpgp.key.readArmored(armoredKey);
+    const openpgpKey = await openpgp.key.readArmored(armoredKey);
     if (openpgpKey.err) {
       throw new Error(openpgpKey.err[0].message);
     }
@@ -59,13 +50,13 @@ class OpenpgpModel {
     let keyId = openpgpKey.primaryKey.getKeyId().toHex();
     keyId = keyId.substring(keyId.length - 8);
     // extract the secret armored key
-    const secretArmoredKey = openpgpKey.armor()
+    const secretArmoredKey = openpgpKey.armor();
     // extract the public armored key
     const publicArmoredKey = openpgpKey.toPublic().armor();
     // extract rsa bits
     const rsaBits = openpgpKey.primaryKey.getAlgorithmInfo().bits;
 
-    const openpgpkeyDto = {userId, keyId, secretArmoredKey, publicArmoredKey, rsaBits};
+    const openpgpkeyDto = {userId: userId, keyId: keyId, secretArmoredKey: secretArmoredKey, publicArmoredKey: publicArmoredKey, rsaBits: rsaBits};
     return new OpenpgpkeyEntity(openpgpkeyDto);
   }
 }

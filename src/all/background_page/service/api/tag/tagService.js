@@ -66,7 +66,7 @@ class TagService extends AbstractService {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${resourceId}`);
     const data = {
       'Tags': tagsDto.map(tag => tag.slug) // @deprecated since v3 should be 'tags'
-    }
+    };
     const bodyString = this.apiClient.buildBody(data);
     const response = await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
     return response.body;

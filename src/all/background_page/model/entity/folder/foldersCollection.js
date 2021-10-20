@@ -33,8 +33,10 @@ class FoldersCollection extends EntityCollection {
       FoldersCollection.getSchema()
     ));
 
-    // Check if folder ids are unique
-    // Why not this.push? It is faster than adding items one by one
+    /*
+     * Check if folder ids are unique
+     * Why not this.push? It is faster than adding items one by one
+     */
     const ids = this._props.map(folder => folder.id);
     ids.sort().sort((a, b) => {
       if (a === b) {
@@ -59,12 +61,14 @@ class FoldersCollection extends EntityCollection {
     return {
       "type": "array",
       "items": FolderEntity.getSchema(),
-    }
+    };
   }
 
-  // ==================================================
-  // Getter
-  // ==================================================
+  /*
+   * ==================================================
+   * Getter
+   * ==================================================
+   */
   /**
    * FoldersCollection.ENTITY_NAME
    * @returns {string}
@@ -126,16 +130,18 @@ class FoldersCollection extends EntityCollection {
       .join("/");
   }
 
-  // ==================================================
-  // Finders
-  // ==================================================
+  /*
+   * ==================================================
+   * Finders
+   * ==================================================
+   */
   /**
    * Get the first item that matches the given id
    * @param {string} id
    * @returns {*} FolderEntity or undefined
    */
   getById(id) {
-    let found = this._items.filter(folder => folder.id === id);
+    const found = this._items.filter(folder => folder.id === id);
     return found.length ? found[0] : undefined;
   }
 
@@ -146,7 +152,7 @@ class FoldersCollection extends EntityCollection {
    * @returns {FoldersCollection}
    */
   getAllChildren(parentId) {
-    return FoldersCollection.getAllChildren(parentId, this, new FoldersCollection([]))
+    return FoldersCollection.getAllChildren(parentId, this, new FoldersCollection([]));
   }
 
   /**
@@ -162,9 +168,11 @@ class FoldersCollection extends EntityCollection {
     if (children.length) {
       try {
         children.forEach(child => outputCollection.push(child));
-      } catch(error) {
-        // children are already in collection
-        // skip...
+      } catch (error) {
+        /*
+         * children are already in collection
+         * skip...
+         */
       }
       const childrenIds = children.map(child => child.id);
       childrenIds.forEach(id => FoldersCollection.getAllChildren(id, inputCollection, outputCollection));
@@ -189,7 +197,7 @@ class FoldersCollection extends EntityCollection {
     }
     const parents = this.getAllParents(folder);
     parents.unshift(folder);
-    return '/' + (parents.folders.map(folder => folder.name)).reverse().join('/');
+    return `/${(parents.folders.map(folder => folder.name)).reverse().join('/')}`;
   }
 
   /**
@@ -199,7 +207,7 @@ class FoldersCollection extends EntityCollection {
    * @returns {FoldersCollection}
    */
   getAllParents(folder) {
-    return FoldersCollection.getAllParents(folder, this, new FoldersCollection([]))
+    return FoldersCollection.getAllParents(folder, this, new FoldersCollection([]));
   }
 
   /**
@@ -221,9 +229,11 @@ class FoldersCollection extends EntityCollection {
     return outputCollection;
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the folder to the list
    * @param {object} folder DTO or FolderEntity
@@ -236,10 +246,12 @@ class FoldersCollection extends EntityCollection {
     if (folder instanceof FolderEntity) {
       folder = folder.toDto(FolderEntity.ALL_CONTAIN_OPTIONS); // deep clone
     }
-    let folderEntity = new FolderEntity(folder); // validate
+    const folderEntity = new FolderEntity(folder); // validate
 
-    // Build rules
-    // Only one folder id instance
+    /*
+     * Build rules
+     * Only one folder id instance
+     */
     this.assertUniqueId(folderEntity);
 
     super.push(folderEntity);
@@ -252,17 +264,19 @@ class FoldersCollection extends EntityCollection {
    * @returns {FoldersCollection}
    */
   merge(foldersCollection) {
-    for (let folder of foldersCollection) {
+    for (const folder of foldersCollection) {
       try {
         this.push(folder);
-      } catch(error) {}
+      } catch (error) {}
     }
     return this;
   }
 
-  // ==================================================
-  // Asserts
-  // ==================================================
+  /*
+   * ==================================================
+   * Asserts
+   * ==================================================
+   */
   /**
    * Assert there is no other permission with the same id in the collection
    *
@@ -275,8 +289,8 @@ class FoldersCollection extends EntityCollection {
     }
     const length = this.folders.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingFolder = this.folders[i];
+    for (; i < length; i++) {
+      const existingFolder = this.folders[i];
       if (existingFolder.id && existingFolder.id === folderEntity.id) {
         throw new EntityCollectionError(i, FoldersCollection.RULE_UNIQUE_ID, `Folder id ${folderEntity.id} already exists.`);
       }

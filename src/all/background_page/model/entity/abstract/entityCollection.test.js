@@ -22,9 +22,11 @@ beforeEach(() => {
   jest.resetModules();
 });
 
-//===========================================
-// Fixture classes
-//===========================================
+/*
+ * ===========================================
+ *  Fixture classes
+ * ===========================================
+ */
 
 class TestEntity extends Entity {
   constructor(dto) {
@@ -42,26 +44,29 @@ class TestEntity extends Entity {
           "type": "string",
         }
       }
-    }
+    };
   }
 }
 
+/* eslint-disable no-unused-vars */
 class TestEntityCollection extends Entity {
-  constructor(dto, items) {
+  constructor(dto) {
     super(EntitySchema.validate('TestEntityCollection', dto, TestEntityCollection.getSchema()));
   }
   static getSchema() {
     return {
       "type": "array",
       "items": TestEntity.getSchema(),
-    }
+    };
   }
-
 }
+/* eslint-enable no-unused-vars */
 
-//===========================================
-// Tests
-//===========================================
+/*
+ * ===========================================
+ *  Tests
+ * ===========================================
+ */
 
 describe("EntityCollection", () => {
   it("constructor and getters works", () => {
@@ -84,7 +89,7 @@ describe("EntityCollection", () => {
     expect(collection.items[4]).toEqual(undefined);
 
     // Iterator tests
-    for (let item of collection) {
+    for (const item of collection) {
       expect(item.name).toEqual('first');
       break;
     }

@@ -31,4 +31,4 @@ exports.GroupUserEntityFixtures = {
     "is_admin": true,
     "created": "2020-09-18T04:33:01+00:00"
   }
-}
+};

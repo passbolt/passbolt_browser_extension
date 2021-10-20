@@ -1,7 +1,6 @@
 const {CsrfToken} = require('../../../utils/csrfToken/csrfToken');
 
 class ApiClientOptions {
-
   /**
    * Set base url
    *
@@ -10,14 +9,14 @@ class ApiClientOptions {
    * @returns {ApiClientOptions}
    * @public
    */
-  setBaseUrl (baseUrl) {
+  setBaseUrl(baseUrl) {
     if (!baseUrl) {
       throw new TypeError('ApiClientOption baseUrl is required.');
     }
     if (typeof baseUrl === 'string') {
       try {
         this.baseUrl = new URL(baseUrl);
-      } catch(e) {
+      } catch (e) {
         throw new TypeError('ApiClientOption baseUrl is invalid.');
       }
     } else {
@@ -37,7 +36,7 @@ class ApiClientOptions {
    * @param {string|CsrfToken} csrfToken
    * @public
    */
-  setCsrfToken (csrfToken) {
+  setCsrfToken(csrfToken) {
     if (!csrfToken) {
       throw new TypeError('ApiClientOption csrfToken is required.');
     }
@@ -47,7 +46,7 @@ class ApiClientOptions {
       if (csrfToken instanceof CsrfToken) {
         this.csrfToken = csrfToken;
       } else {
-        throw new TypeError('ApiClientOption csrfToken should be a string or a valid CsrfToken.')
+        throw new TypeError('ApiClientOption csrfToken should be a string or a valid CsrfToken.');
       }
     }
     return this;
@@ -63,10 +62,10 @@ class ApiClientOptions {
    */
   setResourceName(resourceName) {
     if (!resourceName) {
-      throw new TypeError('ApiClientOptions.setResourceName resourceName is required.')
+      throw new TypeError('ApiClientOptions.setResourceName resourceName is required.');
     }
     if (typeof resourceName !== 'string') {
-      throw new TypeError('ApiClientOptions.setResourceName resourceName should be a valid string.')
+      throw new TypeError('ApiClientOptions.setResourceName resourceName should be a valid string.');
     }
     this.resourceName = resourceName;
     return this;

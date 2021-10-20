@@ -38,7 +38,7 @@ class Crypto {
   async encrypt(message, publicKey, privateKey) {
     // If user_id given as parameter, find the user public key.
     if (Validator.isUUID(publicKey)) {
-      let keyInfo = this.keyring.findPublic(publicKey);
+      const keyInfo = this.keyring.findPublic(publicKey);
       if (!keyInfo) {
         throw new Error('The public key could not be found for the user');
       }
@@ -69,7 +69,7 @@ class Crypto {
     }
 
     return encryptedMessage.data;
-  };
+  }
 
   /**
    * Encrypt an array of messages
@@ -86,7 +86,7 @@ class Crypto {
     const _completeCallback = completeCallback || function() {};
     const result = [];
 
-    for (let i in data) {
+    for (const i in data) {
       _startCallback(i);
       const messageEncrypted = await this.encrypt(data[i].message, data[i].userId, privateKey);
       result.push(messageEncrypted);
@@ -94,7 +94,7 @@ class Crypto {
     }
 
     return result;
-  };
+  }
 
   /**
    * Get a decrypted version of the private key
@@ -104,13 +104,13 @@ class Crypto {
    */
   async getAndDecryptPrivateKey(passphrase) {
     const armoredKey = this.keyring.findPrivate().key;
-    let privateKey = (await openpgp.key.readArmored(armoredKey)).keys[0];
+    const privateKey = (await openpgp.key.readArmored(armoredKey)).keys[0];
     if (!privateKey.isDecrypted()) {
       await privateKey.decrypt(passphrase);
     }
 
     return privateKey;
-  };
+  }
 
   /**
    * Decrypt an armored text with a given key.
@@ -131,7 +131,7 @@ class Crypto {
     }
 
     return decrypted.data;
-  };
+  }
 
   /**
    * Decrypt an armored text
@@ -145,7 +145,7 @@ class Crypto {
   async decrypt(armoredMessage, passphrase) {
     const key = await this.getAndDecryptPrivateKey(passphrase);
     return await this.decryptWithKey(armoredMessage, key);
-  };
+  }
 
   /**
    * Decrypt an array of armored text
@@ -162,8 +162,8 @@ class Crypto {
     const _completeCallback = completeCallback || function() {};
     const result = [];
 
-    for (let index in armoredMessages) {
-      if (armoredMessages.hasOwnProperty(index)) {
+    for (const index in armoredMessages) {
+      if (Object.prototype.hasOwnProperty.call(armoredMessages, index)) {
         _startCallback(index);
         const message = await this.decryptWithKey(armoredMessages[index], privateKey);
         result.push(message);
@@ -172,7 +172,7 @@ class Crypto {
     }
 
     return result;
-  };
+  }
 }
 
 exports.Crypto = Crypto;

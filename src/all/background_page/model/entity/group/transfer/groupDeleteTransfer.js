@@ -13,7 +13,6 @@
  */
 const {Entity} = require('../../abstract/entity');
 const {EntityValidationError} = require('../../abstract/entityValidationError');
-const {GroupUserTransfersCollection} = require('../../groupUser/transfer/groupUserTransfersCollection');
 const {PermissionTransfersCollection} = require('../../permission/transfer/permissionTransfersCollection');
 
 const ENTITY_NAME = 'GroupDeleteTransfer';
@@ -26,8 +25,10 @@ class GroupDeleteTransferEntity extends Entity {
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
   constructor(transferDto) {
-    // cannot use default entity schema validation as there are no required field
-    // e.g. owners or managers should be set or both
+    /*
+     * cannot use default entity schema validation as there are no required field
+     * e.g. owners or managers should be set or both
+     */
     super(GroupDeleteTransferEntity.validate(transferDto));
 
     // Association
@@ -61,12 +62,14 @@ class GroupDeleteTransferEntity extends Entity {
       "properties": {
         "owners": PermissionTransfersCollection.getSchema()
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API
    * @returns {Object} with owners and/or managers key set
@@ -79,9 +82,11 @@ class GroupDeleteTransferEntity extends Entity {
     return result;
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get the collection of resource/folder permission transfers if any
    * @returns {PermissionTransfersCollection}
@@ -91,9 +96,11 @@ class GroupDeleteTransferEntity extends Entity {
     return this._owners || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * GroupDeleteTransferEntity.ENTITY_NAME
    * @returns {string}

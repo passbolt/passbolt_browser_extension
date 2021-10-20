@@ -74,12 +74,14 @@ class AbstractActionLogEntity extends Entity {
         // Associations
         "creator": LoggedUserEntity.getSchema()
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
 
   /**
    * Return a DTO ready to be sent to API
@@ -104,9 +106,11 @@ class AbstractActionLogEntity extends Entity {
     return this.toDto();
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
 
   /**
    * @todo to document, see API \Passbolt\AuditLog\Utility\ActionLogResultsParser::getEntryId
@@ -140,9 +144,11 @@ class AbstractActionLogEntity extends Entity {
     return this._props.created || null;
   }
 
-  // ==================================================
-  // Other associated properties methods
-  // ==================================================
+  /*
+   * ==================================================
+   * Other associated properties methods
+   * ==================================================
+   */
 
   /**
    * Get the creator.
@@ -152,9 +158,11 @@ class AbstractActionLogEntity extends Entity {
     return this._creator || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
 
   /**
    * ActionLog.ENTITY_NAME

@@ -202,9 +202,11 @@ describe("Permission Collection", () => {
     expect(c.permissions[2].type).toBe(1);
   });
 
-  //============================================================
-  // Union
-  //============================================================
+  /*
+   * ============================================================
+   *  Union
+   * ============================================================
+   */
 
   it("union returns set1 + set2 - no overlap", () => {
     const dto1 = {
@@ -252,7 +254,7 @@ describe("Permission Collection", () => {
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d992",
       type: PermissionEntity.PERMISSION_UPDATE
-    }
+    };
     const set1 = new PermissionsCollection([dto3, dto1, dto2], false);
     const set2 = new PermissionsCollection([dto1, dto3, dto2], false);
 
@@ -442,8 +444,8 @@ describe("Permission Collection", () => {
       }
     ];
 
-    let permissionCollection = new PermissionsCollection(dto);
-    let permissions = JSON.parse(JSON.stringify(permissionCollection));
+    const permissionCollection = new PermissionsCollection(dto);
+    const permissions = JSON.parse(JSON.stringify(permissionCollection));
     expect(permissions[0].user.profile.first_name).toBe('Ada');
     expect(permissions[0].user.profile.avatar.id).toBe('5426cb53-d909-40eb-9202-38f2c1f94084');
     expect(permissions[1].group.name).toBe('Leadership team');
@@ -470,10 +472,10 @@ describe("Permission Collection", () => {
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d992",
       type: PermissionEntity.PERMISSION_UPDATE
-    }
-    let set1;
-    let set2;
-    let set3;
+    };
+    let set1,
+      set2,
+      set3;
 
     // nothing to remove
     set1 = new PermissionsCollection([dto3], false);
@@ -545,13 +547,11 @@ describe("Permission Collection", () => {
       aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d990",
       type: PermissionEntity.PERMISSION_READ
     };
-    let ownerSet;
-    let readSet;
     let resultSet;
 
     // check remove equal or lower
-    ownerSet = new PermissionsCollection([owner], false);
-    readSet = new PermissionsCollection([read], false);
+    const ownerSet = new PermissionsCollection([owner], false);
+    const readSet = new PermissionsCollection([read], false);
     resultSet = PermissionsCollection.diff(ownerSet, readSet, false);
     expect(resultSet.toDto()).toEqual([owner]);
     resultSet = PermissionsCollection.diff(readSet, ownerSet, false);

@@ -30,7 +30,6 @@ beforeEach(() => {
 });
 
 describe("ResourcesKdbxExporter", () => {
-
   function buildImportResourceDto(num, data) {
     return Object.assign({
       id: `7f077753-0835-4054-92ee-556660ea04a${num}`,
@@ -51,7 +50,7 @@ describe("ResourcesKdbxExporter", () => {
     }, data);
   }
 
-  it("should export with no content", async () => {
+  it("should export with no content", async() => {
     const exportDto = {
       "format": "kdbx",
       "export_resources": [],
@@ -68,7 +67,7 @@ describe("ResourcesKdbxExporter", () => {
     await kdbxweb.Kdbx.load(exportEntity.file, kdbxCredentials);
   });
 
-  it("should export resources and folders", async () => {
+  it("should export resources and folders", async() => {
     const exportFolder1 = buildExternalFolderDto(1);
     const exportFolder2 = buildExternalFolderDto(2, {"folder_parent_path": "Folder 1", "folder_parent_id": exportFolder1.id});
     const exportResource1 = buildImportResourceDto(1);
@@ -99,7 +98,7 @@ describe("ResourcesKdbxExporter", () => {
     expect(kdbxDb.groups[0].groups[1].groups[0].entries[0].fields.get('Title')).toEqual("Password 3");
   });
 
-  it("should protect an export with a password", async () => {
+  it("should protect an export with a password", async() => {
     const exportResource1 = buildImportResourceDto(1);
     const exportDto = {
       "format": "kdbx",
@@ -122,7 +121,7 @@ describe("ResourcesKdbxExporter", () => {
     await kdbxweb.Kdbx.load(exportEntity.file, kdbxCredentials);
   });
 
-  it("should protect an export with a keyfile", async () => {
+  it("should protect an export with a keyfile", async() => {
     const keyfile = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-keyfile.key", {encoding: 'base64'});
     const exportResource1 = buildImportResourceDto(1);
     const exportDto = {

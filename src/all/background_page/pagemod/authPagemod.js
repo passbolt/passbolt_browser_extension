@@ -7,14 +7,13 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 const {PageMod} = require('../sdk/page-mod');
-var app = require('../app');
-var Worker = require('../model/worker');
+const app = require('../app');
+const Worker = require('../model/worker');
 
-var Auth = function () {};
+const Auth = function() {};
 Auth._pageMod = undefined;
 
-Auth.init = function () {
-
+Auth.init = function() {
   if (typeof Auth._pageMod !== 'undefined') {
     Auth._pageMod.destroy();
     Auth._pageMod = undefined;
@@ -24,10 +23,12 @@ Auth.init = function () {
     include: 'about:blank?passbolt=passbolt-iframe-login',
     contentScriptWhen: 'ready',
     contentScriptFile: [
-			// Warning: script and styles need to be modified in
-			// chrome/data/passbolt-iframe-login-form.html
+      /*
+       * Warning: script and styles need to be modified in
+       * chrome/data/passbolt-iframe-login-form.html
+       */
     ],
-    onAttach: function (worker) {
+    onAttach: function(worker) {
       Worker.add('Auth', worker);
 
       app.events.user.listen(worker);

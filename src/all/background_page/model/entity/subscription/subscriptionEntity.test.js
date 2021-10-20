@@ -42,9 +42,9 @@ describe("Subscription entity", () => {
   it("constructor returns validation error if dto required fields are missing", () => {
     try {
       new SubscriptionEntity({});
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.details).toEqual( {
+      expect(error.details).toEqual({
         subscription_id: {required: 'The subscription_id is required.'},
         users: {required: 'The users is required.'},
         created: {required: 'The created is required.'},
@@ -65,16 +65,16 @@ describe("Subscription entity", () => {
         "expiry": [],
         "data": []
       });
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        customer_id: { type: 'The customer_id is not a valid string.' },
-        subscription_id: { type: 'The subscription_id is not a valid string.' },
-        users: { type: 'The users is not a valid integer.' },
-        email: { format: 'The email is not a valid email.' },
-        created: { type: 'The created is not a valid string.' },
-        expiry: { type: 'The expiry is not a valid string.' },
-        data: { type: 'The data is not a valid string.' },
+        customer_id: {type: 'The customer_id is not a valid string.'},
+        subscription_id: {type: 'The subscription_id is not a valid string.'},
+        users: {type: 'The users is not a valid integer.'},
+        email: {format: 'The email is not a valid email.'},
+        created: {type: 'The created is not a valid string.'},
+        expiry: {type: 'The expiry is not a valid string.'},
+        data: {type: 'The data is not a valid string.'},
       });
     }
   });

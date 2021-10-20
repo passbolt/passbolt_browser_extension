@@ -15,7 +15,6 @@ const {splitBySize} = require("../../utils/array/splitBySize");
 const {TagEntity} = require('../entity/tag/tagEntity');
 const {TagsCollection} = require('../entity/tag/tagsCollection');
 const {TagService} = require('../../service/api/tag/tagService');
-const {ResourceEntity} = require('../entity/resource/resourceEntity');
 const {ResourceModel} = require('../../model/resource/resourceModel');
 
 const BULK_OPERATION_SIZE = 5;
@@ -84,9 +83,11 @@ class TagModel {
     await this.resourceModel.deleteTagsLocally(tagId);
   }
 
-  // ==================================================
-  // Bulk tag operation
-  // ==================================================
+  /*
+   * ==================================================
+   * Bulk tag operation
+   * ==================================================
+   */
   /**
    * Bulk tag resources
    * @param {array} resourcesIds the resources ids
@@ -95,13 +96,13 @@ class TagModel {
    * @returns {Promise<array<ResourceEntity>>}
    */
   async bulkTagResources(resourcesIds, tagsCollection, callbacks) {
-    let tagCollections = []
+    let tagCollections = [];
 
     // Parallelize the operations by chunk of BULK_OPERATION_SIZE operations.
     const chunks = splitBySize(resourcesIds, BULK_OPERATION_SIZE);
-    for (let chunkIndex in chunks) {
+    for (const chunkIndex in chunks) {
       const chunk = chunks[chunkIndex];
-      const promises = chunk.map(async (resourceId, mapIndex) => {
+      const promises = chunk.map(async(resourceId, mapIndex) => {
         const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
         return this._bulkTagResources_tagResource(resourceId, tagsCollection, collectionIndex, callbacks);
       });
@@ -133,7 +134,7 @@ class TagModel {
       const updatedTagsCollection = new TagsCollection(tagsDto);
       successCallback(updatedTagsCollection, collectionIndex);
       return updatedTagsCollection;
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       errorCallback(error, collectionIndex);
       return error;

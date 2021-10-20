@@ -50,7 +50,7 @@ class MoveResourcesController {
     await this.assertValidMoveParameters(resourcesIds, destinationFolderId);
     try {
       await this.getPassphrase();
-    } catch(error) {
+    } catch (error) {
       this.cleanup();
       throw error;
     }
@@ -64,10 +64,10 @@ class MoveResourcesController {
       await this.share();
       await progressController.update(this.worker, this.goals, i18n.t('Done'));
       await progressController.close(this.worker);
-      this.cleanup()
-    } catch(error) {
+      this.cleanup();
+    } catch (error) {
       await progressController.close(this.worker);
-      this.cleanup()
+      this.cleanup();
       throw error;
     }
   }
@@ -94,8 +94,10 @@ class MoveResourcesController {
    * @returns {Promise<void>}
    */
   async getPassphrase() {
-    // Get the passphrase if needed and decrypt secret key
-    // We do this to confirm the move even if there is nothing to decrypt/re-encrypt
+    /*
+     * Get the passphrase if needed and decrypt secret key
+     * We do this to confirm the move even if there is nothing to decrypt/re-encrypt
+     */
     const passphrase = await passphraseController.get(this.worker);
     this.privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
   }
@@ -125,7 +127,7 @@ class MoveResourcesController {
    */
   filterOutResourcesThatWontMove() {
     // Remove resources that are directly selected that can't be moved
-    for (let resource of this.resources) {
+    for (const resource of this.resources) {
       let parent = null;
       if (resource.folderParentId !== null) {
         parent = this.resourcesParentFolders.getById(resource.folderParentId);
@@ -155,27 +157,31 @@ class MoveResourcesController {
    */
   async calculateChanges() {
     this.changes = new PermissionChangesCollection([]);
-    for (let resource of this.resources) {
+    for (const resource of this.resources) {
       await progressController.update(this.worker, this.progress++, i18n.t('Calculating changes for {{name}}', {name: resource.name}));
 
-      // A user who can update a resource can move it
-      // But to change the rights they need to be owner
+      /*
+       * A user who can update a resource can move it
+       * But to change the rights they need to be owner
+       */
       if (!resource.permission.isOwner()) {
         break;
       }
 
-      // When a shared folder is moved, we do not change permissions when:
-      // - move is from the root to a personal folder
-      // - move is from a personal folder to a personal folder;
-      // - move is from a personal folder to the root.
+      /*
+       * When a shared folder is moved, we do not change permissions when:
+       * - move is from the root to a personal folder
+       * - move is from a personal folder to a personal folder;
+       * - move is from a personal folder to the root.
+       */
       if (resource.isShared()
         && (this.destinationFolderId === null || this.destinationFolder.isPersonal())
         && (resource.folderParentId === null || resource.isPersonal())) {
         break;
       }
 
-      let parent = !resource.folderParentId ? null : this.resourcesParentFolders.getById(resource.folderParentId);
-      let changes = await this.resourceModel.calculatePermissionsChangesForMove(resource, parent, this.destinationFolder);
+      const parent = !resource.folderParentId ? null : this.resourcesParentFolders.getById(resource.folderParentId);
+      const changes = await this.resourceModel.calculatePermissionsChangesForMove(resource, parent, this.destinationFolder);
       this.changes.merge(changes);
     }
   }
@@ -185,7 +191,7 @@ class MoveResourcesController {
    * @returns {Promise<void>}
    */
   async move() {
-    for (let resource of this.resources) {
+    for (const resource of this.resources) {
       await progressController.update(this.worker, this.progress++, i18n.t('Moving {{name}}', {name: resource.name}));
       if (resource.folderParentId !== this.destinationFolderId) {
         await this.resourceModel.move(resource.id, this.destinationFolderId);
@@ -198,8 +204,8 @@ class MoveResourcesController {
    * @returns {Promise<void>}
    */
   async share() {
-    let resourcesDto = this.resources.toDto({secrets:true});
-    let changesDto = this.changes.toDto();
+    const resourcesDto = this.resources.toDto({secrets: true});
+    const changesDto = this.changes.toDto();
     if (changesDto.length) {
       await progressController.update(this.worker, this.progress++, i18n.t('Synchronizing keys'));
       await this.keyring.sync();

@@ -45,7 +45,7 @@ describe("User entity", () => {
     expect(JSON.stringify(entity)).toEqual(JSON.stringify(dto));
     expect(entity.items[0].username).toEqual('user1@passbolt.com');
     expect(entity.items[1].username).toEqual('user2@passbolt.com');
-    expect(entity.ids).toEqual(["d57c10f5-639d-5160-9c81-8a0c6c4ec851", "d57c10f5-639d-5160-9c81-8a0c6c4ec852"])
+    expect(entity.ids).toEqual(["d57c10f5-639d-5160-9c81-8a0c6c4ec851", "d57c10f5-639d-5160-9c81-8a0c6c4ec852"]);
   });
 
   it("constructor fails if reusing same user", () => {
@@ -56,7 +56,7 @@ describe("User entity", () => {
     };
     const dto = [user1, user1];
 
-    let t = () => {new UsersCollection(dto)};
+    const t = () => { new UsersCollection(dto); };
     expect(t).toThrow(EntityCollectionError);
   });
 
@@ -73,7 +73,7 @@ describe("User entity", () => {
     };
     const dto = [user1, user2];
 
-    let t = () => {new UsersCollection(dto)};
+    const t = () => { new UsersCollection(dto); };
     expect(t).toThrow(EntityCollectionError);
   });
 
@@ -90,7 +90,7 @@ describe("User entity", () => {
     };
     const dto = [user1, user2];
 
-    let t = () => {new UsersCollection(dto)};
+    const t = () => { new UsersCollection(dto); };
     expect(t).toThrow(EntityCollectionError);
   });
 

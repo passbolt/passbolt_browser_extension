@@ -15,7 +15,6 @@ import {GpgkeyEntity} from "./gpgkeyEntity";
 import {GpgkeyEntityFixtures} from "./gpgkeyEntity.test.fixtures";
 import {EntitySchema} from "../abstract/entitySchema";
 import Validator from 'validator';
-import {UsersCollection} from "../user/usersCollection";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -33,7 +32,7 @@ describe("Gpgkey entity", () => {
     try {
       const key = new GpgkeyEntity(dto);
       expect(key.toDto()).toEqual(dto);
-    } catch(error) {
+    } catch (error) {
       console.error(error);
     }
   });

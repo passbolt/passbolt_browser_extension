@@ -33,11 +33,13 @@ class UpdatedPermissionsCollection extends EntityCollection {
       UpdatedPermissionsCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(updatedPermissionDto => {
       const updatePermissionEntity = new UpdatedPermissionEntity(updatedPermissionDto);
-      this.push(updatePermissionEntity)
+      this.push(updatePermissionEntity);
     });
 
     // We do not keep original props
@@ -53,7 +55,7 @@ class UpdatedPermissionsCollection extends EntityCollection {
     return {
       "type": "array",
       "items": UpdatedPermissionEntity.getSchema()
-    }
+    };
   }
 
   /**
@@ -73,9 +75,11 @@ class UpdatedPermissionsCollection extends EntityCollection {
     return this._items.map(r => r.id);
   }
 
-  // ==================================================
-  // Assertions
-  // ==================================================
+  /*
+   * ==================================================
+   * Assertions
+   * ==================================================
+   */
 
   /**
    * Assert there is no other updated permission with the same id in the collection
@@ -89,17 +93,19 @@ class UpdatedPermissionsCollection extends EntityCollection {
     }
     const length = this.updatedPermissions.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingUpdatedPermission = this.updatedPermissions[i];
+    for (; i < length; i++) {
+      const existingUpdatedPermission = this.updatedPermissions[i];
       if (existingUpdatedPermission.id && existingUpdatedPermission.id === updatedPermission.id) {
         throw new EntityCollectionError(i, UpdatedPermissionsCollection.RULE_UNIQUE_ID, `Updated permission id ${updatedPermission.id} already exists.`);
       }
     }
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
 
   /**
    * Push a copy of the updated permission to the list
@@ -120,9 +126,11 @@ class UpdatedPermissionsCollection extends EntityCollection {
     super.push(updatedPermissionEntity);
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
 
   /**
    * UpdatedPermissionsCollection.ENTITY_NAME

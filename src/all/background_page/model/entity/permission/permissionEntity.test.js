@@ -26,7 +26,7 @@ beforeEach(() => {
  * getTestDto
  * @returns {object}
  */
-function getTestDto(option) {
+function getTestDto() {
   return {
     'aro': PermissionEntity.ARO_USER,
     'aco': PermissionEntity.ACO_RESOURCE,
@@ -110,7 +110,7 @@ describe("Entity permission", () => {
         'modified': 123
       });
       expect(false).toBe(true);
-    } catch(error) {
+    } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('id')).toBe(true);
       expect(error.hasError('modified')).toBe(true);
@@ -181,13 +181,13 @@ describe("Entity permission", () => {
     try {
       PermissionEntity.assertIsPermission(null);
       expect(false).toBe(true);
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof TypeError).toBe(true);
     }
     try {
       PermissionEntity.assertIsPermission(getTestDto());
       expect(false).toBe(true);
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof TypeError).toBe(true);
     }
     PermissionEntity.assertIsPermission(new PermissionEntity(getTestDto()));
@@ -203,6 +203,6 @@ describe("Entity permission", () => {
       'aco': PermissionEntity.ACO_FOLDER,
       'aco_foreign_key': '7f077753-0835-4054-92ee-556660ea04f0',
       'type': PermissionEntity.PERMISSION_OWNER,
-    })
+    });
   });
 });

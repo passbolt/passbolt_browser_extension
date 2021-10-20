@@ -14,7 +14,6 @@
 import Validator from 'validator';
 import {ApiClientOptions} from "../apiClient/apiClientOptions";
 import {AbstractService} from "./abstractService";
-import {ApiClient} from "../apiClient/apiClient";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -24,24 +23,24 @@ beforeEach(() => {
 
 describe("Abstract service", () => {
   it("constructor works", () => {
-    const options = (new ApiClientOptions()).setBaseUrl('https://test.passbolt.test/')
+    const options = (new ApiClientOptions()).setBaseUrl('https://test.passbolt.test/');
     const service = new AbstractService(options, 'test');
 
     // Basics
-    let t = () => {service.assertValidId('test')};
+    let t = () => { service.assertValidId('test'); };
     expect(t).toThrow(TypeError);
-    t = () => {service.assertNonEmptyData(null)};
+    t = () => { service.assertNonEmptyData(null); };
     expect(t).toThrow(TypeError);
   });
 
   it("constructor works", () => {
-    const options = (new ApiClientOptions()).setBaseUrl('https://test.passbolt.test/')
+    const options = (new ApiClientOptions()).setBaseUrl('https://test.passbolt.test/');
     const service = new AbstractService(options, 'test');
 
-    let formated = service.formatContainOptions(
+    const formated = service.formatContainOptions(
       {"user": true, "user.profile": false},
       ['user', 'user.profile', 'user.profile.avatar', 'gpgkey'],
     );
-    expect(formated).toEqual({"contain[user]":"1", "contain[user.profile]":"0"})
+    expect(formated).toEqual({"contain[user]": "1", "contain[user.profile]": "0"});
   });
 });

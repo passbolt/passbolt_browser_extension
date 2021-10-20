@@ -48,10 +48,12 @@ class AvatarEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
-        // "user_id": {
-        //   "type": "string",
-        //   "format": "uuid"
-        // },
+        /*
+         * "user_id": {
+         *   "type": "string",
+         *   "format": "uuid"
+         * },
+         */
         "url": {
           "type": "object",
           "required": [
@@ -78,12 +80,14 @@ class AvatarEntity extends Entity {
           "format": "date-time"
         },
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get avatar id
    * @returns {(string|null)} uuid
@@ -122,7 +126,7 @@ class AvatarEntity extends Entity {
    * @param {string} size medium|small
    * @returns {string} admin or user
    */
-   getUrl(size) {
+  getUrl(size) {
     if (!size) {
       throw new TypeError('A size is needed.');
     }
@@ -148,9 +152,11 @@ class AvatarEntity extends Entity {
     return this._props.modified || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * AvatarEntity.ENTITY_NAME
    * @returns {string}

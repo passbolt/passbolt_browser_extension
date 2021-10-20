@@ -38,7 +38,7 @@ class UserModel {
    * @return {UsersCollection}
    * @public
    */
-  async updateLocalStorage () {
+  async updateLocalStorage() {
     const contains =  {profile: true, gpgkey: false, groups_users: false, last_logged_in: true};
     const usersCollection = await this.findAll(contains, null, null, true);
     await UserLocalStorage.set(usersCollection);
@@ -52,7 +52,7 @@ class UserModel {
    * @return {Promise<*>}
    * @public
    */
-  async resendInvite (username) {
+  async resendInvite(username) {
     return this.userService.resendInvite(username);
   }
 
@@ -70,9 +70,11 @@ class UserModel {
     return this.updateLocalStorage();
   }
 
-  //==============================================================
-  // Finders / remote calls
-  //==============================================================
+  /*
+   * ==============================================================
+   *  Finders / remote calls
+   * ==============================================================
+   */
 
   /**
    * Find one
@@ -123,9 +125,11 @@ class UserModel {
     return usersCollection.ids;
   }
 
-  //==============================================================
-  // CRUD
-  //==============================================================
+  /*
+   * ==============================================================
+   *  CRUD
+   * ==============================================================
+   */
   /**
    * Create a user using Passbolt API and add result to local storage
    *
@@ -193,12 +197,14 @@ class UserModel {
    */
   async deleteDryRun(userId, transfer) {
     try {
-      let deleteData = (transfer && transfer instanceof UserDeleteTransferEntity) ? transfer.toDto() : {};
+      const deleteData = (transfer && transfer instanceof UserDeleteTransferEntity) ? transfer.toDto() : {};
       await this.userService.delete(userId, deleteData, true);
-    } catch(error) {
+    } catch (error) {
       if (error instanceof PassboltApiFetchError && error.data.code === 400 && error.data.body.errors) {
-        // recast generic 400 error into a delete dry run error
-        // allowing validation of the returned entities and reuse down the line to transfer permissions
+        /*
+         * recast generic 400 error into a delete dry run error
+         * allowing validation of the returned entities and reuse down the line to transfer permissions
+         */
         throw new DeleteDryRunError(error.message, error.data.body.errors);
       }
       throw error;
@@ -215,12 +221,14 @@ class UserModel {
    */
   async delete(userId, transfer) {
     try {
-      let deleteData = (transfer && transfer instanceof UserDeleteTransferEntity) ? transfer.toDto() : {};
+      const deleteData = (transfer && transfer instanceof UserDeleteTransferEntity) ? transfer.toDto() : {};
       await this.userService.delete(userId, deleteData);
-    } catch(error) {
+    } catch (error) {
       if (error instanceof PassboltApiFetchError && error.data.code === 400 && error.data.body.errors) {
-        // recast generic 400 error into a delete dry run error
-        // allowing validation of the returned entities and reuse down the line to transfer permissions
+        /*
+         * recast generic 400 error into a delete dry run error
+         * allowing validation of the returned entities and reuse down the line to transfer permissions
+         */
         throw new DeleteDryRunError(error.message, error.data.body.errors);
       }
       throw error;

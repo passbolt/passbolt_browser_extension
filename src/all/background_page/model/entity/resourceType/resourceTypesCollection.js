@@ -33,8 +33,10 @@ class ResourceTypesCollection extends EntityCollection {
       ResourceTypesCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(resourceType => {
       this.push(new ResourceTypeEntity(resourceType));
     });
@@ -52,7 +54,7 @@ class ResourceTypesCollection extends EntityCollection {
     return {
       "type": "array",
       "items": ResourceTypeEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -72,9 +74,11 @@ class ResourceTypesCollection extends EntityCollection {
     return this._items.map(r => r.id);
   }
 
-  // ==================================================
-  // Assertions
-  // ==================================================
+  /*
+   * ==================================================
+   * Assertions
+   * ==================================================
+   */
   /**
    * Assert there is no other resourceType with the same id in the collection
    *
@@ -87,17 +91,19 @@ class ResourceTypesCollection extends EntityCollection {
     }
     const length = this.resourceTypes.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingResourceType = this.resourceTypes[i];
+    for (; i < length; i++) {
+      const existingResourceType = this.resourceTypes[i];
       if (existingResourceType.id && existingResourceType.id === resourceType.id) {
         throw new EntityCollectionError(i, ResourceTypesCollection.RULE_UNIQUE_ID, `Resource type id ${resourceType.id} already exists.`);
       }
     }
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the resourceType to the list
    * @param {object} resourceType DTO or ResourceTypeEntity
@@ -117,9 +123,11 @@ class ResourceTypesCollection extends EntityCollection {
     super.push(resourceTypeEntity);
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
   /**
    * ResourceTypesCollection.ENTITY_NAME
    * @returns {string}

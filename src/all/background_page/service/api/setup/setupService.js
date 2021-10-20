@@ -118,19 +118,21 @@ class SetupService extends AbstractService {
 
     try {
       responseHtml = await response.text();
-      let parser = new DOMParser();
-      let parsedHtml = parser.parseFromString(responseHtml, 'text/html');
+      const parser = new DOMParser();
+      const parsedHtml = parser.parseFromString(responseHtml, 'text/html');
       username = parsedHtml.getElementById('js_setup_user_username').value;
       firstName = parsedHtml.getElementById('js_setup_user_first_name').value;
       lastName = parsedHtml.getElementById('js_setup_user_last_name').value;
     } catch (error) {
-      // If the response cannot be parsed, it's not a Passbolt API response.
-      // It can be a for example a proxy timeout error (504).
+      /*
+       * If the response cannot be parsed, it's not a Passbolt API response.
+       * It can be a for example a proxy timeout error (504).
+       */
       throw new PassboltBadResponseError();
     }
 
     return {
-      username,
+      username: username,
       profile: {
         first_name: firstName,
         last_name: lastName
@@ -161,19 +163,21 @@ class SetupService extends AbstractService {
 
     try {
       responseHtml = await response.text();
-      let parser = new DOMParser();
-      let parsedHtml = parser.parseFromString(responseHtml, 'text/html');
+      const parser = new DOMParser();
+      const parsedHtml = parser.parseFromString(responseHtml, 'text/html');
       username = parsedHtml.getElementById('js_setup_user_username').value;
       firstName = parsedHtml.getElementById('js_setup_user_first_name').value;
       lastName = parsedHtml.getElementById('js_setup_user_last_name').value;
     } catch (error) {
-      // If the response cannot be parsed, it's not a Passbolt API response.
-      // It can be a for example a proxy timeout error (504).
+      /*
+       * If the response cannot be parsed, it's not a Passbolt API response.
+       * It can be a for example a proxy timeout error (504).
+       */
       throw new PassboltBadResponseError();
     }
 
     return {
-      username,
+      username: username,
       profile: {
         first_name: firstName,
         last_name: lastName

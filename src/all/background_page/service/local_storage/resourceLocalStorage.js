@@ -42,7 +42,7 @@ class ResourceLocalStorage {
   static async get() {
     const {resources} = await browser.storage.local.get([RESOURCES_LOCAL_STORAGE_KEY]);
     return resources;
-  };
+  }
 
   /**
    * Set the resources in local storage.
@@ -56,14 +56,14 @@ class ResourceLocalStorage {
       if (!(resourcesCollection instanceof ResourcesCollection)) {
         throw new TypeError('ResourceLocalStorage::set expects a ResourcesCollection');
       }
-      for (let resourceEntity of resourcesCollection) {
+      for (const resourceEntity of resourcesCollection) {
         ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
         resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
       }
     }
-    await browser.storage.local.set({resources});
+    await browser.storage.local.set({resources: resources});
     lock.release();
-  };
+  }
 
   /**
    * Get a resource from the local storage by id
@@ -74,7 +74,7 @@ class ResourceLocalStorage {
   static async getResourceById(id) {
     const resources = await ResourceLocalStorage.get();
     return resources.find(item => item.id === id);
-  };
+  }
 
 
   /**
@@ -87,13 +87,13 @@ class ResourceLocalStorage {
       ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
       const resources = await ResourceLocalStorage.get();
       resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
-      await browser.storage.local.set({ resources });
+      await browser.storage.local.set({resources: resources});
       lock.release();
     } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
   /**
    * Add multiple resources to the local storage
@@ -107,13 +107,13 @@ class ResourceLocalStorage {
         ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
         resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
       });
-      await browser.storage.local.set({ resources });
+      await browser.storage.local.set({resources: resources});
       lock.release();
     } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
   /**
    * Update a resource in the local storage.
@@ -130,13 +130,13 @@ class ResourceLocalStorage {
         throw new Error('The resource could not be found in the local storage');
       }
       resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
-      await browser.storage.local.set({ resources });
+      await browser.storage.local.set({resources: resources});
       lock.release();
-    } catch(error) {
+    } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
   /**
    * Delete a resource in the local storage by id.
@@ -151,18 +151,20 @@ class ResourceLocalStorage {
         if (resourceIndex !== -1) {
           resources.splice(resourceIndex, 1);
         }
-        await browser.storage.local.set({ resources });
+        await browser.storage.local.set({resources: resources});
         lock.release();
       }
-    } catch(error) {
+    } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
-  // =================================================
-  // Static methods
-  // =================================================
+  /*
+   * =================================================
+   * Static methods
+   * =================================================
+   */
   /**
    * ResourceLocalStorage.DEFAULT_CONTAIN
    * Warning: To be used for entity serialization not service API contain!
@@ -196,10 +198,12 @@ class ResourceLocalStorage {
     }
   }
 
-  // =================================================
-  // Deprecated methods
-  // Stop using DTOs instead one should use entities
-  // =================================================
+  /*
+   * =================================================
+   * Deprecated methods
+   * Stop using DTOs instead one should use entities
+   * =================================================
+   */
   /**
    * Update a resource in the local storage.
    * @param {object} resource The resource to update
@@ -211,13 +215,13 @@ class ResourceLocalStorage {
       const resources = await ResourceLocalStorage.get();
       const resourceIndex = resources.findIndex(item => item.id === resource.id);
       resources[resourceIndex] = resource;
-      await browser.storage.local.set({ resources });
+      await browser.storage.local.set({resources: resources});
       lock.release();
-    } catch(error) {
+    } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
   /**
    * Init resource local storage

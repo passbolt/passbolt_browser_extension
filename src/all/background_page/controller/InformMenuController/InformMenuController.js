@@ -18,7 +18,6 @@ const {PasswordGeneratorModel} = require("../../model/passwordGenerator/password
 const {ResourceModel} = require("../../model/resource/resourceModel");
 const {Crypto} = require('../../model/crypto');
 const {QuickAccessService} = require("../../service/ui/quickAccess.service");
-const User = require('../../model/user').User;
 const passphraseController = require('../passphrase/passphraseController');
 const {BrowserTabService} = require("../../service/ui/browserTab.service");
 const {ExternalResourceEntity} = require("../../model/entity/resource/external/externalResourceEntity");
@@ -58,7 +57,7 @@ class InformMenuController {
         inputValue: callToActionInput.value,
         suggestedResources: suggestedResources,
         secretGeneratorConfiguration: passwordGeneratorConfiguration
-      }
+      };
       this.worker.port.emit(requestId, "SUCCESS", configuration);
     } catch (error) {
       console.error(error);
@@ -95,7 +94,7 @@ class InformMenuController {
     const uri = tab.url;
 
     // Store the resource to save in cache.
-    const resourceDto = {name, username, uri, secret_clear};
+    const resourceDto = {name: name, username: username, uri: uri, secret_clear: secret_clear};
     const resource = new ExternalResourceEntity(resourceDto);
     ResourceInProgressCacheService.set(resource);
 
@@ -129,10 +128,10 @@ class InformMenuController {
       plaintext = await this.resourceModel.deserializePlaintext(resource.resourceTypeId, plaintext);
       const {username} = resource;
       const password = plaintext?.password || plaintext;
-      webIntegrationWorker.port.emit('passbolt.web-integration.fill-credentials', {username, password});
+      webIntegrationWorker.port.emit('passbolt.web-integration.fill-credentials', {username: username, password: password});
       this.worker.port.emit(requestId, "SUCCESS");
       webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
-    } catch(error) {
+    } catch (error) {
       // The original worker has been destroyed when requesting to close the in-form menu, there is no worker to notify.
       console.error(error);
       this.worker.port.emit(requestId, "ERROR", error);

@@ -31,7 +31,7 @@ class ImportError extends Error {
       message: this.message,
       data: data,
       sourceError: sourceError
-    }
+    };
   }
 }
 

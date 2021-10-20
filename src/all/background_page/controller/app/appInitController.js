@@ -37,7 +37,7 @@ class AppInitController {
   async _syncUserSettings() {
     const user = User.getInstance();
     try {
-      await user.settings.sync()
+      await user.settings.sync();
     } catch (error) {
       // @deprecated with v4. The /account/settings entry point exist since v3.0 in CE.
       user.settings.setDefaults();

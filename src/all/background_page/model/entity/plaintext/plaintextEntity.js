@@ -13,7 +13,6 @@
  */
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
-const {EntityValidationError} = require('../abstract/entityValidationError');
 
 const ENTITY_NAME = 'Plaintext';
 
@@ -39,7 +38,7 @@ class PlaintextEntity extends Entity {
    * @throws TypeError unsupported
    */
   static getSchema() {
-    throw new TypeError('Plaintext only support dynamic schemas, defined from resource type.')
+    throw new TypeError('Plaintext only support dynamic schemas, defined from resource type.');
   }
 
   /**
@@ -69,9 +68,11 @@ class PlaintextEntity extends Entity {
     return this._props.description || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * Plaintext.ENTITY_NAME
    * @returns {string}

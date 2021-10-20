@@ -31,24 +31,24 @@ const deduplicateObjects = (arr, key) => {
 
   // Extract the values to deduplicate in an hashtable.
   const valuesHash = arr
-    // Do not add to the hash the object which doesn't have the property.
-    .filter(row => row.hasOwnProperty(key))
-    .map(row => row[key])
+  // Do not add to the hash the object which doesn't have the property.
+    .filter(row => Object.prototype.hasOwnProperty.call(row, key))
+    .map(row => row[key]);
 
   /**
    * Deduplicate the values by flipping the hash table.
    * By instance: ["ID-1", "ID-2", "ID-1"] will become ["ID-1": 0, "ID-2": 1]
    */
   const deduplicatedValuesMap = valuesHash.reduce((aggregator, value, index) => {
-    aggregator[value] = aggregator.hasOwnProperty(value) ? aggregator[value] : index;
-    return aggregator
+    aggregator[value] = Object.prototype.hasOwnProperty.call(aggregator, value) ? aggregator[value] : index;
+    return aggregator;
   }, {});
 
   // Deduplicate the array of objects based on the deduplicated values map.
   return arr.filter((row, index) => {
     // Deduplicate only objects which have the property of interest.
-    if (row.hasOwnProperty(key)) {
-      return deduplicatedValuesMap[row[key]] === index
+    if (Object.prototype.hasOwnProperty.call(row, key)) {
+      return deduplicatedValuesMap[row[key]] === index;
     }
     return true;
   });

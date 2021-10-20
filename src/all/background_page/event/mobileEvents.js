@@ -15,7 +15,7 @@ const {User} = require('../model/user');
 const {MobileTransferModel} = require('../model/mobileTransfer/mobileTransferModel');
 const {TransferEntity} = require('../model/entity/transfer/transferEntity');
 
-const listen = function (worker) {
+const listen = function(worker) {
   /*
    * passbolt.mobile.transfer.get
    *
@@ -23,13 +23,13 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param transferDto {object} The transfer data
    */
-  worker.port.on('passbolt.mobile.transfer.get', async function (requestId, transferId) {
+  worker.port.on('passbolt.mobile.transfer.get', async(requestId, transferId) => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const transferModel = new MobileTransferModel(apiClientOptions);
       const transferEntity = await transferModel.get(transferId);
       worker.port.emit(requestId, 'SUCCESS', transferEntity);
-    } catch(error) {
+    } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
@@ -41,14 +41,14 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param transferDto {object} The transfer data
    */
-  worker.port.on('passbolt.mobile.transfer.create', async function (requestId, transferDto) {
+  worker.port.on('passbolt.mobile.transfer.create', async(requestId, transferDto) => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const transferModel = new MobileTransferModel(apiClientOptions);
       const transferEntity = new TransferEntity(transferDto);
       const updatedTransferEntity = await transferModel.create(transferEntity);
       worker.port.emit(requestId, 'SUCCESS', updatedTransferEntity);
-    } catch(error) {
+    } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
@@ -60,14 +60,14 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param transferDto {object} The transfer data
    */
-  worker.port.on('passbolt.mobile.transfer.update', async function (requestId, transferDto) {
+  worker.port.on('passbolt.mobile.transfer.update', async(requestId, transferDto) => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const transferModel = new MobileTransferModel(apiClientOptions);
       const transferEntity = new TransferEntity(transferDto);
       const updatedTransferEntity = await transferModel.update(transferEntity);
       worker.port.emit(requestId, 'SUCCESS', updatedTransferEntity);
-    } catch(error) {
+    } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }
   });

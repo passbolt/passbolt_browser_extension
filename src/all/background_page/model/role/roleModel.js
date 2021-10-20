@@ -31,7 +31,7 @@ class RoleModel {
    *
    * @return {RolesCollection}
    */
-  async updateLocalStorage () {
+  async updateLocalStorage() {
     const rolesDtos = await this.roleService.findAll();
     const rolesCollection = new RolesCollection(rolesDtos);
     await RolesLocalStorage.set(rolesCollection);
@@ -50,7 +50,7 @@ class RoleModel {
       return new RolesCollection(rolesDto);
     }
     return this.updateLocalStorage();
-  };
+  }
 }
 
 exports.RoleModel = RoleModel;

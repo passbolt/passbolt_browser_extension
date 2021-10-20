@@ -33,6 +33,7 @@
     "@babel/plugin-transform-runtime": "^7.7.4",
     "@babel/preset-env": "^7.10.2",
     "@babel/preset-react": "^7.7.4",
+    "babel-eslint": "^10.1.0",
     "babel-jest": "^27.2.4",
     "babel-loader": "^8.0.4",
     "crx": "^5.0.1",

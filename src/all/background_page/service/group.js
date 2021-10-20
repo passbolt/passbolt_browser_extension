@@ -23,7 +23,7 @@ class GroupService {}
  * @param {object} options Optional parameters
  * @returns {array} The list of groups
  */
-GroupService.findAll = async function (options) {
+GroupService.findAll = async function(options) {
   options = options || {};
   const user = User.getInstance();
   const domain = user.settings.getDomain();

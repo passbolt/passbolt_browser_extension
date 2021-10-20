@@ -48,9 +48,11 @@ class UpdateSubscriptionEntity extends Entity {
     };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API or content code
    * @returns {object}
@@ -68,9 +70,11 @@ class UpdateSubscriptionEntity extends Entity {
     return this.toDto();
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get the created
    * @returns {string}
@@ -89,9 +93,11 @@ class UpdateSubscriptionEntity extends Entity {
     this._props.data = data;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * UpdateSubscriptionEntity.ENTITY_NAME
    * @returns {string}

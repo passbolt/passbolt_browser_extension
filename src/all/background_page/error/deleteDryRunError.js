@@ -27,8 +27,10 @@ class DeleteDryRunError extends Error {
     this.name = 'DeleteDryRunError';
     this.errors = {};
 
-    // validate errors
-    // Build & validate associated objects
+    /*
+     * validate errors
+     * Build & validate associated objects
+     */
     if (errors.groups && errors.groups.sole_manager) {
       this.errors.groups = {
         sole_manager: new GroupsCollection(errors.groups.sole_manager)

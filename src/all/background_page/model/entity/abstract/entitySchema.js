@@ -42,10 +42,10 @@ class EntitySchema {
       if (!schema.properties || !Object.keys(schema).length) {
         throw new TypeError(`Could not validate entity ${name}. Schema error: no properties.`);
       }
-      let schemaProps = schema.properties;
-      for (let propName in schemaProps) {
+      const schemaProps = schema.properties;
+      for (const propName in schemaProps) {
         // Check type is defined
-        if (!schemaProps.hasOwnProperty(propName) || (!schemaProps[propName].type && !schemaProps[propName].anyOf)) {
+        if (!Object.prototype.hasOwnProperty.call(schemaProps, propName) || (!schemaProps[propName].type && !schemaProps[propName].anyOf)) {
           throw TypeError(`Invalid schema. Type missing for ${propName}...`);
         }
         // In case there is multiple types
@@ -113,20 +113,20 @@ class EntitySchema {
     const result = {};
     const validationError = new EntityValidationError(`Could not validate entity ${name}.`);
 
-    for (let propName in schemaProps) {
-      if (!schemaProps.hasOwnProperty(propName)) {
+    for (const propName in schemaProps) {
+      if (!Object.prototype.hasOwnProperty.call(schemaProps, propName)) {
         continue;
       }
 
       // Check if property is required
       if (requiredProps.includes(propName)) {
-        if (!dto.hasOwnProperty(propName)) {
+        if (!Object.prototype.hasOwnProperty.call(dto, propName)) {
           validationError.addError(propName, 'required',  `The ${propName} is required.`);
           continue;
         }
       } else {
         // if it's not required and not present proceed
-        if (!dto.hasOwnProperty(propName)) {
+        if (!Object.prototype.hasOwnProperty.call(dto, propName)) {
           continue;
         }
       }
@@ -180,17 +180,21 @@ class EntitySchema {
       case 'string':
         // maxLength, minLength, regex, etc.
         EntitySchema.validatePropTypeString(propName, prop, propSchema);
-      break;
+        break;
+        /*
+         * Note on 'array' - unchecked as not in use beyond array of objects in passbolt
+         * Currently it must be done manually when bootstrapping collections
+         * example: foldersCollection, permissionsCollection, etc.
+         *
+         * Note on 'object' - we do not check if property of type 'object' validate (or array of objects, see above)
+         * Currently it must be done manually in the entities when bootstrapping associations
+         *
+         * Note on 'integer' and 'number' - Min / max supported, not needed in passbolt
+         */
       case 'array':
-        // Note - unchecked as not in use beyond array of objects in passbolt
-        // Currently it must be done manually when bootstrapping collections
-        // example: foldersCollection, permissionsCollection, etc.
       case 'object':
-        // Note - we do not check if property of type 'object' validate (or array of objects, see above)
-        // Currently it must be done manually in the entities when bootstrapping associations
       case 'number':
       case 'integer':
-        // Note - Min / max supported, not needed in passbolt
       case 'boolean':
       case 'blob':
       case 'null':
@@ -361,13 +365,17 @@ class EntitySchema {
         return Validator.isEmail(prop);
       case 'date-time':
         return Validator.isISO8601(prop);
-      // case 'ipv4':
-      //   return Validator.isIP(prop, '4');
-      // case 'ipv6':
-      //   return Validator.isIP(prop, '6');
+        /*
+         * case 'ipv4':
+         *   return Validator.isIP(prop, '4');
+         * case 'ipv6':
+         *   return Validator.isIP(prop, '6');
+         */
 
-      // Not in json-schema but needed by passbolt
-      // cowboy style section 🤠
+      /*
+       * Not in json-schema but needed by passbolt
+       * cowboy style section 🤠
+       */
       case 'x-url':
         return Validator.isURL(prop);
       case 'x-hex-color':

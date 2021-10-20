@@ -13,11 +13,10 @@ const GpgAuth = require('../model/gpgauth').GpgAuth;
 /*
  * This pagemod help bootstrap the passbolt application from a passbolt server app page
  */
-const App = function () {};
+const App = function() {};
 App._pageMod = null;
 
-App.init = function () {
-
+App.init = function() {
   if (App._pageMod) {
     App._pageMod.destroy();
     App._pageMod = null;
@@ -28,10 +27,12 @@ App.init = function () {
     include: 'about:blank?passbolt=passbolt-iframe-app',
     contentScriptWhen: 'end',
     contentScriptFile: [
-      // Warning: script and styles need to be modified in
-      // chrome/data/passbolt-iframe-app.html
+      /*
+       * Warning: script and styles need to be modified in
+       * chrome/data/passbolt-iframe-app.html
+       */
     ],
-    onAttach: async function (worker) {
+    onAttach: async function(worker) {
       const auth = new GpgAuth();
       if (!await auth.isAuthenticated() || await auth.isMfaRequired()) {
         console.error('Can not attach application if user is not logged in.');

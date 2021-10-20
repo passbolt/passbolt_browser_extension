@@ -70,12 +70,14 @@ class SecretEntity extends Entity {
           "format": "date-time"
         }
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get secret id
    * @returns {(string|null)} uuid
@@ -124,9 +126,11 @@ class SecretEntity extends Entity {
     return this._props.modified || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * SecretEntity.ENTITY_NAME
    * @returns {string}

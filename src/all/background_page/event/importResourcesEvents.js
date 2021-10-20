@@ -7,7 +7,7 @@
 const {ImportResourcesFileController} = require('../controller/import/importResourcesFileController');
 const {User} = require('../model/user');
 
-const listen = function (worker) {
+const listen = function(worker) {
   /*
    * Import resources file
    *
@@ -17,7 +17,7 @@ const listen = function (worker) {
    * @param file {string} The file in base64
    * @returns {{references: {folder: (object|null), tag: (object|null)}, created: {resourcesCount: int, foldersCount: int}, options: {folders: boolean, tags: boolean}, errors: {folders: array, resources: array}}}
    */
-  worker.port.on('passbolt.import-resources.import-file', async function (requestId, fileType, file, options) {
+  worker.port.on('passbolt.import-resources.import-file', async(requestId, fileType, file, options) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const importController = new ImportResourcesFileController(worker, apiClientOptions);
     try {

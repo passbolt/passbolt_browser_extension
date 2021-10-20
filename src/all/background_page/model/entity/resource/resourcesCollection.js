@@ -37,8 +37,10 @@ class ResourcesCollection extends EntityCollection {
       ResourcesCollection.getSchema()
     ));
 
-    // Check if resource ids are unique
-    // Why not this.push? It is faster than adding items one by one
+    /*
+     * Check if resource ids are unique
+     * Why not this.push? It is faster than adding items one by one
+     */
     const ids = this._props.map(resource => resource.id);
     ids.sort().sort((a, b) => {
       if (a === b) {
@@ -63,7 +65,7 @@ class ResourcesCollection extends EntityCollection {
     return {
       "type": "array",
       "items": ResourceEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -160,9 +162,11 @@ class ResourcesCollection extends EntityCollection {
     return count;
   }
 
-  // ==================================================
-  // Sanitization
-  // ==================================================
+  /*
+   * ==================================================
+   * Sanitization
+   * ==================================================
+   */
   /**
    * Sanitize resources dto:
    * - Deduplicate the resources by id.
@@ -178,9 +182,11 @@ class ResourcesCollection extends EntityCollection {
     return deduplicateObjects(dto, 'id');
   }
 
-  // ==================================================
-  // Assertions
-  // ==================================================
+  /*
+   * ==================================================
+   * Assertions
+   * ==================================================
+   */
   /**
    * Assert there is no other resource with the same id in the collection
    *
@@ -193,17 +199,19 @@ class ResourcesCollection extends EntityCollection {
     }
     const length = this.resources.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingResource = this.resources[i];
+    for (; i < length; i++) {
+      const existingResource = this.resources[i];
       if (existingResource.id && existingResource.id === resource.id) {
         throw new EntityCollectionError(i, ResourcesCollection.RULE_UNIQUE_ID, `Resource id ${resource.id} already exists.`);
       }
     }
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the resource to the list
    * @param {object} resource DTO or ResourceEntity
@@ -237,14 +245,16 @@ class ResourcesCollection extends EntityCollection {
    * @param {Array} resourceIds
    */
   removeMany(resourceIds) {
-    for(let i in resourceIds) {
+    for (const i in resourceIds) {
       this.remove(resourceIds[i]);
     }
   }
 
-  // ==================================================
-  // Association management
-  // ==================================================
+  /*
+   * ==================================================
+   * Association management
+   * ==================================================
+   */
   /**
    * Remove a tag association for the resource in the collection if present
    *
@@ -253,7 +263,7 @@ class ResourcesCollection extends EntityCollection {
    */
   removeTagById(tagId) {
     let removed = false;
-    for (let resource of this.resources) {
+    for (const resource of this.resources) {
       if (resource.tags) {
         removed = resource.tags.removeById(tagId) || removed;
       }
@@ -270,7 +280,7 @@ class ResourcesCollection extends EntityCollection {
    */
   replaceTag(tagId, tagEntity) {
     let updated = false;
-    for (let resource of this.resources) {
+    for (const resource of this.resources) {
       if (resource.tags) {
         updated = resource.tags.replaceTag(tagId, tagEntity) || updated;
       }
@@ -310,8 +320,10 @@ class ResourcesCollection extends EntityCollection {
           this.items[j].tags = tagCollection;
           result++;
         } else {
-          // resource not found in collection
-          // let the caller decides if it's important based on results
+          /*
+           * resource not found in collection
+           * let the caller decides if it's important based on results
+           */
         }
       }
     }
@@ -319,9 +331,11 @@ class ResourcesCollection extends EntityCollection {
     return result;
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
   /**
    * ResourcesCollection.ENTITY_NAME
    * @returns {string}

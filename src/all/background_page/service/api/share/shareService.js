@@ -47,7 +47,7 @@ class ShareService extends AbstractService {
   async shareFolder(folderId, permissionChangesDto) {
     this.assertValidId(folderId);
     this.assertNonEmptyData(permissionChangesDto);
-    let url = `folder/${folderId}`;
+    const url = `folder/${folderId}`;
     const response = await this.apiClient.update(url, permissionChangesDto);
     return response.body;
   }

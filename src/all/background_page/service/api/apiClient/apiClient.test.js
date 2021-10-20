@@ -15,7 +15,8 @@ import {ApiClient} from "./apiClient";
 import {ApiClientOptions} from "./apiClientOptions";
 import fetch from 'node-fetch';
 import {PassboltServiceUnavailableError} from '../../../error/passboltServiceUnavailableError';
-import {PassboltApiFetchError} from '../../../error/passboltApiFetchError';
+
+const done = undefined;
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -23,7 +24,6 @@ beforeEach(() => {
 });
 
 describe("Integration test with real fetch", () => {
-
   it("should throw an error if base url is missing", () => {
     expect(() => {
       new ApiClient();
@@ -38,17 +38,17 @@ describe("Integration test with real fetch", () => {
     }).toThrow(TypeError);
   });
 
-  it("should respond 200 to healthcheck status ping", async () => {
+  it("should respond 200 to healthcheck status ping", async() => {
     const options = (new ApiClientOptions())
       .setBaseUrl('https://cloud.passbolt.com/passbolt-monitor/')
       .setResourceName('healthcheck/status');
-    let testClient = new ApiClient(options);
+    const testClient = new ApiClient(options);
     const response = await testClient.findAll();
     expect(response.header.code).toBe(200);
     expect(response.body).toBe('OK');
   });
 
-  it("should respond PassboltServiceUnavailableError to not reachable url", async () => {
+  it("should respond PassboltServiceUnavailableError to not reachable url", async() => {
     const options = (new ApiClientOptions())
       .setBaseUrl('https://notavaliddomain.passbolt.com')
       .setResourceName('nope');
@@ -56,12 +56,12 @@ describe("Integration test with real fetch", () => {
     try {
       await testClient.findAll();
       done.fail();
-    } catch(error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(PassboltServiceUnavailableError);
     }
   });
 
-  it("should respond 404 to wrong url", async () => {
+  it("should respond 404 to wrong url", async() => {
     const options = (new ApiClientOptions())
       .setBaseUrl('https://cloud.passbolt.com/passbolt-monitor/')
       .setResourceName('healthcheck/notfound');
@@ -69,12 +69,12 @@ describe("Integration test with real fetch", () => {
     try {
       await testClient.findAll();
       done.fail();
-    } catch(error) {
+    } catch (error) {
       expect(error.data.code).toBe(404);
     }
   });
 
-  it("should respond 401 to unauthorized url", async () => {
+  it("should respond 401 to unauthorized url", async() => {
     const options = (new ApiClientOptions())
       .setBaseUrl('https://cloud.passbolt.com/passbolt-monitor/')
       .setResourceName('users');
@@ -84,8 +84,10 @@ describe("Integration test with real fetch", () => {
       done.fail();
     } catch (error) {
       expect(error.data.code).toBe(401);
-      // TODO find out why we can't use:
-      //   expect(error).toBeInstanceOf(PassboltApiFetchError)
+      /*
+       * TODO find out why we can't use:
+       *   expect(error).toBeInstanceOf(PassboltApiFetchError)
+       */
       expect(error.name).toBe('PassboltApiFetchError');
     }
   });

@@ -99,7 +99,7 @@ class SetupEntity extends Entity {
         "user": UserEntity.getSchema(),
         "security_token": SecurityTokenEntity.getSchema(),
       }
-    }
+    };
   }
 
   /**
@@ -115,10 +115,10 @@ class SetupEntity extends Entity {
     if (regex.test(setupUrl)) {
       const [, domain, , user_id, token] = setupUrl.match(regex);
       const setupDto = {
-        domain,
-        user_id,
-        token,
-      }
+        domain: domain,
+        user_id: user_id,
+        token: token,
+      };
       if (detectLocale) {
         const url = new URL(setupUrl);
         const locale = url.searchParams.get('locale');
@@ -131,9 +131,11 @@ class SetupEntity extends Entity {
     throw new Error('createFromUrl cannot parse the url');
   }
 
-  // ==================================================
-  // Format / normalize
-  // ==================================================
+  /*
+   * ==================================================
+   * Format / normalize
+   * ==================================================
+   */
 
   /**
    * Normalize format domain.
@@ -144,13 +146,15 @@ class SetupEntity extends Entity {
   static sanitizeDomain(domain) {
     domain = domain || "";
     domain = domain.replace(/\/*$/g, '') // Remove last /
-      .trim() // Remove first and last spaces;
+      .trim(); // Remove first and last spaces;
     return domain;
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API or content code
    * @returns {object}
@@ -182,7 +186,7 @@ class SetupEntity extends Entity {
       user: {
         locale: this.locale
       }
-    }
+    };
   }
 
   toGenerateGpgKeyDto(generateGpgKeyDto) {
@@ -190,7 +194,7 @@ class SetupEntity extends Entity {
       length: GenerateGpgKeyEntity.DEFAULT_LENGTH,
       ...generateGpgKeyDto,
       userId: `${this.user.profile.firstName} ${this.user.profile.lastName} <${this.user.username}>`
-    }
+    };
   }
 
   toAccountDto() {
@@ -215,9 +219,11 @@ class SetupEntity extends Entity {
     return this.toDto();
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get the domain
    * @returns {string} ref ie. http://cloud.passbolt.com/acme
@@ -349,9 +355,11 @@ class SetupEntity extends Entity {
     this._props.locale = locale;
   }
 
-  // ==================================================
-  // Other associated properties methods
-  // ==================================================
+  /*
+   * ==================================================
+   * Other associated properties methods
+   * ==================================================
+   */
   /**
    * Get the user
    * @returns {UserEntity|null}
@@ -384,9 +392,11 @@ class SetupEntity extends Entity {
     this._security_token = securityTokenDto;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * SetupEntity.ENTITY_NAME
    * @returns {string}

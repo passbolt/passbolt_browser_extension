@@ -35,7 +35,7 @@ describe("Folder entity", () => {
     const result = {
       "name": "folder",
       "folder_parent_id": null
-    }
+    };
     const entity = new FolderEntity(dto);
     expect(entity.toDto()).toEqual(result);
     expect(JSON.stringify(entity)).toEqual(JSON.stringify(result));
@@ -52,7 +52,7 @@ describe("Folder entity", () => {
       "name": "folder",
       "folder_parent_id": null
     };
-    expect(dtoNull.hasOwnProperty('folder_parent_id')).toBe(true);
+    expect(Object.prototype.hasOwnProperty.call(dtoNull, 'folder_parent_id')).toBe(true);
     let entity = new FolderEntity(dtoNull);
     const apiDto = entity.toDto();
     expect(apiDto).toEqual(dtoNull);
@@ -95,7 +95,7 @@ describe("Folder entity", () => {
 
   it("constructor returns validation error if dto required fields are missing", () => {
     try {
-      new FolderEntity({'id':'7f077753-0835-4054-92ee-556660ea04f1'});
+      new FolderEntity({'id': '7f077753-0835-4054-92ee-556660ea04f1'});
       expect(false).toBe(true);
     } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
@@ -105,14 +105,14 @@ describe("Folder entity", () => {
 
   it("constructor returns validation error if dto fields are invalid", () => {
     try {
-      new FolderEntity({'id':'nope'});
+      new FolderEntity({'id': 'nope'});
       expect(false).toBe(true);
     } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('id', 'format')).toBe(true);
     }
     try {
-      new FolderEntity({'name':''});
+      new FolderEntity({'name': ''});
       expect(false).toBe(true);
     } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);
@@ -148,8 +148,8 @@ describe("Folder entity", () => {
       "folder_parent_id": "63241b96-81d8-4eb9-8cba-82a6f724b310"
     };
     const folderEntity = new FolderEntity(folderDto);
-    expect(folderEntity.toDto({permission:true})).toEqual(folderDto);
-    const folderJson = JSON.stringify(folderEntity.toDto({permission:true}));
+    expect(folderEntity.toDto({permission: true})).toEqual(folderDto);
+    const folderJson = JSON.stringify(folderEntity.toDto({permission: true}));
     expect(folderJson.includes('37ca07ee-44b6-4ce8-9439-47b4fd5479cc')).toBe(true);
     const folderJson2 = JSON.stringify(folderEntity.toDto());
     expect(folderJson2.includes('37ca07ee-44b6-4ce8-9439-47b4fd5479cc')).toBe(false);
@@ -200,8 +200,10 @@ describe("Folder entity", () => {
         "type": PermissionEntity.PERMISSION_READ
       }
     });
-    // CANNOT MOVE
-    // Share folder read to folder to the root
+    /*
+     * CANNOT MOVE
+     * Share folder read to folder to the root
+     */
     expect(FolderEntity.canFolderMove(sharedRead, sharedRead, null)).toBe(false);
     expect(FolderEntity.canFolderMove(sharedRead, sharedUpdate, null)).toBe(false);
     expect(FolderEntity.canFolderMove(sharedRead, sharedOwner, null)).toBe(false);
@@ -216,8 +218,10 @@ describe("Folder entity", () => {
     expect(FolderEntity.canFolderMove(sharedRead, sharedOwner, sharedUpdate)).toBe(false);
     expect(FolderEntity.canFolderMove(sharedRead, personal, sharedUpdate)).toBe(false);
 
-    // CAN MOVE
-    // Read folder in a personal folder
+    /*
+     * CAN MOVE
+     * Read folder in a personal folder
+     */
     expect(FolderEntity.canFolderMove(sharedRead, personal, null)).toBe(true);
     expect(FolderEntity.canFolderMove(sharedRead, personal, personal)).toBe(true);
     expect(FolderEntity.canFolderMove(sharedRead, null, personal)).toBe(true);

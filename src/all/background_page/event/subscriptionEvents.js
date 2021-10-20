@@ -24,7 +24,7 @@ const listen = function(worker) {
    * @listens passbolt.subscription.get
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.subscription.get', async function (requestId) {
+  worker.port.on('passbolt.subscription.get', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const subscriptionController = new SubscriptionController(worker, apiClientOptions);
     try {
@@ -41,7 +41,7 @@ const listen = function(worker) {
    * @listens passbolt.subscription.get
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.subscription.update', async function (requestId, subscriptionKeyDto) {
+  worker.port.on('passbolt.subscription.update', async(requestId, subscriptionKeyDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const subscriptionController = new SubscriptionController(worker, apiClientOptions);
     try {

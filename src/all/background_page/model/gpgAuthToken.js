@@ -21,7 +21,7 @@ class GpgAuthToken {
    * @param {string} [token] optional The gpg authentication token
    * @throw {Error} if the token is not valid
    */
-  constructor (token) {
+  constructor(token) {
     if (typeof token === 'undefined') {
       this.token = 'gpgauthv1.3.0|36|';
       this.token += Uuid.get();
@@ -43,13 +43,14 @@ class GpgAuthToken {
    * @param {string} value The value of the field to validate
    * @return {*} True or Error
    */
-  validate (field, value) {
+  validate(field, value) {
+    let sections = [];
     switch (field) {
       case 'token' :
         if (typeof value === 'undefined' || value === '') {
           return new Error('The user authentication token cannot be empty');
         }
-        const sections = value.split('|');
+        sections = value.split('|');
         if (sections.length !== 4) {
           return new Error('The user authentication token is not in the right format');
         }
@@ -57,14 +58,14 @@ class GpgAuthToken {
           return new Error('Passbolt does not support this GPGAuth version');
         }
         if (sections[1] !== '36') {
-          return new Error('Passbolt does not support GPGAuth token nonce longer than 36 characters: ' + sections[2]);
+          return new Error(`Passbolt does not support GPGAuth token nonce longer than 36 characters: ${sections[2]}`);
         }
         if (!Validator.isUUID(sections[2])) {
           return new Error('Passbolt does not support GPGAuth token nonce that are not UUIDs');
         }
         return true;
       default :
-        return new Error('No validation defined for field: ' + field);
+        return new Error(`No validation defined for field: ${field}`);
     }
   }
 }

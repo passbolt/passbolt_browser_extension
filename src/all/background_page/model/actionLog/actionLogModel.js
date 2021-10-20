@@ -24,9 +24,11 @@ class ActionLogModel {
     this.actionLogService = new ActionLogService(apiClientOptions);
   }
 
-  //==============================================================
-  // Finders / remote calls
-  //==============================================================
+  /*
+   * ==============================================================
+   *  Finders / remote calls
+   * ==============================================================
+   */
 
   /**
    * Find all action logs for a foreign model
@@ -40,7 +42,7 @@ class ActionLogModel {
    * @public
    */
   async findAllFor(foreignModel, foreignId, page, limit) {
-    let actionLogsDto = await this.actionLogService.findAllFor(foreignModel, foreignId, page, limit);
+    const actionLogsDto = await this.actionLogService.findAllFor(foreignModel, foreignId, page, limit);
     return new ActionLogsCollection(actionLogsDto);
   }
 }

@@ -160,12 +160,14 @@ class ResourceEntity extends Entity {
         "secrets": ResourceSecretsCollection.getSchema(),
         "tags": TagsCollection.getSchema()
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API
    *
@@ -181,13 +183,13 @@ class ResourceEntity extends Entity {
       result.permission = this._permission.toDto();
     }
     if (this._permissions && contain.permissions) {
-        result.permissions = this._permissions.toDto();
+      result.permissions = this._permissions.toDto();
     }
     if (this._tags && contain.tag) {
-        result.tags = this._tags.toDto();
+      result.tags = this._tags.toDto();
     }
     if (this._secrets && contain.secrets) {
-        result.secrets = this._secrets.toDto();
+      result.secrets = this._secrets.toDto();
     }
 
     // preserve null state
@@ -205,9 +207,11 @@ class ResourceEntity extends Entity {
     return this.toDto(ResourceEntity.ALL_CONTAIN_OPTIONS);
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get resource id
    * @returns {(string|null)} uuid
@@ -306,15 +310,17 @@ class ResourceEntity extends Entity {
     return this._props.uri || null;
   }
 
-  // ==================================================
-  // Permissions methods
-  // ==================================================
+  /*
+   * ==================================================
+   * Permissions methods
+   * ==================================================
+   */
   /**
    * Get is personal flag
    * @returns {(boolean|null)}
    */
   isPersonal() {
-    if (this._props.hasOwnProperty('personal')) {
+    if (Object.prototype.hasOwnProperty.call(this._props, 'personal')) {
       return this._props.personal;
     }
     if (this.permissions) {
@@ -395,9 +401,11 @@ class ResourceEntity extends Entity {
     return (destinationFolder === null || !destinationFolder.isReadOnly());
   }
 
-  // ==================================================
-  // Other associated properties methods
-  // ==================================================
+  /*
+   * ==================================================
+   * Other associated properties methods
+   * ==================================================
+   */
   /**
    * Get all resource tags for the current user
    * @returns {(TagsCollection|null)}
@@ -435,15 +443,17 @@ class ResourceEntity extends Entity {
    * @returns {(SecretEntity|null)}
    */
   get secret() {
-    for (let secret of this._secrets) {
+    for (const secret of this._secrets) {
       return secret;
     }
     return null;
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Set the secret
    * @param {ResourceSecretsCollection} secretsCollection
@@ -466,7 +476,7 @@ class ResourceEntity extends Entity {
       return;
     }
     const propSchema = ResourceEntity.getSchema().properties[propName];
-    this._props[propName] = EntitySchema.validateProp(propName, folderParentId, propSchema)
+    this._props[propName] = EntitySchema.validateProp(propName, folderParentId, propSchema);
   }
 
   /**
@@ -493,9 +503,11 @@ class ResourceEntity extends Entity {
     this._favorite = favorite;
   }
 
-  // ==================================================
-  // Build rules
-  // ==================================================
+  /*
+   * ==================================================
+   * Build rules
+   * ==================================================
+   */
   /**
    * Additional permission validation rule
    * Check that the permission is for a resource
@@ -528,7 +540,7 @@ class ResourceEntity extends Entity {
     if (!permissions || !permissions.length) {
       throw new EntityValidationError('ResourceEntity assertValidPermissions expect an array of permissions.');
     }
-    for (let permission of permissions) {
+    for (const permission of permissions) {
       ResourceEntity.assertValidPermission(permission, resourceId);
     }
   }
@@ -547,7 +559,7 @@ class ResourceEntity extends Entity {
     if (!(secrets instanceof ResourceSecretsCollection)) {
       throw new EntityValidationError('ResourceEntity assertValidSecrets expect a ResourceSecretsCollection.');
     }
-    for (let secret of secrets) {
+    for (const secret of secrets) {
       if (secret.resourceId && (secret.resourceId !== resourceId)) {
         throw new EntityValidationError('ResourceEntity assertValidSecrets secret resourceId should match the resource id.');
       }
@@ -565,14 +577,18 @@ class ResourceEntity extends Entity {
     if (favorite.foreignKey !== resourceId) {
       throw new EntityValidationError('ResourceEntity assertValidFavorite favorite foreign key should match the resource id.');
     }
-    // if (favorite.foreignModel !== FavoriteEntity.FAVORITE_RESOURCE) {
-    //   throw new EntityValidationError('ResourceEntity assertValidFavorite favorite foreign model should be a resource.');
-    // }
+    /*
+     * if (favorite.foreignModel !== FavoriteEntity.FAVORITE_RESOURCE) {
+     *   throw new EntityValidationError('ResourceEntity assertValidFavorite favorite foreign model should be a resource.');
+     * }
+     */
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * ResourceEntity.ENTITY_NAME
    * @returns {string}
@@ -586,7 +602,7 @@ class ResourceEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {permission:true, permissions:true, secrets:true, favorite:true, tag:true};
+    return {permission: true, permissions: true, secrets: true, favorite: true, tag: true};
   }
 }
 

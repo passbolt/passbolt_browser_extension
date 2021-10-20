@@ -4,30 +4,34 @@
  * @param port
  * @constructor
  */
-var Tab = function(tab) {
+const Tab = function(tab) {
   this._tab = tab;
   this.id = tab.id;
   this.url = tab.url;
   this.callbacks = {};
 
-  var _this = this;
+  const _this = this;
 
   // setup on ready event
-  this._onTabUpdated = function (tabId, changeInfo, tab) {
-    // if tab is the same than the current worker tab
-    // and is fully loaded
-    if(_this.id == tabId && changeInfo.status == 'complete') {
+  this._onTabUpdated = function(tabId, changeInfo, tab) {
+    /*
+     * if tab is the same than the current worker tab
+     * and is fully loaded
+     */
+    if (_this.id == tabId && changeInfo.status == 'complete') {
       _this.triggerEvent('ready', tab);
     }
   };
   chrome.tabs.onUpdated.addListener(this._onTabUpdated);
 
   // setup on removed event
-  this._onTabRemoved = function (tabId) {
-    if(_this.id == tabId) {
-      // if (chrome.tabs.onRemoved.hasListener(_this.onTabRemoved)) {
-      //   chrome.tabs.onRemoved.removeListener(_this.onTabRemoved);
-      // }
+  this._onTabRemoved = function(tabId) {
+    if (_this.id == tabId) {
+      /*
+       * if (chrome.tabs.onRemoved.hasListener(_this.onTabRemoved)) {
+       *   chrome.tabs.onRemoved.removeListener(_this.onTabRemoved);
+       * }
+       */
       _this.triggerEvent('removed', tab);
     }
   };
@@ -67,9 +71,9 @@ Tab.prototype.removeListener = function(eventName) {
  *
  * @param eventName
  */
-Tab.prototype.triggerEvent = function (eventName) {
+Tab.prototype.triggerEvent = function(eventName) {
   if (typeof this.callbacks[eventName] !== 'undefined') {
-    var args = Array.prototype.slice.call(arguments, 1);
+    const args = Array.prototype.slice.call(arguments, 1);
     this.callbacks[eventName].apply(this, args);
   }
 };

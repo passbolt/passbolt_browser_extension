@@ -30,7 +30,7 @@ beforeEach(() => {
 });
 
 describe("ResourcesKdbxImportParser", () => {
-  it("should read import file", async () => {
+  it("should read import file", async() => {
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-not-protected.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
@@ -43,7 +43,7 @@ describe("ResourcesKdbxImportParser", () => {
     expect(kdbx).toBeInstanceOf(kdbxweb.Kdbx);
   });
 
-  it("should read import file protected by password", async () => {
+  it("should read import file protected by password", async() => {
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-password.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
@@ -61,7 +61,7 @@ describe("ResourcesKdbxImportParser", () => {
     expect(kdbx).toBeInstanceOf(kdbxweb.Kdbx);
   });
 
-  it("should not be able to read import file protected by password if wrong password", async () => {
+  it("should not be able to read import file protected by password if wrong password", async() => {
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-password.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
@@ -78,7 +78,7 @@ describe("ResourcesKdbxImportParser", () => {
     }
   });
 
-  it("should read import file protected by keyfile", async () => {
+  it("should read import file protected by keyfile", async() => {
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-keyfile.kdbx", {encoding: 'base64'});
     const keyfile = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-keyfile.key", {encoding: 'base64'});
     const importDto = {
@@ -97,7 +97,7 @@ describe("ResourcesKdbxImportParser", () => {
     expect(kdbx).toBeInstanceOf(kdbxweb.Kdbx);
   });
 
-  it("should not be able to read import file protected by keyfile if wrong keyfile", async () => {
+  it("should not be able to read import file protected by keyfile if wrong keyfile", async() => {
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-keyfile.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
@@ -132,7 +132,7 @@ describe("ResourcesKdbxImportParser", () => {
     }, data);
   }
 
-  it("should parse resources and folders", async () => {
+  it("should parse resources and folders", async() => {
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-not-protected.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
@@ -176,7 +176,7 @@ describe("ResourcesKdbxImportParser", () => {
     expect(importEntity.importFolders.toJSON()).toEqual(expect.arrayContaining([folder5Dto]));
   });
 
-  it("should catch and keep a reference of import resource entity validation error", async () => {
+  it("should catch and keep a reference of import resource entity validation error", async() => {
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-content-error-not-protected.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",

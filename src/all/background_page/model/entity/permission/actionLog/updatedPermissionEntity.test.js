@@ -59,11 +59,11 @@ describe("Updated permission entity", () => {
 
   it("constructor works fails if not enough data is provided", () => {
     let t;
-    t = () => {new UpdatedPermissionEntity({})};
+    t = () => { new UpdatedPermissionEntity({}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new UpdatedPermissionEntity({id: "fa5f5d7a-32cc-4c5b-9478-f58584ca4222"})};
+    t = () => { new UpdatedPermissionEntity({id: "fa5f5d7a-32cc-4c5b-9478-f58584ca4222"}); };
     expect(t).toThrow(EntityValidationError);
-    t = () => {new UpdatedPermissionEntity({"type": 15})};
+    t = () => { new UpdatedPermissionEntity({"type": 15}); };
     expect(t).toThrow(EntityValidationError);
   });
 });

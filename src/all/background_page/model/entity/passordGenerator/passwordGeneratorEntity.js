@@ -44,7 +44,7 @@ class PasswordGeneratorEntity extends Entity {
         "default_generator": {
           "type": "string"
         },
-        "generators" : {
+        "generators": {
           "type": "object",
         }
       }
@@ -59,9 +59,11 @@ class PasswordGeneratorEntity extends Entity {
     return this._props.generators;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * FolderEntity.ENTITY_NAME
    * @returns {string}

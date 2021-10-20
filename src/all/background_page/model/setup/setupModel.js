@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {UserEntity} = require("../entity/user/userEntity");
-const {SetupEntity} = require("../entity/setup/setupEntity");
 const {SetupService} = require("../../service/api/setup/setupService");
 const {UserService} = require("../../service/api/user/userService");
 
@@ -46,7 +45,7 @@ class SetupModel {
       if (code === 404 || code === 500) {
         userDto = await this.setupService.findLegacySetupInfo(userId, token);
       } else {
-        throw error
+        throw error;
       }
     }
     return new UserEntity(userDto);
@@ -67,11 +66,11 @@ class SetupModel {
       userDto = user;
     } catch (error) {
       // If the entry point doesn't exist or return a 500, the API version is <v3.
-      const code = error.data && error.data.code
+      const code = error.data && error.data.code;
       if (code === 404 || code === 500) {
         userDto = await this.setupService.findLegacyRecoverInfo(userId, token);
       } else {
-        throw error
+        throw error;
       }
     }
     return new UserEntity(userDto);

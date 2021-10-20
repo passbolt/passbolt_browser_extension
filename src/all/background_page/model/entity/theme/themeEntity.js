@@ -13,7 +13,6 @@
  */
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
-const {EntityValidationError} = require('../abstract/entityValidationError');
 
 const ENTITY_NAME = 'Theme';
 
@@ -58,12 +57,14 @@ class ThemeEntity extends Entity {
           "format": "x-url"
         }
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get theme id
    * @returns {(string|null)} uuid
@@ -89,9 +90,11 @@ class ThemeEntity extends Entity {
   }
 
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * ThemeEntity.ENTITY_NAME
    * @returns {string}

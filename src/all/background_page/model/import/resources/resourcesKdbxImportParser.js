@@ -11,8 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {ImportError} = require("../../../error/importError");
-const {ExternalFoldersCollection} = require("../../entity/folder/external/externalFoldersCollection");
-const {ExternalResourcesCollection} = require("../../entity/resource/external/externalResourcesCollection");
 const {ExternalFolderEntity} = require("../../entity/folder/external/externalFolderEntity");
 const {ExternalResourceEntity} = require("../../entity/resource/external/externalResourceEntity");
 
@@ -42,7 +40,7 @@ class ResourcesKdbxImportParser {
    * @returns {Promise<kdbxweb.Kdbx>}
    */
   async readKdbxDb() {
-    const arrayBytes = kdbxweb.ByteUtils.base64ToBytes(this.importEntity.file)
+    const arrayBytes = kdbxweb.ByteUtils.base64ToBytes(this.importEntity.file);
     const kdbxCredentials = this.readKdbxCredentials();
     return kdbxweb.Kdbx.load(arrayBytes.buffer, kdbxCredentials);
   }
@@ -55,10 +53,10 @@ class ResourcesKdbxImportParser {
     let keepassPassword = null;
     let keepassKeyFile = null;
     if (this.importEntity.password) {
-      keepassPassword = kdbxweb.ProtectedValue.fromString(this.importEntity.password)
+      keepassPassword = kdbxweb.ProtectedValue.fromString(this.importEntity.password);
     }
     if (this.importEntity.keyfile) {
-      keepassKeyFile = kdbxweb.ByteUtils.base64ToBytes(this.importEntity.keyfile)
+      keepassKeyFile = kdbxweb.ByteUtils.base64ToBytes(this.importEntity.keyfile);
     }
     return new kdbxweb.Credentials(keepassPassword, keepassKeyFile);
   }

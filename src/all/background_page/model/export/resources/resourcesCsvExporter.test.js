@@ -38,7 +38,7 @@ describe("ResourcesCsvExporter", () => {
     expect(ResourcesCsvExporter.register).toEqual(expect.arrayContaining(supportedRowComposers));
   });
 
-  it("should export with no content", async () => {
+  it("should export with no content", async() => {
     const exportDto = {
       "format": "csv-kdbx",
       "export_resources": [],
@@ -70,10 +70,10 @@ describe("ResourcesCsvExporter", () => {
   }
 
   function buildCsvRow(RowComposer, externalResourceDto) {
-    return `"${Object.keys(RowComposer.mapping).map(fieldName => externalResourceDto[fieldName]).join('","')}"`
+    return `"${Object.keys(RowComposer.mapping).map(fieldName => externalResourceDto[fieldName]).join('","')}"`;
   }
 
-  it("should export resources", async () => {
+  it("should export resources", async() => {
     const exportResource1 = buildImportResourceDto(1);
     const exportResource2 = buildImportResourceDto(2, {"folder_parent_path": "Folder 1"});
     const exportResource3 = buildImportResourceDto(3, {"folder_parent_path": "Folder 1/Folder2"});

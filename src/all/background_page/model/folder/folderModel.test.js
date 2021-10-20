@@ -26,22 +26,26 @@ beforeEach(() => {
 });
 
 describe("FolderModel",  () => {
-  // Folder 1 5f1da286-37ae-4f1c-aaf1-e0342a5d4dc1
-  // -- Folder 2 870ae6ca-538d-45ff-91ae-1466de7b27ac
-  //     -- Folder 3 130162ae-a4eb-46ac-80b2-2a187601109c
-  //     -- Folder 4 af372e21-b93b-480d-bcda-4a772ae141ba
-  //        -- Folder 5 cccb2dd3-c064-46da-ae03-9b77ac19107e
-  // Folder A 2529edc2-3c04-4d31-bc38-0a28ce4e372a
-  // -- Folder B 34719980-89d3-4791-9c5a-63ff91967fd5
-  let folder1 = "5f1da286-37ae-4f1c-aaf1-e0342a5d4dc1";
-    let folder2 = "870ae6ca-538d-45ff-91ae-1466de7b27ac";
-      let folder3 = "130162ae-a4eb-46ac-80b2-2a187601109c";
-      let folder4 = "af372e21-b93b-480d-bcda-4a772ae141ba";
-        let folder5 = "cccb2dd3-c064-46da-ae03-9b77ac19107e";
-  let folderA = "2529edc2-3c04-4d31-bc38-0a28ce4e372a";
-    let folderB = "34719980-89d3-4791-9c5a-63ff91967fd5";
+  /*
+   * Folder 1 5f1da286-37ae-4f1c-aaf1-e0342a5d4dc1
+   * -- Folder 2 870ae6ca-538d-45ff-91ae-1466de7b27ac
+   *     -- Folder 3 130162ae-a4eb-46ac-80b2-2a187601109c
+   *     -- Folder 4 af372e21-b93b-480d-bcda-4a772ae141ba
+   *        -- Folder 5 cccb2dd3-c064-46da-ae03-9b77ac19107e
+   * Folder A 2529edc2-3c04-4d31-bc38-0a28ce4e372a
+   * -- Folder B 34719980-89d3-4791-9c5a-63ff91967fd5
+   */
+  const folder1 = "5f1da286-37ae-4f1c-aaf1-e0342a5d4dc1";
+  /*
+   * const folder2 = "870ae6ca-538d-45ff-91ae-1466de7b27ac";
+   * const folder3 = "130162ae-a4eb-46ac-80b2-2a187601109c";
+   * const folder4 = "af372e21-b93b-480d-bcda-4a772ae141ba";
+   */
+  const folder5 = "cccb2dd3-c064-46da-ae03-9b77ac19107e";
+  const folderA = "2529edc2-3c04-4d31-bc38-0a28ce4e372a";
+  //const folderB = "34719980-89d3-4791-9c5a-63ff91967fd5";
 
-  it("getAllByIds works", async () => {
+  it("getAllByIds works", async() => {
     FolderLocalStorage.get.mockResolvedValue(getReturnValue());
     const apiClientOptions = (new ApiClientOptions()).setBaseUrl('https://www.passbolt.test');
     const folderModel = new FolderModel(apiClientOptions);
@@ -66,11 +70,10 @@ describe("FolderModel",  () => {
     result = await folderModel.getAllByIds([folder1, folder5], true);
     expect(result.length).toBe(5);
   });
-
 });
 
 function getReturnValue() {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     resolve([
       {
         "id": "5f1da286-37ae-4f1c-aaf1-e0342a5d4dc1",
@@ -205,6 +208,6 @@ function getReturnValue() {
         },
         "folder_parent_id": "2529edc2-3c04-4d31-bc38-0a28ce4e372a"
       }
-    ])
+    ]);
   });
 }

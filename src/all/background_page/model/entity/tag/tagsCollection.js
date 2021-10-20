@@ -19,7 +19,7 @@ const {TagEntity} = require('./tagEntity');
 const ENTITY_NAME = 'Tags';
 
 const RULE_UNIQUE_ID = 'unique_id';
-const RULE_UNIQUE_SLUG = 'unique_slug'
+const RULE_UNIQUE_SLUG = 'unique_slug';
 
 class TagsCollection extends EntityCollection {
   /**
@@ -35,8 +35,10 @@ class TagsCollection extends EntityCollection {
       TagsCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(tag => {
       this.push(new TagEntity(tag));
     });
@@ -54,7 +56,7 @@ class TagsCollection extends EntityCollection {
     return {
       "type": "array",
       "items": TagEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -65,9 +67,11 @@ class TagsCollection extends EntityCollection {
     return this._items;
   }
 
-  // ==================================================
-  // Assertions
-  // ==================================================
+  /*
+   * ==================================================
+   * Assertions
+   * ==================================================
+   */
   /**
    * Assert there is no other tag with the same id in the collection
    *
@@ -80,8 +84,8 @@ class TagsCollection extends EntityCollection {
     }
     const length = this.tags.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingTag = this.tags[i];
+    for (; i < length; i++) {
+      const existingTag = this.tags[i];
       if (existingTag.id && existingTag.id === tag.id) {
         throw new EntityCollectionError(i, TagsCollection.RULE_UNIQUE_ID, `Tag id ${tag.id} already exists.`);
       }
@@ -97,17 +101,19 @@ class TagsCollection extends EntityCollection {
   assertUniqueSlug(tag) {
     const length = this.tags.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingTag = this.tags[i];
+    for (; i < length; i++) {
+      const existingTag = this.tags[i];
       if (existingTag.slug && existingTag.slug === tag.slug) {
         throw new EntityCollectionError(i, TagsCollection.RULE_UNIQUE_SLUG, `Tag slug ${tag.slug} already exists.`);
       }
     }
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the tag to the list
    * @param {object} tag DTO or TagEntity
@@ -136,8 +142,8 @@ class TagsCollection extends EntityCollection {
   removeById(tagId) {
     const length = this.tags.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingTag = this.tags[i];
+    for (; i < length; i++) {
+      const existingTag = this.tags[i];
       if (existingTag.id === tagId) {
         this._items.splice(i, 1);
         return true;
@@ -158,8 +164,8 @@ class TagsCollection extends EntityCollection {
     }
     const length = this.tags.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingTag = this.tags[i];
+    for (; i < length; i++) {
+      const existingTag = this.tags[i];
       if (existingTag.id === tagId) {
         this._items[i] = tagEntity;
         return true;
@@ -168,9 +174,11 @@ class TagsCollection extends EntityCollection {
     return false;
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
   /**
    * TagsCollection.ENTITY_NAME
    * @returns {string}

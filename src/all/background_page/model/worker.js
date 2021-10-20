@@ -19,7 +19,7 @@ const workers = {};
  * @param workerId {string} The worker identifier
  * @param worker {Worker} The worker to reference
  */
-const add = function (workerId, worker) {
+const add = function(workerId, worker) {
   const tabId = worker?.tab?.id || -1;
   if (exists(workerId, tabId)) {
     /*
@@ -58,7 +58,7 @@ exports.add = add;
  * @param workerId {string} The worker identifier.
  * @param tabId {string} The tab identifier on which the worker runs.
  */
-const remove = function (workerId, tabId) {
+const remove = function(workerId, tabId) {
   if (!exists(workerId, tabId)) {
     Log.write({
       level: 'warning',
@@ -77,7 +77,7 @@ const remove = function (workerId, tabId) {
  * @param {?boolean} log error optional, default true
  * @return {Worker} null if the worker doesn't exist.
  */
-const get = function (workerId, tabId, log = true) {
+const get = function(workerId, tabId, log = true) {
   if (!exists(workerId, tabId)) {
     const error = new Error(`Could not find worker ID ${workerId} for tab ${tabId}.`);
     if (log) {
@@ -95,7 +95,7 @@ exports.get = get;
  * @param {string} tabId The tab identifier on which the worker runs
  * @return {boolean}
  */
-const exists = function (workerId, tabId) {
+const exists = function(workerId, tabId) {
   return !(!workers[tabId] || !workers[tabId][workerId]);
 };
 exports.exists = exists;
@@ -107,7 +107,7 @@ exports.exists = exists;
  * @param {int} timeout The timeout after which the promise fails if the worker is not found
  * @return {Promise<void>}
  */
-const waitExists = function (workerId, tabId, timeout = 10000) {
+const waitExists = function(workerId, tabId, timeout = 10000) {
   const intervalPeriod = 100;
   let attempt = 0;
 

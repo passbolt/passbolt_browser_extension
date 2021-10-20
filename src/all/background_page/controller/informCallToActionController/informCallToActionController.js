@@ -40,8 +40,7 @@ class InformCallToActionController {
       const auth = new GpgAuth();
       const status = await auth.checkAuthStatus({requestApi: false});
       this.worker.port.emit(requestId, "SUCCESS", status);
-    }
-    catch(error) {
+    } catch (error) {
       /*
        * When we are in a logged out mode and there's some cleaning of the local storage
        * the check status request the api. In case of unauthenticated user, it throws a 401

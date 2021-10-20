@@ -11,8 +11,7 @@ const {ResourceModel} = require('../model/resource/resourceModel');
 const {User} = require('../model/user');
 const {MoveController} = require('../controller/move/moveController');
 
-const listen = function (worker) {
-
+const listen = function(worker) {
   /*
    * Find a folder with complete permissions
    *
@@ -20,7 +19,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param folderId {uuid} the folder uuid
    */
-  worker.port.on('passbolt.folders.find-permissions', async function (requestId, folderId) {
+  worker.port.on('passbolt.folders.find-permissions', async(requestId, folderId) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const folderModel = new FolderModel(clientOptions);
@@ -39,7 +38,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param folder {array} The folder
    */
-  worker.port.on('passbolt.folders.create', async function (requestId, folderDto) {
+  worker.port.on('passbolt.folders.create', async(requestId, folderDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const folderCreateController = new FolderCreateController(worker, requestId, clientOptions);
@@ -57,7 +56,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param folder {array} The folder
    */
-  worker.port.on('passbolt.folders.update', async function (requestId, folderDto) {
+  worker.port.on('passbolt.folders.update', async(requestId, folderDto) => {
     try {
       const folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
       const folderEntity = await folderModel.update(new FolderEntity(folderDto));
@@ -74,7 +73,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param folder {array} The folder
    */
-  worker.port.on('passbolt.folders.delete', async function (requestId, folderId, cascade) {
+  worker.port.on('passbolt.folders.delete', async(requestId, folderId, cascade) => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const folderModel = new FolderModel(apiClientOptions);
@@ -95,9 +94,9 @@ const listen = function (worker) {
    * @listens passbolt.app.folders.update-local-storage
    * @param {uuid} requestId The request identifier
    */
-  worker.port.on('passbolt.folders.update-local-storage', async function (requestId) {
+  worker.port.on('passbolt.folders.update-local-storage', async requestId => {
     try {
-      let folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
+      const folderModel = new FolderModel(await User.getInstance().getApiClientOptions());
       await folderModel.updateLocalStorage();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
@@ -112,7 +111,7 @@ const listen = function (worker) {
    * @listens passbolt.folders.open-move-confirmation-dialog
    * @param {object} moveDto {resources: array of uuids, folders: array of uuids, folderParentId: uuid}
    */
-  worker.port.on('passbolt.folders.open-move-confirmation-dialog', async function (requestId, moveDto) {
+  worker.port.on('passbolt.folders.open-move-confirmation-dialog', async(requestId, moveDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new MoveController(worker, requestId, clientOptions);

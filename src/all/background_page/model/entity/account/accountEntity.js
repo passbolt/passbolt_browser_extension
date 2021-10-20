@@ -62,11 +62,11 @@ class AccountEntity extends Entity {
         "domain": {
           "type": "string"
         },
-        "user_id" : {
+        "user_id": {
           "type": "string",
           "format": "uuid"
         },
-        "token" : {
+        "token": {
           "type": "string",
           "format": "uuid"
         },
@@ -91,12 +91,14 @@ class AccountEntity extends Entity {
         "user": UserEntity.getSchema(),
         "security_token": SecurityTokenEntity.getSchema(),
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API or content code
    * @returns {object}
@@ -135,9 +137,11 @@ class AccountEntity extends Entity {
     return this.toDto();
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get the domain
    * @returns {string} ref ie. http://cloud.passbolt.com/acme
@@ -178,9 +182,11 @@ class AccountEntity extends Entity {
     return this._props.server_public_armored_key;
   }
 
-  // ==================================================
-  // Other associated properties methods
-  // ==================================================
+  /*
+   * ==================================================
+   * Other associated properties methods
+   * ==================================================
+   */
   /**
    * Get the user
    * @returns {UserEntity|null}
@@ -197,9 +203,11 @@ class AccountEntity extends Entity {
     return this._security_token || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * AccountEntity.ENTITY_NAME
    * @returns {string}

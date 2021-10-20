@@ -62,27 +62,29 @@ class GroupUpdateEntity extends Entity {
         "groups_users": GroupUserChangesCollection.getSchema(),
         "secrets": SecretsCollection.getSchema()
       }
-    }
+    };
   }
 
   static createFromGroupsDiff(originalGroupEntity, updatedGroupEntity) {
     const id = originalGroupEntity.id;
     const name = updatedGroupEntity.name;
     const groupsUsers = GroupUserChangesCollection.createFromGroupsUsersCollectionsChanges(originalGroupEntity.groupsUsers, updatedGroupEntity.groupsUsers);
-    const groupUpdateDto = {id, name, groups_users: groupsUsers.toDto()};
+    const groupUpdateDto = {id: id, name: name, groups_users: groupsUsers.toDto()};
     return new GroupUpdateEntity(groupUpdateDto);
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
 
   /**
    * Return a DTO ready to be sent to API
    * @returns {*}
    */
   toDto() {
-    let result = Object.assign({}, this._props);
+    const result = Object.assign({}, this._props);
     if (this._groups_users) {
       result.groups_users = this._groups_users.toDto();
     }
@@ -100,9 +102,11 @@ class GroupUpdateEntity extends Entity {
     return this.toDto();
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
 
   /**
    * Get group id
@@ -120,9 +124,11 @@ class GroupUpdateEntity extends Entity {
     return this._props.name;
   }
 
-  // ==================================================
-  // Other associated properties methods
-  // ==================================================
+  /*
+   * ==================================================
+   * Other associated properties methods
+   * ==================================================
+   */
 
   /**
    * Return groups users
@@ -148,9 +154,11 @@ class GroupUpdateEntity extends Entity {
     return this._secrets = secrets;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
 
   /**
    * GroupEntity.ENTITY_NAME

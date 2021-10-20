@@ -77,12 +77,14 @@ class AuthenticationTokenEntity extends Entity {
           "format": "date-time"
         },
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API or content code
    * @returns {object}
@@ -101,9 +103,11 @@ class AuthenticationTokenEntity extends Entity {
     return this.toDto();
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get the token
    * @returns {string}
@@ -112,9 +116,11 @@ class AuthenticationTokenEntity extends Entity {
     return this._props.token;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * AuthenticationTokenEntity.ENTITY_NAME
    * @returns {string}
@@ -127,7 +133,7 @@ class AuthenticationTokenEntity extends Entity {
    * AuthenticationTokenEntity.AUTHENTICATION_TOKEN_TYPE_LOGIN
    * @returns {string} login
    */
-  static get AUTHENTICATION_TOKEN_TYPE_LOGIN () {
+  static get AUTHENTICATION_TOKEN_TYPE_LOGIN() {
     return AUTHENTICATION_TOKEN_TYPE_LOGIN;
   }
 
@@ -135,7 +141,7 @@ class AuthenticationTokenEntity extends Entity {
    * AuthenticationTokenEntity.AUTHENTICATION_TOKEN_TYPE_MFA
    * @returns {string} mfa
    */
-  static get AUTHENTICATION_TOKEN_TYPE_MFA () {
+  static get AUTHENTICATION_TOKEN_TYPE_MFA() {
     return AUTHENTICATION_TOKEN_TYPE_MFA;
   }
 
@@ -143,7 +149,7 @@ class AuthenticationTokenEntity extends Entity {
    * AuthenticationTokenEntity.AUTHENTICATION_TOKEN_TYPE_MOBILE_TRANSFER
    * @returns {string} mobile_transfer
    */
-  static get AUTHENTICATION_TOKEN_TYPE_MOBILE_TRANSFER () {
+  static get AUTHENTICATION_TOKEN_TYPE_MOBILE_TRANSFER() {
     return AUTHENTICATION_TOKEN_TYPE_MOBILE_TRANSFER;
   }
 
@@ -151,7 +157,7 @@ class AuthenticationTokenEntity extends Entity {
    * AuthenticationTokenEntity.AUTHENTICATION_TOKEN_TYPE_RECOVER
    * @returns {string} recover
    */
-  static get AUTHENTICATION_TOKEN_TYPE_RECOVER () {
+  static get AUTHENTICATION_TOKEN_TYPE_RECOVER() {
     return AUTHENTICATION_TOKEN_TYPE_RECOVER;
   }
 
@@ -159,7 +165,7 @@ class AuthenticationTokenEntity extends Entity {
    * AuthenticationTokenEntity.AUTHENTICATION_TOKEN_TYPE_REGISTER
    * @returns {string} register
    */
-  static get AUTHENTICATION_TOKEN_TYPE_REGISTER () {
+  static get AUTHENTICATION_TOKEN_TYPE_REGISTER() {
     return AUTHENTICATION_TOKEN_TYPE_REGISTER;
   }
 }

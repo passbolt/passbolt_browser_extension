@@ -49,12 +49,14 @@ class OrganizationSettingsEntity extends Entity {
           "type": "object"
         },
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API or content code
    * @returns {object}
@@ -71,9 +73,11 @@ class OrganizationSettingsEntity extends Entity {
     return this.toDto();
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
 
   /**
    * Get organization locale.
@@ -106,9 +110,11 @@ class OrganizationSettingsEntity extends Entity {
     }
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * OrganizationSettingsEntity.ENTITY_NAME
    * @returns {string}

@@ -7,7 +7,7 @@
 const {i18n} = require('../sdk/i18n');
 
 class MfaAuthenticationRequiredError extends Error {
-  constructor(message){
+  constructor(message) {
     message = message || i18n.t('MFA authentication is required.');
     super(message);
     this.name = 'MfaAuthenticationRequiredError';

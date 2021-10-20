@@ -34,8 +34,10 @@ class ThemesCollection extends EntityCollection {
       ThemesCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(secret => {
       this.push(new ThemeEntity(secret));
     });
@@ -53,7 +55,7 @@ class ThemesCollection extends EntityCollection {
     return {
       "type": "array",
       "items": ThemeEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -64,9 +66,11 @@ class ThemesCollection extends EntityCollection {
     return this._items;
   }
 
-  // ==================================================
-  // Assertions
-  // ==================================================
+  /*
+   * ==================================================
+   * Assertions
+   * ==================================================
+   */
   /**
    * Assert there is no other theme with the same id in the collection
    *
@@ -77,8 +81,9 @@ class ThemesCollection extends EntityCollection {
     if (!theme.id) {
       return;
     }
-    if (this.items.some((item, index) => item.id === theme.id)) {
-      throw new EntityCollectionError(index, ThemesCollection.RULE_UNIQUE_ID, `Theme id ${theme.id} already exists.`);
+    const collectionErrorIndex = this.items.findIndex(item => item.id === theme.id);
+    if (collectionErrorIndex !== -1) {
+      throw new EntityCollectionError(collectionErrorIndex, ThemesCollection.RULE_UNIQUE_ID, `Theme id ${theme.id} already exists.`);
     }
   }
 
@@ -92,14 +97,17 @@ class ThemesCollection extends EntityCollection {
     if (!theme.name) {
       return;
     }
-    if (this.items.some((item, index) => item.name === theme.name)) {
-      throw new EntityCollectionError(index, ThemesCollection.RULE_UNIQUE_NAME, `Theme name ${theme.name} already exists.`);
+    const collectionErrorIndex = this.items.findIndex(item => item.name === theme.name);
+    if (collectionErrorIndex !== -1) {
+      throw new EntityCollectionError(collectionErrorIndex, ThemesCollection.RULE_UNIQUE_NAME, `Theme name ${theme.name} already exists.`);
     }
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the theme to the list
    * @param {object} theme DTO or ThemeEntity
@@ -120,9 +128,11 @@ class ThemesCollection extends EntityCollection {
     super.push(themeEntity);
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
   /**
    * ThemesCollection.ENTITY_NAME
    * @returns {string}

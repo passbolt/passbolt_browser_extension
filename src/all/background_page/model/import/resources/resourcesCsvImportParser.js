@@ -55,7 +55,7 @@ class ResourcesCsvImportParser {
    * @returns {Promise<void>}
    */
   async parseImport() {
-    const {data, fields} = this.readCsv()
+    const {data, fields} = this.readCsv();
     const RowParser = this.getRowParser(fields);
     if (!RowParser) {
       throw new FileFormatError('This csv format is not supported.');
@@ -74,9 +74,9 @@ class ResourcesCsvImportParser {
   readCsv() {
     const decoded = atob(this.importEntity.file);
     const csv = BinaryConvert.fromBinary(decoded);
-    const {data, errors, meta: {fields}} = PapaParse.parse(csv, {header: true, skipEmptyLines: true});
+    const {data, meta: {fields}} = PapaParse.parse(csv, {header: true, skipEmptyLines: true});
     // For now, no papaparse controlled errors are a blocking the import process
-    return {data, fields};
+    return {data: data, fields: fields};
   }
 
   /**
@@ -88,7 +88,7 @@ class ResourcesCsvImportParser {
     let selectedRowParser = null;
     let selectedRowParserScore = 0;
 
-    for (let RowParser of register) {
+    for (const RowParser of register) {
       const score = RowParser.canParse(csvFields);
       if (score > selectedRowParserScore) {
         selectedRowParser = RowParser;
@@ -107,9 +107,9 @@ class ResourcesCsvImportParser {
    */
   parseResources(RowParser, data) {
     const collection = new ExternalResourcesCollection([]);
-    data.forEach((row, rowIndex) => {
+    data.forEach(row => {
       try {
-        const externalResourceEntity = RowParser.parse(row, this.resourceTypesCollection)
+        const externalResourceEntity = RowParser.parse(row, this.resourceTypesCollection);
         collection.push(externalResourceEntity);
       } catch (error) {
         this.importEntity.importResourcesErrors.push(new ImportError("Cannot parse resource", row, error));
@@ -125,10 +125,10 @@ class ResourcesCsvImportParser {
    */
   parseFolders(externalResourcesCollection) {
     const collection = new ExternalFoldersCollection([]);
-    for (let externalResourceEntity of externalResourcesCollection) {
+    for (const externalResourceEntity of externalResourcesCollection) {
       try {
         collection.pushFromPath(externalResourceEntity.folderParentPath);
-      } catch(error) {
+      } catch (error) {
         this.handleParseFolderValidationError(error, externalResourceEntity);
       }
     }

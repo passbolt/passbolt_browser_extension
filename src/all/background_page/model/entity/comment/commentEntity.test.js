@@ -90,12 +90,12 @@ describe("Comment entity", () => {
 
   it("constructor returns validation error if dto required fields are missing", () => {
     const required = ["user_id", "foreign_key", "foreign_model", "content"];
-    for (let i in required) {
-      let sut = Object.assign(minimalDto);
-      if (required.hasOwnProperty(i) && sut.hasOwnProperty(required[i])) {
-        let field = required[i];
+    for (const i in required) {
+      const sut = Object.assign(minimalDto);
+      if (Object.prototype.hasOwnProperty.call(required, i) && Object.prototype.hasOwnProperty.call(sut, required[i])) {
+        const field = required[i];
         delete sut[field];
-        let t = () => {
+        const t = () => {
           new CommentEntity(sut);
         };
         expect(t).toThrow(EntityValidationError);
@@ -116,11 +116,11 @@ describe("Comment entity", () => {
       "created_by": "a58de6d3-f52c-5080-b79b-a601a647ac85",
       "modified_by": "a58de6d3-f52c-5080-b79b-a601a647ac85"
     };
-    for (let i in uuids) {
-      let sut = Object.assign(dto);
-      if (uuids.hasOwnProperty(i) && sut.hasOwnProperty(uuids[i])) {
+    for (const i in uuids) {
+      const sut = Object.assign(dto);
+      if (Object.prototype.hasOwnProperty.call(uuids, i) && Object.prototype.hasOwnProperty.call(sut, uuids[i])) {
         sut[uuids[i]] = 'not a uuid';
-        let t = () => {new CommentEntity(sut);};
+        const t = () => { new CommentEntity(sut); };
         expect(t).toThrow(EntityValidationError);
       } else {
         expect(false).toBe(true);
@@ -203,11 +203,11 @@ describe("Comment entity", () => {
     expect(entity.creator.profile.avatar.urlMedium).toBe('img\/public\/Avatar\/f5\/02\/2f\/b98d0c19c79841b4bcb98d44036f3234\/b98d0c19c79841b4bcb98d44036f3234.a99472d5.png');
 
     const serializedDto = entity.toDto();
-    expect(serializedDto.hasOwnProperty('creator')).toBe(false);
-    expect(serializedDto.hasOwnProperty('modifier')).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(serializedDto, 'creator')).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(serializedDto, 'modifier')).toBe(false);
 
-    const serializedDtoWithAssoc = entity.toDto({creator:true, modifier:true});
-    expect(serializedDtoWithAssoc.hasOwnProperty('creator')).toBe(true);
-    expect(serializedDtoWithAssoc.hasOwnProperty('modifier')).toBe(true);
+    const serializedDtoWithAssoc = entity.toDto({creator: true, modifier: true});
+    expect(Object.prototype.hasOwnProperty.call(serializedDtoWithAssoc, 'creator')).toBe(true);
+    expect(Object.prototype.hasOwnProperty.call(serializedDtoWithAssoc, 'modifier')).toBe(true);
   });
 });

@@ -19,7 +19,7 @@ class Request { }
  * @param {User} user The user who is at the origin of the request
  * @return {object} The updated fetch options
  */
-Request.setCsrfHeader = function (fetchOptions, user) {
+Request.setCsrfHeader = function(fetchOptions, user) {
   fetchOptions = fetchOptions || {};
   const csrfToken = user.getCsrfToken();
   if (csrfToken) {
@@ -33,7 +33,7 @@ Request.setCsrfHeader = function (fetchOptions, user) {
  * @param {object} fetchOptions The fetch options
  * @return {object} The updated fetch options
  */
-Request.setHeader = function (fetchOptions, key, value) {
+Request.setHeader = function(fetchOptions, key, value) {
   fetchOptions = fetchOptions || {};
   fetchOptions.headers = fetchOptions.headers || {};
   fetchOptions.headers[key] = value;

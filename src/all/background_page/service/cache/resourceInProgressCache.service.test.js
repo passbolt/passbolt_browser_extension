@@ -20,8 +20,8 @@ jest.useFakeTimers();
 const fakeResourceDto = {
   "name": "",
   "username": "",
-  "uri":"",
-  "secret_clear":""
+  "uri": "",
+  "secret_clear": ""
 };
 
 // Reset the modules before each test.
@@ -31,9 +31,8 @@ beforeEach(() => {
   jest.clearAllMocks();
   jest.clearAllTimers();
 });
- 
+
 describe("ResourceInProgressCache service", () => {
- 
   it("should trigger a reset after a logout", () => {
     const spy = jest.spyOn(ResourceInProgressCacheService, "reset");
     const fakeResource = new ExternalResourceEntity(fakeResourceDto);
@@ -56,7 +55,7 @@ describe("ResourceInProgressCache service", () => {
 
     ResourceInProgressCacheService.set(fakeResource, timeoutDelay);
     expect(spy).toHaveBeenCalledTimes(1);
-    
+
     jest.advanceTimersByTime(timeoutDelay);
     expect(spy).toHaveBeenCalledTimes(2);
   });
@@ -69,7 +68,7 @@ describe("ResourceInProgressCache service", () => {
 
     ResourceInProgressCacheService.set(fakeResource, Number.MAX_SAFE_INTEGER);
     expect(spy).toHaveBeenCalledTimes(1);
-    
+
     ResourceInProgressCacheService.consume();
     expect(spy).toHaveBeenCalledTimes(2);
   });

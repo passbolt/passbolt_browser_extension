@@ -65,12 +65,14 @@ class TagEntity extends Entity {
           "type": "boolean"
         }
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get tag id
    * @returns {(string|null)} uuid
@@ -95,9 +97,11 @@ class TagEntity extends Entity {
     return this._props.is_shared;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * TagEntity.ENTITY_NAME
    * @returns {string}

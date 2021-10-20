@@ -14,7 +14,6 @@
 const GpgAuth = require('../../model/gpgauth').GpgAuth;
 
 class AuthIsMfaRequiredController {
-
   constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
@@ -33,7 +32,6 @@ class AuthIsMfaRequiredController {
       this.worker.port.emit(this.requestId, 'ERROR', error);
     }
   }
-
 }
 
 exports.AuthIsMfaRequiredController = AuthIsMfaRequiredController;

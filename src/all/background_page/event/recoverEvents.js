@@ -17,7 +17,7 @@ const {SetRecoverLocaleController} = require("../controller/locale/setRecoverLoc
 const {GetRecoverLocaleController} = require("../controller/locale/getRecoverLocaleController");
 const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
 
-const listen = function (worker) {
+const listen = function(worker) {
   /**
    * The recover controller.
    * @type {RecoverController}
@@ -32,7 +32,7 @@ const listen = function (worker) {
    * @listens passbolt.recover.first-install
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.recover.first-install', async function (requestId) {
+  worker.port.on('passbolt.recover.first-install', async requestId => {
     try {
       const isFirstInstall = worker.tab.url.indexOf('first-install') !== -1;
       worker.port.emit(requestId, 'SUCCESS', isFirstInstall);
@@ -48,13 +48,13 @@ const listen = function (worker) {
    * @listens passbolt.organization-settings.get
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.organization-settings.get', async function (requestId) {
+  worker.port.on('passbolt.organization-settings.get', async requestId => {
     try {
       const apiClientOptions = (new ApiClientOptions()).setBaseUrl(recoverController.setupEntity.domain);
       const organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
       const organizationSettings = await organizationSettingsModel.getOrFind(true);
       worker.port.emit(requestId, 'SUCCESS', organizationSettings);
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
@@ -106,7 +106,7 @@ const listen = function (worker) {
    * @listens passbolt.recover.info
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.recover.info', async function (requestId) {
+  worker.port.on('passbolt.recover.info', async requestId => {
     try {
       const setupEntity = await recoverController.retrieveRecoverInfo();
       worker.port.emit(requestId, 'SUCCESS', setupEntity);
@@ -125,7 +125,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param armoredKey {string} The armored key to import
    */
-  worker.port.on('passbolt.recover.import-key', async function (requestId, armoredKey) {
+  worker.port.on('passbolt.recover.import-key', async(requestId, armoredKey) => {
     try {
       await recoverController.importKey(armoredKey);
       worker.port.emit(requestId, 'SUCCESS');
@@ -143,7 +143,7 @@ const listen = function (worker) {
    * @param passphrase {string} The passphrase used to verify the secret key
    * @param rememberUntilLogout {boolean} The passphrase should be remembered until the user is logged out
    */
-  worker.port.on('passbolt.recover.verify-passphrase', async function (requestId, passphrase, rememberUntilLogout) {
+  worker.port.on('passbolt.recover.verify-passphrase', async(requestId, passphrase, rememberUntilLogout) => {
     try {
       await recoverController.verifyPassphrase(passphrase, rememberUntilLogout);
       worker.port.emit(requestId, 'SUCCESS');
@@ -160,7 +160,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param securityTokenDto {object} The security token dto. ie: {color: hex-string, text-color: hex-string, code: string}
    */
-  worker.port.on('passbolt.recover.set-security-token', async function (requestId, securityTokenDto) {
+  worker.port.on('passbolt.recover.set-security-token', async(requestId, securityTokenDto) => {
     try {
       recoverController.setSecurityToken(securityTokenDto);
       worker.port.emit(requestId, 'SUCCESS');
@@ -176,7 +176,7 @@ const listen = function (worker) {
    * @listens passbolt.recover.complete
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.recover.complete', async function (requestId) {
+  worker.port.on('passbolt.recover.complete', async requestId => {
     try {
       await recoverController.complete();
       worker.port.emit(requestId, 'SUCCESS');

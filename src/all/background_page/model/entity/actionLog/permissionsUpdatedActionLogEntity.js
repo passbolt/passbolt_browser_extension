@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {EntitySchema} = require('../abstract/entitySchema');
-const {EntityValidationError} = require('../abstract/entityValidationError');
 const {AbstractActionLogEntity} = require("./abstractActionLogEntity");
 const {UpdatedPermissionsCollection} = require("../permission/actionLog/updatedPermissionsCollection");
 
@@ -69,7 +68,7 @@ class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
     schema.properties.type = {
       "type": "string",
       "enum": PermissionsUpdatedActionLogEntity.ALLOWED_TYPES
-    }
+    };
     schema.properties.data = {
       "type": "object",
       "required": ["permissions"],
@@ -83,13 +82,15 @@ class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
           }
         }
       }
-    }
+    };
     return schema;
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
 
   /**
    * Return a DTO ready to be sent to API
@@ -97,7 +98,7 @@ class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
    * @returns {object}
    */
   toDto() {
-    const result = super.toDto()
+    const result = super.toDto();
 
     result.data = {
       permissions: {
@@ -118,9 +119,11 @@ class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
     return this.toDto();
   }
 
-  // ==================================================
-  // Other associated properties methods
-  // ==================================================
+  /*
+   * ==================================================
+   * Other associated properties methods
+   * ==================================================
+   */
 
   /**
    * Get the added permissions
@@ -146,9 +149,11 @@ class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
     return this._permissionsRemoved;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
 
   /**
    * ActionLog.ENTITY_NAME

@@ -13,10 +13,10 @@
 const {PageMod} = require('../sdk/page-mod');
 const app = require('../app');
 
-const InFormMenu = function () {};
+const InFormMenu = function() {};
 InFormMenu._pageMod = undefined;
 
-InFormMenu.init = function () {
+InFormMenu.init = function() {
   if (typeof InFormMenu._pageMod !== 'undefined') {
     InFormMenu._pageMod.destroy();
     InFormMenu._pageMod = undefined;
@@ -27,10 +27,12 @@ InFormMenu.init = function () {
     include: 'about:blank?passbolt=passbolt-iframe-in-form-menu',
     contentScriptWhen: 'ready',
     contentScriptFile: [
-			// Warning: script and styles need to be modified in
-			// chrome/data/passbolt-iframe-in-form-menu.html
-		],
-    onAttach: function (worker) {
+      /*
+       * Warning: script and styles need to be modified in
+       * chrome/data/passbolt-iframe-in-form-menu.html
+       */
+    ],
+    onAttach: function(worker) {
       app.events.informMenu.listen(worker);
 
       /*

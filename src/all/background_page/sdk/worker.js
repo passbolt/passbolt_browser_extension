@@ -1,6 +1,6 @@
-var Port = require('../sdk/port').Port;
-var Tab = require('../sdk/tab').Tab;
-var Log = require('../model/log').Log;
+const Port = require('../sdk/port').Port;
+const Tab = require('../sdk/tab').Tab;
+const Log = require('../model/log').Log;
 
 /**
  * PageMod Worker Chrome Wrapper
@@ -14,19 +14,23 @@ const Worker = function(port, tab, iframe, pageMod) {
   this.iframe = iframe;
   this.pageMod = pageMod;
 
-  // make sure the worker self destroy
-  // when the tab its running in is closed
-  var _this = this;
+  /*
+   * make sure the worker self destroy
+   * when the tab its running in is closed
+   */
+  const _this = this;
   if (tab) {
     this.tab = new Tab(tab);
-    this.tab.on('removed', function () {
+    this.tab.on('removed', () => {
       _this.destroy('tab was closed');
     });
   }
 
-  // make sure the worker self destroy
-  // when it's an iframe worker and the iframe is unloaded
-  if(iframe) {
+  /*
+   * make sure the worker self destroy
+   * when it's an iframe worker and the iframe is unloaded
+   */
+  if (iframe) {
     this.onPortDisconnect = function() {
       _this.port._port.onDisconnect.removeListener(_this.onPortDisconnect);
       _this.destroy('iframe got unloaded');
@@ -40,7 +44,7 @@ const Worker = function(port, tab, iframe, pageMod) {
  * @param eventName
  * @param callback
  */
-Worker.prototype.on = function (eventName, callback) {
+Worker.prototype.on = function(eventName, callback) {
   this.callbacks[eventName] = callback;
 };
 
@@ -48,7 +52,7 @@ Worker.prototype.on = function (eventName, callback) {
  * Trigger an event listener
  * @param eventName
  */
-Worker.prototype.triggerEvent = function (eventName) {
+Worker.prototype.triggerEvent = function(eventName) {
   // Log.write({level: 'debug', message: 'sdk/worker::triggerEvent ' + eventName + ' tab:' + this.tab.id});
   if (typeof this.callbacks[eventName] !== 'undefined') {
     this.callbacks[eventName].apply();
@@ -58,17 +62,19 @@ Worker.prototype.triggerEvent = function (eventName) {
 /**
  * Destroy the worker
  */
-Worker.prototype.destroy = function (reason) {
+Worker.prototype.destroy = function(reason) {
   Log.write({level: 'debug', message: `sdk/worker::destroy ${this.tab && this.tab.id ? `(tab: ${this.tab.id})` : ""} : ${reason}`});
 
   // A detach event is fired just before removal.
   this.triggerEvent('detach');
 
-  // remove the content script from the page
-  // Not possible...
+  /*
+   * remove the content script from the page
+   * Not possible...
+   */
 
   // remove all registered listeners
-  if(this.iframe) {
+  if (this.iframe) {
     this.port._port.onDisconnect.removeListener(this.onPortDisconnect);
   }
   if (this.tab) {

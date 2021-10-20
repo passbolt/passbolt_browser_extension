@@ -55,12 +55,14 @@ class GroupUserTransferEntity extends Entity {
           "format": "uuid"
         },
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get the group user ID
    * This is the membership ID of the user that will be promoted to manager
@@ -82,9 +84,11 @@ class GroupUserTransferEntity extends Entity {
     return this._props.group_id;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * GroupUserTransferEntity.ENTITY_NAME
    *

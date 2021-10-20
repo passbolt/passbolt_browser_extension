@@ -21,7 +21,7 @@ const GENERATORS =  [
   {
     "name": "Password",
     "type": "password",
-    "default_options":{
+    "default_options": {
       "length": 18,
       "look_alike": true,
       "min_length": 8,
@@ -102,7 +102,7 @@ const GENERATORS =  [
   {
     "name": "Passphrase",
     "type": "passphrase",
-    "default_options":{
+    "default_options": {
       "word_count": 9,
       "word_case": "lowercase",
       "min_word": 4,
@@ -128,7 +128,7 @@ class PasswordGeneratorModel {
    *
    * @return {ResourceTypesCollection}
    */
-  async updateLocalStorage () {
+  async updateLocalStorage() {
     let passwordGeneratorDto = {};
     try {
       passwordGeneratorDto = await this.passwordGeneratorService.find();
@@ -136,7 +136,7 @@ class PasswordGeneratorModel {
     } catch (error) {
       if (error instanceof PassboltApiFetchError && error.data && error.data.code === 404) {
         const default_generator = "password";
-        passwordGeneratorDto = Object.assign({}, {default_generator}, {generators: GENERATORS});
+        passwordGeneratorDto = Object.assign({}, {default_generator: default_generator}, {generators: GENERATORS});
       } else {
         throw error;
       }

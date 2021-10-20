@@ -4,13 +4,13 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var User = require('./user').User;
+const User = require('./user').User;
 
 /**
  * Toolbar constructor.
  * @constructor
  */
-var Toolbar = function () {};
+const Toolbar = function() {};
 
 /**
  * Get the toolbar url, that will be used when the user click
@@ -21,16 +21,15 @@ var Toolbar = function () {};
  * - Plugin installed and configured, return the passbolt url.
  * @return {string}
  */
-Toolbar.getToolbarUrl = function () {
-  var url = '',
-    user = User.getInstance();
+Toolbar.getToolbarUrl = function() {
+  let url = '';
+  const user = User.getInstance();
 
   // The plugin is installed and configured
   if (user.isValid()) {
     url = user.settings.getDomain();
-  }
-  // The plugin is installed but not configured
-  else {
+  } else {
+    // The plugin is installed but not configured
     url = 'https://www.passbolt.com/start';
   }
 

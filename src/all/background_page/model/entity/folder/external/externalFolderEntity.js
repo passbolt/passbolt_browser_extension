@@ -13,7 +13,6 @@
 const {FolderEntity} = require("../folderEntity");
 const {Entity} = require('../../abstract/entity');
 const {EntitySchema} = require('../../abstract/entitySchema');
-const {EntityValidationError} = require('../../abstract/entityValidationError');
 
 const ENTITY_NAME = 'ExternalFolder';
 
@@ -22,7 +21,7 @@ class ExternalFolderEntity extends Entity {
    * External folder entity constructor
    *
    * @param {Object} externalFolderDto external folder DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @throws {EntityValidationError} if the dto cannot be converted into an entity
    */
   constructor(externalFolderDto) {
     // Default properties values
@@ -48,7 +47,7 @@ class ExternalFolderEntity extends Entity {
   static getDefault() {
     return {
       "folder_parent_path": ""
-    }
+    };
   }
 
   /**
@@ -70,7 +69,7 @@ class ExternalFolderEntity extends Entity {
           "type": "string"
         }
       }
-    }
+    };
   }
 
   /**
@@ -88,9 +87,11 @@ class ExternalFolderEntity extends Entity {
     return new ExternalFolderEntity(externalFolderDto);
   }
 
-  // ==================================================
-  // Format / normalize
-  // ==================================================
+  /*
+   * ==================================================
+   * Format / normalize
+   * ==================================================
+   */
 
   /**
    * Normalize format path.
@@ -103,7 +104,7 @@ class ExternalFolderEntity extends Entity {
     return path
       .replace(/^(\/{2,})|(\/{2,})$/g, '/') //replace any group of starting or ending slash by a single slash
       .replace(/^(\/(?! ))|((?<! )\/)$/g, '') //remove starting '/' not followed by a space or an ending '/' not preceded by a space
-      .replace(/(?<! )(\/{2,})(?! )/g, '/') //replace any group of multiple / that are not prefixed or suffixed by a space
+      .replace(/(?<! )(\/{2,})(?! )/g, '/'); //replace any group of multiple / that are not prefixed or suffixed by a space
   }
 
   /**
@@ -141,12 +142,14 @@ class ExternalFolderEntity extends Entity {
    */
   static resolveEscapedName(name) {
     name = name || "";
-    return name.replace(/ \/ | \/|\/ /g,'/'); //replace any ' / ', ' /', '/ ' (slash with spaces) by a single '/'
+    return name.replace(/ \/ | \/|\/ /g, '/'); //replace any ' / ', ' /', '/ ' (slash with spaces) by a single '/'
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
 
   /**
    * Return a DTO ready to be sent to API
@@ -165,9 +168,11 @@ class ExternalFolderEntity extends Entity {
     return this.toDto();
   }
 
-  // ==================================================
-  // Dynamic properties getters / setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters / setters
+   * ==================================================
+   */
 
   /**
    * Get folder id
@@ -225,9 +230,11 @@ class ExternalFolderEntity extends Entity {
     this._props.folder_parent_path = folderParentPath;
   }
 
-  // ==================================================
-  // Calculated properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Calculated properties getters
+   * ==================================================
+   */
 
   /**
    * Get folder path
@@ -245,9 +252,11 @@ class ExternalFolderEntity extends Entity {
     return this.folderParentPath ? ExternalFolderEntity.splitFolderPath(this.folderParentPath).length : 0;
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
 
   /**
    * Move folder at a new root
@@ -261,9 +270,11 @@ class ExternalFolderEntity extends Entity {
     }
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
 
   /**
    * ExternalFolderEntity.ENTITY_NAME

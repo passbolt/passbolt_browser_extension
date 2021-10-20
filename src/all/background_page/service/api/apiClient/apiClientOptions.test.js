@@ -14,7 +14,6 @@
 import {ApiClientOptions} from "./apiClientOptions";
 
 describe("ApiClientOption testsuite", () => {
-
   it("should throw an error if url is empty", () => {
     expect(() => {
       (new ApiClientOptions()).setBaseUrl();
@@ -29,7 +28,7 @@ describe("ApiClientOption testsuite", () => {
 
   it("should throw an error if url is not correct type", () => {
     expect(() => {
-      (new ApiClientOptions()).setBaseUrl({'url':'nope'});
+      (new ApiClientOptions()).setBaseUrl({'url': 'nope'});
     }).toThrow(TypeError);
   });
 
@@ -41,8 +40,7 @@ describe("ApiClientOption testsuite", () => {
 
   it("should throw an error if resource name is not a string", () => {
     expect(() => {
-      (new ApiClientOptions()).setResourceName({'test':'test'});
+      (new ApiClientOptions()).setResourceName({'test': 'test'});
     }).toThrow(TypeError);
   });
-
 });

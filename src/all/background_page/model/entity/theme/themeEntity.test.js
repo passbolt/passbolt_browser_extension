@@ -40,7 +40,7 @@ describe("Theme entity", () => {
   it("constructor returns validation error if dto required fields are missing", () => {
     try {
       new ThemeEntity({});
-    } catch(error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(EntityValidationError);
       expect(typeof error.details).toEqual("object");
       expect(error.details.id).not.toBeUndefined();
@@ -57,12 +57,12 @@ describe("Theme entity", () => {
         "preview": "not-an-url",
       });
       expect(false).toBe(true);
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        id: { format: 'The id is not a valid uuid.' },
-        name: { pattern: 'The name is not valid.' },
-        preview: { format: 'The preview is not a valid x-url.' }
+        id: {format: 'The id is not a valid uuid.'},
+        name: {pattern: 'The name is not valid.'},
+        preview: {format: 'The preview is not a valid x-url.'}
       });
     }
   });

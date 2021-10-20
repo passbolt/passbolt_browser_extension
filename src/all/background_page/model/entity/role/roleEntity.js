@@ -69,12 +69,14 @@ class RoleEntity extends Entity {
           "format": "date-time"
         },
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get role id
    * @returns {string} uuid
@@ -115,9 +117,11 @@ class RoleEntity extends Entity {
     return this._props.modified || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * RoleEntity.ENTITY_NAME
    * @returns {string}
@@ -130,7 +134,7 @@ class RoleEntity extends Entity {
    * RoleEntity.ROLE_ADMIN
    * @returns {string} admin
    */
-  static get ROLE_ADMIN () {
+  static get ROLE_ADMIN() {
     return ROLE_ADMIN;
   }
 

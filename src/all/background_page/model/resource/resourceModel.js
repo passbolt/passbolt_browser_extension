@@ -22,7 +22,6 @@ const {PermissionsCollection} = require('../entity/permission/permissionsCollect
 const {PermissionChangesCollection} = require('../entity/permission/change/permissionChangesCollection');
 const {ResourceTypeModel} = require('../../model/resourceType/resourceTypeModel');
 
-const {TagsCollection} = require('../../model/entity/tag/tagsCollection');
 const {MoveService} = require('../../service/api/move/moveService');
 
 const BULK_OPERATION_SIZE = 5;
@@ -46,16 +45,18 @@ class ResourceModel {
    *
    * @return {ResourcesCollection}
    */
-  async updateLocalStorage () {
+  async updateLocalStorage() {
     const contain = {permission: true, favorite: true, tag: true};
     const resourcesCollection = await this.findAll(contain, null, null, true);
     await ResourceLocalStorage.set(resourcesCollection);
     return resourcesCollection;
   }
 
-  //==============================================================
-  // Local storage getters
-  //==============================================================
+  /*
+   * ==============================================================
+   *  Local storage getters
+   * ==============================================================
+   */
   /**
    * Get a collection of resources from the local storage by id
    *
@@ -65,14 +66,14 @@ class ResourceModel {
   async getAllByParentIds(folderIds) {
     const localResources = await ResourceLocalStorage.get();
     const resourcesCollection = new ResourcesCollection([]);
-    for (let i in localResources) {
-      let resourceDto = localResources[i];
+    for (const i in localResources) {
+      const resourceDto = localResources[i];
       if (folderIds.includes(resourceDto.folder_parent_id)) {
         resourcesCollection.push(resourceDto);
       }
     }
     return resourcesCollection;
-  };
+  }
 
   /**
    * Get a collection of resources from the local storage by id
@@ -84,7 +85,7 @@ class ResourceModel {
     const localResources = await ResourceLocalStorage.get();
     const filteredResources = localResources.filter(localResource => resourceIds.includes(localResource.id));
     return new ResourcesCollection(filteredResources);
-  };
+  }
 
   /**
    * Return a resource for a given id from the local storage
@@ -106,9 +107,11 @@ class ResourceModel {
     return localResources ? new ResourcesCollection(localResources) : this.findAll();
   }
 
-  //==============================================================
-  // Permission changes
-  //==============================================================
+  /*
+   * ==============================================================
+   *  Permission changes
+   * ==============================================================
+   */
   /**
    * Calculate permission changes for a move
    * From current permissions, remove the parent folder permissions, add the destination permissions
@@ -142,10 +145,12 @@ class ResourceModel {
       );
     }
 
-    let newPermissions = PermissionsCollection.sum(remainingPermissions, permissionsFromParent, false);
+    const newPermissions = PermissionsCollection.sum(remainingPermissions, permissionsFromParent, false);
     if (!destFolder) {
-      // If the move is toward the root
-      // Reuse highest permission
+      /*
+       * If the move is toward the root
+       * Reuse highest permission
+       */
       newPermissions.addOrReplace(new PermissionEntity({
         aco: PermissionEntity.ACO_RESOURCE,
         aro: resource.permission.aro,
@@ -176,14 +181,16 @@ class ResourceModel {
       }
       const currentPermissions = new PermissionsCollection([resource.permission]);
       const permissionsFromDest = destFolder.permissions.cloneForAco(PermissionEntity.ACO_RESOURCE, resource.id);
-      changes = PermissionChangesCollection.calculateChanges(currentPermissions, permissionsFromDest)
+      changes = PermissionChangesCollection.calculateChanges(currentPermissions, permissionsFromDest);
     }
     return changes;
   }
 
-  //==============================================================
-  // Finders / remote calls
-  //==============================================================
+  /*
+   * ==============================================================
+   *  Finders / remote calls
+   * ==============================================================
+   */
   /**
    * Find all
    *
@@ -207,10 +214,10 @@ class ResourceModel {
    * @param {array} resourcesIds resource uuids
    * @returns {Promise<ResourcesCollection>}
    */
-  async findAllForShare (resourcesIds) {
-    let resourcesDto = await this.resourceService.findAllForShare(resourcesIds);
+  async findAllForShare(resourcesIds) {
+    const resourcesDto = await this.resourceService.findAllForShare(resourcesIds);
     return new ResourcesCollection(resourcesDto);
-  };
+  }
 
   /**
    * Find all resources for decrypt
@@ -218,16 +225,16 @@ class ResourceModel {
    * @param {array} resourcesIds resources uuids
    * @returns {Promise<ResourcesCollection>}
    */
-  async findAllForDecrypt (resourcesIds) {
+  async findAllForDecrypt(resourcesIds) {
     let resourcesDto = [];
     // We split the requests in chunks in order to avoid any too long url error.
     const resourcesIdsChunks = splitBySize(resourcesIds, 80);
-    for (let resourcesIdsChunk of resourcesIdsChunks) {
+    for (const resourcesIdsChunk of resourcesIdsChunks) {
       const partialResourcesDto = await this.resourceService.findAll({'secret': true, 'resource-type': true}, {'has-id': resourcesIdsChunk});
       resourcesDto = [...resourcesDto, ...partialResourcesDto];
     }
     return new ResourcesCollection(resourcesDto);
-  };
+  }
 
   /**
    * Find a resource to share
@@ -235,10 +242,10 @@ class ResourceModel {
    * @param {string} resourcesId resource uuid
    * @returns {Promise<ResourceEntity>}
    */
-  async findForDecrypt (resourcesId) {
+  async findForDecrypt(resourcesId) {
     const resourcesDto = await this.resourceService.get(resourcesId, {'secret': true, 'resource-type': true});
     return new ResourceEntity(resourcesDto);
-  };
+  }
 
   /**
    * Find permissions for a resource
@@ -246,14 +253,16 @@ class ResourceModel {
    * @param {string} resourcesId resource uuid
    * @returns {Promise<PermissionsCollection>}
    */
-  async findResourcePermissions (resourcesId) {
-    const contain = {'permissions.user.profile':true, 'permissions.group':true};
+  async findResourcePermissions(resourcesId) {
+    const contain = {'permissions.user.profile': true, 'permissions.group': true};
 
-    // TODO deprecate findAll with has-id filter and use what's in comment
-    // TODO not possible for backward compatibility issues, because permissions filter not present < v3
-    //const resourcesDto = await this.resourceService.get(resourcesId, contain);
-    //const resourceEntity = new ResourceEntity(resourcesDto);
-    //return resourceEntity.permissions;
+    /*
+     *  TODO deprecate findAll with has-id filter and use what's in comment
+     *  TODO not possible for backward compatibility issues, because permissions filter not present < v3
+     * const resourcesDto = await this.resourceService.get(resourcesId, contain);
+     * const resourceEntity = new ResourceEntity(resourcesDto);
+     * return resourceEntity.permissions;
+     */
 
     // @deprecated
     const filter = {'has-id': [resourcesId]};
@@ -287,9 +296,11 @@ class ResourceModel {
     return (await this.getOrFindAll()).findSuggestedResources(url).map(toDto);
   }
 
-  //==============================================================
-  // CRUD
-  //==============================================================
+  /*
+   * ==============================================================
+   *  CRUD
+   * ==============================================================
+   */
   /**
    * Create a resource using Passbolt API and add result to local storage
    *
@@ -297,7 +308,7 @@ class ResourceModel {
    * @returns {Promise<ResourceEntity>}
    */
   async create(resourceEntity) {
-    const data = resourceEntity.toDto({secrets:true});
+    const data = resourceEntity.toDto({secrets: true});
     const contain = {permission: true, favorite: true, tags: true, folder: true};
     const resourceDto = await this.resourceService.create(data, contain);
     const newResourceEntity = new ResourceEntity(resourceDto);
@@ -312,7 +323,7 @@ class ResourceModel {
    * @returns {Promise<ResourceEntity>}
    */
   async update(resourceEntity) {
-    const data = resourceEntity.toDto({secrets:true});
+    const data = resourceEntity.toDto({secrets: true});
     const resourceDto = await this.resourceService.update(resourceEntity.id, data, ResourceLocalStorage.DEFAULT_CONTAIN);
     const updatedResourceEntity = new ResourceEntity(resourceDto);
     await ResourceLocalStorage.updateResource(updatedResourceEntity);
@@ -348,9 +359,11 @@ class ResourceModel {
     return resourceEntity;
   }
 
-  //==============================================================
-  // Bulk operations
-  //==============================================================
+  /*
+   * ==============================================================
+   *  Bulk operations
+   * ==============================================================
+   */
   /**
    * Create a bulk of resources
    * @param {ResourcesCollection} collection The collection of resources to import
@@ -362,9 +375,9 @@ class ResourceModel {
 
     // Parallelize the operations by chunk of BULK_OPERATION_SIZE operations.
     const chunks = splitBySize(collection.resources, BULK_OPERATION_SIZE);
-    for (let chunkIndex in chunks) {
+    for (const chunkIndex in chunks) {
       const chunk = chunks[chunkIndex];
-      const promises = chunk.map(async (resourceId, mapIndex) => {
+      const promises = chunk.map(async(resourceId, mapIndex) => {
         const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
         return this._bulkCreate_createResource(resourceId, collectionIndex, callbacks);
       });
@@ -396,16 +409,18 @@ class ResourceModel {
     const errorCallback = callbacks.errorCallback || (() => {});
 
     try {
-      // Here we create entity just like in this.create
-      // but we don't add the resource entity in the local storage just yet,
-      // we wait until all resources are created in order to speed things up
-      const data = resourceEntity.toDto({secrets:true});
+      /*
+       * Here we create entity just like in this.create
+       * but we don't add the resource entity in the local storage just yet,
+       * we wait until all resources are created in order to speed things up
+       */
+      const data = resourceEntity.toDto({secrets: true});
       const contain = {permission: true, favorite: true, tags: true, folder: true};
       const resourceDto = await this.resourceService.create(data, contain);
       const createdResourceEntity = new ResourceEntity(resourceDto);
       successCallback(createdResourceEntity, collectionIndex);
       return createdResourceEntity;
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       errorCallback(error, collectionIndex);
       throw error;
@@ -423,9 +438,9 @@ class ResourceModel {
 
     // Parallelize the operations by chunk of BULK_OPERATION_SIZE operations.
     const chunks = splitBySize(resourcesIds, BULK_OPERATION_SIZE);
-    for (let chunkIndex in chunks) {
+    for (const chunkIndex in chunks) {
       const chunk = chunks[chunkIndex];
-      const promises = chunk.map(async (resourceId, mapIndex) => {
+      const promises = chunk.map(async(resourceId, mapIndex) => {
         const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
         return this._bulkDelete_deleteResource(resourceId, collectionIndex, callbacks);
       });
@@ -455,16 +470,18 @@ class ResourceModel {
     try {
       await this.delete(resourceId);
       successCallback(collectionIndex);
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       errorCallback(error, collectionIndex);
       throw error;
     }
   }
 
-  //==============================================================
-  // Secret plaintext serialization
-  //==============================================================
+  /*
+   * ==============================================================
+   *  Secret plaintext serialization
+   * ==============================================================
+   */
   /**
    * Return plaintext ready to be encrypted
    * Based on resource type and plaintext
@@ -502,14 +519,14 @@ class ResourceModel {
    */
   async deserializePlaintext(resourceTypeId, plaintext) {
     if (typeof plaintext !== 'string') {
-      throw new TypeError('Could not deserialize secret, plaintext is not a string.')
+      throw new TypeError('Could not deserialize secret, plaintext is not a string.');
     }
     if (!resourceTypeId) {
       return plaintext;
     }
     const schema = await this.resourceTypeModel.getSecretSchemaById(resourceTypeId);
     if (!schema) {
-      throw new TypeError('Could not find the schema definition for the requested resource type.')
+      throw new TypeError('Could not find the schema definition for the requested resource type.');
     }
     if (schema.type === 'string') {
       return plaintext;
@@ -517,17 +534,21 @@ class ResourceModel {
     try {
       const plaintextDto = JSON.parse(plaintext);
       return new PlaintextEntity(plaintextDto, schema);
-    } catch(error) {
+    } catch (error) {
       console.error(error);
-      // SyntaxError, json is not valid
-      // TypeError schema does not match
+      /*
+       * SyntaxError, json is not valid
+       * TypeError schema does not match
+       */
       return plaintext; // return 'broken' string
     }
   }
 
-  //==============================================================
-  // Associated data management
-  //==============================================================
+  /*
+   * ==============================================================
+   *  Associated data management
+   * ==============================================================
+   */
   /**
    * Update tag in associated resource local storage
    *
@@ -537,7 +558,7 @@ class ResourceModel {
    */
   async replaceTagLocally(tagId, tagEntity) {
     const localResources = await ResourceLocalStorage.get();
-    let resourceCollection = new ResourcesCollection(localResources);
+    const resourceCollection = new ResourcesCollection(localResources);
     if (resourceCollection.replaceTag(tagId, tagEntity)) {
       await ResourceLocalStorage.set(resourceCollection);
       return true;
@@ -571,7 +592,7 @@ class ResourceModel {
    */
   async bulkReplaceResourceTagsLocally(resourceIds, tagsCollections) {
     const resourcesDto = await ResourceLocalStorage.get();
-    let resourceCollection = new ResourcesCollection(resourcesDto);
+    const resourceCollection = new ResourcesCollection(resourcesDto);
     await resourceCollection.bulkReplaceTagsCollection(resourceIds, tagsCollections);
     await ResourceLocalStorage.set(resourceCollection);
   }
@@ -584,7 +605,7 @@ class ResourceModel {
    */
   async deleteTagsLocally(tagId) {
     const localResources = await ResourceLocalStorage.get();
-    let resourceCollection = new ResourcesCollection(localResources);
+    const resourceCollection = new ResourcesCollection(localResources);
     if (resourceCollection.removeTagById(tagId)) {
       await ResourceLocalStorage.set(resourceCollection);
       return true;
@@ -607,9 +628,11 @@ class ResourceModel {
     await ResourceLocalStorage.updateResource(resourceEntity);
   }
 
-  //==============================================================
-  // Assertions
-  //==============================================================
+  /*
+   * ==============================================================
+   *  Assertions
+   * ==============================================================
+   */
   /**
    * Assert that all the folders are in the local storage
    *
@@ -621,7 +644,7 @@ class ResourceModel {
     if (!Array.isArray(resourceIds)) {
       throw new TypeError(`Resources exist check expect an array of uuid.`);
     }
-    for (let i in resourceIds) {
+    for (const i in resourceIds) {
       if (!resources.find(item => item.id === resourceIds[i])) {
         return false;
       }

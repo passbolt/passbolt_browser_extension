@@ -56,12 +56,14 @@ class SecurityTokenEntity extends Entity {
           "format": "x-hex-color"
         }
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
 
   /**
    * Get code
@@ -87,9 +89,11 @@ class SecurityTokenEntity extends Entity {
     return this._props.textcolor;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
 
   /**
    * SecurityTokenEntity.ENTITY_NAME

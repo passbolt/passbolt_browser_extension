@@ -48,7 +48,7 @@ class AvatarUpdateEntity extends Entity {
     const fileBase64 = avatarBase64UpdateDto.fileBase64;
     const mimeType = avatarBase64UpdateDto.mimeType;
     const file = b64ToBlob(fileBase64, mimeType);
-    const avatarUpdateDto = {file, filename, mimeType};
+    const avatarUpdateDto = {file: file, filename: filename, mimeType: mimeType};
     return new AvatarUpdateEntity(avatarUpdateDto);
   }
 
@@ -75,12 +75,14 @@ class AvatarUpdateEntity extends Entity {
           "type": "string"
         }
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
 
   /**
    * Get the file
@@ -114,9 +116,11 @@ class AvatarUpdateEntity extends Entity {
     return this._props.mimeType;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
 
   /**
    * AvatarEntity.ENTITY_NAME

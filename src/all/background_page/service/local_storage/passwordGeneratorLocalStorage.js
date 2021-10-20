@@ -39,7 +39,7 @@ class PasswordGeneratorLocalStorage {
   static async get() {
     const {passwordGenerator} = await browser.storage.local.get([PASSWORD_GENERATOR_LOCAL_STORAGE_KEY]);
     return passwordGenerator;
-  };
+  }
 
   /**
    * Set the password generator in local storage.
@@ -48,9 +48,9 @@ class PasswordGeneratorLocalStorage {
    */
   static async set(passwordGenerator) {
     await lock.acquire();
-    await browser.storage.local.set({passwordGenerator});
+    await browser.storage.local.set({passwordGenerator: passwordGenerator});
     lock.release();
-  };
+  }
 
 
   /**

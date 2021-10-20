@@ -86,7 +86,7 @@ describe("Resources Collection", () => {
     };
     const dto = [resource1, resource1];
 
-    let t = () => {new ResourcesCollection(dto)};
+    const t = () => { new ResourcesCollection(dto); };
     expect(t).toThrow(EntityCollectionError);
   });
 
@@ -104,7 +104,7 @@ describe("Resources Collection", () => {
     };
     const dto = [resource1, resource2, resource3];
 
-    let t = () => {new ResourcesCollection(dto)};
+    const t = () => { new ResourcesCollection(dto); };
     expect(t).toThrow(EntityCollectionError);
   });
 
@@ -123,17 +123,17 @@ describe("Resources Collection", () => {
       "id": "45ce85c9-e301-4de2-8b41-298507002862",
       "is_shared": false,
       "slug": 'tag2'
-    }
+    };
     const dto = [{
       "name": "resource1",
       "tags": [tag1, tag2]
-    },{
+    }, {
       "name": "resource2",
       "tags": [tag1]
-    },{
+    }, {
       "name": "resource3",
       "tags": [tag2]
-    },{
+    }, {
       "name": "resource4"
     }];
     const resourcesCollection = new ResourcesCollection(dto);
@@ -168,7 +168,7 @@ describe("Resources Collection", () => {
       "id": "45ce85c9-e301-4de2-8b41-298507002862",
       "is_shared": false,
       "slug": 'tag2'
-    }
+    };
     const tag3 = {
       "id": "45ce85c9-e301-4de2-8b41-298507002863",
       "is_shared": false,
@@ -177,13 +177,13 @@ describe("Resources Collection", () => {
     const dto = [{
       "name": "resource1",
       "tags": [tag1, tag2]
-    },{
+    }, {
       "name": "resource2",
       "tags": [tag1]
-    },{
+    }, {
       "name": "resource3",
       "tags": [tag2]
-    },{
+    }, {
       "name": "resource4"
     }];
     const resourcesCollection = new ResourcesCollection(dto);
@@ -205,21 +205,21 @@ describe("Resources Collection", () => {
 
   it("bulk replace tag works", () => {
     const tag1 = {"id": "45ce85c9-e301-4de2-8b41-298507002861", "is_shared": false, "slug": 'tag1'};
-    const tag2 = {"id": "45ce85c9-e301-4de2-8b41-298507002862", "is_shared": false, "slug": 'tag2'}
+    const tag2 = {"id": "45ce85c9-e301-4de2-8b41-298507002862", "is_shared": false, "slug": 'tag2'};
     const tag3 = {"id": "45ce85c9-e301-4de2-8b41-298507002863", "is_shared": false, "slug": 'tag3'};
     const dto = [{
       "id": "45ce85c9-e301-4de2-8b41-298507002851",
       "name": "resource1",
       "tags": [tag1, tag2]
-    },{
+    }, {
       "id": "45ce85c9-e301-4de2-8b41-298507002852",
       "name": "resource2",
       "tags": [tag1]
-    },{
+    }, {
       "id": "45ce85c9-e301-4de2-8b41-298507002853",
       "name": "resource3",
       "tags": [tag2]
-    },{
+    }, {
       "id": "45ce85c9-e301-4de2-8b41-298507002854",
       "name": "resource4"
     }];

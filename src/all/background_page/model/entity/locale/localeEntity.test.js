@@ -38,7 +38,7 @@ describe("Locale entity", () => {
   it("constructor returns validation error if dto required fields are missing", () => {
     try {
       new LocaleEntity({});
-    } catch(error) {
+    } catch (error) {
       expect(error).toBeInstanceOf(EntityValidationError);
       expect(typeof error.details).toEqual("object");
       expect(error.details.locale).not.toBeUndefined();
@@ -51,10 +51,10 @@ describe("Locale entity", () => {
         "locale": "🏆‍️"
       });
       expect(false).toBe(true);
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        locale: { pattern: 'The locale is not valid.' },
+        locale: {pattern: 'The locale is not valid.'},
       });
     }
   });

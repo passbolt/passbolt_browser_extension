@@ -41,9 +41,9 @@ class MoveController {
       throw new TypeError('Move controller parameters cannot be empty');
     }
 
-    let folderParentId = moveDto.folderParentId ? moveDto.folderParentId : null;
-    let foldersIds = moveDto.folders ? moveDto.folders : [];
-    let resourcesIds = moveDto.resources ? moveDto.resources : [];
+    const folderParentId = moveDto.folderParentId ? moveDto.folderParentId : null;
+    const foldersIds = moveDto.folders ? moveDto.folders : [];
+    const resourcesIds = moveDto.resources ? moveDto.resources : [];
 
     // TODO
     if (resourcesIds.length && foldersIds.length) {
@@ -55,13 +55,13 @@ class MoveController {
 
     // Move multiple resources at once
     if (resourcesIds.length) {
-      let controller = new MoveResourcesController(this.worker, this.requestId, this.clientOptions);
+      const controller = new MoveResourcesController(this.worker, this.requestId, this.clientOptions);
       await controller.main(resourcesIds, folderParentId);
     }
 
     // Move one folder
     if (foldersIds.length) {
-      let controller = new MoveFolderController(this.worker, this.requestId, this.clientOptions);
+      const controller = new MoveFolderController(this.worker, this.requestId, this.clientOptions);
       await controller.main(foldersIds[0], folderParentId);
     }
   }

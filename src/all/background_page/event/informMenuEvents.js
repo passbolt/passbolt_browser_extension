@@ -18,24 +18,23 @@ const {User} = require('../model/user');
  * Listens the inform menu events
  * @param worker
  */
-const listen = function (worker) {
-
+const listen = function(worker) {
   /** Whenever the in-form menu need initialization */
-  worker.port.on('passbolt.in-form-menu.init', async function(requestId) {
+  worker.port.on('passbolt.in-form-menu.init', async requestId => {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const informMenuController = new InformMenuController(worker, apiClientOptions);
     await informMenuController.getInitialConfiguration(requestId);
   });
 
   /** Whenever the user clicks on create new credentials of the in-form-menu */
-  worker.port.on('passbolt.in-form-menu.create-new-credentials', async function(requestId) {
+  worker.port.on('passbolt.in-form-menu.create-new-credentials', async requestId => {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const informMenuController = new InformMenuController(worker, apiClientOptions);
     await informMenuController.createNewCredentials(requestId);
   });
 
   /** Whenever the user clicks on create new credentials of the in-form-menu */
-  worker.port.on('passbolt.in-form-menu.save-credentials', async function(requestId) {
+  worker.port.on('passbolt.in-form-menu.save-credentials', async requestId => {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const informMenuController = new InformMenuController(worker, apiClientOptions);
     await informMenuController.saveCredentials(requestId);
@@ -44,28 +43,28 @@ const listen = function (worker) {
   /**
    * Whenever the user intends to use a suggested resource as credentials for the current page
    */
-  worker.port.on('passbolt.in-form-menu.use-suggested-resource', async function(requestId, resourceId) {
+  worker.port.on('passbolt.in-form-menu.use-suggested-resource', async(requestId, resourceId) => {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const informMenuController = new InformMenuController(worker, apiClientOptions);
     await informMenuController.useSuggestedResource(requestId, resourceId);
   });
 
   /** Whenever the user clicks on browse credentials of the in-form-menu */
-  worker.port.on('passbolt.in-form-menu.browse-credentials', async function(requestId) {
+  worker.port.on('passbolt.in-form-menu.browse-credentials', async requestId => {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const informMenuController = new InformMenuController(worker, apiClientOptions);
     informMenuController.browseCredentials(requestId);
   });
 
   /** Whenever the user wants to fill the password field with a password */
-  worker.port.on('passbolt.in-form-menu.fill-password', async function(requestId, password) {
+  worker.port.on('passbolt.in-form-menu.fill-password', async(requestId, password) => {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const informMenuController = new InformMenuController(worker, apiClientOptions);
     informMenuController.fillPassword(requestId, password);
   });
 
   /** Whenever the user wants to close the in-form-menu */
-  worker.port.on('passbolt.in-form-menu.close', async function(requestId) {
+  worker.port.on('passbolt.in-form-menu.close', async requestId => {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const informMenuController = new InformMenuController(worker, apiClientOptions);
     informMenuController.close(requestId);
@@ -77,7 +76,7 @@ const listen = function (worker) {
    * @listens passbolt.locale.get
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.locale.get', async function(requestId) {
+  worker.port.on('passbolt.locale.get', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const getLocaleController = new GetLocaleController(worker, apiClientOptions);
 

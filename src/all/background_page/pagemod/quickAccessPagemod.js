@@ -13,14 +13,13 @@ const WorkerModel = require('../model/worker');
 /*
  * This page mod drives the quick access default popup
  */
-const QuickAccess = function () {
+const QuickAccess = function() {
   // The current active worker.
   this._worker = null;
 };
 
-QuickAccess.init = function () {
-
-  chrome.runtime.onConnect.addListener(async function (port) {
+QuickAccess.init = function() {
+  chrome.runtime.onConnect.addListener(async function(port) {
     if (port.name === "quickaccess") {
       this._worker = new Worker(port, port.sender.tab);
 

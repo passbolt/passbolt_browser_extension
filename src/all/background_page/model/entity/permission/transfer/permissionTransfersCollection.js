@@ -32,8 +32,10 @@ class PermissionTransfersCollection extends EntityCollection {
       PermissionTransfersCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(permissionTransfer => {
       this.push(permissionTransfer);
     });
@@ -56,7 +58,7 @@ class PermissionTransfersCollection extends EntityCollection {
     return {
       "type": "array",
       "items": PermissionTransferEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -67,9 +69,11 @@ class PermissionTransfersCollection extends EntityCollection {
     return ENTITY_NAME;
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the permission to the list
    * @param {PermissionTransferEntity} permissionTransfer DTO or PermissionTransferEntity

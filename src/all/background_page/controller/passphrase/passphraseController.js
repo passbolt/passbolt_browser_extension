@@ -11,7 +11,6 @@ const Keyring = require('../../model/keyring').Keyring;
 const User = require('../../model/user').User;
 const Worker = require('../../model/worker');
 const {UserAbortsOperationError} = require("../../error/userAbortsOperationError");
-const {BrowserTabService} = require("../../service/ui/browserTab.service");
 
 /**
  * Get the user master password.
@@ -20,7 +19,7 @@ const {BrowserTabService} = require("../../service/ui/browserTab.service");
  * @return {Promise<string>}
  * @throw Error if the passphrase is not valid.
  */
-const get = async function (worker) {
+const get = async function(worker) {
   const user = User.getInstance();
 
   try {
@@ -39,16 +38,12 @@ exports.get = get;
  * @return {Promise<string>}
  */
 const requestPassphrase = async function(worker) {
-  try {
-    const requestResult = await worker.port.request('passbolt.passphrase.request');
-    const { passphrase, rememberMe } = requestResult;
-    validatePassphrase(passphrase, rememberMe);
-    rememberPassphrase(passphrase, rememberMe);
+  const requestResult = await worker.port.request('passbolt.passphrase.request');
+  const {passphrase, rememberMe} = requestResult;
+  validatePassphrase(passphrase, rememberMe);
+  rememberPassphrase(passphrase, rememberMe);
 
-    return passphrase;
-  } catch (error) {
-    throw error;
-  }
+  return passphrase;
 };
 exports.request = requestPassphrase;
 
@@ -61,11 +56,11 @@ const requestPassphraseFromQuickAccess = async function() {
     return await user.getStoredMasterPassword();
   } catch (error) {
     /*
-     Open the quick access to request the master passphrase to the user.
-     Then once the quick access will have captured the passphrase, it will communicate it to its worker using requestId
-     as message name. Basically, without changing the way the passphrase will be returned if the quick access was already
-     open and it will have to reply to the request "passbolt.passphrase.request".
-    */
+     *Open the quick access to request the master passphrase to the user.
+     *Then once the quick access will have captured the passphrase, it will communicate it to its worker using requestId
+     *as message name. Basically, without changing the way the passphrase will be returned if the quick access was already
+     *open and it will have to reply to the request "passbolt.passphrase.request".
+     */
     const requestId = (Math.round(Math.random() * Math.pow(2, 32))).toString();
     const queryParameters = [
       {name: "uiMode", value: "detached"},
@@ -99,7 +94,7 @@ const listenToDetachedQuickaccessPassphraseRequestResponse = async function(requ
     quickAccessWorker.port.on(requestId, (status, requestResult)  => {
       isResolved = true;
       if (status === 'SUCCESS') {
-        resolve(requestResult)
+        resolve(requestResult);
       } else {
         reject(requestResult);
       }
@@ -111,7 +106,7 @@ const listenToDetachedQuickaccessPassphraseRequestResponse = async function(requ
         const error = new UserAbortsOperationError("The dialog has been closed.");
         reject(error);
       }
-    })
+    });
   });
 
   return promise;

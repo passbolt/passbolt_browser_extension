@@ -33,8 +33,10 @@ class PermissionChangesCollection extends EntityCollection {
       PermissionChangesCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(permissionChange => {
       this.push(permissionChange);
     });
@@ -52,7 +54,7 @@ class PermissionChangesCollection extends EntityCollection {
     return {
       "type": "array",
       "items": PermissionChangeEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -63,9 +65,11 @@ class PermissionChangesCollection extends EntityCollection {
     return ENTITY_NAME;
   }
 
-  // ==================================================
-  // Filters
-  // ==================================================
+  /*
+   * ==================================================
+   * Filters
+   * ==================================================
+   */
   /**
    * Filter By Aco Foreign Key
    *
@@ -88,9 +92,11 @@ class PermissionChangesCollection extends EntityCollection {
     return new PermissionChangesCollection(permissionChanges);
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the permission to the list
    * @param {PermissionChangeEntity} permissionChange DTO or PermissionChangeEntity
@@ -111,7 +117,7 @@ class PermissionChangesCollection extends EntityCollection {
    * @param {PermissionChangesCollection} permissionChangesCollection
    */
   merge(permissionChangesCollection) {
-    for (let changes of permissionChangesCollection) {
+    for (const changes of permissionChangesCollection) {
       this.push(changes);
     }
   }
@@ -125,15 +131,17 @@ class PermissionChangesCollection extends EntityCollection {
    */
   copyForAnotherAco(aco, acoForeignKey) {
     const results = new PermissionChangesCollection([]);
-    for (let change of this.items) {
-      results.push(change.copyForAnotherAco(aco, acoForeignKey))
+    for (const change of this.items) {
+      results.push(change.copyForAnotherAco(aco, acoForeignKey));
     }
     return results;
   }
 
-  // ==================================================
-  // Changes calculation
-  // ==================================================
+  /*
+   * ==================================================
+   * Changes calculation
+   * ==================================================
+   */
   /**
    * Return true if the changes can be applied
    * @param {string} aco folder or resource to reuse the changes for
@@ -147,9 +155,9 @@ class PermissionChangesCollection extends EntityCollection {
       throw new TypeError('PermissionChangesCollection reuseChanges call is missing parameter(s).');
     }
     const result = new PermissionChangesCollection([]);
-    for (let change of changes) {
-      let permission = permissions.getByAro(change.aro, change.aroForeignKey);
-      switch(change.scenario) {
+    for (const change of changes) {
+      const permission = permissions.getByAro(change.aro, change.aroForeignKey);
+      switch (change.scenario) {
         case PermissionChangeEntity.PERMISSION_CHANGE_DELETE:
           if (permission && permission.type === change.type) {
             result.push(PermissionChangeEntity.createFromPermission(
@@ -198,7 +206,7 @@ class PermissionChangesCollection extends EntityCollection {
     const result = new PermissionChangesCollection([]);
 
     // Find new or updated permissions
-    for(let expectedPermission of expectedSet) {
+    for (const expectedPermission of expectedSet) {
       const foundPermission = originalSet.getByAroMatchingPermission(expectedPermission);
       if (!foundPermission) {
         const newChange = PermissionChangeEntity.createFromPermission(expectedPermission, PermissionChangeEntity.PERMISSION_CHANGE_CREATE);
@@ -213,7 +221,7 @@ class PermissionChangesCollection extends EntityCollection {
     }
 
     // Find deleted permissions
-    for(let originalPermission of originalSet) {
+    for (const originalPermission of originalSet) {
       if (!expectedSet.getByAroMatchingPermission(originalPermission)) {
         // Aka, permissions that are in the old set and not the new one
         const newChange = PermissionChangeEntity.createFromPermission(originalPermission, PermissionChangeEntity.PERMISSION_CHANGE_DELETE);

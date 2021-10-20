@@ -33,8 +33,10 @@ class RolesCollection extends EntityCollection {
       RolesCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(role => {
       this.push(new RoleEntity(role));
     });
@@ -52,7 +54,7 @@ class RolesCollection extends EntityCollection {
     return {
       "type": "array",
       "items": RoleEntity.getSchema(),
-    }
+    };
   }
 
   /**
@@ -72,9 +74,11 @@ class RolesCollection extends EntityCollection {
     return this._items.map(r => r.id);
   }
 
-  // ==================================================
-  // Assertions
-  // ==================================================
+  /*
+   * ==================================================
+   * Assertions
+   * ==================================================
+   */
   /**
    * Assert there is no other role with the same id in the collection
    *
@@ -87,17 +91,19 @@ class RolesCollection extends EntityCollection {
     }
     const length = this.roles.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingRole = this.roles[i];
+    for (; i < length; i++) {
+      const existingRole = this.roles[i];
       if (existingRole.id && existingRole.id === role.id) {
         throw new EntityCollectionError(i, RolesCollection.RULE_UNIQUE_ID, `Role id ${role.id} already exists.`);
       }
     }
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
   /**
    * Push a copy of the role to the list
    * @param {object} role DTO or RoleEntity
@@ -117,9 +123,11 @@ class RolesCollection extends EntityCollection {
     super.push(roleEntity);
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
   /**
    * RolesCollection.ENTITY_NAME
    * @returns {string}

@@ -97,7 +97,7 @@ describe("ExternalResourcesCollection", () => {
     const collection = new ExternalResourcesCollection(dto);
     const rootFolder = new ExternalFolderEntity({"name": "Root", "folder_parent_path": "New"});
     collection.changeRootPath(rootFolder);
-    for (let externalResourceEntity of collection) {
+    for (const externalResourceEntity of collection) {
       expect(externalResourceEntity.folderParentPath).toMatch(/^New\/Root/);
     }
   });

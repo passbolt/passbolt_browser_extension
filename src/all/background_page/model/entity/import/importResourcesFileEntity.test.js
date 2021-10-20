@@ -28,7 +28,7 @@ describe("ImportResourcesFileEntity entity", () => {
 
   it("constructor works if valid minimal DTO is provided", () => {
     const csv = "Title,Username,URL,Password,Notes,Group\n" +
-      "Password 1,Username 1,https://url1.com,Password 1,Description 1,\n"
+      "Password 1,Username 1,https://url1.com,Password 1,Description 1,\n";
     const importDto = {
       "ref": "import-ref",
       "file_type": "csv",
@@ -79,10 +79,12 @@ describe("ImportResourcesFileEntity entity", () => {
       expect(error.hasError('file')).toBe(true);
       expect(error.hasError('file_type')).toBe(true);
       expect(error.hasError('ref')).toBe(true);
-      // expect(error.hasError('tags')).toBe(true);
-      // expect(error.hasError('folders')).toBe(true);
-      // expect(error.hasError('password')).toBe(true);
-      // expect(error.hasError('keyfile')).toBe(true);
+      /*
+       * expect(error.hasError('tags')).toBe(true);
+       * expect(error.hasError('folders')).toBe(true);
+       * expect(error.hasError('password')).toBe(true);
+       * expect(error.hasError('keyfile')).toBe(true);
+       */
     }
   });
 });

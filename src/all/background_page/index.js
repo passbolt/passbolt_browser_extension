@@ -4,11 +4,13 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-var storage = require('./sdk/storage').storage;
+const storage = require('./sdk/storage').storage;
 window.storage = storage;
 
-/* Listen to browser events such as browser extension installation. As per the documentation
- * the listeners must be registered synchronously from the start of the page. */
+/*
+ * Listen to browser events such as browser extension installation. As per the documentation
+ * the listeners must be registered synchronously from the start of the page.
+ */
 require('./event/browser/browserEvents.js');
 
 const main = async function() {
@@ -25,7 +27,8 @@ const main = async function() {
   const {RolesLocalStorage} = require("./service/local_storage/rolesLocalStorage");
   const {PasswordGeneratorLocalStorage} = require("./service/local_storage/passwordGeneratorLocalStorage");
 
-  /* ==================================================================================
+  /*
+   * ==================================================================================
    *  Initialization of global objects
    * ==================================================================================
    */
@@ -47,35 +50,39 @@ const main = async function() {
    * due to an openpgpjs bug: https://github.com/openpgpjs/openpgpjs/pull/1148
    */
   openpgp.config.allow_insecure_decryption_with_signing_keys = true;
-  openpgp.initWorker({ path:'/vendors/openpgp.worker.js' });
+  openpgp.initWorker({path: '/vendors/openpgp.worker.js'});
 
-  /* ==================================================================================
+  /*
+   * ==================================================================================
    *  Interface changes
    *  Where we affect the look and feel of the firefox instance
    * ==================================================================================
    */
-  var ToolbarController = require('./controller/toolbarController').ToolbarController;
+  const ToolbarController = require('./controller/toolbarController').ToolbarController;
   new ToolbarController();
 
-  /* ==================================================================================
+  /*
+   * ==================================================================================
    *  Page mods init
    *  Run scripts in the context of web pages whose URL matches a given pattern.
    *  see. https://developer.mozilla.org/en-US/Add-ons/SDK/High-Level_APIs/page-mod
    * ==================================================================================
    */
-  var pageMods = require('./app').pageMods;
+  const pageMods = require('./app').pageMods;
 
   pageMods.WebIntegration.init();
 
   // If the user is valid we enable the login pagemod
-  var user = User.getInstance();
+  const user = User.getInstance();
   if (user.isValid()) {
     // Auth pagemod init can also be triggered by setup and user events (e.g. when config change)
     pageMods.AuthBootstrap.init();
 
-    // App pagemod init is generally triggered after a successful login
-    // We only initialize it here for the cases where the user is already logged in
-    // It can happen when the extension is updated
+    /*
+     * App pagemod init is generally triggered after a successful login
+     * We only initialize it here for the cases where the user is already logged in
+     * It can happen when the extension is updated
+     */
     const auth = new GpgAuth();
     try {
       const isAuthenticated = await auth.isAuthenticated();
@@ -85,9 +92,11 @@ const main = async function() {
         const event = new Event('passbolt.auth.after-login');
         window.dispatchEvent(event);
       }
-    } catch(error) {
-      // Service unavailable
-      // Do nothing...
+    } catch (error) {
+      /*
+       * Service unavailable
+       * Do nothing...
+       */
     }
   }
 
@@ -97,8 +106,10 @@ const main = async function() {
   pageMods.RecoverBootstrap.init();
   pageMods.Recover.init();
 
-  // Other pagemods active all the time
-  // but triggered by App or Auth
+  /*
+   * Other pagemods active all the time
+   * but triggered by App or Auth
+   */
   pageMods.File.init();
   pageMods.Clipboard.init();
   pageMods.Auth.init();
@@ -110,6 +121,6 @@ const main = async function() {
 
 // Init storage and get going.
 storage.init()
-  .then(function () {
+  .then(() => {
     main();
   });

@@ -27,23 +27,23 @@ describe("Avatar entity", () => {
   });
 
   it("constructor works if valid minimal DTO is provided", () => {
-    let dto = {
-      "id":"ae1cd004-d1f6-4e7b-a3c7-3b28da81e9e8",
-      "user_id":"597f24ea-a4cc-4d21-a24e-2181ac1f17ef",
-      "foreign_key":"597f24ea-de28-4b96-9073-2181ac1f17ef",
-      "model":"Avatar",
-      "filename":"avatar.png",
-      "filesize":102968,
-      "mime_type":"image\/png",
-      "extension":"png",
-      "hash":"bc1cd004d1f64e7ba3c67b28da81e9e8",
-      "path":"Avatar\/39\/71\/4b\/ae1cd004fff64e7ba3c73b384481e9e8\/bc1cd004d1f64e7ba3c67b28da81e9e8.png",
-      "adapter":"Local",
-      "created":"2020-03-26T11:14:02+00:00",
-      "modified":"2020-03-26T11:14:02+00:00",
+    const dto = {
+      "id": "ae1cd004-d1f6-4e7b-a3c7-3b28da81e9e8",
+      "user_id": "597f24ea-a4cc-4d21-a24e-2181ac1f17ef",
+      "foreign_key": "597f24ea-de28-4b96-9073-2181ac1f17ef",
+      "model": "Avatar",
+      "filename": "avatar.png",
+      "filesize": 102968,
+      "mime_type": "image\/png",
+      "extension": "png",
+      "hash": "bc1cd004d1f64e7ba3c67b28da81e9e8",
+      "path": "Avatar\/39\/71\/4b\/ae1cd004fff64e7ba3c73b384481e9e8\/bc1cd004d1f64e7ba3c67b28da81e9e8.png",
+      "adapter": "Local",
+      "created": "2020-03-26T11:14:02+00:00",
+      "modified": "2020-03-26T11:14:02+00:00",
       "url": {
-        "medium":"img\/public\/Avatar\/39\/71\/4b\/ae1cd004fff64e7ba3c73b384481e9e8\/bc1cd004d1f64e7ba3c67b28da81e9e8.a99472d5.png",
-        "small":"img\/public\/Avatar\/39\/71\/4b\/ae1cd004fff64e7ba3c73b384481e9e8\/bc1cd004d1f64e7ba3c67b28da81e9e8.65a0ba70.png"
+        "medium": "img\/public\/Avatar\/39\/71\/4b\/ae1cd004fff64e7ba3c73b384481e9e8\/bc1cd004d1f64e7ba3c67b28da81e9e8.a99472d5.png",
+        "small": "img\/public\/Avatar\/39\/71\/4b\/ae1cd004fff64e7ba3c73b384481e9e8\/bc1cd004d1f64e7ba3c67b28da81e9e8.65a0ba70.png"
       },
     };
     const entity = new AvatarEntity(dto);

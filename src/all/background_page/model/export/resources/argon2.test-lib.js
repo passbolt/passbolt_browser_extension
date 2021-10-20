@@ -6,16 +6,16 @@
  * @link          https://github.com/keeweb/kdbxweb/blob/1.9.0/test/test-support/argon2.js
  */
 function argon2(password, salt, memory, iterations, length, parallelism, type, version) {
-  var Module = require('./argon2-asm.min');
-  var passwordLen = password.byteLength;
+  const Module = require('./argon2-asm.min');
+  const passwordLen = password.byteLength;
   password = Module.allocate(new Uint8Array(password), 'i8', Module.ALLOC_NORMAL);
-  var saltLen = salt.byteLength;
+  const saltLen = salt.byteLength;
   salt = Module.allocate(new Uint8Array(salt), 'i8', Module.ALLOC_NORMAL);
-  var hash = Module.allocate(new Array(length), 'i8', Module.ALLOC_NORMAL);
-  var encodedLen = 512;
-  var encoded = Module.allocate(new Array(encodedLen), 'i8', Module.ALLOC_NORMAL);
+  const hash = Module.allocate(new Array(length), 'i8', Module.ALLOC_NORMAL);
+  const encodedLen = 512;
+  const encoded = Module.allocate(new Array(encodedLen), 'i8', Module.ALLOC_NORMAL);
   try {
-    var res = Module._argon2_hash(
+    const res = Module._argon2_hash(
       iterations,
       memory,
       parallelism,
@@ -31,10 +31,10 @@ function argon2(password, salt, memory, iterations, length, parallelism, type, v
       version
     );
     if (res) {
-      return Promise.reject('Argon2 error ' + res);
+      return Promise.reject(`Argon2 error ${res}`);
     }
-    var hashArr = new Uint8Array(length);
-    for (var i = 0; i < length; i++) {
+    const hashArr = new Uint8Array(length);
+    for (let i = 0; i < length; i++) {
       hashArr[i] = Module.HEAP8[hash + i];
     }
     Module._free(password);

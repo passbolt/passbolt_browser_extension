@@ -48,13 +48,15 @@ class ShareResourcesController {
     let progress = 0;
     let privateKey;
 
-    // Number of goals is (number of resources * 3) + 1 :
-    // why 3: simulate call to the API + encrypting step + share call to the API
-    // why +1: this function initialization step
+    /*
+     * Number of goals is (number of resources * 3) + 1 :
+     * why 3: simulate call to the API + encrypting step + share call to the API
+     * why +1: this function initialization step
+     */
     const progressGoal = resources.length * 3 + 1;
 
     try {
-      let passphrase = await passphraseController.get(this.worker);
+      const passphrase = await passphraseController.get(this.worker);
       privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
     } catch (error) {
       console.error(error);
@@ -77,7 +79,7 @@ class ShareResourcesController {
       await progressController.update(this.worker, progressGoal, i18n.t('Done!'));
       await progressController.close(this.worker);
       return results;
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       await progressController.close(this.worker);
       throw error;

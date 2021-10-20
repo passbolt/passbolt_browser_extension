@@ -60,12 +60,14 @@ class GenerateGpgKeyEntity extends Entity {
           "minLength": PASSPHRASE_MIN_LENGTH,
         },
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return dto in opengpg format
    * @returns {object}
@@ -78,9 +80,11 @@ class GenerateGpgKeyEntity extends Entity {
     };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get the user id
    * @returns {string} ie. Ada Lovelace <ada@passbolt.com>
@@ -105,9 +109,11 @@ class GenerateGpgKeyEntity extends Entity {
     return this._props.passphrase;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * GenerateGpgkeyEntity.ENTITY_NAME
    * @returns {string}

@@ -5,44 +5,44 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-let _config = require('../config/config.json');
+const _config = require('../config/config.json');
 
 /**
  * Init the configuration.
  * Retrieve and load the configuration stored in the local storage.
  */
-const init = function () {
-
+const init = function() {
   // Retrieve the config from the local storage
   const storedConfig = storage.getItem('config');
 
   // No config in local storage, do nothing
-  if (storedConfig === null ) {
+  if (storedConfig === null) {
     return;
   }
 
   // Merge the config.json and config stored in local storage
-  for (let name in storedConfig) {
+  for (const name in storedConfig) {
     // only defined items not already defined in config.json
     if (typeof _config[name] === 'undefined') {
       _config[name] = storedConfig[name];
     }
   }
   migrate();
-
 };
 exports.init = init;
 
 const migrate = function() {
-  let storedConfig = storage.getItem('config');
-  if(typeof storedConfig['debug'] !== 'undefined') {
-    // v2.1.0 Migration - Delete unused config items
-    // TODO - remove after next release
-    storage.removeItem('config','setupBootstrapRegex');
-    storage.removeItem('config','debug');
-    storage.removeItem('config','log');
-    storage.removeItem('config','baseUrl');
-    storage.removeItem('config','extensionId');
+  const storedConfig = storage.getItem('config');
+  if (typeof storedConfig['debug'] !== 'undefined') {
+    /*
+     * v2.1.0 Migration - Delete unused config items
+     * TODO - remove after next release
+     */
+    storage.removeItem('config', 'setupBootstrapRegex');
+    storage.removeItem('config', 'debug');
+    storage.removeItem('config', 'log');
+    storage.removeItem('config', 'baseUrl');
+    storage.removeItem('config', 'extensionId');
   }
 };
 exports.migrate = migrate;
@@ -53,8 +53,8 @@ exports.migrate = migrate;
  * @param name {string} Variable name to obtain
  * @returns {*}
  */
-const read = function (name) {
-  if(typeof _config[name] !== 'undefined') {
+const read = function(name) {
+  if (typeof _config[name] !== 'undefined') {
     return _config[name];
   }
   return undefined;
@@ -66,7 +66,7 @@ exports.read = read;
  *
  * @returns {array}
  */
-const readAll = function () {
+const readAll = function() {
   return _config;
 };
 exports.readAll = readAll;
@@ -78,7 +78,7 @@ exports.readAll = readAll;
  * @param value {mixed} Variable value
  * @returns {boolean}
  */
-const write = function (name, value) {
+const write = function(name, value) {
   // do not allow to override the debug mode
   if (name === 'debug') {
     return false;
@@ -94,7 +94,7 @@ exports.write = write;
  *
  * @returns {bool}
  */
-const isDebug = function () {
+const isDebug = function() {
   const debug = read('debug');
   if (typeof debug === 'undefined') {
     return false;
@@ -107,7 +107,7 @@ exports.isDebug = isDebug;
 /**
  * Flush the local storage config.
  */
-const flush = function () {
+const flush = function() {
   storage.removeItem('config');
 };
 exports.flush = flush;

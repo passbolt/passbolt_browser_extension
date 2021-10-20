@@ -64,7 +64,7 @@ describe("Comment entity", () => {
     };
     const dto = [comment1, comment1];
 
-    let t = () => {new CommentsCollection(dto)};
+    const t = () => { new CommentsCollection(dto); };
     expect(t).toThrow(EntityCollectionError);
   });
 
@@ -85,7 +85,7 @@ describe("Comment entity", () => {
     };
     const dto = [comment1, comment2];
 
-    let t = () => {new CommentsCollection(dto)};
+    const t = () => { new CommentsCollection(dto); };
     expect(t).toThrow(EntityCollectionError);
   });
 

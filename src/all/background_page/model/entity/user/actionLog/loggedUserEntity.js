@@ -12,7 +12,6 @@
  */
 const {Entity} = require('../../abstract/entity');
 const {EntitySchema} = require('../../abstract/entitySchema');
-const {EntityValidationError} = require('../../abstract/entityValidationError');
 const {UserEntity} = require("../userEntity");
 const {ProfileEntity} = require("../../profile/profileEntity");
 
@@ -44,7 +43,7 @@ class LoggedUserEntity extends Entity {
    * @returns {Object} schema
    */
   static getSchema() {
-    const schema = UserEntity.getSchema()
+    const schema = UserEntity.getSchema();
     schema.required = ["id", "username", "profile"];
 
     return schema;
@@ -56,7 +55,7 @@ class LoggedUserEntity extends Entity {
    * @returns {*}
    */
   toDto(contain) {
-    let result = Object.assign({}, this._props);
+    const result = Object.assign({}, this._props);
     if (!contain) {
       return result;
     }
@@ -80,9 +79,11 @@ class LoggedUserEntity extends Entity {
     return this.toDto(LoggedUserEntity.ALL_CONTAIN_OPTIONS);
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
 
   /**
    * Get user id
@@ -100,9 +101,11 @@ class LoggedUserEntity extends Entity {
     return this._props.username;
   }
 
-  // ==================================================
-  // Other associated properties methods
-  // ==================================================
+  /*
+   * ==================================================
+   * Other associated properties methods
+   * ==================================================
+   */
 
   /**
    * Get the profile.
@@ -112,9 +115,11 @@ class LoggedUserEntity extends Entity {
     return this._profile || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
 
   /**
    * LoggedUserEntity.ENTITY_NAME

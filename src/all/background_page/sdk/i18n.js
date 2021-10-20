@@ -20,7 +20,6 @@ const HttpApi = require('i18next-http-backend');
 let _i18next;
 
 class I18n {
-
   /**
    * Initialize I18n
    * @param {string} locale The locale. i.e. en-UK

@@ -85,4 +85,4 @@ exports.GroupEntityTestFixtures = {
       }
     ]
   }
-}
+};

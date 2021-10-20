@@ -7,21 +7,21 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-var Config = require('./config');
-var logSettings = Config.read('log');
+const Config = require('./config');
+const logSettings = Config.read('log');
 
 // Logs type.
-var ERROR = 'error';
+const ERROR = 'error';
 exports.ERROR = ERROR;
-var WARNING = 'warning';
+const WARNING = 'warning';
 exports.WARNING = WARNING;
-var INFO = 'info';
+const INFO = 'info';
 exports.INFO = INFO;
-var DEBUG = 'debug';
+const DEBUG = 'debug';
 exports.DEBUG = DEBUG;
 
 // Logs level mapping.
-var logLevelMapping = {
+const logLevelMapping = {
   error: 1,
   warning: 2,
   info: 3,
@@ -29,20 +29,20 @@ var logLevelMapping = {
 };
 
 // The stored logs.
-var _logs = [];
+let _logs = [];
 exports._logs = _logs;
 
 /**
  * The Logger constructor.
  * @constructor
  */
-var Log = function () {};
+const Log = function() {};
 
 /**
  * Write a log.
  * @param log {object} The log to write.
  */
-Log.write = function (log) {
+Log.write = function(log) {
   // If no logging is required, or the log level is lower than the log level message, leave.
   if (logSettings.level == 0 || logSettings.level < logLevelMapping[log.level]) {
     return;
@@ -50,7 +50,7 @@ Log.write = function (log) {
 
   // add a timestamp
   function formatTime(i) {
-    return (i < 10) ? "0" + i : i;
+    return (i < 10) ? `0${i}` : i;
   }
 
   if (!log.date) {
@@ -60,14 +60,14 @@ Log.write = function (log) {
   const m = formatTime(log.date.getMinutes());
   const s = formatTime(log.date.getSeconds());
   const ms = formatTime(log.date.getMilliseconds());
-  log.created =  h + ':' + m + ':' + s + ':' + ms;
+  log.created =  `${h}:${m}:${s}:${ms}`;
 
   // Register the log.
   _logs.push(log);
 
   // The log could also be displayed on the console.
   if (logSettings.console) {
-    var consoleLog = log.created + ' [' + log.level + '] ' + log.message;
+    const consoleLog = `${log.created} [${log.level}] ${log.message}`;
     if (log.level === ERROR) {
       console.error(consoleLog);
     } else if (log.level === WARNING) {
@@ -81,7 +81,7 @@ Log.write = function (log) {
 /**
  * Flush a log.
  */
-Log.init = function () {
+Log.init = function() {
   _logs = [];
 };
 

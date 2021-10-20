@@ -34,9 +34,11 @@ class AbstractRowComposer {
    * @param {ExternalResourceEntity} externalResourceEntity The resource to use to compose the row
    * @returns {object}
    */
+  /* eslint-disable no-unused-vars */
   static compose(externalResourceEntity) {
     throw new Error("compose should be overridden by the inherited class.");
   }
+  /* eslint-enable no-unused-vars */
 }
 
 exports.AbstractRowComposer = AbstractRowComposer;

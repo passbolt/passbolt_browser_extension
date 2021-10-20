@@ -91,28 +91,28 @@ describe("Transfer entity", () => {
 
   it("constructor returns validation error if dto fields are invalid", () => {
     let t;
-    t = () => {new TransferEntity({'id':'nope', 'total_pages': 3});};
+    t = () => { new TransferEntity({'id': 'nope', 'total_pages': 3}); };
     expect(t).toThrow(EntityValidationError);
 
-    t = () => {new TransferEntity({'user_id':'nope', 'total_pages': 3});};
+    t = () => { new TransferEntity({'user_id': 'nope', 'total_pages': 3}); };
     expect(t).toThrow(EntityValidationError);
 
-    t = () => {new TransferEntity({'hash': 3, 'total_pages': 3});};
+    t = () => { new TransferEntity({'hash': 3, 'total_pages': 3}); };
     expect(t).toThrow(EntityValidationError);
 
-    t = () => {new TransferEntity({'current_page':'nope', 'total_pages': 3});};
+    t = () => { new TransferEntity({'current_page': 'nope', 'total_pages': 3}); };
     expect(t).toThrow(EntityValidationError);
 
-    t = () => {new TransferEntity({'total_pages':'nope'});};
+    t = () => { new TransferEntity({'total_pages': 'nope'}); };
     expect(t).toThrow(EntityValidationError);
 
-    t = () => {new TransferEntity({'created':'nope', 'total_pages': 3});};
+    t = () => { new TransferEntity({'created': 'nope', 'total_pages': 3}); };
     expect(t).toThrow(EntityValidationError);
 
-    t = () => {new TransferEntity({'modified':'nope', 'total_pages': 3});};
+    t = () => { new TransferEntity({'modified': 'nope', 'total_pages': 3}); };
     expect(t).toThrow(EntityValidationError);
 
-    t = () => {new TransferEntity({'total_pages': 3, 'authentication_token': {id: 'nope'}});};
+    t = () => { new TransferEntity({'total_pages': 3, 'authentication_token': {id: 'nope'}}); };
     expect(t).toThrow(EntityValidationError);
   });
 });

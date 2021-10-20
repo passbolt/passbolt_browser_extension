@@ -33,7 +33,7 @@ const listen = function(worker) {
    * @listens passbolt.addon.is-configured
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.addon.is-configured', function (requestId) {
+  worker.port.on('passbolt.addon.is-configured', requestId => {
     const user = User.getInstance();
     worker.port.emit(requestId, 'SUCCESS', user.isValid());
   });

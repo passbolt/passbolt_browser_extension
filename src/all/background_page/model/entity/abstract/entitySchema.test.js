@@ -48,21 +48,21 @@ describe("Entity schema", () => {
   };
 
   it("validate throws TypeError if name is empty", () => {
-    let t = () => {
+    const t = () => {
       EntitySchema.validate(null, {'name': 'test'}, validSchema);
     };
     expect(t).toThrow(TypeError);
   });
 
   it("validate throws TypeError if dto is empty", () => {
-    let t = () => {
+    const t = () => {
       EntitySchema.validate('TestObject', null, validSchema);
     };
     expect(t).toThrow(TypeError);
   });
 
   it("validate throws TypeError if schema is empty", () => {
-    let t = () => {
+    const t = () => {
       EntitySchema.validate('TestObject', {'name': 'test'}, null);
     };
     expect(t).toThrow(TypeError);
@@ -76,7 +76,7 @@ describe("Entity schema", () => {
         'some': 'not in list',
         'created': ['not a date']
       };
-      EntitySchema.validate('TestObject', testObject, validSchema)
+      EntitySchema.validate('TestObject', testObject, validSchema);
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details.id.type).toEqual('The id is not a valid string.');
@@ -95,7 +95,7 @@ describe("Entity schema", () => {
         'name': 'ok',
         'type': 'not in list'
       };
-      EntitySchema.validate('TestObject', testObject, validSchema)
+      EntitySchema.validate('TestObject', testObject, validSchema);
     } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details.id.type).toBe(undefined);
@@ -158,14 +158,14 @@ describe("Entity schema anyof", () => {
 
 describe("Entity schema isValidStringFormat", () => {
   it("isValidStringFormat throws TypeError if misused", () => {
-    let t = () => {
+    const t = () => {
       EntitySchema.isValidStringFormat(null, null);
     };
     expect(t).toThrow(TypeError);
   });
 
   it("isValidStringFormat throws TypeError if unsuported type", () => {
-    let t = () => {
+    const t = () => {
       EntitySchema.isValidStringFormat('super', 'walou');
     };
     expect(t).toThrow(TypeError);
@@ -194,12 +194,12 @@ describe("Entity schema isValidStringFormat", () => {
 
 describe("Entity schema isValidPropType", () => {
   it("isValidPropType throws exception if misused", () => {
-    let t = () => {EntitySchema.isValidPropType(null, null);};
+    const t = () => { EntitySchema.isValidPropType(null, null); };
     expect(t).toThrow(TypeError);
   });
 
   it("isValidPropType throws exception if unsuported type", () => {
-    let t = () => {EntitySchema.isValidPropType('super', 'walou');};
+    const t = () => { EntitySchema.isValidPropType('super', 'walou'); };
     expect(t).toThrow(TypeError);
   });
 
@@ -217,13 +217,13 @@ describe("Entity schema isValidPropType", () => {
     expect(EntitySchema.isValidPropType('nope', 'boolean')).toBe(false);
     expect(EntitySchema.isValidPropType('🔥', 'boolean')).toBe(false);
     expect(EntitySchema.isValidPropType({}, 'boolean')).toBe(false);
-    expect(EntitySchema.isValidPropType({'hot':'hot'}, 'boolean')).toBe(false);
+    expect(EntitySchema.isValidPropType({'hot': 'hot'}, 'boolean')).toBe(false);
     expect(EntitySchema.isValidPropType([], 'boolean')).toBe(false);
     expect(EntitySchema.isValidPropType(['hot'], 'boolean')).toBe(false);
     expect(EntitySchema.isValidPropType(null, 'boolean')).toBe(false);
     expect(EntitySchema.isValidPropType(undefined, 'boolean')).toBe(false);
     expect(EntitySchema.isValidPropType((() => false), 'boolean')).toBe(false);
-    expect(EntitySchema.isValidPropType((new Promise((s) => s(false))), 'boolean')).toBe(false);
+    expect(EntitySchema.isValidPropType((new Promise(s => s(false))), 'boolean')).toBe(false);
   });
 
   it("isValidPropType works with strings", () => {
@@ -236,13 +236,13 @@ describe("Entity schema isValidPropType", () => {
     expect(EntitySchema.isValidPropType(1, 'string')).toBe(false);
     expect(EntitySchema.isValidPropType(0, 'string')).toBe(false);
     expect(EntitySchema.isValidPropType({}, 'string')).toBe(false);
-    expect(EntitySchema.isValidPropType({'hot':'hot'}, 'string')).toBe(false);
+    expect(EntitySchema.isValidPropType({'hot': 'hot'}, 'string')).toBe(false);
     expect(EntitySchema.isValidPropType([], 'string')).toBe(false);
     expect(EntitySchema.isValidPropType(['hot'], 'string')).toBe(false);
     expect(EntitySchema.isValidPropType(null, 'string')).toBe(false);
     expect(EntitySchema.isValidPropType(undefined, 'string')).toBe(false);
     expect(EntitySchema.isValidPropType((() => 'string'), 'string')).toBe(false);
-    expect(EntitySchema.isValidPropType((new Promise((s) => s('string'))), 'string')).toBe(false);
+    expect(EntitySchema.isValidPropType((new Promise(s => s('string'))), 'string')).toBe(false);
   });
 
   it("isValidPropType works with integers", () => {
@@ -255,12 +255,12 @@ describe("Entity schema isValidPropType", () => {
     expect(EntitySchema.isValidPropType(true, 'integer')).toBe(false);
     expect(EntitySchema.isValidPropType(false, 'integer')).toBe(false);
     expect(EntitySchema.isValidPropType({}, 'integer')).toBe(false);
-    expect(EntitySchema.isValidPropType({'hot':'hot'}, 'integer')).toBe(false);
+    expect(EntitySchema.isValidPropType({'hot': 'hot'}, 'integer')).toBe(false);
     expect(EntitySchema.isValidPropType([], 'integer')).toBe(false);
     expect(EntitySchema.isValidPropType(['hot'], 'integer')).toBe(false);
     expect(EntitySchema.isValidPropType(null, 'integer')).toBe(false);
     expect(EntitySchema.isValidPropType(undefined, 'integer')).toBe(false);
     expect(EntitySchema.isValidPropType((() => 1), 'integer')).toBe(false);
-    expect(EntitySchema.isValidPropType((new Promise((s) => s(1))), 'integer')).toBe(false);
+    expect(EntitySchema.isValidPropType((new Promise(s => s(1))), 'integer')).toBe(false);
   });
 });

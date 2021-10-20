@@ -46,12 +46,12 @@ describe("Favorite entity", () => {
         "created": "2020-05-06T21:59:24+00:00",
         "modified": "2020-05-06T21:59:24+00:00"
       });
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.details).toEqual( {
-        id: { required: 'The id is required.' },
-        user_id: { required: 'The user_id is required.' },
-        foreign_key: { required: 'The foreign_key is required.' },
+      expect(error.details).toEqual({
+        id: {required: 'The id is required.'},
+        user_id: {required: 'The user_id is required.'},
+        foreign_key: {required: 'The foreign_key is required.'},
         //foreign_model: { required: 'The foreign_model is required.' }
       });
     }
@@ -67,14 +67,14 @@ describe("Favorite entity", () => {
         "created": "🔮",
         "modified": "👠👠"
       });
-    } catch(error) {
+    } catch (error) {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.details).toEqual({
-        id: { format: 'The id is not a valid uuid.' },
-        user_id: { format: 'The user_id is not a valid uuid.' },
-        foreign_key: { format: 'The foreign_key is not a valid uuid.' },
+        id: {format: 'The id is not a valid uuid.'},
+        user_id: {format: 'The user_id is not a valid uuid.'},
+        foreign_key: {format: 'The foreign_key is not a valid uuid.'},
         //foreign_model: { enum: 'The foreign_model value is not included in the supported list.'},
-        created: { format: 'The created is not a valid date-time.' },
+        created: {format: 'The created is not a valid date-time.'},
         //modified: { format: 'The modified is not a valid date-time.' }
       });
     }

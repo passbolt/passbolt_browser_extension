@@ -48,9 +48,11 @@ class FolderModel {
     return foldersCollection;
   }
 
-  // ============================================
-  // Local storage getters
-  // ============================================
+  /*
+   * ============================================
+   * Local storage getters
+   * ============================================
+   */
   /**
    * Return a folder for a given id from the local storage
    *
@@ -75,21 +77,21 @@ class FolderModel {
     const foldersDto = await FolderLocalStorage.get();
     if (foldersDto) {
       const inputCollection = new FoldersCollection(foldersDto);
-      inputCollection.items.forEach((folderDto) => {
+      inputCollection.items.forEach(folderDto => {
         if (folderIds.includes(folderDto.id)) {
           outputCollection.push(folderDto);
         }
       });
       if (withChildren) {
-        for (let i in folderIds) {
-          let folderId = folderIds[i];
-          let children = FoldersCollection.getAllChildren(folderId, inputCollection, outputCollection);
+        for (const i in folderIds) {
+          const folderId = folderIds[i];
+          const children = FoldersCollection.getAllChildren(folderId, inputCollection, outputCollection);
           outputCollection.merge(children);
         }
       }
     }
     return outputCollection;
-  };
+  }
 
   /**
    * Get all the children for the folder provided as input
@@ -101,17 +103,19 @@ class FolderModel {
     const foldersDto = await FolderLocalStorage.get();
     const inputCollection = new FoldersCollection(foldersDto);
     const outputCollection = new FoldersCollection([]);
-    for (let i in folderIds) {
-      let folderId = folderIds[i];
-      let children = FoldersCollection.getAllChildren(folderId, inputCollection, outputCollection);
+    for (const i in folderIds) {
+      const folderId = folderIds[i];
+      const children = FoldersCollection.getAllChildren(folderId, inputCollection, outputCollection);
       outputCollection.merge(children);
     }
     return outputCollection;
-  };
+  }
 
-  // ============================================
-  // Finders
-  // ============================================
+  /*
+   * ============================================
+   * Finders
+   * ============================================
+   */
   /**
    * Get all folders from API and map API result to folder Entity
    *
@@ -159,9 +163,11 @@ class FolderModel {
     return folderEntity.permissions;
   }
 
-  //==============================================================
-  // Permission changes
-  //==============================================================
+  /*
+   * ==============================================================
+   *  Permission changes
+   * ==============================================================
+   */
   /**
    * Calculate permission changes for a move
    * From current permissions, remove the parent folder permissions, add the destination permissions
@@ -195,10 +201,12 @@ class FolderModel {
       );
     }
 
-    let newPermissions = PermissionsCollection.sum(remainingPermissions, permissionsFromParent, false);
+    const newPermissions = PermissionsCollection.sum(remainingPermissions, permissionsFromParent, false);
     if (!destFolder) {
-      // If the move is toward the root
-      // Reuse highest permission
+      /*
+       * If the move is toward the root
+       * Reuse highest permission
+       */
       newPermissions.addOrReplace(new PermissionEntity({
         aco: PermissionEntity.ACO_FOLDER,
         aco_foreign_key: folderEntity.id,
@@ -234,9 +242,11 @@ class FolderModel {
     return changes;
   }
 
-  //==============================================================
-  // CRUD
-  //==============================================================
+  /*
+   * ==============================================================
+   *  CRUD
+   * ==============================================================
+   */
   /**
    * Create a folder using Passbolt API and add result to local storage
    *
@@ -292,8 +302,10 @@ class FolderModel {
   async share(folderEntity, changesCollection, updateStorage) {
     await this.shareService.shareFolder(folderEntity.id, {permissions: changesCollection.toDto()});
     if (typeof updateStorage === 'undefined' || updateStorage) {
-      // update storage in case the folder becomes non visible to current user
-      // TODO: optimize update only the given folder when user lost access
+      /*
+       * update storage in case the folder becomes non visible to current user
+       * TODO: optimize update only the given folder when user lost access
+       */
       await this.updateLocalStorage();
     }
     return folderEntity;
@@ -310,8 +322,10 @@ class FolderModel {
     await this.folderService.delete(folderId, cascade);
     await FolderLocalStorage.delete(folderId);
     if (cascade) {
-      // update storage and get updated sub folders list in case some are deleted
-      // TODO: optimize update only if folder contains subfolders
+      /*
+       * update storage and get updated sub folders list in case some are deleted
+       * TODO: optimize update only if folder contains subfolders
+       */
       await this.updateLocalStorage();
     }
   }
@@ -327,9 +341,9 @@ class FolderModel {
 
     // Parallelize the operations by chunk of BULK_OPERATION_SIZE operations.
     const chunks = splitBySize(collection.folders, BULK_OPERATION_SIZE);
-    for (let chunkIndex in chunks) {
+    for (const chunkIndex in chunks) {
       const chunk = chunks[chunkIndex];
-      const promises = chunk.map(async (folderEntity, mapIndex) => {
+      const promises = chunk.map(async(folderEntity, mapIndex) => {
         const collectionIndex = (chunkIndex * BULK_OPERATION_SIZE) + mapIndex;
         return this._bulkCreate_createFolder(folderEntity, collectionIndex, callbacks);
       });
@@ -361,23 +375,27 @@ class FolderModel {
     const errorCallback = callbacks.errorCallback || (() => {});
 
     try {
-      // Here we create entity just like in this.create
-      // but we don't add the folder entity in the local storage just yet,
-      // we wait until all folders are created in order to speed things up
+      /*
+       * Here we create entity just like in this.create
+       * but we don't add the folder entity in the local storage just yet,
+       * we wait until all folders are created in order to speed things up
+       */
       const folderDto = await this.folderService.create(folderEntity.toDto(), {permission: true});
       const createdFolderEntity = new FolderEntity(folderDto);
       successCallback(createdFolderEntity, collectionIndex);
       return createdFolderEntity;
-    } catch(error) {
+    } catch (error) {
       console.error(error);
       errorCallback(error, collectionIndex);
       throw error;
     }
   }
 
-  // ============================================
-  // Assertions
-  // ============================================
+  /*
+   * ============================================
+   * Assertions
+   * ============================================
+   */
   /**
    * Assert for a given folder id that the folder is in the local storage
    *
@@ -408,7 +426,7 @@ class FolderModel {
     if (!Array.isArray(folderIds)) {
       throw new TypeError(`Folders exist check expect an array of uuid.`);
     }
-    for (let i in folderIds) {
+    for (const i in folderIds) {
       await this.assertFolderExists(folderIds[i]);
     }
   }

@@ -12,7 +12,6 @@
  */
 const {AbstractRowComposer} = require("./abstractRowComposer");
 const {CsvLastPassRowParser} = require("../../../import/resources/csvRowParser/csvLastPassRowParser");
-const {ExternalResourceEntity} = require("../../../entity/resource/external/externalResourceEntity");
 
 const FORMAT = "csv-lastpass";
 
@@ -43,7 +42,7 @@ class CsvLastPassRowComposer extends AbstractRowComposer {
   static compose(externalResourceEntity) {
     const row = {};
     const externalResourceDto = externalResourceEntity.toDto();
-    for (let propertyName in this.mapping) {
+    for (const propertyName in this.mapping) {
       row[this.mapping[propertyName]] = externalResourceDto[propertyName] || "";
     }
     return row;

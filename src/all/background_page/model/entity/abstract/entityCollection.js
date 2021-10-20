@@ -29,9 +29,11 @@ class EntityCollection extends Entity {
     }
   }
 
-  // ==================================================
-  // Serialization
-  // ==================================================
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
   /**
    * Return a DTO ready to be sent to API
    *
@@ -49,9 +51,11 @@ class EntityCollection extends Entity {
     return this.toDto();
   }
 
-  // ==================================================
-  // Dynamic properties getters and setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters and setters
+   * ==================================================
+   */
   /**
    * Get all items references
    * @returns {Array} items
@@ -79,12 +83,12 @@ class EntityCollection extends Entity {
     return {
       next: () => {
         if (i < this._items.length) {
-          return {value: this._items[i++], done: false}
+          return {value: this._items[i++], done: false};
         } else {
-          return {done: true}
+          return {done: true};
         }
       }
-    }
+    };
   }
 
   /**
@@ -99,7 +103,7 @@ class EntityCollection extends Entity {
     if (typeof propName !== 'string' || typeof search !== 'string') {
       throw new TypeError('EntityCollection find by expect propName and search to be strings');
     }
-    return this._items.filter(item => (item._props.hasOwnProperty(propName) && item._props[propName] === search));
+    return this._items.filter(item => (Object.prototype.hasOwnProperty.call(item._props, propName) && item._props[propName] === search));
   }
 
   /**

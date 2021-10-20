@@ -15,11 +15,12 @@ const {CommentEntity} = require('../model/entity/comment/commentEntity');
 const {CommentModel} = require('../model/comment/commentModel');
 const {User} = require('../model/user');
 
-const listen = function (worker) {
-
-  // ================================
-  // SERVICE ACTIONS
-  // ================================
+const listen = function(worker) {
+  /*
+   * ================================
+   * SERVICE ACTIONS
+   * ================================
+   */
   /*
    * Create a new comment
    *
@@ -27,7 +28,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param resourceId {string} the resource uuid
    */
-  worker.port.on('passbolt.comments.find-all-by-resource', async function (requestId, resourceId) {
+  worker.port.on('passbolt.comments.find-all-by-resource', async(requestId, resourceId) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const commentModel = new CommentModel(clientOptions);
@@ -46,7 +47,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param commentDto {object} The comment
    */
-  worker.port.on('passbolt.comments.create', async function (requestId, commentDto) {
+  worker.port.on('passbolt.comments.create', async(requestId, commentDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const commentModel = new CommentModel(clientOptions);
@@ -65,7 +66,7 @@ const listen = function (worker) {
    * @param requestId {uuid} The request identifier
    * @param comment {array} The comment
    */
-  worker.port.on('passbolt.comments.delete', async function (requestId, commentId) {
+  worker.port.on('passbolt.comments.delete', async(requestId, commentId) => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const commentModel = new CommentModel(apiClientOptions);

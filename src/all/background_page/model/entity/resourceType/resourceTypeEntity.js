@@ -81,12 +81,14 @@ class ResourceTypeEntity extends Entity {
           "format": "date-time"
         },
       }
-    }
+    };
   }
 
-  // ==================================================
-  // Dynamic properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
   /**
    * Get resource type id
    * @returns {string} uuid
@@ -143,9 +145,11 @@ class ResourceTypeEntity extends Entity {
     return this._props.modified || null;
   }
 
-  // ==================================================
-  // Static properties getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
   /**
    * ResourceTypeEntity.ENTITY_NAME
    * @returns {string}

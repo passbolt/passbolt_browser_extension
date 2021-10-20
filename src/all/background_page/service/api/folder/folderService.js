@@ -78,7 +78,7 @@ class FolderService extends AbstractService {
    */
   async get(id, contains) {
     this.assertValidId(id);
-    let options = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
+    const options = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.get(id, options);
     return response.body;
   }
@@ -100,7 +100,7 @@ class FolderService extends AbstractService {
   async findAll(contains, filters) {
     contains = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
     filters = filters ? this.formatFilterOptions(contains, FolderService.getSupportedFiltersOptions()) : null;
-    const options = {...contains, ...filters };
+    const options = {...contains, ...filters};
     const response = await this.apiClient.findAll(options);
     if (!response.body || !response.body.length) {
       return [];
@@ -119,7 +119,7 @@ class FolderService extends AbstractService {
    */
   async create(data, contains) {
     this.assertNonEmptyData(data);
-    let options = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
+    const options = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.create(data, options);
     return response.body;
   }
@@ -137,7 +137,7 @@ class FolderService extends AbstractService {
   async update(folderId, folderData, contains) {
     this.assertValidId(folderId);
     this.assertNonEmptyData(folderData);
-    let options = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
+    const options = contains ? this.formatContainOptions(contains, FolderService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.update(folderId, folderData, options);
     return response.body;
   }
@@ -182,7 +182,7 @@ class FolderService extends AbstractService {
       return folders;
     }
 
-    let url = this.apiClient.buildUrl(this.apiClient.baseUrl.toString());
+    const url = this.apiClient.buildUrl(this.apiClient.baseUrl.toString());
     foldersIds.forEach(folderId => {
       url.searchParams.append(`filter[has-id][]`, folderId);
     });
@@ -193,7 +193,6 @@ class FolderService extends AbstractService {
     const response = await this.apiClient.fetchAndHandleResponse('GET', url);
     return response.body;
   }
-
 }
 
 exports.FolderService = FolderService;

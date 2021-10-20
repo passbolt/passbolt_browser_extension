@@ -22,26 +22,26 @@ beforeEach(() => {
 
 describe("Entity", () => {
   it("works with it's own copy of the props and not keep reference", () => {
-    const dto = {a:1, b: {c:2}};
+    const dto = {a: 1, b: {c: 2}};
     const entity = new Entity(dto);
     dto.a = 3;
     dto.b.c = 4;
-    expect(entity._props).toEqual({a:1, b: {c:2}});
+    expect(entity._props).toEqual({a: 1, b: {c: 2}});
   });
 
   it("returns a own copy and not reference", () => {
-    const dto = {a:1, b: {c:2}};
+    const dto = {a: 1, b: {c: 2}};
     const entity = new Entity(dto);
     const apiDto = entity.toDto();
     apiDto.b.c = 3;
-    expect(entity._props).toEqual({a:1, b: {c:2}});
+    expect(entity._props).toEqual({a: 1, b: {c: 2}});
     entity._props.b.c = 4;
-    expect(apiDto).toEqual({a:1, b: {c:3}});
-    expect(entity._props).toEqual({a:1, b: {c:4}});
+    expect(apiDto).toEqual({a: 1, b: {c: 3}});
+    expect(entity._props).toEqual({a: 1, b: {c: 4}});
   });
 
   it("stringify as dto", () => {
-    const dto = {a:1, b: {c:2}};
+    const dto = {a: 1, b: {c: 2}};
     const entity = new Entity(dto);
     expect(JSON.stringify(entity)).toEqual(JSON.stringify(dto));
   });
@@ -68,7 +68,7 @@ describe("Entity", () => {
       'aco_foreign_key': 'truc',
       'gpgkey': {
         'bidule': 'ouaiouai',
-        'users_groups' : {
+        'users_groups': {
           'test': '1'
         }
       }
@@ -82,5 +82,4 @@ describe("Entity", () => {
     expect(entity._hasProp('gpgkey.usersGroups.test')).toBe(true);
     expect(entity._hasProp('gpgkey.nope.no')).toBe(false);
   });
-
 });

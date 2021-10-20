@@ -35,11 +35,13 @@ class ActionLogsCollection extends EntityCollection {
       ActionLogsCollection.getSchema()
     ));
 
-    // Note: there is no "multi-item" validation
-    // Collection validation will fail at the first item that doesn't validate
+    /*
+     * Note: there is no "multi-item" validation
+     * Collection validation will fail at the first item that doesn't validate
+     */
     this._props.forEach(actionLog => {
       const actionLogEntity = this.constructActionLogEntityFromDto(actionLog);
-      this.push(actionLogEntity)
+      this.push(actionLogEntity);
     });
 
     // We do not keep original props
@@ -55,7 +57,7 @@ class ActionLogsCollection extends EntityCollection {
     return {
       "type": "array",
       "items": AbstractActionLogEntity.getSchema()
-    }
+    };
   }
 
   /**
@@ -88,9 +90,11 @@ class ActionLogsCollection extends EntityCollection {
     return this._items.map(item => item.id);
   }
 
-  // ==================================================
-  // Assertions
-  // ==================================================
+  /*
+   * ==================================================
+   * Assertions
+   * ==================================================
+   */
 
   /**
    * Assert there is no other action log with the same id in the collection
@@ -104,17 +108,19 @@ class ActionLogsCollection extends EntityCollection {
     }
     const length = this.actionLogs.length;
     let i = 0;
-    for(; i < length; i++) {
-      let existingActionLog = this.actionLogs[i];
+    for (; i < length; i++) {
+      const existingActionLog = this.actionLogs[i];
       if (existingActionLog.id && existingActionLog.id === actionLog.id) {
         throw new EntityCollectionError(i, ActionLogsCollection.RULE_UNIQUE_ID, `Action log id ${actionLog.id} already exists.`);
       }
     }
   }
 
-  // ==================================================
-  // Setters
-  // ==================================================
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
 
   /**
    * Push a copy of the action log to the list
@@ -135,9 +141,11 @@ class ActionLogsCollection extends EntityCollection {
     super.push(actionLogEntity);
   }
 
-  // ==================================================
-  // Static getters
-  // ==================================================
+  /*
+   * ==================================================
+   * Static getters
+   * ==================================================
+   */
 
   /**
    * ActionLogsCollection.ENTITY_NAME

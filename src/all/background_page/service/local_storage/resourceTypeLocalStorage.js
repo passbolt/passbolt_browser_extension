@@ -42,7 +42,7 @@ class ResourceTypeLocalStorage {
   static async get() {
     const {resourceTypes} = await browser.storage.local.get([RESOURCE_TYPES_LOCAL_STORAGE_KEY]);
     return resourceTypes;
-  };
+  }
 
   /**
    * Set the resourceTypes in local storage.
@@ -56,14 +56,14 @@ class ResourceTypeLocalStorage {
       if (!(resourceTypesCollection instanceof ResourceTypesCollection)) {
         throw new TypeError('ResourceTypeLocalStorage::set expects a ResourceTypesCollection');
       }
-      for (let resourceTypeEntity of resourceTypesCollection) {
+      for (const resourceTypeEntity of resourceTypesCollection) {
         ResourceTypeLocalStorage.assertEntityBeforeSave(resourceTypeEntity);
         resourceTypes.push(resourceTypeEntity.toDto());
       }
     }
-    await browser.storage.local.set({resourceTypes});
+    await browser.storage.local.set({resourceTypes: resourceTypes});
     lock.release();
-  };
+  }
 
   /**
    * Get a resource from the local storage by id
@@ -74,7 +74,7 @@ class ResourceTypeLocalStorage {
   static async getResourceById(id) {
     const resourceTypes = await ResourceTypeLocalStorage.get();
     return resourceTypes.find(item => item.id === id);
-  };
+  }
 
   /**
    * Add a resourceType in the local storage
@@ -86,17 +86,19 @@ class ResourceTypeLocalStorage {
       ResourceTypeLocalStorage.assertEntityBeforeSave(resourceTypeEntity);
       const resourceTypes = await ResourceTypeLocalStorage.get();
       resourceTypes.push(resourceTypeEntity.toDto());
-      await browser.storage.local.set({ resourceTypes });
+      await browser.storage.local.set({resourceTypes: resourceTypes});
       lock.release();
     } catch (error) {
       lock.release();
       throw error;
     }
-  };
+  }
 
-  // =================================================
-  // Static methods
-  // =================================================
+  /*
+   * =================================================
+   * Static methods
+   * =================================================
+   */
   /**
    * Make sure the entity meet some minimal requirements before being stored
    *

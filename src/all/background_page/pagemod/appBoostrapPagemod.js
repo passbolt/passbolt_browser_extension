@@ -14,35 +14,37 @@ const Worker = require('../model/worker');
 const GpgAuth = require('../model/gpgauth').GpgAuth;
 const User = require('../model/user').User;
 
-const AppBoostrapPagemod = function () {
+const AppBoostrapPagemod = function() {
 };
 AppBoostrapPagemod._pageMod = null;
 
-AppBoostrapPagemod.exists = function () {
+AppBoostrapPagemod.exists = function() {
   return AppBoostrapPagemod._pageMod !== null;
 };
 
-AppBoostrapPagemod.destroy = function () {
+AppBoostrapPagemod.destroy = function() {
   if (AppBoostrapPagemod.exists()) {
     AppBoostrapPagemod._pageMod.destroy();
     AppBoostrapPagemod._pageMod = null;
   }
 };
 
-AppBoostrapPagemod.initPageMod = function () {
-  // Attach on passbolt application pages.
-  // By instance if your application domain is : https://demo.passbolt.com
-  // The pagemod will be attached to the following pages :
-  // ✓ https://demo.passbolt.com
-  // ✓ https://demo.passbolt.com/
-  // ✓ https://demo.passbolt.com/#user
-  // ✓ https://demo.passbolt.com/#workspace
-  // ✗ https://demoxpassbolt.com
-  // ✗ https://demo.passbolt.com.attacker.com
-  // ✗ https://demo.passbolt.com/auth/login
+AppBoostrapPagemod.initPageMod = function() {
+  /*
+   * Attach on passbolt application pages.
+   * By instance if your application domain is : https://demo.passbolt.com
+   * The pagemod will be attached to the following pages :
+   * ✓ https://demo.passbolt.com
+   * ✓ https://demo.passbolt.com/
+   * ✓ https://demo.passbolt.com/#user
+   * ✓ https://demo.passbolt.com/#workspace
+   * ✗ https://demoxpassbolt.com
+   * ✗ https://demo.passbolt.com.attacker.com
+   * ✗ https://demo.passbolt.com/auth/login
+   */
   const user = User.getInstance();
   const escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
-  const url = '^' + escapedDomain + '/?(/app.*)?(#.*)?$';
+  const url = `^${escapedDomain}/?(/app.*)?(#.*)?$`;
   const regex = new RegExp(url);
 
   return new PageMod({
@@ -50,8 +52,10 @@ AppBoostrapPagemod.initPageMod = function () {
     include: regex,
     contentScriptWhen: 'ready',
     contentStyleFile: [
-      // @deprecated when support for v2 is dropped
-      // used to control iframe styling without inline style in v3
+      /*
+       * @deprecated when support for v2 is dropped
+       * used to control iframe styling without inline style in v3
+       */
       'data/css/themes/default/ext_external.min.css'
     ],
     contentScriptFile: [
@@ -59,7 +63,7 @@ AppBoostrapPagemod.initPageMod = function () {
       'content_scripts/js/dist/app.js',
     ],
     attachTo: {existing: true, reload: true},
-    onAttach: async function (worker) {
+    onAttach: async function(worker) {
       const auth = new GpgAuth();
       if (!await auth.isAuthenticated() || await auth.isMfaRequired()) {
         console.error('Can not attach application if user is not logged in.');
@@ -76,11 +80,13 @@ AppBoostrapPagemod.initPageMod = function () {
   });
 };
 
-AppBoostrapPagemod.init = function () {
-  return new Promise(function (resolve, reject) {
-    // According to the user status :
-    // * the pagemod should be initialized if the user is valid and logged in;
-    // * the pagemod should be destroyed otherwise;
+AppBoostrapPagemod.init = function() {
+  return new Promise(resolve => {
+    /*
+     * According to the user status :
+     * * the pagemod should be initialized if the user is valid and logged in;
+     * * the pagemod should be destroyed otherwise;
+     */
     const user = User.getInstance();
     if (user.isValid()) {
       AppBoostrapPagemod.destroy();

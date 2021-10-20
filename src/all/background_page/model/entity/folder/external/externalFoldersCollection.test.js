@@ -87,7 +87,7 @@ describe("ExternalFoldersCollection", () => {
     const collection = new ExternalFoldersCollection([{"name": "Folder 1"}, {"name": "Folder 2"}]);
     const rootFolder = new ExternalFolderEntity({"name": "Root", "folder_parent_path": "New"});
     collection.changeRootPath(rootFolder);
-    for (let externalFolderEntity of collection) {
+    for (const externalFolderEntity of collection) {
       expect(externalFolderEntity.folderParentPath).toEqual("New/Root");
     }
   });

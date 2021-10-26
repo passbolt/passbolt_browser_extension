@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.3.1] - 2021-10-26
+### Fixed
+- PB-9388 Fix unnecessary organization settings API calls
+
 ## [3.3.0] - 2021-10-20
 ### Added
 - PB-7608 As LU I should be able to customize the password generator parameters
@@ -673,7 +677,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.3.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.3.1...HEAD
+[3.3.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.3...v3.3.0
 [3.2.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.2...v3.2.3
 [3.2.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.1...v3.2.2

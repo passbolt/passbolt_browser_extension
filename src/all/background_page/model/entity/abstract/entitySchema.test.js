@@ -190,6 +190,83 @@ describe("Entity schema isValidStringFormat", () => {
 
     expect(EntitySchema.isValidStringFormat('not_an_email', 'date-time')).toBe(false);
   });
+
+  it("isValidStringFormat works with URL", () => {
+    expect(EntitySchema.isValidStringFormat('https://localhost', 'x-url')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('https://localhost:8080', 'x-url')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('http://localhost', 'x-url')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('http://localhost:8080', 'x-url')).toBe(true);
+
+    expect(EntitySchema.isValidStringFormat('https://passbolt.test', 'x-url')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('https://passbolt.test:8080', 'x-url')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('https://www.passbolt.test', 'x-url')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('https://www.passbolt.test:8080', 'x-url')).toBe(true);
+
+    expect(EntitySchema.isValidStringFormat('https://passbolt.test/img/test.png', 'x-url')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('https://passbolt.test:8080/img/test.png', 'x-url')).toBe(true);
+
+    expect(EntitySchema.isValidStringFormat('https://192.168.1.1', 'x-url')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('http://192.168.1.1', 'x-url')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('https://192.168.1.1:8080', 'x-url')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('http://192.168.1.1:8080', 'x-url')).toBe(true);
+
+    expect(EntitySchema.isValidStringFormat('localhost', 'x-url')).toBe(true);
+
+    expect(EntitySchema.isValidStringFormat('//localhost', 'x-url')).toBe(false);
+    expect(EntitySchema.isValidStringFormat('//www.passbolt.test', 'x-url')).toBe(false);
+    expect(EntitySchema.isValidStringFormat('mailto://test@passbolt.com', 'x-url')).toBe(false);
+    expect(EntitySchema.isValidStringFormat('tel://123456789', 'x-url')).toBe(false);
+    expect(EntitySchema.isValidStringFormat('moz-extension://134c1a66-c6e3-1343-a5d4-63c511465c17/test.png', 'x-url')).toBe(false);
+  });
+
+  it("isValidStringFormat works with hex color", () => {
+    expect(EntitySchema.isValidStringFormat('#012', 'x-hex-color')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('345', 'x-hex-color')).toBe(true);
+
+    expect(EntitySchema.isValidStringFormat('#678', 'x-hex-color')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('9aB', 'x-hex-color')).toBe(true);
+
+    expect(EntitySchema.isValidStringFormat('#cDeF01', 'x-hex-color')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('234567', 'x-hex-color')).toBe(true);
+
+    expect(EntitySchema.isValidStringFormat('#89aBcDeF', 'x-hex-color')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('01234567', 'x-hex-color')).toBe(true);
+
+    expect(EntitySchema.isValidStringFormat('#012#01', 'x-hex-color')).toBe(false);
+    expect(EntitySchema.isValidStringFormat('##01201', 'x-hex-color')).toBe(false);
+    expect(EntitySchema.isValidStringFormat('012#', 'x-hex-color')).toBe(false);
+
+    expect(EntitySchema.isValidStringFormat('#01', 'x-hex-color')).toBe(false);
+    expect(EntitySchema.isValidStringFormat('34', 'x-hex-color')).toBe(false);
+
+    expect(EntitySchema.isValidStringFormat('#1', 'x-hex-color')).toBe(false);
+    expect(EntitySchema.isValidStringFormat('2', 'x-hex-color')).toBe(false);
+
+    expect(EntitySchema.isValidStringFormat('#12345', 'x-hex-color')).toBe(false);
+    expect(EntitySchema.isValidStringFormat('12345', 'x-hex-color')).toBe(false);
+
+    expect(EntitySchema.isValidStringFormat('#1234567', 'x-hex-color')).toBe(false);
+    expect(EntitySchema.isValidStringFormat('1234567', 'x-hex-color')).toBe(false);
+
+    expect(EntitySchema.isValidStringFormat('#123456789', 'x-hex-color')).toBe(false);
+    expect(EntitySchema.isValidStringFormat('123456789', 'x-hex-color')).toBe(false);
+
+    expect(EntitySchema.isValidStringFormat('#abcdefgh', 'x-hex-color')).toBe(false);
+    expect(EntitySchema.isValidStringFormat('abcdefgh', 'x-hex-color')).toBe(false);
+  });
+
+  it("isValidStringFormat works with base64", () => {
+    expect(EntitySchema.isValidStringFormat('aGVsbG8gcGFzc2JvbHQ=', 'x-base64')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('aGVsbG8gcGFzc2JvbHQ+', 'x-base64')).toBe(true);
+    expect(EntitySchema.isValidStringFormat('aGVsbG8gcGFzc2JvbHQ', 'x-base64')).toBe(false);
+
+    expect(EntitySchema.isValidStringFormat('aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj02LUhVZ3pZUG05Zw==', 'x-base64')).toBe(true);
+
+    expect(EntitySchema.isValidStringFormat('aGVsbG8gcG==Fzc2JvbHQ', 'x-base64')).toBe(false);
+    expect(EntitySchema.isValidStringFormat('==aGVsbG8gcGFzc2JvbHQ', 'x-base64')).toBe(false);
+
+    expect(EntitySchema.isValidStringFormat('$€`£ù%*:', 'x-base64')).toBe(false);
+  });
 });
 
 describe("Entity schema isValidPropType", () => {

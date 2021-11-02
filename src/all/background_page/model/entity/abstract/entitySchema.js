@@ -377,7 +377,7 @@ class EntitySchema {
        * cowboy style section 🤠
        */
       case 'x-url':
-        return Validator.isURL(prop);
+        return Validator.isURL(prop, {require_tld: false});
       case 'x-hex-color':
         return Validator.isHexColor(prop);
       case 'x-base64':

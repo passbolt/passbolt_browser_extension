@@ -54,7 +54,7 @@ describe("Theme entity", () => {
       new ThemeEntity({
         "id": "🏆‍️",
         "name": "🏆‍",
-        "preview": "not-an-url",
+        "preview": "url-without-tld",
       });
       expect(false).toBe(true);
     } catch (error) {
@@ -62,9 +62,17 @@ describe("Theme entity", () => {
       expect(error.details).toEqual({
         id: {format: 'The id is not a valid uuid.'},
         name: {pattern: 'The name is not valid.'},
-        preview: {format: 'The preview is not a valid x-url.'}
       });
     }
   });
-});
 
+  it("constructor works if valid minimal DTO is provided on localhost", () => {
+    const dto = {
+      "id": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+      "name": "default",
+      "preview": "https://localhost:8443/img/themes/default.png",
+    };
+    const entity = new ThemeEntity(dto);
+    expect(entity.toDto()).toEqual(dto);
+  });
+});

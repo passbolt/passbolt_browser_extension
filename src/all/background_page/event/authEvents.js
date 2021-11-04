@@ -14,6 +14,7 @@ const {AuthModel} = require("../model/auth/authModel");
 const {User} = require('../model/user');
 const {Keyring} = require('../model/keyring');
 const Config = require('../model/config');
+const {UserAlreadyLoggedInError} = require("../error/userAlreadyLoggedInError");
 
 const listen = function(worker) {
   /*
@@ -176,8 +177,12 @@ const listen = function(worker) {
       await authModel.login(passphrase, remember);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
+      if (error instanceof UserAlreadyLoggedInError) {
+        worker.port.emit(requestId, 'SUCCESS');
+      } else {
+        console.error(error);
+        worker.port.emit(requestId, 'ERROR', error);
+      }
     }
   });
 

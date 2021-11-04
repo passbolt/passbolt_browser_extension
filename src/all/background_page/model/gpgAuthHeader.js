@@ -5,6 +5,7 @@
  * @licence AGPL-3.0 http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
+const {UserAlreadyLoggedInError} = require("../error/userAlreadyLoggedInError");
 
 /**
  * The class that deals with secrets.
@@ -49,7 +50,7 @@ GpgAuthHeader.prototype.__validate = function(step) {
   // Check if the headers are correct
   const result = this.__validateByStage(step);
   if (result instanceof Error) {
-    throw new Error(result.message);
+    throw result;
   }
 
   return true;
@@ -127,7 +128,7 @@ GpgAuthHeader.prototype.__validateByStage = function(stage) {
     case 'stage1' :
       if (typeof this.headers['x-gpgauth-authenticated'] !== 'string' ||
         this.headers['x-gpgauth-authenticated'] != 'false') {
-        return new Error('x-gpgauth-authenticated should be set to false during stage1');
+        return new UserAlreadyLoggedInError('x-gpgauth-authenticated should be set to false during stage1');
       }
       if (typeof this.headers['x-gpgauth-progress'] !== 'string' ||
         this.headers['x-gpgauth-progress'] != 'stage1') {

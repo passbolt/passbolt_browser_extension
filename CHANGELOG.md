@@ -4,6 +4,48 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.3.1] - 2021-10-26
+### Fixed
+- PB-9388 Fix unnecessary organization settings API calls
+
+## [3.3.0] - 2021-10-20
+### Added
+- PB-7608 As LU I should be able to customize the password generator parameters
+- PB-7608 As LU I should be able to use emojis in the generated passwords
+- PB-7608 As LU I should be able to generate passphrase instead of passwords
+- PB-7606 As LU I should be able to see how many credentials are suggested for the page I’m currently on by looking at the passbolt icon in the toolbar
+- PB-7649 As LU I should be prompted to save a new credential when I generate a password for a new sign-up form
+- PB-7683 As LU I should be able to auto-fill a suggested credential directly from inside an authentication form
+- PB-7693 As LU I should be able to generate a password directly from inside a sign-up form
+- PB-8189 As a user should be able to use the application in German or Swedish
+- PB-6034 As LU I should be able to configure my mobile [experimental]
+
+### Improvement
+- PB-7639 As LU I should be able to import folders containing slash in their names
+- PB-8256 As LU I should be able to see the username and password fields pre-filled when I create a password with the quickaccess
+- PB-8088 As LU I should not see the quickaccess passphrase capture screen shaking when it appears
+- PB-7599 As AN installing the extension on chrome I should be able to see instructions regarding how to pin the extension in the toolbar
+- PB-7626 As LU I should be able to auto-fill a form by directly clicking on a credential suggested by the browser extension quickaccess without seeing the credential details first
+- PB-6132 As LU I should be able to see the role column inside the users grid
+- As LU I should be able to see my quickaccess with a larger wi
+
+### Fixed
+- PB-7813 Fix as LU I shouldn't be able to export from the folders section label if the exports feature is disabled
+- PB-8306 Fix as LU I should see a content skeleton during loading on the share dialog of the application
+- PB-8525 Fix as LU signing-in for the first time with the quickaccess I should be able  to see the tags category
+- PB-7364 As GM I should not see the group name editable in the group edit dialog
+
+### Security
+- PB-8368 Password secret complexity calculation algorithm should take in account graphemes
+- PB-8453 Mark password fields that are viewable as not auto-completable
+- PB-8455 Update dependencies, remove unused grunt-contrib-concat
+
+### Maintenance
+- PB-8367 Add code coverage automation
+- PB-8492 Optimize passbolt-styleguide dependency package size
+- PB-7575 Remove jQuery dependency
+- PB-6057 Remove underscore dependency
+
 ## [3.2.3] - 2021-06-07
 ### Fixed
 - PB-7561 Fix as LU I should import CSV containing non latin1 characters
@@ -635,7 +677,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.3...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.3.1...HEAD
+[3.3.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.3.0...v3.3.1
+[3.3.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.3...v3.3.0
 [3.2.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.2...v3.2.3
 [3.2.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.1...v3.2.2
 [3.2.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.1.0...v3.2.1

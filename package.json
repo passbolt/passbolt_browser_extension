@@ -1,6 +1,6 @@
 {
   "name": "passbolt_extension",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "license": "AGPL-3.0",
   "copyright": "Copyright 2021 Passbolt SA",
   "description": "Passbolt web extension for the open source password manager for teams",
@@ -21,7 +21,7 @@
     "npm-force-resolutions": "0.0.10",
     "openpgp": "4.10.9",
     "papaparse": "^5.2.0",
-    "passbolt-styleguide": "3.3.1",
+    "passbolt-styleguide": "3.3.2",
     "react": "16.12.0",
     "react-dom": "16.12.0",
     "validator": "^13.6.0",

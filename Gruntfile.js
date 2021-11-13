@@ -196,7 +196,7 @@ module.exports = function (grunt) {
           src: [
             'check_black.svg', 'check_white.svg', 'dot_black.svg', 'dot_white.svg', 'dot_red.svg',
             'infinite-bar.gif', 'loading_dark.svg', 'loading_light.svg', 'chevron-right_black.svg',
-            'chevron-right_white.svg', 'chevron-down_black.svg', 'chevron-down_white.svg'
+            'chevron-right_white.svg', 'chevron-down_black.svg', 'chevron-down_white.svg', 'chevron-down_blue.svg'
           ],
           dest: path.build_data + 'img/controls',
           expand: true

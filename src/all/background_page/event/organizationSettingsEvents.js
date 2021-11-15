@@ -22,7 +22,7 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    * @param refreshCache {boolean} Should refresh the cache, default true
    */
-  worker.port.on('passbolt.organization-settings.get', async (requestId, refreshCache = true) => {
+  worker.port.on('passbolt.organization-settings.get', async(requestId, refreshCache = true) => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);

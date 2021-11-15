@@ -14,6 +14,7 @@ const {User} = require('../model/user');
 const {TagModel} = require('../model/tag/tagModel');
 const {TagEntity} = require('../model/entity/tag/tagEntity');
 const {TagsCollection} = require('../model/entity/tag/tagsCollection');
+const {TagController} = require("../controller/tag/tagController");
 
 const listen = function(worker) {
   /*
@@ -48,6 +49,24 @@ const listen = function(worker) {
       const tagsCollection = new TagsCollection(tagsDto);
       const tags = await tagModel.updateResourceTags(resourceId, tagsCollection);
       worker.port.emit(requestId, 'SUCCESS', tags);
+    } catch (error) {
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Add resources tag
+   *
+   * @listens passbolt.tags.add-resource-tags
+   * @param requestId {uuid} The request identifier
+   * @param {object} resourcesTagDto {resources: array of uuids, tag: {object}} the tag to add for the resources
+   */
+  worker.port.on('passbolt.tags.add-resources-tag', async(requestId, resourcesTagDto) => {
+    try {
+      const apiOption = await User.getInstance().getApiClientOptions();
+      const tagController = new TagController(worker, apiOption);
+      await tagController.addTagResources(resourcesTagDto.resources, resourcesTagDto.tag);
+      worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }

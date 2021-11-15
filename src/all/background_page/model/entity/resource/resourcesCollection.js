@@ -167,6 +167,24 @@ class ResourcesCollection extends EntityCollection {
    * Sanitization
    * ==================================================
    */
+
+  /**
+   * Keep the resources if the tag is not present
+   *
+   * @param {string} tagId
+   * @returns {*[]} The resources which they have not the tag
+   */
+  filterByTagNotPresent(tagId) {
+    const tagIsNotPresent = tag => tag.id !== tagId;
+    const filterResource = resource => resource.tags.tags.every(tagIsNotPresent);
+    return  this._items.filter(filterResource);
+  }
+
+  /*
+   * ==================================================
+   * Sanitization
+   * ==================================================
+   */
   /**
    * Sanitize resources dto:
    * - Deduplicate the resources by id.

@@ -1,4 +1,5 @@
 {
+  "Adding tag...": "Adding tag...",
   "An internal error occurred. The server response could not be parsed. Please contact your administrator.": "An internal error occurred. The server response could not be parsed. Please contact your administrator.",
   "Autofill failed. Could not find the active tab.": "Autofill failed. Could not find the active tab.",
   "Calculate permissions": "Calculate permissions",
@@ -38,6 +39,7 @@
   "Moving one resource": "Moving one resource",
   "Moving {{name}}": "Moving {{name}}",
   "Moving {{total}} resources": "Moving {{total}} resources",
+  "Preparing...": "Preparing...",
   "Private key not found.": "Private key not found.",
   "Public key not found.": "Public key not found.",
   "Saving permissions...": "Saving permissions...",
@@ -63,5 +65,6 @@
   "Unable to retrieve the active tab info.": "Unable to retrieve the active tab info.",
   "Updating group": "Updating group",
   "Updating group ...": "Updating group ...",
-  "Updating password": "Updating password"
+  "Updating password": "Updating password",
+  "Updating resource": "Updating resource"
 }

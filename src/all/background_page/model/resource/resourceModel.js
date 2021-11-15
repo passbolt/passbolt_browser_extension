@@ -459,7 +459,6 @@ class ResourceModel {
    * @param {int} collectionIndex The index of the resource in the initial collection
    * @param {{successCallback: function, errorCallback: function}?} callbacks The intermediate operation callbacks
    * @returns {Promise<ResourceEntity|Error>}
-   * @throws Exception if the resource cannot be deleted
    * @private
    */
   async _bulkDelete_deleteResource(resourceId, collectionIndex, callbacks) {

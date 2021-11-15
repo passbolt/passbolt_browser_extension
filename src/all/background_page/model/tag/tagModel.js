@@ -130,7 +130,9 @@ class TagModel {
     const errorCallback = callbacks.errorCallback || (() => {});
 
     try {
-      const tagsDto = await this.tagService.updateResourceTags(resourceId, tagsCollection.toDto());
+      const resourceEntity = await this.resourceModel.getById(resourceId);
+      const updatedTagCollection = new TagsCollection([...tagsCollection.tags, ...resourceEntity.tags]);
+      const tagsDto = await this.tagService.updateResourceTags(resourceId, updatedTagCollection.toDto());
       const updatedTagsCollection = new TagsCollection(tagsDto);
       successCallback(updatedTagsCollection, collectionIndex);
       return updatedTagsCollection;

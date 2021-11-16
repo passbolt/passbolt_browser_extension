@@ -148,7 +148,7 @@ class GpgAuth {
    * @param {string} [serverUrl] optional domain where to get the key.
    * if domain is not provided, then look in the settings.
    *
-   * @returns {Promise.<string>}
+   * @returns {Promise.<object>}
    */
   async getServerKey(serverUrl) {
     const domain = serverUrl || this.getDomain();

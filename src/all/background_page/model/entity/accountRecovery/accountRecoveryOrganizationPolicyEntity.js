@@ -12,37 +12,37 @@
  */
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
-const {AccountRecoveryOrganisationPublicKeyEntity} = require("./accountRecoveryOrganisationPublicKeyEntity");
+const {AccountRecoveryOrganizationPublicKeyEntity} = require("./accountRecoveryOrganizationPublicKeyEntity");
 const {AccountRecoveryPrivateKeyPasswordsCollection} = require("./accountRecoveryPrivateKeyPasswordsCollection");
 const {EntityValidationError} = require("../abstract/entityValidationError");
 
-const ENTITY_NAME = "AccountRecoveryOrganisationPolicy";
+const ENTITY_NAME = "AccountRecoveryOrganizationPolicy";
 
 /**
- * Entity related to the account recovery organisation policy
+ * Entity related to the account recovery organization policy
  */
-class AccountRecoveryOrganisationPolicyEntity extends Entity {
+class AccountRecoveryOrganizationPolicyEntity extends Entity {
   /**
    * Setup entity constructor
    *
-   * @param {Object} accountRecoveryOrganisationPolicyDto account recovery organisation policy DTO
+   * @param {Object} accountRecoveryOrganizationPolicyDto account recovery organization policy DTO
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(accountRecoveryOrganisationPolicyDto) {
+  constructor(accountRecoveryOrganizationPolicyDto) {
     super(EntitySchema.validate(
-      AccountRecoveryOrganisationPolicyEntity.ENTITY_NAME,
-      accountRecoveryOrganisationPolicyDto,
-      AccountRecoveryOrganisationPolicyEntity.getSchema()
+      AccountRecoveryOrganizationPolicyEntity.ENTITY_NAME,
+      accountRecoveryOrganizationPolicyDto,
+      AccountRecoveryOrganizationPolicyEntity.getSchema()
     ));
     // Associations
     if (this._props.account_recovery_organization_key) {
-      this._account_recovery_organization_key = new AccountRecoveryOrganisationPublicKeyEntity(this._props.account_recovery_organization_key);
-      AccountRecoveryOrganisationPolicyEntity.assertValidAccountRecoveryOrganisationPublicKey(this._account_recovery_organization_key, this.account_recovery_organization_key_id);
+      this._account_recovery_organization_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_key);
+      AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryOrganizationPublicKey(this._account_recovery_organization_key, this.account_recovery_organization_key_id);
       delete this._props.account_recovery_organization_key;
     }
     if (this._props.account_recovery_private_key_passwords) {
       this._account_recovery_private_key_passwords = new AccountRecoveryPrivateKeyPasswordsCollection(this._props.account_recovery_private_key_passwords);
-      AccountRecoveryOrganisationPolicyEntity.assertValidAccountRecoveryPrivateKeyPasswords(this._account_recovery_private_key_passwords);
+      AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryPrivateKeyPasswords(this._account_recovery_private_key_passwords);
       delete this._props.account_recovery_private_key_passwords;
     }
   }
@@ -84,7 +84,7 @@ class AccountRecoveryOrganisationPolicyEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
-        "account_recovery_organization_key": AccountRecoveryOrganisationPublicKeyEntity.getSchema(),
+        "account_recovery_organization_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
         "account_recovery_private_key_passwords": AccountRecoveryPrivateKeyPasswordsCollection.getSchema()
       }
     };
@@ -121,20 +121,20 @@ class AccountRecoveryOrganisationPolicyEntity extends Entity {
    * ==================================================
    */
   /**
-   * Additional AccountRecoveryOrganisationPublicKey validation rule
-   * Check that the accountRecoveryOrganisationPublicKey is for a resource
+   * Additional AccountRecoveryOrganizationPublicKey validation rule
+   * Check that the accountRecoveryOrganizationPublicKey is for a resource
    * Check that id match foreignKey if any
    *
-   * @param {AccountRecoveryOrganisationPublicKeyEntity} accountRecoveryOrganisationPublicKey
+   * @param {AccountRecoveryOrganizationPublicKeyEntity} accountRecoveryOrganizationPublicKey
    * @param {string} [accountRecoveryOrganizationKeyId] optional
    * @throws {EntityValidationError} if not valid
    */
-  static assertValidAccountRecoveryOrganisationPublicKey(accountRecoveryOrganisationPublicKey, accountRecoveryOrganizationKeyId) {
-    if (!accountRecoveryOrganisationPublicKey) {
-      throw new EntityValidationError('AccountRecoveryOrganisationPolicyEntity assertValidAccountRecoveryOrganisationPublicKey expect an accountRecoveryOrganisationPublicKey.');
+  static assertValidAccountRecoveryOrganizationPublicKey(accountRecoveryOrganizationPublicKey, accountRecoveryOrganizationKeyId) {
+    if (!accountRecoveryOrganizationPublicKey) {
+      throw new EntityValidationError('AccountRecoveryOrganizationPolicyEntity assertValidAccountRecoveryOrganizationPublicKey expect an accountRecoveryOrganizationPublicKey.');
     }
-    if (accountRecoveryOrganizationKeyId && (accountRecoveryOrganisationPublicKey.id !== accountRecoveryOrganizationKeyId)) {
-      throw new EntityValidationError('AccountRecoveryOrganisationPolicyEntity assertValidPermission resource id doesnt not match foreign key permission.');
+    if (accountRecoveryOrganizationKeyId && (accountRecoveryOrganizationPublicKey.id !== accountRecoveryOrganizationKeyId)) {
+      throw new EntityValidationError('AccountRecoveryOrganizationPolicyEntity assertValidPermission resource id doesnt not match foreign key permission.');
     }
   }
 
@@ -146,10 +146,10 @@ class AccountRecoveryOrganisationPolicyEntity extends Entity {
    */
   static assertValidAccountRecoveryPrivateKeyPasswords(accountRecoveryPrivateKeyPasswords) {
     if (!accountRecoveryPrivateKeyPasswords || !accountRecoveryPrivateKeyPasswords.length) {
-      throw new EntityValidationError('AccountRecoveryOrganisationPolicyEntity assertValidSecrets cannot be empty.');
+      throw new EntityValidationError('AccountRecoveryOrganizationPolicyEntity assertValidSecrets cannot be empty.');
     }
     if (!(accountRecoveryPrivateKeyPasswords instanceof AccountRecoveryPrivateKeyPasswordsCollection)) {
-      throw new EntityValidationError('AccountRecoveryOrganisationPolicyEntity assertValidSecrets expect a AccountRecoveryPrivateKeyPasswordsCollection.');
+      throw new EntityValidationError('AccountRecoveryOrganizationPolicyEntity assertValidSecrets expect a AccountRecoveryPrivateKeyPasswordsCollection.');
     }
   }
 
@@ -173,7 +173,7 @@ class AccountRecoveryOrganisationPolicyEntity extends Entity {
    * ==================================================
    */
   /**
-   * AccountRecoveryOrganisationPolicyEntity.ENTITY_NAME
+   * AccountRecoveryOrganizationPolicyEntity.ENTITY_NAME
    * @returns {string}
    */
   static get ENTITY_NAME() {
@@ -181,4 +181,4 @@ class AccountRecoveryOrganisationPolicyEntity extends Entity {
   }
 }
 
-exports.AccountRecoveryOrganisationPolicyEntity = AccountRecoveryOrganisationPolicyEntity;
+exports.AccountRecoveryOrganizationPolicyEntity = AccountRecoveryOrganizationPolicyEntity;

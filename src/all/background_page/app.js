@@ -56,6 +56,7 @@ events.accountRecovery = require('./event/accountRecoveryEvents');
 events.informCallToAction = require('./event/informCallToActionEvents');
 events.informMenu = require('./event/informMenuEvents');
 events.webIntegration = require('./event/webIntegrationEvents');
+events.accountRecovery = require('./event/accountRecoveryEvents');
 
 exports.events = events;
 

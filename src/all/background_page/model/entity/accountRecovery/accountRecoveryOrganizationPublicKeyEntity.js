@@ -9,34 +9,31 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         3.4.0
  */
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
 
-const ENTITY_NAME = "AccountRecoveryOrganisationPublicKey";
-const FINGERPRINT_MIN_LENGTH = 40;
-const FINGERPRINT_MAX_LENGTH = 40;
+const ENTITY_NAME = 'AccountRecoveryOrganizationPublicKey';
+const FINGERPRINT_LENGTH = 40;
 
-/**
- * Entity related to the account recovery organisation public key
- */
-class AccountRecoveryOrganisationPublicKeyEntity extends Entity {
+class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
   /**
-   * Setup entity constructor
+   * Resource entity constructor
    *
-   * @param {Object} accountRecoveryOrganisationPublicKeyDto account recovery organisation public key DTO
+   * @param {Object} resourceDto resource DTO
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(accountRecoveryOrganisationPublicKeyDto) {
+  constructor(accountRecoveryOrganizationPublicKeyDto) {
     super(EntitySchema.validate(
-      AccountRecoveryOrganisationPublicKeyEntity.ENTITY_NAME,
-      accountRecoveryOrganisationPublicKeyDto,
-      AccountRecoveryOrganisationPublicKeyEntity.getSchema()
+      AccountRecoveryOrganizationPublicKeyEntity.ENTITY_NAME,
+      accountRecoveryOrganizationPublicKeyDto,
+      AccountRecoveryOrganizationPublicKeyEntity.getSchema()
     ));
   }
 
   /**
-   * Get entity schema
+   * Get resource entity schema
    * @returns {Object} schema
    */
   static getSchema() {
@@ -54,26 +51,32 @@ class AccountRecoveryOrganisationPublicKeyEntity extends Entity {
           "type": "string",
         },
         "fingerprint": {
-          "type": "string",
-          "minLength": FINGERPRINT_MIN_LENGTH,
-          "maxLength": FINGERPRINT_MAX_LENGTH
+          "anyOf": [{
+            "type": "string",
+            "length": FINGERPRINT_LENGTH
+          }, {
+            "type": "null"
+          }]
         },
         "created": {
-          "type": "string"
+          "type": "string",
+          "format": "date-time"
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time"
         },
         "created_by": {
           "type": "string",
           "format": "uuid"
-        },
-        "modified": {
-          "type": "string"
         },
         "modified_by": {
           "type": "string",
           "format": "uuid"
         },
         "deleted": {
-          "type": "string"
+          "type": "string",
+          "format": "date-time"
         }
       }
     };
@@ -85,12 +88,13 @@ class AccountRecoveryOrganisationPublicKeyEntity extends Entity {
    * ==================================================
    */
   /**
-   * Return a DTO ready to be sent to API or content code
+   * Return a DTO ready to be sent to API
+   *
+   * @param {object} [contain] optional
    * @returns {object}
    */
   toDto() {
-    const result = Object.assign({}, this._props);
-    return result;
+    return Object.assign({}, this._props);
   }
 
   /**
@@ -103,24 +107,11 @@ class AccountRecoveryOrganisationPublicKeyEntity extends Entity {
 
   /*
    * ==================================================
-   * Dynamic properties getters
-   * ==================================================
-   */
-  /**
-   * Get permission id
-   * @returns {(string|null)} uuid if set
-   */
-  get id() {
-    return this._props.id || null;
-  }
-
-  /*
-   * ==================================================
    * Static properties getters
    * ==================================================
    */
   /**
-   * AccountRecoveryOrganisationPublicKeyEntity.ENTITY_NAME
+   * ResourceEntity.ENTITY_NAME
    * @returns {string}
    */
   static get ENTITY_NAME() {
@@ -128,4 +119,4 @@ class AccountRecoveryOrganisationPublicKeyEntity extends Entity {
   }
 }
 
-exports.AccountRecoveryOrganisationPublicKeyEntity = AccountRecoveryOrganisationPublicKeyEntity;
+exports.AccountRecoveryOrganizationPublicKeyEntity = AccountRecoveryOrganizationPublicKeyEntity;

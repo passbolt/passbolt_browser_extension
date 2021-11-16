@@ -10,19 +10,49 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+const {AccountRecoveryValidatePublicKeyController} = require("../controller/accountRecovery/AccountRecoveryValidatePublicKeyController");
+const {AccountRecoverySaveOrganizationSettingsController} = require("../controller/accountRecovery/AccountRecoverySaveOrganizationSettingsController");
+const {ExternalGpgKeyEntity} = require("../model/entity/gpgkey/external/externalGpgKeyEntity");
 const {User} = require('../model/user');
-const {AccountRecoverySaveOrganisationSettingsController} = require("../controller/accountRecovery/AccountRecoverySaveOrganisationSettingsController");
+const {GpgKeyInfoService} = require("../service/crypto/GpgKeyInfoService");
 
 /**
  * Listens the account recovery events
  * @param worker
  */
 const listen = function(worker) {
-  /** Whenever the account recovery organisation need to be saved */
-  worker.port.on('passbolt.account-recovery.organization.save-settings', async(requestId, accountRecoveryOrganisationPolicyDto) => {
-    const apiClientOptions =  await User.getInstance().getApiClientOptions();
-    const accountRecoverySaveOrganisationSettingsController = new AccountRecoverySaveOrganisationSettingsController(worker, requestId, apiClientOptions);
-    await accountRecoverySaveOrganisationSettingsController.exec(accountRecoveryOrganisationPolicyDto);
+  worker.port.on('passbolt.account-recovery.organization.get', async requestId => {
+    try {
+      worker.port.emit(requestId, 'SUCCESS', {
+        policy: "disabled"
+      });
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /** Whenever the account recovery organization need to be saved */
+  worker.port.on('passbolt.account-recovery.organization.save-settings', async(requestId, accountRecoveryOrganizationPolicyDto) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const accountRecoverySaveOrganizationSettingsController = new AccountRecoverySaveOrganizationSettingsController(worker, requestId, apiClientOptions);
+    await accountRecoverySaveOrganizationSettingsController.exec(accountRecoveryOrganizationPolicyDto);
+  });
+
+  worker.port.on('passbolt.account-recovery.organization.validate-key', async(requestId, newAccountRecoveryOrganizationPublicKeyDto, currentAccountRecoveryOrganizationPublicKeyDto) => {
+    const controller = new AccountRecoveryValidatePublicKeyController(worker, requestId);
+    await controller.validateOrganizationRecoveryKey(newAccountRecoveryOrganizationPublicKeyDto, currentAccountRecoveryOrganizationPublicKeyDto);
+  });
+
+  worker.port.on('passbolt.account-recovery.organization.get-key-details', async(requestId, accountRecoveryOrganizationPublicKeyDto) => {
+    const keyEntity = new ExternalGpgKeyEntity(accountRecoveryOrganizationPublicKeyDto);
+    const keyInfo = await GpgKeyInfoService.getKeyInfo(keyEntity);
+    try {
+      worker.port.emit(requestId, 'SUCCESS', new ExternalGpgKeyEntity(keyInfo));
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
   });
 };
 

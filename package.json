@@ -50,9 +50,10 @@
     "grunt-eslint": "^24.0.0",
     "grunt-shell": "^3.0.1",
     "i18next-scanner": "github:passbolt/i18next-scanner#master",
-    "jest": "^27.4.0",
-    "jest-environment-jsdom": "^27.4.0",
-    "jest-environment-node": "^27.4.0",
+    "jest": "^27.2.4",
+    "jest-environment-jsdom": "^27.2.4",
+    "jest-environment-node": "^27.2.4",
+    "text-encoding-utf-8": "^1.0.2",
     "web-ext": "^6.6.0",
     "webpack": "^5.64.4",
     "webpack-cli": "^4.9.1"

@@ -22,7 +22,7 @@ class AccountRecoveryPrivateKeyPasswordEntity extends Entity {
   /**
    * Setup entity constructor
    *
-   * @param {Object} accountRecoveryPrivateKeyPasswordDto account recovery organisation public key DTO
+   * @param {Object} accountRecoveryPrivateKeyPasswordDto account recovery organization public key DTO
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
   constructor(accountRecoveryPrivateKeyPasswordDto) {
@@ -52,7 +52,7 @@ class AccountRecoveryPrivateKeyPasswordEntity extends Entity {
         },
         "recipient_foreign_model": {
           "type": "string",
-          "enum": ["AccountRecoveryContact",  "AccountRecoveryOrganisationKey"]
+          "enum": ["AccountRecoveryContact",  "AccountRecoveryOrganizationKey"]
         },
         "recipient_foreign_key": {
           "type": "string",

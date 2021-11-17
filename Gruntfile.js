@@ -272,7 +272,10 @@ module.exports = function (grunt) {
         }, {
           // CSS files midgar
           cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/midgar',
-          src: ['ext_legacy.min.css', 'ext_app.min.css', 'ext_in_form_cta.min.css', 'ext_in_form_menu.min.css'],
+          src: [
+            'ext_login.min.css', 'ext_in_form_cta.min.css', 'ext_setup.min.css', 'ext_quickaccess.min.css',
+            'ext_app.min.css', 'ext_authentication.min.css', 'ext_in_form_menu.min.css'
+          ],
           dest: path.build_data + 'css/themes/midgar',
           expand: true
         }, {

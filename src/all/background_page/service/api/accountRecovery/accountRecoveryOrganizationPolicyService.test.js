@@ -64,7 +64,7 @@ describe("Account recovery validate public key controller", () => {
   it("should accept a viable key", () => {
     expect.assertions(1);
     const validationPromise = AccountRecoveryOrganizationPolicyService.validatePublicKey({armored_key: dummyData.viableKey});
-    return expect(validationPromise).toBeDefined();
+    return expect(validationPromise).resolves.not.toThrow();
   });
 
   it("should refuse an invalid key", async() => {

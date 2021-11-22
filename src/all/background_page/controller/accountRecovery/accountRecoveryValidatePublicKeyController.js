@@ -25,13 +25,12 @@ class AccountRecoveryValidatePublicKeyController {
    * @param {AccountRecoveryOrganizationPublicKeyDto} currentOrk
    */
   async exec(newOrk, currentOrk) {
-    try {
-      await AccountRecoveryOrganizationPolicyService.validatePublicKey(newOrk, currentOrk);
-      this.worker.port.emit(this.requestId, "SUCCESS");
-    } catch (error) {
-      console.log(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
-    }
+    await AccountRecoveryOrganizationPolicyService.validatePublicKey(newOrk, currentOrk)
+      .then(() => { this.worker.port.emit(this.requestId, "SUCCESS"); })
+      .catch(error => {
+        console.log(error);
+        this.worker.port.emit(this.requestId, 'ERROR', error);
+      });
   }
 }
 

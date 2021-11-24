@@ -182,6 +182,7 @@ class SetupController {
     const accountEntity = new AccountEntity(accountDto);
     await this.setupModel.complete(this.setupEntity);
     await this.accountModel.add(accountEntity);
+    app.pageMods.WebIntegration.init(); // This is required, the pagemod is not initialized prior to the completion of the setup.
     app.pageMods.AuthBootstrap.init(); // This is required, the pagemod is not initialized prior to the completion of the setup.
     await this.authModel.login(this.setupEntity.passphrase, this.setupEntity.rememberUntilLogout);
     await this.redirectToApp();

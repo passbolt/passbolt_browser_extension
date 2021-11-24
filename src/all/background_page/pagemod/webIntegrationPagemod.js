@@ -10,6 +10,7 @@
 const app = require('../app');
 const {PageMod} = require('../sdk/page-mod');
 const Worker = require('../model/worker');
+const {User} = require("../model/user");
 
 const WebIntegration = function() {};
 WebIntegration._pageMod = undefined;
@@ -20,9 +21,13 @@ WebIntegration.init = function() {
     WebIntegration._pageMod = undefined;
   }
 
+  const user = User.getInstance();
+  const escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
+  const url = `^((?!${escapedDomain}).)*$`;
+
   WebIntegration._pageMod = new PageMod({
     name: 'WebIntegration',
-    include: new RegExp('.*'),
+    include: new RegExp(url),
     contentScriptWhen: 'ready',
     contentStyleFile: [],
     contentScriptFile: [

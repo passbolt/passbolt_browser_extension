@@ -70,11 +70,11 @@ const main = async function() {
    */
   const pageMods = require('./app').pageMods;
 
-  pageMods.WebIntegration.init();
-
-  // If the user is valid we enable the login pagemod
+  // If the user is valid we enable the web integration and login pagemod
   const user = User.getInstance();
   if (user.isValid()) {
+    // Web Integration pagemod init can also be triggered by setup and user events (e.g. when config change)
+    pageMods.WebIntegration.init();
     // Auth pagemod init can also be triggered by setup and user events (e.g. when config change)
     pageMods.AuthBootstrap.init();
 

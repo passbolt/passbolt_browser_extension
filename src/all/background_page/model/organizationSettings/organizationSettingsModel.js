@@ -13,6 +13,7 @@
  */
 const {OrganizationSettingsEntity} = require("../entity/organizationSettings/organizationSettingsEntity");
 const {OrganizationSettingsService} = require("../../service/api/organizationSettings/organizationSettingsService");
+const {PassboltApiFetchError} = require("../../error/passboltApiFetchError");
 
 // Settings local cache.
 let _settings;
@@ -48,7 +49,18 @@ class OrganizationSettingsModel {
    * @returns {Promise<OrganizationSettingsEntity>}
    */
   async find() {
-    const organizationSettingsDto = await this.organizationSettingsService.find();
+    let organizationSettingsDto;
+
+    try {
+      organizationSettingsDto = await this.organizationSettingsService.find();
+    } catch (error) {
+      // When the cloud organization is disabled or not found, the cloud API returns a 403.
+      if (error instanceof PassboltApiFetchError
+        && error?.data?.code === 403) {
+        organizationSettingsDto = OrganizationSettingsEntity.disabledOrganizationSettings;
+      }
+    }
+
     return new OrganizationSettingsEntity(organizationSettingsDto);
   }
 }

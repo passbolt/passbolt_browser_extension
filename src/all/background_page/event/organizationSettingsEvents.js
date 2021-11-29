@@ -24,7 +24,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.organization-settings.get', async(requestId, refreshCache = true) => {
     try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const apiClientOptions = await User.getInstance().getApiClientOptions({requireCsrfToken: false});
       const organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
       const organizationSettings = await organizationSettingsModel.getOrFind(refreshCache);
       worker.port.emit(requestId, 'SUCCESS', organizationSettings);

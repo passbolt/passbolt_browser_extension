@@ -16,6 +16,11 @@ const {EntitySchema} = require('../abstract/entitySchema');
 
 const ENTITY_NAME = "OrganizationSettings";
 
+// Organization status
+const ORGANIZATION_ENABLED = 'enabled';
+const ORGANIZATION_DISABLED = 'disabled';
+const ORGANIZATION_NOT_FOUND = 'not found';
+
 class OrganizationSettingsEntity extends Entity {
   /**
    * Organization settings entity constructor
@@ -24,11 +29,24 @@ class OrganizationSettingsEntity extends Entity {
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
   constructor(organizationSettingsDto) {
+    // Default properties values
+    const props = Object.assign(OrganizationSettingsEntity.getDefault(), organizationSettingsDto);
+
     super(EntitySchema.validate(
       OrganizationSettingsEntity.ENTITY_NAME,
-      organizationSettingsDto,
+      props,
       OrganizationSettingsEntity.getSchema()
     ));
+  }
+
+  /**
+   * Get default properties values
+   * @return {object}
+   */
+  static getDefault() {
+    return {
+      "status": OrganizationSettingsEntity.ORGANIZATION_ENABLED
+    };
   }
 
   /**
@@ -42,6 +60,14 @@ class OrganizationSettingsEntity extends Entity {
 
       ],
       "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            OrganizationSettingsEntity.ORGANIZATION_ENABLED,
+            OrganizationSettingsEntity.ORGANIZATION_DISABLED,
+            OrganizationSettingsEntity.ORGANIZATION_NOT_FOUND
+          ]
+        },
         "app": {
           "type": "object"
         },
@@ -49,6 +75,15 @@ class OrganizationSettingsEntity extends Entity {
           "type": "object"
         },
       }
+    };
+  }
+
+  /**
+   * Return a disabled organization settings.
+   */
+  static get disabledOrganizationSettings() {
+    return {
+      status: this.ORGANIZATION_DISABLED
     };
   }
 
@@ -121,6 +156,30 @@ class OrganizationSettingsEntity extends Entity {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
+  }
+
+  /**
+   * OrganizationSettingsEntity.ORGANIZATION_ENABLED
+   * @returns {string}
+   */
+  static get ORGANIZATION_ENABLED() {
+    return ORGANIZATION_ENABLED;
+  }
+
+  /**
+   * OrganizationSettingsEntity.ORGANIZATION_DISABLED
+   * @returns {string}
+   */
+  static get ORGANIZATION_DISABLED() {
+    return ORGANIZATION_DISABLED;
+  }
+
+  /**
+   * OrganizationSettingsEntity.ORGANIZATION_NOT_FOUND
+   * @returns {string}
+   */
+  static get ORGANIZATION_NOT_FOUND() {
+    return ORGANIZATION_NOT_FOUND;
   }
 }
 

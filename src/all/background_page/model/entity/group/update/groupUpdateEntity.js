@@ -151,7 +151,7 @@ class GroupUpdateEntity extends Entity {
    * @param {SecretsCollection} secrets
    */
   set secrets(secrets) {
-    return this._secrets = secrets;
+    this._secrets = secrets;
   }
 
   /*

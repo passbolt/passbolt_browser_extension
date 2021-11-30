@@ -41,11 +41,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-9317 Fix theme selection screen does not work when server url is not a TLD
 
 ### Security
-- SEC-314 fix Upgrade qr-code dependency
 - SEC-315 fix Upgrade validator dependency
 
 ### Maintenance
-- PB-8523 Ignore "src/css" folder in .gitignore and .npmignore
+- PB-8523 Ignore "src/css" folder in styleguide dependency npm package
 - PB-8432 Improve the way styles are loaded in storybook
 - PB-5897 Add language switch in storybook for all components
 - PB-8374 Lint background page source code

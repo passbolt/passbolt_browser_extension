@@ -3,6 +3,52 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [3.4.0] - 2021-12-01
+### Added
+- PB-9826 As a user I want to use passbolt natively on Edge
+- PB-1743 As LU I want to tag resource using drag and drop
+- PB-8372 As LU I want to see the quickaccess application in dark mode
+- PB-8371 As LU I want to see the login screen in dark mode
+- PB-8371 As AN I want to see the recover & setup screens in dark mode as per my OS preferences
+
+### Improvement
+- PB-9374 As LU I want to see the loading text translated in all the setup/recover screens
+- PB-9374 As LU I want to see the next button translated in all the setup/recover screens
+- PB-8521 As LU I want to preview my passphrase when I sign-in with the quickaccess
+- PB-8521 As LU I want to preview the password protecting a kdbx when I import a kdbx protected by password
+- PB-9292 As LU I want to see the neat grids checkboxes
+- PB-8935 As LU changing my passphrase I want to see my security token when my current passphrase is requested
+- PB-9315 As AN I want to see some space between my name and my avatar on the login screen
+- PB-9318 As LU already logged in I don't want to see any error when I try to sign-in again
+
+### Fixed
+- PB-9316 Fix as LU I don't want to see a padding at the right of the quickaccess right after signing in
+- PB-9759 Fix as LU I don't want to see in form menu CTA if the associated input field was removed from the DOM
+- PB-9376 Fix as LU I want to see the sub-folders caret aligned with the sub-folders names
+- PB-8900 Fix as LU I don't want to see the sub-folders of the last folder displayed on top of the tags section
+- PB-9648 Fix as LU I don't want to see in form menu CTA displayed out of its associated input field
+- PB-9409 Fix as LU I don't want to see a dead link on the update my passphrase settings screen
+- PB-8934 Fix as LU I want to see the key UI in the key inspector screen of the profile instead of my account full name
+- PB-9410 Fix as LU changing my passphrase I should see the processing button aligned with the other form button
+- PB-9321 Fix spelling mistakes reported by the community
+- PB-9287 Fix as LU I want to see the text displayed in the recovery process "check your email" screen will the right size
+- PB-8939 Fix as LU I don't want to see the progress dialog current operation details on 2 lines
+- PB-9286 Fix as LU I want to see the locale dropdown field of the setup/recover screen well positioned
+- PB-8938 Fix as LU previewing a password in the resource details sidebar I don't want to see the password spread over 2 lines
+- PB-8937 Fix as LU previewing a password in the grid I don't want to see the password spread over 2 lines
+- PB-9285 Fix as LU uploading an invalid avatar I want to see an error having the same style as other form fields errors
+- PB-9331 Fix as LU I should not see the in-form menu CTA on the passbolt trusted domain
+- PB-9317 Fix theme selection screen does not work when server url is not a TLD
+
+### Security
+- SEC-314 fix Upgrade qr-code dependency
+- SEC-315 fix Upgrade validator dependency
+
+### Maintenance
+- PB-8523 Ignore "src/css" folder in .gitignore and .npmignore
+- PB-8432 Improve the way styles are loaded in storybook
+- PB-5897 Add language switch in storybook for all components
+- PB-8374 Lint background page source code
 
 ## [3.3.1] - 2021-10-26
 ### Fixed
@@ -677,8 +723,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.3.1...HEAD
-[3.3.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.3.0...v3.3.1
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.4.0...HEAD
+[3.4.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.3.1...v3.4.0
+[3.3.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.3...v3.3.0
 [3.2.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.2...v3.2.3
 [3.2.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.1...v3.2.2

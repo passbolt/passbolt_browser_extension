@@ -88,10 +88,10 @@ module.exports = function (grunt) {
     eslint: {
       options: {
         maxWarnings: 1,
-        configFile: '.eslintrc.json',
+        overrideConfigFile: '.eslintrc.json',
         cache: true,
         fix: grunt.option('fix'),
-        reportUnusedDisableDirectives: true
+        reportUnusedDisableDirectives: "error"
       },
       target: [
         'src/all/**/*.js'

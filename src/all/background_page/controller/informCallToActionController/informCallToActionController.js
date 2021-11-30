@@ -12,7 +12,7 @@
  * @since         3.3.0
  */
 const Worker = require('../../model/worker');
-const {QuickAccessService} = require("../../service/ui/QuickAccess.service");
+const {QuickAccessService} = require("../../service/ui/quickAccess.service");
 const {ResourceModel} = require('../../model/resource/resourceModel');
 const GpgAuth = require('../../model/gpgauth').GpgAuth;
 const {User} = require('../../model/user');

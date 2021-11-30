@@ -16,7 +16,7 @@ const Config = require('../config');
 const {i18n} = require("../../sdk/i18n");
 const {LocalesCollection} = require("../entity/locale/localesCollection");
 const {LocaleEntity} = require("../entity/locale/localeEntity");
-const {OrganizationSettingsModel} = require("../organizationSettings/OrganizationSettingsModel");
+const {OrganizationSettingsModel} = require("../organizationSettings/organizationSettingsModel");
 
 class LocaleModel {
   /**

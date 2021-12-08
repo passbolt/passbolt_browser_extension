@@ -64,7 +64,7 @@ const listen = function(worker) {
   worker.port.on('passbolt.account-recovery.organization.download-generated-key', async(requestId, privateKeyDto) => {
     try {
       const date = new Date().toISOString().slice(0, 10);
-      await fileController.saveFile(`organization-recovery-private-key-${date}.key`, privateKeyDto.armored_key, "text/plain", worker.tab.id);
+      await fileController.saveFile(`organization-recovery-private-key-${date}.asc`, privateKeyDto.armored_key, "text/plain", worker.tab.id);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);

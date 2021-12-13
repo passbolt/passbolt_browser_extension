@@ -12,14 +12,14 @@
  * @since         3.4.0
  */
 const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
-const {AccountRecoveryOrganisationPolicyEntity} = require("../../model/entity/accountRecovery/accountRecoveryOrganisationPolicyEntity");
+const {AccountRecoveryOrganizationPolicyEntity} = require("../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity");
 
 /**
  * Controller related to the account recovery save settings
  */
-class AccountRecoverySaveOrganisationSettingsController {
+class AccountRecoverySaveOrganizationSettingsController {
   /**
-   * AccountRecoverySaveOrganisationSettingsController constructor
+   * AccountRecoverySaveOrganizationSettingsController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions
@@ -31,14 +31,14 @@ class AccountRecoverySaveOrganisationSettingsController {
   }
 
   /**
-   * Request the save organisation settings of the account recovery
-   * @param accountRecoveryOrganisationPolicyDto The account recovery organisation policy
+   * Request the save organization settings of the account recovery
+   * @param accountRecoveryOrganizationPolicyDto The account recovery organization policy
    */
-  async exec(accountRecoveryOrganisationPolicyDto) {
+  async exec(accountRecoveryOrganizationPolicyDto) {
     try {
-      const accountRecoveryOrganisationPolicyEntity = new AccountRecoveryOrganisationPolicyEntity(accountRecoveryOrganisationPolicyDto);
-      const newAccountRecoveryOrganisationPolicyEntity = await this.accountRecoveryModel.saveOrganisationSettings(accountRecoveryOrganisationPolicyEntity);
-      this.worker.port.emit(this.requestId, "SUCCESS", newAccountRecoveryOrganisationPolicyEntity);
+      const accountRecoveryOrganizationPolicyEntity = new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
+      await this.accountRecoveryModel.saveOrganizationSettings(accountRecoveryOrganizationPolicyEntity);
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, 'ERROR', error);
@@ -47,4 +47,4 @@ class AccountRecoverySaveOrganisationSettingsController {
 }
 
 
-exports.AccountRecoverySaveOrganisationSettingsController = AccountRecoverySaveOrganisationSettingsController;
+exports.AccountRecoverySaveOrganizationSettingsController = AccountRecoverySaveOrganizationSettingsController;

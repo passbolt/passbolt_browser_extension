@@ -11,8 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.4.0
  */
-const {AccountRecoveryOrganisationPolicyService} = require("../../service/api/accountRecovery/accountRecoveryOrganisationPolicyService");
-const {AccountRecoveryOrganisationPolicyEntity} = require("../entity/accountRecovery/accountRecoveryOrganisationPolicyEntity");
+const {AccountRecoveryOrganizationPolicyService} = require("../../service/api/accountRecovery/accountRecoveryOrganizationPolicyService");
 
 /**
  * Model related to the account recovery
@@ -25,17 +24,16 @@ class AccountRecoveryModel {
    * @public
    */
   constructor(apiClientOptions) {
-    this.accountRecoveryOrganisationPolicyService = new AccountRecoveryOrganisationPolicyService(apiClientOptions);
+    this.accountRecoveryOrganizationPolicyService = new AccountRecoveryOrganizationPolicyService(apiClientOptions);
   }
 
   /**
-   * Save organisation settings of a accountRecovery using Passbolt API
+   * Save organization settings of a accountRecovery using Passbolt API
    *
-   * @param {AccountRecoveryOrganisationPolicyEntity} accountRecoveryOrganisationPolicyEntity
+   * @param {AccountRecoveryOrganizationPolicyEntity} accountRecoveryOrganizationPolicyEntity
    */
-  async saveOrganisationSettings(accountRecoveryOrganisationPolicyEntity) {
-    const accountRecoveryOrganisationPolicyDto = await this.accountRecoveryOrganisationPolicyService.saveOrganisationSettings(accountRecoveryOrganisationPolicyEntity.toDto());
-    return new AccountRecoveryOrganisationPolicyEntity(accountRecoveryOrganisationPolicyDto);
+  async saveOrganizationSettings(accountRecoveryOrganizationPolicyEntity) {
+    await this.accountRecoveryOrganizationPolicyService.saveOrganizationSettings(accountRecoveryOrganizationPolicyEntity.toDto());
   }
 }
 

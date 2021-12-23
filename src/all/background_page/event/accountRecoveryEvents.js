@@ -12,6 +12,7 @@
  */
 const {AccountRecoveryValidatePublicKeyController} = require("../controller/accountRecovery/AccountRecoveryValidatePublicKeyController");
 const {AccountRecoverySaveOrganizationSettingsController} = require("../controller/accountRecovery/accountRecoverySaveOrganizationSettingsController");
+const {ValidatePrivateOrganizationAccountRecoveryKeyController} = require("../controller/accountRecovery/validatePrivateOrganizationAccountRecoveryKeyController");
 const {ExternalGpgKeyEntity} = require("../model/entity/gpgkey/external/externalGpgKeyEntity");
 const {User} = require('../model/user');
 const {GpgKeyInfoService} = require("../service/crypto/gpgKeyInfoService");
@@ -67,12 +68,17 @@ const listen = function(worker) {
   worker.port.on('passbolt.account-recovery.download-organization-generated-key', async(requestId, privateKeyDto) => {
     try {
       const date = new Date().toISOString().slice(0, 10);
-      await fileController.saveFile(`organization-recovery-private-key-${date}.key`, privateKeyDto.armored_key, "text/plain", worker.tab.id);
+      await fileController.saveFile(`organization-recovery-private-key-${date}.asc`, privateKeyDto.armored_key, "text/plain", worker.tab.id);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
+  });
+
+  worker.port.on('passbolt.account-recovery.validate-organization-private-key', async(requestId, accountRecoveryPolicyDto, privateAccountRecoveryKeyDto) => {
+    const controller = new ValidatePrivateOrganizationAccountRecoveryKeyController(worker, requestId);
+    return await controller.exec(accountRecoveryPolicyDto, privateAccountRecoveryKeyDto);
   });
 };
 

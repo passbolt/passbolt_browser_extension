@@ -60,7 +60,7 @@ function checkError(armored_key, errorMessage) {
   return expect(validationPromise).rejects.toEqual(new Error(errorMessage));
 }
 
-describe("Account recovery validate public key controller", () => {
+describe("Account recovery validate public key service", () => {
   it("should accept a viable key", () => {
     expect.assertions(1);
     const validationPromise = AccountRecoveryOrganizationPolicyService.validatePublicKey({armored_key: dummyData.viableKey});

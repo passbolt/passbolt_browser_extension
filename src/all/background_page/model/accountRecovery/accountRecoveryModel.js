@@ -43,8 +43,8 @@ class AccountRecoveryModel {
    *
    * @param {AccountRecoveryOrganizationPolicyEntity} accountRecoveryOrganizationPolicyEntity
    */
-  async saveOrganisationSettings(accountRecoveryOrganizationPolicyEntity) {
-    const accountRecoveryOrganizationPolicyDto = await this.accountRecoveryOrganizationPolicyService.saveOrganisationSettings(accountRecoveryOrganizationPolicyEntity.toDto());
+  async saveOrganizationSettings(accountRecoveryOrganizationPolicyEntity) {
+    const accountRecoveryOrganizationPolicyDto = await this.accountRecoveryOrganizationPolicyService.saveOrganizationSettings(accountRecoveryOrganizationPolicyEntity.toDto());
     return new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
   }
 }

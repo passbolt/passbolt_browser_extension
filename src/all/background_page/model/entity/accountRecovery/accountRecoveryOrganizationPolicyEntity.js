@@ -9,6 +9,7 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         3.5.0
  */
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
@@ -166,6 +167,9 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
    * Dynamic properties getters
    * ==================================================
    */
+  get armoredKey() {
+    return this._account_recovery_organization_public_key.armoredKey;
+  }
 
   /*
    * ==================================================

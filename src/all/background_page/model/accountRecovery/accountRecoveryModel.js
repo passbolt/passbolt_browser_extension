@@ -9,9 +9,10 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.4.0
+ * @since         3.5.0
  */
 const {AccountRecoveryOrganizationPolicyService} = require("../../service/api/accountRecovery/accountRecoveryOrganizationPolicyService");
+const {AccountRecoveryOrganizationPolicyEntity} = require("../entity/accountRecovery/accountRecoveryOrganizationPolicyEntity");
 
 /**
  * Model related to the account recovery
@@ -28,12 +29,23 @@ class AccountRecoveryModel {
   }
 
   /**
-   * Save organization settings of a accountRecovery using Passbolt API
+   * Get an organization settings of an accountRecovery using Passbolt API
+   *
+   * @return {AccountRecoveryOrganizationPolicyEntity}
+   */
+  async find() {
+    const accountRecoveryOrganizationPolicyDto = await this.accountRecoveryOrganizationPolicyService.find();
+    return new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
+  }
+
+  /**
+   * Save organization settings of an accountRecovery using Passbolt API
    *
    * @param {AccountRecoveryOrganizationPolicyEntity} accountRecoveryOrganizationPolicyEntity
    */
-  async saveOrganizationSettings(accountRecoveryOrganizationPolicyEntity) {
-    await this.accountRecoveryOrganizationPolicyService.saveOrganizationSettings(accountRecoveryOrganizationPolicyEntity.toDto());
+  async saveOrganisationSettings(accountRecoveryOrganizationPolicyEntity) {
+    const accountRecoveryOrganizationPolicyDto = await this.accountRecoveryOrganizationPolicyService.saveOrganisationSettings(accountRecoveryOrganizationPolicyEntity.toDto());
+    return new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
   }
 }
 

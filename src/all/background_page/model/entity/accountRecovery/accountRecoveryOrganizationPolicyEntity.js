@@ -35,10 +35,10 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
       AccountRecoveryOrganizationPolicyEntity.getSchema()
     ));
     // Associations
-    if (this._props.account_recovery_organization_key) {
-      this._account_recovery_organization_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_key);
-      AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryOrganizationPublicKey(this._account_recovery_organization_key, this.account_recovery_organization_key_id);
-      delete this._props.account_recovery_organization_key;
+    if (this._props.account_recovery_organization_public_key) {
+      this._account_recovery_organization_public_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_public_key);
+      AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryOrganizationPublicKey(this._account_recovery_organization_public_key, this.account_recovery_organization_public_key_id);
+      delete this._props.account_recovery_organization_public_key;
     }
     if (this._props.account_recovery_private_key_passwords) {
       this._account_recovery_private_key_passwords = new AccountRecoveryPrivateKeyPasswordsCollection(this._props.account_recovery_private_key_passwords);
@@ -80,11 +80,11 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
-        "account_recovery_organization_key_id": {
+        "account_recovery_organization_public_key_id": {
           "type": "string",
           "format": "uuid"
         },
-        "account_recovery_organization_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
+        "account_recovery_organization_public_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
         "account_recovery_private_key_passwords": AccountRecoveryPrivateKeyPasswordsCollection.getSchema()
       }
     };
@@ -106,8 +106,8 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
     if (!contain) {
       return result;
     }
-    if (this._account_recovery_organization_key && contain.account_recovery_organization_key) {
-      result.account_recovery_organization_key = this._account_recovery_organization_key.toDto();
+    if (this._account_recovery_organization_public_key && contain.account_recovery_organization_public_key) {
+      result.account_recovery_organization_public_key = this._account_recovery_organization_public_key.toDto();
     }
     if (this._account_recovery_private_key_passwords && contain.account_recovery_private_key_passwords) {
       result.account_recovery_private_key_passwords = this._account_recovery_private_key_passwords.toDto();

@@ -17,35 +17,38 @@ const {User} = require('../model/user');
 const {GpgKeyInfoService} = require("../service/crypto/gpgKeyInfoService");
 const {AccountRecoveryGenerateKeyPairController} = require("../controller/accountRecovery/accountRecoveryGenerateKeyPairController");
 const fileController = require('../controller/fileController');
+const {AccountRecoveryModel} = require("../model/accountRecovery/accountRecoveryModel");
 /**
  * Listens the account recovery events
  * @param worker
  */
 const listen = function(worker) {
-  worker.port.on('passbolt.account-recovery.organization.get', async requestId => {
+  /** Whenever the account recovery organization needs to be get */
+  worker.port.on('passbolt.account-recovery.get', async requestId => {
     try {
-      worker.port.emit(requestId, 'SUCCESS', {
-        policy: "disabled"
-      });
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
+      const accountRecoveryOrganizationPolicyEntity = await accountRecoveryModel.find();
+      worker.port.emit(requestId, 'SUCCESS', accountRecoveryOrganizationPolicyEntity);
     } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
   });
 
-  /** Whenever the account recovery organization need to be saved */
-  worker.port.on('passbolt.account-recovery.organization.save-settings', async(requestId, accountRecoveryOrganizationPolicyDto) => {
+  /** Whenever the account recovery organization needs to be saved */
+  worker.port.on('passbolt.account-recovery.save-organization-settings', async(requestId, accountRecoveryOrganizationPolicyDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const accountRecoverySaveOrganizationSettingsController = new AccountRecoverySaveOrganizationSettingsController(worker, requestId, apiClientOptions);
     await accountRecoverySaveOrganizationSettingsController.exec(accountRecoveryOrganizationPolicyDto);
   });
 
-  worker.port.on('passbolt.account-recovery.organization.validate-key', async(requestId, newAccountRecoveryOrganizationPublicKeyDto, currentAccountRecoveryOrganizationPublicKeyDto) => {
+  worker.port.on('passbolt.account-recovery.validate-organization-key', async(requestId, newAccountRecoveryOrganizationPublicKeyDto, currentAccountRecoveryOrganizationPublicKeyDto) => {
     const controller = new AccountRecoveryValidatePublicKeyController(worker, requestId);
     await controller.exec(newAccountRecoveryOrganizationPublicKeyDto, currentAccountRecoveryOrganizationPublicKeyDto);
   });
 
-  worker.port.on('passbolt.account-recovery.organization.get-key-details', async(requestId, accountRecoveryOrganizationPublicKeyDto) => {
+  worker.port.on('passbolt.account-recovery.get-organization-key-details', async(requestId, accountRecoveryOrganizationPublicKeyDto) => {
     try {
       const keyEntity = new ExternalGpgKeyEntity(accountRecoveryOrganizationPublicKeyDto);
       const keyInfo = await GpgKeyInfoService.getKeyInfo(keyEntity);
@@ -56,15 +59,15 @@ const listen = function(worker) {
     }
   });
 
-  worker.port.on('passbolt.account-recovery.organization.generate-key', async(requestId, generateGpgKeyDto) => {
+  worker.port.on('passbolt.account-recovery.generate-organization-key', async(requestId, generateGpgKeyDto) => {
     const controller = new AccountRecoveryGenerateKeyPairController(worker, requestId);
     await controller.exec(generateGpgKeyDto);
   });
 
-  worker.port.on('passbolt.account-recovery.organization.download-generated-key', async(requestId, privateKeyDto) => {
+  worker.port.on('passbolt.account-recovery.download-organization-generated-key', async(requestId, privateKeyDto) => {
     try {
       const date = new Date().toISOString().slice(0, 10);
-      await fileController.saveFile(`organization-recovery-private-key-${date}.asc`, privateKeyDto.armored_key, "text/plain", worker.tab.id);
+      await fileController.saveFile(`organization-recovery-private-key-${date}.key`, privateKeyDto.armored_key, "text/plain", worker.tab.id);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);

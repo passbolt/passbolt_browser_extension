@@ -41,7 +41,22 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
   }
 
   /**
-   * Save organization settings of a accountRecovery using Passbolt API
+   * Find an organization settings of an accountRecovery
+   *
+   * @returns {Promise<*>} response body
+   * @throws {Error} if options are invalid or API error
+   * @public
+   */
+  async find() {
+    return {policy: 'disabled'};
+    /*
+     * const response = this.apiClient.findAll();
+     * return response.body;
+     */
+  }
+
+  /**
+   * Save organization settings of an accountRecovery using Passbolt API
    *
    * @param {Object} accountRecoveryOrganizationPolicyDto
    * @returns {Promise<*>} Response body
@@ -50,8 +65,11 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
    */
   async saveOrganizationSettings(accountRecoveryOrganizationPolicyDto) {
     this.assertNonEmptyData(accountRecoveryOrganizationPolicyDto);
-    const response = await this.apiClient.create(accountRecoveryOrganizationPolicyDto);
-    return response.body;
+    return accountRecoveryOrganizationPolicyDto;
+    /*
+     * const response = await this.apiClient.create(accountRecoveryOrganizationPolicyDto);
+     * return response.body;
+     */
   }
 
   /**

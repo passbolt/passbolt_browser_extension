@@ -23,7 +23,7 @@ const {ResourceSecretsCollection} = require('../secret/resource/resourceSecretsC
 
 const ENTITY_NAME = 'Resource';
 const RESOURCE_NAME_MAX_LENGTH = 255;
-const RESOURCE_USERNAME_MAX_LENGTH = 64;
+const RESOURCE_USERNAME_MAX_LENGTH = 255;
 const RESOURCE_URI_MAX_LENGTH = 1024;
 const RESOURCE_DESCRIPTION_MAX_LENGTH = 10000;
 

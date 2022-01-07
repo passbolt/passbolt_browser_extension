@@ -159,7 +159,8 @@ module.exports = function (grunt) {
       },
       locales: {
         files: [
-          { expand: true, cwd: path.src + 'locales', src: ['**'], dest: path.build + 'locales' }
+          { expand: true, cwd: path.src + 'locales', src: ['**'], dest: path.build + 'locales' },
+          { expand: true, cwd: path.src + '_locales', src: ['**'], dest: path.build + '_locales' }
         ]
       },
       // switch manifest file to firefox or chrome

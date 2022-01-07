@@ -190,10 +190,11 @@ class SetupEntity extends Entity {
   }
 
   toGenerateGpgKeyDto(generateGpgKeyDto) {
+
     return {
       length: GenerateGpgKeyEntity.DEFAULT_LENGTH,
       ...generateGpgKeyDto,
-      userId: `${this.user.profile.firstName} ${this.user.profile.lastName} <${this.user.username}>`
+      userId: `"${this.user.profile.firstName} ${this.user.profile.lastName}" <${this.user.username}>`
     };
   }
 

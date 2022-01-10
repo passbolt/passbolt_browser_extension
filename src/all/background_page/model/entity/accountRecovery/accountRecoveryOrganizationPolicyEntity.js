@@ -167,7 +167,9 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
    * @returns {*}
    */
   toJSON() {
-    return this.toDto();
+    return this.toDto({
+      account_recovery_organization_public_key: true
+    });
   }
 
   /*

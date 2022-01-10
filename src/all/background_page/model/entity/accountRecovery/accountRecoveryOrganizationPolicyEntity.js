@@ -46,6 +46,10 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
       AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryPrivateKeyPasswords(this._account_recovery_private_key_passwords);
       delete this._props.account_recovery_private_key_passwords;
     }
+    if (this._props.account_recovery_organization_revoked_key) {
+      this._account_recovery_organization_revoked_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_revoked_key);
+      delete this._props.account_recovery_organization_revoked_key;
+    }
   }
 
   /**
@@ -86,7 +90,8 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
           "format": "uuid"
         },
         "account_recovery_organization_public_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
-        "account_recovery_private_key_passwords": AccountRecoveryPrivateKeyPasswordsCollection.getSchema()
+        "account_recovery_private_key_passwords": AccountRecoveryPrivateKeyPasswordsCollection.getSchema(),
+        "account_recovery_organization_revoked_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
       }
     };
   }
@@ -112,6 +117,9 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
     }
     if (this._account_recovery_private_key_passwords && contain.account_recovery_private_key_passwords) {
       result.account_recovery_private_key_passwords = this._account_recovery_private_key_passwords.toDto();
+    }
+    if (this._account_recovery_organization_revoked_key && contain.account_recovery_organization_revoked_key) {
+      result.account_recovery_organization_revoked_key = this._account_recovery_organization_revoked_key.toDto();
     }
     return result;
   }
@@ -168,7 +176,15 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
    * ==================================================
    */
   get armoredKey() {
-    return this._account_recovery_organization_public_key.armoredKey;
+    return this._account_recovery_organization_public_key ? this._account_recovery_organization_public_key.armoredKey : null;
+  }
+
+  get revokedKey() {
+    return this._account_recovery_organization_revoked_key ? this._account_recovery_organization_revoked_key.armoredKey : null;
+  }
+
+  get policy() {
+    return this._props.policy;
   }
 
   /*

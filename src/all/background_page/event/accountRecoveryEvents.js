@@ -38,10 +38,10 @@ const listen = function(worker) {
   });
 
   /** Whenever the account recovery organization needs to be saved */
-  worker.port.on('passbolt.account-recovery.save-organization-settings', async(requestId, accountRecoveryOrganizationPolicyDto) => {
+  worker.port.on('passbolt.account-recovery.save-organization-settings', async(requestId, accountRecoveryOrganizationPolicyDto, oldAccountRecoveryOrganizationPolicyDto, privateGpgKeyDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const accountRecoverySaveOrganizationSettingsController = new AccountRecoverySaveOrganizationSettingsController(worker, requestId, apiClientOptions);
-    await accountRecoverySaveOrganizationSettingsController.exec(accountRecoveryOrganizationPolicyDto);
+    await accountRecoverySaveOrganizationSettingsController.exec(accountRecoveryOrganizationPolicyDto, oldAccountRecoveryOrganizationPolicyDto, privateGpgKeyDto);
   });
 
   worker.port.on('passbolt.account-recovery.validate-organization-key', async(requestId, newAccountRecoveryOrganizationPublicKeyDto, currentAccountRecoveryOrganizationPublicKeyDto) => {

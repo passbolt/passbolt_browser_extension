@@ -19,12 +19,20 @@ class GpgKeyInfoService {
    * @param {ExternalGpgKeyEntity} key
    */
   static async getKeyInfo(keyDto) {
-    let key = await openpgp.key.readArmored(keyDto.armoredKey);
+    const key = await openpgp.key.readArmored(keyDto.armoredKey);
     if (key.err) {
       throw new Error(key.err[0].message);
     }
-    key = key.keys[0];
 
+    return await GpgKeyInfoService.getKeyInfoFromOpenGpgKey(key.keys[0]);
+  }
+
+  /**
+   * Returns a key information DTO from a given openpgp.Key
+   * @param {openpgp.Key} key
+   * @returns {Object}
+   */
+  static async getKeyInfoFromOpenGpgKey(key) {
     // Check the userIds
     const userIds = key.getUserIds();
     const userIdsSplited = [];
@@ -72,7 +80,7 @@ class GpgKeyInfoService {
       length: key.primaryKey.getAlgorithmInfo().bits,
       curve: key.primaryKey.getAlgorithmInfo().curve || null,
       private: key.isPrivate(),
-      revoked: false //await key.isRevoked()  TODO: do a proper revokation check as the isRevoked() needs parameters and doesn't work with empty params
+      revoked: await key.isRevoked()
     };
   }
 

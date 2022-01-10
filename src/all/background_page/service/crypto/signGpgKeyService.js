@@ -12,23 +12,26 @@
  * @since         3.5.0
  */
 
-const {InvalidMasterPasswordError} = require("../../error/invalidMasterPasswordError");
 const {ExternalGpgKeyEntity} = require("../../model/entity/gpgkey/external/externalGpgKeyEntity");
 const {GpgKeyInfoService} = require("./gpgKeyInfoService");
 
-class DecryptPrivateKeyService {
+class SignGpgKeyService {
   /**
-   * @param {PrivateGpgKeyEntity} privateKey
-   * @return {Promise<ExternalGpgKeyEntity>}
+   * @param {ExternalGpgKeyEntity} gpgKeyToSign
+   * @param {ExternalGpgKeyCollection} gpgKeyCollection
    */
-  static async decrypt(privateGpgkeyEntity) {
-    const privateKey = (await openpgp.key.readArmored(privateGpgkeyEntity.armoredKey)).keys[0];
-    await privateKey.decrypt(privateGpgkeyEntity.passphrase)
-      .catch(() => { throw new InvalidMasterPasswordError(); });
+  static async sign(gpgKeyToSign, gpgKeyCollection) {
+    const keyToSign = (await openpgp.key.readArmored(gpgKeyToSign.armoredKey)).keys[0];
+    const signingKeys = [];
+    for (let i = 0; i < gpgKeyCollection.items.length; i++) {
+      const keys = (await openpgp.key.readArmored(gpgKeyCollection.items[i].armoredKey)).keys;
+      keys.forEach(key => { signingKeys.push(key); });
+    }
 
-    return await GpgKeyInfoService.getKeyInfoFromOpenGpgKey(privateKey)
-      .then(keyInfo => new ExternalGpgKeyEntity(keyInfo));
+    const signedKey = await keyToSign.signAllUsers(signingKeys);
+    const keyInfo = await GpgKeyInfoService.getKeyInfoFromOpenGpgKey(signedKey);
+    return new ExternalGpgKeyEntity(keyInfo);
   }
 }
 
-exports.DecryptPrivateKeyService = DecryptPrivateKeyService;
+exports.SignGpgKeyService = SignGpgKeyService;

@@ -101,5 +101,16 @@ describe("AccountRecoveryOrganizationPolicy entity", () => {
       });
     }
   });
+
+  it("constructor returns validation error if dto required fields are missing", () => {
+    try {
+      new AccountRecoveryOrganizationPolicyEntity({});
+    } catch (error) {
+      expect(error instanceof EntityValidationError).toBe(true);
+      expect(error.details).toEqual({
+        policy: {required: 'The policy is required.'},
+      });
+    }
+  });
 });
 

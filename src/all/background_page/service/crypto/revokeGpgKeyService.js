@@ -12,23 +12,19 @@
  * @since         3.5.0
  */
 
-const {InvalidMasterPasswordError} = require("../../error/invalidMasterPasswordError");
 const {ExternalGpgKeyEntity} = require("../../model/entity/gpgkey/external/externalGpgKeyEntity");
 const {GpgKeyInfoService} = require("./gpgKeyInfoService");
 
-class DecryptPrivateKeyService {
+class RevokeGpgKeyService {
   /**
-   * @param {PrivateGpgKeyEntity} privateKey
-   * @return {Promise<ExternalGpgKeyEntity>}
+   * @param {ExternalGpgKeyEntity} gpgKeyToRevoke
    */
-  static async decrypt(privateGpgkeyEntity) {
-    const privateKey = (await openpgp.key.readArmored(privateGpgkeyEntity.armoredKey)).keys[0];
-    await privateKey.decrypt(privateGpgkeyEntity.passphrase)
-      .catch(() => { throw new InvalidMasterPasswordError(); });
-
-    return await GpgKeyInfoService.getKeyInfoFromOpenGpgKey(privateKey)
-      .then(keyInfo => new ExternalGpgKeyEntity(keyInfo));
+  static async revoke(gpgKeyToRevoke) {
+    const key = (await openpgp.key.readArmored(gpgKeyToRevoke.armoredKey)).keys[0];
+    const revokedKey = await key.revoke();
+    const keyInfo = await GpgKeyInfoService.getKeyInfoFromOpenGpgKey(revokedKey);
+    return new ExternalGpgKeyEntity(keyInfo);
   }
 }
 
-exports.DecryptPrivateKeyService = DecryptPrivateKeyService;
+exports.RevokeGpgKeyService = RevokeGpgKeyService;

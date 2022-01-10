@@ -130,6 +130,10 @@ class ExternalGpgKeyEntity extends Entity {
     return this._props.armored_key;
   }
 
+  get revoked() {
+    return this._props.revoked;
+  }
+
   /*
    * ==================================================
    * Static properties getters

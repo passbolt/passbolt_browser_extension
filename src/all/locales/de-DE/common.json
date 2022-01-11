@@ -1,5 +1,5 @@
 {
-  "Adding tag...": "Adding tag...",
+  "Adding tag...": "Tag hinzufügen...",
   "An internal error occurred. The server response could not be parsed. Please contact your administrator.": "Ein interner Fehler ist aufgetreten. Die Antwort des Servers konnte nicht analysiert werden. Bitte kontaktieren Sie Ihren Administrator.",
   "Autofill failed. Could not find the active tab.": "Automatisches Ausfüllen fehlgeschlagen. Der aktive Tab konnte nicht gefunden werden.",
   "Calculate permissions": "Berechtigungen berechnen",
@@ -39,7 +39,7 @@
   "Moving one resource": "Eine Ressource wird verschoben",
   "Moving {{name}}": "{{name}} wird verschoben",
   "Moving {{total}} resources": "{{total}} Ressourcen werden verschoben",
-  "Preparing...": "Preparing...",
+  "Preparing...": "Vorbereiten...",
   "Private key not found.": "Privater Schlüssel nicht gefunden.",
   "Public key not found.": "Öffentlicher Schlüssel nicht gefunden.",
   "Saving permissions...": "Berechtigungen werden gespeichert...",
@@ -66,5 +66,5 @@
   "Updating group": "Gruppe wird aktualisiert",
   "Updating group ...": "Gruppe wird aktualisiert ...",
   "Updating password": "Passwort wird aktualisiert",
-  "Updating resource": "Updating resource"
+  "Updating resource": "Ressource wird aktualisiert"
 }

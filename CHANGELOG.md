@@ -3,6 +3,33 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [3.5.0] - 2021-01-12
+### Added
+- PB-13161 As LU I should be able to passbolt with my Android mobile
+- PB-13161 As LU I should be able to passbolt with my IOS mobile
+- PB-13321 As a user I can use passbolt in Dutch
+- PB-13321 As a user I can use passbolt in Japanese
+- PB-13321 As a user I can use passbolt in Polish
+
+### Improved
+- PB-9402 As LU I should be able to create and import passwords having a name and username of 255 characters long
+- PB-13178 As a user visiting the web stores I should be aware that the application supports multiple languages
+- PB-9748 Optimize in-form menu integration performance by avoiding the CTA mutation observer to be called when passbolt manipulates the DOM itself
+
+### Security
+- PB-13162 Upgrade QRCode library to v1.5.0
+
+### Fixed
+- PB-12819 Fix as LU I should autofill/auto-save on forms having only a password field
+- GITHUB-136 Fix as LU I want to see the in-form menu CTA well positioned on pages having no scroll but CSS transformation
+- GITHUB-137 Fix as a user I should see the in-form menu CTA on modal having a z-index greater that 1000
+- PB-13268 As LU I should be able to put comma in my user names
+- PB-12873 As LU I shouldn’t see double escaped characters on the translation of strings including variables
+
+### Maintenance
+- PB-12955 Fix error and warning messages in unit test console
+- PB-13309 Upgrade dev dependency webpack-dev-server to v4.7.2
+
 ## [3.4.0] - 2021-12-01
 ### Added
 - PB-9826 As a user I want to use passbolt natively on Edge
@@ -722,7 +749,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.4.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.5.0...HEAD
+[3.5.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.4.0...v3.5.0
 [3.4.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.3.1...v3.4.0
 [3.3.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.3.0...v3.3.1
 [3.3.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.2.3...v3.3.0

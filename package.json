@@ -21,7 +21,7 @@
     "npm-force-resolutions": "0.0.10",
     "openpgp": "4.10.9",
     "papaparse": "^5.2.0",
-    "passbolt-styleguide": "3.5.0",
+    "passbolt-styleguide": "3.5.1",
     "react": "16.12.0",
     "react-dom": "16.12.0",
     "validator": "^13.7.0",

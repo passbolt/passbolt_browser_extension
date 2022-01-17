@@ -15,7 +15,7 @@ const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
 
 const ENTITY_NAME = 'ResourceType';
-const RESOURCE_TYPE_NAME_MAX_LENGTH = 64;
+const RESOURCE_TYPE_NAME_MAX_LENGTH = 255;
 const RESOURCE_TYPE_SLUG_MAX_LENGTH = 64;
 const RESOURCE_TYPE_DESCRIPTION_MAX_LENGTH = 255;
 

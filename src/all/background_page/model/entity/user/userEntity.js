@@ -17,6 +17,7 @@ const {RoleEntity} = require('../role/roleEntity');
 const {ProfileEntity} = require('../profile/profileEntity');
 const {GpgkeyEntity} = require('../gpgkey/gpgkeyEntity');
 const {GroupsUsersCollection} = require('../groupUser/groupsUsersCollection');
+const {AccountRecoveryUserSettingEntity} = require("../accountRecovery/accountRecoveryUserSettingEntity");
 
 const ENTITY_NAME = 'User';
 
@@ -51,6 +52,10 @@ class UserEntity extends Entity {
     if (this._props.groups_users) {
       this._groups_users = new GroupsUsersCollection(this._props.groups_users);
       delete this._props.groups_users;
+    }
+    if (this._props.account_recovery_user_setting) {
+      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting);
+      delete this._props.account_recovery_user_setting;
     }
   }
 
@@ -119,7 +124,8 @@ class UserEntity extends Entity {
         "role": RoleEntity.getSchema(),
         "profile": ProfileEntity.getSchema(),
         "gpgkey": GpgkeyEntity.getSchema(),
-        "groups_users": GroupsUsersCollection.getSchema()
+        "groups_users": GroupsUsersCollection.getSchema(),
+        "account_recovery_user_setting": AccountRecoveryUserSettingEntity.getSchema()
       }
     };
   }
@@ -191,6 +197,9 @@ class UserEntity extends Entity {
     }
     if (this.groupsUsers && contain.groups_users) {
       result.groups_users = this.groupsUsers.toDto();
+    }
+    if (this.accountRecoveryUserSetting && contain.account_recovery_user_setting) {
+      result.account_recovery_user_setting = this.accountRecoveryUserSetting.toDto();
     }
     return result;
   }
@@ -310,7 +319,7 @@ class UserEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {profile: ProfileEntity.ALL_CONTAIN_OPTIONS, role: true, gpgkey: true, groups_users: true};
+    return {profile: ProfileEntity.ALL_CONTAIN_OPTIONS, role: true, gpgkey: true, groups_users: true, account_recovery_user_setting: true};
   }
 
   /*
@@ -361,6 +370,14 @@ class UserEntity extends Entity {
    */
   get groupsUsers() {
     return this._groups_users || null;
+  }
+
+  /**
+   * Get user account recover setting
+   * @returns {(accountRecoverUserSetting|null)} account recover setting
+   */
+  get accountRecoveryUserSetting() {
+    return this._account_recovery_user_setting || null;
   }
 }
 

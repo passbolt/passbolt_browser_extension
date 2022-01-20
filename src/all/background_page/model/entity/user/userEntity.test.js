@@ -63,11 +63,13 @@ describe("User entity", () => {
     expect(entity.role).not.toBe(null);
     expect(entity.profile).not.toBe(null);
     expect(entity.gpgkey).not.toBe(null);
+    expect(entity.accountRecoveryUserSetting).not.toBe(null);
     expect(entity.role.name).toEqual('admin');
     expect(entity.isMfaEnabled).toBe(false);
     expect(entity.gpgkey.armoredKey.startsWith('-----BEGIN PGP PUBLIC KEY BLOCK-----')).toBe(true);
+    expect(entity.accountRecoveryUserSetting.status).toEqual('approved');
 
-    const dtoWithContain = entity.toDto({role: true, profile: true, gpgkey: true});
+    const dtoWithContain = entity.toDto({role: true, profile: true, gpgkey: true, account_recovery_user_setting: true});
     expect(dtoWithContain.role.name).toEqual('admin');
     expect(dtoWithContain.profile.first_name).toEqual('Admin');
     expect(dtoWithContain.gpgkey.armored_key.startsWith('-----BEGIN PGP PUBLIC KEY BLOCK-----')).toBe(true);
@@ -117,7 +119,6 @@ describe("User entity", () => {
     };
     const entity = new UserEntity(dto);
     expect(entity.isMfaEnabled).toBe(null);
-
 
     const dto2 = {
       "role_id": "a58de6d3-f52c-5080-b79b-a601a647ac85",

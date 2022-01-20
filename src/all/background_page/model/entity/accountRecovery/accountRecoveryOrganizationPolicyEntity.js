@@ -9,15 +9,18 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.5.0
+ * @since         3.6.0
  */
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {AccountRecoveryOrganizationPublicKeyEntity} = require("./accountRecoveryOrganizationPublicKeyEntity");
-const {AccountRecoveryPrivateKeyPasswordsCollection} = require("./accountRecoveryPrivateKeyPasswordsCollection");
 const {EntityValidationError} = require("../abstract/entityValidationError");
 
 const ENTITY_NAME = "AccountRecoveryOrganizationPolicy";
+const POLICY_DISABLED = "disabled";
+const POLICY_MANDATORY = "mandatory";
+const POLICY_OPT_IN = "opt-in";
+const POLICY_OPT_OUT = "opt-out";
 
 /**
  * Entity related to the account recovery organization policy
@@ -40,11 +43,6 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
       this._account_recovery_organization_public_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_public_key);
       AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryOrganizationPublicKey(this._account_recovery_organization_public_key, this.account_recovery_organization_public_key_id);
       delete this._props.account_recovery_organization_public_key;
-    }
-    if (this._props.account_recovery_private_key_passwords) {
-      this._account_recovery_private_key_passwords = new AccountRecoveryPrivateKeyPasswordsCollection(this._props.account_recovery_private_key_passwords);
-      AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryPrivateKeyPasswords(this._account_recovery_private_key_passwords);
-      delete this._props.account_recovery_private_key_passwords;
     }
     if (this._props.account_recovery_organization_revoked_key) {
       this._account_recovery_organization_revoked_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_revoked_key);
@@ -69,17 +67,24 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
         },
         "policy": {
           "type": "string",
-          "enum": ["opt-in", "opt-out", "disabled", "mandatory"]
+          "enum": [
+            AccountRecoveryOrganizationPolicyEntity.POLICY_DISABLED,
+            AccountRecoveryOrganizationPolicyEntity.POLICY_MANDATORY,
+            AccountRecoveryOrganizationPolicyEntity.POLICY_OPT_IN,
+            AccountRecoveryOrganizationPolicyEntity.POLICY_OPT_OUT,
+          ]
         },
         "created": {
-          "type": "string"
+          "type": "string",
+          "format": "date-time"
         },
         "created_by": {
           "type": "string",
           "format": "uuid"
         },
         "modified": {
-          "type": "string"
+          "type": "string",
+          "format": "date-time"
         },
         "modified_by": {
           "type": "string",
@@ -90,7 +95,6 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
           "format": "uuid"
         },
         "account_recovery_organization_public_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
-        "account_recovery_private_key_passwords": AccountRecoveryPrivateKeyPasswordsCollection.getSchema(),
         "account_recovery_organization_revoked_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
       }
     };
@@ -114,9 +118,6 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
     }
     if (this._account_recovery_organization_public_key && contain.account_recovery_organization_public_key) {
       result.account_recovery_organization_public_key = this._account_recovery_organization_public_key.toDto();
-    }
-    if (this._account_recovery_private_key_passwords && contain.account_recovery_private_key_passwords) {
-      result.account_recovery_private_key_passwords = this._account_recovery_private_key_passwords.toDto();
     }
     if (this._account_recovery_organization_revoked_key && contain.account_recovery_organization_revoked_key) {
       result.account_recovery_organization_revoked_key = this._account_recovery_organization_revoked_key.toDto();
@@ -148,21 +149,6 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
   }
 
   /**
-   * Additional secret validation rule
-   *
-   * @param {AccountRecoveryPrivateKeyPasswordsCollection} accountRecoveryPrivateKeyPasswords
-   * @throws {EntityValidationError} if not valid
-   */
-  static assertValidAccountRecoveryPrivateKeyPasswords(accountRecoveryPrivateKeyPasswords) {
-    if (!accountRecoveryPrivateKeyPasswords || !accountRecoveryPrivateKeyPasswords.length) {
-      throw new EntityValidationError('AccountRecoveryOrganizationPolicyEntity assertValidSecrets cannot be empty.');
-    }
-    if (!(accountRecoveryPrivateKeyPasswords instanceof AccountRecoveryPrivateKeyPasswordsCollection)) {
-      throw new EntityValidationError('AccountRecoveryOrganizationPolicyEntity assertValidSecrets expect a AccountRecoveryPrivateKeyPasswordsCollection.');
-    }
-  }
-
-  /**
    * Customizes JSON stringification behavior
    * @returns {*}
    */
@@ -177,6 +163,15 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
    * Dynamic properties getters
    * ==================================================
    */
+
+  /**
+   * Get the account recovery organization public key.
+   * @returns {AccountRecoveryOrganizationPublicKeyEntity|null}
+   */
+  get accountRecoveryOrganizationPublicKey() {
+    return this._account_recovery_organization_public_key || null;
+  }
+
   get armoredKey() {
     return this._account_recovery_organization_public_key ? this._account_recovery_organization_public_key.armoredKey : null;
   }
@@ -187,6 +182,38 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
 
   get policy() {
     return this._props.policy;
+  }
+
+  /**
+   * Return true if the account recovery program is disabled.
+   * @returns {boolean}
+   */
+  get isDisabled() {
+    return this.policy === AccountRecoveryOrganizationPolicyEntity.POLICY_DISABLED;
+  }
+
+  /**
+   * Return true if the account recovery program is enabled.
+   * @returns {boolean}
+   */
+  get isEnabled() {
+    return !this.isDisabled;
+  }
+
+  /**
+   * Return true if the account recovery program is enabled in opt-in.
+   * @returns {boolean}
+   */
+  get isOptIn() {
+    return this.policy === AccountRecoveryOrganizationPolicyEntity.POLICY_OPT_IN;
+  }
+
+  /**
+   * Return true if the account recovery program is enabled in opt-out.
+   * @returns {boolean}
+   */
+  get isOptOut() {
+    return this.policy === AccountRecoveryOrganizationPolicyEntity.POLICY_OPT_OUT;
   }
 
   /*
@@ -200,6 +227,38 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
+  }
+
+  /**
+   * AccountRecoveryOrganizationPolicyEntity.POLICY_DISABLED
+   * @returns {string}
+   */
+  static get POLICY_DISABLED() {
+    return POLICY_DISABLED;
+  }
+
+  /**
+   * AccountRecoveryOrganizationPolicyEntity.POLICY_MANDATORY
+   * @returns {string}
+   */
+  static get POLICY_MANDATORY() {
+    return POLICY_MANDATORY;
+  }
+
+  /**
+   * AccountRecoveryOrganizationPolicyEntity.POLICY_OPT_IN
+   * @returns {string}
+   */
+  static get POLICY_OPT_IN() {
+    return POLICY_OPT_IN;
+  }
+
+  /**
+   * AccountRecoveryOrganizationPolicyEntity.POLICY_OPT_OUT
+   * @returns {string}
+   */
+  static get POLICY_OPT_OUT() {
+    return POLICY_OPT_OUT;
   }
 }
 

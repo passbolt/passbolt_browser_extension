@@ -18,16 +18,28 @@ const {GpgKeyInfoService} = require("./gpgKeyInfoService");
 
 class DecryptPrivateKeyService {
   /**
-   * @param {PrivateGpgKeyEntity} privateKey
+   * @param {PrivateGpgkeyEntity} privateKey
    * @return {Promise<ExternalGpgKeyEntity>}
    */
-  static async decrypt(privateGpgkeyEntity) {
-    const privateKey = (await openpgp.key.readArmored(privateGpgkeyEntity.armoredKey)).keys[0];
-    await privateKey.decrypt(privateGpgkeyEntity.passphrase)
-      .catch(() => { throw new InvalidMasterPasswordError(); });
+  static async decryptPrivateGpgKeyEntity(privateGpgKeyEntity) {
+    const privateKey = await this.decrypt(privateGpgKeyEntity.armoredKey, privateGpgKeyEntity.passphrase);
 
     return await GpgKeyInfoService.getKeyInfoFromOpenGpgKey(privateKey)
       .then(keyInfo => new ExternalGpgKeyEntity(keyInfo));
+  }
+
+  /**
+   *
+   * @param {string} armoredKey
+   * @param {string} passphrase
+   * @returns {Promise<*>}
+   */
+  static async decrypt(armoredKey, passphrase) {
+    const privateKey = (await openpgp.key.readArmored(armoredKey)).keys[0];
+    await privateKey.decrypt(passphrase)
+      .catch(() => { throw new InvalidMasterPasswordError(); });
+
+    return privateKey;
   }
 }
 

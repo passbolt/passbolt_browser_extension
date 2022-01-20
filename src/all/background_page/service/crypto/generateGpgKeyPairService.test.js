@@ -75,5 +75,5 @@ describe("GenerateGpgKeyPair service", () => {
     expect(privateKeyInfo.private).toBe(true);
     expect(privateKeyInfo.revoked).toBe(false);
     expect(privateKeyInfo.expires).toBe("Never");
-  }, 10 * 1000);
+  }, 50 * 1000);
 });

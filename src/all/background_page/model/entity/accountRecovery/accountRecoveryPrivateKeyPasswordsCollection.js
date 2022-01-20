@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.5.0
+ * @since         3.6.0
  */
 
 const {EntityCollection} = require('../abstract/entityCollection');
@@ -28,13 +28,13 @@ class AccountRecoveryPrivateKeyPasswordsCollection extends EntityCollection {
   /**
    * AccountRecoveryPrivateKeyPasswords Entity constructor
    *
-   * @param {Object} AccountRecoveryPrivateKeyPasswordsCollectionDto resource DTO
+   * @param {Object} AccountRecoveryPrivateKeyPasswordsCollectionDto accountRecoveryPrivateKeyPasswordsCollection DTO
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(AccountRecoveryPrivateKeyPasswordsCollectionDto) {
+  constructor(accountRecoveryPrivateKeyPasswordsCollectionDto) {
     super(EntitySchema.validate(
       AccountRecoveryPrivateKeyPasswordsCollection.ENTITY_NAME,
-      AccountRecoveryPrivateKeyPasswordsCollectionDto,
+      accountRecoveryPrivateKeyPasswordsCollectionDto,
       AccountRecoveryPrivateKeyPasswordsCollection.getSchema()
     ));
 
@@ -42,15 +42,15 @@ class AccountRecoveryPrivateKeyPasswordsCollection extends EntityCollection {
      * Check if resource ids are unique
      * Why not this.push? It is faster than adding items one by one
      */
-    const ids = this._props.map(resource => resource.id);
+    const ids = this._props.map(accountRecoveryPrivateKeyPassword => accountRecoveryPrivateKeyPassword.id);
     ids.sort().sort((a, b) => {
       if (a === b) {
         throw new EntityCollectionError(0, AccountRecoveryPrivateKeyPasswordsCollection.RULE_UNIQUE_ID, `AccountRecoveryPrivateKeyPassword id ${a} already exists.`);
       }
     });
     // Directly push into the private property _items[]
-    this._props.forEach(resource => {
-      this._items.push(new AccountRecoveryPrivateKeyPasswordEntity(resource));
+    this._props.forEach(accountRecoveryPrivateKeyPassword => {
+      this._items.push(new AccountRecoveryPrivateKeyPasswordEntity(accountRecoveryPrivateKeyPassword));
     });
 
     // We do not keep original props

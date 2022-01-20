@@ -1,5 +1,5 @@
 /**
- * Passbolt ~ Open source password manager for teams
+ * Passbolt ~ Open source  manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
@@ -14,49 +14,47 @@
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
 
-const ENTITY_NAME = 'AccountRecoveryOrganizationPublicKey';
-const FINGERPRINT_LENGTH = 40;
+const ENTITY_NAME = "AccountRecoveryPrivateKey";
 
-class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
+/**
+ * Entity related to the account recovery private key
+ */
+class AccountRecoveryPrivateKeyEntity extends Entity {
   /**
-   * Resource entity constructor
+   * Setup entity constructor
    *
-   * @param {Object} accountRecoveryOrganizationPublicKeyDto accountRecoveryOrganizationPublicKey DTO
+   * @param {Object} accountRecoveryPrivateKeyDto account recovery organization public key DTO
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(accountRecoveryOrganizationPublicKeyDto) {
+  constructor(accountRecoveryPrivateKeyDto) {
     super(EntitySchema.validate(
-      AccountRecoveryOrganizationPublicKeyEntity.ENTITY_NAME,
-      accountRecoveryOrganizationPublicKeyDto,
-      AccountRecoveryOrganizationPublicKeyEntity.getSchema()
+      AccountRecoveryPrivateKeyEntity.ENTITY_NAME,
+      accountRecoveryPrivateKeyDto,
+      AccountRecoveryPrivateKeyEntity.getSchema()
     ));
   }
 
   /**
-   * Get resource entity schema
+   * Get entity schema
    * @returns {Object} schema
    */
   static getSchema() {
     return {
       "type": "object",
       "required": [
-        "armored_key"
+        "data"
       ],
       "properties": {
         "id": {
           "type": "string",
           "format": "uuid"
         },
-        "armored_key": {
+        "user_id": {
           "type": "string",
+          "format": "uuid"
         },
-        "fingerprint": {
-          "anyOf": [{
-            "type": "string",
-            "length": FINGERPRINT_LENGTH
-          }, {
-            "type": "null"
-          }]
+        "data": {
+          "type": "string"
         },
         "created": {
           "type": "string",
@@ -73,10 +71,6 @@ class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
         "modified_by": {
           "type": "string",
           "format": "uuid"
-        },
-        "deleted": {
-          "type": "string",
-          "format": "date-time"
         }
       }
     };
@@ -88,13 +82,12 @@ class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
    * ==================================================
    */
   /**
-   * Return a DTO ready to be sent to API
-   *
-   * @param {object} [contain] optional
+   * Return a DTO ready to be sent to API or content code
    * @returns {object}
    */
   toDto() {
-    return Object.assign({}, this._props);
+    const result = Object.assign({}, this._props);
+    return result;
   }
 
   /**
@@ -110,9 +103,6 @@ class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
    * Dynamic properties getters
    * ==================================================
    */
-  get armoredKey() {
-    return this._props.armored_key;
-  }
 
   /*
    * ==================================================
@@ -120,7 +110,7 @@ class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
    * ==================================================
    */
   /**
-   * ResourceEntity.ENTITY_NAME
+   * AccountRecoveryPrivateKeyEntity.ENTITY_NAME
    * @returns {string}
    */
   static get ENTITY_NAME() {
@@ -128,4 +118,4 @@ class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
   }
 }
 
-exports.AccountRecoveryOrganizationPublicKeyEntity = AccountRecoveryOrganizationPublicKeyEntity;
+exports.AccountRecoveryPrivateKeyEntity = AccountRecoveryPrivateKeyEntity;

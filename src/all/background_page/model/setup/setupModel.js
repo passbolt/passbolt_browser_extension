@@ -13,6 +13,7 @@
 const {UserEntity} = require("../entity/user/userEntity");
 const {SetupService} = require("../../service/api/setup/setupService");
 const {UserService} = require("../../service/api/user/userService");
+const {AccountRecoveryOrganizationPolicyEntity} = require("../entity/accountRecovery/accountRecoveryOrganizationPolicyEntity");
 
 class SetupModel {
   /**
@@ -28,27 +29,32 @@ class SetupModel {
 
   /**
    * Find setup info. Retrieve the user profile and server public key and return a setup entity
-   * @param {string} userId The user id
-   * @param {string} token The setup token
    * populated with these information.
+   * @param {SetupEntity} setupEntity The setup entity
    * @returns {Promise<UserEntity>}
    * @throws {Error} if options are invalid or API error
    */
-  async findSetupInfo(userId, token) {
-    let userDto = null;
+  async findSetupInfo(setupEntity) {
+    let userDto, accountRecoveryOrganizationPolicyDto;
     try {
-      const {user} = await this.setupService.findSetupInfo(userId, token);
-      userDto = user;
+      const result = await this.setupService.findSetupInfo(setupEntity.userId, setupEntity.token);
+      userDto = result?.user;
+      accountRecoveryOrganizationPolicyDto = result?.account_recovery_organization_policy;
     } catch (error) {
       // If the entry point doesn't exist or return a 500, the API version is <v3.
       const code = error.data && error.data.code;
       if (code === 404 || code === 500) {
-        userDto = await this.setupService.findLegacySetupInfo(userId, token);
+        userDto = await this.setupService.findLegacySetupInfo(setupEntity.userId, setupEntity.token);
       } else {
         throw error;
       }
     }
-    return new UserEntity(userDto);
+    if (userDto) {
+      setupEntity.user = new UserEntity(userDto);
+    }
+    if (accountRecoveryOrganizationPolicyDto) {
+      setupEntity.accountRecoveryOrganizationPolicy = new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
+    }
   }
 
   /**

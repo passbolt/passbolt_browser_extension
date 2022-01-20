@@ -69,6 +69,7 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
    * @public
    */
   async saveOrganizationSettings(accountRecoveryOrganizationPolicyDto) {
+    // @todo @debug @mock for account-recovery
     this.assertNonEmptyData(accountRecoveryOrganizationPolicyDto);
     return accountRecoveryOrganizationPolicyDto;
     /*

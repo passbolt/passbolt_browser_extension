@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.5.0
+ * @since         3.6.0
  */
 const {AccountRecoveryOrganizationPolicyService} = require("../../service/api/accountRecovery/accountRecoveryOrganizationPolicyService");
 const {AccountRecoveryOrganizationPolicyEntity} = require("../entity/accountRecovery/accountRecoveryOrganizationPolicyEntity");
@@ -50,26 +50,26 @@ class AccountRecoveryModel {
    * @param {AccountRecoveryOrganizationPolicyEntity} accountRecoveryOrganizationPolicyEntity
    * @param {AccountRecoveryOrganizationPolicyEntity} oldAccountRecoveryOrganizationPolicyEntity
    * @param {PrivateGpgkeyEntity} oldORKprivateKeyEntity
-   * @param {adminPassphrase} adminPassphrase
+   * @param {string} adminPassphrase
    */
   async saveOrganizationSettings(accountRecoveryOrganizationPolicyEntity, oldAccountRecoveryOrganizationPolicyEntity, oldORKprivateKeyEntity, adminPassphrase) {
     const hasToSignKey = this.hasToSignTheNewKey(accountRecoveryOrganizationPolicyEntity, oldAccountRecoveryOrganizationPolicyEntity);
     const hasToRevokeOldKey = this.hasToRevokeTheFormerKey(accountRecoveryOrganizationPolicyEntity, oldAccountRecoveryOrganizationPolicyEntity);
+
     const contains = {
-      account_recovery_organization_public_key: accountRecoveryOrganizationPolicyEntity !== "disabled",
-      account_recovery_private_key_passwords: false,
+      account_recovery_organization_public_key: accountRecoveryOrganizationPolicyEntity.isEnabled,
       account_recovery_organization_revoked_key: hasToRevokeOldKey
     };
 
     const accountRecoveryOrganizationPolicyDto = accountRecoveryOrganizationPolicyEntity.toDto();
 
     const decryptedOldORK = oldORKprivateKeyEntity
-      ? await DecryptPrivateKeyService.decrypt(oldORKprivateKeyEntity)
+      ? await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(oldORKprivateKeyEntity)
       : null;
 
     if (hasToSignKey) {
       const keyring = new Keyring();
-      const decryptedAdminPrivateKey = await DecryptPrivateKeyService.decrypt(new PrivateGpgkeyEntity({
+      const decryptedAdminPrivateKey = await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(new PrivateGpgkeyEntity({
         armored_key: keyring.findPrivate().key,
         passphrase: adminPassphrase
       }));
@@ -107,9 +107,11 @@ class AccountRecoveryModel {
    * @param {AccountRecoveryOrganizationPolicyEntity} oldAccountRecoveryOrganizationPolicyEntity
    */
   hasToSignTheNewKey(newAccountRecoveryOrganizationPolicyEntity, oldAccountRecoveryOrganizationPolicyEntity) {
-    return newAccountRecoveryOrganizationPolicyEntity !== "disabled"
-      && oldAccountRecoveryOrganizationPolicyEntity !== "disabled"
-      && oldAccountRecoveryOrganizationPolicyEntity.armoredKey !== newAccountRecoveryOrganizationPolicyEntity.armoredKey;
+    const newPolicyEnabled = newAccountRecoveryOrganizationPolicyEntity.isEnabled;
+    const oldPolicyDisabled = oldAccountRecoveryOrganizationPolicyEntity.isDisabled;
+    const keyHasChanged = oldAccountRecoveryOrganizationPolicyEntity.armoredKey !== newAccountRecoveryOrganizationPolicyEntity.armoredKey;
+
+    return newPolicyEnabled && (oldPolicyDisabled || keyHasChanged);
   }
 
   /**
@@ -120,8 +122,8 @@ class AccountRecoveryModel {
    * @param {AccountRecoveryOrganizationPolicyEntity} oldAccountRecoveryOrganizationPolicyEntity
    */
   hasToRevokeTheFormerKey(newAccountRecoveryOrganizationPolicyEntity, oldAccountRecoveryOrganizationPolicyEntity) {
-    const newPolicyIsDisabled = newAccountRecoveryOrganizationPolicyEntity.policy === "disabled";
-    const oldPolicyIsEnabled = oldAccountRecoveryOrganizationPolicyEntity.policy !== "disabled";
+    const newPolicyIsDisabled = newAccountRecoveryOrganizationPolicyEntity.isDisabled;
+    const oldPolicyIsEnabled = oldAccountRecoveryOrganizationPolicyEntity.isEnabled;
     const keyHasChanged = newAccountRecoveryOrganizationPolicyEntity.armoredKey !== oldAccountRecoveryOrganizationPolicyEntity.armoredKey;
 
     return oldPolicyIsEnabled && (keyHasChanged || newPolicyIsDisabled);

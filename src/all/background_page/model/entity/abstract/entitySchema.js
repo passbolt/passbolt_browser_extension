@@ -178,7 +178,7 @@ class EntitySchema {
     // Additional rules by types
     switch (propSchema.type) {
       case 'string':
-        // maxLength, minLength, regex, etc.
+        // maxLength, minLength, length, regex, etc.
         EntitySchema.validatePropTypeString(propName, prop, propSchema);
         break;
         /*
@@ -240,6 +240,11 @@ class EntitySchema {
     if (propSchema.format) {
       if (!EntitySchema.isValidStringFormat(prop, propSchema.format)) {
         validationError.addError(propName, 'format', `The ${propName} is not a valid ${propSchema.format}.`);
+      }
+    }
+    if (propSchema.length) {
+      if (!EntitySchema.isValidStringLength(prop, propSchema.length, propSchema.length)) {
+        validationError.addError(propName, 'length', `The ${propName} should be ${propSchema.length} character in length.`);
       }
     }
     if (propSchema.minLength) {

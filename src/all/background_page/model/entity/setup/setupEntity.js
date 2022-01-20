@@ -15,6 +15,8 @@ const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {UserEntity} = require("../user/userEntity");
 const {SecurityTokenEntity} = require("../securityToken/securityTokenEntity");
+const {AccountRecoveryUserSettingEntity} = require("../accountRecovery/accountRecoveryUserSettingEntity");
+const {AccountRecoveryOrganizationPolicyEntity} = require("../accountRecovery/accountRecoveryOrganizationPolicyEntity");
 
 const ENTITY_NAME = "Setup";
 
@@ -45,6 +47,14 @@ class SetupEntity extends Entity {
     if (this._props.security_token) {
       this._security_token = new SecurityTokenEntity(this._props.security_token);
       delete this._props.security_token;
+    }
+    if (this._props.account_recovery_user_setting) {
+      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting);
+      delete this._props.account_recovery_user_setting;
+    }
+    if (this._props.account_recovery_organization_policy) {
+      this._account_recovery_organization_policy = new AccountRecoveryOrganizationPolicyEntity(this._props.account_recovery_organization_policy);
+      delete this._props.account_recovery_organization_policy;
     }
   }
 
@@ -98,6 +108,8 @@ class SetupEntity extends Entity {
         // Associated models
         "user": UserEntity.getSchema(),
         "security_token": SecurityTokenEntity.getSchema(),
+        "account_recovery_user_setting": AccountRecoveryUserSettingEntity.getSchema(),
+        "account_recovery_organization_policy": AccountRecoveryOrganizationPolicyEntity.getSchema()
       }
     };
   }
@@ -167,6 +179,9 @@ class SetupEntity extends Entity {
     if (this._security_token) {
       result.security_token = this._security_token.toDto();
     }
+    if (this._account_recovery_user_setting) {
+      result.account_recovery_user_setting = this._account_recovery_user_setting.toDto();
+    }
 
     return result;
   }
@@ -185,12 +200,15 @@ class SetupEntity extends Entity {
       },
       user: {
         locale: this.locale
-      }
+      },
+      account_recovery_user_setting: this.accountRecoveryUserSetting?.toDto({
+        account_recovery_private_key: true,
+        account_recovery_private_key_passwords: true
+      }),
     };
   }
 
   toGenerateGpgKeyDto(generateGpgKeyDto) {
-
     return {
       length: GenerateGpgKeyEntity.DEFAULT_LENGTH,
       ...generateGpgKeyDto,
@@ -354,6 +372,44 @@ class SetupEntity extends Entity {
   set locale(locale) {
     EntitySchema.validateProp("locale", locale, SetupEntity.getSchema().properties.locale);
     this._props.locale = locale;
+  }
+
+  /**
+   * Get the setup account recovery user setting
+   * @returns {(AccountRecoveryUserSettingEntity|null)}
+   */
+  get accountRecoveryUserSetting() {
+    return this._account_recovery_user_setting || null;
+  }
+
+  /**
+   * set the setup account recovery user setting
+   * @param {AccountRecoveryUserSettingEntity} accountRecoveryUserSetting The account recovery user setting
+   */
+  set accountRecoveryUserSetting(accountRecoveryUserSetting) {
+    if (!accountRecoveryUserSetting || !(accountRecoveryUserSetting instanceof AccountRecoveryUserSettingEntity)) {
+      throw new TypeError('Failed to assert the parameter is a valid AccountRecoveryUserSettingEntity');
+    }
+    this._account_recovery_user_setting = accountRecoveryUserSetting;
+  }
+
+  /**
+   * Get the setup account recovery organization policy
+   * @returns {(AccountRecoveryOrganizationPolicyEntity|null)}
+   */
+  get accountRecoveryOrganizationPolicy() {
+    return this._account_recovery_organization_policy || null;
+  }
+
+  /**
+   * set the setup account recovery organization policy
+   * @param {AccountRecoveryOrganizationPolicyEntity} accountRecoveryOrganizationPolicy The account recovery organization policy
+   */
+  set accountRecoveryOrganizationPolicy(accountRecoveryOrganizationPolicy) {
+    if (!accountRecoveryOrganizationPolicy || !(accountRecoveryOrganizationPolicy instanceof AccountRecoveryOrganizationPolicyEntity)) {
+      throw new TypeError('Failed to assert the parameter is a valid AccountRecoveryUserSettingEntity');
+    }
+    this._account_recovery_organization_policy = accountRecoveryOrganizationPolicy;
   }
 
   /*

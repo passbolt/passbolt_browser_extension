@@ -150,6 +150,39 @@ const listen = function(worker) {
   });
 
   /*
+   * Retrieve the account recovery organization policy if any.
+   *
+   * @listens passbolt.setup.get-account-recovery-organization-policy
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.setup.get-account-recovery-organization-policy', async requestId => {
+    try {
+      const accountRecoveryOrganizationPolicy = await setupController.getAccountRecoveryOrganizationPolicy();
+      worker.port.emit(requestId, 'SUCCESS', accountRecoveryOrganizationPolicy);
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * Set the account recovery user setting.
+   *
+   * @listens passbolt.setup.set-account-recovery-user-setting
+   * @param requestId {uuid} The request identifier
+   * @param accountRecoveryUserSettingDto {object} The account recovery user settings
+   */
+  worker.port.on('passbolt.setup.set-account-recovery-user-setting', async(requestId, accountRecoveryUserSettingDto) => {
+    try {
+      await setupController.setAccountRecoveryUserSetting(accountRecoveryUserSettingDto);
+      worker.port.emit(requestId, 'SUCCESS');
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
    * Import secret key.
    *
    * @listens passbolt.setup.import-key

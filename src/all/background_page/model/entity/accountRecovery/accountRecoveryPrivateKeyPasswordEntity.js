@@ -9,12 +9,13 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.5.0
+ * @since         3.6.0
  */
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
 
 const ENTITY_NAME = "AccountRecoveryPrivateKeyPassword";
+const FOREIGN_MODEL_ORGANIZATION_KEY = "AccountRecoveryOrganizationKey";
 
 /**
  * Entity related to the account recovery private key password
@@ -43,7 +44,6 @@ class AccountRecoveryPrivateKeyPasswordEntity extends Entity {
       "type": "object",
       "required": [
         "recipient_foreign_model",
-        "recipient_foreign_key",
         "data"
       ],
       "properties": {
@@ -53,7 +53,7 @@ class AccountRecoveryPrivateKeyPasswordEntity extends Entity {
         },
         "recipient_foreign_model": {
           "type": "string",
-          "enum": ["AccountRecoveryContact",  "AccountRecoveryOrganizationKey"]
+          "enum": [AccountRecoveryPrivateKeyPasswordEntity.FOREIGN_MODEL_ORGANIZATION_KEY]
         },
         "recipient_foreign_key": {
           "type": "string",
@@ -76,8 +76,7 @@ class AccountRecoveryPrivateKeyPasswordEntity extends Entity {
    * @returns {object}
    */
   toDto() {
-    const result = Object.assign({}, this._props);
-    return result;
+    return Object.assign({}, this._props);
   }
 
   /**
@@ -112,6 +111,14 @@ class AccountRecoveryPrivateKeyPasswordEntity extends Entity {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
+  }
+
+  /**
+   * AccountRecoveryPrivateKeyPasswordEntity.FOREIGN_MODEL_ORGANIZATION_KEY
+   * @returns {string}
+   */
+  static get FOREIGN_MODEL_ORGANIZATION_KEY() {
+    return FOREIGN_MODEL_ORGANIZATION_KEY;
   }
 }
 

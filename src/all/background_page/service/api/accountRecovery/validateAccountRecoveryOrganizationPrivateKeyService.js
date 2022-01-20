@@ -33,7 +33,7 @@ class ValidateAccountRecoveryOrganizationPrivateKeyService {
       throw new WrongOrganizationRecoveryKeyError(`Error, this is not the current organization recovery key. Expected fingerprint: ${publicKeyInfo.fingerprint}`, publicKeyInfo.fingerprint);
     }
 
-    return (await DecryptPrivateKeyService.decrypt(privateKeyEntity)) !== null;
+    return (await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(privateKeyEntity)) !== null;
   }
 }
 

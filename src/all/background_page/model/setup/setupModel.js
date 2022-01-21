@@ -28,10 +28,10 @@ class SetupModel {
   }
 
   /**
-   * Find setup info. Retrieve the user profile and server public key and return a setup entity
-   * populated with these information.
+   * Retrieve setup information and populate the setup entity with it.
+   *
    * @param {SetupEntity} setupEntity The setup entity
-   * @returns {Promise<UserEntity>}
+   * @returns {Promise<void>}
    * @throws {Error} if options are invalid or API error
    */
   async findSetupInfo(setupEntity) {
@@ -58,28 +58,33 @@ class SetupModel {
   }
 
   /**
-   * Find setup info. Retrieve the user profile and server public key and return a setup entity
-   * @param {string} userId The user id
-   * @param {string} token The setup token
-   * populated with these information.
-   * @returns {Promise<UserEntity>}
+   * Retrieve recover information and populate the recover entity with it.
+   *
+   * @param {RecoverEntity} recoverEntity The recover entity
+   * @returns {Promise<void>}
    * @throws {Error} if options are invalid or API error
    */
-  async findRecoverInfo(userId, token) {
-    let userDto = null;
+  async findRecoverInfo(recoverEntity) {
+    let userDto, accountRecoveryOrganizationPolicyDto;
     try {
-      const {user} = await this.setupService.findRecoverInfo(userId, token);
-      userDto = user;
+      const result = await this.setupService.findRecoverInfo(recoverEntity.userId, recoverEntity.token);
+      userDto = result?.user;
+      accountRecoveryOrganizationPolicyDto = result?.account_recovery_organization_policy;
     } catch (error) {
       // If the entry point doesn't exist or return a 500, the API version is <v3.
       const code = error.data && error.data.code;
       if (code === 404 || code === 500) {
-        userDto = await this.setupService.findLegacyRecoverInfo(userId, token);
+        userDto = await this.setupService.findLegacyRecoverInfo(recoverEntity.userId, recoverEntity.token);
       } else {
         throw error;
       }
     }
-    return new UserEntity(userDto);
+    if (userDto) {
+      recoverEntity.user = new UserEntity(userDto);
+    }
+    if (accountRecoveryOrganizationPolicyDto) {
+      recoverEntity.accountRecoveryOrganizationPolicy = new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
+    }
   }
 
   /**

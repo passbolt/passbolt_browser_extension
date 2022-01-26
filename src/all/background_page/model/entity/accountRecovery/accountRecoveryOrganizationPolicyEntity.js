@@ -15,6 +15,7 @@ const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {AccountRecoveryOrganizationPublicKeyEntity} = require("./accountRecoveryOrganizationPublicKeyEntity");
 const {EntityValidationError} = require("../abstract/entityValidationError");
+const {UserEntity} = require("../user/userEntity");
 
 const ENTITY_NAME = "AccountRecoveryOrganizationPolicy";
 const POLICY_DISABLED = "disabled";
@@ -47,6 +48,10 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
     if (this._props.account_recovery_organization_revoked_key) {
       this._account_recovery_organization_revoked_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_revoked_key);
       delete this._props.account_recovery_organization_revoked_key;
+    }
+    if (this._props.creator) {
+      this._creator = new UserEntity(this._props.creator);
+      delete this._props.creator;
     }
   }
 
@@ -96,6 +101,7 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
         },
         "account_recovery_organization_public_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
         "account_recovery_organization_revoked_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
+        "creator": UserEntity.getSchema(),
       }
     };
   }
@@ -121,6 +127,9 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
     }
     if (this._account_recovery_organization_revoked_key && contain.account_recovery_organization_revoked_key) {
       result.account_recovery_organization_revoked_key = this._account_recovery_organization_revoked_key.toDto();
+    }
+    if (this._creator && contain.creator) {
+      result.creator = this._creator.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
     }
     return result;
   }
@@ -154,7 +163,8 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
    */
   toJSON() {
     return this.toDto({
-      account_recovery_organization_public_key: true
+      account_recovery_organization_public_key: true,
+      creator: true
     });
   }
 

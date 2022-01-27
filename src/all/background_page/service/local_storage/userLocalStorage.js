@@ -150,7 +150,7 @@ class UserLocalStorage {
    * @private
    */
   static get DEFAULT_CONTAIN() {
-    return {profile: {avatar: true}};
+    return {profile: {avatar: true}, pending_account_recovery_user_request: true};
   }
 
   /**

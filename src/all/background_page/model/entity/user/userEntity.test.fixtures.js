@@ -69,6 +69,15 @@ exports.UserEntityTestFixtures = {
       "modified": "2020-05-04T20:31:45+00:00",
       "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
       "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856"
+    },
+    "pending_account_recovery_user_request": {
+      "id": "d4c0e643-3967-443b-93b3-102d902c4510",
+      "authentication_token_id": "d4c0e643-3967-443b-93b3-102d902c4512",
+      "status": "pending",
+      "created": "2020-05-04T20:31:45+00:00",
+      "modified": "2020-05-04T20:31:45+00:00",
+      "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+      "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856"
     }
   }
 };

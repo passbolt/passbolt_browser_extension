@@ -20,6 +20,8 @@ const {SignGpgKeyService} = require("../../service/crypto/signGpgKeyService");
 const {RevokeGpgKeyService} = require("../../service/crypto/revokeGpgKeyService");
 const {Keyring} = require("../../model/keyring");
 const {DecryptPrivateKeyService} = require('../../service/crypto/decryptPrivateKeyService');
+const {AccountRecoveryRequestsCollection} = require("../entity/accountRecovery/accountRecoveryRequestsCollection");
+const {AccountRecoveryRequestService} = require("../../service/api/accountRecovery/accountRecoveryRequestService");
 /**
  * Model related to the account recovery
  */
@@ -32,6 +34,7 @@ class AccountRecoveryModel {
    */
   constructor(apiClientOptions) {
     this.accountRecoveryOrganizationPolicyService = new AccountRecoveryOrganizationPolicyService(apiClientOptions);
+    this.accountRecoveryRequestService = new AccountRecoveryRequestService(apiClientOptions);
   }
 
   /**
@@ -42,6 +45,16 @@ class AccountRecoveryModel {
   async find() {
     const accountRecoveryOrganizationPolicyDto = await this.accountRecoveryOrganizationPolicyService.find();
     return new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
+  }
+
+  /**
+   * Get user requests of an accountRecovery using Passbolt API
+   *
+   * @return {AccountRecoveryRequestsCollection}
+   */
+  async findUserRequests(userId) {
+    const accountRecoveryRequestsCollectionDto = await this.accountRecoveryRequestService.findByUser(userId);
+    return new AccountRecoveryRequestsCollection(accountRecoveryRequestsCollectionDto);
   }
 
   /**

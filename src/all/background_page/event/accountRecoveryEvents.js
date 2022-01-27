@@ -80,6 +80,19 @@ const listen = function(worker) {
     const controller = new ValidatePrivateOrganizationAccountRecoveryKeyController(worker, requestId);
     return await controller.exec(accountRecoveryPolicyDto, privateAccountRecoveryKeyDto);
   });
+
+  /** Whenever the account recovery user requests needs to be get */
+  worker.port.on('passbolt.account-recovery.get-user-requests', async(requestId, userId) => {
+    try {
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
+      const accountRecoveryUserRequestsCollection = await accountRecoveryModel.findUserRequests(userId);
+      worker.port.emit(requestId, 'SUCCESS', accountRecoveryUserRequestsCollection);
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
 };
 
 exports.listen = listen;

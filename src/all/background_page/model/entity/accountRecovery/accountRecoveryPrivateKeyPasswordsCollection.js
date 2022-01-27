@@ -145,7 +145,7 @@ class AccountRecoveryPrivateKeyPasswordsCollection extends EntityCollection {
       throw new TypeError(`accountRecoveryPrivateKeyPasswordsCollection push parameter should be an object.`);
     }
     if (accountRecoveryPrivateKeyPassword instanceof AccountRecoveryPrivateKeyPasswordEntity) {
-      accountRecoveryPrivateKeyPassword = accountRecoveryPrivateKeyPassword.toDto(accountRecoveryPrivateKeyPasswordEntity.ALL_CONTAIN_OPTIONS); // deep clone
+      accountRecoveryPrivateKeyPassword = accountRecoveryPrivateKeyPassword.toDto(); // deep clone
     }
     const accountRecoveryPrivateKeyPasswordEntity = new AccountRecoveryPrivateKeyPasswordEntity(accountRecoveryPrivateKeyPassword); // validate
 

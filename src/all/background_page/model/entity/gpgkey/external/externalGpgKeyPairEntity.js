@@ -9,11 +9,10 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.5.0
+ * @since         3.6.0
  */
 const {Entity} = require('../../abstract/entity');
 const {EntitySchema} = require('../../abstract/entitySchema');
-const {EntityValidationError} = require('../../abstract/entityValidationError');
 const {ExternalGpgKeyEntity} = require('./externalGpgKeyEntity');
 
 const ENTITY_NAME = 'externalGpgKeyPairEntity';
@@ -32,12 +31,14 @@ class ExternalGpgKeyPairEntity extends Entity {
       ExternalGpgKeyPairEntity.getSchema()
     ));
 
-    if (typeof(this.privateKey.private) !== "undefined" && !this.privateKey.private) {
-      throw new EntityValidationError(`Could not validate entity ${ExternalGpgKeyPairEntity.ENTITY_NAME}. The private key part is public`);
+    if (this._props.private_key) {
+      this._private_key = new ExternalGpgKeyEntity(this._props.private_key);
+      delete this._props.private_key;
     }
 
-    if (typeof(this.publicKey.private) !== "undefined" && this.publicKey.private) {
-      throw new EntityValidationError(`Could not validate entity ${ExternalGpgKeyPairEntity.ENTITY_NAME}. The public key part is private`);
+    if (this._props.public_key) {
+      this._public_key = new ExternalGpgKeyEntity(this._props.public_key);
+      delete this._props.public_key;
     }
   }
 
@@ -61,6 +62,27 @@ class ExternalGpgKeyPairEntity extends Entity {
 
   /*
    * ==================================================
+   * Serialization
+   * ==================================================
+   */
+  /**
+   * Return a DTO ready to be sent to API or content code
+   * @returns {object}
+   */
+  toDto() {
+    const result = Object.assign({}, this._props);
+    if (this._public_key) {
+      result.public_key = this._public_key.toDto();
+    }
+    if (this._private_key) {
+      result.private_key = this._private_key.toDto();
+    }
+
+    return result;
+  }
+
+  /*
+   * ==================================================
    * Dynamic properties getters
    * ==================================================
    */
@@ -69,7 +91,7 @@ class ExternalGpgKeyPairEntity extends Entity {
    * @returns {ExternalGpgKeyEntity}
    */
   get publicKey() {
-    return this._props.public_key;
+    return this._public_key;
   }
 
   /**
@@ -77,7 +99,7 @@ class ExternalGpgKeyPairEntity extends Entity {
    * @returns {ExternalGpgKeyEntity}
    */
   get privateKey() {
-    return this._props.private_key;
+    return this._private_key;
   }
 
   /*

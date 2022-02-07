@@ -17,6 +17,10 @@ const {SecurityTokenEntity} = require("../securityToken/securityTokenEntity");
 
 const ENTITY_NAME = "Account";
 
+// Type of accounts.
+const TYPE_ACCOUNT = "Account";
+const TYPE_ACCOUNT_RECOVERY = "Account recovery";
+
 class AccountEntity extends Entity {
   /**
    * Setup entity constructor
@@ -25,6 +29,9 @@ class AccountEntity extends Entity {
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
   constructor(accountDto) {
+    // Default properties values
+    accountDto = Object.assign(AccountEntity.getDefault(), accountDto);
+
     super(EntitySchema.validate(
       AccountEntity.ENTITY_NAME,
       accountDto,
@@ -43,6 +50,16 @@ class AccountEntity extends Entity {
   }
 
   /**
+   * Get default properties values
+   * @return {object}
+   */
+  static getDefault() {
+    return {
+      "type": AccountEntity.TYPE_ACCOUNT,
+    };
+  }
+
+  /**
    * Get entity schema
    * @returns {Object} schema
    */
@@ -50,6 +67,7 @@ class AccountEntity extends Entity {
     return {
       "type": "object",
       "required": [
+        "type",
         "domain",
         "user_id",
         "user_public_armored_key",
@@ -59,6 +77,13 @@ class AccountEntity extends Entity {
         "security_token",
       ],
       "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            AccountEntity.TYPE_ACCOUNT,
+            AccountEntity.TYPE_ACCOUNT_RECOVERY,
+          ]
+        },
         "domain": {
           "type": "string"
         },
@@ -142,6 +167,15 @@ class AccountEntity extends Entity {
    * Dynamic properties getters
    * ==================================================
    */
+
+  /**
+   * Get the account type
+   * @return {string}
+   */
+  get type() {
+    return this._props.type;
+  }
+
   /**
    * Get the domain
    * @returns {string} ref ie. http://cloud.passbolt.com/acme
@@ -214,6 +248,22 @@ class AccountEntity extends Entity {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
+  }
+
+  /**
+   * AccountEntity.TYPE_ACCOUNT_RECOVERY
+   * @returns {string}
+   */
+  static get TYPE_ACCOUNT_RECOVERY() {
+    return TYPE_ACCOUNT_RECOVERY;
+  }
+
+  /**
+   * AccountEntity.TYPE_ACCOUNT
+   * @returns {string}
+   */
+  static get TYPE_ACCOUNT() {
+    return TYPE_ACCOUNT;
   }
 }
 

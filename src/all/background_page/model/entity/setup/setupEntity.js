@@ -17,8 +17,10 @@ const {UserEntity} = require("../user/userEntity");
 const {SecurityTokenEntity} = require("../securityToken/securityTokenEntity");
 const {AccountRecoveryUserSettingEntity} = require("../accountRecovery/accountRecoveryUserSettingEntity");
 const {AccountRecoveryOrganizationPolicyEntity} = require("../accountRecovery/accountRecoveryOrganizationPolicyEntity");
+const {AccountEntity} = require("../account/accountEntity");
 
 const ENTITY_NAME = "Setup";
+const FINGERPRINT_LENGTH = 40;
 
 class SetupEntity extends Entity {
   /**
@@ -87,6 +89,14 @@ class SetupEntity extends Entity {
         },
         "remember_until_logout": {
           "type": "boolean"
+        },
+        "user_key_fingerprint": {
+          "anyOf": [{
+            "type": "string",
+            "length": FINGERPRINT_LENGTH
+          }, {
+            "type": "null"
+          }]
         },
         "user_public_armored_key": {
           "type": "string"
@@ -182,6 +192,9 @@ class SetupEntity extends Entity {
     if (this._account_recovery_user_setting) {
       result.account_recovery_user_setting = this._account_recovery_user_setting.toDto();
     }
+    if (this._account_recovery_organization_policy) {
+      result.account_recovery_organization_policy = this._account_recovery_organization_policy.toDto();
+    }
 
     return result;
   }
@@ -208,6 +221,21 @@ class SetupEntity extends Entity {
     };
   }
 
+  /**
+   * Return a DTO ready to be sent to the API to initiate an account recovery.
+   * @type {Object}
+   */
+  toAccountRecoveryRequestCreateDto() {
+    return {
+      authentication_token: {
+        token: this.token
+      },
+      fingerprint: this.userKeyFingerprint,
+      user_id: this.userId,
+      armored_key: this.userPublicArmoredKey
+    };
+  }
+
   toGenerateGpgKeyDto(generateGpgKeyDto) {
     return {
       length: GenerateGpgKeyEntity.DEFAULT_LENGTH,
@@ -218,6 +246,7 @@ class SetupEntity extends Entity {
 
   toAccountDto() {
     const accountDto = {
+      type: AccountEntity.TYPE_ACCOUNT,
       domain: this.domain,
       user_id: this.userId,
       user: this.user.toDto(UserEntity.ALL_CONTAIN_OPTIONS),
@@ -225,6 +254,25 @@ class SetupEntity extends Entity {
       user_private_armored_key: this.userPrivateArmoredKey,
       server_public_armored_key: this.serverPublicArmoredKey,
       security_token: this.securityToken.toDto(),
+    };
+    accountDto.user.locale = this.locale;
+    return accountDto;
+  }
+
+  /**
+   * Generate DTO to create a temporary account used for the account recovery.
+   * @returns {object}
+   */
+  toAccountRecoveryAccountDto() {
+    const accountDto = {
+      type: AccountEntity.TYPE_ACCOUNT_RECOVERY,
+      domain: this.domain,
+      user_id: this.userId,
+      user: this.user?.toDto(UserEntity.ALL_CONTAIN_OPTIONS) || {},
+      user_public_armored_key: this.userPublicArmoredKey,
+      user_private_armored_key: this.userPrivateArmoredKey,
+      server_public_armored_key: this.serverPublicArmoredKey,
+      security_token: this.securityToken?.toDto(),
     };
     accountDto.user.locale = this.locale;
     return accountDto;
@@ -301,6 +349,21 @@ class SetupEntity extends Entity {
   set rememberUntilLogout(rememberUntilLogout) {
     EntitySchema.validateProp("remember_until_logout", rememberUntilLogout, SetupEntity.getSchema().properties.remember_until_logout);
     this._props.remember_until_logout = rememberUntilLogout;
+  }
+
+  /**
+   * Get the user key fingerprint.
+   */
+  get userKeyFingerprint() {
+    return this._props.user_key_fingerprint;
+  }
+
+  /**
+   * Set the user key fingerprint.
+   * @param {string} fingerprint The key fingerprint.
+   */
+  set userKeyFingerprint(fingerprint) {
+    this._props.user_key_fingerprint = fingerprint;
   }
 
   /**

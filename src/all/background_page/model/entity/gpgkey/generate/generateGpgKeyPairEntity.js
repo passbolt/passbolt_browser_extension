@@ -43,7 +43,7 @@ class GenerateGpgKeyPairEntity extends Entity {
       "required": [
         "name",
         "email",
-        "password",
+        "passphrase",
         "keySize"
       ],
       "properties": {
@@ -55,7 +55,7 @@ class GenerateGpgKeyPairEntity extends Entity {
           "type": "string",
           "custom": goog.format.EmailAddress.isValidAddress
         },
-        "password": {
+        "passphrase": {
           "type": "string",
           "minLength": 1
         },
@@ -82,7 +82,7 @@ class GenerateGpgKeyPairEntity extends Entity {
     return {
       userIds: [this.userId],
       rsaBits: this.rsaBits,
-      passphrase: this.passphrase
+      password: this.passphrase
     };
   }
 
@@ -128,7 +128,7 @@ class GenerateGpgKeyPairEntity extends Entity {
    * @returns {string}
    */
   get passphrase() {
-    return this._props.password;
+    return this._props.passphrase;
   }
 
   /*
@@ -142,6 +142,14 @@ class GenerateGpgKeyPairEntity extends Entity {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
+  }
+
+  /**
+   * GenerateGpgKeyPairEntity.DEFAULT_LENGTH
+   * @returns {int}
+   */
+  static get DEFAULT_LENGTH() {
+    return DEFAULT_LENGTH;
   }
 }
 

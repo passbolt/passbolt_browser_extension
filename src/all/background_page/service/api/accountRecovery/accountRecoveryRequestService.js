@@ -108,6 +108,17 @@ class AccountRecoveryRequestService extends AbstractService {
      * return response.body;
      */
   }
+
+  /**
+   * Create an account recovery request.
+   * @param {Object} accountRecoveryRequestDto The request dto
+   * @returns {Promise<object>} response
+   * @throws {Error} if options are invalid or API error
+   */
+  async create(accountRecoveryRequestDto) {
+    const response = this.apiClient.create(accountRecoveryRequestDto);
+    return response.body;
+  }
 }
 
 exports.AccountRecoveryRequestService = AccountRecoveryRequestService;

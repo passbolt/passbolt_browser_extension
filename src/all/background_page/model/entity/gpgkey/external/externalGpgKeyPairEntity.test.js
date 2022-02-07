@@ -30,10 +30,10 @@ describe("ExternalGpgKey entity", () => {
 
   it("constructor works if valid minimal DTO is provided", () => {
     expect.assertions(1);
-    const armored_key = ExternalGpgKeyEntityFixtures.minimal_dto;
+    const externalGpgKeyDto = ExternalGpgKeyEntityFixtures.minimal_dto;
     const dto = {
-      public_key: armored_key,
-      private_key: armored_key
+      public_key: externalGpgKeyDto,
+      private_key: externalGpgKeyDto
     };
 
     const entity = new ExternalGpgKeyPairEntity(dto);
@@ -59,36 +59,6 @@ describe("ExternalGpgKey entity", () => {
       expect(error instanceof EntityValidationError).toBe(true);
       expect(error.hasError('private_key', 'required')).toBe(true);
       expect(error.hasError('public_key', 'required')).toBe(true);
-    }
-  });
-
-  it("constructor throws an exception if private key is public", () => {
-    expect.assertions(2);
-    const expectedError =
-      new EntityValidationError(`Could not validate entity ${ExternalGpgKeyPairEntity.ENTITY_NAME}. The private key part is public`);
-    try {
-      new ExternalGpgKeyPairEntity({
-        public_key: ExternalGpgKeyEntityFixtures.full_dto,
-        private_key: ExternalGpgKeyEntityFixtures.full_dto
-      });
-    } catch (error) {
-      expect(error instanceof EntityValidationError).toBe(true);
-      expect(error).toEqual(expectedError);
-    }
-  });
-
-  it("constructor throws an exception if public key is private", () => {
-    expect.assertions(2);
-    const expectedError =
-      new EntityValidationError(`Could not validate entity ${ExternalGpgKeyPairEntity.ENTITY_NAME}. The public key part is private`);
-    try {
-      new ExternalGpgKeyPairEntity({
-        public_key: ExternalGpgKeyEntityFixtures.private_key_dto,
-        private_key: ExternalGpgKeyEntityFixtures.private_key_dto
-      });
-    } catch (error) {
-      expect(error instanceof EntityValidationError).toBe(true);
-      expect(error).toEqual(expectedError);
     }
   });
 });

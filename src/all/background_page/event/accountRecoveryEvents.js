@@ -19,6 +19,7 @@ const {GpgKeyInfoService} = require("../service/crypto/gpgKeyInfoService");
 const {AccountRecoveryGenerateKeyPairController} = require("../controller/accountRecovery/accountRecoveryGenerateKeyPairController");
 const fileController = require('../controller/fileController');
 const {AccountRecoveryModel} = require("../model/accountRecovery/accountRecoveryModel");
+const {AccountRecoverySaveUserSettingController} = require("../controller/accountRecovery/accountRecoverySaveUserSetting");
 /**
  * Listens the account recovery events
  * @param worker
@@ -92,6 +93,12 @@ const listen = function(worker) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
+  });
+
+  worker.port.on('passbolt.user.save-account-recovery-settings', async(requestId, accountRecoveryUserSettingDto, accountRecoveryOrganizationPublicKeyDto) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new AccountRecoverySaveUserSettingController(worker, requestId, apiClientOptions);
+    return await controller.exec(accountRecoveryUserSettingDto, accountRecoveryOrganizationPublicKeyDto);
   });
 };
 

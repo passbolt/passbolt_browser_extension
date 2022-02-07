@@ -22,6 +22,8 @@ const {Keyring} = require("../../model/keyring");
 const {DecryptPrivateKeyService} = require('../../service/crypto/decryptPrivateKeyService');
 const {AccountRecoveryRequestsCollection} = require("../entity/accountRecovery/accountRecoveryRequestsCollection");
 const {AccountRecoveryRequestService} = require("../../service/api/accountRecovery/accountRecoveryRequestService");
+const {AccountRecoveryUserService} = require('../../service/api/accountRecovery/accountRecoveryUserService');
+const {BuildAccountRecoveryUserSettingEntityService} = require('../../service/accountRecovery/buildAccountRecoveryUserSettingEntityService');
 /**
  * Model related to the account recovery
  */
@@ -35,6 +37,7 @@ class AccountRecoveryModel {
   constructor(apiClientOptions) {
     this.accountRecoveryOrganizationPolicyService = new AccountRecoveryOrganizationPolicyService(apiClientOptions);
     this.accountRecoveryRequestService = new AccountRecoveryRequestService(apiClientOptions);
+    this.accountRecoveryUserService = new AccountRecoveryUserService(apiClientOptions);
   }
 
   /**
@@ -110,6 +113,33 @@ class AccountRecoveryModel {
     const newAccountRecoveryPolicy = new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
     const saveAccountRecoveryOrganizationPolicyDto = await this.accountRecoveryOrganizationPolicyService.saveOrganizationSettings(newAccountRecoveryPolicy.toDto(contains));
     return new AccountRecoveryOrganizationPolicyEntity(saveAccountRecoveryOrganizationPolicyDto);
+  }
+
+  /**
+   * Save the user account recovery setting using Passbolt API
+   *
+   * @param {AccountRecoveryUserSettingEntity} accountRecoveryUserSetting
+   * @param {string|null} userPasshphrase the user passphrase to decrypt private in case of the setting is "approved"
+   * @param {AccountRecoveryOrganizationPublicKeyEntity|null} accountRecoveryOrganizationPublicKeyEntity
+   */
+  async saveUserSetting(accountRecoveryUserSetting, userPasshphrase, accountRecoveryOrganizationPublicKeyEntity) {
+    if (accountRecoveryUserSetting.isRejected) {
+      this.accountRecoveryUserService.saveUserSetting(accountRecoveryUserSetting);
+      return;
+    }
+
+    const keyring = new Keyring();
+    const decryptedUserPrivateKey = await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(new PrivateGpgkeyEntity({
+      armored_key: keyring.findPrivate().key,
+      passphrase: userPasshphrase
+    }));
+
+    const accountRecoveryUserSettingEntity = await BuildAccountRecoveryUserSettingEntityService.build(
+      accountRecoveryUserSetting.toDto(),
+      accountRecoveryOrganizationPublicKeyEntity,
+      decryptedUserPrivateKey.armoredKey
+    );
+    this.accountRecoveryUserService.saveUserSetting(accountRecoveryUserSettingEntity);
   }
 
   /**

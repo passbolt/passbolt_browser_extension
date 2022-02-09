@@ -24,6 +24,9 @@ const {AccountRecoveryRequestsCollection} = require("../entity/accountRecovery/a
 const {AccountRecoveryRequestService} = require("../../service/api/accountRecovery/accountRecoveryRequestService");
 const {AccountRecoveryUserService} = require('../../service/api/accountRecovery/accountRecoveryUserService');
 const {BuildAccountRecoveryUserSettingEntityService} = require('../../service/accountRecovery/buildAccountRecoveryUserSettingEntityService');
+const {AccountRecoveryResponseService} = require("../../service/api/accountRecovery/accountRecoveryResponseService");
+const {AccountRecoveryRequestEntity} = require("../entity/accountRecovery/accountRecoveryRequestEntity");
+const {AccountRecoveryResponseEntity} = require("../entity/accountRecovery/accountRecoveryResponseEntity");
 /**
  * Model related to the account recovery
  */
@@ -38,6 +41,7 @@ class AccountRecoveryModel {
     this.accountRecoveryOrganizationPolicyService = new AccountRecoveryOrganizationPolicyService(apiClientOptions);
     this.accountRecoveryRequestService = new AccountRecoveryRequestService(apiClientOptions);
     this.accountRecoveryUserService = new AccountRecoveryUserService(apiClientOptions);
+    this.accountRecoveryResponseService = new AccountRecoveryResponseService(apiClientOptions);
   }
 
   /**
@@ -58,6 +62,16 @@ class AccountRecoveryModel {
   async findUserRequests(userId) {
     const accountRecoveryRequestsCollectionDto = await this.accountRecoveryRequestService.findByUser(userId);
     return new AccountRecoveryRequestsCollection(accountRecoveryRequestsCollectionDto);
+  }
+
+  /**
+   * Get request by id of an accountRecovery using Passbolt API
+   *
+   * @return {AccountRecoveryRequestEntity}
+   */
+  async findRequestById(id) {
+    const accountRecoveryRequestDto = await this.accountRecoveryRequestService.findById(id);
+    return new AccountRecoveryRequestEntity(accountRecoveryRequestDto);
   }
 
   /**
@@ -170,6 +184,16 @@ class AccountRecoveryModel {
     const keyHasChanged = newAccountRecoveryOrganizationPolicyEntity.armoredKey !== oldAccountRecoveryOrganizationPolicyEntity.armoredKey;
 
     return oldPolicyIsEnabled && (keyHasChanged || newPolicyIsDisabled);
+  }
+
+  /**
+   * Save the response for the review of an account recovery
+   *
+   * @param {AccountRecoveryResponseEntity} accountRecoveryResponseEntity
+   */
+  async saveReview(accountRecoveryResponseEntity) {
+    const accountRecoveryResponseDto = await this.accountRecoveryResponseService.saveReview(accountRecoveryResponseEntity.toDto());
+    return new AccountRecoveryResponseEntity(accountRecoveryResponseDto);
   }
 }
 

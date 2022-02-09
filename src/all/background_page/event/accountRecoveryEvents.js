@@ -20,6 +20,7 @@ const {AccountRecoveryGenerateKeyPairController} = require("../controller/accoun
 const fileController = require('../controller/fileController');
 const {AccountRecoveryModel} = require("../model/accountRecovery/accountRecoveryModel");
 const {AccountRecoverySaveUserSettingController} = require("../controller/accountRecovery/accountRecoverySaveUserSetting");
+const {AccountRecoveryResponseController} = require("../controller/accountRecovery/accountRecoveryResponseController");
 /**
  * Listens the account recovery events
  * @param worker
@@ -99,6 +100,19 @@ const listen = function(worker) {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AccountRecoverySaveUserSettingController(worker, requestId, apiClientOptions);
     return await controller.exec(accountRecoveryUserSettingDto, accountRecoveryOrganizationPublicKeyDto);
+  });
+
+  /** Whenever the admin review the account recovery request */
+  worker.port.on('passbolt.account-recovery.organization-review', async(requestId, accountRecoveryResponseDto, privateKeyDto) => {
+    try {
+      const apiClientOptions = await User.getInstance().getApiClientOptions();
+      const accountRecoveryResponseController = new AccountRecoveryResponseController(worker, apiClientOptions);
+      await accountRecoveryResponseController.saveReview(accountRecoveryResponseDto, privateKeyDto);
+      this.worker.port.emit(requestId, "SUCCESS");
+    } catch (error) {
+      console.error(error);
+      this.worker.port.emit(requestId, 'ERROR', error);
+    }
   });
 };
 

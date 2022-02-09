@@ -15,25 +15,23 @@ const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {AccountRecoveryPrivateKeyPasswordsCollection} = require("./accountRecoveryPrivateKeyPasswordsCollection");
 
-const ENTITY_NAME = 'AccountRecoveryRequest';
-const FINGERPRINT_LENGTH = 40;
-const STATUS_PENDING = "pending";
+const ENTITY_NAME = 'AccountRecoveryResponse';
 const STATUS_REJECTED = "rejected";
 const STATUS_APPROVED = "approved";
-const STATUS_COMPLETED = "completed";
+const RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY = "AccountRecoveryOrganizationKey";
 
-class AccountRecoveryRequestEntity extends Entity {
+class AccountRecoveryResponseEntity extends Entity {
   /**
-   * AccountRecoveryRequestEntity entity constructor
+   * AccountRecoveryResponseEntity entity constructor
    *
-   * @param {Object} accountRecoveryRequestDto account recovery request DTO
+   * @param {Object} accountRecoveryResponseDto account recovery Response DTO
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(accountRecoveryRequestDto) {
+  constructor(accountRecoveryResponseDto) {
     super(EntitySchema.validate(
-      AccountRecoveryRequestEntity.ENTITY_NAME,
-      accountRecoveryRequestDto,
-      AccountRecoveryRequestEntity.getSchema()
+      AccountRecoveryResponseEntity.ENTITY_NAME,
+      accountRecoveryResponseDto,
+      AccountRecoveryResponseEntity.getSchema()
     ));
 
     // Associations
@@ -44,48 +42,41 @@ class AccountRecoveryRequestEntity extends Entity {
   }
 
   /**
-   * Get resource entity schema
+   * Get entity schema
    * @returns {Object} schema
    */
   static getSchema() {
     return {
       "type": "object",
       "required": [
-        "id",
-        "authentication_token_id",
-        "status",
-        "created",
-        "created_by",
-        "modified",
-        "modified_by"
+        "account_recovery_request_id",
+        "responder_foreign_key",
+        "responder_foreign_model",
+        "status"
       ],
       "properties": {
         "id": {
           "type": "string",
           "format": "uuid"
         },
-        "user_id": {
+        "account_recovery_request_id": {
           "type": "string",
           "format": "uuid"
         },
-        "armored_key": {
-          "type": "string",
-        },
-        "fingerprint": {
-          "anyOf": [{
-            "type": "string",
-            "length": FINGERPRINT_LENGTH
-          }, {
-            "type": "null"
-          }]
-        },
-        "authentication_token_id": {
+        "responder_foreign_key": {
           "type": "string",
           "format": "uuid"
+        },
+        "responder_foreign_model": {
+          "type": "string",
+          "enum": [RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY]
+        },
+        "data": {
+          "type": "string",
         },
         "status": {
           "type": "string",
-          "enum": [STATUS_PENDING, STATUS_REJECTED, STATUS_APPROVED, STATUS_COMPLETED]
+          "enum": [STATUS_REJECTED, STATUS_APPROVED]
         },
         "created": {
           "type": "string",
@@ -159,7 +150,7 @@ class AccountRecoveryRequestEntity extends Entity {
    * @returns {*}
    */
   toJSON() {
-    return this.toDto(AccountRecoveryRequestEntity.ALL_CONTAIN_OPTIONS);
+    return this.toDto(AccountRecoveryResponseEntity.ALL_CONTAIN_OPTIONS);
   }
 
   /*
@@ -184,15 +175,7 @@ class AccountRecoveryRequestEntity extends Entity {
   }
 
   /**
-   * Get the armored key
-   * @returns {string} armored_key
-   */
-  get armoredKey() {
-    return this._props.armored_key;
-  }
-
-  /**
-   * AccountRecoveryRequestEntity.ALL_CONTAIN_OPTIONS
+   * AccountRecoveryResponseEntity.ALL_CONTAIN_OPTIONS
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
@@ -205,18 +188,29 @@ class AccountRecoveryRequestEntity extends Entity {
    * ==================================================
    */
   /**
-   * ResourceEntity.ENTITY_NAME
+   * AccountRecoveryResponseEntity.ENTITY_NAME
    * @returns {string}
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
   }
 
-  /*
-   * ==================================================
-   * Associated properties getters
-   * ==================================================
+  /**
+   * AccountRecoveryResponseEntity.STATUS_APPROVED
+   * @returns {string}
    */
+  static get STATUS_APPROVED() {
+    return STATUS_APPROVED;
+  }
+
+  /**
+   * AccountRecoveryResponseEntity.STATUS_REJECTED
+   * @returns {string}
+   */
+  static get STATUS_REJECTED() {
+    return STATUS_REJECTED;
+  }
+
   /**
    * Get the account recovery private key passwords
    * @returns {AccountRecoveryPrivateKeyPasswordsCollection || null} account_recovery_private_key_passwords
@@ -226,4 +220,4 @@ class AccountRecoveryRequestEntity extends Entity {
   }
 }
 
-exports.AccountRecoveryRequestEntity = AccountRecoveryRequestEntity;
+exports.AccountRecoveryResponseEntity = AccountRecoveryResponseEntity;

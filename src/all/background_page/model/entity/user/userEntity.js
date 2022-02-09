@@ -208,7 +208,7 @@ class UserEntity extends Entity {
       result.account_recovery_user_setting = this.accountRecoveryUserSetting.toDto();
     }
     if (this.pendingAccountRecoveryUserRequest && contain.pending_account_recovery_user_request) {
-      result.pending_account_recovery_user_request = this.pendingAccountRecoveryUserRequest.toDto();
+      result.pending_account_recovery_user_request = this.pendingAccountRecoveryUserRequest.toDto(AccountRecoveryRequestEntity.ALL_CONTAIN_OPTIONS);
     }
     return result;
   }

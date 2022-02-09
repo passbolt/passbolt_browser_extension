@@ -71,7 +71,7 @@ class AccountRecoveryPrivateKeyPasswordsCollection extends EntityCollection {
 
   /**
    * Get accountRecoveryPrivateKeyPasswords
-   * @returns {Array<ResourceEntity>}
+   * @returns {Array<AccountRecoveryPrivateKeyPasswordEntity>}
    */
   get accountRecoveryPrivateKeyPasswords() {
     return this._items;
@@ -172,6 +172,15 @@ class AccountRecoveryPrivateKeyPasswordsCollection extends EntityCollection {
     for (const i in accountRecoveryPrivateKeyPasswordIds) {
       this.remove(accountRecoveryPrivateKeyPasswordIds[i]);
     }
+  }
+
+  /**
+   * @param {string} foreignModel
+   * @returns {AccountRecoveryPrivateKeyPasswordEntity}
+   */
+  filterByForeignModel(foreignModel) {
+    const filterPrivateKeyPasswordByRecipientForeignModel = accountRecoveryPrivateKeyPassword => accountRecoveryPrivateKeyPassword.recipientForeignModel === foreignModel;
+    return this.items.find(filterPrivateKeyPasswordByRecipientForeignModel);
   }
 
   /*

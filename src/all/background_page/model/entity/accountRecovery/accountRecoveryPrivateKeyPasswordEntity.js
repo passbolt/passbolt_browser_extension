@@ -96,8 +96,16 @@ class AccountRecoveryPrivateKeyPasswordEntity extends Entity {
     return this._props.id || null;
   }
 
-  get recipient_foreign_key() {
+  get recipientForeignKey() {
     return this._props.recipient_foreign_key || null;
+  }
+
+  get data() {
+    return this._props.data;
+  }
+
+  get recipientForeignModel() {
+    return this._props.recipient_foreign_model;
   }
 
   /*

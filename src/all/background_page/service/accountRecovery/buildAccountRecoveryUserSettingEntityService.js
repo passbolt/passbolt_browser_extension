@@ -71,8 +71,7 @@ class BuildAccountRecoveryUserSettingEntityService {
     accountRecoveryUserSetting.accountRecoveryPrivateKey = new AccountRecoveryPrivateKeyEntity(accountRecoveryPrivateKeyDto);
 
     // Encrypt AES256 secret with organization recovery public key.
-    const organisationPublicKeys = (await openpgp.key.readArmored(accountRecoveryOrganizationPublicKey.armoredKey)).keys;
-    const userPrivateKeySecretEncrypted = await EncryptMessageService.encrypt(symmetricSecret, organisationPublicKeys, decryptedArmoredPrivateKey);
+    const userPrivateKeySecretEncrypted = await EncryptMessageService.encrypt(symmetricSecret, accountRecoveryOrganizationPublicKey.armoredKey, decryptedArmoredPrivateKey);
     const accountRecoveryPrivateKeyPasswordDto = {
       data: userPrivateKeySecretEncrypted.data,
       recipient_foreign_model: AccountRecoveryPrivateKeyPasswordEntity.FOREIGN_MODEL_ORGANIZATION_KEY

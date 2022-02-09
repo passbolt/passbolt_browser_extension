@@ -61,7 +61,7 @@ describe("AccountRecoveryRequest entity", () => {
     expect(entity.accountRecoveryPrivateKeyPasswords).not.toBe(null);
     expect(entity.accountRecoveryPrivateKeyPasswords.length).toEqual(1);
 
-    const dtoWithContain = entity.toDto({user: true, account_recovery_private_key_passwords: true, account_recovery_request_responses: true});
+    const dtoWithContain = entity.toDto({account_recovery_private_key_passwords: true});
     expect(dtoWithContain.account_recovery_private_key_passwords[0].recipient_foreign_key).toEqual('10801423-4151-42a4-99d1-86e66145a08c');
   });
 

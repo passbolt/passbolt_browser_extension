@@ -23,7 +23,7 @@ class EncryptMessageService {
   static async encryptSymmetrically(message, passwords, signingKeys) {
     signingKeys = await this._assertPrivateKeys(signingKeys);
 
-    return await openpgp.encrypt({
+    return openpgp.encrypt({
       message: openpgp.message.fromText(message),
       passwords: passwords,
       privateKeys: signingKeys
@@ -34,11 +34,12 @@ class EncryptMessageService {
    * Encrypt and sign text message.
    *
    * @param {string} message The message to encrypt.
-   * @param {openpgp.key.Key} encryptionKeys The public key(s) to use to encrypt the message
+   * @param {openpgp.key.Key|string} encryptionKeys The public key(s) to use to encrypt the message
    * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} signingKeys The private key(s) to use to sign the message.
    * @returns {Promise<*>}
    */
   static async encrypt(message, encryptionKeys, signingKeys) {
+    encryptionKeys = await this._assertPublicKeys(encryptionKeys);
     signingKeys = await this._assertPrivateKeys(signingKeys);
 
     return openpgp.encrypt({
@@ -80,6 +81,26 @@ class EncryptMessageService {
     }
 
     return privateKeys;
+  }
+
+  /**
+   * Assert the public key(s).
+   * - Should be a valid armored key or valid openpgp key.
+   *
+   * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} publicKeys The private key(s) to assert.
+   * @returns {array<openpgp.key.Key>|openpgp.key.Key}
+   * @private
+   */
+  static async _assertPublicKeys(publicKeys) {
+    if (typeof publicKeys === "string") {
+      try {
+        publicKeys = (await openpgp.key.readArmored(publicKeys)).keys;
+      } catch (error) {
+        throw new Error("The public key is not a valid armored key");
+      }
+    }
+
+    return publicKeys;
   }
 }
 

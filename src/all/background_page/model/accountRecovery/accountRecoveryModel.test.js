@@ -38,6 +38,10 @@ jest.mock("../../service/api/accountRecovery/accountRecoveryRequestService", () 
   AccountRecoveryRequestService: jest.fn().mockImplementation(() => {})
 }));
 
+jest.mock("../../service/api/accountRecovery/accountRecoveryResponseService", () => ({
+  AccountRecoveryResponseService: jest.fn().mockImplementation(() => {})
+}));
+
 const mockedSaveUserSetting = jest.fn();
 jest.mock("../../service/api/accountRecovery/accountRecoveryUserService", () => ({
   AccountRecoveryUserService: jest.fn().mockImplementation(() => ({

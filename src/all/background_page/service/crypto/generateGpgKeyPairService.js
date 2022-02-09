@@ -12,21 +12,20 @@
  * @since         3.5.0
  */
 
-const {GenerateGpgKeyPairEntity} = require('../../model/entity/gpgkey/generate/generateGpgKeyPairEntity');
 const {ExternalGpgKeyPairEntity} = require('../../model/entity/gpgkey/external/externalGpgKeyPairEntity');
-const {ExternalGpgKeyEntity} = require('../../model/entity/gpgkey/external/externalGpgKeyEntity');
 
 class GenerateGpgKeyPairService {
   /**
-   * @param {ExternalGpgKeyEntity} key
+   * Generate a gpg key pair.
+   * @param {GenerateGpgKeyPairEntity} generateGpgKeyPairEntity The gpg generation parameter
+   * @return {ExternalGpgKeyPairEntity}
    */
-  static async generateKeyPair(generateGpgKeyPairDto) {
-    const generateGpgKeyPairEntity = new GenerateGpgKeyPairEntity(generateGpgKeyPairDto);
+  static async generateKeyPair(generateGpgKeyPairEntity) {
     const opengpgKeyPair = await openpgp.generateKey(generateGpgKeyPairEntity.toOpenPgpGenerateKeyDto());
 
     return new ExternalGpgKeyPairEntity({
-      public_key: new ExternalGpgKeyEntity({armored_key: opengpgKeyPair.publicKeyArmored}),
-      private_key: new ExternalGpgKeyEntity({armored_key: opengpgKeyPair.privateKeyArmored})
+      public_key: {armored_key: opengpgKeyPair.publicKeyArmored},
+      private_key: {armored_key: opengpgKeyPair.privateKeyArmored}
     });
   }
 }

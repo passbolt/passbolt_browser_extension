@@ -16,6 +16,8 @@ const Worker = require('../model/worker');
 const {SetRecoverLocaleController} = require("../controller/locale/setRecoverLocaleController");
 const {GetRecoverLocaleController} = require("../controller/locale/getRecoverLocaleController");
 const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
+const {RecoverInitiateAccountRecoveryRequestController} = require("../controller/recover/recoverInitiateAccountRecoveryRequestController");
+const {RecoverGenerateAccountRecoveryRequestKeyController} = require("../controller/recover/recoverGenerateAccountRecoveryRequestKeyController");
 
 const listen = function(worker) {
   /**
@@ -184,6 +186,30 @@ const listen = function(worker) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
+  });
+
+
+  /*
+   * Generate the account recover request key.
+   *
+   * @listens passbolt.recover.generate-account-recovery-request-key
+   * @param requestId {uuid} The request identifier
+   * @param generateGpgKeyPairDto {object} The key generation parameter
+   */
+  worker.port.on('passbolt.recover.generate-account-recovery-request-key', async(requestId, generateGpgKeyPairDto) => {
+    const controller = new RecoverGenerateAccountRecoveryRequestKeyController(worker, requestId, recoverController.setupEntity);
+    await controller._exec(generateGpgKeyPairDto);
+  });
+
+  /*
+   * Create account recovery request.
+   *
+   * @listens passbolt.recover.initiate-account-recovery-request
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.recover.initiate-account-recovery-request', async requestId => {
+    const controller = new RecoverInitiateAccountRecoveryRequestController(worker, requestId, recoverController.setupEntity);
+    await controller._exec();
   });
 };
 exports.listen = listen;

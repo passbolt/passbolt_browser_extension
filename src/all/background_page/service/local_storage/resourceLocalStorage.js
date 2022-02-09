@@ -46,7 +46,7 @@ class ResourceLocalStorage {
 
   /**
    * Set the resources in local storage.
-   * @param {ResourcesCollection} resourcesCollection The folders to insert in the local storage.
+   * @param {ResourcesCollection} resourcesCollection The resources to insert in the local storage.
    * @return {void}
    */
   static async set(resourcesCollection) {

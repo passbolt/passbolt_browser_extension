@@ -1,6 +1,7 @@
 /**
  * Based on https://thecodebarbarian.com/mutual-exclusion-patterns-with-node-promises
  * @copyright Valeri Karpov
+ * @deprecated see setImmediate MDN warning https://developer.mozilla.org/en-US/docs/Web/API/Window/setImmediate
  */
 const {EventEmitter} = require('events');
 

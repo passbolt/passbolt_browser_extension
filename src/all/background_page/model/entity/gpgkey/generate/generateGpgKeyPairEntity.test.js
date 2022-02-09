@@ -31,7 +31,7 @@ describe("GenerateGpgKeyPair entity", () => {
     const dto = {
       name: "Jean-Jacky",
       email: "jj@passbolt.com",
-      password: "ultra-secure",
+      passphrase: "ultra-secure",
       keySize: 4096
     };
     const entity = new GenerateGpgKeyPairEntity(dto);
@@ -43,7 +43,7 @@ describe("GenerateGpgKeyPair entity", () => {
       const dto = {
         name: "",
         email: "@passbolt.com",
-        password: "",
+        passphrase: "",
         keySize: 128
       };
       new GenerateGpgKeyPairEntity(dto);
@@ -51,7 +51,7 @@ describe("GenerateGpgKeyPair entity", () => {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('name', 'minLength')).toBe(true);
       expect(error.hasError('email', 'custom')).toBe(true);
-      expect(error.hasError('password', 'minLength')).toBe(true);
+      expect(error.hasError('passphrase', 'minLength')).toBe(true);
       expect(error.hasError('keySize', 'enum')).toBe(true);
     }
   });

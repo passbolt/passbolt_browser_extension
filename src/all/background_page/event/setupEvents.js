@@ -121,11 +121,11 @@ const listen = function(worker) {
    *
    * @listens passbolt.setup.generate-key
    * @param requestId {uuid} The request identifier
-   * @param passphrase {string} The passphrase used to generate the key
+   * @param generateGpgKeyDto {object} The key generation parameter
    */
-  worker.port.on('passbolt.setup.generate-key', async(requestId, passphrase) => {
+  worker.port.on('passbolt.setup.generate-key', async(requestId, generateGpgKeyDto) => {
     try {
-      await setupController.generateKey(passphrase);
+      await setupController.generateKey(generateGpgKeyDto);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);

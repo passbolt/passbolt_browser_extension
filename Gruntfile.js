@@ -47,7 +47,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-browserify');
-  grunt.loadNpmTasks('grunt-eslint');
   grunt.loadNpmTasks('i18next-scanner');
 
   grunt.registerTask('default', ['bundle']);
@@ -57,7 +56,7 @@ module.exports = function (grunt) {
   grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle', 'browserify:vendors']);
   grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle', 'browserify:vendors']);
 
-  grunt.registerTask('build', ['eslint', 'test', 'build-firefox', 'build-chrome']);
+  grunt.registerTask('build', ['shell:eslint', 'test', 'build-firefox', 'build-chrome']);
 
   grunt.registerTask('build-firefox', ['build-firefox-debug', 'build-firefox-prod']);
   grunt.registerTask('build-firefox-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-firefox', 'shell:build_webpack_apps_debug', 'shell:build_firefox_debug']);
@@ -81,22 +80,6 @@ module.exports = function (grunt) {
     */
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-
-    /**
-     * Eslint.
-     */
-    eslint: {
-      options: {
-        maxWarnings: 1,
-        overrideConfigFile: '.eslintrc.json',
-        cache: true,
-        fix: grunt.option('fix'),
-        reportUnusedDisableDirectives: "error"
-      },
-      target: [
-        'src/all/**/*.js'
-      ]
-    },
 
     /**
      * Browserify is a tool to package CommonJS Javascript code for use in the browser.
@@ -324,6 +307,12 @@ module.exports = function (grunt) {
           'webpack --env debug=true --config webpack-data.in-form-menu.config.js',
           'webpack --env debug=true --config webpack-data.clipboard.config.js',
           'webpack --env debug=true --config webpack-data.download.config.js'
+        ].join(' && ')
+      },
+      // Execute the eslint command
+      eslint: {
+        command: [
+          'npm run eslint'
         ].join(' && ')
       },
 

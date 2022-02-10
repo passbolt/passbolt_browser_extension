@@ -32,24 +32,23 @@
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",
+    "@babel/eslint-parser": "^7.17.0",
     "@babel/plugin-transform-runtime": "^7.16.4",
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-react": "^7.16.0",
-    "babel-eslint": "^10.1.0",
     "babel-jest": "^27.4.0",
     "babel-loader": "^8.2.3",
     "crx": "^5.0.1",
-    "eslint": "^6.6.0",
+    "eslint": "^8.8.0",
     "eslint-plugin-import": "^2.25.3",
-    "eslint-plugin-jest": "^23.0.4",
-    "eslint-plugin-no-unsanitized": "^3.2.0",
+    "eslint-plugin-jest": "^26.1.0",
+    "eslint-plugin-no-unsanitized": "^4.0.1",
     "eslint-plugin-react": "^7.27.1",
     "grunt": "^1.0.3",
     "grunt-browserify": "^6.0.0",
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-watch": "^1.1.0",
-    "grunt-eslint": "^24.0.0",
     "grunt-shell": "^3.0.1",
     "i18next-scanner": "github:passbolt/i18next-scanner#master",
     "jest": "^27.2.4",
@@ -72,7 +71,7 @@
     "build-data": "webpack --config webpack-data.config.js",
     "test": "grunt test",
     "test-coverage": "grunt test-coverage",
-    "eslint": "grunt eslint",
-    "eslint-fix": "grunt eslint --fix"
+    "eslint": "eslint -c .eslintrc.json --ext js --ext jsx src",
+    "eslint-fix": "eslint -c .eslintrc.json --ext js --ext jsx --fix src"
   }
 }

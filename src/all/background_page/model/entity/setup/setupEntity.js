@@ -190,7 +190,6 @@ class SetupEntity extends Entity {
   }
 
   toGenerateGpgKeyDto(generateGpgKeyDto) {
-
     return {
       length: GenerateGpgKeyEntity.DEFAULT_LENGTH,
       ...generateGpgKeyDto,

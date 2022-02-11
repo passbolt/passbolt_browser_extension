@@ -13,6 +13,9 @@ const {BadSignatureMessageGpgKeyError} = require("../../error/badSignatureMessag
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+
+const {assertPrivateKeys, assertPublicKeys, assertMessage} = require("../../utils/openpgp/openpgpAssertions");
+
 class DecryptMessageService {
   /**
    * Decrypt a text message with signature.
@@ -23,9 +26,9 @@ class DecryptMessageService {
    * @returns {Promise<*>}
    */
   static async decrypt(message, decryptionKeys, signingKeys) {
-    decryptionKeys = await this._assertPrivateKeys(decryptionKeys);
-    signingKeys = await this._assertKeys(signingKeys);
-    message = await this._readMessage(message);
+    decryptionKeys = await assertPrivateKeys(decryptionKeys);
+    signingKeys = await assertPublicKeys(signingKeys);
+    message = await assertMessage(message);
 
     const decryptedMessage = await openpgp.decrypt({
       message: message,
@@ -37,81 +40,6 @@ class DecryptMessageService {
       throw new BadSignatureMessageGpgKeyError('Bad signing keys.');
     }
     return decryptedMessage;
-  }
-
-
-
-  /**
-   * Assert the private key(s).
-   * - Should be a valid armored key or valid openpgp key.
-   * - Should be private.
-   * - Should be decrypted.
-   *
-   * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} privateKeys The private key(s) to assert.
-   * @returns {array<openpgp.key.Key>|openpgp.key.Key}
-   * @private
-   */
-  static async _assertPrivateKeys(privateKeys) {
-    if (Array.isArray(privateKeys)) {
-      return privateKeys.map(decryptionKey => this._assertPrivateKeys(decryptionKey));
-    }
-
-    if (typeof privateKeys === "string") {
-      try {
-        privateKeys = (await openpgp.key.readArmored(privateKeys)).keys[0];
-      } catch (error) {
-        throw new Error("The private key is not a valid armored key");
-      }
-    }
-
-    if (!privateKeys.isPrivate()) {
-      throw new Error("The private key is not a valid private key.");
-    }
-
-    if (!privateKeys.isDecrypted()) {
-      throw new Error("The private key is not decrypted.");
-    }
-
-    return privateKeys;
-  }
-
-  /**
-   * Assert key(s).
-   * - Should be a valid armored key or valid openpgp key.
-   *
-   * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} keys The key(s) to assert.
-   * @returns {array<openpgp.key.Key>|openpgp.key.Key}
-   * @private
-   */
-  static async _assertKeys(keys) {
-    if (typeof keys === "string") {
-      try {
-        keys = (await openpgp.key.readArmored(keys)).keys;
-      } catch (error) {
-        throw new Error("The public key is not a valid armored key");
-      }
-    }
-
-    return keys;
-  }
-
-  /**
-   * Read the message.
-   * - Should be a valid message.
-   *
-   * @param {string} message The message to read.
-   * @returns {*}
-   * @private
-   */
-  static async _readMessage(message) {
-    if (typeof message === "string") {
-      try {
-        message = await openpgp.message.readArmored(message);
-        return message;
-      } catch (error) {
-        throw new Error("The message is not a valid cleartext signed message");
-      }
-    }
   }
 
   /**

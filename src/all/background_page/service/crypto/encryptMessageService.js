@@ -11,6 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+
+const {assertPrivateKeys, assertPublicKeys} = require("../../utils/openpgp/openpgpAssertions");
 class EncryptMessageService {
   /**
    * Encrypt symmetrically a message
@@ -21,7 +23,7 @@ class EncryptMessageService {
    * @returns {Promise<openpgp.Message>}
    */
   static async encryptSymmetrically(message, passwords, signingKeys) {
-    signingKeys = await this._assertPrivateKeys(signingKeys);
+    signingKeys = await assertPrivateKeys(signingKeys);
 
     return openpgp.encrypt({
       message: openpgp.message.fromText(message),
@@ -39,68 +41,14 @@ class EncryptMessageService {
    * @returns {Promise<*>}
    */
   static async encrypt(message, encryptionKeys, signingKeys) {
-    encryptionKeys = await this._assertPublicKeys(encryptionKeys);
-    signingKeys = await this._assertPrivateKeys(signingKeys);
+    encryptionKeys = await assertPublicKeys(encryptionKeys);
+    signingKeys = await assertPrivateKeys(signingKeys);
 
     return openpgp.encrypt({
       message: openpgp.message.fromText(message),
       publicKeys: encryptionKeys,
       privateKeys: signingKeys
     });
-  }
-
-  /**
-   * Assert the private key(s).
-   * - Should be a valid armored key or valid openpgp key.
-   * - Should be private.
-   * - Should be decrypted.
-   *
-   * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} privateKeys The private key(s) to assert.
-   * @returns {array<openpgp.key.Key>|openpgp.key.Key}
-   * @private
-   */
-  static async _assertPrivateKeys(privateKeys) {
-    if (Array.isArray(privateKeys)) {
-      return privateKeys.map(signingKey => this._assertPrivateKeys(signingKey));
-    }
-
-    if (typeof privateKeys === "string") {
-      try {
-        privateKeys = (await openpgp.key.readArmored(privateKeys)).keys[0];
-      } catch (error) {
-        throw new Error("The private key is not a valid armored key");
-      }
-    }
-
-    if (!privateKeys.isPrivate()) {
-      throw new Error("The private key is not a valid private key.");
-    }
-
-    if (!privateKeys.isDecrypted()) {
-      throw new Error("The private key is not decrypted.");
-    }
-
-    return privateKeys;
-  }
-
-  /**
-   * Assert the public key(s).
-   * - Should be a valid armored key or valid openpgp key.
-   *
-   * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} publicKeys The private key(s) to assert.
-   * @returns {array<openpgp.key.Key>|openpgp.key.Key}
-   * @private
-   */
-  static async _assertPublicKeys(publicKeys) {
-    if (typeof publicKeys === "string") {
-      try {
-        publicKeys = (await openpgp.key.readArmored(publicKeys)).keys;
-      } catch (error) {
-        throw new Error("The public key is not a valid armored key");
-      }
-    }
-
-    return publicKeys;
   }
 }
 

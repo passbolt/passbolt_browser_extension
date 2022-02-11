@@ -20,9 +20,10 @@ class RevokeGpgKeyService {
    * @param {ExternalGpgKeyEntity} gpgKeyToRevoke
    */
   static async revoke(gpgKeyToRevoke) {
-    const key = (await openpgp.key.readArmored(gpgKeyToRevoke.armoredKey)).keys[0];
-    const revokedKey = await key.revoke();
-    const keyInfo = await GpgKeyInfoService.getKeyInfoFromOpenGpgKey(revokedKey);
+    const {publicKey} = await openpgp.revokeKey({
+      key: (await openpgp.key.readArmored(gpgKeyToRevoke.armoredKey)).keys[0]
+    });
+    const keyInfo = await GpgKeyInfoService.getKeyInfoFromOpenGpgKey(publicKey);
     return new ExternalGpgKeyEntity(keyInfo);
   }
 }

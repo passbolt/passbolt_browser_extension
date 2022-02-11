@@ -30,16 +30,19 @@ beforeEach(() => {
 
 describe("RevokeGpgKey service", () => {
   it("should generate a revoked public key given a decrypted private key", async() => {
-    expect.assertions(2);
+    expect.assertions(4);
 
     const bettyPrivateGpgKey = (await openpgp.key.readArmored(bettyPrivateKey)).keys[0];
     await bettyPrivateGpgKey.decrypt("betty@passbolt.com");
 
     const validPublicKey = bettyPrivateGpgKey.toPublic();
     const publicKeyInfo = await GpgKeyInfoService.getKeyInfo(new ExternalGpgKeyEntity({armored_key: validPublicKey.armor()}));
+    expect(publicKeyInfo.private).toBe(false);
     expect(publicKeyInfo.revoked).toBe(false);
 
     const revokedPublicKey = await RevokeGpgKeyService.revoke(new ExternalGpgKeyEntity({armored_key: bettyPrivateGpgKey.armor()}));
-    expect(revokedPublicKey.revoked).toBe(true);
+    const revokedKeyInfo =  await GpgKeyInfoService.getKeyInfo(revokedPublicKey);
+    expect(revokedKeyInfo.private).toBe(false);
+    expect(revokedKeyInfo.revoked).toBe(true);
   });
 });

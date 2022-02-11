@@ -11,11 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.5.0
  */
+const {i18n} = require('../../sdk/i18n');
 const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
 const {AccountRecoveryOrganizationPolicyEntity} = require("../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity");
 const {PrivateGpgkeyEntity} = require("../../model/entity/gpgkey/privateGpgkeyEntity");
 const PassphraseController = require("../../controller/passphrase/passphraseController");
-
+const {ProgressService} = require("../../service/progress/progressService");
+const {Keyring} = require("../../model/keyring");
+const {SaveAccountRecoveryOrganizationSettingsScenario} = require('../../scenarios/accountRecovery/saveAccountRecoveryOrganizationSettingsScenario');
 /**
  * Controller related to the account recovery save settings
  */
@@ -29,23 +32,31 @@ class AccountRecoverySaveOrganizationSettingsController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
+    const accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
+    const progressService = new ProgressService(this.worker, i18n.t("Rekeying users' key"));
+    this.saveAccountRecoveryOrganizationSettingsScenario = new SaveAccountRecoveryOrganizationSettingsScenario(progressService, accountRecoveryModel);
   }
 
   /**
    * Request the save organization settings of the account recovery
-   * @param accountRecoveryOrganizationPolicyDto The account recovery organization policy
-   * @param oldAccountRecoveryOrganisationPolicyDto the current account recovery organization policy
+   * @param newAccountRecoveryOrganizationPolicyDto The new account recovery organization policy settings
+   * @param currentAccountRecoveryOrganisationPolicyDto the current account recovery organization policy settings
    * @param privateKeyDto the current private ORK with its passphrase
    */
-  async exec(accountRecoveryOrganizationPolicyDto, oldAccountRecoveryOrganisationPolicyDto, privateKeyDto) {
+  async exec(newAccountRecoveryOrganizationPolicyDto, currentAccountRecoveryOrganisationPolicyDto, privateKeyDto) {
     try {
-      const adminPassphrase = await PassphraseController.request(this.worker);
-      const accountRecoveryOrganizationPolicyEntity = new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
-      const oldAccountRecoveryOrganizationPolicyEntity = oldAccountRecoveryOrganisationPolicyDto ? new AccountRecoveryOrganizationPolicyEntity(oldAccountRecoveryOrganisationPolicyDto) : null;
-      const privateKeyEntity = privateKeyDto ? new PrivateGpgkeyEntity(privateKeyDto) : null;
+      const administratorPassphrase = await PassphraseController.request(this.worker);
+      const newAccountRecoveryOrganizationPolicyEntity = new AccountRecoveryOrganizationPolicyEntity(newAccountRecoveryOrganizationPolicyDto);
+      const currentAccountRecoveryOrganizationPolicyEntity = new AccountRecoveryOrganizationPolicyEntity(currentAccountRecoveryOrganisationPolicyDto);
+      const administratorPrivateKeyEntity = new PrivateGpgkeyEntity({
+        armored_key: (new Keyring()).findPrivate().key,
+        passphrase: administratorPassphrase
+      });
+      const privateORKEntity = privateKeyDto ? new PrivateGpgkeyEntity(privateKeyDto) : null;
 
-      await this.accountRecoveryModel.saveOrganizationSettings(accountRecoveryOrganizationPolicyEntity, oldAccountRecoveryOrganizationPolicyEntity, privateKeyEntity, adminPassphrase);
+      await this.saveAccountRecoveryOrganizationSettingsScenario
+        .run(newAccountRecoveryOrganizationPolicyEntity, currentAccountRecoveryOrganizationPolicyEntity, administratorPrivateKeyEntity, privateORKEntity);
+
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
@@ -53,6 +64,5 @@ class AccountRecoverySaveOrganizationSettingsController {
     }
   }
 }
-
 
 exports.AccountRecoverySaveOrganizationSettingsController = AccountRecoverySaveOrganizationSettingsController;

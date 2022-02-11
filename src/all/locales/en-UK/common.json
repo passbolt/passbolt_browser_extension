@@ -42,6 +42,7 @@
   "Preparing...": "Preparing...",
   "Private key not found.": "Private key not found.",
   "Public key not found.": "Public key not found.",
+  "Rekeying users' key": "",
   "Saving permissions...": "Saving permissions...",
   "Saving resource": "Saving resource",
   "Server internal error. Check with your administrator.": "Server internal error. Check with your administrator.",
@@ -66,5 +67,6 @@
   "Updating group": "Updating group",
   "Updating group ...": "Updating group ...",
   "Updating password": "Updating password",
-  "Updating resource": "Updating resource"
+  "Updating resource": "Updating resource",
+  "Updating users' key...": ""
 }

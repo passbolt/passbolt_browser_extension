@@ -16,6 +16,7 @@ const {EntitySchema} = require('../abstract/entitySchema');
 const {AccountRecoveryOrganizationPublicKeyEntity} = require("./accountRecoveryOrganizationPublicKeyEntity");
 const {EntityValidationError} = require("../abstract/entityValidationError");
 const {UserEntity} = require("../user/userEntity");
+const {AccountRecoveryPrivateKeyPasswordsCollection} = require('./accountRecoveryPrivateKeyPasswordsCollection');
 
 const ENTITY_NAME = "AccountRecoveryOrganizationPolicy";
 const POLICY_DISABLED = "disabled";
@@ -48,6 +49,10 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
     if (this._props.account_recovery_organization_revoked_key) {
       this._account_recovery_organization_revoked_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_revoked_key);
       delete this._props.account_recovery_organization_revoked_key;
+    }
+    if (this._props.account_recovery_private_key_passwords) {
+      this._account_recovery_private_key_passwords = new AccountRecoveryPrivateKeyPasswordsCollection(this._props.account_recovery_private_key_passwords);
+      delete this._props.account_recovery_private_key_passwords;
     }
     if (this._props.creator) {
       this._creator = new UserEntity(this._props.creator);
@@ -101,6 +106,7 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
         },
         "account_recovery_organization_public_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
         "account_recovery_organization_revoked_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
+        "account_recovery_private_key_passwords": AccountRecoveryPrivateKeyPasswordsCollection.getSchema(),
         "creator": UserEntity.getSchema(),
       }
     };
@@ -127,6 +133,9 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
     }
     if (this._account_recovery_organization_revoked_key && contain.account_recovery_organization_revoked_key) {
       result.account_recovery_organization_revoked_key = this._account_recovery_organization_revoked_key.toDto();
+    }
+    if (this._account_recovery_private_key_passwords && contain.account_recovery_private_key_passwords) {
+      result.account_recovery_private_key_passwords = this._account_recovery_private_key_passwords.toDto();
     }
     if (this._creator && contain.creator) {
       result.creator = this._creator.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
@@ -269,6 +278,18 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
    */
   static get POLICY_OPT_OUT() {
     return POLICY_OPT_OUT;
+  }
+
+  /**
+   * AccountRecoveryOrganizationPolicyEntity.ALL_CONTAIN_OPTIONS
+   * @returns {object} all contain options that can be used in toDto()
+   */
+  static get ALL_CONTAIN_OPTIONS() {
+    return {
+      account_recovery_organization_public_key: true,
+      account_recovery_organization_revoked_key: true,
+      account_recovery_private_key_passwords: true
+    };
   }
 }
 

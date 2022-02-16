@@ -17,8 +17,9 @@ const {ExternalGpgKeyPairEntity} = require('../../model/entity/gpgkey/external/e
 class GenerateGpgKeyPairService {
   /**
    * Generate a gpg key pair.
+   *
    * @param {GenerateGpgKeyPairEntity} generateGpgKeyPairEntity The gpg generation parameter
-   * @return {ExternalGpgKeyPairEntity}
+   * @return {Promise<ExternalGpgKeyPairEntity>}
    */
   static async generateKeyPair(generateGpgKeyPairEntity) {
     const opengpgKeyPair = await openpgp.generateKey(generateGpgKeyPairEntity.toOpenPgpGenerateKeyDto());

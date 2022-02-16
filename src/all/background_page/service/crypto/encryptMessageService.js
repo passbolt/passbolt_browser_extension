@@ -38,7 +38,7 @@ class EncryptMessageService {
    * @param {string} message The message to encrypt.
    * @param {openpgp.key.Key|string} encryptionKeys The public key(s) to use to encrypt the message
    * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} signingKeys The private key(s) to use to sign the message.
-   * @returns {Promise<*>}
+   * @returns {Promise<openpgp.Message>}
    */
   static async encrypt(message, encryptionKeys, signingKeys) {
     encryptionKeys = await assertPublicKeys(encryptionKeys);

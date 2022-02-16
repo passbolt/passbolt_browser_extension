@@ -17,8 +17,11 @@ const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
 
 class DecryptPrivateKeyService {
   /**
+   * Decrypt a private key with the given passphrase.
+   *
    * @param {PrivateGpgkeyEntity} privateKey
    * @return {Promise<ExternalGpgKeyEntity>}
+   * @throws {InvalidMasterPasswordError} if the key cannot be decrypted with the passphrase
    */
   static async decryptPrivateGpgKeyEntity(privateGpgKeyEntity) {
     const privateKey = await this.decrypt(privateGpgKeyEntity.armoredKey, privateGpgKeyEntity.passphrase);
@@ -27,10 +30,12 @@ class DecryptPrivateKeyService {
   }
 
   /**
+   * Decrypt a private key with the given passphrase.
    *
    * @param {string} armoredKey
    * @param {string} passphrase
-   * @returns {Promise<*>}
+   * @returns {Promise<openpgp.key.Key>}
+   * @throws {InvalidMasterPasswordError} if the key cannot be decrypted with the passphrase
    */
   static async decrypt(armoredKey, passphrase) {
     const privateKey = (await openpgp.key.readArmored(armoredKey)).keys[0];

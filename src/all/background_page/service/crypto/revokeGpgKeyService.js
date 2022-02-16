@@ -16,7 +16,10 @@ const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
 
 class RevokeGpgKeyService {
   /**
-   * @param {Promise<ExternalGpgKeyEntity>} gpgKeyToRevoke
+   * Get a revoked public key from a given decrypted private key.
+   *
+   * @param {ExternalGpgKeyEntity>} gpgKeyToRevoke
+   * @param {Promise<ExternalGpgKeyEntity>}
    */
   static async revoke(gpgKeyToRevoke) {
     const {publicKey} = await openpgp.revokeKey({

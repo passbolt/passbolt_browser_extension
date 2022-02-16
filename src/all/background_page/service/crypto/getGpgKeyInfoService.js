@@ -21,7 +21,7 @@ class GetGpgKeyInfoService {
    * Returns the information of the given key.
    *
    * @param {ExternalGpgKeyEntity|openpgp.key.Key|string} key The key to get the info from.
-   * @return {ExternalGpgKeyEntity}
+   * @return {Promise<ExternalGpgKeyEntity>}
    */
   static async getKeyInfo(key) {
     const readKey = await this._readOpenPgpKey(key);
@@ -32,7 +32,8 @@ class GetGpgKeyInfoService {
    * Read an openpgp key from different supported format.
    *
    * @param {ExternalGpgKeyEntity|openpgp.key.Key|string} key The key to read.
-   * @return {openpgp.key.Key}
+   * @return {Promise<openpgp.key.Key>}
+   * @private
    */
   static async _readOpenPgpKey(key) {
     if (key instanceof openpgp.key.Key) {
@@ -74,6 +75,7 @@ class GetGpgKeyInfoService {
    *
    * @param {openpgp.key.Key} key The key to get info from.
    * @returns {Promise<ExternalGpgKeyEntity>}
+   * @private
    */
   static async _keyInfo(key) {
     // Check the userIds
@@ -122,6 +124,12 @@ class GetGpgKeyInfoService {
     return new ExternalGpgKeyEntity(externalGpgKeyDto);
   }
 
+  /**
+   * Format the name of an openpgp's lib algorithm name to an internal one.
+   *
+   * @param {string} algorithmName
+   * @returns {string}
+   */
   static formatAlgorithm(algorithmName) {
     switch (algorithmName) {
       case "rsa_encrypt_sign":

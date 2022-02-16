@@ -16,6 +16,7 @@ const Worker = require('../model/worker');
 const {SetSetupLocaleController} = require("../controller/locale/setSetupLocaleController");
 const {GetSetupLocaleController} = require("../controller/locale/getSetupLocaleController");
 const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
+const {VerifyPassphraseSetupController} = require("../controller/setup/verifyPassphraseSetupController");
 
 const listen = function(worker) {
   /**
@@ -208,13 +209,8 @@ const listen = function(worker) {
    * @param rememberUntilLogout {boolean} The passphrase should be remembered until the user is logged out
    */
   worker.port.on('passbolt.setup.verify-passphrase', async(requestId, passphrase, rememberUntilLogout) => {
-    try {
-      await setupController.verifyPassphrase(passphrase, rememberUntilLogout);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new VerifyPassphraseSetupController(worker, requestId, setupController.setupEntity);
+    await controller._exec(passphrase, rememberUntilLogout);
   });
 
   /*

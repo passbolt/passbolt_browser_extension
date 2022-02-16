@@ -14,7 +14,6 @@ const {i18n} = require('../../sdk/i18n');
 const app = require("../../app");
 const {ApiClientOptions} = require("../../service/api/apiClient/apiClientOptions");
 const {GpgKeyError} = require("../../error/GpgKeyError");
-const {InvalidMasterPasswordError} = require("../../error/invalidMasterPasswordError");
 const {AccountModel} = require("../../model/account/accountModel");
 const {SetupModel} = require("../../model/setup/setupModel");
 const {AuthModel} = require("../../model/auth/authModel");
@@ -110,26 +109,6 @@ class RecoverController {
     } catch (error) {
       // @todo Handle not controlled errors, such as timeout error...
       throw new GpgKeyError(i18n.t('This key does not match any account.'));
-    }
-  }
-
-  /**
-   * Verify the imported key passphrase
-   * @param {string} passphrase The passphrase
-   * @param {boolean?} rememberUntilLogout (Optional) The passphrase should be remembered until the user is logged out
-   * @returns {Promise<void>}
-   */
-  async verifyPassphrase(passphrase, rememberUntilLogout) {
-    const privateKey = (await openpgp.key.readArmored(this.setupEntity.userPrivateArmoredKey)).keys[0];
-    try {
-      await privateKey.decrypt(passphrase);
-    } catch (error) {
-      throw new InvalidMasterPasswordError();
-    }
-    // Store the user passphrase to login in after the setup operation.
-    this.setupEntity.passphrase = passphrase;
-    if (rememberUntilLogout) {
-      this.setupEntity.rememberUntilLogout = rememberUntilLogout;
     }
   }
 

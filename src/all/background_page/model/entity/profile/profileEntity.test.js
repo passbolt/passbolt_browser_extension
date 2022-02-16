@@ -14,13 +14,6 @@
 import {ProfileEntity} from "./profileEntity";
 import {EntitySchema} from "../abstract/entitySchema";
 import {EntityValidationError} from '../abstract/entityValidationError';
-import Validator from 'validator';
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Profile entity", () => {
   it("schema must validate", () => {

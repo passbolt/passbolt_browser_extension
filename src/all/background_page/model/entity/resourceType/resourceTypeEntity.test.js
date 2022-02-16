@@ -14,13 +14,6 @@
 import {EntityValidationError} from "../abstract/entityValidationError";
 import {EntitySchema} from "../abstract/entitySchema";
 import {ResourceTypeEntity} from "./resourceTypeEntity";
-import Validator from 'validator';
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Resource Type entity", () => {
   it("schema must validate", () => {

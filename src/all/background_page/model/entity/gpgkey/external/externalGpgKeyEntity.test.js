@@ -11,17 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.5.0
  */
-import Validator from 'validator';
 import {ExternalGpgKeyEntity} from "./externalGpgKeyEntity";
 import {ExternalGpgKeyEntityFixtures} from "./externalGpgKeyEntity.test.fixtures";
 import {EntitySchema} from "../../abstract/entitySchema";
 import {EntityValidationError} from '../../abstract/entityValidationError';
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("ExternalGpgKey entity", () => {
   it("schema must validate", () => {

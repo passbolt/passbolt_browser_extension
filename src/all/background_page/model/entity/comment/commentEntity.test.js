@@ -14,13 +14,6 @@
 import {CommentEntity} from "./commentEntity";
 import {EntityValidationError} from "../abstract/entityValidationError";
 import {EntitySchema} from "../abstract/entitySchema";
-import Validator from 'validator';
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 const minimalDto = {
   "user_id": "a58de6d3-f52c-5080-b79b-a601a647ac85",

@@ -12,23 +12,11 @@
  * @since         3.6.0
  */
 
-const openpgp = require("openpgp/dist/openpgp");
-import textEncoding from 'text-encoding-utf-8';
-import Validator from "validator";
 import {v4 as uuidv4} from "uuid";
 import {Worker} from "../../sdk/worker";
 import {RecoverGenerateAccountRecoveryRequestKeyController} from "./recoverGenerateAccountRecoveryRequestKeyController";
 import {SetupEntity} from "../../model/entity/setup/setupEntity";
 import {step0SetupRequestInitializedDto} from "../../model/entity/setup/SetupEntity.test.data";
-
-// Required to use openpgpjs with jest.
-global.TextEncoder = textEncoding.TextEncoder;
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator; // Required by Account entity schema validation
-  window.openpgp = openpgp; // Required by Uuid.get to generate uuid
-});
 
 describe("RecoverGenerateAccountRecoveryRequestKeyController", () => {
   describe("RecoverGenerateAccountRecoveryRequestKeyController::exec", () => {

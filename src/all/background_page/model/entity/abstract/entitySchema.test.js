@@ -13,13 +13,6 @@
  */
 import {EntitySchema} from "./entitySchema";
 import {EntityValidationError} from './entityValidationError';
-import Validator from 'validator';
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Entity schema", () => {
   // Fixtures

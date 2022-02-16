@@ -13,14 +13,7 @@
  */
 import {SubscriptionEntity} from "./subscriptionEntity";
 import {EntitySchema} from "../abstract/entitySchema";
-import Validator from 'validator';
 import {EntityValidationError} from "../abstract/entityValidationError";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Subscription entity", () => {
   it("schema must validate", () => {

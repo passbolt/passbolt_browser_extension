@@ -15,13 +15,6 @@ import {UserEntity} from "./userEntity";
 import {UserEntityTestFixtures} from "./userEntity.test.fixtures";
 import {EntitySchema} from "../abstract/entitySchema";
 import {EntityValidationError} from '../abstract/entityValidationError';
-import Validator from 'validator';
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("User entity", () => {
   it("schema must validate", () => {

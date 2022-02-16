@@ -1,5 +1,3 @@
-import textEncoding from "text-encoding-utf-8";
-
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,19 +12,8 @@ import textEncoding from "text-encoding-utf-8";
  * @since         3.3.0
  */
 
-const openpgp = require('openpgp/dist/openpgp');
-import Validator from "validator";
 import {BuildAccountRecoveryUserSettingEntityService} from "./buildAccountRecoveryUserSettingEntityService";
 import {AccountRecoveryOrganizationPublicKeyEntity} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPublicKeyEntity";
-
-// Mandatory to exploit openpgpjs in the test.
-global.TextEncoder = textEncoding.TextEncoder;
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  window.openpgp = openpgp;
-});
 
 describe("BuildAccountRecoveryUserSettingEntityService service", () => {
   it("Build account recovery user setting entity with rejected status", async() => {

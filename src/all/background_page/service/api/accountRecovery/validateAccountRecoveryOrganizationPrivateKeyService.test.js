@@ -11,23 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.5.0
  */
-const openpgp = require('openpgp/dist/openpgp');
-const textEncoding = require('text-encoding-utf-8');
 
-import Validator from "validator";
 import {dummyData} from "./validateAccountRecoveryOrganizationPrivateKeyService.test.data";
 import {ValidateAccountRecoveryOrganizationPrivateKeyService} from "./validateAccountRecoveryOrganizationPrivateKeyService";
 import {AccountRecoveryOrganizationPolicyEntity} from "../../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
 import {PrivateGpgkeyEntity} from "../../../model/entity/gpgkey/privateGpgkeyEntity";
-global.TextEncoder = textEncoding.TextEncoder;
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.openpgp = openpgp;
-  window.Validator = Validator;
-
-  jest.resetModules();
-});
 
 function getValidatePromise(keyPair) {
   const accountRecoveryOrganisationPolicyEntity = new AccountRecoveryOrganizationPolicyEntity(keyPair.publicKey);

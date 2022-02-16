@@ -11,16 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Validator from 'validator';
 import {EntitySchema} from "../../abstract/entitySchema";
 import {EntityValidationError} from '../../abstract/entityValidationError';
 import {GenerateGpgKeyPairEntity} from "./generateGpgKeyPairEntity";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("GenerateGpgKeyPair entity", () => {
   it("schema must validate", () => {

@@ -11,16 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.4
  */
-import Validator from 'validator';
 import {EntitySchema} from "../abstract/entitySchema";
 import {GroupsCollection} from "./groupsCollection";
 import {EntityCollectionError} from "../abstract/entityCollectionError";
-
-// Reset the modules before each resource1.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Groups collection", () => {
   it("schema must validate", () => {

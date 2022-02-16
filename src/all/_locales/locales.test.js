@@ -11,14 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.5.0
  */
-import Validator from 'validator';
 import fs from "fs";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Locales", () => {
   it("Extension name and description have the right size.", async() => {

@@ -15,14 +15,8 @@ import {ResourcesCollection} from "./resourcesCollection";
 import {TagEntity} from "../tag/tagEntity";
 import {EntityCollectionError} from "../abstract/entityCollectionError";
 import {EntitySchema} from "../abstract/entitySchema";
-import Validator from 'validator';
 import {TagsCollection} from "../tag/tagsCollection";
 
-// Reset the modules before each resource1.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Resources Collection", () => {
   it("schema must validate", () => {

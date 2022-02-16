@@ -11,17 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Validator from 'validator';
 import {FolderEntity} from "./folderEntity";
 import {EntityValidationError} from "../abstract/entityValidationError";
 import {EntitySchema} from "../abstract/entitySchema";
 import {PermissionEntity} from "../permission/permissionEntity";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Folder entity", () => {
   it("schema must validate", () => {

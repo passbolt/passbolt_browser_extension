@@ -11,17 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import Validator from 'validator';
 import {EntitySchema} from "../abstract/entitySchema";
 import {EntityValidationError} from "../abstract/entityValidationError";
 import {AccountRecoveryRequestEntity} from "./accountRecoveryRequestEntity";
 import {AccountRecoveryRequestEntityTestFixtures} from "./accountRecoveryRequestEntity.test.fixtures";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("AccountRecoveryRequest entity", () => {
   it("schema must validate", () => {

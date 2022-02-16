@@ -13,21 +13,14 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import Validator from "validator";
 import * as kdbxweb from "kdbxweb";
 import argon2 from "./argon2.test-lib";
-
 import {ResourcesKdbxExporter} from "./resourcesKdbxExporter";
 import {ExportResourcesFileEntity} from "../../entity/export/exportResourcesFileEntity";
 import fs from "fs";
 
-// Reset the modules before each test.
-beforeEach(() => {
-  global.Validator = Validator;
-  global.kdbxweb = kdbxweb;
-  kdbxweb.CryptoEngine.argon2 = argon2;
-  jest.resetModules();
-});
+global.kdbxweb = kdbxweb;
+kdbxweb.CryptoEngine.argon2 = argon2;
 
 describe("ResourcesKdbxExporter", () => {
   function buildImportResourceDto(num, data) {

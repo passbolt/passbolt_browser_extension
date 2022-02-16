@@ -14,13 +14,6 @@
 import {GpgkeyEntity} from "./gpgkeyEntity";
 import {GpgkeyEntityFixtures} from "./gpgkeyEntity.test.fixtures";
 import {EntitySchema} from "../abstract/entitySchema";
-import Validator from 'validator';
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Gpgkey entity", () => {
   it("schema must validate", () => {

@@ -14,13 +14,6 @@
 import {Entity} from "./entity";
 import {EntityCollection} from "./entityCollection";
 import {EntitySchema} from "./entitySchema";
-import Validator from 'validator';
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 /*
  * ===========================================

@@ -12,21 +12,12 @@
  * @since         3.6.0
  */
 
-window.Validator = require('validator');
-window.openpgp = require('openpgp/dist/openpgp');
-const textEncoding = require('text-encoding-utf-8');
 const {AccountRecoveryOrganizationPolicyEntityBuilder} = require("./accountRecoveryOrganizationPolicyEntityBuilder");
 const {AccountRecoveryOrganizationPolicyEntity} = require("./accountRecoveryOrganizationPolicyEntity");
 const {AccountRecoveryPrivateKeyPasswordsCollection} = require('./accountRecoveryPrivateKeyPasswordsCollection');
 const {data} = require('./accountRecoveryOrganizationPolicyEntityBuilder.test.data');
 
-global.TextEncoder = textEncoding.TextEncoder;
-
 describe("AccountRecoveryOrganizationPolicyEntity builder", () => {
-  beforeEach(() => {
-    jest.resetModules();
-  });
-
   it("should build an AccountRecoveryOrganizationPolicyEntity with the minimum information required", async() => {
     const currentOrganizationPolicy = new AccountRecoveryOrganizationPolicyEntity(data.policies.disabled);
     const newOrganizationPolicy = new AccountRecoveryOrganizationPolicyEntity(data.policies.disabled);

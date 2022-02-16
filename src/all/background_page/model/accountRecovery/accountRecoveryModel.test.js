@@ -45,13 +45,6 @@ jest.mock('../keyring', () => ({
 
 const apiClientOptions = (new ApiClientOptions()).setBaseUrl('https://test.passbolt.test/');
 
-// Reset the modules before each test.
-beforeEach(() => {
-  window.openpgp = openpgp;
-  window.Validator = Validator;
-  jest.resetModules();
-});
-
 describe("AccountRecovery model", () => {
   it('should update the user account recovery setting without signing keys if the user rejected the policy', async() => {
     expect.assertions(1);

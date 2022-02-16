@@ -1,5 +1,3 @@
-import textEncoding from "text-encoding-utf-8";
-
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,23 +12,16 @@ import textEncoding from "text-encoding-utf-8";
  * @since         3.6.0
  */
 
-const openpgp = require('openpgp/dist/openpgp');
-import Validator from "validator";
 import {SetAccountRecoveryUserSetting} from "./setAccountRecoveryUserSetting";
 import {SetupEntity} from "../../model/entity/setup/setupEntity";
 import {BuildAccountRecoveryUserSettingEntityService} from "../accountRecovery/buildAccountRecoveryUserSettingEntityService";
 import {AccountRecoveryUserSettingEntity} from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
-
-global.TextEncoder = textEncoding.TextEncoder;
 
 // const mock
 jest.mock("../../service/accountRecovery/buildAccountRecoveryUserSettingEntityService");
 
 // Reset the modules before each test.
 beforeEach(() => {
-  window.Validator = Validator;
-  window.openpgp = openpgp;
-  jest.resetModules();
   BuildAccountRecoveryUserSettingEntityService.build.mockImplementation(dto => new AccountRecoveryUserSettingEntity(dto));
 });
 

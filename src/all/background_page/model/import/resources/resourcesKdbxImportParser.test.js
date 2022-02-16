@@ -14,20 +14,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import fs from "fs";
-import Validator from "validator";
 import * as kdbxweb from "kdbxweb";
-
 import {ResourcesKdbxImportParser} from "./resourcesKdbxImportParser";
 import {ImportResourcesFileEntity} from "../../entity/import/importResourcesFileEntity";
 import {EntityValidationError} from "../../entity/abstract/entityValidationError";
 import {ImportError} from "../../../error/importError";
 
-// Reset the modules before each test.
-beforeEach(() => {
-  global.kdbxweb = kdbxweb;
-  global.Validator = Validator;
-  jest.resetModules();
-});
+global.kdbxweb = kdbxweb;
 
 describe("ResourcesKdbxImportParser", () => {
   it("should read import file", async() => {

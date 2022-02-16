@@ -13,15 +13,8 @@
  */
 import {PermissionChangesCollection} from "./permissionChangesCollection";
 import {EntitySchema} from "../../abstract/entitySchema";
-import Validator from 'validator';
 import {PermissionEntity} from "../permissionEntity";
 import {PermissionsCollection} from "../permissionsCollection";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("PermissionChangesCollection", () => {
   it("schema must validate", () => {

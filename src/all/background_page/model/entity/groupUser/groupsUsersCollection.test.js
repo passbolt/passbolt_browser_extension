@@ -14,13 +14,6 @@
 import {GroupsUsersCollection} from "./groupsUsersCollection";
 import {GroupsUsersCollectionTestFixtures} from "./groupsUsersCollection.test.fixtures";
 import {EntitySchema} from "../abstract/entitySchema";
-import Validator from 'validator';
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Groups users collection", () => {
   it("schema must validate", () => {

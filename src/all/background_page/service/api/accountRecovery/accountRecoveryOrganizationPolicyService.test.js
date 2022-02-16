@@ -11,14 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.5.0
  */
-const openpgp = require('openpgp/dist/openpgp');
-const textEncoding = require('text-encoding-utf-8');
-
-import Validator from "validator";
 import {AccountRecoveryOrganizationPolicyService} from "./accountRecoveryOrganizationPolicyService";
 import {dummyData} from "./accountRecoveryOrganizationPolicyService.test.data";
-
-global.TextEncoder = textEncoding.TextEncoder;
 
 jest.mock('../../../model/keyring', () => {
   const keyList = {
@@ -45,14 +39,6 @@ jest.mock('../../../model/gpgauth', () => {
       getServerKey: async() => serverKey
     }))
   };
-});
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.openpgp = openpgp;
-  window.Validator = Validator;
-
-  jest.resetModules();
 });
 
 function checkError(armored_key, errorMessage) {

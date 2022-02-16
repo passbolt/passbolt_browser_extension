@@ -18,6 +18,7 @@ const {GetRecoverLocaleController} = require("../controller/locale/getRecoverLoc
 const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
 const {RecoverInitiateAccountRecoveryRequestController} = require("../controller/recover/recoverInitiateAccountRecoveryRequestController");
 const {RecoverGenerateAccountRecoveryRequestKeyController} = require("../controller/recover/recoverGenerateAccountRecoveryRequestKeyController");
+const {VerifyPassphraseSetupController} = require("../controller/setup/verifyPassphraseSetupController");
 
 const listen = function(worker) {
   /**
@@ -146,13 +147,8 @@ const listen = function(worker) {
    * @param rememberUntilLogout {boolean} The passphrase should be remembered until the user is logged out
    */
   worker.port.on('passbolt.recover.verify-passphrase', async(requestId, passphrase, rememberUntilLogout) => {
-    try {
-      await recoverController.verifyPassphrase(passphrase, rememberUntilLogout);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new VerifyPassphraseSetupController(worker, requestId, recoverController.setupEntity);
+    await controller._exec(passphrase, rememberUntilLogout);
   });
 
   /*

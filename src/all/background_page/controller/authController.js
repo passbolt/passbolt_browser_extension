@@ -73,7 +73,7 @@ class AuthController {
       try {
         if (await this.authLegacy.serverKeyChanged()) {
           error = new ServerKeyChangedError(i18n.t('The server key has changed.'));
-        } else if (await this.authLegacy.isServerKeyExpired()) {
+        } else if (this.authLegacy.isServerKeyExpired()) {
           error = new KeyIsExpiredError(i18n.t('The server key is expired.'));
         }
       } catch (e) {

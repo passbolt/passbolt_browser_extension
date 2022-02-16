@@ -121,7 +121,7 @@ class GpgAuth {
    */
   async serverKeyChanged() {
     const remoteKey = await this.getServerKey();
-    const localKey = await this.getServerKeyFromKeyring();
+    const localKey = this.getServerKeyFromKeyring().armoredKey;
     return remoteKey.keydata.trim() !== localKey.trim();
   }
 
@@ -129,17 +129,17 @@ class GpgAuth {
    * Get Server key from keyring
    * @returns {Promise<*>}
    */
-  async getServerKeyFromKeyring() {
-    return await this.keyring.findPublic(Uuid.get(this.getDomain())).armoredKey;
+  getServerKeyFromKeyring() {
+    return this.keyring.findPublic(Uuid.get(this.getDomain()));
   }
 
   /**
    * isServerKeyExpired
    * @returns {Promise<boolean>}
    */
-  async isServerKeyExpired() {
-    const key = await this.getServerKeyFromKeyring();
-    return await this.keyring.keyIsExpired(key);
+  isServerKeyExpired() {
+    const key = this.getServerKeyFromKeyring();
+    return key.isExpired;
   }
 
   /**

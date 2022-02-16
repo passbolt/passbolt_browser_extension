@@ -14,13 +14,6 @@
 import {ExternalGpgKeyCollection} from "./externalGpgKeyCollection";
 import {ExternalGpgKeyEntityFixtures} from "./externalGpgKeyEntity.test.fixtures";
 import {EntitySchema} from "../../abstract/entitySchema";
-import Validator from 'validator';
-
-// Reset the modules before each resource1.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("ExternalGpgKey Collection", () => {
   it("schema must validate", () => {

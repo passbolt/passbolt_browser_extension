@@ -10,18 +10,11 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import Validator from 'validator';
 import {EntitySchema} from "../abstract/entitySchema";
 import {EntityValidationError} from '../abstract/entityValidationError';
 import {DefaultActionLogEntity} from "./defaultActionLogEntity";
 import {UpdatedPermissionEntity} from "../permission/actionLog/updatedPermissionEntity";
 const {DefaultActionLogEntityTestFixtures} = require('./defaultActionLogEntity.test.fixtures');
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Default action log entity", () => {
   function getDummyDefaultActionLogDto(changes) {

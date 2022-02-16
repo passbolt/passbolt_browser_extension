@@ -13,14 +13,8 @@
  */
 import {PermissionEntity} from "./permissionEntity";
 import {EntitySchema} from "../abstract/entitySchema";
-import Validator from 'validator';
 import {PermissionsCollection} from "./permissionsCollection";
 import {EntityCollectionError} from "../abstract/entityCollectionError";
-
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Permission Collection", () => {
   it("schema must validate", () => {

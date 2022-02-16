@@ -14,13 +14,6 @@
 import {CommentsCollection} from "./commentsCollection";
 import {EntityCollectionError} from "../abstract/entityCollectionError";
 import {EntitySchema} from "../abstract/entitySchema";
-import Validator from 'validator';
-
-// Reset the modules before each comment1.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Comment entity", () => {
   it("schema must validate", () => {

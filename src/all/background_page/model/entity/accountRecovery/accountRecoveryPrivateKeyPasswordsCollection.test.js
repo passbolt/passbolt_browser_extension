@@ -14,13 +14,6 @@
 import {AccountRecoveryPrivateKeyPasswordsCollection} from "./accountRecoveryPrivateKeyPasswordsCollection";
 import {EntityCollectionError} from "../abstract/entityCollectionError";
 import {EntitySchema} from "../abstract/entitySchema";
-import Validator from 'validator';
-
-// Reset the modules before each resource1.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("AccountRecoveryPrivateKeyPasswords Collection", () => {
   it("schema must validate", () => {

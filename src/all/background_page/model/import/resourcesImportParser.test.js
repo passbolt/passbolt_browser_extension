@@ -13,21 +13,14 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+global.PapaParse = require("papaparse");
 import fs from "fs";
-import Validator from "validator";
-import PapaParse from "papaparse";
 import * as kdbxweb from "kdbxweb";
 import {ResourcesImportParser} from "./resourcesImportParser";
 import {ImportResourcesFileEntity} from "../entity/import/importResourcesFileEntity";
 import {ResourcesCsvImportParser} from "./resources/resourcesCsvImportParser";
 
-// Reset the modules before each test.
-beforeEach(() => {
-  global.Validator = Validator;
-  global.PapaParse = PapaParse;
-  global.kdbxweb = kdbxweb;
-  jest.resetModules();
-});
+global.kdbxweb = kdbxweb;
 
 describe("ResourcesImportParser", () => {
   it("should be able to parse CSV file", async() => {

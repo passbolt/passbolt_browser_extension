@@ -10,22 +10,12 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import Validator from "validator";
-import PapaParse from "papaparse";
-
+window.PapaParse = require("papaparse");
 import {ResourcesCsvExporter} from "./resourcesCsvExporter";
 import {Csv1PasswordRowComposer} from "./csvRowComposer/csv1passwordRowComposer";
 import {CsvKdbxRowComposer} from "./csvRowComposer/csvKdbxRowComposer";
 import {CsvLastPassRowComposer} from "./csvRowComposer/csvLastPassRowComposer";
 import {ExportResourcesFileEntity} from "../../entity/export/exportResourcesFileEntity";
-
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  window.PapaParse = PapaParse;
-  jest.resetModules();
-});
 
 describe("ResourcesCsvExporter", () => {
   it("should be aware of the supported row parsers", () => {

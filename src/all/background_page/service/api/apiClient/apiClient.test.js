@@ -11,17 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+window.fetch = require('node-fetch');
 import {ApiClient} from "./apiClient";
 import {ApiClientOptions} from "./apiClientOptions";
-import fetch from 'node-fetch';
 import {PassboltServiceUnavailableError} from '../../../error/passboltServiceUnavailableError';
 
 const done = undefined;
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.fetch = fetch;
-});
 
 describe("Integration test with real fetch", () => {
   it("should throw an error if base url is missing", () => {

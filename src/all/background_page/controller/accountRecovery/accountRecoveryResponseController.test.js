@@ -12,25 +12,13 @@
  * @since         3.6.0
  */
 import {ApiClientOptions} from "../../service/api/apiClient/apiClientOptions";
-
-const openpgp = require("openpgp/dist/openpgp");
-import textEncoding from 'text-encoding-utf-8';
-import Validator from "validator";
 import {Worker} from "../../sdk/worker";
 import {AccountRecoveryResponseController} from "./accountRecoveryResponseController";
 
-// Required to use openpgpjs with jest.
-global.TextEncoder = textEncoding.TextEncoder;
 
 jest.mock("../passphrase/passphraseController.js", () => ({
   request: jest.fn().mockImplementation(() => {})
 }));
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator; // Required by Account entity schema validation
-  window.openpgp = openpgp; // Required by Uuid.get to generate uuid
-});
 
 describe("AccountRecoveryResponseController", () => {
   describe("AccountRecoveryResponseController::saveReview", () => {

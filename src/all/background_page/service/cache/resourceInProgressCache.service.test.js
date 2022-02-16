@@ -12,7 +12,6 @@
  * @since         3.3.0
  */
 import {ResourceInProgressCacheService} from "./resourceInProgressCache.service";
-import Validator from 'validator';
 const {ExternalResourceEntity} = require("../../model/entity/resource/external/externalResourceEntity");
 
 jest.useFakeTimers();
@@ -26,7 +25,6 @@ const fakeResourceDto = {
 
 // Reset the modules before each test.
 beforeEach(() => {
-  window.Validator = Validator;
   jest.resetModules();
   jest.clearAllMocks();
   jest.clearAllTimers();

@@ -13,11 +13,6 @@
  */
 import {GroupService} from "./groupService";
 
-// Reset the modules before each test.
-beforeEach(() => {
-  jest.resetModules();
-});
-
 describe("Group entity", () => {
   it('remap legacy contains', () => {
     const v1 = {

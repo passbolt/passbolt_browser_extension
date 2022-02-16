@@ -11,16 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-window.Validator = require('validator');
-window.openpgp = require('openpgp/dist/openpgp');
-const textEncoding = require('text-encoding-utf-8');
 import {AccountRecoveryOrganizationPolicyEntity} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
 import {SaveAccountRecoveryOrganizationSettingsScenario} from "./saveAccountRecoveryOrganizationSettingsScenario";
 import {PrivateGpgkeyEntity} from "../../model/entity/gpgkey/privateGpgkeyEntity";
 import {AccountRecoveryPrivateKeyPasswordsCollection} from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordsCollection";
 import {mockedData} from './saveAccountRecoveryOrganizationSettingsScenario.test.data';
-
-global.TextEncoder = textEncoding.TextEncoder;
 
 //This avoids an error to be displayed in the console when the progress manager is starting
 jest.mock('../../sdk/i18n', () => ({
@@ -28,11 +23,6 @@ jest.mock('../../sdk/i18n', () => ({
     t: a => a
   }
 }));
-
-// Reset the modules before each test.
-beforeEach(() => {
-  jest.resetModules();
-});
 
 describe("SaveAccountRecoveryOrganizationSettings scenarios", () => {
   const mockedProgressService = {

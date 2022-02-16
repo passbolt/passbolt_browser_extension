@@ -12,14 +12,7 @@
  * @since         3.0.0
  */
 import {UserDeleteTransferEntity} from "./userDeleteTransfer";
-import Validator from 'validator';
 import {EntityValidationError} from "../../abstract/entityValidationError";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("User delete transfer entity", () => {
   it("constructor works if valid minimal DTO is provided", () => {

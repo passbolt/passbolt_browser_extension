@@ -13,14 +13,7 @@
  */
 import {TagEntity} from "./tagEntity";
 import {EntitySchema} from "../abstract/entitySchema";
-import Validator from 'validator';
 import {EntityValidationError} from "../abstract/entityValidationError";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Tag entity", () => {
   it("schema must validate", () => {

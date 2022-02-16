@@ -12,13 +12,6 @@
  * @since         2.13.0
  */
 import {Entity} from "./entity";
-import Validator from 'validator';
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Entity", () => {
   it("works with it's own copy of the props and not keep reference", () => {

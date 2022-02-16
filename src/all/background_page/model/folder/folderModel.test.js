@@ -11,19 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Validator from "validator";
 import {FolderLocalStorage} from '../../service/local_storage/folderLocalStorage';
 import {ApiClientOptions} from "../../service/api/apiClient/apiClientOptions";
 import {FolderModel} from "./folderModel";
 
 // Mock storage
 jest.mock('../../service/local_storage/folderLocalStorage');
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("FolderModel",  () => {
   /*

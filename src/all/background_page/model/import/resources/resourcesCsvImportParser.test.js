@@ -10,8 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import Validator from "validator";
-import PapaParse from "papaparse";
+window.PapaParse = require("papaparse");
 import fs from "fs";
 
 import {FileFormatError} from "../../../error/fileFormatError";
@@ -26,13 +25,6 @@ import {ImportResourcesFileEntity} from "../../entity/import/importResourcesFile
 import {EntityValidationError} from "../../entity/abstract/entityValidationError";
 import {ImportError} from "../../../error/importError";
 import {BinaryConvert} from "../../../utils/format/binaryConvert";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  window.PapaParse = PapaParse;
-  jest.resetModules();
-});
 
 describe("ResourcesCsvImportParser", () => {
   it("should be aware of the supported row parsers", () => {

@@ -127,7 +127,7 @@ class GpgAuth {
 
   /**
    * Get Server key from keyring
-   * @returns {object}
+   * @returns {ExternalGpgKeyEntity}
    */
   getServerKeyFromKeyring() {
     return this.keyring.findPublic(Uuid.get(this.getDomain()));

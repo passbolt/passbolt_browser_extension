@@ -15,13 +15,6 @@ import {UsersCollection} from "./usersCollection";
 import {EntityCollectionError} from "../abstract/entityCollectionError";
 import {UsersCollectionTestFixtures} from "./usersCollection.test.fixtures";
 import {EntitySchema} from "../abstract/entitySchema";
-import Validator from 'validator';
-
-// Reset the modules before each user1.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("User entity", () => {
   it("schema must validate", () => {

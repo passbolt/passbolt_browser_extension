@@ -10,15 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import Validator from "validator";
 import {ExternalResourceEntity} from "../../../entity/resource/external/externalResourceEntity";
 import {CsvKdbxRowParser} from "./csvKdbxRowParser";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("CsvKdbxRowParser", () => {
   it("can parse kdbx csv", () => {

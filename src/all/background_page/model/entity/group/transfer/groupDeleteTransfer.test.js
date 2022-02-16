@@ -12,14 +12,7 @@
  * @since         3.0.0
  */
 import {GroupDeleteTransferEntity} from "./groupDeleteTransfer";
-import Validator from 'validator';
 import {EntityValidationError} from "../../abstract/entityValidationError";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Group delete transfer entity", () => {
   it("constructor works if valid minimal DTO is provided", () => {

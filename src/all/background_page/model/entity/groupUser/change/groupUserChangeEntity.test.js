@@ -10,15 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import Validator from 'validator';
 import {GroupUserChangeEntity} from "./groupUserChangeEntity";
 import {GroupUserEntity} from "../groupUserEntity";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Group user change entity", () => {
   it("constructor works if valid minimal DTO is provided", () => {

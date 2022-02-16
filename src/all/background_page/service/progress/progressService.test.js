@@ -15,10 +15,6 @@
 const {ProgressService} = require('./progressService');
 
 describe("AccountRecoveryOrganizationPolicyEntity builder", () => {
-  beforeEach(() => {
-    jest.resetModules();
-  });
-
   it("should emit the right events with the right information", async() => {
     const title = "Progress bar title";
     const goals = 3;

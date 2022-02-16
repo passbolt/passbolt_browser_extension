@@ -10,16 +10,9 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import Validator from 'validator';
 import {EntitySchema} from "../../abstract/entitySchema";
 import {EntityValidationError} from '../../abstract/entityValidationError';
 import {LoggedUserEntity} from "./loggedUserEntity";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Logged user entity", () => {
   it("schema must validate", () => {

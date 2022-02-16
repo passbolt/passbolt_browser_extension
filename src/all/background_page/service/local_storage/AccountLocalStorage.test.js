@@ -14,9 +14,7 @@
 
 import MockStorage from "../../sdk/storage.test.mock";
 
-const openpgp = require('openpgp/dist/openpgp');
-const XRegExp = require("xregexp");
-import Validator from 'validator';
+window.XRegExp = require("xregexp");
 import {v4 as uuidv4} from 'uuid';
 import {AccountLocalStorage} from "./accountLocalStorage";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
@@ -24,9 +22,6 @@ import {AccountEntity} from "../../model/entity/account/accountEntity";
 
 // Reset the modules before each test.
 beforeEach(() => {
-  window.XRegExp = XRegExp; // Required by Account entity schema validation
-  window.Validator = Validator; // Required by Account entity schema validation
-  window.openpgp = openpgp; // Required by Uuid.get to generate uuid
   window.browser = Object.assign({}, {storage: new MockStorage()}); // Required by local storage
 });
 

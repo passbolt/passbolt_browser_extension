@@ -12,7 +12,6 @@
  * @since         3.6.0
  */
 
-import Validator from "validator";
 import {v4 as uuidv4} from "uuid";
 import {enableFetchMocks} from 'jest-fetch-mock';
 import {Worker} from "../../sdk/worker";
@@ -26,9 +25,7 @@ import {
 } from "../../model/entity/setup/SetupEntity.test.data";
 import MockStorage from "../../sdk/storage.test.mock";
 
-// Reset the modules before each test.
 beforeEach(() => {
-  window.Validator = Validator; // Required by Account entity schema validation
   window.browser = Object.assign({}, {storage: new MockStorage()}); // Required by local storage
   enableFetchMocks();
 });

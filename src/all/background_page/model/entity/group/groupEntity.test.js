@@ -14,13 +14,6 @@
 import {GroupEntity} from "./groupEntity";
 import {GroupEntityTestFixtures} from "./groupEntity.test.fixtures";
 import {EntitySchema} from "../abstract/entitySchema";
-import Validator from 'validator';
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Group entity", () => {
   it("schema must validate", () => {

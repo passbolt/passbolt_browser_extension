@@ -10,15 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import Validator from "validator";
 import {CsvLastPassRowParser} from "./csvLastPassRowParser";
 import {ExternalResourceEntity} from "../../../entity/resource/external/externalResourceEntity";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("CsvLastPassRowParser", () => {
   it("can parse LastPass csv", () => {

@@ -14,13 +14,6 @@
 import {AccountRecoveryRequestsCollection} from "./accountRecoveryRequestsCollection";
 import {EntityCollectionError} from "../abstract/entityCollectionError";
 import {EntitySchema} from "../abstract/entitySchema";
-import Validator from 'validator';
-
-// Reset the modules before each resource1.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("AccountRecoveryRequest Collection", () => {
   it("schema must validate", () => {

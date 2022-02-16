@@ -11,15 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import Validator from 'validator';
 import {ApiClientOptions} from "../apiClient/apiClientOptions";
 import {AbstractService} from "./abstractService";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("Abstract service", () => {
   it("constructor works", () => {

@@ -12,14 +12,7 @@
  */
 import {EntitySchema} from "../abstract/entitySchema";
 import {EntityValidationError} from "../abstract/entityValidationError";
-import Validator from 'validator';
 import {SecurityTokenEntity} from "./securityTokenEntity";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.Validator = Validator;
-  jest.resetModules();
-});
 
 describe("SecurityToken entity", () => {
   it("schema must validate", () => {

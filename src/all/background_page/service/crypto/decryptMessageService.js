@@ -23,7 +23,8 @@ class DecryptMessageService {
    * @param {string} message The message to decrypt.
    * @param {openpgp.key.Key|string} decryptionKeys The private key(s) to use to decrypt the message
    * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} signingKeys The public key(s) to check the signature.
-   * @returns {Promise<*>}
+   * @returns {Promise<openpgp.Message>}
+   * @throws {BadSignatureMessageGpgKeyError} if the given signatures don't match the message to decrypt.
    */
   static async decrypt(message, decryptionKeys, signingKeys) {
     decryptionKeys = await assertPrivateKeys(decryptionKeys);

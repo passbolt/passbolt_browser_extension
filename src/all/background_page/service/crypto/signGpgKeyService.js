@@ -16,8 +16,11 @@ const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
 
 class SignGpgKeyService {
   /**
+   * Signs a key with the given collection of key.
+   *
    * @param {ExternalGpgKeyEntity} gpgKeyToSign
-   * @param {Promise<ExternalGpgKeyCollection>} gpgKeyCollection
+   * @param {ExternalGpgKeyCollection} gpgKeyCollection
+   * @returns {Promise<ExternalGpgKeyEntity>}
    */
   static async sign(gpgKeyToSign, gpgKeyCollection) {
     const keyToSign = (await openpgp.key.readArmored(gpgKeyToSign.armoredKey)).keys[0];

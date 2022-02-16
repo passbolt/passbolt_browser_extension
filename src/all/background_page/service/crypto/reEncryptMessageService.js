@@ -20,11 +20,11 @@ class ReEncryptMessageService {
   /**
    * Re-encrypt a given PGP Message with another key.
    *
-   * @param {string|openpgp.message} encryptedMessage
-   * @param {string|openpgp.key|Array<string|openpgp.key>} encryptionKeys
-   * @param {string|openpgp.key|Array<string|openpgp.key>} decryptionKeys
-   * @param {string|openpgp.key|Array<string|openpgp.key>} signingKeys
-   * @returns {Promise<openpgp.message>} armored re-encrypted message.
+   * @param {string|openpgp.Message} encryptedMessage
+   * @param {string|openpgp.key.Key|Array<string|openpgp.key.Key>} encryptionKeys
+   * @param {string|openpgp.key.Key|Array<string|openpgp.key.Key>} decryptionKeys
+   * @param {string|openpgp.key.Key|Array<string|openpgp.key.Key>} signingKeys
+   * @returns {Promise<openpgp.Message>} armored re-encrypted message.
    */
   static async reEncrypt(encryptedMessage, encryptionKeys, decryptionKeys, signingKeys) {
     encryptedMessage = await assertMessage(encryptedMessage);

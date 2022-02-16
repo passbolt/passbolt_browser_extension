@@ -127,7 +127,7 @@ class GpgAuth {
 
   /**
    * Get Server key from keyring
-   * @returns {Promise<*>}
+   * @returns {object}
    */
   getServerKeyFromKeyring() {
     return this.keyring.findPublic(Uuid.get(this.getDomain()));
@@ -135,7 +135,7 @@ class GpgAuth {
 
   /**
    * isServerKeyExpired
-   * @returns {Promise<boolean>}
+   * @returns {boolean}
    */
   isServerKeyExpired() {
     const key = this.getServerKeyFromKeyring();

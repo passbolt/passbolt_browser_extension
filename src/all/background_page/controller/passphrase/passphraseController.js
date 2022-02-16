@@ -11,6 +11,7 @@ const Keyring = require('../../model/keyring').Keyring;
 const User = require('../../model/user').User;
 const Worker = require('../../model/worker');
 const {UserAbortsOperationError} = require("../../error/userAbortsOperationError");
+const {DecryptPrivateKeyService} = require("../../service/crypto/decryptPrivateKeyService");
 
 /**
  * Get the user master password.
@@ -40,7 +41,7 @@ exports.get = get;
 const requestPassphrase = async function(worker) {
   const requestResult = await worker.port.request('passbolt.passphrase.request');
   const {passphrase, rememberMe} = requestResult;
-  validatePassphrase(passphrase, rememberMe);
+  await validatePassphrase(passphrase);
   rememberPassphrase(passphrase, rememberMe);
 
   return passphrase;
@@ -69,7 +70,7 @@ const requestPassphraseFromQuickAccess = async function() {
     ];
     const quickAccessWindow = await QuickAccessService.openInDetachedMode(queryParameters);
     const {passphrase, rememberMe} = await listenToDetachedQuickaccessPassphraseRequestResponse(requestId, quickAccessWindow);
-    validatePassphrase(passphrase, rememberMe);
+    await validatePassphrase(passphrase);
     rememberPassphrase(passphrase, rememberMe);
 
     return passphrase;
@@ -129,18 +130,16 @@ const rememberPassphrase = function(passphrase, duration) {
 /**
  * Validate the passphrase.
  * @param {string} passphrase The passphrase.
- * @param {integer|string} rememberMe (Optional) The duration in second to remember the passphrase for. If -1 given then it will.
- * @throw Error if the passphrase is not valid.
+ * @returns {Promise<void>}
+ * @throws {Error} Error if the passphrase is not a valid utf-8 string.
+ * @throws {InvalidMasterPasswordError} if the passphrase is not valid.
  */
-const validatePassphrase = function(passphrase, rememberMe) {
+const validatePassphrase = async function(passphrase) {
   if (!Validator.isUtf8(passphrase)) {
     throw new Error(i18n.t('The passphrase should be a valid UTF8 string.'));
   }
-  if (!(typeof rememberMe === 'boolean') && !Number.isInteger(rememberMe)) {
-    throw new Error(i18n.t('The remember me should be a valid integer.'));
-  }
 
   const keyring = new Keyring();
-  keyring.checkPassphrase(passphrase);
+  await DecryptPrivateKeyService.decrypt(keyring.findPrivate().armoredKey, passphrase);
 };
 

@@ -12,13 +12,12 @@
  * @since         3.5.0
  */
 
-const {ExternalGpgKeyEntity} = require("../../model/entity/gpgkey/external/externalGpgKeyEntity");
-const {GpgKeyInfoService} = require("./gpgKeyInfoService");
+const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
 
 class SignGpgKeyService {
   /**
    * @param {ExternalGpgKeyEntity} gpgKeyToSign
-   * @param {ExternalGpgKeyCollection} gpgKeyCollection
+   * @param {Promise<ExternalGpgKeyCollection>} gpgKeyCollection
    */
   static async sign(gpgKeyToSign, gpgKeyCollection) {
     const keyToSign = (await openpgp.key.readArmored(gpgKeyToSign.armoredKey)).keys[0];
@@ -29,8 +28,7 @@ class SignGpgKeyService {
     }
 
     const signedKey = await keyToSign.signAllUsers(signingKeys);
-    const keyInfo = await GpgKeyInfoService.getKeyInfoFromOpenGpgKey(signedKey);
-    return new ExternalGpgKeyEntity(keyInfo);
+    return await GetGpgKeyInfoService.getKeyInfo(signedKey);
   }
 }
 

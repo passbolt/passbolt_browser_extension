@@ -14,7 +14,7 @@
 const openpgp = require('openpgp/dist/openpgp');
 const textEncoding = require('text-encoding-utf-8');
 const {RevokeGpgKeyService} = require("./revokeGpgKeyService");
-const {GpgKeyInfoService} = require("./gpgKeyInfoService");
+const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
 import Validator from 'validator';
 import {ExternalGpgKeyEntity} from '../../model/entity/gpgkey/external/externalGpgKeyEntity';
 
@@ -36,12 +36,12 @@ describe("RevokeGpgKey service", () => {
     await bettyPrivateGpgKey.decrypt("betty@passbolt.com");
 
     const validPublicKey = bettyPrivateGpgKey.toPublic();
-    const publicKeyInfo = await GpgKeyInfoService.getKeyInfo(new ExternalGpgKeyEntity({armored_key: validPublicKey.armor()}));
+    const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(new ExternalGpgKeyEntity({armored_key: validPublicKey.armor()}));
     expect(publicKeyInfo.private).toBe(false);
     expect(publicKeyInfo.revoked).toBe(false);
 
     const revokedPublicKey = await RevokeGpgKeyService.revoke(new ExternalGpgKeyEntity({armored_key: bettyPrivateGpgKey.armor()}));
-    const revokedKeyInfo =  await GpgKeyInfoService.getKeyInfo(revokedPublicKey);
+    const revokedKeyInfo =  await GetGpgKeyInfoService.getKeyInfo(revokedPublicKey);
     expect(revokedKeyInfo.private).toBe(false);
     expect(revokedKeyInfo.revoked).toBe(true);
   });

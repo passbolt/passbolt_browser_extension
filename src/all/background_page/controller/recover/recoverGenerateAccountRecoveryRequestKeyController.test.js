@@ -81,6 +81,6 @@ describe("RecoverGenerateAccountRecoveryRequestKeyController", () => {
       expect(setupEntity.userPublicArmoredKey).not.toBeNull();
       expect(setupEntity.userPrivateArmoredKey).not.toBeNull();
       expect(setupEntity.userKeyFingerprint).not.toBeNull();
-    }, 10000);
+    }, 20000);
   });
 });

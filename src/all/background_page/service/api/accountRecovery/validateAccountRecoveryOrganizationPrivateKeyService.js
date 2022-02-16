@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.5.0
  */
-const {GpgKeyInfoService} = require("../../crypto/gpgKeyInfoService");
+const {GetGpgKeyInfoService} = require("../../crypto/getGpgKeyInfoService");
 const {DecryptPrivateKeyService} = require('../../crypto/decryptPrivateKeyService');
 const {WrongOrganizationRecoveryKeyError} = require('../../../error/wrongOrganizationRecoveryKeyError');
 
@@ -26,8 +26,8 @@ class ValidateAccountRecoveryOrganizationPrivateKeyService {
    * @throws {Error} if any of the checks are wrong
    */
   static async validate(accountRecoveryOrganisationPolicyEntity, privateKeyEntity) {
-    const publicKeyInfo = await GpgKeyInfoService.getKeyInfo(accountRecoveryOrganisationPolicyEntity);
-    const privateKeyInfo = await GpgKeyInfoService.getKeyInfo(privateKeyEntity);
+    const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountRecoveryOrganisationPolicyEntity.accountRecoveryOrganizationPublicKey.armoredKey);
+    const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKeyEntity.armoredKey);
 
     if (publicKeyInfo.fingerprint !== privateKeyInfo.fingerprint) {
       throw new WrongOrganizationRecoveryKeyError(`Error, this is not the current organization recovery key. Expected fingerprint: ${publicKeyInfo.fingerprint}`, publicKeyInfo.fingerprint);

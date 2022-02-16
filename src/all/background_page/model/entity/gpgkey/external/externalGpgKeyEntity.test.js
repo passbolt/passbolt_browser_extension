@@ -40,6 +40,21 @@ describe("ExternalGpgKey entity", () => {
     expect(entity.toDto()).toEqual(dto);
   });
 
+  it("constructor works if valid legacy full DTO is provided", () => {
+    const legacyDto = ExternalGpgKeyEntityFixtures.legacy_full_dto;
+    const entity = new ExternalGpgKeyEntity(legacyDto);
+    const sanitizedDto = {
+      ...legacyDto,
+      armored_key: legacyDto.key,
+      key_id: legacyDto.keyId,
+      user_ids: legacyDto.userIds
+    };
+    delete sanitizedDto.key;
+    delete sanitizedDto.keyId;
+    delete sanitizedDto.userIds;
+    expect(entity.toDto()).toEqual(sanitizedDto);
+  });
+
   it("constructor throws an exception if DTO is missing required field", () => {
     try {
       const dto = ExternalGpgKeyEntityFixtures.missing_required_field_dto;

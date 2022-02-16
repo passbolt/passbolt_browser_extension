@@ -12,7 +12,6 @@
  * @since         2.13.0
  */
 
-const {Keyring} = require('../../model/keyring');
 const {Crypto} = require('../../model/crypto');
 const {User} = require('../../model/user');
 
@@ -41,8 +40,7 @@ class ExportResourcesFileController {
     this.worker = worker;
 
     // Crypto
-    this.keyring = new Keyring();
-    this.crypto = new Crypto(this.keyring);
+    this.crypto = new Crypto();
 
     // Models
     this.resourceTypeModel = new ResourceTypeModel(clientOptions);

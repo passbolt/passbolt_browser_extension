@@ -12,11 +12,9 @@
  * @since         2.0.0
  */
 const Uuid = require('../utils/uuid');
-
-const {InvalidMasterPasswordError} = require('../error/invalidMasterPasswordError');
 const {UserSettings} = require('./userSettings/userSettings');
-
-const {goog} = require('../utils/format/emailaddress');
+const {GetGpgKeyInfoService} = require('../service/crypto/getGpgKeyInfoService');
+const {ExternalGpgKeyEntity} = require('./entity/gpgkey/external/externalGpgKeyEntity');
 
 /**
  * Constants
@@ -45,14 +43,14 @@ class Keyring {
    * Get a public key by its fingerprint.
    *
    * @param {string} userId uuid
-   * @returns {Key|undefined}
+   * @returns {ExternalGpgKeyEntity | undefined}
    */
   findPublic(userId) {
     let i;
     const publicKeys = this.getPublicKeysFromStorage();
     for (i in publicKeys) {
       if (Object.prototype.hasOwnProperty.call(publicKeys, i) && publicKeys[i].user_id === userId) {
-        return publicKeys[i];
+        return new ExternalGpgKeyEntity(publicKeys[i]);
       }
     }
     return undefined;
@@ -62,12 +60,12 @@ class Keyring {
    * Get a private key by its fingerprint.
    * We currently only support one private key per person
    *
-   * @returns {Key}
+   * @returns {ExternalGpgKeyEntity | undefined}
    */
   findPrivate() {
     const userId = Keyring.MY_KEY_ID;
     const privateKeys = this.getPrivateKeysFromStorage();
-    return privateKeys[userId];
+    return privateKeys[userId] ? new ExternalGpgKeyEntity(privateKeys[userId]) : undefined;
   }
 
   /*
@@ -114,7 +112,7 @@ class Keyring {
     }
 
     // Get the keyInfo.
-    const keyInfo = await this.keyInfo(armoredPublicKey);
+    const keyInfo = (await GetGpgKeyInfoService.getKeyInfo(armoredPublicKey)).toDto();
 
     // Add the key in the keyring.
     const publicKeys = this.getPublicKeysFromStorage();
@@ -157,7 +155,7 @@ class Keyring {
     }
 
     // Get the keyInfo.
-    const keyInfo = await this.keyInfo(armoredKey);
+    const keyInfo = (await GetGpgKeyInfoService.getKeyInfo(armoredKey)).toDto();
 
     // Add the key in the keyring
     const privateKeys = this.getPrivateKeysFromStorage();
@@ -222,71 +220,6 @@ class Keyring {
   }
 
   /**
-   * Get the key info.
-   *
-   * @param {string} armoredKey The key to examine
-   * @return {array}
-   * @throw Error if the key cannot be read by openpgp
-   */
-  async keyInfo(armoredKey) {
-    // Attempt to read armored key.
-    let key = await openpgp.key.readArmored(armoredKey);
-    if (key.err) {
-      throw new Error(key.err[0].message);
-    }
-    key = key.keys[0];
-
-    // Check the userIds
-    const userIds = key.getUserIds();
-    const userIdsSplited = [];
-    if (userIds.length === 0) {
-      throw new Error('No key user ID found');
-    }
-
-    for (const i in userIds) {
-      if (Object.prototype.hasOwnProperty.call(userIds, i)) {
-        const result = goog.format.EmailAddress.parse(userIds[i]);
-        userIdsSplited.push({
-          name: result.name_,
-          email: result.address_
-        });
-      }
-    }
-
-    // seems like opengpg keys id can be longer than 8 bytes (16 default?)
-    let keyid = key.primaryKey.getKeyId().toHex();
-    if (keyid.length > 8) {
-      keyid = keyid.substr(keyid.length - 8);
-    }
-
-    // Format expiration time
-    let expirationTime, created;
-    try {
-      expirationTime = await key.getExpirationTime();
-      expirationTime = expirationTime.toString();
-      if (expirationTime === 'Infinity') {
-        expirationTime = 'Never';
-      }
-      created = key.primaryKey.created.toString();
-    } catch (error) {
-      expirationTime = null;
-    }
-
-    return {
-      key: key.armor(),
-      keyId: keyid,
-      userIds: userIdsSplited,
-      fingerprint: key.primaryKey.getFingerprint(),
-      created: created,
-      expires: expirationTime,
-      algorithm: key.primaryKey.getAlgorithmInfo().algorithm,
-      length: key.primaryKey.getAlgorithmInfo().bits,
-      curve: key.primaryKey.getAlgorithmInfo().curve,
-      private: key.isPrivate()
-    };
-  }
-
-  /**
    * Extract a public armored key from a private armored key.
    *
    * @param {string} privateArmoredKey The private key armored
@@ -324,25 +257,6 @@ class Keyring {
     const now = Date.now();
 
     return expirationDate < now;
-  }
-
-  /**
-   * Check if the passphrase is valid for the user private key.
-   *
-   * @param {string} passphrase The key passphrase
-   * @returns {Promise}
-   * @todo move to Crypto
-   */
-  async checkPassphrase(passphrase) {
-    const privateKey = this.findPrivate();
-    const privKeyObj = (await openpgp.key.readArmored(privateKey.key)).keys[0];
-    if (!privKeyObj.isDecrypted()) {
-      try {
-        await privKeyObj.decrypt(passphrase);
-      } catch (error) {
-        throw new InvalidMasterPasswordError();
-      }
-    }
   }
 
   /*

@@ -15,6 +15,7 @@ const {User} = require('../model/user');
 const {Keyring} = require('../model/keyring');
 const Config = require('../model/config');
 const {UserAlreadyLoggedInError} = require("../error/userAlreadyLoggedInError");
+const {CheckPassphraseController} = require('../controller/crypto/checkPassphraseController');
 
 const listen = function(worker) {
   /*
@@ -149,14 +150,8 @@ const listen = function(worker) {
    * @param passphrase {string} The passphrase to verify
    */
   worker.port.on('passbolt.auth.verify-passphrase', async(requestId, passphrase) => {
-    const keyring = new Keyring();
-    try {
-      await keyring.checkPassphrase(passphrase);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new CheckPassphraseController(worker, requestId);
+    await controller._exec(passphrase);
   });
 
   /*

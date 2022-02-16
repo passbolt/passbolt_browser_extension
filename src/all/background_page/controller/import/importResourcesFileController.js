@@ -10,7 +10,6 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {Keyring} = require('../../model/keyring');
 const {Crypto} = require('../../model/crypto');
 const {User} = require('../../model/user');
 
@@ -43,8 +42,7 @@ class ImportResourcesFileController {
     this.worker = worker;
 
     // Crypto
-    this.keyring = new Keyring();
-    this.crypto = new Crypto(this.keyring);
+    this.crypto = new Crypto();
 
     // Models
     this.resourceTypeModel = new ResourceTypeModel(clientOptions);

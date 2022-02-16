@@ -7,12 +7,11 @@
  */
 const {i18n} = require('../sdk/i18n');
 const {Keyring} = require('../model/keyring');
-const {User} = require('../model/user');
-const Uuid = require('../utils/uuid');
 const keyring = new Keyring();
 const passphraseController = require('../controller/passphrase/passphraseController');
-
 const fileController = require('../controller/fileController');
+const {GetUserKeyInfoController} = require('../controller/crypto/getUserKeyInfoController');
+const {CheckPassphraseController} = require('../controller/crypto/checkPassphraseController');
 
 const listen = function(worker) {
   /*
@@ -29,46 +28,8 @@ const listen = function(worker) {
    * @param userId {string} The user identifier
    */
   worker.port.on('passbolt.keyring.get-public-key-info-by-user', async(requestId, userId) => {
-    let key = keyring.findPublic(userId);
-    // If the key is not in the keyring, try to sync the keyring and try again
-    if (!key) {
-      await keyring.sync();
-      key = keyring.findPublic(userId);
-    }
-
-    if (key) {
-      const keyInfo = await keyring.keyInfo(key.key);
-      worker.port.emit(requestId, 'SUCCESS', keyInfo);
-    } else {
-      worker.port.emit(requestId, 'ERROR', i18n.t('Key not found'));
-    }
-  });
-
-  /*
-   * Get the server's public key.
-   *
-   * @listens passbolt.keyring.server.get
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.keyring.server.get', requestId => {
-    let user, domain;
-
-    try {
-      user = User.getInstance();
-      domain = user.settings.getDomain();
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error.message);
-      return;
-    }
-
-    const serverkeyid = Uuid.get(domain);
-    const serverkey = keyring.findPublic(serverkeyid);
-
-    if (typeof serverkey !== 'undefined') {
-      worker.port.emit(requestId, 'SUCCESS', serverkey);
-    } else {
-      worker.port.emit(requestId, 'ERROR');
-    }
+    const controller = new GetUserKeyInfoController(worker, requestId);
+    await controller._exec(userId);
   });
 
   /*
@@ -85,12 +46,8 @@ const listen = function(worker) {
    * @param passphrase {string} The passphrase to check
    */
   worker.port.on('passbolt.keyring.private.checkpassphrase', async(requestId, passphrase) => {
-    try {
-      await keyring.checkPassphrase(passphrase);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new CheckPassphraseController(worker, requestId);
+    await controller._exec(passphrase);
   });
 
   /*
@@ -111,7 +68,7 @@ const listen = function(worker) {
     try {
       const privateKeyInfo = await keyring.findPrivate();
       if (privateKeyInfo) {
-        publicKeyArmored = await keyring.extractPublicKey(privateKeyInfo.key);
+        publicKeyArmored = await keyring.extractPublicKey(privateKeyInfo.armoredKey);
       }
       if (!publicKeyArmored) {
         throw new Error(i18n.t('Public key not found.'));
@@ -137,7 +94,7 @@ const listen = function(worker) {
       if (!privateKeyInfo) {
         throw new Error(i18n.t('Private key not found.'));
       }
-      await fileController.saveFile(filename, privateKeyInfo.key, "text/plain", worker.tab.id);
+      await fileController.saveFile(filename, privateKeyInfo.armoredKey, "text/plain", worker.tab.id);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
@@ -153,11 +110,11 @@ const listen = function(worker) {
   worker.port.on('passbolt.keyring.get-private-key', async requestId => {
     try {
       await passphraseController.request(worker);
-      const privateKeyInfo = await keyring.findPrivate();
+      const privateKeyInfo = keyring.findPrivate();
       if (!privateKeyInfo) {
         throw new Error('Private key not found.');
       }
-      worker.port.emit(requestId, 'SUCCESS', privateKeyInfo.key);
+      worker.port.emit(requestId, 'SUCCESS', privateKeyInfo.armoredKey);
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }

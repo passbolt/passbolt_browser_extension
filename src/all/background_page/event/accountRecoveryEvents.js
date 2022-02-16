@@ -15,7 +15,7 @@ const {AccountRecoverySaveOrganizationSettingsController} = require("../controll
 const {ValidatePrivateOrganizationAccountRecoveryKeyController} = require("../controller/accountRecovery/validatePrivateOrganizationAccountRecoveryKeyController");
 const {ExternalGpgKeyEntity} = require("../model/entity/gpgkey/external/externalGpgKeyEntity");
 const {User} = require('../model/user');
-const {GpgKeyInfoService} = require("../service/crypto/gpgKeyInfoService");
+const {GetGpgKeyInfoService} = require("../service/crypto/getGpgKeyInfoService");
 const {AccountRecoveryGenerateKeyPairController} = require("../controller/accountRecovery/accountRecoveryGenerateKeyPairController");
 const fileController = require('../controller/fileController');
 const {AccountRecoveryModel} = require("../model/accountRecovery/accountRecoveryModel");
@@ -53,8 +53,7 @@ const listen = function(worker) {
 
   worker.port.on('passbolt.account-recovery.get-organization-key-details', async(requestId, accountRecoveryOrganizationPublicKeyDto) => {
     try {
-      const keyEntity = new ExternalGpgKeyEntity(accountRecoveryOrganizationPublicKeyDto);
-      const keyInfo = await GpgKeyInfoService.getKeyInfo(keyEntity);
+      const keyInfo = await GetGpgKeyInfoService.getKeyInfo(accountRecoveryOrganizationPublicKeyDto.armored_key);
       worker.port.emit(requestId, 'SUCCESS', new ExternalGpgKeyEntity(keyInfo));
     } catch (error) {
       console.error(error);

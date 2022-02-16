@@ -17,7 +17,6 @@ const {AuthStatusLocalStorage} = require("../../service/local_storage/authStatus
 const {GpgAuth} = require("../gpgauth");
 const {AuthService} = require("../../service/api/auth/authService");
 const {User} = require("../user");
-const {Keyring} = require("../keyring");
 const {Crypto} = require("../crypto");
 
 class AuthModel {
@@ -29,9 +28,8 @@ class AuthModel {
    */
   constructor(apiClientOptions) {
     this.authService = new AuthService(apiClientOptions);
-    const keyring = new Keyring();
-    this.crypto = new Crypto(keyring);
-    this.legacyAuthModel = new GpgAuth(keyring);
+    this.crypto = new Crypto();
+    this.legacyAuthModel = new GpgAuth();
   }
 
   /**

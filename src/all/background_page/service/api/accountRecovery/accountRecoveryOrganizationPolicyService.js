@@ -12,8 +12,7 @@
  * @since         3.5.0
  */
 const {AbstractService} = require('../abstract/abstractService');
-const {ExternalGpgKeyEntity} = require("../../../model/entity/gpgkey/external/externalGpgKeyEntity");
-const {GpgKeyInfoService} = require("../../crypto/gpgKeyInfoService");
+const {GetGpgKeyInfoService} = require("../../crypto/getGpgKeyInfoService");
 const {GpgAuth} = require('../../../model/gpgauth');
 const {Keyring} = require('../../../model/keyring');
 
@@ -107,8 +106,7 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
    * @throws {Error} if any of the checks are wrong
    */
   static async validatePublicKey(newAccountRecoveryOrganizationPublicKeyDto, currentAccountRecoveryOrganizationPublicKeyDto) {
-    const keyEntity = new ExternalGpgKeyEntity(newAccountRecoveryOrganizationPublicKeyDto);
-    const keyInfo = await GpgKeyInfoService.getKeyInfo(keyEntity);
+    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(newAccountRecoveryOrganizationPublicKeyDto.armored_key);
 
     if (keyInfo.algorithm !== "RSA") {
       throw new Error(`The algorithm used for the key is ${keyInfo.algorithm} but, must be RSA.`);
@@ -157,8 +155,7 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
       return;
     }
 
-    const currentOrkEntity = new ExternalGpgKeyEntity(currentAccountRecoveryOrganizationPublicKeyDto);
-    const currentOrkInfo = await GpgKeyInfoService.getKeyInfo(currentOrkEntity);
+    const currentOrkInfo = await GetGpgKeyInfoService.getKeyInfo(currentAccountRecoveryOrganizationPublicKeyDto.armored_key);
     if (currentOrkInfo.fingerprint === keyInfo.fingerprint) {
       throw new Error("The key is the current organization recovery key, you must provide a new one.");
     }

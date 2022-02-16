@@ -27,6 +27,7 @@ const {SecurityTokenEntity} = require("../../model/entity/securityToken/security
 const {AccountEntity} = require("../../model/entity/account/accountEntity");
 const {i18n} = require('../../sdk/i18n');
 const {SetAccountRecoveryUserSetting} = require("../../service/setup/setAccountRecoveryUserSetting");
+const {GetGpgKeyInfoService} = require('../../service/crypto/getGpgKeyInfoService');
 
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
 
@@ -55,8 +56,9 @@ class SetupController {
    */
   async retrieveSetupInfo() {
     const serverKeyDto = await this.authModel.getServerKey();
-    await this.keyring.keyInfo(serverKeyDto.armored_key);
-    this.setupEntity.serverPublicArmoredKey = serverKeyDto.armored_key;
+    //Ensures that `serverKeyDto.armored_key` is a valid key.
+    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(serverKeyDto.armored_key);
+    this.setupEntity.serverPublicArmoredKey = keyInfo.armoredKey;
     await this.setupModel.findSetupInfo(this.setupEntity);
     return this.setupEntity;
   }
@@ -110,7 +112,7 @@ class SetupController {
   async importKey(armoredKey) {
     const keyInfo = await this._assertImportKeyFormat(armoredKey);
     await this._assertImportKeyNotUsed(keyInfo.fingerprint);
-    this.setupEntity.userPrivateArmoredKey = keyInfo.key;
+    this.setupEntity.userPrivateArmoredKey = keyInfo.armoredKey;
     this.setupEntity.userPublicArmoredKey = await this.keyring.extractPublicKey(this.setupEntity.userPrivateArmoredKey);
   }
 
@@ -126,7 +128,7 @@ class SetupController {
     let keyInfo = null;
 
     try {
-      keyInfo = await this.keyring.keyInfo(armoredKey);
+      keyInfo = await GetGpgKeyInfoService.getKeyInfo(armoredKey);
     } catch (error) {
       throw new GpgKeyError(i18n.t('The key must be a valid private key.'));
     }

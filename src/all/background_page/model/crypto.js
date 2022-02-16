@@ -42,7 +42,7 @@ class Crypto {
       if (!keyInfo) {
         throw new Error('The public key could not be found for the user');
       }
-      publicKey = keyInfo.key;
+      publicKey = keyInfo.armoredKey;
     }
 
     try {
@@ -103,7 +103,7 @@ class Crypto {
    * @return {Promise<openpgp.key.Key>} The user decrypted private key
    */
   async getAndDecryptPrivateKey(passphrase) {
-    const armoredKey = this.keyring.findPrivate().key;
+    const armoredKey = this.keyring.findPrivate().armoredKey;
     const privateKey = (await openpgp.key.readArmored(armoredKey)).keys[0];
     if (!privateKey.isDecrypted()) {
       await privateKey.decrypt(passphrase);

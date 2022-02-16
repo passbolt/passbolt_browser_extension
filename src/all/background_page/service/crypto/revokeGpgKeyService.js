@@ -12,19 +12,17 @@
  * @since         3.5.0
  */
 
-const {ExternalGpgKeyEntity} = require("../../model/entity/gpgkey/external/externalGpgKeyEntity");
-const {GpgKeyInfoService} = require("./gpgKeyInfoService");
+const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
 
 class RevokeGpgKeyService {
   /**
-   * @param {ExternalGpgKeyEntity} gpgKeyToRevoke
+   * @param {Promise<ExternalGpgKeyEntity>} gpgKeyToRevoke
    */
   static async revoke(gpgKeyToRevoke) {
     const {publicKey} = await openpgp.revokeKey({
       key: (await openpgp.key.readArmored(gpgKeyToRevoke.armoredKey)).keys[0]
     });
-    const keyInfo = await GpgKeyInfoService.getKeyInfoFromOpenGpgKey(publicKey);
-    return new ExternalGpgKeyEntity(keyInfo);
+    return await GetGpgKeyInfoService.getKeyInfo(publicKey);
   }
 }
 

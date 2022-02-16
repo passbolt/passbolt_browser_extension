@@ -58,7 +58,7 @@ class AccountModel {
    */
   async updatePrivateKey(oldPassphrase, newPassphrase) {
     const privateKey = this.keyring.findPrivate();
-    const userPrivateKeyObj = (await openpgp.key.readArmored(privateKey.key)).keys[0];
+    const userPrivateKeyObj = (await openpgp.key.readArmored(privateKey.armoredKey)).keys[0];
     const userNewPrivateKey = await openpgp.decryptKey({privateKey: userPrivateKeyObj, passphrase: oldPassphrase});
     await userNewPrivateKey.key.encrypt(newPassphrase);
     const userPrivateArmoredKey = userNewPrivateKey.key.armor();
@@ -66,7 +66,7 @@ class AccountModel {
       await this.keyring.importPrivate(userPrivateArmoredKey);
     } catch (error) {
       // Rollback to the old passphrase
-      await this.keyring.importPrivate(privateKey.key);
+      await this.keyring.importPrivate(privateKey.armoredKey);
       throw error;
     }
     return userPrivateArmoredKey;

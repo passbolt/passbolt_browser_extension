@@ -13,8 +13,7 @@
  */
 
 const {InvalidMasterPasswordError} = require("../../error/invalidMasterPasswordError");
-const {ExternalGpgKeyEntity} = require("../../model/entity/gpgkey/external/externalGpgKeyEntity");
-const {GpgKeyInfoService} = require("./gpgKeyInfoService");
+const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
 
 class DecryptPrivateKeyService {
   /**
@@ -24,8 +23,7 @@ class DecryptPrivateKeyService {
   static async decryptPrivateGpgKeyEntity(privateGpgKeyEntity) {
     const privateKey = await this.decrypt(privateGpgKeyEntity.armoredKey, privateGpgKeyEntity.passphrase);
 
-    return await GpgKeyInfoService.getKeyInfoFromOpenGpgKey(privateKey)
-      .then(keyInfo => new ExternalGpgKeyEntity(keyInfo));
+    return await GetGpgKeyInfoService.getKeyInfo(privateKey);
   }
 
   /**

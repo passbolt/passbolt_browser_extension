@@ -24,6 +24,7 @@ const {Crypto} = require('../../model/crypto');
 const {SetupEntity} = require("../../model/entity/setup/setupEntity");
 const {SecurityTokenEntity} = require("../../model/entity/securityToken/securityTokenEntity");
 const {AccountEntity} = require("../../model/entity/account/accountEntity");
+const {GetGpgKeyInfoService} = require('../../service/crypto/getGpgKeyInfoService');
 
 class RecoverController {
   /**
@@ -50,8 +51,9 @@ class RecoverController {
    */
   async retrieveRecoverInfo() {
     const serverKeyDto = await this.authModel.getServerKey();
-    await this.keyring.keyInfo(serverKeyDto.armored_key);
-    this.setupEntity.serverPublicArmoredKey = serverKeyDto.armored_key;
+    //Ensures that `serverKeyDto.armored_key` is a valid key.
+    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(serverKeyDto.armored_key);
+    this.setupEntity.serverPublicArmoredKey = keyInfo.armoredKey;
     await this.setupModel.findRecoverInfo(this.setupEntity);
     return this.setupEntity;
   }
@@ -64,7 +66,7 @@ class RecoverController {
   async importKey(armoredKey) {
     const keyInfo = await this._assertImportKeyFormat(armoredKey);
     await this._assertImportKeyOwnedByUser(keyInfo.fingerprint);
-    this.setupEntity.userPrivateArmoredKey = keyInfo.key;
+    this.setupEntity.userPrivateArmoredKey = keyInfo.armoredKey;
     this.setupEntity.userPublicArmoredKey = await this.keyring.extractPublicKey(this.setupEntity.userPrivateArmoredKey);
   }
 
@@ -80,7 +82,7 @@ class RecoverController {
     let keyInfo = null;
 
     try {
-      keyInfo = await this.keyring.keyInfo(armoredKey);
+      keyInfo = await GetGpgKeyInfoService.getKeyInfo(armoredKey);
     } catch (error) {
       throw new GpgKeyError(i18n.t('The key must be a valid private key.'));
     }

@@ -70,7 +70,7 @@ class GpgAuth {
    */
   async verify(serverUrl, armoredServerKey, userFingerprint) {
     const domain = serverUrl || this.getDomain();
-    const serverKey = armoredServerKey || this.keyring.findPublic(Uuid.get(domain)).key;
+    const serverKey = armoredServerKey || this.keyring.findPublic(Uuid.get(domain)).armoredKey;
     const fingerprint = userFingerprint || this.keyring.findPrivate().fingerprint;
 
     // Encrypt a random token
@@ -130,7 +130,7 @@ class GpgAuth {
    * @returns {Promise<*>}
    */
   async getServerKeyFromKeyring() {
-    return await this.keyring.findPublic(Uuid.get(this.getDomain())).key;
+    return await this.keyring.findPublic(Uuid.get(this.getDomain())).armoredKey;
   }
 
   /**

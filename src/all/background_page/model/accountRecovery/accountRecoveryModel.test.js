@@ -12,18 +12,14 @@
  * @since         3.4.0
  */
 
-const openpgp = require('openpgp/dist/openpgp');
-const textEncoding = require('text-encoding-utf-8');
-import Validator from 'validator';
 import {ApiClientOptions} from '../../service/api/apiClient/apiClientOptions';
 import {AccountRecoveryOrganizationPublicKeyEntity} from '../entity/accountRecovery/accountRecoveryOrganizationPublicKeyEntity';
 import {AccountRecoveryModel} from "./accountRecoveryModel";
 import {AccountRecoveryUserSettingEntity} from '../entity/accountRecovery/accountRecoveryUserSettingEntity';
 import {AccountRecoveryPrivateKeyEntity} from '../entity/accountRecovery/accountRecoveryPrivateKeyEntity';
 import {AccountRecoveryPrivateKeyPasswordsCollection} from '../entity/accountRecovery/accountRecoveryPrivateKeyPasswordsCollection';
+import {ExternalGpgKeyEntity} from '../entity/gpgkey/external/externalGpgKeyEntity';
 import keys from './accountRecoveryModel.test.data';
-
-global.TextEncoder = textEncoding.TextEncoder;
 
 jest.mock("../../service/api/accountRecovery/accountRecoveryRequestService", () => ({
   AccountRecoveryRequestService: jest.fn().mockImplementation(() => {})
@@ -40,12 +36,10 @@ jest.mock("../../service/api/accountRecovery/accountRecoveryUserService", () => 
   }))
 }));
 
-const mockAdminPrivateKey = keys.adminPrivateKey;
+const mockAdminPrivateKey = new ExternalGpgKeyEntity({armored_key: keys.adminPrivateKey});
 jest.mock('../keyring', () => ({
   Keyring: jest.fn().mockImplementation(() => ({
-    findPrivate: jest.fn(() => ({
-      key: mockAdminPrivateKey
-    }))
+    findPrivate: jest.fn(() => mockAdminPrivateKey)
   }))
 }));
 

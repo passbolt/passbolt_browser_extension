@@ -97,7 +97,7 @@ class AccountRecoveryModel {
 
     const keyring = new Keyring();
     const decryptedUserPrivateKey = await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(new PrivateGpgkeyEntity({
-      armored_key: keyring.findPrivate().key,
+      armored_key: keyring.findPrivate().armoredKey,
       passphrase: userPasshphrase
     }));
 

@@ -46,7 +46,7 @@ class AuthController {
     const user = User.getInstance();
     const clientOptions = await user.getApiClientOptions({requireCsrfToken: false});
     const authModel = new AuthModel(clientOptions);
-    const serverKey = this.keyring.findPublic(Uuid.get(user.settings.getDomain())).key;
+    const serverKey = this.keyring.findPublic(Uuid.get(user.settings.getDomain())).armoredKey;
     const userFingerprint = this.keyring.findPrivate().fingerprint;
 
     try {

@@ -29,6 +29,7 @@ class ExternalGpgKeyEntity extends Entity {
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
   constructor(gpgkeyDto) {
+    gpgkeyDto = ExternalGpgKeyEntity.sanitizeDto(gpgkeyDto);
     super(EntitySchema.validate(
       ExternalGpgKeyEntity.ENTITY_NAME,
       gpgkeyDto,
@@ -117,6 +118,32 @@ class ExternalGpgKeyEntity extends Entity {
     };
   }
 
+  /**
+   * Sanitized the given dto.
+   * It accepts both old and new version of the dto and sets new fields with new ones if any.
+   *
+   * @param {Object} dto
+   * @returns {Object}
+   */
+  static sanitizeDto(dto) {
+    const sanitizedDto = {...dto};
+
+    if (dto.key) {
+      sanitizedDto.armored_key = dto.key;
+      delete sanitizedDto.key;
+    }
+    if (dto.keyId) {
+      sanitizedDto.key_id = dto.keyId;
+      delete sanitizedDto.keyId;
+    }
+    if (dto.userIds) {
+      sanitizedDto.user_ids = dto.userIds;
+      delete sanitizedDto.userIds;
+    }
+
+    return sanitizedDto;
+  }
+
   /*
    * ==================================================
    * Dynamic properties getters
@@ -130,8 +157,99 @@ class ExternalGpgKeyEntity extends Entity {
     return this._props.armored_key;
   }
 
+  /**
+   * Get gpgkey key id
+   * @returns {string}
+   */
+  get keyId() {
+    return this._props.key_id;
+  }
+
+  /**
+   * Get gpgkey user ids
+   * @returns {Array<{name: string, email:string>}
+   */
+  get userIds() {
+    return this._props.user_ids;
+  }
+
+  /**
+   * Get gpgkey key fingerprint
+   * @returns {string}
+   */
+  get fingerprint() {
+    return this._props.fingerprint;
+  }
+
+  /**
+   * Get time at when the key is considered as expired
+   * @returns {string}
+   */
+  get expires() {
+    return this._props.expires;
+  }
+
+  /**
+   * Get time at when the key has been created
+   * @returns {string}
+   */
+  get created() {
+    return this._props.created;
+  }
+
+  /**
+   * Get the algorithm use to generate the key
+   * @returns {string}
+   */
+  get algorithm() {
+    return this._props.algorithm;
+  }
+
+  /**
+   * Get the size of the key
+   * @returns {number}
+   */
+  get length() {
+    return this._props.length;
+  }
+
+  /**
+   * Get the curve used for the generation of the key
+   * @returns {string | null}
+   */
+  get curve() {
+    return this._props.curve;
+  }
+
+  /**
+   * Get the revocation state of the keu
+   * @returns {boolean}
+   */
   get revoked() {
     return this._props.revoked;
+  }
+
+  /**
+   * Returns true if the key is private false otherwise
+   * @returns {boolean}
+   */
+  get private() {
+    return this._props.private;
+  }
+
+  /**
+   * Returns true if the key is expired
+   * @returns {boolean}
+   */
+  get isExpired() {
+    const expires = this.expires;
+    if (expires === "Never") {
+      return false;
+    }
+    const now = Date.now();
+    const expirationDate = new Date(expires);
+
+    return expirationDate < now;
   }
 
   /*

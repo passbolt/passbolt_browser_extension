@@ -49,7 +49,7 @@ class AccountRecoverySaveOrganizationSettingsController {
       const newAccountRecoveryOrganizationPolicyEntity = new AccountRecoveryOrganizationPolicyEntity(newAccountRecoveryOrganizationPolicyDto);
       const currentAccountRecoveryOrganizationPolicyEntity = new AccountRecoveryOrganizationPolicyEntity(currentAccountRecoveryOrganisationPolicyDto);
       const administratorPrivateKeyEntity = new PrivateGpgkeyEntity({
-        armored_key: (new Keyring()).findPrivate().key,
+        armored_key: (new Keyring()).findPrivate().armoredKey,
         passphrase: administratorPassphrase
       });
       const privateORKEntity = privateKeyDto ? new PrivateGpgkeyEntity(privateKeyDto) : null;

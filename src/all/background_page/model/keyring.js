@@ -230,35 +230,6 @@ class Keyring {
     return key.keys[0].toPublic().armor();
   }
 
-  /**
-   * Check if a key is expired.
-   * @param {string} armoredKey The key to check
-   * @returns {Promise<boolean>}
-   */
-  async keyIsExpired(armoredKey) {
-    let key = await openpgp.key.readArmored(armoredKey);
-    if (key.err) {
-      throw new Error(key.err[0].message);
-    }
-
-    key = key.keys[0];
-    let expirationTime;
-    try {
-      expirationTime = await key.getExpirationTime();
-    } catch (error) {
-      return false;
-    }
-
-    if (expirationTime === Infinity) {
-      return false;
-    }
-
-    const expirationDate = new Date(expirationTime.toString());
-    const now = Date.now();
-
-    return expirationDate < now;
-  }
-
   /*
    * ==================================================
    * SERVER SYNC

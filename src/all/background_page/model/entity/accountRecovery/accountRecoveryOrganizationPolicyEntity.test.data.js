@@ -16,6 +16,17 @@ import {v4 as uuidv4} from "uuid";
 import {defaultUserDto} from "../user/userEntity.test.data";
 import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
 
+export const createAccountRecoveryOrganizationPolicyDto = data => {
+  const defaultData = {
+    policy: "opt-out",
+    account_recovery_organization_public_key: {
+      armored_key: pgpKeys.account_recovery_organization.public
+    },
+  };
+
+  return Object.assign(defaultData, data || {});
+};
+
 export const defaultAccountRecoveryOrganizationPolicyDto = data => {
   const defaultData = {
     id: uuidv4(),

@@ -13,7 +13,7 @@
  */
 
 const {AccountRecoveryValidatePublicKeyController} = require("../controller/accountRecovery/AccountRecoveryValidatePublicKeyController");
-const {AccountRecoverySaveOrganizationSettingsController} = require("../controller/accountRecovery/accountRecoverySaveOrganizationSettingsController");
+const {AccountRecoverySaveOrganizationPolicyController} = require("../controller/accountRecovery/accountRecoverySaveOrganizationPolicyController");
 const {AccountRecoveryValidateOrganizationPrivateKeyController} = require("../controller/accountRecovery/accountRecoveryValidateOrganizationPrivateKeyController");
 const {User} = require('../model/user');
 const {AccountRecoveryGenerateOrganizationKeyController} = require("../controller/accountRecovery/accountRecoveryGenerateOrganizationKeyController");
@@ -31,14 +31,14 @@ const {AccountRecoveryGetOrganizationPolicyController} = require("../controller/
 const listen = function(worker) {
   worker.port.on('passbolt.account-recovery.get-organization-policy', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const accountRecoveryGetOrganizationPolicyController = new AccountRecoveryGetOrganizationPolicyController(worker, requestId, apiClientOptions);
-    await accountRecoveryGetOrganizationPolicyController._exec();
+    const controller = new AccountRecoveryGetOrganizationPolicyController(worker, requestId, apiClientOptions);
+    await controller._exec();
   });
 
-  worker.port.on('passbolt.account-recovery.save-organization-settings', async(requestId, accountRecoveryOrganizationPolicyDto, oldAccountRecoveryOrganizationPolicyDto, privateGpgKeyDto) => {
+  worker.port.on('passbolt.account-recovery.save-organization-policy', async(requestId, accountRecoveryOrganizationPolicyDto, privateGpgKeyDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const accountRecoverySaveOrganizationSettingsController = new AccountRecoverySaveOrganizationSettingsController(worker, requestId, apiClientOptions);
-    await accountRecoverySaveOrganizationSettingsController.exec(accountRecoveryOrganizationPolicyDto, oldAccountRecoveryOrganizationPolicyDto, privateGpgKeyDto);
+    const controller = new AccountRecoverySaveOrganizationPolicyController(worker, requestId, apiClientOptions);
+    await controller._exec(accountRecoveryOrganizationPolicyDto, privateGpgKeyDto);
   });
 
   worker.port.on('passbolt.account-recovery.validate-organization-key', async(requestId, newAccountRecoveryOrganizationPublicKeyDto, currentAccountRecoveryOrganizationPublicKeyDto) => {
@@ -47,8 +47,8 @@ const listen = function(worker) {
   });
 
   worker.port.on('passbolt.account-recovery.get-organization-key-details', async(requestId, armoredKey) => {
-    const getKeyInfoController = new GetKeyInfoController(worker, requestId);
-    await getKeyInfoController._exec(armoredKey);
+    const controller = new GetKeyInfoController(worker, requestId);
+    await controller._exec(armoredKey);
   });
 
   worker.port.on('passbolt.account-recovery.generate-organization-key', async(requestId, generateGpgKeyDto) => {

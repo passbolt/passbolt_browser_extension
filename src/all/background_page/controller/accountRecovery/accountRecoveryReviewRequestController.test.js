@@ -111,12 +111,13 @@ describe("AccountRecoveryReviewUserRequestController", () => {
         .setBaseUrl("https://localhost");
       const controller = new AccountRecoveryReviewRequestController(mockWorker, requestId, apiClientOptions);
 
-      // Mock API responses
+      // Mock API get account recovery request.
       const accountRecoveryRequestId = uuidv4();
       const mockFetchRequestUrl = `${apiClientOptions.baseUrl}/account-recovery/requests/${accountRecoveryRequestId}.json*`;
       const mockFetchRequestResult = defaultAccountRecoveryRequestDto({id: accountRecoveryRequestId});
       fetch.doMockOnceIf(new RegExp(mockFetchRequestUrl), JSON.stringify({header: {}, body: mockFetchRequestResult}));
 
+      // Mock API save account recovery response.
       const mockPostResponseUrl = `${apiClientOptions.baseUrl}/account-recovery/responses.json*`;
       const mockPostResponseResult = acceptedAccountRecoveryResponseDto();
       fetch.doMockOnceIf(new RegExp(mockPostResponseUrl), JSON.stringify({header: {}, body: mockPostResponseResult}));

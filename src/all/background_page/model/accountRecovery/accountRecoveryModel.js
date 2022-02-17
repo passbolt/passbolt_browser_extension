@@ -113,9 +113,15 @@ class AccountRecoveryModel {
     this.accountRecoveryUserService.saveUserSetting(accountRecoveryUserSettingEntity);
   }
 
-  async saveOrganizationSettings(accountRecoveryOrganizationPolicyEntity) {
+  /**
+   * Save the organization policy.
+   *
+   * @param {AccountRecoveryOrganizationPolicyEntity} accountRecoveryOrganizationPolicyEntity The organization policy to save.
+   * @returns {Promise<AccountRecoveryOrganizationPolicyEntity>}
+   */
+  async saveOrganizationPolicy(accountRecoveryOrganizationPolicyEntity) {
     const accountRecoveryPolicyDto = accountRecoveryOrganizationPolicyEntity.toDto(AccountRecoveryOrganizationPolicyEntity.ALL_CONTAIN_OPTIONS);
-    const savedAccountRecoveryPolicyDto = await this.accountRecoveryOrganizationPolicyService.saveOrganizationSettings(accountRecoveryPolicyDto);
+    const savedAccountRecoveryPolicyDto = await this.accountRecoveryOrganizationPolicyService.saveOrganizationPolicy(accountRecoveryPolicyDto);
     return new AccountRecoveryOrganizationPolicyEntity(savedAccountRecoveryPolicyDto);
   }
 

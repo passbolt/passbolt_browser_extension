@@ -1,12 +1,12 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
@@ -67,18 +67,33 @@ class ExternalGpgKeyPairEntity extends Entity {
    */
   /**
    * Return a DTO ready to be sent to API or content code
+   * @param {object} [contain] optional
    * @returns {object}
    */
-  toDto() {
+  toDto(contain) {
     const result = Object.assign({}, this._props);
-    if (this._public_key) {
-      result.public_key = this._public_key.toDto();
+
+    if (!contain) {
+      return result;
     }
-    if (this._private_key) {
-      result.private_key = this._private_key.toDto();
+
+    if (contain.public_key && this._public_key) {
+      result.public_key = this.publicKey.toDto();
+    }
+    if (contain.private_key && this._private_key) {
+      result.private_key = this.privateKey.toDto();
     }
 
     return result;
+  }
+
+
+  /**
+   * Customizes JSON stringification behavior
+   * @returns {*}
+   */
+  toJSON() {
+    return this.toDto(ExternalGpgKeyPairEntity.ALL_CONTAIN_OPTIONS);
   }
 
   /*
@@ -113,6 +128,14 @@ class ExternalGpgKeyPairEntity extends Entity {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
+  }
+
+  /**
+   * ExternalGpgKeyPairEntity.ALL_CONTAIN_OPTIONS
+   * @returns {object} all contain options that can be used in toDto()
+   */
+  static get ALL_CONTAIN_OPTIONS() {
+    return {public_key: true, private_key: true};
   }
 }
 

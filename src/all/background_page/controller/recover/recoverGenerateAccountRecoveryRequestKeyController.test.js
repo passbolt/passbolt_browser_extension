@@ -30,7 +30,6 @@ describe("RecoverGenerateAccountRecoveryRequestKeyController", () => {
       expect.assertions(2);
       try {
         await controller.exec();
-        expect(false).toBeTruthy();
       } catch (error) {
         expect(error.message).toEqual("Could not validate entity GenerateGpgKeyPairEntity.");
         expect(error.details.email).not.toBeUndefined();
@@ -47,7 +46,6 @@ describe("RecoverGenerateAccountRecoveryRequestKeyController", () => {
       expect.assertions(2);
       try {
         await controller.exec();
-        expect(false).toBeTruthy();
       } catch (error) {
         expect(error.message).toEqual("Could not validate entity GenerateGpgKeyPairEntity.");
         expect(error.details.passphrase).not.toBeUndefined();

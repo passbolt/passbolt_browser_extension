@@ -1,3 +1,70 @@
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         3.6.0
+ */
+
+import {v4 as uuidv4} from "uuid";
+
+/**
+ * The Test Account Recovery Request gpg key is used to encrypt the private key password
+ * Clear text password: 3f28361aa774a5767fbe70ecd09b2fbbf1d5b4b493fe171089436bfa6a2eb03fe630fa9f2483c59b68e20616f1a7597ff8d058a6f79d228a4181d71a61f80d98
+ */
+export const createAcceptedAccountRecoveryResponseDto = data => {
+  const defaultData = {
+    "account_recovery_request_id": uuidv4(),
+    "responder_foreign_key": uuidv4(),
+    "responder_foreign_model": "AccountRecoveryOrganizationKey",
+    "data": "-----BEGIN PGP MESSAGE-----\n\nhQGMA28jNnDWObePAQv6A4mEoHvefNOoSOEiiguPH72H74pUUPUxcZVrZt/1JkvM\nFd3udwDbGKhgkP74+qvVgh7RedcbTzpkQ5WINjSWQVrM821VyOwzPtM42t/z3piE\nam1WdIG/qb3S9D6ai4OOe06oXxrSNWH2qTSZlKgl7m+RM9K4a0k2BrAuMDcR+Sj3\nltvMOLm3k/bl4H5g/0OBxEkA2ivYEhi7BSv83wwghNo4tFJWAlV5ebvqCyhdFoHq\n1AM/yGZ91MIHAuYv1vp2NCSlVikzFYwjR6B2lCOeWbS0XIO/Fsf163U9eLxsdgyq\ngE4tjz/sD3qwapjMpubPGaZ5XFdK4oyY54brUtQ7ENlalH2jJixxCUEPM7d8jpM5\nTXi1vVdfcPMu+5eZZREwkMHC/WMZKROgkBQ4Q5hUEaqjJOwhuSz7CTB049vg6OiK\nGxM5EVC4mVT7106E36Fvj3bAgCKSvobOfR46EpxQmGUvRTnrthCVcKZVFtgYcXpd\nY17Ocagj5da9lDyl9zSY0ukBANTcCzi5hrBxChBIwvECNuFuqRMQfXi3pdfoN49P\nmCTMi5HrAtT1o17bKjuYL4MSjOboLoh2KZF5OOKQnuAFpMOHpOHD6DgaEdsXP1sn\nXkQCAo/W/7LK25Fo2sGK9GwO2Fqzu8mapaPfEJ+es35lVoQRrf0YQatw+7c4wjAE\nvTeWgCvkV+rAUMEIMGNqQbVVzVentwBrPHXLi6bJNbSdmPueTlnH2TwRja40gFTP\nxUk1oQN60QlyGkQZIWxqPrVdHWBnRdEklYGJXzCkahcvejmww6glVGtBBEiip1S7\noo2HYKtq3JkgAcGPb4BD5yPSBIapMlb7E62SdxFwwXvAHboy2D5NeHmoFijAiBJp\nBE1R1Oe9FG3gb1uKNws9UCwVlaXR9VxY2eSKWfMwqA4McWvTyaL4BtrZWWhu9vR/\nMwPHnBP4yUdRO8vyDJGIsWCEey8n29Hr5rcMu7kFWc3WQcRxFaK/Sam/i555w7sL\nSe3NU68nWXkidCQ2D2T2iYmRP0CsF6FKTQwj5pbCR6ZWTtsbtt4FztfKSvU5osEJ\nz5BqmIYOIfA5/cOyqn6XYnBaII3SzIwBUuqUlbaBEmSCif7NbjAjrfqcTgbHc7+h\nFz64XbPFwo0sxA2KGiJg2sXOU6blT7O6ESwfCtES8WvxR6rs5YDXumu7CtRtfp+Z\nIsBNVTo+9sO9CAZaXDiNITgUyyAkWeN8PsF3eXWtNHR0kBwMJZQyFjC7/IJ7h+l2\na45lUA9FaIvENcBet3baErOgXhECNaBJoD2LMG1jbX4ecHP8V0k9O4N7E/frZGIz\n/h50rZYW2BCQBxd6KPLCnGd/fL7E7SIDR5pLydvpLXRoQIwjtjchhthwE2B23g8u\nqpZj5doXSJEOn3pUZXT0T6dHfIpzNiHzYDfOaZ5ZraEmkgdE5JU8BQPeDVj9Uo5H\npwv0E7Wn7d2OJWMxkholb4c/e6AeEcc9KZBWpiUpqvHUyIcJi6zaZtyhv/Dy1YMF\nj2inTdmOFExTERJm2Lsps5FQwvvh5QnG3ILuIyVFwKo=\n=sbxg\n-----END PGP MESSAGE-----\n",
+    "status": "approved",
+  };
+
+  return Object.assign(defaultData, data || {});
+};
+
+export const createRejectedAccountRecoveryResponseDto = data => {
+  const defaultData = {
+    "account_recovery_request_id": uuidv4(),
+    "responder_foreign_key": uuidv4(),
+    "responder_foreign_model": "AccountRecoveryOrganizationKey",
+    "status": "rejected",
+  };
+
+  return Object.assign(defaultData, data || {});
+};
+
+export const acceptedAccountRecoveryResponseDto = data => {
+  const defaultData = createAcceptedAccountRecoveryResponseDto({
+    "id": uuidv4(),
+    "created": "2020-05-04T20:31:45+00:00",
+    "modified": "2020-05-04T20:31:45+00:00",
+    "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+    "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856"
+  });
+
+  return Object.assign(defaultData, data || {});
+};
+
+export const rejectedAccountRecoveryResponseDto = data => {
+  const defaultData = createRejectedAccountRecoveryResponseDto({
+    "id": uuidv4(),
+    "created": "2020-05-04T20:31:45+00:00",
+    "modified": "2020-05-04T20:31:45+00:00",
+    "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+    "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856"
+  });
+
+  return Object.assign(defaultData, data || {});
+};
+
 exports.AccountRecoveryRequestEntityTestData = {
   "default": {
     "id": "d4c0e643-3967-443b-93b3-102d902c4510",
@@ -9,14 +76,7 @@ exports.AccountRecoveryRequestEntityTestData = {
     "created": "2020-05-04T20:31:45+00:00",
     "modified": "2020-05-04T20:31:45+00:00",
     "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-    "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-    "account_recovery_private_key_passwords": [
-      {
-        "recipient_foreign_model": "AccountRecoveryOrganizationKey",
-        "recipient_foreign_key": "10801423-4151-42a4-99d1-86e66145a08c",
-        "data": "-----BEGIN PGP MESSAGE-----\r\nVersion: OpenPGP.js v4.6.2\r\nComment: https:\/\/openpgpjs.org\r\n\r\nwcFMAxYTR81eetNbAQ\/\/TEWCA7W1kx7IzcZi4nmT92IZbdpzCBSQt5htSCoJ\r\nFfzGd27yeDT2GoEtmxmkG+gEak8ci0Jxa9FECaYDBzG4ixEDfDMfWqw\/WK2w\r\nj04oja+0qCAimV2nyItSYoaK5aZj8vL97V6U\/7YcraC9QTNY1Kd8RDPeL32D\r\nO2dpquPDLx5uMAmMoSZWruNCGqqJPjxMcxc2PBco+GJMcaGcYa5Y3+YueNpZ\r\nIIS0PbMpgiJlVvYzZywYC5lkIKFadVeV6MNkMmJfWB4VHq2Hoo3poZVP1rZV\r\n6cU7a7UuG4W3UUmezxQGQ6WAjh+qzkQHXrwI3cgU14du9sTCh8occwcPhG1C\r\nj8ljcTJqexQxA91TSj2UqhAnyB9yzZRcoh38bj\/OyGQmtiwxEFIzUymSi2pt\r\nysjJOZ7lB1Oh2l4vbgxJoNxtgvzY+3dsNXL510x793Hev3X2YcbO\/TJoy6G9\r\n89cuocJ1dlLIHqrfri43y1V0ZTfoa\/vigma4Qa5kUtB1tN0j38z+6tcjiz\/s\r\n8RJmXUK2bfHhvEbuc\/YnDDltpiZHc3QUtbj5TV2m+fO0ad2jVqxsi4eZid\/V\r\n\/WDUrAxRzY7xNRTRQQDbnT831NZeZbYobCpfPqU8ylF9iv\/V4lsyNYFrU0ne\r\n37JRFzl3cOY+jlqxGHaAF9\/mC3b3D3DmlZ+kOOQ7lE\/SwaoBAuDaJRsKzNqj\r\nTz8UFif5iwrEQY5BNzYd+zwGVzMlVP\/RNXR2YlAHx5lPMylgI73RDMoMZ4RT\r\nb7AQB9DqgobZI3dh3B90XqjkRiy3VJ\/nMhwknaZc6onJQgl2O\/ULie9kh69U\r\n1ojIkN+SHFCl42T1iT2eN08QUPffDVTMvT103WlX+MW8FV6CmF+TcDRUexs3\r\nT\/2EvFlxP6QTG41vLk4Sm3xce7rEZHiJ9hRrF26xVfT5jM+7z149lP5J8mgA\r\nARSBj2jlO7P1afQX+5RyYR+guD9LN95qMsNJwukTCzIo1AhE7yywf7b8v3a6\r\nXyanZo+TbDqxnJlozEMsdyGBwBn7UX6Erv072cZadO\/ZG2RBkbgiBGZ5hAjg\r\nPqwRAkfzDNa4WhsE9Crqs5ROy6IsDBGuAa8\/as0oCzIV+Ou4BPzKHfQDQS6U\r\nT0R+48sVAZAYY7TqaNHvf+3nlqMyssaK0SPm2fg3DZXPM2pcDatCFb4gVElC\r\n1qbG8pRIBmS\/NYr8m7IBnazDs9L6lYAjybuHes6cPqasDmHKha6DKl1P6jX+\r\nEeDxA0AVL4rZdUCt1fpEcFR\/R\/o4uDDLO8NGiHwM3MnbNI8G0SQy8q\/NhI11\r\nzWXyDeAR6hHKYC4h6WCCTFxe364PWLjQ5PGOLeAfeWEPCDZmP6U99kwoiOUu\r\ni8UuoIAFon3lIOXZnJ3ZtAcQ5UJ3gNcJH1EImZFdYtRgLo3GOPjBcNqGbmCu\r\n4xo+yMGy9Y8YJZM9HakKAChmHf01J3DAwNfUm8Rhx5w+NBQRm0aJ319wsACH\r\nlLEYvv+bVfPkNTvW\/vWND9eOPGI0Q8o=\r\n=AOt0\r\n-----END PGP MESSAGE-----\r\n"
-      }
-    ]
+    "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856"
   },
   "minimal": {
     "id": "d4c0e643-3967-443b-93b3-102d902c4510",

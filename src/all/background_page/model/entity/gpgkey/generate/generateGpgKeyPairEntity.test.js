@@ -1,15 +1,15 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         2.13.0
+ * @since         3.6.0
  */
 import {EntitySchema} from "../../abstract/entitySchema";
 import {EntityValidationError} from '../../abstract/entityValidationError';
@@ -37,7 +37,7 @@ describe("GenerateGpgKeyPair entity", () => {
         name: "",
         email: "@passbolt.com",
         passphrase: "",
-        keySize: 128
+        keySize: "super strong key size"
       };
       new GenerateGpgKeyPairEntity(dto);
     } catch (error) {
@@ -45,7 +45,7 @@ describe("GenerateGpgKeyPair entity", () => {
       expect(error.hasError('name', 'minLength')).toBe(true);
       expect(error.hasError('email', 'custom')).toBe(true);
       expect(error.hasError('passphrase', 'minLength')).toBe(true);
-      expect(error.hasError('keySize', 'enum')).toBe(true);
+      expect(error.hasError('keySize', 'type')).toBe(true);
     }
   });
 });

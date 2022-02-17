@@ -1,5 +1,3 @@
-const {BadSignatureMessageGpgKeyError} = require("../../error/badSignatureMessageGpgKeyError");
-
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -14,7 +12,8 @@ const {BadSignatureMessageGpgKeyError} = require("../../error/badSignatureMessag
  * @since         3.6.0
  */
 
-const {assertPrivateKeys, assertPublicKeys, assertMessage} = require("../../utils/openpgp/openpgpAssertions");
+const {BadSignatureMessageGpgKeyError} = require("../../error/badSignatureMessageGpgKeyError");
+const {assertDecryptedPrivateKeys, assertPublicKeys, assertMessage} = require("../../utils/openpgp/openpgpAssertions");
 
 class DecryptMessageService {
   /**
@@ -27,7 +26,7 @@ class DecryptMessageService {
    * @throws {BadSignatureMessageGpgKeyError} if the given signatures don't match the message to decrypt.
    */
   static async decrypt(message, decryptionKeys, signingKeys) {
-    decryptionKeys = await assertPrivateKeys(decryptionKeys);
+    decryptionKeys = await assertDecryptedPrivateKeys(decryptionKeys);
     signingKeys = await assertPublicKeys(signingKeys);
     message = await assertMessage(message);
 

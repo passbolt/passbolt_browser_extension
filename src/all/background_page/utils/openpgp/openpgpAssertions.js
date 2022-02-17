@@ -1,6 +1,6 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
@@ -16,7 +16,6 @@
  * Assert pgp private key(s).
  * - Should be a valid armored key or valid openpgp key.
  * - Should be private.
- * - Should be decrypted.
  *
  * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} privateKeys The private key(s) to assert.
  * @returns {array<openpgp.key.Key>|openpgp.key.Key}
@@ -24,7 +23,7 @@
  */
 const assertPrivateKeys = async privateKeys => {
   if (Array.isArray(privateKeys)) {
-    return privateKeys.map(decryptionKey => assertPrivateKeys(decryptionKey));
+    return privateKeys.map(async key => await assertPrivateKeys(key));
   }
 
   if (typeof privateKeys === "string") {
@@ -33,19 +32,41 @@ const assertPrivateKeys = async privateKeys => {
     } catch (error) {
       throw new Error("The private key is not a valid armored key");
     }
+  } else if (!(privateKeys instanceof openpgp.key.Key)) {
+    throw new Error("The private keys must be of type string or openpgp.key.Key");
   }
 
   if (!privateKeys.isPrivate()) {
     throw new Error("The private key is not a valid private key.");
   }
 
-  if (!privateKeys.isDecrypted()) {
-    throw new Error("The private key is not decrypted.");
-  }
-
   return privateKeys;
 };
 exports.assertPrivateKeys = assertPrivateKeys;
+
+/**
+ * Assert pgp private decrypted key(s).
+ * - Should be a valid armored key or valid openpgp key.
+ * - Should be private.
+ * - Should be decrypted.
+ *
+ * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} privateKeys The private key(s) to assert.
+ * @returns {array<openpgp.key.Key>|openpgp.key.Key}
+ * @private
+ */
+const assertDecryptedPrivateKeys = async privateKeys => {
+  if (Array.isArray(privateKeys)) {
+    return privateKeys.map(async key => await assertDecryptedPrivateKeys(key));
+  }
+
+  const privateKey = await assertPrivateKeys(privateKeys);
+  if (!privateKey.isDecrypted()) {
+    throw new Error("The private key is not decrypted.");
+  }
+
+  return privateKey;
+};
+exports.assertDecryptedPrivateKeys = assertDecryptedPrivateKeys;
 
 /**
  * Assert pgp key(s).

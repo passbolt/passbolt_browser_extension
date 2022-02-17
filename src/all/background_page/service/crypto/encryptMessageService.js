@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-const {assertPrivateKeys, assertPublicKeys} = require("../../utils/openpgp/openpgpAssertions");
+const {assertDecryptedPrivateKeys, assertPublicKeys} = require("../../utils/openpgp/openpgpAssertions");
 class EncryptMessageService {
   /**
    * Encrypt symmetrically a message
@@ -23,7 +23,7 @@ class EncryptMessageService {
    * @returns {Promise<openpgp.Message>}
    */
   static async encryptSymmetrically(message, passwords, signingKeys) {
-    signingKeys = await assertPrivateKeys(signingKeys);
+    signingKeys = await assertDecryptedPrivateKeys(signingKeys);
 
     return openpgp.encrypt({
       message: openpgp.message.fromText(message),
@@ -42,7 +42,7 @@ class EncryptMessageService {
    */
   static async encrypt(message, encryptionKeys, signingKeys) {
     encryptionKeys = await assertPublicKeys(encryptionKeys);
-    signingKeys = await assertPrivateKeys(signingKeys);
+    signingKeys = await assertDecryptedPrivateKeys(signingKeys);
 
     return openpgp.encrypt({
       message: openpgp.message.fromText(message),

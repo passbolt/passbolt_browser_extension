@@ -14,7 +14,7 @@
 
 const {EncryptMessageService} = require('./encryptMessageService');
 const {DecryptMessageService} = require('./decryptMessageService');
-const {assertPrivateKeys, assertMessage, assertPublicKeys} = require("../../utils/openpgp/openpgpAssertions");
+const {assertDecryptedPrivateKeys, assertMessage, assertPublicKeys} = require("../../utils/openpgp/openpgpAssertions");
 
 class ReEncryptMessageService {
   /**
@@ -29,8 +29,8 @@ class ReEncryptMessageService {
   static async reEncrypt(encryptedMessage, encryptionKeys, decryptionKeys, signingKeys) {
     encryptedMessage = await assertMessage(encryptedMessage);
     encryptionKeys = await assertPublicKeys(encryptionKeys);
-    decryptionKeys = await assertPrivateKeys(decryptionKeys);
-    signingKeys = await assertPrivateKeys(signingKeys);
+    decryptionKeys = await assertDecryptedPrivateKeys(decryptionKeys);
+    signingKeys = await assertDecryptedPrivateKeys(signingKeys);
 
     const decryptedMessage = await DecryptMessageService.decrypt(encryptedMessage, decryptionKeys, signingKeys);
     return await EncryptMessageService.encrypt(decryptedMessage.data, encryptionKeys, signingKeys);

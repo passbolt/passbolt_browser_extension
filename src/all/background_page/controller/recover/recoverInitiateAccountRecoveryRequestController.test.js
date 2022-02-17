@@ -13,7 +13,7 @@
  */
 
 import {v4 as uuidv4} from "uuid";
-import {enableFetchMocks} from 'jest-fetch-mock';
+import {enableFetchMocks} from "jest-fetch-mock";
 import {Worker} from "../../sdk/worker";
 import {RecoverInitiateAccountRecoveryRequestController} from "./recoverInitiateAccountRecoveryRequestController";
 import {AccountLocalStorage} from "../../service/local_storage/accountLocalStorage";
@@ -42,7 +42,6 @@ describe("RecoverInitiateAccountRecoveryRequestController", () => {
       expect.assertions(6);
       try {
         await controller.exec();
-        expect(false).toBeTruthy();
       } catch (error) {
         expect(error.message).toEqual("Could not validate entity Account.");
         expect(error.details).not.toBeUndefined();

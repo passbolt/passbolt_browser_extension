@@ -1,19 +1,19 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
-const {AccountRecoveryPrivateKeyPasswordsCollection} = require("./accountRecoveryPrivateKeyPasswordsCollection");
 
 const ENTITY_NAME = 'AccountRecoveryResponse';
 const STATUS_REJECTED = "rejected";
@@ -33,12 +33,6 @@ class AccountRecoveryResponseEntity extends Entity {
       accountRecoveryResponseDto,
       AccountRecoveryResponseEntity.getSchema()
     ));
-
-    // Associations
-    if (this._props.account_recovery_private_key_passwords) {
-      this._account_recovery_private_key_passwords = new AccountRecoveryPrivateKeyPasswordsCollection(this._props.account_recovery_private_key_passwords);
-      delete this._props.account_recovery_private_key_passwords;
-    }
   }
 
   /**
@@ -94,63 +88,8 @@ class AccountRecoveryResponseEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
-        // Associated models
-        "account_recovery_private_key_passwords": AccountRecoveryPrivateKeyPasswordsCollection.getSchema()
       }
     };
-  }
-
-  /*
-   * ==================================================
-   * Sanitization
-   * ==================================================
-   */
-  /**
-   * Sanitize account recovery request dto:
-   * - Remove account recovery request which don't validate if any.
-   *
-   * @param {object} dto the account recovery request dto
-   * @returns {object}
-   */
-  static sanitizeDto(dto) {
-    if (typeof dto !== "object") {
-      return dto;
-    }
-
-    if (Object.prototype.hasOwnProperty.call(dto, 'account_recovery_private_key_passwords')) {
-      dto.account_recovery_private_key_passwords = AccountRecoveryPrivateKeyPasswordsCollection.sanitizeDto(dto.account_recovery_private_key_passwords);
-    }
-
-    return dto;
-  }
-
-  /*
-   * ==================================================
-   * Serialization
-   * ==================================================
-   */
-  /**
-   * Return a DTO ready to be sent to API
-   * @param {object} [contain] optional for example {user: true}
-   * @returns {*}
-   */
-  toDto(contain) {
-    const result = Object.assign({}, this._props);
-    if (!contain) {
-      return result;
-    }
-    if (this.accountRecoveryPrivateKeyPasswords && contain.account_recovery_private_key_passwords) {
-      result.account_recovery_private_key_passwords = this.accountRecoveryPrivateKeyPasswords.toDto();
-    }
-    return result;
-  }
-
-  /**
-   * Customizes JSON stringification behavior
-   * @returns {*}
-   */
-  toJSON() {
-    return this.toDto(AccountRecoveryResponseEntity.ALL_CONTAIN_OPTIONS);
   }
 
   /*
@@ -160,26 +99,58 @@ class AccountRecoveryResponseEntity extends Entity {
    */
   /**
    * Get the id
-   * @returns {string}
+   * @returns {(string|null)}
    */
   get id() {
-    return this._props.id;
+    return this._props.id || null;
   }
 
   /**
    * Get the status
-   * @returns {string} status
+   * @returns {string}
    */
   get status() {
     return this._props.status;
   }
 
   /**
-   * AccountRecoveryResponseEntity.ALL_CONTAIN_OPTIONS
-   * @returns {object} all contain options that can be used in toDto()
+   * Get the data
+   * @returns {(string|null)}
    */
-  static get ALL_CONTAIN_OPTIONS() {
-    return {account_recovery_private_key_passwords: true};
+  get data() {
+    return this._props.data || null;
+  }
+
+  /**
+   * Get created date
+   * @returns {(string|null)} date
+   */
+  get created() {
+    return this._props.created || null;
+  }
+
+  /**
+   * Get modified date
+   * @returns {(string|null)} date
+   */
+  get modified() {
+    return this._props.modified || null;
+  }
+
+  /**
+   * Get created by user id
+   * @returns {(string|null)} uuid
+   */
+  get createdBy() {
+    return this._props.created_by || null;
+  }
+
+  /**
+   * Get modified by user id
+   * @returns {(string|null)} date
+   */
+  get modifiedBy() {
+    return this._props.modified_by || null;
   }
 
   /*
@@ -209,14 +180,6 @@ class AccountRecoveryResponseEntity extends Entity {
    */
   static get STATUS_REJECTED() {
     return STATUS_REJECTED;
-  }
-
-  /**
-   * Get the account recovery private key passwords
-   * @returns {AccountRecoveryPrivateKeyPasswordsCollection || null} account_recovery_private_key_passwords
-   */
-  get accountRecoveryPrivateKeyPasswords() {
-    return this._account_recovery_private_key_passwords || null;
   }
 }
 

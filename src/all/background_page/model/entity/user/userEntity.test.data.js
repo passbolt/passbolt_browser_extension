@@ -17,15 +17,15 @@ import {defaultProfileDto} from "../profile/ProfileEntity.test.data";
 
 export const defaultUserDto = data => {
   const defaultData = {
-    "id": data?.id || uuidv4(),
-    "role_id": data?.role_id || uuidv4(),
-    "username": data?.username || "admin@passbolt.com",
-    "active": typeof data?.active === "boolean" ? data.active : true,
-    "deleted": typeof data?.deleted === "boolean" ? data.deleted : false,
-    "created": data?.created || "2020-04-20T11:32:16+00:00",
-    "modified": data?.modified || "2020-04-20T11:32:16+00:00",
-    "last_logged_in": data?.last_logged_in || "2012-07-04T13:39:25+00:00",
-    "is_mfa_enabled": typeof data?.is_mfa_enabled === "boolean" ? data.deleted : false,
+    "id": uuidv4(),
+    "role_id": uuidv4(),
+    "username": "admin@passbolt.com",
+    "active": true,
+    "deleted": false,
+    "created": "2020-04-20T11:32:16+00:00",
+    "modified": "2020-04-20T11:32:16+00:00",
+    "last_logged_in": "2012-07-04T13:39:25+00:00",
+    "is_mfa_enabled": false,
     "profile": defaultProfileDto(Object.assign({user_id: data?.id}, JSON.parse(JSON.stringify(data?.profile || {})))),
   };
 

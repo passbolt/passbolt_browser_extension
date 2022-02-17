@@ -1,16 +1,17 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+
 import {EntitySchema} from "../abstract/entitySchema";
 import {EntityValidationError} from "../abstract/entityValidationError";
 import {AccountRecoveryResponseEntity} from "./accountRecoveryResponseEntity";
@@ -44,10 +45,6 @@ describe("AccountRecoveryResponse entity", () => {
     const entity = new AccountRecoveryResponseEntity(dto);
     expect(entity.toDto()).toEqual(filtered);
     expect(entity.accountRecoveryPrivateKeyPasswords).not.toBe(null);
-    expect(entity.accountRecoveryPrivateKeyPasswords.length).toEqual(1);
-
-    const dtoWithContain = entity.toDto({account_recovery_private_key_passwords: true});
-    expect(dtoWithContain.account_recovery_private_key_passwords[0].recipient_foreign_key).toEqual('10801423-4151-42a4-99d1-86e66145a08c');
   });
 
   it("constructor returns validation error if dto required fields are missing", () => {

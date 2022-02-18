@@ -21,6 +21,7 @@ describe("GenerateGpgKeyPair entity", () => {
   });
 
   it("constructor works if valid DTO is provided", () => {
+    expect.assertions(1);
     const dto = {
       name: "Jean-Jacky",
       email: "jj@passbolt.com",
@@ -32,6 +33,7 @@ describe("GenerateGpgKeyPair entity", () => {
   });
 
   it("constructor throws an exception if DTO contains invalid field", () => {
+    expect.assertions(5);
     try {
       const dto = {
         name: "",
@@ -41,7 +43,7 @@ describe("GenerateGpgKeyPair entity", () => {
       };
       new GenerateGpgKeyPairEntity(dto);
     } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
+      expect(error).toBeInstanceOf(EntityValidationError);
       expect(error.hasError('name', 'minLength')).toBe(true);
       expect(error.hasError('email', 'custom')).toBe(true);
       expect(error.hasError('passphrase', 'minLength')).toBe(true);

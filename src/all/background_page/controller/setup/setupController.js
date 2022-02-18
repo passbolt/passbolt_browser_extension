@@ -21,7 +21,6 @@ const {GpgAuth} = require("../../model/gpgauth");
 const {Keyring} = require('../../model/keyring');
 const {Crypto} = require('../../model/crypto');
 const {SetupEntity} = require("../../model/entity/setup/setupEntity");
-const {GenerateGpgKeyEntity} = require("../../model/entity/gpgkey/generate/generateGpgkeyEntity");
 const {SecurityTokenEntity} = require("../../model/entity/securityToken/securityTokenEntity");
 const {AccountEntity} = require("../../model/entity/account/accountEntity");
 const {i18n} = require('../../sdk/i18n');
@@ -68,21 +67,6 @@ class SetupController {
    */
   async getAccountRecoveryOrganizationPolicy() {
     return this.setupEntity.accountRecoveryOrganizationPolicy;
-  }
-
-  /**
-   * Generate user gpg key.
-   * @param {object} generateGpgKeyDto The meta used to generate the user key
-   */
-  async generateKey(generateGpgKeyDto) {
-    generateGpgKeyDto = this.setupEntity.toGenerateGpgKeyDto(generateGpgKeyDto);
-    const generateGpgKeyEntity = new GenerateGpgKeyEntity(generateGpgKeyDto);
-    const generateOpengpgKeyDto = generateGpgKeyEntity.toGenerateOpengpgKeyDto();
-    const opengpgKeyPair = await openpgp.generateKey(generateOpengpgKeyDto);
-    this.setupEntity.userPrivateArmoredKey = opengpgKeyPair.privateKeyArmored;
-    this.setupEntity.userPublicArmoredKey = opengpgKeyPair.publicKeyArmored;
-    // Store the user passphrase to login in after the setup operation.
-    this.setupEntity.passphrase = generateGpgKeyDto.passphrase;
   }
 
   /**

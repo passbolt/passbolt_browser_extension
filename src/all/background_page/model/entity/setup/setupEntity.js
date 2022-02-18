@@ -10,7 +10,6 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {GenerateGpgKeyEntity} = require("../gpgkey/generate/generateGpgkeyEntity");
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {UserEntity} = require("../user/userEntity");
@@ -233,14 +232,6 @@ class SetupEntity extends Entity {
       fingerprint: this.userKeyFingerprint,
       user_id: this.userId,
       armored_key: this.userPublicArmoredKey
-    };
-  }
-
-  toGenerateGpgKeyDto(generateGpgKeyDto) {
-    return {
-      length: GenerateGpgKeyEntity.DEFAULT_LENGTH,
-      ...generateGpgKeyDto,
-      userId: `"${this.user.profile.firstName} ${this.user.profile.lastName}" <${this.user.username}>`
     };
   }
 

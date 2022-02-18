@@ -16,7 +16,6 @@ const {Entity} = require('../../abstract/entity');
 const {EntitySchema} = require('../../abstract/entitySchema');
 
 const ENTITY_NAME = "GenerateGpgKeyPairEntity";
-const DEFAULT_LENGTH = 4096;
 
 class GenerateGpgKeyPairEntity extends Entity {
   /**
@@ -79,7 +78,7 @@ class GenerateGpgKeyPairEntity extends Entity {
     return {
       userIds: [this.userId],
       rsaBits: this.rsaBits,
-      password: this.passphrase
+      passphrase: this.passphrase
     };
   }
 
@@ -139,14 +138,6 @@ class GenerateGpgKeyPairEntity extends Entity {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
-  }
-
-  /**
-   * GenerateGpgKeyPairEntity.DEFAULT_LENGTH
-   * @returns {int}
-   */
-  static get DEFAULT_LENGTH() {
-    return DEFAULT_LENGTH;
   }
 }
 

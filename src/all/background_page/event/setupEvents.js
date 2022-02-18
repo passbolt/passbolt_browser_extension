@@ -17,6 +17,7 @@ const {SetSetupLocaleController} = require("../controller/locale/setSetupLocaleC
 const {GetSetupLocaleController} = require("../controller/locale/getSetupLocaleController");
 const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
 const {VerifyPassphraseSetupController} = require("../controller/setup/verifyPassphraseSetupController");
+const {GenerateKeyPairSetupController} = require("../controller/setup/generateKeyPairSetupController");
 
 const listen = function(worker) {
   /**
@@ -125,13 +126,8 @@ const listen = function(worker) {
    * @param generateGpgKeyDto {object} The key generation parameter
    */
   worker.port.on('passbolt.setup.generate-key', async(requestId, generateGpgKeyDto) => {
-    try {
-      await setupController.generateKey(generateGpgKeyDto);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controler = new GenerateKeyPairSetupController(worker, requestId, setupController.setupEntity);
+    await controler._exec(generateGpgKeyDto);
   });
 
   /*

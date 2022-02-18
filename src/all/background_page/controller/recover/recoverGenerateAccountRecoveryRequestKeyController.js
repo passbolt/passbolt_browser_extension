@@ -16,6 +16,8 @@ const {GenerateGpgKeyPairEntity} = require("../../model/entity/gpgkey/generate/g
 const {GenerateGpgKeyPairService} = require("../../service/crypto/generateGpgKeyPairService");
 const {GetGpgKeyInfoService} = require("../../service/crypto/getGpgKeyInfoService");
 
+const ACCOUNT_RECOVERY_REQUEST_KEY_SIZE = 4096;
+
 class RecoverGenerateAccountRecoveryRequestKeyController {
   /**
    * Constructor.
@@ -54,7 +56,7 @@ class RecoverGenerateAccountRecoveryRequestKeyController {
       name: 'Account recovery request key',
       email: this.setupEntity?.user?.username,
       passphrase: generateGpgKeyPairDto?.passphrase,
-      keySize: GenerateGpgKeyPairEntity.DEFAULT_LENGTH
+      keySize: ACCOUNT_RECOVERY_REQUEST_KEY_SIZE
     };
     const generateGpgKeyPairEntity = new GenerateGpgKeyPairEntity(dto);
     const externalGpgKeyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairEntity);

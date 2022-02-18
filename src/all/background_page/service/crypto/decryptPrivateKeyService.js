@@ -39,6 +39,10 @@ class DecryptPrivateKeyService {
    */
   static async decrypt(armoredKey, passphrase) {
     const privateKey = (await openpgp.key.readArmored(armoredKey)).keys[0];
+    if (privateKey.isDecrypted()) {
+      throw new Error("The private key is already decrypted");
+    }
+
     await privateKey.decrypt(passphrase)
       .catch(() => { throw new InvalidMasterPasswordError(); });
 

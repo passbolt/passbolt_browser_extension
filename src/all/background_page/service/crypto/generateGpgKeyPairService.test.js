@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) 2021 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.5.0
+ * @since         3.6.0
  */
 
 const openpgp = require('openpgp/dist/openpgp');
@@ -18,6 +18,7 @@ import Validator from "validator";
 import {GenerateGpgKeyPairService} from "./generateGpgKeyPairService";
 import {GetGpgKeyInfoService} from "./getGpgKeyInfoService";
 import {GenerateGpgKeyPairEntity} from "../../model/entity/gpgkey/generate/generateGpgKeyPairEntity";
+import {DecryptPrivateKeyService} from "../../service/crypto/decryptPrivateKeyService";
 
 global.TextEncoder = textEncoding.TextEncoder;
 
@@ -29,7 +30,7 @@ beforeEach(() => {
 
 describe("GenerateGpgKeyPair service", () => {
   it('should generate a key pair according to the given parameters', async() => {
-    expect.assertions(15);
+    expect.assertions(16);
     const generateGpgKeyPairDto =  {
       name: "Jean-Jacky",
       email: "jj@passbolt.com",
@@ -58,5 +59,8 @@ describe("GenerateGpgKeyPair service", () => {
     expect(privateKeyInfo.private).toBe(true);
     expect(privateKeyInfo.revoked).toBe(false);
     expect(privateKeyInfo.expires).toBe("Never");
+
+    const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(keyPair.privateKey.armoredKey, generateGpgKeyPairDto.passphrase);
+    expect(decryptedPrivateKey).not.toBeNull();
   }, 50 * 1000);
 });

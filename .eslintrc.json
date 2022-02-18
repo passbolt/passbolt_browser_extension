@@ -192,7 +192,7 @@
     ],
     "object-shorthand": [
       "error",
-      "never"
+      "consistent"
     ],
     "multiline-comment-style": [
       "error",

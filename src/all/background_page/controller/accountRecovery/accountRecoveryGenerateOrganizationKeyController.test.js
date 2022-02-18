@@ -12,42 +12,28 @@
  * @since         3.6.0
  */
 
-import {v4 as uuidv4} from "uuid";
-import {Worker} from "../../sdk/worker";
 import {AccountRecoveryGenerateOrganizationKeyController} from "./accountRecoveryGenerateOrganizationKeyController";
 
 describe("AccountRecoveryGenerateOrganizationKeyController", () => {
   describe("AccountRecoveryGenerateOrganizationKeyController::exec", () => {
     it("Should assert provided generate key pair dto is valid.", async() => {
-      const mockPort = {};
-      const mockWorker = new Worker(mockPort);
-      const requestId = uuidv4();
-      const controller = new AccountRecoveryGenerateOrganizationKeyController(mockWorker, requestId);
+      const controller = new AccountRecoveryGenerateOrganizationKeyController();
+      const promise = controller.exec();
 
-      expect.assertions(4);
-      try {
-        await controller.exec();
-      } catch (error) {
-        expect(error.message).toEqual("Could not validate entity GenerateGpgKeyPairEntity.");
-        expect(error.details.name).not.toBeUndefined();
-        expect(error.details.email).not.toBeUndefined();
-        expect(error.details.passphrase).not.toBeUndefined();
-      }
+      expect.assertions(1);
+      await expect(promise).rejects.toThrowError("Could not validate entity GenerateGpgKeyPairEntity.");
     });
 
     it("Should generate an account recovery organization key pair.", async() => {
-      const mockPort = {};
-      const mockWorker = new Worker(mockPort);
-      const requestId = uuidv4();
-      const controller = new AccountRecoveryGenerateOrganizationKeyController(mockWorker, requestId);
-
-      expect.assertions(3);
+      const controller = new AccountRecoveryGenerateOrganizationKeyController();
       const generateKeyPairDto = {
         name: "key name",
         email: "key@email.com",
         passphrase: "key passphrase",
       };
       const gpgKeyPair = await controller.exec(generateKeyPairDto);
+
+      expect.assertions(3);
       expect(gpgKeyPair.publicKey).not.toBeNull();
       expect(gpgKeyPair.privateKey).not.toBeNull();
       const openpgpKeyRsaBits = (await openpgp.key.readArmored(gpgKeyPair.privateKey.armoredKey)).keys[0].getAlgorithmInfo().bits;

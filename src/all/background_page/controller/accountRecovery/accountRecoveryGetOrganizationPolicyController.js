@@ -32,9 +32,9 @@ class AccountRecoveryGetOrganizationPolicyController {
    *
    * @return {Promise<void>}
    */
-  async _exec(accountRecoveryPrivateKeyDto) {
+  async _exec() {
     try {
-      const accountRecoveryOrganizationPolicy = await this.exec(accountRecoveryPrivateKeyDto);
+      const accountRecoveryOrganizationPolicy = await this.exec();
       this.worker.port.emit(this.requestId, "SUCCESS", accountRecoveryOrganizationPolicy);
     } catch (error) {
       console.error(error);

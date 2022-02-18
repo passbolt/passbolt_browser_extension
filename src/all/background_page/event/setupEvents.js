@@ -17,6 +17,7 @@ const {SetSetupLocaleController} = require("../controller/locale/setSetupLocaleC
 const {GetSetupLocaleController} = require("../controller/locale/getSetupLocaleController");
 const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
 const {VerifyPassphraseSetupController} = require("../controller/setup/verifyPassphraseSetupController");
+const {SetupSetAccountRecoveryUserSettingController} = require("../controller/setup/setupSetAccountRecoveryUserSettingController");
 
 const listen = function(worker) {
   /**
@@ -174,13 +175,8 @@ const listen = function(worker) {
    * @param accountRecoveryUserSettingDto {object} The account recovery user settings
    */
   worker.port.on('passbolt.setup.set-account-recovery-user-setting', async(requestId, accountRecoveryUserSettingDto) => {
-    try {
-      await setupController.setAccountRecoveryUserSetting(accountRecoveryUserSettingDto);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new SetupSetAccountRecoveryUserSettingController(worker, requestId, setupController.setupEntity);
+    await controller._exec(accountRecoveryUserSettingDto);
   });
 
   /*

@@ -92,18 +92,35 @@ class AccountRecoveryPrivateKeyPasswordEntity extends Entity {
    * Dynamic properties getters
    * ==================================================
    */
+
+  /**
+   * Get id
+   * @returns {(string|null)} uuid if set
+   */
   get id() {
     return this._props.id || null;
   }
 
+  /**
+   * Get recipient foreign key
+   * @returns {(string|null)} uuid if set
+   */
   get recipientForeignKey() {
     return this._props.recipient_foreign_key || null;
   }
 
+  /**
+   * Get data
+   * @returns {string} armored pgp message
+   */
   get data() {
-    return this._props.data || null;
+    return this._props.data;
   }
 
+  /**
+   * Get recipient foreign model
+   * @returns {(string|null)} i.e. AccountRecoveryOrganizationKey
+   */
   get recipientForeignModel() {
     return this._props.recipient_foreign_model;
   }

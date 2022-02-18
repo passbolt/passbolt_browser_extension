@@ -19,7 +19,6 @@ const {AccountRecoveryPrivateKeyPasswordsCollection} = require("./accountRecover
 const ENTITY_NAME = 'AccountRecoveryUserSetting';
 const STATUS_APPROVED = 'approved';
 const STATUS_REJECTED = 'rejected';
-const STATUS_PENDING = 'pending';
 
 class AccountRecoveryUserSettingEntity extends Entity {
   /**
@@ -68,8 +67,7 @@ class AccountRecoveryUserSettingEntity extends Entity {
           "type": "string",
           "enum": [
             AccountRecoveryUserSettingEntity.STATUS_APPROVED,
-            AccountRecoveryUserSettingEntity.STATUS_REJECTED,
-            AccountRecoveryUserSettingEntity.STATUS_PENDING
+            AccountRecoveryUserSettingEntity.STATUS_REJECTED
           ]
         },
         "created": {
@@ -150,14 +148,6 @@ class AccountRecoveryUserSettingEntity extends Entity {
     return this.status === AccountRecoveryUserSettingEntity.STATUS_REJECTED;
   }
 
-  /**
-   * Return true if the user didn't yet answer to the account recovery program
-   * @returns {boolean}
-   */
-  get isPending() {
-    return this.status === AccountRecoveryUserSettingEntity.STATUS_PENDING;
-  }
-
   /*
    * ==================================================
    * Dynamic properties setters
@@ -166,21 +156,10 @@ class AccountRecoveryUserSettingEntity extends Entity {
 
   /**
    * Get the user account recovery private key
-   * @returns {(AccountRecoveryPrivateKey|null)}
+   * @returns {(AccountRecoveryPrivateKeyEntity|null)}
    */
   get accountRecoveryPrivateKey() {
     return this._account_recovery_private_key || null;
-  }
-
-  /**
-   * Set the associated account recovery private key
-   * @param {AccountRecoveryPrivateKeyEntity} accountRecoveryPrivateKey
-   */
-  set accountRecoveryPrivateKey(accountRecoveryPrivateKey) {
-    if (!accountRecoveryPrivateKey || !(accountRecoveryPrivateKey instanceof AccountRecoveryPrivateKeyEntity)) {
-      throw new TypeError('Failed to assert the parameter is a valid AccountRecoveryPrivateKeyEntity');
-    }
-    this._account_recovery_private_key = accountRecoveryPrivateKey;
   }
 
   /**
@@ -189,17 +168,6 @@ class AccountRecoveryUserSettingEntity extends Entity {
    */
   get accountRecoveryPrivateKeyPasswords() {
     return this._account_recovery_private_key_passwords || null;
-  }
-
-  /**
-   * Set the associated account recovery private key passwords
-   * @param {AccountRecoveryPrivateKeyPasswordsCollection} accountRecoveryPrivateKeyPasswords
-   */
-  set accountRecoveryPrivateKeyPasswords(accountRecoveryPrivateKeyPasswords) {
-    if (!accountRecoveryPrivateKeyPasswords || !(accountRecoveryPrivateKeyPasswords instanceof AccountRecoveryPrivateKeyPasswordsCollection)) {
-      throw new TypeError('Failed to assert the parameter is a valid AccountRecoveryPrivateKeyPasswordsCollection');
-    }
-    this._account_recovery_private_key_passwords = accountRecoveryPrivateKeyPasswords;
   }
 
   /*
@@ -216,6 +184,14 @@ class AccountRecoveryUserSettingEntity extends Entity {
   }
 
   /**
+   * AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS
+   * @returns {object} all contain options that can be used in toDto()
+   */
+  static get ALL_CONTAIN_OPTIONS() {
+    return {account_recovery_private_key: true, account_recovery_private_key_passwords: true};
+  }
+
+  /**
    * AccountRecoveryUserSettingEntity.STATUS_APPROVED
    * @returns {string}
    */
@@ -225,18 +201,10 @@ class AccountRecoveryUserSettingEntity extends Entity {
 
   /**
    * AccountRecoveryUserSettingEntity.STATUS_REJECTED
-   * @returns {number}
+   * @returns {string}
    */
   static get STATUS_REJECTED() {
     return STATUS_REJECTED;
-  }
-
-  /**
-   * AccountRecoveryUserSettingEntity.PERMISSION_UPDATE
-   * @returns {number}
-   */
-  static get STATUS_PENDING() {
-    return STATUS_PENDING;
   }
 }
 

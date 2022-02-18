@@ -19,7 +19,7 @@ const {User} = require('../model/user');
 const {AccountRecoveryGenerateOrganizationKeyController} = require("../controller/accountRecovery/accountRecoveryGenerateOrganizationKeyController");
 const fileController = require('../controller/fileController');
 const {AccountRecoveryModel} = require("../model/accountRecovery/accountRecoveryModel");
-const {AccountRecoverySaveUserSettingController} = require("../controller/accountRecovery/accountRecoverySaveUserSetting");
+const {AccountRecoverySaveUserSettingsController} = require("../controller/accountRecovery/accountRecoverySaveUserSettingController");
 const {AccountRecoveryReviewRequestController} = require("../controller/accountRecovery/accountRecoveryReviewRequestController");
 const {GetKeyInfoController} = require("../controller/crypto/getKeyInfoController");
 const {AccountRecoveryGetOrganizationPolicyController} = require("../controller/accountRecovery/accountRecoveryGetOrganizationPolicyController");
@@ -86,10 +86,10 @@ const listen = function(worker) {
     }
   });
 
-  worker.port.on('passbolt.user.save-account-recovery-settings', async(requestId, accountRecoveryUserSettingDto, accountRecoveryOrganizationPublicKeyDto) => {
+  worker.port.on('passbolt.account-recovery.save-user-settings', async(requestId, accountRecoveryUserSettingDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new AccountRecoverySaveUserSettingController(worker, requestId, apiClientOptions);
-    return await controller.exec(accountRecoveryUserSettingDto, accountRecoveryOrganizationPublicKeyDto);
+    const controller = new AccountRecoverySaveUserSettingsController(worker, requestId, apiClientOptions);
+    await controller._exec(accountRecoveryUserSettingDto);
   });
 
   worker.port.on('passbolt.account-recovery.review-request', async(requestId, accountRecoveryResponseDto, privateKeyDto) => {

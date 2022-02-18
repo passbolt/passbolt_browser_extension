@@ -25,7 +25,6 @@ const {GenerateGpgKeyEntity} = require("../../model/entity/gpgkey/generate/gener
 const {SecurityTokenEntity} = require("../../model/entity/securityToken/securityTokenEntity");
 const {AccountEntity} = require("../../model/entity/account/accountEntity");
 const {i18n} = require('../../sdk/i18n');
-const {SetAccountRecoveryUserSetting} = require("../../service/setup/setAccountRecoveryUserSetting");
 const {GetGpgKeyInfoService} = require('../../service/crypto/getGpgKeyInfoService');
 
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
@@ -92,15 +91,6 @@ class SetupController {
   async downloadRecoveryKit() {
     const userPrivateArmoredKey = this.setupEntity.userPrivateArmoredKey;
     await fileController.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", this.worker.tab.id);
-  }
-
-  /**
-   * Set the user account recovery setting.
-   * @param {Object} accountRecoveryUserSettingDto The account recovery user setting dto
-   * @return {Promise<void>}
-   */
-  async setAccountRecoveryUserSetting(accountRecoveryUserSettingDto) {
-    return SetAccountRecoveryUserSetting.set(this.setupEntity, accountRecoveryUserSettingDto);
   }
 
   /**

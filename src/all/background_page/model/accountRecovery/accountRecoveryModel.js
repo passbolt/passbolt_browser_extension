@@ -17,14 +17,11 @@ const {AccountRecoveryPrivateKeyPasswordsCollection} = require("../entity/accoun
 const {AccountRecoveryRequestsCollection} = require("../entity/accountRecovery/accountRecoveryRequestsCollection");
 const {AccountRecoveryRequestService} = require("../../service/api/accountRecovery/accountRecoveryRequestService");
 const {AccountRecoveryUserService} = require('../../service/api/accountRecovery/accountRecoveryUserService');
-const {BuildAccountRecoveryUserSettingEntityService} = require('../../service/accountRecovery/buildAccountRecoveryUserSettingEntityService');
 const {AccountRecoveryResponseService} = require("../../service/api/accountRecovery/accountRecoveryResponseService");
 const {AccountRecoveryRequestEntity} = require("../entity/accountRecovery/accountRecoveryRequestEntity");
 const {AccountRecoveryResponseEntity} = require("../entity/accountRecovery/accountRecoveryResponseEntity");
 const {AccountRecoveryPrivateKeyPasswordService} = require('../../service/api/accountRecovery/accountRecoveryPrivateKeyPasswordService');
-const {DecryptPrivateKeyService} = require('../../service/crypto/decryptPrivateKeyService');
-const {PrivateGpgkeyEntity} = require('../entity/gpgkey/privateGpgkeyEntity');
-const {Keyring} = require('../keyring');
+const {AccountRecoveryUserSettingEntity} = require("../entity/accountRecovery/accountRecoveryUserSettingEntity");
 /**
  * Model related to the account recovery
  */
@@ -88,29 +85,15 @@ class AccountRecoveryModel {
   }
 
   /**
-   * Save organization settings of an accountRecovery using Passbolt API
+   * Save account recovery user setting.
    *
-   * @param {AccountRecoveryOrganizationPolicyEntity} accountRecoveryOrganizationPolicyEntity
-   * @returns {Promise<AccountRecoveryOrganizationPolicyEntity>}
+   * @param {AccountRecoveryUserSettingEntity} accountRecoveryUserSetting The user settings to save
+   * @returns {Promise<AccountRecoveryUserSettingEntity>}
    */
-  async saveUserSetting(accountRecoveryUserSetting, userPasshphrase, accountRecoveryOrganizationPublicKeyEntity) {
-    if (accountRecoveryUserSetting.isRejected) {
-      this.accountRecoveryUserService.saveUserSetting(accountRecoveryUserSetting);
-      return;
-    }
-
-    const keyring = new Keyring();
-    const decryptedUserPrivateKey = await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(new PrivateGpgkeyEntity({
-      armored_key: keyring.findPrivate().armoredKey,
-      passphrase: userPasshphrase
-    }));
-
-    const accountRecoveryUserSettingEntity = await BuildAccountRecoveryUserSettingEntityService.build(
-      accountRecoveryUserSetting.toDto(),
-      accountRecoveryOrganizationPublicKeyEntity,
-      decryptedUserPrivateKey.armoredKey
-    );
-    this.accountRecoveryUserService.saveUserSetting(accountRecoveryUserSettingEntity);
+  async saveUserSetting(accountRecoveryUserSetting) {
+    const accountRecoveryUserSettingDto = accountRecoveryUserSetting.toDto(AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS);
+    const savedAccountRecoveryUserSettingDto = await this.accountRecoveryUserService.saveUserSetting(accountRecoveryUserSettingDto);
+    return new AccountRecoveryUserSettingEntity(savedAccountRecoveryUserSettingDto);
   }
 
   /**
@@ -126,13 +109,14 @@ class AccountRecoveryModel {
   }
 
   /**
-   * Save the response for the review of an account recovery
+   * Save the account recovery response.
    *
-   * @param {AccountRecoveryResponseEntity} accountRecoveryResponseEntity
+   * @param {AccountRecoveryResponseEntity} accountRecoveryResponseEntity The account recovery response to save.
    */
   async saveReview(accountRecoveryResponseEntity) {
-    const accountRecoveryResponseDto = await this.accountRecoveryResponseService.saveReview(accountRecoveryResponseEntity.toDto());
-    return new AccountRecoveryResponseEntity(accountRecoveryResponseDto);
+    const accountRecoveryResponseDto = accountRecoveryResponseEntity.toDto(AccountRecoveryResponseEntity);
+    const savedAccountRecoveryResponseDto = await this.accountRecoveryResponseService.saveReview(accountRecoveryResponseDto);
+    return new AccountRecoveryResponseEntity(savedAccountRecoveryResponseDto);
   }
 }
 

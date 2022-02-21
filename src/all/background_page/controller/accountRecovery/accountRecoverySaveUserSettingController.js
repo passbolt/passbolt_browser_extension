@@ -65,7 +65,7 @@ class AccountRecoverySaveUserSettingsController {
     if (isApproved) {
       accountRecoveryUserSettingEntity = await this.buildApprovedUserSetting();
     } else {
-      const userId = User.getInstance().get().id
+      const userId = User.getInstance().get().id;
       const userSettingDto = {user_id: userId, status: AccountRecoveryUserSettingEntity.STATUS_REJECTED};
       accountRecoveryUserSettingEntity = new AccountRecoveryUserSettingEntity(userSettingDto);
     }

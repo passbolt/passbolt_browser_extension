@@ -18,11 +18,11 @@ const {AccountRecoveryValidateOrganizationPrivateKeyController} = require("../co
 const {User} = require('../model/user');
 const {AccountRecoveryGenerateOrganizationKeyController} = require("../controller/accountRecovery/accountRecoveryGenerateOrganizationKeyController");
 const fileController = require('../controller/fileController');
-const {AccountRecoveryModel} = require("../model/accountRecovery/accountRecoveryModel");
 const {AccountRecoverySaveUserSettingsController} = require("../controller/accountRecovery/accountRecoverySaveUserSettingController");
 const {AccountRecoveryReviewRequestController} = require("../controller/accountRecovery/accountRecoveryReviewRequestController");
 const {GetKeyInfoController} = require("../controller/crypto/getKeyInfoController");
 const {AccountRecoveryGetOrganizationPolicyController} = require("../controller/accountRecovery/accountRecoveryGetOrganizationPolicyController");
+const {AccountRecoveryGetUserRequestsController} = require("../controller/accountRecovery/accountRecoveryGetUserRequestsController");
 
 /**
  * Listens the account recovery events
@@ -75,15 +75,9 @@ const listen = function(worker) {
 
   /** Whenever the account recovery user requests needs to be get */
   worker.port.on('passbolt.account-recovery.get-user-requests', async(requestId, userId) => {
-    try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
-      const accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
-      const accountRecoveryUserRequestsCollection = await accountRecoveryModel.findUserRequests(userId);
-      worker.port.emit(requestId, 'SUCCESS', accountRecoveryUserRequestsCollection);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new AccountRecoveryGetUserRequestsController(worker, requestId, apiClientOptions);
+    await controller._exec(userId);
   });
 
   worker.port.on('passbolt.account-recovery.save-user-settings', async(requestId, accountRecoveryUserSettingDto) => {

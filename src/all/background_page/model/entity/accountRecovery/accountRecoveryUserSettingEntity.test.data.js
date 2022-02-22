@@ -13,32 +13,32 @@
  */
 
 import {v4 as uuidv4} from "uuid";
-import {defaultUserDto} from "../user/userEntity.test.data";
-import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
 
-export const createAccountRecoveryOrganizationPolicyDto = data => {
+export const createRejectedAccountRecoveryUserSettingDto = data => {
   const defaultData = {
-    policy: "opt-out",
-    account_recovery_organization_public_key: {
-      armored_key: pgpKeys.account_recovery_organization.public
-    },
+    user_id: uuidv4(),
+    status: "rejected",
   };
 
   return Object.assign(defaultData, data || {});
 };
 
-export const defaultAccountRecoveryOrganizationPolicyDto = data => {
-  const defaultData = {
+export const rejectedAccountRecoveryUserSettingDto = data => {
+  const defaultData = createRejectedAccountRecoveryUserSettingDto({
     id: uuidv4(),
-    policy: "opt-out",
-    account_recovery_organization_public_key: {
-      armored_key: pgpKeys.account_recovery_organization.public
-    },
-    creator: defaultUserDto(),
     created_by: uuidv4(),
     modified_by: uuidv4(),
     created: "2022-01-13T13:19:04.661Z",
     modified: "2022-01-13T13:19:04.661Z"
+  });
+
+  return Object.assign(defaultData, data || {});
+};
+
+export const createAcceptedAccountRecoveryUserSettingDto = data => {
+  const defaultData = {
+    user_id: uuidv4(),
+    status: "approved",
   };
 
   return Object.assign(defaultData, data || {});

@@ -12,8 +12,9 @@
  * @since         3.6.0
  */
 const {AbstractService} = require('../abstract/abstractService');
+const {v4: uuidv4} = require("uuid");
 
-const ACCOUNT_RECOVERY_SERVICE_RESOURCE_NAME = '/account-recovery/users/settings/';
+const ACCOUNT_RECOVERY_SERVICE_RESOURCE_NAME = '/account-recovery/users/settings';
 
 class AccountRecoveryUserService extends AbstractService {
   /**
@@ -37,21 +38,31 @@ class AccountRecoveryUserService extends AbstractService {
   }
 
   /**
-   * Save user account recovery settings using Passbolt API
+   * Save account recovery user setting using Passbolt API
    *
-   * @param {AccountRecoveryUserSettingDto} accountRecoveryUserSettingDto
+   * @param {Object} accountRecoveryUserSettingDto The account recovery user setting dto to save
    * @returns {Promise<*>} Response body
    * @throw {TypeError} if user account recovery setting dto is null
    * @public
    */
   async saveUserSetting(accountRecoveryUserSettingDto) {
-    // @todo @debug @mock for account-recovery
     this.assertNonEmptyData(accountRecoveryUserSettingDto);
-    return accountRecoveryUserSettingDto;
-    /*
-     * const response = await this.apiClient.create(accountRecoveryUserSettingDto);
-     * return response.body;
-     */
+
+    if (typeof jest === "undefined") {
+      // @todo mock based on the test data that need to be written.
+      return {
+        user_id: uuidv4(),
+        status: "rejected",
+        id: uuidv4(),
+        created_by: uuidv4(),
+        modified_by: uuidv4(),
+        created: "2022-01-13T13:19:04.661Z",
+        modified: "2022-01-13T13:19:04.661Z"
+      };
+    }
+
+    const response = await this.apiClient.create(accountRecoveryUserSettingDto);
+    return response.body;
   }
 }
 

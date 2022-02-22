@@ -22,7 +22,7 @@ const privateKey = pgpKeys.ada.private;
 
 describe("ReEncryptPrivateKeyService service", () => {
   it('should throw an exception if the given key is not formatted properly', async() => {
-    const privateKeyFormatError = new Error("The private keys must be of type string or openpgp.key.Key");
+    const privateKeyFormatError = new Error("The key must be of type string or openpgp.key.Key");
     const scenarios = [
       {key: null, expectedError: privateKeyFormatError},
       {key: {}, expectedError: privateKeyFormatError},
@@ -34,18 +34,15 @@ describe("ReEncryptPrivateKeyService service", () => {
     expect.assertions(scenarios.length);
     for (let i = 0; i < scenarios.length; i++) {
       const scenario = scenarios[i];
-      try {
-        await ReEncryptPrivateKeyService.reEncrypt(scenario.key, "old", "new");
-      } catch (e) {
-        expect(e).toStrictEqual(scenario.expectedError);
-      }
+      const promise = ReEncryptPrivateKeyService.reEncrypt(scenario.key, "old", "new");
+      await expect(promise).rejects.toThrowError(scenario.expectedError);
     }
   });
 
   it('should throw an exception if the given key is not a private key', () => {
     expect.assertions(1);
     const promise = ReEncryptPrivateKeyService.reEncrypt(publicKey, "old", "new");
-    return expect(promise).rejects.toThrowError(new Error("The private key is not a valid private key."));
+    return expect(promise).rejects.toThrowError(new Error("The key is not a valid private key."));
   });
 
   it('should throw an exception if the passphrase are formatted properly', async() => {
@@ -53,19 +50,13 @@ describe("ReEncryptPrivateKeyService service", () => {
     const nonUtf8String = "\u{10000}";
     const utf8String = "hello";
 
-    try {
-      //Old passphrase is non UTF8
-      await ReEncryptPrivateKeyService.reEncrypt(privateKey, nonUtf8String, utf8String);
-    } catch (e) {
-      expect(e).toStrictEqual(new Error("The passphrase should be a valid UTF8 string."));
-    }
+    //Old passphrase is non UTF8
+    let promise = ReEncryptPrivateKeyService.reEncrypt(privateKey, nonUtf8String, utf8String);
+    await expect(promise).rejects.toThrowError(new Error("The passphrase should be a valid UTF8 string."));
 
-    try {
-      //New passphrase is non UTF8
-      await ReEncryptPrivateKeyService.reEncrypt(privateKey, utf8String, nonUtf8String);
-    } catch (e) {
-      expect(e).toStrictEqual(new Error("The passphrase should be a valid UTF8 string."));
-    }
+    // New passphrase is non UTF8
+    promise = ReEncryptPrivateKeyService.reEncrypt(privateKey, utf8String, nonUtf8String);
+    await expect(promise).rejects.toThrowError(new Error("The passphrase should be a valid UTF8 string."));
   });
 
   it("should throw an exception if the private key can't be decrypted with the old passphrase", () => {
@@ -74,7 +65,7 @@ describe("ReEncryptPrivateKeyService service", () => {
     return expect(promise).rejects.toThrowError(new InvalidMasterPasswordError());
   });
 
-  it('should reencrypt a given key with a new passphrase', async() => {
+  it('should re-encrypt a given key with a new passphrase', async() => {
     const newPassphrase = "newPassphrase";
     const reEncryptedKey = await ReEncryptPrivateKeyService.reEncrypt(privateKey, "ada@passbolt.com", newPassphrase);
 

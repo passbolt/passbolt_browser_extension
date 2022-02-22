@@ -11,22 +11,20 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {defaultAccountRecoveryRequestDto} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
-
 import {enableFetchMocks} from "jest-fetch-mock";
-import {Worker} from "../../sdk/worker";
 import {v4 as uuidv4} from "uuid";
-import {ApiClientOptions} from "../../service/api/apiClient/apiClientOptions";
 import {AccountRecoveryReviewRequestController} from "./accountRecoveryReviewRequestController";
-import {EntityValidationError} from "../../model/entity/abstract/entityValidationError";
 import {DecryptMessageService} from "../../service/crypto/decryptMessageService";
 import {DecryptPrivateKeyService} from "../../service/crypto/decryptPrivateKeyService";
-import {
-  acceptedAccountRecoveryResponseDto, createAcceptedAccountRecoveryResponseDto,
-  createRejectedAccountRecoveryResponseDto, rejectedAccountRecoveryResponseDto
-} from "../../model/entity/accountRecovery/accountRecoveryResponseEntity.test.data";
 import {InvalidMasterPasswordError} from "../../error/invalidMasterPasswordError";
+import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
 import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
+import {defaultAccountRecoveryRequestDto} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+import {
+  createAcceptedAccountRecoveryResponseDto,
+  createRejectedAccountRecoveryResponseDto
+} from "../../model/entity/accountRecovery/accountRecoveryResponseEntity.test.data";
 
 jest.mock("../passphrase/passphraseController.js", () => ({
   request: jest.fn().mockImplementation(() => {})
@@ -35,151 +33,86 @@ jest.mock("../passphrase/passphraseController.js", () => ({
 // Reset the modules before each test.
 beforeEach(() => {
   enableFetchMocks();
+  fetch.resetMocks();
 });
 
 describe("AccountRecoveryReviewUserRequestController", () => {
   describe("AccountRecoveryReviewUserRequestController::exec", () => {
-    it("Should assert the provided account recovery response dto is valid.", async() => {
-      const mockPort = {};
-      const mockWorker = new Worker(mockPort);
-      const requestId = uuidv4();
-      const apiClientOptions = (new ApiClientOptions()).setBaseUrl("https://localhost");
-      const controller = new AccountRecoveryReviewRequestController(mockWorker, requestId, apiClientOptions);
-
-      const accountRecoveryResponseDto = {};
-      const privateKeyDto = {};
-
-      expect.assertions(6);
-      try {
-        await controller.exec(accountRecoveryResponseDto, privateKeyDto);
-      } catch (error) {
-        expect(error).toBeInstanceOf(EntityValidationError);
-        expect(error.message).toEqual("Could not validate entity AccountRecoveryResponse.");
-        expect(error.details.account_recovery_request_id).not.toBeUndefined();
-        expect(error.details.responder_foreign_key).not.toBeUndefined();
-        expect(error.details.responder_foreign_model).not.toBeUndefined();
-        expect(error.details.status).not.toBeUndefined();
-      }
-    });
-
-    it("Should assert the provided private key dto is valid.", async() => {
-      const mockPort = {};
-      const mockWorker = new Worker(mockPort);
-      const requestId = uuidv4();
-      const apiClientOptions = (new ApiClientOptions())
-        .setBaseUrl("https://localhost");
-      const controller = new AccountRecoveryReviewRequestController(mockWorker, requestId, apiClientOptions);
-
-      const accountRecoveryResponseDto = createAcceptedAccountRecoveryResponseDto();
-      const privateKeyDto = {};
-
-      expect.assertions(4);
-      try {
-        await controller.exec(accountRecoveryResponseDto, privateKeyDto);
-      } catch (error) {
-        expect(error).toBeInstanceOf(EntityValidationError);
-        expect(error.message).toEqual("Could not validate entity PrivateGpgkey.");
-        expect(error.details.passphrase).not.toBeUndefined();
-        expect(error.details.armored_key).not.toBeUndefined();
-      }
-    });
-
-    it("Should throw an error if the account recovery organization private key cannot be decrypted.", async() => {
-      const mockPort = {};
-      const mockWorker = new Worker(mockPort);
-      const requestId = uuidv4();
-      const apiClientOptions = (new ApiClientOptions())
-        .setBaseUrl("https://localhost");
-      const controller = new AccountRecoveryReviewRequestController(mockWorker, requestId, apiClientOptions);
-
-      const accountRecoveryResponseDto = createAcceptedAccountRecoveryResponseDto();
-      const privateKeyDto = {
-        armored_key: pgpKeys.account_recovery_organization.private,
-        passphrase: "wrong-passphrase"
-      };
-
-      expect.assertions(1);
-      const result = controller.exec(accountRecoveryResponseDto, privateKeyDto);
-      await expect(result).rejects.toThrowError(new InvalidMasterPasswordError());
-    });
-
     it("Should save a review account recovery request if approved.", async() => {
-      const mockPort = {};
-      const mockWorker = new Worker(mockPort);
-      const requestId = uuidv4();
-      const apiClientOptions = (new ApiClientOptions())
-        .setBaseUrl("https://localhost");
-      const controller = new AccountRecoveryReviewRequestController(mockWorker, requestId, apiClientOptions);
-
-      // Mock API responses
+      const controller = new AccountRecoveryReviewRequestController(null, null, defaultApiClientOptions());
       const accountRecoveryRequestId = uuidv4();
-      const mockFetchRequestUrl = `${apiClientOptions.baseUrl}/account-recovery/requests/${accountRecoveryRequestId}.json*`;
-      const mockFetchRequestResult = defaultAccountRecoveryRequestDto({id: accountRecoveryRequestId});
-      fetch.doMockOnceIf(new RegExp(mockFetchRequestUrl), JSON.stringify({header: {}, body: mockFetchRequestResult}));
 
-      const mockPostResponseUrl = `${apiClientOptions.baseUrl}/account-recovery/responses.json*`;
-      const mockPostResponseResult = acceptedAccountRecoveryResponseDto();
-      fetch.doMockOnceIf(new RegExp(mockPostResponseUrl), JSON.stringify({header: {}, body: mockPostResponseResult}));
+      // Mock API get account recovery request.
+      fetch.doMockOnce(() => mockApiResponse(defaultAccountRecoveryRequestDto({id: accountRecoveryRequestId})));
+      // Mock API save account recovery response, return the request payload for assertion.
+      fetch.doMockOnce(async req => mockApiResponse(JSON.parse(await req.text())));
 
       const accountRecoveryResponseDto = createAcceptedAccountRecoveryResponseDto({account_recovery_request_id: accountRecoveryRequestId});
       const privateKeyDto = {
         armored_key: pgpKeys.account_recovery_organization.private,
         passphrase: pgpKeys.account_recovery_organization.passphrase
       };
-      const accountRecoveryResponseEntity = await controller.exec(accountRecoveryResponseDto, privateKeyDto);
+      const savedAccountRecoveryResponseEntity = await controller.exec(accountRecoveryResponseDto, privateKeyDto);
 
-      expect.assertions(7);
-      expect(accountRecoveryResponseEntity.id).not.toBeNull();
-      expect(accountRecoveryResponseEntity.status).toEqual("approved");
-      expect(accountRecoveryResponseEntity.created).not.toBeNull();
-      expect(accountRecoveryResponseEntity.modified).not.toBeNull();
-      expect(accountRecoveryResponseEntity.createdBy).not.toBeNull();
-      expect(accountRecoveryResponseEntity.modifiedBy).not.toBeNull();
-
-      // This assertion is testing the tester. Test the API return response data can be decrypted with the test account recovery request key.
+      expect.assertions(2);
+      expect(savedAccountRecoveryResponseEntity.status).toEqual("approved");
       const expectedDecryptedPrivateKeyPasswordData = "3f28361aa774a5767fbe70ecd09b2fbbf1d5b4b493fe171089436bfa6a2eb03fe630fa9f2483c59b68e20616f1a7597ff8d058a6f79d228a4181d71a61f80d98";
       const decryptedAccountRecoveryRequestPrivateKey = await DecryptPrivateKeyService.decrypt(pgpKeys.account_recovery_request.private, pgpKeys.account_recovery_request.passphrase);
-      const decryptedPrivateKeyPasswordData = await DecryptMessageService.decrypt(accountRecoveryResponseEntity.data, decryptedAccountRecoveryRequestPrivateKey, pgpKeys.account_recovery_organization.public);
+      const decryptedPrivateKeyPasswordData = await DecryptMessageService.decrypt(savedAccountRecoveryResponseEntity.data, decryptedAccountRecoveryRequestPrivateKey, pgpKeys.account_recovery_organization.public);
       expect(decryptedPrivateKeyPasswordData.data).toEqual(expectedDecryptedPrivateKeyPasswordData);
     }, 10000);
 
     it("Should save a review account recovery request if rejected.", async() => {
-      const mockPort = {};
-      const mockWorker = new Worker(mockPort);
-      const requestId = uuidv4();
-      const apiClientOptions = (new ApiClientOptions())
-        .setBaseUrl("https://localhost");
-      const controller = new AccountRecoveryReviewRequestController(mockWorker, requestId, apiClientOptions);
+      const controller = new AccountRecoveryReviewRequestController(null, null, defaultApiClientOptions());
 
-      const mockPostResponseUrl = `${apiClientOptions.baseUrl}/account-recovery/responses.json*`;
-      const mockPostResponseResult = rejectedAccountRecoveryResponseDto();
-      fetch.doMockOnceIf(new RegExp(mockPostResponseUrl), JSON.stringify({header: {}, body: mockPostResponseResult}));
+      // Mock API save account recovery response, return the request payload for assertion.
+      fetch.doMockOnce(async req => mockApiResponse(JSON.parse(await req.text())));
 
       const accountRecoveryResponseDto = createRejectedAccountRecoveryResponseDto();
       const accountRecoveryResponseEntity = await controller.exec(accountRecoveryResponseDto);
 
-      expect.assertions(6);
-      expect(accountRecoveryResponseEntity.id).not.toBeNull();
+      expect.assertions(1);
       expect(accountRecoveryResponseEntity.status).toEqual("rejected");
-      expect(accountRecoveryResponseEntity.created).not.toBeNull();
-      expect(accountRecoveryResponseEntity.modified).not.toBeNull();
-      expect(accountRecoveryResponseEntity.createdBy).not.toBeNull();
-      expect(accountRecoveryResponseEntity.modifiedBy).not.toBeNull();
+    });
+
+    it("Should assert the provided account recovery response dto is valid.", async() => {
+      const controller = new AccountRecoveryReviewRequestController(null, null, defaultApiClientOptions());
+      const promise = controller.exec({}, {});
+
+      expect.assertions(1);
+      await expect(promise).rejects.toThrowError("Could not validate entity AccountRecoveryResponse.");
+    });
+
+    it("Should assert the provided private key dto is valid.", async() => {
+      const controller = new AccountRecoveryReviewRequestController(null, null, defaultApiClientOptions());
+
+      const accountRecoveryResponseDto = createAcceptedAccountRecoveryResponseDto();
+      const promise = controller.exec(accountRecoveryResponseDto, {});
+
+      expect.assertions(1);
+      await expect(promise).rejects.toThrowError("Could not validate entity PrivateGpgkey.");
+    });
+
+    it("Should throw an error if the account recovery organization private key cannot be decrypted.", async() => {
+      const controller = new AccountRecoveryReviewRequestController(null, null, defaultApiClientOptions());
+
+      const accountRecoveryResponseDto = createAcceptedAccountRecoveryResponseDto();
+      const privateKeyDto = {
+        armored_key: pgpKeys.account_recovery_organization.private,
+        passphrase: "wrong-passphrase"
+      };
+      const promise = controller.exec(accountRecoveryResponseDto, privateKeyDto);
+
+      expect.assertions(1);
+      await expect(promise).rejects.toThrowError(InvalidMasterPasswordError);
     });
 
     it("Should throw an error if no private key password to decrypt is found.", async() => {
-      const mockPort = {};
-      const mockWorker = new Worker(mockPort);
-      const requestId = uuidv4();
-      const apiClientOptions = (new ApiClientOptions())
-        .setBaseUrl("https://localhost");
-      const controller = new AccountRecoveryReviewRequestController(mockWorker, requestId, apiClientOptions);
-
-      // Mock API responses
+      const controller = new AccountRecoveryReviewRequestController(null, null, defaultApiClientOptions());
       const accountRecoveryRequestId = uuidv4();
-      const mockFetchRequestUrl = `${apiClientOptions.baseUrl}/account-recovery/requests/${accountRecoveryRequestId}.json*`;
-      const mockFetchRequestResult = defaultAccountRecoveryRequestDto({id: accountRecoveryRequestId, account_recovery_private_key_passwords: []});
-      fetch.doMockOnceIf(new RegExp(mockFetchRequestUrl), JSON.stringify({header: {}, body: mockFetchRequestResult}));
+
+      // Mock API get account recovery request with empty account recovery key passwords.
+      fetch.doMockOnce(() => mockApiResponse(defaultAccountRecoveryRequestDto({id: accountRecoveryRequestId, account_recovery_private_key_passwords: []})));
 
       const accountRecoveryResponseDto = createAcceptedAccountRecoveryResponseDto({account_recovery_request_id: accountRecoveryRequestId});
       const privateKeyDto = {

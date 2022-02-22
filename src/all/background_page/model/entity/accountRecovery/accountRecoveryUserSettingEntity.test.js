@@ -22,7 +22,7 @@ describe("AccountRecoveryUserSetting entity", () => {
 
   it("constructor works if valid minimal DTO is provided", () => {
     const dto = {
-      "status": "pending"
+      "status": "approved"
     };
     const entity = new AccountRecoveryUserSettingEntity(dto);
     expect(entity.toDto()).toEqual(dto);
@@ -32,7 +32,7 @@ describe("AccountRecoveryUserSetting entity", () => {
     const dto = {
       "id": "d4c0e643-3967-443b-93b3-102d902c4510",
       "user_id": "d4c0e643-3967-443b-93b3-102d902c4511",
-      "status": "pending",
+      "status": "approved",
       "created": "2020-05-04T20:31:45+00:00",
       "modified": "2020-05-04T20:31:45+00:00",
       "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
@@ -46,7 +46,7 @@ describe("AccountRecoveryUserSetting entity", () => {
     const dto = {
       "id": "d4c0e643-3967-443b-93b3-102d902c4510",
       "user_id": "d4c0e643-3967-443b-93b3-102d902c4511",
-      "status": "pending",
+      "status": "approved",
       "created": "2020-05-04T20:31:45+00:00",
       "modified": "2020-05-04T20:31:45+00:00",
       "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",

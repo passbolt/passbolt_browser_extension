@@ -14,9 +14,9 @@
 
 const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
 
-class AccountRecoveryGetOrganizationPolicyController {
+class AccountRecoveryGetUserRequestsController {
   /**
-   * AccountRecoveryGetOrganizationPolicyController constructor
+   * AccountRecoveryGetUserRequestsController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions
@@ -30,26 +30,32 @@ class AccountRecoveryGetOrganizationPolicyController {
   /**
    * Wrapper of exec function to run it with worker.
    *
+   * @param {string} userId The user id the retrieve the user requests for
    * @return {Promise<void>}
    */
-  async _exec() {
+  async _exec(userId) {
     try {
-      const accountRecoveryOrganizationPolicy = await this.exec();
-      this.worker.port.emit(this.requestId, "SUCCESS", accountRecoveryOrganizationPolicy);
+      const collections = await this.exec(userId);
+      this.worker.port.emit(this.requestId, "SUCCESS", collections);
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, 'ERROR', error);
+      this.worker.port.emit(this.requestId, "ERROR", error);
     }
   }
 
   /**
-   * Get the account recovery organization policy
+   * Get account recovery user requests.
    *
-   * @return {Promise<AccountRecoveryOrganizationPolicyEntity|null>}
+   * @param {string} userId The user id the retrieve the user requests for
+   * @return {Promise<AccountRecoveryRequestsCollection|null>}
    */
-  async exec() {
-    return this.accountRecoveryModel.findOrganizationPolicy();
+  async exec(userId) {
+    if (!Validator.isUUID(userId)) {
+      throw new Error("The user id is not valid");
+    }
+
+    return this.accountRecoveryModel.findUserRequests(userId);
   }
 }
 
-exports.AccountRecoveryGetOrganizationPolicyController = AccountRecoveryGetOrganizationPolicyController;
+exports.AccountRecoveryGetUserRequestsController = AccountRecoveryGetUserRequestsController;

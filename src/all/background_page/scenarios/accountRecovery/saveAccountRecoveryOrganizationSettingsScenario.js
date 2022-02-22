@@ -31,39 +31,39 @@ class SaveAccountRecoveryOrganizationSettingsScenario {
   /**
    * Run the scenario to Save a new account recovery organization settings.
    *
-   * @param {AccountRecoveryOrganizationPolicyEntity} newPolicyEntity
-   * @param {AccountRecoveryOrganizationPolicyEntity} currentPolicyEntity
-   * @param {PrivateGpgkeyEntity} administratorPrivateKeyEntity
-   * @param {PrivateGpgkeyEntity|null} privateORKEntity
+   * @param {AccountRecoveryOrganizationPolicyEntity} newOrganizationPolicy The new account recovery organization policy.
+   * @param {AccountRecoveryOrganizationPolicyEntity} currentOrganizationPolicy The current account recovery organization policy.
+   * @param {PrivateGpgkeyEntity} userPrivateKey The user private key.
+   * @param {PrivateGpgkeyEntity|null} organizationPrivateKey The current account recovery organization private key.
    */
-  async run(newPolicyEntity, currentPolicyEntity, administratorPrivateKeyEntity, privateORKEntity) {
+  async run(newOrganizationPolicy, currentOrganizationPolicy, userPrivateKey, organizationPrivateKey) {
     const signingKeys = new ExternalGpgKeyCollection([]);
-    const hasToRevokeCurentORK = this._hasToRevokedCurrentORK(newPolicyEntity, currentPolicyEntity);
-    const hasToSignNewORK = this._hasToSignNewORK(newPolicyEntity, currentPolicyEntity);
-    const hasToRekeyPrivateKeyPasswordsCollection = hasToRevokeCurentORK && hasToSignNewORK;
-    const entityBuilder = new AccountRecoveryOrganizationPolicyEntityBuilder(newPolicyEntity, currentPolicyEntity);
+    const hasToRevokeCurrentOrganizationKey = this._hasToRevokedCurrentORK(newOrganizationPolicy, currentOrganizationPolicy);
+    const hasToSignNewOrganizationKey = this._hasToSignNewORK(newOrganizationPolicy, currentOrganizationPolicy);
+    const hasToReKeyPrivateKeyPasswords = hasToRevokeCurrentOrganizationKey && hasToSignNewOrganizationKey;
+    const entityBuilder = new AccountRecoveryOrganizationPolicyEntityBuilder(newOrganizationPolicy, currentOrganizationPolicy);
 
-    if (hasToRevokeCurentORK) {
-      const decryptedORKEntity = (await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(privateORKEntity)).armoredKey;
-      entityBuilder.withCurrentORKRevoked(await this._revokeCurrentORK(decryptedORKEntity));
+    if (hasToRevokeCurrentOrganizationKey) {
+      const decryptedOrganizationPrivateKey = (await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(organizationPrivateKey)).armoredKey;
+      entityBuilder.withCurrentORKRevoked(await this._revokeCurrentORK(decryptedOrganizationPrivateKey));
 
-      signingKeys.push(decryptedORKEntity);
+      signingKeys.push(decryptedOrganizationPrivateKey);
 
-      if (hasToRekeyPrivateKeyPasswordsCollection) {
-        const privateKeyPasswordCollection = await this._reEncryptPrivateKeyPasswords(newPolicyEntity.armoredKey, decryptedORKEntity);
+      if (hasToReKeyPrivateKeyPasswords) {
+        const privateKeyPasswordCollection = await this._reEncryptPrivateKeyPasswords(newOrganizationPolicy.armoredKey, decryptedOrganizationPrivateKey);
         entityBuilder.withPrivateKeyPasswordCollection(privateKeyPasswordCollection);
       }
     }
 
-    if (hasToSignNewORK) {
-      const decryptedAdministratorKey = await (DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(administratorPrivateKeyEntity));
+    if (hasToSignNewOrganizationKey) {
+      const decryptedAdministratorKey = await (DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(userPrivateKey));
       signingKeys.push(decryptedAdministratorKey.armoredKey);
 
-      const signedNewORK = await this._signNewORK(newPolicyEntity.armoredKey, signingKeys);
+      const signedNewORK = await this._signNewORK(newOrganizationPolicy.armoredKey, signingKeys);
       entityBuilder.withNewORKSigned(signedNewORK);
     }
 
-    await this.accountRecoveryModel.saveOrganizationSettings(await entityBuilder.build());
+    return this.accountRecoveryModel.saveOrganizationPolicy(await entityBuilder.build());
   }
 
   /**

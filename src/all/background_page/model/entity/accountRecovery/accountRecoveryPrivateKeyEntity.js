@@ -104,6 +104,14 @@ class AccountRecoveryPrivateKeyEntity extends Entity {
    * ==================================================
    */
 
+  /**
+   * Get data
+   * @returns {string} armored pgp message
+   */
+  get data() {
+    return this._props.data;
+  }
+
   /*
    * ==================================================
    * Static properties getters

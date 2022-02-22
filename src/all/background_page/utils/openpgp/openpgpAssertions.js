@@ -13,6 +13,33 @@
  */
 
 /**
+ * Assert pgp key(s).
+ * - Should be a valid armored key or valid openpgp key.
+ *
+ * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} publicKeys The key(s) to assert.
+ * @returns {array<openpgp.key.Key>|openpgp.key.Key}
+ * @private
+ */
+const assertKeys = async keys => {
+  if (Array.isArray(keys)) {
+    return Promise.all(keys.map(key => assertKeys(key)));
+  }
+
+  if (typeof keys === "string") {
+    try {
+      keys = (await openpgp.key.readArmored(keys)).keys[0];
+    } catch (error) {
+      throw new Error("The key is not a valid armored key");
+    }
+  } else if (!(keys instanceof openpgp.key.Key)) {
+    throw new Error("The key must be of type string or openpgp.key.Key");
+  }
+
+  return keys;
+};
+exports.assertKeys = assertKeys;
+
+/**
  * Assert pgp private key(s).
  * - Should be a valid armored key or valid openpgp key.
  * - Should be private.
@@ -23,24 +50,15 @@
  */
 const assertPrivateKeys = async privateKeys => {
   if (Array.isArray(privateKeys)) {
-    return privateKeys.map(async key => await assertPrivateKeys(key));
+    return Promise.all(privateKeys.map(key => assertPrivateKeys(key)));
   }
 
-  if (typeof privateKeys === "string") {
-    try {
-      privateKeys = (await openpgp.key.readArmored(privateKeys)).keys[0];
-    } catch (error) {
-      throw new Error("The private key is not a valid armored key");
-    }
-  } else if (!(privateKeys instanceof openpgp.key.Key)) {
-    throw new Error("The private keys must be of type string or openpgp.key.Key");
+  const privateKey = await assertKeys(privateKeys);
+  if (!privateKey.isPrivate()) {
+    throw new Error("The key is not a valid private key.");
   }
 
-  if (!privateKeys.isPrivate()) {
-    throw new Error("The private key is not a valid private key.");
-  }
-
-  return privateKeys;
+  return privateKey;
 };
 exports.assertPrivateKeys = assertPrivateKeys;
 
@@ -56,7 +74,7 @@ exports.assertPrivateKeys = assertPrivateKeys;
  */
 const assertDecryptedPrivateKeys = async privateKeys => {
   if (Array.isArray(privateKeys)) {
-    return privateKeys.map(async key => await assertDecryptedPrivateKeys(key));
+    return Promise.all(privateKeys.map(key => assertDecryptedPrivateKeys(key)));
   }
 
   const privateKey = await assertPrivateKeys(privateKeys);

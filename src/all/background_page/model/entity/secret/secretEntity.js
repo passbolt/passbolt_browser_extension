@@ -88,7 +88,7 @@ class SecretEntity extends Entity {
 
   /**
    * Get secret data
-   * @returns {string} admin or user
+   * @returns {string} armored pgp message
    */
   get data() {
     return this._props.data;

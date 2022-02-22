@@ -12,15 +12,14 @@
  * @since         3.6.0
  */
 
-import {v4 as uuidv4} from "uuid";
 import {enableFetchMocks} from "jest-fetch-mock";
-import {Worker} from "../../sdk/worker";
 import {AccountRecoveryValidateOrganizationPrivateKeyController} from "./accountRecoveryValidateOrganizationPrivateKeyController";
-import {ApiClientOptions} from "../../service/api/apiClient/apiClientOptions";
 import {EntityValidationError} from "../../model/entity/abstract/entityValidationError";
 import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
 import {defaultAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import {WrongOrganizationRecoveryKeyError} from "../../error/wrongOrganizationRecoveryKeyError";
+import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -30,30 +29,20 @@ beforeEach(() => {
 describe("AccountRecoveryValidateOrganizationPrivateKeyController", () => {
   describe("AccountRecoveryValidateOrganizationPrivateKeyController::exec", () => {
     it("Should assert the provided private key dto is valid.", async() => {
-      const mockPort = {};
-      const mockWorker = new Worker(mockPort);
-      const requestId = uuidv4();
-      const apiClientOptions = (new ApiClientOptions()).setBaseUrl("https://localhost");
-      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(mockWorker, requestId, apiClientOptions);
+      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(null, null, defaultApiClientOptions());
 
       const accountRecoveryPrivateKeyDto = {};
+      const resultPromise = controller.exec(accountRecoveryPrivateKeyDto);
 
       expect.assertions(1);
-      const resultPromise = controller.exec(accountRecoveryPrivateKeyDto);
       await expect(resultPromise).rejects.toThrowError(EntityValidationError);
     });
 
     it("Should throw an error if no account recovery organization policy is found.", async() => {
-      const mockPort = {};
-      const mockWorker = new Worker(mockPort);
-      const requestId = uuidv4();
-      const apiClientOptions = (new ApiClientOptions()).setBaseUrl("https://localhost");
-      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(mockWorker, requestId, apiClientOptions);
+      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(null, null, defaultApiClientOptions());
 
-      // Mock API responses
-      const mockFetchRequestUrl = `${apiClientOptions.baseUrl}/account-recovery/organization-policies.json*`;
-      const mockFetchRequestResult = null;
-      fetch.doMockOnceIf(new RegExp(mockFetchRequestUrl), JSON.stringify({header: {}, body: mockFetchRequestResult}));
+      // Mock API get account recovery organization policy.
+      fetch.doMockOnce(() => mockApiResponse(null));
 
       const privateKeyDto = {
         armored_key: pgpKeys.account_recovery_organization.private,
@@ -67,16 +56,10 @@ describe("AccountRecoveryValidateOrganizationPrivateKeyController", () => {
 
 
     it("Should throw an error if the key doesn't validate.", async() => {
-      const mockPort = {};
-      const mockWorker = new Worker(mockPort);
-      const requestId = uuidv4();
-      const apiClientOptions = (new ApiClientOptions()).setBaseUrl("https://localhost");
-      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(mockWorker, requestId, apiClientOptions);
+      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(null, null, defaultApiClientOptions());
 
-      // Mock API responses
-      const mockFetchRequestUrl = `${apiClientOptions.baseUrl}/account-recovery/organization-policies.json*`;
-      const mockFetchRequestResult = defaultAccountRecoveryOrganizationPolicyDto();
-      fetch.doMockOnceIf(new RegExp(mockFetchRequestUrl), JSON.stringify({header: {}, body: mockFetchRequestResult}));
+      // Mock API get account recovery organization policy.
+      fetch.doMockOnce(() => mockApiResponse(defaultAccountRecoveryOrganizationPolicyDto()));
 
       const privateKeyDto = {
         armored_key: pgpKeys.ada.private,
@@ -89,16 +72,10 @@ describe("AccountRecoveryValidateOrganizationPrivateKeyController", () => {
     });
 
     it("Should validate a valid account organization private key.", async() => {
-      const mockPort = {};
-      const mockWorker = new Worker(mockPort);
-      const requestId = uuidv4();
-      const apiClientOptions = (new ApiClientOptions()).setBaseUrl("https://localhost");
-      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(mockWorker, requestId, apiClientOptions);
+      const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(null, null, defaultApiClientOptions());
 
-      // Mock API responses
-      const mockFetchRequestUrl = `${apiClientOptions.baseUrl}/account-recovery/organization-policies.json*`;
-      const mockFetchRequestResult = defaultAccountRecoveryOrganizationPolicyDto();
-      fetch.doMockOnceIf(new RegExp(mockFetchRequestUrl), JSON.stringify({header: {}, body: mockFetchRequestResult}));
+      // Mock API get account recovery organization policy.
+      fetch.doMockOnce(() => mockApiResponse(defaultAccountRecoveryOrganizationPolicyDto()));
 
       const privateKeyDto = {
         armored_key: pgpKeys.account_recovery_organization.private,

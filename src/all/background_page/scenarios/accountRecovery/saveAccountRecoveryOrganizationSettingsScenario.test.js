@@ -32,7 +32,7 @@ describe("SaveAccountRecoveryOrganizationSettings scenarios", () => {
   };
 
   const mockedAccountRecoveryModel = {
-    saveOrganizationSettings: jest.fn(),
+    saveOrganizationPolicy: jest.fn(),
     findAccountRecoveryPrivateKeyPasswords: jest.fn(() => (
       new AccountRecoveryPrivateKeyPasswordsCollection(mockedData.privateKeyPasswordCollectionDto)
     ))
@@ -45,7 +45,7 @@ describe("SaveAccountRecoveryOrganizationSettings scenarios", () => {
 
   it(": the current policy is disabled and the new one is enabled", async() => {
     expect.assertions(5);
-    mockedAccountRecoveryModel.saveOrganizationSettings.mockImplementation(accountRecoveryOrganizationPolicyEntity => {
+    mockedAccountRecoveryModel.saveOrganizationPolicy.mockImplementation(accountRecoveryOrganizationPolicyEntity => {
       const dto = accountRecoveryOrganizationPolicyEntity.toDto(AccountRecoveryOrganizationPolicyEntity.ALL_CONTAIN_OPTIONS);
       expect(dto.policy).toEqual(newPolicyEntity.policy);
       expect(dto.account_recovery_organization_public_key.armored_key).toMatch(/^-----BEGIN PGP PUBLIC KEY BLOCK-----/);
@@ -62,7 +62,7 @@ describe("SaveAccountRecoveryOrganizationSettings scenarios", () => {
 
   it(": the current policy is enabled and the new one is disabled", async() => {
     expect.assertions(5);
-    mockedAccountRecoveryModel.saveOrganizationSettings.mockImplementation(accountRecoveryOrganizationPolicyEntity => {
+    mockedAccountRecoveryModel.saveOrganizationPolicy.mockImplementation(accountRecoveryOrganizationPolicyEntity => {
       const dto = accountRecoveryOrganizationPolicyEntity.toDto(AccountRecoveryOrganizationPolicyEntity.ALL_CONTAIN_OPTIONS);
       expect(dto.policy).toEqual(newPolicyEntity.policy);
       expect(dto.account_recovery_organization_revoked_key.armored_key).toMatch(/^-----BEGIN PGP PUBLIC KEY BLOCK-----/);
@@ -79,7 +79,7 @@ describe("SaveAccountRecoveryOrganizationSettings scenarios", () => {
 
   it(": the current policy is enabled and the new one is enabled but the ORK didn't change", async() => {
     expect.assertions(4);
-    mockedAccountRecoveryModel.saveOrganizationSettings.mockImplementation(accountRecoveryOrganizationPolicyEntity => {
+    mockedAccountRecoveryModel.saveOrganizationPolicy.mockImplementation(accountRecoveryOrganizationPolicyEntity => {
       const dto = accountRecoveryOrganizationPolicyEntity.toDto(AccountRecoveryOrganizationPolicyEntity.ALL_CONTAIN_OPTIONS);
       expect(dto.policy).toEqual(newPolicyEntity.policy);
       //Keys must be equal as the didn't change in this scenario
@@ -95,7 +95,7 @@ describe("SaveAccountRecoveryOrganizationSettings scenarios", () => {
 
   it(": the current policy is enabled and the new one is enabled and the ORK changed", async() => {
     expect.assertions(10);
-    mockedAccountRecoveryModel.saveOrganizationSettings.mockImplementation(accountRecoveryOrganizationPolicyEntity => {
+    mockedAccountRecoveryModel.saveOrganizationPolicy.mockImplementation(accountRecoveryOrganizationPolicyEntity => {
       const dto = accountRecoveryOrganizationPolicyEntity.toDto(AccountRecoveryOrganizationPolicyEntity.ALL_CONTAIN_OPTIONS);
       expect(dto.policy).toEqual(newPolicyEntity.policy);
       //Keys can't be equal as the key is now revoked at this stage

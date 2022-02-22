@@ -82,14 +82,16 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
    * @throw {TypeError} if account recovery organization policy dto is null
    * @public
    */
-  async saveOrganizationSettings(accountRecoveryOrganizationPolicyDto) {
-    // @todo @debug @mock for account-recovery
+  async saveOrganizationPolicy(accountRecoveryOrganizationPolicyDto) {
     this.assertNonEmptyData(accountRecoveryOrganizationPolicyDto);
-    return accountRecoveryOrganizationPolicyDto;
-    /*
-     * const response = await this.apiClient.create(accountRecoveryOrganizationPolicyDto);
-     * return response.body;
-     */
+
+    // @todo @debug @mock for account-recovery
+    if (typeof jest === 'undefined') {
+      return accountRecoveryOrganizationPolicyDto;
+    }
+
+    const response = await this.apiClient.create(accountRecoveryOrganizationPolicyDto);
+    return response.body;
   }
 
   /**

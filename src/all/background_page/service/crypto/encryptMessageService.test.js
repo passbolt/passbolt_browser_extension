@@ -28,7 +28,7 @@ describe("EncryptMessageService", () => {
 
       expect.assertions(3);
 
-      expect(resultEncrypt?.data).not.toBeNull();
+      expect(resultEncrypt?.data).toBeTruthy();
       const resultDecrypt = await openpgp.decrypt({
         message: await openpgp.message.readArmored(resultEncrypt.data),
         passwords: [encryptPassword]
@@ -44,7 +44,7 @@ describe("EncryptMessageService", () => {
       const resultEncrypt = await EncryptMessageService.encryptSymmetrically(messageClear, [encryptPassword], signingKey);
 
       expect.assertions(4);
-      expect(resultEncrypt?.data).not.toBeNull();
+      expect(resultEncrypt?.data).toBeTruthy();
       const resultDecrypt = await openpgp.decrypt({
         message: await openpgp.message.readArmored(resultEncrypt.data),
         passwords: [encryptPassword],
@@ -63,7 +63,7 @@ describe("EncryptMessageService", () => {
       const resultEncrypt = await EncryptMessageService.encryptSymmetrically(messageClear, [encryptPassword], [signingKeyUserA, signingKeyUserB]);
 
       expect.assertions(5);
-      expect(resultEncrypt?.data).not.toBeNull();
+      expect(resultEncrypt?.data).toBeTruthy();
       const resultDecrypt = await openpgp.decrypt({
         message: await openpgp.message.readArmored(resultEncrypt.data),
         passwords: [encryptPassword],
@@ -94,7 +94,7 @@ describe("EncryptMessageService", () => {
       const resultEncrypt = await EncryptMessageService.encrypt(messageClear, publicKey);
 
       expect.assertions(2);
-      expect(resultEncrypt?.data).not.toBeNull();
+      expect(resultEncrypt?.data).toBeTruthy();
       const resultDecrypt = await openpgp.decrypt({
         message: await openpgp.message.readArmored(resultEncrypt.data),
         privateKeys: (await openpgp.key.readArmored(pgpKeys.ada.private_decrypted)).keys[0]
@@ -110,7 +110,7 @@ describe("EncryptMessageService", () => {
       const resultEncrypt = await EncryptMessageService.encrypt(messageClear, publicKey, signingKey);
 
       expect.assertions(3);
-      expect(resultEncrypt?.data).not.toBeNull();
+      expect(resultEncrypt?.data).toBeTruthy();
       const resultDecrypt = await openpgp.decrypt({
         message: await openpgp.message.readArmored(resultEncrypt.data),
         privateKeys: (await openpgp.key.readArmored(pgpKeys.ada.private_decrypted)).keys[0],
@@ -129,7 +129,7 @@ describe("EncryptMessageService", () => {
       const resultEncrypt = await EncryptMessageService.encrypt(messageClear, publicKey, [signingKeyUserA, signingKeyUserB]);
 
       expect.assertions(4);
-      expect(resultEncrypt?.data).not.toBeNull();
+      expect(resultEncrypt?.data).toBeTruthy();
       const resultDecrypt = await openpgp.decrypt({
         message: await openpgp.message.readArmored(resultEncrypt.data),
         privateKeys: (await openpgp.key.readArmored(pgpKeys.ada.private_decrypted)).keys[0],

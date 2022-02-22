@@ -49,7 +49,7 @@ describe("AccountRecoverySaveUserSettingsController", () => {
 
       expect.assertions(1);
       const savedAccountRecoveryUserSettingDto = savedAccountRecoveryUserSetting.toDto(AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS);
-      await expect(savedAccountRecoveryUserSettingDto).toEqual(accountRecoveryUserSettingDto);
+      expect(savedAccountRecoveryUserSettingDto).toEqual(accountRecoveryUserSettingDto);
     });
 
     it("Should save an approved account recovery user setting.", async() => {
@@ -66,11 +66,11 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       const savedAccountRecoveryUserSetting = await controller.exec(accountRecoveryUserSettingDto);
 
       expect.assertions(5);
-      await expect(savedAccountRecoveryUserSetting).toBeInstanceOf(AccountRecoveryUserSettingEntity);
-      await expect(savedAccountRecoveryUserSetting.status).toEqual(AccountRecoveryUserSettingEntity.STATUS_APPROVED);
-      await expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKey).not.toBeUndefined();
-      await expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKeyPasswords).not.toBeUndefined();
-      await expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKeyPasswords).toHaveLength(1);
+      expect(savedAccountRecoveryUserSetting).toBeInstanceOf(AccountRecoveryUserSettingEntity);
+      expect(savedAccountRecoveryUserSetting.status).toEqual(AccountRecoveryUserSettingEntity.STATUS_APPROVED);
+      expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKey).not.toBeUndefined();
+      expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKeyPasswords).not.toBeUndefined();
+      expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKeyPasswords).toHaveLength(1);
     });
 
     it("Should throw an error if no account recovery organization policy is found.", async() => {

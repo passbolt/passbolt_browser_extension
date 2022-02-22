@@ -56,7 +56,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
       expect.assertions(1);
       const createdAccountRecoveryOrganizationPolicyDto = createdAccountRecoveryOrganizationPolicy.toDto(AccountRecoveryOrganizationPolicyEntity.ALL_CONTAIN_OPTIONS);
       // Even if we mock the API result, we ensure the output of the controller.
-      await expect(createdAccountRecoveryOrganizationPolicyDto).toEqual(accountRecoveryOrganizationPolicyDto);
+      expect(createdAccountRecoveryOrganizationPolicyDto).toEqual(accountRecoveryOrganizationPolicyDto);
     });
 
     it("Should assert the provided account recovery policy dto is valid.", async() => {

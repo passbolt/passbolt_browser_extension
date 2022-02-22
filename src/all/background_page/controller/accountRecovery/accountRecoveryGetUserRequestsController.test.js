@@ -41,7 +41,7 @@ describe("AccountRecoveryGetUserRequestsController", () => {
       const items = accountRecoveryRequests.items;
       expect(items).toHaveLength(2);
       const accountRecoveryOrganizationPolicyDto = accountRecoveryRequests.toDto();
-      await expect(accountRecoveryOrganizationPolicyDto).toEqual(mockApiResult);
+      expect(accountRecoveryOrganizationPolicyDto).toEqual(mockApiResult);
     });
 
     it("Should return an empty collection if the users has no account recovery requests.", async() => {

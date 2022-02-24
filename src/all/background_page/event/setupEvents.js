@@ -19,6 +19,7 @@ const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
 const {VerifyPassphraseSetupController} = require("../controller/setup/verifyPassphraseSetupController");
 const {GenerateKeyPairSetupController} = require("../controller/setup/generateKeyPairSetupController");
 const {SetupSetAccountRecoveryUserSettingController} = require("../controller/setup/setupSetAccountRecoveryUserSettingController");
+const {ImportPrivateKeySetupController} = require("../controller/setup/importPrivateKeySetupController");
 
 const listen = function(worker) {
   /**
@@ -183,13 +184,8 @@ const listen = function(worker) {
    * @param armoredKey {string} The armored key to import
    */
   worker.port.on('passbolt.setup.import-key', async(requestId, armoredKey) => {
-    try {
-      await setupController.importKey(armoredKey);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new ImportPrivateKeySetupController(worker, requestId, setupController.setupEntity);
+    await controller._exec(armoredKey);
   });
 
   /*

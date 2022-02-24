@@ -12,6 +12,7 @@ const passphraseController = require('../controller/passphrase/passphraseControl
 const fileController = require('../controller/fileController');
 const {GetUserKeyInfoController} = require('../controller/crypto/getUserKeyInfoController');
 const {CheckPassphraseController} = require('../controller/crypto/checkPassphraseController');
+const {DownloadUserPublicController} = require('../controller/crypto/downloadUserPublicKeyController');
 
 const listen = function(worker) {
   /*
@@ -63,21 +64,8 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.keyring.download-my-public-key', async requestId => {
-    let publicKeyArmored;
-    const filename = "passbolt_public.asc";
-    try {
-      const privateKeyInfo = await keyring.findPrivate();
-      if (privateKeyInfo) {
-        publicKeyArmored = await keyring.extractPublicKey(privateKeyInfo.armoredKey);
-      }
-      if (!publicKeyArmored) {
-        throw new Error(i18n.t('Public key not found.'));
-      }
-      await fileController.saveFile(filename, publicKeyArmored, "text/plain", worker.tab.id);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new DownloadUserPublicController(worker, requestId);
+    await controller._exec();
   });
 
   /*

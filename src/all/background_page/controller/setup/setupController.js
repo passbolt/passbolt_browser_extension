@@ -13,7 +13,6 @@
 const app = require("../../app");
 const {ApiClientOptions} = require("../../service/api/apiClient/apiClientOptions");
 const fileController = require('../../controller/fileController');
-const {GpgKeyError} = require("../../error/GpgKeyError");
 const {AccountModel} = require("../../model/account/accountModel");
 const {SetupModel} = require("../../model/setup/setupModel");
 const {AuthModel} = require("../../model/auth/authModel");
@@ -23,7 +22,7 @@ const {Crypto} = require('../../model/crypto');
 const {SetupEntity} = require("../../model/entity/setup/setupEntity");
 const {SecurityTokenEntity} = require("../../model/entity/securityToken/securityTokenEntity");
 const {AccountEntity} = require("../../model/entity/account/accountEntity");
-const {i18n} = require('../../sdk/i18n');
+const {SetAccountRecoveryUserSetting} = require("../../service/setup/setAccountRecoveryUserSetting");
 const {GetGpgKeyInfoService} = require('../../service/crypto/getGpgKeyInfoService');
 
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
@@ -78,62 +77,12 @@ class SetupController {
   }
 
   /**
-   * Import user key.
-   * @param {string} armoredKey The key to import
-   * @returns {Promise<void>}
+   * Set the user account recovery setting.
+   * @param {Object} accountRecoveryUserSettingDto The account recovery user setting dto
+   * @return {Promise<void>}
    */
-  async importKey(armoredKey) {
-    const keyInfo = await this._assertImportKeyFormat(armoredKey);
-    await this._assertImportKeyNotUsed(keyInfo.fingerprint);
-    this.setupEntity.userPrivateArmoredKey = keyInfo.armoredKey;
-    this.setupEntity.userPublicArmoredKey = await this.keyring.extractPublicKey(this.setupEntity.userPrivateArmoredKey);
-  }
-
-  /**
-   * Assert import key.
-   * @param {string} armoredKey The user armored private key
-   * @returns {Promise<object>} The keyinfo
-   * @throws {GpgKeyError} If the key is not a valid key
-   * @throws {GpgKeyError} If the key is not a private key
-   * @private
-   */
-  async _assertImportKeyFormat(armoredKey) {
-    let keyInfo = null;
-
-    try {
-      keyInfo = await GetGpgKeyInfoService.getKeyInfo(armoredKey);
-    } catch (error) {
-      throw new GpgKeyError(i18n.t('The key must be a valid private key.'));
-    }
-    if (!keyInfo.private) {
-      throw new GpgKeyError(i18n.t('The key must be a private key.'));
-    }
-
-    return keyInfo;
-  }
-
-  /**
-   * Assert import key is not already used
-   * @param {string} fingerprint The import key fingerprint
-   * @returns {Promise<void>}
-   * @throws {GpgKeyError} If the key is already used
-   * @private
-   */
-  async _assertImportKeyNotUsed(fingerprint) {
-    const domain = this.setupEntity.domain;
-    const serverPublicArmoredKey = this.setupEntity.serverPublicArmoredKey;
-    let keyAlreadyUsed = false;
-
-    try {
-      await this.legacyAuthModel.verify(domain, serverPublicArmoredKey, fingerprint);
-      keyAlreadyUsed = true;
-    } catch (error) {
-      // @todo Handle not controlled errors, such as timeout error...
-    }
-
-    if (keyAlreadyUsed) {
-      throw new GpgKeyError(i18n.t('This key is already used by another user.'));
-    }
+  async setAccountRecoveryUserSetting(accountRecoveryUserSettingDto) {
+    return SetAccountRecoveryUserSetting.set(this.setupEntity, accountRecoveryUserSettingDto);
   }
 
   /**

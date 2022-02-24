@@ -65,7 +65,11 @@ class Crypto {
     try {
       encryptedMessage = await openpgp.encrypt(options);
     } finally {
-      await openpgp.getWorker().clearKeyCache();
+      //Unit tests might fail otherwise
+      const worker = openpgp.getWorker();
+      if (worker) {
+        await openpgp.getWorker().clearKeyCache();
+      }
     }
 
     return encryptedMessage.data;
@@ -127,7 +131,11 @@ class Crypto {
     try {
       decrypted = await openpgp.decrypt({privateKeys: [privateKey], message: pgpMessage});
     } finally {
-      await openpgp.getWorker().clearKeyCache();
+      //Unit tests might fail otherwise
+      const worker = openpgp.getWorker();
+      if (worker) {
+        await openpgp.getWorker().clearKeyCache();
+      }
     }
 
     return decrypted.data;

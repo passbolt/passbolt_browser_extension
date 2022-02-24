@@ -219,17 +219,6 @@ class Keyring {
     return armoredKey;
   }
 
-  /**
-   * Extract a public armored key from a private armored key.
-   *
-   * @param {string} privateArmoredKey The private key armored
-   * @returns {string}
-   */
-  async extractPublicKey(privateArmoredKey) {
-    const key = await openpgp.key.readArmored(privateArmoredKey);
-    return key.keys[0].toPublic().armor();
-  }
-
   /*
    * ==================================================
    * SERVER SYNC

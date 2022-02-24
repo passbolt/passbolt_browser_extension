@@ -10,10 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {i18n} = require('../../sdk/i18n');
 const app = require("../../app");
 const {ApiClientOptions} = require("../../service/api/apiClient/apiClientOptions");
-const {GpgKeyError} = require("../../error/GpgKeyError");
 const {AccountModel} = require("../../model/account/accountModel");
 const {SetupModel} = require("../../model/setup/setupModel");
 const {AuthModel} = require("../../model/auth/authModel");
@@ -55,61 +53,6 @@ class RecoverController {
     this.setupEntity.serverPublicArmoredKey = keyInfo.armoredKey;
     await this.setupModel.findRecoverInfo(this.setupEntity);
     return this.setupEntity;
-  }
-
-  /**
-   * Import user key.
-   * @param {string} armoredKey The key to import
-   * @returns {Promise<void>}
-   */
-  async importKey(armoredKey) {
-    const keyInfo = await this._assertImportKeyFormat(armoredKey);
-    await this._assertImportKeyOwnedByUser(keyInfo.fingerprint);
-    this.setupEntity.userPrivateArmoredKey = keyInfo.armoredKey;
-    this.setupEntity.userPublicArmoredKey = await this.keyring.extractPublicKey(this.setupEntity.userPrivateArmoredKey);
-  }
-
-  /**
-   * Assert import key.
-   * @param {string} armoredKey The user armored private key
-   * @returns {Promise<object>} The keyinfo
-   * @throws {GpgKeyError} If the key is not a valid key
-   * @throws {GpgKeyError} If the key is not a private key
-   * @private
-   */
-  async _assertImportKeyFormat(armoredKey) {
-    let keyInfo = null;
-
-    try {
-      keyInfo = await GetGpgKeyInfoService.getKeyInfo(armoredKey);
-    } catch (error) {
-      throw new GpgKeyError(i18n.t('The key must be a valid private key.'));
-    }
-    if (!keyInfo.private) {
-      throw new GpgKeyError(i18n.t('The key must be a private key.'));
-    }
-
-    return keyInfo;
-  }
-
-  /**
-   * Assert import key is owned by the user doing the recover.
-   * @todo for now the function only check that the key is recognized by the server. The API does offer yet a way to verify that a key is associated to a user id.
-   * @param {string} fingerprint The import key fingerprint
-   * @returns {Promise<void>}
-   * @throws {GpgKeyError} If the key is already used
-   * @private
-   */
-  async _assertImportKeyOwnedByUser(fingerprint) {
-    const domain = this.setupEntity.domain;
-    const serverPublicArmoredKey = this.setupEntity.serverPublicArmoredKey;
-
-    try {
-      await this.legacyAuthModel.verify(domain, serverPublicArmoredKey, fingerprint);
-    } catch (error) {
-      // @todo Handle not controlled errors, such as timeout error...
-      throw new GpgKeyError(i18n.t('This key does not match any account.'));
-    }
   }
 
   /**

@@ -24,6 +24,19 @@ class MockExtension {
    * @returns {Promise<void>}
    */
   static async withConfiguredAccount() {
+    this.withMissingPrivateKeyAccount();
+
+    // Mock user private key
+    const keyring = new Keyring();
+    await keyring.importPrivate(pgpKeys.ada.private);
+  }
+
+  /**
+   * Mock the extension with a partially configured account. Ada by default without the private key set.
+   *
+   * @returns {Promise<void>}
+   */
+  static withMissingPrivateKeyAccount() {
     const user = User.getInstance();
     user.settings.setDomain("https://localhost");
     user.settings.setSecurityToken(defaultSecurityTokenDto());
@@ -35,9 +48,8 @@ class MockExtension {
     };
     user.set(userDto);
 
-    // Mock user private key
     const keyring = new Keyring();
-    await keyring.importPrivate(pgpKeys.ada.private);
+    keyring.flush(Keyring.PRIVATE);
   }
 }
 exports.MockExtension = MockExtension;

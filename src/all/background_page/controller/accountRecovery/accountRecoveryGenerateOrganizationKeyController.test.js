@@ -38,6 +38,6 @@ describe("AccountRecoveryGenerateOrganizationKeyController", () => {
       expect(gpgKeyPair.privateKey).not.toBeNull();
       const openpgpKeyRsaBits = (await openpgp.key.readArmored(gpgKeyPair.privateKey.armoredKey)).keys[0].getAlgorithmInfo().bits;
       expect(openpgpKeyRsaBits).toEqual(4096);
-    }, 10000);
+    }, 20000);
   });
 });

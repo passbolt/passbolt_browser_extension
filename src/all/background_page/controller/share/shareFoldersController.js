@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.8.0
  */
-const {Crypto} = require('../../model/crypto');
 const {Keyring} = require('../../model/keyring');
 const {Share} = require('../../model/share');
 const {FolderModel} = require('../../model/folder/folderModel');
@@ -22,6 +21,7 @@ const {FoldersCollection} = require('../../model/entity/folder/foldersCollection
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
 const {i18n} = require('../../sdk/i18n');
+const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
 
 class ShareFoldersController {
   /**
@@ -37,8 +37,6 @@ class ShareFoldersController {
     this.folderModel = new FolderModel(apiClientOptions);
     this.resourceModel = new ResourceModel(apiClientOptions);
     this.keyring = new Keyring();
-    this.crypto = new Crypto();
-
     // Work variables
     this.folders = null;
     this.folder = null;
@@ -120,7 +118,7 @@ class ShareFoldersController {
      * We do this to confirm the move even if there is nothing to decrypt/re-encrypt
      */
     const passphrase = await passphraseController.get(this.worker);
-    this.privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
+    this.privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
   }
 
   /**

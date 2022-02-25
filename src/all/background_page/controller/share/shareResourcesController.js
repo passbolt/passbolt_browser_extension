@@ -11,13 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.8.0
  */
-const {Crypto} = require('../../model/crypto');
 const {Keyring} = require('../../model/keyring');
 const {Share} = require('../../model/share');
 const {ResourceModel} = require('../../model/resource/resourceModel');
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
 const {i18n} = require('../../sdk/i18n');
+const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
 
 class ShareResourcesController {
   /**
@@ -43,7 +43,6 @@ class ShareResourcesController {
    */
   async main(resources, changes) {
     const keyring = new Keyring();
-    const crypto = new Crypto(keyring);
 
     let progress = 0;
     let privateKey;
@@ -57,7 +56,7 @@ class ShareResourcesController {
 
     try {
       const passphrase = await passphraseController.get(this.worker);
-      privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
+      privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
     } catch (error) {
       console.error(error);
       throw error;

@@ -15,7 +15,6 @@ const Uuid = require('../utils/uuid');
 const Worker = require('../model/worker');
 const {User} = require('../model/user');
 const {AuthModel} = require("../model/auth/authModel");
-const {Crypto} = require('../model/crypto');
 const {Keyring} = require('../model/keyring');
 const {KeyIsExpiredError} = require('../error/keyIsExpiredError');
 const {ServerKeyChangedError} = require('../error/serverKeyChangedError');
@@ -33,7 +32,6 @@ class AuthController {
     this.worker = worker;
     this.requestId = requestId;
     this.keyring = new Keyring();
-    this.crypto = new Crypto(this.keyring);
     this.authLegacy = new GpgAuth(this.keyring);
   }
 

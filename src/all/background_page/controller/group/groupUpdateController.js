@@ -18,8 +18,10 @@ const {GroupEntity} = require("../../model/entity/group/groupEntity");
 const {SecretEntity} = require("../../model/entity/secret/secretEntity");
 const {SecretsCollection} = require("../../model/entity/secret/secretsCollection");
 const {Keyring} = require('../../model/keyring');
-const {Crypto} = require('../../model/crypto');
 const {i18n} = require('../../sdk/i18n');
+const {EncryptMessageService} = require("../../service/crypto/encryptMessageService");
+const {DecryptMessageService} = require("../../service/crypto/decryptMessageService");
+const {GetDecryptedUserPrivateKeyService} = require("../../service/account/getDecryptedUserPrivateKeyService");
 
 class GroupsUpdateController {
   /**
@@ -33,7 +35,6 @@ class GroupsUpdateController {
     this.worker = worker;
     this.groupModel = new GroupModel(clientOptions);
     this.keyring = new Keyring();
-    this.crypto = new Crypto(this.keyring);
     this.progressGoal = 10;
     this.progress = 0;
   }
@@ -89,7 +90,7 @@ class GroupsUpdateController {
    */
   async getPrivateKey() {
     const passphrase = await passphraseController.get(this.worker);
-    return this.crypto.getAndDecryptPrivateKey(passphrase);
+    return GetDecryptedUserPrivateKeyService.getKey(passphrase);
   }
 
   /**
@@ -127,10 +128,11 @@ class GroupsUpdateController {
       const resourceId = neededSecret.resourceId;
       const userId = neededSecret.userId;
       progressController.update(this.worker, this.progress++, i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
+      const userPublicKey = this.keyring.findPublic(userId).armoredKey;
       const secretDto = {
         resource_id: resourceId,
         user_id: userId,
-        data: await this.crypto.encrypt(decryptedSecrets[resourceId], userId, privateKey)
+        data: (await EncryptMessageService.encrypt(decryptedSecrets[resourceId], userPublicKey, privateKey)).data
       };
       const secret = new SecretEntity(secretDto);
       secrets.push(secret);
@@ -150,7 +152,7 @@ class GroupsUpdateController {
     for (const i in items) {
       const secret = items[i];
       progressController.update(this.worker, this.progress++, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
-      result[secret.resourceId] = await this.crypto.decryptWithKey(secret.data, privateKey);
+      result[secret.resourceId] = (await DecryptMessageService.decrypt(secret.data, privateKey)).data;
     }
     return result;
   }

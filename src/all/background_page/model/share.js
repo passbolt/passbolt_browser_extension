@@ -11,7 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.4.0
  */
-const {Crypto} = require('../model/crypto');
+const {Keyring} = require('../model/keyring');
+const {DecryptMessageService} = require('../service/crypto/decryptMessageService');
+const {EncryptMessageService} = require('../service/crypto/encryptMessageService');
 const {ShareService} = require('../service/share');
 
 class Share {}
@@ -49,7 +51,6 @@ Share.bulkShareResources = async function(resources, changes, privateKey, progre
   const resourcesChanges = bulkShareAggregateChanges(resources, changes);
   const resourcesNewUsers = await bulkShareSimulate(resources, resourcesChanges, progressCallback);
   const resourcesSecrets = await bulkShareEncrypt(resources, resourcesNewUsers, privateKey, progressCallback);
-
   for (const resourceId in resourcesChanges) {
     if (Object.prototype.hasOwnProperty.call(resourcesChanges, resourceId)) {
       const resource = resources.find(resource => resource.id === resourceId);
@@ -143,7 +144,7 @@ const bulkShareSimulate = async function(resources, resourcesChanges, progressCa
  * ]
  */
 const bulkShareEncrypt = async function(resources, resourcesNewUsers, privateKey, progressCallback) {
-  const crypto = new Crypto();
+  const keyring = new Keyring();
   const secrets = {};
 
   for (const resourceId in resourcesNewUsers) {
@@ -152,14 +153,22 @@ const bulkShareEncrypt = async function(resources, resourcesNewUsers, privateKey
     const users = resourcesNewUsers[resourceId];
     progressCallback(`Encrypting for ${resource.name}`);
     if (users && users.length) {
-      const message = await crypto.decryptWithKey(originalArmored, privateKey);
+      const message = (await DecryptMessageService.decrypt(originalArmored, privateKey)).data;
       const encryptAllData = users.reduce((carry, userId) => [...carry, {userId: userId, message: message}], []);
-      const result = await crypto.encryptAll(encryptAllData, privateKey);
-      secrets[resourceId] = result.map((armored, i) => ({
-        resource_id: resourceId,
-        user_id: users[i],
-        data: armored
-      }));
+
+      const result = [];
+      for (const i in encryptAllData) {
+        const data = encryptAllData[i];
+        const userPublicKey = keyring.findPublic(data.userId).armoredKey;
+        const messageEncrypted = (await EncryptMessageService.encrypt(data.message, userPublicKey, privateKey)).data;
+        result.push({
+          resource_id: resourceId,
+          user_id: data.userId,
+          data: messageEncrypted
+        });
+      }
+
+      secrets[resourceId] = result;
     }
   }
 

@@ -17,7 +17,6 @@ const {SetupModel} = require("../../model/setup/setupModel");
 const {AuthModel} = require("../../model/auth/authModel");
 const {GpgAuth} = require("../../model/gpgauth");
 const {Keyring} = require('../../model/keyring');
-const {Crypto} = require('../../model/crypto');
 const {SetupEntity} = require("../../model/entity/setup/setupEntity");
 const {SecurityTokenEntity} = require("../../model/entity/securityToken/securityTokenEntity");
 const {AccountEntity} = require("../../model/entity/account/accountEntity");
@@ -38,7 +37,6 @@ class RecoverController {
     this.authModel = new AuthModel(apiClientOptions);
     this.accountModel = new AccountModel(apiClientOptions);
     this.keyring = new Keyring();
-    this.crypto = new Crypto(this.keyring);
     this.legacyAuthModel = new GpgAuth(this.keyring);
   }
 

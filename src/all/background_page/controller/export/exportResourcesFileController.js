@@ -11,8 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-
-const {Crypto} = require('../../model/crypto');
 const {User} = require('../../model/user');
 
 const progressController = require('../progress/progressController');
@@ -29,6 +27,8 @@ const {ExternalFoldersCollection} = require("../../model/entity/folder/external/
 const {ExportResourcesFileEntity} = require("../../model/entity/export/exportResourcesFileEntity");
 
 const {i18n} = require('../../sdk/i18n');
+const {DecryptMessageService} = require("../../service/crypto/decryptMessageService");
+const {GetDecryptedUserPrivateKeyService} = require("../../service/account/getDecryptedUserPrivateKeyService");
 
 class ExportResourcesFileController {
   /**
@@ -38,9 +38,6 @@ class ExportResourcesFileController {
    */
   constructor(worker, clientOptions) {
     this.worker = worker;
-
-    // Crypto
-    this.crypto = new Crypto();
 
     // Models
     this.resourceTypeModel = new ResourceTypeModel(clientOptions);
@@ -99,7 +96,7 @@ class ExportResourcesFileController {
    */
   async getPrivateKey() {
     const passphrase = await passphraseController.get(this.worker);
-    return this.crypto.getAndDecryptPrivateKey(passphrase);
+    return GetDecryptedUserPrivateKeyService.getKey(passphrase);
   }
 
   /**
@@ -113,7 +110,7 @@ class ExportResourcesFileController {
     for (const exportResourceEntity of exportEntity.exportResources.items) {
       i++;
       progressController.update(this.worker, ++this.progress, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: exportEntity.exportResources.items.length}));
-      let secretClear = await this.crypto.decryptWithKey(exportResourceEntity.secrets.items[0].data, privateKey);
+      let secretClear = (await DecryptMessageService.decrypt(exportResourceEntity.secrets.items[0].data, privateKey)).data;
 
       // @deprecated Prior to v3, resources have no resource type. Remove this condition with v4.
       if (!exportResourceEntity.resourceTypeId) {

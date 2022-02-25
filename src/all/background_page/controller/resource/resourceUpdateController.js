@@ -17,10 +17,11 @@ const progressController = require('../progress/progressController');
 const {ResourceSecretsCollection} = require("../../model/entity/secret/resource/resourceSecretsCollection");
 
 const {Keyring} = require('../../model/keyring');
-const {Crypto} = require('../../model/crypto');
 const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
 const {ResourceModel} = require('../../model/resource/resourceModel');
 const {UserModel} = require('../../model/user/userModel');
+const {EncryptMessageService} = require('../../service/crypto/encryptMessageService');
+const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
 
 class ResourceUpdateController {
   /**
@@ -35,7 +36,7 @@ class ResourceUpdateController {
     this.requestId = requestId;
     this.resourceModel = new ResourceModel(clientOptions);
     this.userModel = new UserModel(clientOptions);
-    this.crypto = new Crypto();
+    this.keyring = new Keyring();
   }
 
   /**
@@ -89,8 +90,7 @@ class ResourceUpdateController {
 
       // Sync keyring
       await progressController.update(this.worker, 1, i18n.t("Synchronizing keyring"));
-      const keyring = new Keyring();
-      await keyring.sync();
+      await this.keyring.sync();
 
       // Encrypt
       const plaintext = await this.resourceModel.serializePlaintextDto(resourceEntity.resourceTypeId, plaintextDto);
@@ -115,7 +115,7 @@ class ResourceUpdateController {
   async getPrivateKey() {
     try {
       const passphrase = await passphraseController.get(this.worker);
-      return await this.crypto.getAndDecryptPrivateKey(passphrase);
+      return GetDecryptedUserPrivateKeyService.getKey(passphrase);
     } catch (error) {
       console.error(error);
       throw error;
@@ -136,7 +136,8 @@ class ResourceUpdateController {
     for (let i = 0; i < usersIds.length; i++) {
       if (Object.prototype.hasOwnProperty.call(usersIds, i)) {
         const userId =  usersIds[i];
-        const data = await this.crypto.encrypt(plaintextDto, userId, privateKey);
+        const userPublicKey = this.keyring.findPublic(userId).armoredKey;
+        const data = (await EncryptMessageService.encrypt(plaintextDto, userPublicKey, privateKey)).data;
         secrets.push({user_id: userId, data: data});
         await progressController.update(this.worker, i + 2, i18n.t("Encrypting"));
       }

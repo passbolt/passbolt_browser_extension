@@ -16,12 +16,12 @@ const {ResourceInProgressCacheService} = require("../../service/cache/resourceIn
 const Worker = require('../../model/worker');
 const {PasswordGeneratorModel} = require("../../model/passwordGenerator/passwordGeneratorModel");
 const {ResourceModel} = require("../../model/resource/resourceModel");
-const {Crypto} = require('../../model/crypto');
 const {QuickAccessService} = require("../../service/ui/quickAccess.service");
 const passphraseController = require('../passphrase/passphraseController');
 const {BrowserTabService} = require("../../service/ui/browserTab.service");
 const {ExternalResourceEntity} = require("../../model/entity/resource/external/externalResourceEntity");
-
+const {DecryptMessageService} = require('../../service/crypto/decryptMessageService');
+const {GetDecryptedUserPrivateKeyService} = require("../../service/account/getDecryptedUserPrivateKeyService");
 
 /**
  * Controller related to the in-form call-to-action
@@ -35,7 +35,6 @@ class InformMenuController {
   constructor(worker, apiClientOptions) {
     this.worker = worker;
     this.resourceModel = new ResourceModel(apiClientOptions);
-    this.crypto = new Crypto();
     this.apiClientOptions = apiClientOptions;
   }
 
@@ -123,8 +122,8 @@ class InformMenuController {
       // Get the resource, decrypt the resources password and requests to fill the credentials
       const passphrase = await passphraseController.requestFromQuickAccess();
       const resource = await this.resourceModel.findForDecrypt(resourceId);
-      const privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
-      let plaintext = await this.crypto.decryptWithKey(resource.secret.data, privateKey);
+      const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
+      let plaintext = (await DecryptMessageService.decrypt(resource.secret.data, privateKey)).data;
       plaintext = await this.resourceModel.deserializePlaintext(resource.resourceTypeId, plaintext);
       const {username} = resource;
       const password = plaintext?.password || plaintext;

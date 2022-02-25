@@ -43,7 +43,7 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
     // Associations
     if (this._props.account_recovery_organization_public_key) {
       this._account_recovery_organization_public_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_public_key);
-      AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryOrganizationPublicKey(this._account_recovery_organization_public_key, this.account_recovery_organization_public_key_id);
+      AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryOrganizationPublicKey(this._account_recovery_organization_public_key, this.public_key_id);
       delete this._props.account_recovery_organization_public_key;
     }
     if (this._props.account_recovery_organization_revoked_key) {
@@ -100,9 +100,13 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
-        "account_recovery_organization_public_key_id": {
-          "type": "string",
-          "format": "uuid"
+        "public_key_id": {
+          "anyOf": [{
+            "type": "string",
+            "format": "uuid"
+          }, {
+            "type": "null"
+          }]
         },
         "account_recovery_organization_public_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
         "account_recovery_organization_revoked_key": AccountRecoveryOrganizationPublicKeyEntity.getSchema(),
@@ -173,6 +177,8 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
   toJSON() {
     return this.toDto({
       account_recovery_organization_public_key: true,
+      account_recovery_organization_revoked_key: true,
+      account_recovery_private_key_passwords: true,
       creator: true
     });
   }

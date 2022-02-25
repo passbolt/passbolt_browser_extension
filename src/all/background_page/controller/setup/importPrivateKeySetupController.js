@@ -61,7 +61,7 @@ class ImportPrivateKeySetupController {
    */
   async exec(armoredKey) {
     const privateOpenpgpKey = await assertPrivateKeys(armoredKey);
-    await this._assertImportKeyNotUsed(privateOpenpgpKey.fingerprint);
+    await this._assertImportKeyNotUsed(privateOpenpgpKey.getFingerprint());
     this.setupEntity.userPrivateArmoredKey = privateOpenpgpKey.armor();
     this.setupEntity.userPublicArmoredKey = privateOpenpgpKey.toPublic().armor();
   }

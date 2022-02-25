@@ -17,8 +17,8 @@ import {AccountRecoverySaveOrganizationPolicyController} from "./accountRecovery
 import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
 import PassphraseController from "../passphrase/passphraseController";
 import {
-  createAccountRecoveryOrganizationPolicyDto,
-  defaultAccountRecoveryOrganizationPolicyDto
+  createEnabledAccountRecoveryOrganizationPolicyDto,
+  enabledAccountRecoveryOrganizationPolicyDto
 } from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import {EntityValidationError} from "../../model/entity/abstract/entityValidationError";
 import {AccountRecoveryOrganizationPolicyEntity} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
@@ -42,11 +42,11 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
       // Mock user passphrase capture.
       PassphraseController.request.mockResolvedValue(pgpKeys.ada.passphrase);
       // Mock API get account recovery organization policy.
-      fetch.doMockOnce(() => mockApiResponse(defaultAccountRecoveryOrganizationPolicyDto()));
+      fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
       // Mock API account recovery user settings post. Return data such as the API will, including the request payload.
       fetch.doMockOnce(async req => mockApiResponse(JSON.parse(await req.text())));
 
-      const accountRecoveryOrganizationPolicyDto = createAccountRecoveryOrganizationPolicyDto();
+      const accountRecoveryOrganizationPolicyDto = createEnabledAccountRecoveryOrganizationPolicyDto();
       const accountRecoveryOrganizationPrivateKeyDto = {
         armored_key: pgpKeys.account_recovery_organization.private,
         passphrase: pgpKeys.account_recovery_organization.passphrase
@@ -76,7 +76,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
     it("Should assert the provided account recovery private key dto is valid.", async() => {
       const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions());
 
-      const accountRecoveryOrganizationPolicyDto = createAccountRecoveryOrganizationPolicyDto();
+      const accountRecoveryOrganizationPolicyDto = createEnabledAccountRecoveryOrganizationPolicyDto();
       const accountRecoveryOrganizationPrivateKeyDto = {};
       const controllerPromise = controller.exec(accountRecoveryOrganizationPolicyDto, accountRecoveryOrganizationPrivateKeyDto);
 

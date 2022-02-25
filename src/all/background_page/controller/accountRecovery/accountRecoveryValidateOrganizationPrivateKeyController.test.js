@@ -16,7 +16,7 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {AccountRecoveryValidateOrganizationPrivateKeyController} from "./accountRecoveryValidateOrganizationPrivateKeyController";
 import {EntityValidationError} from "../../model/entity/abstract/entityValidationError";
 import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
-import {defaultAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
+import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import {WrongOrganizationRecoveryKeyError} from "../../error/wrongOrganizationRecoveryKeyError";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
@@ -59,7 +59,7 @@ describe("AccountRecoveryValidateOrganizationPrivateKeyController", () => {
       const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(null, null, defaultApiClientOptions());
 
       // Mock API get account recovery organization policy.
-      fetch.doMockOnce(() => mockApiResponse(defaultAccountRecoveryOrganizationPolicyDto()));
+      fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
 
       const privateKeyDto = {
         armored_key: pgpKeys.ada.private,
@@ -75,7 +75,7 @@ describe("AccountRecoveryValidateOrganizationPrivateKeyController", () => {
       const controller = new AccountRecoveryValidateOrganizationPrivateKeyController(null, null, defaultApiClientOptions());
 
       // Mock API get account recovery organization policy.
-      fetch.doMockOnce(() => mockApiResponse(defaultAccountRecoveryOrganizationPolicyDto()));
+      fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
 
       const privateKeyDto = {
         armored_key: pgpKeys.account_recovery_organization.private,

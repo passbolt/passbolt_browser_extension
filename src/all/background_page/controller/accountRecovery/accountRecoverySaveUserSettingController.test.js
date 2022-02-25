@@ -23,7 +23,7 @@ import {
   createRejectedAccountRecoveryUserSettingDto
 } from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity.test.data";
 import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
-import {defaultAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
+import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 
@@ -58,7 +58,7 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       // Mock user passphrase capture.
       PassphraseController.request.mockResolvedValue(pgpKeys.ada.passphrase);
       // Mock API account recovery organization policy fetch.
-      fetch.doMockOnce(() => mockApiResponse(defaultAccountRecoveryOrganizationPolicyDto()));
+      fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
       // Mock API account recovery user settings post. Return data such as the API will.
       fetch.doMockOnce(async req => mockApiResponse(JSON.parse(await req.text())));
 

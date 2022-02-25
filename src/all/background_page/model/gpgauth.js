@@ -17,13 +17,14 @@ const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
 const {AuthService} = require('../service/auth');
 const {User} = require('./user');
 const {Keyring} = require('./keyring');
-const {Crypto} = require('./crypto');
 const {GpgAuthToken} = require('./gpgAuthToken');
 const {GpgAuthHeader} = require('./gpgAuthHeader');
 const {MfaAuthenticationRequiredError} = require('../error/mfaAuthenticationRequiredError');
 const {Request} = require('./request');
 const {OrganizationSettingsModel} = require('./organizationSettings/organizationSettingsModel');
 const {AuthStatusLocalStorage} = require('../service/local_storage/authStatusLocalStorage');
+const {EncryptMessageService} = require('../service/crypto/encryptMessageService');
+const {DecryptMessageService} = require('../service/crypto/decryptMessageService');
 
 const URL_VERIFY = '/auth/verify.json?api-version=v2';
 const URL_LOGIN = '/auth/login.json?api-version=v2';
@@ -40,7 +41,6 @@ class GpgAuth {
    */
   constructor(keyring) {
     this.keyring = keyring ? keyring : new Keyring();
-    this.crypto = new Crypto(this.keyring);
 
     // Check the authentication status interval.
     this.checkIsAuthenticatedTimeout = null;
@@ -77,7 +77,7 @@ class GpgAuth {
     let encrypted, originalToken;
     try {
       originalToken = new GpgAuthToken();
-      encrypted = await this.crypto.encrypt(originalToken.token, serverKey);
+      encrypted = (await EncryptMessageService.encrypt(originalToken.token, serverKey)).data;
     } catch (error) {
       throw new Error(`Unable to encrypt the verify token. ${error.message}`);
     }
@@ -206,7 +206,7 @@ class GpgAuth {
 
     // Try to decrypt the User Auth Token
     const encryptedUserAuthToken = stripslashes(urldecode(auth.headers['x-gpgauth-user-auth-token']));
-    const userAuthToken = await this.crypto.decryptWithKey(encryptedUserAuthToken, privateKey);
+    const userAuthToken = (await DecryptMessageService.decrypt(encryptedUserAuthToken, privateKey)).data;
 
     // Validate the User Auth Token
     const authToken = new GpgAuthToken(userAuthToken);

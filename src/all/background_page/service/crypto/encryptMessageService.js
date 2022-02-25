@@ -24,36 +24,54 @@ class EncryptMessageService {
    * @returns {Promise<openpgp.Message>}
    */
   static async encryptSymmetrically(message, passwords, signingKeys = null) {
-    if (signingKeys) {
-      signingKeys = await assertDecryptedPrivateKeys(signingKeys);
-    }
+    try {
+      if (signingKeys) {
+        signingKeys = await assertDecryptedPrivateKeys(signingKeys);
+      }
 
-    return openpgp.encrypt({
-      message: openpgp.message.fromText(message),
-      passwords: passwords,
-      privateKeys: signingKeys
-    });
+      return await openpgp.encrypt({
+        message: openpgp.message.fromText(message),
+        passwords: passwords,
+        privateKeys: signingKeys
+      });
+    } finally {
+      this._clearCache();
+    }
   }
 
   /**
    * Encrypt and sign text message.
    *
    * @param {string} message The message to encrypt.
-   * @param {openpgp.key.Key|string} encryptionKeys The public key(s) to use to encrypt the message
+   * @param {openpgp.key.Key|string} encryptionKey The public key(s) to use to encrypt the message
    * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} signingKeys The private key(s) to use to sign the message.
    * @returns {Promise<openpgp.message.Message>}
    */
-  static async encrypt(message, encryptionKeys, signingKeys = null) {
-    encryptionKeys = await assertPublicKeys(encryptionKeys);
-    if (signingKeys) {
-      signingKeys = await assertDecryptedPrivateKeys(signingKeys);
-    }
+  static async encrypt(message, encryptionKey, signingKeys = null) {
+    try {
+      encryptionKey = await assertPublicKeys(encryptionKey);
+      if (signingKeys) {
+        signingKeys = await assertDecryptedPrivateKeys(signingKeys);
+      }
 
-    return openpgp.encrypt({
-      message: openpgp.message.fromText(message),
-      publicKeys: encryptionKeys,
-      privateKeys: signingKeys
-    });
+      return await openpgp.encrypt({
+        message: openpgp.message.fromText(message),
+        publicKeys: encryptionKey,
+        privateKeys: signingKeys
+      });
+    } finally {
+      this._clearCache();
+    }
+  }
+
+  /**
+   * Clear the openpgp cache to avoid sensitive to remain in memory.
+   */
+  static async _clearCache() {
+    const worker = openpgp.getWorker();
+    if (worker) {
+      await worker.clearKeyCache();
+    }
   }
 }
 

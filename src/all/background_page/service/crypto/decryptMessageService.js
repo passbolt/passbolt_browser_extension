@@ -52,23 +52,27 @@ class DecryptMessageService {
    * @throws {BadSignatureMessageGpgKeyError} if the given signatures don't match the message to decrypt.
    */
   static async decrypt(message, decryptionKeys, signingKeys = null) {
-    message = await assertMessage(message);
-    decryptionKeys = await assertDecryptedPrivateKeys(decryptionKeys);
-    if (signingKeys) {
-      signingKeys = await assertKeys(signingKeys);
+    try {
+      message = await assertMessage(message);
+      decryptionKeys = await assertDecryptedPrivateKeys(decryptionKeys);
+      if (signingKeys) {
+        signingKeys = await assertKeys(signingKeys);
+      }
+
+      const decryptedMessage = await openpgp.decrypt({
+        message: message,
+        privateKeys: decryptionKeys,
+        publicKeys: signingKeys
+      });
+
+      if (signingKeys && !this._assertSignatures(decryptedMessage)) {
+        throw new BadSignatureMessageGpgKeyError('The signature(s) cannot be verified.');
+      }
+
+      return decryptedMessage;
+    } finally {
+      this._clearCache();
     }
-
-    const decryptedMessage = await openpgp.decrypt({
-      message: message,
-      privateKeys: decryptionKeys,
-      publicKeys: signingKeys
-    });
-
-    if (signingKeys && !this._assertSignatures(decryptedMessage)) {
-      throw new BadSignatureMessageGpgKeyError('The signature(s) cannot be verified.');
-    }
-
-    return decryptedMessage;
   }
 
   /**
@@ -79,6 +83,16 @@ class DecryptMessageService {
    */
   static _assertSignatures(decryptedMessage) {
     return decryptedMessage.signatures.reduce((result, signature) => result && signature.valid, true);
+  }
+
+  /**
+   * Clear the openpgp cache to avoid sensitive to remain in memory.
+   */
+  static async _clearCache() {
+    const worker = openpgp.getWorker();
+    if (worker) {
+      await worker.clearKeyCache();
+    }
   }
 }
 

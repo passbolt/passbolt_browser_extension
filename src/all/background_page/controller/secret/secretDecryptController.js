@@ -12,11 +12,12 @@
  * @since         2.8.0
  */
 const {i18n} = require('../../sdk/i18n');
-const {Crypto} = require('../../model/crypto');
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
 
 const {ResourceModel} = require('../../model/resource/resourceModel');
+const {DecryptMessageService} = require('../../service/crypto/decryptMessageService');
+const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
 
 class SecretDecryptController {
   /**
@@ -38,8 +39,6 @@ class SecretDecryptController {
    * @return {Promise<Object>} e.g. {resource: <ResourceEntity>, plaintext:<PlaintextEntity|string>}
    */
   async main(resourceId, showProgress) {
-    const crypto = new Crypto();
-
     // Start downloading secret
     const resourcePromise = this.resourceModel.findForDecrypt(resourceId);
 
@@ -51,14 +50,14 @@ class SecretDecryptController {
       if (showProgress) {
         await progressController.open(this.worker, i18n.t('Decrypting ...'), 2, i18n.t("Decrypting private key"));
       }
-      const privateKey = await crypto.getAndDecryptPrivateKey(passphrase);
+      const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
 
       // Decrypt and deserialize the secret if needed
       if (showProgress) {
         await progressController.update(this.worker, 1, i18n.t("Decrypting secret"));
       }
       const resource = await resourcePromise;
-      let plaintext = await crypto.decryptWithKey(resource.secret.data, privateKey);
+      let plaintext = (await DecryptMessageService.decrypt(resource.secret.data, privateKey)).data;
       plaintext = await this.resourceModel.deserializePlaintext(resource.resourceTypeId, plaintext);
 
       // Wrap up

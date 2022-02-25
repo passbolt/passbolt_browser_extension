@@ -12,7 +12,6 @@
  * @since         2.13.0
  */
 const {i18n} = require('../../sdk/i18n');
-const {Crypto} = require('../../model/crypto');
 const {Keyring} = require('../../model/keyring');
 const {Share} = require('../../model/share');
 const {FolderEntity} = require('../../model/entity/folder/folderEntity');
@@ -23,6 +22,7 @@ const {PermissionChangesCollection} = require('../../model/entity/permission/cha
 
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
+const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
 
 class MoveFolderController {
   /**
@@ -38,7 +38,6 @@ class MoveFolderController {
     this.folderModel = new FolderModel(clientOptions);
     this.resourceModel = new ResourceModel(clientOptions);
     this.keyring = new Keyring();
-    this.crypto = new Crypto();
 
     // Work variables
     this.folderId = null;
@@ -119,7 +118,7 @@ class MoveFolderController {
      * We do this to confirm the move even if there is nothing to decrypt/re-encrypt
      */
     const passphrase = await passphraseController.get(this.worker);
-    this.privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
+    this.privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
   }
 
   /**

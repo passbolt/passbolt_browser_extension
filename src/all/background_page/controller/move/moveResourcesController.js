@@ -13,7 +13,6 @@
  */
 const {i18n} = require('../../sdk/i18n');
 const {Keyring} = require('../../model/keyring');
-const {Crypto} = require('../../model/crypto');
 const {Share} = require('../../model/share');
 const {FolderModel} = require('../../model/folder/folderModel');
 const {ResourceModel} = require('../../model/resource/resourceModel');
@@ -22,6 +21,7 @@ const {PermissionChangesCollection} = require('../../model/entity/permission/cha
 
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
+const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
 
 class MoveResourcesController {
   /**
@@ -37,7 +37,6 @@ class MoveResourcesController {
     this.folderModel = new FolderModel(clientOptions);
     this.resourceModel = new ResourceModel(clientOptions);
     this.keyring = new Keyring();
-    this.crypto = new Crypto();
   }
 
   /**
@@ -99,7 +98,7 @@ class MoveResourcesController {
      * We do this to confirm the move even if there is nothing to decrypt/re-encrypt
      */
     const passphrase = await passphraseController.get(this.worker);
-    this.privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
+    this.privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
   }
 
   /**

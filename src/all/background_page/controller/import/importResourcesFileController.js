@@ -10,7 +10,6 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {Crypto} = require('../../model/crypto');
 const {User} = require('../../model/user');
 
 const progressController = require('../progress/progressController');
@@ -31,6 +30,9 @@ const {ImportResourcesFileEntity} = require("../../model/entity/import/importRes
 const {SecretEntity} = require("../../model/entity/secret/secretEntity");
 
 const {i18n} = require('../../sdk/i18n');
+const {EncryptMessageService} = require('../../service/crypto/encryptMessageService');
+const {Keyring} = require('../../model/keyring');
+const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
 
 class ImportResourcesFileController {
   /**
@@ -42,7 +44,7 @@ class ImportResourcesFileController {
     this.worker = worker;
 
     // Crypto
-    this.crypto = new Crypto();
+    this.keyring = new Keyring();
 
     // Models
     this.resourceTypeModel = new ResourceTypeModel(clientOptions);
@@ -136,7 +138,7 @@ class ImportResourcesFileController {
    */
   async getPrivateKey() {
     const passphrase = await passphraseController.get(this.worker);
-    return this.crypto.getAndDecryptPrivateKey(passphrase);
+    return GetDecryptedUserPrivateKeyService.getKey(passphrase);
   }
 
   /**
@@ -154,7 +156,8 @@ class ImportResourcesFileController {
       // @todo The secret DTO could be carried by the external resource entity. It can be done when we arrange the external resource entity schema validation.
       const secretDto = this.buildSecretDto(importResourceEntity);
       const serializedPlaintextDto = await this.resourceModel.serializePlaintextDto(importResourceEntity.resourceTypeId, secretDto);
-      const data = await this.crypto.encrypt(serializedPlaintextDto, userId, privateKey);
+      const userPublicKey = this.keyring.findPublic(userId).armoredKey;
+      const data = (await EncryptMessageService.encrypt(serializedPlaintextDto, userPublicKey, privateKey)).data;
       const secret = new SecretEntity({data: data});
       importResourceEntity.secrets = new ResourceSecretsCollection([secret]);
     }

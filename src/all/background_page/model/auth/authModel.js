@@ -17,7 +17,8 @@ const {AuthStatusLocalStorage} = require("../../service/local_storage/authStatus
 const {GpgAuth} = require("../gpgauth");
 const {AuthService} = require("../../service/api/auth/authService");
 const {User} = require("../user");
-const {Crypto} = require("../crypto");
+const {EncryptMessageService} = require("../../service/crypto/encryptMessageService");
+const {GetDecryptedUserPrivateKeyService} = require("../../service/account/getDecryptedUserPrivateKeyService");
 
 class AuthModel {
   /**
@@ -28,7 +29,6 @@ class AuthModel {
    */
   constructor(apiClientOptions) {
     this.authService = new AuthService(apiClientOptions);
-    this.crypto = new Crypto();
     this.legacyAuthModel = new GpgAuth();
   }
 
@@ -70,7 +70,7 @@ class AuthModel {
   async login(passphrase, rememberUntilLogout) {
     rememberUntilLogout = rememberUntilLogout || false;
     const user = User.getInstance();
-    const privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
+    const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
     // @deprecated to be removed with v4. Prior to API v3, retrieving the CSRF token log the user out, so we need to fetch it before the login.
     await user.retrieveAndStoreCsrfToken();
     await this.legacyAuthModel.login(privateKey);
@@ -108,7 +108,7 @@ class AuthModel {
     let encryptedToken, originalToken;
     try {
       originalToken = new GpgAuthToken();
-      encryptedToken = await this.crypto.encrypt(originalToken.token, serverKey);
+      encryptedToken = (await EncryptMessageService.encrypt(originalToken.token, serverKey)).data;
     } catch (error) {
       throw new Error(`Unable to encrypt the verify token. ${error.message}`);
     }

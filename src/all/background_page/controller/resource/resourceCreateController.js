@@ -15,7 +15,6 @@ const {i18n} = require('../../sdk/i18n');
 
 const {Keyring} = require('../../model/keyring');
 const {Share} = require('../../model/share');
-const {Crypto} = require('../../model/crypto');
 const {User} = require('../../model/user');
 
 const {FolderModel} = require('../../model/folder/folderModel');
@@ -25,6 +24,8 @@ const {ResourceSecretsCollection} = require("../../model/entity/secret/resource/
 
 const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
+const {EncryptMessageService} = require('../../service/crypto/encryptMessageService');
+const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
 
 class ResourceCreateController {
   /**
@@ -39,7 +40,7 @@ class ResourceCreateController {
     this.requestId = requestId;
     this.resourceModel = new ResourceModel(clientOptions);
     this.folderModel = new FolderModel(clientOptions);
-    this.crypto = new Crypto();
+    this.keyring = new Keyring();
     this.progress = 0;
     this.goals = 0;
   }
@@ -64,7 +65,7 @@ class ResourceCreateController {
     // Get the passphrase if needed and decrypt secret key
     try {
       const passphrase = await passphraseController.get(this.worker);
-      privateKey = await this.crypto.getAndDecryptPrivateKey(passphrase);
+      privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
     } catch (error) {
       console.error(error);
       throw error;
@@ -76,7 +77,8 @@ class ResourceCreateController {
 
       // Encrypt and sign
       await progressController.update(this.worker, this.progress++, i18n.t('Encrypting secret'));
-      const secret = await this.crypto.encrypt(plaintext, User.getInstance().get().id, privateKey);
+      const userPublicKey = this.keyring.findPublic(User.getInstance().get().id).armoredKey;
+      const secret = (await EncryptMessageService.encrypt(plaintext, userPublicKey, privateKey)).data;
       resource.secrets = new ResourceSecretsCollection([{data: secret}]);
 
       // Save
@@ -120,8 +122,7 @@ class ResourceCreateController {
 
       // Sync keyring
       await progressController.update(this.worker, this.progress++, i18n.t('Synchronizing keys'));
-      const keyring = new Keyring();
-      await keyring.sync();
+      await this.keyring.sync();
 
       // Share
       await progressController.update(this.worker, this.progress++, i18n.t('Start sharing'));

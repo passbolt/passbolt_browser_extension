@@ -15,14 +15,14 @@
 import {v4 as uuidv4} from 'uuid';
 import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
 import {BuildApprovedAccountRecoveryUserSettingEntityService} from "./buildApprovedAccountRecoveryUserSettingEntityService";
-import {defaultAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
+import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import {AccountRecoveryOrganizationPolicyEntity} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
 import {DecryptMessageService} from "../crypto/decryptMessageService";
 import {DecryptPrivateKeyService} from "../crypto/decryptPrivateKeyService";
 
 describe("BuildApprovedAccountRecoveryUserSettingEntityService service", () => {
   it("Build approved account recovery user setting entity", async() => {
-    const organizationPolicyDto = defaultAccountRecoveryOrganizationPolicyDto();
+    const organizationPolicyDto = enabledAccountRecoveryOrganizationPolicyDto();
     const organizationPolicy = new AccountRecoveryOrganizationPolicyEntity(organizationPolicyDto);
     const accountRecoveryUserSetting = await BuildApprovedAccountRecoveryUserSettingEntityService.build(uuidv4(), pgpKeys.ada.private_decrypted, organizationPolicy);
 

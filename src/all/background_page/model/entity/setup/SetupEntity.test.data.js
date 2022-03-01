@@ -16,7 +16,7 @@ import {ExternalGpgKeyEntityFixtures} from "../gpgkey/external/externalGpgKeyEnt
 import {defaultUserDto} from "../user/userEntity.test.data";
 import {defaultSecurityTokenDto} from "../securityToken/SecurityTokenEntity.test.data";
 import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
-import {defaultAccountRecoveryOrganizationPolicyDto} from "../accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
+import {enabledAccountRecoveryOrganizationPolicyDto} from "../accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 
 export const step0SetupRequestInitializedDto = data => {
   const defaultData = {
@@ -24,7 +24,7 @@ export const step0SetupRequestInitializedDto = data => {
     user_id: "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
     token: "62748a2c-9b68-4b04-9e92-1721042418af",
     user: defaultUserDto(),
-    account_recovery_organization_policy: defaultAccountRecoveryOrganizationPolicyDto()
+    account_recovery_organization_policy: enabledAccountRecoveryOrganizationPolicyDto()
   };
 
   return Object.assign(defaultData, data || {});

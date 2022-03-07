@@ -42,7 +42,7 @@ describe("DecryptPrivateKey service", () => {
     const decryptedKey = await DecryptPrivateKeyService.decrypt(pgpKeys.ada.private, "ada@passbolt.com");
 
     try {
-      await DecryptPrivateKeyService.decrypt(decryptedKey.armor(), "ada@passbolt.com");
+      await DecryptPrivateKeyService.decrypt(decryptedKey, "ada@passbolt.com");
     } catch (e) {
       expect(e).toStrictEqual(new Error("The private key is already decrypted"));
     }

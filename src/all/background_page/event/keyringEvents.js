@@ -12,7 +12,7 @@ const passphraseController = require('../controller/passphrase/passphraseControl
 const fileController = require('../controller/fileController');
 const {GetUserKeyInfoController} = require('../controller/crypto/getUserKeyInfoController');
 const {CheckPassphraseController} = require('../controller/crypto/checkPassphraseController');
-const {DownloadUserPublicController} = require('../controller/crypto/downloadUserPublicKeyController');
+const {DownloadUserPublicKeyController} = require('../controller/crypto/downloadUserPublicKeyController');
 
 const listen = function(worker) {
   /*
@@ -64,7 +64,7 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.keyring.download-my-public-key', async requestId => {
-    const controller = new DownloadUserPublicController(worker, requestId);
+    const controller = new DownloadUserPublicKeyController(worker, requestId);
     await controller._exec();
   });
 

@@ -27,7 +27,7 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
    * Build accepted account recovery user setting entity.
    *
    * @param {string} userId The target user identifier.
-   * @param {openpgp.key.Key|string} decryptedPrivateOpenpgpKey The user decrypted private openpgp key.
+   * @param {openpgp.PrivateKey|string} decryptedPrivateOpenpgpKey The user decrypted private openpgp key.
    * @param {AccountRecoveryOrganizationPolicyEntity} organizationPolicy The organization policy.
    * @returns {Promise<AccountRecoveryUserSettingEntity>}
    */
@@ -56,14 +56,14 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
    * Encrypt the user private key symmetrically.
    *
    * @param {string} symmetricSecret The symmetric secret to use to encrypt the private key.
-   * @param {openpgp.key.Key} decryptedPrivateOpenpgpKey The user decrypted private openpgp key.
+   * @param {openpgp.PrivateKey} decryptedPrivateOpenpgpKey The user decrypted private openpgp key.
    * @returns {Promise<Object>}
    */
   static async _encryptPrivateKey(symmetricSecret, decryptedPrivateOpenpgpKey) {
     const decryptedPrivateArmoredKey = decryptedPrivateOpenpgpKey.armor();
     const userPrivateKeySymmetricEncrypted = await EncryptMessageService.encryptSymmetrically(decryptedPrivateArmoredKey, [symmetricSecret], decryptedPrivateArmoredKey);
 
-    return {data: userPrivateKeySymmetricEncrypted.data};
+    return {data: userPrivateKeySymmetricEncrypted};
   }
 
   /**
@@ -71,14 +71,14 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
    *
    * @param {string} symmetricSecret The symmetric secret to use to encrypt the private key.
    * @param {AccountRecoveryOrganizationPolicyEntity} organizationPolicy The organization policy.
-   * @param {openpgp.key.Key} decryptedPrivateOpenpgpKey The user decrypted private openpgp key.
+   * @param {openpgp.PrivateKey} decryptedPrivateOpenpgpKey The user decrypted private openpgp key.
    * @returns {Promise<Object>}
    */
   static async _encryptPrivateKeyPasswordsForOrganizationKey(symmetricSecret, organizationPolicy, decryptedPrivateOpenpgpKey) {
     const userPrivateKeySecretEncrypted = await EncryptMessageService.encrypt(symmetricSecret, organizationPolicy.armoredKey, decryptedPrivateOpenpgpKey);
 
     return {
-      data: userPrivateKeySecretEncrypted.data,
+      data: userPrivateKeySecretEncrypted,
       recipient_foreign_model: AccountRecoveryPrivateKeyPasswordEntity.FOREIGN_MODEL_ORGANIZATION_KEY
     };
   }

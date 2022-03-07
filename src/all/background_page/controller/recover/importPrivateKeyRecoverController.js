@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
+const {i18n} = require("../../sdk/i18n");
 const {SetupEntity} = require("../../model/entity/setup/setupEntity");
 const {GpgAuth} = require("../../model/gpgauth");
 const {GpgKeyError} = require("../../error/GpgKeyError");
@@ -85,7 +85,7 @@ class ImportPrivateKeyRecoverController {
       await this.legacyAuthModel.verify(domain, serverPublicArmoredKey, fingerprint);
     } catch (error) {
       // @todo Handle not controlled errors, such as timeout error...
-      throw new GpgKeyError('This key does not match any account.');
+      throw new GpgKeyError(i18n.t('This key does not match any account.'));
     }
   }
 }

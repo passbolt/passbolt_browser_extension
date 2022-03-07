@@ -25,7 +25,7 @@ exports.open = open;
  * Replace by response from progress worker
  */
 const delay = async function(ms) {
-  ms = !ms ? 200 : ms;
+  ms = !ms ? 0 : ms;
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 exports.delay = delay;

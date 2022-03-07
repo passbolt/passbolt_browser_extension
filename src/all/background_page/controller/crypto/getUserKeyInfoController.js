@@ -61,7 +61,7 @@ class GetUserKeyInfoController {
         throw new Error('User key not found');
       }
     }
-    return await GetGpgKeyInfoService.getKeyInfo(key.armoredKey);
+    return GetGpgKeyInfoService.getKeyInfo(key.armoredKey);
   }
 }
 

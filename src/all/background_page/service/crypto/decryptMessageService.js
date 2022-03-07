@@ -12,31 +12,32 @@
  * @since         3.6.0
  */
 
-const {BadSignatureMessageGpgKeyError} = require("../../error/badSignatureMessageGpgKeyError");
-const {assertDecryptedPrivateKeys, assertMessage, assertKeys} = require("../../utils/openpgp/openpgpAssertions");
+const {assertDecryptedPrivateKeys, assertEncryptedMessage, assertKeys} = require("../../utils/openpgp/openpgpAssertions");
 
 class DecryptMessageService {
   /**
    * Encrypt symmetrically a message
    *
-   * @param {string} message The message to encrypt.
-   * @param {array<string>} passwords The passwords to use to encrypt the message.
-   * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} signingKeys The private key(s) to use to sign the message.
-   * @returns {Promise<openpgp.message.Message>}
+   * @param {openpgp.Message|string} message The message to decrypt.
+   * @param {string} password The password to use to encrypt the message.
+   * @param {array<openpgp.PrivateKey|string>|openpgp.PrivateKey|string} verificationKeys The private key(s) to use to sign the message.
+   * @returns {Promise<string>}
    */
-  static async decryptSymmetrically(message, passwords, signingKeys = null) {
-    if (signingKeys) {
-      signingKeys = await assertKeys(signingKeys);
+  static async decryptSymmetrically(message, password, verificationKeys = null) {
+    if (verificationKeys) {
+      verificationKeys = await assertKeys(verificationKeys);
     }
+    message = await assertEncryptedMessage(message);
 
-    const decryptedMessage = await openpgp.decrypt({
-      message: await openpgp.message.readArmored(message),
-      passwords: passwords,
-      publicKeys: signingKeys
+    const {data: decryptedMessage, signatures} = await openpgp.decrypt({
+      message: message,
+      passwords: [password],
+      verificationKeys: verificationKeys,
+      expectSigned: Boolean(verificationKeys)
     });
 
-    if (signingKeys && !this._assertSignatures(decryptedMessage)) {
-      throw new BadSignatureMessageGpgKeyError('The signature(s) cannot be verified.');
+    if (verificationKeys) {
+      await this._doSignatureVerification(signatures);
     }
 
     return decryptedMessage;
@@ -45,54 +46,51 @@ class DecryptMessageService {
   /**
    * Decrypt a text message with signature.
    *
-   * @param {string} message The message to decrypt.
-   * @param {openpgp.key.Key|string} decryptionKeys The private key(s) to use to decrypt the message
-   * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} signingKeys The public key(s) to check the signature.
-   * @returns {Promise<openpgp.Message>}
-   * @throws {BadSignatureMessageGpgKeyError} if the given signatures don't match the message to decrypt.
+   * @param {openpgp.Message|string} message The message to decrypt.
+   * @param {openpgp.PrivateKey|string} decryptionKey The private key to use to decrypt the message
+   * @param {array<openpgp.PublicKey|string>|openpgp.PublicKey|string?} verificationKeys (optional) The public key(s) to check the signature.
+   * @returns {Promise<string>}
+   * @throws {Error} if the given signatures don't match the message to decrypt.
    */
-  static async decrypt(message, decryptionKeys, signingKeys = null) {
-    try {
-      message = await assertMessage(message);
-      decryptionKeys = await assertDecryptedPrivateKeys(decryptionKeys);
-      if (signingKeys) {
-        signingKeys = await assertKeys(signingKeys);
-      }
-
-      const decryptedMessage = await openpgp.decrypt({
-        message: message,
-        privateKeys: decryptionKeys,
-        publicKeys: signingKeys
-      });
-
-      if (signingKeys && !this._assertSignatures(decryptedMessage)) {
-        throw new BadSignatureMessageGpgKeyError('The signature(s) cannot be verified.');
-      }
-
-      return decryptedMessage;
-    } finally {
-      this._clearCache();
+  static async decrypt(message, decryptionKey, verificationKeys = null) {
+    message = await assertEncryptedMessage(message);
+    decryptionKey = await assertDecryptedPrivateKeys(decryptionKey);
+    if (verificationKeys) {
+      verificationKeys = await assertKeys(verificationKeys);
     }
+
+    const {data: decryptedMessage, signatures} = await openpgp.decrypt({
+      message: message,
+      decryptionKeys: decryptionKey,
+      verificationKeys: verificationKeys,
+      expectSigned: Boolean(verificationKeys)
+    });
+
+    if (verificationKeys) {
+      await this._doSignatureVerification(signatures);
+    }
+
+    return decryptedMessage;
   }
 
   /**
-   * Assert signatures
-   * @param {openpgp.Message} decryptedMessage The decrypted message to assert the signatures for
-   * @returns {boolean}
+   * Assert signatures.
+   *
+   * @param {Array<openpgp.Signature>} signatures The signatures to run the verification for
+   * @returns {Promise<void>}
+   * @throws {Error} if any of the signature does not verify the message.
    * @private
    */
-  static _assertSignatures(decryptedMessage) {
-    return decryptedMessage.signatures.reduce((result, signature) => result && signature.valid, true);
-  }
-
-  /**
-   * Clear the openpgp cache to avoid sensitive to remain in memory.
-   */
-  static async _clearCache() {
-    const worker = openpgp.getWorker();
-    if (worker) {
-      await worker.clearKeyCache();
-    }
+  static async _doSignatureVerification(signatures) {
+    /*
+     * Openpgp.js's signatures is an array of signature to verify.
+     * The verification process is run by starting a promise from the signature.verified field.
+     * The promise is set to always return true but, throws an exception if it can't be verified.
+     * So here, basically we expect to have an exception to be thrown if one of the
+     * expected signature is not ok.
+     */
+    const verificationPromises = signatures.map(signature => signature.verified);
+    await Promise.all(verificationPromises);
   }
 }
 

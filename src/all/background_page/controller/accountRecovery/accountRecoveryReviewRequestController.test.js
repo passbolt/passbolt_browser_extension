@@ -1,4 +1,7 @@
 /**
+ * @jest-environment node
+ */
+/**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  *
@@ -59,7 +62,7 @@ describe("AccountRecoveryReviewUserRequestController", () => {
       const expectedDecryptedPrivateKeyPasswordData = "3f28361aa774a5767fbe70ecd09b2fbbf1d5b4b493fe171089436bfa6a2eb03fe630fa9f2483c59b68e20616f1a7597ff8d058a6f79d228a4181d71a61f80d98";
       const decryptedAccountRecoveryRequestPrivateKey = await DecryptPrivateKeyService.decrypt(pgpKeys.account_recovery_request.private, pgpKeys.account_recovery_request.passphrase);
       const decryptedPrivateKeyPasswordData = await DecryptMessageService.decrypt(savedAccountRecoveryResponseEntity.data, decryptedAccountRecoveryRequestPrivateKey, pgpKeys.account_recovery_organization.public);
-      expect(decryptedPrivateKeyPasswordData.data).toEqual(expectedDecryptedPrivateKeyPasswordData);
+      expect(decryptedPrivateKeyPasswordData).toEqual(expectedDecryptedPrivateKeyPasswordData);
     }, 10000);
 
     it("Should save a review account recovery request if rejected.", async() => {

@@ -20,7 +20,7 @@ class GetDecryptedUserPrivateKeyService {
    * Get current user's private key and decrypts it.
    *
    * @param {string} passphrase The user's private key passphrase to decrypt to key.
-   * @returns {Promise<openpgp.key.Key>}
+   * @returns {Promise<string>}
    */
   static async getKey(passphrase) {
     const keyring = new Keyring();

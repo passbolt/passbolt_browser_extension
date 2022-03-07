@@ -12,26 +12,24 @@
  * @since         3.6.0
  */
 
-const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
+const {assertDecryptedPrivateKeys, assertPublicKeys} = require("../../utils/openpgp/openpgpAssertions");
 
 class SignGpgKeyService {
   /**
    * Signs a key with the given collection of key.
    *
-   * @param {ExternalGpgKeyEntity} gpgKeyToSign
-   * @param {ExternalGpgKeyCollection} gpgKeyCollection
-   * @returns {Promise<ExternalGpgKeyEntity>}
+   * @param {string|openpgp.PublicKey} gpgKeyToSign
+   * @param {Array<string|openpgp.PrivateKey>} gpgKeyCollection
+   * @returns {Promise<openpgp.PublicKey>}
    */
   static async sign(gpgKeyToSign, gpgKeyCollection) {
-    const keyToSign = (await openpgp.key.readArmored(gpgKeyToSign.armoredKey)).keys[0];
+    gpgKeyToSign = await assertPublicKeys(gpgKeyToSign);
     const signingKeys = [];
-    for (let i = 0; i < gpgKeyCollection.items.length; i++) {
-      const keys = (await openpgp.key.readArmored(gpgKeyCollection.items[i].armoredKey)).keys;
-      keys.forEach(key => { signingKeys.push(key); });
+    for (let i = 0; i < gpgKeyCollection.length; i++) {
+      const key = await assertDecryptedPrivateKeys(gpgKeyCollection[i]);
+      signingKeys.push(key);
     }
-
-    const signedKey = await keyToSign.signAllUsers(signingKeys);
-    return await GetGpgKeyInfoService.getKeyInfo(signedKey);
+    return gpgKeyToSign.signAllUsers(signingKeys);
   }
 }
 

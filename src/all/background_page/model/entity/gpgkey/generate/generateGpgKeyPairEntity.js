@@ -76,9 +76,10 @@ class GenerateGpgKeyPairEntity extends Entity {
    */
   toGenerateOpenpgpKeyDto() {
     return {
-      userIds: [this.userId],
+      userIDs: [this.userId],
       rsaBits: this.rsaBits,
-      passphrase: this.passphrase
+      passphrase: this.passphrase,
+      type: 'rsa'
     };
   }
 

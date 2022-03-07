@@ -110,7 +110,7 @@ class ResourceUpdateController {
 
   /**
    * getPrivateKey
-   * @returns {Promise<openpgp.key.Key>}
+   * @returns {Promise<openpgp.PrivateKey>}
    */
   async getPrivateKey() {
     try {
@@ -128,7 +128,7 @@ class ResourceUpdateController {
    *
    * @param {string|Object} plaintextDto
    * @param {array} usersIds
-   * @param {openpgp.key.Key} privateKey
+   * @param {openpgp.PrivateKey} privateKey
    * @returns {Promise<ResourceSecretsCollection>}
    */
   async encryptSecrets(plaintextDto, usersIds, privateKey) {
@@ -137,7 +137,7 @@ class ResourceUpdateController {
       if (Object.prototype.hasOwnProperty.call(usersIds, i)) {
         const userId =  usersIds[i];
         const userPublicKey = this.keyring.findPublic(userId).armoredKey;
-        const data = (await EncryptMessageService.encrypt(plaintextDto, userPublicKey, privateKey)).data;
+        const data = await EncryptMessageService.encrypt(plaintextDto, userPublicKey, privateKey);
         secrets.push({user_id: userId, data: data});
         await progressController.update(this.worker, i + 2, i18n.t("Encrypting"));
       }

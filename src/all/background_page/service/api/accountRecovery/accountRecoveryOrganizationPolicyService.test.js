@@ -58,7 +58,7 @@ describe("Account recovery validate public key service", () => {
     await checkError(dummyData.privateKey, "The key must be a public key.");
     await checkError(dummyData.weakKey, "The key size is of 2048 bits but, must be at least of 4096 bits.");
     await checkError(dummyData.expiredKey, "The key is expired.");
-    await checkError(dummyData.notAKey, "Misformed armored text");
+    await checkError(dummyData.notAKey, "The key is not a valid armored key");
     await checkError(dummyData.existingKey, "The key is already being used, the organization recovery key must be a new one.");
   });
 

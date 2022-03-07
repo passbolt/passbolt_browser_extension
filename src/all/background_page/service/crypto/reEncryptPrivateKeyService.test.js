@@ -22,7 +22,7 @@ const privateKey = pgpKeys.ada.private;
 
 describe("ReEncryptPrivateKeyService service", () => {
   it('should throw an exception if the given key is not formatted properly', async() => {
-    const privateKeyFormatError = new Error("The key must be of type string or openpgp.key.Key");
+    const privateKeyFormatError = new Error("The key must be of type string, openpgp.PublicKey or openpgp.PrivateKey");
     const scenarios = [
       {key: null, expectedError: privateKeyFormatError},
       {key: {}, expectedError: privateKeyFormatError},
@@ -69,7 +69,7 @@ describe("ReEncryptPrivateKeyService service", () => {
     const newPassphrase = "newPassphrase";
     const reEncryptedKey = await ReEncryptPrivateKeyService.reEncrypt(privateKey, "ada@passbolt.com", newPassphrase);
 
-    const promise = DecryptPrivateKeyService.decrypt(reEncryptedKey.armoredKey, newPassphrase);
+    const promise = DecryptPrivateKeyService.decrypt(reEncryptedKey, newPassphrase);
     return expect(promise).resolves.not.toBeNull();
   });
 });

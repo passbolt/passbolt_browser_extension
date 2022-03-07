@@ -14,35 +14,43 @@
 
 const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
 const {ExternalGpgKeyEntity} = require('./../../model/entity/gpgkey/external/externalGpgKeyEntity');
-const {GpgKeyError} = require("../../error/GpgKeyError");
 const {ExternalGpgKeyCollection} = require("../../model/entity/gpgkey/external/externalGpgKeyCollection");
-const {keyInfoDtos} = require('./getGpgKeyInfoService.test.data');
+const {
+  validKeyDto,
+  expiredKeyDto,
+  revokedKeyDto,
+  validKeyWithExpirationDateDto
+} = require('./getGpgKeyInfoService.test.data');
 
 describe("GpgKeyInfo service", () => {
-  it(`should provide the right information given a key from a compatible type'`, async() => {
-    const dto = keyInfoDtos.validKeyDto;
+  it(`should provide the right information given a key from a compatible type`, async() => {
+    const dto = validKeyDto();
     const availableFormatData = [
       dto.armored_key,
-      new ExternalGpgKeyEntity(dto),
-      (await openpgp.key.readArmored(dto.armored_key)).keys[0],
+      await openpgp.readKey({armoredKey: dto.armored_key}),
     ];
 
+    //avoid issues where parsing a key actually change the resulting armor (embed data are still the same though)
+    delete dto.armored_key;
     expect.assertions(availableFormatData.length);
 
     for (let i = 0; i < availableFormatData.length; i++) {
       const keyInfo = await GetGpgKeyInfoService.getKeyInfo(availableFormatData[i]);
-      expect(keyInfo.toDto()).toEqual(dto);
+      const receivedData = keyInfo.toDto();
+      delete receivedData.armored_key;
+      expect(receivedData).toEqual(dto);
     }
   });
 
   it("should throw an exception if the parameter type is incorrect", async() => {
-    const dto = keyInfoDtos.validKeyDto;
+    const dto = validKeyDto();
     const wronglyTypedData = [
       42, true,
       {armored_key: dto.armored_key},
       {armoredKey: dto.armored_key},
       {key: dto.armored_key},
-      new ExternalGpgKeyCollection([{armored_key: dto.armored_key}])
+      new ExternalGpgKeyCollection([{armored_key: dto.armored_key}]),
+      new ExternalGpgKeyEntity({armored_key: dto.armored_key})
     ];
 
     expect.assertions(wronglyTypedData.length);
@@ -51,15 +59,14 @@ describe("GpgKeyInfo service", () => {
       try {
         await GetGpgKeyInfoService.getKeyInfo(wronglyTypedData[i]);
       } catch (e) {
-        expect(e).toEqual(new GpgKeyError("Cannot parse key from the given data"));
+        expect(e).toStrictEqual(new Error("The key must be of type string, openpgp.PublicKey or openpgp.PrivateKey"));
       }
     }
   });
 
   it("should throw an exception if the key is not properly formatted", async() => {
     const goodTypeWithWrongData = [
-      ":D",
-      new ExternalGpgKeyEntity({armored_key: ":/"})
+      ":D"
     ];
 
     expect.assertions(goodTypeWithWrongData.length);
@@ -68,27 +75,27 @@ describe("GpgKeyInfo service", () => {
       try {
         await GetGpgKeyInfoService.getKeyInfo(goodTypeWithWrongData[i]);
       } catch (e) {
-        expect(e).toEqual(new GpgKeyError("Misformed armored text"));
+        expect(e).toStrictEqual(new Error("The key is not a valid armored key"));
       }
     }
   });
 
   it("should give the information of a key that will expire", async() => {
-    const dto = keyInfoDtos.validKeyWithExpirationDateDto;
+    const dto = validKeyWithExpirationDateDto();
     expect.assertions(1);
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(dto.armored_key);
     expect(keyInfo.toDto()).toEqual(dto);
   });
 
   it("should give the information of a key that is expired", async() => {
-    const dto = keyInfoDtos.expiredKeyDto;
+    const dto = expiredKeyDto();
     expect.assertions(1);
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(dto.armored_key);
     expect(keyInfo.toDto()).toEqual(dto);
   });
 
   it("should give the information of a key that is revoked", async() => {
-    const dto = keyInfoDtos.revokedKeyDto;
+    const dto = revokedKeyDto();
     expect.assertions(1);
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(dto.armored_key);
     expect(keyInfo.toDto()).toEqual(dto);

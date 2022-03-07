@@ -86,7 +86,7 @@ class GroupsUpdateController {
 
   /**
    * Get the user private key decrypted
-   * @returns {Promise<openpgp.key.Key>}
+   * @returns {Promise<openpgp.PrivateKey>}
    */
   async getPrivateKey() {
     const passphrase = await passphraseController.get(this.worker);
@@ -127,12 +127,12 @@ class GroupsUpdateController {
       const neededSecret = items[i];
       const resourceId = neededSecret.resourceId;
       const userId = neededSecret.userId;
-      progressController.update(this.worker, this.progress++, i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
+      await progressController.update(this.worker, this.progress++, i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
       const userPublicKey = this.keyring.findPublic(userId).armoredKey;
       const secretDto = {
         resource_id: resourceId,
         user_id: userId,
-        data: (await EncryptMessageService.encrypt(decryptedSecrets[resourceId], userPublicKey, privateKey)).data
+        data: await EncryptMessageService.encrypt(decryptedSecrets[resourceId], userPublicKey, privateKey)
       };
       const secret = new SecretEntity(secretDto);
       secrets.push(secret);
@@ -151,8 +151,8 @@ class GroupsUpdateController {
     const items = secretsCollection.items;
     for (const i in items) {
       const secret = items[i];
-      progressController.update(this.worker, this.progress++, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
-      result[secret.resourceId] = (await DecryptMessageService.decrypt(secret.data, privateKey)).data;
+      await progressController.update(this.worker, this.progress++, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
+      result[secret.resourceId] = await DecryptMessageService.decrypt(secret.data, privateKey);
     }
     return result;
   }

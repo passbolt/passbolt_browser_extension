@@ -12,66 +12,50 @@
  * @since         3.6.0
  */
 
-const {assertDecryptedPrivateKeys, assertPublicKeys} = require("../../utils/openpgp/openpgpAssertions");
+const {assertDecryptedPrivateKeys, assertPublicKeys, assertMessageToEncrypt} = require("../../utils/openpgp/openpgpAssertions");
 
 class EncryptMessageService {
   /**
    * Encrypt symmetrically a message.
    *
    * @param {string} message The message to encrypt.
-   * @param {array<string>} passwords The passwords to use to encrypt the message.
-   * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} signingKeys The private key(s) to use to sign the message.
-   * @returns {Promise<openpgp.Message>}
+   * @param {string} password The password to use to encrypt the message.
+   * @param {array<openpgp.PrivateKey|string>|openpgp.PrivateKey|string} signingKeys The private key(s) to use to sign the message.
+   * @returns {Promise<string>} the encrypted message in its armored version
    */
-  static async encryptSymmetrically(message, passwords, signingKeys = null) {
-    try {
-      if (signingKeys) {
-        signingKeys = await assertDecryptedPrivateKeys(signingKeys);
-      }
-
-      return await openpgp.encrypt({
-        message: openpgp.message.fromText(message),
-        passwords: passwords,
-        privateKeys: signingKeys
-      });
-    } finally {
-      this._clearCache();
+  static async encryptSymmetrically(message, password, signingKeys = null) {
+    if (signingKeys) {
+      signingKeys = await assertDecryptedPrivateKeys(signingKeys);
     }
+
+    message = await assertMessageToEncrypt(message);
+    return await openpgp.encrypt({
+      message: message,
+      passwords: password,
+      signingKeys: signingKeys
+    });
   }
 
   /**
    * Encrypt and sign text message.
    *
    * @param {string} message The message to encrypt.
-   * @param {openpgp.key.Key|string} encryptionKey The public key(s) to use to encrypt the message
-   * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} signingKeys The private key(s) to use to sign the message.
-   * @returns {Promise<openpgp.message.Message>}
+   * @param {openpgp.PublicKey|string} encryptionKey The public key(s) to use to encrypt the message
+   * @param {array<openpgp.PrivateKey|string>|openpgp.PrivateKey|string} signingKeys The private key(s) to use to sign the message.
+   * @returns {Promise<string>} the encrypted message in its armored version
    */
   static async encrypt(message, encryptionKey, signingKeys = null) {
-    try {
-      encryptionKey = await assertPublicKeys(encryptionKey);
-      if (signingKeys) {
-        signingKeys = await assertDecryptedPrivateKeys(signingKeys);
-      }
-
-      return await openpgp.encrypt({
-        message: openpgp.message.fromText(message),
-        publicKeys: encryptionKey,
-        privateKeys: signingKeys
-      });
-    } finally {
-      this._clearCache();
+    message = await assertMessageToEncrypt(message);
+    encryptionKey = await assertPublicKeys(encryptionKey);
+    if (signingKeys) {
+      signingKeys = await assertDecryptedPrivateKeys(signingKeys);
     }
-  }
 
-  /**
-   * Clear the openpgp cache to avoid sensitive to remain in memory.
-   */
-  static async _clearCache() {
-    const worker = openpgp.getWorker();
-    if (worker) {
-      await worker.clearKeyCache();
-    }
+    return await openpgp.encrypt({
+      message: message,
+      encryptionKeys: encryptionKey,
+      signingKeys: signingKeys
+    });
   }
 }
 

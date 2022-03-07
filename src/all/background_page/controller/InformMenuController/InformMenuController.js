@@ -123,7 +123,7 @@ class InformMenuController {
       const passphrase = await passphraseController.requestFromQuickAccess();
       const resource = await this.resourceModel.findForDecrypt(resourceId);
       const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
-      let plaintext = (await DecryptMessageService.decrypt(resource.secret.data, privateKey)).data;
+      let plaintext = await DecryptMessageService.decrypt(resource.secret.data, privateKey);
       plaintext = await this.resourceModel.deserializePlaintext(resource.resourceTypeId, plaintext);
       const {username} = resource;
       const password = plaintext?.password || plaintext;

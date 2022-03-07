@@ -12,6 +12,7 @@
  * @since         3.6.0
  */
 
+const {i18n} = require('../../sdk/i18n');
 const {GpgKeyError} = require('../../error/GpgKeyError');
 const {Keyring} = require('../../model/keyring');
 const {assertPrivateKeys} = require('../../utils/openpgp/openpgpAssertions');
@@ -56,7 +57,7 @@ class DownloadUserPublicKeyController {
     try {
       privateKey = await assertPrivateKeys(this.keyring.findPrivate().armoredKey);
     } catch (e) {
-      throw new GpgKeyError("Public key can't be found.");
+      throw new GpgKeyError(i18n.t("Public key can't be found."));
     }
 
     const publicKeyArmored = await privateKey.toPublic().armor();

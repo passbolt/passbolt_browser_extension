@@ -13,33 +13,32 @@
  */
 
 const {DecryptPrivateKeyService} = require('./decryptPrivateKeyService');
-const {GetGpgKeyInfoService} = require('./getGpgKeyInfoService');
-const {assertPrivateKeys} = require('../../utils/openpgp/openpgpAssertions');
+const {assertPrivateKeys, assertDecryptedPrivateKeys} = require('../../utils/openpgp/openpgpAssertions');
 
 class ReEncryptPrivateKeyService {
   /**
    * Re-encrypt a given PGP key with another passphrase.
    *
-   * @param {openpgp.key.Key|string} encryptedPrivateArmoredKey the private armored key to re-encrypt with a new password.
+   * @param {openpgp.PrivateKey|string} encryptedPrivateKey the private key to re-encrypt with a new password.
    * @param {string} oldPassphrase the passphraase that can be used to decrypt the given encrypted key.
    * @param {string} newPassphrase the new passphrase with which to re-encrypt the given private key.
-   * @returns {Promise<ExternalGpgKeyEntity>}
+   * @returns {Promise<string>} the armored private key encrypted with the new password
    * @throws {Error} if oldPassphrase or newPassphrase are not valid passphrases.
    * @throws {Error} if encryptedPrivateArmoredKey is not a valid private key.
    * @throws {InvalidMasterPasswordError} if the private key can't be decrypted with oldPassphrase.
    */
-  static async reEncrypt(encryptedPrivateArmoredKey, oldPassphrase, newPassphrase) {
-    if (Array.isArray(encryptedPrivateArmoredKey)) {
+  static async reEncrypt(encryptedPrivateKey, oldPassphrase, newPassphrase) {
+    if (Array.isArray(encryptedPrivateKey)) {
       throw new Error('Only a single private key is allowed to be reencrypted.');
     }
 
-    encryptedPrivateArmoredKey = await assertPrivateKeys(encryptedPrivateArmoredKey);
+    encryptedPrivateKey = await assertPrivateKeys(encryptedPrivateKey);
     this._validatePassphrase(oldPassphrase);
     this._validatePassphrase(newPassphrase);
 
-    const userNewPrivateKey = await DecryptPrivateKeyService.decrypt(encryptedPrivateArmoredKey.armor(), oldPassphrase);
-    await userNewPrivateKey.encrypt(newPassphrase);
-    return GetGpgKeyInfoService.getKeyInfo(userNewPrivateKey.armor());
+    let userDecryptedKey = await DecryptPrivateKeyService.decrypt(encryptedPrivateKey.armor(), oldPassphrase);
+    userDecryptedKey = await assertDecryptedPrivateKeys(userDecryptedKey);
+    return (await openpgp.encryptKey({privateKey: userDecryptedKey, passphrase: newPassphrase})).armor();
   }
 
   /**

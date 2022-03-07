@@ -25,6 +25,7 @@ const {OrganizationSettingsModel} = require('./organizationSettings/organization
 const {AuthStatusLocalStorage} = require('../service/local_storage/authStatusLocalStorage');
 const {EncryptMessageService} = require('../service/crypto/encryptMessageService');
 const {DecryptMessageService} = require('../service/crypto/decryptMessageService');
+const {GetGpgKeyInfoService} = require('../service/crypto/getGpgKeyInfoService');
 
 const URL_VERIFY = '/auth/verify.json?api-version=v2';
 const URL_LOGIN = '/auth/login.json?api-version=v2';
@@ -77,7 +78,7 @@ class GpgAuth {
     let encrypted, originalToken;
     try {
       originalToken = new GpgAuthToken();
-      encrypted = (await EncryptMessageService.encrypt(originalToken.token, serverKey)).data;
+      encrypted = await EncryptMessageService.encrypt(originalToken.token, serverKey);
     } catch (error) {
       throw new Error(`Unable to encrypt the verify token. ${error.message}`);
     }
@@ -169,25 +170,26 @@ class GpgAuth {
   /**
    * GPGAuth Login - handle stage1, stage2 and complete
    *
-   * @param privateKey {openpgp.key.Key} The decrypted private key to use to decrypt the message.
+   * @param privateKey {openpgp.PrivateKey} The decrypted private key to use to decrypt the message.
    * @returns {Promise.<string>} referrer url
    */
   async login(privateKey) {
-    const userAuthToken = await this.stage1(privateKey);
-    await this.stage2(userAuthToken, privateKey);
+    const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKey);
+    const userAuthToken = await this.stage1(privateKeyInfo);
+    await this.stage2(userAuthToken, privateKeyInfo);
   }
 
   /**
    * GPGAuth stage1 - get and decrypt a verification given by the server
    *
-   * @param privateKey {openpgp.key.Key} The decrypted private key to use to decrypt the message.
+   * @param {ExternalGpgKeyEntity} privateKey The decrypted private key to use to decrypt the message.
    * @returns {Promise.<string>} token
    */
   async stage1(privateKey) {
     // Prepare request data
     const url = this.getDomain() + URL_LOGIN;
     const body = new FormData();
-    body.append('data[gpg_auth][keyid]', privateKey.primaryKey.getFingerprint());
+    body.append('data[gpg_auth][keyid]', privateKey.fingerprint);
     const fetchOptions = {
       method: 'POST',
       credentials: 'include',
@@ -206,7 +208,7 @@ class GpgAuth {
 
     // Try to decrypt the User Auth Token
     const encryptedUserAuthToken = stripslashes(urldecode(auth.headers['x-gpgauth-user-auth-token']));
-    const userAuthToken = (await DecryptMessageService.decrypt(encryptedUserAuthToken, privateKey)).data;
+    const userAuthToken = await DecryptMessageService.decrypt(encryptedUserAuthToken, privateKey.armoredKey);
 
     // Validate the User Auth Token
     const authToken = new GpgAuthToken(userAuthToken);
@@ -217,7 +219,7 @@ class GpgAuth {
    * Stage 2. send back the token to the server to get auth cookie
    *
    * @param userAuthToken {string} The user authentication token
-   * @param {openpgp.key.Key} privateKey decrypted private key
+   * @param {ExternalGpgKeyEntity} privateKey decrypted private key
    * @returns {Promise.<string>} url to redirect the user to
    */
   async stage2(userAuthToken, privateKey) {
@@ -225,7 +227,7 @@ class GpgAuth {
     const url = this.getDomain() + URL_LOGIN;
     const domain = User.getInstance().settings.getDomain();
     const data = new FormData();
-    data.append('data[gpg_auth][keyid]', privateKey.primaryKey.getFingerprint());
+    data.append('data[gpg_auth][keyid]', privateKey.fingerprint);
     data.append('data[gpg_auth][user_token_result]', userAuthToken);
 
     // Send it over

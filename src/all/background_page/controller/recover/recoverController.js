@@ -20,7 +20,7 @@ const {Keyring} = require('../../model/keyring');
 const {SetupEntity} = require("../../model/entity/setup/setupEntity");
 const {SecurityTokenEntity} = require("../../model/entity/securityToken/securityTokenEntity");
 const {AccountEntity} = require("../../model/entity/account/accountEntity");
-const {GetGpgKeyInfoService} = require('../../service/crypto/getGpgKeyInfoService');
+const {assertPublicKeys} = require("../../utils/openpgp/openpgpAssertions");
 
 class RecoverController {
   /**
@@ -46,9 +46,8 @@ class RecoverController {
    */
   async retrieveRecoverInfo() {
     const serverKeyDto = await this.authModel.getServerKey();
-    //Ensures that `serverKeyDto.armored_key` is a valid key.
-    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(serverKeyDto.armored_key);
-    this.setupEntity.serverPublicArmoredKey = keyInfo.armoredKey;
+    const keyInfo = await assertPublicKeys(serverKeyDto.armored_key);
+    this.setupEntity.serverPublicArmoredKey = keyInfo.armor();
     await this.setupModel.findRecoverInfo(this.setupEntity);
     return this.setupEntity;
   }

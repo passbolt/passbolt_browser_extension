@@ -17,7 +17,7 @@ class ProgressService {
     this.worker = worker;
     this.title = title;
     this.progress = 0;
-    this.delayDuration = 200;
+    this.delayDuration = 0;
   }
 
   /**

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
+const {i18n} = require('../../sdk/i18n');
 const {SetupEntity} = require("../../model/entity/setup/setupEntity");
 const {GpgAuth} = require("../../model/gpgauth");
 const {GpgKeyError} = require("../../error/GpgKeyError");
@@ -89,7 +89,7 @@ class ImportPrivateKeySetupController {
     }
 
     if (keyAlreadyUsed) {
-      throw new GpgKeyError('This key is already used by another user.');
+      throw new GpgKeyError(i18n.t('This key is already used by another user.'));
     }
   }
 }

@@ -134,7 +134,7 @@ class ImportResourcesFileController {
 
   /**
    * Get the user private key decrypted
-   * @returns {Promise<openpgp.key.Key>}
+   * @returns {Promise<openpgp.PrivateKey>}
    */
   async getPrivateKey() {
     const passphrase = await passphraseController.get(this.worker);
@@ -145,19 +145,19 @@ class ImportResourcesFileController {
    * Encrypt the secrets.
    * @param {ImportResourcesFileEntity} importEntity The import object
    * @param {string} userId uuid
-   * @param {openpgp.key.Key} privateKey
+   * @param {openpgp.PrivateKey} privateKey
    * @returns {Promise<void>}
    */
   async encryptSecrets(importEntity, userId, privateKey) {
     let i = 0;
     for (const importResourceEntity of importEntity.importResources) {
       i++;
-      progressController.update(this.worker, this.progress++, i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: importEntity.importResources.items.length}));
+      await progressController.update(this.worker, this.progress++, i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: importEntity.importResources.items.length}));
       // @todo The secret DTO could be carried by the external resource entity. It can be done when we arrange the external resource entity schema validation.
       const secretDto = this.buildSecretDto(importResourceEntity);
       const serializedPlaintextDto = await this.resourceModel.serializePlaintextDto(importResourceEntity.resourceTypeId, secretDto);
       const userPublicKey = this.keyring.findPublic(userId).armoredKey;
-      const data = (await EncryptMessageService.encrypt(serializedPlaintextDto, userPublicKey, privateKey)).data;
+      const data = await EncryptMessageService.encrypt(serializedPlaintextDto, userPublicKey, privateKey);
       const secret = new SecretEntity({data: data});
       importResourceEntity.secrets = new ResourceSecretsCollection([secret]);
     }

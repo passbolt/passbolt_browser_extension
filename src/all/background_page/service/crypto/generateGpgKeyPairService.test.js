@@ -11,22 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-const openpgp = require('openpgp/dist/openpgp');
-import textEncoding from 'text-encoding-utf-8';
-import Validator from "validator";
 import {GenerateGpgKeyPairService} from "./generateGpgKeyPairService";
 import {GetGpgKeyInfoService} from "./getGpgKeyInfoService";
 import {GenerateGpgKeyPairEntity} from "../../model/entity/gpgkey/generate/generateGpgKeyPairEntity";
 import {DecryptPrivateKeyService} from "../../service/crypto/decryptPrivateKeyService";
-
-global.TextEncoder = textEncoding.TextEncoder;
-
-beforeEach(() => {
-  window.Validator = Validator;
-  window.openpgp = openpgp;
-  jest.resetModules();
-});
 
 describe("GenerateGpgKeyPair service", () => {
   it('should generate a key pair according to the given parameters', async() => {
@@ -44,7 +32,7 @@ describe("GenerateGpgKeyPair service", () => {
     expect(keyPair.public_key).not.toBeNull();
     expect(keyPair.private_key).not.toBeNull();
 
-    const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(keyPair.publicKey);
+    const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(keyPair.publicKey.armoredKey);
     expect(publicKeyInfo.algorithm).toBe("RSA");
     expect(publicKeyInfo.userIds[0]).toEqual({name: generateGpgKeyPairDto.name, email: generateGpgKeyPairDto.email});
     expect(publicKeyInfo.length).toBe(generateGpgKeyPairDto.keySize);
@@ -52,7 +40,7 @@ describe("GenerateGpgKeyPair service", () => {
     expect(publicKeyInfo.revoked).toBe(false);
     expect(publicKeyInfo.expires).toBe("Never");
 
-    const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(keyPair.privateKey);
+    const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(keyPair.privateKey.armoredKey);
     expect(privateKeyInfo.algorithm).toBe("RSA");
     expect(privateKeyInfo.userIds[0]).toEqual({name: generateGpgKeyPairDto.name, email: generateGpgKeyPairDto.email});
     expect(privateKeyInfo.length).toBe(generateGpgKeyPairDto.keySize);

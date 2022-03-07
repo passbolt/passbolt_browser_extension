@@ -12,20 +12,21 @@
  * @since         3.6.0
  */
 
-const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
+const {assertDecryptedPrivateKeys} = require("../../utils/openpgp/openpgpAssertions");
 
 class RevokeGpgKeyService {
   /**
    * Get a revoked public key from a given decrypted private key.
    *
-   * @param {ExternalGpgKeyEntity>} gpgKeyToRevoke
-   * @param {Promise<ExternalGpgKeyEntity>}
+   * @param {openpgp.PrivateKey|string} gpgKeyToRevoke
+   * @returns {Promise<string>} an armored public key revoked
    */
   static async revoke(gpgKeyToRevoke) {
+    gpgKeyToRevoke = await assertDecryptedPrivateKeys(gpgKeyToRevoke);
     const {publicKey} = await openpgp.revokeKey({
-      key: (await openpgp.key.readArmored(gpgKeyToRevoke.armoredKey)).keys[0]
+      key: gpgKeyToRevoke
     });
-    return await GetGpgKeyInfoService.getKeyInfo(publicKey);
+    return publicKey;
   }
 }
 

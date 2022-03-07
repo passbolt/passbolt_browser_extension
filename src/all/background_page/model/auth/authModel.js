@@ -108,7 +108,7 @@ class AuthModel {
     let encryptedToken, originalToken;
     try {
       originalToken = new GpgAuthToken();
-      encryptedToken = (await EncryptMessageService.encrypt(originalToken.token, serverKey)).data;
+      encryptedToken = await EncryptMessageService.encrypt(originalToken.token, serverKey);
     } catch (error) {
       throw new Error(`Unable to encrypt the verify token. ${error.message}`);
     }

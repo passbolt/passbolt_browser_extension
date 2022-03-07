@@ -11,29 +11,28 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
 const {EncryptMessageService} = require('./encryptMessageService');
 const {DecryptMessageService} = require('./decryptMessageService');
-const {assertDecryptedPrivateKeys, assertMessage, assertPublicKeys} = require("../../utils/openpgp/openpgpAssertions");
+const {assertDecryptedPrivateKeys, assertEncryptedMessage, assertPublicKeys} = require("../../utils/openpgp/openpgpAssertions");
 
 class ReEncryptMessageService {
   /**
    * Re-encrypt a given PGP Message with another key.
    *
    * @param {string|openpgp.Message} encryptedMessage
-   * @param {string|openpgp.key.Key|Array<string|openpgp.key.Key>} encryptionKeys
-   * @param {string|openpgp.key.Key|Array<string|openpgp.key.Key>} decryptionKeys
-   * @param {string|openpgp.key.Key|Array<string|openpgp.key.Key>} signingKeys
-   * @returns {Promise<openpgp.Message>} armored re-encrypted message.
+   * @param {string|openpgp.PublicKey|Array<string|openpgp.PublicKey>} encryptionKeys
+   * @param {string|openpgp.PrivateKey|Array<string|openpgp.PrivateKey>} decryptionKeys
+   * @param {string|openpgp.PrivateKey|Array<string|openpgp.PrivateKey>} signingKeys
+   * @returns {Promise<string>} armored re-encrypted message.
    */
   static async reEncrypt(encryptedMessage, encryptionKeys, decryptionKeys, signingKeys) {
-    encryptedMessage = await assertMessage(encryptedMessage);
+    encryptedMessage = await assertEncryptedMessage(encryptedMessage);
     encryptionKeys = await assertPublicKeys(encryptionKeys);
     decryptionKeys = await assertDecryptedPrivateKeys(decryptionKeys);
     signingKeys = await assertDecryptedPrivateKeys(signingKeys);
 
     const decryptedMessage = await DecryptMessageService.decrypt(encryptedMessage, decryptionKeys, signingKeys);
-    return await EncryptMessageService.encrypt(decryptedMessage.data, encryptionKeys, signingKeys);
+    return await EncryptMessageService.encrypt(decryptedMessage, encryptionKeys, signingKeys);
   }
 }
 

@@ -57,7 +57,7 @@ class SecretDecryptController {
         await progressController.update(this.worker, 1, i18n.t("Decrypting secret"));
       }
       const resource = await resourcePromise;
-      let plaintext = (await DecryptMessageService.decrypt(resource.secret.data, privateKey)).data;
+      let plaintext = await DecryptMessageService.decrypt(resource.secret.data, privateKey);
       plaintext = await this.resourceModel.deserializePlaintext(resource.resourceTypeId, plaintext);
 
       // Wrap up

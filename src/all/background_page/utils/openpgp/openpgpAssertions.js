@@ -12,12 +12,14 @@
  * @since         3.6.0
  */
 
+const {i18n} = require("../../sdk/i18n");
+
 /**
  * Assert pgp key(s).
  * - Should be a valid armored key or valid openpgp key.
  *
- * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} publicKeys The key(s) to assert.
- * @returns {array<openpgp.key.Key>|openpgp.key.Key}
+ * @param {array<openpgp.PublicKey|openpgp.Private|string>|openpgp.PublicKey|openpgp.Private|string} publicKeys The key(s) to assert.
+ * @returns {array<openpgp.PublicKey|openpgp.Private>|openpgp.PublicKey|openpgp.Private}
  * @private
  */
 const assertKeys = async keys => {
@@ -27,12 +29,12 @@ const assertKeys = async keys => {
 
   if (typeof keys === "string") {
     try {
-      keys = (await openpgp.key.readArmored(keys)).keys[0];
+      keys = await openpgp.readKey({armoredKey: keys});
     } catch (error) {
       throw new Error("The key is not a valid armored key");
     }
-  } else if (!(keys instanceof openpgp.key.Key)) {
-    throw new Error("The key must be of type string or openpgp.key.Key");
+  } else if (!(keys instanceof openpgp.PublicKey) && !(keys instanceof openpgp.PrivateKey)) {
+    throw new Error("The key must be of type string, openpgp.PublicKey or openpgp.PrivateKey");
   }
 
   return keys;
@@ -44,8 +46,8 @@ exports.assertKeys = assertKeys;
  * - Should be a valid armored key or valid openpgp key.
  * - Should be private.
  *
- * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} privateKeys The private key(s) to assert.
- * @returns {array<openpgp.key.Key>|openpgp.key.Key}
+ * @param {array<openpgp.PublicKey|openpgp.Private|string>|openpgp.PublicKey|openpgp.Private|string} privateKeys The private key(s) to assert.
+ * @returns {array<openpgp.PublicKey|openpgp.Private>|openpgp.PublicKey|openpgp.Private}
  * @private
  */
 const assertPrivateKeys = async privateKeys => {
@@ -55,7 +57,7 @@ const assertPrivateKeys = async privateKeys => {
 
   const privateKey = await assertKeys(privateKeys);
   if (!privateKey.isPrivate()) {
-    throw new Error("The key is not a valid private key.");
+    throw new Error(i18n.t("The key is not a valid private key."));
   }
 
   return privateKey;
@@ -68,8 +70,8 @@ exports.assertPrivateKeys = assertPrivateKeys;
  * - Should be private.
  * - Should be decrypted.
  *
- * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} privateKeys The private key(s) to assert.
- * @returns {array<openpgp.key.Key>|openpgp.key.Key}
+ * @param {array<openpgp.PrivateKey|string>|openpgp.PrivateKey|string} privateKeys The private key(s) to assert.
+ * @returns {array<openpgp.PrivateKey>|openpgp.PrivateKey}
  * @private
  */
 const assertDecryptedPrivateKeys = async privateKeys => {
@@ -90,17 +92,21 @@ exports.assertDecryptedPrivateKeys = assertDecryptedPrivateKeys;
  * Assert pgp key(s).
  * - Should be a valid armored key or valid openpgp key.
  *
- * @param {array<openpgp.key.Key|string>|openpgp.key.Key|string} publicKeys The private key(s) to assert.
- * @returns {array<openpgp.key.Key>|openpgp.key.Key}
+ * @param {array<openpgp.PublicKey|string>|openpgp.PublicKey|string} publicKeys The private key(s) to assert.
+ * @returns {array<openpgp.PublicKey>|openpgp.PublicKey}
  * @private
  */
 const assertPublicKeys = async keys => {
   if (typeof keys === "string") {
     try {
-      keys = (await openpgp.key.readArmored(keys)).keys;
+      keys = await openpgp.readKey({armoredKey: keys});
     } catch (error) {
       throw new Error("The public key is not a valid armored key");
     }
+  }
+
+  if (keys.isPrivate()) {
+    throw new Error(i18n.t("The key is not a valid public key."));
   }
 
   return keys;
@@ -111,19 +117,40 @@ exports.assertPublicKeys = assertPublicKeys;
  * Assert pgp message.
  * - Should be a valid message.
  *
- * @param {CleartextMessage|string} privateKeys The message to assert.
- * @returns {CleartextMessage}
+ * @param {openpgp.Message|string} message The message to assert.
+ * @returns {openpgp.Message}
  * @private
  */
-const assertMessage = async message => {
+const assertMessageToEncrypt = async message => {
   if (typeof message === "string") {
-    try {
-      message = await openpgp.message.readArmored(message);
-    } catch (error) {
-      throw new Error("The message is not a valid cleartext signed message");
-    }
+    message = await openpgp.createMessage({text: message, format: 'utf8'});
+  } else if (!(message instanceof openpgp.Message)) {
+    throw new Error("The message should be of type string or openpgp.Message");
   }
 
   return message;
 };
-exports.assertMessage = assertMessage;
+exports.assertMessageToEncrypt = assertMessageToEncrypt;
+
+/**
+ * Assert pgp encrypted message.
+ * - Should be a valid message.
+ *
+ * @param {openpgp.Message|string} message The message to assert.
+ * @returns {openpgp.Message}
+ * @private
+ */
+const assertEncryptedMessage = async message => {
+  if (typeof message === "string") {
+    try {
+      message = await openpgp.readMessage({armoredMessage: message});
+    } catch (error) {
+      throw new Error("The message is not a valid openpgp message");
+    }
+  } else if (!(message instanceof openpgp.Message)) {
+    throw new Error("The message should be of type string or openpgp.Message");
+  }
+
+  return message;
+};
+exports.assertEncryptedMessage = assertEncryptedMessage;

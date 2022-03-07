@@ -15,6 +15,7 @@ const Uuid = require('../utils/uuid');
 const {UserSettings} = require('./userSettings/userSettings');
 const {GetGpgKeyInfoService} = require('../service/crypto/getGpgKeyInfoService');
 const {ExternalGpgKeyEntity} = require('./entity/gpgkey/external/externalGpgKeyEntity');
+const {assertPublicKeys, assertPrivateKeys} = require('../utils/openpgp/openpgpAssertions');
 
 /**
  * Constants
@@ -100,19 +101,10 @@ class Keyring {
     armoredPublicKey = this.findArmoredKeyInText(armoredPublicKey, Keyring.PUBLIC);
 
     // Is the given key a valid pgp key ?
-    const publicKey = await openpgp.key.readArmored(armoredPublicKey);
-    if (publicKey.err) {
-      throw new Error(publicKey.err[0].message);
-    }
-
-    // If the key is not public, return an error.
-    const primaryPublicKey = publicKey.keys[0];
-    if (!primaryPublicKey.isPublic()) {
-      throw new Error('Expected a public key but got a private key instead');
-    }
+    const primaryPublicKey = await assertPublicKeys(armoredPublicKey);
 
     // Get the keyInfo.
-    const keyInfo = (await GetGpgKeyInfoService.getKeyInfo(armoredPublicKey)).toDto();
+    const keyInfo = (await GetGpgKeyInfoService.getKeyInfo(primaryPublicKey)).toDto();
 
     // Add the key in the keyring.
     const publicKeys = this.getPublicKeysFromStorage();
@@ -142,20 +134,10 @@ class Keyring {
      */
     armoredKey = this.findArmoredKeyInText(armoredKey, Keyring.PRIVATE);
 
-    // Is the given key a valid pgp key ?
-    let privateKey = await openpgp.key.readArmored(armoredKey);
-    if (privateKey.err) {
-      throw new Error(privateKey.err[0].message);
-    }
-
-    // If the key is not private, return an error.
-    privateKey = privateKey.keys[0];
-    if (!privateKey.isPrivate()) {
-      throw new Error('Expected a private key but got a public key instead');
-    }
+    const privateKey = await assertPrivateKeys(armoredKey);
 
     // Get the keyInfo.
-    const keyInfo = (await GetGpgKeyInfoService.getKeyInfo(armoredKey)).toDto();
+    const keyInfo = (await GetGpgKeyInfoService.getKeyInfo(privateKey)).toDto();
 
     // Add the key in the keyring
     const privateKeys = this.getPrivateKeysFromStorage();

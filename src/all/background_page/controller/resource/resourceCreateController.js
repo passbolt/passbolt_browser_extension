@@ -78,7 +78,7 @@ class ResourceCreateController {
       // Encrypt and sign
       await progressController.update(this.worker, this.progress++, i18n.t('Encrypting secret'));
       const userPublicKey = this.keyring.findPublic(User.getInstance().get().id).armoredKey;
-      const secret = (await EncryptMessageService.encrypt(plaintext, userPublicKey, privateKey)).data;
+      const secret = await EncryptMessageService.encrypt(plaintext, userPublicKey, privateKey);
       resource.secrets = new ResourceSecretsCollection([{data: secret}]);
 
       // Save
@@ -106,7 +106,7 @@ class ResourceCreateController {
    * This includes sharing the resource to match the parent folder permissions
    *
    * @param {ResourceEntity} resourceEntity
-   * @param {openpgp.key.Key} privateKey The user decrypted private key
+   * @param {openpgp.PrivateKey} privateKey The user decrypted private key
    * @returns {Promise<void>}
    */
   async handleCreateInFolder(resourceEntity, privateKey) {

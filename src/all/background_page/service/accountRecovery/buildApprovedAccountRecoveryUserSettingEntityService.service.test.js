@@ -18,7 +18,6 @@ import {BuildApprovedAccountRecoveryUserSettingEntityService} from "./buildAppro
 import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import {AccountRecoveryOrganizationPolicyEntity} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
 import {DecryptMessageService} from "../crypto/decryptMessageService";
-import {DecryptPrivateKeyService} from "../crypto/decryptPrivateKeyService";
 
 describe("BuildApprovedAccountRecoveryUserSettingEntityService service", () => {
   it("Build approved account recovery user setting entity", async() => {
@@ -34,11 +33,9 @@ describe("BuildApprovedAccountRecoveryUserSettingEntityService service", () => {
     // Ensure the escrow can be decrypted.
     const userPrivateKeyPasswordEncrypted = accountRecoveryUserSetting.accountRecoveryPrivateKeyPasswords.items[0].data;
     const userPrivateKeyEncrypted = accountRecoveryUserSetting.accountRecoveryPrivateKey.data;
-    const decryptedOrganizationPrivateOpenpgpKey = await DecryptPrivateKeyService.decrypt(pgpKeys.account_recovery_organization.private, pgpKeys.account_recovery_organization.passphrase);
-    const symmetricSecretOpenPgpMessage = await DecryptMessageService.decrypt(userPrivateKeyPasswordEncrypted, decryptedOrganizationPrivateOpenpgpKey, pgpKeys.ada.private_decrypted);
-    const symmetricSecret = symmetricSecretOpenPgpMessage.data;
-    const userPrivateArmoredOpenpgpKeyDecrypted = await DecryptMessageService.decryptSymmetrically(userPrivateKeyEncrypted, [symmetricSecret], pgpKeys.ada.private_decrypted);
-    expect(userPrivateArmoredOpenpgpKeyDecrypted.data.trim()).toEqual(pgpKeys.ada.private_decrypted);
+    const symmetricSecret = await DecryptMessageService.decrypt(userPrivateKeyPasswordEncrypted, pgpKeys.account_recovery_organization.private_decrypted, pgpKeys.ada.private_decrypted);
+    const userPrivateArmoredOpenpgpKeyDecrypted = await DecryptMessageService.decryptSymmetrically(userPrivateKeyEncrypted, symmetricSecret, pgpKeys.ada.private_decrypted);
+    expect(userPrivateArmoredOpenpgpKeyDecrypted.trim()).toEqual(pgpKeys.ada.private_decrypted);
   });
 
   it("Should throw an error if the provided user private key is not a valid decrypted private pgp key.", async() => {

@@ -21,7 +21,7 @@ const {Keyring} = require('../../model/keyring');
 const {SetupEntity} = require("../../model/entity/setup/setupEntity");
 const {SecurityTokenEntity} = require("../../model/entity/securityToken/securityTokenEntity");
 const {AccountEntity} = require("../../model/entity/account/accountEntity");
-const {GetGpgKeyInfoService} = require('../../service/crypto/getGpgKeyInfoService');
+const {assertPublicKeys} = require("../../utils/openpgp/openpgpAssertions");
 
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
 
@@ -50,8 +50,8 @@ class SetupController {
   async retrieveSetupInfo() {
     const serverKeyDto = await this.authModel.getServerKey();
     //Ensures that `serverKeyDto.armored_key` is a valid key.
-    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(serverKeyDto.armored_key);
-    this.setupEntity.serverPublicArmoredKey = keyInfo.armoredKey;
+    const keyInfo = await assertPublicKeys(serverKeyDto.armored_key);
+    this.setupEntity.serverPublicArmoredKey = keyInfo.armor();
     await this.setupModel.findSetupInfo(this.setupEntity);
     return this.setupEntity;
   }

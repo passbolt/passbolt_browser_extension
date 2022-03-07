@@ -92,7 +92,7 @@ class ExportResourcesFileController {
 
   /**
    * Get the user private key decrypted
-   * @returns {Promise<openpgp.key.Key>}
+   * @returns {Promise<openpgp.PrivateKey>}
    */
   async getPrivateKey() {
     const passphrase = await passphraseController.get(this.worker);
@@ -109,8 +109,8 @@ class ExportResourcesFileController {
     const resourcesTypesCollection = await this.resourceTypeModel.getOrFindAll();
     for (const exportResourceEntity of exportEntity.exportResources.items) {
       i++;
-      progressController.update(this.worker, ++this.progress, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: exportEntity.exportResources.items.length}));
-      let secretClear = (await DecryptMessageService.decrypt(exportResourceEntity.secrets.items[0].data, privateKey)).data;
+      await progressController.update(this.worker, ++this.progress, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: exportEntity.exportResources.items.length}));
+      let secretClear = await DecryptMessageService.decrypt(exportResourceEntity.secrets.items[0].data, privateKey);
 
       // @deprecated Prior to v3, resources have no resource type. Remove this condition with v4.
       if (!exportResourceEntity.resourceTypeId) {

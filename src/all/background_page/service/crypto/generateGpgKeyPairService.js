@@ -22,11 +22,12 @@ class GenerateGpgKeyPairService {
    * @return {Promise<ExternalGpgKeyPairEntity>}
    */
   static async generateKeyPair(generateGpgKeyPairEntity) {
-    const openpgpKeyPair = await openpgp.generateKey(generateGpgKeyPairEntity.toGenerateOpenpgpKeyDto());
+    const openpgpGenerateKeyDto = Object.assign(generateGpgKeyPairEntity.toGenerateOpenpgpKeyDto(), {format: 'armored'});
+    const openpgpKeyPair = await openpgp.generateKey(openpgpGenerateKeyDto);
 
     return new ExternalGpgKeyPairEntity({
-      public_key: {armored_key: openpgpKeyPair.publicKeyArmored},
-      private_key: {armored_key: openpgpKeyPair.privateKeyArmored}
+      public_key: {armored_key: openpgpKeyPair.publicKey},
+      private_key: {armored_key: openpgpKeyPair.privateKey}
     });
   }
 }

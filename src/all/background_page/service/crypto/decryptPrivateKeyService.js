@@ -13,40 +13,39 @@
  */
 
 const {InvalidMasterPasswordError} = require("../../error/invalidMasterPasswordError");
-const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
+const {assertPrivateKeys} = require("../../utils/openpgp/openpgpAssertions");
 
 class DecryptPrivateKeyService {
   /**
    * Decrypt a private key with the given passphrase.
    *
    * @param {PrivateGpgkeyEntity} privateKey
-   * @return {Promise<ExternalGpgKeyEntity>}
+   * @returns {Promise<string>} the armored private key decrypted
    * @throws {InvalidMasterPasswordError} if the key cannot be decrypted with the passphrase
    */
   static async decryptPrivateGpgKeyEntity(privateGpgKeyEntity) {
-    const privateKey = await this.decrypt(privateGpgKeyEntity.armoredKey, privateGpgKeyEntity.passphrase);
-
-    return await GetGpgKeyInfoService.getKeyInfo(privateKey);
+    return this.decrypt(privateGpgKeyEntity.armoredKey, privateGpgKeyEntity.passphrase);
   }
 
   /**
    * Decrypt a private key with the given passphrase.
    *
-   * @param {string} armoredKey
-   * @param {string} passphrase
-   * @returns {Promise<openpgp.key.Key>}
+   * @param {openpgp.PrivateKey|string} privateKey the private key to decrypt
+   * @param {string} passphrase the passphrase with which to do the decryption operation
+   * @returns {Promise<string>} the armored private key decrypted
    * @throws {InvalidMasterPasswordError} if the key cannot be decrypted with the passphrase
+   * @throws {Error} If the private key is already decrypted.
    */
-  static async decrypt(armoredKey, passphrase) {
-    const privateKey = (await openpgp.key.readArmored(armoredKey)).keys[0];
+  static async decrypt(privateKey, passphrase) {
+    privateKey = await assertPrivateKeys(privateKey);
     if (privateKey.isDecrypted()) {
       throw new Error("The private key is already decrypted");
     }
 
-    await privateKey.decrypt(passphrase)
-      .catch(() => { throw new InvalidMasterPasswordError(); });
-
-    return privateKey;
+    return (await openpgp.decryptKey({
+      privateKey: privateKey,
+      passphrase: passphrase
+    }).catch(() => { throw new InvalidMasterPasswordError(); })).armor();
   }
 }
 

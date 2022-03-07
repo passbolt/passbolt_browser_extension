@@ -84,9 +84,7 @@ class AccountRecoveryReviewRequestController {
     if (!accountRecoveryPrivateKeyPassword) {
       throw new Error("No account recovery private key password found.");
     }
-    const openpgpMessage = await ReEncryptMessageService.reEncrypt(accountRecoveryPrivateKeyPassword.data, accountRecoveryRequestEntity.armoredKey, organizationPrivateKeyDecrypted.armoredKey, organizationPrivateKeyDecrypted.armoredKey);
-
-    return openpgpMessage.data;
+    return ReEncryptMessageService.reEncrypt(accountRecoveryPrivateKeyPassword.data, accountRecoveryRequestEntity.armoredKey, organizationPrivateKeyDecrypted, organizationPrivateKeyDecrypted);
   }
 }
 

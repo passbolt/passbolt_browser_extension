@@ -15,71 +15,30 @@
 const {goog} = require('../../utils/format/emailaddress');
 const {ExternalGpgKeyEntity} = require('../../model/entity/gpgkey/external/externalGpgKeyEntity');
 const {GpgKeyError} = require('../../error/GpgKeyError');
+const {assertKeys} = require('../../utils/openpgp/openpgpAssertions');
 
 class GetGpgKeyInfoService {
   /**
    * Returns the information of the given key.
    *
-   * @param {ExternalGpgKeyEntity|openpgp.key.Key|string} key The key to get the info from.
+   * @param {openpgp.PublicKey|openpgp.PrivateKey|string} key The key to get the info from.
    * @return {Promise<ExternalGpgKeyEntity>}
    */
   static async getKeyInfo(key) {
-    const readKey = await this._readOpenPgpKey(key);
-    return await this._keyInfo(readKey);
-  }
-
-  /**
-   * Read an openpgp key from different supported format.
-   *
-   * @param {ExternalGpgKeyEntity|openpgp.key.Key|string} key The key to read.
-   * @return {Promise<openpgp.key.Key>}
-   * @private
-   */
-  static async _readOpenPgpKey(key) {
-    if (key instanceof openpgp.key.Key) {
-      return key;
-    } else if (key instanceof ExternalGpgKeyEntity) {
-      return this._readOpenpgpKeyFromArmoredKey(key.armoredKey);
-    } else if (typeof key === "string") {
-      return this._readOpenpgpKeyFromArmoredKey(key);
-    }
-
-    throw new GpgKeyError("Cannot parse key from the given data");
-  }
-
-  /**
-   * Read an armored key.
-   *
-   * @param {string} armoredKey The armored key to read.
-   * @returns {Promise<openpgp.key.Key>}
-   * @throws {GpgKeyError} If the armored key cannot be read
-   * @private
-   */
-  static async _readOpenpgpKeyFromArmoredKey(armoredKey) {
-    let result = null;
-    try {
-      result = await openpgp.key.readArmored(armoredKey);
-    } catch (e) {
-      throw new GpgKeyError(e.message);
-    }
-
-    if (result.err) {
-      throw new GpgKeyError(result.err[0].message);
-    }
-
-    return result.keys[0];
+    const readKey = await assertKeys(key);
+    return this._keyInfo(readKey);
   }
 
   /**
    * Returns key information.
    *
-   * @param {openpgp.key.Key} key The key to get info from.
+   * @param {openpgp.PublicKey|openpgp.PrivateKey} key The key to get info from.
    * @returns {Promise<ExternalGpgKeyEntity>}
    * @private
    */
   static async _keyInfo(key) {
     // Check the userIds
-    const userIds = key.getUserIds();
+    const userIds = key.getUserIDs();
     const userIdsSplited = [];
     if (userIds.length === 0) {
       throw new GpgKeyError('No key user ID found');
@@ -96,7 +55,7 @@ class GetGpgKeyInfoService {
     }
 
     // seems like opengpg keys id can be longer than 8 bytes (16 default?)
-    let keyid = key.primaryKey.getKeyId().toHex();
+    let keyid = key.getKeyID().toHex();
     if (keyid.length > 8) {
       keyid = keyid.substr(keyid.length - 8);
     }
@@ -107,16 +66,17 @@ class GetGpgKeyInfoService {
       ? "Never"
       : opengpgExpirationTime.toISOString();
 
+    const algorithmInfo = key.getAlgorithmInfo();
     const externalGpgKeyDto = {
       armored_key: key.armor(),
       key_id: keyid,
       user_ids: userIdsSplited,
-      fingerprint: key.primaryKey.getFingerprint(),
-      created: key.primaryKey.getCreationTime().toISOString(),
+      fingerprint: key.getFingerprint(),
+      created: key.getCreationTime().toISOString(),
       expires: expirationTime,
-      algorithm: this.formatAlgorithm(key.primaryKey.getAlgorithmInfo().algorithm),
-      length: key.primaryKey.getAlgorithmInfo().bits,
-      curve: key.primaryKey.getAlgorithmInfo().curve || null,
+      algorithm: this.formatAlgorithm(algorithmInfo.algorithm),
+      length: this.getKeyLength(algorithmInfo),
+      curve: key.getAlgorithmInfo().curve || null,
       private: key.isPrivate(),
       revoked: await key.isRevoked()
     };
@@ -132,9 +92,9 @@ class GetGpgKeyInfoService {
    */
   static formatAlgorithm(algorithmName) {
     switch (algorithmName) {
-      case "rsa_encrypt_sign":
-      case "rsa_encrypt":
-      case "rsa_sign":
+      case "rsaEncryptSign":
+      case "rsaEncrypt":
+      case "rsaSign":
         return "RSA";
       case "elgamal":
         return "Elgamal";
@@ -151,6 +111,20 @@ class GetGpgKeyInfoService {
       case "aedsa":
         return "AEDSA";
     }
+  }
+
+  /**
+   * Get the key size from an openpgp algorithm info.
+   *
+   * @param {object} algorithmInfo
+   * @returns {string}
+   */
+  static getKeyLength(algorithmInfo) {
+    if (typeof(algorithmInfo.bits) !== "undefined") {
+      return algorithmInfo.bits;
+    }
+    //@todo: check for other possibilities like when using an algorithm like ECC.
+    return undefined;
   }
 }
 

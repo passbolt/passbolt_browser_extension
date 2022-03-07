@@ -59,7 +59,7 @@ class AccountModel {
    */
   async updatePrivateKey(oldPassphrase, newPassphrase) {
     const privateKey = this.keyring.findPrivate();
-    const reEncryptedArmoredKey = (await ReEncryptPrivateKeyService.reEncrypt(privateKey.armoredKey, oldPassphrase, newPassphrase)).armoredKey;
+    const reEncryptedArmoredKey = await ReEncryptPrivateKeyService.reEncrypt(privateKey.armoredKey, oldPassphrase, newPassphrase);
     try {
       await this.keyring.importPrivate(reEncryptedArmoredKey);
     } catch (error) {

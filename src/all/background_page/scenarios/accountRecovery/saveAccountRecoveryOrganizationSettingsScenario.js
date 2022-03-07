@@ -19,8 +19,6 @@ const {DecryptPrivateKeyService} = require('../../service/crypto/decryptPrivateK
 const {ReEncryptMessageService} = require("../../service/crypto/reEncryptMessageService");
 const {SignGpgKeyService} = require('../../service/crypto/signGpgKeyService');
 const {RevokeGpgKeyService} = require('../../service/crypto/revokeGpgKeyService');
-const {ExternalGpgKeyEntity} = require('../../model/entity/gpgkey/external/externalGpgKeyEntity');
-const {ExternalGpgKeyCollection} = require('../../model/entity/gpgkey/external/externalGpgKeyCollection');
 
 class SaveAccountRecoveryOrganizationSettingsScenario {
   constructor(progressService, accountRecoveryModel) {
@@ -37,15 +35,15 @@ class SaveAccountRecoveryOrganizationSettingsScenario {
    * @param {PrivateGpgkeyEntity|null} organizationPrivateKey The current account recovery organization private key.
    */
   async run(newOrganizationPolicy, currentOrganizationPolicy, userPrivateKey, organizationPrivateKey) {
-    const signingKeys = new ExternalGpgKeyCollection([]);
+    const signingKeys = [];
     const hasToRevokeCurrentOrganizationKey = this._hasToRevokedCurrentORK(newOrganizationPolicy, currentOrganizationPolicy);
     const hasToSignNewOrganizationKey = this._hasToSignNewORK(newOrganizationPolicy, currentOrganizationPolicy);
     const hasToReKeyPrivateKeyPasswords = hasToRevokeCurrentOrganizationKey && hasToSignNewOrganizationKey;
     const entityBuilder = new AccountRecoveryOrganizationPolicyEntityBuilder(newOrganizationPolicy, currentOrganizationPolicy);
 
     if (hasToRevokeCurrentOrganizationKey) {
-      const decryptedOrganizationPrivateKey = (await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(organizationPrivateKey)).armoredKey;
-      entityBuilder.withCurrentORKRevoked(await this._revokeCurrentORK(decryptedOrganizationPrivateKey));
+      const decryptedOrganizationPrivateKey = await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(organizationPrivateKey);
+      entityBuilder.withCurrentORKRevoked(await RevokeGpgKeyService.revoke(decryptedOrganizationPrivateKey));
 
       signingKeys.push(decryptedOrganizationPrivateKey);
 
@@ -56,14 +54,14 @@ class SaveAccountRecoveryOrganizationSettingsScenario {
     }
 
     if (hasToSignNewOrganizationKey) {
-      const decryptedAdministratorKey = await (DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(userPrivateKey));
-      signingKeys.push(decryptedAdministratorKey.armoredKey);
+      const decryptedAdministratorKey = await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(userPrivateKey);
+      signingKeys.push(decryptedAdministratorKey);
 
-      const signedNewORK = await this._signNewORK(newOrganizationPolicy.armoredKey, signingKeys);
-      entityBuilder.withNewORKSigned(signedNewORK);
+      const signedNewORK = await SignGpgKeyService.sign(newOrganizationPolicy.armoredKey, signingKeys);
+      entityBuilder.withNewORKSigned(signedNewORK.armor());
     }
 
-    return this.accountRecoveryModel.saveOrganizationPolicy(await entityBuilder.build());
+    return this.accountRecoveryModel.saveOrganizationPolicy(entityBuilder.build());
   }
 
   /**
@@ -129,7 +127,7 @@ class SaveAccountRecoveryOrganizationSettingsScenario {
       const encryptedKeyData = await ReEncryptMessageService.reEncrypt(items[i].data, encryptionKey, decryptionKey, decryptionKey);
       const privateKeyPasswordDto = {
         ...items[i].toDto(),
-        data: encryptedKeyData.data
+        data: encryptedKeyData
       };
       newAccountRecoveryPrivateKeyPasswords.push(privateKeyPasswordDto);
       await this.progressService.finishStep();
@@ -137,29 +135,6 @@ class SaveAccountRecoveryOrganizationSettingsScenario {
 
     await this.progressService.close();
     return new AccountRecoveryPrivateKeyPasswordsCollection(newAccountRecoveryPrivateKeyPasswords);
-  }
-
-  /**
-   * Do sign the given key with the given signing keys.
-   *
-   * @param {string} newOrkArmoredKey
-   * @param {Array<string>} signingKeys
-   * @returns {Promise<string>}
-   */
-  async _signNewORK(newOrkArmoredKey, signingKeys) {
-    const keyToSign = new ExternalGpgKeyEntity({armored_key: newOrkArmoredKey});
-    return (await SignGpgKeyService.sign(keyToSign, signingKeys)).armoredKey;
-  }
-
-  /**
-   * Do revoke the given key.
-   *
-   * @param {string} currentORKArmoredKey
-   * @returns {Promise<string>}
-   */
-  async _revokeCurrentORK(currentORKArmoredKey) {
-    const keyToRevoke = new ExternalGpgKeyEntity({armored_key: currentORKArmoredKey});
-    return (await RevokeGpgKeyService.revoke(keyToRevoke)).armoredKey;
   }
 }
 

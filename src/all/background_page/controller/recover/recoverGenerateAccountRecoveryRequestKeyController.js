@@ -60,7 +60,7 @@ class RecoverGenerateAccountRecoveryRequestKeyController {
     };
     const generateGpgKeyPairEntity = new GenerateGpgKeyPairEntity(dto);
     const externalGpgKeyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairEntity);
-    const publicGpgKeyInfo = await GetGpgKeyInfoService.getKeyInfo(externalGpgKeyPair.publicKey);
+    const publicGpgKeyInfo = await GetGpgKeyInfoService.getKeyInfo(externalGpgKeyPair.publicKey.armoredKey);
     this.setupEntity.userPrivateArmoredKey = externalGpgKeyPair.privateKey.armoredKey;
     this.setupEntity.userPublicArmoredKey = externalGpgKeyPair.publicKey.armoredKey;
     this.setupEntity.passphrase = dto.passphrase;

@@ -20,7 +20,7 @@ class DecryptMessageService {
    *
    * @param {openpgp.Message|string} message The message to decrypt.
    * @param {string} password The password to use to encrypt the message.
-   * @param {array<openpgp.PrivateKey|string>|openpgp.PrivateKey|string} verificationKeys The private key(s) to use to sign the message.
+   * @param {array<openpgp.PrivateKey|openpgp.PublicKey|string>|openpgp.PrivateKey|openpgp.PublicKey|string} verificationKeys The private key(s) to use to sign the message.
    * @returns {Promise<string>}
    */
   static async decryptSymmetrically(message, password, verificationKeys = null) {

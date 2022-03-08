@@ -37,11 +37,12 @@ describe("ReEncryptMessage service", () => {
 
     const currentDecryptionKey = await getDecryptedKey(pgpKeys.betty.private, "betty@passbolt.com");
     const signinKey = await getDecryptedKey(pgpKeys.ada.private, "ada@passbolt.com");
+    const verificationKeys = pgpKeys.ada.public;
     const newEncryptionKey = pgpKeys.admin.public;
-    const resultingMessage = await ReEncryptMessageService.reEncrypt(encryptedMessage, newEncryptionKey, currentDecryptionKey, signinKey);
+    const resultingMessage = await ReEncryptMessageService.reEncrypt(encryptedMessage, newEncryptionKey, currentDecryptionKey, verificationKeys, signinKey);
 
     const newDecryptionKey = await getDecryptedKey(pgpKeys.admin.private, "admin@passbolt.com");
-    const decryptedMessage = await DecryptMessageService.decrypt(resultingMessage, newDecryptionKey, signinKey);
+    const decryptedMessage = await DecryptMessageService.decrypt(resultingMessage, newDecryptionKey, verificationKeys);
 
     expect(decryptedMessage).toBe(cleartextMessage);
   });

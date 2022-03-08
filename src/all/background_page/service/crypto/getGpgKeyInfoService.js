@@ -76,7 +76,7 @@ class GetGpgKeyInfoService {
       expires: expirationTime,
       algorithm: this.formatAlgorithm(algorithmInfo.algorithm),
       length: this.getKeyLength(algorithmInfo),
-      curve: key.getAlgorithmInfo().curve || null,
+      curve: algorithmInfo.curve || null,
       private: key.isPrivate(),
       revoked: await key.isRevoked()
     };
@@ -120,10 +120,33 @@ class GetGpgKeyInfoService {
    * @returns {string}
    */
   static getKeyLength(algorithmInfo) {
+    //algorithm are DSA or RSA
     if (typeof(algorithmInfo.bits) !== "undefined") {
       return algorithmInfo.bits;
     }
-    //@todo: check for other possibilities like when using an algorithm like ECC.
+
+    //algorithm are ECDSA or EdDSA
+    const curveName = algorithmInfo?.curve.toString().toLowerCase();
+    switch (curveName) {
+      case "nist p-256":
+      case "ed25519":
+      case "curve25519":
+      case "brainpoolp256r1": {
+        return 256;
+      }
+      case "brainpoolp384r1":
+      case "nist p-384": {
+        return 384;
+      }
+      case "brainpoolp512r1": {
+        return 512;
+      }
+      case "nist p-521": {
+        return 521;
+      }
+    }
+
+    //@todo check if we covered every cases especially for algo like: Elgamal, ECDH, AEDH and AEDSA
     return undefined;
   }
 }

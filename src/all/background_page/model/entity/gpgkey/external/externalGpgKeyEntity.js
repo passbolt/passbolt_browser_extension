@@ -94,8 +94,7 @@ class ExternalGpgKeyEntity extends Entity {
           "format": "date-time"
         },
         "algorithm": {
-          "type": "string",
-          "enum": ["RSA"]
+          "type": "string"
         },
         "length": {
           "type": "integer",

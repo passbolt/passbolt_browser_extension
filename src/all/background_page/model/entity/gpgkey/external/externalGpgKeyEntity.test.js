@@ -33,6 +33,12 @@ describe("ExternalGpgKey entity", () => {
     expect(entity.toDto()).toEqual(dto);
   });
 
+  it("constructor works if non RSA key information is provided", () => {
+    const dto = ExternalGpgKeyEntityFixtures.eddsa;
+    const entity = new ExternalGpgKeyEntity(dto);
+    expect(entity.toDto()).toEqual(dto);
+  });
+
   it("constructor works if valid legacy full DTO is provided", () => {
     const legacyDto = ExternalGpgKeyEntityFixtures.legacy_full_dto;
     const entity = new ExternalGpgKeyEntity(legacyDto);
@@ -68,7 +74,6 @@ describe("ExternalGpgKey entity", () => {
       //expect(error.hasError('user_ids', 'format')).toBe(true); //checks in array are apparently not done
       expect(error.hasError('fingerprint', 'maxLength')).toBe(true);
       expect(error.hasError('created', 'type')).toBe(true);
-      expect(error.hasError('algorithm', 'enum')).toBe(true);
       expect(error.hasError('length', 'type')).toBe(true);
       expect(error.hasError('curve', 'type')).toBe(true);
       expect(error.hasError('private', 'type')).toBe(true);

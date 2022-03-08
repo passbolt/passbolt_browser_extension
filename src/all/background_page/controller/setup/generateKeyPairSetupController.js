@@ -20,7 +20,7 @@ const {GenerateGpgKeyPairService} = require("../../service/crypto/generateGpgKey
  * @typedef {({passphrase: string})} GenerateKeyPairPassphraseDto
  */
 
-const DEFAULT_KEY_SIZE = 2048;
+const DEFAULT_KEY_SIZE = 3072;
 
 class GenerateKeyPairSetupController {
   /**

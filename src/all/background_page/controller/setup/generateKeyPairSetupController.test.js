@@ -101,8 +101,8 @@ describe("GenerateKeyPairSetupController", () => {
       expect(privateKeyInfo.fingerprint).toBe(publicKeyInfo.fingerprint);
       expect(publicKeyInfo.private).toBe(false);
       expect(privateKeyInfo.private).toBe(true);
-      expect(publicKeyInfo.length).toBe(2048);
-      expect(privateKeyInfo.length).toBe(2048);
+      expect(publicKeyInfo.length).toBe(3072);
+      expect(privateKeyInfo.length).toBe(3072);
       expect(privateKeyInfo.userIds).toStrictEqual(expectedUserIds);
       expect(setupEntity.passphrase).toBe(passphraseDto.passphrase);
 

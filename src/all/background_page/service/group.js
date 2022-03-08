@@ -44,7 +44,7 @@ GroupService.findAll = async function(options) {
   let response, responseJson;
 
   try {
-    response = await fetch(url, fetchOptions);
+    response = await fetch(url.toString(), fetchOptions);
   } catch (error) {
     // Catch Network error such as connection lost.
     throw new PassboltServiceUnavailableError(error.message);

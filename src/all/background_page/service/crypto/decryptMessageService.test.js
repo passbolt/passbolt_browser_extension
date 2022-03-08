@@ -36,9 +36,10 @@ describe("DecryptMessageService", () => {
       const messageClear = "message clear";
       const password = "bim bam boom";
       const signingKey = pgpKeys.ada.private_decrypted;
+      const verifyingKey = pgpKeys.ada.private;
       const messageEncryptedArmored = await EncryptMessageService.encryptSymmetrically(messageClear, [password], signingKey);
 
-      const resultDecrypt = await DecryptMessageService.decryptSymmetrically(messageEncryptedArmored, password, signingKey);
+      const resultDecrypt = await DecryptMessageService.decryptSymmetrically(messageEncryptedArmored, password, verifyingKey);
 
       expect.assertions(1);
       expect(resultDecrypt).toEqual(messageClear);
@@ -49,9 +50,11 @@ describe("DecryptMessageService", () => {
       const password = "bim bam boom";
       const signingKeyUserA = pgpKeys.ada.private_decrypted;
       const signingKeyUserB = pgpKeys.betty.private_decrypted;
+      const verifyingKeyA = pgpKeys.ada.private_decrypted;
+      const verifyingKeyB = pgpKeys.betty.public;
       const messageEncryptedArmored = await EncryptMessageService.encryptSymmetrically(messageClear, [password], [signingKeyUserA, signingKeyUserB]);
 
-      const resultDecrypt = await DecryptMessageService.decryptSymmetrically(messageEncryptedArmored, password, [signingKeyUserA, signingKeyUserB]);
+      const resultDecrypt = await DecryptMessageService.decryptSymmetrically(messageEncryptedArmored, password, [verifyingKeyA, verifyingKeyB]);
 
       expect.assertions(1);
       expect(resultDecrypt).toEqual(messageClear);
@@ -85,9 +88,10 @@ describe("DecryptMessageService", () => {
       const password = "bim bam boom";
       const signingKeyUserA = pgpKeys.ada.private_decrypted;
       const signingKeyUserB = pgpKeys.betty.private_decrypted;
+      const verifyingKeyA = pgpKeys.ada.private_decrypted;
       const messageEncryptedArmored = await EncryptMessageService.encryptSymmetrically(messageClear, [password], [signingKeyUserA, signingKeyUserB]);
 
-      const resultDecrypt = DecryptMessageService.decryptSymmetrically(messageEncryptedArmored, password, [signingKeyUserA, pgpKeys.admin.public]);
+      const resultDecrypt = DecryptMessageService.decryptSymmetrically(messageEncryptedArmored, password, [verifyingKeyA, pgpKeys.admin.public]);
 
       expect.assertions(1);
       await expect(resultDecrypt).rejects.toThrow("Could not find signing key with key ID d3f1fe4be61d7009");
@@ -112,9 +116,10 @@ describe("DecryptMessageService", () => {
       const publicKey = pgpKeys.betty.public;
       const privateKey = pgpKeys.betty.private_decrypted;
       const signingKey = pgpKeys.ada.private_decrypted;
+      const verifyingKey = pgpKeys.ada.public;
       const messageEncryptedArmored = await EncryptMessageService.encrypt(messageClear, publicKey, signingKey);
 
-      const resultDecrypt = await DecryptMessageService.decrypt(messageEncryptedArmored, privateKey, signingKey);
+      const resultDecrypt = await DecryptMessageService.decrypt(messageEncryptedArmored, privateKey, verifyingKey);
 
       expect.assertions(1);
       expect(resultDecrypt).toEqual(messageClear);
@@ -126,9 +131,11 @@ describe("DecryptMessageService", () => {
       const privateKey = pgpKeys.betty.private_decrypted;
       const signingKeyUserA = pgpKeys.ada.private_decrypted;
       const signingKeyUserB = pgpKeys.betty.private_decrypted;
+      const verifyingKeyA = pgpKeys.ada.public;
+      const verifyingKeyB = pgpKeys.betty.public;
       const messageEncryptedArmored = await EncryptMessageService.encrypt(messageClear, publicKey, [signingKeyUserA, signingKeyUserB]);
 
-      const resultDecrypt = await DecryptMessageService.decrypt(messageEncryptedArmored, privateKey, [signingKeyUserA, signingKeyUserB]);
+      const resultDecrypt = await DecryptMessageService.decrypt(messageEncryptedArmored, privateKey, [verifyingKeyA, verifyingKeyB]);
 
       expect.assertions(1);
       expect(resultDecrypt).toEqual(messageClear);
@@ -165,9 +172,10 @@ describe("DecryptMessageService", () => {
       const privateKey = pgpKeys.betty.private_decrypted;
       const signingKeyUserA = pgpKeys.ada.private_decrypted;
       const signingKeyUserB = pgpKeys.betty.private_decrypted;
+      const verifyingKeyA = pgpKeys.ada.private_decrypted;
       const messageEncryptedArmored = await EncryptMessageService.encrypt(messageClear, publicKey, [signingKeyUserA, signingKeyUserB]);
 
-      const resultDecrypt = DecryptMessageService.decrypt(messageEncryptedArmored, privateKey, [signingKeyUserA, pgpKeys.admin.public]);
+      const resultDecrypt = DecryptMessageService.decrypt(messageEncryptedArmored, privateKey, [verifyingKeyA, pgpKeys.admin.public]);
 
       expect.assertions(1);
       await expect(resultDecrypt).rejects.toThrow("Could not find signing key with key ID d3f1fe4be61d7009");

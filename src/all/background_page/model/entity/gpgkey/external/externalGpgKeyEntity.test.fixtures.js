@@ -14,85 +14,98 @@
 const {pgpKeys} = require("../../../../../tests/fixtures/pgpKeys/keys");
 
 exports.ExternalGpgKeyEntityFixtures = {
-  "minimal_dto": {
-    "armored_key": pgpKeys.ada.public,
+  minimal_dto: {
+    armored_key: pgpKeys.ada.public,
   },
   full_dto: {
-    "armored_key": pgpKeys.ada.public,
-    "key_id": "5d9b054f",
-    "user_ids": [{
+    armored_key: pgpKeys.ada.public,
+    key_id: "5d9b054f",
+    user_ids: [{
       email: "ada@passbolt.com",
       name: "Ada Lovelace"
     }],
-    "fingerprint": "03f60e958f4cb29723acdf761353b5b15d9b054f",
-    "expires": "Never",
-    "created": "2015-08-09T12:48:31.000Z",
-    "algorithm": "RSA",
-    "length": 4096,
-    "curve": null,
-    "private": false,
-    "revoked": false
+    fingerprint: "03f60e958f4cb29723acdf761353b5b15d9b054f",
+    expires: "Never",
+    created: "2015-08-09T12:48:31.000Z",
+    algorithm: "RSA",
+    length: 4096,
+    curve: null,
+    private: false,
+    revoked: false
   },
   missing_required_field_dto: {
-    "key_id": "5d9b054f",
-    "user_ids": [{
+    key_id: "5d9b054f",
+    user_ids: [{
       email: "ada@passbolt.com",
       name: "Ada Lovelace"
     }],
-    "fingerprint": "03f60e958f4cb29723acdf761353b5b15d9b054f",
-    "expires": "Never",
-    "created": "2015-08-09T12:48:31.000Z",
-    "algorithm": "RSA",
-    "length": 4096,
-    "curve": null,
-    "private": false,
-    "revoked": false
+    fingerprint: "03f60e958f4cb29723acdf761353b5b15d9b054f",
+    expires: "Never",
+    created: "2015-08-09T12:48:31.000Z",
+    algorithm: "RSA",
+    length: 4096,
+    curve: null,
+    private: false,
+    revoked: false
   },
   broken_fields_dto: {
-    "armored_key": "---",
-    "key_id": "-",
-    "user_ids": [{
-      "email": "fake-email.com"
+    armored_key: "---",
+    key_id: "-",
+    user_ids: [{
+      email: "fake-email.com"
     }],
-    "fingerprint": "03f60e958f4cb29723acdf761353b5b15d9b054f03f60e958f4cb29723acdf761353b5b15d9b054f",
-    "expires": "Never",
-    "created": null,
-    "algorithm": "",
-    "length": "4096",
-    "curve": false,
-    "private": "false",
-    "revoked": "false"
+    fingerprint: "03f60e958f4cb29723acdf761353b5b15d9b054f03f60e958f4cb29723acdf761353b5b15d9b054f",
+    expires: "Never",
+    created: null,
+    algorithm: "",
+    length: "4096",
+    curve: false,
+    private: "false",
+    revoked: "false"
   },
   private_key_dto: {
-    "armored_key": pgpKeys.ada.private,
-    "key_id": "5d9b054f",
-    "user_ids": [{
+    armored_key: pgpKeys.ada.private,
+    key_id: "5d9b054f",
+    user_ids: [{
       email: "ada@passbolt.com",
       name: "Ada Lovelace"
     }],
-    "fingerprint": "03f60e958f4cb29723acdf761353b5b15d9b054f",
-    "expires": "Never",
-    "created": "2015-08-09T12:48:31.000Z",
-    "algorithm": "RSA",
-    "length": 4096,
-    "curve": null,
-    "private": true,
-    "revoked": false
+    fingerprint: "03f60e958f4cb29723acdf761353b5b15d9b054f",
+    expires: "Never",
+    created: "2015-08-09T12:48:31.000Z",
+    algorithm: "RSA",
+    length: 4096,
+    curve: null,
+    private: true,
+    revoked: false
   },
   legacy_full_dto: {
-    "key": pgpKeys.ada.public,
-    "keyId": "5d9b054f",
-    "userIds": [{
+    key: pgpKeys.ada.public,
+    keyId: "5d9b054f",
+    userIds: [{
       email: "ada@passbolt.com",
       name: "Ada Lovelace"
     }],
-    "fingerprint": "03f60e958f4cb29723acdf761353b5b15d9b054f",
-    "expires": "Never",
-    "created": "2015-08-09T12:48:31.000Z",
-    "algorithm": "RSA",
-    "length": 4096,
-    "curve": null,
-    "private": false,
-    "revoked": false
+    fingerprint: "03f60e958f4cb29723acdf761353b5b15d9b054f",
+    expires: "Never",
+    created: "2015-08-09T12:48:31.000Z",
+    algorithm: "RSA",
+    length: 4096,
+    curve: null,
+    private: false,
+    revoked: false
   },
+  eddsa: {
+    armored_key: pgpKeys.anita.public,
+    key_id: pgpKeys.anita.key_id,
+    user_ids: pgpKeys.anita.user_ids,
+    fingerprint: pgpKeys.anita.fingerprint,
+    expires: "Never",
+    created: pgpKeys.anita.created,
+    algorithm: pgpKeys.anita.algorithm,
+    length: pgpKeys.anita.length,
+    curve: pgpKeys.anita.curve,
+    private: false,
+    revoked: pgpKeys.anita.revoked,
+  }
 };

@@ -46,3 +46,8 @@ export const validKeyWithExpirationDateDto = (data = {}) => {
   const defaultData = getKeyDto(pgpKeys.validKeyWithExpirationDateDto);
   return Object.assign(defaultData, data);
 };
+
+export const eddsaCurveKeyDto = (data = {}) => {
+  const defaultData = getKeyDto(pgpKeys.anita);
+  return Object.assign(defaultData, data);
+};

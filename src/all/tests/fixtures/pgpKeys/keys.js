@@ -141,4 +141,21 @@ exports.pgpKeys = {
     curve: null,
     revoked: false
   },
+  anita: {
+    public: "-----BEGIN PGP PUBLIC KEY BLOCK-----\n\nmDMEYicdnRYJKwYBBAHaRw8BAQdAGfiUSyJhjUh2ETBykOVGzkCDxpxtXks5ppeo\n/2G9mYi0H0FuaXRhIEJvcmcgPGFuaXRhQHBhc3Nib2x0LmNvbT6IkAQTFggAOBYh\nBNytc1UTaJK8yedTY61cBOp7YtmqBQJiJx2dAhsDBQsJCAcCBhUKCQgLAgQWAgMB\nAh4BAheAAAoJEK1cBOp7Ytmq9csA/RPhX0ltv64ZY9n/jUJad1xepM6EfIK0W2jm\nTCPXrlo+AQCtfNyMaCXABaRN3vxFHA3ozCPm1ZhldqdxPH8i2JceBbg4BGInHZ0S\nCisGAQQBl1UBBQEBB0AQ0i8igy7N02X4ZCeax+WKaIIeXLLbuyzCDfhTjQXcJwMB\nCAeIeAQYFggAIBYhBNytc1UTaJK8yedTY61cBOp7YtmqBQJiJx2dAhsMAAoJEK1c\nBOp7YtmqBKgA/3TNBaNFRLvDMMZgio3CIGNciEy65k4ARGrRSRiYx2LtAPwLoG1E\nvpgrF+F3n9QaiXWbeFyULNvqn6eDUL5sdZK4Aw==\n=h/rL\n-----END PGP PUBLIC KEY BLOCK-----\n",
+    private: "-----BEGIN PGP PRIVATE KEY BLOCK-----\n\nlIYEYicdnRYJKwYBBAHaRw8BAQdAGfiUSyJhjUh2ETBykOVGzkCDxpxtXks5ppeo\n/2G9mYj+BwMCtrbPZhwNzvfoOEmqY+a6Z2Vjs0Reb4UuoSj43rmwIUdSMQ9WpB5E\nkV26HJyV5WIRySKSZkKoT1ty9q5jvYnbYmV0nX4+wEO6MdymiPK39LQfQW5pdGEg\nQm9yZyA8YW5pdGFAcGFzc2JvbHQuY29tPoiQBBMWCAA4FiEE3K1zVRNokrzJ51Nj\nrVwE6nti2aoFAmInHZ0CGwMFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AACgkQrVwE\n6nti2ar1ywD9E+FfSW2/rhlj2f+NQlp3XF6kzoR8grRbaOZMI9euWj4BAK183Ixo\nJcAFpE3e/EUcDejMI+bVmGV2p3E8fyLYlx4FnIsEYicdnRIKKwYBBAGXVQEFAQEH\nQBDSLyKDLs3TZfhkJ5rH5Ypogh5cstu7LMIN+FONBdwnAwEIB/4HAwJJJ5xOz6cc\nmuisnOyHJRPhpsIuQTVZqMMOgXgerV0wGjZHxSGvRC248o3AVnZcZP2aQ2YPjMkx\n6q/E60e1wo/ETfY6hCB37kcfHZCtYm9fiHgEGBYIACAWIQTcrXNVE2iSvMnnU2Ot\nXATqe2LZqgUCYicdnQIbDAAKCRCtXATqe2LZqgSoAP90zQWjRUS7wzDGYIqNwiBj\nXIhMuuZOAERq0UkYmMdi7QD8C6BtRL6YKxfhd5/UGol1m3hclCzb6p+ng1C+bHWS\nuAM=\n=ACJN\n-----END PGP PRIVATE KEY BLOCK-----",
+    passphrase: "anita@passbolt.com",
+    key_id: "7b62d9aa",
+    user_ids: [{
+      email: "anita@passbolt.com",
+      name: "Anita Borg",
+    }],
+    fingerprint: "dcad7355136892bcc9e75363ad5c04ea7b62d9aa",
+    expires: "Never",
+    created: "2022-03-08T09:10:53.000Z",
+    algorithm: "EdDSA",
+    length: 256,
+    curve: "ed25519",
+    revoked: false,
+  }
 };

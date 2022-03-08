@@ -41,7 +41,7 @@ ShareService.searchAros = async function(keywords) {
   let response, responseJson;
 
   try {
-    response = await fetch(url, fetchOptions);
+    response = await fetch(url.toString(), fetchOptions);
   } catch (error) {
     // Catch Network error such as connection lost.
     throw new PassboltServiceUnavailableError(error.message);
@@ -89,7 +89,7 @@ ShareService.searchResourceAros = async function(resourceId, keywords) {
   let response, responseJson;
 
   try {
-    response = await fetch(url, fetchOptions);
+    response = await fetch(url.toString(), fetchOptions);
   } catch (error) {
     // Catch Network error such as connection lost.
     throw new PassboltServiceUnavailableError(error.message);
@@ -136,7 +136,7 @@ ShareService.shareResource = async function(resourceId, data) {
   let response, responseJson;
 
   try {
-    response = await fetch(url, fetchOptions);
+    response = await fetch(url.toString(), fetchOptions);
   } catch (error) {
     // Catch Network error such as connection lost.
     throw new PassboltServiceUnavailableError(error.message);
@@ -189,7 +189,7 @@ ShareService.simulateShareResource = async function(resourceId, permissions) {
   let response, responseJson;
 
   try {
-    response = await fetch(url, fetchOptions);
+    response = await fetch(url.toString(), fetchOptions);
   } catch (error) {
     // Catch Network error such as connection lost.
     throw new PassboltServiceUnavailableError(error.message);

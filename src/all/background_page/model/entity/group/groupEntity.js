@@ -263,6 +263,7 @@ class GroupEntity extends Entity {
 
   /**
    * Return current user group user
+   * @todo is it still used? Consider for removal
    * @returns {(GroupUserEntity|null)}
    */
   get myGroupUser() {

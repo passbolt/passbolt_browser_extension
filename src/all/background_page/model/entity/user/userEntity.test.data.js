@@ -31,3 +31,27 @@ export const defaultUserDto = data => {
 
   return Object.assign(defaultData, data || {});
 };
+
+export const users = {
+  ada: defaultUserDto({
+    username: "ada@passbolt.com",
+    profile: {
+      first_name: "Ada",
+      last_name: "Lovelace"
+    }
+  }),
+  admin: defaultUserDto({
+    username: "admin@passbolt.com",
+    profile: {
+      first_name: "Admin",
+      last_name: "User"
+    }
+  }),
+  betty: defaultUserDto({
+    username: "betty@passbolt.com",
+    profile: {
+      first_name: "Betty",
+      last_name: "Holberton"
+    }
+  }),
+};

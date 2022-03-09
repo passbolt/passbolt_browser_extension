@@ -211,12 +211,14 @@ class SetupEntity extends Entity {
         armored_key: this.userPublicArmoredKey
       },
       user: {
+        //@deprecated since v3.6.0: the `locale` field is now on the root object
         locale: this.locale
       },
       account_recovery_user_setting: this.accountRecoveryUserSetting?.toDto({
         account_recovery_private_key: true,
         account_recovery_private_key_passwords: true
       }),
+      locale: this.locale
     };
   }
 

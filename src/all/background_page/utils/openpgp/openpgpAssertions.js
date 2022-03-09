@@ -96,20 +96,17 @@ exports.assertDecryptedPrivateKeys = assertDecryptedPrivateKeys;
  * @returns {array<openpgp.PublicKey>|openpgp.PublicKey}
  * @private
  */
-const assertPublicKeys = async keys => {
-  if (typeof keys === "string") {
-    try {
-      keys = await openpgp.readKey({armoredKey: keys});
-    } catch (error) {
-      throw new Error("The public key is not a valid armored key");
-    }
+const assertPublicKeys = async publicKeys => {
+  if (Array.isArray(publicKeys)) {
+    return Promise.all(publicKeys.map(key => assertPublicKeys(key)));
   }
 
-  if (keys.isPrivate()) {
+  const publicKey = await assertKeys(publicKeys);
+  if (publicKey.isPrivate()) {
     throw new Error(i18n.t("The key is not a valid public key."));
   }
 
-  return keys;
+  return publicKey;
 };
 exports.assertPublicKeys = assertPublicKeys;
 

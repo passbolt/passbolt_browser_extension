@@ -61,10 +61,15 @@ class GetGpgKeyInfoService {
     }
 
     // Format expiration time
-    const opengpgExpirationTime = await key.getExpirationTime();
-    const expirationTime = opengpgExpirationTime === Infinity
-      ? "Never"
-      : opengpgExpirationTime.toISOString();
+    let expirationTime;
+    try {
+      const opengpgExpirationTime = await key.getExpirationTime();
+      expirationTime = opengpgExpirationTime === Infinity
+        ? "Never"
+        : opengpgExpirationTime.toISOString();
+    } catch (e) {
+      expirationTime = null;
+    }
 
     const algorithmInfo = key.getAlgorithmInfo();
     const externalGpgKeyDto = {

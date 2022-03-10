@@ -23,12 +23,12 @@ class MockExtension {
    * Mock the extension with a configured account. Ada by default.
    * @returns {Promise<void>}
    */
-  static async withConfiguredAccount() {
-    this.withMissingPrivateKeyAccount();
+  static async withConfiguredAccount(keyData = pgpKeys.ada) {
+    this.withMissingPrivateKeyAccount(keyData);
 
     // Mock user private key
     const keyring = new Keyring();
-    await keyring.importPrivate(pgpKeys.ada.private);
+    await keyring.importPrivate(keyData.private);
   }
 
   /**
@@ -36,15 +36,16 @@ class MockExtension {
    *
    * @returns {Promise<void>}
    */
-  static withMissingPrivateKeyAccount() {
+  static withMissingPrivateKeyAccount(keyData = pgpKeys.ada) {
     const user = User.getInstance();
     user.settings.setDomain("https://localhost");
     user.settings.setSecurityToken(defaultSecurityTokenDto());
+    const nameSplitted = keyData.user_ids[0].name.split(" ");
     const userDto = {
       id: uuidv4(),
-      username: "ada@passbolt.com",
-      firstname: "Ada",
-      lastname: "Lovelace",
+      username: keyData.user_ids[0].email,
+      firstname: nameSplitted.shift(),
+      lastname: nameSplitted.join(" "),
     };
     user.set(userDto);
 

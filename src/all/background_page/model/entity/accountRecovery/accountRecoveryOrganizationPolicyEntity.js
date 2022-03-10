@@ -197,16 +197,36 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
     return this._account_recovery_organization_public_key || null;
   }
 
+  /**
+   * Get the account recovery organization public armored key.
+   * @returns {string|null}
+   */
   get armoredKey() {
     return this._account_recovery_organization_public_key ? this._account_recovery_organization_public_key.armoredKey : null;
   }
 
+  /**
+   * Get the previous account recovery organization revoked armored key.
+   * @returns {string|null}
+   */
   get revokedKey() {
     return this._account_recovery_organization_revoked_key ? this._account_recovery_organization_revoked_key.armoredKey : null;
   }
 
+  /**
+   * Get the current account recovery organization policy.
+   * @returns {string}
+   */
   get policy() {
     return this._props.policy;
+  }
+
+  /**
+   * Get the collection of private key passwords.
+   * @returns {AccountRecoveryPrivateKeyPasswordsCollection|null}
+   */
+  get privateKeyPasswords() {
+    return this._account_recovery_private_key_passwords ? this._account_recovery_private_key_passwords : null;
   }
 
   /**

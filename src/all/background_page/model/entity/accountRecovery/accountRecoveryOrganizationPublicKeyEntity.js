@@ -25,6 +25,8 @@ class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
   constructor(accountRecoveryOrganizationPublicKeyDto) {
+    accountRecoveryOrganizationPublicKeyDto = AccountRecoveryOrganizationPublicKeyEntity.sanitizeDto(accountRecoveryOrganizationPublicKeyDto);
+
     super(EntitySchema.validate(
       AccountRecoveryOrganizationPublicKeyEntity.ENTITY_NAME,
       accountRecoveryOrganizationPublicKeyDto,
@@ -84,6 +86,33 @@ class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
 
   /*
    * ==================================================
+   * Sanitization
+   * ==================================================
+   */
+  /**
+   * Sanitize account recovery organization public key dto.
+   * @param {object} dto The dto to sanitiaze
+   * @returns {object}
+   */
+  static sanitizeDto(dto) {
+    dto = Object.assign({}, dto); // shallow clone.
+    if (dto.fingerprint) {
+      dto.fingerprint = this.sanitizeFingerPrint(dto.fingerprint);
+    }
+    return dto;
+  }
+
+  /**
+   * Sanitize a fingerprint.
+   * @param {string} fingerprint The fingerprint to sanitize.
+   * @return {string}
+   */
+  static sanitizeFingerPrint(fingerprint = "") {
+    return fingerprint.toUpperCase();
+  }
+
+  /*
+   * ==================================================
    * Serialization
    * ==================================================
    */
@@ -112,6 +141,23 @@ class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
    */
   get armoredKey() {
     return this._props.armored_key;
+  }
+
+  /**
+   * Get the public key fingerprint.
+   * @returns {string}
+   */
+  get fingerprint() {
+    return this._props.fingerprint;
+  }
+
+  /**
+   * Set the public key fingerprint.
+   * @param {string} fingerprint The fingerprint to set.
+   */
+  set fingerprint(fingerprint) {
+    EntitySchema.validateProp("fingerprint", fingerprint, AccountRecoveryOrganizationPublicKeyEntity.getSchema().properties.fingerprint);
+    this._props.fingerprint = AccountRecoveryOrganizationPublicKeyEntity.sanitizeFingerPrint(fingerprint);
   }
 
   /*

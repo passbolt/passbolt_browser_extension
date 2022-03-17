@@ -47,7 +47,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-browserify');
-  grunt.loadNpmTasks('i18next-scanner');
+  grunt.loadNpmTasks('passbolt-i18next-scanner');
 
   grunt.registerTask('default', ['bundle']);
   grunt.registerTask('pre-dist', ['copy:vendors', 'copy:styleguide']);

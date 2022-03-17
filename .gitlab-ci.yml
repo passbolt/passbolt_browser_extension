@@ -9,14 +9,14 @@ stages:
 
 tester:
   stage: test
-  image: node:14
+  image: node:16
   script:
     - npm ci
     - npm run test
 
 linter:
   stage: test
-  image: node:12
+  image: node:16
   script:
     - npm ci
     - npm run eslint

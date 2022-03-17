@@ -17,7 +17,7 @@ window.in_array = require('locutus/php/array/in_array');
  * Other libraries
  */
 window.browser = require('webextension-polyfill/dist/browser-polyfill');
-window.XRegExp = require('xregexp/xregexp-all');
+window.XRegExp = require('xregexp');
 window.Validator = require('validator/validator');
 window.Validator.isUtf8 = require('./utils/validatorRules').isUtf8;
 window.Validator.isUtf8Extended = require('./utils/validatorRules').isUtf8Extended;
@@ -28,4 +28,4 @@ window.PapaParse = require('papaparse/papaparse');
  * Crypto/sec libraries
  */
 //window.openpgp = require('openpgp/dist/openpgp');
-window.jsSHA = require('jssha/src/sha');
+window.jsSHA = require('jssha');

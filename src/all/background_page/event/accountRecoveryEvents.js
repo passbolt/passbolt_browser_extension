@@ -46,7 +46,7 @@ const listen = function(worker) {
     await controller.exec(newAccountRecoveryOrganizationPublicKeyDto, currentAccountRecoveryOrganizationPublicKeyDto);
   });
 
-  worker.port.on('passbolt.account-recovery.get-organization-key-details', async(requestId, armoredKey) => {
+  worker.port.on('passbolt.account-recovery.get-organization-key-info', async(requestId, armoredKey) => {
     const controller = new GetKeyInfoController(worker, requestId);
     await controller._exec(armoredKey);
   });
@@ -56,10 +56,10 @@ const listen = function(worker) {
     await controller._exec(generateGpgKeyDto);
   });
 
-  worker.port.on('passbolt.account-recovery.download-organization-generated-key', async(requestId, privateKeyDto) => {
+  worker.port.on('passbolt.account-recovery.download-organization-generated-key', async(requestId, privateKey) => {
     try {
       const date = new Date().toISOString().slice(0, 10);
-      await fileController.saveFile(`organization-recovery-private-key-${date}.asc`, privateKeyDto.armored_key, "text/plain", worker.tab.id);
+      await fileController.saveFile(`organization-recovery-private-key-${date}.asc`, privateKey, "text/plain", worker.tab.id);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);

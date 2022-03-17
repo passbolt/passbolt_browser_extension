@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {Entity} = require('../abstract/entity');
-const {EntitySchema} = require('../abstract/entitySchema');
+const {Entity} = require("../abstract/entity");
+const {EntitySchema} = require("../abstract/entitySchema");
 const {AccountRecoveryPrivateKeyPasswordsCollection} = require("./accountRecoveryPrivateKeyPasswordsCollection");
 
-const ENTITY_NAME = 'AccountRecoveryRequest';
+const ENTITY_NAME = "AccountRecoveryRequest";
 const FINGERPRINT_LENGTH = 40;
 const STATUS_PENDING = "pending";
 const STATUS_REJECTED = "rejected";

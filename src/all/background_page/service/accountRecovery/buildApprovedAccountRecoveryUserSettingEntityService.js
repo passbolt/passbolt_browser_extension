@@ -18,6 +18,7 @@ const {AccountRecoveryUserSettingEntity} = require("../../model/entity/accountRe
 const {AccountRecoveryPrivateKeyPasswordEntity} = require("../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity");
 const {AccountRecoveryOrganizationPolicyEntity} = require("../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity");
 const {assertDecryptedPrivateKeys} = require("../../utils/openpgp/openpgpAssertions");
+const {GetGpgKeyInfoService} = require("../crypto/getGpgKeyInfoService");
 
 // Length of the secret to use to encrypt symmetrically the user private key with.
 const SYMMETRIC_SECRET_LENGTH = 512;
@@ -75,11 +76,13 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
    * @returns {Promise<Object>}
    */
   static async _encryptPrivateKeyPasswordsForOrganizationKey(symmetricSecret, organizationPolicy, decryptedPrivateOpenpgpKey) {
-    const userPrivateKeySecretEncrypted = await EncryptMessageService.encrypt(symmetricSecret, organizationPolicy.armoredKey, decryptedPrivateOpenpgpKey);
-
+    const ork = organizationPolicy.armoredKey;
+    const orkInfo = await GetGpgKeyInfoService.getKeyInfo(ork);
+    const userPrivateKeySecretEncrypted = await EncryptMessageService.encrypt(symmetricSecret, ork, decryptedPrivateOpenpgpKey);
     return {
       data: userPrivateKeySecretEncrypted,
-      recipient_foreign_model: AccountRecoveryPrivateKeyPasswordEntity.FOREIGN_MODEL_ORGANIZATION_KEY
+      recipient_foreign_model: AccountRecoveryPrivateKeyPasswordEntity.FOREIGN_MODEL_ORGANIZATION_KEY,
+      recipient_fingerprint: orkInfo.fingerprint,
     };
   }
 }

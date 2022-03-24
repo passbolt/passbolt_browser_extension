@@ -250,7 +250,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
 
       const apiResponse = await controller.exec(newOrganizationPolicy, accountRecoveryOrganizationPrivateKeyDto);
 
-      expect.assertions(8 + existingPrivateKeyPasswords.length);
+      expect.assertions(8 + existingPrivateKeyPasswords.length * 2);
       expect(apiResponse.policy).toEqual(newOrganizationPolicy.policy);
 
       expect(await areKeysEqual(apiResponse.revokedKey, newOrganizationPolicyOrk)).toBe(false);
@@ -265,9 +265,11 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
 
       const privateKeyPasswords = apiResponse.privateKeyPasswords.items;
       const decryptionKey = pgpKeys.account_recovery_organization_alternative.private_decrypted;
+      const expectedFingerprint = pgpKeys.account_recovery_organization_alternative.fingerprint.toUpperCase();
       for (let i = 0; i < privateKeyPasswords.length; i++) {
         const decryptedPassword = await DecryptMessageService.decrypt(privateKeyPasswords[i].data, decryptionKey);
         expect(decryptedPassword).not.toBeNull();
+        expect(privateKeyPasswords[i].recipientFingerprint.toUpperCase()).toBe(expectedFingerprint);
       }
     });
   });

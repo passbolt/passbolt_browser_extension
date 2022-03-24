@@ -16,7 +16,7 @@ const {EntitySchema} = require('../abstract/entitySchema');
 
 const ENTITY_NAME = "AccountRecoveryPrivateKeyPassword";
 const FOREIGN_MODEL_ORGANIZATION_KEY = "AccountRecoveryOrganizationKey";
-
+const FINGERPRINT_LENGTH = 40;
 /**
  * Entity related to the account recovery private key password
  */
@@ -44,6 +44,7 @@ class AccountRecoveryPrivateKeyPasswordEntity extends Entity {
       "type": "object",
       "required": [
         "recipient_foreign_model",
+        "recipient_fingerprint",
         "data"
       ],
       "properties": {
@@ -58,6 +59,10 @@ class AccountRecoveryPrivateKeyPasswordEntity extends Entity {
         "recipient_foreign_key": {
           "type": "string",
           "format": "uuid"
+        },
+        "recipient_fingerprint": {
+          "type": "string",
+          "length": FINGERPRINT_LENGTH
         },
         "data": {
           "type": "string"
@@ -123,6 +128,14 @@ class AccountRecoveryPrivateKeyPasswordEntity extends Entity {
    */
   get recipientForeignModel() {
     return this._props.recipient_foreign_model;
+  }
+
+  /**
+   * Get the recipient kes's fingerprint
+   * @returns {(string)}
+   */
+  get recipientFingerprint() {
+    return this._props.recipient_fingerprint;
   }
 
   /*

@@ -25,10 +25,15 @@ describe("BuildApprovedAccountRecoveryUserSettingEntityService service", () => {
     const organizationPolicy = new AccountRecoveryOrganizationPolicyEntity(organizationPolicyDto);
     const accountRecoveryUserSetting = await BuildApprovedAccountRecoveryUserSettingEntityService.build(uuidv4(), pgpKeys.ada.private_decrypted, organizationPolicy);
 
-    expect.assertions(4);
+    expect.assertions(5);
     expect(accountRecoveryUserSetting.isApproved).toBe(true);
     expect(accountRecoveryUserSetting.accountRecoveryPrivateKey).not.toBeNull();
     expect(accountRecoveryUserSetting.accountRecoveryPrivateKeyPasswords).not.toBeNull();
+
+    // Ensure the recipient fingerprint is properly set.
+    const privateKeyPasswordRecipientFingerprint = accountRecoveryUserSetting.accountRecoveryPrivateKeyPasswords.items[0].recipientFingerprint;
+    const organizationPolicyFingerprint = organizationPolicyDto.account_recovery_organization_public_key.fingerprint.toUpperCase();
+    expect(privateKeyPasswordRecipientFingerprint).toBe(organizationPolicyFingerprint);
 
     // Ensure the escrow can be decrypted.
     const userPrivateKeyPasswordEncrypted = accountRecoveryUserSetting.accountRecoveryPrivateKeyPasswords.items[0].data;

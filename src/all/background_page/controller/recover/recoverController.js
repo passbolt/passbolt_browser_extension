@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const app = require("../../app");
-const {ApiClientOptions} = require("../../service/api/apiClient/apiClientOptions");
 const {AccountModel} = require("../../model/account/accountModel");
 const {SetupModel} = require("../../model/setup/setupModel");
 const {AuthModel} = require("../../model/auth/authModel");
@@ -26,13 +25,13 @@ class RecoverController {
   /**
    * Recover controller constructor
    *
-   * @param {Worker} worker
+   * @param {Worker} worker The worker the controller is executed on.
+   * @param {ApiClientOptions} apiClientOptions The api client options.
    * @param {string} url The url on which the recover is launched
    */
-  constructor(worker, url) {
+  constructor(worker, apiClientOptions, url) {
     this.worker = worker;
     this.setupEntity = SetupEntity.createFromUrl(url);
-    const apiClientOptions = (new ApiClientOptions()).setBaseUrl(this.setupEntity.domain);
     this.setupModel = new SetupModel(apiClientOptions);
     this.authModel = new AuthModel(apiClientOptions);
     this.accountModel = new AccountModel(apiClientOptions);

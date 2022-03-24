@@ -44,9 +44,9 @@ class ImportPrivateKeyRecoverController {
    * @param {string} armoredKey The key to import
    * @returns {Promise<void>}
    */
-  async _exec(generateGpgKeyDto) {
+  async _exec(armoredKey) {
     try {
-      await this.exec(generateGpgKeyDto);
+      await this.exec(armoredKey);
       this.worker.port.emit(this.requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);

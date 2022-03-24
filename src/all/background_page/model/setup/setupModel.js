@@ -37,14 +37,14 @@ class SetupModel {
   async findSetupInfo(setupEntity) {
     let userDto, accountRecoveryOrganizationPolicyDto;
     try {
-      const result = await this.setupService.findSetupInfo(setupEntity.userId, setupEntity.token);
+      const result = await this.setupService.findSetupInfo(setupEntity.userId, setupEntity.authenticationTokenToken);
       userDto = result?.user;
       accountRecoveryOrganizationPolicyDto = result?.account_recovery_organization_policy;
     } catch (error) {
       // If the entry point doesn't exist or return a 500, the API version is <v3.
       const code = error.data && error.data.code;
       if (code === 404 || code === 500) {
-        userDto = await this.setupService.findLegacySetupInfo(setupEntity.userId, setupEntity.token);
+        userDto = await this.setupService.findLegacySetupInfo(setupEntity.userId, setupEntity.authenticationTokenToken);
       } else {
         throw error;
       }
@@ -60,21 +60,21 @@ class SetupModel {
   /**
    * Retrieve recover information and populate the recover entity with it.
    *
-   * @param {RecoverEntity} recoverEntity The recover entity
+   * @param {SetupEntity} recoverEntity The recover entity
    * @returns {Promise<void>}
    * @throws {Error} if options are invalid or API error
    */
   async findRecoverInfo(recoverEntity) {
     let userDto, accountRecoveryOrganizationPolicyDto;
     try {
-      const result = await this.setupService.findRecoverInfo(recoverEntity.userId, recoverEntity.token);
+      const result = await this.setupService.findRecoverInfo(recoverEntity.userId, recoverEntity.authenticationTokenToken);
       userDto = result?.user;
       accountRecoveryOrganizationPolicyDto = result?.account_recovery_organization_policy;
     } catch (error) {
       // If the entry point doesn't exist or return a 500, the API version is <v3.
       const code = error.data && error.data.code;
       if (code === 404 || code === 500) {
-        userDto = await this.setupService.findLegacyRecoverInfo(recoverEntity.userId, recoverEntity.token);
+        userDto = await this.setupService.findLegacyRecoverInfo(recoverEntity.userId, recoverEntity.authenticationTokenToken);
       } else {
         throw error;
       }

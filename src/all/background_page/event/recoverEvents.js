@@ -15,20 +15,13 @@ const {RecoverController} = require("../controller/recover/recoverController");
 const Worker = require('../model/worker');
 const {SetRecoverLocaleController} = require("../controller/locale/setRecoverLocaleController");
 const {GetRecoverLocaleController} = require("../controller/locale/getRecoverLocaleController");
-const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
 const {RecoverInitiateAccountRecoveryRequestController} = require("../controller/recover/recoverInitiateAccountRecoveryRequestController");
 const {RecoverGenerateAccountRecoveryRequestKeyController} = require("../controller/recover/recoverGenerateAccountRecoveryRequestKeyController");
 const {VerifyPassphraseSetupController} = require("../controller/setup/verifyPassphraseSetupController");
 const {ImportPrivateKeyRecoverController} = require('../controller/recover/importPrivateKeyRecoverController');
 
-const listen = function(worker) {
-  /**
-   * The recover controller.
-   * @type {RecoverController}
-   * @private
-   */
-  const recoverController = new RecoverController(worker, worker.tab.url);
-
+const listen = (worker, apiClientOptions) => {
+  const recoverController = new RecoverController(worker, apiClientOptions, worker.tab.url);
 
   /*
    * Is the first install.
@@ -54,7 +47,6 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.organization-settings.get', async requestId => {
     try {
-      const apiClientOptions = (new ApiClientOptions()).setBaseUrl(recoverController.setupEntity.domain);
       const organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
       const organizationSettings = await organizationSettingsModel.getOrFind(true);
       worker.port.emit(requestId, 'SUCCESS', organizationSettings);
@@ -75,7 +67,6 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.locale.get', async function(requestId) {
-    const apiClientOptions = (new ApiClientOptions()).setBaseUrl(recoverController.setupEntity.domain);
     const getRecoverLocaleController = new GetRecoverLocaleController(this.worker, apiClientOptions, recoverController.setupEntity);
 
     try {
@@ -95,7 +86,6 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.locale.update-user-locale', async function(requestId, localeDto) {
     try {
-      const apiClientOptions = (new ApiClientOptions()).setBaseUrl(recoverController.setupEntity.domain);
       const setRecoverLocaleController = new SetRecoverLocaleController(this.worker, apiClientOptions, recoverController.setupEntity);
       await setRecoverLocaleController.setLocale(localeDto);
       worker.port.emit(requestId, 'SUCCESS');
@@ -200,7 +190,7 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.recover.initiate-account-recovery-request', async requestId => {
-    const controller = new RecoverInitiateAccountRecoveryRequestController(worker, requestId, recoverController.setupEntity);
+    const controller = new RecoverInitiateAccountRecoveryRequestController(worker, apiClientOptions, requestId, recoverController.setupEntity);
     await controller._exec();
   });
 };

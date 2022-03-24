@@ -110,7 +110,7 @@ class AccountRecoveryRequestService extends AbstractService {
    * @throws {Error} if options are invalid or API error
    */
   async create(accountRecoveryRequestDto) {
-    const response = this.apiClient.create(accountRecoveryRequestDto);
+    const response = await this.apiClient.create(accountRecoveryRequestDto);
     return response.body;
   }
 }

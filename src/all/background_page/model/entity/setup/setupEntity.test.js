@@ -65,7 +65,7 @@ describe("Setup entity", () => {
     const setupEntity = SetupEntity.createFromUrl(url);
     expect(setupEntity.domain).toEqual("https://cloud.passbolt.local/acme");
     expect(setupEntity.userId).toEqual("d57c10f5-639d-5160-9c81-8a0c6c4ec856");
-    expect(setupEntity.token).toEqual("10801423-4151-42a4-99d1-86e66145a08c");
+    expect(setupEntity.authenticationTokenToken).toEqual("10801423-4151-42a4-99d1-86e66145a08c");
   });
 
   it("createFromUrl throws an error if it cannot parse the url", () => {

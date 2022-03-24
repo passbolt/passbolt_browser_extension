@@ -113,7 +113,7 @@ class UserModel {
       id: "d4c0e643-3967-443b-93b3-102d902c4510",
       authentication_token_id: "d4c0e643-3967-443b-93b3-102d902c4512",
       armored_key: pgpKeys.ada.public,
-      fingerprint: "03f60e958f4cb29723acdf761353b5b15d9b054f",
+      fingerprint: pgpKeys.ada.fingerprint,
       status: "pending",
       created: "2020-05-04T20:31:45+00:00",
       modified: "2020-05-04T20:31:45+00:00",

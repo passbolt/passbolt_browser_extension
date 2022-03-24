@@ -21,7 +21,7 @@ export const defaultAccountRecoveryRequestDto = (data = {}) => {
     "id": uuidv4(),
     "authentication_token_id": uuidv4(),
     "armored_key": pgpKeys.account_recovery_request.public,
-    "fingerprint": "03f60e958f4cb29723acdf761353b5b15d9b054f",
+    "fingerprint": pgpKeys.account_recovery_request.fingerprint,
     "status": "pending",
     "created": "2020-05-04T20:31:45+00:00",
     "modified": "2020-05-04T20:31:45+00:00",

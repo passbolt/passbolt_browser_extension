@@ -34,7 +34,7 @@ describe("GetDecryptedUserPrivateKey service", () => {
     decryptedKey = await assertDecryptedPrivateKeys(decryptedKey);
     expect(decryptedKey.isPrivate()).toBe(true);
     expect(decryptedKey.isDecrypted()).toBe(true);
-    expect(decryptedKey.getFingerprint()).toBe(key.fingerprint);
+    expect(decryptedKey.getFingerprint().toUpperCase()).toBe(key.fingerprint);
   }, 10 * 1000);
 
   it("should throw an Error if the private key can't be find", async() => {

@@ -46,12 +46,17 @@ class AccountRecoveryModel {
    * @return {AccountRecoveryOrganizationPolicyEntity|null}
    */
   async findOrganizationPolicy() {
-    const accountRecoveryOrganizationPolicyDto = await this.accountRecoveryOrganizationPolicyService.find();
-    if (accountRecoveryOrganizationPolicyDto) {
-      return new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
+    const contains = {'creator': true, 'creator.gpgkey': true};
+    const accountRecoveryOrganizationPolicyDto = await this.accountRecoveryOrganizationPolicyService.find(contains);
+    if (!accountRecoveryOrganizationPolicyDto) {
+      return null;
     }
 
-    return null;
+    const entity = new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
+    if (entity.isDisabled && entity.creator) {
+      await AccountRecoveryOrganizationPolicyEntity.assertValidCreatorGpgkey(entity);
+    }
+    return entity;
   }
 
   /**

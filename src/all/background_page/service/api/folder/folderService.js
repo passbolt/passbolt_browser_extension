@@ -85,7 +85,7 @@ class FolderService extends AbstractService {
 
   /**
    * Find all folders
-   *å
+   *
    * @param {Object} [contains] optional for example {"user": true}
    *        @see getSupportedContainOptions
    * @param {Object} [filters] optional for example {"has-id": [uuid, ...]}

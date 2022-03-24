@@ -24,7 +24,7 @@ exports.ExternalGpgKeyEntityFixtures = {
       email: "ada@passbolt.com",
       name: "Ada Lovelace"
     }],
-    fingerprint: "03f60e958f4cb29723acdf761353b5b15d9b054f",
+    fingerprint: pgpKeys.ada.fingerprint,
     expires: "Never",
     created: "2015-08-09T12:48:31.000Z",
     algorithm: "RSA",
@@ -39,7 +39,7 @@ exports.ExternalGpgKeyEntityFixtures = {
       email: "ada@passbolt.com",
       name: "Ada Lovelace"
     }],
-    fingerprint: "03f60e958f4cb29723acdf761353b5b15d9b054f",
+    fingerprint: pgpKeys.ada.fingerprint,
     expires: "Never",
     created: "2015-08-09T12:48:31.000Z",
     algorithm: "RSA",
@@ -70,7 +70,7 @@ exports.ExternalGpgKeyEntityFixtures = {
       email: "ada@passbolt.com",
       name: "Ada Lovelace"
     }],
-    fingerprint: "03f60e958f4cb29723acdf761353b5b15d9b054f",
+    fingerprint: pgpKeys.ada.fingerprint,
     expires: "Never",
     created: "2015-08-09T12:48:31.000Z",
     algorithm: "RSA",
@@ -86,7 +86,7 @@ exports.ExternalGpgKeyEntityFixtures = {
       email: "ada@passbolt.com",
       name: "Ada Lovelace"
     }],
-    fingerprint: "03f60e958f4cb29723acdf761353b5b15d9b054f",
+    fingerprint: pgpKeys.ada.fingerprint,
     expires: "Never",
     created: "2015-08-09T12:48:31.000Z",
     algorithm: "RSA",

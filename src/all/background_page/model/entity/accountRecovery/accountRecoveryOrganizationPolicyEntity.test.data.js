@@ -39,10 +39,18 @@ export const createDisabledAccountRecoveryOrganizationPolicyDto = data => {
 };
 
 export const disabledAccountRecoveryOrganizationPolicyDto = data => {
+  const userId = uuidv4();
   const defaultData = createDisabledAccountRecoveryOrganizationPolicyDto({
     id: uuidv4(),
     public_key_id: null,
-    creator: defaultUserDto(),
+    creator: defaultUserDto({
+      id: userId,
+      gpgkey: {
+        user_id: userId,
+        armored_key: pgpKeys.ada.public,
+        fingerprint: pgpKeys.ada.fingerprint
+      }
+    }),
     created_by: uuidv4(),
     modified_by: uuidv4(),
     created: "2022-01-13T13:19:04.661Z",
@@ -64,11 +72,19 @@ export const createEnabledAccountRecoveryOrganizationPolicyDto = data => {
 };
 
 export const enabledAccountRecoveryOrganizationPolicyDto = data => {
+  const userId = uuidv4();
   const defaultData = createEnabledAccountRecoveryOrganizationPolicyDto({
     id: uuidv4(),
     public_key_id: uuidv4(),
     account_recovery_organization_public_key: defaultAccountRecoveryOrganizationPublicKeyDto(),
-    creator: defaultUserDto(),
+    creator: defaultUserDto({
+      id: userId,
+      gpgkey: {
+        user_id: userId,
+        armored_key: pgpKeys.ada.public,
+        fingerprint: pgpKeys.ada.fingerprint
+      }
+    }),
     created_by: uuidv4(),
     modified_by: uuidv4(),
     created: "2022-01-13T13:19:04.661Z",

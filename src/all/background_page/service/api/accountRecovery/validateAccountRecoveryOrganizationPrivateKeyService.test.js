@@ -34,7 +34,7 @@ describe("Validate account recovery organization private key service", () => {
   it("should refuse an invalid key pair", () => {
     expect.assertions(1);
     const promise = getValidatePromise(dummyData.invalidKeyPair);
-    const expectedError = new Error("Error, this is not the current organization recovery key. Expected fingerprint: 03f60e958f4cb29723acdf761353b5b15d9b054f");
+    const expectedError = new Error("Error, this is not the current organization recovery key. Expected fingerprint: 03F60E958F4CB29723ACDF761353B5B15D9B054F");
     return expect(promise).rejects.toThrow(expectedError);
   });
 

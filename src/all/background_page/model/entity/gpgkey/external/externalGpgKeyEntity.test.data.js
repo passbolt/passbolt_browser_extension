@@ -17,20 +17,17 @@ import {pgpKeys} from "../../../../../tests/fixtures/pgpKeys/keys";
 export const adaExternalPrivateGpgKeyEntityDto = (data = {}) => {
   const defaultData = {
     "armored_key": pgpKeys.ada.private,
-    "key_id": "5d9b054f",
-    "user_ids": [{
-      email: "ada@passbolt.com",
-      name: "Ada Lovelace"
-    }],
-    "fingerprint": "03f60e958f4cb29723acdf761353b5b15d9b054f",
-    "expires": "Never",
-    "created": "2015-08-09T12:48:31.000Z",
-    "algorithm": "RSA",
-    "length": 4096,
-    "curve": null,
+    "key_id": pgpKeys.ada.key_id,
+    "user_ids": pgpKeys.ada.user_ids,
+    "fingerprint": pgpKeys.ada.fingerprint,
+    "expires": pgpKeys.ada.expires,
+    "created": pgpKeys.ada.created,
+    "algorithm": pgpKeys.ada.algorithm,
+    "length": pgpKeys.ada.length,
+    "curve": pgpKeys.ada.curve,
     "private": true,
-    "revoked": false
+    "revoked": pgpKeys.ada.revoked
   };
 
-  return Object.assign(defaultData, data || {});
+  return Object.assign(defaultData, data);
 };

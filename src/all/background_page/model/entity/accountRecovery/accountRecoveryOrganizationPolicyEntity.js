@@ -17,6 +17,7 @@ const {AccountRecoveryOrganizationPublicKeyEntity} = require("./accountRecoveryO
 const {EntityValidationError} = require("../abstract/entityValidationError");
 const {UserEntity} = require("../user/userEntity");
 const {AccountRecoveryPrivateKeyPasswordsCollection} = require('./accountRecoveryPrivateKeyPasswordsCollection');
+const {GetGpgKeyInfoService} = require('../../../service/crypto/getGpgKeyInfoService');
 
 const ENTITY_NAME = "AccountRecoveryOrganizationPolicy";
 const POLICY_DISABLED = "disabled";
@@ -171,6 +172,40 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
   }
 
   /**
+   * Additional AccountRecoveryOrganizationPolicyEntity validation rule.
+   *  Check that the creator is defined
+   *  Check that the creator.gpgkey is defined
+   *  Check that the creator id is matching the gpgkey.user_id
+   *  Check that the creator key's fingerprint is defined
+   *  Check that the given creator's key is matching the givent fingerprint
+   * @param {AccountRecoveryOrganizationPolicyEntity} entity
+   * @throws {Error} if creator is not defined
+   * @throws {Error} if creator.gpgkey is not defined
+   * @throws {Error} if creator id is not the same as the creator.gpgkey user_id
+   * @throws {Error} if declared fingerprint in gpgkey does not match the key itself
+   */
+  static async assertValidCreatorGpgkey(entity) {
+    const creator = entity.creator;
+    if (!creator) {
+      throw new EntityValidationError('AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects a creator to be defined.');
+    }
+
+    const gpgkey = creator.gpgkey;
+    if (!gpgkey) {
+      throw new EntityValidationError('AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects a creator.gpgkey to be defined.');
+    }
+
+    if (creator.id !== gpgkey.userId) {
+      throw new EntityValidationError("AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects the creator's id to match the gpgkey.user_id.");
+    }
+
+    const computedFingerprint = (await GetGpgKeyInfoService.getKeyInfo(gpgkey.armoredKey)).fingerprint;
+    if (computedFingerprint !== gpgkey.fingerprint.toUpperCase()) {
+      throw new EntityValidationError("AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects the gpgkey armoredKey's fingerprint to match the given fingerprint.");
+    }
+  }
+
+  /**
    * Customizes JSON stringification behavior
    * @returns {*}
    */
@@ -259,6 +294,14 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
    */
   get isOptOut() {
     return this.policy === AccountRecoveryOrganizationPolicyEntity.POLICY_OPT_OUT;
+  }
+
+  /**
+   * Return the creator of the organization policy.
+   * @returns {UserEntity}
+   */
+  get creator() {
+    return this._creator;
   }
 
   /*

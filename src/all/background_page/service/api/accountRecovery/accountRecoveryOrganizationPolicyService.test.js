@@ -17,7 +17,7 @@ import {dummyData} from "./accountRecoveryOrganizationPolicyService.test.data";
 jest.mock('../../../model/keyring', () => {
   const keyList = {
     keyId1: {
-      fingerprint: "03f60e958f4cb29723acdf761353b5b15d9b054f"
+      fingerprint: "03F60E958F4CB29723ACDF761353B5B15D9B054F"
     }
   };
 
@@ -31,7 +31,7 @@ jest.mock('../../../model/keyring', () => {
 
 jest.mock('../../../model/gpgauth', () => {
   const serverKey = {
-    fingerprint: "7d85c136779f2f8ba48f193e1f194e8d4d8cb098"
+    fingerprint: "7D85C136779F2F8BA48F193E1F194E8D4D8CB098"
   };
 
   return {

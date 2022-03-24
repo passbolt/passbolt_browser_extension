@@ -131,7 +131,7 @@ class GpgkeyEntity extends Entity {
    * @returns {string} admin or user
    */
   get userId() {
-    return this._props.userId;
+    return this._props.user_id;
   }
 
   /**

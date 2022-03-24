@@ -40,14 +40,27 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
   }
 
   /**
+   * Return the list of supported options for the contain option in API find operations
+   *
+   * @returns {Array<string>} list of supported option
+   */
+  static getSupportedContainOptions() {
+    return [
+      "creator",
+      "creator.gpgkey",
+    ];
+  }
+
+  /**
    * Find an organization settings of an accountRecovery
    *
    * @returns {Promise<*>} response body
    * @throws {Error} if options are invalid or API error
    * @public
    */
-  async find() {
-    const response = await this.apiClient.findAll();
+  async find(contains) {
+    const options = contains ? this.formatContainOptions(contains, AccountRecoveryOrganizationPolicyService.getSupportedContainOptions()) : null;
+    const response = await this.apiClient.findAll(options);
     return response.body;
   }
 
@@ -113,8 +126,7 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
     const gpgAuth = new GpgAuth(keyring);
 
     const serverKey = await gpgAuth.getServerKey();
-
-    if (serverKey.fingerprint.toLowerCase() === keyInfo.fingerprint) {
+    if (serverKey.fingerprint.toUpperCase() === keyInfo.fingerprint) {
       throw new Error("The key is the current server key, the organization recovery key must be a new one.");
     }
 
@@ -122,7 +134,7 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
     const publicKeys = keyring.getPublicKeysFromStorage();
     for (const id in publicKeys) {
       const publicKey = publicKeys[id];
-      if (publicKey.fingerprint === keyInfo.fingerprint) {
+      if (publicKey.fingerprint.toUpperCase() === keyInfo.fingerprint) {
         throw new Error("The key is already being used, the organization recovery key must be a new one.");
       }
     }

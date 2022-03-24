@@ -76,7 +76,7 @@ class GetGpgKeyInfoService {
       armored_key: key.armor(),
       key_id: keyid,
       user_ids: userIdsSplited,
-      fingerprint: key.getFingerprint(),
+      fingerprint: key.getFingerprint().toUpperCase(),
       created: key.getCreationTime().toISOString(),
       expires: expirationTime,
       algorithm: this.formatAlgorithm(algorithmInfo.algorithm),

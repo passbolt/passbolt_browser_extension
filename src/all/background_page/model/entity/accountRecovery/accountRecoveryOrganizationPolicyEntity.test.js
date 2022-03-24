@@ -25,6 +25,8 @@ import {
   disabledPreviouslyEnabledAccountRecoveryOrganizationPolicyDto,
   enabledAccountRecoveryOrganizationPolicyDto, rotateKeyAccountRecoveryOrganizationPolicyDto
 } from "./accountRecoveryOrganizationPolicyEntity.test.data";
+import {users} from "../user/userEntity.test.data";
+import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
 
 describe("AccountRecoveryOrganizationPolicy entity", () => {
   it("schema must validate", () => {
@@ -114,5 +116,64 @@ describe("AccountRecoveryOrganizationPolicy entity", () => {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('public_key_id', 'type')).toBe(true);
     }
+  });
+
+  describe("AccountRecoveryOrganizationPolicy assertValidCreatorGpgkey", () => {
+    it("should not validate the entity if creator is missing", async() => {
+      const dto = disabledAccountRecoveryOrganizationPolicyDto({creator: null});
+      const entity = new AccountRecoveryOrganizationPolicyEntity(dto);
+      expect.assertions(1);
+      try {
+        await AccountRecoveryOrganizationPolicyEntity.assertValidCreatorGpgkey(entity);
+      } catch (e) {
+        expect(e).toStrictEqual(new EntityValidationError('AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects a creator to be defined.'));
+      }
+    });
+
+    it("should not validate the entity if gpgkey is missing", async() => {
+      const dto = disabledAccountRecoveryOrganizationPolicyDto();
+      delete dto.creator.gpgkey;
+      const entity = new AccountRecoveryOrganizationPolicyEntity(dto);
+      expect.assertions(1);
+      try {
+        await AccountRecoveryOrganizationPolicyEntity.assertValidCreatorGpgkey(entity);
+      } catch (e) {
+        expect(e).toStrictEqual(new EntityValidationError('AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects a creator.gpgkey to be defined.'));
+      }
+    });
+
+    it("should not validate the entity if creator id and gpgkey.user_id are not matching", async() => {
+      const dto = disabledAccountRecoveryOrganizationPolicyDto();
+      dto.creator.id = users.ada.id;
+      dto.creator.gpgkey.user_id = users.admin.id;
+      const entity = new AccountRecoveryOrganizationPolicyEntity(dto);
+      expect.assertions(1);
+      try {
+        await AccountRecoveryOrganizationPolicyEntity.assertValidCreatorGpgkey(entity);
+      } catch (e) {
+        expect(e).toStrictEqual(new EntityValidationError("AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects the creator's id to match the gpgkey.user_id."));
+      }
+    });
+
+    it("should not validate the entity if fingerprint is not matching the gpgkey fingerprint", async() => {
+      const dto = disabledAccountRecoveryOrganizationPolicyDto();
+      dto.creator.gpgkey.fingerprint = pgpKeys.account_recovery_organization.fingerprint;
+      dto.creator.gpgkey.armored_key = pgpKeys.ada.public;
+      const entity = new AccountRecoveryOrganizationPolicyEntity(dto);
+      expect.assertions(1);
+      try {
+        await AccountRecoveryOrganizationPolicyEntity.assertValidCreatorGpgkey(entity);
+      } catch (e) {
+        expect(e).toStrictEqual(new EntityValidationError("AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects the gpgkey armoredKey's fingerprint to match the given fingerprint."));
+      }
+    });
+
+    it("should validate the entity if user_ids are mathching and if fingerprints are matching", async() => {
+      const dto = disabledAccountRecoveryOrganizationPolicyDto();
+      const entity = new AccountRecoveryOrganizationPolicyEntity(dto);
+      expect.assertions(1);
+      const promise = AccountRecoveryOrganizationPolicyEntity.assertValidCreatorGpgkey(entity);
+      await expect(promise).resolves.toBeUndefined();
+    });
   });
 });

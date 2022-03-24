@@ -91,7 +91,7 @@ class AccountEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
-        "token": {
+        "authentication_token_token": {
           "type": "string",
           "format": "uuid"
         },
@@ -108,6 +108,15 @@ class AccountEntity extends Entity {
           "anyOf": [{
             "type": "string",
             "pattern": /^[a-z]{2}-[A-Z]{2}$/,
+          }, {
+            "type": "null"
+          }]
+        },
+        // @todo entity-validation only required for account recovery account creation.
+        "account_recovery_request_id": {
+          "anyOf": [{
+            "type": "string",
+            "format": "uuid"
           }, {
             "type": "null"
           }]
@@ -214,6 +223,23 @@ class AccountEntity extends Entity {
    */
   get serverPublicArmoredKey() {
     return this._props.server_public_armored_key;
+  }
+
+  /**
+   * Get the account recovery request id
+   * @return {string}
+   */
+  get accountRecoveryRequestId() {
+    return this._props.account_recovery_request_id;
+  }
+
+  /**
+   * Set the account recovery request id
+   * @params {string} accountRecoveryRequestId The account recovery request id
+   */
+  set accountRecoveryRequestId(accountRecoveryRequestId) {
+    EntitySchema.validateProp("account_recovery_request_id", accountRecoveryRequestId, AccountEntity.getSchema().properties.account_recovery_request_id);
+    this._props.account_recovery_request_id = accountRecoveryRequestId;
   }
 
   /*

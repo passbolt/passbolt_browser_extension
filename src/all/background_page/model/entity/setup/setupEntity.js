@@ -205,7 +205,7 @@ class SetupEntity extends Entity {
   toCompleteDto() {
     return {
       authenticationtoken: {
-        token: this.token
+        token: this.authenticationTokenToken
       },
       gpgkey: {
         armored_key: this.userPublicArmoredKey
@@ -229,7 +229,7 @@ class SetupEntity extends Entity {
   toAccountRecoveryRequestCreateDto() {
     return {
       authentication_token: {
-        token: this.token
+        token: this.authenticationTokenToken
       },
       fingerprint: this.userKeyFingerprint,
       user_id: this.userId,
@@ -261,10 +261,11 @@ class SetupEntity extends Entity {
       type: AccountEntity.TYPE_ACCOUNT_RECOVERY,
       domain: this.domain,
       user_id: this.userId,
-      user: this.user?.toDto(UserEntity.ALL_CONTAIN_OPTIONS) || {},
+      authentication_token_token: this.authenticationTokenToken,
       user_public_armored_key: this.userPublicArmoredKey,
       user_private_armored_key: this.userPrivateArmoredKey,
       server_public_armored_key: this.serverPublicArmoredKey,
+      user: this.user?.toDto(UserEntity.ALL_CONTAIN_OPTIONS) || {},
       security_token: this.securityToken?.toDto(),
     };
     accountDto.user.locale = this.locale;
@@ -301,10 +302,10 @@ class SetupEntity extends Entity {
   }
 
   /**
-   * Get the registration token
+   * Get the authentication token token
    * @returns {string}
    */
-  get token() {
+  get authenticationTokenToken() {
     return this._props.token;
   }
 

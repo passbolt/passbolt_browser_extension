@@ -12,6 +12,7 @@
  */
 const {PageMod} = require('../sdk/page-mod');
 const app = require('../app');
+const {BuildSetupApiClientOptions} = require("../service/setup/buildApiClientOptionsService");
 
 /*
  * This pagemod help bootstrap the first step of the recover process from a passbolt server app page
@@ -36,9 +37,11 @@ Recover.init = function() {
        * chrome/data/passbolt-iframe-recover.html
        */
     ],
-    onAttach: function(worker) {
+    onAttach: async function(worker) {
+      const apiClientOptions = await BuildSetupApiClientOptions.buildFromUrl(worker.tab.url);
+
       app.events.config.listen(worker);
-      app.events.recover.listen(worker);
+      app.events.recover.listen(worker, apiClientOptions);
 
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows

@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {ApiClientOptions} = require("../../service/api/apiClient/apiClientOptions");
 const {AccountModel} = require("../../model/account/accountModel");
 const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
 const {AccountEntity} = require("../../model/entity/account/accountEntity");
@@ -23,14 +22,14 @@ class RecoverInitiateAccountRecoveryRequestController {
   /**
    * Constructor.
    * @param {Worker} worker The associated worker.
+   * @param {ApiClientOptions} apiClientOptions The api client options.
    * @param {string} requestId The associated request id.
    * @param {SetupEntity} setupEntity The associated setup entity.
    */
-  constructor(worker, requestId, setupEntity) {
+  constructor(worker, apiClientOptions, requestId, setupEntity) {
     this.worker = worker;
     this.requestId = requestId;
     this.setupEntity = setupEntity;
-    const apiClientOptions = (new ApiClientOptions()).setBaseUrl(this.setupEntity.domain);
     this.accountModel = new AccountModel(apiClientOptions);
     this.accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
     this.accountRecoveryRequestService = new AccountRecoveryRequestService(apiClientOptions);
@@ -55,14 +54,18 @@ class RecoverInitiateAccountRecoveryRequestController {
    * @returns {Promise<void>}
    */
   async exec() {
-    const accountDto = this.setupEntity.toAccountRecoveryAccountDto();
-    const accountEntity = new AccountEntity(accountDto);
     const accountRecoveryRequestDto = this.setupEntity.toAccountRecoveryRequestCreateDto();
     const accountRecoverRequestCreate = new AccountRecoveryRequestCreateEntity(accountRecoveryRequestDto);
+    const accountRecoveryRequest = await this.accountRecoveryRequestService.create(accountRecoverRequestCreate);
 
-    await AccountLocalStorage.deleteByUserIdAndType(accountEntity.userId, accountEntity.type);
+    const accountDto = this.setupEntity.toAccountRecoveryAccountDto();
+    accountDto.account_recovery_request_id = accountRecoveryRequest.id;
+    const accountEntity = new AccountEntity(accountDto);
+
+    // Delete any existing account recovery request temporary accounts, as the API will anyway cancel other on going requests.
+    await AccountLocalStorage.deleteByUserIdAndType(accountEntity.userId, AccountEntity.TYPE_ACCOUNT_RECOVERY);
+
     await AccountLocalStorage.add(accountEntity);
-    await this.accountRecoveryRequestService.create(accountRecoverRequestCreate);
   }
 }
 

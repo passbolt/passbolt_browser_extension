@@ -52,7 +52,8 @@ class UserService extends AbstractService {
       'last_logged_in', // only use when v2.13 support is dropped
       'gpgkey',
       'groups_users',
-      'profile'
+      'profile',
+      'account_recovery_user_setting',
     ];
   }
 

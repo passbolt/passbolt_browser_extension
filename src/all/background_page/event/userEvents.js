@@ -94,7 +94,7 @@ const listen = function(worker) {
       const clientOptions = await User.getInstance().getApiClientOptions();
       const userModel = new UserModel(clientOptions);
       const loggedInUserId = User.getInstance().get().id;
-      const contains = {profile: true, role: true};
+      const contains = {profile: true, role: true, account_recovery_user_setting: true};
       const userEntity = await userModel.findOne(loggedInUserId, contains, true);
       worker.port.emit(requestId, 'SUCCESS', userEntity);
     } catch (error) {

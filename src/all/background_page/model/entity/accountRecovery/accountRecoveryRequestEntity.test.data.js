@@ -19,7 +19,6 @@ import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
 export const defaultAccountRecoveryRequestDto = (data = {}) => {
   const defaultData = {
     "id": uuidv4(),
-    "authentication_token_id": uuidv4(),
     "armored_key": pgpKeys.account_recovery_request.public,
     "fingerprint": pgpKeys.account_recovery_request.fingerprint,
     "status": "pending",

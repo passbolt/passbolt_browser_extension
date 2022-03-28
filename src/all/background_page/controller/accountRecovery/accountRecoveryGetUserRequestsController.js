@@ -54,7 +54,10 @@ class AccountRecoveryGetUserRequestsController {
       throw new Error("The user id is not valid");
     }
 
-    return this.accountRecoveryModel.findUserRequests(userId);
+    const filters = {
+      "has-users": [userId],
+    };
+    return this.accountRecoveryModel.findUserRequests(filters);
   }
 }
 

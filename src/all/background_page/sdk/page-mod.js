@@ -105,7 +105,14 @@ class PageMod {
      * When a tab is updated we try to insert content code if it matches
      * the include and contentScriptWhen pageMod parameters
      */
-    this._listeners['chrome.tabs.onUpdated'] = (tabId, changeInfo, tab) => {
+    this._listeners['chrome.tabs.onUpdated'] = async(tabId, changeInfo, tab) => {
+      /*
+       * Temporarily fixing a bug seen with Chrome 99. tab doesn't always have defined url, title and favIconUrl properties.
+       * @see https://bugs.chromium.org/p/chromium/issues/detail?id=1305284&sort=-opened&q=tabs.onUpdated&can=1
+       */
+      if (typeof tab.url === 'undefined' && changeInfo?.status === 'complete') {
+        tab = await browser.tabs.get(tabId);
+      }
       this.__onTabUpdated(tabId, changeInfo, tab);
     };
     chrome.tabs.onUpdated.addListener(this._listeners['chrome.tabs.onUpdated']);
@@ -235,7 +242,7 @@ class PageMod {
      * We can't insert scripts if the url is not https or http
      * as this is not allowed, instead we insert the scripts manually in the background page if needed
      */
-    if (!(tab.url.startsWith('http://') || tab.url.startsWith('https://'))) {
+    if (!(tab?.url?.startsWith('http://') || tab?.url?.startsWith('https://'))) {
       return;
     }
     if (typeof reload === 'undefined') {
@@ -290,7 +297,7 @@ class PageMod {
      * We can't insert scripts if the url is not https or http
      * as this is not allowed, instead we insert the scripts manually in the background page if needed
      */
-    if (!(tab.url.startsWith('http://') || tab.url.startsWith('https://'))) {
+    if (!(tab?.url?.startsWith('http://') || tab?.url?.startsWith('https://'))) {
       return;
     }
     // Check if pagemod url pattern match tab url

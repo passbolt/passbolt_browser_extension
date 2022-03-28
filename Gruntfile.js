@@ -48,12 +48,12 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-eslint');
-  grunt.loadNpmTasks('i18next-scanner');
+  //grunt.loadNpmTasks('i18next-scanner');
 
   grunt.registerTask('default', ['bundle']);
   grunt.registerTask('pre-dist', ['copy:vendors', 'copy:styleguide']);
 
-  grunt.registerTask('bundle', ['externalize-locale-strings', 'copy:background_page', 'copy:content_scripts', 'browserify:background_page', 'copy:data', 'copy:locales']);
+  grunt.registerTask('bundle', [/*'externalize-locale-strings',*/ 'copy:background_page', 'copy:content_scripts', 'browserify:background_page', 'copy:data', 'copy:locales']);
   grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle', 'browserify:vendors']);
   grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle', 'browserify:vendors']);
 

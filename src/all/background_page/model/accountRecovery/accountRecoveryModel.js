@@ -62,10 +62,11 @@ class AccountRecoveryModel {
   /**
    * Get user requests of an accountRecovery using Passbolt API
    *
+   * @param {object} filters additional filters to supply to the find query
    * @return {AccountRecoveryRequestsCollection}
    */
-  async findUserRequests(userId) {
-    const accountRecoveryRequestsCollectionDto = await this.accountRecoveryRequestService.findByUser(userId);
+  async findUserRequests(filters) {
+    const accountRecoveryRequestsCollectionDto = await this.accountRecoveryRequestService.findByUser(filters);
     return new AccountRecoveryRequestsCollection(accountRecoveryRequestsCollectionDto);
   }
 

@@ -25,19 +25,25 @@ beforeEach(() => {
 
 describe("AccountRecoveryGetUserRequestsController", () => {
   describe("AccountRecoveryGetUserRequestsController::exec", () => {
-    it("Should retrieve the account recovery organization policy.", async() => {
+    it("Should retrieve the user's account recovery requests.", async() => {
       // Mock API fetch account recovery requests response.
       const userId = uuidv4();
       const mockApiResult = [
         defaultAccountRecoveryRequestDto({user_id: userId}),
         defaultAccountRecoveryRequestDto({user_id: userId})
       ];
-      fetch.doMock(() => mockApiResponse(mockApiResult));
+      fetch.doMock(req => {
+        const queryString = (new URL(req.url)).search;
+        const params = new URLSearchParams(queryString);
+        const hasUsersFilter = params.get("filter[has-users][]");
+        expect(hasUsersFilter).toBe(userId);
+        return mockApiResponse(mockApiResult);
+      });
 
       const controller = new AccountRecoveryGetUserRequestsController(null, null, defaultApiClientOptions());
       const accountRecoveryRequests = await controller.exec(userId);
 
-      expect.assertions(2);
+      expect.assertions(3);
       const items = accountRecoveryRequests.items;
       expect(items).toHaveLength(2);
       const accountRecoveryOrganizationPolicyDto = accountRecoveryRequests.toDto();

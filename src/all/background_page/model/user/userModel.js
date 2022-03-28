@@ -20,7 +20,6 @@ const {UserLocalStorage} = require('../../service/local_storage/userLocalStorage
 
 const {PassboltApiFetchError} = require('../../error/passboltApiFetchError');
 const {DeleteDryRunError} = require('../../error/deleteDryRunError');
-const {pgpKeys} = require('../../../tests/fixtures/pgpKeys/keys');
 
 class UserModel {
   /**
@@ -40,8 +39,8 @@ class UserModel {
    * @public
    */
   async updateLocalStorage() {
-    // contain pending_account_recovery_user_request is only available for admin or recovery contact role
-    const contains =  {profile: true, gpgkey: false, groups_users: false, last_logged_in: true, pending_account_recovery_user_request: true};
+    // contain pending_account_recovery_request is only available for admin or recovery contact role
+    const contains =  {profile: true, gpgkey: false, groups_users: false, last_logged_in: true, pending_account_recovery_request: true};
     const usersCollection = await this.findAll(contains, null, null, true);
     await UserLocalStorage.set(usersCollection);
     return usersCollection;
@@ -108,18 +107,6 @@ class UserModel {
     if (preSanitize) {
       usersDto = UsersCollection.sanitizeDto(usersDto);
     }
-    // @todo @debug @mock for account-recovery
-    usersDto[0].pending_account_recovery_user_request = {
-      id: "d4c0e643-3967-443b-93b3-102d902c4510",
-      authentication_token_id: "d4c0e643-3967-443b-93b3-102d902c4512",
-      armored_key: pgpKeys.ada.public,
-      fingerprint: pgpKeys.ada.fingerprint,
-      status: "pending",
-      created: "2020-05-04T20:31:45+00:00",
-      modified: "2020-05-04T20:31:45+00:00",
-      created_by: "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      modified_by: "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-    };
     return new UsersCollection(usersDto);
   }
 

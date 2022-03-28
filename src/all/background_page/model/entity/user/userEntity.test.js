@@ -64,12 +64,12 @@ describe("User entity", () => {
     expect(entity.pendingAccountRecoveryUserRequest).not.toBe(null);
     expect(entity.pendingAccountRecoveryUserRequest.status).toEqual('pending');
 
-    const dtoWithContain = entity.toDto({role: true, profile: true, gpgkey: true, account_recovery_user_setting: true, pending_account_recovery_user_request: true});
+    const dtoWithContain = entity.toDto({role: true, profile: true, gpgkey: true, account_recovery_user_setting: true, pending_account_recovery_request: true});
     expect(dtoWithContain.role.name).toEqual('admin');
     expect(dtoWithContain.profile.first_name).toEqual('Admin');
     expect(dtoWithContain.gpgkey.armored_key.startsWith('-----BEGIN PGP PUBLIC KEY BLOCK-----')).toBe(true);
     expect(dtoWithContain.is_mfa_enabled).toBe(false);
-    expect(dtoWithContain.pending_account_recovery_user_request.status).toBe('pending');
+    expect(dtoWithContain.pending_account_recovery_request.status).toBe('pending');
   });
 
   it("constructor throws an exception if DTO is missing required field", () => {

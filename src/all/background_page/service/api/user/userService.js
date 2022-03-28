@@ -54,6 +54,7 @@ class UserService extends AbstractService {
       'groups_users',
       'profile',
       'account_recovery_user_setting',
+      'pending_account_recovery_request',
     ];
   }
 

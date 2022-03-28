@@ -64,10 +64,6 @@ describe("AccountRecoveryRequest entity", () => {
       expect(error.details).toEqual({
         id: {required: 'The id is required.'},
         status: {required: 'The status is required.'},
-        created: {required: 'The created is required.'},
-        created_by: {required: 'The created_by is required.'},
-        modified: {required: 'The modified is required.'},
-        modified_by: {required: 'The modified_by is required.'},
       });
     }
   });

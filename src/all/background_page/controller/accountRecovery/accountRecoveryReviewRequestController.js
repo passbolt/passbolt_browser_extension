@@ -84,7 +84,7 @@ class AccountRecoveryReviewRequestController {
     if (!accountRecoveryPrivateKeyPassword) {
       throw new Error("No account recovery private key password found.");
     }
-    return ReEncryptMessageService.reEncrypt(accountRecoveryPrivateKeyPassword.data, accountRecoveryRequestEntity.armoredKey, organizationPrivateKeyDecrypted, organizationPrivateKeyDecrypted, organizationPrivateKeyDecrypted);
+    return ReEncryptMessageService.reEncrypt(accountRecoveryPrivateKeyPassword.data, accountRecoveryRequestEntity.armoredKey, organizationPrivateKeyDecrypted, organizationPrivateKeyDecrypted);
   }
 }
 

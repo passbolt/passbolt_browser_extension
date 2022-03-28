@@ -181,7 +181,7 @@ class AccountRecoverySaveOrganizationPolicyController {
     const items = accountRecoveryPrivateKeyPasswords.items;
     const encryptionKeyInfo = await GetGpgKeyInfoService.getKeyInfo(encryptionKey);
     for (let i = 0; i < items.length; i++) {
-      const encryptedKeyData = await ReEncryptMessageService.reEncrypt(items[i].data, encryptionKey, decryptionKey, decryptionKey, decryptionKey);
+      const encryptedKeyData = await ReEncryptMessageService.reEncrypt(items[i].data, encryptionKey, decryptionKey, decryptionKey);
       const privateKeyPasswordDto = {
         ...items[i].toDto(),
         data: encryptedKeyData,

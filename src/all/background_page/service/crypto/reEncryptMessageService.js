@@ -22,16 +22,18 @@ class ReEncryptMessageService {
    * @param {string|openpgp.Message} encryptedMessage
    * @param {string|openpgp.PublicKey|Array<string|openpgp.PublicKey>} encryptionKeys
    * @param {string|openpgp.PrivateKey|Array<string|openpgp.PrivateKey>} decryptionKeys
-   * @param {string|openpgp.PrivateKey|openpgp.PublicKey|Array<string|openpgp.PrivateKey|openpgp.PublicKey>} verifyingKeys
    * @param {string|openpgp.PrivateKey|Array<string|openpgp.PrivateKey>} signingKeys
+   * @param {string|openpgp.PrivateKey|openpgp.PublicKey|Array<string|openpgp.PrivateKey|openpgp.PublicKey>} verifyingKeys
    * @returns {Promise<string>} armored re-encrypted message.
    */
-  static async reEncrypt(encryptedMessage, encryptionKeys, decryptionKeys, verifyingKeys, signingKeys) {
+  static async reEncrypt(encryptedMessage, encryptionKeys, decryptionKeys, signingKeys, verifyingKeys) {
     encryptedMessage = await assertEncryptedMessage(encryptedMessage);
     encryptionKeys = await assertPublicKeys(encryptionKeys);
     decryptionKeys = await assertDecryptedPrivateKeys(decryptionKeys);
     signingKeys = await assertDecryptedPrivateKeys(signingKeys);
-    verifyingKeys = await assertKeys(verifyingKeys);
+    if (verifyingKeys) {
+      verifyingKeys = await assertKeys(verifyingKeys);
+    }
 
     const decryptedMessage = await DecryptMessageService.decrypt(encryptedMessage, decryptionKeys, verifyingKeys);
     return await EncryptMessageService.encrypt(decryptedMessage, encryptionKeys, signingKeys);

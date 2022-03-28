@@ -33,6 +33,7 @@ import {MockExtension} from "../../../tests/mocks/mockExtension";
 import {GetGpgKeyInfoService} from "../../service/crypto/getGpgKeyInfoService";
 import {DecryptMessageService} from "../../service/crypto/decryptMessageService";
 import {assertKeys} from "../../utils/openpgp/openpgpAssertions";
+import {v4 as uuidv4} from "uuid";
 
 jest.mock("../passphrase/passphraseController.js");
 jest.mock("../../service/progress/progressService", () => ({
@@ -56,8 +57,9 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
       await MockExtension.withConfiguredAccount();
       // Mock user passphrase capture.
       PassphraseController.request.mockResolvedValue(pgpKeys.ada.passphrase);
+      const accountRecoveryOrganizationPolicyServerResponse = enabledAccountRecoveryOrganizationPolicyDto();
       // Mock API get account recovery organization policy.
-      fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
+      fetch.doMockOnce(() => mockApiResponse(accountRecoveryOrganizationPolicyServerResponse));
       // Mock API account recovery user settings post. Return data such as the API will, including the request payload.
       fetch.doMockOnce(async req => mockApiResponse(JSON.parse(await req.text())));
 
@@ -195,9 +197,12 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
 
     it(": the current policy is enabled and the new one is enabled but the ORK didn't change", async() => {
       const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions());
-      const currentOrganizationPolicy = optInAccountRecoveryOranizationPolicyDto();
+      const publicKeyId = uuidv4();
+      const currentOrganizationPolicy = optInAccountRecoveryOranizationPolicyDto({
+        public_key_id: publicKeyId
+      });
       const newOrganizationPolicy = optOutAccountRecoveryOranizationPolicyDto();
-      const newOrganizationPolicyOrk = newOrganizationPolicy.account_recovery_organization_public_key.armored_key;
+      delete newOrganizationPolicy.account_recovery_organization_public_key;
       // Mock extension with a configured account.
       await MockExtension.withConfiguredAccount(pgpKeys.admin);
       // Mock user passphrase capture.
@@ -214,11 +219,12 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
 
       const apiResponse = await controller.exec(newOrganizationPolicy, accountRecoveryOrganizationPrivateKeyDto);
 
-      expect.assertions(4);
+      expect.assertions(5);
       expect(apiResponse.policy).toEqual(newOrganizationPolicy.policy);
-      expect(await areKeysEqual(apiResponse.armoredKey, newOrganizationPolicyOrk)).toBe(true);
+      expect(apiResponse.armoredKey).toBeNull();
       expect(apiResponse.revokedKey).toBeNull();
       expect(apiResponse.privateKeyPasswords).toBeNull();
+      expect(apiResponse.publicKeyId).toBe(publicKeyId);
     });
 
     it(": the current policy is enabled and the new one is enabled and the ORK changed", async() => {

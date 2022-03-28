@@ -14,6 +14,7 @@
 const {i18n} = require('../../sdk/i18n');
 const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
 const {AccountRecoveryOrganizationPolicyEntity} = require("../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity");
+const {AccountRecoveryOrganizationPolicyChangeEntity} = require("../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyChangeEntity");
 const {PrivateGpgkeyEntity} = require("../../model/entity/gpgkey/privateGpgkeyEntity");
 const {AccountRecoveryPrivateKeyPasswordsCollection} = require("../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordsCollection");
 const {Keyring} = require("../../model/keyring");
@@ -68,7 +69,7 @@ class AccountRecoverySaveOrganizationPolicyController {
    */
   async exec(organizationPolicyChangesDto, organizationPrivateKeyDto = null) {
     const userPassphrase = await PassphraseController.request(this.worker);
-    const organizationPolicyChanges = new AccountRecoveryOrganizationPolicyEntity(organizationPolicyChangesDto);
+    const organizationPolicyChanges = new AccountRecoveryOrganizationPolicyChangeEntity(organizationPolicyChangesDto);
     const organizationPrivateKey = organizationPrivateKeyDto ? new PrivateGpgkeyEntity(organizationPrivateKeyDto) : null;
 
     const currentOrganizationPolicy = await this.accountRecoveryModel.findOrganizationPolicy();
@@ -79,10 +80,13 @@ class AccountRecoverySaveOrganizationPolicyController {
     const hasToReKeyPrivateKeyPasswords = hasToRevokeCurrentOrganizationKey && hasToSignNewOrganizationKey;
 
     const saveOrganizationPolicyDto = organizationPolicyChanges.toDto({account_recovery_organization_public_key: true});
+    saveOrganizationPolicyDto.policy = saveOrganizationPolicyDto.policy || currentOrganizationPolicy.policy;
 
     if (hasNewOrganizationKey) {
       const newOrganizationPublicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(organizationPolicyChanges.armoredKey);
       saveOrganizationPolicyDto.account_recovery_organization_public_key.fingerprint = newOrganizationPublicKeyInfo.fingerprint;
+    } else {
+      saveOrganizationPolicyDto.public_key_id = currentOrganizationPolicy.publicKeyId;
     }
 
     const signingKeys = [];
@@ -120,7 +124,7 @@ class AccountRecoverySaveOrganizationPolicyController {
    * Returns true if the current ORK needs to be revoked.
    * It is the case when the ORK is changed or if the new policy is set to "disabled".
    *
-   * @param {AccountRecoveryOrganizationPolicyEntity} policyChangesEntity The organization policy changes
+   * @param {AccountRecoveryOrganizationPolicyChangeEntity} policyChangesEntity The organization policy changes
    * @param {AccountRecoveryOrganizationPolicyEntity} currentPolicyEntity The current organization policy
    * @returns {bool}
    */
@@ -141,7 +145,7 @@ class AccountRecoverySaveOrganizationPolicyController {
    * Returns true if the new ORK needs to be signed.
    * It needs to be signed if the new ORK is enabled and changed from the current one.
    *
-   * @param {AccountRecoveryOrganizationPolicyEntity} policyChangesEntity The organization policy changes
+   * @param {AccountRecoveryOrganizationPolicyChangeEntity} policyChangesEntity The organization policy changes
    * @param {AccountRecoveryOrganizationPolicyEntity} currentPolicyEntity The current organization policy
    * @returns {bool}
    */

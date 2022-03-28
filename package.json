@@ -1,6 +1,6 @@
 {
   "name": "passbolt_-_open_source_password_manager",
-  "version": "3.5.0",
+  "version": "3.5.1",
   "license": "AGPL-3.0",
   "copyright": "Copyright 2022 Passbolt SA",
   "description": "Passbolt web extension for the open source password manager for teams",
@@ -49,7 +49,6 @@
     "grunt-contrib-watch": "^1.1.0",
     "grunt-eslint": "^24.0.0",
     "grunt-shell": "^3.0.1",
-    "i18next-scanner": "github:passbolt/i18next-scanner#master",
     "jest": "^27.4.0",
     "jest-environment-jsdom": "^27.4.0",
     "jest-environment-node": "^27.4.0",

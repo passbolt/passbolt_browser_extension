@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [3.5.1] - 2022-03-29
+### Fixed
+- PB-14378 Tab doesn't always have defined url, title and favIconUrl properties on chrome.tabs.onUpdated event listener callback
+
 ## [3.5.0] - 2021-01-12
 ### Added
 - PB-13161 As LU I should be able to passbolt with my Android mobile
@@ -749,7 +753,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.5.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.5.1...HEAD
+[3.5.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.5.0...v3.5.1
 [3.5.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.4.0...v3.5.0
 [3.4.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.3.1...v3.4.0
 [3.3.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.3.0...v3.3.1

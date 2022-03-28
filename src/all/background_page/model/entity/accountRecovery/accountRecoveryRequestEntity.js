@@ -52,7 +52,6 @@ class AccountRecoveryRequestEntity extends Entity {
       "type": "object",
       "required": [
         "id",
-        "authentication_token_id",
         "status",
         "created",
         "created_by",
@@ -78,10 +77,6 @@ class AccountRecoveryRequestEntity extends Entity {
           }, {
             "type": "null"
           }]
-        },
-        "authentication_token_id": {
-          "type": "string",
-          "format": "uuid"
         },
         "status": {
           "type": "string",

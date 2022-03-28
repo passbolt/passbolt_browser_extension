@@ -148,6 +148,19 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
     return result;
   }
 
+  /**
+   * Customizes JSON stringification behavior
+   * @returns {*}
+   */
+  toJSON() {
+    return this.toDto({
+      account_recovery_organization_public_key: true,
+      account_recovery_organization_revoked_key: true,
+      account_recovery_private_key_passwords: true,
+      creator: true
+    });
+  }
+
   /*
    * ==================================================
    * Build rules
@@ -205,19 +218,6 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
     }
   }
 
-  /**
-   * Customizes JSON stringification behavior
-   * @returns {*}
-   */
-  toJSON() {
-    return this.toDto({
-      account_recovery_organization_public_key: true,
-      account_recovery_organization_revoked_key: true,
-      account_recovery_private_key_passwords: true,
-      creator: true
-    });
-  }
-
   /*
    * ==================================================
    * Dynamic properties getters
@@ -230,6 +230,14 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
    */
   get accountRecoveryOrganizationPublicKey() {
     return this._account_recovery_organization_public_key || null;
+  }
+
+  /**
+   * Get the id of the account recovery organization public key.
+   * @returns {string}
+   */
+  get publicKeyId() {
+    return this._props.public_key_id;
   }
 
   /**

@@ -79,7 +79,8 @@ class AccountRecoveryReviewRequestController {
    */
   async reEncryptPrivateKeyPasswordForUser(organizationPrivateGpgkey, accountRecoveryRequestId) {
     const organizationPrivateKeyDecrypted = await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(organizationPrivateGpgkey);
-    const accountRecoveryRequestEntity = await this.accountRecoveryModel.findRequestById(accountRecoveryRequestId);
+    const findRequestContains = {account_recovery_private_key_passwords: true};
+    const accountRecoveryRequestEntity = await this.accountRecoveryModel.findRequestById(accountRecoveryRequestId, findRequestContains);
     const accountRecoveryPrivateKeyPassword = accountRecoveryRequestEntity.accountRecoveryPrivateKeyPasswords.filterByForeignModel(AccountRecoveryPrivateKeyPasswordEntity.FOREIGN_MODEL_ORGANIZATION_KEY);
     if (!accountRecoveryPrivateKeyPassword) {
       throw new Error("No account recovery private key password found.");

@@ -46,7 +46,12 @@ describe("AccountRecoveryReviewUserRequestController", () => {
       const accountRecoveryRequestId = uuidv4();
 
       // Mock API get account recovery request.
-      fetch.doMockOnce(() => mockApiResponse(defaultAccountRecoveryRequestDto({id: accountRecoveryRequestId})));
+      fetch.doMockOnce(req => {
+        const queryString = (new URL(req.url)).search;
+        const params = new URLSearchParams(queryString);
+        expect(params.get("contain[account_recovery_private_key_passwords]")).toBeTruthy();
+        return mockApiResponse(defaultAccountRecoveryRequestDto({id: accountRecoveryRequestId}));
+      });
       // Mock API save account recovery response, return the request payload for assertion.
       fetch.doMockOnce(async req => mockApiResponse(JSON.parse(await req.text())));
 
@@ -57,7 +62,7 @@ describe("AccountRecoveryReviewUserRequestController", () => {
       };
       const savedAccountRecoveryResponseEntity = await controller.exec(accountRecoveryResponseDto, privateKeyDto);
 
-      expect.assertions(2);
+      expect.assertions(3);
       expect(savedAccountRecoveryResponseEntity.status).toEqual("approved");
       const expectedDecryptedPrivateKeyPasswordData = "3f28361aa774a5767fbe70ecd09b2fbbf1d5b4b493fe171089436bfa6a2eb03fe630fa9f2483c59b68e20616f1a7597ff8d058a6f79d228a4181d71a61f80d98";
       const decryptedAccountRecoveryRequestPrivateKey = await DecryptPrivateKeyService.decrypt(pgpKeys.account_recovery_request.private, pgpKeys.account_recovery_request.passphrase);
@@ -115,7 +120,12 @@ describe("AccountRecoveryReviewUserRequestController", () => {
       const accountRecoveryRequestId = uuidv4();
 
       // Mock API get account recovery request with empty account recovery key passwords.
-      fetch.doMockOnce(() => mockApiResponse(defaultAccountRecoveryRequestDto({id: accountRecoveryRequestId, account_recovery_private_key_passwords: []})));
+      fetch.doMockOnce(req => {
+        const queryString = (new URL(req.url)).search;
+        const params = new URLSearchParams(queryString);
+        expect(params.get("contain[account_recovery_private_key_passwords]")).toBeTruthy();
+        return mockApiResponse(defaultAccountRecoveryRequestDto({id: accountRecoveryRequestId, account_recovery_private_key_passwords: []}));
+      });
 
       const accountRecoveryResponseDto = createAcceptedAccountRecoveryResponseDto({account_recovery_request_id: accountRecoveryRequestId});
       const privateKeyDto = {
@@ -124,7 +134,7 @@ describe("AccountRecoveryReviewUserRequestController", () => {
       };
       const result = controller.exec(accountRecoveryResponseDto, privateKeyDto);
 
-      expect.assertions(1);
+      expect.assertions(2);
       await expect(result).rejects.toThrowError("No account recovery private key password found.");
     });
   });

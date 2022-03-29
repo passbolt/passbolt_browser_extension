@@ -43,7 +43,7 @@ class AccountRecoveryModel {
   /**
    * Find the organization policy using Passbolt API
    *
-   * @return {AccountRecoveryOrganizationPolicyEntity|null}
+   * @return {Promise<AccountRecoveryOrganizationPolicyEntity|null>}
    */
   async findOrganizationPolicy() {
     const contains = {'creator': true, 'creator.gpgkey': true};
@@ -63,7 +63,7 @@ class AccountRecoveryModel {
    * Get user requests of an accountRecovery using Passbolt API
    *
    * @param {object} filters additional filters to supply to the find query
-   * @return {AccountRecoveryRequestsCollection}
+   * @return {Promise<AccountRecoveryRequestsCollection>}
    */
   async findUserRequests(filters) {
     const accountRecoveryRequestsCollectionDto = await this.accountRecoveryRequestService.findByUser(filters);
@@ -119,7 +119,7 @@ class AccountRecoveryModel {
   /**
    * Save the account recovery response.
    *
-   * @param {AccountRecoveryResponseEntity} accountRecoveryResponseEntity The account recovery response to save.
+   * @param {Promise<AccountRecoveryResponseEntity>} accountRecoveryResponseEntity The account recovery response to save.
    */
   async saveReview(accountRecoveryResponseEntity) {
     const accountRecoveryResponseDto = accountRecoveryResponseEntity.toDto(AccountRecoveryResponseEntity);

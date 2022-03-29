@@ -20,7 +20,6 @@ const {AccountRecoveryGenerateOrganizationKeyController} = require("../controlle
 const fileController = require('../controller/fileController');
 const {AccountRecoverySaveUserSettingsController} = require("../controller/accountRecovery/accountRecoverySaveUserSettingController");
 const {AccountRecoveryReviewRequestController} = require("../controller/accountRecovery/accountRecoveryReviewRequestController");
-const {GetKeyInfoController} = require("../controller/crypto/getKeyInfoController");
 const {AccountRecoveryGetOrganizationPolicyController} = require("../controller/accountRecovery/accountRecoveryGetOrganizationPolicyController");
 const {AccountRecoveryGetUserRequestsController} = require("../controller/accountRecovery/accountRecoveryGetUserRequestsController");
 
@@ -44,11 +43,6 @@ const listen = function(worker) {
   worker.port.on('passbolt.account-recovery.validate-organization-key', async(requestId, newAccountRecoveryOrganizationPublicKeyDto, currentAccountRecoveryOrganizationPublicKeyDto) => {
     const controller = new AccountRecoveryValidatePublicKeyController(worker, requestId);
     await controller.exec(newAccountRecoveryOrganizationPublicKeyDto, currentAccountRecoveryOrganizationPublicKeyDto);
-  });
-
-  worker.port.on('passbolt.account-recovery.get-organization-key-info', async(requestId, armoredKey) => {
-    const controller = new GetKeyInfoController(worker, requestId);
-    await controller._exec(armoredKey);
   });
 
   worker.port.on('passbolt.account-recovery.generate-organization-key', async(requestId, generateGpgKeyDto) => {

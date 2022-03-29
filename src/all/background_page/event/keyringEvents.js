@@ -11,6 +11,7 @@ const keyring = new Keyring();
 const passphraseController = require('../controller/passphrase/passphraseController');
 const fileController = require('../controller/fileController');
 const {GetUserKeyInfoController} = require('../controller/crypto/getUserKeyInfoController');
+const {GetKeyInfoController} = require('../controller/crypto/getKeyInfoController');
 const {CheckPassphraseController} = require('../controller/crypto/checkPassphraseController');
 const {DownloadUserPublicKeyController} = require('../controller/crypto/downloadUserPublicKeyController');
 
@@ -31,6 +32,18 @@ const listen = function(worker) {
   worker.port.on('passbolt.keyring.get-public-key-info-by-user', async(requestId, userId) => {
     const controller = new GetUserKeyInfoController(worker, requestId);
     await controller._exec(userId);
+  });
+
+  /**
+   * Get information from the given armored key.
+   *
+   * @listens passbolt.keyring.get-key-info
+   * @param {uuid} requestId The request identifier
+   * @param {string} armoredKey The armored key to get info from
+   */
+  worker.port.on('passbolt.keyring.get-key-info', async(requestId, armoredKey) => {
+    const controller = new GetKeyInfoController(worker, requestId);
+    await controller._exec(armoredKey);
   });
 
   /*

@@ -23,6 +23,7 @@ const {AccountRecoveryReviewRequestController} = require("../controller/accountR
 const {GetKeyInfoController} = require("../controller/crypto/getKeyInfoController");
 const {AccountRecoveryGetOrganizationPolicyController} = require("../controller/accountRecovery/accountRecoveryGetOrganizationPolicyController");
 const {AccountRecoveryGetUserRequestsController} = require("../controller/accountRecovery/accountRecoveryGetUserRequestsController");
+const {AccountRecoveryGetRequestController} = require("../controller/accountRecovery/accountRecoveryGetRequestController");
 
 /**
  * Listens the account recovery events
@@ -73,11 +74,16 @@ const listen = function(worker) {
     return await controller._exec(accountRecoveryOrganizationPrivateKeyDto);
   });
 
-  /** Whenever the account recovery user requests needs to be get */
   worker.port.on('passbolt.account-recovery.get-user-requests', async(requestId, userId) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AccountRecoveryGetUserRequestsController(worker, requestId, apiClientOptions);
     await controller._exec(userId);
+  });
+
+  worker.port.on('passbolt.account-recovery.get-request', async(requestId, accountRecoveryRequestId) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new AccountRecoveryGetRequestController(worker, requestId, apiClientOptions);
+    await controller._exec(accountRecoveryRequestId);
   });
 
   worker.port.on('passbolt.account-recovery.save-user-settings', async(requestId, accountRecoveryUserSettingDto) => {

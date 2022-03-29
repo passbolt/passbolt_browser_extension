@@ -71,12 +71,14 @@ class AccountRecoveryModel {
   }
 
   /**
-   * Get request by id of an accountRecovery using Passbolt API
+   * Find account recovery request by id.
    *
+   * @param {string} id The request id
+   * @param {Object} [contains] optional example: {creator: true, creator.gpgkey: true}
    * @return {AccountRecoveryRequestEntity}
    */
-  async findRequestById(id) {
-    const accountRecoveryRequestDto = await this.accountRecoveryRequestService.findById(id);
+  async findRequestById(id, contains = {}) {
+    const accountRecoveryRequestDto = await this.accountRecoveryRequestService.findById(id, contains);
     return new AccountRecoveryRequestEntity(accountRecoveryRequestDto);
   }
 

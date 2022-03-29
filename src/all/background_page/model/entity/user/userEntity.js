@@ -58,9 +58,9 @@ class UserEntity extends Entity {
       this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting);
       delete this._props.account_recovery_user_setting;
     }
-    if (this._props.pending_account_recovery_user_request) {
-      this._pending_account_recovery_user_request = new AccountRecoveryRequestEntity(this._props.pending_account_recovery_user_request);
-      delete this._props.pending_account_recovery_user_request;
+    if (this._props.pending_account_recovery_request) {
+      this._pending_account_recovery_request = new AccountRecoveryRequestEntity(this._props.pending_account_recovery_request);
+      delete this._props.pending_account_recovery_request;
     }
   }
 
@@ -131,7 +131,7 @@ class UserEntity extends Entity {
         "gpgkey": GpgkeyEntity.getSchema(),
         "groups_users": GroupsUsersCollection.getSchema(),
         "account_recovery_user_setting": AccountRecoveryUserSettingEntity.getSchema(),
-        "pending_account_recovery_user_request": AccountRecoveryRequestEntity.getSchema()
+        "pending_account_recovery_request": AccountRecoveryRequestEntity.getSchema()
       }
     };
   }
@@ -207,8 +207,8 @@ class UserEntity extends Entity {
     if (this.accountRecoveryUserSetting && contain.account_recovery_user_setting) {
       result.account_recovery_user_setting = this.accountRecoveryUserSetting.toDto();
     }
-    if (this.pendingAccountRecoveryUserRequest && contain.pending_account_recovery_user_request) {
-      result.pending_account_recovery_user_request = this.pendingAccountRecoveryUserRequest.toDto(AccountRecoveryRequestEntity.ALL_CONTAIN_OPTIONS);
+    if (this.pendingAccountRecoveryUserRequest && contain.pending_account_recovery_request) {
+      result.pending_account_recovery_request = this.pendingAccountRecoveryUserRequest.toDto(AccountRecoveryRequestEntity.ALL_CONTAIN_OPTIONS);
     }
     return result;
   }
@@ -328,7 +328,7 @@ class UserEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {profile: ProfileEntity.ALL_CONTAIN_OPTIONS, role: true, gpgkey: true, groups_users: true, account_recovery_user_setting: true, pending_account_recovery_user_request: true};
+    return {profile: ProfileEntity.ALL_CONTAIN_OPTIONS, role: true, gpgkey: true, groups_users: true, account_recovery_user_setting: true, pending_account_recovery_request: true};
   }
 
   /*
@@ -394,7 +394,7 @@ class UserEntity extends Entity {
    * @returns {AccountRecoveryRequestEntity|null} pending account recovery request
    */
   get pendingAccountRecoveryUserRequest() {
-    return this._pending_account_recovery_user_request || null;
+    return this._pending_account_recovery_request || null;
   }
 }
 

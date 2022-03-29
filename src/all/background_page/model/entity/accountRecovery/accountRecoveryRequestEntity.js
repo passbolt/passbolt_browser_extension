@@ -14,6 +14,9 @@
 const {Entity} = require("../abstract/entity");
 const {EntitySchema} = require("../abstract/entitySchema");
 const {AccountRecoveryPrivateKeyPasswordsCollection} = require("./accountRecoveryPrivateKeyPasswordsCollection");
+const {RoleEntity} = require("../role/roleEntity");
+const {ProfileEntity} = require("../profile/profileEntity");
+const {GpgkeyEntity} = require("../gpgkey/gpgkeyEntity");
 
 const ENTITY_NAME = "AccountRecoveryRequest";
 const FINGERPRINT_LENGTH = 40;
@@ -52,11 +55,7 @@ class AccountRecoveryRequestEntity extends Entity {
       "type": "object",
       "required": [
         "id",
-        "status",
-        "created",
-        "created_by",
-        "modified",
-        "modified_by"
+        "status"
       ],
       "properties": {
         "id": {
@@ -99,7 +98,41 @@ class AccountRecoveryRequestEntity extends Entity {
           "format": "uuid"
         },
         // Associated models
-        "account_recovery_private_key_passwords": AccountRecoveryPrivateKeyPasswordsCollection.getSchema()
+        "account_recovery_private_key_passwords": AccountRecoveryPrivateKeyPasswordsCollection.getSchema(),
+        "creator": AccountRecoveryRequestEntity.getUserEntitySchema()
+      }
+    };
+  }
+
+  /**
+   * Get the user entity schema.
+   * @todo Handle schema definition cyclic dependency.
+   * @returns {Object}
+   */
+  static getUserEntitySchema() {
+    return {
+      "type": "object",
+      "required": [
+        "username",
+        // "role_id",
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "role_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "username": {
+          "type": "string",
+          "format": "email"
+        },
+        // Associated models
+        "role": RoleEntity.getSchema(),
+        "profile": ProfileEntity.getSchema(),
+        "gpgkey": GpgkeyEntity.getSchema(),
       }
     };
   }

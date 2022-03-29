@@ -45,6 +45,7 @@ class AccountRecoveryRequestService extends AbstractService {
     return [
       "creator",
       "creator.gpgkey",
+      'account_recovery_private_key_passwords',
     ];
   }
 
@@ -63,7 +64,7 @@ class AccountRecoveryRequestService extends AbstractService {
    * Find the requests of account recovery by user
    *
    * @param {string} id The request Id
-   * @param {Object} [contains] optional example: {creator: true, creator.gpgkey: true}
+   * @param {Object} [contains] Additionnal information to retrieve along with the request. i.e. {creator: true, creator.gpgkey: true}
    * @returns {Promise<*>} response body
    * @throws {Error} if options are invalid or API error
    * @public

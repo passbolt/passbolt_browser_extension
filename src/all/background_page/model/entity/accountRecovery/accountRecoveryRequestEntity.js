@@ -13,10 +13,10 @@
  */
 const {Entity} = require("../abstract/entity");
 const {EntitySchema} = require("../abstract/entitySchema");
-const {AccountRecoveryPrivateKeyPasswordsCollection} = require("./accountRecoveryPrivateKeyPasswordsCollection");
 const {RoleEntity} = require("../role/roleEntity");
 const {ProfileEntity} = require("../profile/profileEntity");
 const {GpgkeyEntity} = require("../gpgkey/gpgkeyEntity");
+const {AccountRecoveryPrivateKeyEntity} = require("./accountRecoveryPrivateKeyEntity");
 
 const ENTITY_NAME = "AccountRecoveryRequest";
 const FINGERPRINT_LENGTH = 40;
@@ -40,9 +40,9 @@ class AccountRecoveryRequestEntity extends Entity {
     ));
 
     // Associations
-    if (this._props.account_recovery_private_key_passwords) {
-      this._account_recovery_private_key_passwords = new AccountRecoveryPrivateKeyPasswordsCollection(this._props.account_recovery_private_key_passwords);
-      delete this._props.account_recovery_private_key_passwords;
+    if (this._props.account_recovery_private_key) {
+      this._account_recovery_private_key = new AccountRecoveryPrivateKeyEntity(this._props.account_recovery_private_key);
+      delete this._props.account_recovery_private_key;
     }
   }
 
@@ -98,7 +98,7 @@ class AccountRecoveryRequestEntity extends Entity {
           "format": "uuid"
         },
         // Associated models
-        "account_recovery_private_key_passwords": AccountRecoveryPrivateKeyPasswordsCollection.getSchema(),
+        "account_recovery_private_key": AccountRecoveryPrivateKeyEntity.getSchema(),
         "creator": AccountRecoveryRequestEntity.getUserEntitySchema()
       }
     };
@@ -142,24 +142,6 @@ class AccountRecoveryRequestEntity extends Entity {
    * Sanitization
    * ==================================================
    */
-  /**
-   * Sanitize account recovery request dto:
-   * - Remove account recovery request which don't validate if any.
-   *
-   * @param {object} dto the account recovery request dto
-   * @returns {object}
-   */
-  static sanitizeDto(dto) {
-    if (typeof dto !== "object") {
-      return dto;
-    }
-
-    if (Object.prototype.hasOwnProperty.call(dto, 'account_recovery_private_key_passwords')) {
-      dto.account_recovery_private_key_passwords = AccountRecoveryPrivateKeyPasswordsCollection.sanitizeDto(dto.account_recovery_private_key_passwords);
-    }
-
-    return dto;
-  }
 
   /*
    * ==================================================
@@ -176,8 +158,8 @@ class AccountRecoveryRequestEntity extends Entity {
     if (!contain) {
       return result;
     }
-    if (this.accountRecoveryPrivateKeyPasswords && contain.account_recovery_private_key_passwords) {
-      result.account_recovery_private_key_passwords = this.accountRecoveryPrivateKeyPasswords.toDto();
+    if (this.accountRecoveryPrivateKey && contain.account_recovery_private_key) {
+      result.account_recovery_private_key = this.accountRecoveryPrivateKey.toDto(AccountRecoveryPrivateKeyEntity.ALL_CONTAIN_OPTIONS);
     }
     return result;
   }
@@ -224,7 +206,7 @@ class AccountRecoveryRequestEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {account_recovery_private_key_passwords: true};
+    return {account_recovery_private_key: true};
   }
 
   /*
@@ -246,11 +228,11 @@ class AccountRecoveryRequestEntity extends Entity {
    * ==================================================
    */
   /**
-   * Get the account recovery private key passwords
-   * @returns {AccountRecoveryPrivateKeyPasswordsCollection || null} account_recovery_private_key_passwords
+   * Get the account recovery private key
+   * @returns {AccountRecoveryPrivateKeyEntity || null} account_recovery_private_key
    */
-  get accountRecoveryPrivateKeyPasswords() {
-    return this._account_recovery_private_key_passwords || null;
+  get accountRecoveryPrivateKey() {
+    return this._account_recovery_private_key || null;
   }
 }
 

@@ -48,12 +48,14 @@ describe("AccountRecoveryRequest entity", () => {
       "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856"
     };
     const entity = new AccountRecoveryRequestEntity(dto);
+    expect.assertions(5);
     expect(entity.toDto()).toEqual(filtered);
-    expect(entity.accountRecoveryPrivateKeyPasswords).not.toBe(null);
-    expect(entity.accountRecoveryPrivateKeyPasswords.length).toEqual(1);
+    expect(entity.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords).toBeTruthy();
+    expect(entity.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords.length).toEqual(1);
 
-    const dtoWithContain = entity.toDto({account_recovery_private_key_passwords: true});
-    expect(dtoWithContain.account_recovery_private_key_passwords[0].recipient_foreign_key).toEqual('10801423-4151-42a4-99d1-86e66145a08c');
+    const dtoWithContain = entity.toDto({account_recovery_private_key: true});
+    expect(dtoWithContain.account_recovery_private_key.account_recovery_private_key_passwords.length).toBe(1);
+    expect(dtoWithContain.account_recovery_private_key.account_recovery_private_key_passwords[0].recipient_foreign_key).toEqual('10801423-4151-42a4-99d1-86e66145a08c');
   });
 
   it("constructor returns validation error if dto required fields are missing", () => {
@@ -68,4 +70,3 @@ describe("AccountRecoveryRequest entity", () => {
     }
   });
 });
-

@@ -50,11 +50,11 @@ describe("SetupSetAccountRecoveryUserSettingController", () => {
       await controller.exec(accountRecoveryUserSettingDto);
 
       expect.assertions(5);
-      await expect(setupEntity.accountRecoveryUserSetting).toBeInstanceOf(AccountRecoveryUserSettingEntity);
-      await expect(setupEntity.accountRecoveryUserSetting.status).toEqual(AccountRecoveryUserSettingEntity.STATUS_APPROVED);
-      await expect(setupEntity.accountRecoveryUserSetting.accountRecoveryPrivateKey).not.toBeUndefined();
-      await expect(setupEntity.accountRecoveryUserSetting.accountRecoveryPrivateKeyPasswords).not.toBeUndefined();
-      await expect(setupEntity.accountRecoveryUserSetting.accountRecoveryPrivateKeyPasswords).toHaveLength(1);
+      expect(setupEntity.accountRecoveryUserSetting).toBeInstanceOf(AccountRecoveryUserSettingEntity);
+      expect(setupEntity.accountRecoveryUserSetting.status).toEqual(AccountRecoveryUserSettingEntity.STATUS_APPROVED);
+      expect(setupEntity.accountRecoveryUserSetting.accountRecoveryPrivateKey).not.toBeUndefined();
+      expect(setupEntity.accountRecoveryUserSetting.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords).not.toBeUndefined();
+      expect(setupEntity.accountRecoveryUserSetting.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords).toHaveLength(1);
     });
   });
 });

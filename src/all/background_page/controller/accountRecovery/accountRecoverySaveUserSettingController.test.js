@@ -69,8 +69,8 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       expect(savedAccountRecoveryUserSetting).toBeInstanceOf(AccountRecoveryUserSettingEntity);
       expect(savedAccountRecoveryUserSetting.status).toEqual(AccountRecoveryUserSettingEntity.STATUS_APPROVED);
       expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKey).not.toBeUndefined();
-      expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKeyPasswords).not.toBeUndefined();
-      expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKeyPasswords).toHaveLength(1);
+      expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords).not.toBeUndefined();
+      expect(savedAccountRecoveryUserSetting.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords).toHaveLength(1);
     });
 
     it("Should throw an error if no account recovery organization policy is found.", async() => {

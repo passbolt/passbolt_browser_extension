@@ -18,6 +18,7 @@ import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {AccountRecoveryGetUserRequestsController} from "./accountRecoveryGetUserRequestsController";
 import {defaultAccountRecoveryRequestDto} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+import {AccountRecoveryRequestEntity} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -46,7 +47,7 @@ describe("AccountRecoveryGetUserRequestsController", () => {
       expect.assertions(3);
       const items = accountRecoveryRequests.items;
       expect(items).toHaveLength(2);
-      const accountRecoveryOrganizationPolicyDto = accountRecoveryRequests.toDto();
+      const accountRecoveryOrganizationPolicyDto = accountRecoveryRequests.toDto(AccountRecoveryRequestEntity.ALL_CONTAIN_OPTIONS);
       expect(accountRecoveryOrganizationPolicyDto).toEqual(mockApiResult);
     });
 

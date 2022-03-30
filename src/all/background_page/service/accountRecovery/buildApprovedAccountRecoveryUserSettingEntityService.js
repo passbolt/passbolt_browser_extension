@@ -43,11 +43,12 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
     const accountRecoveryPrivateKeyDto = await this._encryptPrivateKey(symmetricSecret, decryptedPrivateOpenpgpKey);
     const accountRecoveryPrivateKeyPasswordForOrganizationDto = await this._encryptPrivateKeyPasswordsForOrganizationKey(symmetricSecret, organizationPolicy, decryptedPrivateOpenpgpKey);
 
+    accountRecoveryPrivateKeyDto.account_recovery_private_key_passwords = [accountRecoveryPrivateKeyPasswordForOrganizationDto];
+
     const userSettingDto = {
       user_id: userId,
       status: AccountRecoveryUserSettingEntity.STATUS_APPROVED,
-      account_recovery_private_key: accountRecoveryPrivateKeyDto,
-      account_recovery_private_key_passwords: [accountRecoveryPrivateKeyPasswordForOrganizationDto]
+      account_recovery_private_key: accountRecoveryPrivateKeyDto
     };
 
     return new AccountRecoveryUserSettingEntity(userSettingDto);

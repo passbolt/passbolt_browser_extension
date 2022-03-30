@@ -13,22 +13,36 @@
  */
 
 import {v4 as uuidv4} from "uuid";
-import {defaultAccountRecoveryPrivateKeyPasswordDto} from "./accountRecoveryPrivateKeyPasswordEntity.test.data";
+import {defaultAccountRecoveryPrivateKeyDto} from "./accountRecoveryPrivateKeyEntity.test.data";
 import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
 
 export const defaultAccountRecoveryRequestDto = (data = {}) => {
   const defaultData = {
-    "id": uuidv4(),
-    "armored_key": pgpKeys.account_recovery_request.public,
-    "fingerprint": pgpKeys.account_recovery_request.fingerprint,
-    "status": "pending",
-    "created": "2020-05-04T20:31:45+00:00",
-    "modified": "2020-05-04T20:31:45+00:00",
-    "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-    "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-    "account_recovery_private_key_passwords": [
-      defaultAccountRecoveryPrivateKeyPasswordDto()
-    ]
+    id: uuidv4(),
+    armored_key: pgpKeys.account_recovery_request.public,
+    fingerprint: pgpKeys.account_recovery_request.fingerprint,
+    status: "pending",
+    created: "2020-05-04T20:31:45+00:00",
+    modified: "2020-05-04T20:31:45+00:00",
+    created_by: "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+    modified_by: "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+    account_recovery_private_key: defaultAccountRecoveryPrivateKeyDto()
+  };
+
+  return Object.assign(defaultData, data || {});
+};
+
+export const accountRecoveryRequestWithoutPrivateKeyPasswordDto = (data = {}) => {
+  const defaultData = {
+    id: uuidv4(),
+    armored_key: pgpKeys.account_recovery_request.public,
+    fingerprint: pgpKeys.account_recovery_request.fingerprint,
+    status: "pending",
+    created: "2020-05-04T20:31:45+00:00",
+    modified: "2020-05-04T20:31:45+00:00",
+    created_by: "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+    modified_by: "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+    account_recovery_private_key: defaultAccountRecoveryPrivateKeyDto({account_recovery_private_key_passwords: []})
   };
 
   return Object.assign(defaultData, data || {});

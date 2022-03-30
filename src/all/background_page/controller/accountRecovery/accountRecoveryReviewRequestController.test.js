@@ -23,10 +23,13 @@ import {InvalidMasterPasswordError} from "../../error/invalidMasterPasswordError
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
 import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
-import {defaultAccountRecoveryRequestDto} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+import {
+  defaultAccountRecoveryRequestDto,
+  accountRecoveryRequestWithoutPrivateKeyPasswordDto,
+} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import {
   createAcceptedAccountRecoveryResponseDto,
-  createRejectedAccountRecoveryResponseDto
+  createRejectedAccountRecoveryResponseDto,
 } from "../../model/entity/accountRecovery/accountRecoveryResponseEntity.test.data";
 
 jest.mock("../passphrase/passphraseController.js", () => ({
@@ -124,7 +127,7 @@ describe("AccountRecoveryReviewUserRequestController", () => {
         const queryString = (new URL(req.url)).search;
         const params = new URLSearchParams(queryString);
         expect(params.get("contain[account_recovery_private_key_passwords]")).toBeTruthy();
-        return mockApiResponse(defaultAccountRecoveryRequestDto({id: accountRecoveryRequestId, account_recovery_private_key_passwords: []}));
+        return mockApiResponse(accountRecoveryRequestWithoutPrivateKeyPasswordDto({id: accountRecoveryRequestId}));
       });
 
       const accountRecoveryResponseDto = createAcceptedAccountRecoveryResponseDto({account_recovery_request_id: accountRecoveryRequestId});

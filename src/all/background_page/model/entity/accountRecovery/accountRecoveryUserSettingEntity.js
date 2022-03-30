@@ -14,7 +14,6 @@
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
 const {AccountRecoveryPrivateKeyEntity} = require("./accountRecoveryPrivateKeyEntity");
-const {AccountRecoveryPrivateKeyPasswordsCollection} = require("./accountRecoveryPrivateKeyPasswordsCollection");
 
 const ENTITY_NAME = 'AccountRecoveryUserSetting';
 const STATUS_APPROVED = 'approved';
@@ -37,10 +36,6 @@ class AccountRecoveryUserSettingEntity extends Entity {
     if (this._props.account_recovery_private_key) {
       this._account_recovery_private_key = new AccountRecoveryPrivateKeyEntity(this._props.account_recovery_private_key);
       delete this._props.account_recovery_private_key;
-    }
-    if (this._props.account_recovery_private_key_passwords) {
-      this._account_recovery_private_key_passwords = new AccountRecoveryPrivateKeyPasswordsCollection(this._props.account_recovery_private_key_passwords);
-      delete this._props._account_recovery_private_key_passwords;
     }
   }
 
@@ -87,7 +82,6 @@ class AccountRecoveryUserSettingEntity extends Entity {
           "format": "uuid"
         },
         "account_recovery_private_key": AccountRecoveryPrivateKeyEntity.getSchema(),
-        "account_recovery_private_key_passwords": AccountRecoveryPrivateKeyPasswordsCollection.getSchema()
       }
     };
   }
@@ -106,12 +100,8 @@ class AccountRecoveryUserSettingEntity extends Entity {
   toDto(contain) {
     const result = Object.assign({}, this._props);
     if (this._account_recovery_private_key && contain?.account_recovery_private_key) {
-      result.account_recovery_private_key = this._account_recovery_private_key.toDto();
+      result.account_recovery_private_key = this._account_recovery_private_key.toDto(AccountRecoveryPrivateKeyEntity.ALL_CONTAIN_OPTIONS);
     }
-    if (this._account_recovery_private_key_passwords && contain?.account_recovery_private_key_passwords) {
-      result.account_recovery_private_key_passwords = this._account_recovery_private_key_passwords.toDto();
-    }
-
     return result;
   }
 
@@ -162,14 +152,6 @@ class AccountRecoveryUserSettingEntity extends Entity {
     return this._account_recovery_private_key || null;
   }
 
-  /**
-   * Get the user account recovery private key passwords
-   * @returns {(AccountRecoveryPrivateKeyPasswordsCollection|null)}
-   */
-  get accountRecoveryPrivateKeyPasswords() {
-    return this._account_recovery_private_key_passwords || null;
-  }
-
   /*
    * ==================================================
    * Static properties getters
@@ -188,7 +170,9 @@ class AccountRecoveryUserSettingEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {account_recovery_private_key: true, account_recovery_private_key_passwords: true};
+    return {
+      account_recovery_private_key: true,
+    };
   }
 
   /**

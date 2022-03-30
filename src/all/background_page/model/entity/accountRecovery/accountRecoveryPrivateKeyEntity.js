@@ -13,6 +13,7 @@
  */
 const {Entity} = require('../abstract/entity');
 const {EntitySchema} = require('../abstract/entitySchema');
+const {AccountRecoveryPrivateKeyPasswordsCollection} = require('./accountRecoveryPrivateKeyPasswordsCollection');
 
 const ENTITY_NAME = "AccountRecoveryPrivateKey";
 
@@ -32,6 +33,13 @@ class AccountRecoveryPrivateKeyEntity extends Entity {
       accountRecoveryPrivateKeyDto,
       AccountRecoveryPrivateKeyEntity.getSchema()
     ));
+
+    // Associations
+    if (this._props.account_recovery_private_key_passwords) {
+      const sanitizedCollection = AccountRecoveryPrivateKeyPasswordsCollection.sanitizeDto(this._props.account_recovery_private_key_passwords);
+      this._account_recovery_private_key_passwords = new AccountRecoveryPrivateKeyPasswordsCollection(sanitizedCollection);
+      delete this._props.account_recovery_private_key_passwords;
+    }
   }
 
   /**
@@ -41,9 +49,7 @@ class AccountRecoveryPrivateKeyEntity extends Entity {
   static getSchema() {
     return {
       "type": "object",
-      "required": [
-        "data"
-      ],
+      "required": [],
       "properties": {
         "id": {
           "type": "string",
@@ -71,7 +77,8 @@ class AccountRecoveryPrivateKeyEntity extends Entity {
         "modified_by": {
           "type": "string",
           "format": "uuid"
-        }
+        },
+        "account_recovery_private_key_passwords": AccountRecoveryPrivateKeyPasswordsCollection.getSchema(),
       }
     };
   }
@@ -83,10 +90,18 @@ class AccountRecoveryPrivateKeyEntity extends Entity {
    */
   /**
    * Return a DTO ready to be sent to API or content code
+   *
+   * @param {object} [contain] optional
    * @returns {object}
    */
-  toDto() {
+  toDto(contain) {
     const result = Object.assign({}, this._props);
+    if (!contain) {
+      return result;
+    }
+    if (this._account_recovery_private_key_passwords && contain.account_recovery_private_key_passwords) {
+      result.account_recovery_private_key_passwords = this._account_recovery_private_key_passwords.toDto();
+    }
     return result;
   }
 
@@ -95,7 +110,7 @@ class AccountRecoveryPrivateKeyEntity extends Entity {
    * @returns {*}
    */
   toJSON() {
-    return this.toDto();
+    return this.toDto(AccountRecoveryPrivateKeyEntity.ALL_CONTAIN_OPTIONS);
   }
 
   /*
@@ -106,10 +121,18 @@ class AccountRecoveryPrivateKeyEntity extends Entity {
 
   /**
    * Get data
-   * @returns {string} armored pgp message
+   * @returns {string|null} armored pgp message
    */
   get data() {
-    return this._props.data;
+    return this._props.data || null;
+  }
+
+  /**
+   * Get the associated account recovery private key passwords
+   * @returns {AccountRecoveryPrivateKeyPasswordsCollection|null}
+   */
+  get accountRecoveryPrivateKeyPasswords() {
+    return this._account_recovery_private_key_passwords || null;
   }
 
   /*
@@ -123,6 +146,16 @@ class AccountRecoveryPrivateKeyEntity extends Entity {
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
+  }
+
+  /**
+   * AccountRecoveryPrivateKeyEntity.ALL_CONTAIN_OPTIONS
+   * @returns {object} all contain options that can be used in toDto()
+   */
+  static get ALL_CONTAIN_OPTIONS() {
+    return {
+      account_recovery_private_key_passwords: true,
+    };
   }
 }
 

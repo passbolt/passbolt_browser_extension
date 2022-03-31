@@ -19,6 +19,7 @@ const {RecoverInitiateAccountRecoveryRequestController} = require("../controller
 const {RecoverGenerateAccountRecoveryRequestKeyController} = require("../controller/recover/recoverGenerateAccountRecoveryRequestKeyController");
 const {VerifyPassphraseSetupController} = require("../controller/setup/verifyPassphraseSetupController");
 const {ImportPrivateKeyRecoverController} = require('../controller/recover/importPrivateKeyRecoverController');
+const {GetKeyInfoController} = require("../controller/crypto/getKeyInfoController");
 
 const listen = (worker, apiClientOptions) => {
   const recoverController = new RecoverController(worker, apiClientOptions, worker.tab.url);
@@ -192,6 +193,18 @@ const listen = (worker, apiClientOptions) => {
   worker.port.on('passbolt.recover.initiate-account-recovery-request', async requestId => {
     const controller = new RecoverInitiateAccountRecoveryRequestController(worker, apiClientOptions, requestId, recoverController.setupEntity);
     await controller._exec();
+  });
+
+  /**
+   * Get information from the given armored key.
+   *
+   * @listens passbolt.keyring.get-key-info
+   * @param {uuid} requestId The request identifier
+   * @param {string} armoredKey The armored key to get info from
+   */
+  worker.port.on('passbolt.keyring.get-key-info', async(requestId, armoredKey) => {
+    const controller = new GetKeyInfoController(worker, requestId);
+    await controller._exec(armoredKey);
   });
 };
 exports.listen = listen;

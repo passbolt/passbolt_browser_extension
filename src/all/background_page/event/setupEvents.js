@@ -20,6 +20,7 @@ const {VerifyPassphraseSetupController} = require("../controller/setup/verifyPas
 const {GenerateKeyPairSetupController} = require("../controller/setup/generateKeyPairSetupController");
 const {SetupSetAccountRecoveryUserSettingController} = require("../controller/setup/setupSetAccountRecoveryUserSettingController");
 const {ImportPrivateKeySetupController} = require("../controller/setup/importPrivateKeySetupController");
+const {GetKeyInfoController} = require("../controller/crypto/getKeyInfoController");
 
 const listen = function(worker) {
   /**
@@ -232,6 +233,18 @@ const listen = function(worker) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
+  });
+
+  /**
+   * Get information from the given armored key.
+   *
+   * @listens passbolt.keyring.get-key-info
+   * @param {uuid} requestId The request identifier
+   * @param {string} armoredKey The armored key to get info from
+   */
+  worker.port.on('passbolt.keyring.get-key-info', async(requestId, armoredKey) => {
+    const controller = new GetKeyInfoController(worker, requestId);
+    await controller._exec(armoredKey);
   });
 };
 exports.listen = listen;

@@ -46,6 +46,7 @@ class AccountRecoveryRequestService extends AbstractService {
       "creator",
       "creator.gpgkey",
       'account_recovery_private_key_passwords',
+      "armored_key",
     ];
   }
 

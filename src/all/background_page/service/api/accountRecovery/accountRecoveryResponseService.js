@@ -42,11 +42,6 @@ class AccountRecoveryResponseService extends AbstractService {
    * @returns {Promise<*>}
    */
   async saveReview(accountRecoveryResponseDto) {
-    // @todo @debug @mock for account-recovery
-    if (typeof jest === 'undefined') {
-      return accountRecoveryResponseDto;
-    }
-
     const response = await this.apiClient.create(accountRecoveryResponseDto);
     return response.body;
   }

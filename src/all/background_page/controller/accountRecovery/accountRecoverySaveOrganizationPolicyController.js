@@ -13,6 +13,7 @@
  */
 const {i18n} = require('../../sdk/i18n');
 const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
+const {AccountRecoveryPrivateKeyPasswordEntity} = require("../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity");
 const {AccountRecoveryOrganizationPolicyEntity} = require("../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity");
 const {AccountRecoveryOrganizationPolicyChangeEntity} = require("../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyChangeEntity");
 const {PrivateGpgkeyEntity} = require("../../model/entity/gpgkey/privateGpgkeyEntity");
@@ -181,11 +182,13 @@ class AccountRecoverySaveOrganizationPolicyController {
     const items = accountRecoveryPrivateKeyPasswords.items;
     const encryptionKeyInfo = await GetGpgKeyInfoService.getKeyInfo(encryptionKey);
     for (let i = 0; i < items.length; i++) {
-      const encryptedKeyData = await ReEncryptMessageService.reEncrypt(items[i].data, encryptionKey, decryptionKey, decryptionKey);
+      const currentPassword = items[i];
+      const encryptedKeyData = await ReEncryptMessageService.reEncrypt(currentPassword.data, encryptionKey, decryptionKey, decryptionKey);
       const privateKeyPasswordDto = {
-        ...items[i].toDto(),
         data: encryptedKeyData,
+        private_key_id: currentPassword.privateKeyId,
         recipient_fingerprint: encryptionKeyInfo.fingerprint,
+        recipient_foreign_model: AccountRecoveryPrivateKeyPasswordEntity.FOREIGN_MODEL_ORGANIZATION_KEY,
       };
       newAccountRecoveryPrivateKeyPasswords.push(privateKeyPasswordDto);
       await this.progressService.finishStep();

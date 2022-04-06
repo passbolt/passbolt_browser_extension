@@ -21,6 +21,7 @@ export const createAccountRecoveryPrivateKeyPasswordDto = data => {
    * Clear text password: 3f28361aa774a5767fbe70ecd09b2fbbf1d5b4b493fe171089436bfa6a2eb03fe630fa9f2483c59b68e20616f1a7597ff8d058a6f79d228a4181d71a61f80d98
    */
   const defaultData = {
+    private_key_id: uuidv4(),
     recipient_foreign_model: "AccountRecoveryOrganizationKey",
     recipient_foreign_key: uuidv4(),
     recipient_fingerprint: "28FBD1034880416B2B8CA75A289BCE03F3C0893F",

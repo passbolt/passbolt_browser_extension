@@ -52,6 +52,10 @@ class AccountRecoveryPrivateKeyPasswordEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
+        "private_key_id": {
+          "type": "string",
+          "format": "uuid"
+        },
         "recipient_foreign_model": {
           "type": "string",
           "enum": [AccountRecoveryPrivateKeyPasswordEntity.FOREIGN_MODEL_ORGANIZATION_KEY]
@@ -104,6 +108,14 @@ class AccountRecoveryPrivateKeyPasswordEntity extends Entity {
    */
   get id() {
     return this._props.id || null;
+  }
+
+  /**
+   * Get the private key id
+   * @returns {(string|null)} uuid if set
+   */
+  get privateKeyId() {
+    return this._props.private_key_id || null;
   }
 
   /**

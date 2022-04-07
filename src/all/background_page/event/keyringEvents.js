@@ -5,15 +5,14 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {i18n} = require('../sdk/i18n');
 const {Keyring} = require('../model/keyring');
 const keyring = new Keyring();
 const passphraseController = require('../controller/passphrase/passphraseController');
-const fileController = require('../controller/fileController');
 const {GetUserKeyInfoController} = require('../controller/crypto/getUserKeyInfoController');
 const {GetKeyInfoController} = require('../controller/crypto/getKeyInfoController');
 const {CheckPassphraseController} = require('../controller/crypto/checkPassphraseController');
 const {DownloadUserPublicKeyController} = require('../controller/crypto/downloadUserPublicKeyController');
+const {DownloadUserPrivateKeyController} = require('../controller/crypto/downloadUserPrivateKeyController');
 
 const listen = function(worker) {
   /*
@@ -88,18 +87,8 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.keyring.download-my-private-key', async requestId => {
-    const filename = "passbolt_private.asc";
-    try {
-      await passphraseController.request(worker);
-      const privateKeyInfo = await keyring.findPrivate();
-      if (!privateKeyInfo) {
-        throw new Error(i18n.t('Private key not found.'));
-      }
-      await fileController.saveFile(filename, privateKeyInfo.armoredKey, "text/plain", worker.tab.id);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new DownloadUserPrivateKeyController(worker, requestId);
+    await controller._exec();
   });
 
   /*

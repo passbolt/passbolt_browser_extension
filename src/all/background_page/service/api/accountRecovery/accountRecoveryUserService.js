@@ -12,9 +12,8 @@
  * @since         3.6.0
  */
 const {AbstractService} = require('../abstract/abstractService');
-const {v4: uuidv4} = require("uuid");
 
-const ACCOUNT_RECOVERY_SERVICE_RESOURCE_NAME = '/account-recovery/users/settings';
+const ACCOUNT_RECOVERY_SERVICE_RESOURCE_NAME = '/account-recovery/user-settings';
 
 class AccountRecoveryUserService extends AbstractService {
   /**
@@ -47,20 +46,6 @@ class AccountRecoveryUserService extends AbstractService {
    */
   async saveUserSetting(accountRecoveryUserSettingDto) {
     this.assertNonEmptyData(accountRecoveryUserSettingDto);
-
-    if (typeof jest === "undefined") {
-      // @todo mock based on the test data that need to be written.
-      return {
-        user_id: uuidv4(),
-        status: "rejected",
-        id: uuidv4(),
-        created_by: uuidv4(),
-        modified_by: uuidv4(),
-        created: "2022-01-13T13:19:04.661Z",
-        modified: "2022-01-13T13:19:04.661Z"
-      };
-    }
-
     const response = await this.apiClient.create(accountRecoveryUserSettingDto);
     return response.body;
   }

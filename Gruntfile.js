@@ -262,7 +262,7 @@ module.exports = function (grunt) {
         }, {
           // Fonts
           cwd: path.node_modules + 'passbolt-styleguide/src/fonts',
-          src: ['opensans-bold.woff', 'opensans-regular.woff'],
+          src: ['opensans-bold.woff', 'opensans-semibold.woff', 'opensans-regular.woff'],
           dest: path.build_data + 'fonts',
           expand: true
         }, {

@@ -26,6 +26,7 @@ const {AuthStatusLocalStorage} = require('../service/local_storage/authStatusLoc
 const {EncryptMessageService} = require('../service/crypto/encryptMessageService');
 const {DecryptMessageService} = require('../service/crypto/decryptMessageService');
 const {GetGpgKeyInfoService} = require('../service/crypto/getGpgKeyInfoService');
+const {CompareGpgKeyService} = require('../service/crypto/compareGpgKeyService');
 
 const URL_VERIFY = '/auth/verify.json?api-version=v2';
 const URL_LOGIN = '/auth/login.json?api-version=v2';
@@ -123,7 +124,7 @@ class GpgAuth {
   async serverKeyChanged() {
     const remoteKey = await this.getServerKey();
     const localKey = this.getServerKeyFromKeyring().armoredKey;
-    return remoteKey.keydata.trim() !== localKey.trim();
+    return await CompareGpgKeyService.areKeysTheSame(remoteKey.keydata, localKey);
   }
 
   /**

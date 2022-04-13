@@ -36,7 +36,7 @@ class EntitySchema {
       return;
     }
     if (schema.type === 'object') {
-      if (!schema.required || !Array.isArray(schema.required) || !schema.required.length) {
+      if (!schema.required || !Array.isArray(schema.required)) {
         throw new TypeError(`Could not validate entity ${name}. Schema error: no required properties.`);
       }
       if (!schema.properties || !Object.keys(schema).length) {

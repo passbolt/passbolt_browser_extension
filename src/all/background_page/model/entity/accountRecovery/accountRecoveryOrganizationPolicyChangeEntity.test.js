@@ -23,13 +23,8 @@ import {
   rotateAccountRecoveryOrganizationPolicyKeyDto
 } from "./accountRecoveryOrganizationPolicyChangeEntity.test.data";
 
-describe("AccountRecoveryOrganizationPolicy entity", () => {
-  /**
-   * @todo @skip; the schema validation is skipped for the moment as it can't be validated.
-   * The reason is that the schema validation expect a non empty array of "required" and
-   * this entity doesn't have specific required fields defined in the schema.
-   */
-  it.skip("schema must validate", () => {
+describe("AccountRecoveryOrganizationPolicyChange entity", () => {
+  it("schema must validate", () => {
     EntitySchema.validateSchema(AccountRecoveryOrganizationPolicyChangeEntity.ENTITY_NAME, AccountRecoveryOrganizationPolicyChangeEntity.getSchema());
   });
 

@@ -30,7 +30,7 @@ describe("AccountLocalStorage", () => {
     it("Should return undefined if nothing stored in the storage", async() => {
       expect.assertions(1);
       const result = await AccountLocalStorage.get();
-      expect(result).toBeUndefined();
+      expect(result).toEqual([]);
     });
 
     it("Should return content stored in the local storage", async() => {
@@ -76,7 +76,7 @@ describe("AccountLocalStorage", () => {
       await AccountLocalStorage.add(account);
       const {accounts} = await browser.storage.local.get([AccountLocalStorage.ACCOUNTS_LOCAL_STORAGE_KEY]);
       expect(accounts).toHaveLength(1);
-      expect(accounts[0]).toEqual(account.toDto());
+      expect(accounts[0]).toEqual(account.toDto(AccountEntity.ALL_CONTAIN_OPTIONS));
     });
 
     /**
@@ -100,7 +100,7 @@ describe("AccountLocalStorage", () => {
       expect.assertions(2);
       for (let i = 0; i < sampleSize; i++) {
         const account = new AccountEntity(defaultAccountDto());
-        accountsToAdd.push(account.toDto());
+        accountsToAdd.push(account.toDto(AccountEntity.ALL_CONTAIN_OPTIONS));
         await addFn(account);
       }
       const {accounts} = await browser.storage.local.get([AccountLocalStorage.ACCOUNTS_LOCAL_STORAGE_KEY]);
@@ -117,7 +117,7 @@ describe("AccountLocalStorage", () => {
       await browser.storage.local.set({[AccountLocalStorage.ACCOUNTS_LOCAL_STORAGE_KEY]: []});
       for (let i = 0; i < sampleSize; i++) {
         const account = new AccountEntity(defaultAccountDto());
-        accountsToAdd.push(account.toDto());
+        accountsToAdd.push(account.toDto(AccountEntity.ALL_CONTAIN_OPTIONS));
         promises.push(addFn(account));
       }
 
@@ -147,7 +147,7 @@ describe("AccountLocalStorage", () => {
       expect.assertions(1);
       await AccountLocalStorage.deleteByUserIdAndType(uuidv4(), AccountEntity.TYPE_ACCOUNT);
       const {accounts} = await browser.storage.local.get([AccountLocalStorage.ACCOUNTS_LOCAL_STORAGE_KEY]);
-      expect(accounts).toBeUndefined();
+      expect(accounts).toEqual([]);
     });
 
     it("Should run against a not yet defined local storage", async() => {
@@ -156,7 +156,7 @@ describe("AccountLocalStorage", () => {
       // Not yet defined local storage
       await AccountLocalStorage.deleteByUserIdAndType(uuidv4(), AccountEntity.TYPE_ACCOUNT);
       const {accounts} = await browser.storage.local.get([AccountLocalStorage.ACCOUNTS_LOCAL_STORAGE_KEY]);
-      expect(accounts).toBeUndefined();
+      expect(accounts).toEqual([]);
     });
 
     it("Should run against an empty local storage", async() => {

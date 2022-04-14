@@ -17,6 +17,7 @@ const {RoleEntity} = require("../role/roleEntity");
 const {ProfileEntity} = require("../profile/profileEntity");
 const {GpgkeyEntity} = require("../gpgkey/gpgkeyEntity");
 const {AccountRecoveryPrivateKeyEntity} = require("./accountRecoveryPrivateKeyEntity");
+const {AccountRecoveryResponsesCollection} = require("./accountRecoveryResponsesCollection");
 
 const ENTITY_NAME = "AccountRecoveryRequest";
 const FINGERPRINT_LENGTH = 40;
@@ -43,6 +44,10 @@ class AccountRecoveryRequestEntity extends Entity {
     if (this._props.account_recovery_private_key) {
       this._account_recovery_private_key = new AccountRecoveryPrivateKeyEntity(this._props.account_recovery_private_key);
       delete this._props.account_recovery_private_key;
+    }
+    if (this._props.account_recovery_responses) {
+      this._account_recovery_responses = new AccountRecoveryResponsesCollection(this._props.account_recovery_responses);
+      delete this._props.account_recovery_responses;
     }
   }
 
@@ -99,7 +104,8 @@ class AccountRecoveryRequestEntity extends Entity {
         },
         // Associated models
         "account_recovery_private_key": AccountRecoveryPrivateKeyEntity.getSchema(),
-        "creator": AccountRecoveryRequestEntity.getUserEntitySchema()
+        "creator": AccountRecoveryRequestEntity.getUserEntitySchema(),
+        "account_recovery_responses": AccountRecoveryResponsesCollection.getSchema(),
       }
     };
   }
@@ -227,12 +233,21 @@ class AccountRecoveryRequestEntity extends Entity {
    * Associated properties getters
    * ==================================================
    */
+
   /**
    * Get the account recovery private key
    * @returns {AccountRecoveryPrivateKeyEntity || null} account_recovery_private_key
    */
   get accountRecoveryPrivateKey() {
     return this._account_recovery_private_key || null;
+  }
+
+  /**
+   * Get the account recovery responses
+   * @returns {AccountRecoveryResponsesCollection || null}
+   */
+  get accountRecoveryResponses() {
+    return this._account_recovery_responses || null;
   }
 }
 

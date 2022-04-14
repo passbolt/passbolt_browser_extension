@@ -163,7 +163,7 @@ class PageMod {
     if (typeof iframe === 'undefined') {
       iframe = false;
     }
-    this._listeners['chrome.runtime.onConnect'] =  port => {
+    this._listeners['chrome.runtime.onConnect'] = port => {
       // check if the portname match
       if (port.name === portName) {
         /*

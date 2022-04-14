@@ -10,9 +10,11 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+
 const {PageMod} = require('../sdk/page-mod');
 const app = require('../app');
-const {BuildSetupApiClientOptions} = require("../service/setup/buildApiClientOptionsService");
+const {BuildAccountRecoverService} = require("../service/recover/buildAccountRecoverService");
+const {BuildAccountApiClientOptionsService} = require("../service/account/buildApiClientOptionsService");
 
 /*
  * This pagemod help bootstrap the first step of the recover process from a passbolt server app page
@@ -38,10 +40,19 @@ Recover.init = function() {
        */
     ],
     onAttach: async function(worker) {
-      const apiClientOptions = await BuildSetupApiClientOptions.buildFromUrl(worker.tab.url);
+      let account, apiClientOptions;
+      try {
+        account = BuildAccountRecoverService.buildFromRecoverUrl(worker.tab.url);
+        apiClientOptions = await BuildAccountApiClientOptionsService.build(account);
+      } catch (error) {
+        // Unexpected error, this pagemod shouldn't have been initialized as the bootstrapRecoverPagemod should have raised an exception and not inject this iframe.
+        console.error(error);
+        return;
+      }
 
+      // @todo account-recovery-refactoring check to remove all the listener, they expose confidential services.
       app.events.config.listen(worker);
-      app.events.recover.listen(worker, apiClientOptions);
+      app.events.recover.listen(worker, apiClientOptions, account);
 
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows

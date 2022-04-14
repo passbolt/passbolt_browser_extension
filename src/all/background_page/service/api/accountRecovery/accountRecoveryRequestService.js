@@ -77,6 +77,22 @@ class AccountRecoveryRequestService extends AbstractService {
   }
 
   /**
+   * Find a request by id by authenticating the user with its authentication token.
+   * @param {string} id The request id
+   * @param {string} userId The target user id
+   * @param {string} authenticationTokenToken The authentication token
+   * @returns {Promise<Object>}
+   */
+  async findRequestByIdAndUserIdAndAuthenticationToken(id, userId, authenticationTokenToken) {
+    this.assertValidId(id);
+    this.assertValidId(userId);
+    this.assertValidId(authenticationTokenToken);
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${id}/${userId}/${authenticationTokenToken}`);
+    const response = await this.apiClient.fetchAndHandleResponse('GET', url);
+    return response.body;
+  }
+
+  /**
    * Find the requests of account recovery by user
    *
    * @param {object} filters The additional filters to provide to the API

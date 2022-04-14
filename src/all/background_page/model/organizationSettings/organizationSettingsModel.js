@@ -45,6 +45,13 @@ class OrganizationSettingsModel {
   }
 
   /**
+   * Flush the settings cache
+   */
+  static flushCache() {
+    _settings = null;
+  }
+
+  /**
    * Find the organization settings.
    * @returns {Promise<OrganizationSettingsEntity>}
    */

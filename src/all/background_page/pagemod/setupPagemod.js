@@ -10,8 +10,11 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+
 const {PageMod} = require('../sdk/page-mod');
 const app = require('../app');
+const {BuildAccountSetupService} = require("../service/setup/buildAccountSetupService");
+const {BuildAccountApiClientOptionsService} = require("../service/account/buildApiClientOptionsService");
 
 /*
  * This pagemod help bootstrap the first step of the setup process from a passbolt server app page
@@ -36,9 +39,20 @@ Setup.init = function() {
        * chrome/data/passbolt-iframe-setup.html
        */
     ],
-    onAttach: function(worker) {
+    onAttach: async function(worker) {
+      let account, apiClientOptions;
+      try {
+        account = BuildAccountSetupService.buildFromSetupUrl(worker.tab.url);
+        apiClientOptions = await BuildAccountApiClientOptionsService.build(account);
+      } catch (error) {
+        // Unexpected error, this pagemod shouldn't have been initialized as the bootstrapSetupPagemod should have raised an exception and not inject this iframe.
+        console.error(error);
+        return;
+      }
+
+      // @todo account-recovery-refactoring check to remove all the listener, they expose confidential services.
       app.events.config.listen(worker);
-      app.events.setup.listen(worker);
+      app.events.setup.listen(worker, apiClientOptions, account);
 
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows

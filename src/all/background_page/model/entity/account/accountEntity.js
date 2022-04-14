@@ -10,18 +10,16 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {Entity} = require('../abstract/entity');
+
+const {AbstractAccountEntity} = require("./abstractAccountEntity");
 const {EntitySchema} = require('../abstract/entitySchema');
-const {UserEntity} = require("../user/userEntity");
-const {SecurityTokenEntity} = require("../securityToken/securityTokenEntity");
 
 const ENTITY_NAME = "Account";
 
-// Type of accounts.
+// Type of account.
 const TYPE_ACCOUNT = "Account";
-const TYPE_ACCOUNT_RECOVERY = "Account recovery";
 
-class AccountEntity extends Entity {
+class AccountEntity extends AbstractAccountEntity {
   /**
    * Setup entity constructor
    *
@@ -29,34 +27,27 @@ class AccountEntity extends Entity {
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
   constructor(accountDto) {
-    // Default properties values
-    accountDto = Object.assign(AccountEntity.getDefault(), accountDto);
+    AccountEntity.marshal(accountDto);
 
     super(EntitySchema.validate(
       AccountEntity.ENTITY_NAME,
       accountDto,
       AccountEntity.getSchema()
     ));
-
-    // Associations
-    if (this._props.user) {
-      this._user = new UserEntity(this._props.user);
-      delete this._props.user;
-    }
-    if (this._props.security_token) {
-      this._security_token = new SecurityTokenEntity(this._props.security_token);
-      delete this._props.security_token;
-    }
   }
 
   /**
-   * Get default properties values
-   * @return {object}
+   * Marshal the dto
+   * @param {Object} accountDto account DTO
+   * @return {Object}
    */
-  static getDefault() {
-    return {
-      "type": AccountEntity.TYPE_ACCOUNT,
-    };
+  static marshal(accountDto) {
+    Object.assign(
+      accountDto,
+      {
+        type: AccountEntity.TYPE_ACCOUNT
+      }
+    );
   }
 
   /**
@@ -64,66 +55,27 @@ class AccountEntity extends Entity {
    * @returns {Object} schema
    */
   static getSchema() {
+    const abstractAccountEntitySchema = AbstractAccountEntity.getSchema();
     return {
       "type": "object",
       "required": [
         "type",
         "domain",
         "user_id",
+        "username",
+        "first_name",
+        "last_name",
         "user_public_armored_key",
         "user_private_armored_key",
         "server_public_armored_key",
-        "user",
         "security_token",
       ],
       "properties": {
+        ... abstractAccountEntitySchema.properties,
         "type": {
           "type": "string",
-          "enum": [
-            AccountEntity.TYPE_ACCOUNT,
-            AccountEntity.TYPE_ACCOUNT_RECOVERY,
-          ]
+          "pattern": `^${AccountEntity.TYPE_ACCOUNT}$`,
         },
-        "domain": {
-          "type": "string"
-        },
-        "user_id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "authentication_token_token": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "user_public_armored_key": {
-          "type": "string"
-        },
-        "user_private_armored_key": {
-          "type": "string"
-        },
-        "server_public_armored_key": {
-          "type": "string"
-        },
-        "locale": {
-          "anyOf": [{
-            "type": "string",
-            "pattern": /^[a-z]{2}-[A-Z]{2}$/,
-          }, {
-            "type": "null"
-          }]
-        },
-        // @todo entity-validation only required for account recovery account creation.
-        "account_recovery_request_id": {
-          "anyOf": [{
-            "type": "string",
-            "format": "uuid"
-          }, {
-            "type": "null"
-          }]
-        },
-        // Associated models
-        "user": UserEntity.getSchema(),
-        "security_token": SecurityTokenEntity.getSchema(),
       }
     };
   }
@@ -133,16 +85,26 @@ class AccountEntity extends Entity {
    * Serialization
    * ==================================================
    */
+
   /**
    * Return a DTO ready to be sent to API or content code
+   * @param {Object} contains The contains
    * @returns {object}
    */
-  toDto() {
+  toDto(contains = {}) {
     const result = Object.assign({}, this._props);
-    if (this._user) {
-      result.user = this._user.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
+
+    // Ensure some properties are not leaked by default and require an explicit contain.
+    delete result.user_private_armored_key;
+
+    if (!contains) {
+      return result;
     }
-    if (this._security_token) {
+
+    if (contains.user_private_armored_key) {
+      result.user_private_armored_key = this.userPrivateArmoredKey;
+    }
+    if (contains.security_token && this._security_token) {
       result.security_token = this._security_token.toDto();
     }
 
@@ -156,111 +118,11 @@ class AccountEntity extends Entity {
   toLegacyUserDto() {
     return {
       id: this.userId,
-      username: this.user.username,
-      firstname: this.user.profile.firstName,
-      lastname: this.user.profile.lastName,
-      locale: this.user.locale
+      username: this.username,
+      firstname: this.firstName,
+      lastname: this.lastName,
+      locale: this.locale
     };
-  }
-
-  /**
-   * Customizes JSON stringification behavior
-   * @returns {*}
-   */
-  toJSON() {
-    return this.toDto();
-  }
-
-  /*
-   * ==================================================
-   * Dynamic properties getters
-   * ==================================================
-   */
-
-  /**
-   * Get the account type
-   * @return {string}
-   */
-  get type() {
-    return this._props.type;
-  }
-
-  /**
-   * Get the domain
-   * @returns {string} ref ie. http://cloud.passbolt.com/acme
-   */
-  get domain() {
-    return this._props.domain;
-  }
-
-  /**
-   * Get the user id
-   * @returns {string}
-   */
-  get userId() {
-    return this._props.user_id;
-  }
-
-  /**
-   * Get the user public armored key
-   * @returns {string}
-   */
-  get userPublicArmoredKey() {
-    return this._props.user_public_armored_key;
-  }
-
-  /**
-   * Get the user private armored key
-   * @returns {string}
-   */
-  get userPrivateArmoredKey() {
-    return this._props.user_private_armored_key;
-  }
-
-  /**
-   * Get the server public armored key
-   * @returns {string}
-   */
-  get serverPublicArmoredKey() {
-    return this._props.server_public_armored_key;
-  }
-
-  /**
-   * Get the account recovery request id
-   * @return {string}
-   */
-  get accountRecoveryRequestId() {
-    return this._props.account_recovery_request_id;
-  }
-
-  /**
-   * Set the account recovery request id
-   * @params {string} accountRecoveryRequestId The account recovery request id
-   */
-  set accountRecoveryRequestId(accountRecoveryRequestId) {
-    EntitySchema.validateProp("account_recovery_request_id", accountRecoveryRequestId, AccountEntity.getSchema().properties.account_recovery_request_id);
-    this._props.account_recovery_request_id = accountRecoveryRequestId;
-  }
-
-  /*
-   * ==================================================
-   * Other associated properties methods
-   * ==================================================
-   */
-  /**
-   * Get the user
-   * @returns {UserEntity|null}
-   */
-  get user() {
-    return this._user || null;
-  }
-
-  /**
-   * Get security token
-   * @returns {(SecurityTokenEntity|null)}
-   */
-  get securityToken() {
-    return this._security_token || null;
   }
 
   /*
@@ -268,20 +130,24 @@ class AccountEntity extends Entity {
    * Static properties getters
    * ==================================================
    */
+
+  /**
+   * AbstractAccountEntity.ALL_CONTAIN_OPTIONS
+   * @returns {object} all contain options that can be used in toDto()
+   */
+  static get ALL_CONTAIN_OPTIONS() {
+    return {
+      user_private_armored_key: true,
+      security_token: true,
+    };
+  }
+
   /**
    * AccountEntity.ENTITY_NAME
    * @returns {string}
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
-  }
-
-  /**
-   * AccountEntity.TYPE_ACCOUNT_RECOVERY
-   * @returns {string}
-   */
-  static get TYPE_ACCOUNT_RECOVERY() {
-    return TYPE_ACCOUNT_RECOVERY;
   }
 
   /**

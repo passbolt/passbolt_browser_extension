@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 const AwaitLock = require("await-lock").default;
-const {AccountEntity} = require("../../model/entity/account/accountEntity");
+const {AbstractAccountEntity} = require("../../model/entity/account/abstractAccountEntity");
 const lock = new AwaitLock();
 
 const ACCOUNTS_LOCAL_STORAGE_KEY = 'accounts';
@@ -27,7 +27,7 @@ class AccountLocalStorage {
    */
   static async get() {
     const {accounts} = await browser.storage.local.get([ACCOUNTS_LOCAL_STORAGE_KEY]);
-    return accounts;
+    return accounts || [];
   }
 
   /**
@@ -44,16 +44,16 @@ class AccountLocalStorage {
 
   /**
    * Add an account in the local storage
-   * @param {AccountEntity} accountEntity
+   * @param {AbstractAccountEntity} accountEntity
    */
   static async add(accountEntity) {
-    if (!(accountEntity instanceof AccountEntity)) {
+    if (!(accountEntity instanceof AbstractAccountEntity)) {
       throw new TypeError('ResourceLocalStorage::add expects an AccountEntity');
     }
 
     await lock.acquireAsync();
     try {
-      const accounts = await AccountLocalStorage.get() || [];
+      const accounts = await AccountLocalStorage.get();
       accounts.push(accountEntity.toDto(AccountLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({[ACCOUNTS_LOCAL_STORAGE_KEY]: accounts});
       lock.release();
@@ -95,7 +95,13 @@ class AccountLocalStorage {
    * @private
    */
   static get DEFAULT_CONTAIN() {
-    return {user: true, security_token: true};
+    return {
+      user: true,
+      security_token: true,
+      authentication_token_token: true,
+      account_recovery_request_id: true,
+      user_private_armored_key: true,
+    };
   }
 
   /**

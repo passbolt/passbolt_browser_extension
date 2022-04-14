@@ -6,6 +6,7 @@ const config = {
     'setup': path.resolve(__dirname, './src/all/content_scripts/js/app/Setup.js'),
     'recover': path.resolve(__dirname, './src/all/content_scripts/js/app/Recover.js'),
     'login': path.resolve(__dirname, './src/all/content_scripts/js/app/Login.js'),
+    'account-recovery': path.resolve(__dirname, './src/all/content_scripts/js/app/AccountRecovery.js'),
   },
   mode: 'production',
   module: {

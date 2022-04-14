@@ -40,6 +40,8 @@ RecoverBootstrap.init = function() {
       'content_scripts/js/dist/recover.js',
     ],
     onAttach: function(worker) {
+      // @todo refactoring-account-recovery, should we do something if the url doesn't parse.
+
       Worker.add('RecoverBootstrap', worker);
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows

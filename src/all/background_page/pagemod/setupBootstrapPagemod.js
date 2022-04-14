@@ -23,7 +23,8 @@ SetupBootstrap.init = function() {
     SetupBootstrap._pageMod = undefined;
   }
   const uuidRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}";
-  const setupBootstrapRegex = `(.*)\/setup\/install\/(${uuidRegex})\/(${uuidRegex})`;
+  // @deprecated url /setup/start with v3.6.0.
+  const setupBootstrapRegex = `.*\/setup\/(install|start)\/${uuidRegex}\/${uuidRegex}`;
   SetupBootstrap._pageMod = new PageMod({
     name: 'SetupBootstrap',
     include: new RegExp(setupBootstrapRegex),
@@ -40,6 +41,8 @@ SetupBootstrap.init = function() {
       'content_scripts/js/dist/setup.js',
     ],
     onAttach: function(worker) {
+      // @todo refactoring-account-recovery, should we do something if the url doesn't parse.
+
       Worker.add('SetupBootstrap', worker);
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows

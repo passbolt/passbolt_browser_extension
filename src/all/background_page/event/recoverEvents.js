@@ -1,207 +1,98 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         2.0.0
  */
-const {OrganizationSettingsModel} = require("../model/organizationSettings/organizationSettingsModel");
-const {RecoverController} = require("../controller/recover/recoverController");
-const Worker = require('../model/worker');
-const {SetRecoverLocaleController} = require("../controller/locale/setRecoverLocaleController");
-const {GetRecoverLocaleController} = require("../controller/locale/getRecoverLocaleController");
-const {RecoverInitiateAccountRecoveryRequestController} = require("../controller/recover/recoverInitiateAccountRecoveryRequestController");
-const {RecoverGenerateAccountRecoveryRequestKeyController} = require("../controller/recover/recoverGenerateAccountRecoveryRequestKeyController");
-const {VerifyPassphraseSetupController} = require("../controller/setup/verifyPassphraseSetupController");
-const {ImportPrivateKeyRecoverController} = require('../controller/recover/importPrivateKeyRecoverController');
+
+const {SetSetupLocaleController} = require("../controller/setup/setSetupLocaleController");
+const {InitiateRecoverAccountRecoveryRequestController} = require("../controller/recover/initiateRecoverAccountRecoveryRequestController");
+const {GenerateRecoverAccountRecoveryRequestKeyController} = require("../controller/recover/generateRecoverAccountRecoveryRequestKeyController");
+const {VerifyAccountPassphraseController} = require("../controller/account/verifyAccountPassphraseController");
+const {ImportRecoverPrivateKeyController} = require('../controller/recover/importRecoverPrivateKeyController');
 const {GetKeyInfoController} = require("../controller/crypto/getKeyInfoController");
+const {GetOrganizationSettingsController} = require("../controller/organizationSettings/getOrganizationSettingsController");
+const {IsExtensionFirstInstallController} = require("../controller/extension/isExtensionFirstInstallController");
+const {StartRecoverController} = require("../controller/recover/startRecoverController");
+const {SetSetupSecurityTokenController} = require("../controller/setup/setSetupSecurityTokenController");
+const {HasRecoverUserEnabledAccountRecoveryController} = require("../controller/recover/hasRecoverUserEnabledAccountRecoveryController");
+const {CompleteRecoverController} = require("../controller/recover/completeRecoverController");
+const {AuthSignInController} = require("../controller/auth/authSignInController");
+const {GetAndInitializeAccountLocaleController} = require("../controller/account/getAndInitializeAccountLocaleController");
 
-const listen = (worker, apiClientOptions) => {
-  const recoverController = new RecoverController(worker, apiClientOptions, worker.tab.url);
-
-  /*
-   * Is the first install.
-   *
-   * @listens passbolt.recover.first-install
-   * @param requestId {uuid} The request identifier
-   */
+const listen = (worker, apiClientOptions, account) => {
   worker.port.on('passbolt.recover.first-install', async requestId => {
-    try {
-      const isFirstInstall = worker.tab.url.indexOf('first-install') !== -1;
-      worker.port.emit(requestId, 'SUCCESS', isFirstInstall);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
-  });
-
-  /*
-   * Retrieve the organization settings.
-   *
-   * @listens passbolt.organization-settings.get
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.organization-settings.get', async requestId => {
-    try {
-      const organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
-      const organizationSettings = await organizationSettingsModel.getOrFind(true);
-      worker.port.emit(requestId, 'SUCCESS', organizationSettings);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
-  });
-
-  /*
-   * Get the runtime locale.
-   *
-   * The recover PageMod cannot use the common locale event listeners as these one need a browser extension already
-   * configured with user settings in the local storage in order to perform API request.
-   * @deprecated with multi-accounts support
-   *
-   * @listens passbolt.locale.get
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.locale.get', async function(requestId) {
-    const getRecoverLocaleController = new GetRecoverLocaleController(this.worker, apiClientOptions, recoverController.setupEntity);
-
-    try {
-      const localeEntity = await getRecoverLocaleController.getLocale();
-      worker.port.emit(requestId, 'SUCCESS', localeEntity);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
-  });
-
-  /*
-   * Set the user locale.
-   *
-   * @listens passbolt.locale.update-user-locale
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.locale.update-user-locale', async function(requestId, localeDto) {
-    try {
-      const setRecoverLocaleController = new SetRecoverLocaleController(this.worker, apiClientOptions, recoverController.setupEntity);
-      await setRecoverLocaleController.setLocale(localeDto);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
-    }
-  });
-
-  /*
-   * Retrieve the recover info
-   *
-   * @listens passbolt.recover.info
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.recover.info', async requestId => {
-    try {
-      const setupEntity = await recoverController.retrieveRecoverInfo();
-      worker.port.emit(requestId, 'SUCCESS', setupEntity);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-      // In case of unexpected error at this step, let the API treat the case.
-      Worker.get('RecoverBootstrap', worker.tab.id).port.emit('passbolt.recover-bootstrap.remove-iframe');
-    }
-  });
-
-  /*
-   * Import secret key.
-   *
-   * @listens passbolt.recover.import-key
-   * @param requestId {uuid} The request identifier
-   * @param armoredKey {string} The armored key to import
-   */
-  worker.port.on('passbolt.recover.import-key', async(requestId, armoredKey) => {
-    const controller = new ImportPrivateKeyRecoverController(worker, requestId, recoverController.setupEntity);
-    await controller._exec(armoredKey);
-  });
-
-  /*
-   * Verify secret key passphrase
-   *
-   * @listens passbolt.recover.verify-passphrase
-   * @param requestId {uuid} The request identifier
-   * @param passphrase {string} The passphrase used to verify the secret key
-   * @param rememberUntilLogout {boolean} The passphrase should be remembered until the user is logged out
-   */
-  worker.port.on('passbolt.recover.verify-passphrase', async(requestId, passphrase, rememberUntilLogout) => {
-    const controller = new VerifyPassphraseSetupController(worker, requestId, recoverController.setupEntity);
-    await controller._exec(passphrase, rememberUntilLogout);
-  });
-
-  /*
-   * Set the user security token
-   *
-   * @listens passbolt.recover.set-security-token
-   * @param requestId {uuid} The request identifier
-   * @param securityTokenDto {object} The security token dto. ie: {color: hex-string, text-color: hex-string, code: string}
-   */
-  worker.port.on('passbolt.recover.set-security-token', async(requestId, securityTokenDto) => {
-    try {
-      recoverController.setSecurityToken(securityTokenDto);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
-  });
-
-  /*
-   * Complete the recovery
-   *
-   * @listens passbolt.recover.complete
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.recover.complete', async requestId => {
-    try {
-      await recoverController.complete();
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
-  });
-
-
-  /*
-   * Generate the account recover request key.
-   *
-   * @listens passbolt.recover.generate-account-recovery-request-key
-   * @param requestId {uuid} The request identifier
-   * @param generateGpgKeyPairDto {object} The key generation parameter
-   */
-  worker.port.on('passbolt.recover.generate-account-recovery-request-key', async(requestId, generateGpgKeyPairDto) => {
-    const controller = new RecoverGenerateAccountRecoveryRequestKeyController(worker, requestId, recoverController.setupEntity);
-    await controller._exec(generateGpgKeyPairDto);
-  });
-
-  /*
-   * Create account recovery request.
-   *
-   * @listens passbolt.recover.initiate-account-recovery-request
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.recover.initiate-account-recovery-request', async requestId => {
-    const controller = new RecoverInitiateAccountRecoveryRequestController(worker, apiClientOptions, requestId, recoverController.setupEntity);
+    const controller = new IsExtensionFirstInstallController(worker, requestId);
     await controller._exec();
   });
 
-  /**
-   * Get information from the given armored key.
-   *
-   * @listens passbolt.keyring.get-key-info
-   * @param {uuid} requestId The request identifier
-   * @param {string} armoredKey The armored key to get info from
-   */
+  worker.port.on('passbolt.organization-settings.get', async requestId => {
+    const controller = new GetOrganizationSettingsController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.recover.start', async requestId => {
+    const controller = new StartRecoverController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.locale.get', async requestId => {
+    const controller = new GetAndInitializeAccountLocaleController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.locale.update-user-locale', async(requestId, localeDto) => {
+    const controller = new SetSetupLocaleController(worker, requestId, apiClientOptions, account);
+    await controller._exec(localeDto);
+  });
+
+  worker.port.on('passbolt.recover.has-user-enabled-account-recovery', async requestId => {
+    const controller = new HasRecoverUserEnabledAccountRecoveryController(worker, requestId, account);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.recover.import-key', async(requestId, armoredKey) => {
+    const controller = new ImportRecoverPrivateKeyController(worker, requestId, account);
+    await controller._exec(armoredKey);
+  });
+
+  worker.port.on('passbolt.recover.verify-passphrase', async(requestId, passphrase) => {
+    const controller = new VerifyAccountPassphraseController(worker, requestId, account);
+    await controller._exec(passphrase);
+  });
+
+  worker.port.on('passbolt.recover.set-security-token', async(requestId, securityTokenDto) => {
+    const controller = new SetSetupSecurityTokenController(worker, requestId, account);
+    await controller._exec(securityTokenDto);
+  });
+
+  worker.port.on('passbolt.recover.complete', async requestId => {
+    const controller = new CompleteRecoverController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.recover.sign-in', async(requestId, passphrase, rememberMe) => {
+    const controller = new AuthSignInController(worker, requestId, apiClientOptions, account);
+    await controller._exec(passphrase, rememberMe);
+  });
+
+  worker.port.on('passbolt.recover.generate-account-recovery-request-key', async(requestId, generateGpgKeyPairDto) => {
+    const controller = new GenerateRecoverAccountRecoveryRequestKeyController(worker, requestId, account);
+    await controller._exec(generateGpgKeyPairDto);
+  });
+
+  worker.port.on('passbolt.recover.initiate-account-recovery-request', async requestId => {
+    const controller = new InitiateRecoverAccountRecoveryRequestController(worker, apiClientOptions, requestId, account);
+    await controller._exec();
+  });
+
   worker.port.on('passbolt.keyring.get-key-info', async(requestId, armoredKey) => {
     const controller = new GetKeyInfoController(worker, requestId);
     await controller._exec(armoredKey);

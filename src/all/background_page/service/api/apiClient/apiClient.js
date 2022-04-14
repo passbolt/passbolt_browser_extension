@@ -325,7 +325,7 @@ class ApiClient {
     try {
       responseJson = await response.json();
     } catch (error) {
-      console.error(error);
+      console.error(url.toString(), error);
       /*
        * If the response cannot be parsed, it's not a Passbolt API response.
        * It can be a for example a proxy timeout error (504).

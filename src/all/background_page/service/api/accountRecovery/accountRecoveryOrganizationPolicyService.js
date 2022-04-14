@@ -98,15 +98,15 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(newAccountRecoveryOrganizationPublicKeyDto.armored_key);
 
     if (keyInfo.algorithm !== "RSA") {
-      throw new Error(`The algorithm used for the key is ${keyInfo.algorithm} but, must be RSA.`);
+      throw new Error("The key algorithm should be RSA.");
     }
 
     if (keyInfo.private) {
-      throw new Error(`The key must be a public key.`);
+      throw new Error("The key should be public.");
     }
 
     if (keyInfo.revoked) {
-      throw new Error(`The key is revoked.`);
+      throw new Error("The key should not be revoked.");
     }
 
     if (keyInfo.expires !== "Never") {
@@ -114,12 +114,12 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
       const expirationDate = new Date(keyInfo.expires);
 
       if (expirationDate < now) {
-        throw new Error(`The key is expired.`);
+        throw new Error("The key should not be expired.");
       }
     }
 
     if (keyInfo.length < 4096) {
-      throw new Error(`The key size is of ${keyInfo.length} bits but, must be at least of 4096 bits.`);
+      throw new Error("The key should be at least 4096 bits.");
     }
 
     const keyring = new Keyring();

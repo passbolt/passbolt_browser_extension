@@ -98,4 +98,13 @@ Port.prototype.onDisconnect = function(callback) {
   });
 };
 
+/**
+ * Disconnect the port
+ *
+ * @return {void}
+ */
+Port.prototype.disconnect = function() {
+  this._port.disconnect();
+};
+
 exports.Port = Port;

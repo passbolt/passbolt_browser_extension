@@ -23,6 +23,8 @@ const {AccountRecoveryReviewRequestController} = require("../controller/accountR
 const {AccountRecoveryGetOrganizationPolicyController} = require("../controller/accountRecovery/accountRecoveryGetOrganizationPolicyController");
 const {AccountRecoveryGetUserRequestsController} = require("../controller/accountRecovery/accountRecoveryGetUserRequestsController");
 const {AccountRecoveryGetRequestController} = require("../controller/accountRecovery/accountRecoveryGetRequestController");
+const {HasUserPostponedUserSettingInvitationController} = require("../controller/accountRecovery/HasUserPostponedUserSettingInvitationController");
+const {PostponeUserSettingInvitationController} = require("../controller/accountRecovery/postponeUserSettingInvitationController");
 
 /**
  * Listens the account recovery events
@@ -90,6 +92,16 @@ const listen = function(worker) {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AccountRecoveryReviewRequestController(worker, requestId, apiClientOptions);
     await controller._exec(accountRecoveryResponseDto, privateKeyDto);
+  });
+
+  worker.port.on('passbolt.account-recovery.has-user-postponed-user-setting-invitation', async requestId => {
+    const controller = new HasUserPostponedUserSettingInvitationController(worker, requestId);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.account-recovery.postpone-user-setting-invitation', async requestId => {
+    const controller = new PostponeUserSettingInvitationController(worker, requestId);
+    await controller._exec();
   });
 };
 

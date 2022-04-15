@@ -26,6 +26,7 @@ const main = async function() {
   const {GroupLocalStorage} = require('./service/local_storage/groupLocalStorage');
   const {RolesLocalStorage} = require("./service/local_storage/rolesLocalStorage");
   const {PasswordGeneratorLocalStorage} = require("./service/local_storage/passwordGeneratorLocalStorage");
+  const {PostponedUserSettingInvitationService} = require('./service/accountRecovery/postponedUserSettingInvitationService');
 
   /*
    * ==================================================================================
@@ -43,6 +44,7 @@ const main = async function() {
   GroupLocalStorage.init();
   RolesLocalStorage.init();
   PasswordGeneratorLocalStorage.init();
+  PostponedUserSettingInvitationService.init();
 
   // Openpgpjs worker initialization
   /**

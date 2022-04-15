@@ -11,21 +11,37 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+
 class ParseSetupUrlService {
   /**
    * Parse a setup url.
    * @param {string} url The setup url.
-   * @returns {{user_id: string, domain: string, token: string}}
-   * @throws {Error} If the setup url cannot be parsed.
+   * @returns {{user_id: string, domain: string, authentication_token_token: string}}
+   * @throw {Error} If the setup url cannot be parsed.
+   * @throw {Error} If the domain is not valid.
    */
   static parse(url) {
     const uuidRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}";
-    const regex = new RegExp(`(.*)\/setup\/(install|recover)\/(${uuidRegex})\/(${uuidRegex})`);
-    if (regex.test(url)) {
-      const [, domain, , user_id, token] = url.match(regex);
-      return {domain, user_id, token};
+    const regex = new RegExp(`(.*)\/setup\/(install|start)\/(${uuidRegex})\/(${uuidRegex})`);
+
+    if (!regex.test(url)) {
+      throw new Error('Cannot parse setup url. The url does not match the pattern.');
     }
-    throw new Error('Cannot parse setup url.');
+
+    const parsedUrl = url.match(regex);
+    let [, domain] = parsedUrl;
+    const [, , , user_id, authentication_token_token] = parsedUrl;
+
+    // Sanitize domains, removed trailing "/" in order to avoid domains such as https://passbolt.dev//
+    domain = domain.replace(/\/*$/g, '');
+
+    try {
+      new URL(domain);
+    } catch (error) {
+      throw new Error('Cannot parse setup url. The domain is not valid.');
+    }
+
+    return {domain, user_id, authentication_token_token};
   }
 }
 

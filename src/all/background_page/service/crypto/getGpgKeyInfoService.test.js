@@ -60,7 +60,7 @@ describe("GpgKeyInfo service", () => {
       try {
         await GetGpgKeyInfoService.getKeyInfo(wronglyTypedData[i]);
       } catch (e) {
-        expect(e).toStrictEqual(new Error("The key must be of type string, openpgp.PublicKey or openpgp.PrivateKey"));
+        expect(e).toStrictEqual(new Error("The key should be a valid armored key or a valid openpgp key."));
       }
     }
   });
@@ -76,7 +76,7 @@ describe("GpgKeyInfo service", () => {
       try {
         await GetGpgKeyInfoService.getKeyInfo(goodTypeWithWrongData[i]);
       } catch (e) {
-        expect(e).toStrictEqual(new Error("The key is not a valid armored key"));
+        expect(e).toStrictEqual(new Error("The key should be a valid armored key or a valid openpgp key."));
       }
     }
   });

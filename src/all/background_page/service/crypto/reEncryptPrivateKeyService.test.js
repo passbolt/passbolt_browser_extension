@@ -22,7 +22,7 @@ const privateKey = pgpKeys.ada.private;
 
 describe("ReEncryptPrivateKeyService service", () => {
   it('should throw an exception if the given key is not formatted properly', async() => {
-    const privateKeyFormatError = new Error("The key must be of type string, openpgp.PublicKey or openpgp.PrivateKey");
+    const privateKeyFormatError = new Error("The key should be a valid armored key or a valid openpgp key.");
     const scenarios = [
       {key: null, expectedError: privateKeyFormatError},
       {key: {}, expectedError: privateKeyFormatError},
@@ -42,7 +42,7 @@ describe("ReEncryptPrivateKeyService service", () => {
   it('should throw an exception if the given key is not a private key', () => {
     expect.assertions(1);
     const promise = ReEncryptPrivateKeyService.reEncrypt(publicKey, "old", "new");
-    return expect(promise).rejects.toThrowError(new Error("The key is not a valid private key."));
+    return expect(promise).rejects.toThrowError(new Error("The key should be private."));
   });
 
   it('should throw an exception if the passphrase are formatted properly', async() => {

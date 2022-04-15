@@ -101,11 +101,13 @@ const main = async function() {
     }
   }
 
-  // Setup pagemods
+  // Setup/recover/account recovery pagemods
   pageMods.SetupBootstrap.init();
   pageMods.Setup.init();
   pageMods.RecoverBootstrap.init();
   pageMods.Recover.init();
+  pageMods.AccountRecoveryBootstrap.init();
+  pageMods.AccountRecovery.init();
 
   /*
    * Other pagemods active all the time

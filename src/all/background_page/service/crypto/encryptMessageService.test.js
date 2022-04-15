@@ -81,7 +81,7 @@ describe("EncryptMessageService", () => {
       const resultEncryptPromise = EncryptMessageService.encryptSymmetrically(messageClear, [encryptPassword], signKey);
 
       expect.assertions(1);
-      await expect(resultEncryptPromise).rejects.toThrow("The private key is not decrypted.");
+      await expect(resultEncryptPromise).rejects.toThrow("The private key should be decrypted.");
     });
   });
 
@@ -133,7 +133,7 @@ describe("EncryptMessageService", () => {
       const resultEncrypt = EncryptMessageService.encrypt(messageClear, publicKey, signingKey);
 
       expect.assertions(1);
-      await expect(resultEncrypt).rejects.toThrow("The private key is not decrypted.");
+      await expect(resultEncrypt).rejects.toThrow("The private key should be decrypted.");
     });
   });
 });

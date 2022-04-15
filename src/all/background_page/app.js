@@ -138,6 +138,17 @@ pageMods.RecoverBootstrap = require('./pagemod/recoverBootstrapPagemod').Recover
 pageMods.Recover = require('./pagemod/recoverPagemod').Setup;
 
 /*
+ * This pagemod helps bootstrap the account recovery application to inject on a passbolt served page.
+ */
+pageMods.AccountRecoveryBootstrap = require('./pagemod/accountRecoveryBootstrapPagemod').AccountRecoveryBootstrap;
+
+/*
+ * This page mod drives the account recovery process
+ * The account recovery process is driven on the add-on side, see in ../data/passbolt-iframe-account-recovery.html
+ */
+pageMods.AccountRecovery = require('./pagemod/accountRecoveryPagemod').AccountRecovery;
+
+/*
  * This page mod drives the reset of setup process
  * The reset of the setup process is driven on the add-on side, see in ../data/quickaccess.html
  */

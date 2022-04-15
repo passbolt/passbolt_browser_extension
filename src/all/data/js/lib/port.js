@@ -139,6 +139,28 @@ const self = window.self || {};
   };
 
   /**
+   * Wait until the background pagemod is ready.
+   * @returns {Promise}
+   */
+  Port.prototype.waitUntilPageModReady = function() {
+    return new Promise((resolve, reject) => {
+      const checkInterval = setInterval(() => {
+        // If the background page disconnected the port.
+        if (!this._connected) {
+          console.debug('Port disconnected');
+          clearInterval(checkInterval);
+          reject();
+        } else {
+          port.request("passbolt.pagemod.is-ready").then(() => {
+            clearInterval(checkInterval);
+            resolve();
+          });
+        }
+      }, 50);
+    });
+  };
+
+  /**
    ****************************************************************************
    * Protected utilities
    ****************************************************************************

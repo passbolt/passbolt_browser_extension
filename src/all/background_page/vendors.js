@@ -27,5 +27,4 @@ window.PapaParse = require('papaparse/papaparse');
 /**
  * Crypto/sec libraries
  */
-//window.openpgp = require('openpgp/dist/openpgp');
 window.jsSHA = require('jssha');

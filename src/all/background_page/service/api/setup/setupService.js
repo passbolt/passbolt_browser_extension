@@ -52,15 +52,15 @@ class SetupService extends AbstractService {
   }
 
   /**
-   * Complete a recovery
+   * Complete a recover
    * @param {string} userId the user id
    * @param {object} completeDto The complete operation dto
    * @returns {Promise<*>} response body
    * @throws {Error} if options are invalid or API error
    */
-  async completeRecovery(userId, completeDto) {
+  async completeRecover(userId, completeDto) {
     this.assertValidId(userId);
-    const url = new URL(`${this.apiClient.baseUrl}/completeRecovery/${userId}`);
+    const url = new URL(`${this.apiClient.baseUrl}/recover/complete/${userId}`);
     const bodyString = this.apiClient.buildBody(completeDto);
     return this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
   }
@@ -75,7 +75,7 @@ class SetupService extends AbstractService {
   async findSetupInfo(userId, token) {
     this.assertValidId(userId);
     this.assertValidId(token);
-    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/install/${userId}/${token}`, {});
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/start/${userId}/${token}`, {});
     const response = await this.apiClient.fetchAndHandleResponse('GET', url);
     return response.body;
   }

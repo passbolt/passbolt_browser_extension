@@ -13,7 +13,8 @@
  */
 
 const {DecryptPrivateKeyService} = require('./decryptPrivateKeyService');
-const {assertPrivateKeys, assertDecryptedPrivateKeys} = require('../../utils/openpgp/openpgpAssertions');
+const {assertPrivateKeys} = require('../../utils/openpgp/openpgpAssertions');
+const {EncryptPrivateKeyService} = require("./encryptPrivateKeyService");
 
 class ReEncryptPrivateKeyService {
   /**
@@ -36,9 +37,8 @@ class ReEncryptPrivateKeyService {
     this._validatePassphrase(oldPassphrase);
     this._validatePassphrase(newPassphrase);
 
-    let userDecryptedKey = await DecryptPrivateKeyService.decrypt(encryptedPrivateKey.armor(), oldPassphrase);
-    userDecryptedKey = await assertDecryptedPrivateKeys(userDecryptedKey);
-    return (await openpgp.encryptKey({privateKey: userDecryptedKey, passphrase: newPassphrase})).armor();
+    const userDecryptedKey = await DecryptPrivateKeyService.decrypt(encryptedPrivateKey.armor(), oldPassphrase);
+    return EncryptPrivateKeyService.encrypt(userDecryptedKey, newPassphrase);
   }
 
   /**

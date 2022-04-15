@@ -47,7 +47,7 @@ describe("BuildApprovedAccountRecoveryUserSettingEntityService service", () => {
     const resultPromise = BuildApprovedAccountRecoveryUserSettingEntityService.build(uuidv4(), pgpKeys.ada.private, {});
 
     expect.assertions(1);
-    await expect(resultPromise).rejects.toThrow("The private key is not decrypted.");
+    await expect(resultPromise).rejects.toThrow("The private key should be decrypted.");
   });
 
   it("Should throw an error if the provided organization policy is not a valid AccountRecoveryOrganizationPolicyEntity.", async() => {

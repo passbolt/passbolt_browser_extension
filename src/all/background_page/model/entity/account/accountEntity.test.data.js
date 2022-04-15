@@ -14,23 +14,27 @@
 
 import {v4 as uuidv4} from 'uuid';
 import {AccountEntity} from "./accountEntity";
-import {defaultUserDto} from "../user/userEntity.test.data";
 import {defaultSecurityTokenDto} from "../securityToken/SecurityTokenEntity.test.data";
 import {pgpKeys} from '../../../../tests/fixtures/pgpKeys/keys';
 
-export const defaultAccountDto = data => {
-  const userId = data?.user_id || uuidv4();
+export const defaultAccountDto = (data = {}) => {
+  data = JSON.parse(JSON.stringify(data));
 
   const defaultData = {
-    "type": data?.type || AccountEntity.TYPE_ACCOUNT_RECOVERY,
-    "domain": data?.domain || "https://passbolt.local",
-    "user_id": userId,
-    "user_public_armored_key": data?.user_public_armored_key || pgpKeys.account_recovery_request.public,
-    "user_private_armored_key": data?.user_private_armored_key || pgpKeys.account_recovery_request.private,
-    "server_public_armored_key": data?.server_public_armored_key || pgpKeys.ada.public,
-    "user": defaultUserDto(Object.assign({id: userId}, JSON.parse(JSON.stringify(data?.user || {})))),
-    "security_token": defaultSecurityTokenDto(Object.assign({}, JSON.parse(JSON.stringify(data?.security_token || {}))))
+    "type": AccountEntity.TYPE_ACCOUNT,
+    "domain": "https://passbolt.local",
+    "user_id": uuidv4(),
+    "username": "ada@passbolt.dev",
+    "first_name": "Ada",
+    "last_name": "Lovelace",
+    "user_public_armored_key": pgpKeys.account_recovery_request.public,
+    "user_private_armored_key": pgpKeys.account_recovery_request.private,
+    "server_public_armored_key": pgpKeys.ada.public,
+    "locale": "de-DE",
+    "security_token": defaultSecurityTokenDto(data?.security_token)
   };
 
-  return Object.assign(defaultData, data || {});
+  delete data.securityToken;
+
+  return Object.assign(defaultData, data);
 };

@@ -55,7 +55,7 @@ class AccountModel {
    * @param {string} oldPassphrase The old passphrase
    * @param {string} newPassphrase The new passphrase
    * @returns {Promise<string>}
-   * @throws {Error} if options are invalid or API error
+   * @throws {Error} if something went wrong while updating the private passphrase
    */
   async updatePrivateKey(oldPassphrase, newPassphrase) {
     const privateKey = this.keyring.findPrivate();

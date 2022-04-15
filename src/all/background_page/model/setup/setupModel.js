@@ -28,85 +28,112 @@ class SetupModel {
   }
 
   /**
-   * Retrieve setup information and populate the setup entity with it.
+   * Start recover.
+   * The API will return the necessary data to complete the journey:
+   * - user and its meta data
+   * - account recovery organization policy
    *
-   * @param {SetupEntity} setupEntity The setup entity
-   * @returns {Promise<void>}
+   * @param {string} userId The user id to start the setup for.
+   * @param {string} authenticationTokenToken The authentication token.
+   * @return {Promise<{user: UserEntity, accountRecoveryOrganizationPolicy: AccountRecoveryOrganizationPolicyEntity}>}
    * @throws {Error} if options are invalid or API error
    */
-  async findSetupInfo(setupEntity) {
-    let userDto, accountRecoveryOrganizationPolicyDto;
+  async startSetup(userId, authenticationTokenToken) {
+    let user, accountRecoveryOrganizationPolicy, userDto, accountRecoveryOrganizationPolicyDto;
+
+    if (!Validator.isUUID(userId)) {
+      throw new TypeError("userId should be a valid uuid.");
+    }
+    if (!Validator.isUUID(authenticationTokenToken)) {
+      throw new TypeError("authenticationTokenToken should be a valid uuid.");
+    }
+
     try {
-      const result = await this.setupService.findSetupInfo(setupEntity.userId, setupEntity.authenticationTokenToken);
+      const result = await this.setupService.findSetupInfo(userId, authenticationTokenToken);
       userDto = result?.user;
       accountRecoveryOrganizationPolicyDto = result?.account_recovery_organization_policy;
     } catch (error) {
       // If the entry point doesn't exist or return a 500, the API version is <v3.
       const code = error.data && error.data.code;
       if (code === 404 || code === 500) {
-        userDto = await this.setupService.findLegacySetupInfo(setupEntity.userId, setupEntity.authenticationTokenToken);
+        userDto = await this.setupService.findLegacySetupInfo(userId, authenticationTokenToken);
       } else {
         throw error;
       }
     }
+
     if (userDto) {
-      setupEntity.user = new UserEntity(userDto);
+      user = new UserEntity(userDto);
     }
     if (accountRecoveryOrganizationPolicyDto) {
-      setupEntity.accountRecoveryOrganizationPolicy = new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
+      accountRecoveryOrganizationPolicy = new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
     }
+
+    return {user, accountRecoveryOrganizationPolicy};
   }
 
   /**
-   * Retrieve recover information and populate the recover entity with it.
+   * Start recover.src/all/background_page/model/entity/accountRecovery/accountRecoveryRequestEntity.js
+   * The API will return the necessary data to complete the journey:
+   * - user and its meta data
+   * - account recovery organization policy
    *
-   * @param {SetupEntity} recoverEntity The recover entity
-   * @returns {Promise<void>}
-   * @throws {Error} if options are invalid or API error
+   * @param {string} userId The user id to start the recover for.
+   * @param {string} authenticationTokenToken The authentication token.
+   * @return {Promise<{user: UserEntity, accountRecoveryOrganizationPolicy: AccountRecoveryOrganizationPolicyEntity}>}
    */
-  async findRecoverInfo(recoverEntity) {
-    let userDto, accountRecoveryOrganizationPolicyDto;
+  async startRecover(userId, authenticationTokenToken) {
+    let user, accountRecoveryOrganizationPolicy, userDto, accountRecoveryOrganizationPolicyDto;
+
+    if (!Validator.isUUID(userId)) {
+      throw new TypeError("userId should be a valid uuid.");
+    }
+    if (!Validator.isUUID(authenticationTokenToken)) {
+      throw new TypeError("authenticationTokenToken should be a valid uuid.");
+    }
+
     try {
-      const result = await this.setupService.findRecoverInfo(recoverEntity.userId, recoverEntity.authenticationTokenToken);
+      const result = await this.setupService.findRecoverInfo(userId, authenticationTokenToken);
       userDto = result?.user;
       accountRecoveryOrganizationPolicyDto = result?.account_recovery_organization_policy;
     } catch (error) {
       // If the entry point doesn't exist or return a 500, the API version is <v3.
       const code = error.data && error.data.code;
       if (code === 404 || code === 500) {
-        userDto = await this.setupService.findLegacyRecoverInfo(recoverEntity.userId, recoverEntity.authenticationTokenToken);
+        userDto = await this.setupService.findLegacyRecoverInfo(userId, authenticationTokenToken);
       } else {
         throw error;
       }
     }
     if (userDto) {
-      recoverEntity.user = new UserEntity(userDto);
+      user = new UserEntity(userDto);
     }
     if (accountRecoveryOrganizationPolicyDto) {
-      recoverEntity.accountRecoveryOrganizationPolicy = new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
+      accountRecoveryOrganizationPolicy = new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
     }
+
+    return {user, accountRecoveryOrganizationPolicy};
   }
 
   /**
    * Complete the setup.
-   * @param {SetupEntity} setupEntity The setup entity
+   * @param {AccountSetupEntity} account The account being set up.
    * @returns {Promise<void>}
    * @throws {Error} if options are invalid or API error
    */
-  async complete(setupEntity) {
-    const completeDto = setupEntity.toCompleteDto();
-    await this.setupService.complete(setupEntity.userId, completeDto);
+  async completeSetup(account) {
+    const completeDto = account.toCompleteSetupDto();
+    await this.setupService.complete(account.userId, completeDto);
   }
 
   /**
-   * Complete the recovery
-   * @param {SetupEntity} setupEntity The setup entity
+   * Complete the recover.
+   * @param {AccountRecoverEntity} account The account being recovered.
    * @returns {Promise<void>}
-   * @throws {Error} if options are invalid or API error
    */
-  async completeRecovery(setupEntity) {
-    const completeDto = setupEntity.toCompleteDto();
-    await this.setupService.completeRecovery(setupEntity.userId, completeDto);
+  async completeRecover(account) {
+    const recoverCompleteDto = account.toCompleteRecoverDto();
+    await this.setupService.completeRecover(account.userId, recoverCompleteDto);
   }
 }
 

@@ -18,6 +18,8 @@ const {DecryptPrivateKeyService} = require('../../service/crypto/decryptPrivateK
 class CheckPassphraseController {
   /**
    * CheckPassphraseController constructor
+   * @todo multi-account to replace by verifyAccountPassphraseController.
+   *
    * @param {Worker} worker
    * @param {string} requestId uuid
    */

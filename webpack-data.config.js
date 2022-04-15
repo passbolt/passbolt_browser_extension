@@ -2,6 +2,7 @@ const path = require('path');
 
 const config = {
   entry: {
+    'account-recovery': path.resolve(__dirname, './src/all/data/js/app/AccountRecovery.js'),
     'app': path.resolve(__dirname, './src/all/data/js/app/App.js'),
     'setup': path.resolve(__dirname, './src/all/data/js/app/Setup.js'),
     'recover': path.resolve(__dirname, './src/all/data/js/app/Recover.js'),

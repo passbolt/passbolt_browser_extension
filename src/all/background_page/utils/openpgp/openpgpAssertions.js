@@ -18,7 +18,7 @@ const {i18n} = require("../../sdk/i18n");
  * Assert pgp key(s).
  * - Should be a valid armored key or valid openpgp key.
  *
- * @param {array<openpgp.PublicKey|openpgp.Private|string>|openpgp.PublicKey|openpgp.Private|string} publicKeys The key(s) to assert.
+ * @param {array<openpgp.PublicKey|openpgp.Private|string>|openpgp.PublicKey|openpgp.Private|string} keys The key(s) to assert.
  * @returns {array<openpgp.PublicKey|openpgp.Private>|openpgp.PublicKey|openpgp.Private}
  * @private
  */
@@ -31,10 +31,10 @@ const assertKeys = async keys => {
     try {
       keys = await openpgp.readKey({armoredKey: keys});
     } catch (error) {
-      throw new Error("The key is not a valid armored key");
+      throw new Error("The key should be a valid armored key or a valid openpgp key.");
     }
   } else if (!(keys instanceof openpgp.PublicKey) && !(keys instanceof openpgp.PrivateKey)) {
-    throw new Error("The key must be of type string, openpgp.PublicKey or openpgp.PrivateKey");
+    throw new Error("The key should be a valid armored key or a valid openpgp key.");
   }
 
   return keys;
@@ -57,7 +57,7 @@ const assertPrivateKeys = async privateKeys => {
 
   const privateKey = await assertKeys(privateKeys);
   if (!privateKey.isPrivate()) {
-    throw new Error(i18n.t("The key is not a valid private key."));
+    throw new Error(i18n.t("The key should be private."));
   }
 
   return privateKey;
@@ -81,7 +81,7 @@ const assertDecryptedPrivateKeys = async privateKeys => {
 
   const privateKey = await assertPrivateKeys(privateKeys);
   if (!privateKey.isDecrypted()) {
-    throw new Error("The private key is not decrypted.");
+    throw new Error("The private key should be decrypted.");
   }
 
   return privateKey;
@@ -103,7 +103,7 @@ const assertPublicKeys = async publicKeys => {
 
   const publicKey = await assertKeys(publicKeys);
   if (publicKey.isPrivate()) {
-    throw new Error(i18n.t("The key is not a valid public key."));
+    throw new Error(i18n.t("The key should be public."));
   }
 
   return publicKey;

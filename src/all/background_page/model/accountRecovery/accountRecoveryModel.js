@@ -22,6 +22,9 @@ const {AccountRecoveryRequestEntity} = require("../entity/accountRecovery/accoun
 const {AccountRecoveryResponseEntity} = require("../entity/accountRecovery/accountRecoveryResponseEntity");
 const {AccountRecoveryPrivateKeyPasswordService} = require('../../service/api/accountRecovery/accountRecoveryPrivateKeyPasswordService');
 const {AccountRecoveryUserSettingEntity} = require("../entity/accountRecovery/accountRecoveryUserSettingEntity");
+const {AccountRecoveryContinueService} = require('../../service/api/accountRecovery/accountRecoveryContinueService');
+const {SetupService} = require("../../service/api/setup/setupService");
+
 /**
  * Model related to the account recovery
  */
@@ -38,15 +41,17 @@ class AccountRecoveryModel {
     this.accountRecoveryUserService = new AccountRecoveryUserService(apiClientOptions);
     this.accountRecoveryResponseService = new AccountRecoveryResponseService(apiClientOptions);
     this.accountRecoveryPrivateKeyPasswordService = new AccountRecoveryPrivateKeyPasswordService(apiClientOptions);
+    this.accountRecoveryContinueService = new AccountRecoveryContinueService(apiClientOptions);
+    this.setupService = new SetupService(apiClientOptions);
   }
 
   /**
    * Find the organization policy using Passbolt API
    *
+   * @param {Object} [contains] optional example: {creator: true, creator.gpgkey: true}
    * @return {Promise<AccountRecoveryOrganizationPolicyEntity|null>}
    */
-  async findOrganizationPolicy() {
-    const contains = {'creator': true, 'creator.gpgkey': true};
+  async findOrganizationPolicy(contains = {}) {
     const accountRecoveryOrganizationPolicyDto = await this.accountRecoveryOrganizationPolicyService.find(contains);
     if (!accountRecoveryOrganizationPolicyDto) {
       return null;
@@ -62,10 +67,10 @@ class AccountRecoveryModel {
   /**
    * Get user requests of an accountRecovery using Passbolt API
    *
-   * @param {object} filters additional filters to supply to the find query
+   * @param {object} [filters] additional filters to supply to the find query
    * @return {Promise<AccountRecoveryRequestsCollection>}
    */
-  async findUserRequests(filters) {
+  async findUserRequests(filters = {}) {
     const accountRecoveryRequestsCollectionDto = await this.accountRecoveryRequestService.findByUser(filters);
     return new AccountRecoveryRequestsCollection(accountRecoveryRequestsCollectionDto);
   }
@@ -78,6 +83,9 @@ class AccountRecoveryModel {
    * @return {AccountRecoveryRequestEntity}
    */
   async findRequestById(id, contains = {}) {
+    if (!Validator.isUUID(id)) {
+      throw new TypeError(`id should be a valid uuid.`);
+    }
     const accountRecoveryRequestDto = await this.accountRecoveryRequestService.findById(id, contains);
     return new AccountRecoveryRequestEntity(accountRecoveryRequestDto);
   }
@@ -125,6 +133,46 @@ class AccountRecoveryModel {
     const accountRecoveryResponseDto = accountRecoveryResponseEntity.toDto(AccountRecoveryResponseEntity);
     const savedAccountRecoveryResponseDto = await this.accountRecoveryResponseService.saveReview(accountRecoveryResponseDto);
     return new AccountRecoveryResponseEntity(savedAccountRecoveryResponseDto);
+  }
+
+  /**
+   * Check if a user can continue the account recovery journey.
+   * It will throw an exception if the user cannot.
+   *
+   * @param {string} userId The user id who continues the account recovery
+   * @param {string} authenticationTokenToken The authentication token
+   * @return {Promise<void>}
+   */
+  async continue(userId, authenticationTokenToken) {
+    if (!Validator.isUUID(userId)) {
+      throw new TypeError(`userId should be a valid uuid.`);
+    }
+    if (!Validator.isUUID(authenticationTokenToken)) {
+      throw new TypeError(`authenticationTokenToken should be a valid uuid.`);
+    }
+    await this.accountRecoveryContinueService.continue(userId, authenticationTokenToken);
+  }
+
+  /**
+   * Find the account recovery request associated to the stored temporary recovery account.
+   *
+   * @param {string} requestId The request id to retrieve
+   * @param {string} userId The user id that initiates the request
+   * @param {string} authenticationTokenToken The authentication token
+   * @return {AccountRecoveryRequestEntity}
+   */
+  async findRequestByIdAndUserIdAndAuthenticationToken(requestId, userId, authenticationTokenToken) {
+    if (!Validator.isUUID(requestId)) {
+      throw new TypeError(`requestId should be a valid uuid.`);
+    }
+    if (!Validator.isUUID(userId)) {
+      throw new TypeError(`userId should be a valid uuid.`);
+    }
+    if (!Validator.isUUID(authenticationTokenToken)) {
+      throw new TypeError(`authenticationTokenToken should be a valid uuid.`);
+    }
+    const accountRecoveryRequestDto = await this.accountRecoveryRequestService.findRequestByIdAndUserIdAndAuthenticationToken(requestId, userId, authenticationTokenToken);
+    return new AccountRecoveryRequestEntity(accountRecoveryRequestDto);
   }
 }
 

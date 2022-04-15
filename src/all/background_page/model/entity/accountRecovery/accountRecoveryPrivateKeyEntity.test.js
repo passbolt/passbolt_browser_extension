@@ -17,12 +17,7 @@ import {AccountRecoveryPrivateKeyEntity} from "./accountRecoveryPrivateKeyEntity
 import {defaultAccountRecoveryPrivateKeyDto} from "./accountRecoveryPrivateKeyEntity.test.data";
 
 describe("AccountRecoveryPrivateKey entity", () => {
-  /*
-   * @todo @skip. The following test has been skipped due to the removal of the data field as a required field.
-   * Thus there is no required field anymore for this entity and this, for the moment, is consider as an invalid schema.
-   * @unskip when we will have a solution that supports entity without required fields.
-   */
-  it.skip("schema must validate", () => {
+  it("schema must validate", () => {
     EntitySchema.validateSchema(AccountRecoveryPrivateKeyEntity.ENTITY_NAME, AccountRecoveryPrivateKeyEntity.getSchema());
   });
 

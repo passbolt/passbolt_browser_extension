@@ -85,7 +85,10 @@ describe("GpgKeyInfo service", () => {
     const dto = validKeyWithExpirationDateDto();
     expect.assertions(1);
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(dto.armored_key);
-    expect(keyInfo.toDto()).toEqual(dto);
+    const keyInfoDto = keyInfo.toDto();
+    delete dto.armored_key;
+    delete keyInfoDto.armored_key;
+    expect(keyInfoDto).toEqual(dto);
   });
 
   it("should give the information of a key that is expired", async() => {

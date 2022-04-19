@@ -22,7 +22,7 @@
     "npm-force-resolutions": "0.0.10",
     "openpgp": "5.2.0",
     "papaparse": "^5.2.0",
-    "passbolt-styleguide": "3.5.3",
+    "passbolt-styleguide": "3.6.0-alpha1",
     "react": "16.12.0",
     "react-dom": "16.12.0",
     "secrets.js-grempe": "^2.0.0",

@@ -27,6 +27,7 @@ const {DownloadSetupRecoveryKitController} = require("../controller/setup/downlo
 const {SetSetupSecurityTokenController} = require("../controller/setup/setSetupSecurityTokenController");
 const {CompleteSetupController} = require("../controller/setup/completeSetupController");
 const {AuthSignInController} = require("../controller/auth/authSignInController");
+const {ValidatePrivateGpgKeyController} = require("../controller/crypto/validatePrivateGpgKeyController");
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -111,6 +112,11 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.setup.sign-in', async(requestId, passphrase, rememberMe) => {
     const controller = new AuthSignInController(worker, requestId, apiClientOptions, account);
     await controller._exec(passphrase, rememberMe);
+  });
+
+  worker.port.on('passbolt.setup.validate-private-key', async(requestId, key) => {
+    const controller = new ValidatePrivateGpgKeyController(worker, requestId);
+    await controller._exec(key, true);
   });
 };
 exports.listen = listen;

@@ -26,6 +26,7 @@ const {HasRecoverUserEnabledAccountRecoveryController} = require("../controller/
 const {CompleteRecoverController} = require("../controller/recover/completeRecoverController");
 const {AuthSignInController} = require("../controller/auth/authSignInController");
 const {GetAndInitializeAccountLocaleController} = require("../controller/account/getAndInitializeAccountLocaleController");
+const {ValidatePrivateGpgKeyController} = require("../controller/crypto/validatePrivateGpgKeyController");
 
 const listen = (worker, apiClientOptions, account) => {
   worker.port.on('passbolt.recover.first-install', async requestId => {
@@ -96,6 +97,11 @@ const listen = (worker, apiClientOptions, account) => {
   worker.port.on('passbolt.keyring.get-key-info', async(requestId, armoredKey) => {
     const controller = new GetKeyInfoController(worker, requestId);
     await controller._exec(armoredKey);
+  });
+
+  worker.port.on('passbolt.recover.validate-private-key', async(requestId, key) => {
+    const controller = new ValidatePrivateGpgKeyController(worker, requestId);
+    await controller._exec(key, false);
   });
 };
 exports.listen = listen;

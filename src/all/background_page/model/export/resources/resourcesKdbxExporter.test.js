@@ -1,5 +1,5 @@
 /**
- * @jest-environment ./.jest.custom-kdbx-environment
+ * @jest-environment ./test/jest.custom-kdbx-environment
  */
 /**
  * Passbolt ~ Open source password manager for teams

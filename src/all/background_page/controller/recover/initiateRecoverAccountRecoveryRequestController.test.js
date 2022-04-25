@@ -17,7 +17,7 @@ import {InitiateRecoverAccountRecoveryRequestController} from "./initiateRecover
 import {AccountLocalStorage} from "../../service/local_storage/accountLocalStorage";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
-import {defaultAccountRecoveryRequestDto} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+import {pendingAccountRecoveryRequestDto} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import {AccountRecoverEntity} from "../../model/entity/account/accountRecoverEntity";
 import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
 import {AccountAccountRecoveryEntity} from "../../model/entity/account/accountAccountRecoveryEntity";
@@ -33,7 +33,7 @@ describe("InitiateRecoverAccountRecoveryRequestController", () => {
       const controller = new InitiateRecoverAccountRecoveryRequestController(null, defaultApiClientOptions(), null, account);
 
       // Mock the API response.
-      const mockApiResponseDto = defaultAccountRecoveryRequestDto();
+      const mockApiResponseDto = pendingAccountRecoveryRequestDto();
       const mockApiFetch = fetch.doMockOnce(() => mockApiResponse(mockApiResponseDto));
 
       await controller.exec();

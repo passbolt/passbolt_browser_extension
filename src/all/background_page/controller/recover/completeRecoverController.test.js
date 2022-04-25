@@ -64,10 +64,7 @@ describe("CompleteRecoverController", () => {
       expect(app.pageMods.AuthBootstrap.init).toHaveBeenCalled();
     });
 
-    /*
-     * The test is skipped until the user is flushed.
-     */
-    it.skip("Should not add the account to the local storage if the complete API request fails.", async() => {
+    it("Should not add the account to the local storage if the complete API request fails.", async() => {
       const account = new AccountRecoverEntity(withSecurityTokenAccountRecoverDto());
       const controller = new CompleteRecoverController(null, null, defaultApiClientOptions(), account);
 
@@ -78,9 +75,9 @@ describe("CompleteRecoverController", () => {
 
       const promise = controller.exec();
 
-      // expect.assertions(10);
+      expect.assertions(2);
       await expect(promise).rejects.toThrow();
-      expect(() => User.getInstance().get).toThrow("The user is not set");
+      expect(() => User.getInstance().get()).toThrow("The user is not set");
     });
   });
 });

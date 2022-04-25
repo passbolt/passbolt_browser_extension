@@ -120,6 +120,22 @@ class AccountRecoveryPrivateKeyEntity extends Entity {
    */
 
   /**
+   * Get the id
+   * @returns {string|null}
+   */
+  get id() {
+    return this._props.id || null;
+  }
+
+  /**
+   * Get the user id
+   * @returns {string|null}
+   */
+  get userId() {
+    return this._props.user_id || null;
+  }
+
+  /**
    * Get data
    * @returns {string|null} armored pgp message
    */

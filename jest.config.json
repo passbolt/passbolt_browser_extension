@@ -1,0 +1,10 @@
+{
+  "testEnvironment": "jsdom",
+  "setupFilesAfterEnv": ["<rootDir>/test/jest.setup.js"],
+  "transform": {
+    "^.+\\.js$": ["babel-jest", {
+      "presets": ["@babel/env", "@babel/react"],
+      "plugins": ["@babel/plugin-transform-runtime"]
+    }]
+  }
+}

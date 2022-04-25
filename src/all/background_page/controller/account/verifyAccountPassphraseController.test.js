@@ -24,7 +24,7 @@ describe("VerifyAccountPassphraseController", () => {
       const controller = new VerifyAccountPassphraseController(null, null, account);
 
       expect.assertions(1);
-      const promise = controller.exec(pgpKeys.account_recovery_request.passphrase);
+      const promise = controller.exec(pgpKeys.ada.passphrase);
       await expect(promise).resolves.toBeUndefined();
     }, 10000);
 

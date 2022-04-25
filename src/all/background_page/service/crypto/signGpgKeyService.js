@@ -16,20 +16,23 @@ const {assertDecryptedPrivateKeys, assertPublicKeys} = require("../../utils/open
 
 class SignGpgKeyService {
   /**
-   * Signs a key with the given collection of key.
+   * Signs a key.
    *
-   * @param {string|openpgp.PublicKey} gpgKeyToSign
-   * @param {Array<string|openpgp.PrivateKey>} gpgKeyCollection
+   * @param {string|openpgp.PublicKey} publicKeyToSign The public key to sign.
+   * @param {Array<string|openpgp.PrivateKey>|string|openpgp.PrivateKey} signingKeys The key(s) to use to sign.
    * @returns {Promise<openpgp.PublicKey>}
    */
-  static async sign(gpgKeyToSign, gpgKeyCollection) {
-    gpgKeyToSign = await assertPublicKeys(gpgKeyToSign);
-    const signingKeys = [];
-    for (let i = 0; i < gpgKeyCollection.length; i++) {
-      const key = await assertDecryptedPrivateKeys(gpgKeyCollection[i]);
-      signingKeys.push(key);
+  static async sign(publicKeyToSign, signingKeys) {
+    if (Array.isArray(publicKeyToSign)) {
+      throw new TypeError('Only a single public key is allowed to be signed.');
     }
-    return gpgKeyToSign.signAllUsers(signingKeys);
+    publicKeyToSign = await assertPublicKeys(publicKeyToSign);
+    signingKeys = await assertDecryptedPrivateKeys(signingKeys);
+    if (!Array.isArray(signingKeys)) {
+      signingKeys = [signingKeys];
+    }
+
+    return publicKeyToSign.signAllUsers(signingKeys);
   }
 }
 

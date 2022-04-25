@@ -15,10 +15,6 @@
 import {v4 as uuidv4} from "uuid";
 import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
 
-/**
- * The Test Account Recovery Request gpg key is used to encrypt the private key password
- * Clear text password: 3f28361aa774a5767fbe70ecd09b2fbbf1d5b4b493fe171089436bfa6a2eb03fe630fa9f2483c59b68e20616f1a7597ff8d058a6f79d228a4181d71a61f80d98
- */
 export const createAcceptedAccountRecoveryResponseDto = data => {
   const defaultData = {
     "account_recovery_request_id": uuidv4(),
@@ -41,10 +37,17 @@ export const createRejectedAccountRecoveryResponseDto = data => {
   return Object.assign(defaultData, data || {});
 };
 
+/**
+ * The Test Account Recovery Request gpg key is used to encrypt the response data.
+ * The target private key belong to Ada.
+ * The Admin private key was used to sign the encrypted payload.
+ * The Organization private key was used to sign the encrypted payload.
+ * To know more about the data checkout the AccountRecoveryPrivateKeyPasswordEntity test data.
+ */
 export const acceptedAccountRecoveryResponseDto = data => {
   const defaultData = createAcceptedAccountRecoveryResponseDto({
     "id": uuidv4(),
-    "data": "-----BEGIN PGP MESSAGE-----\n\nhQGMA28jNnDWObePAQv6A4mEoHvefNOoSOEiiguPH72H74pUUPUxcZVrZt/1JkvM\nFd3udwDbGKhgkP74+qvVgh7RedcbTzpkQ5WINjSWQVrM821VyOwzPtM42t/z3piE\nam1WdIG/qb3S9D6ai4OOe06oXxrSNWH2qTSZlKgl7m+RM9K4a0k2BrAuMDcR+Sj3\nltvMOLm3k/bl4H5g/0OBxEkA2ivYEhi7BSv83wwghNo4tFJWAlV5ebvqCyhdFoHq\n1AM/yGZ91MIHAuYv1vp2NCSlVikzFYwjR6B2lCOeWbS0XIO/Fsf163U9eLxsdgyq\ngE4tjz/sD3qwapjMpubPGaZ5XFdK4oyY54brUtQ7ENlalH2jJixxCUEPM7d8jpM5\nTXi1vVdfcPMu+5eZZREwkMHC/WMZKROgkBQ4Q5hUEaqjJOwhuSz7CTB049vg6OiK\nGxM5EVC4mVT7106E36Fvj3bAgCKSvobOfR46EpxQmGUvRTnrthCVcKZVFtgYcXpd\nY17Ocagj5da9lDyl9zSY0ukBANTcCzi5hrBxChBIwvECNuFuqRMQfXi3pdfoN49P\nmCTMi5HrAtT1o17bKjuYL4MSjOboLoh2KZF5OOKQnuAFpMOHpOHD6DgaEdsXP1sn\nXkQCAo/W/7LK25Fo2sGK9GwO2Fqzu8mapaPfEJ+es35lVoQRrf0YQatw+7c4wjAE\nvTeWgCvkV+rAUMEIMGNqQbVVzVentwBrPHXLi6bJNbSdmPueTlnH2TwRja40gFTP\nxUk1oQN60QlyGkQZIWxqPrVdHWBnRdEklYGJXzCkahcvejmww6glVGtBBEiip1S7\noo2HYKtq3JkgAcGPb4BD5yPSBIapMlb7E62SdxFwwXvAHboy2D5NeHmoFijAiBJp\nBE1R1Oe9FG3gb1uKNws9UCwVlaXR9VxY2eSKWfMwqA4McWvTyaL4BtrZWWhu9vR/\nMwPHnBP4yUdRO8vyDJGIsWCEey8n29Hr5rcMu7kFWc3WQcRxFaK/Sam/i555w7sL\nSe3NU68nWXkidCQ2D2T2iYmRP0CsF6FKTQwj5pbCR6ZWTtsbtt4FztfKSvU5osEJ\nz5BqmIYOIfA5/cOyqn6XYnBaII3SzIwBUuqUlbaBEmSCif7NbjAjrfqcTgbHc7+h\nFz64XbPFwo0sxA2KGiJg2sXOU6blT7O6ESwfCtES8WvxR6rs5YDXumu7CtRtfp+Z\nIsBNVTo+9sO9CAZaXDiNITgUyyAkWeN8PsF3eXWtNHR0kBwMJZQyFjC7/IJ7h+l2\na45lUA9FaIvENcBet3baErOgXhECNaBJoD2LMG1jbX4ecHP8V0k9O4N7E/frZGIz\n/h50rZYW2BCQBxd6KPLCnGd/fL7E7SIDR5pLydvpLXRoQIwjtjchhthwE2B23g8u\nqpZj5doXSJEOn3pUZXT0T6dHfIpzNiHzYDfOaZ5ZraEmkgdE5JU8BQPeDVj9Uo5H\npwv0E7Wn7d2OJWMxkholb4c/e6AeEcc9KZBWpiUpqvHUyIcJi6zaZtyhv/Dy1YMF\nj2inTdmOFExTERJm2Lsps5FQwvvh5QnG3ILuIyVFwKo=\n=sbxg\n-----END PGP MESSAGE-----\n",
+    "data": "-----BEGIN PGP MESSAGE-----\n\n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\nTkNSR5Q0i+U4Lj1nLqudb7b3jqo=\n=xRbi\n-----END PGP MESSAGE-----",
     "created": "2020-05-04T20:31:45+00:00",
     "modified": "2020-05-04T20:31:45+00:00",
     "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",

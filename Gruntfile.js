@@ -321,11 +321,11 @@ module.exports = function (grunt) {
        */
       test: {
         stdout: true,
-        command: "jest --config .jest.config.json --no-cache ./src/all/ --maxWorkers=4"
+        command: "jest --no-cache ./src/all/ --maxWorkers=4"
       },
       test_coverage: {
         stdout: true,
-        command: "jest --config .jest.config.json --no-cache ./src/all/ --maxWorkers=4 --coverage --collectCoverageFrom=src/**/*.{js,jsx}"
+        command: "jest --no-cache ./src/all/ --maxWorkers=4 --coverage --collectCoverageFrom=src/**/*.{js,jsx}"
       },
 
       /**

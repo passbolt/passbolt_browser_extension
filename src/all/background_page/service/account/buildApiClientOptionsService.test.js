@@ -13,7 +13,7 @@
  */
 
 describe("BuildAccountApiClientOptionsService", () => {
-  describe("BuildAccountApiClientOptionsService:recover", () => {
+  describe("BuildAccountApiClientOptionsService:build", () => {
     it.todo("To test");
   });
 });

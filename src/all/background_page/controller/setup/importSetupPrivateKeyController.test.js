@@ -112,7 +112,7 @@ describe("ImportSetupPrivateKeyController", () => {
     });
 
     it("Should set the private key and public of the setup entity.", async() => {
-      expect.assertions(9);
+      expect.assertions(13);
       await MockExtension.withConfiguredAccount();
 
       const mockedResponse = {
@@ -130,6 +130,10 @@ describe("ImportSetupPrivateKeyController", () => {
       const controller = new ImportSetupPrivateKeyController(null, null, account);
 
       await controller.exec(expectedKeyData.private);
+      await expect(account.userKeyFingerprint).not.toBeNull();
+      await expect(account.userKeyFingerprint).toHaveLength(40);
+      await expect(account.userPublicArmoredKey).toBeOpenpgpPublicKey();
+      await expect(account.userPrivateArmoredKey).toBeOpenpgpPrivateKey();
 
       const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(account.userPublicArmoredKey);
       const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(account.userPrivateArmoredKey);

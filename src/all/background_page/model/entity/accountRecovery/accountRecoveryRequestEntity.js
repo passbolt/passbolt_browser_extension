@@ -145,12 +145,6 @@ class AccountRecoveryRequestEntity extends Entity {
 
   /*
    * ==================================================
-   * Sanitization
-   * ==================================================
-   */
-
-  /*
-   * ==================================================
    * Serialization
    * ==================================================
    */
@@ -192,6 +186,14 @@ class AccountRecoveryRequestEntity extends Entity {
   }
 
   /**
+   * Get the user id
+   * @returns {string}
+   */
+  get userId() {
+    return this._props.user_id;
+  }
+
+  /**
    * Get the status
    * @returns {string} status
    */
@@ -217,22 +219,17 @@ class AccountRecoveryRequestEntity extends Entity {
 
   /*
    * ==================================================
-   * Static properties getters
-   * ==================================================
-   */
-  /**
-   * ResourceEntity.ENTITY_NAME
-   * @returns {string}
-   */
-  static get ENTITY_NAME() {
-    return ENTITY_NAME;
-  }
-
-  /*
-   * ==================================================
    * Associated properties getters
    * ==================================================
    */
+
+  /**
+   * Get the request creator
+   * @returns {UserEntity|null}
+   */
+  get creator() {
+    return this._creator || null;
+  }
 
   /**
    * Get the account recovery private key
@@ -248,6 +245,19 @@ class AccountRecoveryRequestEntity extends Entity {
    */
   get accountRecoveryResponses() {
     return this._account_recovery_responses || null;
+  }
+
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
+  /**
+   * ResourceEntity.ENTITY_NAME
+   * @returns {string}
+   */
+  static get ENTITY_NAME() {
+    return ENTITY_NAME;
   }
 }
 

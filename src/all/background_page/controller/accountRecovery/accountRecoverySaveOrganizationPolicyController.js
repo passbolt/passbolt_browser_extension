@@ -21,11 +21,12 @@ const {AccountRecoveryPrivateKeyPasswordsCollection} = require("../../model/enti
 const {Keyring} = require("../../model/keyring");
 const {ProgressService} = require("../../service/progress/progressService");
 const {DecryptPrivateKeyService} = require('../../service/crypto/decryptPrivateKeyService');
-const {ReEncryptMessageService} = require("../../service/crypto/reEncryptMessageService");
 const {SignGpgKeyService} = require('../../service/crypto/signGpgKeyService');
 const {RevokeGpgKeyService} = require('../../service/crypto/revokeGpgKeyService');
 const PassphraseController = require("../../controller/passphrase/passphraseController");
 const {GetGpgKeyInfoService} = require("../../service/crypto/getGpgKeyInfoService");
+const {DecryptPrivateKeyPasswordDataService} = require("../../service/accountRecovery/decryptPrivateKeyPasswordDataService");
+const {EncryptMessageService} = require("../../service/crypto/encryptMessageService");
 
 /**
  * Controller related to the account recovery save settings
@@ -42,6 +43,7 @@ class AccountRecoverySaveOrganizationPolicyController {
     this.requestId = requestId;
     this.accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
     this.progressService = new ProgressService(this.worker, i18n.t("Rekeying users' key"));
+    this.keyring = new Keyring();
   }
 
   /**
@@ -69,7 +71,7 @@ class AccountRecoverySaveOrganizationPolicyController {
    * @return {Promise<AccountRecoveryOrganizationPolicyEntity>}
    */
   async exec(organizationPolicyChangesDto, organizationPrivateKeyDto = null) {
-    const userPassphrase = await PassphraseController.request(this.worker);
+    const userPassphrase = await PassphraseController.get(this.worker);
     const organizationPolicyChanges = new AccountRecoveryOrganizationPolicyChangeEntity(organizationPolicyChangesDto);
     const organizationPrivateKey = organizationPrivateKeyDto ? new PrivateGpgkeyEntity(organizationPrivateKeyDto) : null;
 
@@ -77,20 +79,22 @@ class AccountRecoverySaveOrganizationPolicyController {
 
     const hasNewOrganizationKey = Boolean(organizationPolicyChanges.accountRecoveryOrganizationPublicKey);
     const hasToRevokeCurrentOrganizationKey = this._hasToRevokedCurrentORK(organizationPolicyChanges, currentOrganizationPolicy);
-    const hasToSignNewOrganizationKey = this._hasToSignNewORK(organizationPolicyChanges, currentOrganizationPolicy);
-    const hasToReKeyPrivateKeyPasswords = hasToRevokeCurrentOrganizationKey && hasToSignNewOrganizationKey;
 
     const saveOrganizationPolicyDto = organizationPolicyChanges.toDto({account_recovery_organization_public_key: true});
     saveOrganizationPolicyDto.policy = saveOrganizationPolicyDto.policy || currentOrganizationPolicy.policy;
 
+    const signedInUserPrivateKey = this.keyring.findPrivate().armoredKey;
+    const signedInUserDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(signedInUserPrivateKey, userPassphrase);
+
     if (hasNewOrganizationKey) {
       const newOrganizationPublicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(organizationPolicyChanges.armoredKey);
       saveOrganizationPolicyDto.account_recovery_organization_public_key.fingerprint = newOrganizationPublicKeyInfo.fingerprint;
+      const signedNewORK = await SignGpgKeyService.sign(saveOrganizationPolicyDto.account_recovery_organization_public_key.armored_key, signedInUserDecryptedPrivateKey);
+      saveOrganizationPolicyDto.account_recovery_organization_public_key.armored_key = signedNewORK.armor();
     } else {
       saveOrganizationPolicyDto.public_key_id = currentOrganizationPolicy.publicKeyId;
     }
 
-    const signingKeys = [];
     if (hasToRevokeCurrentOrganizationKey) {
       const decryptedOrganizationPrivateKey = await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(organizationPrivateKey);
       const organizationPrivateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(decryptedOrganizationPrivateKey);
@@ -99,21 +103,12 @@ class AccountRecoverySaveOrganizationPolicyController {
         fingerprint: organizationPrivateKeyInfo.fingerprint
       };
 
-      signingKeys.push(decryptedOrganizationPrivateKey);
-
-      if (hasToReKeyPrivateKeyPasswords) {
-        const privateKeyPasswordCollection = await this._reEncryptPrivateKeyPasswords(organizationPolicyChanges.armoredKey, decryptedOrganizationPrivateKey);
+      if (hasNewOrganizationKey) {
+        const signedNewORK = await SignGpgKeyService.sign(saveOrganizationPolicyDto.account_recovery_organization_public_key.armored_key, decryptedOrganizationPrivateKey);
+        saveOrganizationPolicyDto.account_recovery_organization_public_key.armored_key = signedNewORK.armor();
+        const privateKeyPasswordCollection = await this._reEncryptPrivateKeyPasswords(organizationPolicyChanges.armoredKey, decryptedOrganizationPrivateKey, signedInUserDecryptedPrivateKey);
         saveOrganizationPolicyDto.account_recovery_private_key_passwords = privateKeyPasswordCollection.toDto();
       }
-    }
-
-    if (hasToSignNewOrganizationKey) {
-      const usersPrivateKey = (new Keyring()).findPrivate().armoredKey;
-      const decryptedAdministratorKey = await DecryptPrivateKeyService.decrypt(usersPrivateKey, userPassphrase);
-      signingKeys.push(decryptedAdministratorKey);
-
-      const signedNewORK = await SignGpgKeyService.sign(organizationPolicyChanges.armoredKey, signingKeys);
-      saveOrganizationPolicyDto.account_recovery_organization_public_key.armored_key = signedNewORK.armor();
     }
 
     const saveOrganizationPolicyEntity = new AccountRecoveryOrganizationPolicyEntity(saveOrganizationPolicyDto);
@@ -143,34 +138,13 @@ class AccountRecoverySaveOrganizationPolicyController {
   }
 
   /**
-   * Returns true if the new ORK needs to be signed.
-   * It needs to be signed if the new ORK is enabled and changed from the current one.
+   * Re-encrypt the existing account recovery private key passwords with the new organization recovery key.
    *
-   * @param {AccountRecoveryOrganizationPolicyChangeEntity} policyChangesEntity The organization policy changes
-   * @param {AccountRecoveryOrganizationPolicyEntity} currentPolicyEntity The current organization policy
-   * @returns {bool}
-   */
-  _hasToSignNewORK(policyChangesEntity, currentPolicyEntity) {
-    if (policyChangesEntity.isDisabled) {
-      return false;
-    }
-
-    if (currentPolicyEntity.isDisabled) {
-      return true;
-    }
-
-    return Boolean(policyChangesEntity.accountRecoveryOrganizationPublicKey)
-      && currentPolicyEntity.armoredKey !== policyChangesEntity.armoredKey;
-  }
-
-  /**
-   * Reencrypt the existing account recovery private key passwords with the new organization recovery key.
-   *
-   * @param {string} encryptionKey
-   * @param {string} decryptionKey
+   * @param {openpgp.PublicKey|string} encryptionKey The new organization public key to use to encrypt the private key password data.
+   * @param {openpgp.PrivateKey|string} decryptionKey The previous organization decrypted private key to use to decrypt the private key password data.
    * @returns {Promise<AccountRecoveryPrivateKeyPasswordsCollection>}
    */
-  async _reEncryptPrivateKeyPasswords(encryptionKey, decryptionKey) {
+  async _reEncryptPrivateKeyPasswords(encryptionKey, decryptionKey, signedInUserDecryptedPrivateKey) {
     const accountRecoveryPrivateKeyPasswords = await this.accountRecoveryModel.findAccountRecoveryPrivateKeyPasswords();
     if (accountRecoveryPrivateKeyPasswords.length === 0) {
       return new AccountRecoveryPrivateKeyPasswordsCollection([]);
@@ -178,24 +152,39 @@ class AccountRecoverySaveOrganizationPolicyController {
 
     await this.progressService.start(accountRecoveryPrivateKeyPasswords.length, i18n.t("Updating users' key..."));
 
-    const newAccountRecoveryPrivateKeyPasswords = [];
-    const items = accountRecoveryPrivateKeyPasswords.items;
+    const reEncryptedPrivateKeyPasswords = [];
     const encryptionKeyInfo = await GetGpgKeyInfoService.getKeyInfo(encryptionKey);
-    for (let i = 0; i < items.length; i++) {
-      const currentPassword = items[i];
-      const encryptedKeyData = await ReEncryptMessageService.reEncrypt(currentPassword.data, encryptionKey, decryptionKey, decryptionKey);
-      const privateKeyPasswordDto = {
-        data: encryptedKeyData,
-        private_key_id: currentPassword.privateKeyId,
-        recipient_fingerprint: encryptionKeyInfo.fingerprint,
-        recipient_foreign_model: AccountRecoveryPrivateKeyPasswordEntity.FOREIGN_MODEL_ORGANIZATION_KEY,
-      };
-      newAccountRecoveryPrivateKeyPasswords.push(privateKeyPasswordDto);
+    for (const privateKeyPassword of accountRecoveryPrivateKeyPasswords) {
+      const newPrivateKeyPasswordDto = await this._reEncryptPrivateKeyPassword(privateKeyPassword, encryptionKey, decryptionKey, encryptionKeyInfo.fingerprint, signedInUserDecryptedPrivateKey);
+      reEncryptedPrivateKeyPasswords.push(newPrivateKeyPasswordDto);
       await this.progressService.finishStep();
     }
 
     this.progressService.close();
-    return new AccountRecoveryPrivateKeyPasswordsCollection(newAccountRecoveryPrivateKeyPasswords);
+    return new AccountRecoveryPrivateKeyPasswordsCollection(reEncryptedPrivateKeyPasswords);
+  }
+
+  /**
+   * Re-encrypt a private key password.
+   * @param {AccountRecoveryPrivateKeyPasswordEntity} privateKeyPassword The private key password to re-encrypt.
+   * @param {openpgp.PublicKey|string} encryptionKey The new organization public key to use to encrypt the private key password data.
+   * @param {openpgp.PrivateKey|string} decryptionKey The previous organization decrypted private key to use to decrypt the private key password data.
+   * @param {string} recipientFingerprint The new organization public key fingerprint to use as password recipient fingerprint.
+   * @param {openpgp.PrivateKey|string} signedInUserDecryptedPrivateKey The signed-in user decrypted private key to use to sign the private key password data.
+   * @returns {Promise<AccountRecoveryPrivateKeyPasswordEntity>}
+   * @private
+   */
+  async _reEncryptPrivateKeyPassword(privateKeyPassword, encryptionKey, decryptionKey, recipientFingerprint, signedInUserDecryptedPrivateKey) {
+    const privateKeyPasswordDecryptedData = await DecryptPrivateKeyPasswordDataService.decrypt(privateKeyPassword, decryptionKey);
+    const privateKeyPasswordDecryptedDataSerialized = JSON.stringify(privateKeyPasswordDecryptedData);
+    const encryptedKeyData = await EncryptMessageService.encrypt(privateKeyPasswordDecryptedDataSerialized, encryptionKey, [decryptionKey, signedInUserDecryptedPrivateKey]);
+
+    return new AccountRecoveryPrivateKeyPasswordEntity({
+      data: encryptedKeyData,
+      private_key_id: privateKeyPassword.privateKeyId,
+      recipient_fingerprint: recipientFingerprint,
+      recipient_foreign_model: AccountRecoveryPrivateKeyPasswordEntity.FOREIGN_MODEL_ORGANIZATION_KEY,
+    });
   }
 }
 

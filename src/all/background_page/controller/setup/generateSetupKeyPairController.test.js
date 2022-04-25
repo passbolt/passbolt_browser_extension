@@ -54,12 +54,16 @@ describe("GenerateSetupKeyPairController", () => {
     });
 
     it("Should generate a gpg key pair and update the account accordingly.", async() => {
-      expect.assertions(7);
+      expect.assertions(11);
       const generateKeyPairDto = {passphrase: "What a great passphrase!"};
       const account = new AccountSetupEntity(startAccountSetupDto());
       const controller = new GenerateSetupKeyPairController(null, null, account);
 
       await controller.exec(generateKeyPairDto);
+      await expect(account.userKeyFingerprint).not.toBeNull();
+      await expect(account.userKeyFingerprint).toHaveLength(40);
+      await expect(account.userPublicArmoredKey).toBeOpenpgpPublicKey();
+      await expect(account.userPrivateArmoredKey).toBeOpenpgpPrivateKey();
 
       const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(account.userPublicArmoredKey);
       const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(account.userPrivateArmoredKey);

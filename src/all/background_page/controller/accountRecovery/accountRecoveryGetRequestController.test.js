@@ -12,11 +12,10 @@
  * @since         3.6.0
  */
 
-import {v4 as uuidv4} from "uuid";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import {defaultAccountRecoveryRequestDto} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+import {pendingAccountRecoveryRequestDto} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import {AccountRecoveryGetRequestController} from "./accountRecoveryGetRequestController";
 import {AccountRecoveryRequestEntity} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity";
 
@@ -28,11 +27,11 @@ describe("AccountRecoveryGetRequestController", () => {
   describe("AccountRecoveryGetRequestController::exec", () => {
     it("Should retrieve an account recovery request.", async() => {
       // Mock API fetch account recovery organization policy response.
-      const mockApiResult = defaultAccountRecoveryRequestDto();
+      const mockApiResult = pendingAccountRecoveryRequestDto();
       fetch.doMock(() => mockApiResponse(mockApiResult));
 
       const controller = new AccountRecoveryGetRequestController(null, null, defaultApiClientOptions());
-      const accountRecoveryRequest = await controller.exec(uuidv4());
+      const accountRecoveryRequest = await controller.exec(mockApiResult.id);
 
       expect.assertions(1);
       const accountRecoveryRequestDto = accountRecoveryRequest.toDto(AccountRecoveryRequestEntity.ALL_CONTAIN_OPTIONS);
@@ -41,7 +40,7 @@ describe("AccountRecoveryGetRequestController", () => {
 
     it("Should throw an error if the account recovery request id is not a valid.", async() => {
       // Mock API fetch account recovery organization policy response.
-      const mockApiResult = defaultAccountRecoveryRequestDto();
+      const mockApiResult = pendingAccountRecoveryRequestDto();
       fetch.doMock(() => mockApiResponse(mockApiResult));
 
       const controller = new AccountRecoveryGetRequestController(null, null, defaultApiClientOptions());

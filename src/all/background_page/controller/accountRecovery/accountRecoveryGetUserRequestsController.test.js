@@ -17,7 +17,7 @@ import {v4 as uuidv4} from "uuid";
 import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {AccountRecoveryGetUserRequestsController} from "./accountRecoveryGetUserRequestsController";
-import {defaultAccountRecoveryRequestDto} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+import {pendingAccountRecoveryRequestDto} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import {AccountRecoveryRequestEntity} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity";
 
 beforeEach(() => {
@@ -30,8 +30,8 @@ describe("AccountRecoveryGetUserRequestsController", () => {
       // Mock API fetch account recovery requests response.
       const userId = uuidv4();
       const mockApiResult = [
-        defaultAccountRecoveryRequestDto({user_id: userId}),
-        defaultAccountRecoveryRequestDto({user_id: userId})
+        pendingAccountRecoveryRequestDto({user_id: userId}),
+        pendingAccountRecoveryRequestDto({user_id: userId})
       ];
       fetch.doMock(req => {
         const queryString = (new URL(req.url)).search;

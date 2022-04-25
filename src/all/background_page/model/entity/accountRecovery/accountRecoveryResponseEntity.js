@@ -63,14 +63,14 @@ class AccountRecoveryResponseEntity extends Entity {
         },
         "responder_foreign_model": {
           "type": "string",
-          "enum": [RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY]
+          "enum": [this.RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY]
         },
         "data": {
           "type": "string",
         },
         "status": {
           "type": "string",
-          "enum": [STATUS_REJECTED, STATUS_APPROVED]
+          "enum": [this.STATUS_REJECTED, this.STATUS_APPROVED]
         },
         "created": {
           "type": "string",
@@ -180,6 +180,13 @@ class AccountRecoveryResponseEntity extends Entity {
    */
   static get STATUS_REJECTED() {
     return STATUS_REJECTED;
+  }
+
+  /**
+   * AccountRecoveryResponseEntity.RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY
+   */
+  static get RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY() {
+    return RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY;
   }
 }
 

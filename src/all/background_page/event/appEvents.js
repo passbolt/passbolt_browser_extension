@@ -12,7 +12,7 @@
  */
 const Worker = require('../model/worker');
 const {User} = require("../model/user");
-const {GetAccountRecoveryOrganizationPolicyController} = require("../controller/accountRecovery/getAccountRecoveryOrganizationPolicyController");
+const {GetOrganizationPolicyController} = require("../controller/accountRecovery/getOrganizationPolicyController");
 const {AccountRecoverySaveOrganizationPolicyController} = require("../controller/accountRecovery/accountRecoverySaveOrganizationPolicyController");
 const {AccountRecoveryValidatePublicKeyController} = require("../controller/accountRecovery/accountRecoveryValidatePublicKeyController");
 const {AccountRecoveryGenerateOrganizationKeyController} = require("../controller/accountRecovery/accountRecoveryGenerateOrganizationKeyController");
@@ -21,11 +21,11 @@ const {AccountRecoveryValidateOrganizationPrivateKeyController} = require("../co
 const {AccountRecoveryGetUserRequestsController} = require("../controller/accountRecovery/accountRecoveryGetUserRequestsController");
 const {AccountRecoveryGetRequestController} = require("../controller/accountRecovery/accountRecoveryGetRequestController");
 const {AccountRecoverySaveUserSettingsController} = require("../controller/accountRecovery/accountRecoverySaveUserSettingController");
-const {AccountRecoveryReviewRequestController} = require("../controller/accountRecovery/accountRecoveryReviewRequestController");
+const {ReviewRequestController} = require("../controller/accountRecovery/reviewRequestController");
 const {HasUserPostponedUserSettingInvitationController} = require("../controller/accountRecovery/hasUserPostponedUserSettingInvitationController");
 const {PostponeUserSettingInvitationController} = require("../controller/accountRecovery/postponeUserSettingInvitationController");
 
-const listen = function(worker) {
+const listen = function(worker, account) {
   /*
    * Whenever the (React) app changes his route
    * @listens passbolt.app.route-changed
@@ -46,7 +46,7 @@ const listen = function(worker) {
 
   worker.port.on('passbolt.account-recovery.get-organization-policy', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new GetAccountRecoveryOrganizationPolicyController(worker, requestId, apiClientOptions);
+    const controller = new GetOrganizationPolicyController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
@@ -97,14 +97,14 @@ const listen = function(worker) {
 
   worker.port.on('passbolt.account-recovery.save-user-settings', async(requestId, accountRecoveryUserSettingDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new AccountRecoverySaveUserSettingsController(worker, requestId, apiClientOptions);
+    const controller = new AccountRecoverySaveUserSettingsController(worker, requestId, apiClientOptions, account);
     await controller._exec(accountRecoveryUserSettingDto);
   });
 
-  worker.port.on('passbolt.account-recovery.review-request', async(requestId, accountRecoveryResponseDto, privateKeyDto) => {
+  worker.port.on('passbolt.account-recovery.review-request', async(requestId, accountRecoveryRequestId, responseStatus, privateKeyDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new AccountRecoveryReviewRequestController(worker, requestId, apiClientOptions);
-    await controller._exec(accountRecoveryResponseDto, privateKeyDto);
+    const controller = new ReviewRequestController(worker, requestId, apiClientOptions, account);
+    await controller._exec(accountRecoveryRequestId, responseStatus, privateKeyDto);
   });
 
   worker.port.on('passbolt.account-recovery.has-user-postponed-user-setting-invitation', async requestId => {

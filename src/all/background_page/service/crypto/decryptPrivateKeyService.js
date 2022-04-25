@@ -19,7 +19,7 @@ class DecryptPrivateKeyService {
   /**
    * Decrypt a private key with the given passphrase.
    *
-   * @param {PrivateGpgkeyEntity} privateKey
+   * @param {PrivateGpgkeyEntity} privateGpgKeyEntity The private gpg key entity to decrypt.
    * @returns {Promise<string>} the armored private key decrypted
    * @throws {InvalidMasterPasswordError} if the key cannot be decrypted with the passphrase
    */
@@ -42,10 +42,14 @@ class DecryptPrivateKeyService {
       throw new Error("The private key is already decrypted");
     }
 
-    return (await openpgp.decryptKey({
-      privateKey: privateKey,
-      passphrase: passphrase
-    }).catch(() => { throw new InvalidMasterPasswordError(); })).armor();
+    try {
+      return (await openpgp.decryptKey({
+        privateKey: privateKey,
+        passphrase: passphrase
+      })).armor();
+    } catch (error) {
+      throw new InvalidMasterPasswordError();
+    }
   }
 }
 

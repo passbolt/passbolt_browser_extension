@@ -16,10 +16,10 @@ export const contains = (equals, list, value) => list.findIndex(item => equals(i
 
 exports.toThrowEntityValidationErrorOnProperties = function(error, expected) {
   const {printExpected, printReceived, matcherHint} = this.utils;
-  const actual = error.details;
+  const actual = error.details || [];
 
   const passMessage =
-    `${matcherHint('.not.toContainAllKeys')
+    `${matcherHint('.not.toThrowEntityValidationErrorOnProperties')
     }\n\n` +
     `Expected validation to not fail on properties:\n` +
     `  ${printExpected(expected)}\n` +
@@ -27,7 +27,7 @@ exports.toThrowEntityValidationErrorOnProperties = function(error, expected) {
     `  ${printReceived(Object.keys(actual))}`;
 
   const failMessage =
-    `${matcherHint('.toContainAllKeys')
+    `${matcherHint('.toThrowEntityValidationErrorOnProperties')
     }\n\n` +
     `Expected validation to fail on properties:\n` +
     `  ${printExpected(expected)}\n` +

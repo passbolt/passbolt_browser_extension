@@ -13,8 +13,18 @@
  */
 
 import {toThrowEntityValidationErrorOnProperties} from "./toThrowEntityValidationErrorOnProperties";
+import {toBeOpenpgpKeySignedBy} from "./toBeOpenpgpKeySignedBy";
+import {toBeOpenpgpPublicKey} from "./toBeOpenpgpPublicKey";
+import {toBeOpenpgpRevokedKey} from "./toBeOpenpgpRevokedKey";
+import {toBeEqualToOpenpgpKey} from "./toBeEqualToOpenpgpKey";
+import {toBeOpenpgpPrivateKey} from "./toBeOpenpgpPrivateKey";
 
 const extensions = {
+  toBeEqualToOpenpgpKey,
+  toBeOpenpgpKeySignedBy,
+  toBeOpenpgpPrivateKey,
+  toBeOpenpgpPublicKey,
+  toBeOpenpgpRevokedKey,
   toThrowEntityValidationErrorOnProperties
 };
 

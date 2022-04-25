@@ -14,6 +14,7 @@
 
 const {GenerateGpgKeyPairEntity} = require('../../model/entity/gpgkey/generate/generateGpgKeyPairEntity');
 const {GenerateGpgKeyPairService} = require("../../service/crypto/generateGpgKeyPairService");
+const {GetGpgKeyInfoService} = require("../../service/crypto/getGpgKeyInfoService");
 
 /**
  * @typedef {({passphrase: string})} GenerateKeyPairPassphraseDto
@@ -58,7 +59,9 @@ class GenerateSetupKeyPairController {
   async exec(generateGpgKeyDto) {
     const generateGpgKeyPairEntity = this._buildGenerateKeyPairEntity(generateGpgKeyDto.passphrase);
     const keyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairEntity);
+    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(keyPair.publicKey.armoredKey);
 
+    this.account.userKeyFingerprint = keyInfo.fingerprint;
     this.account.userPrivateArmoredKey = keyPair.privateKey.armoredKey;
     this.account.userPublicArmoredKey = keyPair.publicKey.armoredKey;
   }

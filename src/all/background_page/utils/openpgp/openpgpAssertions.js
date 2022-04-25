@@ -46,8 +46,8 @@ exports.assertKeys = assertKeys;
  * - Should be a valid armored key or valid openpgp key.
  * - Should be private.
  *
- * @param {array<openpgp.PublicKey|openpgp.Private|string>|openpgp.PublicKey|openpgp.Private|string} privateKeys The private key(s) to assert.
- * @returns {array<openpgp.PublicKey|openpgp.Private>|openpgp.PublicKey|openpgp.Private}
+ * @param {array<openpgp.Private|string>|openpgp.Private|string} privateKeys The private key(s) to assert.
+ * @returns {array<openpgp.Private>|openpgp.Private}
  * @private
  */
 const assertPrivateKeys = async privateKeys => {

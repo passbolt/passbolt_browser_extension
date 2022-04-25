@@ -80,7 +80,7 @@ class AccountRecoveryModel {
    *
    * @param {string} id The request id
    * @param {Object} [contains] optional example: {creator: true, creator.gpgkey: true}
-   * @return {AccountRecoveryRequestEntity}
+   * @return {Promise<AccountRecoveryRequestEntity>}
    */
   async findRequestById(id, contains = {}) {
     if (!Validator.isUUID(id)) {
@@ -127,10 +127,11 @@ class AccountRecoveryModel {
   /**
    * Save the account recovery response.
    *
-   * @param {Promise<AccountRecoveryResponseEntity>} accountRecoveryResponseEntity The account recovery response to save.
+   * @param {AccountRecoveryResponseEntity} accountRecoveryResponseEntity The account recovery response to save.
+   * @return {Promise<AccountRecoveryResponseEntity>}
    */
   async saveReview(accountRecoveryResponseEntity) {
-    const accountRecoveryResponseDto = accountRecoveryResponseEntity.toDto(AccountRecoveryResponseEntity);
+    const accountRecoveryResponseDto = accountRecoveryResponseEntity.toDto();
     const savedAccountRecoveryResponseDto = await this.accountRecoveryResponseService.saveReview(accountRecoveryResponseDto);
     return new AccountRecoveryResponseEntity(savedAccountRecoveryResponseDto);
   }

@@ -13,7 +13,7 @@
  */
 
 const {ContinueAccountRecoveryController} = require("../controller/accountRecovery/continueAccountRecoveryController");
-const {AccountRecoveryRecoverAccountController} = require("../controller/accountRecovery/accountRecoveryRecoverAccountController");
+const {RecoverAccountController} = require("../controller/accountRecovery/recoverAccountController");
 const {AuthSignInController} = require("../controller/auth/authSignInController");
 const {GetOrganizationSettingsController} = require("../controller/organizationSettings/getOrganizationSettingsController");
 const {GetExtensionVersionController} = require("../controller/extension/getExtensionVersionController");
@@ -59,7 +59,7 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.account-recovery.recover-account', async(requestId, passphrase) => {
-    const controller = new AccountRecoveryRecoverAccountController(worker, requestId, apiClientOptions, account);
+    const controller = new RecoverAccountController(worker, requestId, apiClientOptions, account);
     await controller._exec(passphrase);
   });
 

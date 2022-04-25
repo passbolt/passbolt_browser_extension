@@ -21,7 +21,7 @@ export const initialAccountSetupDto = (data = {}) => {
   const defaultData = {
     "type": AccountSetupEntity.TYPE_ACCOUNT,
     "domain": "https://passbolt.local",
-    "user_id": uuidv4(),
+    "user_id": pgpKeys.ada.userId,
     "authentication_token_token": uuidv4(),
   };
 
@@ -30,9 +30,9 @@ export const initialAccountSetupDto = (data = {}) => {
 
 export const startAccountSetupDto = (data = {}) => {
   const defaultData = {
-    "first_name": "John",
-    "last_name": "Doe",
-    "username": "john@passbolt.dev"
+    "first_name": "Ada",
+    "last_name": "Lovelace",
+    "username": "ada@passbolt.dev"
   };
 
   return initialAccountSetupDto(Object.assign(defaultData, data));

@@ -29,11 +29,13 @@ class AccountRecoverySaveUserSettingsController {
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions
+   * @param {AbstractAccountEntity} account The account associated to the worker.
    */
-  constructor(worker, requestId, apiClientOptions) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.keyring = new Keyring();
+    this.account = account;
     this.accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
   }
 
@@ -78,7 +80,6 @@ class AccountRecoverySaveUserSettingsController {
    * @returns {Promise<AccountRecoveryUserSettingEntity>}
    */
   async buildApprovedUserSetting() {
-    const userId = User.getInstance().get().id;
     const userPassphrase = await PassphraseController.request(this.worker);
     const userPrivateArmoredKey = this.keyring.findPrivate().armoredKey;
     const userDecryptedPrivateOpenpgpKey = await DecryptPrivateKeyService.decrypt(userPrivateArmoredKey, userPassphrase);
@@ -87,7 +88,7 @@ class AccountRecoverySaveUserSettingsController {
       throw new Error("Account recovery organization policy not found.");
     }
 
-    return BuildApprovedAccountRecoveryUserSettingEntityService.build(userId, userDecryptedPrivateOpenpgpKey, organizationPolicy);
+    return BuildApprovedAccountRecoveryUserSettingEntityService.build(this.account, userDecryptedPrivateOpenpgpKey, organizationPolicy);
   }
 }
 

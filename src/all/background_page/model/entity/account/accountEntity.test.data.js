@@ -27,14 +27,34 @@ export const defaultAccountDto = (data = {}) => {
     "username": "ada@passbolt.dev",
     "first_name": "Ada",
     "last_name": "Lovelace",
-    "user_public_armored_key": pgpKeys.account_recovery_request.public,
-    "user_private_armored_key": pgpKeys.account_recovery_request.private,
-    "server_public_armored_key": pgpKeys.ada.public,
+    "user_key_fingerprint": pgpKeys.ada.fingerprint,
+    "user_public_armored_key": pgpKeys.ada.public,
+    "user_private_armored_key": pgpKeys.ada.private,
+    "server_public_armored_key": pgpKeys.server.public,
     "locale": "de-DE",
-    "security_token": defaultSecurityTokenDto(data?.security_token)
   };
+
+  data = Object.assign(defaultData, data);
+  data.security_token = defaultSecurityTokenDto(data?.security_token);
 
   delete data.securityToken;
 
   return Object.assign(defaultData, data);
+};
+
+export const adminAccountDto = (data = {}) => {
+  const defaultData = {
+    "user_id": pgpKeys.admin.userId,
+    "username": "admin@passbolt.dev",
+    "first_name": "Admin",
+    "last_name": "User",
+    "user_key_fingerprint": pgpKeys.admin.fingerprint,
+    "user_public_armored_key": pgpKeys.admin.public,
+    "user_private_armored_key": pgpKeys.admin.private,
+  };
+
+  return defaultAccountDto({
+    ...defaultData,
+    ...data
+  });
 };

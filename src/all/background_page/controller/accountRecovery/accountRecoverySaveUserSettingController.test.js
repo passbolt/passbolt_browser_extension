@@ -26,6 +26,8 @@ import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
 import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import {AccountEntity} from "../../model/entity/account/accountEntity";
 
 jest.mock("../passphrase/passphraseController.js");
 
@@ -53,7 +55,8 @@ describe("AccountRecoverySaveUserSettingsController", () => {
     });
 
     it("Should save an approved account recovery user setting.", async() => {
-      const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions());
+      const account = new AccountEntity(defaultAccountDto());
+      const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions(), account);
 
       // Mock user passphrase capture.
       PassphraseController.request.mockResolvedValue(pgpKeys.ada.passphrase);

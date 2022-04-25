@@ -5,6 +5,7 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
+const defaultConfig = require('../config/config.json');
 const _config = require('../config/config.json');
 
 /**
@@ -108,6 +109,14 @@ exports.isDebug = isDebug;
  * Flush the local storage config.
  */
 const flush = function() {
+  // Remove all properties from the local _config variable.
+  for (const key in _config) {
+    delete _config[key];
+  }
+  // Add the default config to the local _config variable.
+  for (const key in defaultConfig) {
+    _config[key] = defaultConfig[key];
+  }
   storage.removeItem('config');
 };
 exports.flush = flush;

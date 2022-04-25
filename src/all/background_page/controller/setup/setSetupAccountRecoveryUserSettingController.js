@@ -79,12 +79,11 @@ class SetSetupAccountRecoveryUserSettingController {
       throw new TypeError('The passphrase should be a valid string.');
     }
 
-    const userId = this.account.userId;
     const userPrivateArmoredKey = this.account.userPrivateArmoredKey;
     const userDecryptedPrivateOpenpgpKey = await DecryptPrivateKeyService.decrypt(userPrivateArmoredKey, passphrase);
     const organizationPolicy = this.runtimeMemory.accountRecoveryOrganizationPolicy;
 
-    return BuildApprovedAccountRecoveryUserSettingEntityService.build(userId, userDecryptedPrivateOpenpgpKey, organizationPolicy);
+    return BuildApprovedAccountRecoveryUserSettingEntityService.build(this.account, userDecryptedPrivateOpenpgpKey, organizationPolicy);
   }
 
   /**

@@ -8,6 +8,7 @@ const {PageMod} = require('../sdk/page-mod');
 const app = require('../app');
 const Worker = require('../model/worker');
 const {AppInitController} = require("../controller/app/appInitController");
+const {GetLegacyAccountService} = require("../service/account/getLegacyAccountService");
 const GpgAuth = require('../model/gpgauth').GpgAuth;
 
 /*
@@ -43,10 +44,16 @@ App.init = function() {
       const appInitController = new AppInitController();
       await appInitController.main();
 
+      /*
+       * Retrieve the account associated with this worker.
+       * @todo This method comes to replace the User.getInstance().get().
+       */
+      const account = await GetLegacyAccountService.get();
+
       app.events.appBootstrap.listen(worker);
 
       // Initialize the events listeners.
-      app.events.app.listen(worker);
+      app.events.app.listen(worker, account);
       app.events.auth.listen(worker);
       app.events.clipboard.listen(worker);
       app.events.config.listen(worker);

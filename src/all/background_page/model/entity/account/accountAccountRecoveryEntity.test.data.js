@@ -16,21 +16,21 @@ import {v4 as uuidv4} from "uuid";
 import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
 import {defaultSecurityTokenDto} from "../securityToken/SecurityTokenEntity.test.data";
 import {AccountAccountRecoveryEntity} from "./accountAccountRecoveryEntity";
-import {defaultAccountRecoveryRequestDto} from "../accountRecovery/accountRecoveryRequestEntity.test.data";
+import {pendingAccountRecoveryRequestDto} from "../accountRecovery/accountRecoveryRequestEntity.test.data";
 
 export const initialAccountAccountRecoveryDto = (data = {}) => {
   const defaultData = {
     "type": AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY,
     "domain": "https://passbolt.local",
-    "user_id": uuidv4(),
+    "user_id": pgpKeys.ada.userId,
     "authentication_token_token": uuidv4(),
     "first_name": "Ada",
     "last_name": "Lovelace",
     "username": "ada@passbolt.com",
     "server_public_armored_key": pgpKeys.server.public,
-    "user_key_fingerprint": pgpKeys.ada.fingerprint,
-    "user_public_armored_key": pgpKeys.ada.public,
-    "user_private_armored_key": pgpKeys.ada.private,
+    "user_key_fingerprint": pgpKeys.account_recovery_request.fingerprint,
+    "user_public_armored_key": pgpKeys.account_recovery_request.public,
+    "user_private_armored_key": pgpKeys.account_recovery_request.private,
     "security_token": defaultSecurityTokenDto(data?.security_token),
     "account_recovery_request_id":  uuidv4(),
   };
@@ -45,7 +45,7 @@ export const defaultAccountAccountRecoveryDto = (data = {}) => {
   const accountRecoveryRequestId = uuidv4();
   const defaultData = {
     account_recovery_request_id: accountRecoveryRequestId,
-    account_recovery_request: defaultAccountRecoveryRequestDto({id: accountRecoveryRequestId})
+    account_recovery_request: pendingAccountRecoveryRequestDto({id: accountRecoveryRequestId})
   };
   return initialAccountAccountRecoveryDto(Object.assign(defaultData, data));
 };

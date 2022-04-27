@@ -16,6 +16,7 @@ import {
   assertKeys,
   assertPrivateKeys,
   assertDecryptedPrivateKeys,
+  assertEncryptedPrivateKeys,
   assertPublicKeys,
   assertMessageToEncrypt,
   assertEncryptedMessage
@@ -285,6 +286,72 @@ describe("OpenPGP Assertions", () => {
         await assertDecryptedPrivateKeys(keyList);
       } catch (e) {
         expect(e).toStrictEqual(new Error("The private key should be decrypted."));
+      }
+    });
+  });
+
+  describe("OpenPGP Assertions::assertEncryptedPrivateKeys", () => {
+    it("Should return openpgp.PrivateKey for every acceptable type", async() => {
+      const openpgpDecryptedKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private});
+      const scenarios = [
+        pgpKeys.ada.private,
+        openpgpDecryptedKey
+      ];
+
+      expect.assertions(scenarios.length * 2);
+      for (let i = 0; i < scenarios.length; i++) {
+        const readKey = await assertEncryptedPrivateKeys(scenarios[i]);
+        expect(readKey).toBeInstanceOf(openpgp.PrivateKey);
+        expect(readKey.isDecrypted()).toBe(false);
+      }
+    });
+
+    it("Should return an array of openpgp.PrivateKey from an array of acceptable privateKey type", async() => {
+      const openpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private});
+      const privateKeys = [pgpKeys.ada.private, openpgpKey];
+
+      expect.assertions((privateKeys.length * 2) + 1);
+      const readKeys = await assertEncryptedPrivateKeys(privateKeys);
+
+      expect(readKeys.length).toBe(privateKeys.length);
+      for (let i = 0; i < readKeys.length; i++) {
+        expect(readKeys[i]).toBeInstanceOf(openpgp.PrivateKey);
+        expect(readKeys[i].isDecrypted()).toBe(false);
+      }
+    });
+
+    it("Should throw an Error if the input private key is not valid", async() => {
+      const publicOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.public});
+      const privateDecryptedOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private_decrypted});
+
+      const scenarios = [
+        {input: ":D", expectedError: new Error("The key should be a valid armored key or a valid openpgp key.")},
+        {input: publicOpenpgpKey, expectedError: new Error("The key should be private.")},
+        {input: pgpKeys.ada.public, expectedError: new Error("The key should be private.")},
+        {input: pgpKeys.ada.private_decrypted, expectedError: new Error("The private key should not be decrypted.")},
+        {input: privateDecryptedOpenpgpKey, expectedError: new Error("The private key should not be decrypted.")}
+      ];
+
+      expect.assertions(scenarios.length);
+      for (let i = 0; i < scenarios.length; i++) {
+        try {
+          await assertEncryptedPrivateKeys(scenarios[i].input);
+        } catch (e) {
+          expect(e).toStrictEqual(scenarios[i].expectedError);
+        }
+      }
+    });
+
+    it("Should throw an Error if at least one of the key in the list is not a valid private key", async() => {
+      const invalidPublicKey = pgpKeys.ada.private_decrypted;
+      const validPublicKey = pgpKeys.ada.private;
+      const keyList = [validPublicKey, invalidPublicKey];
+
+      expect.assertions(1);
+      try {
+        await assertEncryptedPrivateKeys(keyList);
+      } catch (e) {
+        expect(e).toStrictEqual(new Error("The private key should not be decrypted."));
       }
     });
   });

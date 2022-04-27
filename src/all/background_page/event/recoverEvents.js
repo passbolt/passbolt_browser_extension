@@ -27,7 +27,7 @@ const {HasRecoverUserEnabledAccountRecoveryController} = require("../controller/
 const {CompleteRecoverController} = require("../controller/recover/completeRecoverController");
 const {AuthSignInController} = require("../controller/auth/authSignInController");
 const {GetAndInitializeAccountLocaleController} = require("../controller/account/getAndInitializeAccountLocaleController");
-const {ValidatePrivateGpgKeyController} = require("../controller/crypto/validatePrivateGpgKeyController");
+const {ValidatePrivateGpgKeyRecoverController} = require("../controller/crypto/validatePrivateGpgKeyRecoverController");
 const {AbortAndRequestHelp} = require("../controller/recover/abortAndRequestHelpController");
 
 const listen = (worker, apiClientOptions, account) => {
@@ -107,8 +107,8 @@ const listen = (worker, apiClientOptions, account) => {
   });
 
   worker.port.on('passbolt.recover.validate-private-key', async(requestId, key) => {
-    const controller = new ValidatePrivateGpgKeyController(worker, requestId);
-    await controller._exec(key, false);
+    const controller = new ValidatePrivateGpgKeyRecoverController(worker, requestId);
+    await controller._exec(key);
   });
 
   worker.port.on('passbolt.recover.request-help-credentials-lost', async requestId => {

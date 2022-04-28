@@ -17,7 +17,7 @@ const fileController = require("../../controller/fileController");
 // The recovery kit file name.
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
 
-class DownloadSetupRecoveryKitController {
+class DownloadRecoveryKitController {
   /**
    * Constructor.
    * @param {Worker} worker The associated worker.
@@ -57,4 +57,4 @@ class DownloadSetupRecoveryKitController {
   }
 }
 
-exports.DownloadSetupRecoveryKitController = DownloadSetupRecoveryKitController;
+exports.DownloadRecoveryKitController = DownloadRecoveryKitController;

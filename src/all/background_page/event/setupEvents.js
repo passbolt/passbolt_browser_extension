@@ -23,7 +23,7 @@ const {GetAndInitSetupLocaleController} = require("../controller/setup/getAndIni
 const {SetSetupLocaleController} = require("../controller/setup/setSetupLocaleController");
 const {StartSetupController} = require("../controller/setup/startSetupController");
 const {GetAccountRecoveryOrganizationPolicyController} = require("../controller/setup/getAccountRecoveryOrganizationPolicyController");
-const {DownloadSetupRecoveryKitController} = require("../controller/setup/downloadSetupRecoverKitController");
+const {DownloadRecoveryKitController} = require("../controller/setup/downloadRecoverKitController");
 const {SetSetupSecurityTokenController} = require("../controller/setup/setSetupSecurityTokenController");
 const {CompleteSetupController} = require("../controller/setup/completeSetupController");
 const {AuthSignInController} = require("../controller/auth/authSignInController");
@@ -70,7 +70,7 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.setup.download-recovery-kit', async requestId => {
-    const controller = new DownloadSetupRecoveryKitController(worker, requestId, account);
+    const controller = new DownloadRecoveryKitController(worker, requestId, account);
     await controller._exec();
   });
 

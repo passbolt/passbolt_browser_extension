@@ -12,22 +12,22 @@
  * @since         3.6.0
  */
 
-import {DownloadSetupRecoveryKitController} from "./downloadSetupRecoverKitController";
+import {DownloadRecoveryKitController} from "./downloadRecoverKitController";
 import {
   startAccountSetupDto,
   withUserKeyAccountSetupDto
 } from "../../model/entity/account/accountSetupEntity.test.data";
 import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
 
-const FileController = require("../../controller/fileController");
+const FileController = require("../fileController");
 
 jest.mock("../../controller/fileController");
 
-describe("DownloadSetupRecoveryKitController", () => {
-  describe("DownloadSetupRecoveryKitController::exec", () => {
+describe("DownloadRecoveryKitController", () => {
+  describe("DownloadRecoveryKitController::exec", () => {
     it("Should throw an exception if the account does have a defined user armored private key.", async() => {
       const account = new AccountSetupEntity(startAccountSetupDto());
-      const controller = new DownloadSetupRecoveryKitController(null, null, account);
+      const controller = new DownloadRecoveryKitController(null, null, account);
 
       expect.assertions(1);
       const promise = controller.exec();
@@ -43,7 +43,7 @@ describe("DownloadSetupRecoveryKitController", () => {
       };
 
       const account = new AccountSetupEntity(withUserKeyAccountSetupDto());
-      const controller = new DownloadSetupRecoveryKitController(mockedWorker, null, account);
+      const controller = new DownloadRecoveryKitController(mockedWorker, null, account);
 
       expect.assertions(1);
       await controller.exec();

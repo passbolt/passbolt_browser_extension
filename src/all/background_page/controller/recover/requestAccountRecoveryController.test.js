@@ -13,7 +13,7 @@
  */
 
 import {enableFetchMocks} from "jest-fetch-mock";
-import {InitiateRecoverAccountRecoveryRequestController} from "./initiateRecoverAccountRecoveryRequestController";
+import {RequestAccountRecoveryController} from "./requestAccountRecoveryController";
 import {AccountLocalStorage} from "../../service/local_storage/accountLocalStorage";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
@@ -26,11 +26,11 @@ beforeEach(() => {
   enableFetchMocks();
 });
 
-describe("InitiateRecoverAccountRecoveryRequestController", () => {
-  describe("InitiateRecoverAccountRecoveryRequestController::exec", () => {
+describe("RequestAccountRecoveryController", () => {
+  describe("RequestAccountRecoveryController::exec", () => {
     it("Should initiate an account recovery from the recover journey.", async() => {
       const account = new AccountRecoverEntity(withSecurityTokenAccountRecoverDto());
-      const controller = new InitiateRecoverAccountRecoveryRequestController(null, defaultApiClientOptions(), null, account);
+      const controller = new RequestAccountRecoveryController(null, defaultApiClientOptions(), null, account);
 
       // Mock the API response.
       const mockApiResponseDto = pendingAccountRecoveryRequestDto();

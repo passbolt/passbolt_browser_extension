@@ -20,7 +20,7 @@ const {AccountLocalStorage} = require("../../service/local_storage/accountLocalS
 const {AccountRecoverEntity} = require("../../model/entity/account/accountRecoverEntity");
 const {AccountAccountRecoveryEntity} = require("../../model/entity/account/accountAccountRecoveryEntity");
 
-class InitiateRecoverAccountRecoveryRequestController {
+class RequestAccountRecoveryController {
   /**
    * Constructor.
    * @param {Worker} worker The associated worker.
@@ -70,4 +70,4 @@ class InitiateRecoverAccountRecoveryRequestController {
   }
 }
 
-exports.InitiateRecoverAccountRecoveryRequestController = InitiateRecoverAccountRecoveryRequestController;
+exports.RequestAccountRecoveryController = RequestAccountRecoveryController;

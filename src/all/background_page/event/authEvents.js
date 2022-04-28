@@ -16,8 +16,9 @@ const {Keyring} = require('../model/keyring');
 const Config = require('../model/config');
 const {UserAlreadyLoggedInError} = require("../error/userAlreadyLoggedInError");
 const {CheckPassphraseController} = require('../controller/crypto/checkPassphraseController');
+const {RequestHelpCredentialsLostController} = require("../controller/auth/requestHelpCredentialsLostController");
 
-const listen = function(worker) {
+const listen = function(worker, account) {
   /*
    * Check if the user is authenticated.
    *
@@ -195,6 +196,18 @@ const listen = function(worker) {
     }
     chrome.tabs.update(worker.tab.id, {url: url});
     worker.port.emit(requestId, 'SUCCESS');
+  });
+
+  /*
+   * Request help credentials lost.
+   *
+   * @listens passbolt.auth.request-help-credentials-lost
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.auth.request-help-credentials-lost', async requestId => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new RequestHelpCredentialsLostController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
   });
 };
 

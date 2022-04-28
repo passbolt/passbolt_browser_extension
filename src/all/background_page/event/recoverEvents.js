@@ -13,7 +13,7 @@
  */
 
 const {SetSetupLocaleController} = require("../controller/setup/setSetupLocaleController");
-const {InitiateRecoverAccountRecoveryRequestController} = require("../controller/recover/initiateRecoverAccountRecoveryRequestController");
+const {RequestAccountRecoveryController} = require("../controller/recover/requestAccountRecoveryController");
 const {GenerateRecoverAccountRecoveryRequestKeyController} = require("../controller/recover/generateRecoverAccountRecoveryRequestKeyController");
 const {VerifyAccountPassphraseController} = require("../controller/account/verifyAccountPassphraseController");
 const {ImportRecoverPrivateKeyController} = require('../controller/recover/importRecoverPrivateKeyController');
@@ -27,6 +27,7 @@ const {CompleteRecoverController} = require("../controller/recover/completeRecov
 const {AuthSignInController} = require("../controller/auth/authSignInController");
 const {GetAndInitializeAccountLocaleController} = require("../controller/account/getAndInitializeAccountLocaleController");
 const {ValidatePrivateGpgKeyController} = require("../controller/crypto/validatePrivateGpgKeyController");
+const {AbortAndRequestHelp} = require("../controller/recover/abortAndRequestHelpController");
 
 const listen = (worker, apiClientOptions, account) => {
   worker.port.on('passbolt.recover.first-install', async requestId => {
@@ -90,7 +91,7 @@ const listen = (worker, apiClientOptions, account) => {
   });
 
   worker.port.on('passbolt.recover.initiate-account-recovery-request', async requestId => {
-    const controller = new InitiateRecoverAccountRecoveryRequestController(worker, apiClientOptions, requestId, account);
+    const controller = new RequestAccountRecoveryController(worker, apiClientOptions, requestId, account);
     await controller._exec();
   });
 
@@ -102,6 +103,11 @@ const listen = (worker, apiClientOptions, account) => {
   worker.port.on('passbolt.recover.validate-private-key', async(requestId, key) => {
     const controller = new ValidatePrivateGpgKeyController(worker, requestId);
     await controller._exec(key, false);
+  });
+
+  worker.port.on('passbolt.recover.request-help-credentials-lost', async requestId => {
+    const controller = new AbortAndRequestHelp(worker, requestId, apiClientOptions, account);
+    await controller._exec();
   });
 };
 exports.listen = listen;

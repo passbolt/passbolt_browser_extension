@@ -96,6 +96,21 @@ class SetupService extends AbstractService {
   }
 
   /**
+   * Abort recover.
+   * @param {string} userId the user id
+   * @param {object} abortDto the abort recover dto.
+   * @returns {Promise<*>} response body
+   * @throws {Error} if options are invalid or API error
+   */
+  async abort(userId, abortDto) {
+    this.assertValidId(userId);
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/recover/abort/${userId}`, {});
+    const bodyString = this.apiClient.buildBody(abortDto);
+    const response = await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+    return response.body;
+  }
+
+  /**
    * Find legacy setup info.
    * @param {string} userId the user id
    * @param {string} token the token

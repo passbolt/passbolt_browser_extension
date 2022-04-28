@@ -20,6 +20,7 @@ const {GetExtensionVersionController} = require("../controller/extension/getExte
 const {GetAccountController} = require("../controller/account/getAccountController");
 const {GetAndInitializeAccountLocaleController} = require("../controller/account/getAndInitializeAccountLocaleController");
 const {VerifyAccountPassphraseController} = require("../controller/account/verifyAccountPassphraseController");
+const {AbortAndInitiateNewAccountRecoveryController} = require("../controller/accountRecovery/abortAndInitiateNewAccountRecoveryController");
 const {DownloadRecoveryKitController} = require("../controller/setup/downloadRecoverKitController");
 
 /**
@@ -67,6 +68,11 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.account-recovery.sign-in', async(requestId, passphrase, rememberMe) => {
     const controller = new AuthSignInController(worker, requestId, apiClientOptions, account);
     await controller._exec(passphrase, rememberMe);
+  });
+
+  worker.port.on('passbolt.account-recovery.request-help-credentials-lost', async requestId => {
+    const controller = new AbortAndInitiateNewAccountRecoveryController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
   });
 
   worker.port.on('passbolt.account-recovery.download-recovery-kit', async requestId => {

@@ -135,6 +135,16 @@ class SetupModel {
     const recoverCompleteDto = account.toCompleteRecoverDto();
     await this.setupService.completeRecover(account.userId, recoverCompleteDto);
   }
+
+  /**
+   * Abort recover request.
+   * @param {AccountRecoverEntity|AccountAccountRecoveryEntity} account The account to abort the recover request for.
+   * @returns {Promise<void>}
+   */
+  async abortRecover(account) {
+    const abortRecoverDto = account.toAbortRecoverDto();
+    await this.setupService.abort(account.userId, abortRecoverDto);
+  }
 }
 
 exports.SetupModel = SetupModel;

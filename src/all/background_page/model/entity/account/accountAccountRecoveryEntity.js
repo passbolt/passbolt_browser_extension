@@ -130,6 +130,18 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
     return result;
   }
 
+  /**
+   * Return a DTO ready to be sent the API to abort the the account recovery process.
+   * @returns {object}
+   */
+  toAbortRecoverDto() {
+    return {
+      authentication_token: {
+        token: this.authenticationTokenToken
+      },
+    };
+  }
+
   /*
    * ==================================================
    * Dynamic properties getters

@@ -306,6 +306,19 @@ class UserService extends AbstractService {
     await this.apiClient.fetchAndHandleResponse('GET', url);
     return true;
   }
+
+  /**
+   * Request help credentials lost.
+   * @param {object} requestHelpDto The request help data.
+   * @returns {Promise<*>} response body
+   * @throws {Error} if options are invalid or API error
+   */
+  async requestHelpCredentialsLost(requestHelpDto) {
+    const bodyString = this.apiClient.buildBody(requestHelpDto);
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/recover`, {});
+    const response = await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+    return response.body;
+  }
 }
 
 exports.UserService = UserService;

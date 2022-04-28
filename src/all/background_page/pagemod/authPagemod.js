@@ -9,6 +9,7 @@
 const {PageMod} = require('../sdk/page-mod');
 const app = require('../app');
 const Worker = require('../model/worker');
+const {GetLegacyAccountService} = require("../service/account/getLegacyAccountService");
 
 const Auth = function() {};
 Auth._pageMod = undefined;
@@ -28,12 +29,18 @@ Auth.init = function() {
        * chrome/data/passbolt-iframe-login-form.html
        */
     ],
-    onAttach: function(worker) {
+    onAttach: async function(worker) {
       Worker.add('Auth', worker);
+
+      /*
+       * Retrieve the account associated with this worker.
+       * @todo This method comes to replace the User.getInstance().get().
+       */
+      const account = await GetLegacyAccountService.get();
 
       app.events.user.listen(worker);
       app.events.keyring.listen(worker);
-      app.events.auth.listen(worker);
+      app.events.auth.listen(worker, account);
       app.events.config.listen(worker);
       app.events.organizationSettings.listen(worker);
       app.events.locale.listen(worker);

@@ -238,6 +238,19 @@ class UserModel {
     // Update local storage
     await UserLocalStorage.delete(userId);
   }
+
+  /**
+   * Request help when a user lost its credentials.
+   * @param {AbstractAccountEntity} account The account the credentials have been lost for.
+   * @returns {Promise<void>}
+   */
+  async requestHelpCredentialsLost(account) {
+    const requestHelpDto = {
+      username: account.username,
+      case: "lost-passphrase"
+    };
+    await this.userService.requestHelpCredentialsLost(requestHelpDto);
+  }
 }
 
 exports.UserModel = UserModel;

@@ -70,8 +70,8 @@
     "build": "npm run build-content-scripts; npm run build-data;",
     "build-content-scripts": "webpack --config webpack-content-scripts.config.js",
     "build-data": "webpack --config webpack-data.config.js",
-    "test": "grunt test",
-    "test-coverage": "grunt test-coverage",
+    "test": "jest --no-cache ./src/all/ --maxWorkers=4",
+    "test-coverage": "jest --no-cache ./src/all/ --maxWorkers=4 --coverage --collectCoverageFrom=src/**/*.{js,jsx}",
     "eslint": "eslint -c .eslintrc.json --ext js --ext jsx src",
     "eslint-fix": "eslint -c .eslintrc.json --ext js --ext jsx --fix src"
   }

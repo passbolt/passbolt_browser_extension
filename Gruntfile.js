@@ -56,7 +56,7 @@ module.exports = function (grunt) {
   grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle', 'browserify:vendors']);
   grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle', 'browserify:vendors']);
 
-  grunt.registerTask('build', ['shell:eslint', 'test', 'build-firefox', 'build-chrome']);
+  grunt.registerTask('build', ['shell:eslint', 'shell:test', 'build-firefox', 'build-chrome']);
 
   grunt.registerTask('build-firefox', ['build-firefox-debug', 'build-firefox-prod']);
   grunt.registerTask('build-firefox-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-firefox', 'shell:build_webpack_apps_debug', 'shell:build_firefox_debug']);
@@ -65,9 +65,6 @@ module.exports = function (grunt) {
   grunt.registerTask('build-chrome', ['build-chrome-debug', 'build-chrome-prod']);
   grunt.registerTask('build-chrome-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chrome', 'shell:build_webpack_apps_debug', 'shell:build_chrome_debug']);
   grunt.registerTask('build-chrome-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome', 'shell:build_webpack_apps_prod', 'shell:build_chrome_prod']);
-
-  grunt.registerTask('test', ['shell:test']);
-  grunt.registerTask('test-coverage', ['shell:test_coverage']);
 
   grunt.registerTask('custom-chrome-debug', ['bg-chrome-debug', 'react-chrome-debug']);
   grunt.registerTask('bg-chrome-debug', ['copy:background_page', 'browserify:background_page']);
@@ -321,11 +318,7 @@ module.exports = function (grunt) {
        */
       test: {
         stdout: true,
-        command: "jest --no-cache ./src/all/ --maxWorkers=4"
-      },
-      test_coverage: {
-        stdout: true,
-        command: "jest --no-cache ./src/all/ --maxWorkers=4 --coverage --collectCoverageFrom=src/**/*.{js,jsx}"
+        command: "npm run test"
       },
 
       /**

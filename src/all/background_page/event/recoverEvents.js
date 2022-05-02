@@ -20,6 +20,7 @@ const {ImportRecoverPrivateKeyController} = require('../controller/recover/impor
 const {GetKeyInfoController} = require("../controller/crypto/getKeyInfoController");
 const {GetOrganizationSettingsController} = require("../controller/organizationSettings/getOrganizationSettingsController");
 const {IsExtensionFirstInstallController} = require("../controller/extension/isExtensionFirstInstallController");
+const {IsLostPassphraseCaseController} = require("../controller/accountRecovery/isLostPassphraseCaseController");
 const {StartRecoverController} = require("../controller/recover/startRecoverController");
 const {SetSetupSecurityTokenController} = require("../controller/setup/setSetupSecurityTokenController");
 const {HasRecoverUserEnabledAccountRecoveryController} = require("../controller/recover/hasRecoverUserEnabledAccountRecoveryController");
@@ -32,6 +33,11 @@ const {AbortAndRequestHelp} = require("../controller/recover/abortAndRequestHelp
 const listen = (worker, apiClientOptions, account) => {
   worker.port.on('passbolt.recover.first-install', async requestId => {
     const controller = new IsExtensionFirstInstallController(worker, requestId);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.recover.lost-passphrase-case', async requestId => {
+    const controller = new IsLostPassphraseCaseController(worker, requestId);
     await controller._exec();
   });
 

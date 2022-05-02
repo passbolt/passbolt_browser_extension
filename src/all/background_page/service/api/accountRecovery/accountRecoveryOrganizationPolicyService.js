@@ -90,12 +90,12 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
    * - it's not already used by a user
    * - it's not the previous ORK
    *
-   * @param {AccountRecoveryOrganizationPublicKeyDto} newAccountRecoveryOrganizationPublicKeyDto
-   * @param {AccountRecoveryOrganizationPublicKeyDto} currentAccountRecoveryOrganizationPublicKeyDto
+   * @param {string} publicKeyToValidate the key to check the validity as a potential new organization recovery key
+   * @param {string} organizationPolicyPulicKey the cuurent organization recovery key in its armored form
    * @throws {Error} if any of the checks are wrong
    */
-  static async validatePublicKey(newAccountRecoveryOrganizationPublicKeyDto, currentAccountRecoveryOrganizationPublicKeyDto) {
-    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(newAccountRecoveryOrganizationPublicKeyDto.armored_key);
+  static async validatePublicKey(publicKeyToValidate, organizationPolicyPulicKey) {
+    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(publicKeyToValidate);
 
     if (keyInfo.algorithm !== "RSA") {
       throw new Error("The key algorithm should be RSA.");
@@ -139,11 +139,11 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
       }
     }
 
-    if (!currentAccountRecoveryOrganizationPublicKeyDto) {
+    if (!organizationPolicyPulicKey) {
       return;
     }
 
-    const currentOrkInfo = await GetGpgKeyInfoService.getKeyInfo(currentAccountRecoveryOrganizationPublicKeyDto.armored_key);
+    const currentOrkInfo = await GetGpgKeyInfoService.getKeyInfo(organizationPolicyPulicKey);
     if (currentOrkInfo.fingerprint === keyInfo.fingerprint) {
       throw new Error("The key is the current organization recovery key, you must provide a new one.");
     }

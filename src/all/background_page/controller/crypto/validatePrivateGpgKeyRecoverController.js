@@ -14,8 +14,9 @@
 
 const {GetGpgKeyInfoService} = require('../../service/crypto/getGpgKeyInfoService');
 const {i18n} = require('../../sdk/i18n');
+const {assertEncryptedPrivateKeys} = require("../../utils/openpgp/openpgpAssertions");
 
-class ValidatePrivateGpgKeyController {
+class ValidatePrivateGpgKeyRecoverController {
   /**
    * ValidateGpgKeyController constructor
    * @param {Worker} worker
@@ -30,11 +31,10 @@ class ValidatePrivateGpgKeyController {
    * Wrapper of exec function to run it with worker.
    *
    * @param {string} key the key to validate.
-   * @param {boolean} [ensureKeyNeverExpires] if true, do an extra check to ensure the key doesn't have a expiration date.
    */
-  async _exec(key, ensureKeyNeverExpires = false) {
+  async _exec(key) {
     try {
-      await this.exec(key, ensureKeyNeverExpires);
+      await this.exec(key);
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
@@ -46,9 +46,12 @@ class ValidatePrivateGpgKeyController {
    * Get the given user key information.
    *
    * @param {string} key the key to validate.
-   * @param {boolean} ensureKeyNeverExpires if true, do an extra check to ensure the key doesn't have a expiration date.
+   * @throws {Error} if the key is not a valid GPG Key.
+   * @throws {Error} if the key is revoked.
+   * @throws {Error} if the key is expired.
+   * @throws {Error} if the key is not private.
    */
-  async exec(key, ensureKeyNeverExpires) {
+  async exec(key) {
     let keyInfo;
     try {
       keyInfo = await GetGpgKeyInfoService.getKeyInfo(key);
@@ -61,12 +64,12 @@ class ValidatePrivateGpgKeyController {
       throw new Error(i18n.t("The private key should not be revoked."));
     } else if (keyInfo.isExpired) {
       throw new Error(i18n.t("The private key should not be expired."));
-    } else if (keyInfo.expires !== "Never" && ensureKeyNeverExpires) {
-      throw new Error(i18n.t("The private key should not have an expiry date."));
     } else if (!keyInfo.private) {
       throw new Error(i18n.t("The key should be private."));
     }
+
+    await assertEncryptedPrivateKeys(key);
   }
 }
 
-exports.ValidatePrivateGpgKeyController = ValidatePrivateGpgKeyController;
+exports.ValidatePrivateGpgKeyRecoverController = ValidatePrivateGpgKeyRecoverController;

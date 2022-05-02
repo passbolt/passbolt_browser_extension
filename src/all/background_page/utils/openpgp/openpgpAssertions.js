@@ -89,6 +89,30 @@ const assertDecryptedPrivateKeys = async privateKeys => {
 exports.assertDecryptedPrivateKeys = assertDecryptedPrivateKeys;
 
 /**
+ * Assert pgp private encrypted key(s).
+ * - Should be a valid armored key or valid openpgp key.
+ * - Should be private.
+ * - Should be encrypted.
+ *
+ * @param {array<openpgp.PrivateKey|string>|openpgp.PrivateKey|string} privateKeys The private key(s) to assert.
+ * @returns {array<openpgp.PrivateKey>|openpgp.PrivateKey}
+ * @private
+ */
+const assertEncryptedPrivateKeys = async privateKeys => {
+  if (Array.isArray(privateKeys)) {
+    return Promise.all(privateKeys.map(key => assertEncryptedPrivateKeys(key)));
+  }
+
+  const privateKey = await assertPrivateKeys(privateKeys);
+  if (privateKey.isDecrypted()) {
+    throw new Error("The private key should not be decrypted.");
+  }
+
+  return privateKey;
+};
+exports.assertEncryptedPrivateKeys = assertEncryptedPrivateKeys;
+
+/**
  * Assert pgp key(s).
  * - Should be a valid armored key or valid openpgp key.
  *

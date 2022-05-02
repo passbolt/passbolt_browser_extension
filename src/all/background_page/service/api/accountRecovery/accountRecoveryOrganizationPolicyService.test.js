@@ -42,14 +42,14 @@ jest.mock('../../../model/gpgauth', () => {
 });
 
 function checkError(armored_key, errorMessage) {
-  const validationPromise = AccountRecoveryOrganizationPolicyService.validatePublicKey({armored_key: armored_key});
+  const validationPromise = AccountRecoveryOrganizationPolicyService.validatePublicKey(armored_key);
   return expect(validationPromise).rejects.toEqual(new Error(errorMessage));
 }
 
 describe("Account recovery validate public key service", () => {
   it("should accept a viable key", () => {
     expect.assertions(1);
-    const validationPromise = AccountRecoveryOrganizationPolicyService.validatePublicKey({armored_key: dummyData.viableKey});
+    const validationPromise = AccountRecoveryOrganizationPolicyService.validatePublicKey(dummyData.viableKey);
     return expect(validationPromise).resolves.not.toThrow();
   });
 
@@ -64,10 +64,9 @@ describe("Account recovery validate public key service", () => {
 
   it("should refuse the key if it's the same as currently used", () => {
     expect.assertions(1);
-    const key = {armored_key: dummyData.viableKey};
     const expectedError = new Error("The key is the current organization recovery key, you must provide a new one.");
 
-    const validationPromise = AccountRecoveryOrganizationPolicyService.validatePublicKey(key, key);
+    const validationPromise = AccountRecoveryOrganizationPolicyService.validatePublicKey(dummyData.viableKey, dummyData.viableKey);
     return expect(validationPromise).rejects.toEqual(expectedError);
   });
 });

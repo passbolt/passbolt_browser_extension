@@ -11,27 +11,42 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+
+const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
 const {AccountRecoveryOrganizationPolicyService} = require("../../service/api/accountRecovery/accountRecoveryOrganizationPolicyService");
+
 class AccountRecoveryValidatePublicKeyController {
-  constructor(worker, requestId) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
+    this.accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
   }
 
   /**
-   * Check if the key can be used as an organization recovery key.
+   * Wrapper of exec function to run it with worker.
    *
-   * @param {AccountRecoveryOrganizationPublicKeyDto} newOrk
-   * @param {AccountRecoveryOrganizationPublicKeyDto} currentOrk
+   * @param {string} keyToValidate the key to validate in its armored form.
+   * @return {Promise<void>}
    */
-  async exec(newOrk, currentOrk) {
+  async _exec(keyToValidate) {
     try {
-      await AccountRecoveryOrganizationPolicyService.validatePublicKey(newOrk, currentOrk);
+      await this.exec(keyToValidate);
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, 'ERROR', error);
     }
+  }
+
+  /**
+   * Check if the public key can be used as an organization recovery key.
+   *
+   * @param {string} publicKeyToValidate the public key to validate in its armored form.
+   * @return {Promise<void>}
+   */
+  async exec(publicKeyToValidate) {
+    const organizationPolicy = await this.accountRecoveryModel.findOrganizationPolicy();
+    await AccountRecoveryOrganizationPolicyService.validatePublicKey(publicKeyToValidate, organizationPolicy.armoredKey);
   }
 }
 

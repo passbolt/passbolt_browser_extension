@@ -56,9 +56,10 @@ const listen = function(worker, account) {
     await controller._exec(accountRecoveryOrganizationPolicyDto, privateGpgKeyDto);
   });
 
-  worker.port.on('passbolt.account-recovery.validate-organization-key', async(requestId, newAccountRecoveryOrganizationPublicKeyDto, currentAccountRecoveryOrganizationPublicKeyDto) => {
-    const controller = new AccountRecoveryValidatePublicKeyController(worker, requestId);
-    await controller.exec(newAccountRecoveryOrganizationPublicKeyDto, currentAccountRecoveryOrganizationPublicKeyDto);
+  worker.port.on('passbolt.account-recovery.validate-organization-key', async(requestId, newAccountRecoveryOrganizationPublicKey) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new AccountRecoveryValidatePublicKeyController(worker, requestId, apiClientOptions);
+    await controller._exec(newAccountRecoveryOrganizationPublicKey);
   });
 
   worker.port.on('passbolt.account-recovery.generate-organization-key', async(requestId, generateGpgKeyDto) => {

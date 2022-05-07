@@ -80,7 +80,7 @@ class AccountRecoverySaveUserSettingsController {
    * @returns {Promise<AccountRecoveryUserSettingEntity>}
    */
   async buildApprovedUserSetting() {
-    const userPassphrase = await PassphraseController.request(this.worker);
+    const userPassphrase = await PassphraseController.get(this.worker);
     const userPrivateArmoredKey = this.keyring.findPrivate().armoredKey;
     const userDecryptedPrivateOpenpgpKey = await DecryptPrivateKeyService.decrypt(userPrivateArmoredKey, userPassphrase);
     const organizationPolicy = await this.accountRecoveryModel.findOrganizationPolicy();

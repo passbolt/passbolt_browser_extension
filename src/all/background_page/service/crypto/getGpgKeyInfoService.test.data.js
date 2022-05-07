@@ -51,3 +51,43 @@ export const eddsaCurveKeyDto = (data = {}) => {
   const defaultData = getKeyDto(pgpKeys.anita);
   return Object.assign(defaultData, data);
 };
+
+export const ecc_p256KeyDto = (data = {}) => {
+  const defaultData = getKeyDto(pgpKeys.ecdsa_p256);
+  return Object.assign(defaultData, data);
+};
+
+export const ecc_p384KeyDto = (data = {}) => {
+  const defaultData = getKeyDto(pgpKeys.ecdsa_p384);
+  return Object.assign(defaultData, data);
+};
+
+export const ecc_p521KeyDto = (data = {}) => {
+  const defaultData = getKeyDto(pgpKeys.ecdsa_p521);
+  return Object.assign(defaultData, data);
+};
+
+export const ecc_curve25519KeyDto = (data = {}) => {
+  const defaultData = getKeyDto(pgpKeys.eddsa_ed25519);
+  return Object.assign(defaultData, data);
+};
+
+export const ecc_secp256k1KeyDto = (data = {}) => {
+  const defaultData = getKeyDto(pgpKeys.ecdsa_secp256k1);
+  return Object.assign(defaultData, data);
+};
+
+export const ecc_brainpoolp256r1KeyDto = (data = {}) => {
+  const defaultData = getKeyDto(pgpKeys.ecdsa_brainpoolp256r1);
+  return Object.assign(defaultData, data);
+};
+
+export const ecc_brainpoolp384r1KeyDto = (data = {}) => {
+  const defaultData = getKeyDto(pgpKeys.ecdsa_brainpoolp384r1);
+  return Object.assign(defaultData, data);
+};
+
+export const ecc_brainpoolp512r1KeyDto = (data = {}) => {
+  const defaultData = getKeyDto(pgpKeys.ecdsa_brainpoolp512r1);
+  return Object.assign(defaultData, data);
+};

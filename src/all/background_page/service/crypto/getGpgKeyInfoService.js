@@ -133,25 +133,26 @@ class GetGpgKeyInfoService {
     //algorithm are ECDSA or EdDSA
     const curveName = algorithmInfo?.curve.toString().toLowerCase();
     switch (curveName) {
-      case "nist p-256":
+      case "p256":
       case "ed25519":
+      case "secp256k1":
       case "curve25519":
       case "brainpoolp256r1": {
         return 256;
       }
       case "brainpoolp384r1":
-      case "nist p-384": {
+      case "p384": {
         return 384;
       }
       case "brainpoolp512r1": {
         return 512;
       }
-      case "nist p-521": {
+      case "p521": {
         return 521;
       }
     }
 
-    //@todo check if we covered every cases especially for algo like: Elgamal, ECDH, AEDH and AEDSA
+    //@todo check if we covered every cases especially for algo like: AEDH and AEDSA
     return undefined;
   }
 }

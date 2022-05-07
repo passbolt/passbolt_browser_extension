@@ -21,6 +21,14 @@ const {
   revokedKeyDto,
   validKeyWithExpirationDateDto,
   eddsaCurveKeyDto,
+  ecc_p256KeyDto,
+  ecc_p384KeyDto,
+  ecc_p521KeyDto,
+  ecc_curve25519KeyDto,
+  ecc_secp256k1KeyDto,
+  ecc_brainpoolp256r1KeyDto,
+  ecc_brainpoolp384r1KeyDto,
+  ecc_brainpoolp512r1KeyDto
 } = require('./getGpgKeyInfoService.test.data');
 
 describe("GpgKeyInfo service", () => {
@@ -106,14 +114,28 @@ describe("GpgKeyInfo service", () => {
   });
 
   it("should give the information of a key that is non RSA", async() => {
-    const dto = eddsaCurveKeyDto();
-    expect.assertions(1);
-    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(dto.armored_key);
-    const keyInfoDto = keyInfo.toDto();
+    const scenarios = [
+      eddsaCurveKeyDto(),
+      ecc_p256KeyDto(),
+      ecc_p384KeyDto(),
+      ecc_p521KeyDto(),
+      ecc_curve25519KeyDto(),
+      ecc_secp256k1KeyDto(),
+      ecc_brainpoolp256r1KeyDto(),
+      ecc_brainpoolp384r1KeyDto(),
+      ecc_brainpoolp512r1KeyDto(),
+    ];
+    expect.assertions(scenarios.length);
 
-    //Remove the armored_key as OpenpgpJS produced different armors than gpg cli.
-    delete keyInfoDto.armored_key;
-    delete dto.armored_key;
-    expect(keyInfoDto).toEqual(dto);
+    for (let i = 0; i < scenarios.length; i++) {
+      const dto = scenarios[i];
+      const keyInfo = await GetGpgKeyInfoService.getKeyInfo(dto.armored_key);
+      const keyInfoDto = keyInfo.toDto();
+
+      //Remove the armored_key as OpenpgpJS produced different armors than gpg cli.
+      delete keyInfoDto.armored_key;
+      delete dto.armored_key;
+      expect(keyInfoDto).toEqual(dto);
+    }
   });
 });

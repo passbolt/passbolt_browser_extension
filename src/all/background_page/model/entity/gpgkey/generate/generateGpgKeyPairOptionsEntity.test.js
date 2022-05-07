@@ -13,11 +13,11 @@
  */
 import {EntitySchema} from "../../abstract/entitySchema";
 import {EntityValidationError} from '../../abstract/entityValidationError';
-import {GenerateGpgKeyPairEntity} from "./generateGpgKeyPairEntity";
+import {GenerateGpgKeyPairOptionsEntity} from "./generateGpgKeyPairOptionsEntity";
 
-describe("GenerateGpgKeyPair entity", () => {
+describe("GenerateGpgKeyPairOptionsEntity entity", () => {
   it("schema must validate", () => {
-    EntitySchema.validateSchema(GenerateGpgKeyPairEntity.ENTITY_NAME, GenerateGpgKeyPairEntity.getSchema());
+    EntitySchema.validateSchema(GenerateGpgKeyPairOptionsEntity.ENTITY_NAME, GenerateGpgKeyPairOptionsEntity.getSchema());
   });
 
   it("constructor works if valid DTO is provided", () => {
@@ -26,28 +26,46 @@ describe("GenerateGpgKeyPair entity", () => {
       name: "Jean-Jacky",
       email: "jj@passbolt.com",
       passphrase: "ultra-secure",
-      keySize: 4096
+      keySize: 4096,
+      type: "rsa",
     };
-    const entity = new GenerateGpgKeyPairEntity(dto);
-    expect(entity.toDto()).toEqual(dto);
+    const entity = new GenerateGpgKeyPairOptionsEntity(dto);
+    expect(entity.toDto()).toStrictEqual(dto);
+  });
+
+  it("constructor works if minimal DTO is provided", () => {
+    expect.assertions(1);
+    const dto = {
+      name: "Jean-Jacky",
+      email: "jj@passbolt.com",
+      passphrase: "ultra-secure"
+    };
+    const entity = new GenerateGpgKeyPairOptionsEntity(dto);
+    expect(entity.toDto()).toStrictEqual({
+      ...dto,
+      type: "rsa",
+      keySize: 3072
+    });
   });
 
   it("constructor throws an exception if DTO contains invalid field", () => {
-    expect.assertions(5);
+    expect.assertions(6);
     try {
       const dto = {
         name: "",
         email: "@passbolt.com",
-        passphrase: "",
-        keySize: "super strong key size"
+        passphrase: "1234567",
+        keySize: "super strong key size",
+        type: "rsb",
       };
-      new GenerateGpgKeyPairEntity(dto);
+      new GenerateGpgKeyPairOptionsEntity(dto);
     } catch (error) {
       expect(error).toBeInstanceOf(EntityValidationError);
       expect(error.hasError('name', 'minLength')).toBe(true);
       expect(error.hasError('email', 'custom')).toBe(true);
       expect(error.hasError('passphrase', 'minLength')).toBe(true);
       expect(error.hasError('keySize', 'type')).toBe(true);
+      expect(error.hasError('type', 'enum')).toBe(true);
     }
   });
 });

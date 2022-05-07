@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 const {GenerateGpgKeyPairService} = require('../../service/crypto/generateGpgKeyPairService');
-const {GenerateGpgKeyPairEntity} = require("../../model/entity/gpgkey/generate/generateGpgKeyPairEntity");
+const {GenerateGpgKeyPairOptionsEntity} = require("../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity");
 
 /**
  * The account recovery organization key size.
@@ -51,16 +51,17 @@ class AccountRecoveryGenerateOrganizationKeyController {
 
   /**
    * Generate an account recovery organization gpg key.
-   * @param {Object} generateGpgKeyPairDto The account recovery organization key pair dto
+   * @param {Object} generateGpgKeyPairOptionsDto The account recovery organization key pair dto
    */
-  async exec(generateGpgKeyPairDto = {}) {
-    // Enforce the key size.
-    const defaultGenerateGpgKeyPairDto = {
+  async exec(generateGpgKeyPairOptionsDto = {}) {
+    // Enforce the key size & type.
+    const enforcedGenerateGpgKeyPairOptionsDto = {
+      type: GenerateGpgKeyPairOptionsEntity.TYPE_RSA,
       keySize: ACCOUNT_RECOVERY_ORGANIZATION_KEY_SIZE,
     };
-    Object.assign(generateGpgKeyPairDto, defaultGenerateGpgKeyPairDto);
-    const generateKeyPair = new GenerateGpgKeyPairEntity(generateGpgKeyPairDto);
-    return GenerateGpgKeyPairService.generateKeyPair(generateKeyPair);
+    Object.assign(generateGpgKeyPairOptionsDto, enforcedGenerateGpgKeyPairOptionsDto);
+    const generateKeyPairOptions = new GenerateGpgKeyPairOptionsEntity(generateGpgKeyPairOptionsDto);
+    return GenerateGpgKeyPairService.generateKeyPair(generateKeyPairOptions);
   }
 }
 

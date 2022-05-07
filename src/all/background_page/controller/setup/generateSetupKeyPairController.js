@@ -12,15 +12,13 @@
  * @since         3.6.0
  */
 
-const {GenerateGpgKeyPairEntity} = require('../../model/entity/gpgkey/generate/generateGpgKeyPairEntity');
+const {GenerateGpgKeyPairOptionsEntity} = require('../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity');
 const {GenerateGpgKeyPairService} = require("../../service/crypto/generateGpgKeyPairService");
 const {GetGpgKeyInfoService} = require("../../service/crypto/getGpgKeyInfoService");
 
 /**
  * @typedef {({passphrase: string})} GenerateKeyPairPassphraseDto
  */
-
-const DEFAULT_KEY_SIZE = 3072;
 
 class GenerateSetupKeyPairController {
   /**
@@ -53,12 +51,12 @@ class GenerateSetupKeyPairController {
   /**
    * Generate a key pair and associate to the account being set up.
    *
-   * @param {GenerateKeyPairPassphraseDto} generateGpgKeyDto
+   * @param {GenerateKeyPairPassphraseDto} passphraseDto
    * @returns {Promise<void>}
    */
-  async exec(generateGpgKeyDto) {
-    const generateGpgKeyPairEntity = this._buildGenerateKeyPairEntity(generateGpgKeyDto.passphrase);
-    const keyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairEntity);
+  async exec(passphraseDto) {
+    const generateGpgKeyPairOptionsEntity = this._buildGenerateKeyPairOptionsEntity(passphraseDto.passphrase);
+    const keyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(keyPair.publicKey.armoredKey);
 
     this.account.userKeyFingerprint = keyInfo.fingerprint;
@@ -67,19 +65,18 @@ class GenerateSetupKeyPairController {
   }
 
   /**
-   * Builds a default GenerateGpgKeyPairEntity with the given passphrase.
+   * Builds a default GenerateGpgKeyPairOptionsEntity with the given passphrase.
    *
    * @param {string} passphrase The passphrase used to protect the key.
-   * @returns {GenerateGpgKeyPairEntity}
+   * @returns {GenerateGpgKeyPairOptionsEntity}
    * @throw {EntityValidationError} if the generate key pair entity cannot be created with the given data.
    * @private
    */
-  _buildGenerateKeyPairEntity(passphrase) {
-    return new GenerateGpgKeyPairEntity({
+  _buildGenerateKeyPairOptionsEntity(passphrase) {
+    return new GenerateGpgKeyPairOptionsEntity({
       name: `${this.account.firstName} ${this.account.lastName}`,
       email: this.account.username,
       passphrase: passphrase,
-      keySize: DEFAULT_KEY_SIZE
     });
   }
 }

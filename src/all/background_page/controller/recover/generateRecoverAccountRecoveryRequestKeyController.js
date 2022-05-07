@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-const {GenerateGpgKeyPairEntity} = require("../../model/entity/gpgkey/generate/generateGpgKeyPairEntity");
+const {GenerateGpgKeyPairOptionsEntity} = require("../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity");
 const {GenerateGpgKeyPairService} = require("../../service/crypto/generateGpgKeyPairService");
 const {GetGpgKeyInfoService} = require("../../service/crypto/getGpgKeyInfoService");
 
@@ -58,8 +58,8 @@ class GenerateRecoverAccountRecoveryRequestKeyController {
       passphrase: generateGpgKeyPairDto?.passphrase,
       keySize: ACCOUNT_RECOVERY_REQUEST_KEY_SIZE
     };
-    const generateGpgKeyPairEntity = new GenerateGpgKeyPairEntity(dto);
-    const externalGpgKeyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairEntity);
+    const generateGpgKeyPairOptionsEntity = new GenerateGpgKeyPairOptionsEntity(dto);
+    const externalGpgKeyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);
     const publicGpgKeyInfo = await GetGpgKeyInfoService.getKeyInfo(externalGpgKeyPair.publicKey.armoredKey);
     this.account.userPrivateArmoredKey = externalGpgKeyPair.privateKey.armoredKey;
     this.account.userPublicArmoredKey = externalGpgKeyPair.publicKey.armoredKey;

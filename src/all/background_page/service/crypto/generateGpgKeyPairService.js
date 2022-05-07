@@ -18,11 +18,11 @@ class GenerateGpgKeyPairService {
   /**
    * Generate a gpg key pair.
    *
-   * @param {GenerateGpgKeyPairEntity} generateGpgKeyPairEntity The gpg generation parameter
+   * @param {GenerateGpgKeyPairOptionsEntity} generateGpgKeyPairOptionsEntity The gpg generation parameter
    * @return {Promise<ExternalGpgKeyPairEntity>}
    */
-  static async generateKeyPair(generateGpgKeyPairEntity) {
-    const openpgpGenerateKeyDto = Object.assign(generateGpgKeyPairEntity.toGenerateOpenpgpKeyDto(), {format: 'armored'});
+  static async generateKeyPair(generateGpgKeyPairOptionsEntity) {
+    const openpgpGenerateKeyDto = Object.assign(generateGpgKeyPairOptionsEntity.toGenerateOpenpgpKeyDto(), {format: 'armored'});
     const openpgpKeyPair = await openpgp.generateKey(openpgpGenerateKeyDto);
 
     return new ExternalGpgKeyPairEntity({

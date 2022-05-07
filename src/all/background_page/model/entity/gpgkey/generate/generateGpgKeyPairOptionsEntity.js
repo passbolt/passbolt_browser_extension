@@ -15,21 +15,42 @@ const {goog} = require('../../../../utils/format/emailaddress');
 const {Entity} = require('../../abstract/entity');
 const {EntitySchema} = require('../../abstract/entitySchema');
 
-const ENTITY_NAME = "GenerateGpgKeyPairEntity";
+const ENTITY_NAME = "GenerateGpgKeyPairOptionsEntity";
 
-class GenerateGpgKeyPairEntity extends Entity {
+const TYPE_RSA = "rsa";
+const DEFAULT_TYPE = TYPE_RSA;
+const DEFAULT_KEY_SIZE = 3072;
+
+class GenerateGpgKeyPairOptionsEntity extends Entity {
   /**
    * GenerateGpgKeyPair entity constructor
    *
-   * @param {Object} GenerateGpgKeyPairDto data transfer object
+   * @param {Object} generateGpgKeyPairDto data transfer object
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(GenerateGpgKeyPairDto) {
+  constructor(generateGpgKeyPairDto) {
+    GenerateGpgKeyPairOptionsEntity.marshal(generateGpgKeyPairDto);
+
     super(EntitySchema.validate(
-      GenerateGpgKeyPairEntity.ENTITY_NAME,
-      GenerateGpgKeyPairDto,
-      GenerateGpgKeyPairEntity.getSchema()
+      GenerateGpgKeyPairOptionsEntity.ENTITY_NAME,
+      generateGpgKeyPairDto,
+      GenerateGpgKeyPairOptionsEntity.getSchema()
     ));
+  }
+
+  /**
+   * Marshal the dto
+   * @param {Object} generateGpgKeyPairDto generate gpg key pair DTO
+   * @return {Object}
+   */
+  static marshal(generateGpgKeyPairDto) {
+    if (!generateGpgKeyPairDto.keySize) {
+      generateGpgKeyPairDto.keySize = this.DEFAULT_KEY_SIZE;
+    }
+
+    if (!generateGpgKeyPairDto.type) {
+      generateGpgKeyPairDto.type = this.DEFAULT_TYPE;
+    }
   }
 
   /**
@@ -43,7 +64,8 @@ class GenerateGpgKeyPairEntity extends Entity {
         "name",
         "email",
         "passphrase",
-        "keySize"
+        "keySize",
+        "type",
       ],
       "properties": {
         "name": {
@@ -56,10 +78,15 @@ class GenerateGpgKeyPairEntity extends Entity {
         },
         "passphrase": {
           "type": "string",
-          "minLength": 1
+          "minLength": 8,
+        },
+        "type": {
+          "type": "string",
+          "enum": ["rsa"],
         },
         "keySize": {
-          "type": "integer"
+          "type": "integer",
+          "minLength": this.DEFAULT_KEY_SIZE
         }
       }
     };
@@ -79,7 +106,7 @@ class GenerateGpgKeyPairEntity extends Entity {
       userIDs: [this.userId],
       rsaBits: this.rsaBits,
       passphrase: this.passphrase,
-      type: 'rsa'
+      type: this.type
     };
   }
 
@@ -113,6 +140,14 @@ class GenerateGpgKeyPairEntity extends Entity {
   }
 
   /**
+   * Get the key type length
+   * @returns {string} ie. rsa
+   */
+  get type() {
+    return this._props.type;
+  }
+
+  /**
    * Get the rsa key length
    * @returns {integer} ie. 4096
    */
@@ -134,12 +169,36 @@ class GenerateGpgKeyPairEntity extends Entity {
    * ==================================================
    */
   /**
-   * GenerateGpgKeyPairEntity.ENTITY_NAME
+   * GenerateGpgKeyPairOptionsEntity.ENTITY_NAME
    * @returns {string}
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
   }
+
+  /**
+   * GenerateGpgKeyPairOptionsEntity.DEFAULT_KEY_SIZE
+   * @returns {number}
+   */
+  static get DEFAULT_KEY_SIZE() {
+    return DEFAULT_KEY_SIZE;
+  }
+
+  /**
+   * GenerateGpgKeyPairOptionsEntity.DEFAULT_TYPE
+   * @returns {string}
+   */
+  static get DEFAULT_TYPE() {
+    return DEFAULT_TYPE;
+  }
+
+  /**
+   * GenerateGpgKeyPairOptionsEntity.TYPE_RSA
+   * @returns {string}
+   */
+  static get TYPE_RSA() {
+    return TYPE_RSA;
+  }
 }
 
-exports.GenerateGpgKeyPairEntity = GenerateGpgKeyPairEntity;
+exports.GenerateGpgKeyPairOptionsEntity = GenerateGpgKeyPairOptionsEntity;

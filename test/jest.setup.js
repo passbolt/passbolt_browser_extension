@@ -3,6 +3,7 @@ import MockStorage from '../src/all/background_page/sdk/storage.test.mock';
 import {OrganizationSettingsModel} from "../src/all/background_page/model/organizationSettings/organizationSettingsModel";
 import Config from "../src/all/background_page/model/config";
 import {Keyring} from "../src/all/background_page/model/keyring";
+import {UserLocalStorage} from "../src/all/background_page/service/local_storage/userLocalStorage";
 
 global.chrome = {};
 global.openpgp = require('openpgp');
@@ -16,7 +17,7 @@ global.urldecode = require('locutus/php/url/urldecode');
 global.jsSHA = require('jssha');
 global.XRegExp = require('xregexp');
 
-beforeEach(() => {
+beforeEach(async() => {
   // Before each test, reinitialise the local storages
   global.browser = Object.assign({}, {
     storage: new MockStorage(),
@@ -35,4 +36,5 @@ beforeEach(() => {
   const keyring = new Keyring();
   keyring.flush(Keyring.PUBLIC);
   keyring.flush(Keyring.PRIVATE);
+  await UserLocalStorage.flush();
 });

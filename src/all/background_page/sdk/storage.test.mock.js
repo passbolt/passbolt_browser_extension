@@ -36,6 +36,10 @@ class LocalStorage {
     });
     this.changeCallbacks.forEach(callback => callback(storageChangeEventValue));
   }
+
+  remove(key) {
+    delete this.storage[key];
+  }
 }
 
 class MockStorage {

@@ -42,6 +42,9 @@ import {
 import {AccountRecoveryResponseEntity} from "../../model/entity/accountRecovery/accountRecoveryResponseEntity";
 import PassphraseController from "../passphrase/passphraseController";
 import {MockExtension} from "../../../tests/mocks/mockExtension";
+import {UserLocalStorage} from "../../service/local_storage/userLocalStorage";
+import {defaultUserDto} from "../../model/entity/user/userEntity.test.data";
+import {UsersCollection} from "../../model/entity/user/usersCollection";
 
 jest.mock("../passphrase/passphraseController.js");
 
@@ -65,21 +68,23 @@ describe("ReviewRequestController", () => {
     };
 
     it("Should save a review account recovery request if approved.", async() => {
+      // Add the user in the local storage.
+      await UserLocalStorage.set(new UsersCollection([defaultUserDto({id: requestDto.user_id})]));
       // Import the public key of the user requesting an account recovery in the keyring, it will be used to check the signature on the account recovery private key data.
       const keyring = new Keyring();
       await keyring.importPublic(pgpKeys.ada.public, requestDto.user_id);
 
       // Mock API fetch account recovery organization policy response.
-      fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
+      fetch.doMockOnceIf(/account-recovery\/organization-policies.json/, () => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
       // Mock API get account recovery request.
-      fetch.doMockOnce(req => {
+      fetch.doMockOnceIf(/account-recovery\/requests\//, req => {
         const queryString = (new URL(req.url)).search;
         const params = new URLSearchParams(queryString);
         expect(params.get("contain[account_recovery_private_key_passwords]")).toBeTruthy();
         return mockApiResponse(requestDto);
       });
       // Mock API save account recovery response, return the request payload for assertion.
-      fetch.doMockOnce(async req => mockApiResponse(JSON.parse(await req.text())));
+      fetch.doMockOnceIf(/account-recovery\/responses.json/, async req => mockApiResponse(JSON.parse(await req.text())));
 
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
       const savedAccountRecoveryResponseEntity = await controller.exec(requestId, AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
@@ -100,15 +105,24 @@ describe("ReviewRequestController", () => {
     }, 10000);
 
     it("Should save a review account recovery request if rejected.", async() => {
+      // Add the user in the local storage.
+      await UserLocalStorage.set(new UsersCollection([defaultUserDto({id: requestDto.user_id})]));
       // Mock API fetch account recovery organization policy response.
-      fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
+      fetch.doMockOnceIf(/account-recovery\/organization-policies.json/, () => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
+      // Mock API get account recovery request.
+      fetch.doMockOnceIf(/account-recovery\/requests\//, req => {
+        const queryString = (new URL(req.url)).search;
+        const params = new URLSearchParams(queryString);
+        expect(params.get("contain[account_recovery_private_key_passwords]")).toBeTruthy();
+        return mockApiResponse(requestDto);
+      });
       // Mock API save account recovery response, return the request payload for assertion.
-      fetch.doMockOnce(async req => mockApiResponse(JSON.parse(await req.text())));
+      fetch.doMockOnceIf(/account-recovery\/responses.json/, async req => mockApiResponse(JSON.parse(await req.text())));
 
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
       const accountRecoveryResponseEntity = await controller.exec(uuidv4(), AccountRecoveryResponseEntity.STATUS_REJECTED);
 
-      expect.assertions(1);
+      expect.assertions(2);
       expect(accountRecoveryResponseEntity.status).toEqual("rejected");
     });
 
@@ -121,7 +135,7 @@ describe("ReviewRequestController", () => {
 
     it("Should assert the account recovery organization is enabled.", async() => {
       // Mock API fetch account recovery organization policy response.
-      fetch.doMockOnce(() => mockApiResponse(disabledAccountRecoveryOrganizationPolicyDto()));
+      fetch.doMockOnceIf(/account-recovery\/organization-policies.json/, () => mockApiResponse(disabledAccountRecoveryOrganizationPolicyDto()));
 
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
       const promise = controller.exec(uuidv4());
@@ -131,7 +145,9 @@ describe("ReviewRequestController", () => {
 
     it("Should assert the provided organization private key dto is valid.", async() => {
       // Mock API fetch account recovery organization policy response.
-      fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
+      fetch.doMockOnceIf(/account-recovery\/organization-policies.json/, () => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
+      // Mock API get account recovery request.
+      fetch.doMockOnceIf(/account-recovery\/requests\//, () => mockApiResponse(requestDto));
 
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
       const promise = controller.exec(uuidv4(), AccountRecoveryResponseEntity.STATUS_APPROVED, {});
@@ -141,7 +157,9 @@ describe("ReviewRequestController", () => {
 
     it("Should assert the account recovery organization private key can be decrypted.", async() => {
       // Mock API fetch account recovery organization policy response.
-      fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
+      fetch.doMockOnceIf(/account-recovery\/organization-policies.json/, () => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
+      // Mock API get account recovery request.
+      fetch.doMockOnceIf(/account-recovery\/requests\//, () => mockApiResponse(requestDto));
 
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
       const privateKeyDto = {
@@ -156,6 +174,8 @@ describe("ReviewRequestController", () => {
     it("Should assert the signed-in user private key can be decrypted.", async() => {
       // Mock API fetch account recovery organization policy response.
       fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
+      // Mock API get account recovery request.
+      fetch.doMockOnceIf(/account-recovery\/requests\//, () => mockApiResponse(requestDto));
       // Mock signed in user wrong passphrase
       PassphraseController.get.mockResolvedValue("wrong-passphrase");
 

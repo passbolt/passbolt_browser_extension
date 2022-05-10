@@ -26,11 +26,14 @@ class GenerateSetupKeyPairController {
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
    * @param {AccountSetupEntity} account The account being setup.
+   * @param {Object} runtimeMemory The setup runtime memory.
    */
-  constructor(worker, requestId, account) {
+  constructor(worker, requestId, account, runtimeMemory) {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
+    this.runtimeMemory = runtimeMemory;
+    this.runtimeMemory.passphrase = null;
   }
 
   /**
@@ -62,6 +65,8 @@ class GenerateSetupKeyPairController {
     this.account.userKeyFingerprint = keyInfo.fingerprint;
     this.account.userPrivateArmoredKey = keyPair.privateKey.armoredKey;
     this.account.userPublicArmoredKey = keyPair.publicKey.armoredKey;
+    // The passphrase will be later use to sign in the user.
+    this.runtimeMemory.passphrase = passphraseDto.passphrase;
   }
 
   /**

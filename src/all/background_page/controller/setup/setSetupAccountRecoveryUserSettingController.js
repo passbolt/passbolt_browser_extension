@@ -34,13 +34,11 @@ class SetSetupAccountRecoveryUserSettingController {
   /**
    * Wrapper of exec function to run it with worker.
    *
-   * @param {string} status The account recovery user settings status (approved or rejected).
-   * @param {string} passphrase The user passphrase, necessary to decrypt the user private key.
    * @return {Promise<void>}
    */
-  async _exec(status, passphrase) {
+  async _exec() {
     try {
-      await this.exec(status, passphrase);
+      await this.exec.apply(this, arguments);
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
@@ -52,15 +50,14 @@ class SetSetupAccountRecoveryUserSettingController {
    * Set the account recovery user setting.
    *
    * @param {string} status The account recovery user settings status (approved or rejected).
-   * @param {string} passphrase The user passphrase, necessary to decrypt the user private key.
    * @return {Promise<void>}
    */
-  async exec(status, passphrase) {
+  async exec(status) {
     let accountRecoveryUserSettingEntity;
     const isApproved = status === AccountRecoveryUserSettingEntity.STATUS_APPROVED;
 
     if (isApproved) {
-      accountRecoveryUserSettingEntity = await this.buildApprovedUserSetting(passphrase);
+      accountRecoveryUserSettingEntity = await this.buildApprovedUserSetting();
     } else {
       accountRecoveryUserSettingEntity = await this.buildRejectedUserSetting();
     }
@@ -70,17 +67,16 @@ class SetSetupAccountRecoveryUserSettingController {
 
   /**
    * Build the approved user setting entity.
-   * @param {string} passphrase The user passphrase.
    * @returns {Promise<AccountRecoveryUserSettingEntity>}
-   * @throw {TypeError} if the passphrase does not validate
+   * @throw {TypeError} if no passphrase defined in the setup runtime memory.
    */
-  async buildApprovedUserSetting(passphrase) {
-    if (!passphrase || !Validator.isUtf8(passphrase)) {
-      throw new TypeError('The passphrase should be a valid string.');
+  async buildApprovedUserSetting() {
+    if (!this?.runtimeMemory?.passphrase) {
+      throw new Error('A passphrase is required.');
     }
 
     const userPrivateArmoredKey = this.account.userPrivateArmoredKey;
-    const userDecryptedPrivateOpenpgpKey = await DecryptPrivateKeyService.decrypt(userPrivateArmoredKey, passphrase);
+    const userDecryptedPrivateOpenpgpKey = await DecryptPrivateKeyService.decrypt(userPrivateArmoredKey, this.runtimeMemory.passphrase);
     const organizationPolicy = this.runtimeMemory.accountRecoveryOrganizationPolicy;
 
     return BuildApprovedAccountRecoveryUserSettingEntityService.build(this.account, userDecryptedPrivateOpenpgpKey, organizationPolicy);

@@ -12,7 +12,7 @@
  * @since         2.0.0
  */
 
-const {VerifyAccountPassphraseController} = require("../controller/account/verifyAccountPassphraseController");
+const {VerifyImportedKeyPassphraseController} = require("../controller/setup/verifyImportedKeyPassphraseController");
 const {GenerateSetupKeyPairController} = require("../controller/setup/generateSetupKeyPairController");
 const {SetSetupAccountRecoveryUserSettingController} = require("../controller/setup/setSetupAccountRecoveryUserSettingController");
 const {ImportSetupPrivateKeyController} = require("../controller/setup/importSetupPrivateKeyController");
@@ -26,15 +26,15 @@ const {GetAccountRecoveryOrganizationPolicyController} = require("../controller/
 const {DownloadRecoveryKitController} = require("../controller/setup/downloadRecoverKitController");
 const {SetSetupSecurityTokenController} = require("../controller/setup/setSetupSecurityTokenController");
 const {CompleteSetupController} = require("../controller/setup/completeSetupController");
-const {AuthSignInController} = require("../controller/auth/authSignInController");
 const {ValidatePrivateGpgKeySetupController} = require("../controller/crypto/validatePrivateGpgKeySetupController");
+const {SignInSetupController} = require("../controller/setup/signInSetupController");
 
 const listen = function(worker, apiClientOptions, account) {
   /*
    * The setup runtime memory.
    *
    * Used to store information collected during the user setup journey that shouldn't be stored on the react side of
-   * the application because of their confidentiality or for logic reason. By intance the account recovery organization
+   * the application because of their confidentiality or for logic reason. By instance the account recovery organization
    * policy, collected during a setup start, and used later during the process to encrypt the private escrow of the user.
    */
   const runtimeMemory = {};
@@ -65,7 +65,7 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.setup.generate-key', async(requestId, generateGpgKeyDto) => {
-    const controller = new GenerateSetupKeyPairController(worker, requestId, account);
+    const controller = new GenerateSetupKeyPairController(worker, requestId, account, runtimeMemory);
     await controller._exec(generateGpgKeyDto);
   });
 
@@ -79,9 +79,9 @@ const listen = function(worker, apiClientOptions, account) {
     await controller._exec();
   });
 
-  worker.port.on('passbolt.setup.set-account-recovery-user-setting', async(requestId, status, passphrase) => {
+  worker.port.on('passbolt.setup.set-account-recovery-user-setting', async(requestId, status) => {
     const controller = new SetSetupAccountRecoveryUserSettingController(worker, requestId, account, runtimeMemory);
-    await controller._exec(status, passphrase);
+    await controller._exec(status);
   });
 
   worker.port.on('passbolt.setup.import-key', async(requestId, armoredKey) => {
@@ -90,7 +90,7 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.setup.verify-passphrase', async(requestId, passphrase) => {
-    const controller = new VerifyAccountPassphraseController(worker, requestId, account);
+    const controller = new VerifyImportedKeyPassphraseController(worker, requestId, account, runtimeMemory);
     await controller._exec(passphrase);
   });
 
@@ -100,7 +100,7 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.setup.complete', async requestId => {
-    const controller = new CompleteSetupController(worker, requestId, apiClientOptions, account);
+    const controller = new CompleteSetupController(worker, requestId, apiClientOptions, account, runtimeMemory);
     await controller._exec();
   });
 
@@ -109,9 +109,9 @@ const listen = function(worker, apiClientOptions, account) {
     await controller._exec(armoredKey);
   });
 
-  worker.port.on('passbolt.setup.sign-in', async(requestId, passphrase, rememberMe) => {
-    const controller = new AuthSignInController(worker, requestId, apiClientOptions, account);
-    await controller._exec(passphrase, rememberMe);
+  worker.port.on('passbolt.setup.sign-in', async(requestId, rememberMe) => {
+    const controller = new SignInSetupController(worker, requestId, apiClientOptions, account, runtimeMemory);
+    await controller._exec(rememberMe);
   });
 
   worker.port.on('passbolt.setup.validate-private-key', async(requestId, key) => {

@@ -21,6 +21,8 @@ const PassphraseController = require("../passphrase/passphraseController");
 const {EncryptMessageService} = require("../../service/crypto/encryptMessageService");
 const {Keyring} = require("../../model/keyring");
 const {DecryptPrivateKeyPasswordDataService} = require("../../service/accountRecovery/decryptPrivateKeyPasswordDataService");
+const {UserEntity} = require("../../model/entity/user/userEntity");
+const {UserLocalStorage} = require("../../service/local_storage/userLocalStorage");
 
 class ReviewRequestController {
   /**
@@ -70,18 +72,22 @@ class ReviewRequestController {
     if (organizationPolicy.isDisabled) {
       throw new Error("Sorry the account recovery feature is not enabled for this organization.");
     }
+    const request = await this._findAndAssertRequest(requestId);
 
     if (status === AccountRecoveryResponseEntity.STATUS_APPROVED) {
       const organizationPrivateGpgkey = new PrivateGpgkeyEntity(organizationPrivateGpgkeyDto);
       const passphrase = await PassphraseController.get(this.worker);
-      response = await this._buildApprovedResponse(requestId, organizationPolicy, organizationPrivateGpgkey, passphrase);
+      response = await this._buildApprovedResponse(request, organizationPolicy, organizationPrivateGpgkey, passphrase);
     } else if (status === AccountRecoveryResponseEntity.STATUS_REJECTED) {
       response = this._buildRejectedResponse(requestId, organizationPolicy);
     } else {
       throw new Error("The provided status should be either approved or rejected.");
     }
 
-    return this.accountRecoveryModel.saveReview(response);
+    const accountRecoveryResponse = await this.accountRecoveryModel.saveReview(response);
+    await this._updateUserLocalStorage(request.userId);
+
+    return accountRecoveryResponse;
   }
 
   /**
@@ -103,22 +109,21 @@ class ReviewRequestController {
 
   /**
    * Build the approved response.
-   * @param {string} requestId The account organization request id
-   * @param {AccountRecoveryOrganizationPolicyEntity} organizationPolicy The account recovery organization policy
+   * @param {AccountRecoveryRequestEntity} request The user account recovery request.
+   * @param {AccountRecoveryOrganizationPolicyEntity} organizationPolicy The account recovery organization policy.
    * @param {PrivateGpgkeyEntity} organizationPrivateGpgkey The account recovery organization private key and its associated passphrase.
    * @param {string} signedInUserPassphrase The signed-in user passphrase
    * @returns {AccountRecoveryResponseEntity}
    */
-  async _buildApprovedResponse(requestId, organizationPolicy, organizationPrivateGpgkey, signedInUserPassphrase) {
+  async _buildApprovedResponse(request, organizationPolicy, organizationPrivateGpgkey, signedInUserPassphrase) {
     const organizationPrivateKeyDecrypted = await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(organizationPrivateGpgkey);
     const signedInUserDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(this.account.userPrivateArmoredKey, signedInUserPassphrase);
-    const request = await this._findAndAssertRequest(requestId);
     const userPublicKey = await this._findUserPublicKey(request.userId);
     const data = await this._encryptResponseData(request, organizationPrivateKeyDecrypted, userPublicKey, signedInUserDecryptedPrivateKey);
 
     const accountRecoveryResponseDto = {
       status: AccountRecoveryResponseEntity.STATUS_APPROVED,
-      account_recovery_request_id: requestId,
+      account_recovery_request_id: request.id,
       responder_foreign_key: organizationPolicy.publicKeyId,
       responder_foreign_model: AccountRecoveryResponseEntity.RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY,
       data: data
@@ -203,6 +208,18 @@ class ReviewRequestController {
     const privateKeyPasswordDataSerialized = JSON.stringify(privateKeyPasswordData);
 
     return EncryptMessageService.encrypt(privateKeyPasswordDataSerialized, request.armoredKey, [organizationPrivateKeyDecrypted, signedInUserDecryptedPrivateKey]);
+  }
+
+  /**
+   * Update the user local storage and remove the pending associated account recovery request.
+   * @param {string} userId The identifier of the user to update.
+   * @return {Promise<void>}
+   */
+  async _updateUserLocalStorage(userId) {
+    const userDto = await UserLocalStorage.getUserById(userId);
+    userDto.pending_account_recovery_request = null;
+    const user = new UserEntity(userDto);
+    await UserLocalStorage.updateUser(user);
   }
 }
 

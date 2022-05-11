@@ -15,7 +15,7 @@
 const {SetSetupLocaleController} = require("../controller/setup/setSetupLocaleController");
 const {RequestAccountRecoveryController} = require("../controller/recover/requestAccountRecoveryController");
 const {GenerateRecoverAccountRecoveryRequestKeyController} = require("../controller/recover/generateRecoverAccountRecoveryRequestKeyController");
-const {VerifyAccountPassphraseController} = require("../controller/account/verifyAccountPassphraseController");
+const {VerifyImportedKeyPassphraseController} = require("../controller/setup/verifyImportedKeyPassphraseController");
 const {ImportRecoverPrivateKeyController} = require('../controller/recover/importRecoverPrivateKeyController');
 const {GetKeyInfoController} = require("../controller/crypto/getKeyInfoController");
 const {GetOrganizationSettingsController} = require("../controller/organizationSettings/getOrganizationSettingsController");
@@ -25,12 +25,20 @@ const {StartRecoverController} = require("../controller/recover/startRecoverCont
 const {SetSetupSecurityTokenController} = require("../controller/setup/setSetupSecurityTokenController");
 const {HasRecoverUserEnabledAccountRecoveryController} = require("../controller/recover/hasRecoverUserEnabledAccountRecoveryController");
 const {CompleteRecoverController} = require("../controller/recover/completeRecoverController");
-const {AuthSignInController} = require("../controller/auth/authSignInController");
 const {GetAndInitializeAccountLocaleController} = require("../controller/account/getAndInitializeAccountLocaleController");
 const {ValidatePrivateGpgKeyRecoverController} = require("../controller/crypto/validatePrivateGpgKeyRecoverController");
 const {AbortAndRequestHelp} = require("../controller/recover/abortAndRequestHelpController");
+const {SignInSetupController} = require("../controller/setup/signInSetupController");
 
 const listen = (worker, apiClientOptions, account) => {
+  /*
+   * The recover runtime memory.
+   *
+   * Used to store information collected during the user setup journey that shouldn't be stored on the react side of
+   * the application because of their confidentiality or for logic reason. By instance the passphrase of the user.
+   */
+  const runtimeMemory = {};
+
   worker.port.on('passbolt.recover.first-install', async requestId => {
     const controller = new IsExtensionFirstInstallController(worker, requestId);
     await controller._exec();
@@ -72,7 +80,7 @@ const listen = (worker, apiClientOptions, account) => {
   });
 
   worker.port.on('passbolt.recover.verify-passphrase', async(requestId, passphrase) => {
-    const controller = new VerifyAccountPassphraseController(worker, requestId, account);
+    const controller = new VerifyImportedKeyPassphraseController(worker, requestId, account, runtimeMemory);
     await controller._exec(passphrase);
   });
 
@@ -86,9 +94,9 @@ const listen = (worker, apiClientOptions, account) => {
     await controller._exec();
   });
 
-  worker.port.on('passbolt.recover.sign-in', async(requestId, passphrase, rememberMe) => {
-    const controller = new AuthSignInController(worker, requestId, apiClientOptions, account);
-    await controller._exec(passphrase, rememberMe);
+  worker.port.on('passbolt.recover.sign-in', async(requestId, rememberMe) => {
+    const controller = new SignInSetupController(worker, requestId, apiClientOptions, account, runtimeMemory);
+    await controller._exec(rememberMe);
   });
 
   worker.port.on('passbolt.recover.generate-account-recovery-request-key', async(requestId, generateGpgKeyPairDto) => {

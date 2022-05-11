@@ -22,7 +22,8 @@ describe("GenerateSetupKeyPairController", () => {
   describe("GenerateSetupKeyPairController::exec", () => {
     it("Should throw an exception if the passed DTO is not valid.", async() => {
       const account = new AccountSetupEntity(startAccountSetupDto());
-      const controller = new GenerateSetupKeyPairController(null, null, account);
+      const runtimeMemory = {};
+      const controller = new GenerateSetupKeyPairController(null, null, account, runtimeMemory);
 
       const scenarios = [
         {dto: null, expectedError: TypeError},
@@ -41,7 +42,7 @@ describe("GenerateSetupKeyPairController", () => {
         {dto: {passphrase: undefined}, expectedError: EntityValidationError},
       ];
 
-      expect.assertions(scenarios.length);
+      expect.assertions(scenarios.length * 2);
 
       for (let i = 0; i < scenarios.length; i++) {
         const scenario = scenarios[i];
@@ -49,15 +50,17 @@ describe("GenerateSetupKeyPairController", () => {
           await controller.exec(scenario.dto);
         } catch (e) {
           expect(e).toBeInstanceOf(scenario.expectedError);
+          expect(runtimeMemory.passphrase).toBeFalsy();
         }
       }
     });
 
     it("Should generate a gpg key pair and update the account accordingly.", async() => {
-      expect.assertions(11);
+      expect.assertions(12);
       const generateKeyPairDto = {passphrase: "What a great passphrase!"};
       const account = new AccountSetupEntity(startAccountSetupDto());
-      const controller = new GenerateSetupKeyPairController(null, null, account);
+      const runtimeMemory = {};
+      const controller = new GenerateSetupKeyPairController(null, null, account, runtimeMemory);
 
       await controller.exec(generateKeyPairDto);
       await expect(account.userKeyFingerprint).not.toBeNull();
@@ -81,6 +84,7 @@ describe("GenerateSetupKeyPairController", () => {
 
       const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(account.userPrivateArmoredKey, generateKeyPairDto.passphrase);
       expect(decryptedPrivateKey).not.toBeNull();
+      expect(runtimeMemory.passphrase).toStrictEqual(generateKeyPairDto.passphrase);
     }, 10000);
   });
 });

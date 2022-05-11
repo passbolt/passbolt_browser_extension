@@ -58,8 +58,14 @@ class CompleteSetupController {
     const accountSetup = new AccountEntity(this.account.toDto(AccountSetupEntity.ALL_CONTAIN_OPTIONS));
     await this.setupModel.completeSetup(this.account);
     await this.accountModel.add(accountSetup);
+    this.initPagemods();
+  }
 
-    // If there was no account yet configured, the following pagemods were not instantiated a the extension bootstrap.
+  /**
+   * If there was no account yet configured, the following pagemods were not instantiated a the extension bootstrap.
+   * @return {void}
+   */
+  initPagemods() {
     if (!app.pageMods.WebIntegration._pageMod) {
       app.pageMods.WebIntegration.init();
     }

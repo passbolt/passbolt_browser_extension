@@ -45,10 +45,11 @@ describe("SetSetupAccountRecoveryUserSettingController", () => {
     it("Should save an approved account recovery user setting.", async() => {
       const account = new AccountSetupEntity(withUserKeyAccountSetupDto());
       const runtimeMemory = {
-        accountRecoveryOrganizationPolicy: new AccountRecoveryOrganizationPolicyEntity(enabledAccountRecoveryOrganizationPolicyDto())
+        accountRecoveryOrganizationPolicy: new AccountRecoveryOrganizationPolicyEntity(enabledAccountRecoveryOrganizationPolicyDto()),
+        passphrase: pgpKeys.ada.passphrase
       };
       const controller = new SetSetupAccountRecoveryUserSettingController(null, null, account, runtimeMemory);
-      await controller.exec(AccountRecoveryUserSettingEntity.STATUS_APPROVED, pgpKeys.ada.passphrase);
+      await controller.exec(AccountRecoveryUserSettingEntity.STATUS_APPROVED);
 
       expect.assertions(5);
       expect(account.accountRecoveryUserSetting).toBeInstanceOf(AccountRecoveryUserSettingEntity);
@@ -66,7 +67,7 @@ describe("SetSetupAccountRecoveryUserSettingController", () => {
       const promise = controller.exec(AccountRecoveryUserSettingEntity.STATUS_APPROVED);
 
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError("The passphrase should be a valid string.");
+      await expect(promise).rejects.toThrowError("A passphrase is required.");
     });
   });
 });

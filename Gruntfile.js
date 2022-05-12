@@ -177,7 +177,8 @@ module.exports = function (grunt) {
           src: [
             'check_black.svg', 'check_white.svg', 'dot_black.svg', 'dot_white.svg', 'dot_red.svg',
             'infinite-bar.gif', 'loading_dark.svg', 'loading_light.svg', 'chevron-right_black.svg',
-            'chevron-right_white.svg', 'chevron-down_black.svg', 'chevron-down_white.svg', 'chevron-down_blue.svg'
+            'chevron-right_white.svg', 'chevron-down_black.svg', 'chevron-down_white.svg', 'chevron-down_blue.svg',
+            'success.svg', 'fail.svg', 'warning.svg'
           ],
           dest: path.build_data + 'img/controls',
           expand: true
@@ -222,22 +223,15 @@ module.exports = function (grunt) {
         }, {
           // Illustrations
           nonull: true,
-          cwd: path.node_modules + 'passbolt-styleguide/src/img/diagrams',
-          src: ['mobile-transfer.svg'],
-          dest: path.build_data + 'img/diagrams',
-          expand: true
-        }, {
-          // Illustrations
-          nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/illustrations',
-          src: ['passphrase_intro.png', 'pin_passbolt.gif', 'wave-pin_my_extension.svg', 'email.png'],
+          src: ['passphrase_intro.svg', 'pin_passbolt.gif', 'wave-pin_my_extension.svg', 'email.png'],
           dest: path.build_data + 'img/illustrations',
           expand: true
         }, {
           // Third party logos
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/third_party',
-          src: ['ChromeWebStore.png', 'firefox_logo.png', 'gnupg_logo.png', 'gnupg_logo_disabled.png'],
+          src: ['ChromeWebStore.png', 'firefox_logo-white.png', 'firefox_logo-black.png', 'gnupg_logo.png', 'gnupg_logo_disabled.png', 'appstore.svg', 'playstore.svg'],
           dest: path.build_data + 'img/third_party',
           expand: true
         }, {
@@ -262,7 +256,7 @@ module.exports = function (grunt) {
         }, {
           // Fonts
           cwd: path.node_modules + 'passbolt-styleguide/src/fonts',
-          src: ['opensans-bold.woff', 'opensans-regular.woff'],
+          src: ['opensans-bold.woff', 'opensans-semibold.woff', 'opensans-regular.woff', 'passbolt.ttf'],
           dest: path.build_data + 'fonts',
           expand: true
         }, {

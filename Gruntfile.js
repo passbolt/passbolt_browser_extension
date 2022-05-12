@@ -231,7 +231,7 @@ module.exports = function (grunt) {
           // Third party logos
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/third_party',
-          src: ['ChromeWebStore.png', 'firefox_logo.png', 'gnupg_logo.png', 'gnupg_logo_disabled.png', 'appstore.svg', 'playstore.svg'],
+          src: ['ChromeWebStore.png', 'firefox_logo-white.png', 'firefox_logo-black.png', 'gnupg_logo.png', 'gnupg_logo_disabled.png', 'appstore.svg', 'playstore.svg'],
           dest: path.build_data + 'img/third_party',
           expand: true
         }, {

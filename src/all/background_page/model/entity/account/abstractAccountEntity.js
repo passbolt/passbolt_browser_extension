@@ -63,7 +63,8 @@ class AbstractAccountEntity extends Entity {
         "user_key_fingerprint": {
           "type": "string",
           "minLength": FINGERPRINT_MIN_LENGTH,
-          "maxLength": FINGERPRINT_MAX_LENGTH
+          "maxLength": FINGERPRINT_MAX_LENGTH,
+          "pattern": /^[A-F0-9]{40}$/,
         },
         "user_public_armored_key": {
           "type": "string"

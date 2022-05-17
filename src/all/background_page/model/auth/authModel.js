@@ -19,6 +19,7 @@ const {AuthService} = require("../../service/api/auth/authService");
 const {User} = require("../user");
 const {EncryptMessageService} = require("../../service/crypto/encryptMessageService");
 const {GetDecryptedUserPrivateKeyService} = require("../../service/account/getDecryptedUserPrivateKeyService");
+const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
 
 class AuthModel {
   /**
@@ -104,10 +105,11 @@ class AuthModel {
    * @throws {Error} if verification procedure fails
    * @returns {Promise<void>}
    */
-  async verify(serverKey, fingerprint) {
+  async verify(serverArmoredKey, fingerprint) {
     let encryptedToken, originalToken;
     try {
       originalToken = new GpgAuthToken();
+      const serverKey = await readKeyOrFail(serverArmoredKey);
       encryptedToken = await EncryptMessageService.encrypt(originalToken.token, serverKey);
     } catch (error) {
       throw new Error(`Unable to encrypt the verify token. ${error.message}`);

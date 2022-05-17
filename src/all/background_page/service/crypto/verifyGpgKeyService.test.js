@@ -14,67 +14,84 @@
 import {VerifyGpgKeyService} from "./verifyGpgKeyService";
 import {pgpKeys} from '../../../tests/fixtures/pgpKeys/keys';
 import {SignGpgKeyService} from "./signGpgKeyService";
+import {readAllKeysOrFail, readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 describe("VerifyGpgKeyService", () => {
   it("should verify a key single signature.", async() => {
-    const keyToVerify = await SignGpgKeyService.sign(pgpKeys.admin.public, pgpKeys.ada.private_decrypted);
-    const verifyingKey = pgpKeys.ada.public;
-    const verified = await VerifyGpgKeyService.verify(keyToVerify, verifyingKey);
+    const adminKey = await readKeyOrFail(pgpKeys.admin.public);
+    const sigingKey = await readKeyOrFail(pgpKeys.ada.private_decrypted);
+    const verifyingKey = await readKeyOrFail(pgpKeys.ada.public);
+    const keyToVerify = await SignGpgKeyService.sign(adminKey, [sigingKey]);
+    const verified = await VerifyGpgKeyService.verify(keyToVerify, [verifyingKey]);
     expect.assertions(1);
     expect(verified).toBeTruthy();
   });
 
   it("should verify a key single signature with the presence of other signatures not verified.", async() => {
-    const keyToVerify = await SignGpgKeyService.sign(pgpKeys.admin.public, [pgpKeys.ada.private_decrypted, pgpKeys.betty.private_decrypted]);
-    const verifyingKey = pgpKeys.ada.public;
-    const verified = await VerifyGpgKeyService.verify(keyToVerify, verifyingKey);
+    const adminKey = await readKeyOrFail(pgpKeys.admin.public);
+    const sigingKeys = await readAllKeysOrFail([pgpKeys.ada.private_decrypted, pgpKeys.betty.private_decrypted]);
+    const verifyingKey = await readKeyOrFail(pgpKeys.ada.public);
+    const keyToVerify = await SignGpgKeyService.sign(adminKey, sigingKeys);
+    const verified = await VerifyGpgKeyService.verify(keyToVerify, [verifyingKey]);
     expect.assertions(1);
     expect(verified).toBeTruthy();
   });
 
   it("should verify a key multiple signatures.", async() => {
-    const keyToVerify = await SignGpgKeyService.sign(pgpKeys.admin.public, [pgpKeys.ada.private_decrypted, pgpKeys.betty.private_decrypted]);
-    const verifyingKeys = [pgpKeys.ada.public, pgpKeys.betty.public];
+    const adminKey = await readKeyOrFail(pgpKeys.admin.public);
+    const sigingKeys = await readAllKeysOrFail([pgpKeys.ada.private_decrypted, pgpKeys.betty.private_decrypted]);
+    const keyToVerify = await SignGpgKeyService.sign(adminKey, sigingKeys);
+    const verifyingKeys = await readAllKeysOrFail([pgpKeys.ada.public, pgpKeys.betty.public]);
     const verified = await VerifyGpgKeyService.verify(keyToVerify, verifyingKeys);
     expect.assertions(1);
     expect(verified).toBeTruthy();
   });
 
   it("should verify a key multiple signatures with the presence of other signatures not verified .", async() => {
-    const keyToVerify = await SignGpgKeyService.sign(pgpKeys.admin.public, [pgpKeys.ada.private_decrypted, pgpKeys.betty.private_decrypted, pgpKeys.account_recovery_organization.private_decrypted]);
-    const verifyingKeys = [pgpKeys.ada.public, pgpKeys.betty.public];
+    const adminKey = await readKeyOrFail(pgpKeys.admin.public);
+    const sigingKeys = await readAllKeysOrFail([
+      pgpKeys.ada.private_decrypted,
+      pgpKeys.betty.private_decrypted,
+      pgpKeys.account_recovery_organization.private_decrypted
+    ]);
+    const keyToVerify = await SignGpgKeyService.sign(adminKey, sigingKeys);
+    const verifyingKeys = await readAllKeysOrFail([pgpKeys.ada.public, pgpKeys.betty.public]);
     const verified = await VerifyGpgKeyService.verify(keyToVerify, verifyingKeys);
     expect.assertions(1);
     expect(verified).toBeTruthy();
   });
 
   it("should fail if it cannot verify a single signature.", async() => {
-    const keyToVerify = pgpKeys.admin.public;
-    const verifyingKeys = pgpKeys.ada.public;
+    const keyToVerify = await readKeyOrFail(pgpKeys.admin.public);
+    const verifyingKeys = [await readKeyOrFail(pgpKeys.ada.public)];
     const verified = await VerifyGpgKeyService.verify(keyToVerify, verifyingKeys);
     expect.assertions(1);
     expect(verified).toBeFalsy();
   });
 
   it("should fail if it cannot verify a single signature with the presence of other signatures.", async() => {
-    const keyToVerify = await SignGpgKeyService.sign(pgpKeys.admin.public, [pgpKeys.betty.private_decrypted]);
-    const verifyingKeys = pgpKeys.ada.public;
+    const adminKey = await readKeyOrFail(pgpKeys.admin.public);
+    const sigingKeys = await readAllKeysOrFail([pgpKeys.betty.private_decrypted]);
+    const verifyingKeys = [await readKeyOrFail(pgpKeys.ada.public)];
+    const keyToVerify = await SignGpgKeyService.sign(adminKey, sigingKeys);
     const verified = await VerifyGpgKeyService.verify(keyToVerify, verifyingKeys);
     expect.assertions(1);
     expect(verified).toBeFalsy();
   });
 
   it("should fail if it cannot verify multiple signatures.", async() => {
-    const keyToVerify = pgpKeys.admin.public;
-    const verifyingKeys = [pgpKeys.ada.public, pgpKeys.betty.public];
+    const keyToVerify = await readKeyOrFail(pgpKeys.admin.public);
+    const verifyingKeys = await readAllKeysOrFail([pgpKeys.ada.public, pgpKeys.betty.public]);
     const verified = await VerifyGpgKeyService.verify(keyToVerify, verifyingKeys);
     expect.assertions(1);
     expect(verified).toBeFalsy();
   });
 
   it("should fail if it cannot verify a single signature with the presence of other signatures.", async() => {
-    const keyToVerify = await SignGpgKeyService.sign(pgpKeys.admin.public, [pgpKeys.account_recovery_organization.private_decrypted]);
-    const verifyingKeys = [pgpKeys.ada.public, pgpKeys.betty.public];
+    const adminKey = await readKeyOrFail(pgpKeys.admin.public);
+    const sigingKeys = await readAllKeysOrFail([pgpKeys.account_recovery_organization.private_decrypted]);
+    const keyToVerify = await SignGpgKeyService.sign(adminKey, sigingKeys);
+    const verifyingKeys = await readAllKeysOrFail([pgpKeys.ada.public, pgpKeys.betty.public]);
     const verified = await VerifyGpgKeyService.verify(keyToVerify, verifyingKeys);
     expect.assertions(1);
     expect(verified).toBeFalsy();

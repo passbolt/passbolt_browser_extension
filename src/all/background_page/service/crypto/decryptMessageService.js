@@ -12,22 +12,22 @@
  * @since         3.6.0
  */
 
-const {assertDecryptedPrivateKeys, assertEncryptedMessage, assertKeys} = require("../../utils/openpgp/openpgpAssertions");
+const {assertDecryptedPrivateKey, assertMessage, assertKeys} = require("../../utils/openpgp/openpgpAssertions");
 
 class DecryptMessageService {
   /**
    * Encrypt symmetrically a message
    *
-   * @param {openpgp.Message|string} message The message to decrypt.
+   * @param {openpgp.Message} message The message to decrypt.
    * @param {string} password The password to use to encrypt the message.
-   * @param {array<openpgp.PrivateKey|openpgp.PublicKey|string>|openpgp.PrivateKey|openpgp.PublicKey|string} verificationKeys The private key(s) to use to sign the message.
+   * @param {array<openpgp.PublicKey|openpgp.PrivateKey>} verificationKeys The private key(s) to use to sign the message.
    * @returns {Promise<string>}
    */
   static async decryptSymmetrically(message, password, verificationKeys = null) {
     if (verificationKeys) {
-      verificationKeys = await assertKeys(verificationKeys);
+      assertKeys(verificationKeys);
     }
-    message = await assertEncryptedMessage(message);
+    assertMessage(message);
 
     const {data: decryptedMessage, signatures} = await openpgp.decrypt({
       message: message,
@@ -46,17 +46,17 @@ class DecryptMessageService {
   /**
    * Decrypt a text message with signature.
    *
-   * @param {openpgp.Message|string} message The message to decrypt.
-   * @param {openpgp.PrivateKey|string} decryptionKey The private key to use to decrypt the message
-   * @param {array<openpgp.PublicKey|string>|openpgp.PublicKey|string?} verificationKeys (optional) The public key(s) to check the signature.
+   * @param {openpgp.Message} message The message to decrypt.
+   * @param {openpgp.PrivateKey} decryptionKey The private key to use to decrypt the message
+   * @param {array<openpgp.PublicKey|openpgp.PrivateKey>} verificationKeys (optional) The key(s) to check the signature for.
    * @returns {Promise<string>}
    * @throws {Error} if the given signatures don't match the message to decrypt.
    */
   static async decrypt(message, decryptionKey, verificationKeys = null) {
-    message = await assertEncryptedMessage(message);
-    decryptionKey = await assertDecryptedPrivateKeys(decryptionKey);
+    assertMessage(message);
+    assertDecryptedPrivateKey(decryptionKey);
     if (verificationKeys) {
-      verificationKeys = await assertKeys(verificationKeys);
+      assertKeys(verificationKeys);
     }
 
     const {data: decryptedMessage, signatures} = await openpgp.decrypt({

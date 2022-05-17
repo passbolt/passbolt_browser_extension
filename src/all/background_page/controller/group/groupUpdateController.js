@@ -22,6 +22,7 @@ const {i18n} = require('../../sdk/i18n');
 const {EncryptMessageService} = require("../../service/crypto/encryptMessageService");
 const {DecryptMessageService} = require("../../service/crypto/decryptMessageService");
 const {GetDecryptedUserPrivateKeyService} = require("../../service/account/getDecryptedUserPrivateKeyService");
+const {readMessageOrFail, readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
 
 class GroupsUpdateController {
   /**
@@ -104,7 +105,7 @@ class GroupsUpdateController {
 
   /**
    * Encrypt the needed secrets to complete the group update operation.
-   * @param {string} privateKey The logged in user private key
+   * @param {openpgp.PrivateKey} privateKey The logged in user private key
    * @param {GroupUpdateEntity} groupUpdateDryRunResultEntity The result of the group update simulation
    * @returns {Promise<SecretsCollection>}
    */
@@ -115,7 +116,7 @@ class GroupsUpdateController {
 
   /**
    * Encrypt a collection of needed secrets.
-   * @param {string} privateKey The logged in user private key
+   * @param {openpgp.PrivateKey} privateKey The logged in user private key
    * @param {NeededSecretsCollection} neededSecretsCollection A collection of needed secret
    * @param {Array} decryptedSecrets A collection of decrypted secret [{resourceId: secretDecrypted}, ...]
    * @returns {Promise<SecretsCollection>}
@@ -128,11 +129,12 @@ class GroupsUpdateController {
       const resourceId = neededSecret.resourceId;
       const userId = neededSecret.userId;
       await progressController.update(this.worker, this.progress++, i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
-      const userPublicKey = this.keyring.findPublic(userId).armoredKey;
+      const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
+      const userPublicKey = await readKeyOrFail(userPublicArmoredKey);
       const secretDto = {
         resource_id: resourceId,
         user_id: userId,
-        data: await EncryptMessageService.encrypt(decryptedSecrets[resourceId], userPublicKey, privateKey)
+        data: await EncryptMessageService.encrypt(decryptedSecrets[resourceId], userPublicKey, [privateKey])
       };
       const secret = new SecretEntity(secretDto);
       secrets.push(secret);
@@ -142,7 +144,7 @@ class GroupsUpdateController {
 
   /**
    * Decrypt a collection of secrets
-   * @param {string} privateKey The logged in user private key
+   * @param {openpgp.PrivateKey} privateKey The logged in user private key
    * @param {SecretsCollection} secretsCollection The collection of secrets to decrypt
    * @returns {Promise<[]>} [{resourceId: secretDecrypted}, ...]
    */
@@ -152,7 +154,8 @@ class GroupsUpdateController {
     for (const i in items) {
       const secret = items[i];
       await progressController.update(this.worker, this.progress++, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
-      result[secret.resourceId] = await DecryptMessageService.decrypt(secret.data, privateKey);
+      const secretMessage = await readMessageOrFail(secret.data);
+      result[secret.resourceId] = await DecryptMessageService.decrypt(secretMessage, privateKey);
     }
     return result;
   }

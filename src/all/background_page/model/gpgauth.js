@@ -27,6 +27,7 @@ const {EncryptMessageService} = require('../service/crypto/encryptMessageService
 const {DecryptMessageService} = require('../service/crypto/decryptMessageService');
 const {GetGpgKeyInfoService} = require('../service/crypto/getGpgKeyInfoService');
 const {CompareGpgKeyService} = require('../service/crypto/compareGpgKeyService');
+const {readKeyOrFail, readMessageOrFail} = require('../utils/openpgp/openpgpAssertions');
 
 const URL_VERIFY = '/auth/verify.json?api-version=v2';
 const URL_LOGIN = '/auth/login.json?api-version=v2';
@@ -64,21 +65,22 @@ class GpgAuth {
    * Verify the server identify
    *
    * @param {string} [serverUrl] optional
-   * @param {string} [armoredServerKey] optional
+   * @param {string} [serverArmoredKey] optional
    * @param {string} [userFingerprint] optional
    * @throws {Error} if domain is undefined in settings and serverUrl is not provided
    * @throws {Error} if verification procedure fails
    * @returns {Promise<void>}
    */
-  async verify(serverUrl, armoredServerKey, userFingerprint) {
+  async verify(serverUrl, serverArmoredKey, userFingerprint) {
     const domain = serverUrl || this.getDomain();
-    const serverKey = armoredServerKey || this.keyring.findPublic(Uuid.get(domain)).armoredKey;
+    serverArmoredKey = serverArmoredKey || this.keyring.findPublic(Uuid.get(domain)).armoredKey;
     const fingerprint = userFingerprint || this.keyring.findPrivate().fingerprint;
 
     // Encrypt a random token
     let encrypted, originalToken;
     try {
       originalToken = new GpgAuthToken();
+      const serverKey = await readKeyOrFail(serverArmoredKey);
       encrypted = await EncryptMessageService.encrypt(originalToken.token, serverKey);
     } catch (error) {
       throw new Error(`Unable to encrypt the verify token. ${error.message}`);
@@ -119,12 +121,14 @@ class GpgAuth {
 
   /**
    * Check if the server key has changed
-   * @return {boolean} true if key has changed
+   * @return {Promise<boolean>} true if key has changed
    */
   async serverKeyChanged() {
-    const remoteKey = await this.getServerKey();
-    const localKey = this.getServerKeyFromKeyring().armoredKey;
-    return await CompareGpgKeyService.areKeysTheSame(remoteKey.keydata, localKey);
+    const remoteServerArmoredKey = (await this.getServerKey()).keyData;
+    const remoteServerKey = await readKeyOrFail(remoteServerArmoredKey);
+    const serverLocalArmoredKey = this.getServerKeyFromKeyring().armoredKey;
+    const serverLocalKey = await readKeyOrFail(serverLocalArmoredKey);
+    return CompareGpgKeyService.areKeysTheSame(remoteServerKey, serverLocalKey);
   }
 
   /**
@@ -171,7 +175,7 @@ class GpgAuth {
   /**
    * GPGAuth Login - handle stage1, stage2 and complete
    *
-   * @param privateKey {openpgp.PrivateKey} The decrypted private key to use to decrypt the message.
+   * @param {openpgp.PrivateKey} privateKey The decrypted private key to use to decrypt the message.
    * @returns {Promise.<string>} referrer url
    */
   async login(privateKey) {
@@ -209,7 +213,9 @@ class GpgAuth {
 
     // Try to decrypt the User Auth Token
     const encryptedUserAuthToken = stripslashes(urldecode(auth.headers['x-gpgauth-user-auth-token']));
-    const userAuthToken = await DecryptMessageService.decrypt(encryptedUserAuthToken, privateKey.armoredKey);
+    const decryptionKey = await readKeyOrFail(privateKey.armoredKey);
+    const encryptedMessage = await readMessageOrFail(encryptedUserAuthToken);
+    const userAuthToken = await DecryptMessageService.decrypt(encryptedMessage, decryptionKey);
 
     // Validate the User Auth Token
     const authToken = new GpgAuthToken(userAuthToken);

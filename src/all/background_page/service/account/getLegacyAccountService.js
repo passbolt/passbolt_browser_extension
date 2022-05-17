@@ -34,7 +34,7 @@ class GetLegacyAccountService {
       first_name: user.firstname,
       last_name: user.lastname,
       server_public_armored_key: keyring.findPublic(Uuid.get(user.settings.domain)).armoredKey,
-      user_key_fingerprint: keyring.findPublic(user.id).fingerprint,
+      user_key_fingerprint: keyring.findPublic(user.id).fingerprint.toUpperCase(),
       user_public_armored_key: keyring.findPublic(user.id).armoredKey,
       user_private_armored_key: keyring.findPrivate().armoredKey,
       security_token: user.settings.securityToken,

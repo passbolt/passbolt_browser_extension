@@ -15,7 +15,7 @@ const Uuid = require('../utils/uuid');
 const {UserSettings} = require('./userSettings/userSettings');
 const {GetGpgKeyInfoService} = require('../service/crypto/getGpgKeyInfoService');
 const {ExternalGpgKeyEntity} = require('./entity/gpgkey/external/externalGpgKeyEntity');
-const {assertPublicKeys, assertPrivateKeys} = require('../utils/openpgp/openpgpAssertions');
+const {assertPublicKey, assertPrivateKey, readKeyOrFail} = require('../utils/openpgp/openpgpAssertions');
 
 /**
  * Constants
@@ -99,9 +99,9 @@ class Keyring {
      * public/private. It will extract only the public.
      */
     armoredPublicKey = this.findArmoredKeyInText(armoredPublicKey, Keyring.PUBLIC);
-
     // Is the given key a valid pgp key ?
-    const primaryPublicKey = await assertPublicKeys(armoredPublicKey);
+    const primaryPublicKey = await readKeyOrFail(armoredPublicKey);
+    assertPublicKey(primaryPublicKey);
 
     // Get the keyInfo.
     const keyInfo = (await GetGpgKeyInfoService.getKeyInfo(primaryPublicKey)).toDto();
@@ -134,8 +134,8 @@ class Keyring {
      */
     armoredKey = this.findArmoredKeyInText(armoredKey, Keyring.PRIVATE);
 
-    const privateKey = await assertPrivateKeys(armoredKey);
-
+    const privateKey = await readKeyOrFail(armoredKey);
+    assertPrivateKey(privateKey);
     // Get the keyInfo.
     const keyInfo = (await GetGpgKeyInfoService.getKeyInfo(privateKey)).toDto();
 

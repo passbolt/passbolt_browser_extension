@@ -12,166 +12,251 @@
  * @since         3.6.0
  */
 
-const {i18n} = require("../../sdk/i18n");
+/*
+ * ==================================================
+ * Read and creates functions
+ * ==================================================
+ */
+/**
+ * Read an open pgp armored key string.
+ * @param {string} armoredKey the open pgp key in its armored version.
+ * @return {Promise<openpgp.PrivateKey|openpgp.PublicKey>}
+ * @throws {Error} if the armoredKey is not a string
+ * @throws {Error} if the key couldn't be read
+ */
+const readKeyOrFail = async armoredKey => {
+  if (typeof armoredKey !== "string") {
+    throw new Error("The key should be an openpgp valid armored key string.");
+  }
+
+  try {
+    return await openpgp.readKey({armoredKey: armoredKey});
+  } catch (error) {
+    throw new Error("The key should be an openpgp valid armored key string.");
+  }
+};
+exports.readKeyOrFail = readKeyOrFail;
 
 /**
- * Assert pgp key(s).
- * - Should be a valid armored key or valid openpgp key.
- *
- * @param {array<openpgp.PublicKey|openpgp.Private|string>|openpgp.PublicKey|openpgp.Private|string} keys The key(s) to assert.
- * @returns {array<openpgp.PublicKey|openpgp.Private>|openpgp.PublicKey|openpgp.Private}
- * @private
+ * Read all open pgp armored key strings in the given array.
+ * @param {array<string>} armoredKeys
+ * @returns {Promise<array<openpgp.PrivateKey|openpgp.PublicKey>>}
+ * @throws {Error} if the armoredKeys is not an array
+ * @throws {Error} if one the key couldn't be read
  */
-const assertKeys = async keys => {
-  if (Array.isArray(keys)) {
-    return Promise.all(keys.map(key => assertKeys(key)));
+const readAllKeysOrFail = async armoredKeys => {
+  if (!Array.isArray(armoredKeys)) {
+    throw new Error("The keys should be an array of valid armored key string.");
+  }
+  return Promise.all(armoredKeys.map(key => readKeyOrFail(key)));
+};
+exports.readAllKeysOrFail = readAllKeysOrFail;
+
+/**
+ * Creates on open pgp from a given clear text message string.
+ * @param {string} message the clear text message from which to create an openpgp.Message.
+ * @return {Promise<openpgp.Message>}
+ * @throws {Error} if the messageis not a string
+ */
+const createMessageOrFail = async message => {
+  if (typeof message !== "string") {
+    throw new Error("The message should be of type string.");
+  }
+  return openpgp.createMessage({text: message, format: 'utf8'});
+};
+exports.createMessageOrFail = createMessageOrFail;
+
+/**
+ * Reads a message in its armored string form.
+ * @param {string} message an openg pgp message in its armored form
+ * @returns {Promise<openpgp.Message>}
+ * @throws {Error} if the message is not a string
+ * @throws {Error} if the message can't be parsed as an armored message
+ */
+const readMessageOrFail = async message => {
+  if (typeof message !== "string") {
+    throw new Error("The message should be of type string.");
   }
 
-  if (typeof keys === "string") {
-    try {
-      keys = await openpgp.readKey({armoredKey: keys});
-    } catch (error) {
-      throw new Error("The key should be a valid armored key or a valid openpgp key.");
-    }
-  } else if (!(keys instanceof openpgp.PublicKey) && !(keys instanceof openpgp.PrivateKey)) {
-    throw new Error("The key should be a valid armored key or a valid openpgp key.");
+  try {
+    return await openpgp.readMessage({armoredMessage: message});
+  } catch (error) {
+    throw new Error("The message is not a valid openpgp message");
   }
+};
+exports.readMessageOrFail = readMessageOrFail;
 
-  return keys;
+/*
+ * ==================================================
+ * Assertion functions
+ * ==================================================
+ */
+/**
+ * Assert the given key is an openpgp.PublicKey or openpgp.PrivateKey
+ * @param {openpgp.PublicKey|openpgp.PrivateKey} key
+ * @returns {void}
+ * @throws {Error} if the key is not an openpgp.PublicKey or openpgp.PrivateKey
+ */
+const assertKey = key => {
+  if (!(key instanceof openpgp.PublicKey) && !(key instanceof openpgp.PrivateKey)) {
+    throw new Error("The key should be a valid openpgp key.");
+  }
+};
+exports.assertKey = assertKey;
+
+/**
+ * Assert the given array of keys is an array containing openpgp.PublicKey or openpgp.PrivateKey
+ * @param {array<openpgp.PublicKey|openpgp.PrivateKey>} keys
+ * @returns {void}
+ * @throws {Error} if keys is not an array
+ * @throws {Error} if one of the keys is not an openpgp.PublicKey or openpgp.PrivateKey
+ */
+const assertKeys = keys => {
+  if (!Array.isArray(keys)) {
+    throw new Error("The keys should be an array.");
+  }
+  for (let i = 0; i < keys.length; i++) {
+    assertKey(keys[i]);
+  }
 };
 exports.assertKeys = assertKeys;
 
 /**
- * Assert pgp private key(s).
- * - Should be a valid armored key or valid openpgp key.
- * - Should be private.
- *
- * @param {array<openpgp.Private|string>|openpgp.Private|string} privateKeys The private key(s) to assert.
- * @returns {array<openpgp.Private>|openpgp.Private}
- * @private
+ * Assert the given key is an openpgp.PublicKey
+ * @param {openpgp.PublicKey} key
+ * @returns {void}
+ * @throws {Error} if the key is not an openpgp.PublicKey
  */
-const assertPrivateKeys = async privateKeys => {
-  if (Array.isArray(privateKeys)) {
-    return Promise.all(privateKeys.map(key => assertPrivateKeys(key)));
+const assertPublicKey = key => {
+  /*
+   * we need to check for an openpgp.PublicKey is it's private or not.
+   * This is due to openpgp js types where an openpgp.PrivateKey is of a type openpgp.PublicKey as well
+   */
+  if (!(key instanceof openpgp.PublicKey) || (key instanceof openpgp.PublicKey && key.isPrivate())) {
+    throw new Error("The key should be an openpgp.PublicKey.");
   }
-
-  const privateKey = await assertKeys(privateKeys);
-  if (!privateKey.isPrivate()) {
-    throw new Error(i18n.t("The key should be private."));
-  }
-
-  return privateKey;
 };
-exports.assertPrivateKeys = assertPrivateKeys;
+exports.assertPublicKey = assertPublicKey;
 
 /**
- * Assert pgp private decrypted key(s).
- * - Should be a valid armored key or valid openpgp key.
- * - Should be private.
- * - Should be decrypted.
- *
- * @param {array<openpgp.PrivateKey|string>|openpgp.PrivateKey|string} privateKeys The private key(s) to assert.
- * @returns {array<openpgp.PrivateKey>|openpgp.PrivateKey}
- * @private
+ * Assert the given array of keys is an array containing openpgp.PublicKey
+ * @param {array<openpgp.PublicKey>} keys
+ * @returns {void}
+ * @throws {Error} if keys is not an array
+ * @throws {Error} if one of the keys is not openpgp.PublicKey
  */
-const assertDecryptedPrivateKeys = async privateKeys => {
-  if (Array.isArray(privateKeys)) {
-    return Promise.all(privateKeys.map(key => assertDecryptedPrivateKeys(key)));
+const assertPublicKeys = keys => {
+  if (!Array.isArray(keys)) {
+    throw new Error("The keys should be an array of openpgp.PublicKey.");
   }
-
-  const privateKey = await assertPrivateKeys(privateKeys);
-  if (!privateKey.isDecrypted()) {
-    throw new Error("The private key should be decrypted.");
+  for (let i = 0; i < keys.length; i++) {
+    assertPublicKey(keys[i]);
   }
-
-  return privateKey;
-};
-exports.assertDecryptedPrivateKeys = assertDecryptedPrivateKeys;
-
-/**
- * Assert pgp private encrypted key(s).
- * - Should be a valid armored key or valid openpgp key.
- * - Should be private.
- * - Should be encrypted.
- *
- * @param {array<openpgp.PrivateKey|string>|openpgp.PrivateKey|string} privateKeys The private key(s) to assert.
- * @returns {array<openpgp.PrivateKey>|openpgp.PrivateKey}
- * @private
- */
-const assertEncryptedPrivateKeys = async privateKeys => {
-  if (Array.isArray(privateKeys)) {
-    return Promise.all(privateKeys.map(key => assertEncryptedPrivateKeys(key)));
-  }
-
-  const privateKey = await assertPrivateKeys(privateKeys);
-  if (privateKey.isDecrypted()) {
-    throw new Error("The private key should not be decrypted.");
-  }
-
-  return privateKey;
-};
-exports.assertEncryptedPrivateKeys = assertEncryptedPrivateKeys;
-
-/**
- * Assert pgp key(s).
- * - Should be a valid armored key or valid openpgp key.
- *
- * @param {array<openpgp.PublicKey|string>|openpgp.PublicKey|string} publicKeys The private key(s) to assert.
- * @returns {array<openpgp.PublicKey>|openpgp.PublicKey}
- * @private
- */
-const assertPublicKeys = async publicKeys => {
-  if (Array.isArray(publicKeys)) {
-    return Promise.all(publicKeys.map(key => assertPublicKeys(key)));
-  }
-
-  const publicKey = await assertKeys(publicKeys);
-  if (publicKey.isPrivate()) {
-    throw new Error(i18n.t("The key should be public."));
-  }
-
-  return publicKey;
 };
 exports.assertPublicKeys = assertPublicKeys;
 
 /**
- * Assert pgp message.
- * - Should be a valid message.
- *
- * @param {openpgp.Message|string} message The message to assert.
- * @returns {openpgp.Message}
- * @private
+ * Assert the given key is an openpgp.PrivateKey
+ * @param {openpgp.PrivateKey} key
+ * @returns {void}
+ * @throws {Error} if the key is not an openpgp.PrivateKey
  */
-const assertMessageToEncrypt = async message => {
-  if (typeof message === "string") {
-    message = await openpgp.createMessage({text: message, format: 'utf8'});
-  } else if (!(message instanceof openpgp.Message)) {
-    throw new Error("The message should be of type string or openpgp.Message");
+const assertPrivateKey = key => {
+  // we do an extra check for key.isPrivate to keep things coherent with assertPublicKey.
+  if (!(key instanceof openpgp.PrivateKey) || (key instanceof openpgp.PrivateKey && !key.isPrivate())) {
+    throw new Error("The key should be an openpgp.PrivateKey.");
   }
-
-  return message;
 };
-exports.assertMessageToEncrypt = assertMessageToEncrypt;
+exports.assertPrivateKey = assertPrivateKey;
 
 /**
- * Assert pgp encrypted message.
- * - Should be a valid message.
- *
- * @param {openpgp.Message|string} message The message to assert.
- * @returns {openpgp.Message}
- * @private
+ * Assert the given array of keys is an array containing openpgp.PrivateKey
+ * @param {array<openpgp.PrivateKey>} keys
+ * @returns {void}
+ * @throws {Error} if keys is not an array
+ * @throws {Error} if one of the keys is not openpgp.PrivateKey
  */
-const assertEncryptedMessage = async message => {
-  if (typeof message === "string") {
-    try {
-      message = await openpgp.readMessage({armoredMessage: message});
-    } catch (error) {
-      throw new Error("The message is not a valid openpgp message");
-    }
-  } else if (!(message instanceof openpgp.Message)) {
-    throw new Error("The message should be of type string or openpgp.Message");
+const assertPrivateKeys = keys => {
+  if (!Array.isArray(keys)) {
+    throw new Error("The keys should be an array of openpgp.PrivateKey.");
   }
-
-  return message;
+  for (let i = 0; i < keys.length; i++) {
+    assertPrivateKey(keys[i]);
+  }
 };
-exports.assertEncryptedMessage = assertEncryptedMessage;
+exports.assertPrivateKeys = assertPrivateKeys;
+
+/**
+ * Assert the given key is a decrypted openpgp.PrivateKey
+ * @param {openpgp.PrivateKey} key
+ * @returns {void}
+ * @throws {Error} if the key is not a decrypted openpgp.PrivateKey
+ */
+const assertDecryptedPrivateKey = key => {
+  assertPrivateKey(key);
+  if (!key.isDecrypted()) {
+    throw new Error("The private key should be decrypted.");
+  }
+};
+exports.assertDecryptedPrivateKey = assertDecryptedPrivateKey;
+
+/**
+ * Assert the given array of keys is an array containing decrypted openpgp.PrivateKey
+ * @param {array<openpgp.PrivateKey>} keys
+ * @returns {void}
+ * @throws {Error} if keys is not an array
+ * @throws {Error} if one of the keys is not a decrypted openpgp.PrivateKey
+ */
+const assertDecryptedPrivateKeys = keys => {
+  if (!Array.isArray(keys)) {
+    throw new Error("The keys should be an array of decrypted openpgp.PrivateKey.");
+  }
+  for (let i = 0; i < keys.length; i++) {
+    assertDecryptedPrivateKey(keys[i]);
+  }
+};
+exports.assertDecryptedPrivateKeys = assertDecryptedPrivateKeys;
+
+/**
+ * Assert the given key is an encrypted openpgp.PrivateKey
+ * @param {openpgp.PrivateKey} key
+ * @returns {void}
+ * @throws {Error} if the key is not an encrypted openpgp.PrivateKey
+ */
+const assertEncryptedPrivateKey = key => {
+  assertPrivateKey(key);
+  if (key.isDecrypted()) {
+    throw new Error("The private key should be encrypted.");
+  }
+};
+exports.assertEncryptedPrivateKey = assertEncryptedPrivateKey;
+
+/**
+ * Assert the given array of keys is an array containing encrypted openpgp.PrivateKey
+ * @param {array<openpgp.PrivateKey>} keys
+ * @returns {void}
+ * @throws {Error} if keys is not an array
+ * @throws {Error} if one of the keys is not an encrypted openpgp.PrivateKey
+ */
+const assertEncryptedPrivateKeys = keys => {
+  if (!Array.isArray(keys)) {
+    throw new Error("The keys should be an array of encrypted openpgp.PrivateKey.");
+  }
+  for (let i = 0; i < keys.length; i++) {
+    assertEncryptedPrivateKey(keys[i]);
+  }
+};
+exports.assertEncryptedPrivateKeys = assertEncryptedPrivateKeys;
+
+/**
+ * Assert the given message is an openpgp.Message
+ * @param {openpgp.Message} message
+ * @returns {void}
+ * @throws {Error} if the message is not an openpgp.Message
+ */
+const assertMessage = message => {
+  if (!(message instanceof openpgp.Message)) {
+    throw new Error("The message should be an openpgp.Message");
+  }
+};
+exports.assertMessage = assertMessage;

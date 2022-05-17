@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {GetGpgKeyInfoService} = require("../../crypto/getGpgKeyInfoService");
 const {DecryptPrivateKeyService} = require('../../crypto/decryptPrivateKeyService');
 const {WrongOrganizationRecoveryKeyError} = require('../../../error/wrongOrganizationRecoveryKeyError');
+const {readKeyOrFail} = require("../../../utils/openpgp/openpgpAssertions");
 
 class ValidateAccountRecoveryOrganizationPrivateKeyService {
   /**
@@ -27,14 +27,17 @@ class ValidateAccountRecoveryOrganizationPrivateKeyService {
    * @throws {WrongOrganizationRecoveryKeyError} If the provided key doesn't match the organization key.
    */
   static async validate(accountRecoveryOrganisationPolicyEntity, privateKeyEntity) {
-    const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountRecoveryOrganisationPolicyEntity.accountRecoveryOrganizationPublicKey.armoredKey);
-    const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKeyEntity.armoredKey);
+    const accountRecoveryPublicKey = await readKeyOrFail(accountRecoveryOrganisationPolicyEntity.accountRecoveryOrganizationPublicKey.armoredKey);
+    const privateKey = await readKeyOrFail(privateKeyEntity.armoredKey);
 
-    if (publicKeyInfo.fingerprint !== privateKeyInfo.fingerprint) {
-      throw new WrongOrganizationRecoveryKeyError(`Error, this is not the current organization recovery key. Expected fingerprint: ${publicKeyInfo.fingerprint}`, publicKeyInfo.fingerprint);
+    const publicKeyFingerPrint = accountRecoveryPublicKey.getFingerprint().toUpperCase();
+    const privateKeyFingerPrint = privateKey.getFingerprint().toUpperCase();
+
+    if (publicKeyFingerPrint !== privateKeyFingerPrint) {
+      throw new WrongOrganizationRecoveryKeyError(`Error, this is not the current organization recovery key. Expected fingerprint: ${publicKeyFingerPrint}`, publicKeyFingerPrint);
     }
 
-    await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(privateKeyEntity);
+    await DecryptPrivateKeyService.decrypt(privateKey, privateKeyEntity.passphrase);
   }
 }
 

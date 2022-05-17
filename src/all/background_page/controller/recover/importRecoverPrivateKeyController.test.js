@@ -22,6 +22,7 @@ import {
   withServerKeyAccountRecoverDto
 } from "../../model/entity/account/accountRecoverEntity.test.data";
 import {AccountRecoverEntity} from "../../model/entity/account/accountRecoverEntity";
+import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 global.XRegExp = require("xregexp");
 
@@ -130,8 +131,10 @@ describe("ImportRecoverPrivateKeyController", () => {
 
       await controller.exec(expectedKeyData.private);
 
-      const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(account.userPublicArmoredKey);
-      const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(account.userPrivateArmoredKey);
+      const accountPrivateKey = await readKeyOrFail(account.userPrivateArmoredKey);
+      const accountPublicKey = await readKeyOrFail(account.userPublicArmoredKey);
+      const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountPublicKey);
+      const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountPrivateKey);
 
       expect(privateKeyInfo.fingerprint).toBe(expectedKeyData.fingerprint);
       expect(publicKeyInfo.fingerprint).toBe(expectedKeyData.fingerprint);

@@ -33,6 +33,7 @@ const {i18n} = require('../../sdk/i18n');
 const {EncryptMessageService} = require('../../service/crypto/encryptMessageService');
 const {Keyring} = require('../../model/keyring');
 const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
+const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 class ImportResourcesFileController {
   /**
@@ -156,8 +157,9 @@ class ImportResourcesFileController {
       // @todo The secret DTO could be carried by the external resource entity. It can be done when we arrange the external resource entity schema validation.
       const secretDto = this.buildSecretDto(importResourceEntity);
       const serializedPlaintextDto = await this.resourceModel.serializePlaintextDto(importResourceEntity.resourceTypeId, secretDto);
-      const userPublicKey = this.keyring.findPublic(userId).armoredKey;
-      const data = await EncryptMessageService.encrypt(serializedPlaintextDto, userPublicKey, privateKey);
+      const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
+      const userPublicKey = await readKeyOrFail(userPublicArmoredKey);
+      const data = await EncryptMessageService.encrypt(serializedPlaintextDto, userPublicKey, [privateKey]);
       const secret = new SecretEntity({data: data});
       importResourceEntity.secrets = new ResourceSecretsCollection([secret]);
     }

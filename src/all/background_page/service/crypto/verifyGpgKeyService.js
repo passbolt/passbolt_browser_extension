@@ -12,25 +12,19 @@
  * @since         3.6.0
  */
 
-const {assertKeys} = require("../../utils/openpgp/openpgpAssertions");
+const {assertKey, assertKeys} = require("../../utils/openpgp/openpgpAssertions");
 
 class VerifyGpgKeyService {
   /**
    * Verify a key signatures.
    *
-   * @param {string|openpgp.PublicKey|openpgp.PrivateKey} keyToVerify The key to verify.
-   * @param {Array<string|openpgp.PublicKey|openpgp.PrivateKey>|string|openpgp.PublicKey|openpgp.PrivateKey} verifyingKeys The key(s) to use to verify the signature.
+   * @param {openpgp.PublicKey|openpgp.PrivateKey} keyToVerify The key to verify.
+   * @param {Array<openpgp.PublicKey|openpgp.PrivateKey>} verifyingKeys The key(s) to verify the signature for.
    * @returns {Promise<boolean>}
    */
   static async verify(keyToVerify, verifyingKeys) {
-    if (Array.isArray(keyToVerify)) {
-      throw new TypeError('Only a single public key is allowed to be verified.');
-    }
-    keyToVerify = await assertKeys(keyToVerify);
-    verifyingKeys = await assertKeys(verifyingKeys);
-    if (!Array.isArray(verifyingKeys)) {
-      verifyingKeys = [verifyingKeys];
-    }
+    assertKey(keyToVerify);
+    assertKeys(verifyingKeys);
 
     const result = await keyToVerify.verifyAllUsers(verifyingKeys);
     const signaturesVerifiedCount = result.filter(item => item.valid).length;

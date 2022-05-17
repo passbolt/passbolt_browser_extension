@@ -13,6 +13,7 @@
  */
 
 const {Keyring} = require("../../model/keyring");
+const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
 const {DecryptPrivateKeyService} = require("../crypto/decryptPrivateKeyService");
 
 class GetDecryptedUserPrivateKeyService {
@@ -20,15 +21,16 @@ class GetDecryptedUserPrivateKeyService {
    * Get current user's private key and decrypts it.
    *
    * @param {string} passphrase The user's private key passphrase to decrypt to key.
-   * @returns {Promise<string>}
+   * @returns {Promise<openpgp.PrivateKey>}
    */
   static async getKey(passphrase) {
     const keyring = new Keyring();
-    const userPrivateKey = keyring.findPrivate();
-    if (!userPrivateKey) {
+    const userPrivateArmoredKey = keyring.findPrivate()?.armoredKey;
+    if (!userPrivateArmoredKey) {
       throw new Error("Can't find current user's private key.");
     }
-    return await DecryptPrivateKeyService.decrypt(userPrivateKey.armoredKey, passphrase);
+    const key = await readKeyOrFail(userPrivateArmoredKey);
+    return DecryptPrivateKeyService.decrypt(key, passphrase);
   }
 }
 

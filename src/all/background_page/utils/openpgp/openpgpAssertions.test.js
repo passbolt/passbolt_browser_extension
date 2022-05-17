@@ -13,27 +13,27 @@
  */
 import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
 import {
+  readKeyOrFail,
+  readAllKeysOrFail,
+  createMessageOrFail,
+  readMessageOrFail,
+  assertKey,
   assertKeys,
-  assertPrivateKeys,
-  assertDecryptedPrivateKeys,
-  assertEncryptedPrivateKeys,
+  assertPublicKey,
   assertPublicKeys,
-  assertMessageToEncrypt,
-  assertEncryptedMessage
+  assertPrivateKey,
+  assertPrivateKeys,
+  assertDecryptedPrivateKey,
+  assertDecryptedPrivateKeys,
+  assertEncryptedPrivateKey,
+  assertEncryptedPrivateKeys,
+  assertMessage
 } from "./openpgpAssertions";
 
 describe("OpenPGP Assertions", () => {
-  describe("OpenPGP Assertions::assertPublicKeys", () => {
+  describe("OpenPGP Assertions::readKeyOrFail", () => {
     it("Should return openpgp.PublicKey or openpgp.PrivateKey for every acceptable type", async() => {
-      const publicOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.public});
-      const privateOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private});
-      const privateDecryptedOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private_decrypted});
-
       const scenarios = [
-        {key: publicOpenpgpKey, expectedType: openpgp.PublicKey},
-        {key: privateOpenpgpKey, expectedType: openpgp.PrivateKey},
-        {key: privateDecryptedOpenpgpKey, expectedType: openpgp.PrivateKey},
-
         {key: pgpKeys.ada.public, expectedType: openpgp.PublicKey},
         {key: pgpKeys.ada.private, expectedType: openpgp.PrivateKey},
         {key: pgpKeys.ada.private_decrypted, expectedType: openpgp.PrivateKey},
@@ -41,387 +41,518 @@ describe("OpenPGP Assertions", () => {
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
-        const readKey = await assertKeys(scenarios[i].key);
+        const readKey = await readKeyOrFail(scenarios[i].key);
         expect(readKey).toBeInstanceOf(scenarios[i].expectedType);
       }
     });
 
-    it("Should return an array containing openpgp.PublicKey and openpgp.PrivateKey from an array of acceptable key type", async() => {
-      const publicOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.public});
-      const privateOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private});
-      const privateDecryptedOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private_decrypted});
+    it("Should throw an Error if the input key is not valid", async() => {
+      const openpgpMessage = await openpgp.createMessage({text: "passbolt message", format: 'utf8'});
+      const expectedError = new Error("The key should be an openpgp valid armored key string.");
+      const adaPublicKey = await readKeyOrFail(pgpKeys.ada.public);
+      const scenarios = [
+        adaPublicKey,
+        ":D",
+        openpgpMessage,
+        123123
+      ];
 
+      expect.assertions(scenarios.length);
+      for (let i = 0; i < scenarios.length; i++) {
+        try {
+          await readKeyOrFail(scenarios[i]);
+        } catch (e) {
+          expect(e).toStrictEqual(expectedError);
+        }
+      }
+    });
+  });
+
+  describe("OpenPGP Assertions::readAllKeysOrFail", () => {
+    it("Should return an array containing openpgp.PublicKey or openpgp.PrivateKey from an array of acceptable key type", async() => {
       const keyList = [
-        publicOpenpgpKey,
-        privateOpenpgpKey,
-        privateDecryptedOpenpgpKey,
         pgpKeys.ada.public,
         pgpKeys.ada.private,
         pgpKeys.ada.private_decrypted,
       ];
 
       expect.assertions(keyList.length + 1);
-      const readKeyList = await assertKeys(keyList);
-
+      const readKeyList = await readAllKeysOrFail(keyList);
       expect(readKeyList.length).toBe(keyList.length);
+
       for (let i = 0; i < readKeyList.length; i++) {
         const isOfExpectedType = readKeyList[i] instanceof openpgp.PublicKey || readKeyList[i] instanceof openpgp.PrivateKey;
         expect(isOfExpectedType).toBe(true);
       }
     });
 
-    it("Should throw an Error if the input key is not valid", async() => {
-      const openpgpMessage = await openpgp.createMessage({text: "passbolt message", format: 'utf8'});
+    it("Should throw an Error if at least one of the key in the list is not valid", async() => {
+      const invalidKey = await readKeyOrFail(pgpKeys.ada.public);
+      const validKey = pgpKeys.ada.public;
+      const keyList = [validKey, invalidKey];
+
+      expect.assertions(1);
+      const promise = readAllKeysOrFail(keyList);
+      await expect(promise).rejects.toStrictEqual(new Error("The key should be an openpgp valid armored key string."));
+    });
+  });
+
+  describe("OpenPGP Assertions::createMessageOrFail", () => {
+    it("Should return an openpgp.Message given a string", async() => {
+      const message = "passbolt message";
+      expect.assertions(1);
+      const readMessage = await createMessageOrFail(message);
+      expect(readMessage).toBeInstanceOf(openpgp.Message);
+    });
+
+    it("Should throw an Error if the input message is not valid", async() => {
+      const expectedError = new Error("The message should be of type string.");
+      const adaPublicKey = await readKeyOrFail(pgpKeys.ada.public);
+      const message = await createMessageOrFail("Message");
       const scenarios = [
-        {input: ":D", expectedError: new Error("The key should be a valid armored key or a valid openpgp key.")},
-        {input: openpgpMessage, expectedError: new Error("The key should be a valid armored key or a valid openpgp key.")},
-        {input: 123123, expectedError: new Error("The key should be a valid armored key or a valid openpgp key.")}
+        1234,
+        true,
+        adaPublicKey,
+        message,
       ];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
         try {
-          await assertKeys(scenarios[i].input);
+          await createMessageOrFail(scenarios[i]);
         } catch (e) {
-          expect(e).toStrictEqual(scenarios[i].expectedError);
+          expect(e).toStrictEqual(expectedError);
         }
       }
     });
+  });
 
-    it("Should throw an Error if at least one of the key in the list is not valid", async() => {
-      const invalidKey = await openpgp.createMessage({text: "passbolt message", format: 'utf8'});
-      const validKey = pgpKeys.ada.public;
-      const keyList = [validKey, invalidKey];
+  describe("OpenPGP Assertions::readMessageOrFail", () => {
+    it("Should return an openpgp.Message given an armored message string", async() => {
+      const message = await createMessageOrFail("Message");
+      expect.assertions(1);
+      const readMessage = await readMessageOrFail(message.armor());
+      expect(readMessage).toBeInstanceOf(openpgp.Message);
+    });
+
+    it("Should throw an Error if the input message is not valid", async() => {
+      const expectedError = new Error("The message should be of type string.");
+      const adaPublicKey = await readKeyOrFail(pgpKeys.ada.public);
+      const message = await createMessageOrFail("Message");
+      const scenarios = [
+        1234,
+        true,
+        adaPublicKey,
+        message,
+      ];
+
+      expect.assertions(scenarios.length);
+      for (let i = 0; i < scenarios.length; i++) {
+        try {
+          await readMessageOrFail(scenarios[i]);
+        } catch (e) {
+          expect(e).toStrictEqual(expectedError);
+        }
+      }
+    });
+  });
+
+  describe("OpenPGP Assertions::assertKey", () => {
+    it("Should validate if the key is an expected key type", async() => {
+      const scenarios = await readAllKeysOrFail([
+        pgpKeys.ada.public,
+        pgpKeys.ada.private,
+        pgpKeys.ada.private_decrypted
+      ]);
+
+      expect.assertions(scenarios.length);
+      for (let i = 0; i < scenarios.length; i++) {
+        expect(assertKey(scenarios[i])).toBeUndefined();
+      }
+    });
+
+    it("Should throw an Error if the key is an not of an expected key type", () => {
+      const expectedError = new Error("The key should be a valid openpgp key.");
+      const scenarios = [
+        1234,
+        true,
+        pgpKeys.ada.public
+      ];
+
+      expect.assertions(scenarios.length);
+      for (let i = 0; i < scenarios.length; i++) {
+        try {
+          assertKey(scenarios[i]);
+        } catch (e) {
+          expect(e).toStrictEqual(expectedError);
+        }
+      }
+    });
+  });
+
+  describe("OpenPGP Assertions::assertKeys", () => {
+    it("Should validate if all the keys are of an expected key type", async() => {
+      const keys = await readAllKeysOrFail([
+        pgpKeys.ada.public,
+        pgpKeys.ada.private,
+        pgpKeys.ada.private_decrypted
+      ]);
+
+      expect.assertions(1);
+      expect(assertKeys(keys)).toBeUndefined();
+    });
+
+    it("Should throw an Error if a key is an not of an expected key type", async() => {
+      const adaPublicKey = await readKeyOrFail(pgpKeys.ada.public);
+      const adaPrivateKey = await readKeyOrFail(pgpKeys.ada.private);
+      const keys = [
+        adaPublicKey,
+        adaPrivateKey,
+        "Fake key"
+      ];
 
       expect.assertions(1);
       try {
-        await assertKeys(keyList);
+        assertKeys(keys);
       } catch (e) {
-        expect(e).toStrictEqual(new Error("The key should be a valid armored key or a valid openpgp key."));
+        expect(e).toStrictEqual(new Error("The key should be a valid openpgp key."));
+      }
+    });
+
+    it("Should throw an Error if the provided argument is not an array", async() => {
+      expect.assertions(1);
+
+      try {
+        assertKeys("keys");
+      } catch (e) {
+        expect(e).toStrictEqual(new Error("The keys should be an array."));
+      }
+    });
+  });
+
+  describe("OpenPGP Assertions::assertPublicKey", () => {
+    it("Should validate if the key is an expected key type", async() => {
+      expect.assertions(1);
+      const key = await readKeyOrFail(pgpKeys.ada.public);
+      expect(assertPublicKey(key)).toBeUndefined();
+    });
+
+    it("Should throw an Error if the key is an not of an expected key type", async() => {
+      const expectedError = new Error("The key should be an openpgp.PublicKey.");
+      const adaPrivateKey = await readKeyOrFail(pgpKeys.ada.private);
+      const message = await createMessageOrFail("Message");
+      const scenarios = [
+        1234,
+        true,
+        adaPrivateKey,
+        message,
+      ];
+
+      expect.assertions(scenarios.length);
+      for (let i = 0; i < scenarios.length; i++) {
+        try {
+          assertPublicKey(scenarios[i]);
+        } catch (e) {
+          expect(e).toStrictEqual(expectedError);
+        }
       }
     });
   });
 
   describe("OpenPGP Assertions::assertPublicKeys", () => {
-    it("Should return openpgp.PublicKey for every acceptable type", async() => {
-      const openpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.public});
-      const scenarios = [pgpKeys.ada.public, openpgpKey];
+    it("Should validate if all the keys are of an expected key type", async() => {
+      const readKeys = await readAllKeysOrFail([
+        pgpKeys.ada.public,
+        pgpKeys.betty.public,
+        pgpKeys.ecdsa_p521.public
+      ]);
 
-      expect.assertions(scenarios.length);
-      for (let i = 0; i < scenarios.length; i++) {
-        const readKey = await assertPublicKeys(scenarios[i]);
-        expect(readKey).toBeInstanceOf(openpgp.PublicKey);
+      expect.assertions(1);
+      expect(assertPublicKeys(readKeys)).toBeUndefined();
+    });
+
+    it("Should throw an Error if a key is an not of an expected key type", async() => {
+      const adaPublicKey = await readKeyOrFail(pgpKeys.ada.private);
+      const adaPrivateKey = await readKeyOrFail(pgpKeys.ada.public);
+      const readKeys = [
+        adaPublicKey,
+        adaPrivateKey,
+        pgpKeys.ecdsa_p521.public
+      ];
+
+      expect.assertions(1);
+      try {
+        assertPublicKeys(readKeys);
+      } catch (e) {
+        expect(e).toStrictEqual(new Error("The key should be an openpgp.PublicKey."));
       }
     });
 
-    it("Should return an array of openpgp.PublicKey from an array of acceptable publicKey type", async() => {
-      const openpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.public});
-      const publicKeys = [pgpKeys.ada.public, openpgpKey];
+    it("Should throw an Error if the provided argument is not an array", async() => {
+      expect.assertions(1);
 
-      expect.assertions(publicKeys.length + 1);
-      const readKeys = await assertPublicKeys(publicKeys);
-
-      expect(readKeys.length).toBe(publicKeys.length);
-      for (let i = 0; i < readKeys.length; i++) {
-        expect(readKeys[i]).toBeInstanceOf(openpgp.PublicKey);
+      try {
+        assertPublicKeys("I'm not array :D");
+      } catch (e) {
+        expect(e).toStrictEqual(new Error("The keys should be an array of openpgp.PublicKey."));
       }
     });
+  });
 
-    it("Should throw an Error if the input public key is not valid", async() => {
-      const privateOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private});
+  describe("OpenPGP Assertions::assertPrivateKey", () => {
+    it("Should validate if the key is an expected key type", async() => {
+      expect.assertions(1);
+      const key = await readKeyOrFail(pgpKeys.ada.private);
+      expect(assertPrivateKey(key)).toBeUndefined();
+    });
 
+    it("Should throw an Error if the key is an not of an expected key type", async() => {
+      const expectedError = new Error("The key should be an openpgp.PrivateKey.");
+      const adaPublicKey = await readKeyOrFail(pgpKeys.ada.public);
+      const message = await createMessageOrFail("Message");
       const scenarios = [
-        {input: ":D", expectedError: new Error("The key should be a valid armored key or a valid openpgp key.")},
-        {input: privateOpenpgpKey, expectedError: new Error("The key should be public.")},
-        {input: pgpKeys.ada.private, expectedError: new Error("The key should be public.")}
+        1234,
+        true,
+        adaPublicKey,
+        message,
       ];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
         try {
-          await assertPublicKeys(scenarios[i].input);
+          assertPrivateKey(scenarios[i]);
         } catch (e) {
-          expect(e).toStrictEqual(scenarios[i].expectedError);
+          expect(e).toStrictEqual(expectedError);
         }
-      }
-    });
-
-    it("Should throw an Error if at least one of the key in the list is not a valid public key", async() => {
-      const invalidPublicKey = pgpKeys.ada.private;
-      const validPublicKey = pgpKeys.ada.public;
-      const keyList = [validPublicKey, invalidPublicKey];
-
-      expect.assertions(1);
-      try {
-        await assertPublicKeys(keyList);
-      } catch (e) {
-        expect(e).toStrictEqual(new Error("The key should be public."));
       }
     });
   });
 
   describe("OpenPGP Assertions::assertPrivateKeys", () => {
-    it("Should return openpgp.PrivateKey for every acceptable type", async() => {
-      const openpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private});
-      const openpgpDecryptedKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private_decrypted});
-      const scenarios = [
+    it("Should validate if all the keys are of an expected key type", async() => {
+      const readKeys = await readAllKeysOrFail([
         pgpKeys.ada.private,
-        openpgpKey,
-        pgpKeys.ada.private_decrypted,
-        openpgpDecryptedKey
+        pgpKeys.betty.private,
+        pgpKeys.betty.private_decrypted,
+        pgpKeys.ecdsa_p521.private,
+      ]);
+
+      expect.assertions(1);
+      expect(assertPrivateKeys(readKeys)).toBeUndefined();
+    });
+
+    it("Should throw an Error if the key is an not of an expected key type", async() => {
+      const adaPrivateKey = await readKeyOrFail(pgpKeys.ada.private);
+      const bettyPrivateDecryptedKey = await readKeyOrFail(pgpKeys.betty.private_decrypted);
+      const readKeys = [
+        adaPrivateKey,
+        bettyPrivateDecryptedKey,
+        pgpKeys.ecdsa_p521.public
       ];
 
-      expect.assertions(scenarios.length);
-      for (let i = 0; i < scenarios.length; i++) {
-        const readKey = await assertPrivateKeys(scenarios[i]);
-        expect(readKey).toBeInstanceOf(openpgp.PrivateKey);
+      expect.assertions(1);
+      try {
+        assertPrivateKeys(readKeys);
+      } catch (e) {
+        expect(e).toStrictEqual(new Error("The key should be an openpgp.PrivateKey."));
       }
     });
 
-    it("Should return an array of openpgp.PrivateKey from an array of acceptable privateKey type", async() => {
-      const openpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private});
-      const privateKeys = [pgpKeys.ada.private, openpgpKey];
-
-      expect.assertions(privateKeys.length + 1);
-      const readKeys = await assertPrivateKeys(privateKeys);
-
-      expect(readKeys.length).toBe(privateKeys.length);
-      for (let i = 0; i < readKeys.length; i++) {
-        expect(readKeys[i]).toBeInstanceOf(openpgp.PrivateKey);
+    it("Should throw an Error if the provided argument is not an array", async() => {
+      expect.assertions(1);
+      try {
+        assertPrivateKeys("I'm not array :D");
+      } catch (e) {
+        expect(e).toStrictEqual(new Error("The keys should be an array of openpgp.PrivateKey."));
       }
     });
+  });
 
-    it("Should throw an Error if the input private key is not valid", async() => {
-      const publicOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.public});
+  describe("OpenPGP Assertions::assertDecryptedPrivateKey", () => {
+    it("Should validate if the key is an expected key type", async() => {
+      expect.assertions(1);
+      const key = await readKeyOrFail(pgpKeys.ada.private_decrypted);
+      expect(assertDecryptedPrivateKey(key)).toBeUndefined();
+    });
 
+    it("Should throw an Error if the key is an not of an expected key type", async() => {
+      const typeError = new Error("The key should be an openpgp.PrivateKey.");
+      const adaPublicKey = await readKeyOrFail(pgpKeys.ada.public);
+      const adaPrivateKey = await readKeyOrFail(pgpKeys.ada.private);
+      const message = await createMessageOrFail("Message");
       const scenarios = [
-        {input: ":D", expectedError: new Error("The key should be a valid armored key or a valid openpgp key.")},
-        {input: publicOpenpgpKey, expectedError: new Error("The key should be private.")},
-        {input: pgpKeys.ada.public, expectedError: new Error("The key should be private.")}
+        {input: 1234, expectedError: typeError},
+        {input: true, expectedError: typeError},
+        {input: adaPublicKey, expectedError: typeError},
+        {input: message, expectedError: typeError},
+        {input: adaPrivateKey, expectedError: new Error("The private key should be decrypted.")},
       ];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
         try {
-          await assertPrivateKeys(scenarios[i].input);
+          assertDecryptedPrivateKey(scenarios[i].input);
         } catch (e) {
           expect(e).toStrictEqual(scenarios[i].expectedError);
         }
-      }
-    });
-
-    it("Should throw an Error if at least one of the key in the list is not a valid private key", async() => {
-      const invalidPublicKey = pgpKeys.ada.public;
-      const validPublicKey = pgpKeys.ada.private;
-      const keyList = [validPublicKey, invalidPublicKey];
-
-      expect.assertions(1);
-      try {
-        await assertPrivateKeys(keyList);
-      } catch (e) {
-        expect(e).toStrictEqual(new Error("The key should be private."));
       }
     });
   });
 
   describe("OpenPGP Assertions::assertDecryptedPrivateKeys", () => {
-    it("Should return openpgp.PrivateKey for every acceptable type", async() => {
-      const openpgpDecryptedKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private_decrypted});
-      const scenarios = [
+    it("Should validate if all the keys are of an expected key type", async() => {
+      const readKeys = await readAllKeysOrFail([
         pgpKeys.ada.private_decrypted,
-        openpgpDecryptedKey
-      ];
+        pgpKeys.betty.private_decrypted
+      ]);
 
-      expect.assertions(scenarios.length * 2);
-      for (let i = 0; i < scenarios.length; i++) {
-        const readKey = await assertDecryptedPrivateKeys(scenarios[i]);
-        expect(readKey).toBeInstanceOf(openpgp.PrivateKey);
-        expect(readKey.isDecrypted()).toBe(true);
+      expect.assertions(1);
+      expect(assertDecryptedPrivateKeys(readKeys)).toBeUndefined();
+    });
+
+    it("Should throw an Error if one of the key is not decrypted", async() => {
+      const readKeys = await readAllKeysOrFail([
+        pgpKeys.ada.private_decrypted,
+        pgpKeys.betty.private_decrypted,
+        pgpKeys.ecdsa_p521.private,
+      ]);
+
+      expect.assertions(1);
+      try {
+        assertDecryptedPrivateKeys(readKeys);
+      } catch (e) {
+        expect(e).toStrictEqual(new Error("The private key should be decrypted."));
       }
     });
 
-    it("Should return an array of openpgp.PrivateKey from an array of acceptable privateKey type", async() => {
-      const openpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private_decrypted});
-      const privateKeys = [pgpKeys.ada.private_decrypted, openpgpKey];
+    it("Should throw an Error if one of the key is an not of an expected key type", async() => {
+      const adaPrivateKey = await readKeyOrFail(pgpKeys.ada.private_decrypted);
+      const bettyPrivateKey = await readKeyOrFail(pgpKeys.betty.private_decrypted);
+      const readKeys = [adaPrivateKey, bettyPrivateKey, pgpKeys.ecdsa_p521.public];
 
-      expect.assertions((privateKeys.length * 2) + 1);
-      const readKeys = await assertDecryptedPrivateKeys(privateKeys);
-
-      expect(readKeys.length).toBe(privateKeys.length);
-      for (let i = 0; i < readKeys.length; i++) {
-        expect(readKeys[i]).toBeInstanceOf(openpgp.PrivateKey);
-        expect(readKeys[i].isDecrypted()).toBe(true);
+      expect.assertions(1);
+      try {
+        assertDecryptedPrivateKeys(readKeys);
+      } catch (e) {
+        expect(e).toStrictEqual(new Error("The key should be an openpgp.PrivateKey."));
       }
     });
 
-    it("Should throw an Error if the input private key is not valid", async() => {
-      const publicOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.public});
-      const privateEncryptedOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private});
+    it("Should throw an Error if the provided argument is not an array", async() => {
+      expect.assertions(1);
+      try {
+        assertDecryptedPrivateKeys("I'm not array :D");
+      } catch (e) {
+        expect(e).toStrictEqual(new Error("The keys should be an array of decrypted openpgp.PrivateKey."));
+      }
+    });
+  });
 
+  describe("OpenPGP Assertions::assertEncryptedPrivateKey", () => {
+    it("Should validate if the key is an expected key type", async() => {
+      expect.assertions(1);
+      const key = await readKeyOrFail(pgpKeys.ada.private);
+      expect(assertEncryptedPrivateKey(key)).toBeUndefined();
+    });
+
+    it("Should throw an Error if the key is an not of an expected key type", async() => {
+      const typeError = new Error("The key should be an openpgp.PrivateKey.");
+      const adaPublicKey = await readKeyOrFail(pgpKeys.ada.public);
+      const adaPrivateKey = await readKeyOrFail(pgpKeys.ada.private_decrypted);
+      const message = await createMessageOrFail("Message");
       const scenarios = [
-        {input: ":D", expectedError: new Error("The key should be a valid armored key or a valid openpgp key.")},
-        {input: publicOpenpgpKey, expectedError: new Error("The key should be private.")},
-        {input: pgpKeys.ada.public, expectedError: new Error("The key should be private.")},
-        {input: pgpKeys.ada.private, expectedError: new Error("The private key should be decrypted.")},
-        {input: privateEncryptedOpenpgpKey, expectedError: new Error("The private key should be decrypted.")}
+        {input: 1234, expectedError: typeError},
+        {input: true, expectedError: typeError},
+        {input: adaPublicKey, expectedError: typeError},
+        {input: message, expectedError: typeError},
+        {input: adaPrivateKey, expectedError: new Error("The private key should be encrypted.")},
       ];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
         try {
-          await assertDecryptedPrivateKeys(scenarios[i].input);
+          assertEncryptedPrivateKey(scenarios[i].input);
         } catch (e) {
           expect(e).toStrictEqual(scenarios[i].expectedError);
         }
-      }
-    });
-
-    it("Should throw an Error if at least one of the key in the list is not a valid private key", async() => {
-      const invalidPublicKey = pgpKeys.ada.private;
-      const validPublicKey = pgpKeys.ada.private_decrypted;
-      const keyList = [validPublicKey, invalidPublicKey];
-
-      expect.assertions(1);
-      try {
-        await assertDecryptedPrivateKeys(keyList);
-      } catch (e) {
-        expect(e).toStrictEqual(new Error("The private key should be decrypted."));
       }
     });
   });
 
   describe("OpenPGP Assertions::assertEncryptedPrivateKeys", () => {
-    it("Should return openpgp.PrivateKey for every acceptable type", async() => {
-      const openpgpDecryptedKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private});
-      const scenarios = [
+    it("Should validate if all the keys are of an expected key type", async() => {
+      const readKeys = await readAllKeysOrFail([
         pgpKeys.ada.private,
-        openpgpDecryptedKey
-      ];
+        pgpKeys.betty.private
+      ]);
 
-      expect.assertions(scenarios.length * 2);
-      for (let i = 0; i < scenarios.length; i++) {
-        const readKey = await assertEncryptedPrivateKeys(scenarios[i]);
-        expect(readKey).toBeInstanceOf(openpgp.PrivateKey);
-        expect(readKey.isDecrypted()).toBe(false);
-      }
+      expect.assertions(1);
+      expect(assertEncryptedPrivateKeys(readKeys)).toBeUndefined();
     });
 
-    it("Should return an array of openpgp.PrivateKey from an array of acceptable privateKey type", async() => {
-      const openpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private});
-      const privateKeys = [pgpKeys.ada.private, openpgpKey];
-
-      expect.assertions((privateKeys.length * 2) + 1);
-      const readKeys = await assertEncryptedPrivateKeys(privateKeys);
-
-      expect(readKeys.length).toBe(privateKeys.length);
-      for (let i = 0; i < readKeys.length; i++) {
-        expect(readKeys[i]).toBeInstanceOf(openpgp.PrivateKey);
-        expect(readKeys[i].isDecrypted()).toBe(false);
-      }
-    });
-
-    it("Should throw an Error if the input private key is not valid", async() => {
-      const publicOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.public});
-      const privateDecryptedOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private_decrypted});
-
-      const scenarios = [
-        {input: ":D", expectedError: new Error("The key should be a valid armored key or a valid openpgp key.")},
-        {input: publicOpenpgpKey, expectedError: new Error("The key should be private.")},
-        {input: pgpKeys.ada.public, expectedError: new Error("The key should be private.")},
-        {input: pgpKeys.ada.private_decrypted, expectedError: new Error("The private key should not be decrypted.")},
-        {input: privateDecryptedOpenpgpKey, expectedError: new Error("The private key should not be decrypted.")}
-      ];
-
-      expect.assertions(scenarios.length);
-      for (let i = 0; i < scenarios.length; i++) {
-        try {
-          await assertEncryptedPrivateKeys(scenarios[i].input);
-        } catch (e) {
-          expect(e).toStrictEqual(scenarios[i].expectedError);
-        }
-      }
-    });
-
-    it("Should throw an Error if at least one of the key in the list is not a valid private key", async() => {
-      const invalidPublicKey = pgpKeys.ada.private_decrypted;
-      const validPublicKey = pgpKeys.ada.private;
-      const keyList = [validPublicKey, invalidPublicKey];
+    it("Should throw an Error if one of the key is not encrypted", async() => {
+      const readKeys = await readAllKeysOrFail([
+        pgpKeys.ada.private,
+        pgpKeys.betty.private,
+        pgpKeys.ada.private_decrypted,
+      ]);
 
       expect.assertions(1);
       try {
-        await assertEncryptedPrivateKeys(keyList);
+        assertEncryptedPrivateKeys(readKeys);
       } catch (e) {
-        expect(e).toStrictEqual(new Error("The private key should not be decrypted."));
+        expect(e).toStrictEqual(new Error("The private key should be encrypted."));
+      }
+    });
+
+    it("Should throw an Error if one of the key is an not of an expected key type", async() => {
+      const readKeys = await readAllKeysOrFail([
+        pgpKeys.ada.private,
+        pgpKeys.betty.private,
+        pgpKeys.ecdsa_p521.public
+      ]);
+
+      expect.assertions(1);
+      try {
+        assertEncryptedPrivateKeys(readKeys);
+      } catch (e) {
+        expect(e).toStrictEqual(new Error("The key should be an openpgp.PrivateKey."));
+      }
+    });
+
+    it("Should throw an Error if the provided argument is not an array", async() => {
+      expect.assertions(1);
+      try {
+        assertEncryptedPrivateKeys("I'm not array :D");
+      } catch (e) {
+        expect(e).toStrictEqual(new Error("The keys should be an array of encrypted openpgp.PrivateKey."));
       }
     });
   });
 
-  describe("OpenPGP Assertions::assertMessageToEncrypt", () => {
-    it("Should return openpgp.Message for every acceptable type", async() => {
-      const message = "passbolt message";
-      const scenarios = [
-        message,
-        await openpgp.createMessage({text: message, format: 'utf8'})
-      ];
-
-      expect.assertions(scenarios.length);
-      for (let i = 0; i < scenarios.length; i++) {
-        const readMessage = await assertMessageToEncrypt(scenarios[i]);
-        expect(readMessage).toBeInstanceOf(openpgp.Message);
-      }
+  describe("OpenPGP Assertions::assertMessage", () => {
+    it("Should validate if the message is of an expected key type", async() => {
+      const readMessage = await createMessageOrFail("Message");
+      expect.assertions(1);
+      expect(readMessage).toBeInstanceOf(openpgp.Message);
     });
 
-    it("Should throw an Error if the input message is not valid", async() => {
-      const privateEncryptedOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private});
-
+    it("Should throw an Error if the key is an not of an expected key type", async() => {
+      const expectedError = new Error("The message should be an openpgp.Message");
+      const adaPrivateKey = await readKeyOrFail(pgpKeys.ada.private);
       const scenarios = [
-        {input: 1234, expectedError: new Error("The message should be of type string or openpgp.Message")},
-        {input: true, expectedError: new Error("The message should be of type string or openpgp.Message")},
-        {input: privateEncryptedOpenpgpKey, expectedError: new Error("The message should be of type string or openpgp.Message")}
+        1234,
+        true,
+        pgpKeys.ada.public,
+        adaPrivateKey
       ];
 
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
         try {
-          await assertMessageToEncrypt(scenarios[i].input);
+          assertMessage(scenarios[i]);
         } catch (e) {
-          expect(e).toStrictEqual(scenarios[i].expectedError);
-        }
-      }
-    });
-  });
-
-  describe("OpenPGP Assertions::assertEncryptedMessage", () => {
-    it("Should return openpgp.Message for every acceptable type", async() => {
-      const armoredMessage = "-----BEGIN PGP MESSAGE-----\n\nhF4DEf0kni1RvUwSAQdAPWDyJPNezJ2K+VbIvAzuTa9Lr9Zs4/ghU1ly9wfxSz8w\nfjqRC+YcoTLSCbZhTEz51YK4kj6CjYFD+C+v1PdshF2Dgp8m1PLikHx0grjoy5el\n0j8B9uXBY29RefdfGotg07U/wy4DqzUQGXt9rzzN0vnAnh28Qh+z4rJT7E/it8KD\nW4tGrzf7VFnd5SGaPUmzykg=\n=mh4W\n-----END PGP MESSAGE-----";
-      const scenarios = [
-        armoredMessage,
-        await openpgp.readMessage({armoredMessage: armoredMessage})
-      ];
-
-      expect.assertions(scenarios.length);
-      for (let i = 0; i < scenarios.length; i++) {
-        const readMessage = await assertEncryptedMessage(scenarios[i]);
-        expect(readMessage).toBeInstanceOf(openpgp.Message);
-      }
-    });
-
-    it("Should throw an Error if the input message is not valid", async() => {
-      const privateEncryptedOpenpgpKey = await openpgp.readKey({armoredKey: pgpKeys.ada.private});
-
-      const scenarios = [
-        {input: "1234", expectedError: new Error("The message is not a valid openpgp message")},
-        {input: 1234, expectedError: new Error("The message should be of type string or openpgp.Message")},
-        {input: true, expectedError: new Error("The message should be of type string or openpgp.Message")},
-        {input: privateEncryptedOpenpgpKey, expectedError: new Error("The message should be of type string or openpgp.Message")}
-      ];
-
-      expect.assertions(scenarios.length);
-      for (let i = 0; i < scenarios.length; i++) {
-        try {
-          await assertEncryptedMessage(scenarios[i].input);
-        } catch (e) {
-          expect(e).toStrictEqual(scenarios[i].expectedError);
+          expect(e).toStrictEqual(expectedError);
         }
       }
     });

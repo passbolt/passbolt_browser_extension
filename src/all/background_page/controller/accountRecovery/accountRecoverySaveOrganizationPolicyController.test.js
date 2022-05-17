@@ -37,6 +37,7 @@ import {
   secretSubstitutionAttackAccountRecoveryPrivateKeyPasswordDto
 } from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity.test.data";
 import {AccountRecoveryPrivateKeyPasswordDecryptedDataEntity} from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
+import {readAllKeysOrFail, readKeyOrFail, readMessageOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 jest.mock("../passphrase/passphraseController.js");
 jest.mock("../../service/progress/progressService", () => ({
@@ -217,12 +218,15 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
       expect(apiResponse.privateKeyPasswords.length).toBe(existingPrivateKeyPasswords.length);
 
       const privateKeyPasswords = apiResponse.privateKeyPasswords.items;
-      const decryptionKey = pgpKeys.account_recovery_organization_alternative.private_decrypted;
+      const decryptionKey = await readKeyOrFail(pgpKeys.account_recovery_organization_alternative.private_decrypted);
       const expectedFingerprint = pgpKeys.account_recovery_organization_alternative.fingerprint.toUpperCase();
+
+      const verificationKeys = await readAllKeysOrFail([pgpKeys.admin.public, pgpKeys.account_recovery_organization.public]);
 
       // First password.
       expect(privateKeyPasswords[0].recipientFingerprint.toUpperCase()).toBe(expectedFingerprint);
-      const decryptedPassword1 = await DecryptMessageService.decrypt(privateKeyPasswords[0].data, decryptionKey, [pgpKeys.admin.public, pgpKeys.account_recovery_organization.public]);
+      const firstPasswordMessage = await readMessageOrFail(privateKeyPasswords[0].data);
+      const decryptedPassword1 = await DecryptMessageService.decrypt(firstPasswordMessage, decryptionKey, verificationKeys);
       const privateKeyPasswordDecryptedData1 = new AccountRecoveryPrivateKeyPasswordDecryptedDataEntity(JSON.parse(decryptedPassword1));
       expect(privateKeyPasswordDecryptedData1.type).toEqual("account-recovery-private-key-password-decrypted-data");
       expect(privateKeyPasswordDecryptedData1.domain).toEqual("https://passbolt.local");
@@ -233,7 +237,8 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
 
       // Second password.
       expect(privateKeyPasswords[1].recipientFingerprint.toUpperCase()).toBe(expectedFingerprint);
-      const decryptedPassword2 = await DecryptMessageService.decrypt(privateKeyPasswords[1].data, decryptionKey, [pgpKeys.admin.public, pgpKeys.account_recovery_organization.public]);
+      const secondPasswordMessage = await readMessageOrFail(privateKeyPasswords[1].data);
+      const decryptedPassword2 = await DecryptMessageService.decrypt(secondPasswordMessage, decryptionKey, verificationKeys);
       const privateKeyPasswordDecryptedData2 = new AccountRecoveryPrivateKeyPasswordDecryptedDataEntity(JSON.parse(decryptedPassword2));
       expect(privateKeyPasswordDecryptedData2.type).toEqual("account-recovery-private-key-password-decrypted-data");
       expect(privateKeyPasswordDecryptedData2.domain).toEqual("https://passbolt.local");

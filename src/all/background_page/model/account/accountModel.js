@@ -13,6 +13,7 @@
 const {User} = require('../user');
 const {Keyring} = require('../keyring');
 const {ReEncryptPrivateKeyService} = require('../../service/crypto/reEncryptPrivateKeyService');
+const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 class AccountModel {
   /**
@@ -58,16 +59,17 @@ class AccountModel {
    * @throws {Error} if something went wrong while updating the private passphrase
    */
   async updatePrivateKey(oldPassphrase, newPassphrase) {
-    const privateKey = this.keyring.findPrivate();
-    const reEncryptedArmoredKey = await ReEncryptPrivateKeyService.reEncrypt(privateKey.armoredKey, oldPassphrase, newPassphrase);
+    const privateArmoredKey = this.keyring.findPrivate().armoredKey;
     try {
-      await this.keyring.importPrivate(reEncryptedArmoredKey);
+      const privateKey = await readKeyOrFail(privateArmoredKey);
+      const reEncryptedArmoredKey = await ReEncryptPrivateKeyService.reEncrypt(privateKey, oldPassphrase, newPassphrase);
+      await this.keyring.importPrivate(reEncryptedArmoredKey.armor());
+      return reEncryptedArmoredKey;
     } catch (error) {
       // Rollback to the old passphrase
-      await this.keyring.importPrivate(privateKey.armoredKey);
+      await this.keyring.importPrivate(privateArmoredKey);
       throw error;
     }
-    return reEncryptedArmoredKey;
   }
 }
 

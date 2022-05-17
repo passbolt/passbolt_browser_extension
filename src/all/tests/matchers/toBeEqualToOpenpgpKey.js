@@ -1,5 +1,3 @@
-import {GetGpgKeyInfoService} from "../../background_page/service/crypto/getGpgKeyInfoService";
-
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
@@ -13,11 +11,15 @@ import {GetGpgKeyInfoService} from "../../background_page/service/crypto/getGpgK
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+import {GetGpgKeyInfoService} from "../../background_page/service/crypto/getGpgKeyInfoService";
+import {readKeyOrFail} from "../../background_page/utils/openpgp/openpgpAssertions";
 
 export const contains = (equals, list, value) => list.findIndex(item => equals(item, value)) > -1;
 
-exports.toBeEqualToOpenpgpKey = async function(keyA, keyB) {
+exports.toBeEqualToOpenpgpKey = async function(armoredKeyA, armoredKeyB) {
   const {printExpected, printReceived, matcherHint} = this.utils;
+  const keyA = await readKeyOrFail(armoredKeyA);
+  const keyB = await readKeyOrFail(armoredKeyB);
   const keyAInfo = await GetGpgKeyInfoService.getKeyInfo(keyA);
   const keyBInfo = await GetGpgKeyInfoService.getKeyInfo(keyB);
 

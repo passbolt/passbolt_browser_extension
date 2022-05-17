@@ -23,6 +23,7 @@ const {Keyring} = require("../../model/keyring");
 const {DecryptPrivateKeyPasswordDataService} = require("../../service/accountRecovery/decryptPrivateKeyPasswordDataService");
 const {UserEntity} = require("../../model/entity/user/userEntity");
 const {UserLocalStorage} = require("../../service/local_storage/userLocalStorage");
+const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
 
 class ReviewRequestController {
   /**
@@ -116,9 +117,12 @@ class ReviewRequestController {
    * @returns {AccountRecoveryResponseEntity}
    */
   async _buildApprovedResponse(request, organizationPolicy, organizationPrivateGpgkey, signedInUserPassphrase) {
-    const organizationPrivateKeyDecrypted = await DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(organizationPrivateGpgkey);
-    const signedInUserDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(this.account.userPrivateArmoredKey, signedInUserPassphrase);
-    const userPublicKey = await this._findUserPublicKey(request.userId);
+    const organizationPrivateKey = await readKeyOrFail(organizationPrivateGpgkey.armoredKey);
+    const userPrivateKey = await readKeyOrFail(this.account.userPrivateArmoredKey);
+    const organizationPrivateKeyDecrypted = await DecryptPrivateKeyService.decrypt(organizationPrivateKey, organizationPrivateGpgkey.passphrase);
+    const signedInUserDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, signedInUserPassphrase);
+
+    const userPublicKey = await readKeyOrFail(await this._findUserPublicKey(request.userId));
     const data = await this._encryptResponseData(request, organizationPrivateKeyDecrypted, userPublicKey, signedInUserDecryptedPrivateKey);
 
     const accountRecoveryResponseDto = {
@@ -196,9 +200,9 @@ class ReviewRequestController {
   /**
    * Encrypt response data.
    * @param {AccountRecoveryRequestEntity} request The request to encrypt the response data for.
-   * @param {openpgp.PrivateKey|string} organizationPrivateKeyDecrypted The organization decrypted private key.
-   * @param {openpgp.PublicKey|string} userPublicKey The public key of the user making the request.
-   * @param {openpgp.PrivateKey|string} signedInUserDecryptedPrivateKey The signed-in user decrypted private key.
+   * @param {openpgp.PrivateKey} organizationPrivateKeyDecrypted The organization decrypted private key.
+   * @param {openpgp.PublicKey} userPublicKey The public key of the user making the request.
+   * @param {openpgp.PrivateKey} signedInUserDecryptedPrivateKey The signed-in user decrypted private key.
    * @returns {Promise<string>}
    * @private
    */
@@ -206,8 +210,8 @@ class ReviewRequestController {
     const privateKeyPassword = request.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords.items[0];
     const privateKeyPasswordData = await DecryptPrivateKeyPasswordDataService.decrypt(privateKeyPassword, organizationPrivateKeyDecrypted, request.userId, userPublicKey);
     const privateKeyPasswordDataSerialized = JSON.stringify(privateKeyPasswordData);
-
-    return EncryptMessageService.encrypt(privateKeyPasswordDataSerialized, request.armoredKey, [organizationPrivateKeyDecrypted, signedInUserDecryptedPrivateKey]);
+    const requestKey = await readKeyOrFail(request.armoredKey);
+    return EncryptMessageService.encrypt(privateKeyPasswordDataSerialized, requestKey, [organizationPrivateKeyDecrypted, signedInUserDecryptedPrivateKey]);
   }
 
   /**

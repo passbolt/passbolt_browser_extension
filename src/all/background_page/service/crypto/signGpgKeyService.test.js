@@ -13,15 +13,15 @@
  */
 const {SignGpgKeyService} = require("./signGpgKeyService");
 import {pgpKeys} from '../../../tests/fixtures/pgpKeys/keys';
-import {assertDecryptedPrivateKeys, assertPublicKeys} from '../../utils/openpgp/openpgpAssertions';
+import {readKeyOrFail} from '../../utils/openpgp/openpgpAssertions';
 
 describe("SignGpgKey service", () => {
   it("should sign a given public key with as many as private key provided", async() => {
     expect.assertions(2);
 
-    const keyToSign = await assertPublicKeys(pgpKeys.admin.public);
-    const bettyDecryptedKey = await assertDecryptedPrivateKeys(pgpKeys.betty.private_decrypted);
-    const adaDecryptedKey = await assertDecryptedPrivateKeys(pgpKeys.ada.private_decrypted);
+    const keyToSign = await readKeyOrFail(pgpKeys.admin.public);
+    const bettyDecryptedKey = await readKeyOrFail(pgpKeys.betty.private_decrypted);
+    const adaDecryptedKey = await readKeyOrFail(pgpKeys.ada.private_decrypted);
     const signingKey = [bettyDecryptedKey, adaDecryptedKey];
 
     const adminSignedPublicGpgKey = await SignGpgKeyService.sign(keyToSign, signingKey);

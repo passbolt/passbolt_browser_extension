@@ -12,31 +12,28 @@
  * @since         3.6.0
  */
 
-const {assertDecryptedPrivateKeys} = require("../../utils/openpgp/openpgpAssertions");
+const {assertDecryptedPrivateKey} = require("../../utils/openpgp/openpgpAssertions");
 
 class EncryptPrivateKeyService {
   /**
    * Decrypt a private key with the given passphrase.
    *
-   * @param {openpgp.PrivateKey|string} decryptedPrivateKey the private key to encrypt
+   * @param {openpgp.PrivateKey} decryptedPrivateKey the private key to encrypt
    * @param {string} passphrase the passphrase to use to protect the private key
-   * @returns {Promise<string>} the armored private key encrypted
+   * @returns {Promise<openpgp.PrivateKey>} the encrypted private key
    * @throws {Error} If the private key is already encrypted.
-   * @throws {Error} If the passphrase is not a valid utf8
+   * @throws {Error} If the passphrase is not a valid utf8 string
    */
   static async encrypt(decryptedPrivateKey, passphrase) {
-    if (Array.isArray(decryptedPrivateKey)) {
-      throw new Error('Only a single private key is allowed to be encrypted.');
-    }
-    decryptedPrivateKey = await assertDecryptedPrivateKeys(decryptedPrivateKey);
+    assertDecryptedPrivateKey(decryptedPrivateKey);
     if (!Validator.isUtf8(passphrase)) {
       throw new Error('The passphrase should be a valid UTF8 string.');
     }
 
     return (await openpgp.encryptKey({
       privateKey: decryptedPrivateKey,
-      passphrase: passphrase
-    })).armor();
+      passphrase: passphrase,
+    }));
   }
 }
 

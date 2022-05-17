@@ -17,7 +17,7 @@ const {AccountRecoveryOrganizationPublicKeyEntity} = require("./accountRecoveryO
 const {EntityValidationError} = require("../abstract/entityValidationError");
 const {UserEntity} = require("../user/userEntity");
 const {AccountRecoveryPrivateKeyPasswordsCollection} = require('./accountRecoveryPrivateKeyPasswordsCollection');
-const {GetGpgKeyInfoService} = require('../../../service/crypto/getGpgKeyInfoService');
+const {readKeyOrFail} = require('../../../utils/openpgp/openpgpAssertions');
 
 const ENTITY_NAME = "AccountRecoveryOrganizationPolicy";
 const POLICY_DISABLED = "disabled";
@@ -212,7 +212,8 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
       throw new EntityValidationError("AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects the creator's id to match the gpgkey.user_id.");
     }
 
-    const computedFingerprint = (await GetGpgKeyInfoService.getKeyInfo(gpgkey.armoredKey)).fingerprint;
+    const key = await readKeyOrFail(gpgkey.armoredKey);
+    const computedFingerprint = key.getFingerprint().toUpperCase();
     if (computedFingerprint !== gpgkey.fingerprint.toUpperCase()) {
       throw new EntityValidationError("AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects the gpgkey armoredKey's fingerprint to match the given fingerprint.");
     }

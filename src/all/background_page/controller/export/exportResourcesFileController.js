@@ -29,6 +29,7 @@ const {ExportResourcesFileEntity} = require("../../model/entity/export/exportRes
 const {i18n} = require('../../sdk/i18n');
 const {DecryptMessageService} = require("../../service/crypto/decryptMessageService");
 const {GetDecryptedUserPrivateKeyService} = require("../../service/account/getDecryptedUserPrivateKeyService");
+const {readMessageOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 class ExportResourcesFileController {
   /**
@@ -102,7 +103,10 @@ class ExportResourcesFileController {
   /**
    * Decrypt the secrets.
    * @param {ExportResourcesFileEntity} exportEntity The export object
+   * @param {string} userId The user id to decrypt the secret for
+   * @param {openpgp.PrivateKey} privateKey the encrypted private key for resource decryption
    * @returns {Promise<void>}
+   * @todo UserId variable does not seem to be used.
    */
   async decryptSecrets(exportEntity, userId, privateKey) {
     let i = 0;
@@ -110,7 +114,8 @@ class ExportResourcesFileController {
     for (const exportResourceEntity of exportEntity.exportResources.items) {
       i++;
       await progressController.update(this.worker, ++this.progress, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: exportEntity.exportResources.items.length}));
-      let secretClear = await DecryptMessageService.decrypt(exportResourceEntity.secrets.items[0].data, privateKey);
+      const secretMessage = await readMessageOrFail(exportResourceEntity.secrets.items[0].data);
+      let secretClear = await DecryptMessageService.decrypt(secretMessage, privateKey);
 
       // @deprecated Prior to v3, resources have no resource type. Remove this condition with v4.
       if (!exportResourceEntity.resourceTypeId) {

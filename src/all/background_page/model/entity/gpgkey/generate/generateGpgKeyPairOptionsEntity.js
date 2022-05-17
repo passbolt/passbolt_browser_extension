@@ -82,7 +82,7 @@ class GenerateGpgKeyPairOptionsEntity extends Entity {
         },
         "type": {
           "type": "string",
-          "enum": ["rsa"],
+          "enum": [GenerateGpgKeyPairOptionsEntity.TYPE_RSA],
         },
         "keySize": {
           "type": "integer",

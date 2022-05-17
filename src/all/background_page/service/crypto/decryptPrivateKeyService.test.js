@@ -12,39 +12,30 @@
  * @since         3.6.0
  */
 import {DecryptPrivateKeyService} from "./decryptPrivateKeyService";
-import {PrivateGpgkeyEntity} from "../../model/entity/gpgkey/privateGpgkeyEntity";
 import {InvalidMasterPasswordError} from '../../error/invalidMasterPasswordError';
 import {pgpKeys} from '../../../tests/fixtures/pgpKeys/keys';
+import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 describe("DecryptPrivateKey service", () => {
-  it('should generate decryptPrivateGpgKeyEntity a private key with the right passphrase', () => {
+  it('should validate a private key with the right passphrase', async() => {
     expect.assertions(1);
-    const entity =  new PrivateGpgkeyEntity({
-      armored_key: pgpKeys.ada.private,
-      passphrase: "ada@passbolt.com"
-    });
-
-    return expect(DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(entity)).resolves.not.toBeNull();
+    const key = await readKeyOrFail(pgpKeys.ada.private);
+    await expect(DecryptPrivateKeyService.decrypt(key, "ada@passbolt.com")).resolves.not.toBeNull();
   }, 10 * 1000);
 
-  it('should throw an InvalidMasterPasswordError when the passphrase is not correct', () => {
+  it('should throw an InvalidMasterPasswordError when the passphrase is not correct', async() => {
     expect.assertions(1);
-    const entity =  new PrivateGpgkeyEntity({
-      armored_key: pgpKeys.ada.private,
-      passphrase: "dada@passbolt.com"
-    });
-
-    return expect(DecryptPrivateKeyService.decryptPrivateGpgKeyEntity(entity)).rejects.toThrow(new InvalidMasterPasswordError());
+    const key = await readKeyOrFail(pgpKeys.ada.private);
+    await expect(DecryptPrivateKeyService.decrypt(key, "wrong passphrase")).rejects.toThrow(new InvalidMasterPasswordError());
   }, 10 * 1000);
 
   it('should throw an Error if the private key is already decrypted', async() => {
     expect.assertions(1);
-    const decryptedKey = await DecryptPrivateKeyService.decrypt(pgpKeys.ada.private, "ada@passbolt.com");
-
     try {
-      await DecryptPrivateKeyService.decrypt(decryptedKey, "ada@passbolt.com");
+      const key = await readKeyOrFail(pgpKeys.ada.private_decrypted);
+      await DecryptPrivateKeyService.decrypt(key, "");
     } catch (e) {
-      expect(e).toStrictEqual(new Error("The private key is already decrypted"));
+      expect(e).toStrictEqual(new Error("The private key should be encrypted."));
     }
   }, 10 * 1000);
 });

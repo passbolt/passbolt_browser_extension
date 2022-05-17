@@ -18,6 +18,7 @@ const progressController = require('../progress/progressController');
 const {ResourceModel} = require('../../model/resource/resourceModel');
 const {DecryptMessageService} = require('../../service/crypto/decryptMessageService');
 const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
+const {readMessageOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 class SecretDecryptController {
   /**
@@ -57,7 +58,8 @@ class SecretDecryptController {
         await progressController.update(this.worker, 1, i18n.t("Decrypting secret"));
       }
       const resource = await resourcePromise;
-      let plaintext = await DecryptMessageService.decrypt(resource.secret.data, privateKey);
+      const resourceSecretMessage = await readMessageOrFail(resource.secret.data);
+      let plaintext = await DecryptMessageService.decrypt(resourceSecretMessage, privateKey);
       plaintext = await this.resourceModel.deserializePlaintext(resource.resourceTypeId, plaintext);
 
       // Wrap up

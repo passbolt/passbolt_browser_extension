@@ -20,13 +20,15 @@ import {DecryptMessageService} from "../crypto/decryptMessageService";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {AccountEntity} from "../../model/entity/account/accountEntity";
 import {AccountRecoveryPrivateKeyPasswordDecryptedDataEntity} from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
+import {readKeyOrFail, readMessageOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 describe("BuildApprovedAccountRecoveryUserSettingEntityService service", () => {
   it("Build approved account recovery user setting entity", async() => {
     const account = new AccountEntity(defaultAccountDto());
     const organizationPolicyDto = enabledAccountRecoveryOrganizationPolicyDto();
     const organizationPolicy = new AccountRecoveryOrganizationPolicyEntity(organizationPolicyDto);
-    const accountRecoveryUserSetting = await BuildApprovedAccountRecoveryUserSettingEntityService.build(account, pgpKeys.ada.private_decrypted, organizationPolicy);
+    const decryptedPrivateKey = await readKeyOrFail(pgpKeys.ada.private_decrypted);
+    const accountRecoveryUserSetting = await BuildApprovedAccountRecoveryUserSettingEntityService.build(account, decryptedPrivateKey, organizationPolicy);
 
     expect.assertions(11);
     expect(accountRecoveryUserSetting.isApproved).toBe(true);
@@ -39,9 +41,10 @@ describe("BuildApprovedAccountRecoveryUserSettingEntityService service", () => {
     expect(privateKeyPasswordRecipientFingerprint).toBe(organizationPolicyFingerprint);
 
     // Ensure the private key password decrypted data match the expected meta.
-    const userPrivateKeyPasswordEncrypted = accountRecoveryUserSetting.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords.items[0].data;
-    const userPrivateKeyPasswordEncryptedData = accountRecoveryUserSetting.accountRecoveryPrivateKey.data;
-    const userPrivateKeyPasswordDecryptedSerializedDataDto = await DecryptMessageService.decrypt(userPrivateKeyPasswordEncrypted, pgpKeys.account_recovery_organization.private_decrypted, pgpKeys.ada.private_decrypted);
+    const userPrivateKeyPasswordEncrypted = await readMessageOrFail(accountRecoveryUserSetting.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords.items[0].data);
+    const userPrivateKeyPasswordEncryptedData = await readMessageOrFail(accountRecoveryUserSetting.accountRecoveryPrivateKey.data);
+    const accountRecoveryPrivateKeyDecrypted = await readKeyOrFail(pgpKeys.account_recovery_organization.private_decrypted);
+    const userPrivateKeyPasswordDecryptedSerializedDataDto = await DecryptMessageService.decrypt(userPrivateKeyPasswordEncrypted, accountRecoveryPrivateKeyDecrypted, [decryptedPrivateKey]);
     const userPrivateKeyPasswordDecryptedData = new AccountRecoveryPrivateKeyPasswordDecryptedDataEntity(JSON.parse(userPrivateKeyPasswordDecryptedSerializedDataDto));
     expect(userPrivateKeyPasswordDecryptedData.type).toStrictEqual("account-recovery-private-key-password-decrypted-data");
     expect(userPrivateKeyPasswordDecryptedData.version).toStrictEqual("v1");
@@ -51,13 +54,18 @@ describe("BuildApprovedAccountRecoveryUserSettingEntityService service", () => {
     expect(Date.parse(userPrivateKeyPasswordDecryptedData.created)).toBeTruthy();
 
     // Assert the secret can be used to decrypt the escrow.
-    const userPrivateArmoredOpenpgpKeyDecrypted = await DecryptMessageService.decryptSymmetrically(userPrivateKeyPasswordEncryptedData, userPrivateKeyPasswordDecryptedData.privateKeySecret, pgpKeys.ada.private_decrypted);
+    const userPrivateArmoredOpenpgpKeyDecrypted = await DecryptMessageService.decryptSymmetrically(
+      userPrivateKeyPasswordEncryptedData,
+      userPrivateKeyPasswordDecryptedData.privateKeySecret,
+      [decryptedPrivateKey]
+    );
     expect(userPrivateArmoredOpenpgpKeyDecrypted.trim()).toEqual(pgpKeys.ada.private_decrypted);
   });
 
   it("Should throw an error if the provided user private key is not a valid decrypted private pgp key.", async() => {
     const account = new AccountEntity(defaultAccountDto());
-    const resultPromise = BuildApprovedAccountRecoveryUserSettingEntityService.build(account, pgpKeys.ada.private, {});
+    const privateKey = await readKeyOrFail(pgpKeys.ada.private);
+    const resultPromise = BuildApprovedAccountRecoveryUserSettingEntityService.build(account, privateKey, {});
 
     expect.assertions(1);
     await expect(resultPromise).rejects.toThrow("The private key should be decrypted.");
@@ -66,7 +74,8 @@ describe("BuildApprovedAccountRecoveryUserSettingEntityService service", () => {
   it("Should throw an error if the provided organization policy is not a valid AccountRecoveryOrganizationPolicyEntity.", async() => {
     const account = new AccountEntity(defaultAccountDto());
     const organizationPolicy = {};
-    const resultPromise = BuildApprovedAccountRecoveryUserSettingEntityService.build(account, pgpKeys.ada.private_decrypted, organizationPolicy);
+    const privateKey = await readKeyOrFail(pgpKeys.ada.private_decrypted);
+    const resultPromise = BuildApprovedAccountRecoveryUserSettingEntityService.build(account, privateKey, organizationPolicy);
 
     expect.assertions(1);
     await expect(resultPromise).rejects.toThrow("The provided organizationPolicy must be a valid AccountRecoveryOrganizationPolicyEntity.");

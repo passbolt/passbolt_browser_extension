@@ -14,25 +14,26 @@
 
 const {AccountRecoveryPrivateKeyPasswordDecryptedDataEntity} = require("../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity");
 const {DecryptMessageService} = require("../../service/crypto/decryptMessageService");
-const {GetGpgKeyInfoService} = require("../crypto/getGpgKeyInfoService");
+const {readMessageOrFail} = require("../../utils/openpgp/openpgpAssertions");
 
 class DecryptResponseDataService {
   /**
    * Decrypt the response encrypted data.
    * @param {AccountRecoveryResponseEntity} response The response.
-   * @param {openpgp.PrivateKey|string} decryptionKey The decrypted decryption key.
+   * @param {openpgp.PrivateKey} decryptionKey The decrypted decryption key.
    * @param {string} verificationUserId The id of the user who is the owner of the private key encrypted with the private key password.
-   * @param {openpgp.PublicKey|string} [verificationUserPublicKey] (Optional) The public key of the user who is the owner of the private key encrypted with the private key password
+   * @param {openpgp.PublicKey} [verificationUserPublicKey] (Optional) The public key of the user who is the owner of the private key encrypted with the private key password
    * @return {Promise<AccountRecoveryPrivateKeyPasswordDecryptedDataEntity>}
-   * @throww {Error} If the response data cannot be decrypted.
-   * @throww {Error} If the decrypted response data cannot be parsed.
-   * @throw {EntityValidationError} If the decrypted response data cannot be used to create a private key password decrypted data entity.
-   * @throw {Error} If the user id contained in the decrypted response data does not match the verification user id.
-   * @throw {Error} If the fingerprint contained in the decrypted response data does not match the verification fingerprint.
+   * @throws {Error} If the response data cannot be decrypted.
+   * @throws {Error} If the decrypted response data cannot be parsed.
+   * @throws {EntityValidationError} If the decrypted response data cannot be used to create a private key password decrypted data entity.
+   * @throws {Error} If the user id contained in the decrypted response data does not match the verification user id.
+   * @throws {Error} If the fingerprint contained in the decrypted response data does not match the verification fingerprint.
    */
   static async decrypt(response, decryptionKey, verificationUserId, verificationUserPublicKey) {
     let privateKeyPasswordDecryptedDataDto;
-    const privateKeyPasswordDecryptedDataSerialized = await DecryptMessageService.decrypt(response.data, decryptionKey);
+    const responseDataMessage = await readMessageOrFail(response.data);
+    const privateKeyPasswordDecryptedDataSerialized = await DecryptMessageService.decrypt(responseDataMessage, decryptionKey);
 
     try {
       privateKeyPasswordDecryptedDataDto = JSON.parse(privateKeyPasswordDecryptedDataSerialized);
@@ -47,8 +48,7 @@ class DecryptResponseDataService {
     }
 
     if (verificationUserPublicKey) {
-      const verificationKeyInfo = await GetGpgKeyInfoService.getKeyInfo(verificationUserPublicKey);
-      if (privateKeyPasswordDecryptedData.privateKeyFingerprint !== verificationKeyInfo.fingerprint) {
+      if (privateKeyPasswordDecryptedData.privateKeyFingerprint !== verificationUserPublicKey.getFingerprint().toUpperCase()) {
         throw new Error("The response data fingerprint should match the verification fingerprint.");
       }
     }

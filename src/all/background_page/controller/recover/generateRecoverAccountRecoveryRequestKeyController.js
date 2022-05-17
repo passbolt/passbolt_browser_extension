@@ -14,7 +14,7 @@
 
 const {GenerateGpgKeyPairOptionsEntity} = require("../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity");
 const {GenerateGpgKeyPairService} = require("../../service/crypto/generateGpgKeyPairService");
-const {GetGpgKeyInfoService} = require("../../service/crypto/getGpgKeyInfoService");
+const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
 
 const ACCOUNT_RECOVERY_REQUEST_KEY_SIZE = 4096;
 
@@ -60,10 +60,10 @@ class GenerateRecoverAccountRecoveryRequestKeyController {
     };
     const generateGpgKeyPairOptionsEntity = new GenerateGpgKeyPairOptionsEntity(dto);
     const externalGpgKeyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);
-    const publicGpgKeyInfo = await GetGpgKeyInfoService.getKeyInfo(externalGpgKeyPair.publicKey.armoredKey);
+    const generatedPublicKey = await readKeyOrFail(externalGpgKeyPair.publicKey.armoredKey);
     this.account.userPrivateArmoredKey = externalGpgKeyPair.privateKey.armoredKey;
     this.account.userPublicArmoredKey = externalGpgKeyPair.publicKey.armoredKey;
-    this.account.userKeyFingerprint = publicGpgKeyInfo.fingerprint;
+    this.account.userKeyFingerprint = generatedPublicKey.getFingerprint().toUpperCase();
   }
 }
 

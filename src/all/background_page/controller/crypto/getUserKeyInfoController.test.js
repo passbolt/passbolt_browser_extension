@@ -19,6 +19,7 @@ import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
 import {Keyring} from '../../model/keyring';
 import {GetGpgKeyInfoService} from "../../service/crypto/getGpgKeyInfoService";
 import {v4 as uuidv4} from "uuid";
+import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 const keyring = new Keyring();
 
@@ -36,7 +37,8 @@ describe("GetUserKeyInfocontroller", () => {
     const controller = new GetUserKeyInfoController();
     const keyInfo = await controller.exec(userId);
 
-    const adaKeyInfo = await GetGpgKeyInfoService.getKeyInfo(pgpKeys.ada.public);
+    const adaPublicKey = await readKeyOrFail(pgpKeys.ada.public);
+    const adaKeyInfo = await GetGpgKeyInfoService.getKeyInfo(adaPublicKey);
     expect(keyInfo.toDto()).toStrictEqual(adaKeyInfo.toDto());
   });
 

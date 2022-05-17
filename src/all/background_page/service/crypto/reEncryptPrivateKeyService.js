@@ -13,32 +13,28 @@
  */
 
 const {DecryptPrivateKeyService} = require('./decryptPrivateKeyService');
-const {assertPrivateKeys} = require('../../utils/openpgp/openpgpAssertions');
+const {assertEncryptedPrivateKey} = require('../../utils/openpgp/openpgpAssertions');
 const {EncryptPrivateKeyService} = require("./encryptPrivateKeyService");
 
 class ReEncryptPrivateKeyService {
   /**
    * Re-encrypt a given PGP key with another passphrase.
    *
-   * @param {openpgp.PrivateKey|string} encryptedPrivateKey the private key to re-encrypt with a new password.
+   * @param {openpgp.PrivateKey} encryptedPrivateKey the private key to re-encrypt with a new password.
    * @param {string} oldPassphrase the passphraase that can be used to decrypt the given encrypted key.
    * @param {string} newPassphrase the new passphrase with which to re-encrypt the given private key.
-   * @returns {Promise<string>} the armored private key encrypted with the new password
+   * @returns {Promise<openpgp.PrivateKey>} the private key encrypted with the new password
    * @throws {Error} if oldPassphrase or newPassphrase are not valid passphrases.
    * @throws {Error} if encryptedPrivateArmoredKey is not a valid private key.
    * @throws {InvalidMasterPasswordError} if the private key can't be decrypted with oldPassphrase.
    */
   static async reEncrypt(encryptedPrivateKey, oldPassphrase, newPassphrase) {
-    if (Array.isArray(encryptedPrivateKey)) {
-      throw new Error('Only a single private key is allowed to be reencrypted.');
-    }
-
-    encryptedPrivateKey = await assertPrivateKeys(encryptedPrivateKey);
+    assertEncryptedPrivateKey(encryptedPrivateKey);
     this._validatePassphrase(oldPassphrase);
     this._validatePassphrase(newPassphrase);
 
-    const userDecryptedKey = await DecryptPrivateKeyService.decrypt(encryptedPrivateKey.armor(), oldPassphrase);
-    return EncryptPrivateKeyService.encrypt(userDecryptedKey, newPassphrase);
+    const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(encryptedPrivateKey, oldPassphrase);
+    return EncryptPrivateKeyService.encrypt(decryptedPrivateKey, newPassphrase);
   }
 
   /**

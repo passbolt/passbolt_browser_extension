@@ -18,6 +18,7 @@ import {GpgKeyError} from "../../error/GpgKeyError";
 import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
 import {MockExtension} from "../../../tests/mocks/mockExtension";
 import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
+import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 import {
   startAccountSetupDto,
   withServerKeyAccountSetupDto
@@ -135,8 +136,10 @@ describe("ImportSetupPrivateKeyController", () => {
       await expect(account.userPublicArmoredKey).toBeOpenpgpPublicKey();
       await expect(account.userPrivateArmoredKey).toBeOpenpgpPrivateKey();
 
-      const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(account.userPublicArmoredKey);
-      const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(account.userPrivateArmoredKey);
+      const accountPublicKey = await readKeyOrFail(account.userPublicArmoredKey);
+      const accountPrivateKey = await readKeyOrFail(account.userPrivateArmoredKey);
+      const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountPublicKey);
+      const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountPrivateKey);
 
       expect(privateKeyInfo.fingerprint).toBe(expectedKeyData.fingerprint);
       expect(publicKeyInfo.fingerprint).toBe(expectedKeyData.fingerprint);

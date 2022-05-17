@@ -15,6 +15,7 @@ const {Keyring} = require('../model/keyring');
 const {DecryptMessageService} = require('../service/crypto/decryptMessageService');
 const {EncryptMessageService} = require('../service/crypto/encryptMessageService');
 const {ShareService} = require('../service/share');
+const {readMessageOrFail, readKeyOrFail} = require('../utils/openpgp/openpgpAssertions');
 
 class Share {}
 
@@ -44,7 +45,7 @@ Share.searchResourceAros = function(resourceId, keywords) {
  * Bulk share multiple resources.
  * @param {array} resources The resources to share
  * @param {array} changes The permissions changes to apply
- * @param privateKey {openpgp.PrivateKey} The decrypted private key to use to decrypt the message.
+ * @param {openpgp.PrivateKey} privateKey The decrypted private key to use to decrypt the message.
  * @param {function} progressCallback Notify the user with this callback
  */
 Share.bulkShareResources = async function(resources, changes, privateKey, progressCallback) {
@@ -132,7 +133,7 @@ const bulkShareSimulate = async function(resources, resourcesChanges, progressCa
  * Encrypt the resources secrets for all the new users
  * @param {array} resources The resources to share
  * @param {object} resourcesNewUsers The list of new users to share the resources aggregated by resource
- * @param privateKey {openpgp.PrivateKey} The decrypted private key to use to decrypt the message.
+ * @param {openpgp.PrivateKey} privateKey The decrypted private key to use to decrypt the message.
  * @param {function} progressCallback Notify the user with this callback
  * @returns {object} A list of secrets as expected by the passbolt API
  * [
@@ -149,18 +150,19 @@ const bulkShareEncrypt = async function(resources, resourcesNewUsers, privateKey
 
   for (const resourceId in resourcesNewUsers) {
     const resource = resources.find(resource => resource.id === resourceId);
-    const originalArmored = resource.secrets[0].data;
+    const originalMessage = await readMessageOrFail(resource.secrets[0].data);
     const users = resourcesNewUsers[resourceId];
     progressCallback(`Encrypting for ${resource.name}`);
     if (users && users.length) {
-      const message = await DecryptMessageService.decrypt(originalArmored, privateKey);
+      const message = await DecryptMessageService.decrypt(originalMessage, privateKey);
       const encryptAllData = users.reduce((carry, userId) => [...carry, {userId: userId, message: message}], []);
 
       const result = [];
       for (const i in encryptAllData) {
         const data = encryptAllData[i];
-        const userPublicKey = keyring.findPublic(data.userId).armoredKey;
-        const messageEncrypted = await EncryptMessageService.encrypt(data.message, userPublicKey, privateKey);
+        const userPublicArmoredKey = keyring.findPublic(data.userId).armoredKey;
+        const userPublicKey = await readKeyOrFail(userPublicArmoredKey);
+        const messageEncrypted = await EncryptMessageService.encrypt(data.message, userPublicKey, [privateKey]);
         result.push({
           resource_id: resourceId,
           user_id: data.userId,

@@ -56,7 +56,7 @@ describe("GenerateGpgKeyPairOptionsEntity entity", () => {
         email: "@passbolt.com",
         passphrase: "1234567",
         keySize: "super strong key size",
-        type: "rsb",
+        type: "RSB",
       };
       new GenerateGpgKeyPairOptionsEntity(dto);
     } catch (error) {

@@ -28,9 +28,9 @@ import {
   approvedAccountRecoveryRequestWithoutPrivateKeyDto,
   approvedAccountRecoveryRequestWithoutResponsesDto
 } from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
-import {GetGpgKeyInfoService} from "../../service/crypto/getGpgKeyInfoService";
 import {AccountLocalStorage} from "../../service/local_storage/accountLocalStorage";
 import {InvalidMasterPasswordError} from "../../error/invalidMasterPasswordError";
+import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 jest.mock("../../model/worker");
 
@@ -70,11 +70,14 @@ describe("RecoverAccountController", () => {
 
       // The keyring should contain the user recovered key.
       const keyring = new Keyring();
-      const keyringPrivateFingerprint = (await GetGpgKeyInfoService.getKeyInfo(keyring.findPrivate().armoredKey)).fingerprint;
-      const keyringPublicFingerprint = (await GetGpgKeyInfoService.getKeyInfo(keyring.findPublic(accountRecovery.userId).armoredKey)).fingerprint;
-      expect(keyringPrivateFingerprint).toStrictEqual(pgpKeys.ada.fingerprint);
-      expect(keyringPublicFingerprint).toStrictEqual(pgpKeys.ada.fingerprint);
-      expect(keyringPublicFingerprint).toStrictEqual(keyringPrivateFingerprint);
+      const keyringPrivateKey = await readKeyOrFail(keyring.findPrivate().armoredKey);
+      const userPublicKey = await readKeyOrFail(keyring.findPublic(accountRecovery.userId).armoredKey);
+      const keyringPrivateKeyFingerprint = keyringPrivateKey.getFingerprint().toUpperCase();
+      const userPublicKeyFingerprint = userPublicKey.getFingerprint().toUpperCase();
+
+      expect(keyringPrivateKeyFingerprint).toStrictEqual(pgpKeys.ada.fingerprint);
+      expect(userPublicKeyFingerprint).toStrictEqual(pgpKeys.ada.fingerprint);
+      expect(userPublicKeyFingerprint).toStrictEqual(keyringPrivateKeyFingerprint);
 
       // The auth and web integration pagemods should have been initialized.
       expect(app.pageMods.WebIntegration.init).toHaveBeenCalled();

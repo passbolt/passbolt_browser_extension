@@ -14,7 +14,7 @@
 
 const {GenerateGpgKeyPairOptionsEntity} = require('../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity');
 const {GenerateGpgKeyPairService} = require("../../service/crypto/generateGpgKeyPairService");
-const {GetGpgKeyInfoService} = require("../../service/crypto/getGpgKeyInfoService");
+const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 /**
  * @typedef {({passphrase: string})} GenerateKeyPairPassphraseDto
@@ -60,9 +60,9 @@ class GenerateSetupKeyPairController {
   async exec(passphraseDto) {
     const generateGpgKeyPairOptionsEntity = this._buildGenerateKeyPairOptionsEntity(passphraseDto.passphrase);
     const keyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);
-    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(keyPair.publicKey.armoredKey);
+    const generatedPublicKey = await readKeyOrFail(keyPair.publicKey.armoredKey);
 
-    this.account.userKeyFingerprint = keyInfo.fingerprint;
+    this.account.userKeyFingerprint = generatedPublicKey.getFingerprint().toUpperCase();
     this.account.userPrivateArmoredKey = keyPair.privateKey.armoredKey;
     this.account.userPublicArmoredKey = keyPair.publicKey.armoredKey;
     // The passphrase will be later use to sign in the user.

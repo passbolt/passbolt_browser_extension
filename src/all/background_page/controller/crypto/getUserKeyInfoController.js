@@ -14,6 +14,7 @@
 
 const {Keyring} = require('../../model/keyring');
 const {GetGpgKeyInfoService} = require('../../service/crypto/getGpgKeyInfoService');
+const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 class GetUserKeyInfoController {
   /**
@@ -46,22 +47,23 @@ class GetUserKeyInfoController {
    * Get the given user key information.
    *
    * @param {string} userId The id of the user from whom to get the key information.
-   * @returns {Promise<KeyInfo>}
+   * @returns {Promise<ExternalGpgKeyEntity>}
    */
   async exec(userId) {
-    let key = this.keyring.findPublic(userId);
+    let keyInfo = this.keyring.findPublic(userId);
 
     // If the key is not in the keyring, try to sync the keyring and try again
-    if (!key) {
+    if (!keyInfo) {
       await this.keyring.sync();
-      key = this.keyring.findPublic(userId);
+      keyInfo = this.keyring.findPublic(userId);
 
-      if (!key) {
+      if (!keyInfo) {
         //@todo maybe send a KeyringError instead
         throw new Error('User key not found');
       }
     }
-    return GetGpgKeyInfoService.getKeyInfo(key.armoredKey);
+    const key = await readKeyOrFail(keyInfo.armoredKey);
+    return GetGpgKeyInfoService.getKeyInfo(key);
   }
 }
 

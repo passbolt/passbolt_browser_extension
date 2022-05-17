@@ -22,7 +22,7 @@ export const adaExternalPrivateGpgKeyEntityDto = (data = {}) => {
     "fingerprint": pgpKeys.ada.fingerprint,
     "expires": pgpKeys.ada.expires,
     "created": pgpKeys.ada.created,
-    "algorithm": pgpKeys.ada.algorithm,
+    "algorithm": pgpKeys.ada.algorithm.toLowerCase(),
     "length": pgpKeys.ada.length,
     "curve": pgpKeys.ada.curve,
     "private": true,

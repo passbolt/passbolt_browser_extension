@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-const {assertKeys} = require("../../utils/openpgp/openpgpAssertions");
+const {assertKey} = require("../../utils/openpgp/openpgpAssertions");
 const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
 
 class CompareGpgKeyService {
@@ -22,13 +22,13 @@ class CompareGpgKeyService {
    * - fingerprint
    * - expiration date
    *
-   * @param {openpgp.PublicKey|openpgp.PrivateKey|string} keyA
-   * @param {openpgp.PublicKey|openpgp.PrivateKey|string} keyB
+   * @param {openpgp.PublicKey|openpgp.PrivateKey} keyA
+   * @param {openpgp.PublicKey|openpgp.PrivateKey} keyB
    * @returns {Promise<bool>}
    */
   static async areKeysTheSame(keyA, keyB) {
-    keyA = await assertKeys(keyA);
-    keyB = await assertKeys(keyB);
+    assertKey(keyA);
+    assertKey(keyB);
 
     const keyAInfo = await GetGpgKeyInfoService.getKeyInfo(keyA);
     const keyBInfo = await GetGpgKeyInfoService.getKeyInfo(keyB);

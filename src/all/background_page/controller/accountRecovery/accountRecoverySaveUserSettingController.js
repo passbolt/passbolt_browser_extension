@@ -19,7 +19,7 @@ const {AccountRecoveryUserSettingEntity} = require("../../model/entity/accountRe
 const PassphraseController = require("../../controller/passphrase/passphraseController");
 const {DecryptPrivateKeyService} = require("../../service/crypto/decryptPrivateKeyService");
 const {BuildApprovedAccountRecoveryUserSettingEntityService} = require("../../service/accountRecovery/buildApprovedAccountRecoveryUserSettingEntityService");
-
+const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
 /**
  * Controller related to the account recovery save settings
  */
@@ -82,13 +82,14 @@ class AccountRecoverySaveUserSettingsController {
   async buildApprovedUserSetting() {
     const userPassphrase = await PassphraseController.get(this.worker);
     const userPrivateArmoredKey = this.keyring.findPrivate().armoredKey;
-    const userDecryptedPrivateOpenpgpKey = await DecryptPrivateKeyService.decrypt(userPrivateArmoredKey, userPassphrase);
+    const userPrivateKey = await readKeyOrFail(userPrivateArmoredKey);
+    const userDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, userPassphrase);
     const organizationPolicy = await this.accountRecoveryModel.findOrganizationPolicy();
     if (!organizationPolicy) {
       throw new Error("Account recovery organization policy not found.");
     }
 
-    return BuildApprovedAccountRecoveryUserSettingEntityService.build(this.account, userDecryptedPrivateOpenpgpKey, organizationPolicy);
+    return BuildApprovedAccountRecoveryUserSettingEntityService.build(this.account, userDecryptedPrivateKey, organizationPolicy);
   }
 }
 

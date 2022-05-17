@@ -22,7 +22,7 @@ const {BrowserTabService} = require("../../service/ui/browserTab.service");
 const {ExternalResourceEntity} = require("../../model/entity/resource/external/externalResourceEntity");
 const {DecryptMessageService} = require('../../service/crypto/decryptMessageService');
 const {GetDecryptedUserPrivateKeyService} = require("../../service/account/getDecryptedUserPrivateKeyService");
-
+const {readMessageOrFail} = require("../../utils/openpgp/openpgpAssertions");
 /**
  * Controller related to the in-form call-to-action
  */
@@ -123,7 +123,8 @@ class InformMenuController {
       const passphrase = await passphraseController.requestFromQuickAccess();
       const resource = await this.resourceModel.findForDecrypt(resourceId);
       const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
-      let plaintext = await DecryptMessageService.decrypt(resource.secret.data, privateKey);
+      const resourceSecretMessage = await readMessageOrFail(resource.secret.data);
+      let plaintext = await DecryptMessageService.decrypt(resourceSecretMessage, privateKey);
       plaintext = await this.resourceModel.deserializePlaintext(resource.resourceTypeId, plaintext);
       const {username} = resource;
       const password = plaintext?.password || plaintext;

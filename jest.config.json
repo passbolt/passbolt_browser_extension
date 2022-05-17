@@ -1,5 +1,8 @@
 {
   "testEnvironment": "jsdom",
+  "setupFiles": [
+    "jest-webextension-mock"
+  ],
   "setupFilesAfterEnv": ["<rootDir>/test/jest.setup.js"],
   "transform": {
     "^.+\\.js$": ["babel-jest", {

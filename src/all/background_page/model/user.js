@@ -4,7 +4,7 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const browser = require("webextension-polyfill/dist/browser-polyfill");
+const browser = require("webextension-polyfill");
 const Config = require('./config');
 const {ApiClientOptions} = require('../service/api/apiClient/apiClientOptions');
 const {UserService} = require('../service/api/user/userService');

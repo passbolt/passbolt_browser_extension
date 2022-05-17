@@ -5,7 +5,11 @@ import Config from "../src/all/background_page/model/config";
 import {Keyring} from "../src/all/background_page/model/keyring";
 import {UserLocalStorage} from "../src/all/background_page/service/local_storage/userLocalStorage";
 
-global.chrome = {};
+/*
+ * Fix jest-webextension-mock after upgrading webextension-polyfill to 0.9.0
+ * @see https://github.com/clarkbw/jest-webextension-mock/issues/149#issuecomment-1116558554
+ */
+chrome.runtime.id = "test id";
 global.openpgp = require('openpgp');
 global.Validator = require('validator');
 global.Validator.isUtf8 = require('../src/all/background_page/utils/validatorRules').isUtf8;

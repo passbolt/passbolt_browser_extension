@@ -12,6 +12,7 @@ const User = require('../../model/user').User;
 const Worker = require('../../model/worker');
 const {UserAbortsOperationError} = require("../../error/userAbortsOperationError");
 const {DecryptPrivateKeyService} = require("../../service/crypto/decryptPrivateKeyService");
+const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
 
 /**
  * Get the user master password.
@@ -140,6 +141,8 @@ const validatePassphrase = async function(passphrase) {
   }
 
   const keyring = new Keyring();
-  await DecryptPrivateKeyService.decrypt(keyring.findPrivate().armoredKey, passphrase);
+  const userPrivateArmoredKey = keyring.findPrivate().armoredKey;
+  const userPrivateKey = await readKeyOrFail(userPrivateArmoredKey);
+  await DecryptPrivateKeyService.decrypt(userPrivateKey, passphrase);
 };
 

@@ -26,6 +26,7 @@ const passphraseController = require('../passphrase/passphraseController');
 const progressController = require('../progress/progressController');
 const {EncryptMessageService} = require('../../service/crypto/encryptMessageService');
 const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
+const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 class ResourceCreateController {
   /**
@@ -77,8 +78,10 @@ class ResourceCreateController {
 
       // Encrypt and sign
       await progressController.update(this.worker, this.progress++, i18n.t('Encrypting secret'));
-      const userPublicKey = this.keyring.findPublic(User.getInstance().get().id).armoredKey;
-      const secret = await EncryptMessageService.encrypt(plaintext, userPublicKey, privateKey);
+      const userId = User.getInstance().get().id;
+      const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
+      const userPublicKey = await readKeyOrFail(userPublicArmoredKey);
+      const secret = await EncryptMessageService.encrypt(plaintext, userPublicKey, [privateKey]);
       resource.secrets = new ResourceSecretsCollection([{data: secret}]);
 
       // Save

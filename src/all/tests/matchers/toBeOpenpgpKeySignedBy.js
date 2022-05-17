@@ -13,8 +13,9 @@
  */
 
 import {VerifyGpgKeyService} from "../../background_page/service/crypto/verifyGpgKeyService";
+import {readAllKeysOrFail, readKeyOrFail} from "../../background_page/utils/openpgp/openpgpAssertions";
 
-exports.toBeOpenpgpKeySignedBy = async function(key, verifyingKeys) {
+exports.toBeOpenpgpKeySignedBy = async function(armoredKey, armoredVerifyingKeys) {
   const {printExpected, matcherHint} = this.utils;
 
   const passMessage =
@@ -29,6 +30,12 @@ exports.toBeOpenpgpKeySignedBy = async function(key, verifyingKeys) {
     `Expected validation to verify signature(s):\n` +
     `  ${printExpected(verifyingKeys)}\n`;
 
+  const key = await readKeyOrFail(armoredKey);
+
+  if (!Array.isArray(armoredVerifyingKeys)) {
+    armoredVerifyingKeys = [armoredVerifyingKeys];
+  }
+  const verifyingKeys = await readAllKeysOrFail(armoredVerifyingKeys);
   const pass = await VerifyGpgKeyService.verify(key, verifyingKeys);
 
   return {pass: pass, message: () => (pass ? passMessage : failMessage)};

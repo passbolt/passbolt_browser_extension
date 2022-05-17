@@ -17,8 +17,7 @@ const {EncryptMessageService} = require("../crypto/encryptMessageService");
 const {AccountRecoveryUserSettingEntity} = require("../../model/entity/accountRecovery/accountRecoveryUserSettingEntity");
 const {AccountRecoveryPrivateKeyPasswordEntity} = require("../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity");
 const {AccountRecoveryOrganizationPolicyEntity} = require("../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity");
-const {assertDecryptedPrivateKeys} = require("../../utils/openpgp/openpgpAssertions");
-const {GetGpgKeyInfoService} = require("../crypto/getGpgKeyInfoService");
+const {assertDecryptedPrivateKey, readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
 const {AccountRecoveryPrivateKeyPasswordDecryptedDataEntity} = require("../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity");
 
 // The strength of the secret to use to encrypt the private key.
@@ -29,20 +28,20 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
    * Build accepted account recovery user setting entity.
    *
    * @param {AbstractAccountEntity} account The account creating the account recovery user setting.
-   * @param {openpgp.PrivateKey|string} decryptedPrivateOpenpgpKey The user decrypted private openpgp key.
+   * @param {openpgp.PrivateKey} decryptedPrivateKey The user decrypted private key.
    * @param {AccountRecoveryOrganizationPolicyEntity} organizationPolicy The organization policy.
    * @returns {Promise<AccountRecoveryUserSettingEntity>}
    */
-  static async build(account, decryptedPrivateOpenpgpKey, organizationPolicy) {
-    decryptedPrivateOpenpgpKey = await assertDecryptedPrivateKeys(decryptedPrivateOpenpgpKey);
+  static async build(account, decryptedPrivateKey, organizationPolicy) {
+    assertDecryptedPrivateKey(decryptedPrivateKey);
 
     if (!organizationPolicy || !(organizationPolicy instanceof AccountRecoveryOrganizationPolicyEntity)) {
       throw new Error("The provided organizationPolicy must be a valid AccountRecoveryOrganizationPolicyEntity.");
     }
 
     const symmetricSecret = secrets.random(SYMMETRIC_SECRET_BITS);
-    const accountRecoveryPrivateKeyDto = await this._encryptPrivateKey(symmetricSecret, decryptedPrivateOpenpgpKey);
-    const accountRecoveryPrivateKeyPasswordForOrganizationDto = await this._encryptPrivateKeyPasswordsForOrganizationKey(account, symmetricSecret, organizationPolicy, decryptedPrivateOpenpgpKey);
+    const accountRecoveryPrivateKeyDto = await this._encryptPrivateKey(symmetricSecret, decryptedPrivateKey);
+    const accountRecoveryPrivateKeyPasswordForOrganizationDto = await this._encryptPrivateKeyPasswordsForOrganizationKey(account, symmetricSecret, organizationPolicy, decryptedPrivateKey);
 
     accountRecoveryPrivateKeyDto.account_recovery_private_key_passwords = [accountRecoveryPrivateKeyPasswordForOrganizationDto];
 
@@ -59,13 +58,11 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
    * Encrypt the user private key symmetrically.
    *
    * @param {string} symmetricSecret The symmetric secret to use to encrypt the private key.
-   * @param {openpgp.PrivateKey} decryptedPrivateOpenpgpKey The user decrypted private openpgp key.
+   * @param {openpgp.PrivateKey} decryptedPrivateKey The user decrypted private key.
    * @returns {Promise<Object>}
    */
-  static async _encryptPrivateKey(symmetricSecret, decryptedPrivateOpenpgpKey) {
-    const decryptedPrivateArmoredKey = decryptedPrivateOpenpgpKey.armor();
-    const userPrivateKeySymmetricEncrypted = await EncryptMessageService.encryptSymmetrically(decryptedPrivateArmoredKey, [symmetricSecret], decryptedPrivateArmoredKey);
-
+  static async _encryptPrivateKey(symmetricSecret, decryptedPrivateKey) {
+    const userPrivateKeySymmetricEncrypted = await EncryptMessageService.encryptSymmetrically(decryptedPrivateKey.armor(), [symmetricSecret], [decryptedPrivateKey]);
     return {data: userPrivateKeySymmetricEncrypted};
   }
 
@@ -75,21 +72,20 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
    * @param {AbstractAccountEntity} account The account creating the account recovery user setting.
    * @param {string} symmetricSecret The symmetric secret to use to encrypt the private key.
    * @param {AccountRecoveryOrganizationPolicyEntity} organizationPolicy The organization policy.
-   * @param {openpgp.PrivateKey} decryptedPrivateOpenpgpKey The user decrypted private openpgp key.
+   * @param {openpgp.PrivateKey} decryptedPrivateKey The user decrypted private key.
    * @returns {Promise<Object>}
    * @private
    */
-  static async _encryptPrivateKeyPasswordsForOrganizationKey(account, symmetricSecret, organizationPolicy, decryptedPrivateOpenpgpKey) {
-    const organizationPublicKey = organizationPolicy.armoredKey;
-    const organizationPublicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(organizationPublicKey);
+  static async _encryptPrivateKeyPasswordsForOrganizationKey(account, symmetricSecret, organizationPolicy, decryptedPrivateKey) {
+    const organizationPublicKey = await readKeyOrFail(organizationPolicy.armoredKey);
     const privateKeyPasswordDecryptedData = this._buildPrivateKeyPasswordDecryptedData(account, symmetricSecret);
     const serializedPrivateKeyPasswordDecryptedData = JSON.stringify(privateKeyPasswordDecryptedData.toDto());
-    const privateKeyPasswordEncryptedData = await EncryptMessageService.encrypt(serializedPrivateKeyPasswordDecryptedData, organizationPublicKey, decryptedPrivateOpenpgpKey);
+    const privateKeyPasswordEncryptedData = await EncryptMessageService.encrypt(serializedPrivateKeyPasswordDecryptedData, organizationPublicKey, [decryptedPrivateKey]);
 
     return {
       data: privateKeyPasswordEncryptedData,
       recipient_foreign_model: AccountRecoveryPrivateKeyPasswordEntity.FOREIGN_MODEL_ORGANIZATION_KEY,
-      recipient_fingerprint: organizationPublicKeyInfo.fingerprint,
+      recipient_fingerprint: organizationPublicKey.getFingerprint().toUpperCase(),
     };
   }
 

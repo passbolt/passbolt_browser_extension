@@ -20,7 +20,6 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import each from "jest-each";
 import {ReviewRequestController} from "./reviewRequestController";
 import {DecryptMessageService} from "../../service/crypto/decryptMessageService";
-import {DecryptPrivateKeyService} from "../../service/crypto/decryptPrivateKeyService";
 import {InvalidMasterPasswordError} from "../../error/invalidMasterPasswordError";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
@@ -45,6 +44,7 @@ import {MockExtension} from "../../../tests/mocks/mockExtension";
 import {UserLocalStorage} from "../../service/local_storage/userLocalStorage";
 import {defaultUserDto} from "../../model/entity/user/userEntity.test.data";
 import {UsersCollection} from "../../model/entity/user/usersCollection";
+import {readAllKeysOrFail, readKeyOrFail, readMessageOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 jest.mock("../passphrase/passphraseController.js");
 
@@ -91,10 +91,15 @@ describe("ReviewRequestController", () => {
 
       expect.assertions(9);
       expect(savedAccountRecoveryResponseEntity.status).toEqual("approved");
-      const decryptedAccountRecoveryRequestPrivateKey = await DecryptPrivateKeyService.decrypt(pgpKeys.account_recovery_request.private, pgpKeys.account_recovery_request.passphrase);
-      const privateKeyPasswordDecryptedDataSerialized = await DecryptMessageService.decrypt(savedAccountRecoveryResponseEntity.data, decryptedAccountRecoveryRequestPrivateKey, [pgpKeys.account_recovery_organization.public, pgpKeys.admin.public]);
+
+      const decryptedAccountRecoveryRequestPrivateKey = await readKeyOrFail(pgpKeys.account_recovery_request.private_decrypted);
+      const savedAccountRecoveryResponseData = await readMessageOrFail(savedAccountRecoveryResponseEntity.data);
+      const verificationKeys = await readAllKeysOrFail([pgpKeys.account_recovery_organization.public, pgpKeys.admin.public]);
+
+      const privateKeyPasswordDecryptedDataSerialized = await DecryptMessageService.decrypt(savedAccountRecoveryResponseData, decryptedAccountRecoveryRequestPrivateKey, verificationKeys);
       const privateKeyPasswordDecryptedDataDto = JSON.parse(privateKeyPasswordDecryptedDataSerialized);
       const privateKeyPasswordDecryptedData = new AccountRecoveryPrivateKeyPasswordDecryptedDataEntity(privateKeyPasswordDecryptedDataDto);
+
       expect(privateKeyPasswordDecryptedData.domain).toEqual("https://passbolt.local");
       expect(privateKeyPasswordDecryptedData.privateKeyFingerprint).toEqual(pgpKeys.ada.fingerprint);
       expect(privateKeyPasswordDecryptedData.privateKeySecret).toEqual("f7cf1fa06f973a9ecbb5f0e2bc6d1830532e53ad50da231036bd6c8c00dd7c7dc6c07b04004615cd6808bea2cb6a4ce4c46f7f36b8865292c0f7a28cd6f56112");

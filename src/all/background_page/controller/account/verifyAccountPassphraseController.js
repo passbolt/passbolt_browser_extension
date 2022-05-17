@@ -13,6 +13,7 @@
  */
 
 const {DecryptPrivateKeyService} = require("../../service/crypto/decryptPrivateKeyService");
+const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
 
 class VerifyAccountPassphraseController {
   /**
@@ -58,7 +59,8 @@ class VerifyAccountPassphraseController {
     if (typeof passphrase !== "string") {
       throw new TypeError("The passphrase should be a string.");
     }
-    await DecryptPrivateKeyService.decrypt(privateArmoredKey, passphrase);
+    const privateKey = await readKeyOrFail(privateArmoredKey);
+    await DecryptPrivateKeyService.decrypt(privateKey, passphrase);
   }
 }
 

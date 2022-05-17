@@ -23,6 +23,7 @@ import {UserEntity} from "../../model/entity/user/userEntity";
 import Worker from "../../model/worker";
 import {initialAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
 import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
+import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 jest.mock("../../model/worker");
 
@@ -47,7 +48,8 @@ describe("StartSetupController", () => {
 
       expect.assertions(6);
       await controller.exec();
-      expect(account.serverPublicArmoredKey).toEqual((await GetGpgKeyInfoService.getKeyInfo(mockVerifyDto.keydata)).armoredKey);
+      const key = await readKeyOrFail(mockVerifyDto.keydata);
+      expect(account.serverPublicArmoredKey).toEqual((await GetGpgKeyInfoService.getKeyInfo(key)).armoredKey);
       expect(account.username).toEqual(mockSetupStartDto.user.username);
       expect(account.firstName).toEqual(mockSetupStartDto.user.profile.first_name);
       expect(account.lastName).toEqual(mockSetupStartDto.user.profile.last_name);
@@ -74,7 +76,7 @@ describe("StartSetupController", () => {
 
       expect.assertions(2);
       const promise = controller.exec();
-      await expect(promise).rejects.toThrowError("The key should be a valid armored key or a valid openpgp key.");
+      await expect(promise).rejects.toThrowError("The key should be an openpgp valid armored key string.");
       expect(mockedBootstrapSetupWorkerPortEmit).toHaveBeenCalledWith("passbolt.setup-bootstrap.remove-iframe");
     });
 

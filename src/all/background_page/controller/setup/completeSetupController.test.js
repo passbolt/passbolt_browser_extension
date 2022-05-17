@@ -20,7 +20,7 @@ import {withSecurityTokenAccountSetupDto} from "../../model/entity/account/accou
 import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
 import {User} from "../../model/user";
 import {Keyring} from "../../model/keyring";
-import {GetGpgKeyInfoService} from "../../service/crypto/getGpgKeyInfoService";
+import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 const app = require("../../app");
 
@@ -53,10 +53,14 @@ describe("CompleteSetupController", () => {
       expect(user.settings.securityToken).toStrictEqual(account.securityToken.toDto());
 
       const keyring = new Keyring();
-      const keyringPrivateFingerprint = (await GetGpgKeyInfoService.getKeyInfo(keyring.findPrivate().armoredKey)).fingerprint;
-      const accountPrivateFingerprint = (await GetGpgKeyInfoService.getKeyInfo(account.userPrivateArmoredKey)).fingerprint;
-      const keyringPublicFingerprint = (await GetGpgKeyInfoService.getKeyInfo(keyring.findPublic(account.userId).armoredKey)).fingerprint;
-      const accountPublicFingerprint = (await GetGpgKeyInfoService.getKeyInfo(account.userPublicArmoredKey)).fingerprint;
+      const keyringPrivateKey = await readKeyOrFail(keyring.findPrivate().armoredKey);
+      const keyringPublicKey = await readKeyOrFail(keyring.findPublic(account.userId).armoredKey);
+      const accountPrivateKey = await readKeyOrFail(account.userPrivateArmoredKey);
+      const accountPublicKey = await readKeyOrFail(account.userPublicArmoredKey);
+      const keyringPrivateFingerprint = keyringPrivateKey.getFingerprint().toUpperCase();
+      const accountPrivateFingerprint = accountPrivateKey.getFingerprint().toUpperCase();
+      const keyringPublicFingerprint = keyringPublicKey.getFingerprint().toUpperCase();
+      const accountPublicFingerprint = accountPublicKey.getFingerprint().toUpperCase();
       expect(keyringPrivateFingerprint).toStrictEqual(accountPrivateFingerprint);
       expect(keyringPublicFingerprint).toStrictEqual(accountPublicFingerprint);
       expect(keyringPublicFingerprint).toStrictEqual(keyringPrivateFingerprint);

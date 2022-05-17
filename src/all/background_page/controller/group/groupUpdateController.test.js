@@ -23,6 +23,7 @@ const {GroupsUpdateController} = require("./groupUpdateController");
 const {updateGroupNameDto, add2UsersToGroupDto, add2UsersToGroupDryRunResponse} = require("./groupUpdateController.test.data");
 const {defaultGroup} = require("../../model/entity/group/groupEntity.test.data");
 const {defaultDyRunResponse} = require("../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data");
+const {readKeyOrFail, readMessageOrFail} = require("../../utils/openpgp/openpgpAssertions");
 
 jest.mock("../progress/progressController", () => ({
   open: jest.fn(),
@@ -150,13 +151,17 @@ describe("GroupsUpdateController", () => {
         expect(adminResource3).not.toBeUndefined();
 
         // we should have the new resources encrypted for the correct users and they should be able to decrypt them.
-        const bettyPrivateKey = pgpKeys.betty.private_decrypted;
-        expect(await DecryptMessageService.decrypt(bettyResource1.data, bettyPrivateKey)).toBe("resource1-password");
-        expect(await DecryptMessageService.decrypt(bettyResource2.data, bettyPrivateKey)).toBe("resource2-password");
+        const bettyPrivateKey = await readKeyOrFail(pgpKeys.betty.private_decrypted);
+        const bettyResource1Data = await readMessageOrFail(bettyResource1.data);
+        const bettyResource2Data = await readMessageOrFail(bettyResource2.data);
+        const adminResource1Data = await readMessageOrFail(adminResource1.data);
+        const adminResource3Data = await readMessageOrFail(adminResource3.data);
+        expect(await DecryptMessageService.decrypt(bettyResource1Data, bettyPrivateKey)).toBe("resource1-password");
+        expect(await DecryptMessageService.decrypt(bettyResource2Data, bettyPrivateKey)).toBe("resource2-password");
 
-        const adminPrivateKey = pgpKeys.admin.private_decrypted;
-        expect(await DecryptMessageService.decrypt(adminResource1.data, adminPrivateKey)).toBe("resource1-password");
-        expect(await DecryptMessageService.decrypt(adminResource3.data, adminPrivateKey)).toBe("resource3-password");
+        const adminPrivateKey = await readKeyOrFail(pgpKeys.admin.private_decrypted);
+        expect(await DecryptMessageService.decrypt(adminResource1Data, adminPrivateKey)).toBe("resource1-password");
+        expect(await DecryptMessageService.decrypt(adminResource3Data, adminPrivateKey)).toBe("resource3-password");
 
         return mockApiResponse({id: id, name: name});
       });

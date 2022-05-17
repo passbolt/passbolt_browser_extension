@@ -67,26 +67,26 @@ describe("ValidatePrivateGpgKeySetupController", () => {
     expect.assertions(1);
     const key = "Fake key";
     const controller = new ValidatePrivateGpgKeySetupController();
-    await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The key should be a valid armored GPG key."));
+    await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The key should be an openpgp valid armored key string."));
   });
 
   it("Should throw an exception if the key is public", async() => {
     expect.assertions(1);
     const key = pgpKeys.ada.public;
     const controller = new ValidatePrivateGpgKeySetupController();
-    await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The key should be private."));
+    await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The key should be an openpgp.PrivateKey."));
   });
 
   it("Should throw an exception if the key is revoked", async() => {
     expect.assertions(1);
-    const key = pgpKeys.revokedKey.public;
+    const key = pgpKeys.revokedKey.private;
     const controller = new ValidatePrivateGpgKeySetupController();
     await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The private key should not be revoked."));
   });
 
   it("Should throw an exception if the key is expired", async() => {
     expect.assertions(1);
-    const key =  pgpKeys.expired.public;
+    const key =  pgpKeys.expired.private;
     const controller = new ValidatePrivateGpgKeySetupController();
     await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The private key should not be expired."));
   });
@@ -102,7 +102,7 @@ describe("ValidatePrivateGpgKeySetupController", () => {
     expect.assertions(1);
     const key =  pgpKeys.ada.private_decrypted;
     const controller = new ValidatePrivateGpgKeySetupController();
-    await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The private key should not be decrypted."));
+    await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The private key should be encrypted."));
   });
 
   each([
@@ -127,8 +127,9 @@ describe("ValidatePrivateGpgKeySetupController", () => {
       algorithm: "EdDSA",
       curve: null
     });
+    const dummyKey = pgpKeys.ada.private;
     const controller = new ValidatePrivateGpgKeySetupController();
-    await expect(controller.exec()).rejects.toStrictEqual(new Error("The private key should use a supported algorithm: RSA, ECDSA OR EDDSA."));
+    await expect(controller.exec(dummyKey)).rejects.toStrictEqual(new Error("The private key should use a supported algorithm: RSA, ECDSA OR EDDSA."));
   });
 
   it("Should throw if the private key is not an ECC with an unsupported curve", async() => {
@@ -142,7 +143,8 @@ describe("ValidatePrivateGpgKeySetupController", () => {
       algorithm: "EdDSA",
       curve: "custom-curve"
     });
+    const dummyKey = pgpKeys.ada.private;
     const controller = new ValidatePrivateGpgKeySetupController();
-    await expect(controller.exec()).rejects.toStrictEqual(new Error("An ECC key should be based on a supported curve."));
+    await expect(controller.exec(dummyKey)).rejects.toStrictEqual(new Error("An ECC key should be based on a supported curve."));
   });
 });

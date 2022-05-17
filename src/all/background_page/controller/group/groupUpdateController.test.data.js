@@ -18,6 +18,7 @@ import {createGroupUser} from "../../model/entity/groupUser/groupUsersEntity.tes
 import {EncryptMessageService} from "../../service/crypto/encryptMessageService";
 import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
 import {defaultDyRunResponse} from "../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data";
+import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 export const updateGroupNameDto = (data = {}) => {
   const defaultData = defaultGroup({
@@ -53,10 +54,11 @@ export const add2UsersToGroupDryRunResponse = async(data = {}) => {
     {Secret: {resource_id: resource3Id, user_id: users.admin.id}}
   ];
 
+  const adaPublicKey = await readKeyOrFail(pgpKeys.ada.public);
   const secrets = [
-    {Secret: [{resource_id: resource1Id, data: await EncryptMessageService.encrypt("resource1-password", pgpKeys.ada.public)}]},
-    {Secret: [{resource_id: resource2Id, data: await EncryptMessageService.encrypt("resource2-password", pgpKeys.ada.public)}]},
-    {Secret: [{resource_id: resource3Id, data: await EncryptMessageService.encrypt("resource3-password", pgpKeys.ada.public)}]},
+    {Secret: [{resource_id: resource1Id, data: await EncryptMessageService.encrypt("resource1-password", adaPublicKey)}]},
+    {Secret: [{resource_id: resource2Id, data: await EncryptMessageService.encrypt("resource2-password", adaPublicKey)}]},
+    {Secret: [{resource_id: resource3Id, data: await EncryptMessageService.encrypt("resource3-password", adaPublicKey)}]},
   ];
 
   const defaultData = Object.assign({

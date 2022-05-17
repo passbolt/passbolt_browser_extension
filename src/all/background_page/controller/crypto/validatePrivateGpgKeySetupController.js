@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 const {GetGpgKeyInfoService} = require('../../service/crypto/getGpgKeyInfoService');
-const {assertEncryptedPrivateKeys} = require('../../utils/openpgp/openpgpAssertions');
+const {assertEncryptedPrivateKey, readKeyOrFail, assertPrivateKey} = require('../../utils/openpgp/openpgpAssertions');
 const {GenerateGpgKeyPairOptionsEntity} = require('../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity');
 const {i18n} = require('../../sdk/i18n');
 
@@ -45,7 +45,7 @@ class ValidatePrivateGpgKeySetupController {
   /**
    * Get the given user key information.
    *
-   * @param {string} privateKeyToValidate the key to validate.
+   * @param {string} privateArmoredKey the key to validate.
    * @returns {Promise<void>}
    * @throws {Error} if the key is not a valid GPG Key.
    * @throws {Error} if the key is revoked.
@@ -57,14 +57,12 @@ class ValidatePrivateGpgKeySetupController {
    * @throws {Error} if the key is an ECC with an undefined curve.
    * @throws {Error} if the key is an ECC with an unsupported curve.
    */
-  async exec(privateKeyToValidate) {
-    let keyInfo;
-    try {
-      keyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKeyToValidate);
-    } catch (e) {
-      console.error(e);
-      throw new Error(i18n.t("The key should be a valid armored GPG key."));
-    }
+  async exec(privateArmoredKey) {
+    const privateKey = await readKeyOrFail(privateArmoredKey);
+    assertPrivateKey(privateKey);
+    assertEncryptedPrivateKey(privateKey);
+
+    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKey);
 
     if (keyInfo.revoked) {
       throw new Error(i18n.t("The private key should not be revoked."));
@@ -72,11 +70,9 @@ class ValidatePrivateGpgKeySetupController {
       throw new Error(i18n.t("The private key should not be expired."));
     } else if (keyInfo.expires !== "Never") {
       throw new Error(i18n.t("The private key should not have an expiry date."));
-    } else if (!keyInfo.private) {
-      throw new Error(i18n.t("The key should be private."));
     }
 
-    if (keyInfo.algorithm === "RSA") {
+    if (keyInfo.algorithm === GenerateGpgKeyPairOptionsEntity.TYPE_RSA) {
       if (keyInfo.length < GenerateGpgKeyPairOptionsEntity.DEFAULT_KEY_SIZE) {
         throw new Error(i18n.t("An RSA key should have a length of {{size}} bits minimum.", {size: GenerateGpgKeyPairOptionsEntity.DEFAULT_KEY_SIZE}));
       }
@@ -87,8 +83,6 @@ class ValidatePrivateGpgKeySetupController {
         throw new Error(i18n.t("An ECC key should be based on a supported curve."));
       }
     }
-
-    await assertEncryptedPrivateKeys(privateKeyToValidate);
   }
 
   /**

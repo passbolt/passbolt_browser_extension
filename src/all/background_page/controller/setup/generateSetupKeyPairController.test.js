@@ -17,6 +17,7 @@ import {DecryptPrivateKeyService} from "../../service/crypto/decryptPrivateKeySe
 import {EntityValidationError} from "../../model/entity/abstract/entityValidationError";
 import {startAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
 import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
+import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 describe("GenerateSetupKeyPairController", () => {
   describe("GenerateSetupKeyPairController::exec", () => {
@@ -68,8 +69,10 @@ describe("GenerateSetupKeyPairController", () => {
       await expect(account.userPublicArmoredKey).toBeOpenpgpPublicKey();
       await expect(account.userPrivateArmoredKey).toBeOpenpgpPrivateKey();
 
-      const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(account.userPublicArmoredKey);
-      const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(account.userPrivateArmoredKey);
+      const accountPublicKey = await readKeyOrFail(account.userPublicArmoredKey);
+      const accountPrivateKey = await readKeyOrFail(account.userPrivateArmoredKey);
+      const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountPublicKey);
+      const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountPrivateKey);
 
       const expectedUserIds = [{
         name: `${account.firstName} ${account.lastName}`,
@@ -82,7 +85,8 @@ describe("GenerateSetupKeyPairController", () => {
       expect(privateKeyInfo.length).toBe(3072);
       expect(privateKeyInfo.userIds).toStrictEqual(expectedUserIds);
 
-      const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(account.userPrivateArmoredKey, generateKeyPairDto.passphrase);
+      const userPrivateKey = await readKeyOrFail(account.userPrivateArmoredKey);
+      const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, generateKeyPairDto.passphrase);
       expect(decryptedPrivateKey).not.toBeNull();
       expect(runtimeMemory.passphrase).toStrictEqual(generateKeyPairDto.passphrase);
     }, 10000);

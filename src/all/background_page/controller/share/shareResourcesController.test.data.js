@@ -18,6 +18,7 @@ import {readSecret} from "../../model/entity/secret/secretEntity.test.data";
 import {readPermission} from "../../model/entity/permission/permissionEntity.test.data";
 import {readResource} from "../../model/entity/resource/resourceEntity.test.data";
 import {EncryptMessageService} from "../../service/crypto/encryptMessageService";
+import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 async function buildReadSecret(userId, resourceId, decryptedPrivateKey, cleartextMessage) {
   return readSecret({
@@ -86,9 +87,10 @@ export const _3ResourcesSharedWith3UsersResourcesDto = async() => {
     group: null
   });
 
-  const secret1 = await buildReadSecret(userAda.id, resource1Id, pgpKeys.ada.public, "secret1");
-  const secret2 = await buildReadSecret(userAda.id, resource2Id, pgpKeys.ada.public, "secret2");
-  const secret3 = await buildReadSecret(userAda.id, resource3Id, pgpKeys.ada.public, "secret3");
+  const adaPublicKey = await readKeyOrFail(pgpKeys.ada.public);
+  const secret1 = await buildReadSecret(userAda.id, resource1Id, adaPublicKey, "secret1");
+  const secret2 = await buildReadSecret(userAda.id, resource2Id, adaPublicKey, "secret2");
+  const secret3 = await buildReadSecret(userAda.id, resource3Id, adaPublicKey, "secret3");
 
   const resource1 = readResource({
     id: resource1Id,

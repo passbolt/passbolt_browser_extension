@@ -14,7 +14,7 @@
 
 const {GetGpgKeyInfoService} = require('../../service/crypto/getGpgKeyInfoService');
 const {i18n} = require('../../sdk/i18n');
-const {assertEncryptedPrivateKeys} = require("../../utils/openpgp/openpgpAssertions");
+const {assertEncryptedPrivateKey, readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
 
 class ValidatePrivateGpgKeyRecoverController {
   /**
@@ -45,30 +45,23 @@ class ValidatePrivateGpgKeyRecoverController {
   /**
    * Get the given user key information.
    *
-   * @param {string} key the key to validate.
+   * @param {string} armoredKey the key to validate.
    * @throws {Error} if the key is not a valid GPG Key.
    * @throws {Error} if the key is revoked.
    * @throws {Error} if the key is expired.
    * @throws {Error} if the key is not private.
+   * @throws {Error} if the key is decrypted.
    */
-  async exec(key) {
-    let keyInfo;
-    try {
-      keyInfo = await GetGpgKeyInfoService.getKeyInfo(key);
-    } catch (e) {
-      console.error(e);
-      throw new Error(i18n.t("The key should be a valid armored GPG key."));
-    }
+  async exec(armoredKey) {
+    const key = await readKeyOrFail(armoredKey);
+    assertEncryptedPrivateKey(key);
 
+    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(key);
     if (keyInfo.revoked) {
       throw new Error(i18n.t("The private key should not be revoked."));
     } else if (keyInfo.isExpired) {
       throw new Error(i18n.t("The private key should not be expired."));
-    } else if (!keyInfo.private) {
-      throw new Error(i18n.t("The key should be private."));
     }
-
-    await assertEncryptedPrivateKeys(key);
   }
 }
 

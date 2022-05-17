@@ -17,6 +17,7 @@ import {GetGpgKeyInfoService} from "../../service/crypto/getGpgKeyInfoService";
 import {GpgKeyError} from "../../error/GpgKeyError";
 import {MockExtension} from "../../../tests/mocks/mockExtension";
 import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
+import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 const mockedSaveFile = jest.fn();
 jest.mock('../fileController', () => ({
@@ -42,7 +43,8 @@ describe("DownloadUserPublicKeyController", () => {
       expect(fileContentType).toBe("text/plain");
       expect(workerTabId).toBe(expectedTabId);
 
-      const downloadedKeyInfo = await GetGpgKeyInfoService.getKeyInfo(fileContent);
+      const keyFromFile = await readKeyOrFail(fileContent);
+      const downloadedKeyInfo = await GetGpgKeyInfoService.getKeyInfo(keyFromFile);
       expect(downloadedKeyInfo.private).toBe(false);
       expect(downloadedKeyInfo.keyId).toBe(privateKey.key_id);
       expect(downloadedKeyInfo.fingerprint).toBe(privateKey.fingerprint);
@@ -53,7 +55,7 @@ describe("DownloadUserPublicKeyController", () => {
     expect(mockedSaveFile).toHaveBeenCalledTimes(1);
   });
 
-  it(`Should throw an exception if the user's private key can't be find`, async() => {
+  it(`Should throw an exception if the user's private key can't be found`, async() => {
     expect.assertions(2);
     MockExtension.withMissingPrivateKeyAccount();
     const controller = new DownloadUserPublicKeyController(mockedWorker, null);

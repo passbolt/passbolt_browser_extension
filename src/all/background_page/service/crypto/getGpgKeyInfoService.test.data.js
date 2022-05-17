@@ -20,7 +20,7 @@ const getKeyDto = key => ({
   fingerprint: key.fingerprint,
   expires: key.expires,
   created: key.created,
-  algorithm: key.algorithm,
+  algorithm: key.algorithm.toLowerCase(),
   length: key.length,
   curve: key.curve,
   private: false,

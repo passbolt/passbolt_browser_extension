@@ -20,6 +20,7 @@ const {User} = require('../../model/user');
 const {users} = require("../../model/entity/user/userEntity.test.data");
 const {DecryptMessageService} = require('../../service/crypto/decryptMessageService');
 const {ShareResourcesController} = require("./shareResourcesController");
+const {readMessageOrFail, readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
 const {
   _3ResourcesSharedWith3UsersResourcesDto,
   createChangesDto,
@@ -72,9 +73,9 @@ describe("ShareResourcesController", () => {
 
       // this is a way to find the correct private key with a user id later when we'll try to decrypt messages
       const decryptedPrivateKeys = {};
-      decryptedPrivateKeys[users.ada.id] = pgpKeys.ada.private_decrypted;
-      decryptedPrivateKeys[users.admin.id] = pgpKeys.admin.private_decrypted;
-      decryptedPrivateKeys[users.betty.id] = pgpKeys.betty.private_decrypted;
+      decryptedPrivateKeys[users.ada.id] = await readKeyOrFail(pgpKeys.ada.private_decrypted);
+      decryptedPrivateKeys[users.admin.id] = await readKeyOrFail(pgpKeys.admin.private_decrypted);
+      decryptedPrivateKeys[users.betty.id] = await readKeyOrFail(pgpKeys.betty.private_decrypted);
 
       /*
        * this is one of the parameter that the controller requires.
@@ -165,7 +166,8 @@ describe("ShareResourcesController", () => {
         for (let i = 0; i < secrets.length; i++) {
           const secret = secrets[i];
           const decryptedPrivateKey = decryptedPrivateKeys[secret.user_id];
-          const decryptedMessage = await DecryptMessageService.decrypt(secret.data, decryptedPrivateKey);
+          const secretMessage = await readMessageOrFail(secret.data);
+          const decryptedMessage = await DecryptMessageService.decrypt(secretMessage, decryptedPrivateKey);
           expect(decryptedMessage).toEqual(expect.stringMatching(/^secret[123]$/));
         }
         return mockApiResponse({});

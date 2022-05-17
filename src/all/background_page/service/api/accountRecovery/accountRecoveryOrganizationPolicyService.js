@@ -15,6 +15,8 @@ const {AbstractService} = require('../abstract/abstractService');
 const {GetGpgKeyInfoService} = require("../../crypto/getGpgKeyInfoService");
 const {GpgAuth} = require('../../../model/gpgauth');
 const {Keyring} = require('../../../model/keyring');
+const {readKeyOrFail} = require('../../../utils/openpgp/openpgpAssertions');
+const {GenerateGpgKeyPairOptionsEntity} = require("../../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity");
 
 const ACCOUNT_RECOVERY_ORGANIZATION_POLICY_SERVICE_RESOURCE_NAME = '/account-recovery/organization-policies';
 
@@ -90,14 +92,15 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
    * - it's not already used by a user
    * - it's not the previous ORK
    *
-   * @param {string} publicKeyToValidate the key to check the validity as a potential new organization recovery key
-   * @param {string} organizationPolicyPulicKey the cuurent organization recovery key in its armored form
+   * @param {string} publicArmoredKeyToValidate the key to check the validity as a potential new organization recovery key
+   * @param {string} organizationPolicyPublicArmoredKey the current organization recovery key in its armored form
    * @throws {Error} if any of the checks are wrong
    */
-  static async validatePublicKey(publicKeyToValidate, organizationPolicyPulicKey) {
-    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(publicKeyToValidate);
+  static async validatePublicKey(publicArmoredKeyToValidate, organizationPolicyPublicArmoredKey) {
+    const publicKey = await readKeyOrFail(publicArmoredKeyToValidate);
+    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(publicKey);
 
-    if (keyInfo.algorithm !== "RSA") {
+    if (keyInfo.algorithm !== GenerateGpgKeyPairOptionsEntity.TYPE_RSA) {
       throw new Error("The key algorithm should be RSA.");
     }
 
@@ -139,12 +142,12 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
       }
     }
 
-    if (!organizationPolicyPulicKey) {
+    if (!organizationPolicyPublicArmoredKey) {
       return;
     }
 
-    const currentOrkInfo = await GetGpgKeyInfoService.getKeyInfo(organizationPolicyPulicKey);
-    if (currentOrkInfo.fingerprint === keyInfo.fingerprint) {
+    const organizationPolicyPulicKey = await readKeyOrFail(organizationPolicyPublicArmoredKey);
+    if (organizationPolicyPulicKey.getFingerprint().toUpperCase() === keyInfo.fingerprint) {
       throw new Error("The key is the current organization recovery key, you must provide a new one.");
     }
   }

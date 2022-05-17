@@ -16,7 +16,7 @@ const app = require("../../app");
 const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
 const {AccountEntity} = require("../../model/entity/account/accountEntity");
 const {AccountModel} = require("../../model/account/accountModel");
-const {assertPrivateKeys} = require("../../utils/openpgp/openpgpAssertions");
+const {readMessageOrFail, readKeyOrFail, assertPrivateKey} = require("../../utils/openpgp/openpgpAssertions");
 const {AccountLocalStorage} = require("../../service/local_storage/accountLocalStorage");
 const {SetupModel} = require("../../model/setup/setupModel");
 const {AccountAccountRecoveryEntity} = require("../../model/entity/account/accountAccountRecoveryEntity");
@@ -119,32 +119,34 @@ class RecoverAccountController {
    * @param {AccountRecoveryPrivateKeyEntity} privateKey The account recovery private key to recover.
    * @param {AccountRecoveryResponseEntity} response The account recovery response.
    * @param {string} passphrase The account recovery request user private key passphrase and recovered private key new passphrase.
-   * @return {Promise<string>} The recovered private armored key.
+   * @return {Promise<openpgp.PrivateKey>} The recovered private armored key.
    * @private
    */
   async _recoverPrivateKey(privateKey, response, passphrase) {
-    const requestPrivateKeyDecrypted = await DecryptPrivateKeyService.decrypt(this.account.userPrivateArmoredKey, passphrase);
+    const key = await readKeyOrFail(this.account.userPrivateArmoredKey);
+    const requestPrivateKeyDecrypted = await DecryptPrivateKeyService.decrypt(key, passphrase);
     /*
      * @todo Additional check could be done to ensure the recovered key is the same than the one the user was previously using.
      *   If the user is in the case lost passphrase, a key should still be referenced in the storage of the extension.
      */
     const privateKeyPasswordDecryptedData = await DecryptResponseDataService.decrypt(response, requestPrivateKeyDecrypted, this.account.userId);
-    const decryptedRecoveredPrivateKey = await DecryptMessageService.decryptSymmetrically(privateKey.data, privateKeyPasswordDecryptedData.privateKeySecret);
-
+    const privateKeyData = await readMessageOrFail(privateKey.data);
+    const decryptedRecoveredPrivateArmoredKey = await DecryptMessageService.decryptSymmetrically(privateKeyData, privateKeyPasswordDecryptedData.privateKeySecret);
+    const decryptedRecoveredPrivateKey = await readKeyOrFail(decryptedRecoveredPrivateArmoredKey);
     return EncryptPrivateKeyService.encrypt(decryptedRecoveredPrivateKey, passphrase);
   }
 
   /**
    * Complete the recover.
-   * @param {string} recoveredArmoredPrivateKey The recovered armored private key
+   * @param {openpgp.PrivateKey} recoveredPrivateKey The recovered private key
    * @return {Promise<AccountRecoverEntity>}
    * @private
    */
-  async _completeRecover(recoveredArmoredPrivateKey) {
+  async _completeRecover(recoveredPrivateKey) {
+    assertPrivateKey(recoveredPrivateKey);
     const accountRecoverDto = this.account.toDto(AccountAccountRecoveryEntity.ALL_CONTAIN_OPTIONS);
-    const privateOpenpgpKey = await assertPrivateKeys(recoveredArmoredPrivateKey);
-    accountRecoverDto.user_private_armored_key = recoveredArmoredPrivateKey;
-    accountRecoverDto.user_public_armored_key = privateOpenpgpKey.toPublic().armor();
+    accountRecoverDto.user_private_armored_key = recoveredPrivateKey.armor();
+    accountRecoverDto.user_public_armored_key = recoveredPrivateKey.toPublic().armor();
     const accountRecover = new AccountRecoverEntity(accountRecoverDto);
     await this.setupModel.completeRecover(accountRecover);
 

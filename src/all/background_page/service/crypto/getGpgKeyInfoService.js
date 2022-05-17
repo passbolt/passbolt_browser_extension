@@ -15,28 +15,18 @@
 const {goog} = require('../../utils/format/emailaddress');
 const {ExternalGpgKeyEntity} = require('../../model/entity/gpgkey/external/externalGpgKeyEntity');
 const {GpgKeyError} = require('../../error/GpgKeyError');
-const {assertKeys} = require('../../utils/openpgp/openpgpAssertions');
+const {assertKey} = require('../../utils/openpgp/openpgpAssertions');
 
 class GetGpgKeyInfoService {
   /**
    * Returns the information of the given key.
    *
-   * @param {openpgp.PublicKey|openpgp.PrivateKey|string} key The key to get the info from.
+   * @param {openpgp.PublicKey|openpgp.PrivateKey} key The key to get the info from.
    * @return {Promise<ExternalGpgKeyEntity>}
    */
   static async getKeyInfo(key) {
-    const readKey = await assertKeys(key);
-    return this._keyInfo(readKey);
-  }
+    assertKey(key);
 
-  /**
-   * Returns key information.
-   *
-   * @param {openpgp.PublicKey|openpgp.PrivateKey} key The key to get info from.
-   * @returns {Promise<ExternalGpgKeyEntity>}
-   * @private
-   */
-  static async _keyInfo(key) {
     // Check the userIds
     const userIds = key.getUserIDs();
     const userIdsSplited = [];
@@ -100,21 +90,23 @@ class GetGpgKeyInfoService {
       case "rsaEncryptSign":
       case "rsaEncrypt":
       case "rsaSign":
-        return "RSA";
+        return "rsa";
       case "elgamal":
-        return "Elgamal";
+        return "elgamal";
       case "dsa":
-        return "DSA";
+        return "dsa";
       case "ecdh":
-        return "ECDH";
+        return "ecdh";
       case "ecdsa":
-        return "ECDSA";
+        return "ecdsa";
       case "eddsa":
-        return "EdDSA";
+        return "eddsa";
       case "aedh":
-        return "AEDH";
+        return "aedh";
       case "aedsa":
-        return "AEDSA";
+        return "aedsa";
+      default:
+        throw new Error("Unknown algorithm.");
     }
   }
 

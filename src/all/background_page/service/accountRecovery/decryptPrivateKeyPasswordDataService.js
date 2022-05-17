@@ -14,15 +14,15 @@
 
 const {AccountRecoveryPrivateKeyPasswordDecryptedDataEntity} = require("../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity");
 const {DecryptMessageService} = require("../../service/crypto/decryptMessageService");
-const {GetGpgKeyInfoService} = require("../crypto/getGpgKeyInfoService");
+const {readMessageOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 class DecryptPrivateKeyPasswordDataService {
   /**
    * Decrypt the private key password encrypted data.
    * @param {AccountRecoveryPrivateKeyPasswordEntity} privateKeyPassword The private key password.
-   * @param {openpgp.PrivateKey|string} decryptionKey The decrypted decryption key.
+   * @param {openpgp.PrivateKey} decryptionKey The decrypted decryption key.
    * @param {string} [verificationUserId] The id of the user who is the owner of the private key encrypted with the private key password.
-   * @param {openpgp.PublicKey|string} [verificationUserPublicKey] The public key of the user who is the owner of the private key encrypted with the private key password
+   * @param {openpgp.PublicKey} [verificationUserPublicKey] The public key of the user who is the owner of the private key encrypted with the private key password
    * @return {Promise<AccountRecoveryPrivateKeyPasswordDecryptedDataEntity>}
    * @throw {Error} If the decryption key fingerprint does not match the private key password recipient fingerprint.
    * @throw {Error} If the private key password data cannot be decrypted.
@@ -33,14 +33,14 @@ class DecryptPrivateKeyPasswordDataService {
    */
   static async decrypt(privateKeyPassword, decryptionKey, verificationUserId, verificationUserPublicKey) {
     let privateKeyPasswordDecryptedDataDto;
-    const decryptionKeyInfo = await GetGpgKeyInfoService.getKeyInfo(decryptionKey);
 
-    if (decryptionKeyInfo.fingerprint !== privateKeyPassword.recipientFingerprint) {
+    if (decryptionKey.getFingerprint().toUpperCase() !== privateKeyPassword.recipientFingerprint) {
       throw new Error("The decryption key fingerprint does not match the private key password recipient fingerprint.");
     }
 
     // @todo verify the signature on the password: can be the user itself while performing the setup or the admin while rotating the ork.
-    const privateKeyPasswordDecryptedDataSerialized = await DecryptMessageService.decrypt(privateKeyPassword.data, decryptionKey);
+    const privateKeyPasswordMessage = await readMessageOrFail(privateKeyPassword.data);
+    const privateKeyPasswordDecryptedDataSerialized = await DecryptMessageService.decrypt(privateKeyPasswordMessage, decryptionKey);
 
     try {
       privateKeyPasswordDecryptedDataDto = JSON.parse(privateKeyPasswordDecryptedDataSerialized);
@@ -57,8 +57,7 @@ class DecryptPrivateKeyPasswordDataService {
     }
 
     if (verificationUserPublicKey) {
-      const verificationKeyInfo = await GetGpgKeyInfoService.getKeyInfo(verificationUserPublicKey);
-      if (privateKeyPasswordDecryptedData.privateKeyFingerprint !== verificationKeyInfo.fingerprint) {
+      if (privateKeyPasswordDecryptedData.privateKeyFingerprint !== verificationUserPublicKey.getFingerprint().toUpperCase()) {
         throw new Error("The private key password data fingerprint should match the user public fingerprint.");
       }
     }

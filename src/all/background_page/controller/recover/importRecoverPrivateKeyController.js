@@ -14,7 +14,7 @@
 const {i18n} = require("../../sdk/i18n");
 const {GpgAuth} = require("../../model/gpgauth");
 const {GpgKeyError} = require("../../error/GpgKeyError");
-const {assertPrivateKeys} = require('../../utils/openpgp/openpgpAssertions');
+const {assertPrivateKey, readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 class ImportRecoverPrivateKeyController {
   /**
@@ -51,10 +51,11 @@ class ImportRecoverPrivateKeyController {
    * @returns {Promise<void>}
    */
   async exec(armoredKey) {
-    const privateOpenpgpKey = await assertPrivateKeys(armoredKey);
-    await this._assertImportKeyOwnedByUser(privateOpenpgpKey.getFingerprint());
-    this.account.userPrivateArmoredKey = privateOpenpgpKey.armor();
-    this.account.userPublicArmoredKey = privateOpenpgpKey.toPublic().armor();
+    const privateKey = await readKeyOrFail(armoredKey);
+    assertPrivateKey(privateKey);
+    await this._assertImportKeyOwnedByUser(privateKey.getFingerprint().toUpperCase());
+    this.account.userPrivateArmoredKey = privateKey.armor();
+    this.account.userPublicArmoredKey = privateKey.toPublic().armor();
   }
 
   /**

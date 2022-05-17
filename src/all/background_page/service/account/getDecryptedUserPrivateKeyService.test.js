@@ -14,7 +14,6 @@
 import {GetDecryptedUserPrivateKeyService} from "./getDecryptedUserPrivateKeyService";
 import {ExternalGpgKeyEntity} from "../../model/entity/gpgkey/external/externalGpgKeyEntity";
 import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
-import {assertDecryptedPrivateKeys} from "../../utils/openpgp/openpgpAssertions";
 
 const mockedFindPrivate = jest.fn();
 jest.mock('../../model/keyring.js', () => ({
@@ -30,8 +29,7 @@ describe("GetDecryptedUserPrivateKey service", () => {
     expect.assertions(3);
     mockedFindPrivate.mockImplementation(() => new ExternalGpgKeyEntity({armored_key: key.private}));
 
-    let decryptedKey = await GetDecryptedUserPrivateKeyService.getKey(key.passphrase);
-    decryptedKey = await assertDecryptedPrivateKeys(decryptedKey);
+    const decryptedKey = await GetDecryptedUserPrivateKeyService.getKey(key.passphrase);
     expect(decryptedKey.isPrivate()).toBe(true);
     expect(decryptedKey.isDecrypted()).toBe(true);
     expect(decryptedKey.getFingerprint().toUpperCase()).toBe(key.fingerprint);

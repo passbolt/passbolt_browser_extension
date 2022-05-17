@@ -14,6 +14,7 @@
 
 const {Keyring} = require('../../model/keyring');
 const {DecryptPrivateKeyService} = require('../../service/crypto/decryptPrivateKeyService');
+const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 class CheckPassphraseController {
   /**
@@ -51,14 +52,15 @@ class CheckPassphraseController {
    * @param {string} passphrase The passphrase of the current user's key.
    * @returns {Promise<void>}
    * @throws {InvalidMasterPasswordError} if the passphrase can't decrypt the current user's key.
-   * @throws {Erorr} if no private key could be found.
+   * @throws {Error} if no private key could be found.
    */
   async exec(passphrase) {
     const privateKey = this.keyring.findPrivate();
     if (!privateKey) {
       throw new Error('Private key not found.');
     }
-    await DecryptPrivateKeyService.decrypt(privateKey.armoredKey, passphrase);
+    const key = await readKeyOrFail(privateKey.armoredKey);
+    await DecryptPrivateKeyService.decrypt(key, passphrase);
   }
 }
 

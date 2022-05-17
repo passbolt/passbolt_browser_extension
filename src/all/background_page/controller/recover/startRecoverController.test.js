@@ -23,6 +23,7 @@ import {UserEntity} from "../../model/entity/user/userEntity";
 import {initialAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
 import {AccountRecoverEntity} from "../../model/entity/account/accountRecoverEntity";
 import Worker from "../../model/worker";
+import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 jest.mock("../../model/worker");
 
@@ -47,7 +48,8 @@ describe("StartRecoverController", () => {
 
       expect.assertions(5);
       await controller.exec();
-      expect(account.serverPublicArmoredKey).toEqual((await GetGpgKeyInfoService.getKeyInfo(mockVerifyDto.keydata)).armoredKey);
+      const key = await readKeyOrFail(mockVerifyDto.keydata);
+      expect(account.serverPublicArmoredKey).toEqual((await GetGpgKeyInfoService.getKeyInfo(key)).armoredKey);
       expect(account.username).toEqual(mockRecoverStartDto.user.username);
       expect(account.firstName).toEqual(mockRecoverStartDto.user.profile.first_name);
       expect(account.lastName).toEqual(mockRecoverStartDto.user.profile.last_name);
@@ -73,7 +75,7 @@ describe("StartRecoverController", () => {
 
       expect.assertions(2);
       const promise = controller.exec();
-      await expect(promise).rejects.toThrowError("The key should be a valid armored key or a valid openpgp key.");
+      await expect(promise).rejects.toThrowError("The key should be an openpgp valid armored key string.");
       expect(mockedBootstrapRecoverWorkerPortEmit).toHaveBeenCalledWith("passbolt.recover-bootstrap.remove-iframe");
     });
 

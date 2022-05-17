@@ -16,33 +16,35 @@ import {ReEncryptPrivateKeyService} from './reEncryptPrivateKeyService';
 import {pgpKeys} from '../../../tests/fixtures/pgpKeys/keys';
 import {DecryptPrivateKeyService} from './decryptPrivateKeyService';
 import {InvalidMasterPasswordError} from '../../error/invalidMasterPasswordError';
+import {readKeyOrFail} from '../../utils/openpgp/openpgpAssertions';
 
 const publicKey = pgpKeys.ada.public;
 const privateKey = pgpKeys.ada.private;
 
 describe("ReEncryptPrivateKeyService service", () => {
   it('should throw an exception if the given key is not formatted properly', async() => {
-    const privateKeyFormatError = new Error("The key should be a valid armored key or a valid openpgp key.");
+    const privateKeyFormatError = new Error("The key should be an openpgp.PrivateKey.");
     const scenarios = [
-      {key: null, expectedError: privateKeyFormatError},
-      {key: {}, expectedError: privateKeyFormatError},
-      {key: 1, expectedError: privateKeyFormatError},
-      {key: false, expectedError: privateKeyFormatError},
-      {key: [privateKey], expectedError: new Error('Only a single private key is allowed to be reencrypted.')}
+      null,
+      {},
+      1,
+      false,
+      privateKey,
+      [privateKey],
     ];
 
     expect.assertions(scenarios.length);
     for (let i = 0; i < scenarios.length; i++) {
-      const scenario = scenarios[i];
-      const promise = ReEncryptPrivateKeyService.reEncrypt(scenario.key, "old", "new");
-      await expect(promise).rejects.toThrowError(scenario.expectedError);
+      const promise = ReEncryptPrivateKeyService.reEncrypt(scenarios[i], "old", "new");
+      await expect(promise).rejects.toThrowError(privateKeyFormatError);
     }
   });
 
-  it('should throw an exception if the given key is not a private key', () => {
+  it('should throw an exception if the given key is not a private key', async() => {
     expect.assertions(1);
-    const promise = ReEncryptPrivateKeyService.reEncrypt(publicKey, "old", "new");
-    return expect(promise).rejects.toThrowError(new Error("The key should be private."));
+    const key = await readKeyOrFail(publicKey);
+    const promise = ReEncryptPrivateKeyService.reEncrypt(key, "old", "new");
+    return expect(promise).rejects.toThrowError(new Error("The key should be an openpgp.PrivateKey."));
   });
 
   it('should throw an exception if the passphrase are formatted properly', async() => {
@@ -51,23 +53,26 @@ describe("ReEncryptPrivateKeyService service", () => {
     const utf8String = "hello";
 
     //Old passphrase is non UTF8
-    let promise = ReEncryptPrivateKeyService.reEncrypt(privateKey, nonUtf8String, utf8String);
+    const key = await readKeyOrFail(privateKey);
+    let promise = ReEncryptPrivateKeyService.reEncrypt(key, nonUtf8String, utf8String);
     await expect(promise).rejects.toThrowError(new Error("The passphrase should be a valid UTF8 string."));
 
     // New passphrase is non UTF8
-    promise = ReEncryptPrivateKeyService.reEncrypt(privateKey, utf8String, nonUtf8String);
+    promise = ReEncryptPrivateKeyService.reEncrypt(key, utf8String, nonUtf8String);
     await expect(promise).rejects.toThrowError(new Error("The passphrase should be a valid UTF8 string."));
   });
 
-  it("should throw an exception if the private key can't be decrypted with the old passphrase", () => {
+  it("should throw an exception if the private key can't be decrypted with the old passphrase", async() => {
     expect.assertions(1);
-    const promise = ReEncryptPrivateKeyService.reEncrypt(privateKey, "wrong old passphrase", "");
+    const key = await readKeyOrFail(privateKey);
+    const promise = ReEncryptPrivateKeyService.reEncrypt(key, "wrong old passphrase", "");
     return expect(promise).rejects.toThrowError(new InvalidMasterPasswordError());
   });
 
   it('should re-encrypt a given key with a new passphrase', async() => {
     const newPassphrase = "newPassphrase";
-    const reEncryptedKey = await ReEncryptPrivateKeyService.reEncrypt(privateKey, "ada@passbolt.com", newPassphrase);
+    const key = await readKeyOrFail(privateKey);
+    const reEncryptedKey = await ReEncryptPrivateKeyService.reEncrypt(key, "ada@passbolt.com", newPassphrase);
 
     const promise = DecryptPrivateKeyService.decrypt(reEncryptedKey, newPassphrase);
     return expect(promise).resolves.not.toBeNull();

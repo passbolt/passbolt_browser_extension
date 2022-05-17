@@ -18,6 +18,7 @@ import {GpgKeyError} from "../../error/GpgKeyError";
 import {MockExtension} from "../../../tests/mocks/mockExtension";
 import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
 import PassphraseController from "../passphrase/passphraseController";
+import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 const mockedSaveFile = jest.fn();
 jest.mock('../fileController', () => ({
@@ -45,7 +46,8 @@ describe("DownloadUserPrivateKeyController", () => {
       expect(fileContentType).toBe("text/plain");
       expect(workerTabId).toBe(expectedTabId);
 
-      const downloadedKeyInfo = await GetGpgKeyInfoService.getKeyInfo(fileContent);
+      const keyFromFile = await readKeyOrFail(fileContent);
+      const downloadedKeyInfo = await GetGpgKeyInfoService.getKeyInfo(keyFromFile);
       expect(downloadedKeyInfo.private).toBe(true);
       expect(downloadedKeyInfo.keyId).toBe(privateKey.key_id);
       expect(downloadedKeyInfo.fingerprint).toBe(privateKey.fingerprint);

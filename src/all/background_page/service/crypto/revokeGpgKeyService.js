@@ -12,22 +12,20 @@
  * @since         3.6.0
  */
 
-const {assertDecryptedPrivateKeys} = require("../../utils/openpgp/openpgpAssertions");
+const {assertDecryptedPrivateKey} = require("../../utils/openpgp/openpgpAssertions");
 
 class RevokeGpgKeyService {
   /**
    * Revoke a key.
    *
-   * @param {openpgp.PrivateKey|string} privateKeyToRevoke The private key to revoke.
-   * @returns {Promise<string>} the revoked public armored key
+   * @param {openpgp.PrivateKey} privateKeyToRevoke The private key to revoke.
+   * @returns {Promise<openpgp.PublicKey>} the revoked public armored key
    */
   static async revoke(privateKeyToRevoke) {
-    if (Array.isArray(privateKeyToRevoke)) {
-      throw new TypeError('Only a single private key is allowed to be revoked.');
-    }
-    privateKeyToRevoke = await assertDecryptedPrivateKeys(privateKeyToRevoke);
+    assertDecryptedPrivateKey(privateKeyToRevoke);
     const {publicKey} = await openpgp.revokeKey({
-      key: privateKeyToRevoke
+      key: privateKeyToRevoke,
+      format: 'object'
     });
     return publicKey;
   }

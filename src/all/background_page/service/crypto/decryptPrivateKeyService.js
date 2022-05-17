@@ -13,40 +13,26 @@
  */
 
 const {InvalidMasterPasswordError} = require("../../error/invalidMasterPasswordError");
-const {assertPrivateKeys} = require("../../utils/openpgp/openpgpAssertions");
+const {assertEncryptedPrivateKey} = require("../../utils/openpgp/openpgpAssertions");
 
 class DecryptPrivateKeyService {
   /**
    * Decrypt a private key with the given passphrase.
    *
-   * @param {PrivateGpgkeyEntity} privateGpgKeyEntity The private gpg key entity to decrypt.
-   * @returns {Promise<string>} the armored private key decrypted
-   * @throws {InvalidMasterPasswordError} if the key cannot be decrypted with the passphrase
-   */
-  static async decryptPrivateGpgKeyEntity(privateGpgKeyEntity) {
-    return this.decrypt(privateGpgKeyEntity.armoredKey, privateGpgKeyEntity.passphrase);
-  }
-
-  /**
-   * Decrypt a private key with the given passphrase.
-   *
-   * @param {openpgp.PrivateKey|string} privateKey the private key to decrypt
+   * @param {openpgp.PrivateKey} privateKey the private key to decrypt
    * @param {string} passphrase the passphrase with which to do the decryption operation
-   * @returns {Promise<string>} the armored private key decrypted
+   * @returns {Promise<openpgp.PrivateKey>} the private key decrypted
    * @throws {InvalidMasterPasswordError} if the key cannot be decrypted with the passphrase
    * @throws {Error} If the private key is already decrypted.
    */
   static async decrypt(privateKey, passphrase) {
-    privateKey = await assertPrivateKeys(privateKey);
-    if (privateKey.isDecrypted()) {
-      throw new Error("The private key is already decrypted");
-    }
+    assertEncryptedPrivateKey(privateKey);
 
     try {
       return (await openpgp.decryptKey({
         privateKey: privateKey,
         passphrase: passphrase
-      })).armor();
+      }));
     } catch (error) {
       throw new InvalidMasterPasswordError();
     }

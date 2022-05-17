@@ -22,6 +22,7 @@ const {ResourceModel} = require('../../model/resource/resourceModel');
 const {UserModel} = require('../../model/user/userModel');
 const {EncryptMessageService} = require('../../service/crypto/encryptMessageService');
 const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
+const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 class ResourceUpdateController {
   /**
@@ -136,8 +137,9 @@ class ResourceUpdateController {
     for (let i = 0; i < usersIds.length; i++) {
       if (Object.prototype.hasOwnProperty.call(usersIds, i)) {
         const userId =  usersIds[i];
-        const userPublicKey = this.keyring.findPublic(userId).armoredKey;
-        const data = await EncryptMessageService.encrypt(plaintextDto, userPublicKey, privateKey);
+        const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
+        const userPublicKey = await readKeyOrFail(userPublicArmoredKey);
+        const data = await EncryptMessageService.encrypt(plaintextDto, userPublicKey, [privateKey]);
         secrets.push({user_id: userId, data: data});
         await progressController.update(this.worker, i + 2, i18n.t("Encrypting"));
       }

@@ -14,13 +14,13 @@
 const {RevokeGpgKeyService} = require("./revokeGpgKeyService");
 const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
 import {pgpKeys} from '../../../tests/fixtures/pgpKeys/keys';
-import {assertPrivateKeys} from '../../utils/openpgp/openpgpAssertions';
+import {readKeyOrFail} from '../../utils/openpgp/openpgpAssertions';
 
 describe("RevokeGpgKey service", () => {
   it("should generate a revoked public key given a decrypted private key", async() => {
     expect.assertions(4);
 
-    const bettyPrivateGpgKey = await assertPrivateKeys(pgpKeys.betty.private_decrypted);
+    const bettyPrivateGpgKey = await readKeyOrFail(pgpKeys.betty.private_decrypted);
 
     const validPublicKey = bettyPrivateGpgKey.toPublic();
     const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(validPublicKey);

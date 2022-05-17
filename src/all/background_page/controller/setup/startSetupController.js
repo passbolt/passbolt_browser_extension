@@ -15,7 +15,7 @@
 const Worker = require("../../model/worker");
 const {AuthModel} = require("../../model/auth/authModel");
 const {SetupModel} = require("../../model/setup/setupModel");
-const {assertPublicKeys} = require('../../utils/openpgp/openpgpAssertions');
+const {readKeyOrFail, assertPublicKey} = require('../../utils/openpgp/openpgpAssertions');
 
 class StartSetupController {
   /**
@@ -69,10 +69,11 @@ class StartSetupController {
    */
   async _findAndSetAccountSetupServerPublicKey() {
     const serverKeyDto = await this.authModel.getServerKey();
-    const serverPublicKeyInfo = await assertPublicKeys(serverKeyDto.armored_key);
+    const serverPublicKey = await readKeyOrFail(serverKeyDto.armored_key);
+    assertPublicKey(serverPublicKey);
 
     // associate the server public key to the account being set up.
-    this.account.serverPublicArmoredKey = serverPublicKeyInfo.armor();
+    this.account.serverPublicArmoredKey = serverPublicKey.armor();
   }
 
   /**

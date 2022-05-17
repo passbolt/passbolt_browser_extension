@@ -16,7 +16,7 @@ window.in_array = require('locutus/php/array/in_array');
 /**
  * Other libraries
  */
-window.browser = require('webextension-polyfill/dist/browser-polyfill');
+window.browser = require('webextension-polyfill');
 window.XRegExp = require('xregexp');
 window.Validator = require('validator/validator');
 window.Validator.isUtf8 = require('./utils/validatorRules').isUtf8;

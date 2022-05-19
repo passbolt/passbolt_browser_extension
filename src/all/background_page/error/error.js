@@ -4,9 +4,17 @@ if (!('toJSON' in Error.prototype)) {
       const result = {};
 
       Object.getOwnPropertyNames(this).forEach(function(key) {
-        result[key] = (typeof this[key] === "object" && typeof this[key].toJSON === "function")
-          ? this[key].toJSON()
-          : this[key];
+        if (typeof this[key] !== "object") {
+          result[key] = this[key];
+          return;
+        }
+
+        if (typeof this[key].toJSON === "function") {
+          result[key] = this[key].toJSON();
+          return;
+        }
+
+        result[key] = JSON.parse(JSON.stringify(this[key]));
       }, this);
 
       return result;

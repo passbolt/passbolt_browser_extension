@@ -83,7 +83,7 @@ const get = function(workerId, tabId, log = true) {
     if (log) {
       console.error(error, workers);
     }
-    throw Error;
+    throw error;
   }
   return workers[tabId][workerId];
 };

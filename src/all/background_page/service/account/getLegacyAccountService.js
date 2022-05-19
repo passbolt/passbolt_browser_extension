@@ -26,6 +26,9 @@ class GetLegacyAccountService {
   static async get() {
     const keyring = new Keyring();
     const user = await User.getInstance().get();
+    const serverPublicKeyInfo = keyring.findPublic(Uuid.get(user.settings.domain));
+    const userPublicKeyInfo = keyring.findPublic(user.id);
+    const userPrivateKeyInfo = keyring.findPrivate();
 
     const accountDto = {
       domain: user.settings.domain,
@@ -33,10 +36,10 @@ class GetLegacyAccountService {
       username: user.username,
       first_name: user.firstname,
       last_name: user.lastname,
-      server_public_armored_key: keyring.findPublic(Uuid.get(user.settings.domain)).armoredKey,
-      user_key_fingerprint: keyring.findPublic(user.id).fingerprint.toUpperCase(),
-      user_public_armored_key: keyring.findPublic(user.id).armoredKey,
-      user_private_armored_key: keyring.findPrivate().armoredKey,
+      server_public_armored_key: serverPublicKeyInfo.armoredKey,
+      user_key_fingerprint: userPublicKeyInfo.fingerprint.toUpperCase(),
+      user_public_armored_key: userPublicKeyInfo.armoredKey,
+      user_private_armored_key: userPrivateKeyInfo.armoredKey,
       security_token: user.settings.securityToken,
     };
     return new AccountEntity(accountDto);

@@ -34,9 +34,20 @@ Auth.init = function() {
 
       /*
        * Retrieve the account associated with this worker.
-       * @todo This method comes to replace the User.getInstance().get().
+       * @todo This method comes to replace the User.getInstance().get()
        */
-      const account = await GetLegacyAccountService.get();
+      let account;
+      try {
+        account = await GetLegacyAccountService.get();
+      } catch (error) {
+        /*
+         * Ensure the application does not crash completely if the legacy account cannot be retrieved.
+         * The following controllers won't work as expected:
+         * - RequestHelpCredentialsLostController
+         */
+        console.error('authPagemod::attach legacy account cannot be retrieved, please contact your administrator.');
+        console.error(error);
+      }
 
       app.events.user.listen(worker);
       app.events.keyring.listen(worker);

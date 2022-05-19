@@ -127,6 +127,10 @@ class ExternalGpgKeyEntity extends Entity {
   static sanitizeDto(dto) {
     const sanitizedDto = JSON.parse(JSON.stringify(dto));
 
+    /*
+     * Previous key stored in the keyring have discrepancies with the keyring v3.6.0 stored format.
+     * @deprecated since v3.6.0.
+     */
     if (dto.key) {
       sanitizedDto.armored_key = dto.key;
       delete sanitizedDto.key;
@@ -138,6 +142,25 @@ class ExternalGpgKeyEntity extends Entity {
     if (dto.userIds) {
       sanitizedDto.user_ids = dto.userIds;
       delete sanitizedDto.userIds;
+    }
+    // Created date was not stored in its ISO format.
+    if (dto.created) {
+      try {
+        const date = new Date(sanitizedDto.created);
+        sanitizedDto.created = date.toISOString();
+      } catch (error) {
+        delete sanitizedDto.created;
+      }
+    }
+    // Expires date was not stored in its ISO format.
+    if (dto.expires && dto.expires !== "Never") {
+      try {
+        const date = new Date(sanitizedDto.expires);
+        sanitizedDto.expires = date.toISOString();
+      } catch (error) {
+        delete sanitizedDto.expires;
+        console.error(`ExternalGpgKeyEntity::sanitizeDto Unable to sanitize the key for the user ${dto.user_id}`);
+      }
     }
 
     return sanitizedDto;

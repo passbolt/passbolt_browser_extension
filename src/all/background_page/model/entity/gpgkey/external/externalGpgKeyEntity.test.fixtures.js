@@ -87,8 +87,8 @@ exports.ExternalGpgKeyEntityFixtures = {
       name: "Ada Lovelace"
     }],
     fingerprint: pgpKeys.ada.fingerprint,
-    expires: "Never",
-    created: "2015-08-09T12:48:31.000Z",
+    expires: "Mon Oct 26 2024 13:45:08 GMT+0100 (Central European Standard Time)",
+    created: "Mon Oct 26 2015 13:45:08 GMT+0100 (Central European Standard Time)",
     algorithm: "RSA",
     length: 4096,
     curve: null,

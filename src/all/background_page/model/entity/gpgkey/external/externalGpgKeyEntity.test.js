@@ -46,7 +46,9 @@ describe("ExternalGpgKey entity", () => {
       ...legacyDto,
       armored_key: legacyDto.key,
       key_id: legacyDto.keyId,
-      user_ids: legacyDto.userIds
+      user_ids: legacyDto.userIds,
+      created: "2015-10-26T12:45:08.000Z",
+      expires: "2024-10-26T12:45:08.000Z"
     };
     delete sanitizedDto.key;
     delete sanitizedDto.keyId;

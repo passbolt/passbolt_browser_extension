@@ -3,6 +3,47 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [3.6.0] - 2022-05-23
+### Added
+- PB-12965 As AD I can enable account recovery for the organization
+- PB-13759 As AD I can rotate the organization account recovery key
+- PB-16193 As AD I can see a user account recovery requests history
+- PB-13012 As a user who lost its credentials I can request an account recovery
+- PB-13025 As AD I can approve or reject an account recovery request
+- PB-16117 As AD I can see a user MFA status in the details sidebar
+- PB-15033 As a user who lost its credentials I can request help to an administrator
+- PB-14672 As a user I should see the new design on the password workspace
+- PB-14673 As a user I should see the new design on the user workspace
+- PB-14674 As a user I should see the new design on the user settings workspace
+- PB-15026  As a user I should see the new design on the administration workspace
+- PB-14675 As a user I should see the new design on the authentication screens
+- PB-14677 As a user I should see the new design on the quickaccess application
+- PB-14960 As a user I should see the new design on the web integration inform menu
+- PB-14131 As AN performing a setup, I can import ECC keys
+
+### Improved
+- PB-14896 As AN performing a setup, I should not be able to import an already decrypted key
+- PB-14816 As AN performing a setup, I should not be able to use a passphrase which is part of a data breach
+- PB-14462 As AN on the authentication screens, I should see unexpected errors details
+- PB-14203 As LU on the application, I should see unexpected errors details
+- PB-13852 Improve encryption/decryption performances
+
+### Security
+- PB-13908 As AN performing a setup, I generate key of 3072 bits
+- PB-13908 As AN performing a setup, I cannot import keys weaker than 3072 bits
+
+### Fixed
+- PB-15241 As a user I can use the web integration inform menu in iframe authentication forms
+- PB-13901 As AN performing a sign-in, I should be prompted the server key changed only when the parsed key changed
+- PB-14130 As LU I can select multiple passwords filtered by folder
+- PB-14405 Fix misc sentences plural
+
+### Maintenance
+- PB-14155 Upgrade node to version 16
+- PB-13852 Upgrade openpgp.js to version 5
+- PB-14672 Increase storybook screens coverage
+- PB-14052 Increase browser extension code coverage
+
 ## [3.5.2] - 2022-04-12
 ### Improved
 - PB-14880 Debounce/throttle resource workspaces API requests
@@ -757,7 +798,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.5.2...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.6.0...HEAD
+[3.6.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.5.2...v3.6.0
 [3.5.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.5.1...v3.5.2
 [3.5.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.5.0...v3.5.1
 [3.5.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.4.0...v3.5.0

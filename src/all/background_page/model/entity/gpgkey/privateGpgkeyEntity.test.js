@@ -14,7 +14,7 @@
 import {PrivateGpgkeyEntity} from "./privateGpgkeyEntity";
 import {EntitySchema} from "../abstract/entitySchema";
 import {EntityValidationError} from "../abstract/entityValidationError";
-import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
 
 const validDto = {
   armored_key: pgpKeys.ada.private,

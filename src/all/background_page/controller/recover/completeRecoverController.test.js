@@ -16,7 +16,7 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import app from "../../app";
 import {CompleteRecoverController} from "./completeRecoverController";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
+import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
 import {AccountRecoverEntity} from "../../model/entity/account/accountRecoverEntity";
 import {User} from "../../model/user";

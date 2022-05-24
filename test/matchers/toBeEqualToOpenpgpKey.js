@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {GetGpgKeyInfoService} from "../../background_page/service/crypto/getGpgKeyInfoService";
-import {readKeyOrFail} from "../../background_page/utils/openpgp/openpgpAssertions";
+import {GetGpgKeyInfoService} from "../../src/all/background_page/service/crypto/getGpgKeyInfoService";
+import {readKeyOrFail} from "../../src/all/background_page/utils/openpgp/openpgpAssertions";
 
 export const contains = (equals, list, value) => list.findIndex(item => equals(item, value)) > -1;
 

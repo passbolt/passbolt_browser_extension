@@ -13,7 +13,7 @@
  */
 
 import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
+import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {GetOrganizationPolicyController} from "./getOrganizationPolicyController";
 import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import {AccountRecoveryOrganizationPolicyEntity} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";

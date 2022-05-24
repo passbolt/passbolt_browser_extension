@@ -15,8 +15,8 @@
 import {DownloadUserPublicKeyController} from "./downloadUserPublicKeyController";
 import {GetGpgKeyInfoService} from "../../service/crypto/getGpgKeyInfoService";
 import {GpgKeyError} from "../../error/GpgKeyError";
-import {MockExtension} from "../../../tests/mocks/mockExtension";
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
+import {MockExtension} from "../../../../../test/mocks/mockExtension";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 const mockedSaveFile = jest.fn();

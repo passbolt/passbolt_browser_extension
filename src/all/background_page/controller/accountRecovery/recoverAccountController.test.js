@@ -21,8 +21,8 @@ import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOpti
 import {RecoverAccountController} from "./recoverAccountController";
 import {AccountAccountRecoveryEntity} from "../../model/entity/account/accountAccountRecoveryEntity";
 import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
-import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {
   approvedAccountRecoveryRequestDto,
   approvedAccountRecoveryRequestWithoutPrivateKeyDto,

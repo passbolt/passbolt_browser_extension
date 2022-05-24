@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {readKeyOrFail, readMessageOrFail} from "../../utils/openpgp/openpgpAssertions";
 import {DecryptMessageService} from "./decryptMessageService";
 import {EncryptMessageService} from "./encryptMessageService";

@@ -14,7 +14,7 @@
 
 import {v4 as uuidv4} from "uuid";
 import {defaultAccountRecoveryPrivateKeyDto} from "./accountRecoveryPrivateKeyEntity.test.data";
-import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
 import {acceptedAccountRecoveryResponseDto} from "./accountRecoveryResponseEntity.test.data";
 
 export const pendingAccountRecoveryRequestDto = (data = {}) => {

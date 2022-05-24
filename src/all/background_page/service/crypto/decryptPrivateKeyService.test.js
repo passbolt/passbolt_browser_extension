@@ -13,7 +13,7 @@
  */
 import {DecryptPrivateKeyService} from "./decryptPrivateKeyService";
 import {InvalidMasterPasswordError} from '../../error/invalidMasterPasswordError';
-import {pgpKeys} from '../../../tests/fixtures/pgpKeys/keys';
+import {pgpKeys} from '../../../../../test/fixtures/pgpKeys/keys';
 import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 describe("DecryptPrivateKey service", () => {

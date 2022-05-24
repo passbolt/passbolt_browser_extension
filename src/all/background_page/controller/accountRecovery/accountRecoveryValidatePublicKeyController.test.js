@@ -16,10 +16,10 @@ import each from "jest-each";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {AccountRecoveryValidatePublicKeyController} from "./accountRecoveryValidatePublicKeyController";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
-import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {v4 as uuidv4} from "uuid";
-import {MockExtension} from "../../../tests/mocks/mockExtension";
+import {MockExtension} from "../../../../../test/mocks/mockExtension";
 
 beforeAll(() => {
   enableFetchMocks();

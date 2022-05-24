@@ -15,13 +15,13 @@
 import {v4 as uuidv4} from "uuid";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {AccountRecoverySaveOrganizationPolicyController} from "./accountRecoverySaveOrganizationPolicyController";
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import PassphraseController from "../passphrase/passphraseController";
 import {EntityValidationError} from "../../model/entity/abstract/entityValidationError";
 import {AccountRecoveryOrganizationPolicyEntity} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
-import {MockExtension} from "../../../tests/mocks/mockExtension";
+import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import {MockExtension} from "../../../../../test/mocks/mockExtension";
 import {DecryptMessageService} from "../../service/crypto/decryptMessageService";
 import {
   createEnabledAccountRecoveryOrganizationPolicyDto,

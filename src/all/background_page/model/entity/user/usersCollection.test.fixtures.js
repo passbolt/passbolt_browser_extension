@@ -12,7 +12,7 @@
  * @since         3.0.0
  */
 
-import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
 
 exports.UsersCollectionTestFixtures = {
   "default": [{

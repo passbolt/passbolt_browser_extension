@@ -16,7 +16,7 @@ import {EntitySchema} from "../abstract/entitySchema";
 import {EntityValidationError} from "../abstract/entityValidationError";
 import {AccountRecoveryResponseEntity} from "./accountRecoveryResponseEntity";
 import {AccountRecoveryRequestEntityTestData} from "./accountRecoveryResponseEntity.test.data";
-import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
 
 describe("AccountRecoveryResponse entity", () => {
   it("schema must validate", () => {

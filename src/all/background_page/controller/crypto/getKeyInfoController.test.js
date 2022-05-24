@@ -13,7 +13,7 @@
  */
 
 import {GetKeyInfoController} from "./getKeyInfoController";
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {adaExternalPrivateGpgKeyEntityDto} from "../../model/entity/gpgkey/external/externalGpgKeyEntity.test.data";
 
 describe("GetKeyInfoController", () => {

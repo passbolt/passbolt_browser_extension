@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 import {VerifyGpgKeyService} from "./verifyGpgKeyService";
-import {pgpKeys} from '../../../tests/fixtures/pgpKeys/keys';
+import {pgpKeys} from '../../../../../test/fixtures/pgpKeys/keys';
 import {SignGpgKeyService} from "./signGpgKeyService";
 import {readAllKeysOrFail, readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 

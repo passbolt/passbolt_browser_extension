@@ -31,7 +31,7 @@ const {
   ecc_brainpoolp512r1KeyDto
 } = require('./getGpgKeyInfoService.test.data');
 const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
-const {pgpKeys} = require("../../../tests/fixtures/pgpKeys/keys");
+const {pgpKeys} = require("../../../../../test/fixtures/pgpKeys/keys");
 
 describe("GpgKeyInfo service", () => {
   it(`should provide the right information given a key from a compatible type`, async() => {

@@ -12,8 +12,8 @@
  * @since         3.6.0
  */
 
-import {VerifyGpgKeyService} from "../../background_page/service/crypto/verifyGpgKeyService";
-import {readAllKeysOrFail, readKeyOrFail} from "../../background_page/utils/openpgp/openpgpAssertions";
+import {VerifyGpgKeyService} from "../../src/all/background_page/service/crypto/verifyGpgKeyService";
+import {readAllKeysOrFail, readKeyOrFail} from "../../src/all/background_page/utils/openpgp/openpgpAssertions";
 
 exports.toBeOpenpgpKeySignedBy = async function(armoredKey, armoredVerifyingKeys) {
   const {printExpected, matcherHint} = this.utils;

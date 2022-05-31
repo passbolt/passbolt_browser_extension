@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 const {SignGpgKeyService} = require("./signGpgKeyService");
-import {pgpKeys} from '../../../tests/fixtures/pgpKeys/keys';
+import {pgpKeys} from '../../../../../test/fixtures/pgpKeys/keys';
 import {readKeyOrFail} from '../../utils/openpgp/openpgpAssertions';
 
 describe("SignGpgKey service", () => {

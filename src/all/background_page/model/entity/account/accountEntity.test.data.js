@@ -15,7 +15,7 @@
 import {v4 as uuidv4} from 'uuid';
 import {AccountEntity} from "./accountEntity";
 import {defaultSecurityTokenDto} from "../securityToken/SecurityTokenEntity.test.data";
-import {pgpKeys} from '../../../../tests/fixtures/pgpKeys/keys';
+import {pgpKeys} from '../../../../../../test/fixtures/pgpKeys/keys';
 
 export const defaultAccountDto = (data = {}) => {
   data = JSON.parse(JSON.stringify(data));

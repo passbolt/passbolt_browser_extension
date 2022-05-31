@@ -22,8 +22,8 @@ import {ReviewRequestController} from "./reviewRequestController";
 import {DecryptMessageService} from "../../service/crypto/decryptMessageService";
 import {InvalidMasterPasswordError} from "../../error/invalidMasterPasswordError";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
+import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {
   pendingAccountRecoveryRequestDto,
   pendingAccountRecoveryRequestWithoutPrivateKeyDto,
@@ -40,7 +40,7 @@ import {
 } from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import {AccountRecoveryResponseEntity} from "../../model/entity/accountRecovery/accountRecoveryResponseEntity";
 import PassphraseController from "../passphrase/passphraseController";
-import {MockExtension} from "../../../tests/mocks/mockExtension";
+import {MockExtension} from "../../../../../test/mocks/mockExtension";
 import {UserLocalStorage} from "../../service/local_storage/userLocalStorage";
 import {defaultUserDto} from "../../model/entity/user/userEntity.test.data";
 import {UsersCollection} from "../../model/entity/user/usersCollection";

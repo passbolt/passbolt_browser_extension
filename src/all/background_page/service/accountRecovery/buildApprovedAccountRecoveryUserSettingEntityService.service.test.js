@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {BuildApprovedAccountRecoveryUserSettingEntityService} from "./buildApprovedAccountRecoveryUserSettingEntityService";
 import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import {AccountRecoveryOrganizationPolicyEntity} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";

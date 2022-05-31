@@ -13,7 +13,7 @@
  */
 import {GetDecryptedUserPrivateKeyService} from "./getDecryptedUserPrivateKeyService";
 import {ExternalGpgKeyEntity} from "../../model/entity/gpgkey/external/externalGpgKeyEntity";
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 
 const mockedFindPrivate = jest.fn();
 jest.mock('../../model/keyring.js', () => ({

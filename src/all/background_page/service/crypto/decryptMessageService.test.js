@@ -18,7 +18,7 @@
 
 import {DecryptMessageService} from "./decryptMessageService";
 import {EncryptMessageService} from "./encryptMessageService";
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {readKeyOrFail, readMessageOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 describe("DecryptMessageService", () => {

@@ -17,7 +17,7 @@ import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOpti
 import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
 import {RequestHelpCredentialsLostController} from "./requestHelpCredentialsLostController";
 import {AccountEntity} from "../../model/entity/account/accountEntity";
-import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
+import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 
 beforeEach(() => {
   enableFetchMocks();

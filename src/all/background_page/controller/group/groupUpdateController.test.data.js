@@ -16,7 +16,7 @@ import {users} from "../../model/entity/user/userEntity.test.data";
 import {defaultGroup} from "../../model/entity/group/groupEntity.test.data";
 import {createGroupUser} from "../../model/entity/groupUser/groupUsersEntity.test.data";
 import {EncryptMessageService} from "../../service/crypto/encryptMessageService";
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {defaultDyRunResponse} from "../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data";
 import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 

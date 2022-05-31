@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {pgpKeys} from "../../../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../../../test/fixtures/pgpKeys/keys";
 
 export const adaExternalPrivateGpgKeyEntityDto = (data = {}) => {
   const defaultData = {

@@ -15,8 +15,8 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {ImportRecoverPrivateKeyController} from "./importRecoverPrivateKeyController";
 import {GetGpgKeyInfoService} from "../../service/crypto/getGpgKeyInfoService";
 import {GpgKeyError} from "../../error/GpgKeyError";
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
-import {MockExtension} from "../../../tests/mocks/mockExtension";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {MockExtension} from "../../../../../test/mocks/mockExtension";
 import {
   initialAccountRecoverDto,
   withServerKeyAccountRecoverDto

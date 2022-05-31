@@ -1,4 +1,4 @@
-import '../src/all/tests/matchers/extendExpect';
+import './matchers/extendExpect';
 import MockStorage from '../src/all/background_page/sdk/storage.test.mock';
 import {OrganizationSettingsModel} from "../src/all/background_page/model/organizationSettings/organizationSettingsModel";
 import Config from "../src/all/background_page/model/config";

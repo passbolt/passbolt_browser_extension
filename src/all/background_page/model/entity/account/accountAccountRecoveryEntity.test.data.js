@@ -13,7 +13,7 @@
  */
 
 import {v4 as uuidv4} from "uuid";
-import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
 import {defaultSecurityTokenDto} from "../securityToken/SecurityTokenEntity.test.data";
 import {AccountAccountRecoveryEntity} from "./accountAccountRecoveryEntity";
 import {pendingAccountRecoveryRequestDto} from "../accountRecovery/accountRecoveryRequestEntity.test.data";

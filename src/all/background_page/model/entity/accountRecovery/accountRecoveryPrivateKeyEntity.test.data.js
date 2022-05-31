@@ -17,7 +17,7 @@ import {
   bettyAccountRecoveryPrivateKeyPasswordDto,
   defaultAccountRecoveryPrivateKeyPasswordDto
 } from "./accountRecoveryPrivateKeyPasswordEntity.test.data";
-import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
 
 export const defaultAccountRecoveryPrivateKeyDto = (data = {}) => {
   /**

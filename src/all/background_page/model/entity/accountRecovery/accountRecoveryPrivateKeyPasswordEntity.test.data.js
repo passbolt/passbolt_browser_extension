@@ -13,7 +13,7 @@
  */
 
 import {v4 as uuidv4} from "uuid";
-import {pgpKeys} from "../../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
 
 /**
  * The Test Account Recovery Organization gpg key is used to encrypt the private key password.

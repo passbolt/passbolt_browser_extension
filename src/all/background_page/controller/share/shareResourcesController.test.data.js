@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 import {v4 as uuidv4} from "uuid";
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {users} from "../../model/entity/user/userEntity.test.data";
 import {readSecret} from "../../model/entity/secret/secretEntity.test.data";
 import {readPermission} from "../../model/entity/permission/permissionEntity.test.data";

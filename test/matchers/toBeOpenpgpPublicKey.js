@@ -12,23 +12,23 @@
  * @since         3.6.0
  */
 
-import {readKeyOrFail} from "../../background_page/utils/openpgp/openpgpAssertions";
+import {readKeyOrFail} from "../../src/all/background_page/utils/openpgp/openpgpAssertions";
 
-exports.toBeOpenpgpPrivateKey = async function(armoredKey) {
+exports.toBeOpenpgpPublicKey = async function(armoredKey) {
   const {matcherHint} = this.utils;
 
   const passMessage =
-    `${matcherHint('.not.toBeOpenpgpPrivateKey')
+    `${matcherHint('.not.toBeOpenpgpPublicKey')
     }\n\n` +
-    `Expected key not to be private`;
+    `Expected key not to be public`;
 
   const failMessage =
-    `${matcherHint('.toBeOpenpgpPrivateKey')
+    `${matcherHint('.toBeOpenpgpPublicKey')
     }\n\n` +
-    `Expected key to be private`;
+    `Expected key to be public`;
 
   const key = await readKeyOrFail(armoredKey);
-  const pass = key.isPrivate();
+  const pass = !key.isPrivate();
 
   return {pass: pass, message: () => (pass ? passMessage : failMessage)};
 };

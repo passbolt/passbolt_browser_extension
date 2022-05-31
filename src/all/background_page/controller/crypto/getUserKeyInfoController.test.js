@@ -13,9 +13,9 @@
  */
 import {enableFetchMocks} from "jest-fetch-mock";
 import {GetUserKeyInfoController} from "./getUserKeyInfoController";
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
-import {MockExtension} from "../../../tests/mocks/mockExtension";
-import {mockApiResponse} from "../../../tests/mocks/mockApiResponse";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {MockExtension} from "../../../../../test/mocks/mockExtension";
+import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {Keyring} from '../../model/keyring';
 import {GetGpgKeyInfoService} from "../../service/crypto/getGpgKeyInfoService";
 import {v4 as uuidv4} from "uuid";

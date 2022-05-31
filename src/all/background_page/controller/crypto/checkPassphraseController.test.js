@@ -15,7 +15,7 @@
 import {InvalidMasterPasswordError} from "../../error/invalidMasterPasswordError";
 import {ExternalGpgKeyEntity} from "../../model/entity/gpgkey/external/externalGpgKeyEntity";
 import {CheckPassphraseController} from "./checkPassphraseController";
-import {pgpKeys} from "../../../tests/fixtures/pgpKeys/keys";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 
 const mockFindPrivate = jest.fn();
 jest.mock('../../model/keyring', () => ({

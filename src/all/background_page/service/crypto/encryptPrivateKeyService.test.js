@@ -13,7 +13,7 @@
  */
 
 import {EncryptPrivateKeyService} from "./encryptPrivateKeyService";
-import {pgpKeys} from '../../../tests/fixtures/pgpKeys/keys';
+import {pgpKeys} from '../../../../../test/fixtures/pgpKeys/keys';
 import {DecryptPrivateKeyService} from './decryptPrivateKeyService';
 import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 

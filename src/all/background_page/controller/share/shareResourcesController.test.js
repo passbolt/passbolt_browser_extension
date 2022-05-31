@@ -12,9 +12,9 @@
  * @since         3.6.0
  */
 const {enableFetchMocks} = require("jest-fetch-mock");
-const {MockExtension} = require("../../../tests/mocks/mockExtension");
-const {mockApiResponse} = require("../../../tests/mocks/mockApiResponse");
-const {pgpKeys} = require("../../../tests/fixtures/pgpKeys/keys");
+const {MockExtension} = require("../../../../../test/mocks/mockExtension");
+const {mockApiResponse} = require("../../../../../test/mocks/mockApiResponse");
+const {pgpKeys} = require("../../../../../test/fixtures/pgpKeys/keys");
 const {Keyring} = require('../../model/keyring');
 const {User} = require('../../model/user');
 const {users} = require("../../model/entity/user/userEntity.test.data");

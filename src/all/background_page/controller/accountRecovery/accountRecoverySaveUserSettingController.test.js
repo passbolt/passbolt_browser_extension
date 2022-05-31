@@ -59,7 +59,7 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions(), account);
 
       // Mock user passphrase capture.
-      PassphraseController.get.mockResolvedValue(pgpKeys.ada.passphrase);
+      PassphraseController.request.mockResolvedValue(pgpKeys.ada.passphrase);
       // Mock API account recovery organization policy fetch.
       fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
       // Mock API account recovery user settings post. Return data such as the API will.
@@ -80,7 +80,7 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions());
 
       // Mock user passphrase capture.
-      PassphraseController.get.mockResolvedValue(pgpKeys.ada.passphrase);
+      PassphraseController.request.mockResolvedValue(pgpKeys.ada.passphrase);
       // Mock API account recovery organization policy fetch.
       fetch.doMockOnce(() => mockApiResponse(null));
 

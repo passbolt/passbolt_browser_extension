@@ -3,6 +3,40 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [3.6.1] - 2022-05-31
+### Improved
+- PB-16116 Change user creation dialog tips following the introduction of account recovery
+- PB-16119 As LU changing my security token I should be able to access documentation about phishing attacks
+- PB-16166 Change nested folders icons size
+- PB-16206 Change search bar padding
+- PB-16207 Change midgar theme hover background colour
+- PB-16208 Change midgar inset shadow highlight opacity
+- PB-16209 Change inside fields buttons radius
+- PB-16210 Change midgar hover/active grid lines backgrounds
+- PB-16211 Change midgar active button background
+- PB-16212 Change authentication loading spinner padding
+- PB-16213 As LU I should see a beta pill next to the account recovery menu entry
+- PB-16556 Change midgar sign-in form background
+- PB-16559 Change user settings account recovery layout
+- PB-16588 As GM editing group memberships, I want to see the tooltip icon aligned with the username
+- PB-16589 Change the attention required icon color in the user settings menu
+- PB-16592 Change quickaccess connecting state box background
+- PB-16603 Change grids font weight
+- PB-16605 Reduce letter spacings globally
+- PB-16639 As LU enrolling to the account recovery program I should be requested my passphrase
+
+### Fixed
+- PB-14278 As LU I should see warning messages on form fields
+- PB-16117 As AD I should not see the MFA status in the user sidebar if the user is not active
+- PB-16146 As AD I should not be able to copy the public key of a inactive user
+- PB-16558 As AN on unauthenticated page I should not see “about us” cta tooltip
+- PB-16604 As a LU I should be able to sort the grid by Username and URI
+- PB-16661 As a AN I can accept a server key rotation when the server key stored in the local storage cannot be parsed
+
+### Maintenance
+- PB-16155 Apply linter on all styleguide src code
+- PB-14951 Move common test material
+
 ## [3.6.0] - 2022-05-23
 ### Added
 - PB-12965 As AD I can enable account recovery for the organization
@@ -798,7 +832,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.6.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.6.1...HEAD
+[3.6.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.6.0...v3.6.1
 [3.6.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.5.2...v3.6.0
 [3.5.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.5.1...v3.5.2
 [3.5.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.5.0...v3.5.1

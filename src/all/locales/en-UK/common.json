@@ -59,6 +59,7 @@
   "The private key should not be revoked.": "The private key should not be revoked.",
   "The private key should not have an expiry date.": "The private key should not have an expiry date.",
   "The private key should use a supported algorithm: RSA, ECDSA OR EDDSA.": "The private key should use a supported algorithm: RSA, ECDSA OR EDDSA.",
+  "The server key cannot be parsed.": "The server key cannot be parsed.",
   "The server key has changed.": "The server key has changed.",
   "The server key is expired.": "The server key is expired.",
   "The service is unavailable": "The service is unavailable",

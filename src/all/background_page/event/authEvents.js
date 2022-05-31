@@ -6,7 +6,7 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {AuthController} = require('../controller/authController');
+const {AuthVerifyServerKeyController} = require('../controller/auth/authVerifyServerKeyController');
 const {AuthCheckStatusController} = require('../controller/auth/authCheckStatusController');
 const {AuthIsAuthenticatedController} = require('../controller/auth/authIsAuthenticatedController');
 const {AuthIsMfaRequiredController} = require('../controller/auth/authIsMfaRequiredController');
@@ -97,9 +97,12 @@ const listen = function(worker, account) {
    * @listens passbolt.auth.verify
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.verify-server-key', requestId => {
-    const auth = new AuthController(worker, requestId);
-    auth.verify();
+  worker.port.on('passbolt.auth.verify-server-key', async requestId => {
+    const user = User.getInstance();
+    const apiClientOptions = await user.getApiClientOptions({requireCsrfToken: false});
+    const userDomain = user.settings.getDomain();
+    const auth = new AuthVerifyServerKeyController(worker, requestId, apiClientOptions, userDomain);
+    await auth._exec();
   });
 
   /*

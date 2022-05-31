@@ -24,17 +24,19 @@ class MockExtension {
    * @returns {Promise<void>}
    */
   static async withConfiguredAccount(keyData = pgpKeys.ada) {
-    this.withMissingPrivateKeyAccount(keyData);
+    const user = this.withMissingPrivateKeyAccount(keyData);
 
     // Mock user private key
     const keyring = new Keyring();
     await keyring.importPrivate(keyData.private);
+
+    return user;
   }
 
   /**
    * Mock the extension with a partially configured account. Ada by default without the private key set.
    *
-   * @returns {Promise<void>}
+   * @returns {Promise<User>}
    */
   static withMissingPrivateKeyAccount(keyData = pgpKeys.ada) {
     const user = User.getInstance();
@@ -51,6 +53,8 @@ class MockExtension {
 
     const keyring = new Keyring();
     keyring.flush(Keyring.PRIVATE);
+
+    return user;
   }
 }
 exports.MockExtension = MockExtension;

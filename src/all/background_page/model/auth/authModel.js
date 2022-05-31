@@ -99,7 +99,7 @@ class AuthModel {
   /**
    * Verify the server identify
    *
-   * @param {string} serverKey The public key to use to encrypt the serverToken
+   * @param {string} serverArmoredKey The public key to use to encrypt the serverToken
    * @param {string} fingerprint The fingerprint to verify
    * @throws {Error} If the token cannot be encrypted
    * @throws {Error} if verification procedure fails

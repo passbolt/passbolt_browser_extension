@@ -16,7 +16,7 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {AuthVerifyServerKeyController} from "./authVerifyServerKeyController";
 import {storage} from "../../sdk/storage";
-import {MockExtension} from "../../../tests/mocks/mockExtension";
+import {MockExtension} from "../../../../../test/mocks/mockExtension";
 import Uuid from "../../utils/uuid";
 import {ServerKeyChangedError} from "../../error/serverKeyChangedError";
 

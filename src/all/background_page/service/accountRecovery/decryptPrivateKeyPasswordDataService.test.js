@@ -59,7 +59,7 @@ describe("DecryptPrivateKeyPasswordDataService", () => {
       const privateKeyPassword = new AccountRecoveryPrivateKeyPasswordEntity(defaultAccountRecoveryPrivateKeyPasswordDto({data}));
       const promise = DecryptPrivateKeyPasswordDataService.decrypt(privateKeyPassword, decryptionKey, verificationUserId, verificationPublicKey);
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError("The message is not a valid openpgp message");
+      await expect(promise).rejects.toThrowError("The message should be a valid openpgp message.");
     });
 
     it("should fail if the decrypted private key password data cannot be parsed.", async() => {

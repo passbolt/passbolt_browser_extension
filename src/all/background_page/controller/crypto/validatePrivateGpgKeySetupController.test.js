@@ -67,14 +67,14 @@ describe("ValidatePrivateGpgKeySetupController", () => {
     expect.assertions(1);
     const key = "Fake key";
     const controller = new ValidatePrivateGpgKeySetupController();
-    await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The key should be an openpgp valid armored key string."));
+    await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The key should be a valid openpgp armored key string."));
   });
 
   it("Should throw an exception if the key is public", async() => {
     expect.assertions(1);
     const key = pgpKeys.ada.public;
     const controller = new ValidatePrivateGpgKeySetupController();
-    await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The key should be an openpgp.PrivateKey."));
+    await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The key should be a valid openpgp private key."));
   });
 
   it("Should throw an exception if the key is revoked", async() => {

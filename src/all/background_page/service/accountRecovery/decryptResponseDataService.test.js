@@ -49,7 +49,7 @@ describe("DecryptResponseDataService", () => {
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({data}));
       const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId);
       expect.assertions(1);
-      await expect(promise).rejects.toThrowError("The message is not a valid openpgp message");
+      await expect(promise).rejects.toThrowError("The message should be a valid openpgp message.");
     });
 
     it("should fail if the response data cannot be parsed.", async() => {

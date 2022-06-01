@@ -61,11 +61,19 @@ class AccountRecoverySaveUserSettingsController {
    * @return {Promise<AccountRecoveryUserSettingEntity>}
    */
   async exec(accountRecoveryUserSettingDto) {
+    const organizationPolicy = await this.accountRecoveryModel.findOrganizationPolicy();
+    if (!organizationPolicy) {
+      throw new Error("Account recovery organization policy not found.");
+    }
+
+    if (organizationPolicy.isDisabled) {
+      throw new Error("The Account recovery organization policy should be enabled.");
+    }
+
     let accountRecoveryUserSettingEntity;
     const isApproved = accountRecoveryUserSettingDto.status === AccountRecoveryUserSettingEntity.STATUS_APPROVED;
-
     if (isApproved) {
-      accountRecoveryUserSettingEntity = await this.buildApprovedUserSetting();
+      accountRecoveryUserSettingEntity = await this.buildApprovedUserSetting(organizationPolicy);
     } else {
       const userId = User.getInstance().get().id;
       const userSettingDto = {user_id: userId, status: AccountRecoveryUserSettingEntity.STATUS_REJECTED};
@@ -77,17 +85,14 @@ class AccountRecoverySaveUserSettingsController {
 
   /**
    * Build the approved user setting entity.
+   * @param {AccountRecoveryOrganizationPolicyEntity} organizationPolicy the current organization policy.
    * @returns {Promise<AccountRecoveryUserSettingEntity>}
    */
-  async buildApprovedUserSetting() {
+  async buildApprovedUserSetting(organizationPolicy) {
     const userPassphrase = await PassphraseController.request(this.worker);
     const userPrivateArmoredKey = this.keyring.findPrivate().armoredKey;
     const userPrivateKey = await readKeyOrFail(userPrivateArmoredKey);
     const userDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, userPassphrase);
-    const organizationPolicy = await this.accountRecoveryModel.findOrganizationPolicy();
-    if (!organizationPolicy) {
-      throw new Error("Account recovery organization policy not found.");
-    }
 
     return BuildApprovedAccountRecoveryUserSettingEntityService.build(this.account, userDecryptedPrivateKey, organizationPolicy);
   }

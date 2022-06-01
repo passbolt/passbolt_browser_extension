@@ -14,7 +14,6 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import {User} from "../../model/user";
-import {MockExtension} from "../../../../../test/mocks/mockExtension";
 import {AccountRecoverySaveUserSettingsController} from "./accountRecoverySaveUserSettingController";
 import PassphraseController from "../passphrase/passphraseController";
 import {AccountRecoveryUserSettingEntity} from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
@@ -22,12 +21,13 @@ import {
   createAcceptedAccountRecoveryUserSettingDto,
   createRejectedAccountRecoveryUserSettingDto
 } from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity.test.data";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
-import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import {enabledAccountRecoveryOrganizationPolicyDto, disabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {AccountEntity} from "../../model/entity/account/accountEntity";
+import {MockExtension} from "../../../../../test/mocks/mockExtension";
+import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 
 jest.mock("../passphrase/passphraseController.js");
 
@@ -43,6 +43,8 @@ describe("AccountRecoverySaveUserSettingsController", () => {
     it("Should save a rejected account recovery user setting.", async() => {
       const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions());
 
+      // Mock API account recovery organization policy fetch.
+      fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
       // Mock API account recovery user settings post. Return data such as the API will.
       fetch.doMockOnce(async req => mockApiResponse(JSON.parse(await req.text())));
 
@@ -89,6 +91,21 @@ describe("AccountRecoverySaveUserSettingsController", () => {
 
       expect.assertions(1);
       await expect(result).rejects.toThrowError("Account recovery organization policy not found.");
+    });
+
+    it("Should throw an error if the account recovery organization policy is disabled.", async() => {
+      const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions());
+
+      // Mock user passphrase capture.
+      PassphraseController.request.mockResolvedValue(pgpKeys.ada.passphrase);
+      // Mock API account recovery organization policy fetch.
+      fetch.doMockOnce(() => mockApiResponse(disabledAccountRecoveryOrganizationPolicyDto()));
+
+      const accountRecoveryUserSettingDto = createAcceptedAccountRecoveryUserSettingDto({user_id: User.getInstance().get().id});
+      const result = controller.exec(accountRecoveryUserSettingDto);
+
+      expect.assertions(1);
+      await expect(result).rejects.toThrowError("The Account recovery organization policy should be enabled.");
     });
   });
 });

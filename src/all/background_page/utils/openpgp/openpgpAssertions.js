@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+const {i18n} = require('../../sdk/i18n');
 
 /*
  * ==================================================
@@ -26,13 +27,13 @@
  */
 const readKeyOrFail = async armoredKey => {
   if (typeof armoredKey !== "string") {
-    throw new Error("The key should be an openpgp valid armored key string.");
+    throw new Error(i18n.t("The key should be a valid openpgp armored key string."));
   }
 
   try {
     return await openpgp.readKey({armoredKey: armoredKey});
   } catch (error) {
-    throw new Error("The key should be an openpgp valid armored key string.");
+    throw new Error(i18n.t("The key should be a valid openpgp armored key string."));
   }
 };
 exports.readKeyOrFail = readKeyOrFail;
@@ -46,7 +47,7 @@ exports.readKeyOrFail = readKeyOrFail;
  */
 const readAllKeysOrFail = async armoredKeys => {
   if (!Array.isArray(armoredKeys)) {
-    throw new Error("The keys should be an array of valid armored key string.");
+    throw new Error(i18n.t("The keys should be an array of valid openpgp armored key strings."));
   }
   return Promise.all(armoredKeys.map(key => readKeyOrFail(key)));
 };
@@ -60,7 +61,7 @@ exports.readAllKeysOrFail = readAllKeysOrFail;
  */
 const createMessageOrFail = async message => {
   if (typeof message !== "string") {
-    throw new Error("The message should be of type string.");
+    throw new Error(i18n.t("The message should be of type string."));
   }
   return openpgp.createMessage({text: message, format: 'utf8'});
 };
@@ -75,13 +76,13 @@ exports.createMessageOrFail = createMessageOrFail;
  */
 const readMessageOrFail = async message => {
   if (typeof message !== "string") {
-    throw new Error("The message should be of type string.");
+    throw new Error(i18n.t("The message should be of type string."));
   }
 
   try {
     return await openpgp.readMessage({armoredMessage: message});
   } catch (error) {
-    throw new Error("The message is not a valid openpgp message");
+    throw new Error(i18n.t("The message should be a valid openpgp message."));
   }
 };
 exports.readMessageOrFail = readMessageOrFail;
@@ -99,7 +100,7 @@ exports.readMessageOrFail = readMessageOrFail;
  */
 const assertKey = key => {
   if (!(key instanceof openpgp.PublicKey) && !(key instanceof openpgp.PrivateKey)) {
-    throw new Error("The key should be a valid openpgp key.");
+    throw new Error(i18n.t("The key should be a valid openpgp key."));
   }
 };
 exports.assertKey = assertKey;
@@ -113,7 +114,7 @@ exports.assertKey = assertKey;
  */
 const assertKeys = keys => {
   if (!Array.isArray(keys)) {
-    throw new Error("The keys should be an array.");
+    throw new Error(i18n.t("The keys should be an array."));
   }
   for (let i = 0; i < keys.length; i++) {
     assertKey(keys[i]);
@@ -133,7 +134,7 @@ const assertPublicKey = key => {
    * This is due to openpgp js types where an openpgp.PrivateKey is of a type openpgp.PublicKey as well
    */
   if (!(key instanceof openpgp.PublicKey) || (key instanceof openpgp.PublicKey && key.isPrivate())) {
-    throw new Error("The key should be an openpgp.PublicKey.");
+    throw new Error(i18n.t("The key should be a valid openpgp public key."));
   }
 };
 exports.assertPublicKey = assertPublicKey;
@@ -147,7 +148,7 @@ exports.assertPublicKey = assertPublicKey;
  */
 const assertPublicKeys = keys => {
   if (!Array.isArray(keys)) {
-    throw new Error("The keys should be an array of openpgp.PublicKey.");
+    throw new Error(i18n.t("The keys should be an array of valid openpgp public keys."));
   }
   for (let i = 0; i < keys.length; i++) {
     assertPublicKey(keys[i]);
@@ -164,7 +165,7 @@ exports.assertPublicKeys = assertPublicKeys;
 const assertPrivateKey = key => {
   // we do an extra check for key.isPrivate to keep things coherent with assertPublicKey.
   if (!(key instanceof openpgp.PrivateKey) || (key instanceof openpgp.PrivateKey && !key.isPrivate())) {
-    throw new Error("The key should be an openpgp.PrivateKey.");
+    throw new Error(i18n.t("The key should be a valid openpgp private key."));
   }
 };
 exports.assertPrivateKey = assertPrivateKey;
@@ -178,7 +179,7 @@ exports.assertPrivateKey = assertPrivateKey;
  */
 const assertPrivateKeys = keys => {
   if (!Array.isArray(keys)) {
-    throw new Error("The keys should be an array of openpgp.PrivateKey.");
+    throw new Error(i18n.t("The keys should be an array of valid openpgp private keys."));
   }
   for (let i = 0; i < keys.length; i++) {
     assertPrivateKey(keys[i]);
@@ -195,7 +196,7 @@ exports.assertPrivateKeys = assertPrivateKeys;
 const assertDecryptedPrivateKey = key => {
   assertPrivateKey(key);
   if (!key.isDecrypted()) {
-    throw new Error("The private key should be decrypted.");
+    throw new Error(i18n.t("The private key should be decrypted."));
   }
 };
 exports.assertDecryptedPrivateKey = assertDecryptedPrivateKey;
@@ -209,7 +210,7 @@ exports.assertDecryptedPrivateKey = assertDecryptedPrivateKey;
  */
 const assertDecryptedPrivateKeys = keys => {
   if (!Array.isArray(keys)) {
-    throw new Error("The keys should be an array of decrypted openpgp.PrivateKey.");
+    throw new Error(i18n.t("The keys should be an array of valid decrypted openpgp private keys."));
   }
   for (let i = 0; i < keys.length; i++) {
     assertDecryptedPrivateKey(keys[i]);
@@ -226,7 +227,7 @@ exports.assertDecryptedPrivateKeys = assertDecryptedPrivateKeys;
 const assertEncryptedPrivateKey = key => {
   assertPrivateKey(key);
   if (key.isDecrypted()) {
-    throw new Error("The private key should be encrypted.");
+    throw new Error(i18n.t("The private key should be encrypted."));
   }
 };
 exports.assertEncryptedPrivateKey = assertEncryptedPrivateKey;
@@ -240,7 +241,7 @@ exports.assertEncryptedPrivateKey = assertEncryptedPrivateKey;
  */
 const assertEncryptedPrivateKeys = keys => {
   if (!Array.isArray(keys)) {
-    throw new Error("The keys should be an array of encrypted openpgp.PrivateKey.");
+    throw new Error(i18n.t("The keys should be an array of valid encrypted openpgp private keys."));
   }
   for (let i = 0; i < keys.length; i++) {
     assertEncryptedPrivateKey(keys[i]);
@@ -256,7 +257,7 @@ exports.assertEncryptedPrivateKeys = assertEncryptedPrivateKeys;
  */
 const assertMessage = message => {
   if (!(message instanceof openpgp.Message)) {
-    throw new Error("The message should be an openpgp.Message");
+    throw new Error(i18n.t("The message should be a valid openpgp message."));
   }
 };
 exports.assertMessage = assertMessage;

@@ -23,7 +23,7 @@ const decryptedPrivateKey = pgpKeys.ada.private_decrypted;
 
 describe("EncryptPrivateKeyService service", () => {
   it('should throw an exception if the given key is not formatted properly', async() => {
-    const privateKeyFormatError = new Error("The key should be an openpgp.PrivateKey.");
+    const privateKeyFormatError = new Error("The key should be a valid openpgp private key.");
     const scenarios = [
       null,
       {},

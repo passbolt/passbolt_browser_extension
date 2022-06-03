@@ -124,11 +124,11 @@ class GpgAuth {
    * @return {Promise<boolean>} true if key has changed
    */
   async serverKeyChanged() {
-    const remoteServerArmoredKey = (await this.getServerKey()).keyData;
+    const remoteServerArmoredKey = (await this.getServerKey()).keydata;
     const remoteServerKey = await readKeyOrFail(remoteServerArmoredKey);
     const serverLocalArmoredKey = this.getServerKeyFromKeyring().armoredKey;
     const serverLocalKey = await readKeyOrFail(serverLocalArmoredKey);
-    return CompareGpgKeyService.areKeysTheSame(remoteServerKey, serverLocalKey);
+    return !await CompareGpgKeyService.areKeysTheSame(remoteServerKey, serverLocalKey);
   }
 
   /**

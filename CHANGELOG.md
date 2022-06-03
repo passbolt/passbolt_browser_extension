@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ## [3.6.2] - 2022-06-02
+### Improved
+- PB-16651 As LU I want to get a clear message if I enroll to a disabled account recovery program
+- PB-15677 As LU I want to see openpgp assertions messages translated into my language
+
 ### Fixed
 - PB-16736 Fix as AN I can accept a new server key
 

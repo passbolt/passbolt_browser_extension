@@ -1,18 +1,23 @@
 image: debian:stable-slim
 
-variables:
-  DOCKER_HOST: tcp://localhost:2375
-  DOCKER_DRIVER: overlay2
-
 stages:
   - test
 
 tester:
   stage: test
   image: node:16
+  coverage: /Lines\s* [:] ([\d\.]+)%/
   script:
     - npm ci
-    - npm run test
+    - npm run test:coverage
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
 
 linter:
   stage: test

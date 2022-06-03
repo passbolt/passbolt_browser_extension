@@ -55,6 +55,7 @@
     "jest-environment-jsdom": "^27.5.1",
     "jest-environment-node": "^27.4.0",
     "jest-fetch-mock": "^3.0.3",
+    "jest-junit": "^13.0.0",
     "jest-webextension-mock": "^3.7.22",
     "passbolt-i18next-scanner": "^3.1.999",
     "text-encoding-utf-8": "^1.0.2",
@@ -71,8 +72,9 @@
     "build": "npm run build-content-scripts; npm run build-data;",
     "build-content-scripts": "webpack --config webpack-content-scripts.config.js",
     "build-data": "webpack --config webpack-data.config.js",
-    "test": "jest --no-cache ./src/all/ --maxWorkers=4",
-    "test-coverage": "jest --no-cache ./src/all/ --maxWorkers=4 --coverage --collectCoverageFrom=src/**/*.{js,jsx}",
+    "test": "npm run test:unit",
+    "test:unit": "jest --no-cache ./src/all/ --maxWorkers=4",
+    "test:coverage": "jest --no-cache ./src/all/ --maxWorkers=4 --coverage",
     "eslint": "eslint -c .eslintrc.json --ext js --ext jsx src",
     "eslint-fix": "eslint -c .eslintrc.json --ext js --ext jsx --fix src"
   }

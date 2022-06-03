@@ -9,5 +9,19 @@
       "presets": ["@babel/env", "@babel/react"],
       "plugins": ["@babel/plugin-transform-runtime"]
     }]
-  }
+  },
+  "reporters": [
+    "default",
+    "jest-junit"
+  ],
+  "coverageReporters": [
+    "cobertura",
+    "html",
+    "text-summary"
+  ],
+  "collectCoverageFrom": [
+    "src/**/*.{js,jsx}",
+    "!src/**/*.test.js",
+    "!src/**/*.test.data.js"
+  ]
 }

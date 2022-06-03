@@ -40,3 +40,7 @@ Thumbs.db
 /.settings
 /.idea/*
 gi
+
+# CI                 #
+######################
+junit.xml

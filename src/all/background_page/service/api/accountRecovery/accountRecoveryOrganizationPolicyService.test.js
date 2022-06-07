@@ -57,7 +57,7 @@ describe("Account recovery validate public key service", () => {
     expect.assertions(5);
     await checkError(dummyData.privateKey, "The key should be public.");
     await checkError(dummyData.weakKey, "The key should be at least 4096 bits.");
-    await checkError(dummyData.expiredKey, "The key should not be expired.");
+    await checkError(dummyData.expiredKey, "The key should not have an expiry date.");
     await checkError(dummyData.notAKey, "The key should be a valid openpgp armored key string.");
     await checkError(dummyData.existingKey, "The key is already being used, the organization recovery key must be a new one.");
   });

@@ -56,7 +56,7 @@ describe("AccountRecoveryValidatePublicKeyController", () => {
       {key: pgpKeys.anita.public, expectedError: new Error("The key algorithm should be RSA.")},
       {key: pgpKeys.ada.private, expectedError: new Error("The key should be public.")},
       {key: pgpKeys.revokedKey.public, expectedError: new Error("The key should not be revoked.")},
-      {key: pgpKeys.expired.public, expectedError: new Error("The key should not be expired.")},
+      {key: pgpKeys.expired.public, expectedError: new Error("The key should not have an expiry date.")},
       {key: pgpKeys.validKeyWithExpirationDateDto.public, expectedError: new Error("The key should be at least 4096 bits.")},
       {key: pgpKeys.account_recovery_organization.public, expectedError: new Error("The key is the current server key, the organization recovery key must be a new one.")},
       {key: pgpKeys.account_recovery_organization_alternative.public, expectedError: new Error("The key is already being used, the organization recovery key must be a new one.")},

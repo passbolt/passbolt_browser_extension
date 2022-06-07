@@ -117,7 +117,7 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
       const expirationDate = new Date(keyInfo.expires);
 
       if (expirationDate < now) {
-        throw new Error("The key should not be expired.");
+        throw new Error("The key should not have an expiry date.");
       }
     }
 

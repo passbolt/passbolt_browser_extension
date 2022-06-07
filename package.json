@@ -19,7 +19,6 @@
     "jssha": "~3.2.0",
     "kdbxweb": "2.1.1",
     "locutus": "~2.0.9",
-    "npm-force-resolutions": "0.0.10",
     "openpgp": "5.2.1",
     "papaparse": "^5.2.0",
     "passbolt-styleguide": "^3.6.1",
@@ -64,11 +63,12 @@
     "webpack": "^5.64.4",
     "webpack-cli": "^4.9.1"
   },
-  "resolutions": {
-    "glob-parent": "5.1.2"
+  "overrides": {
+    "glob-stream": {
+      "glob-parent": "5.1.2"
+    }
   },
   "scripts": {
-    "preinstall": "npx npm-force-resolutions || echo 1",
     "build": "npm run build-content-scripts; npm run build-data;",
     "build-content-scripts": "webpack --config webpack-content-scripts.config.js",
     "build-data": "webpack --config webpack-data.config.js",

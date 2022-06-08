@@ -62,8 +62,9 @@ class AccountModel {
     const privateArmoredKey = this.keyring.findPrivate().armoredKey;
     try {
       const privateKey = await readKeyOrFail(privateArmoredKey);
-      const reEncryptedArmoredKey = await ReEncryptPrivateKeyService.reEncrypt(privateKey, oldPassphrase, newPassphrase);
-      await this.keyring.importPrivate(reEncryptedArmoredKey.armor());
+      const reEncryptedPrivateKey = await ReEncryptPrivateKeyService.reEncrypt(privateKey, oldPassphrase, newPassphrase);
+      const reEncryptedArmoredKey = reEncryptedPrivateKey.armor();
+      await this.keyring.importPrivate(reEncryptedArmoredKey);
       return reEncryptedArmoredKey;
     } catch (error) {
       // Rollback to the old passphrase

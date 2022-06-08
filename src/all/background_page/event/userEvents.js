@@ -12,10 +12,8 @@ const {UserEntity} = require('../model/entity/user/userEntity');
 const {UserDeleteTransferEntity} = require('../model/entity/user/transfer/userDeleteTransfer');
 const {AvatarUpdateEntity} = require("../model/entity/avatar/update/avatarUpdateEntity");
 const {SecurityTokenEntity} = require("../model/entity/securityToken/securityTokenEntity");
-const fileController = require('../controller/fileController');
 const {AccountModel} = require("../model/account/accountModel");
-
-const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
+const {UpdatePrivateKeyController} = require("../controller/account/updatePrivateKeyController");
 
 const listen = function(worker) {
   /*
@@ -176,20 +174,9 @@ const listen = function(worker) {
    * @param newPassphrase {string} The new passphrase
    */
   worker.port.on('passbolt.user.update-private-key', async(requestId, oldPassphrase, newPassphrase) => {
-    try {
-      if (typeof oldPassphrase !== 'string' || typeof newPassphrase !== 'string') {
-        throw new Error('The old and new passphrase have to be string');
-      }
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const accountModel = new AccountModel(clientOptions);
-      const userPrivateArmoredKey = await accountModel.updatePrivateKey(oldPassphrase, newPassphrase);
-      await User.getInstance().flushMasterPassword();
-      await fileController.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", worker.tab.id);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new UpdatePrivateKeyController(worker, requestId, apiClientOptions);
+    await controller._exec(oldPassphrase, newPassphrase);
   });
 
   /*

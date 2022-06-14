@@ -23,6 +23,7 @@ const {ExternalResourceEntity} = require("../../model/entity/resource/external/e
 const {DecryptMessageService} = require('../../service/crypto/decryptMessageService');
 const {GetDecryptedUserPrivateKeyService} = require("../../service/account/getDecryptedUserPrivateKeyService");
 const {readMessageOrFail} = require("../../utils/openpgp/openpgpAssertions");
+const {ResourceEntity} = require("../../model/entity/resource/resourceEntity");
 /**
  * Controller related to the in-form call-to-action
  */
@@ -90,7 +91,7 @@ class InformMenuController {
     // Retrieve resource name and uri from tab.
     const tab = await BrowserTabService.getCurrent();
     const name = tab.title;
-    const uri = tab.url;
+    const uri = tab.url.substr(0, ResourceEntity.URI_MAX_LENGTH);
 
     // Store the resource to save in cache.
     const resourceDto = {name: name, username: username, uri: uri, secret_clear: secret_clear};

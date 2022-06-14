@@ -604,6 +604,10 @@ class ResourceEntity extends Entity {
   static get ALL_CONTAIN_OPTIONS() {
     return {permission: true, permissions: true, secrets: true, favorite: true, tag: true};
   }
+
+  static get URI_MAX_LENGTH() {
+    return RESOURCE_URI_MAX_LENGTH;
+  }
 }
 
 exports.ResourceEntity = ResourceEntity;

@@ -40,7 +40,7 @@ class MockExtension {
    */
   static withMissingPrivateKeyAccount(keyData = pgpKeys.ada) {
     const user = User.getInstance();
-    user.settings.setDomain("https://localhost");
+    user.settings.setDomain("https://passbolt.local");
     user.settings.setSecurityToken(defaultSecurityTokenDto());
     const nameSplitted = keyData.user_ids[0].name.split(" ");
     const userDto = {

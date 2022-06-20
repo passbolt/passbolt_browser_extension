@@ -68,6 +68,7 @@ describe("ReviewRequestController", () => {
     };
 
     it("Should save a review account recovery request if approved.", async() => {
+      await MockExtension.withConfiguredAccount();
       // Add the user in the local storage.
       await UserLocalStorage.set(new UsersCollection([defaultUserDto({id: requestDto.user_id})]));
       // Import the public key of the user requesting an account recovery in the keyring, it will be used to check the signature on the account recovery private key data.
@@ -110,6 +111,7 @@ describe("ReviewRequestController", () => {
     }, 10000);
 
     it("Should save a review account recovery request if rejected.", async() => {
+      await MockExtension.withConfiguredAccount();
       // Add the user in the local storage.
       await UserLocalStorage.set(new UsersCollection([defaultUserDto({id: requestDto.user_id})]));
       // Mock API fetch account recovery organization policy response.
@@ -132,6 +134,7 @@ describe("ReviewRequestController", () => {
     });
 
     it("Should assert the provided account recovery id is valid.", async() => {
+      await MockExtension.withConfiguredAccount();
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
       const promise = controller.exec("not-uuid");
       expect.assertions(1);
@@ -139,6 +142,7 @@ describe("ReviewRequestController", () => {
     });
 
     it("Should assert the account recovery organization is enabled.", async() => {
+      await MockExtension.withConfiguredAccount();
       // Mock API fetch account recovery organization policy response.
       fetch.doMockOnceIf(/account-recovery\/organization-policies.json/, () => mockApiResponse(disabledAccountRecoveryOrganizationPolicyDto()));
 
@@ -149,6 +153,7 @@ describe("ReviewRequestController", () => {
     });
 
     it("Should assert the provided organization private key dto is valid.", async() => {
+      await MockExtension.withConfiguredAccount();
       // Mock API fetch account recovery organization policy response.
       fetch.doMockOnceIf(/account-recovery\/organization-policies.json/, () => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
       // Mock API get account recovery request.
@@ -161,6 +166,7 @@ describe("ReviewRequestController", () => {
     });
 
     it("Should assert the account recovery organization private key can be decrypted.", async() => {
+      await MockExtension.withConfiguredAccount();
       // Mock API fetch account recovery organization policy response.
       fetch.doMockOnceIf(/account-recovery\/organization-policies.json/, () => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
       // Mock API get account recovery request.
@@ -177,6 +183,7 @@ describe("ReviewRequestController", () => {
     });
 
     it("Should assert the signed-in user private key can be decrypted.", async() => {
+      await MockExtension.withConfiguredAccount();
       // Mock API fetch account recovery organization policy response.
       fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
       // Mock API get account recovery request.
@@ -199,6 +206,7 @@ describe("ReviewRequestController", () => {
       {expectedError: "The request private key password private key id should match the request private key id.", findRequestMock: pendingAccountRecoveryRequestDto({account_recovery_private_key: {account_recovery_private_key_passwords: [{private_key_id: uuidv4()}]}})},
     ]).describe("Should assert the request returned by the API.", scenario => {
       it(`Should validate the scenario: ${scenario.expectedError}`, async() => {
+        await MockExtension.withConfiguredAccount();
         // Mock API fetch account recovery organization policy response.
         fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
         // Mock API get account recovery request.
@@ -212,7 +220,6 @@ describe("ReviewRequestController", () => {
     });
 
     it("Should assert the public key of the user making the account recovery is found.", async() => {
-      // Required by the keyring sync, this one does not use the api client options.
       await MockExtension.withConfiguredAccount();
       // Mock API fetch account recovery organization policy response.
       fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
@@ -229,6 +236,7 @@ describe("ReviewRequestController", () => {
     });
 
     it("Should assert the private key password data was encrypted for the user making the request, check the encrypted user id match the request user id.", async() => {
+      await MockExtension.withConfiguredAccount();
       const requestDto = pendingAccountRecoveryRequestDto({id: requestId, user_id: pgpKeys.betty.userId});
       // Import the public key of the user requesting an account recovery in the keyring, it will be used to check the signature on the account recovery private key data.
       const keyring = new Keyring();
@@ -248,6 +256,7 @@ describe("ReviewRequestController", () => {
     });
 
     it("Should assert the private key password data was encrypted for the user making the request, check the encrypted private key fingerprint match the user public key fingerprint.", async() => {
+      await MockExtension.withConfiguredAccount();
       // Import the public key of the user requesting an account recovery in the keyring, it will be used to check the signature on the account recovery private key data.
       const keyring = new Keyring();
       await keyring.importPublic(pgpKeys.betty.public, requestDto.user_id);

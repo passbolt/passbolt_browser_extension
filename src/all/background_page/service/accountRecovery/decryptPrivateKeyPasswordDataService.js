@@ -21,6 +21,7 @@ class DecryptPrivateKeyPasswordDataService {
    * Decrypt the private key password encrypted data.
    * @param {AccountRecoveryPrivateKeyPasswordEntity} privateKeyPassword The private key password.
    * @param {openpgp.PrivateKey} decryptionKey The decrypted decryption key.
+   * @param {string} verificationDomain The expected domain the private key password should contain.
    * @param {string} [verificationUserId] The id of the user who is the owner of the private key encrypted with the private key password.
    * @param {openpgp.PublicKey} [verificationUserPublicKey] The public key of the user who is the owner of the private key encrypted with the private key password
    * @return {Promise<AccountRecoveryPrivateKeyPasswordDecryptedDataEntity>}
@@ -31,7 +32,7 @@ class DecryptPrivateKeyPasswordDataService {
    * @throw {Error} If the user id contained in the decrypted private key password data does not match the verification user id.
    * @throw {Error} If the fingerprint contained in the decrypted private key password data does not match the verification fingerprint.
    */
-  static async decrypt(privateKeyPassword, decryptionKey, verificationUserId, verificationUserPublicKey) {
+  static async decrypt(privateKeyPassword, decryptionKey, verificationDomain, verificationUserId, verificationUserPublicKey) {
     let privateKeyPasswordDecryptedDataDto;
 
     if (decryptionKey.getFingerprint().toUpperCase() !== privateKeyPassword.recipientFingerprint) {
@@ -49,6 +50,10 @@ class DecryptPrivateKeyPasswordDataService {
     }
 
     const privateKeyPasswordDecryptedData = new AccountRecoveryPrivateKeyPasswordDecryptedDataEntity(privateKeyPasswordDecryptedDataDto);
+
+    if (privateKeyPasswordDecryptedData.domain !== verificationDomain) {
+      throw new Error("The domain contained in the private key password data does not match the expected target domain.");
+    }
 
     if (verificationUserId) {
       if (privateKeyPasswordDecryptedData.privateKeyUserId !== verificationUserId) {

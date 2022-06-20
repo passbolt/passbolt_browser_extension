@@ -22,7 +22,8 @@ class DecryptResponseDataService {
    * @param {AccountRecoveryResponseEntity} response The response.
    * @param {openpgp.PrivateKey} decryptionKey The decrypted decryption key.
    * @param {string} verificationUserId The id of the user who is the owner of the private key encrypted with the private key password.
-   * @param {openpgp.PublicKey} [verificationUserPublicKey] (Optional) The public key of the user who is the owner of the private key encrypted with the private key password
+   * @param {string}verificationDomain The expected domain to find in the decrypted private key password.
+   * @param {openpgp.PublicKey} [verificationUserPublicKey] (Optional) The public key of the user who is the owner of the private key encrypted with the private key password.
    * @return {Promise<AccountRecoveryPrivateKeyPasswordDecryptedDataEntity>}
    * @throws {Error} If the response data cannot be decrypted.
    * @throws {Error} If the decrypted response data cannot be parsed.
@@ -30,7 +31,7 @@ class DecryptResponseDataService {
    * @throws {Error} If the user id contained in the decrypted response data does not match the verification user id.
    * @throws {Error} If the fingerprint contained in the decrypted response data does not match the verification fingerprint.
    */
-  static async decrypt(response, decryptionKey, verificationUserId, verificationUserPublicKey) {
+  static async decrypt(response, decryptionKey, verificationUserId, verificationDomain, verificationUserPublicKey) {
     let privateKeyPasswordDecryptedDataDto;
     const responseDataMessage = await readMessageOrFail(response.data);
     const privateKeyPasswordDecryptedDataSerialized = await DecryptMessageService.decrypt(responseDataMessage, decryptionKey);
@@ -45,6 +46,10 @@ class DecryptResponseDataService {
 
     if (privateKeyPasswordDecryptedData.privateKeyUserId !== verificationUserId) {
       throw new Error("The user id contained in the response data does not match the verification user id.");
+    }
+
+    if (privateKeyPasswordDecryptedData.domain !== verificationDomain) {
+      throw new Error("The domain contained in the private key password data does not match the expected target domain.");
     }
 
     if (verificationUserPublicKey) {

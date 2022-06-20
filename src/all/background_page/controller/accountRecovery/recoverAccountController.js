@@ -129,7 +129,7 @@ class RecoverAccountController {
      * @todo Additional check could be done to ensure the recovered key is the same than the one the user was previously using.
      *   If the user is in the case lost passphrase, a key should still be referenced in the storage of the extension.
      */
-    const privateKeyPasswordDecryptedData = await DecryptResponseDataService.decrypt(response, requestPrivateKeyDecrypted, this.account.userId);
+    const privateKeyPasswordDecryptedData = await DecryptResponseDataService.decrypt(response, requestPrivateKeyDecrypted, this.account.userId, this.account.domain);
     const privateKeyData = await readMessageOrFail(privateKey.data);
     const decryptedRecoveredPrivateArmoredKey = await DecryptMessageService.decryptSymmetrically(privateKeyData, privateKeyPasswordDecryptedData.privateKeySecret);
     const decryptedRecoveredPrivateKey = await readKeyOrFail(decryptedRecoveredPrivateArmoredKey);

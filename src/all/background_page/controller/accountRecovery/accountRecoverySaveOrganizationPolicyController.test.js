@@ -38,6 +38,8 @@ import {
 } from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity.test.data";
 import {AccountRecoveryPrivateKeyPasswordDecryptedDataEntity} from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
 import {readAllKeysOrFail, readKeyOrFail, readMessageOrFail} from "../../utils/openpgp/openpgpAssertions";
+import {AccountEntity} from "../../model/entity/account/accountEntity";
+import {adminAccountDto} from "../../model/entity/account/accountEntity.test.data";
 
 jest.mock("../passphrase/passphraseController.js");
 jest.mock("../../service/progress/progressService", () => ({
@@ -53,9 +55,10 @@ beforeEach(() => {
 });
 
 describe("AccountRecoverySaveOrganizationPolicyController", () => {
+  const account = new AccountEntity(adminAccountDto());
   describe("AccountRecoverySaveOrganizationPolicyController::exec", () => {
     it("Should save an account recovery organization policy.", async() => {
-      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions());
+      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions(), account);
 
       // Mock extension with a configured account.
       await MockExtension.withConfiguredAccount();
@@ -82,7 +85,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
     });
 
     it("Should enable an account recovery organization policy previously disabled.", async() => {
-      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions());
+      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions(), account);
       const currentOrganizationPolicy = disabledAccountRecoveryOrganizationPolicyDto();
       const newOrganizationPolicy = optInAccountRecoveryOranizationPolicyDto();
       const newOrganizationPolicyOrk = newOrganizationPolicy.account_recovery_organization_public_key.armored_key;
@@ -112,7 +115,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
     });
 
     it("Should disable an account recovery organization policy previously enabled.", async() => {
-      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions());
+      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions(), account);
       const currentOrganizationPolicy = optInAccountRecoveryOranizationPolicyDto();
       const newOrganizationPolicy = disabledAccountRecoveryOrganizationPolicyDto();
       const currentOrganizationPolicyORK = currentOrganizationPolicy.account_recovery_organization_public_key.armored_key;
@@ -144,7 +147,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
     });
 
     it("Should change an account recovery organization policy without changing the organization key.", async() => {
-      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions());
+      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions(), account);
       const publicKeyId = uuidv4();
       const currentOrganizationPolicy = optInAccountRecoveryOranizationPolicyDto({
         public_key_id: publicKeyId
@@ -176,7 +179,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
     });
 
     it("Should rotate an account recovery organization key.", async() => {
-      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions());
+      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions(), account);
       const currentOrganizationPolicy = optInAccountRecoveryOranizationPolicyDto();
       const newOrganizationPolicy = optOutWithNewOrkAccountRecoveryOrganizationPolicyDto();
       const newOrganizationPolicyOrk = newOrganizationPolicy.account_recovery_organization_public_key.armored_key;
@@ -263,7 +266,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
       ];
       fetch.doMockOnce(() => mockApiResponse(existingPrivateKeyPasswords));
 
-      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions());
+      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions(), account);
       const newOrganizationPolicy = optOutWithNewOrkAccountRecoveryOrganizationPolicyDto();
       const accountRecoveryOrganizationPrivateKeyDto = {
         armored_key: pgpKeys.account_recovery_organization.private,
@@ -275,7 +278,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
     });
 
     it("Should assert the provided account recovery policy dto is valid.", async() => {
-      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions());
+      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions(), account);
 
       const accountRecoveryOrganizationPolicyDto = {};
       const accountRecoveryOrganizationPrivateKeyDto = {
@@ -289,7 +292,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
     });
 
     it("Should assert the provided account recovery private key dto is valid.", async() => {
-      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions());
+      const controller = new AccountRecoverySaveOrganizationPolicyController(null, null, defaultApiClientOptions(), account);
 
       const accountRecoveryOrganizationPolicyDto = createEnabledAccountRecoveryOrganizationPolicyDto();
       const accountRecoveryOrganizationPrivateKeyDto = {};

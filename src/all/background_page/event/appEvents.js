@@ -52,7 +52,7 @@ const listen = function(worker, account) {
 
   worker.port.on('passbolt.account-recovery.save-organization-policy', async(requestId, accountRecoveryOrganizationPolicyDto, privateGpgKeyDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new AccountRecoverySaveOrganizationPolicyController(worker, requestId, apiClientOptions);
+    const controller = new AccountRecoverySaveOrganizationPolicyController(worker, requestId, apiClientOptions, account);
     await controller._exec(accountRecoveryOrganizationPolicyDto, privateGpgKeyDto);
   });
 

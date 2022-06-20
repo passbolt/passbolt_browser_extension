@@ -207,8 +207,9 @@ class ReviewRequestController {
    * @private
    */
   async _encryptResponseData(request, organizationPrivateKeyDecrypted, userPublicKey, signedInUserDecryptedPrivateKey) {
+    const verificationDomain = this.account.domain;
     const privateKeyPassword = request.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords.items[0];
-    const privateKeyPasswordData = await DecryptPrivateKeyPasswordDataService.decrypt(privateKeyPassword, organizationPrivateKeyDecrypted, request.userId, userPublicKey);
+    const privateKeyPasswordData = await DecryptPrivateKeyPasswordDataService.decrypt(privateKeyPassword, organizationPrivateKeyDecrypted, verificationDomain, request.userId, userPublicKey);
     const privateKeyPasswordDataSerialized = JSON.stringify(privateKeyPasswordData);
     const requestKey = await readKeyOrFail(request.armoredKey);
     return EncryptMessageService.encrypt(privateKeyPasswordDataSerialized, requestKey, [organizationPrivateKeyDecrypted, signedInUserDecryptedPrivateKey]);

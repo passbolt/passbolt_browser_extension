@@ -38,12 +38,13 @@ class AccountRecoverySaveOrganizationPolicyController {
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions
    */
-  constructor(worker, requestId, apiClientOptions) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
     this.progressService = new ProgressService(this.worker, i18n.t("Rekeying users' key"));
     this.keyring = new Keyring();
+    this.account = account;
   }
 
   /**
@@ -105,10 +106,12 @@ class AccountRecoverySaveOrganizationPolicyController {
       };
 
       if (hasNewOrganizationKey) {
+        const verificationDomain = this.account.domain;
         const privateKeyPasswordCollection = await this._reEncryptPrivateKeyPasswords(
           newOrganizationPublicKey,
           decryptedOrganizationPrivateKey,
           signedInUserDecryptedPrivateKey,
+          verificationDomain,
         );
         const signedNewORK = await SignGpgKeyService.sign(newOrganizationPublicKey, [decryptedOrganizationPrivateKey]);
         saveOrganizationPolicyDto.account_recovery_organization_public_key.armored_key = signedNewORK.armor();
@@ -148,9 +151,10 @@ class AccountRecoverySaveOrganizationPolicyController {
    * @param {openpgp.PublicKey} encryptionKey The new organization public key to use to encrypt the private key password data.
    * @param {openpgp.PrivateKey} decryptionKey The previous organization decrypted private key to use to decrypt the private key password data.
    * @param {openpgp.PrivateKey} signedInUserDecryptedPrivateKey The decrypted private key of the current signed in user.
+   * @param {string} verificationDomain The expected domain the private key passwords must contain in order to proceed with the reencyption.
    * @returns {Promise<AccountRecoveryPrivateKeyPasswordsCollection>}
    */
-  async _reEncryptPrivateKeyPasswords(encryptionKey, decryptionKey, signedInUserDecryptedPrivateKey) {
+  async _reEncryptPrivateKeyPasswords(encryptionKey, decryptionKey, signedInUserDecryptedPrivateKey, verificationDomain) {
     const accountRecoveryPrivateKeyPasswords = await this.accountRecoveryModel.findAccountRecoveryPrivateKeyPasswords();
     if (accountRecoveryPrivateKeyPasswords.length === 0) {
       return new AccountRecoveryPrivateKeyPasswordsCollection([]);
@@ -159,10 +163,16 @@ class AccountRecoverySaveOrganizationPolicyController {
     await this.progressService.start(accountRecoveryPrivateKeyPasswords.length, i18n.t("Updating users' key..."));
 
     const reEncryptedPrivateKeyPasswords = [];
-    for (const privateKeyPassword of accountRecoveryPrivateKeyPasswords) {
-      const newPrivateKeyPasswordDto = await this._reEncryptPrivateKeyPassword(privateKeyPassword, encryptionKey, decryptionKey, signedInUserDecryptedPrivateKey);
-      reEncryptedPrivateKeyPasswords.push(newPrivateKeyPasswordDto);
-      await this.progressService.finishStep();
+    try {
+      for (const privateKeyPassword of accountRecoveryPrivateKeyPasswords) {
+        const newPrivateKeyPasswordDto = await this._reEncryptPrivateKeyPassword(privateKeyPassword, encryptionKey, decryptionKey, signedInUserDecryptedPrivateKey, verificationDomain);
+        reEncryptedPrivateKeyPasswords.push(newPrivateKeyPasswordDto);
+        await this.progressService.finishStep();
+      }
+    } catch (e) {
+      console.error(e);
+      this.progressService.close();
+      throw e;
     }
 
     this.progressService.close();
@@ -175,11 +185,12 @@ class AccountRecoverySaveOrganizationPolicyController {
    * @param {openpgp.PublicKey} encryptionKey The new organization public key to use to encrypt the private key password data.
    * @param {openpgp.PrivateKey} decryptionKey The previous organization decrypted private key to use to decrypt the private key password data.
    * @param {openpgp.PrivateKey} signedInUserDecryptedPrivateKey The signed-in user decrypted private key to use to sign the private key password data.
+   * @param {string} verificationDomain The expected domain the private key passwords must contain in order to proceed with the reencyption.
    * @returns {Promise<AccountRecoveryPrivateKeyPasswordEntity>}
    * @private
    */
-  async _reEncryptPrivateKeyPassword(privateKeyPassword, encryptionKey, decryptionKey, signedInUserDecryptedPrivateKey) {
-    const privateKeyPasswordDecryptedData = await DecryptPrivateKeyPasswordDataService.decrypt(privateKeyPassword, decryptionKey);
+  async _reEncryptPrivateKeyPassword(privateKeyPassword, encryptionKey, decryptionKey, signedInUserDecryptedPrivateKey, verificationDomain) {
+    const privateKeyPasswordDecryptedData = await DecryptPrivateKeyPasswordDataService.decrypt(privateKeyPassword, decryptionKey, verificationDomain);
     const privateKeyPasswordDecryptedDataSerialized = JSON.stringify(privateKeyPasswordDecryptedData);
     const encryptedKeyData = await EncryptMessageService.encrypt(privateKeyPasswordDecryptedDataSerialized, encryptionKey, [decryptionKey, signedInUserDecryptedPrivateKey]);
 

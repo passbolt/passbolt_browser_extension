@@ -19,7 +19,7 @@ import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
  * The Test Account Recovery Organization gpg key is used to encrypt the private key password.
  * The Ada gpg key is used to sign the encrypted message.
  * The private key password belong to the private key of Ada.
- * Clear text password: f7cf1fa06f973a9ecbb5f0e2bc6d1830532e53ad50da231036bd6c8c00dd7c7dc6c07b04004615cd6808bea2cb6a4ce4c46f7f36b8865292c0f7a28cd6f56112
+ * Clear text password: {type":"account-recovery-private-key-password-decrypted-data","version":"v1","domain":"https://passbolt.local","private_key_user_id":"f848277c-5398-58f8-a82a-72397af2d450","private_key_fingerprint":"03F60E958F4CB29723ACDF761353B5B15D9B054F","private_key_secret":"f7cf1fa06f973a9ecbb5f0e2bc6d1830532e53ad50da231036bd6c8c00dd7c7dc6c07b04004615cd6808bea2cb6a4ce4c46f7f36b8865292c0f7a28cd6f56112","created":"2022-04-21T14:45:15.205Z"}
  */
 export const createAccountRecoveryPrivateKeyPasswordDto = (data = {}) => {
   const defaultData = {
@@ -47,7 +47,7 @@ export const defaultAccountRecoveryPrivateKeyPasswordDto = (data = {}) => {
  * The Test Account Recovery Organization gpg key is used to encrypt the private key password.
  * The Betty gpg key is used to sign the encrypted message.
  * The private key password belong to the private key of Betty.
- * Clear text password: 96946dd4d62e1ef5815c25ec8c5152a3abf5d80795f112719b92b0eb86d5d1102e68baab3486025886769bc05177ae7825e484420e58bf5a4692f30021425b85
+ * Clear text password: {"type":"account-recovery-private-key-password-decrypted-data","version":"v1","domain":"https://passbolt.local","private_key_user_id":"e97b14ba-8957-57c9-a357-f78a6e1e1a46","private_key_fingerprint":"A754860C3ADE5AB04599025ED3F1FE4BE61D7009","private_key_secret":"96946dd4d62e1ef5815c25ec8c5152a3abf5d80795f112719b92b0eb86d5d1102e68baab3486025886769bc05177ae7825e484420e58bf5a4692f30021425b85","created":"2022-04-24T13:16:48.469Z"}
  */
 export const bettyAccountRecoveryPrivateKeyPasswordDto = (data = {}) => {
   const defaultData = {
@@ -61,6 +61,7 @@ export const bettyAccountRecoveryPrivateKeyPasswordDto = (data = {}) => {
 
 /**
  * The Test Account Recovery Organization gpg key is used to encrypt the private key password.
+ * Clear text password: {"type":"not-a-valid-decrypted-data-entity-type","version":"v1","domain":"https://passbolt.local","private_key_user_id":"f848277c-5398-58f8-a82a-72397af2d450","private_key_fingerprint":"03F60E958F4CB29723ACDF761353B5B15D9B054F","private_key_secret":"f7cf1fa06f973a9ecbb5f0e2bc6d1830532e53ad50da231036bd6c8c00dd7c7dc6c07b04004615cd6808bea2cb6a4ce4c46f7f36b8865292c0f7a28cd6f56112","created":"2022-04-24T20:22:54.324Z"}
  */
 export const secretSubstitutionAttackAccountRecoveryPrivateKeyPasswordDto = (data = {}) => {
   const defaultData = {

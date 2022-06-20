@@ -24,6 +24,7 @@ import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 describe("DecryptResponseDataService", () => {
   describe("DecryptResponseDataService:decrypt", () => {
+    const expectedDomain = "https://passbolt.local";
     const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto());
     const decryptionArmoredKey = pgpKeys.account_recovery_request.private_decrypted;
     const verificationUserId = pgpKeys.ada.userId;
@@ -31,12 +32,12 @@ describe("DecryptResponseDataService", () => {
 
     it("should decrypt a response data.", async() => {
       const decryptionKey = await readKeyOrFail(decryptionArmoredKey);
-      const privateKeyPasswordDecryptedData = await DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId);
+      const privateKeyPasswordDecryptedData = await DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain);
       expect.assertions(8);
       expect(privateKeyPasswordDecryptedData).toBeInstanceOf(AccountRecoveryPrivateKeyPasswordDecryptedDataEntity);
       expect(privateKeyPasswordDecryptedData.type).toStrictEqual("account-recovery-private-key-password-decrypted-data");
       expect(privateKeyPasswordDecryptedData.version).toStrictEqual("v1");
-      expect(privateKeyPasswordDecryptedData.domain).toStrictEqual("https://passbolt.local");
+      expect(privateKeyPasswordDecryptedData.domain).toStrictEqual(expectedDomain);
       expect(privateKeyPasswordDecryptedData.privateKeyUserId).toStrictEqual(pgpKeys.ada.userId);
       expect(privateKeyPasswordDecryptedData.privateKeyFingerprint).toStrictEqual(pgpKeys.ada.fingerprint);
       expect(privateKeyPasswordDecryptedData.privateKeySecret).toStrictEqual("f7cf1fa06f973a9ecbb5f0e2bc6d1830532e53ad50da231036bd6c8c00dd7c7dc6c07b04004615cd6808bea2cb6a4ce4c46f7f36b8865292c0f7a28cd6f56112");
@@ -47,7 +48,7 @@ describe("DecryptResponseDataService", () => {
       const decryptionKey = await readKeyOrFail(decryptionArmoredKey);
       const data = "decrypt-me-decrypt-me-decrypt-me";
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({data}));
-      const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId);
+      const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain);
       expect.assertions(1);
       await expect(promise).rejects.toThrowError("The message should be a valid openpgp message.");
     });
@@ -57,7 +58,7 @@ describe("DecryptResponseDataService", () => {
       const key = await readKeyOrFail(pgpKeys.account_recovery_request.public);
       const data = await EncryptMessageService.encrypt("decrypt-me-decrypt-me-decrypt-me", key);
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({data}));
-      const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId);
+      const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain);
       expect.assertions(1);
       await expect(promise).rejects.toThrowError("Unable to parse the decrypted response data.");
     });
@@ -68,7 +69,7 @@ describe("DecryptResponseDataService", () => {
       const key = await readKeyOrFail(pgpKeys.account_recovery_request.public);
       const data = await EncryptMessageService.encrypt(JSON.stringify(privateKeyPasswordDataDto), key);
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({data}));
-      const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId);
+      const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain);
       expect.assertions(1);
       await expect(promise).rejects.toThrowEntityValidationErrorOnProperties(["type"]);
     });
@@ -79,7 +80,7 @@ describe("DecryptResponseDataService", () => {
       const key = await readKeyOrFail(pgpKeys.account_recovery_request.public);
       const data = await EncryptMessageService.encrypt(JSON.stringify(privateKeyPasswordDataDto), key);
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({data}));
-      const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId);
+      const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain);
       expect.assertions(1);
       await expect(promise).rejects.toThrowError("The user id contained in the response data does not match the verification user id.");
     });
@@ -91,9 +92,21 @@ describe("DecryptResponseDataService", () => {
       const key = await readKeyOrFail(pgpKeys.account_recovery_request.public);
       const data = await EncryptMessageService.encrypt(JSON.stringify(privateKeyPasswordDataDto), key);
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({data}));
-      const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, verificationKey);
+      const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain, verificationKey);
       expect.assertions(1);
       await expect(promise).rejects.toThrowError("The response data fingerprint should match the verification fingerprint.");
+    });
+
+    it("should fail if the domain contained in the decrypted response data does not match the verification domain.", async() => {
+      const decryptionKey = await readKeyOrFail(decryptionArmoredKey);
+      const verificationKey = await readKeyOrFail(verificationPublicKey);
+      const privateKeyPasswordDataDto = defaultAccountRecoveryPrivateKeyPasswordDecryptedDataDto();
+      const key = await readKeyOrFail(pgpKeys.account_recovery_request.public);
+      const data = await EncryptMessageService.encrypt(JSON.stringify(privateKeyPasswordDataDto), key);
+      const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({data}));
+      const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, "fake domain", verificationKey);
+      expect.assertions(1);
+      await expect(promise).rejects.toThrowError("The domain contained in the private key password data does not match the expected target domain.");
     });
   });
 });

@@ -91,3 +91,10 @@ export const ecc_brainpoolp512r1KeyDto = (data = {}) => {
   const defaultData = getKeyDto(pgpKeys.ecdsa_brainpoolp512r1);
   return Object.assign(defaultData, data);
 };
+
+export const invalidKeyDto = (data = {}) => {
+  const defaultData = getKeyDto(pgpKeys.invalidKeyWithoutChecksum);
+  defaultData.armored_key = pgpKeys.invalidKeyWithoutChecksum.private;
+  defaultData.private = true;
+  return Object.assign(defaultData, data);
+};

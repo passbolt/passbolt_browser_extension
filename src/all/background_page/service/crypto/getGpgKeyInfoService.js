@@ -52,12 +52,12 @@ class GetGpgKeyInfoService {
 
     // Format expiration time
     let expirationTime;
-    try {
-      const opengpgExpirationTime = await key.getExpirationTime();
-      expirationTime = opengpgExpirationTime === Infinity
-        ? "Never"
-        : opengpgExpirationTime.toISOString();
-    } catch (e) {
+    const opengpgExpirationTime = await key.getExpirationTime();
+    if (opengpgExpirationTime instanceof Date) {
+      expirationTime = opengpgExpirationTime.toISOString();
+    } else if (opengpgExpirationTime === Infinity) {
+      expirationTime = opengpgExpirationTime.toString();
+    } else { // opengpgExpirationTime === null
       expirationTime = null;
     }
 
@@ -75,7 +75,6 @@ class GetGpgKeyInfoService {
       private: key.isPrivate(),
       revoked: await key.isRevoked()
     };
-
     return new ExternalGpgKeyEntity(externalGpgKeyDto);
   }
 

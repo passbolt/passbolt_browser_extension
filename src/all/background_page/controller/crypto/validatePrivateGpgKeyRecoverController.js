@@ -57,6 +57,11 @@ class ValidatePrivateGpgKeyRecoverController {
     assertEncryptedPrivateKey(key);
 
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(key);
+
+    if (!keyInfo.isValid) {
+      console.warn("The private key should be a valid openpgp key.");
+    }
+
     if (keyInfo.revoked) {
       throw new Error(i18n.t("The private key should not be revoked."));
     } else if (keyInfo.isExpired) {

@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+import each from "jest-each";
 import {pgpKeys} from '../../../../../test/fixtures/pgpKeys/keys';
 import {ValidatePrivateGpgKeySetupController} from './validatePrivateGpgKeySetupController';
-import each from "jest-each";
 
 //Used to toggle between a mocked service or the real one
 let mockKeyInfoService = false;
@@ -70,6 +70,13 @@ describe("ValidatePrivateGpgKeySetupController", () => {
     await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The key should be a valid openpgp armored key string."));
   });
 
+  it("Should throw an exception if the key is not a valid openpgp key", async() => {
+    expect.assertions(1);
+    const key = pgpKeys.invalidKeyWithoutChecksum.private;
+    const controller = new ValidatePrivateGpgKeySetupController();
+    await expect(controller.exec(key)).rejects.toStrictEqual(new Error("The private key should be a valid openpgp key."));
+  });
+
   it("Should throw an exception if the key is public", async() => {
     expect.assertions(1);
     const key = pgpKeys.ada.public;
@@ -122,10 +129,11 @@ describe("ValidatePrivateGpgKeySetupController", () => {
     mockedKeyInfo.mockResolvedValue({
       revoked: false,
       isExpired: false,
-      expires: "Never",
+      expires: "Infinity",
       private: true,
       algorithm: "EdDSA",
-      curve: null
+      curve: null,
+      isValid: true
     });
     const dummyKey = pgpKeys.ada.private;
     const controller = new ValidatePrivateGpgKeySetupController();
@@ -138,10 +146,11 @@ describe("ValidatePrivateGpgKeySetupController", () => {
     mockedKeyInfo.mockResolvedValue({
       revoked: false,
       isExpired: false,
-      expires: "Never",
+      expires: "Infinity",
       private: true,
       algorithm: "EdDSA",
-      curve: "custom-curve"
+      curve: "custom-curve",
+      isValid: true
     });
     const dummyKey = pgpKeys.ada.private;
     const controller = new ValidatePrivateGpgKeySetupController();

@@ -100,6 +100,10 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
     const publicKey = await readKeyOrFail(publicArmoredKeyToValidate);
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(publicKey);
 
+    if (!keyInfo.isValid) {
+      throw new Error("The key should be a valid openpgp key.");
+    }
+
     if (keyInfo.algorithm !== GenerateGpgKeyPairOptionsEntity.TYPE_RSA) {
       throw new Error("The key algorithm should be RSA.");
     }
@@ -112,7 +116,7 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
       throw new Error("The key should not be revoked.");
     }
 
-    if (keyInfo.expires !== "Never") {
+    if (keyInfo.expires !== "Infinity") {
       throw new Error("The key should not have an expiry date.");
     }
 

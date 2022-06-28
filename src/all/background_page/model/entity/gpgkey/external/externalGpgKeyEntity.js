@@ -86,7 +86,9 @@ class ExternalGpgKeyEntity extends Entity {
             "format": "date-time"
           }, {
             "type": "string",
-            "pattern": "^Never$"
+            "pattern": "^Infinity$"
+          }, {
+            "type": "null"
           }]
         },
         "created": {
@@ -152,8 +154,11 @@ class ExternalGpgKeyEntity extends Entity {
         delete sanitizedDto.created;
       }
     }
-    // Expires date was not stored in its ISO format.
-    if (dto.expires && dto.expires !== "Never") {
+
+    if (dto.expires === "Never") {
+      sanitizedDto.expires = "Infinity";
+    } else if (dto.expires && dto.expires !== "Infinity") {
+      // Expires date was not stored in its ISO format.
       try {
         const date = new Date(sanitizedDto.expires);
         sanitizedDto.expires = date.toISOString();
@@ -205,10 +210,21 @@ class ExternalGpgKeyEntity extends Entity {
 
   /**
    * Get time at when the key is considered as expired
-   * @returns {string}
+   * @returns {string|null}
    */
   get expires() {
     return this._props.expires;
+  }
+
+  /**
+   * Return true if the key is valid.
+   * A key could be read by openpgp js while not being valid.
+   * For instance, if we remove the checksum part of the key,
+   * it's still readable but it can't be considered as valid.
+   * @returns {boolean}
+   */
+  get isValid() {
+    return this.expires !== null;
   }
 
   /**
@@ -261,11 +277,15 @@ class ExternalGpgKeyEntity extends Entity {
 
   /**
    * Returns true if the key is expired
-   * @returns {boolean}
+   * @returns {boolean|null}
    */
   get isExpired() {
     const expires = this.expires;
-    if (expires === "Never") {
+    if (expires === null) {
+      return null;
+    }
+
+    if (expires === "Infinity") {
       return false;
     }
     const now = Date.now();

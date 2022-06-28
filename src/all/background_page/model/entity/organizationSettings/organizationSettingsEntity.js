@@ -74,6 +74,13 @@ class OrganizationSettingsEntity extends Entity {
         "passbolt": {
           "type": "object"
         },
+        "serverTimeDiff": {
+          "anyOf": [{
+            "type": "integer"
+          }, {
+            "type": "null"
+          }]
+        },
       }
     };
   }
@@ -143,6 +150,26 @@ class OrganizationSettingsEntity extends Entity {
     if (this.isPluginEnabled(name)) {
       return this._props.passbolt.plugins[name];
     }
+  }
+
+  /**
+   * Returns true if the predicted server time is in the past.
+   * @returns {boolean}
+   */
+  isServerInPast() {
+    const serverTimeDiff = this._props.serverTimeDiff || 0;
+    return serverTimeDiff < 0;
+  }
+
+  /**
+   * Returns the predicted server time based on the last organization settings download.
+   * @returns {integer}
+   */
+  get serverTime() {
+    const currentClientTime = new Date();
+    const serverTimeDiff = this._props.serverTimeDiff || 0;
+    const serverTime = new Date(currentClientTime.getTime() + serverTimeDiff);
+    return serverTime.getTime();
   }
 
   /*

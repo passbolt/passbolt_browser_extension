@@ -87,6 +87,9 @@ class GenerateGpgKeyPairOptionsEntity extends Entity {
         "keySize": {
           "type": "integer",
           "minLength": this.DEFAULT_KEY_SIZE
+        },
+        "date": {
+          "type": "integer"
         }
       }
     };
@@ -106,7 +109,8 @@ class GenerateGpgKeyPairOptionsEntity extends Entity {
       userIDs: [this.userId],
       rsaBits: this.rsaBits,
       passphrase: this.passphrase,
-      type: this.type
+      type: this.type,
+      date: this.date,
     };
   }
 
@@ -161,6 +165,16 @@ class GenerateGpgKeyPairOptionsEntity extends Entity {
    */
   get passphrase() {
     return this._props.passphrase;
+  }
+
+  /**
+   * Get the creation date to be used for the key generation
+   * @returns {Date}
+   */
+  get date() {
+    return this._props.date !== undefined ?
+      new Date(this._props.date) :
+      new Date();
   }
 
   /*

@@ -13,10 +13,12 @@
  */
 
 import {AccountRecoveryGenerateOrganizationKeyController} from "./accountRecoveryGenerateOrganizationKeyController";
+import {MockExtension} from "../../../../../test/mocks/mockExtension";
 
 describe("AccountRecoveryGenerateOrganizationKeyController", () => {
   describe("AccountRecoveryGenerateOrganizationKeyController::exec", () => {
     it("Should assert provided generate key pair dto is valid.", async() => {
+      await MockExtension.withConfiguredAccount();
       const controller = new AccountRecoveryGenerateOrganizationKeyController();
       const promise = controller.exec();
 
@@ -25,6 +27,7 @@ describe("AccountRecoveryGenerateOrganizationKeyController", () => {
     });
 
     it("Should generate an account recovery organization key pair.", async() => {
+      await MockExtension.withConfiguredAccount();
       const controller = new AccountRecoveryGenerateOrganizationKeyController();
       const generateKeyPairDto = {
         name: "key name",

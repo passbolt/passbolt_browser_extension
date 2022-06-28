@@ -17,4 +17,4 @@
  * @param {Object} body The response body
  * @returns {Promise<string>} The response serialized in JSON.
  */
-exports.mockApiResponse = (body = {}) => Promise.resolve(JSON.stringify({header: {}, body: body}));
+exports.mockApiResponse = (body = {}, header = {}) => Promise.resolve(JSON.stringify({header: header, body: body}));

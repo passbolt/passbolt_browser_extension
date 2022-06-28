@@ -19,12 +19,14 @@ import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 
 describe("GenerateGpgKeyPair service", () => {
   it('should generate a key pair according to the given parameters', async() => {
-    expect.assertions(16);
+    expect.assertions(18);
+    const keyCreationDate = new Date(0);
     const generateGpgKeyPairOptionsDto =  {
       name: "Jean-Jacky",
       email: "jj@passbolt.com",
       passphrase: "ultra-secure",
-      keySize: 4096
+      keySize: 4096,
+      date: keyCreationDate.getTime(),
     };
 
     const generateGpgKeyPairOptionsEntity = new GenerateGpgKeyPairOptionsEntity(generateGpgKeyPairOptionsDto);
@@ -41,6 +43,7 @@ describe("GenerateGpgKeyPair service", () => {
     expect(publicKeyInfo.private).toBe(false);
     expect(publicKeyInfo.revoked).toBe(false);
     expect(publicKeyInfo.expires).toBe("Infinity");
+    expect(publicKeyInfo.created).toBe(keyCreationDate.toISOString());
 
     const privateKey = await readKeyOrFail(keyPair.privateKey.armoredKey);
     const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKey);
@@ -50,6 +53,50 @@ describe("GenerateGpgKeyPair service", () => {
     expect(privateKeyInfo.private).toBe(true);
     expect(privateKeyInfo.revoked).toBe(false);
     expect(privateKeyInfo.expires).toBe("Infinity");
+    expect(privateKeyInfo.created).toBe(keyCreationDate.toISOString());
+
+    const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(privateKey, generateGpgKeyPairOptionsDto.passphrase);
+    expect(decryptedPrivateKey).not.toBeNull();
+  }, 50 * 1000);
+
+  it('should generate a key pair according to the given parameters even without creation date set', async() => {
+    jest.useFakeTimers();
+    const currentTime = new Date();
+    currentTime.setMilliseconds(0);
+    jest.setSystemTime(currentTime);
+    expect.assertions(18);
+    const generateGpgKeyPairOptionsDto =  {
+      name: "Jean-Jacky",
+      email: "jj@passbolt.com",
+      passphrase: "ultra-secure",
+      keySize: 4096,
+    };
+
+    const generateGpgKeyPairOptionsEntity = new GenerateGpgKeyPairOptionsEntity(generateGpgKeyPairOptionsDto);
+    const keyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);
+    expect(keyPair).not.toBeNull();
+    expect(keyPair.public_key).not.toBeNull();
+    expect(keyPair.private_key).not.toBeNull();
+
+    const publicKey = await readKeyOrFail(keyPair.publicKey.armoredKey);
+    const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(publicKey);
+    expect(publicKeyInfo.algorithm).toBe("rsa");
+    expect(publicKeyInfo.userIds[0]).toEqual({name: generateGpgKeyPairOptionsDto.name, email: generateGpgKeyPairOptionsDto.email});
+    expect(publicKeyInfo.length).toBe(generateGpgKeyPairOptionsDto.keySize);
+    expect(publicKeyInfo.private).toBe(false);
+    expect(publicKeyInfo.revoked).toBe(false);
+    expect(publicKeyInfo.expires).toBe("Infinity");
+    expect(publicKeyInfo.created).toBe(currentTime.toISOString());
+
+    const privateKey = await readKeyOrFail(keyPair.privateKey.armoredKey);
+    const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKey);
+    expect(privateKeyInfo.algorithm).toBe("rsa");
+    expect(privateKeyInfo.userIds[0]).toEqual({name: generateGpgKeyPairOptionsDto.name, email: generateGpgKeyPairOptionsDto.email});
+    expect(privateKeyInfo.length).toBe(generateGpgKeyPairOptionsDto.keySize);
+    expect(privateKeyInfo.private).toBe(true);
+    expect(privateKeyInfo.revoked).toBe(false);
+    expect(privateKeyInfo.expires).toBe("Infinity");
+    expect(privateKeyInfo.created).toBe(currentTime.toISOString());
 
     const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(privateKey, generateGpgKeyPairOptionsDto.passphrase);
     expect(decryptedPrivateKey).not.toBeNull();

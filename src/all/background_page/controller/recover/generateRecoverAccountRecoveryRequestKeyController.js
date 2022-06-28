@@ -14,6 +14,7 @@
 
 const {GenerateGpgKeyPairOptionsEntity} = require("../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity");
 const {GenerateGpgKeyPairService} = require("../../service/crypto/generateGpgKeyPairService");
+const {GetGpgKeyCreationDateService} = require("../../service/crypto/getGpgKeyCreationDateService");
 const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
 
 const ACCOUNT_RECOVERY_REQUEST_KEY_SIZE = 4096;
@@ -56,7 +57,8 @@ class GenerateRecoverAccountRecoveryRequestKeyController {
       name: 'Account recovery request key',
       email: this.account?.username,
       passphrase: generateGpgKeyPairDto?.passphrase,
-      keySize: ACCOUNT_RECOVERY_REQUEST_KEY_SIZE
+      keySize: ACCOUNT_RECOVERY_REQUEST_KEY_SIZE,
+      date: await GetGpgKeyCreationDateService.getDate(),
     };
     const generateGpgKeyPairOptionsEntity = new GenerateGpgKeyPairOptionsEntity(dto);
     const externalGpgKeyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);

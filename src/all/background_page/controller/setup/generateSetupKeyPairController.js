@@ -14,6 +14,7 @@
 
 const {GenerateGpgKeyPairOptionsEntity} = require('../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity');
 const {GenerateGpgKeyPairService} = require("../../service/crypto/generateGpgKeyPairService");
+const {GetGpgKeyCreationDateService} = require('../../service/crypto/getGpgKeyCreationDateService');
 const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 /**
@@ -58,7 +59,7 @@ class GenerateSetupKeyPairController {
    * @returns {Promise<void>}
    */
   async exec(passphraseDto) {
-    const generateGpgKeyPairOptionsEntity = this._buildGenerateKeyPairOptionsEntity(passphraseDto.passphrase);
+    const generateGpgKeyPairOptionsEntity = await this._buildGenerateKeyPairOptionsEntity(passphraseDto.passphrase);
     const keyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);
     const generatedPublicKey = await readKeyOrFail(keyPair.publicKey.armoredKey);
 
@@ -73,15 +74,16 @@ class GenerateSetupKeyPairController {
    * Builds a default GenerateGpgKeyPairOptionsEntity with the given passphrase.
    *
    * @param {string} passphrase The passphrase used to protect the key.
-   * @returns {GenerateGpgKeyPairOptionsEntity}
+   * @returns {Promise<GenerateGpgKeyPairOptionsEntity>}
    * @throw {EntityValidationError} if the generate key pair entity cannot be created with the given data.
    * @private
    */
-  _buildGenerateKeyPairOptionsEntity(passphrase) {
+  async _buildGenerateKeyPairOptionsEntity(passphrase) {
     return new GenerateGpgKeyPairOptionsEntity({
       name: `${this.account.firstName} ${this.account.lastName}`,
       email: this.account.username,
       passphrase: passphrase,
+      date: await GetGpgKeyCreationDateService.getDate(),
     });
   }
 }

@@ -28,6 +28,7 @@ describe("GenerateGpgKeyPairOptionsEntity entity", () => {
       passphrase: "ultra-secure",
       keySize: 4096,
       type: "rsa",
+      date: (new Date()).getTime(),
     };
     const entity = new GenerateGpgKeyPairOptionsEntity(dto);
     expect(entity.toDto()).toStrictEqual(dto);

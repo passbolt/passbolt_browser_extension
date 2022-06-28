@@ -45,7 +45,13 @@ class OrganizationSettingsService extends AbstractService {
    */
   async find() {
     const response = await this.apiClient.findAll();
-    return response.body;
+    const body = JSON.parse(JSON.stringify(response.body));
+    body.serverTimeDiff = null;
+    if (response.header.servertime) {
+      const currentTime = new Date();
+      body.serverTimeDiff = (response.header.servertime * 1000) - currentTime.getTime();
+    }
+    return body;
   }
 }
 

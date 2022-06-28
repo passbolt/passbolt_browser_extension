@@ -18,10 +18,12 @@ import {
   startAccountRecoverDto
 } from "../../model/entity/account/accountRecoverEntity.test.data";
 import {AccountRecoverEntity} from "../../model/entity/account/accountRecoverEntity";
+import {MockExtension} from "../../../../../test/mocks/mockExtension";
 
 describe("GenerateRecoverAccountRecoveryRequestKeyController", () => {
   describe("GenerateRecoverAccountRecoveryRequestKeyController::exec", () => {
     it("Should assert provided generate key pair dto is valid.", async() => {
+      await MockExtension.withConfiguredAccount();
       const account = new AccountRecoverEntity(initialAccountRecoverDto());
       const controller = new GenerateRecoverAccountRecoveryRequestKeyController(null, null, account);
 
@@ -32,6 +34,7 @@ describe("GenerateRecoverAccountRecoveryRequestKeyController", () => {
     });
 
     it("Should generate a key pair.", async() => {
+      await MockExtension.withConfiguredAccount();
       const account = new AccountRecoverEntity(startAccountRecoverDto());
       const controller = new GenerateRecoverAccountRecoveryRequestKeyController(null, null, account);
 

@@ -18,10 +18,12 @@ import {EntityValidationError} from "../../model/entity/abstract/entityValidatio
 import {startAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
 import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
 import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
+import {MockExtension} from "../../../../../test/mocks/mockExtension";
 
 describe("GenerateSetupKeyPairController", () => {
   describe("GenerateSetupKeyPairController::exec", () => {
     it("Should throw an exception if the passed DTO is not valid.", async() => {
+      await MockExtension.withConfiguredAccount();
       const account = new AccountSetupEntity(startAccountSetupDto());
       const runtimeMemory = {};
       const controller = new GenerateSetupKeyPairController(null, null, account, runtimeMemory);
@@ -58,6 +60,7 @@ describe("GenerateSetupKeyPairController", () => {
 
     it("Should generate a gpg key pair and update the account accordingly.", async() => {
       expect.assertions(12);
+      await MockExtension.withConfiguredAccount();
       const generateKeyPairDto = {passphrase: "What a great passphrase!"};
       const account = new AccountSetupEntity(startAccountSetupDto());
       const runtimeMemory = {};

@@ -41,7 +41,7 @@ describe("AuthVerifyServerKeyController", () => {
           }
         ],
         "fingerprint": "177C1516F9C1957ABC157CA592D946CDEF1F7583",
-        "expires": "Never",
+        "expires": "Infinity",
         "created": "2021-01-20T13:39:14.000Z",
         "algorithm": "rsa",
         "length": 2048,

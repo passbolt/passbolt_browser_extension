@@ -40,7 +40,7 @@ describe("GenerateGpgKeyPair service", () => {
     expect(publicKeyInfo.length).toBe(generateGpgKeyPairOptionsDto.keySize);
     expect(publicKeyInfo.private).toBe(false);
     expect(publicKeyInfo.revoked).toBe(false);
-    expect(publicKeyInfo.expires).toBe("Never");
+    expect(publicKeyInfo.expires).toBe("Infinity");
 
     const privateKey = await readKeyOrFail(keyPair.privateKey.armoredKey);
     const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKey);
@@ -49,7 +49,7 @@ describe("GenerateGpgKeyPair service", () => {
     expect(privateKeyInfo.length).toBe(generateGpgKeyPairOptionsDto.keySize);
     expect(privateKeyInfo.private).toBe(true);
     expect(privateKeyInfo.revoked).toBe(false);
-    expect(privateKeyInfo.expires).toBe("Never");
+    expect(privateKeyInfo.expires).toBe("Infinity");
 
     const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(privateKey, generateGpgKeyPairOptionsDto.passphrase);
     expect(decryptedPrivateKey).not.toBeNull();

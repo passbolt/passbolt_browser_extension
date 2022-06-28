@@ -25,7 +25,7 @@ exports.ExternalGpgKeyEntityFixtures = {
       name: "Ada Lovelace"
     }],
     fingerprint: pgpKeys.ada.fingerprint,
-    expires: "Never",
+    expires: "Infinity",
     created: "2015-08-09T12:48:31.000Z",
     algorithm: "RSA",
     length: 4096,
@@ -40,7 +40,7 @@ exports.ExternalGpgKeyEntityFixtures = {
       name: "Ada Lovelace"
     }],
     fingerprint: pgpKeys.ada.fingerprint,
-    expires: "Never",
+    expires: "Infinity",
     created: "2015-08-09T12:48:31.000Z",
     algorithm: "RSA",
     length: 4096,
@@ -55,7 +55,7 @@ exports.ExternalGpgKeyEntityFixtures = {
       email: "fake-email.com"
     }],
     fingerprint: "03f60e958f4cb29723acdf761353b5b15d9b054f03f60e958f4cb29723acdf761353b5b15d9b054f",
-    expires: "Never",
+    expires: "Infinity",
     created: null,
     algorithm: "",
     length: "4096",
@@ -71,7 +71,7 @@ exports.ExternalGpgKeyEntityFixtures = {
       name: "Ada Lovelace"
     }],
     fingerprint: pgpKeys.ada.fingerprint,
-    expires: "Never",
+    expires: "Infinity",
     created: "2015-08-09T12:48:31.000Z",
     algorithm: "RSA",
     length: 4096,
@@ -100,7 +100,7 @@ exports.ExternalGpgKeyEntityFixtures = {
     key_id: pgpKeys.anita.key_id,
     user_ids: pgpKeys.anita.user_ids,
     fingerprint: pgpKeys.anita.fingerprint,
-    expires: "Never",
+    expires: "Infinity",
     created: pgpKeys.anita.created,
     algorithm: pgpKeys.anita.algorithm,
     length: pgpKeys.anita.length,

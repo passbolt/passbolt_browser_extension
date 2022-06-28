@@ -67,6 +67,7 @@
   "The message should be a valid openpgp message.": "The message should be a valid openpgp message.",
   "The message should be of type string.": "The message should be of type string.",
   "The passphrase should be a valid UTF8 string.": "The passphrase should be a valid UTF8 string.",
+  "The private key should be a valid openpgp key.": "The private key should be a valid openpgp key.",
   "The private key should be decrypted.": "The private key should be decrypted.",
   "The private key should be encrypted.": "The private key should be encrypted.",
   "The private key should not be expired.": "The private key should not be expired.",

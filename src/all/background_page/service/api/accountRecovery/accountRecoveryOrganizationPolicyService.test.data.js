@@ -20,5 +20,6 @@ exports.dummyData = {
   expiredKey: pgpKeys.lynne.public,
   existingKey: pgpKeys.ada.public,
   serverKey: pgpKeys.user76.public,
+  invalidKey: pgpKeys.invalidKeyWithoutChecksum.private,
   notAKey: ":D"
 };

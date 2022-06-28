@@ -54,7 +54,8 @@ describe("Account recovery validate public key service", () => {
   });
 
   it("should refuse an invalid key", async() => {
-    expect.assertions(5);
+    expect.assertions(6);
+    await checkError(dummyData.invalidKey, "The key should be a valid openpgp key.");
     await checkError(dummyData.privateKey, "The key should be public.");
     await checkError(dummyData.weakKey, "The key should be at least 4096 bits.");
     await checkError(dummyData.expiredKey, "The key should not have an expiry date.");

@@ -28,7 +28,8 @@ const {
   ecc_secp256k1KeyDto,
   ecc_brainpoolp256r1KeyDto,
   ecc_brainpoolp384r1KeyDto,
-  ecc_brainpoolp512r1KeyDto
+  ecc_brainpoolp512r1KeyDto,
+  invalidKeyDto
 } = require('./getGpgKeyInfoService.test.data');
 const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
 const {pgpKeys} = require("../../../../../test/fixtures/pgpKeys/keys");
@@ -137,5 +138,16 @@ describe("GpgKeyInfo service", () => {
       delete dto.armored_key;
       expect(keyInfoDto).toEqual(dto);
     }
+  });
+
+  it("should accept keys with a null expiry date", async() => {
+    const dto = invalidKeyDto();
+    const key = await readKeyOrFail(dto.armored_key);
+    const keyInfo = await GetGpgKeyInfoService.getKeyInfo(key);
+    const keyInfoDto = keyInfo.toDto();
+    //Remove the armored_key as OpenpgpJS produced different armors than gpg cli.
+    delete keyInfoDto.armored_key;
+    delete dto.armored_key;
+    expect(keyInfoDto).toEqual(dto);
   });
 });

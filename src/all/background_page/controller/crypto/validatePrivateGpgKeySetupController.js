@@ -64,11 +64,13 @@ class ValidatePrivateGpgKeySetupController {
 
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKey);
 
-    if (keyInfo.revoked) {
+    if (!keyInfo.isValid) {
+      throw new Error(i18n.t("The private key should be a valid openpgp key."));
+    } else if (keyInfo.revoked) {
       throw new Error(i18n.t("The private key should not be revoked."));
     } else if (keyInfo.isExpired) {
       throw new Error(i18n.t("The private key should not be expired."));
-    } else if (keyInfo.expires !== "Never") {
+    } else if (keyInfo.expires !== "Infinity") {
       throw new Error(i18n.t("The private key should not have an expiry date."));
     }
 

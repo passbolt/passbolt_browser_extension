@@ -124,13 +124,17 @@ class GroupsUpdateController {
   async encryptSecrets(privateKey, neededSecretsCollection, decryptedSecrets) {
     const secrets = new SecretsCollection([]);
     const items = neededSecretsCollection.items;
+    let userId, userPublicArmoredKey, userPublicKey;
     for (const i in items) {
       const neededSecret = items[i];
       const resourceId = neededSecret.resourceId;
-      const userId = neededSecret.userId;
+      // This check implies that neededSecret are sorted by userId to be the most efficient
+      if (userId !== neededSecret.userId) {
+        userId = neededSecret.userId;
+        userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
+        userPublicKey = await readKeyOrFail(userPublicArmoredKey);
+      }
       await progressController.update(this.worker, this.progress++, i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
-      const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
-      const userPublicKey = await readKeyOrFail(userPublicArmoredKey);
       const secretDto = {
         resource_id: resourceId,
         user_id: userId,

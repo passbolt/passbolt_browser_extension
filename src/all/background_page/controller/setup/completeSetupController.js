@@ -69,9 +69,7 @@ class CompleteSetupController {
     if (!app.pageMods.WebIntegration._pageMod) {
       app.pageMods.WebIntegration.init();
     }
-    if (!app.pageMods.AuthBootstrap._pageMod) {
-      app.pageMods.AuthBootstrap.init();
-    }
+    app.pageMods.AuthBootstrap.init();
   }
 }
 

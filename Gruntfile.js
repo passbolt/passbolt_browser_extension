@@ -47,7 +47,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-browserify');
-  grunt.loadNpmTasks('passbolt-i18next-scanner');
 
   grunt.registerTask('default', ['bundle']);
   grunt.registerTask('pre-dist', ['copy:vendors', 'copy:styleguide']);
@@ -70,7 +69,7 @@ module.exports = function (grunt) {
   grunt.registerTask('bg-chrome-debug', ['copy:background_page', 'browserify:background_page']);
   grunt.registerTask('react-chrome-debug', ['copy:content_scripts', 'copy:data', 'copy:locales', 'shell:build_webpack_apps_debug']);
 
-  grunt.registerTask('externalize-locale-strings', ['i18next']);
+  grunt.registerTask('externalize-locale-strings', ['shell:externalize']);
 
   /**
    * Main grunt tasks configuration
@@ -300,6 +299,12 @@ module.exports = function (grunt) {
           'webpack --env debug=true --config webpack-data.download.config.js'
         ].join(' && ')
       },
+      // Execute the externalization command
+      externalize: {
+        command: [
+          'npm run externalize'
+        ].join(' && ')
+      },
       // Execute the eslint command
       eslint: {
         command: [
@@ -365,40 +370,6 @@ module.exports = function (grunt) {
         ].join(' && ')
       }
     },
-    /**
-     * Extract translations through the JS files
-     */
-    i18next: {
-      externalize: {
-        src: 'src/**/*.{js,html}',
-        dest: 'src',
-        options: {
-          lngs: ['en-UK'],
-          func: {
-            list: ['this.translate', 'i18n.t'], // function us  e to parse and find new translation
-            extensions: ['.js', '.jsx']
-          },
-          trans: {
-            component: 'Trans',
-            i18nKey: 'i18nKey',
-            defaultsKey: 'defaults',
-            extensions: ['.js', '.jsx'],
-            fallbackKey: true
-          },
-          nsSeparator: false,
-          keySeparator: false,
-          defaultNs: 'common',
-          resource: {
-            loadPath: 'src/all/locales/{{lng}}/{{ns}}.json',
-            savePath: 'all/locales/{{lng}}/{{ns}}.json'
-          },
-          removeUnusedKeys: true,
-          sort: true,
-          debug: false,
-        }
-      }
-    },
-
     /**
      * Watch task run predefined tasks whenever watched file patterns are added, changed or deleted
      * see. https://github.com/gruntjs/grunt-contrib-watch

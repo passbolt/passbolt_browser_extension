@@ -44,32 +44,32 @@ export const anonymousOrganizationSettings = (data = {}) => {
         "locale": {
           "options": [
             {
-              "locale": "de-DE",
-              "label": "Deutsch"
-            },
-            {
-              "locale": "en-UK",
-              "label": "English"
-            },
-            {
-              "locale": "fr-FR",
-              "label": "Fran\u00e7ais"
-            },
-            {
-              "locale": "ja-JP",
-              "label": "\u65e5\u672c\u8a9e"
-            },
-            {
-              "locale": "nl-NL",
-              "label": "Nederlands"
-            },
-            {
-              "locale": "pl-PL",
-              "label": "Polski"
-            },
-            {
-              "locale": "sv-SE",
-              "label": "Svenska"
+              locale: "de-DE",
+              label: "Deutsch"
+            }, {
+              locale: "en-UK",
+              label: "English"
+            }, {
+              locale: "es-ES",
+              label: "Español"
+            }, {
+              locale: "fr-FR",
+              label: "Français"
+            }, {
+              locale: "ja-JP",
+              label: "日本語"
+            }, {
+              locale: "lt-LT",
+              label: "Lietuvių"
+            }, {
+              locale: "nl-NL",
+              label: "Nederlands"
+            }, {
+              locale: "pl-PL",
+              label: "Polski"
+            }, {
+              locale: "sv-SE",
+              label: "Svenska"
             }
           ]
         },

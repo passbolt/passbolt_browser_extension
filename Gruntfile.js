@@ -302,7 +302,7 @@ module.exports = function (grunt) {
       // Execute the externalization command
       externalize: {
         command: [
-          'npm run externalize'
+          'npm run i18n:externalize'
         ].join(' && ')
       },
       // Execute the eslint command

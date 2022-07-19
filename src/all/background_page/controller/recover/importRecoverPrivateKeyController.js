@@ -76,6 +76,7 @@ class ImportRecoverPrivateKeyController {
     try {
       await this.legacyAuthModel.verify(domain, serverPublicArmoredKey, fingerprint);
     } catch (error) {
+      console.error(error);
       // @todo Handle not controlled errors, such as timeout error...
       throw new GpgKeyError(i18n.t('This key does not match any account.'));
     }

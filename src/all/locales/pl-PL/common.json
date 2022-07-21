@@ -67,7 +67,7 @@
   "The message should be a valid openpgp message.": "Wiadomość powinna być prawidłową wiadomością openpgp.",
   "The message should be of type string.": "Wiadomość powinna być ciągiem.",
   "The passphrase should be a valid UTF8 string.": "Hasło dostępu powinno być prawidłowym ciągiem UTF-8.",
-  "The private key should be a valid openpgp key.": "The private key should be a valid openpgp key.",
+  "The private key should be a valid openpgp key.": "Klucz prywatny powinien być prawidłowym kluczem openpgp.",
   "The private key should be decrypted.": "Klucz prywatny powinien być odszyfrowany.",
   "The private key should be encrypted.": "Klucz prywatny powinien być zaszyfrowany.",
   "The private key should not be expired.": "Klucz prywatny nie powinien być nieważny.",

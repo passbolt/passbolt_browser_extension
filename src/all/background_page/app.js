@@ -56,6 +56,7 @@ events.accountRecovery = require('./event/accountRecoveryEvents');
 events.informCallToAction = require('./event/informCallToActionEvents');
 events.informMenu = require('./event/informMenuEvents');
 events.webIntegration = require('./event/webIntegrationEvents');
+events.publicWebsiteSignIn = require('./event/publicWebsiteSignInEvents');
 
 exports.events = events;
 
@@ -173,5 +174,11 @@ pageMods.InFormMenuCTA = require('./pagemod/inFormCallToActionPagemod').InFormCa
  * This pagemod drives the inform menu iframe tool
  */
 pageMods.InFormMenu = require('./pagemod/informMenuPagemod').InFormMenu;
+
+/*
+ * This pagemod drives the sign in extension
+ * It updates the sign in buttons on the passbolt.com pages.
+ */
+pageMods.PublicWebsiteSignIn = require('./pagemod/publicWebsiteSignInPagemod').PublicWebsiteSignIn;
 
 exports.pageMods = pageMods;

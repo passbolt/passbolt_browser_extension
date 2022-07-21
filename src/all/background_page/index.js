@@ -78,6 +78,8 @@ const main = async function() {
     pageMods.WebIntegration.init();
     // Auth pagemod init can also be triggered by setup and user events (e.g. when config change)
     pageMods.AuthBootstrap.init();
+    // Sign In pagemod init can also be triggered by setup and user events (e.g. when config change)
+    pageMods.PublicWebsiteSignIn.init();
 
     /*
      * App pagemod init is generally triggered after a successful login

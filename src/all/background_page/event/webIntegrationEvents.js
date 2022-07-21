@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 const {WebIntegrationController} = require("../controller/webIntegration/webIntegrationController");
-const User = require('../model/user').User;
 
 /**
  * Listens the web integration events
@@ -26,16 +25,6 @@ const listen = function(worker) {
   worker.port.on('passbolt.web-integration.autosave', async resourceToSave => {
     const webIntegrationController = new WebIntegrationController(worker);
     await webIntegrationController.autosave(resourceToSave);
-  });
-
-  /*
-   * Check if the browser integration is configured.
-   * @listens passbolt.addon.is-configured
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.addon.is-configured', requestId => {
-    const user = User.getInstance();
-    worker.port.emit(requestId, 'SUCCESS', user.isValid());
   });
 };
 

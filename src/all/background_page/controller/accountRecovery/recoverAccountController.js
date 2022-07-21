@@ -196,6 +196,9 @@ class RecoverAccountController {
       app.pageMods.WebIntegration.init();
     }
     app.pageMods.AuthBootstrap.init();
+    if (!app.pageMods.PublicWebsiteSignIn._pageMod) {
+      app.pageMods.PublicWebsiteSignIn.init();
+    }
   }
 }
 

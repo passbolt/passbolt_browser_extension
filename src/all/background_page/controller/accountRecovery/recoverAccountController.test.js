@@ -53,11 +53,12 @@ describe("RecoverAccountController", () => {
       // Mock pagemods to assert the complete start the auth and inform menu pagemods.
       app.pageMods.WebIntegration.init = jest.fn();
       app.pageMods.AuthBootstrap.init = jest.fn();
+      app.pageMods.PublicWebsiteSignIn.init = jest.fn();
 
       const controller = new RecoverAccountController(null, null, apiClientOptions, accountRecovery);
       await controller.exec(passphrase);
 
-      expect.assertions(12);
+      expect.assertions(13);
 
       // The user account should have been configured (legacy).
       const user = User.getInstance().get();
@@ -82,6 +83,7 @@ describe("RecoverAccountController", () => {
       // The auth and web integration pagemods should have been initialized.
       expect(app.pageMods.WebIntegration.init).toHaveBeenCalled();
       expect(app.pageMods.AuthBootstrap.init).toHaveBeenCalled();
+      expect(app.pageMods.PublicWebsiteSignIn.init).toHaveBeenCalled();
 
       // The account recovery should been removed from the account local storage.
       expect(await AccountLocalStorage.get()).toHaveLength(0);

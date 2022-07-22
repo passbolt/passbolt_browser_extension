@@ -3,6 +3,68 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [3.7.0] - 2022-07-26
+### Added
+- PB-15305 As LU I can access the mobile configuration page from the profile dropdown
+- PB-16925 As AN I can access the sign in form of my organization from passbolt.com
+- PB-17094 Mark account recovery feature as stable
+- PB-17095 As a user I can use passbolt in Spanish
+- PB-17095 As a user I can use passbolt in Lituanian
+
+### Improved
+- PB-14103 As a user I want to be able to use the autofill on dzb-bank.de
+- PB-14865 As LU I should see the warning messages on all dialogs with the same design
+- PB-16560 As LU I should be able to read textarea content of dialog without zooming it
+- PB-16641 As AD I want to have a clear error message when I import an account recovery organization key having an expiry date
+- PB-16665 As a user I should see proper error message when an unexpected error happened in the quickaccess
+- PB-16695 As a translator I can provide translation for languages that have multiple plurals
+- PB-16937 As group manager I want to see a dialog skeleton when I'm editing a group having a large number of members
+- PB-16942 Improve UI performance while adding a user to an existing group
+- PB-16944 Improve UI performance while sharing multiple passwords in bulk
+- PB-16991 Improve UI performance of the create group dialog
+- PB-16995 Improve UI performance while adding a user or group to the list of people to share a password with
+- PB-16998 As GM selecting a user to add to a group, I should see the latest member added
+- PB-16703 As a user I can autofill my username on ovh.com
+- PB-16757 As a user on a screen with low dpi I do not want to have a blur effect on the text
+- PB-16759 As a user I want to see a coherent UI on a screen with a large resolution
+
+### Fixed
+- PB-15049 As a user I should be able to complete the setup even if my machine and the server do not have a synchronized time
+- PB-15247 As a user I should not see passbolt setup/recover starting on pages having similar urls
+- PB-16169 As LU I want to see the feedback card call to actions aligned to the left
+- PB-16640 As AD I should be able to subscribe to the account recovery program right after configuring it for the organization
+- PB-16663 Misc style fixes on account recovery download generated key dialog
+- PB-16763  As LU I should be able to change my passphrase and download the new recovery kit
+- PB-16769 As LU I should be able to save passwords with an uri greater than 1024 from the in-form integration
+- PB-16793 Misc style fixes on account recovery administration page
+- PB-16807 As a user I should see the spinner Icon in the Autocomplete component
+- PB-16840 As a user I should not get an error if a gpg key is stored in the local storage with a gpg key expiry set to null
+- PB-16841 As AD I should not be able to import a public organization key having an expiration date
+- PB-16883 As AD I want to be able to select Groups parent group and Users parent group fields in the User Directory interface
+- PB-16926 As LU I should be able to see the right 'Modified' date property in the user sidebar
+- PB-16928 As a translator I should not have strings with unpredictable variables to translate
+- PB-17012 As a user if my domain changed, I should still see the login form after completing a setup, recover or an account recovery 
+- PB-17013 As LU I should see the pre-loading / skeleton style properly
+- PB-17090 As a contributor I want to be able to switch theme in storybook
+
+### Maintenance
+- PB-13559 CI to report on code coverage
+- PB-13887 Prepare theme colors file to welcome the theme customization feature
+- PB-14271 Follow-up add className disabled for input text div
+- PB-14876 Add test for browser integration scroll parent on iframe
+- PB-16770 Update React to version 17
+- PB-16994 Remove check extension configured for browser integration bootstrap
+- PB-17029 As contributor I want to see a storybook home page
+- PB-17032 Remove translatable strings that are duplicated
+- PB-17071 Log verify gpg key error on authentication screen
+
+### Security
+- PB-15259 As LU sharing a resource/folder I want to see a unified tooltip that informs me about a user fingerprint
+- PB-16141 As AN importing a key during the setup, I should be warned when my passphrase is part of a data breach
+- PB-16152 As AD I can not generate an account recovery key with a password which is part of a data breach
+- PB-16154 As AN I cannot bypass the data breach assertion while completing the setup
+- PB-16595 As AD reviewing an account recovery request I should get an error if the domain stored in the encrypted password data is not similar to mine
+
 ## [3.6.2] - 2022-06-02
 ### Improved
 - PB-16651 As LU I want to get a clear message if I enroll to a disabled account recovery program
@@ -840,7 +902,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.6.2...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.0...HEAD
+[3.7.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.6.2...v3.7.0
 [3.6.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.6.1...v3.6.2
 [3.6.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.6.0...v3.6.1
 [3.6.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.5.2...v3.6.0

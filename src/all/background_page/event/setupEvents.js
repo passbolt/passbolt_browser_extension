@@ -65,7 +65,7 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.setup.generate-key', async(requestId, generateGpgKeyDto) => {
-    const controller = new GenerateSetupKeyPairController(worker, requestId, account, runtimeMemory);
+    const controller = new GenerateSetupKeyPairController(worker, requestId, apiClientOptions, account, runtimeMemory);
     await controller._exec(generateGpgKeyDto);
   });
 

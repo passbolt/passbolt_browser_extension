@@ -19,6 +19,7 @@ import {startAccountSetupDto} from "../../model/entity/account/accountSetupEntit
 import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
 import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
 import {MockExtension} from "../../../../../test/mocks/mockExtension";
+import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 
 describe("GenerateSetupKeyPairController", () => {
   describe("GenerateSetupKeyPairController::exec", () => {
@@ -26,7 +27,7 @@ describe("GenerateSetupKeyPairController", () => {
       await MockExtension.withConfiguredAccount();
       const account = new AccountSetupEntity(startAccountSetupDto());
       const runtimeMemory = {};
-      const controller = new GenerateSetupKeyPairController(null, null, account, runtimeMemory);
+      const controller = new GenerateSetupKeyPairController(null, null, defaultApiClientOptions(), account, runtimeMemory);
 
       const scenarios = [
         {dto: null, expectedError: TypeError},
@@ -64,7 +65,7 @@ describe("GenerateSetupKeyPairController", () => {
       const generateKeyPairDto = {passphrase: "What a great passphrase!"};
       const account = new AccountSetupEntity(startAccountSetupDto());
       const runtimeMemory = {};
-      const controller = new GenerateSetupKeyPairController(null, null, account, runtimeMemory);
+      const controller = new GenerateSetupKeyPairController(null, null, defaultApiClientOptions(), account, runtimeMemory);
 
       await controller.exec(generateKeyPairDto);
       await expect(account.userKeyFingerprint).not.toBeNull();

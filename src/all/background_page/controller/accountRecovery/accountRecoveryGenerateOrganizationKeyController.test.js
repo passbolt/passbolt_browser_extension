@@ -14,12 +14,13 @@
 
 import {AccountRecoveryGenerateOrganizationKeyController} from "./accountRecoveryGenerateOrganizationKeyController";
 import {MockExtension} from "../../../../../test/mocks/mockExtension";
+import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 
 describe("AccountRecoveryGenerateOrganizationKeyController", () => {
   describe("AccountRecoveryGenerateOrganizationKeyController::exec", () => {
     it("Should assert provided generate key pair dto is valid.", async() => {
       await MockExtension.withConfiguredAccount();
-      const controller = new AccountRecoveryGenerateOrganizationKeyController();
+      const controller = new AccountRecoveryGenerateOrganizationKeyController(null, null, defaultApiClientOptions());
       const promise = controller.exec();
 
       expect.assertions(1);
@@ -28,7 +29,7 @@ describe("AccountRecoveryGenerateOrganizationKeyController", () => {
 
     it("Should generate an account recovery organization key pair.", async() => {
       await MockExtension.withConfiguredAccount();
-      const controller = new AccountRecoveryGenerateOrganizationKeyController();
+      const controller = new AccountRecoveryGenerateOrganizationKeyController(null, null, defaultApiClientOptions());
       const generateKeyPairDto = {
         name: "key name",
         email: "key@email.com",

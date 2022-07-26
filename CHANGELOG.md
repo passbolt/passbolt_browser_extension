@@ -43,9 +43,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-16883 As AD I want to be able to select Groups parent group and Users parent group fields in the User Directory interface
 - PB-16926 As LU I should be able to see the right 'Modified' date property in the user sidebar
 - PB-16928 As a translator I should not have strings with unpredictable variables to translate
-- PB-17012 As a user if my domain changed, I should still see the login form after completing a setup, recover or an account recovery 
+- PB-17012 As a user if my domain changed, I should still see the login form after completing a setup, recover or an account recovery
 - PB-17013 As LU I should see the pre-loading / skeleton style properly
 - PB-17090 As a contributor I want to be able to switch theme in storybook
+- PB-17155 As a user I want to see my security token with the chosen colors on the account recovery complete screen
 
 ### Maintenance
 - PB-13559 CI to report on code coverage

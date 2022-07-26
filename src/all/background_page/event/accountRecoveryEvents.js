@@ -12,6 +12,7 @@
  * @since         3.6.0
  */
 
+const {SetSetupLocaleController} = require("../controller/setup/setSetupLocaleController");
 const {ContinueAccountRecoveryController} = require("../controller/accountRecovery/continueAccountRecoveryController");
 const {RecoverAccountController} = require("../controller/accountRecovery/recoverAccountController");
 const {AuthSignInController} = require("../controller/auth/authSignInController");
@@ -78,6 +79,11 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.account-recovery.download-recovery-kit', async requestId => {
     const controller = new DownloadRecoveryKitController(worker, requestId, account);
     await controller._exec();
+  });
+
+  worker.port.on('passbolt.locale.update-user-locale', async(requestId, localeDto) => {
+    const controller = new SetSetupLocaleController(worker, requestId, apiClientOptions, account);
+    await controller._exec(localeDto);
   });
 };
 

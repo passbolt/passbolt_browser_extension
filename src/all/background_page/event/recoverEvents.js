@@ -100,7 +100,7 @@ const listen = (worker, apiClientOptions, account) => {
   });
 
   worker.port.on('passbolt.recover.generate-account-recovery-request-key', async(requestId, generateGpgKeyPairDto) => {
-    const controller = new GenerateRecoverAccountRecoveryRequestKeyController(worker, requestId, account);
+    const controller = new GenerateRecoverAccountRecoveryRequestKeyController(worker, requestId, apiClientOptions, account);
     await controller._exec(generateGpgKeyPairDto);
   });
 

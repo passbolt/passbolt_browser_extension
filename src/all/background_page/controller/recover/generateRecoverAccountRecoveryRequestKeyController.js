@@ -24,11 +24,13 @@ class GenerateRecoverAccountRecoveryRequestKeyController {
    * Constructor.
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
+   * @param {ApiClientOptions} apiClientOptions The api client options.
    * @param {AccountRecoverEntity} account The account being recovered.
    */
-  constructor(worker, requestId, account) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
+    this.apiClientOptions = apiClientOptions;
     this.account = account;
   }
 
@@ -58,7 +60,7 @@ class GenerateRecoverAccountRecoveryRequestKeyController {
       email: this.account?.username,
       passphrase: generateGpgKeyPairDto?.passphrase,
       keySize: ACCOUNT_RECOVERY_REQUEST_KEY_SIZE,
-      date: await GetGpgKeyCreationDateService.getDate(),
+      date: await GetGpgKeyCreationDateService.getDate(this.apiClientOptions),
     };
     const generateGpgKeyPairOptionsEntity = new GenerateGpgKeyPairOptionsEntity(dto);
     const externalGpgKeyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);

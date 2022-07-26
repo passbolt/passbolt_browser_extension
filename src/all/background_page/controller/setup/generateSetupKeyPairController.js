@@ -26,12 +26,14 @@ class GenerateSetupKeyPairController {
    * Constructor.
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
+   * @param {ApiClientOptions} apiClientOptions The api client options.
    * @param {AccountSetupEntity} account The account being setup.
    * @param {Object} runtimeMemory The setup runtime memory.
    */
-  constructor(worker, requestId, account, runtimeMemory) {
+  constructor(worker, requestId, apiClientOptions, account, runtimeMemory) {
     this.worker = worker;
     this.requestId = requestId;
+    this.apiClientOptions = apiClientOptions;
     this.account = account;
     this.runtimeMemory = runtimeMemory;
     this.runtimeMemory.passphrase = null;
@@ -83,7 +85,7 @@ class GenerateSetupKeyPairController {
       name: `${this.account.firstName} ${this.account.lastName}`,
       email: this.account.username,
       passphrase: passphrase,
-      date: await GetGpgKeyCreationDateService.getDate(),
+      date: await GetGpgKeyCreationDateService.getDate(this.apiClientOptions),
     });
   }
 }

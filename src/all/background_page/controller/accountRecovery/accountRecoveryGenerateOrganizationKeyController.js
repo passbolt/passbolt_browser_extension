@@ -29,10 +29,12 @@ class AccountRecoveryGenerateOrganizationKeyController {
    * AccountRecoveryGenerateKeyPairController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
+   * @param {ApiClientOptions} apiClientOptions The api client options.
    */
-  constructor(worker, requestId) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
+    this.apiClientOptions = apiClientOptions;
   }
 
   /**
@@ -60,7 +62,7 @@ class AccountRecoveryGenerateOrganizationKeyController {
     const enforcedGenerateGpgKeyPairOptionsDto = {
       type: GenerateGpgKeyPairOptionsEntity.TYPE_RSA,
       keySize: ACCOUNT_RECOVERY_ORGANIZATION_KEY_SIZE,
-      date: await GetGpgKeyCreationDateService.getDate(),
+      date: await GetGpgKeyCreationDateService.getDate(this.apiClientOptions),
     };
     Object.assign(generateGpgKeyPairOptionsDto, enforcedGenerateGpgKeyPairOptionsDto);
     const generateKeyPairOptions = new GenerateGpgKeyPairOptionsEntity(generateGpgKeyPairOptionsDto);

@@ -126,7 +126,7 @@ class AccountSetupEntity extends AbstractAccountEntity {
   }
 
   /**
-   * Return a DTO ready to be sent the API to complete the the setup process.
+   * Return a DTO ready to be sent the API to complete the setup process.
    * @returns {object}
    */
   toCompleteSetupDto() {

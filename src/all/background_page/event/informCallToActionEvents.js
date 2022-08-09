@@ -25,7 +25,7 @@ const listen = function(worker) {
   authenticationEventController.startListen();
 
   /*
-   * Whenever the the in-form call-to-action status is required
+   * Whenever the in-form call-to-action status is required
    * @listens passbolt.in-form-cta.check-status
    * @param requestId {uuid} The request identifier
    * @returns {*{isAuthenticated,isMfaRequired}
@@ -37,7 +37,7 @@ const listen = function(worker) {
   });
 
   /*
-   * Whenever the the in-form call-to-action suggested resources is required
+   * Whenever the in-form call-to-action suggested resources is required
    * @listens passbolt.in-form-cta.suggested-resources
    * @param requestId {uuid} The request identifier
    * @returns {*[]|number}
@@ -49,7 +49,7 @@ const listen = function(worker) {
   });
 
   /*
-   * Whenever the the in-form call-to-action is executed
+   * Whenever the in-form call-to-action is executed
    * @listens passbolt.in-form-cta.execute
    * @param requestId {uuid} The request identifier
    */

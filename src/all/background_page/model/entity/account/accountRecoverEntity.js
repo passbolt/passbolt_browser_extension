@@ -129,7 +129,7 @@ class AccountRecoverEntity extends AbstractAccountEntity {
   }
 
   /**
-   * Return a DTO ready to be sent the API to complete the the recover process.
+   * Return a DTO ready to be sent the API to complete the recover process.
    * @returns {object}
    */
   toCompleteRecoverDto() {
@@ -153,7 +153,7 @@ class AccountRecoverEntity extends AbstractAccountEntity {
   }
 
   /**
-   * Return a DTO ready to be sent the API to abort the the recover process.
+   * Return a DTO ready to be sent the API to abort the recover process.
    * @returns {object}
    */
   toAbortRecoverDto() {

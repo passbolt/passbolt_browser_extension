@@ -20,7 +20,6 @@ const {readMessageOrFail, readKeyOrFail, assertPrivateKey} = require("../../util
 const {AccountLocalStorage} = require("../../service/local_storage/accountLocalStorage");
 const {SetupModel} = require("../../model/setup/setupModel");
 const {AccountAccountRecoveryEntity} = require("../../model/entity/account/accountAccountRecoveryEntity");
-const {AccountRecoverEntity} = require("../../model/entity/account/accountRecoverEntity");
 const {DecryptPrivateKeyService} = require("../../service/crypto/decryptPrivateKeyService");
 const {DecryptMessageService} = require("../../service/crypto/decryptMessageService");
 const {DecryptResponseDataService} = require("../../service/accountRecovery/decryptResponseDataService");
@@ -73,8 +72,8 @@ class RecoverAccountController {
 
     const request = await this._findAndAssertRequest();
     const recoveredArmoredPrivateKey = await this._recoverPrivateKey(request.accountRecoveryPrivateKey, request.accountRecoveryResponses.items[0], passphrase);
-    const accountRecover = await this._completeRecover(recoveredArmoredPrivateKey);
-    const account = await this._addRecoveredAccountToStorage(accountRecover);
+    await this._completeRecover(recoveredArmoredPrivateKey);
+    const account = await this._addRecoveredAccountToStorage(this.account);
     this._updateWorkerAccount(account);
     this._initPagemod();
   }
@@ -139,28 +138,24 @@ class RecoverAccountController {
   /**
    * Complete the recover.
    * @param {openpgp.PrivateKey} recoveredPrivateKey The recovered private key
-   * @return {Promise<AccountRecoverEntity>}
+   * @return {Promise<void>}
    * @private
    */
   async _completeRecover(recoveredPrivateKey) {
     assertPrivateKey(recoveredPrivateKey);
-    const accountRecoverDto = this.account.toDto(AccountAccountRecoveryEntity.ALL_CONTAIN_OPTIONS);
-    accountRecoverDto.user_private_armored_key = recoveredPrivateKey.armor();
-    accountRecoverDto.user_public_armored_key = recoveredPrivateKey.toPublic().armor();
-    const accountRecover = new AccountRecoverEntity(accountRecoverDto);
-    await this.setupModel.completeRecover(accountRecover);
-
-    return accountRecover;
+    this.account.userPrivateArmoredKey = recoveredPrivateKey.armor();
+    this.account.userPublicArmoredKey = recoveredPrivateKey.toPublic().armor();
+    await this.setupModel.completeRecover(this.account);
   }
 
   /**
    * Add account to local storage.
-   * @param {AccountRecoverEntity} accountRecover The recovered account.
+   * @param {AccountAccountRecoveryEntity} accountAccountRecovery The recovered account.
    * @return {Promise<AccountEntity>}
    * @private
    */
-  async _addRecoveredAccountToStorage(accountRecover) {
-    const account = new AccountEntity(accountRecover.toDto(AccountRecoverEntity.ALL_CONTAIN_OPTIONS));
+  async _addRecoveredAccountToStorage(accountAccountRecovery) {
+    const account = new AccountEntity(accountAccountRecovery.toDto(AccountAccountRecoveryEntity.ALL_CONTAIN_OPTIONS));
     await this.accountModel.add(account);
     // Remove from the local storage the account recovery used to initiate/complete the account recovery.
     await AccountLocalStorage.deleteByUserIdAndType(account.userId, AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY);

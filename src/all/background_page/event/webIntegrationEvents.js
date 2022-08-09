@@ -18,7 +18,7 @@ const {WebIntegrationController} = require("../controller/webIntegration/webInte
  */
 const listen = function(worker) {
   /*
-   * Whenever the the auto-save is required
+   * Whenever the auto-save is required
    * @listens passbolt.web-integration.autosave
    * @param requestId {uuid} The request identifier
    */

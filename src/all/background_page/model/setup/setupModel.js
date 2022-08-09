@@ -128,7 +128,7 @@ class SetupModel {
 
   /**
    * Complete the recover.
-   * @param {AccountRecoverEntity} account The account being recovered.
+   * @param {AccountRecoverEntity|AccountAccountRecoveryEntity} account The account being recovered.
    * @returns {Promise<void>}
    */
   async completeRecover(account) {

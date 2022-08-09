@@ -131,7 +131,7 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
   }
 
   /**
-   * Return a DTO ready to be sent the API to abort the the account recovery process.
+   * Return a DTO ready to be sent the API to abort the account recovery process.
    * @returns {object}
    */
   toAbortRecoverDto() {
@@ -139,6 +139,31 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
       authentication_token: {
         token: this.authenticationTokenToken
       },
+    };
+  }
+
+  /**
+   * Return a DTO ready to be sent the API to complete the recover process.
+   * @returns {object}
+   */
+  toCompleteRecoverDto() {
+    return {
+      //@deprecated since v3.6.0: the expected format is authentication_token.
+      authenticationtoken: {
+        token: this.authenticationTokenToken
+      },
+      authentication_token: {
+        token: this.authenticationTokenToken
+      },
+      gpgkey: {
+        armored_key: this.userPublicArmoredKey
+      },
+      //@deprecated since v3.6.0: the `locale` field is now on the root object.
+      user: {
+        locale: this.locale
+      },
+      locale: this.locale,
+      account_recovery_request_id: this.accountRecoveryRequestId
     };
   }
 

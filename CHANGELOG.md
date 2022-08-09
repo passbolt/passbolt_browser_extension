@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [3.7.1] - 2022-08-11
+### Fixed
+- PB-18420 As AN completing the setup I should understand what information the account recovery feature will treat
+
+### Maintenance
+- PB-18421 As a developer I can build a custom theme
+
+### Security
+- PBL-07-004 WP1: Finished account recovery aids future key compromise
+
 ## [3.7.0] - 2022-07-26
 ### Added
 - PB-15305 As LU I can access the mobile configuration page from the profile dropdown
@@ -903,7 +914,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.1...HEAD
+[3.7.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.0...v3.7.1
 [3.7.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.6.2...v3.7.0
 [3.6.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.6.1...v3.6.2
 [3.6.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.6.0...v3.6.1

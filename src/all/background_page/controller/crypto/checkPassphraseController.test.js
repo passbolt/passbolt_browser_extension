@@ -12,17 +12,13 @@
  * @since         3.6.0
  */
 
-import {InvalidMasterPasswordError} from "../../error/invalidMasterPasswordError";
-import {ExternalGpgKeyEntity} from "../../model/entity/gpgkey/external/externalGpgKeyEntity";
-import {CheckPassphraseController} from "./checkPassphraseController";
+import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
+import ExternalGpgKeyEntity from "../../model/entity/gpgkey/external/externalGpgKeyEntity";
+import CheckPassphraseController from "./checkPassphraseController";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import Keyring from "../../model/keyring";
 
-const mockFindPrivate = jest.fn();
-jest.mock('../../model/keyring', () => ({
-  Keyring: jest.fn().mockImplementation(() => ({
-    findPrivate: mockFindPrivate
-  }))
-}));
+const mockFindPrivate = jest.spyOn(Keyring.prototype, "findPrivate");
 
 describe("CheckPassphraseController", () => {
   it(`Should decrypt current user's key with the right passphrase`, () => {

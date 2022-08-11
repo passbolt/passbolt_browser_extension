@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {RoleEntity} from "./roleEntity";
-import {EntityValidationError} from "../abstract/entityValidationError";
-import {EntitySchema} from "../abstract/entitySchema";
+import RoleEntity from "./roleEntity";
+import EntityValidationError from "../abstract/entityValidationError";
+import EntitySchema from "../abstract/entitySchema";
 
 describe("Role entity", () => {
   it("schema must validate", () => {

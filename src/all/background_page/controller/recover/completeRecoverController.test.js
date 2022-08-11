@@ -13,15 +13,16 @@
  */
 
 import {enableFetchMocks} from "jest-fetch-mock";
-import app from "../../app";
-import {CompleteRecoverController} from "./completeRecoverController";
+import {App as app} from "../../app";
+import CompleteRecoverController from "./completeRecoverController";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
-import {AccountRecoverEntity} from "../../model/entity/account/accountRecoverEntity";
-import {User} from "../../model/user";
-import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
-const {Keyring} = require('../../model/keyring');
+import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
+import User from "../../model/user";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+
 
 jest.mock("../../app");
 
@@ -52,10 +53,10 @@ describe("CompleteRecoverController", () => {
       expect(user.settings.securityToken).toStrictEqual(account.securityToken.toDto());
 
       const keyring = new Keyring();
-      const keyringPrivateKey = await readKeyOrFail(keyring.findPrivate().armoredKey);
-      const keyringPublicKey = await readKeyOrFail(keyring.findPublic(account.userId).armoredKey);
-      const accountPrivateKey = await readKeyOrFail(account.userPrivateArmoredKey);
-      const accountPublicKey = await readKeyOrFail(account.userPublicArmoredKey);
+      const keyringPrivateKey = await OpenpgpAssertion.readKeyOrFail(keyring.findPrivate().armoredKey);
+      const keyringPublicKey = await OpenpgpAssertion.readKeyOrFail(keyring.findPublic(account.userId).armoredKey);
+      const accountPrivateKey = await OpenpgpAssertion.readKeyOrFail(account.userPrivateArmoredKey);
+      const accountPublicKey = await OpenpgpAssertion.readKeyOrFail(account.userPublicArmoredKey);
       const keyringPrivateFingerprint = keyringPrivateKey.getFingerprint().toUpperCase();
       const accountPrivateFingerprint = accountPrivateKey.getFingerprint().toUpperCase();
       const keyringPublicFingerprint = keyringPublicKey.getFingerprint().toUpperCase();

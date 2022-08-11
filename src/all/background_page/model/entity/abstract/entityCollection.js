@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {Entity} = require('../abstract/entity');
+import Entity from "../abstract/entity";
 
 class EntityCollection extends Entity {
   /**
@@ -145,4 +145,4 @@ class EntityCollection extends Entity {
   }
 }
 
-exports.EntityCollection = EntityCollection;
+export default EntityCollection;

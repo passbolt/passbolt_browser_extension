@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {EntitySchema} = require('../abstract/entitySchema');
-const {AbstractActionLogEntity} = require("./abstractActionLogEntity");
+import AbstractActionLogEntity from "./abstractActionLogEntity";
+import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = 'DefaultActionLog';
 
@@ -45,4 +45,4 @@ class DefaultActionLogEntity extends AbstractActionLogEntity {
   }
 }
 
-exports.DefaultActionLogEntity = DefaultActionLogEntity;
+export default DefaultActionLogEntity;

@@ -11,10 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const {Entity} = require('../../abstract/entity');
-const {EntityValidationError} = require('../../abstract/entityValidationError');
-const {GroupUserTransfersCollection} = require('../../groupUser/transfer/groupUserTransfersCollection');
-const {PermissionTransfersCollection} = require('../../permission/transfer/permissionTransfersCollection');
+import GroupUserTransfersCollection from "../../groupUser/transfer/groupUserTransfersCollection";
+import PermissionTransfersCollection from "../../permission/transfer/permissionTransfersCollection";
+import Entity from "../../abstract/entity";
+import EntityValidationError from "../../abstract/entityValidationError";
+
 
 const ENTITY_NAME = 'UserDeleteTransfer';
 
@@ -131,4 +132,4 @@ class UserDeleteTransferEntity extends Entity {
   }
 }
 
-exports.UserDeleteTransferEntity = UserDeleteTransferEntity;
+export default UserDeleteTransferEntity;

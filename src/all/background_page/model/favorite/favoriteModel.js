@@ -11,9 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const {FavoriteEntity} = require('../entity/favorite/favoriteEntity');
-const {FavoriteService} = require('../../service/api/favorite/favoriteService');
-const {ResourceModel} = require('../../model/resource/resourceModel');
+import ResourceModel from "../../model/resource/resourceModel";
+import FavoriteService from "../../service/api/favorite/favoriteService";
+import FavoriteEntity from "../entity/favorite/favoriteEntity";
+
 
 class FavoriteModel {
   /**
@@ -57,4 +58,4 @@ class FavoriteModel {
   }
 }
 
-exports.FavoriteModel = FavoriteModel;
+export default FavoriteModel;

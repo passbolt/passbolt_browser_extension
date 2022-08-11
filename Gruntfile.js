@@ -26,8 +26,8 @@ module.exports = function (grunt) {
     src: 'src/all/',
     test: 'test/',
     src_background_page: 'src/all/background_page/',
-    src_background_page_vendors: 'src/all/background_page/vendors/',
     src_chrome: 'src/chrome/',
+    src_chrome_mv3: 'src/all/mv3/chrome/',
     src_content_vendors: 'src/all/data/vendors/',
     src_firefox: 'src/firefox/',
     src_content_scripts: 'src/all/content_scripts/',
@@ -46,27 +46,26 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-browserify');
 
   grunt.registerTask('default', ['bundle']);
-  grunt.registerTask('pre-dist', ['copy:vendors', 'copy:styleguide']);
+  grunt.registerTask('pre-dist', ['copy:styleguide']);
 
-  grunt.registerTask('bundle', ['externalize-locale-strings', 'copy:background_page', 'copy:content_scripts', 'browserify:background_page', 'copy:data', 'copy:locales']);
-  grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle', 'browserify:vendors']);
-  grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle', 'browserify:vendors']);
+  grunt.registerTask('bundle', ['externalize-locale-strings', 'copy:background_page', 'copy:data', 'copy:locales']);
+  grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle']);
+  grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle']);
 
   grunt.registerTask('build', ['shell:eslint', 'shell:test', 'build-firefox', 'build-chrome']);
 
   grunt.registerTask('build-firefox', ['build-firefox-debug', 'build-firefox-prod']);
-  grunt.registerTask('build-firefox-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-firefox', 'shell:build_webpack_apps_debug', 'shell:build_firefox_debug']);
-  grunt.registerTask('build-firefox-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-firefox', 'shell:build_webpack_apps_prod', 'shell:build_firefox_prod']);
+  grunt.registerTask('build-firefox-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-firefox', 'shell:build_background_page_debug', 'shell:build_webpack_apps_debug', 'shell:build_firefox_debug']);
+  grunt.registerTask('build-firefox-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-firefox', 'shell:build_background_page_prod', 'shell:build_webpack_apps_prod', 'shell:build_firefox_prod']);
 
   grunt.registerTask('build-chrome', ['build-chrome-debug', 'build-chrome-prod']);
-  grunt.registerTask('build-chrome-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chrome', 'shell:build_webpack_apps_debug', 'shell:build_chrome_debug']);
-  grunt.registerTask('build-chrome-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome', 'shell:build_webpack_apps_prod', 'shell:build_chrome_prod']);
+  grunt.registerTask('build-chrome-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chrome', 'shell:build_background_page_debug', 'shell:build_webpack_apps_debug', 'shell:build_chrome_debug']);
+  grunt.registerTask('build-chrome-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome', 'shell:build_background_page_prod', 'shell:build_webpack_apps_prod', 'shell:build_chrome_prod']);
 
   grunt.registerTask('custom-chrome-debug', ['bg-chrome-debug', 'react-chrome-debug']);
-  grunt.registerTask('bg-chrome-debug', ['copy:background_page', 'browserify:background_page']);
+  grunt.registerTask('bg-chrome-debug', ['copy:background_page']);
   grunt.registerTask('react-chrome-debug', ['copy:content_scripts', 'copy:data', 'copy:locales', 'shell:build_webpack_apps_debug']);
 
   grunt.registerTask('externalize-locale-strings', ['shell:externalize']);
@@ -76,22 +75,6 @@ module.exports = function (grunt) {
     */
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-
-    /**
-     * Browserify is a tool to package CommonJS Javascript code for use in the browser.
-     * We use CommonJS require syntax to manage dependencies in the web extension add-on code
-     * See also. src/background_page/vendor/require_polyfill.js
-     */
-    browserify: {
-      vendors: {
-        src: [path.src_background_page + 'vendors.js'],
-        dest: path.build + 'vendors.min.js'
-      },
-      background_page: {
-        src: [path.src_background_page + 'index.js'],
-        dest: path.build + 'index.min.js'
-      }
-    },
 
     /**
      * Clean operations
@@ -121,11 +104,6 @@ module.exports = function (grunt) {
           rename: function (dest, src) { console.log(dest + '/config.json'); return dest + '/config.json'; }
         }]
       },
-      content_scripts: {
-        files: [
-          { expand: true, cwd: path.src_content_scripts, src: ['**', '!js/app/**'], dest: path.build_content_scripts }
-        ]
-      },
       background_page: {
         files: [
           { expand: true, cwd: path.src_background_page, src: 'index.html', dest: path.build }
@@ -152,13 +130,6 @@ module.exports = function (grunt) {
         files: [{
           expand: true, cwd: path.src_chrome, src: 'manifest.json', dest: path.build
         }]
-      },
-      // copy node_modules where needed in addon or content code vendors folder
-      vendors: {
-        files: [
-          // openpgpjs
-          { expand: true, cwd: path.node_modules + 'openpgp/dist', src: ['openpgp.js', 'openpgp.worker.js'], dest: path.build_vendors },
-        ]
       },
       // Copy styleguide elements
       styleguide: {
@@ -273,7 +244,19 @@ module.exports = function (grunt) {
      */
     shell: {
       options: { stderr: false },
-
+      /**
+       * Build background page.
+       */
+      build_background_page_prod: {
+        command: [
+          'npm run build:background-page'
+        ].join(' && ')
+      },
+      build_background_page_debug: {
+        command: [
+          'npm run dev:build:background-page'
+        ].join(' && ')
+      },
       /**
        * Build content code apps.
        */
@@ -377,24 +360,14 @@ module.exports = function (grunt) {
      * see. https://github.com/gruntjs/grunt-contrib-watch
      */
     watch: {
-      content_scripts: {
-        files: [path.src_content_scripts + '**/*.*'],
-        tasks: ['copy:content_scripts'],
-        options: { spawn: false }
-      },
       background_page: {
-        files: [path.src + 'background_page/**/*.js', '!' + path.src + 'background_page/vendors/*.js', '!' + path.src + 'background_page/vendors.js'],
-        tasks: ['browserify:background_page'],
+        files: [path.src + 'background_page/**/*.js'],
+        tasks: ['shell:build_background_page_debug'],
         options: { spawn: false }
       },
       config: {
         files: [path.src + 'background_page/config/config.json'],
-        tasks: ['browserify:background_page'],
-        options: { spawn: false }
-      },
-      vendors: {
-        files: [path.src + 'background_page/vendors.js', path.src + 'background_page/vendors/**/*.js', path.src + 'background_page/sdk/storage.js'],
-        tasks: ['browserify:vendors'],
+        tasks: ['shell:build_background_page_debug'],
         options: { spawn: false }
       }
     }

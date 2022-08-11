@@ -18,4 +18,4 @@ class UserAlreadyLoggedInError extends Error {
   }
 }
 
-exports.UserAlreadyLoggedInError = UserAlreadyLoggedInError;
+export default UserAlreadyLoggedInError;

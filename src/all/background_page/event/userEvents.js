@@ -6,14 +6,15 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {User} = require('../model/user');
-const {UserModel} = require('../model/user/userModel');
-const {UserEntity} = require('../model/entity/user/userEntity');
-const {UserDeleteTransferEntity} = require('../model/entity/user/transfer/userDeleteTransfer');
-const {AvatarUpdateEntity} = require("../model/entity/avatar/update/avatarUpdateEntity");
-const {SecurityTokenEntity} = require("../model/entity/securityToken/securityTokenEntity");
-const {AccountModel} = require("../model/account/accountModel");
-const {UpdatePrivateKeyController} = require("../controller/account/updatePrivateKeyController");
+import User from "../model/user";
+import UserModel from "../model/user/userModel";
+import AccountModel from "../model/account/accountModel";
+import UpdatePrivateKeyController from "../controller/account/updatePrivateKeyController";
+import UserDeleteTransferEntity from "../model/entity/user/transfer/userDeleteTransfer";
+import UserEntity from "../model/entity/user/userEntity";
+import SecurityTokenEntity from "../model/entity/securityToken/securityTokenEntity";
+import AvatarUpdateEntity from "../model/entity/avatar/update/avatarUpdateEntity";
+
 
 const listen = function(worker) {
   /*
@@ -260,4 +261,4 @@ const listen = function(worker) {
   });
 };
 
-exports.listen = listen;
+export const UserEvents = {listen};

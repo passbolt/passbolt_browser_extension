@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {AbstractService} = require('../abstract/abstractService');
-const {GetGpgKeyInfoService} = require("../../crypto/getGpgKeyInfoService");
-const {GpgAuth} = require('../../../model/gpgauth');
-const {Keyring} = require('../../../model/keyring');
-const {readKeyOrFail} = require('../../../utils/openpgp/openpgpAssertions');
-const {GenerateGpgKeyPairOptionsEntity} = require("../../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity");
+import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../../model/keyring";
+import GpgAuth from "../../../model/gpgauth";
+import AbstractService from "../abstract/abstractService";
+import GetGpgKeyInfoService from "../../crypto/getGpgKeyInfoService";
+import GenerateGpgKeyPairOptionsEntity from "../../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity";
 
 const ACCOUNT_RECOVERY_ORGANIZATION_POLICY_SERVICE_RESOURCE_NAME = '/account-recovery/organization-policies';
 
@@ -97,7 +97,7 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
    * @throws {Error} if any of the checks are wrong
    */
   static async validatePublicKey(publicArmoredKeyToValidate, organizationPolicyPublicArmoredKey) {
-    const publicKey = await readKeyOrFail(publicArmoredKeyToValidate);
+    const publicKey = await OpenpgpAssertion.readKeyOrFail(publicArmoredKeyToValidate);
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(publicKey);
 
     if (!keyInfo.isValid) {
@@ -145,11 +145,11 @@ class AccountRecoveryOrganizationPolicyService extends AbstractService {
       return;
     }
 
-    const organizationPolicyPulicKey = await readKeyOrFail(organizationPolicyPublicArmoredKey);
+    const organizationPolicyPulicKey = await OpenpgpAssertion.readKeyOrFail(organizationPolicyPublicArmoredKey);
     if (organizationPolicyPulicKey.getFingerprint().toUpperCase() === keyInfo.fingerprint) {
       throw new Error("The key is the current organization recovery key, you must provide a new one.");
     }
   }
 }
 
-exports.AccountRecoveryOrganizationPolicyService = AccountRecoveryOrganizationPolicyService;
+export default AccountRecoveryOrganizationPolicyService;

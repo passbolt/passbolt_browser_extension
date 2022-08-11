@@ -11,25 +11,21 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {User} = require('../../model/user');
-
-const progressController = require('../progress/progressController');
-const passphraseController = require('../passphrase/passphraseController');
-const fileController = require('../fileController');
-
-const {ResourcesExporter} = require("../../model/export/resourcesExporter");
-const {ResourceTypeModel} = require("../../model/resourceType/resourceTypeModel");
-const {FolderModel} = require('../../model/folder/folderModel');
-const {ResourceModel} = require('../../model/resource/resourceModel');
-
-const {ExternalResourcesCollection} = require("../../model/entity/resource/external/externalResourcesCollection");
-const {ExternalFoldersCollection} = require("../../model/entity/folder/external/externalFoldersCollection");
-const {ExportResourcesFileEntity} = require("../../model/entity/export/exportResourcesFileEntity");
-
-const {i18n} = require('../../sdk/i18n');
-const {DecryptMessageService} = require("../../service/crypto/decryptMessageService");
-const {GetDecryptedUserPrivateKeyService} = require("../../service/account/getDecryptedUserPrivateKeyService");
-const {readMessageOrFail} = require('../../utils/openpgp/openpgpAssertions');
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import DecryptMessageService from "../../service/crypto/decryptMessageService";
+import User from "../../model/user";
+import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
+import ResourceModel from "../../model/resource/resourceModel";
+import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import {FileController as fileController} from "../fileController";
+import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
+import FolderModel from "../../model/folder/folderModel";
+import ExternalFoldersCollection from "../../model/entity/folder/external/externalFoldersCollection";
+import {ProgressController as progressController} from "../progress/progressController";
+import ResourcesExporter from "../../model/export/resourcesExporter";
+import ExternalResourcesCollection from "../../model/entity/resource/external/externalResourcesCollection";
+import ExportResourcesFileEntity from "../../model/entity/export/exportResourcesFileEntity";
+import i18n from "../../sdk/i18n";
 
 class ExportResourcesFileController {
   /**
@@ -114,7 +110,7 @@ class ExportResourcesFileController {
     for (const exportResourceEntity of exportEntity.exportResources.items) {
       i++;
       await progressController.update(this.worker, ++this.progress, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: exportEntity.exportResources.items.length}));
-      const secretMessage = await readMessageOrFail(exportResourceEntity.secrets.items[0].data);
+      const secretMessage = await OpenpgpAssertion.readMessageOrFail(exportResourceEntity.secrets.items[0].data);
       let secretClear = await DecryptMessageService.decrypt(secretMessage, privateKey);
 
       // @deprecated Prior to v3, resources have no resource type. Remove this condition with v4.
@@ -178,4 +174,4 @@ class ExportResourcesFileController {
 }
 
 
-exports.ExportResourcesFileController = ExportResourcesFileController;
+export default ExportResourcesFileController;

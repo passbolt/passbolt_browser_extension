@@ -13,4 +13,4 @@ class PassboltApiFetchError extends Error {
   }
 }
 
-exports.PassboltApiFetchError = PassboltApiFetchError;
+export default PassboltApiFetchError;

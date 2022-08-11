@@ -1,6 +1,6 @@
-const Port = require('../sdk/port').Port;
-const Tab = require('../sdk/tab').Tab;
-const Log = require('../model/log').Log;
+import Log from "../model/log";
+import Port from "../sdk/port";
+import Tab from "../sdk/tab";
 
 /**
  * PageMod Worker Chrome Wrapper
@@ -86,4 +86,4 @@ Worker.prototype.destroy = function(reason) {
   delete this.tab;
 };
 
-exports.Worker = Worker;
+export default Worker;

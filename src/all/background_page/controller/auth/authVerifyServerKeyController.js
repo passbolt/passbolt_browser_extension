@@ -11,15 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-const Uuid = require('../../utils/uuid');
-const Worker = require('../../model/worker');
-const {AuthModel} = require("../../model/auth/authModel");
-const {Keyring} = require('../../model/keyring');
-const {KeyIsExpiredError} = require('../../error/keyIsExpiredError');
-const {ServerKeyChangedError} = require('../../error/serverKeyChangedError');
-const {GpgAuth} = require('../../model/gpgauth');
-const {i18n} = require('../../sdk/i18n');
-const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import GpgAuth from "../../model/gpgauth";
+import {Worker} from "../../model/worker";
+import AuthModel from "../../model/auth/authModel";
+import {Uuid} from "../../utils/uuid";
+import i18n from "../../sdk/i18n";
+import KeyIsExpiredError from "../../error/keyIsExpiredError";
+import ServerKeyChangedError from "../../error/serverKeyChangedError";
 
 class AuthVerifyServerKeyController {
   /**
@@ -110,7 +110,7 @@ class AuthVerifyServerKeyController {
    */
   async canParseServerKey(serverArmoredKey) {
     try {
-      await readKeyOrFail(serverArmoredKey);
+      await OpenpgpAssertion.readKeyOrFail(serverArmoredKey);
     } catch (error) {
       return false;
     }
@@ -118,4 +118,4 @@ class AuthVerifyServerKeyController {
   }
 }
 
-exports.AuthVerifyServerKeyController = AuthVerifyServerKeyController;
+export default AuthVerifyServerKeyController;

@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {Entity} = require('../abstract/entity');
-const {EntitySchema} = require('../abstract/entitySchema');
+import Entity from "../abstract/entity";
+import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = "AccountRecoveryPrivateKeyPassword";
 const FOREIGN_MODEL_ORGANIZATION_KEY = "AccountRecoveryOrganizationKey";
@@ -172,4 +172,4 @@ class AccountRecoveryPrivateKeyPasswordEntity extends Entity {
   }
 }
 
-exports.AccountRecoveryPrivateKeyPasswordEntity = AccountRecoveryPrivateKeyPasswordEntity;
+export default AccountRecoveryPrivateKeyPasswordEntity;

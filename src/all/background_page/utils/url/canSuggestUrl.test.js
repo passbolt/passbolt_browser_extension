@@ -1,4 +1,4 @@
-const {canSuggestUrl} = require("./canSuggestUrl");
+import canSuggestUrl from "./canSuggestUrl";
 
 describe("canSuggestUrl", () => {
   it("should suggest matching domain urls", () => {

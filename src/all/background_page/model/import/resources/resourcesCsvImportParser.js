@@ -10,16 +10,16 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {BinaryConvert} = require("../../../utils/format/binaryConvert");
-const {ImportError} = require("../../../error/importError");
-const {FileFormatError} = require("../../../error/fileFormatError");
-const {ExternalFoldersCollection} = require("../../entity/folder/external/externalFoldersCollection");
-const {ExternalResourcesCollection} = require("../../entity/resource/external/externalResourcesCollection");
-const {ExternalFolderEntity} = require("../../entity/folder/external/externalFolderEntity");
-
-const {Csv1PasswordRowParser} = require("./csvRowParser/csv1PasswordRowParser");
-const {CsvKdbxRowParser} = require("./csvRowParser/csvKdbxRowParser");
-const {CsvLastPassRowParser} = require("./csvRowParser/csvLastPassRowParser");
+import ExternalFoldersCollection from "../../entity/folder/external/externalFoldersCollection";
+import ExternalFolderEntity from "../../entity/folder/external/externalFolderEntity";
+import CsvKdbxRowParser from "./csvRowParser/csvKdbxRowParser";
+import Csv1PasswordRowParser from "./csvRowParser/csv1PasswordRowParser";
+import CsvLastPassRowParser from "./csvRowParser/csvLastPassRowParser";
+import ExternalResourcesCollection from "../../entity/resource/external/externalResourcesCollection";
+import FileFormatError from "../../../error/fileFormatError";
+import BinaryConvert from "../../../utils/format/binaryConvert";
+import ImportError from "../../../error/importError";
+import PapaParse from "papaparse";
 
 /**
  * Register of csv row parsers
@@ -161,4 +161,4 @@ class ResourcesCsvImportParser {
   }
 }
 
-exports.ResourcesCsvImportParser = ResourcesCsvImportParser;
+export default ResourcesCsvImportParser;

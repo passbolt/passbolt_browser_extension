@@ -12,18 +12,18 @@
  * @since         3.6.0
  */
 
-const app = require("../../app");
-const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
-const {AccountEntity} = require("../../model/entity/account/accountEntity");
-const {AccountModel} = require("../../model/account/accountModel");
-const {readMessageOrFail, readKeyOrFail, assertPrivateKey} = require("../../utils/openpgp/openpgpAssertions");
-const {AccountLocalStorage} = require("../../service/local_storage/accountLocalStorage");
-const {SetupModel} = require("../../model/setup/setupModel");
-const {AccountAccountRecoveryEntity} = require("../../model/entity/account/accountAccountRecoveryEntity");
-const {DecryptPrivateKeyService} = require("../../service/crypto/decryptPrivateKeyService");
-const {DecryptMessageService} = require("../../service/crypto/decryptMessageService");
-const {DecryptResponseDataService} = require("../../service/accountRecovery/decryptResponseDataService");
-const {EncryptPrivateKeyService} = require("../../service/crypto/encryptPrivateKeyService");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import DecryptMessageService from "../../service/crypto/decryptMessageService";
+import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
+import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
+import EncryptPrivateKeyService from "../../service/crypto/encryptPrivateKeyService";
+import AccountModel from "../../model/account/accountModel";
+import {App as app} from "../../app";
+import AccountLocalStorage from "../../service/local_storage/accountLocalStorage";
+import SetupModel from "../../model/setup/setupModel";
+import DecryptResponseDataService from "../../service/accountRecovery/decryptResponseDataService";
+import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
+import AccountEntity from "../../model/entity/account/accountEntity";
 
 class RecoverAccountController {
   /**
@@ -122,16 +122,16 @@ class RecoverAccountController {
    * @private
    */
   async _recoverPrivateKey(privateKey, response, passphrase) {
-    const key = await readKeyOrFail(this.account.userPrivateArmoredKey);
+    const key = await OpenpgpAssertion.readKeyOrFail(this.account.userPrivateArmoredKey);
     const requestPrivateKeyDecrypted = await DecryptPrivateKeyService.decrypt(key, passphrase);
     /*
      * @todo Additional check could be done to ensure the recovered key is the same than the one the user was previously using.
      *   If the user is in the case lost passphrase, a key should still be referenced in the storage of the extension.
      */
     const privateKeyPasswordDecryptedData = await DecryptResponseDataService.decrypt(response, requestPrivateKeyDecrypted, this.account.userId, this.account.domain);
-    const privateKeyData = await readMessageOrFail(privateKey.data);
+    const privateKeyData = await OpenpgpAssertion.readMessageOrFail(privateKey.data);
     const decryptedRecoveredPrivateArmoredKey = await DecryptMessageService.decryptSymmetrically(privateKeyData, privateKeyPasswordDecryptedData.privateKeySecret);
-    const decryptedRecoveredPrivateKey = await readKeyOrFail(decryptedRecoveredPrivateArmoredKey);
+    const decryptedRecoveredPrivateKey = await OpenpgpAssertion.readKeyOrFail(decryptedRecoveredPrivateArmoredKey);
     return EncryptPrivateKeyService.encrypt(decryptedRecoveredPrivateKey, passphrase);
   }
 
@@ -142,7 +142,7 @@ class RecoverAccountController {
    * @private
    */
   async _completeRecover(recoveredPrivateKey) {
-    assertPrivateKey(recoveredPrivateKey);
+    OpenpgpAssertion.assertPrivateKey(recoveredPrivateKey);
     this.account.userPrivateArmoredKey = recoveredPrivateKey.armor();
     this.account.userPublicArmoredKey = recoveredPrivateKey.toPublic().armor();
     await this.setupModel.completeRecover(this.account);
@@ -197,4 +197,4 @@ class RecoverAccountController {
   }
 }
 
-exports.RecoverAccountController = RecoverAccountController;
+export default RecoverAccountController;

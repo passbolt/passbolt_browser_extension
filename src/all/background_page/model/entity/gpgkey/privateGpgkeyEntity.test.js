@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {PrivateGpgkeyEntity} from "./privateGpgkeyEntity";
-import {EntitySchema} from "../abstract/entitySchema";
-import {EntityValidationError} from "../abstract/entityValidationError";
+import PrivateGpgkeyEntity from "./privateGpgkeyEntity";
+import EntitySchema from "../abstract/entitySchema";
+import EntityValidationError from "../abstract/entityValidationError";
 import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
 
 const validDto = {

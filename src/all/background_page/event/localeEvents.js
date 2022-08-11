@@ -11,10 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-const {GetLocaleController} = require("../controller/locale/getLocaleController");
-const {LocaleEntity} = require("../model/entity/locale/localeEntity");
-const {LocaleModel} = require("../model/locale/localeModel");
-const {User} = require('../model/user');
+import User from "../model/user";
+import LocaleModel from "../model/locale/localeModel";
+import GetLocaleController from "../controller/locale/getLocaleController";
+import LocaleEntity from "../model/entity/locale/localeEntity";
+
 
 const listen = async function(worker) {
   /*
@@ -56,4 +57,4 @@ const listen = async function(worker) {
   });
 };
 
-exports.listen = listen;
+export const LocaleEvents = {listen};

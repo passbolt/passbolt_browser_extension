@@ -14,12 +14,12 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import each from "jest-each";
-import app from "../../app";
-import {User} from "../../model/user";
-import {Keyring} from "../../model/keyring";
+import {App as app} from "../../app";
+import User from "../../model/user";
+import Keyring from "../../model/keyring";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import {RecoverAccountController} from "./recoverAccountController";
-import {AccountAccountRecoveryEntity} from "../../model/entity/account/accountAccountRecoveryEntity";
+import RecoverAccountController from "./recoverAccountController";
+import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
@@ -28,9 +28,9 @@ import {
   approvedAccountRecoveryRequestWithoutPrivateKeyDto,
   approvedAccountRecoveryRequestWithoutResponsesDto
 } from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
-import {AccountLocalStorage} from "../../service/local_storage/accountLocalStorage";
-import {InvalidMasterPasswordError} from "../../error/invalidMasterPasswordError";
-import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
+import AccountLocalStorage from "../../service/local_storage/accountLocalStorage";
+import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 jest.mock("../../model/worker");
 
@@ -71,8 +71,8 @@ describe("RecoverAccountController", () => {
 
       // The keyring should contain the user recovered key.
       const keyring = new Keyring();
-      const keyringPrivateKey = await readKeyOrFail(keyring.findPrivate().armoredKey);
-      const userPublicKey = await readKeyOrFail(keyring.findPublic(accountRecovery.userId).armoredKey);
+      const keyringPrivateKey = await OpenpgpAssertion.readKeyOrFail(keyring.findPrivate().armoredKey);
+      const userPublicKey = await OpenpgpAssertion.readKeyOrFail(keyring.findPublic(accountRecovery.userId).armoredKey);
       const keyringPrivateKeyFingerprint = keyringPrivateKey.getFingerprint().toUpperCase();
       const userPublicKeyFingerprint = userPublicKey.getFingerprint().toUpperCase();
 

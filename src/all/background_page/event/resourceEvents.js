@@ -4,12 +4,12 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {User} = require('../model/user');
-const {Log} = require('../model/log');
-const {ResourceModel} = require('../model/resource/resourceModel');
+import User from "../model/user";
+import ResourceModel from "../model/resource/resourceModel";
+import ResourceCreateController from "../controller/resource/resourceCreateController";
+import ResourceUpdateController from "../controller/resource/resourceUpdateController";
+import Log from "../model/log";
 
-const {ResourceCreateController} = require('../controller/resource/resourceCreateController.js');
-const {ResourceUpdateController} = require('../controller/resource/resourceUpdateController.js');
 
 const listen = function(worker) {
   /*
@@ -130,4 +130,4 @@ const listen = function(worker) {
   });
 };
 
-exports.listen = listen;
+export const ResourceEvents = {listen};

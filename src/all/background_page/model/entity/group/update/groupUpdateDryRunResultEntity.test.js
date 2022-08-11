@@ -10,7 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import {GroupUpdateDryRunResultEntity} from "./groupUpdateDryRunResultEntity";
+import GroupUpdateDryRunResultEntity from "./groupUpdateDryRunResultEntity";
 
 describe("Group update dry run result entity", () => {
   it("constructor works if valid minimal DTO is provided", () => {

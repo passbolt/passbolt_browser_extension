@@ -19,4 +19,4 @@ class BadSignatureMessageGpgKeyError extends Error {
   }
 }
 
-exports.BadSignatureMessageGpgKeyError = BadSignatureMessageGpgKeyError;
+export default BadSignatureMessageGpgKeyError;

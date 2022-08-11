@@ -11,17 +11,16 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.8.0
  */
-const {Keyring} = require('../../model/keyring');
-const {Share} = require('../../model/share');
-const {FolderModel} = require('../../model/folder/folderModel');
-const {ResourceModel} = require('../../model/resource/resourceModel');
-const {PermissionChangesCollection} = require('../../model/entity/permission/change/permissionChangesCollection');
-const {FoldersCollection} = require('../../model/entity/folder/foldersCollection');
-
-const passphraseController = require('../passphrase/passphraseController');
-const progressController = require('../progress/progressController');
-const {i18n} = require('../../sdk/i18n');
-const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
+import Keyring from "../../model/keyring";
+import ResourceModel from "../../model/resource/resourceModel";
+import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
+import FolderModel from "../../model/folder/folderModel";
+import Share from "../../model/share";
+import {ProgressController as progressController} from "../progress/progressController";
+import FoldersCollection from "../../model/entity/folder/foldersCollection";
+import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
+import i18n from "../../sdk/i18n";
 
 class ShareFoldersController {
   /**
@@ -220,4 +219,4 @@ class ShareFoldersController {
   }
 }
 
-exports.ShareFoldersController = ShareFoldersController;
+export default ShareFoldersController;

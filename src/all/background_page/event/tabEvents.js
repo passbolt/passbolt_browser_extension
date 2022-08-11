@@ -4,8 +4,8 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {i18n} = require("../sdk/i18n");
-const {BrowserTabService} = require("../service/ui/browserTab.service");
+import i18n from "../sdk/i18n";
+import {BrowserTabService} from "../service/ui/browserTab.service";
 
 const listen = function(worker) {
   /*
@@ -26,4 +26,4 @@ const listen = function(worker) {
     worker.port.emit(requestId, 'SUCCESS', tab.url);
   });
 };
-exports.listen = listen;
+export const TabEvents = {listen};

@@ -10,19 +10,19 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {GroupUpdateEntity} = require("../../model/entity/group/update/groupUpdateEntity");
-const {GroupModel} = require("../../model/group/groupModel");
-const passphraseController = require('../passphrase/passphraseController');
-const progressController = require('../progress/progressController');
-const {GroupEntity} = require("../../model/entity/group/groupEntity");
-const {SecretEntity} = require("../../model/entity/secret/secretEntity");
-const {SecretsCollection} = require("../../model/entity/secret/secretsCollection");
-const {Keyring} = require('../../model/keyring');
-const {i18n} = require('../../sdk/i18n');
-const {EncryptMessageService} = require("../../service/crypto/encryptMessageService");
-const {DecryptMessageService} = require("../../service/crypto/decryptMessageService");
-const {GetDecryptedUserPrivateKeyService} = require("../../service/account/getDecryptedUserPrivateKeyService");
-const {readMessageOrFail, readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import EncryptMessageService from "../../service/crypto/encryptMessageService";
+import DecryptMessageService from "../../service/crypto/decryptMessageService";
+import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
+import GroupModel from "../../model/group/groupModel";
+import GroupEntity from "../../model/entity/group/groupEntity";
+import {ProgressController as progressController} from "../progress/progressController";
+import GroupUpdateEntity from "../../model/entity/group/update/groupUpdateEntity";
+import i18n from "../../sdk/i18n";
+import SecretEntity from "../../model/entity/secret/secretEntity";
+import SecretsCollection from "../../model/entity/secret/secretsCollection";
 
 class GroupsUpdateController {
   /**
@@ -132,7 +132,7 @@ class GroupsUpdateController {
       if (userId !== neededSecret.userId) {
         userId = neededSecret.userId;
         userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
-        userPublicKey = await readKeyOrFail(userPublicArmoredKey);
+        userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
       }
       await progressController.update(this.worker, this.progress++, i18n.t('Encrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
       const secretDto = {
@@ -158,7 +158,7 @@ class GroupsUpdateController {
     for (const i in items) {
       const secret = items[i];
       await progressController.update(this.worker, this.progress++, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: items.length}));
-      const secretMessage = await readMessageOrFail(secret.data);
+      const secretMessage = await OpenpgpAssertion.readMessageOrFail(secret.data);
       result[secret.resourceId] = await DecryptMessageService.decrypt(secretMessage, privateKey);
     }
     return result;
@@ -175,4 +175,4 @@ class GroupsUpdateController {
   }
 }
 
-exports.GroupsUpdateController = GroupsUpdateController;
+export default GroupsUpdateController;

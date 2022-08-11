@@ -12,10 +12,10 @@
  * @since         3.6.0
  */
 
-import {EncryptPrivateKeyService} from "./encryptPrivateKeyService";
+import EncryptPrivateKeyService from "./encryptPrivateKeyService";
 import {pgpKeys} from '../../../../../test/fixtures/pgpKeys/keys';
-import {DecryptPrivateKeyService} from './decryptPrivateKeyService';
-import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
+import DecryptPrivateKeyService from './decryptPrivateKeyService';
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 const publicKey = pgpKeys.ada.public;
 const privateKey = pgpKeys.ada.private;
@@ -44,14 +44,14 @@ describe("EncryptPrivateKeyService service", () => {
   it('should throw an exception if the passphrase is not formatted properly', async() => {
     expect.assertions(1);
     const nonUtf8String = "\u{10000}";
-    const key = await readKeyOrFail(decryptedPrivateKey);
+    const key = await OpenpgpAssertion.readKeyOrFail(decryptedPrivateKey);
     const promise = EncryptPrivateKeyService.encrypt(key, nonUtf8String);
     await expect(promise).rejects.toThrowError(new Error("The passphrase should be a valid UTF8 string."));
   });
 
   it('should encrypt a given key with a passphrase', async() => {
     const passphrase = "newPassphrase";
-    const key = await readKeyOrFail(decryptedPrivateKey);
+    const key = await OpenpgpAssertion.readKeyOrFail(decryptedPrivateKey);
     const reEncryptedKey = await EncryptPrivateKeyService.encrypt(key, passphrase);
 
     const promise = DecryptPrivateKeyService.decrypt(reEncryptedKey, passphrase);

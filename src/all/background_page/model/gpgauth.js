@@ -11,23 +11,24 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.9.0
  */
-const Uuid = require('../utils/uuid');
-const {ApiClientOptions} = require("../service/api/apiClient/apiClientOptions");
-
-const {AuthService} = require('../service/auth');
-const {User} = require('./user');
-const {Keyring} = require('./keyring');
-const {GpgAuthToken} = require('./gpgAuthToken');
-const {GpgAuthHeader} = require('./gpgAuthHeader');
-const {MfaAuthenticationRequiredError} = require('../error/mfaAuthenticationRequiredError');
-const {Request} = require('./request');
-const {OrganizationSettingsModel} = require('./organizationSettings/organizationSettingsModel');
-const {AuthStatusLocalStorage} = require('../service/local_storage/authStatusLocalStorage');
-const {EncryptMessageService} = require('../service/crypto/encryptMessageService');
-const {DecryptMessageService} = require('../service/crypto/decryptMessageService');
-const {GetGpgKeyInfoService} = require('../service/crypto/getGpgKeyInfoService');
-const {CompareGpgKeyService} = require('../service/crypto/compareGpgKeyService');
-const {readKeyOrFail, readMessageOrFail} = require('../utils/openpgp/openpgpAssertions');
+import {OpenpgpAssertion} from "../utils/openpgp/openpgpAssertions";
+import Keyring from "./keyring";
+import EncryptMessageService from "../service/crypto/encryptMessageService";
+import DecryptMessageService from "../service/crypto/decryptMessageService";
+import CompareGpgKeyService from "../service/crypto/compareGpgKeyService";
+import User from "./user";
+import AuthStatusLocalStorage from "../service/local_storage/authStatusLocalStorage";
+import {Uuid} from "../utils/uuid";
+import GpgAuthToken from "./gpgAuthToken";
+import MfaAuthenticationRequiredError from "../error/mfaAuthenticationRequiredError";
+import OrganizationSettingsModel from "./organizationSettings/organizationSettingsModel";
+import GpgAuthHeader from "./gpgAuthHeader";
+import GetGpgKeyInfoService from "../service/crypto/getGpgKeyInfoService";
+import ApiClientOptions from "../service/api/apiClient/apiClientOptions";
+import AuthService from "../service/auth";
+import Request from "./request";
+import urldecode from 'locutus/php/url/urldecode';
+import stripslashes from 'locutus/php/strings/stripslashes';
 
 const URL_VERIFY = '/auth/verify.json?api-version=v2';
 const URL_LOGIN = '/auth/login.json?api-version=v2';
@@ -80,7 +81,7 @@ class GpgAuth {
     let encrypted, originalToken;
     try {
       originalToken = new GpgAuthToken();
-      const serverKey = await readKeyOrFail(serverArmoredKey);
+      const serverKey = await OpenpgpAssertion.readKeyOrFail(serverArmoredKey);
       encrypted = await EncryptMessageService.encrypt(originalToken.token, serverKey);
     } catch (error) {
       throw new Error(`Unable to encrypt the verify token. ${error.message}`);
@@ -125,9 +126,9 @@ class GpgAuth {
    */
   async serverKeyChanged() {
     const remoteServerArmoredKey = (await this.getServerKey()).keydata;
-    const remoteServerKey = await readKeyOrFail(remoteServerArmoredKey);
+    const remoteServerKey = await OpenpgpAssertion.readKeyOrFail(remoteServerArmoredKey);
     const serverLocalArmoredKey = this.getServerKeyFromKeyring().armoredKey;
-    const serverLocalKey = await readKeyOrFail(serverLocalArmoredKey);
+    const serverLocalKey = await OpenpgpAssertion.readKeyOrFail(serverLocalArmoredKey);
     return !await CompareGpgKeyService.areKeysTheSame(remoteServerKey, serverLocalKey);
   }
 
@@ -213,8 +214,8 @@ class GpgAuth {
 
     // Try to decrypt the User Auth Token
     const encryptedUserAuthToken = stripslashes(urldecode(auth.headers['x-gpgauth-user-auth-token']));
-    const decryptionKey = await readKeyOrFail(privateKey.armoredKey);
-    const encryptedMessage = await readMessageOrFail(encryptedUserAuthToken);
+    const decryptionKey = await OpenpgpAssertion.readKeyOrFail(privateKey.armoredKey);
+    const encryptedMessage = await OpenpgpAssertion.readMessageOrFail(encryptedUserAuthToken);
     const userAuthToken = await DecryptMessageService.decrypt(encryptedMessage, decryptionKey);
 
     // Validate the User Auth Token
@@ -424,4 +425,4 @@ class GpgAuth {
   }
 }
 // Exports the Authentication model object.
-exports.GpgAuth = GpgAuth;
+export default GpgAuth;

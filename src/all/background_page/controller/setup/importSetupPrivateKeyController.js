@@ -12,10 +12,10 @@
  * @since         3.6.0
  */
 
-const {i18n} = require('../../sdk/i18n');
-const {GpgAuth} = require("../../model/gpgauth");
-const {GpgKeyError} = require("../../error/GpgKeyError");
-const {assertPrivateKey, readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
+import GpgAuth from "../../model/gpgauth";
+import i18n from "../../sdk/i18n";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import GpgKeyError from "../../error/GpgKeyError";
 
 class ImportSetupPrivateKeyController {
   /**
@@ -52,8 +52,8 @@ class ImportSetupPrivateKeyController {
    * @returns {Promise<void>}
    */
   async exec(armoredKey) {
-    const privateKey = await readKeyOrFail(armoredKey);
-    assertPrivateKey(privateKey);
+    const privateKey = await OpenpgpAssertion.readKeyOrFail(armoredKey);
+    OpenpgpAssertion.assertPrivateKey(privateKey);
     const privateKeyFingerprint = privateKey.getFingerprint().toUpperCase();
     await this._assertImportKeyNotUsed(privateKeyFingerprint);
 
@@ -90,4 +90,4 @@ class ImportSetupPrivateKeyController {
   }
 }
 
-exports.ImportSetupPrivateKeyController = ImportSetupPrivateKeyController;
+export default ImportSetupPrivateKeyController;

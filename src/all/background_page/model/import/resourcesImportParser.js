@@ -10,10 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {FileTypeError} = require("../../error/fileTypeError");
-const {ImportResourcesFileEntity} = require("../entity/import/importResourcesFileEntity");
-const {ResourcesKdbxImportParser} = require("./resources/resourcesKdbxImportParser");
-const {ResourcesCsvImportParser} = require("./resources/resourcesCsvImportParser");
+import ImportResourcesFileEntity from "../entity/import/importResourcesFileEntity";
+import ResourcesKdbxImportParser from "./resources/resourcesKdbxImportParser";
+import ResourcesCsvImportParser from "./resources/resourcesCsvImportParser";
+import FileTypeError from "../../error/fileTypeError";
 
 class ResourcesImportParser {
   /**
@@ -46,4 +46,4 @@ class ResourcesImportParser {
   }
 }
 
-exports.ResourcesImportParser = ResourcesImportParser;
+export default ResourcesImportParser;

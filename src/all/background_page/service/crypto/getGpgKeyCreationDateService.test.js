@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {GetGpgKeyCreationDateService} from "./getGpgKeyCreationDateService";
+import GetGpgKeyCreationDateService from "./getGpgKeyCreationDateService";
 import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {MockExtension} from "../../../../../test/mocks/mockExtension";
+import MockExtension from "../../../../../test/mocks/mockExtension";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {defaultApiClientOptions} from "../api/apiClient/apiClientOptions.test.data";
 

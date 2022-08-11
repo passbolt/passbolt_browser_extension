@@ -10,30 +10,26 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {User} = require('../../model/user');
-
-const progressController = require('../progress/progressController');
-const passphraseController = require('../passphrase/passphraseController');
-const {ImportError} = require("../../error/importError");
-
-const {ResourcesImportParser} = require("../../model/import/resourcesImportParser");
-const {FolderModel} = require('../../model/folder/folderModel');
-const {ResourceTypeModel} = require("../../model/resourceType/resourceTypeModel");
-const {ResourceModel} = require('../../model/resource/resourceModel');
-const {TagModel} = require('../../model/tag/tagModel');
-
-const {ResourcesCollection} = require("../../model/entity/resource/resourcesCollection");
-const {ExternalFoldersCollection} = require('../../model/entity/folder/external/externalFoldersCollection');
-const {TagsCollection} = require('../../model/entity/tag/tagsCollection');
-const {ResourceSecretsCollection} = require("../../model/entity/secret/resource/resourceSecretsCollection");
-const {ImportResourcesFileEntity} = require("../../model/entity/import/importResourcesFileEntity");
-const {SecretEntity} = require("../../model/entity/secret/secretEntity");
-
-const {i18n} = require('../../sdk/i18n');
-const {EncryptMessageService} = require('../../service/crypto/encryptMessageService');
-const {Keyring} = require('../../model/keyring');
-const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
-const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import EncryptMessageService from "../../service/crypto/encryptMessageService";
+import User from "../../model/user";
+import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
+import ResourceModel from "../../model/resource/resourceModel";
+import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
+import FolderModel from "../../model/folder/folderModel";
+import TagModel from "../../model/tag/tagModel";
+import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
+import ExternalFoldersCollection from "../../model/entity/folder/external/externalFoldersCollection";
+import {ProgressController as progressController} from "../progress/progressController";
+import ImportResourcesFileEntity from "../../model/entity/import/importResourcesFileEntity";
+import ResourcesImportParser from "../../model/import/resourcesImportParser";
+import i18n from "../../sdk/i18n";
+import TagsCollection from "../../model/entity/tag/tagsCollection";
+import SecretEntity from "../../model/entity/secret/secretEntity";
+import ResourceSecretsCollection from "../../model/entity/secret/resource/resourceSecretsCollection";
+import ImportError from "../../error/importError";
 
 class ImportResourcesFileController {
   /**
@@ -158,7 +154,7 @@ class ImportResourcesFileController {
       const secretDto = this.buildSecretDto(importResourceEntity);
       const serializedPlaintextDto = await this.resourceModel.serializePlaintextDto(importResourceEntity.resourceTypeId, secretDto);
       const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
-      const userPublicKey = await readKeyOrFail(userPublicArmoredKey);
+      const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
       const data = await EncryptMessageService.encrypt(serializedPlaintextDto, userPublicKey, [privateKey]);
       const secret = new SecretEntity({data: data});
       importResourceEntity.secrets = new ResourceSecretsCollection([secret]);
@@ -338,4 +334,4 @@ class ImportResourcesFileController {
   }
 }
 
-exports.ImportResourcesFileController = ImportResourcesFileController;
+export default ImportResourcesFileController;

@@ -15,9 +15,9 @@
 import {enableFetchMocks} from "jest-fetch-mock";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {initialAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
-import {AbortAndRequestHelp} from "./abortAndRequestHelpController";
+import AbortAndRequestHelp from "./abortAndRequestHelpController";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {AccountRecoverEntity} from "../../model/entity/account/accountRecoverEntity";
+import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 
 beforeEach(() => {
   enableFetchMocks();

@@ -12,7 +12,8 @@
  * @since         3.6.0
  */
 
-const {ProgressService} = require('./progressService');
+import ProgressService from "./progressService";
+
 
 describe("AccountRecoveryOrganizationPolicyEntity builder", () => {
   it("should emit the right events with the right information", async() => {

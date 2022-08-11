@@ -11,12 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.7.0
  */
-
-const {PageMod} = require('../sdk/page-mod');
-const app = require('../app');
-const Worker = require("../model/worker");
-const {GetLegacyAccountService} = require("../service/account/getLegacyAccountService");
-const {ParsePublicWebsiteUrlService} = require("../service/publicWebsite/parsePublicWebsiteUrlService");
+import {Worker} from "../model/worker";
+import GetLegacyAccountService from "../service/account/getLegacyAccountService";
+import {App as app} from "../app";
+import PageMod from "../sdk/page-mod";
+import ParsePublicWebsiteUrlService from "../service/publicWebsite/parsePublicWebsiteUrlService";
 
 const PublicWebsiteSignIn = function() {};
 PublicWebsiteSignIn._pageMod = undefined;
@@ -63,4 +62,4 @@ PublicWebsiteSignIn.init = function() {
   });
 };
 
-exports.PublicWebsiteSignIn = PublicWebsiteSignIn;
+export default PublicWebsiteSignIn;

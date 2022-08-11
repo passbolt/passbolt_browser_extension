@@ -12,14 +12,16 @@
  * @since         3.6.0
  */
 
-const {User} = require("../../model/user");
-const {Keyring} = require("../../model/keyring");
-const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
-const {AccountRecoveryUserSettingEntity} = require("../../model/entity/accountRecovery/accountRecoveryUserSettingEntity");
-const PassphraseController = require("../../controller/passphrase/passphraseController");
-const {DecryptPrivateKeyService} = require("../../service/crypto/decryptPrivateKeyService");
-const {BuildApprovedAccountRecoveryUserSettingEntityService} = require("../../service/accountRecovery/buildApprovedAccountRecoveryUserSettingEntityService");
-const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
+import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
+import {PassphraseController} from "../passphrase/passphraseController";
+import User from "../../model/user";
+import AccountRecoveryUserSettingEntity from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
+import BuildApprovedAccountRecoveryUserSettingEntityService from "../../service/accountRecovery/buildApprovedAccountRecoveryUserSettingEntityService";
+
+
 /**
  * Controller related to the account recovery save settings
  */
@@ -91,11 +93,11 @@ class AccountRecoverySaveUserSettingsController {
   async buildApprovedUserSetting(organizationPolicy) {
     const userPassphrase = await PassphraseController.request(this.worker);
     const userPrivateArmoredKey = this.keyring.findPrivate().armoredKey;
-    const userPrivateKey = await readKeyOrFail(userPrivateArmoredKey);
+    const userPrivateKey = await OpenpgpAssertion.readKeyOrFail(userPrivateArmoredKey);
     const userDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, userPassphrase);
 
     return BuildApprovedAccountRecoveryUserSettingEntityService.build(this.account, userDecryptedPrivateKey, organizationPolicy);
   }
 }
 
-exports.AccountRecoverySaveUserSettingsController = AccountRecoverySaveUserSettingsController;
+export default AccountRecoverySaveUserSettingsController;

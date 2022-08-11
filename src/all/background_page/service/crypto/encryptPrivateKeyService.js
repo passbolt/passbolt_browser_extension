@@ -12,7 +12,9 @@
  * @since         3.6.0
  */
 
-const {assertDecryptedPrivateKey} = require("../../utils/openpgp/openpgpAssertions");
+import * as openpgp from 'openpgp';
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import {ValidatorRule as Validator} from "../../utils/validatorRules";
 
 class EncryptPrivateKeyService {
   /**
@@ -25,7 +27,7 @@ class EncryptPrivateKeyService {
    * @throws {Error} If the passphrase is not a valid utf8 string
    */
   static async encrypt(decryptedPrivateKey, passphrase) {
-    assertDecryptedPrivateKey(decryptedPrivateKey);
+    OpenpgpAssertion.assertDecryptedPrivateKey(decryptedPrivateKey);
     if (!Validator.isUtf8(passphrase)) {
       throw new Error('The passphrase should be a valid UTF8 string.');
     }
@@ -37,4 +39,4 @@ class EncryptPrivateKeyService {
   }
 }
 
-exports.EncryptPrivateKeyService = EncryptPrivateKeyService;
+export default EncryptPrivateKeyService;

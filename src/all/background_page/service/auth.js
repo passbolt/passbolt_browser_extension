@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
-const MfaAuthenticationRequiredError = require('../error/mfaAuthenticationRequiredError').MfaAuthenticationRequiredError;
-const NotFoundError = require('../error/notFoundError').NotFoundError;
-const {User} = require('../model/user');
-const PassboltBadResponseError = require('../error/passboltBadResponseError').PassboltBadResponseError;
-const PassboltServiceUnavailableError = require('../error/passboltServiceUnavailableError').PassboltServiceUnavailableError;
+import User from "../model/user";
+import PassboltBadResponseError from "../error/passboltBadResponseError";
+import PassboltServiceUnavailableError from "../error/passboltServiceUnavailableError";
+import MfaAuthenticationRequiredError from "../error/mfaAuthenticationRequiredError";
+import NotFoundError from "../error/notFoundError";
 
 class AuthService {}
 
@@ -162,4 +162,4 @@ const _isAuthenticatedLegacy = async function() {
   return false;
 };
 
-exports.AuthService = AuthService;
+export default AuthService;

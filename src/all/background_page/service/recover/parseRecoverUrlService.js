@@ -45,4 +45,4 @@ class ParseRecoverUrlService {
   }
 }
 
-exports.ParseRecoverUrlService = ParseRecoverUrlService;
+export default ParseRecoverUrlService;

@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.3.0
  */
-const {PasswordGeneratorEntity} = require('../entity/passordGenerator/passwordGeneratorEntity');
-const {PasswordGeneratorLocalStorage} = require('../../service/local_storage/passwordGeneratorLocalStorage');
-const {PasswordGeneratorService} = require('../../service/api/passwordGenerator/passwordGeneratorService');
-const PassboltApiFetchError = require('../../error/passboltApiFetchError').PassboltApiFetchError;
+import PasswordGeneratorLocalStorage from "../../service/local_storage/passwordGeneratorLocalStorage";
+import PasswordGeneratorService from "../../service/api/passwordGenerator/passwordGeneratorService";
+import PasswordGeneratorEntity from "../entity/passordGenerator/passwordGeneratorEntity";
+import PassboltApiFetchError from "../../error/passboltApiFetchError";
 
 /** List of possible generator types */
 const GENERATORS =  [
@@ -160,4 +160,4 @@ class PasswordGeneratorModel {
   }
 }
 
-exports.PasswordGeneratorModel = PasswordGeneratorModel;
+export default PasswordGeneratorModel;

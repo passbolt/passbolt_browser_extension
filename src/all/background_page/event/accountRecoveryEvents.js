@@ -11,18 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-const {SetSetupLocaleController} = require("../controller/setup/setSetupLocaleController");
-const {ContinueAccountRecoveryController} = require("../controller/accountRecovery/continueAccountRecoveryController");
-const {RecoverAccountController} = require("../controller/accountRecovery/recoverAccountController");
-const {AuthSignInController} = require("../controller/auth/authSignInController");
-const {GetOrganizationSettingsController} = require("../controller/organizationSettings/getOrganizationSettingsController");
-const {GetExtensionVersionController} = require("../controller/extension/getExtensionVersionController");
-const {GetAccountController} = require("../controller/account/getAccountController");
-const {GetAndInitializeAccountLocaleController} = require("../controller/account/getAndInitializeAccountLocaleController");
-const {VerifyAccountPassphraseController} = require("../controller/account/verifyAccountPassphraseController");
-const {AbortAndInitiateNewAccountRecoveryController} = require("../controller/accountRecovery/abortAndInitiateNewAccountRecoveryController");
-const {DownloadRecoveryKitController} = require("../controller/setup/downloadRecoverKitController");
+import DownloadRecoveryKitController from "../controller/setup/downloadRecoverKitController";
+import ContinueAccountRecoveryController from "../controller/accountRecovery/continueAccountRecoveryController";
+import RecoverAccountController from "../controller/accountRecovery/recoverAccountController";
+import AuthSignInController from "../controller/auth/authSignInController";
+import VerifyAccountPassphraseController from "../controller/account/verifyAccountPassphraseController";
+import AbortAndInitiateNewAccountRecoveryController from "../controller/accountRecovery/abortAndInitiateNewAccountRecoveryController";
+import SetSetupLocaleController from "../controller/setup/setSetupLocaleController";
+import GetOrganizationSettingsController from "../controller/organizationSettings/getOrganizationSettingsController";
+import GetAndInitializeAccountLocaleController from "../controller/account/getAndInitializeAccountLocaleController";
+import GetExtensionVersionController from "../controller/extension/getExtensionVersionController";
+import GetAccountController from "../controller/account/getAccountController";
 
 /**
  * Listens to the account recovery continue application events
@@ -87,4 +86,4 @@ const listen = function(worker, apiClientOptions, account) {
   });
 };
 
-exports.listen = listen;
+export const AccountRecoveryEvents = {listen};

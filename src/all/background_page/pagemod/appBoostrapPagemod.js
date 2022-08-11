@@ -8,11 +8,11 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {PageMod} = require('../sdk/page-mod');
-const app = require('../app');
-const Worker = require('../model/worker');
-const GpgAuth = require('../model/gpgauth').GpgAuth;
-const User = require('../model/user').User;
+import GpgAuth from "../model/gpgauth";
+import User from "../model/user";
+import {Worker} from "../model/worker";
+import {App as app} from "../app";
+import PageMod from "../sdk/page-mod";
 
 const AppBoostrapPagemod = function() {
 };
@@ -96,4 +96,4 @@ AppBoostrapPagemod.init = function() {
   });
 };
 
-exports.AppBoostrap = AppBoostrapPagemod;
+export default AppBoostrapPagemod;

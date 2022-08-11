@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {GroupService} from "./groupService";
+import GroupService from "./groupService";
 
 describe("Group entity", () => {
   it('remap legacy contains', () => {

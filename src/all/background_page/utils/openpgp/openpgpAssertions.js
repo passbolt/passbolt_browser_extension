@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {i18n} = require('../../sdk/i18n');
+import * as openpgp from 'openpgp';
+import i18n from "../../sdk/i18n";
 
 /*
  * ==================================================
@@ -36,7 +37,6 @@ const readKeyOrFail = async armoredKey => {
     throw new Error(i18n.t("The key should be a valid openpgp armored key string."));
   }
 };
-exports.readKeyOrFail = readKeyOrFail;
 
 /**
  * Read all open pgp armored key strings in the given array.
@@ -51,7 +51,6 @@ const readAllKeysOrFail = async armoredKeys => {
   }
   return Promise.all(armoredKeys.map(key => readKeyOrFail(key)));
 };
-exports.readAllKeysOrFail = readAllKeysOrFail;
 
 /**
  * Creates on open pgp from a given clear text message string.
@@ -65,7 +64,6 @@ const createMessageOrFail = async message => {
   }
   return openpgp.createMessage({text: message, format: 'utf8'});
 };
-exports.createMessageOrFail = createMessageOrFail;
 
 /**
  * Reads a message in its armored string form.
@@ -85,7 +83,6 @@ const readMessageOrFail = async message => {
     throw new Error(i18n.t("The message should be a valid openpgp message."));
   }
 };
-exports.readMessageOrFail = readMessageOrFail;
 
 /*
  * ==================================================
@@ -103,7 +100,6 @@ const assertKey = key => {
     throw new Error(i18n.t("The key should be a valid openpgp key."));
   }
 };
-exports.assertKey = assertKey;
 
 /**
  * Assert the given array of keys is an array containing openpgp.PublicKey or openpgp.PrivateKey
@@ -120,7 +116,6 @@ const assertKeys = keys => {
     assertKey(keys[i]);
   }
 };
-exports.assertKeys = assertKeys;
 
 /**
  * Assert the given key is an openpgp.PublicKey
@@ -137,7 +132,6 @@ const assertPublicKey = key => {
     throw new Error(i18n.t("The key should be a valid openpgp public key."));
   }
 };
-exports.assertPublicKey = assertPublicKey;
 
 /**
  * Assert the given array of keys is an array containing openpgp.PublicKey
@@ -154,7 +148,6 @@ const assertPublicKeys = keys => {
     assertPublicKey(keys[i]);
   }
 };
-exports.assertPublicKeys = assertPublicKeys;
 
 /**
  * Assert the given key is an openpgp.PrivateKey
@@ -168,7 +161,6 @@ const assertPrivateKey = key => {
     throw new Error(i18n.t("The key should be a valid openpgp private key."));
   }
 };
-exports.assertPrivateKey = assertPrivateKey;
 
 /**
  * Assert the given array of keys is an array containing openpgp.PrivateKey
@@ -185,7 +177,6 @@ const assertPrivateKeys = keys => {
     assertPrivateKey(keys[i]);
   }
 };
-exports.assertPrivateKeys = assertPrivateKeys;
 
 /**
  * Assert the given key is a decrypted openpgp.PrivateKey
@@ -199,7 +190,6 @@ const assertDecryptedPrivateKey = key => {
     throw new Error(i18n.t("The private key should be decrypted."));
   }
 };
-exports.assertDecryptedPrivateKey = assertDecryptedPrivateKey;
 
 /**
  * Assert the given array of keys is an array containing decrypted openpgp.PrivateKey
@@ -216,7 +206,6 @@ const assertDecryptedPrivateKeys = keys => {
     assertDecryptedPrivateKey(keys[i]);
   }
 };
-exports.assertDecryptedPrivateKeys = assertDecryptedPrivateKeys;
 
 /**
  * Assert the given key is an encrypted openpgp.PrivateKey
@@ -230,7 +219,6 @@ const assertEncryptedPrivateKey = key => {
     throw new Error(i18n.t("The private key should be encrypted."));
   }
 };
-exports.assertEncryptedPrivateKey = assertEncryptedPrivateKey;
 
 /**
  * Assert the given array of keys is an array containing encrypted openpgp.PrivateKey
@@ -247,7 +235,6 @@ const assertEncryptedPrivateKeys = keys => {
     assertEncryptedPrivateKey(keys[i]);
   }
 };
-exports.assertEncryptedPrivateKeys = assertEncryptedPrivateKeys;
 
 /**
  * Assert the given message is an openpgp.Message
@@ -260,4 +247,21 @@ const assertMessage = message => {
     throw new Error(i18n.t("The message should be a valid openpgp message."));
   }
 };
-exports.assertMessage = assertMessage;
+
+export const OpenpgpAssertion = {
+  assertMessage,
+  assertEncryptedPrivateKeys,
+  assertEncryptedPrivateKey,
+  assertDecryptedPrivateKeys,
+  assertDecryptedPrivateKey,
+  assertPrivateKeys,
+  assertPrivateKey,
+  assertPublicKeys,
+  assertPublicKey,
+  assertKeys,
+  assertKey,
+  readMessageOrFail,
+  createMessageOrFail,
+  readAllKeysOrFail,
+  readKeyOrFail
+};

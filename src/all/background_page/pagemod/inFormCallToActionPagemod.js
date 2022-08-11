@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {PageMod} = require('../sdk/page-mod');
-const app = require('../app');
+import PageMod from "../sdk/page-mod";
+import {App as app} from "../app";
 
 const InFormCallToAction = function() {};
 InFormCallToAction._pageMod = undefined;
@@ -45,4 +45,4 @@ InFormCallToAction.init = function() {
   });
 };
 
-exports.InFormCallToAction = InFormCallToAction;
+export default InFormCallToAction;

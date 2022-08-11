@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-const {OrganizationSettingsModel} = require("../../model/organizationSettings/organizationSettingsModel");
+import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 
 class GetOrganizationSettingsController {
   /**
@@ -52,4 +52,4 @@ class GetOrganizationSettingsController {
   }
 }
 
-exports.GetOrganizationSettingsController = GetOrganizationSettingsController;
+export default GetOrganizationSettingsController;

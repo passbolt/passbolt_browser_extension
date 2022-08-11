@@ -11,17 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {SignGpgKeyService} = require("./signGpgKeyService");
+import SignGpgKeyService from "./signGpgKeyService";
 import {pgpKeys} from '../../../../../test/fixtures/pgpKeys/keys';
-import {readKeyOrFail} from '../../utils/openpgp/openpgpAssertions';
+import {OpenpgpAssertion} from '../../utils/openpgp/openpgpAssertions';
 
 describe("SignGpgKey service", () => {
   it("should sign a given public key with as many as private key provided", async() => {
     expect.assertions(2);
 
-    const keyToSign = await readKeyOrFail(pgpKeys.admin.public);
-    const bettyDecryptedKey = await readKeyOrFail(pgpKeys.betty.private_decrypted);
-    const adaDecryptedKey = await readKeyOrFail(pgpKeys.ada.private_decrypted);
+    const keyToSign = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public);
+    const bettyDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
+    const adaDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private_decrypted);
     const signingKey = [bettyDecryptedKey, adaDecryptedKey];
 
     const adminSignedPublicGpgKey = await SignGpgKeyService.sign(keyToSign, signingKey);

@@ -15,12 +15,10 @@
  */
 import fs from "fs";
 import * as kdbxweb from "kdbxweb";
-import {ResourcesKdbxImportParser} from "./resourcesKdbxImportParser";
-import {ImportResourcesFileEntity} from "../../entity/import/importResourcesFileEntity";
-import {EntityValidationError} from "../../entity/abstract/entityValidationError";
-import {ImportError} from "../../../error/importError";
-
-global.kdbxweb = kdbxweb;
+import ResourcesKdbxImportParser from "./resourcesKdbxImportParser";
+import ImportResourcesFileEntity from "../../entity/import/importResourcesFileEntity";
+import EntityValidationError from "../../entity/abstract/entityValidationError";
+import ImportError from "../../../error/importError";
 
 describe("ResourcesKdbxImportParser", () => {
   it("should read import file", async() => {

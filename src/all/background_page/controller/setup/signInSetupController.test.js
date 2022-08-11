@@ -13,10 +13,10 @@
  */
 
 import {enableFetchMocks} from "jest-fetch-mock";
-import {AccountEntity} from "../../model/entity/account/accountEntity";
+import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import {SignInSetupController} from "./signInSetupController";
+import SignInSetupController from "./signInSetupController";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 
 beforeEach(() => {

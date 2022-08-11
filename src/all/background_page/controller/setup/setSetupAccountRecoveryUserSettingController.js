@@ -12,10 +12,10 @@
  * @since         3.6.0
  */
 
-const {AccountRecoveryUserSettingEntity} = require("../../model/entity/accountRecovery/accountRecoveryUserSettingEntity");
-const {DecryptPrivateKeyService} = require("../../service/crypto/decryptPrivateKeyService");
-const {BuildApprovedAccountRecoveryUserSettingEntityService} = require("../../service/accountRecovery/buildApprovedAccountRecoveryUserSettingEntityService");
-const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
+import AccountRecoveryUserSettingEntity from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
+import BuildApprovedAccountRecoveryUserSettingEntityService from "../../service/accountRecovery/buildApprovedAccountRecoveryUserSettingEntityService";
 
 class SetSetupAccountRecoveryUserSettingController {
   /**
@@ -76,7 +76,7 @@ class SetSetupAccountRecoveryUserSettingController {
       throw new Error('A passphrase is required.');
     }
 
-    const userPrivateKey = await readKeyOrFail(this.account.userPrivateArmoredKey);
+    const userPrivateKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPrivateArmoredKey);
     const userDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, this.runtimeMemory.passphrase);
     const organizationPolicy = this.runtimeMemory.accountRecoveryOrganizationPolicy;
 
@@ -95,4 +95,4 @@ class SetSetupAccountRecoveryUserSettingController {
   }
 }
 
-exports.SetSetupAccountRecoveryUserSettingController = SetSetupAccountRecoveryUserSettingController;
+export default SetSetupAccountRecoveryUserSettingController;

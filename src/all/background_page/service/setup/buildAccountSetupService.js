@@ -11,9 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-const {ParseSetupUrlService} = require("./parseSetupUrlService");
-const {AccountSetupEntity} = require("../../model/entity/account/accountSetupEntity");
+import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
+import ParseSetupUrlService from "./parseSetupUrlService";
 
 class BuildAccountSetupService {
   /**
@@ -30,4 +29,4 @@ class BuildAccountSetupService {
   }
 }
 
-exports.BuildAccountSetupService = BuildAccountSetupService;
+export default BuildAccountSetupService;

@@ -12,19 +12,17 @@
  * @since         3.6.0
  */
 import {enableFetchMocks} from "jest-fetch-mock";
-import {ImportRecoverPrivateKeyController} from "./importRecoverPrivateKeyController";
-import {GetGpgKeyInfoService} from "../../service/crypto/getGpgKeyInfoService";
-import {GpgKeyError} from "../../error/GpgKeyError";
+import ImportRecoverPrivateKeyController from "./importRecoverPrivateKeyController";
+import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
+import GpgKeyError from "../../error/GpgKeyError";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
-import {MockExtension} from "../../../../../test/mocks/mockExtension";
+import MockExtension from "../../../../../test/mocks/mockExtension";
 import {
   initialAccountRecoverDto,
   withServerKeyAccountRecoverDto
 } from "../../model/entity/account/accountRecoverEntity.test.data";
-import {AccountRecoverEntity} from "../../model/entity/account/accountRecoverEntity";
-import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
-
-global.XRegExp = require("xregexp");
+import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -131,8 +129,8 @@ describe("ImportRecoverPrivateKeyController", () => {
 
       await controller.exec(expectedKeyData.private);
 
-      const accountPrivateKey = await readKeyOrFail(account.userPrivateArmoredKey);
-      const accountPublicKey = await readKeyOrFail(account.userPublicArmoredKey);
+      const accountPrivateKey = await OpenpgpAssertion.readKeyOrFail(account.userPrivateArmoredKey);
+      const accountPublicKey = await OpenpgpAssertion.readKeyOrFail(account.userPublicArmoredKey);
       const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountPublicKey);
       const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountPrivateKey);
 

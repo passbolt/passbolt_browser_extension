@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.4.0
  */
-const {Keyring} = require('../model/keyring');
-const {DecryptMessageService} = require('../service/crypto/decryptMessageService');
-const {EncryptMessageService} = require('../service/crypto/encryptMessageService');
-const {ShareService} = require('../service/share');
-const {readMessageOrFail, readKeyOrFail} = require('../utils/openpgp/openpgpAssertions');
+import {OpenpgpAssertion} from "../utils/openpgp/openpgpAssertions";
+import Keyring from "../model/keyring";
+import EncryptMessageService from "../service/crypto/encryptMessageService";
+import DecryptMessageService from "../service/crypto/decryptMessageService";
+import ShareService from "../service/share";
 
 class Share {}
 
@@ -150,7 +150,7 @@ const bulkShareEncrypt = async function(resources, resourcesNewUsers, privateKey
 
   for (const resourceId in resourcesNewUsers) {
     const resource = resources.find(resource => resource.id === resourceId);
-    const originalMessage = await readMessageOrFail(resource.secrets[0].data);
+    const originalMessage = await OpenpgpAssertion.readMessageOrFail(resource.secrets[0].data);
     const users = resourcesNewUsers[resourceId];
     progressCallback(`Encrypting for ${resource.name}`);
     if (users && users.length) {
@@ -161,7 +161,7 @@ const bulkShareEncrypt = async function(resources, resourcesNewUsers, privateKey
       for (const i in encryptAllData) {
         const data = encryptAllData[i];
         const userPublicArmoredKey = keyring.findPublic(data.userId).armoredKey;
-        const userPublicKey = await readKeyOrFail(userPublicArmoredKey);
+        const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
         const messageEncrypted = await EncryptMessageService.encrypt(data.message, userPublicKey, [privateKey]);
         result.push({
           resource_id: resourceId,
@@ -177,4 +177,4 @@ const bulkShareEncrypt = async function(resources, resourcesNewUsers, privateKey
   return secrets;
 };
 
-exports.Share = Share;
+export default Share;

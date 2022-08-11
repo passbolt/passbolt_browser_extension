@@ -12,7 +12,8 @@
  * @since         3.6.0
  */
 
-const {assertDecryptedPrivateKey, assertMessage, assertKeys} = require("../../utils/openpgp/openpgpAssertions");
+import * as openpgp from 'openpgp';
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 class DecryptMessageService {
   /**
@@ -25,9 +26,9 @@ class DecryptMessageService {
    */
   static async decryptSymmetrically(message, password, verificationKeys = null) {
     if (verificationKeys) {
-      assertKeys(verificationKeys);
+      OpenpgpAssertion.assertKeys(verificationKeys);
     }
-    assertMessage(message);
+    OpenpgpAssertion.assertMessage(message);
 
     const {data: decryptedMessage, signatures} = await openpgp.decrypt({
       message: message,
@@ -53,10 +54,10 @@ class DecryptMessageService {
    * @throws {Error} if the given signatures don't match the message to decrypt.
    */
   static async decrypt(message, decryptionKey, verificationKeys = null) {
-    assertMessage(message);
-    assertDecryptedPrivateKey(decryptionKey);
+    OpenpgpAssertion.assertMessage(message);
+    OpenpgpAssertion.assertDecryptedPrivateKey(decryptionKey);
     if (verificationKeys) {
-      assertKeys(verificationKeys);
+      OpenpgpAssertion.assertKeys(verificationKeys);
     }
 
     const {data: decryptedMessage, signatures} = await openpgp.decrypt({
@@ -94,4 +95,4 @@ class DecryptMessageService {
   }
 }
 
-exports.DecryptMessageService = DecryptMessageService;
+export default DecryptMessageService;

@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.4.0
  */
-const {User} = require('../model/user');
-const Request = require('../model/request').Request;
-const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
-const PassboltBadResponseError = require('../error/passboltBadResponseError').PassboltBadResponseError;
-const PassboltServiceUnavailableError = require('../error/passboltServiceUnavailableError').PassboltServiceUnavailableError;
+import User from "../model/user";
+import PassboltBadResponseError from "../error/passboltBadResponseError";
+import Request from "../model/request";
+import PassboltApiFetchError from "../error/passboltApiFetchError";
+import PassboltServiceUnavailableError from "../error/passboltServiceUnavailableError";
 
 class ShareService {}
 
@@ -213,4 +213,4 @@ ShareService.simulateShareResource = async function(resourceId, permissions) {
   return responseJson.body;
 };
 
-exports.ShareService = ShareService;
+export default ShareService;

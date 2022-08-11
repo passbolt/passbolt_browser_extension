@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-require('./error.js');
-const {GroupsCollection} = require('../model/entity/group/groupsCollection');
-const {ResourcesCollection} = require('../model/entity/resource/resourcesCollection');
-const {FoldersCollection} = require('../model/entity/folder/foldersCollection');
+import GroupsCollection from "../model/entity/group/groupsCollection";
+import ResourcesCollection from "../model/entity/resource/resourcesCollection";
+import FoldersCollection from "../model/entity/folder/foldersCollection";
+import './error.js';
 
 class DeleteDryRunError extends Error {
   /**
@@ -78,4 +78,4 @@ class DeleteDryRunError extends Error {
   }
 }
 
-exports.DeleteDryRunError = DeleteDryRunError;
+export default DeleteDryRunError;

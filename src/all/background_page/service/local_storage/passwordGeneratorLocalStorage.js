@@ -11,8 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.3.0
  */
-const {Log} = require('../../model/log');
-const Lock = require('../../utils/lock').Lock;
+import browser from "webextension-polyfill";
+import Log from "../../model/log";
+import Lock from "../../utils/lock";
 const lock = new Lock();
 
 const PASSWORD_GENERATOR_LOCAL_STORAGE_KEY = 'passwordGenerator';
@@ -67,4 +68,4 @@ class PasswordGeneratorLocalStorage {
   }
 }
 
-exports.PasswordGeneratorLocalStorage = PasswordGeneratorLocalStorage;
+export default PasswordGeneratorLocalStorage;

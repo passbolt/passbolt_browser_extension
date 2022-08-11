@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {DecryptPrivateKeyService} = require('../../crypto/decryptPrivateKeyService');
-const {WrongOrganizationRecoveryKeyError} = require('../../../error/wrongOrganizationRecoveryKeyError');
-const {readKeyOrFail} = require("../../../utils/openpgp/openpgpAssertions");
+import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
+import DecryptPrivateKeyService from "../../crypto/decryptPrivateKeyService";
+import WrongOrganizationRecoveryKeyError from "../../../error/wrongOrganizationRecoveryKeyError";
 
 class ValidateAccountRecoveryOrganizationPrivateKeyService {
   /**
@@ -27,8 +27,8 @@ class ValidateAccountRecoveryOrganizationPrivateKeyService {
    * @throws {WrongOrganizationRecoveryKeyError} If the provided key doesn't match the organization key.
    */
   static async validate(accountRecoveryOrganisationPolicyEntity, privateKeyEntity) {
-    const accountRecoveryPublicKey = await readKeyOrFail(accountRecoveryOrganisationPolicyEntity.accountRecoveryOrganizationPublicKey.armoredKey);
-    const privateKey = await readKeyOrFail(privateKeyEntity.armoredKey);
+    const accountRecoveryPublicKey = await OpenpgpAssertion.readKeyOrFail(accountRecoveryOrganisationPolicyEntity.accountRecoveryOrganizationPublicKey.armoredKey);
+    const privateKey = await OpenpgpAssertion.readKeyOrFail(privateKeyEntity.armoredKey);
 
     const publicKeyFingerPrint = accountRecoveryPublicKey.getFingerprint().toUpperCase();
     const privateKeyFingerPrint = privateKey.getFingerprint().toUpperCase();
@@ -41,4 +41,4 @@ class ValidateAccountRecoveryOrganizationPrivateKeyService {
   }
 }
 
-exports.ValidateAccountRecoveryOrganizationPrivateKeyService = ValidateAccountRecoveryOrganizationPrivateKeyService;
+export default ValidateAccountRecoveryOrganizationPrivateKeyService;

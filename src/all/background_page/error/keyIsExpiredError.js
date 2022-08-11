@@ -12,4 +12,4 @@ class KeyIsExpiredError extends Error {
   }
 }
 
-exports.KeyIsExpiredError = KeyIsExpiredError;
+export default KeyIsExpiredError;

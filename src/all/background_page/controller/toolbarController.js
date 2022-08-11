@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-const tabsController = require('./tabsController');
-const {BrowserExtensionIconService} = require("../service/ui/browserExtensionIcon.service");
-const {ResourceModel} = require("../model/resource/resourceModel");
-const Toolbar = require('../model/toolbar').Toolbar;
-const {User} = require('../model/user');
-
+import browser from "webextension-polyfill";
+import User from "../model/user";
+import {BrowserExtensionIconService} from "../service/ui/browserExtensionIcon.service";
+import ResourceModel from "../model/resource/resourceModel";
+import Toolbar from "../model/toolbar";
+import {TabController as tabsController} from "./tabsController";
 
 class ToolbarController {
   constructor() {
@@ -156,5 +156,5 @@ class ToolbarController {
   }
 }
 
-// Exports the User object.
-exports.ToolbarController = ToolbarController;
+// Exports the Toolbar controller object.
+export default ToolbarController;

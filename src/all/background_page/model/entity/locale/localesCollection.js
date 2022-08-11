@@ -11,9 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-const {LocaleEntity} = require("./localeEntity");
-const {EntityCollection} = require('../abstract/entityCollection');
-const {EntitySchema} = require('../abstract/entitySchema');
+import LocaleEntity from "./localeEntity";
+import EntityCollection from "../abstract/entityCollection";
+import EntitySchema from "../abstract/entitySchema";
+
 
 const ENTITY_NAME = 'Locales';
 
@@ -95,4 +96,4 @@ class LocalesCollection extends EntityCollection {
   }
 }
 
-exports.LocalesCollection = LocalesCollection;
+export default LocalesCollection;

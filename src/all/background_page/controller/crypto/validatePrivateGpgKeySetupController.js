@@ -11,10 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {GetGpgKeyInfoService} = require('../../service/crypto/getGpgKeyInfoService');
-const {assertEncryptedPrivateKey, readKeyOrFail, assertPrivateKey} = require('../../utils/openpgp/openpgpAssertions');
-const {GenerateGpgKeyPairOptionsEntity} = require('../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity');
-const {i18n} = require('../../sdk/i18n');
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import i18n from "../../sdk/i18n";
+import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
+import GenerateGpgKeyPairOptionsEntity from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity";
+
 
 class ValidatePrivateGpgKeySetupController {
   /**
@@ -58,9 +59,9 @@ class ValidatePrivateGpgKeySetupController {
    * @throws {Error} if the key is an ECC with an unsupported curve.
    */
   async exec(privateArmoredKey) {
-    const privateKey = await readKeyOrFail(privateArmoredKey);
-    assertPrivateKey(privateKey);
-    assertEncryptedPrivateKey(privateKey);
+    const privateKey = await OpenpgpAssertion.readKeyOrFail(privateArmoredKey);
+    OpenpgpAssertion.assertPrivateKey(privateKey);
+    OpenpgpAssertion.assertEncryptedPrivateKey(privateKey);
 
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKey);
 
@@ -110,4 +111,4 @@ class ValidatePrivateGpgKeySetupController {
   }
 }
 
-exports.ValidatePrivateGpgKeySetupController = ValidatePrivateGpgKeySetupController;
+export default ValidatePrivateGpgKeySetupController;

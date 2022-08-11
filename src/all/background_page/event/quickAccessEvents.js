@@ -4,12 +4,14 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {i18n} = require('../sdk/i18n');
-const Worker = require('../model/worker');
-const {BrowserTabService} = require("../service/ui/browserTab.service");
-const {ResourceInProgressCacheService} = require("../service/cache/resourceInProgressCache.service");
-const {User} = require('../model/user');
-const {SecretDecryptController} = require('../controller/secret/secretDecryptController');
+import browser from "webextension-polyfill";
+import User from "../model/user";
+import {Worker} from "../model/worker";
+import {BrowserTabService} from "../service/ui/browserTab.service";
+import SecretDecryptController from "../controller/secret/secretDecryptController";
+import ResourceInProgressCacheService from "../service/cache/resourceInProgressCache.service";
+import i18n from "../sdk/i18n";
+
 
 const listen = function(worker) {
   /*
@@ -116,4 +118,4 @@ const listen = function(worker) {
   });
 };
 
-exports.listen = listen;
+export const QuickAccessEvents = {listen};

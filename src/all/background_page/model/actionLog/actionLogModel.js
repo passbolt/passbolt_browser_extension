@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {ActionLogsCollection} = require("../entity/actionLog/actionLogsCollection");
-const {ActionLogService} = require("../../service/api/actionLog/actionLogService");
+import ActionLogsCollection from "../entity/actionLog/actionLogsCollection";
+import ActionLogService from "../../service/api/actionLog/actionLogService";
 
 class ActionLogModel {
   /**
@@ -47,4 +47,4 @@ class ActionLogModel {
   }
 }
 
-exports.ActionLogModel = ActionLogModel;
+export default ActionLogModel;

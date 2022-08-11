@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+import UserEntity from "../user/userEntity";
+import AbstractAccountEntity from "./abstractAccountEntity";
+import AuthenticationTokenEntity from "../authenticationToken/authenticationTokenEntity";
+import EntitySchema from "../abstract/entitySchema";
+import AccountRecoveryUserSettingEntity from "../accountRecovery/accountRecoveryUserSettingEntity";
 
-const {AbstractAccountEntity} = require("./abstractAccountEntity");
-const {EntitySchema} = require('../abstract/entitySchema');
-const {AuthenticationTokenEntity} = require("../authenticationToken/authenticationTokenEntity");
-const {UserEntity} = require("../user/userEntity");
-const {AccountRecoveryUserSettingEntity} = require("../accountRecovery/accountRecoveryUserSettingEntity");
 
 const ENTITY_NAME = "AccountRecover";
 const TYPE_ACCOUNT_RECOVER = "account-recover";
@@ -260,4 +260,4 @@ class AccountRecoverEntity extends AbstractAccountEntity {
   }
 }
 
-exports.AccountRecoverEntity = AccountRecoverEntity;
+export default AccountRecoverEntity;

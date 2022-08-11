@@ -4,8 +4,8 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {User} = require('../model/user');
-const {FavoriteModel} = require('../model/favorite/favoriteModel');
+import User from "../model/user";
+import FavoriteModel from "../model/favorite/favoriteModel";
 
 const listen = function(worker) {
   /*
@@ -47,4 +47,4 @@ const listen = function(worker) {
   });
 };
 
-exports.listen = listen;
+export const FavoriteEvents = {listen};

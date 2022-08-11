@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {EntityValidationError} = require('./entityValidationError');
+import EntityValidationError from "./entityValidationError";
+import Validator from "validator";
 
 class EntitySchema {
   /**
@@ -422,4 +423,4 @@ class EntitySchema {
   }
 }
 
-exports.EntitySchema = EntitySchema;
+export default EntitySchema;

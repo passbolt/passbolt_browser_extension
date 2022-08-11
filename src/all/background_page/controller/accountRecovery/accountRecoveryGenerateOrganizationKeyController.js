@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {GenerateGpgKeyPairService} = require('../../service/crypto/generateGpgKeyPairService');
-const {GenerateGpgKeyPairOptionsEntity} = require("../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity");
-const {GetGpgKeyCreationDateService} = require('../../service/crypto/getGpgKeyCreationDateService');
+import GetGpgKeyCreationDateService from "../../service/crypto/getGpgKeyCreationDateService";
+import GenerateGpgKeyPairOptionsEntity from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity";
+import GenerateGpgKeyPairService from "../../service/crypto/generateGpgKeyPairService";
 
 /**
  * The account recovery organization key size.
@@ -70,4 +70,4 @@ class AccountRecoveryGenerateOrganizationKeyController {
   }
 }
 
-exports.AccountRecoveryGenerateOrganizationKeyController = AccountRecoveryGenerateOrganizationKeyController;
+export default AccountRecoveryGenerateOrganizationKeyController;

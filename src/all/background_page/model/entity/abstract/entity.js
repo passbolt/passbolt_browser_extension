@@ -100,4 +100,4 @@ class Entity {
   }
 }
 
-exports.Entity = Entity;
+export default Entity;

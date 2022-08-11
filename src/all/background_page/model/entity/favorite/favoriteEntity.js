@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {Entity} = require('../abstract/entity');
-const {EntitySchema} = require('../abstract/entitySchema');
+import Entity from "../abstract/entity";
+import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = 'Favorite';
 const FAVORITE_RESOURCE = 'Resource';
@@ -162,4 +162,4 @@ class FavoriteEntity extends Entity {
   }
 }
 
-exports.FavoriteEntity = FavoriteEntity;
+export default FavoriteEntity;

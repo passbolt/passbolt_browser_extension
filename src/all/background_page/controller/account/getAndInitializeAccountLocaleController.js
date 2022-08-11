@@ -11,8 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-const {LocaleModel} = require("../../model/locale/localeModel");
+import LocaleModel from "../../model/locale/localeModel";
 
 class GetAndInitializeAccountLocaleController {
   /**
@@ -69,4 +68,4 @@ class GetAndInitializeAccountLocaleController {
   }
 }
 
-exports.GetAndInitializeAccountLocaleController = GetAndInitializeAccountLocaleController;
+export default GetAndInitializeAccountLocaleController;

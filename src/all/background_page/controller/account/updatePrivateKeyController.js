@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.3
  */
-const {AccountModel} = require("../../model/account/accountModel");
-const {User} = require("../../model/user");
-const fileController = require('../fileController');
+import {FileController as fileController} from "../fileController";
+import AccountModel from "../../model/account/accountModel";
+import User from "../../model/user";
 
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
 
@@ -61,4 +61,4 @@ class UpdatePrivateKeyController {
   }
 }
 
-exports.UpdatePrivateKeyController = UpdatePrivateKeyController;
+export default UpdatePrivateKeyController;

@@ -12,8 +12,9 @@
  * @since         3.2.0
  */
 
-const {LocaleEntity} = require("../../model/entity/locale/localeEntity");
-const {LocaleModel} = require("../../model/locale/localeModel");
+import LocaleModel from "../../model/locale/localeModel";
+import LocaleEntity from "../../model/entity/locale/localeEntity";
+
 
 class GetAndInitSetupLocaleController {
   /**
@@ -72,4 +73,4 @@ class GetAndInitSetupLocaleController {
   }
 }
 
-exports.GetAndInitSetupLocaleController = GetAndInitSetupLocaleController;
+export default GetAndInitSetupLocaleController;

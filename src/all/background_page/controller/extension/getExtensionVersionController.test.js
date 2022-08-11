@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {GetExtensionVersionController} from "./getExtensionVersionController";
+import GetExtensionVersionController from "./getExtensionVersionController";
 
 describe("GetExtensionVersionController", () => {
   describe("GetExtensionVersionController::exec", () => {

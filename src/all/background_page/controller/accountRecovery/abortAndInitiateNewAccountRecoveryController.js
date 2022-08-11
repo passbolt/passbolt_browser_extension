@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+import UserModel from "../../model/user/userModel";
+import AccountLocalStorage from "../../service/local_storage/accountLocalStorage";
+import SetupModel from "../../model/setup/setupModel";
+import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 
-const {AccountLocalStorage} = require("../../service/local_storage/accountLocalStorage");
-const {AccountAccountRecoveryEntity} = require("../../model/entity/account/accountAccountRecoveryEntity");
-const {SetupModel} = require("../../model/setup/setupModel");
-const {UserModel} = require("../../model/user/userModel");
 
 class AbortAndInitiateNewAccountRecoveryController {
   /**
@@ -58,4 +58,4 @@ class AbortAndInitiateNewAccountRecoveryController {
   }
 }
 
-exports.AbortAndInitiateNewAccountRecoveryController = AbortAndInitiateNewAccountRecoveryController;
+export default AbortAndInitiateNewAccountRecoveryController;

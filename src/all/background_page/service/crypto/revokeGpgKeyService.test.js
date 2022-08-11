@@ -11,16 +11,16 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {RevokeGpgKeyService} = require("./revokeGpgKeyService");
-const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
+import RevokeGpgKeyService from "./revokeGpgKeyService";
 import {pgpKeys} from '../../../../../test/fixtures/pgpKeys/keys';
-import {readKeyOrFail} from '../../utils/openpgp/openpgpAssertions';
+import {OpenpgpAssertion} from '../../utils/openpgp/openpgpAssertions';
+import GetGpgKeyInfoService from "./getGpgKeyInfoService";
 
 describe("RevokeGpgKey service", () => {
   it("should generate a revoked public key given a decrypted private key", async() => {
     expect.assertions(4);
 
-    const bettyPrivateGpgKey = await readKeyOrFail(pgpKeys.betty.private_decrypted);
+    const bettyPrivateGpgKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
 
     const validPublicKey = bettyPrivateGpgKey.toPublic();
     const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(validPublicKey);

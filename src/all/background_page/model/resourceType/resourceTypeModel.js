@@ -11,10 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         v3.0.0
  */
-const {ResourceTypesCollection} = require('../entity/resourceType/resourceTypesCollection');
-const {ResourceTypeLocalStorage} = require('../../service/local_storage/resourceTypeLocalStorage');
-const {ResourceTypeService} = require('../../service/api/resourceType/resourceTypeService');
-const PassboltApiFetchError = require('../../error/passboltApiFetchError').PassboltApiFetchError;
+import ResourceTypeLocalStorage from "../../service/local_storage/resourceTypeLocalStorage";
+import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
+import ResourceTypesCollection from "../entity/resourceType/resourceTypesCollection";
+import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import Validator from "validator";
 
 class ResourceTypeModel {
   /**
@@ -82,4 +83,4 @@ class ResourceTypeModel {
   }
 }
 
-exports.ResourceTypeModel = ResourceTypeModel;
+export default ResourceTypeModel;

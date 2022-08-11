@@ -12,18 +12,19 @@
  * @since         3.6.0
  */
 
-const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
-const {DecryptPrivateKeyService} = require("../../service/crypto/decryptPrivateKeyService");
-const {AccountRecoveryResponseEntity} = require("../../model/entity/accountRecovery/accountRecoveryResponseEntity");
-const {PrivateGpgkeyEntity} = require("../../model/entity/gpgkey/privateGpgkeyEntity");
-const {AccountRecoveryPrivateKeyPasswordEntity} = require("../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity");
-const PassphraseController = require("../passphrase/passphraseController");
-const {EncryptMessageService} = require("../../service/crypto/encryptMessageService");
-const {Keyring} = require("../../model/keyring");
-const {DecryptPrivateKeyPasswordDataService} = require("../../service/accountRecovery/decryptPrivateKeyPasswordDataService");
-const {UserEntity} = require("../../model/entity/user/userEntity");
-const {UserLocalStorage} = require("../../service/local_storage/userLocalStorage");
-const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import EncryptMessageService from "../../service/crypto/encryptMessageService";
+import UserLocalStorage from "../../service/local_storage/userLocalStorage";
+import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
+import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
+import {PassphraseController} from "../passphrase/passphraseController";
+import DecryptPrivateKeyPasswordDataService from "../../service/accountRecovery/decryptPrivateKeyPasswordDataService";
+import AccountRecoveryPrivateKeyPasswordEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity";
+import AccountRecoveryResponseEntity from "../../model/entity/accountRecovery/accountRecoveryResponseEntity";
+import UserEntity from "../../model/entity/user/userEntity";
+import PrivateGpgkeyEntity from "../../model/entity/gpgkey/privateGpgkeyEntity";
+import Validator from "validator";
 
 class ReviewRequestController {
   /**
@@ -117,12 +118,12 @@ class ReviewRequestController {
    * @returns {AccountRecoveryResponseEntity}
    */
   async _buildApprovedResponse(request, organizationPolicy, organizationPrivateGpgkey, signedInUserPassphrase) {
-    const organizationPrivateKey = await readKeyOrFail(organizationPrivateGpgkey.armoredKey);
-    const userPrivateKey = await readKeyOrFail(this.account.userPrivateArmoredKey);
+    const organizationPrivateKey = await OpenpgpAssertion.readKeyOrFail(organizationPrivateGpgkey.armoredKey);
+    const userPrivateKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPrivateArmoredKey);
     const organizationPrivateKeyDecrypted = await DecryptPrivateKeyService.decrypt(organizationPrivateKey, organizationPrivateGpgkey.passphrase);
     const signedInUserDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, signedInUserPassphrase);
 
-    const userPublicKey = await readKeyOrFail(await this._findUserPublicKey(request.userId));
+    const userPublicKey = await OpenpgpAssertion.readKeyOrFail(await this._findUserPublicKey(request.userId));
     const data = await this._encryptResponseData(request, organizationPrivateKeyDecrypted, userPublicKey, signedInUserDecryptedPrivateKey);
 
     const accountRecoveryResponseDto = {
@@ -211,7 +212,7 @@ class ReviewRequestController {
     const privateKeyPassword = request.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords.items[0];
     const privateKeyPasswordData = await DecryptPrivateKeyPasswordDataService.decrypt(privateKeyPassword, organizationPrivateKeyDecrypted, verificationDomain, request.userId, userPublicKey);
     const privateKeyPasswordDataSerialized = JSON.stringify(privateKeyPasswordData);
-    const requestKey = await readKeyOrFail(request.armoredKey);
+    const requestKey = await OpenpgpAssertion.readKeyOrFail(request.armoredKey);
     return EncryptMessageService.encrypt(privateKeyPasswordDataSerialized, requestKey, [organizationPrivateKeyDecrypted, signedInUserDecryptedPrivateKey]);
   }
 
@@ -228,4 +229,4 @@ class ReviewRequestController {
   }
 }
 
-exports.ReviewRequestController = ReviewRequestController;
+export default ReviewRequestController;

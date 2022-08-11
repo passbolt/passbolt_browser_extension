@@ -7,18 +7,13 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-const Config = require('./config');
+import {Config} from "./config";
+
 const logSettings = Config.read('log');
 
 // Logs type.
 const ERROR = 'error';
-exports.ERROR = ERROR;
 const WARNING = 'warning';
-exports.WARNING = WARNING;
-const INFO = 'info';
-exports.INFO = INFO;
-const DEBUG = 'debug';
-exports.DEBUG = DEBUG;
 
 // Logs level mapping.
 const logLevelMapping = {
@@ -30,7 +25,6 @@ const logLevelMapping = {
 
 // The stored logs.
 let _logs = [];
-exports._logs = _logs;
 
 /**
  * The Logger constructor.
@@ -85,4 +79,4 @@ Log.init = function() {
   _logs = [];
 };
 
-exports.Log = Log;
+export default Log;

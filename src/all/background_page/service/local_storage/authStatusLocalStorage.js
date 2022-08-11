@@ -11,8 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.4
  */
-const {Log} = require('../../model/log');
-const {Lock} = require('../../utils/lock');
+import browser from "webextension-polyfill";
+import Log from "../../model/log";
+import Lock from "../../utils/lock";
 const lock = new Lock();
 
 const AUTH_STATUS_STORAGE_KEY = 'auth_status';
@@ -84,4 +85,4 @@ class AuthStatusLocalStorage {
   }
 }
 
-exports.AuthStatusLocalStorage = AuthStatusLocalStorage;
+export default AuthStatusLocalStorage;

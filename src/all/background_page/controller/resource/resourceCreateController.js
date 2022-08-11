@@ -11,22 +11,20 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.9.0
  */
-const {i18n} = require('../../sdk/i18n');
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import EncryptMessageService from "../../service/crypto/encryptMessageService";
+import User from "../../model/user";
+import ResourceModel from "../../model/resource/resourceModel";
+import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
+import FolderModel from "../../model/folder/folderModel";
+import Share from "../../model/share";
+import {ProgressController as progressController} from "../progress/progressController";
+import ResourceEntity from "../../model/entity/resource/resourceEntity";
+import i18n from "../../sdk/i18n";
+import ResourceSecretsCollection from "../../model/entity/secret/resource/resourceSecretsCollection";
 
-const {Keyring} = require('../../model/keyring');
-const {Share} = require('../../model/share');
-const {User} = require('../../model/user');
-
-const {FolderModel} = require('../../model/folder/folderModel');
-const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
-const {ResourceModel} = require('../../model/resource/resourceModel');
-const {ResourceSecretsCollection} = require("../../model/entity/secret/resource/resourceSecretsCollection");
-
-const passphraseController = require('../passphrase/passphraseController');
-const progressController = require('../progress/progressController');
-const {EncryptMessageService} = require('../../service/crypto/encryptMessageService');
-const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
-const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 class ResourceCreateController {
   /**
@@ -80,7 +78,7 @@ class ResourceCreateController {
       await progressController.update(this.worker, this.progress++, i18n.t('Encrypting secret'));
       const userId = User.getInstance().get().id;
       const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
-      const userPublicKey = await readKeyOrFail(userPublicArmoredKey);
+      const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
       const secret = await EncryptMessageService.encrypt(plaintext, userPublicKey, [privateKey]);
       resource.secrets = new ResourceSecretsCollection([{data: secret}]);
 
@@ -138,4 +136,4 @@ class ResourceCreateController {
   }
 }
 
-exports.ResourceCreateController = ResourceCreateController;
+export default ResourceCreateController;

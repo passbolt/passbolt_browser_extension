@@ -11,11 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-const Worker = require("../../model/worker");
-const {AuthModel} = require("../../model/auth/authModel");
-const {SetupModel} = require("../../model/setup/setupModel");
-const {readKeyOrFail, assertPublicKey} = require('../../utils/openpgp/openpgpAssertions');
+import {Worker} from "../../model/worker";
+import AuthModel from "../../model/auth/authModel";
+import SetupModel from "../../model/setup/setupModel";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 class StartSetupController {
   /**
@@ -69,8 +68,8 @@ class StartSetupController {
    */
   async _findAndSetAccountSetupServerPublicKey() {
     const serverKeyDto = await this.authModel.getServerKey();
-    const serverPublicKey = await readKeyOrFail(serverKeyDto.armored_key);
-    assertPublicKey(serverPublicKey);
+    const serverPublicKey = await OpenpgpAssertion.readKeyOrFail(serverKeyDto.armored_key);
+    OpenpgpAssertion.assertPublicKey(serverPublicKey);
 
     // associate the server public key to the account being set up.
     this.account.serverPublicArmoredKey = serverPublicKey.armor();
@@ -113,4 +112,4 @@ class StartSetupController {
   }
 }
 
-exports.StartSetupController = StartSetupController;
+export default StartSetupController;

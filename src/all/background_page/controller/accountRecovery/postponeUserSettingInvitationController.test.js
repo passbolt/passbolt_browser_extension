@@ -12,8 +12,8 @@
  * @since         3.6.0
  */
 
-import {PostponedUserSettingInvitationService} from "../../service/accountRecovery/postponedUserSettingInvitationService";
-import {PostponeUserSettingInvitationController} from "./postponeUserSettingInvitationController";
+import PostponedUserSettingInvitationService from "../../service/accountRecovery/postponedUserSettingInvitationService";
+import PostponeUserSettingInvitationController from "./postponeUserSettingInvitationController";
 
 describe("PostponeUserSettingInvitationController", () => {
   it("can set the account recovery enrollment invitation as postponed", () => {

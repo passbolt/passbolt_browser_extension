@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {FoldersCollection} from "./foldersCollection";
-import {EntitySchema} from "../abstract/entitySchema";
+import FoldersCollection from "./foldersCollection";
+import EntitySchema from "../abstract/entitySchema";
 
 describe("Folders collection entity", () => {
   it("schema must validate", () => {

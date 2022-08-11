@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {AbstractActionLogEntity} = require("../../../model/entity/actionLog/abstractActionLogEntity");
-const {AbstractService} = require('../abstract/abstractService');
+import AbstractActionLogEntity from "../../../model/entity/actionLog/abstractActionLogEntity";
+import AbstractService from "../abstract/abstractService";
 
 const RESOURCE_SERVICE_RESOURCE_NAME = 'actionlog';
 
@@ -111,4 +111,4 @@ class ActionLogService extends AbstractService {
   }
 }
 
-exports.ActionLogService = ActionLogService;
+export default ActionLogService;

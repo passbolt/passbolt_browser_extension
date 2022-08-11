@@ -12,17 +12,15 @@
  * @since         3.6.0
  */
 
-import {DownloadUserPublicKeyController} from "./downloadUserPublicKeyController";
-import {GetGpgKeyInfoService} from "../../service/crypto/getGpgKeyInfoService";
-import {GpgKeyError} from "../../error/GpgKeyError";
-import {MockExtension} from "../../../../../test/mocks/mockExtension";
+import DownloadUserPublicKeyController from "./downloadUserPublicKeyController";
+import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
+import GpgKeyError from "../../error/GpgKeyError";
+import MockExtension from "../../../../../test/mocks/mockExtension";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
-import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import {FileController} from "../fileController";
 
-const mockedSaveFile = jest.fn();
-jest.mock('../fileController', () => ({
-  saveFile: jest.fn((fileName, fileContent, fileContentType, workerTabId) => mockedSaveFile(fileName, fileContent, fileContentType, workerTabId))
-}));
+const mockedSaveFile = jest.spyOn(FileController, "saveFile");
 
 const expectedTabId = "tabIdentifier";
 const mockedWorker = {tab: {id: expectedTabId}};
@@ -43,7 +41,7 @@ describe("DownloadUserPublicKeyController", () => {
       expect(fileContentType).toBe("text/plain");
       expect(workerTabId).toBe(expectedTabId);
 
-      const keyFromFile = await readKeyOrFail(fileContent);
+      const keyFromFile = await OpenpgpAssertion.readKeyOrFail(fileContent);
       const downloadedKeyInfo = await GetGpgKeyInfoService.getKeyInfo(keyFromFile);
       expect(downloadedKeyInfo.private).toBe(false);
       expect(downloadedKeyInfo.keyId).toBe(privateKey.key_id);

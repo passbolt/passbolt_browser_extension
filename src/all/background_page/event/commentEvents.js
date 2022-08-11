@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const {CommentEntity} = require('../model/entity/comment/commentEntity');
-const {CommentModel} = require('../model/comment/commentModel');
-const {User} = require('../model/user');
+import User from "../model/user";
+import CommentEntity from "../model/entity/comment/commentEntity";
+import CommentModel from "../model/comment/commentModel";
 
 const listen = function(worker) {
   /*
@@ -79,4 +79,4 @@ const listen = function(worker) {
   });
 };
 
-exports.listen = listen;
+export const CommentEvents = {listen};

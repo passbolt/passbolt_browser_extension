@@ -1,4 +1,4 @@
-const {PublicWebsiteSignInController} = require("../controller/publicWebsiteSignIn/publicWebsiteSignInController");
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
@@ -12,6 +12,7 @@ const {PublicWebsiteSignInController} = require("../controller/publicWebsiteSign
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.7.0
  */
+import PublicWebsiteSignInController from "../controller/publicWebsiteSignIn/publicWebsiteSignInController";
 
 /**
  * Listens the public website sign in events
@@ -25,4 +26,4 @@ const listen = function(worker, account) {
   });
 };
 
-exports.listen = listen;
+export const PublicWebsiteSignInEvents = {listen};

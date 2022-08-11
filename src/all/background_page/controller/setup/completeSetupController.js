@@ -12,11 +12,11 @@
  * @since         3.6.0
  */
 
-const app = require("../../app");
-const {SetupModel} = require("../../model/setup/setupModel");
-const {AccountModel} = require("../../model/account/accountModel");
-const {AccountEntity} = require("../../model/entity/account/accountEntity");
-const {AccountSetupEntity} = require("../../model/entity/account/accountSetupEntity");
+import AccountModel from "../../model/account/accountModel";
+import {App as app} from "../../app";
+import SetupModel from "../../model/setup/setupModel";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 
 class CompleteSetupController {
   /**
@@ -76,4 +76,4 @@ class CompleteSetupController {
   }
 }
 
-exports.CompleteSetupController = CompleteSetupController;
+export default CompleteSetupController;

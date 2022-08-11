@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 
-const {PageMod} = require('../sdk/page-mod');
-const app = require('../app');
-const {BuildAccountRecoverService} = require("../service/recover/buildAccountRecoverService");
-const {BuildAccountApiClientOptionsService} = require("../service/account/buildApiClientOptionsService");
+import PageMod from "../sdk/page-mod";
+import {App as app} from "../app";
+import BuildAccountApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import BuildAccountRecoverService from "../service/recover/buildAccountRecoverService";
 
 /*
  * This pagemod help bootstrap the first step of the recover process from a passbolt server app page
@@ -63,4 +63,4 @@ Recover.init = function() {
   });
 };
 
-exports.Setup = Recover;
+export default Recover;

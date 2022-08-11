@@ -12,9 +12,9 @@
  * @since         2.0.0
  */
 
-const Config = require('../model/config');
-const {GetExtensionVersionController} = require("../controller/extension/getExtensionVersionController");
-const User = require('../model/user').User;
+import User from "../model/user";
+import GetExtensionVersionController from "../controller/extension/getExtensionVersionController";
+import {Config} from "../model/config";
 
 const listen = function(worker) {
   /*
@@ -103,4 +103,4 @@ const listen = function(worker) {
     worker.port.emit(requestId, 'SUCCESS', chrome.runtime.getURL(''));
   });
 };
-exports.listen = listen;
+export const ConfigEvents = {listen};

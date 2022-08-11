@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const {CommentEntity} = require('../entity/comment/commentEntity');
-const {CommentsCollection} = require("../entity/comment/commentsCollection");
-const {CommentService} = require('../../service/api/comment/commentService');
+import CommentEntity from "../entity/comment/commentEntity";
+import CommentsCollection from "../entity/comment/commentsCollection";
+import CommentService from "../../service/api/comment/commentService";
 
 class CommentModel {
   /**
@@ -61,4 +61,4 @@ class CommentModel {
   }
 }
 
-exports.CommentModel = CommentModel;
+export default CommentModel;

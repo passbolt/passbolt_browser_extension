@@ -16,4 +16,4 @@ class PassboltSubscriptionError extends Error {
   }
 }
 
-exports.PassboltSubscriptionError = PassboltSubscriptionError;
+export default PassboltSubscriptionError;

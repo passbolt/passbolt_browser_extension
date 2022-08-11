@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {Entity} = require('../abstract/entity');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {EntityValidationError} = require('../abstract/entityValidationError');
+import Entity from "../abstract/entity";
+import EntityValidationError from "../abstract/entityValidationError";
+import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = 'Secret';
 
@@ -162,4 +162,4 @@ class SecretEntity extends Entity {
   }
 }
 
-exports.SecretEntity = SecretEntity;
+export default SecretEntity;

@@ -11,16 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const {GroupEntity} = require('../entity/group/groupEntity');
-const {GroupsCollection} = require('../entity/group/groupsCollection');
-const {GroupDeleteTransferEntity} = require('../entity/group/transfer/groupDeleteTransfer');
-const {GroupUpdateDryRunResultEntity} = require("../entity/group/update/groupUpdateDryRunResultEntity");
-
-const {GroupService} = require('../../service/api/group/groupService');
-const {GroupLocalStorage} = require('../../service/local_storage/groupLocalStorage');
-
-const {PassboltApiFetchError} = require('../../error/passboltApiFetchError');
-const {DeleteDryRunError} = require('../../error/deleteDryRunError');
+import GroupLocalStorage from "../../service/local_storage/groupLocalStorage";
+import GroupsCollection from "../entity/group/groupsCollection";
+import DeleteDryRunError from "../../error/deleteDryRunError";
+import GroupEntity from "../entity/group/groupEntity";
+import GroupService from "../../service/api/group/groupService";
+import GroupUpdateDryRunResultEntity from "../entity/group/update/groupUpdateDryRunResultEntity";
+import GroupDeleteTransferEntity from "../entity/group/transfer/groupDeleteTransfer";
+import PassboltApiFetchError from "../../error/passboltApiFetchError";
 
 class GroupModel {
   /**
@@ -193,4 +191,4 @@ class GroupModel {
   }
 }
 
-exports.GroupModel = GroupModel;
+export default GroupModel;

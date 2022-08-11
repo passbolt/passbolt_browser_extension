@@ -12,9 +12,9 @@
  * @since         2.13.0
  */
 window.fetch = require('node-fetch');
-import {ApiClient} from "./apiClient";
-import {ApiClientOptions} from "./apiClientOptions";
-import {PassboltServiceUnavailableError} from '../../../error/passboltServiceUnavailableError';
+import ApiClient from "./apiClient";
+import ApiClientOptions from "./apiClientOptions";
+import PassboltServiceUnavailableError from '../../../error/passboltServiceUnavailableError';
 
 const done = undefined;
 

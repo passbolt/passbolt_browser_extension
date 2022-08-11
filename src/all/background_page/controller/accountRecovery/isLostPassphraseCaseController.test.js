@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+import IsLostPassphraseCaseController from "./isLostPassphraseCaseController";
 
-const {IsLostPassphraseCaseController} = require("./isLostPassphraseCaseController");
 
 describe("IsLostPassphraseCaseController", () => {
   describe("IsLostPassphraseCaseController::exec", () => {

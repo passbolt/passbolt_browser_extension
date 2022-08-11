@@ -11,12 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-const {i18n} = require('../../sdk/i18n');
-const {GpgKeyError} = require('../../error/GpgKeyError');
-const {Keyring} = require('../../model/keyring');
-const fileController = require('../fileController');
-const PassphraseController = require('../passphrase/passphraseController');
+import Keyring from "../../model/keyring";
+import {PassphraseController} from "../passphrase/passphraseController";
+import {FileController as fileController} from "../fileController";
+import i18n from "../../sdk/i18n";
+import GpgKeyError from "../../error/GpgKeyError";
 
 const PRIVATE_KEY_FILENAME = "passbolt_private.asc";
 const MIME_TYPE_TEXT_PLAIN = "text/plain";
@@ -66,4 +65,4 @@ class DownloadUserPrivateKeyController {
   }
 }
 
-exports.DownloadUserPrivateKeyController = DownloadUserPrivateKeyController;
+export default DownloadUserPrivateKeyController;

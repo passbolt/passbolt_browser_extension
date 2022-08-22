@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {PassboltApiFetchError} = require('../../../error/passboltApiFetchError');
-const {PassboltBadResponseError} = require('../../../error/passboltBadResponseError');
-const {PassboltServiceUnavailableError} = require('../../../error/passboltServiceUnavailableError');
+import PassboltBadResponseError from "../../../error/passboltBadResponseError";
+import PassboltApiFetchError from "../../../error/passboltApiFetchError";
+import PassboltServiceUnavailableError from "../../../error/passboltServiceUnavailableError";
 
 class ApiClient {
   /**
@@ -345,4 +345,4 @@ class ApiClient {
   }
 }
 
-exports.ApiClient = ApiClient;
+export default ApiClient;

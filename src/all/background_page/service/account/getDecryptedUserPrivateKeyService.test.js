@@ -11,16 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {GetDecryptedUserPrivateKeyService} from "./getDecryptedUserPrivateKeyService";
-import {ExternalGpgKeyEntity} from "../../model/entity/gpgkey/external/externalGpgKeyEntity";
+import GetDecryptedUserPrivateKeyService from "./getDecryptedUserPrivateKeyService";
+import ExternalGpgKeyEntity from "../../model/entity/gpgkey/external/externalGpgKeyEntity";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import Keyring from "../../model/keyring";
 
-const mockedFindPrivate = jest.fn();
-jest.mock('../../model/keyring.js', () => ({
-  Keyring: jest.fn().mockImplementation(() => ({
-    findPrivate: mockedFindPrivate
-  }))
-}));
+const mockedFindPrivate = jest.spyOn(Keyring.prototype, "findPrivate");
 
 describe("GetDecryptedUserPrivateKey service", () => {
   const key = pgpKeys.ada;

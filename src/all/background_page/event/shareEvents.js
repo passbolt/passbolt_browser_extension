@@ -6,16 +6,14 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {User} = require('../model/user');
-const {Share} = require('../model/share');
-const {ResourceModel} = require('../model/resource/resourceModel');
-const {FolderModel} = require('../model/folder/folderModel');
-
-const {FoldersCollection} = require('../model/entity/folder/foldersCollection');
-const {PermissionChangesCollection} = require('../model/entity/permission/change/permissionChangesCollection');
-
-const {ShareResourcesController} = require('../controller/share/shareResourcesController');
-const {ShareFoldersController} = require('../controller/share/shareFoldersController');
+import User from "../model/user";
+import ResourceModel from "../model/resource/resourceModel";
+import FolderModel from "../model/folder/folderModel";
+import Share from "../model/share";
+import ShareResourcesController from "../controller/share/shareResourcesController";
+import ShareFoldersController from "../controller/share/shareFoldersController";
+import FoldersCollection from "../model/entity/folder/foldersCollection";
+import PermissionChangesCollection from "../model/entity/permission/change/permissionChangesCollection";
 
 const listen = function(worker) {
   /*
@@ -108,4 +106,4 @@ const listen = function(worker) {
     }
   });
 };
-exports.listen = listen;
+export const ShareEvents = {listen};

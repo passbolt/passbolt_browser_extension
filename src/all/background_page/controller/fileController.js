@@ -4,8 +4,8 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const Config = require('../model/config');
-const Worker = require('../model/worker');
+import {Worker} from "../model/worker";
+import {Config} from "../model/config";
 
 /**
  * Save file on disk using download
@@ -46,7 +46,6 @@ function saveFile(filename, content, mimeType, tabid) {
     }
   });
 }
-exports.saveFile = saveFile;
 
 /**
  * Load the content of a file
@@ -62,7 +61,6 @@ function loadFile(path) {
     );
   });
 }
-exports.loadFile = loadFile;
 
 /**
  * Convert a blob file into an ArrayBuffer.
@@ -84,7 +82,6 @@ function blobToArrayBuffer(blob) {
     }
   });
 }
-exports.blobToArrayBuffer = blobToArrayBuffer;
 
 /**
  * Transforms a base 64 encoded file content into a file object.
@@ -117,7 +114,6 @@ function b64ToBlob(b64Data, contentType, sliceSize) {
   const blob = new Blob(byteArrays, {type: contentType});
   return blob;
 }
-exports.b64ToBlob = b64ToBlob;
 
 /**
  * Blob to Data Url.
@@ -133,4 +129,5 @@ function blobToDataURL(blob) {
     a.readAsDataURL(blob);
   });
 }
-exports.blobToDataURL = blobToDataURL;
+
+export const FileController = {saveFile, loadFile, blobToDataURL, b64ToBlob, blobToArrayBuffer};

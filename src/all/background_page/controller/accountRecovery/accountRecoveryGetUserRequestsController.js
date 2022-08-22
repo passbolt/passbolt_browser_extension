@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
+import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
+import Validator from "validator";
 
 class AccountRecoveryGetUserRequestsController {
   /**
@@ -61,4 +61,4 @@ class AccountRecoveryGetUserRequestsController {
   }
 }
 
-exports.AccountRecoveryGetUserRequestsController = AccountRecoveryGetUserRequestsController;
+export default AccountRecoveryGetUserRequestsController;

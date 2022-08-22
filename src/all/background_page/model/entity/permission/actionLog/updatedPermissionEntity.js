@@ -10,11 +10,11 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {Entity} = require('../../abstract/entity');
-const {EntitySchema} = require('../../abstract/entitySchema');
-const {PermissionEntity} = require("../permissionEntity");
-const {LoggedUserEntity} = require("../../user/actionLog/loggedUserEntity");
-const {GroupEntity} = require("../../group/groupEntity");
+import GroupEntity from "../../group/groupEntity";
+import PermissionEntity from "../permissionEntity";
+import Entity from "../../abstract/entity";
+import LoggedUserEntity from "../../user/actionLog/loggedUserEntity";
+import EntitySchema from "../../abstract/entitySchema";
 
 const ENTITY_NAME = 'UpdatedPermission';
 
@@ -178,4 +178,4 @@ class UpdatedPermissionEntity extends Entity {
   }
 }
 
-exports.UpdatedPermissionEntity = UpdatedPermissionEntity;
+export default UpdatedPermissionEntity;

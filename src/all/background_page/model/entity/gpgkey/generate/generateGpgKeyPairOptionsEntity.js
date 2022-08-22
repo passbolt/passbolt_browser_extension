@@ -11,9 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {goog} = require('../../../../utils/format/emailaddress');
-const {Entity} = require('../../abstract/entity');
-const {EntitySchema} = require('../../abstract/entitySchema');
+import Entity from "../../abstract/entity";
+import EntitySchema from "../../abstract/entitySchema";
+import goog from "../../../../utils/format/emailaddress";
+
 
 const ENTITY_NAME = "GenerateGpgKeyPairOptionsEntity";
 
@@ -215,4 +216,4 @@ class GenerateGpgKeyPairOptionsEntity extends Entity {
   }
 }
 
-exports.GenerateGpgKeyPairOptionsEntity = GenerateGpgKeyPairOptionsEntity;
+export default GenerateGpgKeyPairOptionsEntity;

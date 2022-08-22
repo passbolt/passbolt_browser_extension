@@ -12,8 +12,8 @@
  * @since         3.6.0
  */
 
-import {PostponedUserSettingInvitationService} from "../../service/accountRecovery/postponedUserSettingInvitationService";
-import {HasUserPostponedUserSettingInvitationController} from "./hasUserPostponedUserSettingInvitationController";
+import PostponedUserSettingInvitationService from "../../service/accountRecovery/postponedUserSettingInvitationService";
+import HasUserPostponedUserSettingInvitationController from "./hasUserPostponedUserSettingInvitationController";
 
 describe("HasUserPostponedUserSettingInvitationController", () => {
   it("can get the account recovery enrollment invitation status", () => {

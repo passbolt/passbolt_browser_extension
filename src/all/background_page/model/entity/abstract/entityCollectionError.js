@@ -37,4 +37,4 @@ class EntityCollectionError extends Error {
   }
 }
 
-exports.EntityCollectionError = EntityCollectionError;
+export default EntityCollectionError;

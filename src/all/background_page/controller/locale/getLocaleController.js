@@ -14,9 +14,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-const {LocaleEntity} = require("../../model/entity/locale/localeEntity");
-const {LocaleModel} = require("../../model/locale/localeModel");
-const Config = require('../../model/config');
+import LocaleModel from "../../model/locale/localeModel";
+import {Config} from "../../model/config";
+import LocaleEntity from "../../model/entity/locale/localeEntity";
+
 
 class GetLocaleController {
   /**
@@ -54,4 +55,4 @@ class GetLocaleController {
   }
 }
 
-exports.GetLocaleController = GetLocaleController;
+export default GetLocaleController;

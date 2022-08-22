@@ -12,8 +12,8 @@
  * @since         3.6.0
  */
 
-const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
-const Worker = require("../../model/worker");
+import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
+import {Worker} from "../../model/worker";
 
 class ContinueAccountRecoveryController {
   /**
@@ -65,4 +65,4 @@ class ContinueAccountRecoveryController {
   }
 }
 
-exports.ContinueAccountRecoveryController = ContinueAccountRecoveryController;
+export default ContinueAccountRecoveryController;

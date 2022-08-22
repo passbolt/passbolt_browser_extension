@@ -51,4 +51,4 @@ class PostponedUserSettingInvitationService {
   }
 }
 
-exports.PostponedUserSettingInvitationService = PostponedUserSettingInvitationService;
+export default PostponedUserSettingInvitationService;

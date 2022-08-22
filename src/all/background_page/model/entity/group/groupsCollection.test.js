@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.4
  */
-import {EntitySchema} from "../abstract/entitySchema";
-import {GroupsCollection} from "./groupsCollection";
-import {EntityCollectionError} from "../abstract/entityCollectionError";
+import EntitySchema from "../abstract/entitySchema";
+import GroupsCollection from "./groupsCollection";
+import EntityCollectionError from "../abstract/entityCollectionError";
 
 describe("Groups collection", () => {
   it("schema must validate", () => {

@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {i18n} = require("../../sdk/i18n");
-const {GpgAuth} = require("../../model/gpgauth");
-const {GpgKeyError} = require("../../error/GpgKeyError");
-const {assertPrivateKey, readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import GpgAuth from "../../model/gpgauth";
+import GpgKeyError from "../../error/GpgKeyError";
+import i18n from "../../sdk/i18n";
 
 class ImportRecoverPrivateKeyController {
   /**
@@ -51,8 +51,8 @@ class ImportRecoverPrivateKeyController {
    * @returns {Promise<void>}
    */
   async exec(armoredKey) {
-    const privateKey = await readKeyOrFail(armoredKey);
-    assertPrivateKey(privateKey);
+    const privateKey = await OpenpgpAssertion.readKeyOrFail(armoredKey);
+    OpenpgpAssertion.assertPrivateKey(privateKey);
     await this._assertImportKeyOwnedByUser(privateKey.getFingerprint().toUpperCase());
     this.account.userPrivateArmoredKey = privateKey.armor();
     this.account.userPublicArmoredKey = privateKey.toPublic().armor();
@@ -83,4 +83,4 @@ class ImportRecoverPrivateKeyController {
   }
 }
 
-exports.ImportRecoverPrivateKeyController = ImportRecoverPrivateKeyController;
+export default ImportRecoverPrivateKeyController;

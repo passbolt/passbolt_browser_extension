@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 window.PapaParse = require("papaparse");
-import {ResourcesCsvExporter} from "./resourcesCsvExporter";
-import {Csv1PasswordRowComposer} from "./csvRowComposer/csv1passwordRowComposer";
-import {CsvKdbxRowComposer} from "./csvRowComposer/csvKdbxRowComposer";
-import {CsvLastPassRowComposer} from "./csvRowComposer/csvLastPassRowComposer";
-import {ExportResourcesFileEntity} from "../../entity/export/exportResourcesFileEntity";
+import ResourcesCsvExporter from "./resourcesCsvExporter";
+import Csv1PasswordRowComposer from "./csvRowComposer/csv1passwordRowComposer";
+import CsvKdbxRowComposer from "./csvRowComposer/csvKdbxRowComposer";
+import CsvLastPassRowComposer from "./csvRowComposer/csvLastPassRowComposer";
+import ExportResourcesFileEntity from "../../entity/export/exportResourcesFileEntity";
 
 describe("ResourcesCsvExporter", () => {
   it("should be aware of the supported row parsers", () => {

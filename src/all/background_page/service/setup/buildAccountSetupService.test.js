@@ -12,8 +12,8 @@
  * @since         3.6.0
  */
 
-import {BuildAccountSetupService} from "./buildAccountSetupService";
-import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
+import BuildAccountSetupService from "./buildAccountSetupService";
+import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 
 describe("BuildAccountSetupService", () => {
   describe("BuildAccountSetupService:buildFromUrl", () => {

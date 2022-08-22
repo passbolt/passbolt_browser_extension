@@ -1335,4 +1335,4 @@ goog.string.parseInt = function(value) {
   return NaN;
 };
 
-exports.goog = goog;
+export default goog;

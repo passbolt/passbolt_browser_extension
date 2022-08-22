@@ -10,9 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {FolderEntity} = require("../folderEntity");
-const {Entity} = require('../../abstract/entity');
-const {EntitySchema} = require('../../abstract/entitySchema');
+import FolderEntity from "../folderEntity";
+import Entity from "../../abstract/entity";
+import EntitySchema from "../../abstract/entitySchema";
+
 
 const ENTITY_NAME = 'ExternalFolder';
 
@@ -285,4 +286,4 @@ class ExternalFolderEntity extends Entity {
   }
 }
 
-exports.ExternalFolderEntity = ExternalFolderEntity;
+export default ExternalFolderEntity;

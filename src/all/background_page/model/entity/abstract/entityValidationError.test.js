@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {EntityValidationError} from "./entityValidationError";
+import EntityValidationError from "./entityValidationError";
 
 describe("EntityValidationError", () => {
   it("addErrors throw exception if property is not a string", () => {

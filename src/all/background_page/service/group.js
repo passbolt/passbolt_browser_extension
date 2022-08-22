@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.10.0
  */
-const PassboltApiFetchError = require('../error/passboltApiFetchError').PassboltApiFetchError;
-const PassboltBadResponseError = require('../error/passboltBadResponseError').PassboltBadResponseError;
-const PassboltServiceUnavailableError = require('../error/passboltServiceUnavailableError').PassboltServiceUnavailableError;
-const {User} = require('../model/user');
+import User from "../model/user";
+import PassboltBadResponseError from "../error/passboltBadResponseError";
+import PassboltServiceUnavailableError from "../error/passboltServiceUnavailableError";
+import PassboltApiFetchError from "../error/passboltApiFetchError";
 
 class GroupService {}
 

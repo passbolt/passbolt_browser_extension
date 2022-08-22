@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import {PermissionTransfersCollection} from "./permissionTransfersCollection";
-import {EntitySchema} from "../../abstract/entitySchema";
-import {EntityValidationError} from "../../abstract/entityValidationError";
+import PermissionTransfersCollection from "./permissionTransfersCollection";
+import EntitySchema from "../../abstract/entitySchema";
+import EntityValidationError from "../../abstract/entityValidationError";
 
 describe("Permission transfer entity", () => {
   it("schema must validate", () => {

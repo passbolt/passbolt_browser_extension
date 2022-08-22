@@ -16,7 +16,7 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
-import {GetOrganizationSettingsController} from "./getOrganizationSettingsController";
+import GetOrganizationSettingsController from "./getOrganizationSettingsController";
 
 beforeEach(() => {
   enableFetchMocks();

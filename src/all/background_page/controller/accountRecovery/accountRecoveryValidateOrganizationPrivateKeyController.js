@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {PrivateGpgkeyEntity} = require("../../model/entity/gpgkey/privateGpgkeyEntity");
-const {ValidateAccountRecoveryOrganizationPrivateKeyService} = require("../../service/api/accountRecovery/validateAccountRecoveryOrganizationPrivateKeyService");
-const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
+import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
+import ValidateAccountRecoveryOrganizationPrivateKeyService from "../../service/api/accountRecovery/validateAccountRecoveryOrganizationPrivateKeyService";
+import PrivateGpgkeyEntity from "../../model/entity/gpgkey/privateGpgkeyEntity";
 
 class AccountRecoveryValidateOrganizationPrivateKeyController {
   /**
@@ -61,4 +61,4 @@ class AccountRecoveryValidateOrganizationPrivateKeyController {
   }
 }
 
-exports.AccountRecoveryValidateOrganizationPrivateKeyController = AccountRecoveryValidateOrganizationPrivateKeyController;
+export default AccountRecoveryValidateOrganizationPrivateKeyController;

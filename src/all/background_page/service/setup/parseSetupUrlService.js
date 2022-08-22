@@ -45,4 +45,4 @@ class ParseSetupUrlService {
   }
 }
 
-exports.ParseSetupUrlService = ParseSetupUrlService;
+export default ParseSetupUrlService;

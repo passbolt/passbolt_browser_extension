@@ -4,30 +4,30 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const storage = require('./sdk/storage').storage;
-window.storage = storage;
-
+import storage from "./sdk/storage";
 /*
  * Listen to browser events such as browser extension installation. As per the documentation
  * the listeners must be registered synchronously from the start of the page.
  */
-require('./event/browser/browserEvents.js');
+import './event/browser/browserEvents.js';
+import * as openpgp from 'openpgp';
+import GpgAuth from "./model/gpgauth";
+import User from "./model/user";
+import AuthStatusLocalStorage from "./service/local_storage/authStatusLocalStorage";
+import ResourceLocalStorage from "./service/local_storage/resourceLocalStorage";
+import ResourceTypeLocalStorage from "./service/local_storage/resourceTypeLocalStorage";
+import FolderLocalStorage from "./service/local_storage/folderLocalStorage";
+import UserLocalStorage from "./service/local_storage/userLocalStorage";
+import GroupLocalStorage from "./service/local_storage/groupLocalStorage";
+import RolesLocalStorage from "./service/local_storage/rolesLocalStorage";
+import PasswordGeneratorLocalStorage from "./service/local_storage/passwordGeneratorLocalStorage";
+import ToolbarController from "./controller/toolbarController";
+import {App} from "./app";
+import Log from "./model/log";
+import {Config} from "./model/config";
+import PostponedUserSettingInvitationService from "./service/accountRecovery/postponedUserSettingInvitationService";
 
 const main = async function() {
-  const Config = require('./model/config');
-  const {Log} = require('./model/log');
-  const {GpgAuth} = require('./model/gpgauth');
-  const {User} = require('./model/user');
-  const {ResourceLocalStorage} = require('./service/local_storage/resourceLocalStorage');
-  const {ResourceTypeLocalStorage} = require('./service/local_storage/resourceTypeLocalStorage');
-  const {FolderLocalStorage} = require('./service/local_storage/folderLocalStorage');
-  const {AuthStatusLocalStorage} = require('./service/local_storage/authStatusLocalStorage');
-  const {UserLocalStorage} = require('./service/local_storage/userLocalStorage');
-  const {GroupLocalStorage} = require('./service/local_storage/groupLocalStorage');
-  const {RolesLocalStorage} = require("./service/local_storage/rolesLocalStorage");
-  const {PasswordGeneratorLocalStorage} = require("./service/local_storage/passwordGeneratorLocalStorage");
-  const {PostponedUserSettingInvitationService} = require('./service/accountRecovery/postponedUserSettingInvitationService');
-
   /*
    * ==================================================================================
    *  Initialization of global objects
@@ -52,14 +52,12 @@ const main = async function() {
    * due to an openpgpjs bug: https://github.com/openpgpjs/openpgpjs/pull/1148
    */
   openpgp.config.allowInsecureDecryptionWithSigningKeys = true;
-
   /*
    * ==================================================================================
    *  Interface changes
    *  Where we affect the look and feel of the firefox instance
    * ==================================================================================
    */
-  const ToolbarController = require('./controller/toolbarController').ToolbarController;
   new ToolbarController();
 
   /*
@@ -69,7 +67,7 @@ const main = async function() {
    *  see. https://developer.mozilla.org/en-US/Add-ons/SDK/High-Level_APIs/page-mod
    * ==================================================================================
    */
-  const pageMods = require('./app').pageMods;
+  const pageMods = App.pageMods;
 
   // If the user is valid we enable the web integration and login pagemod
   const user = User.getInstance();

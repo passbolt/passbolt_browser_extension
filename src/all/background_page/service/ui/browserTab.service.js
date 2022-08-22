@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.4.0
  */
+import browser from "webextension-polyfill";
 
 /**
  * Get the current tab
@@ -29,7 +30,7 @@ async function getById(id) {
   return tabs.find(tab => tab.id === parseInt(id));
 }
 
-exports.BrowserTabService = {
+export const BrowserTabService = {
   getCurrent: getCurrent,
   getById: getById,
 };

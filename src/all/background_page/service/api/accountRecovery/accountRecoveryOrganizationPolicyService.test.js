@@ -11,35 +11,21 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {AccountRecoveryOrganizationPolicyService} from "./accountRecoveryOrganizationPolicyService";
+import AccountRecoveryOrganizationPolicyService from "./accountRecoveryOrganizationPolicyService";
 import {dummyData} from "./accountRecoveryOrganizationPolicyService.test.data";
+import Keyring from "../../../model/keyring";
+import Gpgauth from "../../../model/gpgauth";
 
-jest.mock('../../../model/keyring', () => {
-  const keyList = {
-    keyId1: {
-      fingerprint: "03F60E958F4CB29723ACDF761353B5B15D9B054F"
-    }
-  };
+jest.spyOn(Keyring.prototype, "getPublicKeysFromStorage").mockImplementation(() => ({
+  keyId1: {
+    fingerprint: "03F60E958F4CB29723ACDF761353B5B15D9B054F"
+  }
+}));
+jest.spyOn(Keyring.prototype, "sync").mockImplementation(() => {});
 
-  return {
-    Keyring: jest.fn().mockImplementation(() => ({
-      sync: async() => { },
-      getPublicKeysFromStorage: () => keyList
-    }))
-  };
-});
-
-jest.mock('../../../model/gpgauth', () => {
-  const serverKey = {
-    fingerprint: "7D85C136779F2F8BA48F193E1F194E8D4D8CB098"
-  };
-
-  return {
-    GpgAuth: jest.fn().mockImplementation(() => ({
-      getServerKey: async() => serverKey
-    }))
-  };
-});
+jest.spyOn(Gpgauth.prototype, "getServerKey").mockImplementation(() => ({
+  fingerprint: "7D85C136779F2F8BA48F193E1F194E8D4D8CB098"
+}));
 
 function checkError(armored_key, errorMessage) {
   const validationPromise = AccountRecoveryOrganizationPolicyService.validatePublicKey(armored_key);

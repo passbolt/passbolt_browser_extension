@@ -10,12 +10,12 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {ResourceSecretsCollection} = require("../../secret/resource/resourceSecretsCollection");
-const {ExternalFolderEntity} = require("../../folder/external/externalFolderEntity");
-const {ResourceEntity} = require("../resourceEntity");
-const {Entity} = require('../../abstract/entity');
-const {EntitySchema} = require('../../abstract/entitySchema');
-const {EntityValidationError} = require('../../abstract/entityValidationError');
+import ResourceEntity from "../resourceEntity";
+import ExternalFolderEntity from "../../folder/external/externalFolderEntity";
+import Entity from "../../abstract/entity";
+import ResourceSecretsCollection from "../../secret/resource/resourceSecretsCollection";
+import EntityValidationError from "../../abstract/entityValidationError";
+import EntitySchema from "../../abstract/entitySchema";
 
 const ENTITY_NAME = 'ExternalResource';
 const DEFAULT_RESOURCE_NAME = '(no name)';
@@ -326,4 +326,4 @@ class ExternalResourceEntity extends Entity {
   }
 }
 
-exports.ExternalResourceEntity = ExternalResourceEntity;
+export default ExternalResourceEntity;

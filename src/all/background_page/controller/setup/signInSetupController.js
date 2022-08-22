@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-const {AuthModel} = require("../../model/auth/authModel");
+import browser from "webextension-polyfill";
+import AuthModel from "../../model/auth/authModel";
 
 class SignInSetupController {
   /**
@@ -74,4 +74,4 @@ class SignInSetupController {
   }
 }
 
-exports.SignInSetupController = SignInSetupController;
+export default SignInSetupController;

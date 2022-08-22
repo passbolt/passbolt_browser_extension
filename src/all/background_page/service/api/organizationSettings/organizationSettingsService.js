@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-const {AbstractService} = require('../abstract/abstractService');
+import AbstractService from "../abstract/abstractService";
 
 const ORGANIZATION_SETTINGS_SERVICE_RESOURCE_NAME = 'settings';
 
@@ -55,4 +55,4 @@ class OrganizationSettingsService extends AbstractService {
   }
 }
 
-exports.OrganizationSettingsService = OrganizationSettingsService;
+export default OrganizationSettingsService;

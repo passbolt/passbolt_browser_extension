@@ -13,7 +13,7 @@
  */
 
 import each from "jest-each";
-import {ParseRecoverUrlService} from "./parseRecoverUrlService";
+import ParseRecoverUrlService from "./parseRecoverUrlService";
 
 describe("ParseRecoverUrlService", () => {
   describe("ParseRecoverUrlService:parse", () => {

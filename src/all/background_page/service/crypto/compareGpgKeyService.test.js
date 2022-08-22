@@ -16,14 +16,14 @@
  * Unit tests on CompareGpgKeyService in regard of specifications
  */
 
-import {CompareGpgKeyService} from "./compareGpgKeyService";
+import CompareGpgKeyService from "./compareGpgKeyService";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
-import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 describe("CompareGpgKeyService", () => {
   describe("CompareGpgKeyService::areKeysTheSame", () => {
     it("Should validate with 2 identical keys", async() => {
-      const key = await readKeyOrFail(pgpKeys.ada.private);
+      const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.private);
       const result = await CompareGpgKeyService.areKeysTheSame(key, key);
 
       expect.assertions(1);
@@ -31,8 +31,8 @@ describe("CompareGpgKeyService", () => {
     }, 10 * 1000);
 
     it("should reject if keys are different", async() => {
-      const keyA = await readKeyOrFail(pgpKeys.ada.public);
-      const keyB = await readKeyOrFail(pgpKeys.betty.public);
+      const keyA = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const keyB = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.public);
       const result = await CompareGpgKeyService.areKeysTheSame(keyA, keyB);
 
       expect.assertions(1);
@@ -40,8 +40,8 @@ describe("CompareGpgKeyService", () => {
     }, 10 * 1000);
 
     it("should reject if keys share the same fingerprint but one has an expiration date", async() => {
-      const keyA = await readKeyOrFail(pgpKeys.ada.public);
-      const keyB = await readKeyOrFail(pgpKeys.ada.public_with_expiration_date);
+      const keyA = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const keyB = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public_with_expiration_date);
       const result = await CompareGpgKeyService.areKeysTheSame(keyA, keyB);
 
       expect.assertions(1);

@@ -10,9 +10,9 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {AbstractService} = require('../abstract/abstractService');
-const {FolderEntity} = require('../../../model/entity/folder/folderEntity');
-const {ResourceEntity} = require('../../../model/entity/resource/resourceEntity');
+import ResourceEntity from "../../../model/entity/resource/resourceEntity";
+import FolderEntity from "../../../model/entity/folder/folderEntity";
+import AbstractService from "../abstract/abstractService";
 
 const MOVE_SERVICE_RESOURCE_NAME = 'move';
 const MOVE_SERVICE_FOREIGN_MODEL_FOLDER = 'Folder';
@@ -65,4 +65,4 @@ class MoveService extends AbstractService {
   }
 }
 
-exports.MoveService = MoveService;
+export default MoveService;

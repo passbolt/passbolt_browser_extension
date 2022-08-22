@@ -12,11 +12,11 @@
  * @since         3.6.0
  */
 
-const {i18n} = require('../../sdk/i18n');
-const {GpgKeyError} = require('../../error/GpgKeyError');
-const {Keyring} = require('../../model/keyring');
-const {assertPrivateKey, readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
-const fileController = require('../fileController');
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import {FileController as fileController} from "../fileController";
+import i18n from "../../sdk/i18n";
+import GpgKeyError from "../../error/GpgKeyError";
 
 const PUBLIC_KEY_FILENAME = "passbolt_public.asc";
 const MIME_TYPE_TEXT_PLAIN = "text/plain";
@@ -57,11 +57,11 @@ class DownloadUserPublicKeyController {
     if (!privateArmoredKey) {
       throw new GpgKeyError(i18n.t("Public key can't be found."));
     }
-    const privateKey = await readKeyOrFail(privateArmoredKey);
-    assertPrivateKey(privateKey);
+    const privateKey = await OpenpgpAssertion.readKeyOrFail(privateArmoredKey);
+    OpenpgpAssertion.assertPrivateKey(privateKey);
     const publicKeyArmored = await privateKey.toPublic().armor();
     await fileController.saveFile(PUBLIC_KEY_FILENAME, publicKeyArmored, MIME_TYPE_TEXT_PLAIN, this.worker.tab.id);
   }
 }
 
-exports.DownloadUserPublicKeyController = DownloadUserPublicKeyController;
+export default DownloadUserPublicKeyController;

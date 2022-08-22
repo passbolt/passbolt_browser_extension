@@ -4,11 +4,13 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const browser = require("webextension-polyfill");
-const Config = require('./config');
-const {ApiClientOptions} = require('../service/api/apiClient/apiClientOptions');
-const {UserService} = require('../service/api/user/userService');
-const {UserSettings} = require('./userSettings/userSettings');
+import browser from "webextension-polyfill";
+import UserService from "../service/api/user/userService";
+import {Config} from "./config";
+import UserSettings from "./userSettings/userSettings";
+import ApiClientOptions from "../service/api/apiClient/apiClientOptions";
+import Validator from "validator";
+import {ValidatorRule} from "../utils/validatorRules";
 
 /**
  * The class that deals with users.
@@ -89,7 +91,7 @@ const User = (function() {
         if (typeof value === 'undefined' || value === '') {
           throw new Error('The first name cannot be empty');
         }
-        if (!Validator.isUtf8(value)) {
+        if (!ValidatorRule.isUtf8(value)) {
           throw new Error('The first name should be a valid UTF8 string');
         }
         if (!Validator.isLength(value, 0, 255)) {
@@ -100,7 +102,7 @@ const User = (function() {
         if (typeof value === 'undefined' || value === '') {
           throw new Error('The last name cannot be empty');
         }
-        if (!Validator.isUtf8(value)) {
+        if (!ValidatorRule.isUtf8(value)) {
           throw new Error('The last name should be a valid UTF8 string');
         }
         if (!Validator.isLength(value, 0, 255)) {
@@ -488,4 +490,4 @@ const UserSingleton = (function() {
   };
 })();
 
-exports.User = UserSingleton;
+export default UserSingleton;

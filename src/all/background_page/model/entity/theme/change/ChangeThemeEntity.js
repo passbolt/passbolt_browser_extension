@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {Entity} = require('../../abstract/entity');
-const {EntitySchema} = require('../../abstract/entitySchema');
-const {ThemeEntity} = require("../themeEntity");
+import Entity from "../../abstract/entity";
+import ThemeEntity from "../themeEntity";
+import EntitySchema from "../../abstract/entitySchema";
 
 const ENTITY_NAME = 'ChangeTheme';
 
@@ -78,4 +78,4 @@ class ChangeThemeEntity extends Entity {
   }
 }
 
-exports.ChangeThemeEntity = ChangeThemeEntity;
+export default ChangeThemeEntity;

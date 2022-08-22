@@ -12,15 +12,15 @@
  * @since         3.6.0
  */
 
-import {GetAccountController} from "./getAccountController";
+import GetAccountController from "./getAccountController";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {AccountEntity} from "../../model/entity/account/accountEntity";
-import {AccountAccountRecoveryEntity} from "../../model/entity/account/accountAccountRecoveryEntity";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
-import {AccountRecoverEntity} from "../../model/entity/account/accountRecoverEntity";
+import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
 import {withSecurityTokenAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
-import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
+import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 
 describe("GetAccountController", () => {
   describe("GetAccountController::exec", () => {

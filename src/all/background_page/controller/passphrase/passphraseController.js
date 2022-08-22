@@ -5,14 +5,15 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-const {QuickAccessService} = require("../../service/ui/quickAccess.service");
-const {i18n} = require('../../sdk/i18n');
-const Keyring = require('../../model/keyring').Keyring;
-const User = require('../../model/user').User;
-const Worker = require('../../model/worker');
-const {UserAbortsOperationError} = require("../../error/userAbortsOperationError");
-const {DecryptPrivateKeyService} = require("../../service/crypto/decryptPrivateKeyService");
-const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import User from "../../model/user";
+import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
+import {QuickAccessService} from "../../service/ui/quickAccess.service";
+import {Worker} from "../../model/worker";
+import i18n from "../../sdk/i18n";
+import UserAbortsOperationError from "../../error/userAbortsOperationError";
+import {ValidatorRule as Validator} from '../../utils/validatorRules';
 
 /**
  * Get the user master password.
@@ -30,7 +31,6 @@ const get = async function(worker) {
     return requestPassphrase(worker);
   }
 };
-exports.get = get;
 
 /**
  * Request the user passphrase.
@@ -47,7 +47,6 @@ const requestPassphrase = async function(worker) {
 
   return passphrase;
 };
-exports.request = requestPassphrase;
 
 /**
  * Request the user passphrase from the Quick Access
@@ -77,7 +76,6 @@ const requestPassphraseFromQuickAccess = async function() {
     return passphrase;
   }
 };
-exports.requestFromQuickAccess = requestPassphraseFromQuickAccess;
 
 /**
  * Listen to the quick access passphrase request response.
@@ -142,7 +140,8 @@ const validatePassphrase = async function(passphrase) {
 
   const keyring = new Keyring();
   const userPrivateArmoredKey = keyring.findPrivate().armoredKey;
-  const userPrivateKey = await readKeyOrFail(userPrivateArmoredKey);
+  const userPrivateKey = await OpenpgpAssertion.readKeyOrFail(userPrivateArmoredKey);
   await DecryptPrivateKeyService.decrypt(userPrivateKey, passphrase);
 };
 
+export const PassphraseController = {get: get, request: requestPassphrase, requestFromQuickAccess: requestPassphraseFromQuickAccess};

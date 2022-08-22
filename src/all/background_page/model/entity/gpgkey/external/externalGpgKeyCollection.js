@@ -12,10 +12,10 @@
  * @since         3.6.0
  */
 
-const {EntityCollection} = require('../../abstract/entityCollection');
-const {EntitySchema} = require('../../abstract/entitySchema');
-const {EntityCollectionError} = require('../../abstract/entityCollectionError');
-const {ExternalGpgKeyEntity} = require("./externalGpgKeyEntity");
+import ExternalGpgKeyEntity from "./externalGpgKeyEntity";
+import EntityCollection from "../../abstract/entityCollection";
+import EntitySchema from "../../abstract/entitySchema";
+import EntityCollectionError from "../../abstract/entityCollectionError";
 
 const ENTITY_NAME = 'externalGpgKey';
 const RULE_UNIQUE_ID = 'fingerprint';
@@ -87,4 +87,4 @@ class ExternalGpgKeyCollection extends EntityCollection {
   }
 }
 
-exports.ExternalGpgKeyCollection = ExternalGpgKeyCollection;
+export default ExternalGpgKeyCollection;

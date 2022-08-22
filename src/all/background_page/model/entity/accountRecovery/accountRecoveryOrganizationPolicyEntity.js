@@ -11,13 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {Entity} = require('../abstract/entity');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {AccountRecoveryOrganizationPublicKeyEntity} = require("./accountRecoveryOrganizationPublicKeyEntity");
-const {EntityValidationError} = require("../abstract/entityValidationError");
-const {UserEntity} = require("../user/userEntity");
-const {AccountRecoveryPrivateKeyPasswordsCollection} = require('./accountRecoveryPrivateKeyPasswordsCollection');
-const {readKeyOrFail} = require('../../../utils/openpgp/openpgpAssertions');
+import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
+import Entity from "../abstract/entity";
+import AccountRecoveryPrivateKeyPasswordsCollection from "./accountRecoveryPrivateKeyPasswordsCollection";
+import UserEntity from "../user/userEntity";
+import AccountRecoveryOrganizationPublicKeyEntity from "./accountRecoveryOrganizationPublicKeyEntity";
+import EntityValidationError from "../abstract/entityValidationError";
+import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = "AccountRecoveryOrganizationPolicy";
 const POLICY_DISABLED = "disabled";
@@ -212,7 +212,7 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
       throw new EntityValidationError("AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects the creator's id to match the gpgkey.user_id.");
     }
 
-    const key = await readKeyOrFail(gpgkey.armoredKey);
+    const key = await OpenpgpAssertion.readKeyOrFail(gpgkey.armoredKey);
     const computedFingerprint = key.getFingerprint().toUpperCase();
     if (computedFingerprint !== gpgkey.fingerprint.toUpperCase()) {
       throw new EntityValidationError("AccountRecoveryOrganizationPolicyEntity assertValidCreatorGpgkey expects the gpgkey armoredKey's fingerprint to match the given fingerprint.");
@@ -372,4 +372,4 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
   }
 }
 
-exports.AccountRecoveryOrganizationPolicyEntity = AccountRecoveryOrganizationPolicyEntity;
+export default AccountRecoveryOrganizationPolicyEntity;

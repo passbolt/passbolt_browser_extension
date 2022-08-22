@@ -12,10 +12,10 @@
  * @since         3.6.0
  */
 
-const {AccountEntity} = require("../../model/entity/account/accountEntity");
-const {User} = require("../../model/user");
-const {Keyring} = require("../../model/keyring");
-const Uuid = require("../../utils/uuid");
+import Keyring from "../../model/keyring";
+import {Uuid} from "../../utils/uuid";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import User from "../../model/user";
 
 class GetLegacyAccountService {
   /**
@@ -46,4 +46,4 @@ class GetLegacyAccountService {
   }
 }
 
-exports.GetLegacyAccountService = GetLegacyAccountService;
+export default GetLegacyAccountService;

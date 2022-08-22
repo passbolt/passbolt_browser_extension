@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.3.0
  */
-const {AbstractService} = require('../abstract/abstractService');
+import AbstractService from "../abstract/abstractService";
 
 const PASSWORD_GENERATOR_SERVICE_RESOURCE_NAME = 'password-generator';
 
@@ -46,4 +46,4 @@ class PasswordGeneratorService extends AbstractService {
   }
 }
 
-exports.PasswordGeneratorService = PasswordGeneratorService;
+export default PasswordGeneratorService;

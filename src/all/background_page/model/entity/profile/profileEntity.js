@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {Entity} = require('../abstract/entity');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {AvatarEntity} = require('../avatar/avatarEntity');
+import Entity from "../abstract/entity";
+import AvatarEntity from "../avatar/avatarEntity";
+import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = 'Profile';
 
@@ -203,4 +203,4 @@ class ProfileEntity extends Entity {
   }
 }
 
-exports.ProfileEntity = ProfileEntity;
+export default ProfileEntity;

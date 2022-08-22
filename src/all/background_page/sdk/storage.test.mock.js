@@ -40,6 +40,10 @@ class LocalStorage {
   remove(key) {
     delete this.storage[key];
   }
+
+  clear() {
+    this.storage = {};
+  }
 }
 
 class MockStorage {

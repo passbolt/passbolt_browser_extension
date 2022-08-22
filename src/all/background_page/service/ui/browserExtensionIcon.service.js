@@ -12,6 +12,8 @@
  * @since         3.3
  */
 
+import browser from "webextension-polyfill";
+
 /** Default Passbolt browser extension icon file path  */
 const DEFAULT_BROWSER_EXTENSION_ICON_FILEPATH = '/icons/icon-32.png';
 
@@ -59,7 +61,7 @@ function setSuggestedResourcesCount(count) {
   }
 }
 
-exports.BrowserExtensionIconService = {
+export const BrowserExtensionIconService = {
   activate: activate,
   deactivate: deactivate,
   setSuggestedResourcesCount: setSuggestedResourcesCount

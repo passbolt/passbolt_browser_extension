@@ -3,7 +3,8 @@
  * @copyright Valeri Karpov
  * @deprecated see setImmediate MDN warning https://developer.mozilla.org/en-US/docs/Web/API/Window/setImmediate
  */
-const {EventEmitter} = require('events');
+import {EventEmitter} from "events";
+import 'setimmediate';
 
 class Lock {
   constructor() {
@@ -42,4 +43,4 @@ class Lock {
   }
 }
 
-exports.Lock = Lock;
+export default Lock;

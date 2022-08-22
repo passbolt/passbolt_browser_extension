@@ -11,11 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-const {User} = require('../model/user');
-const {GroupModel} = require('../model/group/groupModel');
-const {GroupEntity} = require('../model/entity/group/groupEntity');
-const {GroupDeleteTransferEntity} = require('../model/entity/group/transfer/groupDeleteTransfer');
-const {GroupsUpdateController} = require("../controller/group/groupUpdateController");
+import User from "../model/user";
+import GroupModel from "../model/group/groupModel";
+import GroupsUpdateController from "../controller/group/groupUpdateController";
+import GroupEntity from "../model/entity/group/groupEntity";
+import GroupDeleteTransferEntity from "../model/entity/group/transfer/groupDeleteTransfer";
+
 
 const listen = function(worker) {
   /*
@@ -142,4 +143,4 @@ const listen = function(worker) {
     }
   });
 };
-exports.listen = listen;
+export const GroupEvents = {listen};

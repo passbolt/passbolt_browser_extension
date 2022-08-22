@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         1.3.0
  */
-const Log = require('./log').Log;
+import Log from "./log";
 const workers = {};
 
 /**
@@ -51,7 +51,6 @@ const add = function(workerId, worker) {
   const onWorkerDetachHandler = () => remove(workerId, tabId);
   worker.on('detach', onWorkerDetachHandler);
 };
-exports.add = add;
 
 /**
  * Remove a worker from the list of referenced workers.
@@ -87,7 +86,6 @@ const get = function(workerId, tabId, log = true) {
   }
   return workers[tabId][workerId];
 };
-exports.get = get;
 
 /**
  * Checks that a worker exists.
@@ -98,7 +96,6 @@ exports.get = get;
 const exists = function(workerId, tabId) {
   return !(!workers[tabId] || !workers[tabId][workerId]);
 };
-exports.exists = exists;
 
 /**
  * Wait until a worker exists
@@ -127,4 +124,5 @@ const waitExists = function(workerId, tabId, timeout = 10000) {
     }, intervalPeriod);
   });
 };
-exports.waitExists = waitExists;
+
+export const Worker = {waitExists, exists, get, add};

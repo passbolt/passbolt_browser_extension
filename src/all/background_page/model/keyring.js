@@ -11,11 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-const Uuid = require('../utils/uuid');
-const {UserSettings} = require('./userSettings/userSettings');
-const {GetGpgKeyInfoService} = require('../service/crypto/getGpgKeyInfoService');
-const {ExternalGpgKeyEntity} = require('./entity/gpgkey/external/externalGpgKeyEntity');
-const {assertPublicKey, assertPrivateKey, readKeyOrFail} = require('../utils/openpgp/openpgpAssertions');
+import {OpenpgpAssertion} from "../utils/openpgp/openpgpAssertions";
+import {Uuid} from "../utils/uuid";
+import UserSettings from "./userSettings/userSettings";
+import ExternalGpgKeyEntity from "./entity/gpgkey/external/externalGpgKeyEntity";
+import GetGpgKeyInfoService from "../service/crypto/getGpgKeyInfoService";
+import storage from "../sdk/storage";
+import Validator from "validator";
 
 /**
  * Constants
@@ -100,8 +102,8 @@ class Keyring {
      */
     armoredPublicKey = this.findArmoredKeyInText(armoredPublicKey, Keyring.PUBLIC);
     // Is the given key a valid pgp key ?
-    const primaryPublicKey = await readKeyOrFail(armoredPublicKey);
-    assertPublicKey(primaryPublicKey);
+    const primaryPublicKey = await OpenpgpAssertion.readKeyOrFail(armoredPublicKey);
+    OpenpgpAssertion.assertPublicKey(primaryPublicKey);
 
     // Get the keyInfo.
     const keyInfo = (await GetGpgKeyInfoService.getKeyInfo(primaryPublicKey)).toDto();
@@ -134,8 +136,8 @@ class Keyring {
      */
     armoredKey = this.findArmoredKeyInText(armoredKey, Keyring.PRIVATE);
 
-    const privateKey = await readKeyOrFail(armoredKey);
-    assertPrivateKey(privateKey);
+    const privateKey = await OpenpgpAssertion.readKeyOrFail(armoredKey);
+    OpenpgpAssertion.assertPrivateKey(privateKey);
     // Get the keyInfo.
     const keyInfo = (await GetGpgKeyInfoService.getKeyInfo(privateKey)).toDto();
 
@@ -422,4 +424,4 @@ class Keyring {
   }
 }
 
-exports.Keyring = Keyring;
+export default Keyring;

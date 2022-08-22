@@ -12,8 +12,8 @@
  * @since         3.6.0
  */
 
-const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
-const {AccountRecoveryOrganizationPolicyService} = require("../../service/api/accountRecovery/accountRecoveryOrganizationPolicyService");
+import AccountRecoveryOrganizationPolicyService from "../../service/api/accountRecovery/accountRecoveryOrganizationPolicyService";
+import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
 
 class AccountRecoveryValidatePublicKeyController {
   constructor(worker, requestId, apiClientOptions) {
@@ -50,4 +50,4 @@ class AccountRecoveryValidatePublicKeyController {
   }
 }
 
-exports.AccountRecoveryValidatePublicKeyController = AccountRecoveryValidatePublicKeyController;
+export default AccountRecoveryValidatePublicKeyController;

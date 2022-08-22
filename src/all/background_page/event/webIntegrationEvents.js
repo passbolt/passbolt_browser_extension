@@ -10,7 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {WebIntegrationController} = require("../controller/webIntegration/webIntegrationController");
+import WebIntegrationController from "../controller/webIntegration/webIntegrationController";
 
 /**
  * Listens the web integration events
@@ -28,4 +28,4 @@ const listen = function(worker) {
   });
 };
 
-exports.listen = listen;
+export const WebIntegrationEvents = {listen};

@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {EntityCollection} = require('../abstract/entityCollection');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {EntityCollectionError} = require('../abstract/entityCollectionError');
-const {UserEntity} = require('./userEntity');
+import EntityCollection from "../abstract/entityCollection";
+import UserEntity from "./userEntity";
+import EntitySchema from "../abstract/entitySchema";
+import EntityCollectionError from "../abstract/entityCollectionError";
 
 const ENTITY_NAME = 'Users';
 
@@ -237,4 +237,4 @@ class UsersCollection extends EntityCollection {
   }
 }
 
-exports.UsersCollection = UsersCollection;
+export default UsersCollection;

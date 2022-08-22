@@ -78,4 +78,4 @@ Tab.prototype.triggerEvent = function(eventName) {
   }
 };
 
-exports.Tab = Tab;
+export default Tab;

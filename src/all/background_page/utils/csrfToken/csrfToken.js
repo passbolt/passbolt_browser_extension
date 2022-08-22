@@ -57,4 +57,4 @@ class CsrfToken {
   }
 }
 
-exports.CsrfToken = CsrfToken;
+export default CsrfToken;

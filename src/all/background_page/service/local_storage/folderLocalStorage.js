@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {Log} = require('../../model/log');
-const {Lock} = require('../../utils/lock');
+import browser from "webextension-polyfill";
+import Log from "../../model/log";
+import FolderEntity from "../../model/entity/folder/folderEntity";
+import FoldersCollection from "../../model/entity/folder/foldersCollection";
+import Lock from "../../utils/lock";
 const lock = new Lock();
-
-const {FolderEntity} = require('../../model/entity/folder/folderEntity');
-const {FoldersCollection} = require("../../model/entity/folder/foldersCollection");
 
 const FOLDER_LOCAL_STORAGE_KEY = 'folders';
 
@@ -226,4 +226,4 @@ class FolderLocalStorage {
   }
 }
 
-exports.FolderLocalStorage = FolderLocalStorage;
+export default FolderLocalStorage;

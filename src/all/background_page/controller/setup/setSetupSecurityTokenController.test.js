@@ -12,8 +12,8 @@
  * @since         3.6.0
  */
 
-import {SetSetupSecurityTokenController} from "./setSetupSecurityTokenController";
-import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
+import SetSetupSecurityTokenController from "./setSetupSecurityTokenController";
+import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import {withUserKeyAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
 import {defaultSecurityTokenDto} from "../../model/entity/securityToken/SecurityTokenEntity.test.data";
 

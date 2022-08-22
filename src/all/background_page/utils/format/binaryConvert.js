@@ -44,4 +44,4 @@ class BinaryConvert {
   }
 }
 
-exports.BinaryConvert = BinaryConvert;
+export default BinaryConvert;

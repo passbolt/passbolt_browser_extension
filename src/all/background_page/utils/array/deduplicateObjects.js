@@ -54,4 +54,4 @@ const deduplicateObjects = (arr, key) => {
   });
 };
 
-exports.deduplicateObjects = deduplicateObjects;
+export default deduplicateObjects;

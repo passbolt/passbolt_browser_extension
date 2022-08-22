@@ -12,22 +12,23 @@
  * @since         2.0.0
  */
 
-const {VerifyImportedKeyPassphraseController} = require("../controller/setup/verifyImportedKeyPassphraseController");
-const {GenerateSetupKeyPairController} = require("../controller/setup/generateSetupKeyPairController");
-const {SetSetupAccountRecoveryUserSettingController} = require("../controller/setup/setSetupAccountRecoveryUserSettingController");
-const {ImportSetupPrivateKeyController} = require("../controller/setup/importSetupPrivateKeyController");
-const {GetKeyInfoController} = require("../controller/crypto/getKeyInfoController");
-const {GetOrganizationSettingsController} = require("../controller/organizationSettings/getOrganizationSettingsController");
-const {IsExtensionFirstInstallController} = require("../controller/extension/isExtensionFirstInstallController");
-const {GetAndInitSetupLocaleController} = require("../controller/setup/getAndInitSetupLocaleController");
-const {SetSetupLocaleController} = require("../controller/setup/setSetupLocaleController");
-const {StartSetupController} = require("../controller/setup/startSetupController");
-const {GetAccountRecoveryOrganizationPolicyController} = require("../controller/setup/getAccountRecoveryOrganizationPolicyController");
-const {DownloadRecoveryKitController} = require("../controller/setup/downloadRecoverKitController");
-const {SetSetupSecurityTokenController} = require("../controller/setup/setSetupSecurityTokenController");
-const {CompleteSetupController} = require("../controller/setup/completeSetupController");
-const {ValidatePrivateGpgKeySetupController} = require("../controller/crypto/validatePrivateGpgKeySetupController");
-const {SignInSetupController} = require("../controller/setup/signInSetupController");
+import GetKeyInfoController from "../controller/crypto/getKeyInfoController";
+import VerifyImportedKeyPassphraseController from "../controller/setup/verifyImportedKeyPassphraseController";
+import SignInSetupController from "../controller/setup/signInSetupController";
+import SetSetupAccountRecoveryUserSettingController from "../controller/setup/setSetupAccountRecoveryUserSettingController";
+import ImportSetupPrivateKeyController from "../controller/setup/importSetupPrivateKeyController";
+import StartSetupController from "../controller/setup/startSetupController";
+import DownloadRecoveryKitController from "../controller/setup/downloadRecoverKitController";
+import CompleteSetupController from "../controller/setup/completeSetupController";
+import ValidatePrivateGpgKeySetupController from "../controller/crypto/validatePrivateGpgKeySetupController";
+import SetSetupLocaleController from "../controller/setup/setSetupLocaleController";
+import GetOrganizationSettingsController from "../controller/organizationSettings/getOrganizationSettingsController";
+import GenerateSetupKeyPairController from "../controller/setup/generateSetupKeyPairController";
+import GetAndInitSetupLocaleController from "../controller/setup/getAndInitSetupLocaleController";
+import IsExtensionFirstInstallController from "../controller/extension/isExtensionFirstInstallController";
+import SetSetupSecurityTokenController from "../controller/setup/setSetupSecurityTokenController";
+import GetAccountRecoveryOrganizationPolicyController from "../controller/setup/getAccountRecoveryOrganizationPolicyController";
+
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -119,4 +120,4 @@ const listen = function(worker, apiClientOptions, account) {
     await controller._exec(key);
   });
 };
-exports.listen = listen;
+export const SetupEvents = {listen};

@@ -13,10 +13,10 @@
  */
 
 import {enableFetchMocks} from "jest-fetch-mock";
-import {User} from "../../model/user";
-import {AccountRecoverySaveUserSettingsController} from "./accountRecoverySaveUserSettingController";
-import PassphraseController from "../passphrase/passphraseController";
-import {AccountRecoveryUserSettingEntity} from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
+import User from "../../model/user";
+import AccountRecoverySaveUserSettingsController from "./accountRecoverySaveUserSettingController";
+import {PassphraseController} from "../passphrase/passphraseController";
+import AccountRecoveryUserSettingEntity from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import {
   createAcceptedAccountRecoveryUserSettingDto,
   createRejectedAccountRecoveryUserSettingDto
@@ -24,8 +24,8 @@ import {
 import {enabledAccountRecoveryOrganizationPolicyDto, disabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {AccountEntity} from "../../model/entity/account/accountEntity";
-import {MockExtension} from "../../../../../test/mocks/mockExtension";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import MockExtension from "../../../../../test/mocks/mockExtension";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 

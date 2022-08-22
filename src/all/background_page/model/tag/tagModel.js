@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const {splitBySize} = require("../../utils/array/splitBySize");
-const {TagEntity} = require('../entity/tag/tagEntity');
-const {TagsCollection} = require('../entity/tag/tagsCollection');
-const {TagService} = require('../../service/api/tag/tagService');
-const {ResourceModel} = require('../../model/resource/resourceModel');
+import ResourceModel from "../../model/resource/resourceModel";
+import TagService from "../../service/api/tag/tagService";
+import TagEntity from "../entity/tag/tagEntity";
+import TagsCollection from "../entity/tag/tagsCollection";
+import splitBySize from "../../utils/array/splitBySize";
 
 const BULK_OPERATION_SIZE = 5;
 
@@ -144,4 +144,4 @@ class TagModel {
   }
 }
 
-exports.TagModel = TagModel;
+export default TagModel;

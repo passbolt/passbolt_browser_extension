@@ -10,10 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {AbstractService} = require('../abstract/abstractService');
-const {PassboltApiFetchError} = require('../../../error/passboltApiFetchError');
-const {PassboltBadResponseError} = require('../../../error/passboltBadResponseError');
-const {PassboltServiceUnavailableError} = require('../../../error/passboltServiceUnavailableError');
+import PassboltBadResponseError from "../../../error/passboltBadResponseError";
+import AbstractService from "../abstract/abstractService";
+import PassboltApiFetchError from "../../../error/passboltApiFetchError";
+import PassboltServiceUnavailableError from "../../../error/passboltServiceUnavailableError";
 
 const AUTH_SERVICE_RESOURCE_NAME = 'auth';
 
@@ -135,4 +135,4 @@ class AuthService extends AbstractService {
   }
 }
 
-exports.AuthService = AuthService;
+export default AuthService;

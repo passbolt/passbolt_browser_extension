@@ -35,4 +35,4 @@ class ImportError extends Error {
   }
 }
 
-exports.ImportError = ImportError;
+export default ImportError;

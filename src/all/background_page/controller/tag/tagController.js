@@ -10,11 +10,12 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const progressController = require('../progress/progressController');
-const {ResourceModel} = require('../../model/resource/resourceModel');
-const {TagModel} = require('../../model/tag/tagModel');
-const {TagsCollection} = require('../../model/entity/tag/tagsCollection');
-const {i18n} = require("../../sdk/i18n");
+import ResourceModel from "../../model/resource/resourceModel";
+import TagModel from "../../model/tag/tagModel";
+import {ProgressController as progressController} from "../progress/progressController";
+import TagsCollection from "../../model/entity/tag/tagsCollection";
+import i18n from "../../sdk/i18n";
+
 
 class TagController {
   /**
@@ -111,4 +112,4 @@ class TagController {
   }
 }
 
-exports.TagController = TagController;
+export default TagController;

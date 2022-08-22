@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import {UserDeleteTransferEntity} from "./userDeleteTransfer";
-import {EntityValidationError} from "../../abstract/entityValidationError";
+import UserDeleteTransferEntity from "./userDeleteTransfer";
+import EntityValidationError from "../../abstract/entityValidationError";
 
 describe("User delete transfer entity", () => {
   it("constructor works if valid minimal DTO is provided", () => {

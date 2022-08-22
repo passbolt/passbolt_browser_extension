@@ -4,7 +4,7 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const Worker = require('../model/worker');
+import {Worker} from "../model/worker";
 
 const listen = function(worker) {
   /*
@@ -19,4 +19,4 @@ const listen = function(worker) {
     worker.port.emit(requestId, 'SUCCESS');
   });
 };
-exports.listen = listen;
+export const ClipboardEvents = {listen};

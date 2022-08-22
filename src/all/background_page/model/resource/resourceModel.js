@@ -10,19 +10,17 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {splitBySize} = require("../../utils/array/splitBySize");
-const {ResourceEntity} = require('../entity/resource/resourceEntity');
-const {ResourcesCollection} = require('../entity/resource/resourcesCollection');
-const {ResourceLocalStorage} = require('../../service/local_storage/resourceLocalStorage');
-const {ResourceService} = require('../../service/api/resource/resourceService');
-
-const {PlaintextEntity} = require('../entity/plaintext/plaintextEntity');
-const {PermissionEntity} = require('../entity/permission/permissionEntity');
-const {PermissionsCollection} = require('../entity/permission/permissionsCollection');
-const {PermissionChangesCollection} = require('../entity/permission/change/permissionChangesCollection');
-const {ResourceTypeModel} = require('../../model/resourceType/resourceTypeModel');
-
-const {MoveService} = require('../../service/api/move/moveService');
+import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
+import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
+import ResourcesCollection from "../entity/resource/resourcesCollection";
+import PermissionEntity from "../entity/permission/permissionEntity";
+import PermissionsCollection from "../entity/permission/permissionsCollection";
+import ResourceEntity from "../entity/resource/resourceEntity";
+import PermissionChangesCollection from "../entity/permission/change/permissionChangesCollection";
+import MoveService from "../../service/api/move/moveService";
+import ResourceService from "../../service/api/resource/resourceService";
+import PlaintextEntity from "../entity/plaintext/plaintextEntity";
+import splitBySize from "../../utils/array/splitBySize";
 
 const BULK_OPERATION_SIZE = 5;
 const MAX_LENGTH_PLAINTEXT = 4096;
@@ -652,4 +650,4 @@ class ResourceModel {
   }
 }
 
-exports.ResourceModel = ResourceModel;
+export default ResourceModel;

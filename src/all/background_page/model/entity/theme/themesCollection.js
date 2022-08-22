@@ -10,10 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {EntityCollection} = require('../abstract/entityCollection');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {EntityCollectionError} = require('../abstract/entityCollectionError');
-const {ThemeEntity} = require('./themeEntity');
+import EntityCollection from "../abstract/entityCollection";
+import ThemeEntity from "./themeEntity";
+import EntitySchema from "../abstract/entitySchema";
+import EntityCollectionError from "../abstract/entityCollectionError";
 
 const ENTITY_NAME = 'Themes';
 
@@ -158,4 +158,4 @@ class ThemesCollection extends EntityCollection {
   }
 }
 
-exports.ThemesCollection = ThemesCollection;
+export default ThemesCollection;

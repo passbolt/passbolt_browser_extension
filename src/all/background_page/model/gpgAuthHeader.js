@@ -4,8 +4,8 @@
  * @copyright (c) 2016-onwards Bolt Softwares pvt. ltd.
  * @licence AGPL-3.0 http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+import UserAlreadyLoggedInError from "../error/userAlreadyLoggedInError";
 
-const {UserAlreadyLoggedInError} = require("../error/userAlreadyLoggedInError");
 
 /**
  * The class that deals with secrets.
@@ -170,4 +170,4 @@ GpgAuthHeader.prototype.__validateByStage = function(stage) {
   }
 };
 
-exports.GpgAuthHeader = GpgAuthHeader;
+export default GpgAuthHeader;

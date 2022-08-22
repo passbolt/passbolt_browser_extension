@@ -11,19 +11,20 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {AccountRecoveryOrganizationPolicyService} = require("../../service/api/accountRecovery/accountRecoveryOrganizationPolicyService");
-const {AccountRecoveryOrganizationPolicyEntity} = require("../entity/accountRecovery/accountRecoveryOrganizationPolicyEntity");
-const {AccountRecoveryPrivateKeyPasswordsCollection} = require("../entity/accountRecovery/accountRecoveryPrivateKeyPasswordsCollection");
-const {AccountRecoveryRequestsCollection} = require("../entity/accountRecovery/accountRecoveryRequestsCollection");
-const {AccountRecoveryRequestService} = require("../../service/api/accountRecovery/accountRecoveryRequestService");
-const {AccountRecoveryUserService} = require('../../service/api/accountRecovery/accountRecoveryUserService');
-const {AccountRecoveryResponseService} = require("../../service/api/accountRecovery/accountRecoveryResponseService");
-const {AccountRecoveryRequestEntity} = require("../entity/accountRecovery/accountRecoveryRequestEntity");
-const {AccountRecoveryResponseEntity} = require("../entity/accountRecovery/accountRecoveryResponseEntity");
-const {AccountRecoveryPrivateKeyPasswordService} = require('../../service/api/accountRecovery/accountRecoveryPrivateKeyPasswordService');
-const {AccountRecoveryUserSettingEntity} = require("../entity/accountRecovery/accountRecoveryUserSettingEntity");
-const {AccountRecoveryContinueService} = require('../../service/api/accountRecovery/accountRecoveryContinueService');
-const {SetupService} = require("../../service/api/setup/setupService");
+import AccountRecoveryOrganizationPolicyService from "../../service/api/accountRecovery/accountRecoveryOrganizationPolicyService";
+import AccountRecoveryOrganizationPolicyEntity from "../entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
+import AccountRecoveryRequestService from "../../service/api/accountRecovery/accountRecoveryRequestService";
+import AccountRecoveryUserService from "../../service/api/accountRecovery/accountRecoveryUserService";
+import AccountRecoveryResponseService from "../../service/api/accountRecovery/accountRecoveryResponseService";
+import AccountRecoveryPrivateKeyPasswordService from "../../service/api/accountRecovery/accountRecoveryPrivateKeyPasswordService";
+import AccountRecoveryContinueService from "../../service/api/accountRecovery/accountRecoveryContinueService";
+import SetupService from "../../service/api/setup/setupService";
+import AccountRecoveryPrivateKeyPasswordsCollection from "../entity/accountRecovery/accountRecoveryPrivateKeyPasswordsCollection";
+import AccountRecoveryResponseEntity from "../entity/accountRecovery/accountRecoveryResponseEntity";
+import AccountRecoveryRequestEntity from "../entity/accountRecovery/accountRecoveryRequestEntity";
+import AccountRecoveryRequestsCollection from "../entity/accountRecovery/accountRecoveryRequestsCollection";
+import AccountRecoveryUserSettingEntity from "../entity/accountRecovery/accountRecoveryUserSettingEntity";
+import Validator from "validator";
 
 /**
  * Model related to the account recovery
@@ -177,4 +178,4 @@ class AccountRecoveryModel {
   }
 }
 
-exports.AccountRecoveryModel = AccountRecoveryModel;
+export default AccountRecoveryModel;

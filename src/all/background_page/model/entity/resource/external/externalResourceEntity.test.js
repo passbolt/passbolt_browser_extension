@@ -10,10 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import {EntityValidationError} from "../../abstract/entityValidationError";
-import {EntitySchema} from "../../abstract/entitySchema";
-import {ExternalResourceEntity} from "./externalResourceEntity";
-import {ExternalFolderEntity} from "../../folder/external/externalFolderEntity";
+import EntityValidationError from "../../abstract/entityValidationError";
+import EntitySchema from "../../abstract/entitySchema";
+import ExternalResourceEntity from "./externalResourceEntity";
+import ExternalFolderEntity from "../../folder/external/externalFolderEntity";
 
 describe("ExternalResourceEntity", () => {
   it("schema must validate", () => {

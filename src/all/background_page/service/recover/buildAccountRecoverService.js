@@ -12,8 +12,8 @@
  * @since         3.6.0
  */
 
-const {AccountRecoverEntity} = require("../../model/entity/account/accountRecoverEntity");
-const {ParseRecoverUrlService} = require("./parseRecoverUrlService");
+import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
+import ParseRecoverUrlService from "./parseRecoverUrlService";
 
 class BuildAccountRecoverService {
   /**
@@ -30,4 +30,4 @@ class BuildAccountRecoverService {
   }
 }
 
-exports.BuildAccountRecoverService = BuildAccountRecoverService;
+export default BuildAccountRecoverService;

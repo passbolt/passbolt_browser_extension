@@ -6,8 +6,8 @@
  * @copyright (c) 2017-present Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {PageMod} = require('../sdk/page-mod');
-const Worker = require('../model/worker');
+import {Worker} from "../model/worker";
+import PageMod from "../sdk/page-mod";
 
 const Clipboard = function() {};
 Clipboard._pageMod = undefined;
@@ -34,4 +34,4 @@ Clipboard.init = function() {
     }
   });
 };
-exports.Clipboard = Clipboard;
+export default Clipboard;

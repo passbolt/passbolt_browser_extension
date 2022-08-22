@@ -10,10 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import {EntityValidationError} from "../../abstract/entityValidationError";
-import {GroupUpdateEntity} from "./groupUpdateEntity";
-import {GroupEntity} from "../groupEntity";
-import {EntitySchema} from "../../abstract/entitySchema";
+import EntityValidationError from "../../abstract/entityValidationError";
+import GroupUpdateEntity from "./groupUpdateEntity";
+import GroupEntity from "../groupEntity";
+import EntitySchema from "../../abstract/entitySchema";
 
 describe("Group update entity", () => {
   it("schema must validate", () => {

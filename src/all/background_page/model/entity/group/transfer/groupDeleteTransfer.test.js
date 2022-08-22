@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import {GroupDeleteTransferEntity} from "./groupDeleteTransfer";
-import {EntityValidationError} from "../../abstract/entityValidationError";
+import GroupDeleteTransferEntity from "./groupDeleteTransfer";
+import EntityValidationError from "../../abstract/entityValidationError";
 
 describe("Group delete transfer entity", () => {
   it("constructor works if valid minimal DTO is provided", () => {

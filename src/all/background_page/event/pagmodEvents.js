@@ -18,4 +18,4 @@ const listen = function(worker) {
   });
 };
 
-exports.listen = listen;
+export const PagemodEvents = {listen};

@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-const {DecryptPrivateKeyService} = require('./decryptPrivateKeyService');
-const {assertEncryptedPrivateKey} = require('../../utils/openpgp/openpgpAssertions');
-const {EncryptPrivateKeyService} = require("./encryptPrivateKeyService");
+import DecryptPrivateKeyService from "./decryptPrivateKeyService";
+import EncryptPrivateKeyService from "./encryptPrivateKeyService";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import {ValidatorRule as Validator} from "../../utils/validatorRules";
 
 class ReEncryptPrivateKeyService {
   /**
@@ -29,7 +29,7 @@ class ReEncryptPrivateKeyService {
    * @throws {InvalidMasterPasswordError} if the private key can't be decrypted with oldPassphrase.
    */
   static async reEncrypt(encryptedPrivateKey, oldPassphrase, newPassphrase) {
-    assertEncryptedPrivateKey(encryptedPrivateKey);
+    OpenpgpAssertion.assertEncryptedPrivateKey(encryptedPrivateKey);
     this._validatePassphrase(oldPassphrase);
     this._validatePassphrase(newPassphrase);
 
@@ -52,4 +52,4 @@ class ReEncryptPrivateKeyService {
   }
 }
 
-exports.ReEncryptPrivateKeyService = ReEncryptPrivateKeyService;
+export default ReEncryptPrivateKeyService;

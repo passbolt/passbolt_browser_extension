@@ -10,11 +10,11 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import {EntitySchema} from "../abstract/entitySchema";
-import {EntityValidationError} from '../abstract/entityValidationError';
-import {DefaultActionLogEntity} from "./defaultActionLogEntity";
-import {UpdatedPermissionEntity} from "../permission/actionLog/updatedPermissionEntity";
-const {DefaultActionLogEntityTestFixtures} = require('./defaultActionLogEntity.test.fixtures');
+import EntitySchema from "../abstract/entitySchema";
+import EntityValidationError from '../abstract/entityValidationError';
+import DefaultActionLogEntity from "./defaultActionLogEntity";
+import UpdatedPermissionEntity from "../permission/actionLog/updatedPermissionEntity";
+import {DefaultActionLogEntityTestFixtures} from './defaultActionLogEntity.test.fixtures';
 
 describe("Default action log entity", () => {
   function getDummyDefaultActionLogDto(changes) {

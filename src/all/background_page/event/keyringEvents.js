@@ -5,14 +5,13 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {Keyring} = require('../model/keyring');
-const keyring = new Keyring();
-const passphraseController = require('../controller/passphrase/passphraseController');
-const {GetUserKeyInfoController} = require('../controller/crypto/getUserKeyInfoController');
-const {GetKeyInfoController} = require('../controller/crypto/getKeyInfoController');
-const {CheckPassphraseController} = require('../controller/crypto/checkPassphraseController');
-const {DownloadUserPublicKeyController} = require('../controller/crypto/downloadUserPublicKeyController');
-const {DownloadUserPrivateKeyController} = require('../controller/crypto/downloadUserPrivateKeyController');
+import Keyring from "../model/keyring";
+import {PassphraseController as passphraseController} from "../controller/passphrase/passphraseController";
+import CheckPassphraseController from "../controller/crypto/checkPassphraseController";
+import GetUserKeyInfoController from "../controller/crypto/getUserKeyInfoController";
+import GetKeyInfoController from "../controller/crypto/getKeyInfoController";
+import DownloadUserPublicKeyController from "../controller/crypto/downloadUserPublicKeyController";
+import DownloadUserPrivateKeyController from "../controller/crypto/downloadUserPrivateKeyController";
 
 const listen = function(worker) {
   /*
@@ -100,6 +99,7 @@ const listen = function(worker) {
   worker.port.on('passbolt.keyring.get-private-key', async requestId => {
     try {
       await passphraseController.request(worker);
+      const keyring = new Keyring();
       const privateKeyInfo = keyring.findPrivate();
       if (!privateKeyInfo) {
         throw new Error('Private key not found.');
@@ -110,5 +110,5 @@ const listen = function(worker) {
     }
   });
 };
-exports.listen = listen;
+export const KeyringEvents = {listen};
 

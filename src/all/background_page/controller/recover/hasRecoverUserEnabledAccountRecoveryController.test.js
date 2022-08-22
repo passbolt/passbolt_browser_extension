@@ -16,8 +16,8 @@ import {
   startAccountRecoverDto,
   startWithApprovedAccountRecoveryAccountRecoverDto
 } from "../../model/entity/account/accountRecoverEntity.test.data";
-import {AccountRecoverEntity} from "../../model/entity/account/accountRecoverEntity";
-import {HasRecoverUserEnabledAccountRecoveryController} from "./hasRecoverUserEnabledAccountRecoveryController";
+import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
+import HasRecoverUserEnabledAccountRecoveryController from "./hasRecoverUserEnabledAccountRecoveryController";
 
 describe("HasRecoverUserEnabledAccountRecoveryController", () => {
   describe("HasRecoverUserEnabledAccountRecoveryController::exec", () => {

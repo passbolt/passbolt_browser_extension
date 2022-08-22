@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {Log} = require('../../model/log');
-const {Lock} = require('../../utils/lock');
+import browser from "webextension-polyfill";
+import Log from "../../model/log";
+import GroupsCollection from "../../model/entity/group/groupsCollection";
+import GroupEntity from "../../model/entity/group/groupEntity";
+import Lock from "../../utils/lock";
 const lock = new Lock();
-
-const {GroupEntity} = require('../../model/entity/group/groupEntity');
-const {GroupsCollection} = require("../../model/entity/group/groupsCollection");
 
 const GROUP_LOCAL_STORAGE_KEY = 'groups';
 
@@ -192,4 +192,4 @@ class GroupLocalStorage {
   }
 }
 
-exports.GroupLocalStorage = GroupLocalStorage;
+export default GroupLocalStorage;

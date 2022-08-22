@@ -23,4 +23,4 @@ class ParsePublicWebsiteUrlService {
   }
 }
 
-exports.ParsePublicWebsiteUrlService = ParsePublicWebsiteUrlService;
+export default ParsePublicWebsiteUrlService;

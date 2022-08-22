@@ -19,4 +19,4 @@ class NotFoundError extends Error {
   }
 }
 
-exports.NotFoundError = NotFoundError;
+export default NotFoundError;

@@ -12,14 +12,13 @@
  * @since         3.6.0
  */
 
-import {DownloadRecoveryKitController} from "./downloadRecoverKitController";
+import DownloadRecoveryKitController from "./downloadRecoverKitController";
 import {
   startAccountSetupDto,
   withUserKeyAccountSetupDto
 } from "../../model/entity/account/accountSetupEntity.test.data";
-import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
-
-const FileController = require("../fileController");
+import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
+import {FileController} from "../fileController";
 
 jest.mock("../../controller/fileController");
 

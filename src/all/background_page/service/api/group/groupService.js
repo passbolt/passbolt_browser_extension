@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const {AbstractService} = require('../abstract/abstractService');
+import AbstractService from "../abstract/abstractService";
 
 const GROUP_SERVICE_RESOURCE_NAME = 'groups';
 
@@ -269,4 +269,4 @@ class GroupService extends AbstractService {
   }
 }
 
-exports.GroupService = GroupService;
+export default GroupService;

@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         v3.2.0
  */
-const {MobileTransferService} = require('../../service/api/mobileTransferService/mobileTransferService');
-const {TransferEntity} = require('../../model/entity/transfer/transferEntity');
+import MobileTransferService from "../../service/api/mobileTransferService/mobileTransferService";
+import TransferEntity from "../../model/entity/transfer/transferEntity";
 
 class MobileTransferModel {
   /**
@@ -60,4 +60,4 @@ class MobileTransferModel {
   }
 }
 
-exports.MobileTransferModel = MobileTransferModel;
+export default MobileTransferModel;

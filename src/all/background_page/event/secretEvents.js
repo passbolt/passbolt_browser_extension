@@ -5,8 +5,8 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {SecretDecryptController} = require('../controller/secret/secretDecryptController');
-const {User} = require('../model/user');
+import User from "../model/user";
+import SecretDecryptController from "../controller/secret/secretDecryptController";
 
 const listen = function(worker) {
   /*
@@ -31,4 +31,4 @@ const listen = function(worker) {
   });
 };
 
-exports.listen = listen;
+export const SecretEvents = {listen};

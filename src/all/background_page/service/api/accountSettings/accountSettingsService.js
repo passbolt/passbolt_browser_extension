@@ -10,7 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {AbstractService} = require('../abstract/abstractService');
+import AbstractService from "../abstract/abstractService";
 
 const RESOURCE_SERVICE_RESOURCE_NAME = 'account/settings';
 
@@ -93,4 +93,4 @@ class AccountSettingsService extends AbstractService {
   }
 }
 
-exports.AccountSettingsService = AccountSettingsService;
+export default AccountSettingsService;

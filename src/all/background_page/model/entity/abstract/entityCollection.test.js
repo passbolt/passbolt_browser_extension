@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {Entity} from "./entity";
-import {EntityCollection} from "./entityCollection";
-import {EntitySchema} from "./entitySchema";
+import Entity from "./entity";
+import EntityCollection from "./entityCollection";
+import EntitySchema from "./entitySchema";
 
 /*
  * ===========================================

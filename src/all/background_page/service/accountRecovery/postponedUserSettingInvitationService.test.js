@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {PostponedUserSettingInvitationService} from './postponedUserSettingInvitationService';
+import PostponedUserSettingInvitationService from './postponedUserSettingInvitationService';
 
 describe("PostponedUserSettingInvitation service", () => {
   it("Retrieve the right information", async() => {

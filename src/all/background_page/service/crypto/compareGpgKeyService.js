@@ -12,8 +12,8 @@
  * @since         3.6.0
  */
 
-const {assertKey} = require("../../utils/openpgp/openpgpAssertions");
-const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import GetGpgKeyInfoService from "./getGpgKeyInfoService";
 
 class CompareGpgKeyService {
   /**
@@ -27,8 +27,8 @@ class CompareGpgKeyService {
    * @returns {Promise<bool>}
    */
   static async areKeysTheSame(keyA, keyB) {
-    assertKey(keyA);
-    assertKey(keyB);
+    OpenpgpAssertion.assertKey(keyA);
+    OpenpgpAssertion.assertKey(keyB);
 
     const keyAInfo = await GetGpgKeyInfoService.getKeyInfo(keyA);
     const keyBInfo = await GetGpgKeyInfoService.getKeyInfo(keyB);
@@ -37,4 +37,4 @@ class CompareGpgKeyService {
   }
 }
 
-exports.CompareGpgKeyService = CompareGpgKeyService;
+export default CompareGpgKeyService;

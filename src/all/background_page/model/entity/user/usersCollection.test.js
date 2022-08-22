@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {UsersCollection} from "./usersCollection";
-import {EntityCollectionError} from "../abstract/entityCollectionError";
+import UsersCollection from "./usersCollection";
+import EntityCollectionError from "../abstract/entityCollectionError";
 import {UsersCollectionTestFixtures} from "./usersCollection.test.fixtures";
-import {EntitySchema} from "../abstract/entitySchema";
+import EntitySchema from "../abstract/entitySchema";
 
 describe("User entity", () => {
   it("schema must validate", () => {

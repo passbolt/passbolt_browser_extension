@@ -12,8 +12,8 @@
  * @since         3.6.0
  */
 
-import {BuildAccountRecoverService} from "./buildAccountRecoverService";
-import {AccountRecoverEntity} from "../../model/entity/account/accountRecoverEntity";
+import BuildAccountRecoverService from "./buildAccountRecoverService";
+import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 
 describe("BuildAccountRecoverService", () => {
   describe("BuildAccountRecoverService:buildFromUrl", () => {

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {Entity} from "./entity";
+import Entity from "./entity";
 
 describe("Entity", () => {
   it("works with it's own copy of the props and not keep reference", () => {

@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
-const GpgAuth = require('../../model/gpgauth').GpgAuth;
+import GpgAuth from "../../model/gpgauth";
 
 class AuthCheckStatusController {
   constructor(worker, requestId) {
@@ -31,4 +31,4 @@ class AuthCheckStatusController {
   }
 }
 
-exports.AuthCheckStatusController = AuthCheckStatusController;
+export default AuthCheckStatusController;

@@ -12,10 +12,11 @@
  * @since         3.6.0
  */
 
-const {goog} = require('../../utils/format/emailaddress');
-const {ExternalGpgKeyEntity} = require('../../model/entity/gpgkey/external/externalGpgKeyEntity');
-const {GpgKeyError} = require('../../error/GpgKeyError');
-const {assertKey} = require('../../utils/openpgp/openpgpAssertions');
+import ExternalGpgKeyEntity from "../../model/entity/gpgkey/external/externalGpgKeyEntity";
+import goog from "../../utils/format/emailaddress";
+import GpgKeyError from "../../error/GpgKeyError";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+
 
 class GetGpgKeyInfoService {
   /**
@@ -25,7 +26,7 @@ class GetGpgKeyInfoService {
    * @return {Promise<ExternalGpgKeyEntity>}
    */
   static async getKeyInfo(key) {
-    assertKey(key);
+    OpenpgpAssertion.assertKey(key);
 
     // Check the userIds
     const userIds = key.getUserIDs();
@@ -148,4 +149,4 @@ class GetGpgKeyInfoService {
   }
 }
 
-exports.GetGpgKeyInfoService = GetGpgKeyInfoService;
+export default GetGpgKeyInfoService;

@@ -11,9 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {Entity} = require('../abstract/entity');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {AccountRecoveryPrivateKeyEntity} = require("./accountRecoveryPrivateKeyEntity");
+import AccountRecoveryPrivateKeyEntity from "./accountRecoveryPrivateKeyEntity";
+import Entity from "../abstract/entity";
+import EntitySchema from "../abstract/entitySchema";
+
 
 const ENTITY_NAME = 'AccountRecoveryUserSetting';
 const STATUS_APPROVED = 'approved';
@@ -192,4 +193,4 @@ class AccountRecoveryUserSettingEntity extends Entity {
   }
 }
 
-exports.AccountRecoveryUserSettingEntity = AccountRecoveryUserSettingEntity;
+export default AccountRecoveryUserSettingEntity;

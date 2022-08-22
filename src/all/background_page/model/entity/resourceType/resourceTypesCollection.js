@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {EntityCollection} = require('../abstract/entityCollection');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {EntityCollectionError} = require('../abstract/entityCollectionError');
-const {ResourceTypeEntity} = require('./resourceTypeEntity');
+import EntityCollection from "../abstract/entityCollection";
+import ResourceTypeEntity from "./resourceTypeEntity";
+import EntitySchema from "../abstract/entitySchema";
+import EntityCollectionError from "../abstract/entityCollectionError";
 
 const ENTITY_NAME = 'ResourceTypes';
 const RULE_UNIQUE_ID = 'unique_id';
@@ -145,4 +145,4 @@ class ResourceTypesCollection extends EntityCollection {
   }
 }
 
-exports.ResourceTypesCollection = ResourceTypesCollection;
+export default ResourceTypesCollection;

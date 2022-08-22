@@ -11,14 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.8.0
  */
-const {i18n} = require('../../sdk/i18n');
-const passphraseController = require('../passphrase/passphraseController');
-const progressController = require('../progress/progressController');
+import DecryptMessageService from "../../service/crypto/decryptMessageService";
+import ResourceModel from "../../model/resource/resourceModel";
+import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
+import {ProgressController as progressController} from "../progress/progressController";
+import i18n from "../../sdk/i18n";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
-const {ResourceModel} = require('../../model/resource/resourceModel');
-const {DecryptMessageService} = require('../../service/crypto/decryptMessageService');
-const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
-const {readMessageOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 class SecretDecryptController {
   /**
@@ -58,7 +58,7 @@ class SecretDecryptController {
         await progressController.update(this.worker, 1, i18n.t("Decrypting secret"));
       }
       const resource = await resourcePromise;
-      const resourceSecretMessage = await readMessageOrFail(resource.secret.data);
+      const resourceSecretMessage = await OpenpgpAssertion.readMessageOrFail(resource.secret.data);
       let plaintext = await DecryptMessageService.decrypt(resourceSecretMessage, privateKey);
       plaintext = await this.resourceModel.deserializePlaintext(resource.resourceTypeId, plaintext);
 
@@ -78,4 +78,4 @@ class SecretDecryptController {
   }
 }
 
-exports.SecretDecryptController = SecretDecryptController;
+export default SecretDecryptController;

@@ -121,4 +121,4 @@ ScriptExecution.prototype.setGlobals = function(options) {
   this.executeScript([code]);
 };
 
-exports.ScriptExecution = ScriptExecution;
+export default ScriptExecution;

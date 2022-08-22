@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {GenerateGpgKeyPairService} from "./generateGpgKeyPairService";
-import {GetGpgKeyInfoService} from "./getGpgKeyInfoService";
-import {GenerateGpgKeyPairOptionsEntity} from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity";
-import {DecryptPrivateKeyService} from "../../service/crypto/decryptPrivateKeyService";
-import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
+import GenerateGpgKeyPairService from "./generateGpgKeyPairService";
+import GetGpgKeyInfoService from "./getGpgKeyInfoService";
+import GenerateGpgKeyPairOptionsEntity from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity";
+import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 describe("GenerateGpgKeyPair service", () => {
   it('should generate a key pair according to the given parameters', async() => {
@@ -35,7 +35,7 @@ describe("GenerateGpgKeyPair service", () => {
     expect(keyPair.public_key).not.toBeNull();
     expect(keyPair.private_key).not.toBeNull();
 
-    const publicKey = await readKeyOrFail(keyPair.publicKey.armoredKey);
+    const publicKey = await OpenpgpAssertion.readKeyOrFail(keyPair.publicKey.armoredKey);
     const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(publicKey);
     expect(publicKeyInfo.algorithm).toBe("rsa");
     expect(publicKeyInfo.userIds[0]).toEqual({name: generateGpgKeyPairOptionsDto.name, email: generateGpgKeyPairOptionsDto.email});
@@ -45,7 +45,7 @@ describe("GenerateGpgKeyPair service", () => {
     expect(publicKeyInfo.expires).toBe("Infinity");
     expect(publicKeyInfo.created).toBe(keyCreationDate.toISOString());
 
-    const privateKey = await readKeyOrFail(keyPair.privateKey.armoredKey);
+    const privateKey = await OpenpgpAssertion.readKeyOrFail(keyPair.privateKey.armoredKey);
     const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKey);
     expect(privateKeyInfo.algorithm).toBe("rsa");
     expect(privateKeyInfo.userIds[0]).toEqual({name: generateGpgKeyPairOptionsDto.name, email: generateGpgKeyPairOptionsDto.email});
@@ -78,7 +78,7 @@ describe("GenerateGpgKeyPair service", () => {
     expect(keyPair.public_key).not.toBeNull();
     expect(keyPair.private_key).not.toBeNull();
 
-    const publicKey = await readKeyOrFail(keyPair.publicKey.armoredKey);
+    const publicKey = await OpenpgpAssertion.readKeyOrFail(keyPair.publicKey.armoredKey);
     const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(publicKey);
     expect(publicKeyInfo.algorithm).toBe("rsa");
     expect(publicKeyInfo.userIds[0]).toEqual({name: generateGpgKeyPairOptionsDto.name, email: generateGpgKeyPairOptionsDto.email});
@@ -88,7 +88,7 @@ describe("GenerateGpgKeyPair service", () => {
     expect(publicKeyInfo.expires).toBe("Infinity");
     expect(publicKeyInfo.created).toBe(currentTime.toISOString());
 
-    const privateKey = await readKeyOrFail(keyPair.privateKey.armoredKey);
+    const privateKey = await OpenpgpAssertion.readKeyOrFail(keyPair.privateKey.armoredKey);
     const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKey);
     expect(privateKeyInfo.algorithm).toBe("rsa");
     expect(privateKeyInfo.userIds[0]).toEqual({name: generateGpgKeyPairOptionsDto.name, email: generateGpgKeyPairOptionsDto.email});

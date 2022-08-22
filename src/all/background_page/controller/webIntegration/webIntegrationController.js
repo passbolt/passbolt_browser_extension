@@ -12,9 +12,9 @@
  * @since         3.4.0
  */
 
-const {ResourceInProgressCacheService} = require("../../service/cache/resourceInProgressCache.service");
-const {QuickAccessService} = require("../../service/ui/quickAccess.service");
-const {ExternalResourceEntity} = require("../../model/entity/resource/external/externalResourceEntity");
+import ResourceInProgressCacheService from "../../service/cache/resourceInProgressCache.service";
+import {QuickAccessService} from "../../service/ui/quickAccess.service";
+import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
 
 /**
  * Controller related to the in-form call-to-action
@@ -51,4 +51,4 @@ class WebIntegrationController {
 }
 
 
-exports.WebIntegrationController = WebIntegrationController;
+export default WebIntegrationController;

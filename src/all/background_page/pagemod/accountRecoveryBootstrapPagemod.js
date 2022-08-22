@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+import {Worker} from "../model/worker";
+import {App as app} from "../app";
+import PageMod from "../sdk/page-mod";
+import GetRequestLocalAccountService from "../service/accountRecovery/getRequestLocalAccountService";
 
-const {PageMod} = require('../sdk/page-mod');
-const Worker = require('../model/worker');
-const app = require('../app');
-const {GetRequestLocalAccountService} = require("../service/accountRecovery/getRequestLocalAccountService");
 
 const AccountRecoveryBootstrap = function() {};
 AccountRecoveryBootstrap._pageMod = undefined;
@@ -57,4 +57,4 @@ AccountRecoveryBootstrap.init = function() {
   });
 };
 
-exports.AccountRecoveryBootstrap = AccountRecoveryBootstrap;
+export default AccountRecoveryBootstrap;

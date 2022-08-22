@@ -10,10 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {NeededSecretsCollection} = require("../../secret/needed/neededSecretsCollection");
-const {Entity} = require('../../abstract/entity');
-const {EntitySchema} = require('../../abstract/entitySchema');
-const {SecretsCollection} = require("../../secret/secretsCollection");
+import Entity from "../../abstract/entity";
+import NeededSecretsCollection from "../../secret/needed/neededSecretsCollection";
+import SecretsCollection from "../../secret/secretsCollection";
+import EntitySchema from "../../abstract/entitySchema";
 
 const ENTITY_NAME = 'GroupUpdateDryRunResult';
 
@@ -124,4 +124,4 @@ class GroupUpdateDryRunResultEntity extends Entity {
   }
 }
 
-exports.GroupUpdateDryRunResultEntity = GroupUpdateDryRunResultEntity;
+export default GroupUpdateDryRunResultEntity;

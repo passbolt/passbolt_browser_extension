@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {FolderModel} = require('../../model/folder/folderModel');
-const {i18n} = require('../../sdk/i18n');
+import FolderModel from "../../model/folder/folderModel";
+import {ProgressController as progressController} from "../progress/progressController";
+import i18n from "../../sdk/i18n";
 
-const progressController = require('../progress/progressController');
 
 class FolderCreateController {
   /**
@@ -72,4 +72,4 @@ class FolderCreateController {
   }
 }
 
-exports.FolderCreateController = FolderCreateController;
+export default FolderCreateController;

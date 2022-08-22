@@ -11,8 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {MoveResourcesController} = require('./moveResourcesController');
-const {MoveFolderController} = require('./moveFolderController');
+import MoveResourcesController from "./moveResourcesController";
+import MoveFolderController from "./moveFolderController";
+
 
 class MoveController {
   /**
@@ -67,4 +68,4 @@ class MoveController {
   }
 }
 
-exports.MoveController = MoveController;
+export default MoveController;

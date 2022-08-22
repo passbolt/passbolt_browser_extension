@@ -12,4 +12,4 @@ class UserAbortsOperationError extends Error {
   }
 }
 
-exports.UserAbortsOperationError = UserAbortsOperationError;
+export default UserAbortsOperationError;

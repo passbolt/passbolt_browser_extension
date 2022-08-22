@@ -12,8 +12,8 @@
  * @since         3.7.0
  */
 
-import {PublicWebsiteSignInController} from "./publicWebsiteSignInController";
-import {AccountEntity} from "../../model/entity/account/accountEntity";
+import PublicWebsiteSignInController from "./publicWebsiteSignInController";
+import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 
 beforeEach(() => {

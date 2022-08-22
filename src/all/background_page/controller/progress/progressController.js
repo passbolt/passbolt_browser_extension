@@ -18,7 +18,6 @@ const open = async function(worker, title, goals, message) {
   worker.port.emit('passbolt.progress.open-progress-dialog', title, goals, message);
   await delay();
 };
-exports.open = open;
 
 /*
  * TODO
@@ -28,7 +27,6 @@ const delay = async function(ms) {
   ms = !ms ? 0 : ms;
   return new Promise(resolve => setTimeout(resolve, ms));
 };
-exports.delay = delay;
 
 /**
  * Complete a progression.
@@ -38,7 +36,6 @@ exports.delay = delay;
 const close = async function(worker) {
   worker.port.emit('passbolt.progress.close-progress-dialog');
 };
-exports.close = close;
 
 /**
  * Update the progress dialog.
@@ -51,7 +48,6 @@ const update = async function(worker, completed, message) {
   worker.port.emit('passbolt.progress.update', message, completed);
   await delay();
 };
-exports.update = update;
 
 /**
  * Update the goals of the progress dialog.
@@ -62,4 +58,5 @@ exports.update = update;
 const updateGoals = function(worker, goals) {
   worker.port.emit('passbolt.progress.update-goals', goals);
 };
-exports.updateGoals = updateGoals;
+
+export const ProgressController = {open, close, delay, update, updateGoals};

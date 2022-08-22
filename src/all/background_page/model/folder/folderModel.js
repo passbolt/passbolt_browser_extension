@@ -10,17 +10,17 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {splitBySize} = require("../../utils/array/splitBySize");
-const {FolderEntity} = require('../entity/folder/folderEntity');
-const {FoldersCollection} = require("../entity/folder/foldersCollection");
-const {FolderLocalStorage} = require('../../service/local_storage/folderLocalStorage');
-const {FolderService} = require('../../service/api/folder/folderService');
-const {MoveService} = require('../../service/api/move/moveService');
-const {ShareService} = require('../../service/api/share/shareService');
-
-const {PermissionEntity} = require('../entity/permission/permissionEntity');
-const {PermissionsCollection} = require('../entity/permission/permissionsCollection');
-const {PermissionChangesCollection} = require("../entity/permission/change/permissionChangesCollection");
+import FolderLocalStorage from "../../service/local_storage/folderLocalStorage";
+import PermissionEntity from "../entity/permission/permissionEntity";
+import PermissionsCollection from "../entity/permission/permissionsCollection";
+import FolderEntity from "../entity/folder/folderEntity";
+import FoldersCollection from "../entity/folder/foldersCollection";
+import PermissionChangesCollection from "../entity/permission/change/permissionChangesCollection";
+import MoveService from "../../service/api/move/moveService";
+import FolderService from "../../service/api/folder/folderService";
+import ShareService from "../../service/api/share/shareService";
+import splitBySize from "../../utils/array/splitBySize";
+import Validator from "validator";
 
 const BULK_OPERATION_SIZE = 5;
 
@@ -432,4 +432,4 @@ class FolderModel {
   }
 }
 
-exports.FolderModel = FolderModel;
+export default FolderModel;

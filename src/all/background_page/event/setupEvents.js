@@ -28,7 +28,8 @@ import GetAndInitSetupLocaleController from "../controller/setup/getAndInitSetup
 import IsExtensionFirstInstallController from "../controller/extension/isExtensionFirstInstallController";
 import SetSetupSecurityTokenController from "../controller/setup/setSetupSecurityTokenController";
 import GetAccountRecoveryOrganizationPolicyController from "../controller/setup/getAccountRecoveryOrganizationPolicyController";
-
+import GetSsoConfigurationController from "../controller/sso/getSsoConfigurationController";
+import SetSetupSsoUserSettingController from "../controller/setup/setSetupSsoUserSettingController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -117,6 +118,16 @@ const listen = function(worker, apiClientOptions, account) {
 
   worker.port.on('passbolt.setup.validate-private-key', async(requestId, key) => {
     const controller = new ValidatePrivateGpgKeySetupController(worker, requestId);
+    await controller._exec(key);
+  });
+
+  worker.port.on('passbolt.setup.get-sso-configuration', async(requestId, key) => {
+    const controller = new GetSsoConfigurationController(worker, requestId, apiClientOptions);
+    await controller._exec(key);
+  });
+
+  worker.port.on('passbolt.setup.set-sso-user-setting', async(requestId, key) => {
+    const controller = new SetSetupSsoUserSettingController(worker, requestId, account, runtimeMemory);
     await controller._exec(key);
   });
 };

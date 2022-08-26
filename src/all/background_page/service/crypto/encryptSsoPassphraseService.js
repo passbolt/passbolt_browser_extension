@@ -11,29 +11,36 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.7.3
  */
+import {Buffer} from "buffer";
+import DecryptSsoPassphraseService from "./decryptSsoPassphraseService";
 
 class EncryptSsoPassphraseService {
   /**
-   * Generate an AES-GCM key to be used for SSO.
+   * Encrypt a given text using an AES-GCM generated key and with the given IV.
    *
    * @param {string} text text to cipher with the given key and IV.
-   * @param {CryptoKey} key key used to encrypt the text
-   * @param {Uint8Array} iv the initialization vector with which to encrypt the data
-   * @returns {Promise<string>}
+   * @param {CryptoKey} nek the non-extractable key used to encrypt the text on first round
+   * @param {CryptoKey} ek the extractable key used to encrypt the text on second round
+   * @param {Uint8Array} iv1 the initialization vector for the first encryption round
+   * @param {Uint8Array} iv2 the initialization vector for the second encryption round
+   * @returns {Promise<string>} a base64 string ready for serialization
    */
-  static async encrypt(text, key, iv) {
-    const encoder = new TextEncoder();
-    const buffer = encoder.encode(text);
+  static async encrypt(text, nek, ek, iv1, iv2) {
+    const buffer = Buffer.from(text);
 
-    const encryptionAlgorithm = {
-      name: key.algorithm.name,
-      iv: iv
+    const firstEncryptionAlgorithm = {
+      name: nek.algorithm.name,
+      iv: iv1
     };
 
-    const encryptedBuffer = await crypto.subtle.encrypt(encryptionAlgorithm, key, buffer);
+    const secondEncryptionAlgorithm = {
+      name: ek.algorithm.name,
+      iv: iv2
+    };
 
-    const decoder = new TextDecoder();
-    return decoder.decode(encryptedBuffer);
+    const firstEncryption = await crypto.subtle.encrypt(firstEncryptionAlgorithm, nek, buffer);
+    const cipheredBuffer = await crypto.subtle.encrypt(secondEncryptionAlgorithm, ek, firstEncryption);
+    return Buffer.from(cipheredBuffer).toString('base64');
   }
 }
 

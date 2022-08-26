@@ -15,6 +15,8 @@ import GenerateSsoKeyService from "../../service/crypto/generateSsoKeyService";
 import GenerateSsoIvService from "../../service/crypto/generateSsoIvService";
 import EncryptSsoPassphraseService from "../../service/crypto/encryptSsoPassphraseService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
+import browser from "webextension-polyfill"; //@todo: remove
+import {Buffer} from 'buffer';
 
 class SetSetupSsoUserSettingController {
   /**
@@ -61,13 +63,18 @@ class SetSetupSsoUserSettingController {
       const iv1 = GenerateSsoIvService.generateIv();
       const iv2 = GenerateSsoIvService.generateIv();
 
-      const tmpCipher = await EncryptSsoPassphraseService.encrypt(this.runtimeMemory.passphrase, nek, iv1);
-      const cipheredPassphrase = await EncryptSsoPassphraseService.encrypt(tmpCipher, extractableKey, iv2);
+      const cipheredPassphrase = await EncryptSsoPassphraseService.encrypt(this.runtimeMemory.passphrase, nek, extractableKey, iv1, iv2);
 
+      //@todo: do it in a service ?
+      const serializedKey = await crypto.subtle.exportKey("jwk", extractableKey);
       const ssoUserServerData = {
-        key: extractableKey,
+        key: serializedKey,
         cipher: cipheredPassphrase
       };
+
+      //@todo @mock: remove the following line
+      await browser.storage.local.set({__tmp__sso_user_server_data: ssoUserServerData});
+      console.log(ssoUserServerData);
 
       this.account.ssoConfiguration = ssoUserServerData;
       const ssoUserClientData = {nek, iv1, iv2};

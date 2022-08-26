@@ -12,10 +12,11 @@
  * @since         3.7.3
  */
 import AbstractService from "../abstract/abstractService";
+import browser from "webextension-polyfill";//@todo to remove
 
-const SSO_CONFIGURATION_SERVICE_RESOURCE_NAME = '/sso/configuration';
+const SSO_USER_DATA_SERVICE_RESOURCE_NAME = '/sso/config';
 
-class SsoConfigurationService extends AbstractService {
+class SsoUserServerDataService extends AbstractService {
   /**
    * Constructor
    *
@@ -23,7 +24,7 @@ class SsoConfigurationService extends AbstractService {
    * @public
    */
   constructor(apiClientOptions) {
-    super(apiClientOptions, SsoConfigurationService.RESOURCE_NAME);
+    super(apiClientOptions, SsoUserServerDataService.RESOURCE_NAME);
   }
 
   /**
@@ -33,24 +34,22 @@ class SsoConfigurationService extends AbstractService {
    * @public
    */
   static get RESOURCE_NAME() {
-    return SSO_CONFIGURATION_SERVICE_RESOURCE_NAME;
+    return SSO_USER_DATA_SERVICE_RESOURCE_NAME;
   }
 
   /**
    * Get the SSO configuration from the server
-   * @returns {Promise<SsoConfigurationDto>}
+   * @returns {Promise<SsoUserDataDto>}
    */
-  async find() {
+  async findUserData() {
     //@todo @mock
-    return {
-      "provider": "azure",
-      "data": {
-        "url": "https://login.microsoftonline.com"
-      }
-    };
-    const response = await this.apiClient.findAll();
+    const storageKey = "__tmp__sso_user_server_data";
+    const ssoUserData = await browser.storage.local.get([storageKey]);
+    return ssoUserData[storageKey];
+    //@todo: implement
+    const response = await this.apiClient.find();
     return response.body;
   }
 }
 
-export default SsoConfigurationService;
+export default SsoUserServerDataService;

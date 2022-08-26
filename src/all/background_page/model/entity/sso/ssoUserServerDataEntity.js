@@ -14,24 +14,23 @@
 import Entity from "../abstract/entity";
 import EntitySchema from "../abstract/entitySchema";
 
-const ENTITY_NAME = "SsoConfiguration";
-const AZURE = "azure";
+const ENTITY_NAME = "SsoUserServerDataEntity";
 
 /**
- * Entity related to the SSO configuration
+ * Entity related to the account recovery organization policy
  */
-class SsoConfigurationEntity extends Entity {
+class SsoUserServerDataEntity extends Entity {
   /**
    * Setup entity constructor
    *
-   * @param {Object} ssoConfigurationDto SSO configuration DTO
+   * @param {Object} ssoUserServerDataDto sso user's server data DTO
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(ssoConfigurationDto) {
+  constructor(ssoUserServerDataDto) {
     super(EntitySchema.validate(
-      SsoConfigurationEntity.ENTITY_NAME,
-      ssoConfigurationDto,
-      SsoConfigurationEntity.getSchema()
+      SsoUserServerDataEntity.ENTITY_NAME,
+      ssoUserServerDataDto,
+      SsoUserServerDataEntity.getSchema()
     ));
   }
 
@@ -42,41 +41,32 @@ class SsoConfigurationEntity extends Entity {
   static getSchema() {
     return {
       "type": "object",
-      "required": ["provider"],
+      "required": ["cipher", "key"],
       "properties": {
-        "provider": {
+        "cipher": {
           "type": "string",
-          "enum": [
-            SsoConfigurationEntity.AZURE,
-          ]
         },
-        "data": {
+        "key": {
           "type": "object",
         },
       }
     };
   }
 
-  /*
-   * ==================================================
-   * Dynamic properties getters
-   * ==================================================
-   */
-
   /**
-   * Get ther provider identifier
+   * Returns the cipher props.
    * @returns {string}
    */
-  get provider() {
-    return this._props.provider;
+  get cipher() {
+    return this._props.cipher;
   }
 
   /**
-   * Get provider specific data
+   * Returns the key props.
    * @returns {object}
    */
-  get data() {
-    return this._props.data;
+  get key() {
+    return this._props.key;
   }
 
   /*
@@ -85,20 +75,12 @@ class SsoConfigurationEntity extends Entity {
    * ==================================================
    */
   /**
-   * SsoConfigurationEntity.ENTITY_NAME
+   * SsoUserServerDataEntity.ENTITY_NAME
    * @returns {string}
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
   }
-
-  /**
-   * SsoConfigurationEntity.AZURE
-   * @returns {string}
-   */
-  static get AZURE() {
-    return AZURE;
-  }
 }
 
-export default SsoConfigurationEntity;
+export default SsoUserServerDataEntity;

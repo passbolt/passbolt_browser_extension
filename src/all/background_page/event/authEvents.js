@@ -17,6 +17,7 @@ import CheckPassphraseController from "../controller/crypto/checkPassphraseContr
 import RequestHelpCredentialsLostController from "../controller/auth/requestHelpCredentialsLostController";
 import {Config} from "../model/config";
 import UserAlreadyLoggedInError from "../error/userAlreadyLoggedInError";
+import AzureSsoAuthenticationController from "../controller/sso/azureSsoAuthenticationController";
 
 
 const listen = function(worker, account) {
@@ -211,6 +212,17 @@ const listen = function(worker, account) {
   worker.port.on('passbolt.auth.request-help-credentials-lost', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new RequestHelpCredentialsLostController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /**
+   * Attempt to sign in with Azure as a third party sign in provider
+   * @listens passbolt.auth.sso-azure
+   * @param {uuid} requestId The request identifier
+   */
+  worker.port.on('passbolt.auth.sso-azure', async requestId => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new AzureSsoAuthenticationController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 };

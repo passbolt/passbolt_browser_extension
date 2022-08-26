@@ -11,13 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.7.3
  */
-import SsoConfigurationService from "../../service/api/sso/ssoConfigurationService";
-import SsoConfigurationEntity from "../entity/sso/ssoConfigurationEntity";
+import SsoUserServerDataService from "../../service/api/sso/ssoUserServerDataService";
+import SsoUserServerDataEntity from "../entity/sso/ssoUserServerDataEntity";
 
 /**
- * Model related to the SSO configuration
+ * Model related to the SSO user's server-side data
  */
-class SsoConfigurationModel {
+class SsoUserServerDataModel {
   /**
    * Constructor
    *
@@ -25,21 +25,21 @@ class SsoConfigurationModel {
    * @public
    */
   constructor(apiClientOptions) {
-    this.ssoConfigurationService = new SsoConfigurationService(apiClientOptions);
+    this.ssoUserDataService = new SsoUserServerDataService(apiClientOptions);
   }
 
   /**
    * Find the SSO configuration using Passbolt API
    *
-   * @return {Promise<SsoConfigurationEntity|null>}
+   * @return {Promise<SsoUserServerDataEntity|null>}
    */
-  async findSsoConfiguration() {
-    const ssoConfigurationDto = await this.ssoConfigurationService.find();
-    if (!ssoConfigurationDto) {
+  async findUserData() {
+    const ssoUserServerDataDto = await this.ssoUserDataService.findUserData();
+    if (!ssoUserServerDataDto) {
       return null;
     }
-    return new SsoConfigurationEntity(ssoConfigurationDto);
+    return new SsoUserServerDataEntity(ssoUserServerDataDto);
   }
 }
 
-export default SsoConfigurationModel;
+export default SsoUserServerDataModel;

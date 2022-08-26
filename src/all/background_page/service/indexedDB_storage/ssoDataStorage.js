@@ -18,6 +18,19 @@ const SSO_KEYS_OBECT_STORE = 'key_os';
 
 class SsoDataStorage {
   /**
+   * Returns the local SSO client user's data.
+   *
+   * @returns {Promise<SsoClientUserDataDto>}
+   * @public
+   */
+  static async get() {
+    const dbHandler = await this.getDbHandler();
+    const ssoClientData = await this.getSsoData(dbHandler);
+    this.assertSsoClientData(ssoClientData);
+    dbHandler.close();
+    return ssoClientData;
+  }
+  /**
    * Register locally the SSO client user's data.
    *
    * @param {SsoClientUserDataDto} ssoClientData
@@ -41,8 +54,8 @@ class SsoDataStorage {
   static assertSsoClientData(ssoClientData) {
     return ssoClientData.nek instanceof CryptoKey
       && ssoClientData.nek.extractable === false
-      && ssoClientData.nek.algorigtm.name === "AES-GCM"
-      && ssoClientData.nek.algorigtm.length === 256
+      && ssoClientData.nek.algorithm.name === "AES-GCM"
+      && ssoClientData.nek.algorithm.length === 256
       && ssoClientData.nek.usages.includes("encrypt")
       && ssoClientData.nek.usages.includes("decrypt")
 
@@ -63,7 +76,7 @@ class SsoDataStorage {
     return new Promise((resolve, reject) => {
       const openRequest = indexedDB.open(DB_NAME, DB_VERSION);
 
-      openRequest.addEventListener("upgradeneeded", e => {
+      openRequest.onupgradeneeded = e => {
         const db = e.target.result;
         console.log(`Upgrading SSO IndexedDB to version ${db.version}.`);
 
@@ -76,17 +89,17 @@ class SsoDataStorage {
         objectStore.createIndex("iv2", "iv2");
 
         console.log("SSO IndexedDB upgrade completed.");
-      });
+      };
 
-      openRequest.addEventListener("success", () => {
+      openRequest.onsuccess = () => {
         resolve(openRequest.result);
-      });
+      };
 
-      openRequest.addEventListener("error", event => {
+      openRequest.onerror = event => {
         console.error("Database failed to open");
         console.error(event);
         reject();
-      });
+      };
     });
   }
 
@@ -99,8 +112,43 @@ class SsoDataStorage {
    * @private
    */
   static async replaceSsoData(dbHandler, ssoClientData) {
-    await this.clearKeys(dbHandler);
-    await this.storeData(ssoClientData);
+    console.log("replacing data");
+    await this.clearData(dbHandler);
+    await this.storeData(dbHandler, ssoClientData);
+  }
+
+  /**
+   * Finds the SSO client data from the IndexedDB
+   * @param {IDBDatabase} dbHandler
+   * @returns {Promise<SsoClientUserDataDto>}
+   */
+  static async getSsoData(dbHandler) {
+    return new Promise((resolve, reject) => {
+      const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readonly');
+      const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);
+      const cursor = objectStore.openCursor();
+      cursor.onsuccess = e => {
+        const cursor = e.target.result;
+
+        if (!cursor) {
+          console.log("IndexDB SSO client data not found");
+          reject();
+          return;
+        }
+
+        const ssoClientData = {
+          nek: cursor.value.nek,
+          iv1: cursor.value.iv1,
+          iv2: cursor.value.iv2
+        };
+        resolve(ssoClientData);
+      };
+
+      cursor.onerror = e => {
+        console.error("An error occured when trying to open the IndexDb cursor:", e);
+        reject();
+      };
+    });
   }
 
   /**
@@ -110,22 +158,22 @@ class SsoDataStorage {
    * @returns {Promise<void>}
    * @private
    */
-  static async clearKeys(dbHandler) {
+  static async clearData(dbHandler) {
     return new Promise((resolve, reject) => {
       const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readwrite');
       const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);
       const objectStoreRequest = objectStore.clear();
 
-      objectStoreRequest.addEventListener("complete", () => {
+      objectStoreRequest.onsuccess = () => {
         console.log("IndexDB SSO client data cleared");
         resolve();
-      });
+      };
 
-      objectStoreRequest.addEventListener("error", event => {
+      objectStoreRequest.onerror = event => {
         console.error(`The IndexedDB transaction couldn't be opened to clear the data`);
         console.error(event);
         reject();
-      });
+      };
     });
   }
 
@@ -148,20 +196,20 @@ class SsoDataStorage {
       };
       const addRequest = objectStore.add(dataToStore);
 
-      addRequest.addEventListener('success', () => {
+      addRequest.onsuccess = () => {
         console.log("New SSO client data stored successfully");
-      });
+      };
 
-      transaction.addEventListener('complete', () => {
+      transaction.oncomplete = () => {
         //Apparently, according to an MDN documentation, the modification is not 100% guaranteed to be flushed on disk for Firefox
         resolve();
-      });
+      };
 
-      transaction.addEventListener('error', event => {
+      transaction.onerror = event => {
         console.error(`The IndexedDB transaction couldn't be opened to add new data`);
         console.error(event);
         reject();
-      });
+      };
     });
   }
 }

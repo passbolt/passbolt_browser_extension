@@ -14,24 +14,23 @@
 import Entity from "../abstract/entity";
 import EntitySchema from "../abstract/entitySchema";
 
-const ENTITY_NAME = "SsoConfiguration";
-const AZURE = "azure";
+const ENTITY_NAME = "SsoUserClientDataEntity";
 
 /**
- * Entity related to the SSO configuration
+ * Entity related to the SSO user's client data
  */
-class SsoConfigurationEntity extends Entity {
+class SsoUserClientDataEntity extends Entity {
   /**
    * Setup entity constructor
    *
-   * @param {Object} ssoConfigurationDto SSO configuration DTO
+   * @param {Object} ssoUserClientDataDto sso user's client data DTO
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(ssoConfigurationDto) {
+  constructor(ssoUserClientDataDto) {
     super(EntitySchema.validate(
-      SsoConfigurationEntity.ENTITY_NAME,
-      ssoConfigurationDto,
-      SsoConfigurationEntity.getSchema()
+      SsoUserClientDataEntity.ENTITY_NAME,
+      ssoUserClientDataDto,
+      SsoUserClientDataEntity.getSchema()
     ));
   }
 
@@ -42,41 +41,19 @@ class SsoConfigurationEntity extends Entity {
   static getSchema() {
     return {
       "type": "object",
-      "required": ["provider"],
+      "required": ["cipher", "key"],
       "properties": {
-        "provider": {
-          "type": "string",
-          "enum": [
-            SsoConfigurationEntity.AZURE,
-          ]
+        "nek": {
+          "type": "CryptoKey",
         },
-        "data": {
-          "type": "object",
+        "iv1": {
+          "type": "Uint8Array",
+        },
+        "iv2": {
+          "type": "Uint8Array",
         },
       }
     };
-  }
-
-  /*
-   * ==================================================
-   * Dynamic properties getters
-   * ==================================================
-   */
-
-  /**
-   * Get ther provider identifier
-   * @returns {string}
-   */
-  get provider() {
-    return this._props.provider;
-  }
-
-  /**
-   * Get provider specific data
-   * @returns {object}
-   */
-  get data() {
-    return this._props.data;
   }
 
   /*
@@ -85,20 +62,12 @@ class SsoConfigurationEntity extends Entity {
    * ==================================================
    */
   /**
-   * SsoConfigurationEntity.ENTITY_NAME
+   * SsoUserClientDataEntity.ENTITY_NAME
    * @returns {string}
    */
   static get ENTITY_NAME() {
     return ENTITY_NAME;
   }
-
-  /**
-   * SsoConfigurationEntity.AZURE
-   * @returns {string}
-   */
-  static get AZURE() {
-    return AZURE;
-  }
 }
 
-export default SsoConfigurationEntity;
+export default SsoUserClientDataEntity;

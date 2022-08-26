@@ -67,6 +67,15 @@ class SsoDataStorage {
   }
 
   /**
+   * Remove all existing data
+   * @return {Promise<void>}
+   */
+  static async wipeData() {
+    const dbHandler = await this.getDbHandler();
+    await this.clearData(dbHandler);
+  }
+
+  /**
    * Opens the IndexedDB and returns an handler if the operation is successful.
    *
    * @returns {Promise<IDBDatabase>}
@@ -121,6 +130,7 @@ class SsoDataStorage {
    * Finds the SSO client data from the IndexedDB
    * @param {IDBDatabase} dbHandler
    * @returns {Promise<SsoClientUserDataDto>}
+   * @private
    */
   static async getSsoData(dbHandler) {
     return new Promise((resolve, reject) => {
@@ -132,7 +142,7 @@ class SsoDataStorage {
 
         if (!cursor) {
           console.log("IndexDB SSO client data not found");
-          reject();
+          resolve(null);
           return;
         }
 

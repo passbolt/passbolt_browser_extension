@@ -16,7 +16,6 @@ import GenerateSsoIvService from "../../service/crypto/generateSsoIvService";
 import EncryptSsoPassphraseService from "../../service/crypto/encryptSsoPassphraseService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import browser from "webextension-polyfill"; //@todo: remove
-import {Buffer} from 'buffer';
 
 class SetSetupSsoUserSettingController {
   /**

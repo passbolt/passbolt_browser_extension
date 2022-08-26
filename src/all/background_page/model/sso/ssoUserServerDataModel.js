@@ -31,14 +31,24 @@ class SsoUserServerDataModel {
   /**
    * Find the SSO configuration using Passbolt API
    *
+   * @param {string} thirdPartyCode a code given by the third party auth
    * @return {Promise<SsoUserServerDataEntity|null>}
    */
-  async findUserData() {
-    const ssoUserServerDataDto = await this.ssoUserDataService.findUserData();
+  async findUserData(thirdPartyCode) {
+    const ssoUserServerDataDto = await this.ssoUserDataService.findUserData(thirdPartyCode);
     if (!ssoUserServerDataDto) {
       return null;
     }
     return new SsoUserServerDataEntity(ssoUserServerDataDto);
+  }
+
+  /**
+   * Saves the generated credential's server-side data.
+   * @param {SsoUserServerDataEntity} ssoUserServerDataEntity the server-side user's data
+   * @returns {Promise<void>}
+   */
+  async updateUserData(ssoUserServerDataEntity) {
+    await this.ssoUserDataService.update(ssoUserServerDataEntity);
   }
 }
 

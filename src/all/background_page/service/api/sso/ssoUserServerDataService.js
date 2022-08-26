@@ -39,15 +39,33 @@ class SsoUserServerDataService extends AbstractService {
 
   /**
    * Get the SSO configuration from the server
-   * @returns {Promise<SsoUserDataDto>}
+   *
+   * @param {string} thirdPartyCode a third party authentication code
+   * @returns {Promise<SsoUserServerDataDto>}
    */
-  async findUserData() {
+  async findUserData(thirdPartyCode) {
     //@todo @mock
     const storageKey = "__tmp__sso_user_server_data";
     const ssoUserData = await browser.storage.local.get([storageKey]);
     return ssoUserData[storageKey];
     //@todo: implement
     const response = await this.apiClient.find();
+    return response.body;
+  }
+
+  /**
+   * Set the sso server-side user's data.
+   *
+   * @param {SsoUserServerDataEntity} ssoUserServerDataEntity
+   * @returns {Promise<SsoUserServerDataDto>}
+   */
+  async update(ssoUserServerDataEntity) {
+    //@todo @mock
+    return JSON.parse(JSON.stringify(ssoUserServerDataEntity));
+
+    //@todo implement
+    this.assertNonEmptyData(ssoUserServerDataEntity);
+    const response = await this.apiClient.update(null, ssoUserServerDataEntity);
     return response.body;
   }
 }

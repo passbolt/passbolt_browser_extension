@@ -18,7 +18,8 @@ import RequestHelpCredentialsLostController from "../controller/auth/requestHelp
 import {Config} from "../model/config";
 import UserAlreadyLoggedInError from "../error/userAlreadyLoggedInError";
 import AzureSsoAuthenticationController from "../controller/sso/azureSsoAuthenticationController";
-
+import GetSsoClientDataController from "../controller/sso/getSsoClientDataController";
+import AuthLoginController from "../controller/auth/authLoginController";
 
 const listen = function(worker, account) {
   /*
@@ -172,19 +173,9 @@ const listen = function(worker, account) {
    *   (integer) duration in seconds to specify a specific duration
    */
   worker.port.on('passbolt.auth.login', async(requestId, passphrase, remember) => {
-    try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const authModel = new AuthModel(clientOptions);
-      await authModel.login(passphrase, remember);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      if (error instanceof UserAlreadyLoggedInError) {
-        worker.port.emit(requestId, 'SUCCESS');
-      } else {
-        console.error(error);
-        worker.port.emit(requestId, 'ERROR', error);
-      }
-    }
+    const clientOptions = await User.getInstance().getApiClientOptions(); //@todo remove and use a glocal apiClientOptions;
+    const controller = new AuthLoginController(worker, requestId, clientOptions);
+    await controller._exec(passphrase, remember);
   });
 
   /*
@@ -223,6 +214,17 @@ const listen = function(worker, account) {
   worker.port.on('passbolt.auth.sso-azure', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AzureSsoAuthenticationController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
+
+  /**
+   * Returns the sso data register client-side.
+   * @listens passbolt.auth.get-sso-client-data
+   * @param {uuid} requestId The request identifier
+   */
+  worker.port.on('passbolt.auth.get-sso-client-data', async requestId => {
+    console.log("called passbolt.auth.get-sso-client-data");
+    const controller = new GetSsoClientDataController(worker, requestId);
     await controller._exec();
   });
 };

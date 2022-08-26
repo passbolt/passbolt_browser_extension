@@ -57,6 +57,10 @@ class AzureSsoAuthenticationController {
       const ssoServerData = await this.ssoUserServerDataModel.findUserData(thirdPartyCode);
       const ssoClientData = await SsoDataStorage.get();
 
+      if (ssoClientData === null) {
+        throw new Error("Can't attempt SSO login as SSO is not configured on this browser extension.");
+      }
+
       //@todo: do it in a service ?
       const tmpKey = ssoServerData.key;
       const serverKey = await crypto.subtle.importKey("jwk", tmpKey, 'AES-GCM', true, ["encrypt", "decrypt"]);

@@ -199,7 +199,7 @@ describe("ResourcesKdbxImportParser", () => {
     expect(error).toBeInstanceOf(ImportError);
     expect(error.sourceError).toBeInstanceOf(EntityValidationError);
     expect(error.sourceError.details).toHaveProperty("name");
-    expect(error.data.name).toEqual("too-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-name");
+    expect(error.data.name).toEqual("too-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-name");
 
     // Assert resources errors
     expect(importEntity.importResourcesErrors).toHaveLength(1);

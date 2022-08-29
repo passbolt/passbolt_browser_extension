@@ -226,7 +226,7 @@ describe("ResourcesCsvImportParser", () => {
   });
 
   it("should catch and keep a reference of import folder entity validation error", async() => {
-    const path = "too-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-name";
+    const path = "too-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-name";
     const csv = "Title,Username,URL,Password,Notes,Group\n" +
       `,,,,,${path}\n`;
     const importDto = {

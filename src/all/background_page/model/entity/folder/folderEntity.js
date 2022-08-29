@@ -20,7 +20,7 @@ import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = 'Folder';
 const FOLDER_NAME_MIN_LENGTH = 1;
-const FOLDER_NAME_MAX_LENGTH = 64;
+const FOLDER_NAME_MAX_LENGTH = 256;
 
 class FolderEntity extends Entity {
   /**

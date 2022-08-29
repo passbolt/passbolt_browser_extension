@@ -112,7 +112,7 @@ describe("Folder entity", () => {
       expect(error.hasError('name', 'minLength')).toBe(true);
     }
     try {
-      new FolderEntity({'name': Array(257).join("ツ")});
+      new FolderEntity({'name': Array(258).join("ツ")});
       expect(false).toBe(true);
     } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);

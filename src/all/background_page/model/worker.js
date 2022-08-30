@@ -12,7 +12,10 @@
  * @since         1.3.0
  */
 import Log from "./log";
+import browser from "../sdk/polyfill/browserPolyfill";
 const workers = {};
+
+const WORKER_EXIST_FLUSH_ALARM = "WorkerExistFlush";
 
 /**
  * Reference a worker.
@@ -105,24 +108,48 @@ const exists = function(workerId, tabId) {
  * @return {Promise<void>}
  */
 const waitExists = function(workerId, tabId, timeout = 10000) {
-  const intervalPeriod = 100;
-  let attempt = 0;
-
+  const timeoutMs = Date.now() + timeout;
   return new Promise((resolve, reject) => {
-    const interval = setInterval(() => {
-      attempt++;
-      try {
-        get(workerId, tabId, false);
-        clearInterval(interval);
-        resolve();
-      } catch (error) {
-        if (attempt * intervalPeriod >= timeout) {
-          clearInterval(interval);
-          reject(error);
+    const handleFlushEvent = alarm =>  {
+      if (alarm.name === WORKER_EXIST_FLUSH_ALARM) {
+        try {
+          clearAlarm(handleFlushEvent);
+          get(workerId, tabId, false);
+          resolve();
+        } catch (error) {
+          if (alarm.scheduledTime >= timeoutMs) {
+            reject(error);
+          } else {
+            createAlarm(handleFlushEvent);
+          }
         }
       }
-    }, intervalPeriod);
+    };
+    createAlarm(handleFlushEvent);
   });
+};
+
+/**
+ * Create alarm to flush the resource
+ * @private
+ * @param {function} handleFlushEvent The function on alarm listener
+ */
+const createAlarm = function(handleFlushEvent) {
+  // Create an alarm to check if the worker exist
+  browser.alarms.create(WORKER_EXIST_FLUSH_ALARM, {
+    when: Date.now() + 100
+  });
+  browser.alarms.onAlarm.addListener(handleFlushEvent);
+};
+
+/**
+ * Clear the alarm and listener configured for flushing the resource if any.
+ * @private
+ * @param {function} handleFlushEvent The function on alarm listener
+ */
+const clearAlarm = function(handleFlushEvent) {
+  browser.alarms.onAlarm.removeListener(handleFlushEvent);
+  browser.alarms.clear(WORKER_EXIST_FLUSH_ALARM);
 };
 
 export const Worker = {waitExists, exists, get, add};

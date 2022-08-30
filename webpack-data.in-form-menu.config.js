@@ -2,7 +2,7 @@ const path = require('path');
 
 const config = {
   entry: {
-    'app': path.resolve(__dirname, './src/all/data/js/app/InFormMenu.js')
+    'app': path.resolve(__dirname, './src/all/webAccessibleResources/js/app/InFormMenu.js')
   },
   mode: 'production',
   module: {
@@ -39,7 +39,7 @@ const config = {
   output: {
     // Set a unique name to ensure the cohabitation of multiple webpack loader on the same page.
     chunkLoadingGlobal: 'dataInFormMenuChunkLoadingGlobal',
-    path: path.resolve(__dirname, './build/all/data/js/dist/in-form-menu'),
+    path: path.resolve(__dirname, './build/all/webAccessibleResources/js/dist/in-form-menu'),
     pathinfo: true,
     filename: '[name].js'
   }

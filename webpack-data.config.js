@@ -2,12 +2,12 @@ const path = require('path');
 
 const config = {
   entry: {
-    'account-recovery': path.resolve(__dirname, './src/all/data/js/app/AccountRecovery.js'),
-    'app': path.resolve(__dirname, './src/all/data/js/app/App.js'),
-    'setup': path.resolve(__dirname, './src/all/data/js/app/Setup.js'),
-    'recover': path.resolve(__dirname, './src/all/data/js/app/Recover.js'),
-    'login': path.resolve(__dirname, './src/all/data/js/app/Login.js'),
-    'quickaccess': path.resolve(__dirname, './src/all/data/js/app/QuickAccess.js')
+    'account-recovery': path.resolve(__dirname, './src/all/webAccessibleResources/js/app/AccountRecovery.js'),
+    'app': path.resolve(__dirname, './src/all/webAccessibleResources/js/app/App.js'),
+    'setup': path.resolve(__dirname, './src/all/webAccessibleResources/js/app/Setup.js'),
+    'recover': path.resolve(__dirname, './src/all/webAccessibleResources/js/app/Recover.js'),
+    'login': path.resolve(__dirname, './src/all/webAccessibleResources/js/app/Login.js'),
+    'quickaccess': path.resolve(__dirname, './src/all/webAccessibleResources/js/app/QuickAccess.js')
   },
   mode: 'production',
   module: {
@@ -44,7 +44,7 @@ const config = {
   output: {
     // Set a unique name to ensure the cohabitation of multiple webpack loader on the same page.
     chunkLoadingGlobal: 'dataChunkLoadingGlobal',
-    path: path.resolve(__dirname, './build/all/data/js/dist'),
+    path: path.resolve(__dirname, './build/all/webAccessibleResources/js/dist'),
     pathinfo: true,
     filename: '[name].js'
   }

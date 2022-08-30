@@ -33,11 +33,11 @@ RecoverBootstrap.init = function() {
        * @deprecated when support for v2 is dropped
        * used to control iframe styling without inline style in v3
        */
-      'data/css/themes/default/ext_external.min.css'
+      'webAccessibleResources/css/themes/default/ext_external.min.css'
     ],
     contentScriptFile: [
-      'content_scripts/js/dist/vendors.js',
-      'content_scripts/js/dist/recover.js',
+      'contentScripts/js/dist/vendors.js',
+      'contentScripts/js/dist/recover.js',
     ],
     onAttach: function(worker) {
       // @todo refactoring-account-recovery, should we do something if the url doesn't parse.

@@ -35,7 +35,7 @@ const config = {
   resolve: {extensions: ["*", ".js"], fallback: {crypto: false}},
   output: {
     // Set a unique name to ensure the cohabitation of multiple webpack loader on the same page.
-    chunkLoadingGlobal: 'serviceWorkerIndexChunkLoadingGlobal',
+    chunkLoadingGlobal: 'backgroundPageIndexChunkLoadingGlobal',
     path: path.resolve(__dirname, './build/all'),
     pathinfo: true,
     filename: '[name].min.js'

@@ -2,7 +2,7 @@ const path = require('path');
 
 const config = {
   entry: {
-    'browser-integration': path.resolve(__dirname, './src/all/content_scripts/js/app/BrowserIntegration.js'),
+    'browser-integration': path.resolve(__dirname, './src/all/contentScripts/js/app/BrowserIntegration.js'),
   },
   mode: 'production',
   module: {
@@ -33,7 +33,7 @@ const config = {
   output: {
     // Set a unique name to ensure the cohabitation of multiple webpack loader on the same page.
     chunkLoadingGlobal: 'contentScriptBrowserIntegrationChunkLoadingGlobal',
-    path: path.resolve(__dirname, './build/all/content_scripts/js/dist/browser-integration'),
+    path: path.resolve(__dirname, './build/all/contentScripts/js/dist/browser-integration'),
     pathinfo: true,
     filename: '[name].js'
   }

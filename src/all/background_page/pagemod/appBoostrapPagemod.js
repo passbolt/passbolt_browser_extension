@@ -56,11 +56,11 @@ AppBoostrapPagemod.initPageMod = function() {
        * @deprecated when support for v2 is dropped
        * used to control iframe styling without inline style in v3
        */
-      'data/css/themes/default/ext_external.min.css'
+      'webAccessibleResources/css/themes/default/ext_external.min.css'
     ],
     contentScriptFile: [
-      'content_scripts/js/dist/vendors.js',
-      'content_scripts/js/dist/app.js',
+      'contentScripts/js/dist/vendors.js',
+      'contentScripts/js/dist/app.js',
     ],
     attachTo: {existing: true, reload: true},
     onAttach: async function(worker) {

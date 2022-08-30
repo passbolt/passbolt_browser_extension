@@ -32,8 +32,8 @@ WebIntegration.init = function() {
     contentScriptWhen: 'ready',
     contentStyleFile: [],
     contentScriptFile: [
-      'content_scripts/js/dist/browser-integration/vendors.js',
-      'content_scripts/js/dist/browser-integration/browser-integration.js'
+      'contentScripts/js/dist/browser-integration/vendors.js',
+      'contentScripts/js/dist/browser-integration/browser-integration.js'
     ],
     attachTo: {existing: true, reload: false},
     onAttach: function(worker) {

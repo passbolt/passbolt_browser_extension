@@ -339,16 +339,11 @@ class PageMod {
     const scriptExecution = new ScriptExecution(tabId);
 
     // set portname in content code as global variable to be used by data/js/port.js
-    scriptExecution.setGlobals({portname: this.portname});
-
-    // Set JS global variables if needed
-    if (typeof this.args.contentScriptOptions !== 'undefined' && Object.keys(this.args.contentScriptOptions).length) {
-      scriptExecution.setGlobals(this.args.contentScriptOptions);
-    }
+    scriptExecution.injectPortname(this.portname);
 
     // Inject JS files if needed
     const scripts = this.args.contentScriptFile.slice();
-    scriptExecution.injectScripts(scripts);
+    scriptExecution.injectJs(scripts);
 
     // Inject CSS files if needed
     if (typeof this.args.contentStyleFile !== 'undefined') {

@@ -10,9 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {User} = require('../model/user');
-const {ThemeModel} = require("../model/theme/themeModel");
-const {ChangeThemeEntity} = require("../model/entity/theme/change/ChangeThemeEntity");
+import User from "../model/user";
+import ThemeModel from "../model/theme/themeModel";
+import ChangeThemeEntity from "../model/entity/theme/change/ChangeThemeEntity";
+
 
 const listen = async function(worker) {
   /*
@@ -53,4 +54,4 @@ const listen = async function(worker) {
   });
 };
 
-exports.listen = listen;
+export const ThemeEvents = {listen};

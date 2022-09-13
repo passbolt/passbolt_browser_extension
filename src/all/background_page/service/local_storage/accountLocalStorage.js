@@ -11,8 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const AwaitLock = require("await-lock").default;
-const {AbstractAccountEntity} = require("../../model/entity/account/abstractAccountEntity");
+import browser from "webextension-polyfill";
+import AbstractAccountEntity from "../../model/entity/account/abstractAccountEntity";
+import AwaitLock from "await-lock";
+
 const lock = new AwaitLock();
 
 const ACCOUNTS_LOCAL_STORAGE_KEY = 'accounts';
@@ -114,4 +116,4 @@ class AccountLocalStorage {
   }
 }
 
-exports.AccountLocalStorage = AccountLocalStorage;
+export default AccountLocalStorage;

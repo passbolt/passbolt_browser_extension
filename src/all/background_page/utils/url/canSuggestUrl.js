@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 
-const XRegExp = require("xregexp");
-const ipRegex = require("ip-regex");
+import XRegExp from "xregexp";
+import ipRegex from "ip-regex";
 
 /**
  * Check if an url can be suggested for a given one.
@@ -185,4 +185,4 @@ const isParentHostname = function(parent, child) {
   return false;
 };
 
-exports.canSuggestUrl = canSuggestUrl;
+export default canSuggestUrl;

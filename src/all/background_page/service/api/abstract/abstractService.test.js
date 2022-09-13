@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import {ApiClientOptions} from "../apiClient/apiClientOptions";
-import {AbstractService} from "./abstractService";
+import ApiClientOptions from "../apiClient/apiClientOptions";
+import AbstractService from "./abstractService";
 
 describe("Abstract service", () => {
   it("constructor works", () => {

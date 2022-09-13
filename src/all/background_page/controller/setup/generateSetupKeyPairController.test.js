@@ -11,14 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {GenerateSetupKeyPairController} from "./generateSetupKeyPairController";
-import {GetGpgKeyInfoService} from "../../service/crypto/getGpgKeyInfoService";
-import {DecryptPrivateKeyService} from "../../service/crypto/decryptPrivateKeyService";
-import {EntityValidationError} from "../../model/entity/abstract/entityValidationError";
+import GenerateSetupKeyPairController from "./generateSetupKeyPairController";
+import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
+import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
+import EntityValidationError from "../../model/entity/abstract/entityValidationError";
 import {startAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
-import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
-import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
-import {MockExtension} from "../../../../../test/mocks/mockExtension";
+import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import MockExtension from "../../../../../test/mocks/mockExtension";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 
 describe("GenerateSetupKeyPairController", () => {
@@ -73,8 +73,8 @@ describe("GenerateSetupKeyPairController", () => {
       await expect(account.userPublicArmoredKey).toBeOpenpgpPublicKey();
       await expect(account.userPrivateArmoredKey).toBeOpenpgpPrivateKey();
 
-      const accountPublicKey = await readKeyOrFail(account.userPublicArmoredKey);
-      const accountPrivateKey = await readKeyOrFail(account.userPrivateArmoredKey);
+      const accountPublicKey = await OpenpgpAssertion.readKeyOrFail(account.userPublicArmoredKey);
+      const accountPrivateKey = await OpenpgpAssertion.readKeyOrFail(account.userPrivateArmoredKey);
       const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountPublicKey);
       const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountPrivateKey);
 
@@ -89,7 +89,7 @@ describe("GenerateSetupKeyPairController", () => {
       expect(privateKeyInfo.length).toBe(3072);
       expect(privateKeyInfo.userIds).toStrictEqual(expectedUserIds);
 
-      const userPrivateKey = await readKeyOrFail(account.userPrivateArmoredKey);
+      const userPrivateKey = await OpenpgpAssertion.readKeyOrFail(account.userPrivateArmoredKey);
       const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, generateKeyPairDto.passphrase);
       expect(decryptedPrivateKey).not.toBeNull();
       expect(runtimeMemory.passphrase).toStrictEqual(generateKeyPairDto.passphrase);

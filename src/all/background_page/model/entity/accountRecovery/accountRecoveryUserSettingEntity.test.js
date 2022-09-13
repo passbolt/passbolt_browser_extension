@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {EntitySchema} from "../abstract/entitySchema";
-import {EntityValidationError} from "../abstract/entityValidationError";
-import {AccountRecoveryUserSettingEntity} from "./accountRecoveryUserSettingEntity";
+import EntitySchema from "../abstract/entitySchema";
+import EntityValidationError from "../abstract/entityValidationError";
+import AccountRecoveryUserSettingEntity from "./accountRecoveryUserSettingEntity";
 
 describe("AccountRecoveryUserSetting entity", () => {
   it("schema must validate", () => {

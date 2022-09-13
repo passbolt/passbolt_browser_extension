@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
+import googString from "./string";
+
 /**
  * @fileoverview Provides functions to parse and manipulate email addresses.
  *
  */
 const goog = {};
 
-goog.string = require('./string').goog.string;
+goog.string = googString.string;
 
 goog.format = {};
 
@@ -373,4 +375,4 @@ goog.format.EmailAddress.isEscapedDlQuote_ = function(str, pos) {
   return ((slashCount % 2) != 0);
 };
 
-exports.goog = goog;
+export default goog;

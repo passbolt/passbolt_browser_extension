@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import {CsvLastPassRowParser} from "./csvLastPassRowParser";
-import {ExternalResourceEntity} from "../../../entity/resource/external/externalResourceEntity";
+import CsvLastPassRowParser from "./csvLastPassRowParser";
+import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
 
 describe("CsvLastPassRowParser", () => {
   it("can parse LastPass csv", () => {

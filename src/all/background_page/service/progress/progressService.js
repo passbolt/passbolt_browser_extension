@@ -78,4 +78,4 @@ class ProgressService {
   }
 }
 
-exports.ProgressService = ProgressService;
+export default ProgressService;

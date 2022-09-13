@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {AbstractService} = require('../abstract/abstractService');
+import AbstractService from "../abstract/abstractService";
 
 const ACCOUNT_RECOVERY_PRIVATE_KEY_PASSWORD_RESOURCE_NAME = '/account-recovery/private-key-passwords';
 
@@ -49,4 +49,4 @@ class AccountRecoveryPrivateKeyPasswordService extends AbstractService {
   }
 }
 
-exports.AccountRecoveryPrivateKeyPasswordService =  AccountRecoveryPrivateKeyPasswordService;
+export default  AccountRecoveryPrivateKeyPasswordService;

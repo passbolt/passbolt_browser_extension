@@ -13,9 +13,9 @@
  */
 
 import each from "jest-each";
-import {EntitySchema} from "../abstract/entitySchema";
-import {EntityValidationError} from "../abstract/entityValidationError";
-import {AccountRecoveryOrganizationPolicyChangeEntity} from "./accountRecoveryOrganizationPolicyChangeEntity";
+import EntitySchema from "../abstract/entitySchema";
+import EntityValidationError from "../abstract/entityValidationError";
+import AccountRecoveryOrganizationPolicyChangeEntity from "./accountRecoveryOrganizationPolicyChangeEntity";
 import {
   changeToADisabledAccountRecoveryOrganizationPolicyDto,
   changeAnEnabledAccountRecoveryOrganizationPolicyTypeDto,

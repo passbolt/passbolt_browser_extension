@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-const {AbstractService} = require('../abstract/abstractService');
+import AbstractService from "../abstract/abstractService";
 
 const SUBSCRIPTION_SERVICE_RESOURCE_NAME = 'ee/subscription';
 
@@ -60,4 +60,4 @@ class SubscriptionService extends AbstractService {
   }
 }
 
-exports.SubscriptionService = SubscriptionService;
+export default SubscriptionService;

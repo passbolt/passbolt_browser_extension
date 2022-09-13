@@ -10,7 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {ApiClient} = require('../apiClient/apiClient');
+import ApiClient from "../apiClient/apiClient";
+import Validator from "validator";
 
 class AbstractService {
   /**
@@ -119,4 +120,4 @@ class AbstractService {
   }
 }
 
-exports.AbstractService = AbstractService;
+export default AbstractService;

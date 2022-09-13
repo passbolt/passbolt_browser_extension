@@ -26,4 +26,4 @@ const splitBySize = (arr, size) => arr.reduce((chunks, el, i) => {
   return chunks;
 }, []);
 
-exports.splitBySize = splitBySize;
+export default splitBySize;

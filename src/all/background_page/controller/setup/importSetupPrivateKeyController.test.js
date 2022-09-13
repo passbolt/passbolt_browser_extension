@@ -12,19 +12,17 @@
  * @since         3.6.0
  */
 import {enableFetchMocks} from "jest-fetch-mock";
-import {ImportSetupPrivateKeyController} from "./importSetupPrivateKeyController";
-import {GetGpgKeyInfoService} from "../../service/crypto/getGpgKeyInfoService";
-import {GpgKeyError} from "../../error/GpgKeyError";
+import ImportSetupPrivateKeyController from "./importSetupPrivateKeyController";
+import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
+import GpgKeyError from "../../error/GpgKeyError";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
-import {MockExtension} from "../../../../../test/mocks/mockExtension";
-import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
-import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
+import MockExtension from "../../../../../test/mocks/mockExtension";
+import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import {
   startAccountSetupDto,
   withServerKeyAccountSetupDto
 } from "../../model/entity/account/accountSetupEntity.test.data";
-
-global.XRegExp = require("xregexp");
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -136,8 +134,8 @@ describe("ImportSetupPrivateKeyController", () => {
       await expect(account.userPublicArmoredKey).toBeOpenpgpPublicKey();
       await expect(account.userPrivateArmoredKey).toBeOpenpgpPrivateKey();
 
-      const accountPublicKey = await readKeyOrFail(account.userPublicArmoredKey);
-      const accountPrivateKey = await readKeyOrFail(account.userPrivateArmoredKey);
+      const accountPublicKey = await OpenpgpAssertion.readKeyOrFail(account.userPublicArmoredKey);
+      const accountPrivateKey = await OpenpgpAssertion.readKeyOrFail(account.userPrivateArmoredKey);
       const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountPublicKey);
       const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(accountPrivateKey);
 

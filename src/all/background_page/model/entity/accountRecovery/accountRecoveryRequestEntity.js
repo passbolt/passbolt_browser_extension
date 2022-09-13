@@ -11,13 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {Entity} = require("../abstract/entity");
-const {EntitySchema} = require("../abstract/entitySchema");
-const {RoleEntity} = require("../role/roleEntity");
-const {ProfileEntity} = require("../profile/profileEntity");
-const {GpgkeyEntity} = require("../gpgkey/gpgkeyEntity");
-const {AccountRecoveryPrivateKeyEntity} = require("./accountRecoveryPrivateKeyEntity");
-const {AccountRecoveryResponsesCollection} = require("./accountRecoveryResponsesCollection");
+import Entity from "../abstract/entity";
+import RoleEntity from "../role/roleEntity";
+import ProfileEntity from "../profile/profileEntity";
+import GpgkeyEntity from "../gpgkey/gpgkeyEntity";
+import AccountRecoveryResponsesCollection from "./accountRecoveryResponsesCollection";
+import EntitySchema from "../abstract/entitySchema";
+import AccountRecoveryPrivateKeyEntity from "./accountRecoveryPrivateKeyEntity";
 
 const ENTITY_NAME = "AccountRecoveryRequest";
 const FINGERPRINT_LENGTH = 40;
@@ -261,4 +261,4 @@ class AccountRecoveryRequestEntity extends Entity {
   }
 }
 
-exports.AccountRecoveryRequestEntity = AccountRecoveryRequestEntity;
+export default AccountRecoveryRequestEntity;

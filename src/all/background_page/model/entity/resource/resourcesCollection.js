@@ -11,13 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-
-const {EntityCollection} = require('../abstract/entityCollection');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {EntityCollectionError} = require('../abstract/entityCollectionError');
-const {ResourceEntity} = require('./resourceEntity');
-const {deduplicateObjects} = require("../../../utils/array/deduplicateObjects");
-const {canSuggestUrl} = require("../../../utils/url/canSuggestUrl");
+import ResourceEntity from "./resourceEntity";
+import EntityCollection from "../abstract/entityCollection";
+import EntitySchema from "../abstract/entitySchema";
+import EntityCollectionError from "../abstract/entityCollectionError";
+import deduplicateObjects from "../../../utils/array/deduplicateObjects";
+import canSuggestUrl from "../../../utils/url/canSuggestUrl";
 
 const ENTITY_NAME = 'Resources';
 const RULE_UNIQUE_ID = 'unique_id';
@@ -371,4 +370,4 @@ class ResourcesCollection extends EntityCollection {
   }
 }
 
-exports.ResourcesCollection = ResourcesCollection;
+export default ResourcesCollection;

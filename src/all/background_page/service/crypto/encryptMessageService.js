@@ -12,7 +12,8 @@
  * @since         3.6.0
  */
 
-const {assertDecryptedPrivateKeys, assertPublicKey, createMessageOrFail} = require("../../utils/openpgp/openpgpAssertions");
+import * as openpgp from 'openpgp';
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 class EncryptMessageService {
   /**
@@ -25,10 +26,10 @@ class EncryptMessageService {
    */
   static async encryptSymmetrically(message, passwords, signingKeys = null) {
     if (signingKeys) {
-      assertDecryptedPrivateKeys(signingKeys);
+      OpenpgpAssertion.assertDecryptedPrivateKeys(signingKeys);
     }
 
-    const gpgMessage = await createMessageOrFail(message);
+    const gpgMessage = await OpenpgpAssertion.createMessageOrFail(message);
     return openpgp.encrypt({
       message: gpgMessage,
       passwords: passwords,
@@ -45,12 +46,12 @@ class EncryptMessageService {
    * @returns {Promise<string>} the encrypted message in its armored version
    */
   static async encrypt(message, encryptionKey, signingKeys = null) {
-    assertPublicKey(encryptionKey);
+    OpenpgpAssertion.assertPublicKey(encryptionKey);
     if (signingKeys) {
-      assertDecryptedPrivateKeys(signingKeys);
+      OpenpgpAssertion.assertDecryptedPrivateKeys(signingKeys);
     }
 
-    const gpgMessage = await createMessageOrFail(message);
+    const gpgMessage = await OpenpgpAssertion.createMessageOrFail(message);
     return openpgp.encrypt({
       message: gpgMessage,
       encryptionKeys: encryptionKey,
@@ -59,4 +60,4 @@ class EncryptMessageService {
   }
 }
 
-exports.EncryptMessageService = EncryptMessageService;
+export default EncryptMessageService;

@@ -4,8 +4,9 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {ExportResourcesFileController} = require('../controller/export/exportResourcesFileController');
-const {User} = require('../model/user');
+import User from "../model/user";
+import ExportResourcesFileController from "../controller/export/exportResourcesFileController";
+
 
 const listen = async function(worker) {
   /*
@@ -29,4 +30,4 @@ const listen = async function(worker) {
   });
 };
 
-exports.listen = listen;
+export const ExportResourcesEvents = {listen};

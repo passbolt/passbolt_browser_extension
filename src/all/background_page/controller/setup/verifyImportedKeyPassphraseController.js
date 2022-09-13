@@ -12,8 +12,8 @@
  * @since         3.6.0
  */
 
-const {DecryptPrivateKeyService} = require("../../service/crypto/decryptPrivateKeyService");
-const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 
 class VerifyImportedKeyPassphraseController {
   /**
@@ -62,11 +62,11 @@ class VerifyImportedKeyPassphraseController {
     if (typeof passphrase !== "string") {
       throw new TypeError("The passphrase should be a string.");
     }
-    const privateKey = await readKeyOrFail(privateArmoredKey);
+    const privateKey = await OpenpgpAssertion.readKeyOrFail(privateArmoredKey);
     await DecryptPrivateKeyService.decrypt(privateKey, passphrase);
     // The passphrase will be later use to sign in the user.
     this.runtimeMemory.passphrase = passphrase;
   }
 }
 
-exports.VerifyImportedKeyPassphraseController = VerifyImportedKeyPassphraseController;
+export default VerifyImportedKeyPassphraseController;

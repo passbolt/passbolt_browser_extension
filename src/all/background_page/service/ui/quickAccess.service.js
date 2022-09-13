@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.4
  */
+import browser from "webextension-polyfill";
 
 /** The default quickaccesss window height */
 const QUICKACCESS_WINDOW_HEIGHT = 400;
@@ -60,6 +61,6 @@ async function buildDetachedQuickaccessPosition() {
   return {top: top, left: left};
 }
 
-exports.QuickAccessService = {
+export const QuickAccessService = {
   openInDetachedMode: openInDetachedMode
 };

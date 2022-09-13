@@ -11,14 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {Entity} = require('../abstract/entity');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {RoleEntity} = require('../role/roleEntity');
-const {ProfileEntity} = require('../profile/profileEntity');
-const {GpgkeyEntity} = require('../gpgkey/gpgkeyEntity');
-const {GroupsUsersCollection} = require('../groupUser/groupsUsersCollection');
-const {AccountRecoveryUserSettingEntity} = require("../accountRecovery/accountRecoveryUserSettingEntity");
-const {AccountRecoveryRequestEntity} = require("../accountRecovery/accountRecoveryRequestEntity");
+import Entity from "../abstract/entity";
+import RoleEntity from "../role/roleEntity";
+import ProfileEntity from "../profile/profileEntity";
+import GpgkeyEntity from "../gpgkey/gpgkeyEntity";
+import GroupsUsersCollection from "../groupUser/groupsUsersCollection";
+import AccountRecoveryRequestEntity from "../accountRecovery/accountRecoveryRequestEntity";
+import EntitySchema from "../abstract/entitySchema";
+import AccountRecoveryUserSettingEntity from "../accountRecovery/accountRecoveryUserSettingEntity";
 
 const ENTITY_NAME = 'User';
 
@@ -398,4 +398,4 @@ class UserEntity extends Entity {
   }
 }
 
-exports.UserEntity = UserEntity;
+export default UserEntity;

@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {PostponedUserSettingInvitationService} = require('../../service/accountRecovery/postponedUserSettingInvitationService');
+import PostponedUserSettingInvitationService from "../../service/accountRecovery/postponedUserSettingInvitationService";
+
 
 class HasUserPostponedUserSettingInvitationController {
   /**
@@ -46,4 +47,4 @@ class HasUserPostponedUserSettingInvitationController {
   }
 }
 
-exports.HasUserPostponedUserSettingInvitationController = HasUserPostponedUserSettingInvitationController;
+export default HasUserPostponedUserSettingInvitationController;

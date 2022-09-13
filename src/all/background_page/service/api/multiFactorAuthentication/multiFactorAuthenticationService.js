@@ -10,7 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {AbstractService} = require('../abstract/abstractService');
+import AbstractService from "../abstract/abstractService";
 
 const USER_SERVICE_RESOURCE_NAME = 'mfa';
 
@@ -51,4 +51,4 @@ class MultiFactorAuthenticationService extends AbstractService {
   }
 }
 
-exports.MultiFactorAuthenticationService = MultiFactorAuthenticationService;
+export default MultiFactorAuthenticationService;

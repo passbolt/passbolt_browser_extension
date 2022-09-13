@@ -11,9 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-const {ApiClientOptions} = require("../api/apiClient/apiClientOptions");
-const {UserService} = require("../api/user/userService");
+import UserService from "../api/user/userService";
+import ApiClientOptions from "../api/apiClient/apiClientOptions";
 
 class BuildAccountApiClientOptionsService {
   /**
@@ -32,4 +31,4 @@ class BuildAccountApiClientOptionsService {
   }
 }
 
-exports.BuildAccountApiClientOptionsService = BuildAccountApiClientOptionsService;
+export default BuildAccountApiClientOptionsService;

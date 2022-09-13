@@ -10,10 +10,11 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {FileFormatError} = require("../../../error/fileFormatError");
-const {CsvKdbxRowComposer} = require("./csvRowComposer/csvKdbxRowComposer");
-const {Csv1PasswordRowComposer} = require("./csvRowComposer/csv1passwordRowComposer");
-const {CsvLastPassRowComposer} = require("./csvRowComposer/csvLastPassRowComposer");
+import CsvKdbxRowComposer from "./csvRowComposer/csvKdbxRowComposer";
+import Csv1PasswordRowComposer from "./csvRowComposer/csv1passwordRowComposer";
+import CsvLastPassRowComposer from "./csvRowComposer/csvLastPassRowComposer";
+import FileFormatError from "../../../error/fileFormatError";
+import PapaParse from "papaparse";
 
 /**
  * Register of csv row parsers
@@ -83,4 +84,4 @@ class ResourcesCsvExporter {
   }
 }
 
-exports.ResourcesCsvExporter = ResourcesCsvExporter;
+export default ResourcesCsvExporter;

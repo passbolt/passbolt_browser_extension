@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {AccountRecoveryPrivateKeyPasswordsCollection} from "./accountRecoveryPrivateKeyPasswordsCollection";
-import {EntityCollectionError} from "../abstract/entityCollectionError";
-import {EntitySchema} from "../abstract/entitySchema";
+import AccountRecoveryPrivateKeyPasswordsCollection from "./accountRecoveryPrivateKeyPasswordsCollection";
+import EntityCollectionError from "../abstract/entityCollectionError";
+import EntitySchema from "../abstract/entitySchema";
 
 describe("AccountRecoveryPrivateKeyPasswords Collection", () => {
   it("schema must validate", () => {

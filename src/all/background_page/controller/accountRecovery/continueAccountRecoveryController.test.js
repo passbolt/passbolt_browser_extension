@@ -15,10 +15,10 @@
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import {ContinueAccountRecoveryController} from "./continueAccountRecoveryController";
-import {AccountAccountRecoveryEntity} from "../../model/entity/account/accountAccountRecoveryEntity";
+import ContinueAccountRecoveryController from "./continueAccountRecoveryController";
+import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
-import Worker from "../../model/worker";
+import {Worker} from "../../model/worker";
 
 jest.mock("../../model/worker");
 

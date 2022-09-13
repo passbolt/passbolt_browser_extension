@@ -12,13 +12,13 @@
  * @since         3.6.0
  */
 
-const secrets = require("secrets.js-grempe");
-const {EncryptMessageService} = require("../crypto/encryptMessageService");
-const {AccountRecoveryUserSettingEntity} = require("../../model/entity/accountRecovery/accountRecoveryUserSettingEntity");
-const {AccountRecoveryPrivateKeyPasswordEntity} = require("../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity");
-const {AccountRecoveryOrganizationPolicyEntity} = require("../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity");
-const {assertDecryptedPrivateKey, readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
-const {AccountRecoveryPrivateKeyPasswordDecryptedDataEntity} = require("../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import EncryptMessageService from "../crypto/encryptMessageService";
+import AccountRecoveryOrganizationPolicyEntity from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
+import secrets from 'secrets-passbolt';
+import AccountRecoveryPrivateKeyPasswordEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity";
+import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
+import AccountRecoveryUserSettingEntity from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
 
 // The strength of the secret to use to encrypt the private key.
 const SYMMETRIC_SECRET_BITS = 512;
@@ -33,7 +33,7 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
    * @returns {Promise<AccountRecoveryUserSettingEntity>}
    */
   static async build(account, decryptedPrivateKey, organizationPolicy) {
-    assertDecryptedPrivateKey(decryptedPrivateKey);
+    OpenpgpAssertion.assertDecryptedPrivateKey(decryptedPrivateKey);
 
     if (!organizationPolicy || !(organizationPolicy instanceof AccountRecoveryOrganizationPolicyEntity)) {
       throw new Error("The provided organizationPolicy must be a valid AccountRecoveryOrganizationPolicyEntity.");
@@ -77,7 +77,7 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
    * @private
    */
   static async _encryptPrivateKeyPasswordsForOrganizationKey(account, symmetricSecret, organizationPolicy, decryptedPrivateKey) {
-    const organizationPublicKey = await readKeyOrFail(organizationPolicy.armoredKey);
+    const organizationPublicKey = await OpenpgpAssertion.readKeyOrFail(organizationPolicy.armoredKey);
     const privateKeyPasswordDecryptedData = this._buildPrivateKeyPasswordDecryptedData(account, symmetricSecret);
     const serializedPrivateKeyPasswordDecryptedData = JSON.stringify(privateKeyPasswordDecryptedData.toDto());
     const privateKeyPasswordEncryptedData = await EncryptMessageService.encrypt(serializedPrivateKeyPasswordDecryptedData, organizationPublicKey, [decryptedPrivateKey]);
@@ -112,4 +112,4 @@ class BuildApprovedAccountRecoveryUserSettingEntityService {
   }
 }
 
-exports.BuildApprovedAccountRecoveryUserSettingEntityService = BuildApprovedAccountRecoveryUserSettingEntityService;
+export default BuildApprovedAccountRecoveryUserSettingEntityService;

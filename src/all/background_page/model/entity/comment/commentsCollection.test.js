@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {CommentsCollection} from "./commentsCollection";
-import {EntityCollectionError} from "../abstract/entityCollectionError";
-import {EntitySchema} from "../abstract/entitySchema";
+import CommentsCollection from "./commentsCollection";
+import EntityCollectionError from "../abstract/entityCollectionError";
+import EntitySchema from "../abstract/entitySchema";
 
 describe("Comment entity", () => {
   it("schema must validate", () => {

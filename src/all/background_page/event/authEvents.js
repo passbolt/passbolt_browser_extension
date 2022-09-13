@@ -6,17 +6,18 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {AuthVerifyServerKeyController} = require('../controller/auth/authVerifyServerKeyController');
-const {AuthCheckStatusController} = require('../controller/auth/authCheckStatusController');
-const {AuthIsAuthenticatedController} = require('../controller/auth/authIsAuthenticatedController');
-const {AuthIsMfaRequiredController} = require('../controller/auth/authIsMfaRequiredController');
-const {AuthModel} = require("../model/auth/authModel");
-const {User} = require('../model/user');
-const {Keyring} = require('../model/keyring');
-const Config = require('../model/config');
-const {UserAlreadyLoggedInError} = require("../error/userAlreadyLoggedInError");
-const {CheckPassphraseController} = require('../controller/crypto/checkPassphraseController');
-const {RequestHelpCredentialsLostController} = require("../controller/auth/requestHelpCredentialsLostController");
+import Keyring from "../model/keyring";
+import User from "../model/user";
+import AuthModel from "../model/auth/authModel";
+import AuthVerifyServerKeyController from "../controller/auth/authVerifyServerKeyController";
+import AuthCheckStatusController from "../controller/auth/authCheckStatusController";
+import AuthIsAuthenticatedController from "../controller/auth/authIsAuthenticatedController";
+import AuthIsMfaRequiredController from "../controller/auth/authIsMfaRequiredController";
+import CheckPassphraseController from "../controller/crypto/checkPassphraseController";
+import RequestHelpCredentialsLostController from "../controller/auth/requestHelpCredentialsLostController";
+import {Config} from "../model/config";
+import UserAlreadyLoggedInError from "../error/userAlreadyLoggedInError";
+
 
 const listen = function(worker, account) {
   /*
@@ -214,4 +215,4 @@ const listen = function(worker, account) {
   });
 };
 
-exports.listen = listen;
+export const AuthEvents = {listen};

@@ -10,16 +10,17 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const app = require("../../app");
-const {GpgAuthHeader} = require("../gpgAuthHeader");
-const {GpgAuthToken} = require("../gpgAuthToken");
-const {AuthStatusLocalStorage} = require("../../service/local_storage/authStatusLocalStorage");
-const {GpgAuth} = require("../gpgauth");
-const {AuthService} = require("../../service/api/auth/authService");
-const {User} = require("../user");
-const {EncryptMessageService} = require("../../service/crypto/encryptMessageService");
-const {GetDecryptedUserPrivateKeyService} = require("../../service/account/getDecryptedUserPrivateKeyService");
-const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import EncryptMessageService from "../../service/crypto/encryptMessageService";
+import GpgAuth from "../gpgauth";
+import AuthService from "../../service/api/auth/authService";
+import AuthStatusLocalStorage from "../../service/local_storage/authStatusLocalStorage";
+import User from "../user";
+import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
+import {App as app} from "../../app";
+import GpgAuthToken from "../gpgAuthToken";
+import GpgAuthHeader from "../gpgAuthHeader";
+
 
 class AuthModel {
   /**
@@ -109,7 +110,7 @@ class AuthModel {
     let encryptedToken, originalToken;
     try {
       originalToken = new GpgAuthToken();
-      const serverKey = await readKeyOrFail(serverArmoredKey);
+      const serverKey = await OpenpgpAssertion.readKeyOrFail(serverArmoredKey);
       encryptedToken = await EncryptMessageService.encrypt(originalToken.token, serverKey);
     } catch (error) {
       throw new Error(`Unable to encrypt the verify token. ${error.message}`);
@@ -126,4 +127,4 @@ class AuthModel {
   }
 }
 
-exports.AuthModel = AuthModel;
+export default AuthModel;

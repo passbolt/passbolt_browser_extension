@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.4
  */
-const {deduplicateObjects} = require("./deduplicateObjects");
+import deduplicateObjects from "./deduplicateObjects";
 
 describe("deduplicateObjects", () => {
   it("deduplicate array of objects", () => {

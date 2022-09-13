@@ -10,11 +10,11 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {Entity} = require('../abstract/entity');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {UserEntity} = require("../user/userEntity");
-const {SecurityTokenEntity} = require("../securityToken/securityTokenEntity");
-const {ProfileEntity} = require("../profile/profileEntity");
+import Entity from "../abstract/entity";
+import ProfileEntity from "../profile/profileEntity";
+import UserEntity from "../user/userEntity";
+import SecurityTokenEntity from "../securityToken/securityTokenEntity";
+import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = "AbstractAccount";
 
@@ -296,4 +296,4 @@ class AbstractAccountEntity extends Entity {
   }
 }
 
-exports.AbstractAccountEntity = AbstractAccountEntity;
+export default AbstractAccountEntity;

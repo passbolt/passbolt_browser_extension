@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {PageMod} = require('../sdk/page-mod');
-const app = require('../app');
+import PageMod from "../sdk/page-mod";
+import {App as app} from "../app";
 
 const InFormMenu = function() {};
 InFormMenu._pageMod = undefined;
@@ -44,4 +44,4 @@ InFormMenu.init = function() {
   });
 };
 
-exports.InFormMenu = InFormMenu;
+export default InFormMenu;

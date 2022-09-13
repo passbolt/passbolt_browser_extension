@@ -10,7 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {AbstractService} = require('../abstract/abstractService');
+import AbstractService from "../abstract/abstractService";
 
 const FOLDER_SERVICE_RESOURCE_NAME = 'folders';
 
@@ -195,4 +195,4 @@ class FolderService extends AbstractService {
   }
 }
 
-exports.FolderService = FolderService;
+export default FolderService;

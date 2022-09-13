@@ -1,4 +1,4 @@
-const {CsrfToken} = require('../../../utils/csrfToken/csrfToken');
+import CsrfToken from "../../../utils/csrfToken/csrfToken";
 
 class ApiClientOptions {
   /**
@@ -106,5 +106,5 @@ class ApiClientOptions {
     }
   }
 }
-exports.ApiClientOptions = ApiClientOptions;
+export default ApiClientOptions;
 

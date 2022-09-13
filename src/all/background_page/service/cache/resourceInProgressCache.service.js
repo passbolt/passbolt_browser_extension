@@ -12,7 +12,7 @@
  * @since         3.4
  */
 
-const {ExternalResourceEntity} = require("../../model/entity/resource/external/externalResourceEntity");
+import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
 
 /** Default validity timeout of the cache */
 const VALIDITY_TIMEOUT_IN_MS = 6000;
@@ -84,4 +84,4 @@ class ResourceInProgressCacheService {
   }
 }
 
-exports.ResourceInProgressCacheService = new ResourceInProgressCacheService();
+export default new ResourceInProgressCacheService();

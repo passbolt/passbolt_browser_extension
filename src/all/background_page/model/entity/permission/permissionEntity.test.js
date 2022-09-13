@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {PermissionEntity} from "./permissionEntity";
-import {EntityValidationError} from "../abstract/entityValidationError";
-import {EntitySchema} from "../abstract/entitySchema";
+import PermissionEntity from "./permissionEntity";
+import EntityValidationError from "../abstract/entityValidationError";
+import EntitySchema from "../abstract/entitySchema";
 
 /**
  * getTestDto

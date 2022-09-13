@@ -47,4 +47,4 @@ class PublicWebsiteSignInController {
   }
 }
 
-exports.PublicWebsiteSignInController = PublicWebsiteSignInController;
+export default PublicWebsiteSignInController;

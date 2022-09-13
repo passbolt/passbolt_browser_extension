@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {ExternalGpgKeyEntity} from "./externalGpgKeyEntity";
+import ExternalGpgKeyEntity from "./externalGpgKeyEntity";
 import {ExternalGpgKeyEntityFixtures} from "./externalGpgKeyEntity.test.fixtures";
-import {EntitySchema} from "../../abstract/entitySchema";
-import {EntityValidationError} from '../../abstract/entityValidationError';
+import EntitySchema from "../../abstract/entitySchema";
+import EntityValidationError from '../../abstract/entityValidationError';
 
 describe("ExternalGpgKey entity", () => {
   it("schema must validate", () => {

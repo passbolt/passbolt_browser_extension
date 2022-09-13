@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-const {OrganizationSettingsEntity} = require("../entity/organizationSettings/organizationSettingsEntity");
-const {OrganizationSettingsService} = require("../../service/api/organizationSettings/organizationSettingsService");
-const {PassboltApiFetchError} = require("../../error/passboltApiFetchError");
+import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
+import OrganizationSettingsEntity from "../entity/organizationSettings/organizationSettingsEntity";
+import PassboltApiFetchError from "../../error/passboltApiFetchError";
 
 // Settings local cache.
 let _settings;
@@ -72,4 +72,4 @@ class OrganizationSettingsModel {
   }
 }
 
-exports.OrganizationSettingsModel = OrganizationSettingsModel;
+export default OrganizationSettingsModel;

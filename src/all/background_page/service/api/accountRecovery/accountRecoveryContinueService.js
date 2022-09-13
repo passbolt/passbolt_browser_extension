@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {AbstractService} = require('../abstract/abstractService');
+import AbstractService from "../abstract/abstractService";
 
 const ACCOUNT_RECOVERY_CONTINUE_SERVICE_RESOURCE_NAME = '/account-recovery/continue';
 
@@ -49,4 +49,4 @@ class AccountRecoveryContinueService extends AbstractService {
   }
 }
 
-exports.AccountRecoveryContinueService = AccountRecoveryContinueService;
+export default AccountRecoveryContinueService;

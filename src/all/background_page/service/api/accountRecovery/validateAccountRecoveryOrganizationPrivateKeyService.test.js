@@ -13,9 +13,9 @@
  */
 
 import {dummyData} from "./validateAccountRecoveryOrganizationPrivateKeyService.test.data";
-import {ValidateAccountRecoveryOrganizationPrivateKeyService} from "./validateAccountRecoveryOrganizationPrivateKeyService";
-import {AccountRecoveryOrganizationPolicyEntity} from "../../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
-import {PrivateGpgkeyEntity} from "../../../model/entity/gpgkey/privateGpgkeyEntity";
+import ValidateAccountRecoveryOrganizationPrivateKeyService from "./validateAccountRecoveryOrganizationPrivateKeyService";
+import AccountRecoveryOrganizationPolicyEntity from "../../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
+import PrivateGpgkeyEntity from "../../../model/entity/gpgkey/privateGpgkeyEntity";
 
 function getValidatePromise(keyPair) {
   const accountRecoveryOrganisationPolicyEntity = new AccountRecoveryOrganizationPolicyEntity(keyPair.publicKey);

@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {EntityCollection} = require('../abstract/entityCollection');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {EntityCollectionError} = require('../abstract/entityCollectionError');
-const {RoleEntity} = require('./roleEntity');
+import RoleEntity from "./roleEntity";
+import EntityCollection from "../abstract/entityCollection";
+import EntitySchema from "../abstract/entitySchema";
+import EntityCollectionError from "../abstract/entityCollectionError";
 
 const ENTITY_NAME = 'Roles';
 const RULE_UNIQUE_ID = 'unique_id';
@@ -145,4 +145,4 @@ class RolesCollection extends EntityCollection {
   }
 }
 
-exports.RolesCollection = RolesCollection;
+export default RolesCollection;

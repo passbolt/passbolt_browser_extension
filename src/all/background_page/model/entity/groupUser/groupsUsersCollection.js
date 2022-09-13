@@ -11,9 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {EntityCollection} = require('../abstract/entityCollection');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {GroupUserEntity} = require('./groupUserEntity');
+import EntityCollection from "../abstract/entityCollection";
+import GroupUserEntity from "./groupUserEntity";
+import EntitySchema from "../abstract/entitySchema";
+
 
 const ENTITY_NAME = 'GroupsUsers';
 
@@ -150,4 +151,4 @@ class GroupsUsersCollection extends EntityCollection {
   }
 }
 
-exports.GroupsUsersCollection = GroupsUsersCollection;
+export default GroupsUsersCollection;

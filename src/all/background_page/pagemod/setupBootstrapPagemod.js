@@ -10,9 +10,9 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {PageMod} = require('../sdk/page-mod');
-const Worker = require('../model/worker');
-const app = require('../app');
+import {Worker} from "../model/worker";
+import {App as app} from "../app";
+import PageMod from "../sdk/page-mod";
 
 const SetupBootstrap = function() {};
 SetupBootstrap._pageMod = undefined;
@@ -53,4 +53,4 @@ SetupBootstrap.init = function() {
   });
 };
 
-exports.SetupBootstrap = SetupBootstrap;
+export default SetupBootstrap;

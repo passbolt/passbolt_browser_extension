@@ -12,23 +12,24 @@
  * @since         2.0.0
  */
 
-const {SetSetupLocaleController} = require("../controller/setup/setSetupLocaleController");
-const {RequestAccountRecoveryController} = require("../controller/recover/requestAccountRecoveryController");
-const {GenerateRecoverAccountRecoveryRequestKeyController} = require("../controller/recover/generateRecoverAccountRecoveryRequestKeyController");
-const {VerifyImportedKeyPassphraseController} = require("../controller/setup/verifyImportedKeyPassphraseController");
-const {ImportRecoverPrivateKeyController} = require('../controller/recover/importRecoverPrivateKeyController');
-const {GetKeyInfoController} = require("../controller/crypto/getKeyInfoController");
-const {GetOrganizationSettingsController} = require("../controller/organizationSettings/getOrganizationSettingsController");
-const {IsExtensionFirstInstallController} = require("../controller/extension/isExtensionFirstInstallController");
-const {IsLostPassphraseCaseController} = require("../controller/accountRecovery/isLostPassphraseCaseController");
-const {StartRecoverController} = require("../controller/recover/startRecoverController");
-const {SetSetupSecurityTokenController} = require("../controller/setup/setSetupSecurityTokenController");
-const {HasRecoverUserEnabledAccountRecoveryController} = require("../controller/recover/hasRecoverUserEnabledAccountRecoveryController");
-const {CompleteRecoverController} = require("../controller/recover/completeRecoverController");
-const {GetAndInitializeAccountLocaleController} = require("../controller/account/getAndInitializeAccountLocaleController");
-const {ValidatePrivateGpgKeyRecoverController} = require("../controller/crypto/validatePrivateGpgKeyRecoverController");
-const {AbortAndRequestHelp} = require("../controller/recover/abortAndRequestHelpController");
-const {SignInSetupController} = require("../controller/setup/signInSetupController");
+import GetKeyInfoController from "../controller/crypto/getKeyInfoController";
+import RequestAccountRecoveryController from "../controller/recover/requestAccountRecoveryController";
+import GenerateRecoverAccountRecoveryRequestKeyController from "../controller/recover/generateRecoverAccountRecoveryRequestKeyController";
+import VerifyImportedKeyPassphraseController from "../controller/setup/verifyImportedKeyPassphraseController";
+import ImportRecoverPrivateKeyController from "../controller/recover/importRecoverPrivateKeyController";
+import StartRecoverController from "../controller/recover/startRecoverController";
+import CompleteRecoverController from "../controller/recover/completeRecoverController";
+import ValidatePrivateGpgKeyRecoverController from "../controller/crypto/validatePrivateGpgKeyRecoverController";
+import AbortAndRequestHelp from "../controller/recover/abortAndRequestHelpController";
+import SignInSetupController from "../controller/setup/signInSetupController";
+import SetSetupLocaleController from "../controller/setup/setSetupLocaleController";
+import GetOrganizationSettingsController from "../controller/organizationSettings/getOrganizationSettingsController";
+import GetAndInitializeAccountLocaleController from "../controller/account/getAndInitializeAccountLocaleController";
+import IsExtensionFirstInstallController from "../controller/extension/isExtensionFirstInstallController";
+import IsLostPassphraseCaseController from "../controller/accountRecovery/isLostPassphraseCaseController";
+import SetSetupSecurityTokenController from "../controller/setup/setSetupSecurityTokenController";
+import HasRecoverUserEnabledAccountRecoveryController from "../controller/recover/hasRecoverUserEnabledAccountRecoveryController";
+
 
 const listen = (worker, apiClientOptions, account) => {
   /*
@@ -124,4 +125,4 @@ const listen = (worker, apiClientOptions, account) => {
     await controller._exec();
   });
 };
-exports.listen = listen;
+export const RecoverEvents = {listen};

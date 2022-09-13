@@ -11,8 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-const {UserModel} = require("../../model/user/userModel");
+import UserModel from "../../model/user/userModel";
 
 class RequestHelpCredentialsLostController {
   /**
@@ -52,4 +51,4 @@ class RequestHelpCredentialsLostController {
   }
 }
 
-exports.RequestHelpCredentialsLostController = RequestHelpCredentialsLostController;
+export default RequestHelpCredentialsLostController;

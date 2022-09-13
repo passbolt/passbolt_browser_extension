@@ -19,46 +19,99 @@
  *  encryption and decryption events.
  * ==================================================================================
  */
-const events = {};
-events.app = require('./event/appEvents');
-events.appBootstrap = require('./event/appBootstrapEvents');
-events.actionLogs = require('./event/actionLogEvents');
-events.auth = require('./event/authEvents');
-events.clipboard = require('./event/clipboardEvents');
-events.comment = require('./event/commentEvents');
-events.config = require('./event/configEvents');
-events.exportResources = require('./event/exportResourcesEvents');
-events.favorite = require('./event/favoriteEvents');
-events.folder = require('./event/folderEvents');
-events.group = require('./event/groupEvents');
-events.importResources = require('./event/importResourcesEvents');
-events.keyring = require('./event/keyringEvents');
-events.quickAccess = require('./event/quickAccessEvents');
-events.multiFactorAuthentication = require('./event/multiFactorAuthenticationEvents');
-events.pagemod = require('./event/pagmodEvents');
-events.recover = require('./event/recoverEvents');
-events.resource = require('./event/resourceEvents');
-events.resourceType = require('./event/resourceTypeEvents');
-events.role = require('./event/roleEvents');
-events.secret = require('./event/secretEvents');
-events.setup = require('./event/setupEvents');
-events.share = require('./event/shareEvents');
-events.subscription = require('./event/subscriptionEvents');
-events.tab = require('./event/tabEvents');
-events.tag = require('./event/tagEvents');
-events.theme = require('./event/themeEvents');
-events.user = require('./event/userEvents');
-events.organizationSettings = require('./event/organizationSettingsEvents');
-events.locale = require('./event/localeEvents');
-events.passwordGenerator = require('./event/passwordGeneratorEvents');
-events.mobile = require('./event/mobileEvents');
-events.accountRecovery = require('./event/accountRecoveryEvents');
-events.informCallToAction = require('./event/informCallToActionEvents');
-events.informMenu = require('./event/informMenuEvents');
-events.webIntegration = require('./event/webIntegrationEvents');
-events.publicWebsiteSignIn = require('./event/publicWebsiteSignInEvents');
+import {AppEvents} from "./event/appEvents";
+import {AppBootstrapEvents} from "./event/appBootstrapEvents";
+import {ActionLogEvents} from "./event/actionLogEvents";
+import {AuthEvents} from "./event/authEvents";
+import {ClipboardEvents} from "./event/clipboardEvents";
+import {CommentEvents} from "./event/commentEvents";
+import {ConfigEvents} from "./event/configEvents";
+import {ExportResourcesEvents} from "./event/exportResourcesEvents";
+import {FavoriteEvents} from "./event/favoriteEvents";
+import {FolderEvents} from "./event/folderEvents";
+import {GroupEvents} from "./event/groupEvents";
+import {ImportResourcesEvents} from "./event/importResourcesEvents";
+import {KeyringEvents} from "./event/keyringEvents";
+import {QuickAccessEvents} from "./event/quickAccessEvents";
+import {MultiFactorAuthenticationEvents} from "./event/multiFactorAuthenticationEvents";
+import {PagemodEvents} from "./event/pagmodEvents";
+import {RecoverEvents} from "./event/recoverEvents";
+import {ResourceEvents} from "./event/resourceEvents";
+import {ResourceTypeEvents} from "./event/resourceTypeEvents";
+import {RoleEvents} from "./event/roleEvents";
+import {SecretEvents} from "./event/secretEvents";
+import {SetupEvents} from "./event/setupEvents";
+import {ShareEvents} from "./event/shareEvents";
+import {SubscriptionEvents} from "./event/subscriptionEvents";
+import {TabEvents} from "./event/tabEvents";
+import {TagEvents} from "./event/tagEvents";
+import {ThemeEvents} from "./event/themeEvents";
+import {UserEvents} from "./event/userEvents";
+import {OrganizationSettingsEvents} from "./event/organizationSettingsEvents";
+import {LocaleEvents} from "./event/localeEvents";
+import {PasswordGeneratorEvents} from "./event/passwordGeneratorEvents";
+import {MobileEvents} from "./event/mobileEvents";
+import {AccountRecoveryEvents} from "./event/accountRecoveryEvents";
+import {InformCallToActionEvents} from "./event/informCallToActionEvents";
+import {InformMenuEvents} from "./event/informMenuEvents";
+import {WebIntegrationEvents} from "./event/webIntegrationEvents";
+import {PublicWebsiteSignInEvents} from "./event/publicWebsiteSignInEvents";
+import WebIntegration from "./pagemod/webIntegrationPagemod";
+import AppBoostrapPagemod from "./pagemod/appBoostrapPagemod";
+import {AppPagemod} from "./pagemod/appPagemod";
+import AuthBootstrap from "./pagemod/authBootstrapPagemod";
+import Auth from "./pagemod/authPagemod";
+import SetupBootstrap from "./pagemod/setupBootstrapPagemod";
+import Setup from "./pagemod/setupPagemod";
+import RecoverBootstrap from "./pagemod/recoverBootstrapPagemod";
+import AccountRecoveryBootstrap from "./pagemod/accountRecoveryBootstrapPagemod";
+import AccountRecovery from "./pagemod/accountRecoveryPagemod";
+import QuickAccess from "./pagemod/quickAccessPagemod";
+import Clipboard from "./pagemod/clipboardPagemod";
+import File from "./pagemod/filePagemod";
+import InFormCallToAction from "./pagemod/inFormCallToActionPagemod";
+import InFormMenu from "./pagemod/informMenuPagemod";
+import PublicWebsiteSignIn from "./pagemod/publicWebsiteSignInPagemod";
+import Recover from "./pagemod/recoverPagemod";
 
-exports.events = events;
+const events = {};
+events.app = AppEvents;
+events.appBootstrap = AppBootstrapEvents;
+events.actionLogs = ActionLogEvents;
+events.auth = AuthEvents;
+events.clipboard = ClipboardEvents;
+events.comment = CommentEvents;
+events.config = ConfigEvents;
+events.exportResources = ExportResourcesEvents;
+events.favorite = FavoriteEvents;
+events.folder = FolderEvents;
+events.group = GroupEvents;
+events.importResources = ImportResourcesEvents;
+events.keyring = KeyringEvents;
+events.quickAccess = QuickAccessEvents;
+events.multiFactorAuthentication = MultiFactorAuthenticationEvents;
+events.pagemod = PagemodEvents;
+events.recover = RecoverEvents;
+events.resource = ResourceEvents;
+events.resourceType = ResourceTypeEvents;
+events.role = RoleEvents;
+events.secret = SecretEvents;
+events.setup = SetupEvents;
+events.share = ShareEvents;
+events.subscription = SubscriptionEvents;
+events.tab = TabEvents;
+events.tag = TagEvents;
+events.theme = ThemeEvents;
+events.user = UserEvents;
+events.organizationSettings = OrganizationSettingsEvents;
+events.locale = LocaleEvents;
+events.passwordGenerator = PasswordGeneratorEvents;
+events.mobile = MobileEvents;
+events.accountRecovery = AccountRecoveryEvents;
+events.informCallToAction = InformCallToActionEvents;
+events.informMenu = InformMenuEvents;
+events.webIntegration = WebIntegrationEvents;
+events.publicWebsiteSignIn = PublicWebsiteSignInEvents;
 
 /*
  * ==================================================================================
@@ -76,7 +129,6 @@ exports.events = events;
  * communicate via text.
  */
 const callbacks = {};
-exports.callbacks = callbacks;
 
 /*
  * We use this variables to store the references to the pagemods
@@ -90,95 +142,95 @@ const pageMods = {};
  * to know about the status of the extension, in a modernizr fashion
  * It also helps the plugin to recognise if a page behave like a passbolt app
  */
-pageMods.WebIntegration = require('./pagemod/webIntegrationPagemod').WebIntegration;
+pageMods.WebIntegration = WebIntegration;
 
 /*
  * This pagemod drives the main addon app
  * It is inserted in all the pages of a domain that is trusted.
  * Such trust is defined during the first step of the setup process.
  */
-pageMods.AppBoostrap = require('./pagemod/appBoostrapPagemod').AppBoostrap;
+pageMods.AppBoostrap = AppBoostrapPagemod;
 
 /*
  * This pagemod drives the react application.
  */
-pageMods.App = require('./pagemod/appPagemod').App;
+pageMods.App = AppPagemod;
 
 /*
  * This pagemod drives the login / authentication
  */
-pageMods.AuthBootstrap = require('./pagemod/authBootstrapPagemod').AuthBootstrap;
+pageMods.AuthBootstrap = AuthBootstrap;
 
 /*
  * This pagemod drives the login passphrase capture
  */
-pageMods.Auth = require('./pagemod/authPagemod').Auth;
+pageMods.Auth = Auth;
 
 /*
  * This pagemod help bootstrap the first step of the setup process from a passbolt server app page
  * The pattern for this url, driving the setup bootstrap, is defined in config.json
  */
-pageMods.SetupBootstrap = require('./pagemod/setupBootstrapPagemod').SetupBootstrap;
+pageMods.SetupBootstrap = SetupBootstrap;
 
 /*
  * This page mod drives the reset of setup process
  * The reset of the setup process is driven on the add-on side, see in ../data/passbolt-iframe-setup.html
  */
-pageMods.Setup = require('./pagemod/setupPagemod').Setup;
+pageMods.Setup = Setup;
 
 /*
  * This pagemod help bootstrap the first step of the recover process from a passbolt server app page
  * The pattern for this url, driving the recover bootstrap, is defined in config.json
  */
-pageMods.RecoverBootstrap = require('./pagemod/recoverBootstrapPagemod').RecoverBootstrap;
+pageMods.RecoverBootstrap = RecoverBootstrap;
 
 /*
  * This page mod drives the reset of recover process
  * The reset of the setup process is driven on the add-on side, see in ../data/passbolt-iframe-recover.html
  */
-pageMods.Recover = require('./pagemod/recoverPagemod').Setup;
+pageMods.Recover = Recover;
 
 /*
  * This pagemod helps bootstrap the account recovery application to inject on a passbolt served page.
  */
-pageMods.AccountRecoveryBootstrap = require('./pagemod/accountRecoveryBootstrapPagemod').AccountRecoveryBootstrap;
+pageMods.AccountRecoveryBootstrap = AccountRecoveryBootstrap;
 
 /*
  * This page mod drives the account recovery process
  * The account recovery process is driven on the add-on side, see in ../data/passbolt-iframe-account-recovery.html
  */
-pageMods.AccountRecovery = require('./pagemod/accountRecoveryPagemod').AccountRecovery;
+pageMods.AccountRecovery = AccountRecovery;
 
 /*
  * This page mod drives the reset of setup process
  * The reset of the setup process is driven on the add-on side, see in ../data/quickaccess.html
  */
-pageMods.QuickAccess = require('./pagemod/quickAccessPagemod').QuickAccess;
+pageMods.QuickAccess = QuickAccess;
 
 /*
  * This pagemod drives the clipboard iframe tool
  */
-pageMods.Clipboard = require('./pagemod/clipboardPagemod').Clipboard;
+pageMods.Clipboard = Clipboard;
 
 /*
  * This pagemod drives the file iframe tool
  */
-pageMods.File = require('./pagemod/filePagemod').File;
+pageMods.File = File;
 
 /*
  * This pagemod drives the inform menu cta iframe tool
  */
-pageMods.InFormMenuCTA = require('./pagemod/inFormCallToActionPagemod').InFormCallToAction;
+pageMods.InFormMenuCTA = InFormCallToAction;
 
 /*
  * This pagemod drives the inform menu iframe tool
  */
-pageMods.InFormMenu = require('./pagemod/informMenuPagemod').InFormMenu;
+pageMods.InFormMenu = InFormMenu;
 
 /*
  * This pagemod drives the sign in extension
  * It updates the sign in buttons on the passbolt.com pages.
  */
-pageMods.PublicWebsiteSignIn = require('./pagemod/publicWebsiteSignInPagemod').PublicWebsiteSignIn;
+pageMods.PublicWebsiteSignIn = PublicWebsiteSignIn;
 
-exports.pageMods = pageMods;
+export const App = {events, callbacks, pageMods};

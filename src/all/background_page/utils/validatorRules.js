@@ -15,7 +15,6 @@
 const isUtf8Extended = function(value) {
   return typeof value === 'string';
 };
-exports.isUtf8Extended = isUtf8Extended;
 
 /**
  * Check that the input value is a utf8 string.
@@ -40,4 +39,5 @@ const isUtf8 = function(value) {
 
   return true;
 };
-exports.isUtf8 = isUtf8;
+
+export const ValidatorRule = {isUtf8, isUtf8Extended};

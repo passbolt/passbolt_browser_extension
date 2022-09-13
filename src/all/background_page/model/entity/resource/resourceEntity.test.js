@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {ResourceEntity} from "./resourceEntity";
-import {EntitySchema} from "../abstract/entitySchema";
-import {EntityValidationError} from "../abstract/entityValidationError";
+import ResourceEntity from "./resourceEntity";
+import EntitySchema from "../abstract/entitySchema";
+import EntityValidationError from "../abstract/entityValidationError";
 
 describe("Resource entity", () => {
   it("schema must validate", () => {

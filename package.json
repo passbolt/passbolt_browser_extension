@@ -21,10 +21,10 @@
     "locutus": "~2.0.9",
     "openpgp": "5.2.1",
     "papaparse": "^5.2.0",
-    "passbolt-styleguide": "3.7.2",
+    "passbolt-styleguide": "3.7.4-alpha1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "secrets.js-grempe": "^2.0.0",
+    "secrets-passbolt": "github:passbolt/secrets.js#v2.0.1",
     "validator": "^13.7.0",
     "webextension-polyfill": "^0.9.0",
     "xregexp": "~5.1.0"
@@ -59,8 +59,8 @@
     "jest-webextension-mock": "^3.7.22",
     "text-encoding-utf-8": "^1.0.2",
     "uuid": "^8.3.2",
-    "web-ext": "^7.1.1",
-    "webpack": "^5.64.4",
+    "web-ext": "7.2.0",
+    "webpack": "^5.74.0",
     "webpack-cli": "^4.9.1"
   },
   "overrides": {
@@ -69,9 +69,11 @@
     }
   },
   "scripts": {
-    "build": "npm run build-content-scripts; npm run build-data;",
+    "build": "npx grunt build",
     "build-content-scripts": "webpack --config webpack-content-scripts.config.js",
     "build-data": "webpack --config webpack-data.config.js",
+    "build:background-page": "webpack --config webpack.background-page.config.js",
+    "dev:build:background-page": "webpack --env debug=true --config webpack.background-page.config.js",
     "i18n:externalize": "i18next -c ./i18next-parser.config.js",
     "i18n:update": "git checkout l10n_release -- src/all/locales/de-DE src/all/locales/en-UK src/all/locales/es-ES src/all/locales/fr-FR src/all/locales/ja-JP src/all/locales/lt-LT src/all/locales/nl-NL src/all/locales/pl-PL src/all/locales/sv-SE",
     "test": "npm run test:unit",

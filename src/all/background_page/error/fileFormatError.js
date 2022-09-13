@@ -18,4 +18,4 @@ class FileFormatError extends Error {
   }
 }
 
-exports.FileFormatError = FileFormatError;
+export default FileFormatError;

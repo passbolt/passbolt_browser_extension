@@ -48,4 +48,4 @@ class GetAccountRecoveryOrganizationPolicyController {
   }
 }
 
-exports.GetAccountRecoveryOrganizationPolicyController = GetAccountRecoveryOrganizationPolicyController;
+export default GetAccountRecoveryOrganizationPolicyController;

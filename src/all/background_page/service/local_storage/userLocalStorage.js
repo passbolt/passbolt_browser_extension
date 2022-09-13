@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {Log} = require('../../model/log');
-const {Lock} = require('../../utils/lock');
+import browser from "webextension-polyfill";
+import Log from "../../model/log";
+import UserEntity from "../../model/entity/user/userEntity";
+import UsersCollection from "../../model/entity/user/usersCollection";
+import Lock from "../../utils/lock";
 const lock = new Lock();
-
-const {UserEntity} = require('../../model/entity/user/userEntity');
-const {UsersCollection} = require("../../model/entity/user/usersCollection");
 
 const USER_LOCAL_STORAGE_KEY = 'users';
 
@@ -201,4 +201,4 @@ class UserLocalStorage {
   }
 }
 
-exports.UserLocalStorage = UserLocalStorage;
+export default UserLocalStorage;

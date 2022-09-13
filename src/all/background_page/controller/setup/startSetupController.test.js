@@ -13,17 +13,17 @@
  */
 
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import {StartSetupController} from "./startSetupController";
+import StartSetupController from "./startSetupController";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {defaultUserDto} from "../../model/entity/user/userEntity.test.data";
 import {defaultVerifyDto} from "../../model/entity/auth/auth.test.data";
-import {GetGpgKeyInfoService} from "../../service/crypto/getGpgKeyInfoService";
-import {UserEntity} from "../../model/entity/user/userEntity";
-import Worker from "../../model/worker";
+import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
+import UserEntity from "../../model/entity/user/userEntity";
+import {Worker} from "../../model/worker";
 import {initialAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
-import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
-import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
+import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 jest.mock("../../model/worker");
 
@@ -48,7 +48,7 @@ describe("StartSetupController", () => {
 
       expect.assertions(6);
       await controller.exec();
-      const key = await readKeyOrFail(mockVerifyDto.keydata);
+      const key = await OpenpgpAssertion.readKeyOrFail(mockVerifyDto.keydata);
       expect(account.serverPublicArmoredKey).toEqual((await GetGpgKeyInfoService.getKeyInfo(key)).armoredKey);
       expect(account.username).toEqual(mockSetupStartDto.user.username);
       expect(account.firstName).toEqual(mockSetupStartDto.user.profile.first_name);

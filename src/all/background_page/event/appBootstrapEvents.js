@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {User} = require('../model/user');
-const {AuthModel} = require("../model/auth/authModel");
+import User from "../model/user";
+import AuthModel from "../model/auth/authModel";
 
 const listen = function(worker) {
   /*
@@ -34,4 +34,4 @@ const listen = function(worker) {
     }
   });
 };
-exports.listen = listen;
+export const AppBootstrapEvents = {listen};

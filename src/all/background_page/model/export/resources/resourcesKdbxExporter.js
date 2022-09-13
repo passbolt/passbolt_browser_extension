@@ -1,5 +1,3 @@
-const {ExternalFolderEntity} = require("../../entity/folder/external/externalFolderEntity");
-
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) Passbolt SA (https://www.passbolt.com)
@@ -12,6 +10,9 @@ const {ExternalFolderEntity} = require("../../entity/folder/external/externalFol
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+import ExternalFolderEntity from "../../entity/folder/external/externalFolderEntity";
+import * as kdbxweb from 'kdbxweb';
+
 class ResourcesKdbxExporter {
   /**
    * Kdbx exporter constructor
@@ -93,4 +94,4 @@ class ResourcesKdbxExporter {
   }
 }
 
-exports.ResourcesKdbxExporter = ResourcesKdbxExporter;
+export default ResourcesKdbxExporter;

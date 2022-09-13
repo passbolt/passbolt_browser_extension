@@ -40,4 +40,4 @@ Request.setHeader = function(fetchOptions, key, value) {
   return fetchOptions;
 };
 
-exports.Request = Request;
+export default Request;

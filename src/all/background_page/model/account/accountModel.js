@@ -10,10 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {User} = require('../user');
-const {Keyring} = require('../keyring');
-const {ReEncryptPrivateKeyService} = require('../../service/crypto/reEncryptPrivateKeyService');
-const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../keyring";
+import User from "../user";
+import ReEncryptPrivateKeyService from "../../service/crypto/reEncryptPrivateKeyService";
 
 class AccountModel {
   /**
@@ -61,7 +61,7 @@ class AccountModel {
   async updatePrivateKey(oldPassphrase, newPassphrase) {
     const privateArmoredKey = this.keyring.findPrivate().armoredKey;
     try {
-      const privateKey = await readKeyOrFail(privateArmoredKey);
+      const privateKey = await OpenpgpAssertion.readKeyOrFail(privateArmoredKey);
       const reEncryptedPrivateKey = await ReEncryptPrivateKeyService.reEncrypt(privateKey, oldPassphrase, newPassphrase);
       const reEncryptedArmoredKey = reEncryptedPrivateKey.armor();
       await this.keyring.importPrivate(reEncryptedArmoredKey);
@@ -74,4 +74,4 @@ class AccountModel {
   }
 }
 
-exports.AccountModel = AccountModel;
+export default AccountModel;

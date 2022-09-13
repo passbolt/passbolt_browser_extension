@@ -50,4 +50,4 @@ class IsLostPassphraseCaseController {
   }
 }
 
-exports.IsLostPassphraseCaseController = IsLostPassphraseCaseController;
+export default IsLostPassphraseCaseController;

@@ -11,8 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.3.0
  */
-const {PasswordGeneratorModel} = require("../model/passwordGenerator/passwordGeneratorModel");
-const {User} = require('../model/user');
+import User from "../model/user";
+import PasswordGeneratorModel from "../model/passwordGenerator/passwordGeneratorModel";
+
 
 const listen = function(worker) {
   /*
@@ -32,4 +33,4 @@ const listen = function(worker) {
   });
 };
 
-exports.listen = listen;
+export const PasswordGeneratorEvents = {listen};

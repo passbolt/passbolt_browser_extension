@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {ResourcesCollection} from "./resourcesCollection";
-import {TagEntity} from "../tag/tagEntity";
-import {EntityCollectionError} from "../abstract/entityCollectionError";
-import {EntitySchema} from "../abstract/entitySchema";
-import {TagsCollection} from "../tag/tagsCollection";
+import ResourcesCollection from "./resourcesCollection";
+import TagEntity from "../tag/tagEntity";
+import EntityCollectionError from "../abstract/entityCollectionError";
+import EntitySchema from "../abstract/entitySchema";
+import TagsCollection from "../tag/tagsCollection";
 
 
 describe("Resources Collection", () => {

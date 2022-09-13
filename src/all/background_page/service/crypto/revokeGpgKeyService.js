@@ -12,7 +12,8 @@
  * @since         3.6.0
  */
 
-const {assertDecryptedPrivateKey} = require("../../utils/openpgp/openpgpAssertions");
+import * as openpgp from 'openpgp';
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 class RevokeGpgKeyService {
   /**
@@ -22,7 +23,7 @@ class RevokeGpgKeyService {
    * @returns {Promise<openpgp.PublicKey>} the revoked public armored key
    */
   static async revoke(privateKeyToRevoke) {
-    assertDecryptedPrivateKey(privateKeyToRevoke);
+    OpenpgpAssertion.assertDecryptedPrivateKey(privateKeyToRevoke);
     const {publicKey} = await openpgp.revokeKey({
       key: privateKeyToRevoke,
       format: 'object'
@@ -31,4 +32,4 @@ class RevokeGpgKeyService {
   }
 }
 
-exports.RevokeGpgKeyService = RevokeGpgKeyService;
+export default RevokeGpgKeyService;

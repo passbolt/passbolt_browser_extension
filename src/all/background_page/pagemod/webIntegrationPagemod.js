@@ -7,10 +7,11 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const app = require('../app');
-const {PageMod} = require('../sdk/page-mod');
-const Worker = require('../model/worker');
-const {User} = require("../model/user");
+import {Worker} from "../model/worker";
+import {App as app} from "../app";
+import PageMod from "../sdk/page-mod";
+import User from "../model/user";
+
 
 const WebIntegration = function() {};
 WebIntegration._pageMod = undefined;
@@ -49,4 +50,4 @@ WebIntegration.init = function() {
     }
   });
 };
-exports.WebIntegration = WebIntegration;
+export default WebIntegration;

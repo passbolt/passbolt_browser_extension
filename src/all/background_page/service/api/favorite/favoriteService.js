@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const {AbstractService} = require('../abstract/abstractService');
-const {FavoriteEntity} = require('../../../model/entity/favorite/favoriteEntity');
+import AbstractService from "../abstract/abstractService";
+import FavoriteEntity from "../../../model/entity/favorite/favoriteEntity";
 
 const FAVORITE_SERVICE_RESOURCE_NAME = 'favorites';
 
@@ -85,4 +85,4 @@ class FavoriteService extends AbstractService {
   }
 }
 
-exports.FavoriteService = FavoriteService;
+export default FavoriteService;

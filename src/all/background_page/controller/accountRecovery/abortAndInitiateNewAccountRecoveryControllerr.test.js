@@ -14,11 +14,11 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import {AbortAndInitiateNewAccountRecoveryController} from "./abortAndInitiateNewAccountRecoveryController";
+import AbortAndInitiateNewAccountRecoveryController from "./abortAndInitiateNewAccountRecoveryController";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {AccountAccountRecoveryEntity} from "../../model/entity/account/accountAccountRecoveryEntity";
+import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
-import {AccountLocalStorage} from "../../service/local_storage/accountLocalStorage";
+import AccountLocalStorage from "../../service/local_storage/accountLocalStorage";
 
 beforeEach(() => {
   enableFetchMocks();

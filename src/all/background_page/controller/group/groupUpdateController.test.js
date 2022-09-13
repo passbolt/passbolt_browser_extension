@@ -11,30 +11,30 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import DecryptMessageService from "../../service/crypto/decryptMessageService";
+import User from "../../model/user";
+import GroupsUpdateController from "./groupUpdateController";
+import browser from "webextension-polyfill";
+import {PassphraseController} from "../passphrase/passphraseController";
+import MockExtension from "../../../../../test/mocks/mockExtension";
+
 const {enableFetchMocks} = require("jest-fetch-mock");
-const {MockExtension} = require("../../../../../test/mocks/mockExtension");
 const {mockApiResponse} = require("../../../../../test/mocks/mockApiResponse");
 const {pgpKeys} = require("../../../../../test/fixtures/pgpKeys/keys");
 const {users} = require("../../model/entity/user/userEntity.test.data");
-const {User} = require("../../model/user");
-const {Keyring} = require("../../model/keyring");
-const {DecryptMessageService} = require("../../service/crypto/decryptMessageService");
-const {GroupsUpdateController} = require("./groupUpdateController");
+
+
+
 const {updateGroupNameDto, add2UsersToGroupDto, add2UsersToGroupDryRunResponse} = require("./groupUpdateController.test.data");
 const {defaultGroup} = require("../../model/entity/group/groupEntity.test.data");
 const {defaultDyRunResponse} = require("../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data");
-const {readKeyOrFail, readMessageOrFail} = require("../../utils/openpgp/openpgpAssertions");
 
-jest.mock("../progress/progressController", () => ({
-  open: jest.fn(),
-  update: jest.fn(),
-  updateGoals: jest.fn(),
-  close: jest.fn()
-}));
 
-jest.mock("../passphrase/passphraseController", () => ({
-  get: () => "ada@passbolt.com"
-}));
+jest.mock("../progress/progressController");
+
+jest.spyOn(PassphraseController, "get").mockImplementation(() => "ada@passbolt.com");
 
 beforeEach(() => {
   enableFetchMocks();
@@ -151,15 +151,15 @@ describe("GroupsUpdateController", () => {
         expect(adminResource3).not.toBeUndefined();
 
         // we should have the new resources encrypted for the correct users and they should be able to decrypt them.
-        const bettyPrivateKey = await readKeyOrFail(pgpKeys.betty.private_decrypted);
-        const bettyResource1Data = await readMessageOrFail(bettyResource1.data);
-        const bettyResource2Data = await readMessageOrFail(bettyResource2.data);
-        const adminResource1Data = await readMessageOrFail(adminResource1.data);
-        const adminResource3Data = await readMessageOrFail(adminResource3.data);
+        const bettyPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.betty.private_decrypted);
+        const bettyResource1Data = await OpenpgpAssertion.readMessageOrFail(bettyResource1.data);
+        const bettyResource2Data = await OpenpgpAssertion.readMessageOrFail(bettyResource2.data);
+        const adminResource1Data = await OpenpgpAssertion.readMessageOrFail(adminResource1.data);
+        const adminResource3Data = await OpenpgpAssertion.readMessageOrFail(adminResource3.data);
         expect(await DecryptMessageService.decrypt(bettyResource1Data, bettyPrivateKey)).toBe("resource1-password");
         expect(await DecryptMessageService.decrypt(bettyResource2Data, bettyPrivateKey)).toBe("resource2-password");
 
-        const adminPrivateKey = await readKeyOrFail(pgpKeys.admin.private_decrypted);
+        const adminPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
         expect(await DecryptMessageService.decrypt(adminResource1Data, adminPrivateKey)).toBe("resource1-password");
         expect(await DecryptMessageService.decrypt(adminResource3Data, adminPrivateKey)).toBe("resource3-password");
 

@@ -6,10 +6,10 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const app = require('../app');
-const User = require('../model/user').User;
-const {PageMod} = require('../sdk/page-mod');
-const Worker = require('../model/worker');
+import User from "../model/user";
+import {Worker} from "../model/worker";
+import {App as app} from "../app";
+import PageMod from "../sdk/page-mod";
 
 const AuthBootstrap = function() {};
 AuthBootstrap._pageMod = undefined;
@@ -65,4 +65,4 @@ AuthBootstrap.init = function() {
     }
   });
 };
-exports.AuthBootstrap = AuthBootstrap;
+export default AuthBootstrap;

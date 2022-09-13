@@ -12,13 +12,14 @@
  * @since         3.6.0
  */
 
-const {AccountModel} = require("../../model/account/accountModel");
-const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
-const {AccountRecoveryRequestCreateEntity} = require("../../model/entity/accountRecovery/accountRecoveryRequestCreateEntity");
-const {AccountRecoveryRequestService} = require("../../service/api/accountRecovery/accountRecoveryRequestService");
-const {AccountLocalStorage} = require("../../service/local_storage/accountLocalStorage");
-const {AccountRecoverEntity} = require("../../model/entity/account/accountRecoverEntity");
-const {AccountAccountRecoveryEntity} = require("../../model/entity/account/accountAccountRecoveryEntity");
+import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
+import AccountModel from "../../model/account/accountModel";
+import AccountLocalStorage from "../../service/local_storage/accountLocalStorage";
+import AccountRecoveryRequestService from "../../service/api/accountRecovery/accountRecoveryRequestService";
+import AccountRecoveryRequestCreateEntity from "../../model/entity/accountRecovery/accountRecoveryRequestCreateEntity";
+import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
+import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
+
 
 class RequestAccountRecoveryController {
   /**
@@ -70,4 +71,4 @@ class RequestAccountRecoveryController {
   }
 }
 
-exports.RequestAccountRecoveryController = RequestAccountRecoveryController;
+export default RequestAccountRecoveryController;

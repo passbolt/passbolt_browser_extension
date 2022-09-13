@@ -13,16 +13,14 @@
  */
 import {v4 as uuidv4} from "uuid";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
-import {MockExtension} from "../../../../../test/mocks/mockExtension";
+import MockExtension from "../../../../../test/mocks/mockExtension";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import {DecryptPrivateKeyService} from "../../service/crypto/decryptPrivateKeyService";
-import {readKeyOrFail, assertEncryptedPrivateKey} from "../../utils/openpgp/openpgpAssertions";
-import {UpdatePrivateKeyController} from "./updatePrivateKeyController";
+import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
+import UpdatePrivateKeyController from "./updatePrivateKeyController";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import {FileController} from "../fileController";
 
-const mockedSaveFile = jest.fn();
-jest.mock('../fileController', () => ({
-  saveFile: jest.fn((fileName, fileContent, fileContentType, workerTabId) => mockedSaveFile(fileName, fileContent, fileContentType, workerTabId))
-}));
+const mockedSaveFile = jest.spyOn(FileController, "saveFile");
 
 describe("UpdatePrivateKeyController", () => {
   describe("UpdatePrivateKeyController::exec", () => {
@@ -35,8 +33,8 @@ describe("UpdatePrivateKeyController", () => {
         expect(fileContentType).toStrictEqual("text/plain");
         expect(workerTabId).toStrictEqual(worker.tab.id);
 
-        const key = await readKeyOrFail(fileContent);
-        assertEncryptedPrivateKey(key);
+        const key = await OpenpgpAssertion.readKeyOrFail(fileContent);
+        OpenpgpAssertion.assertEncryptedPrivateKey(key);
 
         const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(key, newPassphrase);
         expect(decryptedPrivateKey).toBeTruthy();

@@ -12,18 +12,19 @@
  * @since         3.4.0
  */
 
-const {ResourceInProgressCacheService} = require("../../service/cache/resourceInProgressCache.service");
-const Worker = require('../../model/worker');
-const {PasswordGeneratorModel} = require("../../model/passwordGenerator/passwordGeneratorModel");
-const {ResourceModel} = require("../../model/resource/resourceModel");
-const {QuickAccessService} = require("../../service/ui/quickAccess.service");
-const passphraseController = require('../passphrase/passphraseController');
-const {BrowserTabService} = require("../../service/ui/browserTab.service");
-const {ExternalResourceEntity} = require("../../model/entity/resource/external/externalResourceEntity");
-const {DecryptMessageService} = require('../../service/crypto/decryptMessageService');
-const {GetDecryptedUserPrivateKeyService} = require("../../service/account/getDecryptedUserPrivateKeyService");
-const {readMessageOrFail} = require("../../utils/openpgp/openpgpAssertions");
-const {ResourceEntity} = require("../../model/entity/resource/resourceEntity");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import DecryptMessageService from "../../service/crypto/decryptMessageService";
+import ResourceModel from "../../model/resource/resourceModel";
+import {QuickAccessService} from "../../service/ui/quickAccess.service";
+import {Worker} from "../../model/worker";
+import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
+import {BrowserTabService} from "../../service/ui/browserTab.service";
+import PasswordGeneratorModel from "../../model/passwordGenerator/passwordGeneratorModel";
+import ResourceEntity from "../../model/entity/resource/resourceEntity";
+import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
+import ResourceInProgressCacheService from "../../service/cache/resourceInProgressCache.service";
+
 /**
  * Controller related to the in-form call-to-action
  */
@@ -124,7 +125,7 @@ class InformMenuController {
       const passphrase = await passphraseController.requestFromQuickAccess();
       const resource = await this.resourceModel.findForDecrypt(resourceId);
       const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
-      const resourceSecretMessage = await readMessageOrFail(resource.secret.data);
+      const resourceSecretMessage = await OpenpgpAssertion.readMessageOrFail(resource.secret.data);
       let plaintext = await DecryptMessageService.decrypt(resourceSecretMessage, privateKey);
       plaintext = await this.resourceModel.deserializePlaintext(resource.resourceTypeId, plaintext);
       const {username} = resource;
@@ -173,4 +174,4 @@ class InformMenuController {
 }
 
 
-exports.InformMenuController = InformMenuController;
+export default InformMenuController;

@@ -14,11 +14,11 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import {GetAndInitSetupLocaleController} from "./getAndInitSetupLocaleController";
+import GetAndInitSetupLocaleController from "./getAndInitSetupLocaleController";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 import {initialAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
-import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
+import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 
 jest.mock("../../model/worker");
 

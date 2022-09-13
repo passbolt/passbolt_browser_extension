@@ -11,18 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {i18n} = require('../../sdk/i18n');
-const passphraseController = require('../passphrase/passphraseController');
-const progressController = require('../progress/progressController');
-const {ResourceSecretsCollection} = require("../../model/entity/secret/resource/resourceSecretsCollection");
-
-const {Keyring} = require('../../model/keyring');
-const {ResourceEntity} = require('../../model/entity/resource/resourceEntity');
-const {ResourceModel} = require('../../model/resource/resourceModel');
-const {UserModel} = require('../../model/user/userModel');
-const {EncryptMessageService} = require('../../service/crypto/encryptMessageService');
-const {GetDecryptedUserPrivateKeyService} = require('../../service/account/getDecryptedUserPrivateKeyService');
-const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
+import Keyring from "../../model/keyring";
+import EncryptMessageService from "../../service/crypto/encryptMessageService";
+import ResourceModel from "../../model/resource/resourceModel";
+import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
+import UserModel from "../../model/user/userModel";
+import {ProgressController as progressController} from "../progress/progressController";
+import ResourceEntity from "../../model/entity/resource/resourceEntity";
+import i18n from "../../sdk/i18n";
+import ResourceSecretsCollection from "../../model/entity/secret/resource/resourceSecretsCollection";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 class ResourceUpdateController {
   /**
@@ -138,7 +137,7 @@ class ResourceUpdateController {
       if (Object.prototype.hasOwnProperty.call(usersIds, i)) {
         const userId =  usersIds[i];
         const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
-        const userPublicKey = await readKeyOrFail(userPublicArmoredKey);
+        const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
         const data = await EncryptMessageService.encrypt(plaintextDto, userPublicKey, [privateKey]);
         secrets.push({user_id: userId, data: data});
         await progressController.update(this.worker, i + 2, i18n.t("Encrypting"));
@@ -148,4 +147,4 @@ class ResourceUpdateController {
   }
 }
 
-exports.ResourceUpdateController = ResourceUpdateController;
+export default ResourceUpdateController;

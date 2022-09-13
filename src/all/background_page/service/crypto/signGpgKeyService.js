@@ -11,8 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-const {assertDecryptedPrivateKeys, assertPublicKey} = require("../../utils/openpgp/openpgpAssertions");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 class SignGpgKeyService {
   /**
@@ -23,10 +22,10 @@ class SignGpgKeyService {
    * @returns {Promise<openpgp.PublicKey>}
    */
   static async sign(publicKeyToSign, signingKeys) {
-    assertPublicKey(publicKeyToSign);
-    assertDecryptedPrivateKeys(signingKeys);
+    OpenpgpAssertion.assertPublicKey(publicKeyToSign);
+    OpenpgpAssertion.assertDecryptedPrivateKeys(signingKeys);
     return publicKeyToSign.signAllUsers(signingKeys);
   }
 }
 
-exports.SignGpgKeyService = SignGpgKeyService;
+export default SignGpgKeyService;

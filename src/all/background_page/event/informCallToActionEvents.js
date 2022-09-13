@@ -10,10 +10,9 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {InformCallToActionController} = require("../controller/informCallToActionController/informCallToActionController");
-const {User} = require('../model/user');
-const {AuthenticationEventController} = require("../controller/auth/authenticationEventController");
-
+import User from "../model/user";
+import InformCallToActionController from "../controller/informCallToActionController/informCallToActionController";
+import AuthenticationEventController from "../controller/auth/authenticationEventController";
 
 
 /**
@@ -60,4 +59,4 @@ const listen = function(worker) {
   });
 };
 
-exports.listen = listen;
+export const InformCallToActionEvents = {listen};

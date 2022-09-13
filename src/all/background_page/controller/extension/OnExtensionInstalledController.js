@@ -13,6 +13,8 @@
  *
  * On extension installed controller
  */
+import browser from 'webextension-polyfill';
+
 class OnExtensionInstalledController {
   /**
    * On installed the extension, add first install in the url tab of setup or recover
@@ -58,4 +60,4 @@ const closeTabWebStore = tabs => {
   return Promise.all(tabs.map(tab => tab.url.match(urlWebStoreRegex) ? browser.tabs.remove(tab.id) : tab));
 };
 
-exports.OnExtensionInstalledController = OnExtensionInstalledController;
+export default OnExtensionInstalledController;

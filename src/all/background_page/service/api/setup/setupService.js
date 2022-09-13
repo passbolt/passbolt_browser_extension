@@ -10,9 +10,9 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {PassboltBadResponseError} = require("../../../error/passboltBadResponseError");
-const {PassboltServiceUnavailableError} = require("../../../error/passboltServiceUnavailableError");
-const {AbstractService} = require('../abstract/abstractService');
+import PassboltBadResponseError from "../../../error/passboltBadResponseError";
+import AbstractService from "../abstract/abstractService";
+import PassboltServiceUnavailableError from "../../../error/passboltServiceUnavailableError";
 
 const SETUP_SERVICE_RESOURCE_NAME = 'setup';
 
@@ -201,4 +201,4 @@ class SetupService extends AbstractService {
   }
 }
 
-exports.SetupService = SetupService;
+export default SetupService;

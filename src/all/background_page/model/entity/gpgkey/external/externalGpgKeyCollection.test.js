@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {ExternalGpgKeyCollection} from "./externalGpgKeyCollection";
+import ExternalGpgKeyCollection from "./externalGpgKeyCollection";
 import {ExternalGpgKeyEntityFixtures} from "./externalGpgKeyEntity.test.fixtures";
-import {EntitySchema} from "../../abstract/entitySchema";
+import EntitySchema from "../../abstract/entitySchema";
 
 describe("ExternalGpgKey Collection", () => {
   it("schema must validate", () => {

@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {AbstractRowComposer} = require("./abstractRowComposer");
-const {CsvKdbxRowParser} = require("../../../import/resources/csvRowParser/csvKdbxRowParser");
+import CsvKdbxRowParser from "../../../import/resources/csvRowParser/csvKdbxRowParser";
+import AbstractRowComposer from "./abstractRowComposer";
 
 const FORMAT = "csv-kdbx";
 
@@ -49,4 +49,4 @@ class CsvKdbxRowComposer extends AbstractRowComposer {
   }
 }
 
-exports.CsvKdbxRowComposer = CsvKdbxRowComposer;
+export default CsvKdbxRowComposer;

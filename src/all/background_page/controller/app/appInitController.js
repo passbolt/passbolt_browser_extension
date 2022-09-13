@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const User = require('../../model/user').User;
+import User from "../../model/user";
 
 /**
  * React application bootstrap.
@@ -45,4 +45,4 @@ class AppInitController {
   }
 }
 
-exports.AppInitController = AppInitController;
+export default AppInitController;

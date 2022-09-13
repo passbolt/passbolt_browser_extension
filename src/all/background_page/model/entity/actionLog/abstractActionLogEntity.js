@@ -10,10 +10,11 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {FolderEntity} = require("../folder/folderEntity");
-const {ResourceEntity} = require("../resource/resourceEntity");
-const {LoggedUserEntity} = require("../user/actionLog/loggedUserEntity");
-const {Entity} = require('../abstract/entity');
+import ResourceEntity from "../resource/resourceEntity";
+import FolderEntity from "../folder/folderEntity";
+import Entity from "../abstract/entity";
+import LoggedUserEntity from "../user/actionLog/loggedUserEntity";
+
 
 const ENTITY_NAME = 'AbstractActionLog';
 
@@ -181,4 +182,4 @@ class AbstractActionLogEntity extends Entity {
   }
 }
 
-exports.AbstractActionLogEntity = AbstractActionLogEntity;
+export default AbstractActionLogEntity;

@@ -11,12 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-const {EntityCollection} = require('../abstract/entityCollection');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {EntityCollectionError} = require('../abstract/entityCollectionError');
-const {AccountRecoveryResponseEntity} = require("./accountRecoveryResponseEntity");
-const {deduplicateObjects} = require("../../../utils/array/deduplicateObjects");
+import EntityCollection from "../abstract/entityCollection";
+import AccountRecoveryResponseEntity from "./accountRecoveryResponseEntity";
+import EntitySchema from "../abstract/entitySchema";
+import EntityCollectionError from "../abstract/entityCollectionError";
+import deduplicateObjects from "../../../utils/array/deduplicateObjects";
 
 const ENTITY_NAME = 'AccountRecoveryResponse';
 const RULE_UNIQUE_ID = 'unique_id';
@@ -196,4 +195,4 @@ class AccountRecoveryResponsesCollection extends EntityCollection {
   }
 }
 
-exports.AccountRecoveryResponsesCollection = AccountRecoveryResponsesCollection;
+export default AccountRecoveryResponsesCollection;

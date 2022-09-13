@@ -11,8 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const {AbstractService} = require('../abstract/abstractService');
-const {CommentEntity} = require('../../../model/entity/comment/commentEntity');
+import CommentEntity from "../../../model/entity/comment/commentEntity";
+import AbstractService from "../abstract/abstractService";
+
 
 const COMMENT_SERVICE_RESOURCE_NAME = 'comments';
 
@@ -130,4 +131,4 @@ class CommentService extends AbstractService {
   }
 }
 
-exports.CommentService = CommentService;
+export default CommentService;

@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {GetKeyInfoController} from "./getKeyInfoController";
+import GetKeyInfoController from "./getKeyInfoController";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {adaExternalPrivateGpgKeyEntityDto} from "../../model/entity/gpgkey/external/externalGpgKeyEntity.test.data";
 

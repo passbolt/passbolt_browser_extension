@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const {AbstractService} = require('../abstract/abstractService');
-const {PassboltServiceUnavailableError} = require('../../../error/passboltServiceUnavailableError');
-const {PassboltBadResponseError} = require('../../../error/passboltBadResponseError');
-const {PassboltApiFetchError} = require('../../../error/passboltApiFetchError');
+import PassboltBadResponseError from "../../../error/passboltBadResponseError";
+import AbstractService from "../abstract/abstractService";
+import PassboltApiFetchError from "../../../error/passboltApiFetchError";
+import PassboltServiceUnavailableError from "../../../error/passboltServiceUnavailableError";
 
 const USER_SERVICE_RESOURCE_NAME = 'users';
 
@@ -321,4 +321,4 @@ class UserService extends AbstractService {
   }
 }
 
-exports.UserService = UserService;
+export default UserService;

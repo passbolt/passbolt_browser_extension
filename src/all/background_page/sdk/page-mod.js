@@ -11,11 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-const {ScriptExecution} = require('../sdk/scriptExecution');
-const {Worker} = require('../sdk/worker');
-const Uuid = require('../utils/uuid');
-const Workers = require('../model/worker');
-const {Log} = require('../model/log');
+import browser from "webextension-polyfill";
+import {Worker as Workers} from "../model/worker";
+import ScriptExecution from "../sdk/scriptExecution";
+import Worker from "../sdk/worker";
+import {Uuid} from "../utils/uuid";
+import Log from "../model/log";
+
 
 /**
  * PageMod Class
@@ -369,4 +371,4 @@ class PageMod {
   }
 }
 
-exports.PageMod = PageMod;
+export default PageMod;

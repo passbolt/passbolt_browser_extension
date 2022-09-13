@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {ApiClientOptions} from "./apiClientOptions";
+import ApiClientOptions from "./apiClientOptions";
 
 describe("ApiClientOption testsuite", () => {
   it("should throw an error if url is empty", () => {

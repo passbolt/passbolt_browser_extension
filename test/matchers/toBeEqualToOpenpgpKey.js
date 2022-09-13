@@ -11,15 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {GetGpgKeyInfoService} from "../../src/all/background_page/service/crypto/getGpgKeyInfoService";
-import {readKeyOrFail} from "../../src/all/background_page/utils/openpgp/openpgpAssertions";
+import GetGpgKeyInfoService from "../../src/all/background_page/service/crypto/getGpgKeyInfoService";
+import {OpenpgpAssertion} from "../../src/all/background_page/utils/openpgp/openpgpAssertions";
 
 export const contains = (equals, list, value) => list.findIndex(item => equals(item, value)) > -1;
 
 exports.toBeEqualToOpenpgpKey = async function(armoredKeyA, armoredKeyB) {
   const {printExpected, printReceived, matcherHint} = this.utils;
-  const keyA = await readKeyOrFail(armoredKeyA);
-  const keyB = await readKeyOrFail(armoredKeyB);
+  const keyA = await OpenpgpAssertion.readKeyOrFail(armoredKeyA);
+  const keyB = await OpenpgpAssertion.readKeyOrFail(armoredKeyB);
   const keyAInfo = await GetGpgKeyInfoService.getKeyInfo(keyA);
   const keyBInfo = await GetGpgKeyInfoService.getKeyInfo(keyB);
 

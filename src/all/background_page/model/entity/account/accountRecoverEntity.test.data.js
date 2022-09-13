@@ -15,9 +15,9 @@
 import {v4 as uuidv4} from "uuid";
 import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
 import {defaultSecurityTokenDto} from "../securityToken/SecurityTokenEntity.test.data";
-import {AccountRecoverEntity} from "./accountRecoverEntity";
+import AccountRecoverEntity from "./accountRecoverEntity";
 import {defaultUserDto} from "../user/userEntity.test.data";
-import {AccountRecoveryUserSettingEntity} from "../accountRecovery/accountRecoveryUserSettingEntity";
+import AccountRecoveryUserSettingEntity from "../accountRecovery/accountRecoveryUserSettingEntity";
 
 export const initialAccountRecoverDto = (data = {}) => {
   const defaultData = {

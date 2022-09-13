@@ -4,12 +4,12 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {FolderCreateController} = require('../controller/folder/folderCreateController');
-const {FolderEntity} = require('../model/entity/folder/folderEntity');
-const {FolderModel} = require('../model/folder/folderModel');
-const {ResourceModel} = require('../model/resource/resourceModel');
-const {User} = require('../model/user');
-const {MoveController} = require('../controller/move/moveController');
+import User from "../model/user";
+import ResourceModel from "../model/resource/resourceModel";
+import FolderModel from "../model/folder/folderModel";
+import FolderCreateController from "../controller/folder/folderCreateController";
+import MoveController from "../controller/move/moveController";
+import FolderEntity from "../model/entity/folder/folderEntity";
 
 const listen = function(worker) {
   /*
@@ -123,4 +123,4 @@ const listen = function(worker) {
   });
 };
 
-exports.listen = listen;
+export const FolderEvents = {listen};

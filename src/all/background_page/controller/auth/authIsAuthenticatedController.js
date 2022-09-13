@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
-const GpgAuth = require('../../model/gpgauth').GpgAuth;
+import GpgAuth from "../../model/gpgauth";
 
 class AuthIsAuthenticatedController {
   constructor(worker, requestId) {
@@ -41,4 +41,4 @@ class AuthIsAuthenticatedController {
   }
 }
 
-exports.AuthIsAuthenticatedController = AuthIsAuthenticatedController;
+export default AuthIsAuthenticatedController;

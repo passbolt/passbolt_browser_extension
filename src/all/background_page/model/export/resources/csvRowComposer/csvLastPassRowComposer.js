@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {AbstractRowComposer} = require("./abstractRowComposer");
-const {CsvLastPassRowParser} = require("../../../import/resources/csvRowParser/csvLastPassRowParser");
+import CsvLastPassRowParser from "../../../import/resources/csvRowParser/csvLastPassRowParser";
+import AbstractRowComposer from "./abstractRowComposer";
 
 const FORMAT = "csv-lastpass";
 
@@ -49,4 +49,4 @@ class CsvLastPassRowComposer extends AbstractRowComposer {
   }
 }
 
-exports.CsvLastPassRowComposer = CsvLastPassRowComposer;
+export default CsvLastPassRowComposer;

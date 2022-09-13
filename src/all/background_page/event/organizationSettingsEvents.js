@@ -11,8 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-const User = require('../model/user').User;
-const {OrganizationSettingsModel} = require('../model/organizationSettings/organizationSettingsModel');
+import User from "../model/user";
+import OrganizationSettingsModel from "../model/organizationSettings/organizationSettingsModel";
+
 
 const listen = function(worker) {
   /*
@@ -34,4 +35,4 @@ const listen = function(worker) {
     }
   });
 };
-exports.listen = listen;
+export const OrganizationSettingsEvents = {listen};

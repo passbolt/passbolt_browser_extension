@@ -12,11 +12,11 @@
  * @since         3.6.0
  */
 
-const Worker = require("../../model/worker");
-const {AuthModel} = require("../../model/auth/authModel");
-const {SetupModel} = require("../../model/setup/setupModel");
-const {assertPublicKey, readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
-const {AccountRecoveryUserSettingEntity} = require("../../model/entity/accountRecovery/accountRecoveryUserSettingEntity");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import {Worker} from "../../model/worker";
+import AuthModel from "../../model/auth/authModel";
+import SetupModel from "../../model/setup/setupModel";
+import AccountRecoveryUserSettingEntity from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
 
 class StartRecoverController {
   /**
@@ -68,8 +68,8 @@ class StartRecoverController {
    */
   async _findAndSetAccountServerPublicKey() {
     const serverKeyDto = await this.authModel.getServerKey();
-    const serverKey = await readKeyOrFail(serverKeyDto.armored_key);
-    assertPublicKey(serverKey);
+    const serverKey = await OpenpgpAssertion.readKeyOrFail(serverKeyDto.armored_key);
+    OpenpgpAssertion.assertPublicKey(serverKey);
     // associate the server public key to the current account.
     this.account.serverPublicArmoredKey = serverKey.armor();
   }
@@ -112,4 +112,4 @@ class StartRecoverController {
   }
 }
 
-exports.StartRecoverController = StartRecoverController;
+export default StartRecoverController;

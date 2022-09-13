@@ -41,4 +41,4 @@ class AbstractRowComposer {
   /* eslint-enable no-unused-vars */
 }
 
-exports.AbstractRowComposer = AbstractRowComposer;
+export default AbstractRowComposer;

@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 
-const {AbstractAccountEntity} = require("./abstractAccountEntity");
-const {EntitySchema} = require('../abstract/entitySchema');
+import AbstractAccountEntity from "./abstractAccountEntity";
+import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = "Account";
 
@@ -159,4 +159,4 @@ class AccountEntity extends AbstractAccountEntity {
   }
 }
 
-exports.AccountEntity = AccountEntity;
+export default AccountEntity;

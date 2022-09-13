@@ -12,10 +12,10 @@
  * @since         3.6.0
  */
 
-const {GenerateGpgKeyPairOptionsEntity} = require("../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity");
-const {GenerateGpgKeyPairService} = require("../../service/crypto/generateGpgKeyPairService");
-const {GetGpgKeyCreationDateService} = require("../../service/crypto/getGpgKeyCreationDateService");
-const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import GetGpgKeyCreationDateService from "../../service/crypto/getGpgKeyCreationDateService";
+import GenerateGpgKeyPairOptionsEntity from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity";
+import GenerateGpgKeyPairService from "../../service/crypto/generateGpgKeyPairService";
 
 const ACCOUNT_RECOVERY_REQUEST_KEY_SIZE = 4096;
 
@@ -64,11 +64,11 @@ class GenerateRecoverAccountRecoveryRequestKeyController {
     };
     const generateGpgKeyPairOptionsEntity = new GenerateGpgKeyPairOptionsEntity(dto);
     const externalGpgKeyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);
-    const generatedPublicKey = await readKeyOrFail(externalGpgKeyPair.publicKey.armoredKey);
+    const generatedPublicKey = await OpenpgpAssertion.readKeyOrFail(externalGpgKeyPair.publicKey.armoredKey);
     this.account.userPrivateArmoredKey = externalGpgKeyPair.privateKey.armoredKey;
     this.account.userPublicArmoredKey = externalGpgKeyPair.publicKey.armoredKey;
     this.account.userKeyFingerprint = generatedPublicKey.getFingerprint().toUpperCase();
   }
 }
 
-exports.GenerateRecoverAccountRecoveryRequestKeyController = GenerateRecoverAccountRecoveryRequestKeyController;
+export default GenerateRecoverAccountRecoveryRequestKeyController;

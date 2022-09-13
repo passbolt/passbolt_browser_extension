@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {TagEntity} from "./tagEntity";
-import {TagsCollection} from "./tagsCollection";
-import {EntityCollectionError} from "../abstract/entityCollectionError";
-import {EntitySchema} from "../abstract/entitySchema";
+import TagEntity from "./tagEntity";
+import TagsCollection from "./tagsCollection";
+import EntityCollectionError from "../abstract/entityCollectionError";
+import EntitySchema from "../abstract/entitySchema";
 
 describe("Tag entity", () => {
   it("schema must validate", () => {

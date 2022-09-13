@@ -12,7 +12,8 @@
  * @since         3.6.0
  */
 
-const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
+import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
+import Validator from "validator";
 
 class AccountRecoveryGetRequestController {
   /**
@@ -65,4 +66,4 @@ class AccountRecoveryGetRequestController {
   }
 }
 
-exports.AccountRecoveryGetRequestController = AccountRecoveryGetRequestController;
+export default AccountRecoveryGetRequestController;

@@ -12,9 +12,10 @@
  * @since         3.6.0
  */
 
-const {Keyring} = require('../../model/keyring');
-const {GetGpgKeyInfoService} = require('../../service/crypto/getGpgKeyInfoService');
-const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
+
 
 class GetKeyInfoController {
   /**
@@ -54,9 +55,9 @@ class GetKeyInfoController {
       throw new Error('An armored key must be provided');
     }
 
-    const key = await readKeyOrFail(armoredKey);
+    const key = await OpenpgpAssertion.readKeyOrFail(armoredKey);
     return await GetGpgKeyInfoService.getKeyInfo(key);
   }
 }
 
-exports.GetKeyInfoController = GetKeyInfoController;
+export default GetKeyInfoController;

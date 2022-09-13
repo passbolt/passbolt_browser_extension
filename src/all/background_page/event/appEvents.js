@@ -10,20 +10,20 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const Worker = require('../model/worker');
-const {User} = require("../model/user");
-const {GetOrganizationPolicyController} = require("../controller/accountRecovery/getOrganizationPolicyController");
-const {AccountRecoverySaveOrganizationPolicyController} = require("../controller/accountRecovery/accountRecoverySaveOrganizationPolicyController");
-const {AccountRecoveryValidatePublicKeyController} = require("../controller/accountRecovery/accountRecoveryValidatePublicKeyController");
-const {AccountRecoveryGenerateOrganizationKeyController} = require("../controller/accountRecovery/accountRecoveryGenerateOrganizationKeyController");
-const fileController = require("../controller/fileController");
-const {AccountRecoveryValidateOrganizationPrivateKeyController} = require("../controller/accountRecovery/accountRecoveryValidateOrganizationPrivateKeyController");
-const {AccountRecoveryGetUserRequestsController} = require("../controller/accountRecovery/accountRecoveryGetUserRequestsController");
-const {AccountRecoveryGetRequestController} = require("../controller/accountRecovery/accountRecoveryGetRequestController");
-const {AccountRecoverySaveUserSettingsController} = require("../controller/accountRecovery/accountRecoverySaveUserSettingController");
-const {ReviewRequestController} = require("../controller/accountRecovery/reviewRequestController");
-const {HasUserPostponedUserSettingInvitationController} = require("../controller/accountRecovery/hasUserPostponedUserSettingInvitationController");
-const {PostponeUserSettingInvitationController} = require("../controller/accountRecovery/postponeUserSettingInvitationController");
+import GetOrganizationPolicyController from "../controller/accountRecovery/getOrganizationPolicyController";
+import User from "../model/user";
+import {Worker} from "../model/worker";
+import AccountRecoverySaveOrganizationPolicyController from "../controller/accountRecovery/accountRecoverySaveOrganizationPolicyController";
+import AccountRecoveryValidatePublicKeyController from "../controller/accountRecovery/accountRecoveryValidatePublicKeyController";
+import {FileController as fileController} from "../controller/fileController";
+import AccountRecoveryValidateOrganizationPrivateKeyController from "../controller/accountRecovery/accountRecoveryValidateOrganizationPrivateKeyController";
+import AccountRecoveryGetUserRequestsController from "../controller/accountRecovery/accountRecoveryGetUserRequestsController";
+import AccountRecoveryGetRequestController from "../controller/accountRecovery/accountRecoveryGetRequestController";
+import ReviewRequestController from "../controller/accountRecovery/reviewRequestController";
+import AccountRecoveryGenerateOrganizationKeyController from "../controller/accountRecovery/accountRecoveryGenerateOrganizationKeyController";
+import AccountRecoverySaveUserSettingsController from "../controller/accountRecovery/accountRecoverySaveUserSettingController";
+import HasUserPostponedUserSettingInvitationController from "../controller/accountRecovery/hasUserPostponedUserSettingInvitationController";
+import PostponeUserSettingInvitationController from "../controller/accountRecovery/postponeUserSettingInvitationController";
 
 const listen = function(worker, account) {
   /*
@@ -119,4 +119,4 @@ const listen = function(worker, account) {
     await controller._exec();
   });
 };
-exports.listen = listen;
+export const AppEvents = {listen};

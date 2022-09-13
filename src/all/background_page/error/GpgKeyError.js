@@ -18,4 +18,4 @@ class GpgKeyError extends Error {
   }
 }
 
-exports.GpgKeyError = GpgKeyError;
+export default GpgKeyError;

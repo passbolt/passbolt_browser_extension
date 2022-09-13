@@ -12,9 +12,10 @@
  * @since         3.6.0
  */
 
-const {GetGpgKeyInfoService} = require('../../service/crypto/getGpgKeyInfoService');
-const {i18n} = require('../../sdk/i18n');
-const {assertEncryptedPrivateKey, readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import i18n from "../../sdk/i18n";
+import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
+
 
 class ValidatePrivateGpgKeyRecoverController {
   /**
@@ -53,8 +54,8 @@ class ValidatePrivateGpgKeyRecoverController {
    * @throws {Error} if the key is decrypted.
    */
   async exec(armoredKey) {
-    const key = await readKeyOrFail(armoredKey);
-    assertEncryptedPrivateKey(key);
+    const key = await OpenpgpAssertion.readKeyOrFail(armoredKey);
+    OpenpgpAssertion.assertEncryptedPrivateKey(key);
 
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(key);
 
@@ -70,4 +71,4 @@ class ValidatePrivateGpgKeyRecoverController {
   }
 }
 
-exports.ValidatePrivateGpgKeyRecoverController = ValidatePrivateGpgKeyRecoverController;
+export default ValidatePrivateGpgKeyRecoverController;

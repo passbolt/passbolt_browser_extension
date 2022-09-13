@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+import DecryptMessageService from "../../service/crypto/decryptMessageService";
+import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
-const {AccountRecoveryPrivateKeyPasswordDecryptedDataEntity} = require("../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity");
-const {DecryptMessageService} = require("../../service/crypto/decryptMessageService");
-const {readMessageOrFail} = require('../../utils/openpgp/openpgpAssertions');
 
 class DecryptPrivateKeyPasswordDataService {
   /**
@@ -40,7 +40,7 @@ class DecryptPrivateKeyPasswordDataService {
     }
 
     // @todo verify the signature on the password: can be the user itself while performing the setup or the admin while rotating the ork.
-    const privateKeyPasswordMessage = await readMessageOrFail(privateKeyPassword.data);
+    const privateKeyPasswordMessage = await OpenpgpAssertion.readMessageOrFail(privateKeyPassword.data);
     const privateKeyPasswordDecryptedDataSerialized = await DecryptMessageService.decrypt(privateKeyPasswordMessage, decryptionKey);
 
     try {
@@ -71,4 +71,4 @@ class DecryptPrivateKeyPasswordDataService {
   }
 }
 
-exports.DecryptPrivateKeyPasswordDataService = DecryptPrivateKeyPasswordDataService;
+export default DecryptPrivateKeyPasswordDataService;

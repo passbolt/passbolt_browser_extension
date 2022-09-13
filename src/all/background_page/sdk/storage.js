@@ -80,6 +80,4 @@ LocalStorage.prototype.removeItem = function(key, subkey) {
   this._store();
 };
 
-exports.LocalStorage = LocalStorage;
-const storage = new LocalStorage();
-exports.storage = storage;
+export default new LocalStorage();

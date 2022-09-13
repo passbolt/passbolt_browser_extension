@@ -13,10 +13,10 @@
  */
 
 import {v4 as uuidv4} from 'uuid';
-import {GetRequestLocalAccountService} from "./getRequestLocalAccountService";
-import {AccountAccountRecoveryEntity} from "../../model/entity/account/accountAccountRecoveryEntity";
+import GetRequestLocalAccountService from "./getRequestLocalAccountService";
+import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import {initialAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
-import {AccountLocalStorage} from "../local_storage/accountLocalStorage";
+import AccountLocalStorage from "../local_storage/accountLocalStorage";
 
 describe("GetRequestLocalAccountService", () => {
   describe("GetRequestLocalAccountService:parse", () => {

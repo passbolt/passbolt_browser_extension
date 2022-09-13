@@ -14,9 +14,9 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {GetOrganizationPolicyController} from "./getOrganizationPolicyController";
+import GetOrganizationPolicyController from "./getOrganizationPolicyController";
 import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
-import {AccountRecoveryOrganizationPolicyEntity} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
+import AccountRecoveryOrganizationPolicyEntity from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 
 beforeEach(() => {

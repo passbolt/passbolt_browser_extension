@@ -12,9 +12,10 @@
  * @since         3.6.0
  */
 
-const {Keyring} = require('../../model/keyring');
-const {GetGpgKeyInfoService} = require('../../service/crypto/getGpgKeyInfoService');
-const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
+
 
 class GetUserKeyInfoController {
   /**
@@ -62,9 +63,9 @@ class GetUserKeyInfoController {
         throw new Error('User key not found');
       }
     }
-    const key = await readKeyOrFail(keyInfo.armoredKey);
+    const key = await OpenpgpAssertion.readKeyOrFail(keyInfo.armoredKey);
     return GetGpgKeyInfoService.getKeyInfo(key);
   }
 }
 
-exports.GetUserKeyInfoController = GetUserKeyInfoController;
+export default GetUserKeyInfoController;

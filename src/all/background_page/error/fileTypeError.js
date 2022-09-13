@@ -18,4 +18,4 @@ class FileTypeError extends Error {
   }
 }
 
-exports.FileTypeError = FileTypeError;
+export default FileTypeError;

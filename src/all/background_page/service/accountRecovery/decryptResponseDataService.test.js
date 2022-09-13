@@ -13,14 +13,14 @@
  */
 
 import {v4 as uuidv4} from "uuid";
-import {DecryptResponseDataService} from "./decryptResponseDataService";
+import DecryptResponseDataService from "./decryptResponseDataService";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
-import {EncryptMessageService} from "../crypto/encryptMessageService";
+import EncryptMessageService from "../crypto/encryptMessageService";
 import {defaultAccountRecoveryPrivateKeyPasswordDecryptedDataDto} from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity.test.data";
-import {AccountRecoveryPrivateKeyPasswordDecryptedDataEntity} from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
+import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
 import {acceptedAccountRecoveryResponseDto} from "../../model/entity/accountRecovery/accountRecoveryResponseEntity.test.data";
-import {AccountRecoveryResponseEntity} from "../../model/entity/accountRecovery/accountRecoveryResponseEntity";
-import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
+import AccountRecoveryResponseEntity from "../../model/entity/accountRecovery/accountRecoveryResponseEntity";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 describe("DecryptResponseDataService", () => {
   describe("DecryptResponseDataService:decrypt", () => {
@@ -31,7 +31,7 @@ describe("DecryptResponseDataService", () => {
     const verificationPublicKey = pgpKeys.ada.public;
 
     it("should decrypt a response data.", async() => {
-      const decryptionKey = await readKeyOrFail(decryptionArmoredKey);
+      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(decryptionArmoredKey);
       const privateKeyPasswordDecryptedData = await DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain);
       expect.assertions(8);
       expect(privateKeyPasswordDecryptedData).toBeInstanceOf(AccountRecoveryPrivateKeyPasswordDecryptedDataEntity);
@@ -45,7 +45,7 @@ describe("DecryptResponseDataService", () => {
     });
 
     it("should fail if the response data cannot be decrypted.", async() => {
-      const decryptionKey = await readKeyOrFail(decryptionArmoredKey);
+      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(decryptionArmoredKey);
       const data = "decrypt-me-decrypt-me-decrypt-me";
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({data}));
       const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain);
@@ -54,8 +54,8 @@ describe("DecryptResponseDataService", () => {
     });
 
     it("should fail if the response data cannot be parsed.", async() => {
-      const decryptionKey = await readKeyOrFail(decryptionArmoredKey);
-      const key = await readKeyOrFail(pgpKeys.account_recovery_request.public);
+      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(decryptionArmoredKey);
+      const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.account_recovery_request.public);
       const data = await EncryptMessageService.encrypt("decrypt-me-decrypt-me-decrypt-me", key);
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({data}));
       const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain);
@@ -64,9 +64,9 @@ describe("DecryptResponseDataService", () => {
     });
 
     it("should fail if the decrypted response data cannot be used to create a private key password decrypted data entity.", async() => {
-      const decryptionKey = await readKeyOrFail(decryptionArmoredKey);
+      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(decryptionArmoredKey);
       const privateKeyPasswordDataDto = defaultAccountRecoveryPrivateKeyPasswordDecryptedDataDto({type: "not-a-valid-decrypted-data-entity-type"});
-      const key = await readKeyOrFail(pgpKeys.account_recovery_request.public);
+      const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.account_recovery_request.public);
       const data = await EncryptMessageService.encrypt(JSON.stringify(privateKeyPasswordDataDto), key);
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({data}));
       const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain);
@@ -75,9 +75,9 @@ describe("DecryptResponseDataService", () => {
     });
 
     it("should fail if the user id contained in the decrypted response data does not match the verification user id.", async() => {
-      const decryptionKey = await readKeyOrFail(decryptionArmoredKey);
+      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(decryptionArmoredKey);
       const privateKeyPasswordDataDto = defaultAccountRecoveryPrivateKeyPasswordDecryptedDataDto({private_key_user_id: uuidv4()});
-      const key = await readKeyOrFail(pgpKeys.account_recovery_request.public);
+      const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.account_recovery_request.public);
       const data = await EncryptMessageService.encrypt(JSON.stringify(privateKeyPasswordDataDto), key);
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({data}));
       const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain);
@@ -86,10 +86,10 @@ describe("DecryptResponseDataService", () => {
     });
 
     it("should fail if the fingerprint contained in the decrypted response data does not match the verification fingerprint.", async() => {
-      const decryptionKey = await readKeyOrFail(decryptionArmoredKey);
-      const verificationKey = await readKeyOrFail(verificationPublicKey);
+      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(decryptionArmoredKey);
+      const verificationKey = await OpenpgpAssertion.readKeyOrFail(verificationPublicKey);
       const privateKeyPasswordDataDto = defaultAccountRecoveryPrivateKeyPasswordDecryptedDataDto({private_key_fingerprint: pgpKeys.betty.fingerprint});
-      const key = await readKeyOrFail(pgpKeys.account_recovery_request.public);
+      const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.account_recovery_request.public);
       const data = await EncryptMessageService.encrypt(JSON.stringify(privateKeyPasswordDataDto), key);
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({data}));
       const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, expectedDomain, verificationKey);
@@ -98,10 +98,10 @@ describe("DecryptResponseDataService", () => {
     });
 
     it("should fail if the domain contained in the decrypted response data does not match the verification domain.", async() => {
-      const decryptionKey = await readKeyOrFail(decryptionArmoredKey);
-      const verificationKey = await readKeyOrFail(verificationPublicKey);
+      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(decryptionArmoredKey);
+      const verificationKey = await OpenpgpAssertion.readKeyOrFail(verificationPublicKey);
       const privateKeyPasswordDataDto = defaultAccountRecoveryPrivateKeyPasswordDecryptedDataDto();
-      const key = await readKeyOrFail(pgpKeys.account_recovery_request.public);
+      const key = await OpenpgpAssertion.readKeyOrFail(pgpKeys.account_recovery_request.public);
       const data = await EncryptMessageService.encrypt(JSON.stringify(privateKeyPasswordDataDto), key);
       const response = new AccountRecoveryResponseEntity(acceptedAccountRecoveryResponseDto({data}));
       const promise = DecryptResponseDataService.decrypt(response, decryptionKey, verificationUserId, "fake domain", verificationKey);

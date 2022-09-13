@@ -12,14 +12,14 @@
  * @since         3.6.0
  */
 import {enableFetchMocks} from "jest-fetch-mock";
-import {GetUserKeyInfoController} from "./getUserKeyInfoController";
+import GetUserKeyInfoController from "./getUserKeyInfoController";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
-import {MockExtension} from "../../../../../test/mocks/mockExtension";
+import MockExtension from "../../../../../test/mocks/mockExtension";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {Keyring} from '../../model/keyring';
-import {GetGpgKeyInfoService} from "../../service/crypto/getGpgKeyInfoService";
+import Keyring from '../../model/keyring';
+import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 import {v4 as uuidv4} from "uuid";
-import {readKeyOrFail} from "../../utils/openpgp/openpgpAssertions";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 const keyring = new Keyring();
 
@@ -37,7 +37,7 @@ describe("GetUserKeyInfocontroller", () => {
     const controller = new GetUserKeyInfoController();
     const keyInfo = await controller.exec(userId);
 
-    const adaPublicKey = await readKeyOrFail(pgpKeys.ada.public);
+    const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
     const adaKeyInfo = await GetGpgKeyInfoService.getKeyInfo(adaPublicKey);
     expect(keyInfo.toDto()).toStrictEqual(adaKeyInfo.toDto());
   });

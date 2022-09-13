@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {PermissionChangesCollection} from "./permissionChangesCollection";
-import {EntitySchema} from "../../abstract/entitySchema";
-import {PermissionEntity} from "../permissionEntity";
-import {PermissionsCollection} from "../permissionsCollection";
+import PermissionChangesCollection from "./permissionChangesCollection";
+import EntitySchema from "../../abstract/entitySchema";
+import PermissionEntity from "../permissionEntity";
+import PermissionsCollection from "../permissionsCollection";
 
 describe("PermissionChangesCollection", () => {
   it("schema must validate", () => {

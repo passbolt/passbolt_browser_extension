@@ -4,6 +4,25 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.7.2] - 2022-09-13
+### Fixed
+- PB-17158: As LU I want to see an entropy at 0 when the typed passphrase is exposed in a data breach
+- PB-18370: As LU I want to see the user settings yubikey form matching the common form style
+- PB-18417: As AN I want to see the server key change error with the proper design
+- PB-17154: As AD I want to see the input field in user directory UI with the proper design
+
+### Maintenance
+- PB-17720: As AD I wish the account recovery setting page not to refresh infinitely
+- PB-18498: As a developer I wish to build the background page in manifest version 2 with webpack
+
+### Improved
+- PB-16898: As AN I want to the full list of supported browser if I'm not using one
+- PB-18495: As LU I want to see effective date as tooltip of calculated relative date
+- PB-17152: As LU for a first install with chrome, I wish to see the 'eye catcher' with a good contrast
+- PB-18659: As LU I want to be able to give to folder names up to 256 characters
+- PB-17062: As a developer I can customize and test new theme on storybook
+- PB-16946: As a developer I want to have a new theme in Storybook
+
 ## [3.7.1] - 2022-08-11
 ### Fixed
 - PB-18420 As AN completing the setup I should understand what information the account recovery feature will treat
@@ -914,7 +933,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.1...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.2...HEAD
+[3.7.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.1...v3.7.2
 [3.7.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.0...v3.7.1
 [3.7.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.6.2...v3.7.0
 [3.6.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.6.1...v3.6.2

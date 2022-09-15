@@ -13,13 +13,25 @@ import Worker from "../sdk/worker";
 /*
  * This page mod drives the quick access default popup
  */
-const QuickAccess = function() {
-  // The current active worker.
-  this._worker = null;
-};
+class QuickAccess {
+  constructor() {
+    // The current active worker.
+    this._worker = null;
+    this.handleOnConnect = this.handleOnConnect.bind(this);
+  }
 
-QuickAccess.init = function() {
-  chrome.runtime.onConnect.addListener(async function(port) {
+  /**
+   * Initialize the Quickaccess by listening to the onConnect event.
+   */
+  init() {
+    chrome.runtime.onConnect.addListener(this.handleOnConnect);
+  }
+
+  /**
+   * Handle port connection by listening to application events and register a new worker.
+   * @param {Port} port
+   */
+  async handleOnConnect(port) {
     if (port.name === "quickaccess") {
       this._worker = new Worker(port, port.sender.tab);
 
@@ -40,7 +52,7 @@ QuickAccess.init = function() {
       app.events.pagemod.listen(this._worker);
       WorkerModel.add('QuickAccess', this._worker);
     }
-  });
-};
+  }
+}
 
-export default QuickAccess;
+export default new QuickAccess();

@@ -13,8 +13,9 @@
  *
  * Background script for browser listener
  */
+import browser from 'webextension-polyfill';
+import OnExtensionInstalledController from "../../controller/extension/OnExtensionInstalledController";
 
-const {OnExtensionInstalledController} = require("../../controller/extension/OnExtensionInstalledController");
 /**
  * On installed the extension, add first install in the url tab of setup or recover
  */

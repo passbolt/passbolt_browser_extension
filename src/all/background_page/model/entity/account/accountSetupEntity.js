@@ -12,11 +12,11 @@
  * @since         3.6.0
  */
 
-const {AbstractAccountEntity} = require("./abstractAccountEntity");
-const {EntitySchema} = require('../abstract/entitySchema');
-const {AuthenticationTokenEntity} = require("../authenticationToken/authenticationTokenEntity");
-const {UserEntity} = require("../user/userEntity");
-const {AccountRecoveryUserSettingEntity} = require("../accountRecovery/accountRecoveryUserSettingEntity");
+import UserEntity from "../user/userEntity";
+import AbstractAccountEntity from "./abstractAccountEntity";
+import AuthenticationTokenEntity from "../authenticationToken/authenticationTokenEntity";
+import EntitySchema from "../abstract/entitySchema";
+import AccountRecoveryUserSettingEntity from "../accountRecovery/accountRecoveryUserSettingEntity";
 
 const ENTITY_NAME = "AccountSetup";
 const TYPE_ACCOUNT_SETUP = "account-setup";
@@ -242,4 +242,4 @@ class AccountSetupEntity extends AbstractAccountEntity {
   }
 }
 
-exports.AccountSetupEntity = AccountSetupEntity;
+export default AccountSetupEntity;

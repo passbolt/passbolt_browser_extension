@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {EntitySchema} from "./entitySchema";
-import {EntityValidationError} from './entityValidationError';
+import EntitySchema from "./entitySchema";
+import EntityValidationError from './entityValidationError';
 
 describe("Entity schema", () => {
   // Fixtures

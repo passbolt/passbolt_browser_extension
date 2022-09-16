@@ -10,9 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {ImportError} = require("../../../error/importError");
-const {ExternalFolderEntity} = require("../../entity/folder/external/externalFolderEntity");
-const {ExternalResourceEntity} = require("../../entity/resource/external/externalResourceEntity");
+import ExternalFolderEntity from "../../entity/folder/external/externalFolderEntity";
+import ExternalResourceEntity from "../../entity/resource/external/externalResourceEntity";
+import ImportError from "../../../error/importError";
+import * as kdbxweb from 'kdbxweb';
 
 class ResourcesKdbxImportParser {
   /**
@@ -171,4 +172,4 @@ class ResourcesKdbxImportParser {
   }
 }
 
-exports.ResourcesKdbxImportParser = ResourcesKdbxImportParser;
+export default ResourcesKdbxImportParser;

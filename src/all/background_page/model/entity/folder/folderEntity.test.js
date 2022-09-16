@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {FolderEntity} from "./folderEntity";
-import {EntityValidationError} from "../abstract/entityValidationError";
-import {EntitySchema} from "../abstract/entitySchema";
-import {PermissionEntity} from "../permission/permissionEntity";
+import FolderEntity from "./folderEntity";
+import EntityValidationError from "../abstract/entityValidationError";
+import EntitySchema from "../abstract/entitySchema";
+import PermissionEntity from "../permission/permissionEntity";
 
 describe("Folder entity", () => {
   it("schema must validate", () => {
@@ -112,7 +112,7 @@ describe("Folder entity", () => {
       expect(error.hasError('name', 'minLength')).toBe(true);
     }
     try {
-      new FolderEntity({'name': Array(257).join("ツ")});
+      new FolderEntity({'name': Array(258).join("ツ")});
       expect(false).toBe(true);
     } catch (error) {
       expect((error instanceof EntityValidationError)).toBe(true);

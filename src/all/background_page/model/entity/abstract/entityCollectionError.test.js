@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {EntityCollectionError} from "./entityCollectionError";
+import EntityCollectionError from "./entityCollectionError";
 
 describe("EntityCollectionError", () => {
   it("constructor throw exception if position is empty", () => {

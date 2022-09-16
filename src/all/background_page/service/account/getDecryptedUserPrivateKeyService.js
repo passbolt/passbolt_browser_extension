@@ -12,9 +12,10 @@
  * @since         3.6.0
  */
 
-const {Keyring} = require("../../model/keyring");
-const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
-const {DecryptPrivateKeyService} = require("../crypto/decryptPrivateKeyService");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
+
 
 class GetDecryptedUserPrivateKeyService {
   /**
@@ -29,9 +30,9 @@ class GetDecryptedUserPrivateKeyService {
     if (!userPrivateArmoredKey) {
       throw new Error("Can't find current user's private key.");
     }
-    const key = await readKeyOrFail(userPrivateArmoredKey);
+    const key = await OpenpgpAssertion.readKeyOrFail(userPrivateArmoredKey);
     return DecryptPrivateKeyService.decrypt(key, passphrase);
   }
 }
 
-exports.GetDecryptedUserPrivateKeyService = GetDecryptedUserPrivateKeyService;
+export default GetDecryptedUserPrivateKeyService;

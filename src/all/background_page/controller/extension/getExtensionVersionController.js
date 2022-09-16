@@ -48,4 +48,4 @@ class GetExtensionVersionController {
   }
 }
 
-exports.GetExtensionVersionController = GetExtensionVersionController;
+export default GetExtensionVersionController;

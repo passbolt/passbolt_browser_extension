@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import {ExternalResourceEntity} from "../../../entity/resource/external/externalResourceEntity";
-import {CsvKdbxRowParser} from "./csvKdbxRowParser";
+import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
+import CsvKdbxRowParser from "./csvKdbxRowParser";
 
 describe("CsvKdbxRowParser", () => {
   it("can parse kdbx csv", () => {

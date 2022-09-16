@@ -48,4 +48,4 @@ class IsExtensionFirstInstallController {
   }
 }
 
-exports.IsExtensionFirstInstallController = IsExtensionFirstInstallController;
+export default IsExtensionFirstInstallController;

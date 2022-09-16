@@ -12,11 +12,12 @@
  * @since         3.6.0
  */
 
-const app = require("../../app");
-const {SetupModel} = require("../../model/setup/setupModel");
-const {AccountModel} = require("../../model/account/accountModel");
-const {AccountEntity} = require("../../model/entity/account/accountEntity");
-const {AccountRecoverEntity} = require("../../model/entity/account/accountRecoverEntity");
+import AccountModel from "../../model/account/accountModel";
+import {App as app} from "../../app";
+import SetupModel from "../../model/setup/setupModel";
+import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
+import AccountEntity from "../../model/entity/account/accountEntity";
+
 
 class CompleteRecoverController {
   /**
@@ -69,4 +70,4 @@ class CompleteRecoverController {
   }
 }
 
-exports.CompleteRecoverController = CompleteRecoverController;
+export default CompleteRecoverController;

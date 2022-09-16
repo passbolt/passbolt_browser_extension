@@ -12,9 +12,9 @@
  * @since         3.6.0
  */
 
-import {EntitySchema} from "../abstract/entitySchema";
-import {EntityValidationError} from "../abstract/entityValidationError";
-import {AccountRecoveryResponseEntity} from "./accountRecoveryResponseEntity";
+import EntitySchema from "../abstract/entitySchema";
+import EntityValidationError from "../abstract/entityValidationError";
+import AccountRecoveryResponseEntity from "./accountRecoveryResponseEntity";
 import {AccountRecoveryRequestEntityTestData} from "./accountRecoveryResponseEntity.test.data";
 import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
 

@@ -14,15 +14,15 @@
 
 import {v4 as uuidv4} from "uuid";
 import {enableFetchMocks} from "jest-fetch-mock";
-import {AccountRecoverySaveOrganizationPolicyController} from "./accountRecoverySaveOrganizationPolicyController";
+import AccountRecoverySaveOrganizationPolicyController from "./accountRecoverySaveOrganizationPolicyController";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
-import PassphraseController from "../passphrase/passphraseController";
-import {EntityValidationError} from "../../model/entity/abstract/entityValidationError";
-import {AccountRecoveryOrganizationPolicyEntity} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
+import {PassphraseController} from "../passphrase/passphraseController";
+import EntityValidationError from "../../model/entity/abstract/entityValidationError";
+import AccountRecoveryOrganizationPolicyEntity from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {MockExtension} from "../../../../../test/mocks/mockExtension";
-import {DecryptMessageService} from "../../service/crypto/decryptMessageService";
+import MockExtension from "../../../../../test/mocks/mockExtension";
+import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import {
   createEnabledAccountRecoveryOrganizationPolicyDto,
   disabledAccountRecoveryOrganizationPolicyDto,
@@ -36,19 +36,13 @@ import {
   defaultAccountRecoveryPrivateKeyPasswordDto,
   secretSubstitutionAttackAccountRecoveryPrivateKeyPasswordDto
 } from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity.test.data";
-import {AccountRecoveryPrivateKeyPasswordDecryptedDataEntity} from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
-import {readAllKeysOrFail, readKeyOrFail, readMessageOrFail} from "../../utils/openpgp/openpgpAssertions";
-import {AccountEntity} from "../../model/entity/account/accountEntity";
+import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
+import AccountEntity from "../../model/entity/account/accountEntity";
 import {adminAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 jest.mock("../passphrase/passphraseController.js");
-jest.mock("../../service/progress/progressService", () => ({
-  ProgressService: jest.fn().mockImplementation(() => ({
-    start: jest.fn(),
-    finishStep: jest.fn(),
-    close: jest.fn()
-  }))
-}));
+jest.mock("../../service/progress/progressService");
 
 beforeEach(() => {
   enableFetchMocks();
@@ -221,14 +215,14 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
       expect(apiResponse.privateKeyPasswords.length).toBe(existingPrivateKeyPasswords.length);
 
       const privateKeyPasswords = apiResponse.privateKeyPasswords.items;
-      const decryptionKey = await readKeyOrFail(pgpKeys.account_recovery_organization_alternative.private_decrypted);
+      const decryptionKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.account_recovery_organization_alternative.private_decrypted);
       const expectedFingerprint = pgpKeys.account_recovery_organization_alternative.fingerprint.toUpperCase();
 
-      const verificationKeys = await readAllKeysOrFail([pgpKeys.admin.public, pgpKeys.account_recovery_organization.public]);
+      const verificationKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.admin.public, pgpKeys.account_recovery_organization.public]);
 
       // First password.
       expect(privateKeyPasswords[0].recipientFingerprint.toUpperCase()).toBe(expectedFingerprint);
-      const firstPasswordMessage = await readMessageOrFail(privateKeyPasswords[0].data);
+      const firstPasswordMessage = await OpenpgpAssertion.readMessageOrFail(privateKeyPasswords[0].data);
       const decryptedPassword1 = await DecryptMessageService.decrypt(firstPasswordMessage, decryptionKey, verificationKeys);
       const privateKeyPasswordDecryptedData1 = new AccountRecoveryPrivateKeyPasswordDecryptedDataEntity(JSON.parse(decryptedPassword1));
       expect(privateKeyPasswordDecryptedData1.type).toEqual("account-recovery-private-key-password-decrypted-data");
@@ -240,7 +234,7 @@ describe("AccountRecoverySaveOrganizationPolicyController", () => {
 
       // Second password.
       expect(privateKeyPasswords[1].recipientFingerprint.toUpperCase()).toBe(expectedFingerprint);
-      const secondPasswordMessage = await readMessageOrFail(privateKeyPasswords[1].data);
+      const secondPasswordMessage = await OpenpgpAssertion.readMessageOrFail(privateKeyPasswords[1].data);
       const decryptedPassword2 = await DecryptMessageService.decrypt(secondPasswordMessage, decryptionKey, verificationKeys);
       const privateKeyPasswordDecryptedData2 = new AccountRecoveryPrivateKeyPasswordDecryptedDataEntity(JSON.parse(decryptedPassword2));
       expect(privateKeyPasswordDecryptedData2.type).toEqual("account-recovery-private-key-password-decrypted-data");

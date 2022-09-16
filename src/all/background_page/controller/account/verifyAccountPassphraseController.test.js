@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {VerifyAccountPassphraseController} from "./verifyAccountPassphraseController";
-import {InvalidMasterPasswordError} from "../../error/invalidMasterPasswordError";
-import {AccountEntity} from "../../model/entity/account/accountEntity";
+import VerifyAccountPassphraseController from "./verifyAccountPassphraseController";
+import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
+import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 

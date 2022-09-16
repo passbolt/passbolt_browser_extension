@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {GroupUserEntity} from "./groupUserEntity";
+import GroupUserEntity from "./groupUserEntity";
 import {GroupUserEntityFixtures} from "./groupUserEntity.test.fixtures";
-import {EntitySchema} from "../abstract/entitySchema";
+import EntitySchema from "../abstract/entitySchema";
 
 describe("Group user entity", () => {
   it("schema must validate", () => {

@@ -11,11 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const {EntityCollection} = require('../abstract/entityCollection');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {EntityCollectionError} = require('../abstract/entityCollectionError');
-const {GroupEntity} = require('./groupEntity');
-const {deduplicateObjects} = require("../../../utils/array/deduplicateObjects");
+import GroupEntity from "./groupEntity";
+import EntityCollection from "../abstract/entityCollection";
+import EntitySchema from "../abstract/entitySchema";
+import EntityCollectionError from "../abstract/entityCollectionError";
+import deduplicateObjects from "../../../utils/array/deduplicateObjects";
+
 
 const ENTITY_NAME = 'Groups';
 
@@ -241,4 +242,4 @@ class GroupsCollection extends EntityCollection {
   }
 }
 
-exports.GroupsCollection = GroupsCollection;
+export default GroupsCollection;

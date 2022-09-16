@@ -13,18 +13,18 @@
 window.PapaParse = require("papaparse");
 import fs from "fs";
 
-import {FileFormatError} from "../../../error/fileFormatError";
-import {ResourcesCsvImportParser} from "./resourcesCsvImportParser";
+import FileFormatError from "../../../error/fileFormatError";
+import ResourcesCsvImportParser from "./resourcesCsvImportParser";
 
-import {Csv1PasswordRowParser} from "./csvRowParser/csv1PasswordRowParser";
-import {CsvKdbxRowParser} from "./csvRowParser/csvKdbxRowParser";
-import {CsvLastPassRowParser} from "./csvRowParser/csvLastPassRowParser";
+import Csv1PasswordRowParser from "./csvRowParser/csv1PasswordRowParser";
+import CsvKdbxRowParser from "./csvRowParser/csvKdbxRowParser";
+import CsvLastPassRowParser from "./csvRowParser/csvLastPassRowParser";
 
-import {ExternalResourceEntity} from "../../entity/resource/external/externalResourceEntity";
-import {ImportResourcesFileEntity} from "../../entity/import/importResourcesFileEntity";
-import {EntityValidationError} from "../../entity/abstract/entityValidationError";
-import {ImportError} from "../../../error/importError";
-import {BinaryConvert} from "../../../utils/format/binaryConvert";
+import ExternalResourceEntity from "../../entity/resource/external/externalResourceEntity";
+import ImportResourcesFileEntity from "../../entity/import/importResourcesFileEntity";
+import EntityValidationError from "../../entity/abstract/entityValidationError";
+import ImportError from "../../../error/importError";
+import BinaryConvert from "../../../utils/format/binaryConvert";
 
 describe("ResourcesCsvImportParser", () => {
   it("should be aware of the supported row parsers", () => {
@@ -226,7 +226,7 @@ describe("ResourcesCsvImportParser", () => {
   });
 
   it("should catch and keep a reference of import folder entity validation error", async() => {
-    const path = "too-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-name";
+    const path = "too-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-name";
     const csv = "Title,Username,URL,Password,Notes,Group\n" +
       `,,,,,${path}\n`;
     const importDto = {

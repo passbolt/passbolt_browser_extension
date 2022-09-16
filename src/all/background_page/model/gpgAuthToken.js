@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-const Uuid = require('../utils/uuid');
+import {Uuid} from "../utils/uuid";
+import Validator from "validator";
 
 class GpgAuthToken {
   /**
@@ -70,4 +71,4 @@ class GpgAuthToken {
   }
 }
 
-exports.GpgAuthToken = GpgAuthToken;
+export default GpgAuthToken;

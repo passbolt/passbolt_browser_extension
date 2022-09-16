@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.3.0
  */
-import {ResourceInProgressCacheService} from "./resourceInProgressCache.service";
-const {ExternalResourceEntity} = require("../../model/entity/resource/external/externalResourceEntity");
+import ResourceInProgressCacheService from "./resourceInProgressCache.service";
+import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
 
 jest.useFakeTimers();
 

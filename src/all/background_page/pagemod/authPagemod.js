@@ -6,10 +6,10 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {PageMod} = require('../sdk/page-mod');
-const app = require('../app');
-const Worker = require('../model/worker');
-const {GetLegacyAccountService} = require("../service/account/getLegacyAccountService");
+import {Worker} from "../model/worker";
+import GetLegacyAccountService from "../service/account/getLegacyAccountService";
+import {App as app} from "../app";
+import PageMod from "../sdk/page-mod";
 
 const Auth = function() {};
 Auth._pageMod = undefined;
@@ -64,4 +64,4 @@ Auth.init = function() {
     }
   });
 };
-exports.Auth = Auth;
+export default Auth;

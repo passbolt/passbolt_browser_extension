@@ -11,8 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.6
  */
-const {ResourceTypeModel} = require("../model/resourceType/resourceTypeModel");
-const {User} = require('../model/user');
+import User from "../model/user";
+import ResourceTypeModel from "../model/resourceType/resourceTypeModel";
+
 
 const listen = function(worker) {
   /*
@@ -33,4 +34,4 @@ const listen = function(worker) {
   });
 };
 
-exports.listen = listen;
+export const ResourceTypeEvents = {listen};

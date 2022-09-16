@@ -12,7 +12,6 @@
 const open = function(url) {
   chrome.tabs.create({url: url});
 };
-exports.open = open;
 
 /**
  * Get the active tab url.
@@ -25,7 +24,6 @@ const getActiveTabUrl = function() {
     });
   });
 };
-exports.getActiveTabUrl = getActiveTabUrl;
 
 /**
  * Set the active tab url.
@@ -48,4 +46,5 @@ const setActiveTabUrl = function(url) {
     });
   }
 };
-exports.setActiveTabUrl = setActiveTabUrl;
+
+export const TabController = {open, getActiveTabUrl, setActiveTabUrl};

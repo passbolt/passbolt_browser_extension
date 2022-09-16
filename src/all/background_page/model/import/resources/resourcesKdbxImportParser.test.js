@@ -15,12 +15,10 @@
  */
 import fs from "fs";
 import * as kdbxweb from "kdbxweb";
-import {ResourcesKdbxImportParser} from "./resourcesKdbxImportParser";
-import {ImportResourcesFileEntity} from "../../entity/import/importResourcesFileEntity";
-import {EntityValidationError} from "../../entity/abstract/entityValidationError";
-import {ImportError} from "../../../error/importError";
-
-global.kdbxweb = kdbxweb;
+import ResourcesKdbxImportParser from "./resourcesKdbxImportParser";
+import ImportResourcesFileEntity from "../../entity/import/importResourcesFileEntity";
+import EntityValidationError from "../../entity/abstract/entityValidationError";
+import ImportError from "../../../error/importError";
 
 describe("ResourcesKdbxImportParser", () => {
   it("should read import file", async() => {
@@ -201,7 +199,7 @@ describe("ResourcesKdbxImportParser", () => {
     expect(error).toBeInstanceOf(ImportError);
     expect(error.sourceError).toBeInstanceOf(EntityValidationError);
     expect(error.sourceError.details).toHaveProperty("name");
-    expect(error.data.name).toEqual("too-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-name");
+    expect(error.data.name).toEqual("too-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-nametoo-long-folder-name-too-long-folder-name-too-long-folder-name-too-long-folder-name");
 
     // Assert resources errors
     expect(importEntity.importResourcesErrors).toHaveLength(1);

@@ -12,9 +12,11 @@
  * @since         3.6.0
  */
 
-const {GetGpgKeyInfoService} = require("./getGpgKeyInfoService");
-const {ExternalGpgKeyEntity} = require('./../../model/entity/gpgkey/external/externalGpgKeyEntity');
-const {ExternalGpgKeyCollection} = require("../../model/entity/gpgkey/external/externalGpgKeyCollection");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import ExternalGpgKeyEntity from "./../../model/entity/gpgkey/external/externalGpgKeyEntity";
+import GetGpgKeyInfoService from "./getGpgKeyInfoService";
+import ExternalGpgKeyCollection from "../../model/entity/gpgkey/external/externalGpgKeyCollection";
+
 const {
   validKeyDto,
   expiredKeyDto,
@@ -31,13 +33,13 @@ const {
   ecc_brainpoolp512r1KeyDto,
   invalidKeyDto
 } = require('./getGpgKeyInfoService.test.data');
-const {readKeyOrFail} = require("../../utils/openpgp/openpgpAssertions");
 const {pgpKeys} = require("../../../../../test/fixtures/pgpKeys/keys");
+
 
 describe("GpgKeyInfo service", () => {
   it(`should provide the right information given a key from a compatible type`, async() => {
     const dto = validKeyDto();
-    const key = await readKeyOrFail(dto.armored_key);
+    const key = await OpenpgpAssertion.readKeyOrFail(dto.armored_key);
 
     //avoid issues where parsing a key actually change the resulting armor (embed data are still the same though)
     expect.assertions(1);
@@ -83,7 +85,7 @@ describe("GpgKeyInfo service", () => {
   it("should give the information of a key that will expire", async() => {
     expect.assertions(1);
     const dto = validKeyWithExpirationDateDto();
-    const armoredKey = await readKeyOrFail(dto.armored_key);
+    const armoredKey = await OpenpgpAssertion.readKeyOrFail(dto.armored_key);
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(armoredKey);
     const keyInfoDto = keyInfo.toDto();
     delete dto.armored_key;
@@ -94,7 +96,7 @@ describe("GpgKeyInfo service", () => {
   it("should give the information of a key that is expired", async() => {
     expect.assertions(1);
     const dto = expiredKeyDto();
-    const key = await readKeyOrFail(dto.armored_key);
+    const key = await OpenpgpAssertion.readKeyOrFail(dto.armored_key);
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(key);
     const keyInfoDto = keyInfo.toDto();
     delete dto.armored_key;
@@ -105,7 +107,7 @@ describe("GpgKeyInfo service", () => {
   it("should give the information of a key that is revoked", async() => {
     expect.assertions(1);
     const dto = revokedKeyDto();
-    const key = await readKeyOrFail(dto.armored_key);
+    const key = await OpenpgpAssertion.readKeyOrFail(dto.armored_key);
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(key);
     const keyInfoDto = keyInfo.toDto();
     delete dto.armored_key;
@@ -129,7 +131,7 @@ describe("GpgKeyInfo service", () => {
 
     for (let i = 0; i < scenarios.length; i++) {
       const dto = scenarios[i];
-      const key = await readKeyOrFail(dto.armored_key);
+      const key = await OpenpgpAssertion.readKeyOrFail(dto.armored_key);
       const keyInfo = await GetGpgKeyInfoService.getKeyInfo(key);
       const keyInfoDto = keyInfo.toDto();
 
@@ -142,7 +144,7 @@ describe("GpgKeyInfo service", () => {
 
   it("should accept keys with a null expiry date", async() => {
     const dto = invalidKeyDto();
-    const key = await readKeyOrFail(dto.armored_key);
+    const key = await OpenpgpAssertion.readKeyOrFail(dto.armored_key);
     const keyInfo = await GetGpgKeyInfoService.getKeyInfo(key);
     const keyInfoDto = keyInfo.toDto();
     //Remove the armored_key as OpenpgpJS produced different armors than gpg cli.

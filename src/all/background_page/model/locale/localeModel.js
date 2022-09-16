@@ -11,12 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-const {AccountSettingsService} = require("../../service/api/accountSettings/accountSettingsService");
-const Config = require('../config');
-const {i18n} = require("../../sdk/i18n");
-const {LocalesCollection} = require("../entity/locale/localesCollection");
-const {LocaleEntity} = require("../entity/locale/localeEntity");
-const {OrganizationSettingsModel} = require("../organizationSettings/organizationSettingsModel");
+import OrganizationSettingsModel from "../organizationSettings/organizationSettingsModel";
+import AccountSettingsService from "../../service/api/accountSettings/accountSettingsService";
+import {Config} from "../config";
+import i18n from "../../sdk/i18n";
+import LocaleEntity from "../entity/locale/localeEntity";
+import LocalesCollection from "../entity/locale/localesCollection";
+
 
 class LocaleModel {
   /**
@@ -133,4 +134,4 @@ class LocaleModel {
   }
 }
 
-exports.LocaleModel = LocaleModel;
+export default LocaleModel;

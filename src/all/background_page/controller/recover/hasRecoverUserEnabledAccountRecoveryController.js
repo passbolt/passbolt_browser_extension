@@ -48,4 +48,4 @@ class HasRecoverUserEnabledAccountRecoveryController {
   }
 }
 
-exports.HasRecoverUserEnabledAccountRecoveryController = HasRecoverUserEnabledAccountRecoveryController;
+export default HasRecoverUserEnabledAccountRecoveryController;

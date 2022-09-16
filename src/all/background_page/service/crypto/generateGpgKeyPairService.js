@@ -12,7 +12,8 @@
  * @since         3.6.0
  */
 
-const {ExternalGpgKeyPairEntity} = require('../../model/entity/gpgkey/external/externalGpgKeyPairEntity');
+import ExternalGpgKeyPairEntity from "../../model/entity/gpgkey/external/externalGpgKeyPairEntity";
+import * as openpgp from 'openpgp';
 
 class GenerateGpgKeyPairService {
   /**
@@ -32,4 +33,4 @@ class GenerateGpgKeyPairService {
   }
 }
 
-exports.GenerateGpgKeyPairService = GenerateGpgKeyPairService;
+export default GenerateGpgKeyPairService;

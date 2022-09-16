@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import {GroupUserChangeEntity} from "./groupUserChangeEntity";
-import {GroupUserEntity} from "../groupUserEntity";
+import GroupUserChangeEntity from "./groupUserChangeEntity";
+import GroupUserEntity from "../groupUserEntity";
 
 describe("Group user change entity", () => {
   it("constructor works if valid minimal DTO is provided", () => {

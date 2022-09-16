@@ -14,8 +14,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {SubscriptionController} = require("../controller/subscription/subscriptionController");
-const {User} = require('../model/user');
+import SubscriptionController from "../controller/subscription/subscriptionController";
+import User from "../model/user";
 
 const listen = function(worker) {
   /*
@@ -52,4 +52,4 @@ const listen = function(worker) {
     }
   });
 };
-exports.listen = listen;
+export const SubscriptionEvents = {listen};

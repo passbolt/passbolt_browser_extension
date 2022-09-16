@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-const {IsExtensionFirstInstallController} = require("./isExtensionFirstInstallController");
+import IsExtensionFirstInstallController from "./isExtensionFirstInstallController";
 
 describe("IsExtensionFirstInstallController", () => {
   describe("IsExtensionFirstInstallController::exec", () => {

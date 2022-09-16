@@ -11,22 +11,22 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {i18n} = require('../../sdk/i18n');
-const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
-const {AccountRecoveryPrivateKeyPasswordEntity} = require("../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity");
-const {AccountRecoveryOrganizationPolicyEntity} = require("../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity");
-const {AccountRecoveryOrganizationPolicyChangeEntity} = require("../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyChangeEntity");
-const {PrivateGpgkeyEntity} = require("../../model/entity/gpgkey/privateGpgkeyEntity");
-const {AccountRecoveryPrivateKeyPasswordsCollection} = require("../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordsCollection");
-const {Keyring} = require("../../model/keyring");
-const {ProgressService} = require("../../service/progress/progressService");
-const {DecryptPrivateKeyService} = require('../../service/crypto/decryptPrivateKeyService');
-const {SignGpgKeyService} = require('../../service/crypto/signGpgKeyService');
-const {RevokeGpgKeyService} = require('../../service/crypto/revokeGpgKeyService');
-const PassphraseController = require("../../controller/passphrase/passphraseController");
-const {DecryptPrivateKeyPasswordDataService} = require("../../service/accountRecovery/decryptPrivateKeyPasswordDataService");
-const {EncryptMessageService} = require("../../service/crypto/encryptMessageService");
-const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import EncryptMessageService from "../../service/crypto/encryptMessageService";
+import AccountRecoveryOrganizationPolicyEntity from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
+import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
+import AccountRecoveryOrganizationPolicyChangeEntity from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyChangeEntity";
+import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
+import SignGpgKeyService from "../../service/crypto/signGpgKeyService";
+import RevokeGpgKeyService from "../../service/crypto/revokeGpgKeyService";
+import {PassphraseController} from "../passphrase/passphraseController";
+import DecryptPrivateKeyPasswordDataService from "../../service/accountRecovery/decryptPrivateKeyPasswordDataService";
+import i18n from "../../sdk/i18n";
+import AccountRecoveryPrivateKeyPasswordEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity";
+import AccountRecoveryPrivateKeyPasswordsCollection from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordsCollection";
+import PrivateGpgkeyEntity from "../../model/entity/gpgkey/privateGpgkeyEntity";
+import ProgressService from "../../service/progress/progressService";
 
 /**
  * Controller related to the account recovery save settings
@@ -80,12 +80,12 @@ class AccountRecoverySaveOrganizationPolicyController {
     const hasNewOrganizationKey = Boolean(organizationPolicyChanges.accountRecoveryOrganizationPublicKey);
     const hasToRevokeCurrentOrganizationKey = this._hasToRevokedCurrentORK(organizationPolicyChanges, currentOrganizationPolicy);
 
-    const newOrganizationPublicKey = hasNewOrganizationKey ? await readKeyOrFail(organizationPolicyChanges.accountRecoveryOrganizationPublicKey.armoredKey) : null;
+    const newOrganizationPublicKey = hasNewOrganizationKey ? await OpenpgpAssertion.readKeyOrFail(organizationPolicyChanges.accountRecoveryOrganizationPublicKey.armoredKey) : null;
     const saveOrganizationPolicyDto = organizationPolicyChanges.toDto({account_recovery_organization_public_key: true});
     saveOrganizationPolicyDto.policy = saveOrganizationPolicyDto.policy || currentOrganizationPolicy.policy;
 
     const signedInUserPrivateArmoredKey = this.keyring.findPrivate().armoredKey;
-    const signedInUserPrivateKey = await readKeyOrFail(signedInUserPrivateArmoredKey);
+    const signedInUserPrivateKey = await OpenpgpAssertion.readKeyOrFail(signedInUserPrivateArmoredKey);
     const signedInUserDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(signedInUserPrivateKey, userPassphrase);
 
     if (hasNewOrganizationKey) {
@@ -97,7 +97,7 @@ class AccountRecoverySaveOrganizationPolicyController {
     }
 
     if (hasToRevokeCurrentOrganizationKey) {
-      const organizationPrivateKey = await readKeyOrFail(organizationPrivateKeyEntity.armoredKey);
+      const organizationPrivateKey = await OpenpgpAssertion.readKeyOrFail(organizationPrivateKeyEntity.armoredKey);
       const decryptedOrganizationPrivateKey = await DecryptPrivateKeyService.decrypt(organizationPrivateKey, organizationPrivateKeyEntity.passphrase);
       const revokedPublicKey = await RevokeGpgKeyService.revoke(decryptedOrganizationPrivateKey);
       saveOrganizationPolicyDto.account_recovery_organization_revoked_key = {
@@ -203,4 +203,4 @@ class AccountRecoverySaveOrganizationPolicyController {
   }
 }
 
-exports.AccountRecoverySaveOrganizationPolicyController = AccountRecoverySaveOrganizationPolicyController;
+export default AccountRecoverySaveOrganizationPolicyController;

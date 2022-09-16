@@ -10,9 +10,9 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import {EntitySchema} from "../abstract/entitySchema";
-import {EntityValidationError} from "../abstract/entityValidationError";
-import {SecurityTokenEntity} from "./securityTokenEntity";
+import EntitySchema from "../abstract/entitySchema";
+import EntityValidationError from "../abstract/entityValidationError";
+import SecurityTokenEntity from "./securityTokenEntity";
 
 describe("SecurityToken entity", () => {
   it("schema must validate", () => {

@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-const i18next = require('i18next');
-const HttpApi = require('i18next-http-backend');
+import i18next from "i18next";
+import HttpApi from "i18next-http-backend";
 
 /**
  * The instance of the I18next library.
@@ -65,4 +65,4 @@ class I18n {
   }
 }
 
-exports.i18n = I18n;
+export default I18n;

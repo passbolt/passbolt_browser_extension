@@ -64,4 +64,4 @@ class AuthenticationEventController {
 }
 
 
-exports.AuthenticationEventController = AuthenticationEventController;
+export default AuthenticationEventController;

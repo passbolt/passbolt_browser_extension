@@ -12,7 +12,7 @@
  * @since         3.2.0
  */
 
-const {LocaleModel} = require("../../model/locale/localeModel");
+import LocaleModel from "../../model/locale/localeModel";
 
 class SetSetupLocaleController {
   /**
@@ -60,4 +60,4 @@ class SetSetupLocaleController {
   }
 }
 
-exports.SetSetupLocaleController = SetSetupLocaleController;
+export default SetSetupLocaleController;

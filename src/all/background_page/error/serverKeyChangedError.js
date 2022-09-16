@@ -12,4 +12,4 @@ class ServerKeyChangedError extends Error {
   }
 }
 
-exports.ServerKeyChangedError = ServerKeyChangedError;
+export default ServerKeyChangedError;

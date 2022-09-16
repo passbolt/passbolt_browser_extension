@@ -11,19 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-import MockStorage from "../../sdk/storage.test.mock";
-
-window.XRegExp = require("xregexp");
 import {v4 as uuidv4} from 'uuid';
-import {AccountLocalStorage} from "./accountLocalStorage";
+import AccountLocalStorage from "./accountLocalStorage";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {AccountEntity} from "../../model/entity/account/accountEntity";
-
-// Reset the modules before each test.
-beforeEach(() => {
-  window.browser = Object.assign({}, {storage: new MockStorage()}); // Required by local storage
-});
+import AccountEntity from "../../model/entity/account/accountEntity";
+import browser from "webextension-polyfill";
 
 describe("AccountLocalStorage", () => {
   describe("AccountLocalStorage::get", () => {
@@ -36,7 +28,6 @@ describe("AccountLocalStorage", () => {
     it("Should return content stored in the local storage", async() => {
       const accounts = [defaultAccountDto()];
       browser.storage.local.set({[AccountLocalStorage.ACCOUNTS_LOCAL_STORAGE_KEY]: accounts});
-
       expect.assertions(1);
       const result = await AccountLocalStorage.get();
       expect(result).toEqual(accounts);

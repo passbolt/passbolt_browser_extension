@@ -13,25 +13,8 @@
  */
 import each from "jest-each";
 import {pgpKeys} from '../../../../../test/fixtures/pgpKeys/keys';
-import {ValidatePrivateGpgKeySetupController} from './validatePrivateGpgKeySetupController';
-
-//Used to toggle between a mocked service or the real one
-let mockKeyInfoService = false;
-const mockedKeyInfo = jest.fn();
-jest.mock('../../service/crypto/getGpgKeyInfoService', () => {
-  const {GetGpgKeyInfoService} = jest.requireActual('../../service/crypto/getGpgKeyInfoService');
-
-  return {
-    GetGpgKeyInfoService: {
-      getKeyInfo: key => {
-        if (mockKeyInfoService) {
-          return mockedKeyInfo();
-        }
-        return GetGpgKeyInfoService.getKeyInfo(key);
-      }
-    }
-  };
-});
+import ValidatePrivateGpgKeySetupController from './validatePrivateGpgKeySetupController';
+import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 
 describe("ValidatePrivateGpgKeySetupController", () => {
   each([
@@ -125,8 +108,7 @@ describe("ValidatePrivateGpgKeySetupController", () => {
 
   it(`Should throw if the private key is not an RSA and has no curve associated`, async() => {
     expect.assertions(1);
-    mockKeyInfoService = true;
-    mockedKeyInfo.mockResolvedValue({
+    const keyInfo = {
       revoked: false,
       isExpired: false,
       expires: "Infinity",
@@ -134,7 +116,8 @@ describe("ValidatePrivateGpgKeySetupController", () => {
       algorithm: "EdDSA",
       curve: null,
       isValid: true
-    });
+    };
+    jest.spyOn(GetGpgKeyInfoService, "getKeyInfo").mockImplementation(() => keyInfo);
     const dummyKey = pgpKeys.ada.private;
     const controller = new ValidatePrivateGpgKeySetupController();
     await expect(controller.exec(dummyKey)).rejects.toStrictEqual(new Error("The private key should use a supported algorithm: RSA, ECDSA OR EDDSA."));
@@ -142,8 +125,7 @@ describe("ValidatePrivateGpgKeySetupController", () => {
 
   it("Should throw if the private key is not an ECC with an unsupported curve", async() => {
     expect.assertions(1);
-    mockKeyInfoService = true;
-    mockedKeyInfo.mockResolvedValue({
+    const keyInfo = {
       revoked: false,
       isExpired: false,
       expires: "Infinity",
@@ -151,7 +133,8 @@ describe("ValidatePrivateGpgKeySetupController", () => {
       algorithm: "EdDSA",
       curve: "custom-curve",
       isValid: true
-    });
+    };
+    jest.spyOn(GetGpgKeyInfoService, "getKeyInfo").mockImplementation(() => keyInfo);
     const dummyKey = pgpKeys.ada.private;
     const controller = new ValidatePrivateGpgKeySetupController();
     await expect(controller.exec(dummyKey)).rejects.toStrictEqual(new Error("An ECC key should be based on a supported curve."));

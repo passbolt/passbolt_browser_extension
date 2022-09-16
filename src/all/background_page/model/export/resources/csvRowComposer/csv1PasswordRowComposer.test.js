@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import {Csv1PasswordRowComposer} from "./csv1passwordRowComposer";
-import {ExternalResourceEntity} from "../../../entity/resource/external/externalResourceEntity";
+import Csv1PasswordRowComposer from "./csv1passwordRowComposer";
+import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
 
 describe("Csv1PasswordComposer", () => {
   it("can compose 1password csv row", () => {

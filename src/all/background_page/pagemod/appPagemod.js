@@ -4,12 +4,13 @@
  * @copyright (c) 2020 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const {PageMod} = require('../sdk/page-mod');
-const app = require('../app');
-const Worker = require('../model/worker');
-const {AppInitController} = require("../controller/app/appInitController");
-const {GetLegacyAccountService} = require("../service/account/getLegacyAccountService");
-const GpgAuth = require('../model/gpgauth').GpgAuth;
+import GpgAuth from "../model/gpgauth";
+import {Worker} from "../model/worker";
+import GetLegacyAccountService from "../service/account/getLegacyAccountService";
+import {App as app} from "../app";
+import PageMod from "../sdk/page-mod";
+import AppInitController from "../controller/app/appInitController";
+
 
 /*
  * This pagemod help bootstrap the passbolt application from a passbolt server app page
@@ -100,4 +101,4 @@ App.init = function() {
   });
 };
 
-exports.App = App;
+export const AppPagemod = App;

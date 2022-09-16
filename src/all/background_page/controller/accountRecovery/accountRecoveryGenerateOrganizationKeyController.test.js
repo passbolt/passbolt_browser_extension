@@ -12,9 +12,10 @@
  * @since         3.6.0
  */
 
-import {AccountRecoveryGenerateOrganizationKeyController} from "./accountRecoveryGenerateOrganizationKeyController";
-import {MockExtension} from "../../../../../test/mocks/mockExtension";
+import AccountRecoveryGenerateOrganizationKeyController from "./accountRecoveryGenerateOrganizationKeyController";
+import MockExtension from "../../../../../test/mocks/mockExtension";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import * as openpgp from 'openpgp';
 
 describe("AccountRecoveryGenerateOrganizationKeyController", () => {
   describe("AccountRecoveryGenerateOrganizationKeyController::exec", () => {

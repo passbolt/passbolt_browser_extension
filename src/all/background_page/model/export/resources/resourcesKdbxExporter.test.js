@@ -15,8 +15,8 @@
  */
 import * as kdbxweb from "kdbxweb";
 import argon2 from "./argon2.test-lib";
-import {ResourcesKdbxExporter} from "./resourcesKdbxExporter";
-import {ExportResourcesFileEntity} from "../../entity/export/exportResourcesFileEntity";
+import ResourcesKdbxExporter from "./resourcesKdbxExporter";
+import ExportResourcesFileEntity from "../../entity/export/exportResourcesFileEntity";
 import fs from "fs";
 
 global.kdbxweb = kdbxweb;

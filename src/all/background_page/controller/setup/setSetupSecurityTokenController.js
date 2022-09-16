@@ -11,8 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-const {SecurityTokenEntity} = require("../../model/entity/securityToken/securityTokenEntity");
+import SecurityTokenEntity from "../../model/entity/securityToken/securityTokenEntity";
 
 class SetSetupSecurityTokenController {
   /**
@@ -53,4 +52,4 @@ class SetSetupSecurityTokenController {
   }
 }
 
-exports.SetSetupSecurityTokenController = SetSetupSecurityTokenController;
+export default SetSetupSecurityTokenController;

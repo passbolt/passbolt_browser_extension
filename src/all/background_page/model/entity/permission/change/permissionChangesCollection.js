@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {EntityCollection} = require('../../abstract/entityCollection');
-const {EntitySchema} = require('../../abstract/entitySchema');
-const {PermissionChangeEntity} = require('./permissionChangeEntity');
-const {PermissionsCollection} = require('../permissionsCollection');
-const {PermissionEntity} = require('../permissionEntity');
+import PermissionEntity from "../permissionEntity";
+import PermissionsCollection from "../permissionsCollection";
+import PermissionChangeEntity from "./permissionChangeEntity";
+import EntityCollection from "../../abstract/entityCollection";
+import EntitySchema from "../../abstract/entitySchema";
 
 const ENTITY_NAME = 'PermissionChanges';
 
@@ -233,4 +233,4 @@ class PermissionChangesCollection extends EntityCollection {
   }
 }
 
-exports.PermissionChangesCollection = PermissionChangesCollection;
+export default PermissionChangesCollection;

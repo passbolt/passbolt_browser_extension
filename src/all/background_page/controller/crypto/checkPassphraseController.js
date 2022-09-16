@@ -12,9 +12,10 @@
  * @since         3.6.0
  */
 
-const {Keyring} = require('../../model/keyring');
-const {DecryptPrivateKeyService} = require('../../service/crypto/decryptPrivateKeyService');
-const {readKeyOrFail} = require('../../utils/openpgp/openpgpAssertions');
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import Keyring from "../../model/keyring";
+import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
+
 
 class CheckPassphraseController {
   /**
@@ -59,9 +60,9 @@ class CheckPassphraseController {
     if (!privateKey) {
       throw new Error('Private key not found.');
     }
-    const key = await readKeyOrFail(privateKey.armoredKey);
+    const key = await OpenpgpAssertion.readKeyOrFail(privateKey.armoredKey);
     await DecryptPrivateKeyService.decrypt(key, passphrase);
   }
 }
 
-exports.CheckPassphraseController = CheckPassphraseController;
+export default CheckPassphraseController;

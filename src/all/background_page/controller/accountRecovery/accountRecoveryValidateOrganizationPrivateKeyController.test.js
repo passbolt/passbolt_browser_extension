@@ -13,11 +13,11 @@
  */
 
 import {enableFetchMocks} from "jest-fetch-mock";
-import {AccountRecoveryValidateOrganizationPrivateKeyController} from "./accountRecoveryValidateOrganizationPrivateKeyController";
-import {EntityValidationError} from "../../model/entity/abstract/entityValidationError";
+import AccountRecoveryValidateOrganizationPrivateKeyController from "./accountRecoveryValidateOrganizationPrivateKeyController";
+import EntityValidationError from "../../model/entity/abstract/entityValidationError";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
-import {WrongOrganizationRecoveryKeyError} from "../../error/wrongOrganizationRecoveryKeyError";
+import WrongOrganizationRecoveryKeyError from "../../error/wrongOrganizationRecoveryKeyError";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 

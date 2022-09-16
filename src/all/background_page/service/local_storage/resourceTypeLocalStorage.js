@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const {Log} = require('../../model/log');
-const Lock = require('../../utils/lock').Lock;
+import browser from "webextension-polyfill";
+import Log from "../../model/log";
+import ResourceTypeEntity from "../../model/entity/resourceType/resourceTypeEntity";
+import ResourceTypesCollection from "../../model/entity/resourceType/resourceTypesCollection";
+import Lock from "../../utils/lock";
 const lock = new Lock();
-
-const {ResourceTypeEntity} = require('../../model/entity/resourceType/resourceTypeEntity');
-const {ResourceTypesCollection} = require("../../model/entity/resourceType/resourceTypesCollection");
 
 const RESOURCE_TYPES_LOCAL_STORAGE_KEY = 'resourceTypes';
 
@@ -132,4 +132,4 @@ class ResourceTypeLocalStorage {
   }
 }
 
-exports.ResourceTypeLocalStorage = ResourceTypeLocalStorage;
+export default ResourceTypeLocalStorage;

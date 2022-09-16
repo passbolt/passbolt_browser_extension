@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         v3.0.0
  */
-const {RolesCollection} = require('../entity/role/rolesCollection');
-const {RolesLocalStorage} = require('../../service/local_storage/rolesLocalStorage');
-const {RoleService} = require('../../service/api/role/roleService');
+import RolesLocalStorage from "../../service/local_storage/rolesLocalStorage";
+import RoleService from "../../service/api/role/roleService";
+import RolesCollection from "../entity/role/rolesCollection";
 
 class RoleModel {
   /**
@@ -53,4 +53,4 @@ class RoleModel {
   }
 }
 
-exports.RoleModel = RoleModel;
+export default RoleModel;

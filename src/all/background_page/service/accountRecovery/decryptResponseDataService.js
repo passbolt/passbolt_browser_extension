@@ -12,9 +12,10 @@
  * @since         3.6.0
  */
 
-const {AccountRecoveryPrivateKeyPasswordDecryptedDataEntity} = require("../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity");
-const {DecryptMessageService} = require("../../service/crypto/decryptMessageService");
-const {readMessageOrFail} = require("../../utils/openpgp/openpgpAssertions");
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import DecryptMessageService from "../../service/crypto/decryptMessageService";
+import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
+
 
 class DecryptResponseDataService {
   /**
@@ -33,7 +34,7 @@ class DecryptResponseDataService {
    */
   static async decrypt(response, decryptionKey, verificationUserId, verificationDomain, verificationUserPublicKey) {
     let privateKeyPasswordDecryptedDataDto;
-    const responseDataMessage = await readMessageOrFail(response.data);
+    const responseDataMessage = await OpenpgpAssertion.readMessageOrFail(response.data);
     const privateKeyPasswordDecryptedDataSerialized = await DecryptMessageService.decrypt(responseDataMessage, decryptionKey);
 
     try {
@@ -62,4 +63,4 @@ class DecryptResponseDataService {
   }
 }
 
-exports.DecryptResponseDataService = DecryptResponseDataService;
+export default DecryptResponseDataService;

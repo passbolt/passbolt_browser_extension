@@ -6,20 +6,32 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const app = require('../app');
-const {Worker} = require('../sdk/worker');
-const WorkerModel = require('../model/worker');
+import {Worker as WorkerModel} from "../model/worker";
+import {App as app} from "../app";
+import Worker from "../sdk/worker";
 
 /*
  * This page mod drives the quick access default popup
  */
-const QuickAccess = function() {
-  // The current active worker.
-  this._worker = null;
-};
+class QuickAccess {
+  constructor() {
+    // The current active worker.
+    this._worker = null;
+    this.handleOnConnect = this.handleOnConnect.bind(this);
+  }
 
-QuickAccess.init = function() {
-  chrome.runtime.onConnect.addListener(async function(port) {
+  /**
+   * Initialize the Quickaccess by listening to the onConnect event.
+   */
+  init() {
+    chrome.runtime.onConnect.addListener(this.handleOnConnect);
+  }
+
+  /**
+   * Handle port connection by listening to application events and register a new worker.
+   * @param {Port} port
+   */
+  async handleOnConnect(port) {
     if (port.name === "quickaccess") {
       this._worker = new Worker(port, port.sender.tab);
 
@@ -38,10 +50,9 @@ QuickAccess.init = function() {
 
       // Keep the pagemod event listeners at the end of the list.
       app.events.pagemod.listen(this._worker);
-
       WorkerModel.add('QuickAccess', this._worker);
     }
-  });
-};
+  }
+}
 
-exports.QuickAccess = QuickAccess;
+export default new QuickAccess();

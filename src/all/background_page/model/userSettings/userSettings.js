@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-const Config = require('../config');
+import {Config} from "../config";
+import Validator from "validator";
 
 /**
  * The class that deals with users settings
@@ -410,4 +411,4 @@ class UserSettings {
     return true;
   }
 }
-exports.UserSettings = UserSettings;
+export default UserSettings;

@@ -78,4 +78,4 @@ class EntityValidationError extends Error {
   }
 }
 
-exports.EntityValidationError = EntityValidationError;
+export default EntityValidationError;

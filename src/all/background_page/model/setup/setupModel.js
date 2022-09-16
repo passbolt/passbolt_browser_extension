@@ -10,10 +10,11 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {UserEntity} = require("../entity/user/userEntity");
-const {SetupService} = require("../../service/api/setup/setupService");
-const {UserService} = require("../../service/api/user/userService");
-const {AccountRecoveryOrganizationPolicyEntity} = require("../entity/accountRecovery/accountRecoveryOrganizationPolicyEntity");
+import AccountRecoveryOrganizationPolicyEntity from "../entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
+import UserService from "../../service/api/user/userService";
+import SetupService from "../../service/api/setup/setupService";
+import UserEntity from "../entity/user/userEntity";
+import Validator from "validator";
 
 class SetupModel {
   /**
@@ -147,4 +148,4 @@ class SetupModel {
   }
 }
 
-exports.SetupModel = SetupModel;
+export default SetupModel;

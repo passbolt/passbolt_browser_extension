@@ -11,9 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-const {Entity} = require('../../abstract/entity');
-const {EntitySchema} = require('../../abstract/entitySchema');
-const {b64ToBlob} = require("../../../../utils/format/base64");
+import Entity from "../../abstract/entity";
+import EntitySchema from "../../abstract/entitySchema";
+import b64ToBlob from "../../../../utils/format/base64";
+
 
 const ENTITY_NAME = 'AvatarUpdate';
 
@@ -131,4 +132,4 @@ class AvatarUpdateEntity extends Entity {
   }
 }
 
-exports.AvatarUpdateEntity = AvatarUpdateEntity;
+export default AvatarUpdateEntity;

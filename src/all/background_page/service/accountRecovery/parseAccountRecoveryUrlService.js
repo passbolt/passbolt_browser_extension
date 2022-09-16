@@ -44,4 +44,4 @@ class ParseAccountRecoveryUrlService {
   }
 }
 
-exports.ParseAccountRecoveryUrlService = ParseAccountRecoveryUrlService;
+export default ParseAccountRecoveryUrlService;

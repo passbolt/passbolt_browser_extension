@@ -58,4 +58,4 @@ class AbstractCsvRowParser {
   }
 }
 
-exports.AbstractCsvRowParser = AbstractCsvRowParser;
+export default AbstractCsvRowParser;

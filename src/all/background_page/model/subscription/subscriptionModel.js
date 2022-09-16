@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-const {PassboltSubscriptionError} = require("../../error/passboltSubscriptionError");
-const {SubscriptionEntity} = require("../entity/subscription/subscriptionEntity");
-const {SubscriptionService} = require("../../service/api/subscription/subscriptionService");
+import SubscriptionService from "../../service/api/subscription/subscriptionService";
+import SubscriptionEntity from "../entity/subscription/subscriptionEntity";
+import PassboltSubscriptionError from "../../error/passboltSubscriptionError";
 
 class SubscriptionModel {
   /**
@@ -78,4 +78,4 @@ class SubscriptionModel {
   }
 }
 
-exports.SubscriptionModel = SubscriptionModel;
+export default SubscriptionModel;

@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.2.0
  */
-import {AuthenticationTokenEntity} from "./authenticationTokenEntity";
-import {EntityValidationError} from "../abstract/entityValidationError";
-import {EntitySchema} from "../abstract/entitySchema";
+import AuthenticationTokenEntity from "./authenticationTokenEntity";
+import EntityValidationError from "../abstract/entityValidationError";
+import EntitySchema from "../abstract/entitySchema";
 
 describe("AuthenticationToken entity", () => {
   it("schema must validate", () => {

@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 
-const {PageMod} = require('../sdk/page-mod');
-const app = require('../app');
-const {BuildAccountSetupService} = require("../service/setup/buildAccountSetupService");
-const {BuildAccountApiClientOptionsService} = require("../service/account/buildApiClientOptionsService");
+import PageMod from "../sdk/page-mod";
+import {App as app} from "../app";
+import BuildAccountSetupService from "../service/setup/buildAccountSetupService";
+import BuildAccountApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 
 /*
  * This pagemod help bootstrap the first step of the setup process from a passbolt server app page
@@ -63,4 +63,4 @@ Setup.init = function() {
   });
 };
 
-exports.Setup = Setup;
+export default Setup;

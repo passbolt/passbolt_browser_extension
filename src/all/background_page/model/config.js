@@ -5,8 +5,9 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 
-const defaultConfig = require('../config/config.json');
-const _config = require('../config/config.json');
+import defaultConfig from '../config/config.json';
+import _config from '../config/config.json';
+import storage from "../sdk/storage";
 
 /**
  * Init the configuration.
@@ -30,7 +31,6 @@ const init = function() {
   }
   migrate();
 };
-exports.init = init;
 
 const migrate = function() {
   const storedConfig = storage.getItem('config');
@@ -46,7 +46,6 @@ const migrate = function() {
     storage.removeItem('config', 'extensionId');
   }
 };
-exports.migrate = migrate;
 
 /**
  * Read a configuration variable.
@@ -60,7 +59,6 @@ const read = function(name) {
   }
   return undefined;
 };
-exports.read = read;
 
 /**
  * Read all configuration variables.
@@ -70,7 +68,6 @@ exports.read = read;
 const readAll = function() {
   return _config;
 };
-exports.readAll = readAll;
 
 /**
  * Set a configuration variable.
@@ -88,7 +85,6 @@ const write = function(name, value) {
   storage.setItem('config', _config);
   return true;
 };
-exports.write = write;
 
 /**
  * Is debug enabled?
@@ -103,7 +99,6 @@ const isDebug = function() {
     return debug;
   }
 };
-exports.isDebug = isDebug;
 
 /**
  * Flush the local storage config.
@@ -119,4 +114,5 @@ const flush = function() {
   }
   storage.removeItem('config');
 };
-exports.flush = flush;
+
+export const Config = {init, read, write, flush, isDebug, migrate, readAll};

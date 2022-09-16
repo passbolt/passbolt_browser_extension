@@ -11,9 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         v3.2.0
  */
-const {User} = require('../model/user');
-const {MobileTransferModel} = require('../model/mobileTransfer/mobileTransferModel');
-const {TransferEntity} = require('../model/entity/transfer/transferEntity');
+import User from "../model/user";
+import MobileTransferModel from "../model/mobileTransfer/mobileTransferModel";
+import TransferEntity from "../model/entity/transfer/transferEntity";
+
 
 const listen = function(worker) {
   /*
@@ -73,4 +74,4 @@ const listen = function(worker) {
   });
 };
 
-exports.listen = listen;
+export const MobileEvents = {listen};

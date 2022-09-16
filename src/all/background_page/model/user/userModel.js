@@ -11,15 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const {UserEntity} = require('../entity/user/userEntity');
-const {UsersCollection} = require('../entity/user/usersCollection');
-const {UserDeleteTransferEntity} = require('../entity/user/transfer/userDeleteTransfer');
-
-const {UserService} = require('../../service/api/user/userService');
-const {UserLocalStorage} = require('../../service/local_storage/userLocalStorage');
-
-const {PassboltApiFetchError} = require('../../error/passboltApiFetchError');
-const {DeleteDryRunError} = require('../../error/deleteDryRunError');
+import UserLocalStorage from "../../service/local_storage/userLocalStorage";
+import DeleteDryRunError from "../../error/deleteDryRunError";
+import UserService from "../../service/api/user/userService";
+import UserDeleteTransferEntity from "../entity/user/transfer/userDeleteTransfer";
+import UserEntity from "../entity/user/userEntity";
+import UsersCollection from "../entity/user/usersCollection";
+import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import Validator from "validator";
 
 class UserModel {
   /**
@@ -253,4 +252,4 @@ class UserModel {
   }
 }
 
-exports.UserModel = UserModel;
+export default UserModel;

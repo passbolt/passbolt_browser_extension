@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {ActionLogModel} = require("../model/actionLog/actionLogModel");
-const {User} = require('../model/user');
+import User from "../model/user";
+import ActionLogModel from "../model/actionLog/actionLogModel";
 
 const listen = async function(worker) {
   /*
@@ -35,4 +35,4 @@ const listen = async function(worker) {
   });
 };
 
-exports.listen = listen;
+export const ActionLogEvents = {listen};

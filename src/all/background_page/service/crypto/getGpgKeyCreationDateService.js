@@ -11,8 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.3
  */
-
-const {OrganizationSettingsModel} = require("../../model/organizationSettings/organizationSettingsModel");
+import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 
 class GetGpgKeyCreationDateService {
   /**
@@ -39,4 +38,4 @@ class GetGpgKeyCreationDateService {
   }
 }
 
-exports.GetGpgKeyCreationDateService = GetGpgKeyCreationDateService;
+export default GetGpgKeyCreationDateService;

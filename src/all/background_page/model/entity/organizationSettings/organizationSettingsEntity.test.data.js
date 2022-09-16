@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {OrganizationSettingsEntity} from "./organizationSettingsEntity";
+import OrganizationSettingsEntity from "./organizationSettingsEntity";
 
 export const anonymousOrganizationSettings = (data = {}) => {
   const defaultData = {

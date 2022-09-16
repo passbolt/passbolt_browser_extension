@@ -12,13 +12,13 @@
  * @since         3.6.0
  */
 
-import {GenerateRecoverAccountRecoveryRequestKeyController} from "./generateRecoverAccountRecoveryRequestKeyController";
+import GenerateRecoverAccountRecoveryRequestKeyController from "./generateRecoverAccountRecoveryRequestKeyController";
 import {
   initialAccountRecoverDto,
   startAccountRecoverDto
 } from "../../model/entity/account/accountRecoverEntity.test.data";
-import {AccountRecoverEntity} from "../../model/entity/account/accountRecoverEntity";
-import {MockExtension} from "../../../../../test/mocks/mockExtension";
+import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
+import MockExtension from "../../../../../test/mocks/mockExtension";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 
 describe("GenerateRecoverAccountRecoveryRequestKeyController", () => {

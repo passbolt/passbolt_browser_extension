@@ -11,11 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.3.0
  */
-const Worker = require('../../model/worker');
-const {QuickAccessService} = require("../../service/ui/quickAccess.service");
-const {ResourceModel} = require('../../model/resource/resourceModel');
-const GpgAuth = require('../../model/gpgauth').GpgAuth;
-const {User} = require('../../model/user');
+import GpgAuth from "../../model/gpgauth";
+import browser from "webextension-polyfill";
+import User from "../../model/user";
+import ResourceModel from "../../model/resource/resourceModel";
+import {QuickAccessService} from "../../service/ui/quickAccess.service";
+import {Worker} from "../../model/worker";
 
 /**
  * Controller related to the in-form call-to-action
@@ -94,4 +95,4 @@ class InformCallToActionController {
 }
 
 
-exports.InformCallToActionController = InformCallToActionController;
+export default InformCallToActionController;

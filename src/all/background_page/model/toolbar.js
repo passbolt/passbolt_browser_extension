@@ -4,7 +4,7 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-const User = require('./user').User;
+import User from "./user";
 
 /**
  * Toolbar constructor.
@@ -37,4 +37,4 @@ Toolbar.getToolbarUrl = function() {
 };
 
 
-exports.Toolbar = Toolbar;
+export default Toolbar;

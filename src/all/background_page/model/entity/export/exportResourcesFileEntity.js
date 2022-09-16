@@ -10,10 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {Entity} = require('../abstract/entity');
-const {EntitySchema} = require('../abstract/entitySchema');
-const {ExternalFoldersCollection} = require("../folder/external/externalFoldersCollection");
-const {ExternalResourcesCollection} = require("../resource/external/externalResourcesCollection");
+import ExternalFoldersCollection from "../folder/external/externalFoldersCollection";
+import ExternalResourcesCollection from "../resource/external/externalResourcesCollection";
+import Entity from "../abstract/entity";
+import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = "ExportResourcesFileEntity";
 const FORMAT_KDBX = "kdbx";
@@ -306,4 +306,4 @@ class ExportResourcesFileEntity extends Entity {
   }
 }
 
-exports.ExportResourcesFileEntity = ExportResourcesFileEntity;
+export default ExportResourcesFileEntity;

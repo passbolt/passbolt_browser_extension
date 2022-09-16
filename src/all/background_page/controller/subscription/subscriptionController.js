@@ -14,8 +14,9 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {UpdateSubscriptionEntity} = require("../../model/entity/subscription/update/updateSubscriptionEntity");
-const {SubscriptionModel} = require("../../model/subscription/subscriptionModel");
+import SubscriptionModel from "../../model/subscription/subscriptionModel";
+import UpdateSubscriptionEntity from "../../model/entity/subscription/update/updateSubscriptionEntity";
+
 
 class SubscriptionController {
   /**
@@ -49,4 +50,4 @@ class SubscriptionController {
   }
 }
 
-exports.SubscriptionController = SubscriptionController;
+export default SubscriptionController;

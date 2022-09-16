@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {AbstractRowComposer} = require("./abstractRowComposer");
-const {Csv1PasswordRowParser} = require("../../../import/resources/csvRowParser/csv1PasswordRowParser");
+import Csv1PasswordRowParser from "../../../import/resources/csvRowParser/csv1PasswordRowParser";
+import AbstractRowComposer from "./abstractRowComposer";
 
 const FORMAT = "csv-1password";
 
@@ -49,4 +49,4 @@ class Csv1PasswordRowComposer extends AbstractRowComposer {
   }
 }
 
-exports.Csv1PasswordRowComposer = Csv1PasswordRowComposer;
+export default Csv1PasswordRowComposer;

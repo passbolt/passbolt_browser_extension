@@ -12,9 +12,9 @@
  * @since         3.6.0
  */
 
-import {GetAccountRecoveryOrganizationPolicyController} from "./getAccountRecoveryOrganizationPolicyController";
+import GetAccountRecoveryOrganizationPolicyController from "./getAccountRecoveryOrganizationPolicyController";
 import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
-import {AccountRecoveryOrganizationPolicyEntity} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
+import AccountRecoveryOrganizationPolicyEntity from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
 
 describe("GetAccountRecoveryOrganizationPolicyController", () => {
   describe("GetAccountRecoveryOrganizationPolicyController::exec", () => {

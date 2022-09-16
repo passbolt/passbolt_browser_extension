@@ -12,10 +12,10 @@
  * @since         3.6.0
  */
 
-const {AbstractAccountEntity} = require("./abstractAccountEntity");
-const {EntitySchema} = require('../abstract/entitySchema');
-const {AuthenticationTokenEntity} = require("../authenticationToken/authenticationTokenEntity");
-const {AccountRecoveryRequestEntity} = require("../accountRecovery/accountRecoveryRequestEntity");
+import AccountRecoveryRequestEntity from "../accountRecovery/accountRecoveryRequestEntity";
+import AbstractAccountEntity from "./abstractAccountEntity";
+import AuthenticationTokenEntity from "../authenticationToken/authenticationTokenEntity";
+import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = "AccountAccountRecovery";
 const TYPE_ACCOUNT_ACCOUNT_RECOVERY = "account-account-recovery";
@@ -248,4 +248,4 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
   }
 }
 
-exports.AccountAccountRecoveryEntity = AccountAccountRecoveryEntity;
+export default AccountAccountRecoveryEntity;

@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import {CommentEntity} from "./commentEntity";
-import {EntityValidationError} from "../abstract/entityValidationError";
-import {EntitySchema} from "../abstract/entitySchema";
+import CommentEntity from "./commentEntity";
+import EntityValidationError from "../abstract/entityValidationError";
+import EntitySchema from "../abstract/entitySchema";
 
 const minimalDto = {
   "user_id": "a58de6d3-f52c-5080-b79b-a601a647ac85",

@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
 
-const {AccountRecoveryModel} = require("../../model/accountRecovery/accountRecoveryModel");
 
 class GetOrganizationPolicyController {
   /**
@@ -53,4 +53,4 @@ class GetOrganizationPolicyController {
   }
 }
 
-exports.GetOrganizationPolicyController = GetOrganizationPolicyController;
+export default GetOrganizationPolicyController;

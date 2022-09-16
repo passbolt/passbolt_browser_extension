@@ -10,11 +10,12 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {User} = require('../model/user');
-const {TagModel} = require('../model/tag/tagModel');
-const {TagEntity} = require('../model/entity/tag/tagEntity');
-const {TagsCollection} = require('../model/entity/tag/tagsCollection');
-const {TagController} = require("../controller/tag/tagController");
+import User from "../model/user";
+import TagModel from "../model/tag/tagModel";
+import TagController from "../controller/tag/tagController";
+import TagEntity from "../model/entity/tag/tagEntity";
+import TagsCollection from "../model/entity/tag/tagsCollection";
+
 
 const listen = function(worker) {
   /*
@@ -109,4 +110,4 @@ const listen = function(worker) {
     }
   });
 };
-exports.listen = listen;
+export const TagEvents = {listen};

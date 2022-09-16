@@ -18,9 +18,9 @@
 import {v4 as uuidv4} from "uuid";
 import {enableFetchMocks} from "jest-fetch-mock";
 import each from "jest-each";
-import {ReviewRequestController} from "./reviewRequestController";
-import {DecryptMessageService} from "../../service/crypto/decryptMessageService";
-import {InvalidMasterPasswordError} from "../../error/invalidMasterPasswordError";
+import ReviewRequestController from "./reviewRequestController";
+import DecryptMessageService from "../../service/crypto/decryptMessageService";
+import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
@@ -30,21 +30,21 @@ import {
   pendingAccountRecoveryRequestWithoutPrivateKeyPasswordDto,
 } from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import {adminAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {AccountEntity} from "../../model/entity/account/accountEntity";
-import {Keyring} from "../../model/keyring";
-import {AccountRecoveryPrivateKeyPasswordDecryptedDataEntity} from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
-import {EntityValidationError} from "../../model/entity/abstract/entityValidationError";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import Keyring from "../../model/keyring";
+import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
+import EntityValidationError from "../../model/entity/abstract/entityValidationError";
 import {
   disabledAccountRecoveryOrganizationPolicyDto,
   enabledAccountRecoveryOrganizationPolicyDto
 } from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
-import {AccountRecoveryResponseEntity} from "../../model/entity/accountRecovery/accountRecoveryResponseEntity";
-import PassphraseController from "../passphrase/passphraseController";
-import {MockExtension} from "../../../../../test/mocks/mockExtension";
-import {UserLocalStorage} from "../../service/local_storage/userLocalStorage";
+import AccountRecoveryResponseEntity from "../../model/entity/accountRecovery/accountRecoveryResponseEntity";
+import {PassphraseController} from "../passphrase/passphraseController";
+import MockExtension from "../../../../../test/mocks/mockExtension";
+import UserLocalStorage from "../../service/local_storage/userLocalStorage";
 import {defaultUserDto} from "../../model/entity/user/userEntity.test.data";
-import {UsersCollection} from "../../model/entity/user/usersCollection";
-import {readAllKeysOrFail, readKeyOrFail, readMessageOrFail} from "../../utils/openpgp/openpgpAssertions";
+import UsersCollection from "../../model/entity/user/usersCollection";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 jest.mock("../passphrase/passphraseController.js");
 
@@ -93,9 +93,9 @@ describe("ReviewRequestController", () => {
       expect.assertions(9);
       expect(savedAccountRecoveryResponseEntity.status).toEqual("approved");
 
-      const decryptedAccountRecoveryRequestPrivateKey = await readKeyOrFail(pgpKeys.account_recovery_request.private_decrypted);
-      const savedAccountRecoveryResponseData = await readMessageOrFail(savedAccountRecoveryResponseEntity.data);
-      const verificationKeys = await readAllKeysOrFail([pgpKeys.account_recovery_organization.public, pgpKeys.admin.public]);
+      const decryptedAccountRecoveryRequestPrivateKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.account_recovery_request.private_decrypted);
+      const savedAccountRecoveryResponseData = await OpenpgpAssertion.readMessageOrFail(savedAccountRecoveryResponseEntity.data);
+      const verificationKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.account_recovery_organization.public, pgpKeys.admin.public]);
 
       const privateKeyPasswordDecryptedDataSerialized = await DecryptMessageService.decrypt(savedAccountRecoveryResponseData, decryptedAccountRecoveryRequestPrivateKey, verificationKeys);
       const privateKeyPasswordDecryptedDataDto = JSON.parse(privateKeyPasswordDecryptedDataSerialized);

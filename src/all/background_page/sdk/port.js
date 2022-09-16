@@ -1,13 +1,12 @@
-
 /**
  * Port Chrome Wrapper
  *
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-require('../error/error.js');
-const Log = require('../model/log').Log;
+import Log from "../model/log";
 
+import '../error/error.js';
 const Port = function(port) {
   this._port = port;
 };
@@ -107,4 +106,4 @@ Port.prototype.disconnect = function() {
   this._port.disconnect();
 };
 
-exports.Port = Port;
+export default Port;

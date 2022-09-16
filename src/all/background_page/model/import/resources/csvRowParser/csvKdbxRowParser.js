@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {AbstractCsvRowParser} = require("./abstractCsvRowParser");
-const {ExternalResourceEntity} = require("../../../entity/resource/external/externalResourceEntity");
+import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
+import AbstractCsvRowParser from "./abstractCsvRowParser";
 
 class CsvKdbxRowParser extends AbstractCsvRowParser {
   /**
@@ -62,4 +62,4 @@ class CsvKdbxRowParser extends AbstractCsvRowParser {
   }
 }
 
-exports.CsvKdbxRowParser = CsvKdbxRowParser;
+export default CsvKdbxRowParser;

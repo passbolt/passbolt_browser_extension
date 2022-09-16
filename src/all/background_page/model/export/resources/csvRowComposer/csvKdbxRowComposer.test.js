@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import {CsvKdbxRowComposer} from "./csvKdbxRowComposer";
-import {ExternalResourceEntity} from "../../../entity/resource/external/externalResourceEntity";
+import CsvKdbxRowComposer from "./csvKdbxRowComposer";
+import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
 
 describe("CsvKdbxComposer", () => {
   it("can compose kdbx csv row", () => {

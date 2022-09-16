@@ -16,8 +16,8 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {SetSetupLocaleController} from "./setSetupLocaleController";
-import {AccountSetupEntity} from "../../model/entity/account/accountSetupEntity";
+import SetSetupLocaleController from "./setSetupLocaleController";
+import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import {initialAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
 
 beforeEach(() => {

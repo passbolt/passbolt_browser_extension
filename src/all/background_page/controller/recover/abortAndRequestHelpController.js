@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+import SetupModel from "../../model/setup/setupModel";
 
-const {SetupModel} = require("../../model/setup/setupModel");
 
 class AbortAndRequestHelp {
   /**
@@ -52,4 +52,4 @@ class AbortAndRequestHelp {
   }
 }
 
-exports.AbortAndRequestHelp = AbortAndRequestHelp;
+export default AbortAndRequestHelp;

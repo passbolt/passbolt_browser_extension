@@ -12,10 +12,11 @@
  * @since         3.6.0
  */
 
-const {PageMod} = require('../sdk/page-mod');
-const app = require('../app');
-const {GetRequestLocalAccountService} = require("../service/accountRecovery/getRequestLocalAccountService");
-const {BuildAccountApiClientOptionsService} = require("../service/account/buildApiClientOptionsService");
+import PageMod from "../sdk/page-mod";
+import {App as app} from "../app";
+import GetRequestLocalAccountService from "../service/accountRecovery/getRequestLocalAccountService";
+import BuildAccountApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+
 
 /*
  * This pagemod handles the account recovery process served into an iframe controlled by the browser extension.
@@ -65,4 +66,4 @@ AccountRecovery.init = function() {
   });
 };
 
-exports.AccountRecovery = AccountRecovery;
+export default AccountRecovery;

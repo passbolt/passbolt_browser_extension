@@ -20,4 +20,4 @@ class WrongOrganizationRecoveryKeyError extends Error {
   }
 }
 
-exports.WrongOrganizationRecoveryKeyError = WrongOrganizationRecoveryKeyError;
+export default WrongOrganizationRecoveryKeyError;

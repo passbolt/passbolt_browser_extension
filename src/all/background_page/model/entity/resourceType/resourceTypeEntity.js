@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-const {Entity} = require('../abstract/entity');
-const {EntitySchema} = require('../abstract/entitySchema');
+import Entity from "../abstract/entity";
+import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = 'ResourceType';
 const RESOURCE_TYPE_NAME_MAX_LENGTH = 255;
@@ -159,4 +159,4 @@ class ResourceTypeEntity extends Entity {
   }
 }
 
-exports.ResourceTypeEntity = ResourceTypeEntity;
+export default ResourceTypeEntity;

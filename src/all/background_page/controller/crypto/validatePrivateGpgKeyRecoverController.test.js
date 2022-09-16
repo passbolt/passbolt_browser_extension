@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
-import {ValidatePrivateGpgKeyRecoverController} from "./validatePrivateGpgKeyRecoverController";
+import ValidatePrivateGpgKeyRecoverController from "./validatePrivateGpgKeyRecoverController";
 
 describe("ValidatePrivateGpgKeyRecoverController", () => {
   it(`Should pass if the key is valid`, async() => {

@@ -10,9 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {ThemesCollection} = require("../entity/theme/themesCollection");
-const {AccountSettingsService} = require("../../service/api/accountSettings/accountSettingsService");
-const Config = require('../config');
+import AccountSettingsService from "../../service/api/accountSettings/accountSettingsService";
+import {Config} from "../config";
+import ThemesCollection from "../entity/theme/themesCollection";
+
 
 class ThemeModel {
   /**
@@ -63,4 +64,4 @@ class ThemeModel {
   }
 }
 
-exports.ThemeModel = ThemeModel;
+export default ThemeModel;

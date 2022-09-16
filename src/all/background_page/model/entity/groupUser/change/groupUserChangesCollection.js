@@ -10,10 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-const {EntityCollection} = require('../../abstract/entityCollection');
-const {EntitySchema} = require('../../abstract/entitySchema');
-const {GroupUserChangeEntity} = require("./groupUserChangeEntity");
-const {GroupsUsersCollection} = require("../groupsUsersCollection");
+import EntityCollection from "../../abstract/entityCollection";
+import GroupsUsersCollection from "../groupsUsersCollection";
+import GroupUserChangeEntity from "./groupUserChangeEntity";
+import EntitySchema from "../../abstract/entitySchema";
 
 const ENTITY_NAME = 'GroupUserChanges';
 
@@ -129,4 +129,4 @@ class GroupUserChangesCollection extends EntityCollection {
   }
 }
 
-exports.GroupUserChangesCollection = GroupUserChangesCollection;
+export default GroupUserChangesCollection;

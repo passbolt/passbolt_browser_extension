@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.6
  */
-const {User} = require('../model/user');
-const {RoleModel} = require("../model/role/roleModel");
+import User from "../model/user";
+import RoleModel from "../model/role/roleModel";
 
 const listen = function(worker) {
   /*
@@ -33,4 +33,4 @@ const listen = function(worker) {
   });
 };
 
-exports.listen = listen;
+export const RoleEvents = {listen};

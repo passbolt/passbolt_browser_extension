@@ -467,7 +467,6 @@ module.exports = function (grunt) {
         files: [
           path.src_web_accessible_resources + 'js/app/AccountRecovery.js',
           path.src_web_accessible_resources + 'js/app/App.js',
-          path.src_web_accessible_resources + 'js/app/Clipboard.js',
           path.src_web_accessible_resources + 'js/app/Download.js',
           path.src_web_accessible_resources + 'js/app/Login.js',
           path.src_web_accessible_resources + 'js/app/QuickAccess.js',

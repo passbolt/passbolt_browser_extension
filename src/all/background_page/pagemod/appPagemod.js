@@ -68,7 +68,6 @@ App.init = function() {
       // Initialize the events listeners.
       app.events.app.listen(worker, account);
       app.events.auth.listen(worker);
-      app.events.clipboard.listen(worker);
       app.events.config.listen(worker);
       app.events.folder.listen(worker);
       app.events.resource.listen(worker);

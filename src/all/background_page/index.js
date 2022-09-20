@@ -114,7 +114,6 @@ const main = async function() {
    * but triggered by App or Auth
    */
   pageMods.File.init();
-  pageMods.Clipboard.init();
   pageMods.Auth.init();
   pageMods.QuickAccess.init();
   pageMods.InFormMenuCTA.init();

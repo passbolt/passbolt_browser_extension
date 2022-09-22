@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.7.3] - 2022-09-24
+### Security
+- PB-19090 Ensure we are spell-jacking proof for our input password
+
 ## [3.7.2] - 2022-09-13
 ### Fixed
 - PB-17158: As LU I want to see an entropy at 0 when the typed passphrase is exposed in a data breach

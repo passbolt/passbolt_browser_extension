@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.4
  */
-import browser from "webextension-polyfill";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 /** The default quickaccesss window height */
 const QUICKACCESS_WINDOW_HEIGHT = 400;

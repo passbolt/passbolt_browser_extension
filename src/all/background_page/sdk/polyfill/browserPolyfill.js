@@ -16,6 +16,6 @@
  * This code provides polyfills for the need of Passbolt.
  */
 import browser from "webextension-polyfill";
-import "./scripting-polyfill"; //mv3 scripting API for mv2
+import "./scriptingPolyfill"; //mv3 scripting API for mv2
 
 export default browser;

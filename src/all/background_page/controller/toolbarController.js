@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import browser from "webextension-polyfill";
+import browser from "../sdk/polyfill/browserPolyfill";
 import User from "../model/user";
 import {BrowserExtensionIconService} from "../service/ui/browserExtensionIcon.service";
 import ResourceModel from "../model/resource/resourceModel";

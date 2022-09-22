@@ -4,7 +4,7 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import browser from "webextension-polyfill";
+import browser from "../sdk/polyfill/browserPolyfill";
 import User from "../model/user";
 import {Worker} from "../model/worker";
 import {BrowserTabService} from "../service/ui/browserTab.service";

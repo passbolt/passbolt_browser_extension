@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import browser from "webextension-polyfill";
+import browser from "../sdk/polyfill/browserPolyfill";
 import {Worker as Workers} from "../model/worker";
 import ScriptExecution from "../sdk/scriptExecution";
 import Worker from "../sdk/worker";

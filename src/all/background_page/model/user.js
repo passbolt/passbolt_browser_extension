@@ -4,7 +4,7 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import browser from "webextension-polyfill";
+import browser from "../sdk/polyfill/browserPolyfill";
 import UserService from "../service/api/user/userService";
 import {Config} from "./config";
 import UserSettings from "./userSettings/userSettings";

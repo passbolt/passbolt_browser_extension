@@ -15,9 +15,9 @@ import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import ResourceModel from "../../model/resource/resourceModel";
 import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
-import {ProgressController as progressController} from "../progress/progressController";
 import i18n from "../../sdk/i18n";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import ProgressService from "../../service/progress/progressService";
 
 
 class SecretDecryptController {
@@ -32,6 +32,7 @@ class SecretDecryptController {
     this.worker = worker;
     this.requestId = requestId;
     this.resourceModel = new ResourceModel(apiClientOptions);
+    this.progressService = new ProgressService(this.worker, i18n.t('Decrypting ...'));
   }
 
   /**
@@ -49,13 +50,13 @@ class SecretDecryptController {
     try {
       // Decrypt the private key
       if (showProgress) {
-        await progressController.open(this.worker, i18n.t('Decrypting ...'), 2, i18n.t("Decrypting private key"));
+        this.progressService.start(2, i18n.t("Decrypting private key"));
       }
       const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
 
       // Decrypt and deserialize the secret if needed
       if (showProgress) {
-        await progressController.update(this.worker, 1, i18n.t("Decrypting secret"));
+        await this.progressService.finishStep(i18n.t("Decrypting secret"), true);
       }
       const resource = await resourcePromise;
       const resourceSecretMessage = await OpenpgpAssertion.readMessageOrFail(resource.secret.data);
@@ -64,14 +65,14 @@ class SecretDecryptController {
 
       // Wrap up
       if (showProgress) {
-        await progressController.update(this.worker, 2, i18n.t("Complete"));
-        await progressController.close(this.worker);
+        await this.progressService.finishStep(i18n.t("Complete"), true);
+        await this.progressService.close();
       }
       return {plaintext: plaintext, resource: resource};
     } catch (error) {
       console.error(error);
       if (showProgress) {
-        await progressController.close(this.worker);
+        await this.progressService.close();
       }
       throw error;
     }

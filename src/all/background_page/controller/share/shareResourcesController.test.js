@@ -30,7 +30,7 @@ const {
 } = require('./shareResourcesController.test.data');
 
 
-jest.mock("../progress/progressController");
+jest.mock("../../service/progress/progressService");
 
 jest.spyOn(PassphraseController, "get").mockImplementation(() => "ada@passbolt.com");
 

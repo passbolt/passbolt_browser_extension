@@ -120,9 +120,9 @@ class ResourceModel {
    * @param {ResourceEntity} resource
    * @param {(FolderEntity|null)} parentFolder
    * @param {(FolderEntity|null)} destFolder
-   * @returns {Promise<PermissionChangesCollection>}
+   * @returns {PermissionChangesCollection}
    */
-  async calculatePermissionsChangesForMove(resource, parentFolder, destFolder) {
+  calculatePermissionsChangesForMove(resource, parentFolder, destFolder) {
     let remainingPermissions = new PermissionsCollection([], false);
 
     // Remove permissions from parent if any

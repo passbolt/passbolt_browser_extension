@@ -14,13 +14,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import * as kdbxweb from "kdbxweb";
-import argon2 from "./argon2.test-lib";
 import ResourcesKdbxExporter from "./resourcesKdbxExporter";
 import ExportResourcesFileEntity from "../../entity/export/exportResourcesFileEntity";
 import fs from "fs";
 
 global.kdbxweb = kdbxweb;
-kdbxweb.CryptoEngine.argon2 = argon2;
 
 describe("ResourcesKdbxExporter", () => {
   function buildImportResourceDto(num, data) {
@@ -44,6 +42,7 @@ describe("ResourcesKdbxExporter", () => {
   }
 
   it("should export with no content", async() => {
+    expect.assertions(1);
     const exportDto = {
       "format": "kdbx",
       "export_resources": [],
@@ -61,6 +60,7 @@ describe("ResourcesKdbxExporter", () => {
   });
 
   it("should export resources and folders", async() => {
+    expect.assertions(9);
     const exportFolder1 = buildExternalFolderDto(1);
     const exportFolder2 = buildExternalFolderDto(2, {"folder_parent_path": "Folder 1", "folder_parent_id": exportFolder1.id});
     const exportResource1 = buildImportResourceDto(1);
@@ -92,6 +92,7 @@ describe("ResourcesKdbxExporter", () => {
   });
 
   it("should protect an export with a password", async() => {
+    expect.assertions(2);
     const exportResource1 = buildImportResourceDto(1);
     const exportDto = {
       "format": "kdbx",
@@ -115,6 +116,7 @@ describe("ResourcesKdbxExporter", () => {
   });
 
   it("should protect an export with a keyfile", async() => {
+    expect.assertions(2);
     const keyfile = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-keyfile.key", {encoding: 'base64'});
     const exportResource1 = buildImportResourceDto(1);
     const exportDto = {
@@ -136,5 +138,37 @@ describe("ResourcesKdbxExporter", () => {
 
     const kdbxCredentials = new kdbxweb.Credentials(null, kdbxweb.ByteUtils.base64ToBytes(exportEntity.keyfile));
     await kdbxweb.Kdbx.load(exportEntity.file, kdbxCredentials);
+  });
+
+  it("should export Argon2 encrypted file with minimal OWASP requirements", async() => {
+    expect.assertions(7);
+    const exportDto = {
+      "format": "kdbx",
+      "export_resources": [],
+      "export_folders": []
+    };
+
+    const exportEntity = new ExportResourcesFileEntity(exportDto);
+    const exporter = new ResourcesKdbxExporter(exportEntity);
+    await exporter.export();
+
+    expect(exportEntity.file).toBeInstanceOf(ArrayBuffer);
+
+    const kdbxCredentials = new kdbxweb.Credentials(null, null);
+    const kdbxDb = await kdbxweb.Kdbx.load(exportEntity.file, kdbxCredentials);
+
+    const memory = kdbxDb.header.kdfParameters.get("M");
+    const parallelism = kdbxDb.header.kdfParameters.get("P");
+    const iteration = kdbxDb.header.kdfParameters.get("I");
+
+    expect(memory.lo).toBeGreaterThanOrEqual(15 * 1024 * 1024);
+    expect(parallelism).toBe(1);
+    expect(iteration.hi).toBe(0);
+    expect(iteration.lo).toBe(2);
+    expect(kdbxDb.header.versionMajor).toBe(4);
+
+    const uuid = kdbxDb.header.kdfParameters.get("$UUID");
+    const uuidb64 = Buffer.from(uuid).toString('base64');
+    expect(uuidb64).toBe(kdbxweb.Consts.KdfId.Argon2id);
   });
 });

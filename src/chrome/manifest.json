@@ -33,6 +33,7 @@
       "description": "Open passbolt in a new tab!"
     }
   },
+  "content_security_policy": "script-src 'self' 'wasm-eval' blob: filesystem:",
   "permissions": [
     "activeTab",
     "tabs",

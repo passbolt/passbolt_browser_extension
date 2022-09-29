@@ -6,6 +6,7 @@ import OrganizationSettingsModel from "../src/all/background_page/model/organiza
 import {Config} from "../src/all/background_page/model/config";
 import Keyring from "../src/all/background_page/model/keyring";
 import browser from "webextension-polyfill";
+import {TextEncoder, TextDecoder} from "text-encoding";
 
 /*
  * Fix jest-webextension-mock after upgrading webextension-polyfill to 0.9.0

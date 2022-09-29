@@ -7,6 +7,7 @@ const config = {
   },
   mode: 'production',
   module: {
+    noParse: /\.wasm$/,
     rules: [
       {
         test: /\.(js|jsx)$/,
@@ -15,6 +16,11 @@ const config = {
         options: {
           presets: ["@babel/react"],
         }
+      },
+      {
+        test: /\.wasm$/,
+        loader: 'base64-loader',
+        type: 'javascript/auto',
       }
     ]
   },
@@ -32,7 +38,14 @@ const config = {
       }
     },
   },
-  resolve: {extensions: ["*", ".js"], fallback: {crypto: false}},
+  resolve: {
+    extensions: ["*", ".js"],
+    fallback: {
+      crypto: false,
+      path: false,
+      fs: false,
+    }
+  },
   output: {
     // Set a unique name to ensure the cohabitation of multiple webpack loader on the same page.
     chunkLoadingGlobal: 'backgroundPageIndexChunkLoadingGlobal',

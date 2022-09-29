@@ -12,6 +12,10 @@
  */
 import ExternalFolderEntity from "../../entity/folder/external/externalFolderEntity";
 import * as kdbxweb from 'kdbxweb';
+import argon2 from "argon2-browser";
+
+const ARGON2_PARALLELISM = 1;
+const ARGON2_MEMORY_KB = 15 * 1024;
 
 class ResourcesKdbxExporter {
   /**
@@ -27,6 +31,7 @@ class ResourcesKdbxExporter {
    * @returns {Promise<void>}
    */
   async export() {
+    kdbxweb.CryptoEngine.setArgon2Impl(this.argon2Hash);
     const kdbxDb = await this.createKdbxDb();
     const rootExportFolders = this.exportEntity.exportFolders.getByDepth(0);
     rootExportFolders.forEach(rootExportFolder => this.createKdbxGroup(kdbxDb, rootExportFolder, kdbxDb.getDefaultGroup()));
@@ -36,13 +41,38 @@ class ResourcesKdbxExporter {
   }
 
   /**
+   * Argon2 hasing proxy function.
+   * Recommandation could be found here https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html
+   * @param {Uint8Array} password the password to be hashed
+   * @param {Uint8Array} salt the salt used for the hashing algorithm
+   * @returns {Promise<Uint8Array>} the Argon2id hashed password
+   */
+  async argon2Hash(password, salt) {
+    const args = {
+      pass: new Uint8Array(password),
+      salt: new Uint8Array(salt),
+      mem: ARGON2_MEMORY_KB, // should be 15 * 1024 kB minimum
+      time: 2, // iteration count (2 recommanded for Argon2id)
+      hashLen: 32, // 32 bytes required by kdbxweb (another value produce an bad derived key error)
+      parallelism: ARGON2_PARALLELISM, // degree of parallelism (1 recommanded)
+      type: argon2.ArgonType.Argon2id, // Argon2id recommanded
+    };
+    const result = await argon2.hash(args);
+    return result.hash;
+  }
+
+  /**
    * Create a KDBX database
    * @returns {Promise<Keeweb.Kdbx>}
    */
   async createKdbxDb() {
     const credentials = this.createKdbxCredentials();
     const kdbxDb = kdbxweb.Kdbx.create(credentials, 'passbolt export');
-    kdbxDb.setVersion(3);
+    kdbxDb.setKdf(kdbxweb.Consts.KdfId.Argon2id);
+    //Define the degree of parallelism for the Argon2 algo (1 recommanded)
+    kdbxDb.header.kdfParameters.set("P", kdbxweb.VarDictionary.ValueType.UInt32, ARGON2_PARALLELISM);
+    //Define the memory used for the Argon2 algo (15MB minimum)
+    kdbxDb.header.kdfParameters.set("M", kdbxweb.VarDictionary.ValueType.UInt64, new kdbxweb.Int64(ARGON2_MEMORY_KB * 1024));
     return kdbxDb;
   }
 

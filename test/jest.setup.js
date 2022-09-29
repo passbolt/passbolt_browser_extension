@@ -20,7 +20,21 @@ jest.mock("webextension-polyfill", () => Object.assign({}, {
       version: "v3.6.0"
     }))
   },
-  alarms: new MockAlarms()
+  alarms: new MockAlarms(),
+  tabs: {
+    query: jest.fn()
+  },
+  browserAction: {
+    setIcon: jest.fn(),
+    onClicked: {
+      addListener: jest.fn()
+    }
+  },
+  commands: {
+    onCommand: {
+      addListener: jest.fn()
+    }
+  }
 }));
 
 beforeEach(async() => {

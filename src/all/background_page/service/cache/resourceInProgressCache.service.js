@@ -13,14 +13,13 @@
  */
 
 import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 /** Default validity timeout of the cache */
 const VALIDITY_TIMEOUT_IN_MS = 6000;
 
-/** The cached resource*/
-let resourceDto,
-  /** The invalidity timeout */
-  invalidTimeout;
+const RESOURCE_IN_PROGRESS_CACHE_FLUSH_ALARM = "ResourceInProgressCacheFlush";
+const RESOURCE_IN_PROGRESS_STORAGE_KEY = "resourceInProgress";
 
 /**
  * A cache service used whenever one wants to store information about a resource creation in progress.
@@ -32,7 +31,6 @@ class ResourceInProgressCacheService {
    * Default constructor
    */
   constructor() {
-    resourceDto = null;
     this.bindCallbacks();
   }
 
@@ -41,16 +39,17 @@ class ResourceInProgressCacheService {
    */
   bindCallbacks() {
     this.reset = this.reset.bind(this);
+    this.handleFlushEvent = this.handleFlushEvent.bind(this);
   }
 
   /**
    * Consume the cached resource.
    * @return {Object} A resource DTO
    */
-  consume() {
-    const resource = resourceDto;
+  async consume() {
+    const storedResourceData = await browser.storage.session.get(RESOURCE_IN_PROGRESS_STORAGE_KEY);
     this.reset();
-    return resource;
+    return storedResourceData?.[RESOURCE_IN_PROGRESS_STORAGE_KEY] || null;
   }
 
   /**
@@ -58,28 +57,60 @@ class ResourceInProgressCacheService {
    * @param {ExternalResourceEntity|object} resource The resource to store in cache.
    * @param {?int} timeoutInMs Period of time in millsecond after which the cache will be cleaned.
    */
-  set(resource, timeoutInMs = VALIDITY_TIMEOUT_IN_MS) {
+  async set(resource, timeoutInMs = VALIDITY_TIMEOUT_IN_MS) {
     if (!(resource instanceof ExternalResourceEntity)) {
       throw new TypeError('ResourceInProgressCacheService::set expects a ExternalResourceEntity');
     }
     // Clean everything before set the value
     this.reset();
 
-    resourceDto = resource.toDto();
+    await browser.storage.session.set({[RESOURCE_IN_PROGRESS_STORAGE_KEY]: resource.toDto()});
 
-    // Invalid the cache after a given time
-    invalidTimeout = setTimeout(this.reset, timeoutInMs);
+    this.scheduleStorageFlush(timeoutInMs);
 
     // Invalid the cache if the user is logged out
     window.addEventListener("passbolt.auth.after-logout", this.reset);
   }
 
   /**
+   * Schedule an alarm to flush the resource
+   * @param timeInMs
+   * @private
+   */
+  scheduleStorageFlush(timeInMs) {
+    // Create an alarm to invalid the cache after a given time
+    browser.alarms.create(RESOURCE_IN_PROGRESS_CACHE_FLUSH_ALARM, {
+      when: Date.now() + timeInMs
+    });
+    browser.alarms.onAlarm.addListener(this.handleFlushEvent);
+  }
+
+  /**
+   * Clear the alarm and listener configured for flushing the resource if any.
+   * @private
+   */
+  clearAlarm() {
+    browser.alarms.onAlarm.removeListener(this.handleFlushEvent);
+    browser.alarms.clear(RESOURCE_IN_PROGRESS_CACHE_FLUSH_ALARM);
+  }
+
+  /**
+   * Flush the current stored resource when the ResourceInProgressCacheFlush alarm triggers.
+   * @param {Alarm} alarm
+   * @private
+   */
+  async handleFlushEvent(alarm) {
+    if (alarm.name === RESOURCE_IN_PROGRESS_CACHE_FLUSH_ALARM) {
+      this.reset();
+    }
+  }
+
+  /**
    * Resets the cache
    */
   reset() {
-    resourceDto = null;
-    clearTimeout(invalidTimeout);
+    browser.storage.session.remove(RESOURCE_IN_PROGRESS_STORAGE_KEY);
+    this.clearAlarm();
     window.removeEventListener("passbolt.auth.after-logout", this.reset);
   }
 }

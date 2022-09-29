@@ -18,21 +18,38 @@ import ResourceModel from "../model/resource/resourceModel";
 import Toolbar from "../model/toolbar";
 import {TabController as tabsController} from "./tabsController";
 
+const UPDATE_SUGGESTED_RESOURCE_BADGE_FLUSH_ALARM = "UpdateSuggestedResourceBadgeCacheFlush";
+
 class ToolbarController {
   constructor() {
     // Initially, set the browser extension icon as inactive
     BrowserExtensionIconService.deactivate();
+    this.bindCallbacks();
     this.addEventListeners();
+  }
+
+  /**
+   * Bind callbacks
+   */
+  bindCallbacks() {
+    this.handleButtonClick = this.handleButtonClick.bind(this);
+    this.handleShortcutPressed = this.handleShortcutPressed.bind(this);
+    this.handleUserLoggedOut = this.handleUserLoggedOut.bind(this);
+    this.handleUserLoggedIn = this.handleUserLoggedIn.bind(this);
+    this.handleSuggestedResourcesOnUpdatedTabBound = this.handleSuggestedResourcesOnUpdatedTab.bind(this);
+    this.handleSuggestedResourcesOnActivatedTabBound = this.handleSuggestedResourcesOnActivatedTab.bind(this);
+    this.handleSuggestedResourcesOnFocusedWindowBound = this.handleSuggestedResourcesOnFocusedWindow.bind(this);
+    this.handleFlushEvent = this.handleFlushEvent.bind(this);
   }
 
   /**
    * Add event listeners.
    */
   addEventListeners() {
-    browser.browserAction.onClicked.addListener(this.handleButtonClick.bind(this));
-    browser.commands.onCommand.addListener(this.handleShortcutPressed.bind(this));
-    window.addEventListener("passbolt.auth.after-logout", this.handleUserLoggedOut.bind(this));
-    window.addEventListener("passbolt.auth.after-login", this.handleUserLoggedIn.bind(this));
+    browser.browserAction.onClicked.addListener(this.handleButtonClick);
+    browser.commands.onCommand.addListener(this.handleShortcutPressed);
+    window.addEventListener("passbolt.auth.after-logout", this.handleUserLoggedOut);
+    window.addEventListener("passbolt.auth.after-login", this.handleUserLoggedIn);
   }
 
   /**
@@ -66,11 +83,8 @@ class ToolbarController {
     BrowserExtensionIconService.activate();
     this.updateSuggestedResourcesBadge();
 
-    this.handleSuggestedResourcesOnUpdatedTabBound = this.handleSuggestedResourcesOnUpdatedTab.bind(this);
     browser.tabs.onUpdated.addListener(this.handleSuggestedResourcesOnUpdatedTabBound);
-    this.handleSuggestedResourcesOnActivatedTabBound = this.handleSuggestedResourcesOnActivatedTab.bind(this);
     browser.tabs.onActivated.addListener(this.handleSuggestedResourcesOnActivatedTabBound);
-    this.handleSuggestedResourcesOnFocusedWindowBound = this.handleSuggestedResourcesOnFocusedWindow.bind(this);
     browser.windows.onFocusChanged.addListener(this.handleSuggestedResourcesOnFocusedWindowBound);
   }
 
@@ -135,6 +149,7 @@ class ToolbarController {
     let currentTab;
 
     try {
+      this.clearAlarm();
       const tabs = await browser.tabs.query({'active': true, 'lastFocusedWindow': true});
       currentTab = tabs[0];
     } catch (error) {
@@ -143,7 +158,7 @@ class ToolbarController {
        * Loop until there is no error.
        */
       if (browser.runtime.lastError) {
-        setTimeout(() => this.updateSuggestedResourcesBadge(), 50);
+        this.createAlarm();
         return;
       }
       throw error;
@@ -152,6 +167,39 @@ class ToolbarController {
     if (currentTab) {
       const count = await this.resourceModel.countSuggestedResources(currentTab.url);
       BrowserExtensionIconService.setSuggestedResourcesCount(count);
+    }
+  }
+
+  /**
+   * Create alarm to flush the resource
+   * @param timeoutInMs
+   * @private
+   */
+  createAlarm() {
+    // Create an alarm to restart the update suggested resource badge
+    browser.alarms.create(UPDATE_SUGGESTED_RESOURCE_BADGE_FLUSH_ALARM, {
+      when: Date.now() + 50
+    });
+    browser.alarms.onAlarm.addListener(this.handleFlushEvent);
+  }
+
+  /**
+   * Clear the alarm and listener configured for flushing the resource if any.
+   * @private
+   */
+  clearAlarm() {
+    browser.alarms.onAlarm.removeListener(this.handleFlushEvent);
+    browser.alarms.clear(UPDATE_SUGGESTED_RESOURCE_BADGE_FLUSH_ALARM);
+  }
+
+  /**
+   * Flush the current stored resource when the ResourceInProgressCacheFlush alarm triggers.
+   * @param {Alarm} alarm
+   * @private
+   */
+  handleFlushEvent(alarm) {
+    if (alarm.name === UPDATE_SUGGESTED_RESOURCE_BADGE_FLUSH_ALARM) {
+      this.updateSuggestedResourcesBadge();
     }
   }
 }

@@ -160,7 +160,7 @@ class AccountRecoverySaveOrganizationPolicyController {
       return new AccountRecoveryPrivateKeyPasswordsCollection([]);
     }
 
-    await this.progressService.start(accountRecoveryPrivateKeyPasswords.length, i18n.t("Updating users' key..."));
+    this.progressService.start(accountRecoveryPrivateKeyPasswords.length, i18n.t("Updating users' key..."));
 
     const reEncryptedPrivateKeyPasswords = [];
     try {
@@ -171,11 +171,11 @@ class AccountRecoverySaveOrganizationPolicyController {
       }
     } catch (e) {
       console.error(e);
-      this.progressService.close();
+      await this.progressService.close();
       throw e;
     }
 
-    this.progressService.close();
+    await this.progressService.close();
     return new AccountRecoveryPrivateKeyPasswordsCollection(reEncryptedPrivateKeyPasswords);
   }
 

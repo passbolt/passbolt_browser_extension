@@ -32,7 +32,7 @@ const {defaultGroup} = require("../../model/entity/group/groupEntity.test.data")
 const {defaultDyRunResponse} = require("../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data");
 
 
-jest.mock("../progress/progressController");
+jest.mock("../../service/progress/progressService");
 
 jest.spyOn(PassphraseController, "get").mockImplementation(() => "ada@passbolt.com");
 

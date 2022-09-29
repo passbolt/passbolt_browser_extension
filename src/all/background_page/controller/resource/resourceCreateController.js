@@ -20,10 +20,10 @@ import {PassphraseController as passphraseController} from "../passphrase/passph
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import FolderModel from "../../model/folder/folderModel";
 import Share from "../../model/share";
-import {ProgressController as progressController} from "../progress/progressController";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import i18n from "../../sdk/i18n";
 import ResourceSecretsCollection from "../../model/entity/secret/resource/resourceSecretsCollection";
+import ProgressService from "../../service/progress/progressService";
 
 
 class ResourceCreateController {
@@ -40,8 +40,7 @@ class ResourceCreateController {
     this.resourceModel = new ResourceModel(clientOptions);
     this.folderModel = new FolderModel(clientOptions);
     this.keyring = new Keyring();
-    this.progress = 0;
-    this.goals = 0;
+    this.progressService = new ProgressService(this.worker, i18n.t('Creating password'));
   }
 
   /**
@@ -59,7 +58,7 @@ class ResourceCreateController {
      * as we don't know how many 'share' operations are needed yet
      */
     let resource = new ResourceEntity(resourceDto);
-    this.goals = resource.folderParentId ? 10 : 2;
+    const goals = resource.folderParentId ? 10 : 2;
 
     // Get the passphrase if needed and decrypt secret key
     try {
@@ -71,11 +70,11 @@ class ResourceCreateController {
     }
 
     try {
-      await progressController.open(this.worker, i18n.t('Creating password'), this.goals, i18n.t('Initializing'));
+      this.progressService.start(goals, i18n.t('Initializing'));
       const plaintext = await this.resourceModel.serializePlaintextDto(resource.resourceTypeId, plaintextDto);
 
       // Encrypt and sign
-      await progressController.update(this.worker, this.progress++, i18n.t('Encrypting secret'));
+      await this.progressService.finishStep(i18n.t('Encrypting secret'), true);
       const userId = User.getInstance().get().id;
       const userPublicArmoredKey = this.keyring.findPublic(userId).armoredKey;
       const userPublicKey = await OpenpgpAssertion.readKeyOrFail(userPublicArmoredKey);
@@ -83,7 +82,7 @@ class ResourceCreateController {
       resource.secrets = new ResourceSecretsCollection([{data: secret}]);
 
       // Save
-      await progressController.update(this.worker, this.progress++, i18n.t('Creating password'));
+      await this.progressService.finishStep(i18n.t('Creating password'), true);
       resource = await this.resourceModel.create(resource);
 
       // Share if needed
@@ -92,12 +91,12 @@ class ResourceCreateController {
       }
     } catch (error) {
       console.error(error);
-      await progressController.close(this.worker);
+      await this.progressService.close();
       throw error;
     }
 
-    await progressController.update(this.worker, this.goals, i18n.t('Done!'));
-    await progressController.close(this.worker);
+    await this.progressService.finishStep(i18n.t('Done!'), true);
+    await this.progressService.close();
 
     return resource;
   }
@@ -112,25 +111,25 @@ class ResourceCreateController {
    */
   async handleCreateInFolder(resourceEntity, privateKey) {
     // Calculate changes if any
-    await progressController.update(this.worker, this.progress++, i18n.t('Calculate permissions'));
+    await this.progressService.finishStep(i18n.t('Calculate permissions'), true);
     const destinationFolder = await this.folderModel.findForShare(resourceEntity.folderParentId);
     const changes = await this.resourceModel.calculatePermissionsChangesForCreate(resourceEntity, destinationFolder);
 
     // Apply changes
     if (changes.length) {
-      this.goals = (changes.length * 3) + 2 + this.progress; // closer to reality...
-      await progressController.updateGoals(this.worker, this.goals);
+      const goals = (changes.length * 3) + 2 + this.progressService.progress; // closer to reality...
+      this.progressService.updateGoals(goals);
 
       // Sync keyring
-      await progressController.update(this.worker, this.progress++, i18n.t('Synchronizing keys'));
+      await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
       await this.keyring.sync();
 
       // Share
-      await progressController.update(this.worker, this.progress++, i18n.t('Start sharing'));
+      await this.progressService.finishStep(i18n.t('Start sharing'), true);
       const resourcesToShare = [resourceEntity.toDto({secrets: true})];
-      await Share.bulkShareResources(resourcesToShare, changes.toDto(), privateKey, async message => {
-        await progressController.update(this.worker, this.progress++, message);
-      });
+      await Share.bulkShareResources(resourcesToShare, changes.toDto(), privateKey, async message =>
+        await this.progressService.finishStep(message)
+      );
       await this.resourceModel.updateLocalStorage();
     }
   }

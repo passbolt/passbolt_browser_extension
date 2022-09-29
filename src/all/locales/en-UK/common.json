@@ -47,6 +47,8 @@
   "Saving permissions...": "Saving permissions...",
   "Saving resource": "Saving resource",
   "Server internal error. Check with your administrator.": "Server internal error. Check with your administrator.",
+  "Share {{count}} password_one": "Share {{count}} password",
+  "Share {{count}} password_other": "Share {{count}} passwords",
   "Sharing folder {{name}}": "Sharing folder {{name}}",
   "Start sharing": "Start sharing",
   "Synchronizing keyring": "Synchronizing keyring",

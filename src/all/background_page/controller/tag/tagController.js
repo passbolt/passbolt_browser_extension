@@ -12,9 +12,9 @@
  */
 import ResourceModel from "../../model/resource/resourceModel";
 import TagModel from "../../model/tag/tagModel";
-import {ProgressController as progressController} from "../progress/progressController";
 import TagsCollection from "../../model/entity/tag/tagsCollection";
 import i18n from "../../sdk/i18n";
+import ProgressService from "../../service/progress/progressService";
 
 
 class TagController {
@@ -31,8 +31,7 @@ class TagController {
     this.tagModel = new TagModel(clientOptions);
 
     // Progress
-    this.progressGoal = 100;
-    this.progress = 0;
+    this.progressService = new ProgressService(this.worker, i18n.t('Adding tag...'));
   }
 
   /**
@@ -41,18 +40,18 @@ class TagController {
    * @param {Object} tag The tag to add
    */
   async addTagResources(resourceIds, tag) {
-    this.progressGoal = 2 // Initialization + resource to filter
+    const progressGoal = 2 // Initialization + resource to filter
       + resourceIds.length; // #resource add tag
-    await progressController.open(this.worker, i18n.t('Adding tag...'), this.progressGoal, i18n.t('Initialize'));
+    this.progressService.start(progressGoal, i18n.t('Initialize'));
     try {
       const resourceIdsToKeep = await this._keepResourcesTagNotPresent(resourceIds, tag.id);
       if (resourceIdsToKeep.length > 0) {
         await this._taggingResources(resourceIdsToKeep, tag);
       }
-      await progressController.update(this.worker, this.progressGoal, i18n.t('Done!'));
-      await progressController.close(this.worker);
+      await this.progressService.finishStep(i18n.t('Done!'), true);
+      await this.progressService.close();
     } catch (error) {
-      await progressController.close(this.worker);
+      await this.progressService.close();
       throw error;
     }
   }
@@ -65,10 +64,10 @@ class TagController {
    * @private
    */
   async _keepResourcesTagNotPresent(resourceIds, tagId) {
-    await progressController.update(this.worker, this.progress++, i18n.t('Preparing...'));
+    await this.progressService.finishStep(i18n.t('Preparing...'), true);
     const resourceCollections = await this.resourceModel.getAllByIds(resourceIds);
     const resourceCollectionsToKeep = resourceCollections.filterByTagNotPresent(tagId);
-    const resourceIdsToKeep =  resourceCollectionsToKeep.map(resource => resource.id);
+    const resourceIdsToKeep = resourceCollectionsToKeep.map(resource => resource.id);
     return resourceIdsToKeep;
   }
 
@@ -79,7 +78,7 @@ class TagController {
    * @private
    */
   async _taggingResources(resourceIds, tag) {
-    await progressController.update(this.worker, this.progress++, i18n.t('Updating resource'));
+    await this.progressService.finishStep(i18n.t('Updating resource'), true);
     const tagsCollection = new TagsCollection([tag]);
 
     // Bulk tag the resources.
@@ -97,8 +96,8 @@ class TagController {
    * @param {int} taggedCount The number of resource tagged (with success or no)
    * @private
    */
-  _handleTagResourceSuccess(resourceNumber, taggedCount) {
-    progressController.update(this.worker, this.progress++, i18n.t(`Tagging passwords ${taggedCount}/${resourceNumber}`));
+  async _handleTagResourceSuccess(resourceNumber, taggedCount) {
+    await this.progressService.finishStep(i18n.t(`Tagging passwords ${taggedCount}/${resourceNumber}`));
   }
 
   /**
@@ -107,8 +106,8 @@ class TagController {
    * @param {int} taggedCount The number of resource tagged (with success or no)
    * @private
    */
-  _handleTagResourceError(resourceNumber, taggedCount) {
-    progressController.update(this.worker, this.progress++, i18n.t(`Tagging passwords ${taggedCount}/${resourceNumber}`));
+  async _handleTagResourceError(resourceNumber, taggedCount) {
+    await this.progressService.finishStep(i18n.t(`Tagging passwords ${taggedCount}/${resourceNumber}`));
   }
 }
 

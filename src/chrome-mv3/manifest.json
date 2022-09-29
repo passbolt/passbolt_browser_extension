@@ -38,7 +38,8 @@
     "unlimitedStorage",
     "storage",
     "tabs",
-    "scripting"
+    "scripting",
+    "alarms"
   ],
   "host_permissions": [
     "*://*/*"

@@ -7,13 +7,13 @@
 
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
-import User from "../../model/user";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
 import {Worker} from "../../model/worker";
 import i18n from "../../sdk/i18n";
 import UserAbortsOperationError from "../../error/userAbortsOperationError";
 import {ValidatorRule as Validator} from '../../utils/validatorRules';
+import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 
 /**
  * Get the user master password.
@@ -23,13 +23,11 @@ import {ValidatorRule as Validator} from '../../utils/validatorRules';
  * @throw Error if the passphrase is not valid.
  */
 const get = async function(worker) {
-  const user = User.getInstance();
-
-  try {
-    return await user.getStoredMasterPassword();
-  } catch (error) {
-    return requestPassphrase(worker);
+  const passphrase = await PassphraseStorageService.get();
+  if (passphrase) {
+    return passphrase;
   }
+  return requestPassphrase(worker);
 };
 
 /**
@@ -43,7 +41,7 @@ const requestPassphrase = async function(worker) {
   const requestResult = await worker.port.request('passbolt.passphrase.request');
   const {passphrase, rememberMe} = requestResult;
   await validatePassphrase(passphrase);
-  rememberPassphrase(passphrase, rememberMe);
+  await rememberPassphrase(passphrase, rememberMe);
 
   return passphrase;
 };
@@ -52,29 +50,29 @@ const requestPassphrase = async function(worker) {
  * Request the user passphrase from the Quick Access
  */
 const requestPassphraseFromQuickAccess = async function() {
-  const user = User.getInstance();
-  try {
-    return await user.getStoredMasterPassword();
-  } catch (error) {
-    /*
-     *Open the quick access to request the master passphrase to the user.
-     *Then once the quick access will have captured the passphrase, it will communicate it to its worker using requestId
-     *as message name. Basically, without changing the way the passphrase will be returned if the quick access was already
-     *open and it will have to reply to the request "passbolt.passphrase.request".
-     */
-    const requestId = (Math.round(Math.random() * Math.pow(2, 32))).toString();
-    const queryParameters = [
-      {name: "uiMode", value: "detached"},
-      {name: "feature", value: "request-passphrase"},
-      {name: "requestId", value: requestId}
-    ];
-    const quickAccessWindow = await QuickAccessService.openInDetachedMode(queryParameters);
-    const {passphrase, rememberMe} = await listenToDetachedQuickaccessPassphraseRequestResponse(requestId, quickAccessWindow);
-    await validatePassphrase(passphrase);
-    rememberPassphrase(passphrase, rememberMe);
-
-    return passphrase;
+  const storedPassphrase = await PassphraseStorageService.get();
+  if (storedPassphrase) {
+    return storedPassphrase;
   }
+
+  /*
+   * Open the quick access to request the master passphrase to the user.
+   * Then once the quick access will have captured the passphrase, it will communicate it to its worker using requestId
+   * as message name. Basically, without changing the way the passphrase will be returned if the quick access was already
+   * open and it will have to reply to the request "passbolt.passphrase.request".
+   */
+  const requestId = (Math.round(Math.random() * Math.pow(2, 32))).toString();
+  const queryParameters = [
+    {name: "uiMode", value: "detached"},
+    {name: "feature", value: "request-passphrase"},
+    {name: "requestId", value: requestId}
+  ];
+  const quickAccessWindow = await QuickAccessService.openInDetachedMode(queryParameters);
+  const {passphrase, rememberMe} = await listenToDetachedQuickaccessPassphraseRequestResponse(requestId, quickAccessWindow);
+  await validatePassphrase(passphrase);
+  await rememberPassphrase(passphrase, rememberMe);
+
+  return passphrase;
 };
 
 /**
@@ -118,12 +116,11 @@ const listenToDetachedQuickaccessPassphraseRequestResponse = async function(requ
  * @param {integer|string} duration The duration in second to remember the passphrase for. If -1 given then it will.
  *   remember the passphrase until the user is logged out.
  */
-const rememberPassphrase = function(passphrase, duration) {
+const rememberPassphrase = async function(passphrase, duration) {
   if (!duration || !Number.isInteger(duration)) {
     return;
   }
-  const user = User.getInstance();
-  user.storeMasterPasswordTemporarily(passphrase, duration);
+  await PassphraseStorageService.set(passphrase, duration);
 };
 
 /**

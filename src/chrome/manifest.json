@@ -42,7 +42,8 @@
     "background",
     "clipboardWrite",
     "downloads",
-    "*://*/*"
+    "*://*/*",
+    "alarms"
   ],
   "web_accessible_resources": [
     "webAccessibleResources/*"

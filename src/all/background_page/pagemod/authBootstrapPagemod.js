@@ -10,6 +10,7 @@ import User from "../model/user";
 import {Worker} from "../model/worker";
 import {App as app} from "../app";
 import PageMod from "../sdk/page-mod";
+import PassphraseStorageService from "../service/session_storage/passphraseStorageService";
 
 const AuthBootstrap = function() {};
 AuthBootstrap._pageMod = undefined;
@@ -51,9 +52,8 @@ AuthBootstrap.init = function() {
       'contentScripts/js/dist/login.js',
     ],
     attachTo: {existing: true, reload: true},
-    onAttach: function(worker) {
-      user.flushMasterPassword();
-      user.stopSessionKeepAlive();
+    onAttach: async function(worker) {
+      await PassphraseStorageService.flush();
 
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows

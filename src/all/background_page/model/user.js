@@ -4,13 +4,13 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import browser from "../sdk/polyfill/browserPolyfill";
 import UserService from "../service/api/user/userService";
 import {Config} from "./config";
 import UserSettings from "./userSettings/userSettings";
 import ApiClientOptions from "../service/api/apiClient/apiClientOptions";
 import Validator from "validator";
 import {ValidatorRule} from "../utils/validatorRules";
+import PassphraseStorageService from "../service/session_storage/passphraseStorageService";
 
 /**
  * The class that deals with users.
@@ -21,19 +21,6 @@ const User = (function() {
 
   // the fields
   this._user = {};
-
-  /*
-   * _masterpassword be a json object with :
-   * - password: value of master password
-   * - created: timestamp when it was stored
-   * - timeout: interval function before passphrase is flushed
-   */
-  this._masterPassword = null;
-
-  /*
-   * Interval function to keep session alive
-   */
-  this._sessionKeepAliveTimeout = null;
 
   /*
    * _csrfToken The user current csrf token.
@@ -290,82 +277,6 @@ const User = (function() {
   };
 
   /**
-   * Store the master password temporarily.
-   *
-   * @param masterPassword {string} The master password to store.
-   * @param seconds {int} seconds Remember the master password for X seconds. If -1 given,
-   * store the master password until the end of the session.
-   */
-  this.storeMasterPasswordTemporarily = function(masterPassword, seconds) {
-    this.flushMasterPassword();
-    this._masterPassword = {
-      "password": masterPassword,
-      "created": Math.round(new Date().getTime() / 1000.0),
-      "timeout": null
-    };
-
-    /*
-     * If the seconds parameters is not equal to -1, set a timeout to flush the master passphrase at the end
-     * of the defined period. If it is set to -1 it will be flushed based on the passbolt.auth.after-logout
-     * event or when the browser is closed.
-     */
-    if (seconds !== -1) {
-      this._masterPassword.timeout = setTimeout(() => {
-        this.flushMasterPassword();
-        this.stopSessionKeepAlive();
-      }, seconds * 1000);
-    }
-    if (this._sessionKeepAliveTimeout === null) {
-      this.setKeepAliveTimeout();
-    }
-  };
-
-  /**
-   * Flush the master password if any stored during a previous session
-   */
-  this.flushMasterPassword = function() {
-    if (this._masterPassword && this._masterPassword.timeout) {
-      clearTimeout(this._masterPassword.timeout);
-    }
-    this._masterPassword = null;
-  };
-
-  /**
-   * Stop keeping the session alive
-   */
-  this.stopSessionKeepAlive = function() {
-    if (this._sessionKeepAliveTimeout) {
-      clearTimeout(this._sessionKeepAliveTimeout);
-    }
-    this._sessionKeepAliveTimeout = null;
-  };
-
-  /**
-   * @return void
-   */
-  this.setKeepAliveTimeout = function() {
-    this._sessionKeepAliveTimeout = setTimeout(() => {
-      this.keepAlive();
-    }, 15 * 60 * 1000); // check every 15 minutes
-  };
-
-  /**
-   * Keep session alive if user's system is active for last 15 min
-   * @returns void
-   */
-  this.keepAlive = function() {
-    const idleInterval = 15 * 60; // detection interval in sec: 15 minutes
-    browser.idle.queryState(idleInterval).then(async idleState => {
-      if (idleState === 'active' && this._masterPassword !== null) {
-        const apiClientOptions = await this.getApiClientOptions();
-        const userService = new UserService(apiClientOptions);
-        await userService.keepSessionAlive();
-      }
-      this.setKeepAliveTimeout();
-    });
-  };
-
-  /**
    * Retrieve and the store the user csrf token.
    * @return {void}
    */
@@ -436,29 +347,6 @@ const User = (function() {
   this.updateSecurityToken = async function(token) {
     this.settings.setSecurityToken(token);
   };
-
-  /**
-   * Check if the master password is stored.
-   * @return {boolean}
-   */
-  this.isMasterPasswordStored = function() {
-    return this._masterPassword !== null;
-  };
-
-  /**
-   * Retrieve master password from memory, in case it was stored temporarily
-   * by the user.
-   * @returns {Promise}
-   */
-  this.getStoredMasterPassword = function() {
-    return new Promise((resolve, reject) => {
-      if (this.isMasterPasswordStored()) {
-        resolve(this._masterPassword.password);
-      } else {
-        reject(new Error('No master password stored.'));
-      }
-    });
-  };
 });
 
 const UserSingleton = (function() {
@@ -481,11 +369,9 @@ const UserSingleton = (function() {
        * Observe when the user session is terminated.
        * - Flush the temporary stored master password
        */
-      window.addEventListener("passbolt.auth.after-logout", () => {
-        const user = UserSingleton.getInstance();
-        user.flushMasterPassword();
-        user.stopSessionKeepAlive();
-      });
+      window.addEventListener("passbolt.auth.after-logout", async() =>
+        await PassphraseStorageService.flush()
+      );
     }
   };
 })();

@@ -20,7 +20,7 @@ import GetDecryptedUserPrivateKeyService from "../../service/account/getDecrypte
 import {App as app} from "../../app";
 import GpgAuthToken from "../gpgAuthToken";
 import GpgAuthHeader from "../gpgAuthHeader";
-
+import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 
 class AuthModel {
   /**
@@ -81,7 +81,7 @@ class AuthModel {
      * MFA may not be complete yet, so no need to preload things here
      */
     if (rememberUntilLogout) {
-      user.storeMasterPasswordTemporarily(passphrase, -1);
+      await PassphraseStorageService.set(passphrase, -1);
     }
     await this.postLogin();
   }

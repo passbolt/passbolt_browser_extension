@@ -1,5 +1,6 @@
 import './matchers/extendExpect';
 import MockStorage from '../src/all/background_page/sdk/storage.test.mock';
+import MockAlarms from './mocks/mockAlarms';
 import OrganizationSettingsModel from "../src/all/background_page/model/organizationSettings/organizationSettingsModel";
 import {Config} from "../src/all/background_page/model/config";
 import Keyring from "../src/all/background_page/model/keyring";
@@ -18,7 +19,8 @@ jest.mock("webextension-polyfill", () => Object.assign({}, {
     getManifest: jest.fn(() => ({
       version: "v3.6.0"
     }))
-  }
+  },
+  alarms: new MockAlarms()
 }));
 
 beforeEach(async() => {

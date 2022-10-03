@@ -13,7 +13,7 @@
  */
 import {v4 as uuidv4} from "uuid";
 
-export const readSecret = async(data = {}) => {
+export const readSecret = (data = {}) => {
   const defaultData = {
     id: uuidv4(),
     created: "2022-03-04T13:59:11+00:00",

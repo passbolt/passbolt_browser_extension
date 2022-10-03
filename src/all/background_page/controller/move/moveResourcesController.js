@@ -21,6 +21,7 @@ import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
+import Log from "../../model/log";
 
 
 class MoveResourcesController {
@@ -133,6 +134,7 @@ class MoveResourcesController {
    */
   filterOutResourcesThatWontMove() {
     // Remove resources that are directly selected that can't be moved
+    const resourceIdsToRemove = [];
     for (const resource of this.resources) {
       let parent = null;
       if (resource.folderParentId !== null) {
@@ -140,9 +142,10 @@ class MoveResourcesController {
       }
       if (!ResourceEntity.canResourceMove(resource, parent, this.destinationFolder)) {
         console.warning(`Resource ${resource.name} can not be moved, skipping.`);
-        this.resources.remove(resource.id);
+        resourceIdsToRemove.push(resource.id);
       }
     }
+    this.resources.removeMany(resourceIdsToRemove);
   }
 
   /**
@@ -192,11 +195,19 @@ class MoveResourcesController {
    * @returns {Promise<void>}
    */
   async move() {
+    const resourceIdsToRemove = [];
     for (const resource of this.resources) {
-      await this.progressService.finishStep(i18n.t('Moving {{name}}', {name: resource.name}));
       if (resource.folderParentId !== this.destinationFolderId) {
-        await this.resourceModel.move(resource.id, this.destinationFolderId);
+        await this.progressService.finishStep(i18n.t('Moving {{name}}', {name: resource.name}));
+        await this.resourceModel.move(resource, this.destinationFolderId);
+      } else {
+        Log.write({level: 'debug', message: `Resource ${resource.name} is already in the folder, skipping.`});
+        resourceIdsToRemove.push(resource.id);
       }
+    }
+    this.resources.removeMany(resourceIdsToRemove);
+    if (this.resources.length > 0) {
+      await this.resourceModel.updateCollection(this.resources);
     }
   }
 

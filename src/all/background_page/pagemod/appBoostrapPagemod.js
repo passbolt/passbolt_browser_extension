@@ -13,9 +13,9 @@ import User from "../model/user";
 import {Worker} from "../model/worker";
 import {App as app} from "../app";
 import PageMod from "../sdk/page-mod";
+import ParseAppUrlService from "../service/app/parseAppUrlService";
 
-const AppBoostrapPagemod = function() {
-};
+const AppBoostrapPagemod = function() {};
 AppBoostrapPagemod._pageMod = null;
 
 AppBoostrapPagemod.exists = function() {
@@ -42,31 +42,27 @@ AppBoostrapPagemod.initPageMod = function() {
    * ✗ https://demo.passbolt.com.attacker.com
    * ✗ https://demo.passbolt.com/auth/login
    */
-  const user = User.getInstance();
-  const escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
-  const url = `^${escapedDomain}/?(/app.*)?(#.*)?$`;
-  const regex = new RegExp(url);
 
   return new PageMod({
-    name: 'AppBoostrap',
-    include: regex,
-    contentScriptWhen: 'ready',
+    name: "AppBoostrap",
+    include: new RegExp(ParseAppUrlService.getRegex()),
+    contentScriptWhen: "ready",
     contentStyleFile: [
       /*
        * @deprecated when support for v2 is dropped
        * used to control iframe styling without inline style in v3
        */
-      'webAccessibleResources/css/themes/default/ext_external.min.css'
+      "webAccessibleResources/css/themes/default/ext_external.min.css"
     ],
     contentScriptFile: [
-      'contentScripts/js/dist/vendors.js',
-      'contentScripts/js/dist/app.js',
+      "contentScripts/js/dist/vendors.js",
+      "contentScripts/js/dist/app.js",
     ],
     attachTo: {existing: true, reload: true},
     onAttach: async function(worker) {
       const auth = new GpgAuth();
-      if (!await auth.isAuthenticated() || await auth.isMfaRequired()) {
-        console.error('Can not attach application if user is not logged in.');
+      if (!(await auth.isAuthenticated()) || (await auth.isMfaRequired())) {
+        console.error("Can not attach application if user is not logged in.");
         return;
       }
 
@@ -75,8 +71,8 @@ AppBoostrapPagemod.initPageMod = function() {
       // Keep the pagemod event listeners at the end of the list.
       app.events.pagemod.listen(worker);
 
-      Worker.add('AppBootstrap', worker);
-    }
+      Worker.add("AppBootstrap", worker);
+    },
   });
 };
 

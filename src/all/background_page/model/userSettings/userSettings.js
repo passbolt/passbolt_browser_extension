@@ -127,7 +127,7 @@ class UserSettings {
    * @returns {void}
    */
   validateTheme(theme) {
-    const whitelist = ['default', 'midgar'];
+    const whitelist = ['default', 'midgar', 'solarized_light', 'solarized_dark'];
     if (whitelist.indexOf(theme) === -1) {
       throw new Error('The theme is not valid.');
     }

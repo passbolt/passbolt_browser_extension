@@ -329,6 +329,16 @@ class ResourceModel {
   }
 
   /**
+   * Update resources in the local storage
+   *
+   * @param {ResourcesCollection} resourcesCollection
+   * @returns {Promise<void>}
+   */
+  async updateCollection(resourcesCollection) {
+    await ResourceLocalStorage.updateResourcesCollection(resourcesCollection);
+  }
+
+  /**
    * Delete a resource using Passbolt API and remove the resource from the local storage
    *
    * @param {string} resourceId The resource id
@@ -340,21 +350,14 @@ class ResourceModel {
   }
 
   /**
-   * Move a folder using Passbolt API
+   * Move resources using Passbolt API
    *
-   * @param {string} resourceId the resource id
+   * @param {ResourceEntity} resourceEntity the resource entity
    * @param {(string|null)} folderParentId the folder parent
-   * @returns {ResourceEntity}
    */
-  async move(resourceId, folderParentId) {
-    const resourceDto = await ResourceLocalStorage.getResourceById(resourceId);
-    const resourceEntity = new ResourceEntity(resourceDto);
+  async move(resourceEntity, folderParentId) {
     resourceEntity.folderParentId = folderParentId;
     await this.moveService.move(resourceEntity);
-    // TODO update modified date
-    await ResourceLocalStorage.updateResource(resourceEntity);
-
-    return resourceEntity;
   }
 
   /*

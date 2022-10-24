@@ -17,9 +17,10 @@ import AuthenticationEventController from "../controller/auth/authenticationEven
 
 /**
  * Listens the inform call to action events
- * @param worker
+ * @param {Worker} worker
+ * @param {AccountEntity} account the user account
  */
-const listen = function(worker) {
+const listen = function(worker, _, account) {
   const authenticationEventController = new AuthenticationEventController(worker);
   authenticationEventController.startListen();
 
@@ -31,7 +32,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.in-form-cta.check-status', async requestId => {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
-    const informCallToActionController = new InformCallToActionController(worker, apiClientOptions);
+    const informCallToActionController = new InformCallToActionController(worker, apiClientOptions, account);
     await informCallToActionController.checkStatus(requestId);
   });
 
@@ -43,7 +44,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.in-form-cta.suggested-resources', async requestId => {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
-    const informCallToActionController = new InformCallToActionController(worker, apiClientOptions);
+    const informCallToActionController = new InformCallToActionController(worker, apiClientOptions, account);
     await informCallToActionController.countSuggestedResourcesCount(requestId);
   });
 
@@ -54,7 +55,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.in-form-cta.execute', async requestId => {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
-    const informCallToActionController = new InformCallToActionController(worker, apiClientOptions);
+    const informCallToActionController = new InformCallToActionController(worker, apiClientOptions, account);
     await informCallToActionController.execute(requestId);
   });
 };

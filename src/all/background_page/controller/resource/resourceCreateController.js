@@ -37,7 +37,7 @@ class ResourceCreateController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.resourceModel = new ResourceModel(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.folderModel = new FolderModel(apiClientOptions);
     this.keyring = new Keyring();
     this.progressService = new ProgressService(this.worker, i18n.t('Creating password'));

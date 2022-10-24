@@ -44,7 +44,7 @@ const listen = function(worker, _, account) {
   worker.port.on('passbolt.share.get-resources', async(requestId, resourcesIds) => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
-      const resourceModel = new ResourceModel(apiClientOptions);
+      const resourceModel = new ResourceModel(apiClientOptions, account);
       const resourcesCollection = await resourceModel.findAllForShare(resourcesIds);
       worker.port.emit(requestId, 'SUCCESS', resourcesCollection);
     } catch (error) {

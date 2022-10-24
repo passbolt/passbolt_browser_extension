@@ -45,7 +45,7 @@ const listen = function(worker, _, account) {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const controller = new SecretDecryptController(worker, requestId, apiClientOptions, account);
       const plaintextEntity = await controller.exec(resourceId);
-      const resourceModel = new ResourceModel(apiClientOptions);
+      const resourceModel = new ResourceModel(apiClientOptions, account);
       const resource = await resourceModel.getById(resourceId);
 
       // Define what to do autofill

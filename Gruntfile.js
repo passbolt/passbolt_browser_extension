@@ -228,6 +228,24 @@ module.exports = function (grunt) {
           dest: path.build_web_accessible_resources + 'css/themes/midgar',
           expand: true
         }, {
+          // CSS files solarized light
+          cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/solarized_light',
+          src: [
+            'ext_login.min.css', 'ext_in_form_cta.min.css', 'ext_setup.min.css', 'ext_quickaccess.min.css',
+            'ext_app.min.css', 'ext_authentication.min.css', 'ext_in_form_menu.min.css'
+          ],
+          dest: path.build_web_accessible_resources + 'css/themes/solarized_light',
+          expand: true
+        }, {
+          // CSS files solarized dark
+          cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/solarized_dark',
+          src: [
+            'ext_login.min.css', 'ext_in_form_cta.min.css', 'ext_setup.min.css', 'ext_quickaccess.min.css',
+            'ext_app.min.css', 'ext_authentication.min.css', 'ext_in_form_menu.min.css'
+          ],
+          dest: path.build_web_accessible_resources + 'css/themes/solarized_dark',
+          expand: true
+        }, {
           // Fonts
           cwd: path.node_modules + 'passbolt-styleguide/src/fonts',
           src: ['opensans-bold.woff', 'opensans-regular.woff', 'passbolt.ttf'],

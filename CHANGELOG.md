@@ -4,6 +4,39 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.8.0] - 2022-11-04
+### Added
+- PB-19151: As LU I want to be able to use Solarized light and dark themes
+- PB-19220: As AD I want to manage SMTP settings in the administration workspace
+
+### Improved
+- PB-19229: As AD I want to see the passwords I entered in the MFA administration settings forms
+- PB-19226: As LU I want to move resources to another folder with better performances
+- PB-19034: As GM I should see if there is more than 3 users in a group I'm editing
+- PB-19214: As LU I want to see a long resource/tag/folders name fitting its delete dialog
+
+### Fixed
+- PB-19228: As a user I should see a feedback when the password or description fields content is truncated by a field limit
+- PB-19216: As LU I want to populate a form from the Quick access after the generation of new credentials
+
+### Security
+- PB-19537: As a user I want my password fields to be hidden in Passbolt forms when the form is being submitted
+- PB-18639: Restrict the port connection to our extension only for chrome
+
+### Maintenance
+- PB-19237: As a dev I should see the “change user passphrase” stories in storybook
+- PB-18499: [MV3] Bootstrap MV3 build
+- PB-18600: [MV3] Migrate passphrase “remember me” code into a service
+- PB-18640: [MV3] Use alarms API instead of setTimeout and setInterval
+- PB-18641: [MV3] Use ProgressService instead of ProgressController
+- PB-18649: Use navigator.clipboard API instead of the copy to clipboard iframe mechanism
+- PB-18657: [MV3] Implement a scripting polyfill to ensure scripts and css can be injected with both manifest versions
+- PB-19231: Improve “select” styleguide component unit tests coverage
+- PB-19232: Implement browser extension app url parser
+- PB-19238: Move events create and get to dedicated controllers
+- PB-19558: Run storybook test against CI
+- PB-19586: Create email notifications actions
+
 ## [3.7.3] - 2022-09-24
 ### Security
 - PB-19090 Ensure we are spell-jacking proof for our input password
@@ -937,7 +970,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.2...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.8.0...HEAD
+[3.8.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.3...v3.8.0
+[3.7.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.2...v3.7.3
 [3.7.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.1...v3.7.2
 [3.7.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.0...v3.7.1
 [3.7.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.6.2...v3.7.0

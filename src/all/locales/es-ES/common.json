@@ -67,7 +67,7 @@
   "The message should be a valid openpgp message.": "El mensaje debe ser un mensaje válido de openpgp.",
   "The message should be of type string.": "El mensaje debe ser de tipo cadena.",
   "The passphrase should be a valid UTF8 string.": "La contraseña debe ser una cadena UTF8 válida.",
-  "The private key should be a valid openpgp key.": "La clave debe ser una clave openpgp válida.",
+  "The private key should be a valid openpgp key.": "La clave privada debe ser una clave openpgp válida.",
   "The private key should be decrypted.": "La clave privada debe estar descifrada.",
   "The private key should be encrypted.": "La clave privada debe estar cifrada.",
   "The private key should not be expired.": "La clave privada no debería estar caducada.",

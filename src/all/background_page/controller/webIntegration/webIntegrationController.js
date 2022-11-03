@@ -45,7 +45,7 @@ class WebIntegrationController {
       secret_clear: resourceToSave.password
     };
     const resource = new ExternalResourceEntity(resourceDto);
-    ResourceInProgressCacheService.set(resource);
+    await ResourceInProgressCacheService.set(resource);
     QuickAccessService.openInDetachedMode(queryParameters);
   }
 }

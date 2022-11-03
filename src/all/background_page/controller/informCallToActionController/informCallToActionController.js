@@ -12,7 +12,7 @@
  * @since         3.3.0
  */
 import GpgAuth from "../../model/gpgauth";
-import browser from "webextension-polyfill";
+import browser from "../../sdk/polyfill/browserPolyfill";
 import User from "../../model/user";
 import ResourceModel from "../../model/resource/resourceModel";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";

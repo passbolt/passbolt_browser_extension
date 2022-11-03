@@ -97,7 +97,7 @@ class InformMenuController {
     // Store the resource to save in cache.
     const resourceDto = {name: name, username: username, uri: uri, secret_clear: secret_clear};
     const resource = new ExternalResourceEntity(resourceDto);
-    ResourceInProgressCacheService.set(resource);
+    await ResourceInProgressCacheService.set(resource);
 
     // Open the quickaccess on the save credentials page.
     const quickaccessDetachModeQueryParameters = [

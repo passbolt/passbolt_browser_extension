@@ -13,7 +13,7 @@
  *
  * Background script for browser listener
  */
-import browser from 'webextension-polyfill';
+import browser from '../../sdk/polyfill/browserPolyfill';
 import OnExtensionInstalledController from "../../controller/extension/OnExtensionInstalledController";
 
 /**

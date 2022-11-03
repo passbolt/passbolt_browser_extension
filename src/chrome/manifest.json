@@ -5,23 +5,24 @@
   "version": "3.7.3",
   "description": "__MSG_appDescription__",
   "default_locale": "en",
+  "externally_connectable": {},
   "icons": {
-    "16": "icons/icon-16.png",
-    "48": "icons/icon-48.png",
-    "128": "icons/icon-128.png"
+    "16": "webAccessibleResources/img/icons/icon-16.png",
+    "48": "webAccessibleResources/img/icons/icon-48.png",
+    "128": "webAccessibleResources/img/icons/icon-128.png"
   },
   "background": {
     "page": "index.html"
   },
   "browser_action": {
-    "default_icon": "icons/icon-32.png",
+    "default_icon": "webAccessibleResources/img/icons/icon-32.png",
     "theme_icons": [{
-        "light": "icons/icon-32.png",
-        "dark": "icons/icon-32.png",
+        "light": "webAccessibleResources/img/icons/icon-32.png",
+        "dark": "webAccessibleResources/img/icons/icon-32.png",
         "size": 32
     }],
     "default_title": "Passbolt Quickaccess",
-    "default_popup": "data/quickaccess.html?passbolt=quickaccess"
+    "default_popup": "webAccessibleResources/quickaccess.html?passbolt=quickaccess"
   },
   "commands": {
     "passbolt-open": {
@@ -41,9 +42,10 @@
     "background",
     "clipboardWrite",
     "downloads",
-    "*://*/*"
+    "*://*/*",
+    "alarms"
   ],
   "web_accessible_resources": [
-    "data/*"
+    "webAccessibleResources/*"
   ]
 }

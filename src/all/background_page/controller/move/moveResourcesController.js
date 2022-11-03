@@ -17,10 +17,11 @@ import {PassphraseController as passphraseController} from "../passphrase/passph
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import FolderModel from "../../model/folder/folderModel";
 import Share from "../../model/share";
-import {ProgressController as progressController} from "../progress/progressController";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
 import i18n from "../../sdk/i18n";
+import ProgressService from "../../service/progress/progressService";
+import Log from "../../model/log";
 
 
 class MoveResourcesController {
@@ -37,6 +38,7 @@ class MoveResourcesController {
     this.folderModel = new FolderModel(clientOptions);
     this.resourceModel = new ResourceModel(clientOptions);
     this.keyring = new Keyring();
+    this.progressService = new ProgressService(this.worker);
   }
 
   /**
@@ -54,18 +56,24 @@ class MoveResourcesController {
       throw error;
     }
     try {
-      await progressController.open(this.worker, this.getProgressTitle(), 1, i18n.t('Initializing ...'));
+      this.progressService.title = this.getProgressTitle();
+      this.progressService.start(null, i18n.t('Initializing ...'));
+
       await this.findAllForShare();
       this.filterOutResourcesThatWontMove();
-      await this.setGoals();
+
+      this.progressService.updateGoals(this.getGoals());
+
+      await this.progressService.finishStep(i18n.t('Calculating changes ...'), true);
       await this.calculateChanges();
+
       await this.move();
       await this.share();
-      await progressController.update(this.worker, this.goals, i18n.t('Done'));
-      await progressController.close(this.worker);
+      await this.progressService.finishStep(i18n.t('Done'), true);
+      await this.progressService.close();
       this.cleanup();
     } catch (error) {
-      await progressController.close(this.worker);
+      await this.progressService.close();
       this.cleanup();
       throw error;
     }
@@ -126,6 +134,7 @@ class MoveResourcesController {
    */
   filterOutResourcesThatWontMove() {
     // Remove resources that are directly selected that can't be moved
+    const resourceIdsToRemove = [];
     for (const resource of this.resources) {
       let parent = null;
       if (resource.folderParentId !== null) {
@@ -133,32 +142,28 @@ class MoveResourcesController {
       }
       if (!ResourceEntity.canResourceMove(resource, parent, this.destinationFolder)) {
         console.warning(`Resource ${resource.name} can not be moved, skipping.`);
-        this.resources.remove(resource.id);
+        resourceIdsToRemove.push(resource.id);
       }
     }
+    this.resources.removeMany(resourceIdsToRemove);
   }
 
   /**
    * Set goals and init progress counter
-   * @returns {Promise<void>}
+   * @returns {number}
    */
-  async setGoals() {
+  getGoals() {
     // goals = (number of resources to move * get move, secret, decrypt, share) + calculate changes + sync keyring
-    this.goals = (this.resources.length * 5) + 1;
-    this.progress = 0;
-    await progressController.updateGoals(this.worker, this.goals);
-    await progressController.update(this.worker, this.progress++, i18n.t('Calculating changes ...'));
+    return (this.resources.length * 5) + 1;
   }
 
   /**
    * Build changes to be used in bulk share
-   * @returns {Promise<void>}
    */
   async calculateChanges() {
     this.changes = new PermissionChangesCollection([]);
     for (const resource of this.resources) {
-      await progressController.update(this.worker, this.progress++, i18n.t('Calculating changes for {{name}}', {name: resource.name}));
-
+      await this.progressService.finishStep(i18n.t('Calculating changes for {{name}}', {name: resource.name}));
       /*
        * A user who can update a resource can move it
        * But to change the rights they need to be owner
@@ -180,7 +185,7 @@ class MoveResourcesController {
       }
 
       const parent = !resource.folderParentId ? null : this.resourcesParentFolders.getById(resource.folderParentId);
-      const changes = await this.resourceModel.calculatePermissionsChangesForMove(resource, parent, this.destinationFolder);
+      const changes = this.resourceModel.calculatePermissionsChangesForMove(resource, parent, this.destinationFolder);
       this.changes.merge(changes);
     }
   }
@@ -190,11 +195,19 @@ class MoveResourcesController {
    * @returns {Promise<void>}
    */
   async move() {
+    const resourceIdsToRemove = [];
     for (const resource of this.resources) {
-      await progressController.update(this.worker, this.progress++, i18n.t('Moving {{name}}', {name: resource.name}));
       if (resource.folderParentId !== this.destinationFolderId) {
-        await this.resourceModel.move(resource.id, this.destinationFolderId);
+        await this.progressService.finishStep(i18n.t('Moving {{name}}', {name: resource.name}));
+        await this.resourceModel.move(resource, this.destinationFolderId);
+      } else {
+        Log.write({level: 'debug', message: `Resource ${resource.name} is already in the folder, skipping.`});
+        resourceIdsToRemove.push(resource.id);
       }
+    }
+    this.resources.removeMany(resourceIdsToRemove);
+    if (this.resources.length > 0) {
+      await this.resourceModel.updateCollection(this.resources);
     }
   }
 
@@ -206,10 +219,10 @@ class MoveResourcesController {
     const resourcesDto = this.resources.toDto({secrets: true});
     const changesDto = this.changes.toDto();
     if (changesDto.length) {
-      await progressController.update(this.worker, this.progress++, i18n.t('Synchronizing keys'));
+      await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
       await this.keyring.sync();
       await Share.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
-        await progressController.update(this.worker, this.progress++, message);
+        await this.progressService.finishStep(message);
       });
       await this.resourceModel.updateLocalStorage();
     }

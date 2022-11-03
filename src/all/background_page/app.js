@@ -23,7 +23,6 @@ import {AppEvents} from "./event/appEvents";
 import {AppBootstrapEvents} from "./event/appBootstrapEvents";
 import {ActionLogEvents} from "./event/actionLogEvents";
 import {AuthEvents} from "./event/authEvents";
-import {ClipboardEvents} from "./event/clipboardEvents";
 import {CommentEvents} from "./event/commentEvents";
 import {ConfigEvents} from "./event/configEvents";
 import {ExportResourcesEvents} from "./event/exportResourcesEvents";
@@ -67,7 +66,6 @@ import RecoverBootstrap from "./pagemod/recoverBootstrapPagemod";
 import AccountRecoveryBootstrap from "./pagemod/accountRecoveryBootstrapPagemod";
 import AccountRecovery from "./pagemod/accountRecoveryPagemod";
 import QuickAccess from "./pagemod/quickAccessPagemod";
-import Clipboard from "./pagemod/clipboardPagemod";
 import File from "./pagemod/filePagemod";
 import InFormCallToAction from "./pagemod/inFormCallToActionPagemod";
 import InFormMenu from "./pagemod/informMenuPagemod";
@@ -79,7 +77,6 @@ events.app = AppEvents;
 events.appBootstrap = AppBootstrapEvents;
 events.actionLogs = ActionLogEvents;
 events.auth = AuthEvents;
-events.clipboard = ClipboardEvents;
 events.comment = CommentEvents;
 events.config = ConfigEvents;
 events.exportResources = ExportResourcesEvents;
@@ -206,11 +203,6 @@ pageMods.AccountRecovery = AccountRecovery;
  * The reset of the setup process is driven on the add-on side, see in ../data/quickaccess.html
  */
 pageMods.QuickAccess = QuickAccess;
-
-/*
- * This pagemod drives the clipboard iframe tool
- */
-pageMods.Clipboard = Clipboard;
 
 /*
  * This pagemod drives the file iframe tool

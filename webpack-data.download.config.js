@@ -2,7 +2,7 @@ const path = require('path');
 
 const config = {
   entry: {
-    'app': path.resolve(__dirname, './src/all/data/js/app/Download.js')
+    'app': path.resolve(__dirname, './src/all/webAccessibleResources/js/app/Download.js')
   },
   mode: 'production',
   module: {
@@ -35,7 +35,7 @@ const config = {
   output: {
     // Set a unique name to ensure the cohabitation of multiple webpack loader on the same page.
     chunkLoadingGlobal: 'dataDownloadChunkLoadingGlobal',
-    path: path.resolve(__dirname, './build/all/data/js/dist/download'),
+    path: path.resolve(__dirname, './build/all/webAccessibleResources/js/dist/download'),
     pathinfo: true,
     filename: '[name].js'
   }

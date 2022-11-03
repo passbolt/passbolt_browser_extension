@@ -17,10 +17,10 @@ import {PassphraseController as passphraseController} from "../passphrase/passph
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import FolderModel from "../../model/folder/folderModel";
 import Share from "../../model/share";
-import {ProgressController as progressController} from "../progress/progressController";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
 import i18n from "../../sdk/i18n";
+import ProgressService from "../../service/progress/progressService";
 
 class ShareFoldersController {
   /**
@@ -48,6 +48,8 @@ class ShareFoldersController {
 
     this.passphrase = null;
     this.privateKey = null;
+
+    this.progressService = new ProgressService(this.worker);
   }
 
   /**
@@ -68,16 +70,19 @@ class ShareFoldersController {
     }
 
     try {
-      await progressController.open(this.worker, i18n.t('Sharing folder {{name}}', {name: this.folder.name}), 1, i18n.t('Initializing ...'));
+      this.progressService.title = i18n.t('Sharing folder {{name}}', {name: this.folder.name});
+      this.progressService.start(null, i18n.t('Initializing ...'));
       await this.findAllForShare();
-      await this.setGoals();
-      await this.calculateChanges();
+      this.progressService.updateGoals(this.getGoals());
+
+      await this.progressService.finishStep(i18n.t('Calculating changes...'), true);
+      this.calculateChanges();
       await this.share();
-      await progressController.update(this.worker, this.goals, i18n.t('Done'));
-      await progressController.close(this.worker);
+      await this.progressService.finishStep(i18n.t('Done'), true);
+      await this.progressService.close();
       this.cleanup();
     } catch (error) {
-      await progressController.close(this.worker);
+      await this.progressService.close();
       this.cleanup();
       throw error;
     }
@@ -147,22 +152,18 @@ class ShareFoldersController {
 
   /**
    * Set goals and init progress counter
-   * @returns {Promise<void>}
+   * @returns {number}
    */
-  async setGoals() {
+  getGoals() {
     /*
      * calculate changes for folder + subfolders + resources
      * init + (folders to update * 2) + (resources to update * get secret, decrypt, encrypt, share) + sync keyring
      */
-    this.goals = 3 + (this.subFolders.length * 2) + (this.resources.length * 4);
-    this.progress = 0;
-    await progressController.updateGoals(this.worker, this.goals);
-    await progressController.update(this.worker, this.progress++, i18n.t('Calculating changes...'));
+    return 3 + (this.subFolders.length * 2) + (this.resources.length * 4);
   }
 
   /**
-   *
-   * @returns {Promise<void>}
+   * Build changes to be used in bulk share
    */
   calculateChanges() {
     // Add current folder changes to final folders changes
@@ -193,7 +194,7 @@ class ShareFoldersController {
       const folders = new FoldersCollection([this.folder]);
       folders.merge(this.subFolders);
       await Share.bulkShareFolders(folders, this.foldersChanges, this.folderModel,  async message => {
-        await progressController.update(this.worker, this.progress++, message);
+        await this.progressService.finishStep(message);
       });
     }
 
@@ -201,10 +202,10 @@ class ShareFoldersController {
     if (this.resourcesChanges.length) {
       const resourcesDto = this.resources.toDto({secrets: true});
       const changesDto = this.resourcesChanges.toDto();
-      await progressController.update(this.worker, this.progress++, i18n.t('Synchronizing keys'));
+      await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
       await this.keyring.sync();
       await Share.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
-        await progressController.update(this.worker, this.progress++, message);
+        await this.progressService.finishStep(message);
       });
       await this.resourceModel.updateLocalStorage();
     }

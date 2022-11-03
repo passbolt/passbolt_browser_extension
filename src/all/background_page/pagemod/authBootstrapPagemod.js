@@ -10,6 +10,7 @@ import User from "../model/user";
 import {Worker} from "../model/worker";
 import {App as app} from "../app";
 import PageMod from "../sdk/page-mod";
+import PassphraseStorageService from "../service/session_storage/passphraseStorageService";
 
 const AuthBootstrap = function() {};
 AuthBootstrap._pageMod = undefined;
@@ -44,16 +45,15 @@ AuthBootstrap.init = function() {
        * @deprecated when support for v2 is dropped
        * used to control iframe styling without inline style in v3
        */
-      'data/css/themes/default/ext_external.min.css'
+      'webAccessibleResources/css/themes/default/ext_external.min.css'
     ],
     contentScriptFile: [
-      'content_scripts/js/dist/vendors.js',
-      'content_scripts/js/dist/login.js',
+      'contentScripts/js/dist/vendors.js',
+      'contentScripts/js/dist/login.js',
     ],
     attachTo: {existing: true, reload: true},
-    onAttach: function(worker) {
-      user.flushMasterPassword();
-      user.stopSessionKeepAlive();
+    onAttach: async function(worker) {
+      await PassphraseStorageService.flush();
 
       /*
        * Keep the pagemod event listeners at the end of the list, it answers to an event that allows

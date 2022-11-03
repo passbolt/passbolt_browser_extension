@@ -178,9 +178,9 @@ class FolderModel {
    * @param {ResourceEntity} folderEntity
    * @param {(FolderEntity|null)} parentFolder
    * @param {(FolderEntity|null)} destFolder
-   * @returns {Promise<PermissionChangesCollection>}
+   * @returns {PermissionChangesCollection}
    */
-  async calculatePermissionsChangesForMove(folderEntity, parentFolder, destFolder) {
+  calculatePermissionsChangesForMove(folderEntity, parentFolder, destFolder) {
     let remainingPermissions = new PermissionsCollection([], false);
 
     // Remove permissions from parent if any

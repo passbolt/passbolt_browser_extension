@@ -21,12 +21,13 @@ import {FileController as fileController} from "../fileController";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import FolderModel from "../../model/folder/folderModel";
 import ExternalFoldersCollection from "../../model/entity/folder/external/externalFoldersCollection";
-import {ProgressController as progressController} from "../progress/progressController";
+import ProgressService from "../../service/progress/progressService";
 import ResourcesExporter from "../../model/export/resourcesExporter";
 import ExternalResourcesCollection from "../../model/entity/resource/external/externalResourcesCollection";
 import ExportResourcesFileEntity from "../../model/entity/export/exportResourcesFileEntity";
 import i18n from "../../sdk/i18n";
 
+const INITIAL_PROGRESS_GOAL = 100;
 class ExportResourcesFileController {
   /**
    * ExportResourcesFileController constructor
@@ -41,9 +42,7 @@ class ExportResourcesFileController {
     this.resourceModel = new ResourceModel(clientOptions);
     this.folderModel = new FolderModel(clientOptions);
 
-    // Progress
-    this.progressGoal = 100;
-    this.progress = 0;
+    this.progressService = new ProgressService(this.worker, i18n.t("Exporting ..."));
   }
 
   /**
@@ -54,17 +53,18 @@ class ExportResourcesFileController {
     const userId = User.getInstance().get().id;
 
     try {
+      this.progressService.start(INITIAL_PROGRESS_GOAL, i18n.t("Generate file"));
       const exportEntity = new ExportResourcesFileEntity(exportResourcesFileDto);
       await this.prepareExportContent(exportEntity);
       const privateKey = await this.getPrivateKey();
       await this.decryptSecrets(exportEntity, userId, privateKey);
       await this.export(exportEntity);
       await this.download(exportEntity);
-      await progressController.update(this.worker, this.progressGoal, i18n.t('Generate file'));
-      await progressController.close(this.worker);
+      await this.progressService.finishStep(i18n.t('Done'), true);
+      await this.progressService.close();
       return exportEntity;
     } catch (error) {
-      await progressController.close(this.worker);
+      await this.progressService.close();
       throw error;
     }
   }
@@ -76,8 +76,8 @@ class ExportResourcesFileController {
    */
   async prepareExportContent(exportEntity) {
     const progressGoals = exportEntity.resourcesIds.length + 2; // 1 (initialize & find secrets) + #secrets (to encrypt) + 1 (Complete operation)
-    await progressController.open(this.worker, i18n.t("Exporting ..."), progressGoals, i18n.t('Initialize'));
-    await progressController.update(this.worker, ++this.progress);
+    this.progressService.updateGoals(progressGoals);
+    await this.progressService.finishStep(i18n.t('Initialize'), true);
 
     const foldersCollection = await this.folderModel.getAllByIds(exportEntity.foldersIds);
     const exportFoldersCollection = ExternalFoldersCollection.constructFromFoldersCollection(foldersCollection);
@@ -109,7 +109,7 @@ class ExportResourcesFileController {
     const resourcesTypesCollection = await this.resourceTypeModel.getOrFindAll();
     for (const exportResourceEntity of exportEntity.exportResources.items) {
       i++;
-      await progressController.update(this.worker, ++this.progress, i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: exportEntity.exportResources.items.length}));
+      await this.progressService.finishStep(i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: exportEntity.exportResources.items.length}));
       const secretMessage = await OpenpgpAssertion.readMessageOrFail(exportResourceEntity.secrets.items[0].data);
       let secretClear = await DecryptMessageService.decrypt(secretMessage, privateKey);
 

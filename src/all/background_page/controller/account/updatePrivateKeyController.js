@@ -13,7 +13,7 @@
  */
 import {FileController as fileController} from "../fileController";
 import AccountModel from "../../model/account/accountModel";
-import User from "../../model/user";
+import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
 
@@ -56,7 +56,7 @@ class UpdatePrivateKeyController {
       throw new Error('The old and new passphrase have to be string');
     }
     const userPrivateArmoredKey = await this.accountModel.updatePrivateKey(oldPassphrase, newPassphrase);
-    await User.getInstance().flushMasterPassword();
+    await PassphraseStorageService.flushPassphrase();
     await fileController.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", this.worker.tab.id);
   }
 }

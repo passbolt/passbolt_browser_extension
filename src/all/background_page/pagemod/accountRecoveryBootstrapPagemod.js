@@ -35,8 +35,8 @@ AccountRecoveryBootstrap.init = function() {
     contentScriptWhen: 'ready',
     contentStyleFile: [],
     contentScriptFile: [
-      'content_scripts/js/dist/vendors.js',
-      'content_scripts/js/dist/account-recovery.js',
+      'contentScripts/js/dist/vendors.js',
+      'contentScripts/js/dist/account-recovery.js',
     ],
     onAttach: async function(worker) {
       try {

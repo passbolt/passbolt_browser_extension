@@ -5,120 +5,75 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
+import browser from "./polyfill/browserPolyfill";
+
 /**
- * ScriptExecution Constructor
- *
- * @param tabId int
- * @constructor
+ * Used to set the portname.
+ * This function is used as a replacement for the imported JS code string.
+ * With MV3 API, it's not possible anymore, we need an existing function to import.
+ * @param {string} portname
  */
-function ScriptExecution(tabId) {
-  this.tabId = tabId;
+function globalSetPortname(portname) {
+  window.portname = portname;
 }
 
 /**
- * Create a callback to injects JavaScript code into a page.
- * ref. https://developer.chrome.com/extensions/tabs#method-executeScript
- *
- * @param tabId
- * @param details
- * @param callback
- * @returns {Function}
+ * Utility class to insert JS, CSS into a tab.
  */
-ScriptExecution.prototype.createScriptCallback = function(tabId, details, callback) {
-  return function() {
-    chrome.tabs.executeScript(tabId, details, callback);
-  };
-};
-
-/**
- * Create a callback to injects CSS into a page
- * ref. https://developer.chrome.com/extensions/tabs#method-insertCSS
- *
- * @param tabId
- * @param details
- * @param callback
- * @returns {Function}
- */
-ScriptExecution.prototype.createCssCallback = function(tabId, details, callback) {
-  return function() {
-    chrome.tabs.insertCSS(tabId, details, callback);
-  };
-};
-
-/**
- * Insert sequentially javascript code in the page
- *
- * @param fileArray array
- * @returns ScriptExecution object
- */
-ScriptExecution.prototype.injectScripts = function(fileArray) {
-  let callback = null;
-  let info = null;
-
-  for (let i = fileArray.length - 1; i >= 0; --i) {
-    info = {file: fileArray[i], runAt: 'document_end'};
-    callback = this.createScriptCallback(this.tabId, info, callback);
+class ScriptExecution {
+  constructor(tabId) {
+    this.tabId = tabId;
   }
-  if (callback !== null) {
-    callback();
-  }
-};
 
-/**
- * Insert javascript code in the page
- *
- * @param codeArray array
- * @returns ScriptExecution object
- */
-ScriptExecution.prototype.executeScript = function(codeArray) {
-  let callback = null;
-  let info = null;
-
-  for (let i = codeArray.length - 1; i >= 0; --i) {
-    info = {code: codeArray[i], runAt: 'document_end'};
-    callback = this.createScriptCallback(this.tabId, info, callback);
-  }
-  if (callback !== null) {
-    callback();
-  }
-};
-
-/**
- * Inject sequentially an array of css file in a page
- *
- * @param fileArray array
- * @returns ScriptExecution object
- */
-ScriptExecution.prototype.injectCss = function(fileArray) {
-  let callback = null;
-  let info = null;
-
-  for (let i = fileArray.length - 1; i >= 0; --i) {
-    info = {file: fileArray[i], runAt: 'document_end'};
-    callback = this.createCssCallback(this.tabId, info, callback);
-  }
-  if (callback !== null) {
-    callback();
-  }
-};
-
-/**
- * Set a global variables in the content code environment
- * @param options as key value
- */
-ScriptExecution.prototype.setGlobals = function(options) {
-  let value, code;
-  for (const key in options) {
-    value = options[key];
-    code = `var ${key}="`;
-    if (typeof value === 'string') {
-      code += options[key];
-    } else {
-      throw Error('ScriptExecution.setGlobal unsupported type');
+  /**
+   * Insert javascript files in the page
+   * @param {Array<string>} fileArray
+   */
+  injectJs(fileArray) {
+    if (fileArray.length === 0) {
+      return;
     }
-    code += '";';
+
+    browser.scripting.executeScript({
+      files: fileArray,
+      target: {
+        tabId: this.tabId
+      },
+      world: "ISOLATED"
+    });
   }
-  this.executeScript([code]);
-};
+
+  /**
+   * Inject an array of css files in a page
+   * @param {Array<string>} fileArray
+   */
+  injectCss(fileArray) {
+    if (fileArray.length === 0) {
+      return;
+    }
+
+    browser.scripting.insertCSS({
+      files: fileArray,
+      target: {
+        tabId: this.tabId
+      }
+    });
+  }
+
+  /**
+   * Injects the portname as a global variable.
+   * @param {string} portName
+   */
+  injectPortname(portName) {
+    browser.scripting.executeScript({
+      func: globalSetPortname,
+      args: [portName],
+      target: {
+        tabId: this.tabId
+      },
+      world: "ISOLATED"
+    });
+  }
+}
 
 export default ScriptExecution;

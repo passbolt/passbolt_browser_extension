@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import browser from "webextension-polyfill";
+import browser from "../../sdk/polyfill/browserPolyfill";
 import AbstractAccountEntity from "../../model/entity/account/abstractAccountEntity";
 import AwaitLock from "await-lock";
 

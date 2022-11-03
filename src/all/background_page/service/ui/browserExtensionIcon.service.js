@@ -12,10 +12,10 @@
  * @since         3.3
  */
 
-import browser from "webextension-polyfill";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 /** Default Passbolt browser extension icon file path  */
-const DEFAULT_BROWSER_EXTENSION_ICON_FILEPATH = '/icons/icon-32.png';
+const DEFAULT_BROWSER_EXTENSION_ICON_FILEPATH = '/webAccessibleResources/img/icons/icon-32.png';
 
 /**
  * Set a new browser extension icon given an icon file path. If empty, set the default icon
@@ -33,14 +33,14 @@ function setIcon(path) {
  * Set the browser extension icon in an active mode
  */
 function activate() {
-  setIcon('/icons/icon-32.png');
+  setIcon('/webAccessibleResources/img/icons/icon-32.png');
 }
 
 /**
  * Set the browser extension icon in an inactive mode
  */
 function deactivate() {
-  setIcon('/icons/icon-32-signout.png');
+  setIcon('/webAccessibleResources/img/icons/icon-32-signout.png');
 }
 
 /**
@@ -52,12 +52,12 @@ function setSuggestedResourcesCount(count) {
   if (hasAtLeastOneResourceToSuggest) {
     const hasLessThanFiveResourcesToSuggest = count <= 5;
     if (hasLessThanFiveResourcesToSuggest) {
-      setIcon(`/icons/icon-32-badge-${count}.png`);
+      setIcon(`/webAccessibleResources/img/icons/icon-32-badge-${count}.png`);
     } else {
-      setIcon(`/icons/icon-32-badge-5+.png`);
+      setIcon(`/webAccessibleResources/img/icons/icon-32-badge-5+.png`);
     }
   } else {
-    setIcon('/icons/icon-32.png');
+    setIcon('/webAccessibleResources/img/icons/icon-32.png');
   }
 }
 

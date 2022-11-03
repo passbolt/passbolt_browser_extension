@@ -2,11 +2,11 @@ const path = require('path');
 
 const config = {
   entry: {
-    'app': path.resolve(__dirname, './src/all/content_scripts/js/app/App.js'),
-    'setup': path.resolve(__dirname, './src/all/content_scripts/js/app/Setup.js'),
-    'recover': path.resolve(__dirname, './src/all/content_scripts/js/app/Recover.js'),
-    'login': path.resolve(__dirname, './src/all/content_scripts/js/app/Login.js'),
-    'account-recovery': path.resolve(__dirname, './src/all/content_scripts/js/app/AccountRecovery.js'),
+    'app': path.resolve(__dirname, './src/all/contentScripts/js/app/App.js'),
+    'setup': path.resolve(__dirname, './src/all/contentScripts/js/app/Setup.js'),
+    'recover': path.resolve(__dirname, './src/all/contentScripts/js/app/Recover.js'),
+    'login': path.resolve(__dirname, './src/all/contentScripts/js/app/Login.js'),
+    'account-recovery': path.resolve(__dirname, './src/all/contentScripts/js/app/AccountRecovery.js'),
   },
   mode: 'production',
   module: {
@@ -37,7 +37,7 @@ const config = {
   output: {
     // Set a unique name to ensure the cohabitation of multiple webpack loader on the same page.
     chunkLoadingGlobal: 'contentScriptChunkLoadingGlobal',
-    path: path.resolve(__dirname, './build/all/content_scripts/js/dist'),
+    path: path.resolve(__dirname, './build/all/contentScripts/js/dist'),
     pathinfo: true,
     filename: '[name].js'
   }

@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_appName__",
+  "short_name": "passbolt",
+  "version": "3.7.0",
+  "description": "__MSG_appDescription__",
+  "default_locale": "en",
+  "externally_connectable": {},
+  "icons": {
+    "16": "webAccessibleResources/img/icons/icon-16.png",
+    "48": "webAccessibleResources/img/icons/icon-48.png",
+    "128": "webAccessibleResources/img/icons/icon-128.png"
+  },
+  "background": {
+    "service_worker": "serviceWorker/serviceWorker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_icon": "webAccessibleResources/img/icons/icon-32.png",
+    "theme_icons": [{
+      "light": "webAccessibleResources/img/icons/icon-32.png",
+      "dark": "webAccessibleResources/img/icons/icon-32.png",
+      "size": 32
+    }],
+    "default_title": "Passbolt Quickaccess",
+    "default_popup": "webAccessibleResources/quickaccess.html?passbolt=quickaccess"
+  },
+  "commands": {
+    "passbolt-open": {
+      "suggested_key": {
+        "default": "Alt+Shift+P",
+        "mac": "Alt+Shift+P"
+      },
+      "description": "Open passbolt in a new tab!"
+    }
+  },
+  "permissions": [
+    "unlimitedStorage",
+    "storage",
+    "tabs",
+    "scripting",
+    "alarms"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "web_accessible_resources": [{
+    "resources": ["webAccessibleResources/*"],
+    "matches": ["*://*/*"]
+  }]
+}

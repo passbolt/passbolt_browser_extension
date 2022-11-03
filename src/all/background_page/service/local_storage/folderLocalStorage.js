@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import browser from "webextension-polyfill";
+import browser from "../../sdk/polyfill/browserPolyfill";
 import Log from "../../model/log";
 import FolderEntity from "../../model/entity/folder/folderEntity";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";

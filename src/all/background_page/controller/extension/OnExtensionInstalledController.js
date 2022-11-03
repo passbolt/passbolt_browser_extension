@@ -13,7 +13,7 @@
  *
  * On extension installed controller
  */
-import browser from 'webextension-polyfill';
+import browser from '../../sdk/polyfill/browserPolyfill';
 
 class OnExtensionInstalledController {
   /**

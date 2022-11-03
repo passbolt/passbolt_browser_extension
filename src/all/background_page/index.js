@@ -26,6 +26,7 @@ import {App} from "./app";
 import Log from "./model/log";
 import {Config} from "./model/config";
 import PostponedUserSettingInvitationService from "./service/accountRecovery/postponedUserSettingInvitationService";
+import PassphraseStorageService from "./service/session_storage/passphraseStorageService";
 
 const main = async function() {
   /*
@@ -45,6 +46,7 @@ const main = async function() {
   RolesLocalStorage.init();
   PasswordGeneratorLocalStorage.init();
   PostponedUserSettingInvitationService.init();
+  await PassphraseStorageService.init();
 
   // Openpgpjs worker initialization
   /**
@@ -114,7 +116,6 @@ const main = async function() {
    * but triggered by App or Auth
    */
   pageMods.File.init();
-  pageMods.Clipboard.init();
   pageMods.Auth.init();
   pageMods.QuickAccess.init();
   pageMods.InFormMenuCTA.init();

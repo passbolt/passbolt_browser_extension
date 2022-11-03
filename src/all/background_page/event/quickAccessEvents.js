@@ -4,7 +4,7 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import browser from "webextension-polyfill";
+import browser from "../sdk/polyfill/browserPolyfill";
 import User from "../model/user";
 import {Worker} from "../model/worker";
 import {BrowserTabService} from "../service/ui/browserTab.service";
@@ -70,7 +70,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.quickaccess.prepare-resource', async(requestId, tabId) => {
     try {
-      const resourceInProgress = ResourceInProgressCacheService.consume();
+      const resourceInProgress = await ResourceInProgressCacheService.consume();
       if (resourceInProgress === null) {
         // Retrieve resource name and uri from tab.
         const tab = tabId ? await BrowserTabService.getById(tabId) : await BrowserTabService.getCurrent();
@@ -94,7 +94,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.quickaccess.prepare-autosave', async requestId => {
     try {
-      const resourceInProgress = ResourceInProgressCacheService.consume() || {};
+      const resourceInProgress = await ResourceInProgressCacheService.consume() || {};
       worker.port.emit(requestId, 'SUCCESS', resourceInProgress);
     } catch (error) {
       console.error(error);

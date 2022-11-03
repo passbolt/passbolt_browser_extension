@@ -12,8 +12,8 @@
  * @since         2.13.0
  */
 import FolderModel from "../../model/folder/folderModel";
-import {ProgressController as progressController} from "../progress/progressController";
 import i18n from "../../sdk/i18n";
+import ProgressService from "../../service/progress/progressService";
 
 
 class FolderCreateController {
@@ -28,6 +28,7 @@ class FolderCreateController {
     this.worker = worker;
     this.requestId = requestId;
     this.folderModel = new FolderModel(clientOptions);
+    this.progressService = new ProgressService(this.worker, i18n.t('Creating folder...'));
   }
 
   /**
@@ -37,12 +38,11 @@ class FolderCreateController {
    * @returns {Promise<FolderEntity>}
    */
   async main(originalFolder) {
-    let progress = 0;
     const progressGoal = !originalFolder.folderParentId ? 1 : 3;
 
     try {
       const msg = `Creating folder ${originalFolder.name}`;
-      await progressController.open(this.worker, msg, progressGoal, i18n.t('Creating folder...'));
+      this.progressService.start(progressGoal, msg);
       const folderEntity = await this.folderModel.create(originalFolder);
 
       if (folderEntity.folderParentId) {
@@ -51,22 +51,22 @@ class FolderCreateController {
          * TODO ask if they want to keep the original permission?
          * TODO a remember me option to skip confirmation dialog
          */
-        await progressController.update(this.worker, progress++, i18n.t('Fetching parent permissions'));
+        await this.progressService.finishStep(i18n.t('Fetching parent permissions'), true);
         const targetFolder = await this.folderModel.findForShare(folderEntity.folderParentId);
 
-        await progressController.update(this.worker, progress++, i18n.t('Saving permissions...'));
+        await this.progressService.finishStep(i18n.t('Saving permissions...'), true);
         const changes = await this.folderModel.calculatePermissionsChangesForCreate(folderEntity, targetFolder);
         if (changes) {
           await this.folderModel.share(folderEntity, changes);
         }
       }
 
-      await progressController.update(this.worker, progressGoal,  i18n.t('Done!'));
-      await progressController.close(this.worker);
+      await this.progressService.finishStep(i18n.t('Done!'), true);
+      await this.progressService.close();
       return folderEntity;
     } catch (error) {
       console.error(error);
-      await progressController.close(this.worker);
+      await this.progressService.close();
       throw error;
     }
   }

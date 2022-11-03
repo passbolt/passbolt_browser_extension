@@ -16,7 +16,7 @@ import Keyring from "../../model/keyring";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import User from "../../model/user";
 import GroupsUpdateController from "./groupUpdateController";
-import browser from "webextension-polyfill";
+import browser from "../../sdk/polyfill/browserPolyfill";
 import {PassphraseController} from "../passphrase/passphraseController";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 
@@ -32,7 +32,7 @@ const {defaultGroup} = require("../../model/entity/group/groupEntity.test.data")
 const {defaultDyRunResponse} = require("../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data");
 
 
-jest.mock("../progress/progressController");
+jest.mock("../../service/progress/progressService");
 
 jest.spyOn(PassphraseController, "get").mockImplementation(() => "ada@passbolt.com");
 

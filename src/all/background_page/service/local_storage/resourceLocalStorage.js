@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
-import browser from "webextension-polyfill";
+import browser from "../../sdk/polyfill/browserPolyfill";
 import Log from "../../model/log";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
@@ -130,6 +130,31 @@ class ResourceLocalStorage {
         throw new Error('The resource could not be found in the local storage');
       }
       resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+      await browser.storage.local.set({resources: resources});
+      lock.release();
+    } catch (error) {
+      lock.release();
+      throw error;
+    }
+  }
+
+  /**
+   * Update a resource collection in the local storage.
+   * @param {ResourcesCollection} resourcesCollection The resources to update
+   * @throws {Error} if the resource does not exist in the local storage
+   */
+  static async updateResourcesCollection(resourcesCollection) {
+    await lock.acquire();
+    try {
+      const resources = await ResourceLocalStorage.get();
+      for (const resourceEntity of resourcesCollection) {
+        ResourceLocalStorage.assertEntityBeforeSave(resourceEntity);
+        const resourceIndex = resources.findIndex(item => item.id === resourceEntity.id);
+        if (resourceIndex === -1) {
+          throw new Error('The resource could not be found in the local storage');
+        }
+        resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
+      }
       await browser.storage.local.set({resources: resources});
       lock.release();
     } catch (error) {

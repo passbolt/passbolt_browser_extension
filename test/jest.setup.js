@@ -28,7 +28,9 @@ jest.mock("webextension-polyfill", () => Object.assign({}, {
   },
   alarms: new MockAlarms(),
   tabs: {
-    query: jest.fn()
+    query: jest.fn(),
+    executeScript: jest.fn(),
+    insertCSS: jest.fn()
   },
   browserAction: {
     setIcon: jest.fn(),

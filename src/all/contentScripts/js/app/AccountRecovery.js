@@ -15,17 +15,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import ExtBootstrapAccountRecovery from "passbolt-styleguide/src/react-extension/ExtBootstrapAccountRecovery";
-/* eslint-disable no-unused-vars */
 import Port from "../../../webAccessibleResources/js/lib/port";
-/* eslint-enable no-unused-vars */
 
 async function main() {
-  try {
-    await port.waitUntilPageModReady();
-  } catch (error) {
-    // If the background page disconnected the port.
-    return;
-  }
+  const port = new Port(self.portname);
+  await port.connect();
   const browserExtensionUrl = chrome.runtime.getURL("/");
   const domContainer = document.createElement("div");
   document.body.appendChild(domContainer);

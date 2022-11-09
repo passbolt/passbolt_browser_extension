@@ -1,38 +1,62 @@
 /**
- * The passbolt content code messaging capabilities
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  *
- * @copyright (c) 2017 Passbolt SARL
- * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         2.0.0
  */
-const self = window.self || {};
+import browser from "../../../background_page/sdk/polyfill/browserPolyfill";
+import {v4 as uuidv4} from "uuid";
 
-(function(self) {
+class Port {
   /**
-   * Port Class Constructor
-   * @param port
-   * @constructor
+   *
+   * @param {string} name
    */
-  const Port = function(portname) {
-    this._i = 0;
+  constructor(name) {
     this._listeners = {};
-
-    if (typeof portname !== 'undefined') {
-      this._portname = portname;
-    } else {
-      const msg = 'Port requires a portname to communicate to the addon code.';
-      throw Error(msg);
+    if (typeof name === "undefined") {
+      throw Error("A port name is required.");
+    } else if (typeof name  !== "string") {
+      throw Error("The port name should be a valid string.");
     }
-    this._port = chrome.runtime.connect({name: this._portname});
-    this._connected = true;
 
+    this._name = name;
+  }
+
+  /**
+   * Connect the port
+   * @returns {Promise<>}
+   */
+  connect() {
+    let resolver;
+    const promise = new Promise(resolve => { resolver = resolve; });
+    this._port = browser.runtime.connect({name: this._name});
+    this.initListener();
+    this.once("passbolt.port.ready", resolver);
+    return promise;
+  }
+
+  /**
+   * Init listener
+   * @private
+   */
+  initListener() {
     this._port.onDisconnect.addListener(() => {
-      console.warn(`port disconnected from addon code: ${portname}`);
+      console.warn(`port disconnected from addon code: ${this._name}`);
       this._connected = false;
     });
+
     this._port.onMessage.addListener(msg => {
       this._onMessage(msg);
     });
-  };
+  }
 
   /**
    * When a message is received on the port
@@ -41,7 +65,7 @@ const self = window.self || {};
    * @param msg
    * @private
    */
-  Port.prototype._onMessage = function(msg) {
+  _onMessage(msg) {
     const eventName = msg[0];
     if (typeof this._listeners[eventName] !== 'undefined' && this._listeners[eventName].length > 0) {
       const listeners = this._listeners[eventName];
@@ -49,14 +73,17 @@ const self = window.self || {};
         const listener = listeners[i];
         const args = Array.prototype.slice.call(msg, 1);
         listener.callback.apply(this, args);
-
         if (listener.once) {
           this._listeners[eventName].splice(i, 1);
+          // delete the listener if empty array
+          if (this._listeners[eventName].length === 0) {
+            delete this._listeners[eventName];
+          }
           i--; // jump back since i++ is the new i
         }
       }
     }
-  };
+  }
 
   /**
    * Add listener for a message name on the current port
@@ -66,7 +93,7 @@ const self = window.self || {};
    * @param once bool
    * @private
    */
-  Port.prototype._addListener = function(name, callback, once) {
+  _addListener(name, callback, once) {
     if (typeof this._listeners[name] === 'undefined') {
       this._listeners[name] = [];
     }
@@ -75,7 +102,7 @@ const self = window.self || {};
       callback: callback,
       once: once
     });
-  };
+  }
 
   /**
    * On message name triggers a callback
@@ -83,9 +110,9 @@ const self = window.self || {};
    * @param name
    * @param callback
    */
-  Port.prototype.on = function(name, callback) {
+  on(name, callback) {
     this._addListener(name, callback, false);
-  };
+  }
 
   /**
    * On message name triggers a callback only once,
@@ -94,29 +121,30 @@ const self = window.self || {};
    * @param name
    * @param callback
    */
-  Port.prototype.once = function(name, callback) {
+  once(name, callback) {
     this._addListener(name, callback, true);
-  };
+  }
 
   /**
    * Emit a message to the addon code
-   * @param args
+   * @param requestArgs the arguments
    */
-  Port.prototype.emit = function() {
-    const message = JSON.stringify(arguments);
+  emit(...requestArgs) {
+    const message = JSON.stringify(requestArgs);
     this._port.postMessage(message);
-  };
+  }
 
   /**
    * Emit a request to the addon code and expect a response.
-   * @param args
+   * @param message the message
+   * @param args the arguments
    * @return Promise
    */
-  Port.prototype.request = function(message) {
+  request(message, ...args) {
     // Generate a request id that will be used by the addon to answer this request.
-    const requestId = (Math.round(Math.random() * Math.pow(2, 32))).toString();
+    const requestId = uuidv4();
     // Add the requestId to the request parameters.
-    const requestArgs = [message, requestId].concat(Array.prototype.slice.call(arguments, 1));
+    const requestArgs = [message, requestId].concat(args);
 
     // The promise that is return when you call passbolt.request.
     return new Promise((resolve, reject) => {
@@ -124,108 +152,17 @@ const self = window.self || {};
        * Observe when the request has been completed.
        * Or if a progress notification is sent.
        */
-      this.once(requestId, function(status) {
-        const callbackArgs = Array.prototype.slice.call(arguments, 1);
-        if (status == 'SUCCESS') {
+      this.once(requestId, function(status, ...callbackArgs) {
+        if (status === 'SUCCESS') {
           resolve.apply(null, callbackArgs);
-        } else if (status == 'ERROR') {
+        } else if (status === 'ERROR') {
           reject.apply(null, callbackArgs);
         }
       });
-
       // Emit the message to the addon-code.
       this.emit.apply(this, requestArgs);
     });
-  };
+  }
+}
 
-  /**
-   * Wait until the background pagemod is ready.
-   * @returns {Promise}
-   */
-  Port.prototype.waitUntilPageModReady = function() {
-    return new Promise((resolve, reject) => {
-      const checkInterval = setInterval(() => {
-        // If the background page disconnected the port.
-        if (!this._connected) {
-          console.debug('Port disconnected');
-          clearInterval(checkInterval);
-          reject();
-        } else {
-          port.request("passbolt.pagemod.is-ready").then(() => {
-            clearInterval(checkInterval);
-            resolve();
-          });
-        }
-      }, 50);
-    });
-  };
-
-  /**
-   ****************************************************************************
-   * Protected utilities
-   ****************************************************************************
-   */
-
-  /**
-   * Parse url query variables to allow finding the portname in it
-   */
-  Port._parseUrlQuery = function() {
-    const query = window.location.search.substring(1);
-    const vars = query.split('&');
-    const result = [];
-    for (let i = 0; i < vars.length; i++) {
-      const pair = vars[i].split('=');
-      result[pair[0]] = pair[1];
-    }
-    return result;
-  };
-
-  /**
-   ****************************************************************************
-   * Bootstrap the self.port object to be used by request and message
-   ****************************************************************************
-   */
-  /**
-   * Port get singleton
-   * @returns {Port}
-   */
-  Port.get = function(portname) {
-    if (typeof self.port === 'undefined' || !self.port._connected) {
-      self.port = new Port(portname);
-    }
-    return self.port;
-  };
-
-  /**
-   * Create a port instance in self.port as global variable to match the firefox synthax
-   * this instance will be used by the message and request objects
-   * and subsequently any content code needing to communicate with the addon code
-   */
-  Port.initPort = function() {
-    /*
-     * Define port name and build singleton
-     * if portname is not inserted as variable from addon code (default scenario)
-     */
-    let port;
-    if (typeof portname === 'undefined') {
-      // try to get portname for url (Iframe scenario)
-      const query = Port._parseUrlQuery();
-      if (typeof query['passbolt'] !== 'undefined') {
-        port = query['passbolt'];
-      } else {
-        throw new Error('Portname is not provided in content code');
-      }
-    } else {
-      // eslint-disable-next-line no-undef
-      port = portname;
-    }
-    return Port.get(port);
-  };
-
-  // init port unless told not to
-  Port.initPort();
-})(self);
-
-window.self = self;
-// result must be structured-clonable data
-undefined;
+export default Port;

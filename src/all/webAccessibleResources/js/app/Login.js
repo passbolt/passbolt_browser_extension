@@ -14,33 +14,15 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import ExtAuthenticationLogin from "passbolt-styleguide/src/react-extension/ExtAuthenticationLogin";
-/* eslint-disable no-unused-vars */
 import Port from "../lib/port";
-import browser from "webextension-polyfill";
-/* eslint-enable no-unused-vars */
-
-const storage = browser.storage;
-
-/**
- * Wait until the background pagemod is ready.
- * @returns {Promise}
- */
-async function waitPagemodIsReady() {
-  let resolver;
-  const promise = new Promise(resolve => { resolver = resolve; });
-
-  const checkInterval = setInterval(() => {
-    port.request("passbolt.pagemod.is-ready").then(() => {
-      resolver();
-      clearInterval(checkInterval);
-    });
-  }, 50);
-
-  return promise;
-}
+import browser from "../../../background_page/sdk/polyfill/browserPolyfill";
 
 async function main() {
-  await waitPagemodIsReady();
+  const query = new URLSearchParams(window.location.search);
+  const portname = query.get('passbolt');
+  const port = new Port(portname);
+  await port.connect();
+  const storage = browser.storage;
   const domContainer = document.createElement("div");
   document.body.appendChild(domContainer);
   ReactDOM.render(React.createElement(ExtAuthenticationLogin, {port: port, storage: storage}), domContainer);

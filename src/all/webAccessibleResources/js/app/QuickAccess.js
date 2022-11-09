@@ -14,33 +14,15 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import ExtQuickAccess from "passbolt-styleguide/src/react-quickaccess/ExtQuickAccess";
-import browser from "webextension-polyfill";
-/* eslint-disable no-unused-vars */
+import browser from "../../../background_page/sdk/polyfill/browserPolyfill";
 import Port from "../lib/port";
-/* eslint-enable no-unused-vars */
-
-const storage = browser.storage;
-
-/**
- * Wait until the background pagemod is ready.
- * @returns {Promise}
- */
-async function waitPagemodIsReady() {
-  let resolver;
-  const promise = new Promise(resolve => { resolver = resolve; });
-
-  const checkInterval = setInterval(() => {
-    port.request("passbolt.pagemod.is-ready").then(() => {
-      resolver();
-      clearInterval(checkInterval);
-    });
-  }, 50);
-
-  return promise;
-}
 
 async function main() {
-  await waitPagemodIsReady();
+  const query = new URLSearchParams(window.location.search);
+  const portname = query.get('passbolt');
+  const port = new Port(portname);
+  await port.connect();
+  const storage = browser.storage;
   const domContainer = document.querySelector('#quickaccess-container');
   ReactDOM.render(React.createElement(ExtQuickAccess, {port: port, storage: storage}), domContainer);
 }

@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import {Worker} from "../model/worker";
-import {App as app} from "../app";
 import PageMod from "../sdk/page-mod";
 
 const SetupBootstrap = function() {};
@@ -44,11 +43,6 @@ SetupBootstrap.init = function() {
       // @todo refactoring-account-recovery, should we do something if the url doesn't parse.
 
       Worker.add('SetupBootstrap', worker);
-      /*
-       * Keep the pagemod event listeners at the end of the list, it answers to an event that allows
-       * the content code to know when the background page is ready.
-       */
-      app.events.pagemod.listen(worker);
     }
   });
 };

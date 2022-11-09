@@ -68,9 +68,6 @@ AppBoostrapPagemod.initPageMod = function() {
 
       app.events.appBootstrap.listen(worker);
 
-      // Keep the pagemod event listeners at the end of the list.
-      app.events.pagemod.listen(worker);
-
       Worker.add("AppBootstrap", worker);
     },
   });

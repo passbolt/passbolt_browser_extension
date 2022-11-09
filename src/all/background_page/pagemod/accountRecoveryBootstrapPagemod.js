@@ -12,7 +12,6 @@
  * @since         3.6.0
  */
 import {Worker} from "../model/worker";
-import {App as app} from "../app";
 import PageMod from "../sdk/page-mod";
 import GetRequestLocalAccountService from "../service/accountRecovery/getRequestLocalAccountService";
 
@@ -48,11 +47,6 @@ AccountRecoveryBootstrap.init = function() {
       }
 
       Worker.add('AccountRecoveryBootstrap', worker);
-      /*
-       * Keep the pagemod event listeners at the end of the list, it answers to an event that allows
-       * the content code to know when the background page is ready.
-       */
-      app.events.pagemod.listen(worker);
     }
   });
 };

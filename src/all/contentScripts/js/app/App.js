@@ -13,31 +13,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import ExtBootstrapApp from "passbolt-styleguide/src/react-extension/ExtBootstrapApp";
-/* eslint-disable no-unused-vars */
 import Port from "../../../webAccessibleResources/js/lib/port";
 import browser from "webextension-polyfill";
-/* eslint-enable no-unused-vars */
-
-/**
- * Wait until the background pagemod is ready.
- * @returns {Promise}
- */
-async function waitPagemodIsReady() {
-  let resolver;
-  const promise = new Promise(resolve => { resolver = resolve; });
-
-  const checkInterval = setInterval(() => {
-    port.request("passbolt.pagemod.is-ready").then(() => {
-      resolver();
-      clearInterval(checkInterval);
-    });
-  }, 50);
-
-  return promise;
-}
 
 async function main() {
-  await waitPagemodIsReady();
+  const port = new Port(self.portname);
+  await port.connect();
   const storage = browser.storage;
   const browserExtensionUrl = chrome.runtime.getURL("/");
   const domContainer = document.createElement("div");

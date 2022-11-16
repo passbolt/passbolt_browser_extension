@@ -48,9 +48,12 @@ class QuickAccess {
       app.events.locale.listen(this._worker);
       app.events.passwordGenerator.listen(this._worker);
 
-      // Keep the pagemod event listeners at the end of the list.
-      app.events.pagemod.listen(this._worker);
       WorkerModel.add('QuickAccess', this._worker);
+      /*
+       * Notify the content script that the pagemod is ready to communicate.
+       * This notification is usually sent by the page-mod itself after the events are attached, however the quickaccess is not a pagemod.
+       */
+      this._worker.port.emit("passbolt.port.ready");
     }
   }
 }

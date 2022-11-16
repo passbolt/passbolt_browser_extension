@@ -11,31 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.7.0
  */
-/* eslint-disable no-unused-vars */
-import Port from "../../../webAccessibleResources/js/lib/port";
-/* eslint-enable no-unused-vars */
 import {PublicWebsiteSignInBootstrap} from "passbolt-styleguide/src/public-website-sign-in/PublicWebsiteSignInBootstrap.js";
-
-/**
- * Wait until the background pagemod is ready.
- * @returns {Promise}
- */
-async function waitPagemodIsReady() {
-  let resolver;
-  const promise = new Promise(resolve => { resolver = resolve; });
-
-  const checkInterval = setInterval(() => {
-    port.request("passbolt.pagemod.is-ready").then(() => {
-      resolver();
-      clearInterval(checkInterval);
-    });
-  }, 50);
-
-  return promise;
-}
+import Port from "../../../webAccessibleResources/js/lib/port";
 
 async function main() {
-  await waitPagemodIsReady();
+  // Make the port object as a global variable to use it directly (TODO the port could be use in props)
+  self.port = new Port(self.portname);
+  await self.port.connect();
   PublicWebsiteSignInBootstrap.init();
 }
 

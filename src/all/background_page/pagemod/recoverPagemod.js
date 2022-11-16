@@ -53,12 +53,6 @@ Recover.init = function() {
       // @todo account-recovery-refactoring check to remove all the listener, they expose confidential services.
       app.events.config.listen(worker);
       app.events.recover.listen(worker, apiClientOptions, account);
-
-      /*
-       * Keep the pagemod event listeners at the end of the list, it answers to an event that allows
-       * the content code to know when the background page is ready.
-       */
-      app.events.pagemod.listen(worker);
     }
   });
 };

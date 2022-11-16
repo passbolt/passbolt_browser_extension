@@ -172,7 +172,7 @@ class PageMod {
     if (typeof iframe === 'undefined') {
       iframe = false;
     }
-    this._listeners['chrome.runtime.onConnect'] = port => {
+    this._listeners['chrome.runtime.onConnect'] = async port => {
       // check if the portname match
       if (port.name === portName) {
         /*
@@ -191,7 +191,9 @@ class PageMod {
         if (typeof tabId === 'undefined' || tabId === port.sender.tab.id) {
           this._ports[port.sender.tab.id] = port;
           const worker = new Worker(port, port.sender.tab, iframe, this);
-          this.args.onAttach(worker);
+          await this.args.onAttach(worker);
+          // Notify the content script that the pagemod is ready to communicate.
+          worker.port.emit("passbolt.port.ready");
         }
       }
     };

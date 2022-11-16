@@ -17,7 +17,7 @@ import GetLocaleController from "../controller/locale/getLocaleController";
 import LocaleEntity from "../model/entity/locale/localeEntity";
 
 
-const listen = async function(worker) {
+const listen = function(worker) {
   /*
    * Get locale language
    *

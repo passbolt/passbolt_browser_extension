@@ -11,20 +11,22 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import download from "downloadjs/download";
-/* eslint-disable no-unused-vars */
 import Port from "../lib/port";
-/* eslint-enable no-unused-vars */
 
 // Wait the document to be ready before executing the script given in parameter.
 const iframeReady = callback => {
-  if (document.readyState != "loading") {
+  if (document.readyState !== "loading") {
     callback();
   } else {
     document.addEventListener("DOMContentLoaded", callback);
   }
 };
 
-iframeReady(() => {
+iframeReady(async() => {
+  const query = new URLSearchParams(window.location.search);
+  const portname = query.get('passbolt');
+  const port = new Port(portname);
+  await port.connect();
   port.on('passbolt.file-iframe.download', (filename, content) => {
     download(content, filename, "text/plain");
   });

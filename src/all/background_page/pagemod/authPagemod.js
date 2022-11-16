@@ -55,12 +55,6 @@ Auth.init = function() {
       app.events.config.listen(worker);
       app.events.organizationSettings.listen(worker);
       app.events.locale.listen(worker);
-
-      /*
-       * Keep the pagemod event listeners at the end of the list, it answers to an event that allows
-       * the content code to know when the background page is ready.
-       */
-      app.events.pagemod.listen(worker);
     }
   });
 };

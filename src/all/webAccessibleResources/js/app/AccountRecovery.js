@@ -15,17 +15,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import ExtAuthenticationAccountRecovery from "passbolt-styleguide/src/react-extension/ExtAuthenticationAccountRecovery";
-/* eslint-disable no-unused-vars */
 import Port from "../lib/port";
-/* eslint-enable no-unused-vars */
 
 async function main() {
-  try {
-    await port.waitUntilPageModReady();
-  } catch (error) {
-    // If the background page disconnected the port.
-    return;
-  }
+  const query = new URLSearchParams(window.location.search);
+  const portname = query.get('passbolt');
+  const port = new Port(portname);
+  await port.connect();
   const domContainer = document.createElement("div");
   document.body.appendChild(domContainer);
   ReactDOM.render(React.createElement(ExtAuthenticationAccountRecovery, {port: port}), domContainer);

@@ -13,34 +13,16 @@
  */
 import React from "react";
 import ReactDOM from "react-dom";
-import browser from "webextension-polyfill";
+import browser from "../../../background_page/sdk/polyfill/browserPolyfill";
 import ExtApp from "passbolt-styleguide/src/react-extension/ExtApp";
-/* eslint-disable no-unused-vars */
 import Port from "../lib/port";
-/* eslint-enable no-unused-vars */
-
-const storage = browser.storage;
-
-/**
- * Wait until the background pagemod is ready.
- * @returns {Promise}
- */
-async function waitPagemodIsReady() {
-  let resolver;
-  const promise = new Promise(resolve => { resolver = resolve; });
-
-  const checkInterval = setInterval(() => {
-    port.request("passbolt.pagemod.is-ready").then(() => {
-      resolver();
-      clearInterval(checkInterval);
-    });
-  }, 50);
-
-  return promise;
-}
 
 async function main() {
-  await waitPagemodIsReady();
+  const query = new URLSearchParams(window.location.search);
+  const portname = query.get('passbolt');
+  const port = new Port(portname);
+  await port.connect();
+  const storage = browser.storage;
   const domContainer = document.createElement("div");
   document.body.appendChild(domContainer);
   ReactDOM.render(React.createElement(ExtApp, {port: port, storage: storage}), domContainer);

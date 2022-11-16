@@ -52,12 +52,6 @@ PublicWebsiteSignIn.init = function() {
       }
 
       app.events.publicWebsiteSignIn.listen(worker, account);
-
-      /*
-       * Keep the pagemod event listeners at the end of the list, it answers to an event that allows
-       * the content code to know when the background page is ready.
-       */
-      app.events.pagemod.listen(worker);
     }
   });
 };

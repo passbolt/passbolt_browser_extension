@@ -24,7 +24,20 @@ jest.mock("webextension-polyfill", () => Object.assign({}, {
   runtime: {
     getManifest: jest.fn(() => ({
       version: "v3.6.0"
-    }))
+    })),
+    connect: jest.fn(function ({ name }) {
+      return {
+        name,
+        postMessage: jest.fn(),
+        onDisconnect: {
+          addListener: jest.fn(),
+        },
+        onMessage: {
+          addListener: jest.fn(),
+        },
+        disconnect: jest.fn(),
+      };
+    }),
   },
   alarms: new MockAlarms(),
   tabs: {

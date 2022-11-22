@@ -30,7 +30,7 @@ class PassphraseStorageService {
    */
   static async init() {
     this._handleFlushEvent = this._handleFlushEvent.bind(this);
-    this._handleKeepSeesionAlive = this._handleKeepSeesionAlive.bind(this);
+    this._handleKeepSessionAlive = this._handleKeepSessionAlive.bind(this);
     await this.flush();
   }
 
@@ -56,7 +56,6 @@ class PassphraseStorageService {
 
     const keepAliveAlarm = await browser.alarms.get(SESSION_KEEP_ALIVE_ALARM);
     if (!keepAliveAlarm) {
-      this._clearKeepAliveAlarms(); //@todo check if needed
       this._keepAliveSession();
     }
   }
@@ -118,8 +117,8 @@ class PassphraseStorageService {
    */
   static async _clearKeepAliveAlarms() {
     await browser.alarms.clear(SESSION_KEEP_ALIVE_ALARM);
-    if (browser.alarms.onAlarm.hasListener(this._handleKeepSeesionAlive)) {
-      browser.alarms.onAlarm.removeListener(this._handleKeepSeesionAlive);
+    if (browser.alarms.onAlarm.hasListener(this._handleKeepSessionAlive)) {
+      browser.alarms.onAlarm.removeListener(this._handleKeepSessionAlive);
     }
   }
 
@@ -140,21 +139,19 @@ class PassphraseStorageService {
    * @returns {Promise<void>}
    * @private
    */
-  static _handleKeepSeesionAlive(alarm) {
+  static async _handleKeepSessionAlive(alarm) {
     if (alarm.name !== SESSION_KEEP_ALIVE_ALARM) {
       return;
     }
 
-    const idleInterval = SESSION_CHECK_INTERNAL * 60; //idle time in seconds
-    browser.idle.queryState(idleInterval).then(async idleState => {
-      if (idleState !== 'active' || this._masterPassword === null) {
-        return;
-      }
+    if (await this.get() === null) {
+      return;
+    }
 
-      const apiClientOptions = User.getInstance().getApiClientOptions();
-      const userService = new UserService(apiClientOptions);
-      await userService.keepSessionAlive();
-    });
+    const user = User.getInstance();
+    const apiClientOptions = await user.getApiClientOptions();
+    const userService = new UserService(apiClientOptions);
+    userService.keepSessionAlive();
   }
 
   /**
@@ -166,7 +163,7 @@ class PassphraseStorageService {
       periodInMinutes: SESSION_CHECK_INTERNAL
     });
 
-    browser.alarms.onAlarm.addListener(this._handleKeepSeesionAlive);
+    browser.alarms.onAlarm.addListener(this._handleKeepSessionAlive);
   }
 }
 

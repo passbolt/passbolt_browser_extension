@@ -16,7 +16,6 @@ import AuthIsMfaRequiredController from "../controller/auth/authIsMfaRequiredCon
 import CheckPassphraseController from "../controller/crypto/checkPassphraseController";
 import RequestHelpCredentialsLostController from "../controller/auth/requestHelpCredentialsLostController";
 import {Config} from "../model/config";
-import UserAlreadyLoggedInError from "../error/userAlreadyLoggedInError";
 import AzureSsoAuthenticationController from "../controller/sso/azureSsoAuthenticationController";
 import GetSsoClientDataController from "../controller/sso/getSsoClientDataController";
 import AuthLoginController from "../controller/auth/authLoginController";
@@ -213,7 +212,7 @@ const listen = function(worker, account) {
    */
   worker.port.on('passbolt.auth.sso-azure', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new AzureSsoAuthenticationController(worker, requestId, apiClientOptions);
+    const controller = new AzureSsoAuthenticationController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 
@@ -223,7 +222,6 @@ const listen = function(worker, account) {
    * @param {uuid} requestId The request identifier
    */
   worker.port.on('passbolt.auth.get-sso-client-data', async requestId => {
-    console.log("called passbolt.auth.get-sso-client-data");
     const controller = new GetSsoClientDataController(worker, requestId);
     await controller._exec();
   });

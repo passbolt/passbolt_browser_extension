@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.7.3
+ * @since         3.9.0
  */
 import SsoConfigurationService from "../../service/api/sso/ssoConfigurationService";
 import SsoConfigurationEntity from "../entity/sso/ssoConfigurationEntity";
@@ -29,16 +29,50 @@ class SsoConfigurationModel {
   }
 
   /**
-   * Find the SSO configuration using Passbolt API
-   *
-   * @return {Promise<SsoConfigurationEntity|null>}
+   * Save the given configuration entity as a draft onto the API.
+   * @param {SsoConfigurationEntity} ssoConfigurationEntity the entity to save
+   * @returns {Promise<SsoConfigurationEntity>} the saved entity
    */
-  async findSsoConfiguration() {
-    const ssoConfigurationDto = await this.ssoConfigurationService.find();
-    if (!ssoConfigurationDto) {
-      return null;
-    }
+  async saveDraft(ssoConfigurationEntity) {
+    const savedDraft = await this.ssoConfigurationService.saveDraft(ssoConfigurationEntity.toDto());
+    return new SsoConfigurationEntity(savedDraft);
+  }
+
+  /**
+   * Return the sso configuration for a given id using Passbolt API.
+   *
+   * @param {string} ssoConfigurationId uuid
+   * @returns {Promise<SsoConfigurationEntity>}
+   */
+  async getById(ssoConfigurationId) {
+    const ssoConfigurationDto = await this.ssoConfigurationService.get(ssoConfigurationId);
     return new SsoConfigurationEntity(ssoConfigurationDto);
+  }
+
+  /**
+   * Find the current active SSO configuration using Passbolt API
+   * @param {object} contains
+   * @returns {Promise<SsoConfigurationEntity>}
+   */
+  async getCurrent(contains) {
+    const ssoConfigurationDto = await this.ssoConfigurationService.getCurrent(contains);
+    return new SsoConfigurationEntity(ssoConfigurationDto);
+  }
+
+  /**
+   * Activates an SSO configuration matching give id using Passbolt API
+   *
+   * @param {uuid} ssoConfigurationId
+   * @param {uuid} ssoToken
+   * @returns {Promise<SsoConfigurationEntity>}
+   */
+  async activate(ssoConfigurationId, ssoToken) {
+    const activationDto = {
+      token: ssoToken,
+      status: "active"
+    };
+    const savedDraft = await this.ssoConfigurationService.activateConfiguration(ssoConfigurationId, activationDto);
+    return new SsoConfigurationEntity(savedDraft);
   }
 }
 

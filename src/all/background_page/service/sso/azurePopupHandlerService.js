@@ -12,11 +12,11 @@
  * @since         3.7.3
  */
 import browser from "webextension-polyfill";
-import SsoConfigurationEntity from "../../model/entity/sso/ssoConfigurationEntity";
-import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
+import UserClosedSsoPopUp from "../../error/UserClosedSsoPopUp";
 
 const AZURE_POPUP_WINDOW_HEIGHT = 600;
 const AZURE_POPUP_WINDOW_WIDTH = 380;
+const SSO_LOGIN_SUCCESS_ENDPOINT = "/sso/login/success";
 
 class AzurePopupHandlerService {
   /**
@@ -25,32 +25,28 @@ class AzurePopupHandlerService {
    * @param {ApiClientOptions} apiClientOptions
    * @public
    */
-  constructor(apiClientOptions) {
-    this.ssoConfigurationModel = new SsoConfigurationModel(apiClientOptions);
+  constructor(accountDomain) {
     this.popup = null;
     this.popupTabId = null;
     this.verifyCodeInTab = this.verifyCodeInTab.bind(this);
     this.verifyPopupClosed = this.verifyPopupClosed.bind(this);
+    this.baseUrl = accountDomain;
   }
 
   /**
    * Get the SSO configuration from the server
+   * @param {URL} url the url for opening the popup
    * @returns {Promise<void>}
    * @public
    */
-  async getCodeFromThirdParty() {
-    const ssoConfiguration = await this.ssoConfigurationModel.findSsoConfiguration();
-    if (ssoConfiguration.provider !== SsoConfigurationEntity.AZURE) {
-      throw new Error("Unsupported SSO provider");
-    }
-
-    const popUrl = ssoConfiguration.data.url;
-    this.popup = await this.openPopup(popUrl);
+  async getCodeFromThirdParty(popUrl) {
+    this.popup = await this.openPopup(popUrl.toString());
     this.popupTabId = this.popup.tabs[0].id;
 
     return new Promise((resolve, reject) => {
       this.resolvePromise = resolve;
       this.rejectPromise = reject;
+
       browser.tabs.onUpdated.addListener(this.verifyCodeInTab);
       browser.tabs.onRemoved.addListener(this.verifyPopupClosed);
     });
@@ -87,11 +83,11 @@ class AzurePopupHandlerService {
     }
 
     if (removeInfo.isWindowClosing) {
-      this.rejectPromise("The user closed the popup");
+      this.rejectPromise(new UserClosedSsoPopUp());
       return;
     }
 
-    this.rejectPromise("The popup closed unexpectedly");
+    this.rejectPromise(new Error("The popup closed unexpectedly"));
   }
 
   /**
@@ -100,7 +96,6 @@ class AzurePopupHandlerService {
    * @public
    */
   async closeHandler() {
-    console.log("Closing handler");
     browser.tabs.onUpdated.removeListener(this.verifyCodeInTab);
     browser.tabs.onRemoved.removeListener(this.verifyPopupClosed);
     this.rejectPromise = null;
@@ -134,17 +129,13 @@ class AzurePopupHandlerService {
    * @private
    */
   grabCodeFromHash(url) {
-    //@todo @mock use a real mmiplementation it's unknown at this stage
-    try {
-      const parsedUrl = new URL(url);
-      const code = parsedUrl.searchParams.get('login_hint') || null;
-      if (code) {
-        console.log("Code found:", code);
-      }
-      return code;
-    } catch (e) {
+    const expectedUrl = `${this.baseUrl}${SSO_LOGIN_SUCCESS_ENDPOINT}`;
+    if (!url.startsWith(expectedUrl)) {
       return null;
     }
+    const parsedUrl = new URL(url);
+    const code = parsedUrl.searchParams.get('token') || null;
+    return code;
   }
 }
 

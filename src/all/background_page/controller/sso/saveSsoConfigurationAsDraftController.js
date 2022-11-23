@@ -11,11 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
+import SsoConfigurationEntity from "../../model/entity/sso/ssoConfigurationEntity";
 import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
 
-class GetSsoConfigurationController {
+class SaveSsoConfigurationAsDraftController {
   /**
-   * GetSsoConfigurationController constructor
+   * SaveSsoConfigurationAsDraftController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions
@@ -29,12 +30,13 @@ class GetSsoConfigurationController {
   /**
    * Wrapper of exec function to run it with worker.
    *
+   * @param {SsoConfigurationDto} ssoConfiguration the draft SSO configuration to save
    * @return {Promise<void>}
    */
-  async _exec() {
+  async _exec(draftSsoConfiguration) {
     try {
-      const ssoConfiguration = await this.exec();
-      this.worker.port.emit(this.requestId, "SUCCESS", ssoConfiguration);
+      const savedSsoConfiguration = await this.exec(draftSsoConfiguration);
+      this.worker.port.emit(this.requestId, "SUCCESS", savedSsoConfiguration);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, "ERROR", error);
@@ -44,11 +46,13 @@ class GetSsoConfigurationController {
   /**
    * Get the current SSO configuration.
    *
+   * @param {SsoConfigurationDto} ssoConfiguration the draft SSO configuration to save
    * @return {Promise<SsoConfigurationModel|null>}
    */
-  async exec() {
-    return null; //this.ssoConfigurationModel.findSsoConfiguration();
+  async exec(draftSsoConfiguration) {
+    const ssoConfigurationEntity = new SsoConfigurationEntity(draftSsoConfiguration);
+    return await this.ssoConfigurationModel.saveDraft(ssoConfigurationEntity);
   }
 }
 
-export default GetSsoConfigurationController;
+export default SaveSsoConfigurationAsDraftController;

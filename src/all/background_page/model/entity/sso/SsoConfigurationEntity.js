@@ -17,6 +17,9 @@ import EntitySchema from "../abstract/entitySchema";
 const ENTITY_NAME = "SsoConfiguration";
 const AZURE = "azure";
 
+const DATE_REGEXP = /^\d{4}-\d{2}-\d{2}$/;
+const DATETIME_REGEXP = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+
 /**
  * Entity related to the SSO configuration
  */
@@ -30,7 +33,7 @@ class SsoConfigurationEntity extends Entity {
   constructor(ssoConfigurationDto) {
     super(EntitySchema.validate(
       SsoConfigurationEntity.ENTITY_NAME,
-      ssoConfigurationDto,
+      SsoConfigurationEntity.sanitizeDto(ssoConfigurationDto),
       SsoConfigurationEntity.getSchema()
     ));
   }
@@ -42,19 +45,85 @@ class SsoConfigurationEntity extends Entity {
   static getSchema() {
     return {
       "type": "object",
-      "required": ["provider"],
+      "required": [],
       "properties": {
-        "provider": {
+        "id": {
           "type": "string",
-          "enum": [
-            SsoConfigurationEntity.AZURE,
-          ]
+          "format": "uuid"
+        },
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+        },
+        "provider": {
+          "anyOf": [{
+            "type": "string",
+            "enum": [
+              SsoConfigurationEntity.AZURE,
+            ]
+          }, {
+            "type": "null"
+          }],
         },
         "data": {
           "type": "object",
         },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "created_by": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "modified_by": {
+          "type": "string",
+          "format": "uuid"
+        },
       }
     };
+  }
+
+  /*
+   * ==================================================
+   * Sanitization
+   * ==================================================
+   */
+  /**
+   * Sanitize account recovery organization public key dto.
+   * @param {object} dto The dto to sanitiaze
+   * @returns {object}
+   */
+  static sanitizeDto(dto) {
+    dto = Object.assign({}, dto); // shallow clone.
+    if (dto?.data?.client_secret_expiry && DATETIME_REGEXP.test(dto.data.client_secret_expiry)) {
+      // we ignore the time part of the date as the UI doesn't support it
+      dto.data.client_secret_expiry = dto.data.client_secret_expiry.substr(0, 10);
+    }
+    return dto;
+  }
+
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
+  /**
+   * Return a DTO ready to be sent to API
+   * @returns {*}
+   */
+  toDto() {
+    const dto = JSON.parse(JSON.stringify(this));
+    if (dto?.data?.client_secret_expiry && DATE_REGEXP.test(dto.data.client_secret_expiry)) {
+      dto.data.client_secret_expiry += " 00:00:00";
+    }
+    return dto;
   }
 
   /*
@@ -64,19 +133,19 @@ class SsoConfigurationEntity extends Entity {
    */
 
   /**
-   * Get ther provider identifier
+   * Get the configuration identifier
+   * @returns {string}
+   */
+  get id() {
+    return this._props.id;
+  }
+
+  /**
+   * Get the provider identifier
    * @returns {string}
    */
   get provider() {
     return this._props.provider;
-  }
-
-  /**
-   * Get provider specific data
-   * @returns {object}
-   */
-  get data() {
-    return this._props.data;
   }
 
   /*

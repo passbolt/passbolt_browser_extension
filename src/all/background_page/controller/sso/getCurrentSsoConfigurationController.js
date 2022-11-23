@@ -1,3 +1,4 @@
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
@@ -11,28 +12,30 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
+import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
 
-class GetSsoClientDataController {
+class GetCurrentSsoConfigurationController {
   /**
-   * GetSsoClientDataController constructor
+   * AzureSsoAuthenticationController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    */
-  constructor(worker, requestId) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
+    this.ssoConfigurationModel = new SsoConfigurationModel(apiClientOptions);
   }
 
   /**
    * Wrapper of exec function to run it with worker.
    *
+   * @param {uuid} draftSsoConfigurationId the draft sso configuration id
    * @return {Promise<void>}
    */
   async _exec() {
     try {
-      const ssoClientData = await this.exec();
-      this.worker.port.emit(this.requestId, "SUCCESS", ssoClientData);
+      const ssoConfiguration = await this.exec();
+      this.worker.port.emit(this.requestId, "SUCCESS", ssoConfiguration);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, "ERROR", error);
@@ -40,13 +43,15 @@ class GetSsoClientDataController {
   }
 
   /**
-   * Get the current SSO client data if any.
+   * Returns the current active SSO configuration registered from the API.
    *
-   * @return {Promise<SsoUserClientDataEntity|null>}
+   * @return {Promise<SsoConfigurationEntity>}
    */
   async exec() {
-    return SsoDataStorage.get();
+    const contains = {data: true};
+    const ssoConfigurationEntity = await this.ssoConfigurationModel.getCurrent(contains);
+    return ssoConfigurationEntity;
   }
 }
 
-export default GetSsoClientDataController;
+export default GetCurrentSsoConfigurationController;

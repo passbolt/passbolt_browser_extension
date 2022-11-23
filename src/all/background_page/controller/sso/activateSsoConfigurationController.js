@@ -12,13 +12,13 @@
  * @since         3.9.0
  */
 import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
+import Validator from "validator";
 
-class GetSsoConfigurationController {
+class ActivateSsoConfigurationController {
   /**
-   * GetSsoConfigurationController constructor
+   * AzureSsoAuthenticationController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
-   * @param {ApiClientOptions} apiClientOptions
    */
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
@@ -29,11 +29,13 @@ class GetSsoConfigurationController {
   /**
    * Wrapper of exec function to run it with worker.
    *
+   * @param {uuid} ssoDraftConfigurationId the identifier of draft SSO configuration to activate
+   * @param {uuid} ssoToken the token to provide to activate the SSO configuration
    * @return {Promise<void>}
    */
-  async _exec() {
+  async _exec(ssoDraftConfigurationId, ssoToken) {
     try {
-      const ssoConfiguration = await this.exec();
+      const ssoConfiguration = await this.exec(ssoDraftConfigurationId, ssoToken);
       this.worker.port.emit(this.requestId, "SUCCESS", ssoConfiguration);
     } catch (error) {
       console.error(error);
@@ -42,13 +44,23 @@ class GetSsoConfigurationController {
   }
 
   /**
-   * Get the current SSO configuration.
+   * Get the current user's passphrase using SSO authentication.
    *
-   * @return {Promise<SsoConfigurationModel|null>}
+   * @param {uuid} ssoDraftConfigurationId the identifier of draft SSO configuration to activate
+   * @param {uuid} ssoToken the token to provide to activate the SSO configuration
+   * @return {Promise<SsoConfigurationEntity>}
    */
-  async exec() {
-    return null; //this.ssoConfigurationModel.findSsoConfiguration();
+  async exec(ssoDraftConfigurationId, ssoToken) {
+    if (!Validator.isUUID(ssoDraftConfigurationId)) {
+      throw new TypeError('The SSO configuration id should be a valid uuid.');
+    }
+
+    if (!Validator.isUUID(ssoToken)) {
+      throw new TypeError('The SSO activation token should be a valid uuid.');
+    }
+
+    return await this.ssoConfigurationModel.activate(ssoDraftConfigurationId, ssoToken);
   }
 }
 
-export default GetSsoConfigurationController;
+export default ActivateSsoConfigurationController;

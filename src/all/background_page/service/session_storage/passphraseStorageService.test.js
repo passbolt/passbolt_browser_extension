@@ -34,20 +34,21 @@ describe("PassphraseStorageService", () => {
 
   describe("PassphraseStorageService::set", () => {
     it("Should register the given passphrase on the storage without time limit", async() => {
-      expect.assertions(6);
+      expect.assertions(7);
       const spyOnStorageSet = jest.spyOn(browser.storage.session, "set");
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
       const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
+      const spyOnKeepAliveSession = jest.spyOn(PassphraseStorageService, "_handleKeepSessionAlive").mockImplementationOnce(() => jest.fn());
       await PassphraseStorageService.init();
 
       const passphrase = "This is a very strong passphrase";
-      await PassphraseStorageService.set(passphrase);
+      await PassphraseStorageService.set(passphrase, -1);
 
       expect(spyOnStorageSet).toHaveBeenCalledTimes(1);
       expect(spyOnStorageSet).toHaveBeenCalledWith({passphrase: passphrase});
 
-      //Called 2 times at init + 2 times during the ::set
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(2 + 2);
+      //Called 2 times at init + 1 times during the ::set
+      expect(spyOnAlarmClear).toHaveBeenCalledTimes(2 + 1);
       expect(spyOnAlarmClear).toHaveBeenCalledWith("PassphraseStorageFlush");
 
       //Only keep alive session is called and not passphrase storage flush
@@ -56,16 +57,19 @@ describe("PassphraseStorageService", () => {
         delayInMinutes: 15,
         periodInMinutes: 15
       });
+
+      await jest.advanceTimersByTime(15 * 60 * 1000);
+      expect(spyOnKeepAliveSession).toHaveBeenCalledTimes(1);
     });
 
     it("Should register the given passphrase on the storage with a time limit", async() => {
-      expect.assertions(13);
+      expect.assertions(14);
       const spyOnStorageSet = jest.spyOn(browser.storage.session, "set");
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
       const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
       const spyOnAlarmListeners = jest.spyOn(browser.alarms.onAlarm, "addListener");
       const spyOnFlush = jest.spyOn(PassphraseStorageService, "flush");
-      const spyOnKeepAliveSession = jest.spyOn(PassphraseStorageService, "_handleKeepSeesionAlive");
+      const spyOnKeepAliveSession = jest.spyOn(PassphraseStorageService, "_handleKeepSessionAlive");
 
       await PassphraseStorageService.init();
       expect(spyOnFlush).toHaveBeenCalledTimes(1);
@@ -79,8 +83,8 @@ describe("PassphraseStorageService", () => {
       expect(spyOnStorageSet).toHaveBeenCalledTimes(1);
       expect(spyOnStorageSet).toHaveBeenCalledWith({passphrase: passphrase});
 
-      //Called 2 times at init + 2 times during the ::set
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(4);
+      //Called 2 times at init + 1 times during the ::set
+      expect(spyOnAlarmClear).toHaveBeenCalledTimes(3);
       expect(spyOnAlarmClear).toHaveBeenCalledWith("PassphraseStorageFlush");
 
       expect(spyOnAlarmCreate).toHaveBeenCalledTimes(2);
@@ -96,9 +100,10 @@ describe("PassphraseStorageService", () => {
       //1 call by the init funciton and another from the alarm
       expect(spyOnFlush).toHaveBeenCalledTimes(2);
 
-      //The keep alive session shoudn't have been called has the passphrase been flushed before
+      //The keep alive session shoud have been called 1 time with the PassphraseStorageFlush alarm
       await jest.advanceTimersByTime(15 * 60 * 1000);
-      expect(spyOnKeepAliveSession).not.toHaveBeenCalled();
+      expect(spyOnKeepAliveSession).toHaveBeenCalledTimes(1);
+      expect(spyOnKeepAliveSession).toHaveBeenCalledWith({name: "PassphraseStorageFlush", periodInMinutes: undefined, scheduledTime: expect.anything()});
     });
   });
 
@@ -158,7 +163,7 @@ describe("PassphraseStorageService", () => {
       expect(storedPassphrase).toBe(passphrase);
 
       //Clear is called with Init and Set
-      const expectedClearCall = 4;
+      const expectedClearCall = 3;
       expect(spyOnAlarmClear).toHaveBeenCalledTimes(expectedClearCall);
 
       await PassphraseStorageService.flushPassphrase();

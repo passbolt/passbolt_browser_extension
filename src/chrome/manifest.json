@@ -34,7 +34,6 @@
     }
   },
   "permissions": [
-    "idle",
     "activeTab",
     "tabs",
     "unlimitedStorage",

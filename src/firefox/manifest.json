@@ -38,7 +38,6 @@
     }
   },
   "permissions": [
-    "idle",
     "activeTab",
     "clipboardWrite",
     "tabs",

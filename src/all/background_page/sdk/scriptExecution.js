@@ -21,8 +21,9 @@ function globalSetPortname(portname) {
  * Utility class to insert JS, CSS into a tab.
  */
 class ScriptExecution {
-  constructor(tabId) {
+  constructor(tabId, frameId = 0) {
     this.tabId = tabId;
+    this.frameId = frameId;
   }
 
   /**
@@ -37,7 +38,8 @@ class ScriptExecution {
     browser.scripting.executeScript({
       files: fileArray,
       target: {
-        tabId: this.tabId
+        tabId: this.tabId,
+        frameId: this.frameId
       },
       world: "ISOLATED"
     });
@@ -55,7 +57,8 @@ class ScriptExecution {
     browser.scripting.insertCSS({
       files: fileArray,
       target: {
-        tabId: this.tabId
+        tabId: this.tabId,
+        frameId: this.frameId
       }
     });
   }
@@ -69,7 +72,8 @@ class ScriptExecution {
       func: globalSetPortname,
       args: [portName],
       target: {
-        tabId: this.tabId
+        tabId: this.tabId,
+        frameId: this.frameId
       },
       world: "ISOLATED"
     });

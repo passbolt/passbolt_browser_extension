@@ -50,7 +50,7 @@ module.exports = function (grunt) {
   grunt.registerTask('bundle', ['externalize-locale-strings', 'copy:background_page', 'copy:web_accessible_resources', 'copy:locales']);
   grunt.registerTask('bundle-firefox', ['copy:manifest_firefox', 'bundle']);
   grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle']);
-  grunt.registerTask('bundle-mv3', ['externalize-locale-strings', 'copy:web_accessible_resources', 'copy:locales']);
+  grunt.registerTask('bundle-mv3', ['externalize-locale-strings', 'copy:service_worker', 'copy:web_accessible_resources', 'copy:locales']);
   grunt.registerTask('bundle-chrome-mv3', ['copy:manifest_chrome_mv3', 'bundle-mv3']);
 
   grunt.registerTask('build', ['shell:eslint', 'shell:test', 'build-firefox', 'build-chrome', 'build-chrome-mv3']);
@@ -106,6 +106,11 @@ module.exports = function (grunt) {
       background_page: {
         files: [
           { expand: true, cwd: path.src_background_page, src: 'index.html', dest: path.build }
+        ]
+      },
+      service_worker: {
+        files: [
+          { expand: true, cwd: path.src_chrome_mv3, src: 'serviceWorker.js', dest: path.build + 'serviceWorker' }
         ]
       },
       web_accessible_resources: {
@@ -449,7 +454,7 @@ module.exports = function (grunt) {
       },
       service_worker: {
         files: [path.src_chrome_mv3 + 'serviceWorker.js'],
-        tasks: ['shell:build_service_worker_debug'],
+        tasks: ['shell:build_service_worker_debug', 'copy:service_worker'],
         options: { spawn: false }
       },
       content_script_app: {

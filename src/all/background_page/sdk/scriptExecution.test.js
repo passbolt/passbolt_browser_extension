@@ -26,13 +26,13 @@ describe("ScriptExecution", () => {
 
       const option = {
         func: expect.anything(),
-          args: [portname],
+        args: [portname],
         target: {
           tabId: 1,
           frameId: 0
         },
         world: "ISOLATED"
-      }
+      };
 
       scriptExecution.injectPortname(portname);
 
@@ -53,9 +53,9 @@ describe("ScriptExecution", () => {
           frameId: 0
         },
         world: "ISOLATED"
-      }
+      };
 
-      scriptExecution.injectJs(files)
+      scriptExecution.injectJs(files);
 
       expect(mockedScriptingJS).toHaveBeenCalledWith(option);
     });
@@ -73,9 +73,9 @@ describe("ScriptExecution", () => {
           tabId: 3,
           frameId: 0
         }
-      }
+      };
 
-      scriptExecution.injectCss(files)
+      scriptExecution.injectCss(files);
 
       expect(mockedScriptingCSS).toHaveBeenCalledWith(option);
     });

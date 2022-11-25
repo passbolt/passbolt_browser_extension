@@ -3,7 +3,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 
 const config = {
   entry: {
-    'serviceWorker': path.resolve(__dirname, './src/chrome-mv3/serviceWorker.js'),
+    'index': path.resolve(__dirname, './src/chrome-mv3/index.js'),
   },
   mode: 'production',
   module: {

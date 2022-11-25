@@ -1,3 +1,4 @@
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
@@ -11,4 +12,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-self.importScripts("vendors.js", "index.js");
+import browser from "../all/background_page/sdk/polyfill/browserPolyfill";
+
+// TODO start listener browser events
+/**
+ * Add listener on any on complete navigation
+ */
+browser.webNavigation.onCompleted.addListener(details => console.log(details));

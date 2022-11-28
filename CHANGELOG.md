@@ -4,8 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.8.2] - 2022-11-27
+### Fixed
+PB-21565: As a logged-in user, I should decide to keep my session alive until I sign out
+PB-21372: As a logged-in user, I should see folders without caret aligned
+
 ## [3.8.0] - 2022-11-04
-#### Added
+### Added
 PB-19151: As a logged-in user, I want to be able to use Solarized light and dark themes
 PB-19220: As an administrator, I want to manage the organization SMTP settings in the administration workspace
 

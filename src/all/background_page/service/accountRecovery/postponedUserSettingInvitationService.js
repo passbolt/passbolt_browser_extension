@@ -45,7 +45,7 @@ class PostponedUserSettingInvitationService {
   static init() {
     this.reset();
 
-    window.addEventListener("passbolt.auth.after-logout", () => {
+    self.addEventListener("passbolt.auth.after-logout", () => {
       this.reset();
     });
   }

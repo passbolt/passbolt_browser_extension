@@ -52,7 +52,7 @@ class AuthModel {
     const isMfaRequired = false;
     await AuthStatusLocalStorage.set(isAuthenticated, isMfaRequired);
     const event = new Event('passbolt.auth.after-logout');
-    window.dispatchEvent(event);
+    self.dispatchEvent(event);
   }
 
   /**
@@ -94,7 +94,7 @@ class AuthModel {
     await this.legacyAuthModel.startCheckAuthStatusLoop();
     await app.pageMods.AppBoostrap.init();
     const event = new Event('passbolt.auth.after-login');
-    window.dispatchEvent(event);
+    self.dispatchEvent(event);
   }
 
   /**

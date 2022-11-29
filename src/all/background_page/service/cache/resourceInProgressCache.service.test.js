@@ -45,7 +45,7 @@ describe("ResourceInProgressCache service", () => {
     expect(spyOnStorageSet).toHaveBeenCalledTimes(1);
     expect(spyOnStorageSet).toHaveBeenCalledWith({resourceInProgress: fakeResource.toDto()});
 
-    window.dispatchEvent(new Event('passbolt.auth.after-logout'));
+    self.dispatchEvent(new Event('passbolt.auth.after-logout'));
     expect(spy).toHaveBeenCalledTimes(2);
   });
 

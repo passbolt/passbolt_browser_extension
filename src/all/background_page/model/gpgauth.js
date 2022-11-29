@@ -366,7 +366,7 @@ class GpgAuth {
 
     this.checkAuthStatusTimeout = setTimeout(async() => {
       if (!await this.isAuthenticated()) {
-        window.dispatchEvent(new Event('passbolt.auth.after-logout'));
+        self.dispatchEvent(new Event('passbolt.auth.after-logout'));
       } else {
         this.startCheckAuthStatusLoop();
       }

@@ -28,6 +28,7 @@ import TestAzureSsoAuthenticationController from "../controller/sso/testAzureSso
 import GetCurrentSsoConfigurationController from "../controller/sso/getCurrentSsoConfigurationController";
 import SaveSsoConfigurationAsDraftController from "../controller/sso/saveSsoConfigurationAsDraftController";
 import ActivateSsoConfigurationController from "../controller/sso/activateSsoConfigurationController";
+import DeleteSsoConfigurationController from "../controller/sso/deleteSsoConfigurationController";
 
 const listen = function(worker, account) {
   /*
@@ -137,7 +138,7 @@ const listen = function(worker, account) {
 
   worker.port.on('passbolt.sso.test.azure', async(requestId, draftId) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new TestAzureSsoAuthenticationController(worker, requestId, apiClientOptions);
+    const controller = new TestAzureSsoAuthenticationController(worker, requestId, apiClientOptions, account);
     await controller._exec(draftId);
   });
 
@@ -145,6 +146,12 @@ const listen = function(worker, account) {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new ActivateSsoConfigurationController(worker, requestId, apiClientOptions);
     await controller._exec(draftId, ssoToken);
+  });
+
+  worker.port.on('passbolt.sso.delete-settings', async(requestId, configurationId) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new DeleteSsoConfigurationController(worker, requestId, apiClientOptions);
+    await controller._exec(configurationId);
   });
 };
 export const AppEvents = {listen};

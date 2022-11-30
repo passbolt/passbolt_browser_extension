@@ -84,6 +84,15 @@ class SsoConfigurationService extends AbstractService {
     const response = await this.apiClient.update(configurationId, activationDto);
     return response.body;
   }
+
+  /**
+   * Deletes the given configuration id using the Passbolt API.
+   * @param {uuid} configurationId
+   */
+  async delete(configurationId) {
+    const response = await this.apiClient.delete(configurationId);
+    return response.body;
+  }
 }
 
 export default SsoConfigurationService;

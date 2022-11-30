@@ -60,7 +60,7 @@ class SsoConfigurationModel {
   }
 
   /**
-   * Activates an SSO configuration matching give id using Passbolt API
+   * Activates an SSO configuration matching a given id using Passbolt API
    *
    * @param {uuid} ssoConfigurationId
    * @param {uuid} ssoToken
@@ -73,6 +73,16 @@ class SsoConfigurationModel {
     };
     const savedDraft = await this.ssoConfigurationService.activateConfiguration(ssoConfigurationId, activationDto);
     return new SsoConfigurationEntity(savedDraft);
+  }
+
+  /**
+   * Deletes an SSO configuration matching a given id using Passbolt API
+   *
+   * @param {uuid} ssoConfigurationId
+   * @returns {Promise<void>}
+   */
+  async delete(ssoConfigurationId) {
+    await this.ssoConfigurationService.delete(ssoConfigurationId);
   }
 }
 

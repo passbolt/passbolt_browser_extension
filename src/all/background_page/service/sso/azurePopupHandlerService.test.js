@@ -35,12 +35,21 @@ afterAll(() => {
   browser.windows = currentBrowserWindows;
 });
 
+/**
+ * Ensures the code inside returned promises are executed.
+ * Usefull for the promise with which we can't use await as they won't resolve and we need the code inside to be executed.
+ */
+function runPendingPromises() {
+  return new Promise(resolve => setTimeout(resolve, 0));
+}
+
 describe("AzurePopupHandlerService", () => {
   describe("AzurePopupHandlerService", () => {
     const userDomain = "https://fakeurl.passbolt.com";
     const ssoToken = uuid();
-    const finalUrl = `${userDomain}/sso/login/success?token=${ssoToken}`;
+    const finalUrl = `${userDomain}/sso/login/dry-run/success?token=${ssoToken}`;
     const thirdPartyUrl = new URL("https://fakeurl.thirdparty.com");
+
     it("Should return SSO token when navigation is done to a correct URL", async() => {
       expect.assertions(4);
       const tabId = uuid();
@@ -53,11 +62,7 @@ describe("AzurePopupHandlerService", () => {
       const service = new AzurePopupHandlerService(userDomain);
       const promise = service.getCodeFromThirdParty(thirdPartyUrl);
 
-      /*
-       * ensures the code inside the returned promise from `getCodeFromThirdParty` is executed
-       * we can't use `await` for that as the promise doesn't resolve and provokes a timeout in the unit test
-       */
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await runPendingPromises();
 
       expect(browser.windows.create).toHaveBeenCalledWith({
         url: thirdPartyUrl.toString(),
@@ -69,12 +74,16 @@ describe("AzurePopupHandlerService", () => {
       expect(browser.tabs.onUpdated.addListener).toHaveBeenCalledWith(expect.any(Function));
       expect(browser.tabs.onRemoved.addListener).toHaveBeenCalledWith(expect.any(Function));
 
+      //Update on the expected tabid as pending
       browser.tabs.onUpdated.triggers(tabId, null, {status: "pending"});
+      //Update on the expected tabid as complete but without token
       browser.tabs.onUpdated.triggers(tabId, null, {status: "complete", url: thirdPartyUrl.toString()});
+      //Update on abother tabid as pending with the awaited URL
       browser.tabs.onUpdated.triggers(uuid(), null, {status: "pending", url: finalUrl});
+      //Update on the expected tabid as complete with the awaited URL
       browser.tabs.onUpdated.triggers(tabId, null, {status: "complete", url: finalUrl});
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await runPendingPromises();
 
       expect(await promise).toBe(ssoToken);
     });
@@ -91,7 +100,7 @@ describe("AzurePopupHandlerService", () => {
       const service = new AzurePopupHandlerService();
       const promise = service.getCodeFromThirdParty(thirdPartyUrl);
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await runPendingPromises();
 
       browser.tabs.onRemoved.triggers(tabId, {isWindowClosing: true});
       return expect(promise).rejects.toThrowError(new UserClosedSsoPopUp());
@@ -109,7 +118,7 @@ describe("AzurePopupHandlerService", () => {
       const service = new AzurePopupHandlerService();
       const promise = service.getCodeFromThirdParty(thirdPartyUrl);
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await runPendingPromises();
 
       browser.tabs.onRemoved.triggers(tabId, {isWindowClosing: false});
       return expect(promise).rejects.toThrowError(new Error("The popup closed unexpectedly"));
@@ -127,7 +136,7 @@ describe("AzurePopupHandlerService", () => {
       const service = new AzurePopupHandlerService();
       service.getCodeFromThirdParty(thirdPartyUrl);
 
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await runPendingPromises();
 
       service.closeHandler();
 

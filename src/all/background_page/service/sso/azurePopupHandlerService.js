@@ -16,7 +16,7 @@ import UserClosedSsoPopUp from "../../error/UserClosedSsoPopUp";
 
 const AZURE_POPUP_WINDOW_HEIGHT = 600;
 const AZURE_POPUP_WINDOW_WIDTH = 380;
-const SSO_LOGIN_SUCCESS_ENDPOINT = "/sso/login/success";
+const SSO_LOGIN_SUCCESS_ENDPOINT = "/sso/login/dry-run/success";
 
 class AzurePopupHandlerService {
   /**

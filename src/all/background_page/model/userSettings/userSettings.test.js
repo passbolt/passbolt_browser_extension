@@ -18,8 +18,6 @@ jest.mock('../config', () => ({
   read: item => item
 }));
 
-window.storage = {getItem: jest.fn()};
-
 describe("User settings validation security token", () => {
   const userSettings = new UserSettings();
 

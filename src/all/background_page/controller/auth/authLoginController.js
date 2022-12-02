@@ -14,13 +14,13 @@
 
 import AuthModel from "../../model/auth/authModel";
 import UserAlreadyLoggedInError from "../../error/userAlreadyLoggedInError";
-import GenerateSsoKeyService from "../../service/crypto/generateSsoKeyService";
-import GenerateSsoIvService from "../../service/crypto/generateSsoIvService";
-import EncryptSsoPassphraseService from "../../service/crypto/encryptSsoPassphraseService";
+import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
+import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
+import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
+import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
-import SsoUserServerDataModel from "../../model/sso/ssoUserServerDataModel";
-//@todo @mock remove
-import browser from "webextension-polyfill";
+import Keyring from "../../model/keyring";
+import CheckPassphraseService from "../../service/crypto/checkPassphraseService";
 
 class AuthLoginController {
   /**
@@ -33,7 +33,10 @@ class AuthLoginController {
     this.worker = worker;
     this.requestId = requestId;
     this.authModel = new AuthModel(apiClientOptions);
-    this.ssoUserServerData = new SsoUserServerDataModel(apiClientOptions);
+    this.organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.ssoConfigurationModel = new SsoConfigurationModel(apiClientOptions);
+    this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
+    this.checkPassphraseService = new CheckPassphraseService(new Keyring());
   }
 
   /**
@@ -68,6 +71,16 @@ class AuthLoginController {
    * @return {Promise<void>}
    */
   async exec(passphrase, remember) {
+    /*
+     * In order to generate the SSO kit, a call to the API is made to retrieve the SSO settings and ensure it's needed.
+     * But, for this call we must be not logged in of fully logged in (with MFA validated as well).
+     * In the case when MFA is required, finding the SSO settings is blocked as MFA is demanded.
+     * So in order to proceed with the SSO kit and ensure to encrypt a working passphrase, we do a passphrase check first.
+     * Then we proceed with the SSO kit and afterward the login process.
+     */
+    await this.checkPassphraseService.checkPassphrase(passphrase);
+    await this.generateSsoKitIfNeeded(passphrase);
+
     try {
       await this.authModel.login(passphrase, remember);
     } catch (error) {
@@ -75,43 +88,29 @@ class AuthLoginController {
         throw error;
       }
     }
-
-    await this.configureUserSsoAuth(passphrase);
   }
 
   /**
-   * Configure the current user's SSO authentication.
+   * Check if conditions are to met to generate an SSO kit and generates it if needed.
    *
-   * @param {string} passphrase The passphrase to encrypt for SSO
-   * @return {Promise<void>}
+   * @param {string} passphrase the passphrase to encrypt for the SSO kit.
+   * @returns {Promise<void>}
    */
-  async configureUserSsoAuth(passphrase) {
-    try {
-      const nek = await GenerateSsoKeyService.generateSsoKey();
-      const extractableKey = await GenerateSsoKeyService.generateSsoKey(true);
-      const iv1 = GenerateSsoIvService.generateIv();
-      const iv2 = GenerateSsoIvService.generateIv();
+  async generateSsoKitIfNeeded(passphrase) {
+    const localSsoKit = await SsoDataStorage.get();
+    const organizationSettings = await this.organizationSettingsModel.getOrFind();
+    if (!organizationSettings.isPluginEnabled("sso")) {
+      if (localSsoKit) {
+        await SsoDataStorage.flush();
+      }
+      return;
+    }
 
-      const cipheredPassphrase = await EncryptSsoPassphraseService.encrypt(passphrase, nek, extractableKey, iv1, iv2);
-
-      //@todo: do it in a service ?
-      const serializedKey = await crypto.subtle.exportKey("jwk", extractableKey);
-      const ssoUserServerData = {
-        key: serializedKey,
-        cipher: cipheredPassphrase
-      };
-
-      //@todo @mock: remove the following line
-      await browser.storage.local.set({__tmp__sso_user_server_data: ssoUserServerData});
-      console.log(ssoUserServerData);
-
-      const ssoUserClientData = {nek, iv1, iv2};
-      await SsoDataStorage.save(ssoUserClientData);
-
-      await this.ssoUserServerData.updateUserData(ssoUserServerData);
-    } catch (error) {
-      await SsoDataStorage.wipeData();
-      throw error;
+    const currentSsoConfig = await this.ssoConfigurationModel.getCurrent();
+    if (!currentSsoConfig?.provider && localSsoKit) {
+      await SsoDataStorage.flush();
+    } else if (currentSsoConfig?.provider && !localSsoKit) {
+      await GenerateSsoKitService.generate(passphrase, currentSsoConfig.provider);
     }
   }
 }

@@ -12,16 +12,11 @@
  * @since         3.9.0
  */
 
-class GenerateSsoIvService {
-  /**
-   * Generate an AES-GCM key to be used for SSO.
-   *
-   * @param {integer} length size of the IV to generate.
-   * @returns {UInt8Array}
-   */
-  static generateIv(length = 12) {
-    return crypto.getRandomValues(new Uint8Array(length));
+class ClientSsoKitNotFoundError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'ClientSsoKitNotFoundError';
   }
 }
 
-export default GenerateSsoIvService;
+export default ClientSsoKitNotFoundError;

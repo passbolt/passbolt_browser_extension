@@ -16,7 +16,7 @@ import Validator from "validator";
 
 class ActivateSsoConfigurationController {
   /**
-   * AzureSsoAuthenticationController constructor
+   * ActivateSsoConfigurationController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    */

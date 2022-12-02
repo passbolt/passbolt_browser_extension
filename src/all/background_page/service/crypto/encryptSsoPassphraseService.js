@@ -12,7 +12,6 @@
  * @since         3.7.3
  */
 import {Buffer} from "buffer";
-import DecryptSsoPassphraseService from "./decryptSsoPassphraseService";
 
 class EncryptSsoPassphraseService {
   /**

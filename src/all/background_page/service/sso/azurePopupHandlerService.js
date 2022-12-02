@@ -9,14 +9,15 @@
  * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.7.3
+ * @since         3.9.0
  */
 import browser from "webextension-polyfill";
-import UserClosedSsoPopUp from "../../error/UserClosedSsoPopUp";
+import UserClosedSsoPopUp from "../../error/userClosedSsoPopUp";
 
 const AZURE_POPUP_WINDOW_HEIGHT = 600;
 const AZURE_POPUP_WINDOW_WIDTH = 380;
-const SSO_LOGIN_SUCCESS_ENDPOINT = "/sso/login/dry-run/success";
+const DRY_RUN_SSO_LOGIN_SUCCESS_ENDPOINT = "/sso/login/dry-run/success";
+const SSO_LOGIN_SUCCESS_ENDPOINT = "/sso/login/success";
 
 class AzurePopupHandlerService {
   /**
@@ -25,12 +26,13 @@ class AzurePopupHandlerService {
    * @param {ApiClientOptions} apiClientOptions
    * @public
    */
-  constructor(accountDomain) {
+  constructor(accountDomain, asDryRun = false) {
     this.popup = null;
     this.popupTabId = null;
     this.verifyCodeInTab = this.verifyCodeInTab.bind(this);
     this.verifyPopupClosed = this.verifyPopupClosed.bind(this);
-    this.baseUrl = accountDomain;
+    const endpoint = asDryRun ? DRY_RUN_SSO_LOGIN_SUCCESS_ENDPOINT : SSO_LOGIN_SUCCESS_ENDPOINT;
+    this.expectedUrl = `${accountDomain}${endpoint}`;
   }
 
   /**
@@ -129,8 +131,7 @@ class AzurePopupHandlerService {
    * @private
    */
   grabCodeFromHash(url) {
-    const expectedUrl = `${this.baseUrl}${SSO_LOGIN_SUCCESS_ENDPOINT}`;
-    if (!url.startsWith(expectedUrl)) {
+    if (!url.startsWith(this.expectedUrl)) {
       return null;
     }
     const parsedUrl = new URL(url);

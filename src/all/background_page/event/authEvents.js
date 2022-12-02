@@ -19,6 +19,7 @@ import {Config} from "../model/config";
 import AzureSsoAuthenticationController from "../controller/sso/azureSsoAuthenticationController";
 import GetSsoClientDataController from "../controller/sso/getSsoClientDataController";
 import AuthLoginController from "../controller/auth/authLoginController";
+import GetLocalSsoProviderConfiguredController from "../controller/sso/getLocalSsoProviderConfiguredController";
 
 const listen = function(worker, account) {
   /*
@@ -207,10 +208,10 @@ const listen = function(worker, account) {
 
   /**
    * Attempt to sign in with Azure as a third party sign in provider
-   * @listens passbolt.auth.sso-azure
+   * @listens passbolt.sso.sign-in-with-azure
    * @param {uuid} requestId The request identifier
    */
-  worker.port.on('passbolt.auth.sso-azure', async requestId => {
+  worker.port.on('passbolt.sso.sign-in-with-azure', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AzureSsoAuthenticationController(worker, requestId, apiClientOptions, account);
     await controller._exec();
@@ -221,8 +222,18 @@ const listen = function(worker, account) {
    * @listens passbolt.auth.get-sso-client-data
    * @param {uuid} requestId The request identifier
    */
-  worker.port.on('passbolt.auth.get-sso-client-data', async requestId => {
+  worker.port.on('passbolt.sso.get-local-sso-kit', async requestId => {
     const controller = new GetSsoClientDataController(worker, requestId);
+    await controller._exec();
+  });
+
+  /**
+   * Returns the sso provider id registered client-side.
+   * @listens passbolt.sso.get-local-configured-provider
+   * @param {uuid} requestId The request identifier
+   */
+  worker.port.on('passbolt.sso.get-local-configured-provider', async requestId => {
+    const controller = new GetLocalSsoProviderConfiguredController(worker, requestId);
     await controller._exec();
   });
 };

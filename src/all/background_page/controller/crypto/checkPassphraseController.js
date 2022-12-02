@@ -11,11 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
-import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
-
+import CheckPassphraseService from "../../service/crypto/checkPassphraseService";
 
 class CheckPassphraseController {
   /**
@@ -29,6 +26,7 @@ class CheckPassphraseController {
     this.worker = worker;
     this.requestId = requestId;
     this.keyring = new Keyring();
+    this.checkPassphraseService = new CheckPassphraseService(this.keyring);
   }
 
   /**
@@ -56,12 +54,7 @@ class CheckPassphraseController {
    * @throws {Error} if no private key could be found.
    */
   async exec(passphrase) {
-    const privateKey = this.keyring.findPrivate();
-    if (!privateKey) {
-      throw new Error('Private key not found.');
-    }
-    const key = await OpenpgpAssertion.readKeyOrFail(privateKey.armoredKey);
-    await DecryptPrivateKeyService.decrypt(key, passphrase);
+    await this.checkPassphraseService.checkPassphrase(passphrase);
   }
 }
 

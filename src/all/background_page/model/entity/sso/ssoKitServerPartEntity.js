@@ -9,17 +9,17 @@
  * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.7.3
+ * @since         3.9.0
  */
 import Entity from "../abstract/entity";
 import EntitySchema from "../abstract/entitySchema";
 
-const ENTITY_NAME = "SsoUserServerDataEntity";
+const ENTITY_NAME = "SsoKitServerPartEntity";
 
 /**
  * Entity related to the account recovery organization policy
  */
-class SsoUserServerDataEntity extends Entity {
+class SsoKitServerPartEntity extends Entity {
   /**
    * Setup entity constructor
    *
@@ -28,9 +28,9 @@ class SsoUserServerDataEntity extends Entity {
    */
   constructor(ssoUserServerDataDto) {
     super(EntitySchema.validate(
-      SsoUserServerDataEntity.ENTITY_NAME,
+      SsoKitServerPartEntity.ENTITY_NAME,
       ssoUserServerDataDto,
-      SsoUserServerDataEntity.getSchema()
+      SsoKitServerPartEntity.getSchema()
     ));
   }
 
@@ -41,32 +41,53 @@ class SsoUserServerDataEntity extends Entity {
   static getSchema() {
     return {
       "type": "object",
-      "required": ["cipher", "key"],
+      "required": ["data"],
       "properties": {
-        "cipher": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "data": {
           "type": "string",
         },
-        "key": {
-          "type": "object",
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "created_by": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "modified_by": {
+          "type": "string",
+          "format": "uuid"
         },
       }
     };
   }
 
   /**
-   * Returns the cipher props.
+   * Returns the id props of the SSO kit.
    * @returns {string}
    */
-  get cipher() {
-    return this._props.cipher;
+  get id() {
+    return this._props.id;
   }
 
   /**
-   * Returns the key props.
-   * @returns {object}
+   * Returns the data (containing the secret) props.
+   * @returns {string}
    */
-  get key() {
-    return this._props.key;
+  get data() {
+    return this._props.data;
   }
 
   /*
@@ -75,7 +96,7 @@ class SsoUserServerDataEntity extends Entity {
    * ==================================================
    */
   /**
-   * SsoUserServerDataEntity.ENTITY_NAME
+   * SsoKitServerPartEntity.ENTITY_NAME
    * @returns {string}
    */
   static get ENTITY_NAME() {
@@ -83,4 +104,4 @@ class SsoUserServerDataEntity extends Entity {
   }
 }
 
-export default SsoUserServerDataEntity;
+export default SsoKitServerPartEntity;

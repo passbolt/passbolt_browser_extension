@@ -9,68 +9,56 @@
  * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.7.3
+ * @since         3.9.0
  */
+import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";
 
 const DB_VERSION = 1;
-const DB_NAME = "ssoData_db";
-const SSO_KEYS_OBECT_STORE = 'key_os';
+const DB_NAME = "ssoKit_db";
+const SSO_KEYS_OBECT_STORE = 'ssoKit_os';
 
 class SsoDataStorage {
   /**
    * Returns the local SSO client user's data.
    *
-   * @returns {Promise<SsoClientUserDataDto>}
+   * @returns {Promise<SsoKitClientPartEntity|null>}
    * @public
    */
   static async get() {
     const dbHandler = await this.getDbHandler();
     const ssoClientData = await this.getSsoData(dbHandler);
-    this.assertSsoClientData(ssoClientData);
     dbHandler.close();
     return ssoClientData;
   }
   /**
    * Register locally the SSO client user's data.
    *
-   * @param {SsoClientUserDataDto} ssoClientData
+   * @param {SsoKitClientPartEntity} ssoClientData
    * @returns {Promise<void>}
    * @public
    */
-  static async save(ssoClientData) {
-    this.assertSsoClientData(ssoClientData);
+  static async save(ssoKitClientPartEntity) {
     const dbHandler = await this.getDbHandler();
-    await this.replaceSsoData(dbHandler, ssoClientData);
+    await this.replaceSsoData(dbHandler, ssoKitClientPartEntity);
     dbHandler.close();
   }
 
   /**
-   * Assert the given data is a proper SsoClientDataDto
-   *
-   * @param {SsoClientUserDataDto} ssoClientData
+   * Updates the local SSO kit with the given id.
+   * @param {uuid} ssoKitId
    * @returns {Promise<void>}
-   * @private
    */
-  static assertSsoClientData(ssoClientData) {
-    return ssoClientData.nek instanceof CryptoKey
-      && ssoClientData.nek.extractable === false
-      && ssoClientData.nek.algorithm.name === "AES-GCM"
-      && ssoClientData.nek.algorithm.length === 256
-      && ssoClientData.nek.usages.includes("encrypt")
-      && ssoClientData.nek.usages.includes("decrypt")
-
-      && ssoClientData.iv1 instanceof Uint8Array
-      && ssoClientData.iv1.length === 12
-
-      && ssoClientData.iv2 instanceof Uint8Array
-      && ssoClientData.iv2.length === 12;
+  static async updateLocalKitIdWith(ssoKitId) {
+    const dbHandler = await this.getDbHandler();
+    await this.updateSsoDataWithId(dbHandler, ssoKitId);
+    dbHandler.close();
   }
 
   /**
    * Remove all existing data
    * @return {Promise<void>}
    */
-  static async wipeData() {
+  static async flush() {
     const dbHandler = await this.getDbHandler();
     await this.clearData(dbHandler);
   }
@@ -87,15 +75,14 @@ class SsoDataStorage {
 
       openRequest.onupgradeneeded = e => {
         const db = e.target.result;
-        console.log(`Upgrading SSO IndexedDB to version ${db.version}.`);
+        console.log(`Upgrading SSO IndexedDB from version ${e.oldVersion} to version ${e.newVersion}.`);
 
-        const objectStore = db.createObjectStore(SSO_KEYS_OBECT_STORE, {
-          keyPath: 'id',
-        });
-
-        objectStore.createIndex("nek", "nek", {unique: true});
-        objectStore.createIndex("iv1", "iv1");
-        objectStore.createIndex("iv2", "iv2");
+        if (e.oldVersion < 1) {
+          const objectStore = db.createObjectStore(SSO_KEYS_OBECT_STORE, {
+            keyPath: 'pk_id',
+          });
+          objectStore.createIndex("sso_kit", "sso_kit", {unique: true});
+        }
 
         console.log("SSO IndexedDB upgrade completed.");
       };
@@ -116,20 +103,20 @@ class SsoDataStorage {
    * Replace the current existing SSO client data or store new one.
    *
    * @param {IDBDatabase} dbHandler an opened IndexDB handler
-   * @param {SsoClientUserDataDto} ssoClientData
+   * @param {ssoKitClientPartEntity} ssoKitClientPartEntity
    * @returns {Promise<void>}
    * @private
    */
-  static async replaceSsoData(dbHandler, ssoClientData) {
+  static async replaceSsoData(dbHandler, ssoKitClientPartEntity) {
     console.log("replacing data");
     await this.clearData(dbHandler);
-    await this.storeData(dbHandler, ssoClientData);
+    await this.storeData(dbHandler, ssoKitClientPartEntity);
   }
 
   /**
    * Finds the SSO client data from the IndexedDB
    * @param {IDBDatabase} dbHandler
-   * @returns {Promise<SsoClientUserDataDto>}
+   * @returns {Promise<SsoKitClientPartEntity|null>}
    * @private
    */
   static async getSsoData(dbHandler) {
@@ -146,11 +133,7 @@ class SsoDataStorage {
           return;
         }
 
-        const ssoClientData = {
-          nek: cursor.value.nek,
-          iv1: cursor.value.iv1,
-          iv2: cursor.value.iv2
-        };
+        const ssoClientData = new SsoKitClientPartEntity(cursor.value.sso_kit);
         resolve(ssoClientData);
       };
 
@@ -191,20 +174,17 @@ class SsoDataStorage {
    * Store the given SSO client data.
    *
    * @param {IDBDatabase} dbHandler an opened IndexDB handler
-   * @param {SsoClientUserDataDto} ssoClientData
+   * @param {SsoKitClientPartEntity} ssoKitClientPartEntity
    * @returns {Promise<void>}
    * @private
    */
-  static async storeData(dbHandler, ssoClientData) {
+  static async storeData(dbHandler, ssoKitClientPartEntity) {
     return new Promise((resolve, reject) => {
       const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readwrite');
       const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);
 
-      const dataToStore = {
-        id: 1,
-        ...ssoClientData
-      };
-      const addRequest = objectStore.add(dataToStore);
+      const ssoKit = ssoKitClientPartEntity.toDto();
+      const addRequest = objectStore.add({pk_id: 1, sso_kit: ssoKit});
 
       addRequest.onsuccess = () => {
         console.log("New SSO client data stored successfully");
@@ -217,6 +197,40 @@ class SsoDataStorage {
 
       transaction.onerror = event => {
         console.error(`The IndexedDB transaction couldn't be opened to add new data`);
+        console.error(event);
+        reject();
+      };
+    });
+  }
+
+  /**
+   * Updates the id of the SSO kit.
+   *
+   * @param {IDBDatabase} dbHandler an opened IndexDB handler
+   * @param {uuid} ssoKitClientPartEntity
+   * @returns {Promise<void>}
+   * @private
+   */
+  static async updateSsoDataWithId(dbHandler, ssoKitId) {
+    const ssoData = await this.getSsoData(dbHandler);
+    return new Promise((resolve, reject) => {
+      const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readwrite');
+      const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);
+
+      const newSsoKit = Object.assign({}, ssoData.toDto(), {id: ssoKitId});
+      const putRequest = objectStore.put({pk_id: 1, sso_kit: newSsoKit});
+
+      putRequest.onsuccess = () => {
+        console.log("The SSO Kit identifier has been updated successfully");
+      };
+
+      transaction.oncomplete = () => {
+        //Apparently, according to an MDN documentation, the modification is not 100% guaranteed to be flushed on disk for Firefox
+        resolve();
+      };
+
+      transaction.onerror = event => {
+        console.error(`The IndexedDB transaction couldn't be opened to updated the SSO Kit`);
         console.error(event);
         reject();
       };

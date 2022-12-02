@@ -11,12 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import DecryptSsoPassphraseService from "../../service/crypto/decryptSsoPassphraseService";
-import SsoUserServerDataModel from "../../model/sso/ssoUserServerDataModel";
 import AzurePopupHandlerService from "../../service/sso/azurePopupHandlerService";
 import {Buffer} from 'buffer';
+import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
+import SsoAzureLoginModel from "../../model/sso/ssoAzureLoginModel";
+import AuthModel from "../../model/auth/authModel";
+import ClientSsoKitNotFoundError from "../../error/clientSsoKitNotFoundError";
 
 class AzureSsoAuthenticationController {
   /**
@@ -27,8 +29,11 @@ class AzureSsoAuthenticationController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.ssoUserServerDataModel = new SsoUserServerDataModel(apiClientOptions);
-    this.azurePopupHandler = new AzurePopupHandlerService(account.domain);
+    this.account = account;
+    this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
+    this.ssoAzureLoginModel = new SsoAzureLoginModel(apiClientOptions);
+    this.azurePopupHandler = new AzurePopupHandlerService(account.domain, false);
+    this.authModel = new AuthModel(apiClientOptions);
   }
 
   /**
@@ -47,33 +52,45 @@ class AzureSsoAuthenticationController {
   }
 
   /**
-   * Get the current user's passphrase using SSO authentication.
+   * Authenticate the user using the third party SSO provider.
    *
-   * @return {Promise<string>}
+   * @return {Promise<void>}
    */
   async exec() {
     try {
-      const thirdPartyCode = await this.azurePopupHandler.getCodeFromThirdParty();
-      const ssoServerData = await this.ssoUserServerDataModel.findUserData(thirdPartyCode);
-      const ssoClientData = await SsoDataStorage.get();
-
-      if (ssoClientData === null) {
-        throw new Error("Can't attempt SSO login as SSO is not configured on this browser extension.");
+      const clientPartSsoKit = await SsoDataStorage.get();
+      if (!clientPartSsoKit) {
+        throw new ClientSsoKitNotFoundError("The Single Sign-On cannot proceed as there is no SSO kit registered on this browser profile.");
       }
+      const userId = this.account.userId;
+      const loginUrl = await this.ssoAzureLoginModel.getLoginUrl(userId);
+      const thirdPartyCode = await this.azurePopupHandler.getCodeFromThirdParty(loginUrl);
+      const ssoServerData = await this.ssoKitServerPartModel.getSsoKit(clientPartSsoKit.id, userId, thirdPartyCode);
 
-      //@todo: do it in a service ?
-      const tmpKey = ssoServerData.key;
-      const serverKey = await crypto.subtle.importKey("jwk", tmpKey, 'AES-GCM', true, ["encrypt", "decrypt"]);
-      const serverCipher = Buffer.from(ssoServerData.cipher, 'base64');
+      const jsonServerKey = JSON.parse(Buffer.from(ssoServerData.data, "base64").toString());
+      const serverKey = await crypto.subtle.importKey("jwk", jsonServerKey, 'AES-GCM', true, ["encrypt", "decrypt"]);
 
-
-      const passphrase = await DecryptSsoPassphraseService.decrypt(serverCipher, ssoClientData.nek, serverKey, ssoClientData.iv1, ssoClientData.iv2);
+      const passphrase = await DecryptSsoPassphraseService.decrypt(clientPartSsoKit.secret, clientPartSsoKit.nek, serverKey, clientPartSsoKit.iv1, clientPartSsoKit.iv2);
       await this.azurePopupHandler.closeHandler();
-      return passphrase;
+      await this.authModel.login(passphrase, true);
     } catch (error) {
-      console.log("An error occured while handle Azure sign in:", error);
-      this.azurePopupHandler.closeHandler();
+      console.error("An error occured while handle Azure sign in:", error);
+      this.handleSpecificErrors(error);
       throw error;
+    }
+  }
+
+  /**
+   * Handles error of different type coming from the SSO authentication process
+   * @param {Error} error
+   */
+  handleSpecificErrors(error) {
+    switch (error.name) {
+      case 'InvalidMasterPasswordError':
+      case 'PassboltApiFetchError':
+      case 'OutdatedSsoKitError': {
+        SsoDataStorage.flush();
+      }
     }
   }
 }

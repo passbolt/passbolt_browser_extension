@@ -9,9 +9,11 @@
  * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.7.3
+ * @since         3.9.0
  */
 import {Buffer} from 'buffer';
+import OutdatedSsoKitError from '../../error/outdatedSsoKitError';
+import UnexpectedSsoKitDecryptionError from '../../error/unexpectedSsoKitDecryptionError';
 
 class DecryptSsoPassphraseService {
   /**
@@ -35,8 +37,28 @@ class DecryptSsoPassphraseService {
       iv: iv1
     };
 
-    const firstDecryptionBuffer = await crypto.subtle.decrypt(firstDecryptionAlgorithm, ek, buffer);
-    const secondDecryptionBuffer = await crypto.subtle.decrypt(secondDecryptionAlgorithm, nek, firstDecryptionBuffer);
+    let firstDecryptionBuffer = null;
+    try {
+      firstDecryptionBuffer = await crypto.subtle.decrypt(firstDecryptionAlgorithm, ek, buffer);
+    } catch (e) {
+      /**
+       * This might happen if a backup client side or server side was done and both kits are mismatching.
+       */
+      console.error(e);
+      throw new OutdatedSsoKitError(`Unable to decrypt passphrase from the server SSO kit: ${e.message}`);
+    }
+
+    let secondDecryptionBuffer = null;
+    try {
+      secondDecryptionBuffer = await crypto.subtle.decrypt(secondDecryptionAlgorithm, nek, firstDecryptionBuffer);
+    } catch (e) {
+      /**
+       * This can happen if the local SSO kit nek and/or iv1 has changed (manually?).
+       */
+      console.error(e);
+      throw new UnexpectedSsoKitDecryptionError(`Unable to decrypt passphrase with the local SSO kit: ${e.message}`);
+    }
+
     return Buffer.from(secondDecryptionBuffer).toString();
   }
 }

@@ -16,7 +16,7 @@ import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
 
 class GetCurrentSsoConfigurationController {
   /**
-   * AzureSsoAuthenticationController constructor
+   * GetCurrentSsoConfigurationController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    */

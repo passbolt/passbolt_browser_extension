@@ -17,7 +17,7 @@ import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
 
 class TestAzureSsoAuthenticationController {
   /**
-   * AzureSsoAuthenticationController constructor
+   * TestAzureSsoAuthenticationController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    */
@@ -26,7 +26,7 @@ class TestAzureSsoAuthenticationController {
     this.requestId = requestId;
     this.ssoConfigurationModel = new SsoConfigurationModel(apiClientOptions);
     this.ssoDryRunModel = new SsoDryRunModel(apiClientOptions);
-    this.azurePopupHandler = new AzurePopupHandlerService(account.domain);
+    this.azurePopupHandler = new AzurePopupHandlerService(account.domain, true);
   }
 
   /**

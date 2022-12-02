@@ -11,17 +11,20 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
+import {v4 as uuid} from "uuid";
+import GenerateSsoIvService from "../../../service/crypto/generateSsoIvService";
 
-class GenerateSsoIvService {
-  /**
-   * Generate an AES-GCM key to be used for SSO.
-   *
-   * @param {integer} length size of the IV to generate.
-   * @returns {UInt8Array}
-   */
-  static generateIv(length = 12) {
-    return crypto.getRandomValues(new Uint8Array(length));
-  }
-}
-
-export default GenerateSsoIvService;
+export const clientSsoKit = async(data = {}) => {
+  const algorithm = {
+    name: "AES-GCM",
+    length: 256
+  };
+  const nek = new CryptoKey(algorithm, false, ["encrypt", "decrypt"]);
+  return Object.assign({
+    id: uuid(),
+    secret: Buffer.from(JSON.stringify("Don't tell everybody, this is a secret")).toString('base64'),
+    nek: nek,
+    iv1: await GenerateSsoIvService.generateIv(),
+    iv2: await GenerateSsoIvService.generateIv()
+  }, data);
+};

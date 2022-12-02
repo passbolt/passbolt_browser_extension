@@ -11,19 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
+import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 
-class GetSsoConfigurationController {
+class GetSsoClientDataController {
   /**
-   * GetSsoConfigurationController constructor
+   * GetSsoClientDataController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
-   * @param {ApiClientOptions} apiClientOptions
    */
-  constructor(worker, requestId, apiClientOptions) {
+  constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
-    this.ssoConfigurationModel = new SsoConfigurationModel(apiClientOptions);
   }
 
   /**
@@ -33,8 +31,8 @@ class GetSsoConfigurationController {
    */
   async _exec() {
     try {
-      const ssoConfiguration = await this.exec();
-      this.worker.port.emit(this.requestId, "SUCCESS", ssoConfiguration);
+      const ssoClientData = await this.exec();
+      this.worker.port.emit(this.requestId, "SUCCESS", ssoClientData);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, "ERROR", error);
@@ -42,13 +40,18 @@ class GetSsoConfigurationController {
   }
 
   /**
-   * Get the current SSO configuration.
+   * Get the current SSO client data if any.
    *
-   * @return {Promise<SsoConfigurationModel|null>}
+   * @return {Promise<string|null>}
    */
   async exec() {
-    return null; //this.ssoConfigurationModel.findSsoConfiguration();
+    const data = await SsoDataStorage.get();
+    if (!data) {
+      return null;
+    }
+
+    return data.provider;
   }
 }
 
-export default GetSsoConfigurationController;
+export default GetSsoClientDataController;

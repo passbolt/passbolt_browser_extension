@@ -1,0 +1,108 @@
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         3.9.0
+ */
+import "../../../../../../test/mocks/mockCryptoKey";
+import SsoKitClientPartEntity from "./ssoKitClientPartEntity";
+import EntitySchema from "../abstract/entitySchema";
+import EntityValidationError from "../abstract/entityValidationError";
+import {v4 as uuid} from "uuid";
+import {clientSsoKit} from "./ssoKitClientPart.test.data";
+import GenerateSsoIvService from "../../../service/crypto/generateSsoIvService";
+
+describe("Sso Configuration Entity", () => {
+  it("schema must validate", () => {
+    EntitySchema.validateSchema(SsoKitClientPartEntity.ENTITY_NAME, SsoKitClientPartEntity.getSchema());
+  });
+
+  it("constructor works if valid minimal DTO is provided", async() => {
+    expect.assertions(1);
+    const dto = await clientSsoKit();
+
+    const entity = new SsoKitClientPartEntity(dto);
+    expect(entity.toDto()).toEqual(dto);
+  });
+
+  it("constructor works if full valid DTO is provided", async() => {
+    expect.assertions(1);
+    const dto = await clientSsoKit({
+      created: "2020-05-04T20:31:45+00:00",
+      modified: "2020-05-04T20:31:45+00:00",
+      created_by: uuid(),
+      modified_by: uuid(),
+    });
+
+    const entity = new SsoKitClientPartEntity(dto);
+    expect(entity.toDto()).toEqual(dto);
+  });
+
+  it("constructor returns validation error if dto required fields are invalid", async() => {
+    function generateNek({algorithmName = "AES-GCM", algorithmLength = 256, capabilities = ["encrypt", "decrypt"], extractable = false}) {
+      const algorithm = {
+        name: algorithmName,
+        length: algorithmLength
+      };
+      return new CryptoKey(algorithm, extractable, capabilities);
+    }
+    const ssoKit = await clientSsoKit();
+    const invalidNeks = [
+      "nek",
+      {},
+      generateNek({algorithmName: "test"}),
+      generateNek({algorithmLength: 10}),
+      generateNek({capabilities: []}),
+      generateNek({capabilities: ["encrypt"]}),
+      generateNek({capabilities: ["decrypt"]}),
+      generateNek({capabilities: ["encrypt", "decrypt", "sign"]}),
+      generateNek({extractable: true}),
+    ];
+    const invalidIvs = [{
+      iv1: [1, 2, 3],
+      iv2: await GenerateSsoIvService.generateIv()
+    }, {
+      iv1: await GenerateSsoIvService.generateIv(),
+      iv2: [1, 2, 3]
+    }, {
+      iv1: await GenerateSsoIvService.generateIv(),
+      iv2: await GenerateSsoIvService.generateIv(1)
+    }, {
+      iv1: await GenerateSsoIvService.generateIv(1),
+      iv2: await GenerateSsoIvService.generateIv()
+    }, {
+      iv1: await GenerateSsoIvService.generateIv(16),
+      iv2: await GenerateSsoIvService.generateIv()
+    }, {
+      iv1: await GenerateSsoIvService.generateIv(),
+      iv2: await GenerateSsoIvService.generateIv(16)
+    }];
+
+    expect.assertions(invalidNeks.length + invalidIvs.length);
+
+    for (let i = 0; i < invalidNeks.length; i++) {
+      const dto = Object.assign({}, ssoKit, {nek: invalidNeks[i]});
+      try {
+        new SsoKitClientPartEntity(dto);
+      } catch (e) {
+        expect(e).toBeInstanceOf(EntityValidationError);
+      }
+    }
+
+    for (let i = 0; i < invalidIvs.length; i++) {
+      const dto = Object.assign({}, ssoKit, invalidIvs[i]);
+      try {
+        new SsoKitClientPartEntity(dto);
+      } catch (e) {
+        expect(e).toBeInstanceOf(EntityValidationError);
+      }
+    }
+  });
+});

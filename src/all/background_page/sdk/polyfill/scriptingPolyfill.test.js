@@ -28,13 +28,13 @@ describe("Scripting", () => {
 
       const option = {
         func: func,
-          args: ["Hello"],
+        args: ["Hello"],
         target: {
           tabId: 1,
           frameId: 0
         },
         world: "ISOLATED"
-      }
+      };
 
       browser.scripting.executeScript(option);
 
@@ -56,7 +56,7 @@ describe("Scripting", () => {
           frameId: 0
         },
         world: "ISOLATED"
-      }
+      };
 
       browser.scripting.executeScript(option);
 
@@ -76,7 +76,7 @@ describe("Scripting", () => {
           tabId: 1,
           frameId: 0
         }
-      }
+      };
 
       browser.scripting.insertCSS(option);
 

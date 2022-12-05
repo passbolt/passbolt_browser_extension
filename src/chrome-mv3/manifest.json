@@ -12,8 +12,7 @@
     "128": "webAccessibleResources/img/icons/icon-128.png"
   },
   "background": {
-    "service_worker": "serviceWorker/serviceWorker.js",
-    "type": "module"
+    "service_worker": "serviceWorker/serviceWorker.js"
   },
   "action": {
     "default_icon": "webAccessibleResources/img/icons/icon-32.png",
@@ -39,7 +38,8 @@
     "storage",
     "tabs",
     "scripting",
-    "alarms"
+    "alarms",
+    "webNavigation"
   ],
   "host_permissions": [
     "*://*/*"

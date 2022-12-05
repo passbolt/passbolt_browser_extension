@@ -69,7 +69,7 @@ class ResourceInProgressCacheService {
     this.scheduleStorageFlush(timeoutInMs);
 
     // Invalid the cache if the user is logged out
-    window.addEventListener("passbolt.auth.after-logout", this.reset);
+    self.addEventListener("passbolt.auth.after-logout", this.reset);
   }
 
   /**
@@ -111,7 +111,7 @@ class ResourceInProgressCacheService {
   reset() {
     browser.storage.session.remove(RESOURCE_IN_PROGRESS_STORAGE_KEY);
     this.clearAlarm();
-    window.removeEventListener("passbolt.auth.after-logout", this.reset);
+    self.removeEventListener("passbolt.auth.after-logout", this.reset);
   }
 }
 

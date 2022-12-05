@@ -369,7 +369,7 @@ const UserSingleton = (function() {
        * Observe when the user session is terminated.
        * - Flush the temporary stored master password
        */
-      window.addEventListener("passbolt.auth.after-logout", async() =>
+      self.addEventListener("passbolt.auth.after-logout", async() =>
         await PassphraseStorageService.flush()
       );
     }

@@ -38,8 +38,8 @@ class AuthenticationEventController {
    * Start event listeners.
    */
   startListen() {
-    window.addEventListener("passbolt.auth.after-logout", this.handleUserLoggedOut);
-    window.addEventListener("passbolt.auth.after-login", this.handleUserLoggedIn);
+    self.addEventListener("passbolt.auth.after-logout", this.handleUserLoggedOut);
+    self.addEventListener("passbolt.auth.after-login", this.handleUserLoggedIn);
     this.worker.port._port.onDisconnect.addListener(this.handleRemoveListener);
   }
 
@@ -58,8 +58,8 @@ class AuthenticationEventController {
   }
 
   handleRemoveListener() {
-    window.removeEventListener("passbolt.auth.after-logout", this.handleUserLoggedOut);
-    window.removeEventListener("passbolt.auth.after-login", this.handleUserLoggedIn);
+    self.removeEventListener("passbolt.auth.after-logout", this.handleUserLoggedOut);
+    self.removeEventListener("passbolt.auth.after-login", this.handleUserLoggedIn);
   }
 }
 

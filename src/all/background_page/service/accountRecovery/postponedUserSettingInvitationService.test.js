@@ -32,7 +32,7 @@ describe("PostponedUserSettingInvitation service", () => {
     PostponedUserSettingInvitationService.postpone();
     expect(PostponedUserSettingInvitationService.hasPostponed()).toBe(true);
 
-    window.dispatchEvent(new Event('passbolt.auth.after-logout'));
+    self.dispatchEvent(new Event('passbolt.auth.after-logout'));
     expect(PostponedUserSettingInvitationService.hasPostponed()).toBe(false);
   });
 });

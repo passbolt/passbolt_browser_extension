@@ -93,7 +93,7 @@ const main = async function() {
         await pageMods.AppBoostrap.init();
         auth.startCheckAuthStatusLoop();
         const event = new Event('passbolt.auth.after-login');
-        window.dispatchEvent(event);
+        self.dispatchEvent(event);
       }
     } catch (error) {
       /*

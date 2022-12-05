@@ -62,7 +62,7 @@ class PasswordGeneratorLocalStorage {
     this.flush();
 
     // Flush the local storage when the passbolt user session is terminated
-    window.addEventListener("passbolt.auth.after-logout", () => {
+    self.addEventListener("passbolt.auth.after-logout", () => {
       this.flush();
     });
   }

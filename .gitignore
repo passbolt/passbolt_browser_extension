@@ -23,6 +23,9 @@ __snapshots__
 /build
 /bootstrap.js
 *.pem
+/dist/**/*debug.*
+/dist/chrome-v3/
+/dist/**/*latest\@passbolt.com.*
 
 # Config
 lib/config/config.json

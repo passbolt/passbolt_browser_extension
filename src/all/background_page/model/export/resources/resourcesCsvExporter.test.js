@@ -10,7 +10,6 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-window.PapaParse = require("papaparse");
 import ResourcesCsvExporter from "./resourcesCsvExporter";
 import Csv1PasswordRowComposer from "./csvRowComposer/csv1passwordRowComposer";
 import CsvKdbxRowComposer from "./csvRowComposer/csvKdbxRowComposer";

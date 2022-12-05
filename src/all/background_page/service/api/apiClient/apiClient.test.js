@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-window.fetch = require('node-fetch');
 import ApiClient from "./apiClient";
 import ApiClientOptions from "./apiClientOptions";
 import PassboltServiceUnavailableError from '../../../error/passboltServiceUnavailableError';

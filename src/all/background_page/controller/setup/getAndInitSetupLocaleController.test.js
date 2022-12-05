@@ -50,7 +50,7 @@ describe("GetAndInitSetupLocaleController", () => {
       const mockOrganizationSettings = anonymousOrganizationSettings();
       fetch.doMockOnce(() => mockApiResponse(mockOrganizationSettings));
       // Mock the navigator locale
-      const languageGetterMock = jest.spyOn(window.navigator, 'language', 'get');
+      const languageGetterMock = jest.spyOn(self.navigator, 'language', 'get');
       languageGetterMock.mockReturnValue("de-AT");
 
       expect.assertions(1);
@@ -66,7 +66,7 @@ describe("GetAndInitSetupLocaleController", () => {
       const mockOrganizationSettings = anonymousOrganizationSettings();
       fetch.doMockOnce(() => mockApiResponse(mockOrganizationSettings));
       // Mock the navigator locale
-      const languageGetterMock = jest.spyOn(window.navigator, 'language', 'get');
+      const languageGetterMock = jest.spyOn(self.navigator, 'language', 'get');
       languageGetterMock.mockReturnValue("de-DE");
 
       expect.assertions(1);
@@ -82,7 +82,7 @@ describe("GetAndInitSetupLocaleController", () => {
       const mockOrganizationSettings = anonymousOrganizationSettings({app: {locale: "ja-JP"}});
       fetch.doMockOnce(() => mockApiResponse(mockOrganizationSettings));
       // Mock the navigator locale
-      const languageGetterMock = jest.spyOn(window.navigator, 'language', 'get');
+      const languageGetterMock = jest.spyOn(self.navigator, 'language', 'get');
       languageGetterMock.mockReturnValue("ma-MA");
 
       expect.assertions(1);
@@ -98,7 +98,7 @@ describe("GetAndInitSetupLocaleController", () => {
       const mockOrganizationSettings = anonymousOrganizationSettings({app: {locale: null}});
       fetch.doMockOnce(() => mockApiResponse(mockOrganizationSettings));
       // Mock the navigator locale
-      const languageGetterMock = jest.spyOn(window.navigator, 'language', 'get');
+      const languageGetterMock = jest.spyOn(self.navigator, 'language', 'get');
       languageGetterMock.mockReturnValue("ma-MA");
 
       expect.assertions(1);

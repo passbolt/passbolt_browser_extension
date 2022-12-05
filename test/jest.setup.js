@@ -19,6 +19,7 @@ global.console = {
 };
 global.TextEncoder = require('text-encoding-utf-8').TextEncoder;
 global.TextDecoder = require('text-encoding-utf-8').TextDecoder;
+global.fetch = require('node-fetch');
 jest.mock("webextension-polyfill", () => Object.assign({}, {
   storage: new MockStorage(),
   runtime: {

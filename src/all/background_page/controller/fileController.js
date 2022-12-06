@@ -24,7 +24,7 @@ function saveFile(filename, content, mimeType, tabid) {
 
   return new Promise(resolve => {
     if (chrome.downloads) {
-      const url = window.URL.createObjectURL(content);
+      const url = self.URL.createObjectURL(content);
       /*
        * Don't propose the "save as dialog" if running the test, the tests need the file to be automatically saved
        * in the default downloads directory.
@@ -33,7 +33,7 @@ function saveFile(filename, content, mimeType, tabid) {
       chrome.downloads.download(
         {url: url, filename: filename, saveAs: saveAs},
         () => {
-          window.URL.revokeObjectURL(url);
+          self.URL.revokeObjectURL(url);
           resolve();
         });
     } else {

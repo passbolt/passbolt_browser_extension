@@ -49,16 +49,26 @@ describe("Port", () => {
 
   describe("Port::request", () => {
     it("Should post a message and wait the result", async() => {
-      expect.assertions(3);
+      expect.assertions(6);
 
       const portname = uuidv4();
       const port = new Port(portname);
       port.connect();
       port._onMessage(["passbolt.port.ready"]);
 
+      jest.spyOn(port, "emit");
+      jest.spyOn(port.lock, "acquire");
+      jest.spyOn(port.lock, "release");
+
       const message = "request_message";
       const promise = port.request(message, {data: "data"});
       const requestId = Object.keys(port._listeners)[0];
+
+      expect(port.emit).toHaveBeenCalledWith(message, requestId, {data: "data"});
+      expect(port.lock.acquire).toHaveBeenCalled();
+      // Force to wait the promise has been resolve to be sure the post message has been called
+      await port.connectIfDisconnected();
+      expect(port.lock.release).toHaveBeenCalled();
       expect(port._port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, {data: "data"}]));
 
       const dataReceived = {data: "dataReceived"};

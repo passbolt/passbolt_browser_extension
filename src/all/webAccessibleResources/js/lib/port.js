@@ -13,6 +13,7 @@
  */
 import browser from "../../../background_page/sdk/polyfill/browserPolyfill";
 import {v4 as uuidv4} from "uuid";
+import Lock from "../../../background_page/utils/lock";
 
 class Port {
   /**
@@ -21,6 +22,7 @@ class Port {
    */
   constructor(name) {
     this._listeners = {};
+    this.lock = new Lock();
     if (typeof name === "undefined") {
       throw Error("A port name is required.");
     } else if (typeof name  !== "string") {
@@ -38,6 +40,7 @@ class Port {
     let resolver;
     const promise = new Promise(resolve => { resolver = resolve; });
     this._port = browser.runtime.connect({name: this._name});
+    this._connected = true;
     this.initListener();
     this.once("passbolt.port.ready", resolver);
     return promise;
@@ -129,8 +132,9 @@ class Port {
    * Emit a message to the addon code
    * @param requestArgs the arguments
    */
-  emit(...requestArgs) {
+  async emit(...requestArgs) {
     const message = JSON.stringify(requestArgs);
+    await this.connectIfDisconnected();
     this._port.postMessage(message);
   }
 
@@ -162,6 +166,18 @@ class Port {
       // Emit the message to the addon-code.
       this.emit.apply(this, requestArgs);
     });
+  }
+
+  /**
+   * Has to connect the port
+   * @returns {Promise<void>}
+   */
+  async connectIfDisconnected() {
+    await this.lock.acquire();
+    if (!this._connected) {
+      await this.connect();
+    }
+    this.lock.release();
   }
 }
 

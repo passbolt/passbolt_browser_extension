@@ -15,6 +15,9 @@ import PagemodManager from "../pagemod/pagemodManager";
 import pagemod from "./pagemod";
 import RecoverBootstrapPagemod from "./recoverBootstrapPagemod";
 import SetupBootstrapPagemod from "./setupBootstrapPagemod";
+import AuthBootstrapPagemod from "./authBootstrapPagemod";
+import User from "../../all/background_page/model/user";
+import UserSettings from "../../all/background_page/model/userSettings/userSettings";
 
 jest.spyOn(pagemod.prototype, "injectFiles").mockImplementation(jest.fn());
 jest.spyOn(pagemod.prototype, "attachEvents").mockImplementation(jest.fn());
@@ -56,6 +59,25 @@ describe("PagemodManager", () => {
       expect(pagemod.prototype.injectFiles).toHaveBeenCalledWith(details.tabId, details.frameId);
       // Called twice (WebIntegration, PublicWebsiteSignIn)
       expect(SetupBootstrapPagemod.injectFiles).toHaveBeenCalledTimes(1);
+    });
+
+    it("Should find the auth page mod and inject file", async() => {
+      expect.assertions(2);
+      // data mocked
+      const details = {
+        tabId: 1,
+        frameId: 0,
+        url: "https://passbolt.dev/auth/login"
+      };
+      // mock functions
+      jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
+      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
+      // process
+      await PagemodManager.exec(details);
+      // expectations
+      expect(pagemod.prototype.injectFiles).toHaveBeenCalledWith(details.tabId, details.frameId);
+      // Called twice (WebIntegration, PublicWebsiteSignIn)
+      expect(AuthBootstrapPagemod.injectFiles).toHaveBeenCalledTimes(1);
     });
 
     it("Should not find any pagemod", async() => {

@@ -17,6 +17,8 @@ import RecoverBootstrapPagemod from "./recoverBootstrapPagemod";
 import RecoverPagemod from "./recoverPagemod";
 import SetupBootstrapPagemod from "./setupBootstrapPagemod";
 import SetupPagemod from "./setupPagemod";
+import AuthBootstrapPagemod from "./authBootstrapPagemod";
+import AuthPagemod from "./authPagemod";
 
 /**
  * The pagemod manager have the role of dispatching the process to the correct pagemod
@@ -25,7 +27,7 @@ class PagemodManager {
   constructor() {
     // TODO find a way to init the storage one time
     storage.init().then(Config.init);
-    this.pagemods = [RecoverBootstrapPagemod, RecoverPagemod, SetupBootstrapPagemod, SetupPagemod];
+    this.pagemods = [RecoverBootstrapPagemod, RecoverPagemod, SetupBootstrapPagemod, SetupPagemod, AuthBootstrapPagemod, AuthPagemod];
     this.exec = this.exec.bind(this);
   }
 

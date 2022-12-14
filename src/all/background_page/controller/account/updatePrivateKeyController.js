@@ -14,6 +14,11 @@
 import AccountModel from "../../model/account/accountModel";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import FileService from "../../service/file/fileService";
+import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
+import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
+import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
+import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
 
@@ -29,6 +34,8 @@ class UpdatePrivateKeyController {
     this.requestId = requestId;
     this.apiClientOptions = apiClientOptions;
     this.accountModel = new AccountModel(apiClientOptions);
+    this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
+    this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
   }
 
   /**
@@ -48,16 +55,51 @@ class UpdatePrivateKeyController {
 
   /**
    * Updates the passphrase of the current user's private key and then starts a download of the new key.
-   *
+   * It also generates a new SSO kit if required.
+   * @param {string} oldPassphrase
+   * @param {string} newPassphrase
    * @returns {Promise<void>}
    */
   async exec(oldPassphrase, newPassphrase) {
     if (typeof oldPassphrase !== 'string' || typeof newPassphrase !== 'string') {
       throw new Error('The old and new passphrase have to be string');
     }
-    const userPrivateArmoredKey = await this.accountModel.updatePrivateKey(oldPassphrase, newPassphrase);
+    const organizationSettings = await this.organisationSettingsModel.getOrFind();
+    const ssoIsEnabled = organizationSettings.isPluginEnabled("sso");
+
+    const userPrivateArmoredKey = await this.accountModel.rotatePrivateKeyPassphrase(oldPassphrase, newPassphrase);
+    if (ssoIsEnabled) {
+      await this.regenerateSsoKit(newPassphrase);
+    }
+    await this.accountModel.updatePrivateKey(userPrivateArmoredKey);
     await PassphraseStorageService.flushPassphrase();
+    if (PassphraseStorageService.isSessionKeptUntilLogOut()) {
+      await PassphraseStorageService.set(newPassphrase);
+    }
     await FileService.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", this.worker.tab.id);
+  }
+
+  /**
+   * Handles the generation of a new SSO kit.
+   * @param {string} newPassphrase
+   * @returns {Promise<void>}
+   */
+  async regenerateSsoKit(newPassphrase) {
+    const currentKit = await SsoDataStorage.get();
+    if (currentKit?.id) {
+      try {
+        await this.ssoKitServerPartModel.deleteSsoKit(currentKit.id);
+      } catch (e) {
+        // we assume that the kit migth have been remove from the server already
+        if (!(e instanceof PassboltApiFetchError)) {
+          throw e;
+        }
+      }
+    }
+    const ssoKits = await GenerateSsoKitService.generateSsoKits(newPassphrase, currentKit.provider);
+    const registeredServerPartSsoKit = await this.ssoKitServerPartModel.setupSsoKit(ssoKits.serverPart);
+    ssoKits.clientPart.id = registeredServerPartSsoKit.id;
+    await SsoDataStorage.save(ssoKits.clientPart);
   }
 }
 

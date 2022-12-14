@@ -50,6 +50,15 @@ class SsoKitServerPartModel {
     const ssoKit = await this.ssoKitServerPartService.setupSsoKit(ssoKitServerPartEntity);
     return new SsoKitServerPartEntity(ssoKit);
   }
+
+  /**
+   * Delete an SSO kit matching the given id.
+   * @param {uuid} ssoKitId
+   * @returns {Promise<void>}
+   */
+  async deleteSsoKit(ssoKitId) {
+    await this.ssoKitServerPartService.deleteSsoKit(ssoKitId);
+  }
 }
 
 export default SsoKitServerPartModel;

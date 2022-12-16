@@ -21,6 +21,7 @@ const FORMAT_CSV_KDBX = "csv-kdbx";
 const FORMAT_CSV_LASTPASS = "csv-lastpass";
 const FORMAT_CSV_1PASSWORD = "csv-1password";
 const FORMAT_CSV_CHROMIUM = "csv-chromium";
+const FORMAT_CSV_BITWARDEN = "csv-bitwarden";
 
 class ExportResourcesFileEntity extends Entity {
   /**
@@ -272,6 +273,7 @@ class ExportResourcesFileEntity extends Entity {
       ExportResourcesFileEntity.FORMAT_CSV_LASTPASS,
       ExportResourcesFileEntity.FORMAT_CSV_1PASSWORD,
       ExportResourcesFileEntity.FORMAT_CSV_CHROMIUM,
+      ExportResourcesFileEntity.FORMAT_CSV_BITWARDEN
     ];
   }
 
@@ -313,6 +315,14 @@ class ExportResourcesFileEntity extends Entity {
    */
   static get FORMAT_CSV_CHROMIUM() {
     return FORMAT_CSV_CHROMIUM;
+  }
+
+  /**
+   * ExportResourcesFileEntity.FORMAT_CSV_BITWARDEN
+   * @returns {string}
+   */
+  static get FORMAT_CSV_BITWARDEN() {
+    return FORMAT_CSV_BITWARDEN;
   }
 }
 

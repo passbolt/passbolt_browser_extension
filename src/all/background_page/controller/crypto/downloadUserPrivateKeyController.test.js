@@ -19,9 +19,9 @@ import MockExtension from "../../../../../test/mocks/mockExtension";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {PassphraseController} from "../passphrase/passphraseController";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import {FileController} from "../fileController";
+import FileService from "../../service/file/fileService";
 
-const mockedSaveFile = jest.spyOn(FileController, "saveFile");
+const mockedSaveFile = jest.spyOn(FileService, "saveFile");
 
 jest.mock("../passphrase/passphraseController");
 

@@ -8,9 +8,11 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 import {Worker} from "../model/worker";
-import {App as app} from "../app";
 import PageMod from "../sdk/page-mod";
 import User from "../model/user";
+import {ConfigEvents} from "../event/configEvents";
+import {WebIntegrationEvents} from "../event/webIntegrationEvents";
+import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 
 
 const WebIntegration = function() {};
@@ -38,9 +40,9 @@ WebIntegration.init = function() {
     attachTo: {existing: true, reload: false},
     onAttach: function(worker) {
       Worker.add('WebIntegration', worker);
-      app.events.config.listen(worker);
-      app.events.webIntegration.listen(worker);
-      app.events.organizationSettings.listen(worker);
+      ConfigEvents.listen(worker);
+      WebIntegrationEvents.listen(worker);
+      OrganizationSettingsEvents.listen(worker);
     }
   });
 };

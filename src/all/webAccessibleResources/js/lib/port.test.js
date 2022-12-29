@@ -16,10 +16,6 @@ import browser from "../../../background_page/sdk/polyfill/browserPolyfill";
 import {v4 as uuidv4} from "uuid";
 
 describe("Port", () => {
-  beforeEach(async() => {
-
-  });
-
   describe("Port::connect", () => {
     it("Should create new port with the name and connect", async() => {
       expect.assertions(5);

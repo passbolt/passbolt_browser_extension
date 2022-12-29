@@ -29,7 +29,7 @@ describe("ScriptExecution", () => {
         args: [portname],
         target: {
           tabId: 1,
-          frameId: 0
+          frameIds: [0]
         },
         world: "ISOLATED"
       };
@@ -50,7 +50,7 @@ describe("ScriptExecution", () => {
         files: files,
         target: {
           tabId: 2,
-          frameId: 0
+          frameIds: [0]
         },
         world: "ISOLATED"
       };
@@ -71,7 +71,7 @@ describe("ScriptExecution", () => {
         files: files,
         target: {
           tabId: 3,
-          frameId: 0
+          frameIds: [0]
         }
       };
 

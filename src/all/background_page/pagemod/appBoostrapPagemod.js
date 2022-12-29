@@ -11,9 +11,9 @@
 import GpgAuth from "../model/gpgauth";
 import User from "../model/user";
 import {Worker} from "../model/worker";
-import {App as app} from "../app";
 import PageMod from "../sdk/page-mod";
 import ParseAppUrlService from "../service/app/parseAppUrlService";
+import {AppBootstrapEvents} from "../event/appBootstrapEvents";
 
 const AppBoostrapPagemod = function() {};
 AppBoostrapPagemod._pageMod = null;
@@ -66,7 +66,7 @@ AppBoostrapPagemod.initPageMod = function() {
         return;
       }
 
-      app.events.appBootstrap.listen(worker);
+      AppBootstrapEvents.listen(worker);
 
       Worker.add("AppBootstrap", worker);
     },

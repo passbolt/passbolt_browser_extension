@@ -38,7 +38,7 @@ class Scripting {
     const fileArray = options.files;
 
     for (let i = fileArray.length - 1; i >= 0; --i) {
-      const info = {file: fileArray[i], runAt: 'document_end', frameId: options.target?.frameId};
+      const info = {file: fileArray[i], runAt: 'document_end', frameId: options.target?.frameIds[0]};
       callback = this._createCssCallback(options.target.tabId, info, callback);
     }
 
@@ -81,7 +81,7 @@ class Scripting {
     const fileArray = options.files;
 
     for (let i = fileArray.length - 1; i >= 0; --i) {
-      const info = {file: fileArray[i], runAt: 'document_end', frameId: options.target?.frameId};
+      const info = {file: fileArray[i], runAt: 'document_end', frameId: options.target?.frameIds[0]};
       callback = this._createJsCallback(options.target.tabId, info, callback);
     }
 
@@ -103,7 +103,7 @@ class Scripting {
 
     const codeToInject = options.func.toString() + functionCall;
 
-    const info = {code: codeToInject, runAt: 'document_end', frameId: options.target?.frameId};
+    const info = {code: codeToInject, runAt: 'document_end', frameId: options.target?.frameIds[0]};
     const cb = this._createJsCallback(options.target.tabId, info, null);
     cb();
   }

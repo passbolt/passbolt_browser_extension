@@ -13,7 +13,6 @@
  */
 
 import {enableFetchMocks} from "jest-fetch-mock";
-import {App as app} from "../../app";
 import CompleteRecoverController from "./completeRecoverController";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
@@ -22,9 +21,9 @@ import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntit
 import User from "../../model/user";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
-
-
-jest.mock("../../app");
+import WebIntegration from "../../pagemod/webIntegrationPagemod";
+import AuthBootstrap from "../../pagemod/authBootstrapPagemod";
+import PublicWebsiteSignIn from "../../pagemod/publicWebsiteSignInPagemod";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -34,15 +33,18 @@ beforeEach(() => {
 describe("CompleteRecoverController", () => {
   describe("CompleteRecoverController::exec", () => {
     it("Should complete the recover.", async() => {
+      jest.spyOn(chrome.runtime, 'getManifest').mockImplementationOnce(() => ({manifest_version: 2}));
       const account = new AccountRecoverEntity(withSecurityTokenAccountRecoverDto());
       const controller = new CompleteRecoverController(null, null, defaultApiClientOptions(), account);
 
       // Mock API complete request.
       fetch.doMockOnce(() => mockApiResponse());
       // Mock pagemods to assert the complete start the auth and inform menu pagemods.
-      app.pageMods.WebIntegration.init = jest.fn();
+      WebIntegration.init = jest.fn();
+      PublicWebsiteSignIn.init = jest.fn();
+      AuthBootstrap.init = jest.fn();
 
-      expect.assertions(11);
+      expect.assertions(12);
       await controller.exec();
       const user = User.getInstance().get();
       expect(user.id).toStrictEqual(account.userId);
@@ -65,18 +67,20 @@ describe("CompleteRecoverController", () => {
       expect(keyringPublicFingerprint).toStrictEqual(accountPublicFingerprint);
       expect(keyringPublicFingerprint).toStrictEqual(keyringPrivateFingerprint);
 
-      expect(app.pageMods.WebIntegration.init).toHaveBeenCalled();
-      expect(app.pageMods.AuthBootstrap.init).toHaveBeenCalled();
+      expect(WebIntegration.init).toHaveBeenCalled();
+      expect(PublicWebsiteSignIn.init).toHaveBeenCalled();
+      expect(AuthBootstrap.init).toHaveBeenCalled();
     });
 
     it("Should not add the account to the local storage if the complete API request fails.", async() => {
+      jest.spyOn(chrome.runtime, 'getManifest').mockImplementationOnce(() => ({manifest_version: 2}));
       const account = new AccountRecoverEntity(withSecurityTokenAccountRecoverDto());
       const controller = new CompleteRecoverController(null, null, defaultApiClientOptions(), account);
 
       // Mock API complete request.
       fetch.doMockOnce(() => Promise.reject());
       // Mock pagemods to assert the complete start the auth and inform menu pagemods.
-      app.pageMods.WebIntegration.init = jest.fn();
+      WebIntegration.init = jest.fn();
 
       const promise = controller.exec();
 

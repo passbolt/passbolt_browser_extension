@@ -31,7 +31,7 @@ describe("Scripting", () => {
         args: ["Hello"],
         target: {
           tabId: 1,
-          frameId: 0
+          frameIds: [0]
         },
         world: "ISOLATED"
       };
@@ -53,7 +53,7 @@ describe("Scripting", () => {
         files: ["filename.js", "filename2.js"],
         target: {
           tabId: 1,
-          frameId: 0
+          frameIds: [0]
         },
         world: "ISOLATED"
       };
@@ -74,7 +74,7 @@ describe("Scripting", () => {
         files: ["filename.css"],
         target: {
           tabId: 1,
-          frameId: 0
+          frameIds: [0]
         }
       };
 

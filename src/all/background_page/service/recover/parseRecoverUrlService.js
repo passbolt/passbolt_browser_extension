@@ -21,14 +21,12 @@ class ParseRecoverUrlService {
    * @throw {Error} If the domain is not valid.
    */
   static parse(url) {
-    const uuidRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}";
-    const regex = new RegExp(`(.*)\/(setup\/recover|setup\/recover\/start)\/(${uuidRegex})\/(${uuidRegex})`);
+    const parsedUrl = url.match(this.getRegex());
 
-    if (!regex.test(url)) {
-      throw new Error('Cannot parse recover url. The url does not match the pattern.');
+    if (!parsedUrl) {
+      throw new Error('The url does not match the pattern.');
     }
 
-    const parsedUrl = url.match(regex);
     let [, domain] = parsedUrl;
     const [, , , user_id, authentication_token_token] = parsedUrl;
 
@@ -38,10 +36,33 @@ class ParseRecoverUrlService {
     try {
       new URL(domain);
     } catch (error) {
-      throw new Error('Cannot parse recover url. The domain is not valid.');
+      throw new Error('The domain is not valid.');
     }
 
     return {domain, user_id, authentication_token_token};
+  }
+
+  /**
+   * Get the recover url regex.
+   * @returns {RegExp}
+   */
+  static getRegex() {
+    const uuidRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}";
+    return new RegExp(`(.*)\/(setup\/recover|setup\/recover\/start)\/(${uuidRegex})\/(${uuidRegex})`);
+  }
+
+  /**
+   * Test the url against the regex.
+   * @param {string} url The url to test
+   * @returns {boolean}
+   */
+  static test(url) {
+    try {
+      this.parse(url);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
 

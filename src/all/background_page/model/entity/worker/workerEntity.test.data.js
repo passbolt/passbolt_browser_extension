@@ -11,21 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import browser from "../all/background_page/sdk/polyfill/browserPolyfill";
-import PortManager from "./sdk/portManager";
-import PagemodManager from "./pagemod/pagemodManager";
+import {v4 as uuidv4} from "uuid";
 
-/**
- * Add listener on any on complete navigation
- */
-browser.webNavigation.onCompleted.addListener(PagemodManager.exec);
-
-/**
- * Add listener on connect port
- */
-browser.runtime.onConnect.addListener(PortManager.onPortConnect);
-
-/**
- * Add listener on tabs on removed
- */
-browser.tabs.onRemoved.addListener(PortManager.onTabRemoved);
+export const readWorker = (data = {}) => {
+  const defaultObject = {
+    id: uuidv4(),
+    name: "worker",
+    tabId: 1,
+    frameId: 0,
+  };
+  return Object.assign(defaultObject, data);
+};

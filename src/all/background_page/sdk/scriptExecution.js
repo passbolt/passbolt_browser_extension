@@ -39,8 +39,9 @@ class ScriptExecution {
       files: fileArray,
       target: {
         tabId: this.tabId,
-        frameId: this.frameId
+        frameIds: [this.frameId]
       },
+      // Very important to isolated script and avoiding to share global variable between scripts
       world: "ISOLATED"
     });
   }
@@ -58,7 +59,7 @@ class ScriptExecution {
       files: fileArray,
       target: {
         tabId: this.tabId,
-        frameId: this.frameId
+        frameIds: [this.frameId]
       }
     });
   }
@@ -73,7 +74,7 @@ class ScriptExecution {
       args: [portName],
       target: {
         tabId: this.tabId,
-        frameId: this.frameId
+        frameIds: [this.frameId]
       },
       world: "ISOLATED"
     });

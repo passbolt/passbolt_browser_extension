@@ -453,7 +453,7 @@ module.exports = function (grunt) {
         options: { spawn: false }
       },
       service_worker: {
-        files: [path.src_chrome_mv3 + 'serviceWorker.js'],
+        files: [`${path.src_background_page}**/*.js`, `${path.src_chrome_mv3}**/*.js`],
         tasks: ['shell:build_service_worker_debug', 'copy:service_worker'],
         options: { spawn: false }
       },

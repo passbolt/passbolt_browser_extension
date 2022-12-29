@@ -11,21 +11,21 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import browser from "../all/background_page/sdk/polyfill/browserPolyfill";
-import PortManager from "./sdk/portManager";
-import PagemodManager from "./pagemod/pagemodManager";
 
-/**
- * Add listener on any on complete navigation
- */
-browser.webNavigation.onCompleted.addListener(PagemodManager.exec);
-
-/**
- * Add listener on connect port
- */
-browser.runtime.onConnect.addListener(PortManager.onPortConnect);
-
-/**
- * Add listener on tabs on removed
- */
-browser.tabs.onRemoved.addListener(PortManager.onTabRemoved);
+export const mockPort = jest.fn(({name, tabId, frameId}) => ({
+  name: name,
+  sender: {
+    tab: {
+      id: tabId
+    },
+    frameId: frameId
+  },
+  postMessage: jest.fn(),
+  onDisconnect: {
+    addListener: jest.fn(),
+  },
+  onMessage: {
+    addListener: jest.fn(),
+  },
+  disconnect: jest.fn(),
+}));

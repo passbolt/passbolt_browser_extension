@@ -7,6 +7,7 @@
  */
 import User from "../model/user";
 import SecretDecryptController from "../controller/secret/secretDecryptController";
+import PownedPasswordController from '../controller/secret/pownedPasswordController';
 
 const listen = function(worker) {
   /*
@@ -28,6 +29,18 @@ const listen = function(worker) {
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }
+  });
+
+  /*
+   * Check if password is powned
+   *
+   * @listens passbolt.secrets.powned-password
+   * @param requestId {uuid} The request identifier
+   * @param password {string} the password to check
+   */
+  worker.port.on('passbolt.secrets.powned-password', async(requestId, password) => {
+    const controller = new PownedPasswordController(worker, requestId);
+    await controller._exec(password);
   });
 };
 

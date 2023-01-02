@@ -29,6 +29,7 @@ import GetCurrentSsoConfigurationController from "../controller/sso/getCurrentSs
 import SaveSsoConfigurationAsDraftController from "../controller/sso/saveSsoConfigurationAsDraftController";
 import ActivateSsoConfigurationController from "../controller/sso/activateSsoConfigurationController";
 import DeleteSsoConfigurationController from "../controller/sso/deleteSsoConfigurationController";
+import GenerateSsoKitController from "../controller/auth/generateSsoKitController";
 
 const listen = function(worker, account) {
   /*
@@ -152,6 +153,12 @@ const listen = function(worker, account) {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new DeleteSsoConfigurationController(worker, requestId, apiClientOptions);
     await controller._exec(configurationId);
+  });
+
+  worker.port.on('passbolt.sso.generate-sso-kit', async(requestId, provider) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new GenerateSsoKitController(worker, requestId, apiClientOptions);
+    await controller._exec(provider);
   });
 };
 export const AppEvents = {listen};

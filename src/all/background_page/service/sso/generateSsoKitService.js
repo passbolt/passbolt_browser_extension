@@ -31,27 +31,43 @@ class GenerateSsoKitService {
    */
   static async generate(passphrase, provider) {
     try {
-      const nek = await GenerateSsoKeyService.generateSsoKey();
-      const extractableKey = await GenerateSsoKeyService.generateSsoKey(true);
-      const iv1 = GenerateSsoIvService.generateIv();
-      const iv2 = GenerateSsoIvService.generateIv();
-
-      const secret = await EncryptSsoPassphraseService.encrypt(passphrase, nek, extractableKey, iv1, iv2);
-      const ssoKitClientPartEntity = new SsoKitClientPartEntity({nek, iv1, iv2, secret, provider});
-      await SsoDataStorage.save(ssoKitClientPartEntity);
-
-      const exportedKey = await crypto.subtle.exportKey("jwk", extractableKey);
-      const serializedKey = Buffer.from(JSON.stringify(exportedKey)).toString("base64");
-      const ssoKitServerPart = new SsoKitServerPartEntity({
-        data: serializedKey
-      });
-
-      await SsoKitTemporaryStorageService.set(ssoKitServerPart);
+      const kits = await this.generateSsoKits(passphrase, provider);
+      await SsoDataStorage.save(kits.clientPart);
+      await SsoKitTemporaryStorageService.set(kits.serverPart);
     } catch (error) {
       await SsoDataStorage.flush();
       await SsoKitTemporaryStorageService.flush();
       throw error;
     }
+  }
+
+  /**
+   * Generates and stores a new SSO kit.
+   *
+   * @param {string} passphrase The passphrase to encrypt for SSO
+   * @param {string} provider The SSO provider identifier
+   * @return {Promise<Object>}
+   */
+  static async generateSsoKits(passphrase, provider) {
+    const nek = await GenerateSsoKeyService.generateSsoKey();
+    const extractableKey = await GenerateSsoKeyService.generateSsoKey(true);
+    const iv1 = GenerateSsoIvService.generateIv();
+    const iv2 = GenerateSsoIvService.generateIv();
+
+    const secret = await EncryptSsoPassphraseService.encrypt(passphrase, nek, extractableKey, iv1, iv2);
+    const ssoKitClientPartEntity = new SsoKitClientPartEntity({nek, iv1, iv2, secret, provider});
+    //await SsoDataStorage.save(ssoKitClientPartEntity);
+
+    const exportedKey = await crypto.subtle.exportKey("jwk", extractableKey);
+    const serializedKey = Buffer.from(JSON.stringify(exportedKey)).toString("base64");
+    const ssoKitServerPartEntity = new SsoKitServerPartEntity({
+      data: serializedKey
+    });
+
+    return {
+      clientPart: ssoKitClientPartEntity,
+      serverPart: ssoKitServerPartEntity,
+    };
   }
 }
 

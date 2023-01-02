@@ -162,8 +162,28 @@ class SsoKitClientPartEntity extends Entity {
    * Get the SSO Kit id
    * @returns {string}
    */
+  set id(value) {
+    const schema = SsoKitClientPartEntity.getSchema();
+    EntitySchema.validateProp("id", value, schema.properties.id);
+    this._props.id = value;
+  }
+
+  /**
+   * Get the SSO Kit id
+   * @returns {string}
+   */
   get id() {
     return this._props.id;
+  }
+
+  /**
+   * Get the SSO provider identifier
+   * @returns {string}
+   */
+  set provider(value) {
+    const schema = SsoKitClientPartEntity.getSchema();
+    EntitySchema.validateProp("provider", value, schema.properties.provider);
+    this._props.provider = value;
   }
 
   /**

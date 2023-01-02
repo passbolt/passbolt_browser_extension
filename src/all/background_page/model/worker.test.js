@@ -47,7 +47,12 @@ describe("Worker model", () => {
       id: "100",
       url: "https://localhost"
     };
-    worker.add("QuickAccess", new Worker({}, tab));
+    const port = {
+      onMessage: {
+        addListener: jest.fn()
+      }
+    };
+    worker.add("QuickAccess", new Worker(port, tab));
     jest.advanceTimersByTime(100);
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spyOnAlarmCreate).toHaveBeenCalledTimes(2);

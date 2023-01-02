@@ -141,7 +141,7 @@ class MoveResourcesController {
         parent = this.resourcesParentFolders.getById(resource.folderParentId);
       }
       if (!ResourceEntity.canResourceMove(resource, parent, this.destinationFolder)) {
-        console.warning(`Resource ${resource.name} can not be moved, skipping.`);
+        console.warn(`Resource ${resource.name} can not be moved, skipping.`);
         resourceIdsToRemove.push(resource.id);
       }
     }

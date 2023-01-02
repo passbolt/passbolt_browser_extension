@@ -14,6 +14,7 @@
 import PagemodManager from "../pagemod/pagemodManager";
 import pagemod from "./pagemod";
 import RecoverBootstrapPagemod from "./recoverBootstrapPagemod";
+import SetupBootstrapPagemod from "./setupBootstrapPagemod";
 
 jest.spyOn(pagemod.prototype, "injectFiles").mockImplementation(jest.fn());
 jest.spyOn(pagemod.prototype, "attachEvents").mockImplementation(jest.fn());
@@ -25,7 +26,7 @@ describe("PagemodManager", () => {
   });
 
   describe("PagemodManager::exec", () => {
-    it("Should find the  recover page mod and inject file", async() => {
+    it("Should find the recover page mod and inject file", async() => {
       expect.assertions(2);
       // data mocked
       const details = {
@@ -39,6 +40,22 @@ describe("PagemodManager", () => {
       expect(pagemod.prototype.injectFiles).toHaveBeenCalledWith(details.tabId, details.frameId);
       // Called twice (WebIntegration, PublicWebsiteSignIn)
       expect(RecoverBootstrapPagemod.injectFiles).toHaveBeenCalledTimes(1);
+    });
+
+    it("Should find the setup page mod and inject file", async() => {
+      expect.assertions(2);
+      // data mocked
+      const details = {
+        tabId: 1,
+        frameId: 0,
+        url: "https://passbolt.dev/setup/start/d57c10f5-639d-5160-9c81-8a0c6c4ec856/efc85bca-fc9f-4b32-aebf-b82765312e47"
+      };
+      // process
+      await PagemodManager.exec(details);
+      // expectations
+      expect(pagemod.prototype.injectFiles).toHaveBeenCalledWith(details.tabId, details.frameId);
+      // Called twice (WebIntegration, PublicWebsiteSignIn)
+      expect(SetupBootstrapPagemod.injectFiles).toHaveBeenCalledTimes(1);
     });
 
     it("Should not find any pagemod", async() => {

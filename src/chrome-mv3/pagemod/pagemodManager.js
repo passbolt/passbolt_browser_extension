@@ -15,6 +15,8 @@ import storage from "../../all/background_page/sdk/storage";
 import {Config} from "../../all/background_page/model/config";
 import RecoverBootstrapPagemod from "./recoverBootstrapPagemod";
 import RecoverPagemod from "./recoverPagemod";
+import SetupBootstrapPagemod from "./setupBootstrapPagemod";
+import SetupPagemod from "./setupPagemod";
 
 /**
  * The pagemod manager have the role of dispatching the process to the correct pagemod
@@ -23,7 +25,7 @@ class PagemodManager {
   constructor() {
     // TODO find a way to init the storage one time
     storage.init().then(Config.init);
-    this.pagemods = [RecoverBootstrapPagemod, RecoverPagemod];
+    this.pagemods = [RecoverBootstrapPagemod, RecoverPagemod, SetupBootstrapPagemod, SetupPagemod];
     this.exec = this.exec.bind(this);
   }
 

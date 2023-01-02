@@ -15,7 +15,7 @@ global.console = {
   ...console,
   debug: jest.fn(),
   error: jest.fn(),
-  warning: jest.fn()
+  warn: jest.fn()
 };
 global.TextEncoder = require('text-encoding-utf-8').TextEncoder;
 global.TextDecoder = require('text-encoding-utf-8').TextDecoder;

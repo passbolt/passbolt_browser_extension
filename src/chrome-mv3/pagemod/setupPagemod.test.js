@@ -11,25 +11,25 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import Recover from "./recoverPagemod";
-import {RecoverEvents} from "../../all/background_page/event/recoverEvents";
-import BuildAccountRecoverService from "../../all/background_page/service/recover/buildAccountRecoverService";
+import Setup from "./setupPagemod";
 import {ConfigEvents} from "../../all/background_page/event/configEvents";
+import {SetupEvents} from "../../all/background_page/event/setupEvents";
 import BuildAccountApiClientOptionsService
   from "../../all/background_page/service/account/buildApiClientOptionsService";
+import BuildAccountSetupService from "../../all/background_page/service/setup/buildAccountSetupService";
 
-jest.spyOn(BuildAccountRecoverService, "buildFromRecoverUrl").mockImplementation(jest.fn());
+jest.spyOn(BuildAccountSetupService, "buildFromSetupUrl").mockImplementation(jest.fn());
 jest.spyOn(BuildAccountApiClientOptionsService, "build").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
-jest.spyOn(RecoverEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(SetupEvents, "listen").mockImplementation(jest.fn());
 
-describe("Recover", () => {
+describe("Setup", () => {
   beforeEach(async() => {
     jest.resetModules();
     jest.clearAllMocks();
   });
 
-  describe("Recover::attachEvents", () => {
+  describe("Setup::attachEvents", () => {
     it("Should attach events", async() => {
       expect.assertions(6);
       // data mocked
@@ -43,22 +43,22 @@ describe("Recover", () => {
         }
       };
       // process
-      await Recover.attachEvents(port);
+      await Setup.attachEvents(port);
       // expectations
-      expect(BuildAccountRecoverService.buildFromRecoverUrl).toHaveBeenCalledWith(port._port.sender.tab.url);
+      expect(BuildAccountSetupService.buildFromSetupUrl).toHaveBeenCalledWith(port._port.sender.tab.url);
       expect(BuildAccountApiClientOptionsService.build).toHaveBeenCalled();
       expect(ConfigEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
-      expect(RecoverEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
-      expect(Recover.events).toStrictEqual([ConfigEvents, RecoverEvents]);
-      expect(Recover.appName).toBe('Recover');
+      expect(SetupEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
+      expect(Setup.events).toStrictEqual([ConfigEvents, SetupEvents]);
+      expect(Setup.appName).toBe('Setup');
     });
   });
 
-  describe("Recover::canBeAttachedTo", () => {
+  describe("Setup::canBeAttachedTo", () => {
     it("Should have the canBeAttachedTo not valid", async() => {
       expect.assertions(1);
       // process
-      const canBeAttachedTo = await Recover.canBeAttachedTo({});
+      const canBeAttachedTo = await Setup.canBeAttachedTo({});
       // expectations
       expect(canBeAttachedTo).toBeFalsy();
     });

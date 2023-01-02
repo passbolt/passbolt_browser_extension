@@ -79,8 +79,6 @@ describe("CompleteRecoverController", () => {
 
       // Mock API complete request.
       fetch.doMockOnce(() => Promise.reject());
-      // Mock pagemods to assert the complete start the auth and inform menu pagemods.
-      WebIntegration.init = jest.fn();
 
       const promise = controller.exec();
 

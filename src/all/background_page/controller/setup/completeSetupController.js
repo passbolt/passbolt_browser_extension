@@ -13,10 +13,13 @@
  */
 
 import AccountModel from "../../model/account/accountModel";
-import {App as app} from "../../app";
 import SetupModel from "../../model/setup/setupModel";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
+import browser from "webextension-polyfill";
+import WebIntegration from "../../pagemod/webIntegrationPagemod";
+import AuthBootstrap from "../../pagemod/authBootstrapPagemod";
+import PublicWebsiteSignIn from "../../pagemod/publicWebsiteSignInPagemod";
 
 class CompleteSetupController {
   /**
@@ -58,7 +61,10 @@ class CompleteSetupController {
     const accountSetup = new AccountEntity(this.account.toDto(AccountSetupEntity.ALL_CONTAIN_OPTIONS));
     await this.setupModel.completeSetup(this.account);
     await this.accountModel.add(accountSetup);
-    this.initPagemods();
+    // @deprecated The support of MV2 will be down soon
+    if (this.isManifestV2) {
+      this.initPagemods();
+    }
   }
 
   /**
@@ -66,13 +72,18 @@ class CompleteSetupController {
    * @return {void}
    */
   initPagemods() {
-    if (!app.pageMods.WebIntegration._pageMod) {
-      app.pageMods.WebIntegration.init();
-    }
-    app.pageMods.AuthBootstrap.init();
-    if (!app.pageMods.PublicWebsiteSignIn._pageMod) {
-      app.pageMods.PublicWebsiteSignIn.init();
-    }
+    // For the manifest V2, if there was no account yet configured, the following pagemods were not instantiated at the extension bootstrap.
+    WebIntegration.init();
+    AuthBootstrap.init();
+    PublicWebsiteSignIn.init();
+  }
+
+  /**
+   * Is manifest v2
+   * @returns {boolean}
+   */
+  get isManifestV2() {
+    return browser.runtime.getManifest().manifest_version === 2;
   }
 }
 

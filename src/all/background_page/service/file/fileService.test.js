@@ -23,7 +23,7 @@ beforeEach(() => {
 
 describe("FileService", () => {
   describe("FileService::saveFile", () => {
-    it("save file with chrome", async() => {
+    it("save file with chrome MV2", async() => {
       expect.assertions(3);
       // data mocked
       chrome.downloads = {
@@ -31,12 +31,28 @@ describe("FileService", () => {
       };
       global.URL.createObjectURL = jest.fn();
       global.URL.revokeObjectURL = jest.fn();
+      // mock function
+      jest.spyOn(chrome.runtime, 'getManifest').mockImplementationOnce(() => ({manifest_version: 2}));
       // process
       await FileService.saveFile("filename", "Text", null, 1);
       // expectation
       expect(global.URL.createObjectURL).toHaveBeenCalled();
       expect(global.URL.revokeObjectURL).toHaveBeenCalled();
-      expect(chrome.downloads.download).toHaveBeenCalledWith({filename: "filename", saveAs: true, url: undefined});
+      expect(chrome.downloads.download).toHaveBeenCalledWith({filename: "filename", url: undefined});
+    });
+
+    it("save file with chrome MV3", async() => {
+      expect.assertions(1);
+      // data mocked
+      chrome.downloads = {
+        download: jest.fn()
+      };
+      // mock function
+      jest.spyOn(chrome.runtime, 'getManifest').mockImplementationOnce(() => ({manifest_version: 3}));
+      // process
+      await FileService.saveFile("filename", "Text", null, 1);
+      // expectation
+      expect(chrome.downloads.download).toHaveBeenCalledWith({filename: "filename", url: "data:text/plain;base64,VGV4dA=="});
     });
 
     it("save file with firefox", async() => {

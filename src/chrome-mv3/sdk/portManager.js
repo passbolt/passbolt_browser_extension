@@ -18,7 +18,7 @@ import WorkerEntity from "../../all/background_page/model/entity/worker/workerEn
 
 class PortManager {
   constructor() {
-    this._ports = {}; // Object{tabid:{frameId:port}, ...} for which the port is available
+    this._ports = {}; // Object{portId: port, ...} for which the port is available
     this.onPortConnect = this.onPortConnect.bind(this);
     this.onTabRemoved = this.onTabRemoved.bind(this);
   }

@@ -108,7 +108,6 @@ class SsoDataStorage {
    * @private
    */
   static async replaceSsoData(dbHandler, ssoKitClientPartEntity) {
-    console.log("replacing data");
     await this.clearData(dbHandler);
     await this.storeData(dbHandler, ssoKitClientPartEntity);
   }
@@ -128,7 +127,6 @@ class SsoDataStorage {
         const cursor = e.target.result;
 
         if (!cursor) {
-          console.log("IndexDB SSO client data not found");
           resolve(null);
           return;
         }

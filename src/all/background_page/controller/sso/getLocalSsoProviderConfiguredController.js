@@ -13,9 +13,9 @@
  */
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 
-class GetSsoClientDataController {
+class GetLocalSsoProviderConfiguredController {
   /**
-   * GetSsoClientDataController constructor
+   * GetLocalSsoProviderConfiguredController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    */
@@ -54,4 +54,4 @@ class GetSsoClientDataController {
   }
 }
 
-export default GetSsoClientDataController;
+export default GetLocalSsoProviderConfiguredController;

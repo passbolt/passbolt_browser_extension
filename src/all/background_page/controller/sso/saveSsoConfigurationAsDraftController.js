@@ -51,7 +51,7 @@ class SaveSsoConfigurationAsDraftController {
    */
   async exec(draftSsoConfiguration) {
     const ssoConfigurationEntity = new SsoConfigurationEntity(draftSsoConfiguration);
-    return await this.ssoConfigurationModel.saveDraft(ssoConfigurationEntity);
+    return this.ssoConfigurationModel.saveDraft(ssoConfigurationEntity);
   }
 }
 

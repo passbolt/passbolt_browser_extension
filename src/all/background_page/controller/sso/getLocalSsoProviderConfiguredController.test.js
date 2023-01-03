@@ -31,8 +31,7 @@ describe("GetSsoClientDataController", () => {
 
     it("Should return null if no local SSO kit has been built.", async() => {
       expect.assertions(1);
-      const expectedReturnedObject = null;
-      SsoDataStorage.setMockedData(expectedReturnedObject);
+      SsoDataStorage.setMockedData(null);
 
       const controller = new GetLocalSsoProviderConfiguredController();
       const provider = await controller.exec();

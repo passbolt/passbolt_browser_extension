@@ -38,7 +38,7 @@ describe("DeleteSsoConfigurationController", () => {
       await controller.exec(configurationId);
     });
 
-    it("Should throw the given configuration.", async() => {
+    it("Should throw an error if the given configuration id is not a valid uuid.", async() => {
       expect.assertions(1);
 
       const controller = new DeleteSsoConfigurationController(null, null, defaultApiClientOptions());

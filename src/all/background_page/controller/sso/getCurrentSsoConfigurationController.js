@@ -49,8 +49,7 @@ class GetCurrentSsoConfigurationController {
    */
   async exec() {
     const contains = {data: true};
-    const ssoConfigurationEntity = await this.ssoConfigurationModel.getCurrent(contains);
-    return ssoConfigurationEntity;
+    return this.ssoConfigurationModel.getCurrent(contains);
   }
 }
 

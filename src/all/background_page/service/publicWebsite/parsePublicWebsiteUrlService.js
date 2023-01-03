@@ -21,6 +21,15 @@ class ParsePublicWebsiteUrlService {
     const publicWebsiteDomain = '(www|signup)\.passbolt\.com';
     return new RegExp(`^https\:\/\/${publicWebsiteDomain}(\/.*|#.*)?$`);
   }
+
+  /**
+   * Test the url against the regex.
+   * @param {string} url The url to test
+   * @returns {boolean}
+   */
+  static test(url) {
+    return this.regex.test(url);
+  }
 }
 
 export default ParsePublicWebsiteUrlService;

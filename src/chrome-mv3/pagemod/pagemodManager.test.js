@@ -117,6 +117,25 @@ describe("PagemodManager", () => {
       expect(WebIntegrationPagemod.injectFiles).toHaveBeenCalledTimes(1);
     });
 
+    it.only("Should find the public website sign in page mod and inject file", async() => {
+      expect.assertions(2);
+      // data mocked
+      const details = {
+        tabId: 1,
+        frameId: 0,
+        url: "https://www.passbolt.com"
+      };
+      // mock functions
+      jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
+      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
+      // process
+      await PagemodManager.exec(details);
+      // expectations
+      expect(pagemod.prototype.injectFiles).toHaveBeenCalledWith(details.tabId, details.frameId);
+      // Called twice for PublicWebsiteSignInPagemod and WebIntegrationPagemod
+      expect(pagemod.prototype.injectFiles).toHaveBeenCalledTimes(2);
+    });
+
     it("Should not find any pagemod", async() => {
       expect.assertions(1);
       // data mocked

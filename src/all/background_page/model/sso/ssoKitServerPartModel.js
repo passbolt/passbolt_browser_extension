@@ -29,7 +29,7 @@ class SsoKitServerPartModel {
   }
 
   /**
-   * Find the server part SSO kit given an Sso kit id, user id and an authorisation token using Passbolt API
+   * Find the server part SSO kit given an SSO kit id, user id and an authorisation token using Passbolt API
    *
    * @param {string} ssoKitId a code given by the third party auth
    * @param {string} userId a code given by the third party auth

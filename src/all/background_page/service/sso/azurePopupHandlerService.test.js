@@ -78,7 +78,7 @@ describe("AzurePopupHandlerService", () => {
       browser.tabs.onUpdated.triggers(tabId, null, {status: "pending"});
       //Update on the expected tabid as complete but without token
       browser.tabs.onUpdated.triggers(tabId, null, {status: "complete", url: thirdPartyUrl.toString()});
-      //Update on abother tabid as pending with the awaited URL
+      //Update on another tabid as pending with the awaited URL
       browser.tabs.onUpdated.triggers(uuid(), null, {status: "pending", url: finalUrl});
       //Update on the expected tabid as complete with the awaited URL
       browser.tabs.onUpdated.triggers(tabId, null, {status: "complete", url: finalUrl});
@@ -88,7 +88,7 @@ describe("AzurePopupHandlerService", () => {
       expect(await promise).toBe(ssoToken);
     });
 
-    it("Should return SSO token when navigation is done to a correct URL", async() => {
+    it("Should return SSO token when navigation is done to a correct URL in sign-in mode", async() => {
       expect.assertions(4);
       const finalUrl = `${userDomain}/sso/login/success?token=${ssoToken}`;
       const tabId = uuid();

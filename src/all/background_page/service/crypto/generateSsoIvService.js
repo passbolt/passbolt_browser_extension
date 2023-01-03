@@ -14,10 +14,10 @@
 
 class GenerateSsoIvService {
   /**
-   * Generate an AES-GCM key to be used for SSO.
+   * Generate an Initialisation Vector of the given length (by default 12).
    *
    * @param {integer} length size of the IV to generate.
-   * @returns {UInt8Array}
+   * @returns {Uint8Array}
    */
   static generateIv(length = 12) {
     return crypto.getRandomValues(new Uint8Array(length));

@@ -52,7 +52,7 @@ class AzureSsoAuthenticationController {
   }
 
   /**
-   * Authenticate the user using the third party SSO provider.
+   * Authenticate the user using Azure as the SSO provider.
    *
    * @return {Promise<void>}
    */

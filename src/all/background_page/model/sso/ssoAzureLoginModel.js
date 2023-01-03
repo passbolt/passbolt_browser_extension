@@ -14,7 +14,7 @@
 import SsoAzureLoginService from "../../service/api/sso/ssoAzureLoginService";
 
 /**
- * Model related to the SSO kit server part data
+ * Model related to the SSO Azure Login URL
  */
 class SsoAzureLoginModel {
   /**
@@ -28,12 +28,10 @@ class SsoAzureLoginModel {
   }
 
   /**
-   * Find the server part SSO kit given an Sso kit id, user id and an authorisation token using Passbolt API
+   * Get the Azure login URL given a user id
    *
-   * @param {string} ssoKitId a code given by the third party auth
-   * @param {string} userId a code given by the third party auth
-   * @param {string} ssoToken a code given by the third party auth
-   * @return {Promise<SsoUserServerDataEntity|null>}
+   * @param {uuid} userid
+   * @return {Promise<URL>}
    */
   async getLoginUrl(userId) {
     const redirectUrlDto = await this.ssoAzureLoginService.getLoginUrl({user_id: userId});

@@ -27,7 +27,7 @@ class CheckPassphraseService {
   }
 
   /**
-   * Wrapper of exec function to run it with worker.
+   * Run a decryption check of the current private key with the given passphrase
    *
    * @param {string} passphrase The passphrase with which to try the current user's key decryption.
    * @returns {Promise<void>}

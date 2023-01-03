@@ -17,7 +17,7 @@ import UnexpectedSsoKitDecryptionError from '../../error/unexpectedSsoKitDecrypt
 
 class DecryptSsoPassphraseService {
   /**
-   * Decrypt a given ciphered text using an AES-GCM generated key and with the given IV.
+   * Decrypt a given ciphered text using an AES-GCM generated keys and with the given IVs.
    *
    * @param {string} text a base64 string to decipher with keys and ivs.
    * @param {CryptoKey} nek the non-extractable key used to decrypt the text on second round

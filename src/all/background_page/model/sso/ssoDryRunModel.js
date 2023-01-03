@@ -28,7 +28,7 @@ class SsoDryRunModel {
   }
 
   /**
-   * Get the URL for the popup to run test dry run test.
+   * Get the URL to process a dry-run.
    * @param {string} providerId the provider identifier
    * @param {uuid} ssoConfigurationId the sso draft configuration id
    * @returns {Promise<URL>}

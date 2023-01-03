@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.7.3
+ * @since         3.9.0
  */
 
 import AuthModel from "../../model/auth/authModel";
@@ -73,7 +73,7 @@ class AuthLoginController {
   async exec(passphrase, remember) {
     /*
      * In order to generate the SSO kit, a call to the API is made to retrieve the SSO settings and ensure it's needed.
-     * But, for this call we must be not logged in of fully logged in (with MFA validated as well).
+     * But, for this call we must be logged out or fully logged in (with MFA).
      * In the case when MFA is required, finding the SSO settings is blocked as MFA is demanded.
      * So in order to proceed with the SSO kit and ensure to encrypt a working passphrase, we do a passphrase check first.
      * Then we proceed with the SSO kit and afterward the login process.
@@ -100,6 +100,10 @@ class AuthLoginController {
     const localSsoKit = await SsoDataStorage.get();
     const organizationSettings = await this.organizationSettingsModel.getOrFind();
     if (!organizationSettings.isPluginEnabled("sso")) {
+      /*
+       * If the plugin is disabled there is no reason to keep an SSO kit
+       * Plus, if we have an SSO kit locally, the login page will continue display the SSO login
+       */
       if (localSsoKit) {
         await SsoDataStorage.flush();
       }
@@ -108,6 +112,10 @@ class AuthLoginController {
 
     const currentSsoConfig = await this.ssoConfigurationModel.getCurrent();
     if (!currentSsoConfig?.provider && localSsoKit) {
+      /*
+       * if we have a local SSO kit but the plugin is not configured
+       * it means it has been disabled and there is no point to keep it
+       */
       await SsoDataStorage.flush();
     } else if (currentSsoConfig?.provider && !localSsoKit) {
       await GenerateSsoKitService.generate(passphrase, currentSsoConfig.provider);

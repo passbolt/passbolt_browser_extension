@@ -44,7 +44,7 @@ class ActivateSsoConfigurationController {
   }
 
   /**
-   * Get the current user's passphrase using SSO authentication.
+   * Activates the SSO configuration given an SSO configuration id
    *
    * @param {uuid} ssoDraftConfigurationId the identifier of draft SSO configuration to activate
    * @param {uuid} ssoToken the token to provide to activate the SSO configuration

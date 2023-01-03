@@ -21,7 +21,7 @@ import {PassphraseController} from "../passphrase/passphraseController";
 
 class GenerateSsoKitController {
   /**
-   * AuthLoginController constructor
+   * GenerateSsoKitController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions the api client options
@@ -38,12 +38,7 @@ class GenerateSsoKitController {
   /**
    * Wrapper of exec function to run it with worker.
    *
-   * @param {uuid} requestId The request identifier
-   * @param {string} passphrase The passphrase to decryt the private key
-   * @param {string} remember whether to remember the passphrase
-   *   (bool) false|undefined if should not remember
-   *   (integer) -1 if should remember for the session
-   *   (integer) duration in seconds to specify a specific duration
+   * @param {string} provider the provider id
    * @return {Promise<void>}
    */
   async _exec(provider) {
@@ -57,13 +52,12 @@ class GenerateSsoKitController {
   }
 
   /**
-   * Attemps to sign in the current user.
+   * Generates an SSO kit for the current logged in user.
    *
    * @param {string} provider the SSO provider id
    * @return {Promise<void>}
    */
   async exec(provider) {
-    const passphrase = await PassphraseController.get(this.worker);
     const currentKit = await SsoDataStorage.get();
 
     // A kit already exists
@@ -77,6 +71,7 @@ class GenerateSsoKitController {
     }
 
     // No SSO kit is avaible, we need to generate a new one.
+    const passphrase = await PassphraseController.get(this.worker);
     const ssoKits = await GenerateSsoKitService.generateSsoKits(passphrase, provider);
 
     const registeredServerPartSsoKit = await this.ssoKitServerPartModel.setupSsoKit(ssoKits.serverPart);

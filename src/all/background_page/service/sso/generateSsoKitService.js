@@ -42,7 +42,7 @@ class GenerateSsoKitService {
   }
 
   /**
-   * Generates and stores a new SSO kit.
+   * Generates a new SSO kit without storing them.
    *
    * @param {string} passphrase The passphrase to encrypt for SSO
    * @param {string} provider The SSO provider identifier
@@ -56,7 +56,6 @@ class GenerateSsoKitService {
 
     const secret = await EncryptSsoPassphraseService.encrypt(passphrase, nek, extractableKey, iv1, iv2);
     const ssoKitClientPartEntity = new SsoKitClientPartEntity({nek, iv1, iv2, secret, provider});
-    //await SsoDataStorage.save(ssoKitClientPartEntity);
 
     const exportedKey = await crypto.subtle.exportKey("jwk", extractableKey);
     const serializedKey = Buffer.from(JSON.stringify(exportedKey)).toString("base64");

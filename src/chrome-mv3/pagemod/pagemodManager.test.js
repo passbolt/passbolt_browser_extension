@@ -20,6 +20,7 @@ import User from "../../all/background_page/model/user";
 import UserSettings from "../../all/background_page/model/userSettings/userSettings";
 import GpgAuth from "../../all/background_page/model/gpgauth";
 import AppBootstrapPagemod from "./appBootstrapPagemod";
+import WebIntegrationPagemod from "./webIntegrationPagemod";
 
 jest.spyOn(pagemod.prototype, "injectFiles").mockImplementation(jest.fn());
 jest.spyOn(pagemod.prototype, "attachEvents").mockImplementation(jest.fn());
@@ -43,7 +44,6 @@ describe("PagemodManager", () => {
       await PagemodManager.exec(details);
       // expectations
       expect(pagemod.prototype.injectFiles).toHaveBeenCalledWith(details.tabId, details.frameId);
-      // Called twice (WebIntegration, PublicWebsiteSignIn)
       expect(RecoverBootstrapPagemod.injectFiles).toHaveBeenCalledTimes(1);
     });
 
@@ -59,7 +59,6 @@ describe("PagemodManager", () => {
       await PagemodManager.exec(details);
       // expectations
       expect(pagemod.prototype.injectFiles).toHaveBeenCalledWith(details.tabId, details.frameId);
-      // Called twice (WebIntegration, PublicWebsiteSignIn)
       expect(SetupBootstrapPagemod.injectFiles).toHaveBeenCalledTimes(1);
     });
 
@@ -98,6 +97,24 @@ describe("PagemodManager", () => {
       // expectations
       expect(pagemod.prototype.injectFiles).toHaveBeenCalledWith(details.tabId, details.frameId);
       expect(AppBootstrapPagemod.injectFiles).toHaveBeenCalledTimes(1);
+    });
+
+    it("Should find the web integration page mod and inject file", async() => {
+      expect.assertions(2);
+      // data mocked
+      const details = {
+        tabId: 1,
+        frameId: 1,
+        url: "https://test.dev/auth/login"
+      };
+      // mock functions
+      jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
+      jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
+      // process
+      await PagemodManager.exec(details);
+      // expectations
+      expect(pagemod.prototype.injectFiles).toHaveBeenCalledWith(details.tabId, details.frameId);
+      expect(WebIntegrationPagemod.injectFiles).toHaveBeenCalledTimes(1);
     });
 
     it("Should not find any pagemod", async() => {

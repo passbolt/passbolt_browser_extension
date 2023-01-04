@@ -13,64 +13,68 @@
  */
 import User from "../../all/background_page/model/user";
 import UserSettings from "../../all/background_page/model/userSettings/userSettings";
-import AuthBootstrap from "./authBootstrapPagemod";
+import WebIntegration from "./webIntegrationPagemod";
 import WorkersSessionStorage from "../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../../all/background_page/model/entity/worker/workerEntity";
 import ScriptExecution from "../../all/background_page/sdk/scriptExecution";
-import {AuthBootstrapEvents} from "../../all/background_page/event/authBootstrapEvents";
 import each from "jest-each";
 import Pagemod from "./pagemod";
+import {ConfigEvents} from "../../all/background_page/event/configEvents";
+import {OrganizationSettingsEvents} from "../../all/background_page/event/organizationSettingsEvents";
+import {WebIntegrationEvents} from "../../all/background_page/event/webIntegrationEvents";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());
-jest.spyOn(AuthBootstrapEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(WebIntegrationEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
 
-describe("AuthBootstrap", () => {
-  beforeEach(() => {
+describe("WebIntegration", () => {
+  beforeEach(async() => {
     jest.resetModules();
     jest.clearAllMocks();
   });
 
-  describe("AuthBootstrap::injectFile", () => {
+  describe("WebIntegration::injectFile", () => {
     it("Should inject file", async() => {
       expect.assertions(9);
       // process
-      await AuthBootstrap.injectFiles(1, 0);
+      await WebIntegration.injectFiles(1, 0);
       // expectations
       expect(spyAddWorker).toHaveBeenCalledWith(expect.any(WorkerEntity));
       expect(spyAddWorker).toHaveBeenCalledTimes(1);
       expect(ScriptExecution.prototype.injectPortname).toHaveBeenCalledTimes(1);
-      expect(ScriptExecution.prototype.injectCss).toHaveBeenCalledWith(AuthBootstrap.contentStyleFiles);
-      expect(ScriptExecution.prototype.injectJs).toHaveBeenCalledWith(AuthBootstrap.contentScriptFiles);
-      expect(AuthBootstrap.contentStyleFiles).toStrictEqual(['webAccessibleResources/css/themes/default/ext_external.min.css']);
-      expect(AuthBootstrap.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/vendors.js', 'contentScripts/js/dist/login.js']);
-      expect(AuthBootstrap.events).toStrictEqual([AuthBootstrapEvents]);
-      expect(AuthBootstrap.appName).toBe('AuthBootstrap');
+      expect(ScriptExecution.prototype.injectCss).toHaveBeenCalledWith(WebIntegration.contentStyleFiles);
+      expect(ScriptExecution.prototype.injectJs).toHaveBeenCalledWith(WebIntegration.contentScriptFiles);
+      expect(WebIntegration.contentStyleFiles).toStrictEqual([]);
+      expect(WebIntegration.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/browser-integration/vendors.js', 'contentScripts/js/dist/browser-integration/browser-integration.js']);
+      expect(WebIntegration.events).toStrictEqual([ConfigEvents, WebIntegrationEvents, OrganizationSettingsEvents]);
+      expect(WebIntegration.appName).toBe('WebIntegration');
     });
   });
 
-  describe("RecoverBootstrap::canBeAttachedTo", () => {
-    it("Should be able to attach auth bootstrap pagemod to browser frame", async() => {
+  describe("WebIntegration::canBeAttachedTo", () => {
+    it("Should be able to attach web integration pagemod to browser frame", async() => {
       expect.assertions(1);
       // mock functions
       jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
       jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
-      const result = await AuthBootstrap.canBeAttachedTo({frameId: Pagemod.TOP_FRAME_ID, url: "https://passbolt.dev/auth/login"});
+      const result = await WebIntegration.canBeAttachedTo({frameId: 1, url: "https://test.dev/auth/login"});
       expect(result).toBeTruthy();
     });
 
     each([
-      {scenario: "No domain", url: "auth/login", frameId: Pagemod.TOP_FRAME_ID},
-      {scenario: "Not top frame", url: "https://passbolt.dev/auth/login", frameId: 1},
+      {scenario: "Passbolt domain", url: "https://passbolt.dev/auth/login", frameId: Pagemod.TOP_FRAME_ID},
+      {scenario: "No domain", url: "about:blank", frameId: 1},
     ]).describe("Should not be able to attach a pagemod to browser frame", _props => {
-      it(`Should be able to attach a pagemod to browser frame: ${_props.scenario}`, async() => {
+      it(`Should not be able to attach a pagemod to browser frame: ${_props.scenario}`, async() => {
         expect.assertions(1);
         // mock functions
         jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
         jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
-        const result = await AuthBootstrap.canBeAttachedTo({frameId: _props.frameId, url: _props.url});
+        const result = await WebIntegration.canBeAttachedTo({frameId: _props.frameId, url: _props.url});
         expect(result).toBeFalsy();
       });
     });
@@ -80,15 +84,15 @@ describe("AuthBootstrap", () => {
       // mock functions
       jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => false);
       // process
-      const result = await AuthBootstrap.canBeAttachedTo({frameId: 0});
+      const result = await WebIntegration.canBeAttachedTo({frameId: 0});
       // expectations
       expect(result).toBeFalsy();
     });
   });
 
-  describe("AuthBootstrap::attachEvents", () => {
+  describe("WebIntegration::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(1);
+      expect.assertions(3);
       // data mocked
       const port = {
         on: () => jest.fn(),
@@ -101,9 +105,11 @@ describe("AuthBootstrap", () => {
         }
       };
       // process
-      await AuthBootstrap.attachEvents(port);
+      await WebIntegration.attachEvents(port);
       // expectations
-      expect(AuthBootstrapEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: AuthBootstrap.name});
+      expect(ConfigEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: WebIntegration.name});
+      expect(WebIntegrationEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: WebIntegration.name});
+      expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: WebIntegration.name});
     });
   });
 });

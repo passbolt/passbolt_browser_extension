@@ -21,6 +21,7 @@ import AuthBootstrapPagemod from "./authBootstrapPagemod";
 import AuthPagemod from "./authPagemod";
 import AppBootstrapPagemod from "./appBootstrapPagemod";
 import AppPagemod from "./appPagemod";
+import WebIntegrationPagemod from "./webIntegrationPagemod";
 
 /**
  * The pagemod manager have the role of dispatching the process to the correct pagemod
@@ -37,7 +38,8 @@ class PagemodManager {
       AuthBootstrapPagemod,
       AuthPagemod,
       AppBootstrapPagemod,
-      AppPagemod
+      AppPagemod,
+      WebIntegrationPagemod
     ];
     this.exec = this.exec.bind(this);
   }

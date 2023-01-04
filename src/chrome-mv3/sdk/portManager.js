@@ -47,7 +47,7 @@ class PortManager {
    * @returns {Promise<boolean>}
    */
   async isKnownPortSender(worker, sender) {
-    if (worker.frameId === null) {
+    if (worker.frameId === undefined) {
       worker.frameId = sender.frameId;
       await WorkersSessionStorage.updateWorker(new WorkerEntity(worker));
     }

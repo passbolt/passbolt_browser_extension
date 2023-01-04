@@ -18,9 +18,9 @@ import {
   withUserKeyAccountSetupDto
 } from "../../model/entity/account/accountSetupEntity.test.data";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
-import {FileController} from "../fileController";
+import FileService from "../../service/file/fileService";
 
-jest.mock("../../controller/fileController");
+jest.mock("../../service/file/fileService");
 
 describe("DownloadRecoveryKitController", () => {
   describe("DownloadRecoveryKitController::exec", () => {
@@ -34,7 +34,7 @@ describe("DownloadRecoveryKitController", () => {
     });
 
     it("Should trigger the recovery kit download.", async() => {
-      FileController.saveFile = jest.fn();
+      FileService.saveFile = jest.fn();
       const mockedWorker = {
         tab: {
           id: "id"
@@ -46,7 +46,7 @@ describe("DownloadRecoveryKitController", () => {
 
       expect.assertions(1);
       await controller.exec();
-      expect(FileController.saveFile).toHaveBeenCalledWith(
+      expect(FileService.saveFile).toHaveBeenCalledWith(
         "passbolt-recovery-kit.asc",
         account.userPrivateArmoredKey,
         "text/plain",

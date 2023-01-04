@@ -15,7 +15,6 @@ import User from "../model/user";
 import {Worker} from "../model/worker";
 import AccountRecoverySaveOrganizationPolicyController from "../controller/accountRecovery/accountRecoverySaveOrganizationPolicyController";
 import AccountRecoveryValidatePublicKeyController from "../controller/accountRecovery/accountRecoveryValidatePublicKeyController";
-import {FileController as fileController} from "../controller/fileController";
 import AccountRecoveryValidateOrganizationPrivateKeyController from "../controller/accountRecovery/accountRecoveryValidateOrganizationPrivateKeyController";
 import AccountRecoveryGetUserRequestsController from "../controller/accountRecovery/accountRecoveryGetUserRequestsController";
 import AccountRecoveryGetRequestController from "../controller/accountRecovery/accountRecoveryGetRequestController";
@@ -24,6 +23,7 @@ import AccountRecoveryGenerateOrganizationKeyController from "../controller/acco
 import AccountRecoverySaveUserSettingsController from "../controller/accountRecovery/accountRecoverySaveUserSettingController";
 import HasUserPostponedUserSettingInvitationController from "../controller/accountRecovery/hasUserPostponedUserSettingInvitationController";
 import PostponeUserSettingInvitationController from "../controller/accountRecovery/postponeUserSettingInvitationController";
+import FileService from "../service/file/fileService";
 
 const listen = function(worker, account) {
   /*
@@ -71,7 +71,7 @@ const listen = function(worker, account) {
   worker.port.on('passbolt.account-recovery.download-organization-generated-key', async(requestId, privateKey) => {
     try {
       const date = new Date().toISOString().slice(0, 10);
-      await fileController.saveFile(`organization-recovery-private-key-${date}.asc`, privateKey, "text/plain", worker.tab.id);
+      await FileService.saveFile(`organization-recovery-private-key-${date}.asc`, privateKey, "text/plain", worker.tab.id);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);

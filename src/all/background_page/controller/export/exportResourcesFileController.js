@@ -17,7 +17,6 @@ import User from "../../model/user";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import ResourceModel from "../../model/resource/resourceModel";
 import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
-import {FileController as fileController} from "../fileController";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import FolderModel from "../../model/folder/folderModel";
 import ExternalFoldersCollection from "../../model/entity/folder/external/externalFoldersCollection";
@@ -26,6 +25,7 @@ import ResourcesExporter from "../../model/export/resourcesExporter";
 import ExternalResourcesCollection from "../../model/entity/resource/external/externalResourcesCollection";
 import ExportResourcesFileEntity from "../../model/entity/export/exportResourcesFileEntity";
 import i18n from "../../sdk/i18n";
+import FileService from "../../service/file/fileService";
 
 const INITIAL_PROGRESS_GOAL = 100;
 class ExportResourcesFileController {
@@ -169,7 +169,7 @@ class ExportResourcesFileController {
     const filename = `passbolt-export-${date}.${exportEntity.fileType}`;
     const mimeType = this.getMimeType(exportEntity.fileType);
     const blobFile = new Blob([exportEntity.file], {type: mimeType});
-    await fileController.saveFile(filename, blobFile, mimeType, this.worker.tab.id);
+    await FileService.saveFile(filename, blobFile, mimeType, this.worker.tab.id);
   }
 }
 

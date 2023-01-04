@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import {FileController as fileController} from "../../controller/fileController";
+import FileService from "../../service/file/fileService";
 // The recovery kit file name.
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
 
@@ -52,7 +52,7 @@ class DownloadRecoveryKitController {
       throw new Error('An account user private armored key is required.');
     }
     const userPrivateArmoredKey = this.account.userPrivateArmoredKey;
-    await fileController.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", this.worker.tab.id);
+    await FileService.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", this.worker.tab.id);
   }
 }
 

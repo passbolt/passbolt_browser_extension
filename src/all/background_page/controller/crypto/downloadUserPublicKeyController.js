@@ -14,9 +14,9 @@
 
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
-import {FileController as fileController} from "../fileController";
 import i18n from "../../sdk/i18n";
 import GpgKeyError from "../../error/GpgKeyError";
+import FileService from "../../service/file/fileService";
 
 const PUBLIC_KEY_FILENAME = "passbolt_public.asc";
 const MIME_TYPE_TEXT_PLAIN = "text/plain";
@@ -60,7 +60,7 @@ class DownloadUserPublicKeyController {
     const privateKey = await OpenpgpAssertion.readKeyOrFail(privateArmoredKey);
     OpenpgpAssertion.assertPrivateKey(privateKey);
     const publicKeyArmored = await privateKey.toPublic().armor();
-    await fileController.saveFile(PUBLIC_KEY_FILENAME, publicKeyArmored, MIME_TYPE_TEXT_PLAIN, this.worker.tab.id);
+    await FileService.saveFile(PUBLIC_KEY_FILENAME, publicKeyArmored, MIME_TYPE_TEXT_PLAIN, this.worker.tab.id);
   }
 }
 

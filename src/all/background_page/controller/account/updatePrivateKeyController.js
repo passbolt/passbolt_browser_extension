@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.3
  */
-import {FileController as fileController} from "../fileController";
 import AccountModel from "../../model/account/accountModel";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
+import FileService from "../../service/file/fileService";
 
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
 
@@ -57,7 +57,7 @@ class UpdatePrivateKeyController {
     }
     const userPrivateArmoredKey = await this.accountModel.updatePrivateKey(oldPassphrase, newPassphrase);
     await PassphraseStorageService.flushPassphrase();
-    await fileController.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", this.worker.tab.id);
+    await FileService.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", this.worker.tab.id);
   }
 }
 

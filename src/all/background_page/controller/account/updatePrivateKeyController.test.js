@@ -18,9 +18,9 @@ import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOpti
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import UpdatePrivateKeyController from "./updatePrivateKeyController";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import {FileController} from "../fileController";
+import FileService from "../../service/file/fileService";
 
-const mockedSaveFile = jest.spyOn(FileController, "saveFile");
+const mockedSaveFile = jest.spyOn(FileService, "saveFile");
 
 describe("UpdatePrivateKeyController", () => {
   describe("UpdatePrivateKeyController::exec", () => {

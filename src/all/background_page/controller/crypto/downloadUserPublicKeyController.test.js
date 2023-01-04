@@ -18,9 +18,9 @@ import GpgKeyError from "../../error/GpgKeyError";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import {FileController} from "../fileController";
+import FileService from "../../service/file/fileService";
 
-const mockedSaveFile = jest.spyOn(FileController, "saveFile");
+const mockedSaveFile = jest.spyOn(FileService, "saveFile");
 
 const expectedTabId = "tabIdentifier";
 const mockedWorker = {tab: {id: expectedTabId}};

@@ -13,9 +13,9 @@
  */
 import Keyring from "../../model/keyring";
 import {PassphraseController} from "../passphrase/passphraseController";
-import {FileController as fileController} from "../fileController";
 import i18n from "../../sdk/i18n";
 import GpgKeyError from "../../error/GpgKeyError";
+import FileService from "../../service/file/fileService";
 
 const PRIVATE_KEY_FILENAME = "passbolt_private.asc";
 const MIME_TYPE_TEXT_PLAIN = "text/plain";
@@ -61,7 +61,7 @@ class DownloadUserPrivateKeyController {
       throw new GpgKeyError(i18n.t("Private key not found."));
     }
 
-    await fileController.saveFile(PRIVATE_KEY_FILENAME, privateKey, MIME_TYPE_TEXT_PLAIN, this.worker.tab.id);
+    await FileService.saveFile(PRIVATE_KEY_FILENAME, privateKey, MIME_TYPE_TEXT_PLAIN, this.worker.tab.id);
   }
 }
 

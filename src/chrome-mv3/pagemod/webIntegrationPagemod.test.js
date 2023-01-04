@@ -22,6 +22,7 @@ import Pagemod from "./pagemod";
 import {ConfigEvents} from "../../all/background_page/event/configEvents";
 import {OrganizationSettingsEvents} from "../../all/background_page/event/organizationSettingsEvents";
 import {WebIntegrationEvents} from "../../all/background_page/event/webIntegrationEvents";
+import {PortEvents} from "../../all/background_page/event/portEvents";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
@@ -30,6 +31,7 @@ jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(WebIntegrationEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(PortEvents, "listen").mockImplementation(jest.fn());
 
 describe("WebIntegration", () => {
   beforeEach(async() => {
@@ -50,7 +52,7 @@ describe("WebIntegration", () => {
       expect(ScriptExecution.prototype.injectJs).toHaveBeenCalledWith(WebIntegration.contentScriptFiles);
       expect(WebIntegration.contentStyleFiles).toStrictEqual([]);
       expect(WebIntegration.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/browser-integration/vendors.js', 'contentScripts/js/dist/browser-integration/browser-integration.js']);
-      expect(WebIntegration.events).toStrictEqual([ConfigEvents, WebIntegrationEvents, OrganizationSettingsEvents]);
+      expect(WebIntegration.events).toStrictEqual([ConfigEvents, WebIntegrationEvents, OrganizationSettingsEvents, PortEvents]);
       expect(WebIntegration.appName).toBe('WebIntegration');
     });
   });
@@ -92,7 +94,7 @@ describe("WebIntegration", () => {
 
   describe("WebIntegration::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(3);
+      expect.assertions(4);
       // data mocked
       const port = {
         on: () => jest.fn(),
@@ -110,6 +112,7 @@ describe("WebIntegration", () => {
       expect(ConfigEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: WebIntegration.name});
       expect(WebIntegrationEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: WebIntegration.name});
       expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: WebIntegration.name});
+      expect(PortEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: WebIntegration.name});
     });
   });
 });

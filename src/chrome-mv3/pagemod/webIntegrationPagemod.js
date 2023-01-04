@@ -16,6 +16,7 @@ import User from "../../all/background_page/model/user";
 import {ConfigEvents} from "../../all/background_page/event/configEvents";
 import {WebIntegrationEvents} from "../../all/background_page/event/webIntegrationEvents";
 import {OrganizationSettingsEvents} from "../../all/background_page/event/organizationSettingsEvents";
+import {PortEvents} from "../../all/background_page/event/portEvents";
 
 class WebIntegration extends Pagemod {
   /**
@@ -39,7 +40,7 @@ class WebIntegration extends Pagemod {
    * @inheritDoc
    */
   get events() {
-    return [ConfigEvents, WebIntegrationEvents, OrganizationSettingsEvents];
+    return [ConfigEvents, WebIntegrationEvents, OrganizationSettingsEvents, PortEvents];
   }
 
   /**

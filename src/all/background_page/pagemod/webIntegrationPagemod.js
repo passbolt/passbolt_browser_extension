@@ -13,6 +13,7 @@ import User from "../model/user";
 import {ConfigEvents} from "../event/configEvents";
 import {WebIntegrationEvents} from "../event/webIntegrationEvents";
 import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
+import {PortEvents} from "../event/portEvents";
 
 
 const WebIntegration = function() {};
@@ -43,6 +44,7 @@ WebIntegration.init = function() {
       ConfigEvents.listen(worker);
       WebIntegrationEvents.listen(worker);
       OrganizationSettingsEvents.listen(worker);
+      PortEvents.listen(worker);
     }
   });
 };

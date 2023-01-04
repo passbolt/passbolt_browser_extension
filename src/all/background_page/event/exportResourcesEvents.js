@@ -8,7 +8,7 @@ import User from "../model/user";
 import ExportResourcesFileController from "../controller/export/exportResourcesFileController";
 
 
-const listen = async function(worker) {
+const listen = function(worker) {
   /*
    * Export resources to file
    *

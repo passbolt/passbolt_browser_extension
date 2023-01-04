@@ -20,7 +20,7 @@ import GetDecryptedUserPrivateKeyService from "../../service/account/getDecrypte
 import GpgAuthToken from "../gpgAuthToken";
 import GpgAuthHeader from "../gpgAuthHeader";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
-import AppBoostrapPagemod from "../../pagemod/appBoostrapPagemod";
+import AppBootstrapPagemod from "../../pagemod/appBootstrapPagemod";
 import browser from "../../sdk/polyfill/browserPolyfill";
 
 class AuthModel {
@@ -96,7 +96,7 @@ class AuthModel {
     // @deprecated The support of MV2 will be down soon
     if (this.isManifestV2) {
       // For the manifest V2, if there was no account yet configured, the following pagemods were not instantiated a the extension bootstrap.
-      await AppBoostrapPagemod.init();
+      await AppBootstrapPagemod.init();
     }
     const event = new Event('passbolt.auth.after-login');
     self.dispatchEvent(event);

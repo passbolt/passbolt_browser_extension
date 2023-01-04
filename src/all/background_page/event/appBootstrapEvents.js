@@ -12,6 +12,7 @@
  */
 import User from "../model/user";
 import AuthModel from "../model/auth/authModel";
+import GeneratePortIdController from "../controller/port/generatePortIdController";
 
 const listen = function(worker) {
   /*
@@ -32,6 +33,17 @@ const listen = function(worker) {
     } catch (error) {
       console.error(error);
     }
+  });
+
+  /*
+   * Generate a port id for the application.
+   *
+   * @listens passbolt.port.generate-id
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.port.generate-id', async requestId => {
+    const controller = new GeneratePortIdController(worker, requestId);
+    await controller._exec();
   });
 };
 export const AppBootstrapEvents = {listen};

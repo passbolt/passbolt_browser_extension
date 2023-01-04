@@ -62,8 +62,8 @@ describe("Auth", () => {
     });
   });
 
-  describe("Auth::isConstraintValidated", () => {
-    it("Should have the constraint not valid", async() => {
+  describe("Auth::canBeAttachedTo", () => {
+    it("Should have the canBeAttachedTo not valid", async() => {
       expect.assertions(1);
       // process
       const canBeAttachedTo = await Auth.canBeAttachedTo({});

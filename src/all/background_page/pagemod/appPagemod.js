@@ -63,8 +63,6 @@ App.init = function() {
         console.error(error);
       }
 
-      app.events.appBootstrap.listen(worker);
-
       // Initialize the events listeners.
       app.events.app.listen(worker, account);
       app.events.auth.listen(worker);

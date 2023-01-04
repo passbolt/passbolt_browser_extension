@@ -117,7 +117,7 @@ describe("PagemodManager", () => {
       expect(WebIntegrationPagemod.injectFiles).toHaveBeenCalledTimes(1);
     });
 
-    it.only("Should find the public website sign in page mod and inject file", async() => {
+    it("Should find the public website sign in page mod and inject file", async() => {
       expect.assertions(2);
       // data mocked
       const details = {

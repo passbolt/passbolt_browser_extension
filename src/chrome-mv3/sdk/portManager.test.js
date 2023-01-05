@@ -43,6 +43,25 @@ describe("PortManager", () => {
       expect(port.postMessage).toHaveBeenCalledWith(['passbolt.port.ready']);
     });
 
+    it("Should connect new port if it is the quick access", async() => {
+      expect.assertions(5);
+      // data mocked
+      const popupUrl = "chrome-extension://extensionId/webAccessibleResources/quickaccess.html?passbolt=quickaccess";
+      const port = mockPort({name: "quickaccess", url: popupUrl});
+      delete port.sender.tab;
+      // mock functions
+      jest.spyOn(chrome.action, "getPopup").mockImplementationOnce(() => popupUrl);
+      jest.spyOn(PagemodManager, "attachEventToPort");
+      // process
+      await PortManager.onPortConnect(port);
+      // expectations
+      expect(chrome.action.getPopup).toHaveBeenCalled();
+      expect(PortManager._ports[port.name]).toBeDefined();
+      expect(PortManager._ports[port.name]._port).toBe(port);
+      expect(PagemodManager.attachEventToPort).toHaveBeenCalledWith(PortManager._ports[port.name], "QuickAccess");
+      expect(port.postMessage).toHaveBeenCalledWith(['passbolt.port.ready']);
+    });
+
     it("Should not connect new port if it is not in the workersSessionStorage", async() => {
       expect.assertions(3);
       // data mocked
@@ -57,6 +76,22 @@ describe("PortManager", () => {
       expect(PortManager._ports[workerDto.id]).toBeUndefined();
       expect(PagemodManager.attachEventToPort).not.toHaveBeenCalled();
       expect(port.postMessage).not.toHaveBeenCalled();
+    });
+
+    it("Should not connect new port if it is not the quick access url", async() => {
+      expect.assertions(3);
+      // data mocked
+      const port = mockPort({name: "test", url: "chrome-extension://extensionId/webAccessibleResources/quickaccess.html?passbolt=test"});
+      delete port.sender.tab;
+      // mock functions
+      jest.spyOn(chrome.action, "getPopup").mockImplementationOnce(() => "chrome-extension://extensionId/webAccessibleResources/quickaccess.html?passbolt=quickaccess");
+      jest.spyOn(PagemodManager, "attachEventToPort");
+      // process
+      await PortManager.onPortConnect(port);
+      // expectations
+      expect(chrome.action.getPopup).toHaveBeenCalled();
+      expect(PortManager._ports[port.name]).not.toBeDefined();
+      expect(PagemodManager.attachEventToPort).not.toHaveBeenCalled();
     });
   });
 

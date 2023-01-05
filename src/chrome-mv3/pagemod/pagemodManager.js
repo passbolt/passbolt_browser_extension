@@ -23,6 +23,7 @@ import AppBootstrapPagemod from "./appBootstrapPagemod";
 import AppPagemod from "./appPagemod";
 import WebIntegrationPagemod from "./webIntegrationPagemod";
 import PublicWebsiteSignInPagemod from "./publicWebsiteSignInPagemod";
+import QuickAccessPagemod from "./quickAccessPagemod";
 
 /**
  * The pagemod manager have the role of dispatching the process to the correct pagemod
@@ -41,7 +42,8 @@ class PagemodManager {
       AppBootstrapPagemod,
       AppPagemod,
       WebIntegrationPagemod,
-      PublicWebsiteSignInPagemod
+      PublicWebsiteSignInPagemod,
+      QuickAccessPagemod
     ];
     this.exec = this.exec.bind(this);
   }

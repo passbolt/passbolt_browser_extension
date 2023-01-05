@@ -68,6 +68,9 @@ jest.mock("webextension-polyfill", () => Object.assign({}, {
       addListener: jest.fn()
     }
   },
+  action: {
+    getPopup: jest.fn()
+  },
   commands: {
     onCommand: {
       addListener: jest.fn()

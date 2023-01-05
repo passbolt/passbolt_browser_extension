@@ -29,21 +29,47 @@ class PortManager {
    * @returns {Promise<void>}
    */
   async onPortConnect(port) {
+    if (await this.isQuickAccessPort(port.sender)) {
+      await this.registerAndAttachEvent(port, "QuickAccess");
+    } else {
+      await this.connectPortFromTab(port)
+    }
+  }
+
+  /**
+   * Connect port from tab
+   * @param port the port
+   * @returns {Promise<void>}
+   */
+  async connectPortFromTab(port) {
     const worker = await WorkersSessionStorage.getWorkerById(port.name);
     if (worker) {
       if (await this.isKnownPortSender(worker, port.sender)) {
-        const portWrapper = new Port(port);
-        this.registerPort(portWrapper);
-        await PagemodManager.attachEventToPort(portWrapper, worker.name);
-        portWrapper.emit('passbolt.port.ready');
+        await this.registerAndAttachEvent(port, worker.name);
       }
     }
   }
 
   /**
-   * Is known port sender
-   * @param worker
+   * Is quickAccess port sender
    * @param sender
+   * @returns {Promise<boolean>}
+   */
+  async isQuickAccessPort(sender) {
+    if (sender.tab) {
+      // Tab property will only be present when the connection was opened from a tab
+      return false;
+    } else {
+      // The sender is a script running in an extension page
+      const popupUrl = await chrome.action.getPopup({});
+      return sender.url === popupUrl;
+    }
+  }
+
+  /**
+   * Is known port sender
+   * @param worker The worker
+   * @param sender The sender
    * @returns {Promise<boolean>}
    */
   async isKnownPortSender(worker, sender) {
@@ -52,6 +78,19 @@ class PortManager {
       await WorkersSessionStorage.updateWorker(new WorkerEntity(worker));
     }
     return worker.tabId === sender.tab.id && worker.frameId === sender.frameId;
+  }
+
+  /**
+   * Register and attach event to the port
+   * @param port The port
+   * @param {string} name The pagemod name
+   * @returns {Promise<void>}
+   */
+  async registerAndAttachEvent(port, name) {
+    const portWrapper = new Port(port);
+    this.registerPort(portWrapper);
+    await PagemodManager.attachEventToPort(portWrapper, name);
+    portWrapper.emit('passbolt.port.ready');
   }
 
   /**
@@ -64,7 +103,7 @@ class PortManager {
 
   /**
    * Disconnect and remove the port
-   * @param id the id
+   * @param {string} id the id
    * @returns <void>
    */
   removePort(id) {

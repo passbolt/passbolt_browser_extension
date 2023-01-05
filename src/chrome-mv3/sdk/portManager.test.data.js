@@ -12,13 +12,14 @@
  * @since         4.0.0
  */
 
-export const mockPort = jest.fn(({name, tabId, frameId}) => ({
+export const mockPort = jest.fn(({name, tabId, frameId, url = ""}) => ({
   name: name,
   sender: {
     tab: {
       id: tabId
     },
-    frameId: frameId
+    frameId: frameId,
+    url:  url
   },
   postMessage: jest.fn(),
   onDisconnect: {

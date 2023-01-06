@@ -91,6 +91,7 @@ App.init = function() {
       app.events.locale.listen(worker);
       app.events.passwordGenerator.listen(worker);
       app.events.mobile.listen(worker);
+      app.events.clipboard.listen(worker);
 
       Worker.add('App', worker);
     }

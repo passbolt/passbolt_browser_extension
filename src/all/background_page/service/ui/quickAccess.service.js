@@ -62,5 +62,5 @@ async function buildDetachedQuickaccessPosition() {
 }
 
 export const QuickAccessService = {
-  openInDetachedMode: openInDetachedMode
+  openInDetachedMode: openInDetachedMode,
 };

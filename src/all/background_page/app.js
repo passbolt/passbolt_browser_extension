@@ -54,6 +54,7 @@ import {InformCallToActionEvents} from "./event/informCallToActionEvents";
 import {InformMenuEvents} from "./event/informMenuEvents";
 import {WebIntegrationEvents} from "./event/webIntegrationEvents";
 import {PublicWebsiteSignInEvents} from "./event/publicWebsiteSignInEvents";
+import {ClipboardEvents} from "./event/clipboardEvents";
 import WebIntegration from "./pagemod/webIntegrationPagemod";
 import AppBoostrapPagemod from "./pagemod/appBoostrapPagemod";
 import {AppPagemod} from "./pagemod/appPagemod";
@@ -107,6 +108,7 @@ events.informCallToAction = InformCallToActionEvents;
 events.informMenu = InformMenuEvents;
 events.webIntegration = WebIntegrationEvents;
 events.publicWebsiteSignIn = PublicWebsiteSignInEvents;
+events.clipboard = ClipboardEvents;
 
 /*
  * ==================================================================================

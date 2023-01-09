@@ -12,12 +12,12 @@
  * @since         3.9.0
  */
 
-class UserClosedSsoPopUp extends Error {
+class UserClosedSsoPopUpError extends Error {
   constructor(message, data) {
     super(message || "The user closed the popup");
-    this.name = 'UserClosedSsoPopUp';
+    this.name = 'UserClosedSsoPopUpError';
     this.data = data || {};
   }
 }
 
-export default UserClosedSsoPopUp;
+export default UserClosedSsoPopUpError;

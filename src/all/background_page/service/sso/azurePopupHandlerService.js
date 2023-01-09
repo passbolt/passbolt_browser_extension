@@ -12,7 +12,7 @@
  * @since         3.9.0
  */
 import browser from "webextension-polyfill";
-import UserClosedSsoPopUp from "../../error/userClosedSsoPopUp";
+import UserClosedSsoPopUpError from "../../error/userClosedSsoPopUpError";
 
 const AZURE_POPUP_WINDOW_HEIGHT = 600;
 const AZURE_POPUP_WINDOW_WIDTH = 380;
@@ -85,7 +85,7 @@ class AzurePopupHandlerService {
     }
 
     if (removeInfo.isWindowClosing) {
-      this.rejectPromise(new UserClosedSsoPopUp());
+      this.rejectPromise(new UserClosedSsoPopUpError());
       return;
     }
 

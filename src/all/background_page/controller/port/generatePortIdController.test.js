@@ -27,14 +27,46 @@ beforeEach(() => {
 });
 
 describe("GeneratePortIdController", () => {
+  describe("GeneratePortIdController::isAllowedToGeneratePortId", () => {
+    it("Should allowed to generate port id", async() => {
+      expect.assertions(6);
+      // data mocked
+      const worker = {
+        name: "WebIntegration"
+      };
+      // process
+      const controller = new GeneratePortIdController(worker, "requestId");
+      // expectations
+      expect(controller.isAllowedToGeneratePortId(worker, "Recover")).toBeFalsy();
+      expect(controller.isAllowedToGeneratePortId(worker, "Setup")).toBeFalsy();
+      expect(controller.isAllowedToGeneratePortId(worker, "App")).toBeFalsy();
+      expect(controller.isAllowedToGeneratePortId(worker, "Unknown")).toBeFalsy();
+      expect(controller.isAllowedToGeneratePortId(worker, "InFormCallToAction")).toBeTruthy();
+      expect(controller.isAllowedToGeneratePortId(worker, "InFormMenu")).toBeTruthy();
+    });
+
+    it("Should not allowed to generate port id for unknown application", async() => {
+      expect.assertions(2);
+      // data mocked
+      const worker = {
+        name: "Unknown"
+      };
+      // process
+      const controller = new GeneratePortIdController(worker, "requestId");
+      // expectations
+      expect(controller.isAllowedToGeneratePortId(worker, "Recover")).toBeFalsy();
+      expect(controller.isAllowedToGeneratePortId(worker, "Unknown")).toBeFalsy();
+    });
+  });
+
   describe("GeneratePortIdController::exec", () => {
-    it("Should generate a port id for MV2", async() => {
+    it("Should generate a port id for recover MV2", async() => {
       expect.assertions(1);
       // data mocked
       const worker = {
         pageMod: {
           args: {
-            name: "applicationNameBootstrap"
+            name: "RecoverBootstrap"
           }
         }
       };
@@ -42,34 +74,74 @@ describe("GeneratePortIdController", () => {
       spyOnManifest.mockImplementationOnce(() => ({manifest_version: 2}));
       // process
       const controller = new GeneratePortIdController(worker, "requestId");
-      const id  = await controller.exec();
+      const id  = await controller.exec("Recover");
       // expectations
-      expect(id).toStrictEqual(`passbolt-iframe-applicationname`);
+      expect(id).toStrictEqual(`passbolt-iframe-recover`);
     });
 
-    it("Should store worker and generate a port id for MV3", async() => {
+    it("Should not generate a port id for application not allowed MV2", async() => {
+      expect.assertions(1);
+      // data mocked
+      const worker = {
+        pageMod: {
+          args: {
+            name: "AuthBootstrap"
+          }
+        }
+      };
+      // process
+      const controller = new GeneratePortIdController(worker, "requestId");
+      try {
+        await controller.exec("App");
+      } catch (error) {
+        // expectations
+        expect(error.message).toStrictEqual("The application is not allowed to open the application App");
+      }
+    });
+
+    it("Should store worker and generate a port id for setup MV3", async() => {
       expect.assertions(2);
       // data mocked
       const worker = {
         tab: {
           id: 1
         },
-        name: "applicationName"
+        name: "SetupBootstrap"
       };
       // mock functions
       spyOnManifest.mockImplementationOnce(() => ({manifest_version: 3}));
       // process
       const controller = new GeneratePortIdController(worker, "requestId");
-      const id  = await controller.exec();
+      const id  = await controller.exec("Setup");
       // data expected
       const workerEntity = new WorkerEntity({
         id: id,
         tabId: worker.tab.id,
-        name: "applicationName"
+        name: "Setup",
+        frameId: null
       });
       // expectations
       expect(id).toMatch(/^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/);
       expect(WorkersSessionStorage.addWorker).toHaveBeenCalledWith(workerEntity);
+    });
+
+    it("Should not store worker and generate a port id for application not allowed MV3", async() => {
+      expect.assertions(1);
+      // data mocked
+      const worker = {
+        tab: {
+          id: 1
+        },
+        name: "AppBootstrap"
+      };
+      // process
+      const controller = new GeneratePortIdController(worker, "requestId");
+      try {
+        await controller.exec("QuickAccess");
+      } catch (error) {
+        // expectations
+        expect(error.message).toStrictEqual("The application is not allowed to open the application QuickAccess");
+      }
     });
   });
 });

@@ -13,7 +13,7 @@
  */
 import Pagemod from "./pagemod";
 import User from "../../all/background_page/model/user";
-import {AuthBootstrapEvents} from "../../all/background_page/event/authBootstrapEvents";
+import {PortEvents} from "../../all/background_page/event/portEvents";
 
 class AuthBootstrap extends Pagemod {
   /**
@@ -37,7 +37,7 @@ class AuthBootstrap extends Pagemod {
    * @inheritDoc
    */
   get events() {
-    return [AuthBootstrapEvents];
+    return [PortEvents];
   }
 
   /**

@@ -12,8 +12,8 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import {RecoverBootstrapEvents} from "../../all/background_page/event/recoverBootstrapEvents";
 import ParseRecoverUrlService from "../../all/background_page/service/recover/parseRecoverUrlService";
+import {PortEvents} from "../../all/background_page/event/portEvents";
 
 class RecoverBootstrap extends Pagemod {
   /**
@@ -37,7 +37,7 @@ class RecoverBootstrap extends Pagemod {
    * @inheritDoc
    */
   get events() {
-    return [RecoverBootstrapEvents];
+    return [PortEvents];
   }
 
   /**

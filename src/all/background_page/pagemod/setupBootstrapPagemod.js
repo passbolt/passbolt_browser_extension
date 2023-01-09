@@ -12,7 +12,7 @@
  */
 import {Worker} from "../model/worker";
 import PageMod from "../sdk/page-mod";
-import {SetupBootstrapEvents} from "../event/setupBootstrapEvents";
+import {PortEvents} from "../event/portEvents";
 
 const SetupBootstrap = function() {};
 SetupBootstrap._pageMod = undefined;
@@ -44,7 +44,7 @@ SetupBootstrap.init = function() {
       // @todo refactoring-account-recovery, should we do something if the url doesn't parse.
 
       Worker.add('SetupBootstrap', worker);
-      SetupBootstrapEvents.listen(worker);
+      PortEvents.listen(worker);
     }
   });
 };

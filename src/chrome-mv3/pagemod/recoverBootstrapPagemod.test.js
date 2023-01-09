@@ -15,17 +15,15 @@ import WorkersSessionStorage from "../service/sessionStorage/workersSessionStora
 import WorkerEntity from "../../all/background_page/model/entity/worker/workerEntity";
 import ScriptExecution from "../../all/background_page/sdk/scriptExecution";
 import RecoverBootstrap from "./recoverBootstrapPagemod";
-import {RecoverBootstrapEvents} from "../../all/background_page/event/recoverBootstrapEvents";
-import {ConfigEvents} from "../../all/background_page/event/configEvents";
 import each from "jest-each";
 import Pagemod from "./pagemod";
+import {PortEvents} from "../../all/background_page/event/portEvents";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());
-jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
-jest.spyOn(RecoverBootstrapEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(PortEvents, "listen").mockImplementation(jest.fn());
 
 describe("RecoverBootstrap", () => {
   beforeEach(async() => {
@@ -46,7 +44,7 @@ describe("RecoverBootstrap", () => {
       expect(ScriptExecution.prototype.injectJs).toHaveBeenCalledWith(RecoverBootstrap.contentScriptFiles);
       expect(RecoverBootstrap.contentStyleFiles).toStrictEqual(['webAccessibleResources/css/themes/default/ext_external.min.css']);
       expect(RecoverBootstrap.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/vendors.js', 'contentScripts/js/dist/recover.js']);
-      expect(RecoverBootstrap.events).toStrictEqual([RecoverBootstrapEvents]);
+      expect(RecoverBootstrap.events).toStrictEqual([PortEvents]);
       expect(RecoverBootstrap.appName).toBe('RecoverBootstrap');
     });
   });
@@ -56,10 +54,11 @@ describe("RecoverBootstrap", () => {
       expect.assertions(1);
       // data mocked
       const port = {
+        on: () => jest.fn(),
         _port: {
           sender: {
             tab: {
-              url: "https://localhost"
+              url: "https://passbolt.dev/setup/recover/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"
             }
           }
         }
@@ -67,7 +66,7 @@ describe("RecoverBootstrap", () => {
       // process
       await RecoverBootstrap.attachEvents(port);
       // expectations
-      expect(RecoverBootstrapEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: RecoverBootstrap.name});
+      expect(PortEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: RecoverBootstrap.name});
     });
   });
 

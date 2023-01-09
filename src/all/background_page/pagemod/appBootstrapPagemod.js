@@ -14,6 +14,7 @@ import {Worker} from "../model/worker";
 import PageMod from "../sdk/page-mod";
 import ParseAppUrlService from "../service/app/parseAppUrlService";
 import {AppBootstrapEvents} from "../event/appBootstrapEvents";
+import {PortEvents} from "../event/portEvents";
 
 const AppBootstrapPagemod = function() {};
 AppBootstrapPagemod._pageMod = null;
@@ -67,6 +68,7 @@ AppBootstrapPagemod.initPageMod = function() {
       }
 
       AppBootstrapEvents.listen(worker);
+      PortEvents.listen(worker);
 
       Worker.add("AppBootstrap", worker);
     },

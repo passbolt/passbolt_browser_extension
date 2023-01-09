@@ -52,7 +52,11 @@ class WorkerEntity extends Entity {
           "type": "integer",
         },
         "frameId": {
-          "type": "integer",
+          "anyOf": [{
+            "type": "integer"
+          }, {
+            "type": "null"
+          }]
         },
         "name": {
           "type": "string",

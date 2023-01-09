@@ -15,14 +15,15 @@ import WorkersSessionStorage from "../service/sessionStorage/workersSessionStora
 import WorkerEntity from "../../all/background_page/model/entity/worker/workerEntity";
 import ScriptExecution from "../../all/background_page/sdk/scriptExecution";
 import SetupBootstrap from "./setupBootstrapPagemod";
-import {SetupBootstrapEvents} from "../../all/background_page/event/setupBootstrapEvents";
 import each from "jest-each";
 import Pagemod from "./pagemod";
+import {PortEvents} from "../../all/background_page/event/portEvents";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());
+jest.spyOn(PortEvents, "listen").mockImplementation(jest.fn());
 
 describe("SetupBootstrap", () => {
   beforeEach(async() => {
@@ -43,8 +44,29 @@ describe("SetupBootstrap", () => {
       expect(ScriptExecution.prototype.injectJs).toHaveBeenCalledWith(SetupBootstrap.contentScriptFiles);
       expect(SetupBootstrap.contentStyleFiles).toStrictEqual(['webAccessibleResources/css/themes/default/ext_external.min.css']);
       expect(SetupBootstrap.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/vendors.js', 'contentScripts/js/dist/setup.js']);
-      expect(SetupBootstrap.events).toStrictEqual([SetupBootstrapEvents]);
+      expect(SetupBootstrap.events).toStrictEqual([PortEvents]);
       expect(SetupBootstrap.appName).toBe('SetupBootstrap');
+    });
+  });
+
+  describe("SetupBootstrap::attachEvents", () => {
+    it("Should attach events", async() => {
+      expect.assertions(1);
+      // data mocked
+      const port = {
+        on: () => jest.fn(),
+        _port: {
+          sender: {
+            tab: {
+              url: "https://passbolt.dev/setup/install/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"
+            }
+          }
+        }
+      };
+      // process
+      await SetupBootstrap.attachEvents(port);
+      // expectations
+      expect(PortEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: SetupBootstrap.name});
     });
   });
 

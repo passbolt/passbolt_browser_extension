@@ -12,8 +12,8 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import {SetupBootstrapEvents} from "../../all/background_page/event/setupBootstrapEvents";
 import ParseSetupUrlService from "../../all/background_page/service/setup/parseSetupUrlService";
+import {PortEvents} from "../../all/background_page/event/portEvents";
 
 class SetupBootstrap extends Pagemod {
   /**
@@ -37,7 +37,7 @@ class SetupBootstrap extends Pagemod {
    * @inheritDoc
    */
   get events() {
-    return [SetupBootstrapEvents];
+    return [PortEvents];
   }
 
   /**

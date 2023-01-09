@@ -21,12 +21,14 @@ import ScriptExecution from "../../all/background_page/sdk/scriptExecution";
 import {AppBootstrapEvents} from "../../all/background_page/event/appBootstrapEvents";
 import Pagemod from "./pagemod";
 import each from "jest-each";
+import {PortEvents} from "../../all/background_page/event/portEvents";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());
 jest.spyOn(AppBootstrapEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(PortEvents, "listen").mockImplementation(jest.fn());
 
 describe("AppBootstrap", () => {
   beforeEach(async() => {
@@ -47,7 +49,7 @@ describe("AppBootstrap", () => {
       expect(ScriptExecution.prototype.injectJs).toHaveBeenCalledWith(AppBootstrap.contentScriptFiles);
       expect(AppBootstrap.contentStyleFiles).toStrictEqual(['webAccessibleResources/css/themes/default/ext_external.min.css']);
       expect(AppBootstrap.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/vendors.js', 'contentScripts/js/dist/app.js']);
-      expect(AppBootstrap.events).toStrictEqual([AppBootstrapEvents]);
+      expect(AppBootstrap.events).toStrictEqual([AppBootstrapEvents, PortEvents]);
       expect(AppBootstrap.appName).toBe('AppBootstrap');
     });
   });
@@ -97,9 +99,9 @@ describe("AppBootstrap", () => {
     });
   });
 
-  describe("AuthBootstrap::attachEvents", () => {
+  describe("AppBootstrap::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(1);
+      expect.assertions(2);
       // data mocked
       const port = {
         on: () => jest.fn(),
@@ -115,6 +117,7 @@ describe("AppBootstrap", () => {
       await AppBootstrap.attachEvents(port);
       // expectations
       expect(AppBootstrapEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: AppBootstrap.name});
+      expect(PortEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: AppBootstrap.name});
     });
   });
 });

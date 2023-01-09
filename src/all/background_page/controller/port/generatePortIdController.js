@@ -17,6 +17,15 @@ import WorkersSessionStorage from "../../../../chrome-mv3/service/sessionStorage
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 import browser from "../../sdk/polyfill/browserPolyfill";
 
+const APPLICATION_ALLOWED = {
+  "RecoverBootstrap": ["Recover"],
+  "SetupBootstrap": ["Setup"],
+  "AuthBootstrap": ["Auth"],
+  "AppBootstrap": ["App"],
+  "AccountRecoveryBootstrap": ["AccountRecovery"],
+  "WebIntegration": ["InFormCallToAction", "InFormMenu"],
+};
+
 class GeneratePortIdController {
   /**
    * Constructor
@@ -33,9 +42,9 @@ class GeneratePortIdController {
    *
    * @return {Promise<void>}
    */
-  async _exec() {
+  async _exec(applicationName) {
     try {
-      const result = await this.exec();
+      const result = await this.exec(applicationName);
       this.worker.port.emit(this.requestId, "SUCCESS", result);
     } catch (error) {
       console.error(error);
@@ -48,21 +57,35 @@ class GeneratePortIdController {
    *
    * @return {Promise<string>}
    */
-  async exec() {
+  async exec(applicationName) {
+    if (!this.isAllowedToGeneratePortId(this.worker, applicationName)) {
+      throw new Error(`The application is not allowed to open the application ${applicationName}`);
+    }
     // @deprecated The support of MV2 will be down soon
     if (this.isManifestV2) {
-      const applicationName = this.worker.pageMod.args.name.replace("Bootstrap", "");
       return `passbolt-iframe-${applicationName.toLowerCase()}`;
     } else {
       const tab = this.worker.tab;
       const worker = {
         id: uuidv4(),
-        name: this.worker.name.replace("Bootstrap", ""),
+        name: applicationName,
         tabId: tab.id,
+        frameId: null
       };
       await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
       return worker.id;
     }
+  }
+
+  /**
+   * Is allowed to generate port id
+   * @param {*} worker
+   * @param {string} applicationName
+   * @returns {Boolean}
+   */
+  isAllowedToGeneratePortId(worker, applicationName) {
+    const workerName = worker.name || worker.pageMod.args.name;
+    return APPLICATION_ALLOWED[workerName]?.includes(applicationName);
   }
 
   /**

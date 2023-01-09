@@ -17,7 +17,7 @@ import AuthBootstrap from "./authBootstrapPagemod";
 import WorkersSessionStorage from "../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../../all/background_page/model/entity/worker/workerEntity";
 import ScriptExecution from "../../all/background_page/sdk/scriptExecution";
-import {AuthBootstrapEvents} from "../../all/background_page/event/authBootstrapEvents";
+import {PortEvents} from "../../all/background_page/event/portEvents";
 import each from "jest-each";
 import Pagemod from "./pagemod";
 
@@ -25,7 +25,7 @@ const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());
-jest.spyOn(AuthBootstrapEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(PortEvents, "listen").mockImplementation(jest.fn());
 
 describe("AuthBootstrap", () => {
   beforeEach(() => {
@@ -46,7 +46,7 @@ describe("AuthBootstrap", () => {
       expect(ScriptExecution.prototype.injectJs).toHaveBeenCalledWith(AuthBootstrap.contentScriptFiles);
       expect(AuthBootstrap.contentStyleFiles).toStrictEqual(['webAccessibleResources/css/themes/default/ext_external.min.css']);
       expect(AuthBootstrap.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/vendors.js', 'contentScripts/js/dist/login.js']);
-      expect(AuthBootstrap.events).toStrictEqual([AuthBootstrapEvents]);
+      expect(AuthBootstrap.events).toStrictEqual([PortEvents]);
       expect(AuthBootstrap.appName).toBe('AuthBootstrap');
     });
   });
@@ -95,7 +95,7 @@ describe("AuthBootstrap", () => {
         _port: {
           sender: {
             tab: {
-              url: "https://localhost"
+              url: "https://passbolt.dev/auth/login"
             }
           }
         }
@@ -103,7 +103,7 @@ describe("AuthBootstrap", () => {
       // process
       await AuthBootstrap.attachEvents(port);
       // expectations
-      expect(AuthBootstrapEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: AuthBootstrap.name});
+      expect(PortEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: AuthBootstrap.name});
     });
   });
 });

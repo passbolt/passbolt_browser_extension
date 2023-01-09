@@ -26,16 +26,18 @@ import ImportError from "../../../error/importError";
 import BinaryConvert from "../../../utils/format/binaryConvert";
 import CsvChromiumRowParser from "./csvRowParser/csvChromiumRowParser";
 import CsvBitWardenRowParser from "./csvRowParser/csvBitWardenRowParser";
+import CsvSafariRowParser from "./csvRowParser/csvSafariRowParser";
 
 describe("ResourcesCsvImportParser", () => {
   it("should be aware of the supported row parsers", () => {
-    expect(ResourcesCsvImportParser.register).toHaveLength(5);
+    expect(ResourcesCsvImportParser.register).toHaveLength(6);
     const supportedRowParsers = [
       Csv1PasswordRowParser,
       CsvKdbxRowParser,
       CsvLastPassRowParser,
       CsvChromiumRowParser,
       CsvBitWardenRowParser,
+      CsvSafariRowParser,
     ];
     expect(ResourcesCsvImportParser.register).toEqual(expect.arrayContaining(supportedRowParsers));
   });

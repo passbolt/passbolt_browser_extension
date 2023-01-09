@@ -22,7 +22,7 @@ class Csv1PasswordRowParser extends AbstractCsvRowParser {
     return {
       "name": "Title",
       "username": "Username",
-      "uri": "URL",
+      "uri": "Url",
       "secret_clear": "Password",
       "description": "Notes",
       "folder_parent_path": "Type"

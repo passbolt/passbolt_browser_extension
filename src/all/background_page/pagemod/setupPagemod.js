@@ -53,6 +53,7 @@ Setup.init = function() {
       // @todo account-recovery-refactoring check to remove all the listener, they expose confidential services.
       app.events.config.listen(worker);
       app.events.setup.listen(worker, apiClientOptions, account);
+      app.events.secret.listen(worker);
     }
   });
 };

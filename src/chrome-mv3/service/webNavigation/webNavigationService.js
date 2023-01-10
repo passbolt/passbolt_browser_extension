@@ -11,21 +11,21 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import browser from "../all/background_page/sdk/polyfill/browserPolyfill";
-import PortManager from "./sdk/portManager";
-import WebNavigationService from "./service/webNavigation/webNavigationService";
+import PortManager from "../../sdk/portManager";
+import PagemodManager from "../../pagemod/pagemodManager";
 
-/**
- * Add listener on any on complete navigation
- */
-browser.webNavigation.onCompleted.addListener(WebNavigationService.exec);
+class WebNavigationService {
+  /**
+   * Execute the navigation service process
+   * @param frameDetails
+   * @returns {Promise<void>}
+   */
+  static async exec(frameDetails) {
+    if (frameDetails.frameId === 0) {
+      await PortManager.onTabRemoved(frameDetails.tabId);
+    }
+    await PagemodManager.exec(frameDetails);
+  }
+}
 
-/**
- * Add listener on connect port
- */
-browser.runtime.onConnect.addListener(PortManager.onPortConnect);
-
-/**
- * Add listener on tabs on removed
- */
-browser.tabs.onRemoved.addListener(PortManager.onTabRemoved);
+export default WebNavigationService;

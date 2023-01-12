@@ -22,10 +22,11 @@ class Scripting {
   /**
    * Insert the given script or function.
    * @param {ScriptInjection} options
+   * @return {Promise<*|void>}
    */
-  executeScript(options) {
-    options.func
-      ? this._insertJsFunc(options)
+  async executeScript(options) {
+    return options.func
+      ? await this._insertJsFunc(options)
       : this._insertJsFiles(options);
   }
 
@@ -94,18 +95,18 @@ class Scripting {
    * Insert a JS function in the given tab.
    * The function is serialized and then inserted as a string in the document (to respect mv3 spirit).
    * @param {ScriptInjection} options
-   * @param {function} callback
    * @private
    */
-  _insertJsFunc(options) {
+  async _insertJsFunc(options) {
     const funcArgs = JSON.stringify(options.args);
     const functionCall = `;${options.func.name}.apply(window, ${funcArgs});`;
 
     const codeToInject = options.func.toString() + functionCall;
 
     const info = {code: codeToInject, runAt: 'document_end', frameId: options.target?.frameIds[0]};
-    const cb = this._createJsCallback(options.target.tabId, info, null);
-    cb();
+    const response = await browser.tabs.executeScript(options.target.tabId, info);
+    // construct response like MV3
+    return response?.map(data => ({result: data}));
   }
 }
 

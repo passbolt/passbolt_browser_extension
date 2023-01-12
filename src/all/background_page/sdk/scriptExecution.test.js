@@ -80,4 +80,63 @@ describe("ScriptExecution", () => {
       expect(mockedScriptingCSS).toHaveBeenCalledWith(option);
     });
   });
+
+  describe("ScriptExecution::injectBase64UrlToCreateObjectURL", () => {
+    it("Should insert JS func", async() => {
+      expect.assertions(2);
+      // data mocked
+      const dataUrl = "data:text/plain;base64,VGV4dA==";
+      self.URL.createObjectURL = jest.fn();
+      const option = {
+        func: expect.anything(),
+        args: [dataUrl],
+        target: {
+          tabId: 1,
+          frameIds: [0]
+        },
+        world: "ISOLATED"
+      };
+      const resultUrl = "blob:https://passbolt.dev/8a3e66b9-4646-4077-815a-5978936aa6d6";
+      // mock function
+      mockedScriptingJS.mockImplementationOnce(script => {
+        const url = script.func.apply(null, script.args);
+        return [{result: url}];
+      });
+      jest.spyOn(self.URL, "createObjectURL").mockImplementationOnce(() => resultUrl);
+      // process
+      const scriptExecution = new ScriptExecution(1);
+      const url = await scriptExecution.injectBase64UrlToCreateObjectURL(dataUrl);
+      // expectation
+      expect(mockedScriptingJS).toHaveBeenCalledWith(option);
+      expect(url).toStrictEqual(resultUrl);
+    });
+  });
+
+  describe("ScriptExecution::injectURLToRevoke", () => {
+    it("Should insert JS func", async() => {
+      expect.assertions(2);
+      // data mocked
+      const url = "blob:https://passbolt.dev/8a3e66b9-4646-4077-815a-5978936aa6d6";
+      self.URL.revokeObjectURL = jest.fn();
+      const option = {
+        func: expect.anything(),
+        args: [url],
+        target: {
+          tabId: 1,
+          frameIds: [0]
+        },
+        world: "ISOLATED"
+      };
+      // mock function
+      mockedScriptingJS.mockImplementationOnce(async script => {
+        script.func.apply(null, script.args);
+      });
+      // process
+      const scriptExecution = new ScriptExecution(1);
+      scriptExecution.injectURLToRevoke(url);
+      // expectation
+      expect(mockedScriptingJS).toHaveBeenCalledWith(option);
+      expect(self.URL.revokeObjectURL).toHaveBeenCalledWith(url);
+    });
+  });
 });

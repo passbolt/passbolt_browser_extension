@@ -12,8 +12,8 @@
  * @since        3.9.0
  */
 
-import {Config} from "../../model/config";
 import {Worker} from "../../model/worker";
+import ScriptExecution from "../../sdk/scriptExecution";
 import browser from "../../sdk/polyfill/browserPolyfill";
 
 /**
@@ -26,37 +26,27 @@ class FileService {
    * @param {String} filename
    * @param {Blob|String} content
    * @param {String} mimeType mime type
-   * @param {int} tabid
-   * @return {Promise}
+   * @param {int} tabId
+   * @return {Promise<void>}
    */
-  static saveFile(filename, content, mimeType, tabid) {
+  static async saveFile(filename, content, mimeType, tabId) {
     if (!mimeType) {
       mimeType = "text/plain";
     }
-    content = new Blob([content], {type: mimeType});
 
-    return new Promise(resolve => {
-      if (chrome.downloads) {
-        const url = self.URL.createObjectURL(content);
-        /*
-         * Don't propose the "save as dialog" if running the test, the tests need the file to be automatically saved
-         * in the default downloads directory.
-         */
-        const saveAs = !Config.isDebug();
-        browser.downloads.download({url: url, filename: filename, saveAs: saveAs})
-          .then(() => {
-            self.URL.revokeObjectURL(url);
-            resolve();
-          });
-      } else {
-        this.blobToDataURL(content)
-          .then(dataUrl => {
-            const fileWorker = Worker.get('FileIframe', tabid);
-            fileWorker.port.emit('passbolt.file-iframe.download', filename, dataUrl);
-            resolve();
-          });
-      }
-    });
+    content = new Blob([content], {type: mimeType});
+    const dataUrl = await this.blobToDataURL(content);
+
+    if (chrome.downloads) {
+      const scriptExecution = new ScriptExecution(tabId);
+      // With MV3 API, it's not possible anymore to use the function URL.createObjectURL or URL.revokeObjectURL
+      const url = await scriptExecution.injectBase64UrlToCreateObjectURL(dataUrl);
+      await browser.downloads.download({url, filename});
+      scriptExecution.injectURLToRevoke(url);
+    } else {
+      const fileWorker = Worker.get('FileIframe', tabId);
+      fileWorker.port.emit('passbolt.file-iframe.download', filename, dataUrl);
+    }
   }
 
   /**

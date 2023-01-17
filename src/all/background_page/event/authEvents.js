@@ -16,8 +16,9 @@ import AuthIsMfaRequiredController from "../controller/auth/authIsMfaRequiredCon
 import CheckPassphraseController from "../controller/crypto/checkPassphraseController";
 import RequestHelpCredentialsLostController from "../controller/auth/requestHelpCredentialsLostController";
 import {Config} from "../model/config";
-import UserAlreadyLoggedInError from "../error/userAlreadyLoggedInError";
-
+import AzureSsoAuthenticationController from "../controller/sso/azureSsoAuthenticationController";
+import AuthLoginController from "../controller/auth/authLoginController";
+import GetLocalSsoProviderConfiguredController from "../controller/sso/getLocalSsoProviderConfiguredController";
 
 const listen = function(worker, account) {
   /*
@@ -171,19 +172,9 @@ const listen = function(worker, account) {
    *   (integer) duration in seconds to specify a specific duration
    */
   worker.port.on('passbolt.auth.login', async(requestId, passphrase, remember) => {
-    try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const authModel = new AuthModel(clientOptions);
-      await authModel.login(passphrase, remember);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      if (error instanceof UserAlreadyLoggedInError) {
-        worker.port.emit(requestId, 'SUCCESS');
-      } else {
-        console.error(error);
-        worker.port.emit(requestId, 'ERROR', error);
-      }
-    }
+    const clientOptions = await User.getInstance().getApiClientOptions(); //@todo remove and use a glocal apiClientOptions;
+    const controller = new AuthLoginController(worker, requestId, clientOptions);
+    await controller._exec(passphrase, remember);
   });
 
   /*
@@ -211,6 +202,27 @@ const listen = function(worker, account) {
   worker.port.on('passbolt.auth.request-help-credentials-lost', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new RequestHelpCredentialsLostController(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  /**
+   * Attempt to sign in with Azure as a third party sign in provider
+   * @listens passbolt.sso.sign-in-with-azure
+   * @param {uuid} requestId The request identifier
+   */
+  worker.port.on('passbolt.sso.sign-in-with-azure', async(requestId, isInQuickaccessMode) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new AzureSsoAuthenticationController(worker, requestId, apiClientOptions, account);
+    await controller._exec(isInQuickaccessMode);
+  });
+
+  /**
+   * Returns the sso provider id registered client-side.
+   * @listens passbolt.sso.get-local-configured-provider
+   * @param {uuid} requestId The request identifier
+   */
+  worker.port.on('passbolt.sso.get-local-configured-provider', async requestId => {
+    const controller = new GetLocalSsoProviderConfiguredController(worker, requestId);
     await controller._exec();
   });
 };

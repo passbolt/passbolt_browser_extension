@@ -67,7 +67,6 @@ class OrganizationSettingsModel {
         organizationSettingsDto = OrganizationSettingsEntity.disabledOrganizationSettings;
       }
     }
-
     return new OrganizationSettingsEntity(organizationSettingsDto);
   }
 }

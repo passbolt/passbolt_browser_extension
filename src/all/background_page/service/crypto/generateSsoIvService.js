@@ -9,23 +9,19 @@
  * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.6.0
+ * @since         3.9.0
  */
 
-/**
- * Mock an API response
- * @param {Object} body The response body
- * @returns {Promise<string>} The response serialized in JSON.
- */
-exports.mockApiResponse = (body = {}, header = {}) => Promise.resolve(JSON.stringify({header: header, body: body}));
+class GenerateSsoIvService {
+  /**
+   * Generate an Initialisation Vector of the given length (by default 12).
+   *
+   * @param {integer} length size of the IV to generate.
+   * @returns {Uint8Array}
+   */
+  static generateIv(length = 12) {
+    return crypto.getRandomValues(new Uint8Array(length));
+  }
+}
 
-exports.mockApiResponseError = (status, errorMessage, body = {}) => Promise.resolve({
-  status: status,
-  body: JSON.stringify({
-    header: {
-      message: errorMessage,
-      status: status
-    },
-    body: body
-  })
-});
+export default GenerateSsoIvService;

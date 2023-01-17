@@ -1,0 +1,173 @@
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         3.9.0
+ */
+import Entity from "../abstract/entity";
+import EntitySchema from "../abstract/entitySchema";
+
+const ENTITY_NAME = "SsoConfiguration";
+const AZURE = "azure";
+
+const DATE_REGEXP = /^\d{4}-\d{2}-\d{2}$/;
+const DATETIME_REGEXP = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+
+/**
+ * Entity related to the SSO configuration
+ */
+class SsoConfigurationEntity extends Entity {
+  /**
+   * Setup entity constructor
+   *
+   * @param {Object} ssoConfigurationDto SSO configuration DTO
+   * @throws EntityValidationError if the dto cannot be converted into an entity
+   */
+  constructor(ssoConfigurationDto) {
+    super(EntitySchema.validate(
+      SsoConfigurationEntity.ENTITY_NAME,
+      SsoConfigurationEntity.sanitizeDto(ssoConfigurationDto),
+      SsoConfigurationEntity.getSchema()
+    ));
+  }
+
+  /**
+   * Get entity schema
+   * @returns {Object} schema
+   */
+  static getSchema() {
+    return {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+        },
+        "provider": {
+          "anyOf": [{
+            "type": "string",
+            "enum": [
+              SsoConfigurationEntity.AZURE,
+            ]
+          }, {
+            "type": "null"
+          }],
+        },
+        "data": {
+          "type": "object",
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modified": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "created_by": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "modified_by": {
+          "type": "string",
+          "format": "uuid"
+        },
+      }
+    };
+  }
+
+  /*
+   * ==================================================
+   * Sanitization
+   * ==================================================
+   */
+  /**
+   * Sanitize account recovery organization public key dto.
+   * @param {object} dto The dto to sanitiaze
+   * @returns {object}
+   */
+  static sanitizeDto(dto) {
+    dto = Object.assign({}, dto); // shallow clone.
+    if (dto?.data?.client_secret_expiry && DATETIME_REGEXP.test(dto.data.client_secret_expiry)) {
+      // we ignore the time part of the date as the UI doesn't support it
+      dto.data.client_secret_expiry = dto.data.client_secret_expiry.substr(0, 10);
+    }
+    return dto;
+  }
+
+  /*
+   * ==================================================
+   * Serialization
+   * ==================================================
+   */
+  /**
+   * Return a DTO ready to be sent to API
+   * @returns {*}
+   */
+  toDto() {
+    const dto = JSON.parse(JSON.stringify(this));
+    if (dto?.data?.client_secret_expiry && DATE_REGEXP.test(dto.data.client_secret_expiry)) {
+      dto.data.client_secret_expiry += " 00:00:00";
+    }
+    return dto;
+  }
+
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
+
+  /**
+   * Get the configuration identifier
+   * @returns {string}
+   */
+  get id() {
+    return this._props.id;
+  }
+
+  /**
+   * Get the provider identifier
+   * @returns {string}
+   */
+  get provider() {
+    return this._props.provider;
+  }
+
+  /*
+   * ==================================================
+   * Static properties getters
+   * ==================================================
+   */
+  /**
+   * SsoConfigurationEntity.ENTITY_NAME
+   * @returns {string}
+   */
+  static get ENTITY_NAME() {
+    return ENTITY_NAME;
+  }
+
+  /**
+   * SsoConfigurationEntity.AZURE
+   * @returns {string}
+   */
+  static get AZURE() {
+    return AZURE;
+  }
+}
+
+export default SsoConfigurationEntity;

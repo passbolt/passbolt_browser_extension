@@ -27,6 +27,7 @@ import Log from "./model/log";
 import {Config} from "./model/config";
 import PostponedUserSettingInvitationService from "./service/accountRecovery/postponedUserSettingInvitationService";
 import PassphraseStorageService from "./service/session_storage/passphraseStorageService";
+import SsoKitTemporaryStorageService from "./service/session_storage/ssoKitTemporaryStorageService";
 
 const main = async function() {
   /*
@@ -47,6 +48,7 @@ const main = async function() {
   PasswordGeneratorLocalStorage.init();
   PostponedUserSettingInvitationService.init();
   await PassphraseStorageService.init();
+  await SsoKitTemporaryStorageService.init();
 
   // Openpgpjs worker initialization
   /**

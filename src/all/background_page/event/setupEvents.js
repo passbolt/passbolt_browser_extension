@@ -29,7 +29,6 @@ import IsExtensionFirstInstallController from "../controller/extension/isExtensi
 import SetSetupSecurityTokenController from "../controller/setup/setSetupSecurityTokenController";
 import GetAccountRecoveryOrganizationPolicyController from "../controller/setup/getAccountRecoveryOrganizationPolicyController";
 
-
 const listen = function(worker, apiClientOptions, account) {
   /*
    * The setup runtime memory.

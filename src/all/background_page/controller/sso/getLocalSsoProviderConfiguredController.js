@@ -45,7 +45,14 @@ class GetLocalSsoProviderConfiguredController {
    * @return {Promise<string|null>}
    */
   async exec() {
-    const data = await SsoDataStorage.get();
+    let data;
+    try {
+      data = await SsoDataStorage.get();
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+
     if (!data) {
       return null;
     }

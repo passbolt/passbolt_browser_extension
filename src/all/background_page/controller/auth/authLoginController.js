@@ -79,7 +79,12 @@ class AuthLoginController {
      * Then we proceed with the SSO kit and afterward the login process.
      */
     await this.checkPassphraseService.checkPassphrase(passphrase);
-    await this.generateSsoKitIfNeeded(passphrase);
+    try {
+      await this.generateSsoKitIfNeeded(passphrase);
+    } catch (e) {
+      // If something goes wrong we just log the error and do not block the login
+      console.error(e);
+    }
 
     try {
       await this.authModel.login(passphrase, remember);

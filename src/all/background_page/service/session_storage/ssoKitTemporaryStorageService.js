@@ -35,7 +35,12 @@ class SsoKitTemporaryStorageService {
    */
   static async set(serverPartSsoKit) {
     await lock.acquire();
-    await browser.storage.session.set({[SSO_KIT_STORAGE_KEY]: serverPartSsoKit});
+    try {
+      await browser.storage.session.set({[SSO_KIT_STORAGE_KEY]: serverPartSsoKit});
+    } catch (e) {
+      lock.release();
+      throw e;
+    }
     lock.release();
   }
 
@@ -45,22 +50,25 @@ class SsoKitTemporaryStorageService {
    */
   static async getAndFlush() {
     await lock.acquire();
+    try {
+      // Get the data if any
+      const storedData = await browser.storage.session.get(SSO_KIT_STORAGE_KEY);
+      const ssoKitServerPartDto = storedData?.[SSO_KIT_STORAGE_KEY] || null;
+      if (!ssoKitServerPartDto) {
+        lock.release();
+        return null;
+      }
+      const entity = new SsoKitServerPartEntity(ssoKitServerPartDto);
 
-    // Get the data if any
-    const storedData = await browser.storage.session.get(SSO_KIT_STORAGE_KEY);
-    const ssoKitServerPartDto = storedData?.[SSO_KIT_STORAGE_KEY] || null;
-    if (!ssoKitServerPartDto) {
+      // Flush the data in any case
+      Log.write({level: 'debug', message: 'SsoKitTemporaryStorageService flushed'});
+      await browser.storage.session.remove(SSO_KIT_STORAGE_KEY);
       lock.release();
-      return null;
+      return entity;
+    } catch (e) {
+      lock.release();
+      throw e;
     }
-    const entity = new SsoKitServerPartEntity(ssoKitServerPartDto);
-
-    // Flush the data in any case
-    Log.write({level: 'debug', message: 'SsoKitTemporaryStorageService flushed'});
-    await browser.storage.session.remove(SSO_KIT_STORAGE_KEY);
-
-    lock.release();
-    return entity;
   }
 
   /**
@@ -69,8 +77,13 @@ class SsoKitTemporaryStorageService {
    */
   static async flush() {
     await lock.acquire();
-    Log.write({level: 'debug', message: 'SsoKitTemporaryStorageService flushed'});
-    await browser.storage.session.remove(SSO_KIT_STORAGE_KEY);
+    try {
+      Log.write({level: 'debug', message: 'SsoKitTemporaryStorageService flushed'});
+      await browser.storage.session.remove(SSO_KIT_STORAGE_KEY);
+    } catch (e) {
+      lock.release();
+      throw e;
+    }
     lock.release();
   }
 }

@@ -14,8 +14,8 @@
 import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";
 
 const DB_VERSION = 1;
-const DB_NAME = "ssoKit_db";
-const SSO_KEYS_OBECT_STORE = 'ssoKit_os';
+const DB_NAME = "sso_kit_db";
+const SSO_KEYS_OBECT_STORE = 'sso_kit';
 
 class SsoDataStorage {
   /**

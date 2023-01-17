@@ -17,7 +17,6 @@ import CheckPassphraseController from "../controller/crypto/checkPassphraseContr
 import RequestHelpCredentialsLostController from "../controller/auth/requestHelpCredentialsLostController";
 import {Config} from "../model/config";
 import AzureSsoAuthenticationController from "../controller/sso/azureSsoAuthenticationController";
-import GetSsoClientDataController from "../controller/sso/getSsoClientDataController";
 import AuthLoginController from "../controller/auth/authLoginController";
 import GetLocalSsoProviderConfiguredController from "../controller/sso/getLocalSsoProviderConfiguredController";
 
@@ -214,16 +213,6 @@ const listen = function(worker, account) {
   worker.port.on('passbolt.sso.sign-in-with-azure', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AzureSsoAuthenticationController(worker, requestId, apiClientOptions, account);
-    await controller._exec();
-  });
-
-  /**
-   * Returns the sso data register client-side.
-   * @listens passbolt.auth.get-sso-client-data
-   * @param {uuid} requestId The request identifier
-   */
-  worker.port.on('passbolt.sso.get-local-sso-kit', async requestId => {
-    const controller = new GetSsoClientDataController(worker, requestId);
     await controller._exec();
   });
 

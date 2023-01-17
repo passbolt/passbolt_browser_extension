@@ -17,8 +17,8 @@ import GetLocalSsoProviderConfiguredController from "./getLocalSsoProviderConfig
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
 
-describe("GetSsoClientDataController", () => {
-  describe("GetSsoClientDataController::exec", () => {
+describe("GetLocalSsoProviderConfiguredController", () => {
+  describe("GetLocalSsoProviderConfiguredController::exec", () => {
     it("Should return the local SSO kit.", async() => {
       expect.assertions(1);
       const ssoLocalKit = await clientSsoKit();

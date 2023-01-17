@@ -54,6 +54,8 @@
   "Synchronizing keyring": "Synchronizing keyring",
   "Synchronizing keys": "Synchronizing keys",
   "Tagging passwords {{taggedCount}}/{{total}}": "Tagging passwords {{taggedCount}}/{{total}}",
+  "The external service is unavailable": "The external service is unavailable",
+  "The external service raised an error": "The external service raised an error",
   "The folder cannot be moved inside itself.": "The folder cannot be moved inside itself.",
   "The folder cannot be shared. Insufficient rights.": "The folder cannot be shared. Insufficient rights.",
   "The key should be a valid openpgp armored key string.": "The key should be a valid openpgp armored key string.",

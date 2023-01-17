@@ -4,6 +4,43 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.9.0] - 2023-01-18
+### Added
+- PB-21383 As AD I can save the SSO server settings
+- PB-21383 As AD I can disable the SSO server settings
+- PB-21393 As a registered user I can use the SSO feature to sign in to passbolt
+- PB-21400 As LU I can rotate my private key's passphrase and still be able to sign in via SSO
+- PB-21735 As a signed-in administrator in the administrator workspace, I can see the user 
+self registration settings option in the left-side bar
+- PB-21740 As a signed-in administrator I can remove a domain from the user self registration list
+- PB-21767 As AN I want to have the SSO login displayed by default when I have an SSO kit available
+- PB-21768 As AD I want my SSO kit to be generated when saving a new SSO settings if I don't have already one
+- PB-21769 As AN I want to use SSO login from the quickaccess
+- PB-21814 As LU When rotating my passphrase I want to clean my SSO kit on the API
+- PB-21842 As AN I want to have help if I can't remember my passphrase and SSO login is activated
+- PB-21907 As a signed-in on the self registration admin settings form, I want to see the warning message on a row domain even when there are errors on other domains rows
+- PB-21908 As a signed-in administrator on the self registration admin settings form, I should not see an error when I enable the settings which previously were containing error
+- PB-21909 As a signed-in administrator on the self registration admin settings form, I want to see the new row having focus when I click on the add a new row button
+- PB-22006 - As a user finalising my recover I should be able to authenticate with SSO after my first sign out
+
+### Improved
+- PB-21920 As a user I want to use the new PwnedPasswords service when I setup an account, recover an account, change my passphrase or generate a organisation recovery key
+- PB-19793 As a user I want to see a consistent layout while signing-in to passbolt
+- PB-20561 As a user changing my passphrase I would like to see the passphrase field description translated
+- PB-21490 As an administrator I shouldn't see the "save required" banner after saving the SMTP settings
+- PB-20559 As an administrator I want clearer account recovery email notification descriptions relative to administrators
+- PB-21746 As a signed-in user I want to autofill french authentication form using french language as field name
+- PB-15269: As LU I do not want to call the API to find my resources multiple times in a row
+- PB-21612: Refactor fileController into a dedicated service
+- PB-19156: Replace setInterval by alarm in worker::waitExists
+
+### Fixed
+- PB-19649 As a user sharing a resource/folder, I should be able to see the number of users contained in groups search result
+- PB-21443 As a user on the administration section I would like to see the passbolt logo
+- PB-21476 As signed-in user, I want to copy content in my clipboard using passbolt over http
+- PB-22022 Fix height for the svg Passbolt logo
+
+
 ## [3.8.2] - 2022-11-27
 ### Fixed
 PB-21565: As a logged-in user, I should decide to keep my session alive until I sign out
@@ -976,7 +1013,8 @@ PB-19586: Create email notifications actions
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.8.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.9.0...HEAD
+[3.9.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.8.0...v3.9.0
 [3.8.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.3...v3.8.0
 [3.7.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.2...v3.7.3
 [3.7.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.1...v3.7.2

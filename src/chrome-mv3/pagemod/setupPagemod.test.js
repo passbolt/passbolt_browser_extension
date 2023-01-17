@@ -17,11 +17,13 @@ import {SetupEvents} from "../../all/background_page/event/setupEvents";
 import BuildAccountApiClientOptionsService
   from "../../all/background_page/service/account/buildApiClientOptionsService";
 import BuildAccountSetupService from "../../all/background_page/service/setup/buildAccountSetupService";
+import {SecretEvents} from "../../all/background_page/event/secretEvents";
 
 jest.spyOn(BuildAccountSetupService, "buildFromSetupUrl").mockImplementation(jest.fn());
 jest.spyOn(BuildAccountApiClientOptionsService, "build").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(SetupEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(SecretEvents, "listen").mockImplementation(jest.fn());
 
 describe("Setup", () => {
   beforeEach(async() => {
@@ -31,7 +33,7 @@ describe("Setup", () => {
 
   describe("Setup::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(6);
+      expect.assertions(7);
       // data mocked
       const port = {
         _port: {
@@ -49,7 +51,8 @@ describe("Setup", () => {
       expect(BuildAccountApiClientOptionsService.build).toHaveBeenCalled();
       expect(ConfigEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
       expect(SetupEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
-      expect(Setup.events).toStrictEqual([ConfigEvents, SetupEvents]);
+      expect(SecretEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
+      expect(Setup.events).toStrictEqual([ConfigEvents, SetupEvents, SecretEvents]);
       expect(Setup.appName).toBe('Setup');
     });
   });

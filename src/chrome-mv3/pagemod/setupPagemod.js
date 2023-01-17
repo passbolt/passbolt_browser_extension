@@ -17,13 +17,14 @@ import BuildAccountApiClientOptionsService
   from "../../all/background_page/service/account/buildApiClientOptionsService";
 import {SetupEvents} from "../../all/background_page/event/setupEvents";
 import BuildAccountSetupService from "../../all/background_page/service/setup/buildAccountSetupService";
+import {SecretEvents} from "../../all/background_page/event/secretEvents";
 
 class Setup extends Pagemod {
   /**
    * @inheritDoc
    */
   get events() {
-    return [ConfigEvents, SetupEvents];
+    return [ConfigEvents, SetupEvents, SecretEvents];
   }
 
   /**

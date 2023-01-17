@@ -17,6 +17,7 @@ import {RecoverEvents} from "../../all/background_page/event/recoverEvents";
 import BuildAccountRecoverService from "../../all/background_page/service/recover/buildAccountRecoverService";
 import BuildAccountApiClientOptionsService
   from "../../all/background_page/service/account/buildApiClientOptionsService";
+import {SecretEvents} from "../../all/background_page/event/secretEvents";
 
 class Recover extends Pagemod {
   /**
@@ -24,7 +25,7 @@ class Recover extends Pagemod {
    * @returns {[]}
    */
   get events() {
-    return [ConfigEvents, RecoverEvents];
+    return [ConfigEvents, RecoverEvents, SecretEvents];
   }
 
   /**

@@ -210,10 +210,10 @@ const listen = function(worker, account) {
    * @listens passbolt.sso.sign-in-with-azure
    * @param {uuid} requestId The request identifier
    */
-  worker.port.on('passbolt.sso.sign-in-with-azure', async requestId => {
+  worker.port.on('passbolt.sso.sign-in-with-azure', async(requestId, isInQuickaccessMode) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AzureSsoAuthenticationController(worker, requestId, apiClientOptions, account);
-    await controller._exec();
+    await controller._exec(isInQuickaccessMode);
   });
 
   /**

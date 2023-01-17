@@ -19,6 +19,7 @@ import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
 import SsoAzureLoginModel from "../../model/sso/ssoAzureLoginModel";
 import AuthModel from "../../model/auth/authModel";
 import ClientSsoKitNotFoundError from "../../error/clientSsoKitNotFoundError";
+import {QuickAccessService} from "../../service/ui/quickAccess.service";
 
 class AzureSsoAuthenticationController {
   /**
@@ -39,12 +40,13 @@ class AzureSsoAuthenticationController {
   /**
    * Wrapper of exec function to run it with worker.
    *
+   * @param {boolean} isInQuickAccessMode true if the controller has been called from the quickaccess
    * @return {Promise<void>}
    */
-  async _exec() {
+  async _exec(isInQuickAccessMode = false) {
     try {
-      const passphrase = await this.exec();
-      this.worker.port.emit(this.requestId, "SUCCESS", passphrase);
+      await this.exec(isInQuickAccessMode);
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, "ERROR", error);
@@ -54,9 +56,10 @@ class AzureSsoAuthenticationController {
   /**
    * Authenticate the user using Azure as the SSO provider.
    *
+   * @param {boolean} isInQuickAccessMode true if the controller has been called from the quickaccess
    * @return {Promise<void>}
    */
-  async exec() {
+  async exec(isInQuickAccessMode) {
     try {
       const clientPartSsoKit = await SsoDataStorage.get();
       if (!clientPartSsoKit) {
@@ -73,11 +76,32 @@ class AzureSsoAuthenticationController {
       const passphrase = await DecryptSsoPassphraseService.decrypt(clientPartSsoKit.secret, clientPartSsoKit.nek, serverKey, clientPartSsoKit.iv1, clientPartSsoKit.iv2);
       await this.azurePopupHandler.closeHandler();
       await this.authModel.login(passphrase, true);
+      if (isInQuickAccessMode) {
+        await this.ensureRedirectionInQuickaccessMode();
+      }
     } catch (error) {
       console.error("An error occured while handle Azure sign in:", error);
       this.handleSpecificErrors(error);
       throw error;
     }
+  }
+
+  /**
+   * Opens the quickacces in detached mode to ensure the redirection after login is made.
+   * Calling this is only done when signin-in with SSO via the quickaccess.
+   * The reason is to avoid a problem where closing the SSO popup actually closes the quickaccess,
+   * as a consequence, the port is disconnected as well.
+   * What could happen is that the port is disconnected before the `_exec` returns the "SUCCESS" and
+   * the login process stops from the styleguide point of view, makinng it broken somehow
+   * the login wouldn't redirect to ressource workspace neither redirect to MFA if required.
+   * @returns {Promise<void>}
+   */
+  async ensureRedirectionInQuickaccessMode() {
+    const queryParameters = [
+      {name: "uiMode", value: "detached"},
+      {name: "feature", value: "login"}
+    ];
+    await QuickAccessService.openInDetachedMode(queryParameters);
   }
 
   /**

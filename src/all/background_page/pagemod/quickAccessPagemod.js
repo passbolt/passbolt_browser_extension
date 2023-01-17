@@ -9,6 +9,7 @@
 import {Worker as WorkerModel} from "../model/worker";
 import {App as app} from "../app";
 import Worker from "../sdk/worker";
+import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 
 /*
  * This page mod drives the quick access default popup
@@ -35,7 +36,22 @@ class QuickAccess {
     if (port.name === "quickaccess") {
       this._worker = new Worker(port, port.sender.tab);
 
-      app.events.auth.listen(this._worker);
+      /*
+       * Retrieve the account associated with this worker.
+       * @todo This method comes to replace the User.getInstance().get()
+       */
+      let account;
+      try {
+        account = await GetLegacyAccountService.get();
+      } catch (error) {
+        /*
+         * Ensure the application does not crash completely if the legacy account cannot be retrieved.
+         */
+        console.error('quickAccessPagemod::attach legacy account cannot be retrieved, please contact your administrator.');
+        console.error(error);
+      }
+
+      app.events.auth.listen(this._worker, account);
       app.events.config.listen(this._worker);
       app.events.keyring.listen(this._worker);
       app.events.quickAccess.listen(this._worker);

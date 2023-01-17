@@ -85,13 +85,24 @@ class UpdatePrivateKeyController {
    * @returns {Promise<void>}
    */
   async regenerateSsoKit(newPassphrase) {
-    const currentKit = await SsoDataStorage.get();
-    if (currentKit?.id) {
+    let currentKit;
+    try {
+      currentKit = await SsoDataStorage.get();
+    } catch (e) {
+      console.log(e);
+      return;
+    }
+
+    if (!currentKit) {
+      return;
+    }
+
+    if (currentKit.id) {
       try {
         await this.ssoKitServerPartModel.deleteSsoKit(currentKit.id);
       } catch (e) {
-        // we assume that the kit migth have been remove from the server already
-        if (!(e instanceof PassboltApiFetchError)) {
+        // we assume that the kit might have been remove from the server already
+        if (!(e instanceof PassboltApiFetchError && e?.data?.code === 404)) {
           throw e;
         }
       }

@@ -59,6 +59,16 @@ class SsoKitServerPartService extends AbstractService {
     const response = await this.apiClient.create(ssoKitServerPartDto);
     return response.body;
   }
+
+  /**
+   * Delete an SSO kit matching the given ID using the API.
+   * @param {uuid} ssoKitId
+   * @returns {Promise<void>}
+   */
+  async deleteSsoKit(ssoKitId) {
+    this.assertValidId(ssoKitId);
+    await this.apiClient.delete(ssoKitId);
+  }
 }
 
 export default SsoKitServerPartService;

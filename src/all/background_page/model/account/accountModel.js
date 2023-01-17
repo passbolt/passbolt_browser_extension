@@ -14,6 +14,7 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../keyring";
 import User from "../user";
 import ReEncryptPrivateKeyService from "../../service/crypto/reEncryptPrivateKeyService";
+import PrivateKeyMismatchError from "../../error/privateKeyMismatchError";
 
 class AccountModel {
   /**
@@ -58,19 +59,25 @@ class AccountModel {
    * @returns {Promise<string>}
    * @throws {Error} if something went wrong while updating the private passphrase
    */
-  async updatePrivateKey(oldPassphrase, newPassphrase) {
+  async rotatePrivateKeyPassphrase(oldPassphrase, newPassphrase) {
     const privateArmoredKey = this.keyring.findPrivate().armoredKey;
-    try {
-      const privateKey = await OpenpgpAssertion.readKeyOrFail(privateArmoredKey);
-      const reEncryptedPrivateKey = await ReEncryptPrivateKeyService.reEncrypt(privateKey, oldPassphrase, newPassphrase);
-      const reEncryptedArmoredKey = reEncryptedPrivateKey.armor();
-      await this.keyring.importPrivate(reEncryptedArmoredKey);
-      return reEncryptedArmoredKey;
-    } catch (error) {
-      // Rollback to the old passphrase
-      await this.keyring.importPrivate(privateArmoredKey);
-      throw error;
+    const privateKey = await OpenpgpAssertion.readKeyOrFail(privateArmoredKey);
+    const reEncryptedPrivateKey = await ReEncryptPrivateKeyService.reEncrypt(privateKey, oldPassphrase, newPassphrase);
+    return reEncryptedPrivateKey.armor();
+  }
+
+  /**
+   * Update the currently stored private key with the given private key into the local storage.
+   * @param {string} newPrivateArmoredKey armored private key
+   * @returns {Promise<void>}
+   */
+  async updatePrivateKey(newPrivateArmoredKey) {
+    const currentPrivateKey = this.keyring.findPrivate();
+    const newPrivateKey = await OpenpgpAssertion.readKeyOrFail(newPrivateArmoredKey);
+    if (currentPrivateKey.fingerprint.toUpperCase() !== newPrivateKey.getFingerprint().toUpperCase()) {
+      throw new PrivateKeyMismatchError("The private key to import doesn't match the current private key.");
     }
+    await this.keyring.importPrivate(newPrivateArmoredKey);
   }
 }
 

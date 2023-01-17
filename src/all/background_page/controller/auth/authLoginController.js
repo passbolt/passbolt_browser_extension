@@ -17,10 +17,9 @@ import UserAlreadyLoggedInError from "../../error/userAlreadyLoggedInError";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
 import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
 import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
-import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
-import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import Keyring from "../../model/keyring";
 import CheckPassphraseService from "../../service/crypto/checkPassphraseService";
+import UpdateSsoCredentialsService from "../../service/account/updateSsoCredentialsService";
 
 class AuthLoginController {
   /**
@@ -36,6 +35,7 @@ class AuthLoginController {
     this.organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
     this.ssoConfigurationModel = new SsoConfigurationModel(apiClientOptions);
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
+    this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
     this.checkPassphraseService = new CheckPassphraseService(new Keyring());
   }
 
@@ -80,7 +80,7 @@ class AuthLoginController {
      */
     await this.checkPassphraseService.checkPassphrase(passphrase);
     try {
-      await this.generateSsoKitIfNeeded(passphrase);
+      await this.updateSsoCredentialsService.updateSsoKitIfNeeded(passphrase);
     } catch (e) {
       // If something goes wrong we just log the error and do not block the login
       console.error(e);
@@ -92,38 +92,6 @@ class AuthLoginController {
       if (!(error instanceof UserAlreadyLoggedInError)) {
         throw error;
       }
-    }
-  }
-
-  /**
-   * Check if conditions are to met to generate an SSO kit and generates it if needed.
-   *
-   * @param {string} passphrase the passphrase to encrypt for the SSO kit.
-   * @returns {Promise<void>}
-   */
-  async generateSsoKitIfNeeded(passphrase) {
-    const localSsoKit = await SsoDataStorage.get();
-    const organizationSettings = await this.organizationSettingsModel.getOrFind();
-    if (!organizationSettings.isPluginEnabled("sso")) {
-      /*
-       * If the plugin is disabled there is no reason to keep an SSO kit
-       * Plus, if we have an SSO kit locally, the login page will continue display the SSO login
-       */
-      if (localSsoKit) {
-        await SsoDataStorage.flush();
-      }
-      return;
-    }
-
-    const currentSsoConfig = await this.ssoConfigurationModel.getCurrent();
-    if (!currentSsoConfig?.provider && localSsoKit) {
-      /*
-       * if we have a local SSO kit but the plugin is not configured
-       * it means it has been disabled and there is no point to keep it
-       */
-      await SsoDataStorage.flush();
-    } else if (currentSsoConfig?.provider && !localSsoKit) {
-      await GenerateSsoKitService.generate(passphrase, currentSsoConfig.provider);
     }
   }
 }

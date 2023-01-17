@@ -80,6 +80,15 @@ class PassphraseStorageService {
   }
 
   /**
+   * Returns true if the session is set to be kept until the user logs out.
+   * @returns {boolean}
+   */
+  static isSessionKeptUntilLogOut() {
+    // we assume that the event listener is present only when the session is no kept until log out.
+    return !browser.alarms.onAlarm.hasListener(this._handleFlushEvent);
+  }
+
+  /**
    * Removes the stored passphrase from the session memory and resets alarms.
    * @return {Promise<void>}
    */

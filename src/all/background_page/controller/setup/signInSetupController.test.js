@@ -12,12 +12,21 @@
  * @since         3.6.0
  */
 
+import "../../../../../test/mocks/mockSsoDataStorage";
+import "../../../../../test/mocks/mockCryptoKey";
 import {enableFetchMocks} from "jest-fetch-mock";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import SignInSetupController from "./signInSetupController";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
+import MockExtension from "../../../../../test/mocks/mockExtension";
+import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
+import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
+import {withAzureSsoSettings} from "../sso/getCurrentSsoConfigurationController.test.data";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -49,6 +58,47 @@ describe("SignInSetupController", () => {
       expect.assertions(1);
       const promiseInvalidTypeParameter = controller.exec(42);
       await expect(promiseInvalidTypeParameter).rejects.toThrowError("The rememberMe should be a boolean.");
+    }, 10000);
+
+    it("Should throw an exception if the provided passphrase can't decrypt the current private key.", async() => {
+      await MockExtension.withConfiguredAccount();
+      const account = new AccountEntity(defaultAccountDto());
+      const runtimeMemory = {passphrase: "fake passphrase"};
+      const controller = new SignInSetupController(null, null, defaultApiClientOptions(), account, runtimeMemory);
+
+      expect.assertions(1);
+      try {
+        await controller.exec(true);
+      } catch (e) {
+        expect(e).toBeInstanceOf(InvalidMasterPasswordError);
+      }
+    }, 10000);
+
+    /**
+     * @todo: put back when a easier mock implementation of login procedure will be available
+     */
+    it.skip("Should ask for SSO kits generation.", async() => {
+      const organizationSettings = anonymousOrganizationSettings();
+      organizationSettings.passbolt.plugins.sso = {
+        enabled: true
+      };
+      fetch.doMockOnceIf(new RegExp('/settings.json'), () => mockApiResponse(organizationSettings, {servertime: Date.now() / 1000}));
+      fetch.doMockOnceIf(new RegExp('/sso/settings/current.json'), () => mockApiResponse(withAzureSsoSettings()));
+      fetch.doMockOnceIf(new RegExp('/csrf-token.json'), () => mockApiResponse("csrf-token"));
+
+      SsoDataStorage.setMockedData(null);
+
+      jest.spyOn(GenerateSsoKitService, "generate");
+
+      await MockExtension.withConfiguredAccount();
+      const account = new AccountEntity(defaultAccountDto());
+      const runtimeMemory = {passphrase: "ada@passbolt.com"};
+      const controller = new SignInSetupController(null, null, defaultApiClientOptions(), account, runtimeMemory);
+
+      expect.assertions(2);
+      await controller.exec(true);
+      expect(GenerateSsoKitService.generate).toHaveBeenCalledWith("ada@passbolt.com", "azure");
+      expect(GenerateSsoKitService.generate).toHaveBeenCalledTimes(1);
     }, 10000);
   });
 });

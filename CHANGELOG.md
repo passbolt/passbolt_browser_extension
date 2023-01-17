@@ -40,6 +40,20 @@ self registration settings option in the left-side bar
 - PB-21476 As signed-in user, I want to copy content in my clipboard using passbolt over http
 - PB-22022 Fix height for the svg Passbolt logo
 
+### Maintenance
+- PB-19054 Remove the usage of the soon the soon unavailable global “window” object
+- PB-19292 As a user I want file downloads to be compatible with MV3 as well
+- PB-19299 Remove the usage of the soon the soon unavailable global “window” object in the unit tests
+- PB-19309 Remove the usage of the soon the soon unavailable global “window” object in the “Random” crypto helper
+- PB-19586 Refactor administration screen actions components
+- PB-19639 Refactor applications port connection bootstrap
+- PB-19650 Handle MV3 port re-connection
+- PB-19657 Add frameId to the ScriptExecution
+- PB-21370 Reduce repository size
+- PB-21435 Bootstrap MV3 service worker
+- PB-21486 Increase code coverage relative to the SMTP authentication method recently added in the SMTP settings admin screen
+- PB-21911 As a developer I want to know the source (author, url, license) of the src/react-extension/lib/Domain/Domains.js list
+
 
 ## [3.8.2] - 2022-11-27
 ### Fixed

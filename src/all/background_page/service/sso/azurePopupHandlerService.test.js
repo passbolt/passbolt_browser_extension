@@ -20,6 +20,12 @@ import UserClosedSsoPopUpError from "../../error/userClosedSsoPopUpError";
 let currentBrowserTab = null;
 let currentBrowserWindows = null;
 
+const AZURE_SUPPORTED_URLS = [
+  'https://login.microsoftonline.com',
+  'https://login.microsoftonline.us',
+  'https://login.partner.microsoftonline.cn',
+];
+
 beforeAll(() => {
   currentBrowserTab = browser.tabs;
   currentBrowserWindows = browser.windows;
@@ -28,6 +34,8 @@ beforeAll(() => {
   browser.windows = {
     create: jest.fn()
   };
+
+  jest.clearAllMocks();
 });
 
 afterAll(() => {
@@ -48,7 +56,7 @@ describe("AzurePopupHandlerService", () => {
     const userDomain = "https://fakeurl.passbolt.com";
     const ssoToken = uuid();
     const finalUrl = `${userDomain}/sso/login/dry-run/success?token=${ssoToken}`;
-    const thirdPartyUrl = new URL("https://fakeurl.thirdparty.com");
+    const thirdPartyUrl = new URL("https://login.microsoftonline.com");
 
     it("Should return SSO token when navigation is done to a correct URL in dry-run mode", async() => {
       expect.assertions(4);
@@ -182,6 +190,49 @@ describe("AzurePopupHandlerService", () => {
       expect(browser.tabs.onUpdated.removeListener).toHaveBeenCalledWith(expect.any(Function));
       expect(browser.tabs.onRemoved.removeListener).toHaveBeenCalledWith(expect.any(Function));
       expect(browser.tabs.remove).toHaveBeenCalledWith(tabId);
+    });
+
+    it("Should throw an exception if the popupUrl is not an Azure URL", async() => {
+      expect.assertions(1);
+      const tabId = uuid();
+      browser.windows.create.mockImplementation(async() => ({
+        tabs: [{
+          id: tabId
+        }]
+      }));
+
+      const service = new AzurePopupHandlerService(userDomain, true);
+      try {
+        await service.getCodeFromThirdParty(new URL("javascript:console('this would be an XSS')"));
+      } catch (e) {
+        expect(e).toStrictEqual(new Error("Unsupported single sign-on login url"));
+      }
+    });
+
+    it("Should accepy any of the Azure URL", async() => {
+      expect.assertions(AZURE_SUPPORTED_URLS.length);
+      const tabId = uuid();
+      browser.windows.create.mockImplementation(async() => ({
+        tabs: [{
+          id: tabId
+        }]
+      }));
+
+      const service = new AzurePopupHandlerService(userDomain, true);
+
+      for (let i = 0; i < AZURE_SUPPORTED_URLS.length; i++) {
+        const url = new URL(AZURE_SUPPORTED_URLS[i]);
+        service.getCodeFromThirdParty(url);
+
+        await runPendingPromises();
+
+        expect(browser.windows.create).toHaveBeenCalledWith({
+          url: url.toString(),
+          type: "popup",
+          width: expect.any(Number),
+          height: expect.any(Number)
+        });
+      }
     });
   });
 });

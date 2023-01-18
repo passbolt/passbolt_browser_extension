@@ -14,7 +14,7 @@
 import {v4 as uuid} from "uuid";
 import GenerateSsoIvService from "../../../service/crypto/generateSsoIvService";
 
-export const clientSsoKit = async(data = {}) => {
+export const clientSsoKit = (data = {}) => {
   const algorithm = {
     name: "AES-GCM",
     length: 256
@@ -24,7 +24,8 @@ export const clientSsoKit = async(data = {}) => {
     id: uuid(),
     secret: Buffer.from(JSON.stringify("Don't tell everybody, this is a secret")).toString('base64'),
     nek: nek,
-    iv1: await GenerateSsoIvService.generateIv(),
-    iv2: await GenerateSsoIvService.generateIv()
+    iv1: GenerateSsoIvService.generateIv(),
+    iv2: GenerateSsoIvService.generateIv(),
+    provider: "azure"
   }, data);
 };

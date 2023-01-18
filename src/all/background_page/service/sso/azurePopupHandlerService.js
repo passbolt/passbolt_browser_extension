@@ -18,7 +18,7 @@ const AZURE_POPUP_WINDOW_HEIGHT = 600;
 const AZURE_POPUP_WINDOW_WIDTH = 380;
 const DRY_RUN_SSO_LOGIN_SUCCESS_ENDPOINT = "/sso/login/dry-run/success";
 const SSO_LOGIN_SUCCESS_ENDPOINT = "/sso/login/success";
-const SUPPORTED_URLS = [
+const SSO_LOGIN_SUPPORTED_URLS = [
   'https://login.microsoftonline.com',
   'https://login.microsoftonline.us',
   'https://login.partner.microsoftonline.cn',
@@ -122,17 +122,28 @@ class AzurePopupHandlerService {
    * @private
    */
   async openPopup(url) {
+    this.assertSsoLoginUrl(url);
+
     const type = "popup";
     const width = AZURE_POPUP_WINDOW_WIDTH;
     const height = AZURE_POPUP_WINDOW_HEIGHT;
 
-    const isSupportedUrl = SUPPORTED_URLS.some(supportedAzureUrl => url.startsWith(supportedAzureUrl));
+    const windowCreateData = {url, type, width, height};
+    return await browser.windows.create(windowCreateData);
+  }
+
+  /**
+   * Assert that an url is a supported sso login url.
+   * @param {string} url the url for the popup to point at
+   * @throw {Error} If the url is not supported
+   * @return {void}
+   * @private
+   */
+  assertSsoLoginUrl(url) {
+    const isSupportedUrl = SSO_LOGIN_SUPPORTED_URLS.some(supportedUrl => url.startsWith(supportedUrl));
     if (!isSupportedUrl) {
       throw new Error('Unsupported single sign-on login url');
     }
-
-    const windowCreateData = {url, type, width, height};
-    return await browser.windows.create(windowCreateData);
   }
 
   /**

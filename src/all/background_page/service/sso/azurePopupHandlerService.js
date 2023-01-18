@@ -18,6 +18,11 @@ const AZURE_POPUP_WINDOW_HEIGHT = 600;
 const AZURE_POPUP_WINDOW_WIDTH = 380;
 const DRY_RUN_SSO_LOGIN_SUCCESS_ENDPOINT = "/sso/login/dry-run/success";
 const SSO_LOGIN_SUCCESS_ENDPOINT = "/sso/login/success";
+const SUPPORTED_URLS = [
+  'https://login.microsoftonline.com',
+  'https://login.microsoftonline.us',
+  'https://login.partner.microsoftonline.cn',
+];
 
 class AzurePopupHandlerService {
   /**
@@ -120,6 +125,12 @@ class AzurePopupHandlerService {
     const type = "popup";
     const width = AZURE_POPUP_WINDOW_WIDTH;
     const height = AZURE_POPUP_WINDOW_HEIGHT;
+
+    const isSupportedUrl = SUPPORTED_URLS.some(supportedAzureUrl => url.startsWith(supportedAzureUrl));
+    if (!isSupportedUrl) {
+      throw new Error('Unsupported single sign-on login url');
+    }
+
     const windowCreateData = {url, type, width, height};
     return await browser.windows.create(windowCreateData);
   }

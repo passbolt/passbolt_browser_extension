@@ -30,7 +30,6 @@ self registration settings option in the left-side bar
 - PB-21490 As an administrator I shouldn't see the "save required" banner after saving the SMTP settings
 - PB-20559 As an administrator I want clearer account recovery email notification descriptions relative to administrators
 - PB-21746 As a signed-in user I want to autofill french authentication form using french language as field name
-- PB-15269: As LU I do not want to call the API to find my resources multiple times in a row
 - PB-21612: Refactor fileController into a dedicated service
 - PB-19156: Replace setInterval by alarm in worker::waitExists
 

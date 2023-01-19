@@ -6,10 +6,10 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import User from "../model/user";
 import {Worker} from "../model/worker";
 import PageMod from "../sdk/page-mod";
 import PassphraseStorageService from "../service/session_storage/passphraseStorageService";
+import ParseAuthUrlService from "../service/auth/parseAuthUrlService";
 
 const AuthBootstrap = function() {};
 AuthBootstrap._pageMod = undefined;
@@ -30,14 +30,9 @@ AuthBootstrap.init = function() {
    * ✗ https://demoxpassbolt.com/auth/login
    * ✗ https://demo.passbolt.com/auth/login/nope
    */
-  const user = User.getInstance();
-  const escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
-  const url = `^${escapedDomain}/auth/login/?(#.*)?(\\?.*)?$`;
-  const regex = new RegExp(url);
-
   AuthBootstrap._pageMod = new PageMod({
     name: 'AuthBootstrap',
-    include: regex,
+    include: ParseAuthUrlService.regex,
     contentScriptWhen: 'ready',
     contentStyleFile: [
       /*

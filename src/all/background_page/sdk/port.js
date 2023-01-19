@@ -5,105 +5,149 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 import Log from "../model/log";
+import {v4 as uuidv4} from "uuid";
 
-import '../error/error.js';
-const Port = function(port) {
-  this._port = port;
-};
-
-/**
- * On() call a callback for a given message name
- *
- * @param msgName
- * @param callback
- */
-Port.prototype.on = function(msgName, callback) {
-  const _this = this;
-  this._port.onMessage.addListener(json => {
-    const msg = JSON.parse(json);
-    let args = Object.keys(msg).map(key => msg[key]);
-    args = Array.prototype.slice.call(args, 1);
-    if (msg[0] === msgName) {
-      // TODO create list of blacklisted events
-      if (msgName !== 'passbolt.auth.is-authenticated') {
-        Log.write({level: 'debug', message: `Port on @ message: ${msgName}`});
-      }
-      callback.apply(_this, args);
+class Port {
+  /**
+   * Constructor
+   * @param {port} port
+   */
+  constructor(port) {
+    if (!port) {
+      throw Error("A port is required.");
     }
-  });
-};
-
-/**
- * Send a message to the content code
- *
- * @param msgName string
- * @param token uuid
- * @param status SUCCESS | ERROR
- */
-Port.prototype.emit = function() {
-  const message = arguments[1] || arguments[0];
-  Log.write({level: 'debug', message: `Port emit @ message: ${message}`});
-  const args = Array.prototype.slice.call(arguments)
-    .map(arg => (arg && typeof arg.toJSON === "function") ? arg.toJSON() : arg);
-  this._port.postMessage(args);
-};
-
-/**
- * Send a message to the content code
- *
- * @param msgName string
- * @param token uuid
- * @param status SUCCESS | ERROR
- */
-Port.prototype.emitQuiet = function() {
-  const args = Array.prototype.slice.call(arguments)
-    .map(arg => (arg && typeof arg.toJSON === "function") ? arg.toJSON() : arg);
-  this._port.postMessage(args);
-};
-
-/**
- * Send a message to the content code
- *
- * @param {string} message
- */
-Port.prototype.request = async function(message) {
-  Log.write({level: 'debug', message: `Port request @ message: ${arguments[1]}`});
-  // The generated requestId used to identify the request.
-  const requestId = (Math.round(Math.random() * Math.pow(2, 32))).toString();
-  // Add the requestId to the request parameters.
-  const requestArgs = [message, requestId].concat(Array.prototype.slice.call(arguments, 1));
-
-  return new Promise((resolve, reject) => {
-    this.on(requestId, function(status) {
-      const responseArgs = Array.prototype.slice.call(arguments, 1);
-      if (status === 'SUCCESS') {
-        resolve.apply(null, responseArgs);
-      } else if (status === 'ERROR') {
-        reject.apply(null, responseArgs);
-      }
+    this._listeners = {};
+    this._port = port;
+    this._port.onMessage.addListener(msg => {
+      this._onMessage(msg);
     });
-    this.emit.apply(this, requestArgs);
-  });
-};
+  }
 
-/**
- * onDestroyed() called when the port is destroyed
- *
- * @param callback
- */
-Port.prototype.onDisconnect = function(callback) {
-  this._port.onDisconnect.addListener(() => {
-    callback();
-  });
-};
+  /**
+   * When a message is received on the port
+   * Triggers all the callback associated with that message name
+   *
+   * @param json
+   * @private
+   */
+  _onMessage(json) {
+    const msg = JSON.parse(json);
+    const eventName = msg[0];
+    if (Array.isArray(this._listeners[eventName])) {
+      const listeners = this._listeners[eventName];
+      for (let i = 0; i < listeners.length; i++) {
+        const listener = listeners[i];
+        const args = Array.prototype.slice.call(msg, 1);
+        listener.callback.apply(this, args);
+        if (listener.once) {
+          this._listeners[eventName].splice(i, 1);
+          // delete the listener if empty array
+          if (this._listeners[eventName].length === 0) {
+            delete this._listeners[eventName];
+          }
+          i--; // jump back since i++ is the new i
+        }
+      }
+    }
+  }
 
-/**
- * Disconnect the port
- *
- * @return {void}
- */
-Port.prototype.disconnect = function() {
-  this._port.disconnect();
-};
+  /**
+   * Add listener for a message name on the current port
+   *
+   * @param name string
+   * @param callback function
+   * @param once bool
+   * @private
+   */
+  _addListener(name, callback, once) {
+    if (!Array.isArray(this._listeners[name])) {
+      this._listeners[name] = [];
+    }
+    this._listeners[name].push({
+      name: name,
+      callback: callback,
+      once: once
+    });
+  }
+
+  /**
+   * On message name triggers a callback
+   *
+   * @param name
+   * @param callback
+   */
+  on(name, callback) {
+    this._addListener(name, callback, false);
+  }
+
+  /**
+   * On message name triggers a callback only once,
+   * e.g. remove the listener once the message has been received
+   *
+   * @param name
+   * @param callback
+   */
+  once(name, callback) {
+    this._addListener(name, callback, true);
+  }
+
+  /**
+   * Emit a message to the content code
+   * @param requestArgs the arguments
+   */
+  emit(...requestArgs) {
+    const message = JSON.stringify(requestArgs);
+    Log.write({level: 'debug', message: `Port emit @ message: ${message}`});
+    this._port.postMessage(message);
+  }
+
+  /**
+   * Emit a message quiet to the content code
+   * @param requestArgs the arguments
+   */
+  async emitQuiet(...requestArgs) {
+    const message = JSON.stringify(requestArgs);
+    this._port.postMessage(message);
+  }
+
+  /**
+   * Emit a request to the content code and expect a response.
+   * @param message the message
+   * @param args the arguments
+   * @return Promise
+   */
+  request(message, ...args) {
+    // Generate a request id that will be used by the addon to answer this request.
+    const requestId = uuidv4();
+    // Add the requestId to the request parameters.
+    const requestArgs = [message, requestId].concat(args);
+
+    // The promise that is return when you call passbolt.request.
+    return new Promise((resolve, reject) => {
+      /*
+       * Observe when the request has been completed.
+       * Or if a progress notification is sent.
+       */
+      this.once(requestId, (status, ...callbackArgs) => {
+        if (status === 'SUCCESS') {
+          resolve.apply(null, callbackArgs);
+        } else if (status === 'ERROR') {
+          reject.apply(null, callbackArgs);
+        }
+      });
+      // Emit the message to the addon-code.
+      this.emit.apply(this, requestArgs);
+    });
+  }
+
+  /**
+   * Disconnect the port
+   *
+   * @return {void}
+   */
+  disconnect() {
+    this._port.disconnect();
+  }
+}
 
 export default Port;

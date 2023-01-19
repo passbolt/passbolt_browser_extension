@@ -326,7 +326,7 @@ class PageMod {
          * try to post a message in that port
          * If the port is disconnected, an error is thrown.
          */
-        this._ports[tabId].postMessage('passbolt.port.check');
+        this._ports[tabId].postMessage(JSON.stringify('passbolt.port.check'));
         /*
          * If there is not error it means there is already a content script running
          * and we do not need to include it a second time

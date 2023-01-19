@@ -65,12 +65,13 @@ class Port {
    * When a message is received on the port
    * Triggers all the callback associated with that message name
    *
-   * @param msg
+   * @param json
    * @private
    */
-  _onMessage(msg) {
+  _onMessage(json) {
+    const msg = JSON.parse(json);
     const eventName = msg[0];
-    if (typeof this._listeners[eventName] !== 'undefined' && this._listeners[eventName].length > 0) {
+    if (Array.isArray(this._listeners[eventName])) {
       const listeners = this._listeners[eventName];
       for (let i = 0; i < listeners.length; i++) {
         const listener = listeners[i];
@@ -97,7 +98,7 @@ class Port {
    * @private
    */
   _addListener(name, callback, once) {
-    if (typeof this._listeners[name] === 'undefined') {
+    if (!Array.isArray(this._listeners[name])) {
       this._listeners[name] = [];
     }
     this._listeners[name].push({

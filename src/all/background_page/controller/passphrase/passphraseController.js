@@ -98,7 +98,7 @@ const listenToDetachedQuickaccessPassphraseRequestResponse = async function(requ
       }
     });
     // If the users closes the window manually before entering their passphrase, the operation is aborted.
-    quickAccessWorker.port.onDisconnect(() => {
+    quickAccessWorker.port._port.onDisconnect.addListener(() => {
       if (!isResolved) {
         isResolved = true;
         const error = new UserAbortsOperationError("The dialog has been closed.");

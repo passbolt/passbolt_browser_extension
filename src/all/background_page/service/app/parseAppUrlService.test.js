@@ -101,29 +101,33 @@ describe("ParseAppUrlService", () => {
         url: "/passwords",
       },
       {
+        scenario: "Wrong protocol",
+        url: "http://passbolt.dev",
+      },
+      {
         scenario: "Not a domain allowed",
         url: "https://passbolt.io/passwords",
       },
       {
         scenario: "Original domain as subdomain attack",
-        url: "https://passbolt.dev.attacker.com",
-        domain: domain
+        url: "https://passbolt.dev.attacker.com"
       },
       {
         scenario: "Subdomain attack",
-        url: "https://attack.passbolt.dev",
-        domain: domain
+        url: "https://attack.passbolt.dev"
       },
       {
         scenario: "Regex wild mark attack",
-        url: "https://passboltxdev",
-        domain: domain
+        url: "https://passboltxdev"
       },
       {
         scenario: "Non application entry point",
-        url: "https://passbolt.dev/auth/login",
-        domain: domain
-      }
+        url: "https://passbolt.dev/auth/login"
+      },
+      {
+        scenario: "Domain look alike as hash attack",
+        url: `https://www.attacker.com#${domain}`
+      },
     ]).describe("should not parse", _props => {
       it(`should not parse: ${_props.scenario}`, () => {
         expect.assertions(1);

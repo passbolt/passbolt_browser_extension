@@ -7,6 +7,12 @@ tester:
   stage: test
   image: node:16
   coverage: /Lines\s* [:] ([\d\.]+)%/
+  rules:
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH
   script:
     - npm ci
     - npm run test:coverage
@@ -22,6 +28,25 @@ tester:
 linter:
   stage: test
   image: node:16
+  rules:
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH
   script:
     - npm ci
     - npm run eslint
+
+build:
+  stage: test
+  image: node:16
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_BRANCH == "release"
+    - if: $CI_COMMIT_BRANCH == "develop"
+  script:
+    - npm ci
+    - npx grunt build

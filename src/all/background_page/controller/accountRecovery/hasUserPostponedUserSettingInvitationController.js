@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import PostponedUserSettingInvitationService from "../../service/accountRecovery/postponedUserSettingInvitationService";
 
+import PostponedUserSettingInvitationService from '../../service/api/invitation/postponedUserSettingInvitationService';
 
 class HasUserPostponedUserSettingInvitationController {
   /**
@@ -43,7 +43,7 @@ class HasUserPostponedUserSettingInvitationController {
    * Check if the user has postponed the account recovery enrollment invitation.
    */
   exec() {
-    return PostponedUserSettingInvitationService.hasPostponed();
+    return PostponedUserSettingInvitationService.hasPostponedAccountRecovery();
   }
 }
 

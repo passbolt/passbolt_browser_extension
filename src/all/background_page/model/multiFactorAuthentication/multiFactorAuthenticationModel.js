@@ -13,6 +13,7 @@
 import UserLocalStorage from "../../service/local_storage/userLocalStorage";
 import MultiFactorAuthenticationService from "../../service/api/multiFactorAuthentication/multiFactorAuthenticationService";
 import UserEntity from "../entity/user/userEntity";
+import MultiFactorAuthenticationPolicyService from '../../service/api/multiFactorAuthentication/multiFactorAuthenticationPolicyService';
 
 
 class MultiFactorAuthenticationModel {
@@ -24,6 +25,7 @@ class MultiFactorAuthenticationModel {
    */
   constructor(apiClientOptions) {
     this.multiFactorAuthenticationService = new MultiFactorAuthenticationService(apiClientOptions);
+    this.multiFactorAuthenticationPolicyService = new MultiFactorAuthenticationPolicyService(apiClientOptions);
   }
 
   /**
@@ -41,6 +43,16 @@ class MultiFactorAuthenticationModel {
       const userEntity = new UserEntity(userDto);
       await UserLocalStorage.updateUser(userEntity);
     }
+  }
+
+  async getPolicy() {
+    const setting = await this.multiFactorAuthenticationPolicyService.find();
+    return setting.body.policy;
+  }
+
+  async getMfaSettings() {
+    const setting = await this.multiFactorAuthenticationService.getSettings();
+    return setting.body.MfaAccountSettings;
   }
 }
 

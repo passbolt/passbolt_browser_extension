@@ -92,6 +92,7 @@ App.init = function() {
       app.events.passwordGenerator.listen(worker);
       app.events.mobile.listen(worker);
       app.events.clipboard.listen(worker);
+      app.events.mfaPolicy.listen(worker);
 
       Worker.add('App', worker);
     }

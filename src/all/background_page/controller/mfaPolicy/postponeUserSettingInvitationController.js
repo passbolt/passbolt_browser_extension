@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
 import PostponedUserSettingInvitationService from '../../service/api/invitation/postponedUserSettingInvitationService';
 
-class PostponeUserSettingInvitationController {
+
+class PostponeUserSettingMFAInvitationController {
   /**
-   * PostponeUserSettingInvitationController constructor
+   * PostponeUserSettingMFAInvitationController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    */
@@ -40,11 +40,11 @@ class PostponeUserSettingInvitationController {
   }
 
   /**
-   * Set the account recovery enrollement inviration as postponed.
+   * Set the MFA Policy enrollement inviration as postponed.
    */
   async exec() {
-    PostponedUserSettingInvitationService.postponeAccountRecovery();
+    PostponedUserSettingInvitationService.postponeMFAPolicy();
   }
 }
 
-export default PostponeUserSettingInvitationController;
+export default PostponeUserSettingMFAInvitationController;

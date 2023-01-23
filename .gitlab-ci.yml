@@ -48,5 +48,7 @@ build:
     - if: $CI_COMMIT_BRANCH == "release"
     - if: $CI_COMMIT_BRANCH == "develop"
   script:
+    - apt-get update
+    - apt-get install zip
     - npm ci
     - npx grunt build

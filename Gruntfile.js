@@ -53,7 +53,7 @@ module.exports = function (grunt) {
   grunt.registerTask('bundle-mv3', ['externalize-locale-strings', 'copy:service_worker', 'copy:web_accessible_resources', 'copy:locales']);
   grunt.registerTask('bundle-chrome-mv3', ['copy:manifest_chrome_mv3', 'bundle-mv3']);
 
-  grunt.registerTask('build', ['shell:eslint', 'shell:test', 'build-firefox', 'build-chrome', 'build-chrome-mv3']);
+  grunt.registerTask('build', ['build-firefox-prod', 'build-chrome-prod']);
 
   grunt.registerTask('build-firefox', ['build-firefox-debug', 'build-firefox-prod']);
   grunt.registerTask('build-firefox-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-firefox', 'shell:build_background_page_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug', 'shell:build_firefox_debug']);

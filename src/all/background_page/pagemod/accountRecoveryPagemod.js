@@ -32,7 +32,7 @@ AccountRecovery.init = function() {
 
   AccountRecovery._pageMod = new PageMod({
     name: 'AccountRecovery',
-    include: 'about:blank?passbolt=passbolt-iframe-account-recovery',
+    include: 'about:blank?passbolt=passbolt-iframe-accountrecovery',
     contentScriptWhen: 'ready',
     contentScriptFile: [
       /*

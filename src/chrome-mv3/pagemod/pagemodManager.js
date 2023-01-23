@@ -26,6 +26,8 @@ import PublicWebsiteSignInPagemod from "./publicWebsiteSignInPagemod";
 import QuickAccessPagemod from "./quickAccessPagemod";
 import InFormCallToActionPagemod from "./informCallToActionPagemod";
 import InFormMenuPagemod from "./informMenuPagemod";
+import AccountRecoveryBootstrapPagemod from "./accountRecoveryBootstrapPagemod";
+import AccountRecoveryPagemod from "./accountRecoveryPagemod";
 
 /**
  * The pagemod manager have the role of dispatching the process to the correct pagemod
@@ -47,7 +49,9 @@ class PagemodManager {
       PublicWebsiteSignInPagemod,
       QuickAccessPagemod,
       InFormCallToActionPagemod,
-      InFormMenuPagemod
+      InFormMenuPagemod,
+      AccountRecoveryBootstrapPagemod,
+      AccountRecoveryPagemod
     ];
     this.exec = this.exec.bind(this);
   }

@@ -15,7 +15,6 @@ import "../../../../../test/mocks/mockSsoDataStorage";
 import "../../../../../test/mocks/mockCryptoKey";
 import {enableFetchMocks} from "jest-fetch-mock";
 import each from "jest-each";
-import {App as app} from "../../app";
 import User from "../../model/user";
 import Keyring from "../../model/keyring";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
@@ -32,6 +31,10 @@ import {
 import AccountLocalStorage from "../../service/local_storage/accountLocalStorage";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import WebIntegration from "../../pagemod/webIntegrationPagemod";
+import AuthBootstrap from "../../pagemod/authBootstrapPagemod";
+import PublicWebsiteSignIn from "../../pagemod/publicWebsiteSignInPagemod";
+import browser from "../../sdk/polyfill/browserPolyfill";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
@@ -66,9 +69,11 @@ describe("RecoverAccountController", () => {
       // Mock API organisation settings
       mockOrganisationSettings();
       // Mock pagemods to assert the complete start the auth and inform menu pagemods.
-      app.pageMods.WebIntegration.init = jest.fn();
-      app.pageMods.AuthBootstrap.init = jest.fn();
-      app.pageMods.PublicWebsiteSignIn.init = jest.fn();
+      WebIntegration.init = jest.fn();
+      AuthBootstrap.init = jest.fn();
+      PublicWebsiteSignIn.init = jest.fn();
+      // Mock the chrome locale
+      jest.spyOn(browser.runtime, 'getManifest').mockImplementationOnce(() => ({manifest_version: 2}));
 
       const controller = new RecoverAccountController(null, null, apiClientOptions, accountRecovery);
       await controller.exec(passphrase);
@@ -96,9 +101,9 @@ describe("RecoverAccountController", () => {
       expect(userPublicKeyFingerprint).toStrictEqual(keyringPrivateKeyFingerprint);
 
       // The auth and web integration pagemods should have been initialized.
-      expect(app.pageMods.WebIntegration.init).toHaveBeenCalled();
-      expect(app.pageMods.AuthBootstrap.init).toHaveBeenCalled();
-      expect(app.pageMods.PublicWebsiteSignIn.init).toHaveBeenCalled();
+      expect(WebIntegration.init).toHaveBeenCalled();
+      expect(AuthBootstrap.init).toHaveBeenCalled();
+      expect(PublicWebsiteSignIn.init).toHaveBeenCalled();
 
       // The account recovery should been removed from the account local storage.
       expect(await AccountLocalStorage.get()).toHaveLength(0);
@@ -180,9 +185,9 @@ describe("RecoverAccountController", () => {
       // Mock configured SSO settings
       fetch.doMockOnce(() => mockApiResponse({provider: expetedProvider}));
       // Mock pagemods to assert the complete start the auth and inform menu pagemods.
-      app.pageMods.WebIntegration.init = jest.fn();
-      app.pageMods.AuthBootstrap.init = jest.fn();
-      app.pageMods.PublicWebsiteSignIn.init = jest.fn();
+      WebIntegration.init = jest.fn();
+      AuthBootstrap.init = jest.fn();
+      PublicWebsiteSignIn.init = jest.fn();
 
       jest.spyOn(GenerateSsoKitService, "generate");
 
@@ -206,9 +211,9 @@ describe("RecoverAccountController", () => {
       // Mock API organisation settings
       mockOrganisationSettings();
       // Mock pagemods to assert the complete start the auth and inform menu pagemods.
-      app.pageMods.WebIntegration.init = jest.fn();
-      app.pageMods.AuthBootstrap.init = jest.fn();
-      app.pageMods.PublicWebsiteSignIn.init = jest.fn();
+      WebIntegration.init = jest.fn();
+      AuthBootstrap.init = jest.fn();
+      PublicWebsiteSignIn.init = jest.fn();
 
       jest.spyOn(GenerateSsoKitService, "generate");
 

@@ -12,7 +12,8 @@
  * @since         3.6.0
  */
 
-let isInvitationPostponed = false;
+let isInvitationAccountRecoveryPostponed = false;
+let isInvitationMFAPolicyPostponed = false;
 
 class PostponedUserSettingInvitationService {
   /**
@@ -20,22 +21,39 @@ class PostponedUserSettingInvitationService {
    *
    * @returns {bool}
    */
-  static hasPostponed() {
-    return isInvitationPostponed;
+  static hasPostponedAccountRecovery() {
+    return isInvitationAccountRecoveryPostponed;
   }
 
   /**
-   * Set the account recovery enrollement inviration as postponed.
+   * Returns true if the user has postponned the mfa policy enrollment invitation.
+   *
+   * @returns {bool}
    */
-  static postpone() {
-    isInvitationPostponed = true;
+  static hasPostponedMFAPolicy() {
+    return isInvitationMFAPolicyPostponed;
   }
 
   /**
-   * Set the account recovery enrollement inviration to its default value.
+   * Set the account recovery enrollement invitation as postponed.
+   */
+  static postponeAccountRecovery() {
+    isInvitationAccountRecoveryPostponed = true;
+  }
+
+  /**
+   * Set the MFA policy enrollement invitation as postponed.
+   */
+  static postponeMFAPolicy() {
+    isInvitationMFAPolicyPostponed = true;
+  }
+
+  /**
+   * Set the enrollement invitation to its default value.
    */
   static reset() {
-    isInvitationPostponed = false;
+    isInvitationAccountRecoveryPostponed = false;
+    isInvitationMFAPolicyPostponed = false;
   }
 
   /**

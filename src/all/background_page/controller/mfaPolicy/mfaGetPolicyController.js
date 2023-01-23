@@ -9,30 +9,31 @@
  * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.6.0
+ * @since         3.10.0
  */
 
-import PostponedUserSettingInvitationService from '../../service/api/invitation/postponedUserSettingInvitationService';
+import MultiFactorAuthenticationModel from '../../model/multiFactorAuthentication/multiFactorAuthenticationModel';
 
-class PostponeUserSettingInvitationController {
+class MfaGetPolicyController {
   /**
-   * PostponeUserSettingInvitationController constructor
+   * MfaGetPolicyController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    */
-  constructor(worker, requestId) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
+    this.multiFactorAuthenticationModel = new MultiFactorAuthenticationModel(apiClientOptions);
   }
 
   /**
    * Controller executor.
-   * @returns {Promise<bool>}
+   * @returns {Promise<string>}
    */
   async _exec() {
     try {
-      this.exec();
-      this.worker.port.emit(this.requestId, "SUCCESS");
+      const policy = await this.exec();
+      this.worker.port.emit(this.requestId, "SUCCESS", policy);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, 'ERROR', error);
@@ -40,11 +41,11 @@ class PostponeUserSettingInvitationController {
   }
 
   /**
-   * Set the account recovery enrollement inviration as postponed.
+   * retrieve the MFA Policy.
    */
-  async exec() {
-    PostponedUserSettingInvitationService.postponeAccountRecovery();
+  exec() {
+    return this.multiFactorAuthenticationModel.getPolicy();
   }
 }
 
-export default PostponeUserSettingInvitationController;
+export default MfaGetPolicyController;

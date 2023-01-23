@@ -25,9 +25,9 @@ import ToolbarController from "./controller/toolbarController";
 import {App} from "./app";
 import Log from "./model/log";
 import {Config} from "./model/config";
-import PostponedUserSettingInvitationService from "./service/accountRecovery/postponedUserSettingInvitationService";
 import PassphraseStorageService from "./service/session_storage/passphraseStorageService";
 import SsoKitTemporaryStorageService from "./service/session_storage/ssoKitTemporaryStorageService";
+import PostponedUserSettingInvitationService from './service/api/invitation/postponedUserSettingInvitationService';
 
 const main = async function() {
   /*

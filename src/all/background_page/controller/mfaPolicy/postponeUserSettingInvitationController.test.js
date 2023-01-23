@@ -12,21 +12,17 @@
  * @since         3.6.0
  */
 
-import HasUserPostponedUserSettingInvitationController from "./hasUserPostponedUserSettingInvitationController";
 import PostponedUserSettingInvitationService from '../../service/api/invitation/postponedUserSettingInvitationService';
+import PostponeUserSettingMFAInvitationController from './postponeUserSettingInvitationController';
 
-describe("HasUserPostponedUserSettingInvitationController", () => {
-  it("can get the account recovery enrollment invitation status", () => {
+describe("PostponeUserSettingMFAInvitationController", () => {
+  it("can set the MFA Policy enrollment invitation as postponed", () => {
     expect.assertions(2);
-    const controller = new HasUserPostponedUserSettingInvitationController();
-    const defaultValue = controller.exec();
+    expect(PostponedUserSettingInvitationService.hasPostponedMFAPolicy()).toBe(false);
 
-    expect(defaultValue).toBe(false);
+    const controller = new PostponeUserSettingMFAInvitationController();
+    controller.exec();
 
-    PostponedUserSettingInvitationService.postponeAccountRecovery();
-
-    const setValue = controller.exec();
-    expect(setValue).toBe(true);
+    expect(PostponedUserSettingInvitationService.hasPostponedMFAPolicy()).toBe(true);
   });
 });
-

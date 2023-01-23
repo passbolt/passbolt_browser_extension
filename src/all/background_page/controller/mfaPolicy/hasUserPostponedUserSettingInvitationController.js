@@ -9,14 +9,14 @@
  * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.6.0
+ * @since         3.10.0
  */
 
 import PostponedUserSettingInvitationService from '../../service/api/invitation/postponedUserSettingInvitationService';
 
-class PostponeUserSettingInvitationController {
+class HasUserPostponedUserSettingInvitationMFAPolicyController {
   /**
-   * PostponeUserSettingInvitationController constructor
+   * HasUserPostponedUserSettingInvitationMFAPolicyController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    */
@@ -31,8 +31,8 @@ class PostponeUserSettingInvitationController {
    */
   async _exec() {
     try {
-      this.exec();
-      this.worker.port.emit(this.requestId, "SUCCESS");
+      const hasPostponedInvitation = await this.exec();
+      this.worker.port.emit(this.requestId, "SUCCESS", hasPostponedInvitation);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, 'ERROR', error);
@@ -40,11 +40,11 @@ class PostponeUserSettingInvitationController {
   }
 
   /**
-   * Set the account recovery enrollement inviration as postponed.
+   * Check if the user has postponed the MFA Policy enrollment invitation.
    */
-  async exec() {
-    PostponedUserSettingInvitationService.postponeAccountRecovery();
+  exec() {
+    return PostponedUserSettingInvitationService.hasPostponedMFAPolicy();
   }
 }
 
-export default PostponeUserSettingInvitationController;
+export default HasUserPostponedUserSettingInvitationMFAPolicyController;

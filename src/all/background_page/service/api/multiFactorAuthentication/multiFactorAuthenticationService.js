@@ -49,6 +49,19 @@ class MultiFactorAuthenticationService extends AbstractService {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/${userId}`);
     return this.apiClient.fetchAndHandleResponse('DELETE', url);
   }
+
+  /**
+   * retrieve settings from the user
+   *
+   * @returns {Promise<*>} Response body
+   * @throw {TypeError} if user id is not a valid uuid
+   * @throw {ApiFetchError} if mfa for the user cannot be disabled
+   * @public
+   */
+  async getSettings() {
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/select`);
+    return this.apiClient.fetchAndHandleResponse('GET', url);
+  }
 }
 
 export default MultiFactorAuthenticationService;

@@ -71,6 +71,7 @@ import InFormCallToAction from "./pagemod/inFormCallToActionPagemod";
 import InFormMenu from "./pagemod/informMenuPagemod";
 import PublicWebsiteSignIn from "./pagemod/publicWebsiteSignInPagemod";
 import Recover from "./pagemod/recoverPagemod";
+import {MfaEvents} from './event/mfaEvents';
 
 const events = {};
 events.app = AppEvents;
@@ -108,6 +109,7 @@ events.informCallToAction = InformCallToActionEvents;
 events.informMenu = InformMenuEvents;
 events.webIntegration = WebIntegrationEvents;
 events.publicWebsiteSignIn = PublicWebsiteSignInEvents;
+events.mfaPolicy = MfaEvents;
 events.clipboard = ClipboardEvents;
 
 /*

@@ -12,17 +12,17 @@
  * @since         3.6.0
  */
 
-import PostponedUserSettingInvitationService from "../../service/accountRecovery/postponedUserSettingInvitationService";
 import PostponeUserSettingInvitationController from "./postponeUserSettingInvitationController";
+import PostponedUserSettingInvitationService from '../../service/api/invitation/postponedUserSettingInvitationService';
 
 describe("PostponeUserSettingInvitationController", () => {
   it("can set the account recovery enrollment invitation as postponed", () => {
     expect.assertions(2);
-    expect(PostponedUserSettingInvitationService.hasPostponed()).toBe(false);
+    expect(PostponedUserSettingInvitationService.hasPostponedAccountRecovery()).toBe(false);
 
     const controller = new PostponeUserSettingInvitationController();
     controller.exec();
 
-    expect(PostponedUserSettingInvitationService.hasPostponed()).toBe(true);
+    expect(PostponedUserSettingInvitationService.hasPostponedAccountRecovery()).toBe(true);
   });
 });

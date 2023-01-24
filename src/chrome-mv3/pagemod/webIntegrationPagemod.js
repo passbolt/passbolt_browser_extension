@@ -17,6 +17,8 @@ import {ConfigEvents} from "../../all/background_page/event/configEvents";
 import {WebIntegrationEvents} from "../../all/background_page/event/webIntegrationEvents";
 import {OrganizationSettingsEvents} from "../../all/background_page/event/organizationSettingsEvents";
 import {PortEvents} from "../../all/background_page/event/portEvents";
+import ParseWebIntegrationUrlService
+  from "../../all/background_page/service/webIntegration/parseWebIntegrationUrlService";
 
 class WebIntegration extends Pagemod {
   /**
@@ -58,10 +60,7 @@ class WebIntegration extends Pagemod {
   assertUrlAttachConstraint(frameDetails) {
     const user = User.getInstance();
     if (user.isValid()) {
-      const escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
-      const url = `^(?!(${escapedDomain}|chrome:|about:)).*$`;
-      const regex = new RegExp(url);
-      return regex.test(frameDetails.url);
+      return ParseWebIntegrationUrlService.test(frameDetails.url);
     }
     return false;
   }

@@ -32,7 +32,7 @@ class PortManager {
     if (await this.isQuickAccessPort(port.sender)) {
       await this.registerAndAttachEvent(port, "QuickAccess");
     } else {
-      await this.connectPortFromTab(port)
+      await this.connectPortFromTab(port);
     }
   }
 

@@ -14,6 +14,7 @@
 import Pagemod from "./pagemod";
 import User from "../../all/background_page/model/user";
 import {PortEvents} from "../../all/background_page/event/portEvents";
+import ParseAuthUrlService from "../../all/background_page/service/auth/parseAuthUrlService";
 
 class AuthBootstrap extends Pagemod {
   /**
@@ -65,10 +66,7 @@ class AuthBootstrap extends Pagemod {
   assertUrlAttachConstraint(frameDetails) {
     const user = User.getInstance();
     if (user.isValid()) {
-      const escapedDomain = user.settings.getDomain().replace(/\W/g, "\\$&");
-      const url = `^${escapedDomain}/auth/login/?(#.*)?(\\?.*)?$`;
-      const regex = new RegExp(url);
-      return regex.test(frameDetails.url);
+      return ParseAuthUrlService.test(frameDetails.url);
     }
     return false;
   }

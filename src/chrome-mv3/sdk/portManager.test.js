@@ -40,7 +40,7 @@ describe("PortManager", () => {
       expect(PortManager._ports[workerDto.id]).toBeDefined();
       expect(PortManager._ports[workerDto.id]._port).toBe(port);
       expect(PagemodManager.attachEventToPort).toHaveBeenCalledWith(PortManager._ports[workerDto.id], workerDto.name);
-      expect(port.postMessage).toHaveBeenCalledWith(['passbolt.port.ready']);
+      expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify(['passbolt.port.ready']));
     });
 
     it("Should connect new port if it is the quick access", async() => {
@@ -59,7 +59,7 @@ describe("PortManager", () => {
       expect(PortManager._ports[port.name]).toBeDefined();
       expect(PortManager._ports[port.name]._port).toBe(port);
       expect(PagemodManager.attachEventToPort).toHaveBeenCalledWith(PortManager._ports[port.name], "QuickAccess");
-      expect(port.postMessage).toHaveBeenCalledWith(['passbolt.port.ready']);
+      expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify(['passbolt.port.ready']));
     });
 
     it("Should not connect new port if it is not in the workersSessionStorage", async() => {

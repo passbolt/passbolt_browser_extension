@@ -30,12 +30,12 @@ class SsoDryRunModel {
   /**
    * Get the URL to process a dry-run.
    * @param {string} providerId the provider identifier
-   * @param {uuid} ssoConfigurationId the sso draft configuration id
+   * @param {uuid} ssoSettingsId the sso draft settings id
    * @returns {Promise<URL>}
    */
-  async getUrl(providerId, ssoConfigurationId) {
+  async getUrl(providerId, ssoSettingsId) {
     const dryRunDto = {
-      sso_settings_id: ssoConfigurationId
+      sso_settings_id: ssoSettingsId
     };
     const dryRunUrl = await this.ssoDryRunService.getUrl(providerId, dryRunDto);
     return new URL(dryRunUrl);

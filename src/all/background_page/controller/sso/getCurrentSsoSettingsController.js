@@ -1,3 +1,4 @@
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
@@ -11,32 +12,30 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
-import Validator from "validator";
+import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
 
-class DeleteSsoConfigurationController {
+class GetCurrentSsoSettingsController {
   /**
-   * DeleteSsoConfigurationController constructor
+   * GetCurrentSsoSettingsController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
-   * @param {ApiClientOptions} apiClientOptions
    */
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.ssoConfigurationModel = new SsoConfigurationModel(apiClientOptions);
+    this.ssoSettingsModel = new SsoSettingsModel(apiClientOptions);
   }
 
   /**
    * Wrapper of exec function to run it with worker.
    *
-   * @param {uuid} ssoConfigurationId the SSO configuration to delete
+   * @param {uuid} draftSsoSettingsId the draft sso settings id
    * @return {Promise<void>}
    */
-  async _exec(ssoConfigurationId) {
+  async _exec() {
     try {
-      await this.exec(ssoConfigurationId);
-      this.worker.port.emit(this.requestId, "SUCCESS");
+      const ssoSettings = await this.exec();
+      this.worker.port.emit(this.requestId, "SUCCESS", ssoSettings);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, "ERROR", error);
@@ -44,17 +43,14 @@ class DeleteSsoConfigurationController {
   }
 
   /**
-   * Delete the SSO configuration matching the given id.
+   * Returns the current active SSO settings registered from the API.
    *
-   * @param {uuid} ssoConfigurationId the SSO configuration to delete
-   * @return {Promise<void>}
+   * @return {Promise<SsoSettingsEntity>}
    */
-  async exec(ssoConfigurationId) {
-    if (!Validator.isUUID(ssoConfigurationId)) {
-      throw new Error("A valid SSO settings id is required.");
-    }
-    await this.ssoConfigurationModel.delete(ssoConfigurationId);
+  async exec() {
+    const contains = {data: true};
+    return this.ssoSettingsModel.getCurrent(contains);
   }
 }
 
-export default DeleteSsoConfigurationController;
+export default GetCurrentSsoSettingsController;

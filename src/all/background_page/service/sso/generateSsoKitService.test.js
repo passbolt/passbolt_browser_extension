@@ -14,7 +14,7 @@
 import "../../../../../test/mocks/mockSsoDataStorage";
 import "../../../../../test/mocks/mockCryptoKey";
 import SsoDataStorage from "../indexedDB_storage/ssoDataStorage";
-import {withAzureSsoSettings} from "../../controller/sso/getCurrentSsoConfigurationController.test.data";
+import {withAzureSsoSettings} from "../../controller/sso/getCurrentSsoSettingsController.test.data";
 import GenerateSsoKitService from "./generateSsoKitService";
 import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";

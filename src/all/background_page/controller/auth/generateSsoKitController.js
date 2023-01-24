@@ -14,7 +14,6 @@
 
 import AuthModel from "../../model/auth/authModel";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
-import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import {PassphraseController} from "../passphrase/passphraseController";
@@ -31,7 +30,6 @@ class GenerateSsoKitController {
     this.requestId = requestId;
     this.authModel = new AuthModel(apiClientOptions);
     this.organizationSettingsModel = new GenerateSsoKitService(apiClientOptions);
-    this.ssoConfigurationModel = new SsoConfigurationModel(apiClientOptions);
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
   }
 

@@ -15,7 +15,6 @@
 import AuthModel from "../../model/auth/authModel";
 import UserAlreadyLoggedInError from "../../error/userAlreadyLoggedInError";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
-import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
 import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 import Keyring from "../../model/keyring";
 import CheckPassphraseService from "../../service/crypto/checkPassphraseService";
@@ -33,7 +32,6 @@ class AuthLoginController {
     this.requestId = requestId;
     this.authModel = new AuthModel(apiClientOptions);
     this.organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
-    this.ssoConfigurationModel = new SsoConfigurationModel(apiClientOptions);
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
     this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
     this.checkPassphraseService = new CheckPassphraseService(new Keyring());

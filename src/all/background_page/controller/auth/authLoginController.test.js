@@ -23,7 +23,7 @@ import AuthLoginController from "./authLoginController";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultEmptySettings, withAzureSsoSettings} from "../sso/getCurrentSsoConfigurationController.test.data";
+import {defaultEmptySettings, withAzureSsoSettings} from "../sso/getCurrentSsoSettingsController.test.data";
 import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
 
 const mockLogin = jest.fn();

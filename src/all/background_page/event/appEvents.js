@@ -25,10 +25,10 @@ import HasUserPostponedUserSettingInvitationController from "../controller/accou
 import PostponeUserSettingInvitationController from "../controller/accountRecovery/postponeUserSettingInvitationController";
 import FileService from "../service/file/fileService";
 import TestAzureSsoAuthenticationController from "../controller/sso/testAzureSsoAuthenticationController";
-import GetCurrentSsoConfigurationController from "../controller/sso/getCurrentSsoConfigurationController";
-import SaveSsoConfigurationAsDraftController from "../controller/sso/saveSsoConfigurationAsDraftController";
-import ActivateSsoConfigurationController from "../controller/sso/activateSsoConfigurationController";
-import DeleteSsoConfigurationController from "../controller/sso/deleteSsoConfigurationController";
+import GetCurrentSsoSettingsController from "../controller/sso/getCurrentSsoSettingsController";
+import SaveSsoSettingsAsDraftController from "../controller/sso/saveSsoSettingsAsDraftController";
+import ActivateSsoSettingsController from "../controller/sso/activateSsoSettingsController";
+import DeleteSsoSettingsController from "../controller/sso/deleteSsoSettingsController";
 import GenerateSsoKitController from "../controller/auth/generateSsoKitController";
 
 const listen = function(worker, account) {
@@ -127,14 +127,14 @@ const listen = function(worker, account) {
 
   worker.port.on('passbolt.sso.get-current', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new GetCurrentSsoConfigurationController(worker, requestId, apiClientOptions);
+    const controller = new GetCurrentSsoSettingsController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
-  worker.port.on('passbolt.sso.save-draft', async(requestId, draftSsoConfiguration) => {
+  worker.port.on('passbolt.sso.save-draft', async(requestId, draftSsoSettings) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new SaveSsoConfigurationAsDraftController(worker, requestId, apiClientOptions);
-    await controller._exec(draftSsoConfiguration);
+    const controller = new SaveSsoSettingsAsDraftController(worker, requestId, apiClientOptions);
+    await controller._exec(draftSsoSettings);
   });
 
   worker.port.on('passbolt.sso.test.azure', async(requestId, draftId) => {
@@ -145,14 +145,14 @@ const listen = function(worker, account) {
 
   worker.port.on('passbolt.sso.activate-settings', async(requestId, draftId, ssoToken) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new ActivateSsoConfigurationController(worker, requestId, apiClientOptions);
+    const controller = new ActivateSsoSettingsController(worker, requestId, apiClientOptions);
     await controller._exec(draftId, ssoToken);
   });
 
-  worker.port.on('passbolt.sso.delete-settings', async(requestId, configurationId) => {
+  worker.port.on('passbolt.sso.delete-settings', async(requestId, settingsId) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new DeleteSsoConfigurationController(worker, requestId, apiClientOptions);
-    await controller._exec(configurationId);
+    const controller = new DeleteSsoSettingsController(worker, requestId, apiClientOptions);
+    await controller._exec(settingsId);
   });
 
   worker.port.on('passbolt.sso.generate-sso-kit', async(requestId, provider) => {

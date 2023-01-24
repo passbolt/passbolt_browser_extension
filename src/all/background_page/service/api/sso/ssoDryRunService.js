@@ -48,7 +48,7 @@ class SsoDryRunService {
   }
 
   /**
-   * Get the SSO URL for the current draft configuration
+   * Get the SSO URL for the current draft settings
    * @param {string} providerId the identifier of the SSO provider to test
    * @param {object} dryRunDto the dry run data
    * @returns {Promise<string>}

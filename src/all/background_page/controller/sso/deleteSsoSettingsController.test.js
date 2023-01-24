@@ -15,33 +15,33 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {v4 as uuid} from "uuid";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import DeleteSsoConfigurationController from "./deleteSsoConfigurationController";
+import DeleteSsoSettingsController from "./deleteSsoSettingsController";
 
 beforeEach(() => {
   enableFetchMocks();
   jest.clearAllMocks();
 });
 
-describe("DeleteSsoConfigurationController", () => {
-  describe("DeleteSsoConfigurationController::exec", () => {
-    it("Should delete the given configuration.", async() => {
+describe("DeleteSsoSettingsController", () => {
+  describe("DeleteSsoSettingsController::exec", () => {
+    it("Should delete the given settings.", async() => {
       expect.assertions(1);
 
-      const configurationId = uuid();
+      const settingsId = uuid();
 
-      fetch.doMockOnceIf(new RegExp(`/sso/settings/${configurationId}.json`), async req => {
-        expect(req.url).toBe(`https://localhost//sso/settings/${configurationId}.json?api-version=v2`);
+      fetch.doMockOnceIf(new RegExp(`/sso/settings/${settingsId}.json`), async req => {
+        expect(req.url).toBe(`https://localhost//sso/settings/${settingsId}.json?api-version=v2`);
         return mockApiResponse({});
       });
 
-      const controller = new DeleteSsoConfigurationController(null, null, defaultApiClientOptions());
-      await controller.exec(configurationId);
+      const controller = new DeleteSsoSettingsController(null, null, defaultApiClientOptions());
+      await controller.exec(settingsId);
     });
 
-    it("Should throw an error if the given configuration id is not a valid uuid.", async() => {
+    it("Should throw an error if the given settings id is not a valid uuid.", async() => {
       expect.assertions(1);
 
-      const controller = new DeleteSsoConfigurationController(null, null, defaultApiClientOptions());
+      const controller = new DeleteSsoSettingsController(null, null, defaultApiClientOptions());
       try {
         await controller.exec("fake id");
       } catch (e) {

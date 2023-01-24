@@ -1,4 +1,3 @@
-
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
@@ -12,30 +11,32 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
+import SsoSettingsEntity from "../../model/entity/sso/ssoSettingsEntity";
+import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
 
-class GetCurrentSsoConfigurationController {
+class SaveSsoSettingsAsDraftController {
   /**
-   * GetCurrentSsoConfigurationController constructor
+   * SaveSsoSettingsAsDraftController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
+   * @param {ApiClientOptions} apiClientOptions
    */
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.ssoConfigurationModel = new SsoConfigurationModel(apiClientOptions);
+    this.ssoSettingsModel = new SsoSettingsModel(apiClientOptions);
   }
 
   /**
    * Wrapper of exec function to run it with worker.
    *
-   * @param {uuid} draftSsoConfigurationId the draft sso configuration id
+   * @param {SsoSettingsDto} ssoSettings the draft SSO settings to save
    * @return {Promise<void>}
    */
-  async _exec() {
+  async _exec(draftSsoSettings) {
     try {
-      const ssoConfiguration = await this.exec();
-      this.worker.port.emit(this.requestId, "SUCCESS", ssoConfiguration);
+      const savedSsoSettings = await this.exec(draftSsoSettings);
+      this.worker.port.emit(this.requestId, "SUCCESS", savedSsoSettings);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, "ERROR", error);
@@ -43,14 +44,15 @@ class GetCurrentSsoConfigurationController {
   }
 
   /**
-   * Returns the current active SSO configuration registered from the API.
+   * Get the current SSO settings.
    *
-   * @return {Promise<SsoConfigurationEntity>}
+   * @param {SsoSettingsDto} ssoSettings the draft SSO settings to save
+   * @return {Promise<SsoSettingsModel|null>}
    */
-  async exec() {
-    const contains = {data: true};
-    return this.ssoConfigurationModel.getCurrent(contains);
+  async exec(draftSsoSettings) {
+    const ssoSettingsEntity = new SsoSettingsEntity(draftSsoSettings);
+    return this.ssoSettingsModel.saveDraft(ssoSettingsEntity);
   }
 }
 
-export default GetCurrentSsoConfigurationController;
+export default SaveSsoSettingsAsDraftController;

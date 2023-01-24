@@ -11,14 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import SsoConfigurationEntity from "./ssoConfigurationEntity";
+import SsoSettingsEntity from "./ssoSettingsEntity";
 import EntitySchema from "../abstract/entitySchema";
 import EntityValidationError from "../abstract/entityValidationError";
 import {v4 as uuid} from "uuid";
 
-describe("Sso Configuration Entity", () => {
+describe("Sso Settings Entity", () => {
   it("schema must validate", () => {
-    EntitySchema.validateSchema(SsoConfigurationEntity.ENTITY_NAME, SsoConfigurationEntity.getSchema());
+    EntitySchema.validateSchema(SsoSettingsEntity.ENTITY_NAME, SsoSettingsEntity.getSchema());
   });
 
   it("constructor works if valid minimal DTO is provided", () => {
@@ -29,7 +29,7 @@ describe("Sso Configuration Entity", () => {
       "data": null,
     };
 
-    const entity = new SsoConfigurationEntity(dto);
+    const entity = new SsoSettingsEntity(dto);
     expect(entity.toDto()).toEqual(dto);
   });
 
@@ -48,14 +48,14 @@ describe("Sso Configuration Entity", () => {
       modified_by: uuid(),
     };
 
-    const entity = new SsoConfigurationEntity(dto);
+    const entity = new SsoSettingsEntity(dto);
     expect(entity.toDto()).toEqual(dto);
   });
 
   it("constructor returns validation error if dto required fields are invalid", () => {
     expect.assertions(2);
     try {
-      new SsoConfigurationEntity({
+      new SsoSettingsEntity({
         id: "🏆‍️",
         providers: [1],
         provider: "azure",

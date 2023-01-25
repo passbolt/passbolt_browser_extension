@@ -181,7 +181,7 @@ class SsoDataStorage {
       const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readwrite');
       const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);
 
-      const ssoKit = ssoKitClientPartEntity.toDto();
+      const ssoKit = ssoKitClientPartEntity.toDbSerializableObject();
       const addRequest = objectStore.add({pk_id: 1, sso_kit: ssoKit});
 
       addRequest.onsuccess = () => {
@@ -215,7 +215,7 @@ class SsoDataStorage {
       const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readwrite');
       const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);
 
-      const newSsoKit = Object.assign({}, ssoData.toDto(), {id: ssoKitId});
+      const newSsoKit = Object.assign({}, ssoData.toDbSerializableObject(), {id: ssoKitId});
       const putRequest = objectStore.put({pk_id: 1, sso_kit: newSsoKit});
 
       putRequest.onsuccess = () => {

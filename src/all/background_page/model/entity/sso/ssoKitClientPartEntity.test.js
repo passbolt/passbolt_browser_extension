@@ -29,7 +29,7 @@ describe("Sso Configuration Entity", () => {
     const dto = await clientSsoKit();
 
     const entity = new SsoKitClientPartEntity(dto);
-    expect(entity.toDto()).toEqual(dto);
+    expect(entity.toDbSerializableObject()).toEqual(dto);
   });
 
   it("constructor works if full valid DTO is provided", async() => {
@@ -42,7 +42,7 @@ describe("Sso Configuration Entity", () => {
     });
 
     const entity = new SsoKitClientPartEntity(dto);
-    expect(entity.toDto()).toEqual(dto);
+    expect(entity.toDbSerializableObject()).toEqual(dto);
   });
 
   it("constructor returns validation error if dto required fields are invalid", async() => {

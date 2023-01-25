@@ -33,7 +33,7 @@ class MockSsoDataStorage {
   }
 
   async save(ssoKitClientPartEntity) {
-    this.data = ssoKitClientPartEntity.toDto();
+    this.data = ssoKitClientPartEntity.toDbSerializableObject();
   }
 
   async updateLocalKitIdWith(ssoKitId) {

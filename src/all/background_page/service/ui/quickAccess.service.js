@@ -44,7 +44,7 @@ async function openInDetachedMode(queryParameters = []) {
  * @returns {Promise<string>}
  */
 async function buildDetachedQuickacessUrl(queryParameters) {
-  const browserExtensionUrl = await browser.browserAction.getPopup({});
+  const browserExtensionUrl = await browser.action.getPopup({});
   const quickaccessUrl = new URL(browserExtensionUrl);
   queryParameters.forEach(queryParameter => quickaccessUrl.searchParams.append(queryParameter.name, queryParameter.value));
   return quickaccessUrl.href;

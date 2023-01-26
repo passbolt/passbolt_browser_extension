@@ -63,13 +63,11 @@ jest.mock("webextension-polyfill", () => Object.assign({}, {
     insertCSS: jest.fn()
   },
   browserAction: {
+    getPopup: jest.fn(),
     setIcon: jest.fn(),
     onClicked: {
       addListener: jest.fn()
     }
-  },
-  action: {
-    getPopup: jest.fn()
   },
   commands: {
     onCommand: {

@@ -20,6 +20,7 @@ import FileFormatError from "../../../error/fileFormatError";
 import BinaryConvert from "../../../utils/format/binaryConvert";
 import ImportError from "../../../error/importError";
 import PapaParse from "papaparse";
+import CsvChromiumRowParser from "./csvRowParser/csvChromiumRowParser";
 
 /**
  * Register of csv row parsers
@@ -28,7 +29,8 @@ import PapaParse from "papaparse";
 const register = [
   Csv1PasswordRowParser,
   CsvKdbxRowParser,
-  CsvLastPassRowParser
+  CsvLastPassRowParser,
+  CsvChromiumRowParser,
 ];
 
 class ResourcesCsvImportParser {

@@ -24,6 +24,8 @@ import SetupModel from "../../model/setup/setupModel";
 import DecryptResponseDataService from "../../service/accountRecovery/decryptResponseDataService";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
+import UpdateSsoCredentialsService from "../../service/account/updateSsoCredentialsService";
+import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 
 class RecoverAccountController {
   /**
@@ -40,6 +42,7 @@ class RecoverAccountController {
     this.accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
     this.setupModel = new SetupModel(apiClientOptions);
     this.accountModel = new AccountModel(apiClientOptions);
+    this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
   }
 
   /**
@@ -76,6 +79,7 @@ class RecoverAccountController {
     const account = await this._addRecoveredAccountToStorage(this.account);
     this._updateWorkerAccount(account);
     this._initPagemod();
+    await this._refreshSsoKit(passphrase);
   }
 
   /**
@@ -194,6 +198,21 @@ class RecoverAccountController {
     if (!app.pageMods.PublicWebsiteSignIn._pageMod) {
       app.pageMods.PublicWebsiteSignIn.init();
     }
+  }
+
+  /**
+   * Refresh the local SSO kit by removing it before generating it.
+   * @return {Promise<void>}
+   * @private
+   */
+  async _refreshSsoKit(passphrase) {
+    /*
+     * The storage is first flushed before generating the kit.
+     * It's to ensure the refresh of the kit without deleting the server part.
+     * The server part is kept as the user needs to be logged in to request a DELETE on the API.
+     */
+    await SsoDataStorage.flush();
+    await this.updateSsoCredentialsService.updateSsoKitIfNeeded(passphrase);
   }
 }
 

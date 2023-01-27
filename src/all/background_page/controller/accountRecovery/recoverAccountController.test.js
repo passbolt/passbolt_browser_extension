@@ -11,7 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-
+import "../../../../../test/mocks/mockSsoDataStorage";
+import "../../../../../test/mocks/mockCryptoKey";
 import {enableFetchMocks} from "jest-fetch-mock";
 import each from "jest-each";
 import {App as app} from "../../app";
@@ -31,11 +32,15 @@ import {
 import AccountLocalStorage from "../../service/local_storage/accountLocalStorage";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
+import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
+import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 
 jest.mock("../../model/worker");
 
 beforeEach(() => {
   enableFetchMocks();
+  jest.clearAllMocks();
 });
 
 describe("RecoverAccountController", () => {
@@ -45,11 +50,21 @@ describe("RecoverAccountController", () => {
     const accountRecoveryRequestDto = approvedAccountRecoveryRequestDto({id: accountRecovery.accountRecoveryRequestId});
     const passphrase = pgpKeys.account_recovery_request.passphrase;
 
+    const mockOrganisationSettings = isSsoEnabled => {
+      const organizationSettings = anonymousOrganizationSettings();
+      if (isSsoEnabled) {
+        organizationSettings.passbolt.plugins.sso = {enabled: true};
+      }
+      fetch.doMockOnce(() => mockApiResponse(organizationSettings, {servertime: Date.now() / 1000}));
+    };
+
     it("Should perform the account recovery.", async() => {
       // Mock API fetch account recovery request get response.
       fetch.doMockOnce(() => mockApiResponse(accountRecoveryRequestDto));
       // Mock API complete request.
       fetch.doMockOnce(() => mockApiResponse());
+      // Mock API organisation settings
+      mockOrganisationSettings();
       // Mock pagemods to assert the complete start the auth and inform menu pagemods.
       app.pageMods.WebIntegration.init = jest.fn();
       app.pageMods.AuthBootstrap.init = jest.fn();
@@ -143,6 +158,67 @@ describe("RecoverAccountController", () => {
       expect.assertions(2);
       await expect(promise).rejects.toThrow("Unable to complete the recover.");
       expect(() => User.getInstance().get()).toThrow("The user is not set");
+    });
+
+    it("Should refresh the SSO kit if SSO is enabled.", async() => {
+      const apiClientOptions = defaultApiClientOptions();
+      const passphrase = pgpKeys.account_recovery_request.passphrase;
+      const accountRecovery = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
+      const accountRecoveryRequestDto = approvedAccountRecoveryRequestDto({id: accountRecovery.accountRecoveryRequestId});
+
+      expect.assertions(3);
+      const expetedProvider = "azure";
+      const organizationSettings = anonymousOrganizationSettings();
+      organizationSettings.passbolt.plugins.sso = {enabled: true};
+
+      // Mock API fetch account recovery request get response.
+      fetch.doMockOnce(() => mockApiResponse(accountRecoveryRequestDto));
+      // Mock API complete request.
+      fetch.doMockOnce(() => mockApiResponse());
+      // Mock API organisation settings
+      mockOrganisationSettings(true);
+      // Mock configured SSO settings
+      fetch.doMockOnce(() => mockApiResponse({provider: expetedProvider}));
+      // Mock pagemods to assert the complete start the auth and inform menu pagemods.
+      app.pageMods.WebIntegration.init = jest.fn();
+      app.pageMods.AuthBootstrap.init = jest.fn();
+      app.pageMods.PublicWebsiteSignIn.init = jest.fn();
+
+      jest.spyOn(GenerateSsoKitService, "generate");
+
+      const controller = new RecoverAccountController(null, null, apiClientOptions, accountRecovery);
+      await controller.exec(passphrase);
+
+      expect(SsoDataStorage.flush).toHaveBeenCalled();
+      expect(GenerateSsoKitService.generate).toHaveBeenCalledTimes(1);
+      expect(GenerateSsoKitService.generate).toHaveBeenCalledWith(passphrase, expetedProvider);
+    });
+
+    it("Should only flush SSO kit if SSO is disabled.", async() => {
+      const apiClientOptions = defaultApiClientOptions();
+      const passphrase = pgpKeys.account_recovery_request.passphrase;
+      const accountRecovery = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
+      const accountRecoveryRequestDto = approvedAccountRecoveryRequestDto({id: accountRecovery.accountRecoveryRequestId});
+      // Mock API fetch account recovery request get response.
+      fetch.doMockOnce(() => mockApiResponse(accountRecoveryRequestDto));
+      // Mock API complete request.
+      fetch.doMockOnce(() => mockApiResponse());
+      // Mock API organisation settings
+      mockOrganisationSettings();
+      // Mock pagemods to assert the complete start the auth and inform menu pagemods.
+      app.pageMods.WebIntegration.init = jest.fn();
+      app.pageMods.AuthBootstrap.init = jest.fn();
+      app.pageMods.PublicWebsiteSignIn.init = jest.fn();
+
+      jest.spyOn(GenerateSsoKitService, "generate");
+
+      const controller = new RecoverAccountController(null, null, apiClientOptions, accountRecovery);
+      await controller.exec(passphrase);
+
+      expect.assertions(2);
+
+      expect(SsoDataStorage.flush).toHaveBeenCalled();
+      expect(GenerateSsoKitService.generate).not.toHaveBeenCalled();
     });
   });
 });

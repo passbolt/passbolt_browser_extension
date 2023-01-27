@@ -70,7 +70,7 @@ jest.mock("webextension-polyfill", () => Object.assign({}, {
 
 beforeEach(async() => {
   global.chrome = browser;
-  browser.storage.local.clear(); // Flush the local storage
+  await browser.storage.local.clear(); // Flush the local storage
   // Flush caches
   OrganizationSettingsModel.flushCache();
   Config.flush();

@@ -28,19 +28,22 @@ class SsoKitClientPartEntity extends Entity {
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
   constructor(ssoUserClientDataDto) {
+    //Because of the type of the data in the dto, we cannot use JSON serialization to make a copy of the object, however we can use `structuredClone` to proceed
+    const clonedDto = structuredClone(ssoUserClientDataDto);
+
     super(EntitySchema.validate(
       SsoKitClientPartEntity.ENTITY_NAME,
-      ssoUserClientDataDto,
+      clonedDto,
       SsoKitClientPartEntity.getSchema()
     ));
 
-    SsoKitClientPartEntity.validateNek(ssoUserClientDataDto.nek);
-    SsoKitClientPartEntity.validateIv(ssoUserClientDataDto.iv1);
-    SsoKitClientPartEntity.validateIv(ssoUserClientDataDto.iv2);
+    SsoKitClientPartEntity.validateNek(clonedDto.nek);
+    SsoKitClientPartEntity.validateIv(clonedDto.iv1);
+    SsoKitClientPartEntity.validateIv(clonedDto.iv2);
 
-    this._props.nek = ssoUserClientDataDto.nek;
-    this._props.iv1 = ssoUserClientDataDto.iv1;
-    this._props.iv2 = ssoUserClientDataDto.iv2;
+    this._props.nek = clonedDto.nek;
+    this._props.iv1 = clonedDto.iv1;
+    this._props.iv2 = clonedDto.iv2;
   }
 
   /**
@@ -103,11 +106,19 @@ class SsoKitClientPartEntity extends Entity {
    * ==================================================
    */
   /**
-   * Return a DTO ready to be sent to API or content code
-   * @returns {object}
+   * Not supported
+   * @throws {Error}
    */
   toDto() {
-    return Object.assign({}, this._props);
+    throw new Error("Serialization is not supported on this object");
+  }
+
+  /**
+   * Get an object formated for IndexedDB
+   * @returns {object}
+   */
+  toDbSerializableObject() {
+    return structuredClone(this._props);
   }
 
   /**

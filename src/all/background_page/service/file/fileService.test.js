@@ -27,7 +27,7 @@ describe("FileService", () => {
       expect.assertions(3);
       // data mocked
       chrome.downloads = {
-        download: jest.fn()
+        download: jest.fn(() => Promise.resolve())
       };
       global.URL.createObjectURL = jest.fn();
       global.URL.revokeObjectURL = jest.fn();

@@ -38,7 +38,7 @@ class UpdateSsoCredentialsService {
         await this.ssoKitServerPartModel.deleteSsoKit(localSsoKitId);
       } catch (e) {
         // we assume that the kit migth have been remove from the server already
-        if (!(e instanceof PassboltApiFetchError)) {
+        if (!(e instanceof PassboltApiFetchError && e.data.code === 404)) {
           throw e;
         }
       }

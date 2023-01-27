@@ -173,7 +173,7 @@ const listen = function(worker, account) {
    */
   worker.port.on('passbolt.auth.login', async(requestId, passphrase, remember) => {
     const clientOptions = await User.getInstance().getApiClientOptions(); //@todo remove and use a glocal apiClientOptions;
-    const controller = new AuthLoginController(worker, requestId, clientOptions);
+    const controller = new AuthLoginController(worker, requestId, clientOptions, account);
     await controller._exec(passphrase, remember);
   });
 

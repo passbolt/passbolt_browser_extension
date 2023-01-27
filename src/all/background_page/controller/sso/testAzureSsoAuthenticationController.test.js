@@ -14,7 +14,7 @@
 import {enableFetchMocks} from "jest-fetch-mock";
 import {v4 as uuid} from "uuid";
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
-import {withAzureSsoSettings} from "./saveSsoConfigurationAsDraftController.test.data";
+import {withAzureSsoSettings} from "./saveSsoSettingsAsDraftController.test.data";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import TestAzureSsoAuthenticationController from "./testAzureSsoAuthenticationController";
 import PassboltApiFetchError from "../../error/passboltApiFetchError";
@@ -39,18 +39,18 @@ describe("TestAzureSsoAuthenticationController", () => {
   const fakeUrlToHit = "https://fakeurl.passbolt.com";
   const account = {domain: fakeUrlToHit};
   describe("TestAzureSsoAuthenticationController::exec", () => {
-    it("Should save the given configuration as a draft.", async() => {
+    it("Should save the given settings as a draft.", async() => {
       expect.assertions(5);
 
       const ssoLoginSuccessToken = uuid();
-      const configurationId = uuid();
-      const configuration = withAzureSsoSettings({id: configurationId});
+      const settingsId = uuid();
+      const settings = withAzureSsoSettings({id: settingsId});
 
-      fetch.doMockOnceIf(new RegExp(`/sso/settings/${configurationId}.json`), async() => mockApiResponse(configuration));
-      fetch.doMockOnceIf(new RegExp(`/sso/${configuration.provider}/login/dry-run.json`), async req => {
+      fetch.doMockOnceIf(new RegExp(`/sso/settings/${settingsId}.json`), async() => mockApiResponse(settings));
+      fetch.doMockOnceIf(new RegExp(`/sso/${settings.provider}/login/dry-run.json`), async req => {
         const body = JSON.parse(await req.text());
         expect(body).toStrictEqual({
-          sso_settings_id: configurationId
+          sso_settings_id: settingsId
         });
 
         return mockApiResponse({
@@ -61,7 +61,7 @@ describe("TestAzureSsoAuthenticationController", () => {
       mock_getCodeFromThirdParty.mockImplementation(async() => ssoLoginSuccessToken);
 
       const controller = new TestAzureSsoAuthenticationController(null, null, defaultApiClientOptions(), account);
-      const resultingToken = await controller.exec(configurationId);
+      const resultingToken = await controller.exec(settingsId);
 
       expect(mock_getCodeFromThirdParty).toHaveBeenCalledTimes(1);
       expect(mock_getCodeFromThirdParty).toHaveBeenCalledWith(new URL(fakeUrlToHit));
@@ -70,17 +70,17 @@ describe("TestAzureSsoAuthenticationController", () => {
     });
   });
 
-  it("Should throw an error if something wrong happens during the rertieval of the draft configuration.", async() => {
+  it("Should throw an error if something wrong happens during the rertieval of the draft settings.", async() => {
     expect.assertions(2);
 
-    const configurationId = uuid();
+    const settingsId = uuid();
     const expectedError = new PassboltApiFetchError("Something wrong happened!");
 
-    fetch.doMockOnceIf(new RegExp(`/sso/settings/${configurationId}.json`), () => mockApiResponseError(500, expectedError.message));
+    fetch.doMockOnceIf(new RegExp(`/sso/settings/${settingsId}.json`), () => mockApiResponseError(500, expectedError.message));
 
     const controller = new TestAzureSsoAuthenticationController(null, null, defaultApiClientOptions(), account);
     try {
-      await controller.exec(configurationId);
+      await controller.exec(settingsId);
     } catch (e) {
       expect(e).toStrictEqual(expectedError);
       expect(mock_closeHandler).not.toHaveBeenCalled();
@@ -90,16 +90,16 @@ describe("TestAzureSsoAuthenticationController", () => {
   it("Should throw an error if something wrong happens during the dry run SSO login.", async() => {
     expect.assertions(2);
 
-    const configurationId = uuid();
-    const configuration = withAzureSsoSettings({id: configurationId});
+    const settingsId = uuid();
+    const settings = withAzureSsoSettings({id: settingsId});
     const expectedError = new PassboltApiFetchError("Something wrong happened!");
 
-    fetch.doMockOnceIf(new RegExp(`/sso/settings/${configurationId}.json`), async() => mockApiResponse(configuration));
-    fetch.doMockOnceIf(new RegExp(`/sso/${configuration.provider}/login/dry-run.json`), () => mockApiResponseError(500, expectedError.message));
+    fetch.doMockOnceIf(new RegExp(`/sso/settings/${settingsId}.json`), async() => mockApiResponse(settings));
+    fetch.doMockOnceIf(new RegExp(`/sso/${settings.provider}/login/dry-run.json`), () => mockApiResponseError(500, expectedError.message));
 
     const controller = new TestAzureSsoAuthenticationController(null, null, defaultApiClientOptions(), account);
     try {
-      await controller.exec(configurationId);
+      await controller.exec(settingsId);
     } catch (e) {
       expect(e).toStrictEqual(expectedError);
       expect(mock_closeHandler).not.toHaveBeenCalled();

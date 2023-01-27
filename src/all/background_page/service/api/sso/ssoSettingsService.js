@@ -13,9 +13,9 @@
  */
 import AbstractService from "../abstract/abstractService";
 
-const SSO_CONFIGURATION_SERVICE_RESOURCE_NAME = '/sso/settings';
+const SSO_SETTINGS_SERVICE_RESOURCE_NAME = '/sso/settings';
 
-class SsoConfigurationService extends AbstractService {
+class SsoSettingsService extends AbstractService {
   /**
    * Constructor
    *
@@ -23,7 +23,7 @@ class SsoConfigurationService extends AbstractService {
    * @public
    */
   constructor(apiClientOptions) {
-    super(apiClientOptions, SsoConfigurationService.RESOURCE_NAME);
+    super(apiClientOptions, SsoSettingsService.RESOURCE_NAME);
   }
 
   /**
@@ -33,7 +33,7 @@ class SsoConfigurationService extends AbstractService {
    * @public
    */
   static get RESOURCE_NAME() {
-    return SSO_CONFIGURATION_SERVICE_RESOURCE_NAME;
+    return SSO_SETTINGS_SERVICE_RESOURCE_NAME;
   }
 
   /**
@@ -46,53 +46,53 @@ class SsoConfigurationService extends AbstractService {
   }
 
   /**
-   * Get an SSO configuration for a given id
-   * @param {uuid} ssoConfigurationId
-   * @returns {Promise<SsoConfigurationDto>}
+   * Get an SSO settings for a given id
+   * @param {uuid} ssoSettingsId
+   * @returns {Promise<SsoSettingsDto>}
    */
-  async get(ssoConfigurationId) {
-    const response = await this.apiClient.get(ssoConfigurationId);
+  async get(ssoSettingsId) {
+    const response = await this.apiClient.get(ssoSettingsId);
     return response.body;
   }
 
   /**
-   * Get the current SSO configuration
+   * Get the current SSO settings
    * @param {object} contains
    * @returns
    */
   async getCurrent(contains) {
-    const options = contains ? this.formatContainOptions(contains, SsoConfigurationService.getSupportedContainOptions()) : null;
+    const options = contains ? this.formatContainOptions(contains, SsoSettingsService.getSupportedContainOptions()) : null;
     const response = await this.apiClient.get('current', options);
     return response.body;
   }
 
   /**
-   * Save the given SSO configuration as draft.
-   * @param {SsoConfigurationDto} ssoConfiguration
+   * Save the given SSO settings as draft.
+   * @param {SsoSettingsDto} ssoSettings
    */
-  async saveDraft(ssoConfiguration) {
-    const response = await this.apiClient.create(ssoConfiguration);
+  async saveDraft(ssoSettings) {
+    const response = await this.apiClient.create(ssoSettings);
     return response.body;
   }
 
   /**
-   * Activates the given configuration id using the Passbolt API.
-   * @param {uuid} configurationId
-   * @param {SsoConfigurationActivationDto} activationDto
+   * Activates the given settings id using the Passbolt API.
+   * @param {uuid} settingsId
+   * @param {SsoSettingsActivationDto} activationDto
    */
-  async activateConfiguration(configurationId, activationDto) {
-    const response = await this.apiClient.update(configurationId, activationDto);
+  async activateSettings(settingsId, activationDto) {
+    const response = await this.apiClient.update(settingsId, activationDto);
     return response.body;
   }
 
   /**
-   * Deletes the given configuration id using the Passbolt API.
-   * @param {uuid} configurationId
+   * Deletes the given settings id using the Passbolt API.
+   * @param {uuid} settingsId
    */
-  async delete(configurationId) {
-    const response = await this.apiClient.delete(configurationId);
+  async delete(settingsId) {
+    const response = await this.apiClient.delete(settingsId);
     return response.body;
   }
 }
 
-export default SsoConfigurationService;
+export default SsoSettingsService;

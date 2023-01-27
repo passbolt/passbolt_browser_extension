@@ -26,7 +26,7 @@ import {anonymousOrganizationSettings} from "../../model/entity/organizationSett
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
-import {withAzureSsoSettings} from "../sso/getCurrentSsoConfigurationController.test.data";
+import {withAzureSsoSettings} from "../sso/getCurrentSsoSettingsController.test.data";
 
 beforeEach(() => {
   enableFetchMocks();

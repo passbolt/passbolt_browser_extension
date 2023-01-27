@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import SsoConfigurationEntity from "../../model/entity/sso/ssoConfigurationEntity";
-import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
+import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
+import Validator from "validator";
 
-class SaveSsoConfigurationAsDraftController {
+class DeleteSsoSettingsController {
   /**
-   * SaveSsoConfigurationAsDraftController constructor
+   * DeleteSsoSettingsController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions
@@ -24,19 +24,19 @@ class SaveSsoConfigurationAsDraftController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.ssoConfigurationModel = new SsoConfigurationModel(apiClientOptions);
+    this.ssoSettingsModel = new SsoSettingsModel(apiClientOptions);
   }
 
   /**
    * Wrapper of exec function to run it with worker.
    *
-   * @param {SsoConfigurationDto} ssoConfiguration the draft SSO configuration to save
+   * @param {uuid} ssoSettingsId the SSO settings to delete
    * @return {Promise<void>}
    */
-  async _exec(draftSsoConfiguration) {
+  async _exec(ssoSettingsId) {
     try {
-      const savedSsoConfiguration = await this.exec(draftSsoConfiguration);
-      this.worker.port.emit(this.requestId, "SUCCESS", savedSsoConfiguration);
+      await this.exec(ssoSettingsId);
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, "ERROR", error);
@@ -44,15 +44,17 @@ class SaveSsoConfigurationAsDraftController {
   }
 
   /**
-   * Get the current SSO configuration.
+   * Delete the SSO settings matching the given id.
    *
-   * @param {SsoConfigurationDto} ssoConfiguration the draft SSO configuration to save
-   * @return {Promise<SsoConfigurationModel|null>}
+   * @param {uuid} ssoSettingsId the SSO settings to delete
+   * @return {Promise<void>}
    */
-  async exec(draftSsoConfiguration) {
-    const ssoConfigurationEntity = new SsoConfigurationEntity(draftSsoConfiguration);
-    return this.ssoConfigurationModel.saveDraft(ssoConfigurationEntity);
+  async exec(ssoSettingsId) {
+    if (!Validator.isUUID(ssoSettingsId)) {
+      throw new Error("A valid SSO settings id is required.");
+    }
+    await this.ssoSettingsModel.delete(ssoSettingsId);
   }
 }
 
-export default SaveSsoConfigurationAsDraftController;
+export default DeleteSsoSettingsController;

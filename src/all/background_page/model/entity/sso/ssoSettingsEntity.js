@@ -14,27 +14,27 @@
 import Entity from "../abstract/entity";
 import EntitySchema from "../abstract/entitySchema";
 
-const ENTITY_NAME = "SsoConfiguration";
+const ENTITY_NAME = "SsoSettings";
 const AZURE = "azure";
 
 const DATE_REGEXP = /^\d{4}-\d{2}-\d{2}$/;
 const DATETIME_REGEXP = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 
 /**
- * Entity related to the SSO configuration
+ * Entity related to the SSO settings
  */
-class SsoConfigurationEntity extends Entity {
+class SsoSettingsEntity extends Entity {
   /**
    * Setup entity constructor
    *
-   * @param {Object} ssoConfigurationDto SSO configuration DTO
+   * @param {Object} ssoSettingsDto SSO settings DTO
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(ssoConfigurationDto) {
+  constructor(ssoSettingsDto) {
     super(EntitySchema.validate(
-      SsoConfigurationEntity.ENTITY_NAME,
-      SsoConfigurationEntity.sanitizeDto(ssoConfigurationDto),
-      SsoConfigurationEntity.getSchema()
+      SsoSettingsEntity.ENTITY_NAME,
+      SsoSettingsEntity.sanitizeDto(ssoSettingsDto),
+      SsoSettingsEntity.getSchema()
     ));
   }
 
@@ -61,7 +61,7 @@ class SsoConfigurationEntity extends Entity {
           "anyOf": [{
             "type": "string",
             "enum": [
-              SsoConfigurationEntity.AZURE,
+              SsoSettingsEntity.AZURE,
             ]
           }, {
             "type": "null"
@@ -133,7 +133,7 @@ class SsoConfigurationEntity extends Entity {
    */
 
   /**
-   * Get the configuration identifier
+   * Get the settings identifier
    * @returns {string}
    */
   get id() {
@@ -154,7 +154,7 @@ class SsoConfigurationEntity extends Entity {
    * ==================================================
    */
   /**
-   * SsoConfigurationEntity.ENTITY_NAME
+   * SsoSettingsEntity.ENTITY_NAME
    * @returns {string}
    */
   static get ENTITY_NAME() {
@@ -162,7 +162,7 @@ class SsoConfigurationEntity extends Entity {
   }
 
   /**
-   * SsoConfigurationEntity.AZURE
+   * SsoSettingsEntity.AZURE
    * @returns {string}
    */
   static get AZURE() {
@@ -170,4 +170,4 @@ class SsoConfigurationEntity extends Entity {
   }
 }
 
-export default SsoConfigurationEntity;
+export default SsoSettingsEntity;

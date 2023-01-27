@@ -13,7 +13,7 @@
  */
 import AzurePopupHandlerService from "../../service/sso/azurePopupHandlerService";
 import SsoDryRunModel from "../../model/sso/ssoDryRunModel";
-import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
+import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
 
 class TestAzureSsoAuthenticationController {
   /**
@@ -24,7 +24,7 @@ class TestAzureSsoAuthenticationController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.ssoConfigurationModel = new SsoConfigurationModel(apiClientOptions);
+    this.ssoSettingsModel = new SsoSettingsModel(apiClientOptions);
     this.ssoDryRunModel = new SsoDryRunModel(apiClientOptions);
     this.azurePopupHandler = new AzurePopupHandlerService(account.domain, true);
   }
@@ -32,12 +32,12 @@ class TestAzureSsoAuthenticationController {
   /**
    * Wrapper of exec function to run it with worker.
    *
-   * @param {uuid} draftSsoConfigurationId the draft sso configuration id
+   * @param {uuid} draftSsoSettingsId the draft sso settings id
    * @return {Promise<void>}
    */
-  async _exec(draftSsoConfigurationId) {
+  async _exec(draftSsoSettingsId) {
     try {
-      const ssoToken = await this.exec(draftSsoConfigurationId);
+      const ssoToken = await this.exec(draftSsoSettingsId);
       this.worker.port.emit(this.requestId, "SUCCESS", ssoToken);
     } catch (error) {
       console.error(error);
@@ -47,15 +47,15 @@ class TestAzureSsoAuthenticationController {
 
   /**
    * Run a dry-run login and returns a token from the API if everything is fine.
-   * The token can be used to change the status of the sso configuration to `active`
+   * The token can be used to change the status of the sso settings to `active`
    *
-   * @param {uuid} draftSsoConfigurationId the draft sso configuration id
+   * @param {uuid} draftSsoSettingsId the draft sso settings id
    * @return {Promise<string>}
    */
-  async exec(draftSsoConfigurationId) {
+  async exec(draftSsoSettingsId) {
     try {
-      const ssoConfiguration = await this.ssoConfigurationModel.getById(draftSsoConfigurationId);
-      const thirdPartySignInUrl = await this.ssoDryRunModel.getUrl(ssoConfiguration.provider, ssoConfiguration.id);
+      const ssoSettings = await this.ssoSettingsModel.getById(draftSsoSettingsId);
+      const thirdPartySignInUrl = await this.ssoDryRunModel.getUrl(ssoSettings.provider, ssoSettings.id);
       const ssoToken = await this.azurePopupHandler.getCodeFromThirdParty(thirdPartySignInUrl);
       await this.azurePopupHandler.closeHandler();
       return ssoToken;

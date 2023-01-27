@@ -12,7 +12,7 @@
  * @since         3.9.0
  */
 import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
-import SsoConfigurationModel from "../../model/sso/ssoConfigurationModel";
+import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
 import SsoDataStorage from "../indexedDB_storage/ssoDataStorage";
 import GenerateSsoKitService from "../sso/generateSsoKitService";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
@@ -21,7 +21,7 @@ import PassboltApiFetchError from "../../error/passboltApiFetchError";
 class UpdateSsoCredentialsService {
   constructor(apiClientOption) {
     this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOption);
-    this.ssoConfigurationModel = new SsoConfigurationModel(apiClientOption);
+    this.ssoSettingsModel = new SsoSettingsModel(apiClientOption);
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOption);
   }
 
@@ -67,15 +67,15 @@ class UpdateSsoCredentialsService {
       }
       return;
     }
-    const currentSsoConfig = await this.ssoConfigurationModel.getCurrent();
-    if (!currentSsoConfig?.provider && localSsoKit) {
+    const currentSsoSettings = await this.ssoSettingsModel.getCurrent();
+    if (!currentSsoSettings?.provider && localSsoKit) {
       /*
        * if we have a local SSO kit but the plugin is not configured
        * it means it has been disabled and there is no point to keep it
        */
       await SsoDataStorage.flush();
-    } else if (currentSsoConfig?.provider && !localSsoKit) {
-      await GenerateSsoKitService.generate(passphrase, currentSsoConfig.provider);
+    } else if (currentSsoSettings?.provider && !localSsoKit) {
+      await GenerateSsoKitService.generate(passphrase, currentSsoSettings.provider);
     }
   }
 }

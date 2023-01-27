@@ -41,7 +41,7 @@ class AzurePopupHandlerService {
   }
 
   /**
-   * Get the SSO configuration from the server
+   * Run the third-party SSO provider Sign in and get back a tiken once successfully finished
    * @param {URL} url the url for opening the popup
    * @returns {Promise<void>}
    * @public

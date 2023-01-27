@@ -14,26 +14,26 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import GetCurrentSsoConfigurationController from "./getCurrentSsoConfigurationController";
-import {withAzureSsoSettings} from "./getCurrentSsoConfigurationController.test.data";
+import GetCurrentSsoSettingsController from "./getCurrentSsoSettingsController";
+import {withAzureSsoSettings} from "./getCurrentSsoSettingsController.test.data";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import SsoConfigurationEntity from "../../model/entity/sso/ssoConfigurationEntity";
+import SsoSettingsEntity from "../../model/entity/sso/ssoSettingsEntity";
 
 beforeEach(() => {
   enableFetchMocks();
 });
 
-describe("GetCurrentSsoConfigurationController", () => {
-  describe("GetCurrentSsoConfigurationController::exec", () => {
-    it("Should retrieve the current SSO configuration.", async() => {
+describe("GetCurrentSsoSettingsController", () => {
+  describe("GetCurrentSsoSettingsController::exec", () => {
+    it("Should retrieve the current SSO settings.", async() => {
       expect.assertions(1);
       const ssoSettingsDto = withAzureSsoSettings();
       fetch.doMockOnceIf(new RegExp(`/sso/settings/current.json`), () => mockApiResponse(ssoSettingsDto));
 
-      const controller = new GetCurrentSsoConfigurationController(null, null, defaultApiClientOptions());
+      const controller = new GetCurrentSsoSettingsController(null, null, defaultApiClientOptions());
       const settings = await controller.exec();
 
-      expect(settings).toStrictEqual(new SsoConfigurationEntity(ssoSettingsDto));
+      expect(settings).toStrictEqual(new SsoSettingsEntity(ssoSettingsDto));
     });
   });
 });

@@ -91,7 +91,7 @@ describe("AuthSignInController", () => {
 
     it("Should sign-in the user and not generate an SSO kit if SSO organization settings is enabled and a kit already exists.", async() => {
       expect.assertions(1);
-      SsoDataStorage.setMockedData(await clientSsoKit());
+      SsoDataStorage.setMockedData(clientSsoKit());
       jest.spyOn(GenerateSsoKitService, "generate");
       mockOrganisationSettings(true);
       mockOrganisationSettingsSsoSettings(withAzureSsoSettings());
@@ -118,7 +118,7 @@ describe("AuthSignInController", () => {
 
     it("Should sign-in the user and flush SSO kit data if a kit is available locally and the SSO is not configured for the organisation.", async() => {
       expect.assertions(1);
-      SsoDataStorage.setMockedData(await clientSsoKit());
+      SsoDataStorage.setMockedData(clientSsoKit());
       mockOrganisationSettings(true);
       mockOrganisationSettingsSsoSettings(defaultEmptySettings());
 
@@ -130,7 +130,7 @@ describe("AuthSignInController", () => {
 
     it("Should sign-in the user and flush SSO kit data if a kit is available locally and the organization settings is disabled.", async() => {
       expect.assertions(1);
-      SsoDataStorage.setMockedData(await clientSsoKit());
+      SsoDataStorage.setMockedData(clientSsoKit());
       mockOrganisationSettings(false);
 
       const account = new AccountEntity(defaultAccountDto());

@@ -55,7 +55,7 @@ describe("AzureSsoAuthenticationController", () => {
   describe("AzureSsoAuthenticationController::exec", () => {
     it("Should sign the user using a third party.", async() => {
       expect.assertions(13);
-      const ssoLocalKit = await clientSsoKit();
+      const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
       const serverSsoKitKey = {key: "fakeKey"};
@@ -122,7 +122,7 @@ describe("AzureSsoAuthenticationController", () => {
 
     it("Should throw an error when server sso kit can't be find.", async() => {
       expect.assertions(2);
-      const ssoKit = await clientSsoKit();
+      const ssoKit = clientSsoKit();
       const ssoToken = uuid();
       SsoDataStorage.setMockedData(ssoKit);
 
@@ -146,7 +146,7 @@ describe("AzureSsoAuthenticationController", () => {
     it("Should throw an error when the passphrase can't be decrypted.", async() => {
       expect.assertions(2);
       const ssoToken = uuid();
-      const ssoLocalKit = await clientSsoKit();
+      const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
       const serverSsoKitKey = {key: "fakeKey"};
@@ -177,7 +177,7 @@ describe("AzureSsoAuthenticationController", () => {
     it("Should throw an error when the passphrase can't be decrypted.", async() => {
       expect.assertions(2);
       const ssoToken = uuid();
-      const ssoLocalKit = await clientSsoKit();
+      const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
       const serverSsoKitKey = {key: "fakeKey"};
@@ -209,7 +209,7 @@ describe("AzureSsoAuthenticationController", () => {
     it("Should throw an error when the passphrase doesn't match the user's private key.", async() => {
       expect.assertions(2);
       const ssoToken = uuid();
-      const ssoLocalKit = await clientSsoKit();
+      const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
       const serverSsoKitKey = {key: "fakeKey"};

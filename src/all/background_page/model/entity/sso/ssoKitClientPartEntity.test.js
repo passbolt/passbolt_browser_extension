@@ -26,7 +26,7 @@ describe("Sso Configuration Entity", () => {
 
   it("constructor works if valid minimal DTO is provided", async() => {
     expect.assertions(1);
-    const dto = await clientSsoKit();
+    const dto = clientSsoKit();
 
     const entity = new SsoKitClientPartEntity(dto);
     expect(entity.toDto()).toEqual(dto);
@@ -34,7 +34,7 @@ describe("Sso Configuration Entity", () => {
 
   it("constructor works if full valid DTO is provided", async() => {
     expect.assertions(1);
-    const dto = await clientSsoKit({
+    const dto = clientSsoKit({
       created: "2020-05-04T20:31:45+00:00",
       modified: "2020-05-04T20:31:45+00:00",
       created_by: uuid(),
@@ -53,7 +53,7 @@ describe("Sso Configuration Entity", () => {
       };
       return new CryptoKey(algorithm, extractable, capabilities);
     }
-    const ssoKit = await clientSsoKit();
+    const ssoKit = clientSsoKit();
     const invalidNeks = [
       "nek",
       {},

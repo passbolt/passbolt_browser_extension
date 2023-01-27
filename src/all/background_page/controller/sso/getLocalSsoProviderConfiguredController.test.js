@@ -21,7 +21,7 @@ describe("GetLocalSsoProviderConfiguredController", () => {
   describe("GetLocalSsoProviderConfiguredController::exec", () => {
     it("Should return the local SSO kit.", async() => {
       expect.assertions(1);
-      const ssoLocalKit = await clientSsoKit();
+      const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
 
       const controller = new GetLocalSsoProviderConfiguredController();

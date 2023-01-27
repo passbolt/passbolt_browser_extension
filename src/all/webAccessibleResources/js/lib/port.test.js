@@ -104,7 +104,7 @@ describe("Port", () => {
       port._onMessage(JSON.stringify([requestId, "ERROR", dataReceived]));
       expect(Object.keys(port._listeners).length).toBe(0);
       try {
-        await promise
+        await promise;
       } catch (error) {
         expect(error).toStrictEqual(dataReceived);
       }

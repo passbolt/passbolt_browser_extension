@@ -14,6 +14,7 @@
 
 import {Config} from "../../model/config";
 import {Worker} from "../../model/worker";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 /**
  * File service
@@ -42,9 +43,11 @@ class FileService {
          * in the default downloads directory.
          */
         const saveAs = !Config.isDebug();
-        chrome.downloads.download({url: url, filename: filename, saveAs: saveAs});
-        self.URL.revokeObjectURL(url);
-        resolve();
+        browser.downloads.download({url: url, filename: filename, saveAs: saveAs})
+          .then(() => {
+            self.URL.revokeObjectURL(url);
+            resolve();
+          });
       } else {
         this.blobToDataURL(content)
           .then(dataUrl => {

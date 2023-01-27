@@ -14,7 +14,6 @@
 import DownloadRecoveryKitController from "../controller/setup/downloadRecoverKitController";
 import ContinueAccountRecoveryController from "../controller/accountRecovery/continueAccountRecoveryController";
 import RecoverAccountController from "../controller/accountRecovery/recoverAccountController";
-import AuthSignInController from "../controller/auth/authSignInController";
 import VerifyAccountPassphraseController from "../controller/account/verifyAccountPassphraseController";
 import AbortAndInitiateNewAccountRecoveryController from "../controller/accountRecovery/abortAndInitiateNewAccountRecoveryController";
 import SetSetupLocaleController from "../controller/setup/setSetupLocaleController";
@@ -22,6 +21,7 @@ import GetOrganizationSettingsController from "../controller/organizationSetting
 import GetAndInitializeAccountLocaleController from "../controller/account/getAndInitializeAccountLocaleController";
 import GetExtensionVersionController from "../controller/extension/getExtensionVersionController";
 import GetAccountController from "../controller/account/getAccountController";
+import AuthLoginController from "../controller/auth/authLoginController";
 
 /**
  * Listens to the account recovery continue application events
@@ -66,8 +66,8 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.account-recovery.sign-in', async(requestId, passphrase, rememberMe) => {
-    const controller = new AuthSignInController(worker, requestId, apiClientOptions, account);
-    await controller._exec(passphrase, rememberMe);
+    const controller = new AuthLoginController(worker, requestId, apiClientOptions, account);
+    await controller._exec(passphrase, rememberMe, true);
   });
 
   worker.port.on('passbolt.account-recovery.request-help-credentials-lost', async requestId => {

@@ -40,8 +40,8 @@ beforeEach(async() => {
   await MockExtension.withConfiguredAccount();
 });
 
-describe("AuthSignInController", () => {
-  describe("AuthSignInController::exec", () => {
+describe("AuthLognController", () => {
+  describe("AuthLognController::exec", () => {
     const passphrase = "ada@passbolt.com";
     const mockOrganisationSettings = (withSsoEnabled = true) => {
       const organizationSettings = anonymousOrganizationSettings();
@@ -76,6 +76,26 @@ describe("AuthSignInController", () => {
         expect(mockLogin).toHaveBeenCalledWith(scenario.passphrase, scenario.rememberMe);
       }
     });
+
+    it("Should throw an exception if the passphrase is not a valid.", async() => {
+      const account = new AccountEntity(defaultAccountDto());
+      const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+
+      expect.assertions(2);
+      const promiseMissingParameter = controller.exec();
+      await expect(promiseMissingParameter).rejects.toThrowError("A passphrase is required.");
+      const promiseInvalidTypeParameter = controller.exec(2);
+      await expect(promiseInvalidTypeParameter).rejects.toThrowError("The passphrase should be a string.");
+    }, 10000);
+
+    it("Should throw an exception if the provided remember me is not a valid boolean.", async() => {
+      const account = new AccountEntity(defaultAccountDto());
+      const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+
+      expect.assertions(1);
+      const promiseInvalidTypeParameter = controller.exec("passphrase", 42);
+      await expect(promiseInvalidTypeParameter).rejects.toThrowError("The rememberMe should be a boolean.");
+    }, 10000);
 
     it("Should sign-in the user and not generate an SSO kit if SSO organization settings is disabled.", async() => {
       expect.assertions(1);

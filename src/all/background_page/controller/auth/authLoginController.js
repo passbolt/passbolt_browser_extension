@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-
+import browser from "../../sdk/polyfill/browserPolyfill";
 import AuthModel from "../../model/auth/authModel";
 import UserAlreadyLoggedInError from "../../error/userAlreadyLoggedInError";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
@@ -27,9 +27,10 @@ class AuthLoginController {
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions the api client options
    */
-  constructor(worker, requestId, apiClientOptions) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
+    this.account = account;
     this.authModel = new AuthModel(apiClientOptions);
     this.organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
@@ -42,15 +43,12 @@ class AuthLoginController {
    *
    * @param {uuid} requestId The request identifier
    * @param {string} passphrase The passphrase to decryt the private key
-   * @param {string} remember whether to remember the passphrase
-   *   (bool) false|undefined if should not remember
-   *   (integer) -1 if should remember for the session
-   *   (integer) duration in seconds to specify a specific duration
+   * @param {boolean} rememberMe whether to remember the passphrase or not
    * @return {Promise<void>}
    */
-  async _exec(passphrase, remember) {
+  async _exec(passphrase, remember, shouldRefreshCurrentTab = false) {
     try {
-      await this.exec(passphrase, remember);
+      await this.exec(passphrase, remember, shouldRefreshCurrentTab);
       this.worker.port.emit(this.requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);
@@ -62,13 +60,24 @@ class AuthLoginController {
    * Attemps to sign in the current user.
    *
    * @param {string} passphrase The passphrase to decryt the private key
-   * @param {string} remember whether to remember the passphrase
+   * @param {string} rememberMe whether to remember the passphrase
+   * @param {boolean} shouldRefreshCurrentTab Should the controller calls for a refresh of the current running tab, default false
    *   (bool) false|undefined if should not remember
    *   (integer) -1 if should remember for the session
    *   (integer) duration in seconds to specify a specific duration
    * @return {Promise<void>}
    */
-  async exec(passphrase, remember) {
+  async exec(passphrase, rememberMe, shouldRefreshCurrentTab) {
+    if (typeof passphrase === "undefined") {
+      throw new Error("A passphrase is required.");
+    }
+    if (typeof passphrase !== "string") {
+      throw new Error("The passphrase should be a string.");
+    }
+    if (typeof rememberMe !== "undefined" && typeof rememberMe !== "boolean") {
+      throw new Error("The rememberMe should be a boolean.");
+    }
+
     /*
      * In order to generate the SSO kit, a call to the API is made to retrieve the SSO settings and ensure it's needed.
      * But, for this call we must be logged out or fully logged in (with MFA).
@@ -85,12 +94,25 @@ class AuthLoginController {
     }
 
     try {
-      await this.authModel.login(passphrase, remember);
+      await this.authModel.login(passphrase, rememberMe);
     } catch (error) {
       if (!(error instanceof UserAlreadyLoggedInError)) {
         throw error;
       }
     }
+
+    if (shouldRefreshCurrentTab) {
+      await this.redirectToApp();
+    }
+  }
+
+  /**
+   * Redirect the user to the application
+   * @returns {Promise<void>}
+   */
+  async redirectToApp() {
+    const url = this.account.domain;
+    browser.tabs.update(this.worker.tab.id, {url});
   }
 }
 

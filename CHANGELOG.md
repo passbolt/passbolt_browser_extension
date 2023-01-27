@@ -4,13 +4,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.9.2] - 2023-01-31
+### Fixed
+- PB-22557: As LU I should be able to download file on chromium based browsers
+
 ## [3.9.0] - 2023-01-18
 ### Added
 - PB-21383 As AD I can save the SSO server settings
 - PB-21383 As AD I can disable the SSO server settings
 - PB-21393 As a registered user I can use the SSO feature to sign in to passbolt
 - PB-21400 As LU I can rotate my private key's passphrase and still be able to sign in via SSO
-- PB-21735 As a signed-in administrator in the administrator workspace, I can see the user 
+- PB-21735 As a signed-in administrator in the administrator workspace, I can see the user
 self registration settings option in the left-side bar
 - PB-21740 As a signed-in administrator I can remove a domain from the user self registration list
 - PB-21767 As AN I want to have the SSO login displayed by default when I have an SSO kit available
@@ -56,42 +60,42 @@ self registration settings option in the left-side bar
 
 ## [3.8.2] - 2022-11-27
 ### Fixed
-PB-21565: As a logged-in user, I should decide to keep my session alive until I sign out
-PB-21372: As a logged-in user, I should see folders without caret aligned
+- PB-21565: As a logged-in user, I should decide to keep my session alive until I sign out
+- PB-21372: As a logged-in user, I should see folders without caret aligned
 
 ## [3.8.0] - 2022-11-04
 ### Added
-PB-19151: As a logged-in user, I want to be able to use Solarized light and dark themes
-PB-19220: As an administrator, I want to manage the organization SMTP settings in the administration workspace
+- PB-19151: As a logged-in user, I want to be able to use Solarized light and dark themes
+- PB-19220: As an administrator, I want to manage the organization SMTP settings in the administration workspace
 
 ### Improved
-PB-19229: As an administration, I want to see the passwords I entered in the MFA administration settings forms
-PB-19226: As a logged-in user, I want to move resources to another folder with better performances
-PB-19034: As a group manager I should see if there is more than 3 users in a group I'm editing
-PB-19214: As a logged-in user, I want to see long entities names fitting in dialog
+- PB-19229: As an administration, I want to see the passwords I entered in the MFA administration settings forms
+- PB-19226: As a logged-in user, I want to move resources to another folder with better performances
+- PB-19034: As a group manager I should see if there is more than 3 users in a group I'm editing
+- PB-19214: As a logged-in user, I want to see long entities names fitting in dialog
 
 ### Fixed
-PB-19228: As a user, I should see a feedback when the password or description fields content is truncated by a field limit
-PB-19216: As a logged-in user, I want to populate a form from the Quick Access after the generation of new credentials
-PB-20978: As a logged-in user, I want to autocomplete using reserved keywords
+- PB-19228: As a user, I should see a feedback when the password or description fields content is truncated by a field limit
+- PB-19216: As a logged-in user, I want to populate a form from the Quick Access after the generation of new credentials
+- PB-20978: As a logged-in user, I want to autocomplete using reserved keywords
 
 ### Security
-PB-19537: As a user I want my password fields to be hidden in Passbolt forms when the form is being submitted
-PB-18639: Restrict the port connection to our extension only for chrome
+- PB-19537: As a user I want my password fields to be hidden in Passbolt forms when the form is being submitted
+- PB-18639: Restrict the port connection to our extension only for chrome
 
 ### Maintenance
-PB-19237: As a developer, I should see the “change user passphrase” stories in storybook
-PB-18499: [MV3] Bootstrap MV3 build
-PB-18600: [MV3] Migrate passphrase “remember me” code into a service
-PB-18640: [MV3] Use alarms API instead of setTimeout and setInterval
-PB-18641: [MV3] Use ProgressService instead of ProgressController
-PB-18649: Use navigator.clipboard API instead of the copy to clipboard iframe mechanism
-PB-18657: [MV3] Implement a scripting polyfill to ensure scripts and css can be injected with both manifest versions
-PB-19231: Improve “select” styleguide component unit tests coverage
-PB-19232: Implement browser extension app url parser
-PB-19238: Move events create and get to dedicated controllers
-PB-19558: Run storybook test against CI
-PB-19586: Create email notifications actions
+- PB-19237: As a developer, I should see the “change user passphrase” stories in storybook
+- PB-18499: [MV3] Bootstrap MV3 build
+- PB-18600: [MV3] Migrate passphrase “remember me” code into a service
+- PB-18640: [MV3] Use alarms API instead of setTimeout and setInterval
+- PB-18641: [MV3] Use ProgressService instead of ProgressController
+- PB-18649: Use navigator.clipboard API instead of the copy to clipboard iframe mechanism
+- PB-18657: [MV3] Implement a scripting polyfill to ensure scripts and css can be injected with both manifest versions
+- PB-19231: Improve “select” styleguide component unit tests coverage
+- PB-19232: Implement browser extension app url parser
+- PB-19238: Move events create and get to dedicated controllers
+- PB-19558: Run storybook test against CI
+- PB-19586: Create email notifications actions
 
 ## [3.7.3] - 2022-09-24
 ### Security

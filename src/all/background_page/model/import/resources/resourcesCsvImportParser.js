@@ -21,6 +21,7 @@ import BinaryConvert from "../../../utils/format/binaryConvert";
 import ImportError from "../../../error/importError";
 import PapaParse from "papaparse";
 import CsvChromiumRowParser from "./csvRowParser/csvChromiumRowParser";
+import CsvBitWardenRowParser from "./csvRowParser/csvBitWardenRowParser";
 
 /**
  * Register of csv row parsers
@@ -31,6 +32,7 @@ const register = [
   CsvKdbxRowParser,
   CsvLastPassRowParser,
   CsvChromiumRowParser,
+  CsvBitWardenRowParser,
 ];
 
 class ResourcesCsvImportParser {

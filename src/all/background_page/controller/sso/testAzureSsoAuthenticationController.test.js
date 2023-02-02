@@ -19,13 +19,13 @@ import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOpti
 import TestAzureSsoAuthenticationController from "./testAzureSsoAuthenticationController";
 import PassboltApiFetchError from "../../error/passboltApiFetchError";
 
-const mock_getCodeFromThirdParty = jest.fn();
+const mock_getSsoTokenFromThirdParty = jest.fn();
 const mock_closeHandler = jest.fn();
 
 jest.mock("../../service/sso/azurePopupHandlerService", () => ({
   __esModule: true,
   default: jest.fn(() => ({
-    getCodeFromThirdParty: mock_getCodeFromThirdParty,
+    getSsoTokenFromThirdParty: mock_getSsoTokenFromThirdParty,
     closeHandler: mock_closeHandler
   }))
 }));
@@ -58,13 +58,13 @@ describe("TestAzureSsoAuthenticationController", () => {
         });
       });
 
-      mock_getCodeFromThirdParty.mockImplementation(async() => ssoLoginSuccessToken);
+      mock_getSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginSuccessToken);
 
       const controller = new TestAzureSsoAuthenticationController(null, null, defaultApiClientOptions(), account);
       const resultingToken = await controller.exec(settingsId);
 
-      expect(mock_getCodeFromThirdParty).toHaveBeenCalledTimes(1);
-      expect(mock_getCodeFromThirdParty).toHaveBeenCalledWith(new URL(fakeUrlToHit));
+      expect(mock_getSsoTokenFromThirdParty).toHaveBeenCalledTimes(1);
+      expect(mock_getSsoTokenFromThirdParty).toHaveBeenCalledWith(new URL(fakeUrlToHit));
       expect(mock_closeHandler).toHaveBeenCalledTimes(1);
       expect(resultingToken).toBe(ssoLoginSuccessToken);
     });

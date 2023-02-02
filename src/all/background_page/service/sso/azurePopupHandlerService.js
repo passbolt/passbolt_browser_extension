@@ -29,25 +29,28 @@ class AzurePopupHandlerService {
    * Constructor
    *
    * @param {ApiClientOptions} apiClientOptions
+   * @param {number} originTabIdCall id of the tab from where the call has been made
+   * @param {boolean} asDryRun does the process is for a dry-run
    * @public
    */
-  constructor(accountDomain, asDryRun = false) {
+  constructor(accountDomain, originTabIdCall, asDryRun) {
     this.popup = null;
     this.popupTabId = null;
     this.verifyCodeInTab = this.verifyCodeInTab.bind(this);
     this.verifyPopupClosed = this.verifyPopupClosed.bind(this);
     const endpoint = asDryRun ? DRY_RUN_SSO_LOGIN_SUCCESS_ENDPOINT : SSO_LOGIN_SUCCESS_ENDPOINT;
     this.expectedUrl = `${accountDomain}${endpoint}`;
+    this.originTabIdCall = originTabIdCall;
   }
 
   /**
    * Run the third-party SSO provider Sign in and get back a tiken once successfully finished
-   * @param {URL} url the url for opening the popup
+   * @param {URL} popupUrl the url for opening the popup
    * @returns {Promise<void>}
    * @public
    */
-  async getCodeFromThirdParty(popUrl) {
-    this.popup = await this.openPopup(popUrl.toString());
+  async getSsoTokenFromThirdParty(popupUrl) {
+    this.popup = await this.openPopup(popupUrl.toString());
     this.popupTabId = this.popup.tabs[0].id;
 
     return new Promise((resolve, reject) => {
@@ -64,7 +67,13 @@ class AzurePopupHandlerService {
    * @returns {void}
    * @private
    */
-  verifyCodeInTab(tabId, changeInfo, tab) {
+  async verifyCodeInTab(tabId, changeInfo, tab) {
+    if (tabId === this.originTabIdCall) {
+      this.rejectPromise(new UserAbortsOperationError("The user navigated away from the tab where the SSO sign-in initiated"));
+      await this.closeHandler();
+      return;
+    }
+
     if (tabId !== this.popupTabId) {
       return;
     }
@@ -80,21 +89,23 @@ class AzurePopupHandlerService {
   }
 
   /**
-   * Popup close handler.
+   * Tab removal handler.
+   * In this method we observe if:
+   *  - the SSO sign in popup has been closed by the user
+   *  - the tab from where the SSO sign in has been initiated has been closed by the user
+   * In both case, we cancel the SSO sign in process.
+   *
+   * @param {number} tabId the tab identifier where the event happens
    * @returns {void}
    * @private
    */
-  verifyPopupClosed(tabId, removeInfo) {
-    if (tabId !== this.popupTabId) {
-      return; //It's not our tab
+  async verifyPopupClosed(tabId) {
+    if (tabId === this.originTabIdCall) {
+      this.rejectPromise(new UserAbortsOperationError("The user closed the tab from where the SSO sign-in initiated"));
+      await this.closeHandler();
+    } else if (tabId === this.popupTabId) {
+      this.rejectPromise(new UserAbortsOperationError("The user closed the SSO sign-in popup"));
     }
-
-    if (removeInfo.isWindowClosing) {
-      this.rejectPromise(new UserAbortsOperationError());
-      return;
-    }
-
-    this.rejectPromise(new Error("The popup closed unexpectedly"));
   }
 
   /**

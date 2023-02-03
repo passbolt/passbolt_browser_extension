@@ -42,7 +42,7 @@ describe("GenerateSsoKitController", () => {
       const expextedKitId = uuid();
       const expectedServerPartKit = new SsoKitServerPartEntity({data: "this should be a base64 serialized key"});
       const expectedClientPartKit = new SsoKitClientPartEntity(clientSsoKit());
-      const exepctedClientPartKitWithId = new SsoKitClientPartEntity({...(expectedClientPartKit.toDto()), id: expextedKitId,});
+      const exepctedClientPartKitWithId = new SsoKitClientPartEntity({...(expectedClientPartKit.toDbSerializableObject()), id: expextedKitId,});
 
       SsoDataStorage.setMockedData(null);
 
@@ -78,9 +78,9 @@ describe("GenerateSsoKitController", () => {
       expect.assertions(1);
       const expectedProvider = "google";
       const storedSsoKit = new SsoKitClientPartEntity(clientSsoKit());
-      const expectedClientPartKit = new SsoKitClientPartEntity({...(storedSsoKit.toDto()), provider: expectedProvider});
+      const expectedClientPartKit = new SsoKitClientPartEntity({...(storedSsoKit.toDbSerializableObject()), provider: expectedProvider});
 
-      SsoDataStorage.setMockedData(storedSsoKit.toDto());
+      SsoDataStorage.setMockedData(storedSsoKit.toDbSerializableObject());
 
       const controller = new GenerateSsoKitController(null, null, defaultApiClientOptions());
       await controller.exec(expectedProvider);

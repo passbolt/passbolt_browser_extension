@@ -50,6 +50,10 @@ beforeEach(() => {
 });
 
 describe("AzureSsoAuthenticationController", () => {
+  const azureUrlResponse = {
+    url: "https://login.microsoftonline.com"
+  };
+
   describe("AzureSsoAuthenticationController::exec", () => {
     it("Should sign the user using a third party.", async() => {
       expect.assertions(13);
@@ -61,9 +65,6 @@ describe("AzureSsoAuthenticationController", () => {
         data: Buffer.from(JSON.stringify(serverSsoKitKey)).toString('base64')
       };
       const account = {userId: uuid()};
-      const azureUrlResponse = {
-        url: "https://login.azure.com/passbolt"
-      };
       const severImportedKey = {algorithm: {name: "AES-GCM"}};
       const userPassphrase = "this is the user passphrase";
 
@@ -125,9 +126,6 @@ describe("AzureSsoAuthenticationController", () => {
       SsoDataStorage.setMockedData(ssoKit);
 
       const account = {userId: uuid()};
-      const azureUrlResponse = {
-        url: "https://login.azure.com/passbolt"
-      };
       mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoToken);
       fetch.doMockOnceIf(new RegExp(`/sso/azure/login.json`), async() => mockApiResponse(azureUrlResponse));
       fetch.doMockOnceIf(new RegExp(`/sso/keys/${ssoKit.id}/${account.userId}/${ssoToken}.json`), async() => mockApiResponseError(404));
@@ -152,9 +150,6 @@ describe("AzureSsoAuthenticationController", () => {
         data: Buffer.from(JSON.stringify(serverSsoKitKey)).toString('base64')
       };
       const account = {userId: uuid()};
-      const azureUrlResponse = {
-        url: "https://login.azure.com/passbolt"
-      };
 
       mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);
       jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => { throw new OutdatedSsoKitError(); });
@@ -183,9 +178,6 @@ describe("AzureSsoAuthenticationController", () => {
         data: Buffer.from(JSON.stringify(serverSsoKitKey)).toString('base64')
       };
       const account = {userId: uuid()};
-      const azureUrlResponse = {
-        url: "https://login.azure.com/passbolt"
-      };
 
       mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);
 
@@ -215,9 +207,6 @@ describe("AzureSsoAuthenticationController", () => {
         data: Buffer.from(JSON.stringify(serverSsoKitKey)).toString('base64')
       };
       const account = {userId: uuid()};
-      const azureUrlResponse = {
-        url: "https://login.azure.com/passbolt"
-      };
 
       mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);
 

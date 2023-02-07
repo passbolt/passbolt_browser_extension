@@ -45,7 +45,7 @@ describe("DeleteSsoSettingsController", () => {
       try {
         await controller.exec("fake id");
       } catch (e) {
-        expect(e).toStrictEqual(new Error("A valid SSO settings id is required."));
+        expect(e).toStrictEqual(new Error("The SSO settings id should be a valid uuid."));
       }
     });
   });

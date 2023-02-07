@@ -13,6 +13,12 @@
  */
 import {Buffer} from 'buffer';
 import OutdatedSsoKitError from '../../error/outdatedSsoKitError';
+import {
+  assertBase64String,
+  assertNonExtractableSsoKey,
+  assertExtractableSsoKey,
+  assertValidInitialisationVector
+} from '../../utils/assertions';
 
 class DecryptSsoPassphraseService {
   /**
@@ -26,6 +32,12 @@ class DecryptSsoPassphraseService {
    * @returns {Promise<string>} the deciphered string
    */
   static async decrypt(base64Text, nek, ek, iv1, iv2) {
+    assertBase64String(base64Text);
+    assertNonExtractableSsoKey(nek);
+    assertExtractableSsoKey(ek);
+    assertValidInitialisationVector(iv1);
+    assertValidInitialisationVector(iv2);
+
     const buffer = Buffer.from(base64Text, 'base64');
     const firstDecryptionAlgorithm = {
       name: ek.algorithm.name,

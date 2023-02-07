@@ -37,26 +37,31 @@ class SsoDryRunService {
   }
 
   /**
-   * Instanciate and return a new ApiClient with a ressource URL built from the provider id.
-   * @param {string} providerId the provider identifier
-   * @returns {ApiClient}
-   */
-  getApiClient(providerId) {
-    const resourceName = SsoDryRunService.RESOURCE_NAME.replace("${providerId}", providerId);
-    this.apiClientOptions.setResourceName(resourceName);
-    return new ApiClient(this.apiClientOptions);
-  }
-
-  /**
    * Get the SSO URL for the current draft settings
    * @param {string} providerId the identifier of the SSO provider to test
    * @param {object} dryRunDto the dry run data
-   * @returns {Promise<string>}
+   * @returns {Promise<SsoLoginUrlDto>}
    * @public
    */
   async getUrl(providerId, dryRunDto) {
     const response = await this.getApiClient(providerId).create(dryRunDto);
-    return response.body.url;
+    return response.body;
+  }
+
+  /**
+   * Instanciate and return a new ApiClient with a ressource URL built from the provider id.
+   * @param {string} providerId the provider identifier
+   * @returns {ApiClient}
+   * @private
+   */
+  getApiClient(providerId) {
+    if (typeof(providerId) !== "string") {
+      throw new Error("The provider identifier should be a string");
+    }
+
+    const resourceName = SsoDryRunService.RESOURCE_NAME.replace("${providerId}", providerId);
+    this.apiClientOptions.setResourceName(resourceName);
+    return new ApiClient(this.apiClientOptions);
   }
 }
 

@@ -19,13 +19,13 @@ describe("Csv1PasswordRowParser", () => {
     let fields = ["Title", "Password"];
     expect(Csv1PasswordRowParser.canParse(fields)).toEqual(2);
     // all fields
-    fields = ["Title", "Username", "URL", "Password", "Notes", "Type"];
+    fields = ["Title", "Username", "Url", "Password", "Notes", "Type"];
     expect(Csv1PasswordRowParser.canParse(fields)).toEqual(6);
     // Missing one required field
-    fields = ["Title", "Username", "URL", "Notes", "Type"];
+    fields = ["Title", "Username", "Url", "Notes", "Type"];
     expect(Csv1PasswordRowParser.canParse(fields)).toEqual(0);
     // Duplicate field
-    fields = ["Title", "Username", "URL", "Password", "Notes", "Type", "Type"];
+    fields = ["Title", "Username", "Url", "Password", "Notes", "Type", "Type"];
     expect(Csv1PasswordRowParser.canParse(fields)).toEqual(6);
     // additional fields not supported
     fields = ["Title", "Password", "Unsupported field"];
@@ -50,7 +50,7 @@ describe("Csv1PasswordRowParser", () => {
     const data = {
       "Title": "Password 1",
       "Username": "Username 1",
-      "URL": "https://url1.com",
+      "Url": "https://url1.com",
       "Password": "Secret 1",
       "Notes": "Description 1",
       "Type": "Folder 1"
@@ -59,7 +59,7 @@ describe("Csv1PasswordRowParser", () => {
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);
     expect(externalResourceEntity.name).toEqual(data.Title);
     expect(externalResourceEntity.username).toEqual(data.Username);
-    expect(externalResourceEntity.uri).toEqual(data.URL);
+    expect(externalResourceEntity.uri).toEqual(data.Url);
     expect(externalResourceEntity.secretClear).toEqual(data.Password);
     expect(externalResourceEntity.description).toEqual(data.Notes);
     expect(externalResourceEntity.folderParentPath).toEqual(data.Type);

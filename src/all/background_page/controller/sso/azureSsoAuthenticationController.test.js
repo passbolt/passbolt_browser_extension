@@ -24,6 +24,7 @@ import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
 import PassboltApiFetchError from "../../error/passboltApiFetchError";
 import OutdatedSsoKitError from "../../error/outdatedSsoKitError";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
+import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
 
 const mockLogin = jest.fn();
 jest.mock("../../model/auth/authModel", () => ({
@@ -60,10 +61,8 @@ describe("AzureSsoAuthenticationController", () => {
       const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
-      const serverSsoKitKey = {key: "fakeKey"};
-      const serverSsoKit = {
-        data: Buffer.from(JSON.stringify(serverSsoKitKey)).toString('base64')
-      };
+      const serverSsoKit = {data: generateSsoKitServerData({})};
+      const deserializedKeyData = JSON.parse(Buffer.from(serverSsoKit.data, 'base64').toString());
       const account = {userId: uuid()};
       const severImportedKey = {algorithm: {name: "AES-GCM"}};
       const userPassphrase = "this is the user passphrase";
@@ -76,7 +75,7 @@ describe("AzureSsoAuthenticationController", () => {
 
       crypto.subtle.importKey.mockImplementation(async(keyFormat, keyInfo, algorithmName, isExtractable, capabilities) => {
         expect(keyFormat).toBe("jwk");
-        expect(keyInfo).toStrictEqual(serverSsoKitKey);
+        expect(keyInfo).toStrictEqual(deserializedKeyData);
         expect(algorithmName).toBe('AES-GCM');
         expect(isExtractable).toBe(true);
         expect(capabilities).toStrictEqual(["encrypt", "decrypt"]);
@@ -145,10 +144,7 @@ describe("AzureSsoAuthenticationController", () => {
       const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
-      const serverSsoKitKey = {key: "fakeKey"};
-      const serverSsoKit = {
-        data: Buffer.from(JSON.stringify(serverSsoKitKey)).toString('base64')
-      };
+      const serverSsoKit = {data: generateSsoKitServerData({})};
       const account = {userId: uuid()};
 
       mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);
@@ -173,10 +169,7 @@ describe("AzureSsoAuthenticationController", () => {
       const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
-      const serverSsoKitKey = {key: "fakeKey"};
-      const serverSsoKit = {
-        data: Buffer.from(JSON.stringify(serverSsoKitKey)).toString('base64')
-      };
+      const serverSsoKit = {data: generateSsoKitServerData({})};
       const account = {userId: uuid()};
 
       mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);
@@ -202,10 +195,7 @@ describe("AzureSsoAuthenticationController", () => {
       const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
-      const serverSsoKitKey = {key: "fakeKey"};
-      const serverSsoKit = {
-        data: Buffer.from(JSON.stringify(serverSsoKitKey)).toString('base64')
-      };
+      const serverSsoKit = {data: generateSsoKitServerData({})};
       const account = {userId: uuid()};
 
       mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);

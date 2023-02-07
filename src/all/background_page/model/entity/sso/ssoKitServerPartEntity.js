@@ -13,8 +13,10 @@
  */
 import Entity from "../abstract/entity";
 import EntitySchema from "../abstract/entitySchema";
+import Validator from "validator";
 
 const ENTITY_NAME = "SsoKitServerPartEntity";
+const JWK_ALGORITHM_AES_256_BITS = "A256GCM";
 
 /**
  * Entity related to the account recovery organization policy
@@ -52,7 +54,8 @@ class SsoKitServerPartEntity extends Entity {
           "format": "uuid"
         },
         "data": {
-          "type": "string",
+          "type": "x-custom",
+          "validationCallback": SsoKitServerPartEntity.validateData
         },
         "created": {
           "type": "string",
@@ -74,6 +77,59 @@ class SsoKitServerPartEntity extends Entity {
     };
   }
 
+  /*
+   * ==================================================
+   * Custom validators
+   * ==================================================
+   */
+
+  static validateData(value) {
+    if (typeof value !== "string") {
+      throw new TypeError("The data should be a string");
+    }
+
+    if (!Validator.isBase64(value)) {
+      throw new TypeError("The data should be a base64 formated string");
+    }
+
+    /*
+     * expected format:
+     *   {
+     *     alg: "A256GCM",
+     *     ext: true,
+     *     k: "1fbJmAeV44qez4TDiATBZsOoTbI3mhoV-rnAf6An8X0",
+     *     key_ops: ["encrypt","decrypt"],
+     *     kty: "oct"
+     *   }
+     */
+    const deserializedKey = JSON.parse(Buffer.from(value, "base64").toString());
+
+    if (deserializedKey.alg !== JWK_ALGORITHM_AES_256_BITS) {
+      throw new TypeError('The SSO server key should use the algorithm AES 256 bits');
+    }
+
+    if (!deserializedKey.ext) {
+      throw new TypeError('The SSO server key should be extractable');
+    }
+
+    if (deserializedKey.kty !== "oct") {
+      throw new TypeError('The SSO server key type should be an octect sequence');
+    }
+
+    if (typeof deserializedKey.k !== "string") {
+      throw new TypeError('The SSO server key data should be a string');
+    }
+
+    const usages = deserializedKey.key_ops;
+    const areUsagesValid = usages.length === 2
+      && usages.includes("encrypt")
+      && usages.includes("decrypt");
+
+    if (!areUsagesValid) {
+      throw new TypeError('The SSO server key be usable for and only for encryption and decryption');
+    }
+  }
+
   /**
    * Returns the id props of the SSO kit.
    * @returns {string}
@@ -88,6 +144,14 @@ class SsoKitServerPartEntity extends Entity {
    */
   get data() {
     return this._props.data;
+  }
+
+  /**
+   * Returns the key parsed from the data.
+   * @returns {object}
+   */
+  get key() {
+    return JSON.parse(Buffer.from(this.data, "base64").toString());
   }
 
   /*

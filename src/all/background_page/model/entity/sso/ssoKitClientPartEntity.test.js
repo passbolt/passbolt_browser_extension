@@ -19,7 +19,7 @@ import {v4 as uuid} from "uuid";
 import {clientSsoKit} from "./ssoKitClientPart.test.data";
 import GenerateSsoIvService from "../../../service/crypto/generateSsoIvService";
 
-describe("Sso Settings Entity", () => {
+describe("Sso Kit Client Part Entity", () => {
   it("schema must validate", () => {
     EntitySchema.validateSchema(SsoKitClientPartEntity.ENTITY_NAME, SsoKitClientPartEntity.getSchema());
   });

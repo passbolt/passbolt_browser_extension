@@ -11,7 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
+import {assertUuid} from "../../utils/assertions";
 import SsoAzureLoginService from "../../service/api/sso/ssoAzureLoginService";
+import SsoLoginUrlEntity from "../entity/sso/ssoLoginUrlEntity";
 
 /**
  * Model related to the SSO Azure Login URL
@@ -34,8 +36,10 @@ class SsoAzureLoginModel {
    * @return {Promise<URL>}
    */
   async getLoginUrl(userId) {
+    assertUuid(userId, "The user id should be a valid uuid.");
+
     const redirectUrlDto = await this.ssoAzureLoginService.getLoginUrl({user_id: userId});
-    return new URL(redirectUrlDto);
+    return new SsoLoginUrlEntity(redirectUrlDto);
   }
 }
 

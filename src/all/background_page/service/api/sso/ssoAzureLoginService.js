@@ -39,11 +39,11 @@ class SsoAzureLoginService extends AbstractService {
   /**
    * Get the login URL for the given user from the API.
    * @param {GetLoginUrlDto} getLoginUrlDto
-   * @returns {Promise<SsoKitServerPartDto>}
+   * @returns {Promise<SsoLoginUrlDto>}
    */
   async getLoginUrl(getLoginUrlDto) {
     const response = await this.apiClient.create(getLoginUrlDto);
-    return response.body.url;
+    return response.body;
   }
 }
 

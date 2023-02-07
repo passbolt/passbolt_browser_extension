@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
+import {assertUuid} from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 
 const SSO_USER_DATA_SERVICE_RESOURCE_NAME = '/sso/keys';
@@ -40,10 +41,15 @@ class SsoKitServerPartService extends AbstractService {
    * Get the user's server part SSO kit.
    *
    * @param {uuid} ssoKitId the id of the kit to retrieve
+   * @param {uuid} userId the id of the user that owns the SSO kit
    * @param {uuid} ssoToken an authorisation token to access the data
    * @returns {Promise<SsoKitServerPartDto>}
    */
   async getSsoKit(ssoKitId, userId, ssoToken) {
+    assertUuid(ssoKitId, "The SSO kit id should be a valid uuid.");
+    assertUuid(userId, "The user id should be a valid uuid.");
+    assertUuid(ssoToken, "The SSO token should be a valid uuid.");
+
     const response = await this.apiClient.get(`${ssoKitId}/${userId}/${ssoToken}`);
     return response.body;
   }
@@ -51,7 +57,7 @@ class SsoKitServerPartService extends AbstractService {
   /**
    * Set the server part SSO kit.
    *
-   * @param {SsoKitServerPartDro} ssoKiyServerPartDto
+   * @param {SsoKitServerPartDto} ssoKiyServerPartDto
    * @returns {Promise<SsoKitServerPartDto>}
    */
   async setupSsoKit(ssoKitServerPartDto) {
@@ -66,7 +72,8 @@ class SsoKitServerPartService extends AbstractService {
    * @returns {Promise<void>}
    */
   async deleteSsoKit(ssoKitId) {
-    this.assertValidId(ssoKitId);
+    assertUuid(ssoKitId, "The SSO kit id should be a valid uuid.");
+
     await this.apiClient.delete(ssoKitId);
   }
 }

@@ -14,6 +14,7 @@
 import AzurePopupHandlerService from "../../service/sso/azurePopupHandlerService";
 import SsoDryRunModel from "../../model/sso/ssoDryRunModel";
 import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
+import {assertUuid} from "../../utils/assertions";
 
 class TestAzureSsoAuthenticationController {
   /**
@@ -53,6 +54,8 @@ class TestAzureSsoAuthenticationController {
    * @return {Promise<string>}
    */
   async exec(draftSsoSettingsId) {
+    assertUuid(draftSsoSettingsId, "The SSO settings id should be a valid uuid.");
+
     try {
       const ssoSettings = await this.ssoSettingsModel.getById(draftSsoSettingsId);
       const thirdPartySignInUrl = await this.ssoDryRunModel.getUrl(ssoSettings.provider, ssoSettings.id);

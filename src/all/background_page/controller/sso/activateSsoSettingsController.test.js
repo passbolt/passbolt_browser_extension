@@ -51,7 +51,7 @@ describe("ActivateSsoSettingsController", () => {
       try {
         await controller.exec(ssoDraftSettingsId, ssoToken);
       } catch (e) {
-        expect(e).toStrictEqual(new TypeError('The SSO settings id should be a valid uuid.'));
+        expect(e).toStrictEqual(new Error('The SSO settings id should be a valid uuid.'));
       }
     });
 
@@ -64,7 +64,7 @@ describe("ActivateSsoSettingsController", () => {
       try {
         await controller.exec(ssoDraftSettingsId, ssoToken);
       } catch (e) {
-        expect(e).toStrictEqual(new TypeError('The SSO activation token should be a valid uuid.'));
+        expect(e).toStrictEqual(new Error('The SSO activation token should be a valid uuid.'));
       }
     });
   });

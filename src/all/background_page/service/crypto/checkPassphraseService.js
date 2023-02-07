@@ -13,6 +13,7 @@
  */
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
+import {assertPassphrase} from "../../utils/assertions";
 import GpgKeyError from "../../error/GpgKeyError";
 import i18n from "../../sdk/i18n";
 
@@ -37,6 +38,8 @@ class CheckPassphraseService {
    * @throws {InvalidMasterPasswordError} if the passphrase can't decrypt the private key
    */
   async checkPassphrase(passphrase) {
+    assertPassphrase(passphrase);
+
     const privateKey = this.keyring.findPrivate();
     if (!privateKey) {
       throw new GpgKeyError(i18n.t("Private key not found."));

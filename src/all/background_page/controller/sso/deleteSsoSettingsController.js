@@ -12,7 +12,7 @@
  * @since         3.9.0
  */
 import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
-import Validator from "validator";
+import {assertUuid} from "../../utils/assertions";
 
 class DeleteSsoSettingsController {
   /**
@@ -50,9 +50,8 @@ class DeleteSsoSettingsController {
    * @return {Promise<void>}
    */
   async exec(ssoSettingsId) {
-    if (!Validator.isUUID(ssoSettingsId)) {
-      throw new Error("A valid SSO settings id is required.");
-    }
+    assertUuid(ssoSettingsId, "The SSO settings id should be a valid uuid.");
+
     await this.ssoSettingsModel.delete(ssoSettingsId);
   }
 }

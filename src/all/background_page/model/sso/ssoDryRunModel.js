@@ -12,6 +12,8 @@
  * @since         3.9.0
  */
 import SsoDryRunService from "../../service/api/sso/ssoDryRunService";
+import {assertUuid} from "../../utils/assertions";
+import SsoLoginUrlEntity from "../entity/sso/ssoLoginUrlEntity";
 
 /**
  * Model related to the SSO dry run
@@ -34,11 +36,17 @@ class SsoDryRunModel {
    * @returns {Promise<URL>}
    */
   async getUrl(providerId, ssoSettingsId) {
+    assertUuid(ssoSettingsId, "The SSO settings id should be a valid uuid.");
+
+    if (typeof(providerId) !== "string") {
+      throw new Error("The provider identifier should be a valid string");
+    }
+
     const dryRunDto = {
       sso_settings_id: ssoSettingsId
     };
     const dryRunUrl = await this.ssoDryRunService.getUrl(providerId, dryRunDto);
-    return new URL(dryRunUrl);
+    return new SsoLoginUrlEntity(dryRunUrl);
   }
 }
 

@@ -11,22 +11,18 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
+import "../../../../../test/mocks/mockCryptoKey";
+import {buildMockedCryptoKey} from "../../utils/assertions.test.data";
 import EncryptSsoPassphraseService from "./encryptSsoPassphraseService";
-
-const mockedEncrypt = jest.fn();
-global.self.crypto = {
-  subtle: {
-    encrypt: mockedEncrypt
-  }
-};
+import GenerateSsoIvService from "./generateSsoIvService";
 
 describe("EncryptSsoPassphrase service", () => {
   it('should encrypt the passphrase', async() => {
     expect.assertions(7);
-    const key1 = {algorithm: {name: "AES-GCM"}};
-    const key2 = {algorithm: {name: "AES-GCM"}};
-    const iv1 = new Uint8Array([1]);
-    const iv2 = new Uint8Array([2]);
+    const key1 = await buildMockedCryptoKey({algoName: "AES-GCM", extractable: false});
+    const key2 = await buildMockedCryptoKey({algoName: "AES-GCM"});
+    const iv1 = GenerateSsoIvService.generateIv();
+    const iv2 = GenerateSsoIvService.generateIv();
     const passphraseToEncrypt = "passphrase";
     const buffer1 = Buffer.from("This is the first encryption result buffer");
     const buffer2 = "passphrase but encrypted ^^";
@@ -34,7 +30,7 @@ describe("EncryptSsoPassphrase service", () => {
     let step = 0;
     const expectedEncryptedPassphrase = Buffer.from("passphrase but encrypted ^^").toString('base64');
 
-    const firstDecrypyCallExpectation = (algo, key, buffer) => {
+    const firstDecryptCallExpectation = (algo, key, buffer) => {
       expect(algo).toStrictEqual({
         name: "AES-GCM",
         iv: iv1
@@ -44,7 +40,7 @@ describe("EncryptSsoPassphrase service", () => {
       return buffer1;
     };
 
-    const secondDecrypyCallExpectation = (algo, key, buffer) => {
+    const secondDecryptCallExpectation = (algo, key, buffer) => {
       expect(algo).toStrictEqual({
         name: "AES-GCM",
         iv: iv2
@@ -54,11 +50,11 @@ describe("EncryptSsoPassphrase service", () => {
       return buffer2;
     };
 
-    mockedEncrypt.mockImplementation(async(algo, key, buffer) => {
+    crypto.subtle.encrypt.mockImplementation(async(algo, key, buffer) => {
       step++;
       return step === 1
-        ? firstDecrypyCallExpectation(algo, key, buffer)
-        : secondDecrypyCallExpectation(algo, key, buffer);
+        ? firstDecryptCallExpectation(algo, key, buffer)
+        : secondDecryptCallExpectation(algo, key, buffer);
     });
 
     const encrypted = await EncryptSsoPassphraseService.encrypt(passphraseToEncrypt, key1, key2, iv1, iv2);

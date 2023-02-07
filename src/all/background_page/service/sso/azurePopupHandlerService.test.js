@@ -16,6 +16,8 @@ import browser from "webextension-polyfill";
 import MockTabs from "../../../../../test/mocks/mockTabs";
 import {v4 as uuid} from "uuid";
 import UserAbortsOperationError from "../../error/userAbortsOperationError";
+import SsoLoginUrlEntity from "../../model/entity/sso/ssoLoginUrlEntity";
+import EntityValidationError from "../../model/entity/abstract/entityValidationError";
 
 let currentBrowserTab = null;
 let currentBrowserWindows = null;
@@ -56,7 +58,7 @@ describe("AzurePopupHandlerService", () => {
     const userDomain = "https://fakeurl.passbolt.com";
     const ssoToken = uuid();
     const finalUrl = `${userDomain}/sso/login/dry-run/success?token=${ssoToken}`;
-    const thirdPartyUrl = new URL("https://login.microsoftonline.com");
+    const thirdPartyUrl = new SsoLoginUrlEntity({url: "https://login.microsoftonline.com"});
 
     it("Should return SSO token when navigation is done to a correct URL in dry-run mode", async() => {
       expect.assertions(4);
@@ -75,7 +77,7 @@ describe("AzurePopupHandlerService", () => {
       await runPendingPromises();
 
       expect(browser.windows.create).toHaveBeenCalledWith({
-        url: thirdPartyUrl.toString(),
+        url: thirdPartyUrl.url,
         type: "popup",
         width: expect.any(Number),
         height: expect.any(Number)
@@ -87,7 +89,7 @@ describe("AzurePopupHandlerService", () => {
       //Update on the expected tabid as pending
       browser.tabs.onUpdated.triggers(tabId, null, {status: "pending"});
       //Update on the expected tabid as complete but without token
-      browser.tabs.onUpdated.triggers(tabId, null, {status: "complete", url: thirdPartyUrl.toString()});
+      browser.tabs.onUpdated.triggers(tabId, null, {status: "complete", url: thirdPartyUrl.url});
       //Update on another tabid as pending with the awaited URL
       browser.tabs.onUpdated.triggers(uuid(), null, {status: "pending", url: finalUrl});
       //Update on the expected tabid as complete with the awaited URL
@@ -133,7 +135,7 @@ describe("AzurePopupHandlerService", () => {
       await runPendingPromises();
 
       expect(browser.windows.create).toHaveBeenCalledWith({
-        url: thirdPartyUrl.toString(),
+        url: thirdPartyUrl.url,
         type: "popup",
         width: expect.any(Number),
         height: expect.any(Number)
@@ -145,7 +147,7 @@ describe("AzurePopupHandlerService", () => {
       //Update on the expected tabid as pending
       browser.tabs.onUpdated.triggers(tabId, null, {status: "pending"});
       //Update on the expected tabid as complete but without token
-      browser.tabs.onUpdated.triggers(tabId, null, {status: "complete", url: thirdPartyUrl.toString()});
+      browser.tabs.onUpdated.triggers(tabId, null, {status: "complete", url: thirdPartyUrl.url});
       //Update on abother tabid as pending with the awaited URL
       browser.tabs.onUpdated.triggers(uuid(), null, {status: "pending", url: finalUrl});
       //Update on the expected tabid as complete with the awaited URL
@@ -206,9 +208,9 @@ describe("AzurePopupHandlerService", () => {
 
       const service = new AzurePopupHandlerService(userDomain, true);
       try {
-        await service.getSsoTokenFromThirdParty(new URL("javascript:console('this would be an XSS')"));
+        await service.getSsoTokenFromThirdParty(new SsoLoginUrlEntity({url: "javascript:console('this would be an XSS')"}));
       } catch (e) {
-        expect(e).toStrictEqual(new Error("Unsupported single sign-on login url"));
+        expect(e).toStrictEqual(new EntityValidationError("Could not validate entity SsoLoginUrl."));
       }
     });
 
@@ -224,13 +226,13 @@ describe("AzurePopupHandlerService", () => {
       const service = new AzurePopupHandlerService(userDomain, true);
 
       for (let i = 0; i < AZURE_SUPPORTED_URLS.length; i++) {
-        const url = new URL(AZURE_SUPPORTED_URLS[i]);
-        service.getSsoTokenFromThirdParty(url);
+        const loginUrl = new SsoLoginUrlEntity({url: AZURE_SUPPORTED_URLS[i]});
+        service.getSsoTokenFromThirdParty(loginUrl);
 
         await runPendingPromises();
 
         expect(browser.windows.create).toHaveBeenCalledWith({
-          url: url.toString(),
+          url: loginUrl.url,
           type: "popup",
           width: expect.any(Number),
           height: expect.any(Number)

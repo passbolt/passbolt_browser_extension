@@ -31,8 +31,8 @@ class GetLocalSsoProviderConfiguredController {
    */
   async _exec() {
     try {
-      const ssoClientData = await this.exec();
-      this.worker.port.emit(this.requestId, "SUCCESS", ssoClientData);
+      const ssoProvider = await this.exec();
+      this.worker.port.emit(this.requestId, "SUCCESS", ssoProvider);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, "ERROR", error);

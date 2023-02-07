@@ -21,10 +21,8 @@ import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOpti
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import DecryptSsoPassphraseService from "../../service/crypto/decryptSsoPassphraseService";
 import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
-import ClientSsoKitNotFoundError from "../../error/clientSsoKitNotFoundError";
 import PassboltApiFetchError from "../../error/passboltApiFetchError";
 import OutdatedSsoKitError from "../../error/outdatedSsoKitError";
-import UnexpectedSsoKitDecryptionError from "../../error/unexpectedSsoKitDecryptionError";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 
 const mockLogin = jest.fn();
@@ -115,7 +113,7 @@ describe("AzureSsoAuthenticationController", () => {
       try {
         await controller.exec();
       } catch (e) {
-        expect(e).toBeInstanceOf(ClientSsoKitNotFoundError);
+        expect(e).toBeInstanceOf(Error);
         expect(SsoDataStorage.flush).not.toHaveBeenCalled();
       }
     });
@@ -191,7 +189,7 @@ describe("AzureSsoAuthenticationController", () => {
 
       mockGetCodeFromThirdParty.mockImplementation(async() => ssoLoginToken);
 
-      jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => { throw new UnexpectedSsoKitDecryptionError(); });
+      jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => { throw new Error(); });
 
       mockGetCodeFromThirdParty.mockImplementation(async() => ssoToken);
       fetch.doMockOnceIf(new RegExp(`/sso/azure/login.json`), async() => mockApiResponse(azureUrlResponse));
@@ -201,7 +199,7 @@ describe("AzureSsoAuthenticationController", () => {
       try {
         await controller.exec();
       } catch (e) {
-        expect(e).toBeInstanceOf(UnexpectedSsoKitDecryptionError);
+        expect(e).toBeInstanceOf(Error);
         expect(SsoDataStorage.flush).not.toHaveBeenCalled();
       }
     });

@@ -13,7 +13,6 @@
  */
 import {Buffer} from 'buffer';
 import OutdatedSsoKitError from '../../error/outdatedSsoKitError';
-import UnexpectedSsoKitDecryptionError from '../../error/unexpectedSsoKitDecryptionError';
 
 class DecryptSsoPassphraseService {
   /**
@@ -56,7 +55,7 @@ class DecryptSsoPassphraseService {
        * This can happen if the local SSO kit nek and/or iv1 has changed (manually?).
        */
       console.error(e);
-      throw new UnexpectedSsoKitDecryptionError(`Unable to decrypt passphrase with the local SSO kit: ${e.message}`);
+      throw new Error(`Unable to decrypt passphrase with the local SSO kit: ${e.message}`);
     }
 
     return Buffer.from(secondDecryptionBuffer).toString();

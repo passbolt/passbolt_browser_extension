@@ -56,32 +56,37 @@ class SsoKitClientPartEntity extends Entity {
    * @param {CryptoKey} nek
    */
   static validateNek(nek) {
+    const entityValidationError = new EntityValidationError();
     if (!(nek instanceof CryptoKey)) {
-      throw new EntityValidationError("SsoKitClientPartEntity expects an nek to be an instance of CryptoKey.");
+      entityValidationError.addError("nek", "type", "SsoKitClientPartEntity expects an nek to be an instance of CryptoKey.");
     }
 
     if (nek.extractable) {
-      throw new EntityValidationError("SsoKitClientPartEntity expects an nek not to be extractable.");
+      entityValidationError.addError("nek", "type", "SsoKitClientPartEntity expects an nek not to be extractable.");
     }
 
-    if (nek.algorithm.name !== "AES-GCM") {
-      throw new EntityValidationError("SsoKitClientPartEntity expects an nek to use the algorithm 'AES-GSM'.");
+    if (nek?.algorithm?.name !== "AES-GCM") {
+      entityValidationError.addError("nek", "type", "SsoKitClientPartEntity expects an nek to use the algorithm 'AES-GSM'.");
     }
 
-    if (nek.algorithm.length !== 256) {
-      throw new EntityValidationError("SsoKitClientPartEntity expects an nek to use 256 bits.");
+    if (nek?.algorithm?.length !== 256) {
+      entityValidationError.addError("nek", "type", "SsoKitClientPartEntity expects an nek to use 256 bits.");
     }
 
-    if (!nek.usages.includes("encrypt")) {
-      throw new EntityValidationError("SsoKitClientPartEntity expects an nek to have the capability to encrypt.");
+    if (!nek?.usages?.includes("encrypt")) {
+      entityValidationError.addError("nek", "type", "SsoKitClientPartEntity expects an nek to have the capability to encrypt.");
     }
 
-    if (!nek.usages.includes("decrypt")) {
-      throw new EntityValidationError("SsoKitClientPartEntity expects an nek to have the capability to decrypt.");
+    if (!nek?.usages?.includes("decrypt")) {
+      entityValidationError.addError("nek", "type", "SsoKitClientPartEntity expects an nek to have the capability to decrypt.");
     }
 
-    if (nek.usages.length !== 2) {
-      throw new EntityValidationError("SsoKitClientPartEntity expects an nek to only have the following capabilities: encrypt and decrypt.");
+    if (nek?.usages?.length !== 2) {
+      entityValidationError.addError("nek", "type", "SsoKitClientPartEntity expects an nek to only have the following capabilities: encrypt and decrypt.");
+    }
+
+    if (entityValidationError.hasErrors()) {
+      throw entityValidationError;
     }
   }
 
@@ -91,12 +96,17 @@ class SsoKitClientPartEntity extends Entity {
    * @param {Uint8Array} iv
    */
   static validateIv(iv) {
+    const entityValidationError = new EntityValidationError();
     if (!(iv instanceof Uint8Array)) {
-      throw new EntityValidationError("SsoKitClientPartEntity expects IVs to be an instance of Uint8Array.");
+      entityValidationError.addError("iv", "type", "SsoKitClientPartEntity expects IVs to be an instance of Uint8Array.");
     }
 
     if (iv.length !== 12) {
-      throw new EntityValidationError("SsoKitClientPartEntity expects IVs to be of a length of 12 bytes.");
+      entityValidationError.addError("iv", "type", "SsoKitClientPartEntity expects IVs to be of a length of 12 bytes.");
+    }
+
+    if (entityValidationError.hasErrors()) {
+      throw entityValidationError;
     }
   }
 
@@ -170,6 +180,14 @@ class SsoKitClientPartEntity extends Entity {
   }
 
   /**
+   * Returns true if the kit is actually fully configured.
+   * @returns {boolean}
+   */
+  isRegistered() {
+    return Boolean(this.provider);
+  }
+
+  /**
    * Get the SSO Kit id
    * @returns {string}
    */
@@ -180,11 +198,11 @@ class SsoKitClientPartEntity extends Entity {
   }
 
   /**
-   * Get the SSO Kit id
-   * @returns {string}
+   * Get the SSO Kit id if any or null
+   * @returns {string|null}
    */
   get id() {
-    return this._props.id;
+    return this._props.id || null;
   }
 
   /**
@@ -198,11 +216,11 @@ class SsoKitClientPartEntity extends Entity {
   }
 
   /**
-   * Get the SSO provider identifier
-   * @returns {string}
+   * Get the SSO provider identifier if any or null
+   * @returns {string|null}
    */
   get provider() {
-    return this._props.provider;
+    return this._props.provider || null;
   }
 
   /**

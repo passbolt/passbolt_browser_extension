@@ -32,7 +32,7 @@ class AzureSsoAuthenticationController {
     this.account = account;
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
     this.ssoAzureLoginModel = new SsoAzureLoginModel(apiClientOptions);
-    this.azurePopupHandler = new AzurePopupHandlerService(account.domain, false);
+    this.azurePopupHandler = new AzurePopupHandlerService(account.domain, worker?.tab?.id, false);
     this.authModel = new AuthModel(apiClientOptions);
   }
 
@@ -66,7 +66,7 @@ class AzureSsoAuthenticationController {
       }
       const userId = this.account.userId;
       const loginUrl = await this.ssoAzureLoginModel.getLoginUrl(userId);
-      const thirdPartyCode = await this.azurePopupHandler.getCodeFromThirdParty(loginUrl);
+      const thirdPartyCode = await this.azurePopupHandler.getSsoTokenFromThirdParty(loginUrl);
       const ssoServerData = await this.ssoKitServerPartModel.getSsoKit(clientPartSsoKit.id, userId, thirdPartyCode);
 
       const jsonServerKey = JSON.parse(Buffer.from(ssoServerData.data, "base64").toString());

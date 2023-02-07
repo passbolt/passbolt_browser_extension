@@ -15,7 +15,7 @@ import AzurePopupHandlerService from "./azurePopupHandlerService";
 import browser from "webextension-polyfill";
 import MockTabs from "../../../../../test/mocks/mockTabs";
 import {v4 as uuid} from "uuid";
-import UserClosedSsoPopUpError from "../../error/userClosedSsoPopUpError";
+import UserAbortsOperationError from "../../error/userAbortsOperationError";
 
 let currentBrowserTab = null;
 let currentBrowserWindows = null;
@@ -150,7 +150,7 @@ describe("AzurePopupHandlerService", () => {
       await runPendingPromises();
 
       browser.tabs.onRemoved.triggers(tabId, {isWindowClosing: true});
-      return expect(promise).rejects.toThrowError(new UserClosedSsoPopUpError());
+      return expect(promise).rejects.toThrowError(new UserAbortsOperationError());
     });
 
     it("Should ends the process if the popup closes unexpedly", async() => {

@@ -67,22 +67,22 @@ describe("Sso Settings Entity", () => {
     ];
     const invalidIvs = [{
       iv1: [1, 2, 3],
-      iv2: await GenerateSsoIvService.generateIv()
+      iv2: GenerateSsoIvService.generateIv()
     }, {
-      iv1: await GenerateSsoIvService.generateIv(),
+      iv1: GenerateSsoIvService.generateIv(),
       iv2: [1, 2, 3]
     }, {
-      iv1: await GenerateSsoIvService.generateIv(),
-      iv2: await GenerateSsoIvService.generateIv(1)
+      iv1: GenerateSsoIvService.generateIv(),
+      iv2: GenerateSsoIvService.generateIv(1)
     }, {
-      iv1: await GenerateSsoIvService.generateIv(1),
-      iv2: await GenerateSsoIvService.generateIv()
+      iv1: GenerateSsoIvService.generateIv(1),
+      iv2: GenerateSsoIvService.generateIv()
     }, {
-      iv1: await GenerateSsoIvService.generateIv(16),
-      iv2: await GenerateSsoIvService.generateIv()
+      iv1: GenerateSsoIvService.generateIv(16),
+      iv2: GenerateSsoIvService.generateIv()
     }, {
-      iv1: await GenerateSsoIvService.generateIv(),
-      iv2: await GenerateSsoIvService.generateIv(16)
+      iv1: GenerateSsoIvService.generateIv(),
+      iv2: GenerateSsoIvService.generateIv(16)
     }];
 
     expect.assertions(invalidNeks.length + invalidIvs.length);

@@ -34,7 +34,7 @@ class SsoKitServerPartModel {
    * @param {string} ssoKitId a code given by the third party auth
    * @param {string} userId a code given by the third party auth
    * @param {string} ssoToken a code given by the third party auth
-   * @return {Promise<SsoUserServerDataEntity>}
+   * @return {Promise<SsoKitServerPartEntity>}
    */
   async getSsoKit(ssoKitId, userId, ssoToken) {
     const ssoUserServerDataDto = await this.ssoKitServerPartService.getSsoKit(ssoKitId, userId, ssoToken);

@@ -18,7 +18,6 @@ import {Buffer} from 'buffer';
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
 import SsoAzureLoginModel from "../../model/sso/ssoAzureLoginModel";
 import AuthModel from "../../model/auth/authModel";
-import ClientSsoKitNotFoundError from "../../error/clientSsoKitNotFoundError";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
 
 class AzureSsoAuthenticationController {
@@ -63,7 +62,7 @@ class AzureSsoAuthenticationController {
     try {
       const clientPartSsoKit = await SsoDataStorage.get();
       if (!clientPartSsoKit) {
-        throw new ClientSsoKitNotFoundError("The Single Sign-On cannot proceed as there is no SSO kit registered on this browser profile.");
+        throw new Error("The Single Sign-On cannot proceed as there is no SSO kit registered on this browser profile.");
       }
       const userId = this.account.userId;
       const loginUrl = await this.ssoAzureLoginModel.getLoginUrl(userId);

@@ -51,7 +51,7 @@ class CheckPassphraseController {
    * @param {string} passphrase The passphrase of the current user's key.
    * @returns {Promise<void>}
    * @throws {InvalidMasterPasswordError} if the passphrase can't decrypt the current user's key.
-   * @throws {Error} if no private key could be found.
+   * @throws {GpgKeyError} if no private key could be found.
    */
   async exec(passphrase) {
     await this.checkPassphraseService.checkPassphrase(passphrase);

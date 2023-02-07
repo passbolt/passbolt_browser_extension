@@ -13,7 +13,6 @@
  */
 import DecryptSsoPassphraseService from "./decryptSsoPassphraseService";
 import OutdatedSsoKitError from "../../error/outdatedSsoKitError";
-import UnexpectedSsoKitDecryptionError from "../../error/unexpectedSsoKitDecryptionError";
 
 const mockedDecrypt = jest.fn();
 global.self.crypto = {
@@ -79,7 +78,7 @@ describe("DecryptSsoPassphrase service", () => {
     }
   });
 
-  it("should throw an UnexpectedSsoKitDecryptionError if the local SSO kit has been modified somehow", async() => {
+  it("should throw an Error if the local SSO kit has been modified somehow", async() => {
     expect.assertions(1);
     let step = 0;
 
@@ -96,7 +95,7 @@ describe("DecryptSsoPassphrase service", () => {
     try {
       await DecryptSsoPassphraseService.decrypt(buffer1, key1, key2, iv1, iv2);
     } catch (e) {
-      expect(e).toBeInstanceOf(UnexpectedSsoKitDecryptionError);
+      expect(e).toBeInstanceOf(Error);
     }
   });
 });

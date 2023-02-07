@@ -31,6 +31,7 @@ import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntit
 import SsoKitServerPartEntity from "../../model/entity/sso/ssoKitServerPartEntity";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
+import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
 
 const mockedSaveFile = jest.spyOn(FileService, "saveFile");
 
@@ -50,6 +51,9 @@ describe("UpdatePrivateKeyController", () => {
   };
 
   describe("UpdatePrivateKeyController::exec", () => {
+    const data = generateSsoKitServerData({});
+    const dto = {data};
+
     it("Should trigger the download of the recovery kit with the new passphrase.", async() => {
       expect.assertions(4);
 
@@ -140,14 +144,14 @@ describe("UpdatePrivateKeyController", () => {
 
       mockOrganisationSettingCall(true);
       fetch.doMockOnceIf(new RegExp(`/sso/keys/${ssoKit.id}.json`), () => mockApiResponse({}));
-      fetch.doMockOnceIf(new RegExp('/sso/keys.json'), () => mockApiResponse({id: newSsoKitId, data: 'test'}));
+      fetch.doMockOnceIf(new RegExp('/sso/keys.json'), () => mockApiResponse({id: newSsoKitId, data: data}));
 
       jest.spyOn(GenerateSsoKitService, "generateSsoKits").mockImplementation((passphrase, providerId) => {
         expect(passphrase).toBe(newPassphrase);
         expect(providerId).toBe(ssoKit.provider);
 
         return {
-          serverPart: new SsoKitServerPartEntity({data: 'test'}),
+          serverPart: new SsoKitServerPartEntity(dto),
           clientPart: newSsoKit,
         };
       });
@@ -214,7 +218,7 @@ describe("UpdatePrivateKeyController", () => {
       fetch.doMockOnceIf(new RegExp('/sso/keys.json'), () => { throw expectedError; });
 
       jest.spyOn(GenerateSsoKitService, "generateSsoKits").mockImplementation(() => ({
-        serverPart: new SsoKitServerPartEntity({data: 'test'}),
+        serverPart: new SsoKitServerPartEntity(dto),
         clientPart: newSsoKit,
       }));
       jest.spyOn(PassphraseStorageService, "flushPassphrase");
@@ -250,10 +254,10 @@ describe("UpdatePrivateKeyController", () => {
 
       mockOrganisationSettingCall(true);
       fetch.doMockOnceIf(new RegExp(`/sso/keys/${ssoKit.id}.json`), () => mockApiResponseError(404));
-      fetch.doMockOnceIf(new RegExp('/sso/keys.json'), () => mockApiResponse({id: newSsoKitId, data: 'test'}));
+      fetch.doMockOnceIf(new RegExp('/sso/keys.json'), () => mockApiResponse({id: newSsoKitId, data: data}));
 
       jest.spyOn(GenerateSsoKitService, "generateSsoKits").mockImplementation(() => ({
-        serverPart: new SsoKitServerPartEntity({data: 'test'}),
+        serverPart: new SsoKitServerPartEntity(dto),
         clientPart: newSsoKit,
       }));
 

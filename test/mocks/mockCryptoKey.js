@@ -12,6 +12,8 @@
  * @since         3.9.0
  */
 
+import {generateSsoKitServerData} from "../../src/all/background_page/model/entity/sso/ssoKitServerPart.test.data";
+
 class CryptoKey {
   constructor(algorithm, extractable, usages) {
     this.extractable = extractable;
@@ -36,7 +38,8 @@ class CryptoSubtle {
   }
 
   async exportKey(keyFormat, keyInformation) {
-    return new CryptoKey(keyInformation.algorithm, keyInformation.extractable, keyInformation.usages);
+    const b64Key = generateSsoKitServerData({ext: keyInformation.extractable, key_ops: keyInformation.usages});
+    return JSON.parse(Buffer.from(b64Key, "base64").toString());
   }
 
   async importKey(keyFormat, keyBinData, algorithm, extractable, capabilities) {

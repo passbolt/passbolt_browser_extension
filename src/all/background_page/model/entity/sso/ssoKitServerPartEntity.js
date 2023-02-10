@@ -17,6 +17,7 @@ import Validator from "validator";
 
 const ENTITY_NAME = "SsoKitServerPartEntity";
 const JWK_ALGORITHM_AES_256_BITS = "A256GCM";
+import {Buffer} from 'buffer';
 
 /**
  * Entity related to the account recovery organization policy

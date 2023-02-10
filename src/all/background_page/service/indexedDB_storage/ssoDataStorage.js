@@ -12,6 +12,7 @@
  * @since         3.9.0
  */
 import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";
+import {assertUuid} from "../../utils/assertions";
 
 const DB_VERSION = 1;
 const DB_NAME = "sso_kit_db";
@@ -49,6 +50,8 @@ class SsoDataStorage {
    * @returns {Promise<void>}
    */
   static async updateLocalKitIdWith(ssoKitId) {
+    assertUuid(ssoKitId, "A valid SSO kit id is required");
+
     const dbHandler = await this.getDbHandler();
     await this.updateSsoDataWithId(dbHandler, ssoKitId);
     dbHandler.close();

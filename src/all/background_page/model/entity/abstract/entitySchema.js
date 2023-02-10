@@ -201,6 +201,9 @@ class EntitySchema {
       case 'null':
         // No additional checks
         break;
+      case 'x-custom':
+        EntitySchema.validatePropCustom(propName, prop, propSchema);
+        break;
       default:
         throw new TypeError(`Could not validate property ${propName}. Unsupported prop type ${propSchema.type}`);
     }
@@ -222,6 +225,26 @@ class EntitySchema {
     if (!EntitySchema.isValidPropType(prop, propSchema.type)) {
       const validationError = new EntityValidationError(`Could not validate property ${propName}.`);
       validationError.addError(propName, 'type',  `The ${propName} is not a valid ${propSchema.type}.`);
+      throw validationError;
+    }
+  }
+
+  /**
+   * Validate a prop with a custom validator
+   * Throw an error with the validation details if validation fails
+   *
+   * @param {string} propName example: name
+   * @param {*} prop the value to validate
+   * @param {object} propSchema example {type:string}
+   * @throw {EntityValidationError}
+   * @returns void
+   */
+  static validatePropCustom(propName, prop, propSchema) {
+    try {
+      propSchema.validationCallback(prop);
+    } catch (e) {
+      const validationError = new EntityValidationError(`Could not validate property ${propName}.`);
+      validationError.addError(propName, 'custom',  `The ${propName} is not valid: ${e.message}`);
       throw validationError;
     }
   }
@@ -346,6 +369,8 @@ class EntitySchema {
         return Array.isArray(prop);
       case 'blob':
         return prop instanceof Blob;
+      case 'x-custom':
+        return true;
       default:
         throw new TypeError('EntitySchema validation type not supported.');
     }

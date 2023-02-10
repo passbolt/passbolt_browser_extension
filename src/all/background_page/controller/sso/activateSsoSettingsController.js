@@ -12,7 +12,7 @@
  * @since         3.9.0
  */
 import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
-import Validator from "validator";
+import {assertUuid} from "../../utils/assertions";
 
 class ActivateSsoSettingsController {
   /**
@@ -51,13 +51,8 @@ class ActivateSsoSettingsController {
    * @return {Promise<SsoSettingsEntity>}
    */
   async exec(ssoDraftSettingsId, ssoToken) {
-    if (!Validator.isUUID(ssoDraftSettingsId)) {
-      throw new TypeError('The SSO settings id should be a valid uuid.');
-    }
-
-    if (!Validator.isUUID(ssoToken)) {
-      throw new TypeError('The SSO activation token should be a valid uuid.');
-    }
+    assertUuid(ssoDraftSettingsId, "The SSO settings id should be a valid uuid.");
+    assertUuid(ssoToken, "The SSO activation token should be a valid uuid.");
 
     return await this.ssoSettingsModel.activate(ssoDraftSettingsId, ssoToken);
   }

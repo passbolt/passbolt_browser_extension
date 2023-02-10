@@ -46,7 +46,7 @@ class GenerateSsoKitService {
    *
    * @param {string} passphrase The passphrase to encrypt for SSO
    * @param {string} provider The SSO provider identifier
-   * @return {Promise<SsoKitsDto>} the couple SSO kits
+   * @return {Promise<object>} the couple SSO kits
    */
   static async generateSsoKits(passphrase, provider) {
     const nek = await GenerateSsoKeyService.generateSsoKey();

@@ -97,20 +97,31 @@ class UpdatePrivateKeyController {
       return;
     }
 
-    if (currentKit.id) {
-      try {
-        await this.ssoKitServerPartModel.deleteSsoKit(currentKit.id);
-      } catch (e) {
-        // we assume that the kit might have been remove from the server already
-        if (!(e instanceof PassboltApiFetchError && e?.data?.code === 404)) {
-          throw e;
-        }
-      }
+    if (currentKit.isRegistered()) {
+      await this.deleteServerPartSsoKit(currentKit.id);
     }
+
     const ssoKits = await GenerateSsoKitService.generateSsoKits(newPassphrase, currentKit.provider);
     const registeredServerPartSsoKit = await this.ssoKitServerPartModel.setupSsoKit(ssoKits.serverPart);
     ssoKits.clientPart.id = registeredServerPartSsoKit.id;
     await SsoDataStorage.save(ssoKits.clientPart);
+  }
+
+  /**
+   * Tries to delete the server part SSO kit id if any.
+   * If the kit doesn't exist on the server, it ignores the deletion silently.
+   * @param {uuid} ssoKitId
+   * @private
+   */
+  async deleteServerPartSsoKit(ssoKitId) {
+    try {
+      await this.ssoKitServerPartModel.deleteSsoKit(ssoKitId);
+    } catch (e) {
+      // we assume that the kit might have been remove from the server already
+      if (!(e instanceof PassboltApiFetchError && e?.data?.code === 404)) {
+        throw e;
+      }
+    }
   }
 }
 

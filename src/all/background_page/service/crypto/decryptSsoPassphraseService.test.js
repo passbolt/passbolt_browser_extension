@@ -11,27 +11,25 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
+import "../../../../../test/mocks/mockCryptoKey";
 import DecryptSsoPassphraseService from "./decryptSsoPassphraseService";
 import OutdatedSsoKitError from "../../error/outdatedSsoKitError";
-import UnexpectedSsoKitDecryptionError from "../../error/unexpectedSsoKitDecryptionError";
-
-const mockedDecrypt = jest.fn();
-global.self.crypto = {
-  subtle: {
-    decrypt: mockedDecrypt
-  }
-};
+import {buildMockedCryptoKey} from "../../utils/assertions.test.data";
+import GenerateSsoIvService from "./generateSsoIvService";
 
 describe("DecryptSsoPassphrase service", () => {
-  const key1 = {algorithm: {name: "AES-GCM"}};
-  const key2 = {algorithm: {name: "AES-GCM"}};
-  const iv1 = new Uint8Array([1]);
-  const iv2 = new Uint8Array([2]);
+  const key1Promise = buildMockedCryptoKey({algoName: "AES-GCM", extractable: false});
+  const key2Promise = buildMockedCryptoKey({algoName: "AES-GCM"});
+  const iv1 = GenerateSsoIvService.generateIv();
+  const iv2 = GenerateSsoIvService.generateIv();
   const buffer1 = Buffer.from("This is a buffer").toString('base64');
   const buffer2 = Buffer.from("This is a second buffer");
 
   it('should decrypt the passphrase if all data are correct', async() => {
     expect.assertions(7);
+    const key1 = await key1Promise;
+    const key2 = await key2Promise;
+
     let step = 0;
     const expectedDecryptedPassphrase = "passphrase";
 
@@ -55,7 +53,7 @@ describe("DecryptSsoPassphrase service", () => {
       return expectedDecryptedPassphrase;
     };
 
-    mockedDecrypt.mockImplementation(async(algo, key, buffer) => {
+    crypto.subtle.decrypt.mockImplementation(async(algo, key, buffer) => {
       step++;
       return step === 1
         ? firstDecrypyCallExpectation(algo, key, buffer)
@@ -68,7 +66,10 @@ describe("DecryptSsoPassphrase service", () => {
 
   it("should throw an OutdatedSsoKitError if the server SSO kit doesn't match the local SSO kit", async() => {
     expect.assertions(1);
-    mockedDecrypt.mockImplementation(async() => {
+    const key1 = await key1Promise;
+    const key2 = await key2Promise;
+
+    crypto.subtle.decrypt.mockImplementation(async() => {
       throw new Error("Unable to decrypt somehow");
     });
 
@@ -79,14 +80,16 @@ describe("DecryptSsoPassphrase service", () => {
     }
   });
 
-  it("should throw an UnexpectedSsoKitDecryptionError if the local SSO kit has been modified somehow", async() => {
+  it("should throw an Error if the local SSO kit has been modified somehow", async() => {
     expect.assertions(1);
-    let step = 0;
+    const key1 = await key1Promise;
+    const key2 = await key2Promise;
 
+    let step = 0;
     const firstDecrypyCallExpectation = async() => buffer2;
     const secondDecrypyCallExpectation =  async() => { throw new Error("Unable to decrypt somehow"); };
 
-    mockedDecrypt.mockImplementation(async(algo, key, buffer) => {
+    crypto.subtle.decrypt.mockImplementation(async(algo, key, buffer) => {
       step++;
       return step === 1
         ? firstDecrypyCallExpectation(algo, key, buffer)
@@ -96,7 +99,7 @@ describe("DecryptSsoPassphrase service", () => {
     try {
       await DecryptSsoPassphraseService.decrypt(buffer1, key1, key2, iv1, iv2);
     } catch (e) {
-      expect(e).toBeInstanceOf(UnexpectedSsoKitDecryptionError);
+      expect(e).toBeInstanceOf(Error);
     }
   });
 });

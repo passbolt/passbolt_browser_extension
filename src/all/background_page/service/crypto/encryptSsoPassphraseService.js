@@ -12,6 +12,7 @@
  * @since         3.9.0
  */
 import {Buffer} from "buffer";
+import {assertExtractableSsoKey, assertNonExtractableSsoKey, assertValidInitialisationVector} from "../../utils/assertions";
 
 class EncryptSsoPassphraseService {
   /**
@@ -25,6 +26,11 @@ class EncryptSsoPassphraseService {
    * @returns {Promise<string>} a base64 string ready for serialization
    */
   static async encrypt(text, nek, ek, iv1, iv2) {
+    assertNonExtractableSsoKey(nek);
+    assertExtractableSsoKey(ek);
+    assertValidInitialisationVector(iv1);
+    assertValidInitialisationVector(iv2);
+
     const buffer = Buffer.from(text);
 
     const firstEncryptionAlgorithm = {

@@ -25,6 +25,7 @@ import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntit
 import SsoKitServerPartEntity from "../../model/entity/sso/ssoKitServerPartEntity";
 import {PassphraseController} from "../passphrase/passphraseController";
 import GenerateSsoKitController from "./generateSsoKitController";
+import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
 
 jest.mock("../passphrase/passphraseController.js");
 PassphraseController.get.mockResolvedValue(pgpKeys.ada.passphrase);
@@ -38,9 +39,10 @@ describe("GenerateSsoKitController", () => {
   describe("GenerateSsoKitController::exec", () => {
     it("Should generate a brand new kit if none exists.", async() => {
       expect.assertions(5);
+      const data = generateSsoKitServerData({});
       const expectedProvider = "azure";
       const expextedKitId = uuid();
-      const expectedServerPartKit = new SsoKitServerPartEntity({data: "this should be a base64 serialized key"});
+      const expectedServerPartKit = new SsoKitServerPartEntity({data});
       const expectedClientPartKit = new SsoKitClientPartEntity(clientSsoKit());
       const exepctedClientPartKitWithId = new SsoKitClientPartEntity({...(expectedClientPartKit.toDbSerializableObject()), id: expextedKitId,});
 

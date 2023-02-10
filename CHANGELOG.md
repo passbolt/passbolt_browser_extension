@@ -4,6 +4,41 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.10.0] - 2023-02-09
+### Added
+- PB-21752 As an anonymous user I can self register if the organization allows my email domain
+- PB-21999 As a signed-in administrator I can force users to authenticate with MFA at each sign-in
+- PB-22000 As a signed-in administrator I can force users to enable MFA
+- PB-22080 As a signed-in user I should be able to import chromium based browsers csv
+- PB-21874 As signed-in user I should be able to import bitwarden csv
+
+### Improved
+- PB-21910 As a signed-in administrator on the self registration admin settings form I want to see the domain warnings while typing and not after blur event
+- PB-22007 As a user finalizing my account recovery I should be able to authenticate with SSO after my first sign out
+- PB-22619 As a user authenticating with SSO, I should close the SSO popup when I am navigating away in the main frame
+- PB-22617 As a user authentication with SSO, closing the third party popup should not redirect me to the passphrase screen
+
+### Fixed
+- PB-18371 Fix contextual menu positioning issue when right clicking at the bottom of the page
+- PB-22386 As an administrator I want to know if the weak passphrase I am entering to generate an organization recovery key has been pwned
+- PB-22387 As an administrator generating an account recovery organization key, I should see the warning banner after submitting the form
+- PB-22388 Fix as a user recovering my account i should not see that the passphrase i entered has been pwned if it is not the valid passphrase
+- PB-22084 As a signed-in user I can import my passwords from 1Password csv export with their new header conventions
+
+### Maintenance
+- PB-21562 Refactor service worker port and add coverage
+- PB-21813 Unit test the private key's passphrase rotation SSO kit regeneration
+- PB-21878 Unit test the user stories related to SSO via quickaccess
+- PB-21932 Unit test: As AD I want my SSO kit to be generated when saving a new SSO settings
+- PB-21933 Create a service to parse the sign in url
+- PB-22337 Merge both controller AuthController and AuthSignInController to keep consistency
+- PB-22353 Remove redundant toDto function in SsoClientPartEntity
+- PB-22403 Instead of using new URL when getting sso url login, use an entity to ensure consistency and that the data is validated
+- PB-22478 As a developer I should be sure my changes don’t introduce regression in the build
+- PB-22479 As a developer I should be sure my changes don't introduce dependency vulnerabilities
+- PB-22614 Avoid telemetries to be sent to Storybook
+- PB-22630 Fix the Unit test in the browser extension about  method that shouldn't be called
+
 ## [3.9.2] - 2023-01-31
 ### Fixed
 - PB-22557: As LU I should be able to download file on chromium based browsers
@@ -1031,6 +1066,8 @@ self registration settings option in the left-side bar
 - LU: Logged in user
 
 [Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.9.0...HEAD
+[3.10.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.9.2...v3.10.0
+[3.9.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.9.0...v3.9.2
 [3.9.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.8.0...v3.9.0
 [3.8.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.3...v3.8.0
 [3.7.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.7.2...v3.7.3

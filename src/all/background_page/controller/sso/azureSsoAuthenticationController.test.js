@@ -21,11 +21,10 @@ import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOpti
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import DecryptSsoPassphraseService from "../../service/crypto/decryptSsoPassphraseService";
 import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
-import ClientSsoKitNotFoundError from "../../error/clientSsoKitNotFoundError";
 import PassboltApiFetchError from "../../error/passboltApiFetchError";
 import OutdatedSsoKitError from "../../error/outdatedSsoKitError";
-import UnexpectedSsoKitDecryptionError from "../../error/unexpectedSsoKitDecryptionError";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
+import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
 
 const mockLogin = jest.fn();
 jest.mock("../../model/auth/authModel", () => ({
@@ -35,12 +34,12 @@ jest.mock("../../model/auth/authModel", () => ({
   }))
 }));
 
-const mockGetCodeFromThirdParty = jest.fn();
+const mockGetSsoTokenFromThirdParty = jest.fn();
 const mockCloseHandler = jest.fn();
 jest.mock("../../service/sso/azurePopupHandlerService", () => ({
   __esModule: true,
   default: jest.fn(() => ({
-    getCodeFromThirdParty: mockGetCodeFromThirdParty,
+    getSsoTokenFromThirdParty: mockGetSsoTokenFromThirdParty,
     closeHandler: mockCloseHandler
   }))
 }));
@@ -52,24 +51,23 @@ beforeEach(() => {
 });
 
 describe("AzureSsoAuthenticationController", () => {
+  const azureUrlResponse = {
+    url: "https://login.microsoftonline.com"
+  };
+
   describe("AzureSsoAuthenticationController::exec", () => {
     it("Should sign the user using a third party.", async() => {
       expect.assertions(13);
       const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
-      const serverSsoKitKey = {key: "fakeKey"};
-      const serverSsoKit = {
-        data: Buffer.from(JSON.stringify(serverSsoKitKey)).toString('base64')
-      };
+      const serverSsoKit = {data: generateSsoKitServerData({})};
+      const deserializedKeyData = JSON.parse(Buffer.from(serverSsoKit.data, 'base64').toString());
       const account = {userId: uuid()};
-      const azureUrlResponse = {
-        url: "https://login.azure.com/passbolt"
-      };
       const severImportedKey = {algorithm: {name: "AES-GCM"}};
       const userPassphrase = "this is the user passphrase";
 
-      mockGetCodeFromThirdParty.mockImplementation(async() => ssoLoginToken);
+      mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);
       mockLogin.mockImplementation(async(passphrase, rememberMe) => {
         expect(passphrase).toBe(userPassphrase);
         expect(rememberMe).toBe(true);
@@ -77,7 +75,7 @@ describe("AzureSsoAuthenticationController", () => {
 
       crypto.subtle.importKey.mockImplementation(async(keyFormat, keyInfo, algorithmName, isExtractable, capabilities) => {
         expect(keyFormat).toBe("jwk");
-        expect(keyInfo).toStrictEqual(serverSsoKitKey);
+        expect(keyInfo).toStrictEqual(deserializedKeyData);
         expect(algorithmName).toBe('AES-GCM');
         expect(isExtractable).toBe(true);
         expect(capabilities).toStrictEqual(["encrypt", "decrypt"]);
@@ -115,7 +113,7 @@ describe("AzureSsoAuthenticationController", () => {
       try {
         await controller.exec();
       } catch (e) {
-        expect(e).toBeInstanceOf(ClientSsoKitNotFoundError);
+        expect(e).toBeInstanceOf(Error);
         expect(SsoDataStorage.flush).not.toHaveBeenCalled();
       }
     });
@@ -127,10 +125,7 @@ describe("AzureSsoAuthenticationController", () => {
       SsoDataStorage.setMockedData(ssoKit);
 
       const account = {userId: uuid()};
-      const azureUrlResponse = {
-        url: "https://login.azure.com/passbolt"
-      };
-      mockGetCodeFromThirdParty.mockImplementation(async() => ssoToken);
+      mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoToken);
       fetch.doMockOnceIf(new RegExp(`/sso/azure/login.json`), async() => mockApiResponse(azureUrlResponse));
       fetch.doMockOnceIf(new RegExp(`/sso/keys/${ssoKit.id}/${account.userId}/${ssoToken}.json`), async() => mockApiResponseError(404));
 
@@ -149,19 +144,13 @@ describe("AzureSsoAuthenticationController", () => {
       const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
-      const serverSsoKitKey = {key: "fakeKey"};
-      const serverSsoKit = {
-        data: Buffer.from(JSON.stringify(serverSsoKitKey)).toString('base64')
-      };
+      const serverSsoKit = {data: generateSsoKitServerData({})};
       const account = {userId: uuid()};
-      const azureUrlResponse = {
-        url: "https://login.azure.com/passbolt"
-      };
 
-      mockGetCodeFromThirdParty.mockImplementation(async() => ssoLoginToken);
+      mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);
       jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => { throw new OutdatedSsoKitError(); });
 
-      mockGetCodeFromThirdParty.mockImplementation(async() => ssoToken);
+      mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoToken);
       fetch.doMockOnceIf(new RegExp(`/sso/azure/login.json`), async() => mockApiResponse(azureUrlResponse));
       fetch.doMockOnceIf(new RegExp(`/sso/keys/${ssoLocalKit.id}/${account.userId}/${ssoToken}.json`), async() => mockApiResponse(serverSsoKit));
 
@@ -180,20 +169,14 @@ describe("AzureSsoAuthenticationController", () => {
       const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
-      const serverSsoKitKey = {key: "fakeKey"};
-      const serverSsoKit = {
-        data: Buffer.from(JSON.stringify(serverSsoKitKey)).toString('base64')
-      };
+      const serverSsoKit = {data: generateSsoKitServerData({})};
       const account = {userId: uuid()};
-      const azureUrlResponse = {
-        url: "https://login.azure.com/passbolt"
-      };
 
-      mockGetCodeFromThirdParty.mockImplementation(async() => ssoLoginToken);
+      mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);
 
-      jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => { throw new UnexpectedSsoKitDecryptionError(); });
+      jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => { throw new Error(); });
 
-      mockGetCodeFromThirdParty.mockImplementation(async() => ssoToken);
+      mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoToken);
       fetch.doMockOnceIf(new RegExp(`/sso/azure/login.json`), async() => mockApiResponse(azureUrlResponse));
       fetch.doMockOnceIf(new RegExp(`/sso/keys/${ssoLocalKit.id}/${account.userId}/${ssoToken}.json`), async() => mockApiResponse(serverSsoKit));
 
@@ -201,7 +184,7 @@ describe("AzureSsoAuthenticationController", () => {
       try {
         await controller.exec();
       } catch (e) {
-        expect(e).toBeInstanceOf(UnexpectedSsoKitDecryptionError);
+        expect(e).toBeInstanceOf(Error);
         expect(SsoDataStorage.flush).not.toHaveBeenCalled();
       }
     });
@@ -212,20 +195,14 @@ describe("AzureSsoAuthenticationController", () => {
       const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
-      const serverSsoKitKey = {key: "fakeKey"};
-      const serverSsoKit = {
-        data: Buffer.from(JSON.stringify(serverSsoKitKey)).toString('base64')
-      };
+      const serverSsoKit = {data: generateSsoKitServerData({})};
       const account = {userId: uuid()};
-      const azureUrlResponse = {
-        url: "https://login.azure.com/passbolt"
-      };
 
-      mockGetCodeFromThirdParty.mockImplementation(async() => ssoLoginToken);
+      mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);
 
       jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => "passphrase");
 
-      mockGetCodeFromThirdParty.mockImplementation(async() => ssoToken);
+      mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoToken);
       mockLogin.mockImplementation(async() => { throw new InvalidMasterPasswordError(); });
       fetch.doMockOnceIf(new RegExp(`/sso/azure/login.json`), async() => mockApiResponse(azureUrlResponse));
       fetch.doMockOnceIf(new RegExp(`/sso/keys/${ssoLocalKit.id}/${account.userId}/${ssoToken}.json`), async() => mockApiResponse(serverSsoKit));

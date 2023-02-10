@@ -12,42 +12,46 @@
  * @since         3.9.0
  */
 import browser from "webextension-polyfill";
-import UserClosedSsoPopUpError from "../../error/userClosedSsoPopUpError";
+import UserAbortsOperationError from "../../error/userAbortsOperationError";
+import SsoLoginUrlEntity from "../../model/entity/sso/ssoLoginUrlEntity";
+import {assertUuid} from "../../utils/assertions";
 
 const AZURE_POPUP_WINDOW_HEIGHT = 600;
 const AZURE_POPUP_WINDOW_WIDTH = 380;
 const DRY_RUN_SSO_LOGIN_SUCCESS_ENDPOINT = "/sso/login/dry-run/success";
 const SSO_LOGIN_SUCCESS_ENDPOINT = "/sso/login/success";
-const SSO_LOGIN_SUPPORTED_URLS = [
-  'https://login.microsoftonline.com',
-  'https://login.microsoftonline.us',
-  'https://login.partner.microsoftonline.cn',
-];
 
 class AzurePopupHandlerService {
   /**
    * Constructor
    *
    * @param {ApiClientOptions} apiClientOptions
+   * @param {number} originTabIdCall id of the tab from where the call has been made
+   * @param {boolean} asDryRun does the process is for a dry-run
    * @public
    */
-  constructor(accountDomain, asDryRun = false) {
+  constructor(accountDomain, originTabIdCall, asDryRun) {
     this.popup = null;
     this.popupTabId = null;
     this.verifyCodeInTab = this.verifyCodeInTab.bind(this);
     this.verifyPopupClosed = this.verifyPopupClosed.bind(this);
     const endpoint = asDryRun ? DRY_RUN_SSO_LOGIN_SUCCESS_ENDPOINT : SSO_LOGIN_SUCCESS_ENDPOINT;
     this.expectedUrl = `${accountDomain}${endpoint}`;
+    this.originTabIdCall = originTabIdCall;
   }
 
   /**
    * Run the third-party SSO provider Sign in and get back a tiken once successfully finished
-   * @param {URL} url the url for opening the popup
+   * @param {SsoLoginUrlEntity} loginUrlEntity the entity containing the url for opening the popup
    * @returns {Promise<void>}
    * @public
    */
-  async getCodeFromThirdParty(popUrl) {
-    this.popup = await this.openPopup(popUrl.toString());
+  async getSsoTokenFromThirdParty(loginUrlEntity) {
+    if (!(loginUrlEntity instanceof SsoLoginUrlEntity)) {
+      throw new Error("The login URL should be a valid instance of a SsoLoginUrlEntity");
+    }
+
+    this.popup = await this.openPopup(loginUrlEntity.url);
     this.popupTabId = this.popup.tabs[0].id;
 
     return new Promise((resolve, reject) => {
@@ -64,7 +68,13 @@ class AzurePopupHandlerService {
    * @returns {void}
    * @private
    */
-  verifyCodeInTab(tabId, changeInfo, tab) {
+  async verifyCodeInTab(tabId, changeInfo, tab) {
+    if (tabId === this.originTabIdCall) {
+      this.rejectPromise(new UserAbortsOperationError("The user navigated away from the tab where the SSO sign-in initiated"));
+      await this.closeHandler();
+      return;
+    }
+
     if (tabId !== this.popupTabId) {
       return;
     }
@@ -73,28 +83,30 @@ class AzurePopupHandlerService {
       return;
     }
 
-    const code = this.grabCodeFromHash(tab.url);
+    const code = this.grabSsoTokenFromUrl(tab.url);
     if (code !== null) {
       this.resolvePromise(code);
     }
   }
 
   /**
-   * Popup close handler.
+   * Tab removal handler.
+   * In this method we observe if:
+   *  - the SSO sign in popup has been closed by the user
+   *  - the tab from where the SSO sign in has been initiated has been closed by the user
+   * In both case, we cancel the SSO sign in process.
+   *
+   * @param {number} tabId the tab identifier where the event happens
    * @returns {void}
    * @private
    */
-  verifyPopupClosed(tabId, removeInfo) {
-    if (tabId !== this.popupTabId) {
-      return; //It's not our tab
+  async verifyPopupClosed(tabId) {
+    if (tabId === this.originTabIdCall) {
+      this.rejectPromise(new UserAbortsOperationError("The user closed the tab from where the SSO sign-in initiated"));
+      await this.closeHandler();
+    } else if (tabId === this.popupTabId) {
+      this.rejectPromise(new UserAbortsOperationError("The user closed the SSO sign-in popup"));
     }
-
-    if (removeInfo.isWindowClosing) {
-      this.rejectPromise(new UserClosedSsoPopUpError());
-      return;
-    }
-
-    this.rejectPromise(new Error("The popup closed unexpectedly"));
   }
 
   /**
@@ -122,8 +134,6 @@ class AzurePopupHandlerService {
    * @private
    */
   async openPopup(url) {
-    this.assertSsoLoginUrl(url);
-
     const type = "popup";
     const width = AZURE_POPUP_WINDOW_WIDTH;
     const height = AZURE_POPUP_WINDOW_HEIGHT;
@@ -133,32 +143,22 @@ class AzurePopupHandlerService {
   }
 
   /**
-   * Assert that an url is a supported sso login url.
-   * @param {string} url the url for the popup to point at
-   * @throw {Error} If the url is not supported
-   * @return {void}
+   * Tries to extract an SSO token from the given URL.
+   * @param {string} url the url from which to try to extract the SSO token
+   * @return {string<uuid>|null}
    * @private
    */
-  assertSsoLoginUrl(url) {
-    const isSupportedUrl = SSO_LOGIN_SUPPORTED_URLS.some(supportedUrl => url.startsWith(supportedUrl));
-    if (!isSupportedUrl) {
-      throw new Error('Unsupported single sign-on login url');
-    }
-  }
-
-  /**
-   * Tries to extract a well-formatted third party code from a URL's hash.
-   * @param {string} url the url from which to extract the code
-   * @return {string|null}
-   * @private
-   */
-  grabCodeFromHash(url) {
+  grabSsoTokenFromUrl(url) {
     if (!url.startsWith(this.expectedUrl)) {
       return null;
     }
     const parsedUrl = new URL(url);
-    const code = parsedUrl.searchParams.get('token') || null;
-    return code;
+    const ssoToken = parsedUrl.searchParams.get('token') || null;
+
+    if (ssoToken) {
+      assertUuid(ssoToken, "The SSO token should be a valid uuid.");
+      return ssoToken;
+    }
   }
 }
 

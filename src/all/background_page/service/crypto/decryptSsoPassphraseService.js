@@ -13,7 +13,12 @@
  */
 import {Buffer} from 'buffer';
 import OutdatedSsoKitError from '../../error/outdatedSsoKitError';
-import UnexpectedSsoKitDecryptionError from '../../error/unexpectedSsoKitDecryptionError';
+import {
+  assertBase64String,
+  assertNonExtractableSsoKey,
+  assertExtractableSsoKey,
+  assertValidInitialisationVector
+} from '../../utils/assertions';
 
 class DecryptSsoPassphraseService {
   /**
@@ -27,6 +32,12 @@ class DecryptSsoPassphraseService {
    * @returns {Promise<string>} the deciphered string
    */
   static async decrypt(base64Text, nek, ek, iv1, iv2) {
+    assertBase64String(base64Text);
+    assertNonExtractableSsoKey(nek);
+    assertExtractableSsoKey(ek);
+    assertValidInitialisationVector(iv1);
+    assertValidInitialisationVector(iv2);
+
     const buffer = Buffer.from(base64Text, 'base64');
     const firstDecryptionAlgorithm = {
       name: ek.algorithm.name,
@@ -56,7 +67,7 @@ class DecryptSsoPassphraseService {
        * This can happen if the local SSO kit nek and/or iv1 has changed (manually?).
        */
       console.error(e);
-      throw new UnexpectedSsoKitDecryptionError(`Unable to decrypt passphrase with the local SSO kit: ${e.message}`);
+      throw new Error(`Unable to decrypt passphrase with the local SSO kit: ${e.message}`);
     }
 
     return Buffer.from(secondDecryptionBuffer).toString();

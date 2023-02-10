@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
+import {assertUuid} from "../../../utils/assertions";
 import AbstractService from "../abstract/abstractService";
 
 const SSO_SETTINGS_SERVICE_RESOURCE_NAME = '/sso/settings';
@@ -51,6 +52,8 @@ class SsoSettingsService extends AbstractService {
    * @returns {Promise<SsoSettingsDto>}
    */
   async get(ssoSettingsId) {
+    assertUuid(ssoSettingsId, "The SSO settings id should be a valid uuid.");
+
     const response = await this.apiClient.get(ssoSettingsId);
     return response.body;
   }
@@ -77,20 +80,24 @@ class SsoSettingsService extends AbstractService {
 
   /**
    * Activates the given settings id using the Passbolt API.
-   * @param {uuid} settingsId
+   * @param {uuid} ssoSettingsId
    * @param {SsoSettingsActivationDto} activationDto
    */
-  async activateSettings(settingsId, activationDto) {
-    const response = await this.apiClient.update(settingsId, activationDto);
+  async activateSettings(ssoSettingsId, activationDto) {
+    assertUuid(ssoSettingsId, "The SSO settings id should be a valid uuid.");
+
+    const response = await this.apiClient.update(ssoSettingsId, activationDto);
     return response.body;
   }
 
   /**
    * Deletes the given settings id using the Passbolt API.
-   * @param {uuid} settingsId
+   * @param {uuid} ssoSettingsId
    */
-  async delete(settingsId) {
-    const response = await this.apiClient.delete(settingsId);
+  async delete(ssoSettingsId) {
+    assertUuid(ssoSettingsId, "The SSO settings id should be a valid uuid.");
+
+    const response = await this.apiClient.delete(ssoSettingsId);
     return response.body;
   }
 }

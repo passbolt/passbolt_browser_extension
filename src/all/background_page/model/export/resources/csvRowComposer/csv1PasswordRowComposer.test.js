@@ -28,7 +28,7 @@ describe("Csv1PasswordComposer", () => {
     expect(csvRow).toBeInstanceOf(Object);
     expect(csvRow.Title).toEqual(externalResourceEntity.name);
     expect(csvRow.Username).toEqual(externalResourceEntity.username);
-    expect(csvRow.URL).toEqual(externalResourceEntity.uri);
+    expect(csvRow.Url).toEqual(externalResourceEntity.uri);
     expect(csvRow.Password).toEqual(externalResourceEntity.secretClear);
     expect(csvRow.Notes).toEqual(externalResourceEntity.description);
     expect(csvRow.Type).toEqual(externalResourceEntity.folderParentPath);

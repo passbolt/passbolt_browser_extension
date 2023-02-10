@@ -15,7 +15,9 @@ import AzurePopupHandlerService from "./azurePopupHandlerService";
 import browser from "webextension-polyfill";
 import MockTabs from "../../../../../test/mocks/mockTabs";
 import {v4 as uuid} from "uuid";
-import UserClosedSsoPopUpError from "../../error/userClosedSsoPopUpError";
+import UserAbortsOperationError from "../../error/userAbortsOperationError";
+import SsoLoginUrlEntity from "../../model/entity/sso/ssoLoginUrlEntity";
+import EntityValidationError from "../../model/entity/abstract/entityValidationError";
 
 let currentBrowserTab = null;
 let currentBrowserWindows = null;
@@ -56,7 +58,7 @@ describe("AzurePopupHandlerService", () => {
     const userDomain = "https://fakeurl.passbolt.com";
     const ssoToken = uuid();
     const finalUrl = `${userDomain}/sso/login/dry-run/success?token=${ssoToken}`;
-    const thirdPartyUrl = new URL("https://login.microsoftonline.com");
+    const thirdPartyUrl = new SsoLoginUrlEntity({url: "https://login.microsoftonline.com"});
 
     it("Should return SSO token when navigation is done to a correct URL in dry-run mode", async() => {
       expect.assertions(4);
@@ -67,13 +69,15 @@ describe("AzurePopupHandlerService", () => {
         }]
       }));
 
-      const service = new AzurePopupHandlerService(userDomain, true);
-      const promise = service.getCodeFromThirdParty(thirdPartyUrl);
+      const originTabIdCall = 1;
+
+      const service = new AzurePopupHandlerService(userDomain, originTabIdCall, true);
+      const promise = service.getSsoTokenFromThirdParty(thirdPartyUrl);
 
       await runPendingPromises();
 
       expect(browser.windows.create).toHaveBeenCalledWith({
-        url: thirdPartyUrl.toString(),
+        url: thirdPartyUrl.url,
         type: "popup",
         width: expect.any(Number),
         height: expect.any(Number)
@@ -85,7 +89,7 @@ describe("AzurePopupHandlerService", () => {
       //Update on the expected tabid as pending
       browser.tabs.onUpdated.triggers(tabId, null, {status: "pending"});
       //Update on the expected tabid as complete but without token
-      browser.tabs.onUpdated.triggers(tabId, null, {status: "complete", url: thirdPartyUrl.toString()});
+      browser.tabs.onUpdated.triggers(tabId, null, {status: "complete", url: thirdPartyUrl.url});
       //Update on another tabid as pending with the awaited URL
       browser.tabs.onUpdated.triggers(uuid(), null, {status: "pending", url: finalUrl});
       //Update on the expected tabid as complete with the awaited URL
@@ -94,6 +98,25 @@ describe("AzurePopupHandlerService", () => {
       await runPendingPromises();
 
       expect(await promise).toBe(ssoToken);
+    });
+
+    it("Should close the SSO sign-in popup when the tab that calls the popup is being closed by the user", async() => {
+      expect.assertions(1);
+      const tabId = uuid();
+      browser.windows.create.mockImplementation(async() => ({
+        tabs: [{
+          id: tabId
+        }]
+      }));
+
+      const originTabIdCall = uuid();
+      const service = new AzurePopupHandlerService(userDomain, originTabIdCall);
+      const promise = service.getSsoTokenFromThirdParty(thirdPartyUrl);
+
+      await runPendingPromises();
+
+      browser.tabs.onRemoved.triggers(originTabIdCall);
+      return expect(promise).rejects.toThrowError(new UserAbortsOperationError("The user closed the tab from where the SSO sign-in initiated"));
     });
 
     it("Should return SSO token when navigation is done to a correct URL in sign-in mode", async() => {
@@ -107,12 +130,12 @@ describe("AzurePopupHandlerService", () => {
       }));
 
       const service = new AzurePopupHandlerService(userDomain, false);
-      const promise = service.getCodeFromThirdParty(thirdPartyUrl);
+      const promise = service.getSsoTokenFromThirdParty(thirdPartyUrl);
 
       await runPendingPromises();
 
       expect(browser.windows.create).toHaveBeenCalledWith({
-        url: thirdPartyUrl.toString(),
+        url: thirdPartyUrl.url,
         type: "popup",
         width: expect.any(Number),
         height: expect.any(Number)
@@ -124,7 +147,7 @@ describe("AzurePopupHandlerService", () => {
       //Update on the expected tabid as pending
       browser.tabs.onUpdated.triggers(tabId, null, {status: "pending"});
       //Update on the expected tabid as complete but without token
-      browser.tabs.onUpdated.triggers(tabId, null, {status: "complete", url: thirdPartyUrl.toString()});
+      browser.tabs.onUpdated.triggers(tabId, null, {status: "complete", url: thirdPartyUrl.url});
       //Update on abother tabid as pending with the awaited URL
       browser.tabs.onUpdated.triggers(uuid(), null, {status: "pending", url: finalUrl});
       //Update on the expected tabid as complete with the awaited URL
@@ -135,7 +158,7 @@ describe("AzurePopupHandlerService", () => {
       expect(await promise).toBe(ssoToken);
     });
 
-    it("Should ends the process if the user closes the popup", async() => {
+    it("Should end the process if the user closed the popup", async() => {
       expect.assertions(1);
       const tabId = uuid();
       browser.windows.create.mockImplementation(async() => ({
@@ -145,30 +168,12 @@ describe("AzurePopupHandlerService", () => {
       }));
 
       const service = new AzurePopupHandlerService();
-      const promise = service.getCodeFromThirdParty(thirdPartyUrl);
+      const promise = service.getSsoTokenFromThirdParty(thirdPartyUrl);
 
       await runPendingPromises();
 
-      browser.tabs.onRemoved.triggers(tabId, {isWindowClosing: true});
-      return expect(promise).rejects.toThrowError(new UserClosedSsoPopUpError());
-    });
-
-    it("Should ends the process if the popup closes unexpedly", async() => {
-      expect.assertions(1);
-      const tabId = uuid();
-      browser.windows.create.mockImplementation(async() => ({
-        tabs: [{
-          id: tabId
-        }]
-      }));
-
-      const service = new AzurePopupHandlerService();
-      const promise = service.getCodeFromThirdParty(thirdPartyUrl);
-
-      await runPendingPromises();
-
-      browser.tabs.onRemoved.triggers(tabId, {isWindowClosing: false});
-      return expect(promise).rejects.toThrowError(new Error("The popup closed unexpectedly"));
+      browser.tabs.onRemoved.triggers(tabId);
+      return expect(promise).rejects.toThrowError(new UserAbortsOperationError("The user closed the SSO sign-in popup"));
     });
 
     it("Should clean up the listeners when the handler is asked to be closed", async() => {
@@ -181,7 +186,7 @@ describe("AzurePopupHandlerService", () => {
       }));
 
       const service = new AzurePopupHandlerService();
-      service.getCodeFromThirdParty(thirdPartyUrl);
+      service.getSsoTokenFromThirdParty(thirdPartyUrl);
 
       await runPendingPromises();
 
@@ -203,9 +208,9 @@ describe("AzurePopupHandlerService", () => {
 
       const service = new AzurePopupHandlerService(userDomain, true);
       try {
-        await service.getCodeFromThirdParty(new URL("javascript:console('this would be an XSS')"));
+        await service.getSsoTokenFromThirdParty(new SsoLoginUrlEntity({url: "javascript:console('this would be an XSS')"}));
       } catch (e) {
-        expect(e).toStrictEqual(new Error("Unsupported single sign-on login url"));
+        expect(e).toStrictEqual(new EntityValidationError("Could not validate entity SsoLoginUrl."));
       }
     });
 
@@ -221,13 +226,13 @@ describe("AzurePopupHandlerService", () => {
       const service = new AzurePopupHandlerService(userDomain, true);
 
       for (let i = 0; i < AZURE_SUPPORTED_URLS.length; i++) {
-        const url = new URL(AZURE_SUPPORTED_URLS[i]);
-        service.getCodeFromThirdParty(url);
+        const loginUrl = new SsoLoginUrlEntity({url: AZURE_SUPPORTED_URLS[i]});
+        service.getSsoTokenFromThirdParty(loginUrl);
 
         await runPendingPromises();
 
         expect(browser.windows.create).toHaveBeenCalledWith({
-          url: url.toString(),
+          url: loginUrl.url,
           type: "popup",
           width: expect.any(Number),
           height: expect.any(Number)

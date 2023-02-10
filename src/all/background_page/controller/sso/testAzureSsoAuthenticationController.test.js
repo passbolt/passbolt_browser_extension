@@ -18,14 +18,15 @@ import {withAzureSsoSettings} from "./saveSsoSettingsAsDraftController.test.data
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import TestAzureSsoAuthenticationController from "./testAzureSsoAuthenticationController";
 import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import SsoLoginUrlEntity from "../../model/entity/sso/ssoLoginUrlEntity";
 
-const mock_getCodeFromThirdParty = jest.fn();
+const mock_getSsoTokenFromThirdParty = jest.fn();
 const mock_closeHandler = jest.fn();
 
 jest.mock("../../service/sso/azurePopupHandlerService", () => ({
   __esModule: true,
   default: jest.fn(() => ({
-    getCodeFromThirdParty: mock_getCodeFromThirdParty,
+    getSsoTokenFromThirdParty: mock_getSsoTokenFromThirdParty,
     closeHandler: mock_closeHandler
   }))
 }));
@@ -36,8 +37,9 @@ beforeEach(() => {
 });
 
 describe("TestAzureSsoAuthenticationController", () => {
-  const fakeUrlToHit = "https://fakeurl.passbolt.com";
-  const account = {domain: fakeUrlToHit};
+  const urlToHit = {url: "https://login.microsoftonline.us"};
+  const account = {domain: urlToHit.url};
+
   describe("TestAzureSsoAuthenticationController::exec", () => {
     it("Should save the given settings as a draft.", async() => {
       expect.assertions(5);
@@ -53,18 +55,16 @@ describe("TestAzureSsoAuthenticationController", () => {
           sso_settings_id: settingsId
         });
 
-        return mockApiResponse({
-          url: fakeUrlToHit
-        });
+        return mockApiResponse(urlToHit);
       });
 
-      mock_getCodeFromThirdParty.mockImplementation(async() => ssoLoginSuccessToken);
+      mock_getSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginSuccessToken);
 
       const controller = new TestAzureSsoAuthenticationController(null, null, defaultApiClientOptions(), account);
       const resultingToken = await controller.exec(settingsId);
 
-      expect(mock_getCodeFromThirdParty).toHaveBeenCalledTimes(1);
-      expect(mock_getCodeFromThirdParty).toHaveBeenCalledWith(new URL(fakeUrlToHit));
+      expect(mock_getSsoTokenFromThirdParty).toHaveBeenCalledTimes(1);
+      expect(mock_getSsoTokenFromThirdParty).toHaveBeenCalledWith(new SsoLoginUrlEntity(urlToHit));
       expect(mock_closeHandler).toHaveBeenCalledTimes(1);
       expect(resultingToken).toBe(ssoLoginSuccessToken);
     });

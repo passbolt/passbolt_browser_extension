@@ -14,11 +14,9 @@
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import DecryptSsoPassphraseService from "../../service/crypto/decryptSsoPassphraseService";
 import AzurePopupHandlerService from "../../service/sso/azurePopupHandlerService";
-import {Buffer} from 'buffer';
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
 import SsoAzureLoginModel from "../../model/sso/ssoAzureLoginModel";
 import AuthModel from "../../model/auth/authModel";
-import ClientSsoKitNotFoundError from "../../error/clientSsoKitNotFoundError";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
 
 class AzureSsoAuthenticationController {
@@ -33,7 +31,7 @@ class AzureSsoAuthenticationController {
     this.account = account;
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
     this.ssoAzureLoginModel = new SsoAzureLoginModel(apiClientOptions);
-    this.azurePopupHandler = new AzurePopupHandlerService(account.domain, false);
+    this.azurePopupHandler = new AzurePopupHandlerService(account.domain, worker?.tab?.id, false);
     this.authModel = new AuthModel(apiClientOptions);
   }
 
@@ -63,15 +61,14 @@ class AzureSsoAuthenticationController {
     try {
       const clientPartSsoKit = await SsoDataStorage.get();
       if (!clientPartSsoKit) {
-        throw new ClientSsoKitNotFoundError("The Single Sign-On cannot proceed as there is no SSO kit registered on this browser profile.");
+        throw new Error("The Single Sign-On cannot proceed as there is no SSO kit registered on this browser profile.");
       }
       const userId = this.account.userId;
       const loginUrl = await this.ssoAzureLoginModel.getLoginUrl(userId);
-      const thirdPartyCode = await this.azurePopupHandler.getCodeFromThirdParty(loginUrl);
+      const thirdPartyCode = await this.azurePopupHandler.getSsoTokenFromThirdParty(loginUrl);
       const ssoServerData = await this.ssoKitServerPartModel.getSsoKit(clientPartSsoKit.id, userId, thirdPartyCode);
 
-      const jsonServerKey = JSON.parse(Buffer.from(ssoServerData.data, "base64").toString());
-      const serverKey = await crypto.subtle.importKey("jwk", jsonServerKey, 'AES-GCM', true, ["encrypt", "decrypt"]);
+      const serverKey = await crypto.subtle.importKey("jwk", ssoServerData.key, 'AES-GCM', true, ["encrypt", "decrypt"]);
 
       const passphrase = await DecryptSsoPassphraseService.decrypt(clientPartSsoKit.secret, clientPartSsoKit.nek, serverKey, clientPartSsoKit.iv1, clientPartSsoKit.iv2);
       await this.azurePopupHandler.closeHandler();

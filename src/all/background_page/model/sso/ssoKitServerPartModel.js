@@ -12,6 +12,7 @@
  * @since         3.9.0
  */
 import SsoKitServerPartService from "../../service/api/sso/ssoKitServerPartService";
+import {assertUuid} from "../../utils/assertions";
 import SsoKitServerPartEntity from "../entity/sso/ssoKitServerPartEntity";
 
 /**
@@ -34,9 +35,13 @@ class SsoKitServerPartModel {
    * @param {string} ssoKitId a code given by the third party auth
    * @param {string} userId a code given by the third party auth
    * @param {string} ssoToken a code given by the third party auth
-   * @return {Promise<SsoUserServerDataEntity>}
+   * @return {Promise<SsoKitServerPartEntity>}
    */
   async getSsoKit(ssoKitId, userId, ssoToken) {
+    assertUuid(ssoKitId, "The SSO kit id should be a valid uuid.");
+    assertUuid(userId, "The user id should be a valid uuid.");
+    assertUuid(ssoToken, "The SSO token should be a valid uuid.");
+
     const ssoUserServerDataDto = await this.ssoKitServerPartService.getSsoKit(ssoKitId, userId, ssoToken);
     return new SsoKitServerPartEntity(ssoUserServerDataDto);
   }
@@ -57,6 +62,8 @@ class SsoKitServerPartModel {
    * @returns {Promise<void>}
    */
   async deleteSsoKit(ssoKitId) {
+    assertUuid(ssoKitId, "The SSO kit id should be a valid uuid.");
+
     await this.ssoKitServerPartService.deleteSsoKit(ssoKitId);
   }
 }

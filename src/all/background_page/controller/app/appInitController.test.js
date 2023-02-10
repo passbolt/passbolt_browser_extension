@@ -20,6 +20,7 @@ import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import {v4 as uuid} from "uuid";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -62,7 +63,7 @@ describe("AppInitController", () => {
       expect.assertions(3);
       await MockExtension.withConfiguredAccount();
       const userInstance = User.getInstance();
-      const storedServerSsoKit = ({data: Buffer.from("test").toString("base64")});
+      const storedServerSsoKit = {data: generateSsoKitServerData({})};
       const ssoKitServerResponse = Object.assign({}, storedServerSsoKit, {id: uuid()});
 
       jest.spyOn(userInstance.settings, "sync").mockImplementation(async() => null);

@@ -14,7 +14,6 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../keyring";
 import User from "../user";
 import ReEncryptPrivateKeyService from "../../service/crypto/reEncryptPrivateKeyService";
-import PrivateKeyMismatchError from "../../error/privateKeyMismatchError";
 
 class AccountModel {
   /**
@@ -70,12 +69,13 @@ class AccountModel {
    * Update the currently stored private key with the given private key into the local storage.
    * @param {string} newPrivateArmoredKey armored private key
    * @returns {Promise<void>}
+   * @throws {Error} if the new private key doesn't match the one already registered locally
    */
   async updatePrivateKey(newPrivateArmoredKey) {
     const currentPrivateKey = this.keyring.findPrivate();
     const newPrivateKey = await OpenpgpAssertion.readKeyOrFail(newPrivateArmoredKey);
     if (currentPrivateKey.fingerprint.toUpperCase() !== newPrivateKey.getFingerprint().toUpperCase()) {
-      throw new PrivateKeyMismatchError("The private key to import doesn't match the current private key.");
+      throw new Error("The private key to import doesn't match the current private key.");
     }
     await this.keyring.importPrivate(newPrivateArmoredKey);
   }

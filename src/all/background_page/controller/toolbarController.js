@@ -46,7 +46,7 @@ class ToolbarController {
    * Add event listeners.
    */
   addEventListeners() {
-    browser.browserAction.onClicked.addListener(this.handleButtonClick);
+    browser.action.onClicked.addListener(this.handleButtonClick);
     browser.commands.onCommand.addListener(this.handleShortcutPressed);
     self.addEventListener("passbolt.auth.after-logout", this.handleUserLoggedOut);
     self.addEventListener("passbolt.auth.after-login", this.handleUserLoggedIn);

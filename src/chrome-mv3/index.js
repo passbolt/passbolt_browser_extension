@@ -14,6 +14,12 @@
 import browser from "../all/background_page/sdk/polyfill/browserPolyfill";
 import PortManager from "./sdk/portManager";
 import WebNavigationService from "./service/webNavigation/webNavigationService";
+import LocalStorageService from "./service/localStorage/localStorageService";
+
+/**
+ * Add listener on startup
+ */
+browser.runtime.onStartup.addListener(LocalStorageService.flush);
 
 /**
  * Add listener on any on complete navigation

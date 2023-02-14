@@ -11,8 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since        3.9.0
  */
-
-import {Worker} from "../../model/worker";
+import WorkerService from "../worker/workerService";
 import ScriptExecution from "../../sdk/scriptExecution";
 import browser from "../../sdk/polyfill/browserPolyfill";
 
@@ -44,7 +43,7 @@ class FileService {
       await browser.downloads.download({url, filename});
       scriptExecution.injectURLToRevoke(url);
     } else {
-      const fileWorker = Worker.get('FileIframe', tabId);
+      const fileWorker = WorkerService.get('FileIframe', tabId);
       fileWorker.port.emit('passbolt.file-iframe.download', filename, dataUrl);
     }
   }

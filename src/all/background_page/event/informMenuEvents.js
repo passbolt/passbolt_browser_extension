@@ -60,14 +60,14 @@ const listen = function(worker) {
   worker.port.on('passbolt.in-form-menu.fill-password', async(requestId, password) => {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const informMenuController = new InformMenuController(worker, apiClientOptions);
-    informMenuController.fillPassword(requestId, password);
+    await informMenuController.fillPassword(requestId, password);
   });
 
   /** Whenever the user wants to close the in-form-menu */
   worker.port.on('passbolt.in-form-menu.close', async requestId => {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const informMenuController = new InformMenuController(worker, apiClientOptions);
-    informMenuController.close(requestId);
+    await informMenuController.close(requestId);
   });
 
   /*

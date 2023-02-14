@@ -18,6 +18,9 @@ import PagemodManager from "../pagemod/pagemodManager";
 import {readWorker} from "../../all/background_page/model/entity/worker/workerEntity.test.data";
 import WorkerEntity from "../../all/background_page/model/entity/worker/workerEntity";
 
+const spyGetWorkerById = jest.spyOn(WorkersSessionStorage, "getWorkerById");
+const spyGetWorkersByTabId = jest.spyOn(WorkersSessionStorage, "getWorkersByTabId");
+
 describe("PortManager", () => {
   beforeEach(async() => {
     jest.resetModules();
@@ -97,20 +100,25 @@ describe("PortManager", () => {
 
   describe("PortManager::onTabRemoved", () => {
     it("Should remove the workers and runtime memory ports for a specific tab id", async() => {
-      expect.assertions(5);
+      expect.assertions(6);
       // data mocked
       const workerDto1 = readWorker();
-      const workerDto2 = readWorker({frameId: 3});
+      const workerDto2 = readWorker({frameId: null});
       const workerDto3 = readWorker({tabId: 5});
       await WorkersSessionStorage.addWorker(new WorkerEntity(workerDto1));
       await WorkersSessionStorage.addWorker(new WorkerEntity(workerDto2));
       await WorkersSessionStorage.addWorker(new WorkerEntity(workerDto3));
       const port = mockPort({name: workerDto1.id, tabId: workerDto1.tabId, frameId: workerDto1.frameId});
-      const port2 = mockPort({name: workerDto2.id, tabId: workerDto2.tabId, frameId: workerDto2.frameId});
+      const port2 = mockPort({name: workerDto2.id, tabId: workerDto2.tabId, frameId: 3});
       const port3 = mockPort({name: workerDto3.id, tabId: workerDto3.tabId, frameId: workerDto3.frameId});
       // mock functions
       jest.spyOn(PagemodManager, "attachEventToPort");
       jest.spyOn(WorkersSessionStorage, "delete");
+      jest.spyOn(WorkersSessionStorage, "updateWorker");
+      spyGetWorkerById.mockImplementationOnce(() => workerDto1);
+      spyGetWorkerById.mockImplementationOnce(() => workerDto2);
+      spyGetWorkerById.mockImplementationOnce(() => workerDto3);
+      spyGetWorkersByTabId.mockImplementation(() => [workerDto1, workerDto2]);
       // process
       await PortManager.onPortConnect(port);
       await PortManager.onPortConnect(port2);
@@ -120,6 +128,9 @@ describe("PortManager", () => {
       expect(PortManager._ports[workerDto1.id]).toBeUndefined();
       expect(PortManager._ports[workerDto2.id]).toBeUndefined();
       expect(PortManager._ports[workerDto3.id]).toBeDefined();
+      // data updated
+      workerDto2.frameId = 3;
+      expect(WorkersSessionStorage.updateWorker).toHaveBeenCalledWith(new WorkerEntity(workerDto2));
       expect(PagemodManager.attachEventToPort).not.toHaveBeenCalledWith(3);
       expect(WorkersSessionStorage.delete).toHaveBeenCalledWith(1);
     });

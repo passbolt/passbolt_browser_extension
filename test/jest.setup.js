@@ -49,6 +49,9 @@ jest.mock("webextension-polyfill", () => Object.assign({}, {
         disconnect: jest.fn(),
       };
     }),
+    onMessage: {
+      addListener: jest.fn(),
+    },
   },
   alarms: new MockAlarms(),
   tabs: {
@@ -59,6 +62,7 @@ jest.mock("webextension-polyfill", () => Object.assign({}, {
       addListener: jest.fn()
     },
     query: jest.fn(),
+    sendMessage: jest.fn(),
     executeScript: jest.fn(),
     insertCSS: jest.fn()
   },

@@ -13,7 +13,7 @@
  */
 
 import FileService from "./fileService";
-import {Worker} from "../../model/worker";
+import WorkerService from "../worker/workerService";
 import browser from "../../sdk/polyfill/browserPolyfill";
 
 // Reset the modules before each test.
@@ -57,7 +57,7 @@ describe("FileService", () => {
       };
       chrome.downloads = undefined;
       // function mocked
-      jest.spyOn(Worker, "get").mockImplementationOnce(() => worker);
+      jest.spyOn(WorkerService, "get").mockImplementationOnce(() => worker);
       // process
       await FileService.saveFile("filename", "Text", null, 1);
       // expectation

@@ -14,6 +14,7 @@ import i18n from "../../sdk/i18n";
 import UserAbortsOperationError from "../../error/userAbortsOperationError";
 import {ValidatorRule as Validator} from '../../utils/validatorRules';
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
+import WorkerService from "../../service/worker/workerService";
 
 /**
  * Get the user master password.
@@ -84,7 +85,7 @@ const requestPassphraseFromQuickAccess = async function() {
 const listenToDetachedQuickaccessPassphraseRequestResponse = async function(requestId, quickAccessWindow) {
   const tabId = quickAccessWindow?.tabs?.[0]?.id;
   await Worker.waitExists('QuickAccess', tabId);
-  const quickAccessWorker = Worker.get('QuickAccess', tabId);
+  const quickAccessWorker = await WorkerService.get('QuickAccess', tabId);
   let isResolved = false;
 
   const promise = new Promise((resolve, reject) => {

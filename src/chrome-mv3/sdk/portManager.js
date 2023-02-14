@@ -112,6 +112,24 @@ class PortManager {
   }
 
   /**
+   * Is port exist
+   * @param {string} id The id
+   * @returns {boolean}
+   */
+  isPortExist(id) {
+    return Boolean(this._ports[id]);
+  }
+
+  /**
+   * Get the port by id
+   * @param {string} id The id
+   * @returns {Port}
+   */
+  getPortById(id) {
+    return this._ports[id];
+  }
+
+  /**
    * Flush.
    * @returns {Promise<void>}
    */
@@ -122,7 +140,7 @@ class PortManager {
 
   /**
    * On tab removed, remove associated worker from the session storage and delete runtime ports references.
-   * @param {integer} tabId The tab id
+   * @param {number} tabId The tab id
    * @returns {Promise<void>}
    */
   async onTabRemoved(tabId) {

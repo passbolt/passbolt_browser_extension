@@ -12,7 +12,6 @@
  */
 import GetOrganizationPolicyController from "../controller/accountRecovery/getOrganizationPolicyController";
 import User from "../model/user";
-import {Worker} from "../model/worker";
 import AccountRecoverySaveOrganizationPolicyController from "../controller/accountRecovery/accountRecoverySaveOrganizationPolicyController";
 import AccountRecoveryValidatePublicKeyController from "../controller/accountRecovery/accountRecoveryValidatePublicKeyController";
 import AccountRecoveryValidateOrganizationPrivateKeyController from "../controller/accountRecovery/accountRecoveryValidateOrganizationPrivateKeyController";
@@ -24,6 +23,7 @@ import AccountRecoverySaveUserSettingsController from "../controller/accountReco
 import HasUserPostponedUserSettingInvitationController from "../controller/accountRecovery/hasUserPostponedUserSettingInvitationController";
 import PostponeUserSettingInvitationController from "../controller/accountRecovery/postponeUserSettingInvitationController";
 import FileService from "../service/file/fileService";
+import WorkerService from "../service/worker/workerService";
 import TestAzureSsoAuthenticationController from "../controller/sso/testAzureSsoAuthenticationController";
 import GetCurrentSsoSettingsController from "../controller/sso/getCurrentSsoSettingsController";
 import SaveSsoSettingsAsDraftController from "../controller/sso/saveSsoSettingsAsDraftController";
@@ -37,9 +37,9 @@ const listen = function(worker, account) {
    * @listens passbolt.app.route-changed
    * @param path The relative navigated-to path
    */
-  worker.port.on('passbolt.app.route-changed', path => {
+  worker.port.on('passbolt.app.route-changed', async path => {
     if (/^\/[A-Za-z0-9\-\/]*$/.test(path)) {
-      const appBoostrapWorker = Worker.get('AppBootstrap', worker.tab.id);
+      const appBoostrapWorker = await WorkerService.get('AppBootstrap', worker.tab.id);
       appBoostrapWorker.port.emit('passbolt.app-bootstrap.change-route', path);
     }
   });

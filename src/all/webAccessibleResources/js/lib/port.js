@@ -170,7 +170,7 @@ class Port {
   }
 
   /**
-   * Has to connect the port
+   * Connect the port if disconnected
    * @returns {Promise<void>}
    */
   async connectIfDisconnected() {

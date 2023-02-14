@@ -16,7 +16,7 @@ import browser from "../../sdk/polyfill/browserPolyfill";
 import User from "../../model/user";
 import ResourceModel from "../../model/resource/resourceModel";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
-import {Worker} from "../../model/worker";
+import WorkerService from "../../service/worker/workerService";
 
 /**
  * Controller related to the in-form call-to-action
@@ -85,7 +85,8 @@ class InformCallToActionController {
         browser.tabs.create({url: User.getInstance().settings.getDomain(), active: true});
         this.worker.port.emit(requestId, "SUCCESS");
       } else {
-        Worker.get('WebIntegration', this.worker.tab.id).port.emit('passbolt.in-form-menu.open');
+        const webIntegrationWorker = await WorkerService.get('WebIntegration', this.worker.tab.id);
+        webIntegrationWorker.port.emit('passbolt.in-form-menu.open');
       }
     } catch (error) {
       console.error(error);

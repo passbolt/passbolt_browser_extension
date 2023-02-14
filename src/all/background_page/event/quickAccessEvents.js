@@ -6,11 +6,11 @@
  */
 import browser from "../sdk/polyfill/browserPolyfill";
 import User from "../model/user";
-import {Worker} from "../model/worker";
-import {BrowserTabService} from "../service/ui/browserTab.service";
+import BrowserTabService from "../service/ui/browserTab.service";
 import SecretDecryptController from "../controller/secret/secretDecryptController";
 import ResourceInProgressCacheService from "../service/cache/resourceInProgressCache.service";
 import i18n from "../sdk/i18n";
+import WorkerService from "../service/worker/workerService";
 
 
 const listen = function(worker) {
@@ -52,7 +52,7 @@ const listen = function(worker) {
       }
 
       // Current active tab's url is passing to quick access to check the same origin request
-      const webIntegrationWorker = await Worker.get('WebIntegration', tab.id);
+      const webIntegrationWorker = await WorkerService.get('WebIntegration', tab.id);
       await webIntegrationWorker.port.request('passbolt.quickaccess.fill-form', username, password, tab.url);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {

@@ -54,6 +54,19 @@ class WorkersSessionStorage {
   }
 
   /**
+   * Get workers from the session storage by name and tab id
+   *
+   * @param {string} name The name
+   * @param {integer} tabId The tab id
+   * @return {object} worker dto object
+   */
+  getWorkersByNameAndTabId(name, tabId) {
+    const filterByNameAndTabId = workers => workers.filter(worker => worker.name === name && worker.tabId === tabId);
+    return this.getWorkers().then(filterByNameAndTabId);
+  }
+
+
+  /**
    * Add a worker in the session storage
    * @param {WorkerEntity} workerEntity
    * @return {Promise<void>}

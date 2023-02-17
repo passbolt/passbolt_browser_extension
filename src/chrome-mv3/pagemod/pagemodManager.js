@@ -11,8 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import storage from "../../all/background_page/sdk/storage";
-import {Config} from "../../all/background_page/model/config";
 import RecoverBootstrapPagemod from "./recoverBootstrapPagemod";
 import RecoverPagemod from "./recoverPagemod";
 import SetupBootstrapPagemod from "./setupBootstrapPagemod";
@@ -32,8 +30,6 @@ import InFormMenuPagemod from "./informMenuPagemod";
  */
 class PagemodManager {
   constructor() {
-    // TODO find a way to init the storage one time
-    storage.init().then(Config.init);
     this.pagemods = [
       RecoverBootstrapPagemod,
       RecoverPagemod,

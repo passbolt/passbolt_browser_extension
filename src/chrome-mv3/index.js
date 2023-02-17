@@ -15,6 +15,17 @@ import browser from "../all/background_page/sdk/polyfill/browserPolyfill";
 import PortManager from "./sdk/portManager";
 import WebNavigationService from "./service/webNavigation/webNavigationService";
 import LocalStorageService from "./service/localStorage/localStorageService";
+import SystemRequirementService from "./service/systemRequirementService/systemRequirementService";
+
+/**
+ * Load all system requirement
+ */
+SystemRequirementService.get();
+
+/**
+ * Add listener on passbolt logout
+ */
+self.addEventListener("passbolt.auth.after-logout", LocalStorageService.flush);
 
 /**
  * Add listener on startup

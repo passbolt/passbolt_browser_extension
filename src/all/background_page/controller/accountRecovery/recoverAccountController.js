@@ -18,12 +18,15 @@ import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryMod
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import EncryptPrivateKeyService from "../../service/crypto/encryptPrivateKeyService";
 import AccountModel from "../../model/account/accountModel";
-import {App as app} from "../../app";
 import AccountLocalStorage from "../../service/local_storage/accountLocalStorage";
 import SetupModel from "../../model/setup/setupModel";
 import DecryptResponseDataService from "../../service/accountRecovery/decryptResponseDataService";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
+import browser from "webextension-polyfill";
+import WebIntegration from "../../pagemod/webIntegrationPagemod";
+import AuthBootstrap from "../../pagemod/authBootstrapPagemod";
+import PublicWebsiteSignIn from "../../pagemod/publicWebsiteSignInPagemod";
 import UpdateSsoCredentialsService from "../../service/account/updateSsoCredentialsService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 
@@ -78,7 +81,10 @@ class RecoverAccountController {
     await this._completeRecover(recoveredArmoredPrivateKey);
     const account = await this._addRecoveredAccountToStorage(this.account);
     this._updateWorkerAccount(account);
-    this._initPagemod();
+    // @deprecated The support of MV2 will be down soon
+    if (this.isManifestV2) {
+      this._initPagemod();
+    }
     await this._refreshSsoKit(passphrase);
   }
 
@@ -190,14 +196,18 @@ class RecoverAccountController {
    * @private
    */
   _initPagemod() {
-    // If there was no account yet configured, the following pagemods were not instantiated a the extension bootstrap.
-    if (!app.pageMods.WebIntegration._pageMod) {
-      app.pageMods.WebIntegration.init();
-    }
-    app.pageMods.AuthBootstrap.init();
-    if (!app.pageMods.PublicWebsiteSignIn._pageMod) {
-      app.pageMods.PublicWebsiteSignIn.init();
-    }
+    // For the manifest V2, if there was no account yet configured, the following pagemods were not instantiated at the extension bootstrap.
+    WebIntegration.init();
+    AuthBootstrap.init();
+    PublicWebsiteSignIn.init();
+  }
+
+  /**
+   * Is manifest v2
+   * @returns {boolean}
+   */
+  get isManifestV2() {
+    return browser.runtime.getManifest().manifest_version === 2;
   }
 
   /**

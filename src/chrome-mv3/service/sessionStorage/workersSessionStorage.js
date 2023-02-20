@@ -45,7 +45,7 @@ class WorkersSessionStorage {
   /**
    * Get workers from the session storage by tab id
    *
-   * @param {integer} tabId The tab id
+   * @param {number} tabId The tab id
    * @return {Promise<object>} worker dto object
    */
   getWorkersByTabId(tabId) {
@@ -57,7 +57,7 @@ class WorkersSessionStorage {
    * Get workers from the session storage by name and tab id
    *
    * @param {string} name The name
-   * @param {integer} tabId The tab id
+   * @param {number} tabId The tab id
    * @return {object} worker dto object
    */
   getWorkersByNameAndTabId(name, tabId) {
@@ -107,7 +107,7 @@ class WorkersSessionStorage {
 
   /**
    * Delete workers in the session storage by tab id.
-   * @param {integer} tabId The tab id
+   * @param {number} tabId The tab id
    * @return {Promise<void>}
    */
   async delete(tabId) {

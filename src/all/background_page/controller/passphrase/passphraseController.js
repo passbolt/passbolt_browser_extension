@@ -9,7 +9,6 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
-import {Worker} from "../../model/worker";
 import i18n from "../../sdk/i18n";
 import UserAbortsOperationError from "../../error/userAbortsOperationError";
 import {ValidatorRule as Validator} from '../../utils/validatorRules';
@@ -84,11 +83,11 @@ const requestPassphraseFromQuickAccess = async function() {
  */
 const listenToDetachedQuickaccessPassphraseRequestResponse = async function(requestId, quickAccessWindow) {
   const tabId = quickAccessWindow?.tabs?.[0]?.id;
-  await Worker.waitExists('QuickAccess', tabId);
+  await WorkerService.waitExists('QuickAccess', tabId);
   const quickAccessWorker = await WorkerService.get('QuickAccess', tabId);
   let isResolved = false;
 
-  const promise = new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     // When the passphrase is entered and valid, the quickaccess responds on the port with the requestId that has been given to it when opening it.
     quickAccessWorker.port.on(requestId, (status, requestResult)  => {
       isResolved = true;
@@ -107,8 +106,6 @@ const listenToDetachedQuickaccessPassphraseRequestResponse = async function(requ
       }
     });
   });
-
-  return promise;
 };
 
 /**

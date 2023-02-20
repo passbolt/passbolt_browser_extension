@@ -56,7 +56,13 @@ export const anonymousOrganizationSettings = (data = {}) => {
               locale: "fr-FR",
               label: "Français"
             }, {
+              locale: "it-IT",
+              label: "Italiano (Beta)"
+            }, {
               locale: "ja-JP",
+              label: "日本語"
+            }, {
+              locale: "ko-KR",
               label: "日本語"
             }, {
               locale: "lt-LT",
@@ -67,6 +73,12 @@ export const anonymousOrganizationSettings = (data = {}) => {
             }, {
               locale: "pl-PL",
               label: "Polski"
+            }, {
+              locale: "pt-BR",
+              label: "Português Brasil (beta)"
+            }, {
+              locale: "ro-RO",
+              label: "Română (beta)"
             }, {
               locale: "sv-SE",
               label: "Svenska"

@@ -143,5 +143,24 @@ describe("GeneratePortIdController", () => {
         expect(error.message).toStrictEqual("The application is not allowed to open the application QuickAccess");
       }
     });
+
+    it("Should not allowed to generate port id for an application name that is not a string", async() => {
+      expect.assertions(1);
+      // data mocked
+      const worker = {
+        tab: {
+          id: 1
+        },
+        name: "AppBootstrap"
+      };
+      // process
+      const controller = new GeneratePortIdController(worker, "requestId");
+      try {
+        await controller.exec({name: "QuickAccess"});
+      } catch (error) {
+        // expectations
+        expect(error.message).toStrictEqual("The application name should be a string");
+      }
+    });
   });
 });

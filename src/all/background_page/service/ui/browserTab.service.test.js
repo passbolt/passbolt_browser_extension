@@ -40,7 +40,7 @@ describe("BrowserTabService", () => {
       expect.assertions(1);
       // mock data
       const tab1 = {id: 1};
-      const tab2 = {id: 1};
+      const tab2 = {id: 2};
       // mock functions
       jest.spyOn(browser.tabs, 'query').mockImplementationOnce(() => [tab1, tab2]);
       // process

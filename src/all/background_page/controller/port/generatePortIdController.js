@@ -53,11 +53,16 @@ class GeneratePortIdController {
   }
 
   /**
-   * Add worker and generate the port id.
+   * Check if the application name is a string and is allowed to open another application.
+   * For MV2: return the port name
+   * For MV3: Add worker and generate the port id.
    *
    * @return {Promise<string>}
    */
   async exec(applicationName) {
+    if (typeof applicationName !== "string") {
+      throw new Error("The application name should be a string");
+    }
     if (!this.isAllowedToGeneratePortId(this.worker, applicationName)) {
       throw new Error(`The application is not allowed to open the application ${applicationName}`);
     }

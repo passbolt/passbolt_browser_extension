@@ -18,7 +18,7 @@ import WorkersSessionStorage from "../service/sessionStorage/workersSessionStora
 import WorkerEntity from "../../all/background_page/model/entity/worker/workerEntity";
 
 /**
- * To browser frame id
+ * Top browser frame id
  * @type {number}
  */
 const TOP_FRAME_ID = 0;

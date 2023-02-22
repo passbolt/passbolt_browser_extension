@@ -24,6 +24,7 @@ import CsvChromiumRowParser from "./csvRowParser/csvChromiumRowParser";
 import CsvBitWardenRowParser from "./csvRowParser/csvBitWardenRowParser";
 import CsvSafariRowParser from "./csvRowParser/csvSafariRowParser";
 import CsvDashlaneRowParser from "./csvRowParser/csvDashlaneRowParser";
+import CsvMozillaPlatformRowParser from "./csvRowParser/csvMozillaPlatformRowParser";
 
 /**
  * Register of csv row parsers
@@ -36,7 +37,8 @@ const register = [
   CsvChromiumRowParser,
   CsvBitWardenRowParser,
   CsvSafariRowParser,
-  CsvDashlaneRowParser
+  CsvDashlaneRowParser,
+  CsvMozillaPlatformRowParser
 ];
 
 class ResourcesCsvImportParser {

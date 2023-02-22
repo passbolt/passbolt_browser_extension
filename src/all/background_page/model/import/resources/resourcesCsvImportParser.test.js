@@ -29,10 +29,11 @@ import CsvBitWardenRowParser from "./csvRowParser/csvBitWardenRowParser";
 import CsvSafariRowParser from "./csvRowParser/csvSafariRowParser";
 import CsvDashlaneRowParser from "./csvRowParser/csvDashlaneRowParser";
 import CsvMozillaPlatformRowParser from "./csvRowParser/csvMozillaPlatformRowParser";
+import CsvNordpassRowParser from "./csvRowParser/csvNordpassRowParser";
 
 describe("ResourcesCsvImportParser", () => {
   it("should be aware of the supported row parsers", () => {
-    expect(ResourcesCsvImportParser.register).toHaveLength(8);
+    expect(ResourcesCsvImportParser.register).toHaveLength(9);
     const supportedRowParsers = [
       Csv1PasswordRowParser,
       CsvKdbxRowParser,
@@ -41,7 +42,8 @@ describe("ResourcesCsvImportParser", () => {
       CsvBitWardenRowParser,
       CsvSafariRowParser,
       CsvDashlaneRowParser,
-      CsvMozillaPlatformRowParser
+      CsvMozillaPlatformRowParser,
+      CsvNordpassRowParser
     ];
     expect(ResourcesCsvImportParser.register).toEqual(expect.arrayContaining(supportedRowParsers));
   });

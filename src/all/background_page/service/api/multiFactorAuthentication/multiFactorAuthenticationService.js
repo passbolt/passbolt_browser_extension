@@ -60,7 +60,8 @@ class MultiFactorAuthenticationService extends AbstractService {
    */
   async getSettings() {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/select`);
-    return this.apiClient.fetchAndHandleResponse('GET', url);
+    const settings = await this.apiClient.fetchAndHandleResponse('GET', url);
+    return settings.body;
   }
 }
 

@@ -45,7 +45,8 @@ class MultiFactorAuthenticationPolicyService extends AbstractService {
    */
   async find() {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/settings`);
-    return this.apiClient.fetchAndHandleResponse('GET', url);
+    const setting = await this.apiClient.fetchAndHandleResponse('GET', url);
+    return setting.body;
   }
 }
 

@@ -9,13 +9,16 @@
  * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.10.0
+ * @since         3.11.0
  */
 
-export const mfaDto = (data = {}) => {
+import MfaPolicyEntity from './mfaPolicyEntity';
+
+export const defaultMfaPolicy = (data = {}) => {
   const defaultData = {
-    MfaAccountSettings: {totp: false, duo: false, yubikey: false},
-    MfaOrganizationSettings: {totp: true, duo: false, yubikey: false}
+    "policy": MfaPolicyEntity.OPTIN,
+    "remember_me_for_a_month":  false
   };
   return Object.assign(defaultData, data);
 };
+

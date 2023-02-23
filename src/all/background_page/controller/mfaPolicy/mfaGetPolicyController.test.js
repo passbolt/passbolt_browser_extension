@@ -16,6 +16,7 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import MfaGetPolicyController from './mfaGetPolicyController';
+import MfaPolicyEntity from '../../model/entity/mfa/mfaPolicyEntity';
 
 beforeEach(() => {
   enableFetchMocks();
@@ -24,13 +25,14 @@ beforeEach(() => {
 
 describe("MfaGetPolicyController", () => {
   it("can get the current mfa policy", async() => {
+    const apiResult = {policy: MfaPolicyEntity.MANDATORY, remember_me_for_a_month: true};
     // Mock API fetch account recovery organization policy response.
-    fetch.doMock(() => mockApiResponse({policy: "Mandatory"}));
+    fetch.doMock(() => mockApiResponse(apiResult));
 
     expect.assertions(1);
     const controller = new MfaGetPolicyController(null, null, defaultApiClientOptions());
     const result = await controller.exec();
-    expect(result).toEqual("Mandatory");
+    expect(result.toJSON()).toEqual(apiResult);
   });
 });
 

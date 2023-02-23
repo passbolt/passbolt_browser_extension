@@ -14,7 +14,8 @@ import UserLocalStorage from "../../service/local_storage/userLocalStorage";
 import MultiFactorAuthenticationService from "../../service/api/multiFactorAuthentication/multiFactorAuthenticationService";
 import UserEntity from "../entity/user/userEntity";
 import MultiFactorAuthenticationPolicyService from '../../service/api/multiFactorAuthentication/multiFactorAuthenticationPolicyService';
-
+import MfaPolicyEntity from '../entity/mfa/mfaPolicyEntity';
+import MfaCombinedEnabledProvidersEntity from '../entity/mfa/mfaCombinedEnabledProvidersEntity';
 
 class MultiFactorAuthenticationModel {
   /**
@@ -45,14 +46,26 @@ class MultiFactorAuthenticationModel {
     }
   }
 
+  /**
+   * Return the current MFA policy defined by the organization
+   *
+   * @returns {Promise<MfaPolicyEntity>}
+   * @public
+   */
   async getPolicy() {
-    const setting = await this.multiFactorAuthenticationPolicyService.find();
-    return setting.body.policy;
+    const policy = await this.multiFactorAuthenticationPolicyService.find();
+    return new MfaPolicyEntity(policy);
   }
 
+  /**
+   * Return the mfa settings for an organization and user
+   *
+   * @returns {Promise<MfaCombinedEnabledProvidersEntity>}
+   * @public
+   */
   async getMfaSettings() {
     const setting = await this.multiFactorAuthenticationService.getSettings();
-    return setting.body.MfaAccountSettings;
+    return new MfaCombinedEnabledProvidersEntity(setting);
   }
 }
 

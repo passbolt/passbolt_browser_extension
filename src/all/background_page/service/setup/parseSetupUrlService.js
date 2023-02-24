@@ -43,6 +43,20 @@ class ParseSetupUrlService {
 
     return {domain, user_id, authentication_token_token};
   }
+
+  /**
+   * Test the url against the regex.
+   * @param {string} url The url to test
+   * @returns {boolean}
+   */
+  static test(url) {
+    try {
+      this.parse(url);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 }
 
 export default ParseSetupUrlService;

@@ -13,24 +13,35 @@
  */
 import browser from "../../sdk/polyfill/browserPolyfill";
 
-/**
- * Get the current tab
- */
-async function getCurrent() {
-  const tabs = await browser.tabs.query({active: true, currentWindow: true});
-  return tabs[0];
+class BrowserTabService {
+  /**
+   * Get the current tab
+   */
+  static async getCurrent() {
+    const tabs = await browser.tabs.query({active: true, currentWindow: true});
+    return tabs[0];
+  }
+
+  /**
+   * Get by Id
+   * @param id
+   */
+  static async getById(id) {
+    const tabs = await browser.tabs.query({});
+    return tabs.find(tab => tab.id === parseInt(id));
+  }
+
+  /**
+   * Send message to a specific tab id and frame id
+   * @param {any} worker
+   * @param {any} message
+   * @param {any} args
+   * @returns {Promise<*>}
+   */
+  static async sendMessage(worker, message, ...args) {
+    const requestArgs = [message].concat(args);
+    return browser.tabs.sendMessage(worker.tabId, requestArgs, {frameId: worker.frameId});
+  }
 }
 
-/**
- * Get by Id
- * @param id
- */
-async function getById(id) {
-  const tabs = await browser.tabs.query({});
-  return tabs.find(tab => tab.id === parseInt(id));
-}
-
-export const BrowserTabService = {
-  getCurrent: getCurrent,
-  getById: getById,
-};
+export default BrowserTabService;

@@ -56,7 +56,7 @@ import {WebIntegrationEvents} from "./event/webIntegrationEvents";
 import {PublicWebsiteSignInEvents} from "./event/publicWebsiteSignInEvents";
 import {ClipboardEvents} from "./event/clipboardEvents";
 import WebIntegration from "./pagemod/webIntegrationPagemod";
-import AppBoostrapPagemod from "./pagemod/appBoostrapPagemod";
+import AppBootstrapPagemod from "./pagemod/appBootstrapPagemod";
 import {AppPagemod} from "./pagemod/appPagemod";
 import AuthBootstrap from "./pagemod/authBootstrapPagemod";
 import Auth from "./pagemod/authPagemod";
@@ -148,7 +148,7 @@ pageMods.WebIntegration = WebIntegration;
  * It is inserted in all the pages of a domain that is trusted.
  * Such trust is defined during the first step of the setup process.
  */
-pageMods.AppBoostrap = AppBoostrapPagemod;
+pageMods.AppBoostrap = AppBootstrapPagemod;
 
 /*
  * This pagemod drives the react application.

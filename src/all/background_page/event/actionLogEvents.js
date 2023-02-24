@@ -13,7 +13,7 @@
 import User from "../model/user";
 import ActionLogModel from "../model/actionLog/actionLogModel";
 
-const listen = async function(worker) {
+const listen = function(worker) {
   /*
    * Find all action logs for a given instance
    *

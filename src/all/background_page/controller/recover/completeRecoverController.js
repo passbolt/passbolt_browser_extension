@@ -13,10 +13,13 @@
  */
 
 import AccountModel from "../../model/account/accountModel";
-import {App as app} from "../../app";
 import SetupModel from "../../model/setup/setupModel";
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
+import browser from "webextension-polyfill";
+import WebIntegration from "../../pagemod/webIntegrationPagemod";
+import AuthBootstrap from "../../pagemod/authBootstrapPagemod";
+import PublicWebsiteSignIn from "../../pagemod/publicWebsiteSignInPagemod";
 
 
 class CompleteRecoverController {
@@ -59,14 +62,22 @@ class CompleteRecoverController {
     const accountRecovered = new AccountEntity(this.account.toDto(AccountRecoverEntity.ALL_CONTAIN_OPTIONS));
     await this.setupModel.completeRecover(this.account);
     await this.accountModel.add(accountRecovered);
-    // If there was no account yet configured, the following pagemods were not instantiated a the extension bootstrap.
-    if (!app.pageMods.WebIntegration._pageMod) {
-      app.pageMods.WebIntegration.init();
+
+    // @deprecated The support of MV2 will be down soon
+    if (this.isManifestV2) {
+      // For the manifest V2, if there was no account yet configured, the following pagemods were not instantiated at the extension bootstrap.
+      WebIntegration.init();
+      AuthBootstrap.init();
+      PublicWebsiteSignIn.init();
     }
-    app.pageMods.AuthBootstrap.init();
-    if (!app.pageMods.PublicWebsiteSignIn._pageMod) {
-      app.pageMods.PublicWebsiteSignIn.init();
-    }
+  }
+
+  /**
+   * Is manifest v2
+   * @returns {boolean}
+   */
+  get isManifestV2() {
+    return browser.runtime.getManifest().manifest_version === 2;
   }
 }
 

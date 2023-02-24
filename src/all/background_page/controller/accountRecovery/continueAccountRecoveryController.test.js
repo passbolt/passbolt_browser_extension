@@ -18,7 +18,7 @@ import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOpti
 import ContinueAccountRecoveryController from "./continueAccountRecoveryController";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
-import {Worker} from "../../model/worker";
+import WorkerService from "../../service/worker/workerService";
 
 jest.mock("../../model/worker");
 
@@ -51,7 +51,7 @@ describe("ContinueAccountRecoveryController", () => {
       fetch.doMockIf(url, () => Promise.reject(new Error("Unexpected API account recovery error")));
       // Mock Worker to assert error handler.
       const mockedBootstrapAccountRecoveryWorkerPortEmit = jest.fn();
-      Worker.get = jest.fn(() => ({
+      WorkerService.get = jest.fn(() => ({
         port: {
           emit: mockedBootstrapAccountRecoveryWorkerPortEmit
         }

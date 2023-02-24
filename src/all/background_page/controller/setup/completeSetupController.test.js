@@ -21,7 +21,9 @@ import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import User from "../../model/user";
 import Keyring from "../../model/keyring";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import {App as app} from "../../app";
+import WebIntegration from "../../pagemod/webIntegrationPagemod";
+import AuthBootstrap from "../../pagemod/authBootstrapPagemod";
+import PublicWebsiteSignIn from "../../pagemod/publicWebsiteSignInPagemod";
 
 jest.mock("../../app");
 
@@ -33,15 +35,18 @@ beforeEach(() => {
 describe("CompleteSetupController", () => {
   describe("CompleteSetupController::exec", () => {
     it("Should complete the setup.", async() => {
+      jest.spyOn(chrome.runtime, 'getManifest').mockImplementationOnce(() => ({manifest_version: 2}));
       const account = new AccountSetupEntity(withSecurityTokenAccountSetupDto());
       const controller = new CompleteSetupController(null, null, defaultApiClientOptions(), account);
 
       // Mock API complete request.
       fetch.doMockOnce(() => mockApiResponse());
       // Mock pagemods to assert the complete start the auth and inform menu pagemods.
-      app.pageMods.WebIntegration.init = jest.fn();
+      WebIntegration.init = jest.fn();
+      PublicWebsiteSignIn.init = jest.fn();
+      AuthBootstrap.init = jest.fn();
 
-      expect.assertions(11);
+      expect.assertions(12);
       await controller.exec();
       const user = User.getInstance().get();
       expect(user.id).toStrictEqual(account.userId);
@@ -64,8 +69,9 @@ describe("CompleteSetupController", () => {
       expect(keyringPublicFingerprint).toStrictEqual(accountPublicFingerprint);
       expect(keyringPublicFingerprint).toStrictEqual(keyringPrivateFingerprint);
 
-      expect(app.pageMods.WebIntegration.init).toHaveBeenCalled();
-      expect(app.pageMods.AuthBootstrap.init).toHaveBeenCalled();
+      expect(WebIntegration.init).toHaveBeenCalled();
+      expect(PublicWebsiteSignIn.init).toHaveBeenCalled();
+      expect(AuthBootstrap.init).toHaveBeenCalled();
     });
 
     it("Should not add the account to the local storage if the complete API request fails.", async() => {
@@ -74,8 +80,6 @@ describe("CompleteSetupController", () => {
 
       // Mock API complete request.
       fetch.doMockOnce(() => Promise.reject());
-      // Mock pagemods to assert the complete start the auth and inform menu pagemods.
-      app.pageMods.WebIntegration.init = jest.fn();
 
       const promise = controller.exec();
 

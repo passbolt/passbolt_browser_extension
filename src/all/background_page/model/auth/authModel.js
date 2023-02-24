@@ -17,10 +17,11 @@ import AuthService from "../../service/api/auth/authService";
 import AuthStatusLocalStorage from "../../service/local_storage/authStatusLocalStorage";
 import User from "../user";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
-import {App as app} from "../../app";
 import GpgAuthToken from "../gpgAuthToken";
 import GpgAuthHeader from "../gpgAuthHeader";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
+import AppBootstrapPagemod from "../../pagemod/appBootstrapPagemod";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 class AuthModel {
   /**
@@ -92,9 +93,21 @@ class AuthModel {
    */
   async postLogin() {
     await this.legacyAuthModel.startCheckAuthStatusLoop();
-    await app.pageMods.AppBoostrap.init();
+    // @deprecated The support of MV2 will be down soon
+    if (this.isManifestV2) {
+      // For the manifest V2, if there was no account yet configured, the following pagemods were not instantiated a the extension bootstrap.
+      await AppBootstrapPagemod.init();
+    }
     const event = new Event('passbolt.auth.after-login');
     self.dispatchEvent(event);
+  }
+
+  /**
+   * Is manifest v2
+   * @returns {boolean}
+   */
+  get isManifestV2() {
+    return browser.runtime.getManifest().manifest_version === 2;
   }
 
   /**

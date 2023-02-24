@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {Worker} from "../../model/worker";
 import AuthModel from "../../model/auth/authModel";
 import SetupModel from "../../model/setup/setupModel";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import WorkerService from "../../service/worker/workerService";
 
 class StartSetupController {
   /**
@@ -57,7 +57,7 @@ class StartSetupController {
       await this._findAndSetAccountSetupServerPublicKey();
       await this._findAndSetAccountSetupMeta();
     } catch (error) {
-      this._handleUnexpectedError(error);
+      await this._handleUnexpectedError(error);
     }
   }
 
@@ -106,8 +106,8 @@ class StartSetupController {
    * @param {Error} error The error.
    * @private
    */
-  _handleUnexpectedError(error) {
-    Worker.get('SetupBootstrap', this.worker.tab.id).port.emit('passbolt.setup-bootstrap.remove-iframe');
+  async _handleUnexpectedError(error) {
+    (await WorkerService.get('SetupBootstrap', this.worker.tab.id)).port.emit('passbolt.setup-bootstrap.remove-iframe');
     throw error;
   }
 }

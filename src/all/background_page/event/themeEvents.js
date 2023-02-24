@@ -15,7 +15,7 @@ import ThemeModel from "../model/theme/themeModel";
 import ChangeThemeEntity from "../model/entity/theme/change/ChangeThemeEntity";
 
 
-const listen = async function(worker) {
+const listen = function(worker) {
   /*
    * Find all themes
    *

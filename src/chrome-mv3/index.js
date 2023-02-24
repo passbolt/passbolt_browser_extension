@@ -1,4 +1,3 @@
-
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
@@ -13,9 +12,37 @@
  * @since         4.0.0
  */
 import browser from "../all/background_page/sdk/polyfill/browserPolyfill";
+import PortManager from "./sdk/portManager";
+import WebNavigationService from "./service/webNavigation/webNavigationService";
+import LocalStorageService from "./service/localStorage/localStorageService";
+import SystemRequirementService from "./service/systemRequirementService/systemRequirementService";
 
-// TODO start listener browser events
+/**
+ * Load all system requirement
+ */
+SystemRequirementService.get();
+
+/**
+ * Add listener on passbolt logout
+ */
+self.addEventListener("passbolt.auth.after-logout", LocalStorageService.flush);
+
+/**
+ * Add listener on startup
+ */
+browser.runtime.onStartup.addListener(LocalStorageService.flush);
+
 /**
  * Add listener on any on complete navigation
  */
-browser.webNavigation.onCompleted.addListener(details => console.log(details));
+browser.webNavigation.onCompleted.addListener(WebNavigationService.exec);
+
+/**
+ * Add listener on connect port
+ */
+browser.runtime.onConnect.addListener(PortManager.onPortConnect);
+
+/**
+ * Add listener on tabs on removed
+ */
+browser.tabs.onRemoved.addListener(PortManager.onTabRemoved);

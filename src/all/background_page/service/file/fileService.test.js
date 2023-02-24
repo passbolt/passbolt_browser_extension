@@ -13,7 +13,8 @@
  */
 
 import FileService from "./fileService";
-import {Worker} from "../../model/worker";
+import WorkerService from "../worker/workerService";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -31,12 +32,19 @@ describe("FileService", () => {
       };
       global.URL.createObjectURL = jest.fn();
       global.URL.revokeObjectURL = jest.fn();
+      const resultUrl = "blob:https://passbolt.dev/8a3e66b9-4646-4077-815a-5978936aa6d6";
+      // mock function
+      jest.spyOn(browser.scripting, "executeScript").mockImplementation(async script => {
+        const url = script.func.apply(null, script.args);
+        return [{result: url}];
+      });
+      jest.spyOn(self.URL, "createObjectURL").mockImplementationOnce(() => resultUrl);
       // process
       await FileService.saveFile("filename", "Text", null, 1);
       // expectation
       expect(global.URL.createObjectURL).toHaveBeenCalled();
       expect(global.URL.revokeObjectURL).toHaveBeenCalled();
-      expect(chrome.downloads.download).toHaveBeenCalledWith({filename: "filename", saveAs: true, url: undefined});
+      expect(chrome.downloads.download).toHaveBeenCalledWith({filename: "filename", url: resultUrl});
     });
 
     it("save file with firefox", async() => {
@@ -49,7 +57,7 @@ describe("FileService", () => {
       };
       chrome.downloads = undefined;
       // function mocked
-      jest.spyOn(Worker, "get").mockImplementationOnce(() => worker);
+      jest.spyOn(WorkerService, "get").mockImplementationOnce(() => worker);
       // process
       await FileService.saveFile("filename", "Text", null, 1);
       // expectation

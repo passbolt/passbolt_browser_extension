@@ -20,10 +20,10 @@ import {defaultUserDto} from "../../model/entity/user/userEntity.test.data";
 import {defaultVerifyDto} from "../../model/entity/auth/auth.test.data";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 import UserEntity from "../../model/entity/user/userEntity";
-import {Worker} from "../../model/worker";
 import {initialAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import WorkerService from "../../service/worker/workerService";
 
 jest.mock("../../model/worker");
 
@@ -68,7 +68,7 @@ describe("StartSetupController", () => {
       fetch.doMockOnce(() => mockApiResponse(mockVerifyDto));
       // Mock Worker to assert error handler.
       const mockedBootstrapSetupWorkerPortEmit = jest.fn();
-      Worker.get = jest.fn(() => ({
+      WorkerService.get = jest.fn(() => ({
         port: {
           emit: mockedBootstrapSetupWorkerPortEmit
         }
@@ -94,7 +94,7 @@ describe("StartSetupController", () => {
       fetch.doMockOnce(() => mockApiResponse(mockSetupStartDto));
       // Mock Worker to assert error handler.
       const mockedBootstrapSetupWorkerPortEmit = jest.fn();
-      Worker.get = jest.fn(() => ({
+      WorkerService.get = jest.fn(() => ({
         port: {
           emit: mockedBootstrapSetupWorkerPortEmit
         }
@@ -120,7 +120,7 @@ describe("StartSetupController", () => {
       fetch.doMockOnce(() => mockApiResponse(mockSetupStartDto));
       // Mock Worker to assert error handler.
       const mockedBootstrapSetupWorkerPortEmit = jest.fn();
-      Worker.get = jest.fn(() => ({
+      WorkerService.get = jest.fn(() => ({
         port: {
           emit: mockedBootstrapSetupWorkerPortEmit
         }

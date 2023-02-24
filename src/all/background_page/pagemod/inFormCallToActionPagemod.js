@@ -24,7 +24,7 @@ InFormCallToAction.init = function() {
 
   InFormCallToAction._pageMod = new PageMod({
     name: 'InFormCallToAction',
-    include: 'about:blank?passbolt=passbolt-iframe-in-form-call-to-action',
+    include: 'about:blank?passbolt=passbolt-iframe-informcalltoaction',
     contentScriptWhen: 'ready',
     contentScriptFile: [
       /*

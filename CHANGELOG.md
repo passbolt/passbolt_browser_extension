@@ -4,6 +4,61 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.11.0] - 2023-02-27
+### Added
+- PB-22081 As a signed-in user I can import my passwords from a Mozilla platform based browsers csv export
+- PB-22082 As a signed-in user I can import my passwords from safari's web browser csv export
+- PB-22116 As a signed-in user I can import my passwords from a Dashlane csv export
+- PB-22117 As a signed-in user I can import my passwords from a Nordpass csv export
+- PB-22510 As a signed-in user I can import my passwords from a LogMeOnce csv export
+- PB-22588 As LU, I want to import resources in Lastpass csv export following their conventions
+- PB-22866 Add community languages - Italian, Portuguese Br, Korean and Romanian
+- PB-22882 As a user I can use the SSO feature to speed up the extension configuration process
+
+### Improved
+- PB-21548 Add Route to display specific provider in iframe
+- PB-22647 As LU, I want to use my personal google email server to configure the smtp settings
+- PB-22725 As a signed-in user I want to see an introduction screen prior setting up Duo v4
+- PB-22835 As an administrator I can define SMTP Settings client setting
+- PB-22861 As an administrator I want to manage duo v4 settings
+
+### Fixed
+- PB-21408 As a logged-in user navigating to the account recovery user settings from the MFA user settings I should not see the screen blinking
+- PB-22387 Change behaviour for banner when submitting form
+- PB-22587 Fix chromium based browsers csv conventions
+- PB-22701 As a signed-in user I should not see the mfa mandatory dialog if there are no mfa providers enabled for my organization
+- PB-22704 As a user with a configured account and SSO, I should be able to recover/setup another account
+
+### Security
+- PB-21645 As content code application I should not be able to open a port for any kind of applications
+- PB-21754 Erase downloaded file to avoid security issue
+
+### Maintenance
+- PB-19641 Handle the setup and recover runtime object
+- PB-19675 As LU I want to perform a recover using the browser extension with MV3
+- PB-19676 As lu I want to perform a setup using the browser extension with mv3
+- PB-19677 As LU I want to perform a sign-in using the browser extension with MV3
+- PB-19678 As lu I want to start the application using the browser extension with mv3
+- PB-21750 As service worker I should be able to wake up a disconnected application port
+- PB-21822 As LU I want to open quickaccess using the browser extension with MV3
+- PB-21823 As LU I want to see the web integration using the browser extension with MV3
+- PB-21824 As LU I want to see the web public sign in using the browser extension with MV3
+- PB-21829 Clean port after a web navigation on the main frame
+- PB-21996 As LU I want to see the in form call to action using the browser extension with MV3
+- PB-21997 As LU I want to see the in form menu using the browser extension with MV3
+- PB-22009 Follow-up: Create a service to parse the webIntegration in url
+- PB-22076 Handle flush local storage on browser runtime onStartUp for MV3
+- PB-22077 Handle config init and post logout on service worker startup
+- PB-22078 Create a polyfill to handle browser.action on MV2
+- PB-22113 Follow-up: As LU I should be able to open the quickaccess popup from inform menu
+- PB-22412 As LU I want to use account recovery process using the browser extension with MV3
+- PB-22648 Adapt payload when back return duo settings
+- PB-22699 Align behaviours for powned password/passphrase
+- PB-22726 As a developer I want to ensure my changes work with MV3
+- PB-22871 Prepare MV3 merge
+- PB-22896 Update styles to adapt to Duo forms updates
+- PB-22898 Updates to login form design styles
+
 ## [3.10.0] - 2023-02-09
 ### Added
 - PB-21752 As an anonymous user I can self register if the organization allows my email domain

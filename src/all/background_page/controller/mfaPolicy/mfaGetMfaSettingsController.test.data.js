@@ -14,10 +14,8 @@
 
 export const mfaDto = (data = {}) => {
   const defaultData = {
-    totp: true,
-    duo: false,
-    yubikey: true
+    MfaAccountSettings: {totp: false, duo: false, yubikey: false},
+    MfaOrganizationSettings: {totp: true, duo: false, yubikey: false}
   };
-  data = Object.assign(defaultData, data);
-  return {MfaAccountSettings: data};
+  return Object.assign(defaultData, data);
 };

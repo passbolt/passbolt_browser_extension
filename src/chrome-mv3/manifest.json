@@ -39,6 +39,7 @@
     "tabs",
     "scripting",
     "alarms",
+    "downloads",
     "webNavigation"
   ],
   "host_permissions": [

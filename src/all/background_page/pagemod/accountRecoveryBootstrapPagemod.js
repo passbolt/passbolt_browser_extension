@@ -14,6 +14,7 @@
 import {Worker} from "../model/worker";
 import PageMod from "../sdk/page-mod";
 import GetRequestLocalAccountService from "../service/accountRecovery/getRequestLocalAccountService";
+import {PortEvents} from "../event/portEvents";
 
 
 const AccountRecoveryBootstrap = function() {};
@@ -40,6 +41,7 @@ AccountRecoveryBootstrap.init = function() {
     onAttach: async function(worker) {
       try {
         await GetRequestLocalAccountService.getAccountMatchingContinueUrl(worker.tab.url);
+        PortEvents.listen(worker);
       } catch (error) {
         console.error(error);
         worker.port.disconnect();

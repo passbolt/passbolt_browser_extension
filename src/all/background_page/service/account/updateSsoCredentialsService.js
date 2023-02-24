@@ -16,7 +16,6 @@ import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
 import SsoDataStorage from "../indexedDB_storage/ssoDataStorage";
 import GenerateSsoKitService from "../sso/generateSsoKitService";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
 
 class UpdateSsoCredentialsService {
   constructor(apiClientOption) {
@@ -31,19 +30,7 @@ class UpdateSsoCredentialsService {
    * @returns {Promise<ApiClientOptions>}
    */
   async forceUpdateSsoKit(passphrase) {
-    const localSsoKitId = (await SsoDataStorage.get())?.id;
     await SsoDataStorage.flush();
-    if (localSsoKitId) {
-      try {
-        await this.ssoKitServerPartModel.deleteSsoKit(localSsoKitId);
-      } catch (e) {
-        // we assume that the kit migth have been remove from the server already
-        if (!(e instanceof PassboltApiFetchError && e.data.code === 404)) {
-          throw e;
-        }
-      }
-    }
-
     await this.updateSsoKitIfNeeded(passphrase);
   }
 

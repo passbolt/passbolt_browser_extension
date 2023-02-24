@@ -14,12 +14,12 @@
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import GpgAuth from "../../model/gpgauth";
-import {Worker} from "../../model/worker";
 import AuthModel from "../../model/auth/authModel";
 import {Uuid} from "../../utils/uuid";
 import i18n from "../../sdk/i18n";
 import KeyIsExpiredError from "../../error/keyIsExpiredError";
 import ServerKeyChangedError from "../../error/serverKeyChangedError";
+import WorkerService from "../../service/worker/workerService";
 
 class AuthVerifyServerKeyController {
   /**
@@ -82,7 +82,7 @@ class AuthVerifyServerKeyController {
        * If the user has been deleted from the API, remove the authentication iframe served by the
        * browser extension, and let the user continue its journey through the triage app served by the API.
        */
-      Worker.get('AuthBootstrap', this.worker.tab.id).port.emit('passbolt.auth-bootstrap.remove-iframe');
+      (await WorkerService.get('AuthBootstrap', this.worker.tab.id)).port.emit('passbolt.auth-bootstrap.remove-iframe');
     } else {
       try {
         if (!await this.canParseServerKey(serverArmoredKey)) {

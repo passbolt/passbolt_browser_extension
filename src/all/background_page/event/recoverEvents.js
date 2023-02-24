@@ -29,6 +29,7 @@ import IsExtensionFirstInstallController from "../controller/extension/isExtensi
 import IsLostPassphraseCaseController from "../controller/accountRecovery/isLostPassphraseCaseController";
 import SetSetupSecurityTokenController from "../controller/setup/setSetupSecurityTokenController";
 import HasRecoverUserEnabledAccountRecoveryController from "../controller/recover/hasRecoverUserEnabledAccountRecoveryController";
+import GeneratePortIdController from "../controller/port/generatePortIdController";
 
 
 const listen = (worker, apiClientOptions, account) => {
@@ -122,6 +123,11 @@ const listen = (worker, apiClientOptions, account) => {
 
   worker.port.on('passbolt.recover.request-help-credentials-lost', async requestId => {
     const controller = new AbortAndRequestHelp(worker, requestId, apiClientOptions, account);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.port.generate-id', async requestId => {
+    const controller = new GeneratePortIdController(worker, requestId);
     await controller._exec();
   });
 };

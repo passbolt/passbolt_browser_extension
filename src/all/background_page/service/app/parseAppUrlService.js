@@ -47,6 +47,20 @@ class ParseAppUrlService {
       throw new Error("Cannot parse application url. The domain is not valid.");
     }
   }
+
+  /**
+   * Test the url against the regex.
+   * @param {string} url The url to test
+   * @returns {boolean}
+   */
+  static test(url) {
+    try {
+      this.parse(url);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 }
 
 export default ParseAppUrlService;

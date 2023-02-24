@@ -10,6 +10,7 @@ import {Worker} from "../model/worker";
 import PageMod from "../sdk/page-mod";
 import PassphraseStorageService from "../service/session_storage/passphraseStorageService";
 import ParseAuthUrlService from "../service/auth/parseAuthUrlService";
+import {PortEvents} from "../event/portEvents";
 
 const AuthBootstrap = function() {};
 AuthBootstrap._pageMod = undefined;
@@ -50,6 +51,7 @@ AuthBootstrap.init = function() {
       await PassphraseStorageService.flush();
 
       Worker.add('AuthBootstrap', worker);
+      PortEvents.listen(worker);
     }
   });
 };

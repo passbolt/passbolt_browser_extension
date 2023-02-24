@@ -21,29 +21,63 @@ describe("Scripting", () => {
     jest.clearAllMocks();
   });
   describe("Scripting::executeScript", () => {
-    it("Should insert JS func", async() => {
-      expect.assertions(2);
-
+    it("Should insert JS func with a result", async() => {
+      expect.assertions(3);
+      // data mocked
       const func = test => test;
-
       const option = {
         func: func,
         args: ["Hello"],
         target: {
           tabId: 1,
-          frameId: 0
+          frameIds: [0]
         },
         world: "ISOLATED"
       };
-
-      browser.scripting.executeScript(option);
-
+      // mock function
+      jest.spyOn(browser.tabs, "executeScript").mockImplementationOnce(() => {
+        const result = func("Hello");
+        return [result];
+      });
+      // process
+      const result = await browser.scripting.executeScript(option);
+      // expectation
       expect(mockedScriptingJS).toHaveBeenCalledWith(option);
       const funcArgs = JSON.stringify(["Hello"]);
       const functionCall = `;${func.name}.apply(window, ${funcArgs});`;
       const codeToInject = func.toString() + functionCall;
       const info = {code: codeToInject, runAt: 'document_end', frameId: 0};
-      expect(browser.tabs.executeScript).toHaveBeenCalledWith(1, info, null);
+      expect(browser.tabs.executeScript).toHaveBeenCalledWith(1, info);
+      expect(result).toStrictEqual([{"result": "Hello"}]);
+    });
+
+    it("Should insert JS void func", async() => {
+      expect.assertions(3);
+      // data mocked
+      const func = test => test;
+      const option = {
+        func: func,
+        args: ["Hello"],
+        target: {
+          tabId: 1,
+          frameIds: [0]
+        },
+        world: "ISOLATED"
+      };
+      // mock function
+      jest.spyOn(browser.tabs, "executeScript").mockImplementationOnce(() => {
+        func("Hello");
+      });
+      // process
+      const result = await browser.scripting.executeScript(option);
+      // expectation
+      expect(mockedScriptingJS).toHaveBeenCalledWith(option);
+      const funcArgs = JSON.stringify(["Hello"]);
+      const functionCall = `;${func.name}.apply(window, ${funcArgs});`;
+      const codeToInject = func.toString() + functionCall;
+      const info = {code: codeToInject, runAt: 'document_end', frameId: 0};
+      expect(browser.tabs.executeScript).toHaveBeenCalledWith(1, info);
+      expect(result).toStrictEqual(undefined);
     });
 
     it("Should insert JS file", async() => {
@@ -53,7 +87,7 @@ describe("Scripting", () => {
         files: ["filename.js", "filename2.js"],
         target: {
           tabId: 1,
-          frameId: 0
+          frameIds: [0]
         },
         world: "ISOLATED"
       };
@@ -74,7 +108,7 @@ describe("Scripting", () => {
         files: ["filename.css"],
         target: {
           tabId: 1,
-          frameId: 0
+          frameIds: [0]
         }
       };
 

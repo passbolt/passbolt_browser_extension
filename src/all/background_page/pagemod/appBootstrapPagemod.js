@@ -11,25 +11,26 @@
 import GpgAuth from "../model/gpgauth";
 import User from "../model/user";
 import {Worker} from "../model/worker";
-import {App as app} from "../app";
 import PageMod from "../sdk/page-mod";
 import ParseAppUrlService from "../service/app/parseAppUrlService";
+import {AppBootstrapEvents} from "../event/appBootstrapEvents";
+import {PortEvents} from "../event/portEvents";
 
-const AppBoostrapPagemod = function() {};
-AppBoostrapPagemod._pageMod = null;
+const AppBootstrapPagemod = function() {};
+AppBootstrapPagemod._pageMod = null;
 
-AppBoostrapPagemod.exists = function() {
-  return AppBoostrapPagemod._pageMod !== null;
+AppBootstrapPagemod.exists = function() {
+  return AppBootstrapPagemod._pageMod !== null;
 };
 
-AppBoostrapPagemod.destroy = function() {
-  if (AppBoostrapPagemod.exists()) {
-    AppBoostrapPagemod._pageMod.destroy();
-    AppBoostrapPagemod._pageMod = null;
+AppBootstrapPagemod.destroy = function() {
+  if (AppBootstrapPagemod.exists()) {
+    AppBootstrapPagemod._pageMod.destroy();
+    AppBootstrapPagemod._pageMod = null;
   }
 };
 
-AppBoostrapPagemod.initPageMod = function() {
+AppBootstrapPagemod.initPageMod = function() {
   /*
    * Attach on passbolt application pages.
    * By instance if your application domain is : https://demo.passbolt.com
@@ -44,7 +45,7 @@ AppBoostrapPagemod.initPageMod = function() {
    */
 
   return new PageMod({
-    name: "AppBoostrap",
+    name: "AppBootstrap",
     include: new RegExp(ParseAppUrlService.getRegex()),
     contentScriptWhen: "ready",
     contentStyleFile: [
@@ -66,14 +67,15 @@ AppBoostrapPagemod.initPageMod = function() {
         return;
       }
 
-      app.events.appBootstrap.listen(worker);
+      AppBootstrapEvents.listen(worker);
+      PortEvents.listen(worker);
 
       Worker.add("AppBootstrap", worker);
     },
   });
 };
 
-AppBoostrapPagemod.init = function() {
+AppBootstrapPagemod.init = function() {
   return new Promise(resolve => {
     /*
      * According to the user status :
@@ -82,11 +84,11 @@ AppBoostrapPagemod.init = function() {
      */
     const user = User.getInstance();
     if (user.isValid()) {
-      AppBoostrapPagemod.destroy();
-      AppBoostrapPagemod._pageMod = AppBoostrapPagemod.initPageMod();
+      AppBootstrapPagemod.destroy();
+      AppBootstrapPagemod._pageMod = AppBootstrapPagemod.initPageMod();
       resolve();
     }
   });
 };
 
-export default AppBoostrapPagemod;
+export default AppBootstrapPagemod;

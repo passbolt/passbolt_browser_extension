@@ -13,9 +13,9 @@
  */
 import {Worker} from "../model/worker";
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
-import {App as app} from "../app";
 import PageMod from "../sdk/page-mod";
 import ParsePublicWebsiteUrlService from "../service/publicWebsite/parsePublicWebsiteUrlService";
+import {PublicWebsiteSignInEvents} from "../event/publicWebsiteSignInEvents";
 
 const PublicWebsiteSignIn = function() {};
 PublicWebsiteSignIn._pageMod = undefined;
@@ -51,7 +51,7 @@ PublicWebsiteSignIn.init = function() {
         return;
       }
 
-      app.events.publicWebsiteSignIn.listen(worker, account);
+      PublicWebsiteSignInEvents.listen(worker, account);
     }
   });
 };

@@ -13,7 +13,7 @@
  */
 
 import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
-import {Worker} from "../../model/worker";
+import WorkerService from "../../service/worker/workerService";
 
 class ContinueAccountRecoveryController {
   /**
@@ -59,7 +59,7 @@ class ContinueAccountRecoveryController {
        * Stop the account recovery process and destroy the iframe, the application served by the API will handle the user
        * from here.
        */
-      Worker.get('AccountRecoveryBootstrap', this.worker.tab.id).port.emit('passbolt.account-recovery-bootstrap.remove-iframe');
+      (await WorkerService.get('AccountRecoveryBootstrap', this.worker.tab.id)).port.emit('passbolt.account-recovery-bootstrap.remove-iframe');
       throw error;
     }
   }

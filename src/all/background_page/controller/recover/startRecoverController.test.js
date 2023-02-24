@@ -22,10 +22,10 @@ import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 import UserEntity from "../../model/entity/user/userEntity";
 import {initialAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
-import {Worker} from "../../model/worker";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import WorkerService from "../../service/worker/workerService";
 
-jest.mock("../../model/worker");
+jest.mock("../../service/worker/workerService");
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -67,7 +67,7 @@ describe("StartRecoverController", () => {
       fetch.doMockOnce(() => mockApiResponse(mockVerifyDto));
       // Mock Worker to assert error handler.
       const mockedBootstrapRecoverWorkerPortEmit = jest.fn();
-      Worker.get = jest.fn(() => ({
+      WorkerService.get = jest.fn(() => ({
         port: {
           emit: mockedBootstrapRecoverWorkerPortEmit
         }
@@ -93,7 +93,7 @@ describe("StartRecoverController", () => {
       fetch.doMockOnce(() => mockApiResponse(mockRecoverStartDto));
       // Mock Worker to assert error handler.
       const mockedBootstrapRecoverWorkerPortEmit = jest.fn();
-      Worker.get = jest.fn(() => ({
+      WorkerService.get = jest.fn(() => ({
         port: {
           emit: mockedBootstrapRecoverWorkerPortEmit
         }
@@ -119,7 +119,7 @@ describe("StartRecoverController", () => {
       fetch.doMockOnce(() => mockApiResponse(mockRecoverStartDto));
       // Mock Worker to assert error handler.
       const mockedBootstrapRecoverWorkerPortEmit = jest.fn();
-      Worker.get = jest.fn(() => ({
+      WorkerService.get = jest.fn(() => ({
         port: {
           emit: mockedBootstrapRecoverWorkerPortEmit
         }

@@ -32,7 +32,6 @@ describe("MfaGetMfaSettingsController", () => {
     expect.assertions(1);
     const controller = new MfaGetMfaSettingsController(null, null, defaultApiClientOptions());
     const result = await controller.exec();
-    expect(result).toEqual(mockApiResult.MfaAccountSettings);
+    expect(result.toJSON()).toEqual(mockApiResult);
   });
 });
-

@@ -24,7 +24,7 @@ InFormMenu.init = function() {
 
   InFormMenu._pageMod = new PageMod({
     name: 'InFormMenu',
-    include: 'about:blank?passbolt=passbolt-iframe-in-form-menu',
+    include: 'about:blank?passbolt=passbolt-iframe-informmenu',
     contentScriptWhen: 'ready',
     contentScriptFile: [
       /*

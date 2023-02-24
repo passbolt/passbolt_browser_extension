@@ -22,7 +22,7 @@ const DEFAULT_BROWSER_EXTENSION_ICON_FILEPATH = '/webAccessibleResources/img/ico
  * @param path
  */
 function setIcon(path) {
-  browser.browserAction.setIcon({
+  browser.action.setIcon({
     path: {
       32: path || DEFAULT_BROWSER_EXTENSION_ICON_FILEPATH
     }

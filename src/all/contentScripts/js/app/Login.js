@@ -15,10 +15,19 @@ import React from "react";
 import ReactDOM from "react-dom";
 import ExtBootstrapLogin from "passbolt-styleguide/src/react-extension/ExtBootstrapLogin";
 import Port from "../../../webAccessibleResources/js/lib/port";
+import MessageService from "../service/messageService";
+import MessageEventHandler from "../message/messageEventHandler";
+import ConnectPortController from "../controller/connectPortController";
 
 async function main() {
+  // Port connection
   const port = new Port(self.portname);
   await port.connect();
+  // Message listener
+  const messageService = new MessageService();
+  const messageEventHandler = new MessageEventHandler(messageService);
+  messageEventHandler.listen("passbolt.port.connect", ConnectPortController, port);
+  // Start ExtBootstrapLogin
   const browserExtensionUrl = chrome.runtime.getURL("/");
   const domContainer = document.createElement("div");
   document.body.appendChild(domContainer);

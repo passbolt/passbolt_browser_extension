@@ -22,6 +22,11 @@ import ImportError from "../../../error/importError";
 import PapaParse from "papaparse";
 import CsvChromiumRowParser from "./csvRowParser/csvChromiumRowParser";
 import CsvBitWardenRowParser from "./csvRowParser/csvBitWardenRowParser";
+import CsvSafariRowParser from "./csvRowParser/csvSafariRowParser";
+import CsvDashlaneRowParser from "./csvRowParser/csvDashlaneRowParser";
+import CsvMozillaPlatformRowParser from "./csvRowParser/csvMozillaPlatformRowParser";
+import CsvNordpassRowParser from "./csvRowParser/csvNordpassRowParser";
+import CsvLogMeOnceRowParser from "./csvRowParser/csvLogMeOnceRowParser";
 
 /**
  * Register of csv row parsers
@@ -33,6 +38,11 @@ const register = [
   CsvLastPassRowParser,
   CsvChromiumRowParser,
   CsvBitWardenRowParser,
+  CsvSafariRowParser,
+  CsvDashlaneRowParser,
+  CsvMozillaPlatformRowParser,
+  CsvNordpassRowParser,
+  CsvLogMeOnceRowParser
 ];
 
 class ResourcesCsvImportParser {

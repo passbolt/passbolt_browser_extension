@@ -21,7 +21,7 @@ Auth.init = function() {
   }
   Auth._pageMod = new PageMod({
     name: 'Auth',
-    include: 'about:blank?passbolt=passbolt-iframe-login',
+    include: 'about:blank?passbolt=passbolt-iframe-auth',
     contentScriptWhen: 'ready',
     contentScriptFile: [
       /*

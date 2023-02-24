@@ -12,6 +12,7 @@
  */
 import {Worker} from "../model/worker";
 import PageMod from "../sdk/page-mod";
+import {PortEvents} from "../event/portEvents";
 
 const RecoverBootstrap = function() {};
 RecoverBootstrap._pageMod = undefined;
@@ -42,6 +43,7 @@ RecoverBootstrap.init = function() {
       // @todo refactoring-account-recovery, should we do something if the url doesn't parse.
 
       Worker.add('RecoverBootstrap', worker);
+      PortEvents.listen(worker);
     }
   });
 };

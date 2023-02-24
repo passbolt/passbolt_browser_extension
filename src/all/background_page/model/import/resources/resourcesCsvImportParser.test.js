@@ -26,16 +26,26 @@ import ImportError from "../../../error/importError";
 import BinaryConvert from "../../../utils/format/binaryConvert";
 import CsvChromiumRowParser from "./csvRowParser/csvChromiumRowParser";
 import CsvBitWardenRowParser from "./csvRowParser/csvBitWardenRowParser";
+import CsvSafariRowParser from "./csvRowParser/csvSafariRowParser";
+import CsvDashlaneRowParser from "./csvRowParser/csvDashlaneRowParser";
+import CsvMozillaPlatformRowParser from "./csvRowParser/csvMozillaPlatformRowParser";
+import CsvNordpassRowParser from "./csvRowParser/csvNordpassRowParser";
+import CsvLogMeOnceRowParser from "./csvRowParser/csvLogMeOnceRowParser";
 
 describe("ResourcesCsvImportParser", () => {
   it("should be aware of the supported row parsers", () => {
-    expect(ResourcesCsvImportParser.register).toHaveLength(5);
+    expect(ResourcesCsvImportParser.register).toHaveLength(10);
     const supportedRowParsers = [
       Csv1PasswordRowParser,
       CsvKdbxRowParser,
       CsvLastPassRowParser,
       CsvChromiumRowParser,
       CsvBitWardenRowParser,
+      CsvSafariRowParser,
+      CsvDashlaneRowParser,
+      CsvMozillaPlatformRowParser,
+      CsvNordpassRowParser,
+      CsvLogMeOnceRowParser
     ];
     expect(ResourcesCsvImportParser.register).toEqual(expect.arrayContaining(supportedRowParsers));
   });

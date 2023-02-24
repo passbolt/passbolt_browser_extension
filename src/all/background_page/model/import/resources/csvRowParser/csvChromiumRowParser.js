@@ -21,8 +21,8 @@ class CsvChromiumRowParser extends AbstractCsvRowParser {
   static get mapping() {
     return {
       "name": "name",
-      "username": "username",
       "uri": "url",
+      "username": "username",
       "secret_clear": "password",
     };
   }

@@ -4,7 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [3.11.0] - 2023-02-27
+## [3.11.1] - 2023-02-27
 ### Added
 - PB-22081 As a signed-in user I can import my passwords from a Mozilla web browsers csv export
 - PB-22082 As a signed-in user I can import my passwords from Safari web browser csv export
@@ -32,10 +32,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-22588 As a signed-in user I want to import resources in Lastpass csv export following their conventions
 - PB-22701 As a signed-in user I should not see the MFA mandatory dialog if there are no MFA providers enabled for my organization
 - PB-22704 As a user with a configured account and SSO, I should be able to recover/setup another account
+- PB-23277 As a signed-in user I should not have a 404 error with the flag mfa policy disable
 
 ### Security
 - PB-21645 As content code application I should be restricted to open ports only for applications I am allowed to open
 - PB-21754 As a user I should not see any trace of previously downloaded content in my history
+- PB-23279 As a user completing a setup I should not have access to the background page decryption secret capabilities
 
 ### Maintenance
 PB-19641 Handle the setup and recover runtime object

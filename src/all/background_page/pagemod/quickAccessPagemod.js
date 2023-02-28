@@ -59,6 +59,7 @@ class QuickAccess {
       app.events.tag.listen(this._worker);
       app.events.resource.listen(this._worker);
       app.events.secret.listen(this._worker);
+      app.events.pownedPassword.listen(this._worker);
       app.events.organizationSettings.listen(this._worker);
       app.events.tab.listen(this._worker);
       app.events.locale.listen(this._worker);

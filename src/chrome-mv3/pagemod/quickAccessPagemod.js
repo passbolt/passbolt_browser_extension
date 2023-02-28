@@ -24,6 +24,7 @@ import {OrganizationSettingsEvents} from "../../all/background_page/event/organi
 import {TabEvents} from "../../all/background_page/event/tabEvents";
 import {LocaleEvents} from "../../all/background_page/event/localeEvents";
 import {PasswordGeneratorEvents} from "../../all/background_page/event/passwordGeneratorEvents";
+import {PownedPasswordEvents} from '../../all/background_page/event/pownedPasswordEvents';
 
 class QuickAccess extends Pagemod {
   /**
@@ -42,7 +43,8 @@ class QuickAccess extends Pagemod {
       OrganizationSettingsEvents,
       TabEvents,
       LocaleEvents,
-      PasswordGeneratorEvents
+      PasswordGeneratorEvents,
+      PownedPasswordEvents
     ];
   }
 }

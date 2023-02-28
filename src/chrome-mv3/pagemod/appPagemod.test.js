@@ -39,6 +39,7 @@ import {ThemeEvents} from "../../all/background_page/event/themeEvents";
 import {PasswordGeneratorEvents} from "../../all/background_page/event/passwordGeneratorEvents";
 import {MobileEvents} from "../../all/background_page/event/mobileEvents";
 import GpgAuth from "../../all/background_page/model/gpgauth";
+import {PownedPasswordEvents} from '../../all/background_page/event/pownedPasswordEvents';
 
 jest.spyOn(GetLegacyAccountService, "get").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
@@ -66,6 +67,7 @@ jest.spyOn(ThemeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(LocaleEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PasswordGeneratorEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(MobileEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
 
 
 describe("Auth", () => {
@@ -76,7 +78,7 @@ describe("Auth", () => {
 
   describe("Auth::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(28);
+      expect.assertions(29);
       // data mocked
       const port = {
         _port: {
@@ -119,6 +121,7 @@ describe("Auth", () => {
       expect(LocaleEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
       expect(PasswordGeneratorEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
       expect(MobileEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
+      expect(PownedPasswordEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
       expect(App.events).toStrictEqual([
         ConfigEvents,
         AppEvents,
@@ -144,7 +147,8 @@ describe("Auth", () => {
         ThemeEvents,
         LocaleEvents,
         PasswordGeneratorEvents,
-        MobileEvents
+        MobileEvents,
+        PownedPasswordEvents
       ]);
       expect(App.appName).toBe('App');
     });

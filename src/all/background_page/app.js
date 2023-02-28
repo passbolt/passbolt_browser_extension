@@ -72,6 +72,7 @@ import InFormMenu from "./pagemod/informMenuPagemod";
 import PublicWebsiteSignIn from "./pagemod/publicWebsiteSignInPagemod";
 import Recover from "./pagemod/recoverPagemod";
 import {MfaEvents} from './event/mfaEvents';
+import {PownedPasswordEvents} from './event/pownedPasswordEvents';
 
 const events = {};
 events.app = AppEvents;
@@ -111,6 +112,7 @@ events.webIntegration = WebIntegrationEvents;
 events.publicWebsiteSignIn = PublicWebsiteSignInEvents;
 events.mfaPolicy = MfaEvents;
 events.clipboard = ClipboardEvents;
+events.pownedPassword = PownedPasswordEvents;
 
 /*
  * ==================================================================================

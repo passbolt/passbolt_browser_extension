@@ -24,6 +24,7 @@ import {OrganizationSettingsEvents} from "../../all/background_page/event/organi
 import {TabEvents} from "../../all/background_page/event/tabEvents";
 import {LocaleEvents} from "../../all/background_page/event/localeEvents";
 import {PasswordGeneratorEvents} from "../../all/background_page/event/passwordGeneratorEvents";
+import {PownedPasswordEvents} from '../../all/background_page/event/pownedPasswordEvents';
 
 jest.spyOn(AuthEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
@@ -37,6 +38,7 @@ jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(TabEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(LocaleEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PasswordGeneratorEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
 
 describe("QuickAccess", () => {
   beforeEach(async() => {
@@ -46,7 +48,7 @@ describe("QuickAccess", () => {
 
   describe("QuickAccess::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(14);
+      expect.assertions(15);
       // data mocked
       const port = {
         _port: {
@@ -68,7 +70,8 @@ describe("QuickAccess", () => {
       expect(TabEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName});
       expect(LocaleEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName});
       expect(PasswordGeneratorEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName});
-      expect(QuickAccess.events).toStrictEqual([AuthEvents, ConfigEvents, KeyringEvents, QuickAccessEvents, GroupEvents, TagEvents, ResourceEvents, SecretEvents, OrganizationSettingsEvents, TabEvents, LocaleEvents, PasswordGeneratorEvents]);
+      expect(PownedPasswordEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName});
+      expect(QuickAccess.events).toStrictEqual([AuthEvents, ConfigEvents, KeyringEvents, QuickAccessEvents, GroupEvents, TagEvents, ResourceEvents, SecretEvents, OrganizationSettingsEvents, TabEvents, LocaleEvents, PasswordGeneratorEvents, PownedPasswordEvents]);
       expect(QuickAccess.appName).toBe('QuickAccess');
     });
   });

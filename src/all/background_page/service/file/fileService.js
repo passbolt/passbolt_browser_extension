@@ -43,7 +43,7 @@ class FileService {
       await browser.downloads.download({url, filename});
       scriptExecution.injectURLToRevoke(url);
     } else {
-      const fileWorker = WorkerService.get('FileIframe', tabId);
+      const fileWorker = await WorkerService.get('FileIframe', tabId);
       fileWorker.port.emit('passbolt.file-iframe.download', filename, dataUrl);
     }
   }

@@ -73,6 +73,7 @@ App.init = function() {
       app.events.role.listen(worker);
       app.events.keyring.listen(worker);
       app.events.secret.listen(worker);
+      app.events.pownedPassword.listen(worker);
       app.events.organizationSettings.listen(worker);
       app.events.share.listen(worker);
       app.events.subscription.listen(worker);

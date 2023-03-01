@@ -17,13 +17,13 @@ import BuildAccountRecoverService from "../../all/background_page/service/recove
 import {ConfigEvents} from "../../all/background_page/event/configEvents";
 import BuildAccountApiClientOptionsService
   from "../../all/background_page/service/account/buildApiClientOptionsService";
-import {SecretEvents} from "../../all/background_page/event/secretEvents";
+import {PownedPasswordEvents} from '../../all/background_page/event/pownedPasswordEvents';
 
 jest.spyOn(BuildAccountRecoverService, "buildFromRecoverUrl").mockImplementation(jest.fn());
 jest.spyOn(BuildAccountApiClientOptionsService, "build").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RecoverEvents, "listen").mockImplementation(jest.fn());
-jest.spyOn(SecretEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
 
 describe("Recover", () => {
   beforeEach(async() => {
@@ -51,8 +51,8 @@ describe("Recover", () => {
       expect(BuildAccountApiClientOptionsService.build).toHaveBeenCalled();
       expect(ConfigEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
       expect(RecoverEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
-      expect(SecretEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
-      expect(Recover.events).toStrictEqual([ConfigEvents, RecoverEvents, SecretEvents]);
+      expect(PownedPasswordEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
+      expect(Recover.events).toStrictEqual([ConfigEvents, RecoverEvents, PownedPasswordEvents]);
       expect(Recover.appName).toBe('Recover');
     });
   });

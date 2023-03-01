@@ -4,6 +4,64 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [3.11.1] - 2023-02-27
+### Added
+- PB-22081 As a signed-in user I can import my passwords from a Mozilla web browsers csv export
+- PB-22082 As a signed-in user I can import my passwords from Safari web browser csv export
+- PB-22116 As a signed-in user I can import my passwords from a Dashlane csv export
+- PB-22117 As a signed-in user I can import my passwords from a Nordpass csv export
+- PB-22510 As a signed-in user I can import my passwords from a LogMeOnce csv export
+- PB-22866 As a user I want to use passbolt in Italian
+- PB-22866 As a user I want to use passbolt in Portuguese (Brazil)
+- PB-22866 As a user I want to use passbolt in Korean
+- PB-22866 As a user I want to use passbolt in Romanian
+- PB-22882 As a user I can use the SSO feature to speed up the extension configuration process
+
+### Improved
+- PB-21408 As a logged-in user navigating to the account recovery user settings from the MFA user settings I should not see the screen blinking
+- PB-21548 As a signed-in user I can access my MFA settings for a given provider following a dedicated route
+- PB-22647 As a signed-in user I want to use my personal google email server as SMTP server
+- PB-22699 A a user I want a unified experience using pwned password feature
+- PB-22725 As a signed-in user I want to see an introduction screen prior setting up Duo v4
+- PB-22835 As an administrator I can define the optional SMTP Settings “client” setting
+- PB-22861 As an administrator I want to manage Duo v4 settings
+
+### Fixed
+- PB-22387 As an administrator generating an account recovery organization key, I should see the warning banner after submitting the form
+- PB-22587 Fix the CSV exports columns presence and order
+- PB-22588 As a signed-in user I want to import resources in Lastpass csv export following their conventions
+- PB-22701 As a signed-in user I should not see the MFA mandatory dialog if there are no MFA providers enabled for my organization
+- PB-22704 As a user with a configured account and SSO, I should be able to recover/setup another account
+- PB-23277 As a signed-in user I should not have a 404 error with the flag mfa policy disable
+
+### Security
+- PB-21645 As content code application I should be restricted to open ports only for applications I am allowed to open
+- PB-21754 As a user I should not see any trace of previously downloaded content in my history
+- PB-23279 As a user completing a setup I should not have access to the background page decryption secret capabilities
+
+### Maintenance
+PB-19641 Handle the setup and recover runtime object
+- PB-19675 As a signed-in user I want to perform a recover using the browser extension with MV3
+- PB-19676 As a signed-in user I want to perform a setup using the browser extension with mv3
+- PB-19677 As a signed-in user I want to perform a sign-in using the browser extension with MV3
+- PB-19678 As a signed-in user I want to start the application using the browser extension with mv3
+- PB-21750 As service worker I should be able to wake up a disconnected application port
+- PB-21822 As a signed-in user I want to open quickaccess using the browser extension with MV3
+- PB-21823 As a signed-in user I want to see the web integration using the browser extension with MV3
+- PB-21824 As a signed-in user I want to see the web public sign in using the browser extension with MV3
+- PB-21829 Clean port after a web navigation on the main frame
+- PB-21996 As a signed-in user I want to see the in form call to action using the browser extension with MV3
+- PB-21997 As a signed-in user I want to see the in form menu using the browser extension with MV3
+- PB-22009 Create a service to parse the webIntegration in url
+- PB-22076 Handle flush local storage on browser runtime onStartUp for MV3
+- PB-22077 Handle config init and post logout on service worker startup
+- PB-22078 Create a polyfill to handle browser.action on MV2
+- PB-22113 As a signed-in user I should be able to open the quickaccess popup from inform menu with MV3
+- PB-22412 As a signed-in user I want to use account recovery process using the browser extension with MV3
+- PB-22648 Adapt payload when back return duo settings
+- PB-22896 Update styles to adapt to Duo forms updates
+- PB-22898 Update login form design styles
+
 ## [3.10.0] - 2023-02-09
 ### Added
 - PB-21752 As an anonymous user I can self register if the organization allows my email domain

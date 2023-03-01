@@ -57,7 +57,7 @@ describe("FileService", () => {
       };
       chrome.downloads = undefined;
       // function mocked
-      jest.spyOn(WorkerService, "get").mockImplementationOnce(() => worker);
+      jest.spyOn(WorkerService, "get").mockImplementationOnce(() => Promise.resolve(worker));
       // process
       await FileService.saveFile("filename", "Text", null, 1);
       // expectation

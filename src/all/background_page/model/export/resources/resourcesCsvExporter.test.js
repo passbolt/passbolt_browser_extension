@@ -15,14 +15,16 @@ import Csv1PasswordRowComposer from "./csvRowComposer/csv1passwordRowComposer";
 import CsvKdbxRowComposer from "./csvRowComposer/csvKdbxRowComposer";
 import CsvLastPassRowComposer from "./csvRowComposer/csvLastPassRowComposer";
 import ExportResourcesFileEntity from "../../entity/export/exportResourcesFileEntity";
+import CsvChromiumRowComposer from "./csvRowComposer/csvChromiumRowComposer";
 
 describe("ResourcesCsvExporter", () => {
   it("should be aware of the supported row parsers", () => {
-    expect(ResourcesCsvExporter.register).toHaveLength(3);
+    expect(ResourcesCsvExporter.register).toHaveLength(4);
     const supportedRowComposers = [
       Csv1PasswordRowComposer,
       CsvKdbxRowComposer,
-      CsvLastPassRowComposer
+      CsvLastPassRowComposer,
+      CsvChromiumRowComposer,
     ];
     expect(ResourcesCsvExporter.register).toEqual(expect.arrayContaining(supportedRowComposers));
   });

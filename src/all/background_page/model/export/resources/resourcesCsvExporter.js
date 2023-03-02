@@ -21,6 +21,7 @@ import CsvMozillaPlatformRowComposer from "./csvRowComposer/csvMozillaPlatformRo
 import CsvSafariRowComposer from "./csvRowComposer/csvSafariRowComposer";
 import CsvDashlaneRowComposer from "./csvRowComposer/csvDashlaneRowComposer";
 import CsvNordpassRowComposer from "./csvRowComposer/csvNordpassRowComposer";
+import CsvLogMeOnceRowComposer from "./csvRowComposer/csvLogMeOnceRowComposer";
 
 /**
  * Register of csv row parsers
@@ -35,7 +36,8 @@ const register = [
   CsvMozillaPlatformRowComposer,
   CsvSafariRowComposer,
   CsvDashlaneRowComposer,
-  CsvNordpassRowComposer
+  CsvNordpassRowComposer,
+  CsvLogMeOnceRowComposer
 ];
 
 class ResourcesCsvExporter {

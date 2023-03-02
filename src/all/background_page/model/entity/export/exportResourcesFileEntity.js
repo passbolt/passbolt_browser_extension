@@ -23,6 +23,7 @@ const FORMAT_CSV_1PASSWORD = "csv-1password";
 const FORMAT_CSV_CHROMIUM = "csv-chromium";
 const FORMAT_CSV_BITWARDEN = "csv-bitwarden";
 const FORMAT_CSV_MOZILLA = "csv-mozilla";
+const FORMAT_CSV_SAFARI = "csv-safari";
 
 class ExportResourcesFileEntity extends Entity {
   /**
@@ -276,6 +277,7 @@ class ExportResourcesFileEntity extends Entity {
       ExportResourcesFileEntity.FORMAT_CSV_CHROMIUM,
       ExportResourcesFileEntity.FORMAT_CSV_BITWARDEN,
       ExportResourcesFileEntity.FORMAT_CSV_MOZILLA,
+      ExportResourcesFileEntity.FORMAT_CSV_SAFARI,
     ];
   }
 
@@ -333,6 +335,14 @@ class ExportResourcesFileEntity extends Entity {
    */
   static get FORMAT_CSV_MOZILLA() {
     return FORMAT_CSV_MOZILLA;
+  }
+
+  /**
+   * ExportResourcesFileEntity.FORMAT_CSV_SAFARI
+   * @returns {string}
+   */
+  static get FORMAT_CSV_SAFARI() {
+    return FORMAT_CSV_SAFARI;
   }
 }
 

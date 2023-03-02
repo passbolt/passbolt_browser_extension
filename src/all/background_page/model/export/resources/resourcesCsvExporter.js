@@ -18,6 +18,7 @@ import PapaParse from "papaparse";
 import CsvChromiumRowComposer from "./csvRowComposer/csvChromiumRowComposer";
 import CsvBitWardenRowComposer from "./csvRowComposer/csvBitWardenRowComposer";
 import CsvMozillaPlatformRowComposer from "./csvRowComposer/csvMozillaPlatformRowComposer";
+import CsvSafariRowComposer from "./csvRowComposer/csvSafariRowComposer";
 
 /**
  * Register of csv row parsers
@@ -29,7 +30,8 @@ const register = [
   Csv1PasswordRowComposer,
   CsvChromiumRowComposer,
   CsvBitWardenRowComposer,
-  CsvMozillaPlatformRowComposer
+  CsvMozillaPlatformRowComposer,
+  CsvSafariRowComposer
 ];
 
 class ResourcesCsvExporter {

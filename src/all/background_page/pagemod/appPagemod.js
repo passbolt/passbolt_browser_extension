@@ -10,6 +10,8 @@ import GetLegacyAccountService from "../service/account/getLegacyAccountService"
 import {App as app} from "../app";
 import PageMod from "../sdk/page-mod";
 import AppInitController from "../controller/app/appInitController";
+import ParseAppUrlService from "../service/app/parseAppUrlService";
+import User from "../model/user";
 
 
 /*
@@ -35,9 +37,20 @@ App.init = function() {
        */
     ],
     onAttach: async function(worker) {
+      const user = User.getInstance();
+      if (!user.isValid()) {
+        console.error('appPagemod::attach can not attach application if user is not configured.');
+        return;
+      }
+
       const auth = new GpgAuth();
       if (!await auth.isAuthenticated() || await auth.isMfaRequired()) {
-        console.error('Can not attach application if user is not logged in.');
+        console.error('appPagemod::attach can not attach application if user is not logged in.');
+        return;
+      }
+
+      if (!ParseAppUrlService.test(worker.tab.url)) {
+        console.error('appPagemod::attach cannot connect to untrusted parent frame.');
         return;
       }
 

@@ -39,9 +39,10 @@ class QuickAccess {
     }
 
     // QuickAccess should connect a port only from the toolbar action panel or as a detached window as a top frame.
-    const isToolbarPanel = typeof(port?.sender?.tab) === "undefined";
-    const isTopLevelIframe = port?.sender?.frameId === 0;
+    const isToolbarPanel = typeof(port.sender?.tab) === "undefined";
+    const isTopLevelIframe = port.sender?.frameId === 0;
     if (!isToolbarPanel && !isTopLevelIframe) {
+      console.error('quickAccessPagemod::attach can not attach quick access to untrusted frame.');
       return;
     }
 

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [3.11.2] - 2023-03-03
+### Security
+- PB-23328 - PBL-08-001 WP2 Credentials Leakage via Clickjacking - As a signed-in user I should not be able to open the application iframe in an untrusted parent frame
+- PB-23327 - PBL-08-001 WP2 Credentials Leakage via Clickjacking - As a signed-in user I should not be able to open the quickaccess in an iframe
 
 ## [3.11.1] - 2023-02-27
 ### Added
@@ -1123,7 +1127,9 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.9.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.11.2...HEAD
+[3.11.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.11.0...v3.11.2
+[3.11.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.10.0...v3.11.0
 [3.10.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.9.2...v3.10.0
 [3.9.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.9.0...v3.9.2
 [3.9.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.8.0...v3.9.0

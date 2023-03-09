@@ -39,7 +39,7 @@ class UserModel {
    */
   async updateLocalStorage() {
     // contain pending_account_recovery_request is only available for admin or recovery contact role
-    const contains =  {profile: true, gpgkey: false, groups_users: false, last_logged_in: true, pending_account_recovery_request: true, account_recovery_user_setting: true};
+    const contains =  {is_mfa_enabled: true, profile: true, gpgkey: false, groups_users: false, last_logged_in: true, pending_account_recovery_request: true, account_recovery_user_setting: true};
     const usersCollection = await this.findAll(contains, null, null, true);
     await UserLocalStorage.set(usersCollection);
     return usersCollection;

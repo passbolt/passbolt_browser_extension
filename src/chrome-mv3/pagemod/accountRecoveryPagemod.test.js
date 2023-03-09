@@ -64,7 +64,7 @@ describe("AccountRecovery", () => {
         },
         disconnect: jest.fn()
       };
-      jest.spyOn(GetRequestLocalAccountService, "getAccountMatchingContinueUrl").mockImplementation(() => {throw new Error("Error")});
+      jest.spyOn(GetRequestLocalAccountService, "getAccountMatchingContinueUrl").mockImplementation(() => { throw new Error("Error"); });
       // process
       await AccountRecovery.attachEvents(port);
       // expectations

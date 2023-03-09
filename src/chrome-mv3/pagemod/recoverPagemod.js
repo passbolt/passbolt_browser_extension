@@ -15,9 +15,10 @@ import Pagemod from "./pagemod";
 import {ConfigEvents} from "../../all/background_page/event/configEvents";
 import {RecoverEvents} from "../../all/background_page/event/recoverEvents";
 import BuildAccountRecoverService from "../../all/background_page/service/recover/buildAccountRecoverService";
-import BuildAccountApiClientOptionsService
+import BuildApiClientOptionsService
   from "../../all/background_page/service/account/buildApiClientOptionsService";
 import {PownedPasswordEvents} from "../../all/background_page/event/pownedPasswordEvents";
+import OrganizationSettingsModel from "../../all/background_page/model/organizationSettings/organizationSettingsModel";
 
 class Recover extends Pagemod {
   /**
@@ -36,7 +37,8 @@ class Recover extends Pagemod {
     try {
       const tab = port._port.sender.tab;
       const account = BuildAccountRecoverService.buildFromRecoverUrl(tab.url);
-      const apiClientOptions = await BuildAccountApiClientOptionsService.build(account);
+      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+      await (new OrganizationSettingsModel(apiClientOptions)).getOrFind(true);
       for (const event of this.events) {
         event.listen({port, tab}, apiClientOptions, account);
       }

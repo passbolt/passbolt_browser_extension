@@ -16,6 +16,7 @@ import {v4 as uuidv4} from "uuid";
 import {defaultAccountRecoveryPrivateKeyDto} from "./accountRecoveryPrivateKeyEntity.test.data";
 import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
 import {acceptedAccountRecoveryResponseDto} from "./accountRecoveryResponseEntity.test.data";
+import {defaultUserDto} from "../user/userEntity.test.data";
 
 export const pendingAccountRecoveryRequestDto = (data = {}) => {
   const defaultData = {
@@ -33,6 +34,10 @@ export const pendingAccountRecoveryRequestDto = (data = {}) => {
   data.account_recovery_private_key = defaultAccountRecoveryPrivateKeyDto({
     user_id: data.user_id,
     ...data?.account_recovery_private_key
+  });
+  data.creator = defaultUserDto({
+    id: data.user_id,
+    ...data?.creator
   });
 
   return data;
@@ -74,3 +79,9 @@ export const approvedAccountRecoveryRequestWithoutResponsesDto = (data = {}) => 
 
   return dto;
 };
+
+export const pendingAccountRecoveryRequestDtoWithNonStandardCreatorEmail = () => pendingAccountRecoveryRequestDto({
+  creator: {
+    username: 'ada@passbolt.c'
+  }
+});

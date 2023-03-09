@@ -12,7 +12,7 @@
  * @since         4.0.0
  */
 import Pagemod from "./pagemod";
-import BuildAccountApiClientOptionsService
+import BuildApiClientOptionsService
   from "../../all/background_page/service/account/buildApiClientOptionsService";
 import {AccountRecoveryEvents} from "../../all/background_page/event/accountRecoveryEvents";
 import GetRequestLocalAccountService
@@ -35,7 +35,7 @@ class AccountRecovery extends Pagemod {
     try {
       const tab = port._port.sender.tab;
       const account = await GetRequestLocalAccountService.getAccountMatchingContinueUrl(tab.url);
-      const apiClientOptions = await BuildAccountApiClientOptionsService.build(account);
+      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
       for (const event of this.events) {
         event.listen({port, tab}, apiClientOptions, account);
       }

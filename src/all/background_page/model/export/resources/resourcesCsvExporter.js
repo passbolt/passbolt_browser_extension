@@ -15,6 +15,13 @@ import Csv1PasswordRowComposer from "./csvRowComposer/csv1passwordRowComposer";
 import CsvLastPassRowComposer from "./csvRowComposer/csvLastPassRowComposer";
 import FileFormatError from "../../../error/fileFormatError";
 import PapaParse from "papaparse";
+import CsvChromiumRowComposer from "./csvRowComposer/csvChromiumRowComposer";
+import CsvBitWardenRowComposer from "./csvRowComposer/csvBitWardenRowComposer";
+import CsvMozillaPlatformRowComposer from "./csvRowComposer/csvMozillaPlatformRowComposer";
+import CsvSafariRowComposer from "./csvRowComposer/csvSafariRowComposer";
+import CsvDashlaneRowComposer from "./csvRowComposer/csvDashlaneRowComposer";
+import CsvNordpassRowComposer from "./csvRowComposer/csvNordpassRowComposer";
+import CsvLogMeOnceRowComposer from "./csvRowComposer/csvLogMeOnceRowComposer";
 
 /**
  * Register of csv row parsers
@@ -23,7 +30,14 @@ import PapaParse from "papaparse";
 const register = [
   CsvKdbxRowComposer,
   CsvLastPassRowComposer,
-  Csv1PasswordRowComposer
+  Csv1PasswordRowComposer,
+  CsvChromiumRowComposer,
+  CsvBitWardenRowComposer,
+  CsvMozillaPlatformRowComposer,
+  CsvSafariRowComposer,
+  CsvDashlaneRowComposer,
+  CsvNordpassRowComposer,
+  CsvLogMeOnceRowComposer
 ];
 
 class ResourcesCsvExporter {

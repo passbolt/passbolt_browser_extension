@@ -13,8 +13,7 @@
  */
 import Entity from "../../abstract/entity";
 import EntitySchema from "../../abstract/entitySchema";
-import goog from "../../../../utils/format/emailaddress";
-
+import AppEmailValidatorService from "../../../../service/validator/appEmailValidatorService";
 
 const ENTITY_NAME = "GenerateGpgKeyPairOptionsEntity";
 
@@ -75,7 +74,7 @@ class GenerateGpgKeyPairOptionsEntity extends Entity {
         },
         "email": {
           "type": "string",
-          "custom": goog.format.EmailAddress.isValidAddress
+          "custom": AppEmailValidatorService.validate
         },
         "passphrase": {
           "type": "string",

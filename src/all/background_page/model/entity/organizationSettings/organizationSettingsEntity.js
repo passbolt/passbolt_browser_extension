@@ -31,10 +31,11 @@ class OrganizationSettingsEntity extends Entity {
   constructor(organizationSettingsDto) {
     // Default properties values
     const props = Object.assign(OrganizationSettingsEntity.getDefault(), organizationSettingsDto);
+    const sanitizedDto = OrganizationSettingsEntity.sanitizeDto(props);
 
     super(EntitySchema.validate(
       OrganizationSettingsEntity.ENTITY_NAME,
-      props,
+      sanitizedDto,
       OrganizationSettingsEntity.getSchema()
     ));
   }
@@ -92,6 +93,43 @@ class OrganizationSettingsEntity extends Entity {
     return {
       status: this.ORGANIZATION_DISABLED
     };
+  }
+
+  /**
+   * Sanitized the given dto.
+   * It accepts both old and new version of the dto and sets new fields with new ones if any.
+   *
+   * @param {Object} dto
+   * @returns {Object}
+   */
+  static sanitizeDto(dto) {
+    const sanitizedDto = JSON.parse(JSON.stringify(dto));
+
+    OrganizationSettingsEntity.sanitizeEmailValidateRegex(sanitizedDto);
+
+    return sanitizedDto;
+  }
+
+  /**
+   * Sanitize email validate regex
+   * @param {Object} dto The dto to sanitize
+   * @returns {void}
+   */
+  static sanitizeEmailValidateRegex(dto) {
+    const emailValidateRegex = dto?.passbolt?.email?.validate?.regex;
+
+    if (
+      !emailValidateRegex
+        || typeof emailValidateRegex !== 'string'
+        || !emailValidateRegex.trim().length
+    ) {
+      return;
+    }
+
+    dto.passbolt.email.validate.regex = emailValidateRegex
+      .trim()
+      .replace(/^\/+/, '') // Trim starting slash
+      .replace(/\/+$/, '');   // Trim trailing slash
   }
 
   /*
@@ -170,6 +208,14 @@ class OrganizationSettingsEntity extends Entity {
     const serverTimeDiff = this._props.serverTimeDiff || 0;
     const serverTime = new Date(currentClientTime.getTime() + serverTimeDiff);
     return serverTime.getTime();
+  }
+
+  /**
+   * Returns the custom application email validation regex.
+   * @returns {string|null}
+   */
+  get emailValidateRegex() {
+    return this._props?.passbolt?.email?.validate?.regex || null;
   }
 
   /*

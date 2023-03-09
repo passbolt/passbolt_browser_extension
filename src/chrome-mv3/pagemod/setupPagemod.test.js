@@ -14,13 +14,15 @@
 import Setup from "./setupPagemod";
 import {ConfigEvents} from "../../all/background_page/event/configEvents";
 import {SetupEvents} from "../../all/background_page/event/setupEvents";
-import BuildAccountApiClientOptionsService
+import BuildApiClientOptionsService
   from "../../all/background_page/service/account/buildApiClientOptionsService";
 import BuildAccountSetupService from "../../all/background_page/service/setup/buildAccountSetupService";
 import {PownedPasswordEvents} from '../../all/background_page/event/pownedPasswordEvents';
+import {mockApiResponse} from "../../../test/mocks/mockApiResponse";
+import {enableFetchMocks} from "jest-fetch-mock";
 
-jest.spyOn(BuildAccountSetupService, "buildFromSetupUrl").mockImplementation(jest.fn());
-jest.spyOn(BuildAccountApiClientOptionsService, "build").mockImplementation(jest.fn());
+jest.spyOn(BuildAccountSetupService, "buildFromSetupUrl");
+jest.spyOn(BuildApiClientOptionsService, "buildFromAccount");
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(SetupEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
@@ -29,6 +31,7 @@ describe("Setup", () => {
   beforeEach(async() => {
     jest.resetModules();
     jest.clearAllMocks();
+    enableFetchMocks();
   });
 
   describe("Setup::attachEvents", () => {
@@ -39,19 +42,20 @@ describe("Setup", () => {
         _port: {
           sender: {
             tab: {
-              url: "https://localhost"
+              url: "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"
             }
           }
         }
       };
+      fetch.doMockOnceIf(new RegExp('/users/csrf-token.json'), async() => mockApiResponse("csrf-token"));
       // process
       await Setup.attachEvents(port);
       // expectations
       expect(BuildAccountSetupService.buildFromSetupUrl).toHaveBeenCalledWith(port._port.sender.tab.url);
-      expect(BuildAccountApiClientOptionsService.build).toHaveBeenCalled();
-      expect(ConfigEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
-      expect(SetupEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
-      expect(PownedPasswordEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
+      expect(BuildApiClientOptionsService.buildFromAccount).toHaveBeenCalled();
+      expect(ConfigEvents.listen).toHaveBeenCalled();
+      expect(SetupEvents.listen).toHaveBeenCalled();
+      expect(PownedPasswordEvents.listen).toHaveBeenCalled();
       expect(Setup.events).toStrictEqual([ConfigEvents, SetupEvents, PownedPasswordEvents]);
       expect(Setup.appName).toBe('Setup');
     });

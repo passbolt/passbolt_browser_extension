@@ -14,39 +14,34 @@
 import EntitySchema from "../../abstract/entitySchema";
 import EntityValidationError from '../../abstract/entityValidationError';
 import GenerateGpgKeyPairOptionsEntity from "./generateGpgKeyPairOptionsEntity";
+import {
+  customEmailValidationProOrganizationSettings
+} from "../../organizationSettings/organizationSettingsEntity.test.data";
+import OrganizationSettingsModel from "../../../organizationSettings/organizationSettingsModel";
+import OrganizationSettingsEntity from "../../organizationSettings/organizationSettingsEntity";
+import {defaultDto, minimalDto} from "./generateGpgKeyPairOptionsEntity.test.data";
 
 describe("GenerateGpgKeyPairOptionsEntity entity", () => {
   it("schema must validate", () => {
     EntitySchema.validateSchema(GenerateGpgKeyPairOptionsEntity.ENTITY_NAME, GenerateGpgKeyPairOptionsEntity.getSchema());
   });
 
-  it("constructor works if valid DTO is provided", () => {
-    expect.assertions(1);
-    const dto = {
-      name: "Jean-Jacky",
-      email: "jj@passbolt.com",
-      passphrase: "ultra-secure",
-      keySize: 4096,
-      type: "rsa",
-      date: (new Date()).getTime(),
-    };
-    const entity = new GenerateGpgKeyPairOptionsEntity(dto);
-    expect(entity.toDto()).toStrictEqual(dto);
-  });
-
   it("constructor works if minimal DTO is provided", () => {
     expect.assertions(1);
-    const dto = {
-      name: "Jean-Jacky",
-      email: "jj@passbolt.com",
-      passphrase: "ultra-secure"
-    };
+    const dto = minimalDto();
     const entity = new GenerateGpgKeyPairOptionsEntity(dto);
     expect(entity.toDto()).toStrictEqual({
       ...dto,
       type: "rsa",
       keySize: 3072
     });
+  });
+
+  it("constructor works if valid DTO is provided", () => {
+    expect.assertions(1);
+    const dto = defaultDto();
+    const entity = new GenerateGpgKeyPairOptionsEntity(dto);
+    expect(entity.toDto()).toStrictEqual(dto);
   });
 
   it("constructor throws an exception if DTO contains invalid field", () => {
@@ -68,5 +63,25 @@ describe("GenerateGpgKeyPairOptionsEntity entity", () => {
       expect(error.hasError('keySize', 'type')).toBe(true);
       expect(error.hasError('type', 'enum')).toBe(true);
     }
+  });
+
+  it("constructor returns validation error if the email is not standard.", () => {
+    expect.assertions(2);
+    try {
+      const dto = defaultDto({email: "ada@passbolt.c"});
+      new GenerateGpgKeyPairOptionsEntity(dto);
+    } catch (error) {
+      expect(error instanceof EntityValidationError).toBe(true);
+      expect(error.hasError('email', 'custom')).toBe(true);
+    }
+  });
+
+  it("constructor works if the email is not standard and the application settings defined a custom validation.", () => {
+    expect.assertions(1);
+    const organizationSettings = customEmailValidationProOrganizationSettings();
+    OrganizationSettingsModel.set(new OrganizationSettingsEntity(organizationSettings));
+    const dto = defaultDto({email: "ada@passbolt.c"});
+    const entity = new GenerateGpgKeyPairOptionsEntity(dto);
+    expect(entity.email).toEqual("ada@passbolt.c");
   });
 });

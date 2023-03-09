@@ -15,6 +15,12 @@ import UserEntity from "./userEntity";
 import {UserEntityTestFixtures} from "./userEntity.test.fixtures";
 import EntitySchema from "../abstract/entitySchema";
 import EntityValidationError from '../abstract/entityValidationError';
+import {
+  customEmailValidationProOrganizationSettings
+} from "../organizationSettings/organizationSettingsEntity.test.data";
+import OrganizationSettingsModel from "../../organizationSettings/organizationSettingsModel";
+import OrganizationSettingsEntity from "../organizationSettings/organizationSettingsEntity";
+import {defaultUserDto} from "./userEntity.test.data";
 
 describe("User entity", () => {
   it("schema must validate", () => {
@@ -95,8 +101,28 @@ describe("User entity", () => {
       expect((error instanceof EntityValidationError)).toBe(true);
       expect(error.hasError('id', 'format')).toBe(true);
       expect(error.hasError('role_id', 'type')).toBe(true);
-      expect(error.hasError('username', 'format')).toBe(true);
+      expect(error.hasError('username', 'custom')).toBe(true);
     }
+  });
+
+  it("constructor returns validation error if the username is not standard.", () => {
+    expect.assertions(2);
+    try {
+      const dto = defaultUserDto({username: "ada@passbolt.c"});
+      new UserEntity(dto);
+    } catch (error) {
+      expect(error instanceof EntityValidationError).toBe(true);
+      expect(error.hasError('username', 'custom')).toBe(true);
+    }
+  });
+
+  it("constructor works if the username is not standard and the application settings defined a custom validation.", () => {
+    expect.assertions(1);
+    const organizationSettings = customEmailValidationProOrganizationSettings();
+    OrganizationSettingsModel.set(new OrganizationSettingsEntity(organizationSettings));
+    const dto = defaultUserDto({username: "ada@passbolt.c"});
+    const entity = new UserEntity(dto);
+    expect(entity.username).toEqual("ada@passbolt.c");
   });
 
   it("serialization works with full object inside collection", () => {

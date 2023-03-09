@@ -33,6 +33,25 @@ class OrganizationSettingsModel {
   }
 
   /**
+   * Set the settings.
+   * @params {OrganizationSettingsEntity} settings The settings
+   */
+  static set(settings) {
+    if (!(settings instanceof OrganizationSettingsEntity)) {
+      throw new Error('The settings should be an instance of OrganizationSettingsEntity');
+    }
+    _settings = settings;
+  }
+
+  /**
+   * get the cached settings if any.
+   * @return {OrganizationSettingsEntity|null}
+   */
+  static get() {
+    return _settings || null;
+  }
+
+  /**
    * Returns the organization settings from the local cache or requests the server.
    * @param {boolean} refreshCache Should request the API to retrieve the organization settings and refresh the cache.
    * @returns {Promise<OrganizationSettingsEntity>}

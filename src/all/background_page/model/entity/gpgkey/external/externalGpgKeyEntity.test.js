@@ -82,4 +82,8 @@ describe("ExternalGpgKey entity", () => {
       expect(error.hasError('revoked', 'type')).toBe(true);
     }
   });
+
+  it.todo("constructor returns validation error if the user id email is not standard.");
+
+  it.todo("constructor works if the user id email is not standard and the application settings defined a custom validation.");
 });

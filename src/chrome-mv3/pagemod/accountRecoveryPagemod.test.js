@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import BuildAccountApiClientOptionsService
+import BuildApiClientOptionsService
   from "../../all/background_page/service/account/buildApiClientOptionsService";
 import {AccountRecoveryEvents} from "../../all/background_page/event/accountRecoveryEvents";
 import AccountRecovery from "./accountRecoveryPagemod";
@@ -19,7 +19,7 @@ import GetRequestLocalAccountService
   from "../../all/background_page/service/accountRecovery/getRequestLocalAccountService";
 
 jest.spyOn(GetRequestLocalAccountService, "getAccountMatchingContinueUrl").mockImplementation(jest.fn());
-jest.spyOn(BuildAccountApiClientOptionsService, "build").mockImplementation(jest.fn());
+jest.spyOn(BuildApiClientOptionsService, "buildFromAccount").mockImplementation(jest.fn());
 jest.spyOn(AccountRecoveryEvents, "listen").mockImplementation(jest.fn());
 
 describe("AccountRecovery", () => {
@@ -45,7 +45,7 @@ describe("AccountRecovery", () => {
       await AccountRecovery.attachEvents(port);
       // expectations
       expect(GetRequestLocalAccountService.getAccountMatchingContinueUrl).toHaveBeenCalledWith(port._port.sender.tab.url);
-      expect(BuildAccountApiClientOptionsService.build).toHaveBeenCalled();
+      expect(BuildApiClientOptionsService.buildFromAccount).toHaveBeenCalled();
       expect(AccountRecoveryEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
       expect(AccountRecovery.events).toStrictEqual([AccountRecoveryEvents]);
       expect(AccountRecovery.appName).toBe('AccountRecovery');
@@ -64,7 +64,7 @@ describe("AccountRecovery", () => {
         },
         disconnect: jest.fn()
       };
-      jest.spyOn(GetRequestLocalAccountService, "getAccountMatchingContinueUrl").mockImplementation(() => {throw new Error("Error")});
+      jest.spyOn(GetRequestLocalAccountService, "getAccountMatchingContinueUrl").mockImplementation(() => { throw new Error("Error"); });
       // process
       await AccountRecovery.attachEvents(port);
       // expectations

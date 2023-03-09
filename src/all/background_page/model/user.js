@@ -100,7 +100,12 @@ const User = (function() {
         if (typeof value === 'undefined' || value === '') {
           throw new Error('The username cannot be empty');
         }
-        if (!Validator.isEmail(value)) {
+        /*
+         * @deprecated the username could be validated using a custom application setting.
+         * This validation will soon be removed as entities are validating content when the
+         * user is retrieved from or saved in the local storage.
+         */
+        if (!ValidatorRule.isUtf8(value)) {
           throw new Error('The username should be a valid email address');
         }
         if (!Validator.isLength(value, 0, 255)) {

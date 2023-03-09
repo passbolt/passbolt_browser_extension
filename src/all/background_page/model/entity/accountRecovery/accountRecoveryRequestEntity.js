@@ -12,12 +12,10 @@
  * @since         3.6.0
  */
 import Entity from "../abstract/entity";
-import RoleEntity from "../role/roleEntity";
-import ProfileEntity from "../profile/profileEntity";
-import GpgkeyEntity from "../gpgkey/gpgkeyEntity";
 import AccountRecoveryResponsesCollection from "./accountRecoveryResponsesCollection";
 import EntitySchema from "../abstract/entitySchema";
 import AccountRecoveryPrivateKeyEntity from "./accountRecoveryPrivateKeyEntity";
+import UserEntity from "../user/userEntity";
 
 const ENTITY_NAME = "AccountRecoveryRequest";
 const FINGERPRINT_LENGTH = 40;
@@ -28,12 +26,9 @@ const STATUS_COMPLETED = "completed";
 
 class AccountRecoveryRequestEntity extends Entity {
   /**
-   * AccountRecoveryRequestEntity entity constructor
-   *
-   * @param {Object} accountRecoveryRequestDto account recovery request DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(accountRecoveryRequestDto) {
+  constructor(accountRecoveryRequestDto = {}) {
     super(EntitySchema.validate(
       AccountRecoveryRequestEntity.ENTITY_NAME,
       accountRecoveryRequestDto,
@@ -49,11 +44,14 @@ class AccountRecoveryRequestEntity extends Entity {
       this._account_recovery_responses = new AccountRecoveryResponsesCollection(this._props.account_recovery_responses);
       delete this._props.account_recovery_responses;
     }
+    if (this._props.creator) {
+      this._creator = new UserEntity(this._props.creator);
+      delete this._props.creator;
+    }
   }
 
   /**
-   * Get resource entity schema
-   * @returns {Object} schema
+   * @inheritDoc
    */
   static getSchema() {
     return {
@@ -104,41 +102,8 @@ class AccountRecoveryRequestEntity extends Entity {
         },
         // Associated models
         "account_recovery_private_key": AccountRecoveryPrivateKeyEntity.getSchema(),
-        "creator": AccountRecoveryRequestEntity.getUserEntitySchema(),
+        "creator": UserEntity.getSchema(),
         "account_recovery_responses": AccountRecoveryResponsesCollection.getSchema(),
-      }
-    };
-  }
-
-  /**
-   * Get the user entity schema.
-   * @todo Handle schema definition cyclic dependency.
-   * @returns {Object}
-   */
-  static getUserEntitySchema() {
-    return {
-      "type": "object",
-      "required": [
-        "username",
-        // "role_id",
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "role_id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "username": {
-          "type": "string",
-          "format": "email"
-        },
-        // Associated models
-        "role": RoleEntity.getSchema(),
-        "profile": ProfileEntity.getSchema(),
-        "gpgkey": GpgkeyEntity.getSchema(),
       }
     };
   }
@@ -160,6 +125,9 @@ class AccountRecoveryRequestEntity extends Entity {
     }
     if (this.accountRecoveryPrivateKey && contain.account_recovery_private_key) {
       result.account_recovery_private_key = this.accountRecoveryPrivateKey.toDto(AccountRecoveryPrivateKeyEntity.ALL_CONTAIN_OPTIONS);
+    }
+    if (this.creator && contain.creator) {
+      result.creator = this.creator.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
     }
     return result;
   }
@@ -214,7 +182,7 @@ class AccountRecoveryRequestEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {account_recovery_private_key: true};
+    return {account_recovery_private_key: true, creator: true};
   }
 
   /*

@@ -15,12 +15,14 @@ import Recover from "./recoverPagemod";
 import {RecoverEvents} from "../../all/background_page/event/recoverEvents";
 import BuildAccountRecoverService from "../../all/background_page/service/recover/buildAccountRecoverService";
 import {ConfigEvents} from "../../all/background_page/event/configEvents";
-import BuildAccountApiClientOptionsService
+import BuildApiClientOptionsService
   from "../../all/background_page/service/account/buildApiClientOptionsService";
 import {PownedPasswordEvents} from '../../all/background_page/event/pownedPasswordEvents';
+import {mockApiResponse} from "../../../test/mocks/mockApiResponse";
+import {enableFetchMocks} from "jest-fetch-mock";
 
-jest.spyOn(BuildAccountRecoverService, "buildFromRecoverUrl").mockImplementation(jest.fn());
-jest.spyOn(BuildAccountApiClientOptionsService, "build").mockImplementation(jest.fn());
+jest.spyOn(BuildAccountRecoverService, "buildFromRecoverUrl");
+jest.spyOn(BuildApiClientOptionsService, "buildFromAccount");
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RecoverEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
@@ -29,6 +31,7 @@ describe("Recover", () => {
   beforeEach(async() => {
     jest.resetModules();
     jest.clearAllMocks();
+    enableFetchMocks();
   });
 
   describe("Recover::attachEvents", () => {
@@ -39,19 +42,20 @@ describe("Recover", () => {
         _port: {
           sender: {
             tab: {
-              url: "https://localhost"
+              url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"
             }
           }
         }
       };
+      fetch.doMockOnceIf(new RegExp('/users/csrf-token.json'), async() => mockApiResponse("csrf-token"));
       // process
       await Recover.attachEvents(port);
       // expectations
       expect(BuildAccountRecoverService.buildFromRecoverUrl).toHaveBeenCalledWith(port._port.sender.tab.url);
-      expect(BuildAccountApiClientOptionsService.build).toHaveBeenCalled();
-      expect(ConfigEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
-      expect(RecoverEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
-      expect(PownedPasswordEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
+      expect(BuildApiClientOptionsService.buildFromAccount).toHaveBeenCalled();
+      expect(ConfigEvents.listen).toHaveBeenCalled();
+      expect(RecoverEvents.listen).toHaveBeenCalled();
+      expect(PownedPasswordEvents.listen).toHaveBeenCalled();
       expect(Recover.events).toStrictEqual([ConfigEvents, RecoverEvents, PownedPasswordEvents]);
       expect(Recover.appName).toBe('Recover');
     });

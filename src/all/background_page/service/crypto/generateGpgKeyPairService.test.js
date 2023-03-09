@@ -16,18 +16,18 @@ import GetGpgKeyInfoService from "./getGpgKeyInfoService";
 import GenerateGpgKeyPairOptionsEntity from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import {defaultDto} from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity.test.data";
+import {
+  customEmailValidationProOrganizationSettings
+} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
+import OrganizationSettingsEntity from "../../model/entity/organizationSettings/organizationSettingsEntity";
 
 describe("GenerateGpgKeyPair service", () => {
   it('should generate a key pair according to the given parameters', async() => {
     expect.assertions(18);
     const keyCreationDate = new Date(0);
-    const generateGpgKeyPairOptionsDto =  {
-      name: "Jean-Jacky",
-      email: "jj@passbolt.com",
-      passphrase: "ultra-secure",
-      keySize: 4096,
-      date: keyCreationDate.getTime(),
-    };
+    const generateGpgKeyPairOptionsDto = defaultDto({date: keyCreationDate.getTime()});
 
     const generateGpgKeyPairOptionsEntity = new GenerateGpgKeyPairOptionsEntity(generateGpgKeyPairOptionsDto);
     const keyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);
@@ -65,12 +65,7 @@ describe("GenerateGpgKeyPair service", () => {
     currentTime.setMilliseconds(0);
     jest.setSystemTime(currentTime);
     expect.assertions(18);
-    const generateGpgKeyPairOptionsDto =  {
-      name: "Jean-Jacky",
-      email: "jj@passbolt.com",
-      passphrase: "ultra-secure",
-      keySize: 4096,
-    };
+    const generateGpgKeyPairOptionsDto = defaultDto();
 
     const generateGpgKeyPairOptionsEntity = new GenerateGpgKeyPairOptionsEntity(generateGpgKeyPairOptionsDto);
     const keyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);
@@ -100,5 +95,18 @@ describe("GenerateGpgKeyPair service", () => {
 
     const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(privateKey, generateGpgKeyPairOptionsDto.passphrase);
     expect(decryptedPrivateKey).not.toBeNull();
+  }, 50 * 1000);
+
+  it('should generate a key pair with a non standard email if the application settings customize the email validation.', async() => {
+    const organizationSettings = customEmailValidationProOrganizationSettings();
+    OrganizationSettingsModel.set(new OrganizationSettingsEntity(organizationSettings));
+
+    const generateGpgKeyPairOptionsDto = defaultDto({email: 'admin@passbolt.c'});
+    const generateGpgKeyPairOptionsEntity = new GenerateGpgKeyPairOptionsEntity(generateGpgKeyPairOptionsDto);
+    const keyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);
+
+    const publicKey = await OpenpgpAssertion.readKeyOrFail(keyPair.publicKey.armoredKey);
+    const publicKeyInfo = await GetGpgKeyInfoService.getKeyInfo(publicKey);
+    expect(publicKeyInfo.userIds[0]).toEqual({name: generateGpgKeyPairOptionsDto.name, email: generateGpgKeyPairOptionsDto.email});
   }, 50 * 1000);
 });

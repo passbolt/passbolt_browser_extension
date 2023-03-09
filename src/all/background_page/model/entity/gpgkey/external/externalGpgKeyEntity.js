@@ -13,7 +13,7 @@
  */
 import Entity from "../../abstract/entity";
 import EntitySchema from "../../abstract/entitySchema";
-
+import AppEmailValidatorService from "../../../../service/validator/appEmailValidatorService";
 
 const ENTITY_NAME = 'externalGpgKey';
 
@@ -68,7 +68,7 @@ class ExternalGpgKeyEntity extends Entity {
             "properties": {
               "email": {
                 "type": "string",
-                "format": "email"
+                "custom": AppEmailValidatorService.validate
               },
               "name": {
                 "type": "string"

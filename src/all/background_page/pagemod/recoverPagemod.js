@@ -13,8 +13,9 @@
 
 import PageMod from "../sdk/page-mod";
 import {App as app} from "../app";
-import BuildAccountApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import BuildAccountRecoverService from "../service/recover/buildAccountRecoverService";
+import OrganizationSettingsModel from "../model/organizationSettings/organizationSettingsModel";
 
 /*
  * This pagemod help bootstrap the first step of the recover process from a passbolt server app page
@@ -43,7 +44,8 @@ Recover.init = function() {
       let account, apiClientOptions;
       try {
         account = BuildAccountRecoverService.buildFromRecoverUrl(worker.tab.url);
-        apiClientOptions = await BuildAccountApiClientOptionsService.build(account);
+        apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+        await (new OrganizationSettingsModel(apiClientOptions)).getOrFind(true);
       } catch (error) {
         // Unexpected error, this pagemod shouldn't have been initialized as the bootstrapRecoverPagemod should have raised an exception and not inject this iframe.
         console.error(error);

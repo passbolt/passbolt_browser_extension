@@ -14,7 +14,7 @@
 import EntitySchema from "../abstract/entitySchema";
 import EntityValidationError from "../abstract/entityValidationError";
 import AccountRecoveryRequestEntity from "./accountRecoveryRequestEntity";
-import {AccountRecoveryRequestEntityTestFixtures} from "./accountRecoveryRequestEntity.test.fixtures";
+import {pendingAccountRecoveryRequestDto} from "./accountRecoveryRequestEntity.test.data";
 
 describe("AccountRecoveryRequest entity", () => {
   it("schema must validate", () => {
@@ -35,27 +35,28 @@ describe("AccountRecoveryRequest entity", () => {
   });
 
   it("constructor works if valid DTO with associated entity data is provided", () => {
-    const dto = AccountRecoveryRequestEntityTestFixtures.default;
-    const filtered = {
-      "id": "d4c0e643-3967-443b-93b3-102d902c4510",
-      "user_id": "d4c0e643-3967-443b-93b3-102d902c4511",
-      "armored_key": "-----BEGIN PGP MESSAGE-----\n\nwcFMAxYTR81eetNbAQ\/\/TEWCA7W1kx7IzcZi4nmT92IZbdpzCBSQt5htSCoJ\nFfzGd27yeDT2GoEtmxmkG+gEak8ci0Jxa9FECaYDBzG4ixEDfDMfWqw\/WK2w\nj04oja+0qCAimV2nyItSYoaK5aZj8vL97V6U\/7YcraC9QTNY1Kd8RDPeL32D\nO2dpquPDLx5uMAmMoSZWruNCGqqJPjxMcxc2PBco+GJMcaGcYa5Y3+YueNpZ\nIIS0PbMpgiJlVvYzZywYC5lkIKFadVeV6MNkMmJfWB4VHq2Hoo3poZVP1rZV\n6cU7a7UuG4W3UUmezxQGQ6WAjh+qzkQHXrwI3cgU14du9sTCh8occwcPhG1C\nj8ljcTJqexQxA91TSj2UqhAnyB9yzZRcoh38bj\/OyGQmtiwxEFIzUymSi2pt\nysjJOZ7lB1Oh2l4vbgxJoNxtgvzY+3dsNXL510x793Hev3X2YcbO\/TJoy6G9\n89cuocJ1dlLIHqrfri43y1V0ZTfoa\/vigma4Qa5kUtB1tN0j38z+6tcjiz\/s\n8RJmXUK2bfHhvEbuc\/YnDDltpiZHc3QUtbj5TV2m+fO0ad2jVqxsi4eZid\/V\n\/WDUrAxRzY7xNRTRQQDbnT831NZeZbYobCpfPqU8ylF9iv\/V4lsyNYFrU0ne\n37JRFzl3cOY+jlqxGHaAF9\/mC3b3D3DmlZ+kOOQ7lE\/SwaoBAuDaJRsKzNqj\nTz8UFif5iwrEQY5BNzYd+zwGVzMlVP\/RNXR2YlAHx5lPMylgI73RDMoMZ4RT\nb7AQB9DqgobZI3dh3B90XqjkRiy3VJ\/nMhwknaZc6onJQgl2O\/ULie9kh69U\n1ojIkN+SHFCl42T1iT2eN08QUPffDVTMvT103WlX+MW8FV6CmF+TcDRUexs3\nT\/2EvFlxP6QTG41vLk4Sm3xce7rEZHiJ9hRrF26xVfT5jM+7z149lP5J8mgA\nARSBj2jlO7P1afQX+5RyYR+guD9LN95qMsNJwukTCzIo1AhE7yywf7b8v3a6\nXyanZo+TbDqxnJlozEMsdyGBwBn7UX6Erv072cZadO\/ZG2RBkbgiBGZ5hAjg\nPqwRAkfzDNa4WhsE9Crqs5ROy6IsDBGuAa8\/as0oCzIV+Ou4BPzKHfQDQS6U\nT0R+48sVAZAYY7TqaNHvf+3nlqMyssaK0SPm2fg3DZXPM2pcDatCFb4gVElC\n1qbG8pRIBmS\/NYr8m7IBnazDs9L6lYAjybuHes6cPqasDmHKha6DKl1P6jX+\nEeDxA0AVL4rZdUCt1fpEcFR\/R\/o4uDDLO8NGiHwM3MnbNI8G0SQy8q\/NhI11\nzWXyDeAR6hHKYC4h6WCCTFxe364PWLjQ5PGOLeAfeWEPCDZmP6U99kwoiOUu\ni8UuoIAFon3lIOXZnJ3ZtAcQ5UJ3gNcJH1EImZFdYtRgLo3GOPjBcNqGbmCu\n4xo+yMGy9Y8YJZM9HakKAChmHf01J3DAwNfUm8Rhx5w+NBQRm0aJ319wsACH\nlLEYvv+bVfPkNTvW\/vWND9eOPGI0Q8o=\n=AOt0\n-----END PGP MESSAGE-----\n",
-      "fingerprint": "0C1D1761110D1E33C9006D1A5B1B332ED06426D3",
-      "status": "pending",
-      "created": "2020-05-04T20:31:45+00:00",
-      "modified": "2020-05-04T20:31:45+00:00",
-      "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-      "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856"
-    };
+    const dto = pendingAccountRecoveryRequestDto();
     const entity = new AccountRecoveryRequestEntity(dto);
-    expect.assertions(5);
-    expect(entity.toDto()).toEqual(filtered);
+
+    expect.assertions(8);
+    const resultDto = entity.toDto();
+    const keys = Object.keys(resultDto);
+    const expectedKeys = ['id', 'user_id', 'armored_key', 'fingerprint', 'status', 'created', 'modified', 'created_by',
+      'modified_by'];
+    expect(Object.keys(resultDto).length).toBe(9);
+    expect(keys).toEqual(expectedKeys);
     expect(entity.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords).toBeTruthy();
     expect(entity.accountRecoveryPrivateKey.accountRecoveryPrivateKeyPasswords.length).toEqual(1);
 
-    const dtoWithContain = entity.toDto({account_recovery_private_key: true});
-    expect(dtoWithContain.account_recovery_private_key.account_recovery_private_key_passwords.length).toBe(1);
-    expect(dtoWithContain.account_recovery_private_key.account_recovery_private_key_passwords[0].recipient_foreign_key).toEqual('10801423-4151-42a4-99d1-86e66145a08c');
+    const resultDtoWithContain = entity.toDto({account_recovery_private_key: true});
+    const keysWithContain = Object.keys(resultDtoWithContain);
+    const expectedKeysWithContain = ['id', 'user_id', 'armored_key', 'fingerprint', 'status', 'created', 'modified', 'created_by',
+      'modified_by', 'account_recovery_private_key'];
+    expect(Object.keys(keysWithContain).length).toBe(10);
+    expect(keysWithContain).toEqual(expectedKeysWithContain);
+    expect(resultDtoWithContain.account_recovery_private_key.account_recovery_private_key_passwords.length).toBe(1);
+    expect(resultDtoWithContain.account_recovery_private_key.account_recovery_private_key_passwords[0].recipient_foreign_key)
+      .toEqual(dto.account_recovery_private_key.account_recovery_private_key_passwords[0].recipient_foreign_key);
   });
 
   it("constructor returns validation error if dto required fields are missing", () => {
@@ -67,6 +68,34 @@ describe("AccountRecoveryRequest entity", () => {
         id: {required: 'The id is required.'},
         status: {required: 'The status is required.'},
       });
+    }
+  });
+
+  it("constructor returns validation error if fields do not validate", () => {
+    expect.assertions(10);
+    try {
+      new AccountRecoveryRequestEntity({
+        "id": "not-a-uuid",
+        "user_id": "not-a-uuid",
+        "armored_key": true,
+        "fingerprint": "0C1",
+        "status": "not-a-status",
+        "created": "not-a-date",
+        "modified": "not-a-date",
+        "created_by": "not-a-uuid",
+        "modified_by": "not-a-uuid",
+      });
+    } catch (error) {
+      expect(error instanceof EntityValidationError).toBe(true);
+      expect(error.hasError('id', 'format')).toBe(true);
+      expect(error.hasError('user_id', 'format')).toBe(true);
+      expect(error.hasError('armored_key', 'type')).toBe(true);
+      expect(error.hasError('fingerprint', 'type')).toBe(true);
+      expect(error.hasError('status', 'enum')).toBe(true);
+      expect(error.hasError('created', 'format')).toBe(true);
+      expect(error.hasError('modified', 'format')).toBe(true);
+      expect(error.hasError('created_by', 'format')).toBe(true);
+      expect(error.hasError('modified_by', 'format')).toBe(true);
     }
   });
 });

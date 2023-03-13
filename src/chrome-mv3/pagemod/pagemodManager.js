@@ -94,6 +94,15 @@ class PagemodManager {
   findPagemodByAppName(appName) {
     return this.pagemods.find(pagemod => pagemod.appName === appName);
   }
+
+  /**
+   * Has pagemod that match tab url to reload
+   * @param url The url
+   * @return {boolean}
+   */
+  hasPagemodMatchUrlToReload(url) {
+    return this.pagemods.some(pagemod => pagemod.mustReloadOnExtensionUpdate && pagemod.assertUrlAttachConstraint({url}));
+  }
 }
 
 export default new PagemodManager();

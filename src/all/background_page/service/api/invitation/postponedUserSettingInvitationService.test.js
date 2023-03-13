@@ -36,7 +36,7 @@ describe("PostponedUserSettingInvitation service", () => {
 
   it("Should listen the event passbolt.auth.after-logout and reset the postpone the right information", async() => {
     expect.assertions(6);
-    PostponedUserSettingInvitationService.init();
+    PostponedUserSettingInvitationService.reset();
     expect(PostponedUserSettingInvitationService.hasPostponedAccountRecovery()).toBe(false);
     expect(PostponedUserSettingInvitationService.hasPostponedMFAPolicy()).toBe(false);
 
@@ -45,7 +45,7 @@ describe("PostponedUserSettingInvitation service", () => {
     expect(PostponedUserSettingInvitationService.hasPostponedAccountRecovery()).toBe(true);
     expect(PostponedUserSettingInvitationService.hasPostponedMFAPolicy()).toBe(true);
 
-    self.dispatchEvent(new Event('passbolt.auth.after-logout'));
+    PostponedUserSettingInvitationService.reset();
     expect(PostponedUserSettingInvitationService.hasPostponedAccountRecovery()).toBe(false);
     expect(PostponedUserSettingInvitationService.hasPostponedMFAPolicy()).toBe(false);
   });

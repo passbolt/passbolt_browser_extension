@@ -36,7 +36,7 @@ describe("PublicWebsiteSign", () => {
 
   describe("PublicWebsiteSignIn::injectFile", () => {
     it("Should inject file", async() => {
-      expect.assertions(9);
+      expect.assertions(10);
       // process
       await PublicWebsiteSignIn.injectFiles(1, 0);
       // expectations
@@ -48,6 +48,7 @@ describe("PublicWebsiteSign", () => {
       expect(PublicWebsiteSignIn.contentStyleFiles).toStrictEqual([]);
       expect(PublicWebsiteSignIn.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/public-website-sign-in/vendors.js', 'contentScripts/js/dist/public-website-sign-in/public-website-sign-in.js']);
       expect(PublicWebsiteSignIn.events).toStrictEqual([PublicWebsiteSignInEvents]);
+      expect(PublicWebsiteSignIn.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(PublicWebsiteSignIn.appName).toBe('PublicWebsiteSignIn');
     });
   });

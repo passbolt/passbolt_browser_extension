@@ -21,14 +21,6 @@ const SSO_KIT_STORAGE_KEY = "temp_server_part_sso_kit";
 
 class SsoKitTemporaryStorageService {
   /**
-   * Initialisation the storage service
-   * @returns {Promise<void>}
-   */
-  static async init() {
-    await this.flush();
-  }
-
-  /**
    * Stores the server part SSO kit temporarly in session memory.
    * @param {string} serverPartSsoKit
    * @return {Promise<void>}

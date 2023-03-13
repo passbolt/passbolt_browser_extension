@@ -15,6 +15,7 @@ import Port from "../../all/background_page/sdk/port";
 import PagemodManager from "../pagemod/pagemodManager";
 import WorkersSessionStorage from "../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../../all/background_page/model/entity/worker/workerEntity";
+import browser from "../../all/background_page/sdk/polyfill/browserPolyfill";
 
 class PortManager {
   constructor() {
@@ -61,7 +62,7 @@ class PortManager {
       return false;
     } else {
       // The sender is a script running in an extension page
-      const popupUrl = await chrome.action.getPopup({});
+      const popupUrl = await browser.action.getPopup({});
       return sender.url === popupUrl;
     }
   }
@@ -104,10 +105,15 @@ class PortManager {
   /**
    * Disconnect and remove the port
    * @param {string} id the id
+   * @param {object} removeInfo The remove info
    * @returns <void>
    */
-  removePort(id) {
-    this._ports[id]?.disconnect();
+  removePort(id, removeInfo) {
+    // The port will be disconnected automatically after a tab is removed
+    if (!removeInfo) {
+      // Disconnect the port manually when the user navigate to another page (browser will disconnect too late)
+      this._ports[id]?.disconnect();
+    }
     delete this._ports[id];
   }
 
@@ -141,9 +147,10 @@ class PortManager {
   /**
    * On tab removed, remove associated worker from the session storage and delete runtime ports references.
    * @param {number} tabId The tab id
+   * @param {object} removeInfo The remove info (only present on tab on removed event)
    * @returns {Promise<void>}
    */
-  async onTabRemoved(tabId) {
+  async onTabRemoved(tabId, removeInfo = null) {
     if (typeof tabId === "undefined") {
       throw new Error("A tab identifier is required.");
     }
@@ -151,7 +158,7 @@ class PortManager {
       throw new Error("The tab identifier should be a valid integer.");
     }
     const workers = await WorkersSessionStorage.getWorkersByTabId(tabId);
-    workers.forEach(worker => this.removePort(worker.id));
+    workers.forEach(worker => this.removePort(worker.id, removeInfo));
     await WorkersSessionStorage.delete(tabId);
   }
 }

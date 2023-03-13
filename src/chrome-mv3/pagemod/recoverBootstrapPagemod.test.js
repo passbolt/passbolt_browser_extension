@@ -33,7 +33,7 @@ describe("RecoverBootstrap", () => {
 
   describe("RecoverBootstrap::injectFile", () => {
     it("Should inject file", async() => {
-      expect.assertions(9);
+      expect.assertions(10);
       // process
       await RecoverBootstrap.injectFiles(1, 0);
       // expectations
@@ -45,6 +45,7 @@ describe("RecoverBootstrap", () => {
       expect(RecoverBootstrap.contentStyleFiles).toStrictEqual(['webAccessibleResources/css/themes/default/ext_external.min.css']);
       expect(RecoverBootstrap.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/vendors.js', 'contentScripts/js/dist/recover.js']);
       expect(RecoverBootstrap.events).toStrictEqual([PortEvents]);
+      expect(RecoverBootstrap.mustReloadOnExtensionUpdate).toBeTruthy();
       expect(RecoverBootstrap.appName).toBe('RecoverBootstrap');
     });
   });

@@ -24,7 +24,7 @@ describe("InFormMenu", () => {
 
   describe("InformMenu::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(3);
+      expect.assertions(4);
       // data mocked
       const port = {
         _port: {
@@ -40,6 +40,7 @@ describe("InFormMenu", () => {
       // expectations
       expect(InformMenuEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: InformMenu.name});
       expect(InformMenu.events).toStrictEqual([InformMenuEvents]);
+      expect(InformMenu.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(InformMenu.appName).toBe('InFormMenu');
     });
   });

@@ -48,7 +48,7 @@ describe("QuickAccess", () => {
 
   describe("QuickAccess::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(15);
+      expect.assertions(16);
       // data mocked
       const port = {
         _port: {
@@ -72,6 +72,7 @@ describe("QuickAccess", () => {
       expect(PasswordGeneratorEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName});
       expect(PownedPasswordEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName});
       expect(QuickAccess.events).toStrictEqual([AuthEvents, ConfigEvents, KeyringEvents, QuickAccessEvents, GroupEvents, TagEvents, ResourceEvents, SecretEvents, OrganizationSettingsEvents, TabEvents, LocaleEvents, PasswordGeneratorEvents, PownedPasswordEvents]);
+      expect(QuickAccess.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(QuickAccess.appName).toBe('QuickAccess');
     });
   });

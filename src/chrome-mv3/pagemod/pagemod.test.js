@@ -29,7 +29,7 @@ describe("Pagemod", () => {
 
   describe("Pagemod default behavior", () => {
     it("Should create a page mod and inject file with events", async() => {
-      expect.assertions(10);
+      expect.assertions(11);
       // process
       const pagemod = new Pagemod("name");
       await pagemod.injectFiles(1, 0);
@@ -51,6 +51,7 @@ describe("Pagemod", () => {
       expect(pagemod.contentStyleFiles).toStrictEqual([]);
       expect(pagemod.contentScriptFiles).toStrictEqual([]);
       expect(pagemod.events).toStrictEqual([]);
+      expect(pagemod.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(await pagemod.canBeAttachedTo({})).toBeFalsy();
     });
   });

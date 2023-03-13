@@ -36,7 +36,7 @@ describe("Auth", () => {
 
   describe("Auth::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(9);
+      expect.assertions(10);
       // data mocked
       const port = {
         _port: {
@@ -58,6 +58,7 @@ describe("Auth", () => {
       expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
       expect(LocaleEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
       expect(Auth.events).toStrictEqual([ConfigEvents, UserEvents, KeyringEvents, AuthEvents, OrganizationSettingsEvents, LocaleEvents]);
+      expect(Auth.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(Auth.appName).toBe('Auth');
     });
   });

@@ -40,6 +40,8 @@ import {PasswordGeneratorEvents} from "../../all/background_page/event/passwordG
 import {MobileEvents} from "../../all/background_page/event/mobileEvents";
 import GpgAuth from "../../all/background_page/model/gpgauth";
 import {PownedPasswordEvents} from '../../all/background_page/event/pownedPasswordEvents';
+import {MfaEvents} from "../../all/background_page/event/mfaEvents";
+import {ClipboardEvents} from "../../all/background_page/event/clipboardEvents";
 
 jest.spyOn(GetLegacyAccountService, "get").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
@@ -68,6 +70,8 @@ jest.spyOn(LocaleEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PasswordGeneratorEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(MobileEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(MfaEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(ClipboardEvents, "listen").mockImplementation(jest.fn());
 
 
 describe("Auth", () => {
@@ -78,7 +82,7 @@ describe("Auth", () => {
 
   describe("Auth::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(29);
+      expect.assertions(32);
       // data mocked
       const port = {
         _port: {
@@ -122,6 +126,8 @@ describe("Auth", () => {
       expect(PasswordGeneratorEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
       expect(MobileEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
       expect(PownedPasswordEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
+      expect(MfaEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
+      expect(ClipboardEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
       expect(App.events).toStrictEqual([
         ConfigEvents,
         AppEvents,
@@ -148,8 +154,11 @@ describe("Auth", () => {
         LocaleEvents,
         PasswordGeneratorEvents,
         MobileEvents,
-        PownedPasswordEvents
+        PownedPasswordEvents,
+        MfaEvents,
+        ClipboardEvents
       ]);
+      expect(App.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(App.appName).toBe('App');
     });
   });

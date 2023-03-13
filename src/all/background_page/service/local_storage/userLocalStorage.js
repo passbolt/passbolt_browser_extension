@@ -186,19 +186,6 @@ class UserLocalStorage {
       throw new TypeError('UserLocalStorage::set expects UserEntity avatar to be set');
     }
   }
-
-  /**
-   * Init user local storage
-   */
-  static init() {
-    // Flush the local storage when this library is loaded
-    this.flush();
-
-    // Flush the local storage when the passbolt user session is terminated
-    self.addEventListener("passbolt.auth.after-logout", () => {
-      this.flush();
-    });
-  }
 }
 
 export default UserLocalStorage;

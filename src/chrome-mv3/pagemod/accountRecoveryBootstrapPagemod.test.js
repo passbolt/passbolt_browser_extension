@@ -33,7 +33,7 @@ describe("AccountRecoveryBootstrap", () => {
 
   describe("AccountRecoveryBootstrap::injectFile", () => {
     it("Should inject file", async() => {
-      expect.assertions(8);
+      expect.assertions(9);
       // process
       await AccountRecoveryBootstrap.injectFiles(1, 0);
       // expectations
@@ -44,6 +44,7 @@ describe("AccountRecoveryBootstrap", () => {
       expect(ScriptExecution.prototype.injectJs).toHaveBeenCalledWith(AccountRecoveryBootstrap.contentScriptFiles);
       expect(AccountRecoveryBootstrap.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/vendors.js', 'contentScripts/js/dist/account-recovery.js']);
       expect(AccountRecoveryBootstrap.events).toStrictEqual([PortEvents]);
+      expect(AccountRecoveryBootstrap.mustReloadOnExtensionUpdate).toBeTruthy();
       expect(AccountRecoveryBootstrap.appName).toBe('AccountRecoveryBootstrap');
     });
   });

@@ -44,6 +44,13 @@ class AuthBootstrap extends Pagemod {
   /**
    * @inheritDoc
    */
+  get mustReloadOnExtensionUpdate() {
+    return true;
+  }
+
+  /**
+   * @inheritDoc
+   */
   async canBeAttachedTo(frameDetails) {
     return this.assertTopFrameAttachConstraint(frameDetails)
       && this.assertUrlAttachConstraint(frameDetails);

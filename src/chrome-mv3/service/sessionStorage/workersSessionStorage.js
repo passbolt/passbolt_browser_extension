@@ -65,6 +65,16 @@ class WorkersSessionStorage {
     return this.getWorkers().then(filterByNameAndTabId);
   }
 
+  /**
+   * Get worker from the main frame
+   * @param tabId
+   * @return {Promise<object>}
+   */
+  async getWorkerOnMainFrame(tabId) {
+    const workers = await this.getWorkersByTabId(tabId);
+    return workers.find(worker => worker.frameId === 0);
+  }
+
 
   /**
    * Add a worker in the session storage

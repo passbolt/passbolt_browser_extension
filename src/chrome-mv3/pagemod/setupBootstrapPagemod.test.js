@@ -33,7 +33,7 @@ describe("SetupBootstrap", () => {
 
   describe("SetupBootstrap::injectFile", () => {
     it("Should inject file", async() => {
-      expect.assertions(9);
+      expect.assertions(10);
       // process
       await SetupBootstrap.injectFiles(1, 0);
       // expectations
@@ -45,6 +45,7 @@ describe("SetupBootstrap", () => {
       expect(SetupBootstrap.contentStyleFiles).toStrictEqual(['webAccessibleResources/css/themes/default/ext_external.min.css']);
       expect(SetupBootstrap.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/vendors.js', 'contentScripts/js/dist/setup.js']);
       expect(SetupBootstrap.events).toStrictEqual([PortEvents]);
+      expect(SetupBootstrap.mustReloadOnExtensionUpdate).toBeTruthy();
       expect(SetupBootstrap.appName).toBe('SetupBootstrap');
     });
   });

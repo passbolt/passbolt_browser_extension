@@ -36,7 +36,7 @@ describe("Recover", () => {
 
   describe("Recover::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(7);
+      expect.assertions(8);
       // data mocked
       const port = {
         _port: {
@@ -57,6 +57,7 @@ describe("Recover", () => {
       expect(RecoverEvents.listen).toHaveBeenCalled();
       expect(PownedPasswordEvents.listen).toHaveBeenCalled();
       expect(Recover.events).toStrictEqual([ConfigEvents, RecoverEvents, PownedPasswordEvents]);
+      expect(Recover.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(Recover.appName).toBe('Recover');
     });
   });

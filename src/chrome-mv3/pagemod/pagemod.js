@@ -72,6 +72,14 @@ class Pagemod {
   }
 
   /**
+   * Must reload on extension update
+   * @return {boolean}
+   */
+  get mustReloadOnExtensionUpdate() {
+    return false;
+  }
+
+  /**
    * Check a pagemod can be attached to a browser frame.
    * @param {object} frameDetails The browser frame details.
    * @returns {Promise<boolean>}

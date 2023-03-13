@@ -35,7 +35,7 @@ describe("AuthBootstrap", () => {
 
   describe("AuthBootstrap::injectFile", () => {
     it("Should inject file", async() => {
-      expect.assertions(9);
+      expect.assertions(10);
       // process
       await AuthBootstrap.injectFiles(1, 0);
       // expectations
@@ -47,6 +47,7 @@ describe("AuthBootstrap", () => {
       expect(AuthBootstrap.contentStyleFiles).toStrictEqual(['webAccessibleResources/css/themes/default/ext_external.min.css']);
       expect(AuthBootstrap.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/vendors.js', 'contentScripts/js/dist/login.js']);
       expect(AuthBootstrap.events).toStrictEqual([PortEvents]);
+      expect(AuthBootstrap.mustReloadOnExtensionUpdate).toBeTruthy();
       expect(AuthBootstrap.appName).toBe('AuthBootstrap');
     });
   });

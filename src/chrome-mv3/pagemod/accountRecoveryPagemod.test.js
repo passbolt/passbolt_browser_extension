@@ -30,7 +30,7 @@ describe("AccountRecovery", () => {
 
   describe("AccountRecovery::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(5);
+      expect.assertions(6);
       // data mocked
       const port = {
         _port: {
@@ -48,6 +48,7 @@ describe("AccountRecovery", () => {
       expect(BuildApiClientOptionsService.buildFromAccount).toHaveBeenCalled();
       expect(AccountRecoveryEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined, undefined);
       expect(AccountRecovery.events).toStrictEqual([AccountRecoveryEvents]);
+      expect(AccountRecovery.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(AccountRecovery.appName).toBe('AccountRecovery');
     });
 

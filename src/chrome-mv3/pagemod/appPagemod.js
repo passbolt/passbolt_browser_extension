@@ -40,6 +40,8 @@ import {LocaleEvents} from "../../all/background_page/event/localeEvents";
 import {PasswordGeneratorEvents} from "../../all/background_page/event/passwordGeneratorEvents";
 import {MobileEvents} from "../../all/background_page/event/mobileEvents";
 import {PownedPasswordEvents} from '../../all/background_page/event/pownedPasswordEvents';
+import {MfaEvents} from "../../all/background_page/event/mfaEvents";
+import {ClipboardEvents} from "../../all/background_page/event/clipboardEvents";
 
 class App extends Pagemod {
   /**
@@ -72,7 +74,9 @@ class App extends Pagemod {
       LocaleEvents,
       PasswordGeneratorEvents,
       MobileEvents,
-      PownedPasswordEvents
+      PownedPasswordEvents,
+      MfaEvents,
+      ClipboardEvents
     ];
   }
 

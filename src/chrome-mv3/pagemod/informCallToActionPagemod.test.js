@@ -24,7 +24,7 @@ describe("InFormCallToAction", () => {
 
   describe("InformCallToAction::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(3);
+      expect.assertions(4);
       // data mocked
       const port = {
         _port: {
@@ -40,6 +40,7 @@ describe("InFormCallToAction", () => {
       // expectations
       expect(InformCallToActionEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: InformCallToAction.name});
       expect(InformCallToAction.events).toStrictEqual([InformCallToActionEvents]);
+      expect(InformCallToAction.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(InformCallToAction.appName).toBe('InFormCallToAction');
     });
   });

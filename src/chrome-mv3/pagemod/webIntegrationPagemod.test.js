@@ -41,7 +41,7 @@ describe("WebIntegration", () => {
 
   describe("WebIntegration::injectFile", () => {
     it("Should inject file", async() => {
-      expect.assertions(9);
+      expect.assertions(10);
       // process
       await WebIntegration.injectFiles(1, 0);
       // expectations
@@ -53,6 +53,7 @@ describe("WebIntegration", () => {
       expect(WebIntegration.contentStyleFiles).toStrictEqual([]);
       expect(WebIntegration.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/browser-integration/vendors.js', 'contentScripts/js/dist/browser-integration/browser-integration.js']);
       expect(WebIntegration.events).toStrictEqual([ConfigEvents, WebIntegrationEvents, OrganizationSettingsEvents, PortEvents]);
+      expect(WebIntegration.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(WebIntegration.appName).toBe('WebIntegration');
     });
   });

@@ -36,7 +36,7 @@ describe("Setup", () => {
 
   describe("Setup::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(7);
+      expect.assertions(8);
       // data mocked
       const port = {
         _port: {
@@ -57,6 +57,7 @@ describe("Setup", () => {
       expect(SetupEvents.listen).toHaveBeenCalled();
       expect(PownedPasswordEvents.listen).toHaveBeenCalled();
       expect(Setup.events).toStrictEqual([ConfigEvents, SetupEvents, PownedPasswordEvents]);
+      expect(Setup.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(Setup.appName).toBe('Setup');
     });
   });

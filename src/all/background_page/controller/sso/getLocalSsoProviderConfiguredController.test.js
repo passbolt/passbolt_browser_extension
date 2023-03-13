@@ -37,5 +37,15 @@ describe("GetLocalSsoProviderConfiguredController", () => {
       const provider = await controller.exec();
       expect(provider).toBeNull();
     });
+
+    it("Should return null if the local SSO kit is not complete.", async() => {
+      expect.assertions(1);
+      const ssoLocalKit = clientSsoKit({id: null});
+      SsoDataStorage.setMockedData(ssoLocalKit);
+
+      const controller = new GetLocalSsoProviderConfiguredController();
+      const provider = await controller.exec();
+      expect(provider).toBeNull();
+    });
   });
 });

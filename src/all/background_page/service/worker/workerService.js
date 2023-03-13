@@ -12,8 +12,8 @@
  * @since         4.0.0
  */
 import browser from "../../sdk/polyfill/browserPolyfill";
-import PortManager from "../../../../chrome-mv3/sdk/portManager";
-import WorkersSessionStorage from "../../../../chrome-mv3/service/sessionStorage/workersSessionStorage";
+import PortManager from "../../sdk/port/portManager";
+import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import BrowserTabService from "../ui/browserTab.service";
 
 const WORKER_EXIST_ALARM = "WorkerExistFlush";

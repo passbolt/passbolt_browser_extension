@@ -16,7 +16,7 @@ import OnExtensionInstalledController from "./onExtensionInstalledController";
 import browser from "../../sdk/polyfill/browserPolyfill";
 import User from "../../model/user";
 import UserSettings from "../../model/userSettings/userSettings";
-import WebNavigationService from "../../../../chrome-mv3/service/webNavigation/webNavigationService";
+import WebNavigationService from "../../service/webNavigation/webNavigationService";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -90,7 +90,7 @@ describe("OnExtensionInstalledController", () => {
       expect(WebNavigationService.exec).toHaveBeenCalledTimes(2);
     });
 
-    it("Should exec update if the reason is update", async() => {
+    it("Should not exec update neither install if the reason is unknown", async() => {
       expect.assertions(2);
       // data mocked
       const details = {

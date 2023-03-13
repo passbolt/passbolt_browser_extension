@@ -12,10 +12,10 @@
  * @since         3.7.0
  */
 
-import WorkersSessionStorage from "../../../../chrome-mv3/service/sessionStorage/workersSessionStorage";
+import WorkersSessionStorage from "../../service/sessionStorage/workersSessionStorage";
 import RemovePortController from "./removePortController";
 import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
-import PortManager from "../../../../chrome-mv3/sdk/portManager";
+import PortManager from "../../sdk/port/portManager";
 import Port from "../../sdk/port";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 
@@ -23,7 +23,7 @@ jest.spyOn(WorkersSessionStorage, "getWorkersByNameAndTabId");
 jest.spyOn(WorkersSessionStorage, "deleteById");
 jest.spyOn(PortManager, "removePort");
 
-beforeEach(async () => {
+beforeEach(async() => {
   jest.resetModules();
   jest.clearAllMocks();
   await PortManager.flush();
@@ -88,14 +88,14 @@ describe("RemovePortController", () => {
           addListener: () => jest.fn()
         },
         postMessage: () => jest.fn()
-      }
+      };
       const portDisconnected = {
         name: workerInformCallToActionToRemoved.id,
         onMessage: {
           addListener: () => jest.fn()
         },
-        postMessage: () => {throw new Error('Disconnected');}
-      }
+        postMessage: () => { throw new Error('Disconnected'); }
+      };
       const portInformCallToAction = new Port(port);
       const portInformCallToActionToRemoved = new Port(portDisconnected);
       // process

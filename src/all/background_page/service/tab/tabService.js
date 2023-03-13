@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import WorkersSessionStorage from "../../../../chrome-mv3/service/sessionStorage/workersSessionStorage";
+import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import hasUrlSameOrigin from "../../utils/url/hasSameOriginUrl";
-import PortManager from "../../../../chrome-mv3/sdk/portManager";
-import WebNavigationService from "../../../../chrome-mv3/service/webNavigation/webNavigationService";
+import PortManager from "../../sdk/port/portManager";
+import WebNavigationService from "../webNavigation/webNavigationService";
 
 class TabService {
   /**
@@ -42,20 +42,23 @@ class TabService {
       return;
     }
 
+
     // Get the worker on the main frame
     const worker = await WorkersSessionStorage.getWorkerOnMainFrame(tabId);
     // If there is already a worker on the main frame
     if (worker) {
-      // Get the port associate to a bootstrap application
-      const port = PortManager.getPortById(worker.id);
-      // Check if the url has the same origin
-      if (hasUrlSameOrigin(port._port.sender.url, tab.url)) {
-        try {
-          // If the port is still connected do nothing
-          port.emit('passbolt.port.check');
-          return;
-        } catch (error) {
-          console.debug('The port is not connected, navigation detected');
+      if (PortManager.isPortExist(worker.id)) {
+        // Get the port associate to a bootstrap application
+        const port = PortManager.getPortById(worker.id);
+        // Check if the url has the same origin
+        if (hasUrlSameOrigin(port._port.sender.url, tab.url)) {
+          try {
+            // If the port is still connected do nothing
+            port.emit('passbolt.port.check');
+            return;
+          } catch (error) {
+            console.debug('The port is not connected, navigation detected');
+          }
         }
       }
     }
@@ -67,6 +70,7 @@ class TabService {
 
 function mappingFrameDetailsFromTab(tab) {
   return  {
+    // TODO COMMENT
     frameId: 0,
     tabId: tab.id,
     url: tab.url

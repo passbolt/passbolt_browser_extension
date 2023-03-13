@@ -11,15 +11,16 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import WorkersSessionStorage from "../../../../chrome-mv3/service/sessionStorage/workersSessionStorage";
+import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
-import {mockPort} from "../../../../chrome-mv3/sdk/portManager.test.data";
+import {mockPort} from "../../sdk/port/portManager.test.data";
 import Port from "../../sdk/port";
-import PortManager from "../../../../chrome-mv3/sdk/portManager";
-import WebNavigationService from "../../../../chrome-mv3/service/webNavigation/webNavigationService";
+import PortManager from "../../sdk/port/portManager";
+import WebNavigationService from "../webNavigation/webNavigationService";
 import TabService from "./tabService";
 
 const mockGetPort = jest.spyOn(PortManager, "getPortById");
+const mockIsPortExist = jest.spyOn(PortManager, "isPortExist");
 const mockWorker = jest.spyOn(WorkersSessionStorage, "getWorkerOnMainFrame");
 jest.spyOn(WebNavigationService, "exec");
 
@@ -50,6 +51,16 @@ describe("TabService", () => {
       expect(WebNavigationService.exec).not.toHaveBeenCalled();
     });
 
+    it("Should do nothing if tab object has url about:blank", async() => {
+      expect.assertions(3);
+      // process
+      await TabService.exec(1, {status: "complete"}, {url: "about:blank"});
+      // expectations
+      expect(PortManager.getPortById).not.toHaveBeenCalled();
+      expect(WorkersSessionStorage.getWorkerOnMainFrame).not.toHaveBeenCalled();
+      expect(WebNavigationService.exec).not.toHaveBeenCalled();
+    });
+
     it("Should do nothing if worker on main frame and port is still connected", async() => {
       expect.assertions(4);
       // data mocked
@@ -64,6 +75,7 @@ describe("TabService", () => {
       jest.spyOn(portWrapper, "emit");
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
+      mockIsPortExist.mockImplementationOnce(() => true);
       mockGetPort.mockImplementationOnce(() => portWrapper);
       // process
       await TabService.exec(frameDetails.tabId, {status: "complete"}, {url: "https://passbolt.dev"});
@@ -104,6 +116,7 @@ describe("TabService", () => {
       const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: "https://passbolt.dev"});
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
+      mockIsPortExist.mockImplementationOnce(() => true);
       mockGetPort.mockImplementationOnce(() => new Port(port));
       // process
       await TabService.exec(frameDetails.tabId, {status: "complete"}, {id: frameDetails.tabId, url: "https://localhost"});
@@ -127,6 +140,7 @@ describe("TabService", () => {
       jest.spyOn(portWrapper, "emit").mockImplementationOnce(() => { throw new Error(); });
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
+      mockIsPortExist.mockImplementationOnce(() => true);
       mockGetPort.mockImplementationOnce(() => portWrapper);
       // process
       await TabService.exec(frameDetails.tabId, {status: "complete"}, {id: frameDetails.tabId, url: frameDetails.url});

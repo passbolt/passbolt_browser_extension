@@ -13,7 +13,7 @@
  */
 
 import {v4 as uuidv4} from "uuid";
-import WorkersSessionStorage from "../../../../chrome-mv3/service/sessionStorage/workersSessionStorage";
+import WorkersSessionStorage from "../../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 
 const APPLICATION_ALLOWED = {

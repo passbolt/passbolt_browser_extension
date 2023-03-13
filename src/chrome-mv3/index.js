@@ -12,10 +12,10 @@
  * @since         4.0.0
  */
 import browser from "../all/background_page/sdk/polyfill/browserPolyfill";
-import PortManager from "./sdk/portManager";
-import WebNavigationService from "./service/webNavigation/webNavigationService";
-import LocalStorageService from "./service/localStorage/localStorageService";
-import SystemRequirementService from "./service/systemRequirementService/systemRequirementService";
+import PortManager from "../all/background_page/sdk/port/portManager";
+import WebNavigationService from "../all/background_page/service/webNavigation/webNavigationService";
+import LocalStorageService from "../all/background_page/service/localStorage/localStorageService";
+import SystemRequirementService from "../all/background_page/service/systemRequirementService/systemRequirementService";
 import OnExtensionInstalledController from "../all/background_page/controller/extension/onExtensionInstalledController";
 
 /**

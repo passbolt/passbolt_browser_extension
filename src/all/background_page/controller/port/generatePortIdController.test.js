@@ -13,7 +13,7 @@
  */
 
 import GeneratePortIdController from "./generatePortIdController";
-import WorkersSessionStorage from "../../../../chrome-mv3/service/sessionStorage/workersSessionStorage";
+import WorkersSessionStorage from "../../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 
 jest.spyOn(WorkersSessionStorage, "addWorker");

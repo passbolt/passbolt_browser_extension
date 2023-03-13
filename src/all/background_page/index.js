@@ -5,9 +5,9 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 import browser from "./sdk/polyfill/browserPolyfill";
-import PortManager from "../../chrome-mv3/sdk/portManager";
-import SystemRequirementService from "../../chrome-mv3/service/systemRequirementService/systemRequirementService";
-import LocalStorageService from "../../chrome-mv3/service/localStorage/localStorageService";
+import PortManager from "./sdk/port/portManager";
+import SystemRequirementService from "./service/systemRequirementService/systemRequirementService";
+import LocalStorageService from "./service/localStorage/localStorageService";
 import OnExtensionInstalledController from "./controller/extension/onExtensionInstalledController";
 import TabService from "./service/tab/tabService";
 import User from "./model/user";

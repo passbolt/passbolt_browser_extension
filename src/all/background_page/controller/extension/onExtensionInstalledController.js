@@ -14,8 +14,8 @@
  * On extension installed controller
  */
 import browser from '../../sdk/polyfill/browserPolyfill';
-import PagemodManager from "../../../../chrome-mv3/pagemod/pagemodManager";
-import WebNavigationService from "../../../../chrome-mv3/service/webNavigation/webNavigationService";
+import PagemodManager from "../../pagemod/pagemodManager";
+import WebNavigationService from "../../service/webNavigation/webNavigationService";
 import ParseSetupUrlService from "../../service/setup/parseSetupUrlService";
 import ParseRecoverUrlService from "../../service/recover/parseRecoverUrlService";
 
@@ -94,6 +94,7 @@ const reloadTabsMatchPagemodUrl = tabs => {
     if (PagemodManager.hasPagemodMatchUrlToReload(tab.url)) {
       browser.tabs.reload(tab.id);
     } else {
+      // For other tabs detect and inject the new content script
       const frameDetails = {
         frameId: 0,
         tabId: tab.id,

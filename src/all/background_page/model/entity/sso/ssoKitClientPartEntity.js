@@ -184,7 +184,7 @@ class SsoKitClientPartEntity extends Entity {
    * @returns {boolean}
    */
   isRegistered() {
-    return Boolean(this.provider);
+    return Boolean(this.id) && Boolean(this.provider);
   }
 
   /**

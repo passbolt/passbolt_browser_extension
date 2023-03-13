@@ -105,4 +105,27 @@ describe("Sso Kit Client Part Entity", () => {
       }
     }
   });
+
+  it("isRegistered returns true only if the data is complete", async() => {
+    const ssoKit = clientSsoKit();
+    const ssoKitIdLess = clientSsoKit();
+    const ssoKitProviderLess = clientSsoKit();
+
+    delete ssoKitIdLess.id;
+    delete ssoKitProviderLess.provider;
+
+    const scenarios = [
+      {data: ssoKit, isRegistered: true},
+      {data: ssoKitIdLess, isRegistered: false},
+      {data: ssoKitProviderLess, isRegistered: false},
+    ];
+
+    expect.assertions(scenarios.length);
+    for (let i = 0; i < scenarios.length; i++) {
+      const data = scenarios[i].data;
+      const isRegistered = scenarios[i].isRegistered;
+      const entity = new SsoKitClientPartEntity(data);
+      expect(entity.isRegistered()).toBe(isRegistered);
+    }
+  });
 });

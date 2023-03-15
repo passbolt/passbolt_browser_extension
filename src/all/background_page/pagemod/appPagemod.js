@@ -64,7 +64,7 @@ App.init = function() {
        */
       let account;
       try {
-        account = await GetLegacyAccountService.get();
+        account = await GetLegacyAccountService.get({role: true});
       } catch (error) {
         /*
          * Ensure the application does not crash completely if the legacy account cannot be retrieved.
@@ -90,7 +90,7 @@ App.init = function() {
       app.events.organizationSettings.listen(worker);
       app.events.share.listen(worker);
       app.events.subscription.listen(worker);
-      app.events.user.listen(worker);
+      app.events.user.listen(worker, account);
       app.events.group.listen(worker);
       app.events.comment.listen(worker);
       app.events.tag.listen(worker);

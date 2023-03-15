@@ -19,16 +19,19 @@ import UserEntity from "../entity/user/userEntity";
 import UsersCollection from "../entity/user/usersCollection";
 import PassboltApiFetchError from "../../error/passboltApiFetchError";
 import Validator from "validator";
+import RoleEntity from "../entity/role/roleEntity";
 
 class UserModel {
   /**
    * Constructor
    *
    * @param {ApiClientOptions} apiClientOptions
+   * @param {AccountEntity} account the account associated to the worker
    * @public
    */
-  constructor(apiClientOptions) {
+  constructor(apiClientOptions, account = null) {
     this.userService = new UserService(apiClientOptions);
+    this.account = account;
   }
 
   /**
@@ -39,7 +42,11 @@ class UserModel {
    */
   async updateLocalStorage() {
     // contain pending_account_recovery_request is only available for admin or recovery contact role
-    const contains =  {is_mfa_enabled: true, profile: true, gpgkey: false, groups_users: false, last_logged_in: true, pending_account_recovery_request: true, account_recovery_user_setting: true};
+    const contains =  {profile: true, gpgkey: false, groups_users: false, last_logged_in: true, pending_account_recovery_request: true, account_recovery_user_setting: true};
+    // Add is_mfa_enabled contain if the user account role name is admin
+    if (this.account && this.account.roleName === RoleEntity.ROLE_ADMIN) {
+      contains.is_mfa_enabled = true;
+    }
     const usersCollection = await this.findAll(contains, null, null, true);
     await UserLocalStorage.set(usersCollection);
     return usersCollection;

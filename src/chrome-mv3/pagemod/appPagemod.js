@@ -88,7 +88,7 @@ class App extends Pagemod {
         return;
       }
 
-      const account = await GetLegacyAccountService.get();
+      const account = await GetLegacyAccountService.get({role: true});
       for (const event of this.events) {
         event.listen({port, tab}, account);
       }

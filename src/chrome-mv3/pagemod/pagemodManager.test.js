@@ -21,6 +21,7 @@ import UserSettings from "../../all/background_page/model/userSettings/userSetti
 import GpgAuth from "../../all/background_page/model/gpgauth";
 import AppBootstrapPagemod from "./appBootstrapPagemod";
 import WebIntegrationPagemod from "./webIntegrationPagemod";
+import PublicWebsiteSignInPagemod from "./publicWebsiteSignInPagemod";
 
 jest.spyOn(pagemod.prototype, "injectFiles").mockImplementation(jest.fn());
 jest.spyOn(pagemod.prototype, "attachEvents").mockImplementation(jest.fn());
@@ -132,8 +133,7 @@ describe("PagemodManager", () => {
       await PagemodManager.exec(details);
       // expectations
       expect(pagemod.prototype.injectFiles).toHaveBeenCalledWith(details.tabId, details.frameId);
-      // Called twice for PublicWebsiteSignInPagemod and WebIntegrationPagemod
-      expect(pagemod.prototype.injectFiles).toHaveBeenCalledTimes(2);
+      expect(PublicWebsiteSignInPagemod.injectFiles).toHaveBeenCalledTimes(1);
     });
 
     it("Should not find any pagemod", async() => {

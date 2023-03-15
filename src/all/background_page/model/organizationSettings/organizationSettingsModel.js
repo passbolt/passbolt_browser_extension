@@ -54,9 +54,10 @@ class OrganizationSettingsModel {
   /**
    * Returns the organization settings from the local cache or requests the server.
    * @param {boolean} refreshCache Should request the API to retrieve the organization settings and refresh the cache.
+   * Default false
    * @returns {Promise<OrganizationSettingsEntity>}
    */
-  async getOrFind(refreshCache) {
+  async getOrFind(refreshCache = false) {
     if (refreshCache || !_settings) {
       _settings = await this.find();
     }

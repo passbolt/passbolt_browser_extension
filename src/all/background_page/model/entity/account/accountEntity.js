@@ -13,6 +13,7 @@
 
 import AbstractAccountEntity from "./abstractAccountEntity";
 import EntitySchema from "../abstract/entitySchema";
+import RoleEntity from "../role/roleEntity";
 
 const ENTITY_NAME = "Account";
 
@@ -84,6 +85,13 @@ class AccountEntity extends AbstractAccountEntity {
           "type": "string",
           "pattern": `^${AccountEntity.TYPE_ACCOUNT}$`,
         },
+        "role_name": {
+          "anyOf": [
+            RoleEntity.getSchema().properties.name,
+            {
+              "type": "null"
+            }]
+        },
       }
     };
 
@@ -143,6 +151,20 @@ class AccountEntity extends AbstractAccountEntity {
       lastname: this.lastName,
       locale: this.locale
     };
+  }
+
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
+
+  /**
+   * Get the role name
+   * @return {string}
+   */
+  get roleName() {
+    return this._props.role_name;
   }
 
   /*

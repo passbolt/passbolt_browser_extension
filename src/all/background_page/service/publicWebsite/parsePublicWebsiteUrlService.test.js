@@ -22,8 +22,6 @@ describe("ParsePublicWebsiteUrlService", () => {
       {scenario: "Passbolt website random page", url: "https://www.passbolt.com/roadmap"},
       {scenario: "Passbolt website home page and hash", url: "https://www.passbolt.com#hash"},
       {scenario: "Passbolt website random page and hash", url: "https://www.passbolt.com/roadmap#hash"},
-      {scenario: "Passbolt signup website home page", url: "https://signup.passbolt.com"},
-      {scenario: "Passbolt signup website random page", url: "https://signup.passbolt.com/checkout/plan/00000000-000-0000-0000-00000000000?qty=10&freq=annually"},
     ]).describe("should parse", _props => {
       it(`should parse: ${_props.scenario}`, () => {
         const parseResult = ParsePublicWebsiteUrlService.regex.test(_props.url);

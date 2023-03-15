@@ -32,6 +32,7 @@ PublicWebsiteSignIn.init = function() {
     contentScriptWhen: 'ready',
     contentStyleFile: [],
     contentScriptFile: [
+      'contentScripts/js/dist/public-website-sign-in/vendors.js',
       'contentScripts/js/dist/public-website-sign-in/public-website-sign-in.js'
     ],
     attachTo: {existing: true, reload: false},

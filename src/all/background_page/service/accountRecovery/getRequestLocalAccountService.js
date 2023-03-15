@@ -38,7 +38,7 @@ class GetRequestLocalAccountService {
       throw new Error('No account found for the given user in the local storage.');
     }
 
-    const account = new AccountAccountRecoveryEntity(accountDto);
+    const account = new AccountAccountRecoveryEntity(accountDto, {validateUsername: false});
     if (account.domain !== domain
       || account.authenticationTokenToken !== authenticationTokenToken
       || account.userId !== userId) {

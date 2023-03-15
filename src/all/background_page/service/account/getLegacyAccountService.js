@@ -16,8 +16,6 @@ import Keyring from "../../model/keyring";
 import {Uuid} from "../../utils/uuid";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import User from "../../model/user";
-import BuildApiClientOptionsService from "./buildApiClientOptionsService";
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 
 class GetLegacyAccountService {
   /**
@@ -28,11 +26,6 @@ class GetLegacyAccountService {
   static async get() {
     const keyring = new Keyring();
     const user = await User.getInstance().get();
-
-    // Load the application settings, necessary to validate the account username.
-    const apiClientOptions = await BuildApiClientOptionsService.buildFromDomain(user.settings.domain);
-    await (new OrganizationSettingsModel(apiClientOptions)).getOrFind(true);
-
     const serverPublicKeyInfo = keyring.findPublic(Uuid.get(user.settings.domain));
     const userPublicKeyInfo = keyring.findPublic(user.id);
     const userPrivateKeyInfo = keyring.findPrivate();
@@ -49,7 +42,13 @@ class GetLegacyAccountService {
       user_private_armored_key: userPrivateKeyInfo.armoredKey,
       security_token: user.settings.securityToken,
     };
-    return new AccountEntity(accountDto);
+
+    /*
+     * Do not validate the username. This validation can happen only when the application settings are loaded as the
+     * username validation can be customized. The application settings are not retrieved at this stage to not add a time
+     * penalty on all the flows that require the account.
+     */
+    return new AccountEntity(accountDto, {validateUsername: false});
   }
 }
 

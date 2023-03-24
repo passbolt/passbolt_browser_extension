@@ -108,9 +108,15 @@ class AzureSsoAuthenticationController {
   handleSpecificErrors(error) {
     switch (error.name) {
       case 'InvalidMasterPasswordError':
-      case 'PassboltApiFetchError':
       case 'OutdatedSsoKitError': {
         SsoDataStorage.flush();
+        break;
+      }
+      case 'PassboltApiFetchError': {
+        const isCsrfTokenError = error?.data?.code === 403;
+        if (!isCsrfTokenError) {
+          SsoDataStorage.flush();
+        }
       }
     }
   }

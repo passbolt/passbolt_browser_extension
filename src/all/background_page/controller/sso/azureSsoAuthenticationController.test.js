@@ -107,8 +107,8 @@ describe("AzureSsoAuthenticationController", () => {
   describe("AzureSsoAuthenticationController::exec should throw an error when something wrong happens", () => {
     it("Should throw an error when client sso kit can't be find.", async() => {
       expect.assertions(2);
-      SsoDataStorage.setMockedData(null);
       const account = {userId: uuid()};
+      SsoDataStorage.setMockedData(null);
       const controller = new AzureSsoAuthenticationController(null, null, defaultApiClientOptions(), account);
       try {
         await controller.exec();
@@ -122,9 +122,9 @@ describe("AzureSsoAuthenticationController", () => {
       expect.assertions(2);
       const ssoKit = clientSsoKit();
       const ssoToken = uuid();
+      const account = {userId: uuid()};
       SsoDataStorage.setMockedData(ssoKit);
 
-      const account = {userId: uuid()};
       mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoToken);
       fetch.doMockOnceIf(new RegExp(`/sso/azure/login.json`), async() => mockApiResponse(azureUrlResponse));
       fetch.doMockOnceIf(new RegExp(`/sso/keys/${ssoKit.id}/${account.userId}/${ssoToken}.json`), async() => mockApiResponseError(404));
@@ -142,12 +142,10 @@ describe("AzureSsoAuthenticationController", () => {
       expect.assertions(2);
       const ssoToken = uuid();
       const ssoLocalKit = clientSsoKit();
-      SsoDataStorage.setMockedData(ssoLocalKit);
-      const ssoLoginToken = uuid();
       const serverSsoKit = {data: generateSsoKitServerData({})};
       const account = {userId: uuid()};
+      SsoDataStorage.setMockedData(ssoLocalKit);
 
-      mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);
       jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => { throw new OutdatedSsoKitError(); });
 
       mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoToken);
@@ -167,12 +165,9 @@ describe("AzureSsoAuthenticationController", () => {
       expect.assertions(2);
       const ssoToken = uuid();
       const ssoLocalKit = clientSsoKit();
-      SsoDataStorage.setMockedData(ssoLocalKit);
-      const ssoLoginToken = uuid();
       const serverSsoKit = {data: generateSsoKitServerData({})};
       const account = {userId: uuid()};
-
-      mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);
+      SsoDataStorage.setMockedData(ssoLocalKit);
 
       jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => { throw new Error(); });
 
@@ -192,13 +187,10 @@ describe("AzureSsoAuthenticationController", () => {
     it("Should throw an error when the passphrase doesn't match the user's private key.", async() => {
       expect.assertions(2);
       const ssoToken = uuid();
-      const ssoLocalKit = clientSsoKit();
-      SsoDataStorage.setMockedData(ssoLocalKit);
-      const ssoLoginToken = uuid();
       const serverSsoKit = {data: generateSsoKitServerData({})};
       const account = {userId: uuid()};
-
-      mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);
+      const ssoLocalKit = clientSsoKit();
+      SsoDataStorage.setMockedData(ssoLocalKit);
 
       jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => "passphrase");
 
@@ -213,6 +205,23 @@ describe("AzureSsoAuthenticationController", () => {
       } catch (e) {
         expect(e).toBeInstanceOf(InvalidMasterPasswordError);
         expect(SsoDataStorage.flush).toHaveBeenCalledTimes(1);
+      }
+    });
+
+    it("Should throw an error if CSRF token is not valid but shouldn't remove the local SSO kit.", async() => {
+      expect.assertions(2);
+      const account = {userId: uuid()};
+      SsoDataStorage.setMockedData(clientSsoKit());
+
+      jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => "passphrase");
+      fetch.doMockOnceIf(new RegExp(`/sso/azure/login.json`), async() => mockApiResponseError(403, "Wrong CSRF token"));
+
+      const controller = new AzureSsoAuthenticationController(null, null, defaultApiClientOptions(), account);
+      try {
+        await controller.exec();
+      } catch (e) {
+        expect(e).toBeInstanceOf(PassboltApiFetchError);
+        expect(SsoDataStorage.flush).not.toHaveBeenCalled();
       }
     });
   });

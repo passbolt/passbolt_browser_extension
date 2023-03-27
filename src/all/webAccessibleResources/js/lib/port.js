@@ -152,7 +152,7 @@ class Port {
        * Observe when the request has been completed.
        * Or if a progress notification is sent.
        */
-      this.once(requestId, function(status, ...callbackArgs) {
+      this.once(requestId, (status, ...callbackArgs) => {
         if (status === 'SUCCESS') {
           resolve.apply(null, callbackArgs);
         } else if (status === 'ERROR') {

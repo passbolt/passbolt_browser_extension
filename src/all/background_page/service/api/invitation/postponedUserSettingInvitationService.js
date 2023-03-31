@@ -14,6 +14,7 @@
 
 let isInvitationAccountRecoveryPostponed = false;
 let isInvitationMFAPolicyPostponed = false;
+let isInvitationPasswordPolicyPostponed = false;
 
 class PostponedUserSettingInvitationService {
   /**
@@ -35,6 +36,15 @@ class PostponedUserSettingInvitationService {
   }
 
   /**
+   * Returns true if the user has postponned the password policy  invitation.
+   *
+   * @returns {bool}
+   */
+  static hasPostponedPasswordPolicy() {
+    return isInvitationPasswordPolicyPostponed;
+  }
+
+  /**
    * Set the account recovery enrollement invitation as postponed.
    */
   static postponeAccountRecovery() {
@@ -49,11 +59,19 @@ class PostponedUserSettingInvitationService {
   }
 
   /**
+   * Set the Password policy enrollement invitation as postponed.
+   */
+  static postponePasswordPolicy() {
+    isInvitationPasswordPolicyPostponed = true;
+  }
+
+  /**
    * Set the enrollement invitation to its default value.
    */
   static reset() {
     isInvitationAccountRecoveryPostponed = false;
     isInvitationMFAPolicyPostponed = false;
+    isInvitationPasswordPolicyPostponed = false;
   }
 }
 

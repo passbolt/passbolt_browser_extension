@@ -43,6 +43,7 @@ import {MobileEvents} from "../event/mobileEvents";
 import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
 import {MfaEvents} from "../event/mfaEvents";
 import {ClipboardEvents} from "../event/clipboardEvents";
+import {PasswordPoliciesEvents} from "../event/passwordPoliciesEvents";
 
 class App extends Pagemod {
   /**
@@ -85,7 +86,8 @@ class App extends Pagemod {
       MobileEvents,
       PownedPasswordEvents,
       MfaEvents,
-      ClipboardEvents
+      ClipboardEvents,
+      PasswordPoliciesEvents
     ];
   }
 

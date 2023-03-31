@@ -19,6 +19,7 @@ import {AuthEvents} from "../event/authEvents";
 import {ConfigEvents} from "../event/configEvents";
 import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {LocaleEvents} from "../event/localeEvents";
+import {PasswordPoliciesEvents} from "../event/passwordPoliciesEvents";
 
 class Auth extends Pagemod {
   /**
@@ -39,7 +40,8 @@ class Auth extends Pagemod {
       KeyringEvents,
       AuthEvents,
       OrganizationSettingsEvents,
-      LocaleEvents
+      LocaleEvents,
+      PasswordPoliciesEvents,
     ];
   }
 

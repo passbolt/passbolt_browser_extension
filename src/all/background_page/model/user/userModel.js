@@ -20,6 +20,7 @@ import UsersCollection from "../entity/user/usersCollection";
 import PassboltApiFetchError from "../../error/passboltApiFetchError";
 import Validator from "validator";
 import RoleEntity from "../entity/role/roleEntity";
+import UserMeSessionStorageService from "../../service/user/UserMeSessionStorageService";
 
 class UserModel {
   /**
@@ -61,6 +62,17 @@ class UserModel {
    */
   async resendInvite(username) {
     return this.userService.resendInvite(username);
+  }
+
+  async getOrFindMe(refreshCache = false) {
+    let user = await UserMeSessionStorageService.getByAccount(this.account);
+    if (!user || refreshCache) {
+      const contains = {profile: true, role: true, account_recovery_user_setting: true};
+      user = await this.findOne(this.account.userId, contains, true);
+      await UserMeSessionStorageService.setByAccount(this.account, user);
+    }
+
+    return user;
   }
 
   /**

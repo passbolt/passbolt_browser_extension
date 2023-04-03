@@ -31,6 +31,8 @@ import ActivateSsoSettingsController from "../controller/sso/activateSsoSettings
 import DeleteSsoSettingsController from "../controller/sso/deleteSsoSettingsController";
 import GenerateSsoKitController from "../controller/auth/generateSsoKitController";
 import AuthenticationEventController from "../controller/auth/authenticationEventController";
+import CanIUseUiActionController from "../controller/rbac/canIUseUiActionController";
+import FindMeController from "../controller/rbac/findMeController";
 
 const listen = function(worker, account) {
   const authenticationEventController = new AuthenticationEventController(worker);
@@ -162,6 +164,24 @@ const listen = function(worker, account) {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GenerateSsoKitController(worker, requestId, apiClientOptions);
     await controller._exec(provider);
+  });
+
+  /*
+   * ==================================================================================
+   *  Role based control action
+   * ==================================================================================
+   */
+
+  worker.port.on('passbolt.rbac.can-i-use-ui-action', async (requestId, name) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new CanIUseUiActionController(worker, requestId, apiClientOptions, account);
+    await controller._exec(name);
+  });
+
+  worker.port.on('passbolt.rbacs.find-me', async (requestId, name) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new FindMeController(worker, requestId, apiClientOptions, account);
+    await controller._exec(name);
   });
 };
 export const AppEvents = {listen};

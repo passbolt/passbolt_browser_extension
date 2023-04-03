@@ -119,6 +119,19 @@ class RoleEntity extends Entity {
 
   /*
    * ==================================================
+   * Dynamic helper
+   * ==================================================
+   */
+  /**
+   * Check if the role correspond to the admin role.
+   * @returns {boolean}
+   */
+  isAdmin() {
+    return this.name === RoleEntity.ROLE_ADMIN;
+  }
+
+  /*
+   * ==================================================
    * Static properties getters
    * ==================================================
    */

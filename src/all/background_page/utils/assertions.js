@@ -135,3 +135,15 @@ export const assertSsoProvider = provider => {
     throw new Error("The given provider identifier is not a valid SSO provider");
   }
 };
+
+/**
+ * Assert that the given parameter is a valid UUID.
+ * @param {string} str the parameter to validate
+ * @param {string} [errorMessage] the message to throw withing the Error if any
+ * @throws {Error} if the parameter is not valid
+ */
+export const assertString = (str, errorMessage = "The given parameter is not a valid string") => {
+  if (typeof str !== 'string' && !(str instanceof String)) {
+    throw new Error(errorMessage);
+  }
+};

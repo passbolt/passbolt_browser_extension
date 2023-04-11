@@ -49,7 +49,7 @@ Auth.init = function() {
         console.error(error);
       }
 
-      app.events.user.listen(worker);
+      app.events.user.listen(worker, account);
       app.events.keyring.listen(worker);
       app.events.auth.listen(worker, account);
       app.events.config.listen(worker);

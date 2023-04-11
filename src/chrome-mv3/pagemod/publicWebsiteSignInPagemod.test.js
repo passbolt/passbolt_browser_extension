@@ -57,7 +57,7 @@ describe("PublicWebsiteSign", () => {
       expect.assertions(1);
       // mock functions
       jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
-      const result = await PublicWebsiteSignIn.canBeAttachedTo({frameId: Pagemod.TOP_FRAME_ID, url: "https://signup.passbolt.com"});
+      const result = await PublicWebsiteSignIn.canBeAttachedTo({frameId: Pagemod.TOP_FRAME_ID, url: "https://www.passbolt.com"});
       expect(result).toBeTruthy();
     });
 

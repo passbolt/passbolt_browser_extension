@@ -16,6 +16,7 @@ import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
 import SsoDataStorage from "../indexedDB_storage/ssoDataStorage";
 import GenerateSsoKitService from "../sso/generateSsoKitService";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
+import EntityValidationError from "../../model/entity/abstract/entityValidationError";
 
 class UpdateSsoCredentialsService {
   constructor(apiClientOption) {
@@ -39,7 +40,7 @@ class UpdateSsoCredentialsService {
    * - Flush it if one exists and SSO plutin is disabled or the feature is not configured
    * - Creates a new one if none exists and SSO plugin is enabled
    * @param {string} passphrase
-   * @returns {Promise<ApiClientOptions>}
+   * @returns {Promise<void>}
    */
   async updateSsoKitIfNeeded(passphrase) {
     const localSsoKit = await SsoDataStorage.get();
@@ -54,7 +55,24 @@ class UpdateSsoCredentialsService {
       }
       return;
     }
-    const currentSsoSettings = await this.ssoSettingsModel.getCurrent();
+
+    let currentSsoSettings;
+    try {
+      currentSsoSettings = await this.ssoSettingsModel.getCurrent();
+    } catch (e) {
+      if (e instanceof EntityValidationError) {
+        /*
+         * It might happen that the browser extension is on an older version than the server.
+         * If so, the server could be configured with an SSO provider that the browser extension doesn't support.
+         * In such a case, the SsoSettingsEntity will crash at the validation and could block the recover, setup or login steps.
+         */
+        console.error(e);
+        return;
+      }
+      // In other cases, it's an unexpected error that should be thrown like usual
+      throw e;
+    }
+
     if (!currentSsoSettings?.provider && localSsoKit) {
       /*
        * if we have a local SSO kit but the plugin is not configured

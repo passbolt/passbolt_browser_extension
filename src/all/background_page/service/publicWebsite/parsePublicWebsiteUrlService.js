@@ -18,7 +18,7 @@ class ParsePublicWebsiteUrlService {
    * @return {RegExp}
    */
   static get regex() {
-    const publicWebsiteDomain = '(www|signup)\.passbolt\.com';
+    const publicWebsiteDomain = '(www\.)?passbolt\.com';
     return new RegExp(`^https\:\/\/${publicWebsiteDomain}(\/.*|#.*)?$`);
   }
 

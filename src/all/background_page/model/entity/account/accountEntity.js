@@ -13,6 +13,7 @@
 
 import AbstractAccountEntity from "./abstractAccountEntity";
 import EntitySchema from "../abstract/entitySchema";
+import RoleEntity from "../role/roleEntity";
 
 const ENTITY_NAME = "Account";
 
@@ -24,16 +25,23 @@ class AccountEntity extends AbstractAccountEntity {
    * Setup entity constructor
    *
    * @param {Object} accountDto account DTO
+   * @param {Object} options.
+   * - {boolean} validateUsername Validate the username. Default true.
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(accountDto) {
+  constructor(accountDto, options = {}) {
     AccountEntity.marshal(accountDto);
+
+    // Should the username be validated.
+    const isUsernameValidated = options?.validateUsername !== false;
 
     super(EntitySchema.validate(
       AccountEntity.ENTITY_NAME,
       accountDto,
-      AccountEntity.getSchema()
+      AccountEntity.getSchema(isUsernameValidated)
     ));
+
+    this.isUsernameValidated = isUsernameValidated;
   }
 
   /**
@@ -52,11 +60,12 @@ class AccountEntity extends AbstractAccountEntity {
 
   /**
    * Get entity schema
+   * @param {boolean} validateUsername Should validate the username. Default true.
    * @returns {Object} schema
    */
-  static getSchema() {
+  static getSchema(validateUsername = true) {
     const abstractAccountEntitySchema = AbstractAccountEntity.getSchema();
-    return {
+    const schema = {
       "type": "object",
       "required": [
         "type",
@@ -76,8 +85,27 @@ class AccountEntity extends AbstractAccountEntity {
           "type": "string",
           "pattern": `^${AccountEntity.TYPE_ACCOUNT}$`,
         },
+        "role_name": {
+          "anyOf": [
+            RoleEntity.getSchema().properties.name,
+            {
+              "type": "null"
+            }]
+        },
       }
     };
+
+    /*
+     * Do not validate the username. It is used on the applications bootstrap when an account is retrieved from the
+     * storage, but the application settings cannot be retrieved yet as they require an account to work with.
+     */
+    if (!validateUsername) {
+      schema.properties.username = {
+        "type": "string"
+      };
+    }
+
+    return schema;
   }
 
   /*
@@ -123,6 +151,20 @@ class AccountEntity extends AbstractAccountEntity {
       lastname: this.lastName,
       locale: this.locale
     };
+  }
+
+  /*
+   * ==================================================
+   * Dynamic properties getters
+   * ==================================================
+   */
+
+  /**
+   * Get the role name
+   * @return {string}
+   */
+  get roleName() {
+    return this._props.role_name;
   }
 
   /*

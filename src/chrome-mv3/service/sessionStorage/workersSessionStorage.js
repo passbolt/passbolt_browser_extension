@@ -17,6 +17,7 @@ import WorkerEntity from "../../../all/background_page/model/entity/worker/worke
 const lock = new Lock();
 
 const WORKERS_STORAGE_KEY = 'workers';
+const LIMIT_WORKERS_BY_TAB = 100;
 
 class WorkersSessionStorage {
   /**
@@ -86,11 +87,26 @@ class WorkersSessionStorage {
     try {
       this.assertEntityBeforeSave(workerEntity);
       const workers = await this.getWorkers();
-      workers.push(workerEntity.toDto());
-      await browser.storage.session.set({workers});
+      if (!this.IsExceedNumberWorkersByTabId(workers, workerEntity.tabId)) {
+        workers.push(workerEntity.toDto());
+        await browser.storage.session.set({workers});
+      } else {
+        throw new Error(`The extension port limit is exceeded on tab ${workerEntity.tabId}`);
+      }
     } finally {
       lock.release();
     }
+  }
+
+  /**
+   *
+   * @param {Object<array>} workers The workers
+   * @param {number} tabId The tab id
+   * @param {number} limit The limit
+   * @constructor
+   */
+  IsExceedNumberWorkersByTabId(workers, tabId, limit = LIMIT_WORKERS_BY_TAB) {
+    return workers.filter(worker => worker.tabId === tabId).length >= limit;
   }
 
   /**

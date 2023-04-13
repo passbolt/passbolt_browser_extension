@@ -38,6 +38,22 @@ describe("WorkersSessionStorage", () => {
       expect(await WorkersSessionStorage.getWorkerById(workerEntity3.id)).toEqual(workerEntity3.toDto());
       expect(await WorkersSessionStorage.getWorkersByNameAndTabId(workerEntity2.name, workerEntity2.tabId)).toEqual([workerEntity2.toDto()]);
     });
+
+    it("Should not add worker in storage session if the limit by tab is exceeded", async() => {
+      expect.assertions(2);
+      // data mocked
+      try {
+        for (let i = 0; i < 101; i++) {
+          const workerEntity = new WorkerEntity(readWorker());
+          await WorkersSessionStorage.addWorker(workerEntity);
+        }
+      } catch (error) {
+        // expectations
+        const workers = await WorkersSessionStorage.getWorkers();
+        expect(workers.length).toStrictEqual(100);
+        expect(error.message).toStrictEqual("The extension port limit is exceeded on tab 1");
+      }
+    });
   });
 
   describe("WorkersSessionStorage::updateWorker", () => {

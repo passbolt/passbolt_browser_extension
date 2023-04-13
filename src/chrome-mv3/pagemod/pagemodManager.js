@@ -32,22 +32,24 @@ import AccountRecoveryPagemod from "./accountRecoveryPagemod";
  */
 class PagemodManager {
   constructor() {
+    // The order is very important keep the bootstrap application first follow by the webIntegration
     this.pagemods = [
       RecoverBootstrapPagemod,
-      RecoverPagemod,
       SetupBootstrapPagemod,
-      SetupPagemod,
       AuthBootstrapPagemod,
-      AuthPagemod,
       AppBootstrapPagemod,
-      AppPagemod,
-      WebIntegrationPagemod,
+      AccountRecoveryBootstrapPagemod,
       PublicWebsiteSignInPagemod,
+      // WebIntegration should always be under all bootstrap application
+      WebIntegrationPagemod,
+      RecoverPagemod,
+      SetupPagemod,
+      AuthPagemod,
+      AppPagemod,
       QuickAccessPagemod,
       InFormCallToActionPagemod,
       InFormMenuPagemod,
-      AccountRecoveryBootstrapPagemod,
-      AccountRecoveryPagemod
+      AccountRecoveryPagemod,
     ];
     this.exec = this.exec.bind(this);
   }
@@ -59,20 +61,20 @@ class PagemodManager {
    * @returns {Promise<void>}
    */
   async exec(frameDetails) {
-    const pagemods = await this.getPagemodsThatCanBeAttachedTo(frameDetails);
-    await pagemods.forEach(pagemod => pagemod?.injectFiles(frameDetails.tabId, frameDetails.frameId));
+    const pagemod = await this.getPagemodThatCanBeAttachedTo(frameDetails);
+    await pagemod?.injectFiles(frameDetails.tabId, frameDetails.frameId);
   }
 
   /**
-   * Get the pagemods that can be attached to a frame
+   * Get the first pagemod that can be attached to a frame
    * @param {object} frameDetails The browser frame details
    * @returns {Promise<Pagemod>}
    */
-  async getPagemodsThatCanBeAttachedTo(frameDetails) {
+  async getPagemodThatCanBeAttachedTo(frameDetails) {
     const canAttachPagemod = pagemod => pagemod.canBeAttachedTo(frameDetails);
-    const filterPagemodsThatCanBeAttachedTo = canAttachPagemodsResults => this.pagemods.filter((pagemod, index) => canAttachPagemodsResults[index]);
-    // Keep only the pagemods that can be attached.
-    return Promise.all(this.pagemods.map(canAttachPagemod)).then(filterPagemodsThatCanBeAttachedTo);
+    const findPagemodThatCanBeAttachedTo = canAttachPagemodsResults => this.pagemods.find((pagemod, index) => canAttachPagemodsResults[index]);
+    // Keep only one pagemod that can be attached.
+    return Promise.all(this.pagemods.map(canAttachPagemod)).then(findPagemodThatCanBeAttachedTo);
   }
 
   /**

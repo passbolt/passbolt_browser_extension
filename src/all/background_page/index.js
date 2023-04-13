@@ -8,7 +8,7 @@ import browser from "./sdk/polyfill/browserPolyfill";
 import PortManager from "../../chrome-mv3/sdk/portManager";
 import SystemRequirementService from "../../chrome-mv3/service/systemRequirementService/systemRequirementService";
 import LocalStorageService from "../../chrome-mv3/service/localStorage/localStorageService";
-import OnExtensionInstalledController from "./controller/extension/OnExtensionInstalledController";
+import OnExtensionInstalledController from "./controller/extension/onExtensionInstalledController";
 import TabService from "./service/tab/tabService";
 import User from "./model/user";
 import GpgAuth from "./model/gpgauth";
@@ -64,7 +64,7 @@ self.addEventListener("passbolt.auth.after-logout", LocalStorageService.flush);
 /**
  * On installed the extension, add first install in the url tab of setup or recover
  */
-browser.runtime.onInstalled.addListener(OnExtensionInstalledController.onInstall);
+browser.runtime.onInstalled.addListener(OnExtensionInstalledController.exec);
 
 /**
  * Add listener on startup

@@ -86,7 +86,7 @@ class Pagemod {
    */
   /* eslint-disable no-unused-vars */
   async canBeAttachedTo(frameDetails) {
-    console.warn(`The pagemod "${this.appName}" should implement canBeAttachedTo. Default false.`);
+    console.debug(`The pagemod "${this.appName}" should implement canBeAttachedTo. Default false.`);
     return false;
   }
 

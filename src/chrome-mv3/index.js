@@ -16,7 +16,7 @@ import PortManager from "./sdk/portManager";
 import WebNavigationService from "./service/webNavigation/webNavigationService";
 import LocalStorageService from "./service/localStorage/localStorageService";
 import SystemRequirementService from "./service/systemRequirementService/systemRequirementService";
-import OnExtensionInstalledController from "../all/background_page/controller/extension/OnExtensionInstalledController";
+import OnExtensionInstalledController from "../all/background_page/controller/extension/onExtensionInstalledController";
 
 /**
  * Load all system requirement
@@ -36,7 +36,7 @@ browser.runtime.onStartup.addListener(LocalStorageService.flush);
 /**
  * On installed the extension, add first install in the url tab of setup or recover
  */
-browser.runtime.onInstalled.addListener(OnExtensionInstalledController.onInstall);
+browser.runtime.onInstalled.addListener(OnExtensionInstalledController.exec);
 
 /**
  * Add listener on any on complete navigation

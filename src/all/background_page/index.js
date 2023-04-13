@@ -28,6 +28,7 @@ import {Config} from "./model/config";
 import PassphraseStorageService from "./service/session_storage/passphraseStorageService";
 import SsoKitTemporaryStorageService from "./service/session_storage/ssoKitTemporaryStorageService";
 import PostponedUserSettingInvitationService from './service/api/invitation/postponedUserSettingInvitationService';
+import StartLoopAuthSessionCheckService from "./service/auth/startLoopAuthSessionCheckService";
 
 const main = async function() {
   /*
@@ -93,7 +94,8 @@ const main = async function() {
       const isAuthenticated = await auth.isAuthenticated();
       if (isAuthenticated) {
         await pageMods.AppBoostrap.init();
-        auth.startCheckAuthStatusLoop();
+        const startLoopAuthSessionCheckService = new StartLoopAuthSessionCheckService(auth);
+        await startLoopAuthSessionCheckService.exec();
         const event = new Event('passbolt.auth.after-login');
         self.dispatchEvent(event);
       }

@@ -18,7 +18,7 @@ const listen = function(worker) {
   /*
    * Get the resource types from the local storage.
    *
-   * @listens passbolt.resource-type.get-all
+   * @listens passbolt.role.get-all
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.role.get-all', async requestId => {

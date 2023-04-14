@@ -61,7 +61,7 @@ Log.write = function(log) {
 
   // The log could also be displayed on the console.
   if (logSettings.console) {
-    const consoleLog = `${log.created} [${log.level}] ${log.message}`;
+    const consoleLog = `${log.created} [${log.level}] ${JSON.stringify(log.message)}`;
     if (log.level === ERROR) {
       console.error(consoleLog);
     } else if (log.level === WARNING) {

@@ -45,6 +45,7 @@ class Port {
    * @private
    */
   _onMessage(json) {
+    Log.write({level: 'debug', message: `Port onmessage: ${json}`});
     const msg = JSON.parse(json);
     const eventName = msg[0];
     if (Array.isArray(this._listeners[eventName])) {
@@ -62,6 +63,8 @@ class Port {
           i--; // jump back since i++ is the new i
         }
       }
+    } else {
+      console.error("Unexpected message", eventName);
     }
   }
 
@@ -74,6 +77,7 @@ class Port {
    * @private
    */
   _addListener(name, callback, once) {
+    Log.write({level: 'debug', message: `Port addlistener @: ${name}`});
     if (!Array.isArray(this._listeners[name])) {
       this._listeners[name] = [];
     }
@@ -91,6 +95,7 @@ class Port {
    * @param callback
    */
   on(name, callback) {
+    Log.write({level: 'debug', message: `Port on: ${name}`});
     this._addListener(name, callback, false);
   }
 
@@ -131,6 +136,7 @@ class Port {
    * @return Promise
    */
   request(message, ...args) {
+    Log.write({level: 'debug', message: `Port request @ message: ${message}, ${args}`});
     // Generate a request id that will be used by the addon to answer this request.
     const requestId = uuidv4();
     // Add the requestId to the request parameters.
@@ -163,6 +169,7 @@ class Port {
    * @return {void}
    */
   disconnect() {
+    Log.write({level: 'debug', message: `Port disconnect: ${this}`});
     this._port.disconnect();
   }
 }

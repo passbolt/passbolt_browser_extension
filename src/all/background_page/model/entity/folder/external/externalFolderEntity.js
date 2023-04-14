@@ -13,7 +13,7 @@
 import FolderEntity from "../folderEntity";
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-
+import XRegExp from "xregexp";
 
 const ENTITY_NAME = 'ExternalFolder';
 
@@ -103,9 +103,9 @@ class ExternalFolderEntity extends Entity {
   static sanitizePath(path) {
     path = path || "";
     return path
-      .replace(/^(\/{2,})|(\/{2,})$/g, '/') //replace any group of starting or ending slash by a single slash
-      .replace(/^(\/(?! ))|((?<! )\/)$/g, '') //remove starting '/' not followed by a space or an ending '/' not preceded by a space
-      .replace(/(?<! )(\/{2,})(?! )/g, '/'); //replace any group of multiple / that are not prefixed or suffixed by a space
+      .replace(XRegExp("^(\/{2,})|(\/{2,})$,)", "g"), '/') //replace any group of starting or ending slash by a single slash
+      .replace(XRegExp("^(\/(?! ))|((?<! )\/)", "g"), '') //remove starting '/' not followed by a space or an ending '/' not preceded by a space
+      .replace(XRegExp("(?<! )(\/{2,})(?! )", "g"), '/'); //replace any group of multiple / that are not prefixed or suffixed by a space
   }
 
   /**
@@ -116,7 +116,8 @@ class ExternalFolderEntity extends Entity {
    * @return {array<string>}
    */
   static splitFolderPath(path) {
-    return path.split(/(?<! )\/(?! )/g);
+    const regExp = XRegExp("(?<! )\/(?! )", 'g');
+    return path.split(regExp);
   }
 
   /**
@@ -128,9 +129,9 @@ class ExternalFolderEntity extends Entity {
     name = name || "";
     return name
       .trim()
-      .replace(/^\//, '/ ') // replace a starting '/' by '/ '
-      .replace(/\/$/, ' /') // replace an ending '/' by ' /'
-      .replace(/(.)\/(.)/g, '$1 / $2'); //replace all "middle" '/' by ' / '
+      .replace(XRegExp("^\/"), '/ ') // replace a starting '/' by '/ '
+      .replace(XRegExp("\/$"), ' /') // replace an ending '/' by ' /'
+      .replace(XRegExp("(.)\/(.)", "g"), '$1 / $2'); //replace all "middle" '/' by ' / '
   }
 
   /**
@@ -143,7 +144,7 @@ class ExternalFolderEntity extends Entity {
    */
   static resolveEscapedName(name) {
     name = name || "";
-    return name.replace(/ \/ | \/|\/ /g, '/'); //replace any ' / ', ' /', '/ ' (slash with spaces) by a single '/'
+    return name.replace(XRegExp(" \/ | \/|\/ ", "g"), '/'); //replace any ' / ', ' /', '/ ' (slash with spaces) by a single '/'
   }
 
   /*

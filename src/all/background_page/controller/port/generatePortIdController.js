@@ -20,7 +20,7 @@ const APPLICATION_ALLOWED = {
   "RecoverBootstrap": ["Recover"],
   "SetupBootstrap": ["Setup"],
   "AuthBootstrap": ["Auth"],
-  "AppBootstrap": ["App"],
+  "AppBootstrap": ["App", "FileIframe"],
   "AccountRecoveryBootstrap": ["AccountRecovery"],
   "WebIntegration": ["InFormCallToAction", "InFormMenu"],
 };

@@ -65,7 +65,7 @@ describe("WebIntegration", () => {
       jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
       jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
       const result = await WebIntegration.canBeAttachedTo({frameId: 1, url: "https://test.dev/auth/login"});
-      expect(result).toBeTruthy();
+      expect(result).toBeFalsy();
     });
 
     each([

@@ -49,7 +49,17 @@ class WebIntegration extends Pagemod {
    * @inheritDoc
    */
   async canBeAttachedTo(frameDetails) {
-    return this.assertUrlAttachConstraint(frameDetails);
+    return this.assertTopFrameAttachConstraint(frameDetails)
+      && this.assertUrlAttachConstraint(frameDetails);
+  }
+
+  /**
+   * Assert that the attached frame is a top frame.
+   * @param {Object} frameDetails
+   * @returns {boolean}
+   */
+  assertTopFrameAttachConstraint(frameDetails) {
+    return frameDetails.frameId === Pagemod.TOP_FRAME_ID;
   }
 
   /**

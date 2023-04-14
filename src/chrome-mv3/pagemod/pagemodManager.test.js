@@ -105,7 +105,7 @@ describe("PagemodManager", () => {
       // data mocked
       const details = {
         tabId: 1,
-        frameId: 1,
+        frameId: 0,
         url: "https://test.dev/auth/login"
       };
       // mock functions

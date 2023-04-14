@@ -34,12 +34,12 @@ describe("GeneratePortIdController", () => {
       // process
       const controller = new GeneratePortIdController(worker, "requestId");
       // expectations
-      expect(controller.isAllowedToGeneratePortId(worker, "Recover")).toBeFalsy();
-      expect(controller.isAllowedToGeneratePortId(worker, "Setup")).toBeFalsy();
-      expect(controller.isAllowedToGeneratePortId(worker, "App")).toBeFalsy();
-      expect(controller.isAllowedToGeneratePortId(worker, "Unknown")).toBeFalsy();
-      expect(controller.isAllowedToGeneratePortId(worker, "InFormCallToAction")).toBeTruthy();
-      expect(controller.isAllowedToGeneratePortId(worker, "InFormMenu")).toBeTruthy();
+      expect(controller.isAllowedToGeneratePortId(worker.name, "Recover")).toBeFalsy();
+      expect(controller.isAllowedToGeneratePortId(worker.name, "Setup")).toBeFalsy();
+      expect(controller.isAllowedToGeneratePortId(worker.name, "App")).toBeFalsy();
+      expect(controller.isAllowedToGeneratePortId(worker.name, "Unknown")).toBeFalsy();
+      expect(controller.isAllowedToGeneratePortId(worker.name, "InFormCallToAction")).toBeTruthy();
+      expect(controller.isAllowedToGeneratePortId(worker.name, "InFormMenu")).toBeTruthy();
     });
 
     it("Should not allowed to generate port id for unknown application", async() => {
@@ -51,8 +51,8 @@ describe("GeneratePortIdController", () => {
       // process
       const controller = new GeneratePortIdController(worker, "requestId");
       // expectations
-      expect(controller.isAllowedToGeneratePortId(worker, "Recover")).toBeFalsy();
-      expect(controller.isAllowedToGeneratePortId(worker, "Unknown")).toBeFalsy();
+      expect(controller.isAllowedToGeneratePortId(worker.name, "Recover")).toBeFalsy();
+      expect(controller.isAllowedToGeneratePortId(worker.name, "Unknown")).toBeFalsy();
     });
   });
 

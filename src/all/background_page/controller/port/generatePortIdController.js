@@ -53,8 +53,7 @@ class GeneratePortIdController {
 
   /**
    * Check if the application name is a string and is allowed to open another application.
-   * For MV2: return the port name
-   * For MV3: Add worker and generate the port id.
+   * Add worker and generate the port id.
    *
    * @return {Promise<string>}
    */
@@ -62,7 +61,7 @@ class GeneratePortIdController {
     if (typeof applicationName !== "string") {
       throw new Error("The application name should be a string");
     }
-    if (!this.isAllowedToGeneratePortId(this.worker, applicationName)) {
+    if (!this.isAllowedToGeneratePortId(this.worker.name, applicationName)) {
       throw new Error(`The application is not allowed to open the application ${applicationName}`);
     }
 
@@ -79,12 +78,11 @@ class GeneratePortIdController {
 
   /**
    * Is allowed to generate port id
-   * @param {*} worker
+   * @param {string} workerName
    * @param {string} applicationName
    * @returns {Boolean}
    */
-  isAllowedToGeneratePortId(worker, applicationName) {
-    const workerName = worker.name || worker.pageMod.args.name;
+  isAllowedToGeneratePortId(workerName, applicationName) {
     return APPLICATION_ALLOWED[workerName]?.includes(applicationName);
   }
 }

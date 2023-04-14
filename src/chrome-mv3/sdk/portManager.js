@@ -108,7 +108,7 @@ class PortManager {
    * @param {object} removeInfo The remove info
    * @returns <void>
    */
-  removePort(id, removeInfo) {
+  removePort(id, removeInfo = null) {
     // The port will be disconnected automatically after a tab is removed
     if (!removeInfo) {
       // Disconnect the port manually when the user navigate to another page (browser will disconnect too late)
@@ -159,7 +159,7 @@ class PortManager {
     }
     const workers = await WorkersSessionStorage.getWorkersByTabId(tabId);
     workers.forEach(worker => this.removePort(worker.id, removeInfo));
-    await WorkersSessionStorage.delete(tabId);
+    await WorkersSessionStorage.deleteByTabId(tabId);
   }
 }
 

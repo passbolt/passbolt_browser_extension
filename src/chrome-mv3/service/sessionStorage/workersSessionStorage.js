@@ -136,11 +136,28 @@ class WorkersSessionStorage {
    * @param {number} tabId The tab id
    * @return {Promise<void>}
    */
-  async delete(tabId) {
+  async deleteByTabId(tabId) {
     await lock.acquire();
     try {
       const workers = await this.getWorkers();
       const keepWorkerNotInTabId = worker => worker.tabId !== tabId;
+      const workersToKeep = workers.filter(keepWorkerNotInTabId);
+      await browser.storage.session.set({workers: workersToKeep});
+    } finally {
+      lock.release();
+    }
+  }
+
+  /**
+   * Delete workers in the session storage by port id.
+   * @param {string} id The worker id
+   * @return {Promise<void>}
+   */
+  async deleteById(id) {
+    await lock.acquire();
+    try {
+      const workers = await this.getWorkers();
+      const keepWorkerNotInTabId = worker => worker.id !== id;
       const workersToKeep = workers.filter(keepWorkerNotInTabId);
       await browser.storage.session.set({workers: workersToKeep});
     } finally {

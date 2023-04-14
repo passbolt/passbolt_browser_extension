@@ -113,7 +113,7 @@ describe("PortManager", () => {
       const port3 = mockPort({name: workerDto3.id, tabId: workerDto3.tabId, frameId: workerDto3.frameId});
       // mock functions
       jest.spyOn(PagemodManager, "attachEventToPort");
-      jest.spyOn(WorkersSessionStorage, "delete");
+      jest.spyOn(WorkersSessionStorage, "deleteByTabId");
       jest.spyOn(WorkersSessionStorage, "updateWorker");
       spyGetWorkerById.mockImplementationOnce(() => workerDto1);
       spyGetWorkerById.mockImplementationOnce(() => workerDto2);
@@ -132,7 +132,7 @@ describe("PortManager", () => {
       workerDto2.frameId = 3;
       expect(WorkersSessionStorage.updateWorker).toHaveBeenCalledWith(new WorkerEntity(workerDto2));
       expect(PagemodManager.attachEventToPort).not.toHaveBeenCalledWith(3);
-      expect(WorkersSessionStorage.delete).toHaveBeenCalledWith(1);
+      expect(WorkersSessionStorage.deleteByTabId).toHaveBeenCalledWith(1);
     });
 
     it("Should fail if the tabId is not provided", async() => {

@@ -96,7 +96,7 @@ describe("WorkersSessionStorage", () => {
       const workerEntity = new WorkerEntity(readWorker());
       // process
       await WorkersSessionStorage.addWorker(workerEntity);
-      await WorkersSessionStorage.delete(2);
+      await WorkersSessionStorage.deleteByTabId(2);
       // expectations
       expect(await WorkersSessionStorage.getWorkerById(workerEntity.id)).toEqual(workerEntity.toDto());
     });
@@ -111,10 +111,28 @@ describe("WorkersSessionStorage", () => {
       await WorkersSessionStorage.addWorker(workerEntity);
       await WorkersSessionStorage.addWorker(workerEntity2);
       await WorkersSessionStorage.addWorker(workerEntity3);
-      await WorkersSessionStorage.delete(1);
+      await WorkersSessionStorage.deleteByTabId(1);
       // expectations
       expect(await WorkersSessionStorage.getWorkersByTabId(workerEntity.tabId)).toEqual([]);
       expect(await WorkersSessionStorage.getWorkerOnMainFrame(workerEntity.tabId)).toEqual(undefined);
+      expect(await WorkersSessionStorage.getWorkerById(workerEntity3.id)).toEqual(workerEntity3.toDto());
+    });
+
+    it("Should remove worker with an id", async() => {
+      expect.assertions(4);
+      // data mocked
+      const workerEntity = new WorkerEntity(readWorker());
+      const workerEntity2 = new WorkerEntity(readWorker({frameId: 2}));
+      const workerEntity3 = new WorkerEntity(readWorker({tabId: 2}));
+      // process
+      await WorkersSessionStorage.addWorker(workerEntity);
+      await WorkersSessionStorage.addWorker(workerEntity2);
+      await WorkersSessionStorage.addWorker(workerEntity3);
+      await WorkersSessionStorage.deleteById(workerEntity.id);
+      // expectations
+      expect((await WorkersSessionStorage.getWorkers()).length).toEqual(2);
+      expect(await WorkersSessionStorage.getWorkerById(workerEntity.id)).toEqual(undefined);
+      expect(await WorkersSessionStorage.getWorkerById(workerEntity2.id)).toEqual(workerEntity2.toDto());
       expect(await WorkersSessionStorage.getWorkerById(workerEntity3.id)).toEqual(workerEntity3.toDto());
     });
   });

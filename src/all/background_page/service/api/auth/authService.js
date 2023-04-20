@@ -53,15 +53,34 @@ class AuthService extends AbstractService {
    */
   async logout() {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/logout`, {});
-    try {
-      // @deprecated with passbolt API > 4. Logout redirect automatically to login.json which generates an error.
-      await this.apiClient.fetchAndHandleResponse('GET', url, null, {redirect: "manual"});
-    } catch (error) {
-      if (error instanceof PassboltBadResponseError && error?.srcResponse?.type === "opaqueredirect") {
-        // @deprecated with passbolt API > 4. Logout redirect automatically to login.json which generates an error.
-      } else {
-        throw error;
+    const response = await this.apiClient.sendRequest("POST", url, null, {redirect: "manual"});
+    const isResponseOk = response.ok || response.status === 0; // status is 0 as there should be a redirection that is handled manually
+    if (!isResponseOk) {
+      if (response.status !== 404) {
+        throw new PassboltApiFetchError('An unexpected error happened during the logout process', {
+          code: response.status
+        });
       }
+
+      //@todo: remove depreacted function call
+      return this._logoutLegacy();
+    }
+  }
+
+  /**
+   * Logout (the legacy way that uses the deprecated 'GET' method).
+   * @return {Promise<void>}
+   * @deprecated
+   * @private
+   */
+  async _logoutLegacy() {
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/logout`, {});
+    const response = await this.apiClient.sendRequest("GET", url, null, {redirect: "manual"});
+    const isResponseOk = response.ok || response.status === 0; // status is 0 as there should be a redirection that is handled manually
+    if (!isResponseOk) {
+      throw new PassboltApiFetchError('An unexpected error happened during the legacy logout process', {
+        code: response.status
+      });
     }
   }
 

@@ -24,6 +24,7 @@ import DeleteLocalSsoKitController from "../controller/sso/deleteLocalSsoKitCont
 import UpdateLocalSsoProviderController from "../controller/sso/updateLocalSsoProviderController";
 import HasSsoLoginErrorController from "../controller/sso/hasSsoLoginErrorController";
 import GetQualifiedSsoLoginErrorController from "../controller/sso/getQualifiedSsoLoginErrorController";
+import AuthLogoutController from "../controller/auth/authLogoutController";
 
 const listen = function(worker, account) {
   /*
@@ -67,15 +68,8 @@ const listen = function(worker, account) {
    */
   worker.port.on('passbolt.auth.logout', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const auth = new AuthModel(apiClientOptions);
-
-    try {
-      await auth.logout();
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR');
-    }
+    const controller = new AuthLogoutController(worker, requestId, apiClientOptions);
+    await controller._exec(false);
   });
 
   /*
@@ -84,18 +78,10 @@ const listen = function(worker, account) {
    * @listens passbolt.auth.navigate-to-logout
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.navigate-to-logout', async() => {
-    const user = User.getInstance();
-    const apiClientOptions = await user.getApiClientOptions();
-    const auth = new AuthModel(apiClientOptions);
-    const url = `${user.settings.getDomain()}/auth/logout`;
-
-    try {
-      await chrome.tabs.update(worker.tab.id, {url: url});
-      await auth.postLogout();
-    } catch (error) {
-      console.error(error);
-    }
+  worker.port.on('passbolt.auth.navigate-to-logout', async requestId => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new AuthLogoutController(worker, requestId, apiClientOptions);
+    await controller._exec(true);
   });
 
   /*

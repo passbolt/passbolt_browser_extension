@@ -62,8 +62,7 @@ class GenerateSsoKitController {
     if (currentKit) {
       // if the provider change, the kit is still usable, just the provider id needs to be changed
       if (currentKit?.provider !== provider) {
-        currentKit.provider = provider;
-        await SsoDataStorage.save(currentKit);
+        await SsoDataStorage.updateLocalKitProviderWith(provider);
       }
       return;
     }

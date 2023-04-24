@@ -12,6 +12,7 @@
  * @since         3.9.0
  */
 import SsoKitClientPartEntity from "../../src/all/background_page/model/entity/sso/ssoKitClientPartEntity";
+import {assertSsoProvider} from "../../src/all/background_page/utils/assertions";
 
 class MockSsoDataStorage {
   constructor() {
@@ -19,6 +20,7 @@ class MockSsoDataStorage {
     this.get = jest.fn().mockImplementation(this.get.bind(this));
     this.save = jest.fn().mockImplementation(this.save.bind(this));
     this.updateLocalKitIdWith = jest.fn().mockImplementation(this.updateLocalKitIdWith.bind(this));
+    this.updateLocalKitProviderWith = jest.fn().mockImplementation(this.updateLocalKitProviderWith.bind(this));
     this.flush = jest.fn().mockImplementation(this.flush.bind(this));
   }
 
@@ -38,6 +40,11 @@ class MockSsoDataStorage {
 
   async updateLocalKitIdWith(ssoKitId) {
     this.data.id = ssoKitId;
+  }
+
+  async updateLocalKitProviderWith(provider) {
+    assertSsoProvider(provider);
+    this.data.provider = provider;
   }
 
   async flush() {

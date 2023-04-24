@@ -16,14 +16,15 @@ import {v4 as uuid} from "uuid";
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
 import {withAzureSsoSettings} from "./saveSsoSettingsAsDraftController.test.data";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
-import TestAzureSsoAuthenticationController from "./testAzureSsoAuthenticationController";
+import TestSsoAuthenticationController from "./testSsoAuthenticationController";
 import PassboltApiFetchError from "../../error/passboltApiFetchError";
 import SsoLoginUrlEntity from "../../model/entity/sso/ssoLoginUrlEntity";
+import SsoSettingsEntity from "../../model/entity/sso/ssoSettingsEntity";
 
 const mock_getSsoTokenFromThirdParty = jest.fn();
 const mock_closeHandler = jest.fn();
 
-jest.mock("../../service/sso/azurePopupHandlerService", () => ({
+jest.mock("../../service/sso/popupHandlerService", () => ({
   __esModule: true,
   default: jest.fn(() => ({
     getSsoTokenFromThirdParty: mock_getSsoTokenFromThirdParty,
@@ -36,11 +37,11 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe("TestAzureSsoAuthenticationController", () => {
+describe("TestSsoAuthenticationController", () => {
   const urlToHit = {url: "https://login.microsoftonline.us"};
   const account = {domain: urlToHit.url};
 
-  describe("TestAzureSsoAuthenticationController::exec", () => {
+  describe("TestSsoAuthenticationController::exec", () => {
     it("Should save the given settings as a draft.", async() => {
       expect.assertions(5);
 
@@ -60,11 +61,11 @@ describe("TestAzureSsoAuthenticationController", () => {
 
       mock_getSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginSuccessToken);
 
-      const controller = new TestAzureSsoAuthenticationController(null, null, defaultApiClientOptions(), account);
+      const controller = new TestSsoAuthenticationController(null, null, defaultApiClientOptions(), account);
       const resultingToken = await controller.exec(settingsId);
 
       expect(mock_getSsoTokenFromThirdParty).toHaveBeenCalledTimes(1);
-      expect(mock_getSsoTokenFromThirdParty).toHaveBeenCalledWith(new SsoLoginUrlEntity(urlToHit));
+      expect(mock_getSsoTokenFromThirdParty).toHaveBeenCalledWith(new SsoLoginUrlEntity(urlToHit, SsoSettingsEntity.AZURE));
       expect(mock_closeHandler).toHaveBeenCalledTimes(1);
       expect(resultingToken).toBe(ssoLoginSuccessToken);
     });
@@ -78,7 +79,7 @@ describe("TestAzureSsoAuthenticationController", () => {
 
     fetch.doMockOnceIf(new RegExp(`/sso/settings/${settingsId}.json`), () => mockApiResponseError(500, expectedError.message));
 
-    const controller = new TestAzureSsoAuthenticationController(null, null, defaultApiClientOptions(), account);
+    const controller = new TestSsoAuthenticationController(null, null, defaultApiClientOptions(), account);
     try {
       await controller.exec(settingsId);
     } catch (e) {
@@ -97,7 +98,7 @@ describe("TestAzureSsoAuthenticationController", () => {
     fetch.doMockOnceIf(new RegExp(`/sso/settings/${settingsId}.json`), async() => mockApiResponse(settings));
     fetch.doMockOnceIf(new RegExp(`/sso/${settings.provider}/login/dry-run.json`), () => mockApiResponseError(500, expectedError.message));
 
-    const controller = new TestAzureSsoAuthenticationController(null, null, defaultApiClientOptions(), account);
+    const controller = new TestSsoAuthenticationController(null, null, defaultApiClientOptions(), account);
     try {
       await controller.exec(settingsId);
     } catch (e) {

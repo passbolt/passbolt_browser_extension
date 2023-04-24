@@ -26,6 +26,7 @@ import SsoKitServerPartEntity from "../../model/entity/sso/ssoKitServerPartEntit
 import {PassphraseController} from "../passphrase/passphraseController";
 import GenerateSsoKitController from "./generateSsoKitController";
 import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
+import SsoSettingsEntity from "../../model/entity/sso/ssoSettingsEntity";
 
 jest.mock("../passphrase/passphraseController.js");
 PassphraseController.get.mockResolvedValue(pgpKeys.ada.passphrase);
@@ -40,7 +41,7 @@ describe("GenerateSsoKitController", () => {
     it("Should generate a brand new kit if none exists.", async() => {
       expect.assertions(5);
       const data = generateSsoKitServerData({});
-      const expectedProvider = "azure";
+      const expectedProvider = SsoSettingsEntity.AZURE;
       const expextedKitId = uuid();
       const expectedServerPartKit = new SsoKitServerPartEntity({data});
       const expectedClientPartKit = new SsoKitClientPartEntity(clientSsoKit());
@@ -78,16 +79,15 @@ describe("GenerateSsoKitController", () => {
 
     it("Should update the provider if a kit exists and the provider changed.", async() => {
       expect.assertions(1);
-      const expectedProvider = "google";
-      const storedSsoKit = new SsoKitClientPartEntity(clientSsoKit());
-      const expectedClientPartKit = new SsoKitClientPartEntity({...(storedSsoKit.toDbSerializableObject()), provider: expectedProvider});
+      const expectedProvider = SsoSettingsEntity.GOOGLE;
+      const storedSsoKit = new SsoKitClientPartEntity(clientSsoKit({provider: SsoSettingsEntity.AZURE}));
 
       SsoDataStorage.setMockedData(storedSsoKit.toDbSerializableObject());
 
       const controller = new GenerateSsoKitController(null, null, defaultApiClientOptions());
       await controller.exec(expectedProvider);
 
-      expect(SsoDataStorage.save).toHaveBeenCalledWith(expectedClientPartKit);
+      expect(SsoDataStorage.updateLocalKitProviderWith).toHaveBeenCalledWith(expectedProvider);
     });
   });
 });

@@ -46,7 +46,7 @@ class SsoDryRunModel {
       sso_settings_id: ssoSettingsId
     };
     const dryRunUrl = await this.ssoDryRunService.getUrl(providerId, dryRunDto);
-    return new SsoLoginUrlEntity(dryRunUrl);
+    return new SsoLoginUrlEntity(dryRunUrl, providerId);
   }
 }
 

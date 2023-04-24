@@ -16,6 +16,7 @@ import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = "SsoSettings";
 const AZURE = "azure";
+const GOOGLE = "google";
 
 const DATE_REGEXP = /^\d{4}-\d{2}-\d{2}$/;
 const DATETIME_REGEXP = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
@@ -60,9 +61,7 @@ class SsoSettingsEntity extends Entity {
         "provider": {
           "anyOf": [{
             "type": "string",
-            "enum": [
-              SsoSettingsEntity.AZURE,
-            ]
+            "enum": SsoSettingsEntity.AVAILABLE_PROVIDERS
           }, {
             "type": "null"
           }],
@@ -167,6 +166,25 @@ class SsoSettingsEntity extends Entity {
    */
   static get AZURE() {
     return AZURE;
+  }
+
+  /**
+   * SsoSettingsEntity.GOOGLE
+   * @returns {string}
+   */
+  static get GOOGLE() {
+    return GOOGLE;
+  }
+
+  /**
+   * SsoSettingsEntity.AVAILABLE_PROVIDERS
+   * @returns {Array<string>}
+   */
+  static get AVAILABLE_PROVIDERS() {
+    return [
+      SsoSettingsEntity.AZURE,
+      SsoSettingsEntity.GOOGLE,
+    ];
   }
 }
 

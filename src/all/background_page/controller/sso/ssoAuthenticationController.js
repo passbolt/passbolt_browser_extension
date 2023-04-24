@@ -13,15 +13,19 @@
  */
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import DecryptSsoPassphraseService from "../../service/crypto/decryptSsoPassphraseService";
-import AzurePopupHandlerService from "../../service/sso/azurePopupHandlerService";
+import PopupHandlerService from "../../service/sso/popupHandlerService";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
-import SsoAzureLoginModel from "../../model/sso/ssoAzureLoginModel";
 import AuthModel from "../../model/auth/authModel";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
+import SsoLoginModel from "../../model/sso/ssoLoginModel";
+import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
+import SsoSettingsChangedError from "../../error/ssoSettingsChangedError";
+import browser from "../../sdk/polyfill/browserPolyfill";
+import QualifySsoLoginErrorService from "../../service/sso/qualifySsoLoginErrorService";
 
-class AzureSsoAuthenticationController {
+class SsoAuthenticationController {
   /**
-   * AzureSsoAuthenticationController constructor
+   * SsoAuthenticationController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    */
@@ -30,9 +34,10 @@ class AzureSsoAuthenticationController {
     this.requestId = requestId;
     this.account = account;
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
-    this.ssoAzureLoginModel = new SsoAzureLoginModel(apiClientOptions);
-    this.azurePopupHandler = new AzurePopupHandlerService(account.domain, worker?.tab?.id, false);
+    this.ssoLoginModel = new SsoLoginModel(apiClientOptions);
+    this.popupHandler = new PopupHandlerService(account.domain, worker?.tab?.id, false);
     this.authModel = new AuthModel(apiClientOptions);
+    this.ssoSettingsModel = new SsoSettingsModel(apiClientOptions);
   }
 
   /**
@@ -41,9 +46,9 @@ class AzureSsoAuthenticationController {
    * @param {boolean} isInQuickAccessMode true if the controller has been called from the quickaccess
    * @return {Promise<void>}
    */
-  async _exec(isInQuickAccessMode = false) {
+  async _exec(providerId, isInQuickAccessMode = false) {
     try {
-      await this.exec(isInQuickAccessMode);
+      await this.exec(providerId, isInQuickAccessMode);
       this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
@@ -52,32 +57,40 @@ class AzureSsoAuthenticationController {
   }
 
   /**
-   * Authenticate the user using Azure as the SSO provider.
+   * Authenticate the user using a third-party SSO provider.
    *
    * @param {boolean} isInQuickAccessMode true if the controller has been called from the quickaccess
    * @return {Promise<void>}
    */
-  async exec(isInQuickAccessMode) {
+  async exec(providerId, isInQuickAccessMode) {
+    const clientPartSsoKit = await SsoDataStorage.get();
+    if (!clientPartSsoKit) {
+      throw new Error("The Single Sign-On cannot proceed as there is no SSO kit registered on this browser profile.");
+    }
+    const userId = this.account.userId;
+
+    let loginUrl;
     try {
-      const clientPartSsoKit = await SsoDataStorage.get();
-      if (!clientPartSsoKit) {
-        throw new Error("The Single Sign-On cannot proceed as there is no SSO kit registered on this browser profile.");
-      }
-      const userId = this.account.userId;
-      const loginUrl = await this.ssoAzureLoginModel.getLoginUrl(userId);
-      const thirdPartyCode = await this.azurePopupHandler.getSsoTokenFromThirdParty(loginUrl);
+      loginUrl = await this.ssoLoginModel.getLoginUrl(providerId, userId);
+    } catch (e) {
+      const qualifiedError = await this.qualifyGetLoginUrlError(e, isInQuickAccessMode);
+      throw qualifiedError;
+    }
+
+    try {
+      const thirdPartyCode = await this.popupHandler.getSsoTokenFromThirdParty(loginUrl);
       const ssoServerData = await this.ssoKitServerPartModel.getSsoKit(clientPartSsoKit.id, userId, thirdPartyCode);
 
       const serverKey = await crypto.subtle.importKey("jwk", ssoServerData.key, 'AES-GCM', true, ["encrypt", "decrypt"]);
 
       const passphrase = await DecryptSsoPassphraseService.decrypt(clientPartSsoKit.secret, clientPartSsoKit.nek, serverKey, clientPartSsoKit.iv1, clientPartSsoKit.iv2);
-      await this.azurePopupHandler.closeHandler();
+      await this.popupHandler.closeHandler();
       await this.authModel.login(passphrase, true);
       if (isInQuickAccessMode) {
         await this.ensureRedirectionInQuickaccessMode();
       }
     } catch (error) {
-      console.error("An error occured while handle Azure sign in:", error);
+      console.error("An error occured while attempting sign in with a third party provider:", error);
       this.handleSpecificErrors(error);
       throw error;
     }
@@ -120,6 +133,28 @@ class AzureSsoAuthenticationController {
       }
     }
   }
+
+  /**
+   * Qualifies an error happened during the fetching of the SSO provider login URL.
+   * An error happens if the SSO provider has changed since last login or if SSO is disabled
+   * @param {Error} e the error to qualify
+   * @param {boolean} isInQuickAccessMode
+   * @returns {Promise<Error>}
+   */
+  async qualifyGetLoginUrlError(e, isInQuickAccessMode) {
+    if (e.data.code !== 400) {
+      return e; //it's an unexpected state that shouldn't be handle here
+    }
+
+    if (isInQuickAccessMode) {
+      const url = `${this.account.domain}/auth/login?case=sso-login-error`;
+      await browser.tabs.create({url: url, active: true});
+      return new SsoSettingsChangedError("The quickaccess cannot proceed with the SSO login.");
+    }
+
+    const configuration = await this.ssoSettingsModel.getCurrent();
+    return QualifySsoLoginErrorService.qualifyErrorFromConfiguration(configuration);
+  }
 }
 
-export default AzureSsoAuthenticationController;
+export default SsoAuthenticationController;

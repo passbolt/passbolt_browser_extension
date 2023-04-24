@@ -30,8 +30,11 @@ import SaveSsoSettingsAsDraftController from "../controller/sso/saveSsoSettingsA
 import ActivateSsoSettingsController from "../controller/sso/activateSsoSettingsController";
 import DeleteSsoSettingsController from "../controller/sso/deleteSsoSettingsController";
 import GenerateSsoKitController from "../controller/auth/generateSsoKitController";
+import AuthenticationEventController from "../controller/auth/authenticationEventController";
 
 const listen = function(worker, account) {
+  const authenticationEventController = new AuthenticationEventController(worker);
+  authenticationEventController.startListen();
   /*
    * Whenever the (React) app changes his route
    * @listens passbolt.app.route-changed

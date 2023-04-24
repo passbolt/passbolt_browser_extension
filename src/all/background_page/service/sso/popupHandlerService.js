@@ -16,12 +16,12 @@ import UserAbortsOperationError from "../../error/userAbortsOperationError";
 import SsoLoginUrlEntity from "../../model/entity/sso/ssoLoginUrlEntity";
 import {assertUuid} from "../../utils/assertions";
 
-const AZURE_POPUP_WINDOW_HEIGHT = 600;
-const AZURE_POPUP_WINDOW_WIDTH = 380;
+const POPUP_WINDOW_HEIGHT = 600;
+const POPUP_WINDOW_WIDTH = 380;
 const DRY_RUN_SSO_LOGIN_SUCCESS_ENDPOINT = "/sso/login/dry-run/success";
 const SSO_LOGIN_SUCCESS_ENDPOINT = "/sso/login/success";
 
-class AzurePopupHandlerService {
+class PopupHandlerService {
   /**
    * Constructor
    *
@@ -135,8 +135,8 @@ class AzurePopupHandlerService {
    */
   async openPopup(url) {
     const type = "popup";
-    const width = AZURE_POPUP_WINDOW_WIDTH;
-    const height = AZURE_POPUP_WINDOW_HEIGHT;
+    const width = POPUP_WINDOW_WIDTH;
+    const height = POPUP_WINDOW_HEIGHT;
 
     const windowCreateData = {url, type, width, height};
     return await browser.windows.create(windowCreateData);
@@ -162,4 +162,4 @@ class AzurePopupHandlerService {
   }
 }
 
-export default AzurePopupHandlerService;
+export default PopupHandlerService;

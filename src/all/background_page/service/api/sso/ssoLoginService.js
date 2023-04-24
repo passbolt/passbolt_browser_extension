@@ -9,13 +9,13 @@
  * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         3.9.0
+ * @since         4.0.0
  */
-import AbstractService from "../abstract/abstractService";
+import ApiClient from "../apiClient/apiClient";
 
-const SSO_USER_DATA_SERVICE_RESOURCE_NAME = '/sso/azure/login';
+const SSO_USER_DATA_SERVICE_RESOURCE_NAME = '/sso/${providerId}/login';
 
-class SsoAzureLoginService extends AbstractService {
+class SsoLoginService {
   /**
    * Constructor
    *
@@ -23,7 +23,7 @@ class SsoAzureLoginService extends AbstractService {
    * @public
    */
   constructor(apiClientOptions) {
-    super(apiClientOptions, SsoAzureLoginService.RESOURCE_NAME);
+    this.apiClientOptions = apiClientOptions;
   }
 
   /**
@@ -38,13 +38,30 @@ class SsoAzureLoginService extends AbstractService {
 
   /**
    * Get the login URL for the given user from the API.
+   * @param {string} providerId the provider identifier
    * @param {GetLoginUrlDto} getLoginUrlDto
    * @returns {Promise<SsoLoginUrlDto>}
    */
-  async getLoginUrl(getLoginUrlDto) {
-    const response = await this.apiClient.create(getLoginUrlDto);
+  async getLoginUrl(providerId, getLoginUrlDto) {
+    const response = await this.getApiClient(providerId).create(getLoginUrlDto);
     return response.body;
+  }
+
+  /**
+   * Instanciate and return a new ApiClient with a ressource URL built from the provider id.
+   * @param {string} providerId the provider identifier
+   * @returns {ApiClient}
+   * @private
+   */
+  getApiClient(providerId) {
+    if (typeof(providerId) !== "string") {
+      throw new Error("The provider identifier should be a string");
+    }
+
+    const resourceName = SsoLoginService.RESOURCE_NAME.replace("${providerId}", providerId);
+    this.apiClientOptions.setResourceName(resourceName);
+    return new ApiClient(this.apiClientOptions);
   }
 }
 
-export default SsoAzureLoginService;
+export default SsoLoginService;

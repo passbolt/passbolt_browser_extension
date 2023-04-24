@@ -11,14 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import AzurePopupHandlerService from "../../service/sso/azurePopupHandlerService";
+import PopupHandlerService from "../../service/sso/popupHandlerService";
 import SsoDryRunModel from "../../model/sso/ssoDryRunModel";
 import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
 import {assertUuid} from "../../utils/assertions";
 
-class TestAzureSsoAuthenticationController {
+class TestSsoAuthenticationController {
   /**
-   * TestAzureSsoAuthenticationController constructor
+   * TestSsoAuthenticationController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    */
@@ -27,7 +27,7 @@ class TestAzureSsoAuthenticationController {
     this.requestId = requestId;
     this.ssoSettingsModel = new SsoSettingsModel(apiClientOptions);
     this.ssoDryRunModel = new SsoDryRunModel(apiClientOptions);
-    this.azurePopupHandler = new AzurePopupHandlerService(account.domain, worker?.tab?.id, true);
+    this.popupHandler = new PopupHandlerService(account.domain, worker?.tab?.id, true);
   }
 
   /**
@@ -59,14 +59,14 @@ class TestAzureSsoAuthenticationController {
     try {
       const ssoSettings = await this.ssoSettingsModel.getById(draftSsoSettingsId);
       const thirdPartySignInUrl = await this.ssoDryRunModel.getUrl(ssoSettings.provider, ssoSettings.id);
-      const ssoToken = await this.azurePopupHandler.getSsoTokenFromThirdParty(thirdPartySignInUrl);
-      await this.azurePopupHandler.closeHandler();
+      const ssoToken = await this.popupHandler.getSsoTokenFromThirdParty(thirdPartySignInUrl);
+      await this.popupHandler.closeHandler();
       return ssoToken;
     } catch (error) {
-      console.log("An error occured while handle Azure sign in:", error);
+      console.log("An error occured while attempting sign in with a third party provider:", error);
       throw error;
     }
   }
 }
 
-export default TestAzureSsoAuthenticationController;
+export default TestSsoAuthenticationController;

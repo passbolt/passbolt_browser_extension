@@ -23,32 +23,34 @@ describe("Sso Login URL Entity", () => {
 
   it("constructor works if a valid DTO is provided", () => {
     const availableUrl = [
-      'https://login.microsoftonline.com',
-      'https://login.microsoftonline.us',
-      'https://login.partner.microsoftonline.cn',
+      {providerId: "azure", url: 'https://login.microsoftonline.com'},
+      {providerId: "azure", url: 'https://login.microsoftonline.us'},
+      {providerId: "azure", url: 'https://login.partner.microsoftonline.cn'},
+      {providerId: "google", url: 'https://accounts.google.com'}
     ];
 
     expect.assertions(availableUrl.length);
 
     for (let i = 0; i < availableUrl.length; i++) {
       const dto = {
-        url: availableUrl[i]
+        url: availableUrl[i].url
       };
-      const entity = new SsoLoginUrlEntity(dto);
+      const entity = new SsoLoginUrlEntity(dto, availableUrl[i].providerId);
       expect(entity.toDto()).toEqual(dto);
     }
   });
 
   each([
-    {scenario: 'Global microsoft online url', url: 'https://login.microsoftonline.com'},
-    {scenario: 'US microsoft online url', url: 'https://login.microsoftonline.us'},
-    {scenario: 'China microsoft online url', url: 'https://login.partner.microsoftonline.cn'}
+    {scenario: 'Global microsoft online url', url: 'https://login.microsoftonline.com', providerId: "azure"},
+    {scenario: 'US microsoft online url', url: 'https://login.microsoftonline.us', providerId: "azure"},
+    {scenario: 'China microsoft online url', url: 'https://login.partner.microsoftonline.cn', providerId: "azure"},
+    {scenario: 'Google url', url: 'https://accounts.google.com', providerId: "google"}
   ]).describe("Should accept supported url", test => {
     it(`Should accept supported url: ${test.scenario}`, async() => {
       const dto = {
         url: test.url
       };
-      const entity = new SsoLoginUrlEntity(dto);
+      const entity = new SsoLoginUrlEntity(dto, test.providerId);
       expect(entity.toDto()).toEqual(dto);
     });
   });
@@ -64,14 +66,17 @@ describe("Sso Login URL Entity", () => {
     {scenario: 'Regex wild mark attack', url: 'https://loginxmicrosoftonline.com'},
     {scenario: 'Query parameter attack', url: 'https://attacker.com?domain=https://login.microsoftonline.com'},
     {scenario: 'Hash attack', url: 'https://attacker.com#https://login.microsoftonline.com'},
+    {scenario: 'Mixing provider URL attack', url: 'https://login.microsoftonline.com', providerId: "google"},
   ]).describe("Should not accept unsupported or attacker url", test => {
     it(`Should not accept unsupported or attacker url: ${test.scenario}`, async() => {
       const dto = {
         url: test.url
       };
 
+      const providerId = test.providerId || "azure";
+
       try {
-        new SsoLoginUrlEntity(dto);
+        new SsoLoginUrlEntity(dto, providerId);
         expect(true).toBeFalsy();
       } catch (e) {
         expect(e).toBeInstanceOf(EntityValidationError);

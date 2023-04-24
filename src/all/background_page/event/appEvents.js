@@ -24,7 +24,7 @@ import HasUserPostponedUserSettingInvitationController from "../controller/accou
 import PostponeUserSettingInvitationController from "../controller/accountRecovery/postponeUserSettingInvitationController";
 import FileService from "../service/file/fileService";
 import WorkerService from "../service/worker/workerService";
-import TestAzureSsoAuthenticationController from "../controller/sso/testAzureSsoAuthenticationController";
+import TestSsoAuthenticationController from "../controller/sso/testSsoAuthenticationController";
 import GetCurrentSsoSettingsController from "../controller/sso/getCurrentSsoSettingsController";
 import SaveSsoSettingsAsDraftController from "../controller/sso/saveSsoSettingsAsDraftController";
 import ActivateSsoSettingsController from "../controller/sso/activateSsoSettingsController";
@@ -140,9 +140,9 @@ const listen = function(worker, account) {
     await controller._exec(draftSsoSettings);
   });
 
-  worker.port.on('passbolt.sso.test.azure', async(requestId, draftId) => {
+  worker.port.on('passbolt.sso.dry-run', async(requestId, draftId) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new TestAzureSsoAuthenticationController(worker, requestId, apiClientOptions, account);
+    const controller = new TestSsoAuthenticationController(worker, requestId, apiClientOptions, account);
     await controller._exec(draftId);
   });
 

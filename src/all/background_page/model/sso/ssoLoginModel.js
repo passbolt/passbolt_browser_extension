@@ -12,13 +12,13 @@
  * @since         3.9.0
  */
 import {assertUuid} from "../../utils/assertions";
-import SsoAzureLoginService from "../../service/api/sso/ssoAzureLoginService";
 import SsoLoginUrlEntity from "../entity/sso/ssoLoginUrlEntity";
+import SsoLoginService from "../../service/api/sso/ssoLoginService";
 
 /**
  * Model related to the SSO Azure Login URL
  */
-class SsoAzureLoginModel {
+class SsoLoginModel {
   /**
    * Constructor
    *
@@ -26,21 +26,21 @@ class SsoAzureLoginModel {
    * @public
    */
   constructor(apiClientOptions) {
-    this.ssoAzureLoginService = new SsoAzureLoginService(apiClientOptions);
+    this.ssoLoginService = new SsoLoginService(apiClientOptions);
   }
 
   /**
    * Get the Azure login URL given a user id
-   *
+   * @param {string} providerId the provider identifier
    * @param {uuid} userid
    * @return {Promise<URL>}
    */
-  async getLoginUrl(userId) {
+  async getLoginUrl(providerId, userId) {
     assertUuid(userId, "The user id should be a valid uuid.");
 
-    const redirectUrlDto = await this.ssoAzureLoginService.getLoginUrl({user_id: userId});
-    return new SsoLoginUrlEntity(redirectUrlDto);
+    const redirectUrlDto = await this.ssoLoginService.getLoginUrl(providerId, {user_id: userId});
+    return new SsoLoginUrlEntity(redirectUrlDto, providerId);
   }
 }
 
-export default SsoAzureLoginModel;
+export default SsoLoginModel;

@@ -12,7 +12,7 @@
  * @since         3.9.0
  */
 import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";
-import {assertUuid} from "../../utils/assertions";
+import {assertSsoProvider, assertUuid} from "../../utils/assertions";
 
 const DB_VERSION = 1;
 const DB_NAME = "sso_kit_db";
@@ -54,6 +54,19 @@ class SsoDataStorage {
 
     const dbHandler = await this.getDbHandler();
     await this.updateSsoDataWithId(dbHandler, ssoKitId);
+    dbHandler.close();
+  }
+
+  /**
+   * Updates the local SSO kit with the given id.
+   * @param {string} provider
+   * @returns {Promise<void>}
+   */
+  static async updateLocalKitProviderWith(provider) {
+    assertSsoProvider(provider, "A valid SSO provider id is required");
+
+    const dbHandler = await this.getDbHandler();
+    await this.updateSsoDataWithProvider(dbHandler, provider);
     dbHandler.close();
   }
 
@@ -223,6 +236,40 @@ class SsoDataStorage {
 
       putRequest.onsuccess = () => {
         console.log("The SSO Kit identifier has been updated successfully");
+      };
+
+      transaction.oncomplete = () => {
+        //Apparently, according to an MDN documentation, the modification is not 100% guaranteed to be flushed on disk for Firefox
+        resolve();
+      };
+
+      transaction.onerror = event => {
+        console.error(`The IndexedDB transaction couldn't be opened to updated the SSO Kit`);
+        console.error(event);
+        reject();
+      };
+    });
+  }
+
+  /**
+   * Updates the id of the SSO kit.
+   *
+   * @param {IDBDatabase} dbHandler an opened IndexDB handler
+   * @param {string} provider the provider to set
+   * @returns {Promise<void>}
+   * @private
+   */
+  static async updateSsoDataWithProvider(dbHandler, provider) {
+    const ssoData = await this.getSsoData(dbHandler);
+    return new Promise((resolve, reject) => {
+      const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readwrite');
+      const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);
+
+      const newSsoKit = Object.assign({}, ssoData.toDbSerializableObject(), {provider});
+      const putRequest = objectStore.put({pk_id: 1, sso_kit: newSsoKit});
+
+      putRequest.onsuccess = () => {
+        console.log("The SSO provider has been updated successfully");
       };
 
       transaction.oncomplete = () => {

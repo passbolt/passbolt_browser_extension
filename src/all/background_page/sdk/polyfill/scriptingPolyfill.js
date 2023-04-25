@@ -111,6 +111,8 @@ class Scripting {
 }
 
 // If the API is not available, we insert this polyfill otherwise we keep the native API.
-if (!browser.scripting) {
-  browser.scripting = new Scripting();
+if (window.chrome?.desktop) {
+  window.chrome.scripting = new SessionStorage();
+} else if (!browser.storage.session) {
+  browser.storage.scripting = new SessionStorage();
 }

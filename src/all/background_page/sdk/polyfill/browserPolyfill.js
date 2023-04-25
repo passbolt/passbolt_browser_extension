@@ -16,8 +16,12 @@
  * This code provides polyfills for the need of Passbolt.
  */
 import browser from "webextension-polyfill";
+
+
 import "./scriptingPolyfill"; //mv3 scripting API for mv2
 import "./sessionStoragePolyfill"; //mv3 session storage API polyfill
 import "./actionPolyfill"; //mv3 action API polyfill for mv2
 
-export default browser;
+const polyfill = Object.keys(browser).length > 0 ? browser : window.chrome;
+
+export default polyfill;

@@ -36,7 +36,14 @@ class ApiClient {
       if (rawBaseUrl.endsWith('/')) {
         rawBaseUrl = rawBaseUrl.slice(0, -1);
       }
-      this.baseUrl = `${rawBaseUrl}/${this.options.getResourceName()}`;
+      let resourceName = this.options.getResourceName();
+      if (resourceName.startsWith('/')) {
+        resourceName = resourceName.slice(1);
+      }
+      if (resourceName.endsWith('/')) {
+        resourceName = resourceName.slice(0, -1);
+      }
+      this.baseUrl = `${rawBaseUrl}/${resourceName}`;
       this.baseUrl = new URL(this.baseUrl);
     } catch (typeError) {
       throw new TypeError('ApiClient constructor error: b.');

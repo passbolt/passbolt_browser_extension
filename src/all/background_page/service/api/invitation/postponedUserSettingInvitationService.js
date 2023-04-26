@@ -55,18 +55,6 @@ class PostponedUserSettingInvitationService {
     isInvitationAccountRecoveryPostponed = false;
     isInvitationMFAPolicyPostponed = false;
   }
-
-  /**
-   * Initialize the service by setting the options to the default values
-   * and listens to `passbolt.auth.after-logout`
-   */
-  static init() {
-    this.reset();
-
-    self.addEventListener("passbolt.auth.after-logout", () => {
-      this.reset();
-    });
-  }
 }
 
 export default PostponedUserSettingInvitationService;

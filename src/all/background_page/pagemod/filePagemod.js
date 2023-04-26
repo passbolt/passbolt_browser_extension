@@ -1,36 +1,29 @@
 /**
- * File iframe pagemod.
- * This pagemod drives the iframe used when the user want to handle files
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
  *
- * @copyright (c) 2017-present Passbolt SARL
- * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         4.0.0
  */
-import {Worker} from "../model/worker";
-import PageMod from "../sdk/page-mod";
+import Pagemod from "./pagemod";
 
-const File = function() {};
-File._pageMod = undefined;
-
-File.init = function() {
-  if (typeof File._pageMod !== 'undefined') {
-    File._pageMod.destroy();
-    File._pageMod = undefined;
+/**
+ * This is class is only useful for firefox to allowed download file without the permission
+ */
+class FileIframe extends Pagemod {
+  /**
+   * @inheritDoc
+   * @returns {string}
+   */
+  get appName() {
+    return "FileIframe";
   }
+}
 
-  File._pageMod = new PageMod({
-    name: 'File',
-    include: 'about:blank?passbolt=passbolt-iframe-file',
-
-    contentScriptFile: [
-      /*
-       * Warning: Iframe script and styles need to be modified in
-       * chrome/data/passbolt-iframe-file.html
-       */
-    ],
-    contentScriptWhen: 'ready',
-    onAttach: function(worker) {
-      Worker.add('FileIframe', worker);
-    }
-  });
-};
-export default File;
+export default new FileIframe();

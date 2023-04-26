@@ -247,19 +247,6 @@ class ResourceLocalStorage {
       throw error;
     }
   }
-
-  /**
-   * Init resource local storage
-   */
-  static init() {
-    // Flush the local storage when this library is loaded
-    this.flush();
-
-    // Flush the local storage when the passbolt user session is terminated
-    self.addEventListener("passbolt.auth.after-logout", () => {
-      this.flush();
-    });
-  }
 }
 
 export default ResourceLocalStorage;

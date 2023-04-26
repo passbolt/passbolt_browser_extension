@@ -1,47 +1,87 @@
 /**
- * WebIntegration pagemod.
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
  *
- * This pagemod allow inserting classes to help any page
- * to know about the status of the extension, in a modernizr fashion
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
  *
- * @copyright (c) 2017 Passbolt SARL
- * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ * @copyright     Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         4.0.0
  */
-import {Worker} from "../model/worker";
-import PageMod from "../sdk/page-mod";
+import Pagemod from "./pagemod";
+import User from "../model/user";
 import {ConfigEvents} from "../event/configEvents";
 import {WebIntegrationEvents} from "../event/webIntegrationEvents";
 import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {PortEvents} from "../event/portEvents";
-import ParseWebIntegrationUrlService from "../service/webIntegration/parseWebIntegrationUrlService";
+import ParseWebIntegrationUrlService
+  from "../service/webIntegration/parseWebIntegrationUrlService";
 
-
-const WebIntegration = function() {};
-WebIntegration._pageMod = undefined;
-
-WebIntegration.init = function() {
-  if (typeof WebIntegration._pageMod !== 'undefined') {
-    WebIntegration._pageMod.destroy();
-    WebIntegration._pageMod = undefined;
+class WebIntegration extends Pagemod {
+  /**
+   * @inheritDoc
+   * @returns {string}
+   */
+  get appName() {
+    return "WebIntegration";
   }
 
-  WebIntegration._pageMod = new PageMod({
-    name: 'WebIntegration',
-    include: ParseWebIntegrationUrlService.regex,
-    contentScriptWhen: 'ready',
-    contentStyleFile: [],
-    contentScriptFile: [
+  /**
+   * @inheritDoc
+   */
+  get contentStyleFiles() {
+    return [];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  get contentScriptFiles() {
+    return [
       'contentScripts/js/dist/browser-integration/vendors.js',
       'contentScripts/js/dist/browser-integration/browser-integration.js'
-    ],
-    attachTo: {existing: true, reload: false},
-    onAttach: function(worker) {
-      Worker.add('WebIntegration', worker);
-      ConfigEvents.listen(worker);
-      WebIntegrationEvents.listen(worker);
-      OrganizationSettingsEvents.listen(worker);
-      PortEvents.listen(worker);
+    ];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  get events() {
+    return [ConfigEvents, WebIntegrationEvents, OrganizationSettingsEvents, PortEvents];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  async canBeAttachedTo(frameDetails) {
+    return this.assertTopFrameAttachConstraint(frameDetails)
+      && this.assertUrlAttachConstraint(frameDetails);
+  }
+
+  /**
+   * Assert that the attached frame is a top frame.
+   * @param {Object} frameDetails
+   * @returns {boolean}
+   */
+  assertTopFrameAttachConstraint(frameDetails) {
+    return frameDetails.frameId === Pagemod.TOP_FRAME_ID;
+  }
+
+  /**
+   * Assert that the attached frame is a top frame.
+   * @param {Object} frameDetails
+   * @returns {boolean}
+   */
+  assertUrlAttachConstraint(frameDetails) {
+    const user = User.getInstance();
+    if (user.isValid()) {
+      return ParseWebIntegrationUrlService.test(frameDetails.url);
     }
-  });
-};
-export default WebIntegration;
+    return false;
+  }
+}
+
+export default new WebIntegration();

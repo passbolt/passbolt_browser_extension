@@ -12,9 +12,8 @@
  * @since         4.0.0
  */
 import browser from "../../sdk/polyfill/browserPolyfill";
-import PortManager from "../../../../chrome-mv3/sdk/portManager";
-import {Worker} from "../../model/worker";
-import WorkersSessionStorage from "../../../../chrome-mv3/service/sessionStorage/workersSessionStorage";
+import PortManager from "../../sdk/port/portManager";
+import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import BrowserTabService from "../ui/browserTab.service";
 
 const WORKER_EXIST_ALARM = "WorkerExistFlush";
@@ -26,15 +25,9 @@ class WorkerService {
    *
    * @param {string} applicationName The application name
    * @param {number} tabId The tab id
-   * @param {?boolean} log error optional, default true
    * @returns {Promise<Worker>} The worker
    */
-  static async get(applicationName, tabId, log = true) {
-    // @deprecated The support of MV2 will be down soon
-    if (this.isManifestV2) {
-      return Worker.get(applicationName, tabId, log);
-    }
-    // MV3 process
+  static async get(applicationName, tabId) {
     const workers = await WorkersSessionStorage.getWorkersByNameAndTabId(applicationName, tabId);
     if (workers.length === 0) {
       throw new Error(`Could not find worker ${applicationName} for tab ${tabId}.`);
@@ -47,15 +40,6 @@ class WorkerService {
     const port = await PortManager.getPortById(worker.id);
     const tab = port._port.sender.tab;
     return {port, tab};
-  }
-
-  /**
-   * Is manifest v2
-   * @returns {boolean}
-   * @private
-   */
-  static get isManifestV2() {
-    return browser.runtime.getManifest().manifest_version === 2;
   }
 
   /**
@@ -72,7 +56,7 @@ class WorkerService {
         if (alarm.name === WORKER_EXIST_ALARM) {
           try {
             this.clearAlarm(handleWorkerExist);
-            await this.get(applicationName, tabId, false);
+            await this.get(applicationName, tabId);
             resolve();
           } catch (error) {
             if (alarm.scheduledTime >= timeoutMs) {

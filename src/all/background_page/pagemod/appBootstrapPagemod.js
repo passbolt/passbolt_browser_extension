@@ -1,94 +1,104 @@
 /**
- * Passbolt App pagemod.
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
  *
- * This pagemod drives the main addon app
- * It is inserted in all the pages of a domain that is trusted.
- * Such trust is defined during the first step of the setup process.
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
  *
- * @copyright (c) 2019 Passbolt SA
- * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ * @copyright     Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         4.0.0
  */
-import GpgAuth from "../model/gpgauth";
+import Pagemod from "./pagemod";
 import User from "../model/user";
-import {Worker} from "../model/worker";
-import PageMod from "../sdk/page-mod";
-import ParseAppUrlService from "../service/app/parseAppUrlService";
+import GpgAuth from "../model/gpgauth";
 import {AppBootstrapEvents} from "../event/appBootstrapEvents";
+import ParseAppUrlService from "../service/app/parseAppUrlService";
 import {PortEvents} from "../event/portEvents";
 
-const AppBootstrapPagemod = function() {};
-AppBootstrapPagemod._pageMod = null;
-
-AppBootstrapPagemod.exists = function() {
-  return AppBootstrapPagemod._pageMod !== null;
-};
-
-AppBootstrapPagemod.destroy = function() {
-  if (AppBootstrapPagemod.exists()) {
-    AppBootstrapPagemod._pageMod.destroy();
-    AppBootstrapPagemod._pageMod = null;
-  }
-};
-
-AppBootstrapPagemod.initPageMod = function() {
-  /*
-   * Attach on passbolt application pages.
-   * By instance if your application domain is : https://demo.passbolt.com
-   * The pagemod will be attached to the following pages :
-   * ✓ https://demo.passbolt.com
-   * ✓ https://demo.passbolt.com/
-   * ✓ https://demo.passbolt.com/#user
-   * ✓ https://demo.passbolt.com/#workspace
-   * ✗ https://demoxpassbolt.com
-   * ✗ https://demo.passbolt.com.attacker.com
-   * ✗ https://demo.passbolt.com/auth/login
+class AppBootstrap extends Pagemod {
+  /**
+   * @inheritDoc
+   * @returns {string}
    */
+  get appName() {
+    return "AppBootstrap";
+  }
 
-  return new PageMod({
-    name: "AppBootstrap",
-    include: new RegExp(ParseAppUrlService.getRegex()),
-    contentScriptWhen: "ready",
-    contentStyleFile: [
-      /*
-       * @deprecated when support for v2 is dropped
-       * used to control iframe styling without inline style in v3
-       */
-      "webAccessibleResources/css/themes/default/ext_external.min.css"
-    ],
-    contentScriptFile: [
-      "contentScripts/js/dist/vendors.js",
-      "contentScripts/js/dist/app.js",
-    ],
-    attachTo: {existing: true, reload: true},
-    onAttach: async function(worker) {
-      const auth = new GpgAuth();
-      if (!(await auth.isAuthenticated()) || (await auth.isMfaRequired())) {
-        console.error("Can not attach application if user is not logged in.");
-        return;
-      }
+  /**
+   * @inheritDoc
+   */
+  get contentStyleFiles() {
+    return ['webAccessibleResources/css/themes/default/ext_external.min.css'];
+  }
 
-      AppBootstrapEvents.listen(worker);
-      PortEvents.listen(worker);
+  /**
+   * @inheritDoc
+   */
+  get contentScriptFiles() {
+    return [
+      'contentScripts/js/dist/vendors.js',
+      'contentScripts/js/dist/app.js'
+    ];
+  }
 
-      Worker.add("AppBootstrap", worker);
-    },
-  });
-};
+  /**
+   * @inheritDoc
+   */
+  get events() {
+    return [AppBootstrapEvents, PortEvents];
+  }
 
-AppBootstrapPagemod.init = function() {
-  return new Promise(resolve => {
-    /*
-     * According to the user status :
-     * * the pagemod should be initialized if the user is valid and logged in;
-     * * the pagemod should be destroyed otherwise;
-     */
+  /**
+   * @inheritDoc
+   */
+  get mustReloadOnExtensionUpdate() {
+    return true;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  async canBeAttachedTo(frameDetails) {
+    return this.assertTopFrameAttachConstraint(frameDetails)
+      && this.assertUrlAttachConstraint(frameDetails) &&
+      await this.assertUserAuthenticated();
+  }
+
+  /**
+   * Assert that the attached frame is a top frame.
+   * @param {Object} frameDetails
+   * @returns {boolean}
+   */
+  assertTopFrameAttachConstraint(frameDetails) {
+    return frameDetails.frameId === Pagemod.TOP_FRAME_ID;
+  }
+
+  /**
+   * Assert that the attached frame is a top frame.
+   * @param {Object} frameDetails
+   * @returns {boolean}
+   */
+  assertUrlAttachConstraint(frameDetails) {
     const user = User.getInstance();
     if (user.isValid()) {
-      AppBootstrapPagemod.destroy();
-      AppBootstrapPagemod._pageMod = AppBootstrapPagemod.initPageMod();
-      resolve();
+      return ParseAppUrlService.test(frameDetails.url);
     }
-  });
-};
+    return false;
+  }
 
-export default AppBootstrapPagemod;
+  /**
+   * Is the constraint validated
+   * @returns {Promise<boolean>}
+   */
+  assertUserAuthenticated() {
+    const auth = new GpgAuth();
+    const onSuccess = value => value;
+    const onReject = () => false;
+    return auth.isAuthenticated().then(onSuccess, onReject);
+  }
+}
+
+export default new AppBootstrap();

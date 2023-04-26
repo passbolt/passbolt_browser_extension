@@ -62,9 +62,11 @@ describe("Port", () => {
 
       expect(port.emit).toHaveBeenCalledWith(message, requestId, {data: "data"});
       expect(port.lock.acquire).toHaveBeenCalled();
-      // Force to wait the promise has been resolve to be sure the post message has been called
-      await port.connectIfDisconnected();
+      // Force to wait the promise has been resolve
+      await Promise.resolve();
       expect(port.lock.release).toHaveBeenCalled();
+      // Force to wait the promise has been resolve to be sure the post message has been called
+      await Promise.resolve();
       expect(port._port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, {data: "data"}]));
 
       const dataReceived = {data: "dataReceived"};
@@ -91,9 +93,11 @@ describe("Port", () => {
 
       expect(port.emit).toHaveBeenCalledWith(message, requestId, {data: "data"});
       expect(port.lock.acquire).toHaveBeenCalled();
-      // Force to wait the promise has been resolve to be sure the post message has been called
-      await port.connectIfDisconnected();
+      // Force to wait the promise has been resolve
+      await Promise.resolve();
       expect(port.lock.release).toHaveBeenCalled();
+      // Force to wait the promise has been resolve to be sure the post message has been called
+      await Promise.resolve();
       expect(port._port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, {data: "data"}]));
 
       const dataReceived = {data: "dataReceived"};
@@ -104,6 +108,46 @@ describe("Port", () => {
       } catch (error) {
         expect(error).toStrictEqual(dataReceived);
       }
+    });
+
+    it("Should post a message on a disconnected port and wait to connect again before sending a message", async() => {
+      expect.assertions(7);
+
+      const portname = uuidv4();
+      const port = new Port(portname);
+
+      jest.spyOn(port, "connect");
+
+      port.connect();
+      port._onMessage(JSON.stringify(["passbolt.port.ready"]));
+
+      jest.spyOn(port, "emit");
+      jest.spyOn(port.lock, "acquire");
+      jest.spyOn(port.lock, "release");
+
+      const message = "request_message";
+      port._connected = false;
+      const promise = port.request(message, {data: "data"});
+      const requestId = Object.keys(port._listeners)[0];
+
+      expect(port.emit).toHaveBeenCalledWith(message, requestId, {data: "data"});
+      expect(port.lock.acquire).toHaveBeenCalled();
+      // Wait connect listener has been added
+      await Promise.resolve();
+      // Connect the port again
+      port._onMessage(JSON.stringify(["passbolt.port.ready"]));
+      expect(port.connect).toHaveBeenCalledTimes(2);
+      // Wait connect has been done
+      await Promise.resolve();
+      expect(port.lock.release).toHaveBeenCalled();
+      // Wait release has been done
+      await Promise.resolve();
+      expect(port._port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, {data: "data"}]));
+
+      const dataReceived = {data: "dataReceived"};
+      port._onMessage(JSON.stringify([requestId, "SUCCESS", dataReceived]));
+      expect(Object.keys(port._listeners).length).toBe(0);
+      expect(await promise).toStrictEqual(dataReceived);
     });
   });
 });

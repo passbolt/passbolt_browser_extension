@@ -1,88 +1,59 @@
 /**
- * QuickAccess pagemod.
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
  *
- * This page mod drives the quick access default popup.
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
  *
- * @copyright (c) 2019 Passbolt SA
- * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ * @copyright     Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         4.0.0
  */
-import {Worker as WorkerModel} from "../model/worker";
-import {App as app} from "../app";
-import Worker from "../sdk/worker";
-import GetLegacyAccountService from "../service/account/getLegacyAccountService";
+import Pagemod from "./pagemod";
+import {AuthEvents} from "../event/authEvents";
+import {ConfigEvents} from "../event/configEvents";
+import {KeyringEvents} from "../event/keyringEvents";
+import {QuickAccessEvents} from "../event/quickAccessEvents";
+import {GroupEvents} from "../event/groupEvents";
+import {TagEvents} from "../event/tagEvents";
+import {ResourceEvents} from "../event/resourceEvents";
+import {SecretEvents} from "../event/secretEvents";
+import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
+import {TabEvents} from "../event/tabEvents";
+import {LocaleEvents} from "../event/localeEvents";
+import {PasswordGeneratorEvents} from "../event/passwordGeneratorEvents";
+import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
 
-/*
- * This page mod drives the quick access default popup
- */
-class QuickAccess {
-  constructor() {
-    // The current active worker.
-    this._worker = null;
-    this.handleOnConnect = this.handleOnConnect.bind(this);
+class QuickAccess extends Pagemod {
+  /**
+   * @inheritDoc
+   * @returns {string}
+   */
+  get appName() {
+    return "QuickAccess";
   }
 
   /**
-   * Initialize the Quickaccess by listening to the onConnect event.
+   * @inheritDoc
    */
-  init() {
-    chrome.runtime.onConnect.addListener(this.handleOnConnect);
-  }
-
-  /**
-   * Handle port connection by listening to application events and register a new worker.
-   * @param {Port} port
-   */
-  async handleOnConnect(port) {
-    const isQuickAccessPort = port.name === "quickaccess";
-    if (!isQuickAccessPort) {
-      return;
-    }
-
-    // QuickAccess should connect a port only from the toolbar action panel or as a detached window as a top frame.
-    const isToolbarPanel = typeof(port.sender?.tab) === "undefined";
-    const isTopLevelIframe = port.sender?.frameId === 0;
-    if (!isToolbarPanel && !isTopLevelIframe) {
-      console.error('quickAccessPagemod::attach can not attach quick access to untrusted frame.');
-      return;
-    }
-
-    this._worker = new Worker(port, port.sender.tab);
-
-    /*
-     * Retrieve the account associated with this worker.
-     * @todo This method comes to replace the User.getInstance().get()
-     */
-    let account;
-    try {
-      account = await GetLegacyAccountService.get();
-    } catch (error) {
-      /*
-       * Ensure the application does not crash completely if the legacy account cannot be retrieved.
-       */
-      console.error('quickAccessPagemod::attach legacy account cannot be retrieved, please contact your administrator.');
-      console.error(error);
-    }
-
-    app.events.auth.listen(this._worker, account);
-    app.events.config.listen(this._worker);
-    app.events.keyring.listen(this._worker);
-    app.events.quickAccess.listen(this._worker);
-    app.events.group.listen(this._worker);
-    app.events.tag.listen(this._worker);
-    app.events.resource.listen(this._worker);
-    app.events.secret.listen(this._worker);
-    app.events.pownedPassword.listen(this._worker);
-    app.events.organizationSettings.listen(this._worker);
-    app.events.tab.listen(this._worker);
-    app.events.locale.listen(this._worker);
-    app.events.passwordGenerator.listen(this._worker);
-
-    WorkerModel.add('QuickAccess', this._worker);
-    /*
-     * Notify the content script that the pagemod is ready to communicate.
-     * This notification is usually sent by the page-mod itself after the events are attached, however the quickaccess is not a pagemod.
-     */
-    this._worker.port.emit("passbolt.port.ready");
+  get events() {
+    return [
+      AuthEvents,
+      ConfigEvents,
+      KeyringEvents,
+      QuickAccessEvents,
+      GroupEvents,
+      TagEvents,
+      ResourceEvents,
+      SecretEvents,
+      OrganizationSettingsEvents,
+      TabEvents,
+      LocaleEvents,
+      PasswordGeneratorEvents,
+      PownedPasswordEvents
+    ];
   }
 }
 

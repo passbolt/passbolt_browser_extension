@@ -46,7 +46,6 @@ class StartLoopAuthSessionCheckService {
       when: Date.now() + CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD
     });
     browser.alarms.onAlarm.addListener(this.checkAuthStatus);
-    console.log(await browser.alarms.getAll())
   }
 
   /**

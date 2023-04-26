@@ -177,19 +177,6 @@ class GroupLocalStorage {
       throw new TypeError('GroupLocalStorage expects GroupEntity id to be set');
     }
   }
-
-  /**
-   * Init group local storage
-   */
-  static init() {
-    // Flush the local storage when this library is loaded
-    this.flush();
-
-    // Flush the local storage when the passbolt group session is terminated
-    self.addEventListener("passbolt.auth.after-logout", () => {
-      this.flush();
-    });
-  }
 }
 
 export default GroupLocalStorage;

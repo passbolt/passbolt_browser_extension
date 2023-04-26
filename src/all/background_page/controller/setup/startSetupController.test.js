@@ -25,8 +25,6 @@ import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import WorkerService from "../../service/worker/workerService";
 
-jest.mock("../../model/worker");
-
 // Reset the modules before each test.
 beforeEach(() => {
   enableFetchMocks();

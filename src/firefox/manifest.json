@@ -48,5 +48,6 @@
   ],
   "web_accessible_resources": [
     "webAccessibleResources/*"
-  ]
+  ],
+  "content_security_policy": "script-src 'self'; object-src 'none';"
 }

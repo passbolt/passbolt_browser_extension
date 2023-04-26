@@ -174,11 +174,14 @@ class Port {
    * @returns {Promise<void>}
    */
   async connectIfDisconnected() {
-    await this.lock.acquire();
-    if (!this._connected) {
-      await this.connect();
+    try {
+      await this.lock.acquire();
+      if (!this._connected) {
+        await this.connect();
+      }
+    } finally {
+      this.lock.release();
     }
-    this.lock.release();
   }
 }
 

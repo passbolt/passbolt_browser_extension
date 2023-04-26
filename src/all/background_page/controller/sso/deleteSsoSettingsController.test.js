@@ -30,7 +30,7 @@ describe("DeleteSsoSettingsController", () => {
       const settingsId = uuid();
 
       fetch.doMockOnceIf(new RegExp(`/sso/settings/${settingsId}.json`), async req => {
-        expect(req.url).toBe(`https://localhost//sso/settings/${settingsId}.json?api-version=v2`);
+        expect(req.url).toBe(`https://localhost/sso/settings/${settingsId}.json?api-version=v2`);
         return mockApiResponse({});
       });
 

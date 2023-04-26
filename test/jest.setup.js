@@ -33,6 +33,10 @@ global.structuredClone = global.structuredClone || (object => object);
 jest.mock("webextension-polyfill", () => Object.assign({}, {
   storage: new MockStorage(),
   runtime: {
+    OnInstalledReason: {
+      INSTALL: "install",
+      UPDATE: "update"
+    },
     getManifest: jest.fn(() => ({
       version: "v3.6.0"
     })),
@@ -62,6 +66,9 @@ jest.mock("webextension-polyfill", () => Object.assign({}, {
       addListener: jest.fn()
     },
     query: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
+    reload: jest.fn(),
     sendMessage: jest.fn(),
     executeScript: jest.fn(),
     insertCSS: jest.fn()

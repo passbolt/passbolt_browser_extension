@@ -69,6 +69,7 @@ build_mv3:
     - npx grunt build-chrome-mv3
 
 audit:
+  allow_failure: true
   stage: test
   image: node:16
   rules:

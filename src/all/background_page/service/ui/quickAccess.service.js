@@ -13,7 +13,7 @@
  */
 import browser from "../../sdk/polyfill/browserPolyfill";
 import {v4 as uuidv4} from "uuid";
-import WorkersSessionStorage from "../../../../chrome-mv3/service/sessionStorage/workersSessionStorage";
+import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 
 /** The default quickaccesss window height */
@@ -28,14 +28,10 @@ const QUICKACCESS_WINDOW_WIDTH = 380;
  * @return {Promise<windows.Window>}
  */
 async function openInDetachedMode(queryParameters = []) {
-  // Only for MV3 to register the worker in the session storage
-  let workerId = null;
-  if (browser.runtime.getManifest().manifest_version === 3) {
-    workerId = uuidv4();
-    queryParameters.push({name: "passbolt", value: workerId});
-  }
+  // Generate the worker id
+  const workerId = uuidv4();
 
-  const url = await buildDetachedQuickacessUrl(queryParameters);
+  const url = await buildDetachedQuickacessUrl(queryParameters, workerId);
   const {top, left} = await buildDetachedQuickaccessPosition();
 
   const type = "popup";
@@ -44,6 +40,7 @@ async function openInDetachedMode(queryParameters = []) {
   const windowCreateData = {url: url, type: type, left: left, top: top, width: width, height: height};
   const quickAccessWindow = await browser.windows.create(windowCreateData);
 
+  // Register the worker in the session storage
   await addWorkerQuickAccess(workerId, quickAccessWindow.tabs[0].id);
 
   // On firefox 90, with dual screen, the window is not positioned properly and it requires to be moved manually.
@@ -58,29 +55,25 @@ async function openInDetachedMode(queryParameters = []) {
  * @return {Promise<void>}
  */
 async function addWorkerQuickAccess(workerId, tabId) {
-  if (workerId) {
-    const worker = {
-      id: workerId,
-      name: "QuickAccess",
-      tabId: tabId,
-      frameId: 0
-    };
-    await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
-  }
+  const worker = {
+    id: workerId,
+    name: "QuickAccess",
+    tabId: tabId,
+    frameId: 0
+  };
+  await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
 }
 
 /**
  * Build the detached quickaccess url.
  * @param {array<{name: string, value: string}>} queryParameters The query parameters to attach to the quick access detached popup url
+ * @param {string} workerId The worker id
  * @returns {Promise<string>}
  */
-async function buildDetachedQuickacessUrl(queryParameters) {
+async function buildDetachedQuickacessUrl(queryParameters, workerId) {
   const browserExtensionUrl = await browser.action.getPopup({});
   const quickaccessUrl = new URL(browserExtensionUrl);
-  // For MV3 we need to remove the parameter passbolt to avoid duplicate
-  if (queryParameters.find(parameter => parameter.name === "passbolt")) {
-    quickaccessUrl.searchParams.delete("passbolt");
-  }
+  quickaccessUrl.searchParams.set("passbolt", workerId);
   queryParameters.forEach(queryParameter => quickaccessUrl.searchParams.append(queryParameter.name, queryParameter.value));
   return quickaccessUrl.href;
 }

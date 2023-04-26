@@ -1,114 +1,120 @@
 /**
- * React application pagemod.
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
  *
- * @copyright (c) 2020 Passbolt SA
- * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         4.0.0
  */
-import GpgAuth from "../model/gpgauth";
-import {Worker} from "../model/worker";
+import Pagemod from "./pagemod";
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
-import {App as app} from "../app";
-import PageMod from "../sdk/page-mod";
-import AppInitController from "../controller/app/appInitController";
-import ParseAppUrlService from "../service/app/parseAppUrlService";
-import User from "../model/user";
+import GpgAuth from "../model/gpgauth";
+import {AppEvents} from "../event/appEvents";
+import {ConfigEvents} from "../event/configEvents";
+import {AuthEvents} from "../event/authEvents";
+import {FolderEvents} from "../event/folderEvents";
+import {ResourceEvents} from "../event/resourceEvents";
+import {ResourceTypeEvents} from "../event/resourceTypeEvents";
+import {RoleEvents} from "../event/roleEvents";
+import {KeyringEvents} from "../event/keyringEvents";
+import {SecretEvents} from "../event/secretEvents";
+import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
+import {ShareEvents} from "../event/shareEvents";
+import {SubscriptionEvents} from "../event/subscriptionEvents";
+import {UserEvents} from "../event/userEvents";
+import {GroupEvents} from "../event/groupEvents";
+import {CommentEvents} from "../event/commentEvents";
+import {TagEvents} from "../event/tagEvents";
+import {FavoriteEvents} from "../event/favoriteEvents";
+import {ImportResourcesEvents} from "../event/importResourcesEvents";
+import {ExportResourcesEvents} from "../event/exportResourcesEvents";
+import {ActionLogEvents} from "../event/actionLogEvents";
+import {MultiFactorAuthenticationEvents} from "../event/multiFactorAuthenticationEvents";
+import {ThemeEvents} from "../event/themeEvents";
+import {LocaleEvents} from "../event/localeEvents";
+import {PasswordGeneratorEvents} from "../event/passwordGeneratorEvents";
+import {MobileEvents} from "../event/mobileEvents";
+import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
+import {MfaEvents} from "../event/mfaEvents";
+import {ClipboardEvents} from "../event/clipboardEvents";
 
-
-/*
- * This pagemod help bootstrap the passbolt application from a passbolt server app page
- */
-const App = function() {};
-App._pageMod = null;
-
-App.init = function() {
-  if (App._pageMod) {
-    App._pageMod.destroy();
-    App._pageMod = null;
+class App extends Pagemod {
+  /**
+   * @inheritDoc
+   * @returns {string}
+   */
+  get appName() {
+    return "App";
   }
 
-  App._pageMod = new PageMod({
-    name: 'App',
-    include: 'about:blank?passbolt=passbolt-iframe-app',
-    contentScriptWhen: 'end',
-    contentScriptFile: [
-      /*
-       * Warning: script and styles need to be modified in
-       * chrome/data/passbolt-iframe-app.html
-       */
-    ],
-    onAttach: async function(worker) {
-      const user = User.getInstance();
-      if (!user.isValid()) {
-        console.error('appPagemod::attach can not attach application if user is not configured.');
-        return;
-      }
+  /**
+   * @inheritDoc
+   */
+  get events() {
+    return [
+      ConfigEvents,
+      AppEvents,
+      AuthEvents,
+      FolderEvents,
+      ResourceEvents,
+      ResourceTypeEvents,
+      RoleEvents,
+      KeyringEvents,
+      SecretEvents,
+      OrganizationSettingsEvents,
+      ShareEvents,
+      SubscriptionEvents,
+      UserEvents,
+      GroupEvents,
+      CommentEvents,
+      TagEvents,
+      FavoriteEvents,
+      ImportResourcesEvents,
+      ExportResourcesEvents,
+      ActionLogEvents,
+      MultiFactorAuthenticationEvents,
+      ThemeEvents,
+      LocaleEvents,
+      PasswordGeneratorEvents,
+      MobileEvents,
+      PownedPasswordEvents,
+      MfaEvents,
+      ClipboardEvents
+    ];
+  }
 
+  /**
+   * @inheritDoc
+   */
+  async attachEvents(port) {
+    try {
+      const tab = port._port.sender.tab;
       const auth = new GpgAuth();
       if (!await auth.isAuthenticated() || await auth.isMfaRequired()) {
-        console.error('appPagemod::attach can not attach application if user is not logged in.');
+        console.error('Can not attach application if user is not logged in.');
         return;
       }
 
-      if (!ParseAppUrlService.test(worker.tab.url)) {
-        console.error('appPagemod::attach cannot connect to untrusted parent frame.');
-        return;
+      const account = await GetLegacyAccountService.get();
+      for (const event of this.events) {
+        event.listen({port, tab}, account);
       }
-
-      // Init the application.
-      const appInitController = new AppInitController();
-      await appInitController.main();
-
+    } catch (error) {
       /*
-       * Retrieve the account associated with this worker.
-       * @todo This method comes to replace the User.getInstance().get().
+       * Ensure the application does not crash completely if the legacy account cannot be retrieved.
+       * The following controllers won't work as expected:
+       * - AccountRecoverySaveUserSettingsController
+       * - ReviewRequestController
        */
-      let account;
-      try {
-        account = await GetLegacyAccountService.get({role: true});
-      } catch (error) {
-        /*
-         * Ensure the application does not crash completely if the legacy account cannot be retrieved.
-         * The following controllers won't work as expected:
-         * - AccountRecoverySaveUserSettingsController
-         * - ReviewRequestController
-         */
-        console.error('appPagemod::attach legacy account cannot be retrieved, please contact your administrator.');
-        console.error(error);
-      }
-
-      // Initialize the events listeners.
-      app.events.app.listen(worker, account);
-      app.events.auth.listen(worker);
-      app.events.config.listen(worker);
-      app.events.folder.listen(worker);
-      app.events.resource.listen(worker);
-      app.events.resourceType.listen(worker);
-      app.events.role.listen(worker);
-      app.events.keyring.listen(worker);
-      app.events.secret.listen(worker);
-      app.events.pownedPassword.listen(worker);
-      app.events.organizationSettings.listen(worker);
-      app.events.share.listen(worker);
-      app.events.subscription.listen(worker);
-      app.events.user.listen(worker, account);
-      app.events.group.listen(worker);
-      app.events.comment.listen(worker);
-      app.events.tag.listen(worker);
-      app.events.favorite.listen(worker);
-      app.events.importResources.listen(worker);
-      app.events.exportResources.listen(worker);
-      app.events.actionLogs.listen(worker);
-      app.events.multiFactorAuthentication.listen(worker);
-      app.events.theme.listen(worker);
-      app.events.locale.listen(worker);
-      app.events.passwordGenerator.listen(worker);
-      app.events.mobile.listen(worker);
-      app.events.clipboard.listen(worker);
-      app.events.mfaPolicy.listen(worker);
-
-      Worker.add('App', worker);
+      console.error('appPagemod::attach legacy account cannot be retrieved, please contact your administrator.');
+      console.error(error);
     }
-  });
-};
+  }
+}
 
-export const AppPagemod = App;
+export default new App();

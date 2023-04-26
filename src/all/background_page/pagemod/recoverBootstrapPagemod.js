@@ -1,51 +1,85 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @copyright     Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         4.0.0
  */
-import {Worker} from "../model/worker";
-import PageMod from "../sdk/page-mod";
+import Pagemod from "./pagemod";
+import ParseRecoverUrlService from "../service/recover/parseRecoverUrlService";
 import {PortEvents} from "../event/portEvents";
 
-const RecoverBootstrap = function() {};
-RecoverBootstrap._pageMod = undefined;
-
-RecoverBootstrap.init = function() {
-  if (typeof RecoverBootstrap._pageMod !== 'undefined') {
-    RecoverBootstrap._pageMod.destroy();
-    RecoverBootstrap._pageMod = undefined;
+class RecoverBootstrap extends Pagemod {
+  /**
+   * @inheritDoc
+   * @returns {string}
+   */
+  get appName() {
+    return "RecoverBootstrap";
   }
-  const uuidRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}";
-  const recoverBootstrapRegex = `(.*)\/setup\/recover\/(${uuidRegex})\/(${uuidRegex})`;
-  RecoverBootstrap._pageMod = new PageMod({
-    name: 'RecoverBootstrap',
-    include: new RegExp(recoverBootstrapRegex),
-    contentScriptWhen: 'ready',
-    contentStyleFile: [
-      /*
-       * @deprecated when support for v2 is dropped
-       * used to control iframe styling without inline style in v3
-       */
-      'webAccessibleResources/css/themes/default/ext_external.min.css'
-    ],
-    contentScriptFile: [
+
+  /**
+   * @inheritDoc
+   */
+  get contentStyleFiles() {
+    return ['webAccessibleResources/css/themes/default/ext_external.min.css'];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  get contentScriptFiles() {
+    return [
       'contentScripts/js/dist/vendors.js',
       'contentScripts/js/dist/recover.js',
-    ],
-    onAttach: function(worker) {
-      // @todo refactoring-account-recovery, should we do something if the url doesn't parse.
+    ];
+  }
 
-      Worker.add('RecoverBootstrap', worker);
-      PortEvents.listen(worker);
-    }
-  });
-};
+  /**
+   * @inheritDoc
+   */
+  get events() {
+    return [PortEvents];
+  }
 
-export default RecoverBootstrap;
+  /**
+   * @inheritDoc
+   */
+  get mustReloadOnExtensionUpdate() {
+    return true;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  async canBeAttachedTo(frameDetails) {
+    return this.assertTopFrameAttachConstraint(frameDetails)
+      && this.assertUrlAttachConstraint(frameDetails);
+  }
+
+  /**
+   * Assert that the attached frame is a top frame.
+   * @param {Object} frameDetails
+   * @returns {boolean}
+   */
+  assertTopFrameAttachConstraint(frameDetails) {
+    return frameDetails.frameId === Pagemod.TOP_FRAME_ID;
+  }
+
+  /**
+   * Assert that the attached frame is a top frame.
+   * @param {Object} frameDetails
+   * @returns {boolean}
+   */
+  assertUrlAttachConstraint(frameDetails) {
+    return ParseRecoverUrlService.test(frameDetails.url);
+  }
+}
+
+export default new RecoverBootstrap();

@@ -20,8 +20,6 @@ import {anonymousOrganizationSettings} from "../../model/entity/organizationSett
 import {initialAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 
-jest.mock("../../model/worker");
-
 // Reset the modules before each test.
 beforeEach(() => {
   enableFetchMocks();

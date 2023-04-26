@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import WebIntegrationController from "../controller/webIntegration/webIntegrationController";
+import RemovePortController from "../controller/port/removePortController";
 
 /**
  * Listens the web integration events
@@ -25,6 +26,12 @@ const listen = function(worker) {
   worker.port.on('passbolt.web-integration.autosave', async resourceToSave => {
     const webIntegrationController = new WebIntegrationController(worker);
     await webIntegrationController.autosave(resourceToSave);
+  });
+
+  /** Whenever the in-form-menu or in-call-to-action are removed */
+  worker.port.on('passbolt.port.disconnect', async applicationName => {
+    const removePortController = new RemovePortController(worker);
+    await removePortController._exec(applicationName);
   });
 };
 

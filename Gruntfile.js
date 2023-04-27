@@ -30,6 +30,7 @@ module.exports = function (grunt) {
     src_content_scripts: 'src/all/contentScripts/',
     src_web_accessible_resources: 'src/all/webAccessibleResources/',
   };
+  const firefoxWebExtBuildName = 'passbolt_-_open_source_password_manager';
 
   /**
    * Import package.json file content
@@ -378,7 +379,7 @@ module.exports = function (grunt) {
         },
         command: [
           './node_modules/.bin/web-ext build -s=' + path.build + ' -a=' + path.dist_firefox + '  -o=true',
-          'mv ' + path.dist_firefox + pkg.name + '-' + pkg.version + '.zip ' + path.dist_firefox + 'passbolt-' + pkg.version + '-debug.zip',
+          'mv ' + path.dist_firefox + firefoxWebExtBuildName + '-' + pkg.version + '.zip ' + path.dist_firefox + 'passbolt-' + pkg.version + '-debug.zip',
           'rm -f ' + path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
           'ln -fs passbolt-' + pkg.version + '-debug.zip ' + path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
           "echo '\nMoved to " + path.dist_firefox + "passbolt-" + pkg.version + "-debug.zip'"
@@ -390,7 +391,7 @@ module.exports = function (grunt) {
         },
         command: [
           './node_modules/.bin/web-ext build -s=' + path.build + ' -a=' + path.dist_firefox + '  -o=true',
-          'mv ' + path.dist_firefox + pkg.name + '-' + pkg.version + '.zip ' + path.dist_firefox + '/passbolt-' + pkg.version + '.zip',
+          'mv ' + path.dist_firefox + firefoxWebExtBuildName + '-' + pkg.version + '.zip ' + path.dist_firefox + '/passbolt-' + pkg.version + '.zip',
           "echo '\nMoved to " + path.dist_firefox + "passbolt-" + pkg.version + ".zip'"
         ].join(' && ')
       },

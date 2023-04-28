@@ -22,6 +22,7 @@ import "./scriptingPolyfill"; //mv3 scripting API for mv2
 import "./sessionStoragePolyfill"; //mv3 session storage API polyfill
 import "./actionPolyfill"; //mv3 action API polyfill for mv2
 
-const polyfill = Object.keys(browser).length > 0 ? browser : window.chrome;
+const polyfill = window.chrome?.desktop ? window.chrome : browser;
+
 
 export default polyfill;

@@ -43,18 +43,20 @@ class PassphraseStorageService {
     await browser.storage.session.set({[PASSPHRASE_STORAGE_KEY]: passphrase});
     lock.release();
 
-    await this._clearFlushAlarms();
-    if (timeout >= 0) {
-      const flushingTime = Date.now() + timeout * 1000;
-      browser.alarms.create(PASSPHRASE_FLUSH_ALARM, {
-        when: flushingTime
-      });
-      browser.alarms.onAlarm.addListener(this._handleFlushEvent);
-    }
-
-    const keepAliveAlarm = await browser.alarms.get(SESSION_KEEP_ALIVE_ALARM);
-    if (!keepAliveAlarm) {
-      this._keepAliveSession();
+    if(!browser.desktop) {
+        await this._clearFlushAlarms();
+        if (timeout >= 0) {
+          const flushingTime = Date.now() + timeout * 1000;
+          browser.alarms.create(PASSPHRASE_FLUSH_ALARM, {
+            when: flushingTime
+          });
+          browser.alarms.onAlarm.addListener(this._handleFlushEvent);
+        }
+    
+        const keepAliveAlarm = await browser.alarms.get(SESSION_KEEP_ALIVE_ALARM);
+        if (!keepAliveAlarm) {
+          this._keepAliveSession();
+      }
     }
   }
 
@@ -112,9 +114,11 @@ class PassphraseStorageService {
    * @private
    */
   async _clearFlushAlarms() {
-    await browser.alarms.clear(PASSPHRASE_FLUSH_ALARM);
-    if (browser.alarms.onAlarm.hasListener(this._handleFlushEvent)) {
-      browser.alarms.onAlarm.removeListener(this._handleFlushEvent);
+    if(!browser.desktop) {
+      await browser.alarms.clear(PASSPHRASE_FLUSH_ALARM);
+      if (browser.alarms.onAlarm.hasListener(this._handleFlushEvent)) {
+        browser.alarms.onAlarm.removeListener(this._handleFlushEvent);
+      }
     }
   }
 
@@ -123,9 +127,11 @@ class PassphraseStorageService {
    * @private
    */
   async _clearKeepAliveAlarms() {
-    await browser.alarms.clear(SESSION_KEEP_ALIVE_ALARM);
-    if (browser.alarms.onAlarm.hasListener(this._handleKeepSessionAlive)) {
-      browser.alarms.onAlarm.removeListener(this._handleKeepSessionAlive);
+    if(!browser.desktop) {
+      await browser.alarms.clear(SESSION_KEEP_ALIVE_ALARM);
+      if (browser.alarms.onAlarm.hasListener(this._handleKeepSessionAlive)) {
+        browser.alarms.onAlarm.removeListener(this._handleKeepSessionAlive);
+      }
     }
   }
 

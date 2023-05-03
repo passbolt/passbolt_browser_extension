@@ -41,11 +41,13 @@ class StartLoopAuthSessionCheckService {
    * @private
    */
   async scheduleAuthSessionCheck() {
-    // Create an alarm to check the auth session
-    await browser.alarms.create(AUTH_SESSION_CHECK_ALARM, {
-      when: Date.now() + CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD
-    });
-    browser.alarms.onAlarm.addListener(this.checkAuthStatus);
+    if (!browser.desktop) {
+      // Create an alarm to check the auth session
+      await browser.alarms.create(AUTH_SESSION_CHECK_ALARM, {
+        when: Date.now() + CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD
+      });
+      browser.alarms.onAlarm.addListener(this.checkAuthStatus);
+    }
   }
 
   /**
@@ -53,8 +55,10 @@ class StartLoopAuthSessionCheckService {
    * @private
    */
   async clearAlarm() {
-    browser.alarms.onAlarm.removeListener(this.checkAuthStatus);
-    await browser.alarms.clear(AUTH_SESSION_CHECK_ALARM);
+    if (!browser.desktop) {
+      browser.alarms.onAlarm.removeListener(this.checkAuthStatus);
+      await browser.alarms.clear(AUTH_SESSION_CHECK_ALARM);
+    }
   }
 
   /**

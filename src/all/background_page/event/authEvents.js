@@ -211,14 +211,27 @@ const listen = function(worker, account) {
   });
 
   /**
+   * Performs a sign-in via SSO with the selected provider
+   * @param {uuid} requestId the request identifier
+   * @param {boolean} isInQuickaccessMode is the current call made from the quickaccess
+   * @param {string} provider the SSO provider identifier
+   */
+  async function signInWithSso(requestId, isInQuickaccessMode, provider) {
+    const user = await User.getInstance();
+    //sometimes, the CSRF token is not set properly before the login and blocks the user
+    await user.retrieveAndStoreCsrfToken();
+    const apiClientOptions = await user.getApiClientOptions();
+    const controller = new SsoAuthenticationController(worker, requestId, apiClientOptions, account);
+    await controller._exec(provider, isInQuickaccessMode);
+  }
+
+  /**
    * Attempt to sign in with Azure as a third party sign in provider
    * @listens passbolt.sso.sign-in-with-azure
    * @param {uuid} requestId The request identifier
    */
   worker.port.on('passbolt.sso.sign-in-with-azure', async(requestId, isInQuickaccessMode) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new SsoAuthenticationController(worker, requestId, apiClientOptions, account);
-    await controller._exec(SsoSettingsEntity.AZURE, isInQuickaccessMode);
+    await signInWithSso(requestId, isInQuickaccessMode, SsoSettingsEntity.AZURE);
   });
 
   /**
@@ -227,9 +240,7 @@ const listen = function(worker, account) {
    * @param {uuid} requestId The request identifier
    */
   worker.port.on('passbolt.sso.sign-in-with-google', async(requestId, isInQuickaccessMode) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new SsoAuthenticationController(worker, requestId, apiClientOptions, account);
-    await controller._exec(SsoSettingsEntity.GOOGLE, isInQuickaccessMode);
+    await signInWithSso(requestId, isInQuickaccessMode, SsoSettingsEntity.GOOGLE);
   });
 
   /**

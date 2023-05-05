@@ -31,9 +31,15 @@ class GenerateSsoKitService {
    */
   static async generate(passphrase, provider) {
     try {
+      console.log("before kit")
       const kits = await this.generateSsoKits(passphrase, provider);
+
+      console.log("after kit", kits);
       await SsoDataStorage.save(kits.clientPart);
+      console.log("after save");
       await SsoKitTemporaryStorageService.set(kits.serverPart);
+
+      console.log("after stored temps");
     } catch (error) {
       await SsoDataStorage.flush();
       await SsoKitTemporaryStorageService.flush();
@@ -58,6 +64,7 @@ class GenerateSsoKitService {
     const ssoKitClientPartEntity = new SsoKitClientPartEntity({nek, iv1, iv2, secret, provider});
 
     const exportedKey = await crypto.subtle.exportKey("jwk", extractableKey);
+    console.log("after crypto subtle")
     const serializedKey = Buffer.from(JSON.stringify(exportedKey)).toString("base64");
     const ssoKitServerPartEntity = new SsoKitServerPartEntity({
       data: serializedKey

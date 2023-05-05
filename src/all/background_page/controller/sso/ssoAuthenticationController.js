@@ -81,7 +81,8 @@ class SsoAuthenticationController {
       const thirdPartyCode = await this.popupHandler.getSsoTokenFromThirdParty(loginUrl);
       const ssoServerData = await this.ssoKitServerPartModel.getSsoKit(clientPartSsoKit.id, userId, thirdPartyCode);
 
-      const serverKey = await crypto.subtle.importKey("jwk", ssoServerData.key, 'AES-GCM', true, ["encrypt", "decrypt"]);
+      const subtle = crypto.subtle;
+      const serverKey = await subtle.importKey("jwk", ssoServerData.key, 'AES-GCM', true, ["encrypt", "decrypt"]);
 
       const passphrase = await DecryptSsoPassphraseService.decrypt(clientPartSsoKit.secret, clientPartSsoKit.nek, serverKey, clientPartSsoKit.iv1, clientPartSsoKit.iv2);
       await this.popupHandler.closeHandler();

@@ -48,9 +48,10 @@ class DecryptSsoPassphraseService {
       iv: iv1
     };
 
+    const subtle = crypto.subtle;
     let firstDecryptionBuffer = null;
     try {
-      firstDecryptionBuffer = await crypto.subtle.decrypt(firstDecryptionAlgorithm, ek, buffer);
+      firstDecryptionBuffer = await subtle.decrypt(firstDecryptionAlgorithm, ek, buffer);
     } catch (e) {
       /**
        * This might happen if a backup client side or server side was done and both kits are mismatching.
@@ -61,7 +62,7 @@ class DecryptSsoPassphraseService {
 
     let secondDecryptionBuffer = null;
     try {
-      secondDecryptionBuffer = await crypto.subtle.decrypt(secondDecryptionAlgorithm, nek, firstDecryptionBuffer);
+      secondDecryptionBuffer = await subtle.decrypt(secondDecryptionAlgorithm, nek, firstDecryptionBuffer);
     } catch (e) {
       /**
        * This can happen if the local SSO kit nek and/or iv1 has changed (manually?).

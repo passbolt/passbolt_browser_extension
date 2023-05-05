@@ -85,7 +85,7 @@ class SsoDataStorage {
    * @returns {Promise<IDBDatabase>}
    * @private
    */
-  static async getDbHandler() {
+  static getDbHandler() {
     return new Promise((resolve, reject) => {
       const openRequest = indexedDB.open(DB_NAME, DB_VERSION);
 
@@ -134,7 +134,7 @@ class SsoDataStorage {
    * @returns {Promise<SsoKitClientPartEntity|null>}
    * @private
    */
-  static async getSsoData(dbHandler) {
+  static getSsoData(dbHandler) {
     return new Promise((resolve, reject) => {
       const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readonly');
       const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);
@@ -165,7 +165,7 @@ class SsoDataStorage {
    * @returns {Promise<void>}
    * @private
    */
-  static async clearData(dbHandler) {
+  static clearData(dbHandler) {
     return new Promise((resolve, reject) => {
       const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readwrite');
       const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);
@@ -192,7 +192,7 @@ class SsoDataStorage {
    * @returns {Promise<void>}
    * @private
    */
-  static async storeData(dbHandler, ssoKitClientPartEntity) {
+  static storeData(dbHandler, ssoKitClientPartEntity) {
     return new Promise((resolve, reject) => {
       const transaction = dbHandler.transaction([SSO_KEYS_OBECT_STORE], 'readwrite');
       const objectStore = transaction.objectStore(SSO_KEYS_OBECT_STORE);

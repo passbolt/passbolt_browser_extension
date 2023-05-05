@@ -80,7 +80,9 @@ class UpdateSsoCredentialsService {
        */
       await SsoDataStorage.flush();
     } else if (currentSsoSettings?.provider && !localSsoKit) {
-      await GenerateSsoKitService.generate(passphrase, currentSsoSettings.provider);
+      console.log("should generate kit");
+      GenerateSsoKitService.generate(passphrase, currentSsoSettings.provider);
+      console.log("after generate kit");
     }
   }
 }

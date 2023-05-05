@@ -198,7 +198,10 @@ class GpgAuth {
     Request.setCsrfHeader(fetchOptions, User.getInstance());
 
     // Send request token to the server
+    console.log("fetch", url, fetchOptions)
     const response = await fetch(url, fetchOptions);
+
+    console.log("fetch", response)
     if (!response.ok) {
       return this.onResponseError(response);
     }

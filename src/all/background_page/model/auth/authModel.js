@@ -72,10 +72,14 @@ class AuthModel {
   async login(passphrase, rememberUntilLogout) {
     rememberUntilLogout = rememberUntilLogout || false;
     const user = User.getInstance();
+    console.log("before get key");
     const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
+    console.log(privateKey);
     // @deprecated to be removed with v4. Prior to API v3, retrieving the CSRF token log the user out, so we need to fetch it before the login.
     await user.retrieveAndStoreCsrfToken();
+    console.log("after csrf");
     await this.legacyAuthModel.login(privateKey);
+    console.log("after legacy");
     /*
      * Post login operations
      * MFA may not be complete yet, so no need to preload things here

@@ -103,15 +103,15 @@ class AuthLoginController {
     }
 
     if (shouldRefreshCurrentTab) {
-      await this.redirectToApp();
+      this.redirectToApp();
     }
   }
 
   /**
    * Redirect the user to the application
-   * @returns {Promise<void>}
+   * @returns {void}
    */
-  async redirectToApp() {
+  redirectToApp() {
     const url = this.account.domain;
     browser.tabs.update(this.worker.tab.id, {url});
   }

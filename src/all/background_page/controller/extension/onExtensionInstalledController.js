@@ -27,10 +27,10 @@ class OnExtensionInstalledController {
    */
   static async exec(details) {
     switch (details.reason) {
-      case browser.runtime.OnInstalledReason.INSTALL:
+      case "install":
         await OnExtensionInstalledController.onInstall();
         break;
-      case browser.runtime.OnInstalledReason.UPDATE:
+      case "update":
         await OnExtensionInstalledController.onUpdate();
         break;
       default:

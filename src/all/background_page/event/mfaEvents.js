@@ -12,7 +12,7 @@
  * @since         3.10.0
  */
 
-import PostponeUserSettingMFAInvitationController from '../controller/mfaPolicy/postponeUserSettingInvitationController';
+import PostponeUserSettingMFAInvitationController from '../controller/mfaPolicy/postponeUserSettingMfaInvitationController';
 import MfaGetPolicyController from '../controller/mfaPolicy/mfaGetPolicyController';
 import User from "../model/user";
 import MfaGetMfaSettingsController from '../controller/mfaPolicy/mfaGetMfaSettingsController';

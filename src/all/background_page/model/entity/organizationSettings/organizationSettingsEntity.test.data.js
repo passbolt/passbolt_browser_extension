@@ -227,6 +227,10 @@ export const defaultProOrganizationSettings = siteSettings => {
     "folders": {
       "version": "2.0.0",
       "enabled": true
+    },
+    "passwordPolicies": {
+      "version": "1.0.0",
+      "enabled": true
     }
   });
 

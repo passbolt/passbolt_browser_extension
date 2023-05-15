@@ -285,7 +285,7 @@ class ResourceModel {
   /**
    * Returns the possible resources to suggest given an url
    * @param currentUrl An url
-   * @return {*[]|number}
+   * @return {Promise<*[]|number>}
    */
   async findSuggestedResources(url) {
     if (!url) {

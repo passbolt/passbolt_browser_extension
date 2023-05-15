@@ -9,15 +9,13 @@
  * @copyright     Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since         hackaton
+ * @since         3.6.0
  */
+import PostponeUserSettingInvitationService from '../../service/invitation/postponeUserSettingInvitationService';
 
-import EntropyService from "../../service/secret/entropyService";
-
-
-class EntropyPasswordController {
+class PostponeUserSettingMfaInvitationController {
   /**
-   * EntropyPasswordController constructor
+   * PostponeUserSettingMFAInvitationController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    */
@@ -27,29 +25,25 @@ class EntropyPasswordController {
   }
 
   /**
-   * Wrapper of exec function to run it with worker.
-   *
-   * @return {Promise<void>}
+   * Controller executor.
+   * @returns {Promise<bool>}
    */
-  async _exec(password) {
+  async _exec() {
     try {
-      const result = await this.exec(password);
-      this.worker.port.emit(this.requestId, "SUCCESS", result);
+      this.exec();
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
-      this.worker.port.emit(this.requestId, "ERROR", error);
+      this.worker.port.emit(this.requestId, 'ERROR', error);
     }
   }
 
   /**
-   * Check the entropy of credential
-   *
-   * @param password {object} The password to check
-   * @return {Promise<number>} The password entropy.
+   * Set the MFA Policy enrollement inviration as postponed.
    */
-  async exec(password) {
-    return EntropyService.entropy(password);
+  async exec() {
+    PostponeUserSettingInvitationService.postponeMFAPolicy();
   }
 }
 
-export default EntropyPasswordController;
+export default PostponeUserSettingMfaInvitationController;

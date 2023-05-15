@@ -18,7 +18,6 @@ import BuildApiClientOptionsService
 import {SetupEvents} from "../event/setupEvents";
 import BuildAccountSetupService from "../service/setup/buildAccountSetupService";
 import {PownedPasswordEvents} from "../event/pownedPasswordEvents";
-import {PasswordPoliciesEvents} from "../event/passwordPoliciesEvents";
 import OrganizationSettingsModel from "../model/organizationSettings/organizationSettingsModel";
 
 class Setup extends Pagemod {
@@ -37,8 +36,7 @@ class Setup extends Pagemod {
     return [
       ConfigEvents,
       SetupEvents,
-      PownedPasswordEvents,
-      PasswordPoliciesEvents,
+      PownedPasswordEvents
     ];
   }
 

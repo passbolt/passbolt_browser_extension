@@ -17,7 +17,6 @@ import {ConfigEvents} from "../event/configEvents";
 import {WebIntegrationEvents} from "../event/webIntegrationEvents";
 import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {PortEvents} from "../event/portEvents";
-import {PasswordPoliciesEvents} from '../event/passwordPoliciesEvents';
 import ParseWebIntegrationUrlService from "../service/webIntegration/parseWebIntegrationUrlService";
 
 class WebIntegration extends Pagemod {
@@ -55,7 +54,6 @@ class WebIntegration extends Pagemod {
       WebIntegrationEvents,
       OrganizationSettingsEvents,
       PortEvents,
-      PasswordPoliciesEvents
     ];
   }
 

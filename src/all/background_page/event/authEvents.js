@@ -16,9 +16,14 @@ import AuthIsMfaRequiredController from "../controller/auth/authIsMfaRequiredCon
 import CheckPassphraseController from "../controller/crypto/checkPassphraseController";
 import RequestHelpCredentialsLostController from "../controller/auth/requestHelpCredentialsLostController";
 import {Config} from "../model/config";
-import AzureSsoAuthenticationController from "../controller/sso/azureSsoAuthenticationController";
 import AuthLoginController from "../controller/auth/authLoginController";
 import GetLocalSsoProviderConfiguredController from "../controller/sso/getLocalSsoProviderConfiguredController";
+import SsoAuthenticationController from "../controller/sso/ssoAuthenticationController";
+import SsoSettingsEntity from "../model/entity/sso/ssoSettingsEntity";
+import DeleteLocalSsoKitController from "../controller/sso/deleteLocalSsoKitController";
+import UpdateLocalSsoProviderController from "../controller/sso/updateLocalSsoProviderController";
+import HasSsoLoginErrorController from "../controller/sso/hasSsoLoginErrorController";
+import GetQualifiedSsoLoginErrorController from "../controller/sso/getQualifiedSsoLoginErrorController";
 
 const listen = function(worker, account) {
   /*
@@ -206,14 +211,36 @@ const listen = function(worker, account) {
   });
 
   /**
+   * Performs a sign-in via SSO with the selected provider
+   * @param {uuid} requestId the request identifier
+   * @param {boolean} isInQuickaccessMode is the current call made from the quickaccess
+   * @param {string} provider the SSO provider identifier
+   */
+  async function signInWithSso(requestId, isInQuickaccessMode, provider) {
+    const user = await User.getInstance();
+    //sometimes, the CSRF token is not set properly before the login and blocks the user
+    await user.retrieveAndStoreCsrfToken();
+    const apiClientOptions = await user.getApiClientOptions();
+    const controller = new SsoAuthenticationController(worker, requestId, apiClientOptions, account);
+    await controller._exec(provider, isInQuickaccessMode);
+  }
+
+  /**
    * Attempt to sign in with Azure as a third party sign in provider
    * @listens passbolt.sso.sign-in-with-azure
    * @param {uuid} requestId The request identifier
    */
   worker.port.on('passbolt.sso.sign-in-with-azure', async(requestId, isInQuickaccessMode) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new AzureSsoAuthenticationController(worker, requestId, apiClientOptions, account);
-    await controller._exec(isInQuickaccessMode);
+    await signInWithSso(requestId, isInQuickaccessMode, SsoSettingsEntity.AZURE);
+  });
+
+  /**
+   * Attempt to sign in with Google as a third party sign in provider
+   * @listens passbolt.sso.sign-in-with-google
+   * @param {uuid} requestId The request identifier
+   */
+  worker.port.on('passbolt.sso.sign-in-with-google', async(requestId, isInQuickaccessMode) => {
+    await signInWithSso(requestId, isInQuickaccessMode, SsoSettingsEntity.GOOGLE);
   });
 
   /**
@@ -223,6 +250,48 @@ const listen = function(worker, account) {
    */
   worker.port.on('passbolt.sso.get-local-configured-provider', async requestId => {
     const controller = new GetLocalSsoProviderConfiguredController(worker, requestId);
+    await controller._exec();
+  });
+
+  /**
+   * Deletes the SSO kit stored locally
+   * @listens passbolt.sso.delete-local-kit
+   * @param {uuid} requestId The request identifier
+   */
+  worker.port.on('passbolt.sso.delete-local-kit', async requestId => {
+    const controller = new DeleteLocalSsoKitController(worker, requestId);
+    await controller._exec();
+  });
+
+  /**
+   * Updates the SSO kit stored locally
+   * @listens passbolt.sso.update-provider-local-kit
+   * @param {uuid} requestId The request identifier
+   * @param {string} ssoProviderId The new provider to set
+   */
+  worker.port.on('passbolt.sso.update-provider-local-kit', async(requestId, ssoProviderId) => {
+    const controller = new UpdateLocalSsoProviderController(worker, requestId);
+    await controller._exec(ssoProviderId);
+  });
+
+  /**
+   * Checks wether the current tab URL is an SSO login error URL
+   * @listens passbolt.sso.has-sso-login-error
+   * @param {uuid} requestId The request identifier
+   */
+  worker.port.on('passbolt.sso.has-sso-login-error', async requestId => {
+    const controller = new HasSsoLoginErrorController(worker, requestId);
+    await controller._exec();
+  });
+
+  /**
+   * Returns a qualified error based on the local SSO kit configuration and the API configuration
+   * @listens passbolt.sso.get-qualified-sso-login-error
+   * @param {uuid} requestId The request identifier
+   */
+  worker.port.on('passbolt.sso.get-qualified-sso-login-error', async requestId => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new GetQualifiedSsoLoginErrorController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 };

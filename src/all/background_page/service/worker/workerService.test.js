@@ -11,14 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import {Worker as worker} from "../../model/worker";
-import PortManager from "../../../../chrome-mv3/sdk/portManager";
+import PortManager from "../../sdk/port/portManager";
 import WorkerService from "./workerService";
 import BrowserTabService from "../ui/browserTab.service";
-import WorkersSessionStorage from "../../../../chrome-mv3/service/sessionStorage/workersSessionStorage";
+import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
 import browser from "../../sdk/polyfill/browserPolyfill";
-import Worker from "../../sdk/worker";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 
 
@@ -31,18 +29,7 @@ describe("WorkerService", () => {
   });
 
   describe("WorkerService::get", () => {
-    it("Should get worker from manifest v2", async() => {
-      expect.assertions(1);
-      // mock functions
-      jest.spyOn(chrome.runtime, 'getManifest').mockImplementationOnce(() => ({manifest_version: 2}));
-      jest.spyOn(worker, "get").mockImplementationOnce(jest.fn());
-      // process
-      await WorkerService.get("ApplicationName", 1);
-      // expectations
-      expect(worker.get).toHaveBeenCalledWith("ApplicationName", 1, true);
-    });
-
-    it("Should get worker from manifest v3", async() => {
+    it("Should get worker", async() => {
       expect.assertions(3);
       // data mocked
       const worker = readWorker();
@@ -55,7 +42,6 @@ describe("WorkerService", () => {
         }
       };
       // mock functions
-      jest.spyOn(chrome.runtime, 'getManifest').mockImplementationOnce(() => ({manifest_version: 3}));
       jest.spyOn(WorkersSessionStorage, 'getWorkersByNameAndTabId').mockImplementationOnce(() => [worker]);
       jest.spyOn(BrowserTabService, "sendMessage").mockImplementationOnce(() => jest.fn());
       jest.spyOn(PortManager, "getPortById").mockImplementationOnce(() => port);
@@ -67,10 +53,9 @@ describe("WorkerService", () => {
       expect(workerResult).toStrictEqual({port: port, tab: port._port.sender.tab});
     });
 
-    it("Should get no worker from manifest v3", async() => {
+    it("Should get no worker", async() => {
       expect.assertions(3);
       // mock functions
-      jest.spyOn(chrome.runtime, 'getManifest').mockImplementationOnce(() => ({manifest_version: 3}));
       jest.spyOn(WorkersSessionStorage, 'getWorkersByNameAndTabId').mockImplementationOnce(() => []);
       jest.spyOn(BrowserTabService, "sendMessage");
       jest.spyOn(PortManager, "getPortById");
@@ -87,45 +72,7 @@ describe("WorkerService", () => {
   });
 
   describe("WorkerService::waitExists", () => {
-    it("should wait for the worker exists from manifest v2", async() => {
-      expect.assertions(10);
-      // mock functions
-      jest.spyOn(chrome.runtime, 'getManifest').mockImplementation(() => ({manifest_version: 2}));
-      const spy = jest.spyOn(WorkerService, "waitExists");
-      const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
-      const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
-
-      expect(spy).not.toHaveBeenCalled();
-
-      WorkerService.waitExists("QuickAccess", 100);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(0);
-
-      jest.advanceTimersByTime(100);
-      await Promise.resolve();
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(2);
-
-      const tab = {
-        id: 100,
-        url: "https://localhost"
-      };
-      const port = {
-        onMessage: {
-          addListener: jest.fn()
-        }
-      };
-      worker.add("QuickAccess", new Worker(port, tab));
-      jest.advanceTimersByTime(100);
-      await Promise.resolve();
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(2);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(2);
-    });
-
-    it("should wait for the worker exists from manifest v3", async() => {
+    it("should wait for the worker exists", async() => {
       expect.assertions(10);
       // data mocked
       const worker = readWorker({name: "QuickAccess"});
@@ -138,7 +85,6 @@ describe("WorkerService", () => {
         }
       };
       // mock functions
-      jest.spyOn(chrome.runtime, 'getManifest').mockImplementation(() => ({manifest_version: 3}));
       jest.spyOn(PortManager, "getPortById").mockImplementation(() => port);
       const spy = jest.spyOn(WorkerService, "waitExists");
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
@@ -167,7 +113,6 @@ describe("WorkerService", () => {
 
     it("should raise an error if the worker not exists until timeout", async() => {
       expect.assertions(8);
-      jest.spyOn(chrome.runtime, 'getManifest').mockImplementation(() => ({manifest_version: 3}));
       const spy = jest.spyOn(WorkerService, "waitExists");
       jest.spyOn(WorkerService, "get").mockImplementation(() => { throw new Error("Could not find worker ID QuickAccess for tab 1."); });
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");

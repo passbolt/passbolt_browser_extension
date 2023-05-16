@@ -12,7 +12,7 @@
  * @since         3.9.0
  */
 
-export const generateSsoKitServerData = ({alg = "A256GCM", ext = true, k = "string", key_ops = ["encrypt", "decrypt"], kty = "oct"}) => {
+export const generateSsoKitServerData = ({alg = "A256GCM", ext = true, k = "string", key_ops = ["encrypt", "decrypt"], kty = "oct"} = {}) => {
   const key = {alg, ext, k, key_ops, kty};
   return Buffer.from(JSON.stringify(key)).toString("base64");
 };

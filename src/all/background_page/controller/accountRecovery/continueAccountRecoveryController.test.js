@@ -20,8 +20,6 @@ import AccountAccountRecoveryEntity from "../../model/entity/account/accountAcco
 import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
 import WorkerService from "../../service/worker/workerService";
 
-jest.mock("../../model/worker");
-
 beforeEach(() => {
   enableFetchMocks();
 });

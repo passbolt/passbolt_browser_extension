@@ -25,13 +25,11 @@ const SESSION_CHECK_INTERNAL = 15;
 
 class PassphraseStorageService {
   /**
-   * Initialisation the storage service
-   * @returns {Promise<void>}
+   * Constructor of the storage service
    */
-  static async init() {
+  constructor() {
     this._handleFlushEvent = this._handleFlushEvent.bind(this);
     this._handleKeepSessionAlive = this._handleKeepSessionAlive.bind(this);
-    await this.flush();
   }
 
   /**
@@ -40,7 +38,7 @@ class PassphraseStorageService {
    * @param {number|null} timeout duration in second before flushing passphrase
    * @return {Promise<void>}
    */
-  static async set(passphrase, timeout) {
+  async set(passphrase, timeout) {
     await lock.acquire();
     await browser.storage.session.set({[PASSPHRASE_STORAGE_KEY]: passphrase});
     lock.release();
@@ -64,7 +62,7 @@ class PassphraseStorageService {
    * Retrieve the passphrase from the session memory if any.
    * @return {Promise<string|null>}
    */
-  static async get() {
+  async get() {
     const storedData = await browser.storage.session.get(PASSPHRASE_STORAGE_KEY);
     return storedData?.[PASSPHRASE_STORAGE_KEY] || null;
   }
@@ -73,7 +71,7 @@ class PassphraseStorageService {
    * Flush the registered passphrase without removing any alarms.
    * @returns {Promise<void>}
    */
-  static async flushPassphrase() {
+  async flushPassphrase() {
     await lock.acquire();
     await browser.storage.session.remove(PASSPHRASE_STORAGE_KEY);
     lock.release();
@@ -83,7 +81,7 @@ class PassphraseStorageService {
    * Returns true if the session is set to be kept until the user logs out.
    * @returns {boolean}
    */
-  static isSessionKeptUntilLogOut() {
+  isSessionKeptUntilLogOut() {
     // we assume that the event listener is present only when the session is no kept until log out.
     return !browser.alarms.onAlarm.hasListener(this._handleFlushEvent);
   }
@@ -92,7 +90,7 @@ class PassphraseStorageService {
    * Removes the stored passphrase from the session memory and resets alarms.
    * @return {Promise<void>}
    */
-  static async flush() {
+  async flush() {
     Log.write({level: 'debug', message: 'PassphraseStorageService flushed'});
     return Promise.all([
       this.flushPassphrase(),
@@ -105,7 +103,7 @@ class PassphraseStorageService {
    * Removes the stored passphrase from the session memory.
    * @return {Promise<void>}
    */
-  static async stopSessionKeepAlive() {
+  async stopSessionKeepAlive() {
     this._clearKeepAliveAlarms();
   }
 
@@ -113,7 +111,7 @@ class PassphraseStorageService {
    * Clear all the alarms and listeners configured for flushing the passphrase if any.
    * @private
    */
-  static async _clearFlushAlarms() {
+  async _clearFlushAlarms() {
     await browser.alarms.clear(PASSPHRASE_FLUSH_ALARM);
     if (browser.alarms.onAlarm.hasListener(this._handleFlushEvent)) {
       browser.alarms.onAlarm.removeListener(this._handleFlushEvent);
@@ -124,7 +122,7 @@ class PassphraseStorageService {
    * Clear all the alarms and listeners configured for keeping session alive if any.
    * @private
    */
-  static async _clearKeepAliveAlarms() {
+  async _clearKeepAliveAlarms() {
     await browser.alarms.clear(SESSION_KEEP_ALIVE_ALARM);
     if (browser.alarms.onAlarm.hasListener(this._handleKeepSessionAlive)) {
       browser.alarms.onAlarm.removeListener(this._handleKeepSessionAlive);
@@ -136,7 +134,7 @@ class PassphraseStorageService {
    * @param {Alarm} alarm
    * @private
    */
-  static async _handleFlushEvent(alarm) {
+  async _handleFlushEvent(alarm) {
     if (alarm.name === PASSPHRASE_FLUSH_ALARM) {
       await this.flush();
     }
@@ -148,7 +146,7 @@ class PassphraseStorageService {
    * @returns {Promise<void>}
    * @private
    */
-  static async _handleKeepSessionAlive(alarm) {
+  async _handleKeepSessionAlive(alarm) {
     if (alarm.name !== SESSION_KEEP_ALIVE_ALARM) {
       return;
     }
@@ -166,7 +164,7 @@ class PassphraseStorageService {
   /**
    * Creates an alarm to ensure session is kept alive.
    */
-  static _keepAliveSession() {
+  _keepAliveSession() {
     browser.alarms.create(SESSION_KEEP_ALIVE_ALARM, {
       delayInMinutes: SESSION_CHECK_INTERNAL,
       periodInMinutes: SESSION_CHECK_INTERNAL
@@ -176,4 +174,4 @@ class PassphraseStorageService {
   }
 }
 
-export default PassphraseStorageService;
+export default new PassphraseStorageService();

@@ -15,11 +15,16 @@ import Entity from "../abstract/entity";
 import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = "SsoLoginUrl";
-const SSO_LOGIN_SUPPORTED_URLS = [
-  'https://login.microsoftonline.com',
-  'https://login.microsoftonline.us',
-  'https://login.partner.microsoftonline.cn',
-];
+const SSO_LOGIN_SUPPORTED_URLS = {
+  "azure": [
+    'https://login.microsoftonline.com',
+    'https://login.microsoftonline.us',
+    'https://login.partner.microsoftonline.cn',
+  ],
+  "google": [
+    'https://accounts.google.com'
+  ]
+};
 
 /**
  * Entity related to the SSO Login URL
@@ -31,26 +36,27 @@ class SsoLoginUrlEntity extends Entity {
    * @param {Object} ssoLoginUrlDto SSO Login URL DTO
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(ssoLoginUrlDto) {
+  constructor(ssoLoginUrlDto, ssoProvider) {
     super(EntitySchema.validate(
       SsoLoginUrlEntity.ENTITY_NAME,
       ssoLoginUrlDto,
-      SsoLoginUrlEntity.getSchema()
+      SsoLoginUrlEntity.getSchema(ssoProvider)
     ));
   }
 
   /**
    * Get entity schema
+   * @param {string} ssoProvider the sso provider the URL should match for
    * @returns {Object} schema
    */
-  static getSchema() {
+  static getSchema(ssoProvider) {
     return {
       "type": "object",
       "required": ["url"],
       "properties": {
         "url": {
           "type": "x-custom",
-          "validationCallback": SsoLoginUrlEntity.validateUrl
+          "validationCallback": url => SsoLoginUrlEntity.validateUrl(url, ssoProvider)
         },
       }
     };
@@ -62,7 +68,7 @@ class SsoLoginUrlEntity extends Entity {
    * ==================================================
    */
 
-  static validateUrl(value) {
+  static validateUrl(value, ssoProvider) {
     if (typeof value !== "string") {
       throw new TypeError("The url should be a string.");
     }
@@ -75,7 +81,11 @@ class SsoLoginUrlEntity extends Entity {
       throw new Error('The url should be a valid url.');
     }
 
-    const isSupportedUrl = SSO_LOGIN_SUPPORTED_URLS.some(supportedUrl => url.origin === supportedUrl);
+    if (!SSO_LOGIN_SUPPORTED_URLS[ssoProvider]) {
+      throw new Error('The url should be part of the list of supported single sign-on urls.');
+    }
+
+    const isSupportedUrl = SSO_LOGIN_SUPPORTED_URLS[ssoProvider].some(supportedUrl => url.origin === supportedUrl);
     if (!isSupportedUrl) {
       throw new Error('The url should be part of the list of supported single sign-on urls.');
     }

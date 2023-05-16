@@ -283,7 +283,7 @@ const User = (function() {
 
   /**
    * Retrieve and the store the user csrf token.
-   * @return {void}
+   * @return {Promise<void>}
    */
   this.retrieveAndStoreCsrfToken = async function() {
     // Don't use the getApiClientOptions. It will create a loop as it calls this method to retrieve the csrf token.

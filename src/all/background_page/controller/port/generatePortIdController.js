@@ -13,16 +13,15 @@
  */
 
 import {v4 as uuidv4} from "uuid";
-import WorkersSessionStorage from "../../../../chrome-mv3/service/sessionStorage/workersSessionStorage";
+import WorkersSessionStorage from "../../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 const APPLICATION_ALLOWED = {
   "RecoverBootstrap": ["Recover"],
-  "SetupBootstrap": ["Setup"],
+  "SetupBootstrap": ["Setup", "FileIframe"],
   "AuthBootstrap": ["Auth"],
-  "AppBootstrap": ["App"],
-  "AccountRecoveryBootstrap": ["AccountRecovery"],
+  "AppBootstrap": ["App", "FileIframe"],
+  "AccountRecoveryBootstrap": ["AccountRecovery", "FileIframe"],
   "WebIntegration": ["InFormCallToAction", "InFormMenu"],
 };
 
@@ -54,8 +53,7 @@ class GeneratePortIdController {
 
   /**
    * Check if the application name is a string and is allowed to open another application.
-   * For MV2: return the port name
-   * For MV3: Add worker and generate the port id.
+   * Add worker and generate the port id.
    *
    * @return {Promise<string>}
    */
@@ -63,42 +61,29 @@ class GeneratePortIdController {
     if (typeof applicationName !== "string") {
       throw new Error("The application name should be a string");
     }
-    if (!this.isAllowedToGeneratePortId(this.worker, applicationName)) {
+    if (!this.isAllowedToGeneratePortId(this.worker.name, applicationName)) {
       throw new Error(`The application is not allowed to open the application ${applicationName}`);
     }
-    // @deprecated The support of MV2 will be down soon
-    if (this.isManifestV2) {
-      return `passbolt-iframe-${applicationName.toLowerCase()}`;
-    } else {
-      const tab = this.worker.tab;
-      const worker = {
-        id: uuidv4(),
-        name: applicationName,
-        tabId: tab.id,
-        frameId: null
-      };
-      await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
-      return worker.id;
-    }
+
+    const tab = this.worker.tab;
+    const worker = {
+      id: uuidv4(),
+      name: applicationName,
+      tabId: tab.id,
+      frameId: null
+    };
+    await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
+    return worker.id;
   }
 
   /**
    * Is allowed to generate port id
-   * @param {*} worker
+   * @param {string} workerName
    * @param {string} applicationName
    * @returns {Boolean}
    */
-  isAllowedToGeneratePortId(worker, applicationName) {
-    const workerName = worker.name || worker.pageMod.args.name;
+  isAllowedToGeneratePortId(workerName, applicationName) {
     return APPLICATION_ALLOWED[workerName]?.includes(applicationName);
-  }
-
-  /**
-   * Is manifest v2
-   * @returns {boolean}
-   */
-  get isManifestV2() {
-    return browser.runtime.getManifest().manifest_version === 2;
   }
 }
 

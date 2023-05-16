@@ -21,9 +21,6 @@ import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import User from "../../model/user";
 import Keyring from "../../model/keyring";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import WebIntegration from "../../pagemod/webIntegrationPagemod";
-import AuthBootstrap from "../../pagemod/authBootstrapPagemod";
-import PublicWebsiteSignIn from "../../pagemod/publicWebsiteSignInPagemod";
 
 jest.mock("../../app");
 
@@ -35,18 +32,13 @@ beforeEach(() => {
 describe("CompleteSetupController", () => {
   describe("CompleteSetupController::exec", () => {
     it("Should complete the setup.", async() => {
-      jest.spyOn(chrome.runtime, 'getManifest').mockImplementationOnce(() => ({manifest_version: 2}));
       const account = new AccountSetupEntity(withSecurityTokenAccountSetupDto());
       const controller = new CompleteSetupController(null, null, defaultApiClientOptions(), account);
 
       // Mock API complete request.
       fetch.doMockOnce(() => mockApiResponse());
-      // Mock pagemods to assert the complete start the auth and inform menu pagemods.
-      WebIntegration.init = jest.fn();
-      PublicWebsiteSignIn.init = jest.fn();
-      AuthBootstrap.init = jest.fn();
 
-      expect.assertions(12);
+      expect.assertions(9);
       await controller.exec();
       const user = User.getInstance().get();
       expect(user.id).toStrictEqual(account.userId);
@@ -68,10 +60,6 @@ describe("CompleteSetupController", () => {
       expect(keyringPrivateFingerprint).toStrictEqual(accountPrivateFingerprint);
       expect(keyringPublicFingerprint).toStrictEqual(accountPublicFingerprint);
       expect(keyringPublicFingerprint).toStrictEqual(keyringPrivateFingerprint);
-
-      expect(WebIntegration.init).toHaveBeenCalled();
-      expect(PublicWebsiteSignIn.init).toHaveBeenCalled();
-      expect(AuthBootstrap.init).toHaveBeenCalled();
     });
 
     it("Should not add the account to the local storage if the complete API request fails.", async() => {

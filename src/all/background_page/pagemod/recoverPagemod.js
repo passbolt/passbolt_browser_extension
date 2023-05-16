@@ -1,63 +1,60 @@
 /**
  * Passbolt ~ Open source password manager for teams
- * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
  *
  * Licensed under GNU Affero General Public License version 3 of the or any later version.
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @copyright     Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         4.0.0
  */
-
-import PageMod from "../sdk/page-mod";
-import {App as app} from "../app";
-import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import Pagemod from "./pagemod";
+import {ConfigEvents} from "../event/configEvents";
+import {RecoverEvents} from "../event/recoverEvents";
 import BuildAccountRecoverService from "../service/recover/buildAccountRecoverService";
+import BuildApiClientOptionsService
+  from "../service/account/buildApiClientOptionsService";
+import {PownedPasswordEvents} from "../event/pownedPasswordEvents";
 import OrganizationSettingsModel from "../model/organizationSettings/organizationSettingsModel";
 
-/*
- * This pagemod help bootstrap the first step of the recover process from a passbolt server app page
- * The pattern for this url, driving the recover bootstrap, is defined in config.json
- */
-const Recover = function() {};
-Recover._pageMod = undefined;
-
-Recover.init = function() {
-  if (typeof Recover._pageMod !== 'undefined') {
-    Recover._pageMod.destroy();
-    Recover._pageMod = undefined;
+class Recover extends Pagemod {
+  /**
+   * @inheritDoc
+   * @returns {string}
+   */
+  get appName() {
+    return "Recover";
   }
 
-  Recover._pageMod = new PageMod({
-    name: 'Setup',
-    include: 'about:blank?passbolt=passbolt-iframe-recover',
-    contentScriptWhen: 'ready',
-    contentScriptFile: [
-      /*
-       * Warning: script and styles need to be modified in
-       * chrome/data/passbolt-iframe-recover.html
-       */
-    ],
-    onAttach: async function(worker) {
-      let account, apiClientOptions;
-      try {
-        account = BuildAccountRecoverService.buildFromRecoverUrl(worker.tab.url);
-        apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
-        await (new OrganizationSettingsModel(apiClientOptions)).getOrFind(true);
-      } catch (error) {
-        // Unexpected error, this pagemod shouldn't have been initialized as the bootstrapRecoverPagemod should have raised an exception and not inject this iframe.
-        console.error(error);
-        return;
+  /**
+   * Get events
+   * @returns {[]}
+   */
+  get events() {
+    return [ConfigEvents, RecoverEvents, PownedPasswordEvents];
+  }
+
+  /**
+   * Attach events
+   * @param port the port
+   */
+  async attachEvents(port) {
+    try {
+      const tab = port._port.sender.tab;
+      const account = BuildAccountRecoverService.buildFromRecoverUrl(tab.url);
+      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+      await (new OrganizationSettingsModel(apiClientOptions)).getOrFind(true);
+      for (const event of this.events) {
+        event.listen({port, tab}, apiClientOptions, account);
       }
-
-      // @todo account-recovery-refactoring check to remove all the listener, they expose confidential services.
-      app.events.config.listen(worker);
-      app.events.recover.listen(worker, apiClientOptions, account);
-      app.events.pownedPassword.listen(worker);
+    } catch (error) {
+      // Unexpected error, this pagemod shouldn't have been initialized as the bootstrapRecoverPagemod should have raised an exception and not inject this iframe.
+      console.error(error);
     }
-  });
-};
+  }
+}
 
-export default Recover;
+export default new Recover();

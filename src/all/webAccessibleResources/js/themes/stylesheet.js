@@ -88,7 +88,8 @@
       }
 
       const {_passbolt_data: {config}} = storageData;
-      return this.isValidTheme(config["user.settings.theme"]);
+      const keyExists = config && "user.settings.theme" in config;
+      return keyExists && this.isValidTheme(config["user.settings.theme"]);
     }
 
     isValidTheme(theme) {

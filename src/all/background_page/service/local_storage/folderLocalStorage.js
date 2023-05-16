@@ -211,19 +211,6 @@ class FolderLocalStorage {
       throw new TypeError('FolderLocalStorage::set expects FolderEntity permission to be set');
     }
   }
-
-  /**
-   * Init folder local storage
-   */
-  static init() {
-    // Flush the local storage when this library is loaded
-    this.flush();
-
-    // Flush the local storage when the passbolt user session is terminated
-    self.addEventListener("passbolt.auth.after-logout", () => {
-      this.flush();
-    });
-  }
 }
 
 export default FolderLocalStorage;

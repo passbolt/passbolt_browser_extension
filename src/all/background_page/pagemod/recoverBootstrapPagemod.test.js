@@ -73,7 +73,6 @@ describe("RecoverBootstrap", () => {
 
   describe("RecoverBootstrap::canBeAttachedTo", () => {
     each([
-      {scenario: "Legacy url & top frame", url: "https://passbolt.dev/setup/recover/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0", frameId: Pagemod.TOP_FRAME_ID},
       {scenario: "Valid url & top frame", url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0", frameId: Pagemod.TOP_FRAME_ID},
     ]).describe("Should be able to attach a pagemod to browser frame", _props => {
       it(`Should be able to attach a pagemod to browser frame: ${_props.scenario}`, async() => {
@@ -84,6 +83,7 @@ describe("RecoverBootstrap", () => {
     });
 
     each([
+      {scenario: "Legacy url & top frame", url: "https://passbolt.dev/setup/recover/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0", frameId: Pagemod.TOP_FRAME_ID},
       {scenario: "No domain", url: "setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0", frameId: Pagemod.TOP_FRAME_ID},
       {scenario: "No token", url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228", frameId: Pagemod.TOP_FRAME_ID},
       {scenario: "Not top frame", url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0", frameId: 1},

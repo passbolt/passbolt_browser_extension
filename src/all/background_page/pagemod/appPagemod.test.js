@@ -99,7 +99,7 @@ describe("Auth", () => {
       // process
       await App.attachEvents(port);
       // expectations
-      expect(GetLegacyAccountService.get).toHaveBeenCalled();
+      expect(GetLegacyAccountService.get).toHaveBeenCalledWith({role: true});
       expect(ConfigEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
       expect(AppEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
       expect(AuthEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);

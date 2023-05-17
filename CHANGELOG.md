@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [4.0.1] - 2023-05-17
+### Fixed
+- PB-24639 Fix: As an administrator I want to be see which users have activated MFA from the users workspace
+
 ## [4.0.0] - 2023-05-02
 ### Added
 - PB-23531 As an administrator I can setup google as SSO provider
@@ -1191,7 +1195,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.1...HEAD
+[4.0.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.12.1...v4.0.0
 [3.12.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.12.0...v3.12.1
 [3.12.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.11.2...v3.12.0

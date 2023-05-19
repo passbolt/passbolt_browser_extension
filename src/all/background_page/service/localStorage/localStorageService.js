@@ -25,12 +25,14 @@ import PostponedUserSettingInvitationService
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import SsoKitTemporaryStorageService
   from "../session_storage/ssoKitTemporaryStorageService";
+import GetLegacyAccountService from "../account/getLegacyAccountService";
+import RbacsLocalStorage from "../local_storage/rbacLocalStorage";
 
 class LocalStorageService {
   /**
    * Flush all storage
    */
-  static flush() {
+  static async flush() {
     ResourceLocalStorage.flush();
     ResourceTypeLocalStorage.flush();
     FolderLocalStorage.flush();
@@ -42,6 +44,9 @@ class LocalStorageService {
     PostponedUserSettingInvitationService.reset();
     PassphraseStorageService.flush();
     SsoKitTemporaryStorageService.flush();
+    const account = await GetLegacyAccountService.get();
+    const rbacsLocalStorage = new RbacsLocalStorage(account);
+    rbacsLocalStorage.flush();
   }
 }
 

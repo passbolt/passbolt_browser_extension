@@ -11,9 +11,11 @@ import SecretDecryptController from "../controller/secret/secretDecryptControlle
 import ResourceInProgressCacheService from "../service/cache/resourceInProgressCache.service";
 import i18n from "../sdk/i18n";
 import WorkerService from "../service/worker/workerService";
+import FindMeController from "../controller/rbac/findMeController";
+import UserModel from "../model/user/userModel";
 
 
-const listen = function(worker) {
+const listen = function(worker, account) {
   /*
    * Use a resource on the current tab.
    *
@@ -115,6 +117,38 @@ const listen = function(worker) {
     } catch (error) {
       console.error(error);
     }
+  });
+
+  /*
+   * Find the logged in user
+   *
+   * @listens passbolt.users.find-logged-in-user
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.users.find-logged-in-user', async requestId => {
+    try {
+      const clientOptions = await User.getInstance().getApiClientOptions();
+      const userModel = new UserModel(clientOptions, account);
+      const loggedInUserId = User.getInstance().get().id;
+      const contains = {profile: true, role: true, account_recovery_user_setting: true};
+      const userEntity = await userModel.findOne(loggedInUserId, contains, true);
+      worker.port.emit(requestId, 'SUCCESS', userEntity);
+    } catch (error) {
+      console.error(error);
+      worker.port.emit(requestId, 'ERROR', error);
+    }
+  });
+
+  /*
+   * ==================================================================================
+   *  Role based control action
+   * ==================================================================================
+   */
+
+  worker.port.on('passbolt.rbacs.find-me', async(requestId, name) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new FindMeController(worker, requestId, apiClientOptions, account);
+    await controller._exec(name);
   });
 };
 

@@ -16,20 +16,29 @@ import LocalStorageService from "./localStorageService";
 import browser from "../../sdk/polyfill/browserPolyfill";
 import PostponedUserSettingInvitationService
   from "../api/invitation/postponedUserSettingInvitationService";
+import GetLegacyAccountService from "../account/getLegacyAccountService";
+import {v4 as uuidv4} from "uuid";
+import HashString from "../../utils/format/hashString";
 
 describe("LocalStorageService", () => {
   describe("LocalStorageService::flush", () => {
     it("Should flush all storage", async() => {
-      expect.assertions(16);
+      expect.assertions(18);
+      // mock data
+      const account = {
+        domain: "localhost",
+        userId: uuidv4()
+      };
       // spy on
       jest.spyOn(browser.storage.local, "remove");
       jest.spyOn(browser.storage.session, "remove");
       jest.spyOn(browser.alarms, "clear");
       jest.spyOn(PostponedUserSettingInvitationService, "reset");
+      jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
       // process
       await LocalStorageService.flush();
       // expectations
-      expect(browser.storage.local.remove).toHaveBeenCalledTimes(8);
+      expect(browser.storage.local.remove).toHaveBeenCalledTimes(9);
       expect(browser.storage.session.remove).toHaveBeenCalledTimes(2);
       expect(browser.alarms.clear).toHaveBeenCalledTimes(2);
       expect(browser.storage.local.remove).toHaveBeenCalledWith("resources");
@@ -45,6 +54,8 @@ describe("LocalStorageService", () => {
       expect(browser.alarms.clear).toHaveBeenCalledWith("PassphraseStorageFlush");
       expect(browser.alarms.clear).toHaveBeenCalledWith("SessionKeepAlive");
       expect(browser.storage.session.remove).toHaveBeenCalledWith("temp_server_part_sso_kit");
+      expect(GetLegacyAccountService.get).toHaveBeenCalled();
+      expect(browser.storage.local.remove).toHaveBeenCalledWith(`rbac${HashString.exec(account.domain)}${account.userId}`);
     });
   });
 });

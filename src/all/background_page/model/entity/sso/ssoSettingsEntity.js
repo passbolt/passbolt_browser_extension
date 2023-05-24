@@ -101,10 +101,19 @@ class SsoSettingsEntity extends Entity {
    */
   static sanitizeDto(dto) {
     dto = Object.assign({}, dto); // shallow clone.
-    if (dto?.data?.client_secret_expiry && DATETIME_REGEXP.test(dto.data.client_secret_expiry)) {
+    if (dto.data?.client_secret_expiry && DATETIME_REGEXP.test(dto.data.client_secret_expiry)) {
       // we ignore the time part of the date as the UI doesn't support it
       dto.data.client_secret_expiry = dto.data.client_secret_expiry.substr(0, 10);
     }
+
+    // Set the default values to ensure backward compatibility
+    if (!dto.data?.email_claim && dto.data?.provider === AZURE) {
+      dto.data.email_claim = "email";
+    }
+    if (!dto.data?.prompt && dto.data?.provider === AZURE) {
+      dto.data.prompt = "login";
+    }
+
     return dto;
   }
 

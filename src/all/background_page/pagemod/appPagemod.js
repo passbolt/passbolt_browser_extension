@@ -14,6 +14,7 @@
 import Pagemod from "./pagemod";
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import GpgAuth from "../model/gpgauth";
+import AppInitController from "../controller/app/appInitController";
 import {AppEvents} from "../event/appEvents";
 import {ConfigEvents} from "../event/configEvents";
 import {AuthEvents} from "../event/authEvents";
@@ -100,7 +101,11 @@ class App extends Pagemod {
         return;
       }
 
-      const account = await GetLegacyAccountService.get();
+      // Init the application.
+      const appInitController = new AppInitController();
+      await appInitController.main();
+
+      const account = await GetLegacyAccountService.get({role: true});
       for (const event of this.events) {
         event.listen({port, tab}, account);
       }

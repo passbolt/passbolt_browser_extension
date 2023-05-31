@@ -18,6 +18,7 @@ import ParseSetupUrlService from "./parseSetupUrlService";
 describe("ParseSetupUrlService", () => {
   describe("ParseSetupUrlService:parse", () => {
     each([
+      {scenario: "Legacy url", url: "https://passbolt.dev/setup/install/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0", domain: "https://passbolt.dev"},
       {scenario: "TLD", url: "https://passbolt.dev/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0", domain: "https://passbolt.dev"},
       {scenario: "TLD with Port", url: "https://passbolt.dev:4443/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0", domain: "https://passbolt.dev:4443"},
       {scenario: "Non tld", url: "https://passbolt/setup/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0", domain: "https://passbolt"},
@@ -39,7 +40,6 @@ describe("ParseSetupUrlService", () => {
     });
 
     each([
-      {scenario: "Legacy url", url: "https://passbolt.dev/setup/install/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0", domain: "https://passbolt.dev"},
       {scenario: "No domain", url: "setup/install/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"},
       {scenario: "No token", url: "https://passbolt.dev/setup/install/571bec7e-6cce-451d-b53a-f8c93e147228"},
       {scenario: "No user id", url: "https://passbolt.dev/setup/install"},

@@ -39,7 +39,7 @@ describe("PagemodManager", () => {
       const details = {
         tabId: 1,
         frameId: 0,
-        url: "https://passbolt.dev/setup/recover/start/d57c10f5-639d-5160-9c81-8a0c6c4ec856/efc85bca-fc9f-4b32-aebf-b82765312e47"
+        url: "https://passbolt.dev/setup/recover/d57c10f5-639d-5160-9c81-8a0c6c4ec856/efc85bca-fc9f-4b32-aebf-b82765312e47"
       };
       // process
       await PagemodManager.exec(details);
@@ -187,7 +187,7 @@ describe("PagemodManager", () => {
       // expectations
       expect(PagemodManager.hasPagemodMatchUrlToReload("https://passbolt.dev")).toBeTruthy();
       expect(PagemodManager.hasPagemodMatchUrlToReload("https://www.passbolt.com")).toBeFalsy();
-      expect(PagemodManager.hasPagemodMatchUrlToReload("https://passbolt.dev/setup/recover/start/d57c10f5-639d-5160-9c81-8a0c6c4ec856/efc85bca-fc9f-4b32-aebf-b82765312e47")).toBeTruthy();
+      expect(PagemodManager.hasPagemodMatchUrlToReload("https://passbolt.dev/setup/recover/d57c10f5-639d-5160-9c81-8a0c6c4ec856/efc85bca-fc9f-4b32-aebf-b82765312e47")).toBeTruthy();
       expect(PagemodManager.hasPagemodMatchUrlToReload("https://passbolt.dev/auth/login")).toBeTruthy();
       expect(PagemodManager.hasPagemodMatchUrlToReload("https://passbolt.dev/setup/start/d57c10f5-639d-5160-9c81-8a0c6c4ec856/efc85bca-fc9f-4b32-aebf-b82765312e47")).toBeTruthy();
       expect(PagemodManager.hasPagemodMatchUrlToReload("https://passbolt.dev/account-recovery/continue/d57c10f5-639d-5160-9c81-8a0c6c4ec856/cb66b7ca-bb85-4088-b0da-c50f6f0c2a13")).toBeTruthy();

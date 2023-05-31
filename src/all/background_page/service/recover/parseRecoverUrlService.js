@@ -28,7 +28,7 @@ class ParseRecoverUrlService {
     }
 
     let [, domain] = parsedUrl;
-    const [, , user_id, authentication_token_token] = parsedUrl;
+    const [, , , user_id, authentication_token_token] = parsedUrl;
 
     // Sanitize domains, removed trailing "/" in order to avoid domains such as https://passbolt.dev//
     domain = domain.replace(/\/*$/g, '');
@@ -48,7 +48,7 @@ class ParseRecoverUrlService {
    */
   static getRegex() {
     const uuidRegex = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[0-5][a-fA-F0-9]{3}-[089aAbB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}";
-    return new RegExp(`(.*)\/setup\/recover\/start\/(${uuidRegex})\/(${uuidRegex})`);
+    return new RegExp(`(.*)\/(setup\/recover|setup\/recover\/start)\/(${uuidRegex})\/(${uuidRegex})`);
   }
 
   /**

@@ -39,10 +39,10 @@ describe("ParseAccountRecoveryUrlService", () => {
     });
 
     each([
-      {scenario: "No domain", url: "account-recovery/continue/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"},
-      {scenario: "No token", url: "https://passbolt.dev/account-recovery/continue/571bec7e-6cce-451d-b53a-f8c93e147228"},
-      {scenario: "No user id", url: "https://passbolt.dev/account-recovery/continue"},
-      {scenario: "Not targeting account recovery", url: "https://passbolt.dev/setup/recover/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0", domain: "https://passbolt.dev"},
+      {scenario: "No domain", url: "setup/install/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"},
+      {scenario: "No token", url: "https://passbolt.dev/setup/install/571bec7e-6cce-451d-b53a-f8c93e147228"},
+      {scenario: "No user id", url: "https://passbolt.dev/setup/install"},
+      {scenario: "Not targeting setup start", url: "https://passbolt.dev/setup/recover/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0", domain: "https://passbolt.dev"},
     ]).describe("should not parse", _props => {
       it(`should not parse: ${_props.scenario}`, () => {
         expect.assertions(1);

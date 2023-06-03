@@ -13,13 +13,10 @@
  */
 import browser from "../../sdk/polyfill/browserPolyfill";
 import Log from "../../model/log";
-import Lock from "../../utils/lock";
-import HashString from "../../utils/format/hashString";
 import RbacEntity from "passbolt-styleguide/src/shared/models/entity/rbac/rbacEntity";
 import RbacsCollection from "passbolt-styleguide/src/shared/models/entity/rbac/rbacsCollection";
-const lock = new Lock();
 
-const RBACS_LOCAL_STORAGE_KEY = 'rbac';
+export const RBACS_LOCAL_STORAGE_KEY = 'rbac';
 
 class RbacsLocalStorage {
   /**
@@ -27,8 +24,22 @@ class RbacsLocalStorage {
    * @param account the user account
    */
   constructor(account) {
-    this.key = this.getKey(account);
+    this.storageKey = this.getStorageKey(account);
   }
+
+  /**
+   * Get the storage key.
+   * @param {AbstractAccountEntity} account The account to get the key for.
+   * @returns {string}
+   * @throws {Error} If it cannot retrieve account id.
+   */
+  getStorageKey(account) {
+    if (!account.id) {
+      throw new Error('Cannot retrieve account id, necessary to get a rbac storage key.');
+    }
+    return `${RBACS_LOCAL_STORAGE_KEY}-${account.id}`;
+  }
+
   /**
    * Flush the rbacs local storage
    * @throws {Error} if operation failed
@@ -36,7 +47,7 @@ class RbacsLocalStorage {
    */
   async flush() {
     Log.write({level: 'debug', message: 'RbacLocalStorage flushed'});
-    return await browser.storage.local.remove(this.key);
+    return await browser.storage.local.remove(this.storageKey);
   }
 
   /**
@@ -46,8 +57,8 @@ class RbacsLocalStorage {
    * If storage is not set, undefined will be returned.
    */
   async get() {
-    const rbacs = await browser.storage.local.get([this.key]);
-    return rbacs[this.key];
+    const rbacs = await browser.storage.local.get([this.storageKey]);
+    return rbacs[this.storageKey];
   }
 
   /**
@@ -56,19 +67,19 @@ class RbacsLocalStorage {
    * @return {void}
    */
   async set(rbacsCollection) {
-    await lock.acquire();
-    const rbacs = [];
-    if (rbacsCollection) {
-      if (!(rbacsCollection instanceof RbacsCollection)) {
-        throw new TypeError('RbacsLocalStorage::set expects a RbacsCollection');
+    await navigator.locks.request(this.storageKey, async() => {
+      const rbacs = [];
+      if (rbacsCollection) {
+        if (!(rbacsCollection instanceof RbacsCollection)) {
+          throw new TypeError('RbacsLocalStorage::set expects a RbacsCollection');
+        }
+        for (const rbacEntity of rbacsCollection) {
+          RbacsLocalStorage.assertEntityBeforeSave(rbacEntity);
+          rbacs.push(rbacEntity.toDto(RbacEntity.ALL_CONTAIN_OPTIONS));
+        }
       }
-      for (const rbacEntity of rbacsCollection) {
-        RbacsLocalStorage.assertEntityBeforeSave(rbacEntity);
-        rbacs.push(rbacEntity.toDto(RbacEntity.ALL_CONTAIN_OPTIONS));
-      }
-    }
-    await browser.storage.local.set({[this.key]: rbacs});
-    lock.release();
+      await browser.storage.local.set({[this.storageKey]: rbacs});
+    });
   }
 
   /*
@@ -93,15 +104,6 @@ class RbacsLocalStorage {
     if (!rbacEntity.id) {
       throw new TypeError('RolesLocalStorage expects RbacEntity id to be set');
     }
-  }
-
-  /**
-   * Get the key
-   * @param account The user account
-   * @return {string}
-   */
-  getKey(account) {
-    return RBACS_LOCAL_STORAGE_KEY + HashString.exec(account.domain) + account.userId;
   }
 }
 

@@ -12,8 +12,8 @@
  * @since         3.6.0
  */
 import AccountRecoveryPrivateKeyEntity from "./accountRecoveryPrivateKeyEntity";
-import Entity from "../abstract/entity";
-import EntitySchema from "../abstract/entitySchema";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 
 const ENTITY_NAME = 'AccountRecoveryUserSetting';

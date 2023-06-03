@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import Entity from "../../abstract/entity";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import ExternalGpgKeyEntity from "./externalGpgKeyEntity";
-import EntitySchema from "../../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 
 const ENTITY_NAME = 'externalGpgKeyPairEntity';

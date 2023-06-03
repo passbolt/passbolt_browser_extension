@@ -13,13 +13,13 @@
  */
 import PermissionEntity from "../permission/permissionEntity";
 import PermissionsCollection from "../permission/permissionsCollection";
-import Entity from "../abstract/entity";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import FavoriteEntity from "../favorite/favoriteEntity";
 import ResourceTypeEntity from "../resourceType/resourceTypeEntity";
 import TagsCollection from "../tag/tagsCollection";
 import ResourceSecretsCollection from "../secret/resource/resourceSecretsCollection";
-import EntityValidationError from "../abstract/entityValidationError";
-import EntitySchema from "../abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 
 const ENTITY_NAME = 'Resource';

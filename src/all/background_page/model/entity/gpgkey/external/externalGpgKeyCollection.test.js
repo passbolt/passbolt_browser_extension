@@ -13,7 +13,7 @@
  */
 import ExternalGpgKeyCollection from "./externalGpgKeyCollection";
 import {ExternalGpgKeyEntityFixtures} from "./externalGpgKeyEntity.test.fixtures";
-import EntitySchema from "../../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 describe("ExternalGpgKey Collection", () => {
   it("schema must validate", () => {

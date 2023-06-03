@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AccountRecoveryOrganizationPolicyEntity from "./accountRecoveryOrganizationPolicyEntity";
-import Entity from "../abstract/entity";
 import AccountRecoveryOrganizationPublicKeyEntity from "./accountRecoveryOrganizationPublicKeyEntity";
-import EntityValidationError from "../abstract/entityValidationError";
-import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = "AccountRecoveryOrganizationChangePolicy";
 

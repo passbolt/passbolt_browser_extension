@@ -11,20 +11,18 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.1.0
  */
-import {v4 as uuidv4} from 'uuid';
 import RbacLocalStorage from "./rbacLocalStorage";
 import {defaultRbacWithUiActionData} from "passbolt-styleguide/src/shared/models/entity/rbac/rbacEntity.test.data";
 import RbacEntity from "passbolt-styleguide/src/shared/models/entity/rbac/rbacEntity";
 import RbacsCollection from "passbolt-styleguide/src/shared/models/entity/rbac/rbacsCollection";
 import browser from "../../sdk/polyfill/browserPolyfill";
 import GetLegacyAccountService from "../account/getLegacyAccountService";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 
 describe("RbacLocalStorage", () => {
   // mock data
-  const account = {
-    domain: "localhost",
-    userId: uuidv4()
-  };
+  const account = new AccountEntity(defaultAccountDto());
   // spy on
   jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
 
@@ -40,7 +38,7 @@ describe("RbacLocalStorage", () => {
       const rbacs = [defaultRbacWithUiActionData()];
       expect.assertions(1);
       const rbacLocalstorage = new RbacLocalStorage(account);
-      browser.storage.local.set({[rbacLocalstorage.key]: rbacs});
+      browser.storage.local.set({[rbacLocalstorage.storageKey]: rbacs});
       const result = await rbacLocalstorage.get();
       expect(result).toEqual(rbacs);
     });

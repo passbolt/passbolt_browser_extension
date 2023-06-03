@@ -12,10 +12,10 @@
  * @since         3.11.0
  */
 
-import EntitySchema from "../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import MfaCombinedEnabledProvidersEntity from './mfaCombinedEnabledProvidersEntity';
 import {defaultMfaSettings} from "./mfaCombinedEnabledProvidersEntity.data";
-import EntityValidationError from '../abstract/entityValidationError';
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("Mfa settings entity", () => {
   it("schema must validate", () => {

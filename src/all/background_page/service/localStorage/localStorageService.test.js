@@ -14,32 +14,31 @@
 
 import LocalStorageService from "./localStorageService";
 import browser from "../../sdk/polyfill/browserPolyfill";
-import PostponedUserSettingInvitationService
-  from "../api/invitation/postponedUserSettingInvitationService";
+import PostponedUserSettingInvitationService from "../api/invitation/postponedUserSettingInvitationService";
 import GetLegacyAccountService from "../account/getLegacyAccountService";
-import {v4 as uuidv4} from "uuid";
-import HashString from "../../utils/format/hashString";
+import UserMeSessionStorageService from "../sessionStorage/userMeSessionStorageService";
+import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import {RBACS_LOCAL_STORAGE_KEY} from "../local_storage/rbacLocalStorage";
 
 describe("LocalStorageService", () => {
   describe("LocalStorageService::flush", () => {
     it("Should flush all storage", async() => {
-      expect.assertions(18);
+      expect.assertions(19);
       // mock data
-      const account = {
-        domain: "localhost",
-        userId: uuidv4()
-      };
+      const account = new AccountEntity(defaultAccountDto());
       // spy on
       jest.spyOn(browser.storage.local, "remove");
       jest.spyOn(browser.storage.session, "remove");
       jest.spyOn(browser.alarms, "clear");
       jest.spyOn(PostponedUserSettingInvitationService, "reset");
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
+      jest.spyOn(UserMeSessionStorageService, "remove");
       // process
       await LocalStorageService.flush();
       // expectations
       expect(browser.storage.local.remove).toHaveBeenCalledTimes(9);
-      expect(browser.storage.session.remove).toHaveBeenCalledTimes(2);
+      expect(browser.storage.session.remove).toHaveBeenCalledTimes(3);
       expect(browser.alarms.clear).toHaveBeenCalledTimes(2);
       expect(browser.storage.local.remove).toHaveBeenCalledWith("resources");
       expect(browser.storage.local.remove).toHaveBeenCalledWith("resourceTypes");
@@ -55,7 +54,8 @@ describe("LocalStorageService", () => {
       expect(browser.alarms.clear).toHaveBeenCalledWith("SessionKeepAlive");
       expect(browser.storage.session.remove).toHaveBeenCalledWith("temp_server_part_sso_kit");
       expect(GetLegacyAccountService.get).toHaveBeenCalled();
-      expect(browser.storage.local.remove).toHaveBeenCalledWith(`rbac${HashString.exec(account.domain)}${account.userId}`);
+      expect(browser.storage.local.remove).toHaveBeenCalledWith(`${RBACS_LOCAL_STORAGE_KEY}-${account.id}`);
+      expect(UserMeSessionStorageService.remove).toHaveBeenCalledWith(account);
     });
   });
 });

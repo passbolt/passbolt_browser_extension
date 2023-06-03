@@ -13,8 +13,8 @@
  */
 import ResourcesCollection from "./resourcesCollection";
 import TagEntity from "../tag/tagEntity";
-import EntityCollectionError from "../abstract/entityCollectionError";
-import EntitySchema from "../abstract/entitySchema";
+import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import TagsCollection from "../tag/tagsCollection";
 
 

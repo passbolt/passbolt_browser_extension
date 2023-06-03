@@ -12,9 +12,9 @@
  * @since         3.0.0
  */
 import ResourceEntity from "../resource/resourceEntity";
-import Entity from "../abstract/entity";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import UserEntity from "../user/userEntity";
-import EntitySchema from "../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'Comment';
 const COMMENT_CONTENT_MIN_LENGTH = 1;

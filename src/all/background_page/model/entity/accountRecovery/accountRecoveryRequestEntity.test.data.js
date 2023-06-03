@@ -16,12 +16,13 @@ import {v4 as uuidv4} from "uuid";
 import {defaultAccountRecoveryPrivateKeyDto} from "./accountRecoveryPrivateKeyEntity.test.data";
 import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
 import {acceptedAccountRecoveryResponseDto} from "./accountRecoveryResponseEntity.test.data";
-import {defaultUserDto} from "../user/userEntity.test.data";
+import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 
 export const pendingAccountRecoveryRequestDto = (data = {}) => {
-  const defaultData = {
+  const userId = data.user_id || uuidv4();
+  return {
     id: uuidv4(),
-    user_id: uuidv4(),
+    user_id: userId,
     armored_key: pgpKeys.account_recovery_request.public,
     fingerprint: pgpKeys.account_recovery_request.fingerprint,
     status: "pending",
@@ -29,18 +30,14 @@ export const pendingAccountRecoveryRequestDto = (data = {}) => {
     modified: "2020-05-04T20:31:45+00:00",
     created_by: "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
     modified_by: "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
+    account_recovery_private_key: defaultAccountRecoveryPrivateKeyDto({
+      user_id: userId,
+    }),
+    creator: defaultUserDto({
+      id: userId,
+    }),
+    ...data
   };
-  data = Object.assign(defaultData, data);
-  data.account_recovery_private_key = defaultAccountRecoveryPrivateKeyDto({
-    user_id: data.user_id,
-    ...data?.account_recovery_private_key
-  });
-  data.creator = defaultUserDto({
-    id: data.user_id,
-    ...data?.creator
-  });
-
-  return data;
 };
 
 export const pendingAccountRecoveryRequestWithoutPrivateKeyDto = (data = {}) => {
@@ -57,14 +54,11 @@ export const pendingAccountRecoveryRequestWithoutPrivateKeyPasswordDto = (data =
   return dto;
 };
 
-export const approvedAccountRecoveryRequestDto = (data = {}) => {
-  const defaultData = {
-    status: "approved",
-    account_recovery_responses: [acceptedAccountRecoveryResponseDto()]
-  };
-
-  return pendingAccountRecoveryRequestDto(Object.assign(defaultData, data));
-};
+export const approvedAccountRecoveryRequestDto = (data = {}) => pendingAccountRecoveryRequestDto({
+  status: "approved",
+  account_recovery_responses: [acceptedAccountRecoveryResponseDto()],
+  ...data
+});
 
 export const approvedAccountRecoveryRequestWithoutPrivateKeyDto = (data = {}) => {
   const dto = approvedAccountRecoveryRequestDto(data);
@@ -85,3 +79,24 @@ export const pendingAccountRecoveryRequestDtoWithNonStandardCreatorEmail = () =>
     username: 'ada@passbolt.c'
   }
 });
+
+export const pendingAccountRecoveryRequestWithWrongPrivateKeyUserIdDto = () => {
+  const dto = pendingAccountRecoveryRequestDto();
+  dto.account_recovery_private_key.user_id = uuidv4();
+
+  return dto;
+};
+
+export const pendingAccountRecoveryRequestWithInvalidAccountRecoveryPrivateKeyPasswordDto = () => {
+  const dto = pendingAccountRecoveryRequestDto();
+  dto.account_recovery_private_key.account_recovery_private_key_passwords[0].recipient_foreign_model = "unknown-foreign-model";
+
+  return dto;
+};
+
+export const pendingAccountRecoveryRequestWithWrongPrivateKeyIdDto = () => {
+  const dto = pendingAccountRecoveryRequestDto();
+  dto.account_recovery_private_key.account_recovery_private_key_passwords[0].private_key_id = uuidv4();
+
+  return dto;
+};

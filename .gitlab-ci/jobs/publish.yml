@@ -5,6 +5,7 @@ publish-chrome:
       when: manual
   script:
     - |
+      apt-get update && apt-get install -y curl
       bash .gitlab-ci/scripts/bin/publish.sh
       echo "Sending slack build notification"
       echo "================================"
@@ -17,6 +18,7 @@ publish-firefox:
       when: manual
   script:
     - |
+      apt-get update && apt-get install -y curl
       bash .gitlab-ci/scripts/bin/publish.sh firefox
       echo "Sending slack build notification"
       echo "================================"
@@ -29,6 +31,7 @@ publish-edge:
       when: manual
   script:
     - |
+      apt-get update && apt-get install -y curl
       bash .gitlab-ci/scripts/bin/publish.sh edge
       echo "Sending slack build notification"
       echo "================================"

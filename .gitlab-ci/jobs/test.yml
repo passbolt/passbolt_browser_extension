@@ -1,0 +1,32 @@
+tester:
+  stage: test
+  image: node:16
+  coverage: /Lines\s* [:] ([\d\.]+)%/
+  extends: .rules
+  script:
+    - npm ci
+    - npm run test:coverage
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+
+linter:
+  stage: test
+  image: node:16
+  extends: .rules
+  script:
+    - npm ci
+    - npm run eslint
+
+audit:
+  allow_failure: true
+  stage: test
+  image: node:16
+  extends: .rules
+  script:
+    - npm audit

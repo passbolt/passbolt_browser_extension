@@ -23,9 +23,7 @@ __snapshots__
 /build
 /bootstrap.js
 *.pem
-/dist/**/*debug.*
-/dist/chrome-v3/
-/dist/**/*latest\@passbolt.com.*
+/dist
 
 # Config
 lib/config/config.json
@@ -47,3 +45,4 @@ gi
 # CI                 #
 ######################
 junit.xml
+*.vim

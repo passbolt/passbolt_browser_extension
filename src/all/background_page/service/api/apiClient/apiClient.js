@@ -15,6 +15,9 @@ import PassboltBadResponseError from "../../../error/passboltBadResponseError";
 import PassboltApiFetchError from "../../../error/passboltApiFetchError";
 import PassboltServiceUnavailableError from "../../../error/passboltServiceUnavailableError";
 
+/**
+ * @deprecated since v4.1.0. ApiClient was moved to the styleguide project.
+ */
 class ApiClient {
   /**
    * Constructor

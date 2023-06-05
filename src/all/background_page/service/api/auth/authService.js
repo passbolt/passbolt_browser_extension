@@ -62,7 +62,6 @@ class AuthService extends AbstractService {
         });
       }
 
-      //@todo: remove depreacted function call
       return this._logoutLegacy();
     }
   }
@@ -70,7 +69,7 @@ class AuthService extends AbstractService {
   /**
    * Logout (the legacy way that uses the deprecated 'GET' method).
    * @return {Promise<void>}
-   * @deprecated
+   * @deprecated the POST method should be used instead to avoid CSRF
    * @private
    */
   async _logoutLegacy() {

@@ -66,22 +66,10 @@ const listen = function(worker, account) {
    * @listens passbolt.auth.logout
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.logout', async requestId => {
+  worker.port.on('passbolt.auth.logout', async(requestId, withRedirection) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AuthLogoutController(worker, requestId, apiClientOptions);
-    await controller._exec(false);
-  });
-
-  /*
-   * Navigate to logout
-   *
-   * @listens passbolt.auth.navigate-to-logout
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.auth.navigate-to-logout', async requestId => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new AuthLogoutController(worker, requestId, apiClientOptions);
-    await controller._exec(true);
+    await controller._exec(withRedirection);
   });
 
   /*

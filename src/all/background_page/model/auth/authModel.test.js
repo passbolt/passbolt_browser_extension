@@ -13,7 +13,7 @@
  */
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import AuthModel from "../../model/auth/authModel";
-import AuthService from "../../service/api/auth/authService";
+import AuthService from "passbolt-styleguide/src/shared/services/api/auth/AuthService";
 
 beforeEach(async() => {
   jest.clearAllMocks();

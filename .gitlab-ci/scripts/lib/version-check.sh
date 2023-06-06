@@ -23,4 +23,3 @@ function validate_config_version_and_api_tag () {
     return 1
   fi
 }
-

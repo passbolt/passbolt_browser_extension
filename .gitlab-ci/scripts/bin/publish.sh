@@ -28,7 +28,6 @@ function send_to_chrome() {
     -H "x-goog-api-version: 2" \
     -H "Content-Length: 0" \
     -X POST \
-    -v \
     https://www.googleapis.com/chromewebstore/v1.1/items/"$id"/publish
 }
 

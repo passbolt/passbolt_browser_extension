@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [4.0.4] - 2023-06-07
+### Fixed
+- PB-24932 Fix: As a user I want to be able to sign-in through SSO from the inform menu
+
 ## [4.0.3] - 2023-06-05
 ### Fixed
 - PB-24734 Fix As a registered user I would like to be able to use SSO login via the quickaccess
@@ -1199,7 +1203,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.3...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.4...HEAD
+[4.0.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.3...v4.0.4
 [4.0.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.1...v4.0.3
 [4.0.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.12.1...v4.0.0

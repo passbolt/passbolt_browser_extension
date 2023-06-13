@@ -216,6 +216,13 @@ module.exports = function (grunt) {
           dest: path.build_web_accessible_resources + 'img/third_party',
           expand: true
         }, {
+          // theme preview images
+          nonull: true,
+          cwd: path.node_modules + 'passbolt-styleguide/src/img/themes',
+          src: ['default.png', 'midgar.png', 'solarized_dark.png', 'solarized_light.png'],
+          dest: path.build_web_accessible_resources + 'img/themes',
+          expand: true
+        }, {
           // CSS files default
           cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/default',
           src: [

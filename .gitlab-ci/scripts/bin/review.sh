@@ -17,8 +17,7 @@ function send_to_chrome() {
     -H "Authorization: Bearer $token"  \
     -H "x-goog-api-version: 2" \
     -X PUT \
-    -T "$FILE_NAME" \
-    -v \
+    -T "dist/chrome/passbolt-${CI_COMMIT_TAG#v}.zip" \
     https://www.googleapis.com/upload/chromewebstore/v1.1/items/"$id"
 }
 

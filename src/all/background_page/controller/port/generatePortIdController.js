@@ -18,10 +18,10 @@ import WorkerEntity from "../../model/entity/worker/workerEntity";
 
 const APPLICATION_ALLOWED = {
   "RecoverBootstrap": ["Recover"],
-  "SetupBootstrap": ["Setup"],
+  "SetupBootstrap": ["Setup", "FileIframe"],
   "AuthBootstrap": ["Auth"],
   "AppBootstrap": ["App", "FileIframe"],
-  "AccountRecoveryBootstrap": ["AccountRecovery"],
+  "AccountRecoveryBootstrap": ["AccountRecovery", "FileIframe"],
   "WebIntegration": ["InFormCallToAction", "InFormMenu"],
 };
 

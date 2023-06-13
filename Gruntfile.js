@@ -36,6 +36,7 @@ module.exports = function (grunt) {
    * Import package.json file content
    */
   var pkg = grunt.file.readJSON('package.json');
+  var manifestVersion =  pkg.version.replace(/-.*$/,'');
 
   /**
    * Load and enable Tasks
@@ -379,7 +380,7 @@ module.exports = function (grunt) {
         },
         command: [
           './node_modules/.bin/web-ext build -s=' + path.build + ' -a=' + path.dist_firefox + '  -o=true',
-          'mv ' + path.dist_firefox + firefoxWebExtBuildName + '-' + pkg.version + '.zip ' + path.dist_firefox + 'passbolt-' + pkg.version + '-debug.zip',
+          'mv ' + path.dist_firefox + firefoxWebExtBuildName + '-' + manifestVersion + '.zip ' + path.dist_firefox + 'passbolt-' + pkg.version + '-debug.zip',
           'rm -f ' + path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
           'ln -fs passbolt-' + pkg.version + '-debug.zip ' + path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
           "echo '\nMoved to " + path.dist_firefox + "passbolt-" + pkg.version + "-debug.zip'"
@@ -391,7 +392,7 @@ module.exports = function (grunt) {
         },
         command: [
           './node_modules/.bin/web-ext build -s=' + path.build + ' -a=' + path.dist_firefox + '  -o=true',
-          'mv ' + path.dist_firefox + firefoxWebExtBuildName + '-' + pkg.version + '.zip ' + path.dist_firefox + '/passbolt-' + pkg.version + '.zip',
+          'mv ' + path.dist_firefox + firefoxWebExtBuildName + '-' + manifestVersion + '.zip ' + path.dist_firefox + '/passbolt-' + pkg.version + '.zip',
           "echo '\nMoved to " + path.dist_firefox + "passbolt-" + pkg.version + ".zip'"
         ].join(' && ')
       },

@@ -3,6 +3,53 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [4.0.4] - 2023-06-07
+### Fixed
+- PB-24932 Fix: As a user I want to be able to sign-in through SSO from the inform menu
+
+## [4.0.3] - 2023-06-05
+### Fixed
+- PB-24734 Fix As a registered user I would like to be able to use SSO login via the quickaccess
+
+## [4.0.1] - 2023-05-17
+### Fixed
+- PB-24639 Fix: As an administrator I want to be see which users have activated MFA from the users workspace
+
+## [4.0.0] - 2023-05-02
+### Added
+- PB-23531 As an administrator I can setup google as SSO provider
+- PB-23532 As a user I can sign-in with SSO
+- PB-23535 As a user I want to self register with SSO enabled
+- PB-23952 As an administrator I want to synchronize only groups belonging to a given parent group
+- PB-24168 As a user I want to use an accessible version of the UI
+
+### Improvements
+- PB-21564 Application should be aware of authentication status as soon as the user is getting signed out
+
+### Fix
+- PB-21488 Fix the loading of pagemods when user data is not set in the local storage
+- PB-23547 As a signed-in user I should auto-filling credentials in iframe even if there is an empty iframe src ahead
+- PB-24076 Fix ApiClient BaseUrl generation to avoid double slashes in the final URL
+- PB-24100 As a developer I want to use a fix working version of storybook
+- PB-24145 As a signed-in user the inform integration should not freeze the browser if there is a lots of dom changes
+- PB-24260 As a signed-in user I should not see a resource stays selected after moves in a folder
+
+### Security
+- PB-22858 As a user the session storage should have a limit of port by tab
+- PB-22859 As a user the web integration pagemod should be attached only on top frame
+- PB-23556 PBL-08-002 WP2: Passphrase Retained In Memory Post-Logout
+- PB-23942 PBL-08-008 WP2: Lack of explicit CSP on extension manifest
+- PB-23797 Backport MV3 port manager on MV2 without using the webNavigation permission
+
+### Maintenance
+- PB-18667 Migrate gpgAuth session check loop into a dedicated service startLoopAuthSessionCheckService
+- PB-22641 As a user the browser extension should handle when the version is updated
+- PB-22642 As a developer, when inform call to action and inform menu are destroyed, I should remove the port reference in the session storage and portManager
+- PB-24105 As a user I want to trigger file download on firefox with file pagemod
+- PB-24131 As a developer I should have class files in the correct folder
+- PB-24134 As a developer I should be able to run the CI pipeline even if the audit job is failing
+- PB-24147 Remove legacy entry point to check if the user is authenticated
+
 ## [3.12.1] - 2023-03-29
 ### Fix
 - PB-23930 Fix the removal of the SSO kit on CSRF token error
@@ -1156,7 +1203,11 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.12.1...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.4...HEAD
+[4.0.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.3...v4.0.4
+[4.0.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.1...v4.0.3
+[4.0.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.0...v4.0.1
+[4.0.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.12.1...v4.0.0
 [3.12.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.12.0...v3.12.1
 [3.12.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.11.2...v3.12.0
 [3.11.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.11.0...v3.11.2

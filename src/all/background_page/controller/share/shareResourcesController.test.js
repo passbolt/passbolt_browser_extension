@@ -180,6 +180,12 @@ describe("ShareResourcesController", () => {
        */
       fetch.doMockOnce(() => mockApiResponse([]));
 
+      /*
+       * 5th API call is a findAll on Resources Type to update local storage
+       * This unit test doesn't cover the local storage part so we respond with an empty response to ignore it.
+       */
+      fetch.doMockOnce(() => mockApiResponse([]));
+
       // finally we can call the controller with the data as everything is setup.
       const clientOptions = await User.getInstance().getApiClientOptions({requireCsrfToken: false});
       const controller = new ShareResourcesController(null, null, clientOptions);

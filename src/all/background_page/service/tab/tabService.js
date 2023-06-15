@@ -54,7 +54,7 @@ class TabService {
         if (hasUrlSameOrigin(port._port.sender.url, tab.url)) {
           try {
             // If the port is still connected do nothing
-            port.emit('passbolt.port.check');
+            await port.request('passbolt.port.check');
             return;
           } catch (error) {
             console.debug('The port is not connected, navigation detected');

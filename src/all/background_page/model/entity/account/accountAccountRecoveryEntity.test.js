@@ -12,8 +12,8 @@
  * @since         3.12.0
  */
 
-import EntitySchema from "../abstract/entitySchema";
-import EntityValidationError from "../abstract/entityValidationError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AccountAccountRecoveryEntity from "./accountAccountRecoveryEntity";
 import {defaultAccountAccountRecoveryDto} from "./accountAccountRecoveryEntity.test.data";
 

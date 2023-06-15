@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import GroupEntity from "../group/groupEntity";
-import Entity from "../abstract/entity";
 import UserEntity from "../user/userEntity";
-import EntitySchema from "../abstract/entitySchema";
 import Validator from "validator";
 
 const ENTITY_NAME = 'Permission';

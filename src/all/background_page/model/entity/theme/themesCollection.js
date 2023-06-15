@@ -10,10 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import EntityCollection from "../abstract/entityCollection";
+import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
 import ThemeEntity from "./themeEntity";
-import EntitySchema from "../abstract/entitySchema";
-import EntityCollectionError from "../abstract/entityCollectionError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 
 const ENTITY_NAME = 'Themes';
 

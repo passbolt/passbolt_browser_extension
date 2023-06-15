@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import EntityCollection from "../../abstract/entityCollection";
+import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
 import SecretEntity from "../secretEntity";
-import EntitySchema from "../../abstract/entitySchema";
-import EntityCollectionError from "../../abstract/entityCollectionError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 
 const ENTITY_NAME = 'ResourceSecrets';
 

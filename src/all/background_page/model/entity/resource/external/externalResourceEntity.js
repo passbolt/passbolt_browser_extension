@@ -12,10 +12,10 @@
  */
 import ResourceEntity from "../resourceEntity";
 import ExternalFolderEntity from "../../folder/external/externalFolderEntity";
-import Entity from "../../abstract/entity";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import ResourceSecretsCollection from "../../secret/resource/resourceSecretsCollection";
-import EntityValidationError from "../../abstract/entityValidationError";
-import EntitySchema from "../../abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'ExternalResource';
 const DEFAULT_RESOURCE_NAME = '(no name)';

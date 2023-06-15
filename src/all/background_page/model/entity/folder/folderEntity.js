@@ -11,12 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import PermissionEntity from "../permission/permissionEntity";
 import PermissionsCollection from "../permission/permissionsCollection";
-import Entity from "../abstract/entity";
-import EntityValidationError from "../abstract/entityValidationError";
-import EntitySchema from "../abstract/entitySchema";
-
 
 const ENTITY_NAME = 'Folder';
 const FOLDER_NAME_MIN_LENGTH = 1;
@@ -76,8 +75,7 @@ class FolderEntity extends Entity {
             "format": "uuid"
           }, {
             "type": "null"
-          }
-          ]
+          }]
         },
         "name": {
           "type": "string",
@@ -188,7 +186,6 @@ class FolderEntity extends Entity {
   get modified() {
     return this._props.modified || null;
   }
-
 
   /*
    * ==================================================

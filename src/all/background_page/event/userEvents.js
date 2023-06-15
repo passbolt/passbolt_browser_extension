@@ -15,6 +15,7 @@ import UserEntity from "../model/entity/user/userEntity";
 import SecurityTokenEntity from "../model/entity/securityToken/securityTokenEntity";
 import AvatarUpdateEntity from "../model/entity/avatar/update/avatarUpdateEntity";
 import UpdateUserLocalStorageController from "../controller/user/updateUserLocalStorageController";
+import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 
 
 const listen = function(worker, account) {
@@ -72,18 +73,10 @@ const listen = function(worker, account) {
    * @listens passbolt.users.find-logged-in-user
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.users.find-logged-in-user', async requestId => {
-    try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const userModel = new UserModel(clientOptions, account);
-      const loggedInUserId = User.getInstance().get().id;
-      const contains = {profile: true, role: true, account_recovery_user_setting: true};
-      const userEntity = await userModel.findOne(loggedInUserId, contains, true);
-      worker.port.emit(requestId, 'SUCCESS', userEntity);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+  worker.port.on('passbolt.users.find-logged-in-user', async(requestId, refreshCache) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new GetOrFindLoggedInUserController(worker, requestId, apiClientOptions, account);
+    await controller._exec(refreshCache);
   });
 
   /*

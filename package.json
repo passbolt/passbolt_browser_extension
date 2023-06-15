@@ -1,5 +1,5 @@
 {
-  "name": "passbolt_-_open_source_password_manager",
+  "name": "passbolt-browser-extension",
   "version": "4.0.4-rc.0",
   "license": "AGPL-3.0",
   "copyright": "Copyright 2022 Passbolt SA",
@@ -22,7 +22,7 @@
     "locutus": "~2.0.9",
     "openpgp": "5.2.1",
     "papaparse": "^5.2.0",
-    "passbolt-styleguide": "^4.0.5-rc.0",
+    "passbolt-styleguide": "^4.1.0-alpha.4",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "secrets-passbolt": "github:passbolt/secrets.js#v2.0.1",

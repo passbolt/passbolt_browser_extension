@@ -22,7 +22,7 @@ import MockExtension from "../../../../../test/mocks/mockExtension";
 const {enableFetchMocks} = require("jest-fetch-mock");
 const {mockApiResponse} = require("../../../../../test/mocks/mockApiResponse");
 const {pgpKeys} = require("../../../../../test/fixtures/pgpKeys/keys");
-const {users} = require("../../model/entity/user/userEntity.test.data");
+const {users} = require("passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data");
 
 const {
   _3ResourcesSharedWith3UsersResourcesDto,
@@ -176,6 +176,12 @@ describe("ShareResourcesController", () => {
 
       /*
        * 4th API call is a findAll on Resources to update local storage
+       * This unit test doesn't cover the local storage part so we respond with an empty response to ignore it.
+       */
+      fetch.doMockOnce(() => mockApiResponse([]));
+
+      /*
+       * 5th API call is a findAll on Resources Type to update local storage
        * This unit test doesn't cover the local storage part so we respond with an empty response to ignore it.
        */
       fetch.doMockOnce(() => mockApiResponse([]));

@@ -70,7 +70,7 @@ class TabService {
 
 function mappingFrameDetailsFromTab(tab) {
   return  {
-    // TODO COMMENT
+    // Mapping the tab info as a frame details to be compliant with webNavigation
     frameId: 0,
     tabId: tab.id,
     url: tab.url

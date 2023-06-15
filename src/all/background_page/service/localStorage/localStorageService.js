@@ -25,12 +25,21 @@ import PostponedUserSettingInvitationService
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import SsoKitTemporaryStorageService
   from "../session_storage/ssoKitTemporaryStorageService";
+import GetLegacyAccountService from "../account/getLegacyAccountService";
+import RbacsLocalStorage from "../local_storage/rbacLocalStorage";
+import UserMeSessionStorageService from "../sessionStorage/userMeSessionStorageService";
+import User from "../../model/user";
 
+/**
+ * Flush storage data when:
+ * - the webextension starts.
+ * - the user is signed-out.
+ */
 class LocalStorageService {
   /**
    * Flush all storage
    */
-  static flush() {
+  static async flush() {
     ResourceLocalStorage.flush();
     ResourceTypeLocalStorage.flush();
     FolderLocalStorage.flush();
@@ -42,6 +51,18 @@ class LocalStorageService {
     PostponedUserSettingInvitationService.reset();
     PassphraseStorageService.flush();
     SsoKitTemporaryStorageService.flush();
+    this.flushAccountBasedStorages();
+  }
+
+  static async flushAccountBasedStorages() {
+    // If no user is yet configured no need to continue.
+    if (!User.getInstance().isValid()) {
+      return;
+    }
+
+    const account = await GetLegacyAccountService.get();
+    (new RbacsLocalStorage(account)).flush();
+    UserMeSessionStorageService.remove(account);
   }
 }
 

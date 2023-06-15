@@ -17,7 +17,7 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import AccountRecoverySaveOrganizationPolicyController from "./accountRecoverySaveOrganizationPolicyController";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {PassphraseController} from "../passphrase/passphraseController";
-import EntityValidationError from "../../model/entity/abstract/entityValidationError";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AccountRecoveryOrganizationPolicyEntity from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";

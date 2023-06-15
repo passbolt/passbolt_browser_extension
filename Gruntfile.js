@@ -30,6 +30,7 @@ module.exports = function (grunt) {
     src_content_scripts: 'src/all/contentScripts/',
     src_web_accessible_resources: 'src/all/webAccessibleResources/',
   };
+  const firefoxWebExtBuildName = 'passbolt_-_open_source_password_manager';
 
   /**
    * Import package.json file content
@@ -215,6 +216,13 @@ module.exports = function (grunt) {
           dest: path.build_web_accessible_resources + 'img/third_party',
           expand: true
         }, {
+          // theme preview images
+          nonull: true,
+          cwd: path.node_modules + 'passbolt-styleguide/src/img/themes',
+          src: ['default.png', 'midgar.png', 'solarized_dark.png', 'solarized_light.png'],
+          dest: path.build_web_accessible_resources + 'img/themes',
+          expand: true
+        }, {
           // CSS files default
           cwd: path.node_modules + 'passbolt-styleguide/build/css/themes/default',
           src: [
@@ -378,8 +386,8 @@ module.exports = function (grunt) {
           stderr: false
         },
         command: [
-          './node_modules/.bin/web-ext build -s=' + path.build + ' -a=' + path.dist_firefox + ' -o=true',
-          'mv ' + path.dist_firefox + pkg.name + '-' + manifestVersion + '.zip ' + path.dist_firefox + 'passbolt-' + pkg.version + '-debug.zip',
+          './node_modules/.bin/web-ext build -s=' + path.build + ' -a=' + path.dist_firefox + '  -o=true',
+          'mv ' + path.dist_firefox + firefoxWebExtBuildName + '-' + manifestVersion + '.zip ' + path.dist_firefox + 'passbolt-' + pkg.version + '-debug.zip',
           'rm -f ' + path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
           'ln -fs passbolt-' + pkg.version + '-debug.zip ' + path.dist_firefox + 'passbolt-latest@passbolt.com.zip',
           "echo '\nMoved to " + path.dist_firefox + "passbolt-" + pkg.version + "-debug.zip'"
@@ -391,7 +399,7 @@ module.exports = function (grunt) {
         },
         command: [
           './node_modules/.bin/web-ext build -s=' + path.build + ' -a=' + path.dist_firefox + '  -o=true',
-          'mv ' + path.dist_firefox + pkg.name + '-' + manifestVersion + '.zip ' + path.dist_firefox + 'passbolt-' + pkg.version + '.zip',
+          'mv ' + path.dist_firefox + firefoxWebExtBuildName + '-' + manifestVersion + '.zip ' + path.dist_firefox + '/passbolt-' + pkg.version + '.zip',
           "echo '\nMoved to " + path.dist_firefox + "passbolt-" + pkg.version + ".zip'"
         ].join(' && ')
       },
@@ -449,7 +457,7 @@ module.exports = function (grunt) {
      */
     watch: {
       background_page: {
-        files: [path.src_background_page + '**/*.js'],
+        files: [path.src_background_page + '**/*.js', 'node_modules/passbolt-styleguide/src/shared/**/*.js'],
         tasks: ['shell:build_background_page_debug'],
         options: { spawn: false }
       },

@@ -42,5 +42,6 @@ export default class MockTabs {
     this.onUpdated = new EventListerners();
     this.onRemoved = new EventListerners();
     this.remove = jest.fn();
+    this.update = jest.fn();
   }
 }

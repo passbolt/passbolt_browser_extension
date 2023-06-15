@@ -12,8 +12,8 @@
  * @since         2.13.0
  */
 import PermissionEntity from "./permissionEntity";
-import EntityValidationError from "../abstract/entityValidationError";
-import EntitySchema from "../abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 /**
  * getTestDto
@@ -104,7 +104,7 @@ describe("Entity permission", () => {
       });
       expect(false).toBe(true);
     } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
+      expect((error instanceof EntityValidationError)). toBe(true);
       expect(error.hasError('id')).toBe(true);
       expect(error.hasError('modified')).toBe(true);
       expect(error.hasError('aro')).toBe(true);

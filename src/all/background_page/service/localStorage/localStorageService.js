@@ -56,7 +56,7 @@ class LocalStorageService {
 
   static async flushAccountBasedStorages() {
     // If no user is yet configured no need to continue.
-    if (!User.isValid()) {
+    if (!User.getInstance().isValid()) {
       return;
     }
 

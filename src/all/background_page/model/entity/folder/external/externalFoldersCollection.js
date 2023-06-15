@@ -12,8 +12,8 @@
  */
 import FoldersCollection from "../foldersCollection";
 import ExternalFolderEntity from "./externalFolderEntity";
-import EntityCollection from "../../abstract/entityCollection";
-import EntitySchema from "../../abstract/entitySchema";
+import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 
 const ENTITY_NAME = 'ExternalFolders';

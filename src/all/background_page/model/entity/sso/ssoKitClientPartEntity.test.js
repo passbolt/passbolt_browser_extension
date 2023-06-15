@@ -13,8 +13,8 @@
  */
 import "../../../../../../test/mocks/mockCryptoKey";
 import SsoKitClientPartEntity from "./ssoKitClientPartEntity";
-import EntitySchema from "../abstract/entitySchema";
-import EntityValidationError from "../abstract/entityValidationError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import {v4 as uuid} from "uuid";
 import {clientSsoKit} from "./ssoKitClientPart.test.data";
 import GenerateSsoIvService from "../../../service/crypto/generateSsoIvService";

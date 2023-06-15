@@ -13,7 +13,7 @@
  */
 import GpgkeyEntity from "./gpgkeyEntity";
 import {GpgkeyEntityFixtures} from "./gpgkeyEntity.test.fixtures";
-import EntitySchema from "../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 describe("Gpgkey entity", () => {
   it("schema must validate", () => {

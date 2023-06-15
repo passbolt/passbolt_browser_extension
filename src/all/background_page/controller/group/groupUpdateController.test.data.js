@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 import {v4 as uuidv4} from "uuid";
-import {users} from "../../model/entity/user/userEntity.test.data";
+import {users} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import {defaultGroup} from "../../model/entity/group/groupEntity.test.data";
 import {createGroupUser} from "../../model/entity/groupUser/groupUsersEntity.test.data";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";

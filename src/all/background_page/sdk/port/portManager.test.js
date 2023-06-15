@@ -17,6 +17,7 @@ import {mockPort} from "./portManager.test.data";
 import PagemodManager from "../../pagemod/pagemodManager";
 import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
+import GetLegacyAccountService from "../../service/account/getLegacyAccountService";
 
 const spyGetWorkerById = jest.spyOn(WorkersSessionStorage, "getWorkerById");
 const spyGetWorkersByTabId = jest.spyOn(WorkersSessionStorage, "getWorkersByTabId");
@@ -53,6 +54,7 @@ describe("PortManager", () => {
       const port = mockPort({name: "quickaccess", url: popupUrl});
       delete port.sender.tab;
       // mock functions
+      jest.spyOn(GetLegacyAccountService, "get").mockImplementation(jest.fn());
       jest.spyOn(chrome.action, "getPopup").mockImplementationOnce(() => popupUrl);
       jest.spyOn(PagemodManager, "attachEventToPort");
       // process

@@ -12,10 +12,9 @@
  * @since         3.0.0
  */
 import GroupUserTransferEntity from "./groupUserTransferEntity";
-import EntityCollection from "../../abstract/entityCollection";
-import EntityValidationError from "../../abstract/entityValidationError";
-import EntitySchema from "../../abstract/entitySchema";
-
+import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'GroupUserTransfers';
 

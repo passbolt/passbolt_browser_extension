@@ -14,7 +14,7 @@
 import UserEntity from "../user/userEntity";
 import AbstractAccountEntity from "./abstractAccountEntity";
 import AuthenticationTokenEntity from "../authenticationToken/authenticationTokenEntity";
-import EntitySchema from "../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import AccountRecoveryUserSettingEntity from "../accountRecovery/accountRecoveryUserSettingEntity";
 
 

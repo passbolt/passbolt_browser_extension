@@ -13,7 +13,7 @@
  */
 import GroupsUsersCollection from "./groupsUsersCollection";
 import {GroupsUsersCollectionTestFixtures} from "./groupsUsersCollection.test.fixtures";
-import EntitySchema from "../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 describe("Groups users collection", () => {
   it("schema must validate", () => {

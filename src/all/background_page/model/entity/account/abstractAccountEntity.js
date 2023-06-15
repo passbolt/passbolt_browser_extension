@@ -10,16 +10,19 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import Entity from "../abstract/entity";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import ProfileEntity from "../profile/profileEntity";
 import UserEntity from "../user/userEntity";
 import SecurityTokenEntity from "../securityToken/securityTokenEntity";
-import EntitySchema from "../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import {v5 as uuidv5} from "uuid";
 
 const ENTITY_NAME = "AbstractAccount";
 
 const FINGERPRINT_MIN_LENGTH = 40;
 const FINGERPRINT_MAX_LENGTH = 40;
+
+const UUID_PASSBOLT_NAMESPACE = 'd5447ca1-950f-459d-8b20-86ddfdd0f922';
 
 class AbstractAccountEntity extends Entity {
   /**
@@ -96,6 +99,19 @@ class AbstractAccountEntity extends Entity {
    * Dynamic properties getters
    * ==================================================
    */
+
+  /**
+   * Get the account id.
+   * Generate a uuid v5 based on the account domain and account user id.
+   * @return {string|null} uuid. Return null if domain or user id not defined
+   */
+  get id() {
+    if (!this.domain || !this.userId) {
+      return null;
+    }
+
+    return uuidv5(`${this.domain}${this.userId}`, UUID_PASSBOLT_NAMESPACE);
+  }
 
   /**
    * Get the account type

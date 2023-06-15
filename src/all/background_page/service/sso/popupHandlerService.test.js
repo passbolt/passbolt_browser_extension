@@ -17,7 +17,7 @@ import MockTabs from "../../../../../test/mocks/mockTabs";
 import {v4 as uuid} from "uuid";
 import UserAbortsOperationError from "../../error/userAbortsOperationError";
 import SsoLoginUrlEntity from "../../model/entity/sso/ssoLoginUrlEntity";
-import EntityValidationError from "../../model/entity/abstract/entityValidationError";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import SsoSettingsEntity from "../../model/entity/sso/ssoSettingsEntity";
 
 let currentBrowserTab = null;

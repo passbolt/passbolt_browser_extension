@@ -12,122 +12,214 @@
  * @since         2.13.0
  */
 import ProfileEntity from "./profileEntity";
-import EntitySchema from "../abstract/entitySchema";
-import EntityValidationError from '../abstract/entityValidationError';
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import {
+  defaultProfileDto,
+  minimalProfileDto
+} from "passbolt-styleguide/src/shared/models/entity/profile/ProfileEntity.test.data";
+import each from "jest-each";
+import {defaultAvatarDto} from "passbolt-styleguide/src/shared/models/entity/avatar/avatarEntity.test.data";
 
-describe("Profile entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(ProfileEntity.ENTITY_NAME, ProfileEntity.getSchema());
-  });
+describe("ProfileEntity", () => {
+  describe("ProfileEntity:constructor", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(ProfileEntity.ENTITY_NAME, ProfileEntity.getSchema());
+    });
 
-  it("constructor works if valid minimal DTO is provided", () => {
-    const dto = {
-      "first_name": "Dame Steve",
-      "last_name": "Shirley"
-    };
-    const entity = new ProfileEntity(dto);
-    expect(entity.toDto()).toEqual(dto);
-    expect(entity.firstName).toEqual('Dame Steve');
-    expect(entity.lastName).toEqual('Shirley');
-    expect(entity.created).toBe(null);
-    expect(entity.modified).toBe(null);
-    expect(entity.avatar).toBe(null);
-  });
+    it("constructor works if valid minimal DTO is provided", () => {
+      const dto = minimalProfileDto();
+      const entity = new ProfileEntity(dto);
+      expect(entity.id).toBeNull();
+      expect(entity.userId).toBeNull();
+      expect(entity.firstName).toEqual('Ada');
+      expect(entity.lastName).toEqual('Lovelace');
+      expect(entity.created).toBeNull();
+      expect(entity.modified).toBeNull();
+      expect(entity.avatar).toBeNull();
+    });
 
-  it("constructor works if valid  DTO with avatar is provided", () => {
-    const dto = {
-      "id": "2766ff6b-87f1-53a9-98fd-72cd32a3df69",
-      "user_id": "54c6278e-f824-5fda-91ff-3e946b18d994",
-      "first_name": "Dame Steve",
-      "last_name": "Shirley",
-      "created": "2020-04-20T11:32:17+00:00",
-      "modified": "2020-04-20T11:32:17+00:00",
-      "avatar": {
-        "id": "421f7955-74d0-42d4-838f-8b30d056bcc7",
-        "user_id": "54c6278e-f824-5fda-91ff-3e946b18d994",
-        "foreign_key": "2766ff6b-87f1-53a9-98fd-72cd32a3df69",
-        "model": "Avatar",
-        "filename": "dame steve.png",
-        "filesize": 20676,
-        "mime_type": "image\/png",
-        "extension": "png",
-        "hash": "f2695972b9009970ac85aae95f907693268cd249",
-        "path": "Avatar\/d1\/f8\/f4\/421f795574d042d4838f8b30d056bcc7\/421f795574d042d4838f8b30d056bcc7.png",
-        "adapter": "Local",
-        "created": "2020-04-20T11:32:17+00:00",
-        "modified": "2020-04-20T11:32:17+00:00",
-        "url": {
-          "medium": "img\/public\/Avatar\/d1\/f8\/f4\/421f795574d042d4838f8b30d056bcc7\/421f795574d042d4838f8b30d056bcc7.a99472d5.png",
-          "small": "img\/public\/Avatar\/d1\/f8\/f4\/421f795574d042d4838f8b30d056bcc7\/421f795574d042d4838f8b30d056bcc7.65a0ba70.png"
+    it("constructor works if valid DTO is provided with optional properties", () => {
+      const dto = defaultProfileDto();
+      const entity = new ProfileEntity(dto);
+      expect(entity.id).toEqual(dto.id);
+      expect(entity.firstName).toEqual('Ada');
+      expect(entity.lastName).toEqual('Lovelace');
+      expect(entity.created).toEqual("2020-04-20T11:32:17+00:00");
+      expect(entity.modified).toEqual("2020-04-20T11:32:17+00:00");
+      expect(entity.avatar).not.toBeNull();
+      expect(entity.avatar.urlMedium).toEqual("/avatars/view/e6927385-195c-4c7f-a107-a202ea86de40/medium.jpg");
+      expect(entity.avatar.urlSmall).toEqual("/avatars/view/e6927385-195c-4c7f-a107-a202ea86de40/small.jpg");
+    });
+
+    // Validate id
+    each([
+      {scenario: 'is not required but null', rule: 'type', value: null},
+      {scenario: 'valid uuid', rule: 'format', value: 'invalid-id'},
+      {scenario: 'valid format', rule: 'type', value: 42},
+    ]).describe("Should validate the id", test => {
+      it(`Should not accept: ${test.scenario}`, async() => {
+        expect.assertions(2);
+        const dto = defaultProfileDto({
+          id: test.value
+        });
+        try {
+          new ProfileEntity(dto);
+        } catch (error) {
+          expect(error).toBeInstanceOf(EntityValidationError);
+          expect(error.hasError('id', test.rule)).toBeTruthy();
         }
-      }
-    };
-    const filtered = {
-      "id": "2766ff6b-87f1-53a9-98fd-72cd32a3df69",
-      "user_id": "54c6278e-f824-5fda-91ff-3e946b18d994",
-      "first_name": "Dame Steve",
-      "last_name": "Shirley",
-      "created": "2020-04-20T11:32:17+00:00",
-      "modified": "2020-04-20T11:32:17+00:00",
-      "avatar": {
-        "id": "421f7955-74d0-42d4-838f-8b30d056bcc7",
-        "created": "2020-04-20T11:32:17+00:00",
-        "modified": "2020-04-20T11:32:17+00:00",
-        "url": {
-          "medium": "img\/public\/Avatar\/d1\/f8\/f4\/421f795574d042d4838f8b30d056bcc7\/421f795574d042d4838f8b30d056bcc7.a99472d5.png",
-          "small": "img\/public\/Avatar\/d1\/f8\/f4\/421f795574d042d4838f8b30d056bcc7\/421f795574d042d4838f8b30d056bcc7.65a0ba70.png"
-        }
-      }
-    };
-    const filtered2 = {
-      "id": "2766ff6b-87f1-53a9-98fd-72cd32a3df69",
-      "user_id": "54c6278e-f824-5fda-91ff-3e946b18d994",
-      "first_name": "Dame Steve",
-      "last_name": "Shirley",
-      "created": "2020-04-20T11:32:17+00:00",
-      "modified": "2020-04-20T11:32:17+00:00"
-    };
-
-    const entity = new ProfileEntity(dto);
-    expect(entity.toDto({avatar: true})).toEqual(filtered);
-    expect(entity.firstName).toEqual('Dame Steve');
-    expect(entity.lastName).toEqual('Shirley');
-    expect(entity.created).not.toBe(null);
-    expect(entity.modified).not.toBe(null);
-    expect(entity.avatar).not.toBe(null);
-
-    expect(entity.toDto()).toEqual(filtered2);
-    expect(entity.avatar._hasProp('model')).toBe(false);
-    expect(entity.avatar.urlMedium).toBe('img\/public\/Avatar\/d1\/f8\/f4\/421f795574d042d4838f8b30d056bcc7\/421f795574d042d4838f8b30d056bcc7.a99472d5.png');
-    expect(entity.avatar.urlSmall).toBe('img\/public\/Avatar\/d1\/f8\/f4\/421f795574d042d4838f8b30d056bcc7\/421f795574d042d4838f8b30d056bcc7.65a0ba70.png');
-  });
-
-  it("constructor throws an exception if DTO is missing required field", () => {
-    try {
-      new ProfileEntity({"created": "2020-04-20T11:32:17+00:00"});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('first_name', 'required')).toBe(true);
-      expect(error.hasError('last_name', 'required')).toBe(true);
-    }
-  });
-
-  it("constructor throws an exception if DTO contains invalid field", () => {
-    try {
-      new ProfileEntity({
-        "id": "🤷",
-        "user_id": -0,
-        "first_name": ["(ノಠ益ಠ)ノ"],
-        "last_name": Array(257).join("¯\_(ツ)_/¯")
       });
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('id', 'format')).toBe(true);
-      expect(error.hasError('user_id', 'type')).toBe(true);
-      expect(error.hasError('first_name', 'type')).toBe(true);
-      expect(error.hasError('last_name', 'maxLength')).toBe(true);
-    }
+    });
+
+    // Validate user_id
+    each([
+      {scenario: 'is not required but null', rule: 'type', value: null},
+      {scenario: 'valid uuid', rule: 'format', value: 'invalid-id'},
+      {scenario: 'valid format', rule: 'type', value: 42},
+    ]).describe("Should validate the user_id", test => {
+      it(`Should not accept: ${test.scenario}`, async() => {
+        expect.assertions(2);
+        const dto = defaultProfileDto({
+          user_id: test.value
+        });
+        try {
+          new ProfileEntity(dto);
+        } catch (error) {
+          expect(error).toBeInstanceOf(EntityValidationError);
+          expect(error.hasError('user_id', test.rule)).toBeTruthy();
+        }
+      });
+    });
+
+    // Validate first_name
+    each([
+      {scenario: 'is required', rule: 'type'},
+      {scenario: 'is null', rule: 'type', value: null},
+      {scenario: 'valid format', rule: 'type', value: 42},
+    ]).describe("Should validate the first_name", test => {
+      it(`Should not accept: ${test.scenario}`, async() => {
+        expect.assertions(2);
+        const dto = defaultProfileDto({
+          first_name: test.value
+        });
+        try {
+          new ProfileEntity(dto);
+        } catch (error) {
+          expect(error).toBeInstanceOf(EntityValidationError);
+          expect(error.hasError('first_name', test.rule)).toBeTruthy();
+        }
+      });
+    });
+
+    // Validate last_name
+    each([
+      {scenario: 'is required', rule: 'type'},
+      {scenario: 'is null', rule: 'type', value: null},
+      {scenario: 'valid format', rule: 'type', value: 42},
+    ]).describe("Should validate the last_name", test => {
+      it(`Should not accept: ${test.scenario}`, async() => {
+        expect.assertions(2);
+        const dto = defaultProfileDto({
+          last_name: test.value
+        });
+        try {
+          new ProfileEntity(dto);
+        } catch (error) {
+          expect(error).toBeInstanceOf(EntityValidationError);
+          expect(error.hasError('last_name', test.rule)).toBeTruthy();
+        }
+      });
+    });
+
+    each([
+      {scenario: 'is not required but cannot be null', rule: null},
+      {scenario: 'valid url object', rule: 'type', value: 42},
+    ]).describe("Should validate the created", test => {
+      it(`Should not accept: ${test.scenario}`, async() => {
+        expect.assertions(2);
+        const dto = defaultProfileDto({
+          created: test.value
+        });
+        try {
+          new ProfileEntity(dto);
+        } catch (error) {
+          expect(error).toBeInstanceOf(EntityValidationError);
+          expect(error.hasError('created', test.rule)).toBeTruthy();
+        }
+      });
+    });
+
+    each([
+      {scenario: 'is not required but cannot be null', rule: null},
+      {scenario: 'valid url object', rule: 'type', value: 42},
+    ]).describe("Should validate the modified", test => {
+      it(`Should not accept: ${test.scenario}`, async() => {
+        expect.assertions(2);
+        const dto = defaultProfileDto({
+          modified: test.value
+        });
+        try {
+          new ProfileEntity(dto);
+        } catch (error) {
+          expect(error).toBeInstanceOf(EntityValidationError);
+          expect(error.hasError('modified', test.rule)).toBeTruthy();
+        }
+      });
+    });
+
+    it('Should not accept invalid associated avatar', async() => {
+      expect.assertions(2);
+      const dto = defaultProfileDto({
+        avatar: defaultAvatarDto({id: "invalid-id"})
+      });
+      try {
+        new ProfileEntity(dto);
+      } catch (error) {
+        expect(error).toBeInstanceOf(EntityValidationError);
+        expect(error.hasError('id', 'format')).toBeTruthy();
+      }
+    });
+  });
+
+  describe("ProfileEntity:toDto", () => {
+    it("should return the expected properties.", () => {
+      expect.assertions(2);
+      const expectedKeys = [
+        "id",
+        "user_id",
+        "first_name",
+        "last_name",
+        "created",
+        "modified"
+      ];
+
+      const dto = defaultProfileDto();
+      const entity = new ProfileEntity(dto);
+      const resultDto = entity.toDto();
+      const keys = Object.keys(resultDto);
+      expect(keys).toEqual(expectedKeys);
+      expect(Object.keys(resultDto).length).toBe(expectedKeys.length);
+    });
+
+    it("should return the expected properties containing the associated avatar.", () => {
+      expect.assertions(2);
+      const expectedKeys = [
+        "id",
+        "user_id",
+        "first_name",
+        "last_name",
+        "created",
+        "modified",
+        "avatar"
+      ];
+
+      const dto = defaultProfileDto();
+      const entity = new ProfileEntity(dto);
+      const resultDto = entity.toDto({avatar: true});
+      const keys = Object.keys(resultDto);
+      expect(keys).toEqual(expectedKeys);
+      expect(Object.keys(resultDto).length).toBe(expectedKeys.length);
+    });
   });
 });

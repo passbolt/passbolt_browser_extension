@@ -457,7 +457,7 @@ module.exports = function (grunt) {
      */
     watch: {
       background_page: {
-        files: [path.src_background_page + '**/*.js'],
+        files: [path.src_background_page + '**/*.js', 'node_modules/passbolt-styleguide/src/shared/**/*.js'],
         tasks: ['shell:build_background_page_debug'],
         options: { spawn: false }
       },

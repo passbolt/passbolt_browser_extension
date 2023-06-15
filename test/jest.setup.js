@@ -1,6 +1,7 @@
 import './matchers/extendExpect';
 import MockStorage from '../src/all/background_page/sdk/storage.test.mock';
 import MockAlarms from './mocks/mockAlarms';
+import MockNavigatorLocks from './mocks/mockNavigatorLocks';
 import OrganizationSettingsModel from "../src/all/background_page/model/organizationSettings/organizationSettingsModel";
 import {Config} from "../src/all/background_page/model/config";
 import Keyring from "../src/all/background_page/model/keyring";
@@ -23,6 +24,12 @@ global.fetch = require('node-fetch');
 global.crypto = {
   getRandomValues: jest.fn()
 };
+if (!global.navigator) {
+  global.navigator = {};
+}
+if (!global.navigator.locks) {
+  global.navigator.locks = new MockNavigatorLocks();
+}
 
 /*
  * quick polyfill for jest to have stucturedClone function defined

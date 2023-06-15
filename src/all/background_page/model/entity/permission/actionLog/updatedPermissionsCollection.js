@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import UpdatedPermissionEntity from "./updatedPermissionEntity";
-import EntityCollection from "../../abstract/entityCollection";
-import EntitySchema from "../../abstract/entitySchema";
-import EntityCollectionError from "../../abstract/entityCollectionError";
+import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 
 const ENTITY_NAME = 'UpdatedPermissions';
 

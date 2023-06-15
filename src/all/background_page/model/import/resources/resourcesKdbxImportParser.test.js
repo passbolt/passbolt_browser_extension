@@ -17,7 +17,7 @@ import fs from "fs";
 import * as kdbxweb from "kdbxweb";
 import ResourcesKdbxImportParser from "./resourcesKdbxImportParser";
 import ImportResourcesFileEntity from "../../entity/import/importResourcesFileEntity";
-import EntityValidationError from "../../entity/abstract/entityValidationError";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import ImportError from "../../../error/importError";
 
 describe("ResourcesKdbxImportParser", () => {

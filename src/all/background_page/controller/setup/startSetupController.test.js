@@ -16,7 +16,7 @@ import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOpti
 import StartSetupController from "./startSetupController";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultUserDto} from "../../model/entity/user/userEntity.test.data";
+import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import {defaultVerifyDto} from "../../model/entity/auth/auth.test.data";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 import UserEntity from "../../model/entity/user/userEntity";

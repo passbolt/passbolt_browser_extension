@@ -22,7 +22,7 @@ import MockExtension from "../../../../../test/mocks/mockExtension";
 const {enableFetchMocks} = require("jest-fetch-mock");
 const {mockApiResponse} = require("../../../../../test/mocks/mockApiResponse");
 const {pgpKeys} = require("../../../../../test/fixtures/pgpKeys/keys");
-const {users} = require("../../model/entity/user/userEntity.test.data");
+const {users} = require("passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data");
 
 const {
   _3ResourcesSharedWith3UsersResourcesDto,

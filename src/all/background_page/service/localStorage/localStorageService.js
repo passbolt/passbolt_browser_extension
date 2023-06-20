@@ -51,7 +51,7 @@ class LocalStorageService {
     PostponedUserSettingInvitationService.reset();
     PassphraseStorageService.flush();
     SsoKitTemporaryStorageService.flush();
-    this.flushAccountBasedStorages();
+    LocalStorageService.flushAccountBasedStorages();
   }
 
   static async flushAccountBasedStorages() {

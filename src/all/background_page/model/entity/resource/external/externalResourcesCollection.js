@@ -13,8 +13,8 @@
 import ResourcesCollection from "../resourcesCollection";
 import ExternalFoldersCollection from "../../folder/external/externalFoldersCollection";
 import ExternalResourceEntity from "./externalResourceEntity";
-import EntityCollection from "../../abstract/entityCollection";
-import EntitySchema from "../../abstract/entitySchema";
+import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'ExternalResources';
 

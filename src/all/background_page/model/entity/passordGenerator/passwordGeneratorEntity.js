@@ -12,8 +12,8 @@
  * @since         3.3.0
  */
 
-import Entity from "../abstract/entity";
-import EntitySchema from "../abstract/entitySchema";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'PasswordGenerator';
 

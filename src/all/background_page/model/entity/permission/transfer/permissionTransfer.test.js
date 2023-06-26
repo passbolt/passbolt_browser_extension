@@ -12,8 +12,8 @@
  * @since         3.0.0
  */
 import PermissionTransferEntity from "./permissionTransferEntity";
-import EntitySchema from "../../abstract/entitySchema";
-import EntityValidationError from "../../abstract/entityValidationError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("Permission transfer entity", () => {
   it("schema must validate", () => {

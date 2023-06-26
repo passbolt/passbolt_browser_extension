@@ -1,0 +1,25 @@
+review-chrome:
+  stage: review
+  rules:
+    - if: "$CI_COMMIT_TAG"
+  script:
+    - |
+      apt-get update && apt-get install -y curl
+      bash .gitlab-ci/scripts/bin/review.sh chrome
+      echo "Sending slack build notification"
+      echo "================================"
+      bash ./.gitlab-ci/scripts/bin/slack-status-messages.sh ":airplane_departure: passbolt-chrome-extension $CI_COMMIT_TAG has been sent to review!" "$CI_PROJECT_URL/-/jobs/$CI_JOB_ID"
+
+review-firefox:
+  stage: review
+  rules:
+    - if: "$CI_COMMIT_TAG"
+  script:
+    - bash .gitlab-ci/scripts/bin/review.sh firefox
+
+review-edge:
+  stage: review
+  rules:
+    - if: "$CI_COMMIT_TAG"
+  script:
+    - bash .gitlab-ci/scripts/bin/review.sh edge

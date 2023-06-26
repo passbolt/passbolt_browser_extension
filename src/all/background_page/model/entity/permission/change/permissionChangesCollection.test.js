@@ -12,7 +12,7 @@
  * @since         2.13.0
  */
 import PermissionChangesCollection from "./permissionChangesCollection";
-import EntitySchema from "../../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import PermissionEntity from "../permissionEntity";
 import PermissionsCollection from "../permissionsCollection";
 

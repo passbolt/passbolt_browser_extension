@@ -26,14 +26,17 @@ import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {
   pendingAccountRecoveryRequestDto,
+  pendingAccountRecoveryRequestWithInvalidAccountRecoveryPrivateKeyPasswordDto,
   pendingAccountRecoveryRequestWithoutPrivateKeyDto,
   pendingAccountRecoveryRequestWithoutPrivateKeyPasswordDto,
+  pendingAccountRecoveryRequestWithWrongPrivateKeyIdDto,
+  pendingAccountRecoveryRequestWithWrongPrivateKeyUserIdDto,
 } from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import {adminAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import Keyring from "../../model/keyring";
 import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
-import EntityValidationError from "../../model/entity/abstract/entityValidationError";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import {
   disabledAccountRecoveryOrganizationPolicyDto,
   enabledAccountRecoveryOrganizationPolicyDto
@@ -42,7 +45,7 @@ import AccountRecoveryResponseEntity from "../../model/entity/accountRecovery/ac
 import {PassphraseController} from "../passphrase/passphraseController";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import UserLocalStorage from "../../service/local_storage/userLocalStorage";
-import {defaultUserDto} from "../../model/entity/user/userEntity.test.data";
+import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import UsersCollection from "../../model/entity/user/usersCollection";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
@@ -199,11 +202,11 @@ describe("ReviewRequestController", () => {
 
     each([
       {expectedError: "The request should have an associated private key.", findRequestMock: pendingAccountRecoveryRequestWithoutPrivateKeyDto()},
-      {expectedError: "The request user should match the request associated private key user.", findRequestMock: pendingAccountRecoveryRequestDto({account_recovery_private_key: {user_id: uuidv4()}})},
+      {expectedError: "The request user should match the request associated private key user.", findRequestMock: pendingAccountRecoveryRequestWithWrongPrivateKeyUserIdDto()},
       {expectedError: "The account recovery request private key should have a collection of private key passwords.", findRequestMock: pendingAccountRecoveryRequestWithoutPrivateKeyPasswordDto()},
       // For this scenario the validation occurs at the entity level, the recipient foreign model is not valid "".
-      {expectedError: "Could not validate entity AccountRecoveryPrivateKeyPassword.", findRequestMock: pendingAccountRecoveryRequestDto({account_recovery_private_key: {account_recovery_private_key_passwords: [{recipient_foreign_model: "unknown-foreign-model"}]}})},
-      {expectedError: "The request private key password private key id should match the request private key id.", findRequestMock: pendingAccountRecoveryRequestDto({account_recovery_private_key: {account_recovery_private_key_passwords: [{private_key_id: uuidv4()}]}})},
+      {expectedError: "Could not validate entity AccountRecoveryPrivateKeyPassword.", findRequestMock: pendingAccountRecoveryRequestWithInvalidAccountRecoveryPrivateKeyPasswordDto()},
+      {expectedError: "The request private key password private key id should match the request private key id.", findRequestMock: pendingAccountRecoveryRequestWithWrongPrivateKeyIdDto()},
     ]).describe("Should assert the request returned by the API.", scenario => {
       it(`Should validate the scenario: ${scenario.expectedError}`, async() => {
         await MockExtension.withConfiguredAccount();

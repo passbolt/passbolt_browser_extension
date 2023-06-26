@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import EntityCollection from "../abstract/entityCollection";
+import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
 import AccountRecoveryPrivateKeyPasswordEntity from "./accountRecoveryPrivateKeyPasswordEntity";
-import EntitySchema from "../abstract/entitySchema";
-import EntityCollectionError from "../abstract/entityCollectionError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 import deduplicateObjects from "../../../utils/array/deduplicateObjects";
 
 const ENTITY_NAME = 'AccountRecoveryPrivateKeyPassword';

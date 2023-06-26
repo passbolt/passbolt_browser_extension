@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import Entity from "../abstract/entity";
-import EntitySchema from "../abstract/entitySchema";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'ResourceType';
 const RESOURCE_TYPE_NAME_MAX_LENGTH = 255;

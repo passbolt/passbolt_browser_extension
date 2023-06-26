@@ -19,7 +19,7 @@ import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOpti
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import CreateCommentController from "./createCommentController";
 import {v4 as uuidv4} from "uuid";
-import EntityValidationError from "../../model/entity/abstract/entityValidationError";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import CommentModel from "../../model/comment/commentModel";
 
 beforeEach(async() =>  {

@@ -12,8 +12,8 @@
  * @since         4.0.0
  */
 import WorkerEntity from "./workerEntity";
-import EntitySchema from "../abstract/entitySchema";
-import EntityValidationError from "../abstract/entityValidationError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("Worker entity", () => {
   it("schema must validate", () => {

@@ -1,0 +1,38 @@
+publish-chrome:
+  stage: publish
+  rules:
+    - if: "$CI_COMMIT_TAG"
+      when: manual
+  script:
+    - |
+      apt-get update && apt-get install -y curl
+      bash .gitlab-ci/scripts/bin/publish.sh chrome
+      echo "Sending slack build notification"
+      echo "================================"
+      bash ./.gitlab-ci/scripts/bin/slack-status-messages.sh ":rocket: passbolt-chrome-extension $CI_COMMIT_TAG has been published!" "$CI_PROJECT_URL/-/jobs/$CI_JOB_ID"
+
+publish-firefox:
+  stage: publish
+  rules:
+    - if: "$CI_COMMIT_TAG"
+      when: manual
+  script:
+    - |
+      apt-get update && apt-get install -y curl
+      bash .gitlab-ci/scripts/bin/publish.sh firefox
+      echo "Sending slack build notification"
+      echo "================================"
+      bash ./.gitlab-ci/scripts/bin/slack-status-messages.sh ":rocket: passbolt-firefox-extension $CI_COMMIT_TAG has been published!" "$CI_PROJECT_URL/-/jobs/$CI_JOB_ID"
+
+publish-edge:
+  stage: publish
+  rules:
+    - if: "$CI_COMMIT_TAG"
+      when: manual
+  script:
+    - |
+      apt-get update && apt-get install -y curl
+      bash .gitlab-ci/scripts/bin/publish.sh edge
+      echo "Sending slack build notification"
+      echo "================================"
+      bash ./.gitlab-ci/scripts/bin/slack-status-messages.sh ":rocket: passbolt-edge-extension $CI_COMMIT_TAG has been published!" "$CI_PROJECT_URL/-/jobs/$CI_JOB_ID"

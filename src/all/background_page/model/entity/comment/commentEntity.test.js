@@ -12,8 +12,8 @@
  * @since         3.0.0
  */
 import CommentEntity from "./commentEntity";
-import EntityValidationError from "../abstract/entityValidationError";
-import EntitySchema from "../abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const minimalDto = {
   "user_id": "a58de6d3-f52c-5080-b79b-a601a647ac85",

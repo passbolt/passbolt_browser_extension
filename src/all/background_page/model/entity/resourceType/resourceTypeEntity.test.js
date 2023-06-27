@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import EntityValidationError from "../abstract/entityValidationError";
-import EntitySchema from "../abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ResourceTypeEntity from "./resourceTypeEntity";
 
 describe("Resource Type entity", () => {

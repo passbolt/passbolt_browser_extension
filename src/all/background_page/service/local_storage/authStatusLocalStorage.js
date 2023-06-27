@@ -50,7 +50,7 @@ class AuthStatusLocalStorage {
    *
    * @param {boolean} isAuthenticated
    * @param {boolean} isMfaRequired
-   * @return {void}
+   * @return {Promise<void>}
    */
   static async set(isAuthenticated, isMfaRequired) {
     await lock.acquire();

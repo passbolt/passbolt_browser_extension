@@ -12,9 +12,9 @@
  * @since         3.0.0
  */
 import GroupEntity from "./groupEntity";
-import EntityCollection from "../abstract/entityCollection";
-import EntitySchema from "../abstract/entitySchema";
-import EntityCollectionError from "../abstract/entityCollectionError";
+import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 import deduplicateObjects from "../../../utils/array/deduplicateObjects";
 
 

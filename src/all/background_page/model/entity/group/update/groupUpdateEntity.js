@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import GroupEntity from "../groupEntity";
-import Entity from "../../abstract/entity";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import SecretsCollection from "../../secret/secretsCollection";
 import GroupUserChangesCollection from "../../groupUser/change/groupUserChangesCollection";
-import EntitySchema from "../../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'GroupUpdate';
 

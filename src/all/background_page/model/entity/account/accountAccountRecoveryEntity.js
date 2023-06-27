@@ -15,7 +15,7 @@
 import AccountRecoveryRequestEntity from "../accountRecovery/accountRecoveryRequestEntity";
 import AbstractAccountEntity from "./abstractAccountEntity";
 import AuthenticationTokenEntity from "../authenticationToken/authenticationTokenEntity";
-import EntitySchema from "../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = "AccountAccountRecovery";
 const TYPE_ACCOUNT_ACCOUNT_RECOVERY = "account-account-recovery";

@@ -13,8 +13,8 @@
  */
 import TagEntity from "./tagEntity";
 import TagsCollection from "./tagsCollection";
-import EntityCollectionError from "../abstract/entityCollectionError";
-import EntitySchema from "../abstract/entitySchema";
+import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 describe("Tag entity", () => {
   it("schema must validate", () => {

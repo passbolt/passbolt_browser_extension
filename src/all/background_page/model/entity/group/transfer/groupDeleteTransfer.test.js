@@ -12,7 +12,7 @@
  * @since         3.0.0
  */
 import GroupDeleteTransferEntity from "./groupDeleteTransfer";
-import EntityValidationError from "../../abstract/entityValidationError";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("Group delete transfer entity", () => {
   it("constructor works if valid minimal DTO is provided", () => {

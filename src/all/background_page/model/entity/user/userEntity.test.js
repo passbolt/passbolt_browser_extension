@@ -13,14 +13,14 @@
  */
 import UserEntity from "./userEntity";
 import {UserEntityTestFixtures} from "./userEntity.test.fixtures";
-import EntitySchema from "../abstract/entitySchema";
-import EntityValidationError from '../abstract/entityValidationError';
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import {
   customEmailValidationProOrganizationSettings
 } from "../organizationSettings/organizationSettingsEntity.test.data";
 import OrganizationSettingsModel from "../../organizationSettings/organizationSettingsModel";
 import OrganizationSettingsEntity from "../organizationSettings/organizationSettingsEntity";
-import {defaultUserDto} from "./userEntity.test.data";
+import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 
 describe("User entity", () => {
   it("schema must validate", () => {

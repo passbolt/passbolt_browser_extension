@@ -11,13 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import {OpenpgpAssertion} from "../../../utils/openpgp/openpgpAssertions";
-import Entity from "../abstract/entity";
 import AccountRecoveryPrivateKeyPasswordsCollection from "./accountRecoveryPrivateKeyPasswordsCollection";
 import UserEntity from "../user/userEntity";
 import AccountRecoveryOrganizationPublicKeyEntity from "./accountRecoveryOrganizationPublicKeyEntity";
-import EntityValidationError from "../abstract/entityValidationError";
-import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = "AccountRecoveryOrganizationPolicy";
 const POLICY_DISABLED = "disabled";

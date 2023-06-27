@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "../abstract/entity";
-import EntitySchema from "../abstract/entitySchema";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'Avatar';
 const AVATAR_URL_SIZE_SMALL = 'small';
@@ -48,12 +48,6 @@ class AvatarEntity extends Entity {
           "type": "string",
           "format": "uuid"
         },
-        /*
-         * "user_id": {
-         *   "type": "string",
-         *   "format": "uuid"
-         * },
-         */
         "url": {
           "type": "object",
           "required": [
@@ -97,14 +91,6 @@ class AvatarEntity extends Entity {
   }
 
   /**
-   * Get user id
-   * @returns {(string|null)}
-   */
-  get userId() {
-    return this._props.user_id || null;
-  }
-
-  /**
    * Get url (medium size)
    * @returns {*}
    */
@@ -118,22 +104,6 @@ class AvatarEntity extends Entity {
    */
   get urlSmall() {
     return this._props.url["small"];
-  }
-
-  /**
-   * Get avatar url
-   *
-   * @param {string} size medium|small
-   * @returns {string} admin or user
-   */
-  getUrl(size) {
-    if (!size) {
-      throw new TypeError('A size is needed.');
-    }
-    if (size !== 'medium' || size !== 'small') {
-      throw new TypeError('Invalid size, use small or medium.');
-    }
-    return this._props.url[size];
   }
 
   /**

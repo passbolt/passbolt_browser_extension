@@ -18,13 +18,13 @@ import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import MoveResourcesController from "./moveResourcesController";
 import {PassphraseController} from "../passphrase/passphraseController";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
-import {readResourcesCollection} from "../../model/entity/resource/resourcesCollection.test.data";
+import {defaultResourceDtosCollection} from "../../model/entity/resource/resourcesCollection.test.data";
 import FolderModel from "../../model/folder/folderModel";
 import ResourceModel from "../../model/resource/resourceModel";
 import Keyring from "../../model/keyring";
 import ExternalGpgKeyEntity from "../../model/entity/gpgkey/external/externalGpgKeyEntity";
 import FolderEntity from "../../model/entity/folder/folderEntity";
-import {readPermission} from "../../model/entity/permission/permissionEntity.test.data";
+import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data.js";
 import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
 
 jest.mock("../../service/progress/progressService");
@@ -49,11 +49,11 @@ describe("MoveResourcesController", () => {
       // Mock the API response.
       const mockApiFetch = fetch.doMockIf(new RegExp('/move/resource/.*.json'), () => mockApiResponse());
       // Mock API findAllForShare resources.
-      const mockResourcesToMoved = readResourcesCollection();
+      const mockResourcesToMoved = defaultResourceDtosCollection();
       fetch.doMockOnceIf(new RegExp('/resources.json'), () => mockApiResponse(mockResourcesToMoved));
       jest.spyOn(ResourceLocalStorage, "get").mockImplementation(() => mockResourcesToMoved);
       // Mock API findAllForShare folders.
-      const permission = readPermission({aco: "Folder", aco_foreign_key: "f848277c-5398-58f8-a82a-72397af2d450"});
+      const permission = ownerPermissionDto({aco: "Folder", aco_foreign_key: "f848277c-5398-58f8-a82a-72397af2d450"});
       const folderDto = {
         id: "f848277c-5398-58f8-a82a-72397af2d450",
         name: "Test",
@@ -74,7 +74,7 @@ describe("MoveResourcesController", () => {
     it("Should move no resource if resources are always in the folder.", async() => {
       const controller = new MoveResourcesController(null, null, defaultApiClientOptions());
       // Mock API findAllForShare resources.
-      const mockResourcesToMoved = readResourcesCollection();
+      const mockResourcesToMoved = defaultResourceDtosCollection();
       const mockApiFetch = fetch.doMockOnceIf(new RegExp('/resources.json'), () => mockApiResponse(mockResourcesToMoved));
 
       await controller.main(['a848277c-7893-58f8-a82a-72397bf2d890'], null);
@@ -87,11 +87,11 @@ describe("MoveResourcesController", () => {
     it("Should move no resources if the user is no authorize.", async() => {
       const controller = new MoveResourcesController(null, null, defaultApiClientOptions());
       // Mock API findAllForShare resources.
-      const mockResourcesToMoved = readResourcesCollection();
+      const mockResourcesToMoved = defaultResourceDtosCollection();
       const mockApiFetch = fetch.doMockOnceIf(new RegExp('/resources.json'), () => mockApiResponse(mockResourcesToMoved));
       // Mock API findAllForShare folders.
-      const permission = readPermission({aco: "Folder", aco_foreign_key: "f848277c-5398-58f8-a82a-72397af2d450", type: 1});
-      const permissionOwner = readPermission({aco: "Folder", aco_foreign_key: "f848277c-5398-58f8-a82a-72397af2d450"});
+      const permission = ownerPermissionDto({aco: "Folder", aco_foreign_key: "f848277c-5398-58f8-a82a-72397af2d450", type: 1});
+      const permissionOwner = ownerPermissionDto({aco: "Folder", aco_foreign_key: "f848277c-5398-58f8-a82a-72397af2d450"});
       const folderDto = {
         id: "f848277c-5398-58f8-a82a-72397af2d450",
         name: "Test",

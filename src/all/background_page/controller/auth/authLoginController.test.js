@@ -40,8 +40,8 @@ beforeEach(async() => {
   await MockExtension.withConfiguredAccount();
 });
 
-describe("AuthLognController", () => {
-  describe("AuthLognController::exec", () => {
+describe("AuthLoginController", () => {
+  describe("AuthLoginController::exec", () => {
     const passphrase = "ada@passbolt.com";
     const mockOrganisationSettings = (withSsoEnabled = true) => {
       const organizationSettings = anonymousOrganizationSettings();

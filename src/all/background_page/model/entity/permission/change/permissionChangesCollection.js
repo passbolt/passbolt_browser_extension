@@ -14,8 +14,8 @@
 import PermissionEntity from "../permissionEntity";
 import PermissionsCollection from "../permissionsCollection";
 import PermissionChangeEntity from "./permissionChangeEntity";
-import EntityCollection from "../../abstract/entityCollection";
-import EntitySchema from "../../abstract/entitySchema";
+import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'PermissionChanges';
 

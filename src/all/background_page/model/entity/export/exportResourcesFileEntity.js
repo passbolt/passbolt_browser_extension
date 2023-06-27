@@ -12,8 +12,8 @@
  */
 import ExternalFoldersCollection from "../folder/external/externalFoldersCollection";
 import ExternalResourcesCollection from "../resource/external/externalResourcesCollection";
-import Entity from "../abstract/entity";
-import EntitySchema from "../abstract/entitySchema";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = "ExportResourcesFileEntity";
 const FORMAT_KDBX = "kdbx";

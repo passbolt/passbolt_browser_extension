@@ -12,7 +12,7 @@
  * @since         3.12.0
  */
 
-import EntitySchema from "../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import OrganizationSettingsEntity from "./organizationSettingsEntity";
 import {
   customEmailValidationProOrganizationSettings,

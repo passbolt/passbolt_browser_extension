@@ -13,8 +13,8 @@
  */
 import GroupUserTransfersCollection from "../../groupUser/transfer/groupUserTransfersCollection";
 import PermissionTransfersCollection from "../../permission/transfer/permissionTransfersCollection";
-import Entity from "../../abstract/entity";
-import EntityValidationError from "../../abstract/entityValidationError";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 
 const ENTITY_NAME = 'UserDeleteTransfer';

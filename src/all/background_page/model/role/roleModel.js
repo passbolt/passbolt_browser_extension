@@ -13,7 +13,7 @@
  */
 import RolesLocalStorage from "../../service/local_storage/rolesLocalStorage";
 import RoleService from "../../service/api/role/roleService";
-import RolesCollection from "../entity/role/rolesCollection";
+import RolesCollection from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection";
 
 class RoleModel {
   /**

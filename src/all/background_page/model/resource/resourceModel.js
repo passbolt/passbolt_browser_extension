@@ -200,6 +200,7 @@ class ResourceModel {
    */
   async findAll(contains, filters, orders, preSanitize) {
     let resourcesDto = await this.resourceService.findAll(contains, filters, orders);
+    resourcesDto = await this.keepResourcesSupported(resourcesDto);
     if (preSanitize) {
       resourcesDto = ResourcesCollection.sanitizeDto(resourcesDto);
     }
@@ -650,6 +651,17 @@ class ResourceModel {
       }
     }
     return true;
+  }
+
+
+  /**
+   * Keep only resources supported with no or known resource type
+   * @param resourcesDto
+   * @return {Promise<*[]>}
+   */
+  async keepResourcesSupported(resourcesDto) {
+    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+    return resourcesDto.filter(resource => !resource.resource_type_id || resourceTypesCollection.isResourceTypeIdPresent(resource.resource_type_id));
   }
 }
 

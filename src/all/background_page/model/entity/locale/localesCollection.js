@@ -12,8 +12,8 @@
  * @since         3.2.0
  */
 import LocaleEntity from "./localeEntity";
-import EntityCollection from "../abstract/entityCollection";
-import EntitySchema from "../abstract/entitySchema";
+import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 
 const ENTITY_NAME = 'Locales';

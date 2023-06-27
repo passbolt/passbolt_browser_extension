@@ -11,9 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import Entity from "../abstract/entity";
-import EntitySchema from "../abstract/entitySchema";
-import EntityValidationError from "../abstract/entityValidationError";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 const ENTITY_NAME = "SsoKitClientPartEntity";
 

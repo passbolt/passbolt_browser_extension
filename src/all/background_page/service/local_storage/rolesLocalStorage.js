@@ -13,8 +13,8 @@
  */
 import browser from "../../sdk/polyfill/browserPolyfill";
 import Log from "../../model/log";
-import RoleEntity from "../../model/entity/role/roleEntity";
-import RolesCollection from "../../model/entity/role/rolesCollection";
+import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
+import RolesCollection from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection";
 import Lock from "../../utils/lock";
 const lock = new Lock();
 

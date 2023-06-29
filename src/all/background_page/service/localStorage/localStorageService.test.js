@@ -23,6 +23,8 @@ import MockExtension from "../../../../../test/mocks/mockExtension";
 import PostponeUserSettingInvitationService from "../invitation/postponeUserSettingInvitationService";
 import {PASSWORD_POLICIES_LOCAL_STORAGE_KEY} from "../local_storage/passwordPoliciesLocalStorage";
 
+jest.mock("../local_storage/rememberMeLocalStorage");
+
 beforeEach(() => {
   jest.clearAllMocks();
 });
@@ -58,7 +60,7 @@ describe("LocalStorageService", () => {
       expect(browser.alarms.clear).toHaveBeenCalledWith("SessionKeepAlive");
       expect(browser.storage.session.remove).toHaveBeenCalledWith("temp_server_part_sso_kit");
       expect(GetLegacyAccountService.get).not.toHaveBeenCalled();
-      expect(UserMeSessionStorageService.remove).not.toHaveBeenCalledWith();
+      expect(UserMeSessionStorageService.remove).not.toHaveBeenCalled();
     });
 
     it("Should flush all storage (with an account set)", async() => {

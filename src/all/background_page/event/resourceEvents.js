@@ -14,7 +14,7 @@ import GetResourceGridUserSettingController
 import SetResourceGridUserSettingController
   from "../controller/resourceGridSetting/setResourceGridUserSettingController";
 
-const listen = function(worker, apiClientOption, account) {
+const listen = function(worker, _, account) {
   /*
    * Pull the resources from the API and update the local storage.
    *
@@ -83,7 +83,7 @@ const listen = function(worker, apiClientOption, account) {
   worker.port.on('passbolt.resources.create', async(requestId, resourceDto, plaintextDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
-      const controller = new ResourceCreateController(worker, requestId, clientOptions);
+      const controller = new ResourceCreateController(worker, requestId, clientOptions, account);
       const savedResource = await controller.main(resourceDto, plaintextDto);
       worker.port.emit(requestId, 'SUCCESS', savedResource);
     } catch (error) {
@@ -123,7 +123,7 @@ const listen = function(worker, apiClientOption, account) {
   worker.port.on('passbolt.resources.update', async(requestId, resourceDto, plaintextDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
-      const controller = new ResourceUpdateController(worker, requestId, clientOptions);
+      const controller = new ResourceUpdateController(worker, requestId, clientOptions, account);
       const updatedResource = await controller.main(resourceDto, plaintextDto);
       worker.port.emit(requestId, 'SUCCESS', updatedResource);
     } catch (error) {

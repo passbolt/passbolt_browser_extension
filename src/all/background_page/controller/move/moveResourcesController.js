@@ -13,7 +13,7 @@
  */
 import Keyring from "../../model/keyring";
 import ResourceModel from "../../model/resource/resourceModel";
-import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import FolderModel from "../../model/folder/folderModel";
 import Share from "../../model/share";
@@ -32,13 +32,14 @@ class MoveResourcesController {
    * @param {string} requestId
    * @param {ApiClientOptions} clientOptions
    */
-  constructor(worker, requestId, clientOptions) {
+  constructor(worker, requestId, clientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.folderModel = new FolderModel(clientOptions);
     this.resourceModel = new ResourceModel(clientOptions);
     this.keyring = new Keyring();
     this.progressService = new ProgressService(this.worker);
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -105,7 +106,7 @@ class MoveResourcesController {
      * Get the passphrase if needed and decrypt secret key
      * We do this to confirm the move even if there is nothing to decrypt/re-encrypt
      */
-    const passphrase = await passphraseController.get(this.worker);
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     this.privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
   }
 

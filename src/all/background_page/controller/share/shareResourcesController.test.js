@@ -16,7 +16,6 @@ import Keyring from "../../model/keyring";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import User from "../../model/user";
 import ShareResourcesController from "./shareResourcesController";
-import {PassphraseController} from "../passphrase/passphraseController";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 
 const {enableFetchMocks} = require("jest-fetch-mock");
@@ -31,8 +30,7 @@ const {
 
 
 jest.mock("../../service/progress/progressService");
-
-jest.spyOn(PassphraseController, "get").mockImplementation(() => "ada@passbolt.com");
+jest.mock("../../service/passphrase/getPassphraseService");
 
 beforeEach(() => {
   enableFetchMocks();
@@ -189,6 +187,7 @@ describe("ShareResourcesController", () => {
       // finally we can call the controller with the data as everything is setup.
       const clientOptions = await User.getInstance().getApiClientOptions({requireCsrfToken: false});
       const controller = new ShareResourcesController(null, null, clientOptions);
+      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
       await controller.main(resourcesDto, changesDto);
     });
   });

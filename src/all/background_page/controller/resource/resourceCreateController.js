@@ -16,7 +16,7 @@ import Keyring from "../../model/keyring";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import User from "../../model/user";
 import ResourceModel from "../../model/resource/resourceModel";
-import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import FolderModel from "../../model/folder/folderModel";
 import Share from "../../model/share";
@@ -34,13 +34,14 @@ class ResourceCreateController {
    * @param {string} requestId
    * @param {ApiClientOptions} clientOptions
    */
-  constructor(worker, requestId, clientOptions) {
+  constructor(worker, requestId, clientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.resourceModel = new ResourceModel(clientOptions);
     this.folderModel = new FolderModel(clientOptions);
     this.keyring = new Keyring();
     this.progressService = new ProgressService(this.worker, i18n.t('Creating password'));
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -62,7 +63,7 @@ class ResourceCreateController {
 
     // Get the passphrase if needed and decrypt secret key
     try {
-      const passphrase = await passphraseController.get(this.worker);
+      const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
       privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
     } catch (error) {
       console.error(error);

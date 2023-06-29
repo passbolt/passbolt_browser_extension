@@ -42,21 +42,19 @@ import {
   enabledAccountRecoveryOrganizationPolicyDto
 } from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import AccountRecoveryResponseEntity from "../../model/entity/accountRecovery/accountRecoveryResponseEntity";
-import {PassphraseController} from "../passphrase/passphraseController";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import UserLocalStorage from "../../service/local_storage/userLocalStorage";
 import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import UsersCollection from "../../model/entity/user/usersCollection";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
-jest.mock("../passphrase/passphraseController.js");
+jest.mock("../../service/passphrase/getPassphraseService");
 
 // Reset the modules before each test.
 beforeEach(() => {
   enableFetchMocks();
   fetch.resetMocks();
   jest.useFakeTimers();
-  PassphraseController.get.mockResolvedValue(pgpKeys.admin.passphrase);
 });
 
 describe("ReviewRequestController", () => {
@@ -100,6 +98,7 @@ describe("ReviewRequestController", () => {
         fetch.doMockOnceIf(/account-recovery\/responses.json/, async req => mockApiResponse(JSON.parse(await req.text())));
 
         const controller = new ReviewRequestController(null, null, apiClientOptions, account);
+        controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
         const savedAccountRecoveryResponseEntity = await controller.exec(requestId, AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
 
         expect.assertions(9);
@@ -124,6 +123,7 @@ describe("ReviewRequestController", () => {
     });
 
     it("Should save a review account recovery request if rejected.", async() => {
+      expect.assertions(2);
       await MockExtension.withConfiguredAccount();
       // Add the user in the local storage.
       await UserLocalStorage.set(new UsersCollection([defaultUserDto({id: requestDto.user_id})]));
@@ -140,32 +140,38 @@ describe("ReviewRequestController", () => {
       fetch.doMockOnceIf(/account-recovery\/responses.json/, async req => mockApiResponse(JSON.parse(await req.text())));
 
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
+      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
+
       const accountRecoveryResponseEntity = await controller.exec(uuidv4(), AccountRecoveryResponseEntity.STATUS_REJECTED);
 
-      expect.assertions(2);
       expect(accountRecoveryResponseEntity.status).toEqual("rejected");
     });
 
     it("Should assert the provided account recovery id is valid.", async() => {
+      expect.assertions(1);
       await MockExtension.withConfiguredAccount();
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
+      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
+
       const promise = controller.exec("not-uuid");
-      expect.assertions(1);
       await expect(promise).rejects.toThrow(new TypeError("requestId should be a valid uuid."));
     });
 
     it("Should assert the account recovery organization is enabled.", async() => {
+      expect.assertions(1);
       await MockExtension.withConfiguredAccount();
       // Mock API fetch account recovery organization policy response.
       fetch.doMockOnceIf(/account-recovery\/organization-policies.json/, () => mockApiResponse(disabledAccountRecoveryOrganizationPolicyDto()));
 
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
+      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
+
       const promise = controller.exec(uuidv4());
-      expect.assertions(1);
       await expect(promise).rejects.toThrowError("Sorry the account recovery feature is not enabled for this organization.");
     });
 
     it("Should assert the provided organization private key dto is valid.", async() => {
+      expect.assertions(1);
       await MockExtension.withConfiguredAccount();
       // Mock API fetch account recovery organization policy response.
       fetch.doMockOnceIf(/account-recovery\/organization-policies.json/, () => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
@@ -173,12 +179,14 @@ describe("ReviewRequestController", () => {
       fetch.doMockOnceIf(/account-recovery\/requests\//, () => mockApiResponse(requestDto));
 
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
+      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
+
       const promise = controller.exec(uuidv4(), AccountRecoveryResponseEntity.STATUS_APPROVED, {});
-      expect.assertions(1);
       await expect(promise).rejects.toThrowError(new EntityValidationError("Could not validate entity PrivateGpgkey."));
     });
 
     it("Should assert the account recovery organization private key can be decrypted.", async() => {
+      expect.assertions(1);
       await MockExtension.withConfiguredAccount();
       // Mock API fetch account recovery organization policy response.
       fetch.doMockOnceIf(/account-recovery\/organization-policies.json/, () => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
@@ -186,27 +194,28 @@ describe("ReviewRequestController", () => {
       fetch.doMockOnceIf(/account-recovery\/requests\//, () => mockApiResponse(requestDto));
 
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
+      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
+
       const privateKeyDto = {
         armored_key: pgpKeys.account_recovery_organization.private,
         passphrase: "wrong-passphrase"
       };
       const promise = controller.exec(uuidv4(), AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
-      expect.assertions(1);
       await expect(promise).rejects.toThrowError(InvalidMasterPasswordError);
     });
 
     it("Should assert the signed-in user private key can be decrypted.", async() => {
+      expect.assertions(1);
       await MockExtension.withConfiguredAccount();
       // Mock API fetch account recovery organization policy response.
       fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
       // Mock API get account recovery request.
       fetch.doMockOnceIf(/account-recovery\/requests\//, () => mockApiResponse(requestDto));
-      // Mock signed in user wrong passphrase
-      PassphraseController.get.mockResolvedValue("wrong-passphrase");
 
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
+      // Mock signed in user wrong passphrase
+      controller.getPassphraseService.getPassphrase.mockResolvedValue("wrong-passphrase");
       const promise = controller.exec(uuidv4(), AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
-      expect.assertions(1);
       await expect(promise).rejects.toThrowError(InvalidMasterPasswordError);
     });
 
@@ -219,6 +228,7 @@ describe("ReviewRequestController", () => {
       {expectedError: "The request private key password private key id should match the request private key id.", findRequestMock: pendingAccountRecoveryRequestWithWrongPrivateKeyIdDto()},
     ]).describe("Should assert the request returned by the API.", scenario => {
       it(`Should validate the scenario: ${scenario.expectedError}`, async() => {
+        expect.assertions(1);
         await MockExtension.withConfiguredAccount();
         // Mock API fetch account recovery organization policy response.
         fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
@@ -227,12 +237,12 @@ describe("ReviewRequestController", () => {
 
         const controller = new ReviewRequestController(null, null, apiClientOptions, account);
         const promise = controller.exec(uuidv4(), AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
-        expect.assertions(1);
         await expect(promise).rejects.toThrowError(scenario.expectedError);
       });
     });
 
     it("Should assert the public key of the user making the account recovery is found.", async() => {
+      expect.assertions(1);
       await MockExtension.withConfiguredAccount();
       // Mock API fetch account recovery organization policy response.
       fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
@@ -242,13 +252,16 @@ describe("ReviewRequestController", () => {
       fetch.doMockOnce(() => mockApiResponse({}));
 
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
+      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
+
       const promise = controller.exec(requestId, AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
 
-      expect.assertions(1);
       await expect(promise).rejects.toThrowError("Cannot find the public key of the user requesting an account recovery.");
     });
 
     it("Should assert the private key password data was encrypted for the user making the request, check the encrypted user id match the request user id.", async() => {
+      expect.assertions(1);
+
       await MockExtension.withConfiguredAccount();
       const requestDto = pendingAccountRecoveryRequestDto({id: requestId, user_id: pgpKeys.betty.userId});
       // Import the public key of the user requesting an account recovery in the keyring, it will be used to check the signature on the account recovery private key data.
@@ -262,13 +275,16 @@ describe("ReviewRequestController", () => {
       fetch.doMockOnce(() => mockApiResponse({}));
 
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
+      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
+
       const promise = controller.exec(requestId, AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
 
-      expect.assertions(1);
       await expect(promise).rejects.toThrowError("The user id contained in the private key password data does not match the private key target used id.");
     });
 
     it("Should assert the private key password data was encrypted for the user making the request, check the encrypted private key fingerprint match the user public key fingerprint.", async() => {
+      expect.assertions(1);
+
       await MockExtension.withConfiguredAccount();
       // Import the public key of the user requesting an account recovery in the keyring, it will be used to check the signature on the account recovery private key data.
       const keyring = new Keyring();
@@ -281,9 +297,9 @@ describe("ReviewRequestController", () => {
       fetch.doMockOnce(() => mockApiResponse({}));
 
       const controller = new ReviewRequestController(null, null, apiClientOptions, account);
-      const promise = controller.exec(requestId, AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
+      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
 
-      expect.assertions(1);
+      const promise = controller.exec(requestId, AccountRecoveryResponseEntity.STATUS_APPROVED, privateKeyDto);
       await expect(promise).rejects.toThrowError("The private key password data fingerprint should match the user public fingerprint.");
     });
   });

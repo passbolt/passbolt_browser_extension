@@ -23,10 +23,11 @@ class MoveController {
    * @param {string} requestId
    * @param {ApiClientOptions} clientOptions
    */
-  constructor(worker, requestId, clientOptions) {
+  constructor(worker, requestId, clientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.clientOptions = clientOptions;
+    this.account = account;
   }
 
   /**
@@ -56,13 +57,13 @@ class MoveController {
 
     // Move multiple resources at once
     if (resourcesIds.length) {
-      const controller = new MoveResourcesController(this.worker, this.requestId, this.clientOptions);
+      const controller = new MoveResourcesController(this.worker, this.requestId, this.clientOptions, this.account);
       await controller.main(resourcesIds, folderParentId);
     }
 
     // Move one folder
     if (foldersIds.length) {
-      const controller = new MoveFolderController(this.worker, this.requestId, this.clientOptions);
+      const controller = new MoveFolderController(this.worker, this.requestId, this.clientOptions, this.account);
       await controller.main(foldersIds[0], folderParentId);
     }
   }

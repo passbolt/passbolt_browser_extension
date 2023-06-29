@@ -16,7 +16,7 @@ import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import User from "../../model/user";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import ResourceModel from "../../model/resource/resourceModel";
-import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import FolderModel from "../../model/folder/folderModel";
 import ExternalFoldersCollection from "../../model/entity/folder/external/externalFoldersCollection";
@@ -34,7 +34,7 @@ class ExportResourcesFileController {
    * @param {Worker} worker
    * @param {ApiClientOptions} clientOptions
    */
-  constructor(worker, clientOptions) {
+  constructor(worker, clientOptions, account) {
     this.worker = worker;
 
     // Models
@@ -43,6 +43,7 @@ class ExportResourcesFileController {
     this.folderModel = new FolderModel(clientOptions);
 
     this.progressService = new ProgressService(this.worker, i18n.t("Exporting ..."));
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -92,7 +93,7 @@ class ExportResourcesFileController {
    * @returns {Promise<openpgp.PrivateKey>}
    */
   async getPrivateKey() {
-    const passphrase = await passphraseController.get(this.worker);
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     return GetDecryptedUserPrivateKeyService.getKey(passphrase);
   }
 

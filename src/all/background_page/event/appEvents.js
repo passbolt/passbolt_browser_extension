@@ -167,7 +167,7 @@ const listen = function(worker, _, account) {
 
   worker.port.on('passbolt.sso.generate-sso-kit', async(requestId, provider) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new GenerateSsoKitController(worker, requestId, apiClientOptions);
+    const controller = new GenerateSsoKitController(worker, requestId, apiClientOptions, account);
     await controller._exec(provider);
   });
 

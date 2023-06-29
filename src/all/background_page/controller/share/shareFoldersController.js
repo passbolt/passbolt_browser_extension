@@ -13,7 +13,7 @@
  */
 import Keyring from "../../model/keyring";
 import ResourceModel from "../../model/resource/resourceModel";
-import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import FolderModel from "../../model/folder/folderModel";
 import Share from "../../model/share";
@@ -30,7 +30,7 @@ class ShareFoldersController {
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions
    */
-  constructor(worker, requestId, apiClientOptions) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.folderModel = new FolderModel(apiClientOptions);
@@ -50,6 +50,7 @@ class ShareFoldersController {
     this.privateKey = null;
 
     this.progressService = new ProgressService(this.worker);
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -121,7 +122,7 @@ class ShareFoldersController {
      * Get the passphrase if needed and decrypt secret key
      * We do this to confirm the move even if there is nothing to decrypt/re-encrypt
      */
-    const passphrase = await passphraseController.get(this.worker);
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     this.privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
   }
 

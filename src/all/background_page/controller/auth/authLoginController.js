@@ -19,6 +19,8 @@ import OrganizationSettingsModel from "../../model/organizationSettings/organiza
 import Keyring from "../../model/keyring";
 import CheckPassphraseService from "../../service/crypto/checkPassphraseService";
 import UpdateSsoCredentialsService from "../../service/account/updateSsoCredentialsService";
+import AccountModel from "../../model/account/accountModel";
+import RememberMeLocalStorage from "../../service/local_storage/rememberMeLocalStorage";
 
 class AuthLoginController {
   /**
@@ -31,11 +33,14 @@ class AuthLoginController {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
+    this.apiClientOptions = apiClientOptions;
+    this.accountModel = new AccountModel(apiClientOptions, account);
     this.authModel = new AuthModel(apiClientOptions);
     this.organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
     this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
     this.checkPassphraseService = new CheckPassphraseService(new Keyring());
+    this.rememberMeLocalStorage = new RememberMeLocalStorage(account);
   }
 
   /**
@@ -95,6 +100,7 @@ class AuthLoginController {
 
     try {
       await this.authModel.login(passphrase, rememberMe);
+      await this.rememberMeLocalStorage.set(rememberMe);
     } catch (error) {
       if (!(error instanceof UserAlreadyLoggedInError)) {
         throw error;

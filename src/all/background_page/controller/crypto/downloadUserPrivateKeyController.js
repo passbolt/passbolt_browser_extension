@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 import Keyring from "../../model/keyring";
-import {PassphraseController} from "../passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import i18n from "../../sdk/i18n";
 import GpgKeyError from "../../error/GpgKeyError";
 import FileService from "../../service/file/fileService";
@@ -26,10 +26,11 @@ class DownloadUserPrivateKeyController {
    * @param {Worker} worker
    * @param {string} requestId uuid
    */
-  constructor(worker, requestId) {
+  constructor(worker, requestId, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.keyring = new Keyring();
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -53,7 +54,7 @@ class DownloadUserPrivateKeyController {
    * @returns {Promise<void>}
    */
   async exec() {
-    await PassphraseController.request(this.worker);
+    await this.getPassphraseService.requestPassphrase(this.worker);
     let privateKey;
     try {
       privateKey = this.keyring.findPrivate().armoredKey;

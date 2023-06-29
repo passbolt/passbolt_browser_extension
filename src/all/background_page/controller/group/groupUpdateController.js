@@ -14,7 +14,7 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
-import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import GroupModel from "../../model/group/groupModel";
 import GroupEntity from "../../model/entity/group/groupEntity";
@@ -33,12 +33,13 @@ class GroupsUpdateController {
    * @param {string} requestId
    * @param {ApiClientOptions} clientOptions
    */
-  constructor(worker, requestId, clientOptions) {
+  constructor(worker, requestId, clientOptions, account) {
     this.worker = worker;
     this.groupModel = new GroupModel(clientOptions);
     this.keyring = new Keyring();
 
     this.progressService = new ProgressService(this.worker, i18n.t('Updating group ...'));
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -91,7 +92,7 @@ class GroupsUpdateController {
    * @returns {Promise<openpgp.PrivateKey>}
    */
   async getPrivateKey() {
-    const passphrase = await passphraseController.get(this.worker);
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     return GetDecryptedUserPrivateKeyService.getKey(passphrase);
   }
 

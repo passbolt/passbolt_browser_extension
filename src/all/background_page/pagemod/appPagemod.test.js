@@ -74,7 +74,6 @@ jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(MfaEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ClipboardEvents, "listen").mockImplementation(jest.fn());
 
-
 describe("Auth", () => {
   beforeEach(async() => {
     jest.resetModules();
@@ -95,6 +94,8 @@ describe("Auth", () => {
           }
         }
       };
+      jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
+
       // mock functions
       fetch.doMockIf(/csrf-token/, async() => mockApiResponse("csrf-token"));
       jest.spyOn(GpgAuth.prototype, "isAuthenticated").mockImplementation(() => new Promise(resolve => resolve(true)));
@@ -106,7 +107,7 @@ describe("Auth", () => {
       await App.attachEvents(port);
       // expectations
       const expectedPortAndTab = {port: port, tab: port._port.sender.tab};
-      expect(GetLegacyAccountService.get).toHaveBeenCalled();
+      expect(GetLegacyAccountService.get).toHaveBeenCalledWith({role: true});
       expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AppEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AuthEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);

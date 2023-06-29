@@ -9,7 +9,7 @@ import User from "../model/user";
 import SecretDecryptController from "../controller/secret/secretDecryptController";
 import PownedPasswordController from '../controller/secret/pownedPasswordController';
 
-const listen = function(worker) {
+const listen = function(worker, _, account) {
   /*
    * Decrypt a given armored string.
    *
@@ -23,7 +23,7 @@ const listen = function(worker) {
       if (options && Object.prototype.hasOwnProperty.call(options, 'showProgress')) {
         showProgress = options.showProgress;
       }
-      const controller = new SecretDecryptController(worker, requestId, apiClientOptions);
+      const controller = new SecretDecryptController(worker, requestId, apiClientOptions, account);
       const {plaintext} = await controller.main(resourceId, showProgress);
       worker.port.emit(requestId, 'SUCCESS', plaintext);
     } catch (error) {

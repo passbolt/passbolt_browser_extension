@@ -22,8 +22,6 @@ import AccountRecoveryOrganizationPolicyEntity from "../../model/entity/accountR
 import {withUserKeyAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 
-jest.mock("../passphrase/passphraseController.js");
-
 beforeEach(async() => {
   enableFetchMocks();
   fetch.resetMocks();

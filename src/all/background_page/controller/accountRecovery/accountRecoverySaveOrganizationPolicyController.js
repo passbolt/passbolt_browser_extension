@@ -20,7 +20,7 @@ import AccountRecoveryOrganizationPolicyChangeEntity from "../../model/entity/ac
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import SignGpgKeyService from "../../service/crypto/signGpgKeyService";
 import RevokeGpgKeyService from "../../service/crypto/revokeGpgKeyService";
-import {PassphraseController} from "../passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import DecryptPrivateKeyPasswordDataService from "../../service/accountRecovery/decryptPrivateKeyPasswordDataService";
 import i18n from "../../sdk/i18n";
 import AccountRecoveryPrivateKeyPasswordEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity";
@@ -45,6 +45,7 @@ class AccountRecoverySaveOrganizationPolicyController {
     this.progressService = new ProgressService(this.worker, i18n.t("Rekeying users' key"));
     this.keyring = new Keyring();
     this.account = account;
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -72,7 +73,7 @@ class AccountRecoverySaveOrganizationPolicyController {
    * @return {Promise<AccountRecoveryOrganizationPolicyEntity>}
    */
   async exec(organizationPolicyChangesDto, organizationPrivateKeyDto = null) {
-    const userPassphrase = await PassphraseController.get(this.worker);
+    const userPassphrase = await this.getPassphraseService.getPassphrase(this.worker);
     const organizationPolicyChanges = new AccountRecoveryOrganizationPolicyChangeEntity(organizationPolicyChangesDto);
     const organizationPrivateKeyEntity = organizationPrivateKeyDto ? new PrivateGpgkeyEntity(organizationPrivateKeyDto) : null;
     const currentOrganizationPolicy = await this.accountRecoveryModel.findOrganizationPolicy();

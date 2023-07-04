@@ -22,18 +22,11 @@ const Toolbar = function() {};
  * @return {string}
  */
 Toolbar.getToolbarUrl = function() {
-  let url = '';
   const user = User.getInstance();
 
-  // The plugin is installed and configured
-  if (user.isValid()) {
-    url = user.settings.getDomain();
-  } else {
-    // The plugin is installed but not configured
-    url = 'https://www.passbolt.com/start';
-  }
-
-  return url;
+  return user.isValid()
+    ? user.settings.getDomain() // The plugin is installed and configured
+    : 'https://www.passbolt.com/start'; // The plugin is installed but not configured
 };
 
 

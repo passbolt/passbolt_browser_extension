@@ -4,17 +4,17 @@ files:
   - source: /src/all/_locales/en/messages.json
     translation: /src/all/_locales/%two_letters_code%/%original_file_name%
 export_languages:
-  - de
-  - en
-  - es
-  - fr
-  - it
-  - ja
-  - ko
-  - lt
-  - nl
-  - pl
-  - pt
-  - ro
-  - sv
+  - de-DE
+  - en-UK
+  - es-ES
+  - fr-FR
+  - it-IT
+  - ja-JP
+  - ko-KR
+  - lt-LT
+  - nl-NL
+  - pl-PL
+  - pt-BR
+  - ro-RO
+  - sv-SE
 commit_message: '[skip-ci]'

@@ -3,4 +3,18 @@ files:
     translation: /src/all/locales/%locale%/%original_file_name%
   - source: /src/all/_locales/en/messages.json
     translation: /src/all/_locales/%two_letters_code%/%original_file_name%
+export_languages:
+  - 'de'
+  - 'en'
+  - 'es'
+  - 'fr'
+  - 'it'
+  - 'ja'
+  - 'ko'
+  - 'lt'
+  - 'nl'
+  - 'pl'
+  - 'pt'
+  - 'ro'
+  - 'sv'
 commit_message: '[skip-ci]'

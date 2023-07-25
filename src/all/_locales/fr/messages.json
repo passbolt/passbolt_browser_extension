@@ -4,7 +4,7 @@
     "description": "The application name of the extension, displayed in the web store. 45 characters max."
   },
   "appDescription": {
-    "message": "Passbolt extension for the open source password manager for teams.",
+    "message": "Passbolt est un gestionnaire de mots de passe open source conçu pour les équipes.",
     "description": "The description of the extension, displayed in the web store. 85 characters max."
   }
 }

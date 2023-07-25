@@ -1,45 +1,46 @@
 /**
- * Based on https://thecodebarbarian.com/mutual-exclusion-patterns-with-node-promises
- * @copyright Valeri Karpov
- * @deprecated see setImmediate MDN warning https://developer.mozilla.org/en-US/docs/Web/API/Window/setImmediate
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) 2023 Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         4.2.0
  */
-import {EventEmitter} from "events";
-import 'setimmediate';
-
 class Lock {
   constructor() {
     this._locked = false;
-    this._ee = new EventEmitter();
+    this._queue = [];
   }
 
+  /**
+   * Acquire lock
+   * Push a new promise in a queue if the lock is locked
+   * @return {Promise<void>|Promise<unknown>}
+   */
   acquire() {
-    return new Promise(resolve => {
-      // If nobody has the lock, take it and resolve immediately
-      if (!this._locked) {
-        /*
-         * Safe because JS doesn't interrupt you on synchronous operations,
-         * so no need for compare-and-swap or anything like that.
-         */
-        this._locked = true;
-        return resolve();
-      }
-
-      // Otherwise, wait until somebody releases the lock and try again
-      const tryAcquire = () => {
-        if (!this._locked) {
-          this._locked = true;
-          this._ee.removeListener('release', tryAcquire);
-          return resolve();
-        }
-      };
-      this._ee.on('release', tryAcquire);
-    });
+    if (this._locked) {
+      return new Promise(resolve => this._queue.push(resolve));
+    } else {
+      this._locked = true;
+      return Promise.resolve();
+    }
   }
 
+  /**
+   * Release the lock unless there is another promise in the queue
+   */
   release() {
-    // Release the lock immediately
-    this._locked = false;
-    setImmediate(() => this._ee.emit('release'));
+    const next = this._queue.shift();
+    if (next) {
+      next();
+    } else {
+      this._locked = false;
+    }
   }
 }
 

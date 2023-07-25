@@ -72,7 +72,7 @@ describe("TabService", () => {
       };
       const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: frameDetails.url});
       const portWrapper = new Port(port);
-      jest.spyOn(portWrapper, "emit");
+      jest.spyOn(portWrapper, "request").mockImplementationOnce(() => jest.fn());
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
       mockIsPortExist.mockImplementationOnce(() => true);
@@ -82,7 +82,7 @@ describe("TabService", () => {
       // expectations
       expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenCalledWith(frameDetails.tabId);
       expect(PortManager.getPortById).toHaveBeenCalledWith(worker.id);
-      expect(portWrapper.emit).toHaveBeenCalledWith('passbolt.port.check');
+      expect(portWrapper.request).toHaveBeenCalledWith('passbolt.port.check');
       expect(WebNavigationService.exec).not.toHaveBeenCalled();
     });
 
@@ -137,7 +137,7 @@ describe("TabService", () => {
       };
       const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: frameDetails.url});
       const portWrapper = new Port(port);
-      jest.spyOn(portWrapper, "emit").mockImplementationOnce(() => { throw new Error(); });
+      jest.spyOn(portWrapper, "request").mockImplementationOnce(() => { throw new Error(); });
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
       mockIsPortExist.mockImplementationOnce(() => true);

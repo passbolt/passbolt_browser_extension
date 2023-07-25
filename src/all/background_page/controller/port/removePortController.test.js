@@ -87,11 +87,17 @@ describe("RemovePortController", () => {
         onMessage: {
           addListener: () => jest.fn()
         },
+        onDisconnect: {
+          addListener: () => jest.fn()
+        },
         postMessage: () => jest.fn()
       };
       const portDisconnected = {
         name: workerInformCallToActionToRemoved.id,
         onMessage: {
+          addListener: () => jest.fn()
+        },
+        onDisconnect: {
           addListener: () => jest.fn()
         },
         postMessage: () => { throw new Error('Disconnected'); }

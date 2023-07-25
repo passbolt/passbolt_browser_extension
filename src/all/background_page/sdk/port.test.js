@@ -22,6 +22,9 @@ describe("Port", () => {
         onMessage: {
           addListener: jest.fn(),
         },
+        onDisconnect: {
+          addListener: () => jest.fn()
+        },
         postMessage: jest.fn(),
         disconnect: jest.fn()
       };
@@ -59,11 +62,14 @@ describe("Port", () => {
 
   describe("Port::request", () => {
     it("Should post a message and wait a success result", async() => {
-      expect.assertions(5);
+      expect.assertions(7);
       // data mocked
       const port = {
         onMessage: {
           addListener: jest.fn(),
+        },
+        onDisconnect: {
+          addListener: () => jest.fn()
         },
         postMessage: jest.fn()
       };
@@ -77,18 +83,23 @@ describe("Port", () => {
       expect(portServiceWorker.emit).toHaveBeenCalledWith(message, requestId, {data: "data"});
       expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, {data: "data"}]));
       expect(portServiceWorker._listeners[requestId]).toStrictEqual([{callback: expect.anything(), name: requestId, once: true}]);
+      expect(Object.keys(portServiceWorker._disconnectListeners).length).toBe(1);
       const dataReceived = {data: "dataReceived"};
       portServiceWorker._onMessage(JSON.stringify([requestId, "SUCCESS", dataReceived]));
       expect(Object.keys(portServiceWorker._listeners).length).toBe(0);
+      expect(Object.keys(portServiceWorker._disconnectListeners).length).toBe(0);
       expect(await promise).toStrictEqual(dataReceived);
     });
 
     it("Should post a message and wait an error result", async() => {
-      expect.assertions(5);
+      expect.assertions(6);
       // data mocked
       const port = {
         onMessage: {
           addListener: jest.fn(),
+        },
+        onDisconnect: {
+          addListener: () => jest.fn()
         },
         postMessage: jest.fn()
       };
@@ -105,10 +116,42 @@ describe("Port", () => {
       const dataReceived = {data: "dataReceived"};
       portServiceWorker._onMessage(JSON.stringify([requestId, "ERROR", dataReceived]));
       expect(Object.keys(portServiceWorker._listeners).length).toBe(0);
+      expect(Object.keys(portServiceWorker._disconnectListeners).length).toBe(0);
       try {
         await promise;
       } catch (error) {
         expect(error).toStrictEqual(dataReceived);
+      }
+    });
+
+    it("Should post a message and wait an error result when the port is disconnected", async() => {
+      expect.assertions(5);
+      // data mocked
+      const port = {
+        onMessage: {
+          addListener: jest.fn(),
+        },
+        onDisconnect: {
+          addListener: () => jest.fn()
+        },
+        postMessage: jest.fn()
+      };
+      const portServiceWorker = new Port(port);
+      const message = "request_message";
+      jest.spyOn(portServiceWorker, "emit");
+      // process
+      const promise = portServiceWorker.request(message, {data: "data"});
+      const requestId = Object.keys(portServiceWorker._listeners)[0];
+      // expectations
+      expect(portServiceWorker.emit).toHaveBeenCalledWith(message, requestId, {data: "data"});
+      expect(port.postMessage).toHaveBeenCalledWith(JSON.stringify([message, requestId, {data: "data"}]));
+      expect(portServiceWorker._listeners[requestId]).toStrictEqual([{callback: expect.anything(), name: requestId, once: true}]);
+      expect(portServiceWorker._disconnectListeners[requestId]).toStrictEqual(expect.anything());
+      portServiceWorker._onDisconnect();
+      try {
+        await promise;
+      } catch (error) {
+        expect(Object.keys(portServiceWorker._disconnectListeners).length).toBe(0);
       }
     });
   });

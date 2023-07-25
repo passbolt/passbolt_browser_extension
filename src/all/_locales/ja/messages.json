@@ -1,10 +1,10 @@
 {
   "appName": {
-    "message": "Passbolt - Open source password manager",
+    "message": "Passbolt - オープンソースのパスワードマネージャー",
     "description": "The application name of the extension, displayed in the web store. 45 characters max."
   },
   "appDescription": {
-    "message": "Passbolt extension for the open source password manager for teams.",
+    "message": "チーム向けのオープンソースのパスワードマネージャー用のパスボルト拡張機能。",
     "description": "The description of the extension, displayed in the web store. 85 characters max."
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "passbolt-browser-extension",
-  "version": "4.1.2-rc.1",
+  "version": "4.1.2",
   "license": "AGPL-3.0",
   "copyright": "Copyright 2022 Passbolt SA",
   "description": "Passbolt web extension for the open source password manager for teams",

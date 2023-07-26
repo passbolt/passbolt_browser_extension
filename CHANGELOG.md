@@ -3,8 +3,22 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-## [4.1.0] - 2023-06-21
+## [4.1.2] - 2023-07-26
+### Improvement
+- PB-25251 As a signed-in user previewing a password, I should be able to distinguish look alike characters
 
+### Fixed
+- PB-25502 Fix web navigation issue when a port already exists and port disconnection is not fired
+- PB-25339 Fix application refusing to load when detecting passbolt event activities
+- PB-25311 Fix as anonymous user with the browser extension not configured I should be redirected to passbolt getting started page when using the toolbar icon
+- PB-24933 Fix in-form menu detection not working when existing tab port disconnection occurs after webnavigation event
+
+### Maintenance
+- PB-25471 Crowdin should export only a selected subset of languages
+- PB-25272 Github actions updates for storybook
+- PB-25172 Remove former demo application, replaced by storybook
+
+## [4.1.0] - 2023-06-21
 ### Added
 - PB-24169 As an administrator I want to customise what capabilities users are allowed to access on the UI of my organisation
 - PB-24598 SSO allow administrators to remap email/username properties
@@ -1226,7 +1240,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.1.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.1.2...HEAD
+[4.1.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.1.0...v4.1.2
 [4.1.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.4...v4.1.0
 [4.0.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.3...v4.0.4
 [4.0.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.1...v4.0.3

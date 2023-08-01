@@ -1,4 +1,4 @@
-const NodeEnvironment = require('jest-environment-node');
+import NodeEnvironment from "jest-environment-node";
 
 class JestCustomKdbxEnvironment extends NodeEnvironment {
   constructor(config) {
@@ -11,18 +11,6 @@ class JestCustomKdbxEnvironment extends NodeEnvironment {
       }
     });
   }
-
-  async setup() {
-    await super.setup()
-  }
-
-  async teardown() {
-    await super.teardown()
-  }
-
-  runScript(script) {
-    return super.runScript(script);
-  }
 }
 
-module.exports = JestCustomKdbxEnvironment;
+export default JestCustomKdbxEnvironment;

@@ -59,9 +59,4 @@ class CryptoSubtle {
   }
 }
 
-const getRandomValues = typedArray => typedArray.map(() => Math.round(Math.random() * 255));
-
-global.crypto = {
-  subtle: new CryptoSubtle(),
-  getRandomValues: jest.fn().mockImplementation(getRandomValues)
-};
+global.crypto.subtle = new CryptoSubtle();

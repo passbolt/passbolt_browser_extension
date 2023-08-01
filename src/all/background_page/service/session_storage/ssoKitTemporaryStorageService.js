@@ -22,13 +22,13 @@ const SSO_KIT_STORAGE_KEY = "temp_server_part_sso_kit";
 class SsoKitTemporaryStorageService {
   /**
    * Stores the server part SSO kit temporarly in session memory.
-   * @param {string} serverPartSsoKit
+   * @param {SsoKitServerPartEntity} serverPartSsoKit
    * @return {Promise<void>}
    */
   static async set(serverPartSsoKit) {
     await lock.acquire();
     try {
-      await browser.storage.session.set({[SSO_KIT_STORAGE_KEY]: serverPartSsoKit});
+      await browser.storage.session.set({[SSO_KIT_STORAGE_KEY]: serverPartSsoKit.toDto()});
     } catch (e) {
       lock.release();
       throw e;

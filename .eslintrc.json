@@ -40,6 +40,11 @@
     "urldecode": true,
     "OpenpgpkeyEntity": true
   },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
   "rules": {
     "strict": [
       "error",

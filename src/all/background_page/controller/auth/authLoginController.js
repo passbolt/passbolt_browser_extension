@@ -17,7 +17,7 @@ import UserAlreadyLoggedInError from "../../error/userAlreadyLoggedInError";
 import Keyring from "../../model/keyring";
 import CheckPassphraseService from "../../service/crypto/checkPassphraseService";
 import UpdateSsoCredentialsService from "../../service/account/updateSsoCredentialsService";
-import RememberMeLocalStorage from "../../service/local_storage/rememberMeLocalStorage";
+import UserRememberMeLatestChoiceLocalStorage from "../../service/local_storage/userRememberMeLatestChoiceLocalStorage";
 
 class AuthLoginController {
   /**
@@ -34,7 +34,7 @@ class AuthLoginController {
     this.authModel = new AuthModel(apiClientOptions);
     this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
     this.checkPassphraseService = new CheckPassphraseService(new Keyring());
-    this.rememberMeLocalStorage = new RememberMeLocalStorage(account);
+    this.rememberMeLocalStorage = new UserRememberMeLatestChoiceLocalStorage(account);
   }
 
   /**

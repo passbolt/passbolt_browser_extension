@@ -14,9 +14,9 @@
 import browser from "../../sdk/polyfill/browserPolyfill";
 import Log from "../../model/log";
 
-export const REMEMBER_ME_LOCAL_STORAGE_KEY = 'rememberMe';
+export const REMEMBER_ME_LATEST_CHOICE_LOCAL_STORAGE_KEY = 'userRememberMeLatestChoice';
 
-class RememberMeLocalStorage {
+class UserRememberMeLatestChoiceLocalStorage {
   /**
    * Constructor
    * @param account the user account
@@ -35,7 +35,7 @@ class RememberMeLocalStorage {
     if (!account.id) {
       throw new Error('Cannot retrieve account id, necessary to get a rememberMe storage key.');
     }
-    return `${REMEMBER_ME_LOCAL_STORAGE_KEY}-${account.id}`;
+    return `${REMEMBER_ME_LATEST_CHOICE_LOCAL_STORAGE_KEY}-${account.id}`;
   }
 
   /**
@@ -44,7 +44,7 @@ class RememberMeLocalStorage {
    * @return {Promise<void>}
    */
   async flush() {
-    Log.write({level: 'debug', message: 'RememberMeLocalStorage flushed'});
+    Log.write({level: 'debug', message: 'UserRememberMeLatestChoiceLocalStorage flushed'});
     await browser.storage.local.remove(this.storageKey);
   }
 
@@ -70,4 +70,4 @@ class RememberMeLocalStorage {
   }
 }
 
-export default RememberMeLocalStorage;
+export default UserRememberMeLatestChoiceLocalStorage;

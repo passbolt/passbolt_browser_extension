@@ -12,9 +12,9 @@
  * @since         4.2.0
  */
 
-import RememberMeLocalStorage from "../../service/local_storage/rememberMeLocalStorage";
+import UserRememberMeLatestChoiceLocalStorage from "../../service/local_storage/userRememberMeLatestChoiceLocalStorage";
 
-class GetLastRememberMeChoiceController {
+class GetUserRememberMeLatestChoiceController {
   /**
    * Constructor
    * @param {Worker} worker
@@ -24,7 +24,7 @@ class GetLastRememberMeChoiceController {
   constructor(worker, requestId, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.rememberMeLocalStorage = new RememberMeLocalStorage(account);
+    this.rememberMeLocalStorage = new UserRememberMeLatestChoiceLocalStorage(account);
   }
 
   /**
@@ -50,4 +50,4 @@ class GetLastRememberMeChoiceController {
   }
 }
 
-export default GetLastRememberMeChoiceController;
+export default GetUserRememberMeLatestChoiceController;

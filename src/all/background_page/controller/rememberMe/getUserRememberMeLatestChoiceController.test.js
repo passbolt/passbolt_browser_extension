@@ -13,13 +13,13 @@
  */
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import RememberMeLocalStorage from "../../service/local_storage/rememberMeLocalStorage";
-import GetLastRememberMeChoiceController from "./getLastRememberMeChoiceController";
+import UserRememberMeLatestChoiceLocalStorage from "../../service/local_storage/userRememberMeLatestChoiceLocalStorage";
+import GetUserRememberMeLatestChoiceController from "./getUserRememberMeLatestChoiceController";
 
-describe("getLastRememberMeChoiceController", () => {
+describe("GetUserRememberMeLatestChoiceController", () => {
   const account = new AccountEntity(defaultAccountDto());
-  const storage = new RememberMeLocalStorage(account);
-  const controller = new GetLastRememberMeChoiceController(null, null, account);
+  const storage = new UserRememberMeLatestChoiceLocalStorage(account);
+  const controller = new GetUserRememberMeLatestChoiceController(null, null, account);
 
   it("Should return false if the local storage is not set", async() => {
     expect.assertions(1);

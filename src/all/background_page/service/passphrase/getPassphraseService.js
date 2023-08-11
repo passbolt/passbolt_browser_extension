@@ -14,11 +14,11 @@ import UserAbortsOperationError from "../../error/userAbortsOperationError";
 import {ValidatorRule as Validator} from '../../utils/validatorRules';
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import WorkerService from "../../service/worker/workerService";
-import RememberMeLocalStorage from "../../service/local_storage/rememberMeLocalStorage";
+import UserRememberMeLatestChoiceLocalStorage from "../local_storage/userRememberMeLatestChoiceLocalStorage";
 
 export default class GetPassphraseService {
   constructor(account) {
-    this.rememberMeStorage = new RememberMeLocalStorage(account);
+    this.rememberMeStorage = new UserRememberMeLatestChoiceLocalStorage(account);
   }
 
   /**

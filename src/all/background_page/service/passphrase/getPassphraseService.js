@@ -7,18 +7,19 @@
 
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
-import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
-import {QuickAccessService} from "../../service/ui/quickAccess.service";
+import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
+import {QuickAccessService} from "../ui/quickAccess.service";
 import i18n from "../../sdk/i18n";
 import UserAbortsOperationError from "../../error/userAbortsOperationError";
 import {ValidatorRule as Validator} from '../../utils/validatorRules';
-import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
-import WorkerService from "../../service/worker/workerService";
+import PassphraseStorageService from "../session_storage/passphraseStorageService";
+import WorkerService from "../worker/workerService";
 import UserRememberMeLatestChoiceLocalStorage from "../local_storage/userRememberMeLatestChoiceLocalStorage";
+import UserRememberMeLatestChoiceEntity from "../../model/entity/rememberMe/userRememberMeLatestChoiceEntity";
 
 export default class GetPassphraseService {
   constructor(account) {
-    this.rememberMeStorage = new UserRememberMeLatestChoiceLocalStorage(account);
+    this.userRememberMeLatestChoiceStorage = new UserRememberMeLatestChoiceLocalStorage(account);
   }
 
   /**
@@ -54,7 +55,7 @@ export default class GetPassphraseService {
 
   /**
    * Request the user passphrase from the Quick Access
-   * @returns {Promise<void>}
+   * @returns {Promise<string>}
    */
   async requestPassphraseFromQuickAccess() {
     const storedPassphrase = await PassphraseStorageService.get();
@@ -118,16 +119,20 @@ export default class GetPassphraseService {
   /**
    * Remember the user passphrase for a given duration.
    * @param {string} passphrase The passphrase.
-   * @param {integer|string} duration The duration in second to remember the passphrase for. If -1 given then it will.
-   *   remember the passphrase until the user is logged out.
+   * @param {integer|string} duration The duration in second to remember the passphrase for.
+   *  If -1 given then it will remember the passphrase until the user is logged out.
+   * @private
    */
   async rememberPassphrase(passphrase, duration) {
     if (!duration || !Number.isInteger(duration)) {
       return;
     }
+
     await PassphraseStorageService.set(passphrase, duration);
-    const rememberMe = parseInt(duration, 10) === -1;
-    this.rememberMeStorage.set(rememberMe);
+    const userRememberMeLatestChoiceEntity = new UserRememberMeLatestChoiceEntity({
+      duration: parseInt(duration, 10)
+    });
+    this.userRememberMeLatestChoiceStorage.set(userRememberMeLatestChoiceEntity);
   }
 
   /**

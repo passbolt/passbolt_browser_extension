@@ -22,7 +22,7 @@ const MIME_TYPE_TEXT_PLAIN = "text/plain";
 
 class DownloadUserPrivateKeyController {
   /**
-   * CheckPassphraseController constructor
+   * DownloadUserPrivateKeyController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    */

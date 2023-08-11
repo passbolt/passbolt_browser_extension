@@ -23,8 +23,6 @@ import MockExtension from "../../../../../test/mocks/mockExtension";
 import PostponeUserSettingInvitationService from "../invitation/postponeUserSettingInvitationService";
 import {PASSWORD_POLICIES_LOCAL_STORAGE_KEY} from "../local_storage/passwordPoliciesLocalStorage";
 
-jest.mock("../local_storage/rememberMeLocalStorage");
-
 beforeEach(() => {
   jest.clearAllMocks();
 });

@@ -36,19 +36,20 @@ class ImportResourcesFileController {
   /**
    * ImportResourcesFileController constructor
    * @param {Worker} worker
-   * @param {ApiClientOptions} clientOptions
+   * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account the account associated to the worker
    */
-  constructor(worker, clientOptions, account) {
+  constructor(worker, apiClientOptions, account) {
     this.worker = worker;
 
     // Crypto
     this.keyring = new Keyring();
 
     // Models
-    this.resourceTypeModel = new ResourceTypeModel(clientOptions);
-    this.resourceModel = new ResourceModel(clientOptions);
-    this.folderModel = new FolderModel(clientOptions);
-    this.tagModel = new TagModel(clientOptions);
+    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions);
+    this.folderModel = new FolderModel(apiClientOptions);
+    this.tagModel = new TagModel(apiClientOptions);
 
     // Progress
     this.progressService = new ProgressService(this.worker, i18n.t("Importing ..."));

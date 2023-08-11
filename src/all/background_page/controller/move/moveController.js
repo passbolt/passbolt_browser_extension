@@ -21,12 +21,13 @@ class MoveController {
    *
    * @param {Worker} worker
    * @param {string} requestId
-   * @param {ApiClientOptions} clientOptions
+   * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account the account associated to the worker
    */
-  constructor(worker, requestId, clientOptions, account) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.clientOptions = clientOptions;
+    this.apiClientOptions = apiClientOptions;
     this.account = account;
   }
 

@@ -32,15 +32,16 @@ class ExportResourcesFileController {
   /**
    * ExportResourcesFileController constructor
    * @param {Worker} worker
-   * @param {ApiClientOptions} clientOptions
+   * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account the account associated to the worker
    */
-  constructor(worker, clientOptions, account) {
+  constructor(worker, apiClientOptions, account) {
     this.worker = worker;
 
     // Models
-    this.resourceTypeModel = new ResourceTypeModel(clientOptions);
-    this.resourceModel = new ResourceModel(clientOptions);
-    this.folderModel = new FolderModel(clientOptions);
+    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions);
+    this.folderModel = new FolderModel(apiClientOptions);
 
     this.progressService = new ProgressService(this.worker, i18n.t("Exporting ..."));
     this.getPassphraseService = new GetPassphraseService(account);

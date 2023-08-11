@@ -31,11 +31,12 @@ class GroupsUpdateController {
    *
    * @param {Worker} worker
    * @param {string} requestId
-   * @param {ApiClientOptions} clientOptions
+   * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account the account associated to the worker
    */
-  constructor(worker, requestId, clientOptions, account) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
-    this.groupModel = new GroupModel(clientOptions);
+    this.groupModel = new GroupModel(apiClientOptions);
     this.keyring = new Keyring();
 
     this.progressService = new ProgressService(this.worker, i18n.t('Updating group ...'));

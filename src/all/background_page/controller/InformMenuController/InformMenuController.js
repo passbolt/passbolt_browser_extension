@@ -31,7 +31,8 @@ class InformMenuController {
   /**
    * InformMenuController constructor
    * @param {Worker} worker
-   * @param {ApiClientOptions} clientOptions
+   * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account the account associated to the worker
    */
   constructor(worker, apiClientOptions, account) {
     this.worker = worker;

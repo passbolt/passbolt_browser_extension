@@ -14,12 +14,9 @@
 import browser from "../../sdk/polyfill/browserPolyfill";
 import AuthModel from "../../model/auth/authModel";
 import UserAlreadyLoggedInError from "../../error/userAlreadyLoggedInError";
-import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 import Keyring from "../../model/keyring";
 import CheckPassphraseService from "../../service/crypto/checkPassphraseService";
 import UpdateSsoCredentialsService from "../../service/account/updateSsoCredentialsService";
-import AccountModel from "../../model/account/accountModel";
 import RememberMeLocalStorage from "../../service/local_storage/rememberMeLocalStorage";
 
 class AuthLoginController {
@@ -34,10 +31,7 @@ class AuthLoginController {
     this.requestId = requestId;
     this.account = account;
     this.apiClientOptions = apiClientOptions;
-    this.accountModel = new AccountModel(apiClientOptions, account);
     this.authModel = new AuthModel(apiClientOptions);
-    this.organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
-    this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
     this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
     this.checkPassphraseService = new CheckPassphraseService(new Keyring());
     this.rememberMeLocalStorage = new RememberMeLocalStorage(account);

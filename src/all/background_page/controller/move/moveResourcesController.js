@@ -30,13 +30,14 @@ class MoveResourcesController {
    *
    * @param {Worker} worker
    * @param {string} requestId
-   * @param {ApiClientOptions} clientOptions
+   * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account the account associated to the worker
    */
-  constructor(worker, requestId, clientOptions, account) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.folderModel = new FolderModel(clientOptions);
-    this.resourceModel = new ResourceModel(clientOptions);
+    this.folderModel = new FolderModel(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions);
     this.keyring = new Keyring();
     this.progressService = new ProgressService(this.worker);
     this.getPassphraseService = new GetPassphraseService(account);

@@ -25,13 +25,14 @@ class ShareResourcesController {
    *
    * @param {Worker} worker
    * @param {string} requestId
-   * @param {ApiClientOptions} clientOptions
+   * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account The account associated to the worker.
    */
-  constructor(worker, requestId, clientOptions, account) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.clientOptions = clientOptions;
-    this.resourceModel = new ResourceModel(clientOptions);
+    this.clientOptions = apiClientOptions;
+    this.resourceModel = new ResourceModel(apiClientOptions);
     this.progressService = new ProgressService(this.worker);
     this.getPassphraseService = new GetPassphraseService(account);
   }

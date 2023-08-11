@@ -26,7 +26,8 @@ class SecretDecryptController {
    *
    * @param {Worker} worker
    * @param {string} requestId
-   * @param {ApiClientOptions} apiClientOptions
+   * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account The account associated to the worker.
    */
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;

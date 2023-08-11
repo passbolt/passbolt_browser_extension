@@ -13,6 +13,8 @@
  */
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import UserRememberMeLatestChoiceEntity from "../../model/entity/rememberMe/userRememberMeLatestChoiceEntity";
+import {defaultRememberMeLatestChoiceDto} from "../../model/entity/rememberMe/userRememberMeLatestChoiceEntity.test.data";
 import UserRememberMeLatestChoiceLocalStorage from "../../service/local_storage/userRememberMeLatestChoiceLocalStorage";
 import GetUserRememberMeLatestChoiceController from "./getUserRememberMeLatestChoiceController";
 
@@ -33,11 +35,15 @@ describe("GetUserRememberMeLatestChoiceController", () => {
     expect.assertions(2);
     storage.flush();
 
-    storage.set(false);
+    const entity1 = new UserRememberMeLatestChoiceEntity(defaultRememberMeLatestChoiceDto());
+    storage.set(entity1);
     let result = await controller.exec();
     expect(result).toStrictEqual(false);
 
-    storage.set(true);
+    const entity2 = new UserRememberMeLatestChoiceEntity(defaultRememberMeLatestChoiceDto({
+      duration: -1
+    }));
+    storage.set(entity2);
     result = await controller.exec();
     expect(result).toStrictEqual(true);
   });

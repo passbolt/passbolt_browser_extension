@@ -16,6 +16,7 @@ import GetLegacyAccountService from "../account/getLegacyAccountService";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import UserRememberMeLatestChoiceLocalStorage from "./userRememberMeLatestChoiceLocalStorage";
+import UserRememberMeLatestChoiceEntity from "../../model/entity/rememberMe/userRememberMeLatestChoiceEntity";
 
 describe("UserRememberMeLatestChoiceLocalStorage", () => {
   // mock data
@@ -28,33 +29,36 @@ describe("UserRememberMeLatestChoiceLocalStorage", () => {
       expect.assertions(1);
       const storage = new UserRememberMeLatestChoiceLocalStorage(account);
       const result = await storage.get();
-      expect(result).toStrictEqual(false);
+      expect(result).toStrictEqual(null);
     });
 
     it("Should return the content stored in the local storage", async() => {
-      expect.assertions(2);
-      let rememberMeOption = true;
+      expect.assertions(1);
       const storage = new UserRememberMeLatestChoiceLocalStorage(account);
-      browser.storage.local.set({[storage.storageKey]: rememberMeOption});
-      expect(await storage.get()).toEqual(rememberMeOption);
+      const entity = new UserRememberMeLatestChoiceEntity({duration: 3600});
+      browser.storage.local.set({[storage.storageKey]: entity.toDto()});
+      expect(await storage.get()).toEqual(entity);
+    });
 
-      rememberMeOption = false;
-      browser.storage.local.set({[storage.storageKey]: rememberMeOption});
-      expect(await storage.get()).toEqual(rememberMeOption);
+    it("Should return null if the entity cannot be validated", async() => {
+      expect.assertions(1);
+      const storage = new UserRememberMeLatestChoiceLocalStorage(account);
+      browser.storage.local.set({[storage.storageKey]: "garbage"});
+      expect(await storage.get()).toEqual(null);
     });
   });
 
   describe("UserRememberMeLatestChoiceLocalStorage::set", () => {
     it("Should set the rememberMe choice in the local storage", async() => {
       expect.assertions(2);
-      let rememberMeOption = true;
       const storage = new UserRememberMeLatestChoiceLocalStorage(account);
-      await storage.set(rememberMeOption);
-      expect(await storage.get()).toStrictEqual(rememberMeOption);
+      const entity1 = new UserRememberMeLatestChoiceEntity({duration: -1});
+      await storage.set(entity1);
+      expect(await storage.get()).toStrictEqual(entity1);
 
-      rememberMeOption = false;
-      await storage.set(rememberMeOption);
-      expect(await storage.get()).toStrictEqual(rememberMeOption);
+      const entity2 = new UserRememberMeLatestChoiceEntity({duration: 500});
+      await storage.set(entity2);
+      expect(await storage.get()).toStrictEqual(entity2);
     });
   });
 
@@ -62,9 +66,10 @@ describe("UserRememberMeLatestChoiceLocalStorage", () => {
     it("Should flush all the rememberMe option from the local storage", async() => {
       expect.assertions(1);
       const storage = new UserRememberMeLatestChoiceLocalStorage(account);
-      await storage.set(true);
+      const entity = new UserRememberMeLatestChoiceEntity({duration: -1});
+      await storage.set(entity);
       await storage.flush();
-      expect(await storage.get()).toStrictEqual(false);
+      expect(await storage.get()).toStrictEqual(null);
     });
   });
 });

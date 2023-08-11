@@ -24,7 +24,7 @@ class GetUserRememberMeLatestChoiceController {
   constructor(worker, requestId, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.rememberMeLocalStorage = new UserRememberMeLatestChoiceLocalStorage(account);
+    this.userRememberMeLatestChoiceLocalStorage = new UserRememberMeLatestChoiceLocalStorage(account);
   }
 
   /**
@@ -45,8 +45,10 @@ class GetUserRememberMeLatestChoiceController {
    * Find the last user's rememberMe choice
    * @return {Promise<Boolean>}
    */
-  exec() {
-    return this.rememberMeLocalStorage.get();
+  async exec() {
+    //@todo: see to use the duration instead of a boolean
+    const entity = await this.userRememberMeLatestChoiceLocalStorage.get();
+    return entity?.duration === -1;
   }
 }
 

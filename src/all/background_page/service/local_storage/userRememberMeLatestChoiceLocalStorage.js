@@ -13,6 +13,7 @@
  */
 import browser from "../../sdk/polyfill/browserPolyfill";
 import Log from "../../model/log";
+import UserRememberMeLatestChoiceEntity from "../../model/entity/rememberMe/userRememberMeLatestChoiceEntity";
 
 export const REMEMBER_ME_LATEST_CHOICE_LOCAL_STORAGE_KEY = 'userRememberMeLatestChoice';
 
@@ -49,23 +50,33 @@ class UserRememberMeLatestChoiceLocalStorage {
   }
 
   /**
-   * Set the rememberMe local storage.
+   * Set the UserRememberMeLatestChoice local storage.
    * @throws {Error} if operation failed
-   * @return {Promise<boolean>} the rememberMe option of false by default.
+   * @return {Promise<UserRememberMeLatestChoiceEntity|null>} the rememberMe entity or null by default.
    */
   async get() {
-    const rememberMe = await browser.storage.local.get([this.storageKey]);
-    return Boolean(rememberMe[this.storageKey]);
+    const value = await browser.storage.local.get([this.storageKey]);
+    if (!value || !value[this.storageKey]) {
+      return null;
+    }
+
+    // ensure this feature is not breaking anything by returning an accepted default value
+    try {
+      return new UserRememberMeLatestChoiceEntity(value[this.storageKey]);
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 
   /**
    * Set the rememberMe in local storage.
-   * @param {boolean} rememberMe the rememberMe value to save.
+   * @param {UserRememberMeLatestChoiceEntity} rememberMeLatestChoiceEntity the value to save.
    * @return {Promise<void>}
    */
-  async set(rememberMe) {
+  async set(rememberMeLatestChoiceEntity) {
     await navigator.locks.request(this.storageKey, async() => {
-      await browser.storage.local.set({[this.storageKey]: Boolean(rememberMe)});
+      await browser.storage.local.set({[this.storageKey]: rememberMeLatestChoiceEntity.toDto()});
     });
   }
 }

@@ -212,7 +212,7 @@ module.exports = function (grunt) {
           // Third party logos
           nonull: true,
           cwd: path.node_modules + 'passbolt-styleguide/src/img/third_party',
-          src: ['ChromeWebStore.png', 'gnupg_logo.png', 'gnupg_logo_disabled.png', 'appstore.svg', 'playstore.svg'],
+          src: ['ChromeWebStore.png', 'gnupg_logo.png', 'gnupg_logo_disabled.png', 'appstore.svg', 'playstore.svg', 'windowsstore.svg'],
           dest: path.build_web_accessible_resources + 'img/third_party',
           expand: true
         }, {

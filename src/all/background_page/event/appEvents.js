@@ -10,6 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+
 import GetOrganizationPolicyController from "../controller/accountRecovery/getOrganizationPolicyController";
 import User from "../model/user";
 import AccountRecoverySaveOrganizationPolicyController from "../controller/accountRecovery/accountRecoverySaveOrganizationPolicyController";
@@ -32,6 +33,8 @@ import DeleteSsoSettingsController from "../controller/sso/deleteSsoSettingsCont
 import GenerateSsoKitController from "../controller/auth/generateSsoKitController";
 import AuthenticationEventController from "../controller/auth/authenticationEventController";
 import FindMeController from "../controller/rbac/findMeController";
+import ExportDesktopAccountController from "../controller/exportAccount/exportDesktopAccountController";
+import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 
 const listen = function(worker, account) {
   const authenticationEventController = new AuthenticationEventController(worker);
@@ -175,6 +178,17 @@ const listen = function(worker, account) {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new FindMeController(worker, requestId, apiClientOptions, account);
     await controller._exec(name);
+  });
+  /*
+   * export account for desktop application
+   *
+   * @listens passbolt.desktop.export-account
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.desktop.export-account', async requestId => {
+    const account = await GetLegacyAccountService.get();
+    const controller = new ExportDesktopAccountController(worker, requestId, account);
+    await controller._exec();
   });
 };
 export const AppEvents = {listen};

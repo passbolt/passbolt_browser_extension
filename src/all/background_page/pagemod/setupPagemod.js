@@ -33,7 +33,11 @@ class Setup extends Pagemod {
    * @inheritDoc
    */
   get events() {
-    return [ConfigEvents, SetupEvents, PownedPasswordEvents];
+    return [
+      ConfigEvents,
+      SetupEvents,
+      PownedPasswordEvents
+    ];
   }
 
   /**

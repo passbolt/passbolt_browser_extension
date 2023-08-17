@@ -33,10 +33,13 @@ import DeleteSsoSettingsController from "../controller/sso/deleteSsoSettingsCont
 import GenerateSsoKitController from "../controller/auth/generateSsoKitController";
 import AuthenticationEventController from "../controller/auth/authenticationEventController";
 import FindMeController from "../controller/rbac/findMeController";
+import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
+import SavePasswordPoliciesController from "../controller/passwordPolicies/savePasswordPoliciesController";
+import FindPasswordPoliciesController from "../controller/passwordPolicies/findPasswordPoliciesController";
 import ExportDesktopAccountController from "../controller/exportAccount/exportDesktopAccountController";
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 
-const listen = function(worker, account) {
+const listen = function(worker, _, account) {
   const authenticationEventController = new AuthenticationEventController(worker);
   authenticationEventController.startListen();
   /*
@@ -179,6 +182,37 @@ const listen = function(worker, account) {
     const controller = new FindMeController(worker, requestId, apiClientOptions, account);
     await controller._exec(name);
   });
+
+  /*
+   * ==================================================================================
+   *  Password policies events.
+   * ==================================================================================
+   */
+
+  worker.port.on('passbolt.password-policies.get', async requestId => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new GetOrFindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.password-policies.save', async(requestId, passwordSettingsDto) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new SavePasswordPoliciesController(worker, requestId, account, apiClientOptions);
+    await controller._exec(passwordSettingsDto);
+  });
+
+  worker.port.on('passbolt.password-policies.get-admin-settings', async requestId => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new FindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
+    await controller._exec();
+  });
+
+  /*
+   * ==================================================================================
+   *  Desktop app events.
+   * ==================================================================================
+   */
+
   /*
    * export account for desktop application
    *

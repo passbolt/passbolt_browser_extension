@@ -19,6 +19,7 @@ import {AuthEvents} from "../event/authEvents";
 import {ConfigEvents} from "../event/configEvents";
 import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {LocaleEvents} from "../event/localeEvents";
+import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 
 class Auth extends Pagemod {
   /**
@@ -39,7 +40,7 @@ class Auth extends Pagemod {
       KeyringEvents,
       AuthEvents,
       OrganizationSettingsEvents,
-      LocaleEvents
+      LocaleEvents,
     ];
   }
 
@@ -50,8 +51,9 @@ class Auth extends Pagemod {
     try {
       const tab = port._port.sender.tab;
       const account = await GetLegacyAccountService.get();
+      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
       for (const event of this.events) {
-        event.listen({port, tab}, account);
+        event.listen({port, tab}, apiClientOptions, account);
       }
     } catch (error) {
       /*

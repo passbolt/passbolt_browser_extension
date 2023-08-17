@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import PostponedUserSettingInvitationService from '../../service/api/invitation/postponedUserSettingInvitationService';
+import PostponeUserSettingInvitationService from '../../service/invitation/postponeUserSettingInvitationService';
 
 class HasUserPostponedUserSettingInvitationController {
   /**
@@ -43,7 +43,7 @@ class HasUserPostponedUserSettingInvitationController {
    * Check if the user has postponed the account recovery enrollment invitation.
    */
   exec() {
-    return PostponedUserSettingInvitationService.hasPostponedAccountRecovery();
+    return PostponeUserSettingInvitationService.hasPostponedAccountRecovery();
   }
 }
 

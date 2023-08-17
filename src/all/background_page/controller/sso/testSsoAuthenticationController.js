@@ -63,7 +63,7 @@ class TestSsoAuthenticationController {
       await this.popupHandler.closeHandler();
       return ssoToken;
     } catch (error) {
-      console.log("An error occured while attempting sign in with a third party provider:", error);
+      console.error("An error occured while attempting sign in with a third party provider:", error);
       throw error;
     }
   }

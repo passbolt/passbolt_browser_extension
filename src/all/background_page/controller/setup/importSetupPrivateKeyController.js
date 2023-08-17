@@ -81,7 +81,7 @@ class ImportSetupPrivateKeyController {
       await this.legacyAuthModel.verify(domain, serverPublicArmoredKey, fingerprint);
       keyAlreadyUsed = true;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       // @todo Handle not controlled errors, such as timeout error...
     }
 

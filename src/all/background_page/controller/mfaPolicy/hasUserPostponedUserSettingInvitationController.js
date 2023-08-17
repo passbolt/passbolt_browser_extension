@@ -12,7 +12,7 @@
  * @since         3.10.0
  */
 
-import PostponedUserSettingInvitationService from '../../service/api/invitation/postponedUserSettingInvitationService';
+import PostponeUserSettingInvitationService from '../../service/invitation/postponeUserSettingInvitationService';
 
 class HasUserPostponedUserSettingInvitationMFAPolicyController {
   /**
@@ -43,7 +43,7 @@ class HasUserPostponedUserSettingInvitationMFAPolicyController {
    * Check if the user has postponed the MFA Policy enrollment invitation.
    */
   exec() {
-    return PostponedUserSettingInvitationService.hasPostponedMFAPolicy();
+    return PostponeUserSettingInvitationService.hasPostponedMFAPolicy();
   }
 }
 

@@ -15,7 +15,7 @@
 let isInvitationAccountRecoveryPostponed = false;
 let isInvitationMFAPolicyPostponed = false;
 
-class PostponedUserSettingInvitationService {
+class PostponeUserSettingInvitationService {
   /**
    * Returns true if the user has postponned the account recovery enrollment invitation.
    *
@@ -57,4 +57,4 @@ class PostponedUserSettingInvitationService {
   }
 }
 
-export default PostponedUserSettingInvitationService;
+export default PostponeUserSettingInvitationService;

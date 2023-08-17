@@ -12,17 +12,17 @@
  * @since         3.6.0
  */
 
-import PostponedUserSettingInvitationService from '../../service/api/invitation/postponedUserSettingInvitationService';
-import PostponeUserSettingMFAInvitationController from './postponeUserSettingInvitationController';
+import PostponeUserSettingInvitationService from '../../service/invitation/postponeUserSettingInvitationService';
+import PostponeUserSettingMfaInvitationController from './postponeUserSettingMfaInvitationController';
 
 describe("PostponeUserSettingMFAInvitationController", () => {
   it("can set the MFA Policy enrollment invitation as postponed", () => {
     expect.assertions(2);
-    expect(PostponedUserSettingInvitationService.hasPostponedMFAPolicy()).toBe(false);
+    expect(PostponeUserSettingInvitationService.hasPostponedMFAPolicy()).toBe(false);
 
-    const controller = new PostponeUserSettingMFAInvitationController();
+    const controller = new PostponeUserSettingMfaInvitationController();
     controller.exec();
 
-    expect(PostponedUserSettingInvitationService.hasPostponedMFAPolicy()).toBe(true);
+    expect(PostponeUserSettingInvitationService.hasPostponedMFAPolicy()).toBe(true);
   });
 });

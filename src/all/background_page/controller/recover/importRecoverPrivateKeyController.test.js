@@ -38,11 +38,7 @@ beforeEach(() => {
  * global lib is cached before the override and then after the unit test set is done, we put the
  * orginal crypto back where it should be.
  */
-const currentCrypto = global.crypto;
-global.crypto = {getRandomValues: size => Array(size).fill(0)};
-afterAll(() => {
-  global.crypto = currentCrypto;
-});
+jest.spyOn(global.crypto, "getRandomValues").mockImplementation(size => size);
 
 describe("ImportRecoverPrivateKeyController", () => {
   describe("ImportRecoverPrivateKeyController::exec", () => {

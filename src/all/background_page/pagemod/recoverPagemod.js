@@ -34,7 +34,11 @@ class Recover extends Pagemod {
    * @returns {[]}
    */
   get events() {
-    return [ConfigEvents, RecoverEvents, PownedPasswordEvents];
+    return [
+      ConfigEvents,
+      RecoverEvents,
+      PownedPasswordEvents,
+    ];
   }
 
   /**

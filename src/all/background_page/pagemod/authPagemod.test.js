@@ -19,8 +19,11 @@ import {KeyringEvents} from "../event/keyringEvents";
 import {AuthEvents} from "../event/authEvents";
 import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {LocaleEvents} from "../event/localeEvents";
+import {v4 as uuid} from 'uuid';
+import {enableFetchMocks} from "jest-fetch-mock";
+import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import {mockApiResponse} from "../../../../test/mocks/mockApiResponse";
 
-jest.spyOn(GetLegacyAccountService, "get").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(UserEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(KeyringEvents, "listen").mockImplementation(jest.fn());
@@ -32,6 +35,7 @@ describe("Auth", () => {
   beforeEach(async() => {
     jest.resetModules();
     jest.clearAllMocks();
+    enableFetchMocks();
   });
 
   describe("Auth::attachEvents", () => {
@@ -47,16 +51,21 @@ describe("Auth", () => {
           }
         }
       };
+      fetch.doMockIf(/csrf-token/, async() => mockApiResponse("csrf-token"));
+      const mockedAccount = {user_id: uuid(), domain: "https://test-domain.passbolt.com"};
+      const mockApiClient = await BuildApiClientOptionsService.buildFromAccount(mockedAccount);
+      jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
       // process
       await Auth.attachEvents(port);
       // expectations
+      const expectedPortAndTab = {port: port, tab: port._port.sender.tab};
       expect(GetLegacyAccountService.get).toHaveBeenCalled();
-      expect(ConfigEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
-      expect(UserEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
-      expect(KeyringEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
-      expect(AuthEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
-      expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
-      expect(LocaleEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
+      expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(UserEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(KeyringEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(AuthEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(LocaleEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(Auth.events).toStrictEqual([ConfigEvents, UserEvents, KeyringEvents, AuthEvents, OrganizationSettingsEvents, LocaleEvents]);
       expect(Auth.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(Auth.appName).toBe('Auth');

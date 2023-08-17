@@ -26,7 +26,7 @@ import HasSsoLoginErrorController from "../controller/sso/hasSsoLoginErrorContro
 import GetQualifiedSsoLoginErrorController from "../controller/sso/getQualifiedSsoLoginErrorController";
 import AuthLogoutController from "../controller/auth/authLogoutController";
 
-const listen = function(worker, account) {
+const listen = function(worker, _, account) {
   /*
    * Check if the user is authenticated.
    *

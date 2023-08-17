@@ -14,12 +14,13 @@
 
 import CryptoRandomValuesService from "./cryptoRandomValuesService";
 
+jest.spyOn(self.crypto, "getRandomValues");
+
 describe("RandomValue service", () => {
   it(`should provide a random value`, async() => {
     expect.assertions(2);
     const value = CryptoRandomValuesService.randomValuesArray(32);
     expect(value.length).toEqual(32);
-    // Warning: crypto getRandomValues can't be mock properly
     expect(self.crypto.getRandomValues).toHaveBeenCalledWith(value);
   });
 });

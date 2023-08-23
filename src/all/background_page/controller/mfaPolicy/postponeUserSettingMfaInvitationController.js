@@ -11,10 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import PostponedUserSettingInvitationService from '../../service/api/invitation/postponedUserSettingInvitationService';
+import PostponeUserSettingInvitationService from '../../service/invitation/postponeUserSettingInvitationService';
 
-
-class PostponeUserSettingMFAInvitationController {
+class PostponeUserSettingMfaInvitationController {
   /**
    * PostponeUserSettingMFAInvitationController constructor
    * @param {Worker} worker
@@ -43,8 +42,8 @@ class PostponeUserSettingMFAInvitationController {
    * Set the MFA Policy enrollement inviration as postponed.
    */
   async exec() {
-    PostponedUserSettingInvitationService.postponeMFAPolicy();
+    PostponeUserSettingInvitationService.postponeMFAPolicy();
   }
 }
 
-export default PostponeUserSettingMFAInvitationController;
+export default PostponeUserSettingMfaInvitationController;

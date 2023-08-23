@@ -23,10 +23,10 @@ import {SecretEvents} from "../event/secretEvents";
 import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {TabEvents} from "../event/tabEvents";
 import {LocaleEvents} from "../event/localeEvents";
-import {PasswordGeneratorEvents} from "../event/passwordGeneratorEvents";
 import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import {v4 as uuid} from 'uuid';
+import {enableFetchMocks} from "jest-fetch-mock";
 
 jest.spyOn(GetLegacyAccountService, "get").mockImplementation(jest.fn());
 jest.spyOn(AuthEvents, "listen").mockImplementation(jest.fn());
@@ -40,43 +40,44 @@ jest.spyOn(SecretEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(TabEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(LocaleEvents, "listen").mockImplementation(jest.fn());
-jest.spyOn(PasswordGeneratorEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
 
 describe("QuickAccess", () => {
   beforeEach(async() => {
     jest.resetModules();
     jest.clearAllMocks();
+    enableFetchMocks();
   });
 
   describe("QuickAccess::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(16);
+      expect.assertions(15);
       // data mocked
       const port = {
         _port: {
           sender: {}
         }
       };
-      const mockedAccount = {user_id: uuid()};
+      const mockedAccount = {user_id: uuid(), domain: "https://test.passbolt.local"};
+      const apiClientOptions = null;
       jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
       // process
       await QuickAccess.attachEvents(port);
       // expectations
-      expect(AuthEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName}, mockedAccount);
-      expect(ConfigEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName}, mockedAccount);
-      expect(KeyringEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName}, mockedAccount);
-      expect(QuickAccessEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName}, mockedAccount);
-      expect(GroupEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName}, mockedAccount);
-      expect(TagEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName}, mockedAccount);
-      expect(ResourceEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName}, mockedAccount);
-      expect(SecretEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName}, mockedAccount);
-      expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName}, mockedAccount);
-      expect(TabEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName}, mockedAccount);
-      expect(LocaleEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName}, mockedAccount);
-      expect(PasswordGeneratorEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName}, mockedAccount);
-      expect(PownedPasswordEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: QuickAccess.appName}, mockedAccount);
-      expect(QuickAccess.events).toStrictEqual([AuthEvents, ConfigEvents, KeyringEvents, QuickAccessEvents, GroupEvents, TagEvents, ResourceEvents, SecretEvents, OrganizationSettingsEvents, TabEvents, LocaleEvents, PasswordGeneratorEvents, PownedPasswordEvents]);
+      const expectedArgument = {port: port, tab: port._port.sender.tab, name: QuickAccess.appName};
+      expect(AuthEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(KeyringEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(QuickAccessEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(GroupEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(TagEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(ResourceEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(SecretEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(TabEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(LocaleEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(PownedPasswordEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
+      expect(QuickAccess.events).toStrictEqual([AuthEvents, ConfigEvents, KeyringEvents, QuickAccessEvents, GroupEvents, TagEvents, ResourceEvents, SecretEvents, OrganizationSettingsEvents, TabEvents, LocaleEvents, PownedPasswordEvents]);
       expect(QuickAccess.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(QuickAccess.appName).toBe('QuickAccess');
     });

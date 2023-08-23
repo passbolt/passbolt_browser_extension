@@ -14,13 +14,14 @@
 
 import LocalStorageService from "./localStorageService";
 import browser from "../../sdk/polyfill/browserPolyfill";
-import PostponedUserSettingInvitationService from "../api/invitation/postponedUserSettingInvitationService";
 import GetLegacyAccountService from "../account/getLegacyAccountService";
 import UserMeSessionStorageService from "../sessionStorage/userMeSessionStorageService";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {RBACS_LOCAL_STORAGE_KEY} from "../local_storage/rbacLocalStorage";
 import MockExtension from "../../../../../test/mocks/mockExtension";
+import PostponeUserSettingInvitationService from "../invitation/postponeUserSettingInvitationService";
+import {PASSWORD_POLICIES_LOCAL_STORAGE_KEY} from "../local_storage/passwordPoliciesLocalStorage";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -34,9 +35,9 @@ describe("LocalStorageService", () => {
       jest.spyOn(browser.storage.local, "remove");
       jest.spyOn(browser.storage.session, "remove");
       jest.spyOn(browser.alarms, "clear");
-      jest.spyOn(PostponedUserSettingInvitationService, "reset");
       jest.spyOn(GetLegacyAccountService, "get");
       jest.spyOn(UserMeSessionStorageService, "remove");
+      jest.spyOn(PostponeUserSettingInvitationService, "reset");
       // process
       await LocalStorageService.flush();
       // expectations
@@ -51,7 +52,7 @@ describe("LocalStorageService", () => {
       expect(browser.storage.local.remove).toHaveBeenCalledWith("groups");
       expect(browser.storage.local.remove).toHaveBeenCalledWith("roles");
       expect(browser.storage.local.remove).toHaveBeenCalledWith("passwordGenerator");
-      expect(PostponedUserSettingInvitationService.reset).toHaveBeenCalled();
+      expect(PostponeUserSettingInvitationService.reset).toHaveBeenCalled();
       expect(browser.storage.session.remove).toHaveBeenCalledWith("passphrase");
       expect(browser.alarms.clear).toHaveBeenCalledWith("PassphraseStorageFlush");
       expect(browser.alarms.clear).toHaveBeenCalledWith("SessionKeepAlive");
@@ -61,7 +62,7 @@ describe("LocalStorageService", () => {
     });
 
     it("Should flush all storage (with an account set)", async() => {
-      expect.assertions(19);
+      expect.assertions(20);
       // mock data
       MockExtension.withConfiguredAccount();
       const account = new AccountEntity(defaultAccountDto());
@@ -69,13 +70,13 @@ describe("LocalStorageService", () => {
       jest.spyOn(browser.storage.local, "remove");
       jest.spyOn(browser.storage.session, "remove");
       jest.spyOn(browser.alarms, "clear");
-      jest.spyOn(PostponedUserSettingInvitationService, "reset");
+      jest.spyOn(PostponeUserSettingInvitationService, "reset");
       jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
       jest.spyOn(UserMeSessionStorageService, "remove");
       // process
       await LocalStorageService.flush();
       // expectations
-      expect(browser.storage.local.remove).toHaveBeenCalledTimes(9);
+      expect(browser.storage.local.remove).toHaveBeenCalledTimes(10);
       expect(browser.storage.session.remove).toHaveBeenCalledTimes(3);
       expect(browser.alarms.clear).toHaveBeenCalledTimes(2);
       expect(browser.storage.local.remove).toHaveBeenCalledWith("resources");
@@ -86,13 +87,14 @@ describe("LocalStorageService", () => {
       expect(browser.storage.local.remove).toHaveBeenCalledWith("groups");
       expect(browser.storage.local.remove).toHaveBeenCalledWith("roles");
       expect(browser.storage.local.remove).toHaveBeenCalledWith("passwordGenerator");
-      expect(PostponedUserSettingInvitationService.reset).toHaveBeenCalled();
+      expect(PostponeUserSettingInvitationService.reset).toHaveBeenCalled();
       expect(browser.storage.session.remove).toHaveBeenCalledWith("passphrase");
       expect(browser.alarms.clear).toHaveBeenCalledWith("PassphraseStorageFlush");
       expect(browser.alarms.clear).toHaveBeenCalledWith("SessionKeepAlive");
       expect(browser.storage.session.remove).toHaveBeenCalledWith("temp_server_part_sso_kit");
       expect(GetLegacyAccountService.get).toHaveBeenCalled();
       expect(browser.storage.local.remove).toHaveBeenCalledWith(`${RBACS_LOCAL_STORAGE_KEY}-${account.id}`);
+      expect(browser.storage.local.remove).toHaveBeenCalledWith(`${PASSWORD_POLICIES_LOCAL_STORAGE_KEY}-${account.id}`);
       expect(UserMeSessionStorageService.remove).toHaveBeenCalledWith(account);
     });
   });

@@ -13,8 +13,9 @@ import i18n from "../sdk/i18n";
 import WorkerService from "../service/worker/workerService";
 import FindMeController from "../controller/rbac/findMeController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
+import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
 
-const listen = function(worker, account) {
+const listen = function(worker, _, account) {
   /*
    * Use a resource on the current tab.
    *
@@ -141,6 +142,18 @@ const listen = function(worker, account) {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new FindMeController(worker, requestId, apiClientOptions, account);
     await controller._exec(name);
+  });
+
+  /*
+   * ==================================================================================
+   *  Password policies events.
+   * ==================================================================================
+   */
+
+  worker.port.on('passbolt.password-policies.get', async requestId => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new GetOrFindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
+    await controller._exec();
   });
 };
 

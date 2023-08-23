@@ -13,12 +13,12 @@
 import User from "../model/user";
 import InformMenuController from "../controller/InformMenuController/InformMenuController";
 import GetLocaleController from "../controller/locale/getLocaleController";
+import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
 
 /**
  * Listens the inform menu events
- * @param worker
  */
-const listen = function(worker) {
+const listen = function(worker, _, account) {
   /** Whenever the in-form menu need initialization */
   worker.port.on('passbolt.in-form-menu.init', async requestId => {
     const apiClientOptions =  await User.getInstance().getApiClientOptions();
@@ -77,7 +77,7 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.locale.get', async requestId => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const getLocaleController = new GetLocaleController(worker, apiClientOptions);
 
     try {
@@ -87,6 +87,18 @@ const listen = function(worker) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
+  });
+
+  /*
+   * ==================================================================================
+   *  Password policies events.
+   * ==================================================================================
+   */
+
+  worker.port.on('passbolt.password-policies.get', async requestId => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new GetOrFindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
+    await controller._exec();
   });
 };
 

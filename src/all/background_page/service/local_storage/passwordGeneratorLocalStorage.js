@@ -13,11 +13,14 @@
  */
 import browser from "../../sdk/polyfill/browserPolyfill";
 import Log from "../../model/log";
-import Lock from "../../utils/lock";
-const lock = new Lock();
 
 const PASSWORD_GENERATOR_LOCAL_STORAGE_KEY = 'passwordGenerator';
 
+
+/**
+ * @deprecated since v4.2.0 unused anymore; to be remove on v4.3.0
+ * Only flush is in used a the moment to ensure the data is cleaned before it's fully removed.
+ */
 class PasswordGeneratorLocalStorage {
   /**
    * Flush the password generator local storage
@@ -28,29 +31,6 @@ class PasswordGeneratorLocalStorage {
   static async flush() {
     Log.write({level: 'debug', message: 'PasswordGeneratorLocalStorage flushed'});
     return await browser.storage.local.remove(PASSWORD_GENERATOR_LOCAL_STORAGE_KEY);
-  }
-
-  /**
-   * Set the password generator local storage.
-   *
-   * @throws {Error} if operation failed
-   * @return {Promise} results object, containing every object in keys that was found in the storage area.
-   * If storage is not set, undefined will be returned.
-   */
-  static async get() {
-    const {passwordGenerator} = await browser.storage.local.get([PASSWORD_GENERATOR_LOCAL_STORAGE_KEY]);
-    return passwordGenerator;
-  }
-
-  /**
-   * Set the password generator in local storage.
-   * @param {PasswordGeneratorEntity }passwordGenerator The password generator
-   * @return {void}
-   */
-  static async set(passwordGenerator) {
-    await lock.acquire();
-    await browser.storage.local.set({passwordGenerator: passwordGenerator});
-    lock.release();
   }
 }
 

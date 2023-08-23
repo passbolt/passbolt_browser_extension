@@ -12,7 +12,7 @@
  * @since         3.10.0
  */
 
-import PostponedUserSettingInvitationService from "../../service/api/invitation/postponedUserSettingInvitationService";
+import PostponeUserSettingInvitationService from "../../service/invitation/postponeUserSettingInvitationService";
 import HasUserPostponedUserSettingInvitationController from "./hasUserPostponedUserSettingInvitationController";
 
 describe("hasUserPostponedUserSettingInvitationController", () => {
@@ -23,7 +23,7 @@ describe("hasUserPostponedUserSettingInvitationController", () => {
 
     expect(defaultValue).toBe(false);
 
-    PostponedUserSettingInvitationService.postponeMFAPolicy();
+    PostponeUserSettingInvitationService.postponeMFAPolicy();
 
     const setValue = controller.exec();
     expect(setValue).toBe(true);

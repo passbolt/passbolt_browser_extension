@@ -60,7 +60,7 @@ class PublicWebsiteSignIn extends Pagemod {
       const tab = port._port.sender.tab;
       const account =  await GetLegacyAccountService.get();
       for (const event of this.events) {
-        event.listen({port, tab}, account);
+        event.listen({port, tab}, null, account);
       }
     } catch (error) {
       // Unexpected error, this pagemod shouldn't have been initialized as the PublicWebsiteSignPagemod should have raised an exception and not inject the content script.

@@ -23,7 +23,6 @@ import {SecretEvents} from "../event/secretEvents";
 import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {TabEvents} from "../event/tabEvents";
 import {LocaleEvents} from "../event/localeEvents";
-import {PasswordGeneratorEvents} from "../event/passwordGeneratorEvents";
 import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 
@@ -52,8 +51,7 @@ class QuickAccess extends Pagemod {
       OrganizationSettingsEvents,
       TabEvents,
       LocaleEvents,
-      PasswordGeneratorEvents,
-      PownedPasswordEvents
+      PownedPasswordEvents,
     ];
   }
 
@@ -72,7 +70,7 @@ class QuickAccess extends Pagemod {
 
     const worker = {port: port, tab: port._port.sender.tab, name: this.appName};
     for (const event of this.events) {
-      event.listen(worker, account);
+      event.listen(worker, null, account);
     }
   }
 }

@@ -42,7 +42,9 @@ describe("ParseWebIntegrationUrlService", () => {
       {scenario: "Passbolt domain", url: domain},
       {scenario: "Chrome page", url: "chrome://settings/"},
       {scenario: "Blank page", url: "about:blank"},
-      {scenario: "Config page", url: "about:config"}
+      {scenario: "Config page", url: "about:config"},
+      {scenario: "Passbolt page", url: "https://www.passbolt.com/"},
+      {scenario: "gmail page", url: "https://mail.google.com/"}
     ]).describe("should not parse", _props => {
       it(`should not match: ${_props.scenario}`, () => {
         const parseResult = ParseWebIntegrationUrlService.test(_props.url);

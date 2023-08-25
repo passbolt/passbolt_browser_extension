@@ -12,9 +12,9 @@
  * @since         2.13.0
  */
 import PermissionTransferEntity from "./permissionTransferEntity";
-import EntityCollection from "../../abstract/entityCollection";
-import EntityValidationError from "../../abstract/entityValidationError";
-import EntitySchema from "../../abstract/entitySchema";
+import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'PermissionTransfers';
 

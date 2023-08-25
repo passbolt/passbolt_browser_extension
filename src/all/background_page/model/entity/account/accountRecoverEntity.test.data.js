@@ -16,34 +16,28 @@ import {v4 as uuidv4} from "uuid";
 import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
 import {defaultSecurityTokenDto} from "../securityToken/SecurityTokenEntity.test.data";
 import AccountRecoverEntity from "./accountRecoverEntity";
-import {defaultUserDto} from "../user/userEntity.test.data";
+import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import AccountRecoveryUserSettingEntity from "../accountRecovery/accountRecoveryUserSettingEntity";
 
-export const initialAccountRecoverDto = (data = {}) => {
-  const defaultData = {
-    "type": AccountRecoverEntity.TYPE_ACCOUNT_RECOVER,
-    "domain": "https://passbolt.local",
-    "user_id": uuidv4(),
-    "authentication_token_token": uuidv4(),
-  };
-
-  return Object.assign(defaultData, data);
-};
+export const initialAccountRecoverDto = (data = {}) => ({
+  "type": AccountRecoverEntity.TYPE_ACCOUNT_RECOVER,
+  "domain": "https://passbolt.local",
+  "user_id": uuidv4(),
+  "authentication_token_token": uuidv4(),
+  ...data
+});
 
 export const startAccountRecoverDto = (data = {}) => {
-  const user = defaultUserDto(data?.user);
-  const defaultData = {
+  const user = data?.user || defaultUserDto();
+
+  return initialAccountRecoverDto({
     "user_id": user.id,
     "first_name": user.profile.first_name,
     "last_name": user.profile.last_name,
     "username": user.username,
-    "user": user
-  };
-
-  // delete already treated data.
-  delete data.user;
-
-  return initialAccountRecoverDto(Object.assign(defaultData, data));
+    "user": user,
+    ...data
+  });
 };
 
 export const startWithApprovedAccountRecoveryAccountRecoverDto = (data = {}) => {
@@ -51,39 +45,28 @@ export const startWithApprovedAccountRecoveryAccountRecoverDto = (data = {}) => 
     "status": AccountRecoveryUserSettingEntity.STATUS_APPROVED
   };
   const user = defaultUserDto({
-    account_recovery_user_setting: accountRecoveryUserSetting,
-    ...data?.user
+    account_recovery_user_setting: accountRecoveryUserSetting
   });
-  const defaultData = {user};
 
-  // delete already treated data.
-  delete data.user;
-
-  return startAccountRecoverDto(Object.assign(defaultData, data));
+  return startAccountRecoverDto({
+    user: user,
+    ...data
+  });
 };
 
-export const withServerKeyAccountRecoverDto = (data = {}) => {
-  const defaultData = {
-    "server_public_armored_key": pgpKeys.server.public,
-  };
+export const withServerKeyAccountRecoverDto = (data = {}) => startAccountRecoverDto({
+  "server_public_armored_key": pgpKeys.server.public,
+  ...data
+});
 
-  return startAccountRecoverDto(Object.assign(defaultData, data));
-};
+export const withUserKeyAccountRecoverDto = (data = {}) => withServerKeyAccountRecoverDto({
+  "user_key_fingerprint": pgpKeys.ada.fingerprint,
+  "user_public_armored_key": pgpKeys.ada.public,
+  "user_private_armored_key": pgpKeys.ada.private,
+  ...data
+});
 
-export const withUserKeyAccountRecoverDto = (data = {}) => {
-  const defaultData = {
-    "user_key_fingerprint": pgpKeys.ada.fingerprint,
-    "user_public_armored_key": pgpKeys.ada.public,
-    "user_private_armored_key": pgpKeys.ada.private,
-  };
-
-  return withServerKeyAccountRecoverDto(Object.assign(defaultData, data));
-};
-
-export const withSecurityTokenAccountRecoverDto = (data = {}) => {
-  const defaultData = {
-    security_token: defaultSecurityTokenDto()
-  };
-
-  return withUserKeyAccountRecoverDto(Object.assign(defaultData, data));
-};
+export const withSecurityTokenAccountRecoverDto = (data = {}) => withUserKeyAccountRecoverDto({
+  security_token: defaultSecurityTokenDto(),
+  ...data
+});

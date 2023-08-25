@@ -1,0 +1,42 @@
+build:
+  stage: build
+  image: node:16
+  extends: .rules
+  artifacts:
+    when: always
+    paths:
+      - dist/chrome
+      - dist/firefox
+  script:
+    - |
+      apt-get update
+      apt-get install -y curl zip
+      npm ci
+      mkdir -p dist/firefox dist/chrome
+      npx grunt build
+      if [[ "$CI_COMMIT_TAG" != "" ]]; then
+        echo "Sending slack build notification"
+        echo "================================"
+        bash ./.gitlab-ci/scripts/bin/slack-status-messages.sh ":jigsaw: A new wild browser extension appeared! $CI_COMMIT_TAG" "$CI_PROJECT_URL/-/jobs/$CI_JOB_ID/artifacts/browse/dist/"
+      fi
+
+build_mv3:
+  stage: build
+  image: node:16
+  extends: .rules
+  artifacts:
+    when: always
+    paths:
+      - dist/chrome-mv3/
+  script:
+    - |
+      apt-get update
+      apt-get install -y curl zip
+      npm ci
+      mkdir -p dist/chrome-mv3
+      npx grunt build-chrome-mv3
+      if [[ "$CI_COMMIT_TAG" != "" ]]; then
+        echo "Sending slack build notification"
+        echo "================================"
+        bash ./.gitlab-ci/scripts/bin/slack-status-messages.sh ":jigsaw: A new wild MV3 browser extension appeared! $CI_COMMIT_TAG" "$CI_PROJECT_URL/-/jobs/$CI_JOB_ID/artifacts/browse/dist/"
+      fi

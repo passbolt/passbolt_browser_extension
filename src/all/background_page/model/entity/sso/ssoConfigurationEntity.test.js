@@ -12,8 +12,8 @@
  * @since         3.9.0
  */
 import SsoSettingsEntity from "./ssoSettingsEntity";
-import EntitySchema from "../abstract/entitySchema";
-import EntityValidationError from "../abstract/entityValidationError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import {v4 as uuid} from "uuid";
 
 describe("Sso Settings Entity", () => {

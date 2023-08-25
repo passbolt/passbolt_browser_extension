@@ -13,7 +13,7 @@
  */
 
 import {v4 as uuidv4} from "uuid";
-import {defaultUserDto} from "../user/userEntity.test.data";
+import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import {
   alternativeAccountRecoveryOrganizationPublicKeyDto,
   createAccountRecoveryOrganizationPublicKeyDto,

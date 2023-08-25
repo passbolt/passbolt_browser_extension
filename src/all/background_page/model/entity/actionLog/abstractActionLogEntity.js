@@ -12,7 +12,7 @@
  */
 import ResourceEntity from "../resource/resourceEntity";
 import FolderEntity from "../folder/folderEntity";
-import Entity from "../abstract/entity";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import LoggedUserEntity from "../user/actionLog/loggedUserEntity";
 
 

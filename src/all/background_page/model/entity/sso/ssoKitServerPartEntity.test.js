@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import EntitySchema from "../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import SsoKitServerPartEntity from "./ssoKitServerPartEntity";
 import {v4 as uuid} from "uuid";
 import {generateSsoKitServerData} from "./ssoKitServerPart.test.data";

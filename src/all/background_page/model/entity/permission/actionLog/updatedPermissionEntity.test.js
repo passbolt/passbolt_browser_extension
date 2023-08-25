@@ -10,8 +10,8 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import EntitySchema from "../../abstract/entitySchema";
-import EntityValidationError from '../../abstract/entityValidationError';
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import UpdatedPermissionEntity from "./updatedPermissionEntity";
 
 describe("Updated permission entity", () => {

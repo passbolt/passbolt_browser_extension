@@ -13,8 +13,8 @@
  */
 import ExternalGpgKeyEntity from "./externalGpgKeyEntity";
 import {ExternalGpgKeyEntityFixtures} from "./externalGpgKeyEntity.test.fixtures";
-import EntitySchema from "../../abstract/entitySchema";
-import EntityValidationError from '../../abstract/entityValidationError';
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("ExternalGpgKey entity", () => {
   it("schema must validate", () => {

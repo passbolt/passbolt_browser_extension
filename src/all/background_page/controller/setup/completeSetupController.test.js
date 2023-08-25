@@ -22,8 +22,6 @@ import User from "../../model/user";
 import Keyring from "../../model/keyring";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
-jest.mock("../../app");
-
 // Reset the modules before each test.
 beforeEach(() => {
   enableFetchMocks();

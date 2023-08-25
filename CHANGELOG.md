@@ -3,6 +3,37 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [4.1.0] - 2023-06-21
+
+### Added
+- PB-24169 As an administrator I want to customise what capabilities users are allowed to access on the UI of my organisation
+- PB-24598 SSO allow administrators to remap email/username properties
+
+### Fixed
+- PB-14174 As a user I want the inform menu not to be displayed outside my browser window
+- PB-24657 As a user I should see the triage page even when SSO is misconfigured
+- PB-25031 Fix margin on folder name in the information panel
+
+### Improvement
+- PB-24619 As LU I should see the link on the same line in a paragraph
+- PB-24646 As LU, I should see colored passwords
+
+### Maintenance
+- PB-24622 Put back the rolled-back code for LDAP multi-domain and field-mapping feature
+- PB-24794 Adapt browser extension to not crash when unknown content types are retrieved from the API
+
+### Security
+- PB-23852 PBL-02-002 As a user I should sign-out using POST method
+- PB-24997 Change static images URL to be served from the browser extension instead of the API
+
+## [4.0.4] - 2023-06-07
+### Fixed
+- PB-24932 Fix: As a user I want to be able to sign-in through SSO from the inform menu
+
+## [4.0.3] - 2023-06-05
+### Fixed
+- PB-24734 Fix As a registered user I would like to be able to use SSO login via the quickaccess
+
 ## [4.0.1] - 2023-05-17
 ### Fixed
 - PB-24639 Fix: As an administrator I want to be see which users have activated MFA from the users workspace
@@ -1195,7 +1226,10 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.1...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.1.0...HEAD
+[4.1.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.4...v4.1.0
+[4.0.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.3...v4.0.4
+[4.0.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.1...v4.0.3
 [4.0.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.12.1...v4.0.0
 [3.12.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v3.12.0...v3.12.1

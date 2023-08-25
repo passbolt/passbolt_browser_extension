@@ -25,6 +25,7 @@ import {TabEvents} from "../event/tabEvents";
 import {LocaleEvents} from "../event/localeEvents";
 import {PasswordGeneratorEvents} from "../event/passwordGeneratorEvents";
 import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
+import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 
 class QuickAccess extends Pagemod {
   /**
@@ -54,6 +55,27 @@ class QuickAccess extends Pagemod {
       PasswordGeneratorEvents,
       PownedPasswordEvents
     ];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  async attachEvents(port) {
+    try {
+      const tab = port._port.sender.tab;
+      const account = await GetLegacyAccountService.get();
+      for (const event of this.events) {
+        event.listen({port: port, tab: tab, name: this.appName}, account);
+      }
+    } catch (error) {
+      /*
+       * Ensure the application does not crash completely if the legacy account cannot be retrieved.
+       * The following controllers won't work as expected:
+       * - RequestHelpCredentialsLostController
+       */
+      console.error('quickaccessPagemod::attach legacy account cannot be retrieved, please contact your administrator.');
+      console.error(error);
+    }
   }
 }
 

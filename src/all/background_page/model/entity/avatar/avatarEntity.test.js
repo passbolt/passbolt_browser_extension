@@ -11,57 +11,141 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
+
+import each from "jest-each";
 import AvatarEntity from "./avatarEntity";
-import EntitySchema from "../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import {
+  defaultAvatarDto,
+  minimalAvatarDto
+} from "passbolt-styleguide/src/shared/models/entity/avatar/avatarEntity.test.data";
+import Validator from "validator";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
-describe("Avatar entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(AvatarEntity.ENTITY_NAME, AvatarEntity.getSchema());
+describe("AvatarEntity", () => {
+  describe("AvatarEntity:constructor", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(AvatarEntity.ENTITY_NAME, AvatarEntity.getSchema());
+    });
+
+    it("constructor works if valid minimal DTO is provided", () => {
+      const dto = minimalAvatarDto();
+      const entity = new AvatarEntity(dto);
+      expect(entity.id).toBeNull();
+      expect(entity.urlMedium).toEqual('img/avatar/user_medium.png');
+      expect(entity.urlSmall).toEqual('img/avatar/user.png');
+      expect(entity.created).toBeNull();
+      expect(entity.modified).toBeNull();
+    });
+
+    it("constructor works if valid DTO is provided with optional properties", () => {
+      const dto = defaultAvatarDto();
+      const entity = new AvatarEntity(dto);
+      expect(Validator.isUUID(entity.id)).toBe(true);
+      expect(entity.urlMedium).toEqual('/avatars/view/e6927385-195c-4c7f-a107-a202ea86de40/medium.jpg');
+      expect(entity.urlSmall).toEqual('/avatars/view/e6927385-195c-4c7f-a107-a202ea86de40/small.jpg');
+      expect(entity.created).toEqual('2023-06-03T12:03:46+00:00');
+      expect(entity.modified).toEqual('2023-06-03T12:03:46+00:00');
+    });
+
+    each([
+      {scenario: 'valid uuid', rule: 'format', value: 'invalid-id'},
+      {scenario: 'valid format', rule: 'type', value: 42},
+    ]).describe("Should validate the id", test => {
+      it(`Should not accept: ${test.scenario}`, async() => {
+        expect.assertions(2);
+        const dto = defaultAvatarDto({
+          id: test.value
+        });
+        try {
+          new AvatarEntity(dto);
+        } catch (error) {
+          expect(error).toBeInstanceOf(EntityValidationError);
+          expect(error.hasError('id', test.rule)).toBeTruthy();
+        }
+      });
+    });
+
+    each([
+      {scenario: 'required', rule: 'type'},
+      {scenario: 'valid url object', rule: 'type', value: 42},
+      /*
+       * @todo Should validate small & medium urls
+       * {scenario: 'valid medium url', rule: 'type', value: {
+       *     medium: 42
+       *   }},
+       * {scenario: 'valid small url', rule: 'type', value: {
+       *     medium: 42
+       *   }},
+       */
+    ]).describe("Should validate the url", test => {
+      it(`Should not accept: ${test.scenario}`, async() => {
+        expect.assertions(2);
+        const dto = defaultAvatarDto({
+          url: test.value
+        });
+        try {
+          new AvatarEntity(dto);
+        } catch (error) {
+          expect(error).toBeInstanceOf(EntityValidationError);
+          expect(error.hasError('url', test.rule)).toBeTruthy();
+        }
+      });
+    });
+
+    each([
+      {scenario: 'is not required but cannot be null', rule: null},
+      {scenario: 'valid url object', rule: 'type', value: 42},
+    ]).describe("Should validate the created", test => {
+      it(`Should not accept: ${test.scenario}`, async() => {
+        expect.assertions(2);
+        const dto = defaultAvatarDto({
+          created: test.value
+        });
+        try {
+          new AvatarEntity(dto);
+        } catch (error) {
+          expect(error).toBeInstanceOf(EntityValidationError);
+          expect(error.hasError('created', test.rule)).toBeTruthy();
+        }
+      });
+    });
+
+    each([
+      {scenario: 'is not required but cannot be null', rule: null},
+      {scenario: 'valid url object', rule: 'type', value: 42},
+    ]).describe("Should validate the modified", test => {
+      it(`Should not accept: ${test.scenario}`, async() => {
+        expect.assertions(2);
+        const dto = defaultAvatarDto({
+          modified: test.value
+        });
+        try {
+          new AvatarEntity(dto);
+        } catch (error) {
+          expect(error).toBeInstanceOf(EntityValidationError);
+          expect(error.hasError('modified', test.rule)).toBeTruthy();
+        }
+      });
+    });
   });
 
-  it("constructor works if valid minimal DTO is provided", () => {
-    const dto = {
-      "id": "ae1cd004-d1f6-4e7b-a3c7-3b28da81e9e8",
-      "user_id": "597f24ea-a4cc-4d21-a24e-2181ac1f17ef",
-      "foreign_key": "597f24ea-de28-4b96-9073-2181ac1f17ef",
-      "model": "Avatar",
-      "filename": "avatar.png",
-      "filesize": 102968,
-      "mime_type": "image\/png",
-      "extension": "png",
-      "hash": "bc1cd004d1f64e7ba3c67b28da81e9e8",
-      "path": "Avatar\/39\/71\/4b\/ae1cd004fff64e7ba3c73b384481e9e8\/bc1cd004d1f64e7ba3c67b28da81e9e8.png",
-      "adapter": "Local",
-      "created": "2020-03-26T11:14:02+00:00",
-      "modified": "2020-03-26T11:14:02+00:00",
-      "url": {
-        "medium": "img\/public\/Avatar\/39\/71\/4b\/ae1cd004fff64e7ba3c73b384481e9e8\/bc1cd004d1f64e7ba3c67b28da81e9e8.a99472d5.png",
-        "small": "img\/public\/Avatar\/39\/71\/4b\/ae1cd004fff64e7ba3c73b384481e9e8\/bc1cd004d1f64e7ba3c67b28da81e9e8.65a0ba70.png"
-      },
-    };
-    const entity = new AvatarEntity(dto);
-    expect(entity.id).toEqual('ae1cd004-d1f6-4e7b-a3c7-3b28da81e9e8');
-    //expect(entity.userId).toEqual('597f24ea-a4cc-4d21-a24e-2181ac1f17ef');
-    expect(entity.urlMedium).toEqual('img/public/Avatar/39/71/4b/ae1cd004fff64e7ba3c73b384481e9e8/bc1cd004d1f64e7ba3c67b28da81e9e8.a99472d5.png');
-    expect(entity.urlSmall).toEqual('img/public/Avatar/39/71/4b/ae1cd004fff64e7ba3c73b384481e9e8/bc1cd004d1f64e7ba3c67b28da81e9e8.65a0ba70.png');
-    expect(entity.created).toEqual('2020-03-26T11:14:02+00:00');
-    expect(entity.modified).toEqual('2020-03-26T11:14:02+00:00');
-    expect(entity._hasProp('filesize')).toBe(false);
-    expect(entity._hasProp('model')).toBe(false);
-    expect(entity._hasProp('mime_type')).toBe(false);
-    expect(entity._hasProp('hash')).toBe(false);
-    expect(entity._hasProp('filesize')).toBe(false);
-  });
+  describe("AvatarEntity:toDto", () => {
+    it("should return the expected properties.", () => {
+      expect.assertions(2);
+      const expectedKeys = [
+        "id",
+        "url",
+        "created",
+        "modified",
+      ];
 
-  it("constructor works if valid DTO is provided with optional and non supported fields", () => {
-
-  });
-
-  it("constructor returns validation error if dto required fields are missing", () => {
-
-  });
-
-  it("constructor returns validation error if dto fields are invalid", () => {
-
+      const dto = defaultAvatarDto();
+      const entity = new AvatarEntity(dto);
+      const resultDto = entity.toDto();
+      const keys = Object.keys(resultDto);
+      expect(keys).toEqual(expectedKeys);
+      expect(Object.keys(resultDto).length).toBe(expectedKeys.length);
+    });
   });
 });

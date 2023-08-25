@@ -16,7 +16,7 @@ import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
 import SsoDataStorage from "../indexedDB_storage/ssoDataStorage";
 import GenerateSsoKitService from "../sso/generateSsoKitService";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
-import EntityValidationError from "../../model/entity/abstract/entityValidationError";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 class UpdateSsoCredentialsService {
   constructor(apiClientOption) {

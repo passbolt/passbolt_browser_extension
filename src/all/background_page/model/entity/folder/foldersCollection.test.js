@@ -12,7 +12,7 @@
  * @since         2.13.0
  */
 import FoldersCollection from "./foldersCollection";
-import EntitySchema from "../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 describe("Folders collection entity", () => {
   it("schema must validate", () => {

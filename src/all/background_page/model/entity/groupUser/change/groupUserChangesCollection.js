@@ -10,10 +10,10 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import EntityCollection from "../../abstract/entityCollection";
+import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
 import GroupsUsersCollection from "../groupsUsersCollection";
 import GroupUserChangeEntity from "./groupUserChangeEntity";
-import EntitySchema from "../../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'GroupUserChanges';
 

@@ -12,8 +12,8 @@
  */
 
 import AbstractAccountEntity from "./abstractAccountEntity";
-import EntitySchema from "../abstract/entitySchema";
-import RoleEntity from "../role/roleEntity";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 
 const ENTITY_NAME = "Account";
 

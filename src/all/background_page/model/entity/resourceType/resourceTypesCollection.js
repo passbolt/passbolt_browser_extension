@@ -11,13 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import EntityCollection from "../abstract/entityCollection";
+import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
 import ResourceTypeEntity from "./resourceTypeEntity";
-import EntitySchema from "../abstract/entitySchema";
-import EntityCollectionError from "../abstract/entityCollectionError";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 
 const ENTITY_NAME = 'ResourceTypes';
 const RULE_UNIQUE_ID = 'unique_id';
+
+const SUPPORTED_RESOURCE_TYPES = ["password-string", "password-and-description"];
 
 class ResourceTypesCollection extends EntityCollection {
   /**
@@ -74,6 +76,14 @@ class ResourceTypesCollection extends EntityCollection {
     return this._items.map(r => r.id);
   }
 
+  /**
+   * Get supported resource types
+   * @return {string[]}
+   */
+  get supportedResourceTypes() {
+    return SUPPORTED_RESOURCE_TYPES;
+  }
+
   /*
    * ==================================================
    * Assertions
@@ -99,6 +109,15 @@ class ResourceTypesCollection extends EntityCollection {
     }
   }
 
+  /**
+   * Is resource type id present (supported)
+   * @param id The id
+   * @return {boolean}
+   */
+  isResourceTypeIdPresent(id) {
+    return this.resourceTypes.some(resourceType => resourceType.id === id);
+  }
+
   /*
    * ==================================================
    * Setters
@@ -115,13 +134,17 @@ class ResourceTypesCollection extends EntityCollection {
     if (resourceType instanceof ResourceTypeEntity) {
       resourceType = resourceType.toDto(); // deep clone
     }
-    const resourceTypeEntity = new ResourceTypeEntity(resourceType); // validate
+    if (this.supportedResourceTypes.includes(resourceType.slug)) {
+      const resourceTypeEntity = new ResourceTypeEntity(resourceType); // validate
 
-    // Build rules
-    this.assertUniqueId(resourceTypeEntity);
+      // Build rules
+      this.assertUniqueId(resourceTypeEntity);
 
-    super.push(resourceTypeEntity);
+      super.push(resourceTypeEntity);
+    }
   }
+
+
 
   /*
    * ==================================================

@@ -12,9 +12,9 @@
  */
 import GroupEntity from "../../group/groupEntity";
 import PermissionEntity from "../permissionEntity";
-import Entity from "../../abstract/entity";
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import LoggedUserEntity from "../../user/actionLog/loggedUserEntity";
-import EntitySchema from "../../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 const ENTITY_NAME = 'UpdatedPermission';
 

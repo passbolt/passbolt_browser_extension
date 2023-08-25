@@ -13,7 +13,7 @@
  */
 import GroupEntity from "./groupEntity";
 import {GroupEntityTestFixtures} from "./groupEntity.test.fixtures";
-import EntitySchema from "../abstract/entitySchema";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 describe("Group entity", () => {
   it("schema must validate", () => {

@@ -11,9 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import Entity from "../abstract/entity";
+
+import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
+import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import AvatarEntity from "../avatar/avatarEntity";
-import EntitySchema from "../abstract/entitySchema";
 
 const ENTITY_NAME = 'Profile';
 
@@ -135,10 +136,10 @@ class ProfileEntity extends Entity {
    */
   /**
    * Get profile id
-   * @returns {string} uuid
+   * @returns {string|null} uuid
    */
   get id() {
-    return this._props.id;
+    return this._props.id || null;
   }
 
   /**
@@ -167,10 +168,10 @@ class ProfileEntity extends Entity {
 
   /**
    * Get user id
-   * @returns {string} uuid
+   * @returns {string|null} uuid
    */
   get userId() {
-    return this._props.user_id;
+    return this._props.user_id || null;
   }
 
   /**

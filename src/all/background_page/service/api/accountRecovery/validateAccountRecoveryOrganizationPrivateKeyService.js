@@ -25,6 +25,7 @@ class ValidateAccountRecoveryOrganizationPrivateKeyService {
    * @param {PrivateGpgkeyEntity} privateKeyEntity The account recovery organization private key entity
    * @return {Promise<void>}
    * @throws {WrongOrganizationRecoveryKeyError} If the provided key doesn't match the organization key.
+   * @throws {Error} If the private key is encrypted and the passphrase cannot decrypt it
    */
   static async validate(accountRecoveryOrganisationPolicyEntity, privateKeyEntity) {
     const accountRecoveryPublicKey = await OpenpgpAssertion.readKeyOrFail(accountRecoveryOrganisationPolicyEntity.accountRecoveryOrganizationPublicKey.armoredKey);
@@ -37,7 +38,9 @@ class ValidateAccountRecoveryOrganizationPrivateKeyService {
       throw new WrongOrganizationRecoveryKeyError(`Error, this is not the current organization recovery key. Expected fingerprint: ${publicKeyFingerPrint}`, publicKeyFingerPrint);
     }
 
-    await DecryptPrivateKeyService.decrypt(privateKey, privateKeyEntity.passphrase);
+    if (!privateKey.isDecrypted()) {
+      await DecryptPrivateKeyService.decrypt(privateKey, privateKeyEntity.passphrase);
+    }
   }
 }
 

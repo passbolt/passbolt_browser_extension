@@ -98,7 +98,9 @@ class AccountRecoverySaveOrganizationPolicyController {
 
     if (hasToRevokeCurrentOrganizationKey) {
       const organizationPrivateKey = await OpenpgpAssertion.readKeyOrFail(organizationPrivateKeyEntity.armoredKey);
-      const decryptedOrganizationPrivateKey = await DecryptPrivateKeyService.decrypt(organizationPrivateKey, organizationPrivateKeyEntity.passphrase);
+      const decryptedOrganizationPrivateKey = organizationPrivateKey.isDecrypted()
+        ? organizationPrivateKey
+        : await DecryptPrivateKeyService.decrypt(organizationPrivateKey, organizationPrivateKeyEntity.passphrase);
       const revokedPublicKey = await RevokeGpgKeyService.revoke(decryptedOrganizationPrivateKey);
       saveOrganizationPolicyDto.account_recovery_organization_revoked_key = {
         armored_key: revokedPublicKey.armor(),

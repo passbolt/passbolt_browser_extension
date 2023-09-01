@@ -38,11 +38,11 @@ import {ActionLogEvents} from "../event/actionLogEvents";
 import {MultiFactorAuthenticationEvents} from "../event/multiFactorAuthenticationEvents";
 import {ThemeEvents} from "../event/themeEvents";
 import {LocaleEvents} from "../event/localeEvents";
-import {PasswordGeneratorEvents} from "../event/passwordGeneratorEvents";
 import {MobileEvents} from "../event/mobileEvents";
 import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
 import {MfaEvents} from "../event/mfaEvents";
 import {ClipboardEvents} from "../event/clipboardEvents";
+import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 
 class App extends Pagemod {
   /**
@@ -81,7 +81,6 @@ class App extends Pagemod {
       MultiFactorAuthenticationEvents,
       ThemeEvents,
       LocaleEvents,
-      PasswordGeneratorEvents,
       MobileEvents,
       PownedPasswordEvents,
       MfaEvents,
@@ -106,8 +105,9 @@ class App extends Pagemod {
       await appInitController.main();
 
       const account = await GetLegacyAccountService.get({role: true});
+      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
       for (const event of this.events) {
-        event.listen({port, tab}, account);
+        event.listen({port, tab}, apiClientOptions, account);
       }
     } catch (error) {
       /*

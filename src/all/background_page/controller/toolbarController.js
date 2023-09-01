@@ -32,7 +32,6 @@ class ToolbarController {
    * Bind callbacks
    */
   bindCallbacks() {
-    this.handleButtonClick = this.handleButtonClick.bind(this);
     this.handleShortcutPressed = this.handleShortcutPressed.bind(this);
     this.handleUserLoggedOut = this.handleUserLoggedOut.bind(this);
     this.handleUserLoggedIn = this.handleUserLoggedIn.bind(this);
@@ -46,18 +45,9 @@ class ToolbarController {
    * Add event listeners.
    */
   addEventListeners() {
-    browser.action.onClicked.addListener(this.handleButtonClick);
     browser.commands.onCommand.addListener(this.handleShortcutPressed);
     self.addEventListener("passbolt.auth.after-logout", this.handleUserLoggedOut);
     self.addEventListener("passbolt.auth.after-login", this.handleUserLoggedIn);
-  }
-
-  /**
-   * Handle the click on the passbolt toolbar icon.
-   * @private
-   */
-  handleButtonClick() {
-    this.openPassboltTab();
   }
 
   /**

@@ -14,6 +14,8 @@
 import "../../../../../test/mocks/mockCryptoKey";
 import GenerateSsoIvService from "./generateSsoIvService";
 
+jest.spyOn(self.crypto, "getRandomValues");
+
 beforeEach(() => {
   jest.clearAllMocks();
 });

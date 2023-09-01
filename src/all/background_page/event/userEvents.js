@@ -18,7 +18,7 @@ import UpdateUserLocalStorageController from "../controller/user/updateUserLocal
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 
 
-const listen = function(worker, account) {
+const listen = function(worker, apiClientOptions, account) {
   /*
    * ==================================================================================
    *  Getters for user

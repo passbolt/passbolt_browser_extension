@@ -20,8 +20,8 @@ import GroupLocalStorage from "../local_storage/groupLocalStorage";
 import RolesLocalStorage from "../local_storage/rolesLocalStorage";
 import PasswordGeneratorLocalStorage
   from "../local_storage/passwordGeneratorLocalStorage";
-import PostponedUserSettingInvitationService
-  from "../api/invitation/postponedUserSettingInvitationService";
+import PostponeUserSettingInvitationService
+  from "../invitation/postponeUserSettingInvitationService";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import SsoKitTemporaryStorageService
   from "../session_storage/ssoKitTemporaryStorageService";
@@ -29,6 +29,7 @@ import GetLegacyAccountService from "../account/getLegacyAccountService";
 import RbacsLocalStorage from "../local_storage/rbacLocalStorage";
 import UserMeSessionStorageService from "../sessionStorage/userMeSessionStorageService";
 import User from "../../model/user";
+import PasswordPoliciesLocalStorage from "../local_storage/passwordPoliciesLocalStorage";
 
 /**
  * Flush storage data when:
@@ -48,7 +49,7 @@ class LocalStorageService {
     GroupLocalStorage.flush();
     RolesLocalStorage.flush();
     PasswordGeneratorLocalStorage.flush();
-    PostponedUserSettingInvitationService.reset();
+    PostponeUserSettingInvitationService.reset();
     PassphraseStorageService.flush();
     SsoKitTemporaryStorageService.flush();
     LocalStorageService.flushAccountBasedStorages();
@@ -62,6 +63,7 @@ class LocalStorageService {
 
     const account = await GetLegacyAccountService.get();
     (new RbacsLocalStorage(account)).flush();
+    (new PasswordPoliciesLocalStorage(account)).flush();
     UserMeSessionStorageService.remove(account);
   }
 }

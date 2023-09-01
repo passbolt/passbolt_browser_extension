@@ -13,6 +13,9 @@
  */
 import InformMenu from "./informMenuPagemod";
 import {InformMenuEvents} from "../event/informMenuEvents";
+import {v4 as uuid} from 'uuid';
+import GetLegacyAccountService from "../service/account/getLegacyAccountService";
+import {enableFetchMocks} from "jest-fetch-mock";
 
 jest.spyOn(InformMenuEvents, "listen").mockImplementation(jest.fn());
 
@@ -20,6 +23,7 @@ describe("InFormMenu", () => {
   beforeEach(async() => {
     jest.resetModules();
     jest.clearAllMocks();
+    enableFetchMocks();
   });
 
   describe("InformMenu::attachEvents", () => {
@@ -33,12 +37,20 @@ describe("InFormMenu", () => {
               url: "https://localhost"
             }
           }
-        }
+        },
+        on: jest.fn(),
       };
+      const mockedAccount = {
+        user_id: uuid(),
+        domain: "https://test-domain.passbolt.com"
+      };
+      jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
+      const mockApiClient = null;
+
       // process
       await InformMenu.attachEvents(port);
       // expectations
-      expect(InformMenuEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: InformMenu.appName});
+      expect(InformMenuEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: InformMenu.appName}, mockApiClient, mockedAccount);
       expect(InformMenu.events).toStrictEqual([InformMenuEvents]);
       expect(InformMenu.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(InformMenu.appName).toBe('InFormMenu');

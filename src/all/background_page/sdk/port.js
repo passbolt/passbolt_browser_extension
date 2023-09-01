@@ -17,10 +17,24 @@ class Port {
       throw Error("A port is required.");
     }
     this._listeners = {};
+    this._disconnectListeners = {};
     this._port = port;
     this._port.onMessage.addListener(msg => {
       this._onMessage(msg);
     });
+    this._port.onDisconnect.addListener(() => this._onDisconnect());
+  }
+
+  /**
+   * When the port is disconnected, reject all waiting promises and delete listener
+   * @private
+   */
+  _onDisconnect() {
+    const applyAndDeleteDisconnectListener = requestId => {
+      this._disconnectListeners[requestId]?.apply();
+      delete this._disconnectListeners[requestId];
+    };
+    Object.keys(this._disconnectListeners).forEach(applyAndDeleteDisconnectListener);
   }
 
   /**
@@ -134,7 +148,10 @@ class Port {
         } else if (status === 'ERROR') {
           reject.apply(null, callbackArgs);
         }
+        delete this._disconnectListeners[requestId];
       });
+      // Add reject to the disconnect listener
+      this._disconnectListeners[requestId] = reject;
       // Emit the message to the addon-code.
       this.emit.apply(this, requestArgs);
     });

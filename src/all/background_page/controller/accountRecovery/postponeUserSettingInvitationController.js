@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 
-import PostponedUserSettingInvitationService from '../../service/api/invitation/postponedUserSettingInvitationService';
+import PostponeUserSettingInvitationService from '../../service/invitation/postponeUserSettingInvitationService';
 
 class PostponeUserSettingInvitationController {
   /**
@@ -27,7 +27,7 @@ class PostponeUserSettingInvitationController {
 
   /**
    * Controller executor.
-   * @returns {Promise<bool>}
+   * @returns {Promise<void>}
    */
   async _exec() {
     try {
@@ -42,8 +42,8 @@ class PostponeUserSettingInvitationController {
   /**
    * Set the account recovery enrollement inviration as postponed.
    */
-  async exec() {
-    PostponedUserSettingInvitationService.postponeAccountRecovery();
+  exec() {
+    PostponeUserSettingInvitationService.postponeAccountRecovery();
   }
 }
 

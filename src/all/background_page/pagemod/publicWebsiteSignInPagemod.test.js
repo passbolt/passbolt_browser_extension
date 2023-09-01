@@ -20,9 +20,9 @@ import Pagemod from "./pagemod";
 import {PublicWebsiteSignInEvents} from "../event/publicWebsiteSignInEvents";
 import PublicWebsiteSignIn from "./publicWebsiteSignInPagemod";
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
+import {v4 as uuid} from 'uuid';
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
-jest.spyOn(GetLegacyAccountService, "get").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn());
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());
@@ -98,11 +98,14 @@ describe("PublicWebsiteSign", () => {
           }
         }
       };
+
+      const mockedAccount = {user_id: uuid()};
+      jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
       // process
       await PublicWebsiteSignIn.attachEvents(port);
       // expectations
       expect(GetLegacyAccountService.get).toHaveBeenCalled();
-      expect(PublicWebsiteSignInEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, undefined);
+      expect(PublicWebsiteSignInEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab}, null, mockedAccount);
     });
   });
 });

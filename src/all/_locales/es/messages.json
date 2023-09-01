@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "Passbolt - Gestor de contraseñas Open Source",
+    "description": "The application name of the extension, displayed in the web store. 45 characters max."
+  },
+  "appDescription": {
+    "message": "Extensión Passbolt para el gestor de contraseñas de código abierto para equipos.",
+    "description": "The description of the extension, displayed in the web store. 85 characters max."
+  }
+}

@@ -19,7 +19,6 @@ import {QuickAccessService} from "../../service/ui/quickAccess.service";
 import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import BrowserTabService from "../../service/ui/browserTab.service";
-import PasswordGeneratorModel from "../../model/passwordGenerator/passwordGeneratorModel";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
 import ResourceInProgressCacheService from "../../service/cache/resourceInProgressCache.service";
@@ -50,15 +49,10 @@ class InformMenuController {
       const webIntegrationWorker = await WorkerService.get('WebIntegration', this.worker.tab.id);
       const callToActionInput = await webIntegrationWorker.port.request('passbolt.web-integration.last-performed-call-to-action-input');
       const suggestedResources = await this.resourceModel.findSuggestedResources(this.worker.tab.url);
-      const passwordGeneratorModel = new PasswordGeneratorModel(this.apiClientOptions);
-      const passwordGenerator = await passwordGeneratorModel.getOrFindAll();
-      const generatorConfigurationMatch = generator => generator.type === passwordGenerator.default_generator;
-      const passwordGeneratorConfiguration = passwordGenerator.generators.find(generatorConfigurationMatch);
       const configuration = {
         inputType: callToActionInput.type,
         inputValue: callToActionInput.value,
         suggestedResources: suggestedResources,
-        secretGeneratorConfiguration: passwordGeneratorConfiguration
       };
       this.worker.port.emit(requestId, "SUCCESS", configuration);
     } catch (error) {

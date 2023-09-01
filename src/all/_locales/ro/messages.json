@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "Passbolt - Manager open source de parole",
+    "description": "The application name of the extension, displayed in the web store. 45 characters max."
+  },
+  "appDescription": {
+    "message": "Extensia web Passbolt pentru managerul open source de parole pentru echipe.",
+    "description": "The description of the extension, displayed in the web store. 85 characters max."
+  }
+}

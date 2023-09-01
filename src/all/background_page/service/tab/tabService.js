@@ -15,6 +15,7 @@ import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import hasUrlSameOrigin from "../../utils/url/hasSameOriginUrl";
 import PortManager from "../../sdk/port/portManager";
 import WebNavigationService from "../webNavigation/webNavigationService";
+import PromiseTimeoutService from "../../utils/promise/promiseTimeoutService";
 
 class TabService {
   /**
@@ -53,8 +54,8 @@ class TabService {
         // Check if the url has the same origin
         if (hasUrlSameOrigin(port._port.sender.url, tab.url)) {
           try {
-            // If the port is still connected do nothing
-            port.emit('passbolt.port.check');
+            // Check if port is connected
+            await PromiseTimeoutService.exec(port.request('passbolt.port.check'));
             return;
           } catch (error) {
             console.debug('The port is not connected, navigation detected');
@@ -68,9 +69,14 @@ class TabService {
   }
 }
 
+/**
+ * Mapping tab as a frame details to be compliant with webNavigation API
+ * @param tab
+ * @return {{tabId, frameId: number, url}}
+ */
 function mappingFrameDetailsFromTab(tab) {
   return  {
-    // Mapping the tab info as a frame details to be compliant with webNavigation
+    // Mapping the tab info as a frame details to be compliant with webNavigation API
     frameId: 0,
     tabId: tab.id,
     url: tab.url

@@ -3,8 +3,57 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-## [4.1.0] - 2023-06-21
+## [4.2.0] - 2023-08-21
+### Added
+- PB-24268 As a signed-in user I can reorder & show/hide columns of the resource workspace grid
+- PB-25189 As a signed-in user I can resize the columns of the resource workspace grid
+- PB-25283 As a signed-in administrator I can access the password policies
+- PB-25283 As a signed-in administrator I can see the password policies settings
+- PB-25283 As a signed-in administrator I can customise the password policies
+- PB-25283 As a signed-in user I generate passwords using the password policies of my organization
+- PB-25283 As a signed-in user I am warned about passwords which are part of a dictionary
 
+### Improved
+- PB-25251 As a sign-in user I want the passwords to be rendered with a monospace font
+- PB-25288 As a signed-in user I should see the number or resources or users filtered in the workspace from the breadcrumb
+
+### Fixed
+- PB-22555 As a German-speaking signed-in user I want to autofilll my password and name when the input identifiers are in German
+- PB-24612 As a user I should not see “remember until I log out” option in the quickaccess it the option is disabled from the servers
+- PB-25259 Fix dropdown profile style
+- PB-25260 As a user I should be redirect to the resource workspace when signing in right after a sign out
+- PB-25261 Fix box-shadow on more button for folders
+- PB-25320 In-form menu icon was moving when scrolling on page
+- PB-25504 As a user I want to use SSO with Firefox
+- PB-25807 As a signed in user I should see my profile metadata updated after editing my profile
+- PB-25816 As a signed-in user, the link in resource activity or user account recovery activity should be valid
+- PB-25822 Fix typos in User Directory settings interface
+
+### Maintenance
+- PB-25390 Upgrade outdated library word-wrap
+- PB-25391 Udgrade outdated library tough-cookie
+- PB-25704 Upgrade outdated library babel
+
+### Experimental
+- PB-25185 As LU user on the browser extension, I want to export my account to configure the windows application
+- PB-25253 Desktop bootstrapped applications should have CSP rules enforced prior to execute any javascript
+
+## [4.1.2] - 2023-07-26
+### Improvement
+- PB-25251 As a signed-in user previewing a password, I should be able to distinguish look alike characters
+
+### Fixed
+- PB-25502 Fix web navigation issue when a port already exists and port disconnection is not fired
+- PB-25339 Fix application refusing to load when detecting passbolt event activities
+- PB-25311 Fix as anonymous user with the browser extension not configured I should be redirected to passbolt getting started page when using the toolbar icon
+- PB-24933 Fix in-form menu detection not working when existing tab port disconnection occurs after webnavigation event
+
+### Maintenance
+- PB-25471 Crowdin should export only a selected subset of languages
+- PB-25272 Github actions updates for storybook
+- PB-25172 Remove former demo application, replaced by storybook
+
+## [4.1.0] - 2023-06-21
 ### Added
 - PB-24169 As an administrator I want to customise what capabilities users are allowed to access on the UI of my organisation
 - PB-24598 SSO allow administrators to remap email/username properties
@@ -1226,7 +1275,9 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.1.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.2.0...HEAD
+[4.2.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.1.2...v.4.2.0
+[4.1.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.1.0...v4.1.2
 [4.1.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.4...v4.1.0
 [4.0.4]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.3...v4.0.4
 [4.0.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.0.1...v4.0.3

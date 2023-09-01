@@ -13,6 +13,7 @@
  */
 import Pagemod from "./pagemod";
 import {InformMenuEvents} from "../event/informMenuEvents";
+import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 
 class InFormMenu extends Pagemod {
   /**
@@ -28,6 +29,25 @@ class InFormMenu extends Pagemod {
    */
   get events() {
     return [InformMenuEvents];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  async attachEvents(port) {
+    let account;
+    try {
+      account = await GetLegacyAccountService.get();
+    } catch (error) {
+      //Ensure the application does not crash completely if the legacy account cannot be retrieved
+      console.error('InformMenuPagemod::attach legacy account cannot be retrieved, please contact your administrator.');
+      console.error(error);
+    }
+
+    const worker = {port: port, tab: port._port.sender.tab, name: this.appName};
+    for (const event of this.events) {
+      event.listen(worker, null, account);
+    }
   }
 }
 

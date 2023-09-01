@@ -31,6 +31,12 @@ describe("Validate account recovery organization private key service", () => {
     return expect(promise).resolves.not.toThrow();
   });
 
+  it("should accept a viable decrypted key with an empty passphrase", () => {
+    expect.assertions(1);
+    const promise = getValidatePromise(dummyData.decryptedCorrectKeyPair);
+    return expect(promise).resolves.not.toThrow();
+  });
+
   it("should refuse an invalid key pair", () => {
     expect.assertions(1);
     const promise = getValidatePromise(dummyData.invalidKeyPair);

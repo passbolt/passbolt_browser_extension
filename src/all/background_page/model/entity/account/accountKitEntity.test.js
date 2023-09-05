@@ -94,7 +94,7 @@ describe("AccountKitEntity", () => {
       const resultDto = entity.toDto();
       const keys = Object.keys(resultDto);
 
-      expect(keys.length).toBe(8);
+      expect(keys.length).toBe(9);
       expect(keys).toEqual(expectedKeys);
     });
   });

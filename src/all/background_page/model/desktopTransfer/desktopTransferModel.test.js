@@ -28,18 +28,19 @@ describe("DesktopTransferModel", () => {
 
   describe("ExportDesktopAccountController::exec", () => {
     it("Should export account kit with user private key and security token.", async() => {
-      expect.assertions(10);
+      expect.assertions(11);
 
       const accountKit = (await model.getAccountKit(account)).toDto();
       const keys = Object.keys(accountKit);
 
-      expect(keys.length).toEqual(8);
+      expect(keys.length).toEqual(9);
       expect(keys).toEqual(expectedKeys);
       expect(accountKit.domain).toEqual(account.domain);
       expect(accountKit.first_name).toEqual(account.firstName);
       expect(accountKit.last_name).toEqual(account.lastName);
       expect(accountKit.server_public_armored_key).toEqual(account.serverPublicArmoredKey);
       expect(accountKit.user_id).toEqual(account.userId);
+      expect(accountKit.user_public_armored_key).toEqual(account.userPublicArmoredKey);
       expect(accountKit.user_private_armored_key).toEqual(account.userPrivateArmoredKey);
       expect(accountKit.username).toEqual(account.username);
       expect(accountKit.security_token).toEqual(account.securityToken.toDto());

@@ -120,7 +120,10 @@ class ReviewRequestController {
   async _buildApprovedResponse(request, organizationPolicy, organizationPrivateGpgkey, signedInUserPassphrase) {
     const organizationPrivateKey = await OpenpgpAssertion.readKeyOrFail(organizationPrivateGpgkey.armoredKey);
     const userPrivateKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPrivateArmoredKey);
-    const organizationPrivateKeyDecrypted = await DecryptPrivateKeyService.decrypt(organizationPrivateKey, organizationPrivateGpgkey.passphrase);
+    const organizationPrivateKeyDecrypted = organizationPrivateKey.isDecrypted()
+      ? organizationPrivateKey
+      : await DecryptPrivateKeyService.decrypt(organizationPrivateKey, organizationPrivateGpgkey.passphrase);
+
     const signedInUserDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, signedInUserPassphrase);
 
     const userPublicKey = await OpenpgpAssertion.readKeyOrFail(await this._findUserPublicKey(request.userId));

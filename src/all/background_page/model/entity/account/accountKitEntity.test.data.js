@@ -19,6 +19,7 @@ export const expectedKeys = [
   'first_name',
   'last_name',
   'user_private_armored_key',
+  'user_public_armored_key',
   'server_public_armored_key',
   "security_token",
 ];

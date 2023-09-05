@@ -27,6 +27,19 @@ exports.dummyData = {
       passphrase: "ada@passbolt.com"
     }
   },
+  decryptedCorrectKeyPair: {
+    publicKey: {
+      policy: "opt-in",
+      account_recovery_organization_public_key:
+        {
+          armored_key: pgpKeys.account_recovery_organization.public,
+        }
+    },
+    privateKey: {
+      armored_key: pgpKeys.account_recovery_organization.private_decrypted,
+      passphrase: ""
+    }
+  },
   invalidKeyPair: {
     publicKey: {
       policy: "opt-in",

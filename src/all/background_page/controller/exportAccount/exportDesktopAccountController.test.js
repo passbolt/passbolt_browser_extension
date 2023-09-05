@@ -19,6 +19,7 @@ import {PassphraseController} from "../../controller/passphrase/passphraseContro
 import FileService from "../../service/file/fileService";
 import GetLegacyAccountService from "../../service/account/getLegacyAccountService";
 import AccountKitEntity from "../../model/entity/account/accountKitEntity";
+import {Buffer} from 'buffer';
 
 describe("ExportDesktopAccountController", () => {
   const accountDto = new AccountEntity(defaultAccountDto());
@@ -54,8 +55,10 @@ describe("ExportDesktopAccountController", () => {
         security_token: true
       }));
 
+      const base64Content =  Buffer.from(JSON.stringify(accountToExport.toDto())).toString('base64');
+
       expect(controller.desktopTransferModel.getAccountKit).toHaveBeenCalled();
-      expect(FileService.saveFile).toHaveBeenCalledWith("account-kit.json", JSON.stringify(accountToExport.toDto()), "application/json", worker.tab.id);
+      expect(FileService.saveFile).toHaveBeenCalledWith("account-kit.passbolt", base64Content, "application/passbolt", worker.tab.id);
     });
   });
 

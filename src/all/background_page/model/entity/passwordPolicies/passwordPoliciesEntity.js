@@ -131,22 +131,6 @@ class PasswordPoliciesEntity extends Entity {
   }
 
   /**
-   * Returns the default generator of the current policies
-   * @returns {string}
-   */
-  get default_generator() {
-    return this._props.default_generator;
-  }
-
-  /**
-   * Returns the external dictionary check option of the current policies
-   * @returns {boolean}
-   */
-  get external_dictionary_check() {
-    return this._props.external_dictionary_check;
-  }
-
-  /**
    * Returns the specific configuration of the password generator of the current policies
    * @returns {string}
    */

@@ -1,0 +1,37 @@
+{
+  "manifest_version": 2,
+  "name": "Passbolt benchmark",
+  "short_name": "passbolt-benchmark",
+  "version": "4.2.0",
+  "description": "Passbolt benchmark",
+  "default_locale": "en",
+  "applications": {
+    "gecko": {
+      "id": "dev@passbolt.com"
+    }
+  },
+  "icons": {
+    "16": "webAccessibleResources/img/icons/icon-16.png",
+    "48": "webAccessibleResources/img/icons/icon-48.png",
+    "128": "webAccessibleResources/img/icons/icon-128.png"
+  },
+  "browser_action": {
+    "default_icon": "webAccessibleResources/img/icons/icon-32.png",
+    "theme_icons": [{
+      "light": "webAccessibleResources/img/icons/icon-32.png",
+      "dark": "webAccessibleResources/img/icons/icon-32.png",
+      "size": 32
+    }],
+    "default_title": "Passbolt benchmark"
+  },
+  "background": {
+    "page": "index.html"
+  },
+  "permissions": [
+
+  ],
+  "web_accessible_resources": [
+    "webAccessibleResources/*"
+  ],
+  "content_security_policy": "script-src 'self'; object-src 'none';"
+}

@@ -37,6 +37,7 @@ const Log = function() {};
  * @param log {object} The log to write.
  */
 Log.write = function(log) {
+  return;
   // If no logging is required, or the log level is lower than the log level message, leave.
   if (logSettings.level == 0 || logSettings.level < logLevelMapping[log.level]) {
     return;

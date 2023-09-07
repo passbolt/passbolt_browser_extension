@@ -140,6 +140,10 @@ const listen = function(worker, apiClientOptions, account) {
     const controller = new GetOrFindPasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
     await controller._exec(refreshCache);
   });
+
+  worker.port.on('passbolt.quickaccess.ping', (message) => {
+    console.log('------------------ ping', message);
+  });
 };
 
 export const QuickAccessEvents = {listen};

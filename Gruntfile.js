@@ -31,6 +31,8 @@ module.exports = function (grunt) {
     src_firefox: 'src/firefox/',
     src_content_scripts: 'src/all/contentScripts/',
     src_web_accessible_resources: 'src/all/webAccessibleResources/',
+    src_benchmark: 'src/benchmark/',
+    src_benchmark_background_page: 'src/benchmark/background_page/',
   };
   const firefoxWebExtBuildName = 'passbolt_-_open_source_password_manager';
 
@@ -77,6 +79,8 @@ module.exports = function (grunt) {
 
   grunt.registerTask('externalize-locale-strings', ['shell:externalize']);
 
+  grunt.registerTask('build-benchmark', ['clean:build', 'copy:styleguide', 'copy:manifest_benchmark', 'copy:benchmark_background_page', 'shell:build_benchmark_background_page', 'shell:build_web_accessible_resources_benchmark']);
+
   /**
    * Main grunt tasks configuration
     */
@@ -113,7 +117,13 @@ module.exports = function (grunt) {
       },
       background_page: {
         files: [
-          { expand: true, cwd: path.src_background_page, src: 'index.html', dest: path.build }
+          { expand: true, cwd: path.src_background_page, src: 'index.html', dest: path.build },
+        ]
+      },
+      benchmark_background_page: {
+        files: [
+          { expand: true, cwd: path.src_benchmark_background_page, src: 'index.html', dest: path.build },
+          { expand: true, cwd: path.src_benchmark + '_locales', src: ['**'], dest: path.build + '_locales' }
         ]
       },
       service_worker: {
@@ -151,6 +161,11 @@ module.exports = function (grunt) {
       manifest_safari: {
         files: [{
           expand: true, cwd: path.src_safari, src: 'manifest.json', dest: path.build
+        }]
+      },
+      manifest_benchmark: {
+        files: [{
+          expand: true, cwd: path.src_benchmark, src: 'manifest.json', dest: path.build
         }]
       },
       // Copy styleguide elements
@@ -304,6 +319,11 @@ module.exports = function (grunt) {
           'npm run dev:build:background-page'
         ].join(' && ')
       },
+      build_benchmark_background_page: {
+        command: [
+          'npm run dev:build:benchmark-background-page'
+        ].join(' && ')
+      },
       /**
        * Build service worker.
        */
@@ -366,6 +386,11 @@ module.exports = function (grunt) {
       build_web_accessible_resources_browser_integration: {
         command: [
           'npm run dev:build:web-accessible-resources:browser-integration'
+        ].join(' && ')
+      },
+      build_web_accessible_resources_benchmark: {
+        command: [
+          'npm run dev:build:web-accessible-resources:benchmark'
         ].join(' && ')
       },
       // Execute the externalization command

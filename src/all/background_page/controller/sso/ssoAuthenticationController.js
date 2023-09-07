@@ -85,7 +85,8 @@ class SsoAuthenticationController {
       const passphrase = await DecryptSsoPassphraseService.decrypt(clientPartSsoKit.secret, clientPartSsoKit.nek, serverKey, clientPartSsoKit.iv1, clientPartSsoKit.iv2);
       await this.popupHandler.closeHandler();
       await this.authModel.login(passphrase, true);
-      if (isInQuickAccessMode) {
+      if (!isInQuickAccessMode) {
+        console.log('XXXXXXXXXXX REOPEN the baby ' + isInQuickAccessMode);
         await this.ensureRedirectionInQuickaccessMode();
       }
     } catch (error) {
@@ -108,7 +109,7 @@ class SsoAuthenticationController {
   async ensureRedirectionInQuickaccessMode() {
     const queryParameters = [
       {name: "uiMode", value: "detached"},
-      {name: "feature", value: "login"}
+      // {name: "feature", value: "login"}
     ];
     await QuickAccessService.openInDetachedMode(queryParameters);
   }

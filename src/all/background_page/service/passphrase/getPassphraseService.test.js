@@ -96,7 +96,7 @@ describe("GetPassphraseService", () => {
   });
 
   describe("GetPassphraseService::requestPassphrase", () => {
-    it("should call `passbolt.pssphrase.request` to retrieve passphrase from a user input", async() => {
+    it("should call `passbolt.passphrase.request` to retrieve passphrase from a user input", async() => {
       expect.assertions(1);
       const worker = getTestWorker();
       const service = new GetPassphraseService(account);

@@ -25,6 +25,7 @@ class DownloadUserPrivateKeyController {
    * DownloadUserPrivateKeyController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
+   * @param {AccountEntity} account the account associated to the worker
    */
   constructor(worker, requestId, account) {
     this.worker = worker;

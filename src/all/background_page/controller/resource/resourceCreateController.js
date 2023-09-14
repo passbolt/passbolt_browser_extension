@@ -25,7 +25,6 @@ import i18n from "../../sdk/i18n";
 import ResourceSecretsCollection from "../../model/entity/secret/resource/resourceSecretsCollection";
 import ProgressService from "../../service/progress/progressService";
 
-
 class ResourceCreateController {
   /**
    * ResourceCreateController constructor

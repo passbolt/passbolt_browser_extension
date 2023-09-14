@@ -41,7 +41,6 @@ class UserRememberMeLatestChoiceLocalStorage {
 
   /**
    * Flush the rememberMe local storage
-   * @throws {Error} if operation failed
    * @return {Promise<void>}
    */
   async flush() {
@@ -50,7 +49,7 @@ class UserRememberMeLatestChoiceLocalStorage {
   }
 
   /**
-   * Set the UserRememberMeLatestChoice local storage.
+   * Get the UserRememberMeLatestChoice local storage.
    * @throws {Error} if operation failed
    * @return {Promise<UserRememberMeLatestChoiceEntity|null>} the rememberMe entity or null by default.
    */

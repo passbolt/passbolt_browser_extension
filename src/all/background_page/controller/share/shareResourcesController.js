@@ -21,7 +21,7 @@ import ProgressService from "../../service/progress/progressService";
 
 class ShareResourcesController {
   /**
-   * MoveController constructor
+   * ShareResourcesController constructor
    *
    * @param {Worker} worker
    * @param {string} requestId

@@ -28,7 +28,7 @@ describe("InFormMenu", () => {
 
   describe("InformMenu::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(5);
+      expect.assertions(4);
       // data mocked
       const port = {
         _port: {

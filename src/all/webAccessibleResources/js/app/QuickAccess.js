@@ -24,7 +24,15 @@ async function main() {
   await port.connect();
   const storage = browser.storage;
   const domContainer = document.querySelector('#quickaccess-container');
-  ReactDOM.render(React.createElement(ExtQuickAccess, {port: port, storage: storage}), domContainer);
+  // Extract parameters from the url.
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const bootstrapFeature = urlSearchParams.get("feature");
+  const bootstrapRequestId = urlSearchParams.get("requestId");
+  const openerTabId = urlSearchParams.get('tabId');
+  const detached = urlSearchParams.get('uiMode') === "detached";
+
+  const extQuickaccessProps = {port, storage, bootstrapFeature, bootstrapRequestId, openerTabId, detached};
+  ReactDOM.render(React.createElement(ExtQuickAccess, extQuickaccessProps), domContainer);
 }
 
 main();

@@ -35,18 +35,21 @@ class InFormMenu extends Pagemod {
    * @inheritDoc
    */
   async attachEvents(port) {
-    let account;
     try {
-      account = await GetLegacyAccountService.get();
+      const tab = port._port.sender.tab;
+      const account = await GetLegacyAccountService.get();
+      const name = this.appName;
+      for (const event of this.events) {
+        event.listen({port, tab, name}, null, account);
+      }
     } catch (error) {
-      //Ensure the application does not crash completely if the legacy account cannot be retrieved
-      console.error('InformMenuPagemod::attach legacy account cannot be retrieved, please contact your administrator.');
+      /*
+       * Ensure the application does not crash completely if the legacy account cannot be retrieved.
+       * The following controllers won't work as expected:
+       * - RequestHelpCredentialsLostController
+       */
+      console.error('InFormMenu::attach legacy account cannot be retrieved, please contact your administrator.');
       console.error(error);
-    }
-
-    const worker = {port: port, tab: port._port.sender.tab, name: this.appName};
-    for (const event of this.events) {
-      event.listen(worker, null, account);
     }
   }
 }

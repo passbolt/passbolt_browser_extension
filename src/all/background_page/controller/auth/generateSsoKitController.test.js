@@ -23,13 +23,11 @@ import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
 import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";
 import SsoKitServerPartEntity from "../../model/entity/sso/ssoKitServerPartEntity";
-import {PassphraseController} from "../passphrase/passphraseController";
 import GenerateSsoKitController from "./generateSsoKitController";
 import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
 import SsoSettingsEntity from "../../model/entity/sso/ssoSettingsEntity";
 
-jest.mock("../passphrase/passphraseController.js");
-PassphraseController.get.mockResolvedValue(pgpKeys.ada.passphrase);
+jest.mock("../../service/passphrase/getPassphraseService");
 
 beforeEach(() => {
   enableFetchMocks();
@@ -71,9 +69,11 @@ describe("GenerateSsoKitController", () => {
       });
 
       const controller = new GenerateSsoKitController(null, null, defaultApiClientOptions());
+      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
+
       await controller.exec(expectedProvider);
 
-      expect(PassphraseController.get).toHaveBeenCalledTimes(1);
+      expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledTimes(1);
       expect(SsoDataStorage.save).toHaveBeenCalledWith(exepctedClientPartKitWithId);
     });
 
@@ -85,6 +85,8 @@ describe("GenerateSsoKitController", () => {
       SsoDataStorage.setMockedData(storedSsoKit.toDbSerializableObject());
 
       const controller = new GenerateSsoKitController(null, null, defaultApiClientOptions());
+      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
+
       await controller.exec(expectedProvider);
 
       expect(SsoDataStorage.updateLocalKitProviderWith).toHaveBeenCalledWith(expectedProvider);

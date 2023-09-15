@@ -20,6 +20,7 @@ import {ConfigEvents} from "../event/configEvents";
 import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {LocaleEvents} from "../event/localeEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import {RememberMeEvents} from "../event/rememberMeEvents";
 
 class Auth extends Pagemod {
   /**
@@ -41,6 +42,7 @@ class Auth extends Pagemod {
       AuthEvents,
       OrganizationSettingsEvents,
       LocaleEvents,
+      RememberMeEvents
     ];
   }
 

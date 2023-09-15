@@ -14,7 +14,7 @@
 
 import DesktopTransferModel from "../../model/desktopTransfer/desktopTransferModel";
 import FileService from "../../service/file/fileService";
-import {PassphraseController} from "../../controller/passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import {Buffer} from 'buffer';
 
 const PUBLIC_FILENAME = "account-kit.passbolt";
@@ -32,6 +32,7 @@ class ExportDesktopAccountController {
     this.requestId = requestId;
     this.desktopTransferModel = new DesktopTransferModel();
     this.account = account;
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -54,7 +55,7 @@ class ExportDesktopAccountController {
    * @return {Promise<string>}
    */
   async exec() {
-    await PassphraseController.get(this.worker);
+    await this.getPassphraseService.getPassphrase(this.worker);
     const accountKit = await this.desktopTransferModel.getAccountKit(this.account);
     const accountKitStringify = JSON.stringify(accountKit.toDto());
     const fileContent = Buffer.from(accountKitStringify).toString('base64');

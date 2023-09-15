@@ -13,7 +13,7 @@
  */
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import ResourceModel from "../../model/resource/resourceModel";
-import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import i18n from "../../sdk/i18n";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
@@ -26,13 +26,15 @@ class SecretDecryptController {
    *
    * @param {Worker} worker
    * @param {string} requestId
-   * @param {ApiClientOptions} apiClientOptions
+   * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account The account associated to the worker.
    */
-  constructor(worker, requestId, apiClientOptions) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.resourceModel = new ResourceModel(apiClientOptions);
     this.progressService = new ProgressService(this.worker, i18n.t('Decrypting ...'));
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -45,7 +47,7 @@ class SecretDecryptController {
     const resourcePromise = this.resourceModel.findForDecrypt(resourceId);
 
     // Capture the passphrase if needed
-    const passphrase = await passphraseController.get(this.worker);
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
 
     try {
       // Decrypt the private key

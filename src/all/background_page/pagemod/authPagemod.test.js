@@ -23,6 +23,7 @@ import {v4 as uuid} from 'uuid';
 import {enableFetchMocks} from "jest-fetch-mock";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import {mockApiResponse} from "../../../../test/mocks/mockApiResponse";
+import {RememberMeEvents} from "../event/rememberMeEvents";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(UserEvents, "listen").mockImplementation(jest.fn());
@@ -30,6 +31,7 @@ jest.spyOn(KeyringEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AuthEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(LocaleEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 
 describe("Auth", () => {
   beforeEach(async() => {
@@ -40,7 +42,7 @@ describe("Auth", () => {
 
   describe("Auth::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(10);
+      expect.assertions(11);
       // data mocked
       const port = {
         _port: {
@@ -59,14 +61,15 @@ describe("Auth", () => {
       await Auth.attachEvents(port);
       // expectations
       const expectedPortAndTab = {port: port, tab: port._port.sender.tab};
-      expect(GetLegacyAccountService.get).toHaveBeenCalled();
+      expect(GetLegacyAccountService.get).toHaveBeenCalledTimes(1);
       expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(UserEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(KeyringEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AuthEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(LocaleEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
-      expect(Auth.events).toStrictEqual([ConfigEvents, UserEvents, KeyringEvents, AuthEvents, OrganizationSettingsEvents, LocaleEvents]);
+      expect(RememberMeEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(Auth.events).toStrictEqual([ConfigEvents, UserEvents, KeyringEvents, AuthEvents, OrganizationSettingsEvents, LocaleEvents, RememberMeEvents]);
       expect(Auth.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(Auth.appName).toBe('Auth');
     });

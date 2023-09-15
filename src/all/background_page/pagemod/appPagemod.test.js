@@ -45,6 +45,7 @@ import {v4 as uuid} from "uuid";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import {mockApiResponse} from "../../../../test/mocks/mockApiResponse";
 import {enableFetchMocks} from "jest-fetch-mock";
+import {RememberMeEvents} from "../event/rememberMeEvents";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppEvents, "listen").mockImplementation(jest.fn());
@@ -73,7 +74,7 @@ jest.spyOn(MobileEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(MfaEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ClipboardEvents, "listen").mockImplementation(jest.fn());
-
+jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 
 describe("Auth", () => {
   beforeEach(async() => {
@@ -84,7 +85,7 @@ describe("Auth", () => {
 
   describe("Auth::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(31);
+      expect.assertions(32);
       // data mocked
       const port = {
         _port: {
@@ -95,6 +96,8 @@ describe("Auth", () => {
           }
         }
       };
+      jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
+
       // mock functions
       fetch.doMockIf(/csrf-token/, async() => mockApiResponse("csrf-token"));
       jest.spyOn(GpgAuth.prototype, "isAuthenticated").mockImplementation(() => new Promise(resolve => resolve(true)));
@@ -106,7 +109,7 @@ describe("Auth", () => {
       await App.attachEvents(port);
       // expectations
       const expectedPortAndTab = {port: port, tab: port._port.sender.tab};
-      expect(GetLegacyAccountService.get).toHaveBeenCalled();
+      expect(GetLegacyAccountService.get).toHaveBeenCalledWith({role: true});
       expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AppEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AuthEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
@@ -134,6 +137,7 @@ describe("Auth", () => {
       expect(PownedPasswordEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(MfaEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(ClipboardEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(RememberMeEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(App.events).toStrictEqual([
         ConfigEvents,
         AppEvents,
@@ -162,6 +166,7 @@ describe("Auth", () => {
         PownedPasswordEvents,
         MfaEvents,
         ClipboardEvents,
+        RememberMeEvents
       ]);
       expect(App.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(App.appName).toBe('App');

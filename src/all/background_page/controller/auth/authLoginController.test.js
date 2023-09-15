@@ -60,6 +60,7 @@ describe("AuthLoginController", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+
       const scenarios = [{
         passphrase: passphrase,
         rememberMe: true

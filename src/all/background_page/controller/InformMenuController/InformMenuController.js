@@ -16,7 +16,7 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import ResourceModel from "../../model/resource/resourceModel";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
-import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import BrowserTabService from "../../service/ui/browserTab.service";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
@@ -31,12 +31,14 @@ class InformMenuController {
   /**
    * InformMenuController constructor
    * @param {Worker} worker
-   * @param {ApiClientOptions} clientOptions
+   * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account the account associated to the worker
    */
-  constructor(worker, apiClientOptions) {
+  constructor(worker, apiClientOptions, account) {
     this.worker = worker;
     this.resourceModel = new ResourceModel(apiClientOptions);
     this.apiClientOptions = apiClientOptions;
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -119,7 +121,7 @@ class InformMenuController {
     const webIntegrationWorker = await WorkerService.get('WebIntegration', this.worker.tab.id);
     try {
       // Get the resource, decrypt the resources password and requests to fill the credentials
-      const passphrase = await passphraseController.requestFromQuickAccess();
+      const passphrase = await this.getPassphraseService.requestPassphraseFromQuickAccess();
       const resource = await this.resourceModel.findForDecrypt(resourceId);
       const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
       const resourceSecretMessage = await OpenpgpAssertion.readMessageOrFail(resource.secret.data);

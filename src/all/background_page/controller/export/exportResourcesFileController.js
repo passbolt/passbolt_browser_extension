@@ -11,8 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import User from "../../model/user";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import ResourceModel from "../../model/resource/resourceModel";
@@ -26,6 +24,7 @@ import ExternalResourcesCollection from "../../model/entity/resource/external/ex
 import ExportResourcesFileEntity from "../../model/entity/export/exportResourcesFileEntity";
 import i18n from "../../sdk/i18n";
 import FileService from "../../service/file/fileService";
+import DecryptAndParseResourceSecretService from "../../service/secret/decryptAndParseResourceSecretService";
 
 const INITIAL_PROGRESS_GOAL = 100;
 class ExportResourcesFileController {
@@ -108,27 +107,14 @@ class ExportResourcesFileController {
    */
   async decryptSecrets(exportEntity, userId, privateKey) {
     let i = 0;
-    const resourcesTypesCollection = await this.resourceTypeModel.getOrFindAll();
     for (const exportResourceEntity of exportEntity.exportResources.items) {
       i++;
       await this.progressService.finishStep(i18n.t('Decrypting {{counter}}/{{total}}', {counter: i, total: exportEntity.exportResources.items.length}));
-      const secretMessage = await OpenpgpAssertion.readMessageOrFail(exportResourceEntity.secrets.items[0].data);
-      let secretClear = await DecryptMessageService.decrypt(secretMessage, privateKey);
 
-      // @deprecated Prior to v3, resources have no resource type. Remove this condition with v4.
-      if (!exportResourceEntity.resourceTypeId) {
-        exportResourceEntity.secretClear = secretClear;
-        continue;
-      }
-
-      const resourceType = resourcesTypesCollection.getFirst('id', exportResourceEntity.resourceTypeId);
-      if (resourceType && resourceType.slug === 'password-and-description') {
-        secretClear = await this.resourceModel.deserializePlaintext(exportResourceEntity.resourceTypeId, secretClear);
-        exportResourceEntity.description = secretClear.description;
-        exportResourceEntity.secretClear = secretClear.password;
-      } else {
-        exportResourceEntity.secretClear = secretClear;
-      }
+      const secretSchema = await this.resourceTypeModel.getSecretSchemaById(exportResourceEntity.resourceTypeId);
+      const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(exportResourceEntity.secrets.items[0], secretSchema, privateKey);
+      exportResourceEntity.secretClear = plaintextSecret.password;
+      exportResourceEntity.description = plaintextSecret?.description || exportResourceEntity.description;
     }
   }
 

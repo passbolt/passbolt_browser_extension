@@ -10,9 +10,12 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import {getResourceTypeCollection} from './abstractCsvRowParser.test.data.js';
 import CsvSafariRowParser from "./csvSafariRowParser";
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
+import ResourceTypesCollection from "../../../entity/resourceType/resourceTypesCollection";
+import {
+  resourceTypesCollectionDto
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 
 describe("CsvSafariRowParser", () => {
   it("can parse Safari csv", () => {
@@ -54,7 +57,7 @@ describe("CsvSafariRowParser", () => {
       "Password": "Secret 1",
       "Notes": "Description 1",
     };
-    const resourceTypeCollection = getResourceTypeCollection();
+    const resourceTypeCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     jest.spyOn(resourceTypeCollection, "getFirst");
     const externalResourceEntity = CsvSafariRowParser.parse(data, resourceTypeCollection);
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);

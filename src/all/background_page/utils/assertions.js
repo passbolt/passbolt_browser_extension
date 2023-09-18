@@ -147,3 +147,16 @@ export const assertString = (str, errorMessage = "The given parameter is not a v
     throw new Error(errorMessage);
   }
 };
+
+/**
+ * Assert that the given parameter is a valid boolean.
+ * Note: The value has to be defined to be assessed, undefined is considered valid.
+ * @param {*} value the parameter to validate
+ * @param {string} [errorMessage] the message to throw within the error if any
+ * @throws {TypeError} if the parameter is not valid
+ */
+export const assertBoolean = (value, errorMessage = "The given parameter is not a valid boolean") => {
+  if (typeof value !== 'undefined' && typeof value !== 'boolean') {
+    throw new TypeError(errorMessage);
+  }
+};

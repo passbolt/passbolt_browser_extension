@@ -9,16 +9,26 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         4.3.0
  */
 
-import ResourceTypesCollection from "../../../entity/resourceType/resourceTypesCollection";
-import {v4 as uuidv4} from "uuid";
+/**
+ * Resource with string password DTO.
+ * @param {object} data The data to override
+ * @returns {object}
+ */
+export const resourceWithStringPasswordDto = (data = {}) => ({
+  "password": "secret-password",
+  ...data
+});
 
-export function getResourceTypeCollection() {
-  const resourceTypeDto = {
-    id: uuidv4(),
-    name: "Password with description",
-    slug: "password-and-description"
-  };
-  return new ResourceTypesCollection([resourceTypeDto]);
-}
+/**
+ * Resource with encrypted description DTO.
+ * @param {object} data The data to override
+ * @returns {object}
+ */
+export const resourceWithEncryptedDescriptionDto = (data = {}) => ({
+  "password": "secret-password",
+  "description": "secret-description",
+  ...data
+});

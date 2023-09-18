@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.10.0
  */
+import each from "jest-each";
 import "../../../../test/mocks/mockCryptoKey";
 import {
   assertUuid,
@@ -19,7 +20,7 @@ import {
   assertNonExtractableSsoKey,
   assertExtractableSsoKey,
   assertValidInitialisationVector,
-  assertSsoProvider,
+  assertSsoProvider, assertBoolean,
 } from "./assertions";
 import {v4 as uuid} from 'uuid';
 import GenerateSsoIvService from "../service/crypto/generateSsoIvService";
@@ -205,6 +206,31 @@ describe("Assertions", () => {
       for (let i = 0; i < scenarios.length; i++) {
         expect(() => assertSsoProvider(scenarios[i])).toThrow();
       }
+    });
+  });
+
+  describe("Assertions::assertBoolean", () => {
+    each([
+      {scenario: "True", value: true},
+      {scenario: "False", value: false},
+      {scenario: "0", value: undefined},
+    ]).describe(`Should not throw an error if the parameter is valid`, props => {
+      it(`Scenario: ${props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => assertBoolean(props.value)).not.toThrow();
+      });
+    });
+
+    each([
+      {scenario: "1", value: 1},
+      {scenario: "0", value: 0},
+      {scenario: "null", value: null},
+      {scenario: "true", value: "true"}
+    ]).describe(`Should throw an error if the parameter is not valid`, props => {
+      it(`Scenario: ${props.scenario}`, () => {
+        expect.assertions(1);
+        expect(() => assertBoolean(props.value)).toThrow();
+      });
     });
   });
 });

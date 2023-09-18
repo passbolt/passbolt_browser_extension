@@ -16,19 +16,10 @@ const listen = function(worker, _, account) {
    * @listens passbolt.secret.decrypt
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.secret.decrypt', async(requestId, resourceId, options) => {
-    try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
-      let showProgress = true;
-      if (options && Object.prototype.hasOwnProperty.call(options, 'showProgress')) {
-        showProgress = options.showProgress;
-      }
-      const controller = new SecretDecryptController(worker, requestId, apiClientOptions, account);
-      const {plaintext} = await controller.main(resourceId, showProgress);
-      worker.port.emit(requestId, 'SUCCESS', plaintext);
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+  worker.port.on('passbolt.secret.decrypt', async(requestId, resourceId) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new SecretDecryptController(worker, requestId, apiClientOptions, account);
+    await controller._exec(resourceId);
   });
 
   /*

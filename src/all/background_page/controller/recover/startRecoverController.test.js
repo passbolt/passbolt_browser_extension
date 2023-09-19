@@ -24,6 +24,8 @@ import {initialAccountRecoverDto} from "../../model/entity/account/accountRecove
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import WorkerService from "../../service/worker/workerService";
+import UserPassphrasePoliciesEntity from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity";
+import {defaultUserPassphrasePoliciesEntityDto} from "passbolt-styleguide/src/shared/models/userPassphrasePolicies/UserPassphrasePoliciesDto.test.data";
 
 jest.mock("../../service/worker/workerService");
 
@@ -54,6 +56,33 @@ describe("StartRecoverController", () => {
       expect(account.firstName).toEqual(mockRecoverStartDto.user.profile.first_name);
       expect(account.lastName).toEqual(mockRecoverStartDto.user.profile.last_name);
       expect(account.user.toDto(UserEntity.ALL_CONTAIN_OPTIONS)).toEqual(mockRecoverStartDto.user);
+    }, 10 * 1000);
+
+    it("Should initiate the recover process and retrieve the recover material with all configuration", async() => {
+      expect.assertions(6);
+      const userPassphrasePoliciesDto = defaultUserPassphrasePoliciesEntityDto();
+      const account = new AccountRecoverEntity(initialAccountRecoverDto());
+      const runtimeMemory = {};
+      const controller = new StartRecoverController(null, null, defaultApiClientOptions(), account, runtimeMemory);
+
+      // Mock API fetch organization settings
+      const mockVerifyDto = defaultVerifyDto();
+      fetch.doMockOnce(() => mockApiResponse(mockVerifyDto));
+      // Mock API fetch recover start.
+      const mockRecoverStartDto = {
+        user: defaultUserDto(),
+        user_passphrase_policy: userPassphrasePoliciesDto
+      };
+      fetch.doMockOnce(() => mockApiResponse(mockRecoverStartDto));
+
+      await controller.exec();
+      const key = await OpenpgpAssertion.readKeyOrFail(mockVerifyDto.keydata);
+      expect(account.serverPublicArmoredKey).toEqual((await GetGpgKeyInfoService.getKeyInfo(key)).armoredKey);
+      expect(account.username).toEqual(mockRecoverStartDto.user.username);
+      expect(account.firstName).toEqual(mockRecoverStartDto.user.profile.first_name);
+      expect(account.lastName).toEqual(mockRecoverStartDto.user.profile.last_name);
+      expect(account.user.toDto(UserEntity.ALL_CONTAIN_OPTIONS)).toEqual(mockRecoverStartDto.user);
+      expect(runtimeMemory.userPassphrasePolicies).toStrictEqual(new UserPassphrasePoliciesEntity(userPassphrasePoliciesDto));
     }, 10 * 1000);
 
     it("Should not initiate the recover if the API does not provide a valid server public key", async() => {
@@ -102,32 +131,6 @@ describe("StartRecoverController", () => {
       expect.assertions(2);
       const promise = controller.exec();
       await expect(promise).rejects.toThrowError("Could not validate property username.");
-      expect(mockedBootstrapRecoverWorkerPortEmit).toHaveBeenCalledWith("passbolt.recover-bootstrap.remove-iframe");
-    });
-
-    it("Should not initiate the recover if the API does not provide a valid account recovery organization policy (not mandatory)", async() => {
-      const mockedWorker = {tab: {id: "tabID"}};
-      const account = new AccountRecoverEntity(initialAccountRecoverDto());
-      const runtimeMemory = {};
-      const controller = new StartRecoverController(mockedWorker, null, defaultApiClientOptions(), account, runtimeMemory);
-
-      // Mock API fetch organization settings
-      const mockVerifyDto = defaultVerifyDto();
-      fetch.doMockOnce(() => mockApiResponse(mockVerifyDto));
-      // Mock API fetch recover start.
-      const mockRecoverStartDto = {user: defaultUserDto(), account_recovery_organization_policy: {status: "not-valid-status"}};
-      fetch.doMockOnce(() => mockApiResponse(mockRecoverStartDto));
-      // Mock Worker to assert error handler.
-      const mockedBootstrapRecoverWorkerPortEmit = jest.fn();
-      WorkerService.get = jest.fn(() => ({
-        port: {
-          emit: mockedBootstrapRecoverWorkerPortEmit
-        }
-      }));
-
-      expect.assertions(2);
-      const promise = controller.exec();
-      await expect(promise).rejects.toThrowError("Could not validate entity AccountRecoveryOrganizationPolicy.");
       expect(mockedBootstrapRecoverWorkerPortEmit).toHaveBeenCalledWith("passbolt.recover-bootstrap.remove-iframe");
     });
   });

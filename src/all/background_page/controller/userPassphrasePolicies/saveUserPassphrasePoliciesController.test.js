@@ -17,7 +17,7 @@ import AccountEntity from "../../model/entity/account/accountEntity";
 import BuildApiClientOptionsService from "../../service/account/buildApiClientOptionsService";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import UserPassphrasePoliciesEntity from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity";
-import {defaultUserPassphrasePoliciesDto, userPassphrasePoliciesDtoFromApi} from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity.test.data";
+import {defaultUserPassphrasePoliciesEntityDto, userPassphrasePoliciesEntityDtoFromApi} from "passbolt-styleguide/src/shared/models/userPassphrasePolicies/UserPassphrasePoliciesDto.test.data";
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
 import PassboltApiFetchError from "../../error/passboltApiFetchError";
 import PassboltServiceUnavailableError from "../../error/passboltServiceUnavailableError";
@@ -37,11 +37,11 @@ describe("SaveUserPassphrasePoliciesController", () => {
   it("Should save the given dto on the API", async() => {
     expect.assertions(2);
 
-    const dtoToSave = defaultUserPassphrasePoliciesDto({
+    const dtoToSave = defaultUserPassphrasePoliciesEntityDto({
       entropy_minimum: 112,
       external_dictionary_check: false
     });
-    const expectedDto = userPassphrasePoliciesDtoFromApi(dtoToSave);
+    const expectedDto = userPassphrasePoliciesEntityDtoFromApi(dtoToSave);
     const expectedEntity = new UserPassphrasePoliciesEntity(expectedDto);
 
     fetch.doMockOnceIf(/user-passphrase-policies\/settings\.json/, async request => {
@@ -60,7 +60,7 @@ describe("SaveUserPassphrasePoliciesController", () => {
 
     fetch.doMockOnceIf(/user-passphrase-policies\/settings\.json/, () => mockApiResponseError(500, "Something went wrong"));
 
-    const dto = defaultUserPassphrasePoliciesDto();
+    const dto = defaultUserPassphrasePoliciesEntityDto();
     const controller = new SaveUserPassphrasePoliciesController(null, null, apiClientOptions);
     expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltApiFetchError);
   });
@@ -69,7 +69,7 @@ describe("SaveUserPassphrasePoliciesController", () => {
     expect.assertions(1);
     fetch.doMockOnceIf(/user-passphrase-policies\/settings\.json/, () => { throw new Error("Something went wrong"); });
 
-    const dto = defaultUserPassphrasePoliciesDto();
+    const dto = defaultUserPassphrasePoliciesEntityDto();
     const controller = new SaveUserPassphrasePoliciesController(null, null, apiClientOptions);
     expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltServiceUnavailableError);
   });

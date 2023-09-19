@@ -17,7 +17,7 @@ import AccountEntity from "../../model/entity/account/accountEntity";
 import BuildApiClientOptionsService from "../../service/account/buildApiClientOptionsService";
 import UserPassphrasePoliciesEntity from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultUserPassphrasePoliciesDto} from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity.test.data";
+import {defaultUserPassphrasePoliciesEntityDto} from "passbolt-styleguide/src/shared/models/userPassphrasePolicies/UserPassphrasePoliciesDto.test.data";
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
 import FindUserPassphrasePoliciesController from "./findUserPassphrasePoliciesController";
 
@@ -35,7 +35,7 @@ describe("FindUserPassphrasePoliciesController", () => {
   it("Should return the value from the API", async() => {
     expect.assertions(1);
 
-    const expectedDto = defaultUserPassphrasePoliciesDto({
+    const expectedDto = defaultUserPassphrasePoliciesEntityDto({
       entropy_minimum: 112
     });
     const expectedEntity = new UserPassphrasePoliciesEntity(expectedDto);

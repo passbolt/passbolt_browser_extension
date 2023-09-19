@@ -20,12 +20,17 @@ import {
   assertNonExtractableSsoKey,
   assertExtractableSsoKey,
   assertValidInitialisationVector,
-  assertSsoProvider, assertBoolean,
+  assertSsoProvider,
+  assertBoolean,
+  assertType,
 } from "./assertions";
 import {v4 as uuid} from 'uuid';
 import GenerateSsoIvService from "../service/crypto/generateSsoIvService";
 import {buildMockedCryptoKey} from "./assertions.test.data";
 import SsoSettingsEntity from "../model/entity/sso/ssoSettingsEntity";
+import PasswordGeneratorSettingsEntity from "../model/entity/passwordPolicies/passwordGeneratorSettingsEntity";
+import {defaultAccountRecoveryPrivateKeyPasswordDto} from "../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity.test.data";
+import AccountRecoveryPrivateKeyEntity from "../model/entity/accountRecovery/accountRecoveryPrivateKeyEntity";
 
 describe("Assertions", () => {
   describe("Assertions::assertUuid", () => {
@@ -231,6 +236,32 @@ describe("Assertions", () => {
         expect.assertions(1);
         expect(() => assertBoolean(props.value)).toThrow();
       });
+    });
+  });
+
+  describe("Assertions::assertType", () => {
+    it("Should not throw an error if the parameter is of the expected type", () => {
+      expect.assertions(1);
+      const entity = new AccountRecoveryPrivateKeyEntity(defaultAccountRecoveryPrivateKeyPasswordDto());
+      expect(() => assertType(entity, AccountRecoveryPrivateKeyEntity)).not.toThrow();
+    });
+
+    it("Should throw an error if the parameter is not valid", () => {
+      const scenarios = [
+        {},
+        false,
+        12,
+        "",
+        PasswordGeneratorSettingsEntity.createFromDefault()
+      ];
+      expect.assertions(scenarios.length);
+
+      const expectedMessage = "The given data is not a valid User Passphrase Policies entity";
+      const expectedError = new TypeError(expectedMessage);
+      for (let i = 0; i < scenarios.length; i++) {
+        const data = scenarios[i];
+        expect(() => assertType(data, AccountRecoveryPrivateKeyEntity, expectedMessage)).toThrow(expectedError);
+      }
     });
   });
 });

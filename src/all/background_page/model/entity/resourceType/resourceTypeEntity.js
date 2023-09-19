@@ -19,6 +19,11 @@ const RESOURCE_TYPE_NAME_MAX_LENGTH = 255;
 const RESOURCE_TYPE_SLUG_MAX_LENGTH = 64;
 const RESOURCE_TYPE_DESCRIPTION_MAX_LENGTH = 255;
 
+export const RESOURCE_TYPE_PASSWORD_STRING_SLUG = "password-string";
+export const RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG = "password-and-description";
+export const RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG = "password-description-totp";
+export const RESOURCE_TYPE_TOTP_SLUG = "totp";
+
 class ResourceTypeEntity extends Entity {
   /**
    * ResourceType entity constructor

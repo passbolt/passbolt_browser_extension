@@ -19,8 +19,8 @@ import EncryptMessageService from "../crypto/encryptMessageService";
 import PlaintextEntity from "../../model/entity/plaintext/plaintextEntity";
 import SecretEntity from "../../model/entity/secret/secretEntity";
 import {
-  resourceWithEncryptedDescriptionResourceTypeDto,
-  resourceWithStringPasswordResourceTypeDto
+  resourceTypePasswordAndDescriptionDto,
+  resourceTypePasswordStringDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 
 describe('DecryptAndParseResourceSecretService', () => {
@@ -33,7 +33,7 @@ describe('DecryptAndParseResourceSecretService', () => {
       const plaintextSecretMessage = JSON.stringify(plaintextSecretDto);
       const encryptedSecretMessage = await EncryptMessageService.encrypt(plaintextSecretMessage, publicKey);
       const secret = new SecretEntity({data: encryptedSecretMessage});
-      const secretSchema = resourceWithEncryptedDescriptionResourceTypeDto().definition.secret;
+      const secretSchema = resourceTypePasswordAndDescriptionDto().definition.secret;
       const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(secret, secretSchema, privateKey);
       expect(plaintextSecret).toBeInstanceOf(PlaintextEntity);
       expect(plaintextSecret.toDto()).toEqual(plaintextSecretDto);
@@ -46,7 +46,7 @@ describe('DecryptAndParseResourceSecretService', () => {
         + " invalid-secret-message\n"
         + "-----END PGP MESSAGE-----";
       const secret = new SecretEntity({data});
-      const secretSchema = resourceWithEncryptedDescriptionResourceTypeDto().definition.secret;
+      const secretSchema = resourceTypePasswordAndDescriptionDto().definition.secret;
       const resultPromise = DecryptAndParseResourceSecretService.decryptAndParse(secret, secretSchema, privateKey);
       await expect(resultPromise).rejects.toThrow('The message should be a valid openpgp message.');
     });
@@ -56,7 +56,7 @@ describe('DecryptAndParseResourceSecretService', () => {
     it('should parse a resource without encrypted description plaintext secret.', async() => {
       expect.assertions(2);
       const secretMessage = "password";
-      const secretSchema = resourceWithStringPasswordResourceTypeDto().definition.secret;
+      const secretSchema = resourceTypePasswordStringDto().definition.secret;
       const plaintextSecret = await DecryptAndParseResourceSecretService.parse(secretMessage, secretSchema);
       expect(plaintextSecret).toBeInstanceOf(PlaintextEntity);
       expect(plaintextSecret.password).toEqual(secretMessage);
@@ -65,7 +65,7 @@ describe('DecryptAndParseResourceSecretService', () => {
     it('should parse a resource with encrypted description plaintext secret.', async() => {
       expect.assertions(3);
       const secretMessage = '{"password":"password-test","description":"description-test"}';
-      const secretSchema = resourceWithEncryptedDescriptionResourceTypeDto().definition.secret;
+      const secretSchema = resourceTypePasswordAndDescriptionDto().definition.secret;
       const plaintextSecret = await DecryptAndParseResourceSecretService.parse(secretMessage, secretSchema);
       expect(plaintextSecret).toBeInstanceOf(PlaintextEntity);
       expect(plaintextSecret.password).toEqual("password-test");
@@ -75,7 +75,7 @@ describe('DecryptAndParseResourceSecretService', () => {
     it('should not parse a resource with encrypted description plaintext secret with an invalid json secret.', async() => {
       expect.assertions(1);
       const secretMessage = 'invalid-json';
-      const secretSchema = resourceWithEncryptedDescriptionResourceTypeDto().definition.secret;
+      const secretSchema = resourceTypePasswordAndDescriptionDto().definition.secret;
       const resultPromise = DecryptAndParseResourceSecretService.parse(secretMessage, secretSchema);
       await expect(resultPromise).rejects.toThrow('Unable to parse the secret.');
     });

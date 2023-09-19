@@ -12,14 +12,22 @@
  * @since         2.13.0
  */
 import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
-import ResourceTypeEntity from "./resourceTypeEntity";
+import ResourceTypeEntity, {
+  RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG, RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
+  RESOURCE_TYPE_PASSWORD_STRING_SLUG, RESOURCE_TYPE_TOTP_SLUG
+} from "./resourceTypeEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 
 const ENTITY_NAME = 'ResourceTypes';
 const RULE_UNIQUE_ID = 'unique_id';
 
-const SUPPORTED_RESOURCE_TYPES = ["password-string", "password-and-description"];
+const SUPPORTED_RESOURCE_TYPES = [
+  RESOURCE_TYPE_PASSWORD_STRING_SLUG,
+  RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
+  RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
+  RESOURCE_TYPE_TOTP_SLUG
+];
 
 class ResourceTypesCollection extends EntityCollection {
   /**
@@ -143,8 +151,6 @@ class ResourceTypesCollection extends EntityCollection {
       super.push(resourceTypeEntity);
     }
   }
-
-
 
   /*
    * ==================================================

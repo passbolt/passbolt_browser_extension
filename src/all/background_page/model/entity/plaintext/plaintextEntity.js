@@ -100,6 +100,15 @@ class PlaintextEntity extends Entity {
     return this._props.description || null;
   }
 
+  /**
+   * Return totp prop if any
+   *
+   * @returns {(object|null)} totp
+   */
+  get totp() {
+    return this._props.totp || null;
+  }
+
   /*
    * ==================================================
    * Static properties getters

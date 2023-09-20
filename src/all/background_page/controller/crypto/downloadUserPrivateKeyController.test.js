@@ -17,13 +17,12 @@ import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 import GpgKeyError from "../../error/GpgKeyError";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
-import {PassphraseController} from "../passphrase/passphraseController";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import FileService from "../../service/file/fileService";
 
 const mockedSaveFile = jest.spyOn(FileService, "saveFile");
 
-jest.mock("../passphrase/passphraseController");
+jest.mock("../../service/passphrase/getPassphraseService");
 
 const expectedTabId = "tabIdentifier";
 const mockedWorker = {tab: {id: expectedTabId}};
@@ -36,8 +35,8 @@ describe("DownloadUserPrivateKeyController", () => {
   it(`Should trigegr a file download with the private key`, async() => {
     expect.assertions(8);
     await MockExtension.withConfiguredAccount();
-    PassphraseController.request.mockResolvedValue("");
     const controller = new DownloadUserPrivateKeyController(mockedWorker, null);
+    controller.getPassphraseService.requestPassphrase.mockResolvedValue("");
     const privateKey = pgpKeys.ada;
 
     mockedSaveFile.mockImplementation(async(fileName, fileContent, fileContentType, workerTabId) => {
@@ -55,17 +54,17 @@ describe("DownloadUserPrivateKeyController", () => {
     await controller.exec();
 
     expect(mockedSaveFile).toHaveBeenCalledTimes(1);
-    expect(PassphraseController.request).toHaveBeenCalledTimes(1);
+    expect(controller.getPassphraseService.requestPassphrase).toHaveBeenCalledTimes(1);
   });
 
   it(`Should throw an exception if the user's private key can't be find`, async() => {
     expect.assertions(3);
     MockExtension.withMissingPrivateKeyAccount();
-    PassphraseController.request.mockResolvedValue("");
     const controller = new DownloadUserPrivateKeyController(mockedWorker, null);
+    controller.getPassphraseService.requestPassphrase.mockResolvedValue("");
 
     await expect(controller.exec()).rejects.toThrowError(new GpgKeyError("Private key not found."));
     expect(mockedSaveFile).not.toHaveBeenCalled();
-    expect(PassphraseController.request).toHaveBeenCalledTimes(1);
+    expect(controller.getPassphraseService.requestPassphrase).toHaveBeenCalledTimes(1);
   });
 });

@@ -9,16 +9,18 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         4.3.0
  */
 
-import ResourceTypesCollection from "../../../entity/resourceType/resourceTypesCollection";
-import {v4 as uuidv4} from "uuid";
+import {defaultPassphraseGeneratorSettings} from "./passphraseGeneratorSettingsEntity.test.data";
+import {defaultPasswordGeneratorSettings} from "./passwordGeneratorSettingsEntity.test.data";
 
-export function getResourceTypeCollection() {
-  const resourceTypeDto = {
-    id: uuidv4(),
-    name: "Password with description",
-    slug: "password-and-description"
+export const defaultPasswordPolicies = (data = {}) => {
+  const defaultData = {
+    default_generator: "password",
+    external_dictionary_check: true,
+    password_generator_settings: defaultPasswordGeneratorSettings(),
+    passphrase_generator_settings: defaultPassphraseGeneratorSettings(),
   };
-  return new ResourceTypesCollection([resourceTypeDto]);
-}
+  return Object.assign(defaultData, data);
+};

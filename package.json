@@ -11,7 +11,6 @@
     "npm": ">=8.3.1"
   },
   "dependencies": {
-    "@xmldom/xmldom": "^0.7.8",
     "await-lock": "^2.1.0",
     "downloadjs": "^1.4.7",
     "i18next": "^21.6.14",
@@ -22,7 +21,7 @@
     "locutus": "~2.0.9",
     "openpgp": "5.2.1",
     "papaparse": "^5.2.0",
-    "passbolt-styleguide": "^4.2.1",
+    "passbolt-styleguide": "^4.3.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "secrets-passbolt": "github:passbolt/secrets.js#v2.0.1",
@@ -60,7 +59,7 @@
     "jest-webextension-mock": "^3.8.9",
     "text-encoding-utf-8": "^1.0.2",
     "uuid": "^8.3.2",
-    "web-ext": "7.5.0",
+    "web-ext": "7.6.2",
     "webpack": "^5.76.3",
     "webpack-cli": "^4.9.1"
   },

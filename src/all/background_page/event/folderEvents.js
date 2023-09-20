@@ -11,7 +11,7 @@ import FolderCreateController from "../controller/folder/folderCreateController"
 import MoveController from "../controller/move/moveController";
 import FolderEntity from "../model/entity/folder/folderEntity";
 
-const listen = function(worker) {
+const listen = function(worker, _, account) {
   /*
    * Find a folder with complete permissions
    *
@@ -114,7 +114,7 @@ const listen = function(worker) {
   worker.port.on('passbolt.folders.open-move-confirmation-dialog', async(requestId, moveDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
-      const controller = new MoveController(worker, requestId, clientOptions);
+      const controller = new MoveController(worker, requestId, clientOptions, account);
       await controller.main(moveDto);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {

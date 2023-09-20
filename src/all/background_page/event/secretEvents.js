@@ -9,26 +9,17 @@ import User from "../model/user";
 import SecretDecryptController from "../controller/secret/secretDecryptController";
 import PownedPasswordController from '../controller/secret/pownedPasswordController';
 
-const listen = function(worker) {
+const listen = function(worker, _, account) {
   /*
    * Decrypt a given armored string.
    *
    * @listens passbolt.secret.decrypt
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.secret.decrypt', async(requestId, resourceId, options) => {
-    try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
-      let showProgress = true;
-      if (options && Object.prototype.hasOwnProperty.call(options, 'showProgress')) {
-        showProgress = options.showProgress;
-      }
-      const controller = new SecretDecryptController(worker, requestId, apiClientOptions);
-      const {plaintext} = await controller.main(resourceId, showProgress);
-      worker.port.emit(requestId, 'SUCCESS', plaintext);
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+  worker.port.on('passbolt.secret.decrypt', async(requestId, resourceId) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new SecretDecryptController(worker, requestId, apiClientOptions, account);
+    await controller._exec(resourceId);
   });
 
   /*

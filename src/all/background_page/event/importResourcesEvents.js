@@ -8,7 +8,7 @@ import User from "../model/user";
 import ImportResourcesFileController from "../controller/import/importResourcesFileController";
 
 
-const listen = function(worker) {
+const listen = function(worker, _, account) {
   /*
    * Import resources file
    *
@@ -20,7 +20,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.import-resources.import-file', async(requestId, fileType, file, options) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const importController = new ImportResourcesFileController(worker, apiClientOptions);
+    const importController = new ImportResourcesFileController(worker, apiClientOptions, account);
     try {
       const importEntity = await importController.exec(fileType, file, options);
       worker.port.emit(requestId, 'SUCCESS', importEntity);

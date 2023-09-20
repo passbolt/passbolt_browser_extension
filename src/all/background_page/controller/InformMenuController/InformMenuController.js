@@ -12,17 +12,17 @@
  * @since         3.4.0
  */
 
-import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import ResourceModel from "../../model/resource/resourceModel";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
-import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import BrowserTabService from "../../service/ui/browserTab.service";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
 import ResourceInProgressCacheService from "../../service/cache/resourceInProgressCache.service";
 import WorkerService from "../../service/worker/workerService";
+import DecryptAndParseResourceSecretService from "../../service/secret/decryptAndParseResourceSecretService";
+import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 
 /**
  * Controller related to the in-form call-to-action
@@ -31,12 +31,15 @@ class InformMenuController {
   /**
    * InformMenuController constructor
    * @param {Worker} worker
-   * @param {ApiClientOptions} clientOptions
+   * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account the account associated to the worker
    */
-  constructor(worker, apiClientOptions) {
+  constructor(worker, apiClientOptions, account) {
     this.worker = worker;
     this.resourceModel = new ResourceModel(apiClientOptions);
+    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.apiClientOptions = apiClientOptions;
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -119,15 +122,14 @@ class InformMenuController {
     const webIntegrationWorker = await WorkerService.get('WebIntegration', this.worker.tab.id);
     try {
       // Get the resource, decrypt the resources password and requests to fill the credentials
-      const passphrase = await passphraseController.requestFromQuickAccess();
+      const passphrase = await this.getPassphraseService.requestPassphraseFromQuickAccess();
       const resource = await this.resourceModel.findForDecrypt(resourceId);
       const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
-      const resourceSecretMessage = await OpenpgpAssertion.readMessageOrFail(resource.secret.data);
-      let plaintext = await DecryptMessageService.decrypt(resourceSecretMessage, privateKey);
-      plaintext = await this.resourceModel.deserializePlaintext(resource.resourceTypeId, plaintext);
+      const secretSchema = await this.resourceTypeModel.getSecretSchemaById(resource.resourceTypeId);
+      const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(resource.secret, secretSchema, privateKey);
       const {username} = resource;
-      const password = plaintext?.password || plaintext;
-      webIntegrationWorker.port.emit('passbolt.web-integration.fill-credentials', {username: username, password: password});
+      const password = plaintextSecret?.password;
+      webIntegrationWorker.port.emit('passbolt.web-integration.fill-credentials', {username, password});
       this.worker.port.emit(requestId, "SUCCESS");
       webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
     } catch (error) {

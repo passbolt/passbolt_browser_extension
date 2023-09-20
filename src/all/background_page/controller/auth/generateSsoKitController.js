@@ -12,11 +12,10 @@
  * @since         3.9.0
  */
 
-import AuthModel from "../../model/auth/authModel";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
-import {PassphraseController} from "../passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 
 class GenerateSsoKitController {
   /**
@@ -24,13 +23,13 @@ class GenerateSsoKitController {
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account the account associated to the worker
    */
-  constructor(worker, requestId, apiClientOptions) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.authModel = new AuthModel(apiClientOptions);
-    this.organizationSettingsModel = new GenerateSsoKitService(apiClientOptions);
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -68,7 +67,7 @@ class GenerateSsoKitController {
     }
 
     // No SSO kit is avaible, we need to generate a new one.
-    const passphrase = await PassphraseController.get(this.worker);
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     const ssoKits = await GenerateSsoKitService.generateSsoKits(passphrase, provider);
 
     const registeredServerPartSsoKit = await this.ssoKitServerPartModel.setupSsoKit(ssoKits.serverPart);

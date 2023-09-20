@@ -509,42 +509,6 @@ class ResourceModel {
     return JSON.stringify(plaintextEntity);
   }
 
-  /**
-   * Return the secret as per the resource type schema definition
-   *
-   * @param {string|undefined} resourceTypeId The resource type uuid
-   * @param {string} plaintext the secret data in plaintext
-   * @throws {TypeError} if plaintext is not a string or resource id is not a valid uuid
-   * @throws {SyntaxError} if plaintext is not a parsable JSON object (depends on secret schema definition)
-   * @returns {Promise<string|PlaintextEntity>}
-   */
-  async deserializePlaintext(resourceTypeId, plaintext) {
-    if (typeof plaintext !== 'string') {
-      throw new TypeError('Could not deserialize secret, plaintext is not a string.');
-    }
-    if (!resourceTypeId) {
-      return plaintext;
-    }
-    const schema = await this.resourceTypeModel.getSecretSchemaById(resourceTypeId);
-    if (!schema) {
-      throw new TypeError('Could not find the schema definition for the requested resource type.');
-    }
-    if (schema.type === 'string') {
-      return plaintext;
-    }
-    try {
-      const plaintextDto = JSON.parse(plaintext);
-      return new PlaintextEntity(plaintextDto, schema);
-    } catch (error) {
-      console.error(error);
-      /*
-       * SyntaxError, json is not valid
-       * TypeError schema does not match
-       */
-      return plaintext; // return 'broken' string
-    }
-  }
-
   /*
    * ==============================================================
    *  Associated data management

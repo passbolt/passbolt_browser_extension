@@ -15,7 +15,6 @@
 import {enableFetchMocks} from "jest-fetch-mock";
 import User from "../../model/user";
 import AccountRecoverySaveUserSettingsController from "./accountRecoverySaveUserSettingController";
-import {PassphraseController} from "../passphrase/passphraseController";
 import AccountRecoveryUserSettingEntity from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import {
   createAcceptedAccountRecoveryUserSettingDto,
@@ -29,7 +28,7 @@ import MockExtension from "../../../../../test/mocks/mockExtension";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 
-jest.mock("../passphrase/passphraseController.js");
+jest.mock("../../service/passphrase/getPassphraseService");
 
 beforeEach(async() => {
   jest.resetModules();
@@ -61,7 +60,7 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions(), account);
 
       // Mock user passphrase capture.
-      PassphraseController.request.mockResolvedValue(pgpKeys.ada.passphrase);
+      controller.getPassphraseService.requestPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
       // Mock API account recovery organization policy fetch.
       fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
       // Mock API account recovery user settings post. Return data such as the API will.
@@ -82,7 +81,7 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions());
 
       // Mock user passphrase capture.
-      PassphraseController.request.mockResolvedValue(pgpKeys.ada.passphrase);
+      controller.getPassphraseService.requestPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
       // Mock API account recovery organization policy fetch.
       fetch.doMockOnce(() => mockApiResponse(null));
 
@@ -97,7 +96,7 @@ describe("AccountRecoverySaveUserSettingsController", () => {
       const controller = new AccountRecoverySaveUserSettingsController(null, null, defaultApiClientOptions());
 
       // Mock user passphrase capture.
-      PassphraseController.request.mockResolvedValue(pgpKeys.ada.passphrase);
+      controller.getPassphraseService.requestPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
       // Mock API account recovery organization policy fetch.
       fetch.doMockOnce(() => mockApiResponse(disabledAccountRecoveryOrganizationPolicyDto()));
 

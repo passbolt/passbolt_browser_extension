@@ -14,7 +14,11 @@
 
 import DesktopTransferModel from "../../model/desktopTransfer/desktopTransferModel";
 import FileService from "../../service/file/fileService";
-import {PassphraseController} from "../../controller/passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
+import {Buffer} from 'buffer';
+
+const PUBLIC_FILENAME = "account-kit.passbolt";
+const MIME_TYPE_TEXT_PLAIN = "application/passbolt";
 
 class ExportDesktopAccountController {
   /**
@@ -28,6 +32,7 @@ class ExportDesktopAccountController {
     this.requestId = requestId;
     this.desktopTransferModel = new DesktopTransferModel();
     this.account = account;
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -50,9 +55,11 @@ class ExportDesktopAccountController {
    * @return {Promise<string>}
    */
   async exec() {
-    await PassphraseController.get(this.worker);
+    await this.getPassphraseService.getPassphrase(this.worker);
     const accountKit = await this.desktopTransferModel.getAccountKit(this.account);
-    await FileService.saveFile("account-kit.json", JSON.stringify(accountKit.toDto()), "application/json", this.worker.tab.id);
+    const accountKitStringify = JSON.stringify(accountKit.toDto());
+    const fileContent = Buffer.from(accountKitStringify).toString('base64');
+    await FileService.saveFile(PUBLIC_FILENAME, fileContent, MIME_TYPE_TEXT_PLAIN, this.worker.tab.id);
   }
 }
 

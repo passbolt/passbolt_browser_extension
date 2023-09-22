@@ -90,6 +90,7 @@ class GpgAuth {
     const fetchOptions = {
       method: 'POST',
       credentials: 'include',
+      withCredentials: true,
       body: data
     };
     Request.setCsrfHeader(fetchOptions, User.getInstance());
@@ -155,7 +156,8 @@ class GpgAuth {
     const domain = serverUrl || this.getDomain();
     const response = await fetch(domain + URL_VERIFY, {
       method: 'GET',
-      credentials: 'include'
+      credentials: 'include',
+      withCredentials: true,
     });
 
     if (!response.ok) {
@@ -176,7 +178,7 @@ class GpgAuth {
   async login(privateKey) {
     const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKey);
     const userAuthToken = await this.stage1(privateKeyInfo);
-    await this.stage2(userAuthToken, privateKeyInfo);
+    return await this.stage2(userAuthToken, privateKeyInfo);
   }
 
   /**
@@ -193,7 +195,8 @@ class GpgAuth {
     const fetchOptions = {
       method: 'POST',
       credentials: 'include',
-      body: body
+      body: body,
+      withCredentials: true,
     };
     Request.setCsrfHeader(fetchOptions, User.getInstance());
 
@@ -239,7 +242,8 @@ class GpgAuth {
     const fetchOptions = {
       method: 'POST',
       credentials: 'include',
-      body: data
+      body: data,
+      withCredentials: true,
     };
     Request.setCsrfHeader(fetchOptions, User.getInstance());
     const response = await fetch(url, fetchOptions);

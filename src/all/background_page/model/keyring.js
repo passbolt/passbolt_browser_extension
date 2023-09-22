@@ -231,6 +231,7 @@ class Keyring {
     const response = await fetch(url, {
       method: 'GET',
       credentials: 'include',
+      withCredentials: true,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'

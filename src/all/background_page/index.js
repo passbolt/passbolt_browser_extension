@@ -85,4 +85,3 @@ browser.runtime.onConnect.addListener(PortManager.onPortConnect);
  * Add listener on tabs on removed
  */
 browser.tabs.onRemoved.addListener(PortManager.onTabRemoved);
-

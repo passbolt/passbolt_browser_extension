@@ -17,7 +17,8 @@ import ExtQuickAccess from "passbolt-styleguide/src/react-quickaccess/ExtQuickAc
 import browser from "../../../background_page/sdk/polyfill/browserPolyfill";
 import Port from "../lib/port";
 
-async function main() {
+function main() {
+  // did for testing purpose and debugging but the original version actually works
   const query = new URLSearchParams(window.location.search);
   const portname = query.get('passbolt');
   const port = new Port(portname);

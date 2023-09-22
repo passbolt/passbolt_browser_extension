@@ -72,6 +72,7 @@ class ApiClient {
   buildFetchOptions() {
     return {
       credentials: 'include',
+      withCredentials: true,
       headers: {...this.getDefaultHeaders(), ...this.options.getHeaders()}
     };
   }

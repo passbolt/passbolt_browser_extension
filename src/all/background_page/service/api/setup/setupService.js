@@ -125,7 +125,9 @@ class SetupService extends AbstractService {
     const url = new URL(`${this.apiClient.baseUrl}/install/${userId}/${token}`);
     let response, responseHtml, username, firstName, lastName;
     try {
-      response = await fetch(url.toString());
+      response = await fetch(url.toString(), {
+        withCredentials: true,
+      });
     } catch (error) {
       // Catch Network error such as connection lost.
       throw new PassboltServiceUnavailableError(error.message);
@@ -170,7 +172,9 @@ class SetupService extends AbstractService {
     const url = new URL(`${this.apiClient.baseUrl}/recover/${userId}/${token}`);
     let response, responseHtml, username, firstName, lastName;
     try {
-      response = await fetch(url.toString());
+      response = await fetch(url.toString(), {
+        withCredentials: true,
+      });
     } catch (error) {
       // Catch Network error such as connection lost.
       throw new PassboltServiceUnavailableError(error.message);

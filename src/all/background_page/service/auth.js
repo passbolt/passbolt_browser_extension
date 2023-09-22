@@ -30,6 +30,7 @@ AuthService.isAuthenticated = async function() {
   const fetchOptions = {
     method: 'GET',
     credentials: 'include',
+    withCredentials: true,
     headers: {
       'Accept': 'application/json',
       'content-type': 'application/json'

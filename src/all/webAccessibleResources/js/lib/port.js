@@ -47,6 +47,16 @@ class Port {
   }
 
   /**
+   * Connect the port
+   * @returns {Promise<>}
+   */
+  connect2() {
+    this._port = browser.runtime.connect({name: this._name});
+    this._connected = true;
+    this.initListener();
+  }
+
+  /**
    * Init listener
    * @private
    */
@@ -70,11 +80,13 @@ class Port {
    */
   _onMessage(json) {
     const msg = JSON.parse(json);
+    console.log("_onMessage", msg);
     const eventName = msg[0];
     if (Array.isArray(this._listeners[eventName])) {
       const listeners = this._listeners[eventName];
-      for (let i = 0; i < listeners.length; i++) {
+      for (let i = listeners.length - 1; i >= 0; i--) {
         const listener = listeners[i];
+        console.log(eventName, listener);
         const args = Array.prototype.slice.call(msg, 1);
         listener.callback.apply(this, args);
         if (listener.once) {
@@ -83,9 +95,10 @@ class Port {
           if (this._listeners[eventName].length === 0) {
             delete this._listeners[eventName];
           }
-          i--; // jump back since i++ is the new i
         }
       }
+    } else {
+      console.log("nothing", msg);
     }
   }
 
@@ -106,6 +119,8 @@ class Port {
       callback: callback,
       once: once
     });
+
+    console.log(this._listeners, name, once);
   }
 
   /**

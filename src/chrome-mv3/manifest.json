@@ -45,10 +45,9 @@
   "host_permissions": [
     "*://*/*"
   ],
-  "web_accessible_resources": [{
-    "resources": ["webAccessibleResources/*"],
-    "matches": ["*://*/*"]
-  }],
+  "web_accessible_resources": [
+    "webAccessibleResources/*"
+  ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'"
   }

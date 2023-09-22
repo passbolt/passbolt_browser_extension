@@ -17,9 +17,9 @@
   "browser_action": {
     "default_icon": "webAccessibleResources/img/icons/icon-32.png",
     "theme_icons": [{
-        "light": "webAccessibleResources/img/icons/icon-32.png",
-        "dark": "webAccessibleResources/img/icons/icon-32.png",
-        "size": 32
+      "light": "webAccessibleResources/img/icons/icon-32.png",
+      "dark": "webAccessibleResources/img/icons/icon-32.png",
+      "size": 32
     }],
     "default_title": "Passbolt Quickaccess",
     "default_popup": "webAccessibleResources/quickaccess.html?passbolt=quickaccess"

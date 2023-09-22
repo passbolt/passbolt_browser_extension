@@ -86,6 +86,7 @@ class AuthLoginController {
      * Then we proceed with the SSO kit and afterward the login process.
      */
     await this.checkPassphraseService.checkPassphrase(passphrase);
+    console.log("passphrase checked")
     try {
       await this.updateSsoCredentialsService.updateSsoKitIfNeeded(passphrase);
     } catch (e) {
@@ -94,8 +95,10 @@ class AuthLoginController {
     }
 
     try {
+      console.log("login start with model")
       await this.authModel.login(passphrase, rememberMe);
       await this.registerRememberMeOption(rememberMe);
+      console.log("login end with model")
     } catch (error) {
       if (!(error instanceof UserAlreadyLoggedInError)) {
         throw error;

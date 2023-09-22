@@ -273,7 +273,11 @@ class UserService extends AbstractService {
     const url = new URL(`${this.apiClient.baseUrl}/recover`);
     let response, responseHtml;
     try {
-      response = await fetch(url.toString());
+      response = await fetch(url.toString(),{
+        credentials: "include",
+        withCredentials: true,
+      } 
+      );
     } catch (error) {
       // Catch Network error such as connection lost.
       throw new PassboltServiceUnavailableError();

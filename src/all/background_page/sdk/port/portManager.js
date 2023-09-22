@@ -63,7 +63,7 @@ class PortManager {
     } else {
       // The sender is a script running in an extension page
       const popupUrl = await browser.action.getPopup({});
-      return sender.url === popupUrl;
+      return sender.url === popupUrl || typeof(sender.url) === 'undefined'; // this fix the quickaccess in safari as the url in undefined
     }
   }
 

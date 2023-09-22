@@ -151,9 +151,13 @@ const listen = function(worker, _, account) {
    *   (integer) duration in seconds to specify a specific duration
    */
   worker.port.on('passbolt.auth.login', async(requestId, passphrase, remember) => {
+    console.log("getApiClientOptions")
     const clientOptions = await User.getInstance().getApiClientOptions(); //@todo remove and use a glocal apiClientOptions;
+    console.log("AuthLoginController")
     const controller = new AuthLoginController(worker, requestId, clientOptions, account);
+    console.log("AuthLoginController::exec")
     await controller._exec(passphrase, remember);
+    console.log("AuthLoginController::exec after")
   });
 
   /*

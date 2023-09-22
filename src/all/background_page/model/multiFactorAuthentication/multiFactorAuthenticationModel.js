@@ -67,6 +67,16 @@ class MultiFactorAuthenticationModel {
     const setting = await this.multiFactorAuthenticationService.getSettings();
     return new MfaCombinedEnabledProvidersEntity(setting);
   }
+
+  /**
+   * Setup the topf provider
+   * @param   {MfaSetupTotpEntity} mfaSetupTotpEntity
+   * @returns {void}
+   * @public
+   */
+  async setupTotp() {
+    await this.multiFactorAuthenticationService.setupTotp();
+  }
 }
 
 export default MultiFactorAuthenticationModel;

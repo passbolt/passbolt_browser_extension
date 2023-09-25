@@ -32,7 +32,6 @@ class UpdatePrivateKeyController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.apiClientOptions = apiClientOptions;
     this.accountModel = new AccountModel(apiClientOptions);
     this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);

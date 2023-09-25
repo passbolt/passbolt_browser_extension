@@ -24,7 +24,6 @@ class GetAndInitializeAccountLocaleController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.apiClientOptions = apiClientOptions;
     this.account = account;
     this.localeModel = new LocaleModel(apiClientOptions);
   }

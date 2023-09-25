@@ -58,13 +58,13 @@ class MoveController {
 
     // Move multiple resources at once
     if (resourcesIds.length) {
-      const controller = new MoveResourcesController(this.worker, this.requestId, this.clientOptions, this.account);
+      const controller = new MoveResourcesController(this.worker, this.requestId, this.apiClientOptions, this.account);
       await controller.main(resourcesIds, folderParentId);
     }
 
     // Move one folder
     if (foldersIds.length) {
-      const controller = new MoveFolderController(this.worker, this.requestId, this.clientOptions, this.account);
+      const controller = new MoveFolderController(this.worker, this.requestId, this.apiClientOptions, this.account);
       await controller.main(foldersIds[0], folderParentId);
     }
   }

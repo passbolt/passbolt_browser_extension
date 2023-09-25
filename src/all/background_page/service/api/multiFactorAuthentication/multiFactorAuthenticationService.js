@@ -72,8 +72,9 @@ class MultiFactorAuthenticationService extends AbstractService {
    * @public
    */
   async setupTotp(body) {
-    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/verify/totp`);
-    await this.apiClient.fetchAndHandleResponse('POST', url, body);
+    const bodyString = this.apiClient.buildBody(body);
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/totp`);
+    await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
   }
 }
 

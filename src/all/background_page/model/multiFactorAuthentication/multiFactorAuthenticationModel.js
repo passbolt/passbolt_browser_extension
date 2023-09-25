@@ -70,12 +70,12 @@ class MultiFactorAuthenticationModel {
 
   /**
    * Setup the topf provider
-   * @param   {MfaSetupTotpEntity} mfaSetupTotpEntity
+   * @param   {Object} mfaSetupTotpDto
    * @returns {void}
    * @public
    */
-  async setupTotp() {
-    await this.multiFactorAuthenticationService.setupTotp();
+  async setupTotp(mfaSetupTotpDto) {
+    await this.multiFactorAuthenticationService.setupTotp(mfaSetupTotpDto);
   }
 }
 

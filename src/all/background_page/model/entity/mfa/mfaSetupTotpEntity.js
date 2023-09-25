@@ -58,28 +58,6 @@ class MfaSetupTotpEntity extends Entity {
 
   /*
    * ==================================================
-   * Dynamic properties getters
-   * ==================================================
-   */
-
-  /**
-   * Get the totp
-   * @returns {string}
-   */
-  get totp() {
-    return this._props.totp;
-  }
-
-  /**
-   * Get the otp provisioning uri
-   * @returns {boolean}
-   */
-  get otpProvisioningUri() {
-    return this._props.otpProvisioningUri;
-  }
-
-  /*
-   * ==================================================
    * Static properties getters
    * ==================================================
    */

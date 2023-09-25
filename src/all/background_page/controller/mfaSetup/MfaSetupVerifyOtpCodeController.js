@@ -50,7 +50,8 @@ class MfaSetupVerifyOtpCodeController {
    */
   async exec(setupDto) {
     const totpEntity = new MfaSetupTotpEntity(setupDto);
-    await this.multiFactorAuthenticationModel.setupTotp(totpEntity);
+    const toptSetupDto = totpEntity.toDto();
+    await this.multiFactorAuthenticationModel.setupTotp(toptSetupDto);
   }
 }
 

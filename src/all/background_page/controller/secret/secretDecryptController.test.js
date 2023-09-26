@@ -148,7 +148,6 @@ describe("SecretDecryptController", () => {
       const resourceId = uuidv4();
       const plaintextSecretDto = plaintextSecretTotpDto();
       const encryptedSecretData = await EncryptMessageService.encrypt(JSON.stringify(plaintextSecretDto), await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.public));
-      console.log(encryptedSecretData);
       const secretDto = readSecret({
         user_id: account.userId,
         resource_id: resourceId,

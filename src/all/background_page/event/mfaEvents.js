@@ -18,6 +18,8 @@ import User from "../model/user";
 import MfaGetMfaSettingsController from '../controller/mfaPolicy/mfaGetMfaSettingsController';
 import HasUserPostponedUserSettingInvitationMFAPolicyController from '../controller/mfaPolicy/hasUserPostponedUserSettingInvitationController';
 import MfaSetupVerifyOtpCodeController from '../controller/mfaSetup/MfaSetupVerifyOtpCodeController';
+import MfaSetupVerifyProviderController from '../controller/mfaSetup/MfaSetupVerifyProviderController';
+import MfaSetupRemoveProviderController from '../controller/mfaSetup/MfaSetupRemoveProviderController';
 
 /**
  * Listens to the account recovery continue application events
@@ -47,10 +49,22 @@ const listen = function(worker) {
     await controller._exec();
   });
 
+  worker.port.on('passbolt.mfa-setup.verify-provider', async(requestId, providerDto) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new MfaSetupVerifyProviderController(worker, requestId, apiClientOptions);
+    await controller._exec(providerDto);
+  });
+
   worker.port.on('passbolt.mfa-setup.verify-totp-code', async(requestId, code) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new MfaSetupVerifyOtpCodeController(worker, requestId, apiClientOptions);
     await controller._exec(code);
+  });
+
+  worker.port.on('passbolt.mfa-setup.remove-provider', async(requestId, providerDto) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new MfaSetupRemoveProviderController(worker, requestId, apiClientOptions);
+    await controller._exec(providerDto);
   });
 };
 

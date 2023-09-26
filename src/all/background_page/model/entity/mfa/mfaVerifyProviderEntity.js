@@ -16,20 +16,20 @@ import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 
-const ENTITY_NAME = 'MfaSetupTotp';
+const ENTITY_NAME = 'MfaVerifyProvider';
 
-class MfaSetupTotpEntity extends Entity {
+class MfaVerifyProviderEntity extends Entity {
   /**
-   * Mfa policy entity constructor
+   * Mfa verify provider constructor
    *
    * @param {Object} setupDto totp setup dto
    * @throws {EntityValidationError} if the dto cannot be converted into an entity
    */
   constructor(setupDto) {
     super(EntitySchema.validate(
-      MfaSetupTotpEntity.ENTITY_NAME,
+      MfaVerifyProviderEntity.ENTITY_NAME,
       setupDto,
-      MfaSetupTotpEntity.getSchema()
+      MfaVerifyProviderEntity.getSchema()
     ));
   }
 
@@ -41,17 +41,12 @@ class MfaSetupTotpEntity extends Entity {
     return {
       "type": "object",
       "required": [
-        "otpProvisioningUri",
-        "totp"
+        "verified",
       ],
       "properties": {
-        "totp": {
+        "verified": {
           "type": "string",
-          "pattern": /^[a-z0-9]{6}$/
         },
-        "otpProvisioningUri": {
-          "type": "string",
-        }
       }
     };
   }
@@ -70,4 +65,4 @@ class MfaSetupTotpEntity extends Entity {
   }
 }
 
-export default MfaSetupTotpEntity;
+export default MfaVerifyProviderEntity;

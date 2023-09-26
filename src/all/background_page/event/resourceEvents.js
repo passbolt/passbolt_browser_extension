@@ -9,9 +9,12 @@ import ResourceModel from "../model/resource/resourceModel";
 import ResourceCreateController from "../controller/resource/resourceCreateController";
 import ResourceUpdateController from "../controller/resource/resourceUpdateController";
 import Log from "../model/log";
+import GetResourceGridUserSettingController
+  from "../controller/resourceGridSetting/getResourceGridUserSettingController";
+import SetResourceGridUserSettingController
+  from "../controller/resourceGridSetting/setResourceGridUserSettingController";
 
-
-const listen = function(worker) {
+const listen = function(worker, _, account) {
   /*
    * Pull the resources from the API and update the local storage.
    *
@@ -80,7 +83,7 @@ const listen = function(worker) {
   worker.port.on('passbolt.resources.create', async(requestId, resourceDto, plaintextDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
-      const controller = new ResourceCreateController(worker, requestId, clientOptions);
+      const controller = new ResourceCreateController(worker, requestId, clientOptions, account);
       const savedResource = await controller.main(resourceDto, plaintextDto);
       worker.port.emit(requestId, 'SUCCESS', savedResource);
     } catch (error) {
@@ -120,13 +123,36 @@ const listen = function(worker) {
   worker.port.on('passbolt.resources.update', async(requestId, resourceDto, plaintextDto) => {
     try {
       const clientOptions = await User.getInstance().getApiClientOptions();
-      const controller = new ResourceUpdateController(worker, requestId, clientOptions);
+      const controller = new ResourceUpdateController(worker, requestId, clientOptions, account);
       const updatedResource = await controller.main(resourceDto, plaintextDto);
       worker.port.emit(requestId, 'SUCCESS', updatedResource);
     } catch (error) {
       console.error(error);
       worker.port.emit(requestId, 'ERROR', error);
     }
+  });
+
+  /*
+   * Get the resource grid setting
+   *
+   * @listens passbolt.resources.get-grid-setting
+   * @param requestId {uuid} The request identifier
+   */
+  worker.port.on('passbolt.resources.get-grid-setting', async requestId => {
+    const getResourceColumnsSettingsController = new GetResourceGridUserSettingController(worker, requestId, account);
+    await getResourceColumnsSettingsController._exec();
+  });
+
+  /*
+   * Set the resource grid setting
+   *
+   * @listens passbolt.resources.set-grid-setting
+   * @param requestId {uuid} The request identifier
+   * @param gridSetting {object} The grid setting
+   */
+  worker.port.on('passbolt.resources.set-grid-setting', async(requestId, gridSetting) => {
+    const setResourceColumnsSettingsController = new SetResourceGridUserSettingController(worker, requestId, account);
+    await setResourceColumnsSettingsController._exec(gridSetting);
   });
 };
 

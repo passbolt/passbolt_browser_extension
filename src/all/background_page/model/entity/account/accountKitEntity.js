@@ -51,6 +51,7 @@ class AccountKitEntity extends AbstractAccountEntity {
         "last_name",
         "user_private_armored_key",
         "server_public_armored_key",
+        "user_public_armored_key",
         "security_token",
       ],
       "properties": {
@@ -61,6 +62,10 @@ class AccountKitEntity extends AbstractAccountEntity {
         last_name: abstractAccountEntitySchema.properties.last_name,
         security_token: abstractAccountEntitySchema.properties.security_token,
         "user_private_armored_key": {
+          "type": "string",
+          "maxLength": PGP_KEY_MAX_LENGTH
+        },
+        "user_public_armored_key": {
           "type": "string",
           "maxLength": PGP_KEY_MAX_LENGTH
         },

@@ -18,7 +18,7 @@ import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import UserLocalStorage from "../../service/local_storage/userLocalStorage";
 import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
-import {PassphraseController} from "../passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import DecryptPrivateKeyPasswordDataService from "../../service/accountRecovery/decryptPrivateKeyPasswordDataService";
 import AccountRecoveryPrivateKeyPasswordEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity";
 import AccountRecoveryResponseEntity from "../../model/entity/accountRecovery/accountRecoveryResponseEntity";
@@ -40,6 +40,7 @@ class ReviewRequestController {
     this.account = account;
     this.accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
     this.keyringModel = new Keyring();
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -78,7 +79,7 @@ class ReviewRequestController {
 
     if (status === AccountRecoveryResponseEntity.STATUS_APPROVED) {
       const organizationPrivateGpgkey = new PrivateGpgkeyEntity(organizationPrivateGpgkeyDto);
-      const passphrase = await PassphraseController.get(this.worker);
+      const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
       response = await this._buildApprovedResponse(request, organizationPolicy, organizationPrivateGpgkey, passphrase);
     } else if (status === AccountRecoveryResponseEntity.STATUS_REJECTED) {
       response = this._buildRejectedResponse(requestId, organizationPolicy);
@@ -115,12 +116,15 @@ class ReviewRequestController {
    * @param {AccountRecoveryOrganizationPolicyEntity} organizationPolicy The account recovery organization policy.
    * @param {PrivateGpgkeyEntity} organizationPrivateGpgkey The account recovery organization private key and its associated passphrase.
    * @param {string} signedInUserPassphrase The signed-in user passphrase
-   * @returns {AccountRecoveryResponseEntity}
+   * @returns {Promise<AccountRecoveryResponseEntity>}
    */
   async _buildApprovedResponse(request, organizationPolicy, organizationPrivateGpgkey, signedInUserPassphrase) {
     const organizationPrivateKey = await OpenpgpAssertion.readKeyOrFail(organizationPrivateGpgkey.armoredKey);
     const userPrivateKey = await OpenpgpAssertion.readKeyOrFail(this.account.userPrivateArmoredKey);
-    const organizationPrivateKeyDecrypted = await DecryptPrivateKeyService.decrypt(organizationPrivateKey, organizationPrivateGpgkey.passphrase);
+    const organizationPrivateKeyDecrypted = organizationPrivateKey.isDecrypted()
+      ? organizationPrivateKey
+      : await DecryptPrivateKeyService.decrypt(organizationPrivateKey, organizationPrivateGpgkey.passphrase);
+
     const signedInUserDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, signedInUserPassphrase);
 
     const userPublicKey = await OpenpgpAssertion.readKeyOrFail(await this._findUserPublicKey(request.userId));

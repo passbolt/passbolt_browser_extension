@@ -30,7 +30,6 @@ class PasswordPoliciesModel {
   /**
    * Find the current password policies from the API.
    * @returns {Promise<PasswordPoliciesEntity|null>}
-   * @private
    */
   async find() {
     try {

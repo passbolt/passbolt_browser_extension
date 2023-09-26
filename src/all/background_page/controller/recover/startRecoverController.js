@@ -25,13 +25,15 @@ class StartRecoverController {
    * @param {string} requestId The associated request id.
    * @param {ApiClientOptions} apiClientOptions The api client options.
    * @param {AccountRecoverEntity} account The account being recovered.
+   * @param {object} runtimeMemory the runtime memory that stores the data during the process
    */
-  constructor(worker, requestId, apiClientOptions, account) {
+  constructor(worker, requestId, apiClientOptions, account, runtimeMemory) {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
     this.authModel = new AuthModel(apiClientOptions);
     this.setupModel = new SetupModel(apiClientOptions);
+    this.runtimeMemory = runtimeMemory;
   }
 
   /**
@@ -55,7 +57,9 @@ class StartRecoverController {
   async exec() {
     try {
       await this._findAndSetAccountServerPublicKey();
-      await this._findAndSetAccountUserMeta();
+      const {user, userPassphrasePolicies} = await this.setupModel.startRecover(this.account.userId, this.account.authenticationTokenToken);
+      this.runtimeMemory.userPassphrasePolicies = userPassphrasePolicies;
+      this._setAccountUserMeta(user);
     } catch (error) {
       await this._handleUnexpectedError(error);
     }
@@ -76,15 +80,10 @@ class StartRecoverController {
 
   /**
    * Find and set account user meta.
-   * @returns {Promise<void>}
+   * @param {object} user the data relatives to the current user recovering its account.
    * @private
    */
-  async _findAndSetAccountUserMeta() {
-    const {user} = await this.setupModel.startRecover(
-      this.account.userId,
-      this.account.authenticationTokenToken
-    );
-
+  _setAccountUserMeta(user) {
     // Extract the user meta data and associate them to the current temporary account.
     this.account.username = user?.username;
     this.account.firstName = user?.profile?.firstName;

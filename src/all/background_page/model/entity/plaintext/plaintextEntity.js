@@ -35,11 +35,42 @@ class PlaintextEntity extends Entity {
   }
 
   /**
+   * Create plaintext secret entity from legacy plaintext secret.
+   * @param {string} password The password
+   * @returns {PlaintextEntity}
+   */
+  static createFromLegacyPlaintextSecret(password) {
+    const plaintextSecretDto = {password};
+    const schema = this.getLegacyPlaintextSecretSchema();
+
+    return new PlaintextEntity(plaintextSecretDto, schema);
+  }
+
+  /**
    * Get plaintext entity schema
    * @throws TypeError unsupported
    */
   static getSchema() {
     throw new TypeError('Plaintext only support dynamic schemas, defined from resource type.');
+  }
+
+  /**
+   * Get legacy plaintext secret entity schema
+   * @return {object}
+   */
+  static getLegacyPlaintextSecretSchema() {
+    return {
+      "type": "object",
+      "required": [
+        "password"
+      ],
+      "properties": {
+        "password": {
+          "type": "string",
+          "maxLength": 4096
+        },
+      },
+    };
   }
 
   /**
@@ -67,6 +98,15 @@ class PlaintextEntity extends Entity {
    */
   get description() {
     return this._props.description || null;
+  }
+
+  /**
+   * Return totp prop if any
+   *
+   * @returns {(object|null)} totp
+   */
+  get totp() {
+    return this._props.totp || null;
   }
 
   /*

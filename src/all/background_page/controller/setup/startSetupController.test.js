@@ -24,6 +24,10 @@ import {initialAccountSetupDto} from "../../model/entity/account/accountSetupEnt
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import WorkerService from "../../service/worker/workerService";
+import AccountRecoveryOrganizationPolicyEntity from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
+import UserPassphrasePoliciesEntity from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity";
+import {defaultUserPassphrasePoliciesEntityDto} from "passbolt-styleguide/src/shared/models/userPassphrasePolicies/UserPassphrasePoliciesDto.test.data";
+import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -44,7 +48,7 @@ describe("StartSetupController", () => {
       const mockSetupStartDto = {user: defaultUserDto()};
       fetch.doMockOnce(() => mockApiResponse(mockSetupStartDto));
 
-      expect.assertions(6);
+      expect.assertions(7);
       await controller.exec();
       const key = await OpenpgpAssertion.readKeyOrFail(mockVerifyDto.keydata);
       expect(account.serverPublicArmoredKey).toEqual((await GetGpgKeyInfoService.getKeyInfo(key)).armoredKey);
@@ -53,6 +57,37 @@ describe("StartSetupController", () => {
       expect(account.lastName).toEqual(mockSetupStartDto.user.profile.last_name);
       expect(account.user.toDto(UserEntity.ALL_CONTAIN_OPTIONS)).toEqual(mockSetupStartDto.user);
       expect(runtimeMemory.accountRecoveryOrganizationPolicy).toBeUndefined();
+      expect(runtimeMemory.userPassphrasePolicies).toBeUndefined();
+    }, 10 * 1000);
+
+    it("Should initiate the setup process and retrieve the setup material with all configuration", async() => {
+      const account = new AccountSetupEntity(initialAccountSetupDto());
+      const accountRecoveryOrganizationPolicyDto = enabledAccountRecoveryOrganizationPolicyDto();
+      const userPassphrasePoliciesDto = defaultUserPassphrasePoliciesEntityDto();
+      const runtimeMemory = {};
+      const controller = new StartSetupController(null, null, defaultApiClientOptions(), account, runtimeMemory);
+
+      // Mock API fetch organization settings
+      const mockVerifyDto = defaultVerifyDto();
+      fetch.doMockOnce(() => mockApiResponse(mockVerifyDto));
+      // Mock API fetch setup start.
+      const mockSetupStartDto = {
+        user: defaultUserDto(),
+        account_recovery_organization_policy: accountRecoveryOrganizationPolicyDto,
+        user_passphrase_policy: userPassphrasePoliciesDto
+      };
+      fetch.doMockOnce(() => mockApiResponse(mockSetupStartDto));
+
+      expect.assertions(7);
+      await controller.exec();
+      const key = await OpenpgpAssertion.readKeyOrFail(mockVerifyDto.keydata);
+      expect(account.serverPublicArmoredKey).toEqual((await GetGpgKeyInfoService.getKeyInfo(key)).armoredKey);
+      expect(account.username).toEqual(mockSetupStartDto.user.username);
+      expect(account.firstName).toEqual(mockSetupStartDto.user.profile.first_name);
+      expect(account.lastName).toEqual(mockSetupStartDto.user.profile.last_name);
+      expect(account.user.toDto(UserEntity.ALL_CONTAIN_OPTIONS)).toEqual(mockSetupStartDto.user);
+      expect(runtimeMemory.accountRecoveryOrganizationPolicy).toStrictEqual(new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto));
+      expect(runtimeMemory.userPassphrasePolicies).toStrictEqual(new UserPassphrasePoliciesEntity(userPassphrasePoliciesDto));
     }, 10 * 1000);
 
     it("Should not initiate the setup if the API does not provide a valid server public key", async() => {

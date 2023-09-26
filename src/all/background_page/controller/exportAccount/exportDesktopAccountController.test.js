@@ -15,17 +15,17 @@ import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import ExportDesktopAccountController from "./exportDesktopAccountController";
 import {requestId, worker} from "./exportDesktopAccountController.test.data";
-import {PassphraseController} from "../../controller/passphrase/passphraseController";
 import FileService from "../../service/file/fileService";
 import GetLegacyAccountService from "../../service/account/getLegacyAccountService";
 import AccountKitEntity from "../../model/entity/account/accountKitEntity";
+import {Buffer} from 'buffer';
 
 describe("ExportDesktopAccountController", () => {
   const accountDto = new AccountEntity(defaultAccountDto());
   const controller = new ExportDesktopAccountController(worker, requestId, accountDto);
 
   beforeEach(() => {
-    jest.spyOn(PassphraseController, "get").mockImplementation(() => true);
+    jest.spyOn(controller.getPassphraseService, "getPassphrase").mockImplementation(() => true);
     jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => accountDto);
     jest.spyOn(FileService, "saveFile").mockImplementation(jest.fn());
     jest.spyOn(controller.desktopTransferModel, "getAccountKit");
@@ -35,16 +35,17 @@ describe("ExportDesktopAccountController", () => {
     it("Should request the passphrase before any other action.", async() => {
       expect.assertions(3);
       //Simulate an error to check is the other methods have not been called
-      jest.spyOn(PassphraseController, "get").mockRejectedValue(() => new Error());
+      jest.spyOn(controller.getPassphraseService, "getPassphrase").mockRejectedValue(() => new Error());
 
       try {
         await controller.exec();
       } catch {}
 
-      expect(PassphraseController.get).toHaveBeenCalledWith(worker);
+      expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledWith(worker);
       expect(controller.desktopTransferModel.getAccountKit).not.toHaveBeenCalled();
       expect(FileService.saveFile).not.toHaveBeenCalled();
     });
+
     it("Should save the account kit.", async() => {
       expect.assertions(2);
       await controller.exec();
@@ -54,8 +55,10 @@ describe("ExportDesktopAccountController", () => {
         security_token: true
       }));
 
+      const base64Content =  Buffer.from(JSON.stringify(accountToExport.toDto())).toString('base64');
+
       expect(controller.desktopTransferModel.getAccountKit).toHaveBeenCalled();
-      expect(FileService.saveFile).toHaveBeenCalledWith("account-kit.json", JSON.stringify(accountToExport.toDto()), "application/json", worker.tab.id);
+      expect(FileService.saveFile).toHaveBeenCalledWith("account-kit.passbolt", base64Content, "application/passbolt", worker.tab.id);
     });
   });
 
@@ -80,7 +83,7 @@ describe("ExportDesktopAccountController", () => {
     it("Should emit error when an error occured.", async() => {
       expect.assertions(1);
       const error = new Error('Cannot download');
-      PassphraseController.get = jest.fn().mockRejectedValue(error);
+      controller.getPassphraseService.getPassphrase.mockRejectedValue(error);
 
       await controller._exec();
 

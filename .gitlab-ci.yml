@@ -4,6 +4,7 @@ stages:
   - test
   - build
   - review
+  - release
   - publish
 
 .rules:
@@ -17,3 +18,4 @@ include:
   - local: "/.gitlab-ci/jobs/test.yml"
   - local: "/.gitlab-ci/jobs/review.yml"
   - local: "/.gitlab-ci/jobs/publish.yml"
+  - local: ".gitlab-ci/jobs/release.yml"

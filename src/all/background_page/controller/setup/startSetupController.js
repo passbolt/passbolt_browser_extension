@@ -81,7 +81,7 @@ class StartSetupController {
    * @private
    */
   async _findAndSetAccountSetupMeta() {
-    const {user, accountRecoveryOrganizationPolicy} = await this.setupModel.startSetup(
+    const {user, accountRecoveryOrganizationPolicy, userPassphrasePolicies} = await this.setupModel.startSetup(
       this.account.userId,
       this.account.authenticationTokenToken
     );
@@ -97,6 +97,11 @@ class StartSetupController {
     // Keep the account recovery organization policy in the setup runtime memory.
     if (accountRecoveryOrganizationPolicy) {
       this.runtimeMemory.accountRecoveryOrganizationPolicy = accountRecoveryOrganizationPolicy;
+    }
+
+    // Keep the user passphrase policies in the setup runtime memory.
+    if (userPassphrasePolicies) {
+      this.runtimeMemory.userPassphrasePolicies = userPassphrasePolicies;
     }
   }
 

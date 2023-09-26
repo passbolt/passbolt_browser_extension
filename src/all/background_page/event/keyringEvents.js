@@ -5,15 +5,14 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import Keyring from "../model/keyring";
-import {PassphraseController as passphraseController} from "../controller/passphrase/passphraseController";
 import CheckPassphraseController from "../controller/crypto/checkPassphraseController";
 import GetUserKeyInfoController from "../controller/crypto/getUserKeyInfoController";
 import GetKeyInfoController from "../controller/crypto/getKeyInfoController";
 import DownloadUserPublicKeyController from "../controller/crypto/downloadUserPublicKeyController";
 import DownloadUserPrivateKeyController from "../controller/crypto/downloadUserPrivateKeyController";
+import GetUserPrivateKeyController from "../controller/crypto/getUserPrivateKeyController";
 
-const listen = function(worker) {
+const listen = function(worker, _, account) {
   /*
    * ==================================================================================
    *  Get Key info events
@@ -86,7 +85,7 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.keyring.download-my-private-key', async requestId => {
-    const controller = new DownloadUserPrivateKeyController(worker, requestId);
+    const controller = new DownloadUserPrivateKeyController(worker, requestId, account);
     await controller._exec();
   });
 
@@ -97,17 +96,8 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.keyring.get-private-key', async requestId => {
-    try {
-      await passphraseController.request(worker);
-      const keyring = new Keyring();
-      const privateKeyInfo = keyring.findPrivate();
-      if (!privateKeyInfo) {
-        throw new Error('Private key not found.');
-      }
-      worker.port.emit(requestId, 'SUCCESS', privateKeyInfo.armoredKey);
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new GetUserPrivateKeyController(worker, requestId, account);
+    await controller._exec();
   });
 };
 export const KeyringEvents = {listen};

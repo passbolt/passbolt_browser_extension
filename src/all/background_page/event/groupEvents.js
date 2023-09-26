@@ -18,7 +18,7 @@ import GroupEntity from "../model/entity/group/groupEntity";
 import GroupDeleteTransferEntity from "../model/entity/group/transfer/groupDeleteTransfer";
 
 
-const listen = function(worker) {
+const listen = function(worker, _, account) {
   /*
    * Pull the groups from the API and update the local storage.
    *
@@ -91,7 +91,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.groups.update', async(requestId, groupDto) => {
     const clientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new GroupsUpdateController(worker, requestId, clientOptions);
+    const controller = new GroupsUpdateController(worker, requestId, clientOptions, account);
     try {
       const groupUpdated = await controller.main(groupDto);
       worker.port.emit(requestId, 'SUCCESS', groupUpdated);

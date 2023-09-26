@@ -17,10 +17,10 @@ import PublicWebsiteSignInController from "../controller/publicWebsiteSignIn/pub
 /**
  * Listens the public website sign in events
  * @param {Worker} worker The worker
- * @param {ApiClientOptions} apiClientOptions
+ * @param {ApiClientOptions} _
  * @param {AccountEntity} account The account completing the account recovery
  */
-const listen = function(worker, apiClientOptions, account) {
+const listen = function(worker, _, account) {
   worker.port.on('passbolt.extension.sign-in-url', async requestId => {
     const controller = new PublicWebsiteSignInController(worker, requestId, account);
     await controller._exec();

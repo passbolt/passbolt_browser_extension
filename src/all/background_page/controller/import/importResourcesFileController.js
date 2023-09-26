@@ -16,7 +16,7 @@ import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import User from "../../model/user";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import ResourceModel from "../../model/resource/resourceModel";
-import {PassphraseController as passphraseController} from "../passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import FolderModel from "../../model/folder/folderModel";
 import TagModel from "../../model/tag/tagModel";
@@ -36,22 +36,24 @@ class ImportResourcesFileController {
   /**
    * ImportResourcesFileController constructor
    * @param {Worker} worker
-   * @param {ApiClientOptions} clientOptions
+   * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account the account associated to the worker
    */
-  constructor(worker, clientOptions) {
+  constructor(worker, apiClientOptions, account) {
     this.worker = worker;
 
     // Crypto
     this.keyring = new Keyring();
 
     // Models
-    this.resourceTypeModel = new ResourceTypeModel(clientOptions);
-    this.resourceModel = new ResourceModel(clientOptions);
-    this.folderModel = new FolderModel(clientOptions);
-    this.tagModel = new TagModel(clientOptions);
+    this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions);
+    this.folderModel = new FolderModel(apiClientOptions);
+    this.tagModel = new TagModel(apiClientOptions);
 
     // Progress
     this.progressService = new ProgressService(this.worker, i18n.t("Importing ..."));
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -133,7 +135,7 @@ class ImportResourcesFileController {
    * @returns {Promise<openpgp.PrivateKey>}
    */
   async getPrivateKey() {
-    const passphrase = await passphraseController.get(this.worker);
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     return GetDecryptedUserPrivateKeyService.getKey(passphrase);
   }
 

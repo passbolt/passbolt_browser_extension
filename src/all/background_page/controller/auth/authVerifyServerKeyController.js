@@ -33,7 +33,6 @@ class AuthVerifyServerKeyController {
   constructor(worker, requestId, apiClientOptions, userDomain) {
     this.worker = worker;
     this.requestId = requestId;
-    this.apiClientOptions = apiClientOptions;
     this.userDomain = userDomain;
     this.keyring = new Keyring();
     this.authLegacy = new GpgAuth(this.keyring);

@@ -32,7 +32,6 @@ class AuthLoginController {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
-    this.apiClientOptions = apiClientOptions;
     this.authModel = new AuthModel(apiClientOptions);
     this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
     this.checkPassphraseService = new CheckPassphraseService(new Keyring());

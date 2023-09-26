@@ -5,13 +5,12 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import Keyring from "../model/keyring";
-import GetPassphraseService from "../service/passphrase/getPassphraseService";
 import CheckPassphraseController from "../controller/crypto/checkPassphraseController";
 import GetUserKeyInfoController from "../controller/crypto/getUserKeyInfoController";
 import GetKeyInfoController from "../controller/crypto/getKeyInfoController";
 import DownloadUserPublicKeyController from "../controller/crypto/downloadUserPublicKeyController";
 import DownloadUserPrivateKeyController from "../controller/crypto/downloadUserPrivateKeyController";
+import GetUserPrivateKeyController from "../controller/crypto/getUserPrivateKeyController";
 
 const listen = function(worker, _, account) {
   /*
@@ -97,18 +96,8 @@ const listen = function(worker, _, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.keyring.get-private-key', async requestId => {
-    try {
-      const getPassphraseService = new GetPassphraseService(account);
-      await getPassphraseService.request(worker);
-      const keyring = new Keyring();
-      const privateKeyInfo = keyring.findPrivate();
-      if (!privateKeyInfo) {
-        throw new Error('Private key not found.');
-      }
-      worker.port.emit(requestId, 'SUCCESS', privateKeyInfo.armoredKey);
-    } catch (error) {
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const controller = new GetUserPrivateKeyController(worker, requestId, account);
+    await controller._exec();
   });
 };
 export const KeyringEvents = {listen};

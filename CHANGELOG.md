@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [4.3.1] - 2023-09-28
+### Fixed
+- PB-27860 As a signed-in user I should be able to autofill from the quickaccess
+
+
 ## [4.3.0] - 2023-09-21
 ### Added
 - PB-24600 As a user remember me is kept checked for next time if it was used
@@ -1329,6 +1334,7 @@ self registration settings option in the left-side bar
 - LU: Logged in user
 
 [Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.2.0...HEAD
+[4.3.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.3.0...v.4.3.1
 [4.3.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.2.0...v.4.3.0
 [4.2.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.1.2...v.4.2.0
 [4.1.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.1.0...v4.1.2

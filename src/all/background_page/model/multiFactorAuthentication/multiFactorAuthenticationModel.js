@@ -87,7 +87,7 @@ class MultiFactorAuthenticationModel {
    */
   async verifyProvider(provider) {
     const result =  await this.multiFactorAuthenticationService.verifyProvider(provider);
-    return new MfaVerifyProviderEntity(result);
+    return new MfaVerifyProviderEntity(result).toDto();
   }
 
   /**

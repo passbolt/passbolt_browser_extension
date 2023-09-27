@@ -14,6 +14,7 @@ import WorkerService from "../service/worker/workerService";
 import FindMeController from "../controller/rbac/findMeController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
+import ResourceModel from "../model/resource/resourceModel";
 
 const listen = function(worker, _, account) {
   /*
@@ -42,16 +43,13 @@ const listen = function(worker, _, account) {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const controller = new SecretDecryptController(worker, requestId, apiClientOptions, account);
-      const {plaintext, resource} = await controller.main(resourceId, false);
+      const plaintextEntity = await controller.exec(resourceId);
+      const resourceModel = new ResourceModel(apiClientOptions);
+      const resource = await resourceModel.getById(resourceId);
 
       // Define what to do autofill
       const username = resource.username || '';
-      let password;
-      if (typeof plaintext === 'string') {
-        password = plaintext;
-      } else {
-        password = plaintext.password || '';
-      }
+      const password = plaintextEntity?.password || '';
 
       // Current active tab's url is passing to quick access to check the same origin request
       const webIntegrationWorker = await WorkerService.get('WebIntegration', tab.id);

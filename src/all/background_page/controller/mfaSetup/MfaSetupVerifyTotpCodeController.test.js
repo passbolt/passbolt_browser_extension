@@ -15,7 +15,7 @@
 import {enableFetchMocks} from "jest-fetch-mock";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import MfaSetupVerifyOtpCodeController from "./MfaSetupVerifyOtpCodeController";
+import MfaSetupVerifyTotpCodeController from "./MfaSetupVerifyTotpCodeController";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {defaultSetupTotpData} from "../../model/entity/mfa/mfaSetupTotpEntity.test.data";
 import MfaSetupTotpEntity from "../../model/entity/mfa/mfaSetupTotpEntity";
@@ -25,11 +25,11 @@ beforeEach(() => {
 });
 
 
-describe("MfaSetupVerifyOtpCodeController", () => {
+describe("MfaSetupVerifyTotpCodeController", () => {
   let controller;
 
   beforeEach(() => {
-    controller = new MfaSetupVerifyOtpCodeController(null, null, defaultApiClientOptions());
+    controller = new MfaSetupVerifyTotpCodeController(null, null, defaultApiClientOptions());
   });
 
   it("Should verify the otp code", async() => {

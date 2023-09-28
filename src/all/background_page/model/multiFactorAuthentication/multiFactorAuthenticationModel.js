@@ -80,6 +80,16 @@ class MultiFactorAuthenticationModel {
   }
 
   /**
+   * Setup the yubikey provider
+   * @param   {MfaSetupYubikeyEntity} totpEntity
+   * @returns {Promise<void>}
+   * @public
+   */
+  async setupYubikey(totpEntity) {
+    await this.multiFactorAuthenticationService.setupYubikey(totpEntity.toDto());
+  }
+
+  /**
    * Verify the provider setup
    * @param   {MfaProviderEntity} providerEntity
    * @returns {Promise<void>}

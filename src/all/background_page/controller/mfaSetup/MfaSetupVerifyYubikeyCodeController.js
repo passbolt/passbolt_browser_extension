@@ -12,13 +12,13 @@
  * @since         4.4.0
  */
 
-import MfaProviderEntity from "../../model/entity/mfa/mfaProviderEntity";
+import MfaSetupYubikeyEntity from "../../model/entity/mfa/mfaSetupYubikeyEntity";
 import MultiFactorAuthenticationModel from "../../model/multiFactorAuthentication/multiFactorAuthenticationModel";
 
 
-class MfaSetupRemoveProviderController {
+class MfaSetupVerifyYubikeyCodeController {
   /**
-   * MfaSetupRemoveProviderController constructor
+   * MfaSetupVerifyYubikeyCodeController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    */
@@ -35,8 +35,8 @@ class MfaSetupRemoveProviderController {
    */
   async _exec(providerDto) {
     try {
-      await this.exec(providerDto);
-      this.worker.port.emit(this.requestId, "SUCCESS");
+      const response = await this.exec(providerDto);
+      this.worker.port.emit(this.requestId, "SUCCESS", response);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, 'ERROR', error);
@@ -44,15 +44,15 @@ class MfaSetupRemoveProviderController {
   }
 
   /**
-   * Check and save the otp code
-   * @param  {string} provider the provider
+   * Check and save the yubikey otp code
+   * @param  {Object} yubikeyCode code
    * @throws {Error} if the provider is missing
    * @throws {TypeError} if the provider is not part of the enum
    */
-  async exec(providerDto) {
-    const providerEntity = new MfaProviderEntity(providerDto);
-    await this.multiFactorAuthenticationModel.removeProvider(providerEntity);
+  async exec(yubikeyCode) {
+    const yubikeyEntity = new MfaSetupYubikeyEntity(yubikeyCode);
+    return await this.multiFactorAuthenticationModel.verifyProvider(yubikeyEntity);
   }
 }
 
-export default MfaSetupRemoveProviderController;
+export default MfaSetupVerifyYubikeyCodeController;

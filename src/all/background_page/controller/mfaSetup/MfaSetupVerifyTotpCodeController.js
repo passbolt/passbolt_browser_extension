@@ -16,9 +16,9 @@ import MfaSetupTotpEntity from "../../model/entity/mfa/mfaSetupTotpEntity";
 import MultiFactorAuthenticationModel from "../../model/multiFactorAuthentication/multiFactorAuthenticationModel";
 
 
-class MfaSetupVerifyOtpCodeController {
+class MfaSetupVerifyTotpCodeController {
   /**
-   * MfaSetupVerifyOtpCodeController constructor
+   * MfaSetupVerifyTotpCodeController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    */
@@ -53,4 +53,4 @@ class MfaSetupVerifyOtpCodeController {
   }
 }
 
-export default MfaSetupVerifyOtpCodeController;
+export default MfaSetupVerifyTotpCodeController;

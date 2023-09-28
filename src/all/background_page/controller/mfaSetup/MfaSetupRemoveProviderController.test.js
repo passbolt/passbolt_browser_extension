@@ -18,6 +18,7 @@ import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOpti
 import MfaSetupRemoveProviderController from "./MfaSetupRemoveProviderController";
 import {defaultMfaProviderData} from "../../model/entity/mfa/mfaProviderEntity.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import MfaProviderEntity from "../../model/entity/mfa/mfaProviderEntity";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -39,7 +40,7 @@ describe("MfaSetupRemoveProviderController", () => {
 
     await controller.exec(defaultMfaProviderData());
 
-    expect(controller.multiFactorAuthenticationModel.removeProvider).toHaveBeenCalledWith(defaultMfaProviderData().provider);
+    expect(controller.multiFactorAuthenticationModel.removeProvider).toHaveBeenCalledWith(new MfaProviderEntity(defaultMfaProviderData()));
   });
 
   it("Should validate the totp with entity", async() => {

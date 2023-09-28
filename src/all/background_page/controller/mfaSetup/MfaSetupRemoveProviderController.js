@@ -25,8 +25,7 @@ class MfaSetupRemoveProviderController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.apiClientOptions = apiClientOptions;
-    this.multiFactorAuthenticationModel = new MultiFactorAuthenticationModel(this.apiClientOptions);
+    this.multiFactorAuthenticationModel = new MultiFactorAuthenticationModel(apiClientOptions);
   }
 
   /**
@@ -51,8 +50,8 @@ class MfaSetupRemoveProviderController {
    * @throws {TypeError} if the provider is not part of the enum
    */
   async exec(providerDto) {
-    const provider = new MfaProviderEntity(providerDto).provider;
-    await this.multiFactorAuthenticationModel.removeProvider(provider);
+    const providerEntity = new MfaProviderEntity(providerDto);
+    await this.multiFactorAuthenticationModel.removeProvider(providerEntity);
   }
 }
 

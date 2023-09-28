@@ -25,8 +25,7 @@ class MfaSetupVerifyOtpCodeController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.apiClientOptions = apiClientOptions;
-    this.multiFactorAuthenticationModel = new MultiFactorAuthenticationModel(this.apiClientOptions);
+    this.multiFactorAuthenticationModel = new MultiFactorAuthenticationModel(apiClientOptions);
   }
 
   /**
@@ -50,8 +49,7 @@ class MfaSetupVerifyOtpCodeController {
    */
   async exec(setupDto) {
     const totpEntity = new MfaSetupTotpEntity(setupDto);
-    const toptSetupDto = totpEntity.toDto();
-    await this.multiFactorAuthenticationModel.setupTotp(toptSetupDto);
+    await this.multiFactorAuthenticationModel.setupTotp(totpEntity);
   }
 }
 

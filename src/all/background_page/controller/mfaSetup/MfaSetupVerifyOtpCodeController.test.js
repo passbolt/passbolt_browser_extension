@@ -18,6 +18,7 @@ import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/
 import MfaSetupVerifyOtpCodeController from "./MfaSetupVerifyOtpCodeController";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {defaultSetupTotpData} from "../../model/entity/mfa/mfaSetupTotpEntity.test.data";
+import MfaSetupTotpEntity from "../../model/entity/mfa/mfaSetupTotpEntity";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -39,7 +40,7 @@ describe("MfaSetupVerifyOtpCodeController", () => {
 
     await controller.exec(defaultSetupTotpData());
 
-    expect(controller.multiFactorAuthenticationModel.setupTotp).toHaveBeenCalledWith(defaultSetupTotpData());
+    expect(controller.multiFactorAuthenticationModel.setupTotp).toHaveBeenCalledWith(new MfaSetupTotpEntity(defaultSetupTotpData()));
   });
 
   it("Should validate the otp uri and code with entity", async() => {

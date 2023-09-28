@@ -66,7 +66,7 @@ class MultiFactorAuthenticationService extends AbstractService {
 
   /**
    * setup the totp provider
-   * @param {MfaSetupTotpEntity} body
+   * @param {Object} body
    * @throw {TypeError} invalid otp provisioning uri
    * @throw {TypeError} invalid otp code
    * @public

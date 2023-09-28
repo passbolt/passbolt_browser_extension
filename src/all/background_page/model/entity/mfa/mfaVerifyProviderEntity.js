@@ -46,6 +46,7 @@ class MfaVerifyProviderEntity extends Entity {
       "properties": {
         "verified": {
           "type": "string",
+          "format": "date-time"
         },
       }
     };

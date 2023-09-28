@@ -25,8 +25,7 @@ class MfaSetupVerifyProviderController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.apiClientOptions = apiClientOptions;
-    this.multiFactorAuthenticationModel = new MultiFactorAuthenticationModel(this.apiClientOptions);
+    this.multiFactorAuthenticationModel = new MultiFactorAuthenticationModel(apiClientOptions);
   }
 
   /**
@@ -46,13 +45,13 @@ class MfaSetupVerifyProviderController {
 
   /**
    * Check and save the otp code
-   * @param   {string} provider the provider
+   * @param  {Object} provider the provider
    * @throws {Error} if the provider is missing
    * @throws {TypeError} if the provider is not part of the enum
    */
   async exec(providerDto) {
-    const provider = new MfaProviderEntity(providerDto).provider;
-    return await this.multiFactorAuthenticationModel.verifyProvider(provider);
+    const providerEntity = new MfaProviderEntity(providerDto);
+    return await this.multiFactorAuthenticationModel.verifyProvider(providerEntity);
   }
 }
 

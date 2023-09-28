@@ -71,33 +71,33 @@ class MultiFactorAuthenticationModel {
 
   /**
    * Setup the topt provider
-   * @param   {Object} mfaSetupTotpDto
-   * @returns {void}
+   * @param   {MfaSetupTotpEntity} totpEntity
+   * @returns {Promise<void>}
    * @public
    */
-  async setupTotp(mfaSetupTotpDto) {
-    await this.multiFactorAuthenticationService.setupTotp(mfaSetupTotpDto);
+  async setupTotp(totpEntity) {
+    await this.multiFactorAuthenticationService.setupTotp(totpEntity.toDto());
   }
 
   /**
    * Verify the provider setup
-   * @param   {string} provider
-   * @returns {void}
+   * @param   {MfaProviderEntity} providerEntity
+   * @returns {Promise<void>}
    * @public
    */
-  async verifyProvider(provider) {
-    const result =  await this.multiFactorAuthenticationService.verifyProvider(provider);
-    return new MfaVerifyProviderEntity(result).toDto();
+  async verifyProvider(providerEntity) {
+    const result =  await this.multiFactorAuthenticationService.verifyProvider(providerEntity.provider);
+    return new MfaVerifyProviderEntity(result);
   }
 
   /**
    * Remove the provider from configuration
-   * @param   {string} provider
-   * @returns {void}
+   * @param   {MfaProviderEntity} providerEntity
+   * @returns {Promise<void>}
    * @public
    */
-  async removeProvider(provider) {
-    await this.multiFactorAuthenticationService.removeProvider(provider);
+  async removeProvider(providerEntity) {
+    await this.multiFactorAuthenticationService.removeProvider(providerEntity.provider);
   }
 }
 

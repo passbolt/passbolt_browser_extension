@@ -19,6 +19,8 @@ import {defaultMfaProviderData} from "../../model/entity/mfa/mfaProviderEntity.t
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import MfaSetupVerifyProviderController from "./MfaSetupVerifyProviderController";
 import {defaultVerifyProviderData} from "../../model/entity/mfa/mfaVerifyProviderEntity.test.data";
+import MfaProviderEntity from "../../model/entity/mfa/mfaProviderEntity";
+import MfaVerifyProviderEntity from "../../model/entity/mfa/mfaVerifyProviderEntity";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -36,11 +38,12 @@ describe("MfaSetupVerifyProviderController", () => {
     expect.assertions(2);
     jest.spyOn(controller.multiFactorAuthenticationModel, "verifyProvider");
 
+    const verifyEntityParameter = new MfaProviderEntity(defaultMfaProviderData());
     fetch.doMock(() => mockApiResponse(defaultVerifyProviderData()));
     const result = await controller.exec(defaultMfaProviderData());
 
-    expect(controller.multiFactorAuthenticationModel.verifyProvider).toHaveBeenCalledWith(defaultMfaProviderData().provider);
-    expect(result).toEqual(defaultVerifyProviderData());
+    expect(controller.multiFactorAuthenticationModel.verifyProvider).toHaveBeenCalledWith(verifyEntityParameter);
+    expect(result).toEqual(new MfaVerifyProviderEntity(defaultVerifyProviderData()));
   });
 
   it("Should validate the mfa provider with entity", async() => {

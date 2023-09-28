@@ -18,6 +18,10 @@ import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOpti
 import MultiFactorAuthenticationModel from "./multiFactorAuthenticationModel";
 import {defaultSetupTotpData} from "../entity/mfa/mfaSetupTotpEntity.test.data";
 import {defaultVerifyProviderData} from "../entity/mfa/mfaVerifyProviderEntity.test.data";
+import MfaVerifyProviderEntity from "../entity/mfa/mfaVerifyProviderEntity";
+import {defaultMfaProviderData} from "../entity/mfa/mfaProviderEntity.test.data";
+import MfaSetupTotpEntity from "../entity/mfa/mfaSetupTotpEntity";
+import MfaProviderEntity from "../entity/mfa/mfaProviderEntity";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -37,7 +41,7 @@ describe("MultiFactorAuthenticationModel", () => {
 
     fetch.doMock(() => mockApiResponse({}));
 
-    await model.setupTotp(defaultSetupTotpData());
+    await model.setupTotp(new MfaSetupTotpEntity(defaultSetupTotpData()));
 
     expect(model.multiFactorAuthenticationService.setupTotp).toHaveBeenCalledWith(defaultSetupTotpData());
   });
@@ -48,10 +52,10 @@ describe("MultiFactorAuthenticationModel", () => {
 
     fetch.doMock(() => mockApiResponse(defaultVerifyProviderData()));
 
-    const result = await model.verifyProvider("totp");
+    const result = await model.verifyProvider(new defaultMfaProviderData());
 
     expect(model.multiFactorAuthenticationService.verifyProvider).toHaveBeenCalledWith("totp");
-    expect(result).toEqual(defaultVerifyProviderData());
+    expect(result).toEqual(new MfaVerifyProviderEntity(defaultVerifyProviderData()));
   });
 
   it("Should able to remove a MFA provider", async() => {
@@ -60,7 +64,7 @@ describe("MultiFactorAuthenticationModel", () => {
 
     fetch.doMock(() => mockApiResponse({}));
 
-    await model.removeProvider("totp");
+    await model.removeProvider(new MfaProviderEntity(defaultMfaProviderData()));
 
     expect(model.multiFactorAuthenticationService.removeProvider).toHaveBeenCalledWith("totp");
   });

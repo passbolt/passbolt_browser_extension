@@ -15,7 +15,7 @@ import ShareFoldersController from "../controller/share/shareFoldersController";
 import FoldersCollection from "../model/entity/folder/foldersCollection";
 import PermissionChangesCollection from "../model/entity/permission/change/permissionChangesCollection";
 
-const listen = function(worker) {
+const listen = function(worker, _, account) {
   /*
    * Search aros based on keywords.
    * @listens passbolt.share.search-aros
@@ -78,7 +78,7 @@ const listen = function(worker) {
   worker.port.on('passbolt.share.resources.save', async(requestId, resources, changes) => {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
-      const shareResourcesController = new ShareResourcesController(worker, requestId, apiClientOptions);
+      const shareResourcesController = new ShareResourcesController(worker, requestId, apiClientOptions, account);
       await shareResourcesController.main(resources, changes);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
@@ -97,7 +97,7 @@ const listen = function(worker) {
       const folders = new FoldersCollection(foldersDto);
       const permissionChanges = new PermissionChangesCollection(changesDto);
       const apiClientOptions = await User.getInstance().getApiClientOptions();
-      const shareFoldersController = new ShareFoldersController(worker, requestId, apiClientOptions);
+      const shareFoldersController = new ShareFoldersController(worker, requestId, apiClientOptions, account);
       await shareFoldersController.main(folders, permissionChanges);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {

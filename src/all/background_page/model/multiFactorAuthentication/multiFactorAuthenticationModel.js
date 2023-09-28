@@ -16,6 +16,7 @@ import UserEntity from "../entity/user/userEntity";
 import MultiFactorAuthenticationPolicyService from '../../service/api/multiFactorAuthentication/multiFactorAuthenticationPolicyService';
 import MfaPolicyEntity from '../entity/mfa/mfaPolicyEntity';
 import MfaCombinedEnabledProvidersEntity from '../entity/mfa/mfaCombinedEnabledProvidersEntity';
+import MfaVerifyProviderEntity from "../entity/mfa/mfaVerifyProviderEntity";
 
 class MultiFactorAuthenticationModel {
   /**
@@ -66,6 +67,37 @@ class MultiFactorAuthenticationModel {
   async getMfaSettings() {
     const setting = await this.multiFactorAuthenticationService.getSettings();
     return new MfaCombinedEnabledProvidersEntity(setting);
+  }
+
+  /**
+   * Setup the topt provider
+   * @param   {MfaSetupTotpEntity} totpEntity
+   * @returns {Promise<void>}
+   * @public
+   */
+  async setupTotp(totpEntity) {
+    await this.multiFactorAuthenticationService.setupTotp(totpEntity.toDto());
+  }
+
+  /**
+   * Verify the provider setup
+   * @param   {MfaProviderEntity} providerEntity
+   * @returns {Promise<void>}
+   * @public
+   */
+  async verifyProvider(providerEntity) {
+    const result =  await this.multiFactorAuthenticationService.verifyProvider(providerEntity.provider);
+    return new MfaVerifyProviderEntity(result);
+  }
+
+  /**
+   * Remove the provider from configuration
+   * @param   {MfaProviderEntity} providerEntity
+   * @returns {Promise<void>}
+   * @public
+   */
+  async removeProvider(providerEntity) {
+    await this.multiFactorAuthenticationService.removeProvider(providerEntity.provider);
   }
 }
 

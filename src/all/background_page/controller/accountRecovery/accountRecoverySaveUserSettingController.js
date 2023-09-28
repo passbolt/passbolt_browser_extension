@@ -16,7 +16,7 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
-import {PassphraseController} from "../passphrase/passphraseController";
+import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import User from "../../model/user";
 import AccountRecoveryUserSettingEntity from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import BuildApprovedAccountRecoveryUserSettingEntityService from "../../service/accountRecovery/buildApprovedAccountRecoveryUserSettingEntityService";
@@ -39,6 +39,7 @@ class AccountRecoverySaveUserSettingsController {
     this.keyring = new Keyring();
     this.account = account;
     this.accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
+    this.getPassphraseService = new GetPassphraseService(account);
   }
 
   /**
@@ -91,7 +92,7 @@ class AccountRecoverySaveUserSettingsController {
    * @returns {Promise<AccountRecoveryUserSettingEntity>}
    */
   async buildApprovedUserSetting(organizationPolicy) {
-    const userPassphrase = await PassphraseController.request(this.worker);
+    const userPassphrase = await this.getPassphraseService.requestPassphrase(this.worker);
     const userPrivateArmoredKey = this.keyring.findPrivate().armoredKey;
     const userPrivateKey = await OpenpgpAssertion.readKeyOrFail(userPrivateArmoredKey);
     const userDecryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, userPassphrase);

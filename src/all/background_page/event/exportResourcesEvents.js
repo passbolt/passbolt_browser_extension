@@ -8,7 +8,7 @@ import User from "../model/user";
 import ExportResourcesFileController from "../controller/export/exportResourcesFileController";
 
 
-const listen = function(worker) {
+const listen = function(worker, _, account) {
   /*
    * Export resources to file
    *
@@ -19,7 +19,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.export-resources.export-to-file', async(requestId, exportResourcesFileDto) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const exportController = new ExportResourcesFileController(worker, apiClientOptions);
+    const exportController = new ExportResourcesFileController(worker, apiClientOptions, account);
     try {
       await exportController.exec(exportResourcesFileDto);
       worker.port.emit(requestId, 'SUCCESS');

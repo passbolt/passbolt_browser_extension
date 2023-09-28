@@ -14,11 +14,11 @@
 import browser from "../../sdk/polyfill/browserPolyfill";
 import AuthModel from "../../model/auth/authModel";
 import UserAlreadyLoggedInError from "../../error/userAlreadyLoggedInError";
-import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
-import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 import Keyring from "../../model/keyring";
 import CheckPassphraseService from "../../service/crypto/checkPassphraseService";
 import UpdateSsoCredentialsService from "../../service/account/updateSsoCredentialsService";
+import UserRememberMeLatestChoiceLocalStorage from "../../service/local_storage/userRememberMeLatestChoiceLocalStorage";
+import UserRememberMeLatestChoiceEntity from "../../model/entity/rememberMe/userRememberMeLatestChoiceEntity";
 
 class AuthLoginController {
   /**
@@ -26,16 +26,17 @@ class AuthLoginController {
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account The user account
    */
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
+    this.apiClientOptions = apiClientOptions;
     this.authModel = new AuthModel(apiClientOptions);
-    this.organizationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
-    this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
     this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
     this.checkPassphraseService = new CheckPassphraseService(new Keyring());
+    this.userRememberMeLatestChoiceLocalStorage = new UserRememberMeLatestChoiceLocalStorage(account);
   }
 
   /**
@@ -95,6 +96,7 @@ class AuthLoginController {
 
     try {
       await this.authModel.login(passphrase, rememberMe);
+      await this.registerRememberMeOption(rememberMe);
     } catch (error) {
       if (!(error instanceof UserAlreadyLoggedInError)) {
         throw error;
@@ -113,6 +115,17 @@ class AuthLoginController {
   async redirectToApp() {
     const url = this.account.domain;
     browser.tabs.update(this.worker.tab.id, {url});
+  }
+
+  /**
+   * Handles the registration of the rememberMe choice from the user so it can be used next time.
+   * @param {boolean} rememberMe
+   * @returns {Promise<void>}
+   */
+  async registerRememberMeOption(rememberMe) {
+    const duration = rememberMe ? -1 : 0;
+    const userRememberMeLatestChoiceEntity = new UserRememberMeLatestChoiceEntity({duration});
+    await this.userRememberMeLatestChoiceLocalStorage.set(userRememberMeLatestChoiceEntity);
   }
 }
 

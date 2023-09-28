@@ -10,9 +10,12 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import {getResourceTypeCollection} from './abstractCsvRowParser.test.data.js';
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
 import CsvBitWardenRowParser from "./csvBitWardenRowParser";
+import {
+  resourceTypesCollectionDto
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import ResourceTypesCollection from "../../../entity/resourceType/resourceTypesCollection";
 
 describe("CsvBitWardenRowParser", () => {
   it("can parse BitWarden csv", () => {
@@ -56,7 +59,7 @@ describe("CsvBitWardenRowParser", () => {
       "notes": "Description 1",
       "folder": "Folder 1"
     };
-    const resourceTypeCollection = getResourceTypeCollection();
+    const resourceTypeCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
     jest.spyOn(resourceTypeCollection, "getFirst");
     const externalResourceEntity = CsvBitWardenRowParser.parse(data, resourceTypeCollection);
     expect(externalResourceEntity).toBeInstanceOf(ExternalResourceEntity);

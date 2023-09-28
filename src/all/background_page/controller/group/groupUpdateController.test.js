@@ -17,7 +17,6 @@ import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import User from "../../model/user";
 import GroupsUpdateController from "./groupUpdateController";
 import browser from "../../sdk/polyfill/browserPolyfill";
-import {PassphraseController} from "../passphrase/passphraseController";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 
 const {enableFetchMocks} = require("jest-fetch-mock");
@@ -25,16 +24,12 @@ const {mockApiResponse} = require("../../../../../test/mocks/mockApiResponse");
 const {pgpKeys} = require("../../../../../test/fixtures/pgpKeys/keys");
 const {users} = require("passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data");
 
-
-
 const {updateGroupNameDto, add2UsersToGroupDto, add2UsersToGroupDryRunResponse} = require("./groupUpdateController.test.data");
 const {defaultGroup} = require("../../model/entity/group/groupEntity.test.data");
 const {defaultDyRunResponse} = require("../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data");
 
-
 jest.mock("../../service/progress/progressService");
-
-jest.spyOn(PassphraseController, "get").mockImplementation(() => "ada@passbolt.com");
+jest.mock("../../service/passphrase/getPassphraseService");
 
 beforeEach(() => {
   enableFetchMocks();
@@ -57,6 +52,7 @@ describe("GroupsUpdateController", () => {
 
       const clientOptions = await User.getInstance().getApiClientOptions({requireCsrfToken: false});
       const controller = new GroupsUpdateController(null, null, clientOptions);
+      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
 
       // 1st API call is for the dry-run to verify which secrets needs to be computed (no secret to update)
       fetch.doMockOnce(() => mockApiResponse(defaultDyRunResponse()));
@@ -115,6 +111,8 @@ describe("GroupsUpdateController", () => {
 
       const clientOptions = await User.getInstance().getApiClientOptions({requireCsrfToken: false});
       const controller = new GroupsUpdateController(null, null, clientOptions);
+      controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
+
       const dryRunResponse = await add2UsersToGroupDryRunResponse();
       const resource1Id = getResourceId(dryRunResponse, 0);
       const resource2Id = getResourceId(dryRunResponse, 1);

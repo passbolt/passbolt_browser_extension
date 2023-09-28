@@ -58,7 +58,7 @@ describe("LocalStorageService", () => {
       expect(browser.alarms.clear).toHaveBeenCalledWith("SessionKeepAlive");
       expect(browser.storage.session.remove).toHaveBeenCalledWith("temp_server_part_sso_kit");
       expect(GetLegacyAccountService.get).not.toHaveBeenCalled();
-      expect(UserMeSessionStorageService.remove).not.toHaveBeenCalledWith();
+      expect(UserMeSessionStorageService.remove).not.toHaveBeenCalled();
     });
 
     it("Should flush all storage (with an account set)", async() => {

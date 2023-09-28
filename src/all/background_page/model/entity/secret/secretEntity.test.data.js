@@ -20,7 +20,7 @@ export const readSecret = (data = {}) => {
     data: "-----BEGIN PGP MESSAGE----- -----END PGP MESSAGE-----",
     modified: "2022-03-04T13:59:11+00:00",
     resource_id: uuidv4(),
-    user_id: uuidv4()
+    user_id: uuidv4(),
   };
 
   return Object.assign(defaultData, data);

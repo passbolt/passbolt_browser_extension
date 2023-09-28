@@ -63,6 +63,44 @@ class MultiFactorAuthenticationService extends AbstractService {
     const settings = await this.apiClient.fetchAndHandleResponse('GET', url);
     return settings.body;
   }
+
+  /**
+   * setup the totp provider
+   * @param {Object} body
+   * @throw {TypeError} invalid otp provisioning uri
+   * @throw {TypeError} invalid otp code
+   * @public
+   */
+  async setupTotp(body) {
+    const bodyString = this.apiClient.buildBody(body);
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/totp`);
+    await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+  }
+
+  /**
+   * Verify the provider
+   * @param {string} provider
+   * @throw {TypeError} invalid provider
+   * @public
+   */
+  async verifyProvider(provider) {
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/${provider}`);
+    const result = await this.apiClient.fetchAndHandleResponse('GET', url);
+    return result.body;
+  }
+
+  /**
+   * Remove the provider
+   * @param {string} provider
+   * @throw {TypeError} invalid provider
+   * @public
+   */
+  async removeProvider(provider) {
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/${provider}`);
+    const result = await this.apiClient.fetchAndHandleResponse('DELETE', url);
+    return result.body;
+  }
 }
+
 
 export default MultiFactorAuthenticationService;

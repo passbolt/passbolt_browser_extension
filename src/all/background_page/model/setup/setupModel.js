@@ -15,6 +15,7 @@ import UserService from "../../service/api/user/userService";
 import SetupService from "../../service/api/setup/setupService";
 import UserEntity from "../entity/user/userEntity";
 import Validator from "validator";
+import UserPassphrasePoliciesEntity from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity";
 
 class SetupModel {
   /**
@@ -36,11 +37,11 @@ class SetupModel {
    *
    * @param {string} userId The user id to start the setup for.
    * @param {string} authenticationTokenToken The authentication token.
-   * @return {Promise<{user: UserEntity, accountRecoveryOrganizationPolicy: AccountRecoveryOrganizationPolicyEntity}>}
+   * @return {Promise<{user: UserEntity, accountRecoveryOrganizationPolicy: AccountRecoveryOrganizationPolicyEntity, userPassphrasePolicies: UserPassphrasePoliciesEntity}>}
    * @throws {Error} if options are invalid or API error
    */
   async startSetup(userId, authenticationTokenToken) {
-    let user, accountRecoveryOrganizationPolicy, userDto, accountRecoveryOrganizationPolicyDto;
+    let user, accountRecoveryOrganizationPolicy, userDto, accountRecoveryOrganizationPolicyDto, userPassphrasePoliciesDto, userPassphrasePolicies;
 
     if (!Validator.isUUID(userId)) {
       throw new TypeError("userId should be a valid uuid.");
@@ -53,6 +54,7 @@ class SetupModel {
       const result = await this.setupService.findSetupInfo(userId, authenticationTokenToken);
       userDto = result?.user;
       accountRecoveryOrganizationPolicyDto = result?.account_recovery_organization_policy;
+      userPassphrasePoliciesDto = result?.user_passphrase_policy;
     } catch (error) {
       // If the entry point doesn't exist or return a 500, the API version is <v3.
       const code = error.data && error.data.code;
@@ -69,8 +71,11 @@ class SetupModel {
     if (accountRecoveryOrganizationPolicyDto) {
       accountRecoveryOrganizationPolicy = new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
     }
+    if (userPassphrasePoliciesDto) {
+      userPassphrasePolicies = new UserPassphrasePoliciesEntity(userPassphrasePoliciesDto);
+    }
 
-    return {user, accountRecoveryOrganizationPolicy};
+    return {user, accountRecoveryOrganizationPolicy, userPassphrasePolicies};
   }
 
   /**
@@ -81,10 +86,10 @@ class SetupModel {
    *
    * @param {string} userId The user id to start the recover for.
    * @param {string} authenticationTokenToken The authentication token.
-   * @return {Promise<{user: UserEntity, accountRecoveryOrganizationPolicy: AccountRecoveryOrganizationPolicyEntity}>}
+   * @return {Promise<{user: UserEntity, userPassphrasePolicies: UserPassphrasePoliciesEntity}>}
    */
   async startRecover(userId, authenticationTokenToken) {
-    let user, accountRecoveryOrganizationPolicy, userDto, accountRecoveryOrganizationPolicyDto;
+    let user, userDto, userPassphrasePoliciesDto, userPassphrasePolicies;
 
     if (!Validator.isUUID(userId)) {
       throw new TypeError("userId should be a valid uuid.");
@@ -96,7 +101,7 @@ class SetupModel {
     try {
       const result = await this.setupService.findRecoverInfo(userId, authenticationTokenToken);
       userDto = result?.user;
-      accountRecoveryOrganizationPolicyDto = result?.account_recovery_organization_policy;
+      userPassphrasePoliciesDto = result?.user_passphrase_policy;
     } catch (error) {
       // If the entry point doesn't exist or return a 500, the API version is <v3.
       const code = error.data && error.data.code;
@@ -109,11 +114,11 @@ class SetupModel {
     if (userDto) {
       user = new UserEntity(userDto);
     }
-    if (accountRecoveryOrganizationPolicyDto) {
-      accountRecoveryOrganizationPolicy = new AccountRecoveryOrganizationPolicyEntity(accountRecoveryOrganizationPolicyDto);
+    if (userPassphrasePoliciesDto) {
+      userPassphrasePolicies = new UserPassphrasePoliciesEntity(userPassphrasePoliciesDto);
     }
 
-    return {user, accountRecoveryOrganizationPolicy};
+    return {user, userPassphrasePolicies};
   }
 
   /**

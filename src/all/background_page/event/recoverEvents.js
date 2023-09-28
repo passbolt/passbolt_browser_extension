@@ -30,6 +30,7 @@ import IsLostPassphraseCaseController from "../controller/accountRecovery/isLost
 import SetSetupSecurityTokenController from "../controller/setup/setSetupSecurityTokenController";
 import HasRecoverUserEnabledAccountRecoveryController from "../controller/recover/hasRecoverUserEnabledAccountRecoveryController";
 import GeneratePortIdController from "../controller/port/generatePortIdController";
+import GetUserPassphrasePoliciesController from "../controller/setup/getUserPassphrasePoliciesController";
 
 
 const listen = (worker, apiClientOptions, account) => {
@@ -57,7 +58,7 @@ const listen = (worker, apiClientOptions, account) => {
   });
 
   worker.port.on('passbolt.recover.start', async requestId => {
-    const controller = new StartRecoverController(worker, requestId, apiClientOptions, account);
+    const controller = new StartRecoverController(worker, requestId, apiClientOptions, account, runtimeMemory);
     await controller._exec();
   });
 
@@ -128,6 +129,11 @@ const listen = (worker, apiClientOptions, account) => {
 
   worker.port.on('passbolt.port.generate-id', async requestId => {
     const controller = new GeneratePortIdController(worker, requestId);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.recover.get-user-passphrase-policies', async requestId => {
+    const controller = new GetUserPassphrasePoliciesController(worker, requestId, runtimeMemory);
     await controller._exec();
   });
 };

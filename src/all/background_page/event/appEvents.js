@@ -38,6 +38,8 @@ import SavePasswordPoliciesController from "../controller/passwordPolicies/saveP
 import FindPasswordPoliciesController from "../controller/passwordPolicies/findPasswordPoliciesController";
 import ExportDesktopAccountController from "../controller/exportAccount/exportDesktopAccountController";
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
+import FindUserPassphrasePoliciesController from "../controller/userPassphrasePolicies/findUserPassphrasePoliciesController";
+import SaveUserPassphrasePoliciesController from "../controller/userPassphrasePolicies/saveUserPassphrasePoliciesController";
 
 const listen = function(worker, _, account) {
   const authenticationEventController = new AuthenticationEventController(worker);
@@ -167,7 +169,7 @@ const listen = function(worker, _, account) {
 
   worker.port.on('passbolt.sso.generate-sso-kit', async(requestId, provider) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new GenerateSsoKitController(worker, requestId, apiClientOptions);
+    const controller = new GenerateSsoKitController(worker, requestId, apiClientOptions, account);
     await controller._exec(provider);
   });
 
@@ -205,6 +207,24 @@ const listen = function(worker, _, account) {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new FindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
     await controller._exec();
+  });
+
+  /*
+   * ==================================================================================
+   *  User Passphrase Policies events.
+   * ==================================================================================
+   */
+
+  worker.port.on('passbolt.user-passphrase-policies.find', async requestId => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new FindUserPassphrasePoliciesController(worker, requestId, apiClientOptions);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.user-passphrase-policies.save', async(requestId, userPassphrasePoliciesDto) => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new SaveUserPassphrasePoliciesController(worker, requestId, apiClientOptions);
+    await controller._exec(userPassphrasePoliciesDto);
   });
 
   /*

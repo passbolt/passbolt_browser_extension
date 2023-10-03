@@ -17,21 +17,19 @@ import ExportDesktopAccountController from "./exportDesktopAccountController";
 import {requestId, worker} from "./exportDesktopAccountController.test.data";
 import FileService from "../../service/file/fileService";
 import GetLegacyAccountService from "../../service/account/getLegacyAccountService";
-import AccountKitEntity from "../../model/entity/account/accountKitEntity";
 import {Buffer} from 'buffer';
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
-import {signedMessage} from "../../service/crypto/verifyMessageSign.test.data";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import SignMessageService from "../../service/crypto/signMessageService";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 describe("ExportDesktopAccountController", () => {
-  const accountDto = new AccountEntity(defaultAccountDto());
-  const controller = new ExportDesktopAccountController(worker, requestId, accountDto);
+  const account = new AccountEntity(defaultAccountDto());
+  const controller = new ExportDesktopAccountController(worker, requestId, account);
 
   beforeEach(() => {
     jest.spyOn(controller.getPassphraseService, "getPassphrase").mockImplementation(() => pgpKeys.ada.passphrase);
-    jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => accountDto);
-    jest.spyOn(FileService, "saveFile").mockImplementation(jest.fn());
+    jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
     jest.spyOn(controller.desktopTransferModel, "getAccountKit");
   });
 
@@ -40,6 +38,7 @@ describe("ExportDesktopAccountController", () => {
       expect.assertions(3);
       //Simulate an error to check is the other methods have not been called
       jest.spyOn(controller.getPassphraseService, "getPassphrase").mockRejectedValue(() => new Error());
+      jest.spyOn(FileService, "saveFile").mockImplementation(jest.fn());
 
       try {
         await controller.exec();
@@ -50,27 +49,26 @@ describe("ExportDesktopAccountController", () => {
       expect(FileService.saveFile).not.toHaveBeenCalled();
     });
     it("Should save the signed account kit.", async() => {
-      expect.assertions(4);
+      expect.assertions(5);
 
+      let resultSignedAccountKit;
       jest.spyOn(DecryptPrivateKeyService, "decrypt");
       jest.spyOn(SignMessageService, "sign");
-
-      await controller.exec();
-
-      const accountToExport = new AccountKitEntity(accountDto.toDto({
-        user_private_armored_key: true,
-        security_token: true
+      jest.spyOn(FileService, "saveFile").mockImplementation(jest.fn((_, content) => {
+        resultSignedAccountKit = content;
       }));
 
-      const signedAccountKit =  await signedMessage({
-        message: JSON.stringify(accountToExport.toDto()),
-        privateKey: pgpKeys.ada.private_decrypted,
-      });
+      await controller.exec();
 
       expect(SignMessageService.sign).toHaveBeenCalled();
       expect(DecryptPrivateKeyService.decrypt).toHaveBeenCalled();
       expect(controller.desktopTransferModel.getAccountKit).toHaveBeenCalled();
-      expect(FileService.saveFile).toHaveBeenCalledWith("account-kit.passbolt",  Buffer.from(signedAccountKit).toString('base64'), "application/passbolt", worker.tab.id);
+      expect(FileService.saveFile).toHaveBeenCalledWith("account-kit.passbolt", expect.anything(), "application/passbolt", worker.tab.id);
+      // Assert the account kit output.
+      const signedResultAccountKit = Buffer.from(resultSignedAccountKit, "base64").toString();
+      const serializedResultAccountKit = await OpenpgpAssertion.readMessageOrFail(signedResultAccountKit);
+      const resultAccountKitDto = JSON.parse(serializedResultAccountKit.getText());
+      expect(resultAccountKitDto.user_id).toEqual(account.userId);
     });
   });
 

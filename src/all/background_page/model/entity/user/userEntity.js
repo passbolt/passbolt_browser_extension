@@ -95,6 +95,14 @@ class UserEntity extends Entity {
         "deleted": {
           "type": "boolean"
         },
+        "disabled": {
+          "anyOf": [{
+            "type": "string",
+            "format": "date-time"
+          }, {
+            "type": "null"
+          }]
+        },
         "created": {
           "type": "string",
           "format": "date-time"

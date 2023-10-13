@@ -276,7 +276,7 @@ class UserService extends AbstractService {
       response = await fetch(url.toString(),{
         credentials: "include",
         withCredentials: true,
-      } 
+      }
       );
     } catch (error) {
       // Catch Network error such as connection lost.

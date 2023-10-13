@@ -16,11 +16,6 @@
   },
   "action": {
     "default_icon": "webAccessibleResources/img/icons/icon-32.png",
-    "theme_icons": [{
-      "light": "webAccessibleResources/img/icons/icon-32.png",
-      "dark": "webAccessibleResources/img/icons/icon-32.png",
-      "size": 32
-    }],
     "default_title": "Passbolt Quickaccess",
     "default_popup": "webAccessibleResources/quickaccess.html?passbolt=quickaccess"
   },
@@ -39,14 +34,20 @@
     "tabs",
     "scripting",
     "alarms",
-    "downloads",
     "webNavigation"
   ],
   "host_permissions": [
-    "*://*/*"
+    "https://*/*"
   ],
   "web_accessible_resources": [
-    "webAccessibleResources/*"
+    "webAccessibleResources/passbolt-iframe-recover.html",
+    "webAccessibleResources/passbolt-iframe-setup.html",
+    "webAccessibleResources/passbolt-iframe-login.html",
+    "webAccessibleResources/passbolt-iframe-app.html",
+    "webAccessibleResources/passbolt-iframe-account-recovery.html",
+    "webAccessibleResources/passbolt-iframe-file.html",
+    "webAccessibleResources/passbolt-iframe-in-form-call-to-action.html",
+    "webAccessibleResources/passbolt-iframe-in-form-menu.html"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'"

@@ -127,7 +127,7 @@ class SetupService extends AbstractService {
     try {
       response = await fetch(url.toString(), {
         withCredentials: true,
-      });
+      }, ...{credentials: "include"});
     } catch (error) {
       // Catch Network error such as connection lost.
       throw new PassboltServiceUnavailableError(error.message);
@@ -174,7 +174,7 @@ class SetupService extends AbstractService {
     try {
       response = await fetch(url.toString(), {
         withCredentials: true,
-      });
+      }, ...{credentials: "include"});
     } catch (error) {
       // Catch Network error such as connection lost.
       throw new PassboltServiceUnavailableError(error.message);

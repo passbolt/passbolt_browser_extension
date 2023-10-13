@@ -122,6 +122,7 @@ class AuthService extends AbstractService {
     fetchOptions.body = body;
     // It is required to let this property unset in order to let the browser determine it by itself and set the additional variable boundary required by the API to parse the payload.
     delete fetchOptions.headers['content-type'];
+    fetchOptions.credentials = "include"}
 
     let response, responseJson;
     try {

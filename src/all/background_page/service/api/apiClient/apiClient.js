@@ -317,7 +317,7 @@ class ApiClient {
       this.assertBody(body);
     }
 
-    const fetchOptions = {...this.buildFetchOptions(), ...options};
+    const fetchOptions = {...this.buildFetchOptions(), ...options, ...{credentials: "include"}};
     fetchOptions.method = method;
     if (body) {
       fetchOptions.body = body;

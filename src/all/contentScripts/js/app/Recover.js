@@ -30,9 +30,13 @@ async function main() {
   const messageEventHandler = new MessageEventHandler(messageService);
   messageEventHandler.listen("passbolt.port.connect", ConnectPortController, port);
   // Start ExtBootstrapRecover
+  console.log("test")
   const browserExtensionUrl = chrome.runtime.getURL("/");
+  console.log("test", browserExtensionUrl)
   const domContainer = document.createElement("div");
+  console.log("test", domContainer)
   document.body.appendChild(domContainer);
+  console.log("append", domContainer, document)
   ReactDOM.render(<ExtBootstrapRecover port={port} browserExtensionUrl={browserExtensionUrl}/>, domContainer);
 }
 

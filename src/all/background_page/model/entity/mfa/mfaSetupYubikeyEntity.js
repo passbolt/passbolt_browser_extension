@@ -46,7 +46,7 @@ class MfaSetupYubikeyEntity extends Entity {
       "properties": {
         "hotp": {
           "type": "string",
-          "pattern": "/^[cbdefghijklnrtuv]{44}$/"
+          "pattern": /^[cbdefghijklnrtuv]{44}$/
         },
       }
     };

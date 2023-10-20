@@ -50,8 +50,9 @@ class MfaSetupVerifyYubikeyCodeController {
    * @throws {TypeError} if the provider is not part of the enum
    */
   async exec(yubikeyCode) {
+    console.log(yubikeyCode)
     const yubikeyEntity = new MfaSetupYubikeyEntity(yubikeyCode);
-    return await this.multiFactorAuthenticationModel.verifyProvider(yubikeyEntity);
+    return await this.multiFactorAuthenticationModel.setupYubikey(yubikeyEntity);
   }
 }
 

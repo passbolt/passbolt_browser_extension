@@ -25,7 +25,7 @@ describe("SignMessageService service", () => {
     const messageToSign = await openpgp.createMessage({text: 'my-account-kit'});
     const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
 
-    const signedMessage = await SignMessageService.sign(messageToSign, adminDecryptedKey);
+    const signedMessage = await SignMessageService.sign(messageToSign, [adminDecryptedKey]);
     //verify the signature
     const readSignedMessage = await openpgp.readMessage({
       armoredMessage: signedMessage // parse armored message
@@ -40,7 +40,7 @@ describe("SignMessageService service", () => {
     expect.assertions(1);
 
     const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
-    const promise = SignMessageService.sign("", adminDecryptedKey);
+    const promise = SignMessageService.sign("", [adminDecryptedKey]);
 
     return expect(promise).rejects.toThrowError(new TypeError("The message should be a valid openpgp message."));
   });
@@ -50,7 +50,7 @@ describe("SignMessageService service", () => {
     const messageToSign = await openpgp.createMessage({text: 'my-account-kit'});
     const promise = SignMessageService.sign(messageToSign, "");
 
-    return expect(promise).rejects.toThrowError(new Error("The key should be a valid openpgp private key."));
+    return expect(promise).rejects.toThrowError(new Error("The keys should be an array of valid decrypted openpgp private keys."));
   });
 });
 

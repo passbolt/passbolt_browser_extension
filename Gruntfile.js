@@ -44,7 +44,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-watch');
 
   grunt.registerTask('default', ['bundle']);
   grunt.registerTask('pre-dist', ['copy:styleguide']);
@@ -449,88 +448,6 @@ module.exports = function (grunt) {
           './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chrome_mv3 + 'passbolt-' + pkg.version + '.crx ',
           "echo '\nZip and Crx files generated in " + path.dist_chrome_mv3 + "'"
         ].join(' && ')
-      }
-    },
-    /**
-     * Watch task run predefined tasks whenever watched file patterns are added, changed or deleted
-     * see. https://github.com/gruntjs/grunt-contrib-watch
-     */
-    watch: {
-      background_page: {
-        files: [path.src_background_page + '**/*.js', 'node_modules/passbolt-styleguide/src/shared/**/*.js'],
-        tasks: ['shell:build_background_page_debug'],
-        options: { spawn: false }
-      },
-      service_worker: {
-        files: [`${path.src_background_page}**/*.js`, `${path.src_chrome_mv3}**/*.js`],
-        tasks: ['shell:build_service_worker_debug', 'copy:service_worker'],
-        options: { spawn: false }
-      },
-      content_script_app: {
-        files: [
-          path.src_content_scripts + 'js/app/AccountRecovery.js',
-          path.src_content_scripts + 'js/app/App.js',
-          path.src_content_scripts + 'js/app/Login.js',
-          path.src_content_scripts + 'js/app/Recover.js',
-          path.src_content_scripts + 'js/app/Setup.js'
-        ],
-        tasks: ['shell:build_content_script_app'],
-        options: { spawn: false }
-      },
-      content_script_browser_integration: {
-        files: [path.src_content_scripts + 'js/app/BrowserIntegration.js'],
-        tasks: ['shell:build_content_script_browser_integration'],
-        options: { spawn: false }
-      },
-      content_script_public_website: {
-        files: [path.src_content_scripts + 'js/app/PublicWebsiteSignIn.js'],
-        tasks: ['shell:build_content_script_public_website'],
-        options: { spawn: false }
-      },
-      web_accessible_resources: {
-        files: [
-          path.src_web_accessible_resources + 'js/themes/*.js',
-          path.src_web_accessible_resources + '*.html'
-        ],
-        tasks: ['copy:web_accessible_resources'],
-        options: { spawn: false }
-      },
-      web_accessible_resources_app: {
-        files: [
-          path.src_web_accessible_resources + 'js/app/AccountRecovery.js',
-          path.src_web_accessible_resources + 'js/app/App.js',
-          path.src_web_accessible_resources + 'js/app/Download.js',
-          path.src_web_accessible_resources + 'js/app/Login.js',
-          path.src_web_accessible_resources + 'js/app/QuickAccess.js',
-          path.src_web_accessible_resources + 'js/app/Recover.js',
-          path.src_web_accessible_resources + 'js/app/Setup.js',
-          path.src_web_accessible_resources + 'js/app/Setup.js'
-        ],
-        tasks: ['shell:build_web_accessible_resources_app'],
-        options: { spawn: false }
-      },
-      web_accessible_resources_browser_integration: {
-        files: [
-          path.src_web_accessible_resources + 'js/app/InFormCallToAction.js',
-          path.src_web_accessible_resources + 'js/app/InFormMenu.js'
-        ],
-        tasks: ['shell:build_web_accessible_resources_browser_integration'],
-        options: { spawn: false }
-      },
-      manifest_firefox: {
-        files: [path.src_firefox + 'manifest.json'],
-        tasks: ['copy:manifest_firefox'],
-        options: { spawn: false }
-      },
-      manifest_chrome: {
-        files: [path.src_chrome + 'manifest.json'],
-        tasks: ['copy:manifest_chrome'],
-        options: { spawn: false }
-      },
-      manifest_chrome_mv3: {
-        files: [path.src_chrome_mv3 + 'manifest.json'],
-        tasks: ['copy:manifest_chrome_mv3'],
-        options: { spawn: false }
       }
     }
   });

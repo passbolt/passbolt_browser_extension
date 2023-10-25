@@ -56,7 +56,7 @@ describe("VerifyMessageService service", () => {
     const messageToSign = await openpgp.createMessage({text: 'my-account-kit'});
     const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
 
-    const signedMessage = await SignMessageService.sign(messageToSign, adminDecryptedKey);
+    const signedMessage = await SignMessageService.sign(messageToSign, [adminDecryptedKey]);
     //verify the signature
     const readSignedMessage = await openpgp.readMessage({
       armoredMessage: signedMessage // parse armored message

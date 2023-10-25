@@ -17,10 +17,6 @@ import MfaGetPolicyController from '../controller/mfaPolicy/mfaGetPolicyControll
 import User from "../model/user";
 import MfaGetMfaSettingsController from '../controller/mfaPolicy/mfaGetMfaSettingsController';
 import HasUserPostponedUserSettingInvitationMFAPolicyController from '../controller/mfaPolicy/hasUserPostponedUserSettingInvitationController';
-import MfaSetupVerifyTotpCodeController from '../controller/mfaSetup/MfaSetupVerifyTotpCodeController';
-import MfaSetupVerifyProviderController from '../controller/mfaSetup/MfaSetupVerifyProviderController';
-import MfaSetupRemoveProviderController from '../controller/mfaSetup/MfaSetupRemoveProviderController';
-import MfaSetupVerifyYubikeyCodeController from '../controller/mfaSetup/MfaSetupVerifyYubikeyCodeController';
 
 /**
  * Listens to the account recovery continue application events
@@ -58,13 +54,7 @@ const listen = function(worker) {
 
   worker.port.on('passbolt.mfa-setup.verify-totp-code', async(requestId, code) => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new MfaSetupVerifyTotpCodeController(worker, requestId, apiClientOptions);
-    await controller._exec(code);
-  });
-
-  worker.port.on('passbolt.mfa-setup.verify-yubikey-code', async(requestId, code) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new MfaSetupVerifyYubikeyCodeController(worker, requestId, apiClientOptions);
+    const controller = new MfaSetupVerifyOtpCodeController(worker, requestId, apiClientOptions);
     await controller._exec(code);
   });
 

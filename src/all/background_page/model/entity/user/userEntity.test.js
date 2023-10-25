@@ -12,7 +12,7 @@
  * @since         2.13.0
  */
 import UserEntity from "./userEntity";
-import {UserEntityTestFixtures} from "./userEntity.test.fixtures";
+import {defaultUserEntityTestFixtures} from "./userEntity.test.fixtures";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import {
@@ -42,13 +42,16 @@ describe("User entity", () => {
   });
 
   it("constructor works if valid DTO with associated entity data is provided", () => {
-    const dto = UserEntityTestFixtures.default;
+    const dto = defaultUserEntityTestFixtures({
+      "disabled": "2025-04-20T11:32:16+00:00",
+    });
     const filtered = {
       "id": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
       "role_id": "0d51c3a8-5e67-5e3d-882f-e1868966d817",
       "username": "admin@passbolt.com",
       "active": true,
       "deleted": false,
+      "disabled": "2025-04-20T11:32:16+00:00",
       "created": "2020-04-20T11:32:16+00:00",
       "modified": "2020-04-20T11:32:16+00:00",
       "last_logged_in": "2012-07-04T13:39:25+00:00",
@@ -90,18 +93,21 @@ describe("User entity", () => {
   });
 
   it("constructor throws an exception if DTO contains invalid field", () => {
+    expect.assertions(5);
+
     try {
       new UserEntity({
         "id": "🤷",
         "role_id": -0,
         "username": "(ノಠ益ಠ)ノ",
+        "disabled": "it's not a date for sure",
       });
-      expect(false).toBe(true);
     } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
+      expect(error).toBeInstanceOf(EntityValidationError);
       expect(error.hasError('id', 'format')).toBe(true);
       expect(error.hasError('role_id', 'type')).toBe(true);
       expect(error.hasError('username', 'custom')).toBe(true);
+      expect(error.hasError('disabled', 'type')).toBe(true);
     }
   });
 
@@ -126,7 +132,7 @@ describe("User entity", () => {
   });
 
   it("serialization works with full object inside collection", () => {
-    const dto = UserEntityTestFixtures.default;
+    const dto = defaultUserEntityTestFixtures();
     const entity = new UserEntity(dto);
     expect(entity.groupsUsers).not.toBeNull();
     expect(entity.groupsUsers.items[0].id).toEqual('03e26ff8-81d2-5b7f-87e4-99bbc40e1f95');

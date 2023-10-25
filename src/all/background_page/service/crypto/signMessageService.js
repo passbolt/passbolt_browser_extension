@@ -27,7 +27,7 @@ class SignMessageService {
    */
   static async sign(message, signingKeys) {
     OpenpgpAssertion.assertMessage(message);
-    OpenpgpAssertion.assertPrivateKey(signingKeys);
+    OpenpgpAssertion.assertDecryptedPrivateKeys(signingKeys);
 
     const signedMesage = await openpgp.sign({message: message, signingKeys: signingKeys});
 

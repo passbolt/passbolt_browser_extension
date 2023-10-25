@@ -98,7 +98,7 @@ class ResourceModel {
 
   /**
    * Returns the cached collection of resoures or fetch them otherwise
-   * @return {Promise<void>}
+   * @return {Promise<ResourcesCollection>}
    */
   async getOrFindAll() {
     const localResources = await ResourceLocalStorage.get();
@@ -272,14 +272,17 @@ class ResourceModel {
 
   /**
    * Returns the count of possible resources to suggest given an url
-   * @param currentUrl An url
+   * @param {string} url An url
    * @return {*[]|number}
    */
   async countSuggestedResources(url) {
     if (!url) {
       return 0;
     }
-    return (await this.getOrFindAll()).countSuggestedResources(url);
+    const resourcesCollection = await this.getOrFindAll();
+    const passwordResources = await this.keepPasswordResources(resourcesCollection.toDto());
+    const passwordResourcesCollection = new ResourcesCollection(passwordResources);
+    return passwordResourcesCollection.countSuggestedResources(url);
   }
 
   /**
@@ -291,8 +294,10 @@ class ResourceModel {
     if (!url) {
       return 0;
     }
-    const toDto = resourceEntity => resourceEntity.toDto();
-    return (await this.getOrFindAll()).findSuggestedResources(url).map(toDto);
+    const resourcesCollection = await this.getOrFindAll();
+    const passwordResources = await this.keepPasswordResources(resourcesCollection.toDto());
+    const passwordResourcesCollection = new ResourcesCollection(passwordResources);
+    return passwordResourcesCollection.findSuggestedResources(url).toDto();
   }
 
   /*
@@ -626,6 +631,16 @@ class ResourceModel {
   async keepResourcesSupported(resourcesDto) {
     const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
     return resourcesDto.filter(resource => !resource.resource_type_id || resourceTypesCollection.isResourceTypeIdPresent(resource.resource_type_id));
+  }
+
+  /**
+   * Keep only resources supported with no or known resource type
+   * @param resourcesDto
+   * @return {Promise<*[]>}
+   */
+  async keepPasswordResources(resourcesDto) {
+    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+    return resourcesDto.filter(resource => !resource.resource_type_id || resourceTypesCollection.isPasswordResourceType(resource.resource_type_id));
   }
 }
 

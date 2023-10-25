@@ -17,7 +17,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 
 
 const ENTITY_NAME = 'MfaProviderEntity';
-const YUBIKEY = "yubikey";
+const YUBIKEY = "ysbikey";
 const TOTP = "totp";
 const DUO = "duo";
 

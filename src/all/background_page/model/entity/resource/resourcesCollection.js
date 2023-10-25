@@ -17,6 +17,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 import deduplicateObjects from "../../../utils/array/deduplicateObjects";
 import canSuggestUrl from "../../../utils/url/canSuggestUrl";
+import resourcesCollection from "./resourcesCollection";
 
 const ENTITY_NAME = 'Resources';
 const RULE_UNIQUE_ID = 'unique_id';
@@ -124,7 +125,7 @@ class ResourcesCollection extends EntityCollection {
   /**
    * Find the possible resources to suggest given an url
    * @param url An url
-   * @return {*[]} A list of resource
+   * @return {ResourcesCollection} A list of resource
    */
   findSuggestedResources(url) {
     const suggestedResources = [];
@@ -139,7 +140,7 @@ class ResourcesCollection extends EntityCollection {
         }
       }
     }
-    return suggestedResources;
+    return new resourcesCollection(suggestedResources);
   }
 
   /**

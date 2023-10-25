@@ -32,7 +32,7 @@ class VerifyMessageService {
     OpenpgpAssertion.assertKeys(verificationKeys);
 
     const verificationResult = await openpgp.verify({message, verificationKeys});
-    await DecryptMessageService._doSignatureVerification(verificationResult.signatures);
+    await DecryptMessageService.doSignatureVerification(verificationResult.signatures);
   }
 }
 

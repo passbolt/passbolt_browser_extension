@@ -12,11 +12,11 @@
  * @since         4.4.0
  */
 
-import MfaProviderEntity from "../../model/entity/mfa/mfaProviderEntity";
+import MfaSetupTotpEntity from "../../model/entity/mfa/mfaSetupTotpEntity";
 import MultiFactorAuthenticationModel from "../../model/multiFactorAuthentication/multiFactorAuthenticationModel";
 
 
-class MfaSetupVerifyProviderController {
+class MfaSetupVerifyOtpCodeController {
   /**
    * MfaSetupVerifyOtpCodeController constructor
    * @param {Worker} worker
@@ -30,13 +30,13 @@ class MfaSetupVerifyProviderController {
 
   /**
    * Controller executor.
-   * @param   {string} provider the provider
+   * @param   {Object} setupDto the totp object with uri and otp code
    * @returns {Promise<bool>}
    */
-  async _exec(providerDto) {
+  async _exec(setupDto) {
     try {
-      const response = await this.exec(providerDto);
-      this.worker.port.emit(this.requestId, "SUCCESS", response);
+      await this.exec(setupDto);
+      this.worker.port.emit(this.requestId, "SUCCESS");
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, 'ERROR', error);
@@ -45,14 +45,12 @@ class MfaSetupVerifyProviderController {
 
   /**
    * Check and save the otp code
-   * @param  {Object} provider the provider
-   * @throws {Error} if the provider is missing
-   * @throws {TypeError} if the provider is not part of the enum
+   * @param   {Object} setupDto the totp object with uri and otp code
    */
-  async exec(providerDto) {
-    const providerEntity = new MfaProviderEntity(providerDto);
-    return await this.multiFactorAuthenticationModel.verifyProvider(providerEntity);
+  async exec(setupDto) {
+    const totpEntity = new MfaSetupTotpEntity(setupDto);
+    await this.multiFactorAuthenticationModel.setupTotp(totpEntity);
   }
 }
 
-export default MfaSetupVerifyProviderController;
+export default MfaSetupVerifyOtpCodeController;

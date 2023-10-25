@@ -16,7 +16,7 @@ import SecurityTokenEntity from "../model/entity/securityToken/securityTokenEnti
 import AvatarUpdateEntity from "../model/entity/avatar/update/avatarUpdateEntity";
 import UpdateUserLocalStorageController from "../controller/user/updateUserLocalStorageController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
-
+import UpdateUserController from "../controller/user/updateUserController";
 
 const listen = function(worker, _, account) {
   /*
@@ -83,22 +83,15 @@ const listen = function(worker, _, account) {
    * Update a user
    * Can be used to change the role or firstname/lastname but nothing else
    *
-   * @listens passbolt.user.update
+   * @listens passbolt.users.update
    * @param requestId {uuid} The request identifier
    * @param userDato {Object} The user object, example:
    *  {id: <UUID>, username: 'ada@passbolt.com', profile: {first_name: 'ada', last_name: 'lovelace'}, role_id: <UUID>}
    */
   worker.port.on('passbolt.users.update', async(requestId, userDto) => {
-    try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const userModel = new UserModel(clientOptions, account);
-      const userEntity = new UserEntity(userDto);
-      const updatedUser = await userModel.update(userEntity, true);
-      worker.port.emit(requestId, 'SUCCESS', updatedUser);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const clientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new UpdateUserController(worker, requestId, clientOptions, account);
+    await controller._exec(userDto);
   });
 
   /*

@@ -78,6 +78,21 @@ class MultiFactorAuthenticationService extends AbstractService {
   }
 
   /**
+   * setup the yubikey provider
+   * @param {Object} body
+   * @returns {Promise<void>}
+   * @throw {TypeError} invalid otp provisioning uri
+   * @throw {TypeError} invalid otp code
+   * @public
+   */
+  async setupYubikey(body) {
+    const bodyString = this.apiClient.buildBody(body);
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/yubikey`);
+    await this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
+  }
+
+
+  /**
    * Verify the provider
    * @param {string} provider
    * @throw {TypeError} invalid provider

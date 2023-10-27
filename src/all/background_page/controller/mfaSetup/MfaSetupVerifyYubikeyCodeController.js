@@ -46,11 +46,11 @@ class MfaSetupVerifyYubikeyCodeController {
   /**
    * Check and save the yubikey otp code
    * @param  {Object} yubikeyCode code
+   * @returns {Promise<MfaVerifyProviderEntity>}
    * @throws {Error} if the provider is missing
    * @throws {TypeError} if the provider is not part of the enum
    */
   async exec(yubikeyCode) {
-    console.log(yubikeyCode)
     const yubikeyEntity = new MfaSetupYubikeyEntity(yubikeyCode);
     return await this.multiFactorAuthenticationModel.setupYubikey(yubikeyEntity);
   }

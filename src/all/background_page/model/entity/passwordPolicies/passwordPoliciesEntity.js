@@ -77,6 +77,9 @@ class PasswordPoliciesEntity extends Entity {
         },
         "password_generator_settings": PasswordGeneratorSettingsEntity.getSchema(),
         "passphrase_generator_settings": PassphraseGeneratorSettingsEntity.getSchema(),
+        "source": {
+          "type": "string",
+        },
         "created": {
           "type": "string",
           "format": "date-time"

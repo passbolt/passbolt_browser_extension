@@ -26,7 +26,8 @@ describe("Sso Login URL Entity", () => {
       {providerId: "azure", url: 'https://login.microsoftonline.com'},
       {providerId: "azure", url: 'https://login.microsoftonline.us'},
       {providerId: "azure", url: 'https://login.partner.microsoftonline.cn'},
-      {providerId: "google", url: 'https://accounts.google.com'}
+      {providerId: "google", url: 'https://accounts.google.com'},
+      {providerId: "oauth2", url: 'https://oauth2.generic.provider.com'},
     ];
 
     expect.assertions(availableUrl.length);
@@ -67,6 +68,7 @@ describe("Sso Login URL Entity", () => {
     {scenario: 'Query parameter attack', url: 'https://attacker.com?domain=https://login.microsoftonline.com'},
     {scenario: 'Hash attack', url: 'https://attacker.com#https://login.microsoftonline.com'},
     {scenario: 'Mixing provider URL attack', url: 'https://login.microsoftonline.com', providerId: "google"},
+    {scenario: 'Not using HTTPS', url: 'http://not.secure.com', providerId: "oauth2"},
   ]).describe("Should not accept unsupported or attacker url", test => {
     it(`Should not accept unsupported or attacker url: ${test.scenario}`, async() => {
       const dto = {

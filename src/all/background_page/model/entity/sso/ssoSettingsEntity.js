@@ -17,6 +17,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 const ENTITY_NAME = "SsoSettings";
 const AZURE = "azure";
 const GOOGLE = "google";
+const OAUTH2 = "oauth2";
 
 const DATE_REGEXP = /^\d{4}-\d{2}-\d{2}$/;
 const DATETIME_REGEXP = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
@@ -186,6 +187,14 @@ class SsoSettingsEntity extends Entity {
   }
 
   /**
+   * SsoSettingsEntity.GOOGLE
+   * @returns {string}
+   */
+  static get OAUTH2() {
+    return OAUTH2;
+  }
+
+  /**
    * SsoSettingsEntity.AVAILABLE_PROVIDERS
    * @returns {Array<string>}
    */
@@ -193,6 +202,7 @@ class SsoSettingsEntity extends Entity {
     return [
       SsoSettingsEntity.AZURE,
       SsoSettingsEntity.GOOGLE,
+      SsoSettingsEntity.OAUTH2,
     ];
   }
 }

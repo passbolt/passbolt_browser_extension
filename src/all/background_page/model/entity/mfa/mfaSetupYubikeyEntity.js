@@ -16,60 +16,40 @@ import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
 
-const ENTITY_NAME = 'MfaProviderEntity';
-const YUBIKEY = "yubikey";
-const TOTP = "totp";
-const DUO = "duo";
+const ENTITY_NAME = 'MfaSetupYubikeyEntity';
 
-class MfaProviderEntity extends Entity {
+class MfaSetupYubikeyEntity extends Entity {
   /**
-   * Mfa provider constructor
+   * Mfa setup yubikey entity provider constructor
    *
-   * @param {Object} provider mfa provider
+   * @param {Object} setupDto yubikey setup dto
    * @throws {EntityValidationError} if the dto cannot be converted into an entity
    */
-  constructor(providerDto) {
+  constructor(setupDto) {
     super(EntitySchema.validate(
-      MfaProviderEntity.ENTITY_NAME,
-      providerDto,
-      MfaProviderEntity.getSchema()
+      MfaSetupYubikeyEntity.ENTITY_NAME,
+      setupDto,
+      MfaSetupYubikeyEntity.getSchema()
     ));
   }
 
   /**
-   * Get mfa provider entity schema
+   * Get mfa policy entity schema
    * @returns {Object} schema
    */
   static getSchema() {
     return {
       "type": "object",
       "required": [
-        "provider",
+        "hotp",
       ],
       "properties": {
-        "provider": {
+        "hotp": {
           "type": "string",
-          "enum": [
-            YUBIKEY,
-            TOTP,
-            DUO
-          ]
+          "pattern": /^[cbdefghijklnrtuv]{44}$/
         },
       }
     };
-  }
-  /*
-   * ==================================================
-   * Dynamic properties getters
-   * ==================================================
-   */
-
-  /**
-   * Get the mfa provider
-   * @returns {string}
-   */
-  get provider() {
-    return this._props.provider;
   }
 
   /*
@@ -86,4 +66,4 @@ class MfaProviderEntity extends Entity {
   }
 }
 
-export default MfaProviderEntity;
+export default MfaSetupYubikeyEntity;

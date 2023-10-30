@@ -112,6 +112,14 @@ class ResourceEntity extends Entity {
             "type": "null"
           }]
         },
+        "expired": {
+          "anyOf": [{
+            "type": "string",
+            "format": "date-time"
+          }, {
+            "type": "null"
+          }]
+        },
         "deleted": {
           "type": "boolean"
         },

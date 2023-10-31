@@ -218,6 +218,15 @@ const listen = function(worker, _, account) {
   });
 
   /**
+   * Attempt to sign in with a generic OAuth2 as a third party sign in provider
+   * @listens passbolt.sso.sign-in-with-oauth2
+   * @param {uuid} requestId The request identifier
+   */
+  worker.port.on('passbolt.sso.sign-in-with-oauth2', async(requestId, isInQuickaccessMode) => {
+    await signInWithSso(requestId, isInQuickaccessMode, SsoSettingsEntity.OAUTH2);
+  });
+
+  /**
    * Returns the sso provider id registered client-side.
    * @listens passbolt.sso.get-local-configured-provider
    * @param {uuid} requestId The request identifier

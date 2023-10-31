@@ -13,6 +13,7 @@
  */
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import SsoSettingsEntity from "./ssoSettingsEntity";
 
 const ENTITY_NAME = "SsoLoginUrl";
 const SSO_LOGIN_SUPPORTED_URLS = {
@@ -79,6 +80,13 @@ class SsoLoginUrlEntity extends Entity {
       url = new URL(value);
     } catch (error) {
       throw new Error('The url should be a valid url.');
+    }
+
+    if (ssoProvider === SsoSettingsEntity.OAUTH2) {
+      if (url.protocol !== "https:") {
+        throw new Error('The url protocol should be HTTPS.');
+      }
+      return;
     }
 
     if (!SSO_LOGIN_SUPPORTED_URLS[ssoProvider]) {

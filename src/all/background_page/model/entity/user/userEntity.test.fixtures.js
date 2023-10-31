@@ -14,13 +14,14 @@
 
 import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
 
-exports.UserEntityTestFixtures = {
-  "default": {
+export const defaultUserEntityTestFixtures = (data = {}) => {
+  const defaultData = {
     "id": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
     "role_id": "0d51c3a8-5e67-5e3d-882f-e1868966d817",
     "username": "admin@passbolt.com",
     "active": true,
     "deleted": false,
+    "disabled": null,
     "created": "2020-04-20T11:32:16+00:00",
     "modified": "2020-04-20T11:32:16+00:00",
     "last_logged_in": "2012-07-04T13:39:25+00:00",
@@ -94,5 +95,6 @@ exports.UserEntityTestFixtures = {
       "created_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
       "modified_by": "d57c10f5-639d-5160-9c81-8a0c6c4ec856"
     }
-  }
+  };
+  return Object.assign(defaultData, data);
 };

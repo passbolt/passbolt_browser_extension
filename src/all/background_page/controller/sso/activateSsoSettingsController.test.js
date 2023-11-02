@@ -17,6 +17,7 @@ import {v4 as uuid} from "uuid";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import ActivateSsoSettingsController from "./activateSsoSettingsController";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultSsoSettingsWithAzure} from "passbolt-styleguide/src/shared/models/entity/ssoSettings/SsoSettingsEntity.test.data";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -35,7 +36,7 @@ describe("ActivateSsoSettingsController", () => {
           status: "active",
           token: ssoToken
         });
-        return mockApiResponse([]);
+        return mockApiResponse(defaultSsoSettingsWithAzure());
       });
 
       const controller = new ActivateSsoSettingsController(null, null, defaultApiClientOptions());

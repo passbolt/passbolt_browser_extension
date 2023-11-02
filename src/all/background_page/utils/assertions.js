@@ -12,7 +12,7 @@
  * @since         3.10.0
  */
 import Validator from "validator";
-import SsoSettingsEntity from "../model/entity/sso/ssoSettingsEntity";
+import SsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/SsoSettingsEntity";
 import {ValidatorRule} from "./validatorRules";
 
 const UUID_REGEXP = /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i;

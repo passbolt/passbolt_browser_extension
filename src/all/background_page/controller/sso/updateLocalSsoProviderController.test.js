@@ -14,7 +14,8 @@
 import "../../../../../test/mocks/mockCryptoKey";
 import "../../../../../test/mocks/mockSsoDataStorage";
 import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
-import SsoSettingsEntity from "../../model/entity/sso/ssoSettingsEntity";
+import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
+import GoogleSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/GoogleSsoSettingsEntity";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import UpdateLocalSsoProviderController from "./updateLocalSsoProviderController";
 
@@ -22,9 +23,9 @@ describe("UpdateLocalSsoProviderController", () => {
   describe("UpdateLocalSsoProviderController::exec", () => {
     it("Should update the SSO provider stored locally", async() => {
       expect.assertions(1);
-      const expectedProvider = SsoSettingsEntity.GOOGLE;
+      const expectedProvider = GoogleSsoSettingsEntity.PROVIDER_ID;
 
-      const ssoKit = clientSsoKit({provider: SsoSettingsEntity.AZURE});
+      const ssoKit = clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID});
       SsoDataStorage.setMockedData(ssoKit);
 
       const controller = new UpdateLocalSsoProviderController();

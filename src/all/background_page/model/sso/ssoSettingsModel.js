@@ -12,8 +12,7 @@
  * @since         3.9.0
  */
 import SsoSettingsService from "../../service/api/sso/ssoSettingsService";
-import SsoSettingsEntity from "../entity/sso/ssoSettingsEntity";
-
+import SsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/SsoSettingsEntity";
 /**
  * Model related to the SSO Settings
  */

@@ -25,7 +25,8 @@ import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntit
 import SsoKitServerPartEntity from "../../model/entity/sso/ssoKitServerPartEntity";
 import GenerateSsoKitController from "./generateSsoKitController";
 import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
-import SsoSettingsEntity from "../../model/entity/sso/ssoSettingsEntity";
+import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
+import GoogleSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/GoogleSsoSettingsEntity";
 
 jest.mock("../../service/passphrase/getPassphraseService");
 
@@ -39,7 +40,7 @@ describe("GenerateSsoKitController", () => {
     it("Should generate a brand new kit if none exists.", async() => {
       expect.assertions(5);
       const data = generateSsoKitServerData({});
-      const expectedProvider = SsoSettingsEntity.AZURE;
+      const expectedProvider = AzureSsoSettingsEntity.PROVIDER_ID;
       const expextedKitId = uuid();
       const expectedServerPartKit = new SsoKitServerPartEntity({data});
       const expectedClientPartKit = new SsoKitClientPartEntity(clientSsoKit());
@@ -79,8 +80,8 @@ describe("GenerateSsoKitController", () => {
 
     it("Should update the provider if a kit exists and the provider changed.", async() => {
       expect.assertions(1);
-      const expectedProvider = SsoSettingsEntity.GOOGLE;
-      const storedSsoKit = new SsoKitClientPartEntity(clientSsoKit({provider: SsoSettingsEntity.AZURE}));
+      const expectedProvider = GoogleSsoSettingsEntity.PROVIDER_ID;
+      const storedSsoKit = new SsoKitClientPartEntity(clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID}));
 
       SsoDataStorage.setMockedData(storedSsoKit.toDbSerializableObject());
 

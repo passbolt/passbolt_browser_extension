@@ -19,7 +19,6 @@ import {Config} from "../model/config";
 import AuthLoginController from "../controller/auth/authLoginController";
 import GetLocalSsoProviderConfiguredController from "../controller/sso/getLocalSsoProviderConfiguredController";
 import SsoAuthenticationController from "../controller/sso/ssoAuthenticationController";
-import SsoSettingsEntity from "../model/entity/sso/ssoSettingsEntity";
 import DeleteLocalSsoKitController from "../controller/sso/deleteLocalSsoKitController";
 import UpdateLocalSsoProviderController from "../controller/sso/updateLocalSsoProviderController";
 import HasSsoLoginErrorController from "../controller/sso/hasSsoLoginErrorController";
@@ -186,41 +185,15 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   /**
-   * Performs a sign-in via SSO with the selected provider
-   * @param {uuid} requestId the request identifier
+   * Attempt to sign in with the given provider as a third party
+   * @listens passbolt.sso.sign-in
+   * @param {uuid} requestId The request identifier
+   * @param {uuid} providerId the SSO provider identifier
    * @param {boolean} isInQuickaccessMode is the current call made from the quickaccess
-   * @param {string} provider the SSO provider identifier
    */
-  async function signInWithSso(requestId, isInQuickaccessMode, provider) {
+  worker.port.on('passbolt.sso.sign-in', async(requestId, providerId, isInQuickaccessMode) => {
     const controller = new SsoAuthenticationController(worker, requestId, apiClientOptions, account);
-    await controller._exec(provider, isInQuickaccessMode);
-  }
-
-  /**
-   * Attempt to sign in with Azure as a third party sign in provider
-   * @listens passbolt.sso.sign-in-with-azure
-   * @param {uuid} requestId The request identifier
-   */
-  worker.port.on('passbolt.sso.sign-in-with-azure', async(requestId, isInQuickaccessMode) => {
-    await signInWithSso(requestId, isInQuickaccessMode, SsoSettingsEntity.AZURE);
-  });
-
-  /**
-   * Attempt to sign in with Google as a third party sign in provider
-   * @listens passbolt.sso.sign-in-with-google
-   * @param {uuid} requestId The request identifier
-   */
-  worker.port.on('passbolt.sso.sign-in-with-google', async(requestId, isInQuickaccessMode) => {
-    await signInWithSso(requestId, isInQuickaccessMode, SsoSettingsEntity.GOOGLE);
-  });
-
-  /**
-   * Attempt to sign in with a generic OAuth2 as a third party sign in provider
-   * @listens passbolt.sso.sign-in-with-oauth2
-   * @param {uuid} requestId The request identifier
-   */
-  worker.port.on('passbolt.sso.sign-in-with-oauth2', async(requestId, isInQuickaccessMode) => {
-    await signInWithSso(requestId, isInQuickaccessMode, SsoSettingsEntity.OAUTH2);
+    await controller._exec(providerId, isInQuickaccessMode);
   });
 
   /**

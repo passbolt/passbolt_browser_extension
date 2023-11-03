@@ -10,10 +10,11 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
+import SystemRequirementService from "../../../service/systemRequirementService/systemRequirementService";
 import ExternalFolderEntity from "../../entity/folder/external/externalFolderEntity";
 import * as kdbxweb from 'kdbxweb';
 
-class ResourcesKdbxExporter {
+class ResourcesKdbxV4Exporter {
   /**
    * Kdbx exporter constructor
    * @param exportEntity
@@ -42,7 +43,11 @@ class ResourcesKdbxExporter {
   async createKdbxDb() {
     const credentials = this.createKdbxCredentials();
     const kdbxDb = kdbxweb.Kdbx.create(credentials, 'passbolt export');
-    kdbxDb.setVersion(3);
+    kdbxDb.setKdf(kdbxweb.Consts.KdfId.Argon2id);
+    //Define the degree of parallelism for the Argon2 algo (1 recommanded)
+    kdbxDb.header.kdfParameters.set("P", kdbxweb.VarDictionary.ValueType.UInt32, SystemRequirementService.ARGON2_PARALLELISM);
+    //Define the memory used for the Argon2 algo (15MB minimum)
+    kdbxDb.header.kdfParameters.set("M", kdbxweb.VarDictionary.ValueType.UInt64, new kdbxweb.Int64(SystemRequirementService.ARGON2_MEMORY_KB * 1024));
     return kdbxDb;
   }
 
@@ -94,4 +99,4 @@ class ResourcesKdbxExporter {
   }
 }
 
-export default ResourcesKdbxExporter;
+export default ResourcesKdbxV4Exporter;

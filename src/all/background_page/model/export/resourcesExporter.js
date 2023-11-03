@@ -13,6 +13,7 @@
 import ResourcesCsvExporter from "./resources/resourcesCsvExporter";
 import ResourcesKdbxExporter from "./resources/resourcesKdbxExporter";
 import FileTypeError from "../../error/fileTypeError";
+import ResourcesKdbxV4Exporter from "./resources/resourcesKdbxv4Exporter";
 
 class ResourcesExporter {
   /**
@@ -37,6 +38,8 @@ class ResourcesExporter {
         return new ResourcesCsvExporter(exportEntity);
       case "kdbx":
         return new ResourcesKdbxExporter(exportEntity);
+      case "kdbxv4":
+        return new ResourcesKdbxV4Exporter(exportEntity);
       default:
         throw new FileTypeError(`The format ${exportEntity.format} is not supported.`);
     }

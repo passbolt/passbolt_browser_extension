@@ -33,7 +33,6 @@
       "description": "Open passbolt in a new tab!"
     }
   },
-  "content_security_policy": "script-src 'self' 'wasm-eval' blob: filesystem:",
   "permissions": [
     "activeTab",
     "tabs",
@@ -48,5 +47,5 @@
   "web_accessible_resources": [
     "webAccessibleResources/*"
   ],
-  "content_security_policy": "script-src 'self'; object-src 'none';"
+  "content_security_policy": "script-src 'self' 'wasm-eval'; object-src 'none';"
 }

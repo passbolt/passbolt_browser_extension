@@ -54,7 +54,7 @@ class SystemRequirementService {
     return result.hash;
   }
 
-  static get ARGON2_MEMORY() {
+  static get ARGON2_MEMORY_KB() {
     return ARGON2_MEMORY_KB;
   }
 

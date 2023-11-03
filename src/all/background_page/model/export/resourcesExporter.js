@@ -22,8 +22,8 @@ class ResourcesExporter {
    * @returns {Promise<void>}
    */
   export(exportEntity) {
-    const importer = this.getExporter(exportEntity);
-    return importer.export();
+    const exporter = this.getExporter(exportEntity);
+    return exporter.export();
   }
 
   /**
@@ -38,7 +38,7 @@ class ResourcesExporter {
         return new ResourcesCsvExporter(exportEntity);
       case "kdbx":
         return new ResourcesKdbxExporter(exportEntity);
-      case "kdbxv4":
+      case "kdbxV4":
         return new ResourcesKdbxV4Exporter(exportEntity);
       default:
         throw new FileTypeError(`The format ${exportEntity.format} is not supported.`);

@@ -136,6 +136,7 @@ class ExportResourcesFileController {
   getMimeType(extension) {
     let mimeType = "text/plain";
     switch (extension) {
+      case "kdbxV4":
       case "kdbx":
         mimeType = "application/x-keepass";
         break;
@@ -148,13 +149,25 @@ class ExportResourcesFileController {
   }
 
   /**
+   * Get mime type from file extension.
+   * @param {string} extension kdbx or csv or text/plain
+   * @return {string}
+   */
+  getFileExtension(fileType) {
+    if (fileType === "kdbxV4") {
+      return "kdbx";
+    }
+    return fileType;
+  }
+
+  /**
    * Propose the file to download.
    * @param {ExportResourcesFileEntity} exportEntity The export entity
    * @returns {Promise<void>}
    */
   async download(exportEntity) {
     const date = new Date().toISOString().slice(0, 10);
-    const filename = `passbolt-export-${date}.${exportEntity.fileType}`;
+    const filename = `passbolt-export-${date}.${this.getFileExtension(exportEntity.fileType)}`;
     const mimeType = this.getMimeType(exportEntity.fileType);
     const blobFile = new Blob([exportEntity.file], {type: mimeType});
     await FileService.saveFile(filename, blobFile, mimeType, this.worker.tab.id);

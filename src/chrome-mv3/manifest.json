@@ -50,6 +50,6 @@
     "matches": ["*://*/*"]
   }],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'"
+    "extension_pages": "script-src 'self' 'wasm-eval'"
   }
 }

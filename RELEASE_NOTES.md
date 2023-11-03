@@ -1,6 +1,6 @@
 Release song: https://www.youtube.com/watch?v=6Ejga4kJUts
 
-Version 4.4 (Release Candidate) of Passbolt is now available, packed full of improvements and new functionalities.
+Version 4.4 of Passbolt is now available, packed full of improvements and new functionalities.
 
 With this release, users are able to manage TOTPs directly from the browser, providing an extended TOTP experience across all their devices. They can now be created, deleted, organised and shared with others just like any other resource type.
 
@@ -12,7 +12,7 @@ And that's not all – a number of fixes and enhancements have been implemented 
 
 Upgrade to version 4.4 to take advantage of these improvements. Thank you for using and supporting passbolt!
 
-## [4.4.0-rc.0] - 2023-11-03
+## [4.4.0] - 2023-11-06
 ## Browser extension
 ### Added
 - PB-25204 As a signed-in user I can create a standalone TOTP

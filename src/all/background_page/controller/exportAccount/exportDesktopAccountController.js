@@ -16,6 +16,9 @@ import DesktopTransferModel from "../../model/desktopTransfer/desktopTransferMod
 import FileService from "../../service/file/fileService";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import {Buffer} from 'buffer';
+import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
+import SignMessageService from "../../service/crypto/signMessageService";
+import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 const PUBLIC_FILENAME = "account-kit.passbolt";
 const MIME_TYPE_TEXT_PLAIN = "application/passbolt";
@@ -55,10 +58,15 @@ class ExportDesktopAccountController {
    * @return {Promise<string>}
    */
   async exec() {
-    await this.getPassphraseService.getPassphrase(this.worker);
+    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
     const accountKit = await this.desktopTransferModel.getAccountKit(this.account);
-    const accountKitStringify = JSON.stringify(accountKit.toDto());
-    const fileContent = Buffer.from(accountKitStringify).toString('base64');
+    const accountKitDto = accountKit.toDto();
+    const accountKitMessage = await OpenpgpAssertion.createMessageOrFail(JSON.stringify(accountKitDto));
+    const privateKeyForSigning = await OpenpgpAssertion.readKeyOrFail(accountKitDto["user_private_armored_key"]);
+    const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(privateKeyForSigning, passphrase);
+    const signedAccountKit = await SignMessageService.sign(accountKitMessage, [decryptedPrivateKey]);
+
+    const fileContent = Buffer.from(signedAccountKit).toString('base64');
     await FileService.saveFile(PUBLIC_FILENAME, fileContent, MIME_TYPE_TEXT_PLAIN, this.worker.tab.id);
   }
 }

@@ -38,7 +38,7 @@ class DecryptMessageService {
     });
 
     if (verificationKeys) {
-      await this._doSignatureVerification(signatures);
+      await this.doSignatureVerification(signatures);
     }
 
     return decryptedMessage;
@@ -68,7 +68,7 @@ class DecryptMessageService {
     });
 
     if (verificationKeys) {
-      await this._doSignatureVerification(signatures);
+      await this.doSignatureVerification(signatures);
     }
 
     return decryptedMessage;
@@ -80,9 +80,8 @@ class DecryptMessageService {
    * @param {Array<openpgp.Signature>} signatures The signatures to run the verification for
    * @returns {Promise<void>}
    * @throws {Error} if any of the signature does not verify the message.
-   * @private
    */
-  static async _doSignatureVerification(signatures) {
+  static async doSignatureVerification(signatures) {
     /*
      * Openpgp.js's signatures is an array of signature to verify.
      * The verification process is run by starting a promise from the signature.verified field.

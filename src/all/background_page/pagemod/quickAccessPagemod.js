@@ -26,6 +26,7 @@ import {LocaleEvents} from "../event/localeEvents";
 import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import {RememberMeEvents} from "../event/rememberMeEvents";
+import {ResourceTypeEvents} from "../event/resourceTypeEvents";
 
 class QuickAccess extends Pagemod {
   /**
@@ -53,7 +54,8 @@ class QuickAccess extends Pagemod {
       TabEvents,
       LocaleEvents,
       PownedPasswordEvents,
-      RememberMeEvents
+      RememberMeEvents,
+      ResourceTypeEvents
     ];
   }
 

@@ -126,6 +126,20 @@ class ResourceTypesCollection extends EntityCollection {
     return this.resourceTypes.some(resourceType => resourceType.id === id);
   }
 
+  /**
+   * Is resource type password present
+   * @param id The id
+   * @return {boolean}
+   */
+  isPasswordResourceType(id) {
+    const passwordResourceTypesSlug = [
+      RESOURCE_TYPE_PASSWORD_STRING_SLUG,
+      RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
+      RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
+    ];
+    return this.resourceTypes.some(resourceType => resourceType.id === id && passwordResourceTypesSlug.includes(resourceType.slug));
+  }
+
   /*
    * ==================================================
    * Setters

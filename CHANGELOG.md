@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-## [4.4.0-rc.0] - 2023-11-03
+## [4.4.0] - 2023-11-06
 ## Browser extension
 ### Added
 - PB-25204 As a signed-in user I can create a standalone TOTP
@@ -1391,7 +1391,7 @@ self registration settings option in the left-side bar
 - LU: Logged in user
 
 [Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.2.0...HEAD
-[4.4.0-rc.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.3.1...v.4.4.0-rc.0
+[4.4.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.3.1...v.4.4.0
 [4.3.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.3.0...v.4.3.1
 [4.3.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.2.0...v.4.3.0
 [4.2.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.1.2...v.4.2.0

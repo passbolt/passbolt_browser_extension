@@ -7,7 +7,8 @@
   "default_locale": "en",
   "applications": {
     "gecko": {
-      "id": "passbolt@passbolt.com"
+      "id": "passbolt@passbolt.com",
+      "strict_min_version": "115.0"
     }
   },
   "icons": {

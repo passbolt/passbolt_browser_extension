@@ -14,7 +14,7 @@
 
 import * as openpgp from 'openpgp';
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import {ValidatorRule as Validator} from "../../utils/validatorRules";
+import {assertPassphrase} from "../../utils/assertions";
 
 class EncryptPrivateKeyService {
   /**
@@ -28,9 +28,7 @@ class EncryptPrivateKeyService {
    */
   static async encrypt(decryptedPrivateKey, passphrase) {
     OpenpgpAssertion.assertDecryptedPrivateKey(decryptedPrivateKey);
-    if (!Validator.isUtf8(passphrase)) {
-      throw new Error('The passphrase should be a valid UTF8 string.');
-    }
+    assertPassphrase(passphrase);
 
     return (await openpgp.encryptKey({
       privateKey: decryptedPrivateKey,

@@ -246,10 +246,10 @@ describe("GetPassphraseService", () => {
 
     it("should throw an error if the passphrase is not properly formatted", async() => {
       expect.assertions(1);
-      const expectedError = new Error("The passphrase should be a valid UTF8 string.");
+      const expectedError = new Error("The given parameter should be a valid UTF8 string.");
       const service = new GetPassphraseService(account);
       try {
-        await service.validatePassphrase(1234567890);
+        await service.validatePassphrase({data: 1234567890});
       } catch (e) {
         expect(e).toStrictEqual(expectedError);
       }

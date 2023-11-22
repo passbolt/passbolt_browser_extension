@@ -9,13 +9,12 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
 import DecryptPrivateKeyService from "../crypto/decryptPrivateKeyService";
 import {QuickAccessService} from "../ui/quickAccess.service";
-import i18n from "../../sdk/i18n";
 import UserAbortsOperationError from "../../error/userAbortsOperationError";
-import {ValidatorRule as Validator} from '../../utils/validatorRules';
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 import WorkerService from "../worker/workerService";
 import UserRememberMeLatestChoiceLocalStorage from "../local_storage/userRememberMeLatestChoiceLocalStorage";
 import UserRememberMeLatestChoiceEntity from "../../model/entity/rememberMe/userRememberMeLatestChoiceEntity";
+import {assertPassphrase} from "../../utils/assertions";
 
 export default class GetPassphraseService {
   constructor(account) {
@@ -143,9 +142,7 @@ export default class GetPassphraseService {
    * @throws {InvalidMasterPasswordError} if the passphrase is not valid.
    */
   async validatePassphrase(passphrase) {
-    if (!Validator.isUtf8(passphrase)) {
-      throw new Error(i18n.t('The passphrase should be a valid UTF8 string.'));
-    }
+    assertPassphrase(passphrase);
 
     const keyring = new Keyring();
     const userPrivateArmoredKey = keyring.findPrivate().armoredKey;

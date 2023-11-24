@@ -56,6 +56,7 @@
     "jest-fetch-mock": "^3.0.3",
     "jest-junit": "^16.0.0",
     "jest-webextension-mock": "^3.8.9",
+    "lockfile-lint": "^4.12.1",
     "text-encoding-utf-8": "^1.0.2",
     "uuid": "^8.3.2",
     "web-ext": "^7.8.0",
@@ -100,11 +101,13 @@
     "dev:watch:build:content-scripts:public-website": "npm run dev:build:content-scripts:public-website -- -w",
     "dev:watch:build:web-accessible-resources:app": "npm run dev:build:web-accessible-resources:app -- -w",
     "dev:watch:build:web-accessible-resources:browser-integration": "npm run dev:build:web-accessible-resources:browser-integration -- -w",
+    "lint": "npm run lint:lockfile && npm run lint:eslint",
+    "lint:lockfile": "lockfile-lint --path package-lock.json --allowed-hosts npm github.com --allowed-schemes \"https:\" \"git+ssh:\" --empty-hostname false --allowed-urls \"secrets-passbolt@2.0.1-ccce02543c135b0d92f69a70e960d634e7d64609@\"",
+    "lint:eslint": "eslint -c .eslintrc.json --ext js --ext jsx src",
+    "eslint-fix": "eslint -c .eslintrc.json --ext js --ext jsx --fix src",
     "i18n:externalize": "i18next -c ./i18next-parser.config.js",
     "test": "npm run test:unit",
     "test:unit": "jest --no-cache ./src/all/ ./src/chrome-mv3/ --maxWorkers=4",
-    "test:coverage": "jest --no-cache ./src/all/ ./src/chrome-mv3/ --maxWorkers=4 --coverage",
-    "eslint": "eslint -c .eslintrc.json --ext js --ext jsx src",
-    "eslint-fix": "eslint -c .eslintrc.json --ext js --ext jsx --fix src"
+    "test:coverage": "jest --no-cache ./src/all/ ./src/chrome-mv3/ --maxWorkers=4 --coverage"
   }
 }

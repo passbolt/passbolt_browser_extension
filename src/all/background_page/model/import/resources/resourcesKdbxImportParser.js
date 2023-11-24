@@ -14,6 +14,11 @@ import ExternalFolderEntity from "../../entity/folder/external/externalFolderEnt
 import ExternalResourceEntity from "../../entity/resource/external/externalResourceEntity";
 import ImportError from "../../../error/importError";
 import * as kdbxweb from 'kdbxweb';
+import {
+  RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
+  RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG
+} from "../../entity/resourceType/resourceTypeEntity";
+import TotpEntity from "../../entity/totp/totpEntity";
 
 class ResourcesKdbxImportParser {
   /**
@@ -119,6 +124,7 @@ class ResourcesKdbxImportParser {
    * @returns {Object}
    */
   parseResource(kdbxEntry) {
+    let resourceTypeSlug = RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG;
     const externalResourceDto = {
       name: kdbxEntry.fields.get('Title') ? kdbxEntry.fields.get('Title').trim() : "",
       uri: kdbxEntry.fields.get('URL') ? kdbxEntry.fields.get('URL').trim() : "",
@@ -127,12 +133,18 @@ class ResourcesKdbxImportParser {
       folder_parent_path: this.getKdbxEntryPath(kdbxEntry),
       secret_clear: '' // By default a secret can be null
     };
-    if (typeof kdbxEntry.fields.get('Password') == 'object') {
+    if (typeof kdbxEntry.fields.get('Password') === 'object') {
       externalResourceDto.secret_clear = kdbxEntry.fields.get('Password').getText();
+    }
+    if (typeof kdbxEntry.fields.get('otp') === 'object') {
+      const totpUrl = new URL(decodeURIComponent(kdbxEntry.fields.get('otp').getText()));
+      const totp = TotpEntity.createTotpFromUrl(totpUrl);
+      externalResourceDto.totp = totp.toDto();
+      resourceTypeSlug = RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG;
     }
 
     // @todo pebble
-    const resourceType = this.parseResourceType();
+    const resourceType = this.parseResourceType(resourceTypeSlug);
     if (resourceType) {
       externalResourceDto.resource_type_id = resourceType.id;
     }
@@ -150,13 +162,15 @@ class ResourcesKdbxImportParser {
   }
 
   /**
-   * Parse the resource type id
+   * Parse the resource type according to the resource type slug
+   * @param {string} resourceTypeSlug
    * @returns {ResourceTypeEntity}
    */
-  parseResourceType() {
+  parseResourceType(resourceTypeSlug) {
     if (this.resourceTypesCollection) {
-      return this.resourceTypesCollection.getFirst('slug', 'password-and-description');
+      return this.resourceTypesCollection.getFirst('slug', resourceTypeSlug);
     }
+    return null;
   }
 
   /**

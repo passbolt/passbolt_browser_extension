@@ -172,10 +172,13 @@ class ImportResourcesFileController {
     if (importResourceEntity.resourceTypeId) {
       const dto = {
         password: importResourceEntity.secretClear || "",
-        description: importResourceEntity.description || ""
+        description: importResourceEntity.description || "",
+        totp: importResourceEntity.totp || ""
       };
-      // @todo sloppy. We remove the clear description here, but it should be done at a parsing level.
+      // @todo sloppy. We remove the clear secret fields here, but it should be done at a parsing level.
+      importResourceEntity.secretClear = "";
       importResourceEntity.description = "";
+      importResourceEntity.totp = "";
       return dto;
     }
     return importResourceEntity.secretClear;

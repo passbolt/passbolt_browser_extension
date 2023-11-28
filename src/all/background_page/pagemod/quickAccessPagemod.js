@@ -27,6 +27,7 @@ import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import {RememberMeEvents} from "../event/rememberMeEvents";
 import {ResourceTypeEvents} from "../event/resourceTypeEvents";
+import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 
 class QuickAccess extends Pagemod {
   /**
@@ -63,9 +64,10 @@ class QuickAccess extends Pagemod {
    * @inheritDoc
    */
   async attachEvents(port) {
-    let account;
+    let account, apiClientOptions;
     try {
       account = await GetLegacyAccountService.get();
+      apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
     } catch (error) {
       //Ensure the application does not crash completely if the legacy account cannot be retrieved
       console.error('quickaccessPagemod::attach legacy account cannot be retrieved, please contact your administrator.');
@@ -74,7 +76,7 @@ class QuickAccess extends Pagemod {
 
     const worker = {port: port, tab: port._port.sender.tab, name: this.appName};
     for (const event of this.events) {
-      event.listen(worker, null, account);
+      event.listen(worker, apiClientOptions, account);
     }
   }
 }

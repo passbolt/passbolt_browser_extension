@@ -18,6 +18,7 @@ import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
 import browser from "../../sdk/polyfill/browserPolyfill";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
+import WebNavigationService from "../webNavigation/webNavigationService";
 
 
 describe("WorkerService", () => {
@@ -132,6 +133,63 @@ describe("WorkerService", () => {
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spyOnAlarmCreate).toHaveBeenCalledTimes(100);
       expect(spyOnAlarmClear).toHaveBeenCalledTimes(100);
+    });
+  });
+
+  describe("WorkerService::checkAndExecNavigationForWorkerWaitingConnection", () => {
+    it("Exec a navigation", async() => {
+      expect.assertions(3);
+
+      const dto = readWorker({status: WorkerEntity.STATUS_WAITING_CONNECTION});
+
+      jest.spyOn(WorkersSessionStorage, "getWorkerById").mockImplementationOnce(() => dto);
+      jest.spyOn(BrowserTabService, "getById").mockImplementationOnce(() => ({url: "https://url.com"}));
+      jest.spyOn(WebNavigationService, "exec");
+
+      const frameDetails = {
+        url: "https://url.com",
+        tabId: dto.tabId,
+        frameId: 0
+      };
+      const entity = new WorkerEntity(dto);
+      await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(entity);
+      // start the alarm
+      jest.advanceTimersByTime(50);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(entity.toDto()).toEqual(dto);
+      expect(BrowserTabService.getById).toHaveBeenCalledWith(dto.tabId);
+      expect(WebNavigationService.exec).toHaveBeenCalledWith(frameDetails);
+    });
+
+    it("Should not exec a navigation if the worker is connected", async() => {
+      expect.assertions(2);
+      const dto = readWorker();
+
+      jest.spyOn(WorkersSessionStorage, "getWorkerById").mockImplementationOnce(() => dto);
+      jest.spyOn(WebNavigationService, "exec");
+
+      const entity = new WorkerEntity(dto);
+      await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(entity);
+      // start the alarm
+      jest.advanceTimersByTime(50);
+      expect(entity.toDto()).toEqual(dto);
+      expect(WebNavigationService.exec).not.toHaveBeenCalled();
+    });
+
+    it("Should not exec a navigation if the worker is not found", async() => {
+      expect.assertions(2);
+      const dto = readWorker();
+
+      jest.spyOn(WorkersSessionStorage, "getWorkerById").mockImplementationOnce(() => undefined);
+      jest.spyOn(WebNavigationService, "exec");
+
+      const entity = new WorkerEntity(dto);
+      await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(entity);
+      // start the alarm
+      jest.advanceTimersByTime(50);
+      expect(entity.toDto()).toEqual(dto);
+      expect(WebNavigationService.exec).not.toHaveBeenCalled();
     });
   });
 });

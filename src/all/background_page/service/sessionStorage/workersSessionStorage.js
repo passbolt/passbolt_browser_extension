@@ -14,6 +14,7 @@
 import browser from "../../sdk/polyfill/browserPolyfill";
 import Lock from "../../utils/lock";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
+import Validator from "validator";
 const lock = new Lock();
 
 const WORKERS_STORAGE_KEY = 'workers';
@@ -39,6 +40,9 @@ class WorkersSessionStorage {
    * @return {Promise<object>} worker dto object
    */
   getWorkerById(id) {
+    if (!Validator.isUUID(id)) {
+      throw new TypeError("The worker id should be a valid uuid.");
+    }
     const findById = workers => workers.find(worker => worker.id === id);
     return this.getWorkers().then(findById);
   }
@@ -154,6 +158,9 @@ class WorkersSessionStorage {
    * @return {Promise<void>}
    */
   async deleteById(id) {
+    if (!Validator.isUUID(id)) {
+      throw new TypeError("The worker id should be a valid uuid.");
+    }
     await lock.acquire();
     try {
       const workers = await this.getWorkers();

@@ -52,7 +52,7 @@ describe("AuthBootstrap", () => {
     });
   });
 
-  describe("RecoverBootstrap::canBeAttachedTo", () => {
+  describe("AuthBootstrap::canBeAttachedTo", () => {
     it("Should be able to attach auth bootstrap pagemod to browser frame", async() => {
       expect.assertions(1);
       // mock functions

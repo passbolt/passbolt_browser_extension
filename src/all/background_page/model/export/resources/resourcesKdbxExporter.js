@@ -12,6 +12,7 @@
  */
 import ExternalFolderEntity from "../../entity/folder/external/externalFolderEntity";
 import * as kdbxweb from 'kdbxweb';
+import TotpEntity from "../../entity/totp/totpEntity";
 
 class ResourcesKdbxExporter {
   /**
@@ -89,6 +90,10 @@ class ResourcesKdbxExporter {
     if (externalResourceEntity.secretClear) {
       kdbxEntry.fields.set('Password', kdbxweb.ProtectedValue.fromString(externalResourceEntity.secretClear));
     }
+    if (externalResourceEntity.totp) {
+      const totpUrl = this.createUrlTotp(externalResourceEntity);
+      kdbxEntry.fields.set('otp', kdbxweb.ProtectedValue.fromString(totpUrl.toString()));
+    }
     kdbxEntry.fields.set('URL', externalResourceEntity.uri);
     kdbxEntry.fields.set('Notes', externalResourceEntity.description);
 
@@ -100,6 +105,16 @@ class ResourcesKdbxExporter {
       kdbxEntry.times.expiryTime = undefined;
       kdbxEntry.times.expires = false;
     }
+  }
+
+  /**
+   * Create url totp
+   * @param {ExternalResourceEntity} externalResourceEntity The resource to export
+   * @return {URL} The url totp
+   */
+  createUrlTotp(externalResourceEntity) {
+    const totp = new TotpEntity(externalResourceEntity.totp);
+    return totp.createUrlFromResource(externalResourceEntity);
   }
 }
 

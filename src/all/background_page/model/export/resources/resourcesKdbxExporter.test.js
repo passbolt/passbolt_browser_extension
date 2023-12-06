@@ -18,6 +18,7 @@ import argon2 from "./argon2.test-lib";
 import ResourcesKdbxExporter from "./resourcesKdbxExporter";
 import ExportResourcesFileEntity from "../../entity/export/exportResourcesFileEntity";
 import fs from "fs";
+import {defaultTotpDto} from "../../entity/totp/totpDto.test.data";
 
 global.kdbxweb = kdbxweb;
 kdbxweb.CryptoEngine.argon2 = argon2;
@@ -32,6 +33,7 @@ describe("ResourcesKdbxExporter", () => {
       description: `Description ${num}`,
       secret_clear: `Secret ${num}`,
       folder_parent_path: '',
+      totp: defaultTotpDto(),
       expired: null,
     }, data);
   }
@@ -62,7 +64,7 @@ describe("ResourcesKdbxExporter", () => {
   });
 
   it("should export resources and folders", async() => {
-    expect.assertions(14);
+    expect.assertions(16);
 
     const now = new Date();
     now.setMilliseconds(0);
@@ -70,7 +72,7 @@ describe("ResourcesKdbxExporter", () => {
     const exportFolder1 = buildExternalFolderDto(1);
     const exportFolder2 = buildExternalFolderDto(2, {"folder_parent_path": "Folder 1", "folder_parent_id": exportFolder1.id});
     const exportResource1 = buildImportResourceDto(1);
-    const exportResource2 = buildImportResourceDto(2, {"folder_parent_path": "Folder 1", "folder_parent_id": exportFolder1.id});
+    const exportResource2 = buildImportResourceDto(2, {"folder_parent_path": "Folder 1", "folder_parent_id": exportFolder1.id, totp: undefined});
     const exportResource3 = buildImportResourceDto(3, {"folder_parent_path": "Folder 1/Folder2", "folder_parent_id": exportFolder2.id});
     const exportResource4 = buildImportResourceDto(4, {"expired": now.toISOString()});
     const exportDto = {
@@ -109,6 +111,8 @@ describe("ResourcesKdbxExporter", () => {
     expect(password1.times.expiryTime).toBeUndefined();
 
     expect(password1.fields.get('Password').getText()).toEqual("Secret 1");
+    const totp = password1.fields.get('otp').getText();
+    expect(totp).toEqual("otpauth://totp/Password%201%3Ausername1?secret=DAV3DS4ERAAF5QGH&issuer=https%253A%252F%252Furl1.com&algorithm=SHA1&digits=6&period=30");
 
     expect(password4.fields.get('Title')).toEqual("Password 4");
     expect(password4.times.expires).toStrictEqual(true);
@@ -116,6 +120,7 @@ describe("ResourcesKdbxExporter", () => {
 
     expect(folder2.name).toEqual("Folder 2");
     expect(password2.fields.get('Title')).toEqual("Password 2");
+    expect(kdbxDb.groups[0].groups[1].entries[0].fields.get('otp')).toBeUndefined();
     expect(password3.fields.get('Title')).toEqual("Password 3");
   });
 

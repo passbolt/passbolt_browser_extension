@@ -80,10 +80,58 @@ class TotpEntity extends Entity {
    */
   /**
    * Get resource id
-   * @returns {(string|null)} uuid
+   * @returns {string} base32 secret key
    */
   get secret_key() {
     return this._props.secret_key;
+  }
+
+  /**
+   * Get period
+   * @returns {numbers} period
+   */
+  get period() {
+    return this._props.period;
+  }
+
+  /**
+   * Get digits
+   * @returns {numbers} digits
+   */
+  get digits() {
+    return this._props.digits;
+  }
+
+  /**
+   * Get algorithm
+   * @returns {string} algorithm
+   */
+  get algorithm() {
+    return this._props.algorithm;
+  }
+
+  /*
+   * ==================================================
+   * Methods
+   * ==================================================
+   */
+  /**
+   * Create URL from TOTP
+   * @param {ExternalResourceEntity} resource
+   * @return {URL}
+   */
+  createUrlFromResource(resource) {
+    const name = resource.username ? `${resource.name}:${resource.username}` : resource.name;
+    const url = new URL(`otpauth://totp/${encodeURIComponent(name)}`);
+    url.searchParams.append("secret", this.secret_key.replaceAll(/\s+/g, "").toUpperCase());
+    // Add issuer in the TOTP url if any
+    if (resource.uri.length > 0) {
+      url.searchParams.append("issuer", encodeURIComponent(resource.uri));
+    }
+    url.searchParams.append("algorithm", this.algorithm);
+    url.searchParams.append("digits", this.digits.toString());
+    url.searchParams.append("period", this.period.toString());
+    return url;
   }
 
   /*

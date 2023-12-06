@@ -42,7 +42,7 @@ class RbacModel {
    */
   async findAll(contains = {}) {
     const collectionDto = await this.rbacService.findAll(contains);
-    return new RbacsCollection(collectionDto);
+    return new RbacsCollection(collectionDto, true);
   }
 
   /**
@@ -53,7 +53,7 @@ class RbacModel {
    */
   async updateLocalStorage(contains = {}) {
     const collectionDto = await this.rbacMeService.findMe(contains);
-    const rbacsCollection = new RbacsCollection(collectionDto);
+    const rbacsCollection = new RbacsCollection(collectionDto, true);
     this.rbacsLocalStorage.set(rbacsCollection);
     return rbacsCollection;
   }
@@ -66,7 +66,7 @@ class RbacModel {
   async getOrFindMe(contains = {}) {
     const collectionDto = await this.rbacsLocalStorage.get();
     if (typeof collectionDto !== 'undefined') {
-      return new RbacsCollection(collectionDto);
+      return new RbacsCollection(collectionDto, true);
     }
     return this.updateLocalStorage(contains);
   }

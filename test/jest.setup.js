@@ -32,7 +32,9 @@ if (!global.navigator.locks) {
  * quick polyfill for jest to have stucturedClone function defined
  * if it's not defined, it is set to a function that returns the given object itself
  */
-global.structuredClone = global.structuredClone || (object => object);
+if (!global.structuredClone) {
+  global.structuredClone = object => object;
+}
 
 jest.mock("webextension-polyfill", () => Object.assign({}, {
   storage: new MockStorage(),

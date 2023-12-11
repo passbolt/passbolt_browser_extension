@@ -16,6 +16,8 @@ import LocalStorageService from "../all/background_page/service/localStorage/loc
 import SystemRequirementService from "../all/background_page/service/systemRequirementService/systemRequirementService";
 import OnExtensionInstalledController from "../all/background_page/controller/extension/onExtensionInstalledController";
 import TabService from "../all/background_page/service/tab/tabService";
+import OnExtensionUpdateAvailableController
+  from "../all/background_page/controller/extension/onExtensionUpdateAvailableController";
 
 /**
  * Load all system requirement
@@ -36,6 +38,11 @@ browser.runtime.onStartup.addListener(LocalStorageService.flush);
  * On installed the extension, add first install in the url tab of setup or recover
  */
 browser.runtime.onInstalled.addListener(OnExtensionInstalledController.exec);
+
+/**
+ * On update available of the extension, update it when the user is logout
+ */
+browser.runtime.onUpdateAvailable.addListener(OnExtensionUpdateAvailableController.exec);
 
 /**
  * Add listener on any tab update

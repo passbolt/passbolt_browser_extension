@@ -86,7 +86,7 @@ describe("GetCommentsByRessourceController", () => {
     });
     it("Should raise an error when service is not unavailable", async() => {
       fetch.doMock(() => { throw mockedError; });
-      const mockedError = new TypeError("Service error. This is a mocked error");
+      const mockedError = new TypeError("Unable to reach the server, an unexpected error occurred");
       const controller = new GetCommentsByRessourceController(mockedWorker, null, defaultApiClientOptions());
       const spy = jest.spyOn(controller, "exec");
       expect.assertions(3);

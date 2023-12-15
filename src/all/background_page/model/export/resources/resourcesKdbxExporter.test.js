@@ -32,6 +32,7 @@ describe("ResourcesKdbxExporter", () => {
       description: `Description ${num}`,
       secret_clear: `Secret ${num}`,
       folder_parent_path: '',
+      expired: null,
     }, data);
   }
 
@@ -61,14 +62,20 @@ describe("ResourcesKdbxExporter", () => {
   });
 
   it("should export resources and folders", async() => {
+    expect.assertions(14);
+
+    const now = new Date();
+    now.setMilliseconds(0);
+
     const exportFolder1 = buildExternalFolderDto(1);
     const exportFolder2 = buildExternalFolderDto(2, {"folder_parent_path": "Folder 1", "folder_parent_id": exportFolder1.id});
     const exportResource1 = buildImportResourceDto(1);
     const exportResource2 = buildImportResourceDto(2, {"folder_parent_path": "Folder 1", "folder_parent_id": exportFolder1.id});
     const exportResource3 = buildImportResourceDto(3, {"folder_parent_path": "Folder 1/Folder2", "folder_parent_id": exportFolder2.id});
+    const exportResource4 = buildImportResourceDto(4, {"expired": now.toISOString()});
     const exportDto = {
       "format": "kdbx",
-      "export_resources": [exportResource1, exportResource2, exportResource3],
+      "export_resources": [exportResource1, exportResource2, exportResource3, exportResource4],
       "export_folders": [exportFolder1, exportFolder2]
     };
 
@@ -80,15 +87,36 @@ describe("ResourcesKdbxExporter", () => {
 
     const kdbxCredentials = new kdbxweb.Credentials(null, null);
     const kdbxDb = await kdbxweb.Kdbx.load(exportEntity.file, kdbxCredentials);
-    expect(kdbxDb.groups[0].name).toEqual("passbolt export");
-    expect(kdbxDb.groups[0].groups[0].name).toEqual("Recycle Bin");
-    expect(kdbxDb.groups[0].groups[1].name).toEqual("Folder 1");
-    expect(kdbxDb.groups[0].entries[0].fields.get('Title')).toEqual("Password 1");
-    const password1 = kdbxDb.groups[0].entries[0].fields.get('Password').getText();
-    expect(password1).toEqual("Secret 1");
-    expect(kdbxDb.groups[0].groups[1].groups[0].name).toEqual("Folder 2");
-    expect(kdbxDb.groups[0].groups[1].entries[0].fields.get('Title')).toEqual("Password 2");
-    expect(kdbxDb.groups[0].groups[1].groups[0].entries[0].fields.get('Title')).toEqual("Password 3");
+
+    const kdbxRoot = kdbxDb.groups[0];
+    const password1 = kdbxRoot.entries[0];
+    const password4 = kdbxRoot.entries[1];
+
+    const kdbxBin = kdbxRoot.groups[0];
+
+    const folder1 = kdbxRoot.groups[1];
+    const password2 = folder1.entries[0];
+
+    const folder2 = folder1.groups[0];
+    const password3 = folder2.entries[0];
+
+    expect(kdbxRoot.name).toEqual("passbolt export");
+    expect(kdbxBin.name).toEqual("Recycle Bin");
+    expect(folder1.name).toEqual("Folder 1");
+
+    expect(password1.fields.get('Title')).toEqual("Password 1");
+    expect(password1.times.expires).toStrictEqual(false);
+    expect(password1.times.expiryTime).toBeUndefined();
+
+    expect(password1.fields.get('Password').getText()).toEqual("Secret 1");
+
+    expect(password4.fields.get('Title')).toEqual("Password 4");
+    expect(password4.times.expires).toStrictEqual(true);
+    expect(password4.times.expiryTime).toStrictEqual(new Date(now));
+
+    expect(folder2.name).toEqual("Folder 2");
+    expect(password2.fields.get('Title')).toEqual("Password 2");
+    expect(password3.fields.get('Title')).toEqual("Password 3");
   });
 
   it("should protect an export with a password", async() => {

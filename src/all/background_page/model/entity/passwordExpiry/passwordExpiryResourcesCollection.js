@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since 4.5.0
+ * @since         4.5.0
  */
 import PasswordExpiryResourceEntity from "./passwordExpiryResourceEntity";
 import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
@@ -113,6 +113,15 @@ class PasswordExpiryResourcesCollection extends EntityCollection {
     this.assertUniqueId(passwordExpiryResourceEntity);
 
     super.push(passwordExpiryResourceEntity);
+  }
+
+  /**
+   * Remove a passwordExpiryResources identified by an Id
+   * @param passwordExpiryResourcesId
+   */
+  remove(passwordExpiryResourcesId) {
+    const i = this.items.findIndex(item => item.id === passwordExpiryResourcesId);
+    this.items.splice(i, 1);
   }
 
   /*

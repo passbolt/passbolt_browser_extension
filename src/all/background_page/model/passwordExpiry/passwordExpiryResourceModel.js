@@ -31,15 +31,18 @@ class PasswordExpiryResourceModel {
   /**
    * Update the password expiry date of resources on the API.
    * @param {PasswordExpiryResourcesCollection} collection the collection to update
-   * @returns {Promise<PasswordExpiryResourcesCollection|Error>}
+   * @returns {Promise<void|Error>}
    */
   async update(collection) {
     assertType(collection, PasswordExpiryResourcesCollection, 'The given entity is not a PasswordExpiryResourceCollection');
-    // Send the updated resources expiry date in the local storage
-    const passwordExpiryResourcesCollections = await this.passwordExpiryResourceService.update(collection.toDto());
-    // Insert the updated resources expiry date in the local storage
-    await ResourceLocalStorage.updateResourcesExpiryDate(collection.passwordExpiryResources);
-    return new PasswordExpiryResourcesCollection(passwordExpiryResourcesCollections);
+    try {
+      await this.passwordExpiryResourceService.update(collection.toDto());
+      // Insert the updated resources expiry date in the local storage
+      await ResourceLocalStorage.updateResourcesExpiryDate(collection.passwordExpiryResources);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 }
 

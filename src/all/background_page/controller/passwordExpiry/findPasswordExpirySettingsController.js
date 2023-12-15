@@ -11,19 +11,21 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.4.0
  */
-import PasswordExpirySettingsModel from "../../model/passwordExpiry/passwordExpirySettingsModel";
+import PasswordExpirySettingsGetOrFindService
+  from "../../service/passwordExpirySettings/passwordExpirySettingsGetOrFindService";
 
 class FindPasswordExpirySettingsController {
   /**
    * FindPasswordExpirySettingsController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
+   * @param {AccountEntity} account the user account
    * @param {ApiClientOptions} apiClientOptions the api client options
    */
-  constructor(worker, requestId, apiClientOptions) {
+  constructor(worker, requestId, account, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.passwordExpirySettingsModel = new PasswordExpirySettingsModel(apiClientOptions);
+    this.passwordExpirySettingsGetOrFindService = new PasswordExpirySettingsGetOrFindService(account, apiClientOptions);
   }
 
   /**
@@ -45,7 +47,7 @@ class FindPasswordExpirySettingsController {
    * @returns {Promise<PasswordExpirySettingsEntity>}
    */
   async exec() {
-    return await this.passwordExpirySettingsModel.findOrDefault();
+    return await this.passwordExpirySettingsGetOrFindService.exec();
   }
 }
 

@@ -12,7 +12,7 @@ import GetResourceGridUserSettingController
   from "../controller/resourceGridSetting/getResourceGridUserSettingController";
 import SetResourceGridUserSettingController
   from "../controller/resourceGridSetting/setResourceGridUserSettingController";
-import ResourceSetExpiredController from "../controller/resource/resourceSetExpiredController";
+import SetResourcesExpiryDateController from "../controller/resource/setResourcesExpiryDateController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -149,8 +149,15 @@ const listen = function(worker, apiClientOptions, account) {
     await setResourceColumnsSettingsController._exec(gridSetting);
   });
 
+  /*
+   * Set the given resources expiration date
+   *
+   * @listens passbolt.resources.set-expiration-date
+   * @param requestId {uuid} The request identifier
+   * @param gridSetting {object} The grid setting
+   */
   worker.port.on('passbolt.resources.set-expiration-date', async(requestId, passwordExpiryResourcesCollectionDto) => {
-    const controller = new ResourceSetExpiredController(worker, requestId, apiClientOptions);
+    const controller = new SetResourcesExpiryDateController(worker, requestId, apiClientOptions);
     await controller._exec(passwordExpiryResourcesCollectionDto);
   });
 };

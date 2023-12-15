@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since 4.5.0
+ * @since         4.5.0
  */
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
@@ -48,8 +48,12 @@ class PasswordExpiryResourceEntity extends Entity {
           "format": "uuid"
         },
         "expired": {
-          "type": "string",
-          "format": "date-time"
+          "anyOf": [{
+            "type": "string",
+            "format": "date-time"
+          }, {
+            "type": "null",
+          }]
         },
         "created": {
           "type": "string",

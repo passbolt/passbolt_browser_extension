@@ -9,7 +9,7 @@
  * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
- * @since 4.5.0
+ * @since         4.5.0
  */
 
 import each from "jest-each";
@@ -25,10 +25,13 @@ describe("PasswordExpiryResource entity", () => {
   });
 
   it("should accept a mininal valid DTO", () => {
-    expect.assertions(1);
+    expect.assertions(2);
     const minmalDto = defaultPasswordExpiryResourceDto();
 
-    expect(() => new PasswordExpiryResourceEntity(minmalDto)).not.toThrow();
+    const entity = new PasswordExpiryResourceEntity(minmalDto);
+
+    expect(entity.id).toStrictEqual(minmalDto.id);
+    expect(entity.expired).toStrictEqual(minmalDto.expired);
   });
 
   it("should build an entity with given parameters", () => {
@@ -70,7 +73,7 @@ describe("PasswordExpiryResource entity", () => {
     {dto: {id: "string but not uuid"}, errorType: "format"},
     {dto: {id: -1}, errorType: "type"},
 
-    {dto: {expired: "string but not a date"}, errorType: "format"},
+    {dto: {expired: "string but not a date"}, errorType: "type"},
     {dto: {expired: -1}, errorType: "type"},
 
     {dto: {created: "string but not a date"}, errorType: "format"},

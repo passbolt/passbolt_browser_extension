@@ -30,6 +30,7 @@ import RbacsLocalStorage from "../local_storage/rbacLocalStorage";
 import UserMeSessionStorageService from "../sessionStorage/userMeSessionStorageService";
 import User from "../../model/user";
 import PasswordPoliciesLocalStorage from "../local_storage/passwordPoliciesLocalStorage";
+import PasswordExpirySettingsLocalStorage from "../local_storage/passwordExpirySettingsLocalStorage";
 
 /**
  * Flush storage data when:
@@ -64,6 +65,7 @@ class LocalStorageService {
     const account = await GetLegacyAccountService.get();
     (new RbacsLocalStorage(account)).flush();
     (new PasswordPoliciesLocalStorage(account)).flush();
+    (new PasswordExpirySettingsLocalStorage(account)).flush();
     UserMeSessionStorageService.remove(account);
   }
 }

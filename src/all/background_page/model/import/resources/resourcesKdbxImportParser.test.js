@@ -199,7 +199,7 @@ describe("ResourcesKdbxImportParser", () => {
     // Assert resources
     const totp = defaultTotpViewModelDto({secret_key: "TJSNMLGTCYOEMXZG"});
     expect(importEntity.importResources.items).toHaveLength(2);
-    const resource1Dto = buildExternalResourceDto(1, {totp: totp, folder_parent_path: "import-ref/Root", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP});
+    const resource1Dto = buildExternalResourceDto(1, {totp: totp, folder_parent_path: "import-ref/Root", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP, expired: "2023-11-10T08:09:04.000Z"});
     expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource1Dto]));
     const resource2Dto = buildExternalResourceDto(2, {totp: totp, folder_parent_path: "import-ref/Root", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP});
     expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource2Dto]));

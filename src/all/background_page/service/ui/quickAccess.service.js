@@ -59,7 +59,8 @@ async function addWorkerQuickAccess(workerId, tabId) {
     id: workerId,
     name: "QuickAccess",
     tabId: tabId,
-    frameId: 0
+    frameId: 0,
+    status: WorkerEntity.STATUS_WAITING_CONNECTION
   };
   await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
 }

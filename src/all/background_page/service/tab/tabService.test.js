@@ -19,12 +19,13 @@ import PortManager from "../../sdk/port/portManager";
 import WebNavigationService from "../webNavigation/webNavigationService";
 import TabService from "./tabService";
 import browser from "../../sdk/polyfill/browserPolyfill";
+import WorkerEntity from "../../model/entity/worker/workerEntity";
+import BrowserTabService from "../ui/browserTab.service";
 
 const mockGetPort = jest.spyOn(PortManager, "getPortById");
 const mockIsPortExist = jest.spyOn(PortManager, "isPortExist");
 const mockWorker = jest.spyOn(WorkersSessionStorage, "getWorkerOnMainFrame");
 jest.spyOn(WebNavigationService, "exec");
-
 
 describe("TabService", () => {
   beforeEach(async() => {
@@ -79,7 +80,6 @@ describe("TabService", () => {
       const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
-      mockIsPortExist.mockImplementationOnce(() => true);
       mockGetPort.mockImplementationOnce(() => portWrapper);
       // process
       await TabService.exec(frameDetails.tabId, {status: "complete"}, {url: "https://passbolt.dev"});
@@ -161,7 +161,6 @@ describe("TabService", () => {
       const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
-      mockIsPortExist.mockImplementationOnce(() => true);
       mockGetPort.mockImplementationOnce(() => portWrapper);
       // process
       await TabService.exec(frameDetails.tabId, {status: "complete"}, {id: frameDetails.tabId, url: frameDetails.url});
@@ -179,7 +178,7 @@ describe("TabService", () => {
       // data mocked
       const worker = readWorker();
       const frameDetails = {
-        url: "https://localhost",
+        url: "https://url.com",
         tabId: worker.tabId,
         frameId: 0
       };
@@ -189,15 +188,52 @@ describe("TabService", () => {
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
-      mockIsPortExist.mockImplementationOnce(() => true);
       mockGetPort.mockImplementationOnce(() => portWrapper);
+      jest.runAllTimers();
       // process
-      await TabService.exec(frameDetails.tabId, {status: "complete"}, {id: frameDetails.tabId, url: frameDetails.url});
+      const promise = TabService.exec(frameDetails.tabId, {status: "complete"}, {id: frameDetails.tabId, url: frameDetails.url});
+      // start the timeout promise
+      jest.runAllTimers();
+      await promise;
       // Called 1 times after the timeout
       expect(spyOnAlarmClear).toHaveBeenCalledTimes(1);
       // expectations
       expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenCalledWith(frameDetails.tabId);
       expect(PortManager.getPortById).toHaveBeenCalledWith(worker.id);
+      expect(WebNavigationService.exec).toHaveBeenCalledWith(frameDetails);
+    });
+
+    it("Should exec if worker is on main frame and waiting connection", async() => {
+      expect.assertions(6);
+      jest.useFakeTimers();
+      jest.clearAllTimers();
+      // data mocked
+      const worker = readWorker({status: WorkerEntity.STATUS_WAITING_CONNECTION});
+      const frameDetails = {
+        url: "https://url.com",
+        tabId: worker.tabId,
+        frameId: 0
+      };
+      const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
+      const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
+      // mock function
+      mockWorker.mockImplementationOnce(() => worker);
+      jest.spyOn(WorkersSessionStorage, "getWorkerById").mockImplementationOnce(() => worker);
+      jest.spyOn(BrowserTabService, "getById").mockImplementationOnce(() => ({url: "https://url2.com"}));
+      // process
+      await TabService.exec(frameDetails.tabId, {status: "complete"}, {id: frameDetails.tabId, url: frameDetails.url});
+      // expectations
+      expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenCalledWith(frameDetails.tabId);
+      // Called 1 times during the execution
+      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(1);
+      expect(spyOnAlarmClear).toHaveBeenCalledTimes(1);
+      // start the alarm
+      jest.advanceTimersByTime(50);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(WorkersSessionStorage.getWorkerById).toHaveBeenCalledWith(worker.id);
+      expect(BrowserTabService.getById).toHaveBeenCalledWith(worker.tabId);
+      frameDetails.url = "https://url2.com";
       expect(WebNavigationService.exec).toHaveBeenCalledWith(frameDetails);
     });
   });

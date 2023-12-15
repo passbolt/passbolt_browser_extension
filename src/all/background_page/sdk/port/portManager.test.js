@@ -84,7 +84,7 @@ describe("PortManager", () => {
     });
 
     it("Should not connect new port if it is not the quick access url", async() => {
-      expect.assertions(3);
+      expect.assertions(4);
       // data mocked
       const port = mockPort({name: "test", url: "chrome-extension://extensionId/webAccessibleResources/quickaccess.html?passbolt=test"});
       delete port.sender.tab;
@@ -92,11 +92,15 @@ describe("PortManager", () => {
       jest.spyOn(chrome.action, "getPopup").mockImplementationOnce(() => "chrome-extension://extensionId/webAccessibleResources/quickaccess.html?passbolt=quickaccess");
       jest.spyOn(PagemodManager, "attachEventToPort");
       // process
-      await PortManager.onPortConnect(port);
-      // expectations
-      expect(chrome.action.getPopup).toHaveBeenCalled();
-      expect(PortManager._ports[port.name]).not.toBeDefined();
-      expect(PagemodManager.attachEventToPort).not.toHaveBeenCalled();
+      try {
+        await PortManager.onPortConnect(port);
+      } catch (error) {
+        // expectations
+        expect(error.message).toStrictEqual("The worker id should be a valid uuid.")
+        expect(chrome.action.getPopup).toHaveBeenCalled();
+        expect(PortManager._ports[port.name]).not.toBeDefined();
+        expect(PagemodManager.attachEventToPort).not.toHaveBeenCalled();
+      }
     });
   });
 

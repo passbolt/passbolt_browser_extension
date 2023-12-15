@@ -76,14 +76,14 @@ jest.spyOn(MfaEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ClipboardEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 
-describe("Auth", () => {
+describe("App", () => {
   beforeEach(async() => {
     jest.resetModules();
     jest.clearAllMocks();
     enableFetchMocks();
   });
 
-  describe("Auth::attachEvents", () => {
+  describe("App::attachEvents", () => {
     it("Should attach events", async() => {
       expect.assertions(32);
       // data mocked
@@ -173,7 +173,7 @@ describe("Auth", () => {
     });
   });
 
-  describe("Auth::canBeAttachedTo", () => {
+  describe("App::canBeAttachedTo", () => {
     it("Should have the canBeAttachedTo not valid", async() => {
       expect.assertions(1);
       // process

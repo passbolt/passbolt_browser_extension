@@ -64,7 +64,7 @@ class ResourcesKdbxExporter {
 
   /**
    * Create a kdbx group based on an external folder entity
-   * @param {kdbxweb.KdbxDb} kdbxDb The kdbx database
+   * @param {kdbxweb.Kdbx} kdbxDb The kdbx database
    * @param {ExternalFolderEntity} externalFolderEntity The folder to export
    * @param {kdbxweb.Group} parentKdbxGroup The parent kdbx group
    */
@@ -78,7 +78,7 @@ class ResourcesKdbxExporter {
 
   /**
    * Create a kdbx entity based on an external resource entity
-   * @param {kdbxweb.KdbxDb} kdbxDb The kdbx database
+   * @param {kdbxweb.Kdbx} kdbxDb The kdbx database
    * @param {ExternalResourceEntity} externalResourceEntity The resource to export
    * @param {kdbxweb.Group} parentKdbxGroup The parent kdbx group
    */
@@ -91,6 +91,15 @@ class ResourcesKdbxExporter {
     }
     kdbxEntry.fields.set('URL', externalResourceEntity.uri);
     kdbxEntry.fields.set('Notes', externalResourceEntity.description);
+
+    if (externalResourceEntity.expired) {
+      kdbxEntry.times.expiryTime = new Date(externalResourceEntity.expired);
+      kdbxEntry.times.expires = true;
+    } else {
+      //explictly set the expiryTime to undefined as it seems that it takes the current time otherwise
+      kdbxEntry.times.expiryTime = undefined;
+      kdbxEntry.times.expires = false;
+    }
   }
 }
 

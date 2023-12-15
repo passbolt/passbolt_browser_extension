@@ -121,7 +121,8 @@ describe("ResourcesKdbxImportParser", () => {
       uri: `https://url${num}.com`,
       description: `Description ${num}`,
       secret_clear: `Secret ${num}`,
-      folder_parent_path: ``
+      folder_parent_path: ``,
+      expired: null,
     }, data);
   }
 
@@ -254,5 +255,26 @@ describe("ResourcesKdbxImportParser", () => {
     expect(error.sourceError.details).toHaveProperty("name");
     const resourceName = "too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name";
     expect(error.data.name).toEqual(resourceName);
+  });
+
+  it("should import the expiration date", async() => {
+    const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-password.kdbx", {encoding: 'base64'});
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "kdbx",
+      "file": file,
+      "options": {
+        "credentials": {
+          "password": "passbolt"
+        }
+      }
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const parser = new ResourcesKdbxImportParser(importEntity);
+    await parser.parseImport();
+
+    // Assert resources
+    expect(importEntity.importResources.items).toHaveLength(2);
+    expect(importEntity.importResources.items[1].expired).toStrictEqual("2020-11-16T23:00:42.000Z");
   });
 });

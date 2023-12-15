@@ -16,7 +16,8 @@ import ProgressService from "../../service/progress/progressService";
 import PasswordExpiryResourceModel from "../../model/passwordExpiry/passwordExpiryResourceModel";
 import PasswordExpiryResourcesCollection from "../../model/entity/passwordExpiry/passwordExpiryResourcesCollection";
 
-class ResourceSetExpiredController {
+const INITIAL_PROGRESS_GOAL = 2;
+class SetResourcesExpiryDateController {
   /**
    * ImportResourcesFileController constructor
    * @param {Worker} worker
@@ -40,8 +41,8 @@ class ResourceSetExpiredController {
    */
   async _exec(passwordExpiryResourcesCollectionDto) {
     try {
-      const passwordExpiryResourcesCollection = await this.exec(passwordExpiryResourcesCollectionDto);
-      this.worker.port.emit(this.requestId, 'SUCCESS', passwordExpiryResourcesCollection);
+      await this.exec(passwordExpiryResourcesCollectionDto);
+      this.worker.port.emit(this.requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, 'ERROR', error);
@@ -51,26 +52,23 @@ class ResourceSetExpiredController {
   /**
    * Main exec function
    * @param {Array<Object>} passwordExpiryResourcesCollectionDto The password expiry resources collection
-   * @returns {Promise<PasswordExpiryResourcesCollection>}
+   * @returns {Promise<void>}
    */
   async exec(passwordExpiryResourcesCollectionDto) {
-    this.progressService.start(0, i18n.t('Initialize'));
+    this.progressService.start(INITIAL_PROGRESS_GOAL, i18n.t('Initialize'));
     const passwordExpiryResourcesCollection = new PasswordExpiryResourcesCollection(passwordExpiryResourcesCollectionDto);
+    await this.progressService.finishStep(i18n.t('Expiry date will be updated on {{count}} resource.', {count: passwordExpiryResourcesCollectionDto.length}), true);
     try {
-      return await this.setResourcesExpired(passwordExpiryResourcesCollection);
-    } finally {
+      await this.passwordExpiryResourceModel.update(passwordExpiryResourcesCollection);
+      await this.progressService.finishStep(i18n.t('Done'), true);
       await this.progressService.close();
+      this.worker.port.emit(this.requestId, "SUCCESS");
+    } catch (error) {
+      await this.progressService.close();
+      // re-throw the error so the caller function can handle it the usual way
+      throw error;
     }
-  }
-
-  /**
-   * Set the resources expired.
-   * @param {PasswordExpiryResourcesCollection} passwordExpiryResourcesCollection The password expiry resources collection
-   * @returns {Promise<PasswordExpiryResourcesCollection>}
-   */
-  async setResourcesExpired(passwordExpiryResourcesCollection) {
-    return await this.passwordExpiryResourceModel.update(passwordExpiryResourcesCollection);
   }
 }
 
-export default ResourceSetExpiredController;
+export default SetResourcesExpiryDateController;

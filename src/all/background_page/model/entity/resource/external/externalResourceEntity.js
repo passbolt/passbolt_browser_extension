@@ -91,7 +91,8 @@ class ExternalResourceEntity extends Entity {
         "totp": TotpEntity.getSchema(),
         "folder_parent_path": {
           "type": "string"
-        }
+        },
+        "expired": resourceEntitySchema.properties.expired,
       }
     };
   }
@@ -239,6 +240,14 @@ class ExternalResourceEntity extends Entity {
    */
   get resourceTypeId() {
     return this._props.resource_type_id || null;
+  }
+
+  /**
+   * Get the resource type if any
+   * @returns {(string|null)} uuid
+   */
+  get expired() {
+    return this._props.expired || null;
   }
 
   /*

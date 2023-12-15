@@ -120,7 +120,7 @@ class ResourcesKdbxImportParser {
 
   /**
    * Parse a KdbxEntry and extract the resource
-   * @param {KdbxEntry} kdbxEntry The entry
+   * @param {kdbxweb.KdbxEntry} kdbxEntry The entry
    * @returns {Object}
    */
   parseResource(kdbxEntry) {
@@ -131,7 +131,8 @@ class ResourcesKdbxImportParser {
       username: kdbxEntry.fields.get('UserName') ? kdbxEntry.fields.get('UserName').trim() : "",
       description: kdbxEntry.fields.get('Notes') ? kdbxEntry.fields.get('Notes').trim() : "",
       folder_parent_path: this.getKdbxEntryPath(kdbxEntry),
-      secret_clear: '' // By default a secret can be null
+      secret_clear: '', // By default a secret can be null
+      expired: kdbxEntry.times.expires ? kdbxEntry.times.expiryTime?.toISOString() : null,
     };
     if (typeof kdbxEntry.fields.get('Password') === 'object') {
       externalResourceDto.secret_clear = kdbxEntry.fields.get('Password').getText();

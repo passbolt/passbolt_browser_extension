@@ -12,7 +12,6 @@
  * @since         3.9.0
  */
 import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";
-import {assertSsoProvider, assertUuid} from "../../utils/assertions";
 
 const DB_VERSION = 1;
 const DB_NAME = "sso_kit_db";
@@ -34,7 +33,7 @@ class SsoDataStorage {
   /**
    * Register locally the SSO client user's data.
    *
-   * @param {SsoKitClientPartEntity} ssoClientData
+   * @param {SsoKitClientPartEntity} ssoKitClientPartEntity
    * @returns {Promise<void>}
    * @public
    */
@@ -46,27 +45,23 @@ class SsoDataStorage {
 
   /**
    * Updates the local SSO kit with the given id.
-   * @param {uuid} ssoKitId
+   * @param {SsoKitClientPartEntity} ssoKitClientPartEntity
    * @returns {Promise<void>}
    */
-  static async updateLocalKitIdWith(ssoKitId) {
-    assertUuid(ssoKitId, "A valid SSO kit id is required");
-
+  static async updateLocalKitIdWith(ssoKitClientPartEntity) {
     const dbHandler = await this.getDbHandler();
-    await this.updateSsoDataWithId(dbHandler, ssoKitId);
+    await this.updateSsoDataWithId(dbHandler, ssoKitClientPartEntity.id);
     dbHandler.close();
   }
 
   /**
-   * Updates the local SSO kit with the given id.
-   * @param {string} provider
+   * Updates the local SSO kit.
+   * @param {SsoKitClientPartEntity} ssoKitClientPartEntity
    * @returns {Promise<void>}
    */
-  static async updateLocalKitProviderWith(provider) {
-    assertSsoProvider(provider, "A valid SSO provider id is required");
-
+  static async updateLocalKitProviderWith(ssoKitClientPartEntity) {
     const dbHandler = await this.getDbHandler();
-    await this.updateSsoDataWithProvider(dbHandler, provider);
+    await this.updateSsoDataWithProvider(dbHandler, ssoKitClientPartEntity.provider);
     dbHandler.close();
   }
 
@@ -147,8 +142,14 @@ class SsoDataStorage {
           return;
         }
 
-        const ssoClientData = new SsoKitClientPartEntity(cursor.value.sso_kit);
-        resolve(ssoClientData);
+        try {
+          const ssoClientData = new SsoKitClientPartEntity(cursor.value.sso_kit);
+          resolve(ssoClientData);
+        } catch (e) {
+          // an error can happen if a kit is set but the provider is unknown
+          console.error(e);
+          resolve(null);
+        }
       };
 
       cursor.onerror = e => {

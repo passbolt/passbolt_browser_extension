@@ -18,6 +18,7 @@ import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity
 import GoogleSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/GoogleSsoSettingsEntity";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import UpdateLocalSsoProviderController from "./updateLocalSsoProviderController";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("UpdateLocalSsoProviderController", () => {
   describe("UpdateLocalSsoProviderController::exec", () => {
@@ -45,7 +46,7 @@ describe("UpdateLocalSsoProviderController", () => {
       try {
         await controller.exec(expectedProvider);
       } catch (e) {
-        expect(e).toStrictEqual(new Error("The given provider identifier is not a valid SSO provider"));
+        expect(e).toStrictEqual(new EntityValidationError("Could not validate property provider."));
       }
     });
   });

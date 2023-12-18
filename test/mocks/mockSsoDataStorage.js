@@ -11,8 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import SsoKitClientPartEntity from "../../src/all/background_page/model/entity/sso/ssoKitClientPartEntity";
-import {assertSsoProvider} from "../../src/all/background_page/utils/assertions";
+import SsoKitClientPartEntity from "../../src/all/background_page/model/entity/sso/ssoKitClientPartEntity"
 
 class MockSsoDataStorage {
   constructor() {
@@ -24,29 +23,57 @@ class MockSsoDataStorage {
     this.flush = jest.fn().mockImplementation(this.flush.bind(this));
   }
 
-  async setMockedData(data) {
+  /**
+   * Mock/Set the serialized SSO kit on a simulated IndexedDB
+   * @param {Object} data
+   * @returns {Promise<void>}
+   */
+  setMockedData(data) {
     this.data = data;
   }
 
+  /**
+   * Returns the SSO kit currently stored on the IndexedDB
+   * @returns {Promise<SsoKitClientPartEntity|null>}
+   */
   async get() {
     return this.data
       ? new SsoKitClientPartEntity(this.data)
       : null;
   }
 
+  /**
+   * Simulates a registration of the SSO kit on the IndexedDB
+   * @param {SsoKitClientPartEntity} ssoKit
+   * @returns {Promise<void>}
+   */
   async save(ssoKitClientPartEntity) {
     this.data = ssoKitClientPartEntity.toDbSerializableObject();
   }
 
-  async updateLocalKitIdWith(ssoKitId) {
-    this.data.id = ssoKitId;
+  /**
+   * Simulates an update of the ID of the SSO kit stored on the IndexedDB
+   * @param {SsoKitClientPartEntity} ssoKit
+   * @returns {Promise<void>}
+   */
+  async updateLocalKitIdWith(ssoKit) {
+    this.data.id = ssoKit.id;
   }
 
-  async updateLocalKitProviderWith(provider) {
-    assertSsoProvider(provider);
-    this.data.provider = provider;
+  /**
+   * Simulates an update of the provider of the SSO kit stored on the IndexedDB
+   * @param {SsoKitClientPartEntity} ssoKit
+   * @returns {Promise<void>}
+   */
+  async updateLocalKitProviderWith(ssoKit) {
+    this.data.provider = ssoKit.provider;
   }
 
+  /**
+   * Simulates a flush of the SSO kit on the IndexedDB
+   * @param {SsoKitClientPartEntity} ssoKit
+   * @returns {Promise<void>}
+   */
   async flush() {
     this.data = null;
   }

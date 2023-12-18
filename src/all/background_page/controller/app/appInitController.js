@@ -63,7 +63,9 @@ class AppInitController {
 
       const sssoKitServerPartModel = new SsoKitServerPartModel(await user.getApiClientOptions());
       const ssoKit = await sssoKitServerPartModel.setupSsoKit(serverPartSsoKit);
-      await SsoDataStorage.updateLocalKitIdWith(ssoKit.id);
+      const ssoKitClientPart = await SsoDataStorage.get();
+      ssoKitClientPart.id = ssoKit.id;
+      await SsoDataStorage.updateLocalKitIdWith(ssoKitClientPart);
     } catch (e) {
       console.error(e);
       await SsoDataStorage.flush();

@@ -38,7 +38,7 @@ beforeEach(() => {
 describe("GenerateSsoKitController", () => {
   describe("GenerateSsoKitController::exec", () => {
     it("Should generate a brand new kit if none exists.", async() => {
-      expect.assertions(5);
+      expect.assertions(6);
       const data = generateSsoKitServerData({});
       const expectedProvider = AzureSsoSettingsEntity.PROVIDER_ID;
       const expextedKitId = uuid();
@@ -75,22 +75,26 @@ describe("GenerateSsoKitController", () => {
       await controller.exec(expectedProvider);
 
       expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledTimes(1);
+      expect(SsoDataStorage.save).toHaveBeenCalledTimes(1);
       expect(SsoDataStorage.save).toHaveBeenCalledWith(exepctedClientPartKitWithId);
     });
 
     it("Should update the provider if a kit exists and the provider changed.", async() => {
-      expect.assertions(1);
+      expect.assertions(2);
       const expectedProvider = GoogleSsoSettingsEntity.PROVIDER_ID;
-      const storedSsoKit = new SsoKitClientPartEntity(clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID}));
+      const clientSsoKitDto = clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID});
+      const storedSsoKit = new SsoKitClientPartEntity(clientSsoKitDto);
 
       SsoDataStorage.setMockedData(storedSsoKit.toDbSerializableObject());
 
       const controller = new GenerateSsoKitController(null, null, defaultApiClientOptions());
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
 
+      const expectedSsoKit = new SsoKitClientPartEntity({...clientSsoKitDto, provider: expectedProvider});
       await controller.exec(expectedProvider);
 
-      expect(SsoDataStorage.updateLocalKitProviderWith).toHaveBeenCalledWith(expectedProvider);
+      expect(SsoDataStorage.updateLocalKitProviderWith).toHaveBeenCalledTimes(1);
+      expect(SsoDataStorage.updateLocalKitProviderWith).toHaveBeenCalledWith(expectedSsoKit);
     });
   });
 });

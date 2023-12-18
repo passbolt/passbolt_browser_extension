@@ -33,7 +33,7 @@ class SsoSettingsModel {
    * @returns {Promise<SsoSettingsEntity>} the saved entity
    */
   async saveDraft(ssoSettingsEntity) {
-    const savedDraft = await this.ssoSettingsService.saveDraft(ssoSettingsEntity.toDto());
+    const savedDraft = await this.ssoSettingsService.saveDraft(ssoSettingsEntity.toDto({data: true}));
     return new SsoSettingsEntity(savedDraft);
   }
 

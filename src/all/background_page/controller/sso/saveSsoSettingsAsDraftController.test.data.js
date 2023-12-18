@@ -18,11 +18,11 @@ export function withAzureSsoSettings(data = {}) {
   const defaultData = {
     provider: "azure",
     data: {
-      url: "https://login.microsoftonline.com/..",
+      url: "https://login.microsoftonline.com",
       tenant_id: uuid(),
       client_id: uuid(),
       client_secret: "u8x!A%D*G-KaPdSgVkYp3s6v9y$B?E..",
-      client_secret_expiry: "2022-11-02",
+      client_secret_expiry: "2022-11-02 00:00:00",
     },
   };
 

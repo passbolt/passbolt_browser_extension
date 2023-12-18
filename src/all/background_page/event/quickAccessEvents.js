@@ -6,14 +6,12 @@
  */
 import browser from "../sdk/polyfill/browserPolyfill";
 import BrowserTabService from "../service/ui/browserTab.service";
-import SecretDecryptController from "../controller/secret/secretDecryptController";
 import ResourceInProgressCacheService from "../service/cache/resourceInProgressCache.service";
 import i18n from "../sdk/i18n";
-import WorkerService from "../service/worker/workerService";
 import FindMeController from "../controller/rbac/findMeController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
-import ResourceModel from "../model/resource/resourceModel";
+import AutofillController from "../controller/autofill/AutofillController";
 import GetOrFindPasswordExpirySettingsController from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
 
 /**
@@ -45,25 +43,8 @@ const listen = function(worker, apiClientOptions, account) {
     } catch (error) {
       worker.port.emit(requestId, 'ERROR', error);
     }
-
-    try {
-      const controller = new SecretDecryptController(worker, requestId, apiClientOptions, account);
-      const plaintextEntity = await controller.exec(resourceId);
-      const resourceModel = new ResourceModel(apiClientOptions, account);
-      const resource = await resourceModel.getById(resourceId);
-
-      // Define what to do autofill
-      const username = resource.username || '';
-      const password = plaintextEntity?.password || '';
-
-      // Current active tab's url is passing to quick access to check the same origin request
-      const webIntegrationWorker = await WorkerService.get('WebIntegration', tab.id);
-      await webIntegrationWorker.port.request('passbolt.quickaccess.fill-form', username, password, tab.url);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const autofillController = new AutofillController(worker, requestId, apiClientOptions, account);
+    await autofillController._exec(resourceId, tab.id);
   });
 
   /*

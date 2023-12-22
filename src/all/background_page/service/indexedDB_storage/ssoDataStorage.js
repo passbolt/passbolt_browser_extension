@@ -146,9 +146,9 @@ class SsoDataStorage {
           const ssoClientData = new SsoKitClientPartEntity(cursor.value.sso_kit);
           resolve(ssoClientData);
         } catch (e) {
-          // an error can happen if a kit is set but the provider is unknown
+          // a validation error can happen if for instance the provider from the API is not supported yet on the API
           console.error(e);
-          resolve(null);
+          reject();
         }
       };
 

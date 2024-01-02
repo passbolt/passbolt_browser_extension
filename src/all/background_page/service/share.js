@@ -14,7 +14,7 @@
 import User from "../model/user";
 import PassboltBadResponseError from "../error/passboltBadResponseError";
 import Request from "../model/request";
-import PassboltApiFetchError from "../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import PassboltServiceUnavailableError from "../error/passboltServiceUnavailableError";
 
 class ShareService {}

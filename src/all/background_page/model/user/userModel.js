@@ -17,7 +17,7 @@ import UserService from "../../service/api/user/userService";
 import UserDeleteTransferEntity from "../entity/user/transfer/userDeleteTransfer";
 import UserEntity from "../entity/user/userEntity";
 import UsersCollection from "../entity/user/usersCollection";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import Validator from "validator";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import UserMeSessionStorageService from "../../service/sessionStorage/userMeSessionStorageService";

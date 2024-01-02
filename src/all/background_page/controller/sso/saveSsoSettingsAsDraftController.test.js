@@ -18,7 +18,7 @@ import SaveSsoSettingsAsDraftController from "./saveSsoSettingsAsDraftController
 import {withAzureSsoSettings} from "./saveSsoSettingsAsDraftController.test.data";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import SsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/SsoSettingsEntity";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 
 beforeEach(() => {
   enableFetchMocks();

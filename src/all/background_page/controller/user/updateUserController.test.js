@@ -21,7 +21,7 @@ import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.d
 import UpdateUserController from "./updateUserController";
 import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import UserEntity from "../../model/entity/user/userEntity";
 
 beforeEach(() => {

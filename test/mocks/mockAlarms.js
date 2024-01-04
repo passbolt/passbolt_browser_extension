@@ -72,6 +72,8 @@ class OnAlarmEvent {
     this.triggerAlarm = this.triggerAlarm.bind(this);
   }
   addListener(callback) {
+    //Remove duplicate listener for desktop app to avoid infinite loop
+    this.removeListener(callback);
     this._listeners.push(callback);
   }
 

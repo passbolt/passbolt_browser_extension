@@ -16,7 +16,7 @@
     "i18next": "^23.7.16",
     "i18next-http-backend": "^2.4.2",
     "ip-regex": "^5.0.0",
-    "jssha": "~3.2.0",
+    "jssha": "~3.3.1",
     "kdbxweb": "2.1.1",
     "locutus": "~2.0.9",
     "openpgp": "5.2.1",

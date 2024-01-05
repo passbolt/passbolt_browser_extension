@@ -60,8 +60,8 @@
     "text-encoding-utf-8": "^1.0.2",
     "uuid": "^8.3.2",
     "web-ext": "^7.9.0",
-    "webpack": "^5.76.3",
-    "webpack-cli": "^4.9.1"
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
   },
   "overrides": {
     "tough-cookie": "4.1.3",

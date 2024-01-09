@@ -22,13 +22,14 @@ class TagController {
    * TagController constructor
    * @param {Worker} worker
    * @param {ApiClientOptions} clientOptions
+   * @param {AccountEntity} account the user account
    */
-  constructor(worker, clientOptions) {
+  constructor(worker, clientOptions, account) {
     this.worker = worker;
 
     // Models
-    this.resourceModel = new ResourceModel(clientOptions);
-    this.tagModel = new TagModel(clientOptions);
+    this.resourceModel = new ResourceModel(clientOptions, account);
+    this.tagModel = new TagModel(clientOptions, account);
 
     // Progress
     this.progressService = new ProgressService(this.worker, i18n.t('Adding tag...'));

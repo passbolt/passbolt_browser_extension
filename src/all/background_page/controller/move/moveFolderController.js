@@ -37,7 +37,7 @@ class MoveFolderController {
     this.worker = worker;
     this.requestId = requestId;
     this.folderModel = new FolderModel(apiClientOptions);
-    this.resourceModel = new ResourceModel(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.keyring = new Keyring();
 
     // Work variables

@@ -17,6 +17,8 @@ import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import User from "../../model/user";
 import ShareResourcesController from "./shareResourcesController";
 import MockExtension from "../../../../../test/mocks/mockExtension";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 
 const {enableFetchMocks} = require("jest-fetch-mock");
 const {mockApiResponse} = require("../../../../../test/mocks/mockApiResponse");
@@ -60,6 +62,7 @@ describe("ShareResourcesController", () => {
       expect.assertions(2 * resourceShareUpdateCallCount + isPermissionExpectedCallcount + decryptedMessageCallCount);
 
       // preparation of the keyring data to set the 3 needed users
+      const account = new AccountEntity(defaultAccountDto());
       await MockExtension.withConfiguredAccount(); //curent user is ada with her private set in the keyring
       const keyring = new Keyring();
       await keyring.importPublic(pgpKeys.admin.public, users.admin.id);
@@ -186,7 +189,7 @@ describe("ShareResourcesController", () => {
 
       // finally we can call the controller with the data as everything is setup.
       const clientOptions = await User.getInstance().getApiClientOptions({requireCsrfToken: false});
-      const controller = new ShareResourcesController(null, null, clientOptions);
+      const controller = new ShareResourcesController(null, null, clientOptions, account);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
       await controller.main(resourcesDto, changesDto);
     });

@@ -36,7 +36,7 @@ class InformMenuController {
    */
   constructor(worker, apiClientOptions, account) {
     this.worker = worker;
-    this.resourceModel = new ResourceModel(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.getPassphraseService = new GetPassphraseService(account);
   }

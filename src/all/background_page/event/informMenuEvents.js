@@ -17,6 +17,8 @@ import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/
 
 /**
  * Listens the inform menu events
+ * @param {Worker} worker
+ * @param {AccountEntity} account the user account
  */
 const listen = function(worker, _, account) {
   /** Whenever the in-form menu need initialization */

@@ -77,7 +77,7 @@ const listen = function(worker, _, account) {
     try {
       const apiClientOptions = await User.getInstance().getApiClientOptions();
       const folderModel = new FolderModel(apiClientOptions);
-      const resourceModel = new ResourceModel(apiClientOptions);
+      const resourceModel = new ResourceModel(apiClientOptions, account);
 
       await folderModel.delete(folderId, cascade);
       await resourceModel.updateLocalStorage();

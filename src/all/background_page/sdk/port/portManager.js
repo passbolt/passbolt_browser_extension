@@ -72,6 +72,8 @@ class PortManager {
     if (sender.tab) {
       // Tab property will only be present when the connection was opened from a tab
       return false;
+    } else if (sender.origin === "null") { // Safari case
+      return true;
     } else {
       // The sender is a script running in an extension page
       const popupUrl = await browser.action.getPopup({});

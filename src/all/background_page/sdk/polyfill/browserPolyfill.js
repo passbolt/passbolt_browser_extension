@@ -19,5 +19,6 @@ import browser from "webextension-polyfill";
 import "./scriptingPolyfill"; //mv3 scripting API for mv2
 import "./sessionStoragePolyfill"; //mv3 session storage API polyfill
 import "./actionPolyfill"; //mv3 action API polyfill for mv2
+import "./safariPolyfill"; //mv3 action API polyfill for mv2
 
 export default browser;

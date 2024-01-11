@@ -449,7 +449,7 @@ module.exports = function (grunt) {
           './node_modules/.bin/crx pack ' + path.build + ' -p key.pem -o ' + path.dist_chrome_mv3 + 'passbolt-' + pkg.version + '.crx ',
           "echo '\nZip and Crx files generated in " + path.dist_chrome_mv3 + "'"
         ].join(' && ')
-      }
+      },
     }
   });
 };

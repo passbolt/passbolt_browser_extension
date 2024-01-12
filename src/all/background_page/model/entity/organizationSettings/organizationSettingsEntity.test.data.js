@@ -95,6 +95,10 @@ export const anonymousOrganizationSettings = (data = {}) => {
               "label": "Rom\u00e2n\u0103 (beta)"
             },
             {
+              "locale": "ru-RU",
+              "label": "\u0420\u0443\u0441\u0441\u043a\u0438\u0439 (beta)"
+            },
+            {
               "locale": "sv-SE",
               "label": "Svenska"
             }

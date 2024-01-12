@@ -72,6 +72,12 @@ class PortManager {
     if (sender.tab) {
       // Tab property will only be present when the connection was opened from a tab
       return false;
+    } else if (sender.origin === "null") {
+      /*
+       * Safari quickaccess port neither have a tab nor a url property but have a origin set with the string "null"
+       * Typically sender is set like this: {id: "com.passbolt.Passbolt-Safari-Extension.Extension (UNSIGNED)", origin: "null"}
+       */
+      return true;
     } else {
       // The sender is a script running in an extension page
       const popupUrl = await browser.action.getPopup({});

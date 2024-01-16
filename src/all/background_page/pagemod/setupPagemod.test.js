@@ -18,8 +18,8 @@ import BuildApiClientOptionsService
   from "../service/account/buildApiClientOptionsService";
 import BuildAccountSetupService from "../service/setup/buildAccountSetupService";
 import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
-import {mockApiResponse} from "../../../../test/mocks/mockApiResponse";
 import {enableFetchMocks} from "jest-fetch-mock";
+import browser from "../sdk/polyfill/browserPolyfill";
 
 jest.spyOn(BuildAccountSetupService, "buildFromSetupUrl");
 jest.spyOn(BuildApiClientOptionsService, "buildFromAccount");
@@ -47,7 +47,7 @@ describe("Setup", () => {
           }
         }
       };
-      fetch.doMockOnceIf(new RegExp('/users/csrf-token.json'), async() => mockApiResponse("csrf-token"));
+      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       // process
       await Setup.attachEvents(port);
       // expectations

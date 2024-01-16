@@ -27,6 +27,7 @@ import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import {withAzureSsoSettings} from "../sso/getCurrentSsoSettingsController.test.data";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -84,7 +85,7 @@ describe("SignInSetupController", () => {
       };
       fetch.doMockOnceIf(new RegExp('/settings.json'), () => mockApiResponse(organizationSettings, {servertime: Date.now() / 1000}));
       fetch.doMockOnceIf(new RegExp('/sso/settings/current.json'), () => mockApiResponse(withAzureSsoSettings()));
-      fetch.doMockOnceIf(new RegExp('/csrf-token.json'), () => mockApiResponse("csrf-token"));
+      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
       SsoDataStorage.setMockedData(null);
 

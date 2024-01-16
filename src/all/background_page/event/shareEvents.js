@@ -6,7 +6,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import User from "../model/user";
 import ResourceModel from "../model/resource/resourceModel";
 import FolderModel from "../model/folder/folderModel";
 import Share from "../model/share";
@@ -15,7 +14,13 @@ import ShareFoldersController from "../controller/share/shareFoldersController";
 import FoldersCollection from "../model/entity/folder/foldersCollection";
 import PermissionChangesCollection from "../model/entity/permission/change/permissionChangesCollection";
 
-const listen = function(worker, _, account) {
+/**
+ * Listens the share events
+ * @param {Worker} worker
+ * @param {ApiClientOptions} apiClientOptions the api client options
+ * @param {AccountEntity} account the user account
+ */
+const listen = function(worker, apiClientOptions, account) {
   /*
    * Search aros based on keywords.
    * @listens passbolt.share.search-aros
@@ -43,7 +48,6 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.share.get-resources', async(requestId, resourcesIds) => {
     try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const resourceModel = new ResourceModel(apiClientOptions, account);
       const resourcesCollection = await resourceModel.findAllForShare(resourcesIds);
       worker.port.emit(requestId, 'SUCCESS', resourcesCollection);
@@ -60,7 +64,6 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.share.get-folders', async(requestId, foldersIds) => {
     try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const folderModel = new FolderModel(apiClientOptions);
       const foldersCollection = await folderModel.findAllForShare(foldersIds);
       worker.port.emit(requestId, 'SUCCESS', foldersCollection);
@@ -77,7 +80,6 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.share.resources.save', async(requestId, resources, changes) => {
     try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const shareResourcesController = new ShareResourcesController(worker, requestId, apiClientOptions, account);
       await shareResourcesController.main(resources, changes);
       worker.port.emit(requestId, 'SUCCESS');
@@ -96,7 +98,6 @@ const listen = function(worker, _, account) {
     try {
       const folders = new FoldersCollection(foldersDto);
       const permissionChanges = new PermissionChangesCollection(changesDto);
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const shareFoldersController = new ShareFoldersController(worker, requestId, apiClientOptions, account);
       await shareFoldersController.main(folders, permissionChanges);
       worker.port.emit(requestId, 'SUCCESS');

@@ -15,9 +15,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import SubscriptionController from "../controller/subscription/subscriptionController";
-import User from "../model/user";
 
-const listen = function(worker) {
+/**
+ * Listens the subscription events
+ * @param {Worker} worker
+ * @param {ApiClientOptions} apiClientOptions the api client options
+ */
+const listen = function(worker, apiClientOptions) {
   /*
    * Find the subscription
    *
@@ -25,7 +29,6 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.subscription.get', async requestId => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const subscriptionController = new SubscriptionController(worker, apiClientOptions);
     try {
       const subscriptionEntity = await subscriptionController.getSubscription();
@@ -42,7 +45,6 @@ const listen = function(worker) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.subscription.update', async(requestId, subscriptionKeyDto) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const subscriptionController = new SubscriptionController(worker, apiClientOptions);
     try {
       const subscriptionEntity = await subscriptionController.updateSubscription(subscriptionKeyDto);

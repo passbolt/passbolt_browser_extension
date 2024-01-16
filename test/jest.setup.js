@@ -64,6 +64,9 @@ jest.mock("webextension-polyfill", () => Object.assign({}, {
     },
   },
   alarms: new MockAlarms(),
+  cookies: {
+    get: jest.fn()
+  },
   tabs: {
     onUpdated: {
       addListener: jest.fn()

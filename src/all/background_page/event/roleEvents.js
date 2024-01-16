@@ -11,10 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.6
  */
-import User from "../model/user";
 import RoleModel from "../model/role/roleModel";
 
-const listen = function(worker) {
+/**
+ * Listens the role events
+ * @param {Worker} worker
+ * @param {ApiClientOptions} apiClientOptions the api client options
+ */
+const listen = function(worker, apiClientOptions) {
   /*
    * Get the resource types from the local storage.
    *
@@ -23,7 +27,6 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.role.get-all', async requestId => {
     try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const roleModel = new RoleModel(apiClientOptions);
       const roles = await roleModel.getOrFindAll();
       worker.port.emit(requestId, 'SUCCESS', roles);

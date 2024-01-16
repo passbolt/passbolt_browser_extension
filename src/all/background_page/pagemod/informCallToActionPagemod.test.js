@@ -13,10 +13,11 @@
  */
 import InformCallToAction from "./informCallToActionPagemod";
 import {InformCallToActionEvents} from "../event/informCallToActionEvents";
-import {mockApiResponse} from "../../../../test/mocks/mockApiResponse";
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import {v4 as uuid} from 'uuid';
 import {enableFetchMocks} from "jest-fetch-mock";
+import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import browser from "../sdk/polyfill/browserPolyfill";
 
 jest.spyOn(InformCallToActionEvents, "listen").mockImplementation(jest.fn());
 
@@ -41,13 +42,14 @@ describe("InFormCallToAction", () => {
         }
       };
       // mock functions
-      fetch.doMockIf(/csrf-token/, async() => mockApiResponse("csrf-token"));
+      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       const mockedAccount = {user_id: uuid(), domain: "https://test.passbolt.local"};
+      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(mockedAccount);
       jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
       // process
       await InformCallToAction.attachEvents(port);
       // expectations
-      expect(InformCallToActionEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: InformCallToAction.appName}, null, mockedAccount);
+      expect(InformCallToActionEvents.listen).toHaveBeenCalledWith({port: port, tab: port._port.sender.tab, name: InformCallToAction.appName}, apiClientOptions, mockedAccount);
       expect(InformCallToAction.events).toStrictEqual([InformCallToActionEvents]);
       expect(InformCallToAction.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(InformCallToAction.appName).toBe('InFormCallToAction');

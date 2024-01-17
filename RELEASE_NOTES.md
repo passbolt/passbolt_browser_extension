@@ -1,9 +1,13 @@
-Release song: https://www.youtube.com/watch?v=sc5iTNVEOAg
+Release song: https://youtu.be/6JNwqRF32ZI
 
-This is a small maintenance release of the browser extension only. It fixes a bug that prevented users from using the auto-fill feature from the quickaccess.
+Passbolt version 4.4.2 has been released, primarily as a maintenance update to address specific issues reported by users. This version includes two main fixes.
 
-Thank you for choosing passbolt and for your continued support.
+The first fix concerns the Time-based One-Time Password (TOTP) feature. In the previous version, there was an issue where users could accidentally delete the TOTP secret for a resource while editing its description from the sidebar. This has been corrected in the latest update.
 
-## [4.3.1] - 2023-09-28
+The second fix improves the performance of the application, specifically when users are retrieving their resources. This update is part of an ongoing effort to enhance the overall performance of the application, with further improvements planned for future releases.
+
+We extend our gratitude to the community member who reported [this issue](https://github.com/passbolt/passbolt_docker/issues/219).
+
+## [4.4.2] - 2023-11-06
 ### Fixed
-- PB-27860 As a signed-in user I should be able to autofill from the quickaccess
+- PB-28880 Fix resource with TOTP when description is updated from information panel

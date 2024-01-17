@@ -12,6 +12,7 @@
  * @since         4.0.0
  */
 import {v4 as uuidv4} from "uuid";
+import WorkerEntity from "./workerEntity";
 
 export const readWorker = (data = {}) => {
   const defaultObject = {
@@ -19,6 +20,7 @@ export const readWorker = (data = {}) => {
     name: "worker",
     tabId: 1,
     frameId: 0,
+    status: WorkerEntity.STATUS_CONNECTED
   };
   return Object.assign(defaultObject, data);
 };

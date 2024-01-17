@@ -32,7 +32,6 @@ class OrganizationSettingsEntity extends Entity {
     // Default properties values
     const props = Object.assign(OrganizationSettingsEntity.getDefault(), organizationSettingsDto);
     const sanitizedDto = OrganizationSettingsEntity.sanitizeDto(props);
-
     super(EntitySchema.validate(
       OrganizationSettingsEntity.ENTITY_NAME,
       sanitizedDto,

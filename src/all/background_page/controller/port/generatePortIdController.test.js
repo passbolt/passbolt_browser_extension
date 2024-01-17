@@ -74,7 +74,8 @@ describe("GeneratePortIdController", () => {
         id: id,
         tabId: worker.tab.id,
         name: "Setup",
-        frameId: null
+        frameId: null,
+        status: WorkerEntity.STATUS_WAITING_CONNECTION
       });
       // expectations
       expect(id).toMatch(/^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/);

@@ -16,6 +16,7 @@ import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity
 import ResourceSecretsCollection from "../../secret/resource/resourceSecretsCollection";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import TotpEntity from "../../totp/totpEntity";
 
 const ENTITY_NAME = 'ExternalResource';
 const DEFAULT_RESOURCE_NAME = '(no name)';
@@ -87,9 +88,11 @@ class ExternalResourceEntity extends Entity {
         "secret_clear": {
           "type": "string"
         },
+        "totp": TotpEntity.getSchema(),
         "folder_parent_path": {
           "type": "string"
-        }
+        },
+        "expired": resourceEntitySchema.properties.expired,
       }
     };
   }
@@ -215,6 +218,14 @@ class ExternalResourceEntity extends Entity {
     this._props.folder_parent_id = folderParentId;
   }
 
+  get totp() {
+    return this._props.totp;
+  }
+
+  set totp(totp) {
+    this._props.totp = totp;
+  }
+
   /**
    * Get folder parent path
    * @returns {string}
@@ -229,6 +240,14 @@ class ExternalResourceEntity extends Entity {
    */
   get resourceTypeId() {
     return this._props.resource_type_id || null;
+  }
+
+  /**
+   * Get the resource type if any
+   * @returns {(string|null)} uuid
+   */
+  get expired() {
+    return this._props.expired || null;
   }
 
   /*

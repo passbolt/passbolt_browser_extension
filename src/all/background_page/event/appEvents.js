@@ -40,8 +40,11 @@ import ExportDesktopAccountController from "../controller/exportAccount/exportDe
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import FindUserPassphrasePoliciesController from "../controller/userPassphrasePolicies/findUserPassphrasePoliciesController";
 import SaveUserPassphrasePoliciesController from "../controller/userPassphrasePolicies/saveUserPassphrasePoliciesController";
+import SavePasswordExpirySettingsController from "../controller/passwordExpiry/savePasswordExpirySettingsController";
+import DeletePasswordExpirySettingsController from "../controller/passwordExpiry/deletePasswordExpirySettingsController";
+import FindPasswordExpirySettingsController from "../controller/passwordExpiry/findPasswordExpirySettingsController";
 
-const listen = function(worker, _, account) {
+const listen = function(worker, apiClientOptions, account) {
   const authenticationEventController = new AuthenticationEventController(worker);
   authenticationEventController.startListen();
   /*
@@ -226,6 +229,28 @@ const listen = function(worker, _, account) {
     const controller = new SaveUserPassphrasePoliciesController(worker, requestId, apiClientOptions);
     await controller._exec(userPassphrasePoliciesDto);
   });
+
+  /*
+   * ==================================================================================
+   *  Password expiry settings events.
+   * ==================================================================================
+   */
+
+  worker.port.on('passbolt.password-expiry.find', async requestId => {
+    const controller = new FindPasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.password-expiry.save', async(requestId, passwordExpirySettingsDto) => {
+    const controller = new SavePasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
+    await controller._exec(passwordExpirySettingsDto);
+  });
+
+  worker.port.on('passbolt.password-expiry.delete', async(requestId, passwordExpiryId) => {
+    const controller = new DeletePasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
+    await controller._exec(passwordExpiryId);
+  });
+
 
   /*
    * ==================================================================================

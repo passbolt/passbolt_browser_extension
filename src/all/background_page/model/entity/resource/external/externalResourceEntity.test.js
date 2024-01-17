@@ -14,6 +14,8 @@ import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import ExternalResourceEntity from "./externalResourceEntity";
 import ExternalFolderEntity from "../../folder/external/externalFolderEntity";
+import {v4 as uuidv4} from "uuid";
+import {defaultTotpViewModelDto} from 'passbolt-styleguide/src/shared/models/totp/TotpDto.test.data';
 
 describe("ExternalResourceEntity", () => {
   it("schema must validate", () => {
@@ -41,6 +43,45 @@ describe("ExternalResourceEntity", () => {
     expect(entity.folderParentId).toEqual(null);
     expect(entity.folderParentPath).toEqual("");
     expect(entity.secrets).toBeUndefined();
+  });
+
+  it("constructor works if valid fields DTO is provided", () => {
+    expect.assertions(12);
+    const id = uuidv4();
+    const totp = defaultTotpViewModelDto();
+    const dto = {
+      "id": id,
+      "name": "Password 1",
+      "secret_clear": "password",
+      "username": "username",
+      "uri": "uri",
+      "description": "description",
+      "totp": totp
+    };
+    const result = {
+      "id": id,
+      "name": "Password 1",
+      "secret_clear": "password",
+      "username": "username",
+      "uri": "uri",
+      "description": "description",
+      "totp": totp,
+      "folder_parent_path": "",
+    };
+    const entity = new ExternalResourceEntity(dto);
+    expect(entity.toDto()).toEqual(result);
+    expect(entity.id).toEqual(result.id);
+    expect(entity.name).toEqual(result.name);
+    expect(entity.username).toEqual(result.username);
+    expect(entity.uri).toEqual(result.uri);
+    expect(entity.description).toEqual(result.description);
+    expect(entity.secretClear).toEqual(result.secret_clear);
+    expect(entity.folderParentId).toEqual(null);
+    expect(entity.folderParentPath).toEqual("");
+    expect(entity.totp).toEqual(result.totp);
+    expect(entity.secrets).toBeUndefined();
+    entity.totp = defaultTotpViewModelDto({secret_key: "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA"});
+    expect(entity.totp.secret_key !== result.totp.secret_key).toBeTruthy();
   });
 
   it("constructor build resource with default values", () => {

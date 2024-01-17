@@ -15,6 +15,7 @@ import FindMeController from "../controller/rbac/findMeController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
 import ResourceModel from "../model/resource/resourceModel";
+import FindPasswordExpirySettingsController from "../controller/passwordExpiry/findPasswordExpirySettingsController";
 
 const listen = function(worker, _, account) {
   /*
@@ -151,6 +152,12 @@ const listen = function(worker, _, account) {
   worker.port.on('passbolt.password-policies.get', async requestId => {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetOrFindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.password-expiry.find', async requestId => {
+    const apiClientOptions = await User.getInstance().getApiClientOptions();
+    const controller = new FindPasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
     await controller._exec();
   });
 };

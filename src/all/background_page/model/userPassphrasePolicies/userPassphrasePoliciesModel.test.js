@@ -50,7 +50,7 @@ describe("UserPassphrasePolicies model", () => {
       expect(result).toStrictEqual(expectedEntity);
     });
 
-    it("should return a default entity if something goes wrong on the API", async() => {
+    it("should return a default entity if the API returns an HTTP error", async() => {
       expect.assertions(1);
       const expectedEntity = UserPassphrasePoliciesEntity.createFromDefault();
       fetch.doMockOnceIf(/user-passphrase-policies\/settings\.json/, () => mockApiResponseError(404, "Endpoint is not existing"));
@@ -74,7 +74,7 @@ describe("UserPassphrasePolicies model", () => {
   });
 
   describe('::save', () => {
-    it("should save a user passphrase policies and return the stored value from the API", async() => {
+    it("should save the entity and return the stored value from the API", async() => {
       expect.assertions(2);
       const baseData = {
         entropy_minimum: 112,
@@ -107,7 +107,7 @@ describe("UserPassphrasePolicies model", () => {
       expect(() => model.save(entity)).rejects.toThrow(expectedError);
     });
 
-    it("should throw an Error if something goes wrong on the API", async() => {
+    it("should throw an Error if the API returns an HTTP error", async() => {
       expect.assertions(1);
       fetch.doMockOnceIf(/user-passphrase-policies\/settings\.json/, () => mockApiResponseError(500, "Endpoint is not existing"));
 

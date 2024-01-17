@@ -13,7 +13,8 @@
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../keyring";
 import User from "../user";
-import ReEncryptPrivateKeyService from "../../service/crypto/reEncryptPrivateKeyService";
+import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
+import EncryptPrivateKeyService from "../../service/crypto/encryptPrivateKeyService";
 
 class AccountModel {
   /**
@@ -60,8 +61,9 @@ class AccountModel {
    */
   async rotatePrivateKeyPassphrase(oldPassphrase, newPassphrase) {
     const privateArmoredKey = this.keyring.findPrivate().armoredKey;
-    const privateKey = await OpenpgpAssertion.readKeyOrFail(privateArmoredKey);
-    const reEncryptedPrivateKey = await ReEncryptPrivateKeyService.reEncrypt(privateKey, oldPassphrase, newPassphrase);
+    const encryptedPrivateKey = await OpenpgpAssertion.readKeyOrFail(privateArmoredKey);
+    const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(encryptedPrivateKey, oldPassphrase);
+    const reEncryptedPrivateKey = await EncryptPrivateKeyService.encrypt(decryptedPrivateKey, newPassphrase);
     return reEncryptedPrivateKey.armor();
   }
 

@@ -15,8 +15,13 @@ import browser from "../../sdk/polyfill/browserPolyfill";
 import PortManager from "../../sdk/port/portManager";
 import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import BrowserTabService from "../ui/browserTab.service";
+import WorkerEntity from "../../model/entity/worker/workerEntity";
+import WebNavigationService from "../webNavigation/webNavigationService";
 
 const WORKER_EXIST_ALARM = "WorkerExistFlush";
+const WORKER_EXIST_ALARM_TIME_CHECKING = 100;
+const WORKER_CHECK_STATUS_ALARM = 'workerId-';
+const WORKER_CHECK_STATUS_ALARM_TIME_CHECKING = 50;
 
 class WorkerService {
   /**
@@ -55,43 +60,85 @@ class WorkerService {
       const handleWorkerExist = async alarm => {
         if (alarm.name === WORKER_EXIST_ALARM) {
           try {
-            this.clearAlarm(handleWorkerExist);
+            this.clearAlarm(WORKER_EXIST_ALARM, handleWorkerExist);
             await this.get(applicationName, tabId);
             resolve();
           } catch (error) {
             if (alarm.scheduledTime >= timeoutMs) {
               reject(error);
             } else {
-              this.createAlarm(handleWorkerExist);
+              this.createAlarm(WORKER_EXIST_ALARM, WORKER_EXIST_ALARM_TIME_CHECKING, handleWorkerExist);
             }
           }
         }
       };
-      this.createAlarm(handleWorkerExist);
+      this.createAlarm(WORKER_EXIST_ALARM, WORKER_EXIST_ALARM_TIME_CHECKING, handleWorkerExist);
     });
   }
 
   /**
-   * Create alarm to flush the resource
-   * @private
-   * @param {function} handleFlushEvent The function on alarm listener
+   * Clear and create alarm to execute a navigation for worker which are waiting for connection
+   * @params {WorkerEntity} The worker entity
+   * @returns {Promise<void>}
    */
-  static createAlarm(handleFlushEvent) {
+  static async checkAndExecNavigationForWorkerWaitingConnection(workerEntity) {
+    const alarmName = `${WORKER_CHECK_STATUS_ALARM}${workerEntity.id}`;
+    await this.clearAlarm(alarmName, this.execNavigationForWorkerWaitingConnection);
+    await this.createAlarm(alarmName, WORKER_CHECK_STATUS_ALARM_TIME_CHECKING, this.execNavigationForWorkerWaitingConnection);
+  }
+
+  /**
+   * Create alarm
+   * @param {string} alarmName The alarm name
+   * @param {number} timeInMs The time when the alarm fire
+   * @param {function} handleAlarmEvent The function on alarm listener
+   */
+  static createAlarm(alarmName, timeInMs, handleAlarmEvent) {
     // Create an alarm to check if the worker exist
-    browser.alarms.create(WORKER_EXIST_ALARM, {
-      when: Date.now() + 100
+    browser.alarms.create(alarmName, {
+      when: Date.now() + timeInMs
     });
-    browser.alarms.onAlarm.addListener(handleFlushEvent);
+    browser.alarms.onAlarm.addListener(handleAlarmEvent);
   }
 
   /**
-   * Clear the alarm and listener configured for flushing the resource if any.
-   * @private
-   * @param {function} handleFlushEvent The function on alarm listener
+   * Clear the alarm and listener configured.
+   * @param {string} alarmName The alarm name
+   * @param {function} handleAlarmEvent The function on alarm listener
    */
-  static clearAlarm(handleFlushEvent) {
-    browser.alarms.onAlarm.removeListener(handleFlushEvent);
-    browser.alarms.clear(WORKER_EXIST_ALARM);
+  static clearAlarm(alarmName, handleAlarmEvent) {
+    browser.alarms.onAlarm.removeListener(handleAlarmEvent);
+    browser.alarms.clear(alarmName);
+  }
+
+  /**
+   * Exec a navigation for worker block in waiting connection status
+   * @private
+   * @param {Object} alarm
+   * @return {Promise<void>}
+   */
+  static async execNavigationForWorkerWaitingConnection(alarm) {
+    if (alarm.name.startsWith(WORKER_CHECK_STATUS_ALARM)) {
+      const workerId = alarm.name.substring(WORKER_CHECK_STATUS_ALARM.length);
+      const worker = await WorkersSessionStorage.getWorkerById(workerId);
+      if (!worker) {
+        console.debug("No worker has been found");
+        return;
+      }
+      const workerEntity = new WorkerEntity(worker);
+      if (workerEntity.isWaitingConnection) {
+        // Get the tab information by tab id to have the last url in case of redirection
+        const tab = await BrowserTabService.getById(workerEntity.tabId);
+        // Execute the process of a web navigation to detect pagemod and script to insert
+        const frameDetails = {
+          // Mapping the tab info as a frame details to be compliant with webNavigation API
+          frameId: 0,
+          tabId: worker.tabId,
+          url: tab.url
+        };
+        await WebNavigationService.exec(frameDetails);
+      }
+    }
   }
 }
 

@@ -84,6 +84,25 @@ const readMessageOrFail = async message => {
   }
 };
 
+/**
+ * Reads a clear text message in its armored string form.
+ * @param {string} message an openg pgp clear text message in its armored form
+ * @returns {Promise<openpgp.CleartextMessage>}
+ * @throws {Error} if the message is not a string
+ * @throws {Error} if the message can't be parsed as an armored message
+ */
+const readClearMessageOrFail = async message => {
+  if (typeof message !== "string") {
+    throw new Error(i18n.t("The message should be of type string."));
+  }
+
+  try {
+    return await openpgp.readMessage({armoredMessage: message});
+  } catch (error) {
+    throw new Error(i18n.t("The message should be a valid openpgp message."));
+  }
+};
+
 /*
  * ==================================================
  * Assertion functions
@@ -248,8 +267,21 @@ const assertMessage = message => {
   }
 };
 
+/**
+ * Assert the given message is an openpgp.CleartextMessage
+ * @param {openpgp.CleartextMessage} message
+ * @returns {void}
+ * @throws {Error} if the message is not an openpgp.CleartextMessage
+ */
+const assertClearMessage = message => {
+  if (!(message instanceof openpgp.CleartextMessage)) {
+    throw new Error(i18n.t("The message should be a valid openpgp clear text message."));
+  }
+};
+
 export const OpenpgpAssertion = {
   assertMessage,
+  assertClearMessage,
   assertEncryptedPrivateKeys,
   assertEncryptedPrivateKey,
   assertDecryptedPrivateKeys,
@@ -261,6 +293,7 @@ export const OpenpgpAssertion = {
   assertKeys,
   assertKey,
   readMessageOrFail,
+  readClearMessageOrFail,
   createMessageOrFail,
   readAllKeysOrFail,
   readKeyOrFail

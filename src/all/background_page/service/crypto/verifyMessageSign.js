@@ -18,7 +18,7 @@ import DecryptMessageService from './decryptMessageService';
 
 class VerifyMessageService {
   /**
-   * Sign a text message with the private key.
+   * Sign a text message with the public or/and private key.
    *
    * @param {openpgp.Message} message The message to sign.
    * @param {array<openpgp.PublicKey|openpgp.PrivateKey>} verificationKeys (optional) The key(s) to check the signature for.
@@ -31,6 +31,23 @@ class VerifyMessageService {
     OpenpgpAssertion.assertMessage(message);
     OpenpgpAssertion.assertKeys(verificationKeys);
 
+    const verificationResult = await openpgp.verify({message, verificationKeys});
+    await DecryptMessageService.doSignatureVerification(verificationResult.signatures);
+  }
+
+  /**
+   * Sign a text clear text message with the public or/and private keys
+   *
+   * @param {openpgp.CleartextMessage} message The clear text message to sign.
+   * @param {array<openpgp.PublicKey|openpgp.PrivateKey>} verificationKeys (optional) The key(s) to check the signature for.
+   * @returns {Promise<string>}
+   * @throws {TypeError}  If the message is not a valid openpgp.Message
+   * @throws {TypeError}  If one of the provided key is not a valid openpgp.PublicKey or openpgp.PrivateKey
+   * @throws {TypeError}  If the message cannot be verified
+   */
+  static async verifyClearMessage(message, verificationKeys) {
+    OpenpgpAssertion.assertClearMessage(message);
+    OpenpgpAssertion.assertKeys(verificationKeys);
     const verificationResult = await openpgp.verify({message, verificationKeys});
     await DecryptMessageService.doSignatureVerification(verificationResult.signatures);
   }

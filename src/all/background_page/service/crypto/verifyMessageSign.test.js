@@ -24,7 +24,7 @@ describe("VerifyMessageService service", () => {
     expect.assertions(1);
 
     const message = await signedMessage();
-    const readSignedMessage = await openpgp.readMessage({
+    const readSignedMessage = await openpgp.readCleartextMessage({
       armoredMessage: message // parse armored message
     });
     const verificationKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.admin.public]);

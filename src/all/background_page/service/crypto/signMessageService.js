@@ -25,7 +25,7 @@ class SignMessageService {
    * @throws {TypeError}  If the message is not a valid openpgp.Message
    * @throws {TypeError}  If one of the provided key is not a valid openpgp.PrivateKey
    */
-  static async sign(message, signingKeys) {
+  static async signMessage(message, signingKeys) {
     OpenpgpAssertion.assertMessage(message);
     OpenpgpAssertion.assertDecryptedPrivateKeys(signingKeys);
 

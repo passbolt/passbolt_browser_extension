@@ -16,7 +16,7 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import GetCurrentSsoSettingsController from "./getCurrentSsoSettingsController";
 import {withAzureSsoSettings} from "./getCurrentSsoSettingsController.test.data";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import SsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/SsoSettingsEntity";
 
 beforeEach(() => {

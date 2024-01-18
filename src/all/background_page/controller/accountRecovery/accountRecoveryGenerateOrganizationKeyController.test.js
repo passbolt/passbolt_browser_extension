@@ -14,7 +14,7 @@
 
 import AccountRecoveryGenerateOrganizationKeyController from "./accountRecoveryGenerateOrganizationKeyController";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import * as openpgp from 'openpgp';
 
 describe("AccountRecoveryGenerateOrganizationKeyController", () => {

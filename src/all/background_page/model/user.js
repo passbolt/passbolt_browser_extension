@@ -6,7 +6,7 @@
  */
 import {Config} from "./config";
 import UserSettings from "./userSettings/userSettings";
-import ApiClientOptions from "../service/api/apiClient/apiClientOptions";
+import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
 import Validator from "validator";
 import {ValidatorRule} from "../utils/validatorRules";
 import PassphraseStorageService from "../service/session_storage/passphraseStorageService";

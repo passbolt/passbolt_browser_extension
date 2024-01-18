@@ -21,7 +21,7 @@ import each from "jest-each";
 import ReviewRequestController from "./reviewRequestController";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {

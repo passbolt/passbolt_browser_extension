@@ -14,7 +14,7 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import MultiFactorAuthenticationModel from "./multiFactorAuthenticationModel";
 import {defaultSetupTotpData} from "../entity/mfa/mfaSetupTotpEntity.test.data";
 import {defaultVerifyProviderData} from "../entity/mfa/mfaVerifyProviderEntity.test.data";

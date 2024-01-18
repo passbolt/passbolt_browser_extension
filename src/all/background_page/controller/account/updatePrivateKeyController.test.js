@@ -16,7 +16,7 @@ import "../../../../../test/mocks/mockCryptoKey";
 import {v4 as uuidv4} from "uuid";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import UpdatePrivateKeyController from "./updatePrivateKeyController";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";

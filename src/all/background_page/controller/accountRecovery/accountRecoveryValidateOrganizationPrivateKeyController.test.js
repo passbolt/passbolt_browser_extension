@@ -18,7 +18,7 @@ import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import WrongOrganizationRecoveryKeyError from "../../error/wrongOrganizationRecoveryKeyError";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import each from "jest-each";
 

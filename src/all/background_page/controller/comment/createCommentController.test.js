@@ -15,7 +15,7 @@
 import {enableFetchMocks} from "jest-fetch-mock";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import {commentCreationMock, commentResponseMock} from "../../model/entity/comment/comments.test.data";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import CreateCommentController from "./createCommentController";
 import {v4 as uuidv4} from "uuid";

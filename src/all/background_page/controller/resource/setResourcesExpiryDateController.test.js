@@ -16,7 +16,7 @@ import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/Pass
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import PasswordExpiryResourcesCollection from "../../model/entity/passwordExpiry/passwordExpiryResourcesCollection";
 import {defaultPasswordExpiryCollectionDto} from "../../model/entity/passwordExpiry/passwordExpiryResourceCollection.test.data";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
 import SetResourcesExpiryDateController from "./setResourcesExpiryDateController";
 import {enableFetchMocks} from "jest-fetch-mock";

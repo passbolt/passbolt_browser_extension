@@ -27,7 +27,7 @@ class VerifyMessageService {
    * @throws {TypeError}  If one of the provided key is not a valid openpgp.PublicKey or openpgp.PrivateKey
    * @throws {TypeError}  If the message cannot be verified
    */
-  static async verify(message, verificationKeys) {
+  static async verifyMessage(message, verificationKeys) {
     OpenpgpAssertion.assertMessage(message);
     OpenpgpAssertion.assertKeys(verificationKeys);
 

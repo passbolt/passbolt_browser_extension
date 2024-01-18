@@ -53,20 +53,20 @@ describe("ExportDesktopAccountController", () => {
 
       let resultSignedAccountKit;
       jest.spyOn(DecryptPrivateKeyService, "decrypt");
-      jest.spyOn(SignMessageService, "sign");
+      jest.spyOn(SignMessageService, "signClearMessage");
       jest.spyOn(FileService, "saveFile").mockImplementation(jest.fn((_, content) => {
         resultSignedAccountKit = content;
       }));
 
       await controller.exec();
 
-      expect(SignMessageService.sign).toHaveBeenCalled();
+      expect(SignMessageService.signClearMessage).toHaveBeenCalled();
       expect(DecryptPrivateKeyService.decrypt).toHaveBeenCalled();
       expect(controller.desktopTransferModel.getAccountKit).toHaveBeenCalled();
       expect(FileService.saveFile).toHaveBeenCalledWith("account-kit.passbolt", expect.anything(), "application/passbolt", worker.tab.id);
       // Assert the account kit output.
       const signedResultAccountKit = Buffer.from(resultSignedAccountKit, "base64").toString();
-      const serializedResultAccountKit = await OpenpgpAssertion.readMessageOrFail(signedResultAccountKit);
+      const serializedResultAccountKit = await OpenpgpAssertion.readClearMessageOrFail(signedResultAccountKit);
       const resultAccountKitDto = JSON.parse(serializedResultAccountKit.getText());
       expect(resultAccountKitDto.user_id).toEqual(account.userId);
     });

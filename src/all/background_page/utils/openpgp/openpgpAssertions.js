@@ -86,18 +86,18 @@ const readMessageOrFail = async message => {
 
 /**
  * Reads a clear text message in its armored string form.
- * @param {string} message an openg pgp clear text message in its armored form
+ * @param {string} cleartextMessage an openg pgp clear text message in its armored form
  * @returns {Promise<openpgp.CleartextMessage>}
  * @throws {Error} if the message is not a string
  * @throws {Error} if the message can't be parsed as an armored message
  */
-const readClearMessageOrFail = async message => {
-  if (typeof message !== "string") {
+const readClearMessageOrFail = async cleartextMessage => {
+  if (typeof cleartextMessage !== "string") {
     throw new Error(i18n.t("The message should be of type string."));
   }
 
   try {
-    return await openpgp.readMessage({armoredMessage: message});
+    return await openpgp.readCleartextMessage({cleartextMessage});
   } catch (error) {
     throw new Error(i18n.t("The message should be a valid openpgp message."));
   }

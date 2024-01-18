@@ -28,7 +28,17 @@ export const signedMessage = async(data = {}) => {
   const messageToSign = await openpgp.createMessage({text: message});
   const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(privateKey);
 
-  const signedMessage = await SignMessageService.sign(messageToSign, [adminDecryptedKey]);
+  const signedMessage = await SignMessageService.signMessage(messageToSign, [adminDecryptedKey]);
 
   return signedMessage;
+};
+
+export const signedClearMessage = async(data = {}) => {
+  const {message, privateKey} = defaultData(data);
+  const messageToSign = await openpgp.createCleartextMessage({text: message});
+  const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(privateKey);
+
+  const signedClearMessage = await SignMessageService.signClearMessage(messageToSign, [adminDecryptedKey]);
+
+  return signedClearMessage;
 };

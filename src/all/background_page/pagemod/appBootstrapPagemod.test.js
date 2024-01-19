@@ -22,6 +22,7 @@ import {AppBootstrapEvents} from "../event/appBootstrapEvents";
 import Pagemod from "./pagemod";
 import each from "jest-each";
 import {PortEvents} from "../event/portEvents";
+import {DataEvents} from "../event/dataEvents";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
@@ -29,6 +30,7 @@ jest.spyOn(ScriptExecution.prototype, "injectCss").mockImplementation(jest.fn())
 jest.spyOn(ScriptExecution.prototype, "injectJs").mockImplementation(jest.fn());
 jest.spyOn(AppBootstrapEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PortEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(DataEvents, "listen").mockImplementation(jest.fn());
 
 describe("AppBootstrap", () => {
   beforeEach(async() => {
@@ -49,7 +51,7 @@ describe("AppBootstrap", () => {
       expect(ScriptExecution.prototype.injectJs).toHaveBeenCalledWith(AppBootstrap.contentScriptFiles);
       expect(AppBootstrap.contentStyleFiles).toStrictEqual(['webAccessibleResources/css/themes/default/ext_external.min.css']);
       expect(AppBootstrap.contentScriptFiles).toStrictEqual(['contentScripts/js/dist/vendors.js', 'contentScripts/js/dist/app.js']);
-      expect(AppBootstrap.events).toStrictEqual([AppBootstrapEvents, PortEvents]);
+      expect(AppBootstrap.events).toStrictEqual([AppBootstrapEvents, PortEvents, DataEvents]);
       expect(AppBootstrap.mustReloadOnExtensionUpdate).toBeTruthy();
       expect(AppBootstrap.appName).toBe('AppBootstrap');
     });

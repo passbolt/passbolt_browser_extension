@@ -17,6 +17,7 @@ import GpgAuth from "../model/gpgauth";
 import {AppBootstrapEvents} from "../event/appBootstrapEvents";
 import ParseAppUrlService from "../service/app/parseAppUrlService";
 import {PortEvents} from "../event/portEvents";
+import {DataEvents} from "../event/dataEvents";
 
 class AppBootstrap extends Pagemod {
   /**
@@ -48,7 +49,7 @@ class AppBootstrap extends Pagemod {
    * @inheritDoc
    */
   get events() {
-    return [AppBootstrapEvents, PortEvents];
+    return [AppBootstrapEvents, PortEvents, DataEvents];
   }
 
   /**

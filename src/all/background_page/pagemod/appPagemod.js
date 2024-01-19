@@ -44,6 +44,7 @@ import {MfaEvents} from "../event/mfaEvents";
 import {ClipboardEvents} from "../event/clipboardEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import {RememberMeEvents} from "../event/rememberMeEvents";
+import {DataEvents} from "../event/dataEvents";
 
 class App extends Pagemod {
   /**
@@ -59,6 +60,7 @@ class App extends Pagemod {
    */
   get events() {
     return [
+      DataEvents,
       ConfigEvents,
       AppEvents,
       AuthEvents,
@@ -86,7 +88,7 @@ class App extends Pagemod {
       PownedPasswordEvents,
       MfaEvents,
       ClipboardEvents,
-      RememberMeEvents
+      RememberMeEvents,
     ];
   }
 

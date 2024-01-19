@@ -21,6 +21,8 @@ import {OrganizationSettingsEvents} from "../event/organizationSettingsEvents";
 import {LocaleEvents} from "../event/localeEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import {RememberMeEvents} from "../event/rememberMeEvents";
+import {DataEvents} from "../event/dataEvents";
+
 
 class Auth extends Pagemod {
   /**
@@ -36,6 +38,7 @@ class Auth extends Pagemod {
    */
   get events() {
     return [
+      DataEvents,
       ConfigEvents,
       UserEvents,
       KeyringEvents,

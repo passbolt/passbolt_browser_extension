@@ -46,6 +46,7 @@ import BuildApiClientOptionsService from "../service/account/buildApiClientOptio
 import {mockApiResponse} from "../../../../test/mocks/mockApiResponse";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {RememberMeEvents} from "../event/rememberMeEvents";
+import {DataEvents} from "../event/dataEvents";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppEvents, "listen").mockImplementation(jest.fn());
@@ -75,6 +76,7 @@ jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(MfaEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ClipboardEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(DataEvents, "listen").mockImplementation(jest.fn());
 
 describe("App", () => {
   beforeEach(async() => {
@@ -85,7 +87,7 @@ describe("App", () => {
 
   describe("App::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(32);
+      expect.assertions(33);
       // data mocked
       const port = {
         _port: {
@@ -138,7 +140,9 @@ describe("App", () => {
       expect(MfaEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(ClipboardEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(RememberMeEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(DataEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(App.events).toStrictEqual([
+        DataEvents,
         ConfigEvents,
         AppEvents,
         AuthEvents,

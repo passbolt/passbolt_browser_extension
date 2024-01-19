@@ -29,6 +29,7 @@ import {ResourceTypeEvents} from "../event/resourceTypeEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 import {AccountEvents} from "../event/accountEvents";
+import {DataEvents} from "../event/dataEvents";
 
 class QuickAccess extends Pagemod {
   /**
@@ -44,6 +45,7 @@ class QuickAccess extends Pagemod {
    */
   get events() {
     return [
+      DataEvents,
       AuthEvents,
       ConfigEvents,
       KeyringEvents,

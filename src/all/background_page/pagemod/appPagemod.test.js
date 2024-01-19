@@ -48,6 +48,7 @@ import {userLoggedInAuthStatus} from "../controller/auth/authCheckStatus.test.da
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 import {PermissionEvents} from "../event/permissionEvents";
 import {AccountEvents} from "../event/accountEvents";
+import {DataEvents} from "../event/dataEvents";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppEvents, "listen").mockImplementation(jest.fn());
@@ -79,6 +80,7 @@ jest.spyOn(ClipboardEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(PermissionEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AccountEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(DataEvents, "listen").mockImplementation(jest.fn());
 
 describe("App", () => {
   beforeEach(async() => {
@@ -141,7 +143,9 @@ describe("App", () => {
       expect(RememberMeEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(PermissionEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(AccountEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(DataEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(App.events).toStrictEqual([
+        DataEvents,
         ConfigEvents,
         AppEvents,
         AuthEvents,

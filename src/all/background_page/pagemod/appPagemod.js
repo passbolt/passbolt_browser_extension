@@ -46,6 +46,7 @@ import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 import {PermissionEvents} from "../event/permissionEvents";
 import {AccountEvents} from "../event/accountEvents";
+import {DataEvents} from "../event/dataEvents";
 
 class App extends Pagemod {
   /**
@@ -61,6 +62,7 @@ class App extends Pagemod {
    */
   get events() {
     return [
+      DataEvents,
       ConfigEvents,
       AppEvents,
       AuthEvents,

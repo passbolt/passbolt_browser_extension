@@ -23,6 +23,7 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import {RememberMeEvents} from "../event/rememberMeEvents";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
+import {DataEvents} from "../event/dataEvents";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(UserEvents, "listen").mockImplementation(jest.fn());
@@ -31,6 +32,7 @@ jest.spyOn(AuthEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(OrganizationSettingsEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(LocaleEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(DataEvents, "listen").mockImplementation(jest.fn());
 
 describe("Auth", () => {
   beforeEach(async() => {
@@ -41,7 +43,7 @@ describe("Auth", () => {
 
   describe("Auth::attachEvents", () => {
     it("Should attach events", async() => {
-      expect.assertions(11);
+      expect.assertions(12);
       // data mocked
       const port = {
         _port: {
@@ -68,7 +70,8 @@ describe("Auth", () => {
       expect(OrganizationSettingsEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(LocaleEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
       expect(RememberMeEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
-      expect(Auth.events).toStrictEqual([ConfigEvents, UserEvents, KeyringEvents, AuthEvents, OrganizationSettingsEvents, LocaleEvents, RememberMeEvents]);
+      expect(DataEvents.listen).toHaveBeenCalledWith(expectedPortAndTab, mockApiClient, mockedAccount);
+      expect(Auth.events).toStrictEqual([DataEvents, ConfigEvents, UserEvents, KeyringEvents, AuthEvents, OrganizationSettingsEvents, LocaleEvents, RememberMeEvents]);
       expect(Auth.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(Auth.appName).toBe('Auth');
     });

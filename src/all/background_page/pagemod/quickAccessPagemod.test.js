@@ -31,6 +31,7 @@ import {ResourceTypeEvents} from "../event/resourceTypeEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import GetActiveAccountService from "../service/account/getActiveAccountService";
 import {AccountEvents} from "../event/accountEvents";
+import {DataEvents} from "../event/dataEvents";
 
 jest.spyOn(AuthEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
@@ -47,6 +48,7 @@ jest.spyOn(PownedPasswordEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ResourceTypeEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AccountEvents, "listen").mockImplementation(jest.fn());
+jest.spyOn(DataEvents, "listen").mockImplementation(jest.fn());
 
 describe("QuickAccess", () => {
   beforeEach(async() => {
@@ -73,6 +75,7 @@ describe("QuickAccess", () => {
       await QuickAccess.attachEvents(port);
       // expectations
       const expectedArgument = {port: port, tab: port._port.sender.tab, name: QuickAccess.appName};
+      expect(DataEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(AuthEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(ConfigEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(KeyringEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
@@ -87,8 +90,24 @@ describe("QuickAccess", () => {
       expect(PownedPasswordEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(RememberMeEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
       expect(ResourceTypeEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
-      expect(AccountEvents.listen).toHaveBeenCalledWith(expectedArgument, apiClientOptions, mockedAccount);
-      expect(QuickAccess.events).toStrictEqual([AuthEvents, ConfigEvents, KeyringEvents, QuickAccessEvents, GroupEvents, TagEvents, ResourceEvents, SecretEvents, OrganizationSettingsEvents, TabEvents, LocaleEvents, PownedPasswordEvents, RememberMeEvents, ResourceTypeEvents, AccountEvents]);
+      expect(QuickAccess.events).toStrictEqual([
+        DataEvents,
+        AuthEvents,
+        ConfigEvents,
+        KeyringEvents,
+        QuickAccessEvents,
+        GroupEvents,
+        TagEvents,
+        ResourceEvents,
+        SecretEvents,
+        OrganizationSettingsEvents,
+        TabEvents,
+        LocaleEvents,
+        PownedPasswordEvents,
+        RememberMeEvents,
+        ResourceTypeEvents,
+        AccountEvents
+      ]);
       expect(QuickAccess.mustReloadOnExtensionUpdate).toBeFalsy();
       expect(QuickAccess.appName).toBe('QuickAccess');
     });

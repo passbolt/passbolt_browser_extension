@@ -275,8 +275,13 @@ class UserService extends AbstractService {
     try {
       response = await fetch(url.toString());
     } catch (error) {
-      // Catch Network error such as connection lost.
-      throw new PassboltServiceUnavailableError();
+      if (navigator.onLine) {
+        // Catch Network error such as bad certificate or server unreachable.
+        throw new PassboltServiceUnavailableError("Unable to reach the server, an unexpected error occurred");
+      } else {
+        // Network connection lost.
+        throw new PassboltServiceUnavailableError("Unable to reach the server, you are not connected to the network");
+      }
     }
 
     try {

@@ -82,7 +82,6 @@ describe("PasswordExpiry model", () => {
         default_expiry_period: null,
         policy_override: true,
         automatic_update: false,
-        expiry_notification: null,
       };
       const dtoToSave = defaultPasswordExpirySettingsDto(baseData);
       const entityToSave = new PasswordExpirySettingsEntity(dtoToSave);

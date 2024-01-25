@@ -19,38 +19,76 @@ import VerifyMessageService from './verifyMessageSign';
 import * as openpgp from 'openpgp';
 
 describe("SignMessageService service", () => {
-  it("should sign a given message key with a provide key provided", async() => {
-    expect.assertions(1);
+  describe("signMessage method", () => {
+    it("should sign a given message key with a provide key provided", async() => {
+      expect.assertions(1);
 
-    const messageToSign = await openpgp.createMessage({text: 'my-account-kit'});
-    const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
+      const messageToSign = await openpgp.createMessage({text: 'my-account-kit'});
+      const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
 
-    const signedMessage = await SignMessageService.sign(messageToSign, [adminDecryptedKey]);
-    //verify the signature
-    const readSignedMessage = await openpgp.readMessage({
-      armoredMessage: signedMessage // parse armored message
+      const signedMessage = await SignMessageService.signMessage(messageToSign, [adminDecryptedKey]);
+      //verify the signature
+      const readSignedMessage = await openpgp.readMessage({
+        armoredMessage: signedMessage // parse armored message
+      });
+
+      const verificationKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.admin.public]);
+
+      await expect(VerifyMessageService.verifyMessage(readSignedMessage, verificationKeys)).resolves.not.toThrow();
     });
 
-    const verificationKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.admin.public]);
+    it("should throw an error in case an invalid message", async() => {
+      expect.assertions(1);
 
-    await expect(VerifyMessageService.verify(readSignedMessage, verificationKeys)).resolves.not.toThrow();
+      const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
+      const promise = SignMessageService.signMessage("", [adminDecryptedKey]);
+
+      return expect(promise).rejects.toThrowError(new TypeError("The message should be a valid openpgp message."));
+    });
+
+    it("should throw an error in case an invalid private key", async() => {
+      expect.assertions(1);
+      const messageToSign = await openpgp.createMessage({text: 'my-account-kit'});
+      const promise = SignMessageService.signMessage(messageToSign, "");
+
+      return expect(promise).rejects.toThrowError(new Error("The keys should be an array of valid decrypted openpgp private keys."));
+    });
   });
 
-  it("should throw an error in case an invalid message", async() => {
-    expect.assertions(1);
+  describe("signClearMessage method", () => {
+    it("should sign a given message with a provided key", async() => {
+      expect.assertions(1);
 
-    const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
-    const promise = SignMessageService.sign("", [adminDecryptedKey]);
+      const messageToSign = await openpgp.createCleartextMessage({text: 'my-account-kit'});
+      const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
 
-    return expect(promise).rejects.toThrowError(new TypeError("The message should be a valid openpgp message."));
-  });
+      const signedMessage = await SignMessageService.signClearMessage(messageToSign, [adminDecryptedKey]);
+      //verify the signature
+      const readSignedMessage = await openpgp.readCleartextMessage({
+        cleartextMessage: signedMessage // parse armored message
+      });
 
-  it("should throw an error in case an invalid private key", async() => {
-    expect.assertions(1);
-    const messageToSign = await openpgp.createMessage({text: 'my-account-kit'});
-    const promise = SignMessageService.sign(messageToSign, "");
+      const verificationKeys = await OpenpgpAssertion.readAllKeysOrFail([pgpKeys.admin.public]);
 
-    return expect(promise).rejects.toThrowError(new Error("The keys should be an array of valid decrypted openpgp private keys."));
+      await expect(VerifyMessageService.verifyClearMessage(readSignedMessage, verificationKeys)).resolves.not.toThrow();
+    });
+
+    it("should throw an error in case an invalid message", async() => {
+      expect.assertions(1);
+
+      const adminDecryptedKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.admin.private_decrypted);
+      const promise = SignMessageService.signClearMessage("", [adminDecryptedKey]);
+
+      return expect(promise).rejects.toThrowError(new TypeError("The message should be a valid openpgp clear text message."));
+    });
+
+    it("should throw an error in case an invalid private key", async() => {
+      expect.assertions(1);
+      const messageToSign = await openpgp.createCleartextMessage({text: 'my-account-kit'});
+      const promise = SignMessageService.signClearMessage(messageToSign, "");
+
+      return expect(promise).rejects.toThrowError(new Error("The keys should be an array of valid decrypted openpgp private keys."));
+    });
   });
 });
 

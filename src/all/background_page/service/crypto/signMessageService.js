@@ -25,14 +25,31 @@ class SignMessageService {
    * @throws {TypeError}  If the message is not a valid openpgp.Message
    * @throws {TypeError}  If one of the provided key is not a valid openpgp.PrivateKey
    */
-  static async sign(message, signingKeys) {
+  static async signMessage(message, signingKeys) {
     OpenpgpAssertion.assertMessage(message);
     OpenpgpAssertion.assertDecryptedPrivateKeys(signingKeys);
 
     const signedMesage = await openpgp.sign({message: message, signingKeys: signingKeys});
+    return signedMesage;
+  }
 
+  /**
+   * Sign a clear text message with the private key.
+   *
+   * @param {openpgp.CleartextMessage} message The cleartext message to sign.
+   * @param {openpgp.PrivateKey} signingKeys The private key to use to sign the message.
+   * @returns {Promise<string>}
+   * @throws {TypeError}  If the message is not a valid openpgp.Message
+   * @throws {TypeError}  If one of the provided key is not a valid openpgp.PrivateKey
+   */
+  static async signClearMessage(message, signingKeys) {
+    OpenpgpAssertion.assertClearMessage(message);
+    OpenpgpAssertion.assertDecryptedPrivateKeys(signingKeys);
+
+    const signedMesage = await openpgp.sign({message: message, signingKeys: signingKeys});
     return signedMesage;
   }
 }
+
 
 export default SignMessageService;

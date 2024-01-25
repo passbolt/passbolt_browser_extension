@@ -16,11 +16,11 @@ import ResourceModel from "../../model/resource/resourceModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import FolderModel from "../../model/folder/folderModel";
-import Share from "../../model/share";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
+import ShareModel from "../../model/share/shareModel";
 
 class ShareFoldersController {
   /**
@@ -36,6 +36,7 @@ class ShareFoldersController {
     this.requestId = requestId;
     this.folderModel = new FolderModel(apiClientOptions);
     this.resourceModel = new ResourceModel(apiClientOptions, account);
+    this.shareModel = new ShareModel(apiClientOptions);
     this.keyring = new Keyring();
     // Work variables
     this.folders = null;
@@ -195,9 +196,10 @@ class ShareFoldersController {
     if (this.foldersChanges.length) {
       const folders = new FoldersCollection([this.folder]);
       folders.merge(this.subFolders);
-      await Share.bulkShareFolders(folders, this.foldersChanges, this.folderModel,  async message => {
+      await this.shareModel.bulkShareFolders(folders, this.foldersChanges,  async message => {
         await this.progressService.finishStep(message);
       });
+      await this.folderModel.updateLocalStorage();
     }
 
     // Share resources
@@ -206,7 +208,7 @@ class ShareFoldersController {
       const changesDto = this.resourcesChanges.toDto();
       await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
       await this.keyring.sync();
-      await Share.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
+      await this.shareModel.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await this.progressService.finishStep(message);
       });
       await this.resourceModel.updateLocalStorage();

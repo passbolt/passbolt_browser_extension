@@ -23,13 +23,14 @@ import {defaultUserPassphrasePoliciesDto, userPassphrasePoliciesDtoFromApi} from
 import PassboltApiFetchError from "../../error/passboltApiFetchError";
 import PassboltServiceUnavailableError from "../../error/passboltServiceUnavailableError";
 import PasswordPoliciesEntity from "../entity/passwordPolicies/passwordPoliciesEntity";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("UserPassphrasePolicies model", () => {
   let apiClientOptions;
   beforeEach(async() => {
     enableFetchMocks();
     jest.resetAllMocks();
-    fetch.doMockIf(/users\/csrf-token\.json/, () => mockApiResponse("csrf-token"));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     const account = new AccountEntity(defaultAccountDto());
     apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);

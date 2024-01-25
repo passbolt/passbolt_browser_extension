@@ -22,13 +22,14 @@ import PassboltServiceUnavailableError from "../../../error/passboltServiceUnava
 import PasswordExpirySettingsService from "./passwordExpirySettingsService";
 import {v4 as uuid} from 'uuid';
 import {defaultPasswordExpirySettingsDto, defaultPasswordExpirySettingsDtoFromApi} from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
+import browser from "../../../sdk/polyfill/browserPolyfill";
 
 describe("PasswordExpiry service", () => {
   let apiClientOptions;
   beforeEach(async() => {
     enableFetchMocks();
     jest.resetAllMocks();
-    fetch.doMockIf(/users\/csrf-token\.json/, () => mockApiResponse("csrf-token"));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     const account = new AccountEntity(defaultAccountDto());
     apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);

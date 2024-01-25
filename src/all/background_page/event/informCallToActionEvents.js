@@ -10,7 +10,6 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import User from "../model/user";
 import InformCallToActionController from "../controller/informCallToActionController/informCallToActionController";
 import AuthenticationEventController from "../controller/auth/authenticationEventController";
 
@@ -18,9 +17,10 @@ import AuthenticationEventController from "../controller/auth/authenticationEven
 /**
  * Listens the inform call to action events
  * @param {Worker} worker
+ * @param {ApiClientOptions} apiClientOptions
  * @param {AccountEntity} account the user account
  */
-const listen = function(worker, _, account) {
+const listen = function(worker, apiClientOptions, account) {
   const authenticationEventController = new AuthenticationEventController(worker);
   authenticationEventController.startListen();
 
@@ -31,7 +31,6 @@ const listen = function(worker, _, account) {
    * @returns {*{isAuthenticated,isMfaRequired}
    */
   worker.port.on('passbolt.in-form-cta.check-status', async requestId => {
-    const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const informCallToActionController = new InformCallToActionController(worker, apiClientOptions, account);
     await informCallToActionController.checkStatus(requestId);
   });
@@ -43,7 +42,6 @@ const listen = function(worker, _, account) {
    * @returns {*[]|number}
    */
   worker.port.on('passbolt.in-form-cta.suggested-resources', async requestId => {
-    const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const informCallToActionController = new InformCallToActionController(worker, apiClientOptions, account);
     await informCallToActionController.countSuggestedResourcesCount(requestId);
   });
@@ -54,7 +52,6 @@ const listen = function(worker, _, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.in-form-cta.execute', async requestId => {
-    const apiClientOptions =  await User.getInstance().getApiClientOptions();
     const informCallToActionController = new InformCallToActionController(worker, apiClientOptions, account);
     await informCallToActionController.execute(requestId);
   });

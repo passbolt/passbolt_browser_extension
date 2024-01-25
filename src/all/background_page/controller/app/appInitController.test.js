@@ -21,6 +21,7 @@ import {v4 as uuid} from "uuid";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -69,7 +70,7 @@ describe("AppInitController", () => {
       jest.spyOn(userInstance.settings, "sync").mockImplementation(async() => null);
       jest.spyOn(SsoKitTemporaryStorageService, "getAndFlush").mockImplementation(async() => storedServerSsoKit);
 
-      fetch.doMockOnceIf(new RegExp('/users/csrf-token.json'), async() => mockApiResponse("csrf-token"));
+      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
       fetch.doMockOnceIf(new RegExp('/sso/keys.json'), async req => {
         const body = JSON.parse(await req.text());
         expect(body).toStrictEqual(storedServerSsoKit);

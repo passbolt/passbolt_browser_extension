@@ -20,13 +20,14 @@ import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/m
 import DeletePasswordExpirySettingsController from "./deletePasswordExpirySettingsController";
 import {v4 as uuid} from "uuid";
 import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("DeletePasswordExpirySettingsController", () => {
   let account, apiClientOptions;
   beforeEach(async() => {
     enableFetchMocks();
     jest.resetAllMocks();
-    fetch.doMockIf(/users\/csrf-token\.json/, () => mockApiResponse("csrf-token"));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);

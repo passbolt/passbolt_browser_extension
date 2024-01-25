@@ -43,9 +43,9 @@ import {MfaEvents} from "../event/mfaEvents";
 import {ClipboardEvents} from "../event/clipboardEvents";
 import {v4 as uuid} from "uuid";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
-import {mockApiResponse} from "../../../../test/mocks/mockApiResponse";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {RememberMeEvents} from "../event/rememberMeEvents";
+import browser from "../sdk/polyfill/browserPolyfill";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppEvents, "listen").mockImplementation(jest.fn());
@@ -99,7 +99,7 @@ describe("App", () => {
       jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
 
       // mock functions
-      fetch.doMockIf(/csrf-token/, async() => mockApiResponse("csrf-token"));
+      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(GpgAuth.prototype, "isAuthenticated").mockImplementation(() => new Promise(resolve => resolve(true)));
       jest.spyOn(GpgAuth.prototype, "isMfaRequired").mockImplementation(() => new Promise(resolve => resolve(false)));
       const mockedAccount = {user_id: uuid(), domain: "https://test-domain.passbolt.com"};

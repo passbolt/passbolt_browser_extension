@@ -4,13 +4,13 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import UserService from "../service/api/user/userService";
 import {Config} from "./config";
 import UserSettings from "./userSettings/userSettings";
 import ApiClientOptions from "../service/api/apiClient/apiClientOptions";
 import Validator from "validator";
 import {ValidatorRule} from "../utils/validatorRules";
 import PassphraseStorageService from "../service/session_storage/passphraseStorageService";
+import browser from "../sdk/polyfill/browserPolyfill";
 
 /**
  * The class that deals with users.
@@ -286,12 +286,8 @@ const User = (function() {
    * @return {Promise<void>}
    */
   this.retrieveAndStoreCsrfToken = async function() {
-    // Don't use the getApiClientOptions. It will create a loop as it calls this method to retrieve the csrf token.
-    const apiClientOptions = (new ApiClientOptions())
-      .setBaseUrl(this.settings.getDomain());
-    const userService = new UserService(apiClientOptions);
-    const csrfToken = await userService.findCsrfToken();
-    this.setCsrfToken(csrfToken);
+    const csrfToken = await browser.cookies.get({name: "csrfToken", url: this.settings.getDomain()});
+    this.setCsrfToken(csrfToken?.value);
   };
 
   /**

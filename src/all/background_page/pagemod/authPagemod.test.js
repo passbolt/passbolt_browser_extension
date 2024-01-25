@@ -22,8 +22,8 @@ import {LocaleEvents} from "../event/localeEvents";
 import {v4 as uuid} from 'uuid';
 import {enableFetchMocks} from "jest-fetch-mock";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
-import {mockApiResponse} from "../../../../test/mocks/mockApiResponse";
 import {RememberMeEvents} from "../event/rememberMeEvents";
+import browser from "../sdk/polyfill/browserPolyfill";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(UserEvents, "listen").mockImplementation(jest.fn());
@@ -53,7 +53,7 @@ describe("Auth", () => {
           }
         }
       };
-      fetch.doMockIf(/csrf-token/, async() => mockApiResponse("csrf-token"));
+      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       const mockedAccount = {user_id: uuid(), domain: "https://test-domain.passbolt.com"};
       const mockApiClient = await BuildApiClientOptionsService.buildFromAccount(mockedAccount);
       jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);

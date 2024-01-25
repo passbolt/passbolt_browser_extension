@@ -11,10 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import PassboltBadResponseError from "../../../error/passboltBadResponseError";
 import AbstractService from "../abstract/abstractService";
-import PassboltApiFetchError from "../../../error/passboltApiFetchError";
-import PassboltServiceUnavailableError from "../../../error/passboltServiceUnavailableError";
 
 const USER_SERVICE_RESOURCE_NAME = 'users';
 
@@ -236,70 +233,6 @@ class UserService extends AbstractService {
     const data = {username: username};
     const bodyString = this.apiClient.buildBody(data);
     return this.apiClient.fetchAndHandleResponse('POST', url, bodyString);
-  }
-
-  /**
-   * Retrieve the user csrf token
-   * @returns {Promise<string>}
-   */
-  async findCsrfToken() {
-    try {
-      const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/csrf-token`, {});
-      const response = await this.apiClient.fetchAndHandleResponse('GET', url);
-      return response.body;
-    } catch (error) {
-      /**
-       * If the entry point doesn't exist we are in a version < v3.
-       * With the API < v3 we actually receive a 403 instead of normally a 404.
-       * On < v3 the route "/users/csrf_token" is understand as "/users/:id" where ':id' is 'csrf_token'.
-       * This is the reason why we do not have a 404.
-       *
-       * @deprecated with v4. The /users/csrf-token entry point exists since v3.0.
-       */
-      if (error instanceof PassboltApiFetchError && error.data && (error.data.code === 404 || error.data.code === 403)) {
-        return this.findLegacyCsrfToken();
-      } else {
-        throw error;
-      }
-    }
-  }
-
-  /**
-   * Retrieve the user csrf token on a legacy api
-   * @return {Promise<string>}
-   * @deprecated will be removed with v4
-   */
-  async findLegacyCsrfToken() {
-    const url = new URL(`${this.apiClient.baseUrl}/recover`);
-    let response, responseHtml;
-    try {
-      response = await fetch(url.toString());
-    } catch (error) {
-      if (navigator.onLine) {
-        // Catch Network error such as bad certificate or server unreachable.
-        throw new PassboltServiceUnavailableError("Unable to reach the server, an unexpected error occurred");
-      } else {
-        // Network connection lost.
-        throw new PassboltServiceUnavailableError("Unable to reach the server, you are not connected to the network");
-      }
-    }
-
-    try {
-      responseHtml = await response.text();
-      const parser = new DOMParser();
-      const parsedHtml = parser.parseFromString(responseHtml, 'text/html');
-      const csrfTokenInput = parsedHtml.getElementsByName('_csrfToken');
-      if (!csrfTokenInput[0] || !/^[a-z0-9]{128}$/.test(csrfTokenInput[0].value)) {
-        throw new Error('No valid CSRF token found using legacy strategy.');
-      }
-      return csrfTokenInput[0].value;
-    } catch (error) {
-      /*
-       * If the response cannot be parsed, it's not a Passbolt API response.
-       * It can be a for example a proxy timeout error (504).
-       */
-      throw new PassboltBadResponseError();
-    }
   }
 
   /**

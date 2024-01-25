@@ -21,6 +21,7 @@ import BuildApiClientOptionsService from "../../service/account/buildApiClientOp
 import PasswordPoliciesEntity from "../../model/entity/passwordPolicies/passwordPoliciesEntity";
 import {defaultPasswordPolicies} from "../../model/entity/passwordPolicies/passwordPoliciesEntity.test.data";
 import {defaultPasswordGeneratorSettings} from "../../model/entity/passwordPolicies/passwordGeneratorSettingsEntity.test.data";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("GetOrFindPasswordPoliciesController::exec", () => {
   let account, apiClientOptions;
@@ -28,7 +29,7 @@ describe("GetOrFindPasswordPoliciesController::exec", () => {
   beforeEach(async() => {
     enableFetchMocks();
     jest.resetAllMocks();
-    fetch.doMockIf(/users\/csrf-token\.json/, () => mockApiResponse("csrf-token"));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);

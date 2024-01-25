@@ -30,7 +30,7 @@ class AppInitController {
   async main() {
     const user = User.getInstance();
     await this._syncUserSettings(user);
-    await this._syncSsoKit(user);
+    await this._finishSsoServerKitCreation(user);
   }
 
   /**
@@ -49,12 +49,12 @@ class AppInitController {
   }
 
   /**
-   * Synchronize the SSO kit to the server
+   * Finish the step of SSO kit creation on the API side
    * @param {User} user the user to get information from
    * @returns {Promise<void>}
    * @private
    */
-  async _syncSsoKit(user) {
+  async _finishSsoServerKitCreation(user) {
     try {
       const serverPartSsoKit = await SsoKitTemporaryStorageService.getAndFlush();
       if (!serverPartSsoKit) {
@@ -63,7 +63,9 @@ class AppInitController {
 
       const sssoKitServerPartModel = new SsoKitServerPartModel(await user.getApiClientOptions());
       const ssoKit = await sssoKitServerPartModel.setupSsoKit(serverPartSsoKit);
-      await SsoDataStorage.updateLocalKitIdWith(ssoKit.id);
+      const ssoKitClientPart = await SsoDataStorage.get();
+      ssoKitClientPart.id = ssoKit.id;
+      await SsoDataStorage.updateLocalKitIdWith(ssoKitClientPart);
     } catch (e) {
       console.error(e);
       await SsoDataStorage.flush();

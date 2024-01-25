@@ -13,18 +13,14 @@
  */
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import SsoSettingsEntity from "./ssoSettingsEntity";
+import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
+import GoogleSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/GoogleSsoSettingsEntity";
+import OAuth2SsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/OAuth2SsoSettingsEntity";
 
 const ENTITY_NAME = "SsoLoginUrl";
 const SSO_LOGIN_SUPPORTED_URLS = {
-  "azure": [
-    'https://login.microsoftonline.com',
-    'https://login.microsoftonline.us',
-    'https://login.partner.microsoftonline.cn',
-  ],
-  "google": [
-    'https://accounts.google.com'
-  ]
+  [AzureSsoSettingsEntity.PROVIDER_ID]: AzureSsoSettingsEntity.SUPPORTED_URLS,
+  [GoogleSsoSettingsEntity.PROVIDER_ID]: GoogleSsoSettingsEntity.SUPPORTED_URLS
 };
 
 /**
@@ -82,7 +78,7 @@ class SsoLoginUrlEntity extends Entity {
       throw new Error('The url should be a valid url.');
     }
 
-    if (ssoProvider === SsoSettingsEntity.OAUTH2) {
+    if (ssoProvider === OAuth2SsoSettingsEntity.PROVIDER_ID) {
       if (url.protocol !== "https:") {
         throw new Error('The url protocol should be HTTPS.');
       }

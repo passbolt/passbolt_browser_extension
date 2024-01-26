@@ -1,3 +1,4 @@
+
 /**
  * Passbolt ~ Open source password manager for teams
  * Copyright (c) 2022 Passbolt SA (https://www.passbolt.com)
@@ -93,6 +94,10 @@ export const anonymousOrganizationSettings = (data = {}) => {
             {
               "locale": "ro-RO",
               "label": "Rom\u00e2n\u0103 (beta)"
+            },
+            {
+              "locale": "ru-RU",
+              "label": "Pусский (beta)"
             },
             {
               "locale": "sv-SE",

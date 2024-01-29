@@ -17,6 +17,7 @@ import {BrowserExtensionIconService} from "../service/ui/browserExtensionIcon.se
 import ResourceModel from "../model/resource/resourceModel";
 import Toolbar from "../model/toolbar";
 import {TabController as tabsController} from "./tabsController";
+import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 
 const UPDATE_SUGGESTED_RESOURCE_BADGE_FLUSH_ALARM = "UpdateSuggestedResourceBadgeCacheFlush";
 
@@ -26,6 +27,7 @@ class ToolbarController {
     BrowserExtensionIconService.deactivate();
     this.bindCallbacks();
     this.addEventListeners();
+    this.account = null; // The user account
   }
 
   /**
@@ -66,9 +68,10 @@ class ToolbarController {
    * @private
    */
   async handleUserLoggedIn() {
+    this.account = await GetLegacyAccountService.get();
     const user = User.getInstance();
     const apiClientOptions = await user.getApiClientOptions();
-    this.resourceModel = new ResourceModel(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions, this.account);
 
     BrowserExtensionIconService.activate();
     this.updateSuggestedResourcesBadge();
@@ -154,15 +157,36 @@ class ToolbarController {
       throw error;
     }
 
-    if (currentTab) {
+    if (this.hasUrl(currentTab) && this.isUrlNotPassboltDomain(currentTab.url)) {
       const count = await this.resourceModel.countSuggestedResources(currentTab.url);
       BrowserExtensionIconService.setSuggestedResourcesCount(count);
+    } else {
+      BrowserExtensionIconService.setSuggestedResourcesCount(0);
     }
   }
 
   /**
+   * Has url
+   * @param tab
+   * @returns {Boolean}
+   */
+  hasUrl(tab) {
+    return tab && tab.url;
+  }
+
+  /**
+   * Is url not passbolt domain
+   * @param tabUrl
+   * @returns {boolean}
+   */
+  isUrlNotPassboltDomain(tabUrl) {
+    const passboltDomain = new URL(this.account.domain);
+    const url = tabUrl && new URL(tabUrl);
+    return passboltDomain.hostname !== url.hostname;
+  }
+
+  /**
    * Create alarm to flush the resource
-   * @param timeoutInMs
    * @private
    */
   createAlarm() {

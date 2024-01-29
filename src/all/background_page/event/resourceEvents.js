@@ -4,7 +4,6 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import User from "../model/user";
 import ResourceModel from "../model/resource/resourceModel";
 import ResourceCreateController from "../controller/resource/resourceCreateController";
 import ResourceUpdateController from "../controller/resource/resourceUpdateController";
@@ -13,8 +12,9 @@ import GetResourceGridUserSettingController
   from "../controller/resourceGridSetting/getResourceGridUserSettingController";
 import SetResourceGridUserSettingController
   from "../controller/resourceGridSetting/setResourceGridUserSettingController";
+import SetResourcesExpiryDateController from "../controller/resource/setResourcesExpiryDateController";
 
-const listen = function(worker, _, account) {
+const listen = function(worker, apiClientOptions, account) {
   /*
    * Pull the resources from the API and update the local storage.
    *
@@ -24,8 +24,7 @@ const listen = function(worker, _, account) {
   worker.port.on('passbolt.resources.update-local-storage', async requestId => {
     Log.write({level: 'debug', message: 'ResourceEvent listen passbolt.resources.update-local-storage'});
     try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
-      const resourceModel = new ResourceModel(apiClientOptions);
+      const resourceModel = new ResourceModel(apiClientOptions, account);
       resourceModel.updateLocalStorage();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
@@ -42,8 +41,7 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.resources.find-all', async(requestId, options) => {
     try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const resourceModel = new ResourceModel(clientOptions);
+      const resourceModel = new ResourceModel(apiClientOptions, account);
       const {contains, filters, orders} = options;
       const resources = await resourceModel.findAll(contains, filters, orders);
       worker.port.emit(requestId, 'SUCCESS', resources);
@@ -62,8 +60,7 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.resources.find-permissions', async(requestId, resourceId) => {
     try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const resourceModel = new ResourceModel(clientOptions);
+      const resourceModel = new ResourceModel(apiClientOptions, account);
       const permissions = await resourceModel.findResourcePermissions(resourceId);
       worker.port.emit(requestId, 'SUCCESS', permissions);
     } catch (error) {
@@ -82,8 +79,7 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.resources.create', async(requestId, resourceDto, plaintextDto) => {
     try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const controller = new ResourceCreateController(worker, requestId, clientOptions, account);
+      const controller = new ResourceCreateController(worker, requestId, apiClientOptions, account);
       const savedResource = await controller.main(resourceDto, plaintextDto);
       worker.port.emit(requestId, 'SUCCESS', savedResource);
     } catch (error) {
@@ -102,8 +98,7 @@ const listen = function(worker, _, account) {
   worker.port.on('passbolt.resources.delete-all', async(requestId, resourcesIds) => {
     try {
       // TODO DeleteResourcesController with progress dialog if resourceIds > 1
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const resourceModel = new ResourceModel(clientOptions);
+      const resourceModel = new ResourceModel(apiClientOptions, account);
       await resourceModel.bulkDelete(resourcesIds);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
@@ -122,8 +117,7 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.resources.update', async(requestId, resourceDto, plaintextDto) => {
     try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const controller = new ResourceUpdateController(worker, requestId, clientOptions, account);
+      const controller = new ResourceUpdateController(worker, requestId, apiClientOptions, account);
       const updatedResource = await controller.main(resourceDto, plaintextDto);
       worker.port.emit(requestId, 'SUCCESS', updatedResource);
     } catch (error) {
@@ -153,6 +147,18 @@ const listen = function(worker, _, account) {
   worker.port.on('passbolt.resources.set-grid-setting', async(requestId, gridSetting) => {
     const setResourceColumnsSettingsController = new SetResourceGridUserSettingController(worker, requestId, account);
     await setResourceColumnsSettingsController._exec(gridSetting);
+  });
+
+  /*
+   * Set the given resources expiration date
+   *
+   * @listens passbolt.resources.set-expiration-date
+   * @param requestId {uuid} The request identifier
+   * @param gridSetting {object} The grid setting
+   */
+  worker.port.on('passbolt.resources.set-expiration-date', async(requestId, passwordExpiryResourcesCollectionDto) => {
+    const controller = new SetResourcesExpiryDateController(worker, requestId, apiClientOptions);
+    await controller._exec(passwordExpiryResourcesCollectionDto);
   });
 };
 

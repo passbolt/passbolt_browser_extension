@@ -19,14 +19,19 @@ import {Config} from "../model/config";
 import AuthLoginController from "../controller/auth/authLoginController";
 import GetLocalSsoProviderConfiguredController from "../controller/sso/getLocalSsoProviderConfiguredController";
 import SsoAuthenticationController from "../controller/sso/ssoAuthenticationController";
-import SsoSettingsEntity from "../model/entity/sso/ssoSettingsEntity";
 import DeleteLocalSsoKitController from "../controller/sso/deleteLocalSsoKitController";
 import UpdateLocalSsoProviderController from "../controller/sso/updateLocalSsoProviderController";
 import HasSsoLoginErrorController from "../controller/sso/hasSsoLoginErrorController";
 import GetQualifiedSsoLoginErrorController from "../controller/sso/getQualifiedSsoLoginErrorController";
 import AuthLogoutController from "../controller/auth/authLogoutController";
 
-const listen = function(worker, _, account) {
+/**
+ * Listens to the authentication events
+ * @param {Worker} worker The worker
+ * @param {ApiClientOptions} apiClientOptions The api client options
+ * @param {AccountEntity} account The account
+ */
+const listen = function(worker, apiClientOptions, account) {
   /*
    * Check if the user is authenticated.
    *
@@ -67,7 +72,6 @@ const listen = function(worker, _, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.auth.logout', async(requestId, withRedirection) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new AuthLogoutController(worker, requestId, apiClientOptions);
     await controller._exec(withRedirection);
   });
@@ -95,8 +99,7 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.auth.get-server-key', async requestId => {
     try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const authModel = new AuthModel(clientOptions);
+      const authModel = new AuthModel(apiClientOptions);
       const serverKeyDto = await authModel.getServerKey();
       worker.port.emit(requestId, 'SUCCESS', serverKeyDto);
     } catch (error) {
@@ -112,7 +115,6 @@ const listen = function(worker, _, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.auth.replace-server-key', async requestId => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const authModel = new AuthModel(apiClientOptions);
     const keyring = new Keyring();
     const domain = Config.read('user.settings.trustedDomain');
@@ -151,8 +153,7 @@ const listen = function(worker, _, account) {
    *   (integer) duration in seconds to specify a specific duration
    */
   worker.port.on('passbolt.auth.login', async(requestId, passphrase, remember) => {
-    const clientOptions = await User.getInstance().getApiClientOptions(); //@todo remove and use a glocal apiClientOptions;
-    const controller = new AuthLoginController(worker, requestId, clientOptions, account);
+    const controller = new AuthLoginController(worker, requestId, apiClientOptions, account);
     await controller._exec(passphrase, remember);
   });
 
@@ -179,51 +180,20 @@ const listen = function(worker, _, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.auth.request-help-credentials-lost', async requestId => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new RequestHelpCredentialsLostController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 
   /**
-   * Performs a sign-in via SSO with the selected provider
-   * @param {uuid} requestId the request identifier
+   * Attempt to sign in with the given provider as a third party
+   * @listens passbolt.sso.sign-in
+   * @param {uuid} requestId The request identifier
+   * @param {uuid} providerId the SSO provider identifier
    * @param {boolean} isInQuickaccessMode is the current call made from the quickaccess
-   * @param {string} provider the SSO provider identifier
    */
-  async function signInWithSso(requestId, isInQuickaccessMode, provider) {
-    const user = await User.getInstance();
-    //sometimes, the CSRF token is not set properly before the login and blocks the user
-    await user.retrieveAndStoreCsrfToken();
-    const apiClientOptions = await user.getApiClientOptions();
+  worker.port.on('passbolt.sso.sign-in', async(requestId, providerId, isInQuickaccessMode) => {
     const controller = new SsoAuthenticationController(worker, requestId, apiClientOptions, account);
-    await controller._exec(provider, isInQuickaccessMode);
-  }
-
-  /**
-   * Attempt to sign in with Azure as a third party sign in provider
-   * @listens passbolt.sso.sign-in-with-azure
-   * @param {uuid} requestId The request identifier
-   */
-  worker.port.on('passbolt.sso.sign-in-with-azure', async(requestId, isInQuickaccessMode) => {
-    await signInWithSso(requestId, isInQuickaccessMode, SsoSettingsEntity.AZURE);
-  });
-
-  /**
-   * Attempt to sign in with Google as a third party sign in provider
-   * @listens passbolt.sso.sign-in-with-google
-   * @param {uuid} requestId The request identifier
-   */
-  worker.port.on('passbolt.sso.sign-in-with-google', async(requestId, isInQuickaccessMode) => {
-    await signInWithSso(requestId, isInQuickaccessMode, SsoSettingsEntity.GOOGLE);
-  });
-
-  /**
-   * Attempt to sign in with a generic OAuth2 as a third party sign in provider
-   * @listens passbolt.sso.sign-in-with-oauth2
-   * @param {uuid} requestId The request identifier
-   */
-  worker.port.on('passbolt.sso.sign-in-with-oauth2', async(requestId, isInQuickaccessMode) => {
-    await signInWithSso(requestId, isInQuickaccessMode, SsoSettingsEntity.OAUTH2);
+    await controller._exec(providerId, isInQuickaccessMode);
   });
 
   /**
@@ -273,7 +243,6 @@ const listen = function(worker, _, account) {
    * @param {uuid} requestId The request identifier
    */
   worker.port.on('passbolt.sso.get-qualified-sso-login-error', async requestId => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetQualifiedSsoLoginErrorController(worker, requestId, apiClientOptions);
     await controller._exec();
   });

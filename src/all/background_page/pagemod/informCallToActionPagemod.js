@@ -13,6 +13,8 @@
  */
 import Pagemod from "./pagemod";
 import {InformCallToActionEvents} from "../event/informCallToActionEvents";
+import GetLegacyAccountService from "../service/account/getLegacyAccountService";
+import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 
 class InFormCallToAction extends Pagemod {
   /**
@@ -28,6 +30,29 @@ class InFormCallToAction extends Pagemod {
    */
   get events() {
     return [InformCallToActionEvents];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  async attachEvents(port) {
+    try {
+      const tab = port._port.sender.tab;
+      const account = await GetLegacyAccountService.get();
+      const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+      const name = this.appName;
+      for (const event of this.events) {
+        event.listen({port, tab, name}, apiClientOptions, account);
+      }
+    } catch (error) {
+      /*
+       * Ensure the application does not crash completely if the legacy account cannot be retrieved.
+       * The following controllers won't work as expected:
+       * - RequestHelpCredentialsLostController
+       */
+      console.error('InFormMenu::attach legacy account cannot be retrieved, please contact your administrator.');
+      console.error(error);
+    }
   }
 }
 

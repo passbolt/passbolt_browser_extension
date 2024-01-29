@@ -11,11 +11,14 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.6
  */
-import User from "../model/user";
 import ResourceTypeModel from "../model/resourceType/resourceTypeModel";
 
-
-const listen = function(worker) {
+/**
+ * Listens the resource type events
+ * @param {Worker} worker
+ * @param {ApiClientOptions} apiClientOptions the api client options
+ */
+const listen = function(worker, apiClientOptions) {
   /*
    * Get the resource types from the local storage.
    *
@@ -24,7 +27,6 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.resource-type.get-all', async requestId => {
     try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const resourceTypeModel = new ResourceTypeModel(apiClientOptions);
       const resourceTypes = await resourceTypeModel.getOrFindAll();
       worker.port.emit(requestId, 'SUCCESS', resourceTypes);

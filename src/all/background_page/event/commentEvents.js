@@ -15,8 +15,13 @@
 import CreateCommentController from "../controller/comment/createCommentController";
 import DeleteCommentController from "../controller/comment/deleteCommentController";
 import GetCommentsByRessourceController from "../controller/comment/getCommentsByRessourceIdController";
-import User from "../model/user";
-const listen = function(worker) {
+
+/**
+ * Listens to the comments events
+ * @param {Worker} worker The worker
+ * @param {ApiClientOptions} apiClientOptions The api client options
+ */
+const listen = function(worker, apiClientOptions) {
   /*
    * ================================
    * SERVICE ACTIONS
@@ -30,7 +35,6 @@ const listen = function(worker) {
    * @param resourceId {string} the resource uuid
    */
   worker.port.on('passbolt.comments.find-all-by-resource', async(requestId, resourceId) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetCommentsByRessourceController(worker, requestId, apiClientOptions);
     await controller._exec(resourceId);
   });
@@ -44,7 +48,6 @@ const listen = function(worker) {
    * @param commentDto {object} The comment
    */
   worker.port.on('passbolt.comments.create', async(requestId, commentDto) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new CreateCommentController(worker, requestId, apiClientOptions);
     await controller._exec(commentDto);
   });
@@ -57,7 +60,6 @@ const listen = function(worker) {
    * @param comment {array} The comment
    */
   worker.port.on('passbolt.comments.delete', async(requestId, commentId) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new DeleteCommentController(worker, requestId, apiClientOptions);
     await controller._exec(commentId);
   });

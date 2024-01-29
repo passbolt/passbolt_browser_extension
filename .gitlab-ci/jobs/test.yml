@@ -21,7 +21,7 @@ linter:
   extends: .rules
   script:
     - npm ci
-    - npm run eslint
+    - npm run lint
 
 audit:
   allow_failure: true

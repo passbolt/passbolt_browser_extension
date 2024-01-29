@@ -90,7 +90,7 @@ describe("DeleteCommentController", () => {
       expect(spy).toHaveBeenCalledTimes(1);
     });
     it("Should call exec method and send ERROR to worker when fetch is failing", async() => {
-      const mockedError = new TypeError("Service error. This is a mocked error");
+      const mockedError = new TypeError("Unable to reach the server, an unexpected error occurred");
       fetch.doMock(() => { throw mockedError; });
       const controller = new DeleteCommentController(mockedWorker, null, defaultApiClientOptions());
       const spy = jest.spyOn(controller, "exec");

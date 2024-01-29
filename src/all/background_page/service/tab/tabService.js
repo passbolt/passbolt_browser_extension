@@ -16,6 +16,8 @@ import hasUrlSameOrigin from "../../utils/url/hasSameOriginUrl";
 import PortManager from "../../sdk/port/portManager";
 import WebNavigationService from "../webNavigation/webNavigationService";
 import PromiseTimeoutService from "../../utils/promise/promiseTimeoutService";
+import WorkerEntity from "../../model/entity/worker/workerEntity";
+import WorkerService from "../worker/workerService";
 
 class TabService {
   /**
@@ -48,9 +50,20 @@ class TabService {
     const worker = await WorkersSessionStorage.getWorkerOnMainFrame(tabId);
     // If there is already a worker on the main frame
     if (worker) {
-      if (PortManager.isPortExist(worker.id)) {
+      const workerEntity = new WorkerEntity(worker);
+      // If the worker status is still waiting and urls are the same
+      if (workerEntity.isWaitingConnection) {
+        /*
+         * The tabs onUpdated event can send too many events and to avoid multiple content script inserted an alarm will check after 300ms if the worker is still loading
+         * Especially when a user reload the page multiple times very fast the content script is not on the page and can block the worker waiting a port connection
+         * So, in this case an alarm is created and if the worker is still loading the navigation process is done manually.
+         * Also, in case of there is redirection the process wait the last update and trigger the alarm with the last tab url change
+         */
+        await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(workerEntity);
+        return;
+      } else if (workerEntity.isConnected) {
         // Get the port associate to a bootstrap application
-        const port = PortManager.getPortById(worker.id);
+        const port = PortManager.getPortById(workerEntity.id);
         // Check if the url has the same origin
         if (hasUrlSameOrigin(port._port.sender.url, tab.url)) {
           try {

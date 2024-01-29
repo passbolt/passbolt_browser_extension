@@ -31,6 +31,7 @@ class PortManager {
    */
   async onPortConnect(port) {
     if (await this.isQuickAccessPort(port.sender)) {
+      // Quickaccess is not stored in the session storage and there is no worker entity referenced
       await this.registerAndAttachEvent(port, "QuickAccess");
     } else {
       await this.connectPortFromTab(port);
@@ -45,9 +46,20 @@ class PortManager {
   async connectPortFromTab(port) {
     const worker = await WorkersSessionStorage.getWorkerById(port.name);
     if (worker) {
-      if (await this.isKnownPortSender(worker, port.sender)) {
-        await this.registerAndAttachEvent(port, worker.name);
+      const workerEntity = new WorkerEntity(worker);
+      /*
+       * If a port is already connected and is still in memory it should not be registered again
+       * In the MV3 case the memory is flushed when the servoce worker is down so the port should be able to reconnect
+       */
+      if (!this.isPortExist(port.name) && await this.isKnownPortSender(workerEntity, port.sender)) {
+        await this.updateWorkerStatus(workerEntity);
+        await this.registerAndAttachEvent(port, workerEntity.name);
+      } else {
+        console.debug(`A known port has been denied connection or reconnection with name=${port.name}, tabUrl=${port.sender.tab.url}, tabId=${port.sender.tab.id}, frameId=${port.sender.frameId}`);
       }
+    } else {
+      // If there is no worker associate to this port
+      console.debug(`An unknown port has been denied connection with name=${port.name}, tabUrl=${port.sender.tab.url}, tabId=${port.sender.tab.id}, frameId=${port.sender.frameId}`);
     }
   }
 
@@ -69,14 +81,14 @@ class PortManager {
 
   /**
    * Is known port sender
-   * @param worker The worker
+   * @param {WorkerEntity} worker The worker
    * @param sender The sender
    * @returns {Promise<boolean>}
    */
   async isKnownPortSender(worker, sender) {
+    // Iframe application connecting for the first time are not know therefor their frame id is not yet associated
     if (worker.frameId === null) {
       worker.frameId = sender.frameId;
-      await WorkersSessionStorage.updateWorker(new WorkerEntity(worker));
     }
     return worker.tabId === sender.tab.id && worker.frameId === sender.frameId;
   }
@@ -92,6 +104,16 @@ class PortManager {
     this.registerPort(portWrapper);
     await PagemodManager.attachEventToPort(portWrapper, name);
     portWrapper.emit('passbolt.port.ready');
+  }
+
+  /**
+   * Update the worker status
+   * @param {WorkerEntity} worker The worker
+   * @return {Promise<void>}
+   */
+  async updateWorkerStatus(worker) {
+    worker.status = WorkerEntity.STATUS_CONNECTED;
+    await WorkersSessionStorage.updateWorker(worker);
   }
 
   /**

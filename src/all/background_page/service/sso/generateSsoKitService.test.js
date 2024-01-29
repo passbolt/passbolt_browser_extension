@@ -48,7 +48,7 @@ describe("GenerateSsoKitService", () => {
       mockOrganisationSettingsSsoSettings(withAzureSsoSettings());
       jest.spyOn(SsoKitTemporaryStorageService, "set");
 
-      await GenerateSsoKitService.generate("this is the passphrase to encrypt", "azure-provider");
+      await GenerateSsoKitService.generate("this is the passphrase to encrypt", "azure");
 
       expect(SsoDataStorage.save).toHaveBeenCalledWith(expect.any(SsoKitClientPartEntity));
       expect(SsoKitTemporaryStorageService.set).toHaveBeenCalledWith(expect.any(SsoKitServerPartEntity));
@@ -63,7 +63,7 @@ describe("GenerateSsoKitService", () => {
       SsoDataStorage.save.mockImplementation(() => { throw exepctedError; });
       jest.spyOn(SsoKitTemporaryStorageService, "flush");
 
-      await expect(GenerateSsoKitService.generate("test", "test")).rejects.toThrow(exepctedError);
+      await expect(GenerateSsoKitService.generate("test", "azure")).rejects.toThrow(exepctedError);
 
       expect(SsoDataStorage.flush).toHaveBeenCalledTimes(1);
       expect(SsoKitTemporaryStorageService.flush).toHaveBeenCalledTimes(1);

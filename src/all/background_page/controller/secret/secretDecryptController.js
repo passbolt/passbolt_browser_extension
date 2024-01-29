@@ -32,7 +32,7 @@ class SecretDecryptController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.resourceModel = new ResourceModel(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
     this.progressService = new ProgressService(this.worker, i18n.t('Decrypting ...'));
     this.getPassphraseService = new GetPassphraseService(account);

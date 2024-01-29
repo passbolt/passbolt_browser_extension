@@ -88,8 +88,8 @@ class Pagemod {
 
   /**
    * Inject files into the tab id and frame id
-   * @param tabId
-   * @param frameId
+   * @param {number} tabId The tab id
+   * @param {number} frameId The frame id
    * @returns {Promise<void>}
    */
   async injectFiles(tabId, frameId) {
@@ -97,7 +97,8 @@ class Pagemod {
       id: uuidv4(),
       name: this.appName,
       tabId: tabId,
-      frameId: frameId
+      frameId: frameId,
+      status: WorkerEntity.STATUS_WAITING_CONNECTION
     };
     await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
     // a helper to handle insertion of scripts, variables and css in target page

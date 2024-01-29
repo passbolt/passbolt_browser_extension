@@ -12,8 +12,7 @@
  * @since         3.9.0
  */
 import SsoSettingsService from "../../service/api/sso/ssoSettingsService";
-import SsoSettingsEntity from "../entity/sso/ssoSettingsEntity";
-
+import SsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/SsoSettingsEntity";
 /**
  * Model related to the SSO Settings
  */
@@ -34,7 +33,7 @@ class SsoSettingsModel {
    * @returns {Promise<SsoSettingsEntity>} the saved entity
    */
   async saveDraft(ssoSettingsEntity) {
-    const savedDraft = await this.ssoSettingsService.saveDraft(ssoSettingsEntity.toDto());
+    const savedDraft = await this.ssoSettingsService.saveDraft(ssoSettingsEntity.toDto({data: true}));
     return new SsoSettingsEntity(savedDraft);
   }
 

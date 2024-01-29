@@ -18,12 +18,13 @@ class DeletePasswordExpirySettingsController {
    * DeletePasswordExpirySettingsController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
+   * @param {AccountEntity} account the account user
    * @param {ApiClientOptions} apiClientOptions the api client options
    */
-  constructor(worker, requestId, apiClientOptions) {
+  constructor(worker, requestId, account, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.passwordExpirySettingsModel = new PasswordExpirySettingsModel(apiClientOptions);
+    this.passwordExpirySettingsModel = new PasswordExpirySettingsModel(account, apiClientOptions);
   }
 
   /**

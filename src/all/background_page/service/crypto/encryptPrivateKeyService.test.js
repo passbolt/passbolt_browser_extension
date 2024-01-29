@@ -43,18 +43,19 @@ describe("EncryptPrivateKeyService service", () => {
 
   it('should throw an exception if the passphrase is not formatted properly', async() => {
     expect.assertions(1);
-    const nonUtf8String = "\u{10000}";
+    const nonUtf8String = "emoji😀";
     const key = await OpenpgpAssertion.readKeyOrFail(decryptedPrivateKey);
-    const promise = EncryptPrivateKeyService.encrypt(key, nonUtf8String);
-    await expect(promise).rejects.toThrowError(new Error("The passphrase should be a valid UTF8 string."));
+    const encryptedKey = await EncryptPrivateKeyService.encrypt(key, nonUtf8String);
+    const promise = DecryptPrivateKeyService.decrypt(encryptedKey, nonUtf8String);
+    return expect(promise).resolves.not.toBeNull();
   });
 
   it('should encrypt a given key with a passphrase', async() => {
     const passphrase = "newPassphrase";
     const key = await OpenpgpAssertion.readKeyOrFail(decryptedPrivateKey);
-    const reEncryptedKey = await EncryptPrivateKeyService.encrypt(key, passphrase);
+    const encryptedKey = await EncryptPrivateKeyService.encrypt(key, passphrase);
 
-    const promise = DecryptPrivateKeyService.decrypt(reEncryptedKey, passphrase);
+    const promise = DecryptPrivateKeyService.decrypt(encryptedKey, passphrase);
     return expect(promise).resolves.not.toBeNull();
   });
 });

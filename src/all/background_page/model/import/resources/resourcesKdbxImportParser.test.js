@@ -18,10 +18,17 @@ import * as kdbxweb from "kdbxweb";
 import ResourcesKdbxImportParser from "./resourcesKdbxImportParser";
 import ImportResourcesFileEntity from "../../entity/import/importResourcesFileEntity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import {defaultTotpViewModelDto} from "passbolt-styleguide/src/shared/models/totp/TotpDto.test.data";
 import ImportError from "../../../error/importError";
+import ResourceTypesCollection from "../../entity/resourceType/resourceTypesCollection";
+import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import {
+  TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 
 describe("ResourcesKdbxImportParser", () => {
   it("should read import file", async() => {
+    expect.assertions(1);
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-not-protected.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
@@ -35,6 +42,7 @@ describe("ResourcesKdbxImportParser", () => {
   });
 
   it("should read import file protected by password", async() => {
+    expect.assertions(1);
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-password.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
@@ -53,6 +61,7 @@ describe("ResourcesKdbxImportParser", () => {
   });
 
   it("should not be able to read import file protected by password if wrong password", async() => {
+    expect.assertions(1);
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-password.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
@@ -63,13 +72,13 @@ describe("ResourcesKdbxImportParser", () => {
     const parser = new ResourcesKdbxImportParser(importEntity);
     try {
       await parser.readKdbxDb();
-      expect(true).toBeFalsy();
     } catch (error) {
       expect(error).toBeInstanceOf(kdbxweb.KdbxError);
     }
   });
 
   it("should read import file protected by keyfile", async() => {
+    expect.assertions(1);
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-keyfile.kdbx", {encoding: 'base64'});
     const keyfile = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-keyfile.key", {encoding: 'base64'});
     const importDto = {
@@ -89,6 +98,7 @@ describe("ResourcesKdbxImportParser", () => {
   });
 
   it("should not be able to read import file protected by keyfile if wrong keyfile", async() => {
+    expect.assertions(1);
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-keyfile.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
@@ -99,7 +109,6 @@ describe("ResourcesKdbxImportParser", () => {
     const parser = new ResourcesKdbxImportParser(importEntity);
     try {
       await parser.readKdbxDb();
-      expect(true).toBeFalsy();
     } catch (error) {
       expect(error).toBeInstanceOf(kdbxweb.KdbxError);
     }
@@ -112,7 +121,8 @@ describe("ResourcesKdbxImportParser", () => {
       uri: `https://url${num}.com`,
       description: `Description ${num}`,
       secret_clear: `Secret ${num}`,
-      folder_parent_path: ``
+      folder_parent_path: ``,
+      expired: null,
     }, data);
   }
 
@@ -124,6 +134,7 @@ describe("ResourcesKdbxImportParser", () => {
   }
 
   it("should parse resources and folders", async() => {
+    expect.assertions(15);
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-not-protected.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
@@ -167,7 +178,42 @@ describe("ResourcesKdbxImportParser", () => {
     expect(importEntity.importFolders.toJSON()).toEqual(expect.arrayContaining([folder5Dto]));
   });
 
+  it("should parse resources with TOTP and folders", async() => {
+    expect.assertions(6);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-with-totp-protected-password.kdbx", {encoding: 'base64'});
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "kdbx",
+      "file": file,
+      "options": {
+        "credentials": {
+          "password": "passbolt"
+        }
+      }
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection);
+    await parser.parseImport();
+
+    // Assert resources
+    const totp = defaultTotpViewModelDto({secret_key: "TJSNMLGTCYOEMXZG"});
+    expect(importEntity.importResources.items).toHaveLength(2);
+    const resource1Dto = buildExternalResourceDto(1, {totp: totp, folder_parent_path: "import-ref/Root", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP, expired: "2023-11-10T08:09:04.000Z"});
+    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource1Dto]));
+    const resource2Dto = buildExternalResourceDto(2, {totp: totp, folder_parent_path: "import-ref/Root", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP});
+    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource2Dto]));
+
+    // Assert folders
+    expect(importEntity.importFolders.items).toHaveLength(2);
+    const folderRefDto = {name: "import-ref", folder_parent_path: ""};
+    expect(importEntity.importFolders.toJSON()).toEqual(expect.arrayContaining([folderRefDto]));
+    const folderKdbxRootDto = {name: "Root", folder_parent_path: "import-ref"};
+    expect(importEntity.importFolders.toJSON()).toEqual(expect.arrayContaining([folderKdbxRootDto]));
+  });
+
   it("should catch and keep a reference of import resource entity validation error", async() => {
+    expect.assertions(16);
     const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-content-error-not-protected.kdbx", {encoding: 'base64'});
     const importDto = {
       "ref": "import-ref",
@@ -209,5 +255,26 @@ describe("ResourcesKdbxImportParser", () => {
     expect(error.sourceError.details).toHaveProperty("name");
     const resourceName = "too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name-too-long-resource-name";
     expect(error.data.name).toEqual(resourceName);
+  });
+
+  it("should import the expiration date", async() => {
+    const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-protected-password.kdbx", {encoding: 'base64'});
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "kdbx",
+      "file": file,
+      "options": {
+        "credentials": {
+          "password": "passbolt"
+        }
+      }
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const parser = new ResourcesKdbxImportParser(importEntity);
+    await parser.parseImport();
+
+    // Assert resources
+    expect(importEntity.importResources.items).toHaveLength(2);
+    expect(importEntity.importResources.items[1].expired).toStrictEqual("2020-11-16T23:00:42.000Z");
   });
 });

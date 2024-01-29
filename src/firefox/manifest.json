@@ -7,7 +7,8 @@
   "default_locale": "en",
   "applications": {
     "gecko": {
-      "id": "passbolt@passbolt.com"
+      "id": "passbolt@passbolt.com",
+      "strict_min_version": "115.0"
     }
   },
   "icons": {
@@ -29,6 +30,7 @@
     "default_popup": "webAccessibleResources/quickaccess.html?passbolt=quickaccess"
   },
   "commands": {
+    "_execute_browser_action": {},
     "passbolt-open": {
       "suggested_key": {
         "default": "Alt+Shift+P",
@@ -44,7 +46,8 @@
     "storage",
     "unlimitedStorage",
     "*://*/*",
-    "alarms"
+    "alarms",
+    "cookies"
   ],
   "web_accessible_resources": [
     "webAccessibleResources/*"

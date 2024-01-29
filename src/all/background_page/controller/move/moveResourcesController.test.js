@@ -25,6 +25,8 @@ import ExternalGpgKeyEntity from "../../model/entity/gpgkey/external/externalGpg
 import FolderEntity from "../../model/entity/folder/folderEntity";
 import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data.js";
 import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 
 jest.mock("../../service/progress/progressService");
 jest.mock("../../service/passphrase/getPassphraseService");
@@ -33,6 +35,7 @@ jest.spyOn(FolderModel.prototype, "assertFolderExists").mockImplementation(() =>
 jest.spyOn(ResourceModel.prototype, "assertResourcesExist").mockImplementation(() => {});
 const mockedFindPrivate = jest.spyOn(Keyring.prototype, "findPrivate");
 const key = pgpKeys.admin;
+const account = new AccountEntity(defaultAccountDto());
 
 beforeEach(() => {
   enableFetchMocks();
@@ -44,7 +47,7 @@ beforeEach(() => {
 describe("MoveResourcesController", () => {
   describe("MoveResourcesController::main", () => {
     it("Should move resources.", async() => {
-      const controller = new MoveResourcesController(null, null, defaultApiClientOptions());
+      const controller = new MoveResourcesController(null, null, defaultApiClientOptions(), account);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
       // Mock the API response.
       const mockApiFetch = fetch.doMockIf(new RegExp('/move/resource/.*.json'), () => mockApiResponse());
@@ -72,7 +75,7 @@ describe("MoveResourcesController", () => {
     });
 
     it("Should move no resource if resources are always in the folder.", async() => {
-      const controller = new MoveResourcesController(null, null, defaultApiClientOptions());
+      const controller = new MoveResourcesController(null, null, defaultApiClientOptions(), account);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
       // Mock API findAllForShare resources.
       const mockResourcesToMoved = defaultResourceDtosCollection();
@@ -86,7 +89,7 @@ describe("MoveResourcesController", () => {
     });
 
     it("Should move no resources if the user is no authorize.", async() => {
-      const controller = new MoveResourcesController(null, null, defaultApiClientOptions());
+      const controller = new MoveResourcesController(null, null, defaultApiClientOptions(), account);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.admin.passphrase);
       // Mock API findAllForShare resources.
       const mockResourcesToMoved = defaultResourceDtosCollection();

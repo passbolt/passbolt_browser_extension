@@ -19,7 +19,7 @@ import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOpti
 import TestSsoAuthenticationController from "./testSsoAuthenticationController";
 import PassboltApiFetchError from "../../error/passboltApiFetchError";
 import SsoLoginUrlEntity from "../../model/entity/sso/ssoLoginUrlEntity";
-import SsoSettingsEntity from "../../model/entity/sso/ssoSettingsEntity";
+import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
 
 const mock_getSsoTokenFromThirdParty = jest.fn();
 const mock_closeHandler = jest.fn();
@@ -65,7 +65,7 @@ describe("TestSsoAuthenticationController", () => {
       const resultingToken = await controller.exec(settingsId);
 
       expect(mock_getSsoTokenFromThirdParty).toHaveBeenCalledTimes(1);
-      expect(mock_getSsoTokenFromThirdParty).toHaveBeenCalledWith(new SsoLoginUrlEntity(urlToHit, SsoSettingsEntity.AZURE));
+      expect(mock_getSsoTokenFromThirdParty).toHaveBeenCalledWith(new SsoLoginUrlEntity(urlToHit, AzureSsoSettingsEntity.PROVIDER_ID));
       expect(mock_closeHandler).toHaveBeenCalledTimes(1);
       expect(resultingToken).toBe(ssoLoginSuccessToken);
     });

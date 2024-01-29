@@ -12,11 +12,38 @@
  * @since         3.6.0
  */
 
+import AccountEntity from "../../model/entity/account/accountEntity";
+import {adminAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import BuildApiClientOptionsService from "./buildApiClientOptionsService";
+import browser from "../../sdk/polyfill/browserPolyfill";
+
 describe("BuildAccountApiClientOptionsService", () => {
-  describe("BuildAccountApiClientOptionsService:buildFromAccount", () => {
-    it.todo("To test");
+  it("BuildAccountApiClientOptionsService:buildFromAccount", async() => {
+    expect.assertions(3);
+    // data
+    const csrfToken = "csrf-token";
+    const account = new AccountEntity(adminAccountDto());
+    // mocked function
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
+    // execution
+    const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+    // expectations
+    expect(apiClientOptions.baseUrl).toStrictEqual(new URL(account.domain));
+    expect(apiClientOptions.csrfToken.token).toStrictEqual(csrfToken);
+    expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: account.domain});
   });
-  describe("BuildAccountApiClientOptionsService:buildFromDomain", () => {
-    it.todo("To test");
+  it("BuildAccountApiClientOptionsService:buildFromDomain", async() => {
+    expect.assertions(3);
+    // data
+    const csrfToken = "csrf-token";
+    const domain = "https://passbolt.local";
+    // mocked function
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
+    // execution
+    const apiClientOptions = await BuildApiClientOptionsService.buildFromDomain(domain);
+    // expectations
+    expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
+    expect(apiClientOptions.csrfToken.token).toStrictEqual(csrfToken);
+    expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: domain});
   });
 });

@@ -5,7 +5,6 @@
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
 import browser from "../sdk/polyfill/browserPolyfill";
-import User from "../model/user";
 import BrowserTabService from "../service/ui/browserTab.service";
 import SecretDecryptController from "../controller/secret/secretDecryptController";
 import ResourceInProgressCacheService from "../service/cache/resourceInProgressCache.service";
@@ -15,8 +14,15 @@ import FindMeController from "../controller/rbac/findMeController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
 import ResourceModel from "../model/resource/resourceModel";
+import FindPasswordExpirySettingsController from "../controller/passwordExpiry/findPasswordExpirySettingsController";
 
-const listen = function(worker, _, account) {
+/**
+ * Listens to the quickaccess application events
+ * @param {Worker} worker
+ * @param {ApiClientOptions} apiClientOptions the api client options
+ * @param {AccountEntity} account the user account
+ */
+const listen = function(worker, apiClientOptions, account) {
   /*
    * Use a resource on the current tab.
    *
@@ -41,10 +47,9 @@ const listen = function(worker, _, account) {
     }
 
     try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const controller = new SecretDecryptController(worker, requestId, apiClientOptions, account);
       const plaintextEntity = await controller.exec(resourceId);
-      const resourceModel = new ResourceModel(apiClientOptions);
+      const resourceModel = new ResourceModel(apiClientOptions, account);
       const resource = await resourceModel.getById(resourceId);
 
       // Define what to do autofill
@@ -125,7 +130,6 @@ const listen = function(worker, _, account) {
    * @param refreshCache {bool} (Optional) Default false. Should request the API and refresh the cache.
    */
   worker.port.on('passbolt.users.find-logged-in-user', async(requestId, refreshCache = false) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetOrFindLoggedInUserController(worker, requestId, apiClientOptions, account);
     await controller._exec(refreshCache);
   });
@@ -137,7 +141,6 @@ const listen = function(worker, _, account) {
    */
 
   worker.port.on('passbolt.rbacs.find-me', async(requestId, name) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new FindMeController(worker, requestId, apiClientOptions, account);
     await controller._exec(name);
   });
@@ -149,8 +152,12 @@ const listen = function(worker, _, account) {
    */
 
   worker.port.on('passbolt.password-policies.get', async requestId => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetOrFindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.password-expiry.find', async requestId => {
+    const controller = new FindPasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
     await controller._exec();
   });
 };

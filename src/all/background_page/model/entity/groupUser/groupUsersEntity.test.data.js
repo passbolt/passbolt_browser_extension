@@ -13,6 +13,8 @@
  */
 import {v4 as uuidv4} from "uuid";
 
+// @deprecated since v4.5.0
+
 export const createGroupUser = (data = {}) => {
   const defaultData = {
     user_id:  uuidv4(),

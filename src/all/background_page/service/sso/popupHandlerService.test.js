@@ -18,16 +18,17 @@ import {v4 as uuid} from "uuid";
 import UserAbortsOperationError from "../../error/userAbortsOperationError";
 import SsoLoginUrlEntity from "../../model/entity/sso/ssoLoginUrlEntity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import SsoSettingsEntity from "../../model/entity/sso/ssoSettingsEntity";
+import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
+import GoogleSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/GoogleSsoSettingsEntity";
 
 let currentBrowserTab = null;
 let currentBrowserWindows = null;
 
 const SUPPORTED_LOGIN_URLS = [
-  {url: 'https://login.microsoftonline.com', provider: SsoSettingsEntity.AZURE},
-  {url: 'https://login.microsoftonline.us', provider: SsoSettingsEntity.AZURE},
-  {url: 'https://login.partner.microsoftonline.cn', provider: SsoSettingsEntity.AZURE},
-  {url: 'https://accounts.google.com', provider: SsoSettingsEntity.GOOGLE},
+  {url: 'https://login.microsoftonline.com', provider: AzureSsoSettingsEntity.PROVIDER_ID},
+  {url: 'https://login.microsoftonline.us', provider: AzureSsoSettingsEntity.PROVIDER_ID},
+  {url: 'https://login.partner.microsoftonline.cn', provider: AzureSsoSettingsEntity.PROVIDER_ID},
+  {url: 'https://accounts.google.com', provider: GoogleSsoSettingsEntity.PROVIDER_ID},
 ];
 
 beforeAll(() => {
@@ -60,7 +61,7 @@ describe("PopupHandlerService", () => {
     const userDomain = "https://fakeurl.passbolt.com";
     const ssoToken = uuid();
     const finalUrl = `${userDomain}/sso/login/dry-run/success?token=${ssoToken}`;
-    const thirdPartyUrl = new SsoLoginUrlEntity({url: "https://login.microsoftonline.com"}, SsoSettingsEntity.AZURE);
+    const thirdPartyUrl = new SsoLoginUrlEntity({url: "https://login.microsoftonline.com"}, AzureSsoSettingsEntity.PROVIDER_ID);
 
     it("Should return SSO token when navigation is done to a correct URL in dry-run mode", async() => {
       expect.assertions(4);

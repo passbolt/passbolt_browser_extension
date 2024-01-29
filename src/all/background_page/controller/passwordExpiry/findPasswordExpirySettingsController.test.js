@@ -18,30 +18,39 @@ import BuildApiClientOptionsService from "../../service/account/buildApiClientOp
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
 import FindPasswordExpirySettingsController from "./findPasswordExpirySettingsController";
-import {overridenPasswordExpirySettingsDto} from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
+import {defaultPasswordExpirySettingsDtoFromApi} from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
 import PasswordExpirySettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity";
+import OrganizationSettingsEntity from "../../model/entity/organizationSettings/organizationSettingsEntity";
+import {defaultProOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
+import browser from "../../sdk/polyfill/browserPolyfill";
+
+const mockedOrganisationSettings = new OrganizationSettingsEntity(defaultProOrganizationSettings());
+jest.mock('../../model/organizationSettings/organizationSettingsModel', () => ({
+  __esModule: true,
+  default: () => ({
+    getOrFind: () => mockedOrganisationSettings
+  }),
+}));
 
 describe("FindPasswordExpirySettingsController", () => {
-  let apiClientOptions;
+  let account, apiClientOptions;
   beforeEach(async() => {
     enableFetchMocks();
     jest.resetAllMocks();
-    fetch.doMockIf(/users\/csrf-token\.json/, () => mockApiResponse("csrf-token"));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
-    const account = new AccountEntity(defaultAccountDto());
+    account = new AccountEntity(defaultAccountDto());
     apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
   });
 
   it("Should return the value from the API", async() => {
     expect.assertions(1);
 
-    const expectedDto = overridenPasswordExpirySettingsDto({
-      default_expiry_period: 365
-    });
+    const expectedDto = defaultPasswordExpirySettingsDtoFromApi();
     const expectedEntity = new PasswordExpirySettingsEntity(expectedDto);
     fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => mockApiResponse(expectedDto));
 
-    const controller = new FindPasswordExpirySettingsController(null, null, apiClientOptions);
+    const controller = new FindPasswordExpirySettingsController(null, null, account, apiClientOptions);
     const result = await controller.exec();
     expect(result).toStrictEqual(expectedEntity);
   });
@@ -52,7 +61,7 @@ describe("FindPasswordExpirySettingsController", () => {
     const expectedEntity = PasswordExpirySettingsEntity.createFromDefault();
     fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => mockApiResponseError(500, "Something went wrong"));
 
-    const controller = new FindPasswordExpirySettingsController(null, null, apiClientOptions);
+    const controller = new FindPasswordExpirySettingsController(null, null, account, apiClientOptions);
     const result = await controller.exec();
     expect(result).toStrictEqual(expectedEntity);
   });
@@ -63,7 +72,7 @@ describe("FindPasswordExpirySettingsController", () => {
     const expectedEntity = PasswordExpirySettingsEntity.createFromDefault();
     fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => { throw new Error("Something went wrong"); });
 
-    const controller = new FindPasswordExpirySettingsController(null, null, apiClientOptions);
+    const controller = new FindPasswordExpirySettingsController(null, null, account, apiClientOptions);
     const result = await controller.exec();
     expect(result).toStrictEqual(expectedEntity);
   });

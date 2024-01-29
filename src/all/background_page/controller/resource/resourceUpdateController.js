@@ -35,7 +35,7 @@ class ResourceUpdateController {
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.resourceModel = new ResourceModel(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.userModel = new UserModel(apiClientOptions);
     this.keyring = new Keyring();
     this.progressService = new ProgressService(this.worker, i18n.t("Updating password"));

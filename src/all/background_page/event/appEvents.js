@@ -237,17 +237,17 @@ const listen = function(worker, apiClientOptions, account) {
    */
 
   worker.port.on('passbolt.password-expiry.find', async requestId => {
-    const controller = new FindPasswordExpirySettingsController(worker, requestId, apiClientOptions);
+    const controller = new FindPasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
     await controller._exec();
   });
 
   worker.port.on('passbolt.password-expiry.save', async(requestId, passwordExpirySettingsDto) => {
-    const controller = new SavePasswordExpirySettingsController(worker, requestId, apiClientOptions);
+    const controller = new SavePasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
     await controller._exec(passwordExpirySettingsDto);
   });
 
   worker.port.on('passbolt.password-expiry.delete', async(requestId, passwordExpiryId) => {
-    const controller = new DeletePasswordExpirySettingsController(worker, requestId, apiClientOptions);
+    const controller = new DeletePasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
     await controller._exec(passwordExpiryId);
   });
 

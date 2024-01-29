@@ -11,8 +11,8 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import UserService from "../api/user/userService";
 import ApiClientOptions from "../api/apiClient/apiClientOptions";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 class BuildApiClientOptionsService {
   /**
@@ -33,8 +33,8 @@ class BuildApiClientOptionsService {
     const apiClientOptions = (new ApiClientOptions())
       .setBaseUrl(domain);
 
-    const userService = new UserService(apiClientOptions);
-    apiClientOptions.setCsrfToken(await userService.findCsrfToken());
+    const csrfToken = await browser.cookies.get({name: "csrfToken", url: domain});
+    apiClientOptions.setCsrfToken(csrfToken?.value);
 
     return apiClientOptions;
   }

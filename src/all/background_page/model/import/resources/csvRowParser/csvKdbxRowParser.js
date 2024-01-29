@@ -12,6 +12,11 @@
  */
 import ExternalResourceEntity from "../../../entity/resource/external/externalResourceEntity";
 import AbstractCsvRowParser from "./abstractCsvRowParser";
+import {
+  RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
+  RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG
+} from "../../../entity/resourceType/resourceTypeEntity";
+import TotpEntity from "../../../entity/totp/totpEntity";
 
 class CsvKdbxRowParser extends AbstractCsvRowParser {
   /**
@@ -25,7 +30,8 @@ class CsvKdbxRowParser extends AbstractCsvRowParser {
       "uri": "URL",
       "secret_clear": "Password",
       "description": "Notes",
-      "folder_parent_path": "Group"
+      "folder_parent_path": "Group",
+      "totp": "TOTP"
     };
   }
 
@@ -37,28 +43,46 @@ class CsvKdbxRowParser extends AbstractCsvRowParser {
    */
   static parse(data, resourceTypesCollection) {
     const externalResourceDto = {};
-    const resourceType = this.parseResourceType(data, resourceTypesCollection);
-    if (resourceType) {
-      externalResourceDto.resource_type_id = resourceType.id;
-    }
+    let resourceTypeSlug = RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG;
     for (const propertyName in this.mapping) {
       if (data[this.mapping[propertyName]]) {
-        externalResourceDto[propertyName] = data[this.mapping[propertyName]];
+        if (propertyName === "totp") {
+          externalResourceDto.totp = this.parseTotp(data[this.mapping[propertyName]]);
+          resourceTypeSlug = RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG;
+        } else {
+          externalResourceDto[propertyName] = data[this.mapping[propertyName]];
+        }
       }
+    }
+    const resourceType = this.parseResourceType(resourceTypeSlug, resourceTypesCollection);
+    if (resourceType) {
+      externalResourceDto.resource_type_id = resourceType.id;
     }
     return new ExternalResourceEntity(externalResourceDto);
   }
 
   /**
-   * Parse the resource type id
-   * @param {object} data the csv row data
+   * Parse the resource type according to the resource type slug
+   * @param {string} resourceTypeSlug
    * @param {ResourceTypesCollection} resourceTypesCollection The available resource types
    * @returns {ResourceTypeEntity}
    */
-  static parseResourceType(data, resourceTypesCollection) {
+  static parseResourceType(resourceTypeSlug, resourceTypesCollection) {
     if (resourceTypesCollection) {
-      return resourceTypesCollection.getFirst('slug', 'password-and-description');
+      return resourceTypesCollection.getFirst('slug', resourceTypeSlug);
     }
+    return null;
+  }
+
+  /**
+   * Parse the TOTP
+   * @param {string} totpUrl
+   * @return {{secret_key: *, period: *, digits: *, algorithm: *}}
+   */
+  static parseTotp(totpUrl) {
+    const totpUrlDecoded = new URL(decodeURIComponent(totpUrl));
+    const totp = TotpEntity.createTotpFromUrl(totpUrlDecoded);
+    return totp.toDto();
   }
 }
 

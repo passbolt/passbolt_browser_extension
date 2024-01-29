@@ -43,9 +43,9 @@ import {MfaEvents} from "../event/mfaEvents";
 import {ClipboardEvents} from "../event/clipboardEvents";
 import {v4 as uuid} from "uuid";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
-import {mockApiResponse} from "../../../../test/mocks/mockApiResponse";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {RememberMeEvents} from "../event/rememberMeEvents";
+import browser from "../sdk/polyfill/browserPolyfill";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppEvents, "listen").mockImplementation(jest.fn());
@@ -76,14 +76,14 @@ jest.spyOn(MfaEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(ClipboardEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(RememberMeEvents, "listen").mockImplementation(jest.fn());
 
-describe("Auth", () => {
+describe("App", () => {
   beforeEach(async() => {
     jest.resetModules();
     jest.clearAllMocks();
     enableFetchMocks();
   });
 
-  describe("Auth::attachEvents", () => {
+  describe("App::attachEvents", () => {
     it("Should attach events", async() => {
       expect.assertions(32);
       // data mocked
@@ -99,7 +99,7 @@ describe("Auth", () => {
       jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);
 
       // mock functions
-      fetch.doMockIf(/csrf-token/, async() => mockApiResponse("csrf-token"));
+      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(GpgAuth.prototype, "isAuthenticated").mockImplementation(() => new Promise(resolve => resolve(true)));
       jest.spyOn(GpgAuth.prototype, "isMfaRequired").mockImplementation(() => new Promise(resolve => resolve(false)));
       const mockedAccount = {user_id: uuid(), domain: "https://test-domain.passbolt.com"};
@@ -173,7 +173,7 @@ describe("Auth", () => {
     });
   });
 
-  describe("Auth::canBeAttachedTo", () => {
+  describe("App::canBeAttachedTo", () => {
     it("Should have the canBeAttachedTo not valid", async() => {
       expect.assertions(1);
       // process

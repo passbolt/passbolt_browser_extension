@@ -10,12 +10,15 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import User from "../model/user";
 import ThemeModel from "../model/theme/themeModel";
 import ChangeThemeEntity from "../model/entity/theme/change/ChangeThemeEntity";
 
-
-const listen = function(worker) {
+/**
+ * Listens the theme events
+ * @param {Worker} worker
+ * @param {ApiClientOptions} apiClientOptions the api client options
+ */
+const listen = function(worker, apiClientOptions) {
   /*
    * Find all themes
    *
@@ -24,8 +27,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.themes.find-all', async requestId => {
     try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const themeModel = new ThemeModel(clientOptions);
+      const themeModel = new ThemeModel(apiClientOptions);
       const themes = await themeModel.findAll();
       worker.port.emit(requestId, 'SUCCESS', themes);
     } catch (error) {
@@ -42,8 +44,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.themes.change', async(requestId, name) => {
     try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const themeModel = new ThemeModel(clientOptions);
+      const themeModel = new ThemeModel(apiClientOptions);
       const changeThemeEntity = new ChangeThemeEntity({name: name});
       await themeModel.change(changeThemeEntity);
       worker.port.emit(requestId, 'SUCCESS');

@@ -20,3 +20,10 @@ export const defaultSetupTotpData = (props = {}) => {
   return Object.assign(data, props);
 };
 
+export const lowerCaseAlgorithmSetupTotpData = (props = {}) => {
+  const data = {
+    otpProvisioningUri: "otpauth://totp/www.passbolt.local:admin%40passbolt.com?issuer=www.passbolt.local&secret=TVWEGQFS3WPCID6GYAPHHCC54VXHFUL7EC5FVHEMVH7CKQI2XEQQ&algorithm=sha1&digits=6&period=30",
+    totp: "663516"
+  };
+  return Object.assign(data, props);
+};

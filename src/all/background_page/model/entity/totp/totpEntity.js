@@ -99,7 +99,7 @@ class TotpEntity extends Entity {
   static createTotpFromUrl(url) {
     const totp = {
       secret_key: url.searchParams.get('secret').toUpperCase(),
-      algorithm: url.searchParams.get('algorithm') || SUPPORTED_ALGORITHMS[0],
+      algorithm: url.searchParams.get('algorithm')?.toUpperCase() || SUPPORTED_ALGORITHMS[0],
       digits: parseInt(url.searchParams.get('digits'), 10) || 6,
       period: parseInt(url.searchParams.get('period'), 10) || 30,
     };

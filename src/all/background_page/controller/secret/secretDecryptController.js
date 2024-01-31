@@ -60,8 +60,8 @@ class SecretDecryptController {
   async exec(resourceId) {
     assertUuid(resourceId);
 
-    const resourcePromise = this.resourceModel.findForDecrypt(resourceId);
     const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+    const resourcePromise = this.resourceModel.findForDecrypt(resourceId);
     const decryptedPrivateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
     const resource = await resourcePromise;
     const secretSchema = await this.resourceTypeModel.getSecretSchemaById(resource.resourceTypeId);

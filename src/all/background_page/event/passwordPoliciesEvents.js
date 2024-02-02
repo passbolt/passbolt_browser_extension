@@ -14,23 +14,25 @@
 import FindPasswordPoliciesController from "../controller/passwordPolicies/findPasswordPoliciesController";
 import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
 import SavePasswordPoliciesController from "../controller/passwordPolicies/savePasswordPoliciesController";
-import User from "../model/user";
 
-const listen = function(worker, _, account) {
+/**
+ * Listens to the password policies events
+ * @param {Worker} worker
+ * @param {ApiClientOptions} apiClientOptions the api client options
+ * @param {AccountEntity} account the user account
+ */
+const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.password-policies.get', async requestId => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetOrFindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
     await controller._exec();
   });
 
   worker.port.on('passbolt.password-policies.save', async(requestId, passwordSettingsDto) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new SavePasswordPoliciesController(worker, requestId, account, apiClientOptions);
     await controller._exec(passwordSettingsDto);
   });
 
   worker.port.on('passbolt.password-policies.get-admin-settings', async requestId => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new FindPasswordPoliciesController(worker, requestId, account, apiClientOptions);
     await controller._exec();
   });

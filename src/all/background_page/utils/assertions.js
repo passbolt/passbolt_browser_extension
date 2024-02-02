@@ -12,7 +12,6 @@
  * @since         3.10.0
  */
 import Validator from "validator";
-import SsoSettingsEntity from "../model/entity/sso/ssoSettingsEntity";
 import {ValidatorRule} from "./validatorRules";
 
 const UUID_REGEXP = /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i;
@@ -120,19 +119,6 @@ export const assertValidInitialisationVector = initialisationVector => {
 
   if (initialisationVector.length !== 12) {
     throw new Error("The initialisation vector should be 12 bytes long");
-  }
-};
-
-/**
- * Assert that the given parameter is a valid SSO provider identifier.
- * @param {string} provider the parameter to validate
- * @throws {Error} if the parameter is not valid
- * @private
- */
-export const assertSsoProvider = provider => {
-  const isFound = SsoSettingsEntity.AVAILABLE_PROVIDERS.findIndex(el => el === provider) !== -1;
-  if (!isFound) {
-    throw new Error("The given provider identifier is not a valid SSO provider");
   }
 };
 

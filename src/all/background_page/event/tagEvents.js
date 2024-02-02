@@ -10,14 +10,13 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import User from "../model/user";
 import TagModel from "../model/tag/tagModel";
 import TagController from "../controller/tag/tagController";
 import TagEntity from "../model/entity/tag/tagEntity";
 import TagsCollection from "../model/entity/tag/tagsCollection";
 
 
-const listen = function(worker) {
+const listen = function(worker, apiClientOptions, account) {
   /*
    * Find all the tags
    *
@@ -26,8 +25,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.tags.find-all', async requestId => {
     try {
-      const apiOption = await User.getInstance().getApiClientOptions();
-      const tagModel = new TagModel(apiOption);
+      const tagModel = new TagModel(apiClientOptions, account);
       const tagsCollection = await tagModel.findAll();
       worker.port.emit(requestId, 'SUCCESS', tagsCollection);
     } catch (error) {
@@ -45,8 +43,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.tags.update-resource-tags', async(requestId, resourceId, tagsDto) => {
     try {
-      const apiOption = await User.getInstance().getApiClientOptions();
-      const tagModel = new TagModel(apiOption);
+      const tagModel = new TagModel(apiClientOptions, account);
       const tagsCollection = new TagsCollection(tagsDto);
       const tags = await tagModel.updateResourceTags(resourceId, tagsCollection);
       worker.port.emit(requestId, 'SUCCESS', tags);
@@ -64,8 +61,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.tags.add-resources-tag', async(requestId, resourcesTagDto) => {
     try {
-      const apiOption = await User.getInstance().getApiClientOptions();
-      const tagController = new TagController(worker, apiOption);
+      const tagController = new TagController(worker, apiClientOptions, account);
       await tagController.addTagResources(resourcesTagDto.resources, resourcesTagDto.tag);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
@@ -82,8 +78,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.tags.update', async(requestId, tagDto) => {
     try {
-      const apiOption = await User.getInstance().getApiClientOptions();
-      const tagModel = new TagModel(apiOption);
+      const tagModel = new TagModel(apiClientOptions, account);
       const tagEntity = new TagEntity(tagDto);
       const updatedTag = await tagModel.update(tagEntity);
       worker.port.emit(requestId, 'SUCCESS', updatedTag);
@@ -101,8 +96,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.tags.delete', async(requestId, tagId) => {
     try {
-      const apiOption = await User.getInstance().getApiClientOptions();
-      const tagModel = new TagModel(apiOption);
+      const tagModel = new TagModel(apiClientOptions, account);
       await tagModel.delete(tagId);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {

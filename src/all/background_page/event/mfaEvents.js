@@ -14,7 +14,6 @@
 
 import PostponeUserSettingMFAInvitationController from '../controller/mfaPolicy/postponeUserSettingMfaInvitationController';
 import MfaGetPolicyController from '../controller/mfaPolicy/mfaGetPolicyController';
-import User from "../model/user";
 import MfaGetMfaSettingsController from '../controller/mfaPolicy/mfaGetMfaSettingsController';
 import HasUserPostponedUserSettingInvitationMFAPolicyController from '../controller/mfaPolicy/hasUserPostponedUserSettingInvitationController';
 import MfaSetupVerifyTotpCodeController from '../controller/mfaSetup/MfaSetupVerifyTotpCodeController';
@@ -23,11 +22,11 @@ import MfaSetupRemoveProviderController from '../controller/mfaSetup/MfaSetupRem
 import MfaSetupVerifyYubikeyCodeController from '../controller/mfaSetup/MfaSetupVerifyYubikeyCodeController';
 
 /**
- * Listens to the account recovery continue application events
+ * Listens to the MFA events
  * @param {Worker} worker The worker
  * @param {ApiClientOptions} apiClientOptions The api client options
  */
-const listen = function(worker) {
+const listen = function(worker, apiClientOptions) {
   worker.port.on('passbolt.mfa-policy.has-user-postponed-user-setting-invitation', async requestId => {
     const controller = new HasUserPostponedUserSettingInvitationMFAPolicyController(worker, requestId);
     await controller._exec();
@@ -39,37 +38,31 @@ const listen = function(worker) {
   });
 
   worker.port.on('passbolt.mfa-policy.get-policy', async requestId => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new MfaGetPolicyController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
   worker.port.on('passbolt.mfa-policy.get-mfa-settings', async requestId => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new MfaGetMfaSettingsController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
   worker.port.on('passbolt.mfa-setup.verify-provider', async(requestId, providerDto) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new MfaSetupVerifyProviderController(worker, requestId, apiClientOptions);
     await controller._exec(providerDto);
   });
 
   worker.port.on('passbolt.mfa-setup.verify-totp-code', async(requestId, code) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new MfaSetupVerifyTotpCodeController(worker, requestId, apiClientOptions);
     await controller._exec(code);
   });
 
   worker.port.on('passbolt.mfa-setup.verify-yubikey-code', async(requestId, code) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new MfaSetupVerifyYubikeyCodeController(worker, requestId, apiClientOptions);
     await controller._exec(code);
   });
 
   worker.port.on('passbolt.mfa-setup.remove-provider', async(requestId, providerDto) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new MfaSetupRemoveProviderController(worker, requestId, apiClientOptions);
     await controller._exec(providerDto);
   });

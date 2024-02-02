@@ -26,10 +26,11 @@ class InformCallToActionController {
    * InformCallToActionController constructor
    * @param {Worker} worker
    * @param {ApiClientOptions} clientOptions
+   * @param {AccountEntity} account the user account
    */
-  constructor(worker, clientOptions) {
+  constructor(worker, clientOptions, account) {
     this.worker = worker;
-    this.resourceModel = new ResourceModel(clientOptions);
+    this.resourceModel = new ResourceModel(clientOptions, account);
   }
 
   /**

@@ -46,7 +46,7 @@ describe("ContinueAccountRecoveryController", () => {
 
       // Mock API fetch account recovery requests response.
       const url = new RegExp(`/account-recovery/continue/${accountRecovery.userId}/${accountRecovery.authenticationTokenToken}.json`);
-      fetch.doMockIf(url, () => Promise.reject(new Error("Unexpected API account recovery error")));
+      fetch.doMockIf(url, () => Promise.reject(new Error("Unable to reach the server, an unexpected error occurred")));
       // Mock Worker to assert error handler.
       const mockedBootstrapAccountRecoveryWorkerPortEmit = jest.fn();
       WorkerService.get = jest.fn(() => ({
@@ -59,7 +59,7 @@ describe("ContinueAccountRecoveryController", () => {
       const promise = controller.exec();
 
       expect.assertions(2);
-      await expect(promise).rejects.toThrowError("Unexpected API account recovery error");
+      await expect(promise).rejects.toThrowError("Unable to reach the server, an unexpected error occurred");
       expect(mockedBootstrapAccountRecoveryWorkerPortEmit).toHaveBeenCalledWith("passbolt.account-recovery-bootstrap.remove-iframe");
     });
   });

@@ -47,7 +47,9 @@ class UpdateLocalSsoProviderController {
    * @return {Promise<void>}
    */
   async exec(ssoProviderId) {
-    await SsoDataStorage.updateLocalKitProviderWith(ssoProviderId);
+    const ssoClientKit = await SsoDataStorage.get();
+    ssoClientKit.provider = ssoProviderId;
+    await SsoDataStorage.updateLocalKitProviderWith(ssoClientKit);
   }
 }
 

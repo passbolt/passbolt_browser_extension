@@ -14,6 +14,7 @@
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import SsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/SsoSettingsEntity";
 
 const ENTITY_NAME = "SsoKitClientPartEntity";
 
@@ -146,6 +147,7 @@ class SsoKitClientPartEntity extends Entity {
         },
         "provider": {
           "type": "string",
+          "enum": SsoSettingsEntity.AVAILABLE_PROVIDERS,
         },
         "nek": {
           "type": "object",

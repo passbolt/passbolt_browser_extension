@@ -24,7 +24,7 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.resources.update-local-storage', async requestId => {
     Log.write({level: 'debug', message: 'ResourceEvent listen passbolt.resources.update-local-storage'});
     try {
-      const resourceModel = new ResourceModel(apiClientOptions);
+      const resourceModel = new ResourceModel(apiClientOptions, account);
       resourceModel.updateLocalStorage();
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {
@@ -41,7 +41,7 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.resources.find-all', async(requestId, options) => {
     try {
-      const resourceModel = new ResourceModel(apiClientOptions);
+      const resourceModel = new ResourceModel(apiClientOptions, account);
       const {contains, filters, orders} = options;
       const resources = await resourceModel.findAll(contains, filters, orders);
       worker.port.emit(requestId, 'SUCCESS', resources);
@@ -60,7 +60,7 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.resources.find-permissions', async(requestId, resourceId) => {
     try {
-      const resourceModel = new ResourceModel(apiClientOptions);
+      const resourceModel = new ResourceModel(apiClientOptions, account);
       const permissions = await resourceModel.findResourcePermissions(resourceId);
       worker.port.emit(requestId, 'SUCCESS', permissions);
     } catch (error) {
@@ -98,7 +98,7 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.resources.delete-all', async(requestId, resourcesIds) => {
     try {
       // TODO DeleteResourcesController with progress dialog if resourceIds > 1
-      const resourceModel = new ResourceModel(apiClientOptions);
+      const resourceModel = new ResourceModel(apiClientOptions, account);
       await resourceModel.bulkDelete(resourcesIds);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {

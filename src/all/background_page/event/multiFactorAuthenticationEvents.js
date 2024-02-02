@@ -10,11 +10,14 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import User from "../model/user";
 import MultiFactorAuthenticationModel from "../model/multiFactorAuthentication/multiFactorAuthenticationModel";
 
-
-const listen = function(worker) {
+/**
+ * Listens to the Multi-Factor-Authentication events
+ * @param {Worker} worker The worker
+ * @param {ApiClientOptions} apiClientOptions The api client options
+ */
+const listen = function(worker, apiClientOptions) {
   /*
    * Disable mfa for a user
    *
@@ -24,8 +27,7 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.mfa.disable-for-user', async(requestId, userId) => {
     try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const mfaModel = new MultiFactorAuthenticationModel(clientOptions);
+      const mfaModel = new MultiFactorAuthenticationModel(apiClientOptions);
       await mfaModel.disableForUser(userId);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {

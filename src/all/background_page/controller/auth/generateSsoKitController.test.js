@@ -25,7 +25,8 @@ import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntit
 import SsoKitServerPartEntity from "../../model/entity/sso/ssoKitServerPartEntity";
 import GenerateSsoKitController from "./generateSsoKitController";
 import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
-import SsoSettingsEntity from "../../model/entity/sso/ssoSettingsEntity";
+import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
+import GoogleSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/GoogleSsoSettingsEntity";
 
 jest.mock("../../service/passphrase/getPassphraseService");
 
@@ -37,9 +38,9 @@ beforeEach(() => {
 describe("GenerateSsoKitController", () => {
   describe("GenerateSsoKitController::exec", () => {
     it("Should generate a brand new kit if none exists.", async() => {
-      expect.assertions(5);
+      expect.assertions(6);
       const data = generateSsoKitServerData({});
-      const expectedProvider = SsoSettingsEntity.AZURE;
+      const expectedProvider = AzureSsoSettingsEntity.PROVIDER_ID;
       const expextedKitId = uuid();
       const expectedServerPartKit = new SsoKitServerPartEntity({data});
       const expectedClientPartKit = new SsoKitClientPartEntity(clientSsoKit());
@@ -74,22 +75,26 @@ describe("GenerateSsoKitController", () => {
       await controller.exec(expectedProvider);
 
       expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledTimes(1);
+      expect(SsoDataStorage.save).toHaveBeenCalledTimes(1);
       expect(SsoDataStorage.save).toHaveBeenCalledWith(exepctedClientPartKitWithId);
     });
 
     it("Should update the provider if a kit exists and the provider changed.", async() => {
-      expect.assertions(1);
-      const expectedProvider = SsoSettingsEntity.GOOGLE;
-      const storedSsoKit = new SsoKitClientPartEntity(clientSsoKit({provider: SsoSettingsEntity.AZURE}));
+      expect.assertions(2);
+      const expectedProvider = GoogleSsoSettingsEntity.PROVIDER_ID;
+      const clientSsoKitDto = clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID});
+      const storedSsoKit = new SsoKitClientPartEntity(clientSsoKitDto);
 
       SsoDataStorage.setMockedData(storedSsoKit.toDbSerializableObject());
 
       const controller = new GenerateSsoKitController(null, null, defaultApiClientOptions());
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
 
+      const expectedSsoKit = new SsoKitClientPartEntity({...clientSsoKitDto, provider: expectedProvider});
       await controller.exec(expectedProvider);
 
-      expect(SsoDataStorage.updateLocalKitProviderWith).toHaveBeenCalledWith(expectedProvider);
+      expect(SsoDataStorage.updateLocalKitProviderWith).toHaveBeenCalledTimes(1);
+      expect(SsoDataStorage.updateLocalKitProviderWith).toHaveBeenCalledWith(expectedSsoKit);
     });
   });
 });

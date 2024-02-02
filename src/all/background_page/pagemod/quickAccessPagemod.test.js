@@ -30,7 +30,7 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {RememberMeEvents} from "../event/rememberMeEvents";
 import {ResourceTypeEvents} from "../event/resourceTypeEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
-import {mockApiResponse} from "../../../../test/mocks/mockApiResponse";
+import browser from "../sdk/polyfill/browserPolyfill";
 
 jest.spyOn(GetLegacyAccountService, "get").mockImplementation(jest.fn());
 jest.spyOn(AuthEvents, "listen").mockImplementation(jest.fn());
@@ -65,7 +65,7 @@ describe("QuickAccess", () => {
         }
       };
       // mock functions
-      fetch.doMockIf(/csrf-token/, async() => mockApiResponse("csrf-token"));
+      jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       const mockedAccount = {user_id: uuid(), domain: "https://test.passbolt.local"};
       const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(mockedAccount);
       jest.spyOn(GetLegacyAccountService, 'get').mockImplementation(() => mockedAccount);

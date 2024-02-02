@@ -12,6 +12,7 @@
  * @since         3.9.0
  */
 import "../../../../../test/mocks/mockSsoDataStorage";
+import "../../../../../test/mocks/mockCryptoKey";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import AppInitController from "./appInitController";
 import User from "../../model/user";
@@ -21,6 +22,10 @@ import {v4 as uuid} from "uuid";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
+import browser from "../../sdk/polyfill/browserPolyfill";
+import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";
+import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
+import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -62,6 +67,12 @@ describe("AppInitController", () => {
     it("Should sync the SSO kit if any.", async() => {
       expect.assertions(3);
       await MockExtension.withConfiguredAccount();
+
+      const ssoClientKitDto = clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID});
+      delete ssoClientKitDto.id; // let's ensure there is no id for this test
+      const storedSsoKit = new SsoKitClientPartEntity(ssoClientKitDto);
+      SsoDataStorage.setMockedData(storedSsoKit.toDbSerializableObject());
+
       const userInstance = User.getInstance();
       const storedServerSsoKit = {data: generateSsoKitServerData({})};
       const ssoKitServerResponse = Object.assign({}, storedServerSsoKit, {id: uuid()});
@@ -69,7 +80,7 @@ describe("AppInitController", () => {
       jest.spyOn(userInstance.settings, "sync").mockImplementation(async() => null);
       jest.spyOn(SsoKitTemporaryStorageService, "getAndFlush").mockImplementation(async() => storedServerSsoKit);
 
-      fetch.doMockOnceIf(new RegExp('/users/csrf-token.json'), async() => mockApiResponse("csrf-token"));
+      jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
       fetch.doMockOnceIf(new RegExp('/sso/keys.json'), async req => {
         const body = JSON.parse(await req.text());
         expect(body).toStrictEqual(storedServerSsoKit);
@@ -79,8 +90,10 @@ describe("AppInitController", () => {
       const controller = new AppInitController();
       await controller.main();
 
+      const expectedSsoKitClientPartEntity = new SsoKitClientPartEntity({...ssoClientKitDto, id: ssoKitServerResponse.id});
+
       expect(SsoDataStorage.updateLocalKitIdWith).toHaveBeenCalledTimes(1);
-      expect(SsoDataStorage.updateLocalKitIdWith).toHaveBeenCalledWith(ssoKitServerResponse.id);
+      expect(SsoDataStorage.updateLocalKitIdWith).toHaveBeenCalledWith(expectedSsoKitClientPartEntity);
     });
   });
 });

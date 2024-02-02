@@ -17,13 +17,13 @@ import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.d
 import PasswordExpirySettingsGetOrFindService from "./passwordExpirySettingsGetOrFindService";
 import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 import {enableFetchMocks} from "jest-fetch-mock";
-import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("PasswordExpirySettingsGetOrFindService", () => {
   beforeEach(() => {
     enableFetchMocks();
     jest.resetAllMocks();
-    fetch.doMockIf(/users\/csrf-token\.json/, () => mockApiResponse("csrf-token"));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
     jest.resetModules();
   });
 

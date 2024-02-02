@@ -47,9 +47,9 @@ class ImportResourcesFileController {
 
     // Models
     this.resourceTypeModel = new ResourceTypeModel(apiClientOptions);
-    this.resourceModel = new ResourceModel(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.folderModel = new FolderModel(apiClientOptions);
-    this.tagModel = new TagModel(apiClientOptions);
+    this.tagModel = new TagModel(apiClientOptions, account);
 
     // Progress
     this.progressService = new ProgressService(this.worker, i18n.t("Importing ..."));

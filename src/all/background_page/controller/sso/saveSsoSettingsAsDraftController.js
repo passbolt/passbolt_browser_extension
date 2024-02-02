@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import SsoSettingsEntity from "../../model/entity/sso/ssoSettingsEntity";
+import SsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/SsoSettingsEntity";
 import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
 
 class SaveSsoSettingsAsDraftController {

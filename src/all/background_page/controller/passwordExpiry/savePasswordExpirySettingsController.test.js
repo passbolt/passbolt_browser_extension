@@ -25,6 +25,7 @@ import {defaultPasswordExpiryProSettingsDto, defaultPasswordExpirySettingsDto, d
 import PasswordExpiryProSettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiryPro/passwordExpiryProSettingsEntity";
 import {defaultProOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 import OrganizationSettingsEntity from "../../model/entity/organizationSettings/organizationSettingsEntity";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 const mockedOrganisationSettings = new OrganizationSettingsEntity(defaultProOrganizationSettings());
 jest.mock('../../model/organizationSettings/organizationSettingsModel', () => ({
@@ -40,7 +41,7 @@ describe("SavePasswordExpirySettingsController", () => {
   beforeEach(async() => {
     enableFetchMocks();
     jest.resetAllMocks();
-    fetch.doMockIf(/users\/csrf-token\.json/, () => mockApiResponse("csrf-token"));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
   });

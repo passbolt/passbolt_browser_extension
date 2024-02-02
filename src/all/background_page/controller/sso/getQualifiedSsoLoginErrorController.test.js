@@ -19,7 +19,8 @@ import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import GetQualifiedSsoLoginErrorController from './getQualifiedSsoLoginErrorController';
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from '../../../../../test/mocks/mockApiResponse';
-import SsoSettingsEntity from '../../model/entity/sso/ssoSettingsEntity';
+import AzureSsoSettingsEntity from 'passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity';
+import GoogleSsoSettingsEntity from 'passbolt-styleguide/src/shared/models/entity/ssoSettings/GoogleSsoSettingsEntity';
 import SsoDisabledError from '../../error/ssoDisabledError';
 import SsoProviderMismatchError from '../../error/ssoProviderMismatchError';
 
@@ -31,7 +32,7 @@ describe("GetQualifiedSsoLoginErrorController", () => {
   it('Should return an Error (unexpected) if the user has not a local SSO kit', async() => {
     expect.assertions(1);
     SsoDataStorage.setMockedData(null);
-    fetch.doMockOnce(() => mockApiResponse({provider: SsoSettingsEntity.AZURE}));
+    fetch.doMockOnce(() => mockApiResponse({provider: AzureSsoSettingsEntity.PROVIDER_ID}));
 
     const controller = new GetQualifiedSsoLoginErrorController(null, null, defaultApiClientOptions());
     const result = await controller.exec();
@@ -41,8 +42,8 @@ describe("GetQualifiedSsoLoginErrorController", () => {
 
   it("Should return an Error (unexpected) if the user's SSO kit provider is matching the API's one", async() => {
     expect.assertions(1);
-    SsoDataStorage.setMockedData(clientSsoKit({provider: SsoSettingsEntity.AZURE}));
-    fetch.doMockOnce(() => mockApiResponse({provider: SsoSettingsEntity.AZURE}));
+    SsoDataStorage.setMockedData(clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID}));
+    fetch.doMockOnce(() => mockApiResponse({provider: AzureSsoSettingsEntity.PROVIDER_ID}));
 
     const controller = new GetQualifiedSsoLoginErrorController(null, null, defaultApiClientOptions());
     const result = await controller.exec();
@@ -52,7 +53,7 @@ describe("GetQualifiedSsoLoginErrorController", () => {
 
   it("Should return an SsoDisabledError", async() => {
     expect.assertions(1);
-    SsoDataStorage.setMockedData(clientSsoKit({provider: SsoSettingsEntity.AZURE}));
+    SsoDataStorage.setMockedData(clientSsoKit({provider: AzureSsoSettingsEntity.PROVIDER_ID}));
     fetch.doMockOnce(() => mockApiResponse({provider: null}));
 
     const controller = new GetQualifiedSsoLoginErrorController(null, null, defaultApiClientOptions());
@@ -63,12 +64,12 @@ describe("GetQualifiedSsoLoginErrorController", () => {
 
   it("Should return an SsoProviderMismatchError", async() => {
     expect.assertions(1);
-    SsoDataStorage.setMockedData(clientSsoKit({provider: SsoSettingsEntity.GOOGLE}));
-    fetch.doMockOnce(() => mockApiResponse({provider: SsoSettingsEntity.AZURE}));
+    SsoDataStorage.setMockedData(clientSsoKit({provider: GoogleSsoSettingsEntity.PROVIDER_ID}));
+    fetch.doMockOnce(() => mockApiResponse({provider: AzureSsoSettingsEntity.PROVIDER_ID}));
 
     const controller = new GetQualifiedSsoLoginErrorController(null, null, defaultApiClientOptions());
     const result = await controller.exec();
 
-    expect(result).toStrictEqual(new SsoProviderMismatchError("The request SSO provider is not corresponding to the configured one", SsoSettingsEntity.AZURE));
+    expect(result).toStrictEqual(new SsoProviderMismatchError("The request SSO provider is not corresponding to the configured one", AzureSsoSettingsEntity.PROVIDER_ID));
   });
 });

@@ -4,11 +4,16 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import User from "../model/user";
 import ImportResourcesFileController from "../controller/import/importResourcesFileController";
 
 
-const listen = function(worker, _, account) {
+/**
+ * Listens to the import resources events
+ * @param {Worker} worker The worker
+ * @param {ApiClientOptions} apiClientOptions The api client options
+ * @param {AccountEntity} account The account
+ */
+const listen = function(worker, apiClientOptions, account) {
   /*
    * Import resources file
    *
@@ -19,7 +24,6 @@ const listen = function(worker, _, account) {
    * @returns {{references: {folder: (object|null), tag: (object|null)}, created: {resourcesCount: int, foldersCount: int}, options: {folders: boolean, tags: boolean}, errors: {folders: array, resources: array}}}
    */
   worker.port.on('passbolt.import-resources.import-file', async(requestId, fileType, file, options) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const importController = new ImportResourcesFileController(worker, apiClientOptions, account);
     try {
       const importEntity = await importController.exec(fileType, file, options);

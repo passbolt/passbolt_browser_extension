@@ -24,11 +24,12 @@ class TagModel {
    * Constructor
    *
    * @param {ApiClientOptions} apiClientOptions
+   * @param {AccountEntity} account the user account
    * @public
    */
-  constructor(apiClientOptions) {
+  constructor(apiClientOptions, account) {
     this.tagService = new TagService(apiClientOptions);
-    this.resourceModel = new ResourceModel(apiClientOptions);
+    this.resourceModel = new ResourceModel(apiClientOptions, account);
   }
 
   /**

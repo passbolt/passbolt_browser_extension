@@ -40,7 +40,8 @@
     "scripting",
     "alarms",
     "downloads",
-    "webNavigation"
+    "webNavigation",
+    "cookies"
   ],
   "host_permissions": [
     "*://*/*"

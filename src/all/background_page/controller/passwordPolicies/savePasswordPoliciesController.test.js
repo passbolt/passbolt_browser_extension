@@ -22,6 +22,7 @@ import SavePasswordPoliciesController from "./savePasswordPoliciesController";
 import {defaultPasswordPolicies} from "../../model/entity/passwordPolicies/passwordPoliciesEntity.test.data";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
+import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("SavePasswordPoliciesController::exec", () => {
   let account, apiClientOptions;
@@ -29,7 +30,7 @@ describe("SavePasswordPoliciesController::exec", () => {
   beforeEach(async() => {
     enableFetchMocks();
     jest.resetAllMocks();
-    fetch.doMockIf(/users\/csrf-token\.json/, () => mockApiResponse("csrf-token"));
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);

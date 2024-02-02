@@ -56,7 +56,7 @@ describe("SignMessageService service", () => {
   });
 
   describe("signClearMessage method", () => {
-    it("should sign a given message key with a provide key provided", async() => {
+    it("should sign a given message with a provided key", async() => {
       expect.assertions(1);
 
       const messageToSign = await openpgp.createCleartextMessage({text: 'my-account-kit'});

@@ -18,11 +18,11 @@ import DecryptMessageService from './decryptMessageService';
 
 class VerifyMessageService {
   /**
-   * Sign a text message with the public or/and private key.
+   * Verifies a message signature with the public or/and private key.
    *
    * @param {openpgp.Message} message The message to sign.
    * @param {array<openpgp.PublicKey|openpgp.PrivateKey>} verificationKeys (optional) The key(s) to check the signature for.
-   * @returns {Promise<string>}
+   * @returns {Promise<void>}
    * @throws {TypeError}  If the message is not a valid openpgp.Message
    * @throws {TypeError}  If one of the provided key is not a valid openpgp.PublicKey or openpgp.PrivateKey
    * @throws {TypeError}  If the message cannot be verified
@@ -36,12 +36,12 @@ class VerifyMessageService {
   }
 
   /**
-   * Sign a text clear text message with the public or/and private keys
+   * Verifies a clear text message signature with the public or/and private keys
    *
    * @param {openpgp.CleartextMessage} message The clear text message to sign.
    * @param {array<openpgp.PublicKey|openpgp.PrivateKey>} verificationKeys (optional) The key(s) to check the signature for.
-   * @returns {Promise<string>}
-   * @throws {TypeError}  If the message is not a valid openpgp.Message
+   * @returns {Promise<void>}
+   * @throws {TypeError}  If the message is not a valid openpgp.CleartextMessage
    * @throws {TypeError}  If one of the provided key is not a valid openpgp.PublicKey or openpgp.PrivateKey
    * @throws {TypeError}  If the message cannot be verified
    */

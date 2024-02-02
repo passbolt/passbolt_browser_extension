@@ -43,8 +43,13 @@ ShareService.searchAros = async function(keywords) {
   try {
     response = await fetch(url.toString(), fetchOptions);
   } catch (error) {
-    // Catch Network error such as connection lost.
-    throw new PassboltServiceUnavailableError(error.message);
+    if (navigator.onLine) {
+      // Catch Network error such as bad certificate or server unreachable.
+      throw new PassboltServiceUnavailableError("Unable to reach the server, an unexpected error occurred");
+    } else {
+      // Network connection lost.
+      throw new PassboltServiceUnavailableError("Unable to reach the server, you are not connected to the network");
+    }
   }
 
   try {
@@ -91,8 +96,13 @@ ShareService.searchResourceAros = async function(resourceId, keywords) {
   try {
     response = await fetch(url.toString(), fetchOptions);
   } catch (error) {
-    // Catch Network error such as connection lost.
-    throw new PassboltServiceUnavailableError(error.message);
+    if (navigator.onLine) {
+      // Catch Network error such as bad certificate or server unreachable.
+      throw new PassboltServiceUnavailableError("Unable to reach the server, an unexpected error occurred");
+    } else {
+      // Network connection lost.
+      throw new PassboltServiceUnavailableError("Unable to reach the server, you are not connected to the network");
+    }
   }
 
   try {
@@ -138,8 +148,13 @@ ShareService.shareResource = async function(resourceId, data) {
   try {
     response = await fetch(url.toString(), fetchOptions);
   } catch (error) {
-    // Catch Network error such as connection lost.
-    throw new PassboltServiceUnavailableError(error.message);
+    if (navigator.onLine) {
+      // Catch Network error such as bad certificate or server unreachable.
+      throw new PassboltServiceUnavailableError("Unable to reach the server, an unexpected error occurred");
+    } else {
+      // Network connection lost.
+      throw new PassboltServiceUnavailableError("Unable to reach the server, you are not connected to the network");
+    }
   }
 
   try {
@@ -191,8 +206,13 @@ ShareService.simulateShareResource = async function(resourceId, permissions) {
   try {
     response = await fetch(url.toString(), fetchOptions);
   } catch (error) {
-    // Catch Network error such as connection lost.
-    throw new PassboltServiceUnavailableError(error.message);
+    if (navigator.onLine) {
+      // Catch Network error such as bad certificate or server unreachable.
+      throw new PassboltServiceUnavailableError("Unable to reach the server, an unexpected error occurred");
+    } else {
+      // Network connection lost.
+      throw new PassboltServiceUnavailableError("Unable to reach the server, you are not connected to the network");
+    }
   }
 
   try {

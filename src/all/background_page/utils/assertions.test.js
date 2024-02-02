@@ -20,14 +20,12 @@ import {
   assertNonExtractableSsoKey,
   assertExtractableSsoKey,
   assertValidInitialisationVector,
-  assertSsoProvider,
   assertBoolean,
   assertType,
 } from "./assertions";
 import {v4 as uuid} from 'uuid';
 import GenerateSsoIvService from "../service/crypto/generateSsoIvService";
 import {buildMockedCryptoKey} from "./assertions.test.data";
-import SsoSettingsEntity from "../model/entity/sso/ssoSettingsEntity";
 import PasswordGeneratorSettingsEntity from "../model/entity/passwordPolicies/passwordGeneratorSettingsEntity";
 import {defaultAccountRecoveryPrivateKeyPasswordDto} from "../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity.test.data";
 import AccountRecoveryPrivateKeyEntity from "../model/entity/accountRecovery/accountRecoveryPrivateKeyEntity";
@@ -183,33 +181,6 @@ describe("Assertions", () => {
       expect.assertions(scenarios.length);
       for (let i = 0; i < scenarios.length; i++) {
         expect(() => assertValidInitialisationVector(scenarios[i])).toThrow();
-      }
-    });
-  });
-
-  describe("Assertions::assertSsoProvider", () => {
-    it("Should not throw an error if the parameter is valid", () => {
-      const validParameters = SsoSettingsEntity.AVAILABLE_PROVIDERS;
-      expect.assertions(validParameters.length);
-
-      for (let i = 0; i < validParameters.length; i++) {
-        const param = validParameters[i];
-        expect(() => assertSsoProvider(param)).not.toThrow();
-      }
-    });
-
-    it("Should throw an error if the parameter is not valid", () => {
-      const scenarios = [
-        {},
-        false,
-        12,
-        "",
-        "aruze",
-      ];
-
-      expect.assertions(scenarios.length);
-      for (let i = 0; i < scenarios.length; i++) {
-        expect(() => assertSsoProvider(scenarios[i])).toThrow();
       }
     });
   });

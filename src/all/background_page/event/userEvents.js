@@ -6,7 +6,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import User from "../model/user";
 import UserModel from "../model/user/userModel";
 import AccountModel from "../model/account/accountModel";
 import UpdatePrivateKeyController from "../controller/account/updatePrivateKeyController";
@@ -18,7 +17,13 @@ import UpdateUserLocalStorageController from "../controller/user/updateUserLocal
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 import UpdateUserController from "../controller/user/updateUserController";
 
-const listen = function(worker, _, account) {
+/**
+ * Listens the user events
+ * @param {Worker} worker
+ * @param {ApiClientOptions} apiClientOptions the api client options
+ * @param {AccountEntity} account the user account
+ */
+const listen = function(worker, apiClientOptions, account) {
   /*
    * ==================================================================================
    *  Getters for user
@@ -32,7 +37,6 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.users.get-all', async requestId => {
     try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const userModel = new UserModel(apiClientOptions, account);
       const users = await userModel.getOrFindAll();
       worker.port.emit(requestId, 'SUCCESS', users);
@@ -56,8 +60,7 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.users.create', async(requestId, userDto) => {
     try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const userModel = new UserModel(clientOptions, account);
+      const userModel = new UserModel(apiClientOptions, account);
       const userEntity = new UserEntity(userDto);
       const updatedUser = await userModel.create(userEntity);
       worker.port.emit(requestId, 'SUCCESS', updatedUser);
@@ -74,7 +77,6 @@ const listen = function(worker, _, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.users.find-logged-in-user', async(requestId, refreshCache) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new GetOrFindLoggedInUserController(worker, requestId, apiClientOptions, account);
     await controller._exec(refreshCache);
   });
@@ -89,8 +91,7 @@ const listen = function(worker, _, account) {
    *  {id: <UUID>, username: 'ada@passbolt.com', profile: {first_name: 'ada', last_name: 'lovelace'}, role_id: <UUID>}
    */
   worker.port.on('passbolt.users.update', async(requestId, userDto) => {
-    const clientOptions = await User.getInstance().getApiClientOptions();
-    const controller = new UpdateUserController(worker, requestId, clientOptions, account);
+    const controller = new UpdateUserController(worker, requestId, apiClientOptions, account);
     await controller._exec(userDto);
   });
 
@@ -104,8 +105,7 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.users.update-avatar', async(requestId, userId, avatarBase64UpdateDto) => {
     try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const userModel = new UserModel(clientOptions, account);
+      const userModel = new UserModel(apiClientOptions, account);
       const avatarUpdateEntity = AvatarUpdateEntity.createFromFileBase64(avatarBase64UpdateDto);
       const updatedUser = await userModel.updateAvatar(userId, avatarUpdateEntity, true);
       worker.port.emit(requestId, 'SUCCESS', updatedUser);
@@ -125,8 +125,7 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.users.update-security-token', async(requestId, securityTokenDto) => {
     try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const accountModel = new AccountModel(clientOptions, account);
+      const accountModel = new AccountModel(apiClientOptions, account);
       const securityTokenEntity = new SecurityTokenEntity(securityTokenDto);
       await accountModel.changeSecurityToken(securityTokenEntity);
       worker.port.emit(requestId, 'SUCCESS');
@@ -145,7 +144,6 @@ const listen = function(worker, _, account) {
    * @param newPassphrase {string} The new passphrase
    */
   worker.port.on('passbolt.user.update-private-key', async(requestId, oldPassphrase, newPassphrase) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new UpdatePrivateKeyController(worker, requestId, apiClientOptions);
     await controller._exec(oldPassphrase, newPassphrase);
   });
@@ -158,8 +156,7 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.users.delete-dry-run', async(requestId, userId, transferDto) => {
     try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const userModel = new UserModel(clientOptions, account);
+      const userModel = new UserModel(apiClientOptions, account);
       const transferEntity = transferDto ? new UserDeleteTransferEntity(transferDto) : null;
       await userModel.deleteDryRun(userId, transferEntity);
       worker.port.emit(requestId, 'SUCCESS');
@@ -178,8 +175,7 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.users.delete', async(requestId, userId, transferDto) => {
     try {
-      const clientOptions = await User.getInstance().getApiClientOptions();
-      const userModel = new UserModel(clientOptions, account);
+      const userModel = new UserModel(apiClientOptions, account);
       const transferEntity = transferDto ? new UserDeleteTransferEntity(transferDto) : null;
       await userModel.delete(userId, transferEntity);
       worker.port.emit(requestId, 'SUCCESS');
@@ -202,7 +198,6 @@ const listen = function(worker, _, account) {
    * @param {uuid} requestId The request identifier
    */
   worker.port.on('passbolt.users.update-local-storage', async requestId => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new UpdateUserLocalStorageController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
@@ -216,7 +211,7 @@ const listen = function(worker, _, account) {
    */
   worker.port.on('passbolt.users.resend-invite', async(requestId, username) => {
     try {
-      const userModel = new UserModel(await User.getInstance().getApiClientOptions());
+      const userModel = new UserModel(apiClientOptions);
       await userModel.resendInvite(username);
       worker.port.emit(requestId, 'SUCCESS');
     } catch (error) {

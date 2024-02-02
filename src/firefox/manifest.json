@@ -46,7 +46,8 @@
     "storage",
     "unlimitedStorage",
     "*://*/*",
-    "alarms"
+    "alarms",
+    "cookies"
   ],
   "web_accessible_resources": [
     "webAccessibleResources/*"

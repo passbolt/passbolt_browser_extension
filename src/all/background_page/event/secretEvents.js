@@ -5,11 +5,16 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import User from "../model/user";
 import SecretDecryptController from "../controller/secret/secretDecryptController";
 import PownedPasswordController from '../controller/secret/pownedPasswordController';
 
-const listen = function(worker, _, account) {
+/**
+ * Listens the secret events
+ * @param {Worker} worker
+ * @param {ApiClientOptions} apiClientOptions the api client options
+ * @param {AccountEntity} account the user account
+ */
+const listen = function(worker, apiClientOptions, account) {
   /*
    * Decrypt a given armored string.
    *
@@ -17,7 +22,6 @@ const listen = function(worker, _, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.secret.decrypt', async(requestId, resourceId) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new SecretDecryptController(worker, requestId, apiClientOptions, account);
     await controller._exec(resourceId);
   });

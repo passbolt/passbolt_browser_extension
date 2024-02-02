@@ -96,7 +96,7 @@ describe("PortManager", () => {
         await PortManager.onPortConnect(port);
       } catch (error) {
         // expectations
-        expect(error.message).toStrictEqual("The worker id should be a valid uuid.")
+        expect(error.message).toStrictEqual("The worker id should be a valid uuid.");
         expect(chrome.action.getPopup).toHaveBeenCalled();
         expect(PortManager._ports[port.name]).not.toBeDefined();
         expect(PagemodManager.attachEventToPort).not.toHaveBeenCalled();

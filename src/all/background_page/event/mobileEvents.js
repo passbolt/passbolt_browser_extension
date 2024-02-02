@@ -11,12 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         v3.2.0
  */
-import User from "../model/user";
 import MobileTransferModel from "../model/mobileTransfer/mobileTransferModel";
 import TransferEntity from "../model/entity/transfer/transferEntity";
 
-
-const listen = function(worker) {
+/**
+ * Listens to the mobile events
+ * @param {Worker} worker The worker
+ * @param {ApiClientOptions} apiClientOptions The api client options
+ */
+const listen = function(worker, apiClientOptions) {
   /*
    * passbolt.mobile.transfer.get
    *
@@ -26,7 +29,6 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.mobile.transfer.get', async(requestId, transferId) => {
     try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const transferModel = new MobileTransferModel(apiClientOptions);
       const transferEntity = await transferModel.get(transferId);
       worker.port.emit(requestId, 'SUCCESS', transferEntity);
@@ -44,7 +46,6 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.mobile.transfer.create', async(requestId, transferDto) => {
     try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const transferModel = new MobileTransferModel(apiClientOptions);
       const transferEntity = new TransferEntity(transferDto);
       const updatedTransferEntity = await transferModel.create(transferEntity);
@@ -63,7 +64,6 @@ const listen = function(worker) {
    */
   worker.port.on('passbolt.mobile.transfer.update', async(requestId, transferDto) => {
     try {
-      const apiClientOptions = await User.getInstance().getApiClientOptions();
       const transferModel = new MobileTransferModel(apiClientOptions);
       const transferEntity = new TransferEntity(transferDto);
       const updatedTransferEntity = await transferModel.update(transferEntity);

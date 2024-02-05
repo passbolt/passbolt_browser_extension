@@ -13,6 +13,7 @@
  */
 import browser from "../../sdk/polyfill/browserPolyfill";
 import Log from "../../model/log";
+import LocalStorageChangeService from "./localStorageChangeService";
 
 export const PASSBOLT_DATA_LOCAL_STORAGE_KEY = '_passbolt_data';
 
@@ -70,6 +71,7 @@ class PassboltDataLocalStorage {
   async set(passboltData) {
     await navigator.locks.request(this.storageKey, async() => {
       await browser.storage.local.set({[this.storageKey]: passboltData});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent(this.storageKey, passboltData)
     });
   }
 }

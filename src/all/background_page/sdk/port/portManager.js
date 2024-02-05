@@ -16,12 +16,14 @@ import PagemodManager from "../../pagemod/pagemodManager";
 import WorkersSessionStorage from "../../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 import browser from "../polyfill/browserPolyfill";
+import workersSessionStorage from "../../service/sessionStorage/workersSessionStorage";
 
 class PortManager {
   constructor() {
     this._ports = {}; // Object{portId: port, ...} for which the port is available
     this.onPortConnect = this.onPortConnect.bind(this);
     this.onTabRemoved = this.onTabRemoved.bind(this);
+    this.onStorageUpdate = this.onStorageUpdate.bind(this);
   }
 
   /**
@@ -188,6 +190,14 @@ class PortManager {
     const workers = await WorkersSessionStorage.getWorkersByTabId(tabId);
     workers.forEach(worker => this.removePort(worker.id, removeInfo));
     await WorkersSessionStorage.deleteByTabId(tabId);
+  }
+
+  async onStorageUpdate(updatedData) {
+    const workers = await workersSessionStorage.getWorkers();
+    for (let i = 0; i < workers.length; i++) {
+      const workerId = workers[i].id;
+      this._ports[workerId]?.emit('passbolt.local-storage.update', updatedData);
+    }
   }
 }
 

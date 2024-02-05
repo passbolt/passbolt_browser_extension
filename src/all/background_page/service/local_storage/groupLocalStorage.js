@@ -16,6 +16,7 @@ import Log from "../../model/log";
 import GroupsCollection from "../../model/entity/group/groupsCollection";
 import GroupEntity from "../../model/entity/group/groupEntity";
 import Lock from "../../utils/lock";
+import LocalStorageChangeService from "./localStorageChangeService";
 const lock = new Lock();
 
 const GROUP_LOCAL_STORAGE_KEY = 'groups';
@@ -61,6 +62,7 @@ class GroupLocalStorage {
       groups.push(groupEntity.toDto(GroupLocalStorage.DEFAULT_CONTAIN));
     }
     await browser.storage.local.set({groups: groups});
+    LocalStorageChangeService.triggerLocalStorageChangeEvent("groups", groups);
     lock.release();
   }
 
@@ -86,6 +88,7 @@ class GroupLocalStorage {
       const groups = await GroupLocalStorage.get();
       groups.push(groupEntity.toDto(GroupLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({groups: groups});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent("groups", groups);
       lock.release();
     } catch (error) {
       lock.release();
@@ -110,6 +113,7 @@ class GroupLocalStorage {
       }
       groups[groupIndex] = Object.assign(groups[groupIndex], groupEntity.toDto(GroupLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({groups: groups});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent("groups", groups);
       lock.release();
     } catch (error) {
       lock.release();
@@ -131,6 +135,7 @@ class GroupLocalStorage {
           groups.splice(groupIndex, 1);
         }
         await browser.storage.local.set({groups: groups});
+        LocalStorageChangeService.triggerLocalStorageChangeEvent("groups", groups);
         lock.release();
       }
     } catch (error) {

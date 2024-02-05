@@ -27,6 +27,10 @@ SystemRequirementService.get();
  * Add listener on passbolt logout
  */
 self.addEventListener("passbolt.auth.after-logout", LocalStorageService.flush);
+/**
+ * Add listener on passbolt logout
+ */
+self.addEventListener("passbolt.storage.update", PortManager.onStorageUpdate);
 
 /**
  * Add listener on startup

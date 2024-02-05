@@ -1,3 +1,5 @@
+import LocalStorageChangeService from "../service/local_storage/localStorageChangeService";
+
 /**
  * Local Storage Wrapper Class
  * Ref. PASSBOLT-1725
@@ -40,6 +42,8 @@ LocalStorage.prototype._store = function() {
       console.error(chrome.runtime.lastError.message);
     }
   });
+
+  LocalStorageChangeService.triggerLocalStorageChangeEvent("_passbolt_data", this._data);
 };
 
 /**

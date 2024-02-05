@@ -16,6 +16,7 @@ import Log from "../../model/log";
 import UserEntity from "../../model/entity/user/userEntity";
 import UsersCollection from "../../model/entity/user/usersCollection";
 import Lock from "../../utils/lock";
+import LocalStorageChangeService from "./localStorageChangeService";
 const lock = new Lock();
 
 const USER_LOCAL_STORAGE_KEY = 'users';
@@ -61,6 +62,7 @@ class UserLocalStorage {
       users.push(userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
     }
     await browser.storage.local.set({users: users});
+    LocalStorageChangeService.triggerLocalStorageChangeEvent("users", users);
     lock.release();
   }
 
@@ -86,6 +88,7 @@ class UserLocalStorage {
       const users = await UserLocalStorage.get();
       users.push(userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({users: users});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent("users", users);
       lock.release();
     } catch (error) {
       lock.release();
@@ -112,6 +115,7 @@ class UserLocalStorage {
         }
         users[userIndex] = Object.assign(users[userIndex], userEntity.toDto(UserLocalStorage.DEFAULT_CONTAIN));
         await browser.storage.local.set({users: users});
+        LocalStorageChangeService.triggerLocalStorageChangeEvent("users", users);
       }
       lock.release();
     } catch (error) {
@@ -134,6 +138,7 @@ class UserLocalStorage {
           users.splice(userIndex, 1);
         }
         await browser.storage.local.set({users: users});
+        LocalStorageChangeService.triggerLocalStorageChangeEvent("users", users);
         lock.release();
       }
     } catch (error) {

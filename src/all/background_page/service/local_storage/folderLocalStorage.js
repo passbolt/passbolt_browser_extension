@@ -16,6 +16,7 @@ import Log from "../../model/log";
 import FolderEntity from "../../model/entity/folder/folderEntity";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import Lock from "../../utils/lock";
+import LocalStorageChangeService from "./localStorageChangeService";
 const lock = new Lock();
 
 const FOLDER_LOCAL_STORAGE_KEY = 'folders';
@@ -61,6 +62,8 @@ class FolderLocalStorage {
       folders.push(folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
     }
     await browser.storage.local.set({folders: folders});
+
+    LocalStorageChangeService.triggerLocalStorageChangeEvent("folders", folders);
     lock.release();
   }
 
@@ -97,6 +100,7 @@ class FolderLocalStorage {
       const folders = await FolderLocalStorage.get();
       folders.push(folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({folders: folders});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent("folders", folders);
       lock.release();
     } catch (error) {
       lock.release();
@@ -117,6 +121,7 @@ class FolderLocalStorage {
         folders.push(folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
       });
       await browser.storage.local.set({folders: folders});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent("folders", folders);
       lock.release();
     } catch (error) {
       lock.release();
@@ -141,6 +146,7 @@ class FolderLocalStorage {
       }
       folders[folderIndex] = Object.assign(folders[folderIndex], folderEntity.toDto(FolderLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({folders: folders});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent("folders", folders);
       lock.release();
     } catch (error) {
       lock.release();
@@ -162,6 +168,7 @@ class FolderLocalStorage {
           folders.splice(folderIndex, 1);
         }
         await browser.storage.local.set({folders: folders});
+        LocalStorageChangeService.triggerLocalStorageChangeEvent("folders", folders);
         lock.release();
       }
     } catch (error) {

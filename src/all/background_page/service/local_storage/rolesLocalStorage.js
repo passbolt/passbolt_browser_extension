@@ -16,6 +16,7 @@ import Log from "../../model/log";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import RolesCollection from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection";
 import Lock from "../../utils/lock";
+import LocalStorageChangeService from "./localStorageChangeService";
 const lock = new Lock();
 
 const ROLES_LOCAL_STORAGE_KEY = 'roles';
@@ -62,6 +63,9 @@ class RolesLocalStorage {
       }
     }
     await browser.storage.local.set({roles: roles});
+
+    LocalStorageChangeService.triggerLocalStorageChangeEvent("roles", roles);
+
     lock.release();
   }
 
@@ -87,6 +91,7 @@ class RolesLocalStorage {
       const roles = await RolesLocalStorage.get();
       roles.push(roleEntity.toDto());
       await browser.storage.local.set({roles: roles});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent("roles", roles);
       lock.release();
     } catch (error) {
       lock.release();

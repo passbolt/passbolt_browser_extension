@@ -18,6 +18,7 @@ import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import Lock from "../../utils/lock";
 import {assertType} from "../../utils/assertions";
 import PasswordExpiryResourceEntity from "../../model/entity/passwordExpiry/passwordExpiryResourceEntity";
+import LocalStorageChangeService from "./localStorageChangeService";
 const lock = new Lock();
 
 const RESOURCES_LOCAL_STORAGE_KEY = 'resources';
@@ -64,6 +65,7 @@ class ResourceLocalStorage {
       }
     }
     await browser.storage.local.set({resources: resources});
+    LocalStorageChangeService.triggerLocalStorageChangeEvent("resources", resources);
     lock.release();
   }
 
@@ -90,6 +92,7 @@ class ResourceLocalStorage {
       const resources = await ResourceLocalStorage.get();
       resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
       await browser.storage.local.set({resources: resources});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent("resources", resources);
       lock.release();
     } catch (error) {
       lock.release();
@@ -110,6 +113,7 @@ class ResourceLocalStorage {
         resources.push(resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN));
       });
       await browser.storage.local.set({resources: resources});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent("resources", resources);
       lock.release();
     } catch (error) {
       lock.release();
@@ -133,6 +137,7 @@ class ResourceLocalStorage {
       }
       resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
       await browser.storage.local.set({resources: resources});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent("resources", resources);
       lock.release();
     } catch (error) {
       lock.release();
@@ -158,6 +163,7 @@ class ResourceLocalStorage {
         resources[resourceIndex] = resourceEntity.toDto(ResourceLocalStorage.DEFAULT_CONTAIN);
       }
       await browser.storage.local.set({resources: resources});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent("resources", resources);
       lock.release();
     } catch (error) {
       lock.release();
@@ -183,6 +189,7 @@ class ResourceLocalStorage {
         resources[resourceIndex].expired = passwordExpiryResourceEntity.expired;
       }
       await browser.storage.local.set({resources: resources});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent("resources", resources);
       lock.release();
     } catch (error) {
       lock.release();
@@ -204,6 +211,7 @@ class ResourceLocalStorage {
           resources.splice(resourceIndex, 1);
         }
         await browser.storage.local.set({resources: resources});
+        LocalStorageChangeService.triggerLocalStorageChangeEvent("resources", resources);
         lock.release();
       }
     } catch (error) {
@@ -268,6 +276,7 @@ class ResourceLocalStorage {
       const resourceIndex = resources.findIndex(item => item.id === resource.id);
       resources[resourceIndex] = resource;
       await browser.storage.local.set({resources: resources});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent("resources", resources);
       lock.release();
     } catch (error) {
       lock.release();

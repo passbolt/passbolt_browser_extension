@@ -16,6 +16,7 @@ import Log from "../../model/log";
 import ResourceTypeEntity from "../../model/entity/resourceType/resourceTypeEntity";
 import ResourceTypesCollection from "../../model/entity/resourceType/resourceTypesCollection";
 import Lock from "../../utils/lock";
+import LocalStorageChangeService from "./localStorageChangeService";
 const lock = new Lock();
 
 const RESOURCE_TYPES_LOCAL_STORAGE_KEY = 'resourceTypes';
@@ -62,6 +63,7 @@ class ResourceTypeLocalStorage {
       }
     }
     await browser.storage.local.set({resourceTypes: resourceTypes});
+    LocalStorageChangeService.triggerLocalStorageChangeEvent("resourceTypes", resourceTypes);
     lock.release();
   }
 
@@ -87,6 +89,7 @@ class ResourceTypeLocalStorage {
       const resourceTypes = await ResourceTypeLocalStorage.get();
       resourceTypes.push(resourceTypeEntity.toDto());
       await browser.storage.local.set({resourceTypes: resourceTypes});
+      LocalStorageChangeService.triggerLocalStorageChangeEvent("resourceTypes", resourceTypes);
       lock.release();
     } catch (error) {
       lock.release();

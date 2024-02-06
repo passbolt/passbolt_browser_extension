@@ -121,7 +121,7 @@ class PortManager {
    */
   async updateWorkerStatus(worker) {
     worker.status = WorkerEntity.STATUS_CONNECTED;
-    await WorkersSessionStorage.updateWorker(worker);
+    WorkersSessionStorage.updateWorker(worker);
   }
 
   /**

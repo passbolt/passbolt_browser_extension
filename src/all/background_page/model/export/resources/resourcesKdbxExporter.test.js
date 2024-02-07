@@ -63,8 +63,8 @@ describe("ResourcesKdbxExporter", () => {
     await kdbxweb.Kdbx.load(exportEntity.file, kdbxCredentials);
   });
 
-  it("should export resources and folders", async() => {
-    expect.assertions(16);
+  it("should export resources and folders for keepass windows", async() => {
+    expect.assertions(19);
 
     const now = new Date();
     now.setMilliseconds(0);
@@ -77,6 +77,73 @@ describe("ResourcesKdbxExporter", () => {
     const exportResource4 = buildImportResourceDto(4, {"expired": now.toISOString()});
     const exportDto = {
       "format": "kdbx",
+      "export_resources": [exportResource1, exportResource2, exportResource3, exportResource4],
+      "export_folders": [exportFolder1, exportFolder2]
+    };
+
+    const exportEntity = new ExportResourcesFileEntity(exportDto);
+    const exporter = new ResourcesKdbxExporter(exportEntity);
+    await exporter.export();
+
+    expect(exportEntity.file).toBeInstanceOf(ArrayBuffer);
+
+    const kdbxCredentials = new kdbxweb.Credentials(null, null);
+    const kdbxDb = await kdbxweb.Kdbx.load(exportEntity.file, kdbxCredentials);
+
+    const kdbxRoot = kdbxDb.groups[0];
+    const password1 = kdbxRoot.entries[0];
+    const password4 = kdbxRoot.entries[1];
+
+    const kdbxBin = kdbxRoot.groups[0];
+
+    const folder1 = kdbxRoot.groups[1];
+    const password2 = folder1.entries[0];
+
+    const folder2 = folder1.groups[0];
+    const password3 = folder2.entries[0];
+
+    expect(kdbxRoot.name).toEqual("passbolt export");
+    expect(kdbxBin.name).toEqual("Recycle Bin");
+    expect(folder1.name).toEqual("Folder 1");
+
+    expect(password1.fields.get('Title')).toEqual("Password 1");
+    expect(password1.times.expires).toStrictEqual(false);
+    expect(password1.times.expiryTime).toBeUndefined();
+
+    expect(password1.fields.get('Password').getText()).toEqual("Secret 1");
+    const secret_key = password1.fields.get('TimeOtp-Secret-Base32').getText();
+    const algorithm = password1.fields.get('TimeOtp-Algorithm');
+    const digits = password1.fields.get('TimeOtp-Length');
+    const period = password1.fields.get('TimeOtp-Period');
+    expect(secret_key).toEqual("DAV3DS4ERAAF5QGH");
+    expect(algorithm).toEqual("HMAC-SHA-1");
+    expect(digits).toEqual("6");
+    expect(period).toEqual("30");
+
+    expect(password4.fields.get('Title')).toEqual("Password 4");
+    expect(password4.times.expires).toStrictEqual(true);
+    expect(password4.times.expiryTime).toStrictEqual(new Date(now));
+
+    expect(folder2.name).toEqual("Folder 2");
+    expect(password2.fields.get('Title')).toEqual("Password 2");
+    expect(kdbxDb.groups[0].groups[1].entries[0].fields.get('otp')).toBeUndefined();
+    expect(password3.fields.get('Title')).toEqual("Password 3");
+  });
+
+  it("should export resources and folders for other keepass", async() => {
+    expect.assertions(16);
+
+    const now = new Date();
+    now.setMilliseconds(0);
+
+    const exportFolder1 = buildExternalFolderDto(1);
+    const exportFolder2 = buildExternalFolderDto(2, {"folder_parent_path": "Folder 1", "folder_parent_id": exportFolder1.id});
+    const exportResource1 = buildImportResourceDto(1);
+    const exportResource2 = buildImportResourceDto(2, {"folder_parent_path": "Folder 1", "folder_parent_id": exportFolder1.id, totp: undefined});
+    const exportResource3 = buildImportResourceDto(3, {"folder_parent_path": "Folder 1/Folder2", "folder_parent_id": exportFolder2.id});
+    const exportResource4 = buildImportResourceDto(4, {"expired": now.toISOString()});
+    const exportDto = {
+      "format": "kdbx-others",
       "export_resources": [exportResource1, exportResource2, exportResource3, exportResource4],
       "export_folders": [exportFolder1, exportFolder2]
     };

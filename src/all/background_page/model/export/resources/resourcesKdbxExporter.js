@@ -13,6 +13,7 @@
 import ExternalFolderEntity from "../../entity/folder/external/externalFolderEntity";
 import * as kdbxweb from 'kdbxweb';
 import TotpEntity from "../../entity/totp/totpEntity";
+import ExportResourcesFileEntity from "../../entity/export/exportResourcesFileEntity";
 
 class ResourcesKdbxExporter {
   /**
@@ -91,8 +92,7 @@ class ResourcesKdbxExporter {
       kdbxEntry.fields.set('Password', kdbxweb.ProtectedValue.fromString(externalResourceEntity.secretClear));
     }
     if (externalResourceEntity.totp) {
-      const totpUrl = this.createUrlTotp(externalResourceEntity);
-      kdbxEntry.fields.set('otp', kdbxweb.ProtectedValue.fromString(totpUrl.toString()));
+      this.setTotpField(kdbxEntry, externalResourceEntity);
     }
     kdbxEntry.fields.set('URL', externalResourceEntity.uri);
     kdbxEntry.fields.set('Notes', externalResourceEntity.description);
@@ -101,20 +101,37 @@ class ResourcesKdbxExporter {
       kdbxEntry.times.expiryTime = new Date(externalResourceEntity.expired);
       kdbxEntry.times.expires = true;
     } else {
-      //explictly set the expiryTime to undefined as it seems that it takes the current time otherwise
+      //explicitly set the expiryTime to undefined as it seems that it takes the current time otherwise
       kdbxEntry.times.expiryTime = undefined;
       kdbxEntry.times.expires = false;
     }
   }
 
   /**
-   * Create url totp
-   * @param {ExternalResourceEntity} externalResourceEntity The resource to export
-   * @return {URL} The url totp
+   * Set the TOTP fields according to the kdbx format
+   * @param {kdbxweb.KdbxEntry} kdbxEntry
+   * @param {ExternalResourceEntity} externalResourceEntity
    */
-  createUrlTotp(externalResourceEntity) {
+  setTotpField(kdbxEntry, externalResourceEntity) {
     const totp = new TotpEntity(externalResourceEntity.totp);
-    return totp.createUrlFromResource(externalResourceEntity);
+    switch (this.exportEntity.format) {
+      case ExportResourcesFileEntity.FORMAT_KDBX: {
+        kdbxEntry.fields.set('TimeOtp-Secret-Base32', kdbxweb.ProtectedValue.fromString(totp.secret_key));
+        // Adapt algorithm to match keepass windows
+        const algorithm = `HMAC-${totp.algorithm.substring(0, 3)}-${totp.algorithm.substring(3)}`;
+        kdbxEntry.fields.set('TimeOtp-Algorithm', algorithm);
+        kdbxEntry.fields.set('TimeOtp-Length', totp.digits.toString());
+        kdbxEntry.fields.set('TimeOtp-Period', totp.period.toString());
+        break;
+      }
+      case ExportResourcesFileEntity.FORMAT_KDBX_OTHERS: {
+        const totpUrl = totp.createUrlFromResource(externalResourceEntity);
+        kdbxEntry.fields.set('otp', kdbxweb.ProtectedValue.fromString(totpUrl.toString()));
+        break;
+      }
+      default:
+        break;
+    }
   }
 }
 

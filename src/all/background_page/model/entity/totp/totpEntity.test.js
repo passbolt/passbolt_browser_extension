@@ -16,6 +16,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import {defaultTotpViewModelDto} from 'passbolt-styleguide/src/shared/models/totp/TotpDto.test.data';
 import TotpEntity from "./totpEntity";
 import each from "jest-each";
+import {lowerCaseAlgorithmSetupTotpData} from "../mfa/mfaSetupTotpEntity.test.data";
 
 describe("Totp entity", () => {
   it("schema must validate", () => {
@@ -26,6 +27,12 @@ describe("Totp entity", () => {
     const dto = defaultTotpViewModelDto();
     const entity = new TotpEntity(dto);
     expect(entity.toDto()).toEqual(dto);
+  });
+
+  it("CreateTotpFromUrl should work with lowercase algorithm", () => {
+    const otpUrlData = lowerCaseAlgorithmSetupTotpData();
+    const url = new URL(otpUrlData.otpProvisioningUri);
+    expect(() => TotpEntity.createTotpFromUrl(url)).not.toThrow();
   });
 
   each([

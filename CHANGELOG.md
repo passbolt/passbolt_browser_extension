@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [4.5.1] - 2024-02-09
+### Fixed
+- PB-29626 As a user I should retrieve the csrf token if the instance is running from a sub-folder
+
 ## [4.5.0] - 2024-02-05
 ### Added
 - PB-28679 As an administrator I can set advanced password expiry settings
@@ -1453,8 +1457,9 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.5.0...HEAD
-[4.4.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.4.2...v.4.5.0
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.5.1...HEAD
+[4.5.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.5.0...v.4.5.1
+[4.5.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.4.2...v.4.5.0
 [4.4.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.4.0...v.4.4.2
 [4.4.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.3.1...v.4.4.0
 [4.3.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.3.0...v.4.3.1

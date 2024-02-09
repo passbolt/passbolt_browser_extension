@@ -22,6 +22,7 @@ import MfaVerifyProviderEntity from "../entity/mfa/mfaVerifyProviderEntity";
 import {defaultMfaProviderData} from "../entity/mfa/mfaProviderEntity.test.data";
 import MfaSetupTotpEntity from "../entity/mfa/mfaSetupTotpEntity";
 import MfaProviderEntity from "../entity/mfa/mfaProviderEntity";
+import {defaultTotpQrCodeData} from "../entity/mfa/mfaTotpSetupInfoEntity.test.data";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -67,5 +68,17 @@ describe("MultiFactorAuthenticationModel", () => {
     await model.removeProvider(new MfaProviderEntity(defaultMfaProviderData()));
 
     expect(model.multiFactorAuthenticationService.removeProvider).toHaveBeenCalledWith("totp");
+  });
+
+  it("Should retrieve the QR code uri from API", async() => {
+    expect.assertions(2);
+    jest.spyOn(model.multiFactorAuthenticationService, "getMfaToTpSetupInfo");
+
+    fetch.doMock(() => mockApiResponse(defaultTotpQrCodeData()));
+
+    const result = await model.getMfaToTpSetupInfo();
+
+    expect(model.multiFactorAuthenticationService.getMfaToTpSetupInfo).toHaveBeenCalled();
+    expect(result).toEqual(defaultTotpQrCodeData().otpProvisioningUri);
   });
 });

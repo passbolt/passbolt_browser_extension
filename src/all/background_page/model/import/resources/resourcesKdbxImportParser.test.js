@@ -18,13 +18,13 @@ import * as kdbxweb from "kdbxweb";
 import ResourcesKdbxImportParser from "./resourcesKdbxImportParser";
 import ImportResourcesFileEntity from "../../entity/import/importResourcesFileEntity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import {defaultTotpViewModelDto} from "passbolt-styleguide/src/shared/models/totp/TotpDto.test.data";
 import ImportError from "../../../error/importError";
 import ResourceTypesCollection from "../../entity/resourceType/resourceTypesCollection";
 import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {
   TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import {defaultTotpDto} from "../../entity/totp/totpDto.test.data";
 
 describe("ResourcesKdbxImportParser", () => {
   it("should read import file", async() => {
@@ -197,7 +197,7 @@ describe("ResourcesKdbxImportParser", () => {
     await parser.parseImport();
 
     // Assert resources
-    const totp = defaultTotpViewModelDto({secret_key: "TJSNMLGTCYOEMXZG"});
+    const totp = defaultTotpDto({secret_key: "TJSNMLGTCYOEMXZG"});
     expect(importEntity.importResources.items).toHaveLength(2);
     const resource1Dto = buildExternalResourceDto(1, {totp: totp, folder_parent_path: "import-ref/Root", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP, expired: "2023-11-10T08:09:04.000Z"});
     expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource1Dto]));

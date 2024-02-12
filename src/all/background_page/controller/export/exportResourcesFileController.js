@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.13.0
  */
-import User from "../../model/user";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 import ResourceModel from "../../model/resource/resourceModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
@@ -51,14 +50,12 @@ class ExportResourcesFileController {
    * @return {Promise}
    */
   async exec(exportResourcesFileDto) {
-    const userId = User.getInstance().get().id;
-
     try {
       this.progressService.start(INITIAL_PROGRESS_GOAL, i18n.t("Generate file"));
       const exportEntity = new ExportResourcesFileEntity(exportResourcesFileDto);
       await this.prepareExportContent(exportEntity);
       const privateKey = await this.getPrivateKey();
-      await this.decryptSecrets(exportEntity, userId, privateKey);
+      await this.decryptSecrets(exportEntity, privateKey);
       await this.export(exportEntity);
       await this.download(exportEntity);
       await this.progressService.finishStep(i18n.t('Done'), true);
@@ -100,12 +97,11 @@ class ExportResourcesFileController {
   /**
    * Decrypt the secrets.
    * @param {ExportResourcesFileEntity} exportEntity The export object
-   * @param {string} userId The user id to decrypt the secret for
    * @param {openpgp.PrivateKey} privateKey the encrypted private key for resource decryption
    * @returns {Promise<void>}
    * @todo UserId variable does not seem to be used.
    */
-  async decryptSecrets(exportEntity, userId, privateKey) {
+  async decryptSecrets(exportEntity, privateKey) {
     let i = 0;
     for (const exportResourceEntity of exportEntity.exportResources.items) {
       i++;
@@ -115,6 +111,7 @@ class ExportResourcesFileController {
       const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(exportResourceEntity.secrets.items[0], secretSchema, privateKey);
       exportResourceEntity.secretClear = plaintextSecret.password;
       exportResourceEntity.description = plaintextSecret?.description || exportResourceEntity.description;
+      exportResourceEntity.totp = plaintextSecret?.totp;
     }
   }
 

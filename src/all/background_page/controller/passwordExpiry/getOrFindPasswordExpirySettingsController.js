@@ -14,9 +14,9 @@
 import PasswordExpirySettingsGetOrFindService
   from "../../service/passwordExpirySettings/passwordExpirySettingsGetOrFindService";
 
-class FindPasswordExpirySettingsController {
+class GetOrFindPasswordExpirySettingsController {
   /**
-   * FindPasswordExpirySettingsController constructor
+   * GetOrFindPasswordExpirySettingsController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {AccountEntity} account the user account
@@ -30,11 +30,12 @@ class FindPasswordExpirySettingsController {
 
   /**
    * Controller executor.
+   * @param {boolean} refreshCache
    * @returns {Promise<void>}
    */
-  async _exec() {
+  async _exec(refreshCache = false) {
     try {
-      const settings = await this.exec();
+      const settings = await this.exec(refreshCache);
       this.worker.port.emit(this.requestId, "SUCCESS", settings);
     } catch (error) {
       console.error(error);
@@ -44,11 +45,12 @@ class FindPasswordExpirySettingsController {
 
   /**
    * Retrieve the current password expiry settings.
+   * @param {boolean} refreshCache
    * @returns {Promise<PasswordExpirySettingsEntity>}
    */
-  async exec() {
-    return await this.passwordExpirySettingsGetOrFindService.exec();
+  async exec(refreshCache = false) {
+    return await this.passwordExpirySettingsGetOrFindService.exec(refreshCache);
   }
 }
 
-export default FindPasswordExpirySettingsController;
+export default GetOrFindPasswordExpirySettingsController;

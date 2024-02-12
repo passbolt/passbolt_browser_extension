@@ -51,6 +51,23 @@ describe("Totp entity", () => {
     });
   });
 
+  it("constructor works if valid kdbx windows is provided", () => {
+    expect.assertions(1);
+    const fields = new Map();
+    fields.set("TimeOtp-Secret-Base32", {getText: () => "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA"});
+    fields.set("TimeOtp-Algorithm", "HMAC-SHA-256");
+    fields.set("TimeOtp-Length", "7");
+    fields.set("TimeOtp-Period", "60");
+    const entity = TotpEntity.createTotpFromKdbxWindows(fields);
+    const dto = {
+      secret_key: "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA",
+      period: 60,
+      digits: 7,
+      algorithm: "SHA256"
+    };
+    expect(entity.toDto()).toEqual(dto);
+  });
+
   it("constructor works if valid url is provided", () => {
     expect.assertions(1);
     const url = new URL('otpauth://totp/pro.passbolt.local:admin@passbolt.com?issuer=pro.passbolt.local&secret=OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA');

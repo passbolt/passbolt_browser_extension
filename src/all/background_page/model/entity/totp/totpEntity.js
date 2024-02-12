@@ -154,6 +154,21 @@ class TotpEntity extends Entity {
     return new TotpEntity(totp);
   }
 
+  /**
+   * Create TOTP from kdbx windows
+   * @param fields {Object}
+   * @return {TotpEntity}
+   */
+  static createTotpFromKdbxWindows(fields) {
+    const totp = {
+      secret_key: fields.get('TimeOtp-Secret-Base32').getText().toUpperCase(),
+      algorithm: fields.get('TimeOtp-Algorithm')?.slice(5).replace('-', '') || SUPPORTED_ALGORITHMS[0],
+      digits:  parseInt(fields.get('TimeOtp-Length'), 10) || 6,
+      period: parseInt(fields.get('TimeOtp-Period'), 10) || 30
+    };
+    return new TotpEntity(totp);
+  }
+
   /*
    * ==================================================
    * Static properties getters

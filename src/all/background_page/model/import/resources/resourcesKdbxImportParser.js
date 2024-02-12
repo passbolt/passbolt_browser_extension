@@ -137,28 +137,44 @@ class ResourcesKdbxImportParser {
     if (typeof kdbxEntry.fields.get('Password') === 'object') {
       externalResourceDto.secret_clear = kdbxEntry.fields.get('Password').getText();
     }
-    if (typeof kdbxEntry.fields.get('otp') === 'object') {
-      const totpUrl = new URL(decodeURIComponent(kdbxEntry.fields.get('otp').getText()));
-      const totp = TotpEntity.createTotpFromUrl(totpUrl);
-      externalResourceDto.totp = totp.toDto();
-      resourceTypeSlug = RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG;
-    }
-
-    // @todo pebble
-    const resourceType = this.parseResourceType(resourceTypeSlug);
-    if (resourceType) {
-      externalResourceDto.resource_type_id = resourceType.id;
-    }
-
-    // Sanitize.
-    if (!externalResourceDto.name.length) {
-      externalResourceDto.name = ExternalResourceEntity.DEFAULT_RESOURCE_NAME;
-    }
-
     try {
+      const totp = this.getTotp(kdbxEntry);
+      if (totp) {
+        externalResourceDto.totp = totp;
+        resourceTypeSlug = RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG;
+      }
+
+      // @todo pebble
+      const resourceType = this.parseResourceType(resourceTypeSlug);
+      if (resourceType) {
+        externalResourceDto.resource_type_id = resourceType.id;
+      }
+
+      // Sanitize.
+      if (!externalResourceDto.name.length) {
+        externalResourceDto.name = ExternalResourceEntity.DEFAULT_RESOURCE_NAME;
+      }
+
       this.importEntity.importResources.push(externalResourceDto);
     } catch (error) {
       this.importEntity.importResourcesErrors.push(new ImportError("Cannot parse resource", externalResourceDto, error));
+    }
+  }
+
+  /**
+   * Get the totp
+   * @param {kdbxweb.KdbxEntry} kdbxEntry
+   * @return {*}
+   */
+  getTotp(kdbxEntry) {
+    if (kdbxEntry.fields.get('otp')) {
+      const totpUrl = typeof kdbxEntry.fields.get('otp') === 'object' ? kdbxEntry.fields.get('otp').getText() : kdbxEntry.fields.get('otp');
+      const totpUrlDecoded = new URL(decodeURIComponent(totpUrl));
+      const totp = TotpEntity.createTotpFromUrl(totpUrlDecoded);
+      return totp.toDto();
+    } else if (typeof kdbxEntry.fields.get('TimeOtp-Secret-Base32') === 'object') {
+      const totp = TotpEntity.createTotpFromKdbxWindows(kdbxEntry.fields);
+      return totp.toDto();
     }
   }
 

@@ -38,10 +38,11 @@ class PasswordExpirySettingsGetOrFindService {
 
   /**
    * Get or find the password expiry settings in local storage.
+   * @param {boolean} refreshCache
    * @return {Promise<PasswordExpirySettingsEntity>}
    */
-  async exec() {
-    return await navigator.locks.request(this.storageKey, async() => await this.passwordExpirySettingsModel.getOrFindOrDefault());
+  async exec(refreshCache = false) {
+    return await navigator.locks.request(this.storageKey, async() => await this.passwordExpirySettingsModel.getOrFindOrDefault(refreshCache));
   }
 }
 

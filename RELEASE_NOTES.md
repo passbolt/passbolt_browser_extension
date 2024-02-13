@@ -1,4 +1,4 @@
-Passbolt is pleased to announce that the v4.5.2 Release Candidate is officially available for testing. This release contains some important bug fixes for issues reported by the community. As always, your feedback is invaluable, please share and report any issues you come across.
+Passbolt is pleased to announce that the v4.5.2 is officially available. This release contains some important bug fixes for issues reported by the community. As always, your feedback is invaluable, please share and report any issues you come across.
 
 Thank you for your support! ♥️
 

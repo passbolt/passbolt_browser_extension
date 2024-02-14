@@ -17,6 +17,7 @@ import MultiFactorAuthenticationPolicyService from '../../service/api/multiFacto
 import MfaPolicyEntity from '../entity/mfa/mfaPolicyEntity';
 import MfaCombinedEnabledProvidersEntity from '../entity/mfa/mfaCombinedEnabledProvidersEntity';
 import MfaVerifyProviderEntity from "../entity/mfa/mfaVerifyProviderEntity";
+import MfaTotpSetupInfoEntity from "../entity/mfa/mfaTotpSetupInfoEntity";
 
 class MultiFactorAuthenticationModel {
   /**
@@ -56,6 +57,17 @@ class MultiFactorAuthenticationModel {
   async getPolicy() {
     const policy = await this.multiFactorAuthenticationPolicyService.find();
     return new MfaPolicyEntity(policy);
+  }
+
+  /**
+   * Return the otp setup info
+   * @returns {Promise<string>}
+   * @public
+   */
+  async getMfaToTpSetupInfo() {
+    const dto = await this.multiFactorAuthenticationService.getMfaToTpSetupInfo();
+    const QRCode = new MfaTotpSetupInfoEntity(dto).toDto();
+    return QRCode.otpProvisioningUri;
   }
 
   /**

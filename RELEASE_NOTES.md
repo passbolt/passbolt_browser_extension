@@ -1,13 +1,14 @@
-Release song: https://youtu.be/6JNwqRF32ZI
+Passbolt is pleased to announce that the v4.5.2 is officially available. This release contains some important bug fixes for issues reported by the community. As always, your feedback is invaluable, please share and report any issues you come across.
 
-Passbolt version 4.4.2 has been released, primarily as a maintenance update to address specific issues reported by users. This version includes two main fixes.
+Thank you for your support! ♥️
 
-The first fix concerns the Time-based One-Time Password (TOTP) feature. In the previous version, there was an issue where users could accidentally delete the TOTP secret for a resource while editing its description from the sidebar. This has been corrected in the latest update.
+## [4.5.2] - 2024-02-12
+### Added
+- PB-28672 As a user exporting resources I should also export TOTPs
 
-The second fix improves the performance of the application, specifically when users are retrieving their resources. This update is part of an ongoing effort to enhance the overall performance of the application, with further improvements planned for future releases.
-
-We extend our gratitude to the community member who reported [this issue](https://github.com/passbolt/passbolt_docker/issues/219).
-
-## [4.4.2] - 2023-11-06
 ### Fixed
-- PB-28880 Fix resource with TOTP when description is updated from information panel
+- PB-25865 As a signed-in user I can autofill credentials using input and change events
+- PB-29258 As a signed-in user with a large dataset I can select a resource quickly
+- PB-29548 As a signed-in administrator I should refresh password expiry cache when navigating to the password expiry administration page
+- PB-29560 As a user importing a resources from a Windows keepass kdbx I should also import TOTPs
+- PB-29606 As a user exporting a resources to a Windows keepass kdbx I should also export TOTPs

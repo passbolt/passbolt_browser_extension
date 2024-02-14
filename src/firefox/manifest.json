@@ -2,10 +2,10 @@
   "manifest_version": 2,
   "name": "__MSG_appName__",
   "short_name": "passbolt",
-  "version": "4.4.2",
+  "version": "4.5.2",
   "description": "__MSG_appDescription__",
   "default_locale": "en",
-  "applications": {
+  "browser_specific_settings": {
     "gecko": {
       "id": "passbolt@passbolt.com",
       "strict_min_version": "115.0"

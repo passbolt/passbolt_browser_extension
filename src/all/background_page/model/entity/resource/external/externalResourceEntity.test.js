@@ -15,7 +15,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import ExternalResourceEntity from "./externalResourceEntity";
 import ExternalFolderEntity from "../../folder/external/externalFolderEntity";
 import {v4 as uuidv4} from "uuid";
-import {defaultTotpViewModelDto} from 'passbolt-styleguide/src/shared/models/totp/TotpDto.test.data';
+import {defaultTotpDto} from "../../totp/totpDto.test.data";
 
 describe("ExternalResourceEntity", () => {
   it("schema must validate", () => {
@@ -48,7 +48,7 @@ describe("ExternalResourceEntity", () => {
   it("constructor works if valid fields DTO is provided", () => {
     expect.assertions(12);
     const id = uuidv4();
-    const totp = defaultTotpViewModelDto();
+    const totp = defaultTotpDto();
     const dto = {
       "id": id,
       "name": "Password 1",
@@ -80,7 +80,7 @@ describe("ExternalResourceEntity", () => {
     expect(entity.folderParentPath).toEqual("");
     expect(entity.totp).toEqual(result.totp);
     expect(entity.secrets).toBeUndefined();
-    entity.totp = defaultTotpViewModelDto({secret_key: "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA"});
+    entity.totp = defaultTotpDto({secret_key: "OFL3VF3OU4BZP45D4ZME6KTF654JRSSO4Q2EO6FJFGPKHRHYSVJA"});
     expect(entity.totp.secret_key !== result.totp.secret_key).toBeTruthy();
   });
 

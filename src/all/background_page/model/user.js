@@ -286,7 +286,8 @@ const User = (function() {
    * @return {Promise<void>}
    */
   this.retrieveAndStoreCsrfToken = async function() {
-    const csrfToken = await browser.cookies.get({name: "csrfToken", url: this.settings.getDomain()});
+    const url = this.settings.getDomain().slice(-1) === "/" ? this.settings.getDomain() : `${this.settings.getDomain()}/`;
+    const csrfToken = await browser.cookies.get({name: "csrfToken", url: url});
     this.setCsrfToken(csrfToken?.value);
   };
 

@@ -80,10 +80,58 @@ class TotpEntity extends Entity {
    */
   /**
    * Get resource id
-   * @returns {(string|null)} uuid
+   * @returns {string} base32 secret key
    */
   get secret_key() {
     return this._props.secret_key;
+  }
+
+  /**
+   * Get period
+   * @returns {numbers} period
+   */
+  get period() {
+    return this._props.period;
+  }
+
+  /**
+   * Get digits
+   * @returns {numbers} digits
+   */
+  get digits() {
+    return this._props.digits;
+  }
+
+  /**
+   * Get algorithm
+   * @returns {string} algorithm
+   */
+  get algorithm() {
+    return this._props.algorithm;
+  }
+
+  /*
+   * ==================================================
+   * Methods
+   * ==================================================
+   */
+  /**
+   * Create URL from TOTP
+   * @param {ExternalResourceEntity} resource
+   * @return {URL}
+   */
+  createUrlFromResource(resource) {
+    const name = resource.username ? `${resource.name}:${resource.username}` : resource.name;
+    const url = new URL(`otpauth://totp/${encodeURIComponent(name)}`);
+    url.searchParams.append("secret", this.secret_key.replaceAll(/\s+/g, "").toUpperCase());
+    // Add issuer in the TOTP url if any
+    if (resource.uri.length > 0) {
+      url.searchParams.append("issuer", encodeURIComponent(resource.uri));
+    }
+    url.searchParams.append("algorithm", this.algorithm);
+    url.searchParams.append("digits", this.digits.toString());
+    url.searchParams.append("period", this.period.toString());
+    return url;
   }
 
   /*
@@ -102,6 +150,21 @@ class TotpEntity extends Entity {
       algorithm: url.searchParams.get('algorithm')?.toUpperCase() || SUPPORTED_ALGORITHMS[0],
       digits: parseInt(url.searchParams.get('digits'), 10) || 6,
       period: parseInt(url.searchParams.get('period'), 10) || 30,
+    };
+    return new TotpEntity(totp);
+  }
+
+  /**
+   * Create TOTP from kdbx windows
+   * @param fields {Object}
+   * @return {TotpEntity}
+   */
+  static createTotpFromKdbxWindows(fields) {
+    const totp = {
+      secret_key: fields.get('TimeOtp-Secret-Base32').getText().toUpperCase(),
+      algorithm: fields.get('TimeOtp-Algorithm')?.slice(5).replace('-', '') || SUPPORTED_ALGORITHMS[0],
+      digits:  parseInt(fields.get('TimeOtp-Length'), 10) || 6,
+      period: parseInt(fields.get('TimeOtp-Period'), 10) || 30
     };
     return new TotpEntity(totp);
   }

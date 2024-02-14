@@ -34,14 +34,19 @@ class PasswordExpirySettingsModel {
   }
 
   /**
-   * Find the current password expiry settings from the API.
+   * Get the password expiry data from the local storage or find it from the API.
    * The API can send data that is not compatible with what's expected (like CE settings when the PRO is expected)
    * In this case, an exception is catch and we ignore the settings and build new one from scratch to avoid
    * the styleguide to crash.
+   * @param {boolean} refreshCache
    * @returns {Promise<PasswordExpirySettingsEntity>}
    */
-  async getOrFindOrDefault() {
+  async getOrFindOrDefault(refreshCache = false) {
     try {
+      if (refreshCache) {
+        await this.passwordExpirySettingsLocalStorage.flush();
+      }
+
       let passwordExpirySettingsDto = await this.passwordExpirySettingsLocalStorage.get();
       if (!passwordExpirySettingsDto) {
         passwordExpirySettingsDto = await this.passwordExpirySettingsService.find();

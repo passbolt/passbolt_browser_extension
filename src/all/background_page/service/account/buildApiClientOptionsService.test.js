@@ -30,9 +30,10 @@ describe("BuildAccountApiClientOptionsService", () => {
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(account.domain));
     expect(apiClientOptions.csrfToken.token).toStrictEqual(csrfToken);
-    expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: account.domain});
+    expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: `${account.domain}/`});
   });
-  it("BuildAccountApiClientOptionsService:buildFromDomain", async() => {
+
+  it("BuildAccountApiClientOptionsService:buildFromDomain with no subdomain", async() => {
     expect.assertions(3);
     // data
     const csrfToken = "csrf-token";
@@ -44,6 +45,36 @@ describe("BuildAccountApiClientOptionsService", () => {
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
     expect(apiClientOptions.csrfToken.token).toStrictEqual(csrfToken);
+    expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: `${domain}/`});
+  });
+
+  it("BuildAccountApiClientOptionsService:buildFromDomain with slash at the end of a trusted domain", async() => {
+    expect.assertions(3);
+    // data
+    const csrfToken = "csrf-token";
+    const domain = "https://passbolt.local/";
+    // mocked function
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
+    // execution
+    const apiClientOptions = await BuildApiClientOptionsService.buildFromDomain(domain);
+    // expectations
+    expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
+    expect(apiClientOptions.csrfToken.token).toStrictEqual(csrfToken);
     expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: domain});
+  });
+
+  it("BuildAccountApiClientOptionsService:buildFromDomain with subdomain", async() => {
+    expect.assertions(3);
+    // data
+    const csrfToken = "csrf-token";
+    const domain = "https://passbolt.local/test";
+    // mocked function
+    jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
+    // execution
+    const apiClientOptions = await BuildApiClientOptionsService.buildFromDomain(domain);
+    // expectations
+    expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
+    expect(apiClientOptions.csrfToken.token).toStrictEqual(csrfToken);
+    expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: `${domain}/`});
   });
 });

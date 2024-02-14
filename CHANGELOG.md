@@ -3,6 +3,21 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [4.5.2] - 2024-02-12
+### Added
+- PB-28672 As a user exporting resources I should also export TOTPs
+
+### Fixed
+- PB-25865 As a signed-in user I can autofill credentials using input and change events
+- PB-29258 As a signed-in user with a large dataset I can select a resource quickly
+- PB-29548 As a signed-in administrator I should refresh password expiry cache when navigating to the password expiry administration page
+- PB-29560 As a user importing a resources from a Windows keepass kdbx I should also import TOTPs
+- PB-29606 As a user exporting a resources to a Windows keepass kdbx I should also export TOTPs
+
+## [4.5.1] - 2024-02-09
+### Fixed
+- PB-29626 As a user I should retrieve the csrf token if the instance is running from a sub-folder
+
 ## [4.5.0] - 2024-02-05
 ### Added
 - PB-28679 As an administrator I can set advanced password expiry settings
@@ -1453,8 +1468,10 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.5.0...HEAD
-[4.4.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.4.2...v.4.5.0
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.5.2...HEAD
+[4.5.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.5.1...v.4.5.2
+[4.5.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.5.0...v.4.5.1
+[4.5.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.4.2...v.4.5.0
 [4.4.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.4.0...v.4.4.2
 [4.4.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.3.1...v.4.4.0
 [4.3.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.3.0...v.4.3.1

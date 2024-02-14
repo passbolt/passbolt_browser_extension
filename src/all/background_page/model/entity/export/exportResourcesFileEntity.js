@@ -17,6 +17,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 
 const ENTITY_NAME = "ExportResourcesFileEntity";
 const FORMAT_KDBX = "kdbx";
+const FORMAT_KDBX_OTHERS = "kdbx-others";
 const FORMAT_CSV_KDBX = "csv-kdbx";
 const FORMAT_CSV_LASTPASS = "csv-lastpass";
 const FORMAT_CSV_1PASSWORD = "csv-1password";
@@ -274,6 +275,7 @@ class ExportResourcesFileEntity extends Entity {
   static get SUPPORTED_FORMAT() {
     return [
       ExportResourcesFileEntity.FORMAT_KDBX,
+      ExportResourcesFileEntity.FORMAT_KDBX_OTHERS,
       ExportResourcesFileEntity.FORMAT_CSV_KDBX,
       ExportResourcesFileEntity.FORMAT_CSV_LASTPASS,
       ExportResourcesFileEntity.FORMAT_CSV_1PASSWORD,
@@ -293,6 +295,14 @@ class ExportResourcesFileEntity extends Entity {
    */
   static get FORMAT_KDBX() {
     return FORMAT_KDBX;
+  }
+
+  /**
+   * ExportResourcesFileEntity.FORMAT_KDBX_OTHERS
+   * @returns {string}
+   */
+  static get FORMAT_KDBX_OTHERS() {
+    return FORMAT_KDBX_OTHERS;
   }
 
   /**

@@ -18,13 +18,14 @@ import * as kdbxweb from "kdbxweb";
 import ResourcesKdbxImportParser from "./resourcesKdbxImportParser";
 import ImportResourcesFileEntity from "../../entity/import/importResourcesFileEntity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import {defaultTotpViewModelDto} from "passbolt-styleguide/src/shared/models/totp/TotpDto.test.data";
 import ImportError from "../../../error/importError";
 import ResourceTypesCollection from "../../entity/resourceType/resourceTypesCollection";
 import {resourceTypesCollectionDto} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
 import {
+  TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
   TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import {defaultTotpDto} from "../../entity/totp/totpDto.test.data";
 
 describe("ResourcesKdbxImportParser", () => {
   it("should read import file", async() => {
@@ -197,7 +198,7 @@ describe("ResourcesKdbxImportParser", () => {
     await parser.parseImport();
 
     // Assert resources
-    const totp = defaultTotpViewModelDto({secret_key: "TJSNMLGTCYOEMXZG"});
+    const totp = defaultTotpDto({secret_key: "TJSNMLGTCYOEMXZG"});
     expect(importEntity.importResources.items).toHaveLength(2);
     const resource1Dto = buildExternalResourceDto(1, {totp: totp, folder_parent_path: "import-ref/Root", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP, expired: "2023-11-10T08:09:04.000Z"});
     expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource1Dto]));
@@ -209,6 +210,43 @@ describe("ResourcesKdbxImportParser", () => {
     const folderRefDto = {name: "import-ref", folder_parent_path: ""};
     expect(importEntity.importFolders.toJSON()).toEqual(expect.arrayContaining([folderRefDto]));
     const folderKdbxRootDto = {name: "Root", folder_parent_path: "import-ref"};
+    expect(importEntity.importFolders.toJSON()).toEqual(expect.arrayContaining([folderKdbxRootDto]));
+  });
+
+  it("should parse resources with TOTP and folders from kdbx windows", async() => {
+    expect.assertions(7);
+    const resourceTypesCollection = new ResourceTypesCollection(resourceTypesCollectionDto());
+    const file = fs.readFileSync("./src/all/background_page/model/import/resources/kdbx/kdbx-windows-with-totp-protected-password.kdbx", {encoding: 'base64'});
+    const importDto = {
+      "ref": "import-ref",
+      "file_type": "kdbx",
+      "file": file,
+      "options": {
+        "credentials": {
+          "password": "passbolt"
+        }
+      }
+    };
+    const importEntity = new ImportResourcesFileEntity(importDto);
+    const parser = new ResourcesKdbxImportParser(importEntity, resourceTypesCollection);
+    await parser.parseImport();
+
+    // Assert resources
+    const totp = defaultTotpDto({secret_key: "THISISANOTHERSECRET"});
+    const totp2 = defaultTotpDto({secret_key: "THISISTOTPSECRT", algorithm: "SHA256", digits: 8, period: 60});
+    expect(importEntity.importResources.items).toHaveLength(3);
+    const resource1Dto = buildExternalResourceDto(1, {folder_parent_path: "import-ref/Database", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION});
+    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource1Dto]));
+    const resource2Dto = buildExternalResourceDto(2, {totp: totp, folder_parent_path: "import-ref/Database", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP});
+    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource2Dto]));
+    const resource3Dto = buildExternalResourceDto(3, {totp: totp2, folder_parent_path: "import-ref/Database", resource_type_id: TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP});
+    expect(importEntity.importResources.toJSON()).toEqual(expect.arrayContaining([resource3Dto]));
+
+    // Assert folders
+    expect(importEntity.importFolders.items).toHaveLength(2);
+    const folderRefDto = {name: "import-ref", folder_parent_path: ""};
+    expect(importEntity.importFolders.toJSON()).toEqual(expect.arrayContaining([folderRefDto]));
+    const folderKdbxRootDto = {name: "Database", folder_parent_path: "import-ref"};
     expect(importEntity.importFolders.toJSON()).toEqual(expect.arrayContaining([folderKdbxRootDto]));
   });
 

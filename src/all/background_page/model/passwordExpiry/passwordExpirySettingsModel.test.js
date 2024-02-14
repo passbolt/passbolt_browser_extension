@@ -43,7 +43,21 @@ describe("PasswordExpiry model", () => {
     })));
   });
 
-  describe('::findOrDefault', () => {
+  describe('::getOrFindOrDefault', () => {
+    it("should return the value stored on the local storage without requesting the API", async() => {
+      expect.assertions(2);
+      const expectedDto = defaultPasswordExpirySettingsDtoFromApi();
+      jest.spyOn(model.passwordExpirySettingsLocalStorage, "get").mockImplementation(() => expectedDto);
+      const spyOnApiService = jest.spyOn(model.passwordExpirySettingsService, "find");
+
+
+      const expectedEntity = new PasswordExpirySettingsEntity(expectedDto);
+      const result = await model.getOrFindOrDefault();
+
+      expect(result).toStrictEqual(expectedEntity);
+      expect(spyOnApiService).not.toHaveBeenCalled();
+    });
+
     it("should return the value stored on the API", async() => {
       expect.assertions(1);
       const expectedDto = defaultPasswordExpirySettingsDtoFromApi();
@@ -173,8 +187,9 @@ describe("PasswordExpiry model", () => {
       }
     });
   });
+
   describe('::createByDefault', () => {
-    it("should return an PasswordExpirySettingsEntity when passwordExpiryPolicies is disabled ", async() => {
+    it("should return a PasswordExpirySettingsEntity when passwordExpiryPolicies is disabled ", async() => {
       expect.assertions(1);
 
       const result = await model.createFromDefault();
@@ -191,6 +206,39 @@ describe("PasswordExpiry model", () => {
 
       const result = await model.createFromDefault();
       expect(result).toBeInstanceOf(PasswordExpiryProSettingsEntity);
+    });
+  });
+
+  describe('::findOrDefault', () => {
+    it("should return the value stored on the API", async() => {
+      expect.assertions(1);
+      const expectedDto = defaultPasswordExpirySettingsDtoFromApi();
+      const expectedEntity = new PasswordExpirySettingsEntity(expectedDto);
+      fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => mockApiResponse(expectedDto));
+
+      const result = await model.getOrFindOrDefault();
+
+      expect(result).toStrictEqual(expectedEntity);
+    });
+
+    it("should return a default entity if the API returns an HTTP error", async() => {
+      expect.assertions(1);
+      const expectedEntity = PasswordExpirySettingsEntity.createFromDefault();
+      fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => mockApiResponseError(404, "Endpoint is not existing"));
+
+      const result = await model.getOrFindOrDefault();
+
+      expect(result).toStrictEqual(expectedEntity);
+    });
+
+    it("should return a default entity if something goes wrong on the API", async() => {
+      expect.assertions(1);
+      const expectedEntity = PasswordExpirySettingsEntity.createFromDefault();
+      fetch.doMockOnceIf(/password-expiry\/settings\.json/, () => { throw new Error("Something went wrong"); });
+
+      const result = await model.getOrFindOrDefault();
+
+      expect(result).toStrictEqual(expectedEntity);
     });
   });
 });

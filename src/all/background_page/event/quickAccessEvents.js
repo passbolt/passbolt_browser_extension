@@ -14,7 +14,7 @@ import FindMeController from "../controller/rbac/findMeController";
 import GetOrFindLoggedInUserController from "../controller/user/getOrFindLoggedInUserController";
 import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
 import ResourceModel from "../model/resource/resourceModel";
-import FindPasswordExpirySettingsController from "../controller/passwordExpiry/findPasswordExpirySettingsController";
+import GetOrFindPasswordExpirySettingsController from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
 
 /**
  * Listens to the quickaccess application events
@@ -156,9 +156,9 @@ const listen = function(worker, apiClientOptions, account) {
     await controller._exec();
   });
 
-  worker.port.on('passbolt.password-expiry.find', async requestId => {
-    const controller = new FindPasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
-    await controller._exec();
+  worker.port.on('passbolt.password-expiry.get-or-find', async (requestId, refreshCache = false) => {
+    const controller = new GetOrFindPasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
+    await controller._exec(refreshCache);
   });
 };
 

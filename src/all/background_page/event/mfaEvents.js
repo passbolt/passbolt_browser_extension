@@ -69,7 +69,6 @@ const listen = function(worker, apiClientOptions) {
   });
 
   worker.port.on('passbolt.mfa-setup.get-totp-code', async(requestId, providerDto) => {
-    const apiClientOptions = await User.getInstance().getApiClientOptions();
     const controller = new MfaSetupGetTotpCodeController(worker, requestId, apiClientOptions);
     await controller._exec(providerDto);
   });

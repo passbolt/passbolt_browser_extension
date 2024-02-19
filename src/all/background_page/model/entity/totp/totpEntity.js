@@ -171,6 +171,25 @@ class TotpEntity extends Entity {
 
   /*
    * ==================================================
+   * Sanitization
+   * ==================================================
+   */
+  /**
+   * Sanitize totp dto:
+   * - Replace space in secret_key.
+   * - Capitalize characters in secret_key.
+   *
+   * @param {Object} dto The totp dto
+   * @returns {Object}
+   */
+  static sanitizeDto(dto) {
+    // Remove all special characters, whitespace (including spaces, tabs and newline characters) and capitalize characters for secret_key
+    dto.secret_key = dto.secret_key.replace(/(\W|_|\s)/g, '').toUpperCase();
+    return dto;
+  }
+
+  /*
+   * ==================================================
    * Static properties getters
    * ==================================================
    */

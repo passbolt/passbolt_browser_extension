@@ -64,7 +64,7 @@ describe("ResourcesKdbxExporter", () => {
   });
 
   it("should export resources and folders for keepass windows", async() => {
-    expect.assertions(19);
+    expect.assertions(20);
 
     const now = new Date();
     now.setMilliseconds(0);
@@ -73,7 +73,7 @@ describe("ResourcesKdbxExporter", () => {
     const exportFolder2 = buildExternalFolderDto(2, {"folder_parent_path": "Folder 1", "folder_parent_id": exportFolder1.id});
     const exportResource1 = buildImportResourceDto(1);
     const exportResource2 = buildImportResourceDto(2, {"folder_parent_path": "Folder 1", "folder_parent_id": exportFolder1.id, totp: undefined});
-    const exportResource3 = buildImportResourceDto(3, {"folder_parent_path": "Folder 1/Folder2", "folder_parent_id": exportFolder2.id});
+    const exportResource3 = buildImportResourceDto(3, {"folder_parent_path": "Folder 1/Folder2", "folder_parent_id": exportFolder2.id, totp: defaultTotpDto({secret_key: "this is a secret"})});
     const exportResource4 = buildImportResourceDto(4, {"expired": now.toISOString()});
     const exportDto = {
       "format": "kdbx",
@@ -128,10 +128,12 @@ describe("ResourcesKdbxExporter", () => {
     expect(password2.fields.get('Title')).toEqual("Password 2");
     expect(kdbxDb.groups[0].groups[1].entries[0].fields.get('otp')).toBeUndefined();
     expect(password3.fields.get('Title')).toEqual("Password 3");
+    const secret_key2 = password3.fields.get('TimeOtp-Secret-Base32').getText();
+    expect(secret_key2).toEqual("THISISASECRET");
   });
 
   it("should export resources and folders for other keepass", async() => {
-    expect.assertions(16);
+    expect.assertions(17);
 
     const now = new Date();
     now.setMilliseconds(0);
@@ -140,7 +142,7 @@ describe("ResourcesKdbxExporter", () => {
     const exportFolder2 = buildExternalFolderDto(2, {"folder_parent_path": "Folder 1", "folder_parent_id": exportFolder1.id});
     const exportResource1 = buildImportResourceDto(1);
     const exportResource2 = buildImportResourceDto(2, {"folder_parent_path": "Folder 1", "folder_parent_id": exportFolder1.id, totp: undefined});
-    const exportResource3 = buildImportResourceDto(3, {"folder_parent_path": "Folder 1/Folder2", "folder_parent_id": exportFolder2.id});
+    const exportResource3 = buildImportResourceDto(3, {"folder_parent_path": "Folder 1/Folder2", "folder_parent_id": exportFolder2.id, totp: defaultTotpDto({secret_key: "this is a secret!_"})});
     const exportResource4 = buildImportResourceDto(4, {"expired": now.toISOString()});
     const exportDto = {
       "format": "kdbx-others",
@@ -189,6 +191,8 @@ describe("ResourcesKdbxExporter", () => {
     expect(password2.fields.get('Title')).toEqual("Password 2");
     expect(kdbxDb.groups[0].groups[1].entries[0].fields.get('otp')).toBeUndefined();
     expect(password3.fields.get('Title')).toEqual("Password 3");
+    const totp2 = password3.fields.get('otp').getText();
+    expect(totp2).toEqual("otpauth://totp/Password%203%3Ausername3?secret=THISISASECRET&issuer=https%253A%252F%252Furl3.com&algorithm=SHA1&digits=6&period=30");
   });
 
   it("should protect an export with a password", async() => {

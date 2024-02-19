@@ -19,6 +19,7 @@ module.exports = function (grunt) {
 
     dist_chrome: 'dist/chrome/',
     dist_chrome_mv3: 'dist/chrome-mv3/',
+    dist_safari: 'dist/safari/',
     dist_firefox: 'dist/firefox/',
 
     src: 'src/all/',
@@ -26,6 +27,7 @@ module.exports = function (grunt) {
     src_background_page: 'src/all/background_page/',
     src_chrome: 'src/chrome/',
     src_chrome_mv3: 'src/chrome-mv3/',
+    src_safari: 'src/safari/',
     src_firefox: 'src/firefox/',
     src_content_scripts: 'src/all/contentScripts/',
     src_web_accessible_resources: 'src/all/webAccessibleResources/',
@@ -53,6 +55,7 @@ module.exports = function (grunt) {
   grunt.registerTask('bundle-chrome', ['copy:manifest_chrome', 'bundle']);
   grunt.registerTask('bundle-mv3', ['externalize-locale-strings', 'copy:service_worker', 'copy:web_accessible_resources', 'copy:locales']);
   grunt.registerTask('bundle-chrome-mv3', ['copy:manifest_chrome_mv3', 'bundle-mv3']);
+  grunt.registerTask('bundle-safari', ['copy:manifest_safari', 'bundle-mv3']);
 
   grunt.registerTask('build', ['build-firefox-prod', 'build-chrome-prod']);
 
@@ -67,6 +70,10 @@ module.exports = function (grunt) {
   grunt.registerTask('build-chrome-mv3', ['build-chrome-mv3-debug', 'build-chrome-mv3-prod']);
   grunt.registerTask('build-chrome-mv3-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-chrome-mv3', 'shell:build_service_worker_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug', 'shell:build_chrome_mv3_debug']);
   grunt.registerTask('build-chrome-mv3-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-chrome-mv3', 'shell:build_service_worker_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod', 'shell:build_chrome_mv3_prod']);
+
+  grunt.registerTask('build-safari', ['build-safari-debug', 'build-safari-prod']);
+  grunt.registerTask('build-safari-debug', ['clean:build', 'pre-dist', 'copy:config_debug', 'bundle-safari', 'shell:build_service_worker_debug', 'shell:build_content_script_debug', 'shell:build_web_accessible_resources_debug']);
+  grunt.registerTask('build-safari-prod', ['clean:build', 'pre-dist', 'copy:config_default', 'bundle-safari', 'shell:build_service_worker_prod', 'shell:build_content_script_prod', 'shell:build_web_accessible_resources_prod']);
 
   grunt.registerTask('externalize-locale-strings', ['shell:externalize']);
 
@@ -139,6 +146,11 @@ module.exports = function (grunt) {
       manifest_chrome_mv3: {
         files: [{
           expand: true, cwd: path.src_chrome_mv3, src: 'manifest.json', dest: path.build
+        }]
+      },
+      manifest_safari: {
+        files: [{
+          expand: true, cwd: path.src_safari, src: 'manifest.json', dest: path.build
         }]
       },
       // Copy styleguide elements

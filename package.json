@@ -94,6 +94,8 @@
     "dev:build:web-accessible-resources": "npm run dev:build:web-accessible-resources:app; npm run dev:build:web-accessible-resources:browser-integration",
     "dev:build:web-accessible-resources:app": "webpack --env debug=true --config webpack-data.config.js; webpack --env debug=true --config webpack-data.download.config.js",
     "dev:build:web-accessible-resources:browser-integration": "webpack --env debug=true --config webpack-data.in-form-call-to-action.config.js; webpack --env debug=true --config webpack-data.in-form-menu.config.js",
+    "dev:safari:build": "grunt build-safari-debug; npm run dev:safari:convert",
+    "dev:safari:convert": "xcrun safari-web-extension-converter --app-name Passbolt-Safari-Extension --swift --macos-only --project-location ./build-safari-extension --bundle-identifier com.passbolt.safari-extension --force --no-open build/all/",
     "dev:watch:build:background-page": "npm run dev:build:background-page -- -w",
     "dev:watch:build:service-worker": "npm run dev:build:service-worker -- -w",
     "dev:watch:build:content-scripts:app": "npm run dev:build:content-scripts:app -- -w",

@@ -18,7 +18,7 @@ import GroupEntity from "../entity/group/groupEntity";
 import GroupService from "../../service/api/group/groupService";
 import GroupUpdateDryRunResultEntity from "../entity/group/update/groupUpdateDryRunResultEntity";
 import GroupDeleteTransferEntity from "../entity/group/transfer/groupDeleteTransfer";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 
 class GroupModel {
   /**

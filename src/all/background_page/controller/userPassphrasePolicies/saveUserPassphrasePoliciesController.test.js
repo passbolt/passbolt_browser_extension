@@ -19,8 +19,8 @@ import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.d
 import UserPassphrasePoliciesEntity from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity";
 import {defaultUserPassphrasePoliciesEntityDto, userPassphrasePoliciesEntityDtoFromApi} from "passbolt-styleguide/src/shared/models/userPassphrasePolicies/UserPassphrasePoliciesDto.test.data";
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
-import PassboltServiceUnavailableError from "../../error/passboltServiceUnavailableError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
+import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import SaveUserPassphrasePoliciesController from "./saveUserPassphrasePoliciesController";
 import browser from "../../sdk/polyfill/browserPolyfill";
 

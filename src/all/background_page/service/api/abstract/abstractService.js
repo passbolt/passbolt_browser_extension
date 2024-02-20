@@ -10,7 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import ApiClient from "../apiClient/apiClient";
+import {ApiClient} from "passbolt-styleguide/src/shared/lib/apiClient/apiClient";
 import Validator from "validator";
 
 class AbstractService {

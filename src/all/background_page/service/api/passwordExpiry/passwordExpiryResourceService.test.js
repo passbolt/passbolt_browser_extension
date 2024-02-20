@@ -14,8 +14,8 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse, mockApiResponseError} from '../../../../../../test/mocks/mockApiResponse';
-import PassboltApiFetchError from "../../../error/passboltApiFetchError";
-import PassboltServiceUnavailableError from "../../../error/passboltServiceUnavailableError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
+import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import PasswordExpiryResourceService from "./passwordExpiryResourceService";
 import {
   defaultPasswordExpiryResourceDto, defaultPasswordExpiryResourceDtoFromApi

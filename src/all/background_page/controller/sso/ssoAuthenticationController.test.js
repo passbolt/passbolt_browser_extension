@@ -22,7 +22,7 @@ import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOpti
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import DecryptSsoPassphraseService from "../../service/crypto/decryptSsoPassphraseService";
 import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import OutdatedSsoKitError from "../../error/outdatedSsoKitError";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";

@@ -14,7 +14,7 @@
 import ResourceTypeLocalStorage from "../../service/local_storage/resourceTypeLocalStorage";
 import ResourceTypeService from "../../service/api/resourceType/resourceTypeService";
 import ResourceTypesCollection from "../entity/resourceType/resourceTypesCollection";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import Validator from "validator";
 
 class ResourceTypeModel {

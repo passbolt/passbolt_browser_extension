@@ -37,7 +37,7 @@ describe("OnExtensionInstalledController", () => {
         {id: 2, url: "https://passbolt.dev/setup/recover/start/571bec7e-6cce-451d-b53a-f8c93e147228/5ea0fc9c-b180-4873-8e00-9457862e43e0"},
         {id: 3, url: "https://passbolt.dev/auth/login"},
         {id: 4, url: "https://localhost"},
-        {id: 5, url: "https://chrome.google.com/webstore/id/passbolt"},
+        {id: 5, url: "https://chromewebstore.google.com/id/passbolt"},
         {id: 6, url: "https://addons.mozilla.org/id/passbolt"}
       ];
       // mock function

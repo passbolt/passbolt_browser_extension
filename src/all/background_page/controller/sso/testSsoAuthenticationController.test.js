@@ -17,7 +17,7 @@ import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/m
 import {withAzureSsoSettings} from "./saveSsoSettingsAsDraftController.test.data";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
 import TestSsoAuthenticationController from "./testSsoAuthenticationController";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import SsoLoginUrlEntity from "../../model/entity/sso/ssoLoginUrlEntity";
 import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
 

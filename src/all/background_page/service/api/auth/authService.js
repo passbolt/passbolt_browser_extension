@@ -12,7 +12,7 @@
  */
 import PassboltBadResponseError from "../../../error/passboltBadResponseError";
 import AbstractService from "../abstract/abstractService";
-import PassboltApiFetchError from "../../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import PassboltServiceUnavailableError from "../../../error/passboltServiceUnavailableError";
 
 const AUTH_SERVICE_RESOURCE_NAME = 'auth';

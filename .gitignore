@@ -24,6 +24,7 @@ __snapshots__
 /bootstrap.js
 *.pem
 /dist
+/build-safari-extension
 
 # Config
 lib/config/config.json

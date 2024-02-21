@@ -12,8 +12,8 @@
  * @since         4.5.0
  */
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
-import PassboltServiceUnavailableError from "../../error/passboltServiceUnavailableError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
+import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import PasswordExpiryResourcesCollection from "../../model/entity/passwordExpiry/passwordExpiryResourcesCollection";
 import {defaultPasswordExpiryCollectionDto} from "../../model/entity/passwordExpiry/passwordExpiryResourceCollection.test.data";
 import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";

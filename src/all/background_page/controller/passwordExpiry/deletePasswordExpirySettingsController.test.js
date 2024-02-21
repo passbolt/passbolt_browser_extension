@@ -19,7 +19,7 @@ import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.d
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
 import DeletePasswordExpirySettingsController from "./deletePasswordExpirySettingsController";
 import {v4 as uuid} from "uuid";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("DeletePasswordExpirySettingsController", () => {

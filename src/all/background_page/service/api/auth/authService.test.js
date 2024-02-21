@@ -15,7 +15,7 @@ import {defaultApiClientOptions} from "../apiClient/apiClientOptions.test.data";
 import {enableFetchMocks} from "jest-fetch-mock";
 import AuthService from "./authService";
 import {mockApiResponse, mockApiResponseError} from "../../../../../../test/mocks/mockApiResponse";
-import PassboltApiFetchError from "../../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 
 beforeEach(async() => {
   enableFetchMocks();

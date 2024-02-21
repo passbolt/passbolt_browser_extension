@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import ApiClient from "../apiClient/apiClient";
+import {ApiClient} from "passbolt-styleguide/src/shared/lib/apiClient/apiClient";
 
 const SSO_DRY_RUN_SERVICE_RESOURCE_NAME = '/sso/${providerId}/login/dry-run';
 

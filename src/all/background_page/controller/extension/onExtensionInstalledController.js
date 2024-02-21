@@ -80,7 +80,7 @@ const updateTabMatchUrl = tabs => Promise.all(tabs.map(tab => {
  * @returns {Promise<unknown[]>}
  */
 const closeTabWebStore = tabs => {
-  const urlWebStoreRegex = `https:\/\/(chrome.google.com\/webstore|addons.mozilla.org)\/(.*)\/passbolt`;
+  const urlWebStoreRegex = `https:\/\/(chromewebstore.google.com|addons.mozilla.org)\/(.*)\/passbolt`;
   return Promise.all(tabs.map(tab => tab.url.match(urlWebStoreRegex) ? browser.tabs.remove(tab.id) : tab));
 };
 

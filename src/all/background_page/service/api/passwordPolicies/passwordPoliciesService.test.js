@@ -14,7 +14,7 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse, mockApiResponseError} from "../../../../../../test/mocks/mockApiResponse";
-import PassboltApiFetchError from "../../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import AccountEntity from "../../../model/entity/account/accountEntity";
 import BuildApiClientOptionsService from "../../account/buildApiClientOptionsService";
 import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";

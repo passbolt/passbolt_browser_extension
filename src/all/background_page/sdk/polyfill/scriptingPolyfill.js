@@ -114,4 +114,3 @@ class Scripting {
 if (!browser.scripting) {
   browser.scripting = new Scripting();
 }
-  

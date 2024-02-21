@@ -78,4 +78,3 @@ class SessionStorage {
 if (!browser.storage.session) {
   browser.storage.session = new SessionStorage();
 }
-  

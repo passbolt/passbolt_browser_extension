@@ -66,7 +66,6 @@ describe("GetOrFindPasswordExpirySettingsController", () => {
     jest.spyOn(storageService, "get").mockImplementation(() => expectedDto);
     jest.spyOn(storageService, "flush");
 
-    controller.passwordExpirySettingsGetOrFindService.passwordExpirySettingsModel.getOrFindOrDefault;
     const result = await controller.exec();
     expect(result).toStrictEqual(expectedEntity);
     expect(storageService.get).toHaveBeenCalledTimes(1);

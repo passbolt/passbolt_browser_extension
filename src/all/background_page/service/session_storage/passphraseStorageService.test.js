@@ -247,7 +247,7 @@ describe("PassphraseStorageService", () => {
       await PassphraseStorageService.stopSessionKeepAlive();
 
       expect(spyOnAlarmClear).toHaveBeenCalledWith("SessionKeepAlive");
-      expect(spyOnAlarmRemoveListeners).toHaveBeenCalledTimes(1);
+      expect(spyOnAlarmRemoveListeners).toHaveBeenCalledTimes(3);
     });
   });
 });

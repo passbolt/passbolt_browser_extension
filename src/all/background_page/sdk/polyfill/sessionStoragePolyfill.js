@@ -75,9 +75,7 @@ class SessionStorage {
     this._storedData = {};
   }
 }
-
-if (window.chrome?.desktop) {
-  window.chrome.storage.session = new SessionStorage();
-} else if (!browser.storage.session) {
+if (!browser.storage.session) {
   browser.storage.session = new SessionStorage();
 }
+  

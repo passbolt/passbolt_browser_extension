@@ -19,7 +19,7 @@ class SignMessageService {
   /**
    * Sign a text message with the private key.
    *
-   * @param {openpgp.Message|openpgp.CleartextMessage} message The message to sign.
+   * @param {openpgp.Message} message The message to sign.
    * @param {openpgp.PrivateKey} signingKeys The private key to use to sign the message.
    * @returns {Promise<string>}
    * @throws {TypeError}  If the message is not a valid openpgp.Message

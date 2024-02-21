@@ -15,15 +15,7 @@
 /**
  * This code provides polyfills for the need of Passbolt.
  */
-let browser = {};
-if (window.chrome?.desktop) {
-  browser = Object.assign(browser, window.chrome);
-} else {
-  import("webextension-polyfill").then(polyfill => {
-    browser = polyfill;
-  });
-}
-
+import browser from "webextension-polyfill";
 import "./scriptingPolyfill"; //mv3 scripting API for mv2
 import "./sessionStoragePolyfill"; //mv3 session storage API polyfill
 import "./actionPolyfill"; //mv3 action API polyfill for mv2

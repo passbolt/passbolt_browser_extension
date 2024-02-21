@@ -219,7 +219,7 @@ describe("PassphraseStorageService", () => {
 
       expect(spyOnAlarmClear).toHaveBeenCalledWith("PassphraseStorageFlush");
       expect(spyOnAlarmClear).toHaveBeenCalledWith("SessionKeepAlive");
-      expect(spyOnAlarmRemoveListeners).toHaveBeenCalledTimes(2);
+      expect(spyOnAlarmRemoveListeners).toHaveBeenCalledTimes(4);
     });
   });
 

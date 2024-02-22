@@ -22,7 +22,7 @@ import browser from "../../sdk/polyfill/browserPolyfill";
 describe("PasswordExpirySettingsGetOrFindService", () => {
   beforeEach(() => {
     enableFetchMocks();
-    jest.resetAllMocks();
+    fetch.resetMocks();
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
     jest.resetModules();
   });

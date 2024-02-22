@@ -20,7 +20,6 @@ import browser from "../../sdk/polyfill/browserPolyfill";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 import WebNavigationService from "../webNavigation/webNavigationService";
 
-
 describe("WorkerService", () => {
   beforeEach(() => {
     jest.resetModules();
@@ -98,13 +97,11 @@ describe("WorkerService", () => {
       expect(spyOnAlarmCreate).toHaveBeenCalledTimes(1);
       expect(spyOnAlarmClear).toHaveBeenCalledTimes(0);
 
-      jest.advanceTimersByTime(100);
+      jest.advanceTimersByTime(101);
       await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
       expect(spy).toHaveBeenCalledTimes(1);
       expect(spyOnAlarmCreate).toHaveBeenCalledTimes(2);
       expect(spyOnAlarmClear).toHaveBeenCalledTimes(1);
-
-
 
       jest.advanceTimersByTime(100);
       expect(spy).toHaveBeenCalledTimes(1);

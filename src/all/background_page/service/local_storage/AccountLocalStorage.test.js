@@ -173,7 +173,7 @@ describe("AccountLocalStorage", () => {
 
       // expect.assertions(3 + sampleSize);
       expect(accountsToDelete).toHaveLength(sampleSize);
-      let {accounts} = browser.storage.local.get([AccountLocalStorage.ACCOUNTS_LOCAL_STORAGE_KEY]);
+      let {accounts} = await browser.storage.local.get([AccountLocalStorage.ACCOUNTS_LOCAL_STORAGE_KEY]);
       expect(accounts).toHaveLength(sampleSize);
 
       for (let i = 0; i < sampleSize; i++) {
@@ -202,7 +202,7 @@ describe("AccountLocalStorage", () => {
 
       // expect.assertions(3 + sampleSize);
       expect(accountsToDelete).toHaveLength(sampleSize);
-      let {accounts} = browser.storage.local.get([AccountLocalStorage.ACCOUNTS_LOCAL_STORAGE_KEY]);
+      let {accounts} = await browser.storage.local.get([AccountLocalStorage.ACCOUNTS_LOCAL_STORAGE_KEY]);
       expect(accounts).toHaveLength(sampleSize);
 
       for (let i = 0; i < sampleSize; i++) {

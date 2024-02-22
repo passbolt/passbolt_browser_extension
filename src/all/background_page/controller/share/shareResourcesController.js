@@ -15,9 +15,9 @@ import Keyring from "../../model/keyring";
 import ResourceModel from "../../model/resource/resourceModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
-import Share from "../../model/share";
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
+import ShareModel from "../../model/share/shareModel";
 
 class ShareResourcesController {
   /**
@@ -32,6 +32,7 @@ class ShareResourcesController {
     this.worker = worker;
     this.requestId = requestId;
     this.resourceModel = new ResourceModel(apiClientOptions, account);
+    this.shareModel = new ShareModel(apiClientOptions);
     this.progressService = new ProgressService(this.worker);
     this.getPassphraseService = new GetPassphraseService(account);
   }
@@ -68,7 +69,7 @@ class ShareResourcesController {
       this.progressService.start(progressGoal, i18n.t('Initialize'));
       await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
       await keyring.sync();
-      await Share.bulkShareResources(resources, changes, privateKey, async message => {
+      await this.shareModel.bulkShareResources(resources, changes, privateKey, async message => {
         await this.progressService.finishStep(message);
       });
       await this.resourceModel.updateLocalStorage();

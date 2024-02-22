@@ -137,7 +137,7 @@ const listen = function(worker, apiClientOptions, account) {
     await controller._exec();
   });
 
-  worker.port.on('passbolt.password-expiry.get-or-find', async (requestId, refreshCache = false) => {
+  worker.port.on('passbolt.password-expiry.get-or-find', async(requestId, refreshCache = false) => {
     const controller = new GetOrFindPasswordExpirySettingsController(worker, requestId, account, apiClientOptions);
     await controller._exec(refreshCache);
   });

@@ -7,10 +7,16 @@
 import i18n from "../sdk/i18n";
 
 class MfaAuthenticationRequiredError extends Error {
-  constructor(message) {
+  /**
+   * Retrieve the error details for the windows app
+   * @param message
+   * @param {object} errors details
+   */
+  constructor(message, details) {
     message = message || i18n.t('MFA authentication is required.');
     super(message);
     this.name = 'MfaAuthenticationRequiredError';
+    this.details = details;
   }
 }
 

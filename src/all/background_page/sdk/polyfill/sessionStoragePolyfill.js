@@ -75,7 +75,6 @@ class SessionStorage {
     this._storedData = {};
   }
 }
-
 if (!browser.storage.session) {
   browser.storage.session = new SessionStorage();
 }

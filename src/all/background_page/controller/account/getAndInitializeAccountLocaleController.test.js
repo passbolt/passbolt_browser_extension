@@ -16,7 +16,7 @@ import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.d
 import AccountEntity from "../../model/entity/account/accountEntity";
 import GetAndInitializeAccountLocaleController from "./getAndInitializeAccountLocaleController";
 import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 

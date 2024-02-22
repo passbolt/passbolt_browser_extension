@@ -19,7 +19,7 @@ import {startAccountSetupDto} from "../../model/entity/account/accountSetupEntit
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 
 describe("GenerateSetupKeyPairController", () => {
   describe("GenerateSetupKeyPairController::exec", () => {

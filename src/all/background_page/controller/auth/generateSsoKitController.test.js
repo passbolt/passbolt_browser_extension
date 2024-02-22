@@ -17,7 +17,7 @@ import "../../../../../test/mocks/mockSsoDataStorage";
 import "../../../../../test/mocks/mockCryptoKey";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";

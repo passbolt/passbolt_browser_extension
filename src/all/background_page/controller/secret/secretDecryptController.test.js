@@ -13,7 +13,7 @@
  */
 
 import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import SecretDecryptController from "./secretDecryptController";
 import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";

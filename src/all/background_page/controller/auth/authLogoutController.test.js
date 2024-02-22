@@ -12,7 +12,7 @@
  * @since         3.9.0
  */
 import MockTabs from "../../../../../test/mocks/mockTabs";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AuthLogoutController from "./authLogoutController";
 import AuthModel from "../../model/auth/authModel";
 import browser from "../../sdk/polyfill/browserPolyfill";

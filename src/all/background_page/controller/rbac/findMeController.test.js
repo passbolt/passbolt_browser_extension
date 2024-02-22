@@ -22,7 +22,7 @@ import RbacsCollection from "passbolt-styleguide/src/shared/models/entity/rbac/r
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 
 beforeEach(() => {
   enableFetchMocks();

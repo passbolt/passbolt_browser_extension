@@ -18,7 +18,7 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {v4 as uuid} from "uuid";
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
 import SsoAuthenticationController from "./ssoAuthenticationController";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import DecryptSsoPassphraseService from "../../service/crypto/decryptSsoPassphraseService";
 import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";

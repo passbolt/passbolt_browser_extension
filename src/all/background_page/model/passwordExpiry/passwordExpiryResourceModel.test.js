@@ -12,7 +12,7 @@
  * @since         4.5.0
  */
 
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import ResourceLocalStorage from "../../service/local_storage/resourceLocalStorage";
 import PasswordExpiryResourcesCollection from "../entity/passwordExpiry/passwordExpiryResourcesCollection";
 import {defaultPasswordExpiryCollectionDto} from "../entity/passwordExpiry/passwordExpiryResourceCollection.test.data";

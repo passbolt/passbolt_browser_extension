@@ -1,7 +1,8 @@
 {
   "testEnvironment": "jsdom",
   "setupFiles": [
-    "jest-webextension-mock"
+    "jest-webextension-mock",
+    "<rootDir>/test/jest-webextension-force-runtime-id-setup-files.js"
   ],
   "setupFilesAfterEnv": ["<rootDir>/test/jest.setup.js"],
   "transform": {

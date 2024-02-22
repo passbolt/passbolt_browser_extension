@@ -72,23 +72,19 @@ class ProgressService {
    * Updates the progress bar with the latest finished step.
    * @param {string|null} message (Optional) The message to display
    * @param {bool} forceMessageDisplay (Optional) Should the message display be forced. Default false.
-   * @return {Promise<void>}
    */
-  async finishStep(message, forceMessageDisplay = false) {
+  finishStep(message, forceMessageDisplay = false) {
     this._progress++;
     this.message = message;
-    await this._debounceAction(this._updateProgressBar, forceMessageDisplay);
+    this._debounceAction(this._updateProgressBar, forceMessageDisplay);
   }
 
   /**
    * Ends the progression of a task by closing the dialog
    */
-  async close() {
-    return new Promise(resolve => {
-      this.worker.port.emit('passbolt.progress.close-progress-dialog');
-      this.isClose = true;
-      setTimeout(resolve, 0);
-    });
+  close() {
+    this.isClose = true;
+    this.worker.port.emit('passbolt.progress.close-progress-dialog');
   }
 
   /**
@@ -105,7 +101,11 @@ class ProgressService {
    * @param {boolean} forceCallbackCall if true the callback is called regardless of the delay
    * @private
    */
-  async _debounceAction(callback, forceCallbackCall = false) {
+  _debounceAction(callback, forceCallbackCall = false) {
+    if (this.isClose) {
+      return;
+    }
+
     const currentTime = new Date().getTime();
     const deltaTime = currentTime - this.lastTimeCall;
     if (!forceCallbackCall && deltaTime < STEP_DELAY_MS) {
@@ -113,13 +113,7 @@ class ProgressService {
     }
 
     this.lastTimeCall = currentTime;
-    //@todo use chrome.alarms API instead.
-    return new Promise(resolve => setTimeout(() => {
-      if (!this.isClose) {
-        callback();
-      }
-      resolve();
-    }, 0));
+    callback();
   }
 }
 

@@ -113,7 +113,7 @@ class ResourcesKdbxExporter {
    * @param {ExternalResourceEntity} externalResourceEntity
    */
   setTotpField(kdbxEntry, externalResourceEntity) {
-    const totp = new TotpEntity(externalResourceEntity.totp);
+    const totp = new TotpEntity(TotpEntity.sanitizeDto(externalResourceEntity.totp));
     switch (this.exportEntity.format) {
       case ExportResourcesFileEntity.FORMAT_KDBX: {
         kdbxEntry.fields.set('TimeOtp-Secret-Base32', kdbxweb.ProtectedValue.fromString(totp.secret_key));

@@ -35,7 +35,7 @@ describe("GetResourceColumnsSettingController", () => {
 
     it("Should retrieve the resource columns settings.", async() => {
       const mockedAccount = {id: uuid()};
-      const columnsSetting = [{id: "name", label: "Name"}];
+      const columnsSetting = [{id: "name"}];
       const sorter = {propertyName: "name", asc: true};
       const gridUserSetting = {columns_setting: columnsSetting, sorter: sorter};
       jest.spyOn(browser.storage.local, "get").mockImplementationOnce(() => ({[`${RESOURCE_GRID_USER_SETTING_STORAGE_KEY}-${mockedAccount.id}`]: gridUserSetting}));

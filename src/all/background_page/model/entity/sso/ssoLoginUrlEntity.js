@@ -13,6 +13,7 @@
  */
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import AdfsSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AdfsSsoSettingsEntity";
 import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
 import GoogleSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/GoogleSsoSettingsEntity";
 import OAuth2SsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/OAuth2SsoSettingsEntity";
@@ -78,7 +79,7 @@ class SsoLoginUrlEntity extends Entity {
       throw new Error('The url should be a valid url.');
     }
 
-    if (ssoProvider === OAuth2SsoSettingsEntity.PROVIDER_ID) {
+    if (ssoProvider === OAuth2SsoSettingsEntity.PROVIDER_ID || ssoProvider === AdfsSsoSettingsEntity.PROVIDER_ID) {
       if (url.protocol !== "https:") {
         throw new Error('The url protocol should be HTTPS.');
       }

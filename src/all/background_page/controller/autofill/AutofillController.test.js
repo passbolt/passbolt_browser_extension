@@ -15,7 +15,7 @@
 import AccountEntity from "../../model/entity/account/accountEntity";
 import AutofillController from "./AutofillController";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
 import InformMenuPagemod from "../../pagemod/informMenuPagemod";
 import {v4 as uuidv4} from "uuid";
@@ -64,7 +64,6 @@ describe("AutofillController", () => {
       expect(portWrapper.emit).toHaveBeenCalledTimes(2);
       expect(portWrapper.emit).toHaveBeenCalledWith('passbolt.web-integration.fill-credentials', {username: resource.username, password: secret.password});
       expect(portWrapper.emit).toHaveBeenCalledWith('passbolt.in-form-menu.close');
-
     });
 
     it("Should autofill from quickaccess.", async() => {

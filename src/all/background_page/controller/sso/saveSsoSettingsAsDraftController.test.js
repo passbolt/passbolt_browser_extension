@@ -29,7 +29,6 @@ describe("SaveSsoSettingsAsDraftController", () => {
     it("Should save the given settings as a draft.", async() => {
       expect.assertions(2);
       const ssoSettingsDto = withAzureSsoSettings();
-      const expectedData = Object.assign({}, ssoSettingsDto.data);
 
       const expectedSavedSettings = Object.assign({}, ssoSettingsDto, {
         id: uuid(),
@@ -37,7 +36,7 @@ describe("SaveSsoSettingsAsDraftController", () => {
         modified_by: uuid(),
         created: new Date().toISOString(),
         modified: new Date().toISOString(),
-        data: expectedData,
+        data: Object.assign({}, ssoSettingsDto.data),
       });
 
       fetch.doMockOnceIf(new RegExp('/sso/settings.json'), async req => {

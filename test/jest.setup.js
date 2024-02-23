@@ -14,6 +14,7 @@
 
 import "jest-webextension-mock";
 import "./mocks/mockExtensionPolyfill";
+import "./mocks/mockTextEncoder";
 import "./matchers/extendExpect";
 import browser from "webextension-polyfill";
 import MockNavigatorLocks from './mocks/mockNavigatorLocks';
@@ -27,8 +28,6 @@ global.console = {
   error: jest.fn(),
   warn: jest.fn()
 };
-global.TextEncoder = require('text-encoding-utf-8').TextEncoder;
-global.TextDecoder = require('text-encoding-utf-8').TextDecoder;
 global.fetch = require('node-fetch');
 if (!global.navigator) {
   global.navigator = {};

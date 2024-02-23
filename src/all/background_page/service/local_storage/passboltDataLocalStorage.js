@@ -18,23 +18,15 @@ export const PASSBOLT_DATA_LOCAL_STORAGE_KEY = '_passbolt_data';
 
 class PassboltDataLocalStorage {
   /**
-   * Constructor
-   * @param account the user account
-   */
-  constructor(account) {
-    this.storageKey = this.getStorageKey(account);
-  }
-
-  /**
    * Get the storage key.
    * @returns {string}
    */
-  getStorageKey() {
+  get storageKey() {
     return PASSBOLT_DATA_LOCAL_STORAGE_KEY;
   }
 
   /**
-   * Flush the rememberMe local storage
+   * Flush the _passbolt_data local storage
    * @return {Promise<void>}
    */
   async flush() {
@@ -43,23 +35,18 @@ class PassboltDataLocalStorage {
   }
 
   /**
-   * Get the UserRememberMeLatestChoice local storage.
+   * Get the _passbolt_data local storage.
    * @throws {Error} if operation failed
-   * @return {Promise<UserRememberMeLatestChoiceEntity|null>} the rememberMe entity or null by default.
+   * @return {Promise<Object|null>} the _passbolt_data object or null by default.
    */
   async get() {
     const value = await browser.storage.local.get([this.storageKey]);
-    if (!value || !value[this.storageKey]) {
+    if (!value?.[this.storageKey]) {
+      console.error(new Error("Passbolt data read attempted on an empty storage."));
       return null;
     }
 
-    // ensure this feature is not breaking anything by returning an accepted default value
-    try {
-      return value[this.storageKey];
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
+    return value[this.storageKey];
   }
 
   /**

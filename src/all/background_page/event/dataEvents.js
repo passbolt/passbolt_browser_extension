@@ -17,12 +17,12 @@ import GetPassboltDataConfigController from "../controller/dataConfig/getPassbol
 
 const listen = function(worker) {
   /*
-   * Read configuration variable.
+   * Get legacy _passboltData account configuration.
    *
-   * @listens passbolt.data.get-config
+   * @listens passbolt.passbolt-data.get-config
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.data.get-config', async requestId => {
+  worker.port.on('passbolt.passbolt-data.get-config', async requestId => {
     const controller = new GetPassboltDataConfigController(worker, requestId);
     await controller._exec();
   });

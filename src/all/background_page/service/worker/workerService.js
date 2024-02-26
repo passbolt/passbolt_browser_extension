@@ -12,7 +12,6 @@
  * @since         4.0.0
  */
 import {v4 as uuid} from "uuid";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import PortManager from "../../sdk/port/portManager";
 import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import BrowserTabService from "../ui/browserTab.service";

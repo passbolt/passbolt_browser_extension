@@ -13,7 +13,6 @@
  */
 import ResourceInProgressCacheService from "./resourceInProgressCache.service";
 import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 jest.useFakeTimers();
 

@@ -13,7 +13,6 @@
  */
 
 import {v4 as uuid} from "uuid";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import SetResourceGridUserSettingController from "./setResourceGridUserSettingController";
 import {RESOURCE_GRID_USER_SETTING_STORAGE_KEY} from "../../service/local_storage/ressourceGridSettingLocalStorage";
 

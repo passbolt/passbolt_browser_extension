@@ -12,11 +12,10 @@
  * @since         3.6.0
  */
 
-import "jest-webextension-mock";
-import "./mocks/mockExtensionPolyfill";
+import "./mocks/mockWebExtensionPolyfill";
+import browser from "../src/all/common/polyfill/browserPolyfill"
 import "./mocks/mockTextEncoder";
 import "./matchers/extendExpect";
-import browser from "webextension-polyfill";
 import MockNavigatorLocks from './mocks/mockNavigatorLocks';
 import OrganizationSettingsModel from "../src/all/background_page/model/organizationSettings/organizationSettingsModel";
 import {Config} from "../src/all/background_page/model/config";
@@ -45,7 +44,8 @@ if (!global.structuredClone) {
 }
 
 beforeEach(async() => {
-  // @todo to remove while replacing the chrome primitive usage by chrome.
+  // Before each test, ensure a new copy of the browser API is made available in the global scope.
+  global.browser = browser;
   global.chrome = browser;
   // Flush the local storage
   await browser.storage.local.clear();

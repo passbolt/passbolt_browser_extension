@@ -14,7 +14,6 @@
 
 import GetResourceGridUserSettingController from "./getResourceGridUserSettingController";
 import {v4 as uuid} from "uuid";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import {RESOURCE_GRID_USER_SETTING_STORAGE_KEY} from "../../service/local_storage/ressourceGridSettingLocalStorage";
 
 beforeEach(() => {

@@ -14,7 +14,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import ExtQuickAccess from "passbolt-styleguide/src/react-quickaccess/ExtQuickAccess";
-import browser from "../../../background_page/sdk/polyfill/browserPolyfill";
 import Port from "../lib/port";
 
 async function main() {

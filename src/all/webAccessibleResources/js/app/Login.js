@@ -15,7 +15,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import ExtAuthenticationLogin from "passbolt-styleguide/src/react-extension/ExtAuthenticationLogin";
 import Port from "../lib/port";
-import browser from "../../../background_page/sdk/polyfill/browserPolyfill";
 
 async function main() {
   const query = new URLSearchParams(window.location.search);

@@ -23,7 +23,6 @@ import {defaultUserPassphrasePoliciesDto, userPassphrasePoliciesDtoFromApi} from
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import PasswordPoliciesEntity from "../entity/passwordPolicies/passwordPoliciesEntity";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("UserPassphrasePolicies model", () => {
   let apiClientOptions;

@@ -21,7 +21,6 @@ import {mockApiResponse, mockApiResponseError} from '../../../../../../test/mock
 import UserPassphrasePoliciesService from "./userPassphrasePoliciesService";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
-import browser from "../../../sdk/polyfill/browserPolyfill";
 
 describe("UserPassphrasePolicies service", () => {
   let apiClientOptions;

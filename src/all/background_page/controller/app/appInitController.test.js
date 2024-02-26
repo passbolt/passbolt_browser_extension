@@ -22,7 +22,6 @@ import {v4 as uuid} from "uuid";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import SsoKitClientPartEntity from "../../model/entity/sso/ssoKitClientPartEntity";
 import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
 import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";

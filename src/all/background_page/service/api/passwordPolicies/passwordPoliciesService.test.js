@@ -20,7 +20,6 @@ import BuildApiClientOptionsService from "../../account/buildApiClientOptionsSer
 import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
 import {defaultPasswordPolicies} from "../../../model/entity/passwordPolicies/passwordPoliciesEntity.test.data";
 import PasswordPoliciesService from "./passwordPoliciesService";
-import browser from "../../../sdk/polyfill/browserPolyfill";
 
 describe("PasswordPoliciesService", () => {
   let apiClientOptions;

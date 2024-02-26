@@ -12,7 +12,6 @@
  * @since         3.6.0
  */
 import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 class BuildApiClientOptionsService {
   /**

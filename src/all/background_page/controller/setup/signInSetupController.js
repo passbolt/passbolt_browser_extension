@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 import AuthModel from "../../model/auth/authModel";
 import CheckPassphraseService from "../../service/crypto/checkPassphraseService";
 import Keyring from "../../model/keyring";

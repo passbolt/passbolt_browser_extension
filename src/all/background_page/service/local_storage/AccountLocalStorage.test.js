@@ -15,7 +15,6 @@ import {v4 as uuidv4} from 'uuid';
 import AccountLocalStorage from "./accountLocalStorage";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("AccountLocalStorage", () => {
   describe("AccountLocalStorage::get", () => {

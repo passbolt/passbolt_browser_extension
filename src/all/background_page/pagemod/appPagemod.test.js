@@ -45,7 +45,6 @@ import {v4 as uuid} from "uuid";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {RememberMeEvents} from "../event/rememberMeEvents";
-import browser from "../sdk/polyfill/browserPolyfill";
 
 jest.spyOn(ConfigEvents, "listen").mockImplementation(jest.fn());
 jest.spyOn(AppEvents, "listen").mockImplementation(jest.fn());

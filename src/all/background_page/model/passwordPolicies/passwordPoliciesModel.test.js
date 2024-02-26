@@ -21,7 +21,6 @@ import PasswordPoliciesModel from "./passwordPoliciesModel";
 import {defaultPasswordPolicies} from "../entity/passwordPolicies/passwordPoliciesEntity.test.data";
 import PasswordPoliciesEntity from "../entity/passwordPolicies/passwordPoliciesEntity";
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("PasswordPoliciesModel", () => {
   let account, apiClientOptions;

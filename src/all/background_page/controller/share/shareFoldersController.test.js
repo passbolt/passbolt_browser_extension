@@ -21,7 +21,6 @@ import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.d
 import ShareFoldersController from "./shareFoldersController";
 import {_3FoldersSharedWith3UsersResourcesDto, createChangesFolderDto} from "./shareFoldersController.test.data";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
 
 const {enableFetchMocks} = require("jest-fetch-mock");

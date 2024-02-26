@@ -27,7 +27,6 @@ import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import {withAzureSsoSettings} from "../sso/getCurrentSsoSettingsController.test.data";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 beforeEach(() => {
   enableFetchMocks();

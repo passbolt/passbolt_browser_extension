@@ -20,7 +20,6 @@ import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/m
 import DeletePasswordExpirySettingsController from "./deletePasswordExpirySettingsController";
 import {v4 as uuid} from "uuid";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("DeletePasswordExpirySettingsController", () => {
   let account, apiClientOptions;

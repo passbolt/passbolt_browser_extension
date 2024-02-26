@@ -15,7 +15,6 @@ import RbacLocalStorage from "./rbacLocalStorage";
 import {defaultRbacWithUiActionData} from "passbolt-styleguide/src/shared/models/entity/rbac/rbacEntity.test.data";
 import RbacEntity from "passbolt-styleguide/src/shared/models/entity/rbac/rbacEntity";
 import RbacsCollection from "passbolt-styleguide/src/shared/models/entity/rbac/rbacsCollection";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import GetLegacyAccountService from "../account/getLegacyAccountService";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";

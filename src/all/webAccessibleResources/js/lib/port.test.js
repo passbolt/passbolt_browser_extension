@@ -12,7 +12,6 @@
  * @since         3.8.0
  */
 import Port from "./port";
-import browser from "../../../background_page/sdk/polyfill/browserPolyfill";
 import {v4 as uuidv4} from "uuid";
 
 describe("Port", () => {

@@ -16,7 +16,6 @@ import Keyring from "../../model/keyring";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import User from "../../model/user";
 import GroupsUpdateController from "./groupUpdateController";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 
 const {enableFetchMocks} = require("jest-fetch-mock");

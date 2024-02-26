@@ -23,7 +23,6 @@ import {
 import AccountEntity from "../../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "../../account/buildApiClientOptionsService";
-import browser from "../../../sdk/polyfill/browserPolyfill";
 
 describe("PasswordExpiry service", () => {
   let apiClientOptions;

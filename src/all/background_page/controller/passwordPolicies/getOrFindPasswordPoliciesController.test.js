@@ -13,7 +13,6 @@
  */
 
 import {enableFetchMocks} from "jest-fetch-mock";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import GetOrFindPasswordPoliciesController from "./getOrFindPasswordPoliciesController";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";

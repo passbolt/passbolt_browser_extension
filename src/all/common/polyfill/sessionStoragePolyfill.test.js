@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.8.0
  */
-import browser from "./browserPolyfill";
 
 describe("SessionStorage", () => {
   beforeEach(async() => {

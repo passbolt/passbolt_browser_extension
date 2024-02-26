@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import browser from "../all/background_page/sdk/polyfill/browserPolyfill";
 import PortManager from "../all/background_page/sdk/port/portManager";
 import LocalStorageService from "../all/background_page/service/localStorage/localStorageService";
 import SystemRequirementService from "../all/background_page/service/systemRequirementService/systemRequirementService";

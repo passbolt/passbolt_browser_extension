@@ -12,7 +12,6 @@
  * @since         3.8.0
  */
 import PassphraseStorageService from "./passphraseStorageService";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 jest.useFakeTimers();
 

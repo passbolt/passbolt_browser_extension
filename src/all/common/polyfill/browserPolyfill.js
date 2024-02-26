@@ -11,13 +11,21 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.8.0
  */
+const browser = require("webextension-polyfill");
+const ScriptingPolyfill = require("./scriptingPolyfill");
+const SessionStoragePolyfill = require("./sessionStoragePolyfill");
 
-/**
- * This code provides polyfills for the need of Passbolt.
- */
-import browser from "webextension-polyfill";
-import "./scriptingPolyfill"; //mv3 scripting API for mv2
-import "./sessionStoragePolyfill"; //mv3 session storage API polyfill
-import "./actionPolyfill"; //mv3 action API polyfill for mv2
+// mv3 scripting API for mv2
+if (!browser.scripting) {
+  browser.scripting = new ScriptingPolyfill(browser);
+}
+// mv3 session storage API polyfill
+if (!browser.storage.session) {
+  browser.storage.session = new SessionStoragePolyfill();
+}
+// mv3 action API polyfill for mv2
+if (!browser.action) {
+  browser.action = browser.browserAction;
+}
 
-export default browser;
+module.exports = browser;

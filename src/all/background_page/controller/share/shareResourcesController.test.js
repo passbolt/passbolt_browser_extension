@@ -218,7 +218,7 @@ describe("ShareResourcesController", () => {
       try {
         await controller.main([], []);
       } catch (error) {
-        expect(error.message).toStrictEqual("bulkShareAggregateChanges expect an array of ACOs")
+        expect(error.message).toStrictEqual("bulkShareAggregateChanges expect an array of ACOs");
       }
     });
 
@@ -248,7 +248,7 @@ describe("ShareResourcesController", () => {
       try {
         await controller.main(resourcesDto, []);
       } catch (error) {
-        expect(error.message).toStrictEqual("bulkShareAggregateChanges expect an array of changes")
+        expect(error.message).toStrictEqual("bulkShareAggregateChanges expect an array of changes");
       }
     });
   });

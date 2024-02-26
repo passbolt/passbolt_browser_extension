@@ -10,7 +10,6 @@ import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/api
 import Validator from "validator";
 import {ValidatorRule} from "../utils/validatorRules";
 import PassphraseStorageService from "../service/session_storage/passphraseStorageService";
-import browser from "../sdk/polyfill/browserPolyfill";
 
 /**
  * The class that deals with users.

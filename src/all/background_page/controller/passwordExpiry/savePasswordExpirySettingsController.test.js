@@ -25,7 +25,6 @@ import {defaultPasswordExpiryProSettingsDto, defaultPasswordExpirySettingsDto, d
 import PasswordExpiryProSettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiryPro/passwordExpiryProSettingsEntity";
 import {defaultProOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 import OrganizationSettingsEntity from "../../model/entity/organizationSettings/organizationSettingsEntity";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 const mockedOrganisationSettings = new OrganizationSettingsEntity(defaultProOrganizationSettings());
 jest.mock('../../model/organizationSettings/organizationSettingsModel', () => ({

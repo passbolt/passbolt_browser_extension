@@ -13,7 +13,6 @@
  */
 
 import LocalStorageService from "./localStorageService";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import GetLegacyAccountService from "../account/getLegacyAccountService";
 import UserMeSessionStorageService from "../sessionStorage/userMeSessionStorageService";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";

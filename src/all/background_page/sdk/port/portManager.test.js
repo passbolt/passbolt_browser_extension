@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.8.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 import WorkersSessionStorage from "../../service/sessionStorage/workersSessionStorage";
 import PortManager from "./portManager";
 import {mockPort} from "./portManager.test.data";

@@ -12,7 +12,7 @@
  * @since         3.9.0
  */
 
-class EventListerners {
+class MockEventListener {
   constructor() {
     this.listeners = [];
     this.addListener = jest.fn().mockImplementation(this.addListener.bind(this));
@@ -37,11 +37,4 @@ class EventListerners {
   }
 }
 
-export default class MockTabs {
-  constructor() {
-    this.onUpdated = new EventListerners();
-    this.onRemoved = new EventListerners();
-    this.remove = jest.fn();
-    this.update = jest.fn();
-  }
-}
+export default MockEventListener;

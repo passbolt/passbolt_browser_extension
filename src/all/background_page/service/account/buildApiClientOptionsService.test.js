@@ -15,7 +15,6 @@
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {adminAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "./buildApiClientOptionsService";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("BuildAccountApiClientOptionsService", () => {
   it("BuildAccountApiClientOptionsService:buildFromAccount", async() => {

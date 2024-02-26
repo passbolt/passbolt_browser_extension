@@ -22,7 +22,6 @@ import SavePasswordPoliciesController from "./savePasswordPoliciesController";
 import {defaultPasswordPolicies} from "../../model/entity/passwordPolicies/passwordPoliciesEntity.test.data";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("SavePasswordPoliciesController::exec", () => {
   let account, apiClientOptions;

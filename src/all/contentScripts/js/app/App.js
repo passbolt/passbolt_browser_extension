@@ -14,7 +14,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import ExtBootstrapApp from "passbolt-styleguide/src/react-extension/ExtBootstrapApp";
 import Port from "../../../webAccessibleResources/js/lib/port";
-import browser from "webextension-polyfill";
 import MessageService from "../service/messageService";
 import MessageEventHandler from "../message/messageEventHandler";
 import ConnectPortController from "../controller/connectPortController";

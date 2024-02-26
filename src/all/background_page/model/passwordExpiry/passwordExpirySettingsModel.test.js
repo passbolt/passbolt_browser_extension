@@ -26,7 +26,6 @@ import PasswordExpirySettingsModel from "./passwordExpirySettingsModel";
 import {v4 as uuid} from "uuid";
 import PassboltBadResponseError from "passbolt-styleguide/src/shared/lib/Error/PassboltBadResponseError";
 import PasswordExpiryProSettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiryPro/passwordExpiryProSettingsEntity";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("PasswordExpiry model", () => {
   let apiClientOptions, model;

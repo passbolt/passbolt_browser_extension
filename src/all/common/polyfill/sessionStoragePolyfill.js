@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.8.0
  */
-import browser from "webextension-polyfill";
 
 /**
  * Utility class to provide a chrome.storage.session polyfill.
@@ -75,6 +74,5 @@ class SessionStorage {
     this._storedData = {};
   }
 }
-if (!browser.storage.session) {
-  browser.storage.session = new SessionStorage();
-}
+
+module.exports = SessionStorage;

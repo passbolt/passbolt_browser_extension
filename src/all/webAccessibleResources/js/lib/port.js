@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import browser from "../../../background_page/sdk/polyfill/browserPolyfill";
 import {v4 as uuidv4} from "uuid";
 import Lock from "../../../background_page/utils/lock";
 

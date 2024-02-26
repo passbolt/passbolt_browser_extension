@@ -12,7 +12,6 @@
  * @since         3.3.0
  */
 
-import browser from "../sdk/polyfill/browserPolyfill";
 import ToolbarController from "./toolbarController";
 import AccountEntity from "../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../model/entity/account/accountEntity.test.data";

@@ -20,7 +20,6 @@ import FindPasswordPoliciesController from "./findPasswordPoliciesController";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {defaultPasswordPolicies} from "../../model/entity/passwordPolicies/passwordPoliciesEntity.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("FindPasswordPoliciesController::exec", () => {
   let account, apiClientOptions;

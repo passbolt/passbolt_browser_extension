@@ -13,7 +13,6 @@
  */
 import WorkerService from "../worker/workerService";
 import ScriptExecution from "../../sdk/scriptExecution";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 /**
  * File service

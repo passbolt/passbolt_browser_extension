@@ -13,7 +13,6 @@
  *
  * On extension installed controller
  */
-import browser from '../../sdk/polyfill/browserPolyfill';
 import PagemodManager from "../../pagemod/pagemodManager";
 import WebNavigationService from "../../service/webNavigation/webNavigationService";
 import ParseSetupUrlService from "../../service/setup/parseSetupUrlService";

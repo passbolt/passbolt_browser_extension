@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.1.2
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 import {v4 as uuidv4} from "uuid";
 
 const PROMISE_TIMEOUT = 500;

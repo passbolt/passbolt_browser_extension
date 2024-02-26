@@ -12,7 +12,6 @@
  * @since         3.8.0
  */
 import MessageService from "./messageService";
-import browser from "../../../background_page/sdk/polyfill/browserPolyfill";
 
 describe("MessageService", () => {
   describe("MessageService::onMessage", () => {

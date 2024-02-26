@@ -4,7 +4,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import browser from "./sdk/polyfill/browserPolyfill";
 import PortManager from "./sdk/port/portManager";
 import SystemRequirementService from "./service/systemRequirementService/systemRequirementService";
 import LocalStorageService from "./service/localStorage/localStorageService";
@@ -14,7 +13,6 @@ import User from "./model/user";
 import GpgAuth from "./model/gpgauth";
 import Log from "./model/log";
 import StartLoopAuthSessionCheckService from "./service/auth/startLoopAuthSessionCheckService";
-
 
 const main = async() => {
   /**

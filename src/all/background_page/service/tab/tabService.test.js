@@ -18,7 +18,6 @@ import Port from "../../sdk/port";
 import PortManager from "../../sdk/port/portManager";
 import WebNavigationService from "../webNavigation/webNavigationService";
 import TabService from "./tabService";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 import BrowserTabService from "../ui/browserTab.service";
 

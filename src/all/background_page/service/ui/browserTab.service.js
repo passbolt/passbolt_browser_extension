@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.4.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 class BrowserTabService {
   /**

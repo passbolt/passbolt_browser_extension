@@ -22,7 +22,6 @@ import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/m
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import SaveUserPassphrasePoliciesController from "./saveUserPassphrasePoliciesController";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("SaveUserPassphrasePoliciesController", () => {
   let apiClientOptions;

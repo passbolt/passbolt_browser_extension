@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 import Log from "../../model/log";
 import Lock from "../../utils/lock";
 import SsoKitServerPartEntity from "../../model/entity/sso/ssoKitServerPartEntity";

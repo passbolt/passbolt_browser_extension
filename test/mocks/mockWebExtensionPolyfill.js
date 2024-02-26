@@ -11,15 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.6.0
  */
-import mockSessionStorage from "./mockSessionStorage";
-import mockLocalStorage from "./mockLocalStorage";
+import "jest-webextension-mock";
 import MockAlarms from "./mockAlarms";
-import "webextension-polyfill";
+import MockEventListener from "./mockEventListener";
+import MockStorage from "./mockStorage";
 
 jest.mock("webextension-polyfill", () => {
-  const browser = jest.requireActual("webextension-polyfill");
+  const originalBrowser = jest.requireActual("webextension-polyfill");
   return {
-    ...browser,
+    ...originalBrowser,
     // Alarms is not mocked by jest-webextension-mock v3.8.9
     alarms: new MockAlarms(),
     /*
@@ -30,7 +30,7 @@ jest.mock("webextension-polyfill", () => {
       get: jest.fn()
     },
     runtime: {
-      ...browser.runtime,
+      ...originalBrowser.runtime,
       // Force the extension runtime url
       getURL: jest.fn(() => "chrome-extension://didegimhafipceonhjepacocaffmoppf"),
       // Force extension version
@@ -44,22 +44,20 @@ jest.mock("webextension-polyfill", () => {
       },
     },
     storage: {
-      ...browser.storage,
-      // Storage.local mock is incorrect with jest-webextension-mock v3.8.9
-      local: mockLocalStorage,
+      ...originalBrowser.storage,
+      // Override jest-webextension-mock v3.8.9 storage.local with custom one offering local scope store
+      local: new MockStorage(),
       // Storage.session is not mocked by jest-webextension-mock v3.8.9
-      session: mockSessionStorage
+      session: new MockStorage(),
     },
     tabs: {
-      ...browser.tabs,
+      ...originalBrowser.tabs,
       // Tabs primitives not mocked by jest-webextension-mock v3.8.9
       executeScript: jest.fn(),
       insertCSS: jest.fn(),
-      onActivated: {
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        hasListener: jest.fn(),
-      },
+      onActivated: new MockEventListener(),
+      onUpdated: new MockEventListener(),
+      onRemoved: new MockEventListener(),
       reload: jest.fn(),
     },
     /*
@@ -67,6 +65,7 @@ jest.mock("webextension-polyfill", () => {
      * @see https://github.com/clarkbw/jest-webextension-mock/issues/89
      */
     windows: {
+      create: jest.fn(),
       onFocusChanged: {
         addListener: jest.fn(),
         hasListener: jest.fn(),

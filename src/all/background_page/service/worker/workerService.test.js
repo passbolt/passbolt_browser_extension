@@ -16,7 +16,6 @@ import WorkerService from "./workerService";
 import BrowserTabService from "../ui/browserTab.service";
 import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 import WebNavigationService from "../webNavigation/webNavigationService";
 

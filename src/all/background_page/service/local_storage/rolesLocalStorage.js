@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 import Log from "../../model/log";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import RolesCollection from "passbolt-styleguide/src/shared/models/entity/role/rolesCollection";

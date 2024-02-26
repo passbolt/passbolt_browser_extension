@@ -43,16 +43,6 @@ jest.mock("../../model/auth/authModel", () => ({
   }))
 }));
 
-const mockedTabCreate = jest.fn();
-jest.mock("../../sdk/polyfill/browserPolyfill", () => ({
-  __esModule: true,
-  default: {
-    tabs: {
-      create: data => { mockedTabCreate(data); }
-    }
-  }
-}));
-
 const mockGetSsoTokenFromThirdParty = jest.fn();
 const mockCloseHandler = jest.fn();
 jest.mock("../../service/sso/popupHandlerService", () => ({
@@ -212,7 +202,7 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       const expectedUrl = `${User.getInstance().settings.getDomain()}/auth/login?case=sso-login-error`;
       const account = new AccountEntity(defaultAccountDto());
 
-      mockedTabCreate.mockImplementation(tabInfo => {
+      jest.spyOn(browser.tabs, 'create').mockImplementation(tabInfo => {
         expect(tabInfo.url).toBe(expectedUrl);
         expect(tabInfo.active).toBe(true);
       });

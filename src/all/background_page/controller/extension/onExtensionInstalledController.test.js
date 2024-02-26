@@ -13,7 +13,6 @@
  */
 
 import OnExtensionInstalledController from "./onExtensionInstalledController";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import User from "../../model/user";
 import UserSettings from "../../model/userSettings/userSettings";
 import WebNavigationService from "../../service/webNavigation/webNavigationService";

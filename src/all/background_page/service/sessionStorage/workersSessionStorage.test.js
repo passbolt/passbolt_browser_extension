@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
 import WorkersSessionStorage from "./workersSessionStorage";

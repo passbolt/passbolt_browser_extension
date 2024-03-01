@@ -271,16 +271,21 @@ class ResourceModel {
   /**
    * Returns the count of possible resources to suggest given an url
    * @param {string} url An url
-   * @return {*[]|number}
+   * @return {Promise<number>}
    */
   async countSuggestedResources(url) {
     if (!url) {
       return 0;
     }
+
     const resourcesCollection = await this.getOrFindAll();
-    const passwordResources = await this.keepPasswordResources(resourcesCollection.toDto());
-    const passwordResourcesCollection = new ResourcesCollection(passwordResources);
-    return passwordResourcesCollection.countSuggestedResources(url);
+
+    // Filter by resource types behaving as a password.
+    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+    resourceTypesCollection.filterByPasswordResourceTypes();
+    resourcesCollection.filterByResourceTypes(resourceTypesCollection, false);
+
+    return resourcesCollection.countSuggestedResources(url);
   }
 
   /**

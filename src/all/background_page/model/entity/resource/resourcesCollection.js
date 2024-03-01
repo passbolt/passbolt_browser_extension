@@ -164,6 +164,23 @@ class ResourcesCollection extends EntityCollection {
 
   /*
    * ==================================================
+   * Filters
+   * ==================================================
+   */
+
+  /**
+   * Filter by resource types.
+   * @param {ResourceTypesCollection} resourceTypes The resource types to filter by
+   * @param {boolean} [excludeUndefined=true] Filter out resources not having a defined resource type.
+   * @return {void} The function alters the collection itself.
+   */
+  filterByResourceTypes(resourceTypes, excludeUndefined = true) {
+    const resourceTypesIds = resourceTypes.extract("id");
+    this.filterByPropertyValueIn("resource_type_id", resourceTypesIds, excludeUndefined);
+  }
+
+  /*
+   * ==================================================
    * Sanitization
    * ==================================================
    */

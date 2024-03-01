@@ -20,17 +20,14 @@ const ENTITY_NAME = 'ExternalResources';
 
 class ExternalResourcesCollection extends EntityCollection {
   /**
-   * External resources collections constructor
-   *
-   * @param {array} ExternalResourcesCollectionDto resource DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(ExternalResourcesCollectionDto) {
+  constructor(ExternalResourcesCollectionDto, options = {}) {
     super(EntitySchema.validate(
       ExternalResourcesCollection.ENTITY_NAME,
       ExternalResourcesCollectionDto,
       ExternalResourcesCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation

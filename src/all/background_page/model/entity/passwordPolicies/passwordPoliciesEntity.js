@@ -24,17 +24,14 @@ const POLICY_PASSWORD = "password";
 
 class PasswordPoliciesEntity extends Entity {
   /**
-   * Password Policies entity constructor
-   *
-   * @param {Object} passwordPoliciesDto password policies dto
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(passwordPoliciesDto) {
+  constructor(passwordPoliciesDto, options = {}) {
     super(EntitySchema.validate(
       PasswordPoliciesEntity.ENTITY_NAME,
       passwordPoliciesDto,
       PasswordPoliciesEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     if (this._props.password_generator_settings) {

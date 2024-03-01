@@ -20,17 +20,14 @@ const ENTITY_NAME = 'MfaSetupTotp';
 
 class MfaSetupTotpEntity extends Entity {
   /**
-   * Mfa policy entity constructor
-   *
-   * @param {Object} setupDto totp setup dto
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(setupDto) {
+  constructor(setupDto, options = {}) {
     super(EntitySchema.validate(
       MfaSetupTotpEntity.ENTITY_NAME,
       setupDto,
       MfaSetupTotpEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

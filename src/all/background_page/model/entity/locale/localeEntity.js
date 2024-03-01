@@ -21,17 +21,14 @@ const ENTITY_NAME = 'Locale';
  */
 class LocaleEntity extends Entity {
   /**
-   * Locale entity constructor
-   *
-   * @param {Object} localeDto locale DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(localeDto) {
+  constructor(localeDto, options = {}) {
     super(EntitySchema.validate(
       LocaleEntity.ENTITY_NAME,
       localeDto,
       LocaleEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

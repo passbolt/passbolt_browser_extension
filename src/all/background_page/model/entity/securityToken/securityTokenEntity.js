@@ -17,17 +17,14 @@ const ENTITY_NAME = "SecurityToken";
 
 class SecurityTokenEntity extends Entity {
   /**
-   * Security token entity constructor
-   *
-   * @param {Object} securityTokenDto security token DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(securityTokenDto) {
+  constructor(securityTokenDto, options = {}) {
     super(EntitySchema.validate(
       SecurityTokenEntity.ENTITY_NAME,
       securityTokenDto,
       SecurityTokenEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

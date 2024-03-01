@@ -25,17 +25,14 @@ const TRANSFER_STATUS_ERROR = 'error';
 
 class TransferEntity extends Entity {
   /**
-   * Transfer entity constructor
-   *
-   * @param {Object} transferDto transfer DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(transferDto) {
+  constructor(transferDto, options = {}) {
     super(EntitySchema.validate(
       TransferEntity.ENTITY_NAME,
       transferDto,
       TransferEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     if (this._props.authentication_token) {

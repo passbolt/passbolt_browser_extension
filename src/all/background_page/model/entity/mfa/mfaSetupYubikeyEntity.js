@@ -20,17 +20,14 @@ const ENTITY_NAME = 'MfaSetupYubikeyEntity';
 
 class MfaSetupYubikeyEntity extends Entity {
   /**
-   * Mfa setup yubikey entity provider constructor
-   *
-   * @param {Object} setupDto yubikey setup dto
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(setupDto) {
+  constructor(setupDto, options = {}) {
     super(EntitySchema.validate(
       MfaSetupYubikeyEntity.ENTITY_NAME,
       setupDto,
       MfaSetupYubikeyEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

@@ -19,17 +19,14 @@ const ENTITY_NAME = 'GroupUser';
 
 class GroupUserEntity extends Entity {
   /**
-   * GroupUser entity constructor
-   *
-   * @param {Object} groupUserDto groupUser DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(groupUserDto) {
+  constructor(groupUserDto, options = {}) {
     super(EntitySchema.validate(
       GroupUserEntity.ENTITY_NAME,
       groupUserDto,
       GroupUserEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

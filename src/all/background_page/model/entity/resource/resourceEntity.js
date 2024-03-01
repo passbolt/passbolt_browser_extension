@@ -31,17 +31,23 @@ const RESOURCE_DESCRIPTION_MAX_LENGTH = 10000;
 
 class ResourceEntity extends Entity {
   /**
-   * Resource entity constructor
-   *
-   * @param {Object} resourceDto resource DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityValidationError} Build Rule: The collection of secrets, if provided, cannot be empty.
+   * @throws {EntityValidationError} Build Rule: Verify that the secrets associated resource ID corresponds with the
+   * resource ID.
+   * @throws {EntityValidationError} Build Rule: Verify that the permission is designated for a resource, and its
+   * associated aco foreign key corresponds with the resource ID.
+   * @throws {EntityValidationError} Build Rule: Verify that the permissions are designated for a resource, and their
+   * associated aco foreign keys correspond with the resource ID.
+   * @throws {EntityValidationError} Build Rule: Verify that the favorite associated foreign key corresponds with
+   * the resource ID.
    */
-  constructor(resourceDto) {
+  constructor(resourceDto, options = {}) {
     super(EntitySchema.validate(
       ResourceEntity.ENTITY_NAME,
       resourceDto,
       ResourceEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     if (this._props.permission) {

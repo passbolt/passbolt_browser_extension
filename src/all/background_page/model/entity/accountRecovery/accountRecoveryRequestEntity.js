@@ -28,12 +28,12 @@ class AccountRecoveryRequestEntity extends Entity {
   /**
    * @inheritDoc
    */
-  constructor(accountRecoveryRequestDto = {}) {
+  constructor(accountRecoveryRequestDto = {}, options = {}) {
     super(EntitySchema.validate(
       AccountRecoveryRequestEntity.ENTITY_NAME,
       accountRecoveryRequestDto,
       AccountRecoveryRequestEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     if (this._props.account_recovery_private_key) {

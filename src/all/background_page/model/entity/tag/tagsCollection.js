@@ -23,17 +23,16 @@ const RULE_UNIQUE_SLUG = 'unique_slug';
 
 class TagsCollection extends EntityCollection {
   /**
-   * Tags Entity constructor
-   *
-   * @param {Object} tagsCollectionDto tag DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
+   * @todo The collection options.clone, doesn't work completely as expected here as the internal push function is creating the TagEntity.
    */
-  constructor(tagsCollectionDto) {
+  constructor(tagsCollectionDto, options = {}) {
     super(EntitySchema.validate(
       TagsCollection.ENTITY_NAME,
       tagsCollectionDto,
       TagsCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation

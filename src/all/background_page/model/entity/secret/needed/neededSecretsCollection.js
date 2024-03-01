@@ -19,17 +19,14 @@ const ENTITY_NAME = 'NeededSecrets';
 
 class NeededSecretsCollection extends EntityCollection {
   /**
-   * Secrets Entity constructor
-   *
-   * @param {Object} NeededSecretsCollectionDto secret DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(NeededSecretsCollectionDto) {
+  constructor(NeededSecretsCollectionDto, options = {}) {
     super(EntitySchema.validate(
       NeededSecretsCollection.ENTITY_NAME,
       NeededSecretsCollectionDto,
       NeededSecretsCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation

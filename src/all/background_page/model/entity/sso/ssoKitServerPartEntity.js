@@ -24,17 +24,14 @@ import {Buffer} from 'buffer';
  */
 class SsoKitServerPartEntity extends Entity {
   /**
-   * Setup entity constructor
-   *
-   * @param {Object} ssoUserServerDataDto sso user's server data DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(ssoUserServerDataDto) {
+  constructor(ssoUserServerDataDto, options = {}) {
     super(EntitySchema.validate(
       SsoKitServerPartEntity.ENTITY_NAME,
       ssoUserServerDataDto,
       SsoKitServerPartEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

@@ -20,18 +20,14 @@ const TYPE_ACCOUNT = "account-kit";
 
 class AccountKitEntity extends AbstractAccountEntity {
   /**
-   * Setup entity constructor
-   *
-   * @param {Object} accountDto account DTO
-   * @param {Object} options.
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(accountDto) {
+  constructor(accountDto, options = {}) {
     super(EntitySchema.validate(
       AccountKitEntity.ENTITY_NAME,
       accountDto,
       AccountKitEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

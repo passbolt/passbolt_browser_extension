@@ -23,17 +23,14 @@ const PERMISSION_CHANGE_UPDATE = 'update';
 
 class PermissionChangeEntity extends Entity {
   /**
-   * Permission entity constructor
-   *
-   * @param {Object} permissionChangesDto data transfer object
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(permissionChangesDto) {
+  constructor(permissionChangesDto, options = {}) {
     super(EntitySchema.validate(
       PermissionChangeEntity.ENTITY_NAME,
       permissionChangesDto,
       PermissionChangeEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

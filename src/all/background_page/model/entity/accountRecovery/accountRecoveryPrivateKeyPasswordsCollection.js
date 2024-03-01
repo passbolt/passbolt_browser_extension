@@ -25,20 +25,18 @@ const RULE_UNIQUE_ID = 'unique_id';
  */
 class AccountRecoveryPrivateKeyPasswordsCollection extends EntityCollection {
   /**
-   * AccountRecoveryPrivateKeyPasswords Entity constructor
-   *
-   * @param {Object} AccountRecoveryPrivateKeyPasswordsCollectionDto accountRecoveryPrivateKeyPasswordsCollection DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(accountRecoveryPrivateKeyPasswordsCollectionDto) {
+  constructor(accountRecoveryPrivateKeyPasswordsCollectionDto, options = {}) {
     super(EntitySchema.validate(
       AccountRecoveryPrivateKeyPasswordsCollection.ENTITY_NAME,
       accountRecoveryPrivateKeyPasswordsCollectionDto,
       AccountRecoveryPrivateKeyPasswordsCollection.getSchema()
-    ));
+    ), options);
 
     /*
-     * Check if resource ids are unique
+     * Check if items ids are unique
      * Why not this.push? It is faster than adding items one by one
      */
     const ids = this._props.map(accountRecoveryPrivateKeyPassword => accountRecoveryPrivateKeyPassword.id);

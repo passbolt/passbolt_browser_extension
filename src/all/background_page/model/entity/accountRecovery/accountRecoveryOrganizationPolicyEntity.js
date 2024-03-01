@@ -27,20 +27,20 @@ const POLICY_OPT_OUT = "opt-out";
 
 /**
  * Entity related to the account recovery organization policy
+ * @throws {EntityValidationError} Build rule checking if the provided public key id matches the one provided as metadata.
  */
 class AccountRecoveryOrganizationPolicyEntity extends Entity {
   /**
-   * Setup entity constructor
-   *
-   * @param {Object} accountRecoveryOrganizationPolicyDto account recovery organization policy DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityValidationError} Build rule checking if the provided public key id matches the one provided as metadata.
    */
-  constructor(accountRecoveryOrganizationPolicyDto) {
+  constructor(accountRecoveryOrganizationPolicyDto, options = {}) {
     super(EntitySchema.validate(
       AccountRecoveryOrganizationPolicyEntity.ENTITY_NAME,
       accountRecoveryOrganizationPolicyDto,
       AccountRecoveryOrganizationPolicyEntity.getSchema()
-    ));
+    ), options);
+
     // Associations
     if (this._props.account_recovery_organization_public_key) {
       this._account_recovery_organization_public_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_public_key);

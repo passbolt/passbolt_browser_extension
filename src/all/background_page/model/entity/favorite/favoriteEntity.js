@@ -19,17 +19,14 @@ const FAVORITE_RESOURCE = 'Resource';
 
 class FavoriteEntity extends Entity {
   /**
-   * Role entity constructor
-   *
-   * @param {Object} favoriteDto favorite DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(favoriteDto) {
+  constructor(favoriteDto, options = {}) {
     super(EntitySchema.validate(
       FavoriteEntity.ENTITY_NAME,
       favoriteDto,
       FavoriteEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

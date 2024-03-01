@@ -24,17 +24,18 @@ const RULE_SAME_RESOURCE = 'same_resource';
 
 class ResourceSecretsCollection extends EntityCollection {
   /**
-   * ResourceSecrets Collection constructor
-   *
-   * @param {Object} resourceSecretsCollectionDto secrets DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection associated user ID is unique.
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection target the same resource.
+   * @todo The collection options.clone, doesn't work here as the internal push function is recreating the SecretEntity.
    */
-  constructor(resourceSecretsCollectionDto) {
+  constructor(resourceSecretsCollectionDto, options = {}) {
     super(EntitySchema.validate(
       ResourceSecretsCollection.ENTITY_NAME,
       resourceSecretsCollectionDto,
       ResourceSecretsCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation

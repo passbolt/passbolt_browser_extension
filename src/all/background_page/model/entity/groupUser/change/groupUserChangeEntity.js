@@ -21,17 +21,14 @@ const GROUP_USER_CHANGE_UPDATE = 'update';
 
 class GroupUserChangeEntity extends Entity {
   /**
-   * GroupUserChange entity constructor
-   *
-   * @param {Object} groupUserChangesDto data transfer object
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(groupUserChangesDto) {
+  constructor(groupUserChangesDto, options = {}) {
     super(EntitySchema.validate(
       GroupUserChangeEntity.ENTITY_NAME,
       groupUserChangesDto,
       GroupUserChangeEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

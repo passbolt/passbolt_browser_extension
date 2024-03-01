@@ -23,17 +23,14 @@ const PASSPHRASE_WORDS_CAMELCASE = "camelcase";
 
 class PassphraseGeneratorSettingsEntity extends Entity {
   /**
-   * Passphrase Generator Settings entity constructor
-   *
-   * @param {Object} passphraseGeneratorSettingsDto passphrase generator settings dto
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(passphraseGeneratorSettingsDto) {
+  constructor(passphraseGeneratorSettingsDto, options = {}) {
     super(EntitySchema.validate(
       PassphraseGeneratorSettingsEntity.ENTITY_NAME,
       passphraseGeneratorSettingsDto,
       PassphraseGeneratorSettingsEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

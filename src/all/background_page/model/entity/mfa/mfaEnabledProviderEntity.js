@@ -21,17 +21,14 @@ const ENTITY_NAME = 'MfaEnabledProvider';
 
 class MfaEnabledProviderEntity extends Entity {
   /**
-   * Mfa entity constructor
-   *
-   * @param {Object} MfaDto mfa dto
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(MfaDto) {
+  constructor(MfaDto, options = {}) {
     super(EntitySchema.validate(
       MfaEnabledProviderEntity.ENTITY_NAME,
       MfaDto,
       MfaEnabledProviderEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

@@ -25,17 +25,14 @@ const ENTITY_NAME = 'User';
 
 class UserEntity extends Entity {
   /**
-   * User entity constructor
-   *
-   * @param {Object} userDto user DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(userDto) {
+  constructor(userDto, options = {}) {
     super(EntitySchema.validate(
       UserEntity.ENTITY_NAME,
       UserEntity._cleanupLastLoginDate(userDto),
       UserEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     if (this._props.profile) {

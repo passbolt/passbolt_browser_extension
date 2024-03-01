@@ -22,17 +22,16 @@ const ENTITY_NAME = "AccountRecoveryPrivateKey";
  */
 class AccountRecoveryPrivateKeyEntity extends Entity {
   /**
-   * Setup entity constructor
-   *
-   * @param {Object} accountRecoveryPrivateKeyDto account recovery organization public key DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * Note: Sanitize, if provided, the DTO account recovery private key passwords by removing duplicate objects based
+   * on their id.
    */
-  constructor(accountRecoveryPrivateKeyDto) {
+  constructor(accountRecoveryPrivateKeyDto, options = {}) {
     super(EntitySchema.validate(
       AccountRecoveryPrivateKeyEntity.ENTITY_NAME,
       accountRecoveryPrivateKeyDto,
       AccountRecoveryPrivateKeyEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     if (this._props.account_recovery_private_key_passwords) {

@@ -23,17 +23,15 @@ const RULE_UNIQUE_ID = 'unique_id';
 
 class ActionLogsCollection extends EntityCollection {
   /**
-   * Action Logs Collection constructor
-   *
-   * @param {Object} actionLogsCollectionDto action logs DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(actionLogsCollectionDto) {
+  constructor(actionLogsCollectionDto, options = {}) {
     super(EntitySchema.validate(
       ActionLogsCollection.ENTITY_NAME,
       actionLogsCollectionDto,
       ActionLogsCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation

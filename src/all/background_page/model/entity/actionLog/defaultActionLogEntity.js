@@ -17,17 +17,14 @@ const ENTITY_NAME = 'DefaultActionLog';
 
 class DefaultActionLogEntity extends AbstractActionLogEntity {
   /**
-   * Action log entity constructor
-   *
-   * @param {Object} actionLog action log DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(actionLog) {
+  constructor(actionLog, options = {}) {
     super(EntitySchema.validate(
       DefaultActionLogEntity.ENTITY_NAME,
       actionLog,
       DefaultActionLogEntity.getSchema()
-    ));
+    ), options);
   }
 
   /*

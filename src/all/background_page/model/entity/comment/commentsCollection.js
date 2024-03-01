@@ -23,17 +23,16 @@ const RULE_SAME_FOREIGN_MODEL = 'same_foreign_model';
 
 class CommentsCollection extends EntityCollection {
   /**
-   * Comments Entity constructor
-   *
-   * @param {Object} commentsCollectionDto comment DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection target the same foreign entity.
    */
-  constructor(commentsCollectionDto) {
+  constructor(commentsCollectionDto, options = {}) {
     super(EntitySchema.validate(
       CommentsCollection.ENTITY_NAME,
       commentsCollectionDto,
       CommentsCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation

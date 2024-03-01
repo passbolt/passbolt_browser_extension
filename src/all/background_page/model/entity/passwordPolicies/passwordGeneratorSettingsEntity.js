@@ -19,17 +19,14 @@ const ENTITY_NAME = 'PasswordGeneratorSettings';
 
 class PasswordGeneratorSettingsEntity extends Entity {
   /**
-   * Password Generator Settings entity constructor
-   *
-   * @param {Object} passwordGeneratorSettingsDto password generator settings dto
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(passwordGeneratorSettingsDto) {
+  constructor(passwordGeneratorSettingsDto, options = {}) {
     super(EntitySchema.validate(
       PasswordGeneratorSettingsEntity.ENTITY_NAME,
       passwordGeneratorSettingsDto,
       PasswordGeneratorSettingsEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

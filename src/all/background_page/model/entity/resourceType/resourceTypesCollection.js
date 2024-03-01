@@ -37,17 +37,15 @@ const PASSWORD_RESOURCE_TYPES = [
 
 class ResourceTypesCollection extends EntityCollection {
   /**
-   * Resource Types Entity constructor
-   *
-   * @param {Object} resourceTypesCollectionDto resourceType DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(resourceTypesCollectionDto) {
+  constructor(resourceTypesCollectionDto, options = {}) {
     super(EntitySchema.validate(
       ResourceTypesCollection.ENTITY_NAME,
       resourceTypesCollectionDto,
       ResourceTypesCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation

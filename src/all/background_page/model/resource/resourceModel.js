@@ -278,6 +278,20 @@ class ResourceModel {
       return 0;
     }
 
+    const resourcesCollection = await this.findSuggestedResources(url);
+    return resourcesCollection.length;
+  }
+
+  /**
+   * Returns the possible resources to suggest given an url.
+   * @param {string} url The url to suggest for.
+   * @return {Promise<ResourcesCollection>}
+   */
+  async findSuggestedResources(url) {
+    if (!url) {
+      return new ResourcesCollection([]);
+    }
+
     const resourcesCollection = await this.getOrFindAll();
 
     // Filter by resource types behaving as a password.
@@ -285,22 +299,10 @@ class ResourceModel {
     resourceTypesCollection.filterByPasswordResourceTypes();
     resourcesCollection.filterByResourceTypes(resourceTypesCollection, false);
 
-    return resourcesCollection.countSuggestedResources(url);
-  }
+    // Filter by suggested resources.
+    resourcesCollection.filterBySuggestResources(url);
 
-  /**
-   * Returns the possible resources to suggest given an url
-   * @param currentUrl An url
-   * @return {Promise<*[]|number>}
-   */
-  async findSuggestedResources(url) {
-    if (!url) {
-      return 0;
-    }
-    const resourcesCollection = await this.getOrFindAll();
-    const passwordResources = await this.keepPasswordResources(resourcesCollection.toDto());
-    const passwordResourcesCollection = new ResourcesCollection(passwordResources);
-    return passwordResourcesCollection.findSuggestedResources(url).toDto();
+    return resourcesCollection;
   }
 
   /*

@@ -52,7 +52,7 @@ class InformMenuController {
       const configuration = {
         inputType: callToActionInput.type,
         inputValue: callToActionInput.value,
-        suggestedResources: suggestedResources,
+        suggestedResources: suggestedResources.toDto(),
       };
       this.worker.port.emit(requestId, "SUCCESS", configuration);
     } catch (error) {

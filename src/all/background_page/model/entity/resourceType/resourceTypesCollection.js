@@ -29,6 +29,12 @@ const SUPPORTED_RESOURCE_TYPES = [
   RESOURCE_TYPE_TOTP_SLUG
 ];
 
+const PASSWORD_RESOURCE_TYPES = [
+  RESOURCE_TYPE_PASSWORD_STRING_SLUG,
+  RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
+  RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
+];
+
 class ResourceTypesCollection extends EntityCollection {
   /**
    * Resource Types Entity constructor
@@ -132,12 +138,22 @@ class ResourceTypesCollection extends EntityCollection {
    * @return {boolean}
    */
   isPasswordResourceType(id) {
-    const passwordResourceTypesSlug = [
-      RESOURCE_TYPE_PASSWORD_STRING_SLUG,
-      RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
-      RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
-    ];
+    const passwordResourceTypesSlug = PASSWORD_RESOURCE_TYPES;
     return this.resourceTypes.some(resourceType => resourceType.id === id && passwordResourceTypesSlug.includes(resourceType.slug));
+  }
+
+  /*
+   * ==================================================
+   * Filter
+   * ==================================================
+   */
+
+  /**
+   * Filter by password resource types.
+   * @return {void} The function alters the collection itself.
+   */
+  filterByPasswordResourceTypes() {
+    this.filterByPropertyValueIn("slug", PASSWORD_RESOURCE_TYPES);
   }
 
   /*

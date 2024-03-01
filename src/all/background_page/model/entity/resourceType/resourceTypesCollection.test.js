@@ -15,8 +15,15 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import ResourceTypeEntity from "./resourceTypeEntity";
 import ResourceTypesCollection from "./resourceTypesCollection";
 import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
+import {
+  resourceTypesCollectionDto
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import {
+  TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION, TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
+  TEST_RESOURCE_TYPE_PASSWORD_STRING, TEST_RESOURCE_TYPE_TOTP
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
 
-describe("Resource Types Collection", () => {
+describe("ResourceTypesCollection", () => {
   it("schema must validate", () => {
     EntitySchema.validateSchema(ResourceTypesCollection.ENTITY_NAME, ResourceTypesCollection.getSchema());
   });
@@ -134,5 +141,18 @@ describe("Resource Types Collection", () => {
     const resourceTypesCollection = new ResourceTypesCollection([entity, entity2]);
     expect(resourceTypesCollection.isResourceTypeIdPresent("a58de6d3-f52c-5080-b79b-a601a647ac85")).toBeTruthy();
     expect(resourceTypesCollection.isResourceTypeIdPresent("b58de6d3-f52c-5080-b79b-a601a647ac85")).toBeTruthy();
+  });
+
+  describe("ResourceTypesCollection::filterByPasswordResourceTypes", () => {
+    it("should filter the collection by resources types behaving like password.", () => {
+      const resourceTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
+      resourceTypes.filterByPasswordResourceTypes();
+      expect.assertions(5);
+      expect(resourceTypes).toHaveLength(3);
+      expect(resourceTypes.getFirst("id", TEST_RESOURCE_TYPE_PASSWORD_STRING)).toBeTruthy();
+      expect(resourceTypes.getFirst("id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
+      expect(resourceTypes.getFirst("id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
+      expect(resourceTypes.getFirst("id", TEST_RESOURCE_TYPE_TOTP)).toBeFalsy();
+    });
   });
 });

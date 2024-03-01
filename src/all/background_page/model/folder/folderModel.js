@@ -181,7 +181,7 @@ class FolderModel {
    * @returns {PermissionChangesCollection}
    */
   calculatePermissionsChangesForMove(folderEntity, parentFolder, destFolder) {
-    let remainingPermissions = new PermissionsCollection([], false);
+    let remainingPermissions = new PermissionsCollection([], {assertAtLeastOneOwner: false});
 
     // Remove permissions from parent if any
     if (parentFolder) {
@@ -191,7 +191,7 @@ class FolderModel {
       remainingPermissions = PermissionsCollection.diff(folderEntity.permissions, parentFolder.permissions, false);
     }
     // Add parent permissions
-    let permissionsFromParent = new PermissionsCollection([], false);
+    let permissionsFromParent = new PermissionsCollection([], {assertAtLeastOneOwner: false});
     if (destFolder) {
       if (!destFolder.permissions) {
         throw new TypeError('Resource model calculatePermissionsChangesForMove requires destination permissions to be set.');

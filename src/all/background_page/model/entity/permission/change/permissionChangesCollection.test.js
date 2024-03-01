@@ -189,7 +189,7 @@ describe("PermissionChangesCollection", () => {
       delete: true,
       type: PermissionEntity.PERMISSION_OWNER
     }]);
-    const original = new PermissionsCollection([], false);
+    const original = new PermissionsCollection([], {assertAtLeastOneOwner: false});
     let result = PermissionChangesCollection.reuseChanges(
       PermissionEntity.ACO_RESOURCE, resource1, permissions, changes, original
     );
@@ -240,7 +240,7 @@ describe("PermissionChangesCollection", () => {
       aro_foreign_key: user2,
       type: PermissionEntity.PERMISSION_OWNER
     }]);
-    const original = new PermissionsCollection([], false);
+    const original = new PermissionsCollection([], {assertAtLeastOneOwner: false});
     const result = PermissionChangesCollection.reuseChanges(
       PermissionEntity.ACO_RESOURCE, resource1, permissions, changes, original
     );
@@ -343,7 +343,7 @@ describe("PermissionChangesCollection", () => {
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: user4,
       type: PermissionEntity.PERMISSION_OWNER
-    }], false);
+    }], {assertAtLeastOneOwner: false});
 
     const result = PermissionChangesCollection.reuseChanges(
       PermissionEntity.ACO_RESOURCE, resource1, permissions, changes, original

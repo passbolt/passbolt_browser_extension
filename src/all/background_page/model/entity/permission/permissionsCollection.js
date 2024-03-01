@@ -35,15 +35,18 @@ class PermissionsCollection extends EntityCollection {
    * - There should be at least one owner
    *
    * @param {array} permissionsDto
-   * @param {boolean} [ownerValidation] true by default
+   * @param {object} [options={}] Options inherited from EntityCollection, to what is added:
+   * @param {boolean} [options.assertAtLeastOneOwner=true] Assert the collection contains at least one owner.
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(permissionsDto, ownerValidation) {
+  constructor(permissionsDto, options = {}) {
+    const assertAtLeastOneOwner = typeof options?.assertAtLeastOneOwner === 'undefined' || options.assertAtLeastOneOwner;
+
     super(EntitySchema.validate(
       PermissionsCollection.ENTITY_NAME,
       permissionsDto,
       PermissionsCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation
@@ -57,7 +60,7 @@ class PermissionsCollection extends EntityCollection {
      * Logical validation rules
      * A permission list must contain at least one owner
      */
-    if (typeof ownerValidation === 'undefined' || ownerValidation) {
+    if (assertAtLeastOneOwner) {
       this.assertAtLeastOneOwner();
     }
 
@@ -294,7 +297,7 @@ class PermissionsCollection extends EntityCollection {
    * @return {PermissionsCollection} set3
    */
   static sum(set1, set2, ownerValidation) {
-    const set3 = new PermissionsCollection(set1.toDto(), false);
+    const set3 = new PermissionsCollection(set1.toDto(), {assertAtLeastOneOwner: false});
     for (const set2Permission of set2) {
       set3.addOrReplace(set2Permission);
     }
@@ -314,7 +317,7 @@ class PermissionsCollection extends EntityCollection {
    * @return {PermissionsCollection} set3
    */
   static diff(set1, set2, ownerValidation) {
-    const set3 = new PermissionsCollection([], false);
+    const set3 = new PermissionsCollection([], {assertAtLeastOneOwner: false});
     for (const permission of set1) {
       if (!set2.containAtLeastPermission(permission.aro, permission.aroForeignKey, permission.type)) {
         set3.push(permission);
@@ -369,7 +372,7 @@ class PermissionsCollection extends EntityCollection {
    * @return {PermissionsCollection}
    */
   cloneForAco(aco, acoId, ownerValidation) {
-    const permissions = new PermissionsCollection([], false);
+    const permissions = new PermissionsCollection([], {assertAtLeastOneOwner: false});
     for (const parentPermission of this.permissions) {
       const clone = parentPermission.copyForAnotherAco(aco, acoId);
       permissions.addOrReplace(clone);

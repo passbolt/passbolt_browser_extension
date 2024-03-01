@@ -28,14 +28,13 @@ class UserEntity extends Entity {
    * User entity constructor
    *
    * @param {Object} userDto user DTO
-   * @param {Object} [associations] optional {groups_users: <boolean>}
    * @throws EntityValidationError if the dto cannot be converted into an entity
    */
-  constructor(userDto, associations) {
+  constructor(userDto) {
     super(EntitySchema.validate(
       UserEntity.ENTITY_NAME,
       UserEntity._cleanupLastLoginDate(userDto),
-      UserEntity.getSchema(associations)
+      UserEntity.getSchema()
     ));
 
     // Associations

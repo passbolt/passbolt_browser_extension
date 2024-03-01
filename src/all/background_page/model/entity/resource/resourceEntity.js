@@ -20,6 +20,7 @@ import TagsCollection from "../tag/tagsCollection";
 import ResourceSecretsCollection from "../secret/resource/resourceSecretsCollection";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import canSuggestUrl from "../../../utils/url/canSuggestUrl";
 
 
 const ENTITY_NAME = 'Resource';
@@ -408,6 +409,21 @@ class ResourceEntity extends Entity {
         (destinationFolder === null || destinationFolder.isPersonal()));
     }
     return (destinationFolder === null || !destinationFolder.isReadOnly());
+  }
+
+  /*
+   * ==================================================
+   * Meta data relative
+   * ==================================================
+   */
+
+  /**
+   * Check if the resource could be a suggestion for a given url
+   * @param {string} url The url to suggest for.
+   * @returns {boolean}
+   */
+  isSuggestion(url) {
+    return canSuggestUrl(url, this.uri);
   }
 
   /*

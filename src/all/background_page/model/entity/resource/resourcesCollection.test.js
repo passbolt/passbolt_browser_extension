@@ -27,7 +27,7 @@ import ResourceTypesCollection from "../resourceType/resourceTypesCollection";
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
-
+import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 
 describe("Resources Collection", () => {
   it("schema must validate", () => {
@@ -347,6 +347,50 @@ describe("Resources Collection", () => {
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
       expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_TOTP)).toBeFalsy();
       expect(resources.getFirst("name", "Resource password string legacy")).toBeTruthy();
+    });
+
+    it("should throw an exception if the resource types parameter is not a ResourceTypesCollection.", () => {
+      const collection = new ResourcesCollection([]);
+      expect.assertions(1);
+      expect(() => collection.filterByResourceTypes(42)).toThrow(TypeError);
+    });
+  });
+
+  describe("ResourceCollection::filterBySuggestedResources", () => {
+    it("should filter the collection by resources that could be suggested for a given url.", () => {
+      const suggestedResource1 = defaultResourceDto({uri: "https://passbolt.com"});
+      const suggestedResource2 = defaultResourceDto({uri: "passbolt.com"});
+      const notSuggestedResource1 = defaultResourceDto({uri: "not-passbolt.com"});
+      const notSuggestedResource2 = defaultResourceDto({uri: ""});
+      const resources = new ResourcesCollection([
+        suggestedResource1,
+        suggestedResource2,
+        notSuggestedResource1,
+        notSuggestedResource2
+      ]);
+      resources.filterBySuggestResources("https://www.passbolt.com");
+      expect.assertions(3);
+      expect(resources).toHaveLength(2);
+      expect(resources.getFirstById(suggestedResource1.id)).toBeTruthy();
+      expect(resources.getFirstById(suggestedResource2.id)).toBeTruthy();
+    });
+
+    it("should filter all resources out if no resources could be suggested.", () => {
+      const suggestedResource1 = defaultResourceDto({uri: "https://passbolt.com"});
+      const suggestedResource2 = defaultResourceDto({uri: "passbolt.com"});
+      const resources = new ResourcesCollection([
+        suggestedResource1,
+        suggestedResource2,
+      ]);
+      resources.filterBySuggestResources("https://www.not-passbolt.com");
+      expect.assertions(1);
+      expect(resources).toHaveLength(0);
+    });
+
+    it("should throw an exception if the url parameter is not a string.", () => {
+      const collection = new ResourcesCollection([]);
+      expect.assertions(1);
+      expect(() => collection.filterBySuggestResources(42)).toThrow(TypeError);
     });
   });
 });

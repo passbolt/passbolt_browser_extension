@@ -18,6 +18,7 @@ import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/
 import deduplicateObjects from "../../../utils/array/deduplicateObjects";
 import canSuggestUrl from "../../../utils/url/canSuggestUrl";
 import resourcesCollection from "./resourcesCollection";
+import ResourceTypesCollection from "../resourceType/resourceTypesCollection";
 
 const ENTITY_NAME = 'Resources';
 const RULE_UNIQUE_ID = 'unique_id';
@@ -173,10 +174,29 @@ class ResourcesCollection extends EntityCollection {
    * @param {ResourceTypesCollection} resourceTypes The resource types to filter by
    * @param {boolean} [excludeUndefined=true] Filter out resources not having a defined resource type.
    * @return {void} The function alters the collection itself.
+   * @throws TypeError if parameters are invalid
    */
   filterByResourceTypes(resourceTypes, excludeUndefined = true) {
+    if (!(resourceTypes instanceof ResourceTypesCollection)) {
+      throw new TypeError('ResourcesCollection filterByResourceTypes expects resourceTypes to be a ResourceTypesCollection.');
+    }
+
     const resourceTypesIds = resourceTypes.extract("id");
     this.filterByPropertyValueIn("resource_type_id", resourceTypesIds, excludeUndefined);
+  }
+
+  /**
+   * Filter by suggested resources.
+   * @param {string} url The url to suggest for.
+   * @return {void} The function alters the collection itself.
+   * @throws TypeError if parameters are invalid
+   */
+  filterBySuggestResources(url) {
+    if (typeof url !== 'string') {
+      throw new TypeError('ResourcesCollection filterBySuggestResources expects url to be a string.');
+    }
+
+    this.filterByCallback(resource => resource.isSuggestion(url));
   }
 
   /*

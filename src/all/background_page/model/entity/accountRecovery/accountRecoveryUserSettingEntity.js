@@ -22,17 +22,14 @@ const STATUS_REJECTED = 'rejected';
 
 class AccountRecoveryUserSettingEntity extends Entity {
   /**
-   * Resource entity constructor
-   *
-   * @param {Object} accountRecoveryUserSettingDto Account recovery user setting DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(accountRecoveryUserSettingDto) {
+  constructor(accountRecoveryUserSettingDto, options = {}) {
     super(EntitySchema.validate(
       AccountRecoveryUserSettingEntity.ENTITY_NAME,
       accountRecoveryUserSettingDto,
       AccountRecoveryUserSettingEntity.getSchema()
-    ));
+    ), options);
 
     if (this._props.account_recovery_private_key) {
       this._account_recovery_private_key = new AccountRecoveryPrivateKeyEntity(this._props.account_recovery_private_key);

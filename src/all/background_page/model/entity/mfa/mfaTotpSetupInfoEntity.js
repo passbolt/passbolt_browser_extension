@@ -20,17 +20,14 @@ const ENTITY_NAME = 'MfaTotpSetupInfoEntity';
 
 class MfaTotpSetupInfoEntity extends Entity {
   /**
-   * Mfa setup info entity constructor
-   *
-   * @param {Object} dto qr code for totp dto
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(dto) {
+  constructor(dto, options = {}) {
     super(EntitySchema.validate(
       MfaTotpSetupInfoEntity.ENTITY_NAME,
       dto,
       MfaTotpSetupInfoEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

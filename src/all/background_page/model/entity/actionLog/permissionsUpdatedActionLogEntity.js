@@ -23,17 +23,14 @@ const TYPE_PERMISSIONS_UPDATED = "Permissions.updated";
 
 class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
   /**
-   * Action log entity constructor
-   *
-   * @param {Object} actionLog action log DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(actionLog) {
+  constructor(actionLog, options = {}) {
     super(EntitySchema.validate(
       PermissionsUpdatedActionLogEntity.ENTITY_NAME,
       actionLog,
       PermissionsUpdatedActionLogEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     let permissionsAddedDto = [];

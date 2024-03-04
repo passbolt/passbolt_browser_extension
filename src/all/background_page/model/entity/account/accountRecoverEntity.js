@@ -23,19 +23,16 @@ const TYPE_ACCOUNT_RECOVER = "account-recover";
 
 class AccountRecoverEntity extends AbstractAccountEntity {
   /**
-   * Constructor
-   *
-   * @param {Object} accountRecoverDto account recover DTO
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(accountRecoverDto) {
+  constructor(accountRecoverDto, options = {}) {
     AccountRecoverEntity.marshal(accountRecoverDto);
 
     super(EntitySchema.validate(
       AccountRecoverEntity.ENTITY_NAME,
       accountRecoverDto,
       AccountRecoverEntity.getSchema()
-    ));
+    ), options);
 
     // Recover account associations.
     if (this._props.account_recovery_user_setting) {

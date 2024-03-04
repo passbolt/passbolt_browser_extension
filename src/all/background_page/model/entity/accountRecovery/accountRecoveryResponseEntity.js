@@ -21,17 +21,14 @@ const RESPONDER_FOREIGN_MODEL_ORGANIZATION_KEY = "AccountRecoveryOrganizationKey
 
 class AccountRecoveryResponseEntity extends Entity {
   /**
-   * AccountRecoveryResponseEntity entity constructor
-   *
-   * @param {Object} accountRecoveryResponseDto account recovery Response DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(accountRecoveryResponseDto) {
+  constructor(accountRecoveryResponseDto, options = {}) {
     super(EntitySchema.validate(
       AccountRecoveryResponseEntity.ENTITY_NAME,
       accountRecoveryResponseDto,
       AccountRecoveryResponseEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

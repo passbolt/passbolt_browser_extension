@@ -24,18 +24,15 @@ const KEY_ID_MAX_LENGTH = 16;
 
 class ExternalGpgKeyEntity extends Entity {
   /**
-   * External GpgKey entity constructor
-   *
-   * @param {Object} gpgkeyDto gpgkey data transfer object
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(gpgkeyDto) {
+  constructor(gpgkeyDto, options = {}) {
     const sanitizedGpgkeyDto = ExternalGpgKeyEntity.sanitizeDto(gpgkeyDto);
     super(EntitySchema.validate(
       ExternalGpgKeyEntity.ENTITY_NAME,
       sanitizedGpgkeyDto,
       ExternalGpgKeyEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

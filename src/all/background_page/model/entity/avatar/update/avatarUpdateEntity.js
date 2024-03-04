@@ -20,17 +20,16 @@ const ENTITY_NAME = 'AvatarUpdate';
 
 class AvatarUpdateEntity extends Entity {
   /**
-   * Avatar entity constructor
-   *
-   * @param {Object} avatarUpdateDto avatar DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * Note: The entity does not clone the DTO file blob, a functionality not supported by the inherited entity's
+   * cloning process. Doesn't embed this entity into another one for this reason.
    */
-  constructor(avatarUpdateDto) {
+  constructor(avatarUpdateDto, options = {}) {
     super(EntitySchema.validate(
       AvatarUpdateEntity.ENTITY_NAME,
       avatarUpdateDto,
       AvatarUpdateEntity.getSchema()
-    ));
+    ), options);
     // The default behavior of the constructor is to serialize/unserialize the props to ensure a deep copy, it doesn't work with Blob.
     this.file = avatarUpdateDto.file;
   }

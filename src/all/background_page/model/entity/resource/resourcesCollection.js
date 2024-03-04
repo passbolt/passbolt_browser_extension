@@ -26,17 +26,15 @@ const SUGGESTED_RESOURCES_LIMIT = 6;
 
 class ResourcesCollection extends EntityCollection {
   /**
-   * Resources Entity constructor
-   *
-   * @param {Object} resourcesCollectionDto resource DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(resourcesCollectionDto) {
+  constructor(resourcesCollectionDto, options = {}) {
     super(EntitySchema.validate(
       ResourcesCollection.ENTITY_NAME,
       resourcesCollectionDto,
       ResourcesCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Check if resource ids are unique

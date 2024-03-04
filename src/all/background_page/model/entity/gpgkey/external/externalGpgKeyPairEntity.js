@@ -20,17 +20,14 @@ const ENTITY_NAME = 'externalGpgKeyPairEntity';
 
 class ExternalGpgKeyPairEntity extends Entity {
   /**
-   * External GpgKey Pair entity constructor
-   *
-   * @param {Object} externalGpgKeyPeyPairDto externalGpgKeyPeyPair data transfer object
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(externalGpgKeyPeyPairDto) {
+  constructor(externalGpgKeyPeyPairDto, options = {}) {
     super(EntitySchema.validate(
       ExternalGpgKeyPairEntity.ENTITY_NAME,
       externalGpgKeyPeyPairDto,
       ExternalGpgKeyPairEntity.getSchema()
-    ));
+    ), options);
 
     if (this._props.private_key) {
       this._private_key = new ExternalGpgKeyEntity(this._props.private_key);

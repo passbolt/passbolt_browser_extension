@@ -20,17 +20,14 @@ const ENTITY_NAME = 'GroupUpdate';
 
 class GroupUpdateEntity extends Entity {
   /**
-   * GroupUpdate entity constructor
-   *
-   * @param {Object} groupUpdateDto group update DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(groupUpdateDto) {
+  constructor(groupUpdateDto, options = {}) {
     super(EntitySchema.validate(
       GroupUpdateEntity.ENTITY_NAME,
       groupUpdateDto,
       GroupUpdateEntity.getSchema()
-    ));
+    ), options);
 
     // Association
     if (this._props.groups_users) {

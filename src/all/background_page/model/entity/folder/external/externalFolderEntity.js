@@ -14,17 +14,16 @@ import FolderEntity from "../folderEntity";
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 
-
 const ENTITY_NAME = 'ExternalFolder';
 
 class ExternalFolderEntity extends Entity {
   /**
-   * External folder entity constructor
-   *
-   * @param {Object} externalFolderDto external folder DTO
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @inheritDoc
+   * Sanitize:
+   * - Override default data using the data provided in the DTO.
+   * - Normalize the folder parent path, see ExternalFolderEntity::sanitizePath
    */
-  constructor(externalFolderDto) {
+  constructor(externalFolderDto, options = {}) {
     // Default properties values
     const props = Object.assign(ExternalFolderEntity.getDefault(), externalFolderDto);
 
@@ -38,7 +37,7 @@ class ExternalFolderEntity extends Entity {
       ExternalFolderEntity.ENTITY_NAME,
       props,
       ExternalFolderEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

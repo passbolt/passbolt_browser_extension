@@ -23,17 +23,14 @@ const AUTHENTICATION_TOKEN_TYPE_REGISTER = 'register';
 
 class AuthenticationTokenEntity extends Entity {
   /**
-   * Setup entity constructor
-   *
-   * @param {Object} authenticationTokenDto setup DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(authenticationTokenDto) {
+  constructor(authenticationTokenDto, options = {}) {
     super(EntitySchema.validate(
       AuthenticationTokenEntity.ENTITY_NAME,
       authenticationTokenDto,
       AuthenticationTokenEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

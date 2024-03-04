@@ -21,17 +21,11 @@ const ENTITY_NAME = 'UserDeleteTransfer';
 
 class UserDeleteTransferEntity extends Entity {
   /**
-   * UserDeleteTransfer entity constructor
-   *
-   * @param {Object} transferDto transfer DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityValidationError} Build rule checking if at least a list of owners or a list of managers is provided.
    */
-  constructor(transferDto) {
-    /*
-     * cannot use default entity schema validation as there are no required field
-     * e.g. owners or managers should be set or both
-     */
-    super(UserDeleteTransferEntity.validate(transferDto));
+  constructor(transferDto, options = {}) {
+    super(UserDeleteTransferEntity.validate(transferDto), options);
 
     // Association
     if (this._props.owners) {

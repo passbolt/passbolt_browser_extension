@@ -19,17 +19,16 @@ const ENTITY_NAME = 'Tag';
 
 class TagEntity extends Entity {
   /**
-   * Tag entity constructor
-   *
-   * @param {Object} tagDto tag DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * Note: Sanitize, if not provided, the DTO is shared should be set to true if the DTO slug starts with #.
+   * @throws {EntityValidationError} Build Rule: Verify that if the slug starts with # the tag is marked as shared.
    */
-  constructor(tagDto) {
+  constructor(tagDto, options = {}) {
     super(EntitySchema.validate(
       TagEntity.ENTITY_NAME,
       tagDto,
       TagEntity.getSchema()
-    ));
+    ), options);
 
     // Additional build rules
     if (typeof this._props.is_shared === 'undefined') {

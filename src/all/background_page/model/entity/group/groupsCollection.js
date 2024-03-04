@@ -25,17 +25,16 @@ const RULE_UNIQUE_GROUP_NAME = 'unique_group_name';
 
 class GroupsCollection extends EntityCollection {
   /**
-   * Groups Entity constructor
-   *
-   * @param {Object} groupsCollectionDto group DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by name.
    */
-  constructor(groupsCollectionDto) {
+  constructor(groupsCollectionDto, options = {}) {
     super(EntitySchema.validate(
       GroupsCollection.ENTITY_NAME,
       groupsCollectionDto,
       GroupsCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Check if group names and ids are unique
@@ -113,6 +112,7 @@ class GroupsCollection extends EntityCollection {
    *
    * @param {Array} dto The groups dto
    * @returns {Array}
+   * @todo Strategy should be changed with an options.ignoreInvalid passed to the collection constructor.
    */
   static sanitizeDto(dto) {
     if (!Array.isArray(dto)) {

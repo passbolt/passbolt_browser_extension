@@ -25,19 +25,16 @@ const RULE_ONE_OWNER = 'owner';
 
 class PermissionsCollection extends EntityCollection {
   /**
-   * Permissions Collection constructor
+   * @inheritDoc
    * Some validation rules are to be expected:
    * - All items should be a valid PermissionEntity
    * - All items should be about the same folder or resource
    * - There can be only one permission per user or group
-   *
-   * Optional validation
-   * - There should be at least one owner
-   *
-   * @param {array} permissionsDto
-   * @param {object} [options={}] Options inherited from EntityCollection, to what is added:
    * @param {boolean} [options.assertAtLeastOneOwner=true] Assert the collection contains at least one owner.
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by aco & aro.
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection target the same aco.
+   * @todo The collection options.clone, doesn't work completely as expected here as the internal push function is creating the PermissionEntity.
    */
   constructor(permissionsDto, options = {}) {
     const assertAtLeastOneOwner = typeof options?.assertAtLeastOneOwner === 'undefined' || options.assertAtLeastOneOwner;

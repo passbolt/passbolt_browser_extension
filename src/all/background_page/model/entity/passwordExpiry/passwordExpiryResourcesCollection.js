@@ -22,17 +22,15 @@ const RULE_UNIQUE_ID = 'unique_id';
 
 class PasswordExpiryResourcesCollection extends EntityCollection {
   /**
-   * PasswordExpiryResources Entity constructor
-   *
-   * @param {Object} passwordExpiryResourcesCollectionDto passwordExpiryResources DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(passwordExpiryResourcesCollectionDto) {
+  constructor(passwordExpiryResourcesCollectionDto, options = {}) {
     super(EntitySchema.validate(
       PasswordExpiryResourcesCollection.ENTITY_NAME,
       passwordExpiryResourcesCollectionDto,
       PasswordExpiryResourcesCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation

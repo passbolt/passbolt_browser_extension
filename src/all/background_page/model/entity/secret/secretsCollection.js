@@ -23,17 +23,16 @@ const RULE_UNIQUE_RESOURCE_ID_USER_ID = 'unique_resource_id_user_id';
 
 class SecretsCollection extends EntityCollection {
   /**
-   * Secrets Collection constructor
-   *
-   * @param {Object} secretsCollectionDto secret DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection target the same resource and user.
    */
-  constructor(secretsCollectionDto) {
+  constructor(secretsCollectionDto, options = {}) {
     super(EntitySchema.validate(
       SecretsCollection.ENTITY_NAME,
       secretsCollectionDto,
       SecretsCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation

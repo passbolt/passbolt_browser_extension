@@ -25,17 +25,15 @@ const RULE_UNIQUE_ID = 'unique_id';
  */
 class AccountRecoveryRequestsCollection extends EntityCollection {
   /**
-   * AccountRecoveryRequests Entity constructor
-   *
-   * @param {Object} AccountRecoveryRequestsCollectionDto resource DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(AccountRecoveryRequestsCollectionDto) {
+  constructor(AccountRecoveryRequestsCollectionDto, options = {}) {
     super(EntitySchema.validate(
       AccountRecoveryRequestsCollection.ENTITY_NAME,
       AccountRecoveryRequestsCollectionDto,
       AccountRecoveryRequestsCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Check if accountRecoveryRequest ids are unique

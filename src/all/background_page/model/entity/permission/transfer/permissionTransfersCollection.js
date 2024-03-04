@@ -20,17 +20,15 @@ const ENTITY_NAME = 'PermissionTransfers';
 
 class PermissionTransfersCollection extends EntityCollection {
   /**
-   * PermissionTransfers Entity constructor
-   *
-   * @param {array} permissionTransferDto permission changes DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityValidationError} Build Rule: The collection cannot be empty.
    */
-  constructor(permissionTransferDto) {
+  constructor(permissionTransferDto, options = {}) {
     super(EntitySchema.validate(
       PermissionTransfersCollection.ENTITY_NAME,
       permissionTransferDto,
       PermissionTransfersCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation

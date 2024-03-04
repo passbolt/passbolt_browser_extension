@@ -22,12 +22,8 @@ const TYPE_ACCOUNT = "Account";
 
 class AccountEntity extends AbstractAccountEntity {
   /**
-   * Setup entity constructor
-   *
-   * @param {Object} accountDto account DTO
-   * @param {Object} options.
-   * - {boolean} validateUsername Validate the username. Default true.
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @param {boolean} [options.validateUsername=true] Validate the username
    */
   constructor(accountDto, options = {}) {
     AccountEntity.marshal(accountDto);
@@ -39,7 +35,7 @@ class AccountEntity extends AbstractAccountEntity {
       AccountEntity.ENTITY_NAME,
       accountDto,
       AccountEntity.getSchema(isUsernameValidated)
-    ));
+    ), options);
 
     this.isUsernameValidated = isUsernameValidated;
   }

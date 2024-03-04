@@ -26,17 +26,14 @@ export const RESOURCE_TYPE_TOTP_SLUG = "totp";
 
 class ResourceTypeEntity extends Entity {
   /**
-   * ResourceType entity constructor
-   *
-   * @param {Object} resourceTypeDto resource type DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(resourceTypeDto) {
+  constructor(resourceTypeDto, options = {}) {
     super(EntitySchema.validate(
       ResourceTypeEntity.ENTITY_NAME,
       resourceTypeDto,
       ResourceTypeEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

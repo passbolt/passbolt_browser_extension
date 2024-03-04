@@ -18,18 +18,14 @@ const ENTITY_NAME = 'UserRememberMeLatestChoice';
 
 class UserRememberMeLatestChoiceEntity extends Entity {
   /**
-   * UserRememberMeLatestChoice entity constructor
-   * Use to store the latest remember me choice a user made
-   *
-   * @param {Object} userRememberMeLatestChoice secret DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(userRememberMeLatestChoice) {
+  constructor(userRememberMeLatestChoice, options = {}) {
     super(EntitySchema.validate(
       UserRememberMeLatestChoiceEntity.ENTITY_NAME,
       userRememberMeLatestChoice,
       UserRememberMeLatestChoiceEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

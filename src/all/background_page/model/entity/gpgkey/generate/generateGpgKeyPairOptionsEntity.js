@@ -23,19 +23,16 @@ const DEFAULT_KEY_SIZE = 3072;
 
 class GenerateGpgKeyPairOptionsEntity extends Entity {
   /**
-   * GenerateGpgKeyPair entity constructor
-   *
-   * @param {Object} generateGpgKeyPairDto data transfer object
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(generateGpgKeyPairDto) {
+  constructor(generateGpgKeyPairDto, options = {}) {
     GenerateGpgKeyPairOptionsEntity.marshal(generateGpgKeyPairDto);
 
     super(EntitySchema.validate(
       GenerateGpgKeyPairOptionsEntity.ENTITY_NAME,
       generateGpgKeyPairDto,
       GenerateGpgKeyPairOptionsEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

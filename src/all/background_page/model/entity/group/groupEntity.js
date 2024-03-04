@@ -23,17 +23,14 @@ const GROUP_NAME_MAX_LENGTH = 255;
 
 class GroupEntity extends Entity {
   /**
-   * Group entity constructor
-   *
-   * @param {Object} groupDto group DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(groupDto) {
+  constructor(groupDto, options = {}) {
     super(EntitySchema.validate(
       GroupEntity.ENTITY_NAME,
       groupDto,
       GroupEntity.getSchema()
-    ));
+    ), options);
 
     // Association
     if (this._props.groups_users) {

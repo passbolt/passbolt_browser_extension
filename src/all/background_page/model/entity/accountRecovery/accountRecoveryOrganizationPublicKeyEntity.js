@@ -19,19 +19,17 @@ const FINGERPRINT_LENGTH = 40;
 
 class AccountRecoveryOrganizationPublicKeyEntity extends Entity {
   /**
-   * Resource entity constructor
-   *
-   * @param {Object} accountRecoveryOrganizationPublicKeyDto accountRecoveryOrganizationPublicKey DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * Note: Sanitize the DTO fingerprint by converting it to uppercase.
    */
-  constructor(accountRecoveryOrganizationPublicKeyDto) {
+  constructor(accountRecoveryOrganizationPublicKeyDto, options = {}) {
     accountRecoveryOrganizationPublicKeyDto = AccountRecoveryOrganizationPublicKeyEntity.sanitizeDto(accountRecoveryOrganizationPublicKeyDto);
 
     super(EntitySchema.validate(
       AccountRecoveryOrganizationPublicKeyEntity.ENTITY_NAME,
       accountRecoveryOrganizationPublicKeyDto,
       AccountRecoveryOrganizationPublicKeyEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

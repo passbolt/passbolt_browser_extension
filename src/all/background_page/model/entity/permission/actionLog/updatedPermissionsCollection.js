@@ -21,17 +21,15 @@ const RULE_UNIQUE_ID = 'unique_id';
 
 class UpdatedPermissionsCollection extends EntityCollection {
   /**
-   * Updated permissions collection constructor
-   *
-   * @param {Object} updatedPermissionsCollectionDto updated permissions DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(updatedPermissionsCollectionDto) {
+  constructor(updatedPermissionsCollectionDto, options = {}) {
     super(EntitySchema.validate(
       UpdatedPermissionsCollection.ENTITY_NAME,
       updatedPermissionsCollectionDto,
       UpdatedPermissionsCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation

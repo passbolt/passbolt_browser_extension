@@ -23,18 +23,16 @@ const RULE_UNIQUE_USERNAME = 'unique_username';
 
 class UsersCollection extends EntityCollection {
   /**
-   * Users Entity constructor
-   *
-   * @param {Object} usersCollectionDto user DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by username.
    */
-  constructor(usersCollectionDto) {
+  constructor(usersCollectionDto, options = {}) {
     super(EntitySchema.validate(
       UsersCollection.ENTITY_NAME,
       usersCollectionDto,
       UsersCollection.getSchema()
-    ));
-
+    ), options);
 
     /*
      * Check if user usernames and ids are unique

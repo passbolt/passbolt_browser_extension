@@ -18,18 +18,14 @@ const ENTITY_NAME = 'GroupUserTransfer';
 
 class GroupUserTransferEntity extends Entity {
   /**
-   * GroupUserTransfer Entity constructor
-   *
-   * @param {Object} groupUserTransferDto membership transfers
-   * @throws EntityValidationError if the dto cannot be converted into an entity
-   * @public
+   * @inheritDoc
    */
-  constructor(groupUserTransferDto) {
+  constructor(groupUserTransferDto, options = {}) {
     super(EntitySchema.validate(
       GroupUserTransferEntity.ENTITY_NAME,
       groupUserTransferDto,
       GroupUserTransferEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

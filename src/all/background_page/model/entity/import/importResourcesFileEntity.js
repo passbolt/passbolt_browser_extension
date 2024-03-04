@@ -23,17 +23,14 @@ const FILE_TYPE_CSV = "csv";
 
 class ImportResourcesFileEntity extends Entity {
   /**
-   * Import resources file entity constructor
-   *
-   * @param {Object} importResourcesFileDto import resources file DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(importResourcesFileDto) {
+  constructor(importResourcesFileDto, options = {}) {
     super(EntitySchema.validate(
       ImportResourcesFileEntity.ENTITY_NAME,
       importResourcesFileDto,
       ImportResourcesFileEntity.getSchema()
-    ));
+    ), options);
     // @todo Refactor when a schema deep testing strategy is implemented.
     if (importResourcesFileDto.options) {
       EntitySchema.validate(

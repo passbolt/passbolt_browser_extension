@@ -20,17 +20,14 @@ const ENTITY_NAME = 'LoggedUser';
 
 class LoggedUserEntity extends Entity {
   /**
-   * Logged user entity constructor
-   *
-   * @param {Object} LoggedUserDto Logged user DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(LoggedUserDto) {
+  constructor(LoggedUserDto, options = {}) {
     super(EntitySchema.validate(
       LoggedUserEntity.ENTITY_NAME,
       LoggedUserDto,
       LoggedUserEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     if (this._props.profile) {

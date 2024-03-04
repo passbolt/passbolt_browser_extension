@@ -20,17 +20,14 @@ const ENTITY_NAME = 'ExternalFolders';
 
 class ExternalFoldersCollection extends EntityCollection {
   /**
-   * ExternalFoldersCollection constructor
-   *
-   * @param {array} externalFoldersCollectionDto external folders DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(externalFoldersCollectionDto) {
+  constructor(externalFoldersCollectionDto, options = {}) {
     super(EntitySchema.validate(
       ExternalFoldersCollection.ENTITY_NAME,
       externalFoldersCollectionDto,
       ExternalFoldersCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation

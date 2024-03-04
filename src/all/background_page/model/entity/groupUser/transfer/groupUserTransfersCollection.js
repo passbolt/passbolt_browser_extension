@@ -20,17 +20,15 @@ const ENTITY_NAME = 'GroupUserTransfers';
 
 class GroupUserTransfersCollection extends EntityCollection {
   /**
-   * GroupUserTransfers Entity constructor
-   *
-   * @param {array} groupUserTransferDto groupUser changes DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityValidationError} Build Rule: The collection cannot be empty.
    */
-  constructor(groupUserTransferDto) {
+  constructor(groupUserTransferDto, options = {}) {
     super(EntitySchema.validate(
       GroupUserTransfersCollection.ENTITY_NAME,
       groupUserTransferDto,
       GroupUserTransfersCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation

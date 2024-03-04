@@ -23,12 +23,15 @@ const DEFAULT_RESOURCE_NAME = '(no name)';
 
 class ExternalResourceEntity extends Entity {
   /**
-   * External resource entity constructor
-   *
-   * @param {Object} externalResourceDto external resource DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * Sanitize:
+   * - Override default data using the data provided in the DTO.
+   * - Normalize the folder parent path, see ExternalFolderEntity::sanitizePath
+   * @throws {EntityValidationError} Build Rule: The collection of secrets cannot be empty.
+   * @throws {EntityValidationError} Build Rule: Verify that the secrets associated resource ID corresponds with the
+   * resource ID.
    */
-  constructor(externalResourceDto) {
+  constructor(externalResourceDto, options = {}) {
     // Default properties values
     const props = Object.assign(ExternalResourceEntity.getDefault(), externalResourceDto);
 
@@ -42,7 +45,7 @@ class ExternalResourceEntity extends Entity {
       ExternalResourceEntity.ENTITY_NAME,
       props,
       ExternalResourceEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     if (this._props.secrets) {

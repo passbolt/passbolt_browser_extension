@@ -117,9 +117,10 @@ class PasswordGeneratorSettingsEntity extends Entity {
   /**
    * Return the default settings overriden with the given data if any.
    * @param {PasswordGeneratorSettingsEntity} data the data to override the entity with
+   * @param {object} options See PasswordGeneratorSettingsEntity option parameters.
    * @returns {PasswordGeneratorSettingsEntity}
    */
-  static createFromDefault(data = {}) {
+  static createFromDefault(data = {}, options = {}) {
     const defaultDto = Object.assign({
       length: 18,
       min_length: 8,
@@ -137,7 +138,7 @@ class PasswordGeneratorSettingsEntity extends Entity {
       exclude_look_alike_chars: true,
     }, data);
 
-    return new PasswordGeneratorSettingsEntity(defaultDto);
+    return new PasswordGeneratorSettingsEntity(defaultDto, options);
   }
 }
 

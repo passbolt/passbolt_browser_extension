@@ -49,7 +49,7 @@ class ExternalResourceEntity extends Entity {
 
     // Associations
     if (this._props.secrets) {
-      this._secrets = new ResourceSecretsCollection(this._props.secrets);
+      this._secrets = new ResourceSecretsCollection(this._props.secrets, {clone: false});
       ResourceEntity.assertValidSecrets(this._secrets, this.id);
       delete this._props.secrets;
     }

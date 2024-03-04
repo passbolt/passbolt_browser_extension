@@ -31,7 +31,7 @@ class LoggedUserEntity extends Entity {
 
     // Associations
     if (this._props.profile) {
-      this._profile = new ProfileEntity(this._props.profile);
+      this._profile = new ProfileEntity(this._props.profile, {clone: false});
       delete this._props.profile;
     }
   }

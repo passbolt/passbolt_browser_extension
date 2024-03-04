@@ -41,7 +41,7 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
 
     // Associations
     if (this._props.account_recovery_request) {
-      this._account_recovery_request = new AccountRecoveryRequestEntity(this._props.account_recovery_request);
+      this._account_recovery_request = new AccountRecoveryRequestEntity(this._props.account_recovery_request, {clone: false});
       delete this._props.account_recovery_request;
     }
   }

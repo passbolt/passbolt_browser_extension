@@ -35,7 +35,7 @@ class AbstractActionLogEntity extends Entity {
 
     // Associations
     if (this._props.creator) {
-      this._creator = new LoggedUserEntity(this._props.creator);
+      this._creator = new LoggedUserEntity(this._props.creator, {clone: false});
       delete this._props.creator;
     }
   }

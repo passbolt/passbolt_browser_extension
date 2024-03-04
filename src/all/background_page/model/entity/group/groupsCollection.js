@@ -55,7 +55,7 @@ class GroupsCollection extends EntityCollection {
 
     // Directly push into the private property _items[]
     this._props.forEach(group => {
-      this._items.push(new GroupEntity(group));
+      this._items.push(new GroupEntity(group, {clone: false}));
     });
 
     // We do not keep original props

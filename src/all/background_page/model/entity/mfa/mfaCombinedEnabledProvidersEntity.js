@@ -31,11 +31,11 @@ class MfaCombinedEnabledProvidersEntity extends Entity {
 
     // Associations
     if (this._props.MfaOrganizationSettings) {
-      this._mfaOrganizationSettings = new MfaEnabledProviderEntity(this._props.MfaOrganizationSettings);
+      this._mfaOrganizationSettings = new MfaEnabledProviderEntity(this._props.MfaOrganizationSettings, {clone: false});
       delete this._props.MfaOrganizationSettings;
     }
     if (this._props.MfaAccountSettings) {
-      this._mfaAccountSettings = new MfaEnabledProviderEntity(this._props.MfaAccountSettings);
+      this._mfaAccountSettings = new MfaEnabledProviderEntity(this._props.MfaAccountSettings, {clone: false});
       delete this._props.MfaAccountSettings;
     }
   }

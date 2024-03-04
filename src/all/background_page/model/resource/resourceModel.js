@@ -202,7 +202,7 @@ class ResourceModel {
     if (preSanitize) {
       resourcesDto = ResourcesCollection.sanitizeDto(resourcesDto);
     }
-    return new ResourcesCollection(resourcesDto);
+    return new ResourcesCollection(resourcesDto, {clone: false});
   }
 
   /**
@@ -636,16 +636,6 @@ class ResourceModel {
   async keepResourcesSupported(resourcesDto) {
     const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
     return resourcesDto.filter(resource => !resource.resource_type_id || resourceTypesCollection.isResourceTypeIdPresent(resource.resource_type_id));
-  }
-
-  /**
-   * Keep only resources supported with no or known resource type
-   * @param resourcesDto
-   * @return {Promise<*[]>}
-   */
-  async keepPasswordResources(resourcesDto) {
-    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
-    return resourcesDto.filter(resource => !resource.resource_type_id || resourceTypesCollection.isPasswordResourceType(resource.resource_type_id));
   }
 }
 

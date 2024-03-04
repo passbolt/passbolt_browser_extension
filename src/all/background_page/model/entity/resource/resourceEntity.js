@@ -51,27 +51,27 @@ class ResourceEntity extends Entity {
 
     // Associations
     if (this._props.permission) {
-      this._permission = new PermissionEntity(this._props.permission);
+      this._permission = new PermissionEntity(this._props.permission, {clone: false});
       ResourceEntity.assertValidPermission(this._permission, this.id);
       delete this._props.permission;
     }
     if (this._props.permissions) {
-      this._permissions = new PermissionsCollection(this._props.permissions);
+      this._permissions = new PermissionsCollection(this._props.permissions, {clone: false});
       ResourceEntity.assertValidPermissions(this._permissions, this.id);
       delete this._props.permissions;
     }
     if (this._props.secrets) {
-      this._secrets = new ResourceSecretsCollection(this._props.secrets);
+      this._secrets = new ResourceSecretsCollection(this._props.secrets, {clone: false});
       ResourceEntity.assertValidSecrets(this._secrets, this.id);
       delete this._props.secrets;
     }
     if (this._props.favorite) {
-      this._favorite = new FavoriteEntity(this._props.favorite);
+      this._favorite = new FavoriteEntity(this._props.favorite, {clone: false});
       ResourceEntity.assertValidFavorite(this._favorite, this.id);
       delete this._props.favorite;
     }
     if (this._props.tags) {
-      this._tags = new TagsCollection(this._props.tags);
+      this._tags = new TagsCollection(this._props.tags, {clone: false});
       delete this._props.tags;
     }
   }

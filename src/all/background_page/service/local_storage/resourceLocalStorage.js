@@ -36,6 +36,9 @@ class ResourceLocalStorage {
   /**
    * Set the resources local storage.
    *
+   * It's essential to understand that this function produces a duplicate of the local storage value, not a reference.
+   * Therefore, any changes made to this duplicate will not affect the original data or a cache.
+   *
    * @throws {Error} if operation failed
    * @return {Promise} results object, containing every object in keys that was found in the storage area.
    * If storage is not set, undefined will be returned.

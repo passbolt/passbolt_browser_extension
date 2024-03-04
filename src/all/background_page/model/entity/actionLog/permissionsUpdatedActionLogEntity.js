@@ -50,9 +50,9 @@ class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
       }
       delete this._props.data;
     }
-    this._permissionsAdded = new UpdatedPermissionsCollection(permissionsAddedDto);
-    this._permissionsUpdated = new UpdatedPermissionsCollection(permissionsUpdatedDto);
-    this._permissionsRemoved = new UpdatedPermissionsCollection(permissionsRemovedDto);
+    this._permissionsAdded = new UpdatedPermissionsCollection(permissionsAddedDto, {clone: false});
+    this._permissionsUpdated = new UpdatedPermissionsCollection(permissionsUpdatedDto, {clone: false});
+    this._permissionsRemoved = new UpdatedPermissionsCollection(permissionsRemovedDto, {clone: false});
   }
 
   /**

@@ -43,20 +43,20 @@ class AccountRecoveryOrganizationPolicyEntity extends Entity {
 
     // Associations
     if (this._props.account_recovery_organization_public_key) {
-      this._account_recovery_organization_public_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_public_key);
+      this._account_recovery_organization_public_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_public_key, {clone: false});
       AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryOrganizationPublicKey(this._account_recovery_organization_public_key, this.public_key_id);
       delete this._props.account_recovery_organization_public_key;
     }
     if (this._props.account_recovery_organization_revoked_key) {
-      this._account_recovery_organization_revoked_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_revoked_key);
+      this._account_recovery_organization_revoked_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_revoked_key, {clone: false});
       delete this._props.account_recovery_organization_revoked_key;
     }
     if (this._props.account_recovery_private_key_passwords) {
-      this._account_recovery_private_key_passwords = new AccountRecoveryPrivateKeyPasswordsCollection(this._props.account_recovery_private_key_passwords);
+      this._account_recovery_private_key_passwords = new AccountRecoveryPrivateKeyPasswordsCollection(this._props.account_recovery_private_key_passwords, {clone: false});
       delete this._props.account_recovery_private_key_passwords;
     }
     if (this._props.creator) {
-      this._creator = new UserEntity(this._props.creator);
+      this._creator = new UserEntity(this._props.creator, {clone: false});
       delete this._props.creator;
     }
   }

@@ -46,7 +46,7 @@ class AccountRecoveryOrganizationPolicyChangeEntity extends Entity {
 
     // Associations
     if (this._props.account_recovery_organization_public_key) {
-      this._account_recovery_organization_public_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_public_key);
+      this._account_recovery_organization_public_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_public_key, {clone: false});
       AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryOrganizationPublicKey(this._account_recovery_organization_public_key, this.public_key_id);
       delete this._props.account_recovery_organization_public_key;
     }

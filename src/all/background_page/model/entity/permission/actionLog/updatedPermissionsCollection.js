@@ -36,7 +36,7 @@ class UpdatedPermissionsCollection extends EntityCollection {
      * Collection validation will fail at the first item that doesn't validate
      */
     this._props.forEach(updatedPermissionDto => {
-      const updatePermissionEntity = new UpdatedPermissionEntity(updatedPermissionDto);
+      const updatePermissionEntity = new UpdatedPermissionEntity(updatedPermissionDto, {clone: false});
       this.push(updatePermissionEntity);
     });
 

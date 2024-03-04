@@ -48,7 +48,7 @@ class ResourcesCollection extends EntityCollection {
     });
     // Directly push into the private property _items[]
     this._props.forEach(resource => {
-      this._items.push(new ResourceEntity(resource));
+      this._items.push(new ResourceEntity(resource, {clone: false}));
     });
 
     // We do not keep original props

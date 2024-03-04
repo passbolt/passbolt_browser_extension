@@ -30,11 +30,11 @@ class GroupUpdateDryRunResultEntity extends Entity {
 
     // Association
     if (this._props.secrets) {
-      this._secrets = new SecretsCollection(this._props.secrets);
+      this._secrets = new SecretsCollection(this._props.secrets, {clone: false});
       delete this._props.secrets;
     }
     if (this._props.needed_secrets) {
-      this._needed_secrets = new NeededSecretsCollection(this._props.needed_secrets);
+      this._needed_secrets = new NeededSecretsCollection(this._props.needed_secrets, {clone: false});
       delete this._props.needed_secrets;
     }
   }

@@ -38,7 +38,7 @@ class ActionLogsCollection extends EntityCollection {
      * Collection validation will fail at the first item that doesn't validate
      */
     this._props.forEach(actionLog => {
-      const actionLogEntity = this.constructActionLogEntityFromDto(actionLog);
+      const actionLogEntity = this.constructActionLogEntityFromDto(actionLog, {clone: false});
       this.push(actionLogEntity);
     });
 
@@ -61,13 +61,14 @@ class ActionLogsCollection extends EntityCollection {
   /**
    * Get an action log entity based on a DTO.
    * @param {object} actionLogDto The action log DTO.
+   * @param {object} options See the action Log entity constructor to know more about it.
    * @returns {AbstractActionLogEntity|null}
    */
-  constructActionLogEntityFromDto(actionLogDto) {
+  constructActionLogEntityFromDto(actionLogDto, options = {}) {
     if (PermissionsUpdatedActionLog.ALLOWED_TYPES.includes(actionLogDto.type)) {
-      return new PermissionsUpdatedActionLog(actionLogDto);
+      return new PermissionsUpdatedActionLog(actionLogDto, options);
     } else {
-      return new DefaultActionLogEntity(actionLogDto);
+      return new DefaultActionLogEntity(actionLogDto, options);
     }
   }
 

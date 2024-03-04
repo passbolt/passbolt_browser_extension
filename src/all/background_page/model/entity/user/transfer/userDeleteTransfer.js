@@ -29,11 +29,11 @@ class UserDeleteTransferEntity extends Entity {
 
     // Association
     if (this._props.owners) {
-      this._owners = new PermissionTransfersCollection(this._props.owners);
+      this._owners = new PermissionTransfersCollection(this._props.owners, {clone: false});
       delete this._props.owners;
     }
     if (this._props.managers) {
-      this._managers = new GroupUserTransfersCollection(this._props.managers);
+      this._managers = new GroupUserTransfersCollection(this._props.managers, {clone: false});
       delete this._props.managers;
     }
   }

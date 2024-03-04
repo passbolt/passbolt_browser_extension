@@ -32,7 +32,6 @@ class AccountKitEntity extends AbstractAccountEntity {
 
   /**
    * Get entity schema
-   * @param {boolean} validateUsername Should validate the username. Default true.
    * @returns {Object} schema
    */
   static getSchema() {

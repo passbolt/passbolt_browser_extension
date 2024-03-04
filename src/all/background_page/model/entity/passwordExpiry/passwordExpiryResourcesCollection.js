@@ -37,7 +37,7 @@ class PasswordExpiryResourcesCollection extends EntityCollection {
      * Collection validation will fail at the first item that doesn't validate
      */
     this._props.forEach(passwordExpiryResources => {
-      this.push(new PasswordExpiryResourceEntity(passwordExpiryResources));
+      this.push(new PasswordExpiryResourceEntity(passwordExpiryResources, {clone: false}));
     });
 
     // We do not keep original props

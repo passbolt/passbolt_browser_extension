@@ -53,9 +53,10 @@ class ResourceLocalStorageUpdateService {
     if (forceUpdate && this.isTimeOverdue) {
       return this.updateLocalStorage();
     }
+
     const resources = await ResourceLocalStorage.get();
     if (resources) {
-      return new ResourcesCollection(resources);
+      return new ResourcesCollection(resources, {clone: false});
     }
     return this.updateLocalStorage();
   }
@@ -79,7 +80,7 @@ class ResourceLocalStorageUpdateService {
   async updateLocalStorage() {
     let resourcesDto = await this.resourceService.findAll(ResourceLocalStorageUpdateService.DEFAULT_CONTAIN);
     resourcesDto = ResourcesCollection.sanitizeDto(resourcesDto);
-    const resourcesCollection = new ResourcesCollection(resourcesDto);
+    const resourcesCollection = new ResourcesCollection(resourcesDto, {clone: false});
     await ResourceLocalStorage.set(resourcesCollection);
     lastTimeCalledPerAccount[this.account.id] = Date.now();
     return resourcesCollection;

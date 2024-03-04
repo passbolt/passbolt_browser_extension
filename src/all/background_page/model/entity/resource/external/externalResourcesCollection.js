@@ -34,7 +34,7 @@ class ExternalResourcesCollection extends EntityCollection {
      * Collection validation will fail at the first item that doesn't validate
      */
     this._props.forEach(externalResourceDto => {
-      this.push(new ExternalResourceEntity(externalResourceDto));
+      this.push(new ExternalResourceEntity(externalResourceDto, {clone: false}));
     });
 
     // We do not keep original props

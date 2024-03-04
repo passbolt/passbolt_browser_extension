@@ -83,7 +83,7 @@ class GroupModel {
     if (preSanitize) {
       groupsDto = GroupsCollection.sanitizeDto(groupsDto);
     }
-    return new GroupsCollection(groupsDto);
+    return new GroupsCollection(groupsDto, {clone: false});
   }
 
   /**

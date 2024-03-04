@@ -60,11 +60,11 @@ class ExportResourcesFileEntity extends Entity {
 
     // Associations
     if (this._props.export_resources) {
-      this._export_resources = new ExternalResourcesCollection(this._props.export_resources);
+      this._export_resources = new ExternalResourcesCollection(this._props.export_resources, {clone: false});
       delete this._props.export_resources;
     }
     if (this._props.export_folders) {
-      this._export_folders = new ExternalFoldersCollection(this._props.export_folders);
+      this._export_folders = new ExternalFoldersCollection(this._props.export_folders, {clone: false});
       delete this._props.export_folders;
     }
   }

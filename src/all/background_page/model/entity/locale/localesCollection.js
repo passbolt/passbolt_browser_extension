@@ -31,7 +31,7 @@ class LocalesCollection extends EntityCollection {
 
     // Directly push into the private property _items[]
     this._props.forEach(locale => {
-      this._items.push(new LocaleEntity(locale));
+      this._items.push(new LocaleEntity(locale, {clone: false}));
     });
 
     // We do not keep original props

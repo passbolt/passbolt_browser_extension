@@ -37,15 +37,15 @@ class AccountRecoveryRequestEntity extends Entity {
 
     // Associations
     if (this._props.account_recovery_private_key) {
-      this._account_recovery_private_key = new AccountRecoveryPrivateKeyEntity(this._props.account_recovery_private_key);
+      this._account_recovery_private_key = new AccountRecoveryPrivateKeyEntity(this._props.account_recovery_private_key, {clone: false});
       delete this._props.account_recovery_private_key;
     }
     if (this._props.account_recovery_responses) {
-      this._account_recovery_responses = new AccountRecoveryResponsesCollection(this._props.account_recovery_responses);
+      this._account_recovery_responses = new AccountRecoveryResponsesCollection(this._props.account_recovery_responses, {clone: false});
       delete this._props.account_recovery_responses;
     }
     if (this._props.creator) {
-      this._creator = new UserEntity(this._props.creator);
+      this._creator = new UserEntity(this._props.creator, {clone: false});
       delete this._props.creator;
     }
   }

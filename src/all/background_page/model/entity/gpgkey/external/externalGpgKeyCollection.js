@@ -44,7 +44,7 @@ class ExternalGpgKeyCollection extends EntityCollection {
     });
     // Directly push into the private property _items[]
     this._props.forEach(resource => {
-      this._items.push(new ExternalGpgKeyEntity(resource));
+      this._items.push(new ExternalGpgKeyEntity(resource, {clone: false}));
     });
 
     // We do not keep original props

@@ -44,12 +44,12 @@ class FolderEntity extends Entity {
 
     // Associations
     if (this._props.permission) {
-      this._permission = new PermissionEntity(this._props.permission);
+      this._permission = new PermissionEntity(this._props.permission, {clone: false});
       FolderEntity.assertValidPermission(this._permission, this.id);
       delete this._props.permission;
     }
     if (this._props.permissions) {
-      this._permissions = new PermissionsCollection(this._props.permissions);
+      this._permissions = new PermissionsCollection(this._props.permissions, {clone: false});
       FolderEntity.assertValidPermissions(this._permissions, this.id);
       delete this._props.permissions;
     }

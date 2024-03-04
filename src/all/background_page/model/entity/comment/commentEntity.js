@@ -40,11 +40,11 @@ class CommentEntity extends Entity {
 
     // Associations
     if (this._props.creator) {
-      this._creator = new UserEntity(this._props.creator);
+      this._creator = new UserEntity(this._props.creator, {clone: false});
       delete this._props.creator;
     }
     if (this._props.modifier) {
-      this._modifier = new UserEntity(this._props.modifier);
+      this._modifier = new UserEntity(this._props.modifier, {clone: false});
       delete this._props.modifier;
     }
   }

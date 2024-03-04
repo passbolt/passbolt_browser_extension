@@ -34,7 +34,7 @@ class GroupsUsersCollection extends EntityCollection {
      * Collection validation will fail at the first item that doesn't validate
      */
     this._props.forEach(groupUser => {
-      this.push(new GroupUserEntity(groupUser));
+      this.push(new GroupUserEntity(groupUser, {clone: false}));
     });
 
     // We do not keep original props

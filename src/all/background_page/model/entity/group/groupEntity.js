@@ -34,19 +34,19 @@ class GroupEntity extends Entity {
 
     // Association
     if (this._props.groups_users) {
-      this._groups_users = new GroupsUsersCollection(this._props.groups_users);
+      this._groups_users = new GroupsUsersCollection(this._props.groups_users, {clone: false});
       delete this._props.groups_users;
     }
     if (this._props.my_group_user) {
-      this._my_group_user = new GroupUserEntity(this._props.my_group_user);
+      this._my_group_user = new GroupUserEntity(this._props.my_group_user, {clone: false});
       delete this._props.my_group_user;
     }
     if (this._props.creator) {
-      this._creator = new UserEntity(this._props.creator);
+      this._creator = new UserEntity(this._props.creator, {clone: false});
       delete this._props.creator;
     }
     if (this._props.modifier) {
-      this._modifier = new UserEntity(this._props.modifier);
+      this._modifier = new UserEntity(this._props.modifier, {clone: false});
       delete this._props.modifier;
     }
   }

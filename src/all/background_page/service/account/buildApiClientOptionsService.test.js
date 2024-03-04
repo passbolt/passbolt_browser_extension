@@ -28,7 +28,7 @@ describe("BuildAccountApiClientOptionsService", () => {
     const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(account.domain));
-    expect(apiClientOptions.csrfToken.token).toStrictEqual(csrfToken);
+    expect(await apiClientOptions.getHeaders()).toStrictEqual({"X-CSRF-Token": csrfToken});
     expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: `${account.domain}/`});
   });
 
@@ -43,7 +43,7 @@ describe("BuildAccountApiClientOptionsService", () => {
     const apiClientOptions = await BuildApiClientOptionsService.buildFromDomain(domain);
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
-    expect(apiClientOptions.csrfToken.token).toStrictEqual(csrfToken);
+    expect(await apiClientOptions.getHeaders()).toStrictEqual({"X-CSRF-Token": csrfToken});
     expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: `${domain}/`});
   });
 
@@ -58,7 +58,7 @@ describe("BuildAccountApiClientOptionsService", () => {
     const apiClientOptions = await BuildApiClientOptionsService.buildFromDomain(domain);
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
-    expect(apiClientOptions.csrfToken.token).toStrictEqual(csrfToken);
+    expect(await apiClientOptions.getHeaders()).toStrictEqual({"X-CSRF-Token": csrfToken});
     expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: domain});
   });
 
@@ -73,7 +73,7 @@ describe("BuildAccountApiClientOptionsService", () => {
     const apiClientOptions = await BuildApiClientOptionsService.buildFromDomain(domain);
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
-    expect(apiClientOptions.csrfToken.token).toStrictEqual(csrfToken);
+    expect(await apiClientOptions.getHeaders()).toStrictEqual({"X-CSRF-Token": csrfToken});
     expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: `${domain}/`});
   });
 });

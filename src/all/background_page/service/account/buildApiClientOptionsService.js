@@ -29,13 +29,8 @@ class BuildApiClientOptionsService {
    * @returns {Promise<ApiClientOptions>}
    */
   static async buildFromDomain(domain) {
-    const apiClientOptions = (new ApiClientOptions())
+    return (new ApiClientOptions())
       .setBaseUrl(domain);
-    const url = domain.slice(-1) === "/" ? domain : `${domain}/`;
-    const csrfToken = await browser.cookies.get({name: "csrfToken", url: url});
-    apiClientOptions.setCsrfToken(csrfToken?.value);
-
-    return apiClientOptions;
   }
 }
 

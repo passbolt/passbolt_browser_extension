@@ -13,7 +13,7 @@
  */
 
 import "./mocks/mockWebExtensionPolyfill";
-import browser from "../src/all/common/polyfill/browserPolyfill"
+import browser from "../src/all/common/polyfill/browserPolyfill";
 import "./mocks/mockTextEncoder";
 import "./matchers/extendExpect";
 import MockNavigatorLocks from './mocks/mockNavigatorLocks';

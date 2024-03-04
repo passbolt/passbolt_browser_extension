@@ -84,7 +84,7 @@ const listen = function(worker, apiClientOptions, account) {
    */
   worker.port.on('passbolt.auth.verify-server-key', async requestId => {
     const user = User.getInstance();
-    const apiClientOptions = await user.getApiClientOptions({requireCsrfToken: false});
+    const apiClientOptions = await user.getApiClientOptions();
     const userDomain = user.settings.getDomain();
     const auth = new AuthVerifyServerKeyController(worker, requestId, apiClientOptions, userDomain);
     await auth._exec();

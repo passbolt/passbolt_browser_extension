@@ -25,7 +25,7 @@ beforeEach(() => {
 
 describe("StartLoopAuthSessionCheckService", () => {
   it("should trigger a check authentication and clear alarm on logout", async() => {
-    expect.assertions(11);
+    expect.assertions(12);
     // Data mocked
     const gpgAuth = new GpgAuth();
     const startLoopAuthSessionCheckService = new StartLoopAuthSessionCheckService(gpgAuth);
@@ -43,20 +43,20 @@ describe("StartLoopAuthSessionCheckService", () => {
     expect(spyScheduleAuthSessionCheck).toHaveBeenCalledTimes(1);
     expect(spyIsAuthenticated).toHaveBeenCalledTimes(0);
     expect(spyClearAuthSessionCheck).toHaveBeenCalledTimes(0);
-
     jest.advanceTimersByTime(60000);
-    await Promise.resolve();
-    expect(spyScheduleAuthSessionCheck).toHaveBeenCalledTimes(2);
+    expect(spyScheduleAuthSessionCheck).toHaveBeenCalledTimes(1);
     expect(spyIsAuthenticated).toHaveBeenCalledTimes(1);
     expect(spyClearAuthSessionCheck).toHaveBeenCalledTimes(0);
 
+    jest.advanceTimersByTime(60000);
+    expect(spyIsAuthenticated).toHaveBeenCalledTimes(2);
+
     self.dispatchEvent(new Event('passbolt.auth.after-logout'));
-    expect(spyScheduleAuthSessionCheck).toHaveBeenCalledTimes(2);
-    expect(spyIsAuthenticated).toHaveBeenCalledTimes(1);
+    expect(spyScheduleAuthSessionCheck).toHaveBeenCalledTimes(1);
+    expect(spyIsAuthenticated).toHaveBeenCalledTimes(2);
     expect(spyClearAuthSessionCheck).toHaveBeenCalledTimes(1);
     expect(spyAlarmRemoveListener).toHaveBeenCalledWith(startLoopAuthSessionCheckService.checkAuthStatus);
   });
-
 
   it("should send logout event if not authenticated anymore", async() => {
     expect.assertions(11);

@@ -42,6 +42,8 @@ class StartLoopAuthSessionCheckService {
   async scheduleAuthSessionCheck() {
     // Create an alarm to check the auth session
     await browser.alarms.create(AUTH_SESSION_CHECK_ALARM, {
+      // this `periodInMinutes` is set to ensure that after going back from sleep mode the alarms still triggers
+      periodInMinutes: 1,
       when: Date.now() + CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD
     });
     browser.alarms.onAlarm.addListener(this.checkAuthStatus);
@@ -66,8 +68,6 @@ class StartLoopAuthSessionCheckService {
     if (alarm.name === AUTH_SESSION_CHECK_ALARM) {
       if (!await this.gpgAuth.isAuthenticated()) {
         self.dispatchEvent(new Event('passbolt.auth.after-logout'));
-      } else {
-        await this.scheduleAuthSessionCheck();
       }
     }
   }

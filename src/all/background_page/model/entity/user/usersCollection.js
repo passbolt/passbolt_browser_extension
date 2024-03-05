@@ -53,7 +53,7 @@ class UsersCollection extends EntityCollection {
 
     // Directly push into the private property _items[]
     this._props.forEach(user => {
-      this._items.push(new UserEntity(user));
+      this._items.push(new UserEntity(user, {clone: false}));
     });
 
     // We do not keep original props

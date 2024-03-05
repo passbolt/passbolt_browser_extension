@@ -31,11 +31,11 @@ class UpdatedPermissionEntity extends Entity {
 
     // Associations
     if (this._props.user) {
-      this._user = new LoggedUserEntity(this._props.user);
+      this._user = new LoggedUserEntity(this._props.user, {clone: false});
       delete this._props.user;
     }
     if (this._props.group) {
-      this._group = new GroupEntity(this._props.group);
+      this._group = new GroupEntity(this._props.group, {clone: false});
       delete this._props.group;
     }
   }

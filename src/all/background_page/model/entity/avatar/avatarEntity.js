@@ -22,7 +22,7 @@ class AvatarEntity extends Entity {
   /**
    * @inheritDoc
    */
-  constructor(avatarDto, options) {
+  constructor(avatarDto, options = {}) {
     super(EntitySchema.validate(
       AvatarEntity.ENTITY_NAME,
       avatarDto,

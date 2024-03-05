@@ -36,7 +36,7 @@ class AccountSetupEntity extends AbstractAccountEntity {
 
     // Setup account associations.
     if (this._props.account_recovery_user_setting) {
-      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting);
+      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting, {clone: false});
       delete this._props.account_recovery_user_setting;
     }
   }

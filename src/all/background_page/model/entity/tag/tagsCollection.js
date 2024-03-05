@@ -39,7 +39,7 @@ class TagsCollection extends EntityCollection {
      * Collection validation will fail at the first item that doesn't validate
      */
     this._props.forEach(tag => {
-      this.push(new TagEntity(tag));
+      this.push(new TagEntity(tag, {clone: false}));
     });
 
     // We do not keep original props

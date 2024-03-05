@@ -124,7 +124,7 @@ class FolderModel {
    */
   async findAll() {
     const foldersDtos = await this.folderService.findAll({permission: true});
-    return new FoldersCollection(foldersDtos);
+    return new FoldersCollection(foldersDtos, {clone: false});
   }
 
   /**

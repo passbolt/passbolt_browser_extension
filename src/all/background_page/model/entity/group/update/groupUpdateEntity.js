@@ -31,11 +31,11 @@ class GroupUpdateEntity extends Entity {
 
     // Association
     if (this._props.groups_users) {
-      this._groups_users = new GroupUserChangesCollection(this._props.groups_users);
+      this._groups_users = new GroupUserChangesCollection(this._props.groups_users, {clone: false});
       delete this._props.groups_users;
     }
     if (this._props.secrets) {
-      this._secrets = new SecretsCollection(this._props.secrets);
+      this._secrets = new SecretsCollection(this._props.secrets, {clone: false});
       delete this._props.secrets;
     }
   }

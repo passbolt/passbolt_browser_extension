@@ -36,11 +36,11 @@ class AccountRecoverEntity extends AbstractAccountEntity {
 
     // Recover account associations.
     if (this._props.account_recovery_user_setting) {
-      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting);
+      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting, {clone: false});
       delete this._props.account_recovery_user_setting;
     }
     if (this._props.user) {
-      this._user = new UserEntity(this._props.user);
+      this._user = new UserEntity(this._props.user, {clone: false});
       delete this._props.user;
     }
   }

@@ -130,7 +130,7 @@ class UserModel {
     if (preSanitize) {
       usersDto = UsersCollection.sanitizeDto(usersDto);
     }
-    return new UsersCollection(usersDto);
+    return new UsersCollection(usersDto, {clone: false});
   }
 
   /**

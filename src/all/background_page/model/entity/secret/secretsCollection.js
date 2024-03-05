@@ -39,7 +39,7 @@ class SecretsCollection extends EntityCollection {
      * Collection validation will fail at the first item that doesn't validate
      */
     this._props.forEach(secret => {
-      this.push(new SecretEntity(secret));
+      this.push(new SecretEntity(secret, {clone: false}));
     });
 
     // We do not keep original props

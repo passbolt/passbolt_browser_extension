@@ -52,7 +52,7 @@ class ResourceTypesCollection extends EntityCollection {
      * Collection validation will fail at the first item that doesn't validate
      */
     this._props.forEach(resourceType => {
-      this.push(new ResourceTypeEntity(resourceType));
+      this.push(new ResourceTypeEntity(resourceType, {clone: false}));
     });
 
     // We do not keep original props

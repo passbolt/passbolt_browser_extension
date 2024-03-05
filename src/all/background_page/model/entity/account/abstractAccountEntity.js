@@ -33,7 +33,7 @@ class AbstractAccountEntity extends Entity {
 
     // Associations
     if (this._props.security_token) {
-      this._security_token = new SecurityTokenEntity(this._props.security_token);
+      this._security_token = new SecurityTokenEntity(this._props.security_token, {clone: false});
       delete this._props.security_token;
     }
   }

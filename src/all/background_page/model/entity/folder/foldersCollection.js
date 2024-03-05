@@ -43,7 +43,7 @@ class FoldersCollection extends EntityCollection {
     });
     // Directly push into the private property _items[]
     this._props.forEach(folder => {
-      this._items.push(new FolderEntity(folder));
+      this._items.push(new FolderEntity(folder, {clone: false}));
     });
 
     // We do not keep original props

@@ -35,11 +35,11 @@ class PasswordPoliciesEntity extends Entity {
 
     // Associations
     if (this._props.password_generator_settings) {
-      this._password_generator_settings = PasswordGeneratorSettingsEntity.createFromDefault(this._props.password_generator_settings);
+      this._password_generator_settings = PasswordGeneratorSettingsEntity.createFromDefault(this._props.password_generator_settings, {clone: false});
       delete this._props.password_generator_settings;
     }
     if (this._props.passphrase_generator_settings) {
-      this._passphrase_generator_settings = PassphraseGeneratorSettingsEntity.createFromDefault(this._props.passphrase_generator_settings);
+      this._passphrase_generator_settings = PassphraseGeneratorSettingsEntity.createFromDefault(this._props.passphrase_generator_settings, {clone: false});
       delete this._props.passphrase_generator_settings;
     }
   }

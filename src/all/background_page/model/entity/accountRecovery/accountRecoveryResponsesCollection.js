@@ -47,7 +47,7 @@ class AccountRecoveryResponsesCollection extends EntityCollection {
     });
     // Directly push into the private property _items[]
     this._props.forEach(accountRecoveryResponse => {
-      this._items.push(new AccountRecoveryResponseEntity(accountRecoveryResponse));
+      this._items.push(new AccountRecoveryResponseEntity(accountRecoveryResponse, {clone: false}));
     });
 
     // We do not keep original props

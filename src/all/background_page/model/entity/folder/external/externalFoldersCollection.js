@@ -34,7 +34,7 @@ class ExternalFoldersCollection extends EntityCollection {
      * Collection validation will fail at the first item that doesn't validate
      */
     this._props.forEach(externalFolderDto => {
-      this.push(new ExternalFolderEntity(externalFolderDto));
+      this.push(new ExternalFolderEntity(externalFolderDto, {clone: false}));
     });
 
     // We do not keep original props

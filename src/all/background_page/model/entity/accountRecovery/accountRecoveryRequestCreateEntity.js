@@ -31,7 +31,7 @@ class AccountRecoveryRequestCreateEntity extends Entity {
 
     // Associations
     if (this._props.authentication_token) {
-      this._authentication_token = new AuthenticationTokenEntity(this._props.authentication_token);
+      this._authentication_token = new AuthenticationTokenEntity(this._props.authentication_token, {clone: false});
       delete this._props.authentication_token;
     }
   }

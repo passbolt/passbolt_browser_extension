@@ -30,12 +30,12 @@ class ExternalGpgKeyPairEntity extends Entity {
     ), options);
 
     if (this._props.private_key) {
-      this._private_key = new ExternalGpgKeyEntity(this._props.private_key);
+      this._private_key = new ExternalGpgKeyEntity(this._props.private_key, {clone: false});
       delete this._props.private_key;
     }
 
     if (this._props.public_key) {
-      this._public_key = new ExternalGpgKeyEntity(this._props.public_key);
+      this._public_key = new ExternalGpgKeyEntity(this._props.public_key, {clone: false});
       delete this._props.public_key;
     }
   }

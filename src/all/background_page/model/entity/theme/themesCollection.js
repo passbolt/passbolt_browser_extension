@@ -38,7 +38,7 @@ class ThemesCollection extends EntityCollection {
      * Collection validation will fail at the first item that doesn't validate
      */
     this._props.forEach(secret => {
-      this.push(new ThemeEntity(secret));
+      this.push(new ThemeEntity(secret, {clone: false}));
     });
 
     // We do not keep original props

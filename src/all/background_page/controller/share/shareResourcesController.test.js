@@ -191,7 +191,7 @@ describe("ShareResourcesController", () => {
       fetch.doMockOnce(() => mockApiResponse([]));
 
       // finally we can call the controller with the data as everything is setup.
-      const clientOptions = await User.getInstance().getApiClientOptions({requireCsrfToken: false});
+      const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new ShareResourcesController(null, null, clientOptions, account);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
       await controller.main(resourcesDto, changesDto);
@@ -212,7 +212,7 @@ describe("ShareResourcesController", () => {
       fetch.doMockOnce(() => mockApiResponse([]));
 
       // finally we can call the controller with the data as everything is setup.
-      const clientOptions = await User.getInstance().getApiClientOptions({requireCsrfToken: false});
+      const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new ShareResourcesController(null, null, clientOptions, account);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
       try {
@@ -242,7 +242,7 @@ describe("ShareResourcesController", () => {
       const resourcesDto = await _3ResourcesSharedWith3UsersResourcesDto();
 
       // finally we can call the controller with the data as everything is setup.
-      const clientOptions = await User.getInstance().getApiClientOptions({requireCsrfToken: false});
+      const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new ShareResourcesController(null, null, clientOptions, account);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
       try {

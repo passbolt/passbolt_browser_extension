@@ -233,7 +233,7 @@ describe("ShareResourcesController", () => {
       jest.spyOn(browser.storage.local, "get").mockReturnValueOnce({resources: resourcesDto});
 
       // finally we can call the controller with the data as everything is setup.
-      const clientOptions = await User.getInstance().getApiClientOptions({requireCsrfToken: false});
+      const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new ShareFoldersController(null, null, clientOptions, account);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
       await controller.main(new FoldersCollection([foldersDto[0]]), new PermissionChangesCollection(changesDto));

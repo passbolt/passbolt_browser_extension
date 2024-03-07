@@ -94,7 +94,7 @@ describe("SavePasswordExpirySettingsController", () => {
 
     const dto = defaultPasswordExpirySettingsDto();
     const controller = new SavePasswordExpirySettingsController(null, null, account, apiClientOptions);
-    expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltApiFetchError);
+    await expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltApiFetchError);
   });
 
   it("Should return the default value if something goes when requesting the API", async() => {
@@ -103,6 +103,6 @@ describe("SavePasswordExpirySettingsController", () => {
 
     const dto = defaultPasswordExpirySettingsDto();
     const controller = new SavePasswordExpirySettingsController(null, null, account, apiClientOptions);
-    expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltServiceUnavailableError);
+    await expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltServiceUnavailableError);
   });
 });

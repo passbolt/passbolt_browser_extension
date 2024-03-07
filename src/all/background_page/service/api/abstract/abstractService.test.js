@@ -16,7 +16,7 @@ import AbstractService from "./abstractService";
 
 describe("Abstract service", () => {
   it("constructor works", () => {
-    const options = (new ApiClientOptions()).setBaseUrl('https://test.passbolt.test/');
+    const options = new ApiClientOptions().setBaseUrl('https://test.passbolt.test/');
     const service = new AbstractService(options, 'test');
 
     // Basics
@@ -27,7 +27,7 @@ describe("Abstract service", () => {
   });
 
   it("constructor works", () => {
-    const options = (new ApiClientOptions()).setBaseUrl('https://test.passbolt.test/');
+    const options = new ApiClientOptions().setBaseUrl('https://test.passbolt.test/');
     const service = new AbstractService(options, 'test');
 
     const formated = service.formatContainOptions(

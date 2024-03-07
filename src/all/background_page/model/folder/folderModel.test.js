@@ -40,7 +40,7 @@ describe("FolderModel",  () => {
 
   it("getAllByIds works", async() => {
     FolderLocalStorage.get.mockResolvedValue(getReturnValue());
-    const apiClientOptions = (new ApiClientOptions()).setBaseUrl('https://www.passbolt.test');
+    const apiClientOptions = new ApiClientOptions().setBaseUrl('https://www.passbolt.test');
     const folderModel = new FolderModel(apiClientOptions);
 
     // Not found

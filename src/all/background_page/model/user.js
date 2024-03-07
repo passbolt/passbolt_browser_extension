@@ -325,7 +325,7 @@ const User = (function() {
    * @return {ApiClientOptions} apiClientOptions
    */
   this.getApiClientOptions = async function() {
-    return new (new ApiClientOptions())
+    return new ApiClientOptions()
       .setBaseUrl(this.settings.getDomain());
   };
 

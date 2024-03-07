@@ -29,7 +29,7 @@ class BuildApiClientOptionsService {
    * @returns {Promise<ApiClientOptions>}
    */
   static async buildFromDomain(domain) {
-    return (new ApiClientOptions())
+    return new ApiClientOptions()
       .setBaseUrl(domain);
   }
 }

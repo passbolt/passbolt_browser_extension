@@ -51,7 +51,7 @@ describe("ResourceLocalStorageUpdateService", () => {
   describe("ResourceLocalStorageUpdateService::getOrUpdateLocalStorage", () => {
     it("Should find all resources and set the local storage and get it on second call", async() => {
       expect.assertions(6);
-      const options = (new ApiClientOptions()).setBaseUrl('https://localhost');
+      const options = new ApiClientOptions().setBaseUrl('https://localhost');
       const resourceLocalStorageUpdateService = new ResourceLocalStorageUpdateService(account, options);
       let resources = await resourceLocalStorageUpdateService.exec();
       const resourcesToCheckEquality = new ResourcesCollection(await ResourceLocalStorage.get());
@@ -68,7 +68,7 @@ describe("ResourceLocalStorageUpdateService", () => {
 
     it("Should find all resources and set the local storage one time if it's not forced", async() => {
       expect.assertions(2);
-      const options = (new ApiClientOptions()).setBaseUrl('https://localhost');
+      const options = new ApiClientOptions().setBaseUrl('https://localhost');
       const resourceLocalStorageUpdateService = new ResourceLocalStorageUpdateService(account, options);
 
       await resourceLocalStorageUpdateService.exec(true);
@@ -82,7 +82,7 @@ describe("ResourceLocalStorageUpdateService", () => {
 
     it("Should find all resources and set the local storage if the time is of the last called is more than 5000ms and forced", async() => {
       expect.assertions(2);
-      const options = (new ApiClientOptions()).setBaseUrl('https://localhost');
+      const options = new ApiClientOptions().setBaseUrl('https://localhost');
       const resourceLocalStorageUpdateService = new ResourceLocalStorageUpdateService(account, options);
 
       await resourceLocalStorageUpdateService.exec(true);
@@ -97,7 +97,7 @@ describe("ResourceLocalStorageUpdateService", () => {
 
   it("Should find all resources and set the local storage if the forceUpdate is true only once if the time is not overdue", async() => {
     expect.assertions(2);
-    const options = (new ApiClientOptions()).setBaseUrl('https://localhost');
+    const options = new ApiClientOptions().setBaseUrl('https://localhost');
     const resourceLocalStorageUpdateService = new ResourceLocalStorageUpdateService(account, options);
 
     await resourceLocalStorageUpdateService.exec(true);

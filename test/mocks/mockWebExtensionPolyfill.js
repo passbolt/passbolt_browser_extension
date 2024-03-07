@@ -42,6 +42,7 @@ jest.mock("webextension-polyfill", () => {
         INSTALL: "install",
         UPDATE: "update"
       },
+      reload: jest.fn(),
     },
     storage: {
       ...originalBrowser.storage,

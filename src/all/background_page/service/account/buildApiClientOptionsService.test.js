@@ -26,9 +26,10 @@ describe("BuildAccountApiClientOptionsService", () => {
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
     // execution
     const apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
+    const headers = await apiClientOptions.getHeaders();
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(account.domain));
-    expect(await apiClientOptions.getHeaders()).toStrictEqual({"X-CSRF-Token": csrfToken});
+    expect(headers).toStrictEqual({"X-CSRF-Token": csrfToken});
     expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: `${account.domain}/`});
   });
 
@@ -41,9 +42,10 @@ describe("BuildAccountApiClientOptionsService", () => {
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
     // execution
     const apiClientOptions = await BuildApiClientOptionsService.buildFromDomain(domain);
+    const headers = await apiClientOptions.getHeaders();
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
-    expect(await apiClientOptions.getHeaders()).toStrictEqual({"X-CSRF-Token": csrfToken});
+    expect(headers).toStrictEqual({"X-CSRF-Token": csrfToken});
     expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: `${domain}/`});
   });
 
@@ -56,9 +58,10 @@ describe("BuildAccountApiClientOptionsService", () => {
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
     // execution
     const apiClientOptions = await BuildApiClientOptionsService.buildFromDomain(domain);
+    const headers = await apiClientOptions.getHeaders();
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
-    expect(await apiClientOptions.getHeaders()).toStrictEqual({"X-CSRF-Token": csrfToken});
+    expect(headers).toStrictEqual({"X-CSRF-Token": csrfToken});
     expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: domain});
   });
 
@@ -71,9 +74,10 @@ describe("BuildAccountApiClientOptionsService", () => {
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: csrfToken}));
     // execution
     const apiClientOptions = await BuildApiClientOptionsService.buildFromDomain(domain);
+    const headers = await apiClientOptions.getHeaders();
     // expectations
     expect(apiClientOptions.baseUrl).toStrictEqual(new URL(domain));
-    expect(await apiClientOptions.getHeaders()).toStrictEqual({"X-CSRF-Token": csrfToken});
+    expect(headers).toStrictEqual({"X-CSRF-Token": csrfToken});
     expect(browser.cookies.get).toHaveBeenCalledWith({name: "csrfToken", url: `${domain}/`});
   });
 });

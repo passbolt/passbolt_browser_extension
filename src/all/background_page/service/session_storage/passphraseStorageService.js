@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.8.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 import User from "../../model/user";
 import UserService from "../api/user/userService";
 import Log from "../../model/log";

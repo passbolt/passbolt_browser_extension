@@ -20,25 +20,22 @@ const ENTITY_NAME = 'UpdatedPermission';
 
 class UpdatedPermissionEntity extends Entity {
   /**
-   * Updated permission entity constructor
-   *
-   * @param {Object} updatedPermission Updated Permission DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(updatedPermission) {
+  constructor(updatedPermission, options = {}) {
     super(EntitySchema.validate(
       UpdatedPermissionEntity.ENTITY_NAME,
       updatedPermission,
       UpdatedPermissionEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     if (this._props.user) {
-      this._user = new LoggedUserEntity(this._props.user);
+      this._user = new LoggedUserEntity(this._props.user, {clone: false});
       delete this._props.user;
     }
     if (this._props.group) {
-      this._group = new GroupEntity(this._props.group);
+      this._group = new GroupEntity(this._props.group, {clone: false});
       delete this._props.group;
     }
   }

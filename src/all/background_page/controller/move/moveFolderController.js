@@ -16,12 +16,12 @@ import ResourceModel from "../../model/resource/resourceModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import FolderModel from "../../model/folder/folderModel";
-import Share from "../../model/share";
 import FolderEntity from "../../model/entity/folder/folderEntity";
 import FoldersCollection from "../../model/entity/folder/foldersCollection";
 import PermissionChangesCollection from "../../model/entity/permission/change/permissionChangesCollection";
 import i18n from "../../sdk/i18n";
 import ProgressService from "../../service/progress/progressService";
+import ShareModel from "../../model/share/shareModel";
 
 
 class MoveFolderController {
@@ -38,6 +38,7 @@ class MoveFolderController {
     this.requestId = requestId;
     this.folderModel = new FolderModel(apiClientOptions);
     this.resourceModel = new ResourceModel(apiClientOptions, account);
+    this.shareModel = new ShareModel(apiClientOptions);
     this.keyring = new Keyring();
 
     // Work variables
@@ -250,7 +251,7 @@ class MoveFolderController {
     if (this.foldersChanges.length) {
       const folders = new FoldersCollection([this.folder]);
       folders.merge(this.subFolders);
-      await Share.bulkShareFolders(folders, this.foldersChanges, this.folderModel,  async message => {
+      await this.shareModel.bulkShareFolders(folders, this.foldersChanges, this.folderModel,  async message => {
         await this.progressService.finishStep(message);
       });
     }
@@ -261,7 +262,7 @@ class MoveFolderController {
       const changesDto = this.resourcesChanges.toDto();
       await this.progressService.finishStep(i18n.t('Synchronizing keys'), true);
       await this.keyring.sync();
-      await Share.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
+      await this.shareModel.bulkShareResources(resourcesDto, changesDto, this.privateKey, async message => {
         await this.progressService.finishStep(message);
       });
       await this.resourceModel.updateLocalStorage();

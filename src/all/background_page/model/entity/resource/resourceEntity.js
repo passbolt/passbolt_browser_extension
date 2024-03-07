@@ -20,6 +20,7 @@ import TagsCollection from "../tag/tagsCollection";
 import ResourceSecretsCollection from "../secret/resource/resourceSecretsCollection";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import canSuggestUrl from "../../../utils/url/canSuggestUrl";
 
 
 const ENTITY_NAME = 'Resource';
@@ -30,41 +31,47 @@ const RESOURCE_DESCRIPTION_MAX_LENGTH = 10000;
 
 class ResourceEntity extends Entity {
   /**
-   * Resource entity constructor
-   *
-   * @param {Object} resourceDto resource DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityValidationError} Build Rule: The collection of secrets, if provided, cannot be empty.
+   * @throws {EntityValidationError} Build Rule: Verify that the secrets associated resource ID corresponds with the
+   * resource ID.
+   * @throws {EntityValidationError} Build Rule: Verify that the permission is designated for a resource, and its
+   * associated aco foreign key corresponds with the resource ID.
+   * @throws {EntityValidationError} Build Rule: Verify that the permissions are designated for a resource, and their
+   * associated aco foreign keys correspond with the resource ID.
+   * @throws {EntityValidationError} Build Rule: Verify that the favorite associated foreign key corresponds with
+   * the resource ID.
    */
-  constructor(resourceDto) {
+  constructor(resourceDto, options = {}) {
     super(EntitySchema.validate(
       ResourceEntity.ENTITY_NAME,
       resourceDto,
       ResourceEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     if (this._props.permission) {
-      this._permission = new PermissionEntity(this._props.permission);
+      this._permission = new PermissionEntity(this._props.permission, {clone: false});
       ResourceEntity.assertValidPermission(this._permission, this.id);
       delete this._props.permission;
     }
     if (this._props.permissions) {
-      this._permissions = new PermissionsCollection(this._props.permissions);
+      this._permissions = new PermissionsCollection(this._props.permissions, {clone: false});
       ResourceEntity.assertValidPermissions(this._permissions, this.id);
       delete this._props.permissions;
     }
     if (this._props.secrets) {
-      this._secrets = new ResourceSecretsCollection(this._props.secrets);
+      this._secrets = new ResourceSecretsCollection(this._props.secrets, {clone: false});
       ResourceEntity.assertValidSecrets(this._secrets, this.id);
       delete this._props.secrets;
     }
     if (this._props.favorite) {
-      this._favorite = new FavoriteEntity(this._props.favorite);
+      this._favorite = new FavoriteEntity(this._props.favorite, {clone: false});
       ResourceEntity.assertValidFavorite(this._favorite, this.id);
       delete this._props.favorite;
     }
     if (this._props.tags) {
-      this._tags = new TagsCollection(this._props.tags);
+      this._tags = new TagsCollection(this._props.tags, {clone: false});
       delete this._props.tags;
     }
   }
@@ -408,6 +415,21 @@ class ResourceEntity extends Entity {
         (destinationFolder === null || destinationFolder.isPersonal()));
     }
     return (destinationFolder === null || !destinationFolder.isReadOnly());
+  }
+
+  /*
+   * ==================================================
+   * Meta data relative
+   * ==================================================
+   */
+
+  /**
+   * Check if the resource could be a suggestion for a given url
+   * @param {string} url The url to suggest for.
+   * @returns {boolean}
+   */
+  isSuggestion(url) {
+    return canSuggestUrl(url, this.uri);
   }
 
   /*

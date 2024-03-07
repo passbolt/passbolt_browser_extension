@@ -195,7 +195,7 @@ class UserService extends AbstractService {
     const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/${userId}`);
     const body = new FormData();
     body.append("profile[avatar][file]", file, filename);
-    const fetchOptions = this.apiClient.buildFetchOptions();
+    const fetchOptions = await this.apiClient.buildFetchOptions();
     // It is required to let this property unset in order to let the browser determine it by itself and set the additional variable boundary required by the API to parse the payload.
     delete fetchOptions.headers['content-type'];
     const response = await this.apiClient.fetchAndHandleResponse("POST", url, body, fetchOptions);

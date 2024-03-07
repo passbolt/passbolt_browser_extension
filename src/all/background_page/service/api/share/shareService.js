@@ -51,6 +51,38 @@ class ShareService extends AbstractService {
     const response = await this.apiClient.update(url, permissionChangesDto);
     return response.body;
   }
+
+  /**
+   * Simulate share permissions update.
+   *
+   * It is helpful to :
+   *  - Ensure that the changes won't compromise the data integrity;
+   *  - Get the lists of added and removed users (Used for later encryption).
+   *
+   * @param resourceId
+   * @param permissions
+   * @returns {*}
+   */
+  async simulateShareResource(resourceId, permissions) {
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/simulate/resource/${resourceId}`, {});
+    const body = this.apiClient.buildBody({permissions: permissions});
+    const response = await this.apiClient.fetchAndHandleResponse('POST', url, body);
+    return response.body;
+  }
+
+  /**
+   * Share a resource
+   * @param {string} resourceId The resource id to share
+   * @param {object} data The request body data
+   * @returns {*}
+   */
+  async shareResource(resourceId, data) {
+    this.assertValidId(resourceId);
+    this.assertNonEmptyData(data);
+    const url = `resource/${resourceId}`;
+    const response = await this.apiClient.update(url, data);
+    return response.body;
+  }
 }
 
 export default ShareService;

@@ -21,17 +21,14 @@ const STATUS_CONNECTED = 'connected';
 
 class WorkerEntity extends Entity {
   /**
-   * Entity constructor
-   *
-   * @param {Object} workerDto worker DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(workerDto) {
+  constructor(workerDto, options = {}) {
     super(EntitySchema.validate(
       WorkerEntity.ENTITY_NAME,
       workerDto,
       WorkerEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

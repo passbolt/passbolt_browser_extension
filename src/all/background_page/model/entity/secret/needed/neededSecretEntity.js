@@ -16,20 +16,19 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 
 const ENTITY_NAME = 'NeededSecret';
 
+/**
+ * Needed secret entity is used to request secret that need to be encrypted.
+ */
 class NeededSecretEntity extends Entity {
   /**
-   * NeededSecret entity constructor
-   * Used to request secret to encrypt
-   *
-   * @param {Object} neededSecretDto secret DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(neededSecretDto) {
+  constructor(neededSecretDto, options = {}) {
     super(EntitySchema.validate(
       NeededSecretEntity.ENTITY_NAME,
       neededSecretDto,
       NeededSecretEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

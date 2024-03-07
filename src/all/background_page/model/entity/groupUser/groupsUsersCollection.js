@@ -20,24 +20,21 @@ const ENTITY_NAME = 'GroupsUsers';
 
 class GroupsUsersCollection extends EntityCollection {
   /**
-   * GroupUsers Entity constructor
-   *
-   * @param {Object} groupsUsersDto memberships
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(groupsUsersDto) {
+  constructor(groupsUsersDto, options = {}) {
     super(EntitySchema.validate(
       GroupsUsersCollection.ENTITY_NAME,
       groupsUsersDto,
       GroupsUsersCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation
      * Collection validation will fail at the first item that doesn't validate
      */
     this._props.forEach(groupUser => {
-      this.push(new GroupUserEntity(groupUser));
+      this.push(new GroupUserEntity(groupUser, {clone: false}));
     });
 
     // We do not keep original props

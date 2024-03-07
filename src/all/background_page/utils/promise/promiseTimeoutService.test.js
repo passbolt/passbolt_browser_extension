@@ -12,7 +12,6 @@
  * @since         4.1.2
  */
 import PromiseTimeoutService from "./promiseTimeoutService";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("PromiseTimeoutService", () => {
   beforeEach(() => {

@@ -23,12 +23,12 @@ const ENTITY_NAME = "SsoKitClientPartEntity";
  */
 class SsoKitClientPartEntity extends Entity {
   /**
-   * Setup entity constructor
-   *
-   * @param {Object} ssoUserClientDataDto sso user's client data DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * Note: The entity customizes the cloning mechanism to enable the duplication of subtle crypto keys, a functionality
+   * not supported by the inherited entity's cloning process. Doesn't embed this entity into another one for this reason.
+   * @throws {EntityValidationError} Build Rule: Verify the validity of the nek, iv1 and iv2.
    */
-  constructor(ssoUserClientDataDto) {
+  constructor(ssoUserClientDataDto, options = {}) {
     //Because of the type of the data in the dto, we cannot use JSON serialization to make a copy of the object, however we can use `structuredClone` to proceed
     const clonedDto = structuredClone(ssoUserClientDataDto);
 
@@ -36,7 +36,7 @@ class SsoKitClientPartEntity extends Entity {
       SsoKitClientPartEntity.ENTITY_NAME,
       clonedDto,
       SsoKitClientPartEntity.getSchema()
-    ));
+    ), options);
 
     SsoKitClientPartEntity.validateNek(clonedDto.nek);
     SsoKitClientPartEntity.validateIv(clonedDto.iv1);

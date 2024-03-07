@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.3.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 import Log from "../../model/log";
 
 const PASSWORD_GENERATOR_LOCAL_STORAGE_KEY = 'passwordGenerator';

@@ -12,7 +12,6 @@
  * @since         4.1.0
  */
 import AuthModel from "../../model/auth/authModel";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 class AuthLogoutController {
   /**

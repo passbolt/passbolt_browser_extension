@@ -17,7 +17,7 @@ import FileService from "../../service/file/fileService";
 import OrganizationSettingsModel from "../../model/organizationSettings/organizationSettingsModel";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
@@ -32,7 +32,7 @@ class UpdatePrivateKeyController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.accountModel = new AccountModel(apiClientOptions);
+    this.accountModel = new AccountModel();
     this.organisationSettingsModel = new OrganizationSettingsModel(apiClientOptions);
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
   }

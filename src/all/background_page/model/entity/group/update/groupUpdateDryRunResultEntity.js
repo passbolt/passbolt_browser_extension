@@ -19,25 +19,22 @@ const ENTITY_NAME = 'GroupUpdateDryRunResult';
 
 class GroupUpdateDryRunResultEntity extends Entity {
   /**
-   * GroupUpdateDryRunResult entity constructor
-   *
-   * @param {Object} groupUpdateDryRunResultDto DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(groupUpdateDryRunResultDto) {
+  constructor(groupUpdateDryRunResultDto, options = {}) {
     super(EntitySchema.validate(
       GroupUpdateDryRunResultEntity.ENTITY_NAME,
       groupUpdateDryRunResultDto,
       GroupUpdateDryRunResultEntity.getSchema()
-    ));
+    ), options);
 
     // Association
     if (this._props.secrets) {
-      this._secrets = new SecretsCollection(this._props.secrets);
+      this._secrets = new SecretsCollection(this._props.secrets, {clone: false});
       delete this._props.secrets;
     }
     if (this._props.needed_secrets) {
-      this._needed_secrets = new NeededSecretsCollection(this._props.needed_secrets);
+      this._needed_secrets = new NeededSecretsCollection(this._props.needed_secrets, {clone: false});
       delete this._props.needed_secrets;
     }
   }

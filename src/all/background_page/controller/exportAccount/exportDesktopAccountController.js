@@ -19,7 +19,6 @@ import {Buffer} from 'buffer';
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import SignMessageService from "../../service/crypto/signMessageService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import * as openpgp from 'openpgp';
 
 const PUBLIC_FILENAME = "account-kit.passbolt";
 const MIME_TYPE_TEXT_PLAIN = "application/passbolt";
@@ -63,7 +62,7 @@ class ExportDesktopAccountController {
     const accountKit = await this.desktopTransferModel.getAccountKit(this.account);
     const accountKitDto = accountKit.toDto();
 
-    const accountKitMessage = await openpgp.createCleartextMessage({text: JSON.stringify(accountKitDto)});
+    const accountKitMessage = await OpenpgpAssertion.createCleartextMessageOrFail(JSON.stringify(accountKitDto));
     const privateKeyForSigning = await OpenpgpAssertion.readKeyOrFail(accountKitDto["user_private_armored_key"]);
     const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(privateKeyForSigning, passphrase);
     const signedAccountKit = await SignMessageService.signClearMessage(accountKitMessage, [decryptedPrivateKey]);

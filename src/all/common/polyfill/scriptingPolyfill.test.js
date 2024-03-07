@@ -11,18 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import browser from "./browserPolyfill";
-
-const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
-const mockedScriptingCSS = jest.spyOn(browser.scripting, "insertCSS");
 
 describe("Scripting", () => {
   beforeEach(async() => {
     jest.clearAllMocks();
   });
+
   describe("Scripting::executeScript", () => {
     it("Should insert JS func with a result", async() => {
       expect.assertions(3);
+      const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
+
       // data mocked
       const func = test => test;
       const option = {
@@ -53,6 +52,8 @@ describe("Scripting", () => {
 
     it("Should insert JS void func", async() => {
       expect.assertions(3);
+      const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
+
       // data mocked
       const func = test => test;
       const option = {
@@ -82,6 +83,7 @@ describe("Scripting", () => {
 
     it("Should insert JS file", async() => {
       expect.assertions(2);
+      const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
 
       const option = {
         files: ["filename.js", "filename2.js"],
@@ -103,6 +105,7 @@ describe("Scripting", () => {
   describe("Scripting::insertCSS", () => {
     it("Should insert CSS file", async() => {
       expect.assertions(2);
+      const mockedScriptingCSS = jest.spyOn(browser.scripting, "insertCSS");
 
       const option = {
         files: ["filename.css"],

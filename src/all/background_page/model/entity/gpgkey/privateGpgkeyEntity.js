@@ -18,17 +18,14 @@ const ENTITY_NAME = 'PrivateGpgkey';
 
 class PrivateGpgkeyEntity extends Entity {
   /**
-   * PrivateGpgkey entity constructor
-   *
-   * @param {Object} privateGpgkeyDto privateGpgkey data transfer object
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(privateGpgkeyDto) {
+  constructor(privateGpgkeyDto, options = {}) {
     super(EntitySchema.validate(
       PrivateGpgkeyEntity.ENTITY_NAME,
       privateGpgkeyDto,
       PrivateGpgkeyEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.1.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 import Log from "../../model/log";
 import RbacEntity from "passbolt-styleguide/src/shared/models/entity/rbac/rbacEntity";
 import RbacsCollection from "passbolt-styleguide/src/shared/models/entity/rbac/rbacsCollection";

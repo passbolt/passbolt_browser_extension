@@ -19,7 +19,6 @@ import BuildApiClientOptionsService
 import BuildAccountSetupService from "../service/setup/buildAccountSetupService";
 import {PownedPasswordEvents} from '../event/pownedPasswordEvents';
 import {enableFetchMocks} from "jest-fetch-mock";
-import browser from "../sdk/polyfill/browserPolyfill";
 
 jest.spyOn(BuildAccountSetupService, "buildFromSetupUrl");
 jest.spyOn(BuildApiClientOptionsService, "buildFromAccount");

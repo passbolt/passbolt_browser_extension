@@ -21,12 +21,12 @@ class PendingAccountRecoveryEntity extends Entity {
   /**
    * @inheritDoc
    */
-  constructor(dto = {}) {
+  constructor(dto = {}, options = {}) {
     super(EntitySchema.validate(
       PendingAccountRecoveryEntity.ENTITY_NAME,
       dto,
       PendingAccountRecoveryEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

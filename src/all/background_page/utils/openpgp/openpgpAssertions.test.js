@@ -113,6 +113,36 @@ describe("OpenPGP Assertions", () => {
     });
   });
 
+  describe("OpenPGP Assertions::createCleartextMessageOrFail", () => {
+    it("Should return an openpgp.CLeartextMessage given a string", async() => {
+      const message = "passbolt message";
+      expect.assertions(1);
+      const readMessage = await OpenpgpAssertion.createCleartextMessageOrFail(message);
+      expect(readMessage).toBeInstanceOf(openpgp.CleartextMessage);
+    });
+
+    it("Should throw an Error if the input message is not valid", async() => {
+      const expectedError = new Error("The message should be of type string.");
+      const adaPublicKey = await OpenpgpAssertion.readKeyOrFail(pgpKeys.ada.public);
+      const message = await OpenpgpAssertion.createCleartextMessageOrFail("Message");
+      const scenarios = [
+        1234,
+        true,
+        adaPublicKey,
+        message,
+      ];
+
+      expect.assertions(scenarios.length);
+      for (let i = 0; i < scenarios.length; i++) {
+        try {
+          await OpenpgpAssertion.createCleartextMessageOrFail(scenarios[i]);
+        } catch (e) {
+          expect(e).toStrictEqual(expectedError);
+        }
+      }
+    });
+  });
+
   describe("OpenPGP Assertions::readMessageOrFail", () => {
     it("Should return an openpgp.Message given an armored message string", async() => {
       const message = await OpenpgpAssertion.createMessageOrFail("Message");

@@ -13,7 +13,6 @@
  */
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
 import GpgAuth from "../../model/gpgauth";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 jest.useFakeTimers();
 

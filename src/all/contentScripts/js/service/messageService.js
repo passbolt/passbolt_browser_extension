@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import browser from "webextension-polyfill";
 
 class MessageService {
   constructor() {

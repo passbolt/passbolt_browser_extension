@@ -28,6 +28,7 @@ describe("Sso Login URL Entity", () => {
       {providerId: "azure", url: 'https://login.partner.microsoftonline.cn'},
       {providerId: "google", url: 'https://accounts.google.com'},
       {providerId: "oauth2", url: 'https://oauth2.generic.provider.com'},
+      {providerId: "adfs", url: 'https://adfs.partner.microsoft.com'},
     ];
 
     expect.assertions(availableUrl.length);

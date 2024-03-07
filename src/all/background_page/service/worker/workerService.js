@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
+import {v4 as uuid} from "uuid";
 import PortManager from "../../sdk/port/portManager";
 import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import BrowserTabService from "../ui/browserTab.service";
@@ -56,23 +56,24 @@ class WorkerService {
    */
   static waitExists(applicationName, tabId, timeout = 10000) {
     const timeoutMs = Date.now() + timeout;
+    const alarmName = `${WORKER_EXIST_ALARM}-${uuid()}`;
     return new Promise((resolve, reject) => {
       const handleWorkerExist = async alarm => {
-        if (alarm.name === WORKER_EXIST_ALARM) {
+        if (alarm.name === alarmName) {
           try {
-            this.clearAlarm(WORKER_EXIST_ALARM, handleWorkerExist);
+            this.clearAlarm(alarmName, handleWorkerExist);
             await this.get(applicationName, tabId);
             resolve();
           } catch (error) {
             if (alarm.scheduledTime >= timeoutMs) {
               reject(error);
             } else {
-              this.createAlarm(WORKER_EXIST_ALARM, WORKER_EXIST_ALARM_TIME_CHECKING, handleWorkerExist);
+              this.createAlarm(alarmName, WORKER_EXIST_ALARM_TIME_CHECKING, handleWorkerExist);
             }
           }
         }
       };
-      this.createAlarm(WORKER_EXIST_ALARM, WORKER_EXIST_ALARM_TIME_CHECKING, handleWorkerExist);
+      this.createAlarm(alarmName, WORKER_EXIST_ALARM_TIME_CHECKING, handleWorkerExist);
     });
   }
 

@@ -14,14 +14,14 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import RoleEntity from "passbolt-styleguide/src/shared/models/entity/role/roleEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import UpdateUserController from "./updateUserController";
 import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import UserEntity from "../../model/entity/user/userEntity";
 
 beforeEach(() => {

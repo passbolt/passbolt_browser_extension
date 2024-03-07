@@ -121,7 +121,7 @@ class ResourceModel {
    * @returns {PermissionChangesCollection}
    */
   calculatePermissionsChangesForMove(resource, parentFolder, destFolder) {
-    let remainingPermissions = new PermissionsCollection([], false);
+    let remainingPermissions = new PermissionsCollection([], {assertAtLeastOneOwner: false});
 
     // Remove permissions from parent if any
     if (parentFolder !== null) {
@@ -131,7 +131,7 @@ class ResourceModel {
       remainingPermissions = PermissionsCollection.diff(resource.permissions, parentFolder.permissions, false);
     }
     // Add parent permissions
-    let permissionsFromParent = new PermissionsCollection([], false);
+    let permissionsFromParent = new PermissionsCollection([], {assertAtLeastOneOwner: false});
     if (destFolder) {
       if (!destFolder.permissions) {
         throw new TypeError('Resource model calculatePermissionsChangesForMove requires destination permissions to be set.');
@@ -202,7 +202,7 @@ class ResourceModel {
     if (preSanitize) {
       resourcesDto = ResourcesCollection.sanitizeDto(resourcesDto);
     }
-    return new ResourcesCollection(resourcesDto);
+    return new ResourcesCollection(resourcesDto, {clone: false});
   }
 
   /**
@@ -271,31 +271,38 @@ class ResourceModel {
   /**
    * Returns the count of possible resources to suggest given an url
    * @param {string} url An url
-   * @return {*[]|number}
+   * @return {Promise<number>}
    */
   async countSuggestedResources(url) {
     if (!url) {
       return 0;
     }
-    const resourcesCollection = await this.getOrFindAll();
-    const passwordResources = await this.keepPasswordResources(resourcesCollection.toDto());
-    const passwordResourcesCollection = new ResourcesCollection(passwordResources);
-    return passwordResourcesCollection.countSuggestedResources(url);
+
+    const resourcesCollection = await this.findSuggestedResources(url);
+    return resourcesCollection.length;
   }
 
   /**
-   * Returns the possible resources to suggest given an url
-   * @param currentUrl An url
-   * @return {Promise<*[]|number>}
+   * Returns the possible resources to suggest given an url.
+   * @param {string} url The url to suggest for.
+   * @return {Promise<ResourcesCollection>}
    */
   async findSuggestedResources(url) {
     if (!url) {
-      return 0;
+      return new ResourcesCollection([]);
     }
+
     const resourcesCollection = await this.getOrFindAll();
-    const passwordResources = await this.keepPasswordResources(resourcesCollection.toDto());
-    const passwordResourcesCollection = new ResourcesCollection(passwordResources);
-    return passwordResourcesCollection.findSuggestedResources(url).toDto();
+
+    // Filter by resource types behaving as a password.
+    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
+    resourceTypesCollection.filterByPasswordResourceTypes();
+    resourcesCollection.filterByResourceTypes(resourceTypesCollection, false);
+
+    // Filter by suggested resources.
+    resourcesCollection.filterBySuggestResources(url);
+
+    return resourcesCollection;
   }
 
   /*
@@ -629,16 +636,6 @@ class ResourceModel {
   async keepResourcesSupported(resourcesDto) {
     const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
     return resourcesDto.filter(resource => !resource.resource_type_id || resourceTypesCollection.isResourceTypeIdPresent(resource.resource_type_id));
-  }
-
-  /**
-   * Keep only resources supported with no or known resource type
-   * @param resourcesDto
-   * @return {Promise<*[]>}
-   */
-  async keepPasswordResources(resourcesDto) {
-    const resourceTypesCollection = await this.resourceTypeModel.getOrFindAll();
-    return resourcesDto.filter(resource => !resource.resource_type_id || resourceTypesCollection.isPasswordResourceType(resource.resource_type_id));
   }
 }
 

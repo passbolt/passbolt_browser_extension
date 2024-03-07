@@ -20,21 +20,18 @@ const ENTITY_NAME = 'AccountRecoveryRequestCreate';
 
 class AccountRecoveryRequestCreateEntity extends Entity {
   /**
-   * AccountRecoveryRequestCreateEntity entity constructor
-   *
-   * @param {Object} accountRecoveryRequestCreateDto account recovery request create DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(accountRecoveryRequestCreateDto) {
+  constructor(accountRecoveryRequestCreateDto, options = {}) {
     super(EntitySchema.validate(
       AccountRecoveryRequestCreateEntity.ENTITY_NAME,
       accountRecoveryRequestCreateDto,
       AccountRecoveryRequestCreateEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     if (this._props.authentication_token) {
-      this._authentication_token = new AuthenticationTokenEntity(this._props.authentication_token);
+      this._authentication_token = new AuthenticationTokenEntity(this._props.authentication_token, {clone: false});
       delete this._props.authentication_token;
     }
   }

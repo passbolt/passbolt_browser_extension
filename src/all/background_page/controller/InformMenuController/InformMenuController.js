@@ -15,13 +15,11 @@
 import ResourceModel from "../../model/resource/resourceModel";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
-import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import BrowserTabService from "../../service/ui/browserTab.service";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
 import ResourceInProgressCacheService from "../../service/cache/resourceInProgressCache.service";
 import WorkerService from "../../service/worker/workerService";
-import DecryptAndParseResourceSecretService from "../../service/secret/decryptAndParseResourceSecretService";
 import ResourceTypeModel from "../../model/resourceType/resourceTypeModel";
 
 /**
@@ -54,7 +52,7 @@ class InformMenuController {
       const configuration = {
         inputType: callToActionInput.type,
         inputValue: callToActionInput.value,
-        suggestedResources: suggestedResources,
+        suggestedResources: suggestedResources.toDto(),
       };
       this.worker.port.emit(requestId, "SUCCESS", configuration);
     } catch (error) {
@@ -108,35 +106,6 @@ class InformMenuController {
 
     this.worker.port.emit(requestId, "SUCCESS");
     webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
-  }
-
-  /**
-   * Whenever the user intends to use a suggested resource as credentials for the current page
-   * @param requestId A request identifier
-   * @param resourceId A resource identifier
-   * @return {Promise<void>}
-   */
-  async useSuggestedResource(requestId, resourceId) {
-    // WebIntegration Worker
-    const webIntegrationWorker = await WorkerService.get('WebIntegration', this.worker.tab.id);
-    try {
-      // Get the resource, decrypt the resources password and requests to fill the credentials
-      const passphrase = await this.getPassphraseService.requestPassphraseFromQuickAccess();
-      const resource = await this.resourceModel.findForDecrypt(resourceId);
-      const privateKey = await GetDecryptedUserPrivateKeyService.getKey(passphrase);
-      const secretSchema = await this.resourceTypeModel.getSecretSchemaById(resource.resourceTypeId);
-      const plaintextSecret = await DecryptAndParseResourceSecretService.decryptAndParse(resource.secret, secretSchema, privateKey);
-      const {username} = resource;
-      const password = plaintextSecret?.password;
-      webIntegrationWorker.port.emit('passbolt.web-integration.fill-credentials', {username, password});
-      this.worker.port.emit(requestId, "SUCCESS");
-      webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
-    } catch (error) {
-      // The original worker has been destroyed when requesting to close the in-form menu, there is no worker to notify.
-      console.error(error);
-      this.worker.port.emit(requestId, "ERROR", error);
-      webIntegrationWorker.port.emit('passbolt.in-form-menu.close');
-    }
   }
 
   /**

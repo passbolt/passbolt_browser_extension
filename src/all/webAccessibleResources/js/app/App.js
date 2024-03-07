@@ -13,7 +13,6 @@
  */
 import React from "react";
 import ReactDOM from "react-dom";
-import browser from "../../../background_page/sdk/polyfill/browserPolyfill";
 import ExtApp from "passbolt-styleguide/src/react-extension/ExtApp";
 import Port from "../lib/port";
 

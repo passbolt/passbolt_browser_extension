@@ -18,18 +18,14 @@ const ENTITY_NAME = 'PermissionTransfer';
 
 class PermissionTransferEntity extends Entity {
   /**
-   * PermissionTransfer Entity constructor
-   *
-   * @param {Object} permissionTransferDto permission transfer
-   * @throws EntityValidationError if the dto cannot be converted into an entity
-   * @public
+   * @inheritDoc
    */
-  constructor(permissionTransferDto) {
+  constructor(permissionTransferDto, options = {}) {
     super(EntitySchema.validate(
       PermissionTransferEntity.ENTITY_NAME,
       permissionTransferDto,
       PermissionTransferEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

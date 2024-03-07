@@ -20,7 +20,6 @@ import {QuickAccessService} from "../../service/ui/quickAccess.service";
 import SsoLoginModel from "../../model/sso/ssoLoginModel";
 import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
 import SsoSettingsChangedError from "../../error/ssoSettingsChangedError";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import QualifySsoLoginErrorService from "../../service/sso/qualifySsoLoginErrorService";
 
 class SsoAuthenticationController {

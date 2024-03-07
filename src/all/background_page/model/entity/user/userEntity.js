@@ -25,42 +25,38 @@ const ENTITY_NAME = 'User';
 
 class UserEntity extends Entity {
   /**
-   * User entity constructor
-   *
-   * @param {Object} userDto user DTO
-   * @param {Object} [associations] optional {groups_users: <boolean>}
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(userDto, associations) {
+  constructor(userDto, options = {}) {
     super(EntitySchema.validate(
       UserEntity.ENTITY_NAME,
       UserEntity._cleanupLastLoginDate(userDto),
-      UserEntity.getSchema(associations)
-    ));
+      UserEntity.getSchema()
+    ), options);
 
     // Associations
     if (this._props.profile) {
-      this._profile = new ProfileEntity(this._props.profile);
+      this._profile = new ProfileEntity(this._props.profile, {clone: false});
       delete this._props.profile;
     }
     if (this._props.role) {
-      this._role = new RoleEntity(this._props.role);
+      this._role = new RoleEntity(this._props.role, {clone: false});
       delete this._props.role;
     }
     if (this._props.gpgkey) {
-      this._gpgkey = new GpgkeyEntity(this._props.gpgkey);
+      this._gpgkey = new GpgkeyEntity(this._props.gpgkey, {clone: false});
       delete this._props.gpgkey;
     }
     if (this._props.groups_users) {
-      this._groups_users = new GroupsUsersCollection(this._props.groups_users);
+      this._groups_users = new GroupsUsersCollection(this._props.groups_users, {clone: false});
       delete this._props.groups_users;
     }
     if (this._props.account_recovery_user_setting) {
-      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting);
+      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting, {clone: false});
       delete this._props.account_recovery_user_setting;
     }
     if (this._props.pending_account_recovery_request) {
-      this._pending_account_recovery_request = new PendingAccountRecoveryRequestEntity(this._props.pending_account_recovery_request);
+      this._pending_account_recovery_request = new PendingAccountRecoveryRequestEntity(this._props.pending_account_recovery_request, {clone: false});
       delete this._props.pending_account_recovery_request;
     }
   }

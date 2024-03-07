@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const path = require('path');
 
 const config = {
@@ -5,6 +6,12 @@ const config = {
     'browser-integration': path.resolve(__dirname, './src/all/contentScripts/js/app/BrowserIntegration.js'),
   },
   mode: 'production',
+  plugins: [
+    new webpack.ProvidePlugin({
+      // Inject browser polyfill as a global API, and adapt it depending on the environment (MV2/MV3/Windows app).
+      browser: path.resolve(__dirname, './src/all/common/polyfill/browserPolyfill.js'),
+    })
+  ],
   module: {
     rules: [
       {

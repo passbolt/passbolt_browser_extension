@@ -29,26 +29,30 @@ const SUPPORTED_RESOURCE_TYPES = [
   RESOURCE_TYPE_TOTP_SLUG
 ];
 
+const PASSWORD_RESOURCE_TYPES = [
+  RESOURCE_TYPE_PASSWORD_STRING_SLUG,
+  RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
+  RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
+];
+
 class ResourceTypesCollection extends EntityCollection {
   /**
-   * Resource Types Entity constructor
-   *
-   * @param {Object} resourceTypesCollectionDto resourceType DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(resourceTypesCollectionDto) {
+  constructor(resourceTypesCollectionDto, options = {}) {
     super(EntitySchema.validate(
       ResourceTypesCollection.ENTITY_NAME,
       resourceTypesCollectionDto,
       ResourceTypesCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation
      * Collection validation will fail at the first item that doesn't validate
      */
     this._props.forEach(resourceType => {
-      this.push(new ResourceTypeEntity(resourceType));
+      this.push(new ResourceTypeEntity(resourceType, {clone: false}));
     });
 
     // We do not keep original props
@@ -132,12 +136,22 @@ class ResourceTypesCollection extends EntityCollection {
    * @return {boolean}
    */
   isPasswordResourceType(id) {
-    const passwordResourceTypesSlug = [
-      RESOURCE_TYPE_PASSWORD_STRING_SLUG,
-      RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
-      RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP_SLUG,
-    ];
+    const passwordResourceTypesSlug = PASSWORD_RESOURCE_TYPES;
     return this.resourceTypes.some(resourceType => resourceType.id === id && passwordResourceTypesSlug.includes(resourceType.slug));
+  }
+
+  /*
+   * ==================================================
+   * Filter
+   * ==================================================
+   */
+
+  /**
+   * Filter by password resource types.
+   * @return {void} The function alters the collection itself.
+   */
+  filterByPasswordResourceTypes() {
+    this.filterByPropertyValueIn("slug", PASSWORD_RESOURCE_TYPES);
   }
 
   /*

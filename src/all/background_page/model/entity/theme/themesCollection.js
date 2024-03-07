@@ -22,24 +22,23 @@ const RULE_UNIQUE_NAME = 'unique_name';
 
 class ThemesCollection extends EntityCollection {
   /**
-   * Themes Collection constructor
-   *
-   * @param {Object} themesCollectionsDto secret DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by name.
    */
-  constructor(themesCollectionsDto) {
+  constructor(themesCollectionsDto, options = {}) {
     super(EntitySchema.validate(
       ThemesCollection.ENTITY_NAME,
       themesCollectionsDto,
       ThemesCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation
      * Collection validation will fail at the first item that doesn't validate
      */
     this._props.forEach(secret => {
-      this.push(new ThemeEntity(secret));
+      this.push(new ThemeEntity(secret, {clone: false}));
     });
 
     // We do not keep original props

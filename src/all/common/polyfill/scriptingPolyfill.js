@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.8.0
  */
-import browser from "webextension-polyfill";
 
 /**
  * This class provides a manifest_version 3 chrome.scripting API style polyfill to be used with mv2.
@@ -19,6 +18,9 @@ import browser from "webextension-polyfill";
  * This code must be imported for its side effect only
  */
 class Scripting {
+  constructor(browser) {
+    this.browser = browser;
+  }
   /**
    * Insert the given script or function.
    * @param {ScriptInjection} options
@@ -104,13 +106,10 @@ class Scripting {
     const codeToInject = options.func.toString() + functionCall;
 
     const info = {code: codeToInject, runAt: 'document_end', frameId: options.target?.frameIds[0]};
-    const response = await browser.tabs.executeScript(options.target.tabId, info);
+    const response = await this.browser.tabs.executeScript(options.target.tabId, info);
     // construct response like MV3
     return response?.map(data => ({result: data}));
   }
 }
 
-// If the API is not available, we insert this polyfill otherwise we keep the native API.
-if (!browser.scripting) {
-  browser.scripting = new Scripting();
-}
+module.exports = Scripting;

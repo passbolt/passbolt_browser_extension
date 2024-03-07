@@ -23,17 +23,14 @@ const PASSPHRASE_WORDS_CAMELCASE = "camelcase";
 
 class PassphraseGeneratorSettingsEntity extends Entity {
   /**
-   * Passphrase Generator Settings entity constructor
-   *
-   * @param {Object} passphraseGeneratorSettingsDto passphrase generator settings dto
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(passphraseGeneratorSettingsDto) {
+  constructor(passphraseGeneratorSettingsDto, options = {}) {
     super(EntitySchema.validate(
       PassphraseGeneratorSettingsEntity.ENTITY_NAME,
       passphraseGeneratorSettingsDto,
       PassphraseGeneratorSettingsEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**
@@ -93,10 +90,11 @@ class PassphraseGeneratorSettingsEntity extends Entity {
 
   /**
    * Return the default settings overriden with the given data if any.
-   * @param {PasswordPoliciesDto} data the data to override the entity with
-   * @returns {PasswordPoliciesEntity}
+   * @param {object} data the data to override the entity with
+   * @param {object} options See PasswordGeneratorSettingsEntity option parameters.
+   * @returns {PassphraseGeneratorSettingsEntity}
    */
-  static createFromDefault(data = {}) {
+  static createFromDefault(data = {}, options = {}) {
     const defaultDto = Object.assign({
       words: 9,
       min_words: 4,
@@ -105,7 +103,7 @@ class PassphraseGeneratorSettingsEntity extends Entity {
       word_case: PASSPHRASE_WORDS_LOWERCASE,
     }, data);
 
-    return new PassphraseGeneratorSettingsEntity(defaultDto);
+    return new PassphraseGeneratorSettingsEntity(defaultDto, options);
   }
 }
 

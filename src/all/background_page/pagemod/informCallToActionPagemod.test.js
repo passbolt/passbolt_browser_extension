@@ -17,7 +17,6 @@ import GetLegacyAccountService from "../service/account/getLegacyAccountService"
 import {v4 as uuid} from 'uuid';
 import {enableFetchMocks} from "jest-fetch-mock";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
-import browser from "../sdk/polyfill/browserPolyfill";
 
 jest.spyOn(InformCallToActionEvents, "listen").mockImplementation(jest.fn());
 

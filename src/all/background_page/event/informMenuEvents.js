@@ -13,6 +13,7 @@
 import InformMenuController from "../controller/InformMenuController/InformMenuController";
 import GetLocaleController from "../controller/locale/getLocaleController";
 import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
+import AutofillController from "../controller/autofill/AutofillController";
 
 /**
  * Listens the inform menu events
@@ -43,8 +44,8 @@ const listen = function(worker, apiClientOptions, account) {
    * Whenever the user intends to use a suggested resource as credentials for the current page
    */
   worker.port.on('passbolt.in-form-menu.use-suggested-resource', async(requestId, resourceId) => {
-    const informMenuController = new InformMenuController(worker, apiClientOptions, account);
-    await informMenuController.useSuggestedResource(requestId, resourceId);
+    const autofillController = new AutofillController(worker, requestId, apiClientOptions, account);
+    await autofillController._exec(resourceId, worker.tab.id);
   });
 
   /** Whenever the user clicks on browse credentials of the in-form-menu */

@@ -19,17 +19,14 @@ const ENTITY_NAME = 'GroupUserChanges';
 
 class GroupUserChangesCollection extends EntityCollection {
   /**
-   * PermissionChanges Entity constructor
-   *
-   * @param {array} groupUserChangesDto group user changes DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(groupUserChangesDto) {
+  constructor(groupUserChangesDto, options = {}) {
     super(EntitySchema.validate(
       GroupUserChangesCollection.ENTITY_NAME,
       groupUserChangesDto,
       GroupUserChangesCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Note: there is no "multi-item" validation

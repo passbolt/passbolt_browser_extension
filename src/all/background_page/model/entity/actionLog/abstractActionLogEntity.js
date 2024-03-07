@@ -28,16 +28,14 @@ const ALLOWED_FOREIGN_MODELS = [
 
 class AbstractActionLogEntity extends Entity {
   /**
-   * Action log entity constructor
-   *
-   * @param {*} props
+   * @inheritDoc
    */
-  constructor(props) {
-    super(props);
+  constructor(props, options = {}) {
+    super(props, options);
 
     // Associations
     if (this._props.creator) {
-      this._creator = new LoggedUserEntity(this._props.creator);
+      this._creator = new LoggedUserEntity(this._props.creator, {clone: false});
       delete this._props.creator;
     }
   }

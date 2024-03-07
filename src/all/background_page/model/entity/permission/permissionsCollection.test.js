@@ -22,7 +22,7 @@ describe("Permission Collection", () => {
   });
 
   it("constructor must work with empty data", () => {
-    const c = new PermissionsCollection([], false);
+    const c = new PermissionsCollection([], {assertAtLeastOneOwner: false});
     c.push(new PermissionEntity({
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
@@ -217,8 +217,8 @@ describe("Permission Collection", () => {
       aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d991",
       type: PermissionEntity.PERMISSION_READ
     };
-    const set1 = new PermissionsCollection([dto1], false);
-    const set2 = new PermissionsCollection([dto2], false);
+    const set1 = new PermissionsCollection([dto1], {assertAtLeastOneOwner: false});
+    const set2 = new PermissionsCollection([dto2], {assertAtLeastOneOwner: false});
 
     const set3 = PermissionsCollection.sum(set1, set2);
     expect(set3.toDto()).toEqual([dto1, dto2]);
@@ -249,8 +249,8 @@ describe("Permission Collection", () => {
       aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d992",
       type: PermissionEntity.PERMISSION_UPDATE
     };
-    const set1 = new PermissionsCollection([dto3, dto1, dto2], false);
-    const set2 = new PermissionsCollection([dto1, dto3, dto2], false);
+    const set1 = new PermissionsCollection([dto3, dto1, dto2], {assertAtLeastOneOwner: false});
+    const set2 = new PermissionsCollection([dto1, dto3, dto2], {assertAtLeastOneOwner: false});
 
     const set3 = PermissionsCollection.sum(set1, set2);
     const set4 = PermissionsCollection.sum(set2, set1);
@@ -265,14 +265,14 @@ describe("Permission Collection", () => {
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d990",
       type: PermissionEntity.PERMISSION_OWNER
-    }], false);
+    }], {assertAtLeastOneOwner: false});
     const set2 = new PermissionsCollection([{
       aco: PermissionEntity.ACO_FOLDER,
       aco_foreign_key: "c2c7f658-c7ac-4d73-9020-9d2c296d91ff",
       aro: PermissionEntity.ARO_USER,
       aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d990",
       type: PermissionEntity.PERMISSION_READ
-    }], false);
+    }], {assertAtLeastOneOwner: false});
 
     const set3 = PermissionsCollection.sum(set1, set2);
     const set4 = PermissionsCollection.sum(set2, set1);
@@ -302,8 +302,8 @@ describe("Permission Collection", () => {
       aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d991",
       type: PermissionEntity.PERMISSION_READ
     };
-    const set1 = new PermissionsCollection([dto1, dto2], false);
-    const set2 = new PermissionsCollection([], false);
+    const set1 = new PermissionsCollection([dto1, dto2], {assertAtLeastOneOwner: false});
+    const set2 = new PermissionsCollection([], {assertAtLeastOneOwner: false});
 
     const set3 = PermissionsCollection.sum(set1, set2);
     expect(set3.toDto()).toEqual([dto1, dto2]);
@@ -327,8 +327,8 @@ describe("Permission Collection", () => {
       aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d991",
       type: PermissionEntity.PERMISSION_READ
     };
-    const set1 = new PermissionsCollection([dto1, dto2], false);
-    const set2 = new PermissionsCollection([dto2], false);
+    const set1 = new PermissionsCollection([dto1, dto2], {assertAtLeastOneOwner: false});
+    const set2 = new PermissionsCollection([dto2], {assertAtLeastOneOwner: false});
 
     try {
       PermissionsCollection.sum(set1, set2);
@@ -355,8 +355,8 @@ describe("Permission Collection", () => {
       aro_foreign_key: "54c6278e-f824-5fda-91ff-3e946b18d991",
       type: PermissionEntity.PERMISSION_OWNER
     };
-    const set1 = new PermissionsCollection([dto1], false);
-    const set2 = new PermissionsCollection([dto2], false);
+    const set1 = new PermissionsCollection([dto1], {assertAtLeastOneOwner: false});
+    const set2 = new PermissionsCollection([dto2], {assertAtLeastOneOwner: false});
 
     try {
       PermissionsCollection.sum(set1, set2);
@@ -472,56 +472,56 @@ describe("Permission Collection", () => {
       set3;
 
     // nothing to remove
-    set1 = new PermissionsCollection([dto3], false);
-    set2 = new PermissionsCollection([dto1, dto2], false);
+    set1 = new PermissionsCollection([dto3], {assertAtLeastOneOwner: false});
+    set2 = new PermissionsCollection([dto1, dto2], {assertAtLeastOneOwner: false});
     set3 = PermissionsCollection.diff(set1, set2, false);
     expect(set3.toDto()).toEqual([dto3]);
 
     // nothing to remove 2
-    set1 = new PermissionsCollection([dto1, dto2], false);
-    set2 = new PermissionsCollection([dto3], false);
+    set1 = new PermissionsCollection([dto1, dto2], {assertAtLeastOneOwner: false});
+    set2 = new PermissionsCollection([dto3], {assertAtLeastOneOwner: false});
     set3 = PermissionsCollection.diff(set1, set2, false);
     expect(set3.toDto()).toEqual([dto1, dto2]);
 
     // nothing to change
-    set1 = new PermissionsCollection([dto1, dto2], false);
-    set2 = new PermissionsCollection([dto1, dto2], false);
+    set1 = new PermissionsCollection([dto1, dto2], {assertAtLeastOneOwner: false});
+    set2 = new PermissionsCollection([dto1, dto2], {assertAtLeastOneOwner: false});
     set3 = PermissionsCollection.diff(set1, set2, false);
     expect(set3.toDto()).toEqual([]);
 
     // nothing left
-    set1 = new PermissionsCollection([], false);
-    set2 = new PermissionsCollection([dto1, dto2], false);
+    set1 = new PermissionsCollection([], {assertAtLeastOneOwner: false});
+    set2 = new PermissionsCollection([dto1, dto2], {assertAtLeastOneOwner: false});
     set3 = PermissionsCollection.diff(set1, set2, false);
     expect(set3.toDto()).toEqual([]);
 
     // nothing right
-    set1 = new PermissionsCollection([dto1, dto2], false);
-    set2 = new PermissionsCollection([], false);
+    set1 = new PermissionsCollection([dto1, dto2], {assertAtLeastOneOwner: false});
+    set2 = new PermissionsCollection([], {assertAtLeastOneOwner: false});
     set3 = PermissionsCollection.diff(set1, set2, false);
     expect(set3.toDto()).toEqual([dto1, dto2]);
 
     // nothing at all
-    set1 = new PermissionsCollection([], false);
-    set2 = new PermissionsCollection([], false);
+    set1 = new PermissionsCollection([], {assertAtLeastOneOwner: false});
+    set2 = new PermissionsCollection([], {assertAtLeastOneOwner: false});
     set3 = PermissionsCollection.diff(set1, set2, false);
     expect(set3.toDto()).toEqual([]);
 
     // nothing left 2
-    set1 = new PermissionsCollection([dto1, dto2], false);
-    set2 = new PermissionsCollection([dto1, dto2, dto3], false);
+    set1 = new PermissionsCollection([dto1, dto2], {assertAtLeastOneOwner: false});
+    set2 = new PermissionsCollection([dto1, dto2, dto3], {assertAtLeastOneOwner: false});
     set3 = PermissionsCollection.diff(set1, set2, false);
     expect(set3.toDto()).toEqual([]);
 
     // something left
-    set1 = new PermissionsCollection([dto1, dto2], false);
-    set2 = new PermissionsCollection([dto1, dto3], false);
+    set1 = new PermissionsCollection([dto1, dto2], {assertAtLeastOneOwner: false});
+    set2 = new PermissionsCollection([dto1, dto3], {assertAtLeastOneOwner: false});
     set3 = PermissionsCollection.diff(set1, set2, false);
     expect(set3.toDto()).toEqual([dto2]);
 
     // something left 2
-    set1 = new PermissionsCollection([dto1, dto2, dto3], false);
-    set2 = new PermissionsCollection([dto3], false);
+    set1 = new PermissionsCollection([dto1, dto2, dto3], {assertAtLeastOneOwner: false});
+    set2 = new PermissionsCollection([dto3], {assertAtLeastOneOwner: false});
     set3 = PermissionsCollection.diff(set1, set2, false);
     expect(set3.toDto()).toEqual([dto1, dto2]);
   });
@@ -544,8 +544,8 @@ describe("Permission Collection", () => {
     let resultSet;
 
     // check remove equal or lower
-    const ownerSet = new PermissionsCollection([owner], false);
-    const readSet = new PermissionsCollection([read], false);
+    const ownerSet = new PermissionsCollection([owner], {assertAtLeastOneOwner: false});
+    const readSet = new PermissionsCollection([read], {assertAtLeastOneOwner: false});
     resultSet = PermissionsCollection.diff(ownerSet, readSet, false);
     expect(resultSet.toDto()).toEqual([owner]);
     resultSet = PermissionsCollection.diff(readSet, ownerSet, false);

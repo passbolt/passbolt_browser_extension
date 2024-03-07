@@ -171,7 +171,7 @@ class GpgAuth {
    * GPGAuth Login - handle stage1, stage2 and complete
    *
    * @param {openpgp.PrivateKey} privateKey The decrypted private key to use to decrypt the message.
-   * @returns {Promise.<string>} referrer url
+   * @returns {Promise<void>}
    */
   async login(privateKey) {
     const privateKeyInfo = await GetGpgKeyInfoService.getKeyInfo(privateKey);
@@ -222,12 +222,11 @@ class GpgAuth {
    *
    * @param userAuthToken {string} The user authentication token
    * @param {ExternalGpgKeyEntity} privateKey decrypted private key
-   * @returns {Promise.<string>} url to redirect the user to
+   * @returns {Promise<void>}
    */
   async stage2(userAuthToken, privateKey) {
     // Prepare request data
     const url = this.getDomain() + URL_LOGIN;
-    const domain = User.getInstance().settings.getDomain();
     const data = new FormData();
     data.append('data[gpg_auth][keyid]', privateKey.fingerprint);
     data.append('data[gpg_auth][user_token_result]', userAuthToken);
@@ -247,8 +246,7 @@ class GpgAuth {
     }
 
     // Check the headers and return the redirection url
-    const auth = new GpgAuthHeader(response.headers, 'complete');
-    return domain + auth.headers['x-gpgauth-refer'];
+    new GpgAuthHeader(response.headers, 'complete');
   }
 
   /**

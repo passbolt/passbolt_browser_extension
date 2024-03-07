@@ -16,7 +16,7 @@ import MfaGetMfaSettingsController from "./mfaGetMfaSettingsController";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mfaDto} from './mfaGetMfaSettingsController.test.data';
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 
 beforeEach(() => {
   enableFetchMocks();

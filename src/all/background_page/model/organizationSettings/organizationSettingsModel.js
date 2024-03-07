@@ -13,7 +13,7 @@
  */
 import OrganizationSettingsService from "../../service/api/organizationSettings/organizationSettingsService";
 import OrganizationSettingsEntity from "../entity/organizationSettings/organizationSettingsEntity";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 
 // Settings local cache.
 let _settings;

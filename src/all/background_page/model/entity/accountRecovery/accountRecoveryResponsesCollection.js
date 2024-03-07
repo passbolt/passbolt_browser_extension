@@ -25,17 +25,15 @@ const RULE_UNIQUE_ID = 'unique_id';
  */
 class AccountRecoveryResponsesCollection extends EntityCollection {
   /**
-   * AccountRecoveryResponses Entity constructor
-   *
-   * @param {Object} AccountRecoveryResponsesCollectionDto resource DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(AccountRecoveryResponsesCollectionDto) {
+  constructor(AccountRecoveryResponsesCollectionDto, options = {}) {
     super(EntitySchema.validate(
       AccountRecoveryResponsesCollection.ENTITY_NAME,
       AccountRecoveryResponsesCollectionDto,
       AccountRecoveryResponsesCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Check if accountRecoveryResponse ids are unique
@@ -49,7 +47,7 @@ class AccountRecoveryResponsesCollection extends EntityCollection {
     });
     // Directly push into the private property _items[]
     this._props.forEach(accountRecoveryResponse => {
-      this._items.push(new AccountRecoveryResponseEntity(accountRecoveryResponse));
+      this._items.push(new AccountRecoveryResponseEntity(accountRecoveryResponse, {clone: false}));
     });
 
     // We do not keep original props

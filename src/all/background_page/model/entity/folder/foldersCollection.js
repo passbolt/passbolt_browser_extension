@@ -21,17 +21,15 @@ const RULE_UNIQUE_ID = 'unique_id';
 
 class FoldersCollection extends EntityCollection {
   /**
-   * Folders Entity constructor
-   *
-   * @param {Object} foldersCollectionDto folders
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(foldersCollectionDto) {
+  constructor(foldersCollectionDto, options = {}) {
     super(EntitySchema.validate(
       FoldersCollection.ENTITY_NAME,
       foldersCollectionDto,
       FoldersCollection.getSchema()
-    ));
+    ), options);
 
     /*
      * Check if folder ids are unique
@@ -45,7 +43,7 @@ class FoldersCollection extends EntityCollection {
     });
     // Directly push into the private property _items[]
     this._props.forEach(folder => {
-      this._items.push(new FolderEntity(folder));
+      this._items.push(new FolderEntity(folder, {clone: false}));
     });
 
     // We do not keep original props

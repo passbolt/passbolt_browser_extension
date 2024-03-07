@@ -24,17 +24,17 @@ const ENTITY_NAME = "AccountRecoveryOrganizationChangePolicy";
  */
 class AccountRecoveryOrganizationPolicyChangeEntity extends Entity {
   /**
-   * Setup entity constructor
-   *
-   * @param {Object} accountRecoveryOrganizationPolicyChangeDto account recovery organization policy DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityValidationError} Build rule checking if no policy change and no new public key provided.
+   * @throws {EntityValidationError} Build rule checking if the policy is marked as disabled and a new public key is provided.
+   * @throws {EntityValidationError} Build rule checking if the provided public key id matches the one provided as metadata.
    */
-  constructor(accountRecoveryOrganizationPolicyChangeDto) {
+  constructor(accountRecoveryOrganizationPolicyChangeDto, options = {}) {
     super(EntitySchema.validate(
       AccountRecoveryOrganizationPolicyChangeEntity.ENTITY_NAME,
       accountRecoveryOrganizationPolicyChangeDto,
       AccountRecoveryOrganizationPolicyChangeEntity.getSchema()
-    ));
+    ), options);
 
     if (!accountRecoveryOrganizationPolicyChangeDto.policy && !accountRecoveryOrganizationPolicyChangeDto.account_recovery_organization_public_key) {
       throw new EntityValidationError("AccountRecoveryOrganizationPolicyChangeEntity expects a policy or an account_recovery_organization_public_key set to be valid.");
@@ -46,7 +46,7 @@ class AccountRecoveryOrganizationPolicyChangeEntity extends Entity {
 
     // Associations
     if (this._props.account_recovery_organization_public_key) {
-      this._account_recovery_organization_public_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_public_key);
+      this._account_recovery_organization_public_key = new AccountRecoveryOrganizationPublicKeyEntity(this._props.account_recovery_organization_public_key, {clone: false});
       AccountRecoveryOrganizationPolicyEntity.assertValidAccountRecoveryOrganizationPublicKey(this._account_recovery_organization_public_key, this.public_key_id);
       delete this._props.account_recovery_organization_public_key;
     }

@@ -12,17 +12,12 @@
  * @since         3.9.0
  */
 import PopupHandlerService from "./popupHandlerService";
-import browser from "webextension-polyfill";
-import MockTabs from "../../../../../test/mocks/mockTabs";
 import {v4 as uuid} from "uuid";
 import UserAbortsOperationError from "../../error/userAbortsOperationError";
 import SsoLoginUrlEntity from "../../model/entity/sso/ssoLoginUrlEntity";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
 import GoogleSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/GoogleSsoSettingsEntity";
-
-let currentBrowserTab = null;
-let currentBrowserWindows = null;
 
 const SUPPORTED_LOGIN_URLS = [
   {url: 'https://login.microsoftonline.com', provider: AzureSsoSettingsEntity.PROVIDER_ID},
@@ -32,21 +27,9 @@ const SUPPORTED_LOGIN_URLS = [
 ];
 
 beforeAll(() => {
-  currentBrowserTab = browser.tabs;
-  currentBrowserWindows = browser.windows;
-
-  browser.tabs = new MockTabs();
-  browser.windows = {
-    create: jest.fn()
-  };
-
   jest.clearAllMocks();
 });
 
-afterAll(() => {
-  browser.tabs = currentBrowserTab;
-  browser.windows = currentBrowserWindows;
-});
 
 /**
  * Ensures the code inside returned promises are executed.

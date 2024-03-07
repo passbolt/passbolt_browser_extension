@@ -65,6 +65,19 @@ class MultiFactorAuthenticationService extends AbstractService {
   }
 
   /**
+   * retrieve the qr code for totp from the API
+   *
+   * @returns {Promise<*>} Response body
+   * @throw {ApiFetchError} if mfa for the user cannot be disabled
+   * @public
+   */
+  async getMfaToTpSetupInfo() {
+    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/setup/totp`);
+    const settings = await this.apiClient.fetchAndHandleResponse('GET', url);
+    return settings.body;
+  }
+
+  /**
    * setup the totp provider
    * @param {Object} body
    * @throw {TypeError} invalid otp provisioning uri

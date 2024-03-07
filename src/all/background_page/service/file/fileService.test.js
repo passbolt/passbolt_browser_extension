@@ -14,7 +14,6 @@
 
 import FileService from "./fileService";
 import WorkerService from "../worker/workerService";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 // Reset the modules before each test.
 beforeEach(() => {

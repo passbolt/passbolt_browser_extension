@@ -29,25 +29,22 @@ const ALLOWED_FOREIGN_MODELS = [
 
 class CommentEntity extends Entity {
   /**
-   * Comment entity constructor
-   *
-   * @param {Object} commentDto comment DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(commentDto) {
+  constructor(commentDto, options = {}) {
     super(EntitySchema.validate(
       CommentEntity.ENTITY_NAME,
       commentDto,
       CommentEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     if (this._props.creator) {
-      this._creator = new UserEntity(this._props.creator);
+      this._creator = new UserEntity(this._props.creator, {clone: false});
       delete this._props.creator;
     }
     if (this._props.modifier) {
-      this._modifier = new UserEntity(this._props.modifier);
+      this._modifier = new UserEntity(this._props.modifier, {clone: false});
       delete this._props.modifier;
     }
   }

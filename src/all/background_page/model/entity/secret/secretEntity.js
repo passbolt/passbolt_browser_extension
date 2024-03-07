@@ -19,18 +19,15 @@ const ENTITY_NAME = 'Secret';
 
 class SecretEntity extends Entity {
   /**
-   * Secret entity constructor
-   * Used to store encrypted secrets
-   *
-   * @param {Object} secretDto secret DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityValidationError} Build Rule: Verify the data is a valid openpgp message.
    */
-  constructor(secretDto) {
+  constructor(secretDto, options = {}) {
     super(EntitySchema.validate(
       SecretEntity.ENTITY_NAME,
       secretDto,
       SecretEntity.getSchema()
-    ));
+    ), options);
 
     SecretEntity.assertValidMessage(this._props.data);
   }

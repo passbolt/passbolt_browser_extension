@@ -23,12 +23,10 @@ const ORGANIZATION_NOT_FOUND = 'not found';
 
 class OrganizationSettingsEntity extends Entity {
   /**
-   * Organization settings entity constructor
-   *
-   * @param {Object} organizationSettingsDto organization settings DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * Sanitize: Override default settings using the data provided in the DTO.
    */
-  constructor(organizationSettingsDto) {
+  constructor(organizationSettingsDto, options = {}) {
     // Default properties values
     const props = Object.assign(OrganizationSettingsEntity.getDefault(), organizationSettingsDto);
     const sanitizedDto = OrganizationSettingsEntity.sanitizeDto(props);
@@ -36,7 +34,7 @@ class OrganizationSettingsEntity extends Entity {
       OrganizationSettingsEntity.ENTITY_NAME,
       sanitizedDto,
       OrganizationSettingsEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

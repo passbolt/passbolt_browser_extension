@@ -11,12 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import browser from "../all/background_page/sdk/polyfill/browserPolyfill";
 import PortManager from "../all/background_page/sdk/port/portManager";
-import WebNavigationService from "../all/background_page/service/webNavigation/webNavigationService";
 import LocalStorageService from "../all/background_page/service/localStorage/localStorageService";
 import SystemRequirementService from "../all/background_page/service/systemRequirementService/systemRequirementService";
 import OnExtensionInstalledController from "../all/background_page/controller/extension/onExtensionInstalledController";
+import TabService from "../all/background_page/service/tab/tabService";
+import OnExtensionUpdateAvailableController
+  from "../all/background_page/controller/extension/onExtensionUpdateAvailableController";
 
 /**
  * Load all system requirement
@@ -39,9 +40,14 @@ browser.runtime.onStartup.addListener(LocalStorageService.flush);
 browser.runtime.onInstalled.addListener(OnExtensionInstalledController.exec);
 
 /**
- * Add listener on any on complete navigation
+ * On update available of the extension, update it when the user is logout
  */
-browser.webNavigation.onCompleted.addListener(WebNavigationService.exec);
+browser.runtime.onUpdateAvailable.addListener(OnExtensionUpdateAvailableController.exec);
+
+/**
+ * Add listener on any tab update
+ */
+browser.tabs.onUpdated.addListener(TabService.exec);
 
 /**
  * Add listener on connect port

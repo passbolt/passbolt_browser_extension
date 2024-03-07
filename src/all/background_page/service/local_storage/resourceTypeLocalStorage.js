@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 import Log from "../../model/log";
 import ResourceTypeEntity from "../../model/entity/resourceType/resourceTypeEntity";
 import ResourceTypesCollection from "../../model/entity/resourceType/resourceTypesCollection";

@@ -12,7 +12,6 @@
  * @since         4.1.0
  */
 
-import browser from "../../sdk/polyfill/browserPolyfill";
 import UserMeSessionStorageService from "./userMeSessionStorageService";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";

@@ -11,16 +11,13 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import browser from "./polyfill/browserPolyfill";
 import ScriptExecution from "./scriptExecution";
-
-const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
-const mockedScriptingCSS = jest.spyOn(browser.scripting, "insertCSS");
 
 describe("ScriptExecution", () => {
   describe("ScriptExecution::injectPortname", () => {
     it("Should insert JS func", async() => {
       expect.assertions(1);
+      const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
       const scriptExecution = new ScriptExecution(1);
       const portname = "portname";
 
@@ -43,6 +40,7 @@ describe("ScriptExecution", () => {
   describe("ScriptExecution::injectJs", () => {
     it("Should insert JS files", async() => {
       expect.assertions(1);
+      const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
       const scriptExecution = new ScriptExecution(2);
       const files = ["filename.js", "filename2.js"];
 
@@ -64,6 +62,7 @@ describe("ScriptExecution", () => {
   describe("ScriptExecution::injectCSS", () => {
     it("Should insert CSS file", async() => {
       expect.assertions(1);
+      const mockedScriptingCSS = jest.spyOn(browser.scripting, "insertCSS");
       const scriptExecution = new ScriptExecution(3);
       const files = ["filename.css", "filename2.css"];
 
@@ -84,6 +83,7 @@ describe("ScriptExecution", () => {
   describe("ScriptExecution::injectBase64UrlToCreateObjectURL", () => {
     it("Should insert JS func", async() => {
       expect.assertions(2);
+      const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
       // data mocked
       const dataUrl = "data:text/plain;base64,VGV4dA==";
       self.URL.createObjectURL = jest.fn();
@@ -115,6 +115,7 @@ describe("ScriptExecution", () => {
   describe("ScriptExecution::injectURLToRevoke", () => {
     it("Should insert JS func", async() => {
       expect.assertions(2);
+      const mockedScriptingJS = jest.spyOn(browser.scripting, "executeScript");
       // data mocked
       const url = "blob:https://passbolt.dev/8a3e66b9-4646-4077-815a-5978936aa6d6";
       self.URL.revokeObjectURL = jest.fn();

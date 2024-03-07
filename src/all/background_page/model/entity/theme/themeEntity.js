@@ -19,17 +19,14 @@ const ENTITY_NAME = 'Theme';
 
 class ThemeEntity extends Entity {
   /**
-   * Theme entity constructor
-   *
-   * @param {Object} themeDto theme DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(themeDto) {
+  constructor(themeDto, options = {}) {
     super(EntitySchema.validate(
       ThemeEntity.ENTITY_NAME,
       themeDto,
       ThemeEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

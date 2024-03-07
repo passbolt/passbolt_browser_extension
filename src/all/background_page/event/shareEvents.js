@@ -8,7 +8,6 @@
  */
 import ResourceModel from "../model/resource/resourceModel";
 import FolderModel from "../model/folder/folderModel";
-import Share from "../model/share";
 import ShareResourcesController from "../controller/share/shareResourcesController";
 import ShareFoldersController from "../controller/share/shareFoldersController";
 import FoldersCollection from "../model/entity/folder/foldersCollection";
@@ -21,26 +20,6 @@ import PermissionChangesCollection from "../model/entity/permission/change/permi
  * @param {AccountEntity} account the user account
  */
 const listen = function(worker, apiClientOptions, account) {
-  /*
-   * Search aros based on keywords.
-   * @listens passbolt.share.search-aros
-   * @param keywords {string} The keywords to search
-   */
-  worker.port.on('passbolt.share.search-aros', async(requestId, keywords, resourcesForLegacyApi) => {
-    let aros;
-    try {
-      aros = await Share.searchAros(keywords);
-    } catch (error) {
-      if (resourcesForLegacyApi.resourcesIds && resourcesForLegacyApi.resourcesIds.length === 1) {
-        // This code ensure the compatibility with passbolt < v2.4.0.
-        aros = await Share.searchResourceAros(resourcesForLegacyApi.resourcesIds[0], keywords);
-      } else {
-        worker.port.emit(requestId, 'ERROR', error);
-      }
-    }
-    worker.port.emit(requestId, 'SUCCESS', aros);
-  });
-
   /*
    * Retrieve the resources to share.
    * @listens passbolt.share.get-resources

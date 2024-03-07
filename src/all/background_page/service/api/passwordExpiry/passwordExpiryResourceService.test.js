@@ -14,8 +14,8 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse, mockApiResponseError} from '../../../../../../test/mocks/mockApiResponse';
-import PassboltApiFetchError from "../../../error/passboltApiFetchError";
-import PassboltServiceUnavailableError from "../../../error/passboltServiceUnavailableError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
+import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import PasswordExpiryResourceService from "./passwordExpiryResourceService";
 import {
   defaultPasswordExpiryResourceDto, defaultPasswordExpiryResourceDtoFromApi
@@ -23,13 +23,12 @@ import {
 import AccountEntity from "../../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
 import BuildApiClientOptionsService from "../../account/buildApiClientOptionsService";
-import browser from "../../../sdk/polyfill/browserPolyfill";
 
 describe("PasswordExpiry service", () => {
   let apiClientOptions;
   beforeEach(async() => {
     enableFetchMocks();
-    jest.resetAllMocks();
+    fetch.resetMocks();
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     const account = new AccountEntity(defaultAccountDto());

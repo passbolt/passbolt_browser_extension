@@ -26,17 +26,14 @@ const UUID_PASSBOLT_NAMESPACE = 'd5447ca1-950f-459d-8b20-86ddfdd0f922';
 
 class AbstractAccountEntity extends Entity {
   /**
-   * Setup entity constructor
-   *
-   * @param {Object} accountDto account DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(accountDto) {
-    super(accountDto);
+  constructor(accountDto, options = {}) {
+    super(accountDto, options);
 
     // Associations
     if (this._props.security_token) {
-      this._security_token = new SecurityTokenEntity(this._props.security_token);
+      this._security_token = new SecurityTokenEntity(this._props.security_token, {clone: false});
       delete this._props.security_token;
     }
   }

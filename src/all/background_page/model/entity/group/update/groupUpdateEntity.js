@@ -20,25 +20,22 @@ const ENTITY_NAME = 'GroupUpdate';
 
 class GroupUpdateEntity extends Entity {
   /**
-   * GroupUpdate entity constructor
-   *
-   * @param {Object} groupUpdateDto group update DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(groupUpdateDto) {
+  constructor(groupUpdateDto, options = {}) {
     super(EntitySchema.validate(
       GroupUpdateEntity.ENTITY_NAME,
       groupUpdateDto,
       GroupUpdateEntity.getSchema()
-    ));
+    ), options);
 
     // Association
     if (this._props.groups_users) {
-      this._groups_users = new GroupUserChangesCollection(this._props.groups_users);
+      this._groups_users = new GroupUserChangesCollection(this._props.groups_users, {clone: false});
       delete this._props.groups_users;
     }
     if (this._props.secrets) {
-      this._secrets = new SecretsCollection(this._props.secrets);
+      this._secrets = new SecretsCollection(this._props.secrets, {clone: false});
       delete this._props.secrets;
     }
   }

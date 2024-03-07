@@ -22,7 +22,6 @@ import {defaultPasswordExpirySettingsDtoFromApi} from "passbolt-styleguide/src/s
 import PasswordExpirySettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity";
 import OrganizationSettingsEntity from "../../model/entity/organizationSettings/organizationSettingsEntity";
 import {defaultProOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 const mockedOrganisationSettings = new OrganizationSettingsEntity(defaultProOrganizationSettings());
 jest.mock('../../model/organizationSettings/organizationSettingsModel', () => ({
@@ -36,7 +35,7 @@ describe("GetOrFindPasswordExpirySettingsController", () => {
   let account, apiClientOptions;
   beforeEach(async() => {
     enableFetchMocks();
-    jest.resetAllMocks();
+    fetch.resetMocks();
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     account = new AccountEntity(defaultAccountDto());
@@ -66,7 +65,6 @@ describe("GetOrFindPasswordExpirySettingsController", () => {
     jest.spyOn(storageService, "get").mockImplementation(() => expectedDto);
     jest.spyOn(storageService, "flush");
 
-    controller.passwordExpirySettingsGetOrFindService.passwordExpirySettingsModel.getOrFindOrDefault
     const result = await controller.exec();
     expect(result).toStrictEqual(expectedEntity);
     expect(storageService.get).toHaveBeenCalledTimes(1);

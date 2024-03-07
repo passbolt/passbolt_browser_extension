@@ -20,21 +20,18 @@ const ENTITY_NAME = 'Profile';
 
 class ProfileEntity extends Entity {
   /**
-   * Profile entity constructor
-   *
-   * @param {Object} profileDto profile DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(profileDto) {
+  constructor(profileDto, options = {}) {
     super(EntitySchema.validate(
       ProfileEntity.ENTITY_NAME,
       profileDto,
       ProfileEntity.getSchema()
-    ));
+    ), options);
 
     // Association
     if (this._props.avatar) {
-      this._avatar = new AvatarEntity(this._props.avatar);
+      this._avatar = new AvatarEntity(this._props.avatar, {clone: false});
       delete this._props.avatar;
     }
   }

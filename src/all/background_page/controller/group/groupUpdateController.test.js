@@ -16,7 +16,6 @@ import Keyring from "../../model/keyring";
 import DecryptMessageService from "../../service/crypto/decryptMessageService";
 import User from "../../model/user";
 import GroupsUpdateController from "./groupUpdateController";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 
 const {enableFetchMocks} = require("jest-fetch-mock");
@@ -50,7 +49,7 @@ describe("GroupsUpdateController", () => {
 
       browser.storage.local.set({groups: [localGroup]});
 
-      const clientOptions = await User.getInstance().getApiClientOptions({requireCsrfToken: false});
+      const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new GroupsUpdateController(null, null, clientOptions);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
 
@@ -109,7 +108,7 @@ describe("GroupsUpdateController", () => {
 
       browser.storage.local.set({groups: [localGroup]});
 
-      const clientOptions = await User.getInstance().getApiClientOptions({requireCsrfToken: false});
+      const clientOptions = await User.getInstance().getApiClientOptions();
       const controller = new GroupsUpdateController(null, null, clientOptions);
       controller.getPassphraseService.getPassphrase.mockResolvedValue(pgpKeys.ada.passphrase);
 

@@ -20,25 +20,22 @@ const ENTITY_NAME = 'MfaCombinedEnabledProviders';
 
 class MfaCombinedEnabledProvidersEntity extends Entity {
   /**
-   * Mfa settings entity constructor
-   *
-   * @param {Object} mfaSettingsDto mfa setting dto
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(mfaSettingsDto) {
+  constructor(mfaSettingsDto, options = {}) {
     super(EntitySchema.validate(
       MfaCombinedEnabledProvidersEntity.ENTITY_NAME,
       mfaSettingsDto,
       MfaCombinedEnabledProvidersEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     if (this._props.MfaOrganizationSettings) {
-      this._mfaOrganizationSettings = new MfaEnabledProviderEntity(this._props.MfaOrganizationSettings);
+      this._mfaOrganizationSettings = new MfaEnabledProviderEntity(this._props.MfaOrganizationSettings, {clone: false});
       delete this._props.MfaOrganizationSettings;
     }
     if (this._props.MfaAccountSettings) {
-      this._mfaAccountSettings = new MfaEnabledProviderEntity(this._props.MfaAccountSettings);
+      this._mfaAccountSettings = new MfaEnabledProviderEntity(this._props.MfaAccountSettings, {clone: false});
       delete this._props.MfaAccountSettings;
     }
   }

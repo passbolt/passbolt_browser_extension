@@ -18,11 +18,11 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {v4 as uuid} from "uuid";
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
 import SsoAuthenticationController from "./ssoAuthenticationController";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import DecryptSsoPassphraseService from "../../service/crypto/decryptSsoPassphraseService";
 import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import OutdatedSsoKitError from "../../error/outdatedSsoKitError";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import {generateSsoKitServerData} from "../../model/entity/sso/ssoKitServerPart.test.data";
@@ -41,16 +41,6 @@ jest.mock("../../model/auth/authModel", () => ({
   default: jest.fn(() => ({
     login: mockLogin
   }))
-}));
-
-const mockedTabCreate = jest.fn();
-jest.mock("../../sdk/polyfill/browserPolyfill", () => ({
-  __esModule: true,
-  default: {
-    tabs: {
-      create: data => { mockedTabCreate(data); }
-    }
-  }
 }));
 
 const mockGetSsoTokenFromThirdParty = jest.fn();
@@ -212,7 +202,7 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       const expectedUrl = `${User.getInstance().settings.getDomain()}/auth/login?case=sso-login-error`;
       const account = new AccountEntity(defaultAccountDto());
 
-      mockedTabCreate.mockImplementation(tabInfo => {
+      jest.spyOn(browser.tabs, 'create').mockImplementation(tabInfo => {
         expect(tabInfo.url).toBe(expectedUrl);
         expect(tabInfo.active).toBe(true);
       });

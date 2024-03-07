@@ -20,15 +20,14 @@ import BuildApiClientOptionsService from "../../service/account/buildApiClientOp
 import PasswordPoliciesModel from "./passwordPoliciesModel";
 import {defaultPasswordPolicies} from "../entity/passwordPolicies/passwordPoliciesEntity.test.data";
 import PasswordPoliciesEntity from "../entity/passwordPolicies/passwordPoliciesEntity";
-import PassboltServiceUnavailableError from "../../error/passboltServiceUnavailableError";
-import browser from "../../sdk/polyfill/browserPolyfill";
+import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 
 describe("PasswordPoliciesModel", () => {
   let account, apiClientOptions;
 
   beforeEach(async() => {
     enableFetchMocks();
-    jest.resetAllMocks();
+    fetch.resetMocks();
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     account = new AccountEntity(defaultAccountDto());

@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 import Log from "../../model/log";
 import ResourcesCollection from "../../model/entity/resource/resourcesCollection";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
@@ -36,6 +35,9 @@ class ResourceLocalStorage {
 
   /**
    * Set the resources local storage.
+   *
+   * It's essential to understand that this function produces a duplicate of the local storage value, not a reference.
+   * Therefore, any changes made to this duplicate will not affect the original data or a cache.
    *
    * @throws {Error} if operation failed
    * @return {Promise} results object, containing every object in keys that was found in the storage area.

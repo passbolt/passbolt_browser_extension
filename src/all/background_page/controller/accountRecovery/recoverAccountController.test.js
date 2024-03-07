@@ -17,7 +17,7 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import each from "jest-each";
 import User from "../../model/user";
 import Keyring from "../../model/keyring";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import RecoverAccountController from "./recoverAccountController";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";

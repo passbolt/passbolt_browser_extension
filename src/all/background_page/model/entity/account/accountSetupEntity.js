@@ -23,23 +23,20 @@ const TYPE_ACCOUNT_SETUP = "account-setup";
 
 class AccountSetupEntity extends AbstractAccountEntity {
   /**
-   * Setup entity constructor
-   *
-   * @param {Object} accountSetupDto account setup DTO
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(accountSetupDto) {
+  constructor(accountSetupDto, options = {}) {
     AccountSetupEntity.marshal(accountSetupDto);
 
     super(EntitySchema.validate(
       AccountSetupEntity.ENTITY_NAME,
       accountSetupDto,
       AccountSetupEntity.getSchema()
-    ));
+    ), options);
 
     // Setup account associations.
     if (this._props.account_recovery_user_setting) {
-      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting);
+      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting, {clone: false});
       delete this._props.account_recovery_user_setting;
     }
   }

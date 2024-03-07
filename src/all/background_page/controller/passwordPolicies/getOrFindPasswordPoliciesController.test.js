@@ -21,14 +21,13 @@ import BuildApiClientOptionsService from "../../service/account/buildApiClientOp
 import PasswordPoliciesEntity from "../../model/entity/passwordPolicies/passwordPoliciesEntity";
 import {defaultPasswordPolicies} from "../../model/entity/passwordPolicies/passwordPoliciesEntity.test.data";
 import {defaultPasswordGeneratorSettings} from "../../model/entity/passwordPolicies/passwordGeneratorSettingsEntity.test.data";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("GetOrFindPasswordPoliciesController::exec", () => {
   let account, apiClientOptions;
 
   beforeEach(async() => {
     enableFetchMocks();
-    jest.resetAllMocks();
+    fetch.resetMocks();
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     account = new AccountEntity(defaultAccountDto());
@@ -44,9 +43,6 @@ describe("GetOrFindPasswordPoliciesController::exec", () => {
     fetch.doMockOnceIf(/password-policies\/settings\.json/, () => mockApiResponse(expectedPasswordPolicies));
 
     const controller = new GetOrFindPasswordPoliciesController(null, null, account, apiClientOptions);
-    const storage = controller.passwordPoliciesModel.passwordPoliciesLocalStorage;
-    await storage.flush();
-
     const spyOnGetOrFind = jest.spyOn(controller.passwordPoliciesModel, "getOrFind");
     const spyOnFind = jest.spyOn(controller.passwordPoliciesModel, "find");
 
@@ -92,8 +88,6 @@ describe("GetOrFindPasswordPoliciesController::exec", () => {
     fetch.doMockOnceIf(/password-generator\/settings\.json/, () => { throw new Error("something went wrong"); });
 
     const controller = new GetOrFindPasswordPoliciesController(null, null, account, apiClientOptions);
-    const storage = controller.passwordPoliciesModel.passwordPoliciesLocalStorage;
-    await storage.flush();
 
     const spyOnGetOrFind = jest.spyOn(controller.passwordPoliciesModel, "getOrFind");
     const spyOnFind = jest.spyOn(controller.passwordPoliciesModel, "find");
@@ -120,8 +114,6 @@ describe("GetOrFindPasswordPoliciesController::exec", () => {
     fetch.doMockOnceIf(/password-generator\/settings\.json/, () => mockApiResponse(passwordGeneratorSettings));
 
     const controller = new GetOrFindPasswordPoliciesController(null, null, account, apiClientOptions);
-    const storage = controller.passwordPoliciesModel.passwordPoliciesLocalStorage;
-    await storage.flush();
 
     const spyOnGetOrFind = jest.spyOn(controller.passwordPoliciesModel, "getOrFind");
     const spyOnFind = jest.spyOn(controller.passwordPoliciesModel, "find");
@@ -150,8 +142,6 @@ describe("GetOrFindPasswordPoliciesController::exec", () => {
     fetch.doMockOnceIf(/password-policies\/settings\.json/, () => mockApiResponse(weakPasswordPolicies));
 
     const controller = new GetOrFindPasswordPoliciesController(null, null, account, apiClientOptions);
-    const storage = controller.passwordPoliciesModel.passwordPoliciesLocalStorage;
-    await storage.flush();
 
     const resultingPasswordPolicies = await controller.exec();
 

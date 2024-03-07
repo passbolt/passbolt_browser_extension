@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 const CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD = 60000;
 const AUTH_SESSION_CHECK_ALARM = "AuthSessionCheck";

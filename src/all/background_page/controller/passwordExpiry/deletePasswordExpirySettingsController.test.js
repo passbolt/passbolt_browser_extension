@@ -19,14 +19,13 @@ import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.d
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
 import DeletePasswordExpirySettingsController from "./deletePasswordExpirySettingsController";
 import {v4 as uuid} from "uuid";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
-import browser from "../../sdk/polyfill/browserPolyfill";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 
 describe("DeletePasswordExpirySettingsController", () => {
   let account, apiClientOptions;
   beforeEach(async() => {
     enableFetchMocks();
-    jest.resetAllMocks();
+    fetch.resetMocks();
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     account = new AccountEntity(defaultAccountDto());

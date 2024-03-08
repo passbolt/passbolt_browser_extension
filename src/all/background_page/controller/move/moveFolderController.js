@@ -251,7 +251,7 @@ class MoveFolderController {
     if (this.foldersChanges.length) {
       const folders = new FoldersCollection([this.folder]);
       folders.merge(this.subFolders);
-      await this.shareModel.bulkShareFolders(folders, this.foldersChanges, this.folderModel,  async message => {
+      await this.shareModel.bulkShareFolders(folders, this.foldersChanges,  async message => {
         await this.progressService.finishStep(message);
       });
     }

@@ -26,7 +26,7 @@ describe("SetResourceColumnsSettingController", () => {
     it("Should update the resource columns settings in the local storage.", async() => {
       expect.assertions(1);
       const mockedAccount = {id: uuid()};
-      const columnsSetting = [{id: "name"}];
+      const columnsSetting = [{id: "name", label: "name"}];
       const sorter = {propertyName: "name", asc: true};
       const gridUserSetting = {columns_setting: columnsSetting, sorter: sorter};
       jest.spyOn(browser.storage.local, "set");

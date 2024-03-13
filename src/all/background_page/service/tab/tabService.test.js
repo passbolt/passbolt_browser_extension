@@ -203,7 +203,7 @@ describe("TabService", () => {
     });
 
     it("Should exec if worker is on main frame and waiting connection", async() => {
-      expect.assertions(6);
+      expect.assertions(5);
       jest.useFakeTimers();
       jest.clearAllTimers();
       // data mocked
@@ -213,8 +213,7 @@ describe("TabService", () => {
         tabId: worker.tabId,
         frameId: 0
       };
-      const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
-      const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
+      jest.spyOn(global, "setTimeout");
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
       jest.spyOn(WorkersSessionStorage, "getWorkerById").mockImplementationOnce(() => worker);
@@ -224,9 +223,8 @@ describe("TabService", () => {
       // expectations
       expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenCalledWith(frameDetails.tabId);
       // Called 1 times during the execution
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(1);
-      // start the alarm
+      expect(global.setTimeout).toHaveBeenCalledTimes(1);
+      // start the timeout
       jest.advanceTimersByTime(50);
       await Promise.resolve();
       await Promise.resolve();

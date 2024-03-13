@@ -72,7 +72,7 @@ describe("WorkerService", () => {
 
   describe("WorkerService::waitExists", () => {
     it("should wait for the worker exists", async() => {
-      expect.assertions(10);
+      expect.assertions(5);
       // data mocked
       const worker = readWorker({name: "QuickAccess"});
       const port = {
@@ -86,34 +86,27 @@ describe("WorkerService", () => {
       // mock functions
       jest.spyOn(PortManager, "getPortById").mockImplementation(() => port);
       const spy = jest.spyOn(WorkerService, "waitExists");
-      const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
-      const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
+      jest.spyOn(global, "setTimeout");
 
       expect(spy).not.toHaveBeenCalled();
 
       WorkerService.waitExists("QuickAccess", worker.tabId);
       expect(spy).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(0);
 
       jest.advanceTimersByTime(101);
       await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
       expect(spy).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(2);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(1);
+      expect(global.setTimeout).toHaveBeenCalledTimes(1);
 
       jest.advanceTimersByTime(100);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(2);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(2);
+      expect(global.setTimeout).toHaveBeenCalledTimes(1);
     });
 
-    it("should raise an error if the worker not exists until timeout", async() => {
-      expect.assertions(8);
+    it("should raise an error if the worker not exists until timeout", () => {
+      expect.assertions(4);
       const spy = jest.spyOn(WorkerService, "waitExists");
       jest.spyOn(WorkerService, "get").mockImplementation(() => { throw new Error("Could not find worker ID QuickAccess for tab 1."); });
-      const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
-      const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
+      jest.spyOn(global, "setTimeout");
 
       expect(spy).not.toHaveBeenCalled();
 
@@ -122,13 +115,9 @@ describe("WorkerService", () => {
       });
 
       expect(spy).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(0);
 
-      jest.advanceTimersByTime(20000);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(100);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(100);
+      jest.advanceTimersByTime(6000);
+      expect(global.setTimeout).toHaveBeenCalledTimes(50);
     });
   });
 
@@ -149,7 +138,7 @@ describe("WorkerService", () => {
       };
       const entity = new WorkerEntity(dto);
       await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(entity);
-      // start the alarm
+
       jest.advanceTimersByTime(50);
       await Promise.resolve();
       await Promise.resolve();
@@ -167,7 +156,7 @@ describe("WorkerService", () => {
 
       const entity = new WorkerEntity(dto);
       await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(entity);
-      // start the alarm
+
       jest.advanceTimersByTime(50);
       expect(entity.toDto()).toEqual(dto);
       expect(WebNavigationService.exec).not.toHaveBeenCalled();
@@ -182,7 +171,7 @@ describe("WorkerService", () => {
 
       const entity = new WorkerEntity(dto);
       await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(entity);
-      // start the alarm
+
       jest.advanceTimersByTime(50);
       expect(entity.toDto()).toEqual(dto);
       expect(WebNavigationService.exec).not.toHaveBeenCalled();

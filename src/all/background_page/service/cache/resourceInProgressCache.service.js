@@ -17,7 +17,6 @@ import ExternalResourceEntity from "../../model/entity/resource/external/externa
 /** Default validity timeout of the cache */
 const VALIDITY_TIMEOUT_IN_MS = 6000;
 
-const RESOURCE_IN_PROGRESS_CACHE_FLUSH_ALARM = "ResourceInProgressCacheFlush";
 const RESOURCE_IN_PROGRESS_STORAGE_KEY = "resourceInProgress";
 
 /**
@@ -31,6 +30,7 @@ class ResourceInProgressCacheService {
    */
   constructor() {
     this.bindCallbacks();
+    this.timeoutId = null;
   }
 
   /**
@@ -38,7 +38,6 @@ class ResourceInProgressCacheService {
    */
   bindCallbacks() {
     this.reset = this.reset.bind(this);
-    this.handleFlushEvent = this.handleFlushEvent.bind(this);
   }
 
   /**
@@ -64,44 +63,11 @@ class ResourceInProgressCacheService {
     this.reset();
 
     await browser.storage.session.set({[RESOURCE_IN_PROGRESS_STORAGE_KEY]: resource.toDto()});
-
-    this.scheduleStorageFlush(timeoutInMs);
+    // Set a timeout to clean the cache if not consumed
+    this.timeoutId = setTimeout(this.reset, timeoutInMs);
 
     // Invalid the cache if the user is logged out
     self.addEventListener("passbolt.auth.after-logout", this.reset);
-  }
-
-  /**
-   * Schedule an alarm to flush the resource
-   * @param timeInMs
-   * @private
-   */
-  scheduleStorageFlush(timeInMs) {
-    // Create an alarm to invalid the cache after a given time
-    browser.alarms.create(RESOURCE_IN_PROGRESS_CACHE_FLUSH_ALARM, {
-      when: Date.now() + timeInMs
-    });
-    browser.alarms.onAlarm.addListener(this.handleFlushEvent);
-  }
-
-  /**
-   * Clear the alarm and listener configured for flushing the resource if any.
-   * @private
-   */
-  clearAlarm() {
-    browser.alarms.onAlarm.removeListener(this.handleFlushEvent);
-    browser.alarms.clear(RESOURCE_IN_PROGRESS_CACHE_FLUSH_ALARM);
-  }
-
-  /**
-   * Flush the current stored resource when the ResourceInProgressCacheFlush alarm triggers.
-   * @param {Alarm} alarm
-   * @private
-   */
-  async handleFlushEvent(alarm) {
-    if (alarm.name === RESOURCE_IN_PROGRESS_CACHE_FLUSH_ALARM) {
-      this.reset();
-    }
   }
 
   /**
@@ -109,7 +75,8 @@ class ResourceInProgressCacheService {
    */
   reset() {
     browser.storage.session.remove(RESOURCE_IN_PROGRESS_STORAGE_KEY);
-    this.clearAlarm();
+    // Clear the timeout
+    clearTimeout(this.timeoutId);
     self.removeEventListener("passbolt.auth.after-logout", this.reset);
   }
 }

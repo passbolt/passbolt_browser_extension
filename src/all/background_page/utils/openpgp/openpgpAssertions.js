@@ -53,7 +53,7 @@ const readAllKeysOrFail = async armoredKeys => {
 };
 
 /**
- * Creates on open pgp from a given clear text message string.
+ * Creates on open pgp message from a given clear text message string.
  * @param {string} message the clear text message from which to create an openpgp.Message.
  * @return {Promise<openpgp.Message>}
  * @throws {Error} if the messageis not a string
@@ -63,6 +63,19 @@ const createMessageOrFail = async message => {
     throw new Error(i18n.t("The message should be of type string."));
   }
   return openpgp.createMessage({text: message, format: 'utf8'});
+};
+
+/**
+ * Creates on open pgp cleartext message from a given string.
+ * @param {string} text the string from which to create an openpgp.CleartextMessage.
+ * @return {Promise<openpgp.CleartextMessage>}
+ * @throws {Error} if the messageis not a string
+ */
+const createCleartextMessageOrFail = async text => {
+  if (typeof text !== "string") {
+    throw new Error(i18n.t("The message should be of type string."));
+  }
+  return openpgp.createCleartextMessage({text});
 };
 
 /**
@@ -294,6 +307,7 @@ export const OpenpgpAssertion = {
   assertKey,
   readMessageOrFail,
   readClearMessageOrFail,
+  createCleartextMessageOrFail,
   createMessageOrFail,
   readAllKeysOrFail,
   readKeyOrFail

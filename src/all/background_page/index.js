@@ -4,7 +4,6 @@
  * @copyright (c) 2017 Passbolt SARL
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import browser from "./sdk/polyfill/browserPolyfill";
 import PortManager from "./sdk/port/portManager";
 import SystemRequirementService from "./service/systemRequirementService/systemRequirementService";
 import LocalStorageService from "./service/localStorage/localStorageService";
@@ -14,7 +13,7 @@ import User from "./model/user";
 import GpgAuth from "./model/gpgauth";
 import Log from "./model/log";
 import StartLoopAuthSessionCheckService from "./service/auth/startLoopAuthSessionCheckService";
-
+import OnExtensionUpdateAvailableController from "./controller/extension/onExtensionUpdateAvailableController";
 
 const main = async() => {
   /**
@@ -65,6 +64,11 @@ self.addEventListener("passbolt.auth.after-logout", LocalStorageService.flush);
  * On installed the extension, add first install in the url tab of setup or recover
  */
 browser.runtime.onInstalled.addListener(OnExtensionInstalledController.exec);
+
+/**
+ * On update available of the extension, update it when the user is logout
+ */
+browser.runtime.onUpdateAvailable.addListener(OnExtensionUpdateAvailableController.exec);
 
 /**
  * Add listener on startup

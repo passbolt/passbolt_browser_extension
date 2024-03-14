@@ -13,7 +13,7 @@
  */
 
 import {enableFetchMocks} from "jest-fetch-mock";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
 import RequestHelpCredentialsLostController from "./requestHelpCredentialsLostController";
 import AccountEntity from "../../model/entity/account/accountEntity";

@@ -13,7 +13,6 @@
  */
 
 import {v4 as uuid} from "uuid";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import SetResourceGridUserSettingController from "./setResourceGridUserSettingController";
 import {RESOURCE_GRID_USER_SETTING_STORAGE_KEY} from "../../service/local_storage/ressourceGridSettingLocalStorage";
 
@@ -27,7 +26,7 @@ describe("SetResourceColumnsSettingController", () => {
     it("Should update the resource columns settings in the local storage.", async() => {
       expect.assertions(1);
       const mockedAccount = {id: uuid()};
-      const columnsSetting = [{id: "name", label: "Name"}];
+      const columnsSetting = [{id: "name", label: "name"}];
       const sorter = {propertyName: "name", asc: true};
       const gridUserSetting = {columns_setting: columnsSetting, sorter: sorter};
       jest.spyOn(browser.storage.local, "set");

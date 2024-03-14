@@ -15,7 +15,6 @@ import Port from "../port";
 import PagemodManager from "../../pagemod/pagemodManager";
 import WorkersSessionStorage from "../../service/sessionStorage/workersSessionStorage";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
-import browser from "../polyfill/browserPolyfill";
 
 class PortManager {
   constructor() {

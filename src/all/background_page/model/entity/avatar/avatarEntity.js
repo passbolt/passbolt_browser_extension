@@ -20,17 +20,14 @@ const AVATAR_URL_SIZE_MEDIUM = 'medium';
 
 class AvatarEntity extends Entity {
   /**
-   * Avatar entity constructor
-   *
-   * @param {Object} avatarDto avatar DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(avatarDto) {
+  constructor(avatarDto, options = {}) {
     super(EntitySchema.validate(
       AvatarEntity.ENTITY_NAME,
       avatarDto,
       AvatarEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

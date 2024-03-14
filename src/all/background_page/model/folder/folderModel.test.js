@@ -12,7 +12,7 @@
  * @since         2.13.0
  */
 import FolderLocalStorage from '../../service/local_storage/folderLocalStorage';
-import ApiClientOptions from "../../service/api/apiClient/apiClientOptions";
+import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
 import FolderModel from "./folderModel";
 
 // Mock storage
@@ -40,7 +40,7 @@ describe("FolderModel",  () => {
 
   it("getAllByIds works", async() => {
     FolderLocalStorage.get.mockResolvedValue(getReturnValue());
-    const apiClientOptions = (new ApiClientOptions()).setBaseUrl('https://www.passbolt.test');
+    const apiClientOptions = new ApiClientOptions().setBaseUrl('https://www.passbolt.test');
     const folderModel = new FolderModel(apiClientOptions);
 
     // Not found

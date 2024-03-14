@@ -28,25 +28,22 @@ const ACO_FOLDER = 'Folder';
 
 class PermissionEntity extends Entity {
   /**
-   * Permission Entity constructor
-   *
-   * @param {Object} permissionDto permission
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(permissionDto) {
+  constructor(permissionDto, options = {}) {
     super(EntitySchema.validate(
       PermissionEntity.ENTITY_NAME,
       permissionDto,
       PermissionEntity.getSchema()
-    ));
+    ), options);
 
     // Associated models
     if (this._props.user) {
-      this._user = new UserEntity(this._props.user);
+      this._user = new UserEntity(this._props.user, {clone: false});
       delete this._props.user;
     }
     if (this._props.group) {
-      this._group = new GroupEntity(this._props.group);
+      this._group = new GroupEntity(this._props.group, {clone: false});
       delete this._props.group;
     }
   }

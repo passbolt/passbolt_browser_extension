@@ -1,25 +1,32 @@
-import './matchers/extendExpect';
-import MockStorage from '../src/all/background_page/sdk/storage.test.mock';
-import MockAlarms from './mocks/mockAlarms';
+/**
+ * Passbolt ~ Open source password manager for teams
+ * Copyright (c) Passbolt SA (https://www.passbolt.com)
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @copyright     Copyright (c) Passbolt SA (https://www.passbolt.com)
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ * @link          https://www.passbolt.com Passbolt(tm)
+ * @since         3.6.0
+ */
+
+import "./mocks/mockWebExtensionPolyfill";
+import browser from "../src/all/common/polyfill/browserPolyfill";
+import "./mocks/mockTextEncoder";
+import "./matchers/extendExpect";
 import MockNavigatorLocks from './mocks/mockNavigatorLocks';
 import OrganizationSettingsModel from "../src/all/background_page/model/organizationSettings/organizationSettingsModel";
 import {Config} from "../src/all/background_page/model/config";
 import Keyring from "../src/all/background_page/model/keyring";
-import browser from "webextension-polyfill";
 
-/*
- * Fix jest-webextension-mock after upgrading webextension-polyfill to 0.9.0
- * @see https://github.com/clarkbw/jest-webextension-mock/issues/149#issuecomment-1116558554
- */
-chrome.runtime.id = "test id";
 global.console = {
   ...console,
   debug: jest.fn(),
   error: jest.fn(),
   warn: jest.fn()
 };
-global.TextEncoder = require('text-encoding-utf-8').TextEncoder;
-global.TextDecoder = require('text-encoding-utf-8').TextDecoder;
 global.fetch = require('node-fetch');
 if (!global.navigator) {
   global.navigator = {};
@@ -36,69 +43,14 @@ if (!global.structuredClone) {
   global.structuredClone = object => object;
 }
 
-jest.mock("webextension-polyfill", () => Object.assign({}, {
-  storage: new MockStorage(),
-  runtime: {
-    OnInstalledReason: {
-      INSTALL: "install",
-      UPDATE: "update"
-    },
-    getManifest: jest.fn(() => ({
-      version: "v3.6.0"
-    })),
-    connect: jest.fn(function ({ name }) {
-      return {
-        name,
-        postMessage: jest.fn(),
-        onDisconnect: {
-          addListener: jest.fn(),
-        },
-        onMessage: {
-          addListener: jest.fn(),
-        },
-        disconnect: jest.fn(),
-      };
-    }),
-    onMessage: {
-      addListener: jest.fn(),
-    },
-  },
-  alarms: new MockAlarms(),
-  cookies: {
-    get: jest.fn()
-  },
-  tabs: {
-    onUpdated: {
-      addListener: jest.fn()
-    },
-    onRemoved: {
-      addListener: jest.fn()
-    },
-    query: jest.fn(),
-    update: jest.fn(),
-    remove: jest.fn(),
-    reload: jest.fn(),
-    sendMessage: jest.fn(),
-    executeScript: jest.fn(),
-    insertCSS: jest.fn()
-  },
-  browserAction: {
-    getPopup: jest.fn(),
-    setIcon: jest.fn(),
-    onClicked: {
-      addListener: jest.fn()
-    }
-  },
-  commands: {
-    onCommand: {
-      addListener: jest.fn()
-    }
-  }
-}));
-
 beforeEach(async() => {
+  // Before each test, ensure a new copy of the browser API is made available in the global scope.
+  global.browser = browser;
   global.chrome = browser;
-  await browser.storage.local.clear(); // Flush the local storage
+  // Flush the local storage
+  await browser.storage.local.clear();
+  // Flush the session storage
+  await browser.storage.session.clear();
   // Flush caches
   OrganizationSettingsModel.flushCache();
   Config.flush();

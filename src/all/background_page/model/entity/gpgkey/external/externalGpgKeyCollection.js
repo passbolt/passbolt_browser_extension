@@ -22,17 +22,15 @@ const RULE_UNIQUE_ID = 'fingerprint';
 
 class ExternalGpgKeyCollection extends EntityCollection {
   /**
-   * Resources Entity constructor
-   *
-   * @param {Object} externalGpgKeyCollectionDto resource DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(externalGpgKeyCollectionDto) {
+  constructor(externalGpgKeyCollectionDto, options = {}) {
     super(EntitySchema.validate(
       ExternalGpgKeyCollection.ENTITY_NAME,
       externalGpgKeyCollectionDto,
       ExternalGpgKeyCollection.getSchema()
-    ));
+    ), options);
 
     /**
      * Check if resource ids are unique
@@ -46,7 +44,7 @@ class ExternalGpgKeyCollection extends EntityCollection {
     });
     // Directly push into the private property _items[]
     this._props.forEach(resource => {
-      this._items.push(new ExternalGpgKeyEntity(resource));
+      this._items.push(new ExternalGpgKeyEntity(resource, {clone: false}));
     });
 
     // We do not keep original props

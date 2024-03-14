@@ -13,7 +13,6 @@
  */
 import BrowserTabService from "./browserTab.service";
 import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("BrowserTabService", () => {
   beforeEach(async() => {

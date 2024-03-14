@@ -14,7 +14,7 @@
 
 import {v4 as uuidv4} from "uuid";
 import DeleteCommentController from "./deleteCommentController";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {enableFetchMocks} from "jest-fetch-mock";
 import CommentModel from "../../model/comment/commentModel";

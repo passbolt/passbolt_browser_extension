@@ -14,7 +14,7 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import CompleteRecoverController from "./completeRecoverController";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";

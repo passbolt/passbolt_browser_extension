@@ -22,12 +22,8 @@ const TYPE_ACCOUNT_ACCOUNT_RECOVERY = "account-account-recovery";
 
 class AccountAccountRecoveryEntity extends AbstractAccountEntity {
   /**
-   * Constructor
-   *
-   * @param {Object} accountAccountRecoveryDto account account recovery DTO
-   * @param {Object} options.
-   * - {boolean} validateUsername Validate the username. Default true.
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @param {boolean} [options.validateUsername=true] Validate the username
    */
   constructor(accountAccountRecoveryDto, options = {}) {
     AccountAccountRecoveryEntity.marshal(accountAccountRecoveryDto);
@@ -39,13 +35,13 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
       AccountAccountRecoveryEntity.ENTITY_NAME,
       accountAccountRecoveryDto,
       AccountAccountRecoveryEntity.getSchema(isUsernameValidated)
-    ));
+    ), options);
 
     this.isUsernameValidated = isUsernameValidated;
 
     // Associations
     if (this._props.account_recovery_request) {
-      this._account_recovery_request = new AccountRecoveryRequestEntity(this._props.account_recovery_request);
+      this._account_recovery_request = new AccountRecoveryRequestEntity(this._props.account_recovery_request, {clone: false});
       delete this._props.account_recovery_request;
     }
   }

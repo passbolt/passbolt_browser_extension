@@ -31,6 +31,18 @@ describe("Totp entity", () => {
     expect(entity.toDto()).toEqual(dto);
   });
 
+  it("Sanitize DTO should not contains special and space characters", () => {
+    expect.assertions(1);
+    const dto = TotpEntity.sanitizeDto(defaultTotpDto({secret_key: " 572H +KBKéàùêB=_%$ "}));
+    expect(dto.secret_key).toEqual("572HKBKB");
+  });
+
+  it("Sanitize valid DTO should remain the same", () => {
+    expect.assertions(1);
+    const dto = TotpEntity.sanitizeDto(defaultTotpDto());
+    expect(dto.secret_key).toEqual(defaultTotpDto().secret_key);
+  });
+
   it("CreateTotpFromUrl should work with lowercase algorithm", () => {
     const otpUrlData = lowerCaseAlgorithmSetupTotpData();
     const url = new URL(otpUrlData.otpProvisioningUri);

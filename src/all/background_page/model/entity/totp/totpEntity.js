@@ -22,17 +22,14 @@ const SUPPORTED_ALGORITHMS = ["SHA1", "SHA256", "SHA512"];
  */
 class TotpEntity extends Entity {
   /**
-   * totp entity constructor
-   *
-   * @param {Object} totpDto totp DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(totpDto) {
+  constructor(totpDto, options = {}) {
     super(EntitySchema.validate(
       TotpEntity.ENTITY_NAME,
       totpDto,
       TotpEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**
@@ -167,6 +164,25 @@ class TotpEntity extends Entity {
       period: parseInt(fields.get('TimeOtp-Period'), 10) || 30
     };
     return new TotpEntity(totp);
+  }
+
+  /*
+   * ==================================================
+   * Sanitization
+   * ==================================================
+   */
+  /**
+   * Sanitize totp dto:
+   * - Replace space in secret_key.
+   * - Capitalize characters in secret_key.
+   *
+   * @param {Object} dto The totp dto
+   * @returns {Object}
+   */
+  static sanitizeDto(dto) {
+    // Remove all special characters, whitespace (including spaces, tabs and newline characters) and capitalize characters for secret_key
+    dto.secret_key = dto.secret_key.replace(/(\W|_|\s)/g, '').toUpperCase();
+    return dto;
   }
 
   /*

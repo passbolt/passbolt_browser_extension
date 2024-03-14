@@ -12,7 +12,7 @@
  */
 import PassboltBadResponseError from "../../../error/passboltBadResponseError";
 import AbstractService from "../abstract/abstractService";
-import PassboltApiFetchError from "../../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import PassboltServiceUnavailableError from "../../../error/passboltServiceUnavailableError";
 
 const AUTH_SERVICE_RESOURCE_NAME = 'auth';
@@ -117,7 +117,7 @@ class AuthService extends AbstractService {
     body.append('data[gpg_auth][keyid]', fingerprint);
     body.append('data[gpg_auth][server_verify_token]', serverVerifyToken);
 
-    const fetchOptions = this.apiClient.buildFetchOptions();
+    const fetchOptions = await this.apiClient.buildFetchOptions();
     fetchOptions.method = 'POST';
     fetchOptions.body = body;
     // It is required to let this property unset in order to let the browser determine it by itself and set the additional variable boundary required by the API to parse the payload.

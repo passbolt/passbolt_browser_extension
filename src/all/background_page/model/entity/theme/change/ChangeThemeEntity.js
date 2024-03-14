@@ -19,17 +19,14 @@ const ENTITY_NAME = 'ChangeTheme';
 
 class ChangeThemeEntity extends Entity {
   /**
-   * Theme entity constructor
-   *
-   * @param {Object} changeThemeDto theme DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(changeThemeDto) {
+  constructor(changeThemeDto, options = {}) {
     super(EntitySchema.validate(
       ChangeThemeEntity.ENTITY_NAME,
       changeThemeDto,
       ChangeThemeEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

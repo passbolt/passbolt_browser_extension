@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.4
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 import {v4 as uuidv4} from "uuid";
 import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import WorkerEntity from "../../model/entity/worker/workerEntity";

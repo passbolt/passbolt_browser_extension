@@ -31,17 +31,14 @@ const FORMAT_CSV_LOGMEONCE = "csv-logmeonce";
 
 class ExportResourcesFileEntity extends Entity {
   /**
-   * Export resources file entity constructor
-   *
-   * @param {Object} exportResourcesFileDto export resources file DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(exportResourcesFileDto) {
+  constructor(exportResourcesFileDto, options = {}) {
     super(EntitySchema.validate(
       ExportResourcesFileEntity.ENTITY_NAME,
       exportResourcesFileDto,
       ExportResourcesFileEntity.getSchema()
-    ));
+    ), options);
 
     /*
      * // @todo Refactor when a schema deep testing strategy is implemented.
@@ -63,11 +60,11 @@ class ExportResourcesFileEntity extends Entity {
 
     // Associations
     if (this._props.export_resources) {
-      this._export_resources = new ExternalResourcesCollection(this._props.export_resources);
+      this._export_resources = new ExternalResourcesCollection(this._props.export_resources, {clone: false});
       delete this._props.export_resources;
     }
     if (this._props.export_folders) {
-      this._export_folders = new ExternalFoldersCollection(this._props.export_folders);
+      this._export_folders = new ExternalFoldersCollection(this._props.export_folders, {clone: false});
       delete this._props.export_folders;
     }
   }

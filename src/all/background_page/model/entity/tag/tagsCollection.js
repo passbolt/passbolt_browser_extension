@@ -23,30 +23,27 @@ const RULE_UNIQUE_SLUG = 'unique_slug';
 
 class TagsCollection extends EntityCollection {
   /**
-   * Tags Entity constructor
-   *
-   * @param {Object} tagsCollectionDto tag DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
+   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
    */
-  constructor(tagsCollectionDto) {
+  constructor(tagsCollectionDto, options = {}) {
     super(EntitySchema.validate(
       TagsCollection.ENTITY_NAME,
       tagsCollectionDto,
       TagsCollection.getSchema()
-    ));
+    ), options);
 
-    /*
-     * Note: there is no "multi-item" validation
-     * Collection validation will fail at the first item that doesn't validate
-     */
-    this._props.forEach(tag => {
-      this.push(new TagEntity(tag));
-    });
+    this.push(this._props, {clone: false});
 
     // We do not keep original props
     this._props = null;
   }
 
+  /*
+   * ==================================================
+   * Validation
+   * ==================================================
+   */
   /**
    * Get tags entity schema
    *
@@ -59,6 +56,19 @@ class TagsCollection extends EntityCollection {
     };
   }
 
+  /**
+   * Validate the collection build rules.
+   * @throws {EntityCollectionError} If multiple items have the same id.
+   */
+  validateBuildRules() {
+    this.assertUniqueByProperty("id");
+  }
+
+  /*
+   * ==================================================
+   * Getters
+   * ==================================================
+   */
   /**
    * Get tags
    * @returns {Array<TagEntity>}
@@ -114,24 +124,47 @@ class TagsCollection extends EntityCollection {
    * Setters
    * ==================================================
    */
+
   /**
-   * Push a copy of the tag to the list
-   * @param {object} tag DTO or TagEntity
+   * Push an item to the list
+   * @param {object|Entity} item The item to push
+   * @param {object} [entityOptions] Options for constructing the entity, identical to those accepted by the Entity
+   *   constructor that will be utilized for its creation.
+   * @private
    */
-  push(tag) {
-    if (!tag || typeof tag !== 'object') {
+  _pushItem(item, entityOptions = {}) {
+    if (!item || typeof item !== 'object') {
       throw new TypeError(`TagsCollection push parameter should be an object.`);
     }
-    if (tag instanceof TagEntity) {
-      tag = tag.toDto(); // clone
+
+    if (item instanceof TagEntity) {
+      item = item.toDto(TagEntity?.ALL_CONTAIN_OPTIONS); // deep clone
     }
-    const tagEntity = new TagEntity(tag); // validate
 
-    // Build rules
-    this.assertUniqueId(tagEntity);
-    //this.assertUniqueSlug(tagEntity);
+    const entity = new TagEntity(item, entityOptions);
+    super.push(entity);
+  }
 
-    super.push(tagEntity);
+  /**
+   * Push one or multiple items to the list.
+   * @param {object|Entity|array} data The item(s) to add to the collection should be in the form of a DTO, an entity,
+   *   or an array comprising any of the aforementioned.
+   * @param {object} [entityOptions] Options for constructing the entity, identical to those accepted by the Entity
+   *   constructor that will be utilized for its creation.
+   * @throws {EntityCollectionError} If one build rule does not validate.
+   * @throws {EntityValidationError} If one entity schema rule doesn't validate
+   *   (@todo could be an EntityCollectionError to keep a trace of the position of the failing item.)
+   */
+  push(data, entityOptions = {}) {
+    if (Array.isArray(data)) {
+      data.forEach(itemDto => {
+        this._pushItem(itemDto, entityOptions);
+      });
+    } else {
+      this._pushItem(data, entityOptions);
+    }
+
+    this.validateBuildRules();
   }
 
   /**

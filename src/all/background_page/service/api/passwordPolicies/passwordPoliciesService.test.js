@@ -14,20 +14,19 @@
 
 import {enableFetchMocks} from "jest-fetch-mock";
 import {mockApiResponse, mockApiResponseError} from "../../../../../../test/mocks/mockApiResponse";
-import PassboltApiFetchError from "../../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import AccountEntity from "../../../model/entity/account/accountEntity";
 import BuildApiClientOptionsService from "../../account/buildApiClientOptionsService";
 import {defaultAccountDto} from "../../../model/entity/account/accountEntity.test.data";
 import {defaultPasswordPolicies} from "../../../model/entity/passwordPolicies/passwordPoliciesEntity.test.data";
 import PasswordPoliciesService from "./passwordPoliciesService";
-import browser from "../../../sdk/polyfill/browserPolyfill";
 
 describe("PasswordPoliciesService", () => {
   let apiClientOptions;
 
   beforeEach(async() => {
     enableFetchMocks();
-    jest.resetAllMocks();
+    fetch.resetMocks();
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     const account = new AccountEntity(defaultAccountDto());

@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.3.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 import GridUserSettingEntity from "passbolt-styleguide/src/shared/models/entity/gridUserSetting/gridUserSettingEntity";
 
 export const RESOURCE_GRID_USER_SETTING_STORAGE_KEY = 'resourceGridUserSetting';

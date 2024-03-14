@@ -23,18 +23,19 @@ const FOLDER_NAME_MAX_LENGTH = 256;
 
 class FolderEntity extends Entity {
   /**
-   * Folder entity constructor
-   *
-   * @param {Object} folderDto folder
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
-   * @throws {EntityValidationError} if permissions are not for folder or not matching foreign key
+   * @inheritDoc
+   * Note: Sanitize, if not provided, the DTO folder parent id should be null.
+   * @throws {EntityValidationError} Build Rule: Verify that the permission is designated for a folder, and its
+   * associated aco foreign key corresponds with the folder ID.
+   * @throws {EntityValidationError} Build Rule: Verify that the permissions are designated for a folder, and their
+   * associated aco foreign keys correspond with the folder ID.
    */
-  constructor(folderDto) {
+  constructor(folderDto, options = {}) {
     super(EntitySchema.validate(
       FolderEntity.ENTITY_NAME,
       folderDto,
       FolderEntity.getSchema()
-    ));
+    ), options);
 
     // if no parent id specified set it to null
     if (!Object.prototype.hasOwnProperty.call(this._props, 'folder_parent_id')) {
@@ -43,12 +44,12 @@ class FolderEntity extends Entity {
 
     // Associations
     if (this._props.permission) {
-      this._permission = new PermissionEntity(this._props.permission);
+      this._permission = new PermissionEntity(this._props.permission, {clone: false});
       FolderEntity.assertValidPermission(this._permission, this.id);
       delete this._props.permission;
     }
     if (this._props.permissions) {
-      this._permissions = new PermissionsCollection(this._props.permissions);
+      this._permissions = new PermissionsCollection(this._props.permissions, {clone: false});
       FolderEntity.assertValidPermissions(this._permissions, this.id);
       delete this._props.permissions;
     }

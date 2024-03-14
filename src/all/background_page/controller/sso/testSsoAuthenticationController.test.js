@@ -15,9 +15,9 @@ import {enableFetchMocks} from "jest-fetch-mock";
 import {v4 as uuid} from "uuid";
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
 import {withAzureSsoSettings} from "./saveSsoSettingsAsDraftController.test.data";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import TestSsoAuthenticationController from "./testSsoAuthenticationController";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import SsoLoginUrlEntity from "../../model/entity/sso/ssoLoginUrlEntity";
 import AzureSsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/AzureSsoSettingsEntity";
 

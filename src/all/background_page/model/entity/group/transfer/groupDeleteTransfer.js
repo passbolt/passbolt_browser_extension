@@ -20,21 +20,18 @@ const ENTITY_NAME = 'GroupDeleteTransfer';
 
 class GroupDeleteTransferEntity extends Entity {
   /**
-   * GroupDeleteTransfer entity constructor
-   *
-   * @param {Object} transferDto transfer DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(transferDto) {
+  constructor(transferDto, options = {}) {
     /*
      * cannot use default entity schema validation as there are no required field
      * e.g. owners or managers should be set or both
      */
-    super(GroupDeleteTransferEntity.validate(transferDto));
+    super(GroupDeleteTransferEntity.validate(transferDto), options);
 
     // Association
     if (this._props.owners) {
-      this._owners = new PermissionTransfersCollection(this._props.owners);
+      this._owners = new PermissionTransfersCollection(this._props.owners, {clone: false});
       delete this._props.owners;
     }
   }

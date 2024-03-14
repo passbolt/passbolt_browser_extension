@@ -11,11 +11,9 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import MockTabs from "../../../../../test/mocks/mockTabs";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AuthLogoutController from "./authLogoutController";
 import AuthModel from "../../model/auth/authModel";
-import browser from "../../sdk/polyfill/browserPolyfill";
 import {v4 as uuid} from 'uuid';
 
 beforeEach(async() => {
@@ -27,7 +25,6 @@ describe("AuthLogoutController", () => {
     it("Should sign-out the user and not redirect after for the quickaccess.", async() => {
       expect.assertions(2);
       const logoutSpy = jest.spyOn(AuthModel.prototype, "logout").mockImplementation(() => {});
-      browser.tabs = new MockTabs();
 
       const controller = new AuthLogoutController(null, null, defaultApiClientOptions());
       await controller.exec(false);
@@ -39,7 +36,6 @@ describe("AuthLogoutController", () => {
     it("Should sign-out the user and redirect after.", async() => {
       expect.assertions(3);
       const logoutSpy = jest.spyOn(AuthModel.prototype, "logout").mockImplementation(() => {});
-      browser.tabs = new MockTabs();
 
       const worker = {
         tab: {

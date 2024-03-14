@@ -23,17 +23,14 @@ const TYPE_PERMISSIONS_UPDATED = "Permissions.updated";
 
 class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
   /**
-   * Action log entity constructor
-   *
-   * @param {Object} actionLog action log DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(actionLog) {
+  constructor(actionLog, options = {}) {
     super(EntitySchema.validate(
       PermissionsUpdatedActionLogEntity.ENTITY_NAME,
       actionLog,
       PermissionsUpdatedActionLogEntity.getSchema()
-    ));
+    ), options);
 
     // Associations
     let permissionsAddedDto = [];
@@ -53,9 +50,9 @@ class PermissionsUpdatedActionLogEntity extends AbstractActionLogEntity {
       }
       delete this._props.data;
     }
-    this._permissionsAdded = new UpdatedPermissionsCollection(permissionsAddedDto);
-    this._permissionsUpdated = new UpdatedPermissionsCollection(permissionsUpdatedDto);
-    this._permissionsRemoved = new UpdatedPermissionsCollection(permissionsRemovedDto);
+    this._permissionsAdded = new UpdatedPermissionsCollection(permissionsAddedDto, {clone: false});
+    this._permissionsUpdated = new UpdatedPermissionsCollection(permissionsUpdatedDto, {clone: false});
+    this._permissionsRemoved = new UpdatedPermissionsCollection(permissionsRemovedDto, {clone: false});
   }
 
   /**

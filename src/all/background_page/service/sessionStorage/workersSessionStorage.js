@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import browser from "../../sdk/polyfill/browserPolyfill";
 import Lock from "../../utils/lock";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 import Validator from "validator";

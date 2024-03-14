@@ -23,17 +23,14 @@ const DUO = "duo";
 
 class MfaProviderEntity extends Entity {
   /**
-   * Mfa provider constructor
-   *
-   * @param {Object} provider mfa provider
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(providerDto) {
+  constructor(providerDto, options = {}) {
     super(EntitySchema.validate(
       MfaProviderEntity.ENTITY_NAME,
       providerDto,
       MfaProviderEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

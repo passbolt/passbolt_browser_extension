@@ -14,7 +14,7 @@
 import '../../../../../test/mocks/mockSsoDataStorage';
 import '../../../../../test/mocks/mockCryptoKey';
 import {clientSsoKit} from '../../model/entity/sso/ssoKitClientPart.test.data';
-import {defaultApiClientOptions} from '../../service/api/apiClient/apiClientOptions.test.data';
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import GetQualifiedSsoLoginErrorController from './getQualifiedSsoLoginErrorController';
 import {enableFetchMocks} from "jest-fetch-mock";

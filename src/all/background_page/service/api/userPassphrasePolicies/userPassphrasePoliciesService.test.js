@@ -19,15 +19,14 @@ import {defaultAccountDto} from "../../../model/entity/account/accountEntity.tes
 import {defaultUserPassphrasePoliciesDto, userPassphrasePoliciesDtoFromApi} from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity.test.data";
 import {mockApiResponse, mockApiResponseError} from '../../../../../../test/mocks/mockApiResponse';
 import UserPassphrasePoliciesService from "./userPassphrasePoliciesService";
-import PassboltApiFetchError from "../../../error/passboltApiFetchError";
-import PassboltServiceUnavailableError from "../../../error/passboltServiceUnavailableError";
-import browser from "../../../sdk/polyfill/browserPolyfill";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
+import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 
 describe("UserPassphrasePolicies service", () => {
   let apiClientOptions;
   beforeEach(async() => {
     enableFetchMocks();
-    jest.resetAllMocks();
+    fetch.resetMocks();
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
 
     const account = new AccountEntity(defaultAccountDto());

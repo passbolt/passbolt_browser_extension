@@ -17,15 +17,14 @@ import AccountEntity from "../../model/entity/account/accountEntity";
 import BuildApiClientOptionsService from "../../service/account/buildApiClientOptionsService";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
-import PassboltServiceUnavailableError from "../../error/passboltServiceUnavailableError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
+import PassboltServiceUnavailableError from "passbolt-styleguide/src/shared/lib/Error/PassboltServiceUnavailableError";
 import SavePasswordExpirySettingsController from "./savePasswordExpirySettingsController";
 import PasswordExpirySettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity";
 import {defaultPasswordExpiryProSettingsDto, defaultPasswordExpirySettingsDto, defaultPasswordExpirySettingsDtoFromApi} from "passbolt-styleguide/src/shared/models/entity/passwordExpiry/passwordExpirySettingsEntity.test.data";
 import PasswordExpiryProSettingsEntity from "passbolt-styleguide/src/shared/models/entity/passwordExpiryPro/passwordExpiryProSettingsEntity";
 import {defaultProOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 import OrganizationSettingsEntity from "../../model/entity/organizationSettings/organizationSettingsEntity";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 const mockedOrganisationSettings = new OrganizationSettingsEntity(defaultProOrganizationSettings());
 jest.mock('../../model/organizationSettings/organizationSettingsModel', () => ({
@@ -40,7 +39,7 @@ describe("SavePasswordExpirySettingsController", () => {
 
   beforeEach(async() => {
     enableFetchMocks();
-    jest.resetAllMocks();
+    fetch.resetMocks();
     jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
     account = new AccountEntity(defaultAccountDto());
     apiClientOptions = await BuildApiClientOptionsService.buildFromAccount(account);
@@ -95,7 +94,7 @@ describe("SavePasswordExpirySettingsController", () => {
 
     const dto = defaultPasswordExpirySettingsDto();
     const controller = new SavePasswordExpirySettingsController(null, null, account, apiClientOptions);
-    expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltApiFetchError);
+    await expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltApiFetchError);
   });
 
   it("Should return the default value if something goes when requesting the API", async() => {
@@ -104,6 +103,6 @@ describe("SavePasswordExpirySettingsController", () => {
 
     const dto = defaultPasswordExpirySettingsDto();
     const controller = new SavePasswordExpirySettingsController(null, null, account, apiClientOptions);
-    expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltServiceUnavailableError);
+    await expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltServiceUnavailableError);
   });
 });

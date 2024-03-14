@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-import ApiClient from "../apiClient/apiClient";
+import {ApiClient} from "passbolt-styleguide/src/shared/lib/apiClient/apiClient";
 
 const SSO_USER_DATA_SERVICE_RESOURCE_NAME = '/sso/${providerId}/login';
 

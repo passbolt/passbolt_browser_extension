@@ -16,7 +16,18 @@ import TagEntity from "../tag/tagEntity";
 import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import TagsCollection from "../tag/tagsCollection";
-
+import {
+  TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION,
+  TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP,
+  TEST_RESOURCE_TYPE_PASSWORD_STRING,
+  TEST_RESOURCE_TYPE_TOTP
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypeEntity.test.data";
+import {resourceAllTypesDtosCollection} from "./resourcesCollection.test.data";
+import ResourceTypesCollection from "../resourceType/resourceTypesCollection";
+import {
+  resourceTypesCollectionDto
+} from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
+import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/resource/resourceEntity.test.data";
 
 describe("Resources Collection", () => {
   it("schema must validate", () => {
@@ -80,7 +91,9 @@ describe("Resources Collection", () => {
     };
     const dto = [resource1, resource1];
 
-    const t = () => { new ResourcesCollection(dto); };
+    const t = () => {
+      new ResourcesCollection(dto);
+    };
     expect(t).toThrow(EntityCollectionError);
   });
 
@@ -98,7 +111,9 @@ describe("Resources Collection", () => {
     };
     const dto = [resource1, resource2, resource3];
 
-    const t = () => { new ResourcesCollection(dto); };
+    const t = () => {
+      new ResourcesCollection(dto);
+    };
     expect(t).toThrow(EntityCollectionError);
   });
 
@@ -276,6 +291,106 @@ describe("Resources Collection", () => {
 
       const collection = new ResourcesCollection(santitizedDtos);
       expect(collection).toHaveLength(0);
+    });
+  });
+
+  describe("ResourceCollection::filterByResourceTypes", () => {
+    it("should filter the collection by all supported resources types and keep all resources having a defined resource type.", () => {
+      const resources = new ResourcesCollection(resourceAllTypesDtosCollection());
+      const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
+      resources.filterByResourceTypes(resourcesTypes);
+      expect.assertions(6);
+      expect(resources).toHaveLength(4);
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_STRING)).toBeTruthy();
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_TOTP)).toBeTruthy();
+      expect(resources.getFirst("name", "Resource password string legacy")).toBeFalsy();
+    });
+
+    it("with the option to keep resource with undefined resource type, it should filter the collection by all supported and not defined resources types.", () => {
+      const resources = new ResourcesCollection(resourceAllTypesDtosCollection());
+      const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
+      resources.filterByResourceTypes(resourcesTypes, false);
+      expect.assertions(6);
+      expect(resources).toHaveLength(5);
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_STRING)).toBeTruthy();
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_TOTP)).toBeTruthy();
+      expect(resources.getFirst("name", "Resource password string legacy")).toBeTruthy();
+    });
+
+    it("should filter the collection by a subset of resource types and excludes resources without resource type.", () => {
+      const resources = new ResourcesCollection(resourceAllTypesDtosCollection());
+      const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
+      resourcesTypes.filterByPasswordResourceTypes();
+      resources.filterByResourceTypes(resourcesTypes);
+      expect.assertions(6);
+      expect(resources).toHaveLength(3);
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_STRING)).toBeTruthy();
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_TOTP)).toBeFalsy();
+      expect(resources.getFirst("name", "Resource password string legacy")).toBeFalsy();
+    });
+
+    it("should filter the collection by a subset of resource types and includes resources without resource type.", () => {
+      const resources = new ResourcesCollection(resourceAllTypesDtosCollection());
+      const resourcesTypes = new ResourceTypesCollection(resourceTypesCollectionDto());
+      resourcesTypes.filterByPasswordResourceTypes();
+      resources.filterByResourceTypes(resourcesTypes, false);
+      expect.assertions(6);
+      expect(resources).toHaveLength(4);
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_STRING)).toBeTruthy();
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION)).toBeTruthy();
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_PASSWORD_DESCRIPTION_TOTP)).toBeTruthy();
+      expect(resources.getFirst("resource_type_id", TEST_RESOURCE_TYPE_TOTP)).toBeFalsy();
+      expect(resources.getFirst("name", "Resource password string legacy")).toBeTruthy();
+    });
+
+    it("should throw an exception if the resource types parameter is not a ResourceTypesCollection.", () => {
+      const collection = new ResourcesCollection([]);
+      expect.assertions(1);
+      expect(() => collection.filterByResourceTypes(42)).toThrow(TypeError);
+    });
+  });
+
+  describe("ResourceCollection::filterBySuggestedResources", () => {
+    it("should filter the collection by resources that could be suggested for a given url.", () => {
+      const suggestedResource1 = defaultResourceDto({uri: "https://passbolt.com"});
+      const suggestedResource2 = defaultResourceDto({uri: "passbolt.com"});
+      const notSuggestedResource1 = defaultResourceDto({uri: "not-passbolt.com"});
+      const notSuggestedResource2 = defaultResourceDto({uri: ""});
+      const resources = new ResourcesCollection([
+        suggestedResource1,
+        suggestedResource2,
+        notSuggestedResource1,
+        notSuggestedResource2
+      ]);
+      resources.filterBySuggestResources("https://www.passbolt.com");
+      expect.assertions(3);
+      expect(resources).toHaveLength(2);
+      expect(resources.getFirstById(suggestedResource1.id)).toBeTruthy();
+      expect(resources.getFirstById(suggestedResource2.id)).toBeTruthy();
+    });
+
+    it("should filter all resources out if no resources could be suggested.", () => {
+      const suggestedResource1 = defaultResourceDto({uri: "https://passbolt.com"});
+      const suggestedResource2 = defaultResourceDto({uri: "passbolt.com"});
+      const resources = new ResourcesCollection([
+        suggestedResource1,
+        suggestedResource2,
+      ]);
+      resources.filterBySuggestResources("https://www.not-passbolt.com");
+      expect.assertions(1);
+      expect(resources).toHaveLength(0);
+    });
+
+    it("should throw an exception if the url parameter is not a string.", () => {
+      const collection = new ResourcesCollection([]);
+      expect.assertions(1);
+      expect(() => collection.filterBySuggestResources(42)).toThrow(TypeError);
     });
   });
 });

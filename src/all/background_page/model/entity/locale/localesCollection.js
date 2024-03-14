@@ -20,21 +20,18 @@ const ENTITY_NAME = 'Locales';
 
 class LocalesCollection extends EntityCollection {
   /**
-   * Locales collection constructor
-   *
-   * @param {Object} localesCollectionDto locales DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(localesCollectionDto) {
+  constructor(localesCollectionDto, options = {}) {
     super(EntitySchema.validate(
       LocalesCollection.ENTITY_NAME,
       localesCollectionDto,
       LocalesCollection.getSchema()
-    ));
+    ), options);
 
     // Directly push into the private property _items[]
     this._props.forEach(locale => {
-      this._items.push(new LocaleEntity(locale));
+      this._items.push(new LocaleEntity(locale, {clone: false}));
     });
 
     // We do not keep original props

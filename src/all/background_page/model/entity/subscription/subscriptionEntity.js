@@ -17,17 +17,14 @@ const ENTITY_NAME = "Subscription";
 
 class SubscriptionEntity extends Entity {
   /**
-   * Setup entity constructor
-   *
-   * @param {Object} subscriptionDto subscription DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(subscriptionDto) {
+  constructor(subscriptionDto, options = {}) {
     super(EntitySchema.validate(
       SubscriptionEntity.ENTITY_NAME,
       subscriptionDto,
       SubscriptionEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

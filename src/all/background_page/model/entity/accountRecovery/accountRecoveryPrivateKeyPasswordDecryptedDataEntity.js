@@ -27,17 +27,14 @@ const PRIVATE_KEY_FINGERPRINT_MAX_LENGTH = 40;
  */
 class AccountRecoveryPrivateKeyPasswordDecryptedDataEntity extends Entity {
   /**
-   * Constructor
-   *
-   * @param {Object} dto The dto
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(dto) {
+  constructor(dto, options = {}) {
     super(EntitySchema.validate(
       AccountRecoveryPrivateKeyPasswordDecryptedDataEntity.ENTITY_NAME,
       dto,
       AccountRecoveryPrivateKeyPasswordDecryptedDataEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

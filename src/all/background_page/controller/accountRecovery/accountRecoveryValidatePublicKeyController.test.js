@@ -15,7 +15,7 @@
 import each from "jest-each";
 import {enableFetchMocks} from "jest-fetch-mock";
 import AccountRecoveryValidatePublicKeyController from "./accountRecoveryValidatePublicKeyController";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {v4 as uuidv4} from "uuid";

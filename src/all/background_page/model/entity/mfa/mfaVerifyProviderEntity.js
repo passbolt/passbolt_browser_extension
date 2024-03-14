@@ -20,17 +20,14 @@ const ENTITY_NAME = 'MfaVerifyProvider';
 
 class MfaVerifyProviderEntity extends Entity {
   /**
-   * Mfa verify provider constructor
-   *
-   * @param {Object} setupDto totp setup dto
-   * @throws {EntityValidationError} if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(setupDto) {
+  constructor(setupDto, options = {}) {
     super(EntitySchema.validate(
       MfaVerifyProviderEntity.ENTITY_NAME,
       setupDto,
       MfaVerifyProviderEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

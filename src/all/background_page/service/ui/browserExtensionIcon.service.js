@@ -12,8 +12,6 @@
  * @since         3.3
  */
 
-import browser from "../../sdk/polyfill/browserPolyfill";
-
 /** Default Passbolt browser extension icon file path  */
 const DEFAULT_BROWSER_EXTENSION_ICON_FILEPATH = '/webAccessibleResources/img/icons/icon-32.png';
 

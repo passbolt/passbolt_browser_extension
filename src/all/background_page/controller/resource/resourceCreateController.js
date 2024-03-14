@@ -19,11 +19,11 @@ import ResourceModel from "../../model/resource/resourceModel";
 import GetPassphraseService from "../../service/passphrase/getPassphraseService";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
 import FolderModel from "../../model/folder/folderModel";
-import Share from "../../model/share";
 import ResourceEntity from "../../model/entity/resource/resourceEntity";
 import i18n from "../../sdk/i18n";
 import ResourceSecretsCollection from "../../model/entity/secret/resource/resourceSecretsCollection";
 import ProgressService from "../../service/progress/progressService";
+import ShareModel from "../../model/share/shareModel";
 
 class ResourceCreateController {
   /**
@@ -39,6 +39,7 @@ class ResourceCreateController {
     this.requestId = requestId;
     this.resourceModel = new ResourceModel(apiClientOptions, account);
     this.folderModel = new FolderModel(apiClientOptions);
+    this.shareModel = new ShareModel(apiClientOptions);
     this.keyring = new Keyring();
     this.progressService = new ProgressService(this.worker, i18n.t('Creating password'));
     this.getPassphraseService = new GetPassphraseService(account);
@@ -128,7 +129,7 @@ class ResourceCreateController {
       // Share
       await this.progressService.finishStep(i18n.t('Start sharing'), true);
       const resourcesToShare = [resourceEntity.toDto({secrets: true})];
-      await Share.bulkShareResources(resourcesToShare, changes.toDto(), privateKey, async message =>
+      await this.shareModel.bulkShareResources(resourcesToShare, changes.toDto(), privateKey, async message =>
         await this.progressService.finishStep(message)
       );
       await this.resourceModel.updateLocalStorage();

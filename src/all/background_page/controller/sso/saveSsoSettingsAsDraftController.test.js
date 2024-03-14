@@ -16,9 +16,9 @@ import {v4 as uuid} from "uuid";
 import {mockApiResponse, mockApiResponseError} from "../../../../../test/mocks/mockApiResponse";
 import SaveSsoSettingsAsDraftController from "./saveSsoSettingsAsDraftController";
 import {withAzureSsoSettings} from "./saveSsoSettingsAsDraftController.test.data";
-import {defaultApiClientOptions} from "../../service/api/apiClient/apiClientOptions.test.data";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import SsoSettingsEntity from "passbolt-styleguide/src/shared/models/entity/ssoSettings/SsoSettingsEntity";
-import PassboltApiFetchError from "../../error/passboltApiFetchError";
+import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -29,7 +29,6 @@ describe("SaveSsoSettingsAsDraftController", () => {
     it("Should save the given settings as a draft.", async() => {
       expect.assertions(2);
       const ssoSettingsDto = withAzureSsoSettings();
-      const expectedData = Object.assign({}, ssoSettingsDto.data);
 
       const expectedSavedSettings = Object.assign({}, ssoSettingsDto, {
         id: uuid(),
@@ -37,7 +36,7 @@ describe("SaveSsoSettingsAsDraftController", () => {
         modified_by: uuid(),
         created: new Date().toISOString(),
         modified: new Date().toISOString(),
-        data: expectedData,
+        data: Object.assign({}, ssoSettingsDto.data),
       });
 
       fetch.doMockOnceIf(new RegExp('/sso/settings.json'), async req => {

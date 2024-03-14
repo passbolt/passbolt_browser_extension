@@ -18,17 +18,14 @@ const ENTITY_NAME = 'PasswordExpiryResource';
 
 class PasswordExpiryResourceEntity extends Entity {
   /**
-   * PasswordExpiryResource entity constructor
-   *
-   * @param {Object} passwordExpiryResourceDto passwordExpiryResource DTO
-   * @throws EntityValidationError if the dto cannot be converted into an entity
+   * @inheritDoc
    */
-  constructor(passwordExpiryResourceDto) {
+  constructor(passwordExpiryResourceDto, options = {}) {
     super(EntitySchema.validate(
       PasswordExpiryResourceEntity.ENTITY_NAME,
       passwordExpiryResourceDto,
       PasswordExpiryResourceEntity.getSchema()
-    ));
+    ), options);
   }
 
   /**

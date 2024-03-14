@@ -15,7 +15,6 @@ import {v4 as uuidv4} from 'uuid';
 import AccountLocalStorage from "./accountLocalStorage";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
-import browser from "../../sdk/polyfill/browserPolyfill";
 
 describe("AccountLocalStorage", () => {
   describe("AccountLocalStorage::get", () => {
@@ -173,7 +172,7 @@ describe("AccountLocalStorage", () => {
 
       // expect.assertions(3 + sampleSize);
       expect(accountsToDelete).toHaveLength(sampleSize);
-      let {accounts} = browser.storage.local.get([AccountLocalStorage.ACCOUNTS_LOCAL_STORAGE_KEY]);
+      let {accounts} = await browser.storage.local.get([AccountLocalStorage.ACCOUNTS_LOCAL_STORAGE_KEY]);
       expect(accounts).toHaveLength(sampleSize);
 
       for (let i = 0; i < sampleSize; i++) {
@@ -202,7 +201,7 @@ describe("AccountLocalStorage", () => {
 
       // expect.assertions(3 + sampleSize);
       expect(accountsToDelete).toHaveLength(sampleSize);
-      let {accounts} = browser.storage.local.get([AccountLocalStorage.ACCOUNTS_LOCAL_STORAGE_KEY]);
+      let {accounts} = await browser.storage.local.get([AccountLocalStorage.ACCOUNTS_LOCAL_STORAGE_KEY]);
       expect(accounts).toHaveLength(sampleSize);
 
       for (let i = 0; i < sampleSize; i++) {

@@ -11,12 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.0.0
  */
-import ApiClientOptions from "../apiClient/apiClientOptions";
+import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
 import AbstractService from "./abstractService";
 
 describe("Abstract service", () => {
   it("constructor works", () => {
-    const options = (new ApiClientOptions()).setBaseUrl('https://test.passbolt.test/');
+    const options = new ApiClientOptions().setBaseUrl('https://test.passbolt.test/');
     const service = new AbstractService(options, 'test');
 
     // Basics
@@ -27,7 +27,7 @@ describe("Abstract service", () => {
   });
 
   it("constructor works", () => {
-    const options = (new ApiClientOptions()).setBaseUrl('https://test.passbolt.test/');
+    const options = new ApiClientOptions().setBaseUrl('https://test.passbolt.test/');
     const service = new AbstractService(options, 'test');
 
     const formated = service.formatContainOptions(

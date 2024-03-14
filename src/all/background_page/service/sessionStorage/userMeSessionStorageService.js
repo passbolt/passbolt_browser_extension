@@ -12,7 +12,6 @@
  * @since         4.1.0
  */
 
-import browser from "../../sdk/polyfill/browserPolyfill";
 import UserEntity from "../../model/entity/user/userEntity";
 
 const USER_ME_STORAGE_KEY_PREFIX = "user-me";

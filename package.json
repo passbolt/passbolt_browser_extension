@@ -109,7 +109,8 @@
     "lint:eslint-fix": "eslint -c .eslintrc.json --ext js --ext jsx --fix src",
     "i18n:externalize": "i18next -c ./i18next-parser.config.js",
     "test": "npm run test:unit",
-    "test:unit": "jest --no-cache ./src/all/ ./src/chrome-mv3/ --maxWorkers=4",
-    "test:coverage": "jest --no-cache ./src/all/ ./src/chrome-mv3/ --maxWorkers=4 --coverage"
+    "test:unit": "jest --no-cache ./src/all/ ./src/chrome-mv3/",
+    "test:coverage": "jest --no-cache ./src/all/ ./src/chrome-mv3/ --coverage",
+    "test:ci:coverage": "npm run test:coverage -- --runInBand"
   }
 }

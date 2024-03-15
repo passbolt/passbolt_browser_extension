@@ -60,6 +60,17 @@ class WorkersSessionStorage {
   /**
    * Get workers from the session storage by name and tab id
    *
+   * @param {Array<string>} workerNames An array of worker names
+   * @return {Promise<object>} worker dto object
+   */
+  getWorkersByNames(workerNames) {
+    const filterByName = workers => workers.filter(worker => workerNames.includes(worker.name));
+    return this.getWorkers().then(filterByName);
+  }
+
+  /**
+   * Get workers from the session storage by name and tab id
+   *
    * @param {string} name The name
    * @param {number} tabId The tab id
    * @return {object} worker dto object

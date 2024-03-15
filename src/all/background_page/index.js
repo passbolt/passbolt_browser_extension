@@ -14,6 +14,7 @@ import GpgAuth from "./model/gpgauth";
 import Log from "./model/log";
 import StartLoopAuthSessionCheckService from "./service/auth/startLoopAuthSessionCheckService";
 import OnExtensionUpdateAvailableController from "./controller/extension/onExtensionUpdateAvailableController";
+import PostLogoutService from "./service/auth/postLogoutService";
 
 const main = async() => {
   /**
@@ -58,7 +59,7 @@ main();
 /**
  * Add listener on passbolt logout
  */
-self.addEventListener("passbolt.auth.after-logout", LocalStorageService.flush);
+self.addEventListener("passbolt.auth.after-logout", PostLogoutService.exec);
 
 /**
  * On installed the extension, add first install in the url tab of setup or recover

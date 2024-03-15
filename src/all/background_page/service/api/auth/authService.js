@@ -48,42 +48,6 @@ class AuthService extends AbstractService {
   }
 
   /**
-   * Logout
-   * @returns {Promise<void>}
-   */
-  async logout() {
-    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/logout`, {});
-    const response = await this.apiClient.sendRequest("POST", url, null, {redirect: "manual"});
-    const isResponseOk = response.ok || response.status === 0; // status is 0 as there should be a redirection that is handled manually
-    if (!isResponseOk) {
-      if (response.status !== 404) {
-        throw new PassboltApiFetchError('An unexpected error happened during the logout process', {
-          code: response.status
-        });
-      }
-
-      return this._logoutLegacy();
-    }
-  }
-
-  /**
-   * Logout (the legacy way that uses the deprecated 'GET' method).
-   * @return {Promise<void>}
-   * @deprecated the POST method should be used instead to avoid CSRF
-   * @private
-   */
-  async _logoutLegacy() {
-    const url = this.apiClient.buildUrl(`${this.apiClient.baseUrl}/logout`, {});
-    const response = await this.apiClient.sendRequest("GET", url, null, {redirect: "manual"});
-    const isResponseOk = response.ok || response.status === 0; // status is 0 as there should be a redirection that is handled manually
-    if (!isResponseOk) {
-      throw new PassboltApiFetchError('An unexpected error happened during the legacy logout process', {
-        code: response.status
-      });
-    }
-  }
-
-  /**
    * Retrieve the server key
    * @returns {Promise<{armored_key: string, fingerprint: string}>}
    */

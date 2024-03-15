@@ -60,6 +60,7 @@ jest.mock("webextension-polyfill", () => {
       onUpdated: new MockEventListener(),
       onRemoved: new MockEventListener(),
       reload: jest.fn(),
+      sendMessage: jest.fn(),
     },
     /*
      * Windows is not mocked by jest-webextension-mock v3.8.9

@@ -5,7 +5,7 @@ tester:
   extends: .rules
   script:
     - npm ci
-    - npm run test:coverage
+    - npm run test:ci:coverage
   artifacts:
     when: always
     reports:

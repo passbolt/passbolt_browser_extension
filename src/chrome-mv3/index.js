@@ -18,6 +18,7 @@ import OnExtensionInstalledController from "../all/background_page/controller/ex
 import TabService from "../all/background_page/service/tab/tabService";
 import OnExtensionUpdateAvailableController
   from "../all/background_page/controller/extension/onExtensionUpdateAvailableController";
+import PostLogoutService from "../all/background_page/service/auth/postLogoutService";
 
 /**
  * Load all system requirement
@@ -27,7 +28,7 @@ SystemRequirementService.get();
 /**
  * Add listener on passbolt logout
  */
-self.addEventListener("passbolt.auth.after-logout", LocalStorageService.flush);
+self.addEventListener("passbolt.auth.after-logout", PostLogoutService.exec);
 
 /**
  * Add listener on startup

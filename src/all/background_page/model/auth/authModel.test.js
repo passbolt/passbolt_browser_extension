@@ -13,7 +13,7 @@
  */
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AuthModel from "../../model/auth/authModel";
-import AuthService from "passbolt-styleguide/src/shared/services/api/auth/AuthService";
+import AuthLogoutService from "passbolt-styleguide/src/shared/services/api/auth/AuthLogoutService";
 
 beforeEach(async() => {
   jest.clearAllMocks();
@@ -27,7 +27,7 @@ describe("AuthModel", () => {
       const apiClientOptions = defaultApiClientOptions();
       const model = new AuthModel(apiClientOptions);
 
-      const logoutServiceSpy = jest.spyOn(AuthService.prototype, "logout").mockImplementation(() => {});
+      const logoutServiceSpy = jest.spyOn(AuthLogoutService.prototype, "logout").mockImplementation(() => {});
       const dispatchEventSpy = jest.spyOn(self, "dispatchEvent");
 
       await model.logout();

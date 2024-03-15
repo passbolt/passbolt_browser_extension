@@ -13,7 +13,8 @@
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import GpgAuth from "../gpgauth";
-import AuthService from 'passbolt-styleguide/src/shared/services/api/auth/AuthService';
+import AuthService from '../../service/api/auth/authService';
+import AuthLogoutService from 'passbolt-styleguide/src/shared/services/api/auth/AuthLogoutService';
 import AuthStatusLocalStorage from "../../service/local_storage/authStatusLocalStorage";
 import User from "../user";
 import GetDecryptedUserPrivateKeyService from "../../service/account/getDecryptedUserPrivateKeyService";
@@ -31,6 +32,7 @@ class AuthModel {
    */
   constructor(apiClientOptions) {
     this.authService = new AuthService(apiClientOptions);
+    this.authLogoutService = new AuthLogoutService(apiClientOptions);
     this.legacyAuthModel = new GpgAuth();
   }
 
@@ -39,7 +41,7 @@ class AuthModel {
    * @returns {Promise<void>}
    */
   async logout() {
-    await this.authService.logout();
+    await this.authLogoutService.logout();
     await this.postLogout();
   }
 

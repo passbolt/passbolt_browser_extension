@@ -8,7 +8,8 @@ const config = {
   resolve: {
     alias: {
       'react': path.resolve('./node_modules/react'),
-      'react-dom': path.resolve('./node_modules/react-dom')
+      'react-dom': path.resolve('./node_modules/react-dom'),
+      'openpgp': path.resolve('./node_modules/openpgp/dist/openpgp.mjs')
     },
     extensions: ["*", ".js", ".jsx"]
   },

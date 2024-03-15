@@ -17,7 +17,7 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 class DecryptMessageService {
   /**
-   * Encrypt symmetrically a message
+   * Decrypt a message encrypted symmetrically with a password.
    *
    * @param {openpgp.Message} message The message to decrypt.
    * @param {string} password The password to use to encrypt the message.
@@ -31,8 +31,43 @@ class DecryptMessageService {
     OpenpgpAssertion.assertMessage(message);
 
     const {data: decryptedMessage, signatures} = await openpgp.decrypt({
+      config: {
+        // preferredSymmetricAlgorithm: openpgp.enums.symmetric.aes128,
+        // aeadProtect: true,
+        // preferredAEADAlgorithm: openpgp.enums.aead.eax, // Default, native
+        // preferredAEADAlgorithm: openpgp.enums.aead.ocb, // Non-native
+        // preferredAEADAlgorithm: openpgp.enums.aead.experimentalGCM // **Non-standard**, fastest
+      },
       message: message,
       passwords: [password],
+      verificationKeys: verificationKeys,
+      expectSigned: Boolean(verificationKeys)
+    });
+
+    if (verificationKeys) {
+      await this.doSignatureVerification(signatures);
+    }
+
+    return decryptedMessage;
+  }
+
+  /**
+   * Decrypt a message encrypted symmetrically with one or multiple sessions keys.
+   *
+   * @param {openpgp.Message} message The message to decrypt.
+   * @param {array} password The password to use to encrypt the message.
+   * @param {array<openpgp.PublicKey|openpgp.PrivateKey>} verificationKeys The private key(s) to use to sign the message.
+   * @returns {Promise<string>}
+   */
+  static async decryptSymmetricallyWithSessionKey(message, sessionKeys, verificationKeys = null) {
+    if (verificationKeys) {
+      OpenpgpAssertion.assertKeys(verificationKeys);
+    }
+    OpenpgpAssertion.assertMessage(message);
+
+    const {data: decryptedMessage, signatures} = await openpgp.decrypt({
+      message: message,
+      sessionKeys: sessionKeys,
       verificationKeys: verificationKeys,
       expectSigned: Boolean(verificationKeys)
     });

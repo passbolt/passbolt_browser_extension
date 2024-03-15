@@ -93,6 +93,7 @@ const readMessageOrFail = async message => {
   try {
     return await openpgp.readMessage({armoredMessage: message});
   } catch (error) {
+    console.log(error);
     throw new Error(i18n.t("The message should be a valid openpgp message."));
   }
 };

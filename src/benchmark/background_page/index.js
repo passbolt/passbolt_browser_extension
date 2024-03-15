@@ -4,11 +4,14 @@ import {OpenpgpAssertion} from "../../all/background_page/utils/openpgp/openpgpA
 import secrets from "secrets-passbolt";
 import EncryptMessageService from "../../all/background_page/service/crypto/encryptMessageService";
 import {Buffer} from "buffer";
+import * as openpgp from "openpgp";
 
 class Index {
   static async execute() {
     const workersCount = 7;
     const secretsCount = 1430;
+    // For session key test
+    const sessionKeysCount = 1;
 
     const workers = await this.initWorkers(workersCount);
     // await this.benchmark(
@@ -30,11 +33,14 @@ class Index {
     //   'GPG symmetric',
     //   () => this.decryptGpgSym(workers, secretsCount));
     await this.benchmark(
-      'AES',
-      () => this.decryptAes(workers, secretsCount));
-    await this.benchmark(
-      'AES ENCRYPT & DECRYPT',
-      () => this.encryptAndDecryptAes(workers, secretsCount));
+      'GPG ENCRYPT & DECRYPT symmetric',
+      () => this.encryptAndDecryptGpgSym(workers, secretsCount, sessionKeysCount));
+    // await this.benchmark(
+    //   'AES',
+    //   () => this.decryptAes(workers, secretsCount));
+    // await this.benchmark(
+    //   'AES ENCRYPT & DECRYPT',
+    //   () => this.encryptAndDecryptAes(workers, secretsCount));
     // not supported
     // await this.benchmark(
     //   'EDDSA SECO256K1',
@@ -113,6 +119,18 @@ class Index {
     for (let i=0; i<workers.length; i++) {
       const workerProps = {secretsCount, armoredEncryptedMessage};
       const promise = this.requestWorker(workers[i], 'decryptGpgSym', workerProps);
+      promises.push(promise);
+    }
+
+    return Promise.all(promises);
+  }
+
+  static async encryptAndDecryptGpgSym(workers, secretsCount, sessionKeysCount) {
+    const promises = [];
+
+    for (let i=0; i<workers.length; i++) {
+      const workerProps = {secretsCount, sessionKeysCount};
+      const promise = this.requestWorker(workers[i], 'encryptAndDecryptGpgSym', workerProps);
       promises.push(promise);
     }
 

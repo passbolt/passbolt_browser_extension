@@ -83,7 +83,7 @@ module.exports = function (grunt) {
 
   /**
    * Main grunt tasks configuration
-    */
+   */
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 

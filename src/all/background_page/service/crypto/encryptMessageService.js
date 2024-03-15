@@ -31,8 +31,36 @@ class EncryptMessageService {
 
     const gpgMessage = await OpenpgpAssertion.createMessageOrFail(message);
     return openpgp.encrypt({
+      config: {
+        // preferredSymmetricAlgorithm: openpgp.enums.symmetric.aes128,
+        // aeadProtect: true,
+        // preferredAEADAlgorithm: openpgp.enums.aead.eax, // Default, native
+        // preferredAEADAlgorithm: openpgp.enums.aead.ocb, // Non-native
+        // preferredAEADAlgorithm: openpgp.enums.aead.experimentalGCM // **Non-standard**, fastest
+      },
       message: gpgMessage,
       passwords: passwords,
+      signingKeys: signingKeys,
+    });
+  }
+
+  /**
+   * Encrypt symmetrically a message.
+   *
+   * @param {string} message The message to encrypt.
+   * @param {array<object>} sessionKey The sessionKey to use to encrypt the message.
+   * @param {array<openpgp.PrivateKey>} signingKeys The private key(s) to use to sign the message.
+   * @returns {Promise<string>} the encrypted message in its armored version
+   */
+  static async encryptSymmetricallyWithSessionKey(message, sessionKey, signingKeys = null) {
+    if (signingKeys) {
+      OpenpgpAssertion.assertDecryptedPrivateKeys(signingKeys);
+    }
+
+    const gpgMessage = await OpenpgpAssertion.createMessageOrFail(message);
+    return openpgp.encrypt({
+      message: gpgMessage,
+      sessionKey: sessionKey,
       signingKeys: signingKeys,
     });
   }

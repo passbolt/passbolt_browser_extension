@@ -1,5 +1,4 @@
 const path = require('path');
-const TerserPlugin = require("terser-webpack-plugin");
 
 const config = {
   entry: {
@@ -18,21 +17,13 @@ const config = {
       }
     ]
   },
-  optimization: {
-    minimize: true,
-    minimizer: [new TerserPlugin()],
-    splitChunks: {
-      minSize: 0,
-      cacheGroups: {
-        commons: {
-          test: /[\\/]node_modules[\\/]((?!(passbolt\-styleguide)).*)[\\/]/,
-          name: 'vendors',
-          chunks: 'all'
-        },
-      }
+  resolve: {
+    alias: {
+      'openpgp': path.resolve('./node_modules/openpgp/dist/openpgp.mjs')
     },
+    extensions: ["*", ".js"],
+    fallback: {crypto: false}
   },
-  resolve: {extensions: ["*", ".js"], fallback: {crypto: false}},
   output: {
     // Set a unique name to ensure the cohabitation of multiple webpack loader on the same page.
     chunkLoadingGlobal: 'backgroundPageIndexChunkLoadingGlobal',

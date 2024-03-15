@@ -2,6 +2,8 @@ import {OpenpgpAssertion} from "../../../../all/background_page/utils/openpgp/op
 import DecryptMessageService from "../../../../all/background_page/service/crypto/decryptMessageService";
 import {Buffer} from "buffer";
 import secrets from "secrets-passbolt";
+import EncryptMessageService from "../../../../all/background_page/service/crypto/encryptMessageService";
+import * as openpgp from 'openpgp';
 
 /**
  * Service worker that has for aim to generate the server OpenPGP key pair.
@@ -19,6 +21,9 @@ onmessage = async ({data: {action, workerProps}, ports: [port]}) => {
       break;
     case 'decryptGpgSym':
       result = await decryptGpgSym(workerProps.secretsCount, workerProps.armoredEncryptedMessage);
+      break;
+    case 'encryptAndDecryptGpgSym':
+      result = await encryptAndDecryptGpgSym(workerProps.secretsCount, workerProps.sessionKeysCount);
       break;
     case 'decryptGpgAsym':
       result = await decryptGpgAsym(workerProps.secretsCount, workerProps.armoredDecryptedPrivateKey, workerProps.armoredEncryptedMessage);
@@ -50,6 +55,31 @@ const decryptGpgSym = async (secretsCount, armoredEncryptedMessage) => {
     const encryptedMessage = await OpenpgpAssertion.readMessageOrFail(armoredEncryptedMessage);
     await DecryptMessageService.decryptSymmetrically(encryptedMessage, 'password');
   }
+  return performance.now() - start;
+}
+
+const encryptAndDecryptGpgSym = async (secretsCount, sessionKeysCount) => {
+  const armoredEncryptedMessages = [];
+  const sessionKeys = [];
+
+  for (let i = 0; i < sessionKeysCount; i++) {
+    const sessionKey = await openpgp.generateSessionKey(openpgp.enums.symmetric.aes256);
+    sessionKeys.push(sessionKey);
+  }
+
+  for (let i=0; i<secretsCount; i++) {
+    const secret = secrets.random(4096);
+    const armoredEncryptedMessage = await EncryptMessageService.encryptSymmetricallyWithSessionKey(secret, sessionKeys[i % sessionKeys.length]);
+    armoredEncryptedMessages.push(armoredEncryptedMessage);
+  }
+
+  const start = performance.now();
+  for (let i=0; i<secretsCount; i++) {
+    const encryptedMessage = await OpenpgpAssertion.readMessageOrFail(armoredEncryptedMessages[i]);
+    const decryptedMessage = await DecryptMessageService.decryptSymmetricallyWithSessionKey(encryptedMessage, sessionKeys);
+    // console.log(decryptedMessage);
+  }
+
   return performance.now() - start;
 }
 

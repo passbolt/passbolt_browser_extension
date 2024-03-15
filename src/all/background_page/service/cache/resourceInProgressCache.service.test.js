@@ -49,10 +49,10 @@ describe("ResourceInProgressCache service", () => {
   });
 
   it("should do a reset after a period of time", async() => {
-    expect.assertions(7);
+    expect.assertions(6);
     const spy = jest.spyOn(ResourceInProgressCacheService, "reset");
-    const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
-    const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
+    jest.spyOn(global, "setTimeout");
+    jest.spyOn(global, "clearTimeout");
     const timeoutDelay = 5000;
     const fakeResource = new ExternalResourceEntity(fakeResourceDto);
 
@@ -61,14 +61,13 @@ describe("ResourceInProgressCache service", () => {
     await ResourceInProgressCacheService.set(fakeResource, timeoutDelay);
     expect(spy).toHaveBeenCalledTimes(1);
     //Called 1 times during the ::set
-    expect(spyOnAlarmCreate).toHaveBeenCalledTimes(1);
-    expect(spyOnAlarmClear).toHaveBeenCalledTimes(1);
+    expect(global.setTimeout).toHaveBeenCalledTimes(1);
+    expect(global.clearTimeout).toHaveBeenCalledTimes(1);
 
     jest.advanceTimersByTime(timeoutDelay);
     expect(spy).toHaveBeenCalledTimes(2);
     //Called 2 time after the reset
-    expect(spyOnAlarmClear).toHaveBeenCalledTimes(2);
-    expect(spyOnAlarmClear).toHaveBeenCalledWith("ResourceInProgressCacheFlush");
+    expect(global.clearTimeout).toHaveBeenCalledTimes(2);
   });
 
   it("should do a reset after having consumed the cached resource", async() => {

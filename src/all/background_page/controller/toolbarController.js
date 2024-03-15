@@ -18,8 +18,6 @@ import {TabController as tabsController} from "./tabsController";
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 
-const UPDATE_SUGGESTED_RESOURCE_BADGE_FLUSH_ALARM = "UpdateSuggestedResourceBadgeCacheFlush";
-
 class ToolbarController {
   constructor() {
     // Initially, set the browser extension icon as inactive
@@ -40,7 +38,6 @@ class ToolbarController {
     this.handleSuggestedResourcesOnUpdatedTabBound = this.handleSuggestedResourcesOnUpdatedTab.bind(this);
     this.handleSuggestedResourcesOnActivatedTabBound = this.handleSuggestedResourcesOnActivatedTab.bind(this);
     this.handleSuggestedResourcesOnFocusedWindowBound = this.handleSuggestedResourcesOnFocusedWindow.bind(this);
-    this.handleFlushEvent = this.handleFlushEvent.bind(this);
   }
 
   /**
@@ -148,23 +145,8 @@ class ToolbarController {
    * @private
    */
   async updateSuggestedResourcesBadge() {
-    let currentTab;
-
-    try {
-      this.clearAlarm();
-      const tabs = await browser.tabs.query({'active': true, 'lastFocusedWindow': true});
-      currentTab = tabs[0];
-    } catch (error) {
-      /*
-       * With chrome (seen from 91), retrieving the current tab can generate error (Tab is busy).
-       * Loop until there is no error.
-       */
-      if (browser.runtime.lastError) {
-        this.createAlarm();
-        return;
-      }
-      throw error;
-    }
+    const tabs = await browser.tabs.query({'active': true, 'lastFocusedWindow': true});
+    const currentTab = tabs[0];
 
     const tabUrl = currentTab?.url;
     let suggestedResourcesCount = 0;
@@ -200,38 +182,6 @@ class ToolbarController {
    */
   isUrlPassboltExtension(tabUrl) {
     return tabUrl.startsWith(browser.runtime.getURL("/"));
-  }
-
-  /**
-   * Create alarm to flush the resource
-   * @private
-   */
-  createAlarm() {
-    // Create an alarm to restart the update suggested resource badge
-    browser.alarms.create(UPDATE_SUGGESTED_RESOURCE_BADGE_FLUSH_ALARM, {
-      when: Date.now() + 50
-    });
-    browser.alarms.onAlarm.addListener(this.handleFlushEvent);
-  }
-
-  /**
-   * Clear the alarm and listener configured for flushing the resource if any.
-   * @private
-   */
-  clearAlarm() {
-    browser.alarms.onAlarm.removeListener(this.handleFlushEvent);
-    browser.alarms.clear(UPDATE_SUGGESTED_RESOURCE_BADGE_FLUSH_ALARM);
-  }
-
-  /**
-   * Flush the current stored resource when the ResourceInProgressCacheFlush alarm triggers.
-   * @param {Alarm} alarm
-   * @private
-   */
-  handleFlushEvent(alarm) {
-    if (alarm.name === UPDATE_SUGGESTED_RESOURCE_BADGE_FLUSH_ALARM) {
-      this.updateSuggestedResourcesBadge();
-    }
   }
 }
 

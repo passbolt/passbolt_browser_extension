@@ -75,8 +75,8 @@ describe("TabService", () => {
       const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: frameDetails.url});
       const portWrapper = new Port(port);
       jest.spyOn(portWrapper, "request").mockImplementationOnce(() => Promise.resolve());
-      const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
-      const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
+      jest.spyOn(global, "setTimeout");
+      jest.spyOn(global, "clearTimeout");
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
       mockGetPort.mockImplementationOnce(() => portWrapper);
@@ -90,8 +90,8 @@ describe("TabService", () => {
       expect(portWrapper.request).toHaveBeenCalledWith('passbolt.port.check');
       expect(WebNavigationService.exec).not.toHaveBeenCalled();
       // Called 1 times during the execution
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(1);
+      expect(global.setTimeout).toHaveBeenCalledTimes(1);
+      expect(global.clearTimeout).toHaveBeenCalledTimes(1);
     });
 
     it("Should exec if no worker on main frame", async() => {
@@ -156,8 +156,8 @@ describe("TabService", () => {
       const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: frameDetails.url});
       const portWrapper = new Port(port);
       jest.spyOn(portWrapper, "request").mockImplementationOnce(() => Promise.reject());
-      const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
-      const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
+      jest.spyOn(global, "setTimeout");
+      jest.spyOn(global, "clearTimeout");
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
       mockGetPort.mockImplementationOnce(() => portWrapper);
@@ -168,12 +168,12 @@ describe("TabService", () => {
       expect(PortManager.getPortById).toHaveBeenCalledWith(worker.id);
       expect(WebNavigationService.exec).toHaveBeenCalledWith(frameDetails);
       // Called 1 times during the execution
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(1);
+      expect(global.setTimeout).toHaveBeenCalledTimes(1);
+      expect(global.clearTimeout).toHaveBeenCalledTimes(1);
     });
 
     it("Should exec if worker is on main frame and port is not responding before timeout", async() => {
-      expect.assertions(4);
+      expect.assertions(5);
       // data mocked
       const worker = readWorker();
       const frameDetails = {
@@ -184,7 +184,8 @@ describe("TabService", () => {
       const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId, url: frameDetails.url});
       const portWrapper = new Port(port);
       jest.spyOn(portWrapper, "request").mockImplementationOnce(() => new Promise(() => null));
-      const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
+      jest.spyOn(global, "setTimeout");
+      jest.spyOn(global, "clearTimeout");
       // mock function
       mockWorker.mockImplementationOnce(() => worker);
       mockGetPort.mockImplementationOnce(() => portWrapper);
@@ -195,7 +196,8 @@ describe("TabService", () => {
       jest.runAllTimers();
       await promise;
       // Called 1 times after the timeout
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(1);
+      expect(global.setTimeout).toHaveBeenCalledTimes(1);
+      expect(global.clearTimeout).toHaveBeenCalledTimes(0);
       // expectations
       expect(WorkersSessionStorage.getWorkerOnMainFrame).toHaveBeenCalledWith(frameDetails.tabId);
       expect(PortManager.getPortById).toHaveBeenCalledWith(worker.id);

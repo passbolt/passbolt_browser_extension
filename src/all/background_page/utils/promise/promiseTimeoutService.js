@@ -11,8 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.1.2
  */
-import {v4 as uuidv4} from "uuid";
-
 const PROMISE_TIMEOUT = 500;
 class PromiseTimeoutService {
   /**
@@ -23,47 +21,13 @@ class PromiseTimeoutService {
    */
   static exec(promise, timeout = PROMISE_TIMEOUT) {
     return new Promise((resolve, reject) => {
-      const alarmName = uuidv4();
-      // Handle promise timeout
-      const handlePromiseTimeout = alarm => {
-        if (alarm.name === alarmName) {
-          this.clearPromiseTimeoutAlarm(alarmName, handlePromiseTimeout);
-          reject();
-        }
-      };
       // Schedule promise timeout
-      this.schedulePromiseTimeout(alarmName, handlePromiseTimeout, timeout);
+      const timeoutId = setTimeout(reject, timeout);
       // Clear promise timeout alarm
-      const clearTimeout = () => this.clearPromiseTimeoutAlarm(alarmName, handlePromiseTimeout);
+      const clearTimeoutWithId = () => clearTimeout(timeoutId);
       // return the promise resolved else reject and finally clear timeout
-      promise.then(resolve).catch(reject).finally(clearTimeout);
+      promise.then(resolve).catch(reject).finally(clearTimeoutWithId);
     });
-  }
-
-  /**
-   * Schedule an alarm to reject the promise
-   * @param {string} alarmName The alarm name
-   * @param {function} handlePromiseTimeout The function on alarm listener
-   * @param {number} timeout The timeout in ms
-   * @private
-   */
-  static schedulePromiseTimeout(alarmName, handlePromiseTimeout, timeout) {
-    // Create an alarm to reject the promise after a given time
-    browser.alarms.create(alarmName, {
-      when: Date.now() + timeout
-    });
-    browser.alarms.onAlarm.addListener(handlePromiseTimeout);
-  }
-
-  /**
-   * Clear the alarm and listener configured for rejecting the promise.
-   * @param {string} alarmName The alarm name
-   * @param {function} handlePromiseTimeout The function on alarm listener
-   * @private
-   */
-  static clearPromiseTimeoutAlarm(alarmName, handlePromiseTimeout) {
-    browser.alarms.onAlarm.removeListener(handlePromiseTimeout);
-    browser.alarms.clear(alarmName);
   }
 }
 

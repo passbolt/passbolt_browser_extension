@@ -12,14 +12,15 @@
  * @since         3.6.0
  */
 
-import AccountRecoveryOrganizationPolicyService from "../../service/api/accountRecovery/accountRecoveryOrganizationPolicyService";
 import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
+import ValidateOrganizationPublicKeyService from "../../service/accountRecovery/validateOrganizationPublicKeyService";
 
 class AccountRecoveryValidatePublicKeyController {
   constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
     this.accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
+    this.validateOrganizationPublicKeyService = new ValidateOrganizationPublicKeyService(apiClientOptions);
   }
 
   /**
@@ -46,7 +47,7 @@ class AccountRecoveryValidatePublicKeyController {
    */
   async exec(publicKeyToValidate) {
     const organizationPolicy = await this.accountRecoveryModel.findOrganizationPolicy();
-    await AccountRecoveryOrganizationPolicyService.validatePublicKey(publicKeyToValidate, organizationPolicy.armoredKey);
+    await this.validateOrganizationPublicKeyService.validatePublicKey(publicKeyToValidate, organizationPolicy.armoredKey);
   }
 }
 

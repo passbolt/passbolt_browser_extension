@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {pgpKeys} = require("../../../../../../test/fixtures/pgpKeys/keys");
+const {pgpKeys} = require("../../../../../test/fixtures/pgpKeys/keys");
 
 exports.dummyData = {
   viableKey: pgpKeys.test_no_expiry_with_secret.public,

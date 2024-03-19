@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import {enableFetchMocks} from "jest-fetch-mock";
 import ImportRecoverPrivateKeyController from "./importRecoverPrivateKeyController";
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 import GpgKeyError from "../../error/GpgKeyError";
@@ -23,10 +22,10 @@ import {
 } from "../../model/entity/account/accountRecoverEntity.test.data";
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 
 beforeEach(() => {
   jest.clearAllMocks();
-  enableFetchMocks();
 });
 
 /*
@@ -44,7 +43,7 @@ describe("ImportRecoverPrivateKeyController", () => {
   describe("ImportRecoverPrivateKeyController::exec", () => {
     it("Should throw an exception if the passed DTO is not valid.", async() => {
       const account = new AccountRecoverEntity(withServerKeyAccountRecoverDto());
-      const controller = new ImportRecoverPrivateKeyController(null, null, account);
+      const controller = new ImportRecoverPrivateKeyController(null, null, defaultApiClientOptions(), account);
 
       const scenarios = [
         {dto: null, expectedError: Error},
@@ -73,7 +72,7 @@ describe("ImportRecoverPrivateKeyController", () => {
     it("Should throw an exception if the setupEntity is not initialized properly.", async() => {
       expect.assertions(1);
       const account = new AccountRecoverEntity(initialAccountRecoverDto());
-      const controller = new ImportRecoverPrivateKeyController(null, null, account);
+      const controller = new ImportRecoverPrivateKeyController(null, null, defaultApiClientOptions(), account);
       try {
         await controller.exec(pgpKeys.ada.private);
       } catch (e) {
@@ -85,18 +84,9 @@ describe("ImportRecoverPrivateKeyController", () => {
       expect.assertions(1);
       await MockExtension.withConfiguredAccount();
 
-      const mockedResponse = {
-        status: 200,
-        headers: {
-          'content-type': 'application/json',
-          'x-gpgauth-version': '1.3.0',
-          'x-gpgauth-error': true
-        }
-      };
-      fetch.mockResponseOnce({}, mockedResponse);
-
       const account = new AccountRecoverEntity(withServerKeyAccountRecoverDto());
-      const controller = new ImportRecoverPrivateKeyController(null, null, account);
+      const controller = new ImportRecoverPrivateKeyController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(controller.authVerifyServerChallengeService, "verifyAndValidateServerChallenge").mockImplementationOnce(() => { throw new Error("Error"); });
       try {
         await controller.exec(pgpKeys.ada.private);
       } catch (e) {
@@ -105,23 +95,14 @@ describe("ImportRecoverPrivateKeyController", () => {
     });
 
     it("Should set the private key and public of the setup entity.", async() => {
-      expect.assertions(9);
+      expect.assertions(10);
       await MockExtension.withConfiguredAccount();
 
-      const mockedResponse = {
-        status: 200,
-        headers: {
-          'content-type': 'application/json',
-          'x-gpgauth-version': '1.3.0',
-          'x-gpgauth-authenticated': false,
-          'x-gpgauth-progress': 'stage0',
-          'x-gpgauth-verify-response': "gpgauthv1.3.0|36|AAAAAAAA-AAAA-3AAA-aAAA-AAAAAAAAAAAA|gpgauthv1.3.0"
-        }
-      };
-      fetch.mockResponseOnce({}, mockedResponse);
       const expectedKeyData = pgpKeys.ada;
       const account = new AccountRecoverEntity(withServerKeyAccountRecoverDto());
-      const controller = new ImportRecoverPrivateKeyController(null, null, account);
+      const controller = new ImportRecoverPrivateKeyController(null, null, defaultApiClientOptions(), account);
+
+      jest.spyOn(controller.authVerifyServerChallengeService, "verifyAndValidateServerChallenge").mockImplementationOnce(jest.fn());
 
       await controller.exec(expectedKeyData.private);
 
@@ -142,7 +123,8 @@ describe("ImportRecoverPrivateKeyController", () => {
       expect(publicKeyInfo.userIds).toStrictEqual(expectedKeyData.user_ids);
       expect(privateKeyInfo.userIds).toStrictEqual(expectedKeyData.user_ids);
 
-      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(controller.authVerifyServerChallengeService.verifyAndValidateServerChallenge).toHaveBeenCalledWith(expectedKeyData.fingerprint, account.serverPublicArmoredKey);
+      expect(controller.authVerifyServerChallengeService.verifyAndValidateServerChallenge).toHaveBeenCalledTimes(1);
     }, 10000);
   });
 });

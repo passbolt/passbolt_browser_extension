@@ -12,23 +12,24 @@
  * @since         3.6.0
  */
 
-import GpgAuth from "../../model/gpgauth";
 import i18n from "../../sdk/i18n";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import GpgKeyError from "../../error/GpgKeyError";
+import AuthVerifyServerChallengeService from "../../service/auth/authVerifyServerChallengeService";
 
 class ImportSetupPrivateKeyController {
   /**
    * Constructor.
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
+   * @param {ApiClientOptions} apiClientOptions the api client options
    * @param {AccountSetupEntity} account The account being setup.
    */
-  constructor(worker, requestId, account) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
-    this.legacyAuthModel = new GpgAuth();
+    this.authVerifyServerChallengeService = new AuthVerifyServerChallengeService(apiClientOptions);
   }
 
   /**
@@ -70,7 +71,6 @@ class ImportSetupPrivateKeyController {
    * @private
    */
   async _assertImportKeyNotUsed(fingerprint) {
-    const domain = this.account.domain;
     const serverPublicArmoredKey = this.account.serverPublicArmoredKey;
     if (!serverPublicArmoredKey) {
       throw new Error('The server public key should have been provided before importing a private key');
@@ -78,10 +78,10 @@ class ImportSetupPrivateKeyController {
     let keyAlreadyUsed = false;
 
     try {
-      await this.legacyAuthModel.verify(domain, serverPublicArmoredKey, fingerprint);
+      await this.authVerifyServerChallengeService.verifyAndValidateServerChallenge(fingerprint, serverPublicArmoredKey);
       keyAlreadyUsed = true;
     } catch (error) {
-      console.log(error);
+      console.error(error);
       // @todo Handle not controlled errors, such as timeout error...
     }
 

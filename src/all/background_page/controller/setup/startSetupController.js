@@ -11,10 +11,10 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import AuthModel from "../../model/auth/authModel";
 import SetupModel from "../../model/setup/setupModel";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import WorkerService from "../../service/worker/workerService";
+import AuthVerifyServerKeyService from "../../service/api/auth/authVerifyServerKeyService";
 
 class StartSetupController {
   /**
@@ -29,7 +29,7 @@ class StartSetupController {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
-    this.authModel = new AuthModel(apiClientOptions);
+    this.authVerifyServerKeyService = new AuthVerifyServerKeyService(apiClientOptions);
     this.setupModel = new SetupModel(apiClientOptions);
     this.runtimeMemory = runtimeMemory;
   }
@@ -67,7 +67,7 @@ class StartSetupController {
    * @private
    */
   async _findAndSetAccountSetupServerPublicKey() {
-    const serverKeyDto = await this.authModel.getServerKey();
+    const serverKeyDto = await this.authVerifyServerKeyService.getServerKey();
     const serverPublicKey = await OpenpgpAssertion.readKeyOrFail(serverKeyDto.armored_key);
     OpenpgpAssertion.assertPublicKey(serverPublicKey);
 

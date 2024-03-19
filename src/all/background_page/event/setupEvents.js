@@ -86,7 +86,7 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.setup.import-key', async(requestId, armoredKey) => {
-    const controller = new ImportSetupPrivateKeyController(worker, requestId, account);
+    const controller = new ImportSetupPrivateKeyController(worker, requestId, apiClientOptions, account);
     await controller._exec(armoredKey);
   });
 

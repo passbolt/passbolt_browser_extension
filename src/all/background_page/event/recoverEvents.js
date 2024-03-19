@@ -78,7 +78,7 @@ const listen = (worker, apiClientOptions, account) => {
   });
 
   worker.port.on('passbolt.recover.import-key', async(requestId, armoredKey) => {
-    const controller = new ImportRecoverPrivateKeyController(worker, requestId, account);
+    const controller = new ImportRecoverPrivateKeyController(worker, requestId, apiClientOptions, account);
     await controller._exec(armoredKey);
   });
 

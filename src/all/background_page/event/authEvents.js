@@ -6,16 +6,12 @@
  * @copyright (c) 2019 Passbolt SA
  * @licence GNU Affero General Public License http://www.gnu.org/licenses/agpl-3.0.en.html
  */
-import Keyring from "../model/keyring";
-import User from "../model/user";
-import AuthModel from "../model/auth/authModel";
 import AuthVerifyServerKeyController from "../controller/auth/authVerifyServerKeyController";
 import AuthCheckStatusController from "../controller/auth/authCheckStatusController";
 import AuthIsAuthenticatedController from "../controller/auth/authIsAuthenticatedController";
 import AuthIsMfaRequiredController from "../controller/auth/authIsMfaRequiredController";
 import CheckPassphraseController from "../controller/crypto/checkPassphraseController";
 import RequestHelpCredentialsLostController from "../controller/auth/requestHelpCredentialsLostController";
-import {Config} from "../model/config";
 import AuthLoginController from "../controller/auth/authLoginController";
 import GetLocalSsoProviderConfiguredController from "../controller/sso/getLocalSsoProviderConfiguredController";
 import SsoAuthenticationController from "../controller/sso/ssoAuthenticationController";
@@ -24,6 +20,8 @@ import UpdateLocalSsoProviderController from "../controller/sso/updateLocalSsoPr
 import HasSsoLoginErrorController from "../controller/sso/hasSsoLoginErrorController";
 import GetQualifiedSsoLoginErrorController from "../controller/sso/getQualifiedSsoLoginErrorController";
 import AuthLogoutController from "../controller/auth/authLogoutController";
+import GetServerKeyController from "../controller/auth/getServerKeyController";
+import ReplaceServerKeyController from "../controller/auth/replaceServerKeyController";
 
 /**
  * Listens to the authentication events
@@ -83,10 +81,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.auth.verify-server-key', async requestId => {
-    const user = User.getInstance();
-    const apiClientOptions = await user.getApiClientOptions();
-    const userDomain = user.settings.getDomain();
-    const auth = new AuthVerifyServerKeyController(worker, requestId, apiClientOptions, userDomain);
+    const auth = new AuthVerifyServerKeyController(worker, requestId, apiClientOptions, account);
     await auth._exec();
   });
 
@@ -98,14 +93,8 @@ const listen = function(worker, apiClientOptions, account) {
    * @param domain {string} The server's domain
    */
   worker.port.on('passbolt.auth.get-server-key', async requestId => {
-    try {
-      const authModel = new AuthModel(apiClientOptions);
-      const serverKeyDto = await authModel.getServerKey();
-      worker.port.emit(requestId, 'SUCCESS', serverKeyDto);
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const getServerKeyController = new GetServerKeyController(worker, requestId, apiClientOptions);
+    await getServerKeyController._exec();
   });
 
   /*
@@ -115,18 +104,8 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.auth.replace-server-key', async requestId => {
-    const authModel = new AuthModel(apiClientOptions);
-    const keyring = new Keyring();
-    const domain = Config.read('user.settings.trustedDomain');
-
-    try {
-      const serverKeyDto = await authModel.getServerKey();
-      await keyring.importServerPublicKey(serverKeyDto.armored_key, domain);
-      worker.port.emit(requestId, 'SUCCESS');
-    } catch (error) {
-      console.error(error);
-      worker.port.emit(requestId, 'ERROR', error);
-    }
+    const replaceServerKeyController = new ReplaceServerKeyController(worker, requestId, apiClientOptions, account);
+    await replaceServerKeyController._exec();
   });
 
   /*
@@ -164,7 +143,7 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    */
   worker.port.on('passbolt.auth.post-login-redirect', requestId => {
-    let url = Config.read('user.settings.trustedDomain');
+    let url = account.domain;
     const redirectTo = (new URL(worker.tab.url)).searchParams.get('redirect');
     if (/^\/[A-Za-z0-9\-\/]*$/.test(redirectTo)) {
       url = `${url}${redirectTo}`;

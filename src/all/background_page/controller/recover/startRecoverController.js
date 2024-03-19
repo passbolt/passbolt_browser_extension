@@ -13,10 +13,10 @@
  */
 
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import AuthModel from "../../model/auth/authModel";
 import SetupModel from "../../model/setup/setupModel";
 import AccountRecoveryUserSettingEntity from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import WorkerService from "../../service/worker/workerService";
+import AuthVerifyServerKeyService from "../../service/api/auth/authVerifyServerKeyService";
 
 class StartRecoverController {
   /**
@@ -31,7 +31,7 @@ class StartRecoverController {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
-    this.authModel = new AuthModel(apiClientOptions);
+    this.authVerifyServerKeyService = new AuthVerifyServerKeyService(apiClientOptions);
     this.setupModel = new SetupModel(apiClientOptions);
     this.runtimeMemory = runtimeMemory;
   }
@@ -71,7 +71,7 @@ class StartRecoverController {
    * @private
    */
   async _findAndSetAccountServerPublicKey() {
-    const serverKeyDto = await this.authModel.getServerKey();
+    const serverKeyDto = await this.authVerifyServerKeyService.getServerKey();
     const serverKey = await OpenpgpAssertion.readKeyOrFail(serverKeyDto.armored_key);
     OpenpgpAssertion.assertPublicKey(serverKey);
     // associate the server public key to the current account.

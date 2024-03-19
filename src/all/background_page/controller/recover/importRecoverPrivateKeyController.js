@@ -12,22 +12,23 @@
  * @since         3.6.0
  */
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import GpgAuth from "../../model/gpgauth";
 import GpgKeyError from "../../error/GpgKeyError";
 import i18n from "../../sdk/i18n";
+import AuthVerifyServerChallengeService from "../../service/auth/authVerifyServerChallengeService";
 
 class ImportRecoverPrivateKeyController {
   /**
    * Constructor.
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
+   * @param {ApiClientOptions} apiClientOptions the api client options
    * @param {AccountRecoverEntity} account The account being recovered.
    */
-  constructor(worker, requestId, account) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
-    this.legacyAuthModel = new GpgAuth();
+    this.authVerifyServerChallengeService = new AuthVerifyServerChallengeService(apiClientOptions);
   }
 
   /**
@@ -67,14 +68,13 @@ class ImportRecoverPrivateKeyController {
    * @private
    */
   async _assertImportKeyOwnedByUser(fingerprint) {
-    const domain = this.account.domain;
     const serverPublicArmoredKey = this.account.serverPublicArmoredKey;
     if (!serverPublicArmoredKey) {
       throw new Error('The server public key should have been provided before importing a private key');
     }
 
     try {
-      await this.legacyAuthModel.verify(domain, serverPublicArmoredKey, fingerprint);
+      await this.authVerifyServerChallengeService.verifyAndValidateServerChallenge(fingerprint, serverPublicArmoredKey);
     } catch (error) {
       console.error(error);
       // @todo Handle not controlled errors, such as timeout error...

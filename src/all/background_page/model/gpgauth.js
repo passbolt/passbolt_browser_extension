@@ -13,12 +13,9 @@
  */
 import {OpenpgpAssertion} from "../utils/openpgp/openpgpAssertions";
 import Keyring from "./keyring";
-import EncryptMessageService from "../service/crypto/encryptMessageService";
 import DecryptMessageService from "../service/crypto/decryptMessageService";
-import CompareGpgKeyService from "../service/crypto/compareGpgKeyService";
 import User from "./user";
 import AuthStatusLocalStorage from "../service/local_storage/authStatusLocalStorage";
-import {Uuid} from "../utils/uuid";
 import GpgAuthToken from "./gpgAuthToken";
 import MfaAuthenticationRequiredError from "../error/mfaAuthenticationRequiredError";
 import GpgAuthHeader from "./gpgAuthHeader";
@@ -28,7 +25,6 @@ import Request from "./request";
 import urldecode from 'locutus/php/url/urldecode';
 import stripslashes from 'locutus/php/strings/stripslashes';
 
-const URL_VERIFY = '/auth/verify.json?api-version=v2';
 const URL_LOGIN = '/auth/login.json?api-version=v2';
 
 /**
@@ -54,117 +50,6 @@ class GpgAuth {
    */
   getDomain() {
     return User.getInstance().settings.getDomain();
-  }
-
-  /**
-   * Verify the server identify
-   *
-   * @param {string} [serverUrl] optional
-   * @param {string} [serverArmoredKey] optional
-   * @param {string} [userFingerprint] optional
-   * @throws {Error} if domain is undefined in settings and serverUrl is not provided
-   * @throws {Error} if verification procedure fails
-   * @returns {Promise<void>}
-   */
-  async verify(serverUrl, serverArmoredKey, userFingerprint) {
-    const domain = serverUrl || this.getDomain();
-    serverArmoredKey = serverArmoredKey || this.keyring.findPublic(Uuid.get(domain)).armoredKey;
-    const fingerprint = userFingerprint || this.keyring.findPrivate().fingerprint;
-
-    // Encrypt a random token
-    let encrypted, originalToken;
-    try {
-      originalToken = new GpgAuthToken();
-      const serverKey = await OpenpgpAssertion.readKeyOrFail(serverArmoredKey);
-      encrypted = await EncryptMessageService.encrypt(originalToken.token, serverKey);
-    } catch (error) {
-      throw new Error(`Unable to encrypt the verify token. ${error.message}`);
-    }
-
-    // Prepare the request data
-    const data = new FormData();
-    data.append('data[gpg_auth][keyid]', fingerprint);
-    data.append('data[gpg_auth][server_verify_token]', encrypted);
-
-    // Send the data
-    const fetchOptions = {
-      method: 'POST',
-      credentials: 'include',
-      body: data
-    };
-    Request.setCsrfHeader(fetchOptions, User.getInstance());
-    const response = await fetch(domain + URL_VERIFY, fetchOptions);
-
-    // If the server responded with an error build a relevant message
-    if (!response.ok) {
-      const json = await response.json();
-      if (typeof json.header !== 'undefined') {
-        throw new Error(json.header.message);
-      } else {
-        const msg = `Server request failed (${response.status}) without providing additional information.`;
-        throw new Error(msg);
-      }
-    }
-
-    // Check that the server was able to decrypt the token with our local copy
-    const auth = new GpgAuthHeader(response.headers, 'verify');
-    const verifyToken = new GpgAuthToken(auth.headers['x-gpgauth-verify-response']);
-    if (verifyToken.token !== originalToken.token) {
-      throw new Error('The server was unable to prove it can use the advertised OpenPGP key.');
-    }
-  }
-
-  /**
-   * Check if the server key has changed
-   * @return {Promise<boolean>} true if key has changed
-   */
-  async serverKeyChanged() {
-    const remoteServerArmoredKey = (await this.getServerKey()).keydata;
-    const remoteServerKey = await OpenpgpAssertion.readKeyOrFail(remoteServerArmoredKey);
-    const serverLocalArmoredKey = this.getServerKeyFromKeyring().armoredKey;
-    const serverLocalKey = await OpenpgpAssertion.readKeyOrFail(serverLocalArmoredKey);
-    return !await CompareGpgKeyService.areKeysTheSame(remoteServerKey, serverLocalKey);
-  }
-
-  /**
-   * Get Server key from keyring
-   * @returns {ExternalGpgKeyEntity}
-   */
-  getServerKeyFromKeyring() {
-    return this.keyring.findPublic(Uuid.get(this.getDomain()));
-  }
-
-  /**
-   * isServerKeyExpired
-   * @returns {boolean}
-   */
-  isServerKeyExpired() {
-    const key = this.getServerKeyFromKeyring();
-    return key.isExpired;
-  }
-
-  /**
-   * Get Server key for GPG auth.
-   *
-   * @param {string} [serverUrl] optional domain where to get the key.
-   * if domain is not provided, then look in the settings.
-   *
-   * @returns {Promise.<object>}
-   */
-  async getServerKey(serverUrl) {
-    const domain = serverUrl || this.getDomain();
-    const response = await fetch(domain + URL_VERIFY, {
-      method: 'GET',
-      credentials: 'include'
-    });
-
-    if (!response.ok) {
-      const msg = 'There was a problem when trying to communicate with the server' + ` (Code: ${response.status})`;
-      throw new Error(msg);
-    }
-
-    const json = await response.json();
-    return json.body;
   }
 
   /**

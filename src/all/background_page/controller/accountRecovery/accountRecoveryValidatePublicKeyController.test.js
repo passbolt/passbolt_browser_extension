@@ -63,7 +63,7 @@ describe("AccountRecoveryValidatePublicKeyController", () => {
       {key: pgpKeys.account_recovery_organization_alternative.public, expectedError: new Error("The key is already being used, the organization recovery key must be a new one.")},
       {key: pgpKeys.betty.public, expectedError: new Error("The key is the current organization recovery key, you must provide a new one.")},
     ]).describe("Should throw an error when the key cannot be validated", scenario => {
-      it(`Should throw an error whith the scenario: ${scenario.expectedError.message}`, async() => {
+      it(`Should throw an error with the scenario: ${scenario.expectedError.message}`, async() => {
         expect.assertions(1);
         mockFetch();
 

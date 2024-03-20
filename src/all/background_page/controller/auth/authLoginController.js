@@ -11,13 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.9.0
  */
-import AuthModel from "../../model/auth/authModel";
 import UserAlreadyLoggedInError from "../../error/userAlreadyLoggedInError";
 import Keyring from "../../model/keyring";
 import CheckPassphraseService from "../../service/crypto/checkPassphraseService";
 import UpdateSsoCredentialsService from "../../service/account/updateSsoCredentialsService";
 import UserRememberMeLatestChoiceLocalStorage from "../../service/local_storage/userRememberMeLatestChoiceLocalStorage";
 import UserRememberMeLatestChoiceEntity from "../../model/entity/rememberMe/userRememberMeLatestChoiceEntity";
+import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
+import PostLoginService from "../../service/auth/postLoginService";
+import AuthVerifyLoginChallengeService from "../../service/auth/authVerifyLoginChallengeService";
 
 class AuthLoginController {
   /**
@@ -31,7 +33,7 @@ class AuthLoginController {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
-    this.authModel = new AuthModel(apiClientOptions);
+    this.authVerifyLoginChallengeService = new AuthVerifyLoginChallengeService(apiClientOptions);
     this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
     this.checkPassphraseService = new CheckPassphraseService(new Keyring());
     this.userRememberMeLatestChoiceLocalStorage = new UserRememberMeLatestChoiceLocalStorage(account);
@@ -40,9 +42,9 @@ class AuthLoginController {
   /**
    * Wrapper of exec function to run it with worker.
    *
-   * @param {uuid} requestId The request identifier
    * @param {string} passphrase The passphrase to decryt the private key
-   * @param {boolean} rememberMe whether to remember the passphrase or not
+   * @param {boolean} remember whether to remember the passphrase or not
+   * @param {boolean} shouldRefreshCurrentTab should refresh the current tab
    * @return {Promise<void>}
    */
   async _exec(passphrase, remember, shouldRefreshCurrentTab = false) {
@@ -59,11 +61,9 @@ class AuthLoginController {
    * Attemps to sign in the current user.
    *
    * @param {string} passphrase The passphrase to decryt the private key
-   * @param {string} rememberMe whether to remember the passphrase
+   * @param {boolean} rememberMe whether to remember the passphrase
    * @param {boolean} shouldRefreshCurrentTab Should the controller calls for a refresh of the current running tab, default false
    *   (bool) false|undefined if should not remember
-   *   (integer) -1 if should remember for the session
-   *   (integer) duration in seconds to specify a specific duration
    * @return {Promise<void>}
    */
   async exec(passphrase, rememberMe, shouldRefreshCurrentTab) {
@@ -93,7 +93,15 @@ class AuthLoginController {
     }
 
     try {
-      await this.authModel.login(passphrase, rememberMe);
+      await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(this.account.userKeyFingerprint, this.account.userPrivateArmoredKey, passphrase);
+      /*
+       * Post login operations
+       * MFA may not be complete yet, so no need to preload things here
+       */
+      if (rememberMe) {
+        await PassphraseStorageService.set(passphrase, -1);
+      }
+      await PostLoginService.postLogin();
       await this.registerRememberMeOption(rememberMe);
     } catch (error) {
       if (!(error instanceof UserAlreadyLoggedInError)) {

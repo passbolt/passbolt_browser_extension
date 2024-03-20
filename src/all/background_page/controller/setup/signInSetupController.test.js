@@ -27,6 +27,8 @@ import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import {withAzureSsoSettings} from "../sso/getCurrentSsoSettingsController.test.data";
+import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
+import PostLoginService from "../../service/auth/postLoginService";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -74,10 +76,7 @@ describe("SignInSetupController", () => {
       }
     }, 10000);
 
-    /**
-     * @todo: put back when a easier mock implementation of login procedure will be available
-     */
-    it.skip("Should ask for SSO kits generation.", async() => {
+    it("Should ask for SSO kits generation.", async() => {
       const organizationSettings = anonymousOrganizationSettings();
       organizationSettings.passbolt.plugins.sso = {
         enabled: true
@@ -85,6 +84,9 @@ describe("SignInSetupController", () => {
       fetch.doMockOnceIf(new RegExp('/settings.json'), () => mockApiResponse(organizationSettings, {servertime: Date.now() / 1000}));
       fetch.doMockOnceIf(new RegExp('/sso/settings/current.json'), () => mockApiResponse(withAzureSsoSettings()));
       jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
+      jest.spyOn(PassphraseStorageService, "set");
+      jest.spyOn(PostLoginService, "postLogin");
+      jest.spyOn(browser.tabs, "update");
 
       SsoDataStorage.setMockedData(null);
 
@@ -93,12 +95,17 @@ describe("SignInSetupController", () => {
       await MockExtension.withConfiguredAccount();
       const account = new AccountEntity(defaultAccountDto());
       const runtimeMemory = {passphrase: "ada@passbolt.com"};
-      const controller = new SignInSetupController(null, null, defaultApiClientOptions(), account, runtimeMemory);
+      const controller = new SignInSetupController({tab: {id: 1}}, null, defaultApiClientOptions(), account, runtimeMemory);
+      jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
 
-      expect.assertions(2);
+      expect.assertions(6);
       await controller.exec(true);
+      expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledWith(account.userKeyFingerprint, account.userPrivateArmoredKey, runtimeMemory.passphrase);
+      expect(PassphraseStorageService.set).toHaveBeenCalledWith(runtimeMemory.passphrase, -1);
+      expect(PostLoginService.postLogin).toHaveBeenCalled();
       expect(GenerateSsoKitService.generate).toHaveBeenCalledWith("ada@passbolt.com", "azure");
       expect(GenerateSsoKitService.generate).toHaveBeenCalledTimes(1);
+      expect(browser.tabs.update).toHaveBeenCalledWith(1, {url: account.domain});
     }, 10000);
   });
 });

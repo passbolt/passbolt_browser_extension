@@ -11,10 +11,12 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-import AuthModel from "../../model/auth/authModel";
 import CheckPassphraseService from "../../service/crypto/checkPassphraseService";
 import Keyring from "../../model/keyring";
 import UpdateSsoCredentialsService from "../../service/account/updateSsoCredentialsService";
+import AuthVerifyLoginChallengeService from "../../service/auth/authVerifyLoginChallengeService";
+import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
+import PostLoginService from "../../service/auth/postLoginService";
 
 class SignInSetupController {
   /**
@@ -29,7 +31,7 @@ class SignInSetupController {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
-    this.authModel = new AuthModel(apiClientOptions);
+    this.authVerifyLoginChallengeService = new AuthVerifyLoginChallengeService(apiClientOptions);
     this.runtimeMemory = runtimeMemory;
     this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
     this.checkPassphraseService = new CheckPassphraseService(new Keyring());
@@ -68,7 +70,11 @@ class SignInSetupController {
     await this.checkPassphraseService.checkPassphrase(this.runtimeMemory.passphrase);
     await this.updateSsoCredentialsService.forceUpdateSsoKit(this.runtimeMemory.passphrase);
 
-    await this.authModel.login(this.runtimeMemory.passphrase, rememberMe);
+    await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(this.account.userKeyFingerprint, this.account.userPrivateArmoredKey, this.runtimeMemory.passphrase);
+    if (rememberMe) {
+      await PassphraseStorageService.set(this.runtimeMemory.passphrase, -1);
+    }
+    await PostLoginService.postLogin();
     await this.redirectToApp();
   }
 

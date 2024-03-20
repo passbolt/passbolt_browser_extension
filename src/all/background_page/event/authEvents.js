@@ -128,8 +128,6 @@ const listen = function(worker, apiClientOptions, account) {
    * @param passphrase {string} The passphrase to decryt the private key
    * @param remember {string} whether to remember the passphrase
    *   (bool) false|undefined if should not remember
-   *   (integer) -1 if should remember for the session
-   *   (integer) duration in seconds to specify a specific duration
    */
   worker.port.on('passbolt.auth.login', async(requestId, passphrase, remember) => {
     const controller = new AuthLoginController(worker, requestId, apiClientOptions, account);

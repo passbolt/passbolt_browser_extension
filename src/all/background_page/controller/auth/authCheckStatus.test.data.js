@@ -12,18 +12,17 @@
  * @since         4.7.0
  */
 
-import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
-class PostLoginService {
-  /**
-   * Post login
-   * @returns {Promise<void>}
-   */
-  static async postLogin() {
-    const startLoopAuthSessionCheckService = new StartLoopAuthSessionCheckService();
-    await startLoopAuthSessionCheckService.exec();
-    const event = new Event('passbolt.auth.after-login');
-    self.dispatchEvent(event);
-  }
-}
+export const userLoggedOutAuthStatus = () => ({
+  isAuthenticated: false,
+  isMfaRequired: false,
+});
 
-export default PostLoginService;
+export const userLoggedInAuthStatus = () => ({
+  isAuthenticated: true,
+  isMfaRequired: false,
+});
+
+export const userRequireMfaAuthStatus = () => ({
+  isAuthenticated: true,
+  isMfaRequired: true,
+});

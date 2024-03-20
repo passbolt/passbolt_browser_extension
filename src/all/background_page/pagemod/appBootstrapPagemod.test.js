@@ -12,7 +12,6 @@
  * @since         3.8.0
  */
 import User from "../model/user";
-import GpgAuth from "../model/gpgauth";
 import UserSettings from "../model/userSettings/userSettings";
 import AppBootstrap from "./appBootstrapPagemod";
 import WorkersSessionStorage from "../service/sessionStorage/workersSessionStorage";
@@ -22,6 +21,8 @@ import {AppBootstrapEvents} from "../event/appBootstrapEvents";
 import Pagemod from "./pagemod";
 import each from "jest-each";
 import {PortEvents} from "../event/portEvents";
+import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
+import {userLoggedInAuthStatus, userLoggedOutAuthStatus} from "../controller/auth/authCheckStatus.test.data";
 
 const spyAddWorker = jest.spyOn(WorkersSessionStorage, "addWorker");
 jest.spyOn(ScriptExecution.prototype, "injectPortname").mockImplementation(jest.fn());
@@ -60,7 +61,7 @@ describe("AppBootstrap", () => {
       expect.assertions(1);
       // mock functions
       jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
-      jest.spyOn(GpgAuth.prototype, "isAuthenticated").mockImplementation(() => new Promise(resolve => resolve(true)));
+      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(async() => userLoggedInAuthStatus());
       jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
       const result = await AppBootstrap.canBeAttachedTo({frameId: Pagemod.TOP_FRAME_ID, url: "https://passbolt.dev/app"});
       expect(result).toBeTruthy();
@@ -91,7 +92,7 @@ describe("AppBootstrap", () => {
       expect.assertions(1);
       // mock functions
       jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
-      jest.spyOn(GpgAuth.prototype, "isAuthenticated").mockImplementation(() => new Promise(resolve => resolve(false)));
+      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(async() => userLoggedOutAuthStatus());
       jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt");
       // process
       const constraint = await AppBootstrap.canBeAttachedTo({frameId: 0});

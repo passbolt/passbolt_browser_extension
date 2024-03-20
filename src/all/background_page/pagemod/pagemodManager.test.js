@@ -18,10 +18,11 @@ import SetupBootstrapPagemod from "./setupBootstrapPagemod";
 import AuthBootstrapPagemod from "./authBootstrapPagemod";
 import User from "../model/user";
 import UserSettings from "../model/userSettings/userSettings";
-import GpgAuth from "../model/gpgauth";
 import AppBootstrapPagemod from "./appBootstrapPagemod";
 import WebIntegrationPagemod from "./webIntegrationPagemod";
 import PublicWebsiteSignInPagemod from "./publicWebsiteSignInPagemod";
+import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
+import {userLoggedInAuthStatus} from "../controller/auth/authCheckStatus.test.data";
 
 jest.spyOn(pagemod.prototype, "injectFiles").mockImplementation(jest.fn());
 jest.spyOn(pagemod.prototype, "attachEvents").mockImplementation(jest.fn());
@@ -91,7 +92,7 @@ describe("PagemodManager", () => {
       };
       // mock functions
       jest.spyOn(User.getInstance(), "isValid").mockImplementation(() => true);
-      jest.spyOn(GpgAuth.prototype, "isAuthenticated").mockImplementation(() => new Promise(resolve => resolve(true)));
+      jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(async() => userLoggedInAuthStatus());
       jest.spyOn(UserSettings.prototype, "getDomain").mockImplementation(() => "https://passbolt.dev");
       // process
       await PagemodManager.exec(details);

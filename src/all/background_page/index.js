@@ -10,11 +10,11 @@ import LocalStorageService from "./service/localStorage/localStorageService";
 import OnExtensionInstalledController from "./controller/extension/onExtensionInstalledController";
 import TabService from "./service/tab/tabService";
 import User from "./model/user";
-import GpgAuth from "./model/gpgauth";
 import Log from "./model/log";
 import StartLoopAuthSessionCheckService from "./service/auth/startLoopAuthSessionCheckService";
 import OnExtensionUpdateAvailableController from "./controller/extension/onExtensionUpdateAvailableController";
 import PostLogoutService from "./service/auth/postLogoutService";
+import CheckAuthStatusService from "./service/auth/checkAuthStatusService";
 
 const main = async() => {
   /**
@@ -33,23 +33,25 @@ const main = async() => {
 const checkAndProcessIfUserAuthenticated = async() => {
   const user = User.getInstance();
   // Check if user is valid
-  if (user.isValid()) {
-    const auth = new GpgAuth();
-    try {
-      const isAuthenticated = await auth.isAuthenticated();
-      if (isAuthenticated) {
-        const startLoopAuthSessionCheckService = new StartLoopAuthSessionCheckService(auth);
-        await startLoopAuthSessionCheckService.exec();
-        const event = new Event('passbolt.auth.after-login');
-        self.dispatchEvent(event);
-      }
-    } catch (error) {
-      /*
-       * Service unavailable
-       * Do nothing...
-       */
-      Log.write({level: 'debug', message: 'The Service is unavailable to check if the user is authenticated'});
+  if (!user.isValid()) {
+    return;
+  }
+
+  const checkAuthStatusService = new CheckAuthStatusService();
+  try {
+    const authStatus = await checkAuthStatusService.checkAuthStatus(true);
+    if (authStatus.isAuthenticated) {
+      const startLoopAuthSessionCheckService = new StartLoopAuthSessionCheckService();
+      await startLoopAuthSessionCheckService.exec();
+      const event = new Event('passbolt.auth.after-login');
+      self.dispatchEvent(event);
     }
+  } catch (error) {
+    /*
+     * Service unavailable
+     * Do nothing...
+     */
+    Log.write({level: 'debug', message: 'The Service is unavailable to check if the user is authenticated'});
   }
 };
 

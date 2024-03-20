@@ -13,10 +13,10 @@
  */
 import Pagemod from "./pagemod";
 import User from "../model/user";
-import GpgAuth from "../model/gpgauth";
 import {AppBootstrapEvents} from "../event/appBootstrapEvents";
 import ParseAppUrlService from "../service/app/parseAppUrlService";
 import {PortEvents} from "../event/portEvents";
+import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
 
 class AppBootstrap extends Pagemod {
   /**
@@ -93,11 +93,10 @@ class AppBootstrap extends Pagemod {
    * Is the constraint validated
    * @returns {Promise<boolean>}
    */
-  assertUserAuthenticated() {
-    const auth = new GpgAuth();
-    const onSuccess = value => value;
-    const onReject = () => false;
-    return auth.isAuthenticated().then(onSuccess, onReject);
+  async assertUserAuthenticated() {
+    const checkAuthStatusService = new CheckAuthStatusService();
+    const authStatus = await checkAuthStatusService.checkAuthStatus(true);
+    return authStatus.isAuthenticated;
   }
 }
 

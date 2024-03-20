@@ -12,12 +12,17 @@
  * @since         2.13.4
  */
 import Log from "../../model/log";
-import Lock from "../../utils/lock";
-const lock = new Lock();
 
 const AUTH_STATUS_STORAGE_KEY = 'auth_status';
 
 class AuthStatusLocalStorage {
+  /**
+   * Get the storage key.
+   */
+  static get storageKey() {
+    return AUTH_STATUS_STORAGE_KEY;
+  }
+
   /**
    * Flush the folders local storage
    *
@@ -26,7 +31,7 @@ class AuthStatusLocalStorage {
    */
   static async flush() {
     Log.write({level: 'debug', message: 'AuthStatusLocalStorage flushed'});
-    return await browser.storage.local.remove(AuthStatusLocalStorage.AUTH_STATUS_STORAGE_KEY);
+    return await browser.storage.local.remove(this.storageKey);
   }
 
   /**
@@ -37,9 +42,9 @@ class AuthStatusLocalStorage {
    * If storage is not set, undefined will be returned.
    */
   static async get() {
-    const result = await browser.storage.local.get([AuthStatusLocalStorage.AUTH_STATUS_STORAGE_KEY]);
+    const result = await browser.storage.local.get([this.storageKey]);
     if (result) {
-      return result[AuthStatusLocalStorage.AUTH_STATUS_STORAGE_KEY];
+      return result[this.storageKey];
     }
     return undefined;
   }
@@ -52,22 +57,13 @@ class AuthStatusLocalStorage {
    * @return {Promise<void>}
    */
   static async set(isAuthenticated, isMfaRequired) {
-    await lock.acquire();
-    isAuthenticated = isAuthenticated === true ? true : false;
-    isMfaRequired = isMfaRequired === false ? false : true;
-    const status = {};
-    status[AuthStatusLocalStorage.AUTH_STATUS_STORAGE_KEY] = {isAuthenticated: isAuthenticated, isMfaRequired: isMfaRequired};
-    await browser.storage.local.set(status);
-    lock.release();
-  }
-
-  /**
-   * AuthStatusLocalStorage.AUTH_STATUS_STORAGE_KEY
-   * @returns {string}
-   * @constructor
-   */
-  static get AUTH_STATUS_STORAGE_KEY() {
-    return AUTH_STATUS_STORAGE_KEY;
+    await navigator.locks.request(this.storageKey, async() => {
+      const auth_status = {
+        isAuthenticated: Boolean(isAuthenticated),
+        isMfaRequired: Boolean(isMfaRequired),
+      };
+      await browser.storage.local.set({[this.storageKey]: auth_status});
+    });
   }
 }
 

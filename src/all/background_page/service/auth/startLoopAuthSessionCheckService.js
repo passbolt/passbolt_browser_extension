@@ -12,16 +12,17 @@
  * @since         4.0.0
  */
 
+import CheckAuthStatusService from "./checkAuthStatusService";
+
 const CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD = 60000;
 const AUTH_SESSION_CHECK_ALARM = "AuthSessionCheck";
 
 class StartLoopAuthSessionCheckService {
   /**
    * Constructor
-   * @param {GpgAuth} gpgAuth
    */
-  constructor(gpgAuth) {
-    this.gpgAuth = gpgAuth;
+  constructor() {
+    this.checkAuthStatusService = new CheckAuthStatusService();
     this.checkAuthStatus = this.checkAuthStatus.bind(this);
     this.clearAlarm = this.clearAlarm.bind(this);
   }
@@ -66,7 +67,8 @@ class StartLoopAuthSessionCheckService {
    */
   async checkAuthStatus(alarm) {
     if (alarm.name === AUTH_SESSION_CHECK_ALARM) {
-      if (!await this.gpgAuth.isAuthenticated()) {
+      const authStatus = await this.checkAuthStatusService.checkAuthStatus();
+      if (!authStatus.isAuthenticated) {
         self.dispatchEvent(new Event('passbolt.auth.after-logout'));
       }
     }

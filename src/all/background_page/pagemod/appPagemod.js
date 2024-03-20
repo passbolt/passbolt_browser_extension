@@ -13,7 +13,6 @@
  */
 import Pagemod from "./pagemod";
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
-import GpgAuth from "../model/gpgauth";
 import AppInitController from "../controller/app/appInitController";
 import {AppEvents} from "../event/appEvents";
 import {ConfigEvents} from "../event/configEvents";
@@ -44,6 +43,7 @@ import {MfaEvents} from "../event/mfaEvents";
 import {ClipboardEvents} from "../event/clipboardEvents";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 import {RememberMeEvents} from "../event/rememberMeEvents";
+import CheckAuthStatusService from "../service/auth/checkAuthStatusService";
 
 class App extends Pagemod {
   /**
@@ -96,8 +96,9 @@ class App extends Pagemod {
   async attachEvents(port) {
     try {
       const tab = port._port.sender.tab;
-      const auth = new GpgAuth();
-      if (!await auth.isAuthenticated() || await auth.isMfaRequired()) {
+      const checkAuthStatusService = new CheckAuthStatusService();
+      const authStatus = await checkAuthStatusService.checkAuthStatus(true);
+      if (!authStatus.isAuthenticated || authStatus.isMfaRequired) {
         console.error('Can not attach application if user is not logged in.');
         return;
       }

@@ -11,33 +11,34 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
-import GpgAuth from "../../model/gpgauth";
+import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
 
 class AuthIsAuthenticatedController {
   constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
-    this.auth = new GpgAuth();
+    this.checkAuthStatusService = new CheckAuthStatusService();
   }
 
   /**
    * Execute the controller.
-   * @param {object} options Optional parameters
-   * - options.requestApi {bool}, get the status from the API, default true.
    */
-  async main(options) {
-    options = options || {};
-
+  async _exec() {
     try {
-      const isAuthenticated = await this.auth.isAuthenticated(options);
-      if (isAuthenticated) {
-        this.worker.port.emitQuiet(this.requestId, 'SUCCESS', true);
-      } else {
-        this.worker.port.emitQuiet(this.requestId, 'SUCCESS', false);
-      }
+      const isAuthenticated = await this.exec();
+      this.worker.port.emitQuiet(this.requestId, 'SUCCESS', isAuthenticated);
     } catch (error) {
       this.worker.port.emitQuiet(this.requestId, 'ERROR', error);
     }
+  }
+
+  /**
+   * Returns true if the current user is authenticated (regardless of the MFA status)
+   * @returns {Promise<boolean>}
+   */
+  async exec() {
+    const authStatus = await this.checkAuthStatusService.checkAuthStatus(true);
+    return authStatus.isAuthenticated;
   }
 }
 

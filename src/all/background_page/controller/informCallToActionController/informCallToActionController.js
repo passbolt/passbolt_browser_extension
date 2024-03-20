@@ -11,11 +11,11 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.3.0
  */
-import GpgAuth from "../../model/gpgauth";
 import User from "../../model/user";
 import ResourceModel from "../../model/resource/resourceModel";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
 import WorkerService from "../../service/worker/workerService";
+import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
 
 /**
  * Controller related to the in-form call-to-action
@@ -30,6 +30,7 @@ class InformCallToActionController {
   constructor(worker, clientOptions, account) {
     this.worker = worker;
     this.resourceModel = new ResourceModel(clientOptions, account);
+    this.checkAuthStatusService = new CheckAuthStatusService();
   }
 
   /**
@@ -38,8 +39,7 @@ class InformCallToActionController {
    */
   async checkStatus(requestId) {
     try {
-      const auth = new GpgAuth();
-      const status = await auth.checkAuthStatus({requestApi: false});
+      const status = await this.checkAuthStatusService.checkAuthStatus(false);
       this.worker.port.emit(requestId, "SUCCESS", status);
     } catch (error) {
       /*
@@ -72,8 +72,7 @@ class InformCallToActionController {
    */
   async execute(requestId) {
     try {
-      const auth = new GpgAuth();
-      const status = await auth.checkAuthStatus({requestApi: false});
+      const status = await this.checkAuthStatusService.checkAuthStatus(false);
       if (!status.isAuthenticated) {
         const queryParameters = [
           {name: "uiMode", value: "detached"},

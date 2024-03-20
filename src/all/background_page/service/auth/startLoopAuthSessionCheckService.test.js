@@ -12,7 +12,6 @@
  * @since         3.3.0
  */
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
-import GpgAuth from "../../model/gpgauth";
 
 jest.useFakeTimers();
 
@@ -27,12 +26,12 @@ describe("StartLoopAuthSessionCheckService", () => {
   it("should trigger a check authentication and clear alarm on logout", async() => {
     expect.assertions(12);
     // Data mocked
-    const gpgAuth = new GpgAuth();
-    const startLoopAuthSessionCheckService = new StartLoopAuthSessionCheckService(gpgAuth);
+    const startLoopAuthSessionCheckService = new StartLoopAuthSessionCheckService();
     // Function mocked
     const spyScheduleAuthSessionCheck = jest.spyOn(startLoopAuthSessionCheckService, "scheduleAuthSessionCheck");
     const spyClearAuthSessionCheck = jest.spyOn(startLoopAuthSessionCheckService, "clearAlarm");
-    const spyIsAuthenticated = jest.spyOn(gpgAuth, "isAuthenticated").mockImplementation(() => Promise.resolve(true));
+    const authStatus = {isAuthenticated: true, isMfaRequired: false};
+    const spyIsAuthenticated = jest.spyOn(startLoopAuthSessionCheckService.checkAuthStatusService, "checkAuthStatus").mockImplementation(() => Promise.resolve(authStatus));
     const spyAlarmRemoveListener = jest.spyOn(browser.alarms.onAlarm, "removeListener");
 
     expect(spyScheduleAuthSessionCheck).not.toHaveBeenCalled();
@@ -61,13 +60,13 @@ describe("StartLoopAuthSessionCheckService", () => {
   it("should send logout event if not authenticated anymore", async() => {
     expect.assertions(11);
     // Data mocked
-    const gpgAuth = new GpgAuth();
-    const startLoopAuthSessionCheckService = new StartLoopAuthSessionCheckService(gpgAuth);
+    const startLoopAuthSessionCheckService = new StartLoopAuthSessionCheckService();
     // Function mocked
     const spyScheduleAuthSessionCheck = jest.spyOn(startLoopAuthSessionCheckService, "scheduleAuthSessionCheck");
     const spyClearAuthSessionCheck = jest.spyOn(startLoopAuthSessionCheckService, "clearAlarm");
     const spyDispatchEvent = jest.spyOn(self, "dispatchEvent");
-    const spyIsAuthenticated = jest.spyOn(gpgAuth, "isAuthenticated").mockImplementation(() => Promise.resolve(false));
+    const authStatus = {isAuthenticated: false, isMfaRequired: false};
+    const spyIsAuthenticated = jest.spyOn(startLoopAuthSessionCheckService.checkAuthStatusService, "checkAuthStatus").mockImplementation(() => Promise.resolve(authStatus));
     const spyAlarmRemoveListener = jest.spyOn(browser.alarms.onAlarm, "removeListener");
     // Process
     await startLoopAuthSessionCheckService.exec();

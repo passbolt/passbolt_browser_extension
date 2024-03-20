@@ -14,7 +14,8 @@
  * On extension update available controller
  */
 import User from "../../model/user";
-import GpgAuth from "../../model/gpgauth";
+import AuthenticationStatusService from "../../service/authenticationStatusService";
+import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequiredError";
 
 class OnExtensionUpdateAvailableController {
   /**
@@ -39,10 +40,18 @@ const isUserAuthenticated = async() => {
   const user = User.getInstance();
   // Check if user is valid
   if (user.isValid()) {
-    const auth = new GpgAuth();
     try {
-      return await auth.isAuthenticated();
+      const isAuth = await AuthenticationStatusService.isAuthenticated();
+      return isAuth;
     } catch (error) {
+      if (error instanceof MfaAuthenticationRequiredError) {
+        /*
+         * The browser shouldn't update the current extension when the user is logged in.
+         * The main reason is to avoid a bug where the passphrase is registered in memory and then forgotten as the updates provokes a memory clean
+         * This would be problematic for users not knowing/remembering their passphrase and using SSO to sign in
+         */
+        return true;
+      }
       /*
        * Service unavailable
        */

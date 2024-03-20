@@ -11,26 +11,34 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
-import GpgAuth from "../../model/gpgauth";
+import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
 
 class AuthIsMfaRequiredController {
   constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
-    this.auth = new GpgAuth();
+    this.checkAuthStatusService = new CheckAuthStatusService();
   }
 
-  async main() {
+  /**
+   * Execute the controller.
+   */
+  async _exec() {
     try {
-      const isMfaRequired = await this.auth.isMfaRequired();
-      if (isMfaRequired) {
-        this.worker.port.emit(this.requestId, 'SUCCESS', true);
-      } else {
-        this.worker.port.emit(this.requestId, 'SUCCESS', false);
-      }
+      const isMfaRequired = await this.exec();
+      this.worker.port.emit(this.requestId, 'SUCCESS', isMfaRequired);
     } catch (error) {
       this.worker.port.emit(this.requestId, 'ERROR', error);
     }
+  }
+
+  /**
+   * Returns true if the current user needs to answer the MFA challenge to finish sign in
+   * @returns {Promise<boolean>}
+   */
+  async exec() {
+    const authStatus = await this.checkAuthStatusService.checkAuthStatus(true);
+    return authStatus.isMfaRequired;
   }
 }
 

@@ -147,6 +147,7 @@ class RecoverAccountController {
     OpenpgpAssertion.assertPrivateKey(recoveredPrivateKey);
     this.account.userPrivateArmoredKey = recoveredPrivateKey.armor();
     this.account.userPublicArmoredKey = recoveredPrivateKey.toPublic().armor();
+    this.account.userKeyFingerprint = recoveredPrivateKey.getFingerprint().toUpperCase();
     await this.setupModel.completeRecover(this.account);
   }
 
@@ -178,6 +179,7 @@ class RecoverAccountController {
   _updateWorkerAccount(account) {
     this.account.userPublicArmoredKey = account.userPublicArmoredKey;
     this.account.userPrivateArmoredKey = account.userPrivateArmoredKey;
+    this.account.userKeyFingerprint = account.userKeyFingerprint;
   }
 
   /**

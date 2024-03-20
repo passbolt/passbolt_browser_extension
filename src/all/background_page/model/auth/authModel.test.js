@@ -20,10 +20,9 @@ beforeEach(async() => {
 });
 
 describe("AuthModel", () => {
-  describe("AuthModel::exec", () => {
+  describe("AuthModel::logout", () => {
     it("Should call the AuthService to logout and dispatch a logout event", async() => {
       expect.assertions(3);
-
       const apiClientOptions = defaultApiClientOptions();
       const model = new AuthModel(apiClientOptions);
 

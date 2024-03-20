@@ -15,18 +15,22 @@ import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import DecryptSsoPassphraseService from "../../service/crypto/decryptSsoPassphraseService";
 import PopupHandlerService from "../../service/sso/popupHandlerService";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
-import AuthModel from "../../model/auth/authModel";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
 import SsoLoginModel from "../../model/sso/ssoLoginModel";
 import SsoSettingsModel from "../../model/sso/ssoSettingsModel";
 import SsoSettingsChangedError from "../../error/ssoSettingsChangedError";
 import QualifySsoLoginErrorService from "../../service/sso/qualifySsoLoginErrorService";
+import AuthVerifyLoginChallengeService from "../../service/auth/authVerifyLoginChallengeService";
+import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
+import PostLoginService from "../../service/auth/postLoginService";
 
 class SsoAuthenticationController {
   /**
    * SsoAuthenticationController constructor
    * @param {Worker} worker
    * @param {string} requestId uuid
+   * @param {ApiClientOptions} apiClientOptions the api client options
+   * @param {AccountEntity} account The user account
    */
   constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
@@ -35,7 +39,7 @@ class SsoAuthenticationController {
     this.ssoKitServerPartModel = new SsoKitServerPartModel(apiClientOptions);
     this.ssoLoginModel = new SsoLoginModel(apiClientOptions);
     this.popupHandler = new PopupHandlerService(account.domain, worker?.tab?.id, false);
-    this.authModel = new AuthModel(apiClientOptions);
+    this.authVerifyLoginChallengeService = new AuthVerifyLoginChallengeService(apiClientOptions);
     this.ssoSettingsModel = new SsoSettingsModel(apiClientOptions);
   }
 
@@ -84,7 +88,9 @@ class SsoAuthenticationController {
 
       const passphrase = await DecryptSsoPassphraseService.decrypt(clientPartSsoKit.secret, clientPartSsoKit.nek, serverKey, clientPartSsoKit.iv1, clientPartSsoKit.iv2);
       await this.popupHandler.closeHandler();
-      await this.authModel.login(passphrase, true);
+      await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(this.account.userKeyFingerprint, this.account.userPrivateArmoredKey, passphrase);
+      await PassphraseStorageService.set(passphrase, -1);
+      await PostLoginService.postLogin();
       if (isInQuickAccessMode) {
         await this.ensureRedirectionInQuickaccessMode();
       }

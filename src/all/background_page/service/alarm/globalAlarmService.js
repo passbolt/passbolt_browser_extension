@@ -12,11 +12,16 @@
  * @since         4.7.0
  */
 
-import StartLoopAuthSessionCheckService from "../service/auth/startLoopAuthSessionCheckService";
+import StartLoopAuthSessionCheckService from "../auth/startLoopAuthSessionCheckService";
+import PassphraseStorageService from "../session_storage/passphraseStorageService";
 
-/**
- * Top-level alarm callback mapping.
- */
-export const topLevelAlarmMapping = {
+const topLevelAlarmMapping = {
   [StartLoopAuthSessionCheckService.ALARM_NAME]: StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm,
+  [PassphraseStorageService.PASSPHRASE_FLUSH_ALARM_NAME]: PassphraseStorageService.handleFlushEvent,
 };
+
+export default class GlobalAlarmService {
+  static exec(alarm) {
+    topLevelAlarmMapping[alarm.name]?.(alarm);
+  }
+}

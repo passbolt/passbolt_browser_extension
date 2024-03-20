@@ -14,8 +14,6 @@
 import User from "../../model/user";
 import UserService from "../api/user/userService";
 import Log from "../../model/log";
-import Lock from "../../utils/lock";
-const lock = new Lock();
 
 const PASSPHRASE_FLUSH_ALARM = "PassphraseStorageFlush";
 const SESSION_KEEP_ALIVE_ALARM = "SessionKeepAlive";
@@ -24,31 +22,21 @@ const SESSION_CHECK_INTERNAL = 15;
 
 class PassphraseStorageService {
   /**
-   * Constructor of the storage service
-   */
-  constructor() {
-    this._handleFlushEvent = this._handleFlushEvent.bind(this);
-    this._handleKeepSessionAlive = this._handleKeepSessionAlive.bind(this);
-  }
-
-  /**
    * Stores the passphrase in session memory for given a duration.
    * @param {string} passphrase
    * @param {number|null} timeout duration in second before flushing passphrase
    * @return {Promise<void>}
    */
-  async set(passphrase, timeout) {
-    await lock.acquire();
-    await browser.storage.session.set({[PASSPHRASE_STORAGE_KEY]: passphrase});
-    lock.release();
+  static async set(passphrase, timeout) {
+    await navigator.locks.request(PASSPHRASE_STORAGE_KEY, async() => {
+      await browser.storage.session.set({[PASSPHRASE_STORAGE_KEY]: passphrase});
+    });
 
-    await this._clearFlushAlarms();
+    PassphraseStorageService._clearFlushAlarms();
     if (timeout >= 0) {
-      const flushingTime = Date.now() + timeout * 1000;
       browser.alarms.create(PASSPHRASE_FLUSH_ALARM, {
-        when: flushingTime
+        when: Date.now() + timeout * 1000
       });
-      browser.alarms.onAlarm.addListener(this._handleFlushEvent);
     }
 
     const keepAliveAlarm = await browser.alarms.get(SESSION_KEEP_ALIVE_ALARM);
@@ -61,81 +49,78 @@ class PassphraseStorageService {
    * Retrieve the passphrase from the session memory if any.
    * @return {Promise<string|null>}
    */
-  async get() {
+  static async get() {
     const storedData = await browser.storage.session.get(PASSPHRASE_STORAGE_KEY);
     return storedData?.[PASSPHRASE_STORAGE_KEY] || null;
-  }
-
-  /**
-   * Flush the registered passphrase without removing any alarms.
-   * @returns {Promise<void>}
-   */
-  async flushPassphrase() {
-    await lock.acquire();
-    await browser.storage.session.remove(PASSPHRASE_STORAGE_KEY);
-    lock.release();
   }
 
   /**
    * Returns true if the session is set to be kept until the user logs out.
    * @returns {boolean}
    */
-  isSessionKeptUntilLogOut() {
+  static isSessionKeptUntilLogOut() {
     // we assume that the event listener is present only when the session is no kept until log out.
-    return !browser.alarms.onAlarm.hasListener(this._handleFlushEvent);
+    return !browser.alarms.onAlarm.hasListener(PassphraseStorageService.handleFlushEvent);
   }
 
   /**
    * Removes the stored passphrase from the session memory and resets alarms.
    * @return {Promise<void>}
    */
-  async flush() {
+  static async flush() {
     Log.write({level: 'debug', message: 'PassphraseStorageService flushed'});
     return Promise.all([
-      this.flushPassphrase(),
-      this._clearFlushAlarms(),
-      this._clearKeepAliveAlarms(),
+      PassphraseStorageService.flushPassphrase(),
+      PassphraseStorageService._clearFlushAlarms(),
+      PassphraseStorageService._clearKeepAliveAlarms(),
     ]);
   }
 
   /**
-   * Removes the stored passphrase from the session memory.
-   * @return {Promise<void>}
+   * Flush the registered passphrase without removing any alarms.
+   * @returns {Promise<void>}
    */
-  async stopSessionKeepAlive() {
-    this._clearKeepAliveAlarms();
+  static async flushPassphrase() {
+    await navigator.locks.request(PASSPHRASE_STORAGE_KEY, async() => {
+      await browser.storage.session.remove(PASSPHRASE_STORAGE_KEY);
+    });
   }
 
   /**
    * Clear all the alarms and listeners configured for flushing the passphrase if any.
    * @private
    */
-  async _clearFlushAlarms() {
-    await browser.alarms.clear(PASSPHRASE_FLUSH_ALARM);
-    if (browser.alarms.onAlarm.hasListener(this._handleFlushEvent)) {
-      browser.alarms.onAlarm.removeListener(this._handleFlushEvent);
-    }
+  static _clearFlushAlarms() {
+    browser.alarms.clear(PASSPHRASE_FLUSH_ALARM);
   }
 
   /**
    * Clear all the alarms and listeners configured for keeping session alive if any.
    * @private
    */
-  async _clearKeepAliveAlarms() {
+  static async _clearKeepAliveAlarms() {
     await browser.alarms.clear(SESSION_KEEP_ALIVE_ALARM);
-    if (browser.alarms.onAlarm.hasListener(this._handleKeepSessionAlive)) {
-      browser.alarms.onAlarm.removeListener(this._handleKeepSessionAlive);
+    if (browser.alarms.onAlarm.hasListener(PassphraseStorageService._handleKeepSessionAlive)) {
+      browser.alarms.onAlarm.removeListener(PassphraseStorageService._handleKeepSessionAlive);
     }
   }
 
   /**
-   * Flush the current stored passphrase when the PassphraseStorageFlush alarm triggers.
-   * @param {Alarm} alarm
-   * @private
+   * Removes the stored passphrase from the session memory.
+   * @return {Promise<void>}
    */
-  async _handleFlushEvent(alarm) {
+  static stopSessionKeepAlive() {
+    this._clearKeepAliveAlarms();
+  }
+
+  /**
+   * Flush the current stored passphrase when the PassphraseStorageFlush alarm triggers.
+   * This is a top-level alarm callback
+   * @param {Alarm} alarm
+   */
+  static async handleFlushEvent(alarm) {
     if (alarm.name === PASSPHRASE_FLUSH_ALARM) {
-      await this.flush();
+      await PassphraseStorageService.flush();
     }
   }
 
@@ -145,12 +130,12 @@ class PassphraseStorageService {
    * @returns {Promise<void>}
    * @private
    */
-  async _handleKeepSessionAlive(alarm) {
+  static async _handleKeepSessionAlive(alarm) {
     if (alarm.name !== SESSION_KEEP_ALIVE_ALARM) {
       return;
     }
 
-    if (await this.get() === null) {
+    if (await PassphraseStorageService.get() === null) {
       return;
     }
 
@@ -163,7 +148,7 @@ class PassphraseStorageService {
   /**
    * Creates an alarm to ensure session is kept alive.
    */
-  _keepAliveSession() {
+  static _keepAliveSession() {
     browser.alarms.create(SESSION_KEEP_ALIVE_ALARM, {
       delayInMinutes: SESSION_CHECK_INTERNAL,
       periodInMinutes: SESSION_CHECK_INTERNAL
@@ -171,6 +156,14 @@ class PassphraseStorageService {
 
     browser.alarms.onAlarm.addListener(this._handleKeepSessionAlive);
   }
+
+  /**
+   * Returns the PASSPHRASE_FLUSH_ALARM name
+   * @returns {string}
+   */
+  static get PASSPHRASE_FLUSH_ALARM_NAME() {
+    return PASSPHRASE_FLUSH_ALARM;
+  }
 }
 
-export default new PassphraseStorageService();
+export default PassphraseStorageService;

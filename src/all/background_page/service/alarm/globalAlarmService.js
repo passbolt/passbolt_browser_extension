@@ -13,15 +13,29 @@
  */
 
 import StartLoopAuthSessionCheckService from "../auth/startLoopAuthSessionCheckService";
+import KeepSessionAliveService from "../session_storage/keepSessionAliveService";
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 
 const topLevelAlarmMapping = {
-  [StartLoopAuthSessionCheckService.ALARM_NAME]: StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm,
-  [PassphraseStorageService.PASSPHRASE_FLUSH_ALARM_NAME]: PassphraseStorageService.handleFlushEvent,
+  [StartLoopAuthSessionCheckService.ALARM_NAME]: [StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm],
+  [PassphraseStorageService.ALARM_NAME]: [PassphraseStorageService.handleFlushEvent, KeepSessionAliveService.stopKeepingSessionAlive],
 };
 
+/**
+ * Top-level GlobalAlarmService.
+ * The role of the service is to manage alarms that need to be set on top-level.
+ * This is necessary to process alarms' callbacks when the service worker wakes up.
+ * Putting it at a top-level makes sure that the callbacks are still defined and could be called.
+ */
 export default class GlobalAlarmService {
   static exec(alarm) {
-    topLevelAlarmMapping[alarm.name]?.(alarm);
+    const alarmCallbacks = topLevelAlarmMapping[alarm.name];
+    if (!alarmCallbacks) {
+      return;
+    }
+
+    for (let i = 0; i < alarmCallbacks.length; i++) {
+      alarmCallbacks[i](alarm);
+    }
   }
 }

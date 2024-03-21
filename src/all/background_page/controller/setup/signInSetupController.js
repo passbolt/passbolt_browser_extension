@@ -17,6 +17,7 @@ import UpdateSsoCredentialsService from "../../service/account/updateSsoCredenti
 import AuthVerifyLoginChallengeService from "../../service/auth/authVerifyLoginChallengeService";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import PostLoginService from "../../service/auth/postLoginService";
+import KeepSessionAliveService from "../../service/session_storage/keepSessionAliveService";
 
 class SignInSetupController {
   /**
@@ -72,7 +73,10 @@ class SignInSetupController {
 
     await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(this.account.userKeyFingerprint, this.account.userPrivateArmoredKey, this.runtimeMemory.passphrase);
     if (rememberMe) {
-      await PassphraseStorageService.set(this.runtimeMemory.passphrase, -1);
+      Promise.all([
+        PassphraseStorageService.set(this.runtimeMemory.passphrase, -1),
+        KeepSessionAliveService.set(),
+      ]);
     }
     await PostLoginService.postLogin();
     await this.redirectToApp();

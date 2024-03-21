@@ -20,6 +20,7 @@ import UserRememberMeLatestChoiceEntity from "../../model/entity/rememberMe/user
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import PostLoginService from "../../service/auth/postLoginService";
 import AuthVerifyLoginChallengeService from "../../service/auth/authVerifyLoginChallengeService";
+import KeepSessionAliveService from "../../service/session_storage/keepSessionAliveService";
 
 class AuthLoginController {
   /**
@@ -99,7 +100,10 @@ class AuthLoginController {
        * MFA may not be complete yet, so no need to preload things here
        */
       if (rememberMe) {
-        await PassphraseStorageService.set(passphrase, -1);
+        Promise.all([
+          PassphraseStorageService.set(passphrase, -1),
+          KeepSessionAliveService.set(),
+        ]);
       }
       await PostLoginService.postLogin();
       await this.registerRememberMeOption(rememberMe);

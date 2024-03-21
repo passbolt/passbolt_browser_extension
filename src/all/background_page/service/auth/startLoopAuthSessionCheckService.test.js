@@ -21,7 +21,7 @@ beforeEach(async() => {
   jest.resetModules();
   jest.clearAllMocks();
   jest.clearAllTimers();
-  await browser.alarms.clearAllMocks();
+  await browser.alarms.clearAll();
 });
 
 describe("StartLoopAuthSessionCheckService", () => {

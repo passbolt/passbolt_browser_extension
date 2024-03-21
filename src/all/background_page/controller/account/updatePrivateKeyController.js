@@ -19,6 +19,7 @@ import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import SsoKitServerPartModel from "../../model/sso/ssoKitServerPartModel";
 import PassboltApiFetchError from "passbolt-styleguide/src/shared/lib/Error/PassboltApiFetchError";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
+import KeepSessionAliveService from "../../service/session_storage/keepSessionAliveService";
 
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
 
@@ -72,7 +73,7 @@ class UpdatePrivateKeyController {
     }
     await this.accountModel.updatePrivateKey(userPrivateArmoredKey);
     await PassphraseStorageService.flushPassphrase();
-    if (PassphraseStorageService.isSessionKeptUntilLogOut()) {
+    if (KeepSessionAliveService.isSessionKeptUntilLogOut()) {
       await PassphraseStorageService.set(newPassphrase);
     }
     await FileService.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", this.worker.tab.id);

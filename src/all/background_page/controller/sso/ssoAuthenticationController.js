@@ -23,6 +23,7 @@ import QualifySsoLoginErrorService from "../../service/sso/qualifySsoLoginErrorS
 import AuthVerifyLoginChallengeService from "../../service/auth/authVerifyLoginChallengeService";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import PostLoginService from "../../service/auth/postLoginService";
+import KeepSessionAliveService from "../../service/session_storage/keepSessionAliveService";
 
 class SsoAuthenticationController {
   /**
@@ -89,7 +90,10 @@ class SsoAuthenticationController {
       const passphrase = await DecryptSsoPassphraseService.decrypt(clientPartSsoKit.secret, clientPartSsoKit.nek, serverKey, clientPartSsoKit.iv1, clientPartSsoKit.iv2);
       await this.popupHandler.closeHandler();
       await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(this.account.userKeyFingerprint, this.account.userPrivateArmoredKey, passphrase);
-      await PassphraseStorageService.set(passphrase, -1);
+      Promise.all([
+        PassphraseStorageService.set(passphrase, -1),
+        KeepSessionAliveService.set(),
+      ]);
       await PostLoginService.postLogin();
       if (isInQuickAccessMode) {
         await this.ensureRedirectionInQuickaccessMode();

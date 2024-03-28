@@ -3,8 +3,25 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-## [4.6.0] - 2024-03-14
+## [4.6.2-rc0] - 2024-03-28
+### Fixed
+- PB-32394 As a user defining my passphrase while activating my account I want to know if my passphrase is part of a dictionary on form submission
+- PB-32396 As a user defining my new passphrase while changing it I want to know if my new passphrase is part of a dictionary on form submission
+- PB-32401 As an administrator defining the passphrase of the generated organization account recovery key I want to know if the passphrase is part of a dictionary on form submission
+- PB-32407 As a user editing a password I am invited to confirm its edition when this one very weak in a separate dialog on form submission
+- PB-32395 As a user defining my passphrase while requesting an account recovery I want to know if my new passphrase is part of a dictionary on form submission
+- PB-32397 As a user verifying my private key passphrase while activation my account I do not want to know if my passphrase is part of a dictionary at this stage
+- PB-32399 As a user confirming my passphrase while completing an account recovery (Admin approved) I do not want to know if my passphrase is part of a dictionary on form submission
+- PB-32398 As a user confirming my passphrase while importing my private key during an account recover I do not want to know if my passphrase is part of a dictionary on form submission
+- PB-32404 As a user creating a password from the quickaccess I am invited to confirm its creation when this one is part of a dictionary in a separate dialog on form submission
+- PB-32403 As a user updating a password I am invited to confirm its edition when this one is part of a dictionary in a separate dialog on form submission
+- PB-32405 As a user auto-saving a password from the quickaccess I should not be notified if the password is part of an exposed dictionary
+- PB-32402 As a user creating a password I am invited to confirm its creation when this one is part of a dictionary in a separate dialog on form submission
+- PB-32400 As a user confirming my passphrase while importing an account kit on the desktop app I do not want to know if my passphrase is part of a dictionary on form submission
+- PB-32406 As a user creating a password I am invited to confirm its creation when this one very weak in a separate dialog on form submission
+- PB-32427 As a user creating a password from the quickaccess I am invited to confirm its creation when this one is VERY WEAK in a separate page on form submission
 
+## [4.6.0] - 2024-03-14
 ### Added
 - PB-24485 As signed-in administrator I can see the healthcheck in the UI
 - PB-29051 As a user I can use ADFS as SSO provider

@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-## [4.6.2-rc0] - 2024-03-28
+## [4.6.2] - 2024-03-29
 ### Fixed
 - PB-32394 As a user defining my passphrase while activating my account I want to know if my passphrase is part of a dictionary on form submission
 - PB-32396 As a user defining my new passphrase while changing it I want to know if my new passphrase is part of a dictionary on form submission
@@ -110,7 +110,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-29159 As a signed-in user I want the Mfa screen to be available when using the bext 4.4 and API 4.5
 - PB-29263 Replace the mechanism to have CSRF token from the cookie
 
-
 ### Security
 - PB-29194 Upgrade vulnerable library web-ext
 - PB-28658 Mitigate browser extension supply chain attack
@@ -137,7 +136,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - PB-27972 Refactor code of SSO settings
 - PB-28592 Fix minimum gecko version in firefox manifest.json
 - PB-29020 Fix detection pagemod duplicate
-
 
 ## [4.4.2] - 2023-11-06
 ### Fixed

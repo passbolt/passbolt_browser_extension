@@ -1,9 +1,10 @@
-Passbolt is pleased to announce that the v4.6.2 Release Candidate is officially available for testing. This release contains some bug fixes for issues reported by the community. As always, your feedback is invaluable, please share and report any issues you come across.
+Song: https://youtu.be/3WOZwwRH6XU?si=jvTiezg7eEEpEh-S
 
-Thank you for your support! ♥️
+Version 4.6.2 is a targeted maintenance release of the browser extension, focusing on refining passwords strength verification process. This update ensures a balance between adhering to security best practices and maintaining user-friendliness.
 
-## [Unreleased]
-## [4.6.2-rc0] - 2024-03-28
+We extend our gratitude to the community for their insights to help us build passbolt.
+
+## [4.6.2] - 2024-03-29
 ### Fixed
 - PB-32394 As a user defining my passphrase while activating my account I want to know if my passphrase is part of a dictionary on form submission
 - PB-32396 As a user defining my new passphrase while changing it I want to know if my new passphrase is part of a dictionary on form submission

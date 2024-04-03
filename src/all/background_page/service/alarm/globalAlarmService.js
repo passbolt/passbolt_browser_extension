@@ -17,8 +17,9 @@ import KeepSessionAliveService from "../session_storage/keepSessionAliveService"
 import PassphraseStorageService from "../session_storage/passphraseStorageService";
 
 const topLevelAlarmMapping = {
-  [StartLoopAuthSessionCheckService.ALARM_NAME]: [StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm],
-  [PassphraseStorageService.ALARM_NAME]: [PassphraseStorageService.handleFlushEvent, KeepSessionAliveService.stop],
+  [StartLoopAuthSessionCheckService.ALARM_NAME]: StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm,
+  [PassphraseStorageService.ALARM_NAME]: PassphraseStorageService.handleFlushEvent,
+  [KeepSessionAliveService.ALARM_NAME]: KeepSessionAliveService.stop,
 };
 
 /**
@@ -29,13 +30,9 @@ const topLevelAlarmMapping = {
  */
 export default class GlobalAlarmService {
   static exec(alarm) {
-    const alarmCallbacks = topLevelAlarmMapping[alarm.name];
-    if (!alarmCallbacks) {
-      return;
-    }
-
-    for (let i = 0; i < alarmCallbacks.length; i++) {
-      alarmCallbacks[i](alarm);
+    const alarmCallback = topLevelAlarmMapping[alarm.name];
+    if (alarmCallback) {
+      alarmCallback(alarm);
     }
   }
 }

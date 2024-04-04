@@ -34,24 +34,6 @@ class InformCallToActionController {
   }
 
   /**
-   * Whenever one intends to check the status of the call-to-action (authenticated / unauthenticated mode)
-   * @param requestId
-   */
-  async checkStatus(requestId) {
-    try {
-      const status = await this.checkAuthStatusService.checkAuthStatus(false);
-      this.worker.port.emit(requestId, "SUCCESS", status);
-    } catch (error) {
-      /*
-       * When we are in a logged out mode and there's some cleaning of the local storage
-       * the check status request the api. In case of unauthenticated user, it throws a 401
-       * that we catch right here
-       */
-      this.worker.port.emit(requestId, "SUCCESS", {isAuthenticated: false});
-    }
-  }
-
-  /**
    * Whenever one intends to know the count of suggested resources
    * @param requestId The identifier of the request
    */

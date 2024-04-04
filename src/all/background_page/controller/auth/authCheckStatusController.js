@@ -22,11 +22,12 @@ class AuthCheckStatusController {
 
   /**
    * Controller executor.
+   * @param {boolean} [flushCache = true] should the cache be flushed before
    * @returns {Promise<void>}
    */
-  async _exec() {
+  async _exec(flushCache = true) {
     try {
-      const authStatus = await this.exec();
+      const authStatus = await this.exec(flushCache);
       this.worker.port.emit(this.requestId, 'SUCCESS', authStatus);
     } catch (error) {
       console.error(error);
@@ -36,10 +37,11 @@ class AuthCheckStatusController {
 
   /**
    * Controller executor.
+   * @param {boolean} flushCache should the cache be flushed before
    * @returns {Promise<{isAuthenticated: {bool}, isMfaRequired: {bool}}>}
    */
-  async exec() {
-    return await this.checkAuthStatusService.checkAuthStatus(true);
+  async exec(flushCache) {
+    return await this.checkAuthStatusService.checkAuthStatus(flushCache);
   }
 }
 

@@ -30,8 +30,6 @@ class CheckAuthStatusService {
       if (storedStatus) {
         return storedStatus;
       }
-    } else {
-      await AuthStatusLocalStorage.flush();
     }
 
     let isAuthenticated, isMfaRequired;

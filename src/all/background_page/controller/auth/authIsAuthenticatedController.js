@@ -22,10 +22,12 @@ class AuthIsAuthenticatedController {
 
   /**
    * Execute the controller.
+   * @param {boolean} flushCache should the auth status cache be flushed before or not.
+   * @returns {Promise<void>}
    */
-  async _exec() {
+  async _exec(flushCache) {
     try {
-      const isAuthenticated = await this.exec();
+      const isAuthenticated = await this.exec(flushCache);
       this.worker.port.emitQuiet(this.requestId, 'SUCCESS', isAuthenticated);
     } catch (error) {
       this.worker.port.emitQuiet(this.requestId, 'ERROR', error);
@@ -34,10 +36,11 @@ class AuthIsAuthenticatedController {
 
   /**
    * Returns true if the current user is authenticated (regardless of the MFA status)
+   * @param {boolean} flushCache should the auth status cache be flushed before or not.
    * @returns {Promise<boolean>}
    */
-  async exec() {
-    const authStatus = await this.checkAuthStatusService.checkAuthStatus(true);
+  async exec(flushCache) {
+    const authStatus = await this.checkAuthStatusService.checkAuthStatus(flushCache);
     return authStatus.isAuthenticated;
   }
 }

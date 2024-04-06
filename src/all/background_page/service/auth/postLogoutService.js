@@ -20,6 +20,7 @@ import BrowserTabService from "../ui/browserTab.service";
 import toolbarController from "../../controller/toolbarController";
 import AuthenticationEventController from "../../controller/auth/authenticationEventController";
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
+import PassphraseStorageService from "../session_storage/passphraseStorageService";
 
 class PostLogoutService {
   /**
@@ -31,6 +32,7 @@ class PostLogoutService {
     toolbarController.handleUserLoggedOut();
     AuthenticationEventController.handleUserLoggedOut();
     StartLoopAuthSessionCheckService.clearAlarm();
+    PassphraseStorageService.flush();
 
     //@todo remove the dispatch event once every 'after-logout' listeners are handled here
     const event = new Event('passbolt.auth.after-logout');

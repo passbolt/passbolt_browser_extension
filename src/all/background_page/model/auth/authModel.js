@@ -12,6 +12,7 @@
  */
 import AuthLogoutService from 'passbolt-styleguide/src/shared/services/api/auth/AuthLogoutService';
 import AuthStatusLocalStorage from "../../service/local_storage/authStatusLocalStorage";
+import PostLogoutService from '../../service/auth/postLogoutService';
 
 class AuthModel {
   /**
@@ -41,8 +42,7 @@ class AuthModel {
     const isAuthenticated = false;
     const isMfaRequired = false;
     await AuthStatusLocalStorage.set(isAuthenticated, isMfaRequired);
-    const event = new Event('passbolt.auth.after-logout');
-    self.dispatchEvent(event);
+    await PostLogoutService.exec();
   }
 }
 

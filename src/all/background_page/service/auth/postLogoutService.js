@@ -17,6 +17,7 @@ import WebIntegrationPagemod from "../../pagemod/webIntegrationPagemod";
 import PortManager from "../../sdk/port/portManager";
 import LocalStorageService from "../localStorage/localStorageService";
 import BrowserTabService from "../ui/browserTab.service";
+import toolbarController from "../../controller/toolbarController";
 
 class PostLogoutService {
   /**
@@ -26,6 +27,11 @@ class PostLogoutService {
     const workers = await WorkersSessionStorage.getWorkersByNames([AppPagemod.appName, WebIntegrationPagemod.appName]);
     PostLogoutService.sendLogoutEventForWorkerDisconnected(workers);
     LocalStorageService.flush();
+    toolbarController.handleUserLoggedOut();
+
+    //@todo remove the dispatch event once every 'after-logout' listeners are handled here
+    const event = new Event('passbolt.auth.after-logout');
+    self.dispatchEvent(event);
   }
 
   /**

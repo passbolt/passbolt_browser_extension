@@ -12,6 +12,7 @@
  * @since         4.7.0
  */
 
+import toolbarController from "../../controller/toolbarController";
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
 class PostLoginService {
   /**
@@ -20,6 +21,9 @@ class PostLoginService {
    */
   static async postLogin() {
     await StartLoopAuthSessionCheckService.exec();
+    toolbarController.handleUserLoggedIn();
+
+    //@todo remove the dispatch event once every 'after-login' listeners are handled here
     const event = new Event('passbolt.auth.after-login');
     self.dispatchEvent(event);
   }

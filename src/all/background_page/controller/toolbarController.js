@@ -19,7 +19,7 @@ import GetLegacyAccountService from "../service/account/getLegacyAccountService"
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 
 class ToolbarController {
-  constructor() {
+  initialise() {
     // Initially, set the browser extension icon as inactive
     BrowserExtensionIconService.deactivate();
     this.bindCallbacks();
@@ -45,8 +45,6 @@ class ToolbarController {
    */
   addEventListeners() {
     browser.commands.onCommand.addListener(this.handleShortcutPressed);
-    self.addEventListener("passbolt.auth.after-logout", this.handleUserLoggedOut);
-    self.addEventListener("passbolt.auth.after-login", this.handleUserLoggedIn);
   }
 
   /**
@@ -185,5 +183,7 @@ class ToolbarController {
   }
 }
 
+const toolbarController = new ToolbarController();
+
 // Exports the Toolbar controller object.
-export default ToolbarController;
+export default toolbarController;

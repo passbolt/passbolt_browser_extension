@@ -19,17 +19,18 @@ import LocalStorageService from "../localStorage/localStorageService";
 import BrowserTabService from "../ui/browserTab.service";
 import toolbarController from "../../controller/toolbarController";
 import AuthenticationEventController from "../../controller/auth/authenticationEventController";
+import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
 
 class PostLogoutService {
   /**
    * Execute all processes after a logout
    */
   static async exec() {
-    const workers = await WorkersSessionStorage.getWorkersByNames([AppPagemod.appName, WebIntegrationPagemod.appName]);
-    PostLogoutService.sendLogoutEventForWorkerDisconnected(workers);
+    await PostLogoutService.sendLogoutEventForWorkerDisconnected();
     LocalStorageService.flush();
     toolbarController.handleUserLoggedOut();
     AuthenticationEventController.handleUserLoggedOut();
+    StartLoopAuthSessionCheckService.clearAlarm();
 
     //@todo remove the dispatch event once every 'after-logout' listeners are handled here
     const event = new Event('passbolt.auth.after-logout');
@@ -38,10 +39,10 @@ class PostLogoutService {
 
   /**
    * Send logout event on workers disconnected port
-   * @param workers
    * @return {Promise<void>}
    */
-  static async sendLogoutEventForWorkerDisconnected(workers) {
+  static async sendLogoutEventForWorkerDisconnected() {
+    const workers = await WorkersSessionStorage.getWorkersByNames([AppPagemod.appName, WebIntegrationPagemod.appName]);
     for (const worker of workers) {
       if (!PortManager.isPortExist(worker.id)) {
         await BrowserTabService.sendMessage(worker, "passbolt.port.connect", worker.id);

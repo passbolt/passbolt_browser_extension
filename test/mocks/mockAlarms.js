@@ -95,7 +95,7 @@ class MockAlarms {
   _createDelayedInterval(alarmName, options) {
     let scheduledTime = options.when;
     if (!scheduledTime && options.delayInMinutes) {
-      scheduledTime = Date.now() + options.delayInMinutes * 60_000
+      scheduledTime = Date.now() + options.delayInMinutes * 60_000;
     }
 
     const alarm = {

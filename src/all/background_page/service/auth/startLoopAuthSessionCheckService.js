@@ -12,6 +12,7 @@
  * @since         4.0.0
  */
 import CheckAuthStatusService from "./checkAuthStatusService";
+import PostLogoutService from "./postLogoutService";
 
 const CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD = 60000;
 const AUTH_SESSION_CHECK_ALARM = "AuthSessionCheck";
@@ -23,7 +24,6 @@ class StartLoopAuthSessionCheckService {
    */
   static async exec() {
     await StartLoopAuthSessionCheckService.scheduleAuthSessionCheck();
-    self.addEventListener("passbolt.auth.after-logout", StartLoopAuthSessionCheckService.clearAlarm);
   }
 
   /**
@@ -54,16 +54,17 @@ class StartLoopAuthSessionCheckService {
    * - In the case the user is logged out, trigger a passbolt.auth.after-logout event.
    * @param {Alarm} alarm
    * @returns {Promise<void>}
+   * @private
    */
   static async handleAuthStatusCheckAlarm(alarm) {
     if (alarm.name !== StartLoopAuthSessionCheckService.ALARM_NAME) {
       return;
     }
 
-    const checkAuthStatusService = new CheckAuthStatusService();
-    const authStatus = await checkAuthStatusService.checkAuthStatus(true);
+    const checkAuthService = new CheckAuthStatusService();
+    const authStatus = await checkAuthService.checkAuthStatus(true);
     if (!authStatus.isAuthenticated) {
-      self.dispatchEvent(new Event('passbolt.auth.after-logout'));
+      PostLogoutService.exec();
     }
   }
 

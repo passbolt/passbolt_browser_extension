@@ -13,7 +13,7 @@
  */
 
 import AuthenticationEventController from "./authenticationEventController";
-import { defaultWorker } from "./authenticationEventController.test.data";
+import {defaultWorker} from "./authenticationEventController.test.data";
 
 describe("AuthenticationEventController", () => {
   describe("::initialise", () => {

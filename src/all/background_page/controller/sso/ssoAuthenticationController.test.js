@@ -112,7 +112,7 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       const controller = new SsoAuthenticationController(null, null, defaultApiClientOptions(), account);
       jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
       jest.spyOn(PassphraseStorageService, "set");
-      jest.spyOn(PostLoginService, "postLogin");
+      jest.spyOn(PostLoginService, "postLogin").mockImplementation(() => {});
 
       await controller.exec(scenario.providerId);
 
@@ -142,7 +142,7 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       const controller = new SsoAuthenticationController(null, null, defaultApiClientOptions(), account);
       jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
       jest.spyOn(PassphraseStorageService, "set");
-      jest.spyOn(PostLoginService, "postLogin");
+      jest.spyOn(PostLoginService, "postLogin").mockImplementation(() => {});
 
       await controller.exec(scenario.providerId, true);
 

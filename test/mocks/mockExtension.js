@@ -17,6 +17,7 @@ import {defaultSecurityTokenDto} from "../../src/all/background_page/model/entit
 import {v4 as uuidv4} from "uuid";
 import Keyring from "../../src/all/background_page/model/keyring";
 import {pgpKeys} from "../fixtures/pgpKeys/keys";
+import {Uuid} from "../../src/all/background_page/utils/uuid";
 
 class MockExtension {
   /**
@@ -29,6 +30,8 @@ class MockExtension {
     // Mock user private key
     const keyring = new Keyring();
     await keyring.importPrivate(keyData.private);
+    await keyring.importPublic(keyData.public, keyData.userId);
+    await keyring.importPublic(pgpKeys.server.public, Uuid.get(user.settings.getDomain()));
 
     return user;
   }
@@ -44,7 +47,7 @@ class MockExtension {
     user.settings.setSecurityToken(defaultSecurityTokenDto());
     const nameSplitted = keyData.user_ids[0].name.split(" ");
     const userDto = {
-      id: uuidv4(),
+      id: keyData.userId || uuidv4(),
       username: keyData.user_ids[0].email,
       firstname: nameSplitted.shift(),
       lastname: nameSplitted.join(" "),

@@ -12,7 +12,6 @@
  * @since         3.6.0
  */
 
-import {v4 as uuidv4} from 'uuid';
 import AccountEntity from "./accountEntity";
 import {defaultSecurityTokenDto} from "../securityToken/SecurityTokenEntity.test.data";
 import {pgpKeys} from '../../../../../../test/fixtures/pgpKeys/keys';
@@ -23,8 +22,8 @@ export const defaultAccountDto = (data = {}) => {
   const defaultData = {
     "type": AccountEntity.TYPE_ACCOUNT,
     "domain": "https://passbolt.local",
-    "user_id": uuidv4(),
-    "username": "ada@passbolt.dev",
+    "user_id": pgpKeys.ada.userId,
+    "username": "ada@passbolt.com",
     "first_name": "Ada",
     "last_name": "Lovelace",
     "user_key_fingerprint": pgpKeys.ada.fingerprint,
@@ -45,7 +44,7 @@ export const defaultAccountDto = (data = {}) => {
 export const adminAccountDto = (data = {}) => {
   const defaultData = {
     "user_id": pgpKeys.admin.userId,
-    "username": "admin@passbolt.dev",
+    "username": "admin@passbolt.com",
     "first_name": "Admin",
     "last_name": "User",
     "user_key_fingerprint": pgpKeys.admin.fingerprint,

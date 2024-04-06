@@ -144,7 +144,7 @@ class ToolbarController {
    */
   async updateSuggestedResourcesBadge() {
     const tabs = await browser.tabs.query({'active': true, 'lastFocusedWindow': true});
-    const currentTab = tabs[0];
+    const currentTab = tabs?.[0];
 
     const tabUrl = currentTab?.url;
     let suggestedResourcesCount = 0;

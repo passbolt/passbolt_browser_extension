@@ -165,7 +165,9 @@ describe("AccountLocalStorage", () => {
 
       // Initialize the local storage with X accounts;
       for (let i = 0; i < sampleSize; i++) {
-        const account = new AccountEntity(defaultAccountDto());
+        const account = new AccountEntity(defaultAccountDto({
+          user_id: uuidv4(),
+        }));
         accountsToDelete.push(account);
         await AccountLocalStorage.add(account);
       }

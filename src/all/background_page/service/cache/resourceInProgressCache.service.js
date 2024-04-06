@@ -65,9 +65,6 @@ class ResourceInProgressCacheService {
     await browser.storage.session.set({[RESOURCE_IN_PROGRESS_STORAGE_KEY]: resource.toDto()});
     // Set a timeout to clean the cache if not consumed
     this.timeoutId = setTimeout(this.reset, timeoutInMs);
-
-    // Invalid the cache if the user is logged out
-    self.addEventListener("passbolt.auth.after-logout", this.reset);
   }
 
   /**
@@ -77,7 +74,6 @@ class ResourceInProgressCacheService {
     browser.storage.session.remove(RESOURCE_IN_PROGRESS_STORAGE_KEY);
     // Clear the timeout
     clearTimeout(this.timeoutId);
-    self.removeEventListener("passbolt.auth.after-logout", this.reset);
   }
 }
 

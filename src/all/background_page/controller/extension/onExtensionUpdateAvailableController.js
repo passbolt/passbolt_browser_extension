@@ -18,6 +18,7 @@ import AuthenticationStatusService from "../../service/authenticationStatusServi
 import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequiredError";
 import WebIntegrationPagemod from "../../pagemod/webIntegrationPagemod";
 import WorkerService from "../../service/worker/workerService";
+import PublicWebsiteSignInPagemod from "../../pagemod/publicWebsiteSignInPagemod";
 
 class OnExtensionUpdateAvailableController {
   /**
@@ -38,7 +39,7 @@ class OnExtensionUpdateAvailableController {
    * @return {Promise<void>}
    */
   static async cleanAndReload() {
-    await WorkerService.destroyWorkersByName([WebIntegrationPagemod.appName]);
+    await WorkerService.destroyWorkersByName([WebIntegrationPagemod.appName, PublicWebsiteSignInPagemod.appName]);
     browser.runtime.reload();
   }
 }

@@ -16,6 +16,8 @@
 import User from "../../model/user";
 import AuthenticationStatusService from "../../service/authenticationStatusService";
 import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequiredError";
+import WebIntegrationPagemod from "../../pagemod/webIntegrationPagemod";
+import WorkerService from "../../service/worker/workerService";
 
 class OnExtensionUpdateAvailableController {
   /**
@@ -25,10 +27,19 @@ class OnExtensionUpdateAvailableController {
   static async exec() {
     if (await isUserAuthenticated()) {
       // Add listener on passbolt logout to update the extension
-      self.addEventListener("passbolt.auth.after-logout", () => browser.runtime.reload());
+      self.addEventListener("passbolt.auth.after-logout", this.cleanAndReload);
     } else {
-      browser.runtime.reload();
+      await this.cleanAndReload();
     }
+  }
+
+  /**
+   * Clean and reload the new extension
+   * @return {Promise<void>}
+   */
+  static async cleanAndReload() {
+    await WorkerService.destroyWorkersByName([WebIntegrationPagemod.appName]);
+    browser.runtime.reload();
   }
 }
 

@@ -40,6 +40,26 @@ describe("Port", () => {
         expect(error.message).toBe('The port name should be a valid string.');
       }
     });
+
+    it("Should raise an error if context is invalid and send destroy message", async() => {
+      expect.assertions(4);
+
+      const portname = uuidv4();
+      const port = new Port(portname);
+
+      jest.spyOn(browser.runtime, "connect").mockImplementationOnce(() => { throw new Error("context invalid"); });
+      jest.spyOn(port, "destroyContentScript");
+      jest.spyOn(port, "_onMessage");
+
+      expect(port._connected).toBeFalsy();
+      try {
+        await port.connect();
+      } catch (error) {
+        expect(browser.runtime.connect).toHaveBeenCalledWith({name: portname});
+        expect(port.destroyContentScript).toHaveBeenCalled();
+        expect(port._onMessage).toHaveBeenCalledWith(JSON.stringify(["passbolt.content-script.destroy"]));
+      }
+    });
   });
 
   describe("Port::request", () => {

@@ -76,7 +76,7 @@ class WorkerService {
 
   /**
    * Clear and use a timeout to execute a navigation for worker which are waiting for connection
-   * @params {WorkerEntity} The worker entity
+   * @param {WorkerEntity} workerEntity The worker entity
    * @returns {Promise<void>}
    */
   static async checkAndExecNavigationForWorkerWaitingConnection(workerEntity) {
@@ -110,6 +110,28 @@ class WorkerService {
         url: tab.url
       };
       await WebNavigationService.exec(frameDetails);
+    }
+  }
+
+  /**
+   * Send message to destroy all worker to invalidate content script
+   * @param {Array<string>} workersName
+   * @return {Promise<void>}
+   */
+  static async destroyWorkersByName(workersName) {
+    const workers = await WorkersSessionStorage.getWorkersByNames(workersName);
+    for (const worker of workers) {
+      if (!PortManager.isPortExist(worker.id)) {
+        try {
+          await BrowserTabService.sendMessage(worker, "passbolt.port.connect", worker.id);
+        } catch (error) {
+          console.debug("Unable to reconnect the port before to update the extension");
+          console.error(error);
+          continue;
+        }
+      }
+      const port = PortManager.getPortById(worker.id);
+      port.emit('passbolt.content-script.destroy');
     }
   }
 }

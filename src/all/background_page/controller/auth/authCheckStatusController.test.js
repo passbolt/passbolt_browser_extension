@@ -13,7 +13,7 @@
  */
 
 import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequiredError";
-import AuthService from "../../service/authenticationStatusService";
+import AuthenticationStatusService from "../../service/authenticationStatusService";
 import AuthStatusLocalStorage from "../../service/local_storage/authStatusLocalStorage";
 import AuthCheckStatusController from "./authCheckStatusController";
 
@@ -26,7 +26,7 @@ describe("AuthCheckStatusController", () => {
     expect.assertions(3);
     jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => undefined);
     jest.spyOn(AuthStatusLocalStorage, "flush");
-    jest.spyOn(AuthService, "isAuthenticated").mockImplementation(() => false);
+    jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => false);
 
     const controller = new AuthCheckStatusController();
     const authStatus = await controller.exec();
@@ -43,7 +43,7 @@ describe("AuthCheckStatusController", () => {
     expect.assertions(3);
     jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => undefined);
     jest.spyOn(AuthStatusLocalStorage, "flush");
-    jest.spyOn(AuthService, "isAuthenticated").mockImplementation(() => true);
+    jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => true);
 
     const controller = new AuthCheckStatusController();
     const authStatus = await controller.exec();
@@ -60,7 +60,7 @@ describe("AuthCheckStatusController", () => {
     expect.assertions(3);
     jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => undefined);
     jest.spyOn(AuthStatusLocalStorage, "flush");
-    jest.spyOn(AuthService, "isAuthenticated").mockImplementation(() => { throw new MfaAuthenticationRequiredError(); });
+    jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => { throw new MfaAuthenticationRequiredError(); });
 
     const controller = new AuthCheckStatusController();
     const authStatus = await controller.exec();

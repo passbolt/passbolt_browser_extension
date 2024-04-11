@@ -170,14 +170,7 @@ class MockAlarms {
     }
 
     this._registeredAlarms = {};
-  }
 
-  /**
-   * Clean all the mocked alarm data to ensure unit tests are not running with previous tests' data
-   * @returns {Promise<void>}
-   */
-  async clearAllMocks() {
-    this.clearAll();
     this.onAlarm = new OnAlarmEvent();
     this.onAlarm.triggerAlarm = this.onAlarm.triggerAlarm.bind(this);
   }

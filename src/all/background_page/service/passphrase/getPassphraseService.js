@@ -15,6 +15,7 @@ import WorkerService from "../worker/workerService";
 import UserRememberMeLatestChoiceLocalStorage from "../local_storage/userRememberMeLatestChoiceLocalStorage";
 import UserRememberMeLatestChoiceEntity from "../../model/entity/rememberMe/userRememberMeLatestChoiceEntity";
 import {assertPassphrase} from "../../utils/assertions";
+import KeepSessionAliveService from "../session_storage/keepSessionAliveService";
 
 export default class GetPassphraseService {
   constructor(account) {
@@ -127,7 +128,10 @@ export default class GetPassphraseService {
       return;
     }
 
-    await PassphraseStorageService.set(passphrase, duration);
+    await Promise.all([
+      PassphraseStorageService.set(passphrase, duration),
+      KeepSessionAliveService.start(),
+    ]);
     const userRememberMeLatestChoiceEntity = new UserRememberMeLatestChoiceEntity({
       duration: parseInt(duration, 10)
     });

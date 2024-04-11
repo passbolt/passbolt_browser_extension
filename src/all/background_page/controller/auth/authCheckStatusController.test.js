@@ -81,14 +81,14 @@ describe("AuthCheckStatusController", () => {
     };
     jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => expectedAuthStatus);
     jest.spyOn(AuthStatusLocalStorage, "flush");
-    jest.spyOn(AuthService, "isAuthenticated");
+    jest.spyOn(AuthenticationStatusService, "isAuthenticated");
 
     const controller = new AuthCheckStatusController();
     const authStatus = await controller.exec(false);
 
     expect(AuthStatusLocalStorage.get).toHaveBeenCalledTimes(1);
     expect(AuthStatusLocalStorage.flush).not.toHaveBeenCalled();
-    expect(AuthService.isAuthenticated).not.toHaveBeenCalled();
+    expect(AuthenticationStatusService.isAuthenticated).not.toHaveBeenCalled();
     expect(authStatus).toStrictEqual(expectedAuthStatus);
   });
 });

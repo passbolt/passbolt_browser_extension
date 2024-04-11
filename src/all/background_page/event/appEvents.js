@@ -45,8 +45,9 @@ import DeletePasswordExpirySettingsController from "../controller/passwordExpiry
 import GetOrFindPasswordExpirySettingsController from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
 
 const listen = function(worker, apiClientOptions, account) {
-  const authenticationEventController = new AuthenticationEventController(worker);
-  authenticationEventController.startListen();
+  AuthenticationEventController.initialise(worker);
+  AuthenticationEventController.startListen();
+
   /*
    * Whenever the (React) app changes his route
    * @listens passbolt.app.route-changed

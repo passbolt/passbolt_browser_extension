@@ -18,6 +18,7 @@ import PortManager from "../../sdk/port/portManager";
 import LocalStorageService from "../localStorage/localStorageService";
 import BrowserTabService from "../ui/browserTab.service";
 import toolbarController from "../../controller/toolbarController";
+import AuthenticationEventController from "../../controller/auth/authenticationEventController";
 
 class PostLogoutService {
   /**
@@ -28,6 +29,7 @@ class PostLogoutService {
     PostLogoutService.sendLogoutEventForWorkerDisconnected(workers);
     LocalStorageService.flush();
     toolbarController.handleUserLoggedOut();
+    AuthenticationEventController.handleUserLoggedOut();
 
     //@todo remove the dispatch event once every 'after-logout' listeners are handled here
     const event = new Event('passbolt.auth.after-logout');

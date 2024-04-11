@@ -21,8 +21,8 @@ import AuthCheckStatusController from "../controller/auth/authCheckStatusControl
  * @param {AccountEntity} account the user account
  */
 const listen = function(worker, apiClientOptions, account) {
-  const authenticationEventController = new AuthenticationEventController(worker);
-  authenticationEventController.startListen();
+  AuthenticationEventController.initialise(worker);
+  AuthenticationEventController.startListen();
 
   /*
    * Whenever the in-form call-to-action status is required

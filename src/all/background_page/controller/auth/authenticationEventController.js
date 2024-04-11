@@ -17,49 +17,44 @@
  */
 class AuthenticationEventController {
   /**
-   * AuthenticationEventController constructor
+   * AuthenticationEventController initialiser
    * @param {Worker} worker
    */
-  constructor(worker) {
+  static initialise(worker) {
     this.worker = worker;
-    this.bindCallbacks();
-  }
-
-  /**
-   * Binds the callbacks
-   */
-  bindCallbacks() {
-    this.handleUserLoggedOut = this.handleUserLoggedOut.bind(this);
-    this.handleUserLoggedIn = this.handleUserLoggedIn.bind(this);
-    this.handleRemoveListener = this.handleRemoveListener.bind(this);
   }
 
   /**
    * Start event listeners.
    */
-  startListen() {
-    self.addEventListener("passbolt.auth.after-logout", this.handleUserLoggedOut);
-    self.addEventListener("passbolt.auth.after-login", this.handleUserLoggedIn);
-    this.worker.port._port.onDisconnect.addListener(this.handleRemoveListener);
+  static startListen() {
+    this.isPortConnected = true;
+    this.worker.port._port.onDisconnect.addListener(this.handlePortDisconnected);
   }
 
   /**
    * Handle when the user is logged in.
    */
-  async handleUserLoggedIn() {
-    this.worker.port.emit("passbolt.auth.after-login");
+  static handleUserLoggedIn() {
+    if (this.isPortConnected) {
+      this.worker?.port.emit("passbolt.auth.after-login");
+    }
   }
 
   /**
    * Handle when the user is logged out.
    */
-  handleUserLoggedOut() {
-    this.worker.port.emit("passbolt.auth.after-logout");
+  static handleUserLoggedOut() {
+    if (this.isPortConnected) {
+      this.worker?.port.emit("passbolt.auth.after-logout");
+    }
   }
 
-  handleRemoveListener() {
-    self.removeEventListener("passbolt.auth.after-logout", this.handleUserLoggedOut);
-    self.removeEventListener("passbolt.auth.after-login", this.handleUserLoggedIn);
+  /**
+   * Handle when the port is disconnected
+   */
+  static handlePortDisconnected() {
+    this.isPortConnected = false;
   }
 }
 

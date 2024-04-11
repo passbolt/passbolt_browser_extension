@@ -9,8 +9,6 @@ import UserSettings from "./userSettings/userSettings";
 import {ApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions";
 import Validator from "validator";
 import {ValidatorRule} from "../utils/validatorRules";
-import PassphraseStorageService from "../service/session_storage/passphraseStorageService";
-import KeepSessionAliveService from "../service/session_storage/keepSessionAliveService";
 
 /**
  * The class that deals with users.
@@ -353,18 +351,6 @@ const UserSingleton = (function() {
       }
       return instance;
     },
-
-    init: function() {
-      /*
-       * Observe when the user session is terminated.
-       * - Flush the temporary stored master password
-       */
-      self.addEventListener("passbolt.auth.after-logout", () => Promise.all([
-        PassphraseStorageService.flush(),
-        KeepSessionAliveService.stop()
-      ])
-      );
-    }
   };
 })();
 

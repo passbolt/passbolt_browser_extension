@@ -1,6 +1,6 @@
 tester:
   stage: test
-  image: node:18
+  image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/node:18
   coverage: /Lines\s* [:] ([\d\.]+)%/
   extends: .rules
   script:
@@ -17,7 +17,7 @@ tester:
 
 linter:
   stage: test
-  image: node:18
+  image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/node:18
   extends: .rules
   script:
     - npm ci

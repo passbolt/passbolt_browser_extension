@@ -29,10 +29,10 @@ describe("AuthCheckStatusController", () => {
     jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => false);
 
     const controller = new AuthCheckStatusController();
-    const authStatus = await controller.exec();
+    const authStatus = await controller.exec(true);
 
     expect(AuthStatusLocalStorage.get).not.toHaveBeenCalled();
-    expect(AuthStatusLocalStorage.flush).toHaveBeenCalled();
+    expect(AuthStatusLocalStorage.flush).not.toHaveBeenCalled();
     expect(authStatus).toStrictEqual({
       isAuthenticated: false,
       isMfaRequired: false,
@@ -46,10 +46,10 @@ describe("AuthCheckStatusController", () => {
     jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => true);
 
     const controller = new AuthCheckStatusController();
-    const authStatus = await controller.exec();
+    const authStatus = await controller.exec(true);
 
     expect(AuthStatusLocalStorage.get).not.toHaveBeenCalled();
-    expect(AuthStatusLocalStorage.flush).toHaveBeenCalled();
+    expect(AuthStatusLocalStorage.flush).not.toHaveBeenCalled();
     expect(authStatus).toStrictEqual({
       isAuthenticated: true,
       isMfaRequired: false,
@@ -63,13 +63,32 @@ describe("AuthCheckStatusController", () => {
     jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => { throw new MfaAuthenticationRequiredError(); });
 
     const controller = new AuthCheckStatusController();
-    const authStatus = await controller.exec();
+    const authStatus = await controller.exec(true);
 
     expect(AuthStatusLocalStorage.get).not.toHaveBeenCalled();
-    expect(AuthStatusLocalStorage.flush).toHaveBeenCalled();
+    expect(AuthStatusLocalStorage.flush).not.toHaveBeenCalled();
     expect(authStatus).toStrictEqual({
       isAuthenticated: true,
       isMfaRequired: true,
     });
+  });
+
+  it("should return the auth status from the local storage", async() => {
+    expect.assertions(4);
+    const expectedAuthStatus = {
+      isAuthenticated: false,
+      isMfaRequired: false,
+    };
+    jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => expectedAuthStatus);
+    jest.spyOn(AuthStatusLocalStorage, "flush");
+    jest.spyOn(AuthenticationStatusService, "isAuthenticated");
+
+    const controller = new AuthCheckStatusController();
+    const authStatus = await controller.exec(false);
+
+    expect(AuthStatusLocalStorage.get).toHaveBeenCalledTimes(1);
+    expect(AuthStatusLocalStorage.flush).not.toHaveBeenCalled();
+    expect(AuthenticationStatusService.isAuthenticated).not.toHaveBeenCalled();
+    expect(authStatus).toStrictEqual(expectedAuthStatus);
   });
 });

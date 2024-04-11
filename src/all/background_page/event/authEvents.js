@@ -36,9 +36,9 @@ const listen = function(worker, apiClientOptions, account) {
    * @listens passbolt.auth.is-authenticated
    * @param requestId {uuid} The request identifier
    */
-  worker.port.on('passbolt.auth.is-authenticated', async requestId => {
+  worker.port.on('passbolt.auth.is-authenticated', async(requestId, flushCache = true) => {
     const controller = new AuthIsAuthenticatedController(worker, requestId);
-    controller._exec();
+    controller._exec(flushCache);
   });
 
   /*

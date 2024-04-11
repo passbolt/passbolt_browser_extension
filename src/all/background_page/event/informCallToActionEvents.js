@@ -12,7 +12,7 @@
  */
 import InformCallToActionController from "../controller/informCallToActionController/informCallToActionController";
 import AuthenticationEventController from "../controller/auth/authenticationEventController";
-
+import AuthCheckStatusController from "../controller/auth/authCheckStatusController";
 
 /**
  * Listens the inform call to action events
@@ -30,9 +30,9 @@ const listen = function(worker, apiClientOptions, account) {
    * @param requestId {uuid} The request identifier
    * @returns {*{isAuthenticated,isMfaRequired}
    */
-  worker.port.on('passbolt.in-form-cta.check-status', async requestId => {
-    const informCallToActionController = new InformCallToActionController(worker, apiClientOptions, account);
-    await informCallToActionController.checkStatus(requestId);
+  worker.port.on('passbolt.in-form-cta.check-status', async(requestId, flushCache = false) => {
+    const authIsAuthenticatedController = new AuthCheckStatusController(worker, requestId);
+    await authIsAuthenticatedController._exec(flushCache);
   });
 
   /*

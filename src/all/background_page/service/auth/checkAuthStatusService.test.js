@@ -73,7 +73,7 @@ describe("CheckAuthStatusService", () => {
     });
   });
 
-  it("should flush the cache if asked for and call the API to find the authentication status", async() => {
+  it("should ask for an API call to find the authentication status", async() => {
     expect.assertions(3);
     jest.spyOn(AuthStatusLocalStorage, "get").mockImplementation(() => undefined);
     jest.spyOn(AuthStatusLocalStorage, "flush");
@@ -83,7 +83,7 @@ describe("CheckAuthStatusService", () => {
     const authStatus = await service.checkAuthStatus(true);
 
     expect(AuthStatusLocalStorage.get).not.toHaveBeenCalled();
-    expect(AuthStatusLocalStorage.flush).toHaveBeenCalledTimes(1);
+    expect(AuthStatusLocalStorage.flush).not.toHaveBeenCalled();
     expect(authStatus).toStrictEqual({
       isAuthenticated: true,
       isMfaRequired: false,

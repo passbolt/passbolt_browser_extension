@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.7.0
  */
+import MockExtension from "../../../../../test/mocks/mockExtension";
 import PostLoginService from "./postLoginService";
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
 
@@ -22,6 +23,8 @@ describe("PostLoginService", () => {
   describe("PostLoinService::postLogin", () => {
     it("Should call the start loop auth session check service and dispatch a post login event", async() => {
       expect.assertions(2);
+
+      await MockExtension.withConfiguredAccount();
       jest.spyOn(StartLoopAuthSessionCheckService, "exec");
       jest.spyOn(self, "dispatchEvent");
 

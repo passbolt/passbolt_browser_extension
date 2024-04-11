@@ -12,7 +12,7 @@
  * @since         3.3.0
  */
 
-import ToolbarController from "./toolbarController";
+import toolbarController from "./toolbarController";
 import AccountEntity from "../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../model/entity/account/accountEntity.test.data";
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
@@ -48,7 +48,7 @@ describe("ToolbarController", () => {
     it("Given the user is on a tab which has no suggested resource for, it should activate the passbolt icon and display no suggested resource.", async() => {
       expect.assertions(2);
       const account = new AccountEntity(defaultAccountDto());
-      const toolbarController = new ToolbarController();
+      toolbarController.initialise();
 
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(browser.tabs, "query").mockImplementation(() => [{url: 'https://www.wherever.com'}]);
@@ -65,7 +65,7 @@ describe("ToolbarController", () => {
     it("Given the user is on a tab which has suggested resource for, it should activate the passbolt icon and display the number of suggested resources.", async() => {
       expect.assertions(2);
       const account = new AccountEntity(defaultAccountDto());
-      const toolbarController = new ToolbarController();
+      toolbarController.initialise();
 
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(browser.tabs, "query").mockImplementation(() => [{url: 'https://www.passbolt.com'}]);
@@ -84,7 +84,7 @@ describe("ToolbarController", () => {
     it("Given the user signs out, it should deactivate the passbolt icon.", async() => {
       expect.assertions(1);
       const account = new AccountEntity(defaultAccountDto());
-      const toolbarController = new ToolbarController();
+      toolbarController.initialise();
 
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(browser.tabs, "query").mockImplementation(() => [{url: 'https://www.wherever.com'}]);
@@ -103,7 +103,7 @@ describe("ToolbarController", () => {
     it("Given the user navigates to a url having suggested resources, it should change the passbolt icon suggested resources count.", async() => {
       expect.assertions(1);
       const account = new AccountEntity(defaultAccountDto());
-      const toolbarController = new ToolbarController();
+      toolbarController.initialise();
 
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => [{url: 'https://www.wherever.com'}]);
@@ -124,7 +124,7 @@ describe("ToolbarController", () => {
     it("Given the user activates a tab having suggested resources, it should change the passbolt icon suggested resources count.", async() => {
       expect.assertions(2);
       const account = new AccountEntity(defaultAccountDto());
-      const toolbarController = new ToolbarController();
+      toolbarController.initialise();
 
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => [{url: 'https://www.wherever.com'}]);
@@ -144,7 +144,7 @@ describe("ToolbarController", () => {
     it("Given the user switches to a window with a tab having suggested resources, it should change the passbolt icon suggested resources count.", async() => {
       expect.assertions(2);
       const account = new AccountEntity(defaultAccountDto());
-      const toolbarController = new ToolbarController();
+      toolbarController.initialise();
 
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => [{url: 'https://www.wherever.com'}]);
@@ -162,7 +162,7 @@ describe("ToolbarController", () => {
     it("Given the user switches to another application, it should reset the passbolt icon suggested resources count.", async() => {
       expect.assertions(2);
       const account = new AccountEntity(defaultAccountDto());
-      const toolbarController = new ToolbarController();
+      toolbarController.initialise();
 
       jest.spyOn(browser.cookies, "get").mockImplementation(() => ({value: "csrf-token"}));
       jest.spyOn(browser.tabs, "query").mockImplementationOnce(() => [{url: 'https://www.passbolt.com'}]);

@@ -11,11 +11,10 @@ import OnExtensionInstalledController from "./controller/extension/onExtensionIn
 import TabService from "./service/tab/tabService";
 import User from "./model/user";
 import Log from "./model/log";
-import StartLoopAuthSessionCheckService from "./service/auth/startLoopAuthSessionCheckService";
 import OnExtensionUpdateAvailableController from "./controller/extension/onExtensionUpdateAvailableController";
-import PostLogoutService from "./service/auth/postLogoutService";
 import CheckAuthStatusService from "./service/auth/checkAuthStatusService";
 import GlobalAlarmService from "./service/alarm/globalAlarmService";
+import PostLoginService from "./service/auth/postLoginService";
 
 const main = async() => {
   /**
@@ -42,9 +41,7 @@ const checkAndProcessIfUserAuthenticated = async() => {
   try {
     const authStatus = await checkAuthStatusService.checkAuthStatus(true);
     if (authStatus.isAuthenticated) {
-      await StartLoopAuthSessionCheckService.exec();
-      const event = new Event('passbolt.auth.after-login');
-      self.dispatchEvent(event);
+      await PostLoginService.postLogin();
     }
   } catch (error) {
     /*
@@ -56,12 +53,6 @@ const checkAndProcessIfUserAuthenticated = async() => {
 };
 
 main();
-
-
-/**
- * Add listener on passbolt logout
- */
-self.addEventListener("passbolt.auth.after-logout", PostLogoutService.exec);
 
 /**
  * On installed the extension, add first install in the url tab of setup or recover

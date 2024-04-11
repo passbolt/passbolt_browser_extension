@@ -361,7 +361,7 @@ const UserSingleton = (function() {
        */
       self.addEventListener("passbolt.auth.after-logout", () => Promise.all([
         PassphraseStorageService.flush(),
-        KeepSessionAliveService.stopKeepingSessionAlive()
+        KeepSessionAliveService.stop()
       ])
       );
     }

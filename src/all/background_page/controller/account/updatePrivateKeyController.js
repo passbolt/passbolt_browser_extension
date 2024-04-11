@@ -73,7 +73,7 @@ class UpdatePrivateKeyController {
     }
     await this.accountModel.updatePrivateKey(userPrivateArmoredKey);
     await PassphraseStorageService.flushPassphrase();
-    if (KeepSessionAliveService.isSessionKeptUntilLogOut()) {
+    if (KeepSessionAliveService.isStarted()) {
       await PassphraseStorageService.set(newPassphrase);
     }
     await FileService.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", this.worker.tab.id);

@@ -73,9 +73,9 @@ class SignInSetupController {
 
     await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(this.account.userKeyFingerprint, this.account.userPrivateArmoredKey, this.runtimeMemory.passphrase);
     if (rememberMe) {
-      Promise.all([
+      await Promise.all([
         PassphraseStorageService.set(this.runtimeMemory.passphrase, -1),
-        KeepSessionAliveService.set(),
+        KeepSessionAliveService.start(),
       ]);
     }
     await PostLoginService.postLogin();

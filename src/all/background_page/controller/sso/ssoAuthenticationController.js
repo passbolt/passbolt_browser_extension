@@ -90,9 +90,9 @@ class SsoAuthenticationController {
       const passphrase = await DecryptSsoPassphraseService.decrypt(clientPartSsoKit.secret, clientPartSsoKit.nek, serverKey, clientPartSsoKit.iv1, clientPartSsoKit.iv2);
       await this.popupHandler.closeHandler();
       await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(this.account.userKeyFingerprint, this.account.userPrivateArmoredKey, passphrase);
-      Promise.all([
+      await Promise.all([
         PassphraseStorageService.set(passphrase, -1),
-        KeepSessionAliveService.set(),
+        KeepSessionAliveService.start(),
       ]);
       await PostLoginService.postLogin();
       if (isInQuickAccessMode) {

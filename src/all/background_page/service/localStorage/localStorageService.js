@@ -54,7 +54,7 @@ class LocalStorageService {
     PostponeUserSettingInvitationService.reset();
     PassphraseStorageService.flush();
     SsoKitTemporaryStorageService.flush();
-    KeepSessionAliveService.stopKeepingSessionAlive();
+    KeepSessionAliveService.stop();
     LocalStorageService.flushAccountBasedStorages();
   }
 

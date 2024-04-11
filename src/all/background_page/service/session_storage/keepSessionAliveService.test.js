@@ -24,13 +24,13 @@ beforeEach(async() => {
 
 describe("KeepSessionAliveService", () => {
   describe("KeepSessionAliveService::set", () => {
-    it("should set the alarm if none has been set already", async() => {
+    it("should start the alarm if none has been set already", async() => {
       expect.assertions(5);
       const spyOnAlarmGet = jest.spyOn(browser.alarms, "get");
       const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
       const spyOnAlarmAddListener = jest.spyOn(browser.alarms.onAlarm, "addListener");
 
-      await KeepSessionAliveService.set();
+      await KeepSessionAliveService.start();
 
       expect(spyOnAlarmGet).toHaveBeenCalledTimes(1);
       expect(spyOnAlarmCreate).toHaveBeenCalledTimes(1);
@@ -42,13 +42,13 @@ describe("KeepSessionAliveService", () => {
       expect(spyOnAlarmAddListener).toHaveBeenCalledWith(KeepSessionAliveService.handleKeepSessionAlive);
     });
 
-    it("should not set the alarm if one already exist", async() => {
+    it("should not start the alarm if one already exist", async() => {
       expect.assertions(2);
       const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
       const spyOnAlarmAddListener = jest.spyOn(browser.alarms.onAlarm, "addListener");
 
-      await KeepSessionAliveService.set();
-      await KeepSessionAliveService.set();
+      await KeepSessionAliveService.start();
+      await KeepSessionAliveService.start();
 
       expect(spyOnAlarmCreate).toHaveBeenCalledTimes(1);
       expect(spyOnAlarmAddListener).toHaveBeenCalledTimes(1);
@@ -56,30 +56,30 @@ describe("KeepSessionAliveService", () => {
     });
   });
 
-  describe("KeepSessionAliveService::isSessionKeptUntilLogOut", () => {
-    it("should return true if the alarm is set", async() => {
+  describe("KeepSessionAliveService::isStarted", () => {
+    it("should return true if the alarm is started", async() => {
       expect.assertions(1);
-      await KeepSessionAliveService.set();
-      const isSessionKept = await KeepSessionAliveService.isSessionKeptUntilLogOut();
+      await KeepSessionAliveService.start();
+      const isSessionKept = await KeepSessionAliveService.isStarted();
       expect(isSessionKept).toStrictEqual(true);
     });
 
     it("should return false if the alarm has been cleared out", async() => {
       expect.assertions(1);
-      await KeepSessionAliveService.set();
+      await KeepSessionAliveService.start();
       await browser.alarms.clearAll();
-      const isSessionKept = await KeepSessionAliveService.isSessionKeptUntilLogOut();
+      const isSessionKept = await KeepSessionAliveService.isStarted();
       expect(isSessionKept).toStrictEqual(false);
     });
 
     it("should return false if the alarm has never been set", async() => {
       expect.assertions(1);
-      const isSessionKept = await KeepSessionAliveService.isSessionKeptUntilLogOut();
+      const isSessionKept = await KeepSessionAliveService.isStarted();
       expect(isSessionKept).toStrictEqual(false);
     });
   });
 
-  describe("KeepSessionAliveService::stopKeepingSessionAlive", () => {
+  describe("KeepSessionAliveService::stop", () => {
     it("should clear the alarms and remove listeners if any", async() => {
       expect.assertions(4);
 
@@ -87,7 +87,7 @@ describe("KeepSessionAliveService", () => {
       const spyOnAlarmHasListener = jest.spyOn(browser.alarms.onAlarm, "hasListener").mockImplementation(() => true);
       const spyOnAlarmRemoveListener = jest.spyOn(browser.alarms.onAlarm, "removeListener");
 
-      await KeepSessionAliveService.stopKeepingSessionAlive();
+      await KeepSessionAliveService.stop();
 
       expect(spyOnAlarmClear).toHaveBeenCalledTimes(1);
       expect(spyOnAlarmClear).toHaveBeenCalledWith("SessionKeepAlive");
@@ -102,7 +102,7 @@ describe("KeepSessionAliveService", () => {
       const spyOnAlarmHasListener = jest.spyOn(browser.alarms.onAlarm, "hasListener").mockImplementation(() => false);
       const spyOnAlarmRemoveListener = jest.spyOn(browser.alarms.onAlarm, "removeListener");
 
-      await KeepSessionAliveService.stopKeepingSessionAlive();
+      await KeepSessionAliveService.stop();
 
       expect(spyOnAlarmClear).toHaveBeenCalledTimes(1);
       expect(spyOnAlarmClear).toHaveBeenCalledWith("SessionKeepAlive");

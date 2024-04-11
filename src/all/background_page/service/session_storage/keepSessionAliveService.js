@@ -20,10 +20,10 @@ const SESSION_CHECK_INTERNAL = 15;
 
 class KeepSessionAliveService {
   /**
-   * Set the current to be kept alive if not already.
+   * Keeps the user session alive.
    * @return {Promise<void>}
    */
-  static async set() {
+  static async start() {
     const keepAliveAlarm = await browser.alarms.get(KeepSessionAliveService.ALARM_NAME);
     if (!keepAliveAlarm) {
       await this._keepAliveSession();
@@ -31,10 +31,10 @@ class KeepSessionAliveService {
   }
 
   /**
-   * Returns true if the session is set to be kept until the user logs out.
+   * Check if this service is started.
    * @returns {Promise<boolean>}
    */
-  static async isSessionKeptUntilLogOut() {
+  static async isStarted() {
     return Boolean(await browser.alarms.get(KeepSessionAliveService.ALARM_NAME));
   }
 
@@ -42,7 +42,7 @@ class KeepSessionAliveService {
    * Removes the stored passphrase from the session memory.
    * @return {Promise<void>}
    */
-  static async stopKeepingSessionAlive() {
+  static async stop() {
     await browser.alarms.clear(KeepSessionAliveService.ALARM_NAME);
     if (browser.alarms.onAlarm.hasListener(KeepSessionAliveService.handleKeepSessionAlive)) {
       browser.alarms.onAlarm.removeListener(KeepSessionAliveService.handleKeepSessionAlive);
@@ -59,6 +59,7 @@ class KeepSessionAliveService {
       return;
     }
 
+    // The session is kept alive only for the duration users wanted their passphrase to be remembered.
     if (await PassphraseStorageService.get() === null) {
       return;
     }

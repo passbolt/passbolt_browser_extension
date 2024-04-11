@@ -100,9 +100,9 @@ class AuthLoginController {
        * MFA may not be complete yet, so no need to preload things here
        */
       if (rememberMe) {
-        Promise.all([
+        await Promise.all([
           PassphraseStorageService.set(passphrase, -1),
-          KeepSessionAliveService.set(),
+          KeepSessionAliveService.start(),
         ]);
       }
       await PostLoginService.postLogin();

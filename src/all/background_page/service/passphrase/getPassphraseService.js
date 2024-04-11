@@ -128,9 +128,9 @@ export default class GetPassphraseService {
       return;
     }
 
-    Promise.all([
+    await Promise.all([
       PassphraseStorageService.set(passphrase, duration),
-      KeepSessionAliveService.set(),
+      KeepSessionAliveService.start(),
     ]);
     const userRememberMeLatestChoiceEntity = new UserRememberMeLatestChoiceEntity({
       duration: parseInt(duration, 10)

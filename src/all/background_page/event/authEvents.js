@@ -8,7 +8,6 @@
  */
 import AuthVerifyServerKeyController from "../controller/auth/authVerifyServerKeyController";
 import AuthCheckStatusController from "../controller/auth/authCheckStatusController";
-import AuthIsAuthenticatedController from "../controller/auth/authIsAuthenticatedController";
 import AuthIsMfaRequiredController from "../controller/auth/authIsMfaRequiredController";
 import CheckPassphraseController from "../controller/crypto/checkPassphraseController";
 import RequestHelpCredentialsLostController from "../controller/auth/requestHelpCredentialsLostController";
@@ -30,17 +29,6 @@ import ReplaceServerKeyController from "../controller/auth/replaceServerKeyContr
  * @param {AccountEntity} account The account
  */
 const listen = function(worker, apiClientOptions, account) {
-  /*
-   * Check if the user is authenticated.
-   *
-   * @listens passbolt.auth.is-authenticated
-   * @param requestId {uuid} The request identifier
-   */
-  worker.port.on('passbolt.auth.is-authenticated', async(requestId, flushCache = true) => {
-    const controller = new AuthIsAuthenticatedController(worker, requestId);
-    controller._exec(flushCache);
-  });
-
   /*
    * Check if the user requires to complete the mfa.
    *

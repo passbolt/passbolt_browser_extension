@@ -24,10 +24,14 @@ class KeepSessionAliveService {
    * @return {Promise<void>}
    */
   static async start() {
-    const keepAliveAlarm = await browser.alarms.get(KeepSessionAliveService.ALARM_NAME);
-    if (!keepAliveAlarm) {
-      await this._keepAliveSession();
+    if (await KeepSessionAliveService.isStarted()) {
+      return;
     }
+
+    await browser.alarms.create(KeepSessionAliveService.ALARM_NAME, {
+      delayInMinutes: SESSION_CHECK_INTERNAL,
+      periodInMinutes: SESSION_CHECK_INTERNAL
+    });
   }
 
   /**
@@ -44,9 +48,6 @@ class KeepSessionAliveService {
    */
   static async stop() {
     await browser.alarms.clear(KeepSessionAliveService.ALARM_NAME);
-    if (browser.alarms.onAlarm.hasListener(KeepSessionAliveService.handleKeepSessionAlive)) {
-      browser.alarms.onAlarm.removeListener(KeepSessionAliveService.handleKeepSessionAlive);
-    }
   }
 
   /**
@@ -67,20 +68,6 @@ class KeepSessionAliveService {
     const apiClientOptions = await User.getInstance().getApiClientOptions();
     const userService = new UserService(apiClientOptions);
     userService.keepSessionAlive();
-  }
-
-  /**
-   * Creates an alarm to ensure session is kept alive.
-   * @returns {Promise<void>}
-   * @private
-   */
-  static async _keepAliveSession() {
-    await browser.alarms.create(KeepSessionAliveService.ALARM_NAME, {
-      delayInMinutes: SESSION_CHECK_INTERNAL,
-      periodInMinutes: SESSION_CHECK_INTERNAL
-    });
-
-    await browser.alarms.onAlarm.addListener(KeepSessionAliveService.handleKeepSessionAlive);
   }
 
   /**

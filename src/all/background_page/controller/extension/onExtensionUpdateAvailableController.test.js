@@ -24,6 +24,7 @@ import Port from "../../sdk/port";
 import {mockPort} from "../../sdk/port/portManager.test.data";
 import PortManager from "../../sdk/port/portManager";
 import BrowserTabService from "../../service/ui/browserTab.service";
+import PublicWebsiteSignInPagemod from "../../pagemod/publicWebsiteSignInPagemod";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -85,7 +86,7 @@ describe("OnExtensionInstalledController", () => {
     });
 
     it("Should clean and exec update", async() => {
-      expect.assertions(8);
+      expect.assertions(10);
       // data mocked
       const worker = readWorker();
       await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
@@ -93,11 +94,16 @@ describe("OnExtensionInstalledController", () => {
       await WorkersSessionStorage.addWorker(new WorkerEntity(worker2));
       const worker3 = readWorker({name: WebIntegrationPagemod.appName});
       await WorkersSessionStorage.addWorker(new WorkerEntity(worker3));
+      const worker4 = readWorker({name: PublicWebsiteSignInPagemod.appName});
+      await WorkersSessionStorage.addWorker(new WorkerEntity(worker4));
       const webIntegrationPort = mockPort({name: worker2.id, tabId: worker2.tabId, frameId: worker2.frameId});
       const webIntegrationPortWrapper = new Port(webIntegrationPort);
       const webIntegrationPort2 = mockPort({name: worker3.id, tabId: worker3.tabId, frameId: worker3.frameId});
       const webIntegrationPortWrapper2 = new Port(webIntegrationPort2);
+      const publicWebsiteSignInPort = mockPort({name: worker4.id, tabId: worker4.tabId, frameId: worker4.frameId});
+      const publicWebsiteSignInPortWrapper = new Port(publicWebsiteSignInPort);
       PortManager.registerPort(webIntegrationPortWrapper2);
+      PortManager.registerPort(publicWebsiteSignInPortWrapper);
       // mock function
       MockExtension.withConfiguredAccount();
       jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => true);
@@ -105,6 +111,7 @@ describe("OnExtensionInstalledController", () => {
       jest.spyOn(browser.runtime, "reload");
       jest.spyOn(webIntegrationPortWrapper, "emit");
       jest.spyOn(webIntegrationPortWrapper2, "emit");
+      jest.spyOn(publicWebsiteSignInPortWrapper, "emit");
       // process
       await OnExtensionUpdateAvailableController.exec();
       // expectation
@@ -121,6 +128,8 @@ describe("OnExtensionInstalledController", () => {
       expect(webIntegrationPortWrapper.emit).toHaveBeenCalledTimes(1);
       expect(webIntegrationPortWrapper2.emit).toHaveBeenCalledWith("passbolt.content-script.destroy");
       expect(webIntegrationPortWrapper2.emit).toHaveBeenCalledTimes(1);
+      expect(publicWebsiteSignInPortWrapper.emit).toHaveBeenCalledWith("passbolt.content-script.destroy");
+      expect(publicWebsiteSignInPortWrapper.emit).toHaveBeenCalledTimes(1);
       expect(BrowserTabService.sendMessage).toHaveBeenCalledWith(worker2, "passbolt.port.connect", worker2.id);
       expect(BrowserTabService.sendMessage).toHaveBeenCalledTimes(1);
       expect(browser.runtime.reload).toHaveBeenCalledTimes(1);

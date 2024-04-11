@@ -70,6 +70,8 @@ describe("PassphraseStorageService", () => {
       const spyOnFlush = jest.spyOn(PassphraseStorageService, "flush");
       const spyOnKeepAliveSession = jest.spyOn(PassphraseStorageService, "_handleKeepSessionAlive");
 
+      browser.alarms.onAlarm.addListener(async alarm => await PassphraseStorageService.handleFlushEvent(alarm));
+
       await PassphraseStorageService.flush();
       expect(spyOnFlush).toHaveBeenCalledTimes(1);
 
@@ -125,6 +127,8 @@ describe("PassphraseStorageService", () => {
     it("should return null after the delay is passed", async() => {
       expect.assertions(3);
 
+      browser.alarms.onAlarm.addListener(async alarm => await PassphraseStorageService.handleFlushEvent(alarm));
+
       await PassphraseStorageService.flush();
 
       const emptyPassphrase = await PassphraseStorageService.get();
@@ -149,6 +153,8 @@ describe("PassphraseStorageService", () => {
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
       const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
       const spyOnAlarmListeners = jest.spyOn(browser.alarms.onAlarm, "addListener");
+
+      browser.alarms.onAlarm.addListener(async alarm => await PassphraseStorageService.handleFlushEvent(alarm));
 
       await PassphraseStorageService.flush();
 
@@ -200,6 +206,8 @@ describe("PassphraseStorageService", () => {
       const spyOnAlarmListeners = jest.spyOn(browser.alarms.onAlarm, "addListener");
       const spyOnAlarmRemoveListeners = jest.spyOn(browser.alarms.onAlarm, "removeListener");
 
+      browser.alarms.onAlarm.addListener(async alarm => await PassphraseStorageService.handleFlushEvent(alarm));
+
       await PassphraseStorageService.flush();
 
       const passphrase = "This is a very strong passphrase";
@@ -218,7 +226,7 @@ describe("PassphraseStorageService", () => {
 
       expect(spyOnAlarmClear).toHaveBeenCalledWith("PassphraseStorageFlush");
       expect(spyOnAlarmClear).toHaveBeenCalledWith("SessionKeepAlive");
-      expect(spyOnAlarmRemoveListeners).toHaveBeenCalledTimes(4);
+      expect(spyOnAlarmRemoveListeners).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -226,6 +234,8 @@ describe("PassphraseStorageService", () => {
     it("should clear the 'keep session alive' alarm", async() => {
       expect.assertions(1);
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
+
+      browser.alarms.onAlarm.addListener(async alarm => await PassphraseStorageService.handleFlushEvent(alarm));
 
       await PassphraseStorageService.flush();
 
@@ -237,6 +247,8 @@ describe("PassphraseStorageService", () => {
       expect.assertions(2);
       const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
       const spyOnAlarmRemoveListeners = jest.spyOn(browser.alarms.onAlarm, "removeListener");
+
+      browser.alarms.onAlarm.addListener(async alarm => await PassphraseStorageService.handleFlushEvent(alarm));
 
       await PassphraseStorageService.flush();
 

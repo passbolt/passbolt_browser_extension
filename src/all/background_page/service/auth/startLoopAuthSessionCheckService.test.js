@@ -12,6 +12,7 @@
  * @since         3.3.0
  */
 import CheckAuthStatusService from "./checkAuthStatusService";
+import PostLogoutService from "./postLogoutService";
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
 
 jest.useFakeTimers();
@@ -53,20 +54,20 @@ describe("StartLoopAuthSessionCheckService", () => {
     jest.advanceTimersByTime(60000);
     expect(spyIsAuthenticated).toHaveBeenCalledTimes(2);
 
-    self.dispatchEvent(new Event('passbolt.auth.after-logout'));
+    await PostLogoutService.exec();
     expect(spyScheduleAuthSessionCheck).toHaveBeenCalledTimes(1);
     expect(spyIsAuthenticated).toHaveBeenCalledTimes(2);
     expect(spyClearAuthSessionCheck).toHaveBeenCalledTimes(1);
   });
 
   it("should send logout event if not authenticated anymore", async() => {
-    expect.assertions(10);
+    expect.assertions(6);
     // Function mocked
     const spyScheduleAuthSessionCheck = jest.spyOn(StartLoopAuthSessionCheckService, "scheduleAuthSessionCheck");
     const spyClearAuthSessionCheck = jest.spyOn(StartLoopAuthSessionCheckService, "clearAlarm");
-    const spyDispatchEvent = jest.spyOn(self, "dispatchEvent");
     const authStatus = {isAuthenticated: false, isMfaRequired: false};
     const spyIsAuthenticated = jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(() => Promise.resolve(authStatus));
+    const spyOnPostLogout = jest.spyOn(PostLogoutService, "exec").mockImplementation(async() => {});
 
     //mocking top-level alarm handler
     browser.alarms.onAlarm.addListener(async alarm => await StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm(alarm));
@@ -80,13 +81,9 @@ describe("StartLoopAuthSessionCheckService", () => {
 
     jest.advanceTimersByTime(60000);
     await Promise.resolve();
-    expect(spyScheduleAuthSessionCheck).toHaveBeenCalledTimes(1);
-    expect(spyIsAuthenticated).toHaveBeenCalledTimes(1);
-    expect(spyClearAuthSessionCheck).toHaveBeenCalledTimes(1);
 
-    expect(spyDispatchEvent).toHaveBeenCalledWith(new Event('passbolt.auth.after-logout'));
     expect(spyScheduleAuthSessionCheck).toHaveBeenCalledTimes(1);
     expect(spyIsAuthenticated).toHaveBeenCalledTimes(1);
-    expect(spyClearAuthSessionCheck).toHaveBeenCalledTimes(1);
+    expect(spyOnPostLogout).toHaveBeenCalledTimes(1);
   });
 });

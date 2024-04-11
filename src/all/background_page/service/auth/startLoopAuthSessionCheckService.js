@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.0.0
  */
-
 import CheckAuthStatusService from "./checkAuthStatusService";
 
 const CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD = 60000;
@@ -19,59 +18,61 @@ const AUTH_SESSION_CHECK_ALARM = "AuthSessionCheck";
 
 class StartLoopAuthSessionCheckService {
   /**
-   * Constructor
-   */
-  constructor() {
-    this.checkAuthStatusService = new CheckAuthStatusService();
-    this.checkAuthStatus = this.checkAuthStatus.bind(this);
-    this.clearAlarm = this.clearAlarm.bind(this);
-  }
-
-  /**
    * Exec the StartLoopAuthSessionCheckService
    * @return {Promise<void>}
    */
-  async exec() {
-    await this.scheduleAuthSessionCheck();
-    self.addEventListener("passbolt.auth.after-logout", this.clearAlarm);
+  static async exec() {
+    await StartLoopAuthSessionCheckService.scheduleAuthSessionCheck();
+    self.addEventListener("passbolt.auth.after-logout", StartLoopAuthSessionCheckService.clearAlarm);
   }
 
   /**
    * Schedule an alarm to check if the user is authenticated.
+   * @returns {Promise<void>}
    * @private
    */
-  async scheduleAuthSessionCheck() {
-    // Create an alarm to check the auth session
-    await browser.alarms.create(AUTH_SESSION_CHECK_ALARM, {
+  static async scheduleAuthSessionCheck() {
+    // Create an alarm to check the auth session. This alarm is managed in `handleTopLevelAlarms`
+    await browser.alarms.create(StartLoopAuthSessionCheckService.ALARM_NAME, {
       // this `periodInMinutes` is set to ensure that after going back from sleep mode the alarms still triggers
       periodInMinutes: 1,
       when: Date.now() + CHECK_IS_AUTHENTICATED_INTERVAL_PERIOD
     });
-    browser.alarms.onAlarm.addListener(this.checkAuthStatus);
   }
 
   /**
    * Clear the alarm and listener configured for flushing the resource if any.
+   * @returns {Promise<void>}
    * @private
    */
-  async clearAlarm() {
-    browser.alarms.onAlarm.removeListener(this.checkAuthStatus);
-    await browser.alarms.clear(AUTH_SESSION_CHECK_ALARM);
+  static async clearAlarm() {
+    await browser.alarms.clear(StartLoopAuthSessionCheckService.ALARM_NAME);
   }
 
   /**
    * Check if the user is authenticated when the AuthSessionCheck alarm triggers.
    * - In the case the user is logged out, trigger a passbolt.auth.after-logout event.
    * @param {Alarm} alarm
-   * @private
+   * @returns {Promise<void>}
    */
-  async checkAuthStatus(alarm) {
-    if (alarm.name === AUTH_SESSION_CHECK_ALARM) {
-      const authStatus = await this.checkAuthStatusService.checkAuthStatus();
-      if (!authStatus.isAuthenticated) {
-        self.dispatchEvent(new Event('passbolt.auth.after-logout'));
-      }
+  static async handleAuthStatusCheckAlarm(alarm) {
+    if (alarm.name !== StartLoopAuthSessionCheckService.ALARM_NAME) {
+      return;
     }
+
+    const checkAuthStatusService = new CheckAuthStatusService();
+    const authStatus = await checkAuthStatusService.checkAuthStatus(true);
+    if (!authStatus.isAuthenticated) {
+      self.dispatchEvent(new Event('passbolt.auth.after-logout'));
+    }
+  }
+
+  /**
+   * Returns the alarm names that this service handles
+   * @return {string}
+   */
+  static get ALARM_NAME() {
+    return AUTH_SESSION_CHECK_ALARM;
   }
 }
 

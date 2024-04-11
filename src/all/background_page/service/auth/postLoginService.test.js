@@ -22,12 +22,12 @@ describe("PostLoginService", () => {
   describe("PostLoinService::postLogin", () => {
     it("Should call the start loop auth session check service and dispatch a post login event", async() => {
       expect.assertions(2);
-      jest.spyOn(StartLoopAuthSessionCheckService.prototype, "exec");
+      jest.spyOn(StartLoopAuthSessionCheckService, "exec");
       jest.spyOn(self, "dispatchEvent");
 
       await PostLoginService.postLogin();
 
-      expect(StartLoopAuthSessionCheckService.prototype.exec).toHaveBeenCalled();
+      expect(StartLoopAuthSessionCheckService.exec).toHaveBeenCalled();
       expect(self.dispatchEvent).toHaveBeenCalledWith(new Event('passbolt.auth.after-login'));
     });
   });

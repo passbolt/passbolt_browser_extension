@@ -19,6 +19,7 @@ import TabService from "../all/background_page/service/tab/tabService";
 import OnExtensionUpdateAvailableController
   from "../all/background_page/controller/extension/onExtensionUpdateAvailableController";
 import PostLogoutService from "../all/background_page/service/auth/postLogoutService";
+import {topLevelAlarmMapping} from "../all/background_page/utils/topLevelAlarmMapping.data";
 
 /**
  * Load all system requirement
@@ -59,3 +60,21 @@ browser.runtime.onConnect.addListener(PortManager.onPortConnect);
  * Add listener on tabs on removed
  */
 browser.tabs.onRemoved.addListener(PortManager.onTabRemoved);
+
+/**
+ * Top level alarm handler to ensure alarm callbacks are still processed after the service worker awakes.
+ * @param {Alarm} alarm
+ */
+const handleTopLevelAlarms = alarm => {
+  topLevelAlarmMapping[alarm.name]?.(alarm);
+};
+
+/**
+ * Ensures the top-level alarm handler is not triggered twice
+ */
+browser.alarms.onAlarm.removeListener(handleTopLevelAlarms);
+
+/**
+ * Add a top-level alarm handler.
+ */
+browser.alarms.onAlarm.addListener(handleTopLevelAlarms);

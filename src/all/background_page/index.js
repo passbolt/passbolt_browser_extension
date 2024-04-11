@@ -15,6 +15,7 @@ import StartLoopAuthSessionCheckService from "./service/auth/startLoopAuthSessio
 import OnExtensionUpdateAvailableController from "./controller/extension/onExtensionUpdateAvailableController";
 import PostLogoutService from "./service/auth/postLogoutService";
 import CheckAuthStatusService from "./service/auth/checkAuthStatusService";
+import {topLevelAlarmMapping} from "./utils/topLevelAlarmMapping.data";
 
 const main = async() => {
   /**
@@ -41,8 +42,7 @@ const checkAndProcessIfUserAuthenticated = async() => {
   try {
     const authStatus = await checkAuthStatusService.checkAuthStatus(true);
     if (authStatus.isAuthenticated) {
-      const startLoopAuthSessionCheckService = new StartLoopAuthSessionCheckService();
-      await startLoopAuthSessionCheckService.exec();
+      await StartLoopAuthSessionCheckService.exec();
       const event = new Event('passbolt.auth.after-login');
       self.dispatchEvent(event);
     }
@@ -93,3 +93,20 @@ browser.runtime.onConnect.addListener(PortManager.onPortConnect);
  */
 browser.tabs.onRemoved.addListener(PortManager.onTabRemoved);
 
+/**
+ * Top level alarm handler to ensure alarm callbacks are still processed after the service worker awakes.
+ * @param {Alarm} alarm
+ */
+const handleTopLevelAlarms = alarm => {
+  topLevelAlarmMapping[alarm.name]?.(alarm);
+};
+
+/**
+ * Ensures the top-level alarm handler is not triggered twice
+ */
+browser.alarms.onAlarm.removeListener(handleTopLevelAlarms);
+
+/**
+ * Add a top-level alarm handler.
+ */
+browser.alarms.onAlarm.addListener(handleTopLevelAlarms);

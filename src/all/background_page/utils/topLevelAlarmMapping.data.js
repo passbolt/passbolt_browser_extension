@@ -12,17 +12,11 @@
  * @since         4.7.0
  */
 
-import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
-class PostLoginService {
-  /**
-   * Post login
-   * @returns {Promise<void>}
-   */
-  static async postLogin() {
-    await StartLoopAuthSessionCheckService.exec();
-    const event = new Event('passbolt.auth.after-login');
-    self.dispatchEvent(event);
-  }
-}
+import StartLoopAuthSessionCheckService from "../service/auth/startLoopAuthSessionCheckService";
 
-export default PostLoginService;
+/**
+ * Top-level alarm callback mapping.
+ */
+export const topLevelAlarmMapping = {
+  [StartLoopAuthSessionCheckService.ALARM_NAME]: StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm,
+};

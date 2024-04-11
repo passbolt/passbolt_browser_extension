@@ -11,33 +11,36 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.3.0
  */
+import CheckAuthStatusService from "./checkAuthStatusService";
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
 
 jest.useFakeTimers();
 
 // Reset the modules before each test.
-beforeEach(() => {
+beforeEach(async() => {
   jest.resetModules();
   jest.clearAllMocks();
   jest.clearAllTimers();
+  await browser.alarms.clearAllMocks();
 });
 
 describe("StartLoopAuthSessionCheckService", () => {
   it("should trigger a check authentication and clear alarm on logout", async() => {
-    expect.assertions(12);
-    // Data mocked
-    const startLoopAuthSessionCheckService = new StartLoopAuthSessionCheckService();
+    expect.assertions(11);
     // Function mocked
-    const spyScheduleAuthSessionCheck = jest.spyOn(startLoopAuthSessionCheckService, "scheduleAuthSessionCheck");
-    const spyClearAuthSessionCheck = jest.spyOn(startLoopAuthSessionCheckService, "clearAlarm");
+    const spyScheduleAuthSessionCheck = jest.spyOn(StartLoopAuthSessionCheckService, "scheduleAuthSessionCheck");
+    const spyClearAuthSessionCheck = jest.spyOn(StartLoopAuthSessionCheckService, "clearAlarm");
     const authStatus = {isAuthenticated: true, isMfaRequired: false};
-    const spyIsAuthenticated = jest.spyOn(startLoopAuthSessionCheckService.checkAuthStatusService, "checkAuthStatus").mockImplementation(() => Promise.resolve(authStatus));
-    const spyAlarmRemoveListener = jest.spyOn(browser.alarms.onAlarm, "removeListener");
+    const spyIsAuthenticated = jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(() => Promise.resolve(authStatus));
+
+    //mocking top-level alarm handler
+    browser.alarms.onAlarm.addListener(async alarm => await StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm(alarm));
 
     expect(spyScheduleAuthSessionCheck).not.toHaveBeenCalled();
 
     // Process
-    await startLoopAuthSessionCheckService.exec();
+    await StartLoopAuthSessionCheckService.exec();
+
     // Expectation
     expect(spyScheduleAuthSessionCheck).toHaveBeenCalledTimes(1);
     expect(spyIsAuthenticated).toHaveBeenCalledTimes(0);
@@ -54,22 +57,22 @@ describe("StartLoopAuthSessionCheckService", () => {
     expect(spyScheduleAuthSessionCheck).toHaveBeenCalledTimes(1);
     expect(spyIsAuthenticated).toHaveBeenCalledTimes(2);
     expect(spyClearAuthSessionCheck).toHaveBeenCalledTimes(1);
-    expect(spyAlarmRemoveListener).toHaveBeenCalledWith(startLoopAuthSessionCheckService.checkAuthStatus);
   });
 
   it("should send logout event if not authenticated anymore", async() => {
-    expect.assertions(11);
-    // Data mocked
-    const startLoopAuthSessionCheckService = new StartLoopAuthSessionCheckService();
+    expect.assertions(10);
     // Function mocked
-    const spyScheduleAuthSessionCheck = jest.spyOn(startLoopAuthSessionCheckService, "scheduleAuthSessionCheck");
-    const spyClearAuthSessionCheck = jest.spyOn(startLoopAuthSessionCheckService, "clearAlarm");
+    const spyScheduleAuthSessionCheck = jest.spyOn(StartLoopAuthSessionCheckService, "scheduleAuthSessionCheck");
+    const spyClearAuthSessionCheck = jest.spyOn(StartLoopAuthSessionCheckService, "clearAlarm");
     const spyDispatchEvent = jest.spyOn(self, "dispatchEvent");
     const authStatus = {isAuthenticated: false, isMfaRequired: false};
-    const spyIsAuthenticated = jest.spyOn(startLoopAuthSessionCheckService.checkAuthStatusService, "checkAuthStatus").mockImplementation(() => Promise.resolve(authStatus));
-    const spyAlarmRemoveListener = jest.spyOn(browser.alarms.onAlarm, "removeListener");
+    const spyIsAuthenticated = jest.spyOn(CheckAuthStatusService.prototype, "checkAuthStatus").mockImplementation(() => Promise.resolve(authStatus));
+
+    //mocking top-level alarm handler
+    browser.alarms.onAlarm.addListener(async alarm => await StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm(alarm));
+
     // Process
-    await startLoopAuthSessionCheckService.exec();
+    await StartLoopAuthSessionCheckService.exec();
     // Expectation
     expect(spyScheduleAuthSessionCheck).toHaveBeenCalledTimes(1);
     expect(spyIsAuthenticated).toHaveBeenCalledTimes(0);
@@ -85,6 +88,5 @@ describe("StartLoopAuthSessionCheckService", () => {
     expect(spyScheduleAuthSessionCheck).toHaveBeenCalledTimes(1);
     expect(spyIsAuthenticated).toHaveBeenCalledTimes(1);
     expect(spyClearAuthSessionCheck).toHaveBeenCalledTimes(1);
-    expect(spyAlarmRemoveListener).toHaveBeenCalledWith(startLoopAuthSessionCheckService.checkAuthStatus);
   });
 });

@@ -24,8 +24,7 @@ class KeepSessionAliveService {
    * @return {Promise<void>}
    */
   static async start() {
-    const keepAliveAlarm = await browser.alarms.get(KeepSessionAliveService.ALARM_NAME);
-    if (keepAliveAlarm) {
+    if (await KeepSessionAliveService.isStarted()) {
       return;
     }
 

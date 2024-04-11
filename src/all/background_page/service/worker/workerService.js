@@ -87,30 +87,37 @@ class WorkerService {
   }
 
   /**
-   * Exec a navigation for worker block in waiting connection status
+   * Treat debounced navigation due to worker awaiting initial connection or reconnection with the content script
+   * application.
    * @private
-   * @param {string} workerId
+   * @param {string} workerId The worker identifier.
    * @return {Promise<void>}
    */
   static async execNavigationForWorkerWaitingConnection(workerId) {
     const worker = await WorkersSessionStorage.getWorkerById(workerId);
     if (!worker) {
-      console.debug("No worker has been found");
+      console.debug(`WorkerService::execNavigationForWorkerWaitingConnection(${workerId}): Worker not found.`);
       return;
     }
+
     const workerEntity = new WorkerEntity(worker);
-    if (workerEntity.isWaitingConnection) {
-      // Get the tab information by tab id to have the last url in case of redirection
-      const tab = await BrowserTabService.getById(workerEntity.tabId);
-      // Execute the process of a web navigation to detect pagemod and script to insert
-      const frameDetails = {
-        // Mapping the tab info as a frame details to be compliant with webNavigation API
-        frameId: 0,
-        tabId: worker.tabId,
-        url: tab.url
-      };
-      await WebNavigationService.exec(frameDetails);
+    if (!workerEntity.isWaitingConnection && !workerEntity.isReconnecting) {
+      console.debug(`WorkerService::execNavigationForWorkerWaitingConnection(${workerId}): Worker port connected to the content script application.`);
+      return;
     }
+
+    // Get the tab information by tab id to have the last url in case of redirection
+    const tab = await BrowserTabService.getById(workerEntity.tabId);
+    // Execute the process of a web navigation to detect pagemod and script to insert
+    const frameDetails = {
+      // Mapping the tab info as a frame details to be compliant with webNavigation API
+      frameId: 0,
+      tabId: worker.tabId,
+      url: tab.url
+    };
+
+    console.debug(`WorkerService::execNavigationForWorkerWaitingConnection(${workerId}): Trigger pagemods identification process.`);
+    await WebNavigationService.exec(frameDetails);
   }
 
   /**

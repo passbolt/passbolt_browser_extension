@@ -13,6 +13,7 @@
  */
 import ResourceInProgressCacheService from "./resourceInProgressCache.service";
 import ExternalResourceEntity from "../../model/entity/resource/external/externalResourceEntity";
+import PostLogoutService from "../auth/postLogoutService";
 
 jest.useFakeTimers();
 
@@ -44,7 +45,7 @@ describe("ResourceInProgressCache service", () => {
     expect(spyOnStorageSet).toHaveBeenCalledTimes(1);
     expect(spyOnStorageSet).toHaveBeenCalledWith({resourceInProgress: fakeResource.toDto()});
 
-    self.dispatchEvent(new Event('passbolt.auth.after-logout'));
+    await PostLogoutService.exec();
     expect(spy).toHaveBeenCalledTimes(2);
   });
 

@@ -48,7 +48,7 @@ class PortManager {
       const workerEntity = new WorkerEntity(worker);
       /*
        * If a port is already connected and is still in memory it should not be registered again
-       * In the MV3 case the memory is flushed when the servoce worker is down so the port should be able to reconnect
+       * In the MV3 case the memory is flushed when the service worker is down so the port should be able to reconnect
        */
       if (!this.isPortExist(port.name) && await this.isKnownPortSender(workerEntity, port.sender)) {
         await this.updateWorkerStatus(workerEntity);

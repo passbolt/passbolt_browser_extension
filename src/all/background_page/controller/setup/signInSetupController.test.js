@@ -85,7 +85,7 @@ describe("SignInSetupController", () => {
       fetch.doMockOnceIf(new RegExp('/sso/settings/current.json'), () => mockApiResponse(withAzureSsoSettings()));
       jest.spyOn(browser.cookies, "get").mockImplementationOnce(() => ({value: "csrf-token"}));
       jest.spyOn(PassphraseStorageService, "set");
-      jest.spyOn(PostLoginService, "postLogin");
+      jest.spyOn(PostLoginService, "exec");
       jest.spyOn(browser.tabs, "update");
 
       SsoDataStorage.setMockedData(null);
@@ -102,7 +102,7 @@ describe("SignInSetupController", () => {
       await controller.exec(true);
       expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledWith(account.userKeyFingerprint, account.userPrivateArmoredKey, runtimeMemory.passphrase);
       expect(PassphraseStorageService.set).toHaveBeenCalledWith(runtimeMemory.passphrase, -1);
-      expect(PostLoginService.postLogin).toHaveBeenCalled();
+      expect(PostLoginService.exec).toHaveBeenCalled();
       expect(GenerateSsoKitService.generate).toHaveBeenCalledWith("ada@passbolt.com", "azure");
       expect(GenerateSsoKitService.generate).toHaveBeenCalledTimes(1);
       expect(browser.tabs.update).toHaveBeenCalledWith(1, {url: account.domain});

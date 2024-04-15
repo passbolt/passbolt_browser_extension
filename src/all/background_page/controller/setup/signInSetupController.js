@@ -78,7 +78,7 @@ class SignInSetupController {
         KeepSessionAliveService.start(),
       ]);
     }
-    await PostLoginService.postLogin();
+    await PostLoginService.exec();
     await this.redirectToApp();
   }
 

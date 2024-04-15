@@ -16,20 +16,14 @@ import LocalStorageService from "../all/background_page/service/localStorage/loc
 import SystemRequirementService from "../all/background_page/service/systemRequirementService/systemRequirementService";
 import OnExtensionInstalledController from "../all/background_page/controller/extension/onExtensionInstalledController";
 import TabService from "../all/background_page/service/tab/tabService";
-import OnExtensionUpdateAvailableController
-  from "../all/background_page/controller/extension/onExtensionUpdateAvailableController";
-import PostLogoutService from "../all/background_page/service/auth/postLogoutService";
+import OnExtensionUpdateAvailableService
+  from "../all/background_page/service/extension/onExtensionUpdateAvailableService";
 import GlobalAlarmService from "../all/background_page/service/alarm/globalAlarmService";
 
 /**
  * Load all system requirement
  */
 SystemRequirementService.get();
-
-/**
- * Add listener on passbolt logout
- */
-self.addEventListener("passbolt.auth.after-logout", PostLogoutService.exec);
 
 /**
  * Add listener on startup
@@ -44,7 +38,7 @@ browser.runtime.onInstalled.addListener(OnExtensionInstalledController.exec);
 /**
  * On update available of the extension, update it when the user is logout
  */
-browser.runtime.onUpdateAvailable.addListener(OnExtensionUpdateAvailableController.exec);
+browser.runtime.onUpdateAvailable.addListener(OnExtensionUpdateAvailableService.exec);
 
 /**
  * Add listener on any tab update

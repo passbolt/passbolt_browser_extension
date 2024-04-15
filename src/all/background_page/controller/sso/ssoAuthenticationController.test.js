@@ -112,13 +112,13 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       const controller = new SsoAuthenticationController(null, null, defaultApiClientOptions(), account);
       jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
       jest.spyOn(PassphraseStorageService, "set");
-      jest.spyOn(PostLoginService, "postLogin").mockImplementation(() => {});
+      jest.spyOn(PostLoginService, "exec").mockImplementation(() => {});
 
       await controller.exec(scenario.providerId);
 
       expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledWith(account.userKeyFingerprint, account.userPrivateArmoredKey, userPassphrase);
       expect(PassphraseStorageService.set).toHaveBeenCalledWith(userPassphrase, -1);
-      expect(PostLoginService.postLogin).toHaveBeenCalled();
+      expect(PostLoginService.exec).toHaveBeenCalled();
     });
 
     it(`Should sign the user using a third party: ${scenario.providerId}`, async() => {
@@ -142,13 +142,13 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       const controller = new SsoAuthenticationController(null, null, defaultApiClientOptions(), account);
       jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
       jest.spyOn(PassphraseStorageService, "set");
-      jest.spyOn(PostLoginService, "postLogin").mockImplementation(() => {});
+      jest.spyOn(PostLoginService, "exec").mockImplementation(() => {});
 
       await controller.exec(scenario.providerId, true);
 
       expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledWith(account.userKeyFingerprint, account.userPrivateArmoredKey, userPassphrase);
       expect(PassphraseStorageService.set).toHaveBeenCalledWith(userPassphrase, -1);
-      expect(PostLoginService.postLogin).toHaveBeenCalled();
+      expect(PostLoginService.exec).toHaveBeenCalled();
 
       const expectedQuickAccessCallParameters =  [
         {name: "uiMode", value: "detached"},

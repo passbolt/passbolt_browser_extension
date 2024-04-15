@@ -31,7 +31,6 @@ import SaveSsoSettingsAsDraftController from "../controller/sso/saveSsoSettingsA
 import ActivateSsoSettingsController from "../controller/sso/activateSsoSettingsController";
 import DeleteSsoSettingsController from "../controller/sso/deleteSsoSettingsController";
 import GenerateSsoKitController from "../controller/auth/generateSsoKitController";
-import AuthenticationEventController from "../controller/auth/authenticationEventController";
 import FindMeController from "../controller/rbac/findMeController";
 import GetOrFindPasswordPoliciesController from "../controller/passwordPolicies/getOrFindPasswordPoliciesController";
 import SavePasswordPoliciesController from "../controller/passwordPolicies/savePasswordPoliciesController";
@@ -45,9 +44,6 @@ import DeletePasswordExpirySettingsController from "../controller/passwordExpiry
 import GetOrFindPasswordExpirySettingsController from "../controller/passwordExpiry/getOrFindPasswordExpirySettingsController";
 
 const listen = function(worker, apiClientOptions, account) {
-  AuthenticationEventController.initialise(worker);
-  AuthenticationEventController.startListen();
-
   /*
    * Whenever the (React) app changes his route
    * @listens passbolt.app.route-changed

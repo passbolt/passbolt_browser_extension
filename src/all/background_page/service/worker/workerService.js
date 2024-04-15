@@ -126,19 +126,29 @@ class WorkerService {
    * @return {Promise<void>}
    */
   static async destroyWorkersByName(workersName) {
+    this.emitOnWorkersWithName('passbolt.content-script.destroy', workersName);
+  }
+
+  /**
+   * Emit an event to all workers matching the given workersName
+   * @param {string} eventName
+   * @param {Array<string>} workersName
+   * @return {Promise<void>}
+   */
+  static async emitOnWorkersWithName(eventName, workersName) {
     const workers = await WorkersSessionStorage.getWorkersByNames(workersName);
     for (const worker of workers) {
       if (!PortManager.isPortExist(worker.id)) {
         try {
           await BrowserTabService.sendMessage(worker, "passbolt.port.connect", worker.id);
         } catch (error) {
-          console.debug("Unable to reconnect the port before to update the extension");
+          console.debug("Unable to reconnect the port prior to emitting event");
           console.error(error);
           continue;
         }
       }
       const port = PortManager.getPortById(worker.id);
-      port.emit('passbolt.content-script.destroy');
+      port.emit(eventName);
     }
   }
 }

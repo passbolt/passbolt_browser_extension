@@ -11,7 +11,7 @@ import OnExtensionInstalledController from "./controller/extension/onExtensionIn
 import TabService from "./service/tab/tabService";
 import User from "./model/user";
 import Log from "./model/log";
-import OnExtensionUpdateAvailableController from "./controller/extension/onExtensionUpdateAvailableController";
+import OnExtensionUpdateAvailableService from "./service/extension/onExtensionUpdateAvailableService";
 import CheckAuthStatusService from "./service/auth/checkAuthStatusService";
 import GlobalAlarmService from "./service/alarm/globalAlarmService";
 import PostLoginService from "./service/auth/postLoginService";
@@ -62,7 +62,7 @@ browser.runtime.onInstalled.addListener(OnExtensionInstalledController.exec);
 /**
  * On update available of the extension, update it when the user is logout
  */
-browser.runtime.onUpdateAvailable.addListener(OnExtensionUpdateAvailableController.exec);
+browser.runtime.onUpdateAvailable.addListener(OnExtensionUpdateAvailableService.exec);
 
 /**
  * Add listener on startup

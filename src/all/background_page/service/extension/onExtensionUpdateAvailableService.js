@@ -11,24 +11,23 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.6.0
  *
- * On extension update available controller
+ * On extension update available service
  */
 import User from "../../model/user";
-import AuthenticationStatusService from "../../service/authenticationStatusService";
+import AuthenticationStatusService from "../authenticationStatusService";
 import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequiredError";
 import WebIntegrationPagemod from "../../pagemod/webIntegrationPagemod";
-import WorkerService from "../../service/worker/workerService";
+import WorkerService from "../worker/workerService";
 import PublicWebsiteSignInPagemod from "../../pagemod/publicWebsiteSignInPagemod";
 
-class OnExtensionUpdateAvailableController {
+class OnExtensionUpdateAvailableService {
   /**
-   * Execute the OnExtensionUpdateAvailableController process
+   * Execute the OnExtensionUpdateAvailableService process
    * @returns {Promise<void>}
    */
   static async exec() {
     if (await isUserAuthenticated()) {
-      // Add listener on passbolt logout to update the extension
-      self.addEventListener("passbolt.auth.after-logout", this.cleanAndReload);
+      this.shouldReload = true;
     } else {
       await this.cleanAndReload();
     }
@@ -42,19 +41,29 @@ class OnExtensionUpdateAvailableController {
     await WorkerService.destroyWorkersByName([WebIntegrationPagemod.appName, PublicWebsiteSignInPagemod.appName]);
     browser.runtime.reload();
   }
+
+  /**
+   * Handles user logged out event
+   * It triggers a runtime reload if an extension update was available while the user was signed in.
+   */
+  static async handleUserLoggedOut() {
+    if (this.shouldReload) {
+      this.shouldReload = false;
+      await this.cleanAndReload();
+    }
+  }
 }
 
 /**
  * Check and process event if the user is authenticated
- * @return {Promise<bool>}
+ * @returns {Promise<bool>}
  */
 const isUserAuthenticated = async() => {
   const user = User.getInstance();
   // Check if user is valid
   if (user.isValid()) {
     try {
-      const isAuth = await AuthenticationStatusService.isAuthenticated();
-      return isAuth;
+      return await AuthenticationStatusService.isAuthenticated();
     } catch (error) {
       if (error instanceof MfaAuthenticationRequiredError) {
         /*
@@ -74,4 +83,4 @@ const isUserAuthenticated = async() => {
   return false;
 };
 
-export default OnExtensionUpdateAvailableController;
+export default OnExtensionUpdateAvailableService;

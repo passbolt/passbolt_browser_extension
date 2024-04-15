@@ -212,6 +212,7 @@ describe("WorkerService", () => {
       jest.spyOn(portWrapper2, "emit");
 
       await WorkerService.destroyWorkersByName([worker.name, worker2.name]);
+      await Promise.resolve();
 
       // expectation
       expect(portWrapper.emit).toHaveBeenCalledWith("passbolt.content-script.destroy");

@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import InformCallToActionController from "../controller/informCallToActionController/informCallToActionController";
-import AuthenticationEventController from "../controller/auth/authenticationEventController";
 import AuthCheckStatusController from "../controller/auth/authCheckStatusController";
 
 /**
@@ -21,9 +20,6 @@ import AuthCheckStatusController from "../controller/auth/authCheckStatusControl
  * @param {AccountEntity} account the user account
  */
 const listen = function(worker, apiClientOptions, account) {
-  AuthenticationEventController.initialise(worker);
-  AuthenticationEventController.startListen();
-
   /*
    * Whenever the in-form call-to-action status is required
    * @listens passbolt.in-form-cta.check-status

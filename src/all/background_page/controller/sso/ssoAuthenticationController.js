@@ -94,7 +94,7 @@ class SsoAuthenticationController {
         PassphraseStorageService.set(passphrase, -1),
         KeepSessionAliveService.start(),
       ]);
-      await PostLoginService.postLogin();
+      await PostLoginService.exec();
       if (isInQuickAccessMode) {
         await this.ensureRedirectionInQuickaccessMode();
       }

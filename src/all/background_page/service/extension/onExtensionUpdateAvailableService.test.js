@@ -12,19 +12,20 @@
  * @since         4.6.0
  */
 
-import OnExtensionUpdateAvailableController from "./onExtensionUpdateAvailableController";
-import AuthenticationStatusService from "../../service/authenticationStatusService";
+import OnExtensionUpdateAvailableService from "./onExtensionUpdateAvailableService";
+import AuthenticationStatusService from "../authenticationStatusService";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import MfaAuthenticationRequiredError from "../../error/mfaAuthenticationRequiredError";
 import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
-import WorkersSessionStorage from "../../service/sessionStorage/workersSessionStorage";
+import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 import WebIntegrationPagemod from "../../pagemod/webIntegrationPagemod";
 import Port from "../../sdk/port";
 import {mockPort} from "../../sdk/port/portManager.test.data";
 import PortManager from "../../sdk/port/portManager";
-import BrowserTabService from "../../service/ui/browserTab.service";
+import BrowserTabService from "../ui/browserTab.service";
 import PublicWebsiteSignInPagemod from "../../pagemod/publicWebsiteSignInPagemod";
+import PostLogoutService from "../auth/postLogoutService";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -32,23 +33,24 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-describe("OnExtensionInstalledController", () => {
-  describe("OnExtensionInstalledController::exec", () => {
+describe("OnExtensionUpdateAvailableService", () => {
+  describe("OnExtensionUpdateAvailableService::exec", () => {
     it("Should exec update if the user is not signed-in", async() => {
       expect.assertions(3);
+
       // data mocked
+      await MockExtension.withConfiguredAccount();
       const worker = readWorker({name: WebIntegrationPagemod.appName});
       await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
       const webIntegrationPort = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId});
       const webIntegrationPortWrapper = new Port(webIntegrationPort);
       PortManager.registerPort(webIntegrationPortWrapper);
       // mock function
-      MockExtension.withConfiguredAccount();
       jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => false);
       jest.spyOn(browser.runtime, "reload");
       jest.spyOn(webIntegrationPortWrapper, "emit");
       // process
-      await OnExtensionUpdateAvailableController.exec();
+      await OnExtensionUpdateAvailableService.exec();
       // expectation
       expect(webIntegrationPortWrapper.emit).toHaveBeenCalledWith("passbolt.content-script.destroy");
       expect(webIntegrationPortWrapper.emit).toHaveBeenCalledTimes(1);
@@ -58,10 +60,10 @@ describe("OnExtensionInstalledController", () => {
     it("Should exec update if the user is not valid", async() => {
       expect.assertions(1);
       // mock function
-      MockExtension.withMissingPrivateKeyAccount();
+      await MockExtension.withMissingPrivateKeyAccount();
       jest.spyOn(browser.runtime, "reload");
       // process
-      await OnExtensionUpdateAvailableController.exec();
+      await OnExtensionUpdateAvailableService.exec();
       // expectation
       expect(browser.runtime.reload).toHaveBeenCalledTimes(1);
     });
@@ -69,14 +71,14 @@ describe("OnExtensionInstalledController", () => {
     it("Should exec update only when the user is signed-out", async() => {
       expect.assertions(2);
       // mock function
-      MockExtension.withConfiguredAccount();
+      await MockExtension.withConfiguredAccount();
       jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => true);
       jest.spyOn(browser.runtime, "reload");
       // process
-      await OnExtensionUpdateAvailableController.exec();
+      await OnExtensionUpdateAvailableService.exec();
       // expectation
       expect(browser.runtime.reload).not.toHaveBeenCalled();
-      self.dispatchEvent(new Event('passbolt.auth.after-logout'));
+      await PostLogoutService.exec();
       // Waiting all promises has been finished
       await Promise.resolve();
       await Promise.resolve();
@@ -88,6 +90,7 @@ describe("OnExtensionInstalledController", () => {
     it("Should clean and exec update", async() => {
       expect.assertions(10);
       // data mocked
+      await MockExtension.withConfiguredAccount();
       const worker = readWorker();
       await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
       const worker2 = readWorker({name: WebIntegrationPagemod.appName});
@@ -105,7 +108,6 @@ describe("OnExtensionInstalledController", () => {
       PortManager.registerPort(webIntegrationPortWrapper2);
       PortManager.registerPort(publicWebsiteSignInPortWrapper);
       // mock function
-      MockExtension.withConfiguredAccount();
       jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => true);
       jest.spyOn(BrowserTabService, "sendMessage").mockImplementation(() => PortManager.registerPort(webIntegrationPortWrapper));
       jest.spyOn(browser.runtime, "reload");
@@ -113,10 +115,10 @@ describe("OnExtensionInstalledController", () => {
       jest.spyOn(webIntegrationPortWrapper2, "emit");
       jest.spyOn(publicWebsiteSignInPortWrapper, "emit");
       // process
-      await OnExtensionUpdateAvailableController.exec();
+      await OnExtensionUpdateAvailableService.exec();
       // expectation
       expect(browser.runtime.reload).not.toHaveBeenCalled();
-      self.dispatchEvent(new Event('passbolt.auth.after-logout'));
+      await PostLogoutService.exec();
       // Waiting all promises has been finished
       await Promise.resolve();
       await Promise.resolve();
@@ -138,11 +140,11 @@ describe("OnExtensionInstalledController", () => {
     it("Should exec update if an error occurred and there is no possibility to check if the user is authenticated", async() => {
       expect.assertions(1);
       // mock function
-      MockExtension.withConfiguredAccount();
+      await MockExtension.withConfiguredAccount();
       jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => { throw new Error("Error"); });
       jest.spyOn(browser.runtime, "reload");
       // process
-      await OnExtensionUpdateAvailableController.exec();
+      await OnExtensionUpdateAvailableService.exec();
       // expectation
       expect(browser.runtime.reload).toHaveBeenCalledTimes(1);
     });
@@ -150,14 +152,14 @@ describe("OnExtensionInstalledController", () => {
     it("Should not exec update when the user is not fully signed-in", async() => {
       expect.assertions(2);
       // mock function
-      MockExtension.withConfiguredAccount();
+      await MockExtension.withConfiguredAccount();
       jest.spyOn(AuthenticationStatusService, "isAuthenticated").mockImplementation(() => { throw new MfaAuthenticationRequiredError(); });
       jest.spyOn(browser.runtime, "reload");
       // process
-      await OnExtensionUpdateAvailableController.exec();
+      await OnExtensionUpdateAvailableService.exec();
       // expectation
       expect(browser.runtime.reload).not.toHaveBeenCalled();
-      self.dispatchEvent(new Event('passbolt.auth.after-logout'));
+      await PostLogoutService.exec();
       // Waiting all promises has been finished
       await Promise.resolve();
       await Promise.resolve();

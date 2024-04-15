@@ -64,7 +64,7 @@ describe("AuthLoginController", () => {
 
         jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
         jest.spyOn(PassphraseStorageService, "set");
-        jest.spyOn(PostLoginService, "postLogin");
+        jest.spyOn(PostLoginService, "exec");
         jest.spyOn(browser.tabs, "update");
 
         expect.assertions(4);
@@ -81,7 +81,7 @@ describe("AuthLoginController", () => {
         } else {
           expect(browser.tabs.update).not.toHaveBeenCalled();
         }
-        expect(PostLoginService.postLogin).toHaveBeenCalledWith();
+        expect(PostLoginService.exec).toHaveBeenCalledTimes(1);
       });
     });
 

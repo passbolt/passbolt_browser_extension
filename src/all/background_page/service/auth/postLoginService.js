@@ -12,22 +12,28 @@
  * @since         4.7.0
  */
 
-import AuthenticationEventController from "../../controller/auth/authenticationEventController";
-import toolbarController from "../../controller/toolbarController";
+import toolbarService from "../../controller/toolbarService";
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
+import InformCallToActionPagemod from "../../pagemod/informCallToActionPagemod";
+import WorkerService from "../worker/workerService";
+
 class PostLoginService {
   /**
    * Post login
    * @returns {Promise<void>}
    */
-  static async postLogin() {
+  static async exec() {
+    await PostLoginService.sendLoginEventForWorkers();
     await StartLoopAuthSessionCheckService.exec();
-    toolbarController.handleUserLoggedIn();
-    AuthenticationEventController.handleUserLoggedIn();
+    toolbarService.handleUserLoggedIn();
+  }
 
-    //@todo remove the dispatch event once every 'after-login' listeners are handled here
-    const event = new Event('passbolt.auth.after-login');
-    self.dispatchEvent(event);
+  /**
+   * Send login event on workers
+   * @return {Promise<void>}
+   */
+  static async sendLoginEventForWorkers() {
+    await WorkerService.emitOnWorkersWithName('passbolt.auth.after-login', [InformCallToActionPagemod.appName]);
   }
 }
 

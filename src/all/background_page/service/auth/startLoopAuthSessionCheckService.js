@@ -23,15 +23,6 @@ class StartLoopAuthSessionCheckService {
    * @return {Promise<void>}
    */
   static async exec() {
-    await StartLoopAuthSessionCheckService.scheduleAuthSessionCheck();
-  }
-
-  /**
-   * Schedule an alarm to check if the user is authenticated.
-   * @returns {Promise<void>}
-   * @private
-   */
-  static async scheduleAuthSessionCheck() {
     // Create an alarm to check the auth session. This alarm is managed in `handleTopLevelAlarms`
     await browser.alarms.create(StartLoopAuthSessionCheckService.ALARM_NAME, {
       // this `periodInMinutes` is set to ensure that after going back from sleep mode the alarms still triggers
@@ -51,7 +42,6 @@ class StartLoopAuthSessionCheckService {
 
   /**
    * Check if the user is authenticated when the AuthSessionCheck alarm triggers.
-   * - In the case the user is logged out, trigger a passbolt.auth.after-logout event.
    * @param {Alarm} alarm
    * @returns {Promise<void>}
    * @private

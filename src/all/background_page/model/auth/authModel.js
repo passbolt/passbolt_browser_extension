@@ -11,7 +11,6 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  */
 import AuthLogoutService from 'passbolt-styleguide/src/shared/services/api/auth/AuthLogoutService';
-import AuthStatusLocalStorage from "../../service/local_storage/authStatusLocalStorage";
 import PostLogoutService from '../../service/auth/postLogoutService';
 
 class AuthModel {
@@ -31,17 +30,6 @@ class AuthModel {
    */
   async logout() {
     await this.authLogoutService.logout();
-    await this.postLogout();
-  }
-
-  /**
-   * Post logout
-   * @returns {Promise<void>}
-   */
-  async postLogout() {
-    const isAuthenticated = false;
-    const isMfaRequired = false;
-    await AuthStatusLocalStorage.set(isAuthenticated, isMfaRequired);
     await PostLogoutService.exec();
   }
 }

@@ -18,7 +18,7 @@ import {TabController as tabsController} from "./tabsController";
 import GetLegacyAccountService from "../service/account/getLegacyAccountService";
 import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
 
-class ToolbarController {
+class ToolbarService {
   initialise() {
     // Initially, set the browser extension icon as inactive
     BrowserExtensionIconService.deactivate();
@@ -183,7 +183,7 @@ class ToolbarController {
   }
 }
 
-const toolbarController = new ToolbarController();
+const toolbarService = new ToolbarService();
 
-// Exports the Toolbar controller object.
-export default toolbarController;
+// Exports the Toolbar service object.
+export default toolbarService;

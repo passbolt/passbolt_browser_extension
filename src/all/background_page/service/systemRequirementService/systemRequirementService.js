@@ -2,7 +2,7 @@ import storage from "../../sdk/storage";
 import {Config} from "../../model/config";
 import Log from "../../model/log";
 import * as openpgp from "openpgp";
-import toolbarController from "../../controller/toolbarController";
+import toolbarService from "../../controller/toolbarService";
 
 class SystemRequirementService {
   /**
@@ -23,8 +23,8 @@ class SystemRequirementService {
      */
     openpgp.config.allowInsecureDecryptionWithSigningKeys = true;
 
-    // initialise the toolbar controller
-    toolbarController.initialise();
+    // initialise the toolbar service
+    toolbarService.initialise();
   }
 }
 

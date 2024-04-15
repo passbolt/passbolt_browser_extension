@@ -10,7 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  * @link          https://www.passbolt.com Passbolt(tm)
  */
-import AuthModel from "../model/auth/authModel";
+import PostLogoutService from '../service/auth/postLogoutService';
 
 /**
  * Listens to the application bootstrap events
@@ -26,12 +26,11 @@ const listen = function(worker, apiClientOptions, account) {
    * @deprecated will be removed with v4. Helps to support legacy appjs logout.
    */
   worker.port.on('passbolt.app-boostrap.navigate-to-logout', async() => {
-    const auth = new AuthModel(apiClientOptions);
     const url = `${account.domain}/auth/logout`;
 
     try {
       await chrome.tabs.update(worker.tab.id, {url: url});
-      await auth.postLogout();
+      await PostLogoutService.exec();
     } catch (error) {
       console.error(error);
     }

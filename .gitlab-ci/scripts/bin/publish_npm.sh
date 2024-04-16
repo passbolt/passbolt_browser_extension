@@ -19,6 +19,6 @@ elif is_release_alpha "$CI_COMMIT_TAG"; then
   npm publish --tag alpha
 elif is_release_beta "$CI_COMMIT_TAG"; then
   npm publish --tag beta
-else
+elif is_stable "$CI_COMMIT_TAG"; then
   npm publish
 fi

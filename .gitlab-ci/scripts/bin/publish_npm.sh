@@ -22,5 +22,5 @@ elif is_release_beta "$CI_COMMIT_TAG"; then
 elif is_stable "$CI_COMMIT_TAG"; then
   npm publish
 else
-   echo "The tag format is no supported"
+   echo "The tag format is not supported"
 fi

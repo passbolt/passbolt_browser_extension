@@ -5,6 +5,14 @@ function is_valid_api_tag () {
   fi
 }
 
+function is_stable () {
+  local version=$1
+  if [[ ! $version =~ [0-9]+\.[0-9]+\.[0-9]+$ ]];then
+    return 1
+  fi
+  return 0
+}
+
 function is_release_candidate () {
   local version=$1
   if [[ ! $version =~ [0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+ ]];then

@@ -60,4 +60,6 @@ elif is_stable "$CI_COMMIT_TAG"; then
     *) echo "I don't recognize this option"
     ;;
   esac
+else
+  echo "The tag format is no supported"
 fi

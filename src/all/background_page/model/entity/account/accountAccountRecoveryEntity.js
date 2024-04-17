@@ -140,7 +140,7 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
     if (contains.security_token && this._security_token) {
       result.security_token = this._security_token.toDto();
     }
-    if (contains.accountRecoveryRequest && this._account_recovery_request) {
+    if (contains.account_recovery_request && this.accountRecoveryRequest) {
       result.account_recovery_request = this._account_recovery_request.toDto(AccountRecoveryRequestEntity.ALL_CONTAIN_OPTIONS);
     }
 
@@ -196,6 +196,14 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
    */
   get authenticationTokenToken() {
     return this._props.authentication_token_token || null;
+  }
+
+  /**
+   * Get the type.
+   * @return {string}
+   */
+  get type() {
+    return this._props.type;
   }
 
   /**

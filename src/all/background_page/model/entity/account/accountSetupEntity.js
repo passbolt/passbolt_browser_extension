@@ -161,6 +161,14 @@ class AccountSetupEntity extends AbstractAccountEntity {
     return this._props.authentication_token_token || null;
   }
 
+  /**
+   * Get the type.
+   * @return {string}
+   */
+  get type() {
+    return this._props.type;
+  }
+
   /*
    * ==================================================
    * Other associated properties methods

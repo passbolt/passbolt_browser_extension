@@ -15,7 +15,8 @@ import GetGpgKeyCreationDateService from "../../service/crypto/getGpgKeyCreation
 import GenerateGpgKeyPairOptionsEntity from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity";
 import GenerateGpgKeyPairService from "../../service/crypto/generateGpgKeyPairService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
+import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
 
 /**
  * @typedef {({passphrase: string})} GenerateKeyPairPassphraseDto
@@ -27,16 +28,13 @@ class GenerateSetupKeyPairController {
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
    * @param {ApiClientOptions} apiClientOptions The api client options.
-   * @param {AccountSetupEntity} account The account being setup.
-   * @param {Object} runtimeMemory The setup runtime memory.
    */
-  constructor(worker, requestId, apiClientOptions, account, runtimeMemory) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
     this.apiClientOptions = apiClientOptions;
-    this.account = account;
-    this.runtimeMemory = runtimeMemory;
-    this.runtimeMemory.passphrase = null;
+    // The temporary account stored in the session storage
+    this.temporaryAccount = null;
   }
 
   /**
@@ -61,15 +59,18 @@ class GenerateSetupKeyPairController {
    * @returns {Promise<void>}
    */
   async exec(passphraseDto) {
+    this.temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
     const generateGpgKeyPairOptionsEntity = await this._buildGenerateKeyPairOptionsEntity(passphraseDto.passphrase);
     const keyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);
     const generatedPublicKey = await OpenpgpAssertion.readKeyOrFail(keyPair.publicKey.armoredKey);
 
-    this.account.userKeyFingerprint = generatedPublicKey.getFingerprint().toUpperCase();
-    this.account.userPrivateArmoredKey = keyPair.privateKey.armoredKey;
-    this.account.userPublicArmoredKey = keyPair.publicKey.armoredKey;
+    this.temporaryAccount.account.userKeyFingerprint = generatedPublicKey.getFingerprint().toUpperCase();
+    this.temporaryAccount.account.userPrivateArmoredKey = keyPair.privateKey.armoredKey;
+    this.temporaryAccount.account.userPublicArmoredKey = keyPair.publicKey.armoredKey;
     // The passphrase will be later use to sign in the user.
-    this.runtimeMemory.passphrase = passphraseDto.passphrase;
+    this.temporaryAccount.passphrase = passphraseDto.passphrase;
+    // Update all data in the temporary account stored
+    await AccountTemporarySessionStorageService.set(this.temporaryAccount);
   }
 
   /**
@@ -82,8 +83,8 @@ class GenerateSetupKeyPairController {
    */
   async _buildGenerateKeyPairOptionsEntity(passphrase) {
     return new GenerateGpgKeyPairOptionsEntity({
-      name: `${this.account.firstName} ${this.account.lastName}`,
-      email: this.account.username,
+      name: `${this.temporaryAccount.account.firstName} ${this.temporaryAccount.account.lastName}`,
+      email: this.temporaryAccount.account.username,
       passphrase: passphrase,
       date: await GetGpgKeyCreationDateService.getDate(this.apiClientOptions),
     });

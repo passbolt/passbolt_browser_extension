@@ -23,6 +23,7 @@ import {
   withServerKeyAccountSetupDto
 } from "../../model/entity/account/accountSetupEntity.test.data";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -43,7 +44,7 @@ describe("ImportSetupPrivateKeyController", () => {
   describe("GenerateKeyPairSetupController::exec", () => {
     it("Should throw an exception if the passed DTO is not valid.", async() => {
       const account = new AccountSetupEntity(withServerKeyAccountSetupDto());
-      const controller = new ImportSetupPrivateKeyController(null, null, defaultApiClientOptions(), account);
+      const controller = new ImportSetupPrivateKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
 
       const scenarios = [
         {dto: null, expectedError: Error},
@@ -62,6 +63,7 @@ describe("ImportSetupPrivateKeyController", () => {
       for (let i = 0; i < scenarios.length; i++) {
         const scenario = scenarios[i];
         try {
+          jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
           await controller.exec(scenario.dto);
         } catch (e) {
           expect(e).toBeInstanceOf(scenario.expectedError);
@@ -72,7 +74,9 @@ describe("ImportSetupPrivateKeyController", () => {
     it("Should throw an exception if the setupEntity is not initialized properly.", async() => {
       expect.assertions(1);
       const account = new AccountSetupEntity(startAccountSetupDto());
-      const controller = new ImportSetupPrivateKeyController(null, null, defaultApiClientOptions(), account);
+      const controller = new ImportSetupPrivateKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+
       try {
         await controller.exec(pgpKeys.ada.private);
       } catch (e) {
@@ -85,8 +89,9 @@ describe("ImportSetupPrivateKeyController", () => {
       await MockExtension.withConfiguredAccount();
 
       const account = new AccountSetupEntity(withServerKeyAccountSetupDto());
-      const controller = new ImportSetupPrivateKeyController(null, null, defaultApiClientOptions(), account);
+      const controller = new ImportSetupPrivateKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
 
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
       jest.spyOn(controller.authVerifyServerChallengeService, "verifyAndValidateServerChallenge").mockImplementationOnce(jest.fn());
 
       try {
@@ -102,7 +107,9 @@ describe("ImportSetupPrivateKeyController", () => {
 
       const expectedKeyData = pgpKeys.ada;
       const account = new AccountSetupEntity(withServerKeyAccountSetupDto());
-      const controller = new ImportSetupPrivateKeyController(null, null, defaultApiClientOptions(), account);
+      const controller = new ImportSetupPrivateKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      jest.spyOn(AccountTemporarySessionStorageService, "set").mockImplementationOnce(() => jest.fn());
       jest.spyOn(controller.authVerifyServerChallengeService, "verifyAndValidateServerChallenge").mockImplementationOnce(() => { throw new Error('User not known'); });
 
 

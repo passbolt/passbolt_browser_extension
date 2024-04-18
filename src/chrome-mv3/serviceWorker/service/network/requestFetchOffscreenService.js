@@ -11,6 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         4.7.0
  */
+const {Buffer} = require('buffer');
 
 const {SEND_MESSAGE_TARGET_FETCH_OFFSCREEN} = require("../../../offscreens/service/network/fetchOffscreenService");
 
@@ -78,7 +79,7 @@ export class RequestFetchOffscreenService {
       RequestFetchOffscreenService.createIfNotExistOffscreenDocument);
 
     const offscreenFetchId = crypto.randomUUID();
-    const offscreenFetchData = RequestFetchOffscreenService.buildOffscreenData(offscreenFetchId, resource, options);
+    const offscreenFetchData = await RequestFetchOffscreenService.buildOffscreenData(offscreenFetchId, resource, options);
 
     return new Promise((resolve, reject) => {
       // Stack the response listener callbacks.
@@ -116,18 +117,79 @@ export class RequestFetchOffscreenService {
    * @param {object} fetchOptions The fetch options, similar to the native fetch option parameter.
    * @returns {object}
    */
-  static buildOffscreenData(id, resource, fetchOptions = {}) {
+  static async buildOffscreenData(id, resource, fetchOptions = {}) {
     const options = JSON.parse(JSON.stringify(fetchOptions));
 
-    // Format FormData fetch options to allow its serialization.
-    if (fetchOptions?.body instanceof FormData) {
-      const formDataValues = [];
-      for (const key of fetchOptions.body.keys()) {
-        formDataValues.push(`${encodeURIComponent(key)}=${encodeURIComponent(fetchOptions.body.get(key))}`);
-      }
-      options.body = formDataValues.join('&');
-      options.headers['Content-type'] = 'application/x-www-form-urlencoded';
+    if (!(fetchOptions?.body instanceof FormData)) {
+      return {id, resource, options};
     }
+
+    for (const data of fetchOptions.body.values()) {
+      if (data instanceof File) {
+        return this.buildOffscreenDataAsMultiPart(id, resource, fetchOptions);
+      }
+    }
+
+    return this.buildOffscreenDataAsUrlEncoded(id, resource, fetchOptions);
+  }
+
+  /**
+   * Build offscreen message data as application/x-www-form-urlencoded content-type.
+   * @param {string} id The identifier of the offscreen fetch request.
+   * @param {string} resource The fetch url resource, similar to the native fetch resource parameter.
+   * @param {object} fetchOptions The fetch options, similar to the native fetch option parameter.
+   * @returns {object}
+   */
+  static async buildOffscreenDataAsUrlEncoded(id, resource, fetchOptions) {
+    const options = JSON.parse(JSON.stringify(fetchOptions));
+    const formDataValues = [];
+    for (const kevValuePair of fetchOptions.body.entries()) {
+      formDataValues.push(`${encodeURIComponent(kevValuePair[0])}=${encodeURIComponent(kevValuePair[1])}`);
+    }
+    options.body = formDataValues.join('&');
+    options.headers['Content-type'] = 'application/x-www-form-urlencoded';
+    return {id, resource, options};
+  }
+
+
+  /**
+   * Build offscreen message data as multipart/form-data content-type.
+   * This implementation supports only 1 file per field.
+   * In other words it can't be used for a single input that allows multiple files.
+   *
+   * @param {string} id The identifier of the offscreen fetch request.
+   * @param {string} resource The fetch url resource, similar to the native fetch resource parameter.
+   * @param {object} fetchOptions The fetch options, similar to the native fetch option parameter.
+   * @returns {object}
+   */
+  static async buildOffscreenDataAsMultiPart(id, resource, fetchOptions) {
+    const options = JSON.parse(JSON.stringify(fetchOptions));
+
+    const boundary = `----PassboltMultiPartBoundary${crypto.randomUUID()}`;
+    const fieldStart = `--${boundary}`;
+    const formEnd = `--${boundary}--`;
+
+    let requestBody = '';
+    for (const formKeyValuePair of fetchOptions.body.entries()) {
+      const fieldName = formKeyValuePair[0];
+      const formValue = formKeyValuePair[1];
+      const isFile = formValue instanceof File;
+
+      const fieldBody = isFile
+        ? Buffer.from(await formValue.arrayBuffer()).toString('binary')
+        : formValue;
+
+      const fieldHeader = isFile
+        ? `Content-Disposition: form-data; name="${fieldName}"; filename="${formValue.name}"\r\nContent-Type: ${formValue.type}`
+        : `Content-Disposition: form-data; name="${fieldName}"`;
+
+      requestBody += `${fieldStart}\r\n${fieldHeader}\r\n\r\n${fieldBody}\r\n`;
+    }
+
+    requestBody += `${formEnd}\r\n`;
+
+    options.body = requestBody;
+    options.headers['Content-type'] = `multipart/form-data; boundary=${boundary}`;
 
     return {id, resource, options};
   }

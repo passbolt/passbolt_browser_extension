@@ -37,6 +37,19 @@ export default class FetchOffscreenService {
     }
     const {id, resource, options} = message?.data || {};
 
+    if (options.body) {
+      /*
+       * Using a binary buffer is necessary to make the `fetch` sending binary data.
+       * Otherwise, files can't be sent properly as the body is encoded in a way that the data changes.
+       * With the Uint8Array approach, the data remains unchanged during the transfer.
+       */
+      const uint8Array = new Uint8Array(options.body.length);
+      for (let i = 0; i < uint8Array.length; i++) {
+        uint8Array[i] = options.body.charCodeAt(i);
+      }
+      options.body = uint8Array;
+    }
+
     try {
       const response = await fetch(resource, options);
       await FetchOffscreenService.handleSuccessResponse(id, response);

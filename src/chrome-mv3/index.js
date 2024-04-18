@@ -19,6 +19,7 @@ import TabService from "../all/background_page/service/tab/tabService";
 import OnExtensionUpdateAvailableService
   from "../all/background_page/service/extension/onExtensionUpdateAvailableService";
 import GlobalAlarmService from "../all/background_page/service/alarm/globalAlarmService";
+import ResponseFetchOffscreenService from "./serviceWorker/service/network/responseFetchOffscreenService";
 
 /**
  * Load all system requirement
@@ -64,3 +65,8 @@ browser.alarms.onAlarm.removeListener(GlobalAlarmService.exec);
  * Add a top-level alarm handler.
  */
 browser.alarms.onAlarm.addListener(GlobalAlarmService.exec);
+
+/**
+ * Handle offscreen fetch response.
+ */
+chrome.runtime.onMessage.addListener(ResponseFetchOffscreenService.handleFetchResponse);

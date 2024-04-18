@@ -45,7 +45,8 @@
     "downloads",
     "cookies",
     "clipboardWrite",
-    "background"
+    "background",
+    "offscreen"
   ],
   "host_permissions": [
     "*://*/*"

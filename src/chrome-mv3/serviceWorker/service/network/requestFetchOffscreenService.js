@@ -19,6 +19,7 @@ const LOCK_CREATE_OFFSCREEN_FETCH_DOCUMENT = "LOCK_CREATE_OFFSCREEN_FETCH_DOCUME
 const FETCH_OFFSCREEN_DOCUMENT_REASON = "CLIPBOARD";
 const OFFSCREEN_URL = "offscreens/fetch.html";
 const IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY = "IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY";
+let isFetchOffscreenPreferredCache = null;
 
 export class RequestFetchOffscreenService {
   /**
@@ -40,9 +41,12 @@ export class RequestFetchOffscreenService {
    * @returns {Promise<boolean>}
    */
   static async isFetchOffscreenPreferred() {
-    const storageData = await browser.storage.session.get([IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]);
+    if (isFetchOffscreenPreferredCache === null) {
+      const storageData = await browser.storage.session.get([IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]);
+      isFetchOffscreenPreferredCache = Boolean(storageData?.[IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]);
+    }
 
-    return Boolean(storageData?.[IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]);
+    return isFetchOffscreenPreferredCache;
   }
 
   /**
@@ -56,7 +60,7 @@ export class RequestFetchOffscreenService {
       return await fetch(resource, options);
     } catch (error) {
       console.error("RequestFetchOffscreenService::fetchNative: An error occurred while using the native fetch API, fallback on offscreen strategy until browser restart.", error);
-      browser.storage.session.set({[IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]: true});
+      RequestFetchOffscreenService.markFetchOffscreenStrategyAsPreferred();
       return await RequestFetchOffscreenService.fetchOffscreen(resource, options);
     }
   }
@@ -141,5 +145,14 @@ export class RequestFetchOffscreenService {
       target: SEND_MESSAGE_TARGET_FETCH_OFFSCREEN,
       data: offscreenData
     });
+  }
+
+  /**
+   * Mark the fetch offscreen strategy as preferred.
+   * return {Promise<void>}
+   */
+  static async markFetchOffscreenStrategyAsPreferred() {
+    isFetchOffscreenPreferredCache = true;
+    await browser.storage.session.set({[IS_FETCH_OFFSCREEN_PREFERRED_STORAGE_KEY]: isFetchOffscreenPreferredCache});
   }
 }

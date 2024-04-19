@@ -35,16 +35,13 @@ export default class ResponseFetchOffscreenService {
 
     ResponseFetchOffscreenService.assertMessageData(message);
     const {id, type, data} = message;
-    const offscreenRequestPromiseCallbacks = ResponseFetchOffscreenService.getRequestPromiseCallbacksOrFail(id);
+    const offscreenRequestPromiseCallbacks = ResponseFetchOffscreenService.consumeRequestPromiseCallbacksOrFail(id);
 
     if (type === FETCH_OFFSCREEN_RESPONSE_TYPE_SUCCESS) {
       offscreenRequestPromiseCallbacks.resolve(ResponseFetchOffscreenService.buildFetchResponse(data));
     } else if (type === FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR) {
       offscreenRequestPromiseCallbacks.reject(new Error(data.message));
     }
-
-    // Unstack the request promise callbacks.
-    delete offscreenRequestsPromisesCallbacks[id];
   }
 
   /**
@@ -68,17 +65,19 @@ export default class ResponseFetchOffscreenService {
   }
 
   /**
-   * Get the offscreen request promise callbacks or fail.
+   * Consume the offscreen request promise callbacks or fail.
    * @param {string} id The identifier of the offscreen fetch request.
    * @returns {object}
    * @throws {Error} If no request promise callbacks can be found for the given offscreen fetch request id.
    */
-  static getRequestPromiseCallbacksOrFail(id) {
-    if (!offscreenRequestsPromisesCallbacks[id]) {
+  static consumeRequestPromiseCallbacksOrFail(id) {
+    const offscreenRequestPromiseCallback = offscreenRequestsPromisesCallbacks[id];
+    if (!offscreenRequestPromiseCallback) {
       throw new Error("ResponseFetchOffscreenService: No request promise callbacks found for the given offscreen fetch request id.");
     }
+    delete offscreenRequestsPromisesCallbacks[id];
 
-    return offscreenRequestsPromisesCallbacks[id];
+    return offscreenRequestPromiseCallback;
   }
 
   /**

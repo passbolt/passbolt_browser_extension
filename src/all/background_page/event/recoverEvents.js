@@ -34,7 +34,6 @@ import ReloadTabController from "../controller/tab/reloadTabController";
 
 
 const listen = (worker, apiClientOptions, account) => {
-
   worker.port.on('passbolt.recover.first-install', async requestId => {
     const controller = new IsExtensionFirstInstallController(worker, requestId);
     await controller._exec();

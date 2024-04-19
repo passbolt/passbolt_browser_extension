@@ -19,7 +19,7 @@ import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.d
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
 import GenerateSsoKitService from "../../service/sso/generateSsoKitService";
-import AuthLoginController from "./authLoginController";
+import AccountRecoveryLoginController from "./accountRecoveryLoginController";
 import {enableFetchMocks} from "jest-fetch-mock";
 import {anonymousOrganizationSettings} from "../../model/entity/organizationSettings/organizationSettingsEntity.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
@@ -29,6 +29,11 @@ import PostLoginService from "../../service/auth/postLoginService";
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import each from "jest-each";
 import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
+import AccountLocalStorage from "../../service/local_storage/accountLocalStorage";
+import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
+import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
+import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
+import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
 
 beforeEach(async() => {
   enableFetchMocks();
@@ -36,8 +41,8 @@ beforeEach(async() => {
   await MockExtension.withConfiguredAccount();
 });
 
-describe("AuthLoginController", () => {
-  describe("AuthLoginController::exec", () => {
+describe("AccountRecoveryLoginController", () => {
+  describe("AccountRecoveryLoginController::exec", () => {
     const passphrase = "ada@passbolt.com";
     const mockOrganisationSettings = (withSsoEnabled = true) => {
       const organizationSettings = anonymousOrganizationSettings();
@@ -52,16 +57,16 @@ describe("AuthLoginController", () => {
     };
 
     each([
-      {scenario: 'remember me true', passphrase: passphrase, rememberMe: true, shouldRefreshCurrentTab: true},
-      {scenario: 'remember me true, no tab refresh', passphrase: passphrase, rememberMe: true, shouldRefreshCurrentTab: false},
-      {scenario: 'remember me false', passphrase: passphrase, rememberMe: false, shouldRefreshCurrentTab: true},
-      {scenario: 'remember me false, no tab refresh', passphrase: passphrase, rememberMe: false, shouldRefreshCurrentTab: false},
+      {scenario: 'remember me true', passphrase: passphrase, rememberMe: true},
+      {scenario: 'remember me false', passphrase: passphrase, rememberMe: false},
     ]).describe("Should sign-in the user.", test => {
       it(`Sign in with ${test.scenario}`, async() => {
         mockOrganisationSettings(false);
 
-        const account = new AccountEntity(defaultAccountDto());
-        const controller = new AuthLoginController({tab: {id: 1}}, null, defaultApiClientOptions(), account);
+        const account = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
+        // Mock temporary account
+        jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+        const controller = new AccountRecoveryLoginController({tab: {id: 1}, port: {_port: {name: "test"}}}, null, defaultApiClientOptions(), account);
 
         jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
         jest.spyOn(PassphraseStorageService, "set");
@@ -69,38 +74,42 @@ describe("AuthLoginController", () => {
         jest.spyOn(browser.tabs, "update");
         jest.spyOn(AccountTemporarySessionStorageService, "remove");
 
-        expect.assertions(4);
+        expect.assertions(6);
 
-        await controller.exec(test.passphrase, test.rememberMe, test.shouldRefreshCurrentTab);
+        await controller.exec(test.passphrase, test.rememberMe);
         expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledWith(account.userKeyFingerprint, account.userPrivateArmoredKey, test.passphrase);
         if (test.rememberMe) {
           expect(PassphraseStorageService.set).toHaveBeenCalledWith(test.passphrase, -1);
         } else {
           expect(PassphraseStorageService.set).not.toHaveBeenCalled();
         }
-        if (test.shouldRefreshCurrentTab) {
-          expect(browser.tabs.update).toHaveBeenCalledWith(1, {url: account.domain});
-        } else {
-          expect(browser.tabs.update).not.toHaveBeenCalled();
-        }
+
+        expect(browser.tabs.update).toHaveBeenCalledWith(1, {url: account.domain});
         expect(PostLoginService.exec).toHaveBeenCalledTimes(1);
+        expect(AccountTemporarySessionStorageService.remove).toHaveBeenCalledTimes(1);
+        // The account recovery should been removed from the account local storage.
+        expect(await AccountLocalStorage.get()).toHaveLength(0);
       });
     });
 
     it("Should throw an exception if the passphrase is not a valid.", async() => {
-      const account = new AccountEntity(defaultAccountDto());
-      const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+      const account = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
+      // Mock temporary account
+      const controller = new AccountRecoveryLoginController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions(), account);
 
       expect.assertions(2);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
       const promiseMissingParameter = controller.exec();
       await expect(promiseMissingParameter).rejects.toThrowError("A passphrase is required.");
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
       const promiseInvalidTypeParameter = controller.exec(2);
       await expect(promiseInvalidTypeParameter).rejects.toThrowError("The passphrase should be a string.");
     }, 10000);
 
     it("Should throw an exception if the provided remember me is not a valid boolean.", async() => {
       const account = new AccountEntity(defaultAccountDto());
-      const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new AccountRecoveryLoginController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions(), account);
 
       expect.assertions(1);
       const promiseInvalidTypeParameter = controller.exec("passphrase", 42);
@@ -113,8 +122,10 @@ describe("AuthLoginController", () => {
       jest.spyOn(GenerateSsoKitService, "generate");
       mockOrganisationSettings(false);
 
-      const account = new AccountEntity(defaultAccountDto());
-      const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+      const account = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
+      // Mock temporary account
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new AccountRecoveryLoginController({tab: {id: 1}, port: {_port: {name: "test"}}}, null, defaultApiClientOptions(), account);
       jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
 
       await controller.exec(passphrase, true);
@@ -128,8 +139,10 @@ describe("AuthLoginController", () => {
       mockOrganisationSettings(true);
       mockOrganisationSettingsSsoSettings(withAzureSsoSettings());
 
-      const account = new AccountEntity(defaultAccountDto());
-      const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+      const account = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
+      // Mock temporary account
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new AccountRecoveryLoginController({tab: {id: 1}, port: {_port: {name: "test"}}}, null, defaultApiClientOptions(), account);
       jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
 
       await controller.exec(passphrase, true);
@@ -144,8 +157,10 @@ describe("AuthLoginController", () => {
       mockOrganisationSettings(true);
       mockOrganisationSettingsSsoSettings(ssoSettingsDto);
 
-      const account = new AccountEntity(defaultAccountDto());
-      const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+      const account = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
+      // Mock temporary account
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new AccountRecoveryLoginController({tab: {id: 1}, port: {_port: {name: "test"}}}, null, defaultApiClientOptions(), account);
       jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
 
       await controller.exec(passphrase, true);
@@ -159,8 +174,10 @@ describe("AuthLoginController", () => {
       mockOrganisationSettings(true);
       mockOrganisationSettingsSsoSettings(defaultEmptySettings());
 
-      const account = new AccountEntity(defaultAccountDto());
-      const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+      const account = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
+      // Mock temporary account
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new AccountRecoveryLoginController({tab: {id: 1}, port: {_port: {name: "test"}}}, null, defaultApiClientOptions(), account);
       jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
 
       await controller.exec(passphrase, true);
@@ -172,12 +189,25 @@ describe("AuthLoginController", () => {
       SsoDataStorage.setMockedData(clientSsoKit());
       mockOrganisationSettings(false);
 
-      const account = new AccountEntity(defaultAccountDto());
-      const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+      const account = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
+      // Mock temporary account
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new AccountRecoveryLoginController({tab: {id: 1}, port: {_port: {name: "test"}}}, null, defaultApiClientOptions(), account);
       jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
 
       await controller.exec(passphrase, true);
       expect(SsoDataStorage.flush).toHaveBeenCalledTimes(1);
+    });
+
+    it("Should raise an error if no account has been found.", async() => {
+      const account = new AccountRecoverEntity(withSecurityTokenAccountRecoverDto());
+      const controller = new AccountRecoveryLoginController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions(), account);
+      expect.assertions(1);
+      try {
+        await controller.exec(passphrase, true);
+      } catch (error) {
+        expect(error.message).toEqual("You have already started the process on another tab.");
+      }
     });
   });
 });

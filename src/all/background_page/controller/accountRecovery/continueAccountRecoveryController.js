@@ -14,6 +14,9 @@
 
 import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryModel";
 import WorkerService from "../../service/worker/workerService";
+import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
+import AccountTemporaryEntity from "../../model/entity/account/accountTemporaryEntity";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 class ContinueAccountRecoveryController {
   /**
@@ -52,7 +55,9 @@ class ContinueAccountRecoveryController {
    */
   async exec() {
     try {
-      await this.accountRecoveryModel.continue(this.account.userId, this.account.authenticationTokenToken);
+      const accountTemporary = await this._buildTemporaryAccountEntity();
+      await this.accountRecoveryModel.continue(accountTemporary.account.userId, accountTemporary.account.authenticationTokenToken);
+      await AccountTemporarySessionStorageService.set(accountTemporary);
     } catch (error) {
       /*
        * Something went wrong.
@@ -62,6 +67,19 @@ class ContinueAccountRecoveryController {
       (await WorkerService.get('AccountRecoveryBootstrap', this.worker.tab.id)).port.emit('passbolt.account-recovery-bootstrap.remove-iframe');
       throw error;
     }
+  }
+
+  /**
+   * Build the account temporary.
+   * @returns {Promise<AccountTemporaryEntity>}
+   * @private
+   */
+  async _buildTemporaryAccountEntity() {
+    const accountTemporaryDto = {
+      account: this.account.toDto(AccountAccountRecoveryEntity.ALL_CONTAIN_OPTIONS),
+      worker_id: this.worker.port._port.name
+    };
+    return new AccountTemporaryEntity(accountTemporaryDto);
   }
 }
 

@@ -15,7 +15,8 @@ import {v4 as uuid} from "uuid";
 
 export const worker = {
   port: {
-    emit: jest.fn()
+    emit: jest.fn(),
+    request: jest.fn()
   },
   tab: {
     id: uuid()

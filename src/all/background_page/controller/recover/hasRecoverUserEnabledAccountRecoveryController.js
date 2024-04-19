@@ -11,18 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
 
 class HasRecoverUserEnabledAccountRecoveryController {
   /**
    * GetRecoverLocaleController constructor.
    * @param {Worker} worker The worker the controller is executed on.
    * @param {string} requestId The associated request id.
-   * @param {AccountRecoverEntity} account The account being recovered.
    */
-  constructor(worker, requestId, account) {
+  constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
-    this.account = account;
   }
 
   /**
@@ -44,7 +43,8 @@ class HasRecoverUserEnabledAccountRecoveryController {
    * @returns {Promise<boolean>}
    */
   async exec() {
-    return this.account?.user?.accountRecoveryUserSetting?.isApproved === true;
+    const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
+    return temporaryAccount.account?.user?.accountRecoveryUserSetting?.isApproved === true;
   }
 }
 

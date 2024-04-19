@@ -29,19 +29,11 @@ import IsExtensionFirstInstallController from "../controller/extension/isExtensi
 import IsLostPassphraseCaseController from "../controller/accountRecovery/isLostPassphraseCaseController";
 import SetSetupSecurityTokenController from "../controller/setup/setSetupSecurityTokenController";
 import HasRecoverUserEnabledAccountRecoveryController from "../controller/recover/hasRecoverUserEnabledAccountRecoveryController";
-import GeneratePortIdController from "../controller/port/generatePortIdController";
 import GetUserPassphrasePoliciesController from "../controller/setup/getUserPassphrasePoliciesController";
 import ReloadTabController from "../controller/tab/reloadTabController";
 
 
 const listen = (worker, apiClientOptions, account) => {
-  /*
-   * The recover runtime memory.
-   *
-   * Used to store information collected during the user setup journey that shouldn't be stored on the react side of
-   * the application because of their confidentiality or for logic reason. By instance the passphrase of the user.
-   */
-  const runtimeMemory = {};
 
   worker.port.on('passbolt.recover.first-install', async requestId => {
     const controller = new IsExtensionFirstInstallController(worker, requestId);
@@ -59,7 +51,7 @@ const listen = (worker, apiClientOptions, account) => {
   });
 
   worker.port.on('passbolt.recover.start', async requestId => {
-    const controller = new StartRecoverController(worker, requestId, apiClientOptions, account, runtimeMemory);
+    const controller = new StartRecoverController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 
@@ -74,42 +66,42 @@ const listen = (worker, apiClientOptions, account) => {
   });
 
   worker.port.on('passbolt.recover.has-user-enabled-account-recovery', async requestId => {
-    const controller = new HasRecoverUserEnabledAccountRecoveryController(worker, requestId, account);
+    const controller = new HasRecoverUserEnabledAccountRecoveryController(worker, requestId);
     await controller._exec();
   });
 
   worker.port.on('passbolt.recover.import-key', async(requestId, armoredKey) => {
-    const controller = new ImportRecoverPrivateKeyController(worker, requestId, apiClientOptions, account);
+    const controller = new ImportRecoverPrivateKeyController(worker, requestId, apiClientOptions);
     await controller._exec(armoredKey);
   });
 
   worker.port.on('passbolt.recover.verify-passphrase', async(requestId, passphrase) => {
-    const controller = new VerifyImportedKeyPassphraseController(worker, requestId, account, runtimeMemory);
+    const controller = new VerifyImportedKeyPassphraseController(worker, requestId);
     await controller._exec(passphrase);
   });
 
   worker.port.on('passbolt.recover.set-security-token', async(requestId, securityTokenDto) => {
-    const controller = new SetSetupSecurityTokenController(worker, requestId, account);
+    const controller = new SetSetupSecurityTokenController(worker, requestId);
     await controller._exec(securityTokenDto);
   });
 
   worker.port.on('passbolt.recover.complete', async requestId => {
-    const controller = new CompleteRecoverController(worker, requestId, apiClientOptions, account);
+    const controller = new CompleteRecoverController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
   worker.port.on('passbolt.recover.sign-in', async(requestId, rememberMe) => {
-    const controller = new SignInSetupController(worker, requestId, apiClientOptions, account, runtimeMemory);
+    const controller = new SignInSetupController(worker, requestId, apiClientOptions);
     await controller._exec(rememberMe);
   });
 
   worker.port.on('passbolt.recover.generate-account-recovery-request-key', async(requestId, generateGpgKeyPairDto) => {
-    const controller = new GenerateRecoverAccountRecoveryRequestKeyController(worker, requestId, apiClientOptions, account);
+    const controller = new GenerateRecoverAccountRecoveryRequestKeyController(worker, requestId, apiClientOptions);
     await controller._exec(generateGpgKeyPairDto);
   });
 
   worker.port.on('passbolt.recover.initiate-account-recovery-request', async requestId => {
-    const controller = new RequestAccountRecoveryController(worker, apiClientOptions, requestId, account);
+    const controller = new RequestAccountRecoveryController(worker, apiClientOptions, requestId);
     await controller._exec();
   });
 
@@ -124,17 +116,12 @@ const listen = (worker, apiClientOptions, account) => {
   });
 
   worker.port.on('passbolt.recover.request-help-credentials-lost', async requestId => {
-    const controller = new AbortAndRequestHelp(worker, requestId, apiClientOptions, account);
-    await controller._exec();
-  });
-
-  worker.port.on('passbolt.port.generate-id', async requestId => {
-    const controller = new GeneratePortIdController(worker, requestId);
+    const controller = new AbortAndRequestHelp(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
   worker.port.on('passbolt.recover.get-user-passphrase-policies', async requestId => {
-    const controller = new GetUserPassphrasePoliciesController(worker, requestId, runtimeMemory);
+    const controller = new GetUserPassphrasePoliciesController(worker, requestId);
     await controller._exec();
   });
 

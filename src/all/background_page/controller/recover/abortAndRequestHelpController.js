@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 import SetupModel from "../../model/setup/setupModel";
-
+import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
 
 class AbortAndRequestHelp {
   /**
@@ -20,12 +20,10 @@ class AbortAndRequestHelp {
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
    * @param {ApiClientOptions} apiClientOptions The api client options.
-   * @param {AccountRecoverEntity} account The account being recovered.
    */
-  constructor(worker, requestId, apiClientOptions, account) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.account = account;
     this.recoverModel = new SetupModel(apiClientOptions);
   }
 
@@ -48,7 +46,8 @@ class AbortAndRequestHelp {
    * @returns {Promise<void>}
    */
   async exec() {
-    await this.recoverModel.abortRecover(this.account);
+    const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
+    await this.recoverModel.abortRecover(temporaryAccount.account);
   }
 }
 

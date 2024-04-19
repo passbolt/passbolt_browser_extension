@@ -16,6 +16,8 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import GetGpgKeyCreationDateService from "../../service/crypto/getGpgKeyCreationDateService";
 import GenerateGpgKeyPairOptionsEntity from "../../model/entity/gpgkey/generate/generateGpgKeyPairOptionsEntity";
 import GenerateGpgKeyPairService from "../../service/crypto/generateGpgKeyPairService";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
+import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
 
 const ACCOUNT_RECOVERY_REQUEST_KEY_SIZE = 4096;
 
@@ -25,13 +27,11 @@ class GenerateRecoverAccountRecoveryRequestKeyController {
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
    * @param {ApiClientOptions} apiClientOptions The api client options.
-   * @param {AccountRecoverEntity} account The account being recovered.
    */
-  constructor(worker, requestId, apiClientOptions, account) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
     this.apiClientOptions = apiClientOptions;
-    this.account = account;
   }
 
   /**
@@ -55,9 +55,10 @@ class GenerateRecoverAccountRecoveryRequestKeyController {
    * @returns {Promise<void>}
    */
   async exec(generateGpgKeyPairDto) {
+    const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
     const dto = {
       name: 'Account recovery request key',
-      email: this.account?.username,
+      email: temporaryAccount.account?.username,
       passphrase: generateGpgKeyPairDto?.passphrase,
       keySize: ACCOUNT_RECOVERY_REQUEST_KEY_SIZE,
       date: await GetGpgKeyCreationDateService.getDate(this.apiClientOptions),
@@ -65,9 +66,11 @@ class GenerateRecoverAccountRecoveryRequestKeyController {
     const generateGpgKeyPairOptionsEntity = new GenerateGpgKeyPairOptionsEntity(dto);
     const externalGpgKeyPair = await GenerateGpgKeyPairService.generateKeyPair(generateGpgKeyPairOptionsEntity);
     const generatedPublicKey = await OpenpgpAssertion.readKeyOrFail(externalGpgKeyPair.publicKey.armoredKey);
-    this.account.userPrivateArmoredKey = externalGpgKeyPair.privateKey.armoredKey;
-    this.account.userPublicArmoredKey = externalGpgKeyPair.publicKey.armoredKey;
-    this.account.userKeyFingerprint = generatedPublicKey.getFingerprint().toUpperCase();
+    temporaryAccount.account.userPrivateArmoredKey = externalGpgKeyPair.privateKey.armoredKey;
+    temporaryAccount.account.userPublicArmoredKey = externalGpgKeyPair.publicKey.armoredKey;
+    temporaryAccount.account.userKeyFingerprint = generatedPublicKey.getFingerprint().toUpperCase();
+    // Update all data in the temporary account stored
+    await AccountTemporarySessionStorageService.set(temporaryAccount);
   }
 }
 

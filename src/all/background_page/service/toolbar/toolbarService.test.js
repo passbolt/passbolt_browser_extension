@@ -13,16 +13,16 @@
  */
 
 import toolbarService from "./toolbarService";
-import AccountEntity from "../model/entity/account/accountEntity";
-import {defaultAccountDto} from "../model/entity/account/accountEntity.test.data";
-import GetLegacyAccountService from "../service/account/getLegacyAccountService";
-import {BrowserExtensionIconService} from "../service/ui/browserExtensionIcon.service";
-import {defaultResourceDtosCollection} from "../model/entity/resource/resourcesCollection.test.data";
-import ResourceLocalStorage from "../service/local_storage/resourceLocalStorage";
+import AccountEntity from "../../model/entity/account/accountEntity";
+import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
+import GetLegacyAccountService from "../account/getLegacyAccountService";
+import {BrowserExtensionIconService} from "../ui/browserExtensionIcon.service";
+import {defaultResourceDtosCollection} from "../../model/entity/resource/resourcesCollection.test.data";
+import ResourceLocalStorage from "../local_storage/resourceLocalStorage";
 import {
   resourceTypesCollectionDto
 } from "passbolt-styleguide/src/shared/models/entity/resourceType/resourceTypesCollection.test.data";
-import ResourceTypeLocalStorage from "../service/local_storage/resourceTypeLocalStorage";
+import ResourceTypeLocalStorage from "../local_storage/resourceTypeLocalStorage";
 
 jest.useFakeTimers();
 
@@ -33,7 +33,7 @@ beforeEach(() => {
   jest.clearAllTimers();
 });
 
-describe("ToolbarController", () => {
+describe("ToolbarService", () => {
   const browserExtensionIconServiceActivateMock = jest.fn();
   const browserExtensionIconServiceDeactivateMock = jest.fn();
   const browserExtensionIconServiceSetCountMock = jest.fn();

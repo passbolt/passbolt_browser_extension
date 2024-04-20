@@ -12,7 +12,7 @@
  * @since         4.7.0
  */
 
-import toolbarService from "../../controller/toolbarService";
+import toolbarService from "../toolbar/toolbarService";
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
 import InformCallToActionPagemod from "../../pagemod/informCallToActionPagemod";
 import WorkerService from "../worker/workerService";

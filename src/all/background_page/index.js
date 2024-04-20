@@ -15,6 +15,7 @@ import OnExtensionUpdateAvailableService from "./service/extension/onExtensionUp
 import CheckAuthStatusService from "./service/auth/checkAuthStatusService";
 import GlobalAlarmService from "./service/alarm/globalAlarmService";
 import PostLoginService from "./service/auth/postLoginService";
+import PostLogoutService from "./service/auth/postLogoutService";
 
 const main = async() => {
   /**
@@ -37,18 +38,20 @@ const checkAndProcessIfUserAuthenticated = async() => {
     return;
   }
 
-  const checkAuthStatusService = new CheckAuthStatusService();
+  let authStatus;
   try {
-    const authStatus = await checkAuthStatusService.checkAuthStatus(true);
-    if (authStatus.isAuthenticated) {
-      await PostLoginService.postLogin();
-    }
+    const checkAuthStatusService = new CheckAuthStatusService();
+    authStatus = await checkAuthStatusService.checkAuthStatus(true);
   } catch (error) {
-    /*
-     * Service unavailable
-     * Do nothing...
-     */
+    // Service is unavailable, do nothing...
     Log.write({level: 'debug', message: 'The Service is unavailable to check if the user is authenticated'});
+    return;
+  }
+
+  if (authStatus.isAuthenticated) {
+    PostLoginService.exec();
+  } else {
+    PostLogoutService.exec();
   }
 };
 

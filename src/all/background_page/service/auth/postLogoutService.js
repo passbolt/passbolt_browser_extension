@@ -13,7 +13,7 @@
  */
 import AppPagemod from "../../pagemod/appPagemod";
 import LocalStorageService from "../localStorage/localStorageService";
-import toolbarService from "../../controller/toolbarService";
+import toolbarService from "../toolbar/toolbarService";
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
 import resourceInProgressCacheService from "../cache/resourceInProgressCache.service";
 import OnExtensionUpdateAvailableService from "../extension/onExtensionUpdateAvailableService";

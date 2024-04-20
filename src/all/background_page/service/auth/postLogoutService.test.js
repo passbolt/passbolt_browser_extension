@@ -22,10 +22,10 @@ import PortManager from "../../sdk/port/portManager";
 import {mockPort} from "../../sdk/port/portManager.test.data";
 import Port from "../../sdk/port";
 import LocalStorageService from "../localStorage/localStorageService";
-import toolbarController from "../../controller/toolbarService";
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
 import resourceInProgressCacheService from "../cache/resourceInProgressCache.service";
 import OnExtensionUpdateAvailableService from "../extension/onExtensionUpdateAvailableService";
+import toolbarService from "../toolbar/toolbarService";
 
 describe("PostLogoutService", () => {
   beforeEach(() => {
@@ -87,7 +87,7 @@ describe("PostLogoutService", () => {
       expect.assertions(5);
       jest.spyOn(PortManager, "isPortExist").mockImplementation(() => false);
       jest.spyOn(LocalStorageService, "flush");
-      jest.spyOn(toolbarController, "handleUserLoggedOut");
+      jest.spyOn(toolbarService, "handleUserLoggedOut");
       jest.spyOn(StartLoopAuthSessionCheckService, "clearAlarm");
       jest.spyOn(resourceInProgressCacheService, "reset");
       jest.spyOn(OnExtensionUpdateAvailableService, "handleUserLoggedOut");
@@ -95,7 +95,7 @@ describe("PostLogoutService", () => {
       await PostLogoutService.exec();
 
       expect(LocalStorageService.flush).toHaveBeenCalledTimes(1);
-      expect(toolbarController.handleUserLoggedOut).toHaveBeenCalledTimes(1);
+      expect(toolbarService.handleUserLoggedOut).toHaveBeenCalledTimes(1);
       expect(StartLoopAuthSessionCheckService.clearAlarm).toHaveBeenCalledTimes(1);
       expect(resourceInProgressCacheService.reset).toHaveBeenCalledTimes(1);
       expect(OnExtensionUpdateAvailableService.handleUserLoggedOut).toHaveBeenCalledTimes(1);

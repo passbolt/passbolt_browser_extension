@@ -2,7 +2,7 @@ import storage from "../../sdk/storage";
 import {Config} from "../../model/config";
 import Log from "../../model/log";
 import * as openpgp from "openpgp";
-import toolbarService from "../../controller/toolbarService";
+import toolbarService from "../toolbar/toolbarService";
 
 class SystemRequirementService {
   /**

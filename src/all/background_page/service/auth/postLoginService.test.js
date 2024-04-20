@@ -19,10 +19,10 @@ import PortManager from "../../sdk/port/portManager";
 import {mockPort} from "../../sdk/port/portManager.test.data";
 import Port from "../../sdk/port";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import toolbarController from "../../controller/toolbarService";
 import PostLoginService from "./postLoginService";
 import StartLoopAuthSessionCheckService from "./startLoopAuthSessionCheckService";
 import InformCallToActionPagemod from "../../pagemod/informCallToActionPagemod";
+import toolbarService from "../toolbar/toolbarService";
 
 beforeEach(async() => {
   jest.clearAllMocks();
@@ -85,12 +85,12 @@ describe("PostLoginService", () => {
       expect.assertions(2);
 
       jest.spyOn(StartLoopAuthSessionCheckService, "exec");
-      jest.spyOn(toolbarController, "handleUserLoggedIn");
+      jest.spyOn(toolbarService, "handleUserLoggedIn");
 
       await PostLoginService.exec();
 
       expect(StartLoopAuthSessionCheckService.exec).toHaveBeenCalledTimes(1);
-      expect(toolbarController.handleUserLoggedIn).toHaveBeenCalledTimes(1);
+      expect(toolbarService.handleUserLoggedIn).toHaveBeenCalledTimes(1);
     });
   });
 });

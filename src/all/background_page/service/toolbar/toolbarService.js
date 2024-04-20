@@ -11,17 +11,15 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.0.0
  */
-import {BrowserExtensionIconService} from "../service/ui/browserExtensionIcon.service";
-import ResourceModel from "../model/resource/resourceModel";
-import Toolbar from "../model/toolbar";
-import {TabController as tabsController} from "./tabsController";
-import GetLegacyAccountService from "../service/account/getLegacyAccountService";
-import BuildApiClientOptionsService from "../service/account/buildApiClientOptionsService";
+import {BrowserExtensionIconService} from "../ui/browserExtensionIcon.service";
+import ResourceModel from "../../model/resource/resourceModel";
+import Toolbar from "../../model/toolbar";
+import {TabController as tabsController} from "../../controller/tabsController";
+import GetLegacyAccountService from "../account/getLegacyAccountService";
+import BuildApiClientOptionsService from "../account/buildApiClientOptionsService";
 
 class ToolbarService {
   initialise() {
-    // Initially, set the browser extension icon as inactive
-    BrowserExtensionIconService.deactivate();
     this.bindCallbacks();
     this.addEventListeners();
     this.account = null; // The user account

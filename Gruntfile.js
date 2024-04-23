@@ -118,7 +118,8 @@ module.exports = function (grunt) {
       },
       service_worker: {
         files: [
-          { expand: true, cwd: path.src_chrome_mv3, src: 'serviceWorker.js', dest: path.build + 'serviceWorker' }
+          { expand: true, cwd: path.src_chrome_mv3, src: 'serviceWorker.js', dest: path.build + 'serviceWorker' },
+          { expand: true, cwd: `${path.src_chrome_mv3}/offscreens`, src: 'fetch.html', dest: `${path.build}/offscreens` }
         ]
       },
       web_accessible_resources: {
@@ -309,14 +310,15 @@ module.exports = function (grunt) {
        */
       build_service_worker_prod: {
         command: [
-          'npm run build:service-worker'
+          'npm run build:service-worker',
         ].join(' && ')
       },
       build_service_worker_debug: {
         command: [
-          'npm run dev:build:service-worker'
+          'npm run dev:build:service-worker',
         ].join(' && ')
       },
+
       /**
        * Build content script
        */

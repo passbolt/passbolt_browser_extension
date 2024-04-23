@@ -1,20 +1,11 @@
-const webpack = require('webpack');
 const path = require('path');
 const TerserPlugin = require("terser-webpack-plugin");
 
 const config = {
   entry: {
-    'index': path.resolve(__dirname, './src/chrome-mv3/index.js'),
+    'fetch': path.resolve(__dirname, './src/chrome-mv3/offscreens/fetch.js'),
   },
   mode: 'production',
-  plugins: [
-    new webpack.ProvidePlugin({
-      // Inject browser polyfill as a global API, and adapt it depending on the environment (MV2/MV3/Windows app).
-      browser: path.resolve(__dirname, './src/all/common/polyfill/browserPolyfill.js'),
-      // Inject custom api client fetch to MV3 extension as workaround of the invalid certificate issue.
-      customApiClientFetch: path.resolve(__dirname, './src/chrome-mv3/polyfill/fetchOffscreenPolyfill.js'),
-    })
-  ],
   module: {
     rules: [
       {
@@ -44,8 +35,8 @@ const config = {
   resolve: {extensions: ["*", ".js"], fallback: {crypto: false}},
   output: {
     // Set a unique name to ensure the cohabitation of multiple webpack loader on the same page.
-    chunkLoadingGlobal: 'serviceWorkerIndexChunkLoadingGlobal',
-    path: path.resolve(__dirname, './build/all/serviceWorker'),
+    chunkLoadingGlobal: 'offscreensFetchChunkLoadingGlobal',
+    path: path.resolve(__dirname, './build/all/offscreens'),
     pathinfo: true,
     filename: '[name].js'
   }

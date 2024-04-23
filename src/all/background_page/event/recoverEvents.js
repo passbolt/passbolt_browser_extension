@@ -31,6 +31,7 @@ import SetSetupSecurityTokenController from "../controller/setup/setSetupSecurit
 import HasRecoverUserEnabledAccountRecoveryController from "../controller/recover/hasRecoverUserEnabledAccountRecoveryController";
 import GeneratePortIdController from "../controller/port/generatePortIdController";
 import GetUserPassphrasePoliciesController from "../controller/setup/getUserPassphrasePoliciesController";
+import ReloadTabController from "../controller/tab/reloadTabController";
 
 
 const listen = (worker, apiClientOptions, account) => {
@@ -134,6 +135,11 @@ const listen = (worker, apiClientOptions, account) => {
 
   worker.port.on('passbolt.recover.get-user-passphrase-policies', async requestId => {
     const controller = new GetUserPassphrasePoliciesController(worker, requestId, runtimeMemory);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.tab.reload', async requestId => {
+    const controller = new ReloadTabController(worker, requestId);
     await controller._exec();
   });
 };

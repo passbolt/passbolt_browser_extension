@@ -22,6 +22,7 @@ import GetAndInitializeAccountLocaleController from "../controller/account/getAn
 import GetExtensionVersionController from "../controller/extension/getExtensionVersionController";
 import GetAccountController from "../controller/account/getAccountController";
 import AuthLoginController from "../controller/auth/authLoginController";
+import ReloadTabController from "../controller/tab/reloadTabController";
 
 /**
  * Listens to the account recovery continue application events
@@ -83,6 +84,11 @@ const listen = function(worker, apiClientOptions, account) {
   worker.port.on('passbolt.locale.update-user-locale', async(requestId, localeDto) => {
     const controller = new SetSetupLocaleController(worker, requestId, apiClientOptions, account);
     await controller._exec(localeDto);
+  });
+
+  worker.port.on('passbolt.tab.reload', async requestId => {
+    const controller = new ReloadTabController(worker, requestId);
+    await controller._exec();
   });
 };
 

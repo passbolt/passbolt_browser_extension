@@ -41,6 +41,15 @@ class BrowserTabService {
     const requestArgs = [message].concat(args);
     return browser.tabs.sendMessage(worker.tabId, requestArgs, {frameId: worker.frameId});
   }
+
+  /**
+   * Reload the tab
+   * @param id The id of the tab
+   * @return {Promise<void>}
+   */
+  static async reloadTab(id) {
+    await browser.tabs.reload(id);
+  }
 }
 
 export default BrowserTabService;

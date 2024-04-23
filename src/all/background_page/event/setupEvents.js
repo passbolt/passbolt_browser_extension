@@ -29,6 +29,7 @@ import IsExtensionFirstInstallController from "../controller/extension/isExtensi
 import SetSetupSecurityTokenController from "../controller/setup/setSetupSecurityTokenController";
 import GetAccountRecoveryOrganizationPolicyController from "../controller/setup/getAccountRecoveryOrganizationPolicyController";
 import GetUserPassphrasePoliciesController from "../controller/setup/getUserPassphrasePoliciesController";
+import ReloadTabController from "../controller/tab/reloadTabController";
 
 const listen = function(worker, apiClientOptions, account) {
   /*
@@ -122,6 +123,11 @@ const listen = function(worker, apiClientOptions, account) {
 
   worker.port.on('passbolt.setup.get-user-passphrase-policies', async requestId => {
     const controller = new GetUserPassphrasePoliciesController(worker, requestId, runtimeMemory);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.tab.reload', async requestId => {
+    const controller = new ReloadTabController(worker, requestId);
     await controller._exec();
   });
 };

@@ -29,10 +29,17 @@ jest.mock("webextension-polyfill", () => {
     cookies: {
       get: jest.fn()
     },
+    // offscreen is not mocked by jest-webextension-mock v3.8.9
+    offscreen: {
+      closeDocument: jest.fn(),
+      createDocument: jest.fn(),
+    },
     runtime: {
       ...originalBrowser.runtime,
+      // getContexts not mocked by jest-webextension-mock v3.8.9
+      getContexts: jest.fn(() => []),
       // Force the extension runtime url
-      getURL: jest.fn(() => "chrome-extension://didegimhafipceonhjepacocaffmoppf"),
+      getURL: jest.fn(path => `chrome-extension://didegimhafipceonhjepacocaffmoppf/${path}`),
       // Force extension version
       getManifest: jest.fn(() => ({
         version: "v3.6.0"

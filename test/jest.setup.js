@@ -15,6 +15,7 @@
 import "./mocks/mockWebExtensionPolyfill";
 import browser from "../src/all/common/polyfill/browserPolyfill";
 import "./mocks/mockTextEncoder";
+import "./mocks/mockCrypto";
 import "./matchers/extendExpect";
 import MockNavigatorLocks from './mocks/mockNavigatorLocks';
 import OrganizationSettingsModel from "../src/all/background_page/model/organizationSettings/organizationSettingsModel";

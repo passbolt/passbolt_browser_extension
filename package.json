@@ -77,7 +77,7 @@
   "scripts": {
     "build": "npx grunt build",
     "build:background-page": "webpack --config webpack.background-page.config.js",
-    "build:service-worker": "webpack --config webpack.service-worker.config.js",
+    "build:service-worker": "webpack --config webpack.service-worker.config.js; webpack --config webpack-offscreens.fetch.config.js",
     "build:content-scripts": "npm run build:content-scripts:app; npm run build:content-scripts:browser-integration; npm run build:content-scripts:public-website",
     "build:content-scripts:app": "webpack --config webpack-content-scripts.config.js",
     "build:content-scripts:browser-integration": "webpack --config webpack-content-scripts.browser-integration.config.js",
@@ -86,7 +86,7 @@
     "build:web-accessible-resources:app": "webpack --config webpack-data.config.js; webpack --config webpack-data.download.config.js",
     "build:web-accessible-resources:browser-integration": "webpack --config webpack-data.in-form-call-to-action.config.js; webpack --config webpack-data.in-form-menu.config.js",
     "dev:build:background-page": "webpack --env debug=true --config webpack.background-page.config.js",
-    "dev:build:service-worker": "webpack --env debug=true --config webpack.service-worker.config.js",
+    "dev:build:service-worker": "webpack --env debug=true --config webpack.service-worker.config.js; webpack --env debug=true --config webpack-offscreens.fetch.config.js",
     "dev:build:content-scripts": "npm run dev:build:content-scripts:app; npm run dev:build:content-scripts:browser-integration; npm run dev:build:content-scripts:public-website",
     "dev:build:content-scripts:app": "webpack --env debug=true --config webpack-content-scripts.config.js",
     "dev:build:content-scripts:browser-integration": "webpack --env debug=true --config webpack-content-scripts.browser-integration.config.js",

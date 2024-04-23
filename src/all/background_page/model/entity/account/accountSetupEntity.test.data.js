@@ -19,7 +19,7 @@ import {defaultSecurityTokenDto} from "../securityToken/SecurityTokenEntity.test
 
 export const initialAccountSetupDto = (data = {}) => {
   const defaultData = {
-    "type": AccountSetupEntity.TYPE_ACCOUNT,
+    "type": AccountSetupEntity.TYPE_ACCOUNT_SETUP,
     "domain": "https://passbolt.local",
     "user_id": pgpKeys.ada.userId,
     "authentication_token_token": uuidv4(),

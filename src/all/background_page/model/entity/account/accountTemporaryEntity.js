@@ -135,8 +135,8 @@ class AccountTemporaryEntity extends AbstractAccountEntity {
     if (contains.account_recovery_organization_policy && this.accountRecoveryOrganizationPolicy) {
       result.account_recovery_organization_policy = this.accountRecoveryOrganizationPolicy.toDto(AccountRecoveryOrganizationPolicyEntity.ALL_CONTAIN_OPTIONS);
     }
-    if (contains.user_passphrase_policies && this.userPassphrasePolicy) {
-      result.user_passphrase_policies = this.userPassphrasePolicy.toDto();
+    if (contains.user_passphrase_policies && this.userPassphrasePolicies) {
+      result.user_passphrase_policies = this.userPassphrasePolicies.toDto();
     }
 
     return result;
@@ -210,7 +210,7 @@ class AccountTemporaryEntity extends AbstractAccountEntity {
    * Get the user passphrase policy
    * @returns {(UserPassphrasePoliciesEntity|null)}
    */
-  get userPassphrasePolicy() {
+  get userPassphrasePolicies() {
     return this._user_passphrase_policies || null;
   }
 
@@ -219,7 +219,7 @@ class AccountTemporaryEntity extends AbstractAccountEntity {
    * @param {UserPassphrasePoliciesEntity} userPassphrasePolicy The account recovery organization policy
    * @throws {TypeError} If the userPassphrasePolicy parameter is not a valid UserPassphrasePoliciesEntity
    */
-  set userPassphrasePolicy(userPassphrasePolicy) {
+  set userPassphrasePolicies(userPassphrasePolicy) {
     if (!userPassphrasePolicy || !(userPassphrasePolicy instanceof UserPassphrasePoliciesEntity)) {
       throw new TypeError('Failed to assert the parameter is a valid UserPassphrasePoliciesEntity');
     }

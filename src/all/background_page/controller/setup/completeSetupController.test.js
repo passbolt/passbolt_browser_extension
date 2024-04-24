@@ -21,6 +21,7 @@ import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import User from "../../model/user";
 import Keyring from "../../model/keyring";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -31,7 +32,8 @@ describe("CompleteSetupController", () => {
   describe("CompleteSetupController::exec", () => {
     it("Should complete the setup.", async() => {
       const account = new AccountSetupEntity(withSecurityTokenAccountSetupDto());
-      const controller = new CompleteSetupController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new CompleteSetupController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
 
       // Mock API complete request.
       fetch.doMockOnce(() => mockApiResponse());
@@ -62,7 +64,8 @@ describe("CompleteSetupController", () => {
 
     it("Should not add the account to the local storage if the complete API request fails.", async() => {
       const account = new AccountSetupEntity(withSecurityTokenAccountSetupDto());
-      const controller = new CompleteSetupController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new CompleteSetupController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
 
       // Mock API complete request.
       fetch.doMockOnce(() => Promise.reject());
@@ -72,6 +75,16 @@ describe("CompleteSetupController", () => {
       expect.assertions(2);
       await expect(promise).rejects.toThrow();
       expect(() => User.getInstance().get()).toThrow("The user is not set");
+    });
+
+    it("Should raise an error if no account has been found.", async() => {
+      const controller = new CompleteSetupController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      expect.assertions(1);
+      try {
+        await controller.exec();
+      } catch (error) {
+        expect(error.message).toEqual("You have already started the process on another tab.");
+      }
     });
   });
 });

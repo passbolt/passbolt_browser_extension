@@ -115,8 +115,11 @@ class AccountRecoverEntity extends AbstractAccountEntity {
     if (contains.authentication_token_token) {
       result.authentication_token_token = this.authenticationTokenToken;
     }
-    if (contains.security_token && this._security_token) {
-      result.security_token = this._security_token.toDto();
+    if (contains.security_token && this.securityToken) {
+      result.security_token = this.securityToken.toDto();
+    }
+    if (contains.account_recovery_user_setting && this.accountRecoveryUserSetting) {
+      result.account_recovery_user_setting = this.accountRecoveryUserSetting.toDto(AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS);
     }
     if (contains.user && this._user) {
       result.user = this._user.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
@@ -244,6 +247,7 @@ class AccountRecoverEntity extends AbstractAccountEntity {
       user_private_armored_key: true,
       security_token: true,
       authentication_token_token: true,
+      account_recovery_user_setting: true,
       user: true
     };
   }

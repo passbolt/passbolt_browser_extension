@@ -15,23 +15,24 @@
 import GetAccountRecoveryOrganizationPolicyController from "./getAccountRecoveryOrganizationPolicyController";
 import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import AccountRecoveryOrganizationPolicyEntity from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 describe("GetAccountRecoveryOrganizationPolicyController", () => {
   describe("GetAccountRecoveryOrganizationPolicyController::exec", () => {
     it("Should return the account recovery organization policy", async() => {
-      const runtimeMemory = {
-        accountRecoveryOrganizationPolicy: new AccountRecoveryOrganizationPolicyEntity(enabledAccountRecoveryOrganizationPolicyDto())
-      };
-      const controller = new GetAccountRecoveryOrganizationPolicyController(null, null, runtimeMemory);
+      const accountRecoveryOrganizationPolicy = new AccountRecoveryOrganizationPolicyEntity(enabledAccountRecoveryOrganizationPolicyDto());
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({accountRecoveryOrganizationPolicy: accountRecoveryOrganizationPolicy}));
+
+      const controller = new GetAccountRecoveryOrganizationPolicyController({port: {_port: {name: "test"}}}, null);
 
       expect.assertions(1);
-      const accountRecoveryOrganizationPolicy = await controller.exec();
-      expect(accountRecoveryOrganizationPolicy).toBeInstanceOf(AccountRecoveryOrganizationPolicyEntity);
+      const accountRecoveryOrganizationPolicyReceived = await controller.exec();
+      expect(accountRecoveryOrganizationPolicyReceived).toBeInstanceOf(AccountRecoveryOrganizationPolicyEntity);
     });
 
     it("Should not return the account recovery organization policy if not defined", async() => {
-      const runtimeMemory = {};
-      const controller = new GetAccountRecoveryOrganizationPolicyController(null, null, runtimeMemory);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => null);
+      const controller = new GetAccountRecoveryOrganizationPolicyController({port: {_port: {name: "test"}}}, null);
 
       expect.assertions(1);
       const accountRecoveryOrganizationPolicy = await controller.exec();

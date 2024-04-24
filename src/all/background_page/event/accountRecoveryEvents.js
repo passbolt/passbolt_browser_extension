@@ -77,7 +77,7 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.account-recovery.download-recovery-kit', async requestId => {
-    const controller = new DownloadRecoveryKitController(worker, requestId, account);
+    const controller = new DownloadRecoveryKitController(worker, requestId);
     await controller._exec();
   });
 

@@ -11,18 +11,17 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 class GetAccountRecoveryOrganizationPolicyController {
   /**
    * Constructor.
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
-   * @param {Object} runtimeMemory The setup runtime memory.
    */
-  constructor(worker, requestId, runtimeMemory) {
+  constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
-    this.runtimeMemory = runtimeMemory;
   }
 
   /**
@@ -44,7 +43,8 @@ class GetAccountRecoveryOrganizationPolicyController {
    * @returns {Promise<AccountEntity>}
    */
   async exec() {
-    return this.runtimeMemory.accountRecoveryOrganizationPolicy;
+    const temporaryAccount = await AccountTemporarySessionStorageService.get(this.worker.port._port.name);
+    return temporaryAccount?.accountRecoveryOrganizationPolicy;
   }
 }
 

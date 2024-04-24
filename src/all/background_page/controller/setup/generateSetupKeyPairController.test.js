@@ -20,14 +20,16 @@ import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
+import {v4 as uuidv4} from "uuid";
+import AccountTemporaryEntity from "../../model/entity/account/accountTemporaryEntity";
 
 describe("GenerateSetupKeyPairController", () => {
   describe("GenerateSetupKeyPairController::exec", () => {
     it("Should throw an exception if the passed DTO is not valid.", async() => {
       await MockExtension.withConfiguredAccount();
       const account = new AccountSetupEntity(startAccountSetupDto());
-      const runtimeMemory = {};
-      const controller = new GenerateSetupKeyPairController(null, null, defaultApiClientOptions(), account, runtimeMemory);
+      const controller = new GenerateSetupKeyPairController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
 
       const scenarios = [
         {dto: null, expectedError: TypeError},
@@ -46,15 +48,15 @@ describe("GenerateSetupKeyPairController", () => {
         {dto: {passphrase: undefined}, expectedError: EntityValidationError},
       ];
 
-      expect.assertions(scenarios.length * 2);
+      expect.assertions(scenarios.length);
 
       for (let i = 0; i < scenarios.length; i++) {
         const scenario = scenarios[i];
         try {
+          jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
           await controller.exec(scenario.dto);
         } catch (e) {
           expect(e).toBeInstanceOf(scenario.expectedError);
-          expect(runtimeMemory.passphrase).toBeFalsy();
         }
       }
     });
@@ -63,11 +65,15 @@ describe("GenerateSetupKeyPairController", () => {
       expect.assertions(12);
       await MockExtension.withConfiguredAccount();
       const generateKeyPairDto = {passphrase: "What a great passphrase!"};
-      const account = new AccountSetupEntity(startAccountSetupDto());
-      const runtimeMemory = {};
-      const controller = new GenerateSetupKeyPairController(null, null, defaultApiClientOptions(), account, runtimeMemory);
+      const workerId = uuidv4();
+      const setupAccountDto = startAccountSetupDto();
+      const temporaryAccountEntity = new AccountTemporaryEntity({account: setupAccountDto, worker_id: workerId});
+      await AccountTemporarySessionStorageService.set(temporaryAccountEntity);
+      const controller = new GenerateSetupKeyPairController({port: {_port: {name: workerId}}}, null, defaultApiClientOptions());
 
       await controller.exec(generateKeyPairDto);
+      const expectedAccount = await AccountTemporarySessionStorageService.get(workerId);
+      const account = expectedAccount.account;
       await expect(account.userKeyFingerprint).not.toBeNull();
       await expect(account.userKeyFingerprint).toHaveLength(40);
       await expect(account.userPublicArmoredKey).toBeOpenpgpPublicKey();
@@ -92,7 +98,17 @@ describe("GenerateSetupKeyPairController", () => {
       const userPrivateKey = await OpenpgpAssertion.readKeyOrFail(account.userPrivateArmoredKey);
       const decryptedPrivateKey = await DecryptPrivateKeyService.decrypt(userPrivateKey, generateKeyPairDto.passphrase);
       expect(decryptedPrivateKey).not.toBeNull();
-      expect(runtimeMemory.passphrase).toStrictEqual(generateKeyPairDto.passphrase);
+      expect(expectedAccount.passphrase).toStrictEqual(generateKeyPairDto.passphrase);
     }, 10000);
+
+    it("Should raise an error if no account has been found.", async() => {
+      const controller = new GenerateSetupKeyPairController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      expect.assertions(1);
+      try {
+        await controller.exec({passphrase: "passphrase"});
+      } catch (error) {
+        expect(error.message).toEqual("You have already started the process on another tab.");
+      }
+    });
   });
 });

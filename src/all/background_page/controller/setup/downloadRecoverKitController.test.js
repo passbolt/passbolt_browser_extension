@@ -19,6 +19,7 @@ import {
 } from "../../model/entity/account/accountSetupEntity.test.data";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import FileService from "../../service/file/fileService";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 jest.mock("../../service/file/fileService");
 
@@ -26,7 +27,9 @@ describe("DownloadRecoveryKitController", () => {
   describe("DownloadRecoveryKitController::exec", () => {
     it("Should throw an exception if the account does have a defined user armored private key.", async() => {
       const account = new AccountSetupEntity(startAccountSetupDto());
-      const controller = new DownloadRecoveryKitController(null, null, account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+
+      const controller = new DownloadRecoveryKitController({port: {_port: {name: "test"}}}, null);
 
       expect.assertions(1);
       const promise = controller.exec();
@@ -38,11 +41,13 @@ describe("DownloadRecoveryKitController", () => {
       const mockedWorker = {
         tab: {
           id: "id"
-        }
+        },
+        port: {_port: {name: "test"}}
       };
 
       const account = new AccountSetupEntity(withUserKeyAccountSetupDto());
-      const controller = new DownloadRecoveryKitController(mockedWorker, null, account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new DownloadRecoveryKitController(mockedWorker, null);
 
       expect.assertions(1);
       await controller.exec();
@@ -52,6 +57,16 @@ describe("DownloadRecoveryKitController", () => {
         "text/plain",
         mockedWorker.tab.id
       );
+    });
+
+    it("Should raise an error if no account has been found.", async() => {
+      const controller = new DownloadRecoveryKitController({port: {_port: {name: "test"}}}, null);
+      expect.assertions(1);
+      try {
+        await controller.exec();
+      } catch (error) {
+        expect(error.message).toEqual("You have already started the process on another tab.");
+      }
     });
   });
 });

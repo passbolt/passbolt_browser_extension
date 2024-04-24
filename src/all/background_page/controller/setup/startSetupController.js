@@ -15,6 +15,9 @@ import SetupModel from "../../model/setup/setupModel";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import WorkerService from "../../service/worker/workerService";
 import AuthVerifyServerKeyService from "../../service/api/auth/authVerifyServerKeyService";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
+import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
+import AccountTemporaryEntity from "../../model/entity/account/accountTemporaryEntity";
 
 class StartSetupController {
   /**
@@ -22,16 +25,14 @@ class StartSetupController {
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
    * @param {ApiClientOptions} apiClientOptions The api client options.
-   * @param {AccountEntity} account The account being setting up.
-   * @param {Object} runtimeMemory The setup runtime memory.
+   * @param {AccountSetupEntity} account The account being setting up.
    */
-  constructor(worker, requestId, apiClientOptions, account, runtimeMemory) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
     this.authVerifyServerKeyService = new AuthVerifyServerKeyService(apiClientOptions);
     this.setupModel = new SetupModel(apiClientOptions);
-    this.runtimeMemory = runtimeMemory;
   }
 
   /**
@@ -54,11 +55,27 @@ class StartSetupController {
    */
   async exec() {
     try {
+      await this._buildTemporaryAccountEntity();
       await this._findAndSetAccountSetupServerPublicKey();
       await this._findAndSetAccountSetupMeta();
+      // Set all data in the temporary account stored
+      await AccountTemporarySessionStorageService.set(this.temporaryAccount);
     } catch (error) {
       await this._handleUnexpectedError(error);
     }
+  }
+
+  /**
+   * Create or replace the account temporary in the session storage.
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _buildTemporaryAccountEntity() {
+    const temporaryAccountDto = {
+      account: this.account.toDto(AccountSetupEntity.ALL_CONTAIN_OPTIONS),
+      worker_id: this.worker.port._port.name
+    };
+    this.temporaryAccount = new AccountTemporaryEntity(temporaryAccountDto);
   }
 
   /**
@@ -72,7 +89,7 @@ class StartSetupController {
     OpenpgpAssertion.assertPublicKey(serverPublicKey);
 
     // associate the server public key to the account being set up.
-    this.account.serverPublicArmoredKey = serverPublicKey.armor();
+    this.temporaryAccount.account.serverPublicArmoredKey = serverPublicKey.armor();
   }
 
   /**
@@ -82,26 +99,26 @@ class StartSetupController {
    */
   async _findAndSetAccountSetupMeta() {
     const {user, accountRecoveryOrganizationPolicy, userPassphrasePolicies} = await this.setupModel.startSetup(
-      this.account.userId,
-      this.account.authenticationTokenToken
+      this.temporaryAccount.account.userId,
+      this.temporaryAccount.account.authenticationTokenToken
     );
 
     // Associate the user meta to the account being set up.
-    this.account.username = user?.username;
-    this.account.firstName = user?.profile.firstName;
-    this.account.lastName = user?.profile.lastName;
+    this.temporaryAccount.account.username = user?.username;
+    this.temporaryAccount.account.firstName = user?.profile.firstName;
+    this.temporaryAccount.account.lastName = user?.profile.lastName;
 
     // As of v3.6.0 the user is stored only to know if account recovery was enabled for this account.
-    this.account.user = user;
+    this.temporaryAccount.account.user = user;
 
-    // Keep the account recovery organization policy in the setup runtime memory.
+    // Keep the account recovery organization policy in the setup temporary account storage.
     if (accountRecoveryOrganizationPolicy) {
-      this.runtimeMemory.accountRecoveryOrganizationPolicy = accountRecoveryOrganizationPolicy;
+      this.temporaryAccount.accountRecoveryOrganizationPolicy = accountRecoveryOrganizationPolicy;
     }
 
-    // Keep the user passphrase policies in the setup runtime memory.
+    // Keep the user passphrase policies in the setup temporary account storage.
     if (userPassphrasePolicies) {
-      this.runtimeMemory.userPassphrasePolicies = userPassphrasePolicies;
+      this.temporaryAccount.userPassphrasePolicies = userPassphrasePolicies;
     }
   }
 

@@ -18,6 +18,8 @@ import AuthVerifyLoginChallengeService from "../../service/auth/authVerifyLoginC
 import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
 import PostLoginService from "../../service/auth/postLoginService";
 import KeepSessionAliveService from "../../service/session_storage/keepSessionAliveService";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
+import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
 
 class SignInSetupController {
   /**
@@ -25,15 +27,11 @@ class SignInSetupController {
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions
-   * @param {AccountEntity} account The account
-   * @param {Object} runtimeMemory The setup runtime memory.
    */
-  constructor(worker, requestId, apiClientOptions, account, runtimeMemory) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.account = account;
     this.authVerifyLoginChallengeService = new AuthVerifyLoginChallengeService(apiClientOptions);
-    this.runtimeMemory = runtimeMemory;
     this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
     this.checkPassphraseService = new CheckPassphraseService(new Keyring());
   }
@@ -58,36 +56,39 @@ class SignInSetupController {
    * @return {Promise<void>}
    */
   async exec(rememberMe = false) {
-    if (typeof this.runtimeMemory.passphrase === "undefined") {
+    const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
+    if (typeof temporaryAccount.passphrase === "undefined") {
       throw new Error("A passphrase is required.");
     }
-    if (typeof this.runtimeMemory.passphrase !== "string") {
+    if (typeof temporaryAccount.passphrase !== "string") {
       throw new Error("The passphrase should be a string.");
     }
     if (typeof rememberMe !== "undefined" && typeof rememberMe !== "boolean") {
       throw new Error("The rememberMe should be a boolean.");
     }
 
-    await this.checkPassphraseService.checkPassphrase(this.runtimeMemory.passphrase);
-    await this.updateSsoCredentialsService.forceUpdateSsoKit(this.runtimeMemory.passphrase);
+    await this.checkPassphraseService.checkPassphrase(temporaryAccount.passphrase);
+    await this.updateSsoCredentialsService.forceUpdateSsoKit(temporaryAccount.passphrase);
 
-    await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(this.account.userKeyFingerprint, this.account.userPrivateArmoredKey, this.runtimeMemory.passphrase);
+    await this.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge(temporaryAccount.account.userKeyFingerprint, temporaryAccount.account.userPrivateArmoredKey, temporaryAccount.passphrase);
     if (rememberMe) {
       await Promise.all([
-        PassphraseStorageService.set(this.runtimeMemory.passphrase, -1),
+        PassphraseStorageService.set(temporaryAccount.passphrase, -1),
         KeepSessionAliveService.start(),
       ]);
     }
     await PostLoginService.exec();
-    await this.redirectToApp();
+    await this.redirectToApp(temporaryAccount.account.domain);
+    // Clear all data in the temporary account session storage
+    await AccountTemporarySessionStorageService.remove();
   }
 
   /**
    * Redirect the user to the application
+   * @param {string} url The url
    * @returns {Promise<void>}
    */
-  async redirectToApp() {
-    const url = this.account.domain;
+  async redirectToApp(url) {
     browser.tabs.update(this.worker.tab.id, {url});
   }
 }

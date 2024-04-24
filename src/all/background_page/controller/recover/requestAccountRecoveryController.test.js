@@ -21,6 +21,7 @@ import {pendingAccountRecoveryRequestDto} from "../../model/entity/accountRecove
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import {withSecurityTokenAccountRecoverDto} from "../../model/entity/account/accountRecoverEntity.test.data";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -30,7 +31,9 @@ describe("RequestAccountRecoveryController", () => {
   describe("RequestAccountRecoveryController::exec", () => {
     it("Should initiate an account recovery from the recover journey.", async() => {
       const account = new AccountRecoverEntity(withSecurityTokenAccountRecoverDto());
-      const controller = new RequestAccountRecoveryController(null, defaultApiClientOptions(), null, account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      jest.spyOn(AccountTemporarySessionStorageService, "remove");
+      const controller = new RequestAccountRecoveryController({port: {_port: {name: "test"}}}, defaultApiClientOptions(), null);
 
       // Mock the API response.
       const mockApiResponseDto = pendingAccountRecoveryRequestDto();
@@ -38,7 +41,7 @@ describe("RequestAccountRecoveryController", () => {
 
       await controller.exec();
 
-      expect.assertions(3);
+      expect.assertions(4);
       // Expect the API to have been called.
       expect(mockApiFetch).toHaveBeenCalled();
       // Expect the temporary account created in the local storage.
@@ -61,6 +64,17 @@ describe("RequestAccountRecoveryController", () => {
         account_recovery_request_id: mockApiResponseDto.id
       };
       expect(accountForAccountRecovery).toEqual(expectedAccountDto);
+      expect(AccountTemporarySessionStorageService.remove).toHaveBeenCalledTimes(1);
+    });
+
+    it("Should raise an error if no account has been found.", async() => {
+      const controller = new RequestAccountRecoveryController({port: {_port: {name: "test"}}}, defaultApiClientOptions(), null);
+      expect.assertions(1);
+      try {
+        await controller.exec();
+      } catch (error) {
+        expect(error.message).toEqual("You have already started the process on another tab.");
+      }
     });
   });
 });

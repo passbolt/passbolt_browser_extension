@@ -23,6 +23,7 @@ import {
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -43,7 +44,7 @@ describe("ImportRecoverPrivateKeyController", () => {
   describe("ImportRecoverPrivateKeyController::exec", () => {
     it("Should throw an exception if the passed DTO is not valid.", async() => {
       const account = new AccountRecoverEntity(withServerKeyAccountRecoverDto());
-      const controller = new ImportRecoverPrivateKeyController(null, null, defaultApiClientOptions(), account);
+      const controller = new ImportRecoverPrivateKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
 
       const scenarios = [
         {dto: null, expectedError: Error},
@@ -62,6 +63,7 @@ describe("ImportRecoverPrivateKeyController", () => {
       for (let i = 0; i < scenarios.length; i++) {
         const scenario = scenarios[i];
         try {
+          jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
           await controller.exec(scenario.dto);
         } catch (e) {
           expect(e).toBeInstanceOf(scenario.expectedError);
@@ -72,7 +74,8 @@ describe("ImportRecoverPrivateKeyController", () => {
     it("Should throw an exception if the setupEntity is not initialized properly.", async() => {
       expect.assertions(1);
       const account = new AccountRecoverEntity(initialAccountRecoverDto());
-      const controller = new ImportRecoverPrivateKeyController(null, null, defaultApiClientOptions(), account);
+      const controller = new ImportRecoverPrivateKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
       try {
         await controller.exec(pgpKeys.ada.private);
       } catch (e) {
@@ -85,7 +88,8 @@ describe("ImportRecoverPrivateKeyController", () => {
       await MockExtension.withConfiguredAccount();
 
       const account = new AccountRecoverEntity(withServerKeyAccountRecoverDto());
-      const controller = new ImportRecoverPrivateKeyController(null, null, defaultApiClientOptions(), account);
+      const controller = new ImportRecoverPrivateKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
       jest.spyOn(controller.authVerifyServerChallengeService, "verifyAndValidateServerChallenge").mockImplementationOnce(() => { throw new Error("Error"); });
       try {
         await controller.exec(pgpKeys.ada.private);
@@ -100,8 +104,10 @@ describe("ImportRecoverPrivateKeyController", () => {
 
       const expectedKeyData = pgpKeys.ada;
       const account = new AccountRecoverEntity(withServerKeyAccountRecoverDto());
-      const controller = new ImportRecoverPrivateKeyController(null, null, defaultApiClientOptions(), account);
+      const controller = new ImportRecoverPrivateKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
 
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      jest.spyOn(AccountTemporarySessionStorageService, "set").mockImplementationOnce(() => jest.fn());
       jest.spyOn(controller.authVerifyServerChallengeService, "verifyAndValidateServerChallenge").mockImplementationOnce(jest.fn());
 
       await controller.exec(expectedKeyData.private);
@@ -126,5 +132,15 @@ describe("ImportRecoverPrivateKeyController", () => {
       expect(controller.authVerifyServerChallengeService.verifyAndValidateServerChallenge).toHaveBeenCalledWith(expectedKeyData.fingerprint, account.serverPublicArmoredKey);
       expect(controller.authVerifyServerChallengeService.verifyAndValidateServerChallenge).toHaveBeenCalledTimes(1);
     }, 10000);
+
+    it("Should raise an error if no account has been found.", async() => {
+      const controller = new ImportRecoverPrivateKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      expect.assertions(1);
+      try {
+        await controller.exec();
+      } catch (error) {
+        expect(error.message).toEqual("You have already started the process on another tab.");
+      }
+    });
   });
 });

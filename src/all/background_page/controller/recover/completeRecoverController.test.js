@@ -21,6 +21,7 @@ import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntit
 import User from "../../model/user";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import Keyring from "../../model/keyring";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 // Reset the modules before each test.
 beforeEach(() => {
@@ -31,7 +32,8 @@ describe("CompleteRecoverController", () => {
   describe("CompleteRecoverController::exec", () => {
     it("Should complete the recover.", async() => {
       const account = new AccountRecoverEntity(withSecurityTokenAccountRecoverDto());
-      const controller = new CompleteRecoverController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new CompleteRecoverController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
 
       // Mock API complete request.
       fetch.doMockOnce(() => mockApiResponse());
@@ -62,7 +64,8 @@ describe("CompleteRecoverController", () => {
 
     it("Should not add the account to the local storage if the complete API request fails.", async() => {
       const account = new AccountRecoverEntity(withSecurityTokenAccountRecoverDto());
-      const controller = new CompleteRecoverController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new CompleteRecoverController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
 
       // Mock API complete request.
       fetch.doMockOnce(() => Promise.reject());

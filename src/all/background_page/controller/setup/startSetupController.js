@@ -66,7 +66,7 @@ class StartSetupController {
   }
 
   /**
-   * Create or replace the account temporary in the session storage.
+   * Built the account temporary.
    * @returns {Promise<void>}
    * @private
    */

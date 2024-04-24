@@ -4,7 +4,7 @@
     "description": "The application name of the extension, displayed in the web store. 45 characters max."
   },
   "appDescription": {
-    "message": "팀을 위한 오픈 소스 암호 관리자용 패스볼트 확장 프로그램",
+    "message": "팀을 위한 오픈 소스 암호 관리자 패스볼트 확장 프로그램",
     "description": "The description of the extension, displayed in the web store. 85 characters max."
   }
 }

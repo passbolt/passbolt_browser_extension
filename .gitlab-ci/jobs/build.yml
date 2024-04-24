@@ -1,6 +1,6 @@
 build:
   stage: build
-  image: node:18
+  image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/node:18
   extends: .rules
   artifacts:
     when: always
@@ -22,7 +22,7 @@ build:
 
 build_mv3:
   stage: build
-  image: node:18
+  image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/node:18
   extends: .rules
   artifacts:
     when: always

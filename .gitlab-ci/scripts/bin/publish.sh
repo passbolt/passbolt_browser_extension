@@ -46,7 +46,7 @@ if is_release_candidate "$CI_COMMIT_TAG"; then
     *) echo "I don't recognize this option"
     ;;
   esac
-else
+elif is_stable "$CI_COMMIT_TAG"; then
   case "$1" in
     chrome)
       send_to_chrome "$PASSBOLT_STABLE_CHROME_ID"
@@ -60,4 +60,6 @@ else
     *) echo "I don't recognize this option"
     ;;
   esac
+else
+  echo "The tag format is not supported"
 fi

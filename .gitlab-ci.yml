@@ -1,4 +1,4 @@
-image: debian:stable-slim
+image: ${CI_DEPENDENCY_PROXY_DIRECT_GROUP_IMAGE_PREFIX}/debian:stable-slim
 
 stages:
   - test

@@ -39,6 +39,10 @@ class AccountSetupEntity extends AbstractAccountEntity {
       this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting, {clone: false});
       delete this._props.account_recovery_user_setting;
     }
+    if (this._props.user) {
+      this._user = new UserEntity(this._props.user, {clone: false});
+      delete this._props.user;
+    }
   }
 
   /**
@@ -112,11 +116,14 @@ class AccountSetupEntity extends AbstractAccountEntity {
     if (contains.authentication_token_token) {
       result.authentication_token_token = this.authenticationTokenToken;
     }
-    if (contains.security_token && this._security_token) {
-      result.security_token = this._security_token.toDto();
+    if (contains.security_token && this.securityToken) {
+      result.security_token = this.securityToken.toDto();
+    }
+    if (contains.account_recovery_user_setting && this.accountRecoveryUserSetting) {
+      result.account_recovery_user_setting = this.accountRecoveryUserSetting.toDto(AccountRecoveryUserSettingEntity.ALL_CONTAIN_OPTIONS);
     }
     if (contains.user && this._user) {
-      result.user = this._user.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
+      result.user = this.user.toDto(UserEntity.ALL_CONTAIN_OPTIONS);
     }
 
     return result;
@@ -159,6 +166,14 @@ class AccountSetupEntity extends AbstractAccountEntity {
    */
   get authenticationTokenToken() {
     return this._props.authentication_token_token || null;
+  }
+
+  /**
+   * Get the type.
+   * @return {string}
+   */
+  get type() {
+    return this._props.type;
   }
 
   /*
@@ -218,6 +233,7 @@ class AccountSetupEntity extends AbstractAccountEntity {
       user_private_armored_key: true,
       security_token: true,
       authentication_token_token: true,
+      account_recovery_user_setting: true,
       user: true
     };
   }

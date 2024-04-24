@@ -12,18 +12,18 @@
  * @since         3.6.0
  */
 import SecurityTokenEntity from "../../model/entity/securityToken/securityTokenEntity";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
+import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
 
 class SetSetupSecurityTokenController {
   /**
    * GetRecoverLocaleController constructor.
    * @param {Worker} worker The worker the controller is executed on.
    * @param {string} requestId The associated request id.
-   * @param {AccountSetupEntity} account The account being setup.
    */
-  constructor(worker, requestId, account) {
+  constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
-    this.account = account;
   }
 
   /**
@@ -33,7 +33,7 @@ class SetSetupSecurityTokenController {
    */
   async _exec(securityTokenDto) {
     try {
-      this.exec(securityTokenDto);
+      await this.exec(securityTokenDto);
       this.worker.port.emit(this.requestId, 'SUCCESS');
     } catch (error) {
       console.error(error);
@@ -48,7 +48,10 @@ class SetSetupSecurityTokenController {
    * @throw {EntityValidationError} if the security token dto does not validate.
    */
   async exec(securityTokenDto) {
-    this.account.securityToken = new SecurityTokenEntity(securityTokenDto);
+    const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
+    temporaryAccount.account.securityToken = new SecurityTokenEntity(securityTokenDto);
+    // Update all data in the temporary account stored
+    await AccountTemporarySessionStorageService.set(temporaryAccount);
   }
 }
 

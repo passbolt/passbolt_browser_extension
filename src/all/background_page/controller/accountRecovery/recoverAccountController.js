@@ -18,13 +18,14 @@ import AccountRecoveryModel from "../../model/accountRecovery/accountRecoveryMod
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
 import EncryptPrivateKeyService from "../../service/crypto/encryptPrivateKeyService";
 import AccountModel from "../../model/account/accountModel";
-import AccountLocalStorage from "../../service/local_storage/accountLocalStorage";
 import SetupModel from "../../model/setup/setupModel";
 import DecryptResponseDataService from "../../service/accountRecovery/decryptResponseDataService";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import UpdateSsoCredentialsService from "../../service/account/updateSsoCredentialsService";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
+import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
 
 class RecoverAccountController {
   /**
@@ -32,16 +33,16 @@ class RecoverAccountController {
    * @param {Worker} worker
    * @param {string} requestId uuid
    * @param {ApiClientOptions} apiClientOptions
-   * @param {AccountAccountRecoveryEntity} account The account completing the account recovery.
    */
-  constructor(worker, requestId, apiClientOptions, account) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.account = account;
     this.accountRecoveryModel = new AccountRecoveryModel(apiClientOptions);
     this.setupModel = new SetupModel(apiClientOptions);
     this.accountModel = new AccountModel(apiClientOptions);
     this.updateSsoCredentialsService = new UpdateSsoCredentialsService(apiClientOptions);
+    // The temporary account stored in the session storage
+    this.temporaryAccount = null;
   }
 
   /**
@@ -65,6 +66,7 @@ class RecoverAccountController {
    * @return {Promise<void>}
    */
   async exec(passphrase) {
+    this.temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
     if (typeof passphrase === "undefined") {
       throw new Error("A passphrase is required.");
     }
@@ -72,16 +74,19 @@ class RecoverAccountController {
       throw new Error("The passphrase should be a string.");
     }
 
-    const request = await this._findAndAssertRequest();
+    const request = await this._findAndAssertRequest(this.temporaryAccount.account);
     const recoveredArmoredPrivateKey = await this._recoverPrivateKey(request.accountRecoveryPrivateKey, request.accountRecoveryResponses.items[0], passphrase);
     await this._completeRecover(recoveredArmoredPrivateKey);
-    const account = await this._addRecoveredAccountToStorage(this.account);
+    const account = await this._addRecoveredAccountToStorage(this.temporaryAccount.account);
     this._updateWorkerAccount(account);
     await this._refreshSsoKit(passphrase);
+    // Update all data in the temporary account stored
+    await AccountTemporarySessionStorageService.set(this.temporaryAccount);
   }
 
   /**
    * Find the account recovery request.
+   * @param {AccountAccountRecoveryEntity} account The account
    * @return {Promise<AccountRecoveryRequestEntity>}
    * @throw {Error} If the request id does not match the request id associated to the account recovery material stored on the extension
    * @throw {Error} If the request does not have a private key defined
@@ -89,14 +94,14 @@ class RecoverAccountController {
    * @throw {Error} If the request responses is empty
    * @private
    */
-  async _findAndAssertRequest() {
+  async _findAndAssertRequest(account) {
     const accountRecoveryRequest = await this.accountRecoveryModel.findRequestByIdAndUserIdAndAuthenticationToken(
-      this.account.accountRecoveryRequestId,
-      this.account.userId,
-      this.account.authenticationTokenToken
+      account.accountRecoveryRequestId,
+      account.userId,
+      account.authenticationTokenToken
     );
 
-    if (accountRecoveryRequest.id !== this.account.accountRecoveryRequestId) {
+    if (accountRecoveryRequest.id !== account.accountRecoveryRequestId) {
       throw new Error("The account recovery request id should match the request id associated to the account being recovered.");
     }
 
@@ -124,13 +129,13 @@ class RecoverAccountController {
    * @private
    */
   async _recoverPrivateKey(privateKey, response, passphrase) {
-    const key = await OpenpgpAssertion.readKeyOrFail(this.account.userPrivateArmoredKey);
+    const key = await OpenpgpAssertion.readKeyOrFail(this.temporaryAccount.account.userPrivateArmoredKey);
     const requestPrivateKeyDecrypted = await DecryptPrivateKeyService.decrypt(key, passphrase);
     /*
      * @todo Additional check could be done to ensure the recovered key is the same than the one the user was previously using.
      *   If the user is in the case lost passphrase, a key should still be referenced in the storage of the extension.
      */
-    const privateKeyPasswordDecryptedData = await DecryptResponseDataService.decrypt(response, requestPrivateKeyDecrypted, this.account.userId, this.account.domain);
+    const privateKeyPasswordDecryptedData = await DecryptResponseDataService.decrypt(response, requestPrivateKeyDecrypted, this.temporaryAccount.account.userId, this.temporaryAccount.account.domain);
     const privateKeyData = await OpenpgpAssertion.readMessageOrFail(privateKey.data);
     const decryptedRecoveredPrivateArmoredKey = await DecryptMessageService.decryptSymmetrically(privateKeyData, privateKeyPasswordDecryptedData.privateKeySecret);
     const decryptedRecoveredPrivateKey = await OpenpgpAssertion.readKeyOrFail(decryptedRecoveredPrivateArmoredKey);
@@ -145,9 +150,10 @@ class RecoverAccountController {
    */
   async _completeRecover(recoveredPrivateKey) {
     OpenpgpAssertion.assertPrivateKey(recoveredPrivateKey);
-    this.account.userPrivateArmoredKey = recoveredPrivateKey.armor();
-    this.account.userPublicArmoredKey = recoveredPrivateKey.toPublic().armor();
-    await this.setupModel.completeRecover(this.account);
+    this.temporaryAccount.account.userPrivateArmoredKey = recoveredPrivateKey.armor();
+    this.temporaryAccount.account.userPublicArmoredKey = recoveredPrivateKey.toPublic().armor();
+    this.temporaryAccount.account.userKeyFingerprint = recoveredPrivateKey.getFingerprint().toUpperCase();
+    await this.setupModel.completeRecover(this.temporaryAccount.account);
   }
 
   /**
@@ -159,9 +165,6 @@ class RecoverAccountController {
   async _addRecoveredAccountToStorage(accountAccountRecovery) {
     const account = new AccountEntity(accountAccountRecovery.toDto(AccountAccountRecoveryEntity.ALL_CONTAIN_OPTIONS));
     await this.accountModel.add(account);
-    // Remove from the local storage the account recovery used to initiate/complete the account recovery.
-    await AccountLocalStorage.deleteByUserIdAndType(account.userId, AccountAccountRecoveryEntity.TYPE_ACCOUNT_ACCOUNT_RECOVERY);
-
     return account;
   }
 
@@ -176,8 +179,9 @@ class RecoverAccountController {
    * @private
    */
   _updateWorkerAccount(account) {
-    this.account.userPublicArmoredKey = account.userPublicArmoredKey;
-    this.account.userPrivateArmoredKey = account.userPrivateArmoredKey;
+    this.temporaryAccount.account.userPublicArmoredKey = account.userPublicArmoredKey;
+    this.temporaryAccount.account.userPrivateArmoredKey = account.userPrivateArmoredKey;
+    this.temporaryAccount.account.userKeyFingerprint = account.userKeyFingerprint;
   }
 
   /**

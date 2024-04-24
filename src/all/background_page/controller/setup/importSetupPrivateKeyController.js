@@ -12,23 +12,24 @@
  * @since         3.6.0
  */
 
-import GpgAuth from "../../model/gpgauth";
 import i18n from "../../sdk/i18n";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import GpgKeyError from "../../error/GpgKeyError";
+import AuthVerifyServerChallengeService from "../../service/auth/authVerifyServerChallengeService";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
+import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
 
 class ImportSetupPrivateKeyController {
   /**
    * Constructor.
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
-   * @param {AccountSetupEntity} account The account being setup.
+   * @param {ApiClientOptions} apiClientOptions the api client options
    */
-  constructor(worker, requestId, account) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.account = account;
-    this.legacyAuthModel = new GpgAuth();
+    this.authVerifyServerChallengeService = new AuthVerifyServerChallengeService(apiClientOptions);
   }
 
   /**
@@ -52,36 +53,38 @@ class ImportSetupPrivateKeyController {
    * @returns {Promise<void>}
    */
   async exec(armoredKey) {
+    const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
     const privateKey = await OpenpgpAssertion.readKeyOrFail(armoredKey);
     OpenpgpAssertion.assertPrivateKey(privateKey);
     const privateKeyFingerprint = privateKey.getFingerprint().toUpperCase();
-    await this._assertImportKeyNotUsed(privateKeyFingerprint);
+    await this._assertImportKeyNotUsed(privateKeyFingerprint, temporaryAccount.account.serverPublicArmoredKey);
 
-    this.account.userKeyFingerprint = privateKeyFingerprint;
-    this.account.userPrivateArmoredKey = privateKey.armor();
-    this.account.userPublicArmoredKey = privateKey.toPublic().armor();
+    temporaryAccount.account.userKeyFingerprint = privateKeyFingerprint;
+    temporaryAccount.account.userPrivateArmoredKey = privateKey.armor();
+    temporaryAccount.account.userPublicArmoredKey = privateKey.toPublic().armor();
+    // Update all data in the temporary account stored
+    await AccountTemporarySessionStorageService.set(temporaryAccount);
   }
 
   /**
    * Assert import key is not already used
    * @param {string} fingerprint The import key fingerprint
+   * @param {string} serverPublicArmoredKey The server public armored key
    * @returns {Promise<void>}
    * @throws {GpgKeyError} If the key is already used
    * @private
    */
-  async _assertImportKeyNotUsed(fingerprint) {
-    const domain = this.account.domain;
-    const serverPublicArmoredKey = this.account.serverPublicArmoredKey;
+  async _assertImportKeyNotUsed(fingerprint, serverPublicArmoredKey) {
     if (!serverPublicArmoredKey) {
       throw new Error('The server public key should have been provided before importing a private key');
     }
     let keyAlreadyUsed = false;
 
     try {
-      await this.legacyAuthModel.verify(domain, serverPublicArmoredKey, fingerprint);
+      await this.authVerifyServerChallengeService.verifyAndValidateServerChallenge(fingerprint, serverPublicArmoredKey);
       keyAlreadyUsed = true;
     } catch (error) {
-      console.log(error);
+      console.error(error);
       // @todo Handle not controlled errors, such as timeout error...
     }
 

@@ -20,13 +20,15 @@ import {
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 describe("GenerateRecoverAccountRecoveryRequestKeyController", () => {
   describe("GenerateRecoverAccountRecoveryRequestKeyController::exec", () => {
     it("Should assert provided generate key pair dto is valid.", async() => {
       await MockExtension.withConfiguredAccount();
       const account = new AccountRecoverEntity(initialAccountRecoverDto());
-      const controller = new GenerateRecoverAccountRecoveryRequestKeyController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new GenerateRecoverAccountRecoveryRequestKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
 
       expect.assertions(2);
       const promise = controller.exec();
@@ -37,7 +39,9 @@ describe("GenerateRecoverAccountRecoveryRequestKeyController", () => {
     it("Should generate a key pair.", async() => {
       await MockExtension.withConfiguredAccount();
       const account = new AccountRecoverEntity(startAccountRecoverDto());
-      const controller = new GenerateRecoverAccountRecoveryRequestKeyController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      jest.spyOn(AccountTemporarySessionStorageService, "set").mockImplementationOnce(() => jest.fn());
+      const controller = new GenerateRecoverAccountRecoveryRequestKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
 
       expect.assertions(3);
       const generateKeyPairDto = {
@@ -48,5 +52,15 @@ describe("GenerateRecoverAccountRecoveryRequestKeyController", () => {
       expect(account.userPrivateArmoredKey).not.toBeNull();
       expect(account.userKeyFingerprint).not.toBeNull();
     }, 20000);
+
+    it("Should raise an error if no account has been found.", async() => {
+      const controller = new GenerateRecoverAccountRecoveryRequestKeyController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      expect.assertions(1);
+      try {
+        await controller.exec();
+      } catch (error) {
+        expect(error.message).toEqual("You have already started the process on another tab.");
+      }
+    });
   });
 });

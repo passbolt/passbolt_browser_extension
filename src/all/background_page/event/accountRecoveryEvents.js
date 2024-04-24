@@ -21,7 +21,8 @@ import GetOrganizationSettingsController from "../controller/organizationSetting
 import GetAndInitializeAccountLocaleController from "../controller/account/getAndInitializeAccountLocaleController";
 import GetExtensionVersionController from "../controller/extension/getExtensionVersionController";
 import GetAccountController from "../controller/account/getAccountController";
-import AuthLoginController from "../controller/auth/authLoginController";
+import AccountRecoveryLoginController from "../controller/accountRecovery/accountRecoveryLoginController";
+import ReloadTabController from "../controller/tab/reloadTabController";
 
 /**
  * Listens to the account recovery continue application events
@@ -61,13 +62,13 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.account-recovery.recover-account', async(requestId, passphrase) => {
-    const controller = new RecoverAccountController(worker, requestId, apiClientOptions, account);
+    const controller = new RecoverAccountController(worker, requestId, apiClientOptions);
     await controller._exec(passphrase);
   });
 
   worker.port.on('passbolt.account-recovery.sign-in', async(requestId, passphrase, rememberMe) => {
-    const controller = new AuthLoginController(worker, requestId, apiClientOptions, account);
-    await controller._exec(passphrase, rememberMe, true);
+    const controller = new AccountRecoveryLoginController(worker, requestId, apiClientOptions, account);
+    await controller._exec(passphrase, rememberMe);
   });
 
   worker.port.on('passbolt.account-recovery.request-help-credentials-lost', async requestId => {
@@ -76,13 +77,18 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.account-recovery.download-recovery-kit', async requestId => {
-    const controller = new DownloadRecoveryKitController(worker, requestId, account);
+    const controller = new DownloadRecoveryKitController(worker, requestId);
     await controller._exec();
   });
 
   worker.port.on('passbolt.locale.update-user-locale', async(requestId, localeDto) => {
     const controller = new SetSetupLocaleController(worker, requestId, apiClientOptions, account);
     await controller._exec(localeDto);
+  });
+
+  worker.port.on('passbolt.tab.reload', async requestId => {
+    const controller = new ReloadTabController(worker, requestId);
+    await controller._exec();
   });
 };
 

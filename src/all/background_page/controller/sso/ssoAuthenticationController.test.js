@@ -34,14 +34,8 @@ import User from "../../model/user";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {QuickAccessService} from "../../service/ui/quickAccess.service";
-
-const mockLogin = jest.fn();
-jest.mock("../../model/auth/authModel", () => ({
-  __esModule: true,
-  default: jest.fn(() => ({
-    login: mockLogin
-  }))
-}));
+import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
+import PostLoginService from "../../service/auth/postLoginService";
 
 const mockGetSsoTokenFromThirdParty = jest.fn();
 const mockCloseHandler = jest.fn();
@@ -77,21 +71,17 @@ const scenarios = [
 each(scenarios).describe("SsoAuthenticationController", scenario => {
   describe(`SsoAuthenticationController::exec (with provider: '${scenario.providerId}')`, () => {
     it(`Should sign the user using a third party: ${scenario.providerId}`, async() => {
-      expect.assertions(13);
+      expect.assertions(14);
       const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
       const serverSsoKit = {data: generateSsoKitServerData()};
       const deserializedKeyData = JSON.parse(Buffer.from(serverSsoKit.data, 'base64').toString());
-      const account = {userId: uuid()};
+      const account = new AccountEntity(defaultAccountDto());
       const severImportedKey = {algorithm: {name: "AES-GCM"}};
       const userPassphrase = "this is the user passphrase";
 
       mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);
-      mockLogin.mockImplementation(async(passphrase, rememberMe) => {
-        expect(passphrase).toBe(userPassphrase);
-        expect(rememberMe).toBe(true);
-      });
 
       crypto.subtle.importKey.mockImplementation(async(keyFormat, keyInfo, algorithmName, isExtractable, capabilities) => {
         expect(keyFormat).toBe("jwk");
@@ -120,21 +110,28 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       fetch.doMockOnceIf(new RegExp(`/sso/keys/${ssoLocalKit.id}/${account.userId}/${ssoLoginToken}.json`), async() => mockApiResponse(serverSsoKit));
 
       const controller = new SsoAuthenticationController(null, null, defaultApiClientOptions(), account);
-      return controller.exec(scenario.providerId);
+      jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
+      jest.spyOn(PassphraseStorageService, "set");
+      jest.spyOn(PostLoginService, "exec").mockImplementation(() => {});
+
+      await controller.exec(scenario.providerId);
+
+      expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledWith(account.userKeyFingerprint, account.userPrivateArmoredKey, userPassphrase);
+      expect(PassphraseStorageService.set).toHaveBeenCalledWith(userPassphrase, -1);
+      expect(PostLoginService.exec).toHaveBeenCalled();
     });
 
     it(`Should sign the user using a third party: ${scenario.providerId}`, async() => {
-      expect.assertions(2);
+      expect.assertions(5);
       const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
       const ssoLoginToken = uuid();
       const serverSsoKit = {data: generateSsoKitServerData()};
-      const account = {userId: uuid()};
+      const account = new AccountEntity(defaultAccountDto());
       const severImportedKey = {algorithm: {name: "AES-GCM"}};
       const userPassphrase = "this is the user passphrase";
 
       mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoLoginToken);
-      mockLogin.mockImplementation(async() => {});
       crypto.subtle.importKey.mockImplementation(async() => severImportedKey);
       jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => userPassphrase);
       fetch.doMockOnceIf(new RegExp(`/sso/${scenario.providerId}/login.json`), async() => mockApiResponse(scenario.loginUrlResponse));
@@ -143,7 +140,15 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       const spyOnOpenInDetachedMode = jest.spyOn(QuickAccessService, "openInDetachedMode").mockImplementation(() => {});
 
       const controller = new SsoAuthenticationController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
+      jest.spyOn(PassphraseStorageService, "set");
+      jest.spyOn(PostLoginService, "exec").mockImplementation(() => {});
+
       await controller.exec(scenario.providerId, true);
+
+      expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledWith(account.userKeyFingerprint, account.userPrivateArmoredKey, userPassphrase);
+      expect(PassphraseStorageService.set).toHaveBeenCalledWith(userPassphrase, -1);
+      expect(PostLoginService.exec).toHaveBeenCalled();
 
       const expectedQuickAccessCallParameters =  [
         {name: "uiMode", value: "detached"},
@@ -161,7 +166,7 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       const ssoKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoKit);
 
-      const account = {userId: uuid()};
+      const account = new AccountEntity(defaultAccountDto());
       fetch.doMockOnceIf(new RegExp(`/sso/${scenario.providerId}/login.json`), async() => mockApiResponseError(400));
       fetch.doMockOnceIf(new RegExp(`/sso/settings/current.json`), async() => mockApiResponse({provider: null}));
 
@@ -180,7 +185,7 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       const configuredProvider = scenario.providerId === "azure" ? "google" : "azure";
       SsoDataStorage.setMockedData(ssoKit);
 
-      const account = {userId: uuid()};
+      const account = new AccountEntity(defaultAccountDto());
       fetch.doMockOnceIf(new RegExp(`/sso/${scenario.providerId}/login.json`), async() => mockApiResponseError(400));
       fetch.doMockOnceIf(new RegExp(`/sso/settings/current.json`), async() => mockApiResponse({provider: configuredProvider}));
 
@@ -221,7 +226,7 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
   describe(`SsoAuthenticationController::exec should throw an error when something wrong happens (with provider: '${scenario.providerId}')`, () => {
     it("Should throw an error when client sso kit can't be find.", async() => {
       expect.assertions(2);
-      const account = {userId: uuid()};
+      const account = new AccountEntity(defaultAccountDto());
       SsoDataStorage.setMockedData(null);
       const controller = new SsoAuthenticationController(null, null, defaultApiClientOptions(), account);
       try {
@@ -236,7 +241,7 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       expect.assertions(2);
       const ssoKit = clientSsoKit();
       const ssoToken = uuid();
-      const account = {userId: uuid()};
+      const account = new AccountEntity(defaultAccountDto());
       SsoDataStorage.setMockedData(ssoKit);
 
       mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoToken);
@@ -257,7 +262,7 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       const ssoToken = uuid();
       const ssoLocalKit = clientSsoKit();
       const serverSsoKit = {data: generateSsoKitServerData({})};
-      const account = {userId: uuid()};
+      const account = new AccountEntity(defaultAccountDto());
       SsoDataStorage.setMockedData(ssoLocalKit);
 
       jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => { throw new OutdatedSsoKitError(); });
@@ -280,7 +285,7 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       const ssoToken = uuid();
       const ssoLocalKit = clientSsoKit();
       const serverSsoKit = {data: generateSsoKitServerData({})};
-      const account = {userId: uuid()};
+      const account = new AccountEntity(defaultAccountDto());
       SsoDataStorage.setMockedData(ssoLocalKit);
 
       jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => { throw new Error(); });
@@ -302,18 +307,20 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
       expect.assertions(2);
       const ssoToken = uuid();
       const serverSsoKit = {data: generateSsoKitServerData({})};
-      const account = {userId: uuid()};
+      const account = new AccountEntity(defaultAccountDto());
       const ssoLocalKit = clientSsoKit();
       SsoDataStorage.setMockedData(ssoLocalKit);
 
       jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => "passphrase");
 
       mockGetSsoTokenFromThirdParty.mockImplementation(async() => ssoToken);
-      mockLogin.mockImplementation(async() => { throw new InvalidMasterPasswordError(); });
       fetch.doMockOnceIf(new RegExp(`/sso/${scenario.providerId}/login.json`), async() => mockApiResponse(scenario.loginUrlResponse));
       fetch.doMockOnceIf(new RegExp(`/sso/keys/${ssoLocalKit.id}/${account.userId}/${ssoToken}.json`), async() => mockApiResponse(serverSsoKit));
 
       const controller = new SsoAuthenticationController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(() => { throw new InvalidMasterPasswordError(); });
+
+
       try {
         await controller.exec(scenario.providerId);
       } catch (e) {
@@ -324,7 +331,7 @@ each(scenarios).describe("SsoAuthenticationController", scenario => {
 
     it("Should throw an error if CSRF token is not valid but shouldn't remove the local SSO kit.", async() => {
       expect.assertions(2);
-      const account = {userId: uuid()};
+      const account = new AccountEntity(defaultAccountDto());
       SsoDataStorage.setMockedData(clientSsoKit());
 
       jest.spyOn(DecryptSsoPassphraseService, "decrypt").mockImplementation(async() => "passphrase");

@@ -12,31 +12,30 @@
  * @since         2.0.0
  */
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import Keyring from "../../model/keyring";
-import GpgAuth from "../../model/gpgauth";
-import AuthModel from "../../model/auth/authModel";
-import {Uuid} from "../../utils/uuid";
 import i18n from "../../sdk/i18n";
 import KeyIsExpiredError from "../../error/keyIsExpiredError";
 import ServerKeyChangedError from "../../error/serverKeyChangedError";
 import WorkerService from "../../service/worker/workerService";
+import CompareGpgKeyService from "../../service/crypto/compareGpgKeyService";
+import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
+import AuthVerifyServerChallengeService from "../../service/auth/authVerifyServerChallengeService";
+import AuthVerifyServerKeyService from "../../service/api/auth/authVerifyServerKeyService";
 
 class AuthVerifyServerKeyController {
   /**
-   * AuthController Constructor
+   * AuthVerifyServerKeyController Constructor
    *
    * @param {Worker} worker
    * @param {string} requestId
    * @param {ApiClientOptions} apiClientOptions
-   * @param {string} userDomain
+   * @param {AccountEntity} account
    */
-  constructor(worker, requestId, apiClientOptions, userDomain) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
-    this.userDomain = userDomain;
-    this.keyring = new Keyring();
-    this.authLegacy = new GpgAuth(this.keyring);
-    this.authModel = new AuthModel(apiClientOptions);
+    this.authVerifyServerChallengeService = new AuthVerifyServerChallengeService(apiClientOptions);
+    this.authVerifyServerKeyService = new AuthVerifyServerKeyService(apiClientOptions);
+    this.account = account;
   }
 
   /**
@@ -54,28 +53,24 @@ class AuthVerifyServerKeyController {
   }
 
   /**
-   * Perform a GPGAuth verify
+   * Perform a GPGAuth to verify the server identity
    *
    * @returns {Promise<void>}
    */
   async exec() {
-    const serverKey = this.keyring.findPublic(Uuid.get(this.userDomain)).armoredKey;
-    const userFingerprint = this.keyring.findPrivate().fingerprint;
-
     try {
-      await this.authModel.verify(serverKey, userFingerprint);
+      await this.authVerifyServerChallengeService.verifyAndValidateServerChallenge(this.account.userKeyFingerprint, this.account.serverPublicArmoredKey);
     } catch (error) {
-      await this.onVerifyError(error, serverKey);
+      await this.onVerifyError(error);
     }
   }
 
   /**
    * Whenever the verify fail
    * @param {Error} error The error
-   * @param {string} serverArmoredKey The server armored public key.
    * @returns {Promise<void>}
    */
-  async onVerifyError(error, serverArmoredKey) {
+  async onVerifyError(error) {
     if (error.message && error.message.indexOf('no user associated') !== -1) {
       /*
        * If the user has been deleted from the API, remove the authentication iframe served by the
@@ -84,12 +79,12 @@ class AuthVerifyServerKeyController {
       (await WorkerService.get('AuthBootstrap', this.worker.tab.id)).port.emit('passbolt.auth-bootstrap.remove-iframe');
     } else {
       try {
-        if (!await this.canParseServerKey(serverArmoredKey)) {
+        if (!await this.canParseServerKey()) {
           // @deprecated with v3.6.0. Fix an issue users encounter while using an armored server key with multiple keys https://github.com/passbolt/passbolt_browser_extension/issues/150
           error = new ServerKeyChangedError(i18n.t('The server key cannot be parsed.'));
-        } else if (await this.authLegacy.serverKeyChanged()) {
+        } else if (await this.serverKeyChanged()) {
           error = new ServerKeyChangedError(i18n.t('The server key has changed.'));
-        } else if (this.authLegacy.isServerKeyExpired()) {
+        } else if (await this.serverKeyIsExpired()) {
           error = new KeyIsExpiredError(i18n.t('The server key is expired.'));
         }
       } catch (e) {
@@ -104,16 +99,36 @@ class AuthVerifyServerKeyController {
 
   /**
    * Can parse the server key
-   * @param {string} serverArmoredKey The server armored public key.
    * @returns {Promise<boolean>}
    */
-  async canParseServerKey(serverArmoredKey) {
+  async canParseServerKey() {
     try {
-      await OpenpgpAssertion.readKeyOrFail(serverArmoredKey);
+      await OpenpgpAssertion.readKeyOrFail(this.account.serverPublicArmoredKey);
     } catch (error) {
       return false;
     }
     return true;
+  }
+
+  /**
+   * Check if the server key has changed
+   * @return {Promise<boolean>} true if key has changed
+   */
+  async serverKeyChanged() {
+    const remoteServerArmoredKey = (await this.authVerifyServerKeyService.getServerKey()).armored_key;
+    const remoteServerKey = await OpenpgpAssertion.readKeyOrFail(remoteServerArmoredKey);
+    const serverLocalKey = await OpenpgpAssertion.readKeyOrFail(this.account.serverPublicArmoredKey);
+    return !await CompareGpgKeyService.areKeysTheSame(remoteServerKey, serverLocalKey);
+  }
+
+  /**
+   * Check if the server key is expired
+   * @return {Promise<boolean>} true if key has expired
+   */
+  async serverKeyIsExpired() {
+    const publicServerKey = await OpenpgpAssertion.readKeyOrFail(this.account.serverPublicArmoredKey);
+    const serverKey = await GetGpgKeyInfoService.getKeyInfo(publicServerKey);
+    return serverKey.isExpired;
   }
 }
 

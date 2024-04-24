@@ -25,14 +25,10 @@ import {anonymousOrganizationSettings} from "../../model/entity/organizationSett
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {defaultEmptySettings, withAzureSsoSettings} from "../sso/getCurrentSsoSettingsController.test.data";
 import {clientSsoKit} from "../../model/entity/sso/ssoKitClientPart.test.data";
-
-const mockLogin = jest.fn();
-jest.mock("../../model/auth/authModel", () => ({
-  __esModule: true,
-  default: jest.fn(() => ({
-    login: mockLogin
-  }))
-}));
+import PostLoginService from "../../service/auth/postLoginService";
+import PassphraseStorageService from "../../service/session_storage/passphraseStorageService";
+import each from "jest-each";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(async() => {
   enableFetchMocks();
@@ -55,27 +51,40 @@ describe("AuthLoginController", () => {
       fetch.doMockOnceIf(new RegExp('/sso/settings/current.json'), () => mockApiResponse(ssoSettings));
     };
 
-    it("Should sign-in the user.", async() => {
-      mockOrganisationSettings(false);
+    each([
+      {scenario: 'remember me true', passphrase: passphrase, rememberMe: true, shouldRefreshCurrentTab: true},
+      {scenario: 'remember me true, no tab refresh', passphrase: passphrase, rememberMe: true, shouldRefreshCurrentTab: false},
+      {scenario: 'remember me false', passphrase: passphrase, rememberMe: false, shouldRefreshCurrentTab: true},
+      {scenario: 'remember me false, no tab refresh', passphrase: passphrase, rememberMe: false, shouldRefreshCurrentTab: false},
+    ]).describe("Should sign-in the user.", test => {
+      it(`Sign in with ${test.scenario}`, async() => {
+        mockOrganisationSettings(false);
 
-      const account = new AccountEntity(defaultAccountDto());
-      const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+        const account = new AccountEntity(defaultAccountDto());
+        const controller = new AuthLoginController({tab: {id: 1}}, null, defaultApiClientOptions(), account);
 
-      const scenarios = [{
-        passphrase: passphrase,
-        rememberMe: true
-      },
-      {
-        passphrase: passphrase,
-        rememberMe: false
-      }];
-      expect.assertions(scenarios.length);
+        jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
+        jest.spyOn(PassphraseStorageService, "set");
+        jest.spyOn(PostLoginService, "exec");
+        jest.spyOn(browser.tabs, "update");
+        jest.spyOn(AccountTemporarySessionStorageService, "remove");
 
-      for (let i = 0; i < scenarios.length; i++) {
-        const scenario = scenarios[i];
-        await controller.exec(scenario.passphrase, scenario.rememberMe);
-        expect(mockLogin).toHaveBeenCalledWith(scenario.passphrase, scenario.rememberMe);
-      }
+        expect.assertions(4);
+
+        await controller.exec(test.passphrase, test.rememberMe, test.shouldRefreshCurrentTab);
+        expect(controller.authVerifyLoginChallengeService.verifyAndValidateLoginChallenge).toHaveBeenCalledWith(account.userKeyFingerprint, account.userPrivateArmoredKey, test.passphrase);
+        if (test.rememberMe) {
+          expect(PassphraseStorageService.set).toHaveBeenCalledWith(test.passphrase, -1);
+        } else {
+          expect(PassphraseStorageService.set).not.toHaveBeenCalled();
+        }
+        if (test.shouldRefreshCurrentTab) {
+          expect(browser.tabs.update).toHaveBeenCalledWith(1, {url: account.domain});
+        } else {
+          expect(browser.tabs.update).not.toHaveBeenCalled();
+        }
+        expect(PostLoginService.exec).toHaveBeenCalledTimes(1);
+      });
     });
 
     it("Should throw an exception if the passphrase is not a valid.", async() => {
@@ -106,6 +115,8 @@ describe("AuthLoginController", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
+
       await controller.exec(passphrase, true);
       expect(GenerateSsoKitService.generate).not.toHaveBeenCalled();
     });
@@ -119,6 +130,8 @@ describe("AuthLoginController", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
+
       await controller.exec(passphrase, true);
       expect(GenerateSsoKitService.generate).not.toHaveBeenCalled();
     });
@@ -133,6 +146,8 @@ describe("AuthLoginController", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
+
       await controller.exec(passphrase, true);
       expect(GenerateSsoKitService.generate).toHaveBeenCalledTimes(1);
       expect(GenerateSsoKitService.generate).toHaveBeenCalledWith(passphrase, ssoSettingsDto.provider);
@@ -146,6 +161,8 @@ describe("AuthLoginController", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
+
       await controller.exec(passphrase, true);
       expect(SsoDataStorage.flush).toHaveBeenCalledTimes(1);
     });
@@ -157,6 +174,8 @@ describe("AuthLoginController", () => {
 
       const account = new AccountEntity(defaultAccountDto());
       const controller = new AuthLoginController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(controller.authVerifyLoginChallengeService, "verifyAndValidateLoginChallenge").mockImplementationOnce(jest.fn());
+
       await controller.exec(passphrase, true);
       expect(SsoDataStorage.flush).toHaveBeenCalledTimes(1);
     });

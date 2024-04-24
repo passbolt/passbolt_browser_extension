@@ -62,7 +62,7 @@ describe("SaveUserPassphrasePoliciesController", () => {
 
     const dto = defaultUserPassphrasePoliciesEntityDto();
     const controller = new SaveUserPassphrasePoliciesController(null, null, apiClientOptions);
-    expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltApiFetchError);
+    await expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltApiFetchError);
   });
 
   it("Should return the default value if something goes when requesting the API", async() => {
@@ -71,6 +71,6 @@ describe("SaveUserPassphrasePoliciesController", () => {
 
     const dto = defaultUserPassphrasePoliciesEntityDto();
     const controller = new SaveUserPassphrasePoliciesController(null, null, apiClientOptions);
-    expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltServiceUnavailableError);
+    await expect(() => controller.exec(dto)).rejects.toBeInstanceOf(PassboltServiceUnavailableError);
   });
 });

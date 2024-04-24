@@ -31,6 +31,7 @@ import UserMeSessionStorageService from "../sessionStorage/userMeSessionStorageS
 import User from "../../model/user";
 import PasswordPoliciesLocalStorage from "../local_storage/passwordPoliciesLocalStorage";
 import PasswordExpirySettingsLocalStorage from "../local_storage/passwordExpirySettingsLocalStorage";
+import KeepSessionAliveService from "../session_storage/keepSessionAliveService";
 
 /**
  * Flush storage data when:
@@ -53,6 +54,7 @@ class LocalStorageService {
     PostponeUserSettingInvitationService.reset();
     PassphraseStorageService.flush();
     SsoKitTemporaryStorageService.flush();
+    KeepSessionAliveService.stop();
     LocalStorageService.flushAccountBasedStorages();
   }
 

@@ -1,6 +1,6 @@
 {
   "name": "passbolt-browser-extension",
-  "version": "4.6.2",
+  "version": "4.7.0-alpha.1",
   "license": "AGPL-3.0",
   "copyright": "Copyright 2022 Passbolt SA",
   "description": "Passbolt web extension for the open source password manager for teams",
@@ -21,7 +21,7 @@
     "locutus": "~2.0.9",
     "openpgp": "^5.11.1",
     "papaparse": "^5.2.0",
-    "passbolt-styleguide": "^4.6.3",
+    "passbolt-styleguide": "^4.7.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "secrets-passbolt": "github:passbolt/secrets.js#v2.0.1",
@@ -77,7 +77,7 @@
   "scripts": {
     "build": "npx grunt build",
     "build:background-page": "webpack --config webpack.background-page.config.js",
-    "build:service-worker": "webpack --config webpack.service-worker.config.js",
+    "build:service-worker": "webpack --config webpack.service-worker.config.js; webpack --config webpack-offscreens.fetch.config.js",
     "build:content-scripts": "npm run build:content-scripts:app; npm run build:content-scripts:browser-integration; npm run build:content-scripts:public-website",
     "build:content-scripts:app": "webpack --config webpack-content-scripts.config.js",
     "build:content-scripts:browser-integration": "webpack --config webpack-content-scripts.browser-integration.config.js",
@@ -86,7 +86,7 @@
     "build:web-accessible-resources:app": "webpack --config webpack-data.config.js; webpack --config webpack-data.download.config.js",
     "build:web-accessible-resources:browser-integration": "webpack --config webpack-data.in-form-call-to-action.config.js; webpack --config webpack-data.in-form-menu.config.js",
     "dev:build:background-page": "webpack --env debug=true --config webpack.background-page.config.js",
-    "dev:build:service-worker": "webpack --env debug=true --config webpack.service-worker.config.js",
+    "dev:build:service-worker": "webpack --env debug=true --config webpack.service-worker.config.js; webpack --env debug=true --config webpack-offscreens.fetch.config.js",
     "dev:build:content-scripts": "npm run dev:build:content-scripts:app; npm run dev:build:content-scripts:browser-integration; npm run dev:build:content-scripts:public-website",
     "dev:build:content-scripts:app": "webpack --env debug=true --config webpack-content-scripts.config.js",
     "dev:build:content-scripts:browser-integration": "webpack --env debug=true --config webpack-content-scripts.browser-integration.config.js",
@@ -109,7 +109,8 @@
     "lint:eslint-fix": "eslint -c .eslintrc.json --ext js --ext jsx --fix src",
     "i18n:externalize": "i18next -c ./i18next-parser.config.js",
     "test": "npm run test:unit",
-    "test:unit": "jest --no-cache ./src/all/ ./src/chrome-mv3/ --maxWorkers=4",
-    "test:coverage": "jest --no-cache ./src/all/ ./src/chrome-mv3/ --maxWorkers=4 --coverage"
+    "test:unit": "jest --no-cache ./src/all/ ./src/chrome-mv3/",
+    "test:coverage": "jest --no-cache ./src/all/ ./src/chrome-mv3/ --coverage",
+    "test:ci:coverage": "npm run test:coverage -- --runInBand"
   }
 }

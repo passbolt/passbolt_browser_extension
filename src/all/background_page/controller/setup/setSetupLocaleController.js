@@ -13,6 +13,7 @@
  */
 
 import LocaleModel from "../../model/locale/localeModel";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 class SetSetupLocaleController {
   /**
@@ -54,6 +55,12 @@ class SetSetupLocaleController {
     const locale = await this.localeModel.getSupportedLocale(localeDto.locale);
     if (!locale) {
       throw new Error('Unsupported locale.');
+    }
+    // Update the temporary account locale, don't need to check the worker.
+    const temporaryAccount = await AccountTemporarySessionStorageService.get(this.worker.port._port.name);
+    if (temporaryAccount) {
+      temporaryAccount.account.locale = locale.locale;
+      await AccountTemporarySessionStorageService.set(temporaryAccount);
     }
     this.account.locale = locale.locale;
     await this.localeModel.initializeI18next(locale);

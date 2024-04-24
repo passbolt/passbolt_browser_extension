@@ -26,6 +26,8 @@ import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import WorkerService from "../../service/worker/workerService";
 import UserPassphrasePoliciesEntity from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity";
 import {defaultUserPassphrasePoliciesEntityDto} from "passbolt-styleguide/src/shared/models/userPassphrasePolicies/UserPassphrasePoliciesDto.test.data";
+import {v4 as uuidv4} from "uuid";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 jest.mock("../../service/worker/workerService");
 
@@ -38,8 +40,8 @@ describe("StartRecoverController", () => {
   describe("StartRecoverController::exec", () => {
     it("Should initiate the recover process and retrieve the recover material", async() => {
       const account = new AccountRecoverEntity(initialAccountRecoverDto());
-      const runtimeMemory = {};
-      const controller = new StartRecoverController(null, null, defaultApiClientOptions(), account, runtimeMemory);
+      const workerId = uuidv4();
+      const controller = new StartRecoverController({port: {_port: {name: workerId}}}, null, defaultApiClientOptions(), account);
 
       // Mock API fetch organization settings
       const mockVerifyDto = defaultVerifyDto();
@@ -50,20 +52,21 @@ describe("StartRecoverController", () => {
 
       expect.assertions(5);
       await controller.exec();
+      const expectedAccount = await AccountTemporarySessionStorageService.get(workerId);
       const key = await OpenpgpAssertion.readKeyOrFail(mockVerifyDto.keydata);
-      expect(account.serverPublicArmoredKey).toEqual((await GetGpgKeyInfoService.getKeyInfo(key)).armoredKey);
-      expect(account.username).toEqual(mockRecoverStartDto.user.username);
-      expect(account.firstName).toEqual(mockRecoverStartDto.user.profile.first_name);
-      expect(account.lastName).toEqual(mockRecoverStartDto.user.profile.last_name);
-      expect(account.user.toDto(UserEntity.ALL_CONTAIN_OPTIONS)).toEqual(mockRecoverStartDto.user);
+      expect(expectedAccount.account.serverPublicArmoredKey).toEqual((await GetGpgKeyInfoService.getKeyInfo(key)).armoredKey);
+      expect(expectedAccount.account.username).toEqual(mockRecoverStartDto.user.username);
+      expect(expectedAccount.account.firstName).toEqual(mockRecoverStartDto.user.profile.first_name);
+      expect(expectedAccount.account.lastName).toEqual(mockRecoverStartDto.user.profile.last_name);
+      expect(expectedAccount.account.user.toDto(UserEntity.ALL_CONTAIN_OPTIONS)).toEqual(mockRecoverStartDto.user);
     }, 10 * 1000);
 
     it("Should initiate the recover process and retrieve the recover material with all configuration", async() => {
       expect.assertions(6);
       const userPassphrasePoliciesDto = defaultUserPassphrasePoliciesEntityDto();
       const account = new AccountRecoverEntity(initialAccountRecoverDto());
-      const runtimeMemory = {};
-      const controller = new StartRecoverController(null, null, defaultApiClientOptions(), account, runtimeMemory);
+      const workerId = uuidv4();
+      const controller = new StartRecoverController({port: {_port: {name: workerId}}}, null, defaultApiClientOptions(), account);
 
       // Mock API fetch organization settings
       const mockVerifyDto = defaultVerifyDto();
@@ -76,20 +79,21 @@ describe("StartRecoverController", () => {
       fetch.doMockOnce(() => mockApiResponse(mockRecoverStartDto));
 
       await controller.exec();
+      const expectedAccount = await AccountTemporarySessionStorageService.get(workerId);
       const key = await OpenpgpAssertion.readKeyOrFail(mockVerifyDto.keydata);
-      expect(account.serverPublicArmoredKey).toEqual((await GetGpgKeyInfoService.getKeyInfo(key)).armoredKey);
-      expect(account.username).toEqual(mockRecoverStartDto.user.username);
-      expect(account.firstName).toEqual(mockRecoverStartDto.user.profile.first_name);
-      expect(account.lastName).toEqual(mockRecoverStartDto.user.profile.last_name);
-      expect(account.user.toDto(UserEntity.ALL_CONTAIN_OPTIONS)).toEqual(mockRecoverStartDto.user);
-      expect(runtimeMemory.userPassphrasePolicies).toStrictEqual(new UserPassphrasePoliciesEntity(userPassphrasePoliciesDto));
+      expect(expectedAccount.account.serverPublicArmoredKey).toEqual((await GetGpgKeyInfoService.getKeyInfo(key)).armoredKey);
+      expect(expectedAccount.account.username).toEqual(mockRecoverStartDto.user.username);
+      expect(expectedAccount.account.firstName).toEqual(mockRecoverStartDto.user.profile.first_name);
+      expect(expectedAccount.account.lastName).toEqual(mockRecoverStartDto.user.profile.last_name);
+      expect(expectedAccount.account.user.toDto(UserEntity.ALL_CONTAIN_OPTIONS)).toEqual(mockRecoverStartDto.user);
+      expect(expectedAccount.userPassphrasePolicies).toStrictEqual(new UserPassphrasePoliciesEntity(userPassphrasePoliciesDto));
     }, 10 * 1000);
 
     it("Should not initiate the recover if the API does not provide a valid server public key", async() => {
-      const mockedWorker = {tab: {id: "tabID"}};
+      const workerId = uuidv4();
+      const mockedWorker = {tab: {id: "tabID"}, port: {_port: {name: workerId}}};
       const account = new AccountRecoverEntity(initialAccountRecoverDto());
-      const runtimeMemory = {};
-      const controller = new StartRecoverController(mockedWorker, null, defaultApiClientOptions(), account, runtimeMemory);
+      const controller = new StartRecoverController(mockedWorker, null, defaultApiClientOptions(), account);
 
       // Mock API fetch verify
       const mockVerifyDto = defaultVerifyDto({keydata: "not a valid key"});
@@ -109,10 +113,10 @@ describe("StartRecoverController", () => {
     });
 
     it("Should not initiate the recover if the API does not provide a valid user", async() => {
-      const mockedWorker = {tab: {id: "tabID"}};
+      const workerId = uuidv4();
+      const mockedWorker = {tab: {id: "tabID"}, port: {_port: {name: workerId}}};
       const account = new AccountRecoverEntity(initialAccountRecoverDto());
-      const runtimeMemory = {};
-      const controller = new StartRecoverController(mockedWorker, null, defaultApiClientOptions(), account, runtimeMemory);
+      const controller = new StartRecoverController(mockedWorker, null, defaultApiClientOptions(), account);
 
       // Mock API fetch organization settings
       const mockVerifyDto = defaultVerifyDto();

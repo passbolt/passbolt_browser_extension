@@ -13,18 +13,17 @@
  */
 
 import UserPassphrasePoliciesEntity from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 class GetUserPassphrasePoliciesController {
   /**
    * Constructor.
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
-   * @param {Object} runtimeMemory The setup runtime memory.
    */
-  constructor(worker, requestId, runtimeMemory) {
+  constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
-    this.runtimeMemory = runtimeMemory;
   }
 
   /**
@@ -46,7 +45,8 @@ class GetUserPassphrasePoliciesController {
    * @returns {Promise<UserPassphrasePoliciesEntity>}
    */
   async exec() {
-    const userPassphrasePolicies = this.runtimeMemory.userPassphrasePolicies;
+    const temporaryAccount = await AccountTemporarySessionStorageService.get(this.worker.port._port.name);
+    const userPassphrasePolicies = temporaryAccount?.userPassphrasePolicies;
     return userPassphrasePolicies || UserPassphrasePoliciesEntity.createFromDefault();
   }
 }

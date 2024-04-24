@@ -19,6 +19,17 @@
  */
 exports.mockApiResponse = (body = {}, header = {}) => Promise.resolve(JSON.stringify({header: header, body: body}));
 
+exports.mockApiRedirectResponse = (redirectTo, status = 302) => Promise.resolve({
+  status: status,
+  url: redirectTo,
+  body: JSON.stringify({
+    header: {
+      status: status
+    },
+    body: {}
+  })
+});
+
 exports.mockApiResponseError = (status, errorMessage, body = {}) => Promise.resolve({
   status: status,
   body: JSON.stringify({

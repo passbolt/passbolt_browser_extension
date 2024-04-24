@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_appName__",
   "short_name": "passbolt",
-  "version": "4.6.2",
+  "version": "4.7.0",
   "description": "__MSG_appDescription__",
   "default_locale": "en",
   "externally_connectable": {
@@ -45,7 +45,8 @@
     "downloads",
     "cookies",
     "clipboardWrite",
-    "background"
+    "background",
+    "offscreen"
   ],
   "host_permissions": [
     "*://*/*"

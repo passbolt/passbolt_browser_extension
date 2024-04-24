@@ -15,12 +15,19 @@ import React from "react";
 import ReactDOM from "react-dom";
 import ExtApp from "passbolt-styleguide/src/react-extension/ExtApp";
 import Port from "../lib/port";
+import MessageService from "../../../contentScripts/js/service/messageService";
+import MessageEventHandler from "../../../contentScripts/js/message/messageEventHandler";
+import ConnectPortController from "../../../contentScripts/js/controller/connectPortController";
 
 async function main() {
   const query = new URLSearchParams(window.location.search);
   const portname = query.get('passbolt');
   const port = new Port(portname);
   await port.connect();
+  // Message listener
+  const messageService = new MessageService();
+  const messageEventHandler = new MessageEventHandler(messageService);
+  messageEventHandler.listen("passbolt.port.connect", ConnectPortController, port);
   const storage = browser.storage;
   const domContainer = document.createElement("div");
   document.body.appendChild(domContainer);

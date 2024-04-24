@@ -16,6 +16,7 @@ import AccountModel from "../../model/account/accountModel";
 import SetupModel from "../../model/setup/setupModel";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
+import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
 
 class CompleteSetupController {
   /**
@@ -23,12 +24,10 @@ class CompleteSetupController {
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
    * @param {ApiClientOptions} apiClientOptions The api client options.
-   * @param {AccountSetupEntity} account The account being setup.
    */
-  constructor(worker, requestId, apiClientOptions, account) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.account = account;
     this.accountModel = new AccountModel(apiClientOptions);
     this.setupModel = new SetupModel(apiClientOptions);
   }
@@ -54,8 +53,9 @@ class CompleteSetupController {
    * @returns {Promise<void>}
    */
   async exec() {
-    const accountSetup = new AccountEntity(this.account.toDto(AccountSetupEntity.ALL_CONTAIN_OPTIONS));
-    await this.setupModel.completeSetup(this.account);
+    const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
+    const accountSetup = new AccountEntity(temporaryAccount.account.toDto(AccountSetupEntity.ALL_CONTAIN_OPTIONS));
+    await this.setupModel.completeSetup(temporaryAccount.account);
     await this.accountModel.add(accountSetup);
   }
 }

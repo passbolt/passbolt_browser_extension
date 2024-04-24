@@ -16,7 +16,7 @@ import AccountModel from "../../model/account/accountModel";
 import SetupModel from "../../model/setup/setupModel";
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
-
+import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
 
 class CompleteRecoverController {
   /**
@@ -24,12 +24,10 @@ class CompleteRecoverController {
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
    * @param {ApiClientOptions} apiClientOptions The api client options.
-   * @param {AccountRecoverEntity} account The account being recovered.
    */
-  constructor(worker, requestId, apiClientOptions, account) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.account = account;
     this.accountModel = new AccountModel(apiClientOptions);
     this.setupModel = new SetupModel(apiClientOptions);
   }
@@ -55,8 +53,9 @@ class CompleteRecoverController {
    * @returns {Promise<void>}
    */
   async exec() {
-    const accountRecovered = new AccountEntity(this.account.toDto(AccountRecoverEntity.ALL_CONTAIN_OPTIONS));
-    await this.setupModel.completeRecover(this.account);
+    const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
+    const accountRecovered = new AccountEntity(temporaryAccount.account.toDto(AccountRecoverEntity.ALL_CONTAIN_OPTIONS));
+    await this.setupModel.completeRecover(temporaryAccount.account);
     await this.accountModel.add(accountRecovered);
   }
 }

@@ -16,18 +16,15 @@ import LocalStorageService from "../all/background_page/service/localStorage/loc
 import SystemRequirementService from "../all/background_page/service/systemRequirementService/systemRequirementService";
 import OnExtensionInstalledController from "../all/background_page/controller/extension/onExtensionInstalledController";
 import TabService from "../all/background_page/service/tab/tabService";
-import OnExtensionUpdateAvailableController
-  from "../all/background_page/controller/extension/onExtensionUpdateAvailableController";
+import OnExtensionUpdateAvailableService
+  from "../all/background_page/service/extension/onExtensionUpdateAvailableService";
+import GlobalAlarmService from "../all/background_page/service/alarm/globalAlarmService";
+import ResponseFetchOffscreenService from "./serviceWorker/service/network/responseFetchOffscreenService";
 
 /**
  * Load all system requirement
  */
 SystemRequirementService.get();
-
-/**
- * Add listener on passbolt logout
- */
-self.addEventListener("passbolt.auth.after-logout", LocalStorageService.flush);
 
 /**
  * Add listener on startup
@@ -42,7 +39,7 @@ browser.runtime.onInstalled.addListener(OnExtensionInstalledController.exec);
 /**
  * On update available of the extension, update it when the user is logout
  */
-browser.runtime.onUpdateAvailable.addListener(OnExtensionUpdateAvailableController.exec);
+browser.runtime.onUpdateAvailable.addListener(OnExtensionUpdateAvailableService.exec);
 
 /**
  * Add listener on any tab update
@@ -58,3 +55,18 @@ browser.runtime.onConnect.addListener(PortManager.onPortConnect);
  * Add listener on tabs on removed
  */
 browser.tabs.onRemoved.addListener(PortManager.onTabRemoved);
+
+/**
+ * Ensures the top-level alarm handler is not triggered twice
+ */
+browser.alarms.onAlarm.removeListener(GlobalAlarmService.exec);
+
+/**
+ * Add a top-level alarm handler.
+ */
+browser.alarms.onAlarm.addListener(GlobalAlarmService.exec);
+
+/**
+ * Handle offscreen fetch responses.
+ */
+chrome.runtime.onMessage.addListener(ResponseFetchOffscreenService.handleFetchResponse);

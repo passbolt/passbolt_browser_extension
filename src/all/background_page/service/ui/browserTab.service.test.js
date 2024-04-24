@@ -78,4 +78,18 @@ describe("BrowserTabService", () => {
       }
     });
   });
+
+  describe("BrowserTabService::reloadTab", () => {
+    it("Should reload the tab by id", async() => {
+      expect.assertions(1);
+      // mock data
+      const tab = {id: 1};
+      // mock functions
+      jest.spyOn(browser.tabs, 'reload');
+      // process
+      await BrowserTabService.reloadTab(tab.id);
+      // expectations
+      expect(browser.tabs.reload).toHaveBeenCalledWith(tab.id);
+    });
+  });
 });

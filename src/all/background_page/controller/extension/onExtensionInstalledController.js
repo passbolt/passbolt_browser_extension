@@ -17,6 +17,10 @@ import PagemodManager from "../../pagemod/pagemodManager";
 import WebNavigationService from "../../service/webNavigation/webNavigationService";
 import ParseSetupUrlService from "../../service/setup/parseSetupUrlService";
 import ParseRecoverUrlService from "../../service/recover/parseRecoverUrlService";
+import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
+import User from "../../model/user";
+import Log from "../../model/log";
+import {BrowserExtensionIconService} from "../../service/ui/browserExtensionIcon.service";
 
 class OnExtensionInstalledController {
   /**
@@ -51,6 +55,36 @@ class OnExtensionInstalledController {
   static async onUpdate() {
     // Apply on tabs that match the pagemod url regex with refresh option
     await browser.tabs.query({}).then(reloadTabsMatchPagemodUrl);
+    await OnExtensionInstalledController.updateToolbarIcon();
+  }
+
+  /**
+   * Updates the Passbolt icon in the toolbar according to the sign-in status of the current user.
+   * @returns {Promise<void>}
+   */
+  static async updateToolbarIcon() {
+    const user = User.getInstance();
+    // Check if user is valid
+    if (!user.isValid()) {
+      return;
+    }
+
+    let authStatus;
+    try {
+      const checkAuthStatusService = new CheckAuthStatusService();
+      // user the cached data as the worker could wake up every 30 secondes.
+      authStatus = await checkAuthStatusService.checkAuthStatus(false);
+    } catch (error) {
+      // Service is unavailable, do nothing...
+      Log.write({level: 'debug', message: 'The Service is unavailable to check if the user is authenticated'});
+      return;
+    }
+
+    if (authStatus.isAuthenticated) {
+      BrowserExtensionIconService.activate();
+    } else {
+      BrowserExtensionIconService.deactivate();
+    }
   }
 }
 

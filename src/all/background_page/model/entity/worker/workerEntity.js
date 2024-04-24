@@ -18,6 +18,7 @@ const ENTITY_NAME = 'Worker';
 
 const STATUS_WAITING_CONNECTION = 'waiting_connection';
 const STATUS_CONNECTED = 'connected';
+const STATUS_RECONNECTING = 'reconnecting';
 
 class WorkerEntity extends Entity {
   /**
@@ -64,7 +65,7 @@ class WorkerEntity extends Entity {
         },
         "status": {
           "type": "string",
-          "enum": [this.STATUS_WAITING_CONNECTION, this.STATUS_CONNECTED]
+          "enum": [this.STATUS_WAITING_CONNECTION, this.STATUS_CONNECTED, this.STATUS_RECONNECTING]
         }
       }
     };
@@ -161,6 +162,14 @@ class WorkerEntity extends Entity {
     return this.status === STATUS_CONNECTED;
   }
 
+  /**
+   * Is reconnecting
+   * @return {boolean}
+   */
+  get isReconnecting() {
+    return this.status === STATUS_RECONNECTING;
+  }
+
   /*
    * ==================================================
    * Static properties getters
@@ -175,7 +184,7 @@ class WorkerEntity extends Entity {
   }
 
   /**
-   * WorkerEntity.STATUS_APPROVED
+   * WorkerEntity.STATUS_WAITING_CONNECTION
    * @returns {string}
    */
   static get STATUS_WAITING_CONNECTION() {
@@ -183,11 +192,19 @@ class WorkerEntity extends Entity {
   }
 
   /**
-   * WorkerEntity.STATUS_REJECTED
+   * WorkerEntity.STATUS_CONNECTED
    * @returns {string}
    */
   static get STATUS_CONNECTED() {
     return STATUS_CONNECTED;
+  }
+
+  /**
+   * WorkerEntity.STATUS_RECONNECTING
+   * @returns {string}
+   */
+  static get STATUS_RECONNECTING() {
+    return STATUS_RECONNECTING;
   }
 }
 

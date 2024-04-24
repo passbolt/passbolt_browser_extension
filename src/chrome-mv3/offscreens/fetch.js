@@ -12,7 +12,6 @@
  * @since         4.7.0
  */
 
-
 import FetchOffscreenService from "./service/network/fetchOffscreenService";
 
 chrome.runtime.onMessage.addListener(FetchOffscreenService.handleFetchRequest);

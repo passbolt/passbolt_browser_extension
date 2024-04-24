@@ -21,7 +21,7 @@ import GetOrganizationSettingsController from "../controller/organizationSetting
 import GetAndInitializeAccountLocaleController from "../controller/account/getAndInitializeAccountLocaleController";
 import GetExtensionVersionController from "../controller/extension/getExtensionVersionController";
 import GetAccountController from "../controller/account/getAccountController";
-import AuthLoginController from "../controller/auth/authLoginController";
+import AccountRecoveryLoginController from "../controller/accountRecovery/accountRecoveryLoginController";
 import ReloadTabController from "../controller/tab/reloadTabController";
 
 /**
@@ -62,13 +62,13 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.account-recovery.recover-account', async(requestId, passphrase) => {
-    const controller = new RecoverAccountController(worker, requestId, apiClientOptions, account);
+    const controller = new RecoverAccountController(worker, requestId, apiClientOptions);
     await controller._exec(passphrase);
   });
 
   worker.port.on('passbolt.account-recovery.sign-in', async(requestId, passphrase, rememberMe) => {
-    const controller = new AuthLoginController(worker, requestId, apiClientOptions, account);
-    await controller._exec(passphrase, rememberMe, true);
+    const controller = new AccountRecoveryLoginController(worker, requestId, apiClientOptions, account);
+    await controller._exec(passphrase, rememberMe);
   });
 
   worker.port.on('passbolt.account-recovery.request-help-credentials-lost', async requestId => {

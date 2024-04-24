@@ -137,8 +137,8 @@ class AccountAccountRecoveryEntity extends AbstractAccountEntity {
     if (contains.account_recovery_request_id) {
       result.account_recovery_request_id = this.accountRecoveryRequestId;
     }
-    if (contains.security_token && this._security_token) {
-      result.security_token = this._security_token.toDto();
+    if (contains.security_token && this.securityToken) {
+      result.security_token = this.securityToken.toDto();
     }
     if (contains.account_recovery_request && this.accountRecoveryRequest) {
       result.account_recovery_request = this._account_recovery_request.toDto(AccountRecoveryRequestEntity.ALL_CONTAIN_OPTIONS);

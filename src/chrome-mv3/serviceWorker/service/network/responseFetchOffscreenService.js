@@ -16,7 +16,8 @@ import {assertUuid} from "../../../../all/background_page/utils/assertions";
 import {
   FETCH_OFFSCREEN_RESPONSE_TYPE_ERROR,
   FETCH_OFFSCREEN_RESPONSE_TYPE_SUCCESS,
-  SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER
+  SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER,
+  SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_POLLING_HANDLER,
 } from "../../../offscreens/service/network/fetchOffscreenService";
 import {RequestFetchOffscreenService} from "./requestFetchOffscreenService";
 
@@ -27,6 +28,12 @@ export default class ResponseFetchOffscreenService {
    * @return {void}
    */
   static handleFetchResponse(message) {
+    // This is a polling message for long request to keep the service worker alive.
+    if (message.target === SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_POLLING_HANDLER) {
+      console.debug("ResponseFetchOffscreenService: polled");
+      return;
+    }
+
     // Return early if this message isn't meant for the offscreen document.
     if (message.target !== SEND_MESSAGE_TARGET_FETCH_OFFSCREEN_RESPONSE_HANDLER) {
       console.debug("ResponseFetchOffscreenService: received message not specific to the service worker fetch offscreen response handler.");

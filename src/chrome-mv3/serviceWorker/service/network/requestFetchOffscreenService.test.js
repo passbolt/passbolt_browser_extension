@@ -22,7 +22,6 @@ import {
 import {SEND_MESSAGE_TARGET_FETCH_OFFSCREEN} from "../../../offscreens/service/network/fetchOffscreenService";
 import {fetchOptionsWithBodyFormData, fetchOptionWithBodyData} from "./requestFetchOffscreenService.test.data";
 
-
 beforeEach(() => {
   enableFetchMocks();
   fetch.resetMocks();

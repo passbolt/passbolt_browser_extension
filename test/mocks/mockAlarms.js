@@ -25,7 +25,7 @@ class MockAlarms {
   }
 
   /**
-   * Register a new alarm by mocking the mecanism with setInterval and setTimeout.
+   * Register a new alarm by mocking the mechanism with setInterval and setTimeout.
    * @param {string} alarmName the name of the alarm passed as the callback parameter when the alarm triggers
    * @param {object} options the options to define when the alarm triggers and at which frequency
    * @return {Promise<void>} a promise is return to simulate the chrome.alarm API

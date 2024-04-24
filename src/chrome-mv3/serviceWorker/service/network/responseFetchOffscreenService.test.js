@@ -66,7 +66,7 @@ describe("ResponseFetchOffscreenService", () => {
     });
 
     it("should validate message id", () => {
-      expect(() => defaultResponseMessage({id: crypto.randomUUID()})).not.toThrow();
+      expect(() => ResponseFetchOffscreenService.assertMessage(defaultResponseMessage({id: crypto.randomUUID()}))).not.toThrow();
     });
 
     each([

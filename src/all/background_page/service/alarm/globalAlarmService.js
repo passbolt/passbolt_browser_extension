@@ -19,7 +19,7 @@ import PassphraseStorageService from "../session_storage/passphraseStorageServic
 const topLevelAlarmMapping = {
   [StartLoopAuthSessionCheckService.ALARM_NAME]: StartLoopAuthSessionCheckService.handleAuthStatusCheckAlarm,
   [PassphraseStorageService.ALARM_NAME]: PassphraseStorageService.handleFlushEvent,
-  [KeepSessionAliveService.ALARM_NAME]: KeepSessionAliveService.stop,
+  [KeepSessionAliveService.ALARM_NAME]: KeepSessionAliveService.handleKeepSessionAlive,
 };
 
 /**

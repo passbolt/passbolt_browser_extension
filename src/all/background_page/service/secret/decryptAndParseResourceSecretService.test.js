@@ -14,7 +14,7 @@
 
 import DecryptAndParseResourceSecretService from "./decryptAndParseResourceSecretService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import EncryptMessageService from "../crypto/encryptMessageService";
 import PlaintextEntity from "../../model/entity/plaintext/plaintextEntity";
 import SecretEntity from "../../model/entity/secret/secretEntity";

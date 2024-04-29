@@ -20,7 +20,7 @@ import {defaultResourceDto} from "passbolt-styleguide/src/shared/models/entity/r
 import {readSecret} from "../../model/entity/secret/secretEntity.test.data";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {
   plaintextSecretPasswordDescriptionTotpDto,
   plaintextSecretPasswordAndDescriptionDto, plaintextSecretTotpDto

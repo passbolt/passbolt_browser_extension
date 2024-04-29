@@ -16,7 +16,7 @@ import {users} from "passbolt-styleguide/src/shared/models/entity/user/userEntit
 import {defaultGroup} from "../../model/entity/group/groupEntity.test.data";
 import {createGroupUser} from "../../model/entity/groupUser/groupUsersEntity.test.data";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {defaultDyRunResponse} from "../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 

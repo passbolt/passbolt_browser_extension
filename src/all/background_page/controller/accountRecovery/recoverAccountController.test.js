@@ -21,7 +21,7 @@ import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiCli
 import RecoverAccountController from "./recoverAccountController";
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {
   approvedAccountRecoveryRequestDto,

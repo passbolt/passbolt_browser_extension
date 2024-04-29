@@ -11,7 +11,7 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         3.6.0
  */
-const {pgpKeys} = require("../../../../../../../test/fixtures/pgpKeys/keys");
+const {pgpKeys} = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
 
 exports.ExternalGpgKeyEntityFixtures = {
   minimal_dto: {

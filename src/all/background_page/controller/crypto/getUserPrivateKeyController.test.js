@@ -12,7 +12,7 @@
  * @since         4.3.0
  */
 import {enableFetchMocks} from "jest-fetch-mock";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import Keyring from '../../model/keyring';
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";

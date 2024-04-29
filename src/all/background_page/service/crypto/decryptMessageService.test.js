@@ -18,7 +18,7 @@
 
 import DecryptMessageService from "./decryptMessageService";
 import EncryptMessageService from "./encryptMessageService";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 describe("DecryptMessageService", () => {

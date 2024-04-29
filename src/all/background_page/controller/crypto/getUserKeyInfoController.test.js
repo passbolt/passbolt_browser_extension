@@ -13,7 +13,7 @@
  */
 import {enableFetchMocks} from "jest-fetch-mock";
 import GetUserKeyInfoController from "./getUserKeyInfoController";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import Keyring from '../../model/keyring';

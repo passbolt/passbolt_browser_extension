@@ -13,7 +13,7 @@
  */
 import GetDecryptedUserPrivateKeyService from "./getDecryptedUserPrivateKeyService";
 import ExternalGpgKeyEntity from "../../model/entity/gpgkey/external/externalGpgKeyEntity";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import Keyring from "../../model/keyring";
 
 const mockedFindPrivate = jest.spyOn(Keyring.prototype, "findPrivate");

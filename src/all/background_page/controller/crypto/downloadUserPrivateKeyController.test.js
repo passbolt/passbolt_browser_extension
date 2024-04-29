@@ -16,7 +16,7 @@ import DownloadUserPrivateKeyController from "./downloadUserPrivateKeyController
 import GetGpgKeyInfoService from "../../service/crypto/getGpgKeyInfoService";
 import GpgKeyError from "../../error/GpgKeyError";
 import MockExtension from "../../../../../test/mocks/mockExtension";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import FileService from "../../service/file/fileService";
 

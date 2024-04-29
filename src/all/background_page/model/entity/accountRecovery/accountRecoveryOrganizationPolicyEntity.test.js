@@ -26,7 +26,7 @@ import {
   enabledAccountRecoveryOrganizationPolicyDto, rotateKeyAccountRecoveryOrganizationPolicyDto
 } from "./accountRecoveryOrganizationPolicyEntity.test.data";
 import {users} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
-import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 
 describe("AccountRecoveryOrganizationPolicy entity", () => {
   it("schema must validate", () => {

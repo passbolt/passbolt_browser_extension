@@ -14,7 +14,7 @@
 
 import {v4 as uuidv4} from "uuid";
 import AccountSetupEntity from "./accountSetupEntity";
-import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {defaultSecurityTokenDto} from "../securityToken/SecurityTokenEntity.test.data";
 
 export const initialAccountSetupDto = (data = {}) => {

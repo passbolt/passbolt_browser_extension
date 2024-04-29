@@ -12,7 +12,7 @@
  * @since         3.0.0
  */
 
-import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
 
 export const defaultUserEntityTestFixtures = (data = {}) => {
   const defaultData = {

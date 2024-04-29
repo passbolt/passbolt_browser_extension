@@ -17,7 +17,7 @@ import AccountEntity from "../../model/entity/account/accountEntity";
 import AuthVerifyServerChallengeService from "./authVerifyServerChallengeService";
 import {defaultGpgAuthTokenVerifyHeadersDto} from "../../model/gpgAuthHeader.test.data";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
 
 beforeEach(() => {
   jest.resetModules();

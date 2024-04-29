@@ -15,7 +15,7 @@ import VerifyAccountPassphraseController from "./verifyAccountPassphraseControll
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 
 describe("VerifyAccountPassphraseController", () => {
   describe("VerifyAccountPassphraseController::exec", () => {

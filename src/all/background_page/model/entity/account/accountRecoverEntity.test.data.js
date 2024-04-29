@@ -13,7 +13,7 @@
  */
 
 import {v4 as uuidv4} from "uuid";
-import {pgpKeys} from "../../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {defaultSecurityTokenDto} from "../securityToken/SecurityTokenEntity.test.data";
 import AccountRecoverEntity from "./accountRecoverEntity";
 import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";

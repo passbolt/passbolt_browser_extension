@@ -26,7 +26,7 @@ import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.d
 import AccountEntity from "../../model/entity/account/accountEntity";
 import MockExtension from "../../../../../test/mocks/mockExtension";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 
 jest.mock("../../service/passphrase/getPassphraseService");
 

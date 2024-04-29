@@ -17,7 +17,7 @@ import Keyring from "../../model/keyring";
 import ValidateOrganizationPublicKeyService from "./validateOrganizationPublicKeyService";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
 import {dummyData} from "./validateOrganizationPublicKeyService.test.data";
 
 beforeAll(() => {

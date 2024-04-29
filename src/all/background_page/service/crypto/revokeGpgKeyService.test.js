@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 import RevokeGpgKeyService from "./revokeGpgKeyService";
-import {pgpKeys} from '../../../../../test/fixtures/pgpKeys/keys';
+import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
 import {OpenpgpAssertion} from '../../utils/openpgp/openpgpAssertions';
 import GetGpgKeyInfoService from "./getGpgKeyInfoService";
 

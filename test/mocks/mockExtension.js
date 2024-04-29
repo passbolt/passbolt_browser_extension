@@ -16,7 +16,7 @@ import User from "../../src/all/background_page/model/user";
 import {defaultSecurityTokenDto} from "../../src/all/background_page/model/entity/securityToken/SecurityTokenEntity.test.data";
 import {v4 as uuidv4} from "uuid";
 import Keyring from "../../src/all/background_page/model/keyring";
-import {pgpKeys} from "../fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {Uuid} from "../../src/all/background_page/utils/uuid";
 
 class MockExtension {

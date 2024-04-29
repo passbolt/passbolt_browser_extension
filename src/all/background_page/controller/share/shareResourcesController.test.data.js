@@ -12,7 +12,7 @@
  * @since         3.6.0
  */
 import {v4 as uuidv4} from "uuid";
-import {pgpKeys} from "../../../../../test/fixtures/pgpKeys/keys";
+import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {users} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import {readSecret} from "../../model/entity/secret/secretEntity.test.data";
 import {ownerPermissionDto} from "passbolt-styleguide/src/shared/models/entity/permission/permissionEntity.test.data.js";

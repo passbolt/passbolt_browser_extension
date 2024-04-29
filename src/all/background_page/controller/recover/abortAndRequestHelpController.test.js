@@ -18,6 +18,7 @@ import {initialAccountRecoverDto} from "../../model/entity/account/accountRecove
 import AbortAndRequestHelp from "./abortAndRequestHelpController";
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -27,7 +28,8 @@ describe("AbortAndRequestHelpController", () => {
   describe("AbortAndRequestHelpController::exec", () => {
     it("Should request help to an administrator and abort the recover request.", async() => {
       const account = new AccountRecoverEntity(initialAccountRecoverDto());
-      const controller = new AbortAndRequestHelp(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new AbortAndRequestHelp({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
 
       // Mock the API response.
       const mockApiFetch = fetch.doMockOnceIf(new RegExp(`/setup/recover/abort/${account.userId}.json`), () => mockApiResponse());
@@ -37,6 +39,16 @@ describe("AbortAndRequestHelpController", () => {
       expect.assertions(1);
       // Expect the API to have been called.
       expect(mockApiFetch).toHaveBeenCalled();
+    });
+
+    it("Should raise an error if no account has been found.", async() => {
+      const controller = new AbortAndRequestHelp({port: {_port: {name: "test"}}}, null, defaultApiClientOptions());
+      expect.assertions(1);
+      try {
+        await controller.exec();
+      } catch (error) {
+        expect(error.message).toEqual("You have already started the process on another tab.");
+      }
     });
   });
 });

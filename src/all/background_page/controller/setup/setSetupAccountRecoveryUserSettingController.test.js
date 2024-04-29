@@ -21,6 +21,7 @@ import {enabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/ac
 import AccountRecoveryOrganizationPolicyEntity from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity";
 import {withUserKeyAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(async() => {
   enableFetchMocks();
@@ -31,7 +32,9 @@ describe("SetSetupAccountRecoveryUserSettingController", () => {
   describe("SetSetupAccountRecoveryUserSettingController::exec", () => {
     it("Should save a rejected account recovery user setting.", async() => {
       const account = new AccountSetupEntity(withUserKeyAccountSetupDto());
-      const controller = new SetSetupAccountRecoveryUserSettingController(null, null, account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      jest.spyOn(AccountTemporarySessionStorageService, "set").mockImplementationOnce(() => jest.fn());
+      const controller = new SetSetupAccountRecoveryUserSettingController({port: {_port: {name: "test"}}}, null);
       const accountRecoveryUserSettingDto = createRejectedAccountRecoveryUserSettingDto({user_id: account.userId});
       await controller.exec(AccountRecoveryUserSettingEntity.STATUS_REJECTED);
 
@@ -42,11 +45,10 @@ describe("SetSetupAccountRecoveryUserSettingController", () => {
 
     it("Should save an approved account recovery user setting.", async() => {
       const account = new AccountSetupEntity(withUserKeyAccountSetupDto());
-      const runtimeMemory = {
-        accountRecoveryOrganizationPolicy: new AccountRecoveryOrganizationPolicyEntity(enabledAccountRecoveryOrganizationPolicyDto()),
-        passphrase: pgpKeys.ada.passphrase
-      };
-      const controller = new SetSetupAccountRecoveryUserSettingController(null, null, account, runtimeMemory);
+      const accountRecoveryOrganizationPolicy = new AccountRecoveryOrganizationPolicyEntity(enabledAccountRecoveryOrganizationPolicyDto());
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account, accountRecoveryOrganizationPolicy: accountRecoveryOrganizationPolicy, passphrase: pgpKeys.ada.passphrase}));
+      jest.spyOn(AccountTemporarySessionStorageService, "set").mockImplementationOnce(() => jest.fn());
+      const controller = new SetSetupAccountRecoveryUserSettingController({port: {_port: {name: "test"}}}, null);
       await controller.exec(AccountRecoveryUserSettingEntity.STATUS_APPROVED);
 
       expect.assertions(5);
@@ -61,11 +63,22 @@ describe("SetSetupAccountRecoveryUserSettingController", () => {
 
     it("Should throw an error if an attempt to save an approved account recovery user setting without passphrase.", async() => {
       const account = new AccountSetupEntity(withUserKeyAccountSetupDto());
-      const controller = new SetSetupAccountRecoveryUserSettingController(null, null, account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new SetSetupAccountRecoveryUserSettingController({port: {_port: {name: "test"}}}, null);
       const promise = controller.exec(AccountRecoveryUserSettingEntity.STATUS_APPROVED);
 
       expect.assertions(1);
       await expect(promise).rejects.toThrowError("A passphrase is required.");
+    });
+
+    it("Should raise an error if no account has been found.", async() => {
+      const controller = new SetSetupAccountRecoveryUserSettingController({port: {_port: {name: "test"}}}, null);
+      expect.assertions(1);
+      try {
+        await controller.exec(AccountRecoveryUserSettingEntity.STATUS_APPROVED);
+      } catch (error) {
+        expect(error.message).toEqual("You have already started the process on another tab.");
+      }
     });
   });
 });

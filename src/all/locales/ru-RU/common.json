@@ -90,5 +90,6 @@
   "Updating group ...": "Обновление группы ...",
   "Updating password": "Обновление пароля",
   "Updating resource": "Обновление ресурсов",
-  "Updating users' key...": "Обновление ключа пользователя..."
+  "Updating users' key...": "Обновление ключа пользователя...",
+  "You have already started the process on another tab.": "You have already started the process on another tab."
 }

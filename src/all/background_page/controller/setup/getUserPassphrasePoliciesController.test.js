@@ -15,23 +15,23 @@
 import GetUserPassphrasePoliciesController from "./getUserPassphrasePoliciesController";
 import {defaultUserPassphrasePoliciesEntityDto} from "passbolt-styleguide/src/shared/models/userPassphrasePolicies/UserPassphrasePoliciesDto.test.data";
 import UserPassphrasePoliciesEntity from "passbolt-styleguide/src/shared/models/entity/userPassphrasePolicies/userPassphrasePoliciesEntity";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 describe("GetUserPassphrasePoliciesController", () => {
   it("Should return the user passphrase policies from the runtime memory", async() => {
-    const runtimeMemory = {
-      userPassphrasePolicies: new UserPassphrasePoliciesEntity(defaultUserPassphrasePoliciesEntityDto())
-    };
-    const controller = new GetUserPassphrasePoliciesController(null, null, runtimeMemory);
+    const userPassphrasePolicies = new UserPassphrasePoliciesEntity(defaultUserPassphrasePoliciesEntityDto());
+    jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({userPassphrasePolicies: userPassphrasePolicies}));
+    const controller = new GetUserPassphrasePoliciesController({port: {_port: {name: "test"}}}, null);
 
     expect.assertions(2);
     const accountRecoveryOrganizationPolicy = await controller.exec();
     expect(accountRecoveryOrganizationPolicy).toBeInstanceOf(UserPassphrasePoliciesEntity);
-    expect(accountRecoveryOrganizationPolicy).toStrictEqual(runtimeMemory.userPassphrasePolicies);
+    expect(accountRecoveryOrganizationPolicy).toStrictEqual(userPassphrasePolicies);
   });
 
   it("Should return a default user passphrase policies if not defined on the runtime memory", async() => {
-    const runtimeMemory = {};
-    const controller = new GetUserPassphrasePoliciesController(null, null, runtimeMemory);
+    jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => null);
+    const controller = new GetUserPassphrasePoliciesController({port: {_port: {name: "test"}}}, null);
 
     expect.assertions(1);
     const userPassphrasePolicies = await controller.exec();

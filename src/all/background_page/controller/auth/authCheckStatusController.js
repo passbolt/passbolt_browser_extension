@@ -11,23 +11,37 @@
  * @link          https://www.passbolt.com Passbolt(tm)
  * @since         2.11.0
  */
-import GpgAuth from "../../model/gpgauth";
+import CheckAuthStatusService from "../../service/auth/checkAuthStatusService";
 
 class AuthCheckStatusController {
   constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
-    this.auth = new GpgAuth();
+    this.checkAuthStatusService = new CheckAuthStatusService();
   }
 
-  async main() {
+  /**
+   * Controller executor.
+   * @param {boolean} [flushCache = true] should the cache be flushed before
+   * @returns {Promise<void>}
+   */
+  async _exec(flushCache = true) {
     try {
-      const status = await this.auth.checkAuthStatus();
-      this.worker.port.emit(this.requestId, 'SUCCESS', status);
+      const authStatus = await this.exec(flushCache);
+      this.worker.port.emit(this.requestId, 'SUCCESS', authStatus);
     } catch (error) {
       console.error(error);
       this.worker.port.emit(this.requestId, 'ERROR', error);
     }
+  }
+
+  /**
+   * Controller executor.
+   * @param {boolean} flushCache should the cache be flushed before
+   * @returns {Promise<{isAuthenticated: {bool}, isMfaRequired: {bool}}>}
+   */
+  async exec(flushCache) {
+    return await this.checkAuthStatusService.checkAuthStatus(flushCache);
   }
 }
 

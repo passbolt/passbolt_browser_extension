@@ -28,7 +28,7 @@ describe("ExportDesktopAccountController", () => {
   const controller = new ExportDesktopAccountController(worker, requestId, account);
 
   beforeEach(() => {
-    jest.spyOn(controller.getPassphraseService, "getPassphrase").mockImplementation(() => pgpKeys.ada.passphrase);
+    jest.spyOn(controller.getPassphraseService, "requestPassphrase").mockImplementation(() => pgpKeys.ada.passphrase);
     jest.spyOn(GetLegacyAccountService, "get").mockImplementation(() => account);
     jest.spyOn(controller.desktopTransferModel, "getAccountKit");
   });
@@ -37,14 +37,14 @@ describe("ExportDesktopAccountController", () => {
     it("Should request the passphrase before any other action.", async() => {
       expect.assertions(3);
       //Simulate an error to check is the other methods have not been called
-      jest.spyOn(controller.getPassphraseService, "getPassphrase").mockRejectedValue(() => new Error());
+      jest.spyOn(controller.getPassphraseService, "requestPassphrase").mockRejectedValue(() => new Error());
       jest.spyOn(FileService, "saveFile").mockImplementation(jest.fn());
 
       try {
         await controller.exec();
       } catch {}
 
-      expect(controller.getPassphraseService.getPassphrase).toHaveBeenCalledWith(worker);
+      expect(controller.getPassphraseService.requestPassphrase).toHaveBeenCalledWith(worker);
       expect(controller.desktopTransferModel.getAccountKit).not.toHaveBeenCalled();
       expect(FileService.saveFile).not.toHaveBeenCalled();
     });
@@ -93,7 +93,7 @@ describe("ExportDesktopAccountController", () => {
     it("Should emit error when an error occured.", async() => {
       expect.assertions(1);
       const error = new Error('Cannot download');
-      controller.getPassphraseService.getPassphrase.mockRejectedValue(error);
+      controller.getPassphraseService.requestPassphrase.mockRejectedValue(error);
 
       await controller._exec();
 

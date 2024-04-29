@@ -243,7 +243,7 @@ describe("ReviewRequestController", () => {
 
     it("Should assert the public key of the user making the account recovery is found.", async() => {
       expect.assertions(1);
-      await MockExtension.withConfiguredAccount();
+      await MockExtension.withConfiguredAccount(pgpKeys.betty);
       // Mock API fetch account recovery organization policy response.
       fetch.doMockOnce(() => mockApiResponse(enabledAccountRecoveryOrganizationPolicyDto()));
       // Mock API get account recovery request.

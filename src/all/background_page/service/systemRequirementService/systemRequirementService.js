@@ -1,8 +1,8 @@
 import storage from "../../sdk/storage";
 import {Config} from "../../model/config";
 import Log from "../../model/log";
-import ToolbarController from "../../controller/toolbarController";
 import * as openpgp from "openpgp";
+import toolbarService from "../toolbar/toolbarService";
 
 class SystemRequirementService {
   /**
@@ -22,8 +22,9 @@ class SystemRequirementService {
      * due to an openpgpjs bug: https://github.com/openpgpjs/openpgpjs/pull/1148
      */
     openpgp.config.allowInsecureDecryptionWithSigningKeys = true;
-    // Toolbar controller
-    new ToolbarController();
+
+    // initialise the toolbar service
+    toolbarService.initialise();
   }
 }
 

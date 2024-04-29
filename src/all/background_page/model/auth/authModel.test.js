@@ -13,28 +13,27 @@
  */
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import AuthModel from "../../model/auth/authModel";
-import AuthService from "passbolt-styleguide/src/shared/services/api/auth/AuthService";
+import AuthLogoutService from "passbolt-styleguide/src/shared/services/api/auth/AuthLogoutService";
+import PostLogoutService from "../../service/auth/postLogoutService";
 
 beforeEach(async() => {
   jest.clearAllMocks();
 });
 
 describe("AuthModel", () => {
-  describe("AuthModel::exec", () => {
-    it("Should call the AuthService to logout and dispatch a logout event", async() => {
-      expect.assertions(3);
-
+  describe("AuthModel::logout", () => {
+    it("Should call the AuthLogoutService to logout and dispatch a logout event", async() => {
+      expect.assertions(2);
       const apiClientOptions = defaultApiClientOptions();
       const model = new AuthModel(apiClientOptions);
 
-      const logoutServiceSpy = jest.spyOn(AuthService.prototype, "logout").mockImplementation(() => {});
-      const dispatchEventSpy = jest.spyOn(self, "dispatchEvent");
+      const logoutServiceSpy = jest.spyOn(AuthLogoutService.prototype, "logout").mockImplementation(() => {});
+      const postLogoutSpy = jest.spyOn(PostLogoutService, "exec");
 
       await model.logout();
 
       expect(logoutServiceSpy).toHaveBeenCalledTimes(1);
-      expect(dispatchEventSpy).toHaveBeenCalledTimes(1);
-      expect(dispatchEventSpy).toHaveBeenCalledWith(new Event("passbolt.auth.after-logout"));
+      expect(postLogoutSpy).toHaveBeenCalledTimes(1);
     });
   });
 });

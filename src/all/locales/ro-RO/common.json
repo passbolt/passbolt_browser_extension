@@ -90,5 +90,6 @@
   "Updating group ...": "Se actualizează grupul ...",
   "Updating password": "Se actualizează parola",
   "Updating resource": "Se actualizează resursa",
-  "Updating users' key...": "Se actualizează cheia utilizatorilor..."
+  "Updating users' key...": "Se actualizează cheia utilizatorilor...",
+  "You have already started the process on another tab.": "You have already started the process on another tab."
 }

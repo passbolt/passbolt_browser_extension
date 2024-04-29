@@ -13,6 +13,7 @@
  */
 
 import FileService from "../../service/file/fileService";
+import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
 // The recovery kit file name.
 const RECOVERY_KIT_FILENAME = "passbolt-recovery-kit.asc";
 
@@ -21,12 +22,10 @@ class DownloadRecoveryKitController {
    * Constructor.
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
-   * @param {AccountSetupEntity} account The account being setup.
    */
-  constructor(worker, requestId, account) {
+  constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
-    this.account = account;
   }
 
   /**
@@ -48,10 +47,11 @@ class DownloadRecoveryKitController {
    * @returns {Promise<void>}
    */
   async exec() {
-    if (!this.account?.userPrivateArmoredKey) {
+    const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
+    if (!temporaryAccount.account?.userPrivateArmoredKey) {
       throw new Error('An account user private armored key is required.');
     }
-    const userPrivateArmoredKey = this.account.userPrivateArmoredKey;
+    const userPrivateArmoredKey = temporaryAccount.account.userPrivateArmoredKey;
     await FileService.saveFile(RECOVERY_KIT_FILENAME, userPrivateArmoredKey, "text/plain", this.worker.tab.id);
   }
 }

@@ -18,6 +18,8 @@ import WorkersSessionStorage from "../sessionStorage/workersSessionStorage";
 import {readWorker} from "../../model/entity/worker/workerEntity.test.data";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 import WebNavigationService from "../webNavigation/webNavigationService";
+import {mockPort} from "../../sdk/port/portManager.test.data";
+import Port from "../../sdk/port";
 
 describe("WorkerService", () => {
   beforeEach(() => {
@@ -32,24 +34,18 @@ describe("WorkerService", () => {
       expect.assertions(3);
       // data mocked
       const worker = readWorker();
-      const port = {
-        _name: worker.id,
-        _port: {
-          sender: {
-            tab: {}
-          }
-        }
-      };
+      const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId});
+      const portWrapper = new Port(port);
       // mock functions
       jest.spyOn(WorkersSessionStorage, 'getWorkersByNameAndTabId').mockImplementationOnce(() => [worker]);
-      jest.spyOn(BrowserTabService, "sendMessage").mockImplementationOnce(() => jest.fn());
-      jest.spyOn(PortManager, "getPortById").mockImplementationOnce(() => port);
+      jest.spyOn(BrowserTabService, "sendMessage").mockImplementationOnce(() => PortManager.registerPort(portWrapper));
+      jest.spyOn(PortManager, "getPortById");
       // process
       const workerResult = await WorkerService.get("ApplicationName", 1);
       // expectations
       expect(BrowserTabService.sendMessage).toHaveBeenCalledWith(worker, "passbolt.port.connect", worker.id);
       expect(PortManager.getPortById).toHaveBeenCalledWith(worker.id);
-      expect(workerResult).toStrictEqual({port: port, tab: port._port.sender.tab});
+      expect(workerResult).toStrictEqual({port: portWrapper, tab: portWrapper._port.sender.tab});
     });
 
     it("Should get no worker", async() => {
@@ -72,48 +68,36 @@ describe("WorkerService", () => {
 
   describe("WorkerService::waitExists", () => {
     it("should wait for the worker exists", async() => {
-      expect.assertions(10);
+      expect.assertions(5);
       // data mocked
       const worker = readWorker({name: "QuickAccess"});
-      const port = {
-        _name: worker.id,
-        _port: {
-          sender: {
-            tab: worker.tabId
-          }
-        }
-      };
+      const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId});
+      const portWrapper = new Port(port);
+      PortManager.registerPort(portWrapper);
       // mock functions
-      jest.spyOn(PortManager, "getPortById").mockImplementation(() => port);
+      jest.spyOn(PortManager, "getPortById");
       const spy = jest.spyOn(WorkerService, "waitExists");
-      const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
-      const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
+      jest.spyOn(global, "setTimeout");
 
       expect(spy).not.toHaveBeenCalled();
 
       WorkerService.waitExists("QuickAccess", worker.tabId);
       expect(spy).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(0);
 
       jest.advanceTimersByTime(101);
       await WorkersSessionStorage.addWorker(new WorkerEntity(worker));
       expect(spy).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(2);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(1);
+      expect(global.setTimeout).toHaveBeenCalledTimes(1);
 
       jest.advanceTimersByTime(100);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(2);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(2);
+      expect(global.setTimeout).toHaveBeenCalledTimes(1);
     });
 
-    it("should raise an error if the worker not exists until timeout", async() => {
-      expect.assertions(8);
+    it("should raise an error if the worker not exists until timeout", () => {
+      expect.assertions(4);
       const spy = jest.spyOn(WorkerService, "waitExists");
       jest.spyOn(WorkerService, "get").mockImplementation(() => { throw new Error("Could not find worker ID QuickAccess for tab 1."); });
-      const spyOnAlarmClear = jest.spyOn(browser.alarms, "clear");
-      const spyOnAlarmCreate = jest.spyOn(browser.alarms, "create");
+      jest.spyOn(global, "setTimeout");
 
       expect(spy).not.toHaveBeenCalled();
 
@@ -122,13 +106,9 @@ describe("WorkerService", () => {
       });
 
       expect(spy).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(0);
 
-      jest.advanceTimersByTime(20000);
-      expect(spy).toHaveBeenCalledTimes(1);
-      expect(spyOnAlarmCreate).toHaveBeenCalledTimes(100);
-      expect(spyOnAlarmClear).toHaveBeenCalledTimes(100);
+      jest.advanceTimersByTime(6000);
+      expect(global.setTimeout).toHaveBeenCalledTimes(50);
     });
   });
 
@@ -149,7 +129,32 @@ describe("WorkerService", () => {
       };
       const entity = new WorkerEntity(dto);
       await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(entity);
-      // start the alarm
+
+      jest.advanceTimersByTime(50);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(entity.toDto()).toEqual(dto);
+      expect(BrowserTabService.getById).toHaveBeenCalledWith(dto.tabId);
+      expect(WebNavigationService.exec).toHaveBeenCalledWith(frameDetails);
+    });
+
+    it("Exec a navigation", async() => {
+      expect.assertions(3);
+
+      const dto = readWorker({status: WorkerEntity.STATUS_RECONNECTING});
+
+      jest.spyOn(WorkersSessionStorage, "getWorkerById").mockImplementationOnce(() => dto);
+      jest.spyOn(BrowserTabService, "getById").mockImplementationOnce(() => ({url: "https://url.com"}));
+      jest.spyOn(WebNavigationService, "exec");
+
+      const frameDetails = {
+        url: "https://url.com",
+        tabId: dto.tabId,
+        frameId: 0
+      };
+      const entity = new WorkerEntity(dto);
+      await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(entity);
+
       jest.advanceTimersByTime(50);
       await Promise.resolve();
       await Promise.resolve();
@@ -167,7 +172,7 @@ describe("WorkerService", () => {
 
       const entity = new WorkerEntity(dto);
       await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(entity);
-      // start the alarm
+
       jest.advanceTimersByTime(50);
       expect(entity.toDto()).toEqual(dto);
       expect(WebNavigationService.exec).not.toHaveBeenCalled();
@@ -182,10 +187,65 @@ describe("WorkerService", () => {
 
       const entity = new WorkerEntity(dto);
       await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(entity);
-      // start the alarm
+
       jest.advanceTimersByTime(50);
       expect(entity.toDto()).toEqual(dto);
       expect(WebNavigationService.exec).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("WorkerService::destroyWorkersByName", () => {
+    it("Destroy workers", async() => {
+      expect.assertions(6);
+
+      const worker = readWorker();
+      const worker2 = readWorker();
+      const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId});
+      const portWrapper = new Port(port);
+      const port2 = mockPort({name: worker2.id, tabId: worker2.tabId, frameId: worker2.frameId});
+      const portWrapper2 = new Port(port2);
+      PortManager.registerPort(portWrapper);
+
+      jest.spyOn(WorkersSessionStorage, "getWorkersByNames").mockImplementationOnce(() => [worker, worker2]);
+      jest.spyOn(BrowserTabService, "sendMessage").mockImplementationOnce(() => PortManager.registerPort(portWrapper2));
+      jest.spyOn(portWrapper, "emit");
+      jest.spyOn(portWrapper2, "emit");
+
+      await WorkerService.destroyWorkersByName([worker.name, worker2.name]);
+      await Promise.resolve();
+
+      // expectation
+      expect(portWrapper.emit).toHaveBeenCalledWith("passbolt.content-script.destroy");
+      expect(portWrapper.emit).toHaveBeenCalledTimes(1);
+      expect(portWrapper2.emit).toHaveBeenCalledWith("passbolt.content-script.destroy");
+      expect(portWrapper2.emit).toHaveBeenCalledTimes(1);
+      expect(BrowserTabService.sendMessage).toHaveBeenCalledWith(worker2, "passbolt.port.connect", worker2.id);
+      expect(BrowserTabService.sendMessage).toHaveBeenCalledTimes(1);
+    });
+
+    it("Should continue process if worker cannot reconnect port", async() => {
+      expect.assertions(5);
+      const worker = readWorker();
+      const worker2 = readWorker();
+      const port = mockPort({name: worker.id, tabId: worker.tabId, frameId: worker.frameId});
+      const portWrapper = new Port(port);
+      const port2 = mockPort({name: worker2.id, tabId: worker2.tabId, frameId: worker2.frameId});
+      const portWrapper2 = new Port(port2);
+      PortManager.registerPort(portWrapper2);
+
+      jest.spyOn(WorkersSessionStorage, "getWorkersByNames").mockImplementationOnce(() => [worker, worker2]);
+      jest.spyOn(BrowserTabService, "sendMessage").mockImplementationOnce(() => { throw new Error("error"); });
+      jest.spyOn(portWrapper, "emit");
+      jest.spyOn(portWrapper2, "emit");
+
+      await WorkerService.destroyWorkersByName([worker.name, worker2.name]);
+
+      // expectation
+      expect(portWrapper.emit).toHaveBeenCalledTimes(0);
+      expect(portWrapper2.emit).toHaveBeenCalledWith("passbolt.content-script.destroy");
+      expect(portWrapper2.emit).toHaveBeenCalledTimes(1);
+      expect(BrowserTabService.sendMessage).toHaveBeenCalledWith(worker, "passbolt.port.connect", worker.id);
+      expect(BrowserTabService.sendMessage).toHaveBeenCalledTimes(1);
     });
   });
 });

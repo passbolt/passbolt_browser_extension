@@ -90,5 +90,6 @@
   "Updating group ...": "Groep bijwerken ...",
   "Updating password": "Wachtwoord wordt bijgewerkt",
   "Updating resource": "Middel bijwerken",
-  "Updating users' key...": "Gebruikerssleutel wordt bijgewerkt..."
+  "Updating users' key...": "Gebruikerssleutel wordt bijgewerkt...",
+  "You have already started the process on another tab.": "You have already started the process on another tab."
 }

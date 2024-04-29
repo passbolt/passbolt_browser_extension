@@ -13,10 +13,13 @@
  */
 
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import AuthModel from "../../model/auth/authModel";
 import SetupModel from "../../model/setup/setupModel";
 import AccountRecoveryUserSettingEntity from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity";
 import WorkerService from "../../service/worker/workerService";
+import AuthVerifyServerKeyService from "../../service/api/auth/authVerifyServerKeyService";
+import AccountRecoverEntity from "../../model/entity/account/accountRecoverEntity";
+import AccountTemporaryEntity from "../../model/entity/account/accountTemporaryEntity";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 class StartRecoverController {
   /**
@@ -25,15 +28,14 @@ class StartRecoverController {
    * @param {string} requestId The associated request id.
    * @param {ApiClientOptions} apiClientOptions The api client options.
    * @param {AccountRecoverEntity} account The account being recovered.
-   * @param {object} runtimeMemory the runtime memory that stores the data during the process
    */
-  constructor(worker, requestId, apiClientOptions, account, runtimeMemory) {
+  constructor(worker, requestId, apiClientOptions, account) {
     this.worker = worker;
     this.requestId = requestId;
     this.account = account;
-    this.authModel = new AuthModel(apiClientOptions);
+    this.authVerifyServerKeyService = new AuthVerifyServerKeyService(apiClientOptions);
     this.setupModel = new SetupModel(apiClientOptions);
-    this.runtimeMemory = runtimeMemory;
+    this.temporaryAccount = null;
   }
 
   /**
@@ -56,13 +58,32 @@ class StartRecoverController {
    */
   async exec() {
     try {
+      await this._buildTemporaryAccountEntity();
       await this._findAndSetAccountServerPublicKey();
-      const {user, userPassphrasePolicies} = await this.setupModel.startRecover(this.account.userId, this.account.authenticationTokenToken);
-      this.runtimeMemory.userPassphrasePolicies = userPassphrasePolicies;
+      const {user, userPassphrasePolicies} = await this.setupModel.startRecover(this.temporaryAccount.account.userId, this.temporaryAccount.account.authenticationTokenToken);
+      // Keep the user passphrase policies in the setup temporary account storage.
+      if (userPassphrasePolicies) {
+        this.temporaryAccount.userPassphrasePolicies = userPassphrasePolicies;
+      }
       this._setAccountUserMeta(user);
+      // Set all data in the temporary account stored
+      await AccountTemporarySessionStorageService.set(this.temporaryAccount);
     } catch (error) {
       await this._handleUnexpectedError(error);
     }
+  }
+
+  /**
+   * Built the account temporary.
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _buildTemporaryAccountEntity() {
+    const temporaryAccountDto = {
+      account: this.account.toDto(AccountRecoverEntity.ALL_CONTAIN_OPTIONS),
+      worker_id: this.worker.port._port.name
+    };
+    this.temporaryAccount = new AccountTemporaryEntity(temporaryAccountDto);
   }
 
   /**
@@ -71,11 +92,11 @@ class StartRecoverController {
    * @private
    */
   async _findAndSetAccountServerPublicKey() {
-    const serverKeyDto = await this.authModel.getServerKey();
+    const serverKeyDto = await this.authVerifyServerKeyService.getServerKey();
     const serverKey = await OpenpgpAssertion.readKeyOrFail(serverKeyDto.armored_key);
     OpenpgpAssertion.assertPublicKey(serverKey);
     // associate the server public key to the current account.
-    this.account.serverPublicArmoredKey = serverKey.armor();
+    this.temporaryAccount.account.serverPublicArmoredKey = serverKey.armor();
   }
 
   /**
@@ -85,17 +106,17 @@ class StartRecoverController {
    */
   _setAccountUserMeta(user) {
     // Extract the user meta data and associate them to the current temporary account.
-    this.account.username = user?.username;
-    this.account.firstName = user?.profile?.firstName;
-    this.account.lastName = user?.profile?.lastName;
+    this.temporaryAccount.account.username = user?.username;
+    this.temporaryAccount.account.firstName = user?.profile?.firstName;
+    this.temporaryAccount.account.lastName = user?.profile?.lastName;
     if (user?.locale) {
-      this.account.locale = user.locale;
+      this.temporaryAccount.account.locale = user.locale;
     }
     if (user?.accountRecoveryUserSetting?.status === AccountRecoveryUserSettingEntity.STATUS_APPROVED) {
-      this.account.hasApprovedAccountRecoveryUserSetting = true;
+      this.temporaryAccount.account.hasApprovedAccountRecoveryUserSetting = true;
     }
     // As of v3.6.0 the user is stored only to know if account recovery was enabled for this account.
-    this.account.user = user;
+    this.temporaryAccount.account.user = user;
   }
 
   /**

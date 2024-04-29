@@ -18,10 +18,13 @@ import WebNavigationService from "../webNavigation/webNavigationService";
 import PromiseTimeoutService from "../../utils/promise/promiseTimeoutService";
 import WorkerEntity from "../../model/entity/worker/workerEntity";
 import WorkerService from "../worker/workerService";
+import BrowserTabService from "../ui/browserTab.service";
 
 class TabService {
   /**
-   * Execute the navigation service process
+   * Handle tabs onUpdated events.
+   * @see /doc/worker-port-lifecycle.md to know more about worker and content script applications port lifecycle.
+   *
    * @param {number} tabId The tab id
    * @param {object} changeInfo The change info of the tab
    * @param {object} tab The tab
@@ -45,40 +48,80 @@ class TabService {
       return;
     }
 
+    console.debug(`TabService::exec(id: ${tabId}, url: ${tab.url}): Navigation detected.`);
 
     // Get the worker on the main frame
     const worker = await WorkersSessionStorage.getWorkerOnMainFrame(tabId);
-    // If there is already a worker on the main frame
+
+    /*
+     * If there is still a worker in memory relative to the tab top frame. It means that the tab was previously
+     * identified by a pagemod and a worker attached to it.
+     *
+     * If an application remains active on the tab, abort the pagemods identification process, otherwise start
+     * the process and flush the previous worker attached to this tab.
+     */
     if (worker) {
       const workerEntity = new WorkerEntity(worker);
-      // If the worker status is still waiting and urls are the same
-      if (workerEntity.isWaitingConnection) {
-        /*
-         * The tabs onUpdated event can send too many events and to avoid multiple content script inserted an alarm will check after 300ms if the worker is still loading
-         * Especially when a user reload the page multiple times very fast the content script is not on the page and can block the worker waiting a port connection
-         * So, in this case an alarm is created and if the worker is still loading the navigation process is done manually.
-         * Also, in case of there is redirection the process wait the last update and trigger the alarm with the last tab url change
-         */
+      /*
+       * A pagemod might already trying to attach a worker to the tab and is awaiting the content script to open or
+       * reopen the port and connect to it. It can happen when the tabs onUpdated event send too many events with the
+       * complete status, especially happening when a user reloads the tab multiple times very fast.
+       *
+       * To avoid this scenario, ensure that the worker attachment process triggered by the first tabs onUpdated
+       * event had time to complete its treatment. The attachment will be completed when the content script inserted
+       * in the tab successfully opened the port and connect to the background script.
+       *
+       * To avoid any deadlock on the tab, if the content script was not able to connect to the background page within
+       * 300ms, treat the last tabs onUpdated event and trigger a pagemod identification process on it.
+       */
+      if (workerEntity.isWaitingConnection || workerEntity.isReconnecting) {
+        console.debug(`TabService::exec(id: ${tabId}): Waiting content script port initial connection or reconnection.`);
         await WorkerService.checkAndExecNavigationForWorkerWaitingConnection(workerEntity);
         return;
-      } else if (workerEntity.isConnected) {
-        // Get the port associate to a bootstrap application
+      }
+
+      /*
+       * If a port associated to this worker still exists in memory, try to connect to the content script application
+       * that opened it.
+       */
+      if (PortManager.isPortExist(worker.id)) { // Port exists in runtime memory.
         const port = PortManager.getPortById(workerEntity.id);
-        // Check if the url has the same origin
+        /*
+         * Only try to connect with the content script application if the origin of the tab url is similar to the
+         * origin of the application url referenced by the associated port. If the origin change, the tab DOM has
+         * been flushed and within any application on it.
+         */
         if (hasUrlSameOrigin(port._port.sender.url, tab.url)) {
           try {
-            // Check if port is connected
             await PromiseTimeoutService.exec(port.request('passbolt.port.check'));
+            console.debug(`TabService::exec(id: ${tabId}):  Content script application acknowledged presence on worker runtime memory port.`);
             return;
           } catch (error) {
-            console.debug('The port is not connected, navigation detected');
+            console.debug(`TabService::exec(id: ${tabId}): No content script application acknowledged presence on worker runtime memory port.`, error);
           }
+        }
+      } else {
+        /*
+         * If the worker port cannot be found in runtime memory, it could be due to the browser stopping the service
+         * worker (MV3) and with it disconnecting all the ports. If any application remains on the tab message it and
+         * request it to reconnect its port.
+         */
+        try {
+          workerEntity.status = WorkerEntity.STATUS_RECONNECTING;
+          await WorkersSessionStorage.updateWorker(workerEntity);
+          await BrowserTabService.sendMessage(workerEntity, "passbolt.port.connect", workerEntity.id);
+          console.debug(`TabService::exec(id: ${tabId}): A content script application reconnected its port.`);
+          return;
+        } catch (error) {
+          console.debug(`TabService::exec(id: ${tabId}): No content script application was able to reconnect its port.`, error);
         }
       }
     }
+
     // Execute the process of a web navigation to detect pagemod and script to insert
     const frameDetails = mappingFrameDetailsFromTab(tab);
     await WebNavigationService.exec(frameDetails);
+    console.debug(`TabService::exec(id: ${tabId}): Trigger pagemods identification process.`);
   }
 }
 
@@ -88,7 +131,7 @@ class TabService {
  * @return {{tabId, frameId: number, url}}
  */
 function mappingFrameDetailsFromTab(tab) {
-  return  {
+  return {
     // Mapping the tab info as a frame details to be compliant with webNavigation API
     frameId: 0,
     tabId: tab.id,

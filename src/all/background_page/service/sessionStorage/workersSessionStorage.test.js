@@ -22,11 +22,11 @@ describe("WorkersSessionStorage", () => {
 
   describe("WorkersSessionStorage::addWorker", () => {
     it("Should add worker in storage session", async() => {
-      expect.assertions(4);
+      expect.assertions(5);
       // data mocked
       const workerEntity = new WorkerEntity(readWorker());
       const workerEntity2 = new WorkerEntity(readWorker({name: "worker2", frameId: 2}));
-      const workerEntity3 = new WorkerEntity(readWorker({tabId: 2}));
+      const workerEntity3 = new WorkerEntity(readWorker({name: "worker3", tabId: 2}));
       // process
       await WorkersSessionStorage.addWorker(workerEntity);
       await WorkersSessionStorage.addWorker(workerEntity2);
@@ -35,6 +35,7 @@ describe("WorkersSessionStorage", () => {
       expect(await WorkersSessionStorage.getWorkersByTabId(workerEntity.tabId)).toEqual([workerEntity.toDto(), workerEntity2.toDto()]);
       expect(await WorkersSessionStorage.getWorkerOnMainFrame(workerEntity.tabId)).toEqual(workerEntity.toDto());
       expect(await WorkersSessionStorage.getWorkerById(workerEntity3.id)).toEqual(workerEntity3.toDto());
+      expect(await WorkersSessionStorage.getWorkersByNames([workerEntity2.name, workerEntity.name])).toEqual([workerEntity.toDto(), workerEntity2.toDto()]);
       expect(await WorkersSessionStorage.getWorkersByNameAndTabId(workerEntity2.name, workerEntity2.tabId)).toEqual([workerEntity2.toDto()]);
     });
 

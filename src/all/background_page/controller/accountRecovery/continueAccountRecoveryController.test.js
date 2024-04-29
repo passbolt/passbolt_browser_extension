@@ -19,6 +19,8 @@ import ContinueAccountRecoveryController from "./continueAccountRecoveryControll
 import AccountAccountRecoveryEntity from "../../model/entity/account/accountAccountRecoveryEntity";
 import {defaultAccountAccountRecoveryDto} from "../../model/entity/account/accountAccountRecoveryEntity.test.data";
 import WorkerService from "../../service/worker/workerService";
+import {v4 as uuidv4} from "uuid";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -27,21 +29,26 @@ beforeEach(() => {
 describe("ContinueAccountRecoveryController", () => {
   describe("ContinueAccountRecoveryController::exec", () => {
     it("Should continue the account recovery if the user can continue.", async() => {
+      const workerId = uuidv4();
+      const mockedWorker = {tab: {id: "tabID"}, port: {_port: {name: workerId}}};
       const accountRecovery = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
 
       // Mock API fetch account recovery requests response.
       const url = new RegExp(`/account-recovery/continue/${accountRecovery.userId}/${accountRecovery.authenticationTokenToken}.json`);
       fetch.doMockIf(url, () => mockApiResponse());
+      jest.spyOn(AccountTemporarySessionStorageService, "set");
 
-      const controller = new ContinueAccountRecoveryController(null, null, defaultApiClientOptions(), accountRecovery);
+      const controller = new ContinueAccountRecoveryController(mockedWorker, null, defaultApiClientOptions(), accountRecovery);
       const promise = controller.exec();
 
-      expect.assertions(1);
+      expect.assertions(2);
       await expect(promise).resolves.not.toThrow();
+      await expect(AccountTemporarySessionStorageService.set).toHaveBeenCalledTimes(1);
     });
 
     it("Should not continue the account recovery if the API return an error.", async() => {
-      const mockedWorker = {tab: {id: "tabID"}};
+      const workerId = uuidv4();
+      const mockedWorker = {tab: {id: "tabID"}, port: {_port: {name: workerId}}};
       const accountRecovery = new AccountAccountRecoveryEntity(defaultAccountAccountRecoveryDto());
 
       // Mock API fetch account recovery requests response.

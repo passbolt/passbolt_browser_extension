@@ -14,21 +14,18 @@
 
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import DecryptPrivateKeyService from "../../service/crypto/decryptPrivateKeyService";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
+import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
 
 class VerifyImportedKeyPassphraseController {
   /**
    * Constructor.
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
-   * @param {AbstractAccountEntity} account The account associated to the worker.
-   * @param {Object} runtimeMemory The setup runtime memory.
    */
-  constructor(worker, requestId, account, runtimeMemory) {
+  constructor(worker, requestId) {
     this.worker = worker;
     this.requestId = requestId;
-    this.account = account;
-    this.runtimeMemory = runtimeMemory;
-    this.runtimeMemory.passphrase = null;
   }
 
   /**
@@ -55,7 +52,8 @@ class VerifyImportedKeyPassphraseController {
    * @returns {Promise<void>}
    */
   async exec(passphrase) {
-    const privateArmoredKey = this.account?.userPrivateArmoredKey;
+    const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
+    const privateArmoredKey = temporaryAccount.account?.userPrivateArmoredKey;
     if (!privateArmoredKey) {
       throw new Error('An account user private key is required.');
     }
@@ -65,7 +63,9 @@ class VerifyImportedKeyPassphraseController {
     const privateKey = await OpenpgpAssertion.readKeyOrFail(privateArmoredKey);
     await DecryptPrivateKeyService.decrypt(privateKey, passphrase);
     // The passphrase will be later use to sign in the user.
-    this.runtimeMemory.passphrase = passphrase;
+    temporaryAccount.passphrase = passphrase;
+    // Update all data in the temporary account stored
+    await AccountTemporarySessionStorageService.set(temporaryAccount);
   }
 }
 

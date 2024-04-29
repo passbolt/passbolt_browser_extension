@@ -90,5 +90,6 @@
   "Updating group ...": "グループを更新中...",
   "Updating password": "パスワードを更新中",
   "Updating resource": "リソースの更新",
-  "Updating users' key...": "Updating users' key..."
+  "Updating users' key...": "Updating users' key...",
+  "You have already started the process on another tab.": "You have already started the process on another tab."
 }

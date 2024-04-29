@@ -38,7 +38,13 @@ class Port {
   connect() {
     let resolver;
     const promise = new Promise(resolve => { resolver = resolve; });
-    this._port = browser.runtime.connect({name: this._name});
+    try {
+      this._port = browser.runtime.connect({name: this._name});
+    } catch (error) {
+      // Error happen only if there is no listener in the service worker or if the context is invalidated by an update
+      this.destroyContentScript();
+      throw error;
+    }
     this._connected = true;
     this.initListener();
     this.once("passbolt.port.ready", resolver);
@@ -181,6 +187,15 @@ class Port {
     } finally {
       this.lock.release();
     }
+  }
+
+  /**
+   * Simulate the message destroy content script on the port to clean listeners which still running after an update.
+   * In case of a user click manually on the button to update the extension,
+   * there is no process to clean the content script, so it prevent issues on a port reconnection.
+   */
+  destroyContentScript() {
+    this._onMessage(JSON.stringify(["passbolt.content-script.destroy"]));
   }
 }
 

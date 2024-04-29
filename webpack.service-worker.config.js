@@ -11,6 +11,8 @@ const config = {
     new webpack.ProvidePlugin({
       // Inject browser polyfill as a global API, and adapt it depending on the environment (MV2/MV3/Windows app).
       browser: path.resolve(__dirname, './src/all/common/polyfill/browserPolyfill.js'),
+      // Inject custom api client fetch to MV3 extension as workaround of the invalid certificate issue.
+      customApiClientFetch: path.resolve(__dirname, './src/chrome-mv3/polyfill/fetchOffscreenPolyfill.js'),
     })
   ],
   module: {

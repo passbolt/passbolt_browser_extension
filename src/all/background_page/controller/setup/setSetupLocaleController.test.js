@@ -19,6 +19,7 @@ import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import SetSetupLocaleController from "./setSetupLocaleController";
 import AccountSetupEntity from "../../model/entity/account/accountSetupEntity";
 import {initialAccountSetupDto} from "../../model/entity/account/accountSetupEntity.test.data";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
 
 beforeEach(() => {
   enableFetchMocks();
@@ -28,7 +29,9 @@ describe("SetAccountLocaleController", () => {
   describe("SetAccountLocaleController::exec", () => {
     it("Should set the account locale and initialize i18next with it.", async() => {
       const account = new AccountSetupEntity(initialAccountSetupDto());
-      const controller = new SetSetupLocaleController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      jest.spyOn(AccountTemporarySessionStorageService, "set").mockImplementationOnce(() => jest.fn());
+      const controller = new SetSetupLocaleController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions(), account);
 
       // Mock API fetch organization settings
       const mockApiResult = anonymousOrganizationSettings();
@@ -42,7 +45,8 @@ describe("SetAccountLocaleController", () => {
 
     it("Should not accept unsupported locale.", async() => {
       const account = new AccountSetupEntity(initialAccountSetupDto());
-      const controller = new SetSetupLocaleController(null, null, defaultApiClientOptions(), account);
+      jest.spyOn(AccountTemporarySessionStorageService, "get").mockImplementationOnce(() => ({account: account}));
+      const controller = new SetSetupLocaleController({port: {_port: {name: "test"}}}, null, defaultApiClientOptions(), account);
 
       // Mock API fetch organization settings
       const mockApiResult = anonymousOrganizationSettings();

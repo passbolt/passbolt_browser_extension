@@ -58,7 +58,7 @@ class ExportDesktopAccountController {
    * @return {Promise<string>}
    */
   async exec() {
-    const passphrase = await this.getPassphraseService.getPassphrase(this.worker);
+    const passphrase = await this.getPassphraseService.requestPassphrase(this.worker);
     const accountKit = await this.desktopTransferModel.getAccountKit(this.account);
     const accountKitDto = accountKit.toDto();
 

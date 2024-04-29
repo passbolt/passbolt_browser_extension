@@ -90,5 +90,6 @@
   "Updating group ...": "Aktualizowanie grupy ...",
   "Updating password": "Aktualizowanie hasła",
   "Updating resource": "Aktualizowanie zasobu",
-  "Updating users' key...": "Aktualizowanie klucza użytkowników..."
+  "Updating users' key...": "Aktualizowanie klucza użytkowników...",
+  "You have already started the process on another tab.": "You have already started the process on another tab."
 }

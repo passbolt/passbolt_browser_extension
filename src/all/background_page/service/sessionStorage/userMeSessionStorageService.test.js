@@ -18,6 +18,7 @@ import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.d
 import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import UserEntity from "../../model/entity/user/userEntity";
 import ProfileEntity from "../../model/entity/profile/profileEntity";
+import {v4 as uuidv4} from "uuid";
 
 describe("UserMeSessionStorageService", () => {
   beforeEach(async() => {
@@ -49,7 +50,9 @@ describe("UserMeSessionStorageService", () => {
       expect.assertions(1);
       const otherAccount = new AccountEntity(defaultAccountDto());
 
-      const account = new AccountEntity(defaultAccountDto());
+      const account = new AccountEntity(defaultAccountDto({
+        user_id: uuidv4(),
+      }));
       const user = new UserEntity(defaultUserDto());
       await UserMeSessionStorageService.set(account, user);
 
@@ -113,7 +116,9 @@ describe("UserMeSessionStorageService", () => {
     it('should not remove another cached user if there is none for the given account', async() => {
       expect.assertions(1);
 
-      const otherAccount = new AccountEntity(defaultAccountDto());
+      const otherAccount = new AccountEntity(defaultAccountDto({
+        user_id: uuidv4(),
+      }));
       const userOtherAccount = new UserEntity(defaultUserDto());
       await UserMeSessionStorageService.set(otherAccount, userOtherAccount);
 
@@ -127,7 +132,9 @@ describe("UserMeSessionStorageService", () => {
     it('should not remove another cached user if there is a cached user for the given account', async() => {
       expect.assertions(3);
 
-      const otherAccount = new AccountEntity(defaultAccountDto());
+      const otherAccount = new AccountEntity(defaultAccountDto({
+        user_id: uuidv4(),
+      }));
       const userOtherAccount = new UserEntity(defaultUserDto());
       await UserMeSessionStorageService.set(otherAccount, userOtherAccount);
 

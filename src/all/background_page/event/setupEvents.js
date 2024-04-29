@@ -29,17 +29,9 @@ import IsExtensionFirstInstallController from "../controller/extension/isExtensi
 import SetSetupSecurityTokenController from "../controller/setup/setSetupSecurityTokenController";
 import GetAccountRecoveryOrganizationPolicyController from "../controller/setup/getAccountRecoveryOrganizationPolicyController";
 import GetUserPassphrasePoliciesController from "../controller/setup/getUserPassphrasePoliciesController";
+import ReloadTabController from "../controller/tab/reloadTabController";
 
 const listen = function(worker, apiClientOptions, account) {
-  /*
-   * The setup runtime memory.
-   *
-   * Used to store information collected during the user setup journey that shouldn't be stored on the react side of
-   * the application because of their confidentiality or for logic reason. By instance the account recovery organization
-   * policy, collected during a setup start, and used later during the process to encrypt the private escrow of the user.
-   */
-  const runtimeMemory = {};
-
   worker.port.on('passbolt.setup.is-first-install', async requestId => {
     const controller = new IsExtensionFirstInstallController(worker, requestId);
     await controller._exec();
@@ -51,7 +43,7 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.setup.start', async requestId => {
-    const controller = new StartSetupController(worker, requestId, apiClientOptions, account, runtimeMemory);
+    const controller = new StartSetupController(worker, requestId, apiClientOptions, account);
     await controller._exec();
   });
 
@@ -66,42 +58,42 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.setup.generate-key', async(requestId, generateGpgKeyDto) => {
-    const controller = new GenerateSetupKeyPairController(worker, requestId, apiClientOptions, account, runtimeMemory);
+    const controller = new GenerateSetupKeyPairController(worker, requestId, apiClientOptions);
     await controller._exec(generateGpgKeyDto);
   });
 
   worker.port.on('passbolt.setup.download-recovery-kit', async requestId => {
-    const controller = new DownloadRecoveryKitController(worker, requestId, account);
+    const controller = new DownloadRecoveryKitController(worker, requestId);
     await controller._exec();
   });
 
   worker.port.on('passbolt.setup.get-account-recovery-organization-policy', async requestId => {
-    const controller = new GetAccountRecoveryOrganizationPolicyController(worker, requestId, runtimeMemory);
+    const controller = new GetAccountRecoveryOrganizationPolicyController(worker, requestId);
     await controller._exec();
   });
 
   worker.port.on('passbolt.setup.set-account-recovery-user-setting', async(requestId, status) => {
-    const controller = new SetSetupAccountRecoveryUserSettingController(worker, requestId, account, runtimeMemory);
+    const controller = new SetSetupAccountRecoveryUserSettingController(worker, requestId);
     await controller._exec(status);
   });
 
   worker.port.on('passbolt.setup.import-key', async(requestId, armoredKey) => {
-    const controller = new ImportSetupPrivateKeyController(worker, requestId, account);
+    const controller = new ImportSetupPrivateKeyController(worker, requestId, apiClientOptions);
     await controller._exec(armoredKey);
   });
 
   worker.port.on('passbolt.setup.verify-passphrase', async(requestId, passphrase) => {
-    const controller = new VerifyImportedKeyPassphraseController(worker, requestId, account, runtimeMemory);
+    const controller = new VerifyImportedKeyPassphraseController(worker, requestId);
     await controller._exec(passphrase);
   });
 
   worker.port.on('passbolt.setup.set-security-token', async(requestId, securityTokenDto) => {
-    const controller = new SetSetupSecurityTokenController(worker, requestId, account);
+    const controller = new SetSetupSecurityTokenController(worker, requestId);
     await controller._exec(securityTokenDto);
   });
 
   worker.port.on('passbolt.setup.complete', async requestId => {
-    const controller = new CompleteSetupController(worker, requestId, apiClientOptions, account, runtimeMemory);
+    const controller = new CompleteSetupController(worker, requestId, apiClientOptions);
     await controller._exec();
   });
 
@@ -111,7 +103,7 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.setup.sign-in', async(requestId, rememberMe) => {
-    const controller = new SignInSetupController(worker, requestId, apiClientOptions, account, runtimeMemory);
+    const controller = new SignInSetupController(worker, requestId, apiClientOptions);
     await controller._exec(rememberMe);
   });
 
@@ -121,7 +113,12 @@ const listen = function(worker, apiClientOptions, account) {
   });
 
   worker.port.on('passbolt.setup.get-user-passphrase-policies', async requestId => {
-    const controller = new GetUserPassphrasePoliciesController(worker, requestId, runtimeMemory);
+    const controller = new GetUserPassphrasePoliciesController(worker, requestId);
+    await controller._exec();
+  });
+
+  worker.port.on('passbolt.tab.reload', async requestId => {
+    const controller = new ReloadTabController(worker, requestId);
     await controller._exec();
   });
 };

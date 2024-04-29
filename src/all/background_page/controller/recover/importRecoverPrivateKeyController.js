@@ -12,22 +12,23 @@
  * @since         3.6.0
  */
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
-import GpgAuth from "../../model/gpgauth";
 import GpgKeyError from "../../error/GpgKeyError";
 import i18n from "../../sdk/i18n";
+import AuthVerifyServerChallengeService from "../../service/auth/authVerifyServerChallengeService";
+import AccountTemporarySessionStorageService from "../../service/sessionStorage/accountTemporarySessionStorageService";
+import FindAccountTemporaryService from "../../service/account/findAccountTemporaryService";
 
 class ImportRecoverPrivateKeyController {
   /**
    * Constructor.
    * @param {Worker} worker The associated worker.
    * @param {string} requestId The associated request id.
-   * @param {AccountRecoverEntity} account The account being recovered.
+   * @param {ApiClientOptions} apiClientOptions the api client options
    */
-  constructor(worker, requestId, account) {
+  constructor(worker, requestId, apiClientOptions) {
     this.worker = worker;
     this.requestId = requestId;
-    this.account = account;
-    this.legacyAuthModel = new GpgAuth();
+    this.authVerifyServerChallengeService = new AuthVerifyServerChallengeService(apiClientOptions);
   }
 
   /**
@@ -51,30 +52,34 @@ class ImportRecoverPrivateKeyController {
    * @returns {Promise<void>}
    */
   async exec(armoredKey) {
+    const temporaryAccount = await FindAccountTemporaryService.exec(this.worker.port._port.name);
     const privateKey = await OpenpgpAssertion.readKeyOrFail(armoredKey);
     OpenpgpAssertion.assertPrivateKey(privateKey);
-    await this._assertImportKeyOwnedByUser(privateKey.getFingerprint().toUpperCase());
-    this.account.userPrivateArmoredKey = privateKey.armor();
-    this.account.userPublicArmoredKey = privateKey.toPublic().armor();
+    const fingerprint = privateKey.getFingerprint().toUpperCase();
+    await this._assertImportKeyOwnedByUser(fingerprint, temporaryAccount.account.serverPublicArmoredKey);
+    temporaryAccount.account.userPrivateArmoredKey = privateKey.armor();
+    temporaryAccount.account.userPublicArmoredKey = privateKey.toPublic().armor();
+    temporaryAccount.account.userKeyFingerprint = fingerprint;
+    // Update all data in the temporary account stored
+    await AccountTemporarySessionStorageService.set(temporaryAccount);
   }
 
   /**
    * Assert import key is owned by the user doing the recover.
    * @todo for now the function only check that the key is recognized by the server. The API does offer yet a way to verify that a key is associated to a user id.
    * @param {string} fingerprint The import key fingerprint
+   * @param {string} serverPublicArmoredKey The server public armored key
    * @returns {Promise<void>}
    * @throws {GpgKeyError} If the key is already used
    * @private
    */
-  async _assertImportKeyOwnedByUser(fingerprint) {
-    const domain = this.account.domain;
-    const serverPublicArmoredKey = this.account.serverPublicArmoredKey;
+  async _assertImportKeyOwnedByUser(fingerprint, serverPublicArmoredKey) {
     if (!serverPublicArmoredKey) {
       throw new Error('The server public key should have been provided before importing a private key');
     }
 
     try {
-      await this.legacyAuthModel.verify(domain, serverPublicArmoredKey, fingerprint);
+      await this.authVerifyServerChallengeService.verifyAndValidateServerChallenge(fingerprint, serverPublicArmoredKey);
     } catch (error) {
       console.error(error);
       // @todo Handle not controlled errors, such as timeout error...

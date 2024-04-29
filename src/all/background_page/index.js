@@ -10,10 +10,12 @@ import LocalStorageService from "./service/localStorage/localStorageService";
 import OnExtensionInstalledController from "./controller/extension/onExtensionInstalledController";
 import TabService from "./service/tab/tabService";
 import User from "./model/user";
-import GpgAuth from "./model/gpgauth";
 import Log from "./model/log";
-import StartLoopAuthSessionCheckService from "./service/auth/startLoopAuthSessionCheckService";
-import OnExtensionUpdateAvailableController from "./controller/extension/onExtensionUpdateAvailableController";
+import OnExtensionUpdateAvailableService from "./service/extension/onExtensionUpdateAvailableService";
+import CheckAuthStatusService from "./service/auth/checkAuthStatusService";
+import GlobalAlarmService from "./service/alarm/globalAlarmService";
+import PostLoginService from "./service/auth/postLoginService";
+import PostLogoutService from "./service/auth/postLogoutService";
 
 const main = async() => {
   /**
@@ -32,33 +34,28 @@ const main = async() => {
 const checkAndProcessIfUserAuthenticated = async() => {
   const user = User.getInstance();
   // Check if user is valid
-  if (user.isValid()) {
-    const auth = new GpgAuth();
-    try {
-      const isAuthenticated = await auth.isAuthenticated();
-      if (isAuthenticated) {
-        const startLoopAuthSessionCheckService = new StartLoopAuthSessionCheckService(auth);
-        await startLoopAuthSessionCheckService.exec();
-        const event = new Event('passbolt.auth.after-login');
-        self.dispatchEvent(event);
-      }
-    } catch (error) {
-      /*
-       * Service unavailable
-       * Do nothing...
-       */
-      Log.write({level: 'debug', message: 'The Service is unavailable to check if the user is authenticated'});
-    }
+  if (!user.isValid()) {
+    return;
+  }
+
+  let authStatus;
+  try {
+    const checkAuthStatusService = new CheckAuthStatusService();
+    authStatus = await checkAuthStatusService.checkAuthStatus(true);
+  } catch (error) {
+    // Service is unavailable, do nothing...
+    Log.write({level: 'debug', message: 'The Service is unavailable to check if the user is authenticated'});
+    return;
+  }
+
+  if (authStatus.isAuthenticated) {
+    PostLoginService.exec();
+  } else {
+    PostLogoutService.exec();
   }
 };
 
 main();
-
-
-/**
- * Add listener on passbolt logout
- */
-self.addEventListener("passbolt.auth.after-logout", LocalStorageService.flush);
 
 /**
  * On installed the extension, add first install in the url tab of setup or recover
@@ -68,7 +65,7 @@ browser.runtime.onInstalled.addListener(OnExtensionInstalledController.exec);
 /**
  * On update available of the extension, update it when the user is logout
  */
-browser.runtime.onUpdateAvailable.addListener(OnExtensionUpdateAvailableController.exec);
+browser.runtime.onUpdateAvailable.addListener(OnExtensionUpdateAvailableService.exec);
 
 /**
  * Add listener on startup
@@ -90,3 +87,12 @@ browser.runtime.onConnect.addListener(PortManager.onPortConnect);
  */
 browser.tabs.onRemoved.addListener(PortManager.onTabRemoved);
 
+/**
+ * Ensures the top-level alarm handler is not triggered twice
+ */
+browser.alarms.onAlarm.removeListener(GlobalAlarmService.exec);
+
+/**
+ * Add a top-level alarm handler.
+ */
+browser.alarms.onAlarm.addListener(GlobalAlarmService.exec);

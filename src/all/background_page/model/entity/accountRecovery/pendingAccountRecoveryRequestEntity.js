@@ -17,15 +17,15 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 const ENTITY_NAME = "PendingAccountRecoveryRequest";
 const STATUS_PENDING = "pending";
 
-class PendingAccountRecoveryEntity extends Entity {
+class PendingAccountRecoveryRequestEntity extends Entity {
   /**
    * @inheritDoc
    */
   constructor(dto = {}, options = {}) {
     super(EntitySchema.validate(
-      PendingAccountRecoveryEntity.ENTITY_NAME,
+      PendingAccountRecoveryRequestEntity.ENTITY_NAME,
       dto,
-      PendingAccountRecoveryEntity.getSchema()
+      PendingAccountRecoveryRequestEntity.getSchema()
     ), options);
   }
 
@@ -103,4 +103,4 @@ class PendingAccountRecoveryEntity extends Entity {
   }
 }
 
-export default PendingAccountRecoveryEntity;
+export default PendingAccountRecoveryRequestEntity;

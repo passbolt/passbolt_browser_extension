@@ -27,7 +27,7 @@ import {
   approvedAccountRecoveryRequestDto,
   approvedAccountRecoveryRequestWithoutPrivateKeyDto,
   approvedAccountRecoveryRequestWithoutResponsesDto
-} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import InvalidMasterPasswordError from "../../error/invalidMasterPasswordError";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 import SsoDataStorage from "../../service/indexedDB_storage/ssoDataStorage";

@@ -34,7 +34,7 @@ import {
   bettyAccountRecoveryPrivateKeyPasswordDto,
   defaultAccountRecoveryPrivateKeyPasswordDto,
   secretSubstitutionAttackAccountRecoveryPrivateKeyPasswordDto
-} from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity.test.data";
+} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity.test.data";
 import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import {adminAccountDto} from "../../model/entity/account/accountEntity.test.data";

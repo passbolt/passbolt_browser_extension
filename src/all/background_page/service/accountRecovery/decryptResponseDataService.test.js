@@ -18,7 +18,7 @@ import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import EncryptMessageService from "../crypto/encryptMessageService";
 import {defaultAccountRecoveryPrivateKeyPasswordDecryptedDataDto} from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity.test.data";
 import AccountRecoveryPrivateKeyPasswordDecryptedDataEntity from "../../model/entity/accountRecovery/accountRecoveryPrivateKeyPasswordDecryptedDataEntity";
-import {acceptedAccountRecoveryResponseDto} from "../../model/entity/accountRecovery/accountRecoveryResponseEntity.test.data";
+import {acceptedAccountRecoveryResponseDto} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryResponseEntity.test.data";
 import AccountRecoveryResponseEntity from "../../model/entity/accountRecovery/accountRecoveryResponseEntity";
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 

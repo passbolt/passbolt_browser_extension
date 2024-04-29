@@ -15,7 +15,7 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AccountRecoveryResponseEntity from "./accountRecoveryResponseEntity";
-import {AccountRecoveryRequestEntityTestData} from "./accountRecoveryResponseEntity.test.data";
+import {AccountRecoveryRequestEntityTestData} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryResponseEntity.test.data";
 import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
 
 describe("AccountRecoveryResponse entity", () => {

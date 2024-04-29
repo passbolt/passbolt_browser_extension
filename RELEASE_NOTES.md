@@ -1,8 +1,16 @@
 Song: https://www.youtube.com/watch?v=3L4YrGaR8E4
 
-Passbolt is pleased to announce that the v4.7.0 Release Candidate is officially available for testing. This is a maintenance release containing bug fixes for issues reported by the community and preparing the browser extension migration to the manifest version 3. As always, your feedback is invaluable, please share and report any issues you come across.
+Passbolt v4.7 is a maintenance release that resolves multiple issues identified by the community.
+Furthermore, this release supports the commitment to improving customization options and integration features, making it easier for organizations to tailor the system to their specific needs.
 
-Thank you for your support! ♥️
+A key enhancement in this release is the ability for administrators to use custom SSL certificates for SMTP and Users directory server connections (PRO only).
+These long-awaited features are particularly beneficial for organizations operating in air-gapped environments or those using their own root CAs, enabling passbolt to more securely integrate with internal communication tools.
+All of these customizations are visible in the API status report of the administration workspace, providing a clear and manageable overview for administrators.
+
+Moreover, the integration with user directories has been enhanced, now enabling the synchronization of user accounts using multiple fields as email identifiers.
+This allows organizations with heterogeneous data environments to synchronize more seamlessly with Passbolt.
+This improvement is part of a broader initiative aimed at modernizing the integration with your user directories.
+Stay tuned, more enhancements are planned for future releases.
 
 ## [4.7.0] - 2024-04-26
 ### Added

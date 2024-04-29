@@ -19,7 +19,7 @@ import AccountRecoveryUserSettingEntity from "../../model/entity/accountRecovery
 import {
   createAcceptedAccountRecoveryUserSettingDto,
   createRejectedAccountRecoveryUserSettingDto
-} from "../../model/entity/accountRecovery/accountRecoveryUserSettingEntity.test.data";
+} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryUserSettingEntity.test.data";
 import {enabledAccountRecoveryOrganizationPolicyDto, disabledAccountRecoveryOrganizationPolicyDto} from "../../model/entity/accountRecovery/accountRecoveryOrganizationPolicyEntity.test.data";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
 import {defaultAccountDto} from "../../model/entity/account/accountEntity.test.data";

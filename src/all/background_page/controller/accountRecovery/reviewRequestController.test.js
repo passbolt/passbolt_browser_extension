@@ -31,7 +31,7 @@ import {
   pendingAccountRecoveryRequestWithoutPrivateKeyPasswordDto,
   pendingAccountRecoveryRequestWithWrongPrivateKeyIdDto,
   pendingAccountRecoveryRequestWithWrongPrivateKeyUserIdDto,
-} from "../../model/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
+} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 import {adminAccountDto} from "../../model/entity/account/accountEntity.test.data";
 import AccountEntity from "../../model/entity/account/accountEntity";
 import Keyring from "../../model/keyring";

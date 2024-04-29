@@ -25,7 +25,7 @@ import {
 import {
   createAccountRecoveryPrivateKeyPasswordDto,
   defaultAccountRecoveryPrivateKeyPasswordDto
-} from "./accountRecoveryPrivateKeyPasswordEntity.test.data";
+} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryPrivateKeyPasswordEntity.test.data.js";
 import {pgpKeys} from 'passbolt-styleguide/test/fixture/pgpKeys/keys';
 
 // Disabled account recovery organization policy

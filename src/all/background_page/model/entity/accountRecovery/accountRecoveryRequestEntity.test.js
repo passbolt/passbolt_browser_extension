@@ -14,7 +14,7 @@
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AccountRecoveryRequestEntity from "./accountRecoveryRequestEntity";
-import {pendingAccountRecoveryRequestDto} from "./accountRecoveryRequestEntity.test.data";
+import {pendingAccountRecoveryRequestDto} from "passbolt-styleguide/src/shared/models/entity/accountRecovery/accountRecoveryRequestEntity.test.data";
 
 describe("AccountRecoveryRequest entity", () => {
   it("schema must validate", () => {

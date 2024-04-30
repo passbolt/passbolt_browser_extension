@@ -22,6 +22,7 @@ class Port {
   constructor(name) {
     this._listeners = {};
     this.lock = new Lock();
+    this.onConnectErrorHandler = {};
     if (typeof name === "undefined") {
       throw Error("A port name is required.");
     } else if (typeof name  !== "string") {
@@ -41,8 +42,13 @@ class Port {
     try {
       this._port = browser.runtime.connect({name: this._name});
     } catch (error) {
-      // Error happen only if there is no listener in the service worker or if the context is invalidated by an update
-      this.destroyContentScript();
+      /**
+       * Error happen only if there is no listener in the service worker or if the context is invalidated by an update
+       * The call back should remove listeners in content script which still running after an update.
+       * In case of a user click manually on the button to update the extension,
+       * there is no process to clean the content script, so it prevent issues on a port reconnection.
+       */
+      this.onConnectErrorHandler.callback();
       throw error;
     }
     this._connected = true;
@@ -190,12 +196,11 @@ class Port {
   }
 
   /**
-   * Simulate the message destroy content script on the port to clean listeners which still running after an update.
-   * In case of a user click manually on the button to update the extension,
-   * there is no process to clean the content script, so it prevent issues on a port reconnection.
+   * Assign a callback on a connect error
+   * @param {function} callback The callback
    */
-  destroyContentScript() {
-    this._onMessage(JSON.stringify(["passbolt.content-script.destroy"]));
+  onConnectError(callback) {
+    this.onConnectErrorHandler.callback = callback;
   }
 }
 

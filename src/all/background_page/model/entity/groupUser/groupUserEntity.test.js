@@ -12,17 +12,57 @@
  * @since         2.13.0
  */
 import GroupUserEntity from "./groupUserEntity";
-import {GroupUserEntityFixtures} from "./groupUserEntity.test.fixtures";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
+import {defaultGroupUser, minimumGroupUserDto} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
 
-describe("Group user entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(GroupUserEntity.ENTITY_NAME, GroupUserEntity.getSchema());
+describe("GroupUserEntity", () => {
+  describe("GroupUserEntity::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(GroupUserEntity.ENTITY_NAME, GroupUserEntity.getSchema());
+    });
+
+    it("validates id property", () => {
+      assertEntityProperty.string(GroupUserEntity, "id");
+      assertEntityProperty.uuid(GroupUserEntity, "id");
+      assertEntityProperty.notRequired(GroupUserEntity, "id");
+    });
+
+    it("validates user_id property", () => {
+      assertEntityProperty.string(GroupUserEntity, "user_id");
+      assertEntityProperty.uuid(GroupUserEntity, "user_id");
+      assertEntityProperty.required(GroupUserEntity, "user_id");
+    });
+
+    it("validates group_id property", () => {
+      assertEntityProperty.string(GroupUserEntity, "group_id");
+      assertEntityProperty.uuid(GroupUserEntity, "group_id");
+      assertEntityProperty.notRequired(GroupUserEntity, "group_id");
+    });
+
+    it("validates is_admin property", () => {
+      assertEntityProperty.boolean(GroupUserEntity, "is_admin");
+      assertEntityProperty.required(GroupUserEntity, "is_admin");
+    });
+
+    it("validates created property", () => {
+      assertEntityProperty.string(GroupUserEntity, "created");
+      assertEntityProperty.dateTime(GroupUserEntity, "created");
+      assertEntityProperty.notRequired(GroupUserEntity, "created");
+    });
   });
 
-  it("constructor works if valid minimal DTO is provided", () => {
-    const dto = GroupUserEntityFixtures.default;
-    const entity = new GroupUserEntity(dto);
-    expect(entity.toDto()).toEqual(GroupUserEntityFixtures.associationless);
+  describe("GroupUserEntity::constructor", () => {
+    it("constructor works if a valid minimal DTO is provided", () => {
+      const dto = minimumGroupUserDto();
+      const entity = new GroupUserEntity(dto);
+      expect(entity.toDto()).toEqual(dto);
+    });
+
+    it("constructor works if a valid complete DTO is provided", () => {
+      const dto = defaultGroupUser();
+      const entity = new GroupUserEntity(dto);
+      expect(entity.toDto()).toEqual(dto);
+    });
   });
 });

@@ -14,7 +14,7 @@
 import {v4 as uuidv4} from "uuid";
 import {users} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import {defaultGroup} from "../../model/entity/group/groupEntity.test.data";
-import {createGroupUser} from "../../model/entity/groupUser/groupUsersEntity.test.data";
+import {createGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
 import {defaultDyRunResponse} from "../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data";

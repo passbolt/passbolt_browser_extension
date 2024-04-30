@@ -100,7 +100,7 @@ class GroupUserEntity extends Entity {
 
   /**
    * Get groupUser group id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get groupId() {
     return this._props.group_id || null;
@@ -108,7 +108,7 @@ class GroupUserEntity extends Entity {
 
   /**
    * Get group role
-   * @returns {boolean} true if admin
+   * @returns {boolean} true if group manager
    */
   get isAdmin() {
     return this._props.is_admin;

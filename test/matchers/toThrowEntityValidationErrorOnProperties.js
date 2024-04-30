@@ -14,6 +14,9 @@
 
 export const contains = (equals, list, value) => list.findIndex(item => equals(item, value)) > -1;
 
+/**
+ * @deprecated To remove or adapt, works on promise only.
+ */
 exports.toThrowEntityValidationErrorOnProperties = function(error, expected) {
   const {printExpected, printReceived, matcherHint} = this.utils;
   const actual = error.details || [];

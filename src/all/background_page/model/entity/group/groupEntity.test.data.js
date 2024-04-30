@@ -12,7 +12,11 @@
  * @since         3.6.0
  */
 import {v4 as uuidv4} from "uuid";
-import {defaultGroupsUser, createGroupUser} from "../groupUser/groupUsersEntity.test.data";
+import {
+  createGroupUser,
+  defaultGroupUser
+} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data";
+
 
 export const createGroup = (data = {}) => {
   const defaultData = {
@@ -34,7 +38,7 @@ export const defaultGroup = (data = {}) => {
     created: "2022-01-13T13:19:04.661Z",
     modified: "2022-01-13T13:19:04.661Z",
     groups_users: [
-      defaultGroupsUser({user_id: uuidv4(), group_id: groupId, is_admin: true})
+      defaultGroupUser({user_id: uuidv4(), group_id: groupId, is_admin: true})
     ]
   });
 

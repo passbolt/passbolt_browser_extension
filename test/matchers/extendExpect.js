@@ -18,6 +18,7 @@ import {toBeOpenpgpPublicKey} from "./toBeOpenpgpPublicKey";
 import {toBeOpenpgpRevokedKey} from "./toBeOpenpgpRevokedKey";
 import {toBeEqualToOpenpgpKey} from "./toBeEqualToOpenpgpKey";
 import {toBeOpenpgpPrivateKey} from "./toBeOpenpgpPrivateKey";
+import {toThrowEntityValidationError} from "./toThrowEntityValidationError";
 
 const extensions = {
   toBeEqualToOpenpgpKey,
@@ -25,7 +26,8 @@ const extensions = {
   toBeOpenpgpPrivateKey,
   toBeOpenpgpPublicKey,
   toBeOpenpgpRevokedKey,
-  toThrowEntityValidationErrorOnProperties
+  toThrowEntityValidationErrorOnProperties,
+  toThrowEntityValidationError
 };
 
 expect.extend(extensions);

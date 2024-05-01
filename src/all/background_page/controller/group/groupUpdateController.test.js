@@ -24,7 +24,7 @@ const {pgpKeys} = require("passbolt-styleguide/test/fixture/pgpKeys/keys");
 const {users} = require("passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data");
 
 const {updateGroupNameDto, add2UsersToGroupDto, add2UsersToGroupDryRunResponse} = require("./groupUpdateController.test.data");
-const {defaultGroup} = require("../../model/entity/group/groupEntity.test.data");
+const {defaultGroupDto} = require("../../model/entity/group/groupEntity.test.data");
 const {defaultDyRunResponse} = require("../../model/entity/group/update/groupUpdateDryRunResultEntity.test.data");
 
 jest.mock("../../service/progress/progressService");
@@ -43,7 +43,7 @@ describe("GroupsUpdateController", () => {
     it("Only group's name changed", async() => {
       expect.assertions(3);
 
-      const localGroup = defaultGroup();
+      const localGroup = defaultGroupDto();
       const dto = updateGroupNameDto({id: localGroup.id, groups_users: localGroup.groups_users});
       await MockExtension.withConfiguredAccount(); //curent user is ada with her private set in the keyring
 
@@ -97,7 +97,7 @@ describe("GroupsUpdateController", () => {
         }
       };
 
-      const localGroup = defaultGroup();
+      const localGroup = defaultGroupDto();
       const dto = add2UsersToGroupDto({id: localGroup.id, groups_users: localGroup.groups_users});
       await MockExtension.withConfiguredAccount(); //curent user is ada with her private set in the keyring
       const keyring = new Keyring();

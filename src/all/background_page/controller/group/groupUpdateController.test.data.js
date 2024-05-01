@@ -13,7 +13,7 @@
  */
 import {v4 as uuidv4} from "uuid";
 import {users} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
-import {defaultGroup} from "../../model/entity/group/groupEntity.test.data";
+import {defaultGroupDto} from "../../model/entity/group/groupEntity.test.data";
 import {createGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
 import EncryptMessageService from "../../service/crypto/encryptMessageService";
 import {pgpKeys} from "passbolt-styleguide/test/fixture/pgpKeys/keys";
@@ -21,7 +21,7 @@ import {defaultDyRunResponse} from "../../model/entity/group/update/groupUpdateD
 import {OpenpgpAssertion} from "../../utils/openpgp/openpgpAssertions";
 
 export const updateGroupNameDto = (data = {}) => {
-  const defaultData = defaultGroup({
+  const defaultData = defaultGroupDto({
     name: "group name updated",
   });
 
@@ -36,7 +36,7 @@ export const add2UsersToGroupDto = (data = {}) => {
     createGroupUser({id: users.betty.id, user_id: users.betty.id, group_id: groupId}),
   ]);
 
-  return defaultGroup({
+  return defaultGroupDto({
     id: groupId,
     groups_users: groupsUsers
   });

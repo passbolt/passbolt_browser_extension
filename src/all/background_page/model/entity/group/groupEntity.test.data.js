@@ -13,34 +13,50 @@
  */
 import {v4 as uuidv4} from "uuid";
 import {
-  createGroupUser,
   defaultGroupUser
 } from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data";
+import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 
+export const minimumGroupUserDto = (data = {}) => ({
+  name: "Current group",
+  ...data
+});
 
-export const createGroup = (data = {}) => {
-  const defaultData = {
-    name: "Current group",
-    groups_users: [
-      createGroupUser({user_id: uuidv4(), group_id: uuidv4(), is_admin: true})
-    ]
-  };
-
-  return Object.assign(defaultData, data);
-};
-
-export const defaultGroup = (data = {}) => {
+/**
+ * Build default group dto as the API would return.
+ * @param {object} data The data to override the default dto.
+ * @param {Object} [options]
+ * @param {Object} [options.withModifier=false] Add modifier default dto.
+ * @param {Object} [options.withCreator=false] Add creator default dto.
+ * @param {Object} [options.withMyGroupUser=false] Add my group user default dto.
+ * @returns {object}
+ */
+export const defaultGroupDto = (data = {}, options = {}) => {
   const groupId = data.id || uuidv4();
-  const defaultData = createGroup({
+  const defaultData = {
     id: groupId,
-    created_by: uuidv4(),
-    modified_by: uuidv4(),
+    name: "Current group",
     created: "2022-01-13T13:19:04.661Z",
     modified: "2022-01-13T13:19:04.661Z",
+    created_by: uuidv4(),
+    modified_by: uuidv4(),
     groups_users: [
       defaultGroupUser({user_id: uuidv4(), group_id: groupId, is_admin: true})
-    ]
-  });
+    ],
+    ...data
+  };
 
-  return Object.assign(defaultData, data);
+  if (!data.my_group_user && options?.withMyGroupUser) {
+    defaultData.my_group_user = defaultGroupUser({group_id: groupId, is_admin: true});
+  }
+
+  if (!data.creator && options?.withCreator) {
+    defaultData.creator = defaultUserDto();
+  }
+
+  if (!data.modifier && options?.withModifier) {
+    defaultData.modifier = defaultUserDto();
+  }
+
+  return defaultData;
 };

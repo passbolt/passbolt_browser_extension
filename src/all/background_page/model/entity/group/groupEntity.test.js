@@ -12,52 +12,125 @@
  * @since         2.13.0
  */
 import GroupEntity from "./groupEntity";
-import {GroupEntityTestFixtures} from "./groupEntity.test.fixtures";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
+import {defaultGroupDto, minimumGroupUserDto} from "./groupEntity.test.data";
+import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
+import GroupsUsersCollection from "../groupUser/groupsUsersCollection";
+import GroupUserEntity from "../groupUser/groupUserEntity";
 
-describe("Group entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(GroupEntity.ENTITY_NAME, GroupEntity.getSchema());
-  });
-
-  it("constructor works if valid minimal DTO is provided", () => {
-    const dto = GroupEntityTestFixtures.default;
-    const entity = new GroupEntity(dto);
-    expect(entity.toDto(GroupEntity.ALL_CONTAIN_OPTIONS)).toEqual(GroupEntityTestFixtures.without_groups_users_user);
-    expect(entity.name).toEqual('test group');
-  });
-
-  describe("sanitizeDto", () => {
-    it("sanitizeDto should remove groups users that don't validate from the groups_users property ", () => {
-      const groupUser1 = {
-        "id": "10801423-4151-42a4-99d1-86e66145a01a",
-        "group_id": "10801423-4151-42a4-99d1-86e66145a08c",
-        "user_id": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-        "is_admin": true
-      };
-      const groupUser2 = {
-        "id": "10801423-4151-42a4-99d1-86e66145a01b",
-        "group_id": null,
-        "user_id": "d57c10f5-639d-5160-9c81-8a0c6c4ec857",
-        "is_admin": true
-      };
-      const group = {
-        "id": "10801423-4151-42a4-99d1-86e66145a08c",
-        "name": "group1",
-        "groups_users": [groupUser1, groupUser2]
-      };
-
-      const santitizedDto = GroupEntity.sanitizeDto(group);
-      expect(santitizedDto.groups_users).toHaveLength(1);
-      expect(santitizedDto.groups_users).toEqual(expect.arrayContaining([groupUser1]));
-
-      new GroupEntity(santitizedDto);
+describe("GroupEntity", () => {
+  describe("GroupEntity::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(GroupEntity.ENTITY_NAME, GroupEntity.getSchema());
     });
 
-    it("sanitizeDto should return the same data if unsupported type of data is given in parameter", () => {
-      const dto = "not-an-array";
-      const santitizedDto = GroupEntity.sanitizeDto(dto);
-      expect(santitizedDto).toEqual(dto);
+    it("validates id property", () => {
+      assertEntityProperty.string(GroupEntity, "id");
+      assertEntityProperty.uuid(GroupEntity, "id");
+      assertEntityProperty.notRequired(GroupEntity, "id");
+    });
+
+    it("validates name property", () => {
+      assertEntityProperty.string(GroupEntity, "name");
+      assertEntityProperty.required(GroupEntity, "name");
+      assertEntityProperty.minLength(GroupEntity, "name", 1);
+      assertEntityProperty.maxLength(GroupEntity, "name", 255);
+    });
+
+    it("validates deleted property", () => {
+      assertEntityProperty.boolean(GroupEntity, "deleted");
+      assertEntityProperty.notRequired(GroupEntity, "deleted");
+    });
+
+    it("validates created property", () => {
+      assertEntityProperty.string(GroupEntity, "created");
+      assertEntityProperty.dateTime(GroupEntity, "created");
+      assertEntityProperty.notRequired(GroupEntity, "created");
+    });
+
+    it("validates modified property", () => {
+      assertEntityProperty.string(GroupEntity, "modified");
+      assertEntityProperty.dateTime(GroupEntity, "modified");
+      assertEntityProperty.notRequired(GroupEntity, "modified");
+    });
+
+    it("validates created_by property", () => {
+      assertEntityProperty.uuid(GroupEntity, "created_by");
+      assertEntityProperty.notRequired(GroupEntity, "created_by");
+    });
+
+    it("validates modified_by property", () => {
+      assertEntityProperty.uuid(GroupEntity, "modified_by");
+      assertEntityProperty.notRequired(GroupEntity, "modified_by");
+    });
+  });
+
+  describe("GroupEntity::constructor", () => {
+    it("works if valid minimal DTO is provided", () => {
+      expect.assertions(9);
+      const dto = minimumGroupUserDto();
+      const entity = new GroupEntity(dto);
+      expect(entity.toDto(GroupEntity.ALL_CONTAIN_OPTIONS)).toEqual(dto);
+      expect(entity.id).toBeNull();
+      expect(entity.name).toEqual('Current group');
+      expect(entity.created).toBeNull();
+      expect(entity.modified).toBeNull();
+      expect(entity.createdBy).toBeNull();
+      expect(entity.modifiedBy).toBeNull();
+      expect(entity.groupsUsers).toBeNull();
+      expect(entity.myGroupUser).toBeNull();
+    });
+
+    it("works if valid complete DTO is provided", () => {
+      expect.assertions(12);
+      const dto = defaultGroupDto({}, {withMyGroupUser: true, withCreator: true, withModifier: true});
+      const entity = new GroupEntity(dto);
+      expect(entity.toDto(GroupEntity.ALL_CONTAIN_OPTIONS)).toEqual(dto);
+      expect(entity.id).toEqual(dto.id);
+      expect(entity.name).toEqual('Current group');
+      expect(entity.created).toEqual(dto.created);
+      expect(entity.modified).toEqual(dto.modified);
+      expect(entity.createdBy).toEqual(dto.created_by);
+      expect(entity.modifiedBy).toEqual(dto.modified_by);
+      expect(entity.groupsUsers).toBeInstanceOf(GroupsUsersCollection);
+      expect(entity.groupsUsers).toHaveLength(1);
+      expect(entity.groupsUsers.items[0].id).toEqual(dto.groups_users[0].id);
+      expect(entity.myGroupUser).toBeInstanceOf(GroupUserEntity);
+      expect(entity.myGroupUser.id).toEqual(dto.my_group_user.id);
+    });
+
+    it("should, with enabling the ignore invalid option, ignore groups users which do not validate their schema", () => {
+      const dto = defaultGroupDto({
+        groups_users: [
+          defaultGroupUser({group_id: 42}),
+          defaultGroupUser(),
+        ]
+      });
+
+      expect.assertions(2);
+      const entity = new GroupEntity(dto, {ignoreInvalidEntity: true});
+      expect(entity._groups_users).toHaveLength(1);
+      expect(entity._groups_users.items[0]._props.id).toEqual(dto.groups_users[1].id);
+    });
+
+    /*
+     * @todo Associated entities validation error details to review when entity will aggregate them.
+     * @see EntityV2.constructor
+     */
+    it("should throw if one of associated collection data item does not validate their schema", () => {
+      const dto = defaultGroupDto({
+        groups_users: [
+          defaultGroupUser({group_id: 42}),
+          defaultGroupUser(),
+        ]
+      });
+
+      expect.assertions(2);
+      // Currently throw
+      expect(() => new GroupEntity(dto)).toThrowCollectionValidationError("0.group_id.type");
+      // Should throw, or similar fashion, path is important.
+      expect(() => new GroupEntity(dto)).not.toThrowCollectionValidationError("groups_users.0.group_id.type");
     });
   });
 });

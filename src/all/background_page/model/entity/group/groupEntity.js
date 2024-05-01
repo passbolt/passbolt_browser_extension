@@ -34,19 +34,19 @@ class GroupEntity extends Entity {
 
     // Association
     if (this._props.groups_users) {
-      this._groups_users = new GroupsUsersCollection(this._props.groups_users, {clone: false});
+      this._groups_users = new GroupsUsersCollection(this._props.groups_users, {...options, clone: false});
       delete this._props.groups_users;
     }
     if (this._props.my_group_user) {
-      this._my_group_user = new GroupUserEntity(this._props.my_group_user, {clone: false});
+      this._my_group_user = new GroupUserEntity(this._props.my_group_user, {...options, clone: false});
       delete this._props.my_group_user;
     }
     if (this._props.creator) {
-      this._creator = new UserEntity(this._props.creator, {clone: false});
+      this._creator = new UserEntity(this._props.creator, {...options, clone: false});
       delete this._props.creator;
     }
     if (this._props.modifier) {
-      this._modifier = new UserEntity(this._props.modifier, {clone: false});
+      this._modifier = new UserEntity(this._props.modifier, {...options, clone: false});
       delete this._props.modifier;
     }
   }
@@ -152,7 +152,7 @@ class GroupEntity extends Entity {
       if (contain.creator === true) {
         result.creator = this._creator.toDto();
       } else {
-        result.creator = this._creator.toDto(contain.user);
+        result.creator = this._creator.toDto(contain.creator);
       }
     }
     if (this._modifier && contain.modifier) {
@@ -208,17 +208,6 @@ class GroupEntity extends Entity {
   }
 
   /**
-   * Get deleted flag info
-   * @returns {(boolean|null)} true if deleted
-   */
-  get isDeleted() {
-    if (typeof this._props.deleted === 'undefined') {
-      return null;
-    }
-    return this._props.deleted;
-  }
-
-  /**
    * Get created date
    * @returns {(string|null)} date
    */
@@ -260,7 +249,6 @@ class GroupEntity extends Entity {
 
   /**
    * Return current user group user
-   * @todo is it still used? Consider for removal
    * @returns {(GroupUserEntity|null)}
    */
   get myGroupUser() {

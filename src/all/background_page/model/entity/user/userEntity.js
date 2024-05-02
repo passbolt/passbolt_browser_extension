@@ -36,27 +36,27 @@ class UserEntity extends Entity {
 
     // Associations
     if (this._props.profile) {
-      this._profile = new ProfileEntity(this._props.profile, {clone: false});
+      this._profile = new ProfileEntity(this._props.profile, {...options, clone: false});
       delete this._props.profile;
     }
     if (this._props.role) {
-      this._role = new RoleEntity(this._props.role, {clone: false});
+      this._role = new RoleEntity(this._props.role, {...options, clone: false});
       delete this._props.role;
     }
     if (this._props.gpgkey) {
-      this._gpgkey = new GpgkeyEntity(this._props.gpgkey, {clone: false});
+      this._gpgkey = new GpgkeyEntity(this._props.gpgkey, {...options, clone: false});
       delete this._props.gpgkey;
     }
     if (this._props.groups_users) {
-      this._groups_users = new GroupsUsersCollection(this._props.groups_users, {clone: false});
+      this._groups_users = new GroupsUsersCollection(this._props.groups_users, {...options, clone: false});
       delete this._props.groups_users;
     }
     if (this._props.account_recovery_user_setting) {
-      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting, {clone: false});
+      this._account_recovery_user_setting = new AccountRecoveryUserSettingEntity(this._props.account_recovery_user_setting, {...options, clone: false});
       delete this._props.account_recovery_user_setting;
     }
     if (this._props.pending_account_recovery_request) {
-      this._pending_account_recovery_request = new PendingAccountRecoveryRequestEntity(this._props.pending_account_recovery_request, {clone: false});
+      this._pending_account_recovery_request = new PendingAccountRecoveryRequestEntity(this._props.pending_account_recovery_request, {...options, clone: false});
       delete this._props.pending_account_recovery_request;
     }
   }
@@ -241,10 +241,10 @@ class UserEntity extends Entity {
 
   /**
    * Get user role id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get roleId() {
-    return this._props.role_id;
+    return this._props.role_id || null;
   }
 
   /**
@@ -333,7 +333,13 @@ class UserEntity extends Entity {
    * @returns {object} all contain options that can be used in toDto()
    */
   static get ALL_CONTAIN_OPTIONS() {
-    return {profile: ProfileEntity.ALL_CONTAIN_OPTIONS, role: true, gpgkey: true, groups_users: true, account_recovery_user_setting: true, pending_account_recovery_request: true};
+    return {
+      profile: ProfileEntity.ALL_CONTAIN_OPTIONS,
+      role: true, gpgkey: true,
+      groups_users: true,
+      account_recovery_user_setting: true,
+      pending_account_recovery_request: true
+    };
   }
 
   /*
@@ -388,7 +394,7 @@ class UserEntity extends Entity {
 
   /**
    * Get user account recover setting
-   * @returns {(accountRecoverUserSetting|null)} account recover setting
+   * @returns {(AccountRecoveryUserSettingEntity|null)} account recover setting
    */
   get accountRecoveryUserSetting() {
     return this._account_recovery_user_setting || null;

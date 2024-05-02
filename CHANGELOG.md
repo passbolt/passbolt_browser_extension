@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [4.7.1] - 2024-05-02
+### Maintenance
+- PB-33225 MV3 beta rollout
+
 ## [4.7.0] - 2024-04-26
 ### Added
 - PB-32931 As administrator, I see SSO and Directory Sync health checks in Passbolt API Status page
@@ -1586,7 +1590,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.0...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.1...HEAD
+[4.7.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.0...v4.7.1
 [4.7.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.6.2...v4.7.0
 [4.6.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.6.0...v4.6.2
 [4.6.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.5.2...v4.6.0

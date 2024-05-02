@@ -13,7 +13,7 @@
  */
 import GroupUserEntity from "./groupUserEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import {defaultGroupUser, minimumGroupUserDto} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
 
 describe("GroupUserEntity", () => {

@@ -12,22 +12,28 @@
  * @since         3.0.0
  */
 import GroupEntity from "./groupEntity";
-import EntityCollection from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollection";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import EntityCollectionError from "passbolt-styleguide/src/shared/models/entity/abstract/entityCollectionError";
+import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
 import deduplicateObjects from "../../../utils/array/deduplicateObjects";
-
 
 const ENTITY_NAME = 'Groups';
 
 const RULE_UNIQUE_ID = 'unique_id';
 const RULE_UNIQUE_GROUP_NAME = 'unique_group_name';
 
-class GroupsCollection extends EntityCollection {
+class GroupsCollection extends EntityV2Collection {
   /**
    * @inheritDoc
-   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by ID.
-   * @throws {EntityCollectionError} Build Rule: Ensure all items in the collection are unique by name.
+   */
+  get entityClass() {
+    return GroupEntity;
+  }
+
+  /**
+   * @inheritDoc
+   * @param {object} [options.ignoreInvalidEntity=false] Ignore invalid entities.
+   * @throws {CollectionValidationError} Build Rule: Ensure all items in the collection are unique by ID.
+   * @throws {CollectionValidationError} Build Rule: Ensure all items in the collection are unique by name.
    */
   constructor(groupsCollectionDto, options = {}) {
     super(EntitySchema.validate(
@@ -36,32 +42,17 @@ class GroupsCollection extends EntityCollection {
       GroupsCollection.getSchema()
     ), options);
 
-    /*
-     * Check if group names and ids are unique
-     * Why not this.push? It is faster than adding items one by one
-     */
-    const ids = this._props.map(group => group.id);
-    ids.sort().sort((a, b) => {
-      if (a === b) {
-        throw new EntityCollectionError(0, GroupsCollection.RULE_UNIQUE_ID, `Group id ${a} already exists.`);
-      }
-    });
-    const names = this._props.map(group => group.name);
-    names.sort().sort((a, b) => {
-      if (a === b) {
-        throw new EntityCollectionError(0, GroupsCollection.RULE_UNIQUE_GROUP_NAME, `Group name ${a} already exists.`);
-      }
-    });
-
-    // Directly push into the private property _items[]
-    this._props.forEach(group => {
-      this._items.push(new GroupEntity(group, {clone: false}));
-    });
+    this.pushMany(this._props, {...options, clone: false});
 
     // We do not keep original props
     this._props = null;
   }
 
+  /*
+   * ==================================================
+   * Validation
+   * ==================================================
+   */
   /**
    * Get groups entity schema
    *
@@ -75,28 +66,13 @@ class GroupsCollection extends EntityCollection {
   }
 
   /**
-   * Get groups
-   * @returns {Array<GroupEntity>}
+   * @inheritDoc
+   * @throws {EntityValidationError} If a group already exists with the same id.
+   * @throws {EntityValidationError} If a group already exists with the same name.
    */
-  get groups() {
-    return this._items;
-  }
-
-  /**
-   * Get all the ids of the groups in the collection
-   *
-   * @returns {Array<string>}
-   */
-  get ids() {
-    return this._items.map(r => r.id);
-  }
-
-  /**
-   * Get first group in the collection matching requested id
-   * @returns {(GroupEntity|undefined)}
-   */
-  getFirstById(groupId) {
-    return this._items.find(r => (r.id === groupId));
+  validateBuildRules(item) {
+    this.assertNotExist("id", item._props.id);
+    this.assertNotExist("name", item._props.name);
   }
 
   /*
@@ -128,69 +104,24 @@ class GroupsCollection extends EntityCollection {
 
   /*
    * ==================================================
-   * Assertions
+   * Getters
    * ==================================================
    */
   /**
-   * Assert there is no other group with the same id in the collection
-   *
-   * @param {GroupEntity} group
-   * @throws {EntityValidationError} if a group with the same id already exist
+   * Get groups
+   * @returns {Array<GroupEntity>}
    */
-  assertUniqueId(group) {
-    if (!group.id) {
-      return;
-    }
-    const length = this.groups.length;
-    let i = 0;
-    for (; i < length; i++) {
-      const existingGroup = this.groups[i];
-      if (existingGroup.id && existingGroup.id === group.id) {
-        throw new EntityCollectionError(i, GroupsCollection.RULE_UNIQUE_ID, `Group id ${group.id} already exists.`);
-      }
-    }
+  get groups() {
+    return this._items;
   }
 
   /**
-   * Assert there is no other group with the same group name in the collection
+   * Get all the ids of the groups in the collection
    *
-   * @param {GroupEntity} group
-   * @throws {EntityValidationError} if a group with the same group name already exist
+   * @returns {Array<string>}
    */
-  assertUniqueGroupName(group) {
-    const length = this.groups.length;
-    let i = 0;
-    for (; i < length; i++) {
-      const existingGroup = this.groups[i];
-      if (existingGroup.name === group.name) {
-        throw new EntityCollectionError(i, GroupsCollection.RULE_UNIQUE_GROUP_NAME, `The group name ${group.name} already exists.`);
-      }
-    }
-  }
-
-  /*
-   * ==================================================
-   * Setters
-   * ==================================================
-   */
-  /**
-   * Push a copy of the group to the list
-   * @param {object} group DTO or GroupEntity
-   */
-  push(group) {
-    if (!group || typeof group !== 'object') {
-      throw new TypeError(`GroupsCollection push parameter should be an object.`);
-    }
-    if (group instanceof GroupEntity) {
-      group = group.toDto(GroupEntity.ALL_CONTAIN_OPTIONS); // deep clone
-    }
-    const groupEntity = new GroupEntity(group); // validate
-
-    // Build rules
-    this.assertUniqueId(groupEntity);
-    this.assertUniqueGroupName(groupEntity);
-
-    super.push(groupEntity);
+  get ids() {
+    return this._items.map(r => r.id);
   }
 
   /**

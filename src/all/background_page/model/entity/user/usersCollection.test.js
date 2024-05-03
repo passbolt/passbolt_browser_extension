@@ -202,41 +202,4 @@ describe("UsersCollection", () => {
       expect(JSON.stringify(collection)).toEqual(JSON.stringify(dtos));
     });
   });
-
-  describe("sanitizeDto", () => {
-    it("should remove groups users that don't validate from users ", () => {
-      const groupUser1 = {
-        "id": "10801423-4151-42a4-99d1-86e66145a01a",
-        "group_id": "10801423-4151-42a4-99d1-86e66145a08c",
-        "user_id": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-        "is_admin": true
-      };
-      const groupUser2 = {
-        "id": "10801423-4151-42a4-99d1-86e66145a01b",
-        "group_id": null,
-        "user_id": "d57c10f5-639d-5160-9c81-8a0c6c4ec857",
-        "is_admin": true
-      };
-      const user1 = {
-        "id": "10801423-4151-42a4-99d1-86e66145a08c",
-        "username": "admin@passbolt.com",
-        "groups_users": [groupUser1, groupUser2]
-      };
-      const user2 = {
-        "id": "10801423-4151-42a4-99d1-86e66145a08d",
-        "username": "ada@passbolt.com",
-        "groups_users": [groupUser1, groupUser2]
-      };
-
-      const santitizedDto = UsersCollection.sanitizeDto([user1, user2]);
-      expect(santitizedDto).toHaveLength(2);
-      expect(santitizedDto[0].groups_users).toHaveLength(1);
-      expect(santitizedDto[0].groups_users).toEqual(expect.arrayContaining([groupUser1]));
-      expect(santitizedDto[1].groups_users).toHaveLength(1);
-      expect(santitizedDto[1].groups_users).toEqual(expect.arrayContaining([groupUser1]));
-
-      const collection = new UsersCollection(santitizedDto);
-      expect(collection).toHaveLength(2);
-    });
-  });
 });

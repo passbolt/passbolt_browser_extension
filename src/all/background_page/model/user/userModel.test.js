@@ -79,12 +79,10 @@ describe("UserModel", () => {
         username: "betty@passbolt.com",
         groups_users: [defaultGroupUser({group_id: 42, is_admin: true})]
       }, dtoOptions);
-      /*
-       * Duplicated user id;
-       * const dto3 = defaultUserDto({id: dto2.id, username: "carole@passbolt.com"}, dtoOptions);
-       */
+      // Duplicated user id;
+      const dto3 = defaultUserDto({id: dto2.id, username: "carole@passbolt.com"}, dtoOptions);
       const dto4 = defaultUserDto({username: "dame@passbolt.com"}, dtoOptions);
-      const dtos = [dto1, dto2/*, dto3*/, dto4];
+      const dtos = [dto1, dto2, dto3, dto4];
 
       //Mock the API call and check if the call is the one expected
       fetch.doMockOnceIf(/users\.json/, async() => (mockApiResponse(dtos)));
@@ -114,6 +112,35 @@ describe("UserModel", () => {
   });
 
   describe("UserModel::findOne", () => {
+    it("should throw an error if users or its associated content do not validated.", async() => {
+      expect.assertions(2);
+
+      const dtoOptions = {
+        withGroupsUsers: true,
+        withGpgkey: true,
+        withAccountRecoveryUserSetting: true,
+        withPendingAccountRecoveryUserRequest: true,
+      };
+      const dto = defaultUserDto({
+        username: "betty@passbolt.com",
+        groups_users: [defaultGroupUser({group_id: 42, is_admin: true})]
+      }, dtoOptions);
+
+      //Mock the API call and check if the call is the one expected
+      fetch.doMockOnceIf(/users\/.*\.json/, async() => (mockApiResponse(dto)));
+
+      const apiClientOption = defaultApiClientOptions();
+      const model = new UserModel(apiClientOption);
+
+      try {
+        await model.findOne(dto.id, {groups_users: true});
+      } catch (error) {
+        // @todo It should receive an EntityValidationError that should embed the details of the associated collection error.
+        expect(error).toBeInstanceOf(CollectionValidationError);
+        expect(error.details?.[0]?.group_id?.type).toBeTruthy();
+      }
+    });
+
     it("should, with the option ignoreInvalid, ignore invalid groups users if any", async() => {
       const dtoOptions = {
         withGroupsUsers: true,
@@ -182,12 +209,10 @@ describe("UserModel", () => {
         username: "betty@passbolt.com",
         groups_users: [defaultGroupUser({group_id: 42, is_admin: true})]
       }, dtoOptions);
-      /*
-       * Duplicated user id
-       * const dto3 = defaultUserDto({id: dto2.id, username: "carole@passbolt.com"}, dtoOptions);
-       */
+      // Duplicated user id
+      const dto3 = defaultUserDto({id: dto2.id, username: "carole@passbolt.com"}, dtoOptions);
       const dto4 = defaultUserDto({username: "dame@passbolt.com"}, dtoOptions);
-      const dtos = [dto1, dto2/*, dto3*/, dto4];
+      const dtos = [dto1, dto2, dto3, dto4];
 
       //Mock the API call and check if the call is the one expected
       fetch.doMockOnceIf(/users\.json/, async() => (mockApiResponse(dtos)));

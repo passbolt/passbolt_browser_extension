@@ -101,30 +101,6 @@ class GroupEntity extends Entity {
 
   /*
    * ==================================================
-   * Sanitization
-   * ==================================================
-   */
-  /**
-   * Sanitize group dto:
-   * - Remove group users which don't validate if any.
-   *
-   * @param {object} dto the group dto
-   * @returns {object}
-   */
-  static sanitizeDto(dto) {
-    if (typeof dto !== "object") {
-      return dto;
-    }
-
-    if (Object.prototype.hasOwnProperty.call(dto, 'groups_users')) {
-      dto.groups_users = GroupsUsersCollection.sanitizeDto(dto.groups_users);
-    }
-
-    return dto;
-  }
-
-  /*
-   * ==================================================
    * Serialization
    * ==================================================
    */

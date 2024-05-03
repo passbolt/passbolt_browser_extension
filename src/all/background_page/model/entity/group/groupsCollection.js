@@ -14,7 +14,6 @@
 import GroupEntity from "./groupEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityV2Collection from "passbolt-styleguide/src/shared/models/entity/abstract/entityV2Collection";
-import deduplicateObjects from "../../../utils/array/deduplicateObjects";
 
 const ENTITY_NAME = 'Groups';
 
@@ -73,33 +72,6 @@ class GroupsCollection extends EntityV2Collection {
   validateBuildRules(item) {
     this.assertNotExist("id", item._props.id);
     this.assertNotExist("name", item._props.name);
-  }
-
-  /*
-   * ==================================================
-   * Sanitization
-   * ==================================================
-   */
-  /**
-   * Sanitize groups dto:
-   * - Deduplicate the groups by name.
-   * - Deduplicate the groups by id.
-   * - For each group remove group users which don't validate if any.
-   *
-   * @param {Array} dto The groups dto
-   * @returns {Array}
-   * @todo Strategy should be changed with an options.ignoreInvalid passed to the collection constructor.
-   */
-  static sanitizeDto(dto) {
-    if (!Array.isArray(dto)) {
-      return [];
-    }
-
-    let sanitizedDto = deduplicateObjects(dto, 'name');
-    sanitizedDto = deduplicateObjects(sanitizedDto, 'id');
-    sanitizedDto = sanitizedDto.map(rowDto => GroupEntity.sanitizeDto(rowDto));
-
-    return sanitizedDto;
   }
 
   /*

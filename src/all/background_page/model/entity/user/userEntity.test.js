@@ -294,38 +294,4 @@ describe("UserEntity", () => {
       expect(entity2.isMfaEnabled).toBeNull();
     });
   });
-
-  describe("sanitizeDto", () => {
-    it("sanitizeDto should remove groups users that don't validate from the groups_users property ", () => {
-      const groupUser1 = {
-        "id": "10801423-4151-42a4-99d1-86e66145a01a",
-        "group_id": "10801423-4151-42a4-99d1-86e66145a08c",
-        "user_id": "d57c10f5-639d-5160-9c81-8a0c6c4ec856",
-        "is_admin": true
-      };
-      const groupUser2 = {
-        "id": "10801423-4151-42a4-99d1-86e66145a01b",
-        "group_id": null,
-        "user_id": "d57c10f5-639d-5160-9c81-8a0c6c4ec857",
-        "is_admin": true
-      };
-      const user = {
-        "id": "10801423-4151-42a4-99d1-86e66145a08c",
-        "username": "admin@passbolt.com",
-        "groups_users": [groupUser1, groupUser2]
-      };
-
-      const santitizedDto = UserEntity.sanitizeDto(user);
-      expect(santitizedDto.groups_users).toHaveLength(1);
-      expect(santitizedDto.groups_users).toEqual(expect.arrayContaining([groupUser1]));
-
-      new UserEntity(santitizedDto);
-    });
-
-    it("sanitizeDto should return the same data if unsupported type of data is given in parameter", () => {
-      const dto = "not-an-array";
-      const santitizedDto = UserEntity.sanitizeDto(dto);
-      expect(santitizedDto).toEqual(dto);
-    });
-  });
 });

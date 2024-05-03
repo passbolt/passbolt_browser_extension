@@ -21,6 +21,7 @@ import GroupUserEntity from "../entity/groupUser/groupUserEntity";
 import UserEntity from "../entity/user/userEntity";
 import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
 import GroupUpdateEntity from "../entity/group/update/groupUpdateEntity";
+import CollectionValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/collectionValidationError";
 
 beforeAll(() => {
   enableFetchMocks();
@@ -93,6 +94,26 @@ describe("GroupModel", () => {
   });
 
   describe("GroupModel::findAll", () => {
+    it("should throw an error if groups or its associated content do not validated.", async() => {
+      expect.assertions(2);
+
+      const dto1 = defaultGroupDto({name: "group1"}, {withMyGroupUser: true, withModifier: true});
+      const dto2 = defaultGroupDto({id: dto1.id, name: "group2"}, {withMyGroupUser: true, withModifier: true});
+      const dtos = [dto1, dto2];
+
+      //Mock the API call and check if the call is the one expected
+      fetch.doMockOnceIf(/groups\.json/, async() => (mockApiResponse(dtos)));
+
+      const apiClientOption = defaultApiClientOptions();
+      const model = new GroupModel(apiClientOption);
+      try {
+        await model.findAll({}, {}, {});
+      } catch (error) {
+        expect(error).toBeInstanceOf(CollectionValidationError);
+        expect(error.details?.[1]?.id?.unique).toBeTruthy();
+      }
+    });
+
     it("should, with the option ignoreInvalid, ignore invalid groups or invalid associated groups users if any", async() => {
       expect.assertions(13);
 

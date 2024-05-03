@@ -13,7 +13,7 @@
  */
 import Entity from "passbolt-styleguide/src/shared/models/entity/abstract/entity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import b64ToBlob from "../../../../utils/format/base64";
+import Base64Utils from "../../../../utils/format/base64";
 
 
 const ENTITY_NAME = 'AvatarUpdate';
@@ -47,7 +47,7 @@ class AvatarUpdateEntity extends Entity {
     const filename = avatarBase64UpdateDto.filename;
     const fileBase64 = avatarBase64UpdateDto.fileBase64;
     const mimeType = avatarBase64UpdateDto.mimeType;
-    const file = b64ToBlob(fileBase64, mimeType);
+    const file = Base64Utils.base64ToBlob(fileBase64, mimeType);
     const avatarUpdateDto = {file: file, filename: filename, mimeType: mimeType};
     return new AvatarUpdateEntity(avatarUpdateDto);
   }

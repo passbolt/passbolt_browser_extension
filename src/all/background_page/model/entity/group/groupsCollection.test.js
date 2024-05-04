@@ -16,6 +16,7 @@ import GroupsCollection from "./groupsCollection";
 import {defaultGroupDto} from "./groupEntity.test.data";
 import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
 import GroupEntity from "./groupEntity";
+import {defaultGroupsDtos} from "./groupsCollection.test.data";
 
 describe("GroupsCollection", () => {
   it("schema must validate", () => {
@@ -190,6 +191,25 @@ describe("GroupsCollection", () => {
       expect(collection.items[1]._groups_users).toHaveLength(0);
       expect(collection.items[2].id).toEqual(dto3.id);
       expect(collection.items[2]._groups_users).toHaveLength(1);
+    });
+  });
+
+  describe("GroupsCollection:pushMany", () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const groupsCount = 10_000;
+      const groupsUsersPerGroupCount = 5;
+      const groupsDtos = defaultGroupsDtos(groupsCount, {
+        withModifier: true,
+        withCreator: true,
+        withMyGroupUser: true,
+        withGroupsUsers: groupsUsersPerGroupCount
+      });
+
+      const start = performance.now();
+      const collection = new GroupsCollection(groupsDtos, {ignoreInvalidEntity: true});
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(groupsCount);
+      expect(time).toBeLessThan(5_000);
     });
   });
 

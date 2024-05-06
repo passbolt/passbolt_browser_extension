@@ -66,8 +66,8 @@ class GroupsCollection extends EntityV2Collection {
 
   /**
    * @inheritDoc
-   * @param {Set} [options.uniqueIddSetCache] A set of unique ids.
-   * @param {Set} [options.uniqueNamdeSetCache] A set of unique names.
+   * @param {Set} [options.uniqueIdsSetCache] A set of unique ids.
+   * @param {Set} [options.uniqueNamesSetCache] A set of unique names.
    * @throws {EntityValidationError} If a group already exists with the same id.
    * @throws {EntityValidationError} If a group already exists with the same name.
    */

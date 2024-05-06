@@ -62,12 +62,14 @@ class UsersCollection extends EntityV2Collection {
 
   /**
    * @inheritDoc
+   * @param {Set} [options.uniqueIdsSetCache] A set of unique ids.
+   * @param {Set} [options.uniqueUsernamesSetCache] A set of unique names.
    * @throws {EntityValidationError} If a user already exists with the same id.
    * @throws {EntityValidationError} If a user already exists with the same username.
    */
-  validateBuildRules(item) {
-    this.assertNotExist("id", item._props.id);
-    this.assertNotExist("username", item._props.username);
+  validateBuildRules(item, options) {
+    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
+    this.assertNotExist("username", item._props.username, {haystackSet: options?.uniqueUsernamesSetCache});
   }
 
   /*
@@ -97,6 +99,27 @@ class UsersCollection extends EntityV2Collection {
    * Setters
    * ==================================================
    */
+
+  /**
+   * @inheritDoc
+   * This method creates caches of unique ids and names to improve the build rules performance.
+   */
+  pushMany(data, entityOptions = {}, options = {}) {
+    const uniqueIdsSetCache = new Set(this.extract("id"));
+    const uniqueUsernamesSetCache = new Set(this.extract("username"));
+    const onItemPushed = item => {
+      uniqueIdsSetCache.add(item.id);
+      uniqueUsernamesSetCache.add(item.username);
+    };
+
+    options = {
+      onItemPushed: onItemPushed,
+      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache, uniqueUsernamesSetCache},
+      ...options
+    };
+
+    super.pushMany(data, entityOptions, options);
+  }
 
   /**
    * Remove a user identified by an Id

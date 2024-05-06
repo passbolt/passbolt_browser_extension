@@ -14,7 +14,7 @@
 import GroupEntity from "./groupEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
-import {defaultGroupDto, minimumGroupUserDto} from "./groupEntity.test.data";
+import {defaultGroupDto, minimumGroupUserDto} from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
 import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
 import GroupsUsersCollection from "../groupUser/groupsUsersCollection";
 import GroupUserEntity from "../groupUser/groupUserEntity";
@@ -84,7 +84,7 @@ describe("GroupEntity", () => {
 
     it("works if valid complete DTO is provided", () => {
       expect.assertions(12);
-      const dto = defaultGroupDto({}, {withMyGroupUser: true, withCreator: true, withModifier: true});
+      const dto = defaultGroupDto({}, {withMyGroupUser: true, withCreator: true, withModifier: true, withGroupsUsers: true});
       const entity = new GroupEntity(dto);
       expect(entity.toDto(GroupEntity.ALL_CONTAIN_OPTIONS)).toEqual(dto);
       expect(entity.id).toEqual(dto.id);

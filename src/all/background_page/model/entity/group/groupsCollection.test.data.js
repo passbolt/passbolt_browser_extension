@@ -12,7 +12,7 @@
  * @since         4.8.0
  */
 
-import {defaultGroupDto} from "./groupEntity.test.data";
+import {defaultGroupDto} from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
 
 /**
  * Build groups dtos.

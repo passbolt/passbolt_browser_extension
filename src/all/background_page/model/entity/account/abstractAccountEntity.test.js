@@ -110,9 +110,7 @@ describe("AbstractAccountEntity", () => {
         assertEntityProperty.SCENARIO_OBJECT,
         assertEntityProperty.SCENARIO_ARRAY,
         assertEntityProperty.SCENARIO_TRUE,
-        {scenario: "an invalid security token code", value: securityTokenGenerator({code: ";;;"})},
-        {scenario: "an invalid security token color", value: securityTokenGenerator({color: "redish"})},
-        {scenario: "an invalid security token textcolor", value: securityTokenGenerator({textcolor: "greenish"})},
+        {scenario: "an invalid security token code", value: securityTokenGenerator({code: ";;;", color: "redish", textcolor: "greenish"})},
       ];
 
       assertEntityProperty.association(StubAbstractAccountEntity, "security_token", successScenario, failingScenarios);

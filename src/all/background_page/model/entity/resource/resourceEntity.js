@@ -22,7 +22,6 @@ import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import canSuggestUrl from "../../../utils/url/canSuggestUrl";
 
-
 const ENTITY_NAME = 'Resource';
 const RESOURCE_NAME_MAX_LENGTH = 255;
 const RESOURCE_USERNAME_MAX_LENGTH = 255;

@@ -36,6 +36,7 @@ describe("UserModel", () => {
       expect.assertions(7);
 
       const dtoOptions = {
+        withRole: true,
         withGroupsUsers: true,
         withGpgkey: true,
         withAccountRecoveryUserSetting: true,
@@ -67,6 +68,7 @@ describe("UserModel", () => {
 
     it("should ignore invalid users or invalid associated groups users if any", async() => {
       const dtoOptions = {
+        withRole: true,
         withGroupsUsers: true,
         withGpgkey: true,
         withAccountRecoveryUserSetting: true,

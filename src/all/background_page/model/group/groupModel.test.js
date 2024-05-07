@@ -13,7 +13,7 @@
  */
 import {mockApiResponse} from "../../../../../test/mocks/mockApiResponse";
 import {defaultApiClientOptions} from "passbolt-styleguide/src/shared/lib/apiClient/apiClientOptions.test.data";
-import {defaultGroupDto} from "../entity/group/groupEntity.test.data";
+import {defaultGroupDto} from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
 import GroupLocalStorage from "../../service/local_storage/groupLocalStorage";
 import GroupModel from "./groupModel";
 import {enableFetchMocks} from "jest-fetch-mock";
@@ -32,9 +32,9 @@ describe("GroupModel", () => {
     it("should request the API and store the retrieved data in the local storage", async() => {
       expect.assertions(4);
 
-      const dto1 = defaultGroupDto({name: "group1"}, {withMyGroupUser: true, withModifier: true});
-      const dto2 = defaultGroupDto({name: "group2"}, {withMyGroupUser: true, withModifier: true});
-      const dto3 = defaultGroupDto({name: "group3"}, {withMyGroupUser: true, withModifier: true});
+      const dto1 = defaultGroupDto({name: "group1"}, {withMyGroupUser: true, withModifier: true, withGroupsUsers: true});
+      const dto2 = defaultGroupDto({name: "group2"}, {withMyGroupUser: true, withModifier: true, withGroupsUsers: true});
+      const dto3 = defaultGroupDto({name: "group3"}, {withMyGroupUser: true, withModifier: true, withGroupsUsers: true});
       const dtos = [dto1, dto2, dto3];
 
       //Mock the API call and check if the call is the one expected
@@ -56,15 +56,15 @@ describe("GroupModel", () => {
     it("should ignore invalid groups or invalid associated groups users if any", async() => {
       expect.assertions(13);
 
-      const dto1 = defaultGroupDto({name: "group1"}, {withMyGroupUser: true, withModifier: true});
+      const dto1 = defaultGroupDto({name: "group1"}, {withMyGroupUser: true, withModifier: true, withGroupsUsers: true});
       // Invalid groups users item
       const dto2 = defaultGroupDto({
         name: "group 2",
         groups_users: [defaultGroupUser({group_id: 42, is_admin: true})]
       }, {withMyGroupUser: true, withModifier: true});
       // Duplicated group id;
-      const dto3 = defaultGroupDto({id: dto1.id, name: "group3"}, {withMyGroupUser: true, withModifier: true});
-      const dto4 = defaultGroupDto({name: "group4"}, {withMyGroupUser: true, withModifier: true});
+      const dto3 = defaultGroupDto({id: dto1.id, name: "group3"}, {withMyGroupUser: true, withModifier: true, withGroupsUsers: true});
+      const dto4 = defaultGroupDto({name: "group4"}, {withMyGroupUser: true, withModifier: true, withGroupsUsers: true});
       const dtos = [dto1, dto2, dto3, dto4];
 
       //Mock the API call and check if the call is the one expected
@@ -117,15 +117,15 @@ describe("GroupModel", () => {
     it("should, with the option ignoreInvalid, ignore invalid groups or invalid associated groups users if any", async() => {
       expect.assertions(13);
 
-      const dto1 = defaultGroupDto({name: "group1"}, {withMyGroupUser: true, withModifier: true});
+      const dto1 = defaultGroupDto({name: "group1"}, {withMyGroupUser: true, withModifier: true, withGroupsUsers: true});
       // Invalid groups users item
       const dto2 = defaultGroupDto({
         name: "group 2",
         groups_users: [defaultGroupUser({group_id: 42, is_admin: true})]
       }, {withMyGroupUser: true, withModifier: true});
       // Duplicated group id;
-      const dto3 = defaultGroupDto({id: dto1.id, name: "group3"}, {withMyGroupUser: true, withModifier: true});
-      const dto4 = defaultGroupDto({name: "group4"}, {withMyGroupUser: true, withModifier: true});
+      const dto3 = defaultGroupDto({id: dto1.id, name: "group3"}, {withMyGroupUser: true, withModifier: true, withGroupsUsers: true});
+      const dto4 = defaultGroupDto({name: "group4"}, {withMyGroupUser: true, withModifier: true, withGroupsUsers: true});
       const dtos = [dto1, dto2, dto3, dto4];
 
       //Mock the API call and check if the call is the one expected

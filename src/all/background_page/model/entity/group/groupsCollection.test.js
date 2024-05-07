@@ -13,7 +13,7 @@
  */
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import GroupsCollection from "./groupsCollection";
-import {defaultGroupDto} from "./groupEntity.test.data";
+import {defaultGroupDto} from "passbolt-styleguide/src/shared/models/entity/group/groupEntity.test.data";
 import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
 import GroupEntity from "./groupEntity";
 import {defaultGroupsDtos} from "./groupsCollection.test.data";

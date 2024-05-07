@@ -93,18 +93,18 @@ class SecretEntity extends Entity {
 
   /**
    * Get secret user id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get userId() {
-    return this._props.user_id;
+    return this._props.user_id || null;
   }
 
   /**
    * Get secret resource id
-   * @returns {string} uuid
+   * @returns {(string|null)} uuid
    */
   get resourceId() {
-    return this._props.resource_id;
+    return this._props.resource_id || null;
   }
 
   /**
@@ -141,6 +141,7 @@ class SecretEntity extends Entity {
    * @param {string} message
    * @return {EntityValidationError} if the message is not a valid armored block
    * TODO a-fA-F0-9\=... before readArmored
+   * TODO this format validation should be part of the json schema.
    */
   static assertValidMessage(message) {
     const error = new EntityValidationError('This is not a valid OpenPGP armored message');

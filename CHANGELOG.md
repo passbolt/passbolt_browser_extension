@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [4.7.3] - 2024-05-07
+### Maintenance
+- PB-33235 Convert formData file into a json serializable in offscreen
+- PB-33297 Extension update available should store the state if user signed in
+
 ## [4.7.1] - 2024-05-02
 ### Maintenance
 - PB-33225 MV3 beta rollout
@@ -1590,7 +1595,8 @@ self registration settings option in the left-side bar
 - AP: User with plugin installed
 - LU: Logged in user
 
-[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.1...HEAD
+[Unreleased]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.3...HEAD
+[4.7.3]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.1...v4.7.3
 [4.7.1]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.7.0...v4.7.1
 [4.7.0]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.6.2...v4.7.0
 [4.6.2]: https://github.com/passbolt/passbolt_browser_extension/compare/v4.6.0...v4.6.2

@@ -12,8 +12,8 @@
  * @since         3.0.0
  */
 import CommentEntity from "./commentEntity";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 const minimalDto = {
   "user_id": "a58de6d3-f52c-5080-b79b-a601a647ac85",
@@ -23,8 +23,76 @@ const minimalDto = {
 };
 
 describe("Comment entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(CommentEntity.ENTITY_NAME, CommentEntity.getSchema());
+  describe("CommentEntity::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(CommentEntity.ENTITY_NAME, CommentEntity.getSchema());
+    });
+
+    it("validates id property", () => {
+      assertEntityProperty.uuid(CommentEntity, "id");
+      assertEntityProperty.notRequired(CommentEntity, "id");
+    });
+
+    it("validates user_id property", () => {
+      assertEntityProperty.uuid(CommentEntity, "user_id");
+      assertEntityProperty.required(CommentEntity, "user_id");
+    });
+
+    it("validates foreign_key property", () => {
+      assertEntityProperty.uuid(CommentEntity, "foreign_key");
+      assertEntityProperty.required(CommentEntity, "foreign_key");
+    });
+
+    it("validates foreign_model property", () => {
+      const expectedValues = [
+        "Resource",
+      ];
+      const unexpectedValues = ["1", "false", "test"];
+      assertEntityProperty.enumeration(CommentEntity, "foreign_model", expectedValues, unexpectedValues);
+      assertEntityProperty.required(CommentEntity, "foreign_model");
+    });
+
+    it("validates parent_id property", () => {
+      const successScenarios = [
+        assertEntityProperty.SCENARIO_UUID,
+        assertEntityProperty.SCENARIO_NULL,
+      ];
+      const failingScenarios = [
+        assertEntityProperty.SCENARIO_STRING,
+      ];
+      assertEntityProperty.assert(CommentEntity, "parent_id", successScenarios, failingScenarios, "type");
+      assertEntityProperty.nullable(CommentEntity, "parent_id");
+      assertEntityProperty.notRequired(CommentEntity, "parent_id");
+    });
+
+    it("validates content property", () => {
+      assertEntityProperty.string(CommentEntity, "content");
+      assertEntityProperty.minLength(CommentEntity, "content", 1);
+      assertEntityProperty.maxLength(CommentEntity, "content", 255);
+      assertEntityProperty.required(CommentEntity, "content");
+    });
+
+    it("validates created property", () => {
+      assertEntityProperty.string(CommentEntity, "created");
+      assertEntityProperty.dateTime(CommentEntity, "created");
+      assertEntityProperty.notRequired(CommentEntity, "created");
+    });
+
+    it("validates modified property", () => {
+      assertEntityProperty.string(CommentEntity, "modified");
+      assertEntityProperty.dateTime(CommentEntity, "modified");
+      assertEntityProperty.notRequired(CommentEntity, "modified");
+    });
+
+    it("validates created_by property", () => {
+      assertEntityProperty.uuid(CommentEntity, "created_by");
+      assertEntityProperty.notRequired(CommentEntity, "created_by");
+    });
+
+    it("validates modified_by property", () => {
+      assertEntityProperty.uuid(CommentEntity, "modified_by");
+      assertEntityProperty.notRequired(CommentEntity, "modified_by");
+    });
   });
 
   it("constructor works if valid minimal DTO is provided", () => {
@@ -79,46 +147,6 @@ describe("Comment entity", () => {
     expect(entity.created).toBe(filtered.created);
     expect(entity.modifiedBy).toBe(filtered.modified_by);
     expect(entity.createdBy).toBe(filtered.created_by);
-  });
-
-  it("constructor returns validation error if dto required fields are missing", () => {
-    const required = ["user_id", "foreign_key", "foreign_model", "content"];
-    for (const i in required) {
-      const sut = Object.assign(minimalDto);
-      if (Object.prototype.hasOwnProperty.call(required, i) && Object.prototype.hasOwnProperty.call(sut, required[i])) {
-        const field = required[i];
-        delete sut[field];
-        const t = () => {
-          new CommentEntity(sut);
-        };
-        expect(t).toThrow(EntityValidationError);
-      } else {
-        expect(false).toBe(true);
-      }
-    }
-  });
-
-  it("constructor returns validation error if dto uuids are invalid", () => {
-    const uuids = ["id", "user_id", "foreign_key", "parent_id", "created_by", "modified_by"];
-    const dto = {
-      // required
-      "id": "b58de6d3-f52c-5080-b79b-a601a647ac85",
-      "user_id": "a58de6d3-f52c-5080-b79b-a601a647ac85",
-      "foreign_key": "7f077753-0835-4054-92ee-556660ea04f1",
-      "parent_id": "c58de6d3-f52c-5080-b79b-a601a647ac85",
-      "created_by": "a58de6d3-f52c-5080-b79b-a601a647ac85",
-      "modified_by": "a58de6d3-f52c-5080-b79b-a601a647ac85"
-    };
-    for (const i in uuids) {
-      const sut = Object.assign(dto);
-      if (Object.prototype.hasOwnProperty.call(uuids, i) && Object.prototype.hasOwnProperty.call(sut, uuids[i])) {
-        sut[uuids[i]] = 'not a uuid';
-        const t = () => { new CommentEntity(sut); };
-        expect(t).toThrow(EntityValidationError);
-      } else {
-        expect(false).toBe(true);
-      }
-    }
   });
 
   it('serialization should work with associated user model for creator / modifier', () => {

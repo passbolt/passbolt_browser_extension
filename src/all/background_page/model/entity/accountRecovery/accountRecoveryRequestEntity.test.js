@@ -42,7 +42,7 @@ describe("AccountRecoveryRequest entity", () => {
     it("validates fingerprint property", () => {
       const successScenarios = [
         {scenario: "with a valid fingerprint string", value: "ABCD".repeat(10)},
-        {scenario: "with a null value", value: null},
+        assertEntityProperty.SCENARIO_NULL,
       ];
       const failingScenarios = [
         assertEntityProperty.SCENARIO_STRING,

@@ -16,6 +16,7 @@ import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/
 import {defaultUserDto} from "passbolt-styleguide/src/shared/models/entity/user/userEntity.test.data";
 import UserEntity from "./userEntity";
 import {defaultGroupUser} from "passbolt-styleguide/src/shared/models/entity/groupUser/groupUserEntity.test.data.js";
+import {defaultUsersDtos} from "passbolt-styleguide/src/shared/models/entity/user/usersCollection.test.data";
 
 describe("UsersCollection", () => {
   it("schema must validate", () => {
@@ -186,6 +187,26 @@ describe("UsersCollection", () => {
       expect(collection.items[1]._groups_users).toHaveLength(0);
       expect(collection.items[2].id).toEqual(dto3.id);
       expect(collection.items[2]._groups_users).toHaveLength(1);
+    });
+  });
+
+  describe("UsersCollection:pushMany", () => {
+    it("[performance] should ensure performance adding large dataset remains effective.", async() => {
+      const usersCount = 10_000;
+      const groupsUsersPerGroupCount = 5;
+      const dtos = defaultUsersDtos(usersCount, {
+        withRole: true,
+        withGpgkey: true,
+        withAccountRecoveryUserSetting: true,
+        withPendingAccountRecoveryUserRequest: true,
+        withGroupsUsers: groupsUsersPerGroupCount,
+      });
+
+      const start = performance.now();
+      const collection = new UsersCollection(dtos, {ignoreInvalidEntity: true});
+      const time = performance.now() - start;
+      expect(collection).toHaveLength(usersCount);
+      expect(time).toBeLessThan(5_000);
     });
   });
 

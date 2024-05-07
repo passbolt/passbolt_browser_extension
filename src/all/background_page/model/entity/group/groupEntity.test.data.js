@@ -29,6 +29,7 @@ export const minimumGroupUserDto = (data = {}) => ({
  * @param {Object} [options.withModifier=false] Add modifier default dto.
  * @param {Object} [options.withCreator=false] Add creator default dto.
  * @param {Object} [options.withMyGroupUser=false] Add my group user default dto.
+ * @param {Object} [options.withGroupsUsers=0] Add groups users default dto.
  * @returns {object}
  */
 export const defaultGroupDto = (data = {}, options = {}) => {
@@ -56,6 +57,14 @@ export const defaultGroupDto = (data = {}, options = {}) => {
 
   if (!data.modifier && options?.withModifier) {
     defaultData.modifier = defaultUserDto();
+  }
+
+  if (!data.groupsUsers && options?.withGroupsUsers) {
+    defaultData.groups_users = [];
+    for (let i = 0; i < options?.withGroupsUsers; i++) {
+      const groupUserDto = defaultGroupUser({user_id: uuidv4(), group_id: groupId, is_admin: true});
+      defaultData.groups_users.push(groupUserDto);
+    }
   }
 
   return defaultData;

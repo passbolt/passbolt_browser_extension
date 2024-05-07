@@ -66,12 +66,40 @@ class GroupsCollection extends EntityV2Collection {
 
   /**
    * @inheritDoc
+   * @param {Set} [options.uniqueIdsSetCache] A set of unique ids.
+   * @param {Set} [options.uniqueNamesSetCache] A set of unique names.
    * @throws {EntityValidationError} If a group already exists with the same id.
    * @throws {EntityValidationError} If a group already exists with the same name.
    */
-  validateBuildRules(item) {
-    this.assertNotExist("id", item._props.id);
-    this.assertNotExist("name", item._props.name);
+  validateBuildRules(item, options) {
+    this.assertNotExist("id", item._props.id, {haystackSet: options?.uniqueIdsSetCache});
+    this.assertNotExist("name", item._props.name, {haystackSet: options?.uniqueNamesSetCache});
+  }
+
+  /*
+   * ==================================================
+   * Setters
+   * ==================================================
+   */
+  /**
+   * @inheritDoc
+   * This method creates caches of unique ids and names to improve the build rules performance.
+   */
+  pushMany(data, entityOptions = {}, options = {}) {
+    const uniqueIdsSetCache = new Set(this.extract("id"));
+    const uniqueNamesSetCache = new Set(this.extract("name"));
+    const onItemPushed = item => {
+      uniqueIdsSetCache.add(item.id);
+      uniqueNamesSetCache.add(item.name);
+    };
+
+    options = {
+      onItemPushed: onItemPushed,
+      validateBuildRules: {...options?.validateBuildRules, uniqueIdsSetCache, uniqueNamesSetCache},
+      ...options
+    };
+
+    super.pushMany(data, entityOptions, options);
   }
 
   /*

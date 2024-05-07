@@ -14,7 +14,6 @@
 
 import each from "jest-each";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
-import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 import AccountRecoveryOrganizationPublicKeyEntity from "./accountRecoveryOrganizationPublicKeyEntity";
 import {
   alternativeAccountRecoveryOrganizationPublicKeyDto,

@@ -24,10 +24,65 @@ import {
   defaultAccountRecoveryOrganizationPublicKeyDto,
   revokedAccountRecoveryOrganizationPublicKeyDto
 } from "./accountRecoveryOrganizationPublicKeyEntity.test.data";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("AccountRecoveryOrganizationPublicKey entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(AccountRecoveryOrganizationPublicKeyEntity.ENTITY_NAME, AccountRecoveryOrganizationPublicKeyEntity.getSchema());
+  describe("AccountRecoveryOrganizationPublicKeyEntity::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(AccountRecoveryOrganizationPublicKeyEntity.ENTITY_NAME, AccountRecoveryOrganizationPublicKeyEntity.getSchema());
+    });
+
+    it("validates id property", () => {
+      assertEntityProperty.uuid(AccountRecoveryOrganizationPublicKeyEntity, "id");
+      assertEntityProperty.notRequired(AccountRecoveryOrganizationPublicKeyEntity, "id");
+    });
+
+    it("validates armored_key property", () => {
+      assertEntityProperty.string(AccountRecoveryOrganizationPublicKeyEntity, "armored_key");
+      assertEntityProperty.required(AccountRecoveryOrganizationPublicKeyEntity, "armored_key");
+      assertEntityProperty.notNullable(AccountRecoveryOrganizationPublicKeyEntity, "armored_key");
+    });
+
+    it("validates fingerprint property", () => {
+      const successScenarios = [
+        {scenario: "with a valid fingerprint string", value: "ABCD".repeat(10)},
+        {scenario: "with a null value", value: null},
+      ];
+      const failingScenarios = [
+        assertEntityProperty.SCENARIO_STRING,
+      ];
+      assertEntityProperty.assert(AccountRecoveryOrganizationPublicKeyEntity, "fingerprint", successScenarios, failingScenarios, "type");
+      assertEntityProperty.nullable(AccountRecoveryOrganizationPublicKeyEntity, "fingerprint");
+      assertEntityProperty.notRequired(AccountRecoveryOrganizationPublicKeyEntity, "fingerprint");
+    });
+
+    it("validates created property", () => {
+      assertEntityProperty.string(AccountRecoveryOrganizationPublicKeyEntity, "created");
+      assertEntityProperty.dateTime(AccountRecoveryOrganizationPublicKeyEntity, "created");
+      assertEntityProperty.notRequired(AccountRecoveryOrganizationPublicKeyEntity, "created");
+    });
+
+    it("validates modified property", () => {
+      assertEntityProperty.string(AccountRecoveryOrganizationPublicKeyEntity, "modified");
+      assertEntityProperty.dateTime(AccountRecoveryOrganizationPublicKeyEntity, "modified");
+      assertEntityProperty.notRequired(AccountRecoveryOrganizationPublicKeyEntity, "modified");
+    });
+
+    it("validates created_by property", () => {
+      assertEntityProperty.uuid(AccountRecoveryOrganizationPublicKeyEntity, "created_by");
+      assertEntityProperty.notRequired(AccountRecoveryOrganizationPublicKeyEntity, "created_by");
+    });
+
+    it("validates modified_by property", () => {
+      assertEntityProperty.uuid(AccountRecoveryOrganizationPublicKeyEntity, "modified_by");
+      assertEntityProperty.notRequired(AccountRecoveryOrganizationPublicKeyEntity, "modified_by");
+    });
+
+    it("validates deleted property", () => {
+      assertEntityProperty.string(AccountRecoveryOrganizationPublicKeyEntity, "deleted");
+      assertEntityProperty.dateTime(AccountRecoveryOrganizationPublicKeyEntity, "deleted");
+      assertEntityProperty.notRequired(AccountRecoveryOrganizationPublicKeyEntity, "deleted");
+    });
   });
 
   each([
@@ -42,76 +97,6 @@ describe("AccountRecoveryOrganizationPublicKey entity", () => {
       const entity = new AccountRecoveryOrganizationPublicKeyEntity(_props.dto);
       expect(entity.toJSON()).toEqual(_props.dto);
     });
-  });
-
-  it("constructor returns validation error if dto required fields are missing", () => {
-    try {
-      new AccountRecoveryOrganizationPublicKeyEntity({});
-    } catch (error) {
-      expect(error instanceof EntityValidationError).toBe(true);
-      expect(error.details).toEqual({
-        armored_key: {required: 'The armored_key is required.'},
-      });
-    }
-  });
-
-  it("constructor returns validation error if dto fields are invalid", () => {
-    try {
-      new AccountRecoveryOrganizationPublicKeyEntity({'id': 'not-valid-uuid'});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('id', 'format')).toBe(true);
-    }
-    try {
-      new AccountRecoveryOrganizationPublicKeyEntity({'armored_key': 42});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('armored_key', 'type')).toBe(true);
-    }
-    try {
-      new AccountRecoveryOrganizationPublicKeyEntity({'fingerprint': 'not-valid-fingerprint'});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('fingerprint', 'type')).toBe(true);
-    }
-    try {
-      new AccountRecoveryOrganizationPublicKeyEntity({'created': 'not-valid-date'});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('created', 'format')).toBe(true);
-    }
-    try {
-      new AccountRecoveryOrganizationPublicKeyEntity({'modified': 'not-valid-date'});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('modified', 'format')).toBe(true);
-    }
-    try {
-      new AccountRecoveryOrganizationPublicKeyEntity({'created_by': 'not-valid-uuid'});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('created_by', 'format')).toBe(true);
-    }
-    try {
-      new AccountRecoveryOrganizationPublicKeyEntity({'modified_by': 'not-valid-uuid'});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('modified_by', 'format')).toBe(true);
-    }
-    try {
-      new AccountRecoveryOrganizationPublicKeyEntity({'deleted': 'not-valid-date'});
-      expect(false).toBe(true);
-    } catch (error) {
-      expect((error instanceof EntityValidationError)).toBe(true);
-      expect(error.hasError('deleted', 'format')).toBe(true);
-    }
   });
 });
 

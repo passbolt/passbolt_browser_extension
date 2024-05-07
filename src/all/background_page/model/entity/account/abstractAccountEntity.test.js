@@ -81,12 +81,14 @@ describe("AbstractAccountEntity", () => {
       assertEntityProperty.string(StubAbstractAccountEntity, "first_name");
       assertEntityProperty.minLength(StubAbstractAccountEntity, "first_name", 1);
       assertEntityProperty.maxLength(StubAbstractAccountEntity, "first_name", 255);
+      assertEntityProperty.notRequired(StubAbstractAccountEntity, "first_name");
     });
 
     it("validates last_name property", () => {
       assertEntityProperty.string(StubAbstractAccountEntity, "last_name");
       assertEntityProperty.minLength(StubAbstractAccountEntity, "last_name", 1);
       assertEntityProperty.maxLength(StubAbstractAccountEntity, "last_name", 255);
+      assertEntityProperty.notRequired(StubAbstractAccountEntity, "last_name");
     });
 
     it("validates locale property", () => {

@@ -71,7 +71,7 @@ describe("ExternalGpgKey entity", () => {
 
     it("validates expires property", () => {
       const successScenarios = [
-        ...assertEntityProperty.SUCCESS_DATETIME_SCENARIOS,
+        ...assertEntityProperty.SUCCESS_DATETIME_SCENARIO,
         {scenario: "date 'infinity'", value: "Infinity"},
         {scenario: "date 'Never'", value: "Never"},
         assertEntityProperty.SCENARIO_NULL,
@@ -87,7 +87,7 @@ describe("ExternalGpgKey entity", () => {
       assertEntityProperty.assert(ExternalGpgKeyEntity, "created", assertEntityProperty.SUCCESS_STRING_SCENARIOS, [], "type");
 
       //assertEntityProperty.dateTime: without failing tests as the value is enforced in the constructor
-      assertEntityProperty.assert(ExternalGpgKeyEntity, "created", assertEntityProperty.SUCCESS_DATETIME_SCENARIOS, [], "format");
+      assertEntityProperty.assert(ExternalGpgKeyEntity, "created", assertEntityProperty.SUCCESS_DATETIME_SCENARIO, [], "format");
       assertEntityProperty.notRequired(ExternalGpgKeyEntity, "created");
     });
 

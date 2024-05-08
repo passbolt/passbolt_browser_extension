@@ -84,11 +84,11 @@ describe("Resource entity", () => {
 
     it("validates expired property", () => {
       const successScenarios = [
-        ...assertEntityProperty.SUCCESS_DATETIME_SCENARIOS,
+        ...assertEntityProperty.SUCCESS_DATETIME_SCENARIO,
         assertEntityProperty.SCENARIO_NULL,
       ];
       const failingScenarios = [
-        ...assertEntityProperty.FAIL_DATETIME_SCENARIOS,
+        ...assertEntityProperty.FAIL_DATETIME_SCENARIO,
         {scenario: "a string too long", value: "a".repeat(10_000 + 1)}
       ];
 

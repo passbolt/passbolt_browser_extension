@@ -15,6 +15,7 @@ import AbstractAccountEntity from "./abstractAccountEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 import {StubAbstractAccountEntity, defaultAbstractAccountDto} from "./abstractAccountEntity.test.data";
+import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
 
 describe("AbstractAccountEntity", () => {
   describe("AbstractAccountEntity::getSchema", () => {
@@ -104,7 +105,7 @@ describe("AbstractAccountEntity", () => {
         {scenario: "a valid security token", value: securityTokenGenerator()},
       ];
 
-      const failingScenarios = [
+      const failScenarios = [
         assertEntityProperty.SCENARIO_STRING,
         assertEntityProperty.SCENARIO_INTEGER,
         assertEntityProperty.SCENARIO_OBJECT,
@@ -113,7 +114,14 @@ describe("AbstractAccountEntity", () => {
         {scenario: "an invalid security token code", value: securityTokenGenerator({code: ";;;", color: "redish", textcolor: "greenish"})},
       ];
 
-      assertEntityProperty.association(StubAbstractAccountEntity, "security_token", successScenario, failingScenarios);
+      successScenario.forEach(test => {
+        const dto = {security_token: test.value};
+        expect(() => new StubAbstractAccountEntity(dto)).not.toThrow();
+      });
+      failScenarios.forEach(test => {
+        const dto = {security_token: test.value};
+        expect(() => new StubAbstractAccountEntity(dto)).toThrow(EntityValidationError);
+      });
     });
   });
 

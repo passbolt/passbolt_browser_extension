@@ -63,10 +63,10 @@ describe("Gpgkey entity", () => {
 
     it("validates bits property", () => {
       const successScenarios = [
-        ...assertEntityProperty.SUCCESS_INTEGER_SCENARIOS,
+        ...assertEntityProperty.SUCCESS_INTEGER_SCENARIO,
         assertEntityProperty.SCENARIO_NULL,
       ];
-      const failingScenarios = assertEntityProperty.FAIL_INTEGER_SCENARIOS;
+      const failingScenarios = assertEntityProperty.FAIL_INTEGER_SCENARIO;
 
       assertEntityProperty.assert(GpgkeyEntity, "bits", successScenarios, failingScenarios, "type");
       assertEntityProperty.notRequired(GpgkeyEntity, "bits");
@@ -87,10 +87,10 @@ describe("Gpgkey entity", () => {
 
     it("validates expires property", () => {
       const successScenarios = [
-        ...assertEntityProperty.SUCCESS_DATETIME_SCENARIOS,
+        ...assertEntityProperty.SUCCESS_DATETIME_SCENARIO,
         assertEntityProperty.SCENARIO_NULL,
       ];
-      const failingScenarios = assertEntityProperty.FAIL_DATETIME_SCENARIOS;
+      const failingScenarios = assertEntityProperty.FAIL_DATETIME_SCENARIO;
 
       assertEntityProperty.assert(GpgkeyEntity, "expires", successScenarios, failingScenarios, "type");
       assertEntityProperty.notRequired(GpgkeyEntity, "expires");

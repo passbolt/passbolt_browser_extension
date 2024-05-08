@@ -30,10 +30,10 @@ describe("PasswordExpiryResource entity", () => {
 
     it("validates expires property", () => {
       const successScenarios = [
-        ...assertEntityProperty.SUCCESS_DATETIME_SCENARIOS,
+        ...assertEntityProperty.SUCCESS_DATETIME_SCENARIO,
         assertEntityProperty.SCENARIO_NULL,
       ];
-      const failingScenarios = assertEntityProperty.FAIL_DATETIME_SCENARIOS;
+      const failingScenarios = assertEntityProperty.FAIL_DATETIME_SCENARIO;
 
       assertEntityProperty.assert(PasswordExpiryResourceEntity, "expired", successScenarios, failingScenarios, "type");
       assertEntityProperty.required(PasswordExpiryResourceEntity, "expired");

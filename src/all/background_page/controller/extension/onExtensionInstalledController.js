@@ -29,6 +29,9 @@ class OnExtensionInstalledController {
    * @returns {Promise<void>}
    */
   static async exec(details) {
+    console.debug(`The install reason is: ${details.reason}`);
+    console.debug(`The previous version is: ${details.previousVersion}`);
+    console.debug(`The shared_module_update id is: ${details.id}`);
     switch (details.reason) {
       case browser.runtime.OnInstalledReason.INSTALL:
         await OnExtensionInstalledController.onInstall();

@@ -14,10 +14,141 @@
 import ResourceEntity from "./resourceEntity";
 import EntitySchema from "passbolt-styleguide/src/shared/models/entity/abstract/entitySchema";
 import EntityValidationError from "passbolt-styleguide/src/shared/models/entity/abstract/entityValidationError";
+import * as assertEntityProperty from "passbolt-styleguide/test/assert/assertEntityProperty";
 
 describe("Resource entity", () => {
-  it("schema must validate", () => {
-    EntitySchema.validateSchema(ResourceEntity.ENTITY_NAME, ResourceEntity.getSchema());
+  describe("UserEntity::getSchema", () => {
+    it("schema must validate", () => {
+      EntitySchema.validateSchema(ResourceEntity.ENTITY_NAME, ResourceEntity.getSchema());
+    });
+
+    it("validates id property", () => {
+      assertEntityProperty.string(ResourceEntity, "id");
+      assertEntityProperty.uuid(ResourceEntity, "id");
+      assertEntityProperty.notRequired(ResourceEntity, "id");
+    });
+
+    it("validates name property", () => {
+      assertEntityProperty.string(ResourceEntity, "name");
+      assertEntityProperty.maxLength(ResourceEntity, "name", 255);
+      assertEntityProperty.required(ResourceEntity, "name");
+    });
+
+    it("validates username property", () => {
+      const successScenarios = [
+        ...assertEntityProperty.SUCCESS_STRING_SCENARIOS,
+        assertEntityProperty.SCENARIO_NULL,
+      ];
+      const failingScenarios = [
+        ...assertEntityProperty.FAIL_STRING_SCENARIOS,
+        {scenario: "a string too long", value: "a".repeat(255 + 1)}
+      ];
+
+      assertEntityProperty.string(ResourceEntity, "username");
+      assertEntityProperty.assert(ResourceEntity, "username", successScenarios, failingScenarios, "type");
+      assertEntityProperty.nullable(ResourceEntity, "username");
+      assertEntityProperty.notRequired(ResourceEntity, "username");
+    });
+
+    it("validates uri property", () => {
+      const successScenarios = [
+        ...assertEntityProperty.SUCCESS_STRING_SCENARIOS,
+        assertEntityProperty.SCENARIO_NULL,
+      ];
+      const failingScenarios = [
+        ...assertEntityProperty.FAIL_STRING_SCENARIOS,
+        {scenario: "a string too long", value: "a".repeat(1024 + 1)}
+      ];
+
+      assertEntityProperty.string(ResourceEntity, "uri");
+      assertEntityProperty.assert(ResourceEntity, "uri", successScenarios, failingScenarios, "type");
+      assertEntityProperty.nullable(ResourceEntity, "uri");
+      assertEntityProperty.notRequired(ResourceEntity, "uri");
+    });
+
+    it("validates description property", () => {
+      const successScenarios = [
+        ...assertEntityProperty.SUCCESS_STRING_SCENARIOS,
+        assertEntityProperty.SCENARIO_NULL,
+      ];
+      const failingScenarios = [
+        ...assertEntityProperty.FAIL_STRING_SCENARIOS,
+        {scenario: "a string too long", value: "a".repeat(10_000 + 1)}
+      ];
+
+      assertEntityProperty.string(ResourceEntity, "description");
+      assertEntityProperty.assert(ResourceEntity, "description", successScenarios, failingScenarios, "type");
+      assertEntityProperty.nullable(ResourceEntity, "description");
+      assertEntityProperty.notRequired(ResourceEntity, "description");
+    });
+
+    it("validates expired property", () => {
+      const successScenarios = [
+        ...assertEntityProperty.SUCCESS_DATETIME_SCENARIOS,
+        assertEntityProperty.SCENARIO_NULL,
+      ];
+      const failingScenarios = [
+        ...assertEntityProperty.FAIL_DATETIME_SCENARIOS,
+        {scenario: "a string too long", value: "a".repeat(10_000 + 1)}
+      ];
+
+      assertEntityProperty.assert(ResourceEntity, "expired", successScenarios, failingScenarios, "type");
+      assertEntityProperty.nullable(ResourceEntity, "expired");
+      assertEntityProperty.notRequired(ResourceEntity, "expired");
+    });
+
+    it("validates deleted property", () => {
+      assertEntityProperty.boolean(ResourceEntity, "deleted");
+      assertEntityProperty.notRequired(ResourceEntity, "deleted");
+    });
+
+    it("validates created property", () => {
+      assertEntityProperty.string(ResourceEntity, "created");
+      assertEntityProperty.dateTime(ResourceEntity, "created");
+      assertEntityProperty.notRequired(ResourceEntity, "created");
+    });
+
+    it("validates modified property", () => {
+      assertEntityProperty.string(ResourceEntity, "modified");
+      assertEntityProperty.dateTime(ResourceEntity, "modified");
+      assertEntityProperty.notRequired(ResourceEntity, "modified");
+    });
+
+    it("validates created_by property", () => {
+      assertEntityProperty.uuid(ResourceEntity, "created_by");
+      assertEntityProperty.notRequired(ResourceEntity, "created_by");
+    });
+
+    it("validates modified_by property", () => {
+      assertEntityProperty.uuid(ResourceEntity, "modified_by");
+      assertEntityProperty.notRequired(ResourceEntity, "modified_by");
+    });
+
+    it("validates folder_parent_id property", () => {
+      const successScenarios = [
+        assertEntityProperty.SCENARIO_UUID,
+        assertEntityProperty.SCENARIO_NULL,
+      ];
+      const failingScenarios = [
+        ...assertEntityProperty.FAIL_STRING_SCENARIOS,
+        {scenario: "a string too long", value: "a".repeat(10_000 + 1)}
+      ];
+
+      assertEntityProperty.assert(ResourceEntity, "folder_parent_id", successScenarios, failingScenarios, "type");
+      assertEntityProperty.nullable(ResourceEntity, "folder_parent_id");
+      assertEntityProperty.notRequired(ResourceEntity, "folder_parent_id");
+    });
+
+    it("validates resource_type_id property", () => {
+      assertEntityProperty.string(ResourceEntity, "resource_type_id");
+      assertEntityProperty.uuid(ResourceEntity, "resource_type_id");
+      assertEntityProperty.notRequired(ResourceEntity, "resource_type_id");
+    });
+
+    it("validates personal property", () => {
+      assertEntityProperty.boolean(ResourceEntity, "personal");
+      assertEntityProperty.notRequired(ResourceEntity, "personal");
+    });
   });
 
   it("constructor works if valid DTO is provided", () => {

@@ -98,7 +98,7 @@ describe("GroupsCollection", () => {
      * @todo Associated entities validation error details to review when collection will aggregate them.
      * @see EntityV2Collection.pushMany
      */
-    it("should throw if one of data item does not validate the collection associated entity schema", () => {
+    it("should throw if one of item has an associated item that does not validate the collection associated entity schema", () => {
       const dto1 = defaultGroupDto();
       const dto2 = defaultGroupDto({
         name: "group 2",
